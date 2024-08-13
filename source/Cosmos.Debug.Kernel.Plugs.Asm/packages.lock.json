@@ -11,25 +11,27 @@
           "Microsoft.NETCore.Platforms": "1.1.0"
         }
       },
+      "XSharp": {
+        "type": "Direct",
+        "requested": "[0.1.0-build*, )",
+        "resolved": "0.1.0-build856",
+        "contentHash": "KlNxe8hv/5vFrWI8/RQPh22AMk1spGi27x5YDxTFM/nViH6uKvJvSmNO09Qq+Ellii4CjBNFOv3DCx1LAOwE4A==",
+        "dependencies": {
+          "Spruce": "0.1.0-build856"
+        }
+      },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
         "resolved": "1.1.0",
         "contentHash": "kz0PEW2lhqygehI/d6XsPCQzD7ff7gUJaVGPVETX611eadGsA3A877GdSlU0LRVMCTH/+P3o2iDTak+S08V2+A=="
       },
+      "Spruce": {
+        "type": "Transitive",
+        "resolved": "0.1.0-build856",
+        "contentHash": "j8z6yd1cBhcwbvCSQf1CDbH5HlRROMj06VyAF3xINAULME+BTH1cl00LymrHljPTxMpSGCue+W/C2Rop+wJAFw=="
+      },
       "cosmos.debug.kernel": {
         "type": "Project"
-      },
-      "il2cpu.api": {
-        "type": "Project"
-      },
-      "spruce": {
-        "type": "Project"
-      },
-      "xsharp": {
-        "type": "Project",
-        "dependencies": {
-          "Spruce": "[0.1.0-localbuild, )"
-        }
       }
     }
   }

@@ -1,484 +1,354 @@
-﻿using System;
+using Cosmos.Core;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Core
+namespace MACPI.Cosmos.HAL.PCIE
 {
-    /// <summary>
-    /// ACPI (Advanced Configuration and Power Interface) class.
-    /// </summary>
     public unsafe class ACPI
     {
-        /// <summary>
-        /// RSD table struct.
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct RSDPtr
-        {
-            /// <summary>
-            /// Signature.
-            /// </summary>
-            public fixed byte Signature[8];
-            /// <summary>
-            /// CheckSum
-            /// </summary>
-            public byte CheckSum;
-            /// <summary>
-            /// OemID
-            /// </summary>
-            public fixed byte OemID[6];
-            /// <summary>
-            /// Revision
-            /// </summary>
-            public byte Revision;
-            /// <summary>
-            /// RSDT Address
-            /// </summary>
-            public int RsdtAddress;
-        };
-
-        // New Port I/O
-        /// <summary>
-        /// IO port.
-        /// </summary>
-        private static ushort smiIO, pm1aIO, pm1bIO;
-
-        // ACPI variables
-        /// <summary>
-        /// SMI CMD.
-        /// </summary>
-        private static int* SMI_CMD;
-        /// <summary>
-        /// ACPI ENABLE.
-        /// </summary>
-        private static byte ACPI_ENABLE;
-        /// <summary>
-        /// ACPI DISABLE.
-        /// </summary>
-        private static byte ACPI_DISABLE;
-        /// <summary>
-        /// PM1a CNT
-        /// </summary>
-        private static int* PM1a_CNT;
-        /// <summary>
-        /// PM1b CNT
-        /// </summary>
-        private static int* PM1b_CNT;
-        /// <summary>
-        /// SLP TYPa
-        /// </summary>
         private static short SLP_TYPa;
-        /// <summary>
-        /// SLP TYPb
-        /// </summary>
         private static short SLP_TYPb;
-        /// <summary>
-        /// SLP EN.
-        /// </summary>
         private static short SLP_EN;
-        /// <summary>
-        /// PM1 CNT LEN1
-        /// </summary>
-        private static byte PM1_CNT_LEN;
 
-        /// <summary>
-        /// Check ACPI header.
-        /// </summary>
-        /// <param name="ptr"></param>
-        /// <param name="sig"></param>
-        /// <returns></returns>
-        static int acpiCheckHeader(byte* ptr, string sig)
-        {
-            return Compare(sig, ptr);
-        }
+        public static ACPI_FADT* FADT;
+        public static ACPI_MADT* MADT;
+        public static APIC_IO_APIC* IO_APIC;
+        public static ACPI_HPET* HPET;
+        public static MCFGHeader* MCFG;
 
-        /// <summary>
-        /// FACP.
-        /// </summary>
-        private static byte* Facp = null;
-        /// <summary>
-        /// FACP struct.
-        /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        struct FACP
+        private struct ACPI_RSDP
         {
-            /// <summary>
-            /// Signature.
-            /// </summary>
-            public fixed byte Signature[4];
-            /// <summary>
-            /// Length.
-            /// </summary>
-            public int Length;
-
-            /// <summary>
-            /// Unused.
-            /// </summary>
-            public fixed byte unneded1[40 - 8];
-            /// <summary>
-            /// DSDT.
-            /// </summary>
-            public int* DSDT;
-            /// <summary>
-            /// Unused.
-            /// </summary>
-            public fixed byte unneded2[48 - 44];
-            /// <summary>
-            /// SMI CMD.
-            /// </summary>
-            public int* SMI_CMD;
-            /// <summary>
-            /// ACPI ENABLE.
-            /// </summary>
-            public byte ACPI_ENABLE;
-            /// <summary>
-            /// ACPI DISABLE.
-            /// </summary>
-            public byte ACPI_DISABLE;
-            /// <summary>
-            /// Unused.
-            /// </summary>
-            public fixed byte unneded3[64 - 54];
-            /// <summary>
-            /// PM1a CNT BLK.
-            /// </summary>
-            public int* PM1a_CNT_BLK;
-            /// <summary>
-            /// PM1b CNT BLK.
-            /// </summary>
-            public int* PM1b_CNT_BLK;
-            /// <summary>
-            /// Unused.
-            /// </summary>
-            public fixed byte unneded4[89 - 72];
-            /// <summary>
-            /// PM1 CNT LEN.
-            /// </summary>
-            public byte PM1_CNT_LEN;
+            public fixed sbyte Signature[8];
+            public byte Checksum;
+            public fixed sbyte OEMID[6];
+            public byte Revision;
+            public uint RsdtAddress;
         };
 
-        /// <summary>
-        /// Compare string to byte array.
-        /// </summary>
-        /// <param name="c1">String.</param>
-        /// <param name="c2">Pointer to the head of the byte array.</param>
-        /// <returns>0 - identical, -1 different.</returns>
-        static int Compare(string c1, byte* c2)
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct ACPI_HEADER
         {
-            for (int i = 0; i < c1.Length; i++)
-            {
-                if (c1[i] != c2[i]) { return -1; }
-            }
-            return 0;
+            public fixed sbyte Signature[4];
+            public uint Length;
+            public byte Revision;
+            public byte Checksum;
+            public fixed byte OEMID[6];
+            public fixed sbyte OEMTableID[8];
+            public uint OEMRevision;
+            public uint CreatorID;
+            public uint CreatorRevision;
+        };
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct APIC_HEADER
+        {
+            public APIC_TYPE Type;
+            public byte Length;
         }
 
-        /// <summary>
-        /// Check RSD checksum.
-        /// </summary>
-        /// <param name="address">Address to check.</param>
-        /// <returns>True if RSDT table checksum is good.</returns>
-        static bool Check_RSD(uint address)
+        public enum APIC_TYPE : byte
         {
-            byte sum = 0;
-            byte* check = (byte*)address;
-
-            for (int i = 0; i < 20; i++)
-            {
-                sum += *check++;
-            }
-
-            return sum == 0;
+            LocalAPIC,
+            IOAPIC,
+            InterruptOverride
         }
 
-        /// <summary>
-        /// Start the ACPI.
-        /// </summary>
-        /// <param name="initialize">Initialize the ACPI. (default = true)</param>
-        /// <param name="enable">Enable the ACPI. (default = true)</param>
-        public static void Start(bool initialize = true, bool enable = true)
+        [StructLayout(LayoutKind.Sequential,Pack = 1)]
+        public struct MCFGHeader
         {
-            if (initialize)
-            {
-                Init();
-            }
-
-            if (enable)
-            {
-                Enable();
-            }
+            public ACPI_HEADER Header;
+            public ulong Reserved;
+            public MCFGEntry Entry0;
         }
 
-        /// <summary>
-        /// Shutdown the ACPI.
-        /// </summary>
-        /// <exception cref="System.IO.IOException">Thrown on IO error.</exception>
-        public static void Shutdown()
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct MCFGEntry
         {
-            Console.Clear();
-            if (PM1a_CNT == null)
-            {
-                Init();
-            }
-
-            IOPort.Write16(pm1aIO, (ushort)(SLP_TYPa | SLP_EN));
-
-            if (PM1b_CNT != null)
-            {
-                IOPort.Write16(pm1bIO, (ushort)(SLP_TYPb | SLP_EN));
-            }
-
-            CPU.Halt();
+            public ulong BaseAddress;
+            public ushort Segment;
+            public byte StartBus;
+            public byte EndBus;
+            public uint Reserved;
         }
 
-        /// <summary>
-        /// Reboot ACPI.
-        /// Not implemented.
-        /// </summary>
-        /// <exception cref="NotImplementedException">Thrown always.</exception>
-        public static void Reboot()
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        struct APIC_LOCAL_APIC
         {
-            throw new NotImplementedException("ACPI Reset not implemented yet."); //TODO
+            public APIC_HEADER Header;
+            public byte AcpiProcessorId;
+            public byte ApicId;
+            public uint Flags;
         }
 
-        /// <summary>
-        /// Initialize the ACPI.
-        /// </summary>
-        /// <returns>true on success, false on failure.</returns>
-        private static bool Init()
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct APIC_IO_APIC
         {
-            byte* ptr = (byte*)RSDPAddress();
-            int addr = 0;
+            public APIC_HEADER Header;
+            public byte IOApicId;
+            public byte Reserved;
+            public uint IOApicAddress;
+            public uint GlobalSystemInterruptBase;
+        }
 
-            for (int i = 19; i >= 16; i--)
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        struct APIC_INTERRUPT_OVERRIDE
+        {
+            public APIC_HEADER Header;
+            public byte Bus;
+            public byte Source;
+            public uint Interrupt;
+            public ushort Flags;
+        }
+
+        [StructLayout(LayoutKind.Sequential,Pack = 1)]
+        public struct ACPI_HPET 
+        {
+            public ACPI_HEADER Header;
+            public byte HardwareRevisionID;
+            public byte Attribute;
+            public ushort PCIVendorID;
+            public ACPI_HPET_ADDRESS_STRUCTURE Addresses;
+            public byte HPETNumber;
+            public ushort MinimumTick;
+            public byte PageProtection;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct ACPI_HPET_ADDRESS_STRUCTURE 
+        {
+            public byte AddressSpaceID;
+            public byte RegisterBitWidth;
+            public byte RegisterBitOffset;
+            public byte Reserved;
+            public ulong Address;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct ACPI_FADT
+        {
+            public ACPI_HEADER Header;
+
+            public uint FirmwareCtrl;
+            public uint Dsdt;
+
+            public byte Reserved;
+
+            public byte PreferredPowerManagementProfile;
+            public ushort SCI_Interrupt;
+            public uint SMI_CommandPort;
+            public byte AcpiEnable;
+            public byte AcpiDisable;
+            public byte S4BIOS_REQ;
+            public byte PSTATE_Control;
+            public uint PM1aEventBlock;
+            public uint PM1bEventBlock;
+            public uint PM1aControlBlock;
+            public uint PM1bControlBlock;
+            public uint PM2ControlBlock;
+            public uint PMTimerBlock;
+            public uint GPE0Block;
+            public uint GPE1Block;
+            public byte PM1EventLength;
+            public byte PM1ControlLength;
+            public byte PM2ControlLength;
+            public byte PMTimerLength;
+            public byte GPE0Length;
+            public byte GPE1Length;
+            public byte GPE1Base;
+            public byte CStateControl;
+            public ushort WorstC2Latency;
+            public ushort WorstC3Latency;
+            public ushort FlushSize;
+            public ushort FlushStride;
+            public byte DutyOffset;
+            public byte DutyWidth;
+            public byte DayAlarm;
+            public byte MonthAlarm;
+            public byte Century;
+
+            public ushort BootArchitectureFlags;
+
+            public byte Reserved2;
+            public uint Flags;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct ACPI_MADT
+        {
+            public ACPI_HEADER Header;
+            public uint LocalAPICAddress;
+            public uint Flags;
+        }
+
+        private static unsafe ACPI_RSDP* GetRSDP()
+        {
+            byte* p = (byte*)0xE0000;
+            byte* end = (byte*)0xFFFFF;
+
+            while (p < end)
             {
-                addr += *(ptr + i);
-                addr = i == 16 ? addr : addr << 8;
-            }
+                ulong signature = *(ulong*)p;
 
-            ptr = (byte*)addr;
-            ptr += 4; addr = 0;
-
-            for (int i = 3; i >= 0; i--)
-            {
-                addr += *(ptr + i);
-                addr = i == 0 ? addr : addr << 8;
-            }
-
-            int length = addr;
-            ptr -= 4;
-
-            if (ptr != null && acpiCheckHeader(ptr, "RSDT") == 0)
-            {
-                addr = 0;
-                int entrys = length;
-                entrys = (entrys - 36) / 4;
-                ptr += 36;
-                byte* yeuse;
-
-                while (0 < entrys--)
+                if (signature == 0x2052545020445352) // 'RSD PTR '
                 {
-                    for (int i = 3; i >= 0; i--)
-                    {
-                        addr += *(ptr + i);
-                        addr = i == 0 ? addr : addr << 8;
-                    }
-
-                    yeuse = (byte*)addr;
-                    Facp = yeuse;
-
-                    if (acpiCheckHeader((byte*)facpget(0), "DSDT") == 0)
-                    {
-                        byte* S5Addr = (byte*)facpget(0) + 36;
-                        int dsdtLength = *(facpget(0) + 1) - 36;
-
-                        while (0 < dsdtLength--)
-                        {
-                            if (Compare("_S5_", S5Addr) == 0)
-                            {
-                                break;
-                            }
-                            S5Addr++;
-                        }
-
-                        if (dsdtLength > 0)
-                        {
-                            if ((*(S5Addr - 1) == 0x08 || (*(S5Addr - 2) == 0x08 && *(S5Addr - 1) == '\\')) && *(S5Addr + 4) == 0x12)
-                            {
-                                S5Addr += 5;
-                                S5Addr += ((*S5Addr & 0xC0) >> 6) + 2;
-                                if (*S5Addr == 0x0A)
-                                {
-                                    S5Addr++;
-                                }
-                                SLP_TYPa = (short)(*S5Addr << 10);
-                                S5Addr++;
-                                if (*S5Addr == 0x0A)
-                                {
-                                    S5Addr++;
-                                }
-                                SLP_TYPb = (short)(*S5Addr << 10);
-                                SMI_CMD = facpget(1);
-                                ACPI_ENABLE = facpbget(0);
-                                ACPI_DISABLE = facpbget(1);
-                                PM1a_CNT = facpget(2);
-                                PM1b_CNT = facpget(3);
-                                PM1_CNT_LEN = facpbget(3);
-                                SLP_EN = 1 << 13;
-
-                                smiIO = (ushort)SMI_CMD;
-                                pm1aIO = (ushort)PM1a_CNT;
-                                pm1bIO = (ushort)PM1b_CNT;
-
-                                return true;
-                            }
-                        }
-                    }
-                    ptr += 4;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Enable ACPI.
-        /// </summary>
-        public static void Enable()
-        {
-            smiIO = ACPI_ENABLE;
-        }
-
-        /// <summary>
-        /// Disable ACPI.
-        /// </summary>
-        public static void Disable()
-        {
-            smiIO = ACPI_DISABLE;
-        }
-
-        /// <summary>
-        /// Get the RSDP address.
-        /// </summary>
-        /// <returns>uint value.</returns>
-        private static unsafe uint RSDPAddress()
-        {
-            for (uint addr = 0xE0000; addr < 0x100000; addr += 4)
-            {
-                if (Compare("RSD PTR ", (byte*)addr) == 0)
-                {
-                    if (Check_RSD(addr))
-                    {
-                        return addr;
-                    }
-                }
-            }
-
-            uint ebda_address = *(uint*)0x040E;
-            ebda_address = (ebda_address * 0x10) & 0x000fffff;
-
-            for (uint addr = ebda_address; addr < ebda_address + 1024; addr += 4)
-            {
-                if (Compare("RSD PTR ", (byte*)addr) == 0)
-                {
-                    return addr;
-                }
-            }
-
-            return 0;
-        }
-
-        /// <summary>
-        /// Check RSDT table
-        /// </summary>
-        /// <param name="ptr">A pointer to the RSDT</param>
-        /// <returns>RSDT table address</returns>
-        private static uint* acpiCheckRSDPtr(uint* ptr)
-        {
-            string sig = "RSD PTR ";
-            var rsdp = (RSDPtr*)ptr;
-
-            byte* bptr;
-            byte check = 0;
-            int i;
-
-            if (Compare(sig, (byte*)rsdp) == 0)
-            {
-                bptr = (byte*)ptr;
-
-                for (i = 0; i < 20; i++)
-                {
-                    check += *bptr;
-                    bptr++;
+                    return (ACPI_RSDP*)p;
                 }
 
-                if (check == 0)
-                {
-                    Compare("RSDT", (byte*)rsdp->RsdtAddress);
-
-                    if (rsdp->RsdtAddress != 0)
-                    {
-                        return (uint*)rsdp->RsdtAddress;
-                    }
-                }
+                p += 16;
             }
 
             return null;
         }
 
-        /// <summary>
-        /// Get data from the FACP table.
-        /// </summary>
-        /// <param name="number">Index number of the data to get.
-        /// <list type="bullet">
-        /// <item>0 - ACPI ENABLE</item>
-        /// <item>1 - ACPI DISABLE</item>
-        /// <item>2 - PM1 CNT LEN</item>
-        /// <item>other - 0</item>
-        /// </list>
-        /// </param>
-        /// <returns>byte value.</returns>
-        private static byte facpbget(int number)
+        public static void Shutdown()
         {
-            switch (number)
+            IOPort.Write16((ushort)FADT->PM1aControlBlock, (ushort)(SLP_TYPa | SLP_EN));
+            IOPort.Write16((ushort)FADT->PM1bControlBlock, (ushort)(SLP_TYPb | SLP_EN));
+            CPU.Halt();
+        }
+
+        public static List<byte> LocalAPIC_CPUIDs;
+
+        public static void Initialize()
+        {
+            FADT = null;
+            MADT = null;
+            IO_APIC = null;
+            HPET = null;
+            MCFG = null;
+
+            LocalAPIC_CPUIDs = new List<byte>();
+            ACPI_RSDP* rsdp = GetRSDP();
+            //MMIO.Map(rsdp->RsdtAddress, ushort.MaxValue);
+            ACPI_HEADER* hdr = (ACPI_HEADER*)rsdp->RsdtAddress;
+            ACPI_HEADER* rsdt = (ACPI_HEADER*)rsdp->RsdtAddress;
+
+            if (rsdt != null && *(uint*)rsdt == 0x54445352) //RSDT
             {
-                case 0:
-                    return *(Facp + 52);
-                case 1:
-                    return *(Facp + 53);
-                case 2:
-                    return *(Facp + 89);
-                default:
-                    return 0;
+                uint* p = (uint*)(rsdt + 1);
+                uint* end = (uint*)((byte*)rsdt + rsdt->Length);
+
+                while (p < end)
+                {
+                    uint address = *p++;
+                    ParseDT((ACPI_HEADER*)address);
+                }
+            }
+
+            Console.WriteLine("[ACPI] ACPI Initialized");
+        }
+
+        private static void ParseDT(ACPI_HEADER* hdr)
+        {
+            if (*(uint*)hdr->Signature == 0x50434146)
+            {
+                FADT = (ACPI_FADT*)hdr;
+
+                if (*(uint*)FADT->Dsdt == 0x54445344) //DSDT
+                {
+                    byte* S5Addr = (byte*)FADT->Dsdt + sizeof(ACPI_HEADER);
+                    int dsdtLength = *((int*)FADT->Dsdt + 1) - sizeof(ACPI_HEADER);
+
+                    while (0 < dsdtLength--)
+                    {
+                        if (*(uint*)S5Addr == 0x5f35535f) //_S5_
+                            break;
+                        S5Addr++;
+                    }
+
+                    if (dsdtLength > 0)
+                    {
+                        if ((*(S5Addr - 1) == 0x08 || (*(S5Addr - 2) == 0x08 && *(S5Addr - 1) == '\\')) && *(S5Addr + 4) == 0x12)
+                        {
+                            S5Addr += 5;
+                            S5Addr += ((*S5Addr & 0xC0) >> 6) + 2;
+                            if (*S5Addr == 0x0A)
+                                S5Addr++;
+                            SLP_TYPa = (short)(*(S5Addr) << 10);
+                            S5Addr++;
+                            if (*S5Addr == 0x0A)
+                                S5Addr++;
+                            SLP_TYPb = (short)(*(S5Addr) << 10);
+                            SLP_EN = 1 << 13;
+
+                            return;
+                        }
+                    }
+                }
+            }
+            else if (*(uint*)hdr->Signature == 0x43495041)
+            {
+                MADT = (ACPI_MADT*)hdr;
+
+                byte* p = (byte*)(MADT + 1);
+                byte* end = (byte*)MADT + MADT->Header.Length;
+                while (p < end)
+                {
+                    APIC_HEADER* header = (APIC_HEADER*)p;
+                    APIC_TYPE type = header->Type;
+                    byte length = header->Length;
+
+                    if (type == APIC_TYPE.LocalAPIC)
+                    {
+                        APIC_LOCAL_APIC* pic = (APIC_LOCAL_APIC*)p;
+                        if (((pic->Flags & 1) ^ ((pic->Flags >> 1) & 1)) == 1)
+                        {
+                            LocalAPIC_CPUIDs.Add(pic->ApicId);
+                        }
+                    }
+                    else if (type == APIC_TYPE.IOAPIC)
+                    {
+                        APIC_IO_APIC* ioapic = (APIC_IO_APIC*)p;
+                        if (IO_APIC == null)
+                        {
+                            IO_APIC = ioapic;
+                        }
+                    }
+                    else if (type == APIC_TYPE.InterruptOverride)
+                    {
+                        APIC_INTERRUPT_OVERRIDE* ovr = (APIC_INTERRUPT_OVERRIDE*)p;
+                    }
+
+                    p += length;
+                }
+            }
+            else if (*(uint*)hdr->Signature == 0x54455048) 
+            {
+                HPET = (ACPI_HPET*)hdr;
+            }
+            else if (*(uint*)hdr->Signature == 0x4746434D) 
+            {
+                MCFG = (MCFGHeader*)hdr;
             }
         }
 
-        /// <summary>
-        /// Get pointer to the data on the FACP.
-        /// </summary>
-        /// <param name="number">Index number of the data to get.
-        /// <list type="bullet">
-        /// <item>0 - DSDT</item>
-        /// <item>1 - SMI CMD</item>
-        /// <item>2 - PM1a</item>
-        /// <item>3 - PM1b</item>
-        /// <item>other - null</item>
-        /// </list>
-        /// </param>
-        /// <returns>int pointer.</returns>
-        private static int* facpget(int number)
+        public static uint RemapIRQ(uint irq)
         {
-            switch (number)
+            byte* p = (byte*)(MADT + 1);
+            byte* end = (byte*)MADT + MADT->Header.Length;
+
+            while (p < end)
             {
-                case 0:
-                    return (int*)*(int*)(Facp + 40);
-                case 1:
-                    return (int*)*(int*)(Facp + 48);
-                case 2:
-                    return (int*)*(int*)(Facp + 64);
-                case 3:
-                    return (int*)*(int*)(Facp + 68);
-                default:
-                    return null;
+                APIC_HEADER* header = (APIC_HEADER*)p;
+                APIC_TYPE type = header->Type;
+                byte length = header->Length;
+
+                if (type == APIC_TYPE.InterruptOverride)
+                {
+                    APIC_INTERRUPT_OVERRIDE* ovr = (APIC_INTERRUPT_OVERRIDE*)p;
+
+                    if (ovr->Source == irq)
+                    {
+                        return ovr->Interrupt;
+                    }
+                }
+
+                p += length;
             }
+
+            return irq;
         }
     }
 }
