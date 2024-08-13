@@ -83,7 +83,6 @@ namespace Cosmos.Core.PCIE
 
             var numEntries = (ACPI.MCFG->Header.Length - sizeof(ACPI.MCFGHeader) + sizeof(ACPI.MCFGEntry)) / sizeof(ACPI.MCFGEntry);
             Console.WriteLine(numEntries + " PCIE entries");
-            Console.ReadKey();
             for (int i = 0; i < numEntries; i++)
             {
                 ACPI.MCFGEntry* Entries = &ACPI.MCFG->Entry0;
