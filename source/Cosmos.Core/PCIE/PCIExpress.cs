@@ -102,31 +102,22 @@ namespace Cosmos.HAL.PCIE
         {
             ulong BusAddress = BaseAddress + (ulong)(Bus << 20);
 
-            void faint()
-            {
-                Console.WriteLine("failed to add PCIE device");
-                Console.ReadKey();
-            }
-
             Header* Header0 = (Header*)BusAddress;
-            Console.WriteLine($"PCI Express [H0] {Header0->DeviceID} {Header0->ClassID} {Header0->BIST}");
-            if (Header0->DeviceID == 0 || Header0->DeviceID == 0xFFFF) { faint();return; }
+            if (Header0->DeviceID == 0 || Header0->DeviceID == 0xFFFF)return;
 
             for (byte Slot = 0; Slot < 32; Slot++)
             {
                 ulong DeviceAddress = BusAddress + (ulong)(Slot << 15);
 
                 Header* Header1 = (Header*)DeviceAddress;
-                Console.WriteLine($"PCI Express [H1] {Header1->DeviceID} {Header1->ClassID} {Header1->BIST}");
-                if (Header1->DeviceID == 0 || Header1->DeviceID == 0xFFFF) { faint(); return; }
+                if (Header1->DeviceID == 0 || Header1->DeviceID == 0xFFFF) return;
 
                 for (byte Func = 0; Func < 8; Func++)
                 {
                     ulong FuncAddress = DeviceAddress + (ulong)(Func << 12);
 
                     DeviceHeader* Dev = (DeviceHeader*)FuncAddress;
-                    Console.WriteLine($"PCI Express [DEV] {Dev->Header.DeviceID} {Dev->Header.ClassID} {Dev->Header.BIST}");
-                    if (Dev->Header.DeviceID == 0 || Dev->Header.DeviceID == 0xFFFF) { faint(); return; }
+                    if (Dev->Header.DeviceID == 0 || Dev->Header.DeviceID == 0xFFFF) return;
 
                     PCIDevice device = new PCIDevice();
                     device.Segment = Segment;
@@ -170,7 +161,6 @@ namespace Cosmos.HAL.PCIE
                     Console.WriteLine($"[PCI Express {device.Bus}:{device.Slot}:{device.Function}] {device.VendorID} {device.ClassID}");
 
                     PCI.Devices.Add(device);
-                    Console.WriteLine("PCIE device added");
                 }
             }
         }
