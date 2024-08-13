@@ -1,10 +1,8 @@
-﻿using Cosmos.HAL.PCIE;
-using Cosmos.HAL;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using Cosmos.Core;
 
-namespace Cosmos.HAL.PCIE
+namespace Cosmos.Core.PCIE
 {
     public class PCIDevice
     {
@@ -135,8 +133,6 @@ namespace Cosmos.HAL.PCIE
                 device.IRQ = (byte)(0x20 + ReadRegister8(device.Bus, device.Slot, device.Function, 60));
 
                 device.DeviceID = ReadRegister16(device.Bus, device.Slot, device.Function, 2);
-
-                //Console.WriteLine($"[PCI {device.Bus}:{device.Slot}:{device.Function}] {VendorID.GetName(device.VendorID)} {ClassID.GetName(device.ClassID)}");
 
                 Devices.Add(device);
 

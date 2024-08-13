@@ -1,9 +1,8 @@
-﻿using MACPI.Cosmos.HAL.PCIE;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
-using PCIDevice = Cosmos.HAL.PCIE.PCIDevice;
+using PCIDevice = Cosmos.Core.PCIE.PCIDevice;
 
-namespace Cosmos.HAL.PCIE
+namespace Cosmos.Core.PCIE
 {
     public static unsafe class PCIExpress
     {

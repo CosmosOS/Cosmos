@@ -1,6 +1,5 @@
 using System;
 using Cosmos.Core;
-using MACPI.Cosmos.HAL.PCIE;
 
 namespace Cosmos.HAL
 {

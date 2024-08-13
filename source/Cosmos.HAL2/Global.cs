@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.HAL.Network;
-using MACPI.Cosmos.HAL.PCIE;
 
 namespace Cosmos.HAL
 {
