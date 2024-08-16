@@ -7,7 +7,7 @@ Plugs are used to fill "holes" in .NET libraries and replace them with different
  Win32 API calls. Plugs can also be used to provide an alternate implementation 
  for a method, even if it does not rely on the Windows API.
  
- > **Important: All plugs must go in a seperate project, which is included in your original project using the `PlugReference` attribute in your Kernel's csproj.**
+ > **Important: All plugs must go in a seperate project, which is included in your original project using the `PlugsReference` attribute in your Kernel's csproj.**
 
 ## Types of plugs
 
