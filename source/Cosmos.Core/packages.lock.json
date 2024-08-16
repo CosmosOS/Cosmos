@@ -4,6 +4,9 @@
     "net6.0": {
       "cosmos.debug.kernel": {
         "type": "Project"
+      },
+      "il2cpu.api": {
+        "type": "Project"
       }
     }
   }
