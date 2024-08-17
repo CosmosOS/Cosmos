@@ -87,9 +87,9 @@ namespace Cosmos.Core_Plugs.System.Reflection
         }
 
         public static void _GetMarshalAs(IntPtr pNativeType, int cNativeType, out int unmanagedType,
-            out int safeArraySubType, out string? safeArrayUserDefinedSubType,
-            out int arraySubType, out int sizeParamIndex, out int sizeConst, out string? marshalType,
-            out string? marshalCookie,
+            out int safeArraySubType, out string safeArrayUserDefinedSubType,
+            out int arraySubType, out int sizeParamIndex, out int sizeConst, out string marshalType,
+            out string marshalCookie,
             out int iidParamIndex)
         {
             throw new NotImplementedException();
@@ -126,10 +126,9 @@ namespace Cosmos.Core_Plugs.System.Reflection
             throw new NotImplementedException();
         }
         [PlugMethod(Signature = "System_String__System_Reflection_MetadataImport__GetDefaultValue_System_IntPtr__System_Int32___System_Int64___System_Int32___System_Int32_")]
-        public static unsafe int _GetDefaultValue(IntPtr scope,
+        public static unsafe string _GetDefaultValue(IntPtr scope,
             int mdToken,
             out long value,
-            out char* stringMetadataEncoding,
             out int length,
             out int corElementType)
         {

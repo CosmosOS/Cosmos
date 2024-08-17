@@ -9,9 +9,9 @@ namespace Cosmos.Core_Plugs.System
     public class SignatureImpl
     {
         [PlugMethod(Signature = "System_Void__System_Signature_GetSignature_System_Void#__System_Int32__System_RuntimeFieldHandleInternal__System_IRuntimeMethodInfo__System_RuntimeType_")]
-        public static unsafe void GetSignature(
+        public static unsafe void GetSignature(object aThis, 
             void* pCorSig, int cCorSig,
-            object fieldHandle, object? methodHandle, object? declaringType)
+            object fieldHandle, object methodHandle, object declaringType)
         {
             throw new NotImplementedException();
         }
