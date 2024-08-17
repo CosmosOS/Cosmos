@@ -24,7 +24,7 @@ namespace Cosmos.HAL.BlockDevice
         /// </summary>
         /// <param name="aBlockCount">Number of blocks to alloc.</param>
         /// <returns>byte array.</returns>
-        public byte[] NewBlockArray(uint aBlockCount)
+        public byte[] NewBlockArray(ulong aBlockCount)
         {
             return new byte[aBlockCount * mBlockSize];
         }

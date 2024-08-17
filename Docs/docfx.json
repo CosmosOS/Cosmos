@@ -4,7 +4,43 @@
             "src": [
                 {
                     "files": [
-                        "Build.sln"
+                        "IL2CPU/source/IL2CPU/IL2CPU.csproj",
+                        "IL2CPU/source/IL2CPU.API/IL2CPU.API.csproj",
+                        "IL2CPU/source/Cosmos.IL2CPU/Cosmos.IL2CPU.csproj"
+                    ],
+                    "exclude": [
+                        "**/bin/**",
+                        "**/obj/**"
+                    ],
+                    "src": "../../"
+                }
+            ],
+            "dest": "api/il2cpu"
+        },
+        {
+            "src": [
+                {
+                    "files": [
+                        "XSharp/source/XSharp/XSharp/XSharp.csproj"
+                    ],
+                    "exclude": [
+                        "**/bin/**",
+                        "**/obj/**"
+                    ],
+                    "src": "../../"
+                }
+            ],
+            "dest": "api/xsharp"
+        },
+        {
+            "src": [
+                {
+                    "files": [
+                        "source/Cosmos.Core/Cosmos.Core.csproj",
+                        "source/Cosmos.Core_Asm/Cosmos.Core_Asm.csproj",
+                        "source/Cosmos.HAL2/Cosmos.HAL2.csproj",
+                        "source/Cosmos.System2/Cosmos.System2.csproj",
+                        "source/Cosmos.Debug.Kernel/Cosmos.Debug.Kernel.csproj",
                     ],
                     "exclude": [
                         "**/bin/**",
@@ -13,7 +49,24 @@
                     "src": "../"
                 }
             ],
-            "dest": "obj/api"
+            "dest": "api/cosmos"
+        },
+        {
+            "src": [
+                {
+                    "files": [
+                        "source/Cosmos.Core_Plugs/Cosmos.Core_Plugs.csproj",
+                        "source/Cosmos.HAL2/Cosmos.HAL2.csproj",
+                        "source/Cosmos.System2_Plugs/Cosmos.System2_Plugs.csproj"
+                    ],
+                    "exclude": [
+                        "**/bin/**",
+                        "**/obj/**"
+                    ],
+                    "src": "../"
+                }
+            ],
+            "dest": "api/plugs"
         }
     ],
     "build": {
@@ -22,8 +75,22 @@
                 "files": [
                     "**/*.yml"
                 ],
-                "src": "obj/api",
+                "src": "api",
                 "dest": "api"
+            },
+            {
+                "files": [
+                    "**/*.yml"
+                ],
+                "src": "api/cosmos",
+                "dest": "api/cosmos"
+            },
+            {
+                "files": [
+                    "**/*.yml"
+                ],
+                "src": "api/plugs",
+                "dest": "api/plugs"
             },
             {
                 "files": [

@@ -36,12 +36,12 @@ namespace Cosmos.HAL.BlockDevice
 
             // Start of parition entries
             ulong partEntryStart = BitConverter.ToUInt64(GPTHeader, 72);
-            uint numParitions = BitConverter.ToUInt32(GPTHeader, 80);
-            uint partSize = BitConverter.ToUInt32(GPTHeader, 84);
+            ulong numParitions = BitConverter.ToUInt32(GPTHeader, 80);
+            ulong partSize = BitConverter.ToUInt32(GPTHeader, 84);
 
-            uint paritionsPerSector = 512 / partSize;
+            ulong paritionsPerSector = 512 / partSize;
 
-            for (ulong i = 0; i < numParitions/paritionsPerSector; i++)
+            for (ulong i = 0; i < numParitions / paritionsPerSector; i++)
             {
 
                 byte[] partData = new byte[512];
@@ -49,12 +49,12 @@ namespace Cosmos.HAL.BlockDevice
 
                 for (uint j = 0; j < paritionsPerSector; j++)
                 {
-                    ParseParition(partData, j * partSize);
+                    ParseParition(partData, j * (long)partSize);
                 }
             }
         }
 
-        private void ParseParition(byte[] partData, uint off)
+        private void ParseParition(byte[] partData, long off)
         {
             byte[] guidArray = new byte[16];
 

@@ -19,10 +19,10 @@ namespace Cosmos.HAL.BlockDevice
         public class PartInfo
         {
             public readonly byte SystemID;
-            public readonly uint StartSector;
-            public readonly uint SectorCount;
+            public readonly ulong StartSector;
+            public readonly ulong SectorCount;
 
-            public PartInfo(byte aSystemID, uint aStartSector, uint aSectorCount)
+            public PartInfo(byte aSystemID, ulong aStartSector, ulong aSectorCount)
             {
                 SystemID = aSystemID;
                 StartSector = aStartSector;
@@ -41,7 +41,7 @@ namespace Cosmos.HAL.BlockDevice
             ParsePartition(aMBR, 494);
         }
 
-        protected void ParsePartition(byte[] aMBR, uint aLoc)
+        protected void ParsePartition(byte[] aMBR, ulong aLoc)
         {
             byte xSystemID = aMBR[aLoc + 4];
             // SystemID = 0 means no partition
@@ -56,8 +56,8 @@ namespace Cosmos.HAL.BlockDevice
             }
             else if (xSystemID != 0)
             {
-                uint xStartSector = BitConverter.ToUInt32(aMBR, (int)aLoc + 8);
-                uint xSectorCount = BitConverter.ToUInt32(aMBR, (int)aLoc + 12);
+                ulong xStartSector = BitConverter.ToUInt32(aMBR, (int)aLoc + 8);
+                ulong xSectorCount = BitConverter.ToUInt32(aMBR, (int)aLoc + 12);
 
                 var xPartInfo = new PartInfo(xSystemID, xStartSector, xSectorCount);
                 Partitions.Add(xPartInfo);
@@ -128,11 +128,11 @@ namespace Cosmos.HAL.BlockDevice
             partition.Host.ReadBlock(0, 1, ref mb.memory);
             //TO DO: Implement the CHS starting / ending sector adresses and partition type
             mb.Write8((uint)(446 + (PartitionNo * 16) + 4), 0x0B);
-            mb.Write32((uint)(446 + (PartitionNo * 16) + 8), (uint) partition.StartingSector);
-            mb.Write32((uint)(446 + (PartitionNo * 16) + 12), (uint) partition.BlockCount);
+            mb.Write32((uint)(446 + (PartitionNo * 16) + 8), (uint)partition.StartingSector);
+            mb.Write32((uint)(446 + (PartitionNo * 16) + 12), (uint)partition.BlockCount);
             partition.Host.WriteBlock(0, 1, ref mb.memory);
             ParsePartition(mb.memory, 446 + (uint)(PartitionNo * 16));
-            
+
         }
     }
 }
