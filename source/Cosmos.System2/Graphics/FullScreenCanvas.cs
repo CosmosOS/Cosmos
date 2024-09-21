@@ -35,7 +35,7 @@ namespace Cosmos.System.Graphics
             VGADriver
         }
 
-        static Canvas videoDriver = null;
+        public static Canvas videoDriver = null;
         static readonly PCIDevice svgaIIDevice = PCI.GetDevice(VendorID.VMWare, DeviceID.SVGAIIAdapter);
 
         /// <summary>
