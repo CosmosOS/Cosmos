@@ -66,7 +66,7 @@ namespace Cosmos.System.Tests
 
             const string root = @"0:\";
             long initialSize = VFSManager.GetTotalSize(root);
-            ourDisk.FormatPartition(0, FileSystemType.FAT32, true);
+            ourDisk.FormatPartition(0, "FAT32", true);
             Assert.AreEqual(initialSize, VFSManager.GetAvailableFreeSpace(root));
             Assert.AreEqual(0, VFSManager.GetDirectoryListing(root).Count);
             VFSManager.CreateFile(root + "test.txt");

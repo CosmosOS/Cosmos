@@ -62,7 +62,7 @@ namespace Cosmos.System.Tests
 
             Assert.IsTrue(ourPart.RootPath == driveName, "ManagedPartition.RootPath failed drive has wrong name");
 
-            ourDisk.FormatPartition(0, FileSystemType.FAT32, true);
+            ourDisk.FormatPartition(0, "FAT32", true);
 
             var xDi = new DriveInfo(driveName);
 

@@ -55,7 +55,7 @@ namespace Cosmos.Kernel.Tests.DiskManager
 
             ourDisk.Mount();
 
-            ourDisk.FormatPartition(0, FileSystemType.FAT32, true);
+            ourDisk.FormatPartition(0, "FAT32", true);
 
             mDebugger.Send("Format done testing HDD is really empty");
 
