@@ -276,7 +276,7 @@ namespace Cosmos.System.FileSystem
             var part = Partitions[index];
 
             var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
-            if(FilesystemLetter == "" || FilesystemLetter == string.Empty)
+            if (string.IsNullOrEmpty(FilesystemLetter))
             {
                 FilesystemLetter = VFSManager.GetNextFilesystemLetter();
             }
