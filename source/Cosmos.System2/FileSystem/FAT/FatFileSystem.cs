@@ -1610,7 +1610,7 @@ namespace Cosmos.System.FileSystem.FAT
                 var SerialID = new byte[4] { 0x01, 0x02, 0x03, 0x04 };
 
                 xBPB.Copy(0x43, SerialID, 0, SerialID.Length);
-
+                xBPB.WriteString(0x47, "           ");
                 byte[] labelBytes = Encoding.UTF8.GetBytes(Label);
                 if (labelBytes.Length < 11)
                 {
@@ -1622,10 +1622,9 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     throw new Exception("FAT32 label cannot be larger than 11 bytes.");
                 }
-
                 xBPB.Copy(0x047, labelBytes, 0, labelBytes.Length);
                 FileSystemLabel = Label;
-
+                xBPB.WriteString(0x52, "FAT32   ");
 
                 //TODO: OS Boot Code
             }
