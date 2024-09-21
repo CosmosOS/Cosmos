@@ -9,7 +9,7 @@ namespace Cosmos.System.Graphics
     /// </summary>
     public class VGAScreen
     {
-        static readonly VGADriver screen = new();
+        public static readonly VGADriver screen = new();
 
         /// <summary>
         /// Sets the currently used graphics mode.
