@@ -263,14 +263,32 @@ namespace Cosmos.System.FileSystem
             }
         }
 
-        public void FormatPartition(int index, FileSystemType format, bool quick = true)
+        /// <summary>
+        /// Formats a partition to the specified file system type.
+        /// </summary>
+        /// <param name="index">The index of the partition to format.</param>
+        /// <param name="format">The file system type to format the partition to (e.g., "FAT32").</param>
+        /// <param name="quick">Indicates whether the formatting should be quick. Defaults to true.</param>
+        /// <param name="FilesystemLetter">The drive letter for the partition. If empty, one will be automatically assigned.</param>
+        /// <exception cref="NotImplementedException">Thrown when the specified formatting type is not supported.</exception>
+        public virtual void FormatPartition(int index, string format, bool quick = true, string FilesystemLetter = "")
         {
             var part = Partitions[index];
 
             var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
-
-            FatFileSystem.CreateFatFileSystem(part.Host, VFSManager.GetNextFilesystemLetter() + ":\\", xSize, format);
-            Mount();
+            if(FilesystemLetter == "" || FilesystemLetter == string.Empty)
+            {
+                FilesystemLetter = VFSManager.GetNextFilesystemLetter();
+            }
+            if (format.StartsWith("FAT"))
+            {
+                FatFileSystem.CreateFatFileSystem(part.Host, FilesystemLetter + ":\\", xSize, format);
+                Mount();
+            }
+            else
+            {
+                throw new NotImplementedException(format + " formatting not supported.");
+            }
         }
 
         private readonly FileSystem[] mountedPartitions = new FileSystem[4];

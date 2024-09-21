@@ -221,8 +221,8 @@ namespace Cosmos.System.FileSystem
         /// <summary>
         /// Format drive. (delete all)
         /// </summary>
-        /// <param name="aDriveFormat">unused.</param>
-        /// <param name="aQuick">unused.</param>
+        /// <param name="aDriveFormat">Drive format. E.g. FAT32, FAT16...</param>
+        /// <param name="aQuick">Quick format. If false, partition is filled with 0.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <list type = "bullet" >
         /// <item>Thrown when the data length is 0 or greater then Int32.MaxValue.</item>
@@ -252,7 +252,6 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
-        public abstract void Format(FileSystemType aDriveFormat, bool aQuick);
+        public abstract void Format(string aDriveFormat, bool aQuick);
     }
-    public enum FileSystemType { FAT12, FAT16, FAT32 }
 }
