@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
+using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using Cosmos.HAL;
@@ -326,11 +327,17 @@ namespace Cosmos.System.FileSystem
                 Array.Copy(volumeLabelBytes, trimmedVolumeLabelBytes, actualLength);
                 Label = Encoding.UTF8.GetString(trimmedVolumeLabelBytes);
                 global::System.Console.WriteLine("Label (saved): " + Label);
+                if(Label.Length == 0)
+                {
+                    Label = VFSManager.GetNextFilesystemLetter();
+                    global::System.Console.WriteLine("Label empty.");
+                    global::System.Console.WriteLine("Generated new Label: " + Label);
+                }
             }
             else
             {
                 Label = VFSManager.GetNextFilesystemLetter();
-                global::System.Console.WriteLine("Generated new Label " + Label);
+                global::System.Console.WriteLine("Generated new Label: " + Label);
             }
 
             string xRootPath = string.Concat(Label, VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
