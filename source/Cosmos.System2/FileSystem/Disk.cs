@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using System.Net.Mime;
 using System.Text;
+using Cosmos.HAL;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.ISO9660;
@@ -282,7 +283,7 @@ namespace Cosmos.System.FileSystem
             }
             if (format.StartsWith("FAT"))
             {
-                FatFileSystem.CreateFatFileSystem(part.Host, FilesystemLetter + ":\\", xSize, format);
+                FatFileSystem.CreateFatFileSystem(part.Host, FilesystemLetter, xSize, format);
                 Mount();
             }
             else
@@ -306,7 +307,33 @@ namespace Cosmos.System.FileSystem
                 //We already mounted this partiton
                 return;
             }
-            string xRootPath = string.Concat(VFSManager.GetNextFilesystemLetter(), VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
+            string Label = "";
+
+            var xBPB = part.Host.NewBlockArray(1);
+            part.Host.ReadBlock(0UL, 1U, ref xBPB);
+            ushort xSig = BitConverter.ToUInt16(xBPB, 510);
+            if (xSig == 0xAA55) //FAT signature
+            {
+                global::System.Console.WriteLine("Correct FAT signature");
+                byte[] volumeLabelBytes = new byte[11];
+                Array.Copy(xBPB, 0x047, volumeLabelBytes, 0, 11);
+                int actualLength = Array.IndexOf(volumeLabelBytes, (byte)0);
+                if (actualLength == -1)
+                {
+                    actualLength = volumeLabelBytes.Length;
+                }
+                byte[] trimmedVolumeLabelBytes = new byte[actualLength];
+                Array.Copy(volumeLabelBytes, trimmedVolumeLabelBytes, actualLength);
+                Label = Encoding.UTF8.GetString(trimmedVolumeLabelBytes);
+                global::System.Console.WriteLine("Label (saved): " + Label);
+            }
+            else
+            {
+                Label = VFSManager.GetNextFilesystemLetter();
+                global::System.Console.WriteLine("Generated new Label " + Label);
+            }
+
+            string xRootPath = string.Concat(Label, VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
             var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
 
             foreach (var item in FileSystemManager.RegisteredFileSystems)
