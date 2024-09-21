@@ -263,21 +263,14 @@ namespace Cosmos.System.FileSystem
             }
         }
 
-        public void FormatPartition(int index, string format, bool quick = true)
+        public void FormatPartition(int index, FileSystemType format, bool quick = true)
         {
             var part = Partitions[index];
 
             var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
 
-            if (format.StartsWith("FAT"))
-            {
-                FatFileSystem.CreateFatFileSystem(part.Host, VFSManager.GetNextFilesystemLetter() + ":\\", xSize, format);
-                Mount();
-            }
-            else
-            {
-                throw new NotImplementedException(format + " formatting not supported.");
-            }
+            FatFileSystem.CreateFatFileSystem(part.Host, VFSManager.GetNextFilesystemLetter() + ":\\", xSize, format);
+            Mount();
         }
 
         private readonly FileSystem[] mountedPartitions = new FileSystem[4];

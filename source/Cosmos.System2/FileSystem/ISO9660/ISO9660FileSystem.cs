@@ -243,7 +243,7 @@ namespace Cosmos.System.FileSystem.ISO9660
         {
             throw new NotImplementedException("Read only file system");
         }
-        public override void Format(string aDriveFormat, bool aQuick)
+        public override void Format(FileSystemType aDriveFormat, bool aQuick)
         {
             throw new NotImplementedException();
         }

@@ -766,7 +766,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
-        public static FatFileSystem CreateFatFileSystem(Partition aDevice, string aRootPath, long aSize, string aDriveFormat)
+        public static FatFileSystem CreateFatFileSystem(Partition aDevice, string aRootPath, long aSize, FileSystemType aDriveFormat)
         {
             if (aDevice == null)
             {
@@ -1465,7 +1465,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
-        public override void Format(string aDriveFormat, bool aQuick)
+        public override void Format(FileSystemType aDriveFormat, bool aQuick)
         {
             /* Parmaters check */
             if (Device == null)
@@ -1473,21 +1473,17 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException(nameof(Device));
             }
 
-            if (aDriveFormat == "FAT32")
+            if (aDriveFormat == FileSystemType.FAT32)
             {
                 mFatType = FatTypeEnum.Fat32;
             }
-            else if (aDriveFormat == "FAT16")
+            else if (aDriveFormat == FileSystemType.FAT16)
             {
                 throw new NotImplementedException("FAT16 formatting not supported yet.");
             }
-            else if (aDriveFormat == "FAT12")
+            else if (aDriveFormat == FileSystemType.FAT12)
             {
                 throw new NotImplementedException("FAT12 formatting not supported yet.");
-            }
-            else
-            {
-                throw new Exception("Unknown FAT type.");
             }
 
             /* FAT Configuration */
