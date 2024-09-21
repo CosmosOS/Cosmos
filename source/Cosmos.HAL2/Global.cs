@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
@@ -52,7 +51,7 @@ namespace Cosmos.HAL
 
             Console.WriteLine("Starting ACPI");
             debugger.Send("ACPI Init");
-            ACPI.Start();
+            ACPI.Initialize();
 
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller

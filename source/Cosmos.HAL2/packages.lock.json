@@ -12,13 +12,10 @@
         "type": "Project",
         "dependencies": {
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
-          "IL2CPU.API": "[0.1.0-localbuild, )"
+          "IL2CPU.API": "(, )"
         }
       },
       "cosmos.debug.kernel": {
-        "type": "Project"
-      },
-      "il2cpu.api": {
         "type": "Project"
       }
     }
