@@ -13,7 +13,7 @@ namespace Cosmos.System.FileSystem.VFS
     /// </summary>
     public static class VFSManager
     {
-        public static VFSBase mVFS;
+        private static VFSBase mVFS;
 
 
         /// <summary>

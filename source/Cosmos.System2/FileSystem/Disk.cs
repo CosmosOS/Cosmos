@@ -9,13 +9,12 @@ using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.ISO9660;
 using Cosmos.System.FileSystem.VFS;
-using static Cosmos.System.FileSystem.FileSystem;
 
 namespace Cosmos.System.FileSystem
 {
     public class Disk
     {
-        public readonly List<ManagedPartition> parts = new();
+        private readonly List<ManagedPartition> parts = new();
 
         public bool IsMBR => !GPT.IsGPTPartition(Host);
         /// <summary>
@@ -264,25 +263,21 @@ namespace Cosmos.System.FileSystem
             }
         }
 
-        /// <summary>
-        /// Formats the specified partition with the given file system format.
-        /// </summary>
-        /// <param name="index">The index of the partition to format.</param>
-        /// <param name="format">The file system format to use (e.g., FAT32).</param>
-        /// <param name="quick">Indicates whether to perform a quick format. Defaults to true.</param>
-        /// <remarks>
-        /// The method formats the partition by creating a new file system and mounting it.
-        /// The partition is referenced by its index from the list of partitions.
-        /// </remarks>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the partition index is invalid.</exception>
-        public void FormatPartition(int index, FileSystemFormat format, bool quick = true)
+        public void FormatPartition(int index, string format, bool quick = true)
         {
             var part = Partitions[index];
 
             var xSize = (long)(Host.BlockCount * Host.BlockSize / 1024 / 1024);
 
-            FatFileSystem.CreateFatFileSystem(part.Host, VFSManager.GetNextFilesystemLetter() + ":\\", xSize, format);
-            Mount();
+            if (format.StartsWith("FAT"))
+            {
+                FatFileSystem.CreateFatFileSystem(part.Host, VFSManager.GetNextFilesystemLetter() + ":\\", xSize, format);
+                Mount();
+            }
+            else
+            {
+                throw new NotImplementedException(format + " formatting not supported.");
+            }
         }
 
         private readonly FileSystem[] mountedPartitions = new FileSystem[4];

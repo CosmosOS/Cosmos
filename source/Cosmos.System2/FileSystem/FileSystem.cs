@@ -252,7 +252,6 @@ namespace Cosmos.System.FileSystem
         /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
-        public abstract void Format(FileSystemFormat aDriveFormat, bool aQuick);
-        public enum FileSystemFormat { FAT12, FAT16, FAT32 };
+        public abstract void Format(string aDriveFormat, bool aQuick);
     }
 }
