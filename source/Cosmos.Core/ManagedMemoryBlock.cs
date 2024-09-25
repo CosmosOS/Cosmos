@@ -167,6 +167,26 @@ namespace Cosmos.Core
         }
 
         /// <summary>
+        /// Copies data from the memory block to the specified array.
+        /// </summary>
+        /// <param name="aStart">The start index in the memory block from which to begin copying.</param>
+        /// <param name="aData">The array into which data will be copied.</param>
+        /// <param name="aIndex">The starting index in the array where data will be copied.</param>
+        /// <param name="aCount">The number of elements to copy.</param>
+        public unsafe void Get(int aStart, int[] aData, int aIndex, int aCount)
+        {
+            int* xSrc;
+            fixed (byte* aArrayPtr = memory)
+            {
+                xSrc = (int*)aArrayPtr + aStart;
+            }
+            fixed (int* aDataPtr = aData)
+            {
+                MemoryOperations.Copy(aDataPtr + aIndex, xSrc, aCount);
+            }
+        }
+
+        /// <summary>
         /// Write 8-bit to the memory block.
         /// </summary>
         /// <param name="aByteOffset">Data offset.</param>
