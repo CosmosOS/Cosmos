@@ -289,6 +289,33 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public override void DrawRectangle(Color color, int x, int y, int width, int height)
+        {
+            int rawColor = color.ToArgb();
+            /* Draw the top edge */
+            for (int posX = x; posX < x + width; posX++)
+            {
+                DrawPoint((uint)rawColor, posX, y);
+            }
+            /* Draw the bottom edge */
+            int newY = y + height;
+            for (int posX = x; posX < x + width; posX++)
+            {
+                DrawPoint((uint)rawColor, posX, newY);
+            }
+            /* Draw the left edge */
+            for (int posY = y; posY < y + height; posY++)
+            {
+                DrawPoint((uint)rawColor, x, posY);
+            }
+            /* Draw the right edge */
+            int newX = x + width;
+            for (int posY = y; posY < y + height; posY++)
+            {
+                DrawPoint((uint)rawColor, newX, posY);
+            }
+        }
+
         public override void DrawImage(Image aImage, int aX, int aY, bool preventOffBoundPixels = true)
         {
             var xBitmap = aImage.RawData;
