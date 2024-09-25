@@ -12,7 +12,7 @@ namespace Cosmos.System.Graphics
     public class VGACanvas : Canvas
     {
         bool enabled;
-        public readonly VGADriver driver;
+        readonly VGADriver driver;
 
         /// <summary>
         /// Available VGA supported video modes.

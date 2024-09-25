@@ -14,8 +14,8 @@ namespace Cosmos.System.Graphics
     public class VBECanvas : Canvas
     {
         static readonly Mode defaultMode = new(1024, 768, ColorDepth.ColorDepth32);
-        public readonly VBEDriver driver;
-        public Mode mode;
+        readonly VBEDriver driver;
+        Mode mode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VBECanvas"/> class.
