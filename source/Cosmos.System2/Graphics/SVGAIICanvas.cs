@@ -17,8 +17,8 @@ namespace Cosmos.System.Graphics
         internal Debugger debugger = new("SVGAIIScreen");
         static readonly Mode defaultMode = new(1024, 768, ColorDepth.ColorDepth32);
 
-        private Mode mode;
-        private readonly VMWareSVGAII driver;
+        public Mode mode;
+        public readonly VMWareSVGAII driver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SVGAIICanvas"/> class.
