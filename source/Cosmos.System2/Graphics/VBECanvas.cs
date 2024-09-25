@@ -321,25 +321,36 @@ namespace Cosmos.System.Graphics
             var xBitmap = aImage.RawData;
             var xWidth = (int)aImage.Width;
             var xHeight = (int)aImage.Height;
-            if (preventOffBoundPixels)
+            int xOffset = aY * (int)Mode.Width + aX;
+
+            if (!preventOffBoundPixels)
+            {
+                for (int i = 0; i < xHeight; i++)
+                {
+                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
+                }
+            }
+            else
             {
                 var maxWidth = Math.Min(xWidth, (int)mode.Width - aX);
                 var maxHeight = Math.Min(xHeight, (int)mode.Height - aY);
-                int xOffset = aY * (int)Mode.Width + aX;
                 for (int i = 0; i < maxHeight; i++)
                 {
                     driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, maxWidth);
                 }
             }
-            else
-            {
-                int xOffset = aY * xHeight + aX;
-                for (int i = 0; i < Mode.Height; i++)
-                {
-                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
-                }
-            }
+        }
 
+        public override void CroppedDrawImage(Image aImage, int aX, int aY, int aWidth, int aHeight)
+        {
+            var xBitmap = aImage.RawData;
+            var xWidth = aWidth;
+            var xHeight = aHeight;
+            int xOffset = aY * xHeight + aX;
+            for (int i = 0; i < Mode.Height; i++)
+            {
+                driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
+            }
         }
 
         #endregion

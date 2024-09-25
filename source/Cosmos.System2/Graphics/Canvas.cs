@@ -694,6 +694,31 @@ namespace Cosmos.System.Graphics
         }
 
         /// <summary>
+        /// Draws the given image at the specified coordinates, cropping the image to fit within the maximum width and height.
+        /// </summary>
+        /// <param name="image">The image to draw.</param>
+        /// <param name="x">The X coordinate where the image will be drawn.</param>
+        /// <param name="y">The Y coordinate where the image will be drawn.</param>
+        /// <param name="maxWidth">The maximum width to display the image. If the image exceeds this width, it will be cropped.</param>
+        /// <param name="maxHeight">The maximum height to display the image. If the image exceeds this height, it will be cropped.</param>
+        public virtual void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
+        {
+            Color color;
+            int width = Math.Min((int)image.Width, maxWidth);  
+            int height = Math.Min((int)image.Height, maxHeight); 
+            int[] pixels = image.RawData;
+
+            for (int xi = 0; xi < width; xi++)
+            {
+                for (int yi = 0; yi < height; yi++)
+                {
+                    color = Color.FromArgb(pixels[xi + (yi * image.Width)]);
+                    DrawPoint(color, x + xi, y + yi);
+                }
+            }
+        }
+
+        /// <summary>
         /// Draws an image with alpha blending.
         /// </summary>
         /// <param name="image">The image to draw.</param>

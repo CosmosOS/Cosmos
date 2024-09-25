@@ -428,5 +428,17 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
+
+        public override void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
+        {
+            var width = maxWidth;
+            var height = maxHeight;
+            var frameSize = (int)driver.FrameSize;
+            var data = image.RawData;
+            for (int i = 0; i < height; i++)
+            {
+                driver.videoMemory.Copy(GetPointOffset(x, y + i) + frameSize, data, i * width, width);
+            }
+        }
     }
 }
