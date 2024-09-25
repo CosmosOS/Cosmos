@@ -140,6 +140,11 @@ namespace Cosmos.System.Graphics
             return Color.FromArgb((int)driver.GetPixel((uint)aX, (uint)aY));
         }
 
+        public override int GetRawPointColor(int aX, int aY)
+        {
+            return (int)driver.GetPixel((uint)aX, (uint)aY);
+        }
+
         public override Mode DefaultGraphicsMode => new Mode(640, 480, ColorDepth.ColorDepth4);
 
         /// <summary>

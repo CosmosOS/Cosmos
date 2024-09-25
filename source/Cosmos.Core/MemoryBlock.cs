@@ -271,6 +271,22 @@ namespace Cosmos.Core
         }
 
         /// <summary>
+        /// Copies data from the memory block to the specified array.
+        /// </summary>
+        /// <param name="aByteOffset">The byte offset in the memory block from which to start copying.</param>
+        /// <param name="aData">The array into which data will be copied.</param>
+        /// <param name="aIndex">The starting index in the array where data will be copied.</param>
+        /// <param name="aCount">The number of elements to copy.</param>
+        public unsafe void Get(int aByteOffset, int[] aData, int aIndex, int aCount)
+        {
+            int* xSource = (int*)(Base + aByteOffset);
+            fixed (int* aDataPtr = aData)
+            {
+                MemoryOperations.Copy(aDataPtr + aIndex, xSource, aCount);
+            }
+        }
+
+        /// <summary>
         /// Move bytes array down the memory block.
         /// </summary>
         /// <param name="aDest">Destination location.</param>
