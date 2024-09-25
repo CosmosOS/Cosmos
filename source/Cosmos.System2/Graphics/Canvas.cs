@@ -328,6 +328,7 @@ namespace Cosmos.System.Graphics
         /// <param name="x0">The X center coordinate.</param>
         /// <param name="y0">The Y center coordinate.</param>
         /// <param name="radius">The radius of the circle to draw.</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawFilledCircle(Color color, int x0, int y0, int radius)
         {
             int x = radius;
@@ -557,6 +558,7 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The origin X coordinate.</param>
         /// <param name="y">The origin Y coordinate.</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawImage(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;
@@ -644,6 +646,7 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate.</param>
         /// <param name="w">The desired width to scale the image to before drawing.</param>
         /// <param name="h">The desired height to scale the image to before drawing</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public virtual void DrawImage(Image image, int x, int y, int w, int h, bool preventOffBoundPixels = true)
         {
             Color color;
@@ -706,6 +709,7 @@ namespace Cosmos.System.Graphics
         /// <param name="image">The image to draw.</param>
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
         public void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
         {
             Color color;

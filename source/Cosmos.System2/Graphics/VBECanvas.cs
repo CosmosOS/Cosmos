@@ -389,6 +389,31 @@ namespace Cosmos.System.Graphics
             return (int)driver.GetVRAM(offset);
         }
 
+        public override Bitmap GetImage(int x, int y, int width, int height)
+        {
+            Bitmap bitmap = new((uint)width, (uint)height, ColorDepth.ColorDepth32);
+
+            int startX = Math.Max(0, x);
+            int startY = Math.Max(0, y);
+            int endX = Math.Min(x + width, (int)Mode.Width);
+            int endY = Math.Min(y + height, (int)Mode.Height);
+
+            int offsetX = Math.Max(0, -x);
+            int offsetY = Math.Max(0, -y);
+
+            int[] rawData = new int[width * height];
+
+            for (int posy = startY; posy < endY; posy++)
+            {
+                int srcOffset = posy * (int)Mode.Width + startX;
+                int destOffset = (posy - startY) * width;
+                driver.GetVRAM(srcOffset, rawData, destOffset, endX - startX);
+            }
+
+            bitmap.RawData = rawData;
+            return bitmap;
+        }
+
         #endregion
 
     }
