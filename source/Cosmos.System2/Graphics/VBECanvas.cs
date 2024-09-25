@@ -285,6 +285,10 @@ namespace Cosmos.System.Graphics
         {
             for (int i = 0; i < aHeight; i++)
             {
+                if (i >= mode.Height)
+                {
+                    return;
+                }
                 int destinationIndex = (aY + i) * (int)mode.Width + aX;
                 driver.CopyVRAM(destinationIndex, aColors, i * aWidth, aWidth);
             }
@@ -294,6 +298,10 @@ namespace Cosmos.System.Graphics
         {
             for (int i = 0; i < aHeight; i++)
             {
+                if (i >= mode.Height)
+                {
+                    return;
+                }
                 int destinationIndex = (aY + i) * (int)mode.Width + aX;
                 driver.CopyVRAM(destinationIndex, aColors, i * aWidth + startIndex, aWidth);
             }
@@ -458,15 +466,16 @@ namespace Cosmos.System.Graphics
             int endX = Math.Min(x + width, (int)Mode.Width);
             int endY = Math.Min(y + height, (int)Mode.Height);
 
-            int offsetX = Math.Max(0, -x);
-            int offsetY = Math.Max(0, -y);
+            int offsetX = Math.Max(0, -x); 
+            int offsetY = Math.Max(0, -y); 
 
-            int[] rawData = new int[width * height];
+            int[] rawData = new int[width * height]; 
 
             for (int posy = startY; posy < endY; posy++)
             {
                 int srcOffset = posy * (int)Mode.Width + startX;
-                int destOffset = (posy - startY) * width;
+                int destOffset = (posy - startY + offsetY) * width + offsetX;
+
                 driver.GetVRAM(srcOffset, rawData, destOffset, endX - startX);
             }
 
