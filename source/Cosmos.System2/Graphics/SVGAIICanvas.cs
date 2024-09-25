@@ -18,7 +18,7 @@ namespace Cosmos.System.Graphics
         static readonly Mode defaultMode = new(1024, 768, ColorDepth.ColorDepth32);
 
         Mode mode;
-        readonly VMWareSVGAII driver;
+        private readonly VMWareSVGAII driver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SVGAIICanvas"/> class.
