@@ -104,28 +104,42 @@ namespace Cosmos.System.Graphics
 
         public override void DrawRectangle(Color color, int x, int y, int width, int height)
         {
-            int rawColor = color.ToArgb();
-            /* Draw the top edge*/
-            for (int posX = x; posX < x + width; posX++)
+            if (color.A < 255)
             {
-                DrawPoint((uint)rawColor, posX, y);
+                // Draw top edge from (x, y) to (x + width, y)
+                DrawLine(color, x, y, x + width, y);
+                // Draw left edge from (x, y) to (x, y + height)
+                DrawLine(color, x, y, x, y + height);
+                // Draw bottom edge from (x, y + height) to (x + width, y + height)
+                DrawLine(color, x, y + height, x + width, y + height);
+                // Draw right edge from (x + width, y) to (x + width, y + height)
+                DrawLine(color, x + width, y, x + width, y + height);
             }
-            /* Draw the bottom edge */
-            int newY = y + height;
-            for (int posX = x; posX < x + width; posX++)
+            else
             {
-                DrawPoint((uint)rawColor, posX, newY);
-            }
-            /* Draw the left edge */
-            for (int posY = y; posY < y + height; posY++)
-            {
-                DrawPoint((uint)rawColor, x, posY);
-            }
-            /* Draw the right edge */
-            int newX = x + width;
-            for (int posY = y; posY < y + height; posY++)
-            {
-                DrawPoint((uint)rawColor, newX, posY);
+                int rawColor = color.ToArgb();
+                // Draw top edge from (x, y) to (x + width, y)
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawPoint((uint)rawColor, posX, y);
+                }
+                // Draw left edge from (x, y) to (x, y + height)
+                int newY = y + height;
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawPoint((uint)rawColor, posX, newY);
+                }
+                // Draw bottom edge from (x, y + height) to (x + width, y + height)
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawPoint((uint)rawColor, x, posY);
+                }
+                // Draw right edge from (x + width, y) to (x + width, y + height)
+                int newX = x + width;
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawPoint((uint)rawColor, newX, posY);
+                }
             }
         }
 

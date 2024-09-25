@@ -496,40 +496,17 @@ namespace Cosmos.System.Graphics
         /// <param name="height">The height of the rectangle.</param>
         public virtual void DrawRectangle(Color color, int x, int y, int width, int height)
         {
-            /*
-             * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
-             * vertex (we call these vertexes A, B, C, D as for geometric convention)
-             */
+            // Draw top edge from (x, y) to (x + width, y)
+            DrawLine(color, x, y, x + width, y);
 
-            /* The check of the validity of x and y are done in DrawLine() */
+            // Draw left edge from (x, y) to (x, y + height)
+            DrawLine(color, x, y, x, y + height);
 
-            /* The vertex A is where x,y are */
-            int xa = x;
-            int ya = y;
+            // Draw bottom edge from (x, y + height) to (x + width, y + height)
+            DrawLine(color, x, y + height, x + width, y + height);
 
-            /* The vertex B has the same y coordinate of A but x is moved of width pixels */
-            int xb = x + width;
-            int yb = y;
-
-            /* The vertex C has the same x coordiate of A but this time is y that is moved of height pixels */
-            int xc = x;
-            int yc = y + height;
-
-            /* The Vertex D has x moved of width pixels and y moved of height pixels */
-            int xd = x + width;
-            int yd = y + height;
-
-            /* Draw a line betwen A and B */
-            DrawLine(color, xa, ya, xb, yb);
-
-            /* Draw a line between A and C */
-            DrawLine(color, xa, ya, xc, yc);
-
-            /* Draw a line between B and D */
-            DrawLine(color, xb, yb, xd, yd);
-
-            /* Draw a line between C and D */
-            DrawLine(color, xc, yc, xd, yd);
+            // Draw right edge from (x + width, y) to (x + width, y + height)
+            DrawLine(color, x + width, y, x + width, y + height);
         }
 
         /// <summary>
@@ -631,6 +608,13 @@ namespace Cosmos.System.Graphics
             return bitmap;
         }
 
+        /// <summary>
+        /// Scales an image to the specified new width and height.
+        /// </summary>
+        /// <param name="image">The image to be scaled.</param>
+        /// <param name="newWidth">The width of the scaled image.</param>
+        /// <param name="newHeight">The height of the scaled image.</param>
+        /// <returns>An array of integers representing the scaled image's pixel data. (Raw bitmap data)</returns>
         static int[] ScaleImage(Image image, int newWidth, int newHeight)
         {
             int[] pixels = image.RawData;
@@ -640,7 +624,6 @@ namespace Cosmos.System.Graphics
             int xRatio = (int)((w1 << 16) / newWidth) + 1;
             int yRatio = (int)((h1 << 16) / newHeight) + 1;
             int x2, y2;
-
             for (int i = 0; i < newHeight; i++)
             {
                 for (int j = 0; j < newWidth; j++)
@@ -650,7 +633,6 @@ namespace Cosmos.System.Graphics
                     temp[(i * newWidth) + j] = pixels[(y2 * w1) + x2];
                 }
             }
-
             return temp;
         }
 
