@@ -133,6 +133,11 @@ namespace Cosmos.System.Graphics
             driver.SetPixel((uint)aX, (uint)aY, aColor);
         }
 
+        public override void DrawPoint(int aColor, int aX, int aY)
+        {
+            driver.SetPixel((uint)aX, (uint)aY, (uint)aColor);
+        }
+
         public override List<Mode> AvailableModes => availableModes;
 
         public override Color GetPointColor(int aX, int aY)

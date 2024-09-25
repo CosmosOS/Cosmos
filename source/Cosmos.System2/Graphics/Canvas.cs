@@ -109,6 +109,14 @@ namespace Cosmos.System.Graphics
         public abstract void DrawPoint(uint color, int x, int y);
 
         /// <summary>
+        /// Sets the pixel at the given coordinates to the specified <paramref name="color"/>. without ToArgb()
+        /// </summary>
+        /// <param name="color">The color to draw with (raw argb).</param>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        public abstract void DrawPoint(int color, int x, int y);
+
+        /// <summary>
         /// The name of the Canvas implementation.
         /// </summary>
         public abstract string Name();
@@ -154,6 +162,47 @@ namespace Cosmos.System.Graphics
                 for (int Y = 0; Y < height; Y++)
                 {
                     DrawPoint(colors[Y * width + X], x + X, y + Y);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws an array of pixels to the canvas, starting at the given coordinates,
+        /// using the given width.
+        /// </summary>
+        /// <param name="colors">The pixels to draw.</param>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        /// <param name="width">The width of the drawn bitmap.</param>
+        /// <param name="height">The height of the drawn bitmap.</param>
+        public virtual void DrawArray(int[] colors, int x, int y, int width, int height)
+        {
+            for (int X = 0; X < width; X++)
+            {
+                for (int Y = 0; Y < height; Y++)
+                {
+                    DrawPoint(colors[Y * width + X], x + X, y + Y);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws an array of pixels to the canvas, starting at the given coordinates,
+        /// using the given width.
+        /// </summary>
+        /// <param name="colors">The pixels to draw.</param>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        /// <param name="width">The width of the drawn bitmap.</param>
+        /// <param name="height">The height of the drawn bitmap.</param>
+        /// <param name="startIndex">int[] colors tarting position</param>
+        public virtual void DrawArray(int[] colors, int x, int y, int width, int height, int startIndex)
+        {
+            for (int X = 0; X < width; X++)
+            {
+                for (int Y = 0; Y < height; Y++)
+                {
+                    DrawPoint(colors[Y * width + X + startIndex], x + X, y + Y);
                 }
             }
         }
@@ -686,7 +735,8 @@ namespace Cosmos.System.Graphics
         /// <param name="y">The Y coordinate where the image will be drawn.</param>
         /// <param name="maxWidth">The maximum width to display the image. If the image exceeds this width, it will be cropped.</param>
         /// <param name="maxHeight">The maximum height to display the image. If the image exceeds this height, it will be cropped.</param>
-        public virtual void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight)
+        /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
+        public virtual void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight, bool preventOffBoundPixels = true)
         {
             Color color;
             int width = Math.Min((int)image.Width, maxWidth);  
