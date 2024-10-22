@@ -569,19 +569,24 @@ namespace Cosmos.System.Graphics
         /// <param name="height">The height of the rectangle.</param>
         public virtual void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
         {
-            if (height == -1)
-            {
-                height = width;
-            }
-            if (preventOffBoundPixels)
-            {
-                width = Math.Min(width, (int)Mode.Width - xStart);
-                height = Math.Min(height, (int)Mode.Height - yStart);
-            }
-            for (int y = yStart; y < yStart + height; y++)
-            {
-                DrawLine(color, xStart, y, xStart + width - 1, y);
-            }
+             if (height == -1)
+             {
+                 height = width;
+             }
+
+             if (preventOffBoundPixels)
+             {
+                 width = Math.Min(width, (int)Mode.Width - xStart);
+                 height = Math.Min(height, (int)Mode.Height - yStart);
+             }
+
+             for (int j = yStart; j < yStart + height; j++)
+             {
+                 for (int i = xStart; i < xStart + width; i++)
+                 {
+                     DrawPoint(color, i, j);
+                 }
+             }
         }
 
         /// <summary>
