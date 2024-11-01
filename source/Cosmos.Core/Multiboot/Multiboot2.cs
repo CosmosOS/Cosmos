@@ -5,6 +5,7 @@
 * RESOURCES:        https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html
 */
 
+using System.Collections.Generic;
 using Cosmos.Core.Multiboot.Tags;
 using IL2CPU.API.Attribs;
 
@@ -24,12 +25,13 @@ namespace Cosmos.Core.Multiboot
         public static EFI64* EFI64 { get; set; }
         public static AcpiOld* AcpiOld { get; set; }
         public static AcpiNew* AcpiNew { get; set; }
+        public static PointerList<MB2Module> Modules { get; set; }
 
         #endregion
 
         #region Methods
 
-        /// /// <summary>
+        /// <summary>
         /// Parse multiboot2 structure
         /// </summary>
         public static void Init()
@@ -38,14 +40,18 @@ namespace Cosmos.Core.Multiboot
             {
                 isInitialized = true;
 
-                uint MbAddress = GetMBIAddress();
+                Modules = new PointerList<MB2Module>();
 
+                uint MbAddress = GetMBIAddress();
                 MB2Tag* Tag;
 
                 for (Tag = (MB2Tag*)(MbAddress + 8); Tag->Type != 0; Tag = (MB2Tag*)((byte*)Tag + (Tag->Size + 7 & ~7)))
                 {
                     switch (Tag->Type)
                     {
+                        case 3:
+                            Modules.Add((MB2Module*)Tag);
+                            break;
                         case 4:
                             BasicMemoryInformation = (BasicMemoryInformation*)Tag;
                             break;
