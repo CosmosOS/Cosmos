@@ -14,7 +14,7 @@ namespace Cosmos.System.Graphics
     public class VBECanvas : Canvas
     {
         static readonly Mode defaultMode = new(1024, 768, ColorDepth.ColorDepth32);
-        readonly VBEDriver driver;
+        private readonly VBEDriver driver;
         Mode mode;
 
         /// <summary>
@@ -234,6 +234,39 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public override void DrawPoint(uint aColor, int aX, int aY)
+        {
+            uint offset;
+
+            switch (Mode.ColorDepth)
+            {
+                case ColorDepth.ColorDepth32:
+                    offset = (uint)GetPointOffset(aX, aY);
+
+                    driver.SetVRAM(offset, (byte)((aColor >> 16) & 0xFF));
+                    driver.SetVRAM(offset + 1, (byte)((aColor >> 8) & 0xFF));
+                    driver.SetVRAM(offset + 2, (byte)(aColor & 0xFF));
+                    driver.SetVRAM(offset + 3, (byte)((aColor >> 24) & 0xFF));
+
+                    break;
+                case ColorDepth.ColorDepth24:
+                    offset = (uint)GetPointOffset(aX, aY);
+
+                    driver.SetVRAM(offset, (byte)((aColor >> 16) & 0xFF));
+                    driver.SetVRAM(offset + 1, (byte)((aColor >> 8) & 0xFF));
+                    driver.SetVRAM(offset + 2, (byte)(aColor & 0xFF));
+
+                    break;
+                default:
+                    throw new NotImplementedException("Drawing pixels with color depth " + (int)Mode.ColorDepth + " is not yet supported.");
+            }
+        }
+
+        public override void DrawPoint(int aColor, int aX, int aY)
+        {
+            DrawPoint((uint)aColor, aX, aY);
+        }
+
         public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
         {
             ThrowIfCoordNotValid(aX, aY);
@@ -248,43 +281,159 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public override void DrawArray(int[] aColors, int aX, int aY, int aWidth, int aHeight)
+        {
+            for (int i = 0; i < aHeight; i++)
+            {
+                if (i >= mode.Height)
+                {
+                    return;
+                }
+                int destinationIndex = (aY + i) * (int)mode.Width + aX;
+                driver.CopyVRAM(destinationIndex, aColors, i * aWidth, aWidth);
+            }
+        }
+
+        public override void DrawArray(int[] aColors, int aX, int aY, int aWidth, int aHeight, int startIndex)
+        {
+            for (int i = 0; i < aHeight; i++)
+            {
+                if (i >= mode.Height)
+                {
+                    return;
+                }
+                int destinationIndex = (aY + i) * (int)mode.Width + aX;
+                driver.CopyVRAM(destinationIndex, aColors, i * aWidth + startIndex, aWidth);
+            }
+        }
+
         public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight, bool preventOffBoundPixels = true)
         {
             // ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
-            if(preventOffBoundPixels)
-            aWidth = (int)(Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32);
+            if (preventOffBoundPixels)
+            {
+                aWidth = (int)(Math.Min(aWidth, Mode.Width - aX) * (int)Mode.ColorDepth / 32);
+            }
             var color = aColor.ToArgb();
-
             for (int i = aY; i < aY + aHeight; i++)
             {
                 driver.ClearVRAM(GetPointOffset(aX, i), aWidth, color);
             }
         }
 
-        public override void DrawImage(Image aImage, int aX, int aY, bool preventOffBoundPixels = true)
+        public override void DrawRectangle(Color color, int x, int y, int width, int height)
         {
-            var xBitmap = aImage.RawData;
-            var xWidth = (int)aImage.Width;
-            var xHeight = (int)aImage.Height;
+            if (color.A < 255)
+            {
+                // Draw top edge from (x, y) to (x + width, y)
+                DrawLine(color, x, y, x + width, y);
+                // Draw left edge from (x, y) to (x, y + height)
+                DrawLine(color, x, y, x, y + height);
+                // Draw bottom edge from (x, y + height) to (x + width, y + height)
+                DrawLine(color, x, y + height, x + width, y + height);
+                // Draw right edge from (x + width, y) to (x + width, y + height)
+                DrawLine(color, x + width, y, x + width, y + height);
+            }
+            else
+            {
+                int rawColor = color.ToArgb();
+                // Draw top edge from (x, y) to (x + width, y)
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawPoint((uint)rawColor, posX, y);
+                }
+                // Draw left edge from (x, y) to (x, y + height)
+                int newY = y + height;
+                for (int posX = x; posX < x + width; posX++)
+                {
+                    DrawPoint((uint)rawColor, posX, newY);
+                }
+                // Draw bottom edge from (x, y + height) to (x + width, y + height)
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawPoint((uint)rawColor, x, posY);
+                }
+                // Draw right edge from (x + width, y) to (x + width, y + height)
+                int newX = x + width;
+                for (int posY = y; posY < y + height; posY++)
+                {
+                    DrawPoint((uint)rawColor, newX, posY);
+                }
+            }
+        }
+
+        public override void DrawImage(Image image, int x, int y, bool preventOffBoundPixels = true)
+        {
+            var width = (int)image.Width;
+            var height = (int)image.Height;
+            var data = image.RawData;
+
             if (preventOffBoundPixels)
             {
-                var maxWidth = Math.Min(xWidth, (int)mode.Width - aX);
-                var maxHeight = Math.Min(xHeight, (int)mode.Height - aY);
-                int xOffset = aY * (int)Mode.Width + aX;
+                var maxWidth = Math.Min(width, (int)mode.Width - x);
+                var maxHeight = Math.Min(height, (int)mode.Height - y);
+                var startX = Math.Max(0, x);
+                var startY = Math.Max(0, y);
+
+                var sourceX = Math.Max(0, -x);
+                var sourceY = Math.Max(0, -y);
+
+                // Adjust maxWidth and maxHeight if startX or startY were changed
+                maxWidth -= startX - x;
+                maxHeight -= startY - y;
+
                 for (int i = 0; i < maxHeight; i++)
                 {
-                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, maxWidth);
+                    int sourceIndex = (sourceY + i) * width + sourceX;
+                    int destinationIndex = (startY + i) * (int)mode.Width + startX;
+                    driver.CopyVRAM(destinationIndex, data, sourceIndex, maxWidth);
                 }
             }
             else
             {
-                int xOffset = aY * xHeight + aX;
-                for (int i = 0; i < Mode.Height; i++)
+                for (int i = 0; i < height; i++)
                 {
-                    driver.CopyVRAM((i * (int)Mode.Width) + xOffset, xBitmap, i * xWidth, xWidth);
+                    int destinationIndex = (y + i) * (int)mode.Width + x;
+                    driver.CopyVRAM(destinationIndex, data, i * width, width);
                 }
             }
+        }
 
+        public override void CroppedDrawImage(Image aImage, int aX, int aY, int aWidth, int aHeight, bool preventOffBoundPixels = true)
+        {
+            var xBitmap = aImage.RawData;
+            var xWidth = aWidth;
+            var xHeight = aHeight;
+
+            if (preventOffBoundPixels)
+            {
+                var maxWidth = Math.Min(xWidth, (int)Mode.Width - aX);
+                var maxHeight = Math.Min(xHeight, (int)Mode.Height - aY);
+
+                var startX = Math.Max(0, aX);
+                var startY = Math.Max(0, aY);
+
+                var sourceX = Math.Max(0, -aX);
+                var sourceY = Math.Max(0, -aY);
+
+                maxWidth -= startX - aX;
+                maxHeight -= startY - aY;
+
+                for (int i = 0; i < maxHeight; i++)
+                {
+                    int sourceIndex = (sourceY + i) * xWidth + sourceX;
+                    int destinationIndex = (startY + i) * (int)Mode.Width + startX;
+                    driver.CopyVRAM(destinationIndex, xBitmap, sourceIndex, maxWidth);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < xHeight; i++)
+                {
+                    int destinationIndex = (aY + i) * (int)Mode.Width + aX;
+                    driver.CopyVRAM(destinationIndex, xBitmap, i * xWidth, xWidth);
+                }
+            }
         }
 
         #endregion
@@ -300,6 +449,38 @@ namespace Cosmos.System.Graphics
         {
             uint offset = (uint)GetPointOffset(aX, aY);
             return Color.FromArgb((int)driver.GetVRAM(offset));
+        }
+
+        public override int GetRawPointColor(int aX, int aY)
+        {
+            uint offset = (uint)GetPointOffset(aX, aY);
+            return (int)driver.GetVRAM(offset);
+        }
+
+        public override Bitmap GetImage(int x, int y, int width, int height)
+        {
+            Bitmap bitmap = new((uint)width, (uint)height, ColorDepth.ColorDepth32);
+
+            int startX = Math.Max(0, x);
+            int startY = Math.Max(0, y);
+            int endX = Math.Min(x + width, (int)Mode.Width);
+            int endY = Math.Min(y + height, (int)Mode.Height);
+
+            int offsetX = Math.Max(0, -x); 
+            int offsetY = Math.Max(0, -y); 
+
+            int[] rawData = new int[width * height]; 
+
+            for (int posy = startY; posy < endY; posy++)
+            {
+                int srcOffset = posy * (int)Mode.Width + startX;
+                int destOffset = (posy - startY + offsetY) * width + offsetX;
+
+                driver.GetVRAM(srcOffset, rawData, destOffset, endX - startX);
+            }
+
+            bitmap.RawData = rawData;
+            return bitmap;
         }
 
         #endregion
