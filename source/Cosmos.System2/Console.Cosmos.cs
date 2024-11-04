@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Cosmos.Core;
 using Cosmos.System.IO;
 
 // Licensed to the .NET Foundation under one or more agreements.
