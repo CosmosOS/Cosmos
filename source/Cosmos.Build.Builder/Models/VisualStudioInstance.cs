@@ -14,5 +14,7 @@ namespace Cosmos.Build.Builder.Models
         {
             SetupInstance = setupInstance;
         }
+
+        public override string ToString() => SetupInstance.GetInstallationName();
     }
 }

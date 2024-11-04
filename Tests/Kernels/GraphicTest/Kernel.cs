@@ -102,6 +102,9 @@ namespace GraphicTest
             aCanvas.DrawImage(bitmap, 10, 10);
             aCanvas.DrawImage(letter, 50, 10);
 
+            Bitmap GetImageTest = aCanvas.GetImage(50, 10, (int)letter.Width, (int)letter.Height);
+            Assert.AreEqual(GetImageTest.RawData, letter.RawData, "GetImage returns correct values");
+
             /* Drawing BitmapHeaderV5 image */
             Bitmap v5header = new Bitmap(Convert.FromBase64String(parrot));
             aCanvas.DrawImage(v5header,0,0);

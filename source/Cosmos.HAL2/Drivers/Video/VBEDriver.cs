@@ -266,6 +266,18 @@ namespace Cosmos.HAL.Drivers.Video
         }
 
         /// <summary>
+        /// Get VRAM data.
+        /// </summary>
+        /// <param name="aStart">Start position in VRAM.</param>
+        /// <param name="aData">Array to copy data into.</param>
+        /// <param name="aIndex">Starting index in the array to begin copying data.</param>
+        /// <param name="aCount">Number of elements to copy.</param>
+        public void GetVRAM(int aStart, int[] aData, int aIndex, int aCount)
+        {
+            lastbuffer.Get(aStart, aData, aIndex, aCount);
+        }
+
+        /// <summary>
         /// Clear VRAM.
         /// </summary>
         /// <param name="value">Value of fill with.</param>
