@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ApprovalTestsVersion>3.0.22</ApprovalTestsVersion>
         <AvaloniaVersion>0.7.0</AvaloniaVersion>
-        <MicrosoftBuildVersion>16.7.0</MicrosoftBuildVersion>
+        <MicrosoftBuildVersion>17.7.2</MicrosoftBuildVersion>
         <MicrosoftNETFrameworkReferenceAssembliesVersion>1.0.0</MicrosoftNETFrameworkReferenceAssembliesVersion>
         <MicrosoftNETTestSdkVersion>16.0.1</MicrosoftNETTestSdkVersion>
         <MicrosoftTestPlatformObjectModelVersion>16.0.1</MicrosoftTestPlatformObjectModelVersion>

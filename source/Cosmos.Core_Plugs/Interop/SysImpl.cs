@@ -41,5 +41,11 @@ namespace Cosmos.Core_Plugs.Interop
         {
             throw new NotImplementedException();
         }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Sys_CanGetHiddenFlag__")]
+        public static int CanGetHiddenFlag()
+        {
+            return 0; //false
+        }
     }
 }
