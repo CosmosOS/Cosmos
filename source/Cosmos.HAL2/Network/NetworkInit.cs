@@ -55,6 +55,24 @@ namespace Cosmos.HAL.Network
                     }
 
                     #endregion
+
+                    #region RTL8168
+
+                    if (device.VendorID == 0x10EC && device.DeviceID == 0x8168)
+                    {
+
+                        Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+
+                        var RTL8168Device = new RTL8168(device);
+
+                        RTL8168Device.NameID = ("eth" + NetworkDeviceID);
+
+                        Console.WriteLine("Registered at " + RTL8168Device.NameID + " (" + RTL8168Device.MACAddress.ToString() + ")");
+
+                        RTL8168Device.Enable();
+                    }
+                    #endregion
+                    
                     #region E1000
 
                     if (device.VendorID == 0x8086)
@@ -123,8 +141,7 @@ namespace Cosmos.HAL.Network
                            device.DeviceID == (ushort)E1000DeviceID.Intel82562GT_ICH8 ||
                            device.DeviceID == (ushort)E1000DeviceID.Intel82562G_ICH8 ||
                            device.DeviceID == (ushort)E1000DeviceID.Intel82576 ||
-                           device.DeviceID == (ushort)E1000DeviceID.Intel82574L ||
-                           device.DeviceID == (ushort)E1000DeviceID.Intel82575_quadcopper ||
+                           device.DeviceID == (ushort)E1000DeviceID.Intel82574L ||                           device.DeviceID == (ushort)E1000DeviceID.Intel82575_quadcopper ||
                            device.DeviceID == (ushort)E1000DeviceID.Intel82567V_ICH9 ||
                            device.DeviceID == (ushort)E1000DeviceID.Intel82567LM_4_ICH9 ||
                            device.DeviceID == (ushort)E1000DeviceID.Intel82577LM ||
@@ -168,8 +185,8 @@ namespace Cosmos.HAL.Network
 
                             NetworkDeviceID++;
                         }
-                    }
 
+                    }
                     #endregion
                 }
             }
