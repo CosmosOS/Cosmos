@@ -35,7 +35,7 @@
 AppId=CosmosUserKit
 AppName={#VerName}
 AppVerName={#VerName} v{#ChangeSetVersion}
-AppCopyright=Copyright (c) 2007-2021 The Cosmos Project
+AppCopyright=Copyright (c) 2007-2025 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.gocosmos.org/
 AppSupportURL=http://www.gocosmos.org/
