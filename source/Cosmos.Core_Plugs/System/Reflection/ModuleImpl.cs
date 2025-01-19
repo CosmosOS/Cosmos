@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.Core_Plugs.System.Reflection

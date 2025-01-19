@@ -13,6 +13,10 @@ namespace Cosmos.Core_Plugs.System.Globalization
             aIsInherited = false;
         }
 
+        public static void Ctor(CultureInfo aThis, string name)
+        {
+        }
+
         public static CultureInfo get_CurrentCulture() => CultureInfo.InvariantCulture;
 
         public static int GetHashCode(CultureInfo aThis)
