@@ -32,7 +32,7 @@ public class CreateLimineConfig : Task
         var xLabelName = Path.GetFileNameWithoutExtension(xBinName);
         using var xWriter = File.CreateText(Path.Combine($"{TargetDirectory}boot/", "limine.cfg"));
 
-        xWriter.WriteLineAsync(!String.IsNullOrEmpty(Timeout) ? $"TIMEOUT={Timeout}" : "TIMEOUT=0");
+        xWriter.WriteLineAsync(!string.IsNullOrEmpty(Timeout) ? $"TIMEOUT={Timeout}" : "TIMEOUT=0");
         xWriter.WriteLineAsync("VERBOSE=yes");
         xWriter.WriteLineAsync();
 
@@ -50,11 +50,19 @@ public class CreateLimineConfig : Task
                 ? $"KERNEL_PATH=$boot:///boot/{xBinName}"
                 : $"KERNEL_PATH=boot:///boot/{xBinName}");
 
-        if (Modules == null) return true;
+        /*if (Modules == null) return true;
 
         foreach (var module in Modules)
         {
             WriteIndentedLine(xWriter, $"MODULE_PATH=boot:///{module}");
+        }*/
+
+        if (!Directory.Exists($"{TargetDirectory}modules/")) return true;
+
+        foreach (var module in Directory.GetFiles($"{TargetDirectory}modules/"))
+        {
+            Log.LogMessage(MessageImportance.High, "Adding {0} module...", module);
+            WriteIndentedLine(xWriter, $"MODULE_PATH=boot:///modules/{module}");
         }
 
         xWriter.Flush();
