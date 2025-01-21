@@ -68,22 +68,24 @@ If you are utilizing audio, we recommend VirtualBox for the ability to use their
 
 ## VMWare
 
+### VMWare Workstation Pro
+
 WMWare Workstation and VMWare Player are the preferred testing environments
 for Cosmos. This is because they are stable, reliable, and easily controlled
 by the Cosmos Visual Studio integration package. This allows for easy debugging and code execution control.
+VMWare Workstation for the typical Cosmos developer provides more than enough functionality.
 
-VMWare Workstation is not free, however VMWare Player is. VMWare Player for
-the typical Cosmos developer provides more than enough functionality.
+[Since May 13, 2024](https://blogs.vmware.com/workstation/2024/05/vmware-workstation-pro-now-available-free-for-personal-use.html) Broadcom made VMWare Workstation Pro and VMWare Fusion Pro available for free for personal use, and discontinued the free version of VMWare Player.
 
-### VMWare Player
+VMWare Workstation Pro can be downloaded [here](https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion) (Requires Broadcom account)
 
-VMWare Player can be downloaded [here](https://www.vmware.com/go/getplayer-win).
+### VMWare Workstation Player
 
-### VMWare Workstation
+VMWare Workstation Player can still be downloaded through the VMWare software update website.
 
-VMWare Workstation (paid version) can be downloaded for a free trial [here](https://www.vmware.com/go/getworkstation-win).
+VMWare Player (Discontinued) can be downloaded [here](https://softwareupdate.vmware.com/cds/vmw-desktop/player/17.6.2/24409262/) (Doesn't require a Broadcom account)
 
-##  QEMU
+## QEMU
 
 QEMU is not officially supported for Cosmos at this time, but can be used. Just use the ISO option above with debugging turned off.
 If you want to use graphical mode in QEMU (Canvas or SVGA-II), ensure that VBE multiboot is enabled in your project settings of Cosmos.
@@ -117,4 +119,4 @@ Wait and your OS will boot up.
 Not supported at this time.
 
 
-*Last updated on 24 March 2024.*
+*Last updated on 21 January 2025.*
