@@ -83,7 +83,7 @@ VMWare Workstation Pro can be downloaded [here](https://www.vmware.com/products/
 
 VMWare Workstation Player can still be downloaded through the VMWare software update website.
 
-VMWare Player (Discontinued) can be downloaded [here]([https://softwareupdate.vmware.com/cds/vmw-desktop/player](https://softwareupdate.vmware.com/cds/vmw-desktop/player/17.6.2/24409262/)) (Does not require a Broadcom account)
+VMWare Player (Discontinued) can be downloaded [here](https://softwareupdate.vmware.com/cds/vmw-desktop/player/17.6.2/24409262/) (Doesn't require a Broadcom account)
 
 ## QEMU
 
