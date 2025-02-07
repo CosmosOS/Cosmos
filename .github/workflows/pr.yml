@@ -159,7 +159,7 @@ jobs:
           dotnet test "Cosmos\Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj" --logger "trx;LogFileName=$($env:USER_KIT_PATH)TestResults\${{ matrix.kernel }}-TestResult.trx" --filter "FullyQualifiedName~${{ matrix.kernel }}"
       
       - name: Upload Test Logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-logs
           path: ${{ env.USER_KIT_PATH }}TestResults
