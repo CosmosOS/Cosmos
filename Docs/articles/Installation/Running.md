@@ -77,11 +77,12 @@ the typical Cosmos developer provides more than enough functionality.
 
 ### VMWare Player
 
-VMWare Player can be downloaded [here](https://www.vmware.com/go/getplayer-win).
+VMWare Player is discontinued as of April 30, 2024. Please use VMWare Workstation which is free.
 
 ### VMWare Workstation
 
-VMWare Workstation (paid version) can be downloaded for a free trial [here](https://www.vmware.com/go/getworkstation-win).
+VMWare Workstation can be downloaded [here](https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion).
+*VMWare Workstation used be paid but is now free as of November 11, 2024*
 
 ##  QEMU
 
