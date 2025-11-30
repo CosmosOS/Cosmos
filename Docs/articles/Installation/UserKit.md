@@ -24,4 +24,4 @@ The User Kit is a snapshot stable version of Cosmos including a premade installe
 4.  Wait for the install to progress. **Tip:** At the end the installer may look like it has stalled, but it is still doing something in the background. WAIT for the "Finish" button to become available.
 5.  Cosmos should now be installed. Follow other tutorials to find out how to create your first OS.
 
-*Last updated on 24 March 2024.*
+*Last updated on 24 November 2025*
