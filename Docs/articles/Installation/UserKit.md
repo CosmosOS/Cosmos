@@ -7,7 +7,7 @@ for DevKit / running on Linux see [DevKit](DevKit.md)
 *   **Visual Studio 2022** - [Download](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx)
 *   **Visual Studio 2022 Workload: .NET Desktop** - .NET Desktop development
 *   **.NET 6.0** - [Download](https://www.microsoft.com/en-us/download/details.aspx?id=53321)
-*   **VMware Player or Workstation** VMware Player is free, so that is recommended instead - [Download](https://www.vmware.com/uk/products/workstation-player/workstation-player-evaluation.html)
+*   **VMware Player or Workstation** VMware Workstation is now free, so that is recommended. - [Download](https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion)
 *   **Microsoft Visual C++ 2010 Redistributable** - [Download](https://www.microsoft.com/en-us/download/details.aspx?id=26999)
   
 ### Installing Cosmos
