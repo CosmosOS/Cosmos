@@ -501,7 +501,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_00(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Divide by zero", "EDivideByZero", ref aContext, aContext.EIP);
+            HandleException(aContext.EIP, "Division Exception", ref aContext, aContext.EIP);
         }
 
         /// <summary>
@@ -511,7 +511,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_01(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Debug Exception", "Debug Exception", ref aContext);
+            HandleException(aContext.EIP, "Debug Exception", ref aContext);
         }
 
         /// <summary>
@@ -521,7 +521,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_02(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Non Maskable Interrupt Exception", "Non Maskable Interrupt Exception", ref aContext);
+            HandleException(aContext.EIP, "Non Maskable Interrupt Exception", ref aContext);
         }
 
         /// <summary>
@@ -531,7 +531,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_03(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Breakpoint Exception", "Breakpoint Exception", ref aContext);
+            HandleException(aContext.EIP, "Breakpoint Exception", ref aContext);
         }
 
         /// <summary>
@@ -541,7 +541,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_04(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Into Detected Overflow Exception", "Into Detected Overflow Exception", ref aContext);
+            HandleException(aContext.EIP, "Into Detected Overflow Exception", ref aContext);
         }
 
         /// <summary>
@@ -551,7 +551,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_05(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Out of Bounds Exception", "Out of Bounds Exception", ref aContext);
+            HandleException(aContext.EIP, "Out of Bounds Exception", ref aContext);
         }
 
         /// <summary>
@@ -563,7 +563,7 @@ namespace Cosmos.Core {
         public static void HandleInterrupt_06(ref IRQContext aContext) {
             // although mLastKnownAddress is a static, we need to get it here, any subsequent calls will change the value!!!
             var xLastKnownAddress = mLastKnownAddress;
-            HandleException(aContext.EIP, "Invalid Opcode", "EInvalidOpcode", ref aContext, xLastKnownAddress);
+            HandleException(aContext.EIP, "Invalid Opcode", ref aContext, xLastKnownAddress);
         }
 
         /// <summary>
@@ -573,7 +573,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_07(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "No Coprocessor Exception", "No Coprocessor Exception", ref aContext);
+            HandleException(aContext.EIP, "No Coprocessor Exception", ref aContext);
         }
 
         /// <summary>
@@ -583,7 +583,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_08(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Double Fault Exception", "Double Fault Exception", ref aContext);
+            HandleException(aContext.EIP, "Double Fault Exception", ref aContext);
         }
 
         /// <summary>
@@ -593,7 +593,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_09(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Coprocessor Segment Overrun Exception", "Coprocessor Segment Overrun Exception", ref aContext);
+            HandleException(aContext.EIP, "Coprocessor Segment Overrun Exception", ref aContext);
         }
 
         /// <summary>
@@ -603,7 +603,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0A(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Bad TSS Exception", "Bad TSS Exception", ref aContext);
+            HandleException(aContext.EIP, "Bad TSS Exception", ref aContext);
         }
 
         /// <summary>
@@ -613,7 +613,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0B(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Segment Not Present", "Segment Not Present", ref aContext);
+            HandleException(aContext.EIP, "Segment Not Present", ref aContext);
         }
 
         /// <summary>
@@ -623,7 +623,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0C(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Stack Fault Exception", "Stack Fault Exception", ref aContext);
+            HandleException(aContext.EIP, "Stack Fault Exception", ref aContext);
         }
 
         /// <summary>
@@ -636,7 +636,7 @@ namespace Cosmos.Core {
             if (GeneralProtectionFault != null) {
                 GeneralProtectionFault(ref aContext);
             } else {
-                HandleException(aContext.EIP, "General Protection Fault", "GPF", ref aContext);
+                HandleException(aContext.EIP, "General Protection Fault", ref aContext);
             }
         }
 
@@ -647,7 +647,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0E(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Page Fault Exception", "Page Fault Exception", ref aContext);
+            HandleException(aContext.EIP, "Page Fault Exception", ref aContext);
         }
 
         /// <summary>
@@ -657,7 +657,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_0F(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Unknown Interrupt Exception", "Unknown Interrupt Exception", ref aContext);
+            HandleException(aContext.EIP, "Unknown Interrupt Exception", ref aContext);
         }
 
         /// <summary>
@@ -667,7 +667,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_10(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "x87 Floating Point Exception", "Coprocessor Fault Exception", ref aContext);
+            HandleException(aContext.EIP, "Coprocessor Fault Exception", ref aContext);
         }
 
         /// <summary>
@@ -677,7 +677,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_11(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Alignment Exception", "Alignment Exception", ref aContext);
+            HandleException(aContext.EIP, "Alignment Exception", ref aContext);
         }
 
         /// <summary>
@@ -687,7 +687,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_12(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "Machine Check Exception", "Machine Check Exception", ref aContext);
+            HandleException(aContext.EIP, "Machine Check Exception", ref aContext);
         }
 
         /// <summary>
@@ -697,7 +697,7 @@ namespace Cosmos.Core {
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
         public static void HandleInterrupt_13(ref IRQContext aContext) {
-            HandleException(aContext.EIP, "SIMD Floating Point Exception", "SIMD Floating Point Exception", ref aContext);
+            HandleException(aContext.EIP, "SIMD Floating Point Exception", ref aContext);
         }
 
 
@@ -707,13 +707,12 @@ namespace Cosmos.Core {
         /// Handle exception.
         /// </summary>
         /// <param name="aEIP">Unused.</param>
-        /// <param name="aDescription">Unused.</param>
         /// <param name="aName">Unused.</param>
         /// <param name="ctx">IRQ context.</param>
         /// <param name="lastKnownAddressValue">Last known address value. (default = 0)</param>
         /// <exception cref="System.IndexOutOfRangeException">Thrown on fatal error, contact support.</exception>
         /// <exception cref="System.OverflowException">Thrown on fatal error, contact support.</exception>
-        private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx, uint lastKnownAddressValue = 0) {
+        private static void HandleException(uint aEIP, string aName, ref IRQContext ctx, uint lastKnownAddressValue = 0) {
             // At this point we are in a very unstable state.
             // Try not to use any Cosmos routines, just
             // report a crash dump.
@@ -727,28 +726,25 @@ namespace Cosmos.Core {
             {
                 byte* xAddress = (byte*)0xB8000;
 
-                PutErrorString(0, 0, "Cosmos CPU Exception");
-
+                PutErrorString(0, 0, "=== Cosmos CPU Exception ===");
+                PutErrorString(1, 0, aName);
                 PutErrorString(2, 0, "Error Code: 0x");
                 PutErrorChar(2, 14, xHex[(int)((ctx.Interrupt >> 4) & 0xF)]);
                 PutErrorChar(2, 15, xHex[(int)(ctx.Interrupt & 0xF)]);
 
-                PutErrorString(2, 0, aName);
-                PutErrorString(3, 0, aDescription);
-
                 if (lastKnownAddressValue != 0) {
-                    PutErrorString(1, 0, "Last known address: 0x");
-
-                    PutErrorChar(1, 22, xHex[(int)((lastKnownAddressValue >> 28) & 0xF)]);
-                    PutErrorChar(1, 23, xHex[(int)((lastKnownAddressValue >> 24) & 0xF)]);
-                    PutErrorChar(1, 24, xHex[(int)((lastKnownAddressValue >> 20) & 0xF)]);
-                    PutErrorChar(1, 25, xHex[(int)((lastKnownAddressValue >> 16) & 0xF)]);
-                    PutErrorChar(1, 26, xHex[(int)((lastKnownAddressValue >> 12) & 0xF)]);
-                    PutErrorChar(1, 27, xHex[(int)((lastKnownAddressValue >> 8) & 0xF)]);
-                    PutErrorChar(1, 28, xHex[(int)((lastKnownAddressValue >> 4) & 0xF)]);
-                    PutErrorChar(1, 29, xHex[(int)(lastKnownAddressValue & 0xF)]);
+                    PutErrorString(3, 0, "Last known address: 0x");
+                    PutErrorChar(3, 22, xHex[(int)((lastKnownAddressValue >> 28) & 0xF)]);
+                    PutErrorChar(3, 23, xHex[(int)((lastKnownAddressValue >> 24) & 0xF)]);
+                    PutErrorChar(3, 24, xHex[(int)((lastKnownAddressValue >> 20) & 0xF)]);
+                    PutErrorChar(3, 25, xHex[(int)((lastKnownAddressValue >> 16) & 0xF)]);
+                    PutErrorChar(3, 26, xHex[(int)((lastKnownAddressValue >> 12) & 0xF)]);
+                    PutErrorChar(3, 27, xHex[(int)((lastKnownAddressValue >> 8) & 0xF)]);
+                    PutErrorChar(3, 28, xHex[(int)((lastKnownAddressValue >> 4) & 0xF)]);
+                    PutErrorChar(3, 29, xHex[(int)(lastKnownAddressValue & 0xF)]);
                 }
 
+                PutErrorString(4, 0, "System halted.");
             }
 
             // lock up
