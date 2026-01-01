@@ -12,13 +12,13 @@ namespace Cosmos.HAL
     {
         public static readonly Debugger debugger = new("Global");
 
-        public static PIT PIT = new();
+        public static PIT PIT;
         // Must be static init, other static inits rely on it not being null
 
         public static TextScreenBase TextScreen = new TextScreen();
         public static PCI Pci;
 
-        public static readonly PS2Controller PS2Controller = new();
+        public static PS2Controller PS2Controller;
 
         // TODO: continue adding exceptions to the list, as HAL and Core would be documented.
         /// <summary>
@@ -33,8 +33,26 @@ namespace Cosmos.HAL
                 TextScreen = textScreen;
             }
 
+            Console.Clear();
+
             debugger.Send("Before Core.Global.Init");
             Core.Global.Init();
+
+            Console.WriteLine("Starting ACPI");
+            debugger.Send("ACPI Init");
+            ACPI.Start();
+
+            Console.WriteLine("Starting APIC");
+            debugger.Send("Local APIC Init");
+            LocalAPIC.Initialize();
+            debugger.Send("IO APIC Init");
+            IOAPIC.Initialize();
+
+            Console.WriteLine("Starting PIT");
+            PIT = new PIT();
+
+            debugger.Send("Local APIC Timer Init");
+            APICTimer.Initialize();
 
             //TODO Redo this - Global init should be other.
             // Move PCI detection to hardware? Or leave it in core? Is Core PC specific, or deeper?
@@ -50,16 +68,13 @@ namespace Cosmos.HAL
             debugger.Send("PCI Devices");
             PCI.Setup();
 
-            Console.WriteLine("Starting ACPI");
-            debugger.Send("ACPI Init");
-            ACPI.Start();
-
             // http://wiki.osdev.org/%228042%22_PS/2_Controller#Initialising_the_PS.2F2_Controller
             // TODO: USB should be initialized before the PS/2 controller
             // TODO: ACPI should be used to check if a PS/2 controller exists
             debugger.Send("PS/2 Controller Init");
             if (InitPS2)
             {
+                PS2Controller = new PS2Controller();
                 PS2Controller.Initialize(InitScrollWheel);
             }
             else

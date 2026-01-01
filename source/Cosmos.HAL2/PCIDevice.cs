@@ -107,6 +107,10 @@ namespace Cosmos.HAL
         /// </summary>
         public bool Claimed { get; set; }
 
+        public bool SupportMsi = false;
+
+        public byte MsiOffset = 0;
+
         public PCIDevice(uint bus, uint slot, uint function)
         {
             this.bus = bus;
@@ -132,6 +136,8 @@ namespace Cosmos.HAL
             InterruptPIN = (PCIInterruptPIN)ReadRegister8((byte)Config.InterruptPIN);
             InterruptLine = ReadRegister8((byte)Config.InterruptLine);
 
+            CheckMSI();
+
             if ((uint)VendorID == 0xFF && (uint)DeviceID == 0xFFFF)
             {
                 DeviceExists = false;
@@ -149,7 +155,7 @@ namespace Cosmos.HAL
                 BaseAddressBar[3] = new PCIBaseAddressBar(ReadRegister32(0x1C));
                 BaseAddressBar[4] = new PCIBaseAddressBar(ReadRegister32(0x20));
                 BaseAddressBar[5] = new PCIBaseAddressBar(ReadRegister32(0x24));
-            }
+            }          
         }
 
         public void EnableDevice()
@@ -183,6 +189,49 @@ namespace Cosmos.HAL
             uint xAddr = GetAddressBase(Bus, Slot, Function) | 0x0 & 0xFC;
             IOPort.Write32(ConfigAddressPort, xAddr);
             return (ushort)(IOPort.Read32(ConfigDataPort) >> (0x0 % 4 * 8) & 0xFFFF);
+        }
+
+        /// <summary>
+        /// Check if PCI Device supports MSI
+        /// </summary>
+        /// <returns>Boolean value.</returns>
+        private bool CheckMSI()
+        {
+            byte offset = ReadRegister8((byte)Config.CapabilityPointer);
+
+            while (offset > 0)
+            {
+                byte id = ReadRegister8(offset);
+
+                switch (id)
+                {
+                    case 0x05:
+                        SupportMsi = true;
+                        MsiOffset = offset;
+                        return true;
+                }
+                offset = ReadRegister8((byte)(offset + 1));
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Configure PCI Device to use MSI for interrupts.
+        /// </summary>
+        public void SetMSI(byte vector)
+        {
+            if (!SupportMsi)
+            {
+                return;
+            }
+
+            /*
+            ushort msgControl = ReadRegister16((byte)(MsiOffset + 2));
+            WriteRegister32((byte)(MsiOffset + 0x04), (uint)((0x0FEE << 20) | (0 << 12))); //use only APIC 0 since we don't support multiprocessing yet!
+            WriteRegister32((byte)(MsiOffset + (((msgControl << 7) & 1) == 1 ? 0x0C : 0x08)), vector);
+            WriteRegister16((byte)(MsiOffset + 2), (ushort)((msgControl | 1) & ~(0b111 << 4)));
+            */
         }
 
         #region IOReadWrite
@@ -251,7 +300,7 @@ namespace Cosmos.HAL
         /// <param name="aSlot">A slot.</param>
         /// <param name="aFunction">A function.</param>
         /// <returns>UInt32 value.</returns>
-        protected static uint GetAddressBase(uint aBus, uint aSlot, uint aFunction)
+        public static uint GetAddressBase(uint aBus, uint aSlot, uint aFunction)
         {
             return 0x80000000 | (aBus << 16) | ((aSlot & 0x1F) << 11) | ((aFunction & 0x07) << 8);
         }
