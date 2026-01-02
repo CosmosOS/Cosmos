@@ -88,9 +88,9 @@ You can get files and directory listing by using this code:
 var files_list = Directory.GetFiles(@"0:\");
 var directory_list = Directory.GetDirectories(@"0:\");
 
-foreach (var file in files_list);
+foreach (var file in files_list)
 {
-    Console.WriteLine(file)
+    Console.WriteLine(file);
 }
 foreach (var directory in directory_list)
 {
@@ -151,7 +151,7 @@ Here is a example of code of creating a new directory:
 ```C#
 try
 {
-    Directory.Create(@"0:\testdirectory\");
+    Directory.CreateDirectory(@"0:\testdirectory\");
 }
 catch (Exception e)
 {
