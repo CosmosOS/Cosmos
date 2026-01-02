@@ -2,6 +2,7 @@
 // #define COSMOSDEBUG
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -319,7 +320,8 @@ namespace Cosmos.System.FileSystem.FAT
             /// <param name="aData">Output data byte.</param>
             /// <exception cref="OverflowException">Thrown when data lenght is greater then Int32.MaxValue.</exception>
             /// <exception cref="Exception">Thrown when data size invalid.</exception>
-            private void ReadFatSector(ulong aSector, ref byte[] aData) {
+            private void ReadFatSector(ulong aSector, ref byte[] aData)
+            {
                 Global.Debugger.SendInternal("-- FatFileSystem.ReadFatSector --");
                 ulong xSector = mFatSector + aSector;
                 Global.Debugger.SendInternal("xSector  =" + xSector);
@@ -647,6 +649,11 @@ namespace Cosmos.System.FileSystem.FAT
         public uint TotalSectorCount { get; private set; }
 
         /// <summary>
+        /// File System Label used in root path.
+        /// </summary>
+        public string FileSystemLabel { get; private set; }
+
+        /// <summary>
         /// FATs array.
         /// </summary>
         private Fat[] mFats { get; set; }
@@ -781,7 +788,7 @@ namespace Cosmos.System.FileSystem.FAT
             Global.Debugger.SendInternal("Creating a new " + aDriveFormat + " FileSystem.");
 
             var fs = new FatFileSystem(aDevice, aRootPath, aSize, false);
-            fs.Format(aDriveFormat, true);
+            fs.Format(aDriveFormat, true, aRootPath);
             return fs;
         }
 
@@ -866,6 +873,19 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 mFats[i] = new Fat(this, ReservedSectorCount + i * FatSectorCount);
             }
+
+            // Read volume label (11 bytes)
+            byte[] volumeLabelBytes = new byte[11];
+            Array.Copy(xBPB, 0x047, volumeLabelBytes, 0, 11);
+            int actualLength = Array.IndexOf(volumeLabelBytes, (byte)0);
+            if (actualLength == -1)
+            {
+                actualLength = volumeLabelBytes.Length;
+            }
+            byte[] trimmedVolumeLabelBytes = new byte[actualLength];
+            Array.Copy(volumeLabelBytes, trimmedVolumeLabelBytes, actualLength);
+
+            FileSystemLabel = Encoding.UTF8.GetString(trimmedVolumeLabelBytes);
         }
 
         /// <summary>
@@ -962,7 +982,7 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 aSize = BytesPerCluster;
             }
-            
+
 
             if (mFatType == FatTypeEnum.Fat32)
             {
@@ -997,6 +1017,7 @@ namespace Cosmos.System.FileSystem.FAT
             global::System.Console.WriteLine("Root Sector Count     = " + RootSectorCount);
             global::System.Console.WriteLine("Sectors per Cluster   = " + SectorsPerCluster);
             global::System.Console.WriteLine("Total Sector Count    = " + TotalSectorCount);
+            global::System.Console.WriteLine("File System Label     = " + FileSystemLabel);
 
             Global.Debugger.SendInternal("Bytes per Cluster =");
             Global.Debugger.SendInternal(BytesPerCluster);
@@ -1465,7 +1486,7 @@ namespace Cosmos.System.FileSystem.FAT
         /// <exception cref="ArrayTypeMismatchException">Thrown on fatal error.</exception>
         /// <exception cref="InvalidCastException">Thrown when the data in aData is corrupted.</exception>
         /// <exception cref="NotSupportedException">Thrown when FAT type is unknown.</exception>
-        public override void Format(string aDriveFormat, bool aQuick)
+        public override void Format(string aDriveFormat, bool aQuick, string Label)
         {
             /* Parmaters check */
             if (Device == null)
@@ -1587,11 +1608,22 @@ namespace Cosmos.System.FileSystem.FAT
                 xBPB.Write8(0x42, 0x29); //signature
 
                 var SerialID = new byte[4] { 0x01, 0x02, 0x03, 0x04 };
-                var VolumeLabel = "COSMOSDISK";
 
                 xBPB.Copy(0x43, SerialID, 0, SerialID.Length);
                 xBPB.WriteString(0x47, "           ");
-                xBPB.WriteString(0x47, VolumeLabel);
+                byte[] labelBytes = Encoding.UTF8.GetBytes(Label);
+                if (labelBytes.Length < 11)
+                {
+                    byte[] paddedLabelBytes = new byte[11];
+                    Array.Copy(labelBytes, paddedLabelBytes, labelBytes.Length);
+                    labelBytes = paddedLabelBytes;
+                }
+                else if (labelBytes.Length > 11)
+                {
+                    throw new Exception("FAT32 label cannot be larger than 11 bytes.");
+                }
+                xBPB.Copy(0x047, labelBytes, 0, labelBytes.Length);
+                FileSystemLabel = Label;
                 xBPB.WriteString(0x52, "FAT32   ");
 
                 //TODO: OS Boot Code
