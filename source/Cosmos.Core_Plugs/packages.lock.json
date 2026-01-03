@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net8.0": {
       "IgnoresAccessChecksToGenerator": {
         "type": "Direct",
         "requested": "[0.5.0, )",
@@ -1116,6 +1116,7 @@
           "Cosmos.Core": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.IL2CPU": "[0.1.0-localbuild, )",
+          "IL2CPU.API": "[0.1.0-localbuild, )",
           "System.Reflection.TypeExtensions": "[4.7.0, )",
           "XSharp": "[0.1.0-localbuild, )"
         }

@@ -46,7 +46,7 @@ namespace Cosmos.System.Audio.IO {
         }
 
         /// <summary>
-        /// Converts 16-bit samples to the specified format, using the specified 
+        /// Converts 16-bit samples to the specified format, using the specified
         /// buffer. If <paramref name="target"/> is equal to <see cref="AudioBitDepth.Bits16"/>,
         /// no action is performed.
         /// </summary>
@@ -353,7 +353,7 @@ namespace Cosmos.System.Audio.IO {
         }
 
         /// <summary>
-        /// Returns a 24-bit signed integer converted from three bytes at a 
+        /// Returns a 24-bit signed integer converted from three bytes at a
         /// specified position in a byte array pointer.
         /// </summary>
         /// <param name="arrayPtr">A pointer to an array of bytes that includes the three bytes to convert.</param>

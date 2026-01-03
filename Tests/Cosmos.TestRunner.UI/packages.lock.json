@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net8.0": {
       "Avalonia": {
         "type": "Direct",
         "requested": "[0.7.0, )",
@@ -871,8 +871,8 @@
       },
       "System.Data.SqlClient": {
         "type": "Transitive",
-        "resolved": "4.8.5",
-        "contentHash": "fRqxut4lrndPHrXD+ht1XRmCL3obuKldm4XjCRYS9p5f7FSR7shBxAwTkDrpFMsHC9BhNgjjmUtiIjvehn5zkg==",
+        "resolved": "4.8.6",
+        "contentHash": "2Ij/LCaTQRyAi5lAv7UUTV9R2FobC8xN9mE0fXBZohum/xLl8IZVmE98Rq5ugQHjCgTBRKqpXRb4ORulRdA6Ig==",
         "dependencies": {
           "Microsoft.Win32.Registry": "4.7.0",
           "System.Security.Principal.Windows": "4.7.0",
@@ -2354,6 +2354,7 @@
           "Cosmos.Core": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
           "Cosmos.IL2CPU": "[0.1.0-localbuild, )",
+          "IL2CPU.API": "[0.1.0-localbuild, )",
           "System.Reflection.TypeExtensions": "[4.7.0, )",
           "XSharp": "[0.1.0-localbuild, )"
         }
@@ -2365,6 +2366,8 @@
           "Cosmos.Core": "[0.1.0-localbuild, )",
           "Cosmos.Core_Asm": "[0.1.0-localbuild, )",
           "Cosmos.Debug.Kernel": "[0.1.0-localbuild, )",
+          "Cosmos.IL2CPU": "[0.1.0-localbuild, )",
+          "IL2CPU.API": "[0.1.0-localbuild, )",
           "IgnoresAccessChecksToGenerator": "[0.5.0, )",
           "XSharp": "[0.1.0-localbuild, )"
         }
@@ -2579,7 +2582,7 @@
           "SQLitePCLRaw.core": "[2.0.6, )",
           "SQLitePCLRaw.lib.e_sqlite3.linux": "[1.1.14, )",
           "System.ComponentModel.Annotations": "[5.0.0, )",
-          "System.Data.SqlClient": "[4.8.5, )",
+          "System.Data.SqlClient": "[4.8.6, )",
           "System.IO.MemoryMappedFiles": "[4.3.0, )",
           "System.Reflection.Metadata": "[5.0.0, )"
         }
@@ -2646,7 +2649,7 @@
         }
       }
     },
-    "net6.0/win10-x86": {
+    "net8.0/win-x86": {
       "Avalonia.Native": {
         "type": "Transitive",
         "resolved": "0.7.0",
@@ -2671,50 +2674,6 @@
         "contentHash": "uqX2Frwf9PW8MaY7PRNY6HM5BpW1D8oj1EdqzrmbEFD5nH63Yat3aEjN/tws6Tw6Fk7LwmLBvtUh32tTeTaHiA==",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1"
-        }
-      },
-      "Microsoft.NETCore.DotNetHost": {
-        "type": "Transitive",
-        "resolved": "1.0.1",
-        "contentHash": "uaMgykq6AckP3hZW4dsD6zjocxyXPz0tcTl8OX7mlSUWsyFXdtf45sjdwI0JIHxt3gnI6GihAlOAwYK8HE4niQ==",
-        "dependencies": {
-          "runtime.win7-x86.Microsoft.NETCore.DotNetHost": "1.0.1"
-        }
-      },
-      "Microsoft.NETCore.DotNetHostPolicy": {
-        "type": "Transitive",
-        "resolved": "1.0.5",
-        "contentHash": "KR8e8+lh/YnhD0wDCMBRUjn0/VnryxHbu6I61U6m7PAyz9HbRr+iX3BYL925OHMFuFmk1atc/RRGjGtVOVrvrg==",
-        "dependencies": {
-          "Microsoft.NETCore.DotNetHostResolver": "1.0.1",
-          "runtime.win7-x86.Microsoft.NETCore.DotNetHostPolicy": "1.0.5"
-        }
-      },
-      "Microsoft.NETCore.DotNetHostResolver": {
-        "type": "Transitive",
-        "resolved": "1.0.1",
-        "contentHash": "GEXgpAHB9E0OhfcmNJ664Xcd2bJkz2qkGIAFmCgEI5ANlQy4qEEmBVfUqA+Z9HB85ZwWxZc1eIJ6fxdxcjrctg==",
-        "dependencies": {
-          "Microsoft.NETCore.DotNetHost": "1.0.1",
-          "runtime.win7-x86.Microsoft.NETCore.DotNetHostResolver": "1.0.1"
-        }
-      },
-      "Microsoft.NETCore.Jit": {
-        "type": "Transitive",
-        "resolved": "1.0.7",
-        "contentHash": "pNYSZFvX14x4ubToTLxj9O9xNIEg1kHaL6gkMr8urWKIY65cu8272KRlT3cgJCKLbzFO0XZDjvPlRBCFrbJm7Q==",
-        "dependencies": {
-          "runtime.win7-x86.Microsoft.NETCore.Jit": "1.0.7"
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR": {
-        "type": "Transitive",
-        "resolved": "1.0.7",
-        "contentHash": "t81co+R1xDubSQDDYP+zddd1Eya7xGeN2XlJMSsNFUCKRm35/5u8knnXOQTdfE1nf6bYqPROt18WlhdZui1FLA==",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.7",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR": "1.0.7"
         }
       },
       "Microsoft.Win32.Primitives": {
@@ -2865,16 +2824,6 @@
         "type": "Transitive",
         "resolved": "5.0.0-rtm.20519.4",
         "contentHash": "kvMZgZjtcC6cA8Y8imKpjCpiOJKDtwlNekS86GzUol4Jmzh0FWiRwAj4E9ZKO8R7rTBGIA4rkmra9Ko8j7l6AA=="
-      },
-      "runtime.native.System.IO.Compression": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "INBPonS5QPEgn7naufQFXJEp3zX6L4bwHgJ/ZH78aBTpeNfQMtf7C6VrAFhlq2xxWBveIOWyFzQjJ8XzHMhdOQ==",
-        "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
-          "runtime.win7-x86.runtime.native.System.IO.Compression": "4.3.0"
-        }
       },
       "runtime.opensuse.13.2-x64.runtime.native.System.Security.Cryptography.OpenSsl": {
         "type": "Transitive",
@@ -3038,47 +2987,6 @@
           "System.Private.Uri": "4.3.0"
         }
       },
-      "runtime.win7-x86.Microsoft.NETCore.DotNetHost": {
-        "type": "Transitive",
-        "resolved": "1.0.1",
-        "contentHash": "3+kwgwIlQaTygjP8MV1AYvxJSRGQH40OtDzt40p9GSWGDnsanS7zOfXtMhJcS5Wp5u7ZwCAd2wjvKRkWGdadjA=="
-      },
-      "runtime.win7-x86.Microsoft.NETCore.DotNetHostPolicy": {
-        "type": "Transitive",
-        "resolved": "1.0.5",
-        "contentHash": "bRK/P9Biahoty2+Wt3yscatZT1S06vcyzm5XivWrbHZqQHFTLWhVrWabzFuBMv4asf72kniYCZ0wMXyPO+1dNg==",
-        "dependencies": {
-          "Microsoft.NETCore.DotNetHostResolver": "1.0.1"
-        }
-      },
-      "runtime.win7-x86.Microsoft.NETCore.DotNetHostResolver": {
-        "type": "Transitive",
-        "resolved": "1.0.1",
-        "contentHash": "hZ+7TYB1UBWXE3XreX9ZR3/mKkmy5rMcwvKObYaZmYgKX82nFEpgLzJnio0yTEJAwGkmc+JFpwwQaHMDsyTsmQ==",
-        "dependencies": {
-          "Microsoft.NETCore.DotNetHost": "1.0.1"
-        }
-      },
-      "runtime.win7-x86.Microsoft.NETCore.Jit": {
-        "type": "Transitive",
-        "resolved": "1.0.7",
-        "contentHash": "ymuXdyB00051kFKWoEzCOro5syHSXIgMJA/T8NfTk8ftw4+OBU+YUxAC8xnYsyEorxaSz67R8vj595rKtChNnQ=="
-      },
-      "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR": {
-        "type": "Transitive",
-        "resolved": "1.0.7",
-        "contentHash": "q4ORbNN3TOgGVgX8b56LmuM+rl0FjplsBx0zksuxAqEc3aYsanVw/u9pyXnFHRT0Il9oYYWZZPXflmSqG4CcbA=="
-      },
-      "runtime.win7-x86.runtime.native.System.IO.Compression": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "99pM1ZhX7dPNnr/dOxuAxnVl/2XNWRh1WAUfesV3ZKwbR6mnEzpfbz2GX69zrpGvKbEytsjMKCD+auvvH6f7kA=="
-      },
-      "runtime.win7.System.Private.Uri": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "Q+IBgaPYicSQs2tBlmXqbS25c/JLIthWrgrpMwxKSOobW/OqIMVFruUGfuaz4QABVzV8iKdCAbN7APY7Tclbnw=="
-      },
       "SkiaSharp": {
         "type": "Transitive",
         "resolved": "1.60.0",
@@ -3120,8 +3028,8 @@
       },
       "System.Data.SqlClient": {
         "type": "Transitive",
-        "resolved": "4.8.5",
-        "contentHash": "fRqxut4lrndPHrXD+ht1XRmCL3obuKldm4XjCRYS9p5f7FSR7shBxAwTkDrpFMsHC9BhNgjjmUtiIjvehn5zkg==",
+        "resolved": "4.8.6",
+        "contentHash": "2Ij/LCaTQRyAi5lAv7UUTV9R2FobC8xN9mE0fXBZohum/xLl8IZVmE98Rq5ugQHjCgTBRKqpXRb4ORulRdA6Ig==",
         "dependencies": {
           "Microsoft.Win32.Registry": "4.7.0",
           "System.Security.Principal.Windows": "4.7.0",
@@ -3536,8 +3444,7 @@
         "contentHash": "I4SwANiUGho1esj4V4oSlPllXjzCZDE+5XXso2P03LW2vOda2Enzh8DWOxwN6hnrJyp314c7KuVu31QYhRzOGg==",
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
-          "runtime.win7.System.Private.Uri": "4.3.0"
+          "Microsoft.NETCore.Targets": "1.1.0"
         }
       },
       "System.Reflection": {

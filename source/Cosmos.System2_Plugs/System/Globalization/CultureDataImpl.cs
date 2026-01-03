@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Reflection.Emit;
 using IL2CPU.API.Attribs;
 
 namespace Cosmos.System_Plugs.System.Globalization
@@ -115,6 +116,18 @@ namespace Cosmos.System_Plugs.System.Globalization
         public static Calendar get_DefaultCalendar(object aThis)
         {
             return new GregorianCalendar();
+        }
+
+        [PlugMethod(Signature = "System_Int32__Interop_Globalization__IsPredefinedLocale_g____PInvoke|32_0_System_UInt16#_")]
+        public static bool IcuIsEnsurePredefinedLocaleName(string name)
+        {
+            return true;
+        }
+
+        public static bool GetLocaleName(string localeName, out string nativeName)
+        {
+            nativeName = localeName;
+            return true;
         }
     }
 }

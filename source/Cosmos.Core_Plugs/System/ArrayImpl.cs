@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Cosmos.Core;
 using IL2CPU.API;
 using IL2CPU.API.Attribs;
@@ -118,8 +119,11 @@ namespace Cosmos.Core_Plugs.System
         }
 
         [PlugMethod(Signature = "System_Void__System_Array_SetValue_System_Object__System_Int32_")]
-        public static unsafe void SetValue([ObjectPointerAccess] uint* aThis, uint aValue, int aIndex)
+        public static unsafe void InternalSetValue([ObjectPointerAccess] uint* aThis, object aValue, int aIndex)
         {
+            void* valuePtr = Unsafe.AsPointer(ref aValue);
+            uint intVal = *((uint*)valuePtr);
+
             aThis = (uint*) aThis[0];
             aThis += 3;
             uint xElementSize = *aThis;
@@ -128,16 +132,16 @@ namespace Cosmos.Core_Plugs.System
             switch (xElementSize)
             {
                 case 1:
-                    *(byte*) aThis = (byte) aValue;
+                    *(byte*) aThis = (byte) intVal;
                     return;
                 case 2:
-                    *(ushort*) aThis = (ushort) aValue;
+                    *(ushort*) aThis = (ushort) intVal;
                     return;
                 case 3:
-                    *(uint*) aThis = (uint) aValue;
+                    *(uint*) aThis = (uint) intVal;
                     return;
                 case 4:
-                    *(uint*) aThis = (uint) aValue;
+                    *(uint*) aThis = (uint) intVal;
                     return;
             }
             throw new NotSupportedException("SetValue not supported in this situation!");
@@ -151,6 +155,23 @@ namespace Cosmos.Core_Plugs.System
         public static Array CreateInstance(Type type, int size)
         {
             return GCImpl.CreateNewArray((int)VTablesImpl.GetSize(((CosmosRuntimeType)type).mTypeId), size);
+        }
+
+        // {!} work out if this is right
+        [PlugMethod(Signature = "System_Boolean__System_Array_IsSimpleCopy_System_Array__System_Array_")]
+        public static bool IsSimpleCopy(Array sourceArray, Array destinationArray)
+        {
+            return true;
+        }
+
+        // {!} this can be faster
+        [PlugMethod(Signature = "System_Void__System_Array_CopySlow_System_Array__System_Int32__System_Array__System_Int32__System_Int32_")]
+        public static void CopySlow(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                destinationArray.SetValue(sourceArray.GetValue(sourceIndex + i), destinationIndex + i);
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <Configurations>Debug;Release;TEST</Configurations>
@@ -17,6 +17,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="$(IL2CPURepoRoot)source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
+        <ProjectReference Include="$(IL2CPURepoRoot)source\IL2CPU.API\IL2CPU.API.csproj" />
         <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj" />
         <ProjectReference Include="..\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
