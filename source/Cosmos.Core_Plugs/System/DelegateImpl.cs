@@ -6,7 +6,7 @@ using IL2CPU.API.Attribs;
 namespace Cosmos.Core_Plugs.System
 {
     [Plug(Target = typeof(Delegate))]
-    public static class DelegateImpl
+    public static unsafe class DelegateImpl
     {
         [PlugMethod(Signature = "System_Boolean__System_Delegate_Equals_System_Object_")]
         public static bool Equals(Delegate aThis, object aThat)
@@ -23,6 +23,11 @@ namespace Cosmos.Core_Plugs.System
             var xTypeB = b[0][0];
 
             return xTypeA == xTypeB;
+        }
+
+        public static int GetHashCode(Delegate aThis, [FieldAccess(Name = "System.IntPtr System.Delegate._methodPtr")] ref IntPtr aAddress)
+        {
+            return (int)aAddress.ToPointer();
         }
 
         [PlugMethod(Signature = "System_IRuntimeMethodInfo__System_Delegate_FindMethodHandle__")]

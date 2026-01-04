@@ -38,6 +38,7 @@ namespace Cosmos.TestRunner.Full
             //yield return typeof(ConsoleTest.Kernel);
             yield return typeof(MemoryOperationsTest.Kernel);
             yield return typeof(ProcessorTests.Kernel);
+            yield return typeof(ThreadingTests.Kernel);
         }
     }
 }

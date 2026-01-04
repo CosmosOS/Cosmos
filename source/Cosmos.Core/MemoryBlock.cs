@@ -518,6 +518,33 @@ namespace Cosmos.Core
                 (*(byte*)(Base + aByteOffset)) = value;
             }
         }
+
+        /// <summary>
+        /// Convert part for the memory block to array.
+        /// </summary>
+        /// <param name="aStart">A starting position of the data at the source memory block.</param>
+        /// <param name="aIndex">A index to be the staring index at the destination array.</param>
+        /// <param name="aCount">Number of bytes to get.</param>
+        /// <returns>uint array.</returns>
+        public unsafe byte[] ToArray(int aStart, int aIndex, int aCount)
+        {
+            byte* xDest = (byte*)(Base + aStart);
+            byte[] array = new byte[aCount];
+            fixed (byte* aArrayPtr = array)
+            {
+                MemoryOperations.Copy(aArrayPtr + aIndex, xDest, aCount);
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// Convert the memory block to array.
+        /// </summary>
+        /// <returns>uint array.</returns>
+        public byte[] ToArray()
+        {
+            return ToArray(0, 0, (int)Size);
+        }
     }
 
     /// <summary>
