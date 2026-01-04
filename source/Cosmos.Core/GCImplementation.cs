@@ -99,6 +99,7 @@ namespace Cosmos.Core
                 memLength = 128 * 1024 * 1024;
             }
             RAT.Init(memPtr, (uint)memLength);
+            Paging.Init();
         }
         /// <summary>
         /// Get the Pointer of any object needed for Free()
