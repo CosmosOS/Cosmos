@@ -40,13 +40,12 @@ In a project, Cosmos can be thought of as a compiler and a sort-of standard libr
 
 The following is a non-exhaustive list of features that Cosmos offers:
 
-- Low level assembly access and pointer memory control
-- A basic filesystem
+- Deep hardware access and interactions with CPU, keyboard, etc.
+- Support for FAT and ISO9660 file systems (read only in case of ISO9660)
 - Most features found in the .NET core library
-- A CPU/FPU accelerated math library
 - A basic graphics interface
-- A basic network interface
-- A basic audio interface
+- Basic networking with protocols like TCP, DHCP, and DNS
+- PC speaker and AC97 audio support
 
 ## Setting it up
 
