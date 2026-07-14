@@ -12,13 +12,6 @@
   <a href="https://valentinbreiz.github.io/nativeaot-patcher/roadmap.html"><img src="https://img.shields.io/badge/gen3_release-90%25-yellow" /></a>
 </p>
 
-<hr/>
-
-<img width="546" height="538" alt="image" src="https://github.com/user-attachments/assets/7679c86d-68a3-4678-99c2-d5e1f3987eee" />
-
-> [Voted French law aimed at criminalizing free culture](https://www.assemblee-nationale.fr/dyn/17/textes/l17b1133_proposition-loi#). No to authoritarianism! No to fascism! Support your local sound systems!
-> ### 🇫🇷 French citizens — **[SIGN THE PETITION](https://petitions.assemblee-nationale.fr/initiatives/i-5428)**
-
 # Cosmos gen3
 
 A bare-metal C# kernel framework built on **NativeAOT**. Cosmos gen3 is the next generation of the [Cosmos](https://github.com/CosmosOS/Cosmos) operating system project, replacing the IL2CPU transpiler with the official .NET ahead-of-time compiler. The result is an ordinary `dotnet build` that produces a bootable kernel ELF for **x64 or ARM64**, linked with an integrated runtime, plugged with the Cosmos plug system, and packaged into an ISO with the Limine bootloader.
