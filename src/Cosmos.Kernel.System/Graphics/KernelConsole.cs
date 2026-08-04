@@ -96,6 +96,15 @@ public class KernelConsole
     public bool IsAvailable => _canvas != null;
 
     /// <summary>
+    /// Pixel rect of the cursor's current row (full width, one character tall).
+    /// A caller that just wrote a single character with no line wrap/scroll (the
+    /// common case — see ConsolePlug.ReadKey) can present just this rect via
+    /// <see cref="Canvas"/>.Display(x,y,w,h) instead of the whole screen.
+    /// </summary>
+    public (int x, int y, int width, int height) CursorRowRect =>
+        (0, _cursorY * _charHeight, _cols * _charWidth, _charHeight);
+
+    /// <summary>
     /// Gets or sets the font used in this console.
     /// </summary>
     public Font Font

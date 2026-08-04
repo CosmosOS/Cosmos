@@ -542,6 +542,11 @@ internal class GopCanvas : Canvas
         driver.Swap();
     }
 
+    public override void Display(int x, int y, int width, int height)
+    {
+        driver.SwapRect(x, y, width, height);
+    }
+
     #region Reading
 
     public override Color GetPointColor(int aX, int aY)

@@ -107,6 +107,35 @@ public unsafe class GopDriver : GraphicDevice
     }
 
     /// <summary>
+    /// Presents only the given rect of the back buffer, row by row, instead of the
+    /// whole framebuffer. A full <see cref="Swap"/> is a several-megabyte
+    /// non-temporal MMIO write; for a caller that only changed a handful of pixels
+    /// (e.g. one console character cell per keystroke) that cost is paid on every
+    /// call for no visual benefit, and under virtualized display devices is slow
+    /// enough that a rapid burst of full swaps (e.g. fast typing) visibly tears.
+    /// </summary>
+    public override void SwapRect(int x, int y, int width, int height)
+    {
+        if (x < 0) { width += x; x = 0; }
+        if (y < 0) { height += y; y = 0; }
+        if (x >= (int)Width || y >= (int)Height || width <= 0 || height <= 0)
+        {
+            return;
+        }
+
+        width = Math.Min(width, (int)Width - x);
+        height = Math.Min(height, (int)Height - y);
+
+        int rowBytes = width * (int)Stride;
+        var span = lastbuffer.Span;
+        for (int row = 0; row < height; row++)
+        {
+            int byteOffset = (int)((y + row) * Pitch + x * Stride);
+            LinearFrameBuffer.CopyNonTemporal(byteOffset, span.Slice(byteOffset, rowBytes));
+        }
+    }
+
+    /// <summary>
     /// Copy a buffer of pixels to a rectangular region.
     /// </summary>
     public override void CopyBuffer(ReadOnlyMemory<uint> pixels, int x, int y, int width, int height)

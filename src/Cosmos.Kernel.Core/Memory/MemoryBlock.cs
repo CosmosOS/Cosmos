@@ -267,6 +267,22 @@ public class MemoryBlock
     }
 
     /// <summary>
+    /// Copy a byte span into this memory block at the given offset. Same
+    /// non-temporal (cache-bypassing) write as <see cref="Copy(ManagedMemoryBlock)"/>,
+    /// but scoped to a sub-range — for presenting only a damaged rect of an MMIO
+    /// framebuffer instead of paying for a full-buffer copy on every small update.
+    /// </summary>
+    /// <param name="aByteOffset">Destination byte offset within this memory block.</param>
+    /// <param name="aData">Source bytes to write.</param>
+    public unsafe void CopyNonTemporal(int aByteOffset, ReadOnlySpan<byte> aData)
+    {
+        fixed (byte* src = aData)
+        {
+            MemoryOp.MemCopyNonTemporal((byte*)Base + aByteOffset, src, aData.Length);
+        }
+    }
+
+    /// <summary>
     /// Copies data from the memory block to the specified array.
     /// </summary>
     /// <param name="aByteOffset">The byte offset in the memory block from which to start copying.</param>

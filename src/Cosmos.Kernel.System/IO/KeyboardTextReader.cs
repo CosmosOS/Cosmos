@@ -76,7 +76,12 @@ public sealed class KeyboardTextReader : TextReader
                         }
                         if (KernelConsole.Default.IsAvailable)
                         {
-                            KernelConsole.Default.Canvas.Display();
+                            // Scoped to the cursor's row instead of a full-screen Swap: this
+                            // runs on every keystroke, and a multi-megabyte MMIO copy per key
+                            // was slow enough under a virtualized display device to visibly
+                            // tear during fast typing.
+                            var (rx, ry, rw, rh) = KernelConsole.Default.CursorRowRect;
+                            KernelConsole.Default.Canvas.Display(rx, ry, rw, rh);
                         }
                     }
                     break;
@@ -104,7 +109,12 @@ public sealed class KeyboardTextReader : TextReader
 
                         if (KernelConsole.Default.IsAvailable)
                         {
-                            KernelConsole.Default.Canvas.Display();
+                            // Scoped to the cursor's row instead of a full-screen Swap: this
+                            // runs on every keystroke, and a multi-megabyte MMIO copy per key
+                            // was slow enough under a virtualized display device to visibly
+                            // tear during fast typing.
+                            var (rx, ry, rw, rh) = KernelConsole.Default.CursorRowRect;
+                            KernelConsole.Default.Canvas.Display(rx, ry, rw, rh);
                         }
                     }
                     break;
@@ -116,7 +126,12 @@ public sealed class KeyboardTextReader : TextReader
                         KernelConsole.Default.MoveCursorLeft();
                         if (KernelConsole.Default.IsAvailable)
                         {
-                            KernelConsole.Default.Canvas.Display();
+                            // Scoped to the cursor's row instead of a full-screen Swap: this
+                            // runs on every keystroke, and a multi-megabyte MMIO copy per key
+                            // was slow enough under a virtualized display device to visibly
+                            // tear during fast typing.
+                            var (rx, ry, rw, rh) = KernelConsole.Default.CursorRowRect;
+                            KernelConsole.Default.Canvas.Display(rx, ry, rw, rh);
                         }
                     }
                     break;
@@ -128,7 +143,12 @@ public sealed class KeyboardTextReader : TextReader
                         KernelConsole.Default.MoveCursorRight();
                         if (KernelConsole.Default.IsAvailable)
                         {
-                            KernelConsole.Default.Canvas.Display();
+                            // Scoped to the cursor's row instead of a full-screen Swap: this
+                            // runs on every keystroke, and a multi-megabyte MMIO copy per key
+                            // was slow enough under a virtualized display device to visibly
+                            // tear during fast typing.
+                            var (rx, ry, rw, rh) = KernelConsole.Default.CursorRowRect;
+                            KernelConsole.Default.Canvas.Display(rx, ry, rw, rh);
                         }
                     }
                     break;
@@ -141,7 +161,12 @@ public sealed class KeyboardTextReader : TextReader
                         KernelConsole.Default.MoveCursorLeft();
                         if (KernelConsole.Default.IsAvailable)
                         {
-                            KernelConsole.Default.Canvas.Display();
+                            // Scoped to the cursor's row instead of a full-screen Swap: this
+                            // runs on every keystroke, and a multi-megabyte MMIO copy per key
+                            // was slow enough under a virtualized display device to visibly
+                            // tear during fast typing.
+                            var (rx, ry, rw, rh) = KernelConsole.Default.CursorRowRect;
+                            KernelConsole.Default.Canvas.Display(rx, ry, rw, rh);
                         }
                     }
                     break;
@@ -154,7 +179,12 @@ public sealed class KeyboardTextReader : TextReader
                         KernelConsole.Default.MoveCursorRight();
                         if (KernelConsole.Default.IsAvailable)
                         {
-                            KernelConsole.Default.Canvas.Display();
+                            // Scoped to the cursor's row instead of a full-screen Swap: this
+                            // runs on every keystroke, and a multi-megabyte MMIO copy per key
+                            // was slow enough under a virtualized display device to visibly
+                            // tear during fast typing.
+                            var (rx, ry, rw, rh) = KernelConsole.Default.CursorRowRect;
+                            KernelConsole.Default.Canvas.Display(rx, ry, rw, rh);
                         }
                     }
                     break;
@@ -190,7 +220,12 @@ public sealed class KeyboardTextReader : TextReader
                         }
                         if (KernelConsole.Default.IsAvailable)
                         {
-                            KernelConsole.Default.Canvas.Display();
+                            // Scoped to the cursor's row instead of a full-screen Swap: this
+                            // runs on every keystroke, and a multi-megabyte MMIO copy per key
+                            // was slow enough under a virtualized display device to visibly
+                            // tear during fast typing.
+                            var (rx, ry, rw, rh) = KernelConsole.Default.CursorRowRect;
+                            KernelConsole.Default.Canvas.Display(rx, ry, rw, rh);
                         }
                     }
                     break;

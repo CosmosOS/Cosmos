@@ -173,7 +173,14 @@ public class ConsolePlug
             KernelConsole.Default.Write(keyEvent.KeyChar);
             if (KernelConsole.Default.IsAvailable)
             {
-                KernelConsole.Default.Canvas.Display();
+                // A full-screen Display() per keystroke is a multi-megabyte MMIO
+                // copy for a one-character change; under a virtualized display
+                // device that's slow enough that fast typing visibly tears. Scope
+                // the present to the cursor's row (covers the common no-wrap case);
+                // DoLineFeed/Scroll paths (Enter, wrapping) go through a full
+                // Console.WriteLine/Write elsewhere which still does a full Display.
+                var (rx, ry, rw, rh) = KernelConsole.Default.CursorRowRect;
+                KernelConsole.Default.Canvas.Display(rx, ry, rw, rh);
             }
         }
 

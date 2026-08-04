@@ -245,6 +245,14 @@ public unsafe class Canvas
     }
 
     /// <summary>
+    /// Updates only the given rect of the screen from the underlying frame-buffer,
+    /// where supported (see <see cref="Cosmos.Kernel.HAL.Devices.Graphic.GraphicDevice.SwapRect"/>).
+    /// Default falls back to a full <see cref="Display()"/>; for virtual canvases
+    /// this is still a no-op.
+    /// </summary>
+    public virtual void Display(int x, int y, int width, int height) => Display();
+
+    /// <summary>
     /// Gets the color of the pixel at the given coordinates.
     /// </summary>
     /// <param name="x">The X coordinate.</param>
