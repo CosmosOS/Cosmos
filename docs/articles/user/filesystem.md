@@ -52,6 +52,10 @@ using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Vfs;
 ```
 
+Two of those five are HAL namespaces, and that is deliberate. `Cosmos.Kernel.HAL.Vfs` holds the VFS vocabulary that drivers and callers share: the contracts a filesystem driver implements (`IVfsFilesystemType`, `IVfsSuperblock`, `IVfsInode`, `IVfsOpenFile` and their operations interfaces) and the flag, mode and metadata types every mount, create and stat call names (`MountFlags`, `VfsMode`, `VfsStat`, `VfsStatFs`, `SetAttrFlags`, `SeekWhence`, `VfsTimespec`). That is why `MountFlags.None` appears in a kernel's `BeforeRun()`. `Cosmos.Kernel.System.Vfs` holds the manager and the handles, `VfsManager` plus `IVfsNodeHandle`, `IVfsFileHandle` and `IVfsDirectoryHandle`, and the handles are typed in the shared vocabulary, so `IVfsNodeHandle.Inode` gives you a `Cosmos.Kernel.HAL.Vfs.IVfsInode`. The vocabulary sits in the lower assembly because the reference graph runs `Cosmos.Kernel.System` to `Cosmos.Kernel.HAL` to `Cosmos.Kernel.HAL.Interfaces`, never the other way.
+
+`Cosmos.Kernel.HAL.Interfaces.Devices` is needed only by the RAM-disk snippet further down, which implements `IBlockDevice`. Drop that and mounting a real partition takes four.
+
 First, register a FAT driver under a name of your choice, then mount a partition at a mount point. Add this to your kernel's `BeforeRun()`:
 
 ```csharp

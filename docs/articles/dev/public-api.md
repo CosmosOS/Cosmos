@@ -156,6 +156,8 @@ The API site publishes those same four projects and no others: `docs/docfx.json`
 
 The rule points one way. An untracked assembly with public types left in it is not a reason to publish it; it is the backlog the last row of the policy table describes.
 
+That backlog is not only what `Cosmos.Kernel` drags in. `Cosmos.Sdk` gives every kernel a direct `PackageReference` to `Cosmos.Kernel.Core.X64` or `Cosmos.Kernel.Core.ARM64` by architecture, so a kernel's completion list carries 13 public types on x64 (`ApicManager`, `Idt`, `IoApic`, `LocalApic`, `DeviceMapper` and the ACPI MADT records) and 7 on arm64 (the `GIC` family plus `AcpiGic` and `DeviceMapper`), reaching the user without passing through the aggregator at all. `Cosmos.Kernel.HAL.X64` and `Cosmos.Kernel.HAL.ARM64` have none, so the arch tier is half clean already.
+
 An opted-in project references [Microsoft.CodeAnalysis.PublicApiAnalyzers](https://github.com/dotnet/roslyn-analyzers/blob/main/src/PublicApiAnalyzers/PublicApiAnalyzers.Help.md), which requires every `public` symbol to appear in one of two files next to the `.csproj`:
 
 | File | Contents |
@@ -174,7 +176,7 @@ The effect is that any change to the public surface, deliberate or accidental, m
 
 Three categories stay out of the files, the first two through `.editorconfig` overrides that set `RS0016`/`RS0017` to `none` under their paths:
 
-- The vendored directories (`SharpZipLib`, the PNG decoder, the TrueType fonts). Their types that are still `public` leak into the package anyway; making them `internal` is part of the pre-release surface cleanup, and keeping them out of the files means that cleanup will not churn the declared surface.
+- The vendored directories (`SharpZipLib`, the BigGustave PNG decoder, the TrueType fonts). The exemption is what let that cleanup happen without churning the declared surface; all three trees are `internal` throughout now, so it currently exempts nothing and stays as the standing rule for the next vendored tree.
 - The generated `KernelVersion.g.cs` that carries `Kernel.VersionString`: the declared-API format records constant values, and this one changes with every version stamp.
 - `internal` symbols, including everything exposed to the test kernels through `InternalsVisibleTo`.
 
