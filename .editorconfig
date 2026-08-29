@@ -20,7 +20,7 @@ generated_code = true
 [src/Cosmos.Kernel.System/IO/Compression/SharpZipLib/**.cs]
 generated_code = true
 
-[src/Cosmos.Kernel.System/Graphics/Images/Png/**.cs]
+[src/Cosmos.Kernel.System/Graphics/Images/BigGustave/**.cs]
 generated_code = true
 
 # fdlibm port (via Cosmos Gen2)
@@ -286,7 +286,7 @@ dotnet_diagnostic.CS0419.severity = error
 # Vendored code stays out of the declared surface: the tracking files list the
 # repo's own API only, and these types go internal in the pre-release surface
 # cleanup. Must come after the [*.cs] section above (later sections win).
-[src/Cosmos.Kernel.System/{IO/Compression/SharpZipLib,Graphics/Images/Png,Graphics/Fonts/TrueType}/**.cs]
+[src/Cosmos.Kernel.System/{IO/Compression/SharpZipLib,Graphics/Images/BigGustave,Graphics/Fonts/TrueType}/**.cs]
 dotnet_diagnostic.RS0016.severity = none
 dotnet_diagnostic.RS0017.severity = none
 
