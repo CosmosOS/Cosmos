@@ -84,17 +84,24 @@ Some core naming rules are enforced by `.editorconfig`; the table below document
 
 ### One Type Per File
 
-Each public type gets its own file named after the type:
+Each public type gets its own file, named after the type:
 
 ```
 Cosmos.Kernel.Core/
   Scheduler/
-    Thread.cs
-    ThreadState.cs
+    SchedulerThread.cs
+    SchedulerThreadState.cs
     IScheduler.cs
     SchedulerManager.cs
     PerCpuState.cs
 ```
+
+Two kinds of companion share the primary type's file, which keeps the primary
+type's name: a type's own tightly-coupled companion, as `Gpt` has
+`GptPartitionEntry` and `TcpPacket` has `TcpFlags` and `TcpOption`, and a
+subclass family, as `IcmpPacket` has `IcmpEchoRequest` and `IcmpEchoReply`.
+An implementation is not a companion of its interface: 24 files declare a
+top-level interface and each one declares that interface and nothing else.
 
 ### Partial Classes for Large Types
 
@@ -130,68 +137,37 @@ These are conditionally compiled via `.csproj`:
 
 This is only allowed now in `Cosmos.Kernel.Core` but this may change in the future.
 
-### File Structure Order
+### Member Order
 
-Use `// --- Section Name ---` comments to separate groups. The ordering differs between static and instance classes.
+There is no separator convention to follow. Four garbage-collector files carry
+`// --- Section Name ---` headers, written three weeks before this page was,
+and one driver file was later written to match them. The other 353 non-vendored
+files in the four tracked assemblies do not, no file has ever been converted,
+and no analyzer checks it. Neither is there a member order to describe: across
+131 types with three or more kinds of member there are 93 distinct orders, and
+the best-fitting single order covers 43 of them.
 
-#### Static Classes
+Two orderings are still worth following, because a reader checks them inside
+one screen:
 
-```csharp
-public static unsafe partial class StaticClassName
-{
-    // --- Nested types ---
+- Fields and constants come before the members that read them, not after the
+  first method.
+- Constructors come after fields and properties and before methods, and a
+  static factory sits with the constructors it stands in for.
 
-    // --- Constants ---
-
-    // --- Private fields ---
-
-    // --- Public properties ---
-
-    // --- Public methods ---
-
-    // --- Internal methods ---
-
-    // --- Private methods ---
-}
-```
-
-#### Instance Classes 
-
-```csharp
-public unsafe class Canvas
-{
-    // --- Nested types ---
-
-    // --- Constants ---
-
-    // --- Private fields ---
-
-    // --- Public properties ---
-
-    // --- Constructors ---
-
-    // --- Static methods ---
-
-    // --- Public methods ---
-
-    // --- Internal methods ---
-
-    // --- Protected methods ---
-
-    // --- Private methods ---
-}
-```
-
-**Key principles:**
-- **One separator style everywhere:** `// --- Section Name ---`.
-- Constructors always come after fields/properties, before methods.
-- Static factory methods come right after constructors.
+If you want a model for the full separator form in a new file,
+`Cosmos.Kernel.HAL/Devices/Network/VirtioNet.cs` is the one file that
+demonstrates it. Do not convert an existing file to it.
 
 ### Using Directives
 
 - Place `using` directives **outside** the namespace.
 - Sort `System` namespaces first.
 - Use file-scoped namespaces (eg. `namespace Cosmos.Kernel.Core.Scheduler;`).
+  The vendored trees (BigGustave, SharpZipLib, LunarFonts) and the
+  dotnet/runtime mirrors keep the block form so they stay diffable against
+  upstream, and `Core/Runtime/Stdllib.cs` cannot take the file-scoped form
+  at all: it declares four namespaces, one of them nested, which is CS8955.
 
 ---
 
@@ -546,15 +522,17 @@ using (InternalCpu.DisableInterruptsScope())
 
 ### Kernel Panic
 
-For unrecoverable errors, use `Panic.Halt()`:
+For unrecoverable errors, use `Panic.Halt()`. It disables interrupts, prints
+the message and the calling method, file and line, then halts the CPU:
 
 ```csharp
 if (ptr == null)
     Panic.Halt("Memory allocation failed");
-
-// With caller info (auto-filled by compiler)
-Panic.Halt("Invalid thread state");
 ```
+
+The caller information is filled in by the compiler, so pass the message and
+nothing else. `Panic.Halt` is `[DoesNotReturn]`, which is what lets the code
+after a null check dereference the value it just rejected.
 
 ### Exceptions
 
