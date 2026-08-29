@@ -188,6 +188,12 @@ Three categories stay out of the files, the first two through `.editorconfig` ov
 
 Removing or changing a symbol that already shipped is recorded as a `*REMOVED*` line in `Unshipped`, which is exactly what it is: a breaking change, visible as such in the PR. Before the first release, while `Shipped` is empty, a removal simply drops the line.
 
+The code fix inserts a new line in sorted position and never touches the lines already there, so the file's order is whatever the last hand that edited it left behind. Its comparer is `OrdinalIgnoreCase` with an `Ordinal` tie-break, which is not what any shell sort does: a `LC_ALL=C sort` once ran over `Cosmos.Kernel.System/PublicAPI.Unshipped.txt` and left 19 lines the code fix would never have placed there, including the six `abstract` and four `const` entries that belong at the top. No analyzer reads line position, so nothing reported it and nothing will. Sort with the analyzer's own comparer, or leave the file to the code fix:
+
+```
+python3 -c "p='src/Cosmos.Kernel.System/PublicAPI.Unshipped.txt'; L=open(p).read().split(chr(10)); L=[l for l in L if l]; open(p,'w').write(chr(10).join([L[0]]+sorted(L[1:],key=lambda s:(s.upper(),s)))+chr(10))"
+```
+
 ---
 
 ## Package validation

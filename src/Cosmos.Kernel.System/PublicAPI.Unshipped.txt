@@ -1,5 +1,15 @@
 #nullable enable
+abstract Cosmos.Kernel.System.Graphics.Canvas3D.ClearScene(System.Drawing.Color color, float depth = 1) -> void
+abstract Cosmos.Kernel.System.Graphics.Canvas3D.CreateTexture(Cosmos.Kernel.System.Graphics.Image! image) -> Cosmos.Kernel.System.Graphics.Texture!
+abstract Cosmos.Kernel.System.Graphics.Canvas3D.DrawMesh(Cosmos.Kernel.System.Graphics.Mesh! mesh, in System.Numerics.Matrix4x4 world) -> void
+abstract Cosmos.Kernel.System.Graphics.Canvas3D.IsAccelerated.get -> bool
+abstract Cosmos.Kernel.System.Kernel.Run() -> void
+abstract Cosmos.Kernel.System.Keyboard.ScanMapBase.InitializeKeys() -> void
 const Cosmos.Kernel.System.Diagnostics.SchedulerInfo.NanosecondsPerMillisecond = 1000000 -> ulong
+const Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.BootSectorLba = 0 -> ulong
+const Cosmos.Kernel.System.Storage.Gpt.FirstUsableLba = 34 -> ulong
+const Cosmos.Kernel.System.Storage.Gpt.PrimaryHeaderLba = 1 -> ulong
+const Cosmos.Kernel.System.Storage.Gpt.ProtectiveMbrStartLba = 1 -> uint
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.CpuId.get -> uint
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.HasPriority.get -> bool
@@ -81,8 +91,8 @@ Cosmos.Kernel.System.Graphics.Bitmap.Bitmap(byte[]! imageData, Cosmos.Kernel.Sys
 Cosmos.Kernel.System.Graphics.Bitmap.Bitmap(int width, int height, byte[]! pixelData, Cosmos.Kernel.System.Graphics.ColorDepth colorDepth) -> void
 Cosmos.Kernel.System.Graphics.Bitmap.Bitmap(int width, int height, Cosmos.Kernel.System.Graphics.ColorDepth colorDepth) -> void
 Cosmos.Kernel.System.Graphics.Bitmap.Bitmap(string! path, Cosmos.Kernel.System.Graphics.ColorOrder colorOrder = Cosmos.Kernel.System.Graphics.ColorOrder.BGR) -> void
-Cosmos.Kernel.System.Graphics.Bitmap.Save(System.IO.Stream! stream) -> void
 Cosmos.Kernel.System.Graphics.Bitmap.Save(string! path) -> void
+Cosmos.Kernel.System.Graphics.Bitmap.Save(System.IO.Stream! stream) -> void
 Cosmos.Kernel.System.Graphics.Camera3D
 Cosmos.Kernel.System.Graphics.Camera3D.Camera3D() -> void
 Cosmos.Kernel.System.Graphics.Camera3D.Camera3D(System.Numerics.Vector3 position, System.Numerics.Vector3 target) -> void
@@ -145,9 +155,9 @@ Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.HasGlyph(char c) -> bool
 Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.MeasureString(string! text, int sizePx) -> int
 Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.SizePx.get -> int
 Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.SizePx.set -> void
-Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.TrueTypeFont(System.IO.Stream! stream, int sizePx = 16) -> void
 Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.TrueTypeFont(byte[]! fontData, int sizePx = 16) -> void
 Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.TrueTypeFont(string! path, int sizePx = 16) -> void
+Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.TrueTypeFont(System.IO.Stream! stream, int sizePx = 16) -> void
 Cosmos.Kernel.System.Graphics.Image
 Cosmos.Kernel.System.Graphics.Image.ColorDepth.get -> Cosmos.Kernel.System.Graphics.ColorDepth
 Cosmos.Kernel.System.Graphics.Image.ColorDepth.set -> void
@@ -178,9 +188,9 @@ Cosmos.Kernel.System.Graphics.Mode.Mode() -> void
 Cosmos.Kernel.System.Graphics.Mode.Mode(int width, int height, Cosmos.Kernel.System.Graphics.ColorDepth colorDepth) -> void
 Cosmos.Kernel.System.Graphics.Mode.Width.get -> int
 Cosmos.Kernel.System.Graphics.Png
-Cosmos.Kernel.System.Graphics.Png.Png(System.IO.Stream! stream) -> void
 Cosmos.Kernel.System.Graphics.Png.Png(byte[]! imageData) -> void
 Cosmos.Kernel.System.Graphics.Png.Png(string! path) -> void
+Cosmos.Kernel.System.Graphics.Png.Png(System.IO.Stream! stream) -> void
 Cosmos.Kernel.System.Graphics.Texture
 Cosmos.Kernel.System.Graphics.Texture.Dispose() -> void
 Cosmos.Kernel.System.Graphics.Texture.Height.get -> int
@@ -247,10 +257,10 @@ Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.L = 55 -> Cosmos.Kernel.System.Keyboa
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LAlt = 79 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LBracket = 43 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LCtrl = 76 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LShift = 62 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LWin = 78 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LeftArrow = 93 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LowerThan = 59 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
+Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LShift = 62 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
+Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LWin = 78 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.M = 72 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Menu = 84 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Minus = 28 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
@@ -288,9 +298,9 @@ Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.R = 36 -> Cosmos.Kernel.System.Keyboa
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RAlt = 80 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RBracket = 44 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RCtrl = 77 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
+Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RightArrow = 94 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RShift = 63 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RWin = 83 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RightArrow = 94 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.S = 48 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.ScrollLock = 15 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Semicolon = 56 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
@@ -307,6 +317,7 @@ Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Wake = 114 -> Cosmos.Kernel.System.Ke
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.X = 67 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Y = 38 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Z = 66 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
+Cosmos.Kernel.System.Keyboard.KeyboardManager
 Cosmos.Kernel.System.Keyboard.KeyEvent
 Cosmos.Kernel.System.Keyboard.KeyEvent.Key.get -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.KeyEvent.Key.set -> void
@@ -334,17 +345,17 @@ Cosmos.Kernel.System.Keyboard.KeyMapping.ControlShift.get -> char
 Cosmos.Kernel.System.Keyboard.KeyMapping.ControlShift.set -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.Key.get -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
 Cosmos.Kernel.System.Keyboard.KeyMapping.Key.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char n, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char num, char caps, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char num, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
+Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
+Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
+Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
+Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char numLock, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
+Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.NumLock.get -> char
 Cosmos.Kernel.System.Keyboard.KeyMapping.NumLock.set -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.NumLockKey.get -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
@@ -359,7 +370,6 @@ Cosmos.Kernel.System.Keyboard.KeyMapping.ShiftNumLock.get -> char
 Cosmos.Kernel.System.Keyboard.KeyMapping.ShiftNumLock.set -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.Value.get -> char
 Cosmos.Kernel.System.Keyboard.KeyMapping.Value.set -> void
-Cosmos.Kernel.System.Keyboard.KeyboardManager
 Cosmos.Kernel.System.Keyboard.ScanMapBase
 Cosmos.Kernel.System.Keyboard.ScanMapBase.Keys -> System.Collections.Generic.List<Cosmos.Kernel.System.Keyboard.KeyMapping!>!
 Cosmos.Kernel.System.Keyboard.ScanMapBase.ScanMapBase() -> void
@@ -385,8 +395,8 @@ Cosmos.Kernel.System.Network.Config.IPConfig.DefaultGateway.get -> Cosmos.Kernel
 Cosmos.Kernel.System.Network.Config.IPConfig.SubnetMask.get -> Cosmos.Kernel.System.Network.IPv4.Address!
 Cosmos.Kernel.System.Network.IPv4.Address
 Cosmos.Kernel.System.Network.IPv4.Address.Address(byte first, byte second, byte third, byte fourth) -> void
-Cosmos.Kernel.System.Network.IPv4.Address.Address(System.ReadOnlySpan<byte> buffer) -> void
 Cosmos.Kernel.System.Network.IPv4.Address.Address(byte[]! buffer, int offset) -> void
+Cosmos.Kernel.System.Network.IPv4.Address.Address(System.ReadOnlySpan<byte> buffer) -> void
 Cosmos.Kernel.System.Network.IPv4.Address.Address(uint address) -> void
 Cosmos.Kernel.System.Network.IPv4.Address.CompareTo(Cosmos.Kernel.System.Network.IPv4.Address? other) -> int
 Cosmos.Kernel.System.Network.IPv4.Address.Id.get -> uint
@@ -427,17 +437,17 @@ Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.Send(byte[]! data, Cosmos.Kernel
 Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.UdpClient() -> void
 Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.UdpClient(Cosmos.Kernel.System.Network.IPv4.Address! dest, int destPort) -> void
 Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.UdpClient(int localPort) -> void
-Cosmos.Kernel.System.Network.NetworkManager
 Cosmos.Kernel.System.Network.NetworkAdapter
 Cosmos.Kernel.System.Network.NetworkAdapter.Equals(Cosmos.Kernel.System.Network.NetworkAdapter other) -> bool
-Cosmos.Kernel.System.Network.NetworkAdapter.IPConfig.get -> Cosmos.Kernel.System.Network.Config.IPConfig?
 Cosmos.Kernel.System.Network.NetworkAdapter.Index.get -> int
+Cosmos.Kernel.System.Network.NetworkAdapter.IPConfig.get -> Cosmos.Kernel.System.Network.Config.IPConfig?
 Cosmos.Kernel.System.Network.NetworkAdapter.IsValid.get -> bool
 Cosmos.Kernel.System.Network.NetworkAdapter.LinkUp.get -> bool
 Cosmos.Kernel.System.Network.NetworkAdapter.MacAddress.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress?
 Cosmos.Kernel.System.Network.NetworkAdapter.Name.get -> string?
 Cosmos.Kernel.System.Network.NetworkAdapter.NetworkAdapter() -> void
 Cosmos.Kernel.System.Network.NetworkAdapter.Ready.get -> bool
+Cosmos.Kernel.System.Network.NetworkManager
 Cosmos.Kernel.System.Network.NetworkStack
 Cosmos.Kernel.System.Power
 Cosmos.Kernel.System.Storage.Ebr
@@ -458,12 +468,12 @@ Cosmos.Kernel.System.Storage.Partition
 Cosmos.Kernel.System.Storage.Partition.BlockCount.get -> ulong
 Cosmos.Kernel.System.Storage.Partition.BlockSize.get -> ulong
 Cosmos.Kernel.System.Storage.Partition.Flush() -> void
-Cosmos.Kernel.System.Storage.Partition.Name.get -> string!
-Cosmos.Kernel.System.Storage.Partition.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
-Cosmos.Kernel.System.Storage.Partition.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
 Cosmos.Kernel.System.Storage.Partition.Host.get -> Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice!
+Cosmos.Kernel.System.Storage.Partition.Name.get -> string!
 Cosmos.Kernel.System.Storage.Partition.Partition(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! host, ulong startSector, ulong sectorCount, string! name) -> void
+Cosmos.Kernel.System.Storage.Partition.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
 Cosmos.Kernel.System.Storage.Partition.StartSector.get -> ulong
+Cosmos.Kernel.System.Storage.Partition.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
 Cosmos.Kernel.System.Storage.PartitionManager
 Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation
 Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation.PartitionLocation() -> void
@@ -501,16 +511,6 @@ Cosmos.Kernel.System.Vfs.VfsManager.VfsMount.Name.get -> string!
 Cosmos.Kernel.System.Vfs.VfsManager.VfsMount.Partition.get -> Cosmos.Kernel.System.Storage.Partition?
 Cosmos.Kernel.System.Vfs.VfsManager.VfsMount.Source.get -> string!
 Cosmos.Kernel.System.Vfs.VfsManager.VfsMount.Superblock.get -> Cosmos.Kernel.HAL.Vfs.IVfsSuperblock!
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.ClearScene(System.Drawing.Color color, float depth = 1) -> void
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.CreateTexture(Cosmos.Kernel.System.Graphics.Image! image) -> Cosmos.Kernel.System.Graphics.Texture!
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.DrawMesh(Cosmos.Kernel.System.Graphics.Mesh! mesh, in System.Numerics.Matrix4x4 world) -> void
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.IsAccelerated.get -> bool
-abstract Cosmos.Kernel.System.Kernel.Run() -> void
-abstract Cosmos.Kernel.System.Keyboard.ScanMapBase.InitializeKeys() -> void
-const Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.BootSectorLba = 0 -> ulong
-const Cosmos.Kernel.System.Storage.Gpt.FirstUsableLba = 34 -> ulong
-const Cosmos.Kernel.System.Storage.Gpt.PrimaryHeaderLba = 1 -> ulong
-const Cosmos.Kernel.System.Storage.Gpt.ProtectiveMbrStartLba = 1 -> uint
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetAdvance(char c) -> int
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetLineHeight() -> int
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetMaxAdvance() -> int
@@ -630,6 +630,8 @@ static Cosmos.Kernel.System.Network.Config.DnsConfig.Remove(Cosmos.Kernel.System
 static Cosmos.Kernel.System.Network.Config.IPConfig.Enable(Cosmos.Kernel.System.Network.IPv4.Address! address, Cosmos.Kernel.System.Network.IPv4.Address! subnetMask, Cosmos.Kernel.System.Network.IPv4.Address! defaultGateway) -> bool
 static Cosmos.Kernel.System.Network.Config.IPConfig.Enable(Cosmos.Kernel.System.Network.NetworkAdapter adapter, Cosmos.Kernel.System.Network.IPv4.Address! address, Cosmos.Kernel.System.Network.IPv4.Address! subnetMask, Cosmos.Kernel.System.Network.IPv4.Address! defaultGateway) -> bool
 static Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.GetDynamicPort(int tries = 10) -> ushort
+static Cosmos.Kernel.System.Network.NetworkAdapter.operator !=(Cosmos.Kernel.System.Network.NetworkAdapter left, Cosmos.Kernel.System.Network.NetworkAdapter right) -> bool
+static Cosmos.Kernel.System.Network.NetworkAdapter.operator ==(Cosmos.Kernel.System.Network.NetworkAdapter left, Cosmos.Kernel.System.Network.NetworkAdapter right) -> bool
 static Cosmos.Kernel.System.Network.NetworkManager.DeviceCount.get -> int
 static Cosmos.Kernel.System.Network.NetworkManager.GetAdapter(int index) -> Cosmos.Kernel.System.Network.NetworkAdapter
 static Cosmos.Kernel.System.Network.NetworkManager.IsEnabled.get -> bool
@@ -641,8 +643,6 @@ static Cosmos.Kernel.System.Network.NetworkManager.Primary.get -> Cosmos.Kernel.
 static Cosmos.Kernel.System.Network.NetworkManager.Primary.set -> void
 static Cosmos.Kernel.System.Network.NetworkManager.Ready.get -> bool
 static Cosmos.Kernel.System.Network.NetworkManager.Send(byte[]! data, int length) -> bool
-static Cosmos.Kernel.System.Network.NetworkAdapter.operator !=(Cosmos.Kernel.System.Network.NetworkAdapter left, Cosmos.Kernel.System.Network.NetworkAdapter right) -> bool
-static Cosmos.Kernel.System.Network.NetworkAdapter.operator ==(Cosmos.Kernel.System.Network.NetworkAdapter left, Cosmos.Kernel.System.Network.NetworkAdapter right) -> bool
 static Cosmos.Kernel.System.Network.NetworkStack.RemoveAllConfigIP() -> void
 static Cosmos.Kernel.System.Power.Halt() -> void
 static Cosmos.Kernel.System.Power.Reboot() -> void
@@ -716,16 +716,16 @@ static readonly Cosmos.Kernel.System.Network.IPv4.Address.Broadcast -> Cosmos.Ke
 static readonly Cosmos.Kernel.System.Network.IPv4.Address.Zero -> Cosmos.Kernel.System.Network.IPv4.Address!
 static readonly Cosmos.Kernel.System.Storage.Gpt.BasicDataPartitionType -> System.Guid
 virtual Cosmos.Kernel.System.Graphics.Canvas.AvailableModes.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.Graphics.Mode>!
-virtual Cosmos.Kernel.System.Graphics.Canvas.Clear(System.Drawing.Color color) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.Clear(int color) -> void
+virtual Cosmos.Kernel.System.Graphics.Canvas.Clear(System.Drawing.Color color) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.CopyPixels(int srcX, int srcY, int dstX, int dstY, int width, int height) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.CroppedDrawImage(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, int maxWidth, int maxHeight, bool preventOffBoundPixels = true) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DefaultGraphicsMode.get -> Cosmos.Kernel.System.Graphics.Mode
 virtual Cosmos.Kernel.System.Graphics.Canvas.Display() -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawArc(System.Drawing.Color color, int xCenter, int yCenter, int xR, int yR, int startAngle = 0, int endAngle = 360) -> void
-virtual Cosmos.Kernel.System.Graphics.Canvas.DrawArray(System.Drawing.Color[]! colors, int x, int y, int width, int height) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawArray(int[]! colors, int x, int y, int width, int height) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawArray(int[]! colors, int x, int y, int width, int height, int startIndex) -> void
+virtual Cosmos.Kernel.System.Graphics.Canvas.DrawArray(System.Drawing.Color[]! colors, int x, int y, int width, int height) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawCanvas(Cosmos.Kernel.System.Graphics.Canvas! canvas, int x, int y) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawChar(char c, Cosmos.Kernel.System.Graphics.Fonts.Font! font, System.Drawing.Color color, int x, int y) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawCircle(System.Drawing.Color color, int xCenter, int yCenter, int radius) -> void
@@ -736,8 +736,8 @@ virtual Cosmos.Kernel.System.Graphics.Canvas.DrawFilledRectangle(System.Drawing.
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawImage(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, bool preventOffBoundPixels = true) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawImage(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, int w, int h, bool preventOffBoundPixels = true) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawLine(System.Drawing.Color color, int x1, int y1, int x2, int y2) -> void
-virtual Cosmos.Kernel.System.Graphics.Canvas.DrawPoint(System.Drawing.Color color, int x, int y) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawPoint(int color, int x, int y) -> void
+virtual Cosmos.Kernel.System.Graphics.Canvas.DrawPoint(System.Drawing.Color color, int x, int y) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawPoint(uint color, int x, int y) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawPolygon(System.Drawing.Color color, params System.Drawing.Point[]! points) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawRectangle(System.Drawing.Color color, int x, int y, int width, int height) -> void
