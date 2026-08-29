@@ -8,7 +8,7 @@
     <!-- This may need to change -->
     <DefineConstants>$(DefineConstants);NATIVEAOT;TARGET_64BIT</DefineConstants>
     <!-- Package Metadata -->
-    <PackageId>Cosmos.Kernel.System.Core</PackageId>
+    <PackageId>Cosmos.Kernel.Core</PackageId>
     <Title>Cosmos Kernel Core</Title>
     <Description>Core kernel functionality for Cosmos including memory management, runtime, and fundamental kernel services.</Description>
     <PackageTags>cosmos;kernel;core;memory;heap;allocation;kernel-services;runtime</PackageTags>
