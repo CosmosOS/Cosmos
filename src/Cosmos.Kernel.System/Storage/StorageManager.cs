@@ -17,6 +17,13 @@ public static class StorageManager
     /// <summary>Maximum number of block devices the manager can register.</summary>
     private const int MaxDevices = 8;
 
+    private static IBlockDevice? s_primaryDevice;
+    private static List<IBlockDevice>? s_devices;
+    private static List<Partition>? s_partitions;
+
+    /// <summary>Guards every mutation of the device and partition tables.</summary>
+    private static SchedSpinLock s_mutationLock;
+
     /// <summary>
     /// Whether storage support is enabled. Uses centralized feature flag.
     /// </summary>
@@ -35,10 +42,6 @@ public static class StorageManager
             throw new InvalidOperationException("Storage support is disabled. Set CosmosEnableStorage=true in your csproj to enable it.");
         }
     }
-
-    private static IBlockDevice? s_primaryDevice;
-    private static List<IBlockDevice>? s_devices;
-    private static List<Partition>? s_partitions;
 
     /// <summary>
     /// Gets whether the storage manager is initialized, which is what makes
@@ -139,8 +142,6 @@ public static class StorageManager
             RegisterDevice(nvmeNamespaces[i]);
         }
     }
-
-    private static SchedSpinLock s_mutationLock;
 
     /// <summary>
     /// Registers a block device with the manager and scans it for a GPT or

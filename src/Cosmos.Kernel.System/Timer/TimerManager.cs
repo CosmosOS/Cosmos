@@ -29,6 +29,11 @@ public static class TimerManager
     public static bool IsInitialized => s_timer != null;
 
     /// <summary>
+    /// Gets the registered timer device.
+    /// </summary>
+    internal static ITimerDevice? Timer => s_timer;
+
+    /// <summary>
     /// Throws when timer support is compiled out. Guards the two members that
     /// would otherwise do nothing and say nothing: a wait that returns at once
     /// and a frequency change that lands nowhere both read as a kernel bug
@@ -205,9 +210,4 @@ public static class TimerManager
 
         return (ulong)value.Ticks * NanosecondsPerTick;
     }
-
-    /// <summary>
-    /// Gets the registered timer device.
-    /// </summary>
-    internal static ITimerDevice? Timer => s_timer;
 }

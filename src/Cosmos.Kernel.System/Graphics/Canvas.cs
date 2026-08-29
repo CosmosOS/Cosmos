@@ -82,6 +82,11 @@ public unsafe class Canvas
     public virtual int RefreshRate => 60;
 
     /// <summary>
+    /// The name of the Canvas implementation.
+    /// </summary>
+    public virtual string Name => "Canvas";
+
+    /// <summary>
     /// Bytes per pixel (4 in 32bit, 3 in 24bit).
     /// </summary>
     internal int _bytesPerPixel;
@@ -114,6 +119,21 @@ public unsafe class Canvas
         _bytesPerPixel = (int)mode.ColorDepth / 8;
         _stride = (int)mode.ColorDepth / 8;
         _pitch = mode.Width * _bytesPerPixel;
+    }
+
+    /// <summary>
+    /// Creates a virtual (buffer-backed) canvas of the given size.
+    /// </summary>
+    /// <param name="width">The width of the canvas in pixels.</param>
+    /// <param name="height">The height of the canvas in pixels.</param>
+    /// <param name="colorDepth">The color depth (default 32-bit).</param>
+    public Canvas(int width, int height, ColorDepth colorDepth = ColorDepth.ColorDepth32)
+    {
+        _mode = new Mode(width, height, colorDepth);
+        _bytesPerPixel = (int)colorDepth / 8;
+        _stride = (int)colorDepth / 8;
+        _pitch = width * _bytesPerPixel;
+        _buffer = new int[width * height];
     }
 
     /// <summary>
@@ -164,21 +184,6 @@ public unsafe class Canvas
     public static void DisableFullScreen()
     {
         FullScreenCanvas.Disable();
-    }
-
-    /// <summary>
-    /// Creates a virtual (buffer-backed) canvas of the given size.
-    /// </summary>
-    /// <param name="width">The width of the canvas in pixels.</param>
-    /// <param name="height">The height of the canvas in pixels.</param>
-    /// <param name="colorDepth">The color depth (default 32-bit).</param>
-    public Canvas(int width, int height, ColorDepth colorDepth = ColorDepth.ColorDepth32)
-    {
-        _mode = new Mode(width, height, colorDepth);
-        _bytesPerPixel = (int)colorDepth / 8;
-        _stride = (int)colorDepth / 8;
-        _pitch = width * _bytesPerPixel;
-        _buffer = new int[width * height];
     }
 
     /// <summary>
@@ -293,11 +298,6 @@ public unsafe class Canvas
 
         _buffer[y * Width + x] = color;
     }
-
-    /// <summary>
-    /// The name of the Canvas implementation.
-    /// </summary>
-    public virtual string Name => "Canvas";
 
     /// <summary>
     /// Updates the screen to display the underlying frame-buffer.

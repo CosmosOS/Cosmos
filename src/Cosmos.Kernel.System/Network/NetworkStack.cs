@@ -12,6 +12,9 @@ namespace Cosmos.Kernel.System.Network;
 /// </summary>
 public static class NetworkStack
 {
+    /// <summary>Reentrancy guard for <see cref="Update"/>.</summary>
+    private static bool s_updating = false;
+
     /// <summary>
     /// Maps IP (Internet Protocol) addresses to network devices.
     /// </summary>
@@ -90,8 +93,6 @@ public static class NetworkStack
     /// <summary>
     /// Flag to prevent recursive Update calls.
     /// </summary>
-    private static bool s_updating = false;
-
     /// <summary>
     /// Updates the network stack (sends pending packets). Internal: every
     /// path that queues a packet pumps the queue itself, including

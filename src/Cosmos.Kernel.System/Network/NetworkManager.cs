@@ -10,6 +10,10 @@ namespace Cosmos.Kernel.System.Network;
 /// </summary>
 public static class NetworkManager
 {
+    private static INetworkDevice?[]? s_devices;
+    private static int s_deviceCount;
+    private static int s_primaryIndex = -1;
+
     /// <summary>
     /// Whether network support is enabled. Uses centralized feature flag.
     /// </summary>
@@ -28,10 +32,6 @@ public static class NetworkManager
             throw new InvalidOperationException("Network support is disabled. Set CosmosEnableNetwork=true in your csproj to enable it.");
         }
     }
-
-    private static INetworkDevice?[]? s_devices;
-    private static int s_deviceCount;
-    private static int s_primaryIndex = -1;
 
     /// <summary>
     /// Gets whether the network manager is initialized, which is what makes
@@ -98,6 +98,11 @@ public static class NetworkManager
     /// Whether the primary device finished initializing and can carry traffic.
     /// </summary>
     public static bool Ready => PrimaryDevice?.Ready ?? false;
+
+    /// <summary>
+    /// Gets whether the primary device link is up.
+    /// </summary>
+    public static bool LinkUp => PrimaryDevice?.LinkUp ?? false;
 
     /// <summary>
     /// Gets the number of registered network devices.
@@ -171,9 +176,4 @@ public static class NetworkManager
         // build answers false like any other unsendable state.
         return IsEnabled && (PrimaryDevice?.Send(data, length) ?? false);
     }
-
-    /// <summary>
-    /// Gets whether the primary device link is up.
-    /// </summary>
-    public static bool LinkUp => PrimaryDevice?.LinkUp ?? false;
 }
