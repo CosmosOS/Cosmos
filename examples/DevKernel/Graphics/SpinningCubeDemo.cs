@@ -29,13 +29,13 @@ internal static class SpinningCubeDemo
     private const float CubeSize = 1f;
 
     /// <summary>Center of the cube, high enough above the grid that no corner crosses it.</summary>
-    private static readonly Vector3 CubeCenter = new(0f, 1f, 0f);
+    private static readonly Vector3 s_cubeCenter = new(0f, 1f, 0f);
 
     /// <summary>Where the camera stands.</summary>
-    private static readonly Vector3 CameraPosition = new(0f, 2.6f, 4.6f);
+    private static readonly Vector3 s_cameraPosition = new(0f, 2.6f, 4.6f);
 
     /// <summary>What the camera looks at: the middle of the cube.</summary>
-    private static readonly Vector3 CameraTarget = new(0f, 0.9f, 0f);
+    private static readonly Vector3 s_cameraTarget = new(0f, 0.9f, 0f);
 
     /// <summary>Cells along each side of the ground grid.</summary>
     private const int GridSlices = 12;
@@ -91,7 +91,7 @@ internal static class SpinningCubeDemo
             MouseManager.SetPosition(canvas3D.Width / 2, canvas3D.Height / 2);
         }
 
-        canvas3D.Camera = new Camera3D(CameraPosition, CameraTarget);
+        canvas3D.Camera = new Camera3D(s_cameraPosition, s_cameraTarget);
 
         Mesh cube = CreateCube(canvas3D);
         Mesh arrow = CreateArrow(canvas3D);
@@ -122,7 +122,7 @@ internal static class SpinningCubeDemo
                 cube,
                 Matrix4x4.CreateScale(CubeSize) *
                 Matrix4x4.CreateFromQuaternion(orientation) *
-                Matrix4x4.CreateTranslation(CubeCenter));
+                Matrix4x4.CreateTranslation(s_cubeCenter));
 
             canvas3D.Display();
             SysThread.Sleep(FrameDelayMs);
