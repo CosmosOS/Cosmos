@@ -144,7 +144,8 @@ public static class PartitionManager
         {
             return false;
         }
-        return Mbr.RemovePartition(device, slot);
+        Mbr.RemovePartition(device, slot);
+        return true;
     }
 
     /// <summary>Resize the partition at <paramref name="location"/> to <paramref name="newSectorCount"/>. Table-only; does not adjust the filesystem inside.</summary>

@@ -664,7 +664,7 @@ static Cosmos.Kernel.System.Storage.Mbr.Create(Cosmos.Kernel.HAL.Interfaces.Devi
 static Cosmos.Kernel.System.Storage.Mbr.IsMbr(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> bool
 static Cosmos.Kernel.System.Storage.Mbr.MovePartition(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, int index, ulong newStartSector) -> bool
 static Cosmos.Kernel.System.Storage.Mbr.Parse(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> System.Collections.Generic.List<Cosmos.Kernel.System.Storage.MbrPartitionEntry!>!
-static Cosmos.Kernel.System.Storage.Mbr.RemovePartition(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, int index) -> bool
+static Cosmos.Kernel.System.Storage.Mbr.RemovePartition(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, int index) -> void
 static Cosmos.Kernel.System.Storage.Mbr.ResizePartition(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, int index, ulong newSectorCount) -> bool
 static Cosmos.Kernel.System.Storage.Mbr.TryGetExtendedPartition(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, out ulong startSector) -> bool
 static Cosmos.Kernel.System.Storage.Mbr.TryGetExtendedPartition(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, out ulong startSector, out ulong sectorCount) -> bool

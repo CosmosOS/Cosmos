@@ -341,6 +341,12 @@ public class Kernel : Sys.Kernel
     /// <summary>Forward delta of the deliberately legal MovePartition calls (post-adjacency and signature-restamp cells).</summary>
     private const uint LegalMoveDeltaSectors = 100;
 
+    /// <summary>A primary slot past the four the MBR has, for the writers' index check.</summary>
+    private const int MbrSlotBeyondTable = 4;
+
+    /// <summary>A negative primary slot, for the writers' index check.</summary>
+    private const int MbrNegativeSlot = -1;
+
     /// <summary>Per-byte multiplier of the FillPattern move-payload pattern.</summary>
     private const uint FillPatternByteStep = 31;
 
@@ -491,6 +497,7 @@ public class Kernel : Sys.Kernel
         TR.RunIf(dev, "MBR_ResizeMove_RejectsOverlap",     TestMbr_ResizeMoveRejectsOverlap,     SkipNoHost);
         TR.RunIf(dev, "GPT_ResizeMove_RejectsOverlap",     TestGpt_ResizeMoveRejectsOverlap,     SkipNoHost);
         TR.RunIf(dev, "MBR_ResizeMove_RestampsSignature",  TestMbr_ResizeMoveRestampsSignature,  SkipNoHost);
+        TR.RunIf(dev, "MBR_SlotIndex_OutOfRange_Throws",   TestMbr_SlotIndexOutOfRangeThrows,    SkipNoHost);
         TR.RunIf(dev, "GPT_Mutate_SkipsEntriesParseRejects", TestGpt_MutateSkipsEntriesParseRejects, SkipNoHost);
         TR.RunIf(dev, "GPT_Remove_ClearsWholeEntry",       TestGpt_RemoveClearsWholeEntry,       SkipNoHost);
         TR.RunIf(dev, "PartitionManager_MoveFailure_IsNonDestructive", TestPartitionManager_MoveFailureIsNonDestructive, SkipNoHost);
@@ -1297,7 +1304,7 @@ public class Kernel : Sys.Kernel
         Assert.True(Mbr.AddPartition(host, 0, MbrLinuxSystemId, MbrPartAStartSector, MbrPartASectorCount));
         Assert.True(Mbr.AddPartition(host, 1, MbrFat32SystemId, MbrPartBStartSector, MbrPartBSectorCount));
 
-        Assert.True(Mbr.RemovePartition(host, 1));
+        Mbr.RemovePartition(host, 1);
 
         List<MbrPartitionEntry> parts = Mbr.Parse(host);
         Assert.Equal(1, parts.Count);
@@ -1771,7 +1778,7 @@ public class Kernel : Sys.Kernel
         // the resize must be refused outright.
         ResetHostExtendedMbr(host, ExtPartStartSector, ExtPartSectorCount);
         Assert.True(Ebr.TryAddLogical(host, ExtPartStartSector, ExtPartSectorCount, MbrLinuxSystemId, count, out _));
-        Assert.True(Mbr.RemovePartition(host, 0));
+        Mbr.RemovePartition(host, 0);
         Assert.False(Ebr.ResizeLogical(host, ExtPartStartSector, 0, ExtPartSectorCount * 2),
             "a resize without a confirmable extended envelope must be refused");
     }
@@ -2046,6 +2053,83 @@ public class Kernel : Sys.Kernel
     // end, so growing over a neighbour stamped two entries aliasing the same
     // sectors and returned true; Mbr.ResizePartition threw out of a
     // bool-returning method. Only Ebr.ResizeLogical bounded itself.
+    private static void TestMbr_SlotIndexOutOfRangeThrows()
+    {
+        IBlockDevice host = s_dev!;
+        ResetHostMbr(host);
+        Assert.True(Mbr.AddPartition(host, 0, MbrLinuxSystemId, MbrPartAStartSector, MbrPartASectorCount));
+
+        // A slot the table does not have is a caller bug, not a geometry
+        // answer, so every writer throws for it rather than answering the
+        // false it reserves for ranges that do not fit.
+        Assert.True(MbrAddThrowsForSlot(MbrSlotBeyondTable), "AddPartition must throw for a slot past the table");
+        Assert.True(MbrAddThrowsForSlot(MbrNegativeSlot), "AddPartition must throw for a negative slot");
+        Assert.True(MbrRemoveThrowsForSlot(MbrSlotBeyondTable), "RemovePartition must throw for a slot past the table");
+        Assert.True(MbrResizeThrowsForSlot(MbrSlotBeyondTable), "ResizePartition must throw for a slot past the table");
+        Assert.True(MbrMoveThrowsForSlot(MbrSlotBeyondTable), "MovePartition must throw for a slot past the table");
+
+        List<MbrPartitionEntry> parts = Mbr.Parse(host);
+        Assert.Equal(1, parts.Count, "a refused slot index writes nothing");
+        Assert.Equal<ulong>(MbrPartAStartSector, parts[0].StartSector);
+    }
+
+    // One try/catch per method on purpose (cf. MbrAddPartitionRejects):
+    // true = the writer threw ArgumentOutOfRangeException for the slot.
+    private static bool MbrAddThrowsForSlot(int index)
+    {
+        try
+        {
+            Mbr.AddPartition(s_dev!, index, MbrLinuxSystemId, MbrPartBStartSector, MbrPartBSectorCount);
+            return false;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return true;
+        }
+    }
+
+    // One try/catch per method on purpose (cf. MbrAddPartitionRejects).
+    private static bool MbrRemoveThrowsForSlot(int index)
+    {
+        try
+        {
+            Mbr.RemovePartition(s_dev!, index);
+            return false;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return true;
+        }
+    }
+
+    // One try/catch per method on purpose (cf. MbrAddPartitionRejects).
+    private static bool MbrResizeThrowsForSlot(int index)
+    {
+        try
+        {
+            Mbr.ResizePartition(s_dev!, index, MbrPartASectorCount);
+            return false;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return true;
+        }
+    }
+
+    // One try/catch per method on purpose (cf. MbrAddPartitionRejects).
+    private static bool MbrMoveThrowsForSlot(int index)
+    {
+        try
+        {
+            Mbr.MovePartition(s_dev!, index, MbrPartBStartSector);
+            return false;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return true;
+        }
+    }
+
     private static void TestGpt_ResizeMoveRejectsOverlap()
     {
         IBlockDevice host = s_dev!;
