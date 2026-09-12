@@ -106,12 +106,19 @@
              Version="[$(BundledNETCoreAppPackageVersion)]" />
   </ItemGroup>
 
-  <!-- Library Initializers to Run -->
+  <!-- Library initializers, run by the ILC startup code before Main.
+       SortAutoInitialedAssemblies (Cosmos.Build.Ilc) orders them in three stages:
+       Stage="Runtime" first (Core brings up the heap, the GC and the managed
+       modules), then the runtime's own initializers, which Cosmos.Build.Ilc adds
+       as Stage="Framework", then the kernel libraries below, each after the
+       assemblies it references. Cosmos.Kernel and Cosmos.Kernel.System reference
+       neither the other, so their declared order is their run order: the
+       scheduler comes up before System's storage scan issues interrupt-driven I/O. -->
   <ItemGroup>
-    <AutoInitializedAssemblies Include="Cosmos.Kernel.Core" />
+    <AutoInitializedAssemblies Include="Cosmos.Kernel.Core" Stage="Runtime" />
     <AutoInitializedAssemblies Include="Cosmos.Kernel.HAL" />
-    <AutoInitializedAssemblies Include="Cosmos.Kernel.System" />
     <AutoInitializedAssemblies Include="Cosmos.Kernel" />
+    <AutoInitializedAssemblies Include="Cosmos.Kernel.System" />
   </ItemGroup>
 
   <!-- Build tools.
