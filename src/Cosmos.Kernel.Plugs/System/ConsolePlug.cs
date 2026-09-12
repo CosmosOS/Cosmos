@@ -11,8 +11,8 @@ namespace Cosmos.Kernel.Plugs.System;
 public class ConsolePlug
 {
     // Track the start position for current input line (for proper backspace/delete handling)
-    private static int _inputStartX;
-    private static int _inputStartY;
+    private static int s_inputStartX;
+    private static int s_inputStartY;
 
     private static void ThrowIfKeyboardDisabled()
     {

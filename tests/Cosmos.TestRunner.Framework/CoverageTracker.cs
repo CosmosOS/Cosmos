@@ -26,7 +26,7 @@ public static unsafe class CoverageTracker
         public fixed byte Data[MaxMethods];
     }
 
-    private static HitBuffer _hits;
+    private static HitBuffer s_hits;
 
     // Protocol constants (must match Cosmos.TestRunner.Protocol)
     private const byte CoverageData = 107;
@@ -40,7 +40,7 @@ public static unsafe class CoverageTracker
     {
         if ((uint)id < MaxMethods)
         {
-            _hits.Data[id] = 1;
+            s_hits.Data[id] = 1;
         }
     }
 
@@ -54,7 +54,7 @@ public static unsafe class CoverageTracker
         int hitCount = 0;
         for (int i = 0; i < MaxMethods; i++)
         {
-            if (_hits.Data[i] != 0)
+            if (s_hits.Data[i] != 0)
             {
                 hitCount++;
             }
@@ -77,7 +77,7 @@ public static unsafe class CoverageTracker
         int offset = 2;
         for (int i = 0; i < MaxMethods; i++)
         {
-            if (_hits.Data[i] != 0)
+            if (s_hits.Data[i] != 0)
             {
                 payload[offset] = (byte)(i & 0xFF);
                 payload[offset + 1] = (byte)((i >> 8) & 0xFF);

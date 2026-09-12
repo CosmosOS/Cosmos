@@ -99,15 +99,15 @@ public class Kernel : Sys.Kernel
     private const int BargeResultBarged = 1;
 
     // Shared state for thread tests
-    private static volatile bool _threadExecuted;
-    private static volatile int _sharedCounter;
-    private static volatile int _thread1Counter;
-    private static volatile int _thread2Counter;
-    private static Cosmos.Kernel.Core.Scheduler.SpinLock _testLock;
+    private static volatile bool s_threadExecuted;
+    private static volatile int s_sharedCounter;
+    private static volatile int s_thread1Counter;
+    private static volatile int s_thread2Counter;
+    private static Cosmos.Kernel.Core.Scheduler.SpinLock s_testLock;
 
     // Shared state for Monitor/lock tests
-    private static readonly object _lockObj = new object();
-    private static volatile int _lockCounter;
+    private static readonly object s_lockObj = new object();
+    private static volatile int s_lockCounter;
 
     // Custom delegate types for delegate tests
     private delegate void VoidDelegate();
@@ -286,15 +286,15 @@ public class Kernel : Sys.Kernel
     private static void TestLockProtectsSharedData()
     {
         Serial.WriteString("[Test] Testing lock with threads...\n");
-        _lockCounter = 0;
+        s_lockCounter = 0;
 
         SysThread thread1 = new SysThread(() =>
         {
             for (int i = 0; i < LockIterationsPerThread; i++)
             {
-                lock (_lockObj)
+                lock (s_lockObj)
                 {
-                    _lockCounter++;
+                    s_lockCounter++;
                 }
             }
         });
@@ -303,9 +303,9 @@ public class Kernel : Sys.Kernel
         {
             for (int i = 0; i < LockIterationsPerThread; i++)
             {
-                lock (_lockObj)
+                lock (s_lockObj)
                 {
-                    _lockCounter++;
+                    s_lockCounter++;
                 }
             }
         });
@@ -315,16 +315,16 @@ public class Kernel : Sys.Kernel
 
         TimerManager.Wait(LockTestInitialWaitMs);
 
-        for (int i = 0; i < MaxExtraWaitRetries && _lockCounter < ExpectedTotalIncrements; i++)
+        for (int i = 0; i < MaxExtraWaitRetries && s_lockCounter < ExpectedTotalIncrements; i++)
         {
             TimerManager.Wait(RetryWaitMs);
         }
 
         Serial.WriteString("[Test] Lock counter: ");
-        Serial.WriteNumber((uint)_lockCounter);
+        Serial.WriteNumber((uint)s_lockCounter);
         Serial.WriteString("\n");
 
-        Assert.Equal(ExpectedTotalIncrements, _lockCounter);
+        Assert.Equal(ExpectedTotalIncrements, s_lockCounter);
     }
 
     private static void TestLockReentrant()
@@ -402,7 +402,7 @@ public class Kernel : Sys.Kernel
     private static void TestThreadExecution()
     {
         Serial.WriteString("[Test] Testing thread execution...\n");
-        _threadExecuted = false;
+        s_threadExecuted = false;
 
         var thread = new global::System.Threading.Thread(ThreadExecutionWorker);
 
@@ -414,19 +414,19 @@ public class Kernel : Sys.Kernel
         TimerManager.Wait(ThreadStartupWaitMs);
 
         // Check multiple times with delays
-        for (int i = 0; i < ThreadExecPollRetries && !_threadExecuted; i++)
+        for (int i = 0; i < ThreadExecPollRetries && !s_threadExecuted; i++)
         {
             TimerManager.Wait(ThreadPollWaitMs);
         }
 
-        Assert.True(_threadExecuted, "Thread delegate should have executed");
+        Assert.True(s_threadExecuted, "Thread delegate should have executed");
         Serial.WriteString("[Test] Thread execution test complete\n");
     }
 
     private static void ThreadExecutionWorker()
     {
         Serial.WriteString("[Thread] Delegate executing!\n");
-        _threadExecuted = true;
+        s_threadExecuted = true;
         Serial.WriteString("[Thread] Delegate completed!\n");
     }
 
@@ -440,64 +440,64 @@ public class Kernel : Sys.Kernel
     /// <summary>Record whose generated ToString exercises EnsureSufficientExecutionStack (#433).</summary>
     private record StackProbeRecord(int Answer, string Label);
 
-    private static volatile bool _stackProbeDone;
-    private static volatile bool _stackProbeSufficient;
-    private static string? _stackProbeError;
-    private static string? _stackProbeToString;
+    private static volatile bool s_stackProbeDone;
+    private static volatile bool s_stackProbeSufficient;
+    private static string? s_stackProbeError;
+    private static string? s_stackProbeToString;
 
     private static void TestEnsureSufficientStackInThread()
     {
-        _stackProbeDone = false;
-        _stackProbeSufficient = false;
-        _stackProbeError = null;
+        s_stackProbeDone = false;
+        s_stackProbeSufficient = false;
+        s_stackProbeError = null;
 
         var thread = new SysThread(EnsureSufficientStackWorker);
         thread.Start();
 
-        for (int i = 0; i < TaskPollRetries && !_stackProbeDone; i++)
+        for (int i = 0; i < TaskPollRetries && !s_stackProbeDone; i++)
         {
             TimerManager.Wait(TaskPollIntervalMs);
         }
 
-        Assert.True(_stackProbeDone, "EnsureSufficientExecutionStack worker should finish");
-        Assert.True(_stackProbeError == null, "EnsureSufficientExecutionStack should not throw in a spawned thread");
-        Assert.True(_stackProbeSufficient, "TryEnsureSufficientExecutionStack should report sufficient stack in a spawned thread");
+        Assert.True(s_stackProbeDone, "EnsureSufficientExecutionStack worker should finish");
+        Assert.True(s_stackProbeError == null, "EnsureSufficientExecutionStack should not throw in a spawned thread");
+        Assert.True(s_stackProbeSufficient, "TryEnsureSufficientExecutionStack should report sufficient stack in a spawned thread");
     }
 
     private static void EnsureSufficientStackWorker()
     {
-        _stackProbeSufficient = RuntimeHelpers.TryEnsureSufficientExecutionStack();
+        s_stackProbeSufficient = RuntimeHelpers.TryEnsureSufficientExecutionStack();
         try
         {
             RuntimeHelpers.EnsureSufficientExecutionStack();
         }
         catch (InsufficientExecutionStackException e)
         {
-            _stackProbeError = e.Message;
+            s_stackProbeError = e.Message;
             Serial.WriteString("[StackProbe] EnsureSufficientExecutionStack threw: ");
             Serial.WriteString(e.Message);
             Serial.WriteString("\n");
         }
-        _stackProbeDone = true;
+        s_stackProbeDone = true;
     }
 
     private static void TestRecordToStringInThread()
     {
-        _stackProbeDone = false;
-        _stackProbeToString = null;
-        _stackProbeError = null;
+        s_stackProbeDone = false;
+        s_stackProbeToString = null;
+        s_stackProbeError = null;
 
         var thread = new SysThread(RecordToStringWorker);
         thread.Start();
 
-        for (int i = 0; i < TaskPollRetries && !_stackProbeDone; i++)
+        for (int i = 0; i < TaskPollRetries && !s_stackProbeDone; i++)
         {
             TimerManager.Wait(TaskPollIntervalMs);
         }
 
-        Assert.True(_stackProbeDone, "record ToString worker should finish");
-        Assert.True(_stackProbeError == null, "record ToString should not throw in a spawned thread");
-        Assert.True(_stackProbeToString != null && _stackProbeToString.Contains("42"),
+        Assert.True(s_stackProbeDone, "record ToString worker should finish");
+        Assert.True(s_stackProbeError == null, "record ToString should not throw in a spawned thread");
+        Assert.True(s_stackProbeToString != null && s_stackProbeToString.Contains("42"),
             "record ToString should contain the property value");
     }
 
@@ -505,19 +505,19 @@ public class Kernel : Sys.Kernel
     {
         try
         {
-            _stackProbeToString = new StackProbeRecord(42, "yuki").ToString();
+            s_stackProbeToString = new StackProbeRecord(42, "yuki").ToString();
             Serial.WriteString("[StackProbe] record ToString: ");
-            Serial.WriteString(_stackProbeToString);
+            Serial.WriteString(s_stackProbeToString);
             Serial.WriteString("\n");
         }
         catch (InsufficientExecutionStackException e)
         {
-            _stackProbeError = e.Message;
+            s_stackProbeError = e.Message;
             Serial.WriteString("[StackProbe] record ToString threw: ");
             Serial.WriteString(e.Message);
             Serial.WriteString("\n");
         }
-        _stackProbeDone = true;
+        s_stackProbeDone = true;
     }
 
     private static void TestRecordToStringOnMainThread()
@@ -550,27 +550,27 @@ public class Kernel : Sys.Kernel
     /// <summary>Smallest stack SystemNative_CreateThread allocates for a managed thread.</summary>
     private const int MinThreadStackSize = 64 * 1024;
 
-    private static volatile bool _stackSizeProbeDone;
-    private static ulong _observedStackSize;
-    private static volatile bool _observedStackSufficient;
+    private static volatile bool s_stackSizeProbeDone;
+    private static ulong s_observedStackSize;
+    private static volatile bool s_observedStackSufficient;
 
     private static void StackSizeProbeWorker()
     {
-        _observedStackSize = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())!.CurrentThread!.StackSize;
-        _observedStackSufficient = RuntimeHelpers.TryEnsureSufficientExecutionStack();
-        _stackSizeProbeDone = true;
+        s_observedStackSize = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())!.CurrentThread!.StackSize;
+        s_observedStackSufficient = RuntimeHelpers.TryEnsureSufficientExecutionStack();
+        s_stackSizeProbeDone = true;
     }
 
     private static void RunStackSizeProbe(int requestedStackSize)
     {
-        _stackSizeProbeDone = false;
-        _observedStackSize = 0;
-        _observedStackSufficient = false;
+        s_stackSizeProbeDone = false;
+        s_observedStackSize = 0;
+        s_observedStackSufficient = false;
 
         var thread = new SysThread(StackSizeProbeWorker, requestedStackSize);
         thread.Start();
 
-        for (int i = 0; i < TaskPollRetries && !_stackSizeProbeDone; i++)
+        for (int i = 0; i < TaskPollRetries && !s_stackSizeProbeDone; i++)
         {
             TimerManager.Wait(TaskPollIntervalMs);
         }
@@ -580,10 +580,10 @@ public class Kernel : Sys.Kernel
     {
         RunStackSizeProbe(LargeRequestedStackSize);
 
-        Assert.True(_stackSizeProbeDone, "stack-size probe worker should finish");
-        Assert.True(_observedStackSize == LargeRequestedStackSize,
+        Assert.True(s_stackSizeProbeDone, "stack-size probe worker should finish");
+        Assert.True(s_observedStackSize == LargeRequestedStackSize,
             "scheduler thread should get the requested 512KB stack");
-        Assert.True(_observedStackSufficient,
+        Assert.True(s_observedStackSufficient,
             "a 512KB stack should pass TryEnsureSufficientExecutionStack");
     }
 
@@ -591,10 +591,10 @@ public class Kernel : Sys.Kernel
     {
         RunStackSizeProbe(TinyRequestedStackSize);
 
-        Assert.True(_stackSizeProbeDone, "floored stack-size probe worker should finish");
-        Assert.True(_observedStackSize == MinThreadStackSize,
+        Assert.True(s_stackSizeProbeDone, "floored stack-size probe worker should finish");
+        Assert.True(s_observedStackSize == MinThreadStackSize,
             "a 16KB request should be floored to the 64KB minimum");
-        Assert.False(_observedStackSufficient,
+        Assert.False(s_observedStackSufficient,
             "a 64KB stack sits below CoreLib's 128KB reserve, so TryEnsureSufficientExecutionStack reports false (upstream-faithful)");
     }
 
@@ -604,11 +604,11 @@ public class Kernel : Sys.Kernel
     // fallback on the next tick, which re-runs Mutex.Acquire's retry loop:
     // every pass calls OnThreadBlocked again and subtracts tickets that
     // OnThreadReady never added, so TotalTickets drifts (and underflows).
-    private static Cosmos.Kernel.Core.Scheduler.Mutex? _idleMutex;
-    private static volatile bool _mutexWorkerHolding;
-    private static volatile bool _mutexMainContending;
-    private static volatile bool _mutexTestDone;
-    private static volatile bool _mutexWorkerExited;
+    private static Cosmos.Kernel.Core.Scheduler.Mutex? s_idleMutex;
+    private static volatile bool s_mutexWorkerHolding;
+    private static volatile bool s_mutexMainContending;
+    private static volatile bool s_mutexTestDone;
+    private static volatile bool s_mutexWorkerExited;
 
     private static void TestMutexIdleThreadContention()
     {
@@ -618,38 +618,38 @@ public class Kernel : Sys.Kernel
                 as Cosmos.Kernel.Core.Scheduler.Stride.StrideCpuData;
         Assert.True(cpuData != null, "stride per-CPU data should exist");
 
-        _idleMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
-        _mutexWorkerHolding = false;
-        _mutexMainContending = false;
-        _mutexTestDone = false;
-        _mutexWorkerExited = false;
+        s_idleMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
+        s_mutexWorkerHolding = false;
+        s_mutexMainContending = false;
+        s_mutexTestDone = false;
+        s_mutexWorkerExited = false;
 
         var worker = new global::System.Threading.Thread(MutexIdleWorker);
         worker.Start();
 
-        for (int i = 0; i < FlagPollRetries && !_mutexWorkerHolding; i++)
+        for (int i = 0; i < FlagPollRetries && !s_mutexWorkerHolding; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
-        Assert.True(_mutexWorkerHolding, "worker should hold the mutex");
+        Assert.True(s_mutexWorkerHolding, "worker should hold the mutex");
 
         // Both reads happen with the worker runnable (it spins on the flags,
         // never blocking), so any delta comes from the idle thread's own
         // block/ready churn inside Acquire.
         ulong before = cpuData!.TotalTickets;
 
-        _mutexMainContending = true;
-        _idleMutex.Acquire();
-        _idleMutex.Release();
+        s_mutexMainContending = true;
+        s_idleMutex.Acquire();
+        s_idleMutex.Release();
 
         ulong after = cpuData.TotalTickets;
-        _mutexTestDone = true;
+        s_mutexTestDone = true;
 
         // Keep the cell hermetic: wait for the worker to leave its spin and
         // give its exit path time to finish inside THIS cell, so the
         // scheduler bookkeeping of the exit can't interleave with the next
         // cell's thread creation.
-        for (int i = 0; i < FlagPollRetries && !_mutexWorkerExited; i++)
+        for (int i = 0; i < FlagPollRetries && !s_mutexWorkerExited; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
@@ -660,21 +660,21 @@ public class Kernel : Sys.Kernel
 
     private static void MutexIdleWorker()
     {
-        _idleMutex!.Acquire();
-        _mutexWorkerHolding = true;
-        while (!_mutexMainContending)
+        s_idleMutex!.Acquire();
+        s_mutexWorkerHolding = true;
+        while (!s_mutexMainContending)
         {
             // spin until the main (idle) thread is about to contend
         }
         // Hold across several scheduler ticks so the contending idle thread
         // goes through its block/resurrect cycle more than once.
         TimerManager.Wait(IdleMutexHoldMs);
-        _idleMutex.Release();
-        while (!_mutexTestDone)
+        s_idleMutex.Release();
+        while (!s_mutexTestDone)
         {
             // stay runnable until the main thread has sampled TotalTickets
         }
-        _mutexWorkerExited = true;
+        s_mutexWorkerExited = true;
     }
 
     // ===== Multi-waiter paths (List<Thread> scans on non-empty lists) =====
@@ -682,15 +682,15 @@ public class Kernel : Sys.Kernel
     // the Contains call, so the list-scan path (EqualityComparer<Thread>)
     // is otherwise never exercised: the second parked waiter/contender here
     // is what actually walks a non-empty list.
-    private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? _twoWaiterEvent;
-    private static volatile bool _waiterAParked, _waiterBParked;
-    private static volatile bool _waiterAWoke, _waiterBWoke;
+    private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_twoWaiterEvent;
+    private static volatile bool s_waiterAParked, s_waiterBParked;
+    private static volatile bool s_waiterAWoke, s_waiterBWoke;
 
     private static void TestInterruptEventTwoWaiters()
     {
-        _twoWaiterEvent = new Cosmos.Kernel.Core.Scheduler.InterruptEvent();
-        _waiterAParked = _waiterBParked = false;
-        _waiterAWoke = _waiterBWoke = false;
+        s_twoWaiterEvent = new Cosmos.Kernel.Core.Scheduler.InterruptEvent();
+        s_waiterAParked = s_waiterBParked = false;
+        s_waiterAWoke = s_waiterBWoke = false;
 
         var w1 = new global::System.Threading.Thread(TwoWaiterWorkerA);
         var w2 = new global::System.Threading.Thread(TwoWaiterWorkerB);
@@ -699,44 +699,44 @@ public class Kernel : Sys.Kernel
 
         // Let both workers reach Wait() and park; the second one walks the
         // one-element waiter list on its way in.
-        for (int i = 0; i < FlagPollRetries && !(_waiterAParked && _waiterBParked); i++)
+        for (int i = 0; i < FlagPollRetries && !(s_waiterAParked && s_waiterBParked); i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         TimerManager.Wait(FlagPollIntervalMs);
 
-        _twoWaiterEvent.Signal();
-        _twoWaiterEvent.Signal();
+        s_twoWaiterEvent.Signal();
+        s_twoWaiterEvent.Signal();
 
-        for (int i = 0; i < FlagPollRetries && !(_waiterAWoke && _waiterBWoke); i++)
+        for (int i = 0; i < FlagPollRetries && !(s_waiterAWoke && s_waiterBWoke); i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         TimerManager.Wait(ExitGraceWaitMs);
-        Assert.True(_waiterAWoke && _waiterBWoke, "both parked waiters must be woken by two signals");
+        Assert.True(s_waiterAWoke && s_waiterBWoke, "both parked waiters must be woken by two signals");
     }
 
     private static void TwoWaiterWorkerA()
     {
-        _waiterAParked = true;
-        _twoWaiterEvent!.Wait();
-        _waiterAWoke = true;
+        s_waiterAParked = true;
+        s_twoWaiterEvent!.Wait();
+        s_waiterAWoke = true;
     }
 
     private static void TwoWaiterWorkerB()
     {
-        _waiterBParked = true;
-        _twoWaiterEvent!.Wait();
-        _waiterBWoke = true;
+        s_waiterBParked = true;
+        s_twoWaiterEvent!.Wait();
+        s_waiterBWoke = true;
     }
 
-    private static Cosmos.Kernel.Core.Scheduler.Mutex? _contendedMutex;
-    private static volatile int _contenderAcquisitions;
+    private static Cosmos.Kernel.Core.Scheduler.Mutex? s_contendedMutex;
+    private static volatile int s_contenderAcquisitions;
 
     private static void TestMutexThreeContenders()
     {
-        _contendedMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
-        _contenderAcquisitions = 0;
+        s_contendedMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
+        s_contenderAcquisitions = 0;
 
         var c1 = new global::System.Threading.Thread(MutexContenderWorker);
         var c2 = new global::System.Threading.Thread(MutexContenderWorker);
@@ -748,22 +748,22 @@ public class Kernel : Sys.Kernel
         // The holder keeps the mutex across several ticks, so the two other
         // contenders both queue up — the last one scans a non-empty
         // _waitingThreads list.
-        for (int i = 0; i < ContenderPollRetries && _contenderAcquisitions < ContenderCount; i++)
+        for (int i = 0; i < ContenderPollRetries && s_contenderAcquisitions < ContenderCount; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         TimerManager.Wait(ExitGraceWaitMs);
-        Assert.Equal(ContenderCount, _contenderAcquisitions, "all three contenders must acquire the mutex in turn");
+        Assert.Equal(ContenderCount, s_contenderAcquisitions, "all three contenders must acquire the mutex in turn");
     }
 
     private static void MutexContenderWorker()
     {
-        _contendedMutex!.Acquire();
+        s_contendedMutex!.Acquire();
         // Hold across a few ticks so the other contenders pile up in
         // _waitingThreads; the increment is protected by the mutex itself.
         TimerManager.Wait(MutexContenderHoldMs);
-        _contenderAcquisitions++;
-        _contendedMutex.Release();
+        s_contenderAcquisitions++;
+        s_contendedMutex.Release();
     }
 
     // ===== Release hand-off (anti-barging) =====
@@ -773,39 +773,39 @@ public class Kernel : Sys.Kernel
     // waiter on a contended mutex could starve. The releaser's immediate
     // TryAcquire is the deterministic probe: with ownership handed off in
     // Release it must fail.
-    private static Cosmos.Kernel.Core.Scheduler.Mutex? _handoffMutex;
-    private static volatile bool _handoffWorkerHolding;
-    private static volatile bool _handoffReleaseRequested;
-    private static volatile bool _handoffContenderAcquired;
-    private static volatile int _handoffBargeResult; // -1 pending, 0 no barge, 1 barged
+    private static Cosmos.Kernel.Core.Scheduler.Mutex? s_handoffMutex;
+    private static volatile bool s_handoffWorkerHolding;
+    private static volatile bool s_handoffReleaseRequested;
+    private static volatile bool s_handoffContenderAcquired;
+    private static volatile int s_handoffBargeResult; // -1 pending, 0 no barge, 1 barged
 
     private static void TestMutexReleaseHandsOff()
     {
-        _handoffMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
-        _handoffWorkerHolding = false;
-        _handoffReleaseRequested = false;
-        _handoffContenderAcquired = false;
-        _handoffBargeResult = BargeResultPending;
+        s_handoffMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
+        s_handoffWorkerHolding = false;
+        s_handoffReleaseRequested = false;
+        s_handoffContenderAcquired = false;
+        s_handoffBargeResult = BargeResultPending;
 
         var holder = new global::System.Threading.Thread(HandoffHolderWorker);
         holder.Start();
-        for (int i = 0; i < FlagPollRetries && !_handoffWorkerHolding; i++)
+        for (int i = 0; i < FlagPollRetries && !s_handoffWorkerHolding; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
-        Assert.True(_handoffWorkerHolding, "holder should own the mutex");
+        Assert.True(s_handoffWorkerHolding, "holder should own the mutex");
 
         var contender = new global::System.Threading.Thread(HandoffContenderWorker);
         contender.Start();
         // Give the contender a few quanta to park in _waitingThreads.
         TimerManager.Wait(ContenderParkWaitMs);
 
-        _handoffReleaseRequested = true;
-        for (int i = 0; i < FlagPollRetries && _handoffBargeResult == BargeResultPending; i++)
+        s_handoffReleaseRequested = true;
+        for (int i = 0; i < FlagPollRetries && s_handoffBargeResult == BargeResultPending; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
-        for (int i = 0; i < FlagPollRetries && !_handoffContenderAcquired; i++)
+        for (int i = 0; i < FlagPollRetries && !s_handoffContenderAcquired; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
@@ -815,40 +815,40 @@ public class Kernel : Sys.Kernel
         // idle-contention cell for the rationale).
         TimerManager.Wait(ExitGraceWaitMs);
 
-        Assert.Equal(BargeResultNoBarge, _handoffBargeResult,
+        Assert.Equal(BargeResultNoBarge, s_handoffBargeResult,
             "Release must hand the mutex to the parked waiter; the releaser's immediate TryAcquire barged in");
-        Assert.True(_handoffContenderAcquired, "the parked waiter must end up owning the mutex");
+        Assert.True(s_handoffContenderAcquired, "the parked waiter must end up owning the mutex");
     }
 
     private static void HandoffHolderWorker()
     {
-        _handoffMutex!.Acquire();
-        _handoffWorkerHolding = true;
-        while (!_handoffReleaseRequested)
+        s_handoffMutex!.Acquire();
+        s_handoffWorkerHolding = true;
+        while (!s_handoffReleaseRequested)
         {
             // spin: stay runnable so the contender has to park behind us
         }
-        _handoffMutex.Release();
-        bool barged = _handoffMutex.TryAcquire();
-        _handoffBargeResult = barged ? BargeResultBarged : BargeResultNoBarge;
+        s_handoffMutex.Release();
+        bool barged = s_handoffMutex.TryAcquire();
+        s_handoffBargeResult = barged ? BargeResultBarged : BargeResultNoBarge;
         if (barged)
         {
-            _handoffMutex.Release();
+            s_handoffMutex.Release();
         }
     }
 
     private static void HandoffContenderWorker()
     {
-        _handoffMutex!.Acquire();
-        _handoffContenderAcquired = true;
-        _handoffMutex.Release();
+        s_handoffMutex!.Acquire();
+        s_handoffContenderAcquired = true;
+        s_handoffMutex.Release();
     }
 
     private static void TestMultipleThreads()
     {
         Serial.WriteString("[Test] Testing multiple threads...\n");
-        _thread1Counter = 0;
-        _thread2Counter = 0;
+        s_thread1Counter = 0;
+        s_thread2Counter = 0;
 
         var thread1 = new global::System.Threading.Thread(Thread1Worker);
         var thread2 = new global::System.Threading.Thread(Thread2Worker);
@@ -861,19 +861,19 @@ public class Kernel : Sys.Kernel
         TimerManager.Wait(ThreadsCompletionWaitMs);
 
         // Additional waiting if not complete
-        for (int i = 0; i < MaxExtraWaitRetries && (_thread1Counter < WorkerIterationCount || _thread2Counter < WorkerIterationCount); i++)
+        for (int i = 0; i < MaxExtraWaitRetries && (s_thread1Counter < WorkerIterationCount || s_thread2Counter < WorkerIterationCount); i++)
         {
             TimerManager.Wait(RetryWaitMs);
         }
 
         Serial.WriteString("[Test] Thread1 counter: ");
-        Serial.WriteNumber((uint)_thread1Counter);
+        Serial.WriteNumber((uint)s_thread1Counter);
         Serial.WriteString(", Thread2 counter: ");
-        Serial.WriteNumber((uint)_thread2Counter);
+        Serial.WriteNumber((uint)s_thread2Counter);
         Serial.WriteString("\n");
 
-        Assert.Equal(WorkerIterationCount, _thread1Counter);
-        Assert.Equal(WorkerIterationCount, _thread2Counter);
+        Assert.Equal(WorkerIterationCount, s_thread1Counter);
+        Assert.Equal(WorkerIterationCount, s_thread2Counter);
     }
 
     private static void Thread1Worker()
@@ -881,7 +881,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[Thread1] Started\n");
         for (int i = 0; i < WorkerIterationCount; i++)
         {
-            _thread1Counter++;
+            s_thread1Counter++;
             TimerManager.Wait(WorkerStepDelayMs);
         }
         Serial.WriteString("[Thread1] Completed\n");
@@ -892,7 +892,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[Thread2] Started\n");
         for (int i = 0; i < WorkerIterationCount; i++)
         {
-            _thread2Counter++;
+            s_thread2Counter++;
             TimerManager.Wait(WorkerStepDelayMs);
         }
         Serial.WriteString("[Thread2] Completed\n");
@@ -901,8 +901,8 @@ public class Kernel : Sys.Kernel
     private static void TestSpinLockWithThreads()
     {
         Serial.WriteString("[Test] Testing spinlock with threads...\n");
-        _sharedCounter = 0;
-        _testLock = new Cosmos.Kernel.Core.Scheduler.SpinLock();
+        s_sharedCounter = 0;
+        s_testLock = new Cosmos.Kernel.Core.Scheduler.SpinLock();
 
         var thread1 = new global::System.Threading.Thread(SpinLockThread1Worker);
         var thread2 = new global::System.Threading.Thread(SpinLockThread2Worker);
@@ -914,17 +914,17 @@ public class Kernel : Sys.Kernel
         TimerManager.Wait(LockTestInitialWaitMs);
 
         // Additional waiting if not complete
-        for (int i = 0; i < MaxExtraWaitRetries && _sharedCounter < ExpectedTotalIncrements; i++)
+        for (int i = 0; i < MaxExtraWaitRetries && s_sharedCounter < ExpectedTotalIncrements; i++)
         {
             TimerManager.Wait(RetryWaitMs);
         }
 
         Serial.WriteString("[Test] Final counter: ");
-        Serial.WriteNumber((uint)_sharedCounter);
+        Serial.WriteNumber((uint)s_sharedCounter);
         Serial.WriteString("\n");
 
         // With proper locking, counter should be exactly 200
-        Assert.Equal(ExpectedTotalIncrements, _sharedCounter);
+        Assert.Equal(ExpectedTotalIncrements, s_sharedCounter);
     }
 
     private static void SpinLockThread1Worker()
@@ -932,9 +932,9 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[Thread1] Starting increments\n");
         for (int i = 0; i < LockIterationsPerThread; i++)
         {
-            _testLock.Acquire();
-            _sharedCounter++;
-            _testLock.Release();
+            s_testLock.Acquire();
+            s_sharedCounter++;
+            s_testLock.Release();
         }
         Serial.WriteString("[Thread1] Done\n");
     }
@@ -944,51 +944,51 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[Thread2] Starting increments\n");
         for (int i = 0; i < LockIterationsPerThread; i++)
         {
-            _testLock.Acquire();
-            _sharedCounter++;
-            _testLock.Release();
+            s_testLock.Acquire();
+            s_sharedCounter++;
+            s_testLock.Release();
         }
         Serial.WriteString("[Thread2] Done\n");
     }
 
     [ThreadStatic]
-    private static int StaticValue;
+    private static int s_staticValue;
     private static void TestThreadStatics()
     {
         int secondThreadValue = 0;
-        StaticValue = 18;
+        s_staticValue = 18;
 
         SysThread thread = new SysThread(() =>
         {
-            StaticValue = 42;
-            secondThreadValue = StaticValue;
+            s_staticValue = 42;
+            secondThreadValue = s_staticValue;
         });
 
         thread.Start();
 
         TimerManager.Wait(ThreadStaticsWaitMs); // Wait 10ms for the thread to finish.
 
-        Assert.Equal(18, StaticValue);
+        Assert.Equal(18, s_staticValue);
         Assert.Equal(42, secondThreadValue);
     }
 
     // ==================== ThreadPool / Task / Async-Await Tests ====================
 
-    private static volatile bool _threadPoolExecuted;
+    private static volatile bool s_threadPoolExecuted;
 
     private static void TestThreadPoolQueueUserWorkItem()
     {
         Serial.WriteString("[Test] Testing ThreadPool.QueueUserWorkItem...\n");
-        _threadPoolExecuted = false;
+        s_threadPoolExecuted = false;
 
-        ThreadPool.QueueUserWorkItem(_ => { _threadPoolExecuted = true; });
+        ThreadPool.QueueUserWorkItem(_ => { s_threadPoolExecuted = true; });
 
-        for (int i = 0; i < TaskPollRetries && !_threadPoolExecuted; i++)
+        for (int i = 0; i < TaskPollRetries && !s_threadPoolExecuted; i++)
         {
             TimerManager.Wait(TaskPollIntervalMs);
         }
 
-        Assert.True(_threadPoolExecuted, "ThreadPool work item should execute");
+        Assert.True(s_threadPoolExecuted, "ThreadPool work item should execute");
     }
 
     private static void TestTaskFromResult()
@@ -1408,14 +1408,14 @@ public class Kernel : Sys.Kernel
     private static RoundRobinScheduler? s_roundRobin;
 
     // Two measured CPU-bound spinners (the proportional-share/equal-share cells)
-    private static volatile bool _spinGo;
-    private static volatile bool _spinStop;
-    private static volatile bool _spinAReady, _spinBReady;
-    private static volatile bool _spinADone, _spinBDone;
-    private static SchedulerThread? _spinAThread, _spinBThread;
+    private static volatile bool s_spinGo;
+    private static volatile bool s_spinStop;
+    private static volatile bool s_spinAReady, s_spinBReady;
+    private static volatile bool s_spinADone, s_spinBDone;
+    private static SchedulerThread? s_spinAThread, s_spinBThread;
     // Written by each worker before its volatile done flag; read by main after it.
-    private static ulong _spinACount, _spinBCount;
-    private static long _observedPriorityA, _observedPriorityB;
+    private static ulong s_spinACount, s_spinBCount;
+    private static long s_observedPriorityA, s_observedPriorityB;
 
     private static SchedulerThread? CurrentSchedulerThread()
     {
@@ -1463,9 +1463,9 @@ public class Kernel : Sys.Kernel
 
     private static void MeasuredSpinWorkerA()
     {
-        _spinAThread = CurrentSchedulerThread();
-        _spinAReady = true;
-        while (!_spinGo)
+        s_spinAThread = CurrentSchedulerThread();
+        s_spinAReady = true;
+        while (!s_spinGo)
         {
             // wait for main to apply priorities and open the measurement window
         }
@@ -1474,21 +1474,21 @@ public class Kernel : Sys.Kernel
         while (true)
         {
             count++;
-            if ((count & SpinStopCheckMask) == 0 && _spinStop)
+            if ((count & SpinStopCheckMask) == 0 && s_spinStop)
             {
                 break;
             }
         }
 
-        _spinACount = count;
-        _spinADone = true;
+        s_spinACount = count;
+        s_spinADone = true;
     }
 
     private static void MeasuredSpinWorkerB()
     {
-        _spinBThread = CurrentSchedulerThread();
-        _spinBReady = true;
-        while (!_spinGo)
+        s_spinBThread = CurrentSchedulerThread();
+        s_spinBReady = true;
+        while (!s_spinGo)
         {
             // wait for main to apply priorities and open the measurement window
         }
@@ -1497,14 +1497,14 @@ public class Kernel : Sys.Kernel
         while (true)
         {
             count++;
-            if ((count & SpinStopCheckMask) == 0 && _spinStop)
+            if ((count & SpinStopCheckMask) == 0 && s_spinStop)
             {
                 break;
             }
         }
 
-        _spinBCount = count;
-        _spinBDone = true;
+        s_spinBCount = count;
+        s_spinBDone = true;
     }
 
     /// <summary>
@@ -1516,46 +1516,46 @@ public class Kernel : Sys.Kernel
     /// </summary>
     private static void RunTwoSpinnersMeasured(long priorityA, long priorityB)
     {
-        _spinGo = false;
-        _spinStop = false;
-        _spinAReady = _spinBReady = false;
-        _spinADone = _spinBDone = false;
-        _spinAThread = _spinBThread = null;
-        _spinACount = _spinBCount = 0;
-        _observedPriorityA = _observedPriorityB = 0;
+        s_spinGo = false;
+        s_spinStop = false;
+        s_spinAReady = s_spinBReady = false;
+        s_spinADone = s_spinBDone = false;
+        s_spinAThread = s_spinBThread = null;
+        s_spinACount = s_spinBCount = 0;
+        s_observedPriorityA = s_observedPriorityB = 0;
 
         SysThread workerA = new(MeasuredSpinWorkerA);
         SysThread workerB = new(MeasuredSpinWorkerB);
         workerA.Start();
         workerB.Start();
 
-        for (int i = 0; i < FlagPollRetries && !(_spinAReady && _spinBReady); i++)
+        for (int i = 0; i < FlagPollRetries && !(s_spinAReady && s_spinBReady); i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
 
         uint cpuId = SchedulerManager.GetCurrentCpuId();
-        if (_spinAThread != null && _spinBThread != null)
+        if (s_spinAThread != null && s_spinBThread != null)
         {
             // SetPriority runs under a spinlock only (see the plugging guide's
             // kernel constraints); mask the tick around it ourselves.
             using (SchedulerManager.MaskInterrupts())
             {
-                SchedulerManager.SetPriority(cpuId, _spinAThread, priorityA);
-                SchedulerManager.SetPriority(cpuId, _spinBThread, priorityB);
+                SchedulerManager.SetPriority(cpuId, s_spinAThread, priorityA);
+                SchedulerManager.SetPriority(cpuId, s_spinBThread, priorityB);
             }
 
             // Capture what the policy reports while the threads are alive:
             // OnThreadExit drops the bookkeeping GetPriority reads.
-            _observedPriorityA = SchedulerManager.GetPriority(_spinAThread);
-            _observedPriorityB = SchedulerManager.GetPriority(_spinBThread);
+            s_observedPriorityA = SchedulerManager.GetPriority(s_spinAThread);
+            s_observedPriorityB = SchedulerManager.GetPriority(s_spinBThread);
         }
 
-        _spinGo = true;
+        s_spinGo = true;
         TimerManager.Wait(PolicyMeasureMs);
-        _spinStop = true;
+        s_spinStop = true;
 
-        for (int i = 0; i < FlagPollRetries && !(_spinADone && _spinBDone); i++)
+        for (int i = 0; i < FlagPollRetries && !(s_spinADone && s_spinBDone); i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
@@ -1568,9 +1568,9 @@ public class Kernel : Sys.Kernel
         Serial.WriteString(" prioB=");
         Serial.WriteNumber(priorityB);
         Serial.WriteString(" countA=");
-        Serial.WriteNumber((long)_spinACount);
+        Serial.WriteNumber((long)s_spinACount);
         Serial.WriteString(" countB=");
-        Serial.WriteNumber((long)_spinBCount);
+        Serial.WriteNumber((long)s_spinBCount);
         Serial.WriteString("\n");
     }
 
@@ -1585,13 +1585,13 @@ public class Kernel : Sys.Kernel
     {
         RunTwoSpinnersMeasured(HighTickets, LowTickets);
 
-        Assert.True(_spinAReady && _spinBReady, "both measured spinners should start");
-        Assert.True(_spinADone && _spinBDone, "both measured spinners should finish the window");
-        Assert.True(_observedPriorityA == HighTickets && _observedPriorityB == LowTickets,
+        Assert.True(s_spinAReady && s_spinBReady, "both measured spinners should start");
+        Assert.True(s_spinADone && s_spinBDone, "both measured spinners should finish the window");
+        Assert.True(s_observedPriorityA == HighTickets && s_observedPriorityB == LowTickets,
             "Stride should report the tickets set through SetPriority");
-        Assert.True(_spinACount > 0 && _spinBCount > 0,
+        Assert.True(s_spinACount > 0 && s_spinBCount > 0,
             "both spinners must make progress under Stride (proportional share, not starvation)");
-        Assert.True(_spinACount * PolicySkewDenominator >= _spinBCount * PolicySkewNumerator,
+        Assert.True(s_spinACount * PolicySkewDenominator >= s_spinBCount * PolicySkewNumerator,
             "a 4x ticket edge must yield a clearly larger (>= 1.5x) CPU share under Stride");
     }
 
@@ -1621,20 +1621,20 @@ public class Kernel : Sys.Kernel
         }
     }
 
-    private static volatile bool _policyProbeRan;
+    private static volatile bool s_policyProbeRan;
 
     private static void PolicyProbeWorker()
     {
-        _policyProbeRan = true;
+        s_policyProbeRan = true;
     }
 
     private static void RunPolicyProbeWorker()
     {
-        _policyProbeRan = false;
+        s_policyProbeRan = false;
         SysThread probe = new(PolicyProbeWorker);
         probe.Start();
 
-        for (int i = 0; i < FlagPollRetries && !_policyProbeRan; i++)
+        for (int i = 0; i < FlagPollRetries && !s_policyProbeRan; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
@@ -1644,7 +1644,7 @@ public class Kernel : Sys.Kernel
     private static void TestThreadRunsUnderRoundRobin()
     {
         RunPolicyProbeWorker();
-        Assert.True(_policyProbeRan,
+        Assert.True(s_policyProbeRan,
             "a thread created under the Round-Robin policy must be scheduled and run");
     }
 
@@ -1775,19 +1775,19 @@ public class Kernel : Sys.Kernel
     }
 
     // ===== Round-Robin live dispatch =====
-    private static volatile int _fifoRecorded;
+    private static volatile int s_fifoRecorded;
 
     private static void FifoWorker()
     {
         using (SchedulerManager.MaskInterrupts())
         {
-            _fifoRecorded++;
+            s_fifoRecorded++;
         }
     }
 
     private static void TestRoundRobinDispatchesEveryThread()
     {
-        _fifoRecorded = 0;
+        s_fifoRecorded = 0;
 
         // Liveness, not order: FIFO bounds every thread's wait at
         // quantum * queue depth, so all three must reach their delegate.
@@ -1800,35 +1800,35 @@ public class Kernel : Sys.Kernel
         w1.Start();
         w2.Start();
 
-        for (int i = 0; i < FlagPollRetries && _fifoRecorded < FifoWorkerCount; i++)
+        for (int i = 0; i < FlagPollRetries && s_fifoRecorded < FifoWorkerCount; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         TimerManager.Wait(ExitGraceWaitMs);
 
-        Assert.Equal(FifoWorkerCount, _fifoRecorded,
+        Assert.Equal(FifoWorkerCount, s_fifoRecorded,
             "Round-Robin must dispatch every ready thread (no starvation)");
     }
 
     // ===== Round-Robin quantum preemption =====
-    private static volatile bool _preemptStop;
-    private static volatile bool _preemptDone;
-    private static volatile uint _preemptCounter;
+    private static volatile bool s_preemptStop;
+    private static volatile bool s_preemptDone;
+    private static volatile uint s_preemptCounter;
 
     private static void PreemptProbeSpinner()
     {
-        while (!_preemptStop)
+        while (!s_preemptStop)
         {
-            _preemptCounter++;
+            s_preemptCounter++;
         }
-        _preemptDone = true;
+        s_preemptDone = true;
     }
 
     private static void TestRoundRobinQuantumPreemption()
     {
-        _preemptStop = false;
-        _preemptDone = false;
-        _preemptCounter = 0;
+        s_preemptStop = false;
+        s_preemptDone = false;
+        s_preemptCounter = 0;
 
         SysThread spinner = new(PreemptProbeSpinner);
         spinner.Start();
@@ -1837,20 +1837,20 @@ public class Kernel : Sys.Kernel
         // to preempt it at quantum expiry and rotate main back in — merely
         // reaching the asserts proves FIFO's bounded latency for main.
         TimerManager.Wait(PreemptSampleIntervalMs);
-        uint sample1 = _preemptCounter;
+        uint sample1 = s_preemptCounter;
         TimerManager.Wait(PreemptSampleIntervalMs);
-        uint sample2 = _preemptCounter;
+        uint sample2 = s_preemptCounter;
         TimerManager.Wait(PreemptSampleIntervalMs);
-        uint sample3 = _preemptCounter;
+        uint sample3 = s_preemptCounter;
 
-        _preemptStop = true;
-        for (int i = 0; i < FlagPollRetries && !_preemptDone; i++)
+        s_preemptStop = true;
+        for (int i = 0; i < FlagPollRetries && !s_preemptDone; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         TimerManager.Wait(ExitGraceWaitMs);
 
-        Assert.True(_preemptDone, "the preempted spinner should observe stop and exit");
+        Assert.True(s_preemptDone, "the preempted spinner should observe stop and exit");
         Assert.True(sample1 != sample2 && sample2 != sample3,
             "the spinner must keep progressing between main-thread samples (quantum rotation)");
     }
@@ -1859,11 +1859,11 @@ public class Kernel : Sys.Kernel
     {
         RunTwoSpinnersMeasured(LowTickets, LowTickets);
 
-        Assert.True(_spinADone && _spinBDone, "both measured spinners should finish the window");
-        Assert.True(_spinACount > 0 && _spinBCount > 0,
+        Assert.True(s_spinADone && s_spinBDone, "both measured spinners should finish the window");
+        Assert.True(s_spinACount > 0 && s_spinBCount > 0,
             "both spinners must make progress under Round-Robin");
-        Assert.True(_spinACount * PolicySkewDenominator < _spinBCount * PolicySkewNumerator
-            && _spinBCount * PolicySkewDenominator < _spinACount * PolicySkewNumerator,
+        Assert.True(s_spinACount * PolicySkewDenominator < s_spinBCount * PolicySkewNumerator
+            && s_spinBCount * PolicySkewDenominator < s_spinACount * PolicySkewNumerator,
             "equal-quantum turns must yield shares within the 1.5x band under Round-Robin");
     }
 
@@ -1871,24 +1871,24 @@ public class Kernel : Sys.Kernel
     {
         RunTwoSpinnersMeasured(HighTickets, LowTickets);
 
-        Assert.True(_spinADone && _spinBDone, "both measured spinners should finish the window");
-        Assert.True(_observedPriorityA == 0 && _observedPriorityB == 0,
+        Assert.True(s_spinADone && s_spinBDone, "both measured spinners should finish the window");
+        Assert.True(s_observedPriorityA == 0 && s_observedPriorityB == 0,
             "Round-Robin defines no priorities, so GetPriority should report 0 for both");
-        Assert.True(_spinACount * PolicySkewDenominator < _spinBCount * PolicySkewNumerator
-            && _spinBCount * PolicySkewDenominator < _spinACount * PolicySkewNumerator,
+        Assert.True(s_spinACount * PolicySkewDenominator < s_spinBCount * PolicySkewNumerator
+            && s_spinBCount * PolicySkewDenominator < s_spinACount * PolicySkewNumerator,
             "a 4x priority request must not push Round-Robin past the share ratio Stride clears");
     }
 
     // ===== Round-Robin run-queue diagnostics =====
-    private static volatile bool _gateRelease;
-    private static volatile bool _gateAStarted, _gateBStarted, _gateCStarted;
-    private static SchedulerThread? _gateAThread, _gateBThread, _gateCThread;
+    private static volatile bool s_gateRelease;
+    private static volatile bool s_gateAStarted, s_gateBStarted, s_gateCStarted;
+    private static SchedulerThread? s_gateAThread, s_gateBThread, s_gateCThread;
 
     private static void GateWorkerA()
     {
-        _gateAThread = CurrentSchedulerThread();
-        _gateAStarted = true;
-        while (!_gateRelease)
+        s_gateAThread = CurrentSchedulerThread();
+        s_gateAStarted = true;
+        while (!s_gateRelease)
         {
             // stay runnable so main can observe us in the run queue
         }
@@ -1896,9 +1896,9 @@ public class Kernel : Sys.Kernel
 
     private static void GateWorkerB()
     {
-        _gateBThread = CurrentSchedulerThread();
-        _gateBStarted = true;
-        while (!_gateRelease)
+        s_gateBThread = CurrentSchedulerThread();
+        s_gateBStarted = true;
+        while (!s_gateRelease)
         {
             // stay runnable so main can observe us in the run queue
         }
@@ -1906,9 +1906,9 @@ public class Kernel : Sys.Kernel
 
     private static void GateWorkerC()
     {
-        _gateCThread = CurrentSchedulerThread();
-        _gateCStarted = true;
-        while (!_gateRelease)
+        s_gateCThread = CurrentSchedulerThread();
+        s_gateCStarted = true;
+        while (!s_gateRelease)
         {
             // stay runnable so main can observe us in the run queue
         }
@@ -1916,9 +1916,9 @@ public class Kernel : Sys.Kernel
 
     private static void TestRoundRobinRunQueueDiagnostics()
     {
-        _gateRelease = false;
-        _gateAStarted = _gateBStarted = _gateCStarted = false;
-        _gateAThread = _gateBThread = _gateCThread = null;
+        s_gateRelease = false;
+        s_gateAStarted = s_gateBStarted = s_gateCStarted = false;
+        s_gateAThread = s_gateBThread = s_gateCThread = null;
 
         SysThread a = new(GateWorkerA);
         SysThread b = new(GateWorkerB);
@@ -1927,11 +1927,11 @@ public class Kernel : Sys.Kernel
         b.Start();
         c.Start();
 
-        for (int i = 0; i < FlagPollRetries && !(_gateAStarted && _gateBStarted && _gateCStarted); i++)
+        for (int i = 0; i < FlagPollRetries && !(s_gateAStarted && s_gateBStarted && s_gateCStarted); i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
-        Assert.True(_gateAStarted && _gateBStarted && _gateCStarted, "all gate spinners should start");
+        Assert.True(s_gateAStarted && s_gateBStarted && s_gateCStarted, "all gate spinners should start");
 
         IScheduler scheduler = SchedulerManager.Current!;
         PerCpuState state = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())!;
@@ -1939,92 +1939,92 @@ public class Kernel : Sys.Kernel
         // Main is running, so all three spinners are Ready and must be queued.
         Assert.True(scheduler.GetRunQueueCount(state) >= FifoWorkerCount,
             "the run queue should hold the three spinning workers");
-        Assert.True(RunQueueHolds(_gateAThread) && RunQueueHolds(_gateBThread) && RunQueueHolds(_gateCThread),
+        Assert.True(RunQueueHolds(s_gateAThread) && RunQueueHolds(s_gateBThread) && RunQueueHolds(s_gateCThread),
             "each spinning worker should be visible through the diagnostics hooks");
         Assert.True(scheduler.GetRunQueueThread(state, OutOfRangeQueueIndex) == null,
             "an out-of-range run-queue index must read as null");
 
-        _gateRelease = true;
+        s_gateRelease = true;
         for (int i = 0; i < FlagPollRetries
-            && (RunQueueHolds(_gateAThread) || RunQueueHolds(_gateBThread) || RunQueueHolds(_gateCThread)); i++)
+            && (RunQueueHolds(s_gateAThread) || RunQueueHolds(s_gateBThread) || RunQueueHolds(s_gateCThread)); i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         TimerManager.Wait(ExitGraceWaitMs);
 
-        Assert.True(!RunQueueHolds(_gateAThread) && !RunQueueHolds(_gateBThread) && !RunQueueHolds(_gateCThread),
+        Assert.True(!RunQueueHolds(s_gateAThread) && !RunQueueHolds(s_gateBThread) && !RunQueueHolds(s_gateCThread),
             "exited workers must leave the run queue");
     }
 
     // ===== Round-Robin blocked-thread queue membership =====
-    private static Cosmos.Kernel.Core.Scheduler.Mutex? _blockProbeMutex;
-    private static volatile bool _blockWorkerStarted;
-    private static volatile bool _blockWorkerThrough;
-    private static volatile bool _blockRelease;
-    private static SchedulerThread? _blockWorkerThread;
+    private static Cosmos.Kernel.Core.Scheduler.Mutex? s_blockProbeMutex;
+    private static volatile bool s_blockWorkerStarted;
+    private static volatile bool s_blockWorkerThrough;
+    private static volatile bool s_blockRelease;
+    private static SchedulerThread? s_blockWorkerThread;
 
     private static void BlockProbeWorker()
     {
-        _blockWorkerThread = CurrentSchedulerThread();
-        _blockWorkerStarted = true;
-        _blockProbeMutex!.Acquire();   // parks: main holds the mutex
-        _blockWorkerThrough = true;
-        while (!_blockRelease)
+        s_blockWorkerThread = CurrentSchedulerThread();
+        s_blockWorkerStarted = true;
+        s_blockProbeMutex!.Acquire();   // parks: main holds the mutex
+        s_blockWorkerThrough = true;
+        while (!s_blockRelease)
         {
             // stay runnable so main can observe us back in the run queue
         }
-        _blockProbeMutex.Release();
+        s_blockProbeMutex.Release();
     }
 
     private static void TestRoundRobinBlockedLeavesQueue()
     {
-        _blockProbeMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
-        _blockWorkerStarted = false;
-        _blockWorkerThrough = false;
-        _blockRelease = false;
-        _blockWorkerThread = null;
+        s_blockProbeMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
+        s_blockWorkerStarted = false;
+        s_blockWorkerThrough = false;
+        s_blockRelease = false;
+        s_blockWorkerThread = null;
 
-        _blockProbeMutex.Acquire();   // uncontended: taken immediately
+        s_blockProbeMutex.Acquire();   // uncontended: taken immediately
 
         SysThread worker = new(BlockProbeWorker);
         worker.Start();
 
-        for (int i = 0; i < FlagPollRetries && !_blockWorkerStarted; i++)
+        for (int i = 0; i < FlagPollRetries && !s_blockWorkerStarted; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
-        Assert.True(_blockWorkerStarted, "the block-probe worker should start");
-        if (_blockWorkerThread == null)
+        Assert.True(s_blockWorkerStarted, "the block-probe worker should start");
+        if (s_blockWorkerThread == null)
         {
             // Asserts don't throw in this framework; bail before dereferencing,
             // and release so the parked worker can't leak into the next cell.
-            _blockRelease = true;
-            _blockProbeMutex.Release();
+            s_blockRelease = true;
+            s_blockProbeMutex.Release();
             return;
         }
 
         for (int i = 0; i < FlagPollRetries
-            && _blockWorkerThread!.State != Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Blocked; i++)
+            && s_blockWorkerThread!.State != Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Blocked; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
-        Assert.True(_blockWorkerThread!.State == Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Blocked,
+        Assert.True(s_blockWorkerThread!.State == Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Blocked,
             "the worker should park on the held mutex");
-        Assert.False(RunQueueHolds(_blockWorkerThread),
+        Assert.False(RunQueueHolds(s_blockWorkerThread),
             "a mutex-parked thread must leave the Round-Robin run queue");
 
-        _blockProbeMutex.Release();   // hand-off wakes the parked worker
+        s_blockProbeMutex.Release();   // hand-off wakes the parked worker
 
-        for (int i = 0; i < FlagPollRetries && !_blockWorkerThrough; i++)
+        for (int i = 0; i < FlagPollRetries && !s_blockWorkerThrough; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
-        Assert.True(_blockWorkerThrough, "the woken worker should acquire the handed-off mutex");
-        Assert.True(RunQueueHolds(_blockWorkerThread),
+        Assert.True(s_blockWorkerThrough, "the woken worker should acquire the handed-off mutex");
+        Assert.True(RunQueueHolds(s_blockWorkerThread),
             "a woken, spinning thread must re-enter the Round-Robin run queue");
 
-        _blockRelease = true;
-        for (int i = 0; i < FlagPollRetries && RunQueueHolds(_blockWorkerThread); i++)
+        s_blockRelease = true;
+        for (int i = 0; i < FlagPollRetries && RunQueueHolds(s_blockWorkerThread); i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
@@ -2059,21 +2059,21 @@ public class Kernel : Sys.Kernel
             "the restored policy should report the Stride name");
 
         RunPolicyProbeWorker();
-        Assert.True(_policyProbeRan,
+        Assert.True(s_policyProbeRan,
             "a thread created after restoring Stride must be scheduled and run");
     }
 
-    private static volatile bool _rehomeStop;
-    private static volatile bool _rehomeDone;
-    private static volatile uint _rehomeCounter;
+    private static volatile bool s_rehomeStop;
+    private static volatile bool s_rehomeDone;
+    private static volatile uint s_rehomeCounter;
 
     private static void RehomeProbeSpinner()
     {
-        while (!_rehomeStop)
+        while (!s_rehomeStop)
         {
-            _rehomeCounter++;
+            s_rehomeCounter++;
         }
-        _rehomeDone = true;
+        s_rehomeDone = true;
     }
 
     // A thread alive across a policy swap must keep running under the new
@@ -2085,14 +2085,14 @@ public class Kernel : Sys.Kernel
     // the stock Stride policy is exercised as the incoming side too.
     private static void TestSetSchedulerRehomesLiveThreads()
     {
-        _rehomeStop = false;
-        _rehomeDone = false;
-        _rehomeCounter = 0;
+        s_rehomeStop = false;
+        s_rehomeDone = false;
+        s_rehomeCounter = 0;
 
         SysThread spinner = new(RehomeProbeSpinner);
         spinner.Start();
         TimerManager.Wait(PreemptSampleIntervalMs);
-        uint underStride = _rehomeCounter;
+        uint underStride = s_rehomeCounter;
 
         RoundRobinScheduler roundRobin = new();
         using (SchedulerManager.MaskInterrupts())
@@ -2100,7 +2100,7 @@ public class Kernel : Sys.Kernel
             SchedulerManager.SetScheduler(roundRobin);
         }
         TimerManager.Wait(PreemptSampleIntervalMs);
-        uint underRoundRobin = _rehomeCounter;
+        uint underRoundRobin = s_rehomeCounter;
 
         Cosmos.Kernel.Core.Scheduler.Stride.StrideScheduler stride = new();
         using (SchedulerManager.MaskInterrupts())
@@ -2108,10 +2108,10 @@ public class Kernel : Sys.Kernel
             SchedulerManager.SetScheduler(stride);
         }
         TimerManager.Wait(PreemptSampleIntervalMs);
-        uint backUnderStride = _rehomeCounter;
+        uint backUnderStride = s_rehomeCounter;
 
-        _rehomeStop = true;
-        for (int i = 0; i < FlagPollRetries && !_rehomeDone; i++)
+        s_rehomeStop = true;
+        for (int i = 0; i < FlagPollRetries && !s_rehomeDone; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
@@ -2122,6 +2122,6 @@ public class Kernel : Sys.Kernel
             "a thread alive across the swap must keep running under Round-Robin");
         Assert.True(backUnderStride > underRoundRobin,
             "a thread alive across the swap back must keep running under Stride");
-        Assert.True(_rehomeDone, "the re-homed spinner should observe stop and exit");
+        Assert.True(s_rehomeDone, "the re-homed spinner should observe stop and exit");
     }
 }

@@ -24,7 +24,7 @@ public static class SocketPlug
     // Store protocol type per socket (public for cross-assembly access when patched)
     public static readonly Dictionary<int, ProtocolType> _protocolTypes = new();
     // Store TCP state machine per socket instance
-    internal static readonly Dictionary<int, Tcp> _tcpStateMachines = new();
+    internal static readonly Dictionary<int, Tcp> s_tcpStateMachines = new();
     // Store UDP client per socket instance
     public static readonly Dictionary<int, KernelUdpClient> _udpClients = new();
     // Store bound endpoint per socket instance
@@ -92,7 +92,7 @@ public static class SocketPlug
         {
             if (proto == ProtocolType.Tcp)
             {
-                if (_tcpStateMachines.TryGetValue(id, out var sm))
+                if (s_tcpStateMachines.TryGetValue(id, out var sm))
                 {
                     return sm.Status == Status.ESTABLISHED;
                 }
@@ -117,7 +117,7 @@ public static class SocketPlug
 
         if (proto == ProtocolType.Tcp)
         {
-            if (_tcpStateMachines.TryGetValue(id, out var sm))
+            if (s_tcpStateMachines.TryGetValue(id, out var sm))
             {
                 return sm.Data.Length;
             }
@@ -166,7 +166,7 @@ public static class SocketPlug
         {
             if (proto == ProtocolType.Tcp)
             {
-                if (_tcpStateMachines.TryGetValue(id, out var sm))
+                if (s_tcpStateMachines.TryGetValue(id, out var sm))
                 {
                     return sm.Status == Status.ESTABLISHED;
                 }
@@ -224,7 +224,7 @@ public static class SocketPlug
         sm.LocalEndPoint.Port = (ushort)ep.Port;
         sm.Status = Status.LISTEN;
 
-        _tcpStateMachines[id] = sm;
+        s_tcpStateMachines[id] = sm;
     }
 
     [PlugMember]
@@ -232,18 +232,18 @@ public static class SocketPlug
     {
         int id = GetId(aThis);
 
-        if (!_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out var sm))
         {
             Log.WriteString("[SocketPlug] TcpListener not started, starting...\n");
             StartTcp(aThis);
-            sm = _tcpStateMachines[id];
+            sm = s_tcpStateMachines[id];
         }
 
         if (sm.Status == Status.CLOSED)
         {
             Tcp.RemoveConnection(sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address);
             StartTcp(aThis);
-            sm = _tcpStateMachines[id];
+            sm = s_tcpStateMachines[id];
         }
 
         while (sm.WaitStatus(Status.ESTABLISHED) != true)
@@ -313,7 +313,7 @@ public static class SocketPlug
         }
 
         StartTcp(aThis);
-        var sm = _tcpStateMachines[id];
+        var sm = s_tcpStateMachines[id];
 
         if (sm.Status == Status.ESTABLISHED)
         {
@@ -421,7 +421,7 @@ public static class SocketPlug
     {
         Log.WriteString("[SocketPlug] SendTcp: entering\n");
         int id = GetId(aThis);
-        if (!_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out var sm))
         {
             Log.WriteString("[SocketPlug] Must establish a connection before sending data.\n");
             throw new InvalidOperationException("Must establish a connection before sending data.");
@@ -627,7 +627,7 @@ public static class SocketPlug
     public static int ReceiveTcp(Socket aThis, byte[] buffer, int offset, int size)
     {
         int id = GetId(aThis);
-        if (!_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out var sm))
         {
             Log.WriteString("[SocketPlug] Must establish a connection before receiving data.\n");
             throw new InvalidOperationException("Must establish a connection before receiving data.");
@@ -758,7 +758,7 @@ public static class SocketPlug
     {
         Log.WriteString("[SocketPlug] CloseTcp: entering\n");
         int id = GetId(aThis);
-        if (!_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out var sm))
         {
             Log.WriteString("[SocketPlug] CloseTcp: no state machine found, returning\n");
             return;
@@ -772,7 +772,7 @@ public static class SocketPlug
         {
             Log.WriteString("[SocketPlug] CloseTcp: already closed, cleaning up\n");
             Tcp.RemoveConnection(sm);
-            _tcpStateMachines.Remove(id);
+            s_tcpStateMachines.Remove(id);
             _endpoints.Remove(id);
             _localEndPoints.Remove(id);
             _remoteEndPoints.Remove(id);
@@ -793,7 +793,7 @@ public static class SocketPlug
                 sm.Detached = true;
             }
 
-            _tcpStateMachines.Remove(id);
+            s_tcpStateMachines.Remove(id);
             _endpoints.Remove(id);
             _localEndPoints.Remove(id);
             _remoteEndPoints.Remove(id);
@@ -803,7 +803,7 @@ public static class SocketPlug
         if (sm.Status == Status.LISTEN)
         {
             Tcp.RemoveConnection(sm);
-            _tcpStateMachines.Remove(id);
+            s_tcpStateMachines.Remove(id);
         }
         else if (sm.Status == Status.ESTABLISHED)
         {
@@ -834,7 +834,7 @@ public static class SocketPlug
                 sm.Detached = true;
             }
 
-            _tcpStateMachines.Remove(id);
+            s_tcpStateMachines.Remove(id);
         }
 
         _endpoints.Remove(id);

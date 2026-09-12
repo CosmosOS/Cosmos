@@ -28,14 +28,14 @@ namespace Cosmos.Kernel.Tests.Network;
 public class Kernel : Sys.Kernel
 {
     // Network configuration
-    private static Address? _localIP;
-    private static Address? _gatewayIP;
-    private static bool _networkConfigured = false;
-    private static bool _receivedPacket = false;
-    private static byte[]? _lastReceivedData;
-    private static ushort _lastReceivedPort;
-    private static Address? _lastReceivedSourceIP;
-    private static ushort _lastReceivedSourcePort;
+    private static Address? s_localIP;
+    private static Address? s_gatewayIP;
+    private static bool s_networkConfigured = false;
+    private static bool s_receivedPacket = false;
+    private static byte[]? s_lastReceivedData;
+    private static ushort s_lastReceivedPort;
+    private static Address? s_lastReceivedSourceIP;
+    private static ushort s_lastReceivedSourcePort;
 
     // UDP Test ports
     private const ushort TestPort = 5555;
@@ -178,22 +178,22 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        _localIP = netConfig.Address;
-        _gatewayIP = netConfig.DefaultGateway;
-        _networkConfigured = true;
+        s_localIP = netConfig.Address;
+        s_gatewayIP = netConfig.DefaultGateway;
+        s_networkConfigured = true;
 
         Log.WriteString("[Test] DHCP assigned IP: ");
-        Log.WriteString(_localIP.ToString());
+        Log.WriteString(s_localIP.ToString());
         Log.WriteString("\n");
         Log.WriteString("[Test] Gateway: ");
-        Log.WriteString(_gatewayIP.ToString());
+        Log.WriteString(s_gatewayIP.ToString());
         Log.WriteString("\n");
 
         // Verify device has packet handler registered
         Assert.True(device.OnPacketReceived != null, "Device should have packet handler registered after DHCP");
 
         // Verify we got a valid IP (not 0.0.0.0)
-        Assert.True(_localIP.Id != 0, "DHCP should assign a non-zero IP address");
+        Assert.True(s_localIP.Id != 0, "DHCP should assign a non-zero IP address");
     }
 
     // ==================== ICMP Tests ====================
@@ -206,7 +206,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -253,7 +253,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -328,7 +328,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -430,7 +430,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -514,7 +514,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -528,7 +528,7 @@ public class Kernel : Sys.Kernel
 
         // Build the echo request ourselves instead of going through SendEcho,
         // so the reply can be correlated with the id/sequence we chose.
-        var request = new IcmpEchoRequest(_localIP!, target, echoId, echoSequence);
+        var request = new IcmpEchoRequest(s_localIP!, target, echoId, echoSequence);
         Log.WriteString("[Test] Sending crafted echo request id=0x4242 seq=9...\n");
         Assert.True(NetworkStack.Send(request), "NetworkStack.Send should queue a packet with a configured source address");
 
@@ -571,7 +571,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -583,7 +583,7 @@ public class Kernel : Sys.Kernel
         var udpClient = new CosmosUdpClient(seamPort);
 
         byte[] payload = Encoding.ASCII.GetBytes("COSMOS_SEAM_TEST");
-        var packet = new UdpPacket(_localIP!, gateway, seamPort, TestPort, payload);
+        var packet = new UdpPacket(s_localIP!, gateway, seamPort, TestPort, payload);
 
         Log.WriteString("[Test] Sending crafted UDP packet to the echo server...\n");
         Assert.True(udpClient.Send(packet), "Crafted UDP packet should be queued through the client");
@@ -633,7 +633,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -655,7 +655,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -752,7 +752,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -867,7 +867,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -989,7 +989,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -1048,7 +1048,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -1104,7 +1104,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
@@ -1147,7 +1147,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        if (!_networkConfigured)
+        if (!s_networkConfigured)
         {
             TestDHCPConfiguration();
         }
