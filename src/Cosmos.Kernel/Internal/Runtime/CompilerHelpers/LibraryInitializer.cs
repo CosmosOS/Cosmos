@@ -56,7 +56,7 @@ internal class LibraryInitializer
     }
 
     /// <summary>
-    /// Initializes the scheduler subsystem with idle threads for each CPU.
+    /// Initializes the scheduler subsystem: one idle thread per CPU, then the policy.
     /// </summary>
     private static void InitializeScheduler(uint cpuCount)
     {
@@ -64,38 +64,26 @@ internal class LibraryInitializer
         Serial.WriteNumber(cpuCount);
         Serial.WriteString(" CPU(s)\n");
 
-        // Initialize scheduler manager
         SchedulerManager.Initialize(cpuCount);
 
-        // Set up stride scheduler
-        var scheduler = new StrideScheduler();
-        SchedulerManager.SetScheduler(scheduler);
-
-        Serial.WriteString("[SCHED] Using ");
-        Serial.WriteString(scheduler.Name);
-        Serial.WriteString(" scheduler\n");
-
-        // Create idle thread for each CPU
-        // The idle thread represents the main kernel - no separate stack needed
-        // When the shell is preempted, its context is saved to this thread
+        // The idle thread of each CPU is the code running right now, so it
+        // gets no stack of its own: when the kernel is preempted, the IRQ stub
+        // saves the context to the current stack and keeps that RSP in
+        // StackPointer. It becomes the CPU's current thread before any policy
+        // is installed. Thread statics live on the current thread, and a
+        // policy hook may read a static whose class constructor has not run
+        // yet; the class constructor runner's lock identifies its holder by a
+        // thread static, so it needs a current thread to exist.
         for (uint cpu = 0; cpu < cpuCount; cpu++)
         {
-            var idleThread = new Cosmos.Kernel.Core.Scheduler.SchedulerThread
+            SchedulerThread idleThread = new()
             {
                 Id = SchedulerManager.AllocateThreadId(),
                 CpuId = cpu,
-                State = Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Running,  // Already running (it's the current code!)
+                State = SchedulerThreadState.Running,
                 Flags = SchedulerThreadFlags.Pinned | SchedulerThreadFlags.IdleThread
             };
 
-            // DON'T initialize a separate stack - the idle thread IS the current execution
-            // When preempted, the IRQ stub saves context to the current stack
-            // and we store that RSP in StackPointer
-
-            // Register with scheduler (but don't add to run queue)
-            SchedulerManager.CreateThread(cpu, idleThread);
-
-            // Set as CPU's idle and current thread
             SchedulerManager.SetupIdleThread(cpu, idleThread);
 
             Serial.WriteString("[SCHED] Idle thread ");
@@ -105,9 +93,18 @@ internal class LibraryInitializer
             Serial.WriteString("\n");
         }
 
+        // SetScheduler hands every registered thread to the incoming policy,
+        // so the idle threads reach OnThreadCreate already Running, the same
+        // way a thread alive across a later policy swap does.
+        StrideScheduler scheduler = new();
+        SchedulerManager.SetScheduler(scheduler);
+
+        Serial.WriteString("[SCHED] Using ");
+        Serial.WriteString(scheduler.Name);
+        Serial.WriteString(" scheduler\n");
+
         // Enable scheduler (timer will start invoking it)
         SchedulerManager.IsRunning = true;
         Serial.WriteString("[SCHED] Scheduler enabled\n");
-
     }
 }

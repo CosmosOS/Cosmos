@@ -25,10 +25,14 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// </para>
 /// <para>
 /// Two rules hold for every hook. Each must tolerate being called more than
-/// once for the same thread, and each must tolerate a
-/// <see cref="SchedulerExtensible.SchedulerData"/> slot that is null or was
-/// written by a different policy, which is why a hook reads the slot with
-/// <c>as</c> and never a cast.
+/// once for the same thread, and each must tolerate an empty
+/// <see cref="SchedulerExtensible.SchedulerData"/> slot, because
+/// <see cref="OnThreadExit"/> clears it and a thread can lose its record
+/// between a tick and the hook that observes it; that is why a hook reads
+/// the slot with <c>as</c> and never a cast. A record written by a different
+/// policy is never handed to a hook: <see cref="SchedulerManager.SetScheduler"/>
+/// re-homes every live thread through <see cref="OnThreadExit"/> on the
+/// outgoing policy and <see cref="OnThreadCreate"/> on the incoming one.
 /// </para>
 /// <para>Inspired by Ekiben's EkibenScheduler trait.</para>
 /// </summary>
@@ -74,7 +78,16 @@ public interface IScheduler
     /// Allocate this policy's per-thread bookkeeping into
     /// <see cref="SchedulerExtensible.SchedulerData"/> on
     /// <paramref name="thread"/>. Do not queue the thread yet:
-    /// <see cref="OnThreadReady"/> does that. Called with interrupts masked.
+    /// <see cref="OnThreadReady"/> does that. Called with interrupts masked,
+    /// once for a new thread and once for every live thread the policy
+    /// inherits through <see cref="SchedulerManager.SetScheduler"/>. An
+    /// inherited thread arrives in whatever state it is in:
+    /// <see cref="SchedulerThreadState.Ready"/> ones are handed to
+    /// <see cref="OnThreadReady"/> right after, blocked and sleeping ones
+    /// come back through it when they wake, and a
+    /// <see cref="SchedulerThreadState.Running"/> one keeps running and must
+    /// be accounted as runnable without being queued. The boot thread
+    /// arrives that way at startup as well.
     /// </summary>
     /// <param name="cpuState">CPU the thread is being created on.</param>
     /// <param name="thread">Thread entering this policy's management.</param>

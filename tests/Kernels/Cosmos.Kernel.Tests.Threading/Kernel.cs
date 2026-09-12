@@ -207,6 +207,7 @@ public class Kernel : Sys.Kernel
         TR.Run("RoundRobin_RunQueue_ExposesReadyThreads", TestRoundRobinRunQueueDiagnostics);
         TR.Run("RoundRobin_BlockedThread_LeavesRunQueue", TestRoundRobinBlockedLeavesQueue);
         TR.Run("SetScheduler_RestoresStrideDefault", TestSetSchedulerRestoresStride);
+        TR.Run("SetScheduler_RehomesLiveThreads", TestSetSchedulerRehomesLiveThreads);
 
         // Finish test suite
         TR.Finish();
@@ -2037,16 +2038,14 @@ public class Kernel : Sys.Kernel
         // policy once at boot and never swaps back. The swap leaves the
         // remaining lifecycle (Finish/AfterRun) on the stock policy.
 
-        // Quiescence is still asserted here, but as a statement about the
-        // swap rather than a safety precondition: both policies now read
-        // their data slots with 'as', so a Round-Robin thread surviving into
-        // Stride degrades to an absent record instead of faulting Stride's
-        // next hook on it. Every Round-Robin worker above exited (each cell
-        // waits for it), which empties the run queue; the running main thread
-        // still carries the StrideThreadData it booted with.
+        // Every Round-Robin worker above exited (each cell waits for it), so
+        // the run queue is empty here. That is a statement about the cells
+        // above, not a precondition of the swap: SetScheduler re-homes every
+        // live thread, and SetScheduler_RehomesLiveThreads below keeps one
+        // alive across both directions on purpose.
         PerCpuState preSwapState = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())!;
         Assert.Equal(0, SchedulerManager.Current!.GetRunQueueCount(preSwapState),
-            "no Round-Robin thread may survive into the restored Stride policy");
+            "every Round-Robin worker of the cells above should have exited");
 
         Cosmos.Kernel.Core.Scheduler.Stride.StrideScheduler stride = new();
         using (SchedulerManager.MaskInterrupts())
@@ -2062,5 +2061,67 @@ public class Kernel : Sys.Kernel
         RunPolicyProbeWorker();
         Assert.True(_policyProbeRan,
             "a thread created after restoring Stride must be scheduled and run");
+    }
+
+    private static volatile bool _rehomeStop;
+    private static volatile bool _rehomeDone;
+    private static volatile uint _rehomeCounter;
+
+    private static void RehomeProbeSpinner()
+    {
+        while (!_rehomeStop)
+        {
+            _rehomeCounter++;
+        }
+        _rehomeDone = true;
+    }
+
+    // A thread alive across a policy swap must keep running under the new
+    // policy. While main (the boot thread, which is the one calling
+    // SetScheduler) runs, the spinner sits in the installed policy's run
+    // queue. Before SetScheduler re-homed live threads, ShutdownCpu discarded
+    // that queue with the spinner in it: the thread stayed Ready, no hook ever
+    // saw it again, and its counter froze. Both directions are checked, so
+    // the stock Stride policy is exercised as the incoming side too.
+    private static void TestSetSchedulerRehomesLiveThreads()
+    {
+        _rehomeStop = false;
+        _rehomeDone = false;
+        _rehomeCounter = 0;
+
+        SysThread spinner = new(RehomeProbeSpinner);
+        spinner.Start();
+        TimerManager.Wait(PreemptSampleIntervalMs);
+        uint underStride = _rehomeCounter;
+
+        RoundRobinScheduler roundRobin = new();
+        using (SchedulerManager.MaskInterrupts())
+        {
+            SchedulerManager.SetScheduler(roundRobin);
+        }
+        TimerManager.Wait(PreemptSampleIntervalMs);
+        uint underRoundRobin = _rehomeCounter;
+
+        Cosmos.Kernel.Core.Scheduler.Stride.StrideScheduler stride = new();
+        using (SchedulerManager.MaskInterrupts())
+        {
+            SchedulerManager.SetScheduler(stride);
+        }
+        TimerManager.Wait(PreemptSampleIntervalMs);
+        uint backUnderStride = _rehomeCounter;
+
+        _rehomeStop = true;
+        for (int i = 0; i < FlagPollRetries && !_rehomeDone; i++)
+        {
+            TimerManager.Wait(FlagPollIntervalMs);
+        }
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        Assert.True(underStride > 0, "the spinner must run under the boot policy before the swap");
+        Assert.True(underRoundRobin > underStride,
+            "a thread alive across the swap must keep running under Round-Robin");
+        Assert.True(backUnderStride > underRoundRobin,
+            "a thread alive across the swap back must keep running under Stride");
+        Assert.True(_rehomeDone, "the re-homed spinner should observe stop and exit");
     }
 }

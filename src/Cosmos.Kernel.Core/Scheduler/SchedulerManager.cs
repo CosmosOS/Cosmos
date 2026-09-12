@@ -112,12 +112,18 @@ public static class SchedulerManager
     }
 
     /// <summary>
-    /// Installs a scheduling policy. The previous scheduler, if any, is
-    /// shut down on every CPU (<see cref="IScheduler.ShutdownCpu"/>) before
-    /// the new one is initialized (<see cref="IScheduler.InitializeCpu"/>).
-    /// The whole swap runs with interrupts masked, so no tick can land in
-    /// the window where the incoming policy is installed but its per-CPU
-    /// state does not exist yet.
+    /// Installs a scheduling policy. Every live thread moves with it. The
+    /// outgoing policy, if any, gets <see cref="IScheduler.OnThreadExit"/>
+    /// for each thread it was managing and then
+    /// <see cref="IScheduler.ShutdownCpu"/> on every CPU. The incoming policy
+    /// gets <see cref="IScheduler.InitializeCpu"/> on every CPU, then
+    /// <see cref="IScheduler.OnThreadCreate"/> for each live thread and
+    /// <see cref="IScheduler.OnThreadReady"/> for those that were waiting in
+    /// a run queue, so no thread is left behind in a run structure that no
+    /// longer exists. The whole swap runs with interrupts masked, so no tick
+    /// can land in the window where the incoming policy is installed but its
+    /// per-CPU state does not exist yet, and every CPU reschedules on its
+    /// next interrupt exit so the incoming policy picks from its own queue.
     /// </summary>
     /// <param name="scheduler">Scheduler to install.</param>
     public static void SetScheduler(IScheduler scheduler)
@@ -132,11 +138,28 @@ public static class SchedulerManager
         // exists.
         using (s_globalLock.AcquireIrqSafe())
         {
-            if (s_currentScheduler != null)
+            SchedulerThread?[]? threads = s_allThreads;
+            IScheduler? outgoing = s_currentScheduler;
+
+            if (outgoing is not null)
             {
+                if (threads is not null)
+                {
+                    for (int i = 0; i < threads.Length; i++)
+                    {
+                        SchedulerThread? thread = threads[i];
+                        if (thread is null || thread.State == SchedulerThreadState.Dead)
+                        {
+                            continue;
+                        }
+
+                        outgoing.OnThreadExit(s_cpuStates[thread.CpuId], thread);
+                    }
+                }
+
                 for (uint i = 0; i < s_cpuCount; i++)
                 {
-                    s_currentScheduler.ShutdownCpu(s_cpuStates[i]);
+                    outgoing.ShutdownCpu(s_cpuStates[i]);
                 }
             }
 
@@ -145,6 +168,37 @@ public static class SchedulerManager
             for (uint i = 0; i < s_cpuCount; i++)
             {
                 scheduler.InitializeCpu(s_cpuStates[i]);
+            }
+
+            if (threads is not null)
+            {
+                // Same hand-over a thread gets at creation: a record first,
+                // then a place in the run queue if it is waiting for the CPU.
+                // A running thread keeps running and blocked or sleeping ones
+                // come back through ReadyThread when they wake, so only the
+                // Ready ones are queued here. Without this walk the threads
+                // sitting in the outgoing policy's run queue would stay Ready
+                // and never be picked again.
+                for (int i = 0; i < threads.Length; i++)
+                {
+                    SchedulerThread? thread = threads[i];
+                    if (thread is null || thread.State == SchedulerThreadState.Dead)
+                    {
+                        continue;
+                    }
+
+                    PerCpuState state = s_cpuStates[thread.CpuId];
+                    scheduler.OnThreadCreate(state, thread);
+                    if (thread.State == SchedulerThreadState.Ready)
+                    {
+                        scheduler.OnThreadReady(state, thread);
+                    }
+                }
+            }
+
+            for (uint i = 0; i < s_cpuCount; i++)
+            {
+                s_cpuStates[i]._needReschedule = true;
             }
         }
     }
@@ -192,7 +246,11 @@ public static class SchedulerManager
     internal static PerCpuState[]? GetAllCpuStates() => s_cpuStates;
 
     /// <summary>
-    /// Sets up the idle thread for a CPU. Should only be called during initialization.
+    /// Makes <paramref name="idleThread"/> the idle and current thread of a CPU
+    /// and registers it. Boot calls this before the first policy is installed:
+    /// from here on the CPU has a current thread, so thread statics resolve
+    /// and a policy hook may run a class constructor. <see cref="SetScheduler"/>
+    /// then hands the thread to the policy like any other live thread.
     /// </summary>
     internal static void SetupIdleThread(uint cpuId, SchedulerThread idleThread)
     {
@@ -411,8 +469,8 @@ public static class SchedulerManager
 
         using (CPU.InternalCpu.DisableInterruptsScope())
         {
-            // Idempotent: idle-thread setup goes through both CreateThread and
-            // SetupIdleThread, both of which call here. Avoid duplicate slots.
+            // Idempotent: SetScheduler hands every registry entry to the
+            // incoming policy exactly once, so a thread must hold one slot.
             for (int i = 0; i < s_allThreads.Length; i++)
             {
                 if (s_allThreads[i] == thread)

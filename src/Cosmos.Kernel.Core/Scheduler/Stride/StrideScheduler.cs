@@ -44,10 +44,29 @@ internal class StrideScheduler : IScheduler
     /// </summary>
     private const ulong MaxCatchUpQuanta = 1000;
 
+    /// <summary>
+    /// Stopwatch ticks in one <see cref="SchedulerManager.DefaultQuantumNs"/>,
+    /// captured by <see cref="InitializeCpu"/>. The tick path must not be the
+    /// first reader of <see cref="Stopwatch.Frequency"/>: that read runs
+    /// Stopwatch's class constructor through the runtime's class constructor
+    /// runner, which takes a lock the interrupted thread may hold, and an
+    /// interrupt handler cannot wait for it. Never zero once a CPU has been
+    /// initialized.
+    /// </summary>
+    private static ulong s_ticksPerQuantum;
+
     // ========== Lifecycle ==========
 
     public void InitializeCpu(PerCpuState cpuState)
     {
+        // Thread context (SetScheduler), so the first read of Stopwatch's
+        // statics belongs here. The frequency it captures was calibrated by
+        // the platform initializer, which runs before the scheduler is
+        // installed; on ARM64 it is the generic timer's hardware constant.
+        ulong ticksPerQuantum =
+            (ulong)Stopwatch.Frequency * SchedulerManager.DefaultQuantumNs / NanosecondsPerSecond;
+        s_ticksPerQuantum = ticksPerQuantum == 0 ? 1 : ticksPerQuantum;
+
         cpuState.SchedulerData = new StrideCpuData();
     }
 
@@ -60,14 +79,37 @@ internal class StrideScheduler : IScheduler
 
     public void OnThreadCreate(PerCpuState cpuState, SchedulerThread thread)
     {
-        var data = new StrideThreadData
+        StrideThreadData data = new()
         {
             Tickets = DefaultTickets,
             Stride = Stride1 / DefaultTickets,
             Pass = 0,
-            Remain = 0
+            Remain = 0,
+            // A thread inherited from another policy while blocked has no
+            // wake of its own to date its sleep from. Anchoring it here keeps
+            // that first wake from reading as an age-old sleep and earning an
+            // interactive boost it never slept for.
+            LastWakeup = GetTimestamp()
         };
         thread.SchedulerData = data;
+
+        // A thread normally arrives Created and passes through OnThreadReady
+        // before it runs; that is where a runnable thread's tickets enter the
+        // total. A thread that is already running when it is handed over (the
+        // boot thread at startup, or the caller of SetScheduler on a policy
+        // swap) never takes that path, yet the OnThreadBlocked or
+        // OnThreadExit that eventually follows subtracts its tickets. Count
+        // them here so the total cannot underflow.
+        if (thread.State == SchedulerThreadState.Running)
+        {
+            StrideCpuData? cpuData = CpuDataOf(cpuState);
+            if (cpuData is not null)
+            {
+                UpdateGlobalPass(cpuData);
+                data.Pass = (long)cpuData.GlobalPass;
+                cpuData.TotalTickets += data.Tickets;
+            }
+        }
     }
 
     public void OnThreadReady(PerCpuState cpuState, SchedulerThread thread)
@@ -456,17 +498,13 @@ internal class StrideScheduler : IScheduler
 
         // The elapsed delta is in Stopwatch ticks, not nanoseconds (multi-GHz
         // TSC on x64, 62.5 MHz generic timer on ARM64), so the quantum divisor
-        // must be in ticks too — the same conversion MarkSleeping needs for
+        // must be in ticks too, the same conversion MarkSleeping needs for
         // WakeupTime. Dividing ticks by DefaultQuantumNs advanced GlobalPass
         // several times too fast on x64, and the OnThreadYield anti-starvation
         // floor then snapped every spinner up to GlobalPass, flattening ticket
-        // ratios into equal shares.
-        ulong ticksPerQuantum =
-            (ulong)Stopwatch.Frequency * SchedulerManager.DefaultQuantumNs / NanosecondsPerSecond;
-        if (ticksPerQuantum == 0)
-        {
-            ticksPerQuantum = 1;
-        }
+        // ratios into equal shares. The divisor is captured in InitializeCpu;
+        // see s_ticksPerQuantum for why it is not read here.
+        ulong ticksPerQuantum = s_ticksPerQuantum;
 
         // Bound the catch-up. Two deltas are not a real elapsed time: the very
         // first update, where LastPassUpdate is still 0 and the delta is the
