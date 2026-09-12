@@ -44,6 +44,7 @@ public class Kernel : Sys.Kernel
         TR.Run("ColorClass_Basic", TestColorClass);
         TR.Run("Canvas_Basic", TestCanvasDrawing);
         TR.Run("VirtualCanvas_Basic", TestVirtualCanvas);
+        TR.Run("Canvas_CopyPixels_Overlap", TestCopyPixelsOverlap);
 
         // ==================== SVGA3D command layer ====================
         // Struct sizes are host-independent and run on every cell; the FIFO
@@ -426,5 +427,67 @@ public class Kernel : Sys.Kernel
         screen.Display();
 
         Log.Write("Virtual canvas tests executed successfully\n");
+    }
+
+    private static void TestCopyPixelsOverlap()
+    {
+        const int Size = 16;
+        Canvas canvas = new(Size, Size);
+
+        // Copy an 8x8 block one pixel right and one down, then one pixel
+        // up and left, then along one row and one column. Each direction
+        // overlaps its own source on a different side, so a copy that reads
+        // a pixel it has already overwritten fails at least one of them.
+        FillWithCoordinates(canvas, Size);
+        canvas.CopyPixels(2, 2, 3, 3, 8, 8);
+        Assert.True(BlockMatchesSource(canvas, Size, 2, 2, 3, 3, 8, 8), "CopyPixels down-right over its own source");
+
+        FillWithCoordinates(canvas, Size);
+        canvas.CopyPixels(3, 3, 2, 2, 8, 8);
+        Assert.True(BlockMatchesSource(canvas, Size, 3, 3, 2, 2, 8, 8), "CopyPixels up-left over its own source");
+
+        FillWithCoordinates(canvas, Size);
+        canvas.CopyPixels(1, 5, 4, 5, 8, 1);
+        Assert.True(BlockMatchesSource(canvas, Size, 1, 5, 4, 5, 8, 1), "CopyPixels right along one row");
+
+        FillWithCoordinates(canvas, Size);
+        canvas.CopyPixels(5, 4, 5, 1, 1, 8);
+        Assert.True(BlockMatchesSource(canvas, Size, 5, 4, 5, 1, 1, 8), "CopyPixels up along one column");
+
+        // A copy that runs off the canvas writes only the part that fits and
+        // leaves everything outside the destination untouched.
+        FillWithCoordinates(canvas, Size);
+        canvas.CopyPixels(0, 0, Size - 4, Size - 4, 8, 8);
+        Assert.True(BlockMatchesSource(canvas, Size, 0, 0, Size - 4, Size - 4, 4, 4), "CopyPixels clips the destination to the canvas");
+        Assert.Equal(canvas.GetRawPointColor(Size - 5, Size - 5), EncodeCoordinates(Size - 5, Size - 5, Size), "CopyPixels leaves pixels outside the destination alone");
+    }
+
+    private static int EncodeCoordinates(int x, int y, int size) => y * size + x + 1;
+
+    private static void FillWithCoordinates(Canvas canvas, int size)
+    {
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                canvas.DrawPoint(EncodeCoordinates(x, y, size), x, y);
+            }
+        }
+    }
+
+    private static bool BlockMatchesSource(Canvas canvas, int size, int srcX, int srcY, int dstX, int dstY, int width, int height)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (canvas.GetRawPointColor(dstX + x, dstY + y) != EncodeCoordinates(srcX + x, srcY + y, size))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

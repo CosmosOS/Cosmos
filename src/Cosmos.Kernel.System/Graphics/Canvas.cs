@@ -449,8 +449,9 @@ public unsafe class Canvas
     /// <summary>
     /// Copies a rectangle of pixels from one position on the canvas to
     /// another. The rectangle is clipped so that both the source and the
-    /// destination stay within the canvas bounds, and overlapping regions
-    /// copy correctly.
+    /// destination stay within the canvas bounds. Overlapping regions copy
+    /// correctly and without an intermediate buffer: the copy walks away
+    /// from the overlap, the same rule as <c>memmove</c>.
     /// </summary>
     /// <param name="srcX">The X coordinate of the source rectangle.</param>
     /// <param name="srcY">The Y coordinate of the source rectangle.</param>
@@ -472,20 +473,28 @@ public unsafe class Canvas
 
         int copyWidth = right - left;
         int copyHeight = bottom - top;
+        int sourceX = srcX + left;
+        int sourceY = srcY + top;
+        int destinationX = dstX + left;
+        int destinationY = dstY + top;
 
-        // Snapshot the source rectangle before writing so overlapping
-        // source and destination regions do not read already-copied pixels.
-        int[] pixels = new int[copyWidth * copyHeight];
+        // When the destination sits below the source, writing row r of the
+        // destination lands on a source row not yet read, so rows go
+        // bottom-up. Columns only interfere when both rectangles share their
+        // rows; then a destination to the right is written right-to-left.
+        bool rowsBackward = destinationY > sourceY;
+        bool columnsBackward = destinationY == sourceY && destinationX > sourceX;
 
-        for (int row = 0; row < copyHeight; row++)
+        for (int r = 0; r < copyHeight; r++)
         {
-            for (int column = 0; column < copyWidth; column++)
+            int row = rowsBackward ? copyHeight - 1 - r : r;
+
+            for (int c = 0; c < copyWidth; c++)
             {
-                pixels[row * copyWidth + column] = GetRawPointColor(srcX + left + column, srcY + top + row);
+                int column = columnsBackward ? copyWidth - 1 - c : c;
+                DrawPoint(GetRawPointColor(sourceX + column, sourceY + row), destinationX + column, destinationY + row);
             }
         }
-
-        DrawArray(pixels, dstX + left, dstY + top, copyWidth, copyHeight);
     }
 
     /// <summary>
