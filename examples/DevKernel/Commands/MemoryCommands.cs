@@ -43,10 +43,10 @@ internal static class MemoryCommands
             },
             new ShellCommand
             {
-                Name = "gc",
-                Usage = "gc",
+                Name = "gcstat",
+                Usage = "gcstat",
                 Description = "Give live information on the GC",
-                Execute = static (context, args) => GcMonitor.Run(),
+                Execute = static (context, args) => GcStat.Run(),
             },
             new ShellCommand
             {

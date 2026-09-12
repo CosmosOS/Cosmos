@@ -1,32 +1,145 @@
-using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Threading;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
+using DevKernel.Diagnostics.Charting;
+using DevKernel.Graphics;
 using SysThread = System.Threading.Thread;
 
 namespace DevKernel.Diagnostics;
 
+// Full-screen CPU monitor: ramps a synthetic load up and down, plots the resulting
+// CPU usage against the number of stress threads, and lists the scheduler threads.
+//
+// Exits on ESC.
 internal static class CpuStat
 {
-    private const int MaxStressThreads = 8;
-    private const int BurnMs = 30;
-    private const int SleepMs = 400;
-    private const int FrameSleepMs = 100;
-    private const int StepMs = 500;
+    // Sawtooth driving the number of stress threads: one step up every TargetStepMs
+    // until the pool is full, then one step down until it is empty.
+    private struct LoadRamp
+    {
+        private long _lastStepTimestamp;
+        private int _step;
+
+        public static LoadRamp Start()
+        {
+            return new LoadRamp
+            {
+                _lastStepTimestamp = Stopwatch.GetTimestamp(),
+                _step = +1
+            };
+        }
+
+        public int Target { get; private set; }
+
+        public bool IsRising => _step > 0;
+
+        public void Advance()
+        {
+            long stepTicks = Stopwatch.Frequency * TargetStepMs / 1000;
+            long now = Stopwatch.GetTimestamp();
+
+            if (now - _lastStepTimestamp < stepTicks)
+            {
+                return;
+            }
+
+            _lastStepTimestamp = now;
+            Target += _step;
+
+            if (Target >= CpuStressPool.MaxThreads)
+            {
+                Target = CpuStressPool.MaxThreads;
+                _step = -1;
+            }
+            else if (Target <= 0)
+            {
+                Target = 0;
+                _step = +1;
+            }
+        }
+    }
+
+    // Turns the scheduler's cumulative busy-time counter into a percentage: how much of
+    // the CPU time available since the previous sample was actually spent working.
+    internal struct CpuUsageSampler
+    {
+        private long _lastTimestamp;
+        private ulong _lastBusyNs;
+
+        public static CpuUsageSampler Start()
+        {
+            return new CpuUsageSampler
+            {
+                _lastTimestamp = Stopwatch.GetTimestamp(),
+                _lastBusyNs = SchedulerInfo.BusyCpuTimeNs
+            };
+        }
+
+        public double Peak { get; private set; }
+
+        public double Current { get; private set; }
+
+        public double Sample()
+        {
+            long timestamp = Stopwatch.GetTimestamp();
+            ulong busyNs = SchedulerInfo.BusyCpuTimeNs;
+
+            long elapsedTicks = timestamp - _lastTimestamp;
+            uint cpuCount = SchedulerInfo.CpuCount;
+
+            if (elapsedTicks > 0 && cpuCount > 0)
+            {
+                ulong busyDelta = busyNs >= _lastBusyNs ? busyNs - _lastBusyNs : 0UL;
+                double availableNs = elapsedTicks * 1_000_000_000.0 / Stopwatch.Frequency * cpuCount;
+
+                if (availableNs > 0)
+                {
+                    Current = Clamp(busyDelta * 100.0 / availableNs);
+                    if (Current > Peak)
+                    {
+                        Peak = Current;
+                    }
+                }
+            }
+
+            _lastTimestamp = timestamp;
+            _lastBusyNs = busyNs;
+
+            return Current;
+        }
+
+        private static double Clamp(double percent)
+        {
+            if (percent < 0)
+            {
+                return 0;
+            }
+
+            return percent > 100 ? 100 : percent;
+        }
+    }
+
+    private const int FrameDelayMs = 100;
+    private const int TargetStepMs = 500;
     private const int HistorySize = 600;
-    private const int DrainBudgetMs = 2000;
+    private const int ShutdownBudgetMs = 2000;
 
-    private static int s_live;
-    private static int s_dropRequest;
-    private static int s_stop;
+    private const int ChartHeightCapPx = 180;
+    private const double UsageAxisMax = 100;
+    private const int BusyUsagePercent = 50;
+    private const int SaturatedUsagePercent = 80;
 
-    private static readonly float[] s_pctHistory = new float[HistorySize];
-    private static readonly int[] s_threadHistory = new int[HistorySize];
-    private static int s_historyHead;
-    private static int s_historyFilled;
+    private const int ThreadColumnChars = 18;
+
+    private static readonly ChartSeries s_usageSeries =
+        new ChartSeries("CPU %", Color.LimeGreen, HistorySize);
+
+    private static readonly ChartSeries s_stressSeries =
+        new ChartSeries("stress 0.." + CpuStressPool.MaxThreads, Color.Cyan, HistorySize);
+
+    private static readonly ChartSeries[] s_series = [s_usageSeries, s_stressSeries];
 
     public static void Run()
     {
@@ -39,399 +152,217 @@ internal static class CpuStat
         Canvas canvas = Canvas.GetFullScreen();
         PCScreenFont font = PCScreenFont.DefaultFont;
 
-        ResetState();
+        s_usageSeries.Clear();
+        s_stressSeries.Clear();
+        CpuStressPool.Reset();
 
-        long freq = Stopwatch.Frequency;
-        long stepTicks = freq * StepMs / 1000;
+        CpuUsageSampler sampler = CpuUsageSampler.Start();
+        LoadRamp ramp = LoadRamp.Start();
 
-        long lastWall = Stopwatch.GetTimestamp();
-        long lastStepWall = lastWall;
-        ulong lastBusy = SchedulerInfo.BusyCpuTimeNs;
-
-        int target = 0;
-        int direction = +1;
-        double currentPct = 0;
-        double peakPct = 0;
-
-        while (true)
+        while (!EscapePressed())
         {
-            if (Console.KeyAvailable)
-            {
-                ConsoleKeyInfo k = Console.ReadKey(true);
-                if (k.Key == ConsoleKey.Escape)
-                {
-                    break;
-                }
-            }
+            ramp.Advance();
+            CpuStressPool.SetThreadCount(ramp.Target);
 
-            long nowWall = Stopwatch.GetTimestamp();
+            sampler.Sample();
+            int activeThreads = CpuStressPool.Active;
 
-            if (nowWall - lastStepWall >= stepTicks)
-            {
-                lastStepWall = nowWall;
-                target += direction;
-                if (target >= MaxStressThreads)
-                {
-                    target = MaxStressThreads;
-                    direction = -1;
-                }
-                else if (target <= 0)
-                {
-                    target = 0;
-                    direction = +1;
-                }
-            }
+            s_usageSeries.Add(sampler.Current);
+            s_stressSeries.Add(activeThreads * UsageAxisMax / CpuStressPool.MaxThreads);
 
-            int liveSnap = Volatile.Read(ref s_live);
-            int dropSnap = Volatile.Read(ref s_dropRequest);
-            int effective = liveSnap - dropSnap;
-            if (effective < 0)
-            {
-                effective = 0;
-            }
-
-            if (effective < target)
-            {
-                int spawn = target - effective;
-                for (int i = 0; i < spawn; i++)
-                {
-                    Interlocked.Increment(ref s_live);
-                    try
-                    {
-                        SysThread worker = new SysThread(StressWorker);
-                        worker.Start();
-                    }
-                    catch
-                    {
-                        Interlocked.Decrement(ref s_live);
-                        break;
-                    }
-                }
-            }
-            else if (effective > target)
-            {
-                int delta = effective - target;
-                for (int i = 0; i < delta; i++)
-                {
-                    Interlocked.Increment(ref s_dropRequest);
-                }
-            }
-
-            ulong busyNow = SchedulerInfo.BusyCpuTimeNs;
-            long wallDelta = nowWall - lastWall;
-            uint cpuCount = SchedulerInfo.CpuCount;
-            if (wallDelta > 0 && cpuCount > 0)
-            {
-                ulong busyDelta = busyNow >= lastBusy ? busyNow - lastBusy : 0UL;
-                double availableNs = (double)wallDelta * 1_000_000_000.0 / (double)freq * (double)cpuCount;
-                if (availableNs > 0)
-                {
-                    double pct = (double)busyDelta * 100.0 / availableNs;
-                    if (pct < 0)
-                    {
-                        pct = 0;
-                    }
-                    if (pct > 100)
-                    {
-                        pct = 100;
-                    }
-                    currentPct = pct;
-                    if (pct > peakPct)
-                    {
-                        peakPct = pct;
-                    }
-                }
-            }
-            lastBusy = busyNow;
-            lastWall = nowWall;
-
-            liveSnap = Volatile.Read(ref s_live);
-            dropSnap = Volatile.Read(ref s_dropRequest);
-            effective = liveSnap - dropSnap;
-            if (effective < 0)
-            {
-                effective = 0;
-            }
-
-            s_pctHistory[s_historyHead] = (float)currentPct;
-            s_threadHistory[s_historyHead] = effective;
-            s_historyHead++;
-            if (s_historyHead >= HistorySize)
-            {
-                s_historyHead = 0;
-            }
-            if (s_historyFilled < HistorySize)
-            {
-                s_historyFilled++;
-            }
-
-            Render(canvas, font, currentPct, peakPct, target, liveSnap, dropSnap, effective, direction);
+            Render(canvas, font, sampler, ramp, activeThreads);
 
             canvas.Display();
-            SysThread.Sleep(FrameSleepMs);
+            SysThread.Sleep(FrameDelayMs);
         }
 
-        Volatile.Write(ref s_stop, 1);
-        long deadline = Stopwatch.GetTimestamp() + freq * DrainBudgetMs / 1000;
-        while (Volatile.Read(ref s_live) > 0 && Stopwatch.GetTimestamp() < deadline)
-        {
-            SysThread.Sleep(50);
-        }
-
+        CpuStressPool.ShutdownAndWait(ShutdownBudgetMs);
         Console.Clear();
     }
 
-    private static void ResetState()
+    private static bool EscapePressed()
     {
-        Volatile.Write(ref s_live, 0);
-        Volatile.Write(ref s_dropRequest, 0);
-        Volatile.Write(ref s_stop, 0);
-        s_historyHead = 0;
-        s_historyFilled = 0;
-        for (int i = 0; i < HistorySize; i++)
-        {
-            s_pctHistory[i] = 0;
-            s_threadHistory[i] = 0;
-        }
-    }
-
-    private static void StressWorker()
-    {
-        long freq = Stopwatch.Frequency;
-        long burnTicks = freq * BurnMs / 1000;
-        try
-        {
-            while (Volatile.Read(ref s_stop) == 0)
-            {
-                int after = Interlocked.Decrement(ref s_dropRequest);
-                if (after >= 0)
-                {
-                    return;
-                }
-                Interlocked.Increment(ref s_dropRequest);
-
-                long burnEnd = Stopwatch.GetTimestamp() + burnTicks;
-                while (Stopwatch.GetTimestamp() < burnEnd)
-                {
-                }
-
-                SysThread.Sleep(SleepMs);
-            }
-        }
-        finally
-        {
-            Interlocked.Decrement(ref s_live);
-        }
+        return Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Escape;
     }
 
     private static void Render(
         Canvas canvas,
         PCScreenFont font,
-        double currentPct,
-        double peakPct,
-        int target,
-        int live,
-        int drop,
-        int effective,
-        int direction)
+        CpuUsageSampler sampler,
+        LoadRamp ramp,
+        int activeThreads)
     {
-        int w = canvas.Width;
-        int h = canvas.Height;
-        int charW = font.Width;
-        int lh = font.Height + 2;
+        int lineHeight = OverlayLayout.LineHeight(font);
+        int x = OverlayLayout.TextMarginPx;
+        int contentWidth = canvas.Width - x * 2;
+        int row = OverlayLayout.TextMarginPx;
 
-        canvas.DrawFilledRectangle(Color.Black, 0, 0, w, h);
+        canvas.Clear(Color.Black);
 
-        int row = 4;
-        int leftPad = 4;
+        TextRenderer.DrawTruncated(
+            canvas, font, "CPU Utilization Monitor - ESC to exit", Color.LightGray, x, row, contentWidth);
+        row += lineHeight;
 
-        DrawTruncated(canvas, font, "CPU Utilization Monitor - ESC to exit", Color.LightGray, leftPad, row, w - leftPad * 2);
-        row += lh;
+        row = DrawUsageBar(canvas, font, x, row, contentWidth, sampler);
+        row = DrawPoolStats(canvas, font, x, row, contentWidth, ramp, activeThreads);
+        row = DrawUsageChart(canvas, font, x, row, canvas.Width - x);
 
-        Color cpuColor = currentPct < 50 ? Color.LimeGreen : (currentPct < 80 ? Color.Yellow : Color.OrangeRed);
-        string cpuLine = "CPU: " + ((int)currentPct).ToString() + "%";
-        canvas.DrawString(cpuLine, font, cpuColor, leftPad, row);
-
-        string peakLine = "Peak: " + ((int)peakPct).ToString() + "%";
-        int peakX = leftPad + cpuLine.Length * charW + charW * 2;
-        if (peakX + peakLine.Length * charW <= w - leftPad)
-        {
-            canvas.DrawString(peakLine, font, Color.LightGray, peakX, row);
-        }
-        row += lh;
-
-        int barH = lh - 2;
-        canvas.DrawFilledRectangle(Color.FromArgb(40, 40, 40), 0, row, w, barH);
-        int fillW = (int)((double)w * currentPct / 100.0);
-        if (fillW > 0)
-        {
-            canvas.DrawFilledRectangle(cpuColor, 0, row, fillW, barH);
-        }
-        row += barH + 2;
-
-        string dirGlyph = direction > 0 ? "+" : "-";
-        string statsLong = "target=" + target + "  live=" + live + "  drop=" + drop + "  eff=" + effective + "  dir=" + dirGlyph;
-        string statsMid = "tgt=" + target + " live=" + live + " eff=" + effective + " " + dirGlyph;
-        string statsShort = "t=" + target + " e=" + effective;
-        string stats = ChooseFitting(statsLong, statsMid, statsShort, w - leftPad * 2, charW);
-        canvas.DrawString(stats, font, Color.LightGray, leftPad, row);
-        row += lh;
-
-        int reservedFooter = lh * 2;
-        int graphHCap = 180;
-        int graphAvail = h - row - reservedFooter;
-        int graphH = graphAvail > graphHCap ? graphHCap : graphAvail;
-
-        if (graphH >= 60)
-        {
-            int graphY = row;
-
-            canvas.DrawFilledRectangle(Color.FromArgb(15, 15, 15), 0, graphY, w, graphH);
-
-            Color grid = Color.FromArgb(45, 45, 45);
-            for (int p = 25; p <= 75; p += 25)
-            {
-                int gy = graphY + graphH - 1 - (graphH - 1) * p / 100;
-                canvas.DrawLine(grid, 0, gy, w - 1, gy);
-            }
-
-            int filled = s_historyFilled;
-            if (filled >= 2)
-            {
-                int prevX = -1;
-                int prevPctY = 0;
-                int prevThY = 0;
-                for (int i = 0; i < filled; i++)
-                {
-                    int idx = s_historyFilled < HistorySize
-                        ? i
-                        : (s_historyHead + i) % HistorySize;
-
-                    int px = (int)((long)i * (w - 1) / (filled - 1));
-
-                    float pct = s_pctHistory[idx];
-                    int pctY = graphY + graphH - 1 - (int)(pct * (graphH - 1) / 100f);
-
-                    int t = s_threadHistory[idx];
-                    if (t > MaxStressThreads)
-                    {
-                        t = MaxStressThreads;
-                    }
-                    int thY = graphY + graphH - 1 - t * (graphH - 1) / MaxStressThreads;
-
-                    if (prevX >= 0)
-                    {
-                        canvas.DrawLine(Color.LimeGreen, prevX, prevPctY, px, pctY);
-                        canvas.DrawLine(Color.Cyan, prevX, prevThY, px, thY);
-                    }
-                    prevX = px;
-                    prevPctY = pctY;
-                    prevThY = thY;
-                }
-            }
-
-            row += graphH + 2;
-
-            DrawLegend(canvas, font, leftPad, row, w - leftPad, filled);
-            row += lh;
-        }
-
-        DrawRegistry(canvas, font, leftPad, row, w - leftPad, h - row, lh, charW);
+        DrawThreadTable(canvas, font, x, row, canvas.Width - x, canvas.Height - row);
     }
 
-    private static void DrawLegend(Canvas canvas, PCScreenFont font, int x, int y, int maxWidth, int filled)
+    // Percentage headline plus a bar filled proportionally to the current usage.
+    private static int DrawUsageBar(
+        Canvas canvas,
+        PCScreenFont font,
+        int x,
+        int y,
+        int maxWidth,
+        CpuUsageSampler sampler)
     {
-        int charW = font.Width;
-        int swatchSize = font.Height - 4;
+        int lineHeight = OverlayLayout.LineHeight(font);
+        Color usageColor = UsageColor(sampler.Current);
 
-        string cpuLabel = "CPU %";
-        string thLabel = "stress (0.." + MaxStressThreads + ")";
-        string winLabel = "window " + (filled / 10) + "s";
+        string usageText = "CPU: " + (int)sampler.Current + "%";
+        canvas.DrawString(usageText, font, usageColor, x, y);
 
-        int cursor = x;
-        int remaining = maxWidth;
-
-        int cpuW = swatchSize + 4 + cpuLabel.Length * charW + charW * 2;
-        int thW = swatchSize + 4 + thLabel.Length * charW + charW * 2;
-        int winW = winLabel.Length * charW;
-
-        if (cpuW <= remaining)
+        string peakText = "Peak: " + (int)sampler.Peak + "%";
+        int peakX = x + (usageText.Length + 2) * font.Width;
+        if (peakX + peakText.Length * font.Width <= x + maxWidth)
         {
-            canvas.DrawFilledRectangle(Color.LimeGreen, cursor, y + 2, swatchSize, swatchSize);
-            canvas.DrawString(cpuLabel, font, Color.LightGray, cursor + swatchSize + 4, y);
-            cursor += cpuW;
-            remaining -= cpuW;
-        }
-        else
-        {
-            return;
+            canvas.DrawString(peakText, font, Color.LightGray, peakX, y);
         }
 
-        if (thW <= remaining)
+        y += lineHeight;
+
+        int barHeight = lineHeight - OverlayLayout.LineSpacingPx;
+        canvas.DrawFilledRectangle(Color.FromArgb(40, 40, 40), x, y, maxWidth, barHeight);
+
+        int filledWidth = (int)(maxWidth * sampler.Current / UsageAxisMax);
+        if (filledWidth > 0)
         {
-            canvas.DrawFilledRectangle(Color.Cyan, cursor, y + 2, swatchSize, swatchSize);
-            canvas.DrawString(thLabel, font, Color.LightGray, cursor + swatchSize + 4, y);
-            cursor += thW;
-            remaining -= thW;
+            canvas.DrawFilledRectangle(usageColor, x, y, filledWidth, barHeight);
         }
 
-        if (winW <= remaining)
-        {
-            canvas.DrawString(winLabel, font, Color.LightGray, cursor, y);
-        }
+        return y + barHeight + OverlayLayout.LineSpacingPx;
     }
 
-    private static void DrawRegistry(Canvas canvas, PCScreenFont font, int x, int y, int maxWidth, int maxHeight, int lh, int charW)
+    private static Color UsageColor(double usagePercent)
     {
-        int regCount = SchedulerInfo.ThreadCount;
-        if (regCount <= 0)
+        if (usagePercent < BusyUsagePercent)
+        {
+            return Color.LimeGreen;
+        }
+
+        return usagePercent < SaturatedUsagePercent ? Color.Yellow : Color.OrangeRed;
+    }
+
+    private static int DrawPoolStats(
+        Canvas canvas,
+        PCScreenFont font,
+        int x,
+        int y,
+        int maxWidth,
+        LoadRamp ramp,
+        int activeThreads)
+    {
+        string trend = ramp.IsRising ? "+" : "-";
+
+        string stats = TextRenderer.LongestThatFits(
+            font,
+            maxWidth,
+            "target=" + ramp.Target + "  alive=" + CpuStressPool.Alive + "  leaving=" + CpuStressPool.ExitRequests
+                + "  active=" + activeThreads + "  trend=" + trend,
+            "tgt=" + ramp.Target + " alive=" + CpuStressPool.Alive + " act=" + activeThreads + " " + trend,
+            "t=" + ramp.Target + " a=" + activeThreads);
+
+        canvas.DrawString(stats, font, Color.LightGray, x, y);
+
+        return y + OverlayLayout.LineHeight(font);
+    }
+
+    private static int DrawUsageChart(Canvas canvas, PCScreenFont font, int x, int y, int width)
+    {
+        int lineHeight = OverlayLayout.LineHeight(font);
+        int footerHeight = lineHeight * OverlayLayout.SectionBreakRowCount;
+        int available = canvas.Height - y - footerHeight;
+        int chartHeight = available > ChartHeightCapPx ? ChartHeightCapPx : available;
+
+        return LineChart.Draw(
+            canvas,
+            font,
+            s_series,
+            new Rectangle(x, y, width, chartHeight),
+            UsageAxisMax,
+            "100%",
+            "window " + s_usageSeries.Count * FrameDelayMs / 1000 + "s");
+    }
+
+    // Scheduler thread registry, laid out in as many columns as the width allows.
+    private static void DrawThreadTable(
+        Canvas canvas,
+        PCScreenFont font,
+        int x,
+        int y,
+        int maxWidth,
+        int maxHeight)
+    {
+        int lineHeight = OverlayLayout.LineHeight(font);
+        int threadCount = SchedulerInfo.ThreadCount;
+
+        if (threadCount <= 0 || maxHeight < lineHeight * 2)
         {
             return;
         }
 
-        if (maxHeight < lh * 2)
+        TextRenderer.DrawTruncated(
+            canvas,
+            font,
+            "Scheduler threads (" + threadCount + " live):",
+            Color.LightGray,
+            x,
+            y,
+            maxWidth);
+
+        int tableY = y + lineHeight;
+
+        int columnWidth = ThreadColumnChars * font.Width;
+        if (columnWidth > maxWidth)
         {
-            return;
+            columnWidth = maxWidth;
         }
 
-        string header = "Scheduler threads (" + regCount + " live):";
-        DrawTruncated(canvas, font, header, Color.LightGray, x, y, maxWidth);
+        int columns = maxWidth / columnWidth;
+        int rows = (maxHeight - lineHeight) / lineHeight;
+        int capacity = columns * rows;
 
-        int gridY = y + lh;
-        int gridH = maxHeight - lh;
-
-        int colW = charW * 18;
-        if (colW > maxWidth)
-        {
-            colW = maxWidth;
-        }
-        int cols = maxWidth / colW;
-        int rows = gridH / lh;
-
-        int maxEntries = cols * rows;
         int drawn = 0;
-        for (int slot = 0; slot < SchedulerInfo.ThreadSlotCount && drawn < maxEntries; slot++)
+        for (int slot = 0; slot < SchedulerInfo.ThreadSlotCount && drawn < capacity; slot++)
         {
-            if (!SchedulerInfo.TryGetThreadInSlot(slot, out KernelThreadInfo info))
+            if (!SchedulerInfo.TryGetThreadInSlot(slot, out KernelThreadInfo thread))
             {
                 continue;
             }
 
-            int colIdx = drawn % cols;
-            int rowIdx = drawn / cols;
-            int ex = x + colIdx * colW;
-            int ey = gridY + rowIdx * lh;
-            DrawTruncated(canvas, font, FormatThread(info), Color.White, ex, ey, colW - charW);
+            TextRenderer.DrawTruncated(
+                canvas,
+                font,
+                FormatThread(thread),
+                Color.White,
+                x + drawn % columns * columnWidth,
+                tableY + drawn / columns * lineHeight,
+                columnWidth - font.Width);
+
             drawn++;
         }
     }
 
-    private static string FormatThread(KernelThreadInfo info)
+    private static string FormatThread(KernelThreadInfo thread)
     {
-        string flag = info.IsIdle ? "idle"
-                    : info.IsManaged ? "mgd"
+        string kind = thread.IsIdle ? "idle"
+                    : thread.IsManaged ? "mgd"
                     : "krn";
-        string state = info.State switch
+
+        string state = thread.State switch
         {
             KernelThreadState.Running => "RUN",
             KernelThreadState.Ready => "RDY",
@@ -441,57 +372,30 @@ internal static class CpuStat
             KernelThreadState.Created => "NEW",
             _ => "???"
         };
-        return "T" + info.Id + " " + flag + " " + state + " " + FormatRuntime(info.TotalRuntimeNs);
+
+        return "T" + thread.Id + " " + kind + " " + state + " " + FormatRuntime(thread.TotalRuntimeNs);
     }
 
-    private static string FormatRuntime(ulong ns)
+    private static string FormatRuntime(ulong nanoseconds)
     {
-        ulong ms = ns / 1_000_000UL;
-        if (ms < 1000)
+        ulong milliseconds = nanoseconds / 1_000_000UL;
+        if (milliseconds < 1000)
         {
-            return ms.ToString() + "ms";
+            return milliseconds + "ms";
         }
-        ulong sec = ms / 1000UL;
-        if (sec < 60)
-        {
-            ulong tenths = (ms % 1000UL) / 100UL;
-            return sec.ToString() + "." + tenths.ToString() + "s";
-        }
-        ulong min = sec / 60UL;
-        if (min < 60)
-        {
-            return min.ToString() + "m";
-        }
-        ulong hr = min / 60UL;
-        return hr.ToString() + "h";
-    }
 
-    private static string ChooseFitting(string longForm, string midForm, string shortForm, int maxWidth, int charW)
-    {
-        int maxChars = maxWidth / charW;
-        if (longForm.Length <= maxChars)
+        ulong seconds = milliseconds / 1000UL;
+        if (seconds < 60)
         {
-            return longForm;
+            return seconds + "." + milliseconds % 1000UL / 100UL + "s";
         }
-        if (midForm.Length <= maxChars)
-        {
-            return midForm;
-        }
-        return shortForm;
-    }
 
-    private static void DrawTruncated(Canvas canvas, PCScreenFont font, string s, Color color, int x, int y, int maxWidth)
-    {
-        int charW = font.Width;
-        int maxChars = maxWidth / charW;
-        if (maxChars <= 0)
+        ulong minutes = seconds / 60UL;
+        if (minutes < 60)
         {
-            return;
+            return minutes + "m";
         }
-        if (s.Length > maxChars)
-        {
-            s = s.Substring(0, maxChars);
-        }
-        canvas.DrawString(s, font, color, x, y);
+
+        return minutes / 60UL + "h";
     }
 }
