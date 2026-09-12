@@ -79,8 +79,8 @@ namespace Cosmos.TestRunner.Framework
             // bogus times. When that happens, clamp to a sane max and
             // emit a UART warning with the raw inputs so the cause can be
             // debugged from the log.
-            var endTicks = Stopwatch.GetTimestamp();
-            var elapsedTicks = endTicks - s_testStartTicks;
+            long endTicks = Stopwatch.GetTimestamp();
+            long elapsedTicks = endTicks - s_testStartTicks;
             long freq = Stopwatch.Frequency;
             long rawMs = (freq > 0 && elapsedTicks > 0)
                 ? (elapsedTicks * MillisecondsPerSecond) / freq

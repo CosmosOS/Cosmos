@@ -462,8 +462,11 @@ public class Kernel : Sys.Kernel
         Assert.Equal(canvas.GetRawPointColor(Size - 5, Size - 5), EncodeCoordinates(Size - 5, Size - 5, Size), "CopyPixels leaves pixels outside the destination alone");
     }
 
+    // Unique non-zero raw colour per pixel, so a copy that reads a pixel it
+    // already overwrote shows up as the wrong coordinates at the destination.
     private static int EncodeCoordinates(int x, int y, int size) => y * size + x + 1;
 
+    // Paints every pixel with its own encoded coordinates.
     private static void FillWithCoordinates(Canvas canvas, int size)
     {
         for (int y = 0; y < size; y++)
@@ -475,6 +478,7 @@ public class Kernel : Sys.Kernel
         }
     }
 
+    // True when the destination block holds exactly the source block's pixels.
     private static bool BlockMatchesSource(Canvas canvas, int size, int srcX, int srcY, int dstX, int dstY, int width, int height)
     {
         for (int y = 0; y < height; y++)

@@ -313,7 +313,7 @@ public static class SocketPlug
         }
 
         StartTcp(aThis);
-        var sm = s_tcpStateMachines[id];
+        Tcp sm = s_tcpStateMachines[id];
 
         if (sm.Status == Status.ESTABLISHED)
         {

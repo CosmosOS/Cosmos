@@ -528,7 +528,7 @@ public class Kernel : Sys.Kernel
 
         // Build the echo request ourselves instead of going through SendEcho,
         // so the reply can be correlated with the id/sequence we chose.
-        var request = new IcmpEchoRequest(s_localIP!, target, echoId, echoSequence);
+        IcmpEchoRequest request = new(s_localIP!, target, echoId, echoSequence);
         Log.WriteString("[Test] Sending crafted echo request id=0x4242 seq=9...\n");
         Assert.True(NetworkStack.Send(request), "NetworkStack.Send should queue a packet with a configured source address");
 
@@ -583,7 +583,7 @@ public class Kernel : Sys.Kernel
         var udpClient = new CosmosUdpClient(seamPort);
 
         byte[] payload = Encoding.ASCII.GetBytes("COSMOS_SEAM_TEST");
-        var packet = new UdpPacket(s_localIP!, gateway, seamPort, TestPort, payload);
+        UdpPacket packet = new(s_localIP!, gateway, seamPort, TestPort, payload);
 
         Log.WriteString("[Test] Sending crafted UDP packet to the echo server...\n");
         Assert.True(udpClient.Send(packet), "Crafted UDP packet should be queued through the client");
@@ -641,7 +641,7 @@ public class Kernel : Sys.Kernel
         // A source address no interface carries: Send must report the drop
         // instead of pretending the packet went out.
         var unconfigured = new Address(192, 168, 250, 250);
-        var request = new IcmpEchoRequest(unconfigured, new Address(10, 0, 2, 2), 1, 1);
+        IcmpEchoRequest request = new(unconfigured, new Address(10, 0, 2, 2), 1, 1);
         Assert.True(!NetworkStack.Send(request), "Send should return false for a source address no interface carries");
     }
 

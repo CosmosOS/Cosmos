@@ -279,11 +279,17 @@ public static class Ebr
     /// <see cref="PartitionManager.MoveWithData"/> asks it before copying
     /// data so a refused move never touches the disk.
     /// </summary>
-    internal static bool CanMoveLogical(IBlockDevice device, ulong extendedStartSector, int logicalIndex, ulong newStartSector)
-    {
-        return TryPlanMove(device, extendedStartSector, logicalIndex, newStartSector, out _, out _);
-    }
+    internal static bool CanMoveLogical(IBlockDevice device, ulong extendedStartSector, int logicalIndex, ulong newStartSector) =>
+        TryPlanMove(device, extendedStartSector, logicalIndex, newStartSector, out _, out _);
 
+    /// <summary>
+    /// Resolve a logical move: walk the chain to the
+    /// <paramref name="logicalIndex"/>-th node, and accept
+    /// <paramref name="newStartSector"/> only when it lies past that node's
+    /// own EBR sector, fits in the EBR's 32-bit relative field, and ends no
+    /// later than the next node's EBR sector or the container's end. On
+    /// success, hands back the node and the relative start to stamp.
+    /// </summary>
     private static bool TryPlanMove(
         IBlockDevice device,
         ulong extendedStartSector,

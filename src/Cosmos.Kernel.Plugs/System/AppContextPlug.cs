@@ -59,7 +59,7 @@ public static class AppContextPlug
 
         ArgumentException.ThrowIfNullOrEmpty(switchName);
 
-        if (s_switches != null)
+        if (s_switches is not null)
         {
             if (s_switches.TryGetValue(switchName, out isEnabled))
             {

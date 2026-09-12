@@ -122,6 +122,12 @@ public static class Gpt
     /// <summary>Minimum device size in sectors for a GPT to exist at all (LBA 0 plus the header at LBA 1).</summary>
     private const ulong MinGptBlockCount = 2;
 
+    /// <summary>
+    /// Value of an <c>excludeIndex</c> meaning no entry is exempt from the
+    /// overlap check, for a partition that does not exist yet.
+    /// </summary>
+    private const int NoEntryIndex = -1;
+
     /// <summary>Minimum device size in sectors accepted by Create: LBAs 0..33 plus a usable area and a backup slot at BlockCount-1.</summary>
     private const ulong MinCreateBlockCount = 64;
 
@@ -165,6 +171,18 @@ public static class Gpt
     /// <summary>Microsoft Basic Data Partition GUID — used by FAT/NTFS/exFAT volumes.</summary>
     public static readonly Guid BasicDataPartitionType = new(
         0xEBD0A0A2, 0xB9E5, 0x4433, 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7);
+
+    /// <summary>
+    /// Geometry of the partition entry array as declared by a validated
+    /// primary header: where it starts, how many entries it declares, how
+    /// large each is, and how those pack into sectors.
+    /// </summary>
+    private readonly record struct EntryArrayLayout(
+        ulong EntryStartLba,
+        uint EntryCount,
+        uint EntrySize,
+        uint EntriesPerSector,
+        ulong ArraySectors);
 
     /// <summary>True if the GPT header at LBA 1 starts with the EFI PART signature.</summary>
     public static bool IsGpt(IBlockDevice device)
@@ -445,24 +463,6 @@ public static class Gpt
     private delegate bool EntryMutator(Span<byte> entry, EntryArrayLayout layout);
 
     /// <summary>
-    /// Value of an <c>excludeIndex</c> meaning no entry is exempt from the
-    /// overlap check, for a partition that does not exist yet.
-    /// </summary>
-    private const int NoEntryIndex = -1;
-
-    /// <summary>
-    /// Geometry of the partition entry array as declared by a validated
-    /// primary header: where it starts, how many entries it declares, how
-    /// large each is, and how those pack into sectors.
-    /// </summary>
-    private readonly record struct EntryArrayLayout(
-        ulong EntryStartLba,
-        uint EntryCount,
-        uint EntrySize,
-        uint EntriesPerSector,
-        ulong ArraySectors);
-
-    /// <summary>
     /// Read the primary header and range-check every field that drives
     /// I/O. Trust nothing beyond the signature: CRC32s are written as 0 by
     /// this format, so corruption is undetectable, a zeroed entry size
@@ -524,12 +524,17 @@ public static class Gpt
     /// header has no entries to overlap. The range must already be bounded
     /// against the device.
     /// </summary>
-    internal static bool OverlapsOtherEntry(IBlockDevice device, int excludeIndex, ulong startSector, ulong sectorCount)
-    {
-        return TryReadEntryArrayLayout(device, out EntryArrayLayout layout)
-            && OverlapsOtherEntry(device, layout, excludeIndex, startSector, sectorCount);
-    }
+    internal static bool OverlapsOtherEntry(IBlockDevice device, int excludeIndex, ulong startSector, ulong sectorCount) =>
+        TryReadEntryArrayLayout(device, out EntryArrayLayout layout)
+        && OverlapsOtherEntry(device, layout, excludeIndex, startSector, sectorCount);
 
+    /// <summary>
+    /// The array walk behind <see cref="OverlapsOtherEntry(IBlockDevice, int, ulong, ulong)"/>,
+    /// for callers that already hold a validated <paramref name="layout"/>.
+    /// Entries are counted with the same validity filter as <see cref="Parse"/>
+    /// and <see cref="MutateEntry"/>, so <paramref name="excludeIndex"/> names
+    /// the same partition in all three.
+    /// </summary>
     private static bool OverlapsOtherEntry(IBlockDevice device, EntryArrayLayout layout, int excludeIndex, ulong startSector, ulong sectorCount)
     {
         (ulong entryStartLba, uint entryCount, uint entrySize, uint entriesPerSector, ulong arraySectors) = layout;
@@ -580,7 +585,7 @@ public static class Gpt
     /// write the containing sector back. Returns false when the header is
     /// missing/corrupt, the index does not resolve to a used slot, or the
     /// mutator aborts. Applies the same distrust of on-disk header fields
-    /// as <see cref="Parse"/> — CRCs are 0, so every field is range-checked
+    /// as <see cref="Parse"/>: CRCs are 0, so every field is range-checked
     /// before it drives I/O.
     /// </summary>
     private static bool MutateEntry(IBlockDevice device, int index, EntryMutator mutator)

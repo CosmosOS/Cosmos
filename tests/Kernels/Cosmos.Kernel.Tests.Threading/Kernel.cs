@@ -460,7 +460,7 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(s_stackProbeDone, "EnsureSufficientExecutionStack worker should finish");
-        Assert.True(s_stackProbeError == null, "EnsureSufficientExecutionStack should not throw in a spawned thread");
+        Assert.True(s_stackProbeError is null, "EnsureSufficientExecutionStack should not throw in a spawned thread");
         Assert.True(s_stackProbeSufficient, "TryEnsureSufficientExecutionStack should report sufficient stack in a spawned thread");
     }
 
@@ -496,8 +496,8 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(s_stackProbeDone, "record ToString worker should finish");
-        Assert.True(s_stackProbeError == null, "record ToString should not throw in a spawned thread");
-        Assert.True(s_stackProbeToString != null && s_stackProbeToString.Contains("42"),
+        Assert.True(s_stackProbeError is null, "record ToString should not throw in a spawned thread");
+        Assert.True(s_stackProbeToString is not null && s_stackProbeToString.Contains("42"),
             "record ToString should contain the property value");
     }
 
@@ -1535,7 +1535,7 @@ public class Kernel : Sys.Kernel
         }
 
         uint cpuId = SchedulerManager.GetCurrentCpuId();
-        if (s_spinAThread != null && s_spinBThread != null)
+        if (s_spinAThread is not null && s_spinBThread is not null)
         {
             // SetPriority runs under a spinlock only (see the plugging guide's
             // kernel constraints); mask the tick around it ourselves.
@@ -1994,7 +1994,7 @@ public class Kernel : Sys.Kernel
             TimerManager.Wait(FlagPollIntervalMs);
         }
         Assert.True(s_blockWorkerStarted, "the block-probe worker should start");
-        if (s_blockWorkerThread == null)
+        if (s_blockWorkerThread is null)
         {
             // Asserts don't throw in this framework; bail before dereferencing,
             // and release so the parked worker can't leak into the next cell.

@@ -290,6 +290,7 @@ public static class PartitionManager
         return Mbr.MovePartition(device, slot, newStartSector);
     }
 
+    /// <summary>Index of the first empty primary slot in the MBR, or -1 when all four are used.</summary>
     private static int FindFreeMbrSlot(IBlockDevice device)
     {
         Span<byte> mbr = new byte[device.BlockSize];
@@ -305,6 +306,7 @@ public static class PartitionManager
         return -1;
     }
 
+    /// <summary>Primary slot whose entry covers exactly <paramref name="location"/>, or -1.</summary>
     private static int FindMbrSlot(IBlockDevice device, PartitionLocation location)
     {
         return FindMbrSlot(device, location, out _);
@@ -341,6 +343,13 @@ public static class PartitionManager
         return -1;
     }
 
+    /// <summary>
+    /// Whether <paramref name="location"/> is a logical partition: it lies
+    /// inside the extended container and the EBR chain lists an entry with
+    /// exactly that range. On success, hands back the container's start and
+    /// the entry's position in the chain, the two things the
+    /// <see cref="Ebr"/> writers address a logical by.
+    /// </summary>
     private static bool TryFindLogical(IBlockDevice device, PartitionLocation location, out ulong extendedStartSector, out int logicalIndex)
     {
         extendedStartSector = 0;
@@ -369,6 +378,7 @@ public static class PartitionManager
         return false;
     }
 
+    /// <summary>Position of the entry covering exactly <paramref name="location"/> in <see cref="Gpt.Parse"/>'s output, or -1.</summary>
     private static int FindGptIndex(IBlockDevice device, PartitionLocation location)
     {
         List<GptPartitionEntry> entries = Gpt.Parse(device);
@@ -382,6 +392,12 @@ public static class PartitionManager
         return -1;
     }
 
+    /// <summary>
+    /// Copy <paramref name="count"/> sectors from <paramref name="source"/> to
+    /// <paramref name="destination"/> in batches. When the destination
+    /// overlaps the source from above, the batches run from the tail down so
+    /// no sector is overwritten before it is read.
+    /// </summary>
     private static void CopySectors(IBlockDevice device, ulong source, ulong destination, ulong count)
     {
         ulong blockSize = device.BlockSize;
