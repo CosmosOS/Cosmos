@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
 
 namespace Cosmos.Kernel.Core.Scheduler;
@@ -93,6 +94,17 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
 
     // ===== GC Allocation Context (TLAB) =====
     internal AllocContext _allocContext;
+
+    /// <summary>
+    /// Strong handle to the <see cref="System.Threading.Thread"/> this
+    /// control block runs, taken when the thread is created and released
+    /// by <see cref="SchedulerManager.ExitThread"/>. CoreLib frees its own
+    /// handle as soon as the thread reports itself started, so this is the
+    /// only reference the mechanism keeps: it is what lets a thread that is
+    /// killed while queued be stopped on the managed side too. Unallocated
+    /// on a thread that runs a free delegate.
+    /// </summary>
+    internal GCHandle<System.Threading.Thread> ManagedThread;
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private object[][] _threadStaticStorage;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.

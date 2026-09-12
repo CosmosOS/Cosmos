@@ -12,7 +12,12 @@ public enum ThreadKillResult : byte
     /// </summary>
     NotFound,
 
-    /// <summary>The thread was removed from its run queue and terminated.</summary>
+    /// <summary>
+    /// The thread was removed from its run queue and terminated, on the
+    /// managed side too: a <see cref="global::System.Threading.Thread.Join()"/>
+    /// on it returns, and it reads as stopped, exactly as after a return
+    /// from its entry point.
+    /// </summary>
     Killed,
 
     /// <summary>

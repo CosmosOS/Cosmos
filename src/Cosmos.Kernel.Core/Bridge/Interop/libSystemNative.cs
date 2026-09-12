@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
+using SysThread = System.Threading.Thread;
 
 namespace Cosmos.Kernel.Core.Bridge.Interop;
 
@@ -130,7 +131,11 @@ internal static unsafe partial class libSystemNative
                 Id = SchedulerManager.AllocateThreadId(),
                 CpuId = 0,
                 State = SchedulerThreadState.Created,
-                Flags = SchedulerThreadFlags.Managed
+                Flags = SchedulerThreadFlags.Managed,
+                // CoreLib's handle in `parameter` lives only until the thread
+                // reports itself started; the mechanism keeps its own for the
+                // thread's whole life, so a kill can reach the managed side.
+                ManagedThread = new GCHandle<SysThread>(GCHandle<SysThread>.FromIntPtr(parameter).Target)
             };
 
             nuint entryPoint = (nuint)(delegate* unmanaged<IntPtr, void>)&ThreadNative.EntryPointStub;

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Timer;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -41,6 +42,15 @@ public class Kernel : Sys.Kernel
     private const int ThreadPollWaitMs = 200;
     /// <summary>Maximum number of ThreadPollWaitMs checks for the thread-execution flag.</summary>
     private const int ThreadExecPollRetries = 5;
+
+    /// <summary>Poll interval while waiting for the kill victim to report itself started.</summary>
+    private const int KillVictimPollWaitMs = 50;
+
+    /// <summary>Polls before giving up on the kill victim starting.</summary>
+    private const int KillVictimPollRetries = 100;
+
+    /// <summary>How long a Join on a killed thread may take before the test calls it a hang.</summary>
+    private const int KillJoinTimeoutMs = 2000;
 
     /// <summary>Polling interval (ms) while waiting on scheduler-test flags (worker holding, parked, woke, ...).</summary>
     private const int FlagPollIntervalMs = 50;
@@ -147,6 +157,7 @@ public class Kernel : Sys.Kernel
         TR.Run("MainThread_RecordToString_Works", TestRecordToStringOnMainThread);
         TR.Run("Thread_MaxStackSize_IsHonored", TestThreadMaxStackSizeHonored);
         TR.Run("Thread_MaxStackSize_TinyRequestIsFloored", TestThreadTinyStackSizeFloored);
+        TR.Run("Thread_Kill_Queued_StopsManagedSide", TestKillQueuedThreadStopsManagedSide);
         TR.Run("Mutex_IdleThreadContention_KeepsTicketAccounting", TestMutexIdleThreadContention);
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
         TR.Run("Mutex_ThreeContenders_AllAcquire", TestMutexThreeContenders);
@@ -953,6 +964,51 @@ public class Kernel : Sys.Kernel
 
     [ThreadStatic]
     private static int s_staticValue;
+    private static volatile bool s_killVictimStarted;
+    private static volatile bool s_killVictimRelease;
+    private static uint s_killVictimId;
+
+    private static void KillVictimWorker()
+    {
+        if (SchedulerInfo.TryGetCurrentThread(SchedulerManager.GetCurrentCpuId(), out KernelThreadInfo info))
+        {
+            s_killVictimId = info.Id;
+        }
+        s_killVictimStarted = true;
+
+        // Spin until released: the tick preempts the thread, so it sits in
+        // the run queue while the main thread kills it.
+        while (!s_killVictimRelease)
+        {
+        }
+    }
+
+    private static void TestKillQueuedThreadStopsManagedSide()
+    {
+        s_killVictimStarted = false;
+        s_killVictimRelease = false;
+        s_killVictimId = 0;
+
+        SysThread victim = new(KillVictimWorker);
+        victim.Start();
+        for (int i = 0; i < KillVictimPollRetries && !s_killVictimStarted; i++)
+        {
+            TimerManager.Wait(KillVictimPollWaitMs);
+        }
+        Assert.True(s_killVictimStarted, "the victim must have started before it is killed");
+
+        ThreadKillResult result = SchedulerInfo.RequestKill(s_killVictimId);
+        Assert.Equal((int)ThreadKillResult.Killed, (int)result, "a preempted thread sits in the run queue and is killed outright");
+
+        // The managed thread stops with the kernel one: joiners are released
+        // and the state reads Stopped, exactly as after a return from the
+        // entry point. Before the reap reached the managed side, this Join
+        // waited forever.
+        Assert.True(victim.Join(KillJoinTimeoutMs), "Join must return once the killed thread's stop event is set");
+        Assert.True((victim.ThreadState & ThreadState.Stopped) != 0, "the killed thread must read as Stopped");
+        Assert.True(!victim.IsAlive, "the killed thread must not read as alive");
+    }
+
     private static void TestThreadStatics()
     {
         int secondThreadValue = 0;

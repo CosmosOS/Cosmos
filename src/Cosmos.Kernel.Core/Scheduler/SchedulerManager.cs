@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
@@ -283,6 +284,47 @@ public static class SchedulerManager
     // ========== Thread Entry Dispatch ==========
     [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "StartThread")]
     private static extern void StartThread(SysThread aThis, IntPtr parameter);
+
+    [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "StopThread")]
+    private static extern void StopThread(SysThread aThis, SysThread thread);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_stopped")]
+    private static extern ref ManualResetEvent GetStoppedEvent(SysThread thread);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_startException")]
+    private static extern ref Exception? GetStartException(SysThread thread);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_WaitInfo")]
+    [return: UnsafeAccessorType("System.Threading.WaitSubsystem+ThreadWaitInfo, System.Private.CoreLib")]
+    private static extern object GetWaitInfo(SysThread thread);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "OnThreadExiting")]
+    private static extern void OnThreadExiting([UnsafeAccessorType("System.Threading.WaitSubsystem+ThreadWaitInfo, System.Private.CoreLib")] object waitInfo);
+
+    /// <summary>
+    /// Stop <paramref name="thread"/> on the managed side from another
+    /// thread's context. Mirrors CoreLib's <c>Thread.OnThreadExit</c>, which
+    /// cannot be pointed at a thread other than the one it runs on: abandon
+    /// the mutexes the thread holds, mark it stopped, and release its
+    /// joiners. A thread killed before <c>StartThread</c> ever ran on it is
+    /// still unstarted on the managed side, so it takes the path CoreLib
+    /// uses for a start that failed: its creator, still inside
+    /// <c>Start()</c>, is released and throws a
+    /// <see cref="ThreadStartException"/> carrying the reason.
+    /// </summary>
+    private static void StopManagedThread(SysThread thread)
+    {
+        if ((thread.ThreadState & global::System.Threading.ThreadState.Unstarted) != 0)
+        {
+            GetStartException(thread) = new ThreadStateException("The thread was killed before it started.");
+            GetStoppedEvent(thread).Set();
+            return;
+        }
+
+        OnThreadExiting(GetWaitInfo(thread));
+        StopThread(null!, thread);
+        GetStoppedEvent(thread).Set();
+    }
 
     /// <summary>
     /// <para>
@@ -626,30 +668,40 @@ public static class SchedulerManager
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
 
-        // Is Highly likely that the running thread have acquired some state on it's managed counter part (even if it wasn't started from a managed thread).
-        // Here we call the OnThreadExit Callback for the managed thread so it may be cleaned.
-        //
-        // Only for the thread that is actually running: CoreLib's callback
-        // takes no argument and cleans whatever thread it is invoked on. Run
-        // it while killing someone else (SchedulerInfo.RequestKill reaps a
-        // queued thread from the killer's context) and it tears down the
-        // caller's managed thread instead of the victim's.
-        nint managedCallback = ReferenceEquals(GetCpuState(cpuId)?.CurrentThread, thread)
-            ? OnThreadExitCallback
-            : IntPtr.Zero;
-        if (managedCallback != IntPtr.Zero)
+        // The managed side of the thread has to be stopped too: its Stopped
+        // state, its joiners' event, and any mutex it held. CoreLib's exit
+        // callback does all three, but it takes no argument and reads
+        // t_currentThread, so it can only clean the thread it runs on. A
+        // thread exiting itself gets that callback; a thread reaped from
+        // someone else's context (SchedulerInfo.RequestKill on a queued
+        // thread) gets the same three steps addressed at it explicitly.
+        if (ReferenceEquals(GetCpuState(cpuId)?.CurrentThread, thread))
         {
-            Serial.WriteString("[ThreadPlug] Invoking managed thread exit callback for thread ");
-            Serial.WriteNumber(thread.Id);
-            Serial.WriteString("\n");
-            unsafe
+            nint managedCallback = OnThreadExitCallback;
+            if (managedCallback != IntPtr.Zero)
             {
-                var callback = (delegate* unmanaged<void>)managedCallback;
-                callback();
+                Serial.WriteString("[SCHED] ExitThread: managed exit callback for thread ");
+                Serial.WriteNumber(thread.Id);
+                Serial.WriteString("\n");
+                unsafe
+                {
+                    var callback = (delegate* unmanaged<void>)managedCallback;
+                    callback();
+                }
             }
-            Serial.WriteString("[SCHED] ExitThread: callback returned for thread ");
+        }
+        else if (thread.ManagedThread.IsAllocated)
+        {
+            Serial.WriteString("[SCHED] ExitThread: stopping managed thread ");
             Serial.WriteNumber(thread.Id);
-            Serial.WriteString("\n");
+            Serial.WriteString(" from another context\n");
+            StopManagedThread(thread.ManagedThread.Target);
+        }
+
+        if (thread.ManagedThread.IsAllocated)
+        {
+            thread.ManagedThread.Dispose();
+            thread.ManagedThread = default;
         }
 
         Serial.WriteString("[SCHED] ExitThread: entering DisableInterruptsScope for thread ");
