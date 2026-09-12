@@ -61,12 +61,9 @@ public static class PartitionManager
         {
             return false;
         }
-        // The low-level writers only validate device bounds; the facade is
-        // where the free-space invariant lives.
-        if (RangeIntersectsExistingPartition(device, startSector, sectorCount, exclude: null))
-        {
-            return false;
-        }
+        // Each writer refuses a range that overlaps another entry of its own
+        // table (Gpt.AddPartition, Mbr.AddPartition), so the facade only
+        // routes to the right one.
 
         if (Gpt.IsGpt(device))
         {
@@ -163,16 +160,9 @@ public static class PartitionManager
         {
             return false;
         }
-        // The low-level writers only validate device bounds, so the facade owns
-        // the free-space invariant here exactly as Create does. Without it a
-        // grown range walks into its neighbour: Gpt.ResizePartition checks only
-        // the device end, so the GPT path stamped two entries aliasing the same
-        // sectors and still returned true, while Mbr.ResizePartition threw out
-        // of this bool-returning method. Only Ebr.ResizeLogical bounded itself.
-        if (RangeIntersectsExistingPartition(device, location.StartSector, newSectorCount, location))
-        {
-            return false;
-        }
+        // Growing into a neighbour is refused by each writer: Gpt.ResizePartition
+        // and Mbr.ResizePartition test the other entries of their table, and
+        // Ebr.ResizeLogical bounds the logical by the next EBR sector.
 
         if (Gpt.IsGpt(device))
         {
@@ -240,14 +230,11 @@ public static class PartitionManager
         {
             return false;
         }
-        // The destination must be free space (the source itself may
-        // overlap it; CopySectors is direction-aware). With this checked
-        // up front, a copy that later fails to re-table only ever landed
-        // on unallocated sectors.
-        if (RangeIntersectsExistingPartition(device, newStartSector, location.SectorCount, location))
-        {
-            return false;
-        }
+        // The destination must be free space (the source itself may overlap
+        // it; CopySectors is direction-aware). Each format's writer owns that
+        // test and applies it again when it stamps the entry; asking it here,
+        // once the entry is resolved and before the copy, is what keeps a
+        // refused move side-effect free.
 
         // Resolve the table entry and its constraints BEFORE copying, so a
         // false return is side-effect free. The copy-then-retable order
@@ -257,7 +244,7 @@ public static class PartitionManager
         if (Gpt.IsGpt(device))
         {
             int gptIndex = FindGptIndex(device, location);
-            if (gptIndex < 0)
+            if (gptIndex < 0 || Gpt.OverlapsOtherEntry(device, gptIndex, newStartSector, location.SectorCount))
             {
                 return false;
             }
@@ -273,6 +260,10 @@ public static class PartitionManager
 
         if (TryFindLogical(device, location, out ulong extStart, out int logicalIndex))
         {
+            if (!Ebr.CanMoveLogical(device, extStart, logicalIndex, newStartSector))
+            {
+                return false;
+            }
             CopySectors(device, location.StartSector, newStartSector, location.SectorCount);
             device.Flush();
             return Ebr.MoveLogical(device, extStart, logicalIndex, newStartSector);
@@ -288,7 +279,8 @@ public static class PartitionManager
         {
             return false;
         }
-        if (newStartSector > Mbr.LbaFieldMaxValue)
+        if (newStartSector > Mbr.LbaFieldMaxValue
+            || Mbr.OverlapsOtherPrimary(device, slot, newStartSector, location.SectorCount))
         {
             return false;
         }
@@ -296,103 +288,6 @@ public static class PartitionManager
         CopySectors(device, location.StartSector, newStartSector, location.SectorCount);
         device.Flush();
         return Mbr.MovePartition(device, slot, newStartSector);
-    }
-
-    /// <summary>
-    /// True when [<paramref name="startSector"/>, +<paramref name="sectorCount"/>)
-    /// intersects a partition other than <paramref name="exclude"/>. On MBR
-    /// disks, logical partitions are checked including the EBR sector
-    /// preceding each logical's data plus the first EBR at the extended
-    /// start; for non-logical ranges the whole extended container counts
-    /// as occupied.
-    /// </summary>
-    private static bool RangeIntersectsExistingPartition(
-        IBlockDevice device,
-        ulong startSector,
-        ulong sectorCount,
-        PartitionLocation? exclude)
-    {
-        if (Gpt.IsGpt(device))
-        {
-            List<GptPartitionEntry> entries = Gpt.Parse(device);
-            for (int i = 0; i < entries.Count; i++)
-            {
-                if (IsExcluded(entries[i].StartSector, entries[i].SectorCount, exclude))
-                {
-                    continue;
-                }
-                if (Intersects(startSector, sectorCount, entries[i].StartSector, entries[i].SectorCount))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        if (!Mbr.IsMbr(device))
-        {
-            return false;
-        }
-
-        List<MbrPartitionEntry> primaries = Mbr.Parse(device);
-        for (int i = 0; i < primaries.Count; i++)
-        {
-            if (IsExcluded(primaries[i].StartSector, primaries[i].SectorCount, exclude))
-            {
-                continue;
-            }
-            if (Intersects(startSector, sectorCount, primaries[i].StartSector, primaries[i].SectorCount))
-            {
-                return true;
-            }
-        }
-
-        if (!Mbr.TryGetExtendedPartition(device, out ulong extStart, out ulong extCount))
-        {
-            return false;
-        }
-
-        bool excludeIsLogical = exclude.HasValue
-            && TryFindLogical(device, exclude.Value, out _, out _);
-        if (!excludeIsLogical)
-        {
-            // Only logicals may live inside the container; any other range
-            // treats the whole container (chain sectors included) as
-            // occupied.
-            return Intersects(startSector, sectorCount, extStart, extCount);
-        }
-
-        // A logical moving inside its container: the obstacles are the
-        // other logicals (each with the EBR sector preceding its data)
-        // and the chain's first EBR sector. The mover's own EBR stays put
-        // and Ebr.MoveLogical already enforces newStart past it.
-        List<MbrPartitionEntry> logicals = Ebr.Parse(device, extStart);
-        for (int i = 0; i < logicals.Count; i++)
-        {
-            if (IsExcluded(logicals[i].StartSector, logicals[i].SectorCount, exclude))
-            {
-                continue;
-            }
-            if (Intersects(startSector, sectorCount, logicals[i].StartSector - Ebr.EbrSectorSpan, logicals[i].SectorCount + Ebr.EbrSectorSpan))
-            {
-                return true;
-            }
-        }
-        return Intersects(startSector, sectorCount, extStart, Ebr.EbrSectorSpan);
-    }
-
-    /// <summary>Half-open interval intersection on absolute LBA ranges.</summary>
-    private static bool Intersects(ulong aStart, ulong aCount, ulong bStart, ulong bCount)
-    {
-        return aStart < bStart + bCount && bStart < aStart + aCount;
-    }
-
-    /// <summary>True when the entry range is the one <paramref name="exclude"/> designates.</summary>
-    private static bool IsExcluded(ulong startSector, ulong sectorCount, PartitionLocation? exclude)
-    {
-        return exclude.HasValue
-            && exclude.Value.StartSector == startSector
-            && exclude.Value.SectorCount == sectorCount;
     }
 
     private static int FindFreeMbrSlot(IBlockDevice device)

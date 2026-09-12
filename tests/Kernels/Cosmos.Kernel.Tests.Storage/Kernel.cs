@@ -101,6 +101,12 @@ public class Kernel : Sys.Kernel
     /// <summary>Start-LBA delta from the first to the second GPT partition in the mutate-skips cell (sectors).</summary>
     private const ulong GptSecondPartitionDeltaSectors = 4096;
 
+    /// <summary>Length of each partition in the GPT writer overlap test.</summary>
+    private const ulong GptOverlapPartitionSectorCount = 1000;
+
+    /// <summary>Distance from the first partition to the second in the GPT writer overlap test.</summary>
+    private const ulong GptOverlapNeighbourOffsetSectors = 8000;
+
     /// <summary>Sectors past the device end where the raw-corrupted GPT entry's start LBA lands.</summary>
     private const ulong GptCorruptStartOvershootSectors = 5;
 
@@ -483,6 +489,7 @@ public class Kernel : Sys.Kernel
         TR.RunIf(dev, "MBR_TryGetExtended_RejectsBogusGeometry", TestMbr_TryGetExtendedRejectsBogusGeometry, SkipNoHost);
         TR.RunIf(dev, "MBR_ResizeMove_RejectsExtendedSlot", TestMbr_ResizeMoveRejectsExtendedSlot, SkipNoHost);
         TR.RunIf(dev, "MBR_ResizeMove_RejectsOverlap",     TestMbr_ResizeMoveRejectsOverlap,     SkipNoHost);
+        TR.RunIf(dev, "GPT_ResizeMove_RejectsOverlap",     TestGpt_ResizeMoveRejectsOverlap,     SkipNoHost);
         TR.RunIf(dev, "MBR_ResizeMove_RestampsSignature",  TestMbr_ResizeMoveRestampsSignature,  SkipNoHost);
         TR.RunIf(dev, "GPT_Mutate_SkipsEntriesParseRejects", TestGpt_MutateSkipsEntriesParseRejects, SkipNoHost);
         TR.RunIf(dev, "GPT_Remove_ClearsWholeEntry",       TestGpt_RemoveClearsWholeEntry,       SkipNoHost);
@@ -2039,6 +2046,35 @@ public class Kernel : Sys.Kernel
     // end, so growing over a neighbour stamped two entries aliasing the same
     // sectors and returned true; Mbr.ResizePartition threw out of a
     // bool-returning method. Only Ebr.ResizeLogical bounded itself.
+    private static void TestGpt_ResizeMoveRejectsOverlap()
+    {
+        IBlockDevice host = s_dev!;
+        ResetHostGpt(host);
+        const ulong startA = GptAlignedStartLba;
+        const ulong startB = GptAlignedStartLba + GptOverlapNeighbourOffsetSectors;
+        Assert.True(Gpt.AddPartition(host, startA, GptOverlapPartitionSectorCount, Gpt.BasicDataPartitionType));
+        Assert.True(Gpt.AddPartition(host, startB, GptOverlapPartitionSectorCount, Gpt.BasicDataPartitionType));
+
+        // The writers refuse the overlap themselves; nothing above them
+        // has to.
+        Assert.False(Gpt.ResizePartition(host, 0, startB - startA + 1),
+            "growing a GPT entry into its neighbour must be refused");
+        Assert.False(Gpt.MovePartition(host, 1, startA + GptOverlapPartitionSectorCount - 1),
+            "moving a GPT entry onto its neighbour must be refused");
+        Assert.False(Gpt.AddPartition(host, startA + GptOverlapPartitionSectorCount / 2, GptOverlapPartitionSectorCount, Gpt.BasicDataPartitionType),
+            "adding a GPT entry on top of another must be refused");
+        List<GptPartitionEntry> parts = Gpt.Parse(host);
+        Assert.Equal(2, parts.Count, "a refused write leaves the table unchanged");
+        Assert.Equal<ulong>(GptOverlapPartitionSectorCount, parts[0].SectorCount, "the refused resize left the first entry alone");
+        Assert.Equal<ulong>(startB, parts[1].StartSector, "the refused move left the second entry alone");
+
+        // Adjacency stays legal: the end LBA is inclusive, so an entry may
+        // end on the sector just before its neighbour starts.
+        Assert.True(Gpt.ResizePartition(host, 0, startB - startA), "growing up to the neighbour is allowed");
+        Assert.True(Gpt.MovePartition(host, 1, startB + LegalMoveDeltaSectors), "moving into free space is allowed");
+        Assert.Equal(2, Gpt.Parse(host).Count);
+    }
+
     private static void TestPartitionManager_ResizeRefusesOverlap()
     {
         IBlockDevice host = s_dev!;

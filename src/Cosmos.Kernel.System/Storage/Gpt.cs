@@ -189,47 +189,13 @@ public static class Gpt
     public static List<GptPartitionEntry> Parse(IBlockDevice device)
     {
         List<GptPartitionEntry> partitions = new();
-        if (device.BlockCount < MinGptBlockCount)
+        if (!TryReadEntryArrayLayout(device, out EntryArrayLayout layout))
         {
             return partitions;
         }
 
+        (ulong entryStartLba, uint entryCount, uint entrySize, uint entriesPerSector, ulong arraySectors) = layout;
         ulong blockSize = device.BlockSize;
-
-        Span<byte> header = new byte[blockSize];
-        device.ReadBlock(PrimaryHeaderLba, 1, header);
-        if (BitConverter.ToUInt64(header.Slice(HeaderSignatureOffset, UInt64FieldSize)) != EfiPartSignature)
-        {
-            return partitions;
-        }
-
-        // Trust nothing in the header beyond the signature: CRC32s are
-        // written as 0 by this format, so corruption is undetectable and
-        // every field must be range-checked before it drives I/O.
-        ulong entryStartLba = BitConverter.ToUInt64(header.Slice(HeaderEntryArrayLbaOffset, UInt64FieldSize));
-        uint entryCount = BitConverter.ToUInt32(header.Slice(HeaderEntryCountOffset, UInt32FieldSize));
-        uint entrySize = BitConverter.ToUInt32(header.Slice(HeaderEntrySizeOffset, UInt32FieldSize));
-        if (entrySize < PartitionEntrySizeBytes || entrySize > blockSize
-            || entryCount > MaxEntryCount
-            || entryStartLba < EntryArrayLba || entryStartLba >= device.BlockCount)
-        {
-            return partitions;
-        }
-
-        uint entriesPerSector = (uint)(blockSize / entrySize);
-        if (entriesPerSector == 0)
-        {
-            return partitions;
-        }
-
-        // Bound the END of the entry array too: a start LBA near the disk
-        // end with a large count would otherwise still drive out-of-range
-        // sector reads.
-        ulong arraySectors = ((ulong)entryCount + entriesPerSector - 1) / entriesPerSector;
-        if (entryStartLba + arraySectors > device.BlockCount)
-        {
-            return partitions;
-        }
 
         Span<byte> sector = new byte[blockSize];
         for (ulong s = 0; s < (ulong)entryCount; s += entriesPerSector)
@@ -341,15 +307,7 @@ public static class Gpt
     /// </summary>
     public static bool AddPartition(IBlockDevice device, ulong startSector, ulong sectorCount, Guid partitionType)
     {
-        if (device.BlockCount < MinGptBlockCount)
-        {
-            return false;
-        }
-
-        ulong blockSize = device.BlockSize;
-        Span<byte> header = new byte[blockSize];
-        device.ReadBlock(PrimaryHeaderLba, 1, header);
-        if (BitConverter.ToUInt64(header.Slice(HeaderSignatureOffset, UInt64FieldSize)) != EfiPartSignature)
+        if (!TryReadEntryArrayLayout(device, out EntryArrayLayout layout))
         {
             return false;
         }
@@ -364,33 +322,17 @@ public static class Gpt
             return false;
         }
 
-        // Same distrust of on-disk header fields as Parse: no CRCs, so a
-        // zeroed/corrupt SizeOfPartitionEntry would otherwise divide by
-        // zero, and a wild entryCount/entryStartLba would drive unbounded
-        // or out-of-range I/O.
-        ulong entryStartLba = BitConverter.ToUInt64(header.Slice(HeaderEntryArrayLbaOffset, UInt64FieldSize));
-        uint entryCount = BitConverter.ToUInt32(header.Slice(HeaderEntryCountOffset, UInt32FieldSize));
-        uint entrySize = BitConverter.ToUInt32(header.Slice(HeaderEntrySizeOffset, UInt32FieldSize));
-        if (entrySize < PartitionEntrySizeBytes || entrySize > blockSize
-            || entryCount > MaxEntryCount
-            || entryStartLba < EntryArrayLba || entryStartLba >= device.BlockCount)
+        // AddPartition, ResizePartition and MovePartition all refuse a range
+        // that overlaps another entry: two entries aliasing the same sectors
+        // let a write through one corrupt the other, and with CRCs written
+        // as 0 nothing downstream would notice.
+        if (OverlapsOtherEntry(device, layout, NoEntryIndex, startSector, sectorCount))
         {
             return false;
         }
 
-        uint entriesPerSector = (uint)(blockSize / entrySize);
-        if (entriesPerSector == 0)
-        {
-            return false;
-        }
-
-        // Same end-of-array bound as Parse: never read (or claim a slot
-        // in) sectors past the end of the device.
-        ulong arraySectors = ((ulong)entryCount + entriesPerSector - 1) / entriesPerSector;
-        if (entryStartLba + arraySectors > device.BlockCount)
-        {
-            return false;
-        }
+        (ulong entryStartLba, uint entryCount, uint entrySize, uint entriesPerSector, _) = layout;
+        ulong blockSize = device.BlockSize;
 
         Span<byte> sector = new byte[blockSize];
         for (uint s = 0; s < entryCount; s += entriesPerSector)
@@ -430,7 +372,7 @@ public static class Gpt
     /// </summary>
     public static bool RemovePartition(IBlockDevice device, int index)
     {
-        return MutateEntry(device, index, (Span<byte> entry) =>
+        return MutateEntry(device, index, (Span<byte> entry, EntryArrayLayout _) =>
         {
             entry.Clear();
             return true;
@@ -450,12 +392,14 @@ public static class Gpt
             return false;
         }
 
-        return MutateEntry(device, index, (Span<byte> entry) =>
+        return MutateEntry(device, index, (Span<byte> entry, EntryArrayLayout layout) =>
         {
             ulong startLba = BitConverter.ToUInt64(entry.Slice(EntryFirstLbaOffset, UInt64FieldSize));
             // Same write-time rejection as AddPartition: never stamp a
-            // geometry this file's own Parse would drop.
-            if (newSectorCount > device.BlockCount - startLba)
+            // geometry this file's own Parse would drop, and never grow
+            // into a neighbour.
+            if (newSectorCount > device.BlockCount - startLba
+                || OverlapsOtherEntry(device, layout, index, startLba, newSectorCount))
             {
                 return false;
             }
@@ -471,16 +415,17 @@ public static class Gpt
     /// </summary>
     public static bool MovePartition(IBlockDevice device, int index, ulong newStartSector)
     {
-        return MutateEntry(device, index, (Span<byte> entry) =>
+        return MutateEntry(device, index, (Span<byte> entry, EntryArrayLayout layout) =>
         {
             ulong startLba = BitConverter.ToUInt64(entry.Slice(EntryFirstLbaOffset, UInt64FieldSize));
             ulong endLba = BitConverter.ToUInt64(entry.Slice(EntryLastLbaOffset, UInt64FieldSize));
             ulong sectorCount = endLba + 1 - startLba;
             // Same write-time rejection as AddPartition: a start inside the
-            // GPT structures or a range past the disk end must not be
-            // stamped into the table.
+            // GPT structures, a range past the disk end or a range on top
+            // of a neighbour must not be stamped into the table.
             if (newStartSector < FirstUsableLba || newStartSector >= device.BlockCount
-                || sectorCount > device.BlockCount - newStartSector)
+                || sectorCount > device.BlockCount - newStartSector
+                || OverlapsOtherEntry(device, layout, index, newStartSector, sectorCount))
             {
                 return false;
             }
@@ -495,21 +440,39 @@ public static class Gpt
     /// region and returns false, having written nothing, to abort the mutation.
     /// </summary>
     /// <param name="entry">The entry's 0..55 byte region.</param>
+    /// <param name="layout">The validated entry array geometry, for overlap checks against the other entries.</param>
     /// <returns>true when <paramref name="entry"/> was rewritten and should be committed.</returns>
-    private delegate bool EntryMutator(Span<byte> entry);
+    private delegate bool EntryMutator(Span<byte> entry, EntryArrayLayout layout);
 
     /// <summary>
-    /// Locate the <paramref name="index"/>-th non-empty entry in the
-    /// partition entry array, apply <paramref name="mutator"/> to it, and
-    /// write the containing sector back. Returns false when the header is
-    /// missing/corrupt, the index does not resolve to a used slot, or the
-    /// mutator aborts. Applies the same distrust of on-disk header fields
-    /// as <see cref="Parse"/> — CRCs are 0, so every field is range-checked
-    /// before it drives I/O.
+    /// Value of an <c>excludeIndex</c> meaning no entry is exempt from the
+    /// overlap check, for a partition that does not exist yet.
     /// </summary>
-    private static bool MutateEntry(IBlockDevice device, int index, EntryMutator mutator)
+    private const int NoEntryIndex = -1;
+
+    /// <summary>
+    /// Geometry of the partition entry array as declared by a validated
+    /// primary header: where it starts, how many entries it declares, how
+    /// large each is, and how those pack into sectors.
+    /// </summary>
+    private readonly record struct EntryArrayLayout(
+        ulong EntryStartLba,
+        uint EntryCount,
+        uint EntrySize,
+        uint EntriesPerSector,
+        ulong ArraySectors);
+
+    /// <summary>
+    /// Read the primary header and range-check every field that drives
+    /// I/O. Trust nothing beyond the signature: CRC32s are written as 0 by
+    /// this format, so corruption is undetectable, a zeroed entry size
+    /// would divide by zero, and a wild count or array LBA would drive
+    /// unbounded or out-of-range reads.
+    /// </summary>
+    private static bool TryReadEntryArrayLayout(IBlockDevice device, out EntryArrayLayout layout)
     {
-        if (index < 0 || device.BlockCount < MinGptBlockCount)
+        layout = default;
+        if (device.BlockCount < MinGptBlockCount)
         {
             return false;
         }
@@ -538,13 +501,97 @@ public static class Gpt
             return false;
         }
 
-        // Same end-of-array bound as Parse: never read sectors past the end
-        // of the device.
+        // Bound the end of the array too: a start LBA near the disk end
+        // with a large count would otherwise still drive out-of-range reads.
         ulong arraySectors = ((ulong)entryCount + entriesPerSector - 1) / entriesPerSector;
         if (entryStartLba + arraySectors > device.BlockCount)
         {
             return false;
         }
+
+        layout = new EntryArrayLayout(entryStartLba, entryCount, entrySize, entriesPerSector, arraySectors);
+        return true;
+    }
+
+    /// <summary>
+    /// Whether [<paramref name="startSector"/>, +<paramref name="sectorCount"/>)
+    /// intersects a partition other than the one at
+    /// <paramref name="excludeIndex"/> in <see cref="Parse"/>'s index space,
+    /// or any partition at all when the index is negative. Every writer in
+    /// this class asks this before stamping an entry, and
+    /// <see cref="PartitionManager.MoveWithData"/> asks it before copying
+    /// data so a refused move never touches the disk. A disk without a valid
+    /// header has no entries to overlap. The range must already be bounded
+    /// against the device.
+    /// </summary>
+    internal static bool OverlapsOtherEntry(IBlockDevice device, int excludeIndex, ulong startSector, ulong sectorCount)
+    {
+        return TryReadEntryArrayLayout(device, out EntryArrayLayout layout)
+            && OverlapsOtherEntry(device, layout, excludeIndex, startSector, sectorCount);
+    }
+
+    private static bool OverlapsOtherEntry(IBlockDevice device, EntryArrayLayout layout, int excludeIndex, ulong startSector, ulong sectorCount)
+    {
+        (ulong entryStartLba, uint entryCount, uint entrySize, uint entriesPerSector, ulong arraySectors) = layout;
+        int seen = 0;
+        Span<byte> sector = new byte[device.BlockSize];
+        for (uint s = 0; s < entryCount; s += entriesPerSector)
+        {
+            device.ReadBlock(entryStartLba + s / entriesPerSector, 1, sector);
+            uint thisSector = (uint)Math.Min((ulong)entriesPerSector, entryCount - s);
+            for (uint j = 0; j < thisSector; j++)
+            {
+                int offset = (int)(j * entrySize);
+                if (IsZero(sector.Slice(offset, GuidFieldSize)))
+                {
+                    continue;
+                }
+
+                // Count only the entries Parse reports, so excludeIndex
+                // names the same partition here as it does in MutateEntry.
+                ulong otherStart = BitConverter.ToUInt64(sector.Slice(offset + EntryFirstLbaOffset, UInt64FieldSize));
+                ulong otherEnd = BitConverter.ToUInt64(sector.Slice(offset + EntryLastLbaOffset, UInt64FieldSize));
+                if (otherEnd < otherStart || otherStart < entryStartLba + arraySectors || otherEnd >= device.BlockCount)
+                {
+                    continue;
+                }
+
+                int thisIndex = seen;
+                seen++;
+                if (thisIndex == excludeIndex)
+                {
+                    continue;
+                }
+
+                // otherEnd is inclusive.
+                if (startSector <= otherEnd && otherStart < startSector + sectorCount)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Locate the <paramref name="index"/>-th non-empty entry in the
+    /// partition entry array, apply <paramref name="mutator"/> to it, and
+    /// write the containing sector back. Returns false when the header is
+    /// missing/corrupt, the index does not resolve to a used slot, or the
+    /// mutator aborts. Applies the same distrust of on-disk header fields
+    /// as <see cref="Parse"/> — CRCs are 0, so every field is range-checked
+    /// before it drives I/O.
+    /// </summary>
+    private static bool MutateEntry(IBlockDevice device, int index, EntryMutator mutator)
+    {
+        if (index < 0 || !TryReadEntryArrayLayout(device, out EntryArrayLayout layout))
+        {
+            return false;
+        }
+
+        (ulong entryStartLba, uint entryCount, uint entrySize, uint entriesPerSector, ulong arraySectors) = layout;
+        ulong blockSize = device.BlockSize;
 
         int seen = 0;
         Span<byte> sector = new byte[blockSize];
@@ -579,7 +626,7 @@ public static class Gpt
 
                 if (seen == index)
                 {
-                    if (!mutator(sector.Slice(offset, (int)entrySize)))
+                    if (!mutator(sector.Slice(offset, (int)entrySize), layout))
                     {
                         return false;
                     }

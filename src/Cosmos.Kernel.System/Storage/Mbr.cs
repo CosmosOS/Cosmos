@@ -398,6 +398,22 @@ public static class Mbr
     }
 
     /// <summary>
+    /// Whether [<paramref name="startSector"/>, +<paramref name="sectorCount"/>)
+    /// intersects a primary entry other than slot <paramref name="excludeIndex"/>,
+    /// or any primary when the slot is negative. The extended container
+    /// counts as occupied, since its logicals live inside it. Every writer
+    /// in this class asks this before stamping an entry, and
+    /// <see cref="PartitionManager.MoveWithData"/> asks it before copying
+    /// data so a refused move never touches the disk.
+    /// </summary>
+    internal static bool OverlapsOtherPrimary(IBlockDevice device, int excludeIndex, ulong startSector, ulong sectorCount)
+    {
+        Span<byte> mbr = new byte[device.BlockSize];
+        device.ReadBlock(MbrSectorLba, 1, mbr);
+        return OverlapsOtherPrimary(mbr, excludeIndex, startSector, sectorCount);
+    }
+
+    /// <summary>
     /// True when [<paramref name="startSector"/>, +<paramref name="sectorCount"/>)
     /// intersects any occupied primary slot other than <paramref name="index"/>.
     /// Slots with geometry <see cref="Parse"/> would drop are skipped.

@@ -255,20 +255,60 @@ public static class Ebr
         int logicalIndex,
         ulong newStartSector)
     {
+        if (!TryPlanMove(device, extendedStartSector, logicalIndex, newStartSector, out ChainNode node, out uint newRelative))
+        {
+            return false;
+        }
+
+        WriteEbrSector(
+            device,
+            node.EbrLba,
+            node.LogicalSystemId,
+            newRelative,
+            node.LogicalSectorCount,
+            node.NextRelative);
+        return true;
+    }
+
+    /// <summary>
+    /// Whether the <paramref name="logicalIndex"/>-th logical partition may
+    /// have its data start at <paramref name="newStartSector"/>: past its
+    /// own EBR sector, and ending no later than the next logical's EBR
+    /// sector or the container's end. <see cref="MoveLogical"/> applies
+    /// exactly this test when it stamps the entry, and
+    /// <see cref="PartitionManager.MoveWithData"/> asks it before copying
+    /// data so a refused move never touches the disk.
+    /// </summary>
+    internal static bool CanMoveLogical(IBlockDevice device, ulong extendedStartSector, int logicalIndex, ulong newStartSector)
+    {
+        return TryPlanMove(device, extendedStartSector, logicalIndex, newStartSector, out _, out _);
+    }
+
+    private static bool TryPlanMove(
+        IBlockDevice device,
+        ulong extendedStartSector,
+        int logicalIndex,
+        ulong newStartSector,
+        out ChainNode node,
+        out uint newRelative)
+    {
+        node = default;
+        newRelative = 0;
+
         List<ChainNode> chain = WalkChain(device, extendedStartSector);
         if (logicalIndex < 0 || logicalIndex >= chain.Count)
         {
             return false;
         }
 
-        ChainNode node = chain[logicalIndex];
+        node = chain[logicalIndex];
         if (newStartSector <= node.EbrLba)
         {
             return false;
         }
 
-        ulong newRelative = newStartSector - node.EbrLba;
-        if (newRelative > uint.MaxValue)
+        ulong relative = newStartSector - node.EbrLba;
+        if (relative > uint.MaxValue)
         {
             return false;
         }
@@ -282,13 +322,7 @@ public static class Ebr
             return false;
         }
 
-        WriteEbrSector(
-            device,
-            node.EbrLba,
-            node.LogicalSystemId,
-            (uint)newRelative,
-            node.LogicalSectorCount,
-            node.NextRelative);
+        newRelative = (uint)relative;
         return true;
     }
 
