@@ -137,6 +137,8 @@ public abstract class Canvas3D : Canvas
     /// </summary>
     /// <param name="mesh">The mesh to draw; must have been created by this canvas.</param>
     /// <param name="world">The model-to-world transform of the mesh.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="mesh"/> is null.</exception>
+    /// <exception cref="ArgumentException"><paramref name="mesh"/> was not created by this canvas, has been disposed, or maps a texture that has been disposed.</exception>
     public abstract void DrawMesh(Mesh mesh, in Matrix4x4 world);
 
     /// <summary>

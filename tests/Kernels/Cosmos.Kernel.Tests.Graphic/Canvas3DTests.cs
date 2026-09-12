@@ -39,6 +39,9 @@ public static unsafe class Canvas3DTests
     /// <summary>SVGA_3D_CMD_SURFACE_DEFINE (SVGA_3D_CMD_BASE + 0).</summary>
     private const uint CmdSurfaceDefine = 1040;
 
+    /// <summary>SVGA_3D_CMD_SURFACE_DESTROY (SVGA_3D_CMD_BASE + 1).</summary>
+    private const uint CmdSurfaceDestroy = 1041;
+
     /// <summary>SVGA_3D_CMD_CONTEXT_DEFINE (SVGA_3D_CMD_BASE + 5).</summary>
     private const uint CmdContextDefine = 1045;
 
@@ -77,6 +80,9 @@ public static unsafe class Canvas3DTests
 
     /// <summary>Injected surface id of the cube's index buffer (the demo's ebo).</summary>
     private const uint IndexSid = 333;
+
+    /// <summary>Injected surface id of the texture the disposed-texture test creates and destroys.</summary>
+    private const uint TextureSid = 444;
 
     private static PciDevice? s_device;
     private static SvgaIIDriver? s_driver;
@@ -466,6 +472,45 @@ public static unsafe class Canvas3DTests
         Assert.Equal(1u, FifoDword(start + 172), "world transform follows");
         Assert.Equal(start + 360, s_driver.GetFIFO(FIFO.NextCmd), "view+projection+world+draw and nothing else");
 
+        Rewind(start);
+    }
+
+    /// <summary>
+    /// Disposing a texture must destroy its surface and leave every mesh
+    /// that still maps it undrawable: DrawMesh rejects the mesh before
+    /// anything reaches the FIFO, so the freed surface id is never bound
+    /// again. The texture is injected with a known id because uploading one
+    /// needs a live device. Without the rejection the draw bound the dead id
+    /// and the device sampled whatever surface had reused it since.
+    /// </summary>
+    public static void TestDisposedTextureRejected()
+    {
+        uint start = CaptureStart();
+        Texture texture = new(s_canvas!, 2, 2, new SVGA3dSurfaceImageId { sid = TextureSid });
+        Mesh quad = new(s_canvas!, 4, 6, texture, MeshTopology.Triangles)
+        {
+            DriverData = SvgaII3DCanvas.BuildMeshData([5, 6], hasColors: false, hasUvs: true, 7, 6, MeshTopology.Triangles),
+        };
+
+        texture.Dispose();
+
+        Assert.Equal(CmdSurfaceDestroy, FifoDword(start), "dispose destroys the surface");
+        Assert.Equal(TextureSid, FifoDword(start + 8), "the destroyed surface is the texture's");
+        Assert.True(texture.DriverData is null, "the driver slot goes with the surface");
+
+        uint afterDispose = CaptureStart();
+        try
+        {
+            s_canvas!.DrawMesh(quad, Matrix4x4.Identity);
+            Assert.Fail("a mesh mapping a disposed texture was drawn");
+        }
+        catch (ArgumentException)
+        {
+        }
+
+        Assert.Equal(afterDispose, s_driver!.GetFIFO(FIFO.NextCmd), "the rejected draw writes nothing to the FIFO");
+
+        quad.Dispose();
         Rewind(start);
     }
 

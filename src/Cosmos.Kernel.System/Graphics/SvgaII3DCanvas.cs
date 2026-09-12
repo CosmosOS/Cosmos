@@ -141,6 +141,11 @@ internal sealed class SvgaII3DCanvas : Canvas3D
             throw new ArgumentException("The mesh was not created by this canvas or has been disposed.", nameof(mesh));
         }
 
+        if (mesh.Texture is { IsDisposed: true })
+        {
+            throw new ArgumentException("The mesh maps a texture that has been disposed.", nameof(mesh));
+        }
+
         EnsureCamera();
         BindTexture(mesh.Texture);
         _driver3D.SetTransform(_context, SVGA3dTransformType.SVGA3D_TRANSFORM_WORLD, world);
@@ -287,6 +292,7 @@ internal sealed class SvgaII3DCanvas : Canvas3D
     {
         SVGA3dSurfaceImageId surface = (SVGA3dSurfaceImageId)texture.DriverData!;
         _driver3D.DestroySurface(surface.sid);
+        texture.DriverData = null;
 
         if (ReferenceEquals(_boundTexture, texture))
         {

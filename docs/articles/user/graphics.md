@@ -302,7 +302,7 @@ if (canvas is Canvas3D canvas3D)
 }
 ```
 
-`Canvas3D` is a `Canvas`, so every 2D call still works on it and `Display()` presents the frame either way. Meshes come from `CreateMesh` and textures from `CreateTexture(Image)`; `DrawMesh(mesh, world)` places one with a transform. `IsAccelerated` reports whether the drawing is going through the device rather than the CPU.
+`Canvas3D` is a `Canvas`, so every 2D call still works on it and `Display()` presents the frame either way. Meshes come from `CreateMesh` and textures from `CreateTexture(Image)`; `DrawMesh(mesh, world)` places one with a transform. Disposing a texture releases its device memory, and `DrawMesh` rejects a mesh that still maps it. `IsAccelerated` reports whether the drawing is going through the device rather than the CPU.
 
 A kernel cannot implement `Canvas3D` itself. Its constructor is `private protected` and both implementations are internal, so the abstract members on it are call targets, not an extension contract.
 

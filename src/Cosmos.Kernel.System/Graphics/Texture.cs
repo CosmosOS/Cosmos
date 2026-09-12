@@ -18,9 +18,10 @@ public sealed class Texture : IDisposable
 
     /// <summary>
     /// Backend-specific resource data, owned by the canvas that created the
-    /// texture.
+    /// texture. The canvas clears it when it releases the device resource,
+    /// so the slot is set exactly while that resource exists.
     /// </summary>
-    internal object? DriverData { get; }
+    internal object? DriverData { get; set; }
 
     internal Texture(Canvas3D owner, int width, int height, object? driverData)
     {
@@ -43,8 +44,10 @@ public sealed class Texture : IDisposable
     internal bool IsDisposed => _disposed;
 
     /// <summary>
-    /// Releases the device memory held by this texture. The texture must no
-    /// longer be referenced by any mesh that is still drawn.
+    /// Releases the device memory held by this texture. A mesh that still
+    /// maps it can no longer be drawn:
+    /// <see cref="Canvas3D.DrawMesh(Mesh, in global::System.Numerics.Matrix4x4)"/>
+    /// rejects it.
     /// </summary>
     public void Dispose()
     {

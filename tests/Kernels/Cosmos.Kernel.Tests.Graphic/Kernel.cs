@@ -73,6 +73,7 @@ public class Kernel : Sys.Kernel
         TR.RunIf(Canvas3DTests.Ready, "Canvas3D_MeshValidation", Canvas3DTests.TestMeshValidation, Canvas3DTests.SkipNoDevice);
         TR.RunIf(Canvas3DTests.Ready, "Canvas3D_DrawCube_Fifo", Canvas3DTests.TestDrawCubeFifo, Canvas3DTests.SkipNoDevice);
         TR.RunIf(Canvas3DTests.Ready, "Canvas3D_CameraCaching_Fifo", Canvas3DTests.TestCameraCachingFifo, Canvas3DTests.SkipNoDevice);
+        TR.RunIf(Canvas3DTests.Ready, "Canvas3D_DisposedTexture_Rejected", Canvas3DTests.TestDisposedTextureRejected, Canvas3DTests.SkipNoDevice);
         TR.Run("Canvas3D_Discovery", Canvas3DTests.TestCanvas3DDiscovery);
 
         Log.WriteString("[Graphic Tests] All tests completed\n");
