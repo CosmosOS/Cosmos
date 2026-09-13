@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.System.Graphics;
 /// Represents a video mode: the width and height of the display in pixels, and
 /// the number of bits each pixel takes.
 /// </summary>
-public readonly struct Mode
+public readonly struct Mode : IEquatable<Mode>
 {
     /// <summary>
     /// The width of the display mode, in pixels.

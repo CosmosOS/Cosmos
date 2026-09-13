@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 /// <summary>
 /// Represents a IPv4 address.
 /// </summary>
-public sealed class Address : IComparable<Address>
+public sealed class Address : IComparable<Address>, IEquatable<Address>
 {
     private uint _id;
 
@@ -151,17 +151,18 @@ public sealed class Address : IComparable<Address>
         return Id.CompareTo(other.Id);
     }
 
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
+    /// <summary>
+    /// Checks whether <paramref name="other"/> holds the same four bytes.
+    /// </summary>
+    /// <param name="other">The address to compare with, or <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> for the same four bytes; <see langword="false"/> otherwise and for <see langword="null"/>.</returns>
+    public bool Equals(Address? other)
     {
-        if (obj is Address other)
-        {
-            return Parts.SequenceEqual(other.Parts);
-        }
-
-        return false; // obj is not an Address
-
+        return other is not null && Parts.SequenceEqual(other.Parts);
     }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => Equals(obj as Address);
 
     /// <inheritdoc />
     public override int GetHashCode()
