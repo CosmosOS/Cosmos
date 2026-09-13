@@ -49,9 +49,13 @@ internal static unsafe partial class GarbageCollector
             var storeEnum = s_gCHandleManager.DependentHandleStore.GetEnumerator();
             while (storeEnum.MoveNext())
             {
-                if (storeEnum.Current->Object->IsMarked && !((GCObject*)storeEnum.Current->ExtraInfo)->IsMarked)
+                // No secondary means nothing to keep alive: ConditionalWeakTable stores a null
+                // value as a dependent handle without one (SharedArrayPool registers its
+                // thread-local buckets that way), so the mark bit must not be read through it.
+                GCObject* secondary = (GCObject*)storeEnum.Current->ExtraInfo;
+                if (secondary != null && storeEnum.Current->Object->IsMarked && !secondary->IsMarked)
                 {
-                    TryMarkRoot(storeEnum.Current->ExtraInfo);
+                    TryMarkRoot((nint)secondary);
                     markedNew = true;
                 }
             }

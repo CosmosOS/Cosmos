@@ -546,7 +546,7 @@ internal static unsafe class FileDescriptorTable
         }
 
         bool oldIsDirectory = oldStat.IsDirectory;
-        if (oldIsDirectory && newFull.StartsWith(oldFull + "/", StringComparison.Ordinal))
+        if (oldIsDirectory && newFull.StartsWith($"{oldFull}/", StringComparison.Ordinal))
         {
             return PalError.EINVAL;
         }

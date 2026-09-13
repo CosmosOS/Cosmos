@@ -234,7 +234,6 @@ public class UdpPacket : IPPacket
     /// <returns>A human-readable summary of the packet.</returns>
     public override string ToString()
     {
-        return "UDP Packet Src=" + SourceIP + ":" + SourcePort + "," +
-                "Dest=" + DestinationIP + ":" + DestinationPort + ", DataLen=" + UdpDataLength;
+        return $"UDP Packet Src={SourceIP}:{SourcePort},Dest={DestinationIP}:{DestinationPort}, DataLen={UdpDataLength}";
     }
 }

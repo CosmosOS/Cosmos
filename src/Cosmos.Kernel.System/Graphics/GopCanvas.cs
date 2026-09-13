@@ -322,7 +322,7 @@ internal class GopCanvas : Canvas
 
                 break;
             default:
-                throw new NotImplementedException("Drawing pixels with color depth " + (int)Mode.ColorDepth + "is not yet supported.");
+                throw new NotImplementedException($"Drawing pixels with color depth {(int)Mode.ColorDepth} is not yet supported.");
         }
     }
 
@@ -350,7 +350,7 @@ internal class GopCanvas : Canvas
 
                 break;
             default:
-                throw new NotImplementedException("Drawing pixels with color depth " + (int)Mode.ColorDepth + " is not yet supported.");
+                throw new NotImplementedException($"Drawing pixels with color depth {(int)Mode.ColorDepth} is not yet supported.");
         }
     }
 

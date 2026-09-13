@@ -463,8 +463,6 @@ public class TcpPacket : IPPacket
     /// <returns>A human readable summary of the segment.</returns>
     public override string ToString()
     {
-        return "TCP Packet " + SourceIP + ":" + SourcePort +
-            " -> " + DestinationIP + ":" + DestinationPort + " (flags=" + GetFlags() +
-            ", seq=" + SequenceNumber + ", ack=" + AckNumber + ")";
+        return $"TCP Packet {SourceIP}:{SourcePort} -> {DestinationIP}:{DestinationPort} (flags={GetFlags()}, seq={SequenceNumber}, ack={AckNumber})";
     }
 }

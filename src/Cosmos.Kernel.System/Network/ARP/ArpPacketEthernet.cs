@@ -123,8 +123,7 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// <returns>A string representation of the packet.</returns>
     public override string ToString()
     {
-        return "IPv4 Ethernet ARP Packet SenderMac=" + _senderMac + ", TargetMac=" + _targetMac + ", SenderIP=" + _senderIP +
-            ", TargetIP=" + _targetIP + ", Operation=" + _opCode;
+        return $"IPv4 Ethernet ARP Packet SenderMac={_senderMac}, TargetMac={_targetMac}, SenderIP={_senderIP}, TargetIP={_targetIP}, Operation={_opCode}";
     }
 }
 
@@ -170,7 +169,7 @@ public class ArpReplyEthernet : ArpPacketEthernet
     /// <returns>A string representation of the packet.</returns>
     public override string ToString()
     {
-        return "ARP Reply Src=" + _srcMAC + ", Dest=" + _destMAC + ", Sender=" + _senderIP + ", Target=" + _targetIP;
+        return $"ARP Reply Src={_srcMAC}, Dest={_destMAC}, Sender={_senderIP}, Target={_targetIP}";
     }
 }
 
@@ -219,6 +218,6 @@ public class ArpRequestEthernet : ArpPacketEthernet
     /// <returns>A string representation of the packet.</returns>
     public override string ToString()
     {
-        return "ARP Request Src=" + _srcMAC + ", Dest=" + _destMAC + ", Sender=" + _senderIP + ", Target=" + _targetIP;
+        return $"ARP Request Src={_srcMAC}, Dest={_destMAC}, Sender={_senderIP}, Target={_targetIP}";
     }
 }

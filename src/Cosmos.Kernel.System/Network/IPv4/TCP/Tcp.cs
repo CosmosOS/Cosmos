@@ -431,7 +431,7 @@ internal class Tcp : IDisposable
                         ProcessCloseWait(packet);
                         break;
                     default:
-                        Serial.WriteString("[TCP] Unknown TCP connection state = " + (int)Status + "\n");
+                        Serial.WriteString($"[TCP] Unknown TCP connection state = {(int)Status}\n");
                         break;
                 }
             }
@@ -549,7 +549,7 @@ internal class Tcp : IDisposable
             else
             {
                 Status = Status.CLOSED;
-                Serial.WriteString("[TCP] Connection closed! (" + packet.GetFlags() + " received on SYN_SENT state)\n");
+                Serial.WriteString($"[TCP] Connection closed! ({packet.GetFlags()} received on SYN_SENT state)\n");
             }
         }
         else if (packet._ack)

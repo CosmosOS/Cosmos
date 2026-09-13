@@ -120,6 +120,6 @@ public readonly struct Mode : IEquatable<Mode>
     /// </summary>
     public override string ToString()
     {
-        return Width + "x" + Height + "@" + (int)ColorDepth;
+        return $"{Width}x{Height}@{(int)ColorDepth}";
     }
 }

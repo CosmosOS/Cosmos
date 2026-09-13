@@ -186,10 +186,10 @@ public sealed class DhcpClient : UdpClient
                 else
                 {
                     Serial.WriteString("[DHCP ACK] Packet received, applying IP configuration...\n");
-                    Serial.WriteString("   IP Address  : " + packet.Client.ToString() + "\n");
-                    Serial.WriteString("   Subnet mask : " + (packet.Subnet?.ToString() ?? "null") + "\n");
-                    Serial.WriteString("   Gateway     : " + (packet.Gateway?.ToString() ?? "null") + "\n");
-                    Serial.WriteString("   DNS server  : " + (packet.DNS?.ToString() ?? "null") + "\n");
+                    Serial.WriteString($"   IP Address  : {packet.Client}\n");
+                    Serial.WriteString($"   Subnet mask : {packet.Subnet?.ToString() ?? "null"}\n");
+                    Serial.WriteString($"   Gateway     : {packet.Gateway?.ToString() ?? "null"}\n");
+                    Serial.WriteString($"   DNS server  : {packet.DNS?.ToString() ?? "null"}\n");
 
                     IPConfig.Enable(networkDevice, packet.Client, packet.Subnet ?? new Address(255, 255, 255, 0), packet.Gateway ?? Address.Zero);
                     if (packet.DNS != null)

@@ -42,7 +42,7 @@ public sealed class EndPoint : IComparable<EndPoint>, IEquatable<EndPoint>
     /// </summary>
     public override string ToString()
     {
-        return Address.ToString() + ":" + Port.ToString();
+        return $"{Address}:{Port}";
     }
 
     /// <summary>
