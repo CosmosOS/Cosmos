@@ -2,7 +2,6 @@
 abstract Cosmos.Kernel.System.Graphics.Canvas3D.ClearScene(System.Drawing.Color color, float depth = 1) -> void
 abstract Cosmos.Kernel.System.Graphics.Canvas3D.CreateTexture(Cosmos.Kernel.System.Graphics.Image! image) -> Cosmos.Kernel.System.Graphics.Texture!
 abstract Cosmos.Kernel.System.Graphics.Canvas3D.DrawMesh(Cosmos.Kernel.System.Graphics.Mesh! mesh, in System.Numerics.Matrix4x4 world) -> void
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.IsAccelerated.get -> bool
 abstract Cosmos.Kernel.System.Kernel.Run() -> void
 abstract Cosmos.Kernel.System.Keyboard.ScanMapBase.InitializeKeys() -> void
 const Cosmos.Kernel.System.Diagnostics.SchedulerInfo.NanosecondsPerMillisecond = 1000000 -> ulong
@@ -522,8 +521,7 @@ override Cosmos.Kernel.System.Network.IPv4.EndPoint.GetHashCode() -> int
 override Cosmos.Kernel.System.Network.IPv4.EndPoint.ToString() -> string!
 override Cosmos.Kernel.System.Network.NetworkAdapter.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.NetworkAdapter.GetHashCode() -> int
-static Cosmos.Kernel.System.Diagnostics.Log.Write(params object?[]! args) -> void
-static Cosmos.Kernel.System.Diagnostics.Log.Write(string? text) -> void
+static Cosmos.Kernel.System.Diagnostics.Log.Write(params System.ReadOnlySpan<object?> args) -> void
 static Cosmos.Kernel.System.Diagnostics.Log.WriteBytes(System.ReadOnlySpan<byte> bytes) -> void
 static Cosmos.Kernel.System.Diagnostics.Log.WriteHex(uint number) -> void
 static Cosmos.Kernel.System.Diagnostics.Log.WriteHex(ulong number) -> void

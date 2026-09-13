@@ -20,19 +20,6 @@ public static class Log
     public static void WriteString(string text) => Serial.WriteString(text);
 
     /// <summary>
-    /// Writes a string to the log without appending a line terminator. This
-    /// overload exists so that <c>Log.Write("text")</c> keeps the
-    /// allocation-free promise made at the top of this class: without it the
-    /// call binds to the params overload below, which allocates an array for
-    /// its one argument. It takes the same nullable parameter and writes the
-    /// same <c>null</c> for one, so binding here rather than there changes
-    /// what a call allocates and nothing else. Use
-    /// <see cref="WriteString"/> where the argument cannot be null.
-    /// </summary>
-    /// <param name="text">Text to write, or null to write <c>null</c>.</param>
-    public static void Write(string? text) => Serial.WriteString(text ?? "null");
-
-    /// <summary>
     /// Writes an unsigned 64-bit number in decimal. Use
     /// <see cref="WriteHex(ulong)"/> for base-16 digits.
     /// </summary>
@@ -92,11 +79,14 @@ public static class Log
     /// Writes each value in order: strings and characters as text, integers
     /// in decimal, bytes and byte arrays in hexadecimal, booleans as
     /// <c>true</c>/<c>false</c>, <see langword="null"/> as <c>null</c>, and
-    /// anything else via <see cref="object.ToString"/>. Boxing the arguments
-    /// allocates; prefer the typed overloads on allocation-sensitive paths.
+    /// anything else via <see cref="object.ToString"/>. The argument list
+    /// itself costs nothing: the compiler builds it on the stack. A value
+    /// type passed here is still boxed, which does allocate, so prefer
+    /// <see cref="WriteString"/> and the <c>WriteNumber</c> overloads on
+    /// allocation-sensitive paths.
     /// </summary>
     /// <param name="args">Values to write.</param>
-    public static void Write(params object?[] args) => Serial.Write(args);
+    public static void Write(params ReadOnlySpan<object?> args) => Serial.Write(args);
 
     /// <summary>
     /// Writes raw bytes to the log stream as one uninterrupted sequence.

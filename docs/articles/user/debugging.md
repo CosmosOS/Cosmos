@@ -54,14 +54,13 @@ There is no `WriteLine`: append `"\n"` yourself, which is what the kernel does t
 | Call | Writes |
 |---|---|
 | `Log.WriteString(text)` | A string. Takes a non-null argument |
-| `Log.Write(text)` | The same, but accepts null and writes `null` for it |
-| `Log.Write(a, b, c)` | Each argument's `ToString()`, in order. This overload allocates |
+| `Log.Write(a, b, c)` | Each argument's `ToString()`, in order. Accepts null and writes `null` for it |
 | `Log.WriteNumber(n)` | A number in decimal. Overloads for `int`, `uint`, `long` and `ulong` |
 | `Log.WriteHex(n)` | A number in hexadecimal |
 | `Log.WriteHexWithPrefix(n)` | The same with a leading `0x` |
 | `Log.WriteBytes(span)` | Raw bytes, unformatted |
 
-Reach for `WriteString` and `WriteNumber` over `Write` on any path that runs often or runs early. `Write(string?)` costs the same as `WriteString`; the `params` overload builds an array per call, which is what you are avoiding by not using `Console`.
+Reach for `WriteString` and `WriteNumber` over `Write` on any path that runs often or runs early. The argument list of `Write` is built on the stack and costs nothing, but a number or a `bool` passed to it is boxed first, and that box is a heap allocation the typed overloads do not make.
 
 The serial port itself is behind the `CosmosEnableUART` feature switch. With it off the calls still return normally, but nothing reaches the serial stream, so a kernel that turns the switch off should not rely on `Log` for anything it needs to read back.
 

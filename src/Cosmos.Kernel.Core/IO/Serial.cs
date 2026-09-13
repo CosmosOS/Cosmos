@@ -259,7 +259,7 @@ internal static class Serial
         WriteNumber((ulong)number, true);
     }
 
-    public static void Write(params object?[] args)
+    public static void Write(params ReadOnlySpan<object?> args)
     {
         for (int i = 0; i < args.Length; i++)
         {

@@ -164,7 +164,7 @@ public static class InteropSysPlug
     internal static bool LowLevelMonitor_TimedWait(IntPtr monitor, int timeoutMilliseconds)
     {
         Log.Write("[LowLevelMonitor] LowLevelMonitor_TimedWait: BEGIN, timeout=");
-        Log.Write(timeoutMilliseconds);
+        Log.WriteNumber(timeoutMilliseconds);
         Log.Write("ms\n");
         var mon = GCHandle<Monitor>.FromIntPtr(monitor).Target;
 
