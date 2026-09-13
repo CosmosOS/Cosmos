@@ -16,7 +16,7 @@ using Cosmos.Kernel.Core.Runtime;
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 
 /// <summary>Decodes one method's GCInfo blob. Construct, then query / <see cref="EnumerateLiveSlots"/>.</summary>
-public unsafe struct GcInfoDecoder
+internal unsafe struct GcInfoDecoder
 {
     private const uint NO_STACK_BASE_REGISTER = 0xFFFFFFFF;
 

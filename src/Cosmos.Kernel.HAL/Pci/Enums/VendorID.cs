@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.HAL.Pci.Enums;
 
-public enum VendorId
+internal enum VendorId
 {
     Intel = 0x8086,
     Amd = 0x1022,

@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.HAL.X64.Devices.Input;
 /// <summary>
 /// PS/2 Mouse driver.
 /// </summary>
-public class PS2Mouse : MouseDevice
+internal class PS2Mouse : MouseDevice
 {
     private enum Command : byte
     {

@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.System.Graphics;
 /// Represents a single cell in the terminal grid.
 /// Each cell contains a character and its associated colors.
 /// </summary>
-public struct Cell
+internal struct Cell
 {
     /// <summary>
     /// The character displayed in this cell.

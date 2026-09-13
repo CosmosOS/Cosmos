@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.HAL.Devices.Network;
 /// VirtIO network device driver. Transport-agnostic: works over virtio MMIO
 /// (QEMU virt virtio-net-device) and virtio PCI (virtio-net-pci) alike.
 /// </summary>
-public unsafe class VirtioNet : INetworkDevice
+internal unsafe class VirtioNet : INetworkDevice
 {
     // --- Constants ---
 

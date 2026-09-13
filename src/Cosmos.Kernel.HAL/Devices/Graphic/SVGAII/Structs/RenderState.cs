@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
-public struct SVGA3dRenderState
+internal struct SVGA3dRenderState
 {
     [FieldOffset(0)]
     public SVGA3dRenderStateName state;

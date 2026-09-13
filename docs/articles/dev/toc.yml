@@ -10,6 +10,8 @@
   href: testing.md
 - name: Public API Tracking
   href: public-api.md
+- name: Public API - Accessing Internals
+  href: accessing-internals.md
 - name: Garbage Collector
   href: garbage-collector.md
 - name: Garbage Collector - Precise Stack Scan

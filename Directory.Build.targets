@@ -5,6 +5,33 @@
     <AotRuntimeBasePath>$(MSBuildThisFileDirectory)dotnet\runtime\src\coreclr\nativeaot\Runtime.Base\src\</AotRuntimeBasePath>
     <CompilerCommonPath>$(MSBuildThisFileDirectory)dotnet\runtime\src\coreclr\nativeaot\Common\src\</CompilerCommonPath>
   </PropertyGroup>
+  <!-- Property side of CosmosTrackPublicApi (see Directory.Build.props for the
+       flag's documentation). Must live here and not in the props: props are
+       imported before the project body sets the flag, so property conditions
+       on it never fire there. This file is imported after the project body. -->
+  <PropertyGroup Condition="'$(CosmosTrackPublicApi)' == 'true'">
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion Condition="'$(CosmosApiBaselineVersion)' != ''">$(CosmosApiBaselineVersion)</PackageValidationBaselineVersion>
+    <!-- RS0017 (stale txt entry) has no source location, so the .editorconfig
+         [*.cs] severity=error never applies to it; promote it here. RS0016 must
+         NOT be promoted this way: /warnaserror outranks .editorconfig and would
+         trample the per-file severity=none exclusions (LibraryInitializer,
+         KernelVersion.g.cs); its editorconfig error severity already works. -->
+    <WarningsAsErrors>$(WarningsAsErrors);RS0017</WarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- A tracked public surface must be documented, so CS1591 (missing XML doc)
+       is suppressed everywhere except there. Adding the suppression here is
+       what makes the condition possible: the props are imported before the
+       project body sets CosmosTrackPublicApi, so a property condition on the
+       flag is always false there. The error severity comes from the
+       .editorconfig [*.cs] section, not WarningsAsErrors, so it only reaches
+       files this repo's .editorconfig governs; sources linked from the
+       dotnet/runtime submodule keep their default severity. -->
+  <PropertyGroup Condition="'$(CosmosTrackPublicApi)' != 'true'">
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
   <Target Name="EnforceKernelReferenceRules" BeforeTargets="BeforeBuild">
     <PropertyGroup>
       <IsExcluded>$(MSBuildProjectName).StartsWith('Cosmos.Kernel')</IsExcluded>

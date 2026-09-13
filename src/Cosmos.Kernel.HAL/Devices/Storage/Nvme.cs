@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// <see cref="NvmeController"/> instances and all their namespaces show up
 /// in <see cref="Namespaces"/>.
 /// </summary>
-public static class Nvme
+internal static class Nvme
 {
     private static List<NvmeController>? s_controllers;
     private static List<NvmeNamespace>? s_namespaces;

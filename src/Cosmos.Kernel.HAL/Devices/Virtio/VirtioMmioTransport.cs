@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.HAL.Devices.Virtio;
 /// layout), so the platform initializer supplies the window address, the
 /// interrupt line, and the line-interrupt wiring callback.
 /// </summary>
-public sealed class VirtioMmioTransport : VirtioTransport
+internal sealed class VirtioMmioTransport : VirtioTransport
 {
     /// <summary>Virtio MMIO magic value ("virt" in little endian).</summary>
     public const uint Magic = 0x74726976;

@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.X64.Devices.Input;
 /// <summary>
 /// PS/2 Controller driver for managing keyboard and mouse devices.
 /// </summary>
-public class PS2Controller : Device
+internal class PS2Controller : Device
 {
     private enum Command : byte
     {

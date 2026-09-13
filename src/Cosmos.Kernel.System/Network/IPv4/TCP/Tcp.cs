@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.System.Network.IPv4.TCP;
 /// <summary>
 /// Represents a TCP connection status.
 /// </summary>
-public enum Status
+internal enum Status
 {
     /// <summary>
     /// Wait for a connection request from any remote TCP and port.
@@ -75,7 +75,7 @@ public enum Status
 /// <summary>
 /// Represents a Transmission Control Block (TCB).
 /// </summary>
-public class TransmissionControlBlock
+internal class TransmissionControlBlock
 {
     /** Send Sequence Variables **/
 
@@ -144,7 +144,7 @@ public class TransmissionControlBlock
 /// <remarks>
 /// See <a href="https://datatracker.ietf.org/doc/html/rfc793">RFC 793</a> for more information.
 /// </remarks>
-public class Tcp : IDisposable
+internal class Tcp : IDisposable
 {
     public static readonly ushort DynamicPortStart = 49152;
 
@@ -363,7 +363,7 @@ public class Tcp : IDisposable
     /// <summary>
     /// Handles incoming TCP packets according to the current connection status.
     /// </summary>
-    internal void ReceiveData(TCPPacket packet)
+    internal void ReceiveData(TcpPacket packet)
     {
         ReceiveDataInternal(packet);
 
@@ -376,7 +376,7 @@ public class Tcp : IDisposable
         }
     }
 
-    private void ReceiveDataInternal(TCPPacket packet)
+    private void ReceiveDataInternal(TcpPacket packet)
     {
         Serial.WriteString($"[{Table[(int)Status]}] {packet}\n");
 
@@ -403,7 +403,7 @@ public class Tcp : IDisposable
         else
         {
             // Check sequence number and segment data.
-            if (TCB.RcvNxt <= packet.SequenceNumber && packet.SequenceNumber + packet.TCP_DataLength < TCB.RcvNxt + TCB.RcvWnd)
+            if (TCB.RcvNxt <= packet.SequenceNumber && packet.SequenceNumber + packet.TcpDataLength < TCB.RcvNxt + TCB.RcvWnd)
             {
                 switch (Status)
                 {
@@ -437,7 +437,7 @@ public class Tcp : IDisposable
             {
                 if (!packet._rst)
                 {
-                    SendEmptyPacket(Flags.ACK);
+                    SendEmptyPacket(TcpFlags.ACK);
                 }
 
                 Serial.WriteString("[TCP] Sequence number or segment data invalid, packet passed.\n");
@@ -450,7 +450,7 @@ public class Tcp : IDisposable
     /// <summary>
     /// Processes a TCP LISTEN state packet and updates the connection status accordingly.
     /// </summary>
-    public void ProcessListen(TCPPacket packet)
+    public void ProcessListen(TcpPacket packet)
     {
         if (packet._rst)
         {
@@ -490,7 +490,7 @@ public class Tcp : IDisposable
             TCB.RcvUp = 0;
             TCB.IRS = packet.SequenceNumber;
 
-            SendEmptyPacket(Flags.SYN | Flags.ACK);
+            SendEmptyPacket(TcpFlags.SYN | TcpFlags.ACK);
 
             Status = Status.SYN_RECEIVED;
         }
@@ -499,7 +499,7 @@ public class Tcp : IDisposable
     /// <summary>
     /// Processes a TCP SYN_RECEIVED state packet and updates the connection status accordingly.
     /// </summary>
-    public void ProcessSynReceived(TCPPacket packet)
+    public void ProcessSynReceived(TcpPacket packet)
     {
         if (packet._ack)
         {
@@ -513,7 +513,7 @@ public class Tcp : IDisposable
             }
             else
             {
-                SendEmptyPacket(Flags.RST, packet.AckNumber);
+                SendEmptyPacket(TcpFlags.RST, packet.AckNumber);
             }
         }
     }
@@ -521,7 +521,7 @@ public class Tcp : IDisposable
     /// <summary>
     /// Processes a SYN_SENT state TCP packet and updates the connection state accordingly.
     /// </summary>
-    public void ProcessSynSent(TCPPacket packet)
+    public void ProcessSynSent(TcpPacket packet)
     {
         if (packet._syn)
         {
@@ -535,11 +535,11 @@ public class Tcp : IDisposable
                 TCB.SndWl1 = packet.SequenceNumber;
                 TCB.SndWl2 = packet.AckNumber;
 
-                SendEmptyPacket(Flags.ACK);
+                SendEmptyPacket(TcpFlags.ACK);
 
                 Status = Status.ESTABLISHED;
             }
-            else if (packet.TCPFlags == (byte)Flags.SYN)
+            else if (packet.FlagBits == (byte)TcpFlags.SYN)
             {
                 Status = Status.CLOSED;
                 Serial.WriteString("[TCP] Simultaneous open not supported.\n");
@@ -555,7 +555,7 @@ public class Tcp : IDisposable
             //Check for bad ACK packet
             if ((int)packet.AckNumber - TCB.ISS < 0 || packet.AckNumber - TCB.SndNxt > 0)
             {
-                SendEmptyPacket(Flags.RST, packet.AckNumber);
+                SendEmptyPacket(TcpFlags.RST, packet.AckNumber);
                 Serial.WriteString("[TCP] Bad ACK received at SYN_SENT.\n");
             }
             else
@@ -581,7 +581,7 @@ public class Tcp : IDisposable
     /// <summary>
     /// Processes a ESTABLISHED state TCP packet.
     /// </summary>
-    public void ProcessEstablished(TCPPacket packet)
+    public void ProcessEstablished(TcpPacket packet)
     {
         if (packet._ack)
         {
@@ -609,19 +609,19 @@ public class Tcp : IDisposable
             if (packet.AckNumber > TCB.SndNxt)
             {
                 Serial.WriteString("[TCP] ACK for unsent data, sending ACK\n");
-                SendEmptyPacket(Flags.ACK);
+                SendEmptyPacket(TcpFlags.ACK);
                 return;
             }
 
             if (packet._psh)
             {
                 Serial.WriteString("[TCP] PSH received, data length: ");
-                Serial.WriteNumber((ulong)packet.TCP_DataLength);
+                Serial.WriteNumber((ulong)packet.TcpDataLength);
                 Serial.WriteString(", storing data\n");
 
-                TCB.RcvNxt += packet.TCP_DataLength;
+                TCB.RcvNxt += packet.TcpDataLength;
 
-                AppendToData(packet.TCP_Data);
+                AppendToData(packet.TcpData);
 
                 Serial.WriteString("[TCP] Data buffer now has ");
                 Serial.WriteNumber((ulong)(_data?.Length ?? 0));
@@ -633,19 +633,19 @@ public class Tcp : IDisposable
                     Serial.WriteString("[TCP] PSH+FIN received, closing\n");
                     TCB.RcvNxt++;
 
-                    SendEmptyPacket(Flags.ACK);
+                    SendEmptyPacket(TcpFlags.ACK);
 
                     Status = Status.CLOSE_WAIT;
 
                     SimpleWait(300);
 
-                    SendEmptyPacket(Flags.FIN);
+                    SendEmptyPacket(TcpFlags.FIN);
 
                     Status = Status.LAST_ACK;
                 }
                 else
                 {
-                    SendEmptyPacket(Flags.ACK);
+                    SendEmptyPacket(TcpFlags.ACK);
                 }
                 return;
             }
@@ -654,18 +654,18 @@ public class Tcp : IDisposable
                 Serial.WriteString("[TCP] FIN received, closing connection\n");
                 TCB.RcvNxt++;
 
-                SendEmptyPacket(Flags.ACK);
+                SendEmptyPacket(TcpFlags.ACK);
 
                 WaitAndClose();
 
                 return;
             }
 
-            if (packet.TCP_DataLength > 0 && packet.SequenceNumber >= TCB.RcvNxt) //packet sequencing
+            if (packet.TcpDataLength > 0 && packet.SequenceNumber >= TCB.RcvNxt) //packet sequencing
             {
-                TCB.RcvNxt += packet.TCP_DataLength;
+                TCB.RcvNxt += packet.TcpDataLength;
 
-                AppendToData(packet.TCP_Data);
+                AppendToData(packet.TcpData);
             }
         }
         if (packet._rst)
@@ -678,13 +678,13 @@ public class Tcp : IDisposable
         {
             TCB.RcvNxt++;
 
-            SendEmptyPacket(Flags.ACK);
+            SendEmptyPacket(TcpFlags.ACK);
 
             Status = Status.CLOSE_WAIT;
 
             SimpleWait(300);
 
-            SendEmptyPacket(Flags.FIN);
+            SendEmptyPacket(TcpFlags.FIN);
 
             Status = Status.LAST_ACK;
         }
@@ -693,7 +693,7 @@ public class Tcp : IDisposable
     /// <summary>
     /// Process FIN_WAIT1 Status.
     /// </summary>
-    public void ProcessFinWait1(TCPPacket packet)
+    public void ProcessFinWait1(TcpPacket packet)
     {
         if (packet._ack)
         {
@@ -701,7 +701,7 @@ public class Tcp : IDisposable
             {
                 TCB.RcvNxt++;
 
-                SendEmptyPacket(Flags.ACK);
+                SendEmptyPacket(TcpFlags.ACK);
 
                 WaitAndClose();
             }
@@ -714,7 +714,7 @@ public class Tcp : IDisposable
         {
             TCB.RcvNxt++;
 
-            SendEmptyPacket(Flags.ACK);
+            SendEmptyPacket(TcpFlags.ACK);
 
             Status = Status.CLOSING;
         }
@@ -723,13 +723,13 @@ public class Tcp : IDisposable
     /// <summary>
     /// Process FIN_WAIT2 Status.
     /// </summary>
-    public void ProcessFinWait2(TCPPacket packet)
+    public void ProcessFinWait2(TcpPacket packet)
     {
         if (packet._fin)
         {
             TCB.RcvNxt++;
 
-            SendEmptyPacket(Flags.ACK);
+            SendEmptyPacket(TcpFlags.ACK);
 
             WaitAndClose();
         }
@@ -744,7 +744,7 @@ public class Tcp : IDisposable
     /// <summary>
     /// Process CLOSING Status.
     /// </summary>
-    public void ProcessClosing(TCPPacket packet)
+    public void ProcessClosing(TcpPacket packet)
     {
         if (packet._ack)
         {
@@ -755,7 +755,7 @@ public class Tcp : IDisposable
     /// <summary>
     /// Process Close_WAIT Status.
     /// </summary>
-    public void ProcessCloseWait(TCPPacket packet)
+    public void ProcessCloseWait(TcpPacket packet)
     {
         if (packet._ack)
         {
@@ -835,25 +835,25 @@ public class Tcp : IDisposable
     /// <summary>
     /// Sends an empty packet.
     /// </summary>
-    public void SendEmptyPacket(Flags flag)
+    public void SendEmptyPacket(TcpFlags flag)
     {
-        SendPacket(new TCPPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
+        SendPacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
             TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
     }
 
     /// <summary>
     /// Sends an empty packet.
     /// </summary>
-    internal void SendEmptyPacket(Flags flag, uint sequenceNumber)
+    internal void SendEmptyPacket(TcpFlags flag, uint sequenceNumber)
     {
-        SendPacket(new TCPPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
+        SendPacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
             sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
     }
 
     /// <summary>
     /// Sends a TCP packet.
     /// </summary>
-    private void SendPacket(TCPPacket packet)
+    private void SendPacket(TcpPacket packet)
     {
         OutgoingBuffer.AddPacket(packet);
 

@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.CPU;
 /// Low-level CPU operations that can be used by Core components like the heap.
 /// Native imports live in Bridge/Import/CpuNative.cs.
 /// </summary>
-public static class InternalCpu
+internal static class InternalCpu
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void DisableInterrupts() => CpuNative.DisableInterrupts();

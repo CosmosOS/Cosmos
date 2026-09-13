@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// <summary>
 /// Port type enumeration.
 /// </summary>
-public enum PortType
+internal enum PortType
 {
     Nothing = 0x00,
     Sata = 0x01,
@@ -17,7 +17,7 @@ public enum PortType
 /// <summary>
 /// FIS (Frame Information Structure) type enumeration.
 /// </summary>
-public enum FisType : byte
+internal enum FisType : byte
 {
     RegisterH2D = 0x27,  // Register FIS: Host to Device
     RegisterD2H = 0x34,  // Register FIS: Device to Host
@@ -32,7 +32,7 @@ public enum FisType : byte
 /// <summary>
 /// AHCI drive signature to identify what drive is plugged to Port.
 /// </summary>
-public enum AhciSignature : uint
+internal enum AhciSignature : uint
 {
     Sata = 0x0000,
     PortMultiplier = 0x9669,
@@ -44,7 +44,7 @@ public enum AhciSignature : uint
 /// <summary>
 /// SATA Status: Interface Power Management Status.
 /// </summary>
-public enum InterfacePowerManagementStatus : uint
+internal enum InterfacePowerManagementStatus : uint
 {
     NotPresent = 0x00,
     Active = 0x01,
@@ -56,7 +56,7 @@ public enum InterfacePowerManagementStatus : uint
 /// <summary>
 /// SATA Status: Current Interface Speed.
 /// </summary>
-public enum CurrentInterfaceSpeedStatus : uint
+internal enum CurrentInterfaceSpeedStatus : uint
 {
     NotPresent = 0x00,
     Gen1Rate = 0x01,
@@ -67,7 +67,7 @@ public enum CurrentInterfaceSpeedStatus : uint
 /// <summary>
 /// SATA Status: Device Detection Status.
 /// </summary>
-public enum DeviceDetectionStatus : uint
+internal enum DeviceDetectionStatus : uint
 {
     NotDetected = 0x00,
     DeviceDetectedNoPhy = 0x01,
@@ -78,7 +78,7 @@ public enum DeviceDetectionStatus : uint
 /// <summary>
 /// ATA Device Status bits.
 /// </summary>
-public enum AtaDeviceStatus : uint
+internal enum AtaDeviceStatus : uint
 {
     Busy = 0x80,
     DRQ = 0x08
@@ -87,7 +87,7 @@ public enum AtaDeviceStatus : uint
 /// <summary>
 /// Command and Status register bits.
 /// </summary>
-public enum CommandAndStatus : uint
+internal enum CommandAndStatus : uint
 {
     ICC_Reserved0 = 0x0000000F,
     // PxCMD.ICC lives in bits 31:28 (AHCI 1.3.1 s3.3.7) — the values are
@@ -128,7 +128,7 @@ public enum CommandAndStatus : uint
 /// <summary>
 /// Interrupt Status bits.
 /// </summary>
-public enum InterruptStatus : int
+internal enum InterruptStatus : int
 {
     ColdPortDetectStatus = 01 << 31,
     TaskFileErrorStatus = 01 << 30,
@@ -153,7 +153,7 @@ public enum InterruptStatus : int
 /// <summary>
 /// ATA Commands.
 /// </summary>
-public enum AtaCommands : byte
+internal enum AtaCommands : byte
 {
     ReadDma = 0xC8,
     ReadDmaExt = 0x25,

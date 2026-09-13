@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Core.Runtime;
 /// The top is captured by kmain before any managed code executes; the size is
 /// the Limine stack-size request when honored, else the 64 KiB protocol default.
 /// </summary>
-public static unsafe class BootStack
+internal static unsafe class BootStack
 {
     /// <summary>Stack size Limine guarantees when no stack-size request is honored.</summary>
     private const nuint LimineDefaultStackSize = 64 * 1024;

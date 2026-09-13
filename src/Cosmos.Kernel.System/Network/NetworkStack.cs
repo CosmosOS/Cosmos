@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.ARP;
@@ -11,45 +12,33 @@ namespace Cosmos.Kernel.System.Network;
 /// </summary>
 public static class NetworkStack
 {
+    /// <summary>Reentrancy guard for <see cref="Update"/>.</summary>
+    private static bool s_updating = false;
+
     /// <summary>
     /// Maps IP (Internet Protocol) addresses to network devices.
     /// </summary>
-    internal static Dictionary<uint, INetworkDevice> AddressMap { get; private set; } = new();
+    internal static Dictionary<uint, INetworkDevice> AddressMap { get; } = new();
 
     /// <summary>
     /// Maps MAC addresses to network devices.
     /// </summary>
-    internal static Dictionary<uint, INetworkDevice> MACMap { get; private set; } = new();
-
-    /// <summary>
-    /// Initializes the network stack.
-    /// </summary>
-    public static void Initialize()
-    {
-        // TODO is it required to call initialize at all?
-        AddressMap = new Dictionary<uint, INetworkDevice>();
-        MACMap = new Dictionary<uint, INetworkDevice>();
-    }
+    internal static Dictionary<uint, INetworkDevice> MACMap { get; } = new();
 
     /// <summary>
     /// Configures an IP address on the given network device.
     /// </summary>
     /// <param name="device">The target network device.</param>
     /// <param name="ipAddress">The IP address to assign to the device.</param>
-    public static void ConfigIP(INetworkDevice device, Address ipAddress)
+    internal static void ConfigIP(INetworkDevice device, Address ipAddress)
     {
-        if (AddressMap == null || MACMap == null)
-        {
-            Initialize();
-        }
-
         var mac = device.MacAddress;
 
         // Remove old config if exists
-        if (MACMap!.ContainsKey(mac.Hash))
+        if (MACMap.ContainsKey(mac.Hash))
         {
             // Find and remove old IP mapping
-            foreach (var pair in AddressMap!)
+            foreach (KeyValuePair<uint, INetworkDevice> pair in AddressMap)
             {
                 if (pair.Value == device)
                 {
@@ -61,7 +50,7 @@ public static class NetworkStack
         }
 
         // Add new config
-        AddressMap!.Add(ipAddress.Id, device);
+        AddressMap.Add(ipAddress.Id, device);
         MACMap.Add(mac.Hash, device);
 
         // Register packet handler
@@ -79,39 +68,37 @@ public static class NetworkStack
     /// </summary>
     /// <param name="device">The target network device.</param>
     /// <param name="config">The IP configuration to apply.</param>
-    public static void ConfigIP(INetworkDevice device, IPConfig config)
+    /// <remarks>
+    /// Internal: a kernel configures the primary device through
+    /// <see cref="Config.IPConfig.Enable(IPv4.Address, IPv4.Address, IPv4.Address)"/>,
+    /// which is the public form of this and always was.
+    /// </remarks>
+    internal static void ConfigIP(INetworkDevice device, IPConfig config)
     {
-        if (AddressMap == null || MACMap == null)
-        {
-            Initialize();
-        }
-
-        ConfigIP(device, config.IPAddress);
-        IPConfig.Add(config);
-        NetworkConfigManager.AddConfig(device, config);
-        NetworkConfigManager.SetCurrentConfig(device, config);
+        ConfigIP(device, config.Address);
+        IPConfig.Set(device, config);
     }
 
     /// <summary>
-    /// Removes all IP configurations.
+    /// Removes all IP configurations, clearing the stack's address and MAC
+    /// maps with them. The counterpart of <see cref="Config.IPConfig.Enable(IPv4.Address, IPv4.Address, IPv4.Address)"/>.
     /// </summary>
     public static void RemoveAllConfigIP()
     {
-        AddressMap?.Clear();
-        MACMap?.Clear();
-        NetworkConfigManager.ClearConfigs();
+        AddressMap.Clear();
+        MACMap.Clear();
         IPConfig.RemoveAll();
     }
 
     /// <summary>
     /// Flag to prevent recursive Update calls.
     /// </summary>
-    private static bool s_updating = false;
-
     /// <summary>
-    /// Updates the network stack (sends pending packets).
+    /// Updates the network stack (sends pending packets). Internal: every
+    /// path that queues a packet pumps the queue itself, including
+    /// <see cref="Send"/> and each protocol client.
     /// </summary>
-    public static void Update()
+    internal static void Update()
     {
         // Prevent recursive calls
         if (s_updating)
@@ -125,10 +112,34 @@ public static class NetworkStack
     }
 
     /// <summary>
-    /// Handle a network packet.
+    /// Transmits a packet through the stack's outgoing queue: the sending
+    /// device is resolved from the packet's source address, the destination
+    /// MAC is resolved by ARP for non-broadcast destinations, and the queue
+    /// is pumped before returning.
+    /// </summary>
+    /// <param name="packet">A built packet, typically created through one of the packet type constructors.</param>
+    /// <returns>False when no configured interface matches the packet's source address; the packet is not queued in that case.</returns>
+    [Experimental(Experimentals.PacketSeamDiagId)]
+    public static bool Send(IPPacket packet)
+    {
+        if (!OutgoingBuffer.AddPacket(packet))
+        {
+            return false;
+        }
+
+        Update();
+        return true;
+    }
+
+    /// <summary>
+    /// Injects a received Ethernet frame into the stack: the frame is
+    /// dispatched to the ARP or IPv4 handler by EtherType, exactly as a
+    /// frame arriving from a network device would be. This is the receive
+    /// entry point registered on every configured device.
     /// </summary>
     /// <param name="packetData">Packet data array.</param>
     /// <param name="length">Packet length.</param>
+    [Experimental(Experimentals.PacketSeamDiagId)]
     public static void HandlePacket(byte[] packetData, int length)
     {
         Serial.WriteString("[NetworkStack] HandlePacket called, len=");
@@ -150,7 +161,7 @@ public static class NetworkStack
         {
             case 0x0806: // ARP
                 Serial.WriteString("[NetworkStack] -> ARP\n");
-                ARPPacket.ARPHandler(packetData);
+                ArpPacket.ARPHandler(packetData);
                 break;
             case 0x0800: // IPv4
                 Serial.WriteString("[NetworkStack] -> IPv4\n");

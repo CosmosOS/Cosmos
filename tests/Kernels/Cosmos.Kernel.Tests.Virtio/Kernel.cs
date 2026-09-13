@@ -1,5 +1,5 @@
 using System;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
@@ -57,7 +57,7 @@ public class Kernel : Sys.Kernel
 
     protected override void BeforeRun()
     {
-        Serial.WriteString("[Virtio] BeforeRun() reached!\n");
+        Log.WriteString("[Virtio] BeforeRun() reached!\n");
 
         TR.Start("Virtio Device Tests", expectedTests: ExpectedTestCount);
 
@@ -85,7 +85,7 @@ public class Kernel : Sys.Kernel
 
         TR.Finish();
 
-        Serial.WriteString("\n[Tests Complete - System Halting]\n");
+        Log.WriteString("\n[Tests Complete - System Halting]\n");
     }
 
     protected override void Run() => Stop();
@@ -119,9 +119,9 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        Serial.WriteString("[Test] Transport: ");
-        Serial.WriteString(s_net.Transport.TransportName);
-        Serial.WriteString("\n");
+        Log.WriteString("[Test] Transport: ");
+        Log.WriteString(s_net.Transport.TransportName);
+        Log.WriteString("\n");
 
         string expected = s_isPciCell ? PciTransportName : MmioTransportName;
         Assert.Equal(expected, s_net.Transport.TransportName);
@@ -171,16 +171,16 @@ public class Kernel : Sys.Kernel
         bool anyNonZero = false;
         for (int i = 0; i < MacAddressLength; i++)
         {
-            if (mac.bytes[i] != 0)
+            if (mac._bytes[i] != 0)
             {
                 anyNonZero = true;
                 break;
             }
         }
 
-        Serial.WriteString("[Test] MAC: ");
-        Serial.WriteString(mac.ToString());
-        Serial.WriteString("\n");
+        Log.WriteString("[Test] MAC: ");
+        Log.WriteString(mac.ToString());
+        Log.WriteString("\n");
 
         Assert.True(anyNonZero, "MAC address read from device config should not be all zeros");
     }

@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL;
 /// table to extract the PCI ECAM base address. This class just retrieves the result.
 /// Native import lives in Cosmos.Kernel.Core/Bridge/Import/AcpiNative.cs.
 /// </summary>
-public static unsafe class AcpiMcfg
+internal static unsafe class AcpiMcfg
 {
     /// <summary>
     /// Mirrors the C struct acpi_mcfg_info_t from ACPI/acpi_wrapper.c.

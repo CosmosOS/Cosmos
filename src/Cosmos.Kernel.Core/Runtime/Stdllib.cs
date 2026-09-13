@@ -16,11 +16,11 @@ namespace System
             Optimized
         }
 
-        public sealed class RuntimeExportAttribute(string entry) : Attribute
+        internal sealed class RuntimeExportAttribute(string entry) : Attribute
         {
         }
 
-        public sealed class RuntimeImportAttribute : Attribute
+        internal sealed class RuntimeImportAttribute : Attribute
         {
             public string DllName { get; }
             public string EntryPoint { get; }
@@ -229,9 +229,9 @@ namespace Cosmos.Kernel.Core.Runtime
         [RuntimeExport("RhCurrentOSThreadId")]
         internal static ulong RhCurrentOSThreadId()
         {
-            if (CosmosFeatures.SchedulerEnabled && Scheduler.SchedulerManager.Enabled)
+            if (CosmosFeatures.SchedulerEnabled && Scheduler.SchedulerManager.IsRunning)
             {
-                Scheduler.PerCpuState? cpuState = Scheduler.SchedulerManager.GetCpuState(Scheduler.SchedulerManager.GetCurrentCpuId());
+                Scheduler.PerCpuState? cpuState = Scheduler.SchedulerManager.CurrentCpuState;
                 return cpuState?.CurrentThread?.Id ?? 1;
             }
 

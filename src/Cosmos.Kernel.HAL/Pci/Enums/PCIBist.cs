@@ -1,6 +1,6 @@
 namespace Cosmos.Kernel.HAL.Pci.Enums;
 
-public enum PciBist : byte
+internal enum PciBist : byte
 {
     CocdMask = 0x0f, /* Return result */
     Start = 0x40, /* 1 to start BIST, 2 secs or less */

@@ -6,12 +6,11 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard French (FR) keyboard layout.
 /// </summary>
-public class FRStandardLayout : ScanMapBase
+public sealed class FRStandardLayout : ScanMapBase
 {
-    protected override void InitKeys()
+    /// <inheritdoc />
+    protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>();
-
         #region Keys
         /*                       Scan  Norm Shift Num  Caps ShCaps ShNum ConsoleKeyEx */
         Keys.Add(new KeyMapping(0x00, ConsoleKeyEx.NoName));

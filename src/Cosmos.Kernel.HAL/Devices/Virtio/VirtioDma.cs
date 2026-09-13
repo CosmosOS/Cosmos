@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.Devices.Virtio;
 /// works with HHDM virtual addresses; register windows are accessed through
 /// their HHDM alias so the per-arch device-memory attributes apply.
 /// </summary>
-public static class VirtioDma
+internal static class VirtioDma
 {
     /// <summary>
     /// Converts a kernel virtual address (HHDM) to a guest physical address for DMA.

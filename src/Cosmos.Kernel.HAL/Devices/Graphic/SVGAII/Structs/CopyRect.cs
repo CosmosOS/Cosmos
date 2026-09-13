@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SVGA3dCopyRect
+internal struct SVGA3dCopyRect
 {
     public uint x;
     public uint y;

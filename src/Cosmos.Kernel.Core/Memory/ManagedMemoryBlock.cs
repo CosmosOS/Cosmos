@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.Core.Memory;
 /// <summary>
 /// ManagedMemoryBlock class. Used to read and write a managed memory block.
 /// </summary>
-public unsafe class ManagedMemoryBlock
+internal unsafe class ManagedMemoryBlock
 {
     private readonly byte[] _array;
     private readonly Memory<byte> _memory;

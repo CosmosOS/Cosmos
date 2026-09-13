@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.Core.ARM64.Bridge;
 /// IORT advertises. Returns non-zero when no IORT mapping is present, in
 /// which case callers fall back to <c>DeviceID = BDF</c>.
 /// </summary>
-public static unsafe partial class AcpiIortNative
+internal static unsafe partial class AcpiIortNative
 {
     /// <summary>
     /// Resolves <paramref name="bdf"/> on PCI segment <paramref name="segment"/>

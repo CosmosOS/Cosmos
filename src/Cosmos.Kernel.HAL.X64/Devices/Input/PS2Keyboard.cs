@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.X64.Devices.Input;
 /// <summary>
 /// PS/2 Keyboard driver.
 /// </summary>
-public class PS2Keyboard : KeyboardDevice
+internal class PS2Keyboard : KeyboardDevice
 {
     private enum Command : byte
     {

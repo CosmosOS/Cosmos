@@ -17,11 +17,24 @@ public static class StorageManager
     /// <summary>Maximum number of block devices the manager can register.</summary>
     private const int MaxDevices = 8;
 
+    private static IBlockDevice? s_primaryDevice;
+    private static List<IBlockDevice>? s_devices;
+    private static List<Partition>? s_partitions;
+
+    /// <summary>Guards every mutation of the device and partition tables.</summary>
+    private static SchedSpinLock s_mutationLock;
+
     /// <summary>
     /// Whether storage support is enabled. Uses centralized feature flag.
     /// </summary>
     public static bool IsEnabled => CosmosFeatures.StorageEnabled;
 
+    /// <summary>
+    /// Throws when storage support is compiled out. Guards actions, not reads:
+    /// a read answers honestly (0, null, false, empty) so a kernel can branch
+    /// on it, and an action names the switch to set instead of failing
+    /// silently.
+    /// </summary>
     private static void ThrowIfDisabled()
     {
         if (!IsEnabled)
@@ -30,26 +43,29 @@ public static class StorageManager
         }
     }
 
-    private static IBlockDevice? s_primaryDevice;
-    private static IBlockDevice?[]? s_devices;
-    private static int s_deviceCount;
-    private static List<Partition>? s_partitions;
-    private static bool s_initialized;
-
     /// <summary>
-    /// Gets whether the storage manager is initialized.
+    /// Gets whether the storage manager is initialized, which is what makes
+    /// the device table exist.
     /// </summary>
-    public static bool IsInitialized => s_initialized;
+    public static bool IsInitialized => s_devices is not null;
 
     /// <summary>
-    /// Gets the primary block device (first one registered).
+    /// Gets the primary block device (first one registered), or
+    /// <see langword="null"/> when storage is compiled out or no device
+    /// registered at boot.
     /// </summary>
     public static IBlockDevice? PrimaryDevice => s_primaryDevice;
 
     /// <summary>
     /// Gets the number of registered block devices.
     /// </summary>
-    public static int DeviceCount => s_deviceCount;
+    public static int DeviceCount => s_devices?.Count ?? 0;
+
+    /// <summary>
+    /// Every registered block device, in registration order. Empty before
+    /// initialization and when storage support is compiled out.
+    /// </summary>
+    public static IReadOnlyList<IBlockDevice> Devices => (IReadOnlyList<IBlockDevice>?)s_devices ?? Array.Empty<IBlockDevice>();
 
     /// <summary>
     /// Partitions discovered across every registered device. Each entry is
@@ -60,21 +76,46 @@ public static class StorageManager
     public static IReadOnlyList<Partition> Partitions => (IReadOnlyList<Partition>?)s_partitions ?? Array.Empty<Partition>();
 
     /// <summary>
-    /// Initializes the storage manager.
+    /// The partitions discovered on one device, in on-disk order, so a kernel
+    /// can number them per disk the way a user does. A partition's position in
+    /// this list is its index on <paramref name="device"/>. Empty when the
+    /// device has no partition table or is not registered.
     /// </summary>
-    public static void Initialize()
+    /// <param name="device">The device to list the partitions of.</param>
+    public static IReadOnlyList<Partition> GetPartitions(IBlockDevice device)
+    {
+        if (s_partitions is null || device is null)
+        {
+            return Array.Empty<Partition>();
+        }
+
+        List<Partition> onDevice = new();
+        for (int i = 0; i < s_partitions.Count; i++)
+        {
+            if (ReferenceEquals(s_partitions[i].Host, device))
+            {
+                onDevice.Add(s_partitions[i]);
+            }
+        }
+
+        return onDevice;
+    }
+
+    /// <summary>
+    /// Initializes the storage manager. Called once during boot, before the
+    /// HAL block devices are registered.
+    /// </summary>
+    internal static void Initialize()
     {
         ThrowIfDisabled();
 
-        if (s_initialized)
+        if (s_devices is not null)
         {
             return;
         }
 
-        s_devices = new IBlockDevice[MaxDevices];
-        s_deviceCount = 0;
         s_partitions = new List<Partition>();
-        s_initialized = true;
+        s_devices = new List<IBlockDevice>(MaxDevices);
     }
 
     /// <summary>
@@ -82,7 +123,7 @@ public static class StorageManager
     /// (AHCI ports, NVMe namespaces). Called once during boot after the HAL
     /// has initialized the controllers.
     /// </summary>
-    public static void RegisterHalDevices()
+    internal static void RegisterHalDevices()
     {
         if (!IsEnabled)
         {
@@ -108,11 +149,12 @@ public static class StorageManager
     /// <see cref="Partitions"/>.
     /// </summary>
     /// <param name="device">The block device to register.</param>
-    private static SchedSpinLock s_mutationLock;
-
+    /// <exception cref="InvalidOperationException">Storage support is disabled.</exception>
     public static void RegisterDevice(IBlockDevice device)
     {
-        if (device == null || s_devices == null || s_deviceCount >= s_devices.Length)
+        ThrowIfDisabled();
+
+        if (device is null || s_devices is null || s_devices.Count >= MaxDevices)
         {
             return;
         }
@@ -120,14 +162,14 @@ public static class StorageManager
         // Serializes s_devices/s_partitions mutation for post-boot callers
         // (device hotplug paths, tests); reads are still unsynchronized —
         // enumerating Partitions while another thread rescans remains the
-        // caller's problem. Re-registering a known device is a no-op:
-        // RegisterDevice is public and unguarded (unlike Initialize), so a
-        // second RegisterHalDevices call would otherwise double-count the
-        // device and duplicate every partition under identical names.
+        // caller's problem. Re-registering a known device is a no-op: this is
+        // public, so a second RegisterHalDevices call would otherwise
+        // double-count the device and duplicate every partition under
+        // identical names.
         s_mutationLock.Acquire();
         try
         {
-            for (int i = 0; i < s_deviceCount; i++)
+            for (int i = 0; i < s_devices.Count; i++)
             {
                 if (ReferenceEquals(s_devices[i], device))
                 {
@@ -135,7 +177,7 @@ public static class StorageManager
                 }
             }
 
-            s_devices[s_deviceCount++] = device;
+            s_devices.Add(device);
 
             // First device becomes primary
             if (s_primaryDevice == null)
@@ -157,9 +199,13 @@ public static class StorageManager
     /// callers that just wrote a new layout (tests, formatting tools) get
     /// a clean partition list.
     /// </summary>
+    /// <param name="device">The registered device to re-scan.</param>
+    /// <exception cref="InvalidOperationException">Storage support is disabled.</exception>
     public static void RescanPartitions(IBlockDevice device)
     {
-        if (s_partitions == null || device == null)
+        ThrowIfDisabled();
+
+        if (s_partitions is null || device is null)
         {
             return;
         }
@@ -197,10 +243,10 @@ public static class StorageManager
                 Serial.WriteString("[StorageManager] GPT detected on ");
                 Serial.WriteString(device.Name);
                 Serial.WriteString("\n");
-                List<Gpt.PartitionEntry> entries = Gpt.Parse(device);
+                List<GptPartitionEntry> entries = Gpt.Parse(device);
                 for (int i = 0; i < entries.Count; i++)
                 {
-                    Gpt.PartitionEntry e = entries[i];
+                    GptPartitionEntry e = entries[i];
                     s_partitions.Add(new Partition(device, e.StartSector, e.SectorCount, (uint)i));
                 }
                 return;
@@ -211,11 +257,11 @@ public static class StorageManager
                 Serial.WriteString("[StorageManager] MBR detected on ");
                 Serial.WriteString(device.Name);
                 Serial.WriteString("\n");
-                List<Mbr.PartitionEntry> entries = Mbr.Parse(device);
+                List<MbrPartitionEntry> entries = Mbr.Parse(device);
                 uint slot = 0;
                 for (int i = 0; i < entries.Count; i++)
                 {
-                    Mbr.PartitionEntry e = entries[i];
+                    MbrPartitionEntry e = entries[i];
                     s_partitions.Add(new Partition(device, e.StartSector, e.SectorCount, slot));
                     slot++;
                 }
@@ -223,10 +269,10 @@ public static class StorageManager
                 if (Mbr.TryGetExtendedPartition(device, out ulong extendedStart))
                 {
                     Serial.WriteString("[StorageManager] Extended partition found, walking EBR chain\n");
-                    List<Mbr.PartitionEntry> logicals = Ebr.Parse(device, extendedStart);
+                    List<MbrPartitionEntry> logicals = Ebr.Parse(device, extendedStart);
                     for (int i = 0; i < logicals.Count; i++)
                     {
-                        Mbr.PartitionEntry e = logicals[i];
+                        MbrPartitionEntry e = logicals[i];
                         s_partitions.Add(new Partition(device, e.StartSector, e.SectorCount, slot));
                         slot++;
                     }
@@ -251,7 +297,7 @@ public static class StorageManager
             Span<byte> boot = new byte[(int)device.BlockSize];
             device.ReadBlock(FatBootSector.BootSectorLba, 1, boot);
             if (FatBootSector.TryParse(boot, out FatBootSector? volume)
-                && volume!.BytesPerSector == device.BlockSize
+                && volume.BytesPerSector == device.BlockSize
                 && volume.TotalSectorCount <= device.BlockCount)
             {
                 Serial.WriteString("[StorageManager] Unpartitioned filesystem volume detected on ");
@@ -277,12 +323,11 @@ public static class StorageManager
     /// Gets a block device by index.
     /// </summary>
     /// <param name="index">The device index.</param>
-    /// <returns>The block device, or null if not found.</returns>
+    /// <returns>The block device, or null when the index names none and when
+    /// storage support is disabled.</returns>
     public static IBlockDevice? GetDevice(int index)
     {
-        ThrowIfDisabled();
-
-        if (s_devices == null || index < 0 || index >= s_deviceCount)
+        if (s_devices is null || index < 0 || index >= s_devices.Count)
         {
             return null;
         }

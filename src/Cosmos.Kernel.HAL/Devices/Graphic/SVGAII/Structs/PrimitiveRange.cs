@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SVGA3dPrimitiveRange
+internal struct SVGA3dPrimitiveRange
 {
     public SVGA3dPrimitiveType primType;
     public uint primitiveCount;

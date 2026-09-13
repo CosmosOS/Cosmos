@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.System.Filesystems.Fat;
@@ -9,9 +10,13 @@ namespace Cosmos.Kernel.System.Filesystems.Fat;
 /// </summary>
 public enum FatType
 {
+    /// <summary>The volume is not a recognized FAT variant.</summary>
     Unknown,
+    /// <summary>FAT12: fewer than 4085 clusters.</summary>
     Fat12,
+    /// <summary>FAT16: 4085 to 65524 clusters.</summary>
     Fat16,
+    /// <summary>FAT32: 65525 clusters or more.</summary>
     Fat32,
 }
 
@@ -177,25 +182,60 @@ public sealed class FatBootSector
     /// <summary>Highest cluster count of the FAT16 band — the Max encoding of the same §3.5 boundary as <see cref="Fat32MinClusters"/> (Max = Min - 1).</summary>
     internal const uint Fat16MaxClusters = Fat32MinClusters - 1;
 
+    /// <summary>The FAT variant, derived from <see cref="ClusterCount"/>.</summary>
     public FatType Type { get; private set; }
+
+    /// <summary>Bytes per sector (BPB_BytsPerSec): 512, 1024, 2048 or 4096.</summary>
     public uint BytesPerSector { get; private set; }
+
+    /// <summary>Sectors per cluster (BPB_SecPerClus): a power of two up to 128.</summary>
     public uint SectorsPerCluster { get; private set; }
+
+    /// <summary>Cluster size in bytes: <see cref="BytesPerSector"/> times <see cref="SectorsPerCluster"/>.</summary>
     public uint BytesPerCluster { get; private set; }
+
+    /// <summary>Sectors reserved before the first FAT (BPB_RsvdSecCnt).</summary>
     public uint ReservedSectorCount { get; private set; }
+
+    /// <summary>Number of FAT copies (BPB_NumFATs), usually 2.</summary>
     public uint NumberOfFats { get; private set; }
+
+    /// <summary>Number of fixed root directory entries (BPB_RootEntCnt); 0 on FAT32.</summary>
     public uint RootEntryCount { get; private set; }
+
+    /// <summary>Total sectors of the volume (BPB_TotSec16 or BPB_TotSec32).</summary>
     public uint TotalSectorCount { get; private set; }
+
+    /// <summary>Sectors per FAT copy (BPB_FATSz16 or BPB_FATSz32).</summary>
     public uint FatSectorCount { get; private set; }
+
+    /// <summary>First cluster of the root directory (BPB_RootClus); 0 on FAT12/16.</summary>
     public uint RootCluster { get; private set; }
+
+    /// <summary>LBA of the fixed root directory region on FAT12/16; 0 on FAT32.</summary>
     public uint RootStartLba { get; private set; }
+
+    /// <summary>Sectors occupied by the fixed root directory on FAT12/16; 0 on FAT32.</summary>
     public uint RootSectorCount { get; private set; }
+
+    /// <summary>LBA of the first data cluster (cluster 2).</summary>
     public uint DataStartLba { get; private set; }
+
+    /// <summary>Number of data clusters on the volume.</summary>
     public uint ClusterCount { get; private set; }
+
+    /// <summary>LBA of the first FAT copy.</summary>
     public uint FatStartLba { get; private set; }
 
     private FatBootSector() { }
 
-    public static bool TryParse(ReadOnlySpan<byte> bpb, out FatBootSector? bootSector)
+    /// <summary>
+    /// Parses and validates a boot sector, deriving the volume geometry.
+    /// </summary>
+    /// <param name="bpb">The raw boot sector, at least 512 bytes.</param>
+    /// <param name="bootSector">The parsed boot sector, or <see langword="null"/> when parsing fails.</param>
+    /// <returns><see langword="true"/> when the sector carries a valid, spec-legal BPB.</returns>
+    public static bool TryParse(ReadOnlySpan<byte> bpb, [NotNullWhen(true)] out FatBootSector? bootSector)
     {
         bootSector = null;
 

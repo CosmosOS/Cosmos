@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
-public enum SVGA3dTransferType
+internal enum SVGA3dTransferType
 {
     SVGA3D_WRITE_HOST_VRAM = 1,
     SVGA3D_READ_HOST_VRAM = 2,

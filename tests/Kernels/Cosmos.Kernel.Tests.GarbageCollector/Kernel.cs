@@ -891,7 +891,7 @@ public class Kernel : Sys.Kernel
         // kernel halts and the test runner reports the test as failed (or never completes).
         string caught = CatchAtopDeepChain();
         Assert.True(caught == "deep-throw",
-            "EH: a throw must propagate through 5 intermediate frames that may omit RBP/X29 — got '" + caught + "'");
+            "EH: a throw must propagate through 5 intermediate frames that may omit RBP/X29, got '" + caught + "'");
     }
 
     // ==================== GC Soundness Tests ====================

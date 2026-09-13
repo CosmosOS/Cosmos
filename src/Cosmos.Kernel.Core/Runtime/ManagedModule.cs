@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Core.Runtime;
 /// </summary>
 // https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/readytorun-format.md
 
-public static unsafe partial class ManagedModule
+internal static unsafe partial class ManagedModule
 {
     /// <summary>
     /// Table of logical modules.

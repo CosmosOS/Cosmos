@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 
 namespace Cosmos.Kernel.Plugs.System.Net;
 
@@ -53,7 +53,7 @@ public static class IPAddressPlug
         }
         else
         {
-            Serial.WriteString("[IPAddressPlug] Bad IP address format\n");
+            Log.WriteString("[IPAddressPlug] Bad IP address format\n");
             throw new ArgumentException("Bad IP address format");
         }
     }

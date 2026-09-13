@@ -3,10 +3,10 @@
 using System;
 using System.Diagnostics;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core;
+using Cosmos.Kernel.System;
+using Cosmos.Kernel.System.Diagnostics;
 using Monitor = Cosmos.Kernel.Core.Scheduler.Monitor;
 using System.Runtime.InteropServices;
-using Cosmos.Kernel.Core.IO;
 #if ARCH_X64
 using Cosmos.Kernel.HAL.X64.Devices.Clock;
 #elif ARCH_ARM64
@@ -64,7 +64,7 @@ public static class InteropSysPlug
     public static long GetLowResolutionTimestamp()
     {
 
-        if (CosmosFeatures.TimerEnabled)
+        if (KernelFeatures.Timer)
         {
             if (RTC.Instance == null)
             {
@@ -137,16 +137,16 @@ public static class InteropSysPlug
     [PlugMember]
     internal static void LowLevelMonitor_Acquire(IntPtr monitor)
     {
-        Serial.Write("[LowLevelMonitor] Acquire BEGIN\n");
+        Log.Write("[LowLevelMonitor] Acquire BEGIN\n");
         var gchandle = GCHandle<Monitor>.FromIntPtr(monitor);
         gchandle.Target.Acquire();
-        Serial.Write("[LowLevelMonitor] Acquire END\n");
+        Log.Write("[LowLevelMonitor] Acquire END\n");
     }
 
     [PlugMember]
     internal static void LowLevelMonitor_Release(IntPtr monitor)
     {
-        Serial.Write("[LowLevelMonitor] Release\n");
+        Log.Write("[LowLevelMonitor] Release\n");
         var gchandle = GCHandle<Monitor>.FromIntPtr(monitor);
         gchandle.Target.Release();
     }
@@ -154,18 +154,18 @@ public static class InteropSysPlug
     [PlugMember]
     internal static void LowLevelMonitor_Wait(IntPtr monitor)
     {
-        Serial.Write("[LowLevelMonitor] Wait BEGIN\n");
+        Log.Write("[LowLevelMonitor] Wait BEGIN\n");
         var gchandle = GCHandle<Monitor>.FromIntPtr(monitor);
         gchandle.Target.Wait();
-        Serial.Write("[LowLevelMonitor] Wait END\n");
+        Log.Write("[LowLevelMonitor] Wait END\n");
     }
 
     [PlugMember]
     internal static bool LowLevelMonitor_TimedWait(IntPtr monitor, int timeoutMilliseconds)
     {
-        Serial.Write("[LowLevelMonitor] LowLevelMonitor_TimedWait: BEGIN, timeout=");
-        Serial.Write(timeoutMilliseconds);
-        Serial.Write("ms\n");
+        Log.Write("[LowLevelMonitor] LowLevelMonitor_TimedWait: BEGIN, timeout=");
+        Log.WriteNumber(timeoutMilliseconds);
+        Log.Write("ms\n");
         var mon = GCHandle<Monitor>.FromIntPtr(monitor).Target;
 
         if (timeoutMilliseconds < 0)
@@ -182,7 +182,7 @@ public static class InteropSysPlug
     [PlugMember]
     internal static void LowLevelMonitor_Signal_Release(IntPtr monitor)
     {
-        Serial.Write("[LowLevelMonitor] Signal_Release\n");
+        Log.Write("[LowLevelMonitor] Signal_Release\n");
         var gchandle = GCHandle<Monitor>.FromIntPtr(monitor);
         gchandle.Target.Signal();
     }

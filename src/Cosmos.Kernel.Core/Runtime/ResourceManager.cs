@@ -6,7 +6,7 @@ using Internal.Runtime;
 
 namespace Cosmos.Kernel.Core.Runtime;
 
-public static class ResourceManager
+internal static class ResourceManager
 {
     public static unsafe UnmanagedMemoryStream? GetResourceStream(string resourceName)
     {

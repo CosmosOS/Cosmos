@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Vfs;
 
@@ -181,7 +182,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
         FatAttr attr,
         uint firstCluster,
         uint size,
-        out FatInode? created)
+        [NotNullWhen(true)] out FatInode? created)
     {
         created = null;
         string longName = name.ToString();

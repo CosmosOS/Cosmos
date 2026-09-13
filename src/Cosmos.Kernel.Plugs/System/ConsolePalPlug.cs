@@ -1,6 +1,6 @@
 using System.Text;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core;
+using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.IO;
 
@@ -54,6 +54,7 @@ public class ConsolePalPlug
         return false;
     }
 
+    [PlugMember]
     public static bool IsOutputRedirectedCore()
     {
         return false;
@@ -63,7 +64,7 @@ public class ConsolePalPlug
     [PlugMember]
     public static TextReader GetOrCreateReader()
     {
-        if (CosmosFeatures.KeyboardEnabled)
+        if (KernelFeatures.Keyboard)
         {
             if (Console.IsInputRedirected || Console.InputEncoding != Encoding.Default)
             {

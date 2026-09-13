@@ -11,7 +11,7 @@ The garbage collector (it identifies itself as **OrionGC** in the runtime config
 - the [GC handle store](#handle-store), references to heap objects held from outside the heap,
 - [frozen segments](#frozen-segments), read-only objects baked into the kernel binary, never collected.
 
-The GC usually operates in a threaded kernel, but does not require one. When the [scheduler](scheduler.md) is running, it preempts threads from the timer interrupt, keeps every live thread in a global registry the GC scans from, and stores each thread's allocation state on its `Thread` control block; interrupt handlers allocate too (the scheduler tick, input drivers). Before the scheduler starts, or in kernels that compile it out, the GC works the same way with a single static allocation context and the current stack as the only stack root. In either mode there is no dedicated GC thread: a collection runs on whichever thread triggered it, inside `InternalCpu.DisableInterruptsScope()`, so no thread switch or interrupt handler can observe the heap mid-collection.
+The GC usually operates in a threaded kernel, but does not require one. When the [scheduler](scheduler.md) is running, it preempts threads from the timer interrupt, keeps every live thread in a global registry the GC scans from, and stores each thread's allocation state on its `SchedulerThread` control block; interrupt handlers allocate too (the scheduler tick, input drivers). Before the scheduler starts, or in kernels that compile it out, the GC works the same way with a single static allocation context and the current stack as the only stack root. In either mode there is no dedicated GC thread: a collection runs on whichever thread triggered it, inside `InternalCpu.DisableInterruptsScope()`, so no thread switch or interrupt handler can observe the heap mid-collection.
 
 Since every thread and interrupt handler can allocate, allocation goes through per-thread [TLABs](gc-concepts/tlab.md) (thread-local allocation buffers): each thread bumps a pointer inside its own buffer and, apart from a global allocated-bytes counter, only touches shared state when the buffer runs out and needs a refill. Collection is a last resort. When a refill fails, the collector first grows the heap; `Collect()` runs only when the page allocator itself has nothing left to give, or when called explicitly.
 
@@ -44,7 +44,7 @@ The one thing these fields do not describe is where the references inside an ins
 
 ### Object header
 
-Every object on the GC heap starts with a [`GCObject`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCObject.cs) header:
+Every object on the GC heap starts with a [`GCObject`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCObject.cs) header:
 
 | Offset | Size (x64) | Contents | Notes |
 |--------|------------|----------|-------|
@@ -68,7 +68,7 @@ The header is 24 bytes, which is why `MinBlockSize` is 24: every allocation is r
 
 ### AllocContext (TLAB)
 
-[`AllocContext`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/AllocContext.cs) is the per-thread allocation state (the [TLAB](gc-concepts/tlab.md) itself), stored inline on each `Scheduler.Thread` (with a static fallback context used before the scheduler runs, and for the whole kernel lifetime when the scheduler is compiled out):
+[`AllocContext`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/AllocContext.cs) is the per-thread allocation state (the [TLAB](gc-concepts/tlab.md) itself), stored inline on each `SchedulerThread` (with a static fallback context used before the scheduler runs, and for the whole kernel lifetime when the scheduler is compiled out):
 
 | Field | Meaning |
 |-------|---------|
@@ -85,7 +85,7 @@ This section answers where managed memory lives and how the GC finds its way aro
 
 ### Segments
 
-A segment is a contiguous range of pages from the page allocator (`PageType.GCHeap`). The [`GCSegment`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegment.cs) header sits at the base of the allocation, followed by the segment's brick table, then 8 reserved bytes, then the usable region:
+A segment is a contiguous range of pages from the page allocator (`PageType.GCHeap`). The [`GCSegment`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegment.cs) header sits at the base of the allocation, followed by the segment's brick table, then 8 reserved bytes, then the usable region:
 
 <div style="overflow-x:auto">
 <img src="images/diagrams/gc-segment-layout.svg" alt="Memory layout of one GC segment: the GCSegment header, the brick table, 8 reserved bytes, then the usable region. Start points at the first usable byte, Bump at the boundary between allocated objects and free space, End one past the last byte, Next at the following segment." style="width:100%;min-width:620px;max-width:760px">
@@ -97,7 +97,7 @@ The strip is one contiguous allocation in address order, page-aligned base on th
 - `Bump` to `End` is untouched space; [bump allocation](gc-concepts/bump-allocation.md) hands out memory from `Bump` and advances it.
 - The 8 reserved bytes before `Start` exist because the runtime writes a [runtime object header](gc-concepts/object-header.md) (identity hash or thin lock) at `objRef - 4`. For the first object in a segment that write must land in reserved filler instead of the segment's own metadata.
 
-Segment allocation lives in [`GCSegmentManager`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegmentManager.cs). `AllocateSegment(requestedSize)` clamps the request to at least one page, sizes the brick table, rounds the total up to whole pages, and appends the new segment to its manager's linked list. Page rounding slack is given to the usable region, so `TotalSize` is usually a bit larger than the request.
+Segment allocation lives in [`GCSegmentManager`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegmentManager.cs). `AllocateSegment(requestedSize)` clamps the request to at least one page, sizes the brick table, rounds the total up to whole pages, and appends the new segment to its manager's linked list. Page rounding slack is given to the usable region, so `TotalSize` is usually a bit larger than the request.
 
 ### Brick table
 
@@ -142,7 +142,7 @@ A GC handle is a reference to a managed object that lives outside normal root sc
 > [!NOTE]
 > Official docs: [GCHandle](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.gchandle), [Weak references](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/weak-references), [DependentHandle](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.dependenthandle).
 
-The store is owned by a single [`GCHandleManager`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleManager.cs) (the `s_gCHandleManager` instance) and is organized by handle type: one `GCHandleSegmentStore` per handle type, plus a separate store for dependent handles.
+The store is owned by a single [`GCHandleManager`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleManager.cs) (the `s_gCHandleManager` instance) and is organized by handle type: one `GCHandleSegmentStore` per handle type, plus a separate store for dependent handles.
 
 | Type | Value | Keeps target alive? | Notes |
 |------|-------|--------------------|-------|
@@ -191,7 +191,7 @@ This section answers how a `new` becomes a pointer in a handful of instructions,
 
 ### Runtime bridge
 
-The NativeAOT runtime calls exported functions in [`Memory.cs`](../../../src/Cosmos.Kernel.Core/Runtime/Memory.cs). The allocation exports funnel into `GarbageCollector.AllocObject(size, flags)`; before the GC is initialized they fall back to the boot allocator (`MemoryOp.Alloc` plus an explicit zero).
+The NativeAOT runtime calls exported functions in [`Memory.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Runtime/Memory.cs). The allocation exports funnel into `GarbageCollector.AllocObject(size, flags)`; before the GC is initialized they fall back to the boot allocator (`MemoryOp.Alloc` plus an explicit zero).
 
 | Runtime export | Maps to | Purpose |
 |----------------|---------|---------|
@@ -240,7 +240,7 @@ The fast path is two pointer operations: if `AllocPtr + size <= AllocLimit`, bum
 
 ### TLAB refill
 
-`RefillAllocContext` (in [`GarbageCollector.Tlab.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Tlab.cs)) replaces an exhausted TLAB, trying cheap sources before expensive ones: recycled [free-list](#free-lists) space first, then untouched segment space, then new pages, and a collection only when everything else has failed.
+`RefillAllocContext` (in [`GarbageCollector.Tlab.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Tlab.cs)) replaces an exhausted TLAB, trying cheap sources before expensive ones: recycled [free-list](#free-lists) space first, then untouched segment space, then new pages, and a collection only when everything else has failed.
 
 ```mermaid
 flowchart TD
@@ -487,7 +487,7 @@ After the sweep, each chain is regrouped in one pass into FULL segments first, t
 
 ## Statistics and memory info
 
-[`GarbageCollector.Info.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) backs the runtime's memory queries:
+[`GarbageCollector.Info.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) backs the runtime's memory queries:
 
 - `GetStats(out totalCollections, out totalObjectsFreed)` exposes the two running counters. `Collect()`'s return value and these counters are exact: the test suite asserts the deltas match.
 - `GetSimpleMemoryInfo()` fills the snapshot behind `RhGetMemoryInfo`, which is what `GC.GetGCMemoryInfo()` reads: heap size (occupied range of regular plus pinned segments), fragmented bytes (sum of all free-list blocks), committed bytes (segments, frozen segments, mark stack, free-list page, handle store pages), pinned object count (pinned-heap objects plus `Pinned` handles), collection index, and [condemned generation](gc-concepts/gc-generations.md) (always 0; the collector is not generational, so promoted bytes are always 0 too).
@@ -516,7 +516,7 @@ Retiring the conservative path is the keystone: once every thread can be scanned
 
 ## Tests
 
-The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](../../../tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 45 tests (`make test KERNEL=GarbageCollector`). Highlights:
+The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 45 tests (`make test KERNEL=GarbageCollector`). Highlights:
 
 - exact collection accounting (`GC_CollectBasic`, `GC_UnreachableExactCount`),
 - weak and dependent handle behavior (`GC_WeakReference`, `GC_DependentHandle`, `GC_DependentHandleCleanup`),
@@ -534,18 +534,18 @@ The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](
 
 | Area | Path |
 |------|------|
-| GC core | [`src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.cs) |
-| Allocation | [`GarbageCollector.Alloc.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Alloc.cs), [`GarbageCollector.Tlab.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Tlab.cs) |
-| Mark phase | [`GarbageCollector.Mark.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Mark.cs), [`GarbageCollector.PreciseStack.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.PreciseStack.cs) |
-| GCInfo decoder (precise scan) | [`GcInfo/`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GcInfo/), see [Precise Stack Scanning](garbage-collector-gcinfo.md) |
-| Sweep phase | [`GarbageCollector.Sweep.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Sweep.cs) |
-| Segments | [`GCSegment.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegment.cs), [`GCSegmentManager.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegmentManager.cs) |
-| GC handles | [`GCHandle.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandle.cs), [`GCHandleSegment.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleSegment.cs), [`GCHandleManager.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleManager.cs), [`GarbageCollector.GCHandler.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.GCHandler.cs) |
-| Pinned heap | [`GarbageCollector.PinnedHeap.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.PinnedHeap.cs) |
-| Frozen segments | [`GarbageCollector.Frozen.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Frozen.cs) |
-| Statistics | [`GarbageCollector.Info.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) |
-| Object header | [`GCObject.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCObject.cs) |
-| TLAB struct | [`AllocContext.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/AllocContext.cs) |
-| Runtime exports | [`src/Cosmos.Kernel.Core/Runtime/Memory.cs`](../../../src/Cosmos.Kernel.Core/Runtime/Memory.cs) |
-| Module and statics setup | [`src/Cosmos.Kernel.Core/Runtime/ManagedModule.cs`](../../../src/Cosmos.Kernel.Core/Runtime/ManagedModule.cs) |
-| Page allocator | [`src/Cosmos.Kernel.Core/Memory/PageAllocator.cs`](../../../src/Cosmos.Kernel.Core/Memory/PageAllocator.cs) |
+| GC core | [`src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.cs) |
+| Allocation | [`GarbageCollector.Alloc.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Alloc.cs), [`GarbageCollector.Tlab.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Tlab.cs) |
+| Mark phase | [`GarbageCollector.Mark.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Mark.cs), [`GarbageCollector.PreciseStack.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.PreciseStack.cs) |
+| GCInfo decoder (precise scan) | [`GcInfo/`](https://github.com/valentinbreiz/nativeaot-patcher/tree/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GcInfo), see [Precise Stack Scanning](garbage-collector-gcinfo.md) |
+| Sweep phase | [`GarbageCollector.Sweep.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Sweep.cs) |
+| Segments | [`GCSegment.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegment.cs), [`GCSegmentManager.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegmentManager.cs) |
+| GC handles | [`GCHandle.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandle.cs), [`GCHandleSegment.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleSegment.cs), [`GCHandleManager.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleManager.cs), [`GarbageCollector.GCHandler.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.GCHandler.cs) |
+| Pinned heap | [`GarbageCollector.PinnedHeap.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.PinnedHeap.cs) |
+| Frozen segments | [`GarbageCollector.Frozen.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Frozen.cs) |
+| Statistics | [`GarbageCollector.Info.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) |
+| Object header | [`GCObject.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCObject.cs) |
+| TLAB struct | [`AllocContext.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/AllocContext.cs) |
+| Runtime exports | [`src/Cosmos.Kernel.Core/Runtime/Memory.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Runtime/Memory.cs) |
+| Module and statics setup | [`src/Cosmos.Kernel.Core/Runtime/ManagedModule.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Runtime/ManagedModule.cs) |
+| Page allocator | [`src/Cosmos.Kernel.Core/Memory/PageAllocator.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/PageAllocator.cs) |

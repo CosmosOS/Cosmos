@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.Core.CPU;
 /// is delegated to the platform <see cref="IInterruptController"/>
 /// implementation in Cosmos.Kernel.Core.X64 / Cosmos.Kernel.Core.ARM64.
 /// </summary>
-public static class InterruptManager
+internal static class InterruptManager
 {
     /// <summary>
     /// Interrupt delegate signature.

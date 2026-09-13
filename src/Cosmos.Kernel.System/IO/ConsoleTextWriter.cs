@@ -4,7 +4,7 @@ using Cosmos.Kernel.System.Graphics;
 
 namespace Cosmos.Kernel.System.IO;
 
-public sealed class ConsoleTextWriter : TextWriter
+internal sealed class ConsoleTextWriter : TextWriter
 {
     public override Encoding Encoding => Encoding.Default;
     public override void Write(char value)
@@ -12,10 +12,7 @@ public sealed class ConsoleTextWriter : TextWriter
         KernelConsole.ThrowIfKernelConsoleNotInitialized();
 
         KernelConsole.Default.Write(value);
-        if (KernelConsole.Default.IsAvailable)
-        {
-            KernelConsole.Default.Canvas.Display();
-        }
+        KernelConsole.Default.Canvas.Display();
     }
     public override void Write(string? value)
     {
@@ -27,10 +24,7 @@ public sealed class ConsoleTextWriter : TextWriter
         KernelConsole.ThrowIfKernelConsoleNotInitialized();
 
         KernelConsole.Default.Write(value);
-        if (KernelConsole.Default.IsAvailable)
-        {
-            KernelConsole.Default.Canvas.Display();
-        }
+        KernelConsole.Default.Canvas.Display();
     }
 
     public override void Write(ReadOnlySpan<char> buffer)
@@ -38,9 +32,6 @@ public sealed class ConsoleTextWriter : TextWriter
         KernelConsole.ThrowIfKernelConsoleNotInitialized();
 
         KernelConsole.Default.Write(buffer);
-        if (KernelConsole.Default.IsAvailable)
-        {
-            KernelConsole.Default.Canvas.Display();
-        }
+        KernelConsole.Default.Canvas.Display();
     }
 }

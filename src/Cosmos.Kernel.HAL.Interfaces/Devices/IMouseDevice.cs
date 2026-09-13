@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 /// <summary>
 /// Interface for mouse devices.
 /// </summary>
-public interface IMouseDevice
+internal interface IMouseDevice
 {
     /// <summary>
     /// Initialize the mouse device.

@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.System.Filesystems.Fat;
 
 /// <summary>FAT directory-entry attribute bits (FAT spec).</summary>
 [Flags]
-public enum FatAttr : byte
+internal enum FatAttr : byte
 {
     None = 0,
     ReadOnly = 0x01,
@@ -17,7 +17,7 @@ public enum FatAttr : byte
 }
 
 /// <summary>Parsed FAT directory entry. <see cref="ByteOffset"/> is the byte position of the 8.3 record within the buffer that produced it; LFN entries that contributed to <see cref="Name"/> precede it.</summary>
-public sealed class FatDirEntry
+internal sealed class FatDirEntry
 {
     public string Name { get; }
     public string ShortName { get; }
@@ -53,49 +53,49 @@ public sealed class FatDirEntry
 /// Parser and encoder for FAT directory clusters. Operates over raw byte
 /// spans; no I/O is performed here.
 /// </summary>
-public static class FatDirectory
+internal static class FatDirectory
 {
     /// <summary>Size in bytes of one 8.3 directory entry (fatgen103 §6).</summary>
-    public const int EntrySize = 32;
+    internal const int EntrySize = 32;
 
     /// <summary>First byte value marking a deleted entry.</summary>
-    public const byte DeletedMarker = 0xE5;
+    internal const byte DeletedMarker = 0xE5;
 
     /// <summary>First byte value terminating the directory (no entries follow).</summary>
-    public const byte EndOfDirectoryMarker = 0x00;
+    internal const byte EndOfDirectoryMarker = 0x00;
 
     /// <summary>Byte offset of the attribute byte within an 8.3 entry.</summary>
-    public const int AttributesOffset = 11;
+    internal const int AttributesOffset = 11;
 
     /// <summary>Byte offset of the high 16 bits of the first cluster (FAT32; reserved on FAT12/16).</summary>
-    public const int FirstClusterHighOffset = 20;
+    internal const int FirstClusterHighOffset = 20;
 
     /// <summary>Byte offset of the low 16 bits of the first cluster.</summary>
-    public const int FirstClusterLowOffset = 26;
+    internal const int FirstClusterLowOffset = 26;
 
     /// <summary>First-cluster value recorded for an entry that owns no data clusters (fatgen103 §6: DIR_FstClusLO/HI hold 0); also the FAT12/16 fixed root, whose storage lies outside the data area.</summary>
-    public const uint EmptyFirstCluster = 0u;
+    internal const uint EmptyFirstCluster = 0u;
 
     /// <summary>Byte offset of the 32-bit file size.</summary>
-    public const int SizeOffset = 28;
+    internal const int SizeOffset = 28;
 
     /// <summary>Byte width of each 16-bit half of the first-cluster field (DIR_FstClusLO / DIR_FstClusHI, fatgen103 §6).</summary>
-    public const int ClusterWordBytes = 2;
+    internal const int ClusterWordBytes = 2;
 
     /// <summary>Byte width of the 32-bit DIR_FileSize field (fatgen103 §6).</summary>
-    public const int SizeFieldBytes = 4;
+    internal const int SizeFieldBytes = 4;
 
     /// <summary>DIR_FileSize recorded for directory entries — fatgen103 §6 mandates 0 for directories.</summary>
-    public const uint DirectorySizeOnDisk = 0u;
+    internal const uint DirectorySizeOnDisk = 0u;
 
     /// <summary>Shift placing DIR_FstClusHI in the upper 16 bits of the 32-bit cluster number (FAT32).</summary>
-    public const int ClusterHighShift = 16;
+    internal const int ClusterHighShift = 16;
 
     /// <summary>Mask isolating one 16-bit half of a first-cluster number.</summary>
-    public const uint ClusterWordMask = 0xFFFFu;
+    internal const uint ClusterWordMask = 0xFFFFu;
 
     /// <summary>Longest name the LFN format allows.</summary>
-    public const int MaxLfnNameLength = 255;
+    internal const int MaxLfnNameLength = 255;
 
     /// <summary>Length of the full 8.3 name field.</summary>
     internal const int ShortNameLength = 11;
@@ -202,7 +202,7 @@ public static class FatDirectory
     /// on FAT12/16 that field is reserved (OS/2/NT stored the EA handle
     /// there) and must be ignored.
     /// </summary>
-    public static List<FatDirEntry> Parse(ReadOnlySpan<byte> buffer, bool fat32)
+    internal static List<FatDirEntry> Parse(ReadOnlySpan<byte> buffer, bool fat32)
     {
         List<FatDirEntry> result = new();
         Span<char> lfnAccum = stackalloc char[LfnCharsPerEntry * MaxLfnEntries];
@@ -306,7 +306,7 @@ public static class FatDirectory
     /// overlaps the terminator, <paramref name="consumedTerminator"/> is
     /// true and the caller must re-terminate after the new entries.
     /// </summary>
-    public static int FindFreeRun(ReadOnlySpan<byte> buffer, int entriesNeeded, out bool consumedTerminator)
+    internal static int FindFreeRun(ReadOnlySpan<byte> buffer, int entriesNeeded, out bool consumedTerminator)
     {
         consumedTerminator = false;
         int run = 0;
@@ -351,7 +351,7 @@ public static class FatDirectory
         return -1;
     }
 
-    public static int LfnEntryCountFor(ReadOnlySpan<char> name)
+    internal static int LfnEntryCountFor(ReadOnlySpan<char> name)
     {
         if (FitsInShortName(name))
         {
@@ -361,7 +361,7 @@ public static class FatDirectory
     }
 
     /// <summary>Write an 8.3 entry to <paramref name="dest"/> at <paramref name="offset"/>; <paramref name="dest"/> must be writable.</summary>
-    public static void WriteShortEntry(
+    internal static void WriteShortEntry(
         Span<byte> dest,
         int offset,
         ReadOnlySpan<char> shortName11,
@@ -391,7 +391,7 @@ public static class FatDirectory
     /// Case-insensitive ASCII comparison used for FAT name matching —
     /// the single comparer shared by the superblock and inode layers.
     /// </summary>
-    public static bool NameEqualsIgnoreCase(string a, string b)
+    internal static bool NameEqualsIgnoreCase(string a, string b)
     {
         if (a.Length != b.Length)
         {
@@ -417,7 +417,7 @@ public static class FatDirectory
         return true;
     }
 
-    public static void WriteLfnEntries(
+    internal static void WriteLfnEntries(
         Span<byte> dest,
         int offset,
         ReadOnlySpan<char> longName,
@@ -479,7 +479,7 @@ public static class FatDirectory
         }
     }
 
-    public static byte ComputeShortChecksum(ReadOnlySpan<char> shortName11)
+    internal static byte ComputeShortChecksum(ReadOnlySpan<char> shortName11)
     {
         byte sum = 0;
         for (int i = 0; i < ShortNameLength; i++)
@@ -491,7 +491,7 @@ public static class FatDirectory
     }
 
     /// <summary>Checksum over the raw 11 on-disk name bytes (fatgen103 algorithm).</summary>
-    public static byte ComputeShortChecksum(ReadOnlySpan<byte> raw11)
+    internal static byte ComputeShortChecksum(ReadOnlySpan<byte> raw11)
     {
         byte sum = 0;
         for (int i = 0; i < ShortNameLength; i++)
@@ -509,7 +509,7 @@ public static class FatDirectory
     /// invalid on FAT, and short-name lookups would resolve to the wrong
     /// file.
     /// </summary>
-    public static void BuildShortName(string longName, Span<char> dest11, ReadOnlySpan<byte> directoryData)
+    internal static void BuildShortName(string longName, Span<char> dest11, ReadOnlySpan<byte> directoryData)
     {
         for (int i = 0; i < ShortNameLength; i++)
         {
@@ -603,7 +603,7 @@ public static class FatDirectory
         }
     }
 
-    public static bool FitsInShortName(ReadOnlySpan<char> name)
+    internal static bool FitsInShortName(ReadOnlySpan<char> name)
     {
         if (name.Length == 0 || name.Length > MaxShortNameChars)
         {
@@ -680,7 +680,7 @@ public static class FatDirectory
         return digits;
     }
 
-    public static void MarkDeleted(Span<byte> dest, int offset, int entryCount)
+    internal static void MarkDeleted(Span<byte> dest, int offset, int entryCount)
     {
         for (int i = 0; i < entryCount; i++)
         {

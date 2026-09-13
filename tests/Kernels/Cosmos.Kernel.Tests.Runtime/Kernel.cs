@@ -1098,14 +1098,14 @@ public unsafe class Kernel : Sys.Kernel
         double intPart = 0.0;
         double frac = RuntimeMath.ModF(3.75, &intPart);
         Assert.True(intPart == 3.0, "modf integer part");
-        Assert.True(frac > 0.749 && frac < 0.751, "modf fractional part ≈ 0.75");
+        Assert.True(frac > 0.749 && frac < 0.751, "modf fractional part is about 0.75");
     }
 
     // -- sqrt --
     private static void Test_sqrt_Values()
     {
         double r = RuntimeMath.sqrt(16.0);
-        Assert.True(r > 3.999 && r < 4.001, "sqrt(16) ≈ 4");
+        Assert.True(r > 3.999 && r < 4.001, "sqrt(16) is about 4");
 
         Assert.True(RuntimeMath.sqrt(0.0) == 0.0, "sqrt(0) == 0");
         Assert.True(double.IsNaN(RuntimeMath.sqrt(-1.0)), "sqrt(-1) == NaN");

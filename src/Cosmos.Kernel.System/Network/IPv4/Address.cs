@@ -21,9 +21,6 @@ public sealed class Address : IComparable<Address>
     /// </summary>
     public ImmutableArray<byte> Parts { get; }
 
-    public bool IsIpv4 => Parts.Length == 4;
-    public bool IsIpv6 => !IsIpv4;
-
     /// <summary>
     /// The <c>0.0.0.0</c> IP address.
     /// </summary>
@@ -52,13 +49,13 @@ public sealed class Address : IComparable<Address>
     /// <summary>
     /// Create new instance of the <see cref="Address"/> class, with specified IP address.
     /// </summary>
-    /// <param name="aFirst">First block of the address.</param>
-    /// <param name="aSecond">Second block of the address.</param>
-    /// <param name="aThird">Third block of the address.</param>
-    /// <param name="aFourth">Fourth block of the address.</param>
-    public Address(byte aFirst, byte aSecond, byte aThird, byte aFourth)
+    /// <param name="first">First block of the address.</param>
+    /// <param name="second">Second block of the address.</param>
+    /// <param name="third">Third block of the address.</param>
+    /// <param name="fourth">Fourth block of the address.</param>
+    public Address(byte first, byte second, byte third, byte fourth)
     {
-        Parts = [aFirst, aSecond, aThird, aFourth];
+        Parts = [first, second, third, fourth];
     }
 
     /// <summary>
@@ -73,8 +70,8 @@ public sealed class Address : IComparable<Address>
     /// <summary>
     /// Creates a new <see cref="Address"/> instance, with the specified byte span.
     /// </summary>
-    /// <param name="buffer"></param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <param name="buffer">The four address bytes, most significant first.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="buffer"/> is not exactly four bytes long.</exception>
     public Address(ReadOnlySpan<byte> buffer)
     {
         if (buffer.Length != 4)
@@ -87,85 +84,44 @@ public sealed class Address : IComparable<Address>
     }
 
     /// <summary>
-    /// Parses an IP address in its string representation.
+    /// Whether this is the limited broadcast address 255.255.255.255.
+    /// Internal: its one caller is the outgoing queue, which uses it to skip
+    /// ARP resolution.
     /// </summary>
-    /// <param name="addr">The IP address as string.</param>
-    /// <returns>The parsed address value or null when parsing fails.</returns>
-    public static Address? Parse(ReadOnlySpan<char> addr)
-    {
-        var fragments = addr.Split('.');
-        Span<byte> addressBytes = stackalloc byte[4];
-
-        int index = 0;
-        foreach (var fragment in fragments)
-        {
-            if (!byte.TryParse(addr[fragment], out byte value))
-            {
-                return null;
-            }
-            addressBytes[index++] = value;
-            if (index == 4)
-            {
-                return new Address(addressBytes);
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Convert a CIDR number to an IPv4 address.
-    /// </summary>
-    /// <param name="cidr">The CIDR number.</param>
-    public static Address? CIDRToAddress(int cidr)
-    {
-        try
-        {
-            uint mask = 0xffffffff << (32 - cidr);
-            return new Address((byte)(mask >> 24), (byte)(mask >> 16 & 0xff), (byte)(mask >> 8 & 0xff), (byte)(mask & 0xff));
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// Check if this address is a loopback address.
-    /// </summary>
-    public bool IsLoopbackAddress() => Parts[0] == 127;
-
-    /// <summary>
-    /// Check if this address is a broadcast address.
-    /// </summary>
-    public bool IsBroadcastAddress() =>
+    internal bool IsBroadcastAddress() =>
         Parts[0] == 0xFF
         && Parts[1] == 0xFF
         && Parts[2] == 0xFF
         && Parts[3] == 0xFF;
 
     /// <summary>
-    /// Check if this address is an APIPA address.
+    /// Formats the address in dotted-decimal notation (e.g. <c>192.168.1.1</c>).
     /// </summary>
-    public bool IsAPIPA() => Parts[0] == 169 && Parts[1] == 254;
-
     public override string ToString()
     {
         return $"{Parts[0]}.{Parts[1]}.{Parts[2]}.{Parts[3]}";
     }
 
-    public ReadOnlySpan<byte> ToSpan() => Parts.AsSpan();
+    /// <summary>
+    /// The address bytes in network order, as a span over <see cref="Parts"/>.
+    /// Internal: every caller is the socket plug layer, which is framework
+    /// plumbing. A kernel reads the octets from <see cref="Parts"/>.
+    /// </summary>
+    internal ReadOnlySpan<byte> ToSpan() => Parts.AsSpan();
 
     /// <summary>
-    /// Convert this address to a 32-bit number.
+    /// Convert this address to a 32-bit number. Internal: <see cref="Id"/> is
+    /// the same value under the name the ring already uses for it.
     /// </summary>
-    public uint ToUInt32()
+    internal uint ToUInt32()
     {
         return (uint)((Parts[0] << 24) | (Parts[1] << 16) | (Parts[2] << 8) | (Parts[3] << 0));
     }
 
     /// <summary>
-    /// The hash value for this IP. Used to uniquely identify each IP.
+    /// The four octets packed into one number, the first octet in the most
+    /// significant byte. Lossless, so two addresses share an <see cref="Id"/>
+    /// only when they are equal, which is what makes it usable as a map key.
     /// </summary>
     public uint Id
     {
@@ -180,6 +136,11 @@ public sealed class Address : IComparable<Address>
         }
     }
 
+    /// <summary>
+    /// Orders addresses by their numeric value (<see cref="Id"/>); a
+    /// <see langword="null"/> address sorts first.
+    /// </summary>
+    /// <param name="other">The address to compare with.</param>
     public int CompareTo(Address? other)
     {
         if (other is null)
@@ -187,13 +148,10 @@ public sealed class Address : IComparable<Address>
             return 1;
         }
 
-        if (other.IsIpv4 ^ IsIpv4)
-        {
-            throw new Exception("Can't compare IPv6 and IPv4 addresses");
-        }
         return Id.CompareTo(other.Id);
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (obj is Address other)
@@ -205,6 +163,7 @@ public sealed class Address : IComparable<Address>
 
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         return HashCode.Combine(Id);

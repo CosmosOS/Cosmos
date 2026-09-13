@@ -17,7 +17,7 @@ namespace ICSharpCode.SharpZipLib.Zip.Compression.Streams
     ///
     /// authors of the original java version : John Leuner, Jochen Hoenicke
     /// </summary>
-    public class StreamManipulator
+    internal class StreamManipulator
     {
         /// <summary>
         /// Get the next sequence of bits but don't increase input pointer.  bitCount must be

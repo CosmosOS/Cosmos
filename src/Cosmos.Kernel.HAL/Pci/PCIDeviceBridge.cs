@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.HAL.Pci;
 
-public class PciDeviceBridge : PciDevice
+internal class PciDeviceBridge : PciDevice
 {
     public PciBaseAddressBar[] BaseAddresses { get; private set; }
 

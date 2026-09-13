@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.Runtime;
 /// <summary>
 /// Core exception handling implementation.
 /// </summary>
-public static unsafe partial class ExceptionHelper
+internal static unsafe partial class ExceptionHelper
 {
     // Maximum stack frames to walk.
     private const int MAX_STACK_FRAMES = 64;

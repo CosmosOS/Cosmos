@@ -1,14 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
-using SchedThread = Cosmos.Kernel.Core.Scheduler.Thread;
 
 namespace Cosmos.Kernel.Core.Scheduler;
 
 /// <summary>
 /// A condition variable primitive for coordinating scheduler threads around state changes.
 /// </summary>
-public class ConditionVariable : IDisposable
+internal class ConditionVariable : IDisposable
 {
     /// <summary>
     /// Protects access to the condition variable internal state.
@@ -18,7 +17,7 @@ public class ConditionVariable : IDisposable
     /// <summary>
     /// Threads currently waiting for the condition.
     /// </summary>
-    private readonly List<SchedThread> _waitingThreads;
+    private readonly List<SchedulerThread> _waitingThreads;
 
     /// <summary>
     /// Gets the number of waiting threads.
@@ -49,11 +48,11 @@ public class ConditionVariable : IDisposable
     /// </remarks>
     public void Wait(Mutex mutex)
     {
-        SchedThread? currentThread;
+        SchedulerThread? currentThread;
 
         do
         {
-            currentThread = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())?.CurrentThread;
+            currentThread = SchedulerManager.CurrentCpuState?.CurrentThread;
         }
         while (currentThread == null);
 
@@ -75,7 +74,7 @@ public class ConditionVariable : IDisposable
         // Only park the CPU while still Blocked (same rationale as Mutex.Acquire): if a Signal
         // already readied this thread between scope-dispose and this point, halting would sleep
         // past the wake-up until an unrelated interrupt.
-        if (currentThread.State == ThreadState.Blocked)
+        if (currentThread.State == SchedulerThreadState.Blocked)
         {
             InternalCpu.Halt();
         }
@@ -100,7 +99,7 @@ public class ConditionVariable : IDisposable
     /// <returns>true if signaled, false if timeout occurred.</returns>
     public bool WaitTimeout(Mutex mutex, uint timeoutMs)
     {
-        SchedThread? currentThread = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())?.CurrentThread;
+        SchedulerThread? currentThread = SchedulerManager.CurrentCpuState?.CurrentThread;
         if (currentThread == null)
         {
             return false;
@@ -125,7 +124,7 @@ public class ConditionVariable : IDisposable
             SchedulerManager.MarkSleeping(currentThread.CpuId, currentThread, timeoutMs);
         }
 
-        if (currentThread.State == ThreadState.Sleeping)
+        if (currentThread.State == SchedulerThreadState.Sleeping)
         {
             InternalCpu.Halt();
         }
@@ -160,7 +159,7 @@ public class ConditionVariable : IDisposable
     /// avoiding EqualityComparer&lt;T&gt;.Default in kernel paths (see Mutex, InterruptEvent).
     /// Caller must hold <see cref="_lockGuard"/>.
     /// </summary>
-    private bool ContainsWaiterLocked(SchedThread thread)
+    private bool ContainsWaiterLocked(SchedulerThread thread)
     {
         for (int i = 0; i < _waitingThreads.Count; i++)
         {
@@ -174,7 +173,7 @@ public class ConditionVariable : IDisposable
     }
 
     /// <summary>Removes a thread from the wait list. Caller must hold <see cref="_lockGuard"/>.</summary>
-    private void RemoveWaiterLocked(SchedThread thread)
+    private void RemoveWaiterLocked(SchedulerThread thread)
     {
         for (int i = 0; i < _waitingThreads.Count; i++)
         {
@@ -197,7 +196,7 @@ public class ConditionVariable : IDisposable
         {
             if (_waitingThreads.Count > 0)
             {
-                SchedThread waitingThread = _waitingThreads[0];
+                SchedulerThread waitingThread = _waitingThreads[0];
                 _waitingThreads.RemoveAt(0);
 
                 Serial.WriteString("[CV] Signal -> ReadyThread id=");
@@ -221,7 +220,7 @@ public class ConditionVariable : IDisposable
     {
         using (_lockGuard.AcquireIrqSafe())
         {
-            foreach (SchedThread thread in _waitingThreads)
+            foreach (SchedulerThread thread in _waitingThreads)
             {
                 // Wake each thread by marking it ready
                 SchedulerManager.ReadyThread(thread.CpuId, thread);

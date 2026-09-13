@@ -1,119 +1,103 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using Mono.Cecil;
 
 namespace Cosmos.Build.Ilc.Tasks;
 
-#nullable disable
+/// <summary>
+/// Orders the assemblies whose library initializers the ILC startup code runs
+/// before <c>Main</c>. The order has three stages, chosen by the <c>Stage</c>
+/// metadata of each <see cref="AssemblyNames"/> item, and within a stage an
+/// assembly runs after the assemblies it references.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <c>Runtime</c> runs first: the initializer that brings up the heap, the
+/// garbage collector and the managed modules. Nothing may allocate before it.
+/// <c>Framework</c> runs next: the runtime's own initializers, which allocate
+/// and which create the class constructor runner, the piece every later
+/// initializer needs before it can read a lazily constructed static. Items
+/// without a stage are the kernel libraries and run last.
+/// </para>
+/// <para>
+/// The reference graph alone cannot give this order. The patcher copies plug
+/// bodies into <c>System.Private.CoreLib</c>, so the patched CoreLib references
+/// the kernel assemblies its plugs call into, and a plain dependency sort put
+/// its initializer after them: the scheduler was installed and its timer armed
+/// before the class constructor runner existed.
+/// </para>
+/// </remarks>
 public class SortAutoInitialedAssemblies : Microsoft.Build.Utilities.Task
 {
-    [Required]
-    public ITaskItem[] AssemblyPaths { get; set; }
+    private const string StageMetadata = "Stage";
+    private const string RuntimeStage = "Runtime";
+    private const string FrameworkStage = "Framework";
+    private const string LibraryStage = "";
 
-    [Required]
-    public ITaskItem[] AssemblyNames { get; set; }
+    private static readonly string[] s_stageOrder = [RuntimeStage, FrameworkStage, LibraryStage];
 
+    /// <summary>
+    /// The ILC reference assemblies. The reference edges are read from these files.
+    /// </summary>
+    [Required]
+    public ITaskItem[] AssemblyPaths { get; set; } = [];
+
+    /// <summary>
+    /// The assemblies with a library initializer, each with an optional <c>Stage</c> metadata.
+    /// </summary>
+    [Required]
+    public ITaskItem[] AssemblyNames { get; set; } = [];
+
+    /// <summary>
+    /// The same assemblies, in the order ILC must run their initializers.
+    /// </summary>
     [Output]
-    public ITaskItem[] SortedAssemblyNames { get; set; }
+    public ITaskItem[] SortedAssemblyNames { get; set; } = [];
 
     public override bool Execute()
     {
-        if (AssemblyNames.Length == 0)
+        Dictionary<string, List<ITaskItem>> stages = new(StringComparer.Ordinal);
+        foreach (string stage in s_stageOrder)
         {
-            Log.LogMessage(MessageImportance.High, "No assembly names provided, returning empty");
-            SortedAssemblyNames = Array.Empty<ITaskItem>();
-            return true;
+            stages[stage] = new List<ITaskItem>();
+        }
+
+        foreach (ITaskItem item in AssemblyNames)
+        {
+            string stage = item.GetMetadata(StageMetadata);
+            if (!stages.TryGetValue(stage, out List<ITaskItem> members))
+            {
+                Log.LogError(
+                    $"'{item.ItemSpec}' has the unknown library initializer stage '{stage}'. " +
+                    $"Use '{RuntimeStage}', '{FrameworkStage}', or no stage for a kernel library.");
+                return false;
+            }
+
+            members.Add(item);
         }
 
         try
         {
-            HashSet<string> requestedAssemblies = new(
-                AssemblyNames.Select(a => a.ItemSpec),
-                StringComparer.OrdinalIgnoreCase);
-
-            Dictionary<string, string> dllMap = AssemblyPaths.ToDictionary(
-                item => Path.GetFileNameWithoutExtension(item.ItemSpec),
-                item => item.ItemSpec,
-                StringComparer.OrdinalIgnoreCase);
-
-            Dictionary<string, HashSet<string>> graph = new(StringComparer.OrdinalIgnoreCase);
-            HashSet<string> allAssemblies = new(StringComparer.OrdinalIgnoreCase);
-
-            // Build dependency graph only for assemblies we explicitly care about
-            foreach (KeyValuePair<string, string> kvp in dllMap)
+            Dictionary<string, HashSet<string>> references = ReadReferences();
+            List<ITaskItem> ordered = new(AssemblyNames.Length);
+            foreach (string stage in s_stageOrder)
             {
-                string asmPath = kvp.Value;
-                if (!File.Exists(asmPath))
+                List<ITaskItem>? sorted = SortByReferences(stages[stage], references);
+                if (sorted is null)
                 {
-                    Log.LogWarning($"Assembly file not found: {asmPath}");
-                    continue;
+                    return false;
                 }
 
-                // Try to read the assembly, skip if it's not a valid IL assembly
-                AssemblyDefinition asm;
-                try
-                {
-                    asm = AssemblyDefinition.ReadAssembly(asmPath);
-                    Log.LogMessage(MessageImportance.High, " Successfully loaded as IL assembly");
-                }
-                catch (BadImageFormatException ex)
-                {
-                    Log.LogMessage(MessageImportance.High,
-                        "SKIPPED: Not a valid IL assembly (likely native/AOT compiled)");
-                    Log.LogMessage(MessageImportance.Low, $"     Exception: {ex.Message}");
-                    continue;
-                }
-                catch (Exception ex)
-                {
-                    Log.LogWarning($"Could not read assembly {asmPath}: {ex.GetType().Name} - {ex.Message}");
-                    continue;
-                }
-
-                using (asm)
-                {
-                    // Skip if this assembly isn't in AssemblyNames
-                    if (!requestedAssemblies.Contains(asm.Name.Name))
-                    {
-                        continue;
-                    }
-
-                    allAssemblies.Add(kvp.Key);
-
-                    // Only consider dependencies that are also part of AssemblyNames
-                    HashSet<string> refs = new(
-                        asm.MainModule.AssemblyReferences
-                            .Select(r => r.Name)
-                            .Where(requestedAssemblies.Contains),
-                        StringComparer.OrdinalIgnoreCase);
-                    graph[kvp.Key] = refs;
-                }
+                ordered.AddRange(sorted);
             }
 
-            Log.LogMessage(MessageImportance.Low, "Performing topological sort on assembly dependency graph...");
-            List<string> sorted = TopologicalSort(graph, allAssemblies);
-
-            List<string> missing = requestedAssemblies
-                .Where(name => !sorted.Contains(name, StringComparer.OrdinalIgnoreCase))
-                .ToList();
-
-            if (missing.Count > 0)
-            {
-                Log.LogMessage(MessageImportance.High, "--- Missing assemblies (not in graph) ---");
-                foreach (string m in missing)
-                {
-                    Log.LogMessage(MessageImportance.High, $"  - {m}");
-                }
-            }
-
-            // System.* and sorted assemblies
-            TaskItem[] ordered = sorted
-                .Where(requestedAssemblies.Contains)
-                .Concat(missing)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Select(n => new TaskItem(n))
-                .ToArray();
-
-            SortedAssemblyNames = ordered;
+            Log.LogMessage(
+                MessageImportance.Normal,
+                "Library initializer order: " + string.Join(", ", ordered.Select(item => item.ItemSpec)));
+            SortedAssemblyNames = ordered.ToArray();
             return true;
         }
         catch (Exception ex)
@@ -123,53 +107,76 @@ public class SortAutoInitialedAssemblies : Microsoft.Build.Utilities.Task
         }
     }
 
-    private static List<string> TopologicalSort(
-        Dictionary<string, HashSet<string>> graph,
-        HashSet<string> allNodes)
+    /// <summary>
+    /// The references of each initializer assembly that are themselves initializer
+    /// assemblies, read from the ILC reference files. An assembly that is not among
+    /// the references gets no entry and keeps its declared position.
+    /// </summary>
+    private Dictionary<string, HashSet<string>> ReadReferences()
     {
-        Dictionary<string, int> inDegree = new(StringComparer.OrdinalIgnoreCase);
-        foreach (string node in allNodes)
+        HashSet<string> requested = new(AssemblyNames.Select(item => item.ItemSpec), StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, string> paths = new(StringComparer.OrdinalIgnoreCase);
+        foreach (ITaskItem path in AssemblyPaths)
         {
-            inDegree[node] = 0;
+            paths[Path.GetFileNameWithoutExtension(path.ItemSpec)] = path.ItemSpec;
         }
 
-        foreach (KeyValuePair<string, HashSet<string>> kvp in graph)
+        Dictionary<string, HashSet<string>> references = new(StringComparer.OrdinalIgnoreCase);
+        foreach (string name in requested)
         {
-            string node = kvp.Key;
-            HashSet<string> deps = kvp.Value;
-            // If node depends on deps, then node's in-degree increases
-            inDegree[node] = deps.Count(dep => inDegree.ContainsKey(dep));
-        }
-
-        Queue<string> queue = new(
-            inDegree.Where(kvp => kvp.Value == 0).Select(kvp => kvp.Key));
-
-        List<string> result = new();
-
-        while (queue.Count > 0)
-        {
-            string node = queue.Dequeue();
-            result.Add(node);
-
-            // Find all nodes that depend on this node
-            foreach (KeyValuePair<string, HashSet<string>> kvp in graph)
+            if (!paths.TryGetValue(name, out string path))
             {
-                string dependent = kvp.Key;
-                HashSet<string> deps = kvp.Value;
-                if (deps.Contains(node))
-                {
-                    if (--inDegree[dependent] == 0)
-                    {
-                        queue.Enqueue(dependent);
-                    }
-                }
+                Log.LogMessage(
+                    MessageImportance.High,
+                    $"'{name}' is not among the ILC references; its initializer keeps its declared position.");
+                continue;
             }
+
+            using AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(path);
+            references[name] = new HashSet<string>(
+                assembly.MainModule.AssemblyReferences.Select(reference => reference.Name).Where(requested.Contains),
+                StringComparer.OrdinalIgnoreCase);
         }
 
-        // Add any missing (e.g., in cycles)
-        IEnumerable<string> missing = allNodes.Except(result, StringComparer.OrdinalIgnoreCase);
-        result.AddRange(missing);
+        return references;
+    }
+
+    /// <summary>
+    /// Kahn's algorithm over one stage, with the declared order as the tie-break so
+    /// the result does not depend on directory enumeration order. Returns null on a
+    /// reference cycle, which is logged as an error.
+    /// </summary>
+    private List<ITaskItem>? SortByReferences(List<ITaskItem> members, Dictionary<string, HashSet<string>> references)
+    {
+        HashSet<string> inStage = new(members.Select(member => member.ItemSpec), StringComparer.OrdinalIgnoreCase);
+        HashSet<string> placed = new(StringComparer.OrdinalIgnoreCase);
+        List<ITaskItem> pending = new(members);
+        List<ITaskItem> result = new(members.Count);
+
+        while (pending.Count > 0)
+        {
+            int index = pending.FindIndex(item => ReferencesArePlaced(item.ItemSpec));
+            if (index < 0)
+            {
+                Log.LogError(
+                    "The library initializer assemblies " +
+                    string.Join(", ", pending.Select(item => item.ItemSpec)) +
+                    " reference each other in a cycle.");
+                return null;
+            }
+
+            ITaskItem next = pending[index];
+            pending.RemoveAt(index);
+            placed.Add(next.ItemSpec);
+            result.Add(next);
+        }
 
         return result;
+
+        bool ReferencesArePlaced(string name)
+        {
+            return !references.TryGetValue(name, out HashSet<string> refs)
+                || refs.All(reference => !inStage.Contains(reference) || placed.Contains(reference));
+        }
     }
 }

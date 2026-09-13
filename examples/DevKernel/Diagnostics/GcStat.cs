@@ -1,13 +1,11 @@
 using System;
 using System.Drawing;
 using System.Threading;
-using Cosmos.Kernel.Core.Memory;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
 using DevKernel.Diagnostics.Charting;
 using DevKernel.Graphics;
-using KernelGc = Cosmos.Kernel.Core.Memory.GarbageCollector.GarbageCollector;
-using KernelHeap = Cosmos.Kernel.Core.Memory.Heap.Heap;
 
 namespace DevKernel.Diagnostics;
 
@@ -15,11 +13,14 @@ namespace DevKernel.Diagnostics;
 // committed/heap/fragmented bytes over time, and a marker on every frame during which
 // the collector ran.
 //
-// The two upper sections deliberately come from different sources, because they answer
-// different questions:
+// Both upper sections read the same GCMemoryInfo, taken once per frame, but its fields
+// answer two different questions:
 //
-//   LIVE HEAP        walks the heap right now, through the GarbageCollector getters.
-//   LAST COLLECTION  reads GCMemoryInfo, which describes the heap as of the last GC.
+//   LIVE HEAP        the heap-wide figures (used, fragmented, committed, memory load,
+//                    pinned): the kernel collector computes them at the time of the
+//                    call, by walking its segments and free lists.
+//   LAST COLLECTION  the generation 0 figures: recorded by the collector during the
+//                    last collection and unchanged until the next one.
 //
 // Watching them side by side is instructive: fragmentation falls back to almost nothing
 // between two collections, because refilling a TLAB drains the very free lists the live
@@ -31,7 +32,8 @@ namespace DevKernel.Diagnostics;
 // Exits on ESC.
 internal static class GcStat
 {
-    // The kernel collector's own counters, read in one go so a frame stays coherent.
+    // The kernel collector's own counters, read once per frame so every section of
+    // that frame shows the same values.
     private readonly struct CollectorStats
     {
         private CollectorStats(int percentTimeInGc, int collections, int objectsFreed)
@@ -49,10 +51,10 @@ internal static class GcStat
 
         public static CollectorStats Read()
         {
-            int percentTimeInGc = KernelGc.GetLastGCPercentTimeInGC();
-            KernelGc.GetStats(out int collections, out int objectsFreed);
-
-            return new CollectorStats(percentTimeInGc, collections, objectsFreed);
+            return new CollectorStats(
+                MemoryInfo.GcTimePercent,
+                MemoryInfo.TotalCollections,
+                MemoryInfo.TotalObjectsFreed);
         }
     }
 
@@ -100,7 +102,7 @@ internal static class GcStat
 
         ClearHistory();
 
-        ulong peakCommitted = 0;
+        long peakCommitted = 0;
         int lastCollectionCount = -1;
         uint frames = 0;
 
@@ -108,26 +110,25 @@ internal static class GcStat
         {
             if (frames % CollectEveryFrames == 0)
             {
-                KernelHeap.Collect();
+                MemoryInfo.Collect();
             }
 
-            KernelGc.SimpleMemoryInfo live = KernelGc.GetSimpleMemoryInfo();
-            GCMemoryInfo recorded = GC.GetGCMemoryInfo();
+            GCMemoryInfo info = GC.GetGCMemoryInfo();
             CollectorStats collector = CollectorStats.Read();
 
-            if (live.TotalCommittedBytes > peakCommitted)
+            if (info.TotalCommittedBytes > peakCommitted)
             {
-                peakCommitted = live.TotalCommittedBytes;
+                peakCommitted = info.TotalCommittedBytes;
             }
 
-            s_committedSeries.Add(live.TotalCommittedBytes);
-            s_heapSeries.Add(live.HeapSizeBytes);
-            s_fragmentedSeries.Add(live.FragmentedBytes);
+            s_committedSeries.Add(info.TotalCommittedBytes);
+            s_heapSeries.Add(info.HeapSizeBytes);
+            s_fragmentedSeries.Add(info.FragmentedBytes);
 
             s_collectionMarkers.Add(lastCollectionCount >= 0 && collector.Collections != lastCollectionCount);
             lastCollectionCount = collector.Collections;
 
-            Render(canvas, font, live, recorded, collector, peakCommitted);
+            Render(canvas, font, info, collector, peakCommitted);
 
             canvas.Display();
             frames++;
@@ -155,10 +156,9 @@ internal static class GcStat
     private static void Render(
         Canvas canvas,
         PCScreenFont font,
-        KernelGc.SimpleMemoryInfo live,
-        GCMemoryInfo recorded,
+        GCMemoryInfo info,
         CollectorStats collector,
-        ulong peakCommitted)
+        long peakCommitted)
     {
         int x = OverlayLayout.TextMarginPx;
         int row = OverlayLayout.TextMarginPx;
@@ -170,8 +170,8 @@ internal static class GcStat
             canvas, font, "GC / Memory Monitor - ESC to exit", Color.LightGray, x, row, canvas.Width - x * 2);
         row += lineHeight * OverlayLayout.SectionBreakRowCount;
 
-        row = DrawLiveSection(canvas, font, x, row, live, peakCommitted);
-        row = DrawCollectionSection(canvas, font, x, row, recorded);
+        row = DrawLiveSection(canvas, font, x, row, info, peakCommitted);
+        row = DrawCollectionSection(canvas, font, x, row, info);
         row = DrawCollectorSection(canvas, font, x, row, collector);
 
         DrawMemoryChart(canvas, font, x, row, canvas.Width - x);
@@ -183,46 +183,46 @@ internal static class GcStat
         PCScreenFont font,
         int x,
         int y,
-        KernelGc.SimpleMemoryInfo live,
-        ulong peakCommitted)
+        GCMemoryInfo info,
+        long peakCommitted)
     {
         y = DrawSectionTitle(canvas, font, x, y, "LIVE HEAP");
 
         y = DrawRow(canvas, font, x, y, s_liveColor,
-            "used", ByteFormat.Short((long)live.HeapSizeBytes),
-            "fragmented", ByteFormat.Short((long)live.FragmentedBytes));
+            "used", ByteFormat.Short(info.HeapSizeBytes),
+            "fragmented", ByteFormat.Short(info.FragmentedBytes));
 
         y = DrawRow(canvas, font, x, y, s_liveColor,
-            "committed", ByteFormat.Short((long)live.TotalCommittedBytes),
-            "peak", ByteFormat.Short((long)peakCommitted));
+            "committed", ByteFormat.Short(info.TotalCommittedBytes),
+            "peak", ByteFormat.Short(peakCommitted));
 
         y = DrawRow(canvas, font, x, y, s_liveColor,
-            "memory load", ByteFormat.Short((long)live.MemoryLoadBytes),
-            "installed", ByteFormat.Short((long)PageAllocator.RamSize));
+            "memory load", ByteFormat.Short(info.MemoryLoadBytes),
+            "installed", ByteFormat.Short((long)MemoryInfo.RamSizeBytes));
 
         y = DrawRow(canvas, font, x, y, s_liveColor,
-            "pinned", live.PinnedObjectsCount.ToString(),
-            "collections", live.CollectionIndex.ToString());
+            "pinned", info.PinnedObjectsCount.ToString(),
+            "collections", info.Index.ToString());
 
         return y + OverlayLayout.LineHeight(font);
     }
 
-    // Generation 0 around the last collection, as reported by GCMemoryInfo.
+    // Generation 0 around the last collection, as recorded by the collector.
     private static int DrawCollectionSection(
         Canvas canvas,
         PCScreenFont font,
         int x,
         int y,
-        GCMemoryInfo recorded)
+        GCMemoryInfo info)
     {
         y = DrawSectionTitle(canvas, font, x, y, "LAST COLLECTION (GEN 0)");
 
-        if (recorded.GenerationInfo.Length <= Gen0)
+        if (info.GenerationInfo.Length <= Gen0)
         {
             return y + OverlayLayout.LineHeight(font);
         }
 
-        GCGenerationInfo gen0 = recorded.GenerationInfo[Gen0];
+        GCGenerationInfo gen0 = info.GenerationInfo[Gen0];
 
         // One value per cell: a "before -> after" pair does not fit in ValueChars, and an
         // oversized value would push the right-hand column out of line with the other rows.
@@ -239,8 +239,8 @@ internal static class GcStat
             "frag delta", ByteFormat.Short(gen0.FragmentationAfterBytes - gen0.FragmentationBeforeBytes));
 
         y = DrawRow(canvas, font, x, y, s_collectionColor,
-            "heap-wide", ByteFormat.Short(recorded.FragmentedBytes),
-            "index", recorded.Index.ToString());
+            "heap-wide", ByteFormat.Short(info.FragmentedBytes),
+            "index", info.Index.ToString());
 
         return y + OverlayLayout.LineHeight(font);
     }

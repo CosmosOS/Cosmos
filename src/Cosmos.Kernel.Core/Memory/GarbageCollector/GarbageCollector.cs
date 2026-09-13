@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// Mark-and-sweep garbage collector with free list allocation.
 /// Manages GC heap segments, pinned heap, frozen segments, and GC handles.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     // --- Nested types ---
 

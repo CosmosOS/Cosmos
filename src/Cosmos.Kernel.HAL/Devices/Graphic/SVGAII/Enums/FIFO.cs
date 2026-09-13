@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 /// <summary>
 /// FIFO values.
 /// </summary>
-public enum FIFO : uint
+internal enum FIFO : uint
 {   // values are multiplied by 4 to access the array by byte index
     /// <summary>
     /// Min.

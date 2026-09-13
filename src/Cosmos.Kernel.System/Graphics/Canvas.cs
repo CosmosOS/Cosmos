@@ -1,4 +1,4 @@
-//#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,20 +8,34 @@ namespace Cosmos.Kernel.System.Graphics;
 
 /// <summary>
 /// Represents a drawing surface. Can be used directly as a virtual (buffer-backed)
-/// canvas, or subclassed for hardware-backed canvases (e.g. <see cref="GopCanvas"/>).
+/// canvas, or subclassed for hardware-backed canvases.
 /// </summary>
+/// <remarks>
+/// Every drawing primitive clips. A pixel outside 0..<see cref="Width"/>-1 by
+/// 0..<see cref="Height"/>-1 is dropped, a shape that straddles an edge is drawn
+/// up to it, and nothing throws for a coordinate, so coordinates never need
+/// clamping before a call.
+/// </remarks>
 public unsafe class Canvas
 {
     /// <summary>
-    /// Pixel buffer for virtual canvases. Null for hardware-backed subclasses.
-    /// Each element is a raw ARGB pixel value.
+    /// Pixel buffer for virtual canvases. Null for hardware-backed subclasses,
+    /// which draw straight through their device. Each element is a raw ARGB
+    /// pixel value.
     /// </summary>
-    protected int[]? Buffer;
+    private int[]? _buffer;
 
     /// <summary>
-    /// The available graphics modes.
+    /// The one mode a virtual canvas accepts: the one it is in. Rebuilt when
+    /// <see cref="Mode"/> is assigned, so reading it in a loop costs nothing.
     /// </summary>
-    public virtual List<Mode> AvailableModes => new() { Mode };
+    private Mode[]? _availableModes;
+
+    /// <summary>
+    /// The graphics modes this canvas accepts, in the order the driver reports
+    /// them. <see cref="Mode"/> only accepts a mode from this list.
+    /// </summary>
+    public virtual IReadOnlyList<Mode> AvailableModes => _availableModes ??= new Mode[] { Mode };
 
     /// <summary>
     /// The default graphics mode.
@@ -31,28 +45,53 @@ public unsafe class Canvas
     private Mode _mode;
 
     /// <summary>
-    /// The currently used display mode.
+    /// The currently used display mode. Setting it resizes a virtual canvas'
+    /// buffer, discarding its contents, and recomputes the pixel metrics.
+    /// Hardware-backed canvases reprogram the device in their override.
     /// </summary>
+    /// <remarks>
+    /// The setter is not part of the ring: a kernel picks its mode when it
+    /// acquires the canvas, through <see cref="GetFullScreen(Mode)"/> or the
+    /// virtual-canvas constructor.
+    /// </remarks>
     public virtual Mode Mode
     {
         get => _mode;
-        set => _mode = value;
+        protected internal set
+        {
+            _mode = value;
+            _availableModes = null;
+            _bytesPerPixel = (int)value.ColorDepth / 8;
+            _stride = (int)value.ColorDepth / 8;
+            _pitch = value.Width * _bytesPerPixel;
+
+            int length = value.Width * value.Height;
+            if (_buffer is not null && _buffer.Length != length)
+            {
+                _buffer = new int[length];
+            }
+        }
     }
 
     /// <summary>
     /// The width of this canvas in pixels.
     /// </summary>
-    public int Width => (int)Mode.Width;
+    public int Width => Mode.Width;
 
     /// <summary>
     /// The height of this canvas in pixels.
     /// </summary>
-    public int Height => (int)Mode.Height;
+    public int Height => Mode.Height;
 
     /// <summary>
     /// Screen refresh rate in Hz as reported by EDID. Defaults to 60 if unavailable.
     /// </summary>
     public virtual int RefreshRate => 60;
+
+    /// <summary>
+    /// The name of the Canvas implementation.
+    /// </summary>
+    public virtual string Name => "Canvas";
 
     /// <summary>
     /// Bytes per pixel (4 in 32bit, 3 in 24bit).
@@ -86,23 +125,7 @@ public unsafe class Canvas
         _mode = mode;
         _bytesPerPixel = (int)mode.ColorDepth / 8;
         _stride = (int)mode.ColorDepth / 8;
-        _pitch = (int)mode.Width * _bytesPerPixel;
-    }
-
-    /// <summary>
-    /// Gets the hardware-backed full-screen canvas using the default graphics mode.
-    /// </summary>
-    public static Canvas GetFullScreen()
-    {
-        return FullScreenCanvas.GetFullScreenCanvas();
-    }
-
-    /// <summary>
-    /// Gets the hardware-backed full-screen canvas using the specified mode.
-    /// </summary>
-    public static Canvas GetFullScreen(Mode mode)
-    {
-        return FullScreenCanvas.GetFullScreenCanvas(mode);
+        _pitch = mode.Width * _bytesPerPixel;
     }
 
     /// <summary>
@@ -113,11 +136,61 @@ public unsafe class Canvas
     /// <param name="colorDepth">The color depth (default 32-bit).</param>
     public Canvas(int width, int height, ColorDepth colorDepth = ColorDepth.ColorDepth32)
     {
-        _mode = new Mode((uint)width, (uint)height, colorDepth);
+        _mode = new Mode(width, height, colorDepth);
         _bytesPerPixel = (int)colorDepth / 8;
         _stride = (int)colorDepth / 8;
         _pitch = width * _bytesPerPixel;
-        Buffer = new int[width * height];
+        _buffer = new int[width * height];
+    }
+
+    /// <summary>
+    /// Gets the hardware-backed full-screen canvas using the default graphics
+    /// mode. The first call builds it against the detected display device;
+    /// later calls hand back the same canvas without resetting the mode, so
+    /// <see cref="Mode"/> always reports the real screen size.
+    /// <para>
+    /// The display device decides the canvas's type. Only the VMware SVGA II
+    /// adapter negotiates 3D, so a kernel that wants to render 3D tests the
+    /// canvas with <c>is <see cref="Canvas3D"/></c>; on the UEFI framebuffer
+    /// every documented setup uses, it never is.
+    /// </para>
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Graphics support is compiled out with CosmosEnableGraphics=false. Test
+    /// <see cref="KernelFeatures.Graphics"/> first to avoid it.
+    /// </exception>
+    public static Canvas GetFullScreen()
+    {
+        return FullScreenCanvas.Get();
+    }
+
+    /// <summary>
+    /// Gets the hardware-backed full-screen canvas, switching the display to
+    /// <paramref name="mode"/>. The UEFI framebuffer cannot change mode after
+    /// boot, so on the GOP path the request is ignored and the canvas keeps
+    /// reporting the resolution the bootloader set.
+    /// </summary>
+    /// <param name="mode">
+    /// The display mode to switch to; must be one of the canvas's
+    /// <see cref="AvailableModes"/>.
+    /// </param>
+    /// <exception cref="InvalidOperationException">Graphics support is compiled out with CosmosEnableGraphics=false.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The display device does not support <paramref name="mode"/>.</exception>
+    public static Canvas GetFullScreen(Mode mode)
+    {
+        return FullScreenCanvas.Get(mode);
+    }
+
+    /// <summary>
+    /// Returns the display device to text mode and gives the screen back, so a
+    /// later <see cref="GetFullScreen()"/> builds a fresh canvas against a
+    /// re-enabled device. Any canvas already acquired is dead after this call.
+    /// There is no VGA text mode to fall back to on UEFI machines, where this
+    /// is a no-op.
+    /// </summary>
+    public static void DisableFullScreen()
+    {
+        FullScreenCanvas.Disable();
     }
 
     /// <summary>
@@ -134,12 +207,12 @@ public unsafe class Canvas
     /// <param name="color">The ARGB color to clear the screen with.</param>
     public virtual void Clear(int color)
     {
-        if (Buffer == null)
+        if (_buffer is null)
         {
             return;
         }
 
-        Array.Fill(Buffer, color);
+        Array.Fill(_buffer, color);
     }
 
     /// <summary>
@@ -152,9 +225,11 @@ public unsafe class Canvas
     }
 
     /// <summary>
-    /// Disables the canvas.
+    /// Turns the display device off. The device half of
+    /// <see cref="DisableFullScreen"/>, which is what a kernel calls: a
+    /// virtual canvas has no device to turn off at all.
     /// </summary>
-    public virtual void Disable()
+    internal virtual void Disable()
     {
     }
 
@@ -166,7 +241,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual void DrawPoint(Color color, int x, int y)
     {
-        if (Buffer == null)
+        if (_buffer is null)
         {
             return;
         }
@@ -186,7 +261,7 @@ public unsafe class Canvas
             color = AlphaBlend(color, GetPointColor(x, y), color.A);
         }
 
-        Buffer[y * Width + x] = color.ToArgb();
+        _buffer[y * Width + x] = color.ToArgb();
     }
 
     /// <summary>
@@ -197,7 +272,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual void DrawPoint(uint color, int x, int y)
     {
-        if (Buffer == null)
+        if (_buffer is null)
         {
             return;
         }
@@ -207,7 +282,7 @@ public unsafe class Canvas
             return;
         }
 
-        Buffer[y * Width + x] = (int)color;
+        _buffer[y * Width + x] = (int)color;
     }
 
     /// <summary>
@@ -218,7 +293,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual void DrawPoint(int color, int x, int y)
     {
-        if (Buffer == null)
+        if (_buffer is null)
         {
             return;
         }
@@ -228,13 +303,8 @@ public unsafe class Canvas
             return;
         }
 
-        Buffer[y * Width + x] = color;
+        _buffer[y * Width + x] = color;
     }
-
-    /// <summary>
-    /// The name of the Canvas implementation.
-    /// </summary>
-    public virtual string Name() => "Canvas";
 
     /// <summary>
     /// Updates the screen to display the underlying frame-buffer.
@@ -251,7 +321,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual Color GetPointColor(int x, int y)
     {
-        if (Buffer == null)
+        if (_buffer is null)
         {
             return Color.Black;
         }
@@ -261,7 +331,7 @@ public unsafe class Canvas
             return Color.Black;
         }
 
-        return Color.FromArgb(Buffer[y * Width + x]);
+        return Color.FromArgb(_buffer[y * Width + x]);
     }
 
     /// <summary>
@@ -271,7 +341,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual int GetRawPointColor(int x, int y)
     {
-        if (Buffer == null)
+        if (_buffer is null)
         {
             return 0;
         }
@@ -281,13 +351,13 @@ public unsafe class Canvas
             return 0;
         }
 
-        return Buffer[y * Width + x];
+        return _buffer[y * Width + x];
     }
 
     /// <summary>
     /// Gets the raw pixel buffer of this canvas. Returns null for hardware-backed canvases.
     /// </summary>
-    public int[]? GetBuffer() => Buffer;
+    public int[]? GetBuffer() => _buffer;
 
     internal int GetPointOffset(int x, int y)
     {
@@ -384,6 +454,71 @@ public unsafe class Canvas
     }
 
     /// <summary>
+    /// Copies a rectangle of pixels from one position on the canvas to
+    /// another. The rectangle is clipped so that both the source and the
+    /// destination stay within the canvas bounds. Overlapping regions copy
+    /// correctly and without an intermediate buffer: the copy walks away
+    /// from the overlap, the same rule as <c>memmove</c>.
+    /// </summary>
+    /// <param name="srcX">The X coordinate of the source rectangle.</param>
+    /// <param name="srcY">The Y coordinate of the source rectangle.</param>
+    /// <param name="dstX">The X coordinate of the destination rectangle.</param>
+    /// <param name="dstY">The Y coordinate of the destination rectangle.</param>
+    /// <param name="width">The width of the rectangle in pixels.</param>
+    /// <param name="height">The height of the rectangle in pixels.</param>
+    public virtual void CopyPixels(int srcX, int srcY, int dstX, int dstY, int width, int height)
+    {
+        int left = Math.Max(0, Math.Max(-srcX, -dstX));
+        int top = Math.Max(0, Math.Max(-srcY, -dstY));
+        int right = Math.Min(width, Math.Min(Width - srcX, Width - dstX));
+        int bottom = Math.Min(height, Math.Min(Height - srcY, Height - dstY));
+
+        if (left >= right || top >= bottom)
+        {
+            return;
+        }
+
+        int copyWidth = right - left;
+        int copyHeight = bottom - top;
+        int sourceX = srcX + left;
+        int sourceY = srcY + top;
+        int destinationX = dstX + left;
+        int destinationY = dstY + top;
+
+        // When the destination sits below the source, writing row r of the
+        // destination lands on a source row not yet read, so rows go
+        // bottom-up. Columns only interfere when both rectangles share their
+        // rows; then a destination to the right is written right-to-left.
+        bool rowsBackward = destinationY > sourceY;
+        bool columnsBackward = destinationY == sourceY && destinationX > sourceX;
+
+        for (int r = 0; r < copyHeight; r++)
+        {
+            int row = rowsBackward ? copyHeight - 1 - r : r;
+
+            for (int c = 0; c < copyWidth; c++)
+            {
+                int column = columnsBackward ? copyWidth - 1 - c : c;
+                DrawPoint(GetRawPointColor(sourceX + column, sourceY + row), destinationX + column, destinationY + row);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Moves a single pixel to a new position and clears its old position to
+    /// black.
+    /// </summary>
+    /// <param name="x">The X coordinate of the pixel.</param>
+    /// <param name="y">The Y coordinate of the pixel.</param>
+    /// <param name="newX">The X coordinate to move the pixel to.</param>
+    /// <param name="newY">The Y coordinate to move the pixel to.</param>
+    public virtual void MovePixel(int x, int y, int newX, int newY)
+    {
+        CopyPixels(x, y, newX, newY, 1, 1);
+        DrawPoint(0, x, y);
+    }
+
+    /// <summary>
     /// Draws a horizontal line.
     /// </summary>
     /// <param name="color">The color to draw with.</param>
@@ -442,6 +577,11 @@ public unsafe class Canvas
         var px = x1;
         var py = y1;
 
+        // The loops below step before they draw, so they end on (x2, y2) and
+        // would skip the start. Paint it here to keep both endpoints, matching
+        // the axis-aligned paths.
+        DrawPoint(color, px, py);
+
         if (dxabs >= dyabs) // the line is more horizontal than vertical
         {
             for (i = 0; i < dxabs; i++)
@@ -480,6 +620,9 @@ public unsafe class Canvas
     /// <param name="y1">The starting point Y coordinate.</param>
     /// <param name="x2">The end point X coordinate.</param>
     /// <param name="y2">The end point Y coordinate.</param>
+    /// <remarks>
+    /// Both endpoints are painted, so a line from x to x is one pixel.
+    /// </remarks>
     public virtual void DrawLine(Color color, int x1, int y1, int x2, int y2)
     {
         // Trim the given line to fit inside the canvas boundaries
@@ -490,16 +633,17 @@ public unsafe class Canvas
 
         if (dy == 0) // The line is horizontal
         {
+            // Both endpoints are painted, so the run is the distance plus one.
             // DrawHorizontalLine only walks in the positive direction; start
             // from the leftmost point so right-to-left lines are not dropped.
-            DrawHorizontalLine(color, Math.Abs(dx), Math.Min(x1, x2), y1);
+            DrawHorizontalLine(color, Math.Abs(dx) + 1, Math.Min(x1, x2), y1);
             return;
         }
 
         if (dx == 0) // The line is vertical
         {
             // Same as above: start from the topmost point.
-            DrawVerticalLine(color, Math.Abs(dy), x1, Math.Min(y1, y2));
+            DrawVerticalLine(color, Math.Abs(dy) + 1, x1, Math.Min(y1, y2));
             return;
         }
 
@@ -517,10 +661,6 @@ public unsafe class Canvas
     /// <param name="radius">The radius of the circle to draw.</param>
     public virtual void DrawCircle(Color color, int xCenter, int yCenter, int radius)
     {
-        ThrowIfCoordNotValid(xCenter + radius, yCenter);
-        ThrowIfCoordNotValid(xCenter - radius, yCenter);
-        ThrowIfCoordNotValid(xCenter, yCenter + radius);
-        ThrowIfCoordNotValid(xCenter, yCenter - radius);
         int x = radius;
         int y = 0;
         int e = 0;
@@ -601,10 +741,6 @@ public unsafe class Canvas
     /// <param name="yR">The Y radius.</param>
     public virtual void DrawEllipse(Color color, int xCenter, int yCenter, int xR, int yR)
     {
-        ThrowIfCoordNotValid(xCenter + xR, yCenter);
-        ThrowIfCoordNotValid(xCenter - xR, yCenter);
-        ThrowIfCoordNotValid(xCenter, yCenter + yR);
-        ThrowIfCoordNotValid(xCenter, yCenter - yR);
         int a = 2 * xR;
         int b = 2 * yR;
         int b1 = b & 1;
@@ -637,7 +773,7 @@ public unsafe class Canvas
     /// <param name="yCenter">The Y center coordinate.</param>
     /// <param name="xR">The X radius.</param>
     /// <param name="yR">The Y radius.</param>
-    public virtual void DrawFilledEllipse(Color color, int xCenter, int yCenter, int yR, int xR)
+    public virtual void DrawFilledEllipse(Color color, int xCenter, int yCenter, int xR, int yR)
     {
         for (int y = -yR; y <= yR; y++)
         {
@@ -654,16 +790,16 @@ public unsafe class Canvas
     /// <summary>
     /// Draws an arc.
     /// </summary>
-    /// <param name="x">The starting X coordinate.</param>
-    /// <param name="y">The ending X coordinate.</param>
-    /// <param name="width">The width of the arc.</param>
-    /// <param name="height">The height of the arc.</param>
     /// <param name="color">The color of the arc.</param>
+    /// <param name="xCenter">The X coordinate of the arc's center.</param>
+    /// <param name="yCenter">The Y coordinate of the arc's center.</param>
+    /// <param name="xR">The X radius of the arc.</param>
+    /// <param name="yR">The Y radius of the arc.</param>
     /// <param name="startAngle">The starting angle of the arc, in degrees.</param>
     /// <param name="endAngle">The ending angle of the arc, in degrees.</param>
-    public virtual void DrawArc(int x, int y, int width, int height, Color color, int startAngle = 0, int endAngle = 360)
+    public virtual void DrawArc(Color color, int xCenter, int yCenter, int xR, int yR, int startAngle = 0, int endAngle = 360)
     {
-        if (width == 0 || height == 0)
+        if (xR == 0 || yR == 0)
         {
             return;
         }
@@ -671,9 +807,9 @@ public unsafe class Canvas
         for (double angle = startAngle; angle < endAngle; angle += 0.5)
         {
             double angleRadians = Math.PI * angle / 180;
-            int IX = (int)(width * Math.Cos(angleRadians));
-            int IY = (int)(height * Math.Sin(angleRadians));
-            DrawPoint(color, x + IX, y + IY);
+            int IX = (int)(xR * Math.Cos(angleRadians));
+            int IY = (int)(yR * Math.Sin(angleRadians));
+            DrawPoint(color, xCenter + IX, yCenter + IY);
         }
     }
 
@@ -703,59 +839,75 @@ public unsafe class Canvas
     }
 
     /// <summary>
-    /// Draws a square.
+    /// Draws the outline of a rectangle, covering the same area
+    /// <see cref="DrawFilledRectangle"/> fills for the same arguments.
     /// </summary>
     /// <param name="color">The color to draw with.</param>
-    /// <param name="x">The X coordinate.</param>
-    /// <param name="y">The Y coordinate.</param>
-    /// <param name="size">The size of the square.</param>
-    public virtual void DrawSquare(Color color, int x, int y, int size)
-    {
-        DrawRectangle(color, x, y, size, size);
-    }
-
-    /// <summary>
-    /// Draws a rectangle.
-    /// </summary>
-    /// <param name="color">The color to draw with.</param>
-    /// <param name="x">The X coordinate.</param>
-    /// <param name="y">The Y coordinate.</param>
-    /// <param name="width">The width of the rectangle.</param>
-    /// <param name="height">The height of the rectangle.</param>
+    /// <param name="x">The X coordinate of the top-left corner.</param>
+    /// <param name="y">The Y coordinate of the top-left corner.</param>
+    /// <param name="width">The width of the rectangle in pixels.</param>
+    /// <param name="height">The height of the rectangle in pixels.</param>
     public virtual void DrawRectangle(Color color, int x, int y, int width, int height)
     {
-        // Draw top edge from (x, y) to (x + width, y)
-        DrawLine(color, x, y, x + width, y);
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
 
-        // Draw left edge from (x, y) to (x, y + height)
-        DrawLine(color, x, y, x, y + height);
+        // The far edges sit on the last covered pixel, not one past it, so the
+        // outline covers the same width x height area DrawFilledRectangle fills.
+        int right = x + width - 1;
+        int bottom = y + height - 1;
 
-        // Draw bottom edge from (x, y + height) to (x + width, y + height)
-        DrawLine(color, x, y + height, x + width, y + height);
-
-        // Draw right edge from (x + width, y) to (x + width, y + height)
-        DrawLine(color, x + width, y, x + width, y + height);
+        DrawLine(color, x, y, right, y);
+        DrawLine(color, x, y, x, bottom);
+        DrawLine(color, x, bottom, right, bottom);
+        DrawLine(color, right, y, right, bottom);
     }
 
     /// <summary>
     /// Draws a filled rectangle.
     /// </summary>
     /// <param name="color">The color to draw the rectangle with.</param>
-    /// <param name="xStart">The starting point X coordinate.</param>
-    /// <param name="yStart">The starting point Y coordinate.</param>
-    /// <param name="width">The width of the rectangle.</param>
-    /// <param name="height">The height of the rectangle.</param>
-    public virtual void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height, bool preventOffBoundPixels = true)
+    /// <param name="xStart">The X coordinate of the top-left corner.</param>
+    /// <param name="yStart">The Y coordinate of the top-left corner.</param>
+    /// <param name="width">The width of the rectangle in pixels.</param>
+    /// <param name="height">The height of the rectangle in pixels, or -1 to
+    /// reuse <paramref name="width"/> and draw a square.</param>
+    /// <remarks>
+    /// The shape is always clipped to the canvas. There is no opt-out, because
+    /// the hardware canvases fill straight into video memory and an unclipped
+    /// origin there is a write outside the framebuffer, not a stray pixel.
+    /// </remarks>
+    public virtual void DrawFilledRectangle(Color color, int xStart, int yStart, int width, int height)
     {
         if (height == -1)
         {
             height = width;
         }
-        if (preventOffBoundPixels)
+
+        // Clip both corners, not just the far one: a negative origin used to
+        // walk rows above the canvas and draw each one from a negative X.
+        if (xStart < 0)
         {
-            width = Math.Min(width, (int)Mode.Width - xStart);
-            height = Math.Min(height, (int)Mode.Height - yStart);
+            width += xStart;
+            xStart = 0;
         }
+
+        if (yStart < 0)
+        {
+            height += yStart;
+            yStart = 0;
+        }
+
+        width = Math.Min(width, Mode.Width - xStart);
+        height = Math.Min(height, Mode.Height - yStart);
+
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
         for (int y = yStart; y < yStart + height; y++)
         {
             DrawLine(color, xStart, y, xStart + width - 1, y);
@@ -791,8 +943,8 @@ public unsafe class Canvas
         Color color;
         if (preventOffBoundPixels)
         {
-            var maxWidth = Math.Min(image.Width, (uint)(Mode.Width - x));
-            var maxHeight = Math.Min(image.Height, (uint)(Mode.Height - y));
+            int maxWidth = Math.Min(image.Width, Width - x);
+            int maxHeight = Math.Min(image.Height, Height - y);
             for (int xi = 0; xi < maxWidth; xi++)
             {
                 for (int yi = 0; yi < maxHeight; yi++)
@@ -825,7 +977,7 @@ public unsafe class Canvas
     /// <returns>A new <see cref="Bitmap"/> containing the copied region.</returns>
     public virtual Bitmap GetImage(int x, int y, int width, int height)
     {
-        Bitmap bitmap = new Bitmap((uint)width, (uint)height, ColorDepth.ColorDepth32);
+        Bitmap bitmap = new Bitmap(width, height, ColorDepth.ColorDepth32);
 
         for (int posy = 0; posy < height; posy++)
         {
@@ -847,8 +999,8 @@ public unsafe class Canvas
     static int[] ScaleImage(Image image, int newWidth, int newHeight)
     {
         int[] pixels = image.RawData;
-        int w1 = (int)image.Width;
-        int h1 = (int)image.Height;
+        int w1 = image.Width;
+        int h1 = image.Height;
         int[] temp = new int[newWidth * newHeight];
         int xRatio = (int)((w1 << 16) / newWidth) + 1;
         int yRatio = (int)((h1 << 16) / newHeight) + 1;
@@ -881,8 +1033,8 @@ public unsafe class Canvas
         int[] pixels = ScaleImage(image, w, h);
         if (preventOffBoundPixels)
         {
-            var maxWidth = Math.Min(w, (int)Mode.Width - x);
-            var maxHeight = Math.Min(h, (int)Mode.Height - y);
+            int maxWidth = Math.Min(w, Mode.Width - x);
+            int maxHeight = Math.Min(h, Mode.Height - y);
             for (int xi = 0; xi < maxWidth; xi++)
             {
                 for (int yi = 0; yi < maxHeight; yi++)
@@ -917,8 +1069,8 @@ public unsafe class Canvas
     public virtual void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight, bool preventOffBoundPixels = true)
     {
         Color color;
-        int width = Math.Min((int)image.Width, maxWidth);
-        int height = Math.Min((int)image.Height, maxHeight);
+        int width = Math.Min(image.Width, maxWidth);
+        int height = Math.Min(image.Height, maxHeight);
         int[] pixels = image.RawData;
 
         for (int xi = 0; xi < width; xi++)
@@ -943,8 +1095,8 @@ public unsafe class Canvas
         Color color;
         if (preventOffBoundPixels)
         {
-            var maxWidth = Math.Min(image.Width, (uint)(Mode.Width - x));
-            var maxHeight = Math.Min(image.Height, (uint)(Mode.Height - y));
+            int maxWidth = Math.Min(image.Width, Width - x);
+            int maxHeight = Math.Min(image.Height, Height - y);
             for (int xi = 0; xi < maxWidth; xi++)
             {
                 for (int yi = 0; yi < maxHeight; yi++)
@@ -1078,7 +1230,10 @@ public unsafe class Canvas
     /// Draws a single character using the given bitmap font.
     /// </summary>
     /// <param name="c">The character to draw.</param>
-    /// <inheritdoc cref="DrawString(string, Font, Color, int, int)"/>
+    /// <param name="font">The bitmap font to use.</param>
+    /// <param name="color">The color to write the character with.</param>
+    /// <param name="x">The origin X coordinate.</param>
+    /// <param name="y">The origin Y coordinate.</param>
     public virtual void DrawChar(char c, Font font, Color color, int x, int y)
     {
         ArgumentNullException.ThrowIfNull(font);
@@ -1102,7 +1257,7 @@ public unsafe class Canvas
                 byte byteValue = data[p + (cy * bytesPerRow) + (cx / 8)];
                 if (font.ConvertByteToBitAddress(byteValue, (cx % 8) + 1))
                 {
-                    DrawPoint(color, (ushort)(x + cx), (ushort)(y + cy));
+                    DrawPoint(color, x + cx, y + cy);
                 }
             }
         }
@@ -1141,34 +1296,22 @@ public unsafe class Canvas
     }
 
     /// <summary>
-    /// Validates that the given coordinates are in-range of the canvas, and
-    /// throws an exception if the coordinates are out-of-bounds.
+    /// Clamps the line's two endpoints so the segment fits inside the canvas
+    /// boundaries, preserving its slope.
     /// </summary>
-    /// <param name="x">The X coordinate.</param>
-    /// <param name="y">The Y coordinate.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the coordinates are invalid.</exception>
-    protected void ThrowIfCoordNotValid(int x, int y)
-    {
-        if (x < 0 || x >= Mode.Width)
-        {
-            throw new ArgumentOutOfRangeException(nameof(x), $"X coordinate ({x}) is not between 0 and {Mode.Width}");
-        }
-
-        if (y < 0 || y >= Mode.Height)
-        {
-            throw new ArgumentOutOfRangeException(nameof(y), $"Y coordinate ({y}) is not between 0 and {Mode.Height}");
-        }
-    }
-
+    /// <param name="x1">The start point X coordinate.</param>
+    /// <param name="y1">The start point Y coordinate.</param>
+    /// <param name="x2">The end point X coordinate.</param>
+    /// <param name="y2">The end point Y coordinate.</param>
     protected void TrimLine(ref int x1, ref int y1, ref int x2, ref int y2)
     {
         // in case of vertical lines, no need to perform complex operations
         if (x1 == x2)
         {
-            x1 = Math.Min((int)Mode.Width - 1, Math.Max(0, x1));
+            x1 = Math.Min(Mode.Width - 1, Math.Max(0, x1));
             x2 = x1;
-            y1 = Math.Min((int)Mode.Height - 1, Math.Max(0, y1));
-            y2 = Math.Min((int)Mode.Height - 1, Math.Max(0, y2));
+            y1 = Math.Min(Mode.Height - 1, Math.Max(0, y1));
+            y2 = Math.Min(Mode.Height - 1, Math.Max(0, y2));
 
             return;
         }
@@ -1249,12 +1392,13 @@ public unsafe class Canvas
     }
 
     /// <summary>
-    /// Blends between color <paramref name="from"/> and <paramref name="to"/>,
-    /// using the given <paramref name="alpha"/> value.
+    /// Blends <paramref name="to"/> over <paramref name="from"/> at the given
+    /// <paramref name="alpha"/>. At alpha 255 the result is
+    /// <paramref name="to"/>, at 0 it is <paramref name="from"/>.
     /// </summary>
-    /// <param name="to">The background color.</param>
-    /// <param name="from">The foreground color.</param>
-    /// <param name="alpha">The alpha value.</param>
+    /// <param name="to">The color being laid on, weighted by <paramref name="alpha"/>.</param>
+    /// <param name="from">The color already there, weighted by the remainder.</param>
+    /// <param name="alpha">The opacity of <paramref name="to"/>, 0 to 255.</param>
     public static Color AlphaBlend(Color to, Color from, byte alpha)
     {
         byte R = (byte)(((to.R * alpha) + (from.R * (255 - alpha))) >> 8);

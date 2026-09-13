@@ -22,7 +22,7 @@ namespace Cosmos.Kernel.Tests.Graphic;
 public static unsafe class Svga3DTests
 {
     /// <summary>Skip reason for the FIFO tests on cells without the adapter (the bare profile, and all of arm64).</summary>
-    public const string SkipNoDevice = "VMware SVGA II adapter not present — needs the vmware-svga profile";
+    public const string SkipNoDevice = "VMware SVGA II adapter not present, needs the vmware-svga profile";
 
     /// <summary>PCI vendor id of VMware.</summary>
     private const ushort VMwareVendorId = 0x15AD;
@@ -32,6 +32,9 @@ public static unsafe class Svga3DTests
 
     /// <summary>SVGA_3D_CMD_SURFACE_DESTROY (SVGA_3D_CMD_BASE + 1).</summary>
     private const uint CmdSurfaceDestroy = 1041;
+
+    /// <summary>SVGA_3D_CMD_SURFACE_DMA (SVGA_3D_CMD_BASE + 4).</summary>
+    private const uint CmdSurfaceDma = 1044;
 
     /// <summary>SVGA_3D_CMD_CONTEXT_DESTROY (SVGA_3D_CMD_BASE + 6).</summary>
     private const uint CmdContextDestroy = 1046;
@@ -264,6 +267,45 @@ public static unsafe class Svga3DTests
         Assert.Equal(4u, FifoDword(start + 4), "header size is the 4-byte body");
         Assert.Equal(42u, FifoDword(start + 8), "sid");
         Assert.Equal(start + HeaderBytes + 4, s_driver!.GetFIFO(FIFO.NextCmd), "NEXT_CMD advanced by header+body");
+
+        Rewind(start);
+    }
+
+    /// <summary>
+    /// The single-box surface DMA used by the 3D readback path
+    /// (PresentToImage, and Canvas3D's GetImage on a rendered scene) must
+    /// encode the guest pointer, host image, transfer direction and copy box
+    /// exactly. Only the command is enqueued here: the fence/sync that
+    /// completes a real transfer needs a live device.
+    /// </summary>
+    public static void TestSurfaceDmaReadback()
+    {
+        uint start = CaptureStart();
+
+        s_svga3d!.EnqueueSurfaceDma(
+            new SVGA3dSurfaceImageId { sid = 9 },
+            new SVGAGuestPtr { gmrId = 0xFFFFFFFE, offset = 0x1234 },
+            new SVGA3dRect(3, 5, 640, 360),
+            SVGA3dTransferType.SVGA3D_READ_HOST_VRAM);
+
+        Assert.Equal(CmdSurfaceDma, FifoDword(start), "command id is SURFACE_DMA");
+        Assert.Equal(64u, FifoDword(start + 4), "header size is guest image + host image + transfer + 1 copy box");
+        Assert.Equal(0xFFFFFFFEu, FifoDword(start + 8), "guest pointer gmr id (framebuffer GMR)");
+        Assert.Equal(0x1234u, FifoDword(start + 12), "guest pointer offset");
+        Assert.Equal(0u, FifoDword(start + 16), "tightly packed (pitch 0)");
+        Assert.Equal(9u, FifoDword(start + 20), "host image sid");
+        Assert.Equal(0u, FifoDword(start + 24), "host image face");
+        Assert.Equal(0u, FifoDword(start + 28), "host image mipmap");
+        Assert.Equal(2u, FifoDword(start + 32), "transfer READ_HOST_VRAM");
+        Assert.Equal(3u, FifoDword(start + 36), "box x");
+        Assert.Equal(5u, FifoDword(start + 40), "box y");
+        Assert.Equal(0u, FifoDword(start + 44), "box z");
+        Assert.Equal(640u, FifoDword(start + 48), "box width");
+        Assert.Equal(360u, FifoDword(start + 52), "box height");
+        Assert.Equal(1u, FifoDword(start + 56), "box depth 1");
+        Assert.Equal(0u, FifoDword(start + 60), "source x untouched");
+        Assert.Equal(0u, FifoDword(start + 68), "source z untouched");
+        Assert.Equal(start + HeaderBytes + 64, s_driver!.GetFIFO(FIFO.NextCmd), "NEXT_CMD advanced by header+body");
 
         Rewind(start);
     }

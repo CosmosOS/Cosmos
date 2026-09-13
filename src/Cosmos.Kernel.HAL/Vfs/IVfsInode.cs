@@ -7,6 +7,7 @@ namespace Cosmos.Kernel.HAL.Vfs;
 /// </summary>
 public interface IVfsInode
 {
+    /// <summary>Directory and metadata operations for this inode.</summary>
     IInodeOperations InodeOperations { get; }
 
     /// <summary>Non-null for regular files and other seekable/readable nodes; null for pure directory entries if the driver splits roles.</summary>

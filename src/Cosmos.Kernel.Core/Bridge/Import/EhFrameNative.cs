@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// runtime (kmain.c) and resolve to the linker symbols on both architectures,
 /// so no arch gating is needed here.
 /// </summary>
-public static unsafe partial class EhFrameNative
+internal static unsafe partial class EhFrameNative
 {
     [LibraryImport("*", EntryPoint = "get_eh_frame_start")]
     [SuppressGCTransition]

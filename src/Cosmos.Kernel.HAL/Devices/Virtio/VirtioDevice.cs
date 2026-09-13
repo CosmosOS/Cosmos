@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.HAL.Devices.Virtio;
 /// </summary>
 // Note: This class is eagerly constructed at startup because accessing s_devices causes issues otherwise.
 [EagerStaticClassConstruction]
-public static class VirtioDevice
+internal static class VirtioDevice
 {
     private const int MaxDevices = 32;
 

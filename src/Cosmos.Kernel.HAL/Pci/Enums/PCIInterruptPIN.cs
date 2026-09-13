@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.HAL.Pci.Enums;
 
-public enum PciInterruptPin : byte
+internal enum PciInterruptPin : byte
 {
     None = 0x00,
     Inta = 0x01,

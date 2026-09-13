@@ -17,7 +17,6 @@ public static class MouseManager
     public static bool IsEnabled => CosmosFeatures.MouseEnabled;
 
     private static List<IMouseDevice>? s_mice;
-    private static bool s_initialized;
 
     /// <summary>
     /// Current X position (screen coordinates).
@@ -42,7 +41,13 @@ public static class MouseManager
     /// Clears <see cref="ScrollDelta"/> after a poller has consumed it, so a
     /// stale delta is not re-processed every frame until the next wheel event.
     /// </summary>
-    public static void ResetScrollDelta() => ScrollDelta = 0;
+    /// <exception cref="InvalidOperationException">Mouse support is disabled.</exception>
+    public static void ResetScrollDelta()
+    {
+        ThrowIfDisabled();
+
+        ScrollDelta = 0;
+    }
 
     /// <summary>
     /// Left button state.
@@ -62,18 +67,36 @@ public static class MouseManager
     /// <summary>
     /// Screen width for boundary checking.
     /// </summary>
-    public static int ScreenWidth { get; set; } = 1024;
+    public static int ScreenWidth { get; private set; } = 1024;
 
     /// <summary>
     /// Screen height for boundary checking.
     /// </summary>
-    public static int ScreenHeight { get; set; } = 768;
+    public static int ScreenHeight { get; private set; } = 768;
+
+    private static float s_sensitivity = 1.0f;
 
     /// <summary>
     /// Mouse sensitivity multiplier (default 1.0).
     /// </summary>
-    public static float Sensitivity { get; set; } = 1.0f;
+    /// <exception cref="InvalidOperationException">Mouse support is disabled.</exception>
+    public static float Sensitivity
+    {
+        get => s_sensitivity;
+        set
+        {
+            ThrowIfDisabled();
 
+            s_sensitivity = value;
+        }
+    }
+
+    /// <summary>
+    /// Throws when mouse support is compiled out. Guards actions, not reads:
+    /// a read answers honestly (0, null, false, empty) so a kernel can branch
+    /// on it, and an action names the switch to set instead of failing
+    /// silently.
+    /// </summary>
     private static void ThrowIfDisabled()
     {
         if (!IsEnabled)
@@ -83,29 +106,27 @@ public static class MouseManager
     }
 
     /// <summary>
-    /// Initializes the mouse manager.
-    /// Call RegisterMouse() after this to add mice.
+    /// Initializes the mouse manager. Called once during boot, before the
+    /// platform mice are registered.
     /// </summary>
-    public static void Initialize()
+    internal static void Initialize()
     {
         ThrowIfDisabled();
 
-        if (s_initialized)
+        if (s_mice is not null)
         {
             return;
         }
 
-        s_mice = new List<IMouseDevice>();
         X = ScreenWidth / 2;
         Y = ScreenHeight / 2;
-
-        s_initialized = true;
+        s_mice = new List<IMouseDevice>();
     }
 
     /// <summary>
     /// Registers a mouse device with the manager.
     /// </summary>
-    public static void RegisterMouse(IMouseDevice mouse)
+    internal static void RegisterMouse(IMouseDevice mouse)
     {
         if (s_mice == null || mouse == null)
         {
@@ -172,7 +193,7 @@ public static class MouseManager
     /// <summary>
     /// Polls all registered mice for events.
     /// </summary>
-    public static void Poll()
+    internal static void Poll()
     {
         if (s_mice == null)
         {
@@ -188,6 +209,9 @@ public static class MouseManager
     /// <summary>
     /// Sets the mouse position directly (useful for initialization or reset).
     /// </summary>
+    /// <param name="x">New horizontal position, clamped to the screen width.</param>
+    /// <param name="y">New vertical position, clamped to the screen height.</param>
+    /// <exception cref="InvalidOperationException">Mouse support is disabled.</exception>
     public static void SetPosition(int x, int y)
     {
         ThrowIfDisabled();
@@ -220,6 +244,9 @@ public static class MouseManager
     /// <summary>
     /// Updates screen dimensions (call when resolution changes).
     /// </summary>
+    /// <param name="width">New screen width in pixels.</param>
+    /// <param name="height">New screen height in pixels.</param>
+    /// <exception cref="InvalidOperationException">Mouse support is disabled.</exception>
     public static void SetScreenSize(int width, int height)
     {
         ThrowIfDisabled();

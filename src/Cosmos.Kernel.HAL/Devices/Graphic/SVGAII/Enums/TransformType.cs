@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
-public enum SVGA3dTransformType
+internal enum SVGA3dTransformType
 {
     SVGA3D_TRANSFORM_INVALID = 0,
     SVGA3D_TRANSFORM_WORLD = 1,

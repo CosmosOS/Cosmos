@@ -3,7 +3,6 @@
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
-using SchedulerThread = Cosmos.Kernel.Core.Scheduler.Thread;
 
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 
@@ -13,7 +12,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// <summary>
 /// Information methods
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     /// <summary>
     /// Simple snapshot of GC memory statistics used by runtime memory queries.
@@ -250,6 +249,11 @@ public static unsafe partial class GarbageCollector
     public static int GetCollectionIndex()
     {
         return s_totalCollections;
+    }
+
+    public static int GetTotalObjectsFreed()
+    {
+        return s_totalObjectsFreed;
     }
 
     public static int GetCondemnedGeneration()
@@ -515,9 +519,9 @@ public static unsafe partial class GarbageCollector
                     SchedulerThread? thread = threads[i];
                     if (thread != null)
                     {
-                        if (thread.AllocContext.AllocLimit != null && thread.AllocContext.AllocPtr != null)
+                        if (thread._allocContext.AllocLimit != null && thread._allocContext.AllocPtr != null)
                         {
-                            unused += (ulong)(thread.AllocContext.AllocLimit - thread.AllocContext.AllocPtr);
+                            unused += (ulong)(thread._allocContext.AllocLimit - thread._allocContext.AllocPtr);
                         }
 
                         count--;

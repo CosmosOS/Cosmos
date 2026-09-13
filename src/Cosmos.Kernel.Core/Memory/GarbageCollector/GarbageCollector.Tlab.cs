@@ -4,14 +4,13 @@ using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
-using SchedulerThread = Cosmos.Kernel.Core.Scheduler.Thread;
 
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 
 /// <summary>
 /// Thread-Local Allocation Buffer (TLAB) management: refill, return, and per-thread context access.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     /// <summary>
     /// Default TLAB size in bytes (8KB).
@@ -25,15 +24,15 @@ public static unsafe partial class GarbageCollector
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ref AllocContext GetCurrentAllocContext()
     {
-        // SchedulerManager.Enabled is false during early boot (before scheduler init),
+        // SchedulerManager.IsRunning is false during early boot (before scheduler init),
         // so we safely fall back to the static context. CosmosFeatures.SchedulerEnabled
         // alone is a compile-time flag that doesn't guarantee _cpuStates is allocated.
-        if (CosmosFeatures.SchedulerEnabled && SchedulerManager.Enabled)
+        if (CosmosFeatures.SchedulerEnabled && SchedulerManager.IsRunning)
         {
-            PerCpuState? cpuState = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId());
+            PerCpuState? cpuState = SchedulerManager.CurrentCpuState;
             if (cpuState?.CurrentThread != null)
             {
-                return ref cpuState.CurrentThread.AllocContext;
+                return ref cpuState.CurrentThread._allocContext;
             }
         }
 
@@ -152,7 +151,7 @@ public static unsafe partial class GarbageCollector
                     SchedulerThread? thread = threads[i];
                     if (thread != null)
                     {
-                        ReturnAllocContext(ref thread.AllocContext);
+                        ReturnAllocContext(ref thread._allocContext);
                         count--;
                     }
                 }

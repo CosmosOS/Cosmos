@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 /// support (<see cref="SvgaIIDriver.Is3DEnabled"/>) — QEMU's vmware-svga
 /// exposes no 3D capability, so this layer is only exercised on real VMware.
 /// </summary>
-public unsafe class VMWareSVGAII3D
+internal unsafe class VMWareSVGAII3D
 {
     private readonly SvgaIIDriver _driver;
 
@@ -222,20 +222,7 @@ public unsafe class VMWareSVGAII3D
 
         void* buffer = SVGA3DUtil_AllocDMABuffer(size, out SVGAGuestPtr gPtr);
 
-        SVGA3dGuestImage guestImage;
-        guestImage.ptr = gPtr;
-        guestImage.pitch = 0;
-
-        SVGA3dSurfaceImageId hostImage = image;
-
-        SVGA3dCopyBox* boxes;
-        BeginSurfaceDMA(&guestImage, &hostImage, SVGA3dTransferType.SVGA3D_READ_HOST_VRAM, &boxes, 1);
-
-        boxes[0].x = rect.x;
-        boxes[0].y = rect.y;
-        boxes[0].w = width;
-        boxes[0].h = height;
-        boxes[0].d = 1;
+        EnqueueSurfaceDma(image, gPtr, rect, SVGA3dTransferType.SVGA3D_READ_HOST_VRAM);
 
         uint fence = InsertFence();
         SyncToFence(fence);
@@ -256,6 +243,28 @@ public unsafe class VMWareSVGAII3D
         return _imagebuffer;
     }
 
+
+    /// <summary>
+    /// Places a single-box SURFACE_DMA command in the FIFO, transferring the
+    /// given surface rectangle from or to tightly packed guest memory at
+    /// <paramref name="target"/>. The caller owns synchronization: the
+    /// transfer only completes after a fence inserted behind it is reached.
+    /// </summary>
+    public void EnqueueSurfaceDma(SVGA3dSurfaceImageId image, SVGAGuestPtr target, SVGA3dRect rect, SVGA3dTransferType transfer)
+    {
+        SVGA3dGuestImage guestImage;
+        guestImage.ptr = target;
+        guestImage.pitch = 0;
+
+        SVGA3dCopyBox* boxes;
+        BeginSurfaceDMA(&guestImage, &image, transfer, &boxes, 1);
+
+        boxes[0].x = rect.x;
+        boxes[0].y = rect.y;
+        boxes[0].w = rect.w;
+        boxes[0].h = rect.h;
+        boxes[0].d = 1;
+    }
 
     private void BeginSurfaceDMA(
         SVGA3dGuestImage* guestImage,
@@ -297,7 +306,7 @@ public unsafe class VMWareSVGAII3D
         boxes[0].d = 1;
     }
 
-    public uint CreateStaticArrayBuffer<T>(T[] data) where T : unmanaged
+    public uint CreateStaticArrayBuffer<T>(ReadOnlySpan<T> data) where T : unmanaged
     {
         uint size = (uint)(data.Length * sizeof(T));
 
@@ -306,7 +315,7 @@ public unsafe class VMWareSVGAII3D
         SVGAGuestPtr gPtr;
         void* buffer = SVGA3DUtil_AllocDMABuffer(size, out gPtr);
 
-        fixed (T* pData = &data[0])
+        fixed (T* pData = data)
         {
             MemoryOp.MemCopy((byte*)buffer, (byte*)pData, (int)size);
         }

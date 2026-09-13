@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// <summary>
 /// Native imports for boot-time facts recorded by the C bootstrap (kmain.c).
 /// </summary>
-public static partial class BootNative
+internal static partial class BootNative
 {
     /// <summary>
     /// Top of the bootloader-provided stack, captured at kmain entry before any

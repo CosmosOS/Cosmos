@@ -6,6 +6,8 @@
   href: filesystem.md
 - name: Network
   href: network.md
+- name: Timers and Alarms
+  href: timers.md
 - name: Graphics
   href: graphics.md
 - name: Keyboard

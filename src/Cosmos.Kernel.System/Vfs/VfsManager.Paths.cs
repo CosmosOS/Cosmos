@@ -27,10 +27,17 @@ public static partial class VfsManager
     private static string s_currentDirectory = "/";
 
     /// <summary>Kernel-wide current directory; always a normalized absolute path.</summary>
-    public static string CurrentDirectory => s_currentDirectory;
+    /// <remarks>
+    /// Internal with the path helpers below it: their only callers are the PAL
+    /// adapter in <c>Cosmos.Kernel.Plugs</c>, and a kernel reaches the current
+    /// directory through <see cref="global::System.IO.Directory"/>, which that
+    /// adapter is plugged under. A second public anchor would just disagree
+    /// with whatever cwd the kernel's own shell keeps.
+    /// </remarks>
+    internal static string CurrentDirectory => s_currentDirectory;
 
     /// <summary>Sets <see cref="CurrentDirectory"/>; the target must exist and be a directory.</summary>
-    public static bool TrySetCurrentDirectory(string path)
+    internal static bool TrySetCurrentDirectory(string path)
     {
         string? fullPath = MakeAbsolute(path);
         if (fullPath == null || !TryStat(fullPath, out VfsStat stat))
@@ -38,7 +45,7 @@ public static partial class VfsManager
             return false;
         }
 
-        if ((stat.Mode & ModeEnum.FileTypeMask) != ModeEnum.Directory)
+        if (!stat.IsDirectory)
         {
             return false;
         }
@@ -50,7 +57,7 @@ public static partial class VfsManager
     /// <summary>Anchors a relative path at <see cref="CurrentDirectory"/> and strips
     /// trailing separators. Returns null for a null/empty input. Does not
     /// collapse <c>.</c>/<c>..</c> segments.</summary>
-    public static string? MakeAbsolute(string? path)
+    internal static string? MakeAbsolute(string? path)
     {
         if (string.IsNullOrEmpty(path))
         {
@@ -74,7 +81,7 @@ public static partial class VfsManager
 
     /// <summary>Splits an absolute path into its parent path and leaf name
     /// ("/mnt/dir/file" → "/mnt/dir" + "file"; "/file" → "/" + "file").</summary>
-    public static void SplitParentLeaf(string fullPath, out string parentPath, out string leaf)
+    internal static void SplitParentLeaf(string fullPath, out string parentPath, out string leaf)
     {
         int lastSeparator = fullPath.LastIndexOf('/');
         if (lastSeparator <= 0)
@@ -89,7 +96,7 @@ public static partial class VfsManager
     }
 
     /// <summary>True for "/" and for every active mount point.</summary>
-    public static bool IsMountPoint(string fullPath)
+    internal static bool IsMountPoint(string fullPath)
     {
         if (fullPath == s_directorySeparatorString)
         {
@@ -129,7 +136,7 @@ public static partial class VfsManager
 
     /// <summary>First path segments of all mount points — the directory names a
     /// listing of the virtual root shows while no filesystem is mounted at "/".</summary>
-    public static string[] GetVirtualRootEntries()
+    internal static string[] GetVirtualRootEntries()
     {
         var collected = new List<string>(s_mounts.Count);
         for (int i = 0; i < s_mounts.Count; i++)
@@ -156,7 +163,7 @@ public static partial class VfsManager
 
     /// <summary>Creates a regular file at <paramref name="fullPath"/>; the parent
     /// directory must already exist on a mounted filesystem.</summary>
-    public static bool TryCreateFile(string fullPath, ModeEnum permissions)
+    public static bool TryCreateFile(string fullPath, VfsMode permissions)
     {
         SplitParentLeaf(fullPath, out string parentPath, out string leaf);
         if (leaf.Length == 0)
@@ -169,13 +176,13 @@ public static partial class VfsManager
             return false;
         }
 
-        ModeEnum mode = (permissions & ModeEnum.PermissionMask) | ModeEnum.RegularFile;
+        VfsMode mode = (permissions & VfsMode.PermissionMask) | VfsMode.RegularFile;
         return parent.TryCreateFile(leaf, mode, out _);
     }
 
     /// <summary>Creates a directory at <paramref name="fullPath"/>; the parent
     /// directory must already exist on a mounted filesystem.</summary>
-    public static bool TryCreateDirectory(string fullPath, ModeEnum permissions)
+    public static bool TryCreateDirectory(string fullPath, VfsMode permissions)
     {
         SplitParentLeaf(fullPath, out string parentPath, out string leaf);
         if (leaf.Length == 0)
@@ -188,7 +195,7 @@ public static partial class VfsManager
             return false;
         }
 
-        ModeEnum mode = (permissions & ModeEnum.PermissionMask) | ModeEnum.Directory;
+        VfsMode mode = (permissions & VfsMode.PermissionMask) | VfsMode.Directory;
         return parent.TryCreateDirectory(leaf, mode, out _);
     }
 
@@ -232,13 +239,15 @@ public static partial class VfsManager
     /// destination survives a failed rename, and a destination that is still
     /// open goes delete-pending instead of being dropped under its handles.
     /// </summary>
+    /// <param name="oldFullPath">Absolute path of the entry to move.</param>
+    /// <param name="newFullPath">Absolute path it should have afterwards.</param>
+    /// <returns><see langword="false"/> when either path is a mount point, the
+    /// source does not exist, the destination is inside the source's own
+    /// subtree, the two sit on different mounts, the two are of different
+    /// kinds, the destination is a directory that is not empty, or the driver
+    /// refuses the move. Renaming a path onto itself succeeds.</returns>
     public static bool TryRename(string oldFullPath, string newFullPath)
     {
-        if (string.Equals(oldFullPath, newFullPath, StringComparison.Ordinal))
-        {
-            return true;
-        }
-
         if (IsMountPoint(oldFullPath) || IsMountPoint(newFullPath))
         {
             return false;
@@ -249,7 +258,15 @@ public static partial class VfsManager
             return false;
         }
 
-        bool oldIsDirectory = (oldStat.Mode & ModeEnum.FileTypeMask) == ModeEnum.Directory;
+        // Renaming a path onto itself is a no-op, but only once the source is
+        // known to exist: taking the shortcut first reported success for a
+        // path that resolves to nothing, where rename(2) reports ENOENT.
+        if (string.Equals(oldFullPath, newFullPath, StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        bool oldIsDirectory = oldStat.IsDirectory;
         if (oldIsDirectory && newFullPath.StartsWith($"{oldFullPath}{s_directorySeparatorString}", StringComparison.Ordinal))
         {
             return false;
@@ -284,7 +301,7 @@ public static partial class VfsManager
 
         if (destinationExists && !sameEntry)
         {
-            bool newIsDirectory = (newStat.Mode & ModeEnum.FileTypeMask) == ModeEnum.Directory;
+            bool newIsDirectory = newStat.IsDirectory;
             if (oldIsDirectory != newIsDirectory)
             {
                 return false;
@@ -412,7 +429,10 @@ public static partial class VfsManager
         IVfsInode? backupInode = null;
         if (parent.TryLookup(backupLeaf, out IVfsNodeHandle? backupNode))
         {
-            backupInode = backupNode.Inode;
+            using (backupNode)
+            {
+                backupInode = backupNode.Inode;
+            }
         }
 
         bool pending = false;
@@ -436,10 +456,10 @@ public static partial class VfsManager
     private static VfsStat VirtualRootStat()
     {
         VfsStat stat = default;
-        stat.Mode = ModeEnum.Directory
-            | ModeEnum.OwnerRead | ModeEnum.OwnerWrite | ModeEnum.OwnerExecute
-            | ModeEnum.GroupRead | ModeEnum.GroupExecute
-            | ModeEnum.OtherRead | ModeEnum.OtherExecute;
+        stat.Mode = VfsMode.Directory
+            | VfsMode.OwnerRead | VfsMode.OwnerWrite | VfsMode.OwnerExecute
+            | VfsMode.GroupRead | VfsMode.GroupExecute
+            | VfsMode.OtherRead | VfsMode.OtherExecute;
         stat.NLink = 1;
         return stat;
     }

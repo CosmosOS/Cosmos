@@ -116,33 +116,20 @@ internal static class PartitionCommands
             return;
         }
 
-        IReadOnlyList<Partition> partitions = StorageManager.Partitions;
-        for (int i = 0; i < StorageManager.DeviceCount; i++)
+        IReadOnlyList<IBlockDevice> devices = StorageManager.Devices;
+        for (int i = 0; i < devices.Count; i++)
         {
-            IBlockDevice? device = StorageManager.GetDevice(i);
-            if (device == null)
-            {
-                continue;
-            }
-
             Console.WriteLine();
-            StorageView.PrintDeviceBlock(i, device, detailed: false);
-            StorageView.PrintPrimaryMarker(device);
+            StorageView.PrintDeviceBlock(i, devices[i], detailed: false);
+            StorageView.PrintPrimaryMarker(devices[i]);
 
-            int diskPartCount = 0;
-            for (int p = 0; p < partitions.Count; p++)
+            IReadOnlyList<Partition> onDisk = StorageManager.GetPartitions(devices[i]);
+            for (int p = 0; p < onDisk.Count; p++)
             {
-                Partition partition = partitions[p];
-                if (!ReferenceEquals(partition.Host, device))
-                {
-                    continue;
-                }
-
-                PrintPartitionLine(diskPartCount, partition);
-                diskPartCount++;
+                PrintPartitionLine(p, onDisk[p]);
             }
 
-            if (diskPartCount == 0)
+            if (onDisk.Count == 0)
             {
                 Terminal.Muted(PartitionIndent + "(no partitions)");
             }
@@ -338,7 +325,7 @@ internal static class PartitionCommands
 
     private static void DeletePartitionEntry(int diskNumber, int partitionNumber)
     {
-        if (!StorageView.TryResolvePartition(diskNumber, partitionNumber, out _, out Partition? partition) || partition == null)
+        if (!StorageView.TryResolvePartition(diskNumber, partitionNumber, out Partition? partition))
         {
             Terminal.Error("Invalid disk/partition. Use 'lspart' to list.");
             return;

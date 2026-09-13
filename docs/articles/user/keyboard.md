@@ -27,6 +27,9 @@ Keyboard support is behind a feature switch. Make sure your kernel's `.csproj` d
 These are the `using`s the snippets below rely on:
 
 ```csharp
+using System.Drawing;
+using Cosmos.Kernel.System.Graphics;
+using Cosmos.Kernel.System.Graphics.Fonts;
 using Cosmos.Kernel.System.Keyboard;
 using Cosmos.Kernel.System.Keyboard.ScanMaps;
 ```
@@ -111,9 +114,6 @@ while (running)
         }
     }
 
-    x = Math.Clamp(x, 0, canvas.Width - 60);
-    y = Math.Clamp(y, 0, canvas.Height - 60);
-
     canvas.Clear(Color.MidnightBlue);
     canvas.DrawString("Move the square with the arrow keys", font, Color.White, 40, 40);
     canvas.DrawFilledRectangle(Color.Gold, x, y, 60, 60);
@@ -168,7 +168,7 @@ The switch is visible immediately: below, the same six physical keys are typed t
 <!-- video: typing the six keys right of Tab under the US layout ("qwerty"), switching to FRStandardLayout, typing them again ("azerty") -->
 <video src="images/keyboard-layouts.mp4" controls autoplay muted loop playsinline style="max-width:100%"></video>
 
-`KeyboardManager.GetKeyLayout()` returns the active scan map, and a custom layout is a class deriving from `ScanMapBase` that fills the `Keys` list with `KeyMapping` entries.
+`KeyboardManager.GetKeyLayout()` returns the active scan map, and a custom layout is a class deriving from `ScanMapBase` that overrides `InitializeKeys()` to fill the `Keys` list with `KeyMapping` entries. The base constructor calls it, so the list is populated by the time `SetKeyLayout` sees the instance.
 
 ## Current limitations
 
@@ -178,7 +178,7 @@ The switch is visible immediately: below, the same six physical keys are typed t
 
 ## How it works
 
-Every key press raises an interrupt (IRQ1 for the PS/2 keyboard on x64, a virtio-input event on ARM64). The handler feeds the raw scan code to `KeyboardManager.HandleScanCode`, which routes lock and modifier keys to the state properties and converts everything else through the active scan map into a `KeyEvent`, queued in the key buffer. `ReadKey()` halts the CPU until an interrupt delivers the next event; `TryReadKey()` just dequeues. `Console.ReadLine` and `Console.ReadKey` are plugs on top of the same queue, so console input and raw key events never conflict.
+Every key press raises an interrupt (IRQ1 for the PS/2 keyboard on x64, a virtio-input event on ARM64). The handler feeds the raw scan code to `KeyboardManager`, which routes lock and modifier keys to the state properties and converts everything else through the active scan map into a `KeyEvent`, queued in the key buffer. `ReadKey()` halts the CPU until an interrupt delivers the next event; `TryReadKey()` just dequeues. `Console.ReadLine` and `Console.ReadKey` are plugs on top of the same queue, so console input and raw key events never conflict.
 
 ```
 Console.ReadLine / Console.ReadKey        (plugs, Cosmos.Kernel.Plugs)

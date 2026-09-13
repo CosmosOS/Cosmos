@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.Core.Memory;
 /// <summary>
 /// Native SIMD imports live in Bridge/Import/SimdNative.cs.
 /// </summary>
-public static unsafe class MemoryOp
+internal static unsafe class MemoryOp
 {
     public static void InitializeHeap(ulong heapBase, ulong heapSize) =>
         PageAllocator.InitializeHeap((byte*)heapBase, heapSize);

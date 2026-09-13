@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!-- PKV0001 "no compile time asset for net10.0": intentional. The multi-arch
+       package ships only runtimes/linux-{x64,arm64}/lib/ assemblies; the
+       build/{PackageId}.props selects the reference by RID at build time
+       (Directory.MultiArch.targets), so there is no RID-agnostic lib/ asset. -->
+  <Suppression>
+    <DiagnosticId>PKV0001</DiagnosticId>
+    <Target>net10.0</Target>
+  </Suppression>
+</Suppressions>

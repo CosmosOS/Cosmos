@@ -15,7 +15,10 @@ public class KernelConsole
 {
     // The default (global) instance, created by Initialize()
     /// <summary>
-    /// Gets the default (global) console instance.
+    /// Gets the default (global) console instance, or <see langword="null"/>
+    /// until <see cref="Initialize"/> has returned true. Test
+    /// <see cref="IsInitialized"/> rather than this, which tells the compiler
+    /// the same thing.
     /// </summary>
     public static KernelConsole? Default { get; private set; }
 
@@ -75,7 +78,7 @@ public class KernelConsole
     /// </summary>
     /// <param name="canvas">The canvas to render to.</param>
     /// <param name="font">The font to use (defaults to PCScreenFont.DefaultFont).</param>
-    public KernelConsole(Canvas canvas, Font? font = null)
+    internal KernelConsole(Canvas canvas, Font? font = null)
     {
         _canvas = canvas;
         _font = font ?? PCScreenFont.DefaultFont;
@@ -88,12 +91,17 @@ public class KernelConsole
         ClearCells();
     }
 
+    /// <summary>
+    /// Throws when <see cref="Initialize"/> has not run yet, guaranteeing
+    /// <see cref="Default"/> is non-null to callers that return normally.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The kernel console is not initialized.</exception>
     [MemberNotNull(nameof(Default))]
-    public static void ThrowIfKernelConsoleNotInitialized()
+    internal static void ThrowIfKernelConsoleNotInitialized()
     {
         if (Default is null)
         {
-            throw new Exception($"{nameof(KernelConsole)} is not initialized");
+            throw new InvalidOperationException($"{nameof(KernelConsole)} is not initialized");
         }
     }
 
@@ -105,100 +113,120 @@ public class KernelConsole
     /// </summary>
     /// <param name="font">The font to measure.</param>
     /// <exception cref="ArgumentException">Thrown when no usable cell size can
-    /// be derived (would otherwise divide by zero when computing the grid).</exception>
+    /// be derived, or when a cell does not fit the canvas. Either would leave
+    /// a terminal with no cells at all, which every guard in this class reads
+    /// as a live buffer because it tests for null, not for length.</exception>
     private void ApplyFontMetrics(Font font)
     {
-        if (font is TrueTypeFont trueType)
-        {
-            int maxAdvance = 0;
-            for (char c = '!'; c <= '~'; c++)
-            {
-                int advance = trueType.GetAdvance(c, trueType.SizePx);
-                if (advance > maxAdvance)
-                {
-                    maxAdvance = advance;
-                }
-            }
-
-            _charWidth = maxAdvance;
-            _charHeight = trueType.GetLineHeight(trueType.SizePx);
-        }
-        else
-        {
-            _charWidth = font.Width;
-            _charHeight = font.Height;
-        }
+        _charWidth = font.GetMaxAdvance();
+        _charHeight = font.GetLineHeight();
 
         if (_charWidth <= 0 || _charHeight <= 0)
         {
             throw new ArgumentException($"Font provides no usable character cell ({_charWidth}x{_charHeight}).", nameof(font));
         }
+
+        if (_charWidth > _canvas.Width || _charHeight > _canvas.Height)
+        {
+            throw new ArgumentException($"Font cell {_charWidth}x{_charHeight} does not fit the {_canvas.Width}x{_canvas.Height} canvas.", nameof(font));
+        }
     }
 
     /// <summary>
-    /// Gets whether this console is available (has a valid canvas).
+    /// Gets or sets the font used in this console. Setting it resizes the
+    /// terminal grid to the new cell size, clearing the screen and homing the
+    /// cursor. Thread-safe.
     /// </summary>
-    /// <remarks>
-    /// Always true since canvas is initialized in constructor.
-    /// </remarks>
-    public bool IsAvailable => true;
-
-    /// <summary>
-    /// Gets or sets the font used in this console.
-    /// </summary>
+    /// <exception cref="ArgumentException">The font yields no usable character
+    /// cell, or a cell larger than the canvas.</exception>
     public Font Font
     {
         get => _font;
         set
         {
-            ApplyFontMetrics(value);
-
-            CursorX = 0;
-            CursorY = 0;
-
-            _cols = _canvas.Width / _charWidth;
-            _rows = _canvas.Height / _charHeight;
-            _cells = new Cell[_cols * _rows];
-
-            ClearCells();
-
-            _canvas.Clear((int)_backgroundColor);
-            _canvas.Display();
-
-            _font = value;
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the cursor X position (column).
-    /// </summary>
-    public int CursorX
-    {
-        get => _cursorX;
-        set
-        {
-            if (value >= 0 && value < _cols)
+            // Under the lock, like every other mutator: this replaces the cell
+            // buffer and both grid dimensions at once, and a concurrent write
+            // indexes _cells with a position computed against the old grid.
+            using (InternalCpu.DisableInterruptsScope())
             {
-                EraseCursor();
-                _cursorX = value;
-                DrawCursor();
+                _lock.Acquire();
+                try
+                {
+                    ApplyFontMetrics(value);
+
+                    _cursorX = 0;
+                    _cursorY = 0;
+                    _cursorDrawn = false;
+
+                    _cols = _canvas.Width / _charWidth;
+                    _rows = _canvas.Height / _charHeight;
+                    _cells = new Cell[_cols * _rows];
+
+                    ClearCells();
+
+                    _canvas.Clear((int)_backgroundColor);
+                    _canvas.Display();
+
+                    _font = value;
+                }
+                finally
+                {
+                    _lock.Release();
+                }
             }
         }
     }
 
     /// <summary>
-    /// Gets or sets the cursor Y position (row).
+    /// Gets or sets the cursor X position (column). Thread-safe; a column
+    /// outside the terminal is ignored.
     /// </summary>
-    public int CursorY
+    internal int CursorX
+    {
+        get => _cursorX;
+        set
+        {
+            using (InternalCpu.DisableInterruptsScope())
+            {
+                _lock.Acquire();
+                try
+                {
+                    if (value >= 0 && value < _cols)
+                    {
+                        SetCursorLocked(value, _cursorY);
+                    }
+                }
+                finally
+                {
+                    _lock.Release();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the cursor Y position (row). Thread-safe; a row outside
+    /// the terminal is ignored.
+    /// </summary>
+    internal int CursorY
     {
         get => _cursorY;
         set
         {
-            if (value >= 0 && value < _rows)
+            using (InternalCpu.DisableInterruptsScope())
             {
-                EraseCursor();
-                _cursorY = value;
-                DrawCursor();
+                _lock.Acquire();
+                try
+                {
+                    if (value >= 0 && value < _rows)
+                    {
+                        SetCursorLocked(_cursorX, value);
+                    }
+                }
+                finally
+                {
+                    _lock.Release();
+                }
             }
         }
     }
@@ -214,45 +242,38 @@ public class KernelConsole
     public int Rows => _rows;
 
     /// <summary>
-    /// Gets or sets whether the cursor is visible.
+    /// Gets or sets whether the cursor is visible. Thread-safe.
     /// </summary>
-    public bool CursorVisible
+    internal bool CursorVisible
     {
         get => _cursorVisible;
         set
         {
-            if (_cursorVisible != value)
+            using (InternalCpu.DisableInterruptsScope())
             {
-                if (_cursorVisible)
+                _lock.Acquire();
+                try
                 {
-                    EraseCursor();
-                }
+                    if (_cursorVisible != value)
+                    {
+                        if (_cursorVisible)
+                        {
+                            EraseCursor();
+                        }
 
-                _cursorVisible = value;
-                if (_cursorVisible)
+                        _cursorVisible = value;
+                        if (_cursorVisible)
+                        {
+                            DrawCursor();
+                        }
+                    }
+                }
+                finally
                 {
-                    DrawCursor();
+                    _lock.Release();
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// Gets or sets the foreground color.
-    /// </summary>
-    public uint ForegroundColor
-    {
-        get => _foregroundColor;
-        set => _foregroundColor = value;
-    }
-
-    /// <summary>
-    /// Gets or sets the background color.
-    /// </summary>
-    public uint BackgroundColor
-    {
-        get => _backgroundColor;
-        set => _backgroundColor = value;
     }
 
     /// <summary>
@@ -263,7 +284,7 @@ public class KernelConsole
     /// <summary>
     /// Sets the foreground color from ConsoleColor enum.
     /// </summary>
-    public void SetForegroundColor(ConsoleColor color)
+    internal void SetForegroundColor(ConsoleColor color)
     {
         _foregroundColor = s_palette[(int)color];
     }
@@ -271,7 +292,7 @@ public class KernelConsole
     /// <summary>
     /// Sets the background color from ConsoleColor enum.
     /// </summary>
-    public void SetBackgroundColor(ConsoleColor color)
+    internal void SetBackgroundColor(ConsoleColor color)
     {
         _backgroundColor = s_palette[(int)color];
     }
@@ -279,14 +300,19 @@ public class KernelConsole
     /// <summary>
     /// Converts ConsoleColor to uint color.
     /// </summary>
-    public static uint ConsoleColorToUint(ConsoleColor color)
+    internal static uint ConsoleColorToUint(ConsoleColor color)
     {
         return s_palette[(int)color];
     }
 
     /// <summary>
     /// Initializes the default (global) console on the hardware framebuffer.
+    /// Idempotent: a second call leaves the existing console in place, so a
+    /// kernel that overrides <see cref="Kernel.OnBoot"/> may call this whether
+    /// or not it also called <c>base.OnBoot()</c>.
     /// </summary>
+    /// <returns>True when <see cref="Default"/> is available, false when
+    /// graphics are compiled out.</returns>
     [MemberNotNullWhen(true, nameof(Default))]
     public static bool Initialize()
     {
@@ -297,8 +323,7 @@ public class KernelConsole
 
         if (Default != null)
         {
-            // throw exception instead of returning false to enable MemberNotNullWhen attributed above
-            throw new Exception($"{nameof(KernelConsole)} already initialized");
+            return true;
         }
 
         var canvas = Canvas.GetFullScreen();
@@ -316,8 +341,10 @@ public class KernelConsole
     }
 
     /// <summary>
-    /// Gets whether the default console has been initialized.
+    /// Gets whether the default console has been initialized. When true,
+    /// <see cref="Default"/> is non-null.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Default))]
     public static bool IsInitialized => Default != null;
 
     /// <summary>
@@ -333,7 +360,7 @@ public class KernelConsole
     /// </summary>
     private void ClearCells()
     {
-        if (_cells == null)
+        if (_cells is null)
         {
             return;
         }
@@ -348,24 +375,60 @@ public class KernelConsole
     /// Sets the cursor position.
     /// Thread-safe.
     /// </summary>
-    public void SetCursorPosition(int x, int y)
+    internal void SetCursorPosition(int x, int y)
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (x >= 0 && x < _cols && y >= 0 && y < _rows)
+            _lock.Acquire();
+            try
             {
-                _lock.Acquire();
-                try
+                if (x >= 0 && x < _cols && y >= 0 && y < _rows)
                 {
-                    EraseCursor();
-                    _cursorX = x;
-                    _cursorY = y;
-                    DrawCursor();
+                    SetCursorLocked(x, y);
                 }
-                finally
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Moves the cursor and repaints it at the new cell. The caller holds
+    /// <see cref="_lock"/> with interrupts disabled, and has already checked
+    /// that the position is inside the terminal.
+    /// </summary>
+    private void SetCursorLocked(int x, int y)
+    {
+        EraseCursor();
+        _cursorX = x;
+        _cursorY = y;
+        DrawCursor();
+    }
+
+    /// <summary>
+    /// Moves the cursor by a relative offset, reading and writing the position
+    /// in a single locked section. An offset that would leave the terminal is
+    /// ignored.
+    /// </summary>
+    private void MoveCursorBy(int dx, int dy)
+    {
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            _lock.Acquire();
+            try
+            {
+                int x = _cursorX + dx;
+                int y = _cursorY + dy;
+                if (x >= 0 && x < _cols && y >= 0 && y < _rows)
                 {
-                    _lock.Release();
+                    SetCursorLocked(x, y);
                 }
+            }
+            finally
+            {
+                _lock.Release();
             }
         }
     }
@@ -375,7 +438,7 @@ public class KernelConsole
     /// </summary>
     private void DrawCursor()
     {
-        if (!IsAvailable || !_cursorVisible || _cursorDrawn)
+        if (!_cursorVisible || _cursorDrawn)
         {
             return;
         }
@@ -393,7 +456,7 @@ public class KernelConsole
     /// </summary>
     private void EraseCursor()
     {
-        if (!IsAvailable || !_cursorDrawn)
+        if (!_cursorDrawn)
         {
             return;
         }
@@ -419,7 +482,7 @@ public class KernelConsole
     /// </summary>
     private void DrawCharAt(int col, int row)
     {
-        if (!IsAvailable || _cells == null)
+        if (_cells is null)
         {
             return;
         }
@@ -445,36 +508,11 @@ public class KernelConsole
     }
 
     /// <summary>
-    /// Redraws the entire screen from the cell buffer.
-    /// Thread-safe.
-    /// </summary>
-    public void Redraw()
-    {
-        using (InternalCpu.DisableInterruptsScope())
-        {
-            if (!IsAvailable || _cells == null)
-            {
-                return;
-            }
-
-            _lock.Acquire();
-            try
-            {
-                RedrawInternal();
-            }
-            finally
-            {
-                _lock.Release();
-            }
-        }
-    }
-
-    /// <summary>
     /// Internal redraw (must be called with lock held).
     /// </summary>
     private void RedrawInternal()
     {
-        if (_cells == null)
+        if (_cells is null)
         {
             return;
         }
@@ -484,20 +522,15 @@ public class KernelConsole
         // Clear screen with background color
         _canvas.Clear((int)_backgroundColor);
 
-        // Draw all cells
+        // Draw all cells. DrawCharAt repaints the cell background from the
+        // cell, not from the console's current one: a full repaint that used
+        // _backgroundColor for every cell erased the per-cell colours that the
+        // incremental painter had put there.
         for (int row = 0; row < _rows; row++)
         {
             for (int col = 0; col < _cols; col++)
             {
-                int index = GetIndex(row, col);
-                ref Cell cell = ref _cells[index];
-
-                if (cell.Char != '\0' && cell.Char != '\n')
-                {
-                    int pixelX = col * _charWidth;
-                    int pixelY = row * _charHeight;
-                    _canvas.DrawChar(cell.Char, Font, Color.FromArgb((int)cell.ForegroundColor), pixelX, pixelY);
-                }
+                DrawCharAt(col, row);
             }
         }
 
@@ -508,11 +541,11 @@ public class KernelConsole
     /// Writes a character at the current cursor position.
     /// Thread-safe: uses spinlock with interrupt protection.
     /// </summary>
-    public void Write(char c)
+    internal void Write(char c)
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (!IsAvailable || _cells == null)
+            if (_cells is null)
             {
                 return;
             }
@@ -586,11 +619,11 @@ public class KernelConsole
     /// Writes a string at the current cursor position.
     /// Thread-safe: uses spinlock with interrupt protection.
     /// </summary>
-    public void Write(string text)
+    internal void Write(string text)
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (!IsAvailable || _cells == null)
+            if (_cells is null)
             {
                 return;
             }
@@ -614,11 +647,11 @@ public class KernelConsole
     /// Writes a Span of character at the current cursor position
     /// </summary>
     /// <param name="buffer">Span of characters to write</param>
-    public void Write(ReadOnlySpan<char> buffer)
+    internal void Write(ReadOnlySpan<char> buffer)
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (!IsAvailable || _cells == null)
+            if (_cells is null)
             {
                 return;
             }
@@ -639,78 +672,13 @@ public class KernelConsole
     }
 
     /// <summary>
-    /// Writes a character followed by a newline.
-    /// Thread-safe.
-    /// </summary>
-    public void WriteLine(char c)
-    {
-        using (InternalCpu.DisableInterruptsScope())
-        {
-            if (!IsAvailable || _cells == null)
-            {
-                return;
-            }
-
-            _lock.Acquire();
-            try
-            {
-                WriteInternal(c);
-                EraseCursor();
-                DoLineFeed();
-                DrawCursor();
-            }
-            finally
-            {
-                _lock.Release();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Writes a string followed by a newline.
-    /// Thread-safe.
-    /// </summary>
-    public void WriteLine(string text)
-    {
-        using (InternalCpu.DisableInterruptsScope())
-        {
-            if (!IsAvailable || _cells == null)
-            {
-                return;
-            }
-
-            _lock.Acquire();
-            try
-            {
-                foreach (char c in text)
-                {
-                    WriteInternal(c);
-                }
-                EraseCursor();
-                DoLineFeed();
-                DrawCursor();
-            }
-            finally
-            {
-                _lock.Release();
-            }
-        }
-
-    }
-
-    /// <summary>
     /// Writes a newline.
     /// Thread-safe.
     /// </summary>
-    public void WriteLine()
+    internal void WriteLine()
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (!IsAvailable)
-            {
-                return;
-            }
-
             _lock.Acquire();
             try
             {
@@ -727,6 +695,7 @@ public class KernelConsole
 
     /// <summary>
     /// Performs a line feed (move to next line, column 0).
+    /// Must be called with the lock held.
     /// </summary>
     private void DoLineFeed()
     {
@@ -735,13 +704,18 @@ public class KernelConsole
 
         if (_cursorY >= _rows)
         {
-            Scroll();
+            // Home the cursor before scrolling. Scroll repaints the screen,
+            // which repaints the cursor, and an out-of-range row put it one
+            // line below the canvas: clipped away, but still marked drawn, so
+            // the caller's own repaint was then skipped and the caret vanished.
             _cursorY = _rows - 1;
+            Scroll();
         }
     }
 
     /// <summary>
     /// Performs a carriage return (move to column 0).
+    /// Must be called with the lock held.
     /// </summary>
     private void DoCarriageReturn()
     {
@@ -750,6 +724,7 @@ public class KernelConsole
 
     /// <summary>
     /// Performs a backspace (move cursor back and clear character).
+    /// Must be called with the lock held.
     /// </summary>
     private void DoBackspace()
     {
@@ -771,55 +746,21 @@ public class KernelConsole
     }
 
     /// <summary>
-    /// Moves the cursor left by one position.
+    /// Moves the cursor left by one position. Thread-safe; a no-op in the
+    /// first column.
     /// </summary>
-    public void MoveCursorLeft()
+    internal void MoveCursorLeft()
     {
-        if (_cursorX > 0)
-        {
-            EraseCursor();
-            _cursorX--;
-            DrawCursor();
-        }
+        MoveCursorBy(-1, 0);
     }
 
     /// <summary>
-    /// Moves the cursor right by one position.
+    /// Moves the cursor right by one position. Thread-safe; a no-op in the
+    /// last column.
     /// </summary>
-    public void MoveCursorRight()
+    internal void MoveCursorRight()
     {
-        if (_cursorX < _cols - 1)
-        {
-            EraseCursor();
-            _cursorX++;
-            DrawCursor();
-        }
-    }
-
-    /// <summary>
-    /// Moves the cursor up by one position.
-    /// </summary>
-    public void MoveCursorUp()
-    {
-        if (_cursorY > 0)
-        {
-            EraseCursor();
-            _cursorY--;
-            DrawCursor();
-        }
-    }
-
-    /// <summary>
-    /// Moves the cursor down by one position.
-    /// </summary>
-    public void MoveCursorDown()
-    {
-        if (_cursorY < _rows - 1)
-        {
-            EraseCursor();
-            _cursorY++;
-            DrawCursor();
-        }
+        MoveCursorBy(1, 0);
     }
 
     /// <summary>
@@ -828,7 +769,7 @@ public class KernelConsole
     /// </summary>
     private void Scroll()
     {
-        if (_cells == null)
+        if (_cells is null)
         {
             return;
         }
@@ -859,15 +800,10 @@ public class KernelConsole
     /// Clears the entire screen.
     /// Thread-safe.
     /// </summary>
-    public void Clear()
+    internal void Clear()
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (!IsAvailable)
-            {
-                return;
-            }
-
             _lock.Acquire();
             try
             {
@@ -888,52 +824,10 @@ public class KernelConsole
     /// <summary>
     /// Resets colors to default (white on black).
     /// </summary>
-    public void ResetColors()
+    internal void ResetColors()
     {
         _foregroundColor = (uint)Color.White.ToArgb();
         _backgroundColor = (uint)Color.Black.ToArgb();
     }
 
-    /// <summary>
-    /// Gets the character at the specified position.
-    /// </summary>
-    public char GetCharAt(int col, int row)
-    {
-        if (_cells == null || col < 0 || col >= _cols || row < 0 || row >= _rows)
-        {
-            return '\0';
-        }
-
-        int index = GetIndex(row, col);
-        return _cells[index].Char;
-    }
-
-    /// <summary>
-    /// Gets the cell at the specified position.
-    /// </summary>
-    public Cell GetCellAt(int col, int row)
-    {
-        if (_cells == null || col < 0 || col >= _cols || row < 0 || row >= _rows)
-        {
-            return Cell.Empty(_foregroundColor, _backgroundColor);
-        }
-
-        int index = GetIndex(row, col);
-        return _cells[index];
-    }
-
-    /// <summary>
-    /// Sets the cell at the specified position.
-    /// </summary>
-    public void SetCellAt(int col, int row, Cell cell)
-    {
-        if (_cells == null || col < 0 || col >= _cols || row < 0 || row >= _rows)
-        {
-            return;
-        }
-
-        int index = GetIndex(row, col);
-        _cells[index] = cell;
-        DrawCharAt(col, row);
-    }
 }

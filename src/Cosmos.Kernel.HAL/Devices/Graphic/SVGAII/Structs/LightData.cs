@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SVGA3dLightData
+internal struct SVGA3dLightData
 {
     public LightType type;
     public uint inWorldSpace;

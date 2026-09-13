@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
-public enum SVGA3dSurfaceFormat : uint
+internal enum SVGA3dSurfaceFormat : uint
 {
     SVGA3D_FORMAT_INVALID = 0,
 

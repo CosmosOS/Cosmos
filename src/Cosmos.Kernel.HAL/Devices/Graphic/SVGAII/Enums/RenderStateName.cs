@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
-public enum SVGA3dRenderStateName : uint
+internal enum SVGA3dRenderStateName : uint
 {
     SVGA3D_RS_INVALID = 0,
     SVGA3D_RS_ZENABLE = 1,     /* SVGA3dBool */

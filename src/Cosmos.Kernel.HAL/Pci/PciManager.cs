@@ -6,7 +6,7 @@ using Cosmos.Kernel.HAL.Pci.Enums;
 
 namespace Cosmos.Kernel.HAL.Pci;
 
-public class PciManager
+internal class PciManager
 {
     /// <summary>Maximum number of PCI devices tracked in the device cache.</summary>
     private const int MaxDevices = 64;

@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 /// <summary>
 /// ID values.
 /// </summary>
-public enum LightType : uint
+internal enum LightType : uint
 {
     SVGA3D_LIGHTTYPE_INVALID = 0,
     SVGA3D_LIGHTTYPE_POINT = 1,

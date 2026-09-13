@@ -18,7 +18,7 @@ namespace Internal.Runtime
     }
 
 #pragma warning disable 0169
-    public struct ReadyToRunHeader
+    internal struct ReadyToRunHeader
     {
         internal uint Signature;      // ReadyToRunHeaderConstants.Signature
         internal ushort MajorVersion;
@@ -42,12 +42,7 @@ namespace Internal.Runtime
     // This list should be kept in sync with the runtime version at
     // https://github.com/dotnet/runtime/blob/main/src/coreclr/inc/readytorun.h
     //
-#if SYSTEM_PRIVATE_CORELIB
-    internal
-#else
-    public
-#endif
-    enum ReadyToRunSectionType
+    internal enum ReadyToRunSectionType
     {
         //
         // CoreCLR ReadyToRun sections

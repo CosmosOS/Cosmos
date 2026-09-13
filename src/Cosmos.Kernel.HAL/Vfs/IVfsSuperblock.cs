@@ -7,8 +7,10 @@ namespace Cosmos.Kernel.HAL.Vfs;
 /// </summary>
 public interface IVfsSuperblock
 {
+    /// <summary>Root directory inode of this mount.</summary>
     IVfsInode Root { get; }
 
+    /// <summary>Superblock-level callbacks (sync, statfs, unmount).</summary>
     ISuperblockOperations SuperOperations { get; }
 
     /// <summary>Fundamental block size in bytes, or 0 if not applicable.</summary>

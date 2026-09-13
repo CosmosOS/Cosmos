@@ -2,7 +2,7 @@ using Cosmos.Kernel.Core.CPU;
 
 namespace Cosmos.Kernel.Core.ARM64.Cpu;
 
-public partial class ARM64CpuOps : ICpuOps
+internal partial class ARM64CpuOps : ICpuOps
 {
     public void Halt() => InternalCpu.Halt();
 

@@ -1,8 +1,7 @@
 using System;
 using System.Diagnostics;
 using Cosmos.Kernel.Boot.Limine;
-using Cosmos.Kernel.Core.CPU;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 
 namespace Cosmos.TestRunner.Framework
 {
@@ -23,31 +22,17 @@ namespace Cosmos.TestRunner.Framework
         /// <summary>Base of the decimal number system, used when accumulating parsed digits.</summary>
         private const int DecimalBase = 10;
 
-        /// <summary>QEMU kill marker byte 0 of the 0xDE 0xAD 0xBE 0xEF 0xCA 0xFE 0xBA 0xBE end sequence.</summary>
-        private const byte QemuKillMarkerByte0 = 0xDE;
-        /// <summary>QEMU kill marker byte 1 of the end sequence.</summary>
-        private const byte QemuKillMarkerByte1 = 0xAD;
-        /// <summary>QEMU kill marker byte 2 of the end sequence.</summary>
-        private const byte QemuKillMarkerByte2 = 0xBE;
-        /// <summary>QEMU kill marker byte 3 of the end sequence.</summary>
-        private const byte QemuKillMarkerByte3 = 0xEF;
-        /// <summary>QEMU kill marker byte 4 of the end sequence.</summary>
-        private const byte QemuKillMarkerByte4 = 0xCA;
-        /// <summary>QEMU kill marker byte 5 of the end sequence.</summary>
-        private const byte QemuKillMarkerByte5 = 0xFE;
-        /// <summary>QEMU kill marker byte 6 of the end sequence.</summary>
-        private const byte QemuKillMarkerByte6 = 0xBA;
-        /// <summary>QEMU kill marker byte 7 of the end sequence.</summary>
-        private const byte QemuKillMarkerByte7 = 0xBE;
+        /// <summary>End marker telling the QEMU host to kill the VM.</summary>
+        private static ReadOnlySpan<byte> QemuKillMarker => new byte[] { 0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE, 0xBA, 0xBE };
 
-        private static string? _currentSuite;
-        private static ushort _testCount;
-        private static ushort _expectedTestCount;
-        private static ushort _passedCount;
-        private static ushort _failedCount;
-        private static ushort _skippedCount;
-        private static ushort _currentTestNumber;
-        private static long _testStartTicks;
+        private static string? s_currentSuite;
+        private static ushort s_testCount;
+        private static ushort s_expectedTestCount;
+        private static ushort s_passedCount;
+        private static ushort s_failedCount;
+        private static ushort s_skippedCount;
+        private static ushort s_currentTestNumber;
+        private static long s_testStartTicks;
 
         /// <summary>
         /// Start a test suite
@@ -56,13 +41,13 @@ namespace Cosmos.TestRunner.Framework
         /// <param name="expectedTests">Total number of tests that will be registered (0 = unknown)</param>
         public static void Start(string suiteName, ushort expectedTests = 0)
         {
-            _currentSuite = suiteName;
-            _testCount = 0;
-            _expectedTestCount = expectedTests;
-            _passedCount = 0;
-            _failedCount = 0;
-            _skippedCount = 0;
-            _currentTestNumber = 0;
+            s_currentSuite = suiteName;
+            s_testCount = 0;
+            s_expectedTestCount = expectedTests;
+            s_passedCount = 0;
+            s_failedCount = 0;
+            s_skippedCount = 0;
+            s_currentTestNumber = 0;
 
             // Send TestSuiteStart message with expected test count
             SendTestSuiteStart(suiteName, expectedTests);
@@ -73,17 +58,17 @@ namespace Cosmos.TestRunner.Framework
         /// </summary>
         public static void Run(string testName, Action testAction)
         {
-            _currentTestNumber++;
-            _testCount++;
+            s_currentTestNumber++;
+            s_testCount++;
 
             // Send TestStart message
-            SendTestStart(_currentTestNumber, testName);
+            SendTestStart(s_currentTestNumber, testName);
 
             // Reset assertion state
             Assert.Reset();
 
             // Record start time
-            _testStartTicks = Stopwatch.GetTimestamp();
+            s_testStartTicks = Stopwatch.GetTimestamp();
 
             // Execute test
             testAction();
@@ -94,8 +79,8 @@ namespace Cosmos.TestRunner.Framework
             // bogus times. When that happens, clamp to a sane max and
             // emit a UART warning with the raw inputs so the cause can be
             // debugged from the log.
-            var endTicks = Stopwatch.GetTimestamp();
-            var elapsedTicks = endTicks - _testStartTicks;
+            long endTicks = Stopwatch.GetTimestamp();
+            long elapsedTicks = endTicks - s_testStartTicks;
             long freq = Stopwatch.Frequency;
             long rawMs = (freq > 0 && elapsedTicks > 0)
                 ? (elapsedTicks * MillisecondsPerSecond) / freq
@@ -104,17 +89,17 @@ namespace Cosmos.TestRunner.Framework
             uint durationMs;
             if (rawMs < 0 || rawMs > MaxSaneDurationMs)
             {
-                Serial.WriteString("[TestRunner] WARN clamped durationMs=");
-                Serial.WriteNumber(rawMs);
-                Serial.WriteString(" startTicks=");
-                Serial.WriteNumber(_testStartTicks);
-                Serial.WriteString(" endTicks=");
-                Serial.WriteNumber(endTicks);
-                Serial.WriteString(" elapsedTicks=");
-                Serial.WriteNumber(elapsedTicks);
-                Serial.WriteString(" freq=");
-                Serial.WriteNumber(freq);
-                Serial.WriteString("\n");
+                Log.WriteString("[TestRunner] WARN clamped durationMs=");
+                Log.WriteNumber(rawMs);
+                Log.WriteString(" startTicks=");
+                Log.WriteNumber(s_testStartTicks);
+                Log.WriteString(" endTicks=");
+                Log.WriteNumber(endTicks);
+                Log.WriteString(" elapsedTicks=");
+                Log.WriteNumber(elapsedTicks);
+                Log.WriteString(" freq=");
+                Log.WriteNumber(freq);
+                Log.WriteString("\n");
                 durationMs = (uint)MaxSaneDurationMs;
             }
             else
@@ -125,13 +110,13 @@ namespace Cosmos.TestRunner.Framework
             // Check if test failed via Assert
             if (Assert.Failed)
             {
-                _failedCount++;
-                SendTestFail(_currentTestNumber, Assert.FailureMessage ?? "Test failed");
+                s_failedCount++;
+                SendTestFail(s_currentTestNumber, Assert.FailureMessage ?? "Test failed");
             }
             else
             {
-                _passedCount++;
-                SendTestPass(_currentTestNumber, durationMs);
+                s_passedCount++;
+                SendTestPass(s_currentTestNumber, durationMs);
             }
         }
 
@@ -183,28 +168,28 @@ namespace Cosmos.TestRunner.Framework
         /// </summary>
         public static void RunDestructive(string testName, Action testAction, string failureMessage)
         {
-            _currentTestNumber++;
-            _testCount++;
+            s_currentTestNumber++;
+            s_testCount++;
 
             // Pre-send TestStart + TestPass so a successful destructive op
             // (which never returns) still leaves a passing record in the log.
-            SendTestStart(_currentTestNumber, testName);
-            SendTestPass(_currentTestNumber, 0);
-            _passedCount++;
+            SendTestStart(s_currentTestNumber, testName);
+            SendTestPass(s_currentTestNumber, 0);
+            s_passedCount++;
 
             // Distinct sentinel for the engine's re-launch heuristic. A regular
             // TestPass alone is ambiguous (every passing test emits one), so
             // without this the engine would misread a mid-suite crash as a
             // destructive op and burn boot attempts on skip=N+1 re-launches.
-            SendTestDestructiveReached(_currentTestNumber);
+            SendTestDestructiveReached(s_currentTestNumber);
 
             testAction();
 
             // Action returned — destructive op didn't fire. Demote to fail
             // (last write wins in the parser).
-            _passedCount--;
-            _failedCount++;
-            SendTestFail(_currentTestNumber, failureMessage);
+            s_passedCount--;
+            s_failedCount++;
+            SendTestFail(s_currentTestNumber, failureMessage);
         }
 
         /// <summary>
@@ -361,12 +346,12 @@ namespace Cosmos.TestRunner.Framework
         /// </summary>
         public static void Skip(string testName, string reason)
         {
-            _currentTestNumber++;
-            _testCount++;
+            s_currentTestNumber++;
+            s_testCount++;
 
-            _skippedCount++;
-            SendTestStart(_currentTestNumber, testName);
-            SendTestSkip(_currentTestNumber, reason);
+            s_skippedCount++;
+            SendTestStart(s_currentTestNumber, testName);
+            SendTestSkip(s_currentTestNumber, reason);
         }
 
         /// <summary>
@@ -377,26 +362,26 @@ namespace Cosmos.TestRunner.Framework
         public static void Finish()
         {
             // Use expected count if provided, otherwise actual count
-            ushort totalToReport = _expectedTestCount > 0 ? _expectedTestCount : _testCount;
+            ushort totalToReport = s_expectedTestCount > 0 ? s_expectedTestCount : s_testCount;
 
-            SendTestSuiteEnd(totalToReport, _passedCount, _failedCount, _skippedCount);
+            SendTestSuiteEnd(totalToReport, s_passedCount, s_failedCount, s_skippedCount);
 
             // Also send a text message for fallback/debugging
-            Serial.WriteString("\nTest Suite: ");
-            Serial.WriteString(_currentSuite ?? "Unknown");
-            Serial.WriteString("\nTotal: ");
-            Serial.WriteNumber(_testCount);
-            if (_expectedTestCount > 0 && _expectedTestCount != _testCount)
+            Log.WriteString("\nTest Suite: ");
+            Log.WriteString(s_currentSuite ?? "Unknown");
+            Log.WriteString("\nTotal: ");
+            Log.WriteNumber(s_testCount);
+            if (s_expectedTestCount > 0 && s_expectedTestCount != s_testCount)
             {
-                Serial.WriteString(" / ");
-                Serial.WriteNumber(_expectedTestCount);
-                Serial.WriteString(" expected");
+                Log.WriteString(" / ");
+                Log.WriteNumber(s_expectedTestCount);
+                Log.WriteString(" expected");
             }
-            Serial.WriteString("  Passed: ");
-            Serial.WriteNumber(_passedCount);
-            Serial.WriteString("  Failed: ");
-            Serial.WriteNumber(_failedCount);
-            Serial.WriteString("\n");
+            Log.WriteString("  Passed: ");
+            Log.WriteNumber(s_passedCount);
+            Log.WriteString("  Failed: ");
+            Log.WriteNumber(s_failedCount);
+            Log.WriteString("\n");
         }
 
         /// <summary>
@@ -411,14 +396,7 @@ namespace Cosmos.TestRunner.Framework
 
             // Send unique end marker: 0xDE 0xAD 0xBE 0xEF 0xCA 0xFE 0xBA 0xBE
             // This sequence tells the QEMU host to kill the VM
-            Serial.ComWrite(QemuKillMarkerByte0);
-            Serial.ComWrite(QemuKillMarkerByte1);
-            Serial.ComWrite(QemuKillMarkerByte2);
-            Serial.ComWrite(QemuKillMarkerByte3);
-            Serial.ComWrite(QemuKillMarkerByte4);
-            Serial.ComWrite(QemuKillMarkerByte5);
-            Serial.ComWrite(QemuKillMarkerByte6);
-            Serial.ComWrite(QemuKillMarkerByte7);
+            Log.WriteBytes(QemuKillMarker);
         }
 
         #region Protocol Message Sending
@@ -450,6 +428,8 @@ namespace Cosmos.TestRunner.Framework
         /// <summary>Shift extracting byte 3 of a little-endian multi-byte value.</summary>
         private const int Byte3Shift = 24;
 
+        /// <summary>Size in bytes of the frame header: 4-byte magic, command byte, little-endian ushort length.</summary>
+        private const int HeaderSizeBytes = 7;
         /// <summary>Size in bytes of a little-endian ushort payload field (test number, expected count).</summary>
         private const int UInt16FieldSizeBytes = 2;
         /// <summary>Payload size of a TestPass message: ushort test number + uint duration in ms.</summary>
@@ -461,45 +441,51 @@ namespace Cosmos.TestRunner.Framework
         /// Send a protocol message with format: [MAGIC:4][Command:1][Length:2][Payload:N]
         /// Magic signature = 0x19740807 (SerialSignature from Consts.cs)
         /// </summary>
-        private static void SendMessage(byte command, byte[] payload)
+        internal static void SendMessage(byte command, byte[] payload)
         {
             // The protocol shares the UART with diagnostic traces written from IRQ handlers
             // and other threads ([SCHED]/[CV] wake logs). A frame must go out as one
-            // uninterrupted byte sequence: an IRQ landing mid-frame interleaves its log into
-            // the message and the host-side parser drops or garbles it.
-            using (InternalCpu.DisableInterruptsScope())
-            {
-                // Send magic signature (0x19740807 little-endian)
-                Serial.ComWrite(SerialSignatureByte0);
-                Serial.ComWrite(SerialSignatureByte1);
-                Serial.ComWrite(SerialSignatureByte2);
-                Serial.ComWrite(SerialSignatureByte3);
-
-                // Send command byte
-                Serial.ComWrite(command);
-
-                // Send length (little-endian ushort)
-                ushort length = (ushort)payload.Length;
-                Serial.ComWrite((byte)(length & ByteMask));
-                Serial.ComWrite((byte)((length >> Byte1Shift) & ByteMask));
-
-                // Send payload
-                foreach (var b in payload)
-                {
-                    Serial.ComWrite(b);
-                }
-            }
+            // uninterrupted byte sequence, so it is assembled up front and emitted through
+            // the atomic Log.WriteBytes.
+            ushort length = (ushort)payload.Length;
+            byte[] frame = new byte[HeaderSizeBytes + payload.Length];
+            frame[0] = SerialSignatureByte0;
+            frame[1] = SerialSignatureByte1;
+            frame[2] = SerialSignatureByte2;
+            frame[3] = SerialSignatureByte3;
+            frame[4] = command;
+            frame[5] = (byte)(length & ByteMask);
+            frame[6] = (byte)((length >> Byte1Shift) & ByteMask);
+            Array.Copy(payload, 0, frame, HeaderSizeBytes, payload.Length);
+            Log.WriteBytes(frame);
         }
 
+        /// <summary>Lowest character the parser accepts inside a protocol string.</summary>
+        private const char MinProtocolChar = ' ';
+        /// <summary>Highest character that survives one-byte encoding unchanged.</summary>
+        private const char MaxProtocolChar = (char)0x7E;
+        /// <summary>Stand-in written for a character the protocol cannot carry.</summary>
+        private const byte UnsupportedCharByte = (byte)'?';
+
         /// <summary>
-        /// Encode string to UTF-8 bytes (simplified, assumes ASCII for kernel)
+        /// Encode a protocol string as one byte per character. Anything
+        /// outside printable ASCII becomes <c>?</c>, because the engine's
+        /// parser treats a byte below 0x20 in a string field as proof that
+        /// the frame was assembled from interleaved UART bytes and drops the
+        /// whole message. Truncating a wider character produces exactly that:
+        /// an em dash (U+2014) truncates to 0x14, and a skip reason carrying
+        /// one was dropped as noise, which left the test sitting at the pass
+        /// its TestStart had already implied. The same held for a failure
+        /// message, so a real failure could be reported green.
         /// </summary>
+        /// <param name="str">String to encode.</param>
         private static byte[] EncodeString(string str)
         {
-            var bytes = new byte[str.Length];
+            byte[] bytes = new byte[str.Length];
             for (int i = 0; i < str.Length; i++)
             {
-                bytes[i] = (byte)str[i]; // ASCII only for simplicity
+                char c = str[i];
+                bytes[i] = c is >= MinProtocolChar and <= MaxProtocolChar ? (byte)c : UnsupportedCharByte;
             }
             return bytes;
         }

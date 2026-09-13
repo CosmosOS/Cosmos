@@ -18,9 +18,17 @@ public static class PartitionManager
     /// <summary>Identifies a partition by its absolute LBA range on the host disk.</summary>
     public readonly struct PartitionLocation
     {
+        /// <summary>Absolute LBA on the host disk where the partition begins.</summary>
         public ulong StartSector { get; }
+
+        /// <summary>Length of the partition in sectors.</summary>
         public ulong SectorCount { get; }
 
+        /// <summary>
+        /// Creates a location from an absolute LBA range.
+        /// </summary>
+        /// <param name="startSector">Absolute LBA on the host disk where the partition begins.</param>
+        /// <param name="sectorCount">Length of the partition in sectors.</param>
         public PartitionLocation(ulong startSector, ulong sectorCount)
         {
             StartSector = startSector;
@@ -41,8 +49,8 @@ public static class PartitionManager
         byte mbrSystemId,
         Guid gptType)
     {
-        // Start 0 aliases the table sector on both formats; the MBR writer
-        // throws for it, but this facade documents a false return.
+        // Start 0 aliases the table sector on both formats, so both writers
+        // refuse it; check here too, so the reason is stated once at the top.
         if (sectorCount == 0 || startSector == 0)
         {
             return false;
@@ -53,12 +61,9 @@ public static class PartitionManager
         {
             return false;
         }
-        // The low-level writers only validate device bounds; the facade is
-        // where the free-space invariant lives.
-        if (RangeIntersectsExistingPartition(device, startSector, sectorCount, exclude: null))
-        {
-            return false;
-        }
+        // Each writer refuses a range that overlaps another entry of its own
+        // table (Gpt.AddPartition, Mbr.AddPartition), so the facade only
+        // routes to the right one.
 
         if (Gpt.IsGpt(device))
         {
@@ -75,35 +80,40 @@ public static class PartitionManager
         {
             return false;
         }
-        if (startSector > Mbr.LbaFieldMaxValue || sectorCount > Mbr.LbaFieldMaxValue)
-        {
-            return false;
-        }
 
-        Mbr.WritePartition(device, freeSlot, mbrSystemId, (uint)startSector, (uint)sectorCount);
-        return true;
+        // AddPartition owns the 32-bit on-disk field bound and reports it the
+        // same way this does, so the facade no longer pre-checks it.
+        return Mbr.AddPartition(device, freeSlot, mbrSystemId, startSector, sectorCount);
     }
 
     /// <summary>
-    /// Add a logical partition to the disk's extended partition. Returns the
-    /// new partition's absolute start LBA, or 0 on failure (no extended
-    /// partition, no room left, or the disk is GPT).
+    /// Add a logical partition to the disk's extended partition.
     /// </summary>
-    public static ulong CreateLogical(IBlockDevice device, byte systemId, ulong sectorCount)
+    /// <param name="device">The disk to add the logical partition to.</param>
+    /// <param name="systemId">Partition type byte to stamp on the new logical.</param>
+    /// <param name="sectorCount">Length of the new logical in sectors.</param>
+    /// <param name="startSector">Absolute LBA the new logical begins at, when the call succeeds.</param>
+    /// <returns>
+    /// <see langword="false"/> when the disk is GPT or unpartitioned, has no
+    /// extended container, or the container has no room left.
+    /// </returns>
+    public static bool TryCreateLogical(IBlockDevice device, byte systemId, ulong sectorCount, out ulong startSector)
     {
+        startSector = 0;
+
         if (Gpt.IsGpt(device))
         {
-            return 0;
+            return false;
         }
         if (!Mbr.IsMbr(device))
         {
-            return 0;
+            return false;
         }
         if (!Mbr.TryGetExtendedPartition(device, out ulong extStart, out ulong extCount))
         {
-            return 0;
+            return false;
         }
-        return Ebr.AddLogical(device, extStart, extCount, systemId, sectorCount);
+        return Ebr.TryAddLogical(device, extStart, extCount, systemId, sectorCount, out startSector);
     }
 
     /// <summary>Delete the partition occupying <paramref name="location"/>.</summary>
@@ -134,7 +144,7 @@ public static class PartitionManager
         {
             return false;
         }
-        Mbr.DeletePartition(device, slot);
+        Mbr.RemovePartition(device, slot);
         return true;
     }
 
@@ -151,6 +161,9 @@ public static class PartitionManager
         {
             return false;
         }
+        // Growing into a neighbour is refused by each writer: Gpt.ResizePartition
+        // and Mbr.ResizePartition test the other entries of their table, and
+        // Ebr.ResizeLogical bounds the logical by the next EBR sector.
 
         if (Gpt.IsGpt(device))
         {
@@ -172,17 +185,12 @@ public static class PartitionManager
             return Ebr.ResizeLogical(device, extStart, logicalIndex, newSectorCount);
         }
 
-        int slot = FindMbrSlot(device, location);
-        if (slot < 0)
+        int slot = FindMbrSlot(device, location, out byte systemId);
+        if (slot < 0 || !Mbr.IsMutableSystemId(systemId))
         {
             return false;
         }
-        if (newSectorCount > Mbr.LbaFieldMaxValue)
-        {
-            return false;
-        }
-        Mbr.ResizePartition(device, slot, (uint)newSectorCount);
-        return true;
+        return Mbr.ResizePartition(device, slot, newSectorCount);
     }
 
     /// <summary>
@@ -212,14 +220,22 @@ public static class PartitionManager
         {
             return true;
         }
-        // The destination must be free space (the source itself may
-        // overlap it; CopySectors is direction-aware). With this checked
-        // up front, a copy that later fails to re-table only ever landed
-        // on unallocated sectors.
-        if (RangeIntersectsExistingPartition(device, newStartSector, location.SectorCount, location))
+        // Both writers refuse a destination inside the table's own metadata
+        // (Mbr.MovePartition rejects LBA 0, Gpt.MovePartition rejects anything
+        // below the first usable LBA), but they run after the copy. Applying
+        // the same rule here is what keeps a refused move side-effect free:
+        // otherwise CopySectors overwrites the very table the writer is about
+        // to re-read, and the call reports false having destroyed it.
+        ulong firstPlaceableLba = Gpt.IsGpt(device) ? Gpt.FirstUsableLba : Mbr.MbrSectorLba + 1;
+        if (newStartSector < firstPlaceableLba)
         {
             return false;
         }
+        // The destination must be free space (the source itself may overlap
+        // it; CopySectors is direction-aware). Each format's writer owns that
+        // test and applies it again when it stamps the entry; asking it here,
+        // once the entry is resolved and before the copy, is what keeps a
+        // refused move side-effect free.
 
         // Resolve the table entry and its constraints BEFORE copying, so a
         // false return is side-effect free. The copy-then-retable order
@@ -229,7 +245,7 @@ public static class PartitionManager
         if (Gpt.IsGpt(device))
         {
             int gptIndex = FindGptIndex(device, location);
-            if (gptIndex < 0)
+            if (gptIndex < 0 || Gpt.OverlapsOtherEntry(device, gptIndex, newStartSector, location.SectorCount))
             {
                 return false;
             }
@@ -245,123 +261,37 @@ public static class PartitionManager
 
         if (TryFindLogical(device, location, out ulong extStart, out int logicalIndex))
         {
+            if (!Ebr.CanMoveLogical(device, extStart, logicalIndex, newStartSector))
+            {
+                return false;
+            }
             CopySectors(device, location.StartSector, newStartSector, location.SectorCount);
             device.Flush();
             return Ebr.MoveLogical(device, extStart, logicalIndex, newStartSector);
         }
 
-        int slot = FindMbrSlot(device, location);
-        if (slot < 0)
+        // The mutability test belongs with the other pre-copy checks: this
+        // walks the raw table, so it matches the extended container and the
+        // GPT protective entry, which Mbr.MovePartition then refuses. Asking
+        // afterwards meant the sectors were already copied and the refusal
+        // arrived as an exception out of a bool-returning method.
+        int slot = FindMbrSlot(device, location, out byte systemId);
+        if (slot < 0 || !Mbr.IsMutableSystemId(systemId))
         {
             return false;
         }
-        if (newStartSector > Mbr.LbaFieldMaxValue)
+        if (newStartSector > Mbr.LbaFieldMaxValue
+            || Mbr.OverlapsOtherPrimary(device, slot, newStartSector, location.SectorCount))
         {
             return false;
         }
+
         CopySectors(device, location.StartSector, newStartSector, location.SectorCount);
         device.Flush();
-        Mbr.MovePartition(device, slot, (uint)newStartSector);
-        return true;
+        return Mbr.MovePartition(device, slot, newStartSector);
     }
 
-    /// <summary>
-    /// True when [<paramref name="startSector"/>, +<paramref name="sectorCount"/>)
-    /// intersects a partition other than <paramref name="exclude"/>. On MBR
-    /// disks, logical partitions are checked including the EBR sector
-    /// preceding each logical's data plus the first EBR at the extended
-    /// start; for non-logical ranges the whole extended container counts
-    /// as occupied.
-    /// </summary>
-    private static bool RangeIntersectsExistingPartition(
-        IBlockDevice device,
-        ulong startSector,
-        ulong sectorCount,
-        PartitionLocation? exclude)
-    {
-        if (Gpt.IsGpt(device))
-        {
-            List<Gpt.PartitionEntry> entries = Gpt.Parse(device);
-            for (int i = 0; i < entries.Count; i++)
-            {
-                if (IsExcluded(entries[i].StartSector, entries[i].SectorCount, exclude))
-                {
-                    continue;
-                }
-                if (Intersects(startSector, sectorCount, entries[i].StartSector, entries[i].SectorCount))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        if (!Mbr.IsMbr(device))
-        {
-            return false;
-        }
-
-        List<Mbr.PartitionEntry> primaries = Mbr.Parse(device);
-        for (int i = 0; i < primaries.Count; i++)
-        {
-            if (IsExcluded(primaries[i].StartSector, primaries[i].SectorCount, exclude))
-            {
-                continue;
-            }
-            if (Intersects(startSector, sectorCount, primaries[i].StartSector, primaries[i].SectorCount))
-            {
-                return true;
-            }
-        }
-
-        if (!Mbr.TryGetExtendedPartition(device, out ulong extStart, out ulong extCount))
-        {
-            return false;
-        }
-
-        bool excludeIsLogical = exclude.HasValue
-            && TryFindLogical(device, exclude.Value, out _, out _);
-        if (!excludeIsLogical)
-        {
-            // Only logicals may live inside the container; any other range
-            // treats the whole container (chain sectors included) as
-            // occupied.
-            return Intersects(startSector, sectorCount, extStart, extCount);
-        }
-
-        // A logical moving inside its container: the obstacles are the
-        // other logicals (each with the EBR sector preceding its data)
-        // and the chain's first EBR sector. The mover's own EBR stays put
-        // and Ebr.MoveLogical already enforces newStart past it.
-        List<Mbr.PartitionEntry> logicals = Ebr.Parse(device, extStart);
-        for (int i = 0; i < logicals.Count; i++)
-        {
-            if (IsExcluded(logicals[i].StartSector, logicals[i].SectorCount, exclude))
-            {
-                continue;
-            }
-            if (Intersects(startSector, sectorCount, logicals[i].StartSector - Ebr.EbrSectorSpan, logicals[i].SectorCount + Ebr.EbrSectorSpan))
-            {
-                return true;
-            }
-        }
-        return Intersects(startSector, sectorCount, extStart, Ebr.EbrSectorSpan);
-    }
-
-    /// <summary>Half-open interval intersection on absolute LBA ranges.</summary>
-    private static bool Intersects(ulong aStart, ulong aCount, ulong bStart, ulong bCount)
-    {
-        return aStart < bStart + bCount && bStart < aStart + aCount;
-    }
-
-    /// <summary>True when the entry range is the one <paramref name="exclude"/> designates.</summary>
-    private static bool IsExcluded(ulong startSector, ulong sectorCount, PartitionLocation? exclude)
-    {
-        return exclude.HasValue
-            && exclude.Value.StartSector == startSector
-            && exclude.Value.SectorCount == sectorCount;
-    }
-
+    /// <summary>Index of the first empty primary slot in the MBR, or -1 when all four are used.</summary>
     private static int FindFreeMbrSlot(IBlockDevice device)
     {
         Span<byte> mbr = new byte[device.BlockSize];
@@ -377,15 +307,29 @@ public static class PartitionManager
         return -1;
     }
 
+    /// <summary>Primary slot whose entry covers exactly <paramref name="location"/>, or -1.</summary>
     private static int FindMbrSlot(IBlockDevice device, PartitionLocation location)
     {
+        return FindMbrSlot(device, location, out _);
+    }
+
+    /// <summary>
+    /// As <see cref="FindMbrSlot(IBlockDevice, PartitionLocation)"/>, also
+    /// reporting the slot's system ID. This walks the raw table rather than
+    /// <see cref="Mbr.Parse"/>, so it matches extended and protective entries
+    /// too; callers that go on to mutate the slot must test
+    /// <see cref="Mbr.IsMutableSystemId"/> before they act.
+    /// </summary>
+    private static int FindMbrSlot(IBlockDevice device, PartitionLocation location, out byte systemId)
+    {
+        systemId = Mbr.SystemIdEmpty;
         Span<byte> mbr = new byte[device.BlockSize];
         device.ReadBlock(Mbr.MbrSectorLba, 1, mbr);
         for (int i = 0; i < Mbr.MaxPartitions; i++)
         {
             int offset = Mbr.PartitionTableOffset + i * Mbr.PartitionEntrySize;
-            byte systemId = mbr[offset + Mbr.EntrySystemIdOffset];
-            if (systemId == Mbr.SystemIdEmpty)
+            byte slotSystemId = mbr[offset + Mbr.EntrySystemIdOffset];
+            if (slotSystemId == Mbr.SystemIdEmpty)
             {
                 continue;
             }
@@ -393,15 +337,23 @@ public static class PartitionManager
             ulong count = BitConverter.ToUInt32(mbr.Slice(offset + Mbr.EntrySectorCountOffset, Mbr.LbaFieldSizeBytes));
             if (start == location.StartSector && count == location.SectorCount)
             {
+                systemId = slotSystemId;
                 return i;
             }
         }
         return -1;
     }
 
-    private static bool TryFindLogical(IBlockDevice device, PartitionLocation location, out ulong extendedStartLba, out int logicalIndex)
+    /// <summary>
+    /// Whether <paramref name="location"/> is a logical partition: it lies
+    /// inside the extended container and the EBR chain lists an entry with
+    /// exactly that range. On success, hands back the container's start and
+    /// the entry's position in the chain, the two things the
+    /// <see cref="Ebr"/> writers address a logical by.
+    /// </summary>
+    private static bool TryFindLogical(IBlockDevice device, PartitionLocation location, out ulong extendedStartSector, out int logicalIndex)
     {
-        extendedStartLba = 0;
+        extendedStartSector = 0;
         logicalIndex = -1;
 
         if (!Mbr.TryGetExtendedPartition(device, out ulong extStart, out ulong extCount))
@@ -413,12 +365,12 @@ public static class PartitionManager
             return false;
         }
 
-        List<Mbr.PartitionEntry> logicals = Ebr.Parse(device, extStart);
+        List<MbrPartitionEntry> logicals = Ebr.Parse(device, extStart);
         for (int i = 0; i < logicals.Count; i++)
         {
             if (logicals[i].StartSector == location.StartSector && logicals[i].SectorCount == location.SectorCount)
             {
-                extendedStartLba = extStart;
+                extendedStartSector = extStart;
                 logicalIndex = i;
                 return true;
             }
@@ -427,9 +379,10 @@ public static class PartitionManager
         return false;
     }
 
+    /// <summary>Position of the entry covering exactly <paramref name="location"/> in <see cref="Gpt.Parse"/>'s output, or -1.</summary>
     private static int FindGptIndex(IBlockDevice device, PartitionLocation location)
     {
-        List<Gpt.PartitionEntry> entries = Gpt.Parse(device);
+        List<GptPartitionEntry> entries = Gpt.Parse(device);
         for (int i = 0; i < entries.Count; i++)
         {
             if (entries[i].StartSector == location.StartSector && entries[i].SectorCount == location.SectorCount)
@@ -440,6 +393,12 @@ public static class PartitionManager
         return -1;
     }
 
+    /// <summary>
+    /// Copy <paramref name="count"/> sectors from <paramref name="source"/> to
+    /// <paramref name="destination"/> in batches. When the destination
+    /// overlaps the source from above, the batches run from the tail down so
+    /// no sector is overwritten before it is read.
+    /// </summary>
     private static void CopySectors(IBlockDevice device, ulong source, ulong destination, ulong count)
     {
         ulong blockSize = device.BlockSize;

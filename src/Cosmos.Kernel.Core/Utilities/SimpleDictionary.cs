@@ -1,6 +1,6 @@
 namespace Cosmos.Kernel.Core.Utilities;
 
-public class SimpleDictionary<TKey, TValue> where TKey : notnull
+internal class SimpleDictionary<TKey, TValue> where TKey : notnull
 {
     private const int InitialCapacity = 16;
     private Entry[] _buckets;

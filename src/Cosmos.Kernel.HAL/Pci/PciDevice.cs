@@ -8,7 +8,7 @@ using Cosmos.Kernel.HAL.Pci.Enums;
 
 namespace Cosmos.Kernel.HAL.Pci;
 
-public class PciDevice : Device
+internal class PciDevice : Device
 {
     public readonly uint Bus;
     public readonly uint Slot;

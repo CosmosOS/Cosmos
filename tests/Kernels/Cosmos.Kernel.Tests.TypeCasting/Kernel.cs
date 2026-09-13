@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -11,7 +11,7 @@ public class Kernel : Sys.Kernel
 {
     protected override void BeforeRun()
     {
-        Serial.WriteString("[TypeCasting Tests] Starting test suite\n");
+        Log.WriteString("[TypeCasting Tests] Starting test suite\n");
         TR.Start("TypeCasting Tests", expectedTests: 17);
 
         // Class hierarchy type checks (RhTypeCast_IsInstanceOfClass)
@@ -51,7 +51,7 @@ public class Kernel : Sys.Kernel
         TR.Run("FilterAndCatchResume", TestFilterAndCatchResume);
         TR.Run("TryCatch_ConsoleWriteLineExMessage", TestTryCatchConsoleWriteLineExMessage);
 
-        Serial.WriteString("[TypeCasting Tests] All tests completed\n");
+        Log.WriteString("[TypeCasting Tests] All tests completed\n");
         TR.Finish();
     }
 

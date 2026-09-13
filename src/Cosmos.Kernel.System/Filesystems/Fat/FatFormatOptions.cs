@@ -5,7 +5,7 @@ using Cosmos.Kernel.HAL.Vfs;
 namespace Cosmos.Kernel.System.Filesystems.Fat;
 
 /// <summary>
-/// Parameters for <see cref="FatFilesystemType.TryFormat(System.ReadOnlySpan{char}, IVfsFormatOptions?)"/>.
+/// Parameters for <see cref="FatFilesystemType.TryFormat(global::System.ReadOnlySpan{char}, IVfsFormatOptions)"/>.
 /// All <c>0</c> / null fields mean "let the formatter pick a sensible default
 /// for the requested <see cref="FatType"/> and the device size."
 /// </summary>

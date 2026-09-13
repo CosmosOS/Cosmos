@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.Core.Memory.Heap;
 /// <summary>
 /// will mostly fill a whole page
 /// </summary>
-public static unsafe class MediumHeap
+internal static unsafe class MediumHeap
 {
     public static ulong PrefixBytes => (ulong)sizeof(MediumHeapHeader);
 

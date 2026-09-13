@@ -11,14 +11,14 @@ namespace Cosmos.Kernel.HAL.Devices.Virtio;
 /// (<see cref="VirtioTransport.IsrQueue"/> / <see cref="VirtioTransport.IsrConfig"/>);
 /// the transport has already acknowledged the interrupt.
 /// </summary>
-public delegate void VirtioInterruptHandler(uint isrStatus);
+internal delegate void VirtioInterruptHandler(uint isrStatus);
 
 /// <summary>
 /// Wires a platform line interrupt (e.g. a GIC SPI) to a transport dispatch
 /// handler. Supplied by the platform initializer that owns the bus, so the
 /// shared transport stays free of per-arch interrupt-controller calls.
 /// </summary>
-public delegate void VirtioIrqEnable(uint intid, InterruptManager.IrqDelegate handler);
+internal delegate void VirtioIrqEnable(uint intid, InterruptManager.IrqDelegate handler);
 
 /// <summary>
 /// Transport-independent core of a virtio device (virtio spec 1.x): device
@@ -28,7 +28,7 @@ public delegate void VirtioIrqEnable(uint intid, InterruptManager.IrqDelegate ha
 /// <see cref="VirtioMmioTransport"/> and <see cref="VirtioPciTransport"/>
 /// implement the per-transport register access.
 /// </summary>
-public abstract class VirtioTransport
+internal abstract class VirtioTransport
 {
     // Virtio device types (virtio spec section 5).
     public const uint DeviceTypeNetwork = 1;

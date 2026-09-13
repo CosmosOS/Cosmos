@@ -2,7 +2,6 @@ using System.Runtime;
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Scheduler;
-using SchedThread = Cosmos.Kernel.Core.Scheduler.Thread;
 
 namespace Cosmos.Kernel.Core.Runtime;
 
@@ -59,7 +58,7 @@ internal static unsafe class DebugLiveSnapshot
         {
             return;
         }
-        SchedThread?[]? threads = SchedulerManager.Threads;
+        SchedulerThread?[]? threads = SchedulerManager.Threads;
         if (threads == null)
         {
             return;
@@ -78,7 +77,7 @@ internal static unsafe class DebugLiveSnapshot
         }
         for (int i = 0; i < n; i++)
         {
-            SchedThread? t = threads[i];
+            SchedulerThread? t = threads[i];
             if (t == null)
             {
                 continue;

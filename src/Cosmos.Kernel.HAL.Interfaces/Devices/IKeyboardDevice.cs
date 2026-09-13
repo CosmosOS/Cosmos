@@ -7,12 +7,12 @@ namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 /// </summary>
 /// <param name="scanCode">The scan code of the key.</param>
 /// <param name="released">True if the key was released, false if pressed.</param>
-public delegate void KeyPressedHandler(byte scanCode, bool released);
+internal delegate void KeyPressedHandler(byte scanCode, bool released);
 
 /// <summary>
 /// Interface for keyboard devices.
 /// </summary>
-public interface IKeyboardDevice
+internal interface IKeyboardDevice
 {
     /// <summary>
     /// Initialize the keyboard device.

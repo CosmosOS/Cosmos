@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Core.Memory.Heap;
 /// <summary>
 /// Page containing Size Map Table
 /// </summary>
-public unsafe struct SMTPage
+internal unsafe struct SMTPage
 {
     /// <summary>
     /// Pointer to the next page
@@ -21,7 +21,7 @@ public unsafe struct SMTPage
     public RootSMTBlock* First;
 }
 
-public unsafe struct RootSMTBlock
+internal unsafe struct RootSMTBlock
 {
     /// <summary>
     /// Elements stored in the page have a size less or equal to this
@@ -41,7 +41,7 @@ public unsafe struct RootSMTBlock
 }
 
 // Changing the ordering will break SMTBlock* NextFreeBlock(SMTPage* aPage)
-public unsafe struct SMTBlock
+internal unsafe struct SMTBlock
 {
     /// <summary>
     /// Pointer to the actual page, where the elements are stored
@@ -59,7 +59,7 @@ public unsafe struct SMTBlock
     public SMTBlock* NextBlock;
 }
 
-public static unsafe class SmallHeap
+internal static unsafe class SmallHeap
 {
     public static ulong MaxSize => PageAllocator.PageSize / 2 - 1;
 
@@ -136,8 +136,8 @@ public static unsafe class SmallHeap
     /// Gets the last block on a certain page for objects of this size
     /// </summary>
     /// <param name="page">Page to search</param>
-    /// <param name="aSize"></param>
-    /// <returns></returns>
+    /// <param name="aSize">Object size in bytes the block chain is keyed on.</param>
+    /// <returns>The last block in the chain for that size on that page.</returns>
     private static SMTBlock* GetLastBlock(SMTPage* page, uint aSize)
     {
         SMTBlock* ptr = GetFirstBlock(page, aSize)->First;
@@ -157,7 +157,7 @@ public static unsafe class SmallHeap
     /// <summary>
     /// Get the first block for this size on any SMT page, which has space left to allocate to
     /// </summary>
-    /// <param name="aSize"></param>
+    /// <param name="aSize">Object size in bytes the block chain is keyed on.</param>
     /// <returns>Null if no more space on any block of this size</returns>
     private static SMTBlock* GetFirstWithSpace(uint aSize)
     {
@@ -175,7 +175,8 @@ public static unsafe class SmallHeap
     /// <summary>
     /// Get the first block for this size on this SMT page, which has space left to allocate to
     /// </summary>
-    /// <param name="aSize"></param>
+    /// <param name="aPage">Page to search.</param>
+    /// <param name="aSize">Object size in bytes the block chain is keyed on.</param>
     /// <returns>Null if no more space on this page</returns>
     private static SMTBlock* GetFirstWithSpace(SMTPage* aPage, uint aSize) =>
         GetFirstWithSpace(GetFirstBlock(aPage, aSize), aSize);
@@ -184,8 +185,8 @@ public static unsafe class SmallHeap
     /// Get the first block for this size in this SMT block chain, which has space left to allocate to
     /// </summary>
     /// <param name="aRoot">The root node to start the search at</param>
-    /// <param name="aSize"></param>
-    /// <returns></returns>
+    /// <param name="aSize">Object size in bytes the block chain is keyed on.</param>
+    /// <returns>Null if no block in the chain has space left.</returns>
     private static SMTBlock* GetFirstWithSpace(RootSMTBlock* aRoot, uint aSize)
     {
         SMTBlock* ptr = aRoot->First;
@@ -209,6 +210,7 @@ public static unsafe class SmallHeap
     /// <summary>
     /// Add a new root block for a certain size to a certain SMT page
     /// </summary>
+    /// <param name="aPage">Page to add the root block to.</param>
     /// <param name="aSize">Size must be divisible by 2 otherwise Alloc breaks</param>
     private static void AddRootSMTBlock(SMTPage* aPage, uint aSize)
     {
@@ -342,6 +344,8 @@ public static unsafe class SmallHeap
     /// Create a page with the size of an item and try add it to the SMT at a certain page
     /// If the SMT page is full, it will be added to the first SMT page with space or a new SMT page is allocated
     /// </summary>
+    /// <param name="aPage">SMT page the new page is added to, or the first
+    /// page with space when it is full.</param>
     /// <param name="aItemSize">Object size in bytes</param>
     /// <exception cref="Exception">Thrown if:
     /// <list type="bullet">
@@ -612,8 +616,8 @@ public static unsafe class SmallHeap
     /// <summary>
     /// Counts how many elements are currently allocated on a certain page
     /// </summary>
-    /// <param name="aSize"></param>
-    /// <returns></returns>
+    /// <param name="aPage">Page to count on.</param>
+    /// <returns>The number of allocated objects across every block chain on the page.</returns>
     private static int GetAllocatedObjectCount(SMTPage* aPage)
     {
         RootSMTBlock* ptr = aPage->First;

@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard Turkish (TR) keyboard layout.
 /// </summary>
-public class TRStandardLayout : ScanMapBase
+public sealed class TRStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TRStandardLayout"/> class.
@@ -15,10 +15,9 @@ public class TRStandardLayout : ScanMapBase
     {
     }
 
-    protected override void InitKeys()
+    /// <inheritdoc />
+    protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>(100);
-
         #region Keys
 
         /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKeyEx */

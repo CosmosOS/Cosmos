@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.Core.Scheduler.Stride;
 /// <summary>
 /// Stride scheduler per-thread extension data.
 /// </summary>
-public class StrideThreadData
+internal class StrideThreadData
 {
     /// <summary>
     /// Resource weight (higher = more CPU time).

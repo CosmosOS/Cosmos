@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.HAL.Devices.Input;
 /// Virtio-input mouse driver. Transport-agnostic: works over virtio MMIO
 /// (QEMU virt) and virtio PCI (q35 virtio-mouse-pci) alike.
 /// </summary>
-public unsafe class VirtioMouse : MouseDevice
+internal unsafe class VirtioMouse : MouseDevice
 {
     // Linux mouse button codes
     private const ushort BTN_LEFT = 0x110;

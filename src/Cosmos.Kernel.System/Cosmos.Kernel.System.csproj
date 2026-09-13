@@ -7,6 +7,10 @@
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props) -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
 
+    <!-- SchedulerInfo fronts the experimental scheduler seam (COSMOS0001). -->
+    <!-- COSMOS0002: this assembly declares the experimental packet seam and consumes it itself. -->
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0002</NoWarn>
+
     <!-- Package Metadata -->
     <PackageId>Cosmos.Kernel.System</PackageId>
     <Title>Cosmos Kernel System</Title>
@@ -44,6 +48,7 @@
       <_KernelVersionCsLine Include="namespace Cosmos.Kernel.System%3B" />
       <_KernelVersionCsLine Include="public abstract partial class Kernel" />
       <_KernelVersionCsLine Include="{" />
+      <_KernelVersionCsLine Include="    /// &lt;summary&gt;The version of the Cosmos packages this kernel was built against.&lt;/summary&gt;" />
       <_KernelVersionCsLine Include="    public const string VersionString = &quot;$(VersionPrefix)&quot;%3B" />
       <_KernelVersionCsLine Include="}" />
     </ItemGroup>
@@ -69,6 +74,24 @@
     <!-- makes internal members visible to target project - unit tests -->
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.System</_Parameter1>
+    </AssemblyAttribute>
+    <!-- Plugs patch BCL entry points (Console, Sockets) onto the stack's
+         internals; those internals are framework plumbing, not user API. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Cosmos.Kernel.Plugs</_Parameter1>
+    </AssemblyAttribute>
+    <!-- White-box network tests observe the stack's ICMP echo counters. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Cosmos.Kernel.Tests.Network</_Parameter1>
+    </AssemblyAttribute>
+    <!-- White-box FAT layout tests forge and corrupt raw directory bytes. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Cosmos.Kernel.Tests.Fat</_Parameter1>
+    </AssemblyAttribute>
+    <!-- White-box 3D wire tests drive the internal SVGA canvas with the
+         device disabled and inspect the commands it places in the FIFO. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Cosmos.Kernel.Tests.Graphic</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 </Project>

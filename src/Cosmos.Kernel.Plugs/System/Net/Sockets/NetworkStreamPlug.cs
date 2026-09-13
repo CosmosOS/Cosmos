@@ -1,7 +1,7 @@
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 
 namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 
@@ -38,17 +38,17 @@ public static class NetworkStreamPlug
     [PlugMember(".ctor")]
     public static void Ctor(NetworkStream aThis, Socket socket, FileAccess access, bool ownsSocket)
     {
-        Serial.WriteString("[NetworkStreamPlug] Ctor(socket, access, ownsSocket)\n");
+        Log.WriteString("[NetworkStreamPlug] Ctor(socket, access, ownsSocket)\n");
 
         if (socket == null)
         {
-            Serial.WriteString("[NetworkStreamPlug] socket is null\n");
+            Log.WriteString("[NetworkStreamPlug] socket is null\n");
             throw new ArgumentNullException(nameof(socket));
         }
 
         if (!socket.Connected)
         {
-            Serial.WriteString("[NetworkStreamPlug] socket is not connected\n");
+            Log.WriteString("[NetworkStreamPlug] socket is not connected\n");
             throw new IOException("Socket not connected.");
         }
 
@@ -160,20 +160,20 @@ public static class NetworkStreamPlug
     [PlugMember]
     public static void Write(NetworkStream aThis, byte[] buffer, int offset, int count)
     {
-        Serial.WriteString("[NetworkStreamPlug] Write: entering, count=");
-        Serial.WriteNumber((ulong)count);
-        Serial.WriteString("\n");
+        Log.WriteString("[NetworkStreamPlug] Write: entering, count=");
+        Log.WriteNumber((ulong)count);
+        Log.WriteString("\n");
 
         int id = GetId(aThis);
         if (!_streamSockets.TryGetValue(id, out var socket))
         {
-            Serial.WriteString("[NetworkStreamPlug] Write: socket disposed\n");
+            Log.WriteString("[NetworkStreamPlug] Write: socket disposed\n");
             throw new ObjectDisposedException(nameof(NetworkStream));
         }
 
-        Serial.WriteString("[NetworkStreamPlug] Write: calling socket.Send\n");
+        Log.WriteString("[NetworkStreamPlug] Write: calling socket.Send\n");
         socket.Send(buffer, offset, count, SocketFlags.None);
-        Serial.WriteString("[NetworkStreamPlug] Write: socket.Send returned\n");
+        Log.WriteString("[NetworkStreamPlug] Write: socket.Send returned\n");
     }
 
     [PlugMember]

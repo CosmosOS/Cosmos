@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
-public enum Register : ushort
+internal enum Register : ushort
 {
     Enable3D = 0x20,
     Guest3DScratchSize = 0x21,
@@ -44,7 +44,7 @@ public enum Register : ushort
     FifoNumRegisters = 293
 }
 
-public enum Register3D
+internal enum Register3D
 {
     SVGA_FIFO_MIN = 0,
     SVGA_FIFO_MAX,       /* The distance from MIN to MAX must be at least 10K */

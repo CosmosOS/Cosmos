@@ -1,11 +1,9 @@
 using System;
-using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Timer;
 using DevKernel.Diagnostics;
 using DevKernel.Shell;
-using SchedThread = Cosmos.Kernel.Core.Scheduler.Thread;
-using SchedThreadState = Cosmos.Kernel.Core.Scheduler.ThreadState;
 using SysThread = System.Threading.Thread;
 
 namespace DevKernel.Commands;
@@ -21,8 +19,20 @@ internal static class SchedulerCommands
     /// <summary>Delay (ms) after starting the test thread so its output can appear.</summary>
     private const uint ThreadTestWaitMs = 2000;
 
-    /// <summary>Thread ID of the scheduler's idle thread, which the kill command must refuse to kill.</summary>
-    private const uint IdleThreadId = 0;
+    /// <summary>Delay (ms) before the interrupt-context timer fires.</summary>
+    private const uint TimerDelayMs = 100;
+
+    /// <summary>Delay (ms) before the thread-context alarm fires.</summary>
+    private const uint AlarmDelayMs = 200;
+
+    /// <summary>Delay (ms) waited for both to fire, longer than either delay.</summary>
+    private const uint TimersWaitMs = 500;
+
+    /// <summary>Fire count for the interrupt-context timer; written from interrupt context.</summary>
+    private static volatile int s_timerFireCount;
+
+    /// <summary>Fire count for the thread-context alarm; written from the alarm thread.</summary>
+    private static volatile int s_alarmFireCount;
 
     public static void Register(CommandShell shell)
     {
@@ -66,6 +76,13 @@ internal static class SchedulerCommands
                 Usage = "cpustat",
                 Description = "Live CPU% + thread monitor with stress wave",
                 Execute = static (context, args) => CpuStat.Run(),
+            },
+            new ShellCommand
+            {
+                Name = "timers",
+                Usage = "timers",
+                Description = "Fire an interrupt-context timer and a thread-context alarm",
+                Execute = static (context, args) => TestTimers(),
             });
     }
 
@@ -73,8 +90,7 @@ internal static class SchedulerCommands
     {
         Terminal.Header("Scheduler Information:");
 
-        IScheduler? scheduler = SchedulerManager.Current;
-        if (scheduler == null)
+        if (!SchedulerInfo.IsInitialized)
         {
             Terminal.InfoLine("Status", "Not initialized");
             return;
@@ -82,35 +98,35 @@ internal static class SchedulerCommands
 
         Terminal.StatusLine(
             "Status",
-            SchedulerManager.Enabled ? "ENABLED" : "DISABLED",
-            SchedulerManager.Enabled ? ConsoleColor.Green : ConsoleColor.Red);
+            SchedulerInfo.IsRunning ? "ENABLED" : "DISABLED",
+            SchedulerInfo.IsRunning ? ConsoleColor.Green : ConsoleColor.Red);
 
-        Terminal.InfoLine("Scheduler", scheduler.Name);
-        Terminal.InfoLine("CPU Count", SchedulerManager.CpuCount.ToString());
-        Terminal.InfoLine("Quantum", (SchedulerManager.DefaultQuantumNs / Units.NsPerMs).ToString() + " ms");
+        Terminal.InfoLine("Scheduler", SchedulerInfo.SchedulerName!);
+        Terminal.InfoLine("CPU Count", SchedulerInfo.CpuCount.ToString());
+        Terminal.InfoLine(
+            "Tick period",
+            SchedulerInfo.TickPeriodNs == 0
+                ? "no tick yet"
+                : (SchedulerInfo.TickPeriodNs / Units.NsPerMs).ToString() + " ms");
         Console.WriteLine();
 
-        for (uint cpuId = 0; cpuId < SchedulerManager.CpuCount; cpuId++)
+        for (uint cpuId = 0; cpuId < SchedulerInfo.CpuCount; cpuId++)
         {
-            PerCpuState cpuState = SchedulerManager.GetCpuState(cpuId);
-
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("  CPU " + cpuId + ":");
             Console.ResetColor();
 
-            SchedThread? currentThread = cpuState.CurrentThread;
-            if (currentThread != null)
+            if (SchedulerInfo.TryGetCurrentThread(cpuId, out KernelThreadInfo currentThread))
             {
-                PrintThreadInfo(scheduler, currentThread);
+                PrintThreadInfo(currentThread);
             }
 
-            int runQueueCount = scheduler.GetRunQueueCount(cpuState);
+            int runQueueCount = SchedulerInfo.GetRunQueueCount(cpuId);
             for (int i = 0; i < runQueueCount; i++)
             {
-                SchedThread? thread = scheduler.GetRunQueueThread(cpuState, i);
-                if (thread != null)
+                if (SchedulerInfo.TryGetRunQueueThread(cpuId, i, out KernelThreadInfo thread))
                 {
-                    PrintThreadInfo(scheduler, thread);
+                    PrintThreadInfo(thread);
                 }
             }
         }
@@ -118,29 +134,29 @@ internal static class SchedulerCommands
         Console.WriteLine();
     }
 
-    private static void PrintThreadInfo(IScheduler scheduler, SchedThread thread)
+    private static void PrintThreadInfo(KernelThreadInfo info)
     {
         Console.Write("    ");
         Console.ForegroundColor = ConsoleColor.White;
-        Console.Write("Thread " + thread.Id);
+        Console.Write("Thread " + info.Id);
 
         Console.Write(" ");
-        switch (thread.State)
+        switch (info.State)
         {
-            case SchedThreadState.Running:
+            case KernelThreadState.Running:
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write("Running");
                 break;
-            case SchedThreadState.Ready:
+            case KernelThreadState.Ready:
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.Write("Ready");
                 break;
-            case SchedThreadState.Blocked:
-            case SchedThreadState.Sleeping:
+            case KernelThreadState.Blocked:
+            case KernelThreadState.Sleeping:
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(thread.State == SchedThreadState.Blocked ? "Blocked" : "Sleeping");
+                Console.Write(info.State == KernelThreadState.Blocked ? "Blocked" : "Sleeping");
                 break;
-            case SchedThreadState.Dead:
+            case KernelThreadState.Dead:
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("Dead");
                 break;
@@ -150,14 +166,13 @@ internal static class SchedulerCommands
                 break;
         }
 
-        if (thread.SchedulerData != null)
+        if (info.HasPriority)
         {
-            long priority = scheduler.GetPriority(thread);
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write(" Pri=" + priority);
+            Console.Write(" Pri=" + info.Priority);
         }
 
-        ulong runtimeMs = thread.TotalRuntime / Units.NsPerMs;
+        ulong runtimeMs = info.TotalRuntimeNs / Units.NsPerMs;
         Console.ForegroundColor = ConsoleColor.DarkGray;
         Console.Write(" Run=" + runtimeMs + "ms");
 
@@ -165,14 +180,50 @@ internal static class SchedulerCommands
         Console.WriteLine();
     }
 
+    private static void TestTimers()
+    {
+        Terminal.Header("Timers:");
+
+        s_timerFireCount = 0;
+        s_alarmFireCount = 0;
+
+        SoftwareTimer? timer = TimerManager.Schedule(static () => s_timerFireCount++, TimeSpan.FromMilliseconds(TimerDelayMs));
+        if (timer is null)
+        {
+            Terminal.Error("No timer device registered");
+            return;
+        }
+
+        ulong alarmId = AlarmManager.Schedule(static () => s_alarmFireCount++, TimeSpan.FromMilliseconds(AlarmDelayMs));
+        if (alarmId == 0)
+        {
+            Terminal.Error("Scheduler is not running, alarm not scheduled");
+            TimerManager.Cancel(timer);
+            return;
+        }
+
+        Terminal.InfoLine("Timer", TimerDelayMs + "ms, interrupt context, active=" + timer.IsActive);
+        Terminal.InfoLine("Alarm", AlarmDelayMs + "ms, thread context, id=" + alarmId);
+
+        TimerManager.Wait(TimersWaitMs);
+
+        Terminal.InfoLine("Timer fired", s_timerFireCount + "x, active=" + timer.IsActive);
+        Terminal.InfoLine("Alarm fired", s_alarmFireCount + "x");
+
+        // Both were one-shot, so cancelling now reports that they already fired.
+        Terminal.InfoLine("Cancel timer", TimerManager.Cancel(timer) ? "was still pending" : "already fired");
+        Terminal.InfoLine("Cancel alarm", AlarmManager.Cancel(alarmId) ? "was still pending" : "already fired");
+        Console.WriteLine();
+    }
+
     private static void TestThread()
     {
-        Serial.WriteString("[Thread] Testing System.Threading.Thread API\n");
+        Log.WriteString("[Thread] Testing System.Threading.Thread API\n");
         Terminal.Info("Creating and starting a thread...");
 
         SysThread thread = new(static () =>
         {
-            Serial.WriteString("[Thread] Hello from thread delegate!\n");
+            Log.WriteString("[Thread] Hello from thread delegate!\n");
             Console.WriteLine("Hello from thread!");
         });
 
@@ -185,44 +236,30 @@ internal static class SchedulerCommands
 
     private static void KillThread(uint threadId)
     {
-        IScheduler? scheduler = SchedulerManager.Current;
-        if (scheduler == null)
+        if (!SchedulerInfo.IsInitialized)
         {
             Terminal.Error("Scheduler not initialized");
             return;
         }
 
-        if (threadId == IdleThreadId)
+        switch (SchedulerInfo.RequestKill(threadId))
         {
-            Terminal.Error("Cannot kill idle thread (ID " + IdleThreadId + ")");
-            return;
+            case ThreadKillResult.Killed:
+                Terminal.Success("Thread " + threadId + " killed");
+                Console.WriteLine();
+                break;
+            case ThreadKillResult.MarkedForExit:
+                Terminal.Warning("Thread " + threadId + " is running; marked for exit at its next reschedule");
+                break;
+            case ThreadKillResult.RefusedBlocked:
+                Terminal.Error("Thread " + threadId + " is neither running nor queued; it may be blocked, sleeping, never started, or already marked for exit");
+                break;
+            case ThreadKillResult.RefusedIdle:
+                Terminal.Error("Cannot kill idle thread " + threadId);
+                break;
+            default:
+                Terminal.Error("Thread " + threadId + " not found");
+                break;
         }
-
-        for (uint cpuId = 0; cpuId < SchedulerManager.CpuCount; cpuId++)
-        {
-            PerCpuState cpuState = SchedulerManager.GetCpuState(cpuId);
-
-            if (cpuState.CurrentThread?.Id == threadId)
-            {
-                Terminal.Warning("Cannot kill currently running thread");
-                cpuState.CurrentThread.State = SchedThreadState.Dead;
-                return;
-            }
-
-            int count = scheduler.GetRunQueueCount(cpuState);
-            for (int i = 0; i < count; i++)
-            {
-                SchedThread? thread = scheduler.GetRunQueueThread(cpuState, i);
-                if (thread?.Id == threadId)
-                {
-                    SchedulerManager.ExitThread(cpuId, thread);
-                    Terminal.Success("Thread " + threadId + " killed");
-                    Console.WriteLine();
-                    return;
-                }
-            }
-        }
-
-        Terminal.Error("Thread " + threadId + " not found");
     }
 }

@@ -3,6 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Keyboard.ScanMaps;
 
@@ -21,43 +22,50 @@ public static class KeyboardManager
     private static List<IKeyboardDevice>? s_keyboards;
     private static Queue<KeyEvent>? s_queuedKeys;
     private static ScanMapBase? s_scanMap;
-    private static bool s_initialized;
 
     /// <summary>
     /// The num-lock state.
     /// </summary>
-    public static bool NumLock { get; set; }
+    public static bool NumLock { get; private set; }
 
     /// <summary>
     /// The caps-lock state.
     /// </summary>
-    public static bool CapsLock { get; set; }
+    public static bool CapsLock { get; private set; }
 
     /// <summary>
     /// The scroll-lock state.
     /// </summary>
-    public static bool ScrollLock { get; set; }
+    public static bool ScrollLock { get; private set; }
 
     /// <summary>
     /// Whether the Control (Ctrl) key is currently pressed.
     /// </summary>
-    public static bool ControlPressed { get; set; }
+    public static bool ControlPressed { get; private set; }
 
     /// <summary>
     /// Whether the Shift key is currently pressed.
     /// </summary>
-    public static bool ShiftPressed { get; set; }
+    public static bool ShiftPressed { get; private set; }
 
     /// <summary>
     /// Whether the Alt key is currently pressed.
     /// </summary>
-    public static bool AltPressed { get; set; }
+    public static bool AltPressed { get; private set; }
 
     /// <summary>
     /// Whether a keyboard input is pending to be processed.
     /// </summary>
     public static bool KeyAvailable => s_queuedKeys != null && s_queuedKeys.Count > 0;
 
+    /// <summary>
+    /// Throws when keyboard support is compiled out. Guards actions, not reads:
+    /// a read answers honestly (0, null, false, empty) so a kernel can branch
+    /// on it, and an action names the switch to set instead of failing
+    /// silently. <see cref="Peek"/> and <see cref="ReadKey"/> are the two
+    /// exceptions: they return a non-nullable <see cref="KeyEvent"/> and so
+    /// have no value for "no key".
+    /// </summary>
     private static void ThrowIfDisabled()
     {
         if (!IsEnabled)
@@ -67,29 +75,27 @@ public static class KeyboardManager
     }
 
     /// <summary>
-    /// Initializes the keyboard manager.
-    /// Call RegisterKeyboard() after this to add keyboards.
+    /// Initializes the keyboard manager. Called once during boot, before the
+    /// platform keyboards are registered.
     /// </summary>
-    public static void Initialize()
+    internal static void Initialize()
     {
         ThrowIfDisabled();
 
-        if (s_initialized)
+        if (s_keyboards is not null)
         {
             return;
         }
 
-        s_keyboards = new List<IKeyboardDevice>();
         s_queuedKeys = new Queue<KeyEvent>();
         s_scanMap = new USStandardLayout();
-
-        s_initialized = true;
+        s_keyboards = new List<IKeyboardDevice>();
     }
 
     /// <summary>
     /// Registers a keyboard device with the manager.
     /// </summary>
-    public static void RegisterKeyboard(IKeyboardDevice keyboard)
+    internal static void RegisterKeyboard(IKeyboardDevice keyboard)
     {
         if (s_keyboards == null || keyboard == null)
         {
@@ -109,16 +115,25 @@ public static class KeyboardManager
 
     /// <summary>
     /// Enqueues the given key-press event to the internal keyboard buffer.
+    /// Runs in interrupt context on the IRQ path and in thread context from
+    /// <see cref="PollKeyboards"/>, against readers that are always in thread
+    /// context, so every touch of the queue masks interrupts for its
+    /// duration. <see cref="Queue{T}"/> is not reentrant: an enqueue that
+    /// grows the queue reallocates the backing array and rehomes its head
+    /// while a reader may be indexing the old one.
     /// </summary>
     private static void Enqueue(KeyEvent keyEvent)
     {
-        s_queuedKeys?.Enqueue(keyEvent);
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            s_queuedKeys?.Enqueue(keyEvent);
+        }
     }
 
     /// <summary>
     /// Handles a key-press by its physical key scan-code.
     /// </summary>
-    public static void HandleScanCode(byte scanCode, bool released)
+    private static void HandleScanCode(byte scanCode, bool released)
     {
         if (s_scanMap == null)
         {
@@ -185,22 +200,27 @@ public static class KeyboardManager
     /// <summary>
     /// Returns the KeyEvent at the beginning of the key queue without removing it.
     /// </summary>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <returns>The next pending key event, which stays in the queue.</returns>
+    /// <exception cref="InvalidOperationException">Keyboard support is disabled, no keyboard has been registered, or the queue is empty. Check <see cref="KeyAvailable"/> first.</exception>
     public static KeyEvent Peek()
     {
-        if (s_queuedKeys == null)
+        ThrowIfDisabled();
+
+        if (s_queuedKeys is null)
         {
             throw new InvalidOperationException("KeyboardManager not initialized!");
         }
 
-        return s_queuedKeys.Peek();
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            return s_queuedKeys.Peek();
+        }
     }
 
     /// <summary>
     /// Attempts to convert the given physical key scan-code to a KeyEvent.
     /// </summary>
-    public static bool GetKey(byte scanCode, out KeyEvent? keyInfo)
+    private static bool GetKey(byte scanCode, out KeyEvent? keyInfo)
     {
         if (s_scanMap == null)
         {
@@ -214,75 +234,75 @@ public static class KeyboardManager
     /// <summary>
     /// If available, reads the next key from the pending key-press buffer.
     /// </summary>
+    /// <param name="key">The key that was taken off the queue.</param>
+    /// <returns><see langword="false"/> when no key is pending, no keyboard
+    /// has been registered, or keyboard support is compiled out. This is the
+    /// member to use when either answer is normal, since it is the only one
+    /// here that does not throw for an empty queue.</returns>
     public static bool TryReadKey([NotNullWhen(true)] out KeyEvent? key)
     {
-        ThrowIfDisabled();
-
-        if (s_queuedKeys != null && s_queuedKeys.Count > 0)
+        // One call rather than Count-then-Dequeue, so an empty queue is the
+        // bool this member returns rather than a throw out of it. The mask is
+        // what makes the read safe against the interrupt that fills the queue.
+        using (InternalCpu.DisableInterruptsScope())
         {
-            key = s_queuedKeys.Dequeue();
-            return true;
+            if (s_queuedKeys is not null && s_queuedKeys.TryDequeue(out KeyEvent? pending))
+            {
+                key = pending;
+                return true;
+            }
         }
 
         key = default;
         return false;
     }
 
-    private static bool s_readKeyEntered = false;
-
     /// <summary>
     /// Reads the next key from the pending key-press buffer, blocking until available.
     /// </summary>
+    /// <returns>The next key, once one arrives.</returns>
+    /// <exception cref="InvalidOperationException">Keyboard support is disabled,
+    /// or no keyboard has been registered. This member returns a non-nullable
+    /// <see cref="KeyEvent"/> and so has no value meaning "no key", and with
+    /// the feature off it would otherwise wait forever on an interrupt no
+    /// keyboard will raise.</exception>
     public static KeyEvent ReadKey()
     {
         ThrowIfDisabled();
 
-        if (!s_readKeyEntered)
+        if (s_queuedKeys is null)
         {
-            s_readKeyEntered = true;
-            Cosmos.Kernel.Core.IO.Serial.Write("[KeyboardManager] ReadKey() entered\n");
+            throw new InvalidOperationException("KeyboardManager not initialized!");
         }
 
-        while (s_queuedKeys == null || s_queuedKeys.Count == 0)
+        while (true)
         {
+            // The mask covers the take and nothing else: polling allocates and
+            // the halt below waits for the very interrupt this scope masks.
+            using (InternalCpu.DisableInterruptsScope())
+            {
+                if (s_queuedKeys.TryDequeue(out KeyEvent? key))
+                {
+                    return key;
+                }
+            }
+
             // Poll all keyboards for events (in case interrupts aren't working)
             PollKeyboards();
 
             // Halt CPU until interrupt (key press)
             HAL.PlatformHAL.CpuOps?.Halt();
         }
-
-        return s_queuedKeys.Dequeue();
     }
-
-    private static uint s_pollCallCount = 0;
-
-    private static bool s_pollEntered = false;
 
     /// <summary>
     /// Polls all registered keyboards for events.
     /// </summary>
     private static void PollKeyboards()
     {
-        if (!s_pollEntered)
-        {
-            s_pollEntered = true;
-            Cosmos.Kernel.Core.IO.Serial.Write("[KeyboardManager] PollKeyboards() first call\n");
-        }
-
         if (s_keyboards == null)
         {
             return;
-        }
-
-        s_pollCallCount++;
-        if (s_pollCallCount % 100 == 0)
-        {
-            Cosmos.Kernel.Core.IO.Serial.Write("[KeyboardManager] PollKeyboards #");
-            Cosmos.Kernel.Core.IO.Serial.WriteNumber(s_pollCallCount);
-            Cosmos.Kernel.Core.IO.Serial.Write(" keyboards=");
-            Cosmos.Kernel.Core.IO.Serial.WriteNumber((uint)s_keyboards.Count);
-            Cosmos.Kernel.Core.IO.Serial.Write("\n");
         }
 
         foreach (var keyboard in s_keyboards)
@@ -292,19 +312,33 @@ public static class KeyboardManager
     }
 
     /// <summary>
-    /// Gets the currently used keyboard layout.
+    /// Gets the scan map that turns scan codes into characters.
     /// </summary>
+    /// <returns>The active layout, or <see langword="null"/> before a keyboard
+    /// has been registered and when keyboard support is compiled out;
+    /// registration installs <see cref="ScanMaps.USStandardLayout"/>.</returns>
     public static ScanMapBase? GetKeyLayout() => s_scanMap;
 
     /// <summary>
-    /// Sets the currently used keyboard layout.
+    /// Sets the scan map that turns scan codes into characters. This is a
+    /// method rather than a settable property beside
+    /// <see cref="GetKeyLayout"/> because the two halves cannot share a type:
+    /// the read is honestly nullable, while a null layout would leave the
+    /// interrupt path with nothing to decode with. Both forms refuse null at
+    /// run time; only a non-nullable parameter also diagnoses it at compile
+    /// time, which a nullable property cannot.
     /// </summary>
+    /// <param name="scanMap">The layout to use.</param>
+    /// <exception cref="InvalidOperationException">Keyboard support is disabled.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="scanMap"/> is null.</exception>
     public static void SetKeyLayout(ScanMapBase scanMap)
     {
-        if (scanMap != null)
-        {
-            s_scanMap = scanMap;
-        }
+        // The switch first, so a compiled-out keyboard names the switch to set
+        // rather than reporting whatever else is wrong with the call.
+        ThrowIfDisabled();
+        ArgumentNullException.ThrowIfNull(scanMap);
+
+        s_scanMap = scanMap;
     }
 
 }

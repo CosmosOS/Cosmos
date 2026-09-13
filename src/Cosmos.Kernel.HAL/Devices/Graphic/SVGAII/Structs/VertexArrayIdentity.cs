@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SVGA3dVertexArrayIdentity
+internal struct SVGA3dVertexArrayIdentity
 {
     public SVGA3dDeclType type;
     public SVGA3dDeclMethod method;

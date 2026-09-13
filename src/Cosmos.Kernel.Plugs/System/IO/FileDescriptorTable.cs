@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.HAL.Vfs;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Vfs;
 using PalError = global::Interop.Error;
 using PalSys = global::Interop.Sys;
@@ -104,7 +105,7 @@ internal static unsafe class FileDescriptorTable
                 return PalError.EEXIST;
             }
 
-            if ((stat.Mode & ModeEnum.FileTypeMask) == ModeEnum.Directory)
+            if (stat.IsDirectory)
             {
                 // SafeFileHandle.Open remaps EISDIR to EACCES, which is the
                 // BCL's documented behavior for opening a directory path.
@@ -327,7 +328,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.EBADF;
         }
 
-        return file.Handle.Flush() ? PalError.SUCCESS : PalError.EIO;
+        return file.Handle.TryFlush() ? PalError.SUCCESS : PalError.EIO;
     }
 
     internal static PalError Truncate(int fd, long length)
@@ -408,7 +409,7 @@ internal static unsafe class FileDescriptorTable
             chars[i] = (char)buffer[i];
         }
 
-        Cosmos.Kernel.Core.IO.Serial.Write(new string(chars.Slice(0, count)));
+        Log.Write(new string(chars.Slice(0, count)));
     }
 
     // ---------------- path operations ----------------
@@ -450,7 +451,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.ENOENT;
         }
 
-        if ((stat.Mode & ModeEnum.FileTypeMask) == ModeEnum.Directory)
+        if (stat.IsDirectory)
         {
             return PalError.EISDIR;
         }
@@ -506,7 +507,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.ENOENT;
         }
 
-        if ((stat.Mode & ModeEnum.FileTypeMask) != ModeEnum.Directory)
+        if (!stat.IsDirectory)
         {
             return PalError.ENOTDIR;
         }
@@ -544,7 +545,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.ENOENT;
         }
 
-        bool oldIsDirectory = (oldStat.Mode & ModeEnum.FileTypeMask) == ModeEnum.Directory;
+        bool oldIsDirectory = oldStat.IsDirectory;
         if (oldIsDirectory && newFull.StartsWith(oldFull + "/", StringComparison.Ordinal))
         {
             return PalError.EINVAL;
@@ -572,7 +573,7 @@ internal static unsafe class FileDescriptorTable
 
             if (!sameEntry)
             {
-                bool newIsDirectory = (newStat.Mode & ModeEnum.FileTypeMask) == ModeEnum.Directory;
+                bool newIsDirectory = newStat.IsDirectory;
                 if (oldIsDirectory && !newIsDirectory)
                 {
                     return PalError.ENOTDIR;
@@ -608,12 +609,16 @@ internal static unsafe class FileDescriptorTable
             return PalError.EPERM;
         }
 
-        if (!VfsManager.TryOpenDirectory(fullPath, out IVfsDirectoryHandle? node) || node == null)
+        // Any node, not just a directory: chmod applies to files too.
+        if (!VfsManager.TryOpenNode(fullPath, out IVfsNodeHandle? node))
         {
             return PalError.ENOENT;
         }
 
-        return ApplyMode(node.Inode, mode);
+        using (node)
+        {
+            return ApplyMode(node.Inode, mode);
+        }
     }
 
     internal static PalError SetCurrentDirectory(string path)
@@ -629,7 +634,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.ENOENT;
         }
 
-        if ((stat.Mode & ModeEnum.FileTypeMask) != ModeEnum.Directory)
+        if (!stat.IsDirectory)
         {
             return PalError.ENOTDIR;
         }
@@ -669,7 +674,7 @@ internal static unsafe class FileDescriptorTable
                 return PalError.ENOENT;
             }
 
-            if ((stat.Mode & ModeEnum.FileTypeMask) != ModeEnum.Directory)
+            if (!stat.IsDirectory)
             {
                 return PalError.ENOTDIR;
             }
@@ -689,7 +694,7 @@ internal static unsafe class FileDescriptorTable
                 bool directoryEntry = entry.FileOperations == null;
                 if (entry.InodeOperations != null && entry.InodeOperations.GetAttr(entry, out VfsStat entryStat))
                 {
-                    directoryEntry = (entryStat.Mode & ModeEnum.FileTypeMask) == ModeEnum.Directory;
+                    directoryEntry = entryStat.IsDirectory;
                 }
 
                 isDirectory[i] = directoryEntry;
@@ -817,7 +822,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.ENOENT;
         }
 
-        if ((parentStat.Mode & ModeEnum.FileTypeMask) != ModeEnum.Directory)
+        if (!parentStat.IsDirectory)
         {
             return PalError.ENOTDIR;
         }
@@ -846,13 +851,13 @@ internal static unsafe class FileDescriptorTable
         }
 
         VfsStat attributes = default;
-        attributes.Mode = PermissionBits(mode) | (current.Mode & ModeEnum.FileTypeMask);
+        attributes.Mode = PermissionBits(mode) | (current.Mode & VfsMode.FileTypeMask);
         return inode.InodeOperations.SetAttr(inode, SetAttrFlags.Mode, in attributes)
             ? PalError.SUCCESS
             : PalError.EPERM;
     }
 
-    private static ModeEnum PermissionBits(int mode) => (ModeEnum)mode & ModeEnum.PermissionMask;
+    private static VfsMode PermissionBits(int mode) => (VfsMode)mode & VfsMode.PermissionMask;
 
     private static void FillStatus(string fullPath, in VfsStat stat, out PalSys.FileStatus status)
     {

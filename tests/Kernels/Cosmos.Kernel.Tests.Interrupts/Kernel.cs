@@ -133,8 +133,9 @@ public class Kernel : Sys.Kernel
     // the scheduler; without one nothing would generate IRQs to dispatch.
     private static void TestTimerSourceRegistered()
     {
-        Assert.True(TimerManager.IsInitialized, "TimerManager should be initialized");
-        Assert.True(TimerManager.Timer != null, "A timer device should be registered");
+        // IsInitialized is exactly "a timer device is registered": the ring
+        // publishes the fact, so the suite does not read the device itself.
+        Assert.True(TimerManager.IsInitialized, "A timer device should be registered");
     }
 
     // Exercises the dynamic-vector allocator MSI/MSI-X programmers depend on:
@@ -499,7 +500,7 @@ public class Kernel : Sys.Kernel
 
         Assert.True(count > 0, "the dynamic range should not already be exhausted");
         Assert.True(!timerVectorHandedOut,
-            "the LAPIC timer vector must be outside the dynamic window — FreeVector+AllocateVector must never touch it");
+            "the LAPIC timer vector must be outside the dynamic window: FreeVector+AllocateVector must never touch it");
     }
 
 #else

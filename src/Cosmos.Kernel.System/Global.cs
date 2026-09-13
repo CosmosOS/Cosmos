@@ -14,13 +14,12 @@ public static class Global
     private static Kernel? s_kernel;
 
     /// <summary>
-    /// Gets or sets the current kernel instance.
+    /// Gets the current kernel instance, or <see langword="null"/> until
+    /// <see cref="RegisterKernel"/> has been called. The generated entry point
+    /// registers it before <see cref="StartKernel"/> runs, so kernel code
+    /// reached from <see cref="Kernel.Run"/> always sees one.
     /// </summary>
-    public static Kernel? CurrentKernel
-    {
-        get => s_kernel;
-        set => s_kernel = value;
-    }
+    public static Kernel? CurrentKernel => s_kernel;
 
     /// <summary>
     /// Registers a kernel instance to be started by the boot infrastructure.
@@ -34,12 +33,16 @@ public static class Global
     }
 
     /// <summary>
-    /// Initializes the system. Called by the Kernel base class during OnBoot().
-    /// Override OnBoot() in your kernel to customize initialization.
+    /// Brings up the graphical <see cref="KernelConsole"/>, which is what makes
+    /// <c>Console.WriteLine</c> draw to the screen. Every other subsystem is
+    /// already up by this point: the library initializer wires the managers to
+    /// the HAL before any managed code runs. Called once by
+    /// <see cref="Kernel.OnBoot"/>; a kernel customizes this step by overriding
+    /// OnBoot instead.
     /// </summary>
-    public static void Init()
+    internal static void Initialize()
     {
-        Serial.WriteString("[Global] Init() called\n");
+        Serial.WriteString("[Global] Initialize() called\n");
 
         // Initialize graphics console (framebuffer + font)
         if (Cosmos.Kernel.Core.CosmosFeatures.GraphicsEnabled)

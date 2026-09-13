@@ -20,7 +20,7 @@ generated_code = true
 [src/Cosmos.Kernel.System/IO/Compression/SharpZipLib/**.cs]
 generated_code = true
 
-[src/Cosmos.Kernel.System/Graphics/Images/Png/**.cs]
+[src/Cosmos.Kernel.System/Graphics/Images/BigGustave/**.cs]
 generated_code = true
 
 # fdlibm port (via Cosmos Gen2)
@@ -173,10 +173,6 @@ file_header_template = This code is licensed under the BSD 3-Clause license (see
 
 # C++ Files
 
-# XML documentation - missing summary, param, or return tags
-#dotnet_diagnostic.CS1591.severity = warning
-#dotnet_diagnostic.CS1573.severity = warning
-
 # CA2255: The 'ModuleInitializer' attribute should not be used in libraries
 dotnet_diagnostic.CA2255.severity = none
 
@@ -254,10 +250,43 @@ dotnet_diagnostic.RS0017.severity = error
 dotnet_diagnostic.RS0026.severity = none
 dotnet_diagnostic.RS0027.severity = none
 
+# A tracked public surface must be documented. The error severity is scoped to
+# the tracked projects' own paths (editorconfig severity outranks NoWarn, so a
+# repo-wide [*.cs] entry would fire in every project) and never reaches the
+# sources linked from the dotnet/runtime submodule, which sit under the
+# submodule's own root .editorconfig.
+[src/Cosmos.Kernel.{System,Core,HAL,HAL.Interfaces}/**.cs]
+dotnet_diagnostic.CS1591.severity = error
+
+# CS1591 only guarantees that a member has a comment. These four say the
+# comment describes the member in front of it: a parameter list that stops
+# short (CS1573), a tag naming a parameter that is not there (CS1572, CS1734)
+# and a link that does not resolve (CS1574). Each was at zero when it was
+# raised, so the gate holds the surface where the audit left it rather than
+# asking for new work.
+#
+# CS1574 is the one that pays for itself. Inside `Cosmos.Kernel.System.*` the
+# identifier `System` binds to this assembly's own namespace, so a cref to
+# `System.ReadOnlySpan` or `System.Drawing.Color` silently fails to resolve
+# and the rendered page loses the link; `global::System.` is the spelling that
+# works. That trap cost seven links once already.
+#
+# CS0419 is the same defect one step earlier: an unqualified cref to an
+# overloaded member picks an arbitrary overload, so the reader follows a link
+# to a signature nobody meant.
+#
+# The vendored trees below inherit these too. They are clean today, and a
+# vendor drop that is not has to be documented like the rest of the assembly.
+dotnet_diagnostic.CS1572.severity = error
+dotnet_diagnostic.CS1573.severity = error
+dotnet_diagnostic.CS1574.severity = error
+dotnet_diagnostic.CS1734.severity = error
+dotnet_diagnostic.CS0419.severity = error
+
 # Vendored code stays out of the declared surface: the tracking files list the
 # repo's own API only, and these types go internal in the pre-release surface
 # cleanup. Must come after the [*.cs] section above (later sections win).
-[src/Cosmos.Kernel.System/{IO/Compression/SharpZipLib,Graphics/Images/Png,Graphics/Fonts/TrueType}/**.cs]
+[src/Cosmos.Kernel.System/{IO/Compression/SharpZipLib,Graphics/Images/BigGustave,Graphics/Fonts/TrueType}/**.cs]
 dotnet_diagnostic.RS0016.severity = none
 dotnet_diagnostic.RS0017.severity = none
 

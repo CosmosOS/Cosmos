@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.HAL.ARM64.Devices.Clock;
 /// PL031 RTCDR register provides Unix time (seconds since 1970-01-01 UTC).
 /// QEMU virt machine maps PL031 at physical address 0x09010000.
 /// </summary>
-public class RTC : Device
+internal class RTC : Device
 {
     /// <summary>Singleton instance of the RTC.</summary>
     public static RTC? Instance { get; private set; }

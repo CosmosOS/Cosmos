@@ -13,13 +13,11 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// primitives. Requires the scheduler; resolution is bounded by the scheduler
 /// tick.
 /// </summary>
-public static class AlarmSystem
+/// <remarks>
+/// Internal: a kernel reaches this through Cosmos.Kernel.System's AlarmManager.
+/// </remarks>
+internal static class AlarmSystem
 {
-    /// <summary>
-    /// The method invoked when an alarm fires.
-    /// </summary>
-    public delegate void AlarmDelegate();
-
     /// <summary>
     /// A pending alarm entry.
     /// </summary>
@@ -35,7 +33,7 @@ public static class AlarmSystem
         public ulong PeriodTicks { get; init; }
 
         /// <summary>The method invoked when the alarm fires.</summary>
-        public AlarmDelegate Delegate { get; init; }
+        public Action Delegate { get; init; }
     }
 
     /// <summary>Wait used when no alarm is pending. Add signals the alarm thread early, so this is only a heartbeat.</summary>
@@ -53,7 +51,7 @@ public static class AlarmSystem
     /// <param name="delay">Delay before the alarm fires.</param>
     /// <param name="alarm">Method to invoke when the alarm fires.</param>
     /// <returns>The alarm ID, or 0 if the alarm could not be scheduled.</returns>
-    public static ulong Add(TimeSpan delay, AlarmDelegate alarm)
+    public static ulong Add(TimeSpan delay, Action alarm)
     {
         return AddCore(delay, recurring: false, alarm);
     }
@@ -62,10 +60,10 @@ public static class AlarmSystem
     /// Schedules a recurring alarm. The period restarts when the callback
     /// fires, so it must be longer than the callback's execution time.
     /// </summary>
-    /// <param name="period">Period between firings; at least 1 ms.</param>
+    /// <param name="period">Period between firings; must be positive.</param>
     /// <param name="alarm">Method to invoke each period.</param>
     /// <returns>The alarm ID, or 0 if the alarm could not be scheduled.</returns>
-    public static ulong AddRecurring(TimeSpan period, AlarmDelegate alarm)
+    public static ulong AddRecurring(TimeSpan period, Action alarm)
     {
         return AddCore(period, recurring: true, alarm);
     }
@@ -93,14 +91,14 @@ public static class AlarmSystem
         return false;
     }
 
-    private static ulong AddCore(TimeSpan delay, bool recurring, AlarmDelegate alarm)
+    private static ulong AddCore(TimeSpan delay, bool recurring, Action alarm)
     {
         if (alarm == null)
         {
             return 0;
         }
 
-        if (!SchedulerManager.Enabled)
+        if (!SchedulerManager.IsRunning)
         {
             Serial.WriteString("[AlarmSystem] ERROR: scheduler is not running, alarm not scheduled\n");
             return 0;
@@ -109,7 +107,7 @@ public static class AlarmSystem
         ulong delayTicks = ToStopwatchTicks(delay);
         if (recurring && delayTicks == 0)
         {
-            Serial.WriteString("[AlarmSystem] ERROR: recurring alarm period must be at least 1 ms\n");
+            Serial.WriteString("[AlarmSystem] ERROR: recurring alarm period must be positive\n");
             return 0;
         }
 
@@ -121,7 +119,7 @@ public static class AlarmSystem
         InsertSortedLocked(new Alarm
         {
             Id = id,
-            Due = (ulong)Stopwatch.GetTimestamp() + delayTicks,
+            Due = DeadlineFrom((ulong)Stopwatch.GetTimestamp(), delayTicks),
             PeriodTicks = recurring ? delayTicks : 0,
             Delegate = alarm
         });
@@ -170,7 +168,7 @@ public static class AlarmSystem
                 {
                     // Re-arm from now rather than from Due so a late wake-up
                     // doesn't cause a catch-up burst.
-                    InsertSortedLocked(alarm with { Due = now + alarm.PeriodTicks });
+                    InsertSortedLocked(alarm with { Due = DeadlineFrom(now, alarm.PeriodTicks) });
                 }
 
                 // Fire outside the lock: the callback may block or call Add/Remove.
@@ -218,6 +216,23 @@ public static class AlarmSystem
         s_alarms.Insert(index, alarm);
     }
 
+    /// <summary>
+    /// Adds a delay to a timestamp without wrapping. Saturating the delay is
+    /// not enough on its own: a saturated delay added to the current timestamp
+    /// wraps to just before it, which makes a never-alarm due immediately and
+    /// turns a recurring one into a hot loop that re-arms into the past on
+    /// every pass.
+    /// </summary>
+    private static ulong DeadlineFrom(ulong now, ulong delayTicks)
+    {
+        return delayTicks > ulong.MaxValue - now ? ulong.MaxValue : now + delayTicks;
+    }
+
+    /// <summary>
+    /// Converts a duration to Stopwatch timestamp ticks. A non-positive
+    /// duration becomes 0, and a duration too large to express saturates
+    /// rather than wrapping, so a far-future alarm never lands in the past.
+    /// </summary>
     private static ulong ToStopwatchTicks(TimeSpan delay)
     {
         if (delay <= TimeSpan.Zero)
@@ -225,7 +240,25 @@ public static class AlarmSystem
             return 0;
         }
 
-        return (ulong)delay.TotalMilliseconds * ((ulong)Stopwatch.Frequency / 1000);
+        ulong frequency = (ulong)Stopwatch.Frequency;
+        if (frequency == 0)
+        {
+            return 0;
+        }
+
+        // Split the multiply instead of scaling the frequency down to
+        // ticks-per-millisecond first: that divide floors to 0 below 1 kHz,
+        // and rounding the delay to whole milliseconds throws away everything
+        // the TimeSpan holds below one.
+        ulong whole = (ulong)delay.Ticks / (ulong)TimeSpan.TicksPerSecond;
+        ulong fraction = (ulong)delay.Ticks % (ulong)TimeSpan.TicksPerSecond;
+
+        if (whole >= ulong.MaxValue / frequency)
+        {
+            return ulong.MaxValue;
+        }
+
+        return (whole * frequency) + (fraction * frequency / (ulong)TimeSpan.TicksPerSecond);
     }
 
     private static uint TicksToWaitMs(ulong ticks)

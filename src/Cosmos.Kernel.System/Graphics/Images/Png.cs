@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.System.Graphics;
 /// code by the vendored BigGustave decoder and SharpZipLib inflater (see the
 /// Credits page of the documentation).
 /// </summary>
-public class Png : Image
+public sealed class Png : Image
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Png"/> class, using the specified path to a PNG file.
@@ -47,9 +47,9 @@ public class Png : Image
         int width = png.Width;
         int height = png.Height;
 
-        Width = (uint)width;
-        Height = (uint)height;
-        Depth = ColorDepth.ColorDepth32;
+        Width = width;
+        Height = height;
+        ColorDepth = ColorDepth.ColorDepth32;
         RawData = new int[width * height];
 
         for (int y = 0; y < height; y++)

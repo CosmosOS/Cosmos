@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 /// <summary>
 /// ID values.
 /// </summary>
-public enum Face : uint
+internal enum Face : uint
 {
     SVGA3D_FACE_INVALID = 0,
     SVGA3D_FACE_NONE = 1,

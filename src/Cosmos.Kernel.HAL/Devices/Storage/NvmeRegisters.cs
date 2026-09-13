@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 ///
 /// Layout follows NVM Express 1.4 §3.1.
 /// </summary>
-public class NvmeRegisters
+internal class NvmeRegisters
 {
     /// <summary>CAP — Controller Capabilities register offset (RO, 64-bit, NVMe 1.4 §3.1.1).</summary>
     private const ulong CapOffset = 0x00;

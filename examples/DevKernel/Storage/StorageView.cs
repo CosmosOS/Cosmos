@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Filesystems.Fat;
 using Cosmos.Kernel.System.Storage;
@@ -41,19 +42,14 @@ internal static class StorageView
     /// <summary>Prints the geometry block of every attached device, marking the primary one.</summary>
     public static void PrintDevices(bool detailed)
     {
-        Terminal.InfoLine("Device Count", StorageManager.DeviceCount.ToString());
+        IReadOnlyList<IBlockDevice> devices = StorageManager.Devices;
+        Terminal.InfoLine("Device Count", devices.Count.ToString());
 
-        for (int i = 0; i < StorageManager.DeviceCount; i++)
+        for (int i = 0; i < devices.Count; i++)
         {
-            IBlockDevice? device = StorageManager.GetDevice(i);
-            if (device == null)
-            {
-                continue;
-            }
-
             Console.WriteLine();
-            PrintDeviceBlock(i, device, detailed);
-            PrintPrimaryMarker(device);
+            PrintDeviceBlock(i, devices[i], detailed);
+            PrintPrimaryMarker(devices[i]);
         }
     }
 
@@ -110,7 +106,7 @@ internal static class StorageView
             return "unreadable";
         }
 
-        if (FatBootSector.TryParse(boot, out FatBootSector? bootSector) && bootSector != null)
+        if (FatBootSector.TryParse(boot, out FatBootSector? bootSector))
         {
             return bootSector.Type switch
             {
@@ -125,75 +121,53 @@ internal static class StorageView
     }
 
     /// <summary>
-    /// Resolves a (disk, per-disk partition) pair to its index in
-    /// <see cref="StorageManager.Partitions"/>. That global index is what
-    /// VfsManager and PartitionManager expect; per-disk numbering is what the
-    /// user sees.
+    /// Resolves the (disk, per-disk partition) pair the user types to the
+    /// partition itself. The ring numbers partitions per device, which is the
+    /// numbering the listings print.
     /// </summary>
-    public static bool TryResolvePartition(int diskNumber, int partitionNumber, out int globalIndex, out Partition? partition)
+    public static bool TryResolvePartition(int diskNumber, int partitionNumber, [NotNullWhen(true)] out Partition? partition)
     {
-        globalIndex = -1;
         partition = null;
 
-        IBlockDevice? device = StorageManager.GetDevice(diskNumber);
-        if (device == null)
+        IReadOnlyList<IBlockDevice> devices = StorageManager.Devices;
+        if (diskNumber < 0 || diskNumber >= devices.Count)
         {
             return false;
         }
 
-        int local = 0;
-        IReadOnlyList<Partition> all = StorageManager.Partitions;
-        for (int i = 0; i < all.Count; i++)
+        IReadOnlyList<Partition> onDisk = StorageManager.GetPartitions(devices[diskNumber]);
+        if (partitionNumber < 0 || partitionNumber >= onDisk.Count)
         {
-            if (!ReferenceEquals(all[i].Host, device))
-            {
-                continue;
-            }
-
-            if (local == partitionNumber)
-            {
-                globalIndex = i;
-                partition = all[i];
-                return true;
-            }
-
-            local++;
+            return false;
         }
 
-        return false;
+        partition = onDisk[partitionNumber];
+        return true;
     }
 
-    /// <summary>Inverse of <see cref="TryResolvePartition"/>: maps a global index back to (disk, per-disk partition).</summary>
-    public static bool TryResolveGlobalIndex(int globalIndex, out int diskNumber, out int partitionNumber)
+    /// <summary>Inverse of <see cref="TryResolvePartition"/>: names the disk and per-disk slot a partition sits in.</summary>
+    public static bool TryDescribePartition(Partition partition, out int diskNumber, out int partitionNumber)
     {
         diskNumber = -1;
         partitionNumber = 0;
 
-        IReadOnlyList<Partition> all = StorageManager.Partitions;
-        for (int d = 0; d < StorageManager.DeviceCount; d++)
+        IReadOnlyList<IBlockDevice> devices = StorageManager.Devices;
+        for (int d = 0; d < devices.Count; d++)
         {
-            IBlockDevice? device = StorageManager.GetDevice(d);
-            if (device == null)
+            if (!ReferenceEquals(devices[d], partition.Host))
             {
                 continue;
             }
 
-            int local = 0;
-            for (int g = 0; g < all.Count; g++)
+            IReadOnlyList<Partition> onDisk = StorageManager.GetPartitions(devices[d]);
+            for (int i = 0; i < onDisk.Count; i++)
             {
-                if (!ReferenceEquals(all[g].Host, device))
-                {
-                    continue;
-                }
-
-                if (g == globalIndex)
+                if (ReferenceEquals(onDisk[i], partition))
                 {
                     diskNumber = d;
-                    partitionNumber = local;
+                    partitionNumber = i;
                     return true;
                 }
-
-                local++;
             }
         }
 

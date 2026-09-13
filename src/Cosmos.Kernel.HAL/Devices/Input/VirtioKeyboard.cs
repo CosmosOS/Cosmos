@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.HAL.Devices.Input;
 /// Virtio-input keyboard driver. Transport-agnostic: works over virtio MMIO
 /// (QEMU virt) and virtio PCI (q35 virtio-keyboard-pci) alike.
 /// </summary>
-public unsafe class VirtioKeyboard : KeyboardDevice
+internal unsafe class VirtioKeyboard : KeyboardDevice
 {
     // Queue size
     private const uint QueueSize = 64;

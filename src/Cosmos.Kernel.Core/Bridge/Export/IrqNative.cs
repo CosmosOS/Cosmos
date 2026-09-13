@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// Native entry point invoked from the architecture-specific IRQ assembly stubs.
 /// Forwards straight into <see cref="InterruptManager.Dispatch"/> — no indirection.
 /// </summary>
-public static unsafe class IrqNative
+internal static unsafe class IrqNative
 {
     [UnmanagedCallersOnly(EntryPoint = "__managed__irq")]
     public static void Handler(IRQContext* ctx)

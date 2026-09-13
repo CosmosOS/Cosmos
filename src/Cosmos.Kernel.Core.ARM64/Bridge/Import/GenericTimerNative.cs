@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.ARM64.Bridge;
 
-public static partial class GenericTimerNative
+internal static partial class GenericTimerNative
 {
     [LibraryImport("*", EntryPoint = "_native_arm64_timer_get_frequency")]
     [SuppressGCTransition]

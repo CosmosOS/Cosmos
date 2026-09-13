@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.HAL.Cpu.Enums;
 /// <summary>
 /// EFlags Enum.
 /// </summary>
-public enum EFlagsEnum : uint
+internal enum EFlagsEnum : uint
 {
     /// <summary>
     /// Set by arithmetic instructions, can be carry or borrow.

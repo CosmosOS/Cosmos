@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// RSP points to the start of this structure after save.
 /// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public unsafe struct ThreadContext
+internal unsafe struct ThreadContext
 {
     // XMM registers (256 bytes) - SSE/SIMD state
     public fixed byte Xmm[256];

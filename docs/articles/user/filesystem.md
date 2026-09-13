@@ -48,21 +48,42 @@ using System.IO;
 using Cosmos.Kernel.System.Storage;
 using Cosmos.Kernel.System.Vfs;
 using Cosmos.Kernel.System.Filesystems.Fat;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Vfs;
 ```
 
-First, register a FAT driver under a name of your choice, then mount a partition at a mount point. For the FAT driver, the `source` argument is the index into `StorageManager.Partitions` as a string (`"0"` = first discovered partition across all disks). Add this to your kernel's `BeforeRun()`:
+Two of those five are HAL namespaces, and that is deliberate. `Cosmos.Kernel.HAL.Vfs` holds the VFS vocabulary that drivers and callers share: the contracts a filesystem driver implements (`IVfsFilesystemType`, `IVfsSuperblock`, `IVfsInode`, `IVfsOpenFile` and their operations interfaces) and the flag, mode and metadata types every mount, create and stat call names (`MountFlags`, `VfsMode`, `VfsStat`, `VfsStatFs`, `SetAttrFlags`, `SeekWhence`, `VfsTimespec`). That is why `MountFlags.None` appears in a kernel's `BeforeRun()`. `Cosmos.Kernel.System.Vfs` holds the manager and the handles, `VfsManager` plus `IVfsNodeHandle`, `IVfsFileHandle` and `IVfsDirectoryHandle`, and the handles are typed in the shared vocabulary, so `IVfsNodeHandle.Inode` gives you a `Cosmos.Kernel.HAL.Vfs.IVfsInode`. The vocabulary sits in the lower assembly because the reference graph runs `Cosmos.Kernel.System` to `Cosmos.Kernel.HAL` to `Cosmos.Kernel.HAL.Interfaces`, never the other way.
+
+`Cosmos.Kernel.HAL.Interfaces.Devices` is needed only by the RAM-disk snippet further down, which implements `IBlockDevice`. Drop that and mounting a real partition takes four.
+
+First, register a FAT driver under a name of your choice, then mount a partition at a mount point. Add this to your kernel's `BeforeRun()`:
 
 ```csharp
 FatFilesystemType fat = new();
 
-VfsManager.RegisterFilesystem("fat", fat);
-
-if (VfsManager.TryMount("fat", "0", MountFlags.None, "/mnt", out VfsManager.VfsMount? mount))
+if (!VfsManager.RegisterFilesystem("fat", fat))
 {
-    Console.WriteLine("Mounted " + mount.Name + " partition " + mount.Source + " at " + mount.MountPoint);
+    Console.WriteLine("The name \"fat\" is already registered.");
+    return;
+}
+
+if (StorageManager.Partitions.Count == 0)
+{
+    Console.WriteLine("No partitions found.");
+    return;
+}
+
+if (VfsManager.TryMount("fat", StorageManager.Partitions[0], MountFlags.None, "/mnt", out VfsManager.VfsMount? mount))
+{
+    Console.WriteLine("Mounted " + mount.Name + " at " + mount.MountPoint);
 }
 ```
+
+`Partitions` is empty before storage is scanned, when no disk is attached, and when storage is compiled out, so index it only after checking `Count`. Every call above returns whether it worked: `RegisterFilesystem` refuses a name already in use, and `TryMount` refuses a source the driver does not recognize.
+
+`StorageManager.GetPartitions(device)` lists the partitions of one disk, numbered the way a user numbers them; `StorageManager.Partitions` is the flat list across every disk.
+
+There is a second spelling, `VfsManager.TryMount("fat", "0", ...)`, where `source` is a driver-specific string. Every driver accepts one, and the FAT driver reads it as an index into `StorageManager.Partitions`. Prefer the `Partition` overload: creating or deleting a partition renumbers that list, so an index held across a rescan can come to name a different partition.
 
 <!-- screenshot: kernel console right after boot showing the "Mounted fat partition 0 at /mnt" line -->
 ![Mount](images/filesystem-mount.png)
@@ -102,21 +123,98 @@ internal sealed class MemoryBlockDevice : IBlockDevice
 }
 ```
 
-The FAT driver accepts an injected device directly (leave `source` empty when formatting and mounting):
+The FAT driver accepts an injected device directly. Register it as usual and leave `source` empty: with a device already in hand the driver has nothing to look up.
 
 ```csharp
 MemoryBlockDevice ramDisk = new("RAMDISK", 512, 65536);   // 32 MiB
 FatFilesystemType fat = new(ramDisk);
 
-fat.TryFormat(default, new FatFormatOptions { Type = FatType.Fat16 });
-
-VfsManager.RegisterFilesystem("ramfat", fat);
-VfsManager.TryMount("ramfat", "", MountFlags.None, "/mnt", out _);
+if (!VfsManager.RegisterFilesystem("ramfat", fat)
+    || !VfsManager.TryFormat("ramfat", "", new FatFormatOptions { Type = FatType.Fat16 })
+    || !VfsManager.TryMount("ramfat", "", MountFlags.None, "/mnt", out _))
+{
+    Console.WriteLine("RAM disk setup failed.");
+    return;
+}
 ```
+
+## Partition a disk
+
+Formatting needs a partition to format. `StorageManager.Partitions` lists the ones already on the disks the kernel found at boot; when there are none, or you want a different layout, `Gpt`, `Mbr` and `PartitionManager` write the partition table itself. They all take an `IBlockDevice`, which `StorageManager.PrimaryDevice` hands you.
+
+Start by asking what scheme the disk already carries:
+
+```csharp
+IBlockDevice? disk = StorageManager.PrimaryDevice;
+if (disk is null)
+{
+    Console.WriteLine("No disk");
+    return;
+}
+
+if (Gpt.IsGpt(disk))
+{
+    Console.WriteLine("GPT, " + Gpt.Parse(disk).Count + " partition(s)");
+}
+else if (Mbr.IsMbr(disk))
+{
+    Console.WriteLine("MBR, " + Mbr.Parse(disk).Count + " partition(s)");
+}
+else
+{
+    Console.WriteLine("No partition table");
+}
+```
+
+`Gpt.Create` and `Mbr.Create` lay down an empty table of that scheme, **destroying whatever was there**. `PartitionManager.Create` then adds a partition, working on whichever scheme the disk carries so you do not have to branch:
+
+```csharp
+Gpt.Create(disk);
+
+/* 64 MiB at LBA 2048, on a 512-byte-sector disk. The MBR system id and the
+   GPT type GUID are both given; only the one matching the disk's scheme is
+   used. */
+if (!PartitionManager.Create(disk, startSector: 2048, sectorCount: 131072,
+                             mbrSystemId: 0x0C, gptType: Gpt.BasicDataPartitionType))
+{
+    Console.WriteLine("Create failed");
+    return;
+}
+
+StorageManager.RescanPartitions(disk);
+```
+
+`RescanPartitions` is what makes the new partition show up in `StorageManager.Partitions`. Until you call it the list still describes the old table.
+
+Existing partitions are addressed by a `PartitionLocation`, which is the start sector and length rather than an index, so a partition does not change identity when the table is renumbered:
+
+```csharp
+PartitionManager.PartitionLocation where = new(startSector: 2048, sectorCount: 131072);
+
+PartitionManager.Resize(disk, where, newSectorCount: 262144);
+PartitionManager.MoveWithData(disk, where, newStartSector: 4096);
+PartitionManager.Delete(disk, where);
+```
+
+`MoveWithData` copies the contents to the new location before rewriting the entry; `Resize` and `Delete` only touch the table, so shrinking a partition below its filesystem's size loses data.
+
+**Every partition index is positional.** Deleting one renumbers the entries after it, and `StorageManager.Partitions` renumbers with them, so re-read the list after any change rather than holding an index across one.
+
+MBR's four primary slots are extended with a chain of logical partitions. `PartitionManager.TryCreateLogical` adds one inside the extended partition, and `Mbr.TryGetExtendedPartition` finds it:
+
+```csharp
+if (Mbr.TryGetExtendedPartition(disk, out ulong extendedStart, out ulong extendedCount)
+    && PartitionManager.TryCreateLogical(disk, systemId: 0x0C, sectorCount: 65536, out ulong logicalStart))
+{
+    Console.WriteLine("logical partition at LBA " + logicalStart);
+}
+```
+
+`Gpt`, `Mbr` and `Ebr` are the lower layer, one type per scheme, for when you need to write entries the manager does not expose.
 
 ## Format a disk
 
-To format (mkfs) a partition through the VFS, use `VfsManager.TryFormat` with the driver name, the partition index and the driver's option type. The FAT formatter picks sane geometry from the options you give it:
+To format (mkfs) a partition through the VFS, use `VfsManager.TryFormat` with the driver name, the partition and the driver's option type. The FAT formatter picks sane geometry from the options you give it:
 
 ```csharp
 FatFormatOptions options = new()
@@ -125,7 +223,8 @@ FatFormatOptions options = new()
     VolumeLabel = "COSMOS     ",
 };
 
-if (!VfsManager.TryFormat("fat", "0", options))
+if (StorageManager.Partitions.Count == 0
+    || !VfsManager.TryFormat("fat", StorageManager.Partitions[0], options))
 {
     Console.WriteLine("Format failed");
 }
@@ -146,6 +245,21 @@ foreach (VfsManager.VfsMount m in VfsManager.Mounts)
 
 <!-- screenshot: console output of the mount-table loop, e.g. "/mnt -> fat (source 0)" -->
 ![Mounts](images/filesystem-mounts.png)
+
+`m.Partition` is the partition itself, for mounts made with the `Partition` overload. Prefer it to parsing `m.Source` back into an index: it keeps naming the same range on the same disk after a rescan renumbers `StorageManager.Partitions`.
+
+## Check free space
+
+`VfsManager.TryStatFs` reports a mount's block accounting. Free space is the available block count times the block size:
+
+```csharp
+if (VfsManager.TryStatFs("/mnt", out VfsStatFs stats))
+{
+    ulong freeBytes = stats.Bavail * stats.BlockSize;
+    ulong totalBytes = stats.Blocks * stats.BlockSize;
+    Console.WriteLine(freeBytes + " of " + totalBytes + " bytes free");
+}
+```
 
 ## Get a list of files
 
@@ -362,7 +476,7 @@ With **nothing mounted at all**, `System.IO` still degrades gracefully: `Directo
 
 - Symbolic links and hard links are not supported (`ENOTSUP`/`EPERM` under the hood; the BCL surfaces `IOException`).
 - File timestamps are not persisted yet (`File.SetLastWriteTime` is accepted but a FAT timestamp lands later).
-- `DriveInfo` (free-space queries) is not wired up yet.
+- `DriveInfo` is not wired up yet; use `VfsManager.TryStatFs` for free-space queries.
 - FAT is the only filesystem driver today; the `IVfsFilesystemType` interface is what a new driver implements.
 
 ## How it works

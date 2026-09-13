@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.Bridge;
 
-public static partial class CpuNative
+internal static partial class CpuNative
 {
     [LibraryImport("*", EntryPoint = "_native_cpu_disable_interrupts")]
     [SuppressGCTransition]

@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.Core.Extensions;
 
-public static class ByteArray
+internal static class ByteArray
 {
     public static byte Read8(this byte[] memory, uint offset)
     {

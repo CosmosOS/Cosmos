@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
-public enum FIFOCommand
+internal enum FIFOCommand
 {
     /// <summary>
     /// Update.

@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// contents. All I/O on a port is serialized by an internal lock — the
 /// port owns a single bounce buffer.</para>
 /// </summary>
-public class Sata : BlockDevice
+internal class Sata : BlockDevice
 {
     /// <summary>
     /// Regular sector size (512 bytes).

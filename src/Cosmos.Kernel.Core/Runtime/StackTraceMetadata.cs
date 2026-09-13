@@ -7,7 +7,7 @@ using Internal.StackTraceMetadata;
 
 namespace Cosmos.Kernel.Core.Runtime
 {
-    public static class StackTraceMetadata
+    internal static class StackTraceMetadata
     {
         /// <summary>
         /// Indicates whether stack trace metadata support is enabled.

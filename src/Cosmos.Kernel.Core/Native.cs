@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core;
 /// Native low-level hardware access primitives.
 /// Architecture-specific implementations for I/O operations.
 /// </summary>
-public static class Native
+internal static class Native
 {
     /// <summary>
     /// x86-64 Port I/O operations.

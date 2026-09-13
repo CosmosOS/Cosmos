@@ -7,7 +7,7 @@ namespace ICSharpCode.SharpZipLib.Zip.Compression
     /// Stand-in for SharpZipLib's Deflater exposing the single constant the
     /// inflater needs to validate a zlib header.
     /// </summary>
-    public static class Deflater
+    internal static class Deflater
     {
         /// <summary>
         /// The DEFLATE compression method id used in the zlib header.
@@ -19,7 +19,7 @@ namespace ICSharpCode.SharpZipLib.Zip.Compression
     /// Stand-in for SharpZipLib's DeflaterHuffman exposing the bit-reversal
     /// helper used when building Huffman decoding tables.
     /// </summary>
-    public static class DeflaterHuffman
+    internal static class DeflaterHuffman
     {
         private static readonly short[] s_bit4Reverse = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
 

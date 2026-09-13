@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.ARM64.Bridge;
 
-public static partial class GICv3Native
+internal static partial class GICv3Native
 {
     [LibraryImport("*", EntryPoint = "_native_arm64_gicv3_read_icc_iar1_el1")]
     [SuppressGCTransition]

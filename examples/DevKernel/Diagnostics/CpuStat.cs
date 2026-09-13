@@ -1,12 +1,10 @@
 using System.Diagnostics;
 using System.Drawing;
-using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
 using DevKernel.Diagnostics.Charting;
 using DevKernel.Graphics;
-using SchedThread = Cosmos.Kernel.Core.Scheduler.Thread;
-using SchedThreadState = Cosmos.Kernel.Core.Scheduler.ThreadState;
 using SysThread = System.Threading.Thread;
 
 namespace DevKernel.Diagnostics;
@@ -75,7 +73,7 @@ internal static class CpuStat
             return new CpuUsageSampler
             {
                 _lastTimestamp = Stopwatch.GetTimestamp(),
-                _lastBusyNs = SchedulerManager.GetBusyCpuTimeNs()
+                _lastBusyNs = SchedulerInfo.BusyCpuTimeNs
             };
         }
 
@@ -86,10 +84,10 @@ internal static class CpuStat
         public double Sample()
         {
             long timestamp = Stopwatch.GetTimestamp();
-            ulong busyNs = SchedulerManager.GetBusyCpuTimeNs();
+            ulong busyNs = SchedulerInfo.BusyCpuTimeNs;
 
             long elapsedTicks = timestamp - _lastTimestamp;
-            uint cpuCount = SchedulerManager.CpuCount;
+            uint cpuCount = SchedulerInfo.CpuCount;
 
             if (elapsedTicks > 0 && cpuCount > 0)
             {
@@ -145,7 +143,7 @@ internal static class CpuStat
 
     public static void Run()
     {
-        if (!SchedulerManager.IsEnabled)
+        if (!SchedulerInfo.IsSupported)
         {
             Console.WriteLine("cpustat: scheduler disabled (set CosmosEnableScheduler=true).");
             return;
@@ -308,10 +306,10 @@ internal static class CpuStat
         int maxWidth,
         int maxHeight)
     {
-        SchedThread?[]? threads = SchedulerManager.Threads;
         int lineHeight = OverlayLayout.LineHeight(font);
+        int threadCount = SchedulerInfo.ThreadCount;
 
-        if (threads == null || SchedulerManager.ThreadCount <= 0 || maxHeight < lineHeight * 2)
+        if (threadCount <= 0 || maxHeight < lineHeight * 2)
         {
             return;
         }
@@ -319,7 +317,7 @@ internal static class CpuStat
         TextRenderer.DrawTruncated(
             canvas,
             font,
-            "Scheduler threads (" + SchedulerManager.ThreadCount + " live):",
+            "Scheduler threads (" + threadCount + " live):",
             Color.LightGray,
             x,
             y,
@@ -338,10 +336,9 @@ internal static class CpuStat
         int capacity = columns * rows;
 
         int drawn = 0;
-        for (int i = 0; i < threads.Length && drawn < capacity; i++)
+        for (int slot = 0; slot < SchedulerInfo.ThreadSlotCount && drawn < capacity; slot++)
         {
-            SchedThread? thread = threads[i];
-            if (thread == null)
+            if (!SchedulerInfo.TryGetThreadInSlot(slot, out KernelThreadInfo thread))
             {
                 continue;
             }
@@ -359,24 +356,24 @@ internal static class CpuStat
         }
     }
 
-    private static string FormatThread(SchedThread thread)
+    private static string FormatThread(KernelThreadInfo thread)
     {
-        string kind = (thread.Flags & ThreadFlags.IdleThread) != 0 ? "idle"
-                    : (thread.Flags & ThreadFlags.Managed) != 0 ? "mgd"
+        string kind = thread.IsIdle ? "idle"
+                    : thread.IsManaged ? "mgd"
                     : "krn";
 
         string state = thread.State switch
         {
-            SchedThreadState.Running => "RUN",
-            SchedThreadState.Ready => "RDY",
-            SchedThreadState.Blocked => "BLK",
-            SchedThreadState.Sleeping => "SLP",
-            SchedThreadState.Dead => "DED",
-            SchedThreadState.Created => "NEW",
+            KernelThreadState.Running => "RUN",
+            KernelThreadState.Ready => "RDY",
+            KernelThreadState.Blocked => "BLK",
+            KernelThreadState.Sleeping => "SLP",
+            KernelThreadState.Dead => "DED",
+            KernelThreadState.Created => "NEW",
             _ => "???"
         };
 
-        return "T" + thread.Id + " " + kind + " " + state + " " + FormatRuntime(thread.TotalRuntime);
+        return "T" + thread.Id + " " + kind + " " + state + " " + FormatRuntime(thread.TotalRuntimeNs);
     }
 
     private static string FormatRuntime(ulong nanoseconds)

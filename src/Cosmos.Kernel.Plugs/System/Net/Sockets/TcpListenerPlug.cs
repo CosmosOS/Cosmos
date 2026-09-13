@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 
 namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 
@@ -19,7 +19,7 @@ public static class TcpListenerPlug
     [PlugMember(".ctor")]
     public static void Ctor(TcpListener aThis, IPEndPoint localEP)
     {
-        Serial.WriteString("[TcpListenerPlug] Ctor(localEP)\n");
+        Log.WriteString("[TcpListenerPlug] Ctor(localEP)\n");
 
         ArgumentNullException.ThrowIfNull(localEP);
 
@@ -31,30 +31,30 @@ public static class TcpListenerPlug
     [PlugMember(".ctor")]
     public static void Ctor(TcpListener aThis, IPAddress localaddr, int port)
     {
-        Serial.WriteString("[TcpListenerPlug] Ctor(localaddr, port)\n");
+        Log.WriteString("[TcpListenerPlug] Ctor(localaddr, port)\n");
 
         if (localaddr is null)
         {
-            Serial.WriteString("[TcpListenerPlug] localaddr is null!\n");
+            Log.WriteString("[TcpListenerPlug] localaddr is null!\n");
             throw new ArgumentNullException(nameof(localaddr));
         }
 
-        Serial.WriteString("[TcpListenerPlug] Getting ID\n");
+        Log.WriteString("[TcpListenerPlug] Getting ID\n");
         int id = GetId(aThis);
-        Serial.WriteString("[TcpListenerPlug] ID=");
-        Serial.WriteNumber(id);
-        Serial.WriteString("\n");
+        Log.WriteString("[TcpListenerPlug] ID=");
+        Log.WriteNumber(id);
+        Log.WriteString("\n");
 
-        Serial.WriteString("[TcpListenerPlug] Creating IPEndPoint\n");
+        Log.WriteString("[TcpListenerPlug] Creating IPEndPoint\n");
         var ep = new IPEndPoint(localaddr, port);
-        Serial.WriteString("[TcpListenerPlug] IPEndPoint created\n");
+        Log.WriteString("[TcpListenerPlug] IPEndPoint created\n");
 
-        Serial.WriteString("[TcpListenerPlug] Storing endpoint\n");
+        Log.WriteString("[TcpListenerPlug] Storing endpoint\n");
         _serverSocketEPs[id] = ep;
 
-        Serial.WriteString("[TcpListenerPlug] Creating socket\n");
+        Log.WriteString("[TcpListenerPlug] Creating socket\n");
         _serverSockets[id] = new Socket(ep.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-        Serial.WriteString("[TcpListenerPlug] Socket created\n");
+        Log.WriteString("[TcpListenerPlug] Socket created\n");
     }
 
     [PlugMember("get_Server")]
@@ -78,7 +78,7 @@ public static class TcpListenerPlug
     [PlugMember]
     public static void Start(TcpListener aThis)
     {
-        Serial.WriteString("[TcpListenerPlug] Start()\n");
+        Log.WriteString("[TcpListenerPlug] Start()\n");
 
         int id = GetId(aThis);
         if (!_serverSockets.TryGetValue(id, out var socket) || !_serverSocketEPs.TryGetValue(id, out var ep))
@@ -89,15 +89,15 @@ public static class TcpListenerPlug
         socket.Bind(ep);
         socket.Listen(int.MaxValue);
 
-        Serial.WriteString("[TcpListenerPlug] Listening on port ");
-        Serial.WriteNumber((ulong)ep.Port);
-        Serial.WriteString("\n");
+        Log.WriteString("[TcpListenerPlug] Listening on port ");
+        Log.WriteNumber((ulong)ep.Port);
+        Log.WriteString("\n");
     }
 
     [PlugMember]
     public static void Start(TcpListener aThis, int backlog)
     {
-        Serial.WriteString("[TcpListenerPlug] Start(backlog)\n");
+        Log.WriteString("[TcpListenerPlug] Start(backlog)\n");
 
         int id = GetId(aThis);
         if (!_serverSockets.TryGetValue(id, out var socket) || !_serverSocketEPs.TryGetValue(id, out var ep))
@@ -108,15 +108,15 @@ public static class TcpListenerPlug
         socket.Bind(ep);
         socket.Listen(backlog);
 
-        Serial.WriteString("[TcpListenerPlug] Listening on port ");
-        Serial.WriteNumber((ulong)ep.Port);
-        Serial.WriteString("\n");
+        Log.WriteString("[TcpListenerPlug] Listening on port ");
+        Log.WriteNumber((ulong)ep.Port);
+        Log.WriteString("\n");
     }
 
     [PlugMember]
     public static void Stop(TcpListener aThis)
     {
-        Serial.WriteString("[TcpListenerPlug] Stop()\n");
+        Log.WriteString("[TcpListenerPlug] Stop()\n");
 
         int id = GetId(aThis);
         if (_serverSockets.TryGetValue(id, out var socket))
@@ -142,7 +142,7 @@ public static class TcpListenerPlug
     [PlugMember]
     public static Socket AcceptSocket(TcpListener aThis)
     {
-        Serial.WriteString("[TcpListenerPlug] AcceptSocket()\n");
+        Log.WriteString("[TcpListenerPlug] AcceptSocket()\n");
 
         int id = GetId(aThis);
         if (!_serverSockets.TryGetValue(id, out var socket))
@@ -156,7 +156,7 @@ public static class TcpListenerPlug
     [PlugMember]
     public static TcpClient AcceptTcpClient(TcpListener aThis)
     {
-        Serial.WriteString("[TcpListenerPlug] AcceptTcpClient()\n");
+        Log.WriteString("[TcpListenerPlug] AcceptTcpClient()\n");
 
         int id = GetId(aThis);
         if (!_serverSockets.TryGetValue(id, out var socket))

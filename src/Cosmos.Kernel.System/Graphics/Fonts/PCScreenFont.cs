@@ -41,13 +41,29 @@ public class PCScreenFont : Font
     // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     // POSSIBILITY OF SUCH DAMAGE.
 
-    public static class Default
+    /// <summary>
+    /// Names identifying the default font resource.
+    /// </summary>
+    internal static class Default
     {
+        /// <summary>
+        /// The <see cref="AppContext"/> data key checked for an overriding
+        /// embedded-resource name before falling back to <see cref="DefaultFontName"/>.
+        /// </summary>
         public const string DefaultFontKey = "Cosmos.Kernel.System.Graphics.Fonts.DefaultFont";
+
+        /// <summary>
+        /// The embedded-resource name of the default PSF font.
+        /// </summary>
         public const string DefaultFontName = $"{DefaultFontKey}.psf";
     }
 
     static PCScreenFont? s_default = null;
+
+    /// <summary>
+    /// The default console font, loaded lazily from the embedded PSF resource,
+    /// or from a built-in fallback font when the resource is absent.
+    /// </summary>
     public static PCScreenFont DefaultFont
     {
         get
@@ -112,7 +128,7 @@ public class PCScreenFont : Font
     /// <param name="height">The height of a single character in pixels</param>
     /// <param name="data">The PCF data.</param>
     /// <param name="_unicodeMappings">The mappings of Unicode characters to font indexes.</param>
-    public PCScreenFont(byte width, byte height, byte[] data, List<UnicodeMapping> _unicodeMappings) : base(width, height, data)
+    internal PCScreenFont(byte width, byte height, byte[] data, List<UnicodeMapping> _unicodeMappings) : base(width, height, data)
     {
         this._unicodeMappings = _unicodeMappings;
     }
@@ -120,11 +136,10 @@ public class PCScreenFont : Font
     /// <summary>
     /// Loads the given PC Screen Font using the given raw data array.
     /// </summary>
-    /// <param name="fontData">The raw PCF data.</param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException">Thrown when a PCF version 2 file is provided.</exception>
-    /// <exception cref="ArgumentException">Thrown when the provided font data is incorrect.</exception>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="fontData"/> is <see langword="null"/>.</exception>
+    /// <param name="fontData">The raw PSF data. Both version 1 and version 2 are parsed.</param>
+    /// <returns>The parsed font, with its glyph bitmaps and any Unicode table the file carried.</returns>
+    /// <exception cref="ArgumentException"><paramref name="fontData"/> starts with neither
+    /// version's magic number, or carries a header the parser cannot use.</exception>
     public static PCScreenFont LoadFont(byte[] fontData)
     {
         byte charHeight;
@@ -139,7 +154,9 @@ public class PCScreenFont : Font
         if (!version1 && !version2)
         {
             Serial.WriteString($"PCF load: Invalid magic {fontData[0]} {fontData[1]} {fontData[2]} {fontData[3]}");
-            throw new Exception($"Invalid magic value {fontData[0]} {fontData[1]} {fontData[2]} {fontData[3]}.");
+            throw new ArgumentException(
+                $"Invalid magic value {fontData[0]} {fontData[1]} {fontData[2]} {fontData[3]}.",
+                nameof(fontData));
         }
 
         if (version1)
@@ -276,7 +293,7 @@ public class PCScreenFont : Font
     /// <summary>
     /// Converts the PC screen font to a VGA font.
     /// </summary>
-    public byte[] CreateVGAFont()
+    internal byte[] CreateVGAFont()
     {
         byte[] font = new byte[256 * Height * Width / 8];
 
@@ -328,7 +345,7 @@ public class PCScreenFont : Font
 /// <summary>
 /// Represents a Unicode to font position mapping.
 /// </summary>
-public struct UnicodeMapping
+internal struct UnicodeMapping
 {
     public int FontPosition;
     public List<ushort> UnicodeCharacters;

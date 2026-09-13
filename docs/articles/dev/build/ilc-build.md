@@ -1,6 +1,6 @@
 ## Overview
 
-`Cosmos.ilc.Build` integrates the native AOT [ILCompiler](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/ilc-architecture.md) into the MSBuild pipeline. It consumes patched assemblies emitted by [`Cosmos.Build.Patcher`](../../../../src/Cosmos.Build.Patcher) and transforms them into native object files later linked with platform libraries for CosmosOS.
+`Cosmos.ilc.Build` integrates the native AOT [ILCompiler](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/ilc-architecture.md) into the MSBuild pipeline. It consumes patched assemblies emitted by [`Cosmos.Build.Patcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Patcher) and transforms them into native object files later linked with platform libraries for CosmosOS.
 
 ---
 
@@ -57,6 +57,6 @@ Notes:
 
 ## Related components
 
-- [`Cosmos.Build.Ilc`](../../../../src/Cosmos.Build.Ilc)
-- [`Cosmos.Build.Patcher`](../../../../src/Cosmos.Build.Patcher)
-- [`Cosmos.Patcher`](../../../../src/Cosmos.Patcher)
+- [`Cosmos.Build.Ilc`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Ilc)
+- [`Cosmos.Build.Patcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Patcher)
+- [`Cosmos.Patcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher)

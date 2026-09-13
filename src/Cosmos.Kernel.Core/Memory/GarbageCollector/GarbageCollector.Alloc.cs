@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// <summary>
 /// Allocation methods: segment management, bump allocation, and free list operations.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     /// <summary>
     /// Aligns a size up to the nearest pointer-sized boundary.

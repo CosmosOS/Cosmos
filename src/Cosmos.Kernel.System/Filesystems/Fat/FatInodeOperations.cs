@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Vfs;
 
 namespace Cosmos.Kernel.System.Filesystems.Fat;
@@ -33,7 +34,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         _superblock = superblock;
     }
 
-    public bool Lookup(IVfsInode dir, ReadOnlySpan<char> name, out IVfsInode? child)
+    public bool Lookup(IVfsInode dir, ReadOnlySpan<char> name, [NotNullWhen(true)] out IVfsInode? child)
     {
         child = null;
         if (dir is not FatInode parent || !parent.IsDirectory)
@@ -108,7 +109,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         return true;
     }
 
-    public bool Create(IVfsInode dir, ReadOnlySpan<char> name, ModeEnum mode, out IVfsInode? inode)
+    public bool Create(IVfsInode dir, ReadOnlySpan<char> name, VfsMode mode, [NotNullWhen(true)] out IVfsInode? inode)
     {
         inode = null;
         if (dir is not FatInode parent || !parent.IsDirectory)
@@ -133,7 +134,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         return true;
     }
 
-    public bool Mkdir(IVfsInode dir, ReadOnlySpan<char> name, ModeEnum mode, out IVfsInode? inode)
+    public bool Mkdir(IVfsInode dir, ReadOnlySpan<char> name, VfsMode mode, [NotNullWhen(true)] out IVfsInode? inode)
     {
         inode = null;
         if (dir is not FatInode parent || !parent.IsDirectory)
@@ -170,7 +171,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         return true;
     }
 
-    public bool Symlink(IVfsInode dir, ReadOnlySpan<char> name, ReadOnlySpan<char> target, out IVfsInode? inode)
+    public bool Symlink(IVfsInode dir, ReadOnlySpan<char> name, ReadOnlySpan<char> target, [NotNullWhen(true)] out IVfsInode? inode)
     {
         inode = null;
         return false;

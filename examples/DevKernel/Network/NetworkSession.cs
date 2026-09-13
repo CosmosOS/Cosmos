@@ -1,17 +1,11 @@
-using System;
-using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
-using Cosmos.Kernel.System.Network.IPv4.UDP;
 
 namespace DevKernel.Network;
 
 /// <summary>
-/// The IPv4 configuration the shell applied to the primary NIC, plus the UDP
-/// receive callback that dumps incoming payloads to serial and console. One
-/// instance lives for the whole shell session.
+/// The IPv4 configuration the shell applied to the primary NIC. One instance
+/// lives for the whole shell session.
 /// </summary>
 internal sealed class NetworkSession
 {
@@ -36,9 +30,6 @@ internal sealed class NetworkSession
     /// <summary>Unmasked host octet of the /24 subnet mask (255.255.255.0).</summary>
     private const byte SubnetMaskHostOctet = 0;
 
-    /// <summary>Maximum UDP payload bytes echoed to the console per packet.</summary>
-    private const int UdpPreviewMaxBytes = 64;
-
     /// <summary>Address assigned to this machine, once configured.</summary>
     public Address? LocalIp { get; private set; }
 
@@ -53,78 +44,23 @@ internal sealed class NetworkSession
     /// The subnet and gateway are passed through so <c>IPConfig.FindNetwork()</c>
     /// can route outbound packets.
     /// </summary>
-    public void ConfigureStatic(INetworkDevice device)
+    /// <returns>Whether an adapter took the configuration.</returns>
+    public bool ConfigureStatic()
     {
         LocalIp = new Address(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGuestHostOctet);
         GatewayIp = new Address(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGatewayHostOctet);
         Address subnet = new(SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskHostOctet);
 
-        NetworkStack.Initialize();
-        IPConfig.Enable(device, LocalIp, subnet, GatewayIp);
-
-        AttachUdpListener();
-        IsConfigured = true;
+        IsConfigured = IPConfig.Enable(LocalIp, subnet, GatewayIp);
+        return IsConfigured;
     }
 
-    /// <summary>Records the addresses a DHCP server handed out and starts listening for UDP.</summary>
+    /// <summary>Records the addresses a DHCP server handed out.</summary>
     public void AdoptLease(Address localIp, Address gatewayIp)
     {
         LocalIp = localIp;
         GatewayIp = gatewayIp;
 
-        AttachUdpListener();
         IsConfigured = true;
-    }
-
-    private void AttachUdpListener()
-    {
-        UDPPacket.OnUDPDataReceived = OnUdpDataReceived;
-    }
-
-    /// <summary>Logs the full payload to serial, and a printable preview to the console.</summary>
-    private void OnUdpDataReceived(UDPPacket packet)
-    {
-        Serial.Write("[UDP] Received packet from ");
-        Serial.WriteString(packet.SourceIP.ToString());
-        Serial.Write(":");
-        Serial.WriteNumber((ulong)packet.SourcePort);
-        Serial.Write(" -> port ");
-        Serial.WriteNumber((ulong)packet.DestinationPort);
-        Serial.Write("\n");
-
-        byte[] data = packet.UDPData;
-        Serial.Write("[UDP] Payload (");
-        Serial.WriteNumber((ulong)data.Length);
-        Serial.Write(" bytes): ");
-
-        for (int i = 0; i < data.Length; i++)
-        {
-            char c = (char)data[i];
-            if (Ascii.IsPrintable(c))
-            {
-                Serial.Write(c.ToString());
-            }
-        }
-
-        Serial.Write("\n");
-
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.Write("[UDP] ");
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.Write(packet.SourceIP.ToString() + ":" + packet.SourcePort.ToString());
-        Console.ForegroundColor = ConsoleColor.Gray;
-        Console.Write(" -> ");
-        Console.ResetColor();
-
-        for (int i = 0; i < data.Length && i < UdpPreviewMaxBytes; i++)
-        {
-            char c = (char)data[i];
-            if (Ascii.IsPrintable(c))
-            {
-                Console.Write(c.ToString());
-            }
-        }
-
-        Console.WriteLine();
     }
 }

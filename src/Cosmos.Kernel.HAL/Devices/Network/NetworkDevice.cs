@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.HAL.Devices.Network;
 /// <summary>
 /// Abstract base class for all network devices.
 /// </summary>
-public abstract class NetworkDevice : Device, INetworkDevice
+internal abstract class NetworkDevice : Device, INetworkDevice
 {
     /// <summary>
     /// Event handler for packet received events.

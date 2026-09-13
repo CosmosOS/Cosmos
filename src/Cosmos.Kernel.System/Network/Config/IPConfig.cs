@@ -1,4 +1,4 @@
-using Cosmos.Kernel.Core.IO;
+﻿using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.IPv4;
 
@@ -9,55 +9,105 @@ namespace Cosmos.Kernel.System.Network.Config;
 /// </summary>
 public class IPConfig
 {
-    private static readonly List<IPConfig> s_ipConfigs = new();
-
     /// <summary>
-    /// Add the given IPv4 configuration.
+    /// One device and the configuration in force on it.
     /// </summary>
-    internal static void Add(IPConfig config)
+    private sealed class Entry
     {
-        s_ipConfigs.Add(config);
+        internal Entry(INetworkDevice device, IPConfig config)
+        {
+            Device = device;
+            Config = config;
+        }
+
+        internal INetworkDevice Device { get; }
+
+        internal IPConfig Config { get; }
     }
 
     /// <summary>
-    /// Removes the given IPv4 configuration.
+    /// Every configured interface. This is the only store: routing lookups and
+    /// per-device lookups read the same list, so neither can drift from the
+    /// other.
     /// </summary>
-    internal static void Remove(IPConfig config)
+    private static readonly List<Entry> s_configs = new();
+
+    /// <summary>
+    /// Record the configuration now in force on a device, replacing any
+    /// earlier one so a reconfigured device leaves no stale route behind.
+    /// </summary>
+    /// <param name="device">The configured device.</param>
+    /// <param name="config">The configuration applied to it.</param>
+    internal static void Set(INetworkDevice device, IPConfig config)
     {
-        s_ipConfigs.Remove(config);
+        for (int i = 0; i < s_configs.Count; i++)
+        {
+            if (s_configs[i].Device == device)
+            {
+                s_configs[i] = new Entry(device, config);
+                return;
+            }
+        }
+
+        s_configs.Add(new Entry(device, config));
     }
 
     /// <summary>
-    /// Remove all IPv4 configurations.
+    /// Forget every configured interface. Internal: this drops the routing
+    /// list alone, leaving the stack's address and MAC maps behind.
+    /// <see cref="NetworkStack.RemoveAllConfigIP"/> is the complete reset and
+    /// the only caller.
     /// </summary>
     internal static void RemoveAll()
     {
-        s_ipConfigs.Clear();
+        s_configs.Clear();
     }
 
     /// <summary>
-    /// Finds the network address for the specified destination IP address.
+    /// The configuration in force on a device, or null when it has none.
     /// </summary>
-    /// <param name="destIP">The destination IP address.</param>
-    public static Address? FindNetwork(Address destIP)
+    /// <param name="device">The device to look up.</param>
+    internal static IPConfig? Get(INetworkDevice device)
+    {
+        foreach (Entry entry in s_configs)
+        {
+            if (entry.Device == device)
+            {
+                return entry.Config;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Finds the source address to send to the specified destination from.
+    /// Internal: every caller is a client inside this assembly choosing its own
+    /// source address, and a kernel names an interface with a
+    /// <see cref="NetworkAdapter"/> instead.
+    /// </summary>
+    /// <param name="destination">The destination IP address.</param>
+    internal static Address? FindNetwork(Address destination)
     {
         Address? defaultGw = null;
 
-        foreach (IPConfig ipConfig in s_ipConfigs)
+        foreach (Entry entry in s_configs)
         {
-            if ((ipConfig.IPAddress.Id & ipConfig.SubnetMask.Id) ==
-                (destIP.Id & ipConfig.SubnetMask.Id))
+            IPConfig ipConfig = entry.Config;
+
+            if ((ipConfig.Address.Id & ipConfig.SubnetMask.Id) ==
+                (destination.Id & ipConfig.SubnetMask.Id))
             {
-                return ipConfig.IPAddress;
+                return ipConfig.Address;
             }
             if (defaultGw == null && ipConfig.DefaultGateway.CompareTo(Address.Zero) != 0)
             {
-                defaultGw = ipConfig.IPAddress;
+                defaultGw = ipConfig.Address;
             }
 
-            if (!IsLocalAddress(destIP))
+            if (!IsLocalAddress(destination))
             {
-                return ipConfig.IPAddress;
+                return ipConfig.Address;
             }
         }
 
@@ -68,15 +118,15 @@ public class IPConfig
     /// Enables a network device with the specified IP configuration.
     /// </summary>
     /// <param name="device">The network device to enable.</param>
-    /// <param name="ip">The IP address to assign to the device.</param>
-    /// <param name="subnet">The subnet mask to use for the device.</param>
-    /// <param name="gw">The default gateway address to use for the device.</param>
+    /// <param name="address">The IP address to assign to the device.</param>
+    /// <param name="subnetMask">The subnet mask to use for the device.</param>
+    /// <param name="defaultGateway">The default gateway address to use for the device.</param>
     /// <returns><see langword="true"/> if the device was successfully enabled, <see langword="false"/> otherwise.</returns>
-    public static bool Enable(INetworkDevice device, Address ip, Address subnet, Address gw)
+    internal static bool Enable(INetworkDevice device, Address address, Address subnetMask, Address defaultGateway)
     {
         if (device != null)
         {
-            var config = new IPConfig(ip, subnet, gw);
+            IPConfig config = new(address, subnetMask, defaultGateway);
             NetworkStack.ConfigIP(device, config);
             Serial.WriteString("[IPConfig] Config OK.\n");
             return true;
@@ -85,15 +135,54 @@ public class IPConfig
     }
 
     /// <summary>
+    /// Assign an IPv4 configuration to the primary network device.
+    /// </summary>
+    /// <param name="address">The IP address to assign.</param>
+    /// <param name="subnetMask">The subnet mask to use.</param>
+    /// <param name="defaultGateway">The default gateway address to use.</param>
+    /// <returns><see langword="true"/> if the configuration was applied, <see langword="false"/> when there is no device.</returns>
+    public static bool Enable(Address address, Address subnetMask, Address defaultGateway)
+    {
+        INetworkDevice? device = NetworkManager.PrimaryDevice;
+        if (device is null)
+        {
+            return false;
+        }
+
+        return Enable(device, address, subnetMask, defaultGateway);
+    }
+
+    /// <summary>
+    /// Assign an IPv4 configuration to a named network device.
+    /// </summary>
+    /// <param name="adapter">Handle to the device, from <see cref="NetworkManager.GetAdapter(int)"/>.</param>
+    /// <param name="address">The IP address to assign.</param>
+    /// <param name="subnetMask">The subnet mask to use.</param>
+    /// <param name="defaultGateway">The default gateway address to use.</param>
+    /// <returns><see langword="true"/> if the configuration was applied, <see langword="false"/> when the handle names no device.</returns>
+    public static bool Enable(NetworkAdapter adapter, Address address, Address subnetMask, Address defaultGateway)
+    {
+        INetworkDevice? device = adapter.Device;
+        if (device is null)
+        {
+            return false;
+        }
+
+        return Enable(device, address, subnetMask, defaultGateway);
+    }
+
+    /// <summary>
     /// Check if the given address is a local address.
     /// </summary>
     /// <param name="destIP">The address to check.</param>
     internal static bool IsLocalAddress(Address destIP)
     {
-        for (int c = 0; c < s_ipConfigs.Count; c++)
+        for (int c = 0; c < s_configs.Count; c++)
         {
-            if ((s_ipConfigs[c].IPAddress.Id & s_ipConfigs[c].SubnetMask.Id) ==
-                (destIP.Id & s_ipConfigs[c].SubnetMask.Id))
+            IPConfig ipConfig = s_configs[c].Config;
+
+            if ((ipConfig.Address.Id & ipConfig.SubnetMask.Id) ==
+                (destIP.Id & ipConfig.SubnetMask.Id))
             {
                 return true;
             }
@@ -108,11 +197,7 @@ public class IPConfig
     /// <param name="sourceIP">Source IP.</param>
     internal static INetworkDevice? FindInterface(Address sourceIP)
     {
-        if (NetworkStack.AddressMap != null && NetworkStack.AddressMap.ContainsKey(sourceIP.Id))
-        {
-            return NetworkStack.AddressMap[sourceIP.Id];
-        }
-        return null;
+        return NetworkStack.AddressMap.TryGetValue(sourceIP.Id, out INetworkDevice? device) ? device : null;
     }
 
     /// <summary>
@@ -123,41 +208,34 @@ public class IPConfig
     internal static Address? FindRoute(Address destIP)
     {
         // TODO is this correct implementation?
-        for (int c = 0; c < s_ipConfigs.Count; c++)
+        for (int c = 0; c < s_configs.Count; c++)
         {
-            return s_ipConfigs[c].DefaultGateway;
+            return s_configs[c].Config.DefaultGateway;
         }
 
         return null;
     }
 
     /// <summary>
-    /// Creates a IPv4 Configuration with no default gateway.
+    /// Creates a IPv4 Configuration. Internal: a kernel reads a configuration
+    /// back from <see cref="NetworkAdapter.IPConfig"/> and applies one with
+    /// <see cref="Enable(Address, Address, Address)"/>; it never supplies the
+    /// object itself, and the only caller is this class's own Enable.
     /// </summary>
-    /// <param name="ip">IP Address</param>
-    /// <param name="subnet">Subnet Mask</param>
-    public IPConfig(Address ip, Address subnet)
-        : this(ip, subnet, Address.Zero)
+    /// <param name="address">The IPv4 address to assign.</param>
+    /// <param name="subnetMask">The subnet mask.</param>
+    /// <param name="defaultGateway">The default gateway.</param>
+    internal IPConfig(Address address, Address subnetMask, Address defaultGateway)
     {
+        Address = address;
+        SubnetMask = subnetMask;
+        DefaultGateway = defaultGateway;
     }
 
     /// <summary>
-    /// Creates a IPv4 Configuration.
+    /// The IPv4 address assigned to the device this configuration belongs to.
     /// </summary>
-    /// <param name="ip">IP Address</param>
-    /// <param name="subnet">Subnet Mask</param>
-    /// <param name="gw">Default gateway</param>
-    public IPConfig(Address ip, Address subnet, Address gw)
-    {
-        IPAddress = ip;
-        SubnetMask = subnet;
-        DefaultGateway = gw;
-    }
-
-    /// <summary>
-    /// The IP address.
-    /// </summary>
-    public Address IPAddress { get; }
+    public Address Address { get; }
 
     /// <summary>
     /// The subnet mask.

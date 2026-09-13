@@ -54,11 +54,11 @@ internal static class ColorSquareWorker
             return;
         }
 
-        int x = KernelConsole.Default.Canvas.Mode.Width >= (uint)(SquareSize + Margin * HalfDivisor)
-            ? (int)KernelConsole.Default.Canvas.Mode.Width - SquareSize - Margin
+        int x = KernelConsole.Default.Canvas.Mode.Width >= SquareSize + Margin * HalfDivisor
+            ? KernelConsole.Default.Canvas.Mode.Width - SquareSize - Margin
             : Margin;
-        int y = KernelConsole.Default.Canvas.Mode.Height >= (uint)(SquareSize + Margin * HalfDivisor)
-            ? (int)KernelConsole.Default.Canvas.Mode.Height - SquareSize - Margin
+        int y = KernelConsole.Default.Canvas.Mode.Height >= SquareSize + Margin * HalfDivisor
+            ? KernelConsole.Default.Canvas.Mode.Height - SquareSize - Margin
             : Margin;
 
         int frame = 0;

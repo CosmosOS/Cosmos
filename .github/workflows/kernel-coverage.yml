@@ -115,9 +115,11 @@ jobs:
       suite_name: Threading
       suite_id: threading
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Threading
-      timeout_x64: 120
-      timeout_arm64: 180
-      step_timeout_minutes: 10
+      # Matches kernel-tests.yml: the scheduling-policy cells add three fixed
+      # CPU-share measurement windows.
+      timeout_x64: 150
+      timeout_arm64: 240
+      step_timeout_minutes: 12
       coverage: true
 
   # ── Graphic ───────────────────────────────────────────────────────────────────

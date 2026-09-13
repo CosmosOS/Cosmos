@@ -1,6 +1,5 @@
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
-using SchedThread = Cosmos.Kernel.Core.Scheduler.Thread;
 
 namespace Cosmos.Kernel.Core.Scheduler;
 
@@ -10,7 +9,7 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// <remarks>
 /// This mutex supports recursive locking by the same thread.
 /// </remarks>
-public class Mutex : IDisposable
+internal class Mutex : IDisposable
 {
     /// <summary>Initial capacity of the wait queue, pre-sized so the first Add in Acquire allocates nothing under the IRQ-off state lock (mirrors InterruptEvent._waiters).</summary>
     private const int InitialWaitQueueCapacity = 4;
@@ -23,7 +22,7 @@ public class Mutex : IDisposable
     /// <summary>
     /// The thread that currently owns the mutex, or <c>null</c> if unlocked.
     /// </summary>
-    private SchedThread? _ownerThread;
+    private SchedulerThread? _ownerThread;
 
     /// <summary>
     /// The recursion depth for the owning thread.
@@ -33,7 +32,7 @@ public class Mutex : IDisposable
     /// <summary>
     /// Threads waiting to acquire the mutex.
     /// </summary>
-    private readonly List<SchedThread> _waitingThreads;
+    private readonly List<SchedulerThread> _waitingThreads;
 
     /// <summary>
     /// Creates a new mutex instance.
@@ -44,7 +43,7 @@ public class Mutex : IDisposable
         _recursionDepth = 0;
         // Pre-sized for the same reason as InterruptEvent._waiters: the
         // first Add in Acquire happens under the IRQ-off state lock.
-        _waitingThreads = new List<SchedThread>(InitialWaitQueueCapacity);
+        _waitingThreads = new List<SchedulerThread>(InitialWaitQueueCapacity);
     }
 
     /// <summary>
@@ -54,8 +53,8 @@ public class Mutex : IDisposable
     /// </summary>
     public void Acquire()
     {
-        SchedThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())?.CurrentThread
+        SchedulerThread? currentThread = SchedulerManager.IsReady
+            ? SchedulerManager.CurrentCpuState?.CurrentThread
             : null;
 
         if (currentThread == null)
@@ -73,7 +72,7 @@ public class Mutex : IDisposable
         // ownership stays real, it just never parks in _waitingThreads.
         // Interrupts stay enabled between attempts, so the timer keeps
         // preempting to the (runnable) holder until it releases.
-        if ((currentThread.Flags & ThreadFlags.IdleThread) != 0)
+        if ((currentThread.Flags & SchedulerThreadFlags.IdleThread) != 0)
         {
             while (true)
             {
@@ -152,14 +151,14 @@ public class Mutex : IDisposable
             // InterruptEvent.WaitCore): if the hand-off already readied us
             // between scope-dispose and this point, halting would sleep past
             // the wake-up until an unrelated interrupt.
-            if (currentThread.State == ThreadState.Blocked)
+            if (currentThread.State == SchedulerThreadState.Blocked)
             {
                 InternalCpu.Halt();
             }
         }
     }
 
-    private bool ContainsWaiterLocked(SchedThread thread)
+    private bool ContainsWaiterLocked(SchedulerThread thread)
     {
         for (int i = 0; i < _waitingThreads.Count; i++)
         {
@@ -174,7 +173,7 @@ public class Mutex : IDisposable
 
     // ReferenceEquals scan for the same reason as ContainsWaiterLocked.
     // Caller holds the lock.
-    private void RemoveWaiterLocked(SchedThread thread)
+    private void RemoveWaiterLocked(SchedulerThread thread)
     {
         for (int i = 0; i < _waitingThreads.Count; i++)
         {
@@ -192,8 +191,8 @@ public class Mutex : IDisposable
     /// <returns>true if acquired, false if held by another thread.</returns>
     public bool TryAcquire()
     {
-        SchedThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())?.CurrentThread
+        SchedulerThread? currentThread = SchedulerManager.IsReady
+            ? SchedulerManager.CurrentCpuState?.CurrentThread
             : null;
 
         if (currentThread == null)
@@ -228,8 +227,8 @@ public class Mutex : IDisposable
     /// </remarks>
     public void Release()
     {
-        SchedThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())?.CurrentThread
+        SchedulerThread? currentThread = SchedulerManager.IsReady
+            ? SchedulerManager.CurrentCpuState?.CurrentThread
             : null;
 
         if (currentThread == null)
@@ -237,7 +236,7 @@ public class Mutex : IDisposable
             return;
         }
 
-        SchedThread? toReady = null;
+        SchedulerThread? toReady = null;
         using (_lockGuard.AcquireIrqSafe())
         {
             if (_ownerThread != currentThread)
@@ -291,7 +290,7 @@ public class Mutex : IDisposable
     /// <summary>
     /// Gets the current owner thread.
     /// </summary>
-    public SchedThread? OwnerThread
+    public SchedulerThread? OwnerThread
     {
         get
         {
@@ -320,7 +319,7 @@ public class Mutex : IDisposable
     {
         while (true)
         {
-            SchedThread waitingThread;
+            SchedulerThread waitingThread;
             using (_lockGuard.AcquireIrqSafe())
             {
                 if (_waitingThreads.Count == 0)

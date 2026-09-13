@@ -5,8 +5,14 @@ namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 /// <summary>
 /// A software timer that invokes a callback after a delay, driven by the
 /// periodic tick of the timer device it is registered with. Callbacks run
-/// in interrupt context and must not block.
+/// in interrupt context: they must not block, and an exception escaping one
+/// halts the kernel, because the interrupt dispatch has no handler above it.
 /// </summary>
+/// <remarks>
+/// A kernel obtains one from TimerManager.Schedule or ScheduleRecurring and
+/// passes it back to TimerManager.Cancel. Creating one and driving its tick
+/// state belongs to the timer device, so those members are internal.
+/// </remarks>
 public sealed class SoftwareTimer
 {
     private readonly Action _callback;
@@ -19,7 +25,7 @@ public sealed class SoftwareTimer
     /// <param name="callback">The method to invoke when the timer fires.</param>
     /// <param name="timeoutNs">The delay before the timer fires, in nanoseconds. For recurring timers, the period between firings.</param>
     /// <param name="recurring">Whether the timer reloads after firing, or fires only once.</param>
-    public SoftwareTimer(Action callback, ulong timeoutNs, bool recurring)
+    internal SoftwareTimer(Action callback, ulong timeoutNs, bool recurring)
     {
         _callback = callback;
         TimeoutNs = timeoutNs;
@@ -47,7 +53,7 @@ public sealed class SoftwareTimer
     /// Marks the timer active or inactive. Called by the timer device on
     /// registration and unregistration; activating reloads the full timeout.
     /// </summary>
-    public void SetActive(bool active)
+    internal void SetActive(bool active)
     {
         if (active)
         {
@@ -63,7 +69,7 @@ public sealed class SoftwareTimer
     /// </summary>
     /// <param name="elapsedNs">Nanoseconds elapsed since the previous tick.</param>
     /// <returns>True when the timer is due; recurring timers reload automatically.</returns>
-    public bool Tick(ulong elapsedNs)
+    internal bool Tick(ulong elapsedNs)
     {
         if (_remainingNs > elapsedNs)
         {
@@ -78,7 +84,7 @@ public sealed class SoftwareTimer
     /// <summary>
     /// Invokes the timer callback. Called by the timer device when the timer is due.
     /// </summary>
-    public void Invoke()
+    internal void Invoke()
     {
         _callback();
     }

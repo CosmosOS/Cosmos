@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.HAL.Pci.Enums;
 
-public enum SubclassId
+internal enum SubclassId
 {
     // MassStorageController:
     ScsiStorageController = 0x00,

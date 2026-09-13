@@ -9,7 +9,7 @@
     <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591;CS1998;NU1903;SYSLIB0011;</NoWarn>
+    <NoWarn>$(NoWarn);CS1998;NU1903;SYSLIB0011;</NoWarn>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
     <UseArtifactsOutput>true</UseArtifactsOutput>
@@ -85,10 +85,10 @@
   <PropertyGroup>
     <CosmosApiBaselineVersion></CosmosApiBaselineVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(CosmosTrackPublicApi)' == 'true'">
-    <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion Condition="'$(CosmosApiBaselineVersion)' != ''">$(CosmosApiBaselineVersion)</PackageValidationBaselineVersion>
-  </PropertyGroup>
+  <!-- The property side of the flag (package validation, WarningsAsErrors) lives
+       in Directory.Build.targets: this file is imported before the project body
+       sets CosmosTrackPublicApi, so property conditions on it are always false
+       here. Item conditions evaluate after all properties, so this works. -->
   <ItemGroup Condition="'$(CosmosTrackPublicApi)' == 'true'">
     <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
   </ItemGroup>

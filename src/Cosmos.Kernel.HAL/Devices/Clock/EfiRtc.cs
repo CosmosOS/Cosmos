@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.Devices.Clock;
 /// Works on any UEFI platform (x64 or ARM64) after ExitBootServices because
 /// EFI Runtime Services remain valid indefinitely.
 /// </summary>
-public static class EfiRtc
+internal static class EfiRtc
 {
     /// <summary>
     /// Attempts to read the current wall-clock time via EFI Runtime Services.

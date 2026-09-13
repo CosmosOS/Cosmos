@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard English (US) keyboard layout.
 /// </summary>
-public class USStandardLayout : ScanMapBase
+public sealed class USStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="USStandardLayout"/> class.
@@ -15,10 +15,9 @@ public class USStandardLayout : ScanMapBase
     {
     }
 
-    protected override void InitKeys()
+    /// <inheritdoc />
+    protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>(100);
-
         #region Keys
 
         /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKeyEx */

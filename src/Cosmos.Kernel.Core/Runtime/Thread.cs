@@ -7,17 +7,21 @@ using Cosmos.Kernel.Core.Scheduler;
 
 namespace Cosmos.Kernel.Core.Runtime;
 
-public class Thread
+internal class Thread
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    private static object[][] s_threadData;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    /// <summary>
+    /// Thread-static storage of the one thread that exists when the scheduler
+    /// is compiled out. Null until CoreLib allocates it through the reference
+    /// below, the same way a scheduled thread's slot starts.
+    /// </summary>
+    private static object[][]? s_threadData;
+
     [RuntimeExport("RhGetThreadStaticStorage")]
-    internal static ref object[][] RhGetThreadStaticStorage()
+    internal static ref object[][]? RhGetThreadStaticStorage()
     {
         if (CosmosFeatures.SchedulerEnabled)
         {
-            var cpuState = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId());
+            PerCpuState? cpuState = SchedulerManager.CurrentCpuState;
             return ref cpuState.CurrentThread!.GetThreadStaticStorage();
         }
         else
@@ -31,7 +35,7 @@ public class Thread
     {
         if (CosmosFeatures.SchedulerEnabled)
         {
-            Scheduler.Thread? current = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())?.CurrentThread;
+            SchedulerThread? current = SchedulerManager.CurrentCpuState?.CurrentThread;
             if (current != null && current.StackBase != 0)
             {
                 pStackLow = (nint)current.StackBase;
@@ -52,7 +56,7 @@ public class Thread
     [RuntimeExport("RhGetDefaultStackSize")]
     internal static IntPtr RhGetDefaultStackSize()
     {
-        return (nint)Scheduler.Thread.DefaultStackSize;
+        return (nint)SchedulerThread.DefaultStackSize;
     }
 
     /// <summary>
@@ -91,7 +95,7 @@ public class Thread
         Serial.WriteString("RhYield Called\n");
         if (CosmosFeatures.SchedulerEnabled)
         {
-            Scheduler.Thread? thread = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())?.CurrentThread;
+            SchedulerThread? thread = SchedulerManager.CurrentCpuState?.CurrentThread;
             if (thread != null)
             {
                 //TODO: Switch Threads (if possible)

@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.HAL.Pci;
 /// table programming works whether interrupts ultimately land on an x64
 /// LAPIC or an ARM64 GICv3 ITS.
 /// </summary>
-public static class MsiX
+internal static class MsiX
 {
     public const byte CapId = 0x11;
 
@@ -179,7 +179,7 @@ public static class MsiX
 /// state (e.g. ARM64 ITS DeviceID + ITT pointer) so subsequent
 /// <see cref="MsiX.SetEntry"/> calls can route through the same context.
 /// </summary>
-public readonly struct MsiXContext
+internal readonly struct MsiXContext
 {
     public ulong TableVirt { get; }
     public int EntryCount { get; }

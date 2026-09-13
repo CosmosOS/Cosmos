@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.ARM64.IO;
 /// ARM64 uses memory-mapped I/O instead of port I/O.
 /// Native imports live in Cosmos.Kernel.Core.ARM64/Bridge/Import/ARM64MmioNative.cs.
 /// </summary>
-public class ARM64MemoryIO : IPortIO
+internal class ARM64MemoryIO : IPortIO
 {
     // ARM64 uses memory-mapped I/O instead of port I/O
     private const ulong MMIO_BASE = 0x3F000000; // Example base for Raspberry Pi 3/4

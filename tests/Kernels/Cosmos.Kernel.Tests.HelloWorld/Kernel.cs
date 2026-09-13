@@ -1,5 +1,5 @@
 using System;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -10,8 +10,8 @@ public class Kernel : Sys.Kernel
 {
     protected override void BeforeRun()
     {
-        Serial.WriteString("[HelloWorld] BeforeRun() reached!\n");
-        Serial.WriteString("[HelloWorld] Starting tests...\n");
+        Log.WriteString("[HelloWorld] BeforeRun() reached!\n");
+        Log.WriteString("[HelloWorld] Starting tests...\n");
 
         // Initialize test suite
         TR.Start("HelloWorld Basic Tests", expectedTests: 3);
@@ -47,7 +47,7 @@ public class Kernel : Sys.Kernel
         TR.Finish();
 
         // Output completion message
-        Serial.WriteString("\n[Tests Complete - System Halting]\n");
+        Log.WriteString("\n[Tests Complete - System Halting]\n");
     }
 
     protected override void Run()

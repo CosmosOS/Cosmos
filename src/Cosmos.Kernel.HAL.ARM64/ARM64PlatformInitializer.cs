@@ -20,7 +20,7 @@ namespace Cosmos.Kernel.HAL.ARM64;
 /// <summary>
 /// ARM64 platform initializer - creates ARM64-specific HAL components.
 /// </summary>
-public class ARM64PlatformInitializer : IPlatformInitializer
+internal class ARM64PlatformInitializer : IPlatformInitializer
 {
     /// <summary>Number of microseconds in one second, used to convert the generic-timer frequency (Hz) into ticks per microsecond.</summary>
     private const ulong MicrosecondsPerSecond = 1_000_000UL;
@@ -187,8 +187,15 @@ public class ARM64PlatformInitializer : IPlatformInitializer
 
     public void StartSchedulerTimer(uint quantumMs)
     {
-        // Start the timer for preemptive scheduling
+        // Start the timer for preemptive scheduling. Honour quantumMs: the
+        // period the timer was initialized with is the same 10 ms by
+        // coincidence, and silently ignoring the parameter left the caller
+        // believing it had set the tick interval on both architectures.
         Serial.WriteString("[ARM64HAL] Starting Generic Timer for scheduling...\n");
-        _timer?.Start();
+        if (_timer is not null)
+        {
+            _timer.SetPeriod(quantumMs * 1_000_000UL);
+            _timer.Start();
+        }
     }
 }

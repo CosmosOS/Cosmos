@@ -5,7 +5,7 @@ using Cosmos.Kernel.Core;
 namespace Cosmos.Kernel.HAL.Devices.Storage;
 
 /// <summary>NVMe admin opcodes (NVM Express 1.4 §5.x).</summary>
-public static class NvmeAdminOp
+internal static class NvmeAdminOp
 {
     public const byte DeleteIoSq = 0x00;
     public const byte CreateIoSq = 0x01;
@@ -17,7 +17,7 @@ public static class NvmeAdminOp
 }
 
 /// <summary>NVMe NVM-command-set IO opcodes (NVM Express 1.4 §6.x).</summary>
-public static class NvmeIoOp
+internal static class NvmeIoOp
 {
     public const byte Flush = 0x00;
     public const byte Write = 0x01;
@@ -25,7 +25,7 @@ public static class NvmeIoOp
 }
 
 /// <summary>Identify CNS values (NVM Express 1.4 §5.15).</summary>
-public static class NvmeCns
+internal static class NvmeCns
 {
     public const byte Namespace = 0x00;
     public const byte Controller = 0x01;
@@ -38,7 +38,7 @@ public static class NvmeCns
 /// the layout stays exactly as the controller expects regardless of
 /// runtime padding).
 /// </summary>
-public unsafe struct NvmeSqe
+internal unsafe struct NvmeSqe
 {
     /// <summary>Submission Queue Entry size in 64-bit words (64 bytes / 8).</summary>
     private const int SqeSizeQwords = 8;
@@ -120,7 +120,7 @@ public unsafe struct NvmeSqe
 /// NVMe Completion Queue Entry (16 bytes). Reads only — the controller
 /// writes these.
 /// </summary>
-public unsafe struct NvmeCqe
+internal unsafe struct NvmeCqe
 {
     /// <summary>Byte offset of DW0 (command-specific result) within the CQE.</summary>
     private const ulong CommandSpecificOffset = 0x00;

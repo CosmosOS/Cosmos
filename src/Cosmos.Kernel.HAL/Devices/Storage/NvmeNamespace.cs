@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// concurrent callers on the same namespace) execute in parallel up to
 /// the controller's I/O queue depth minus one (the NVMe queue-full rule).
 /// </summary>
-public unsafe class NvmeNamespace : BlockDevice
+internal unsafe class NvmeNamespace : BlockDevice
 {
     private readonly NvmeController _controller;
     private readonly uint _nsid;

@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard Spanish (ES) keyboard layout.
 /// </summary>
-public class ESStandardLayout : ScanMapBase
+public sealed class ESStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ESStandardLayout"/> class.
@@ -15,10 +15,9 @@ public class ESStandardLayout : ScanMapBase
     {
     }
 
-    protected override void InitKeys()
+    /// <inheritdoc />
+    protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>(105);
-
         #region Keys
 
         /*                       Scan Norm Shift Num Caps SCaps SNum AltGr ConsoleKeyEx */

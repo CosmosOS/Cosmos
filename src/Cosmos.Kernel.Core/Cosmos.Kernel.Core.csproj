@@ -8,13 +8,19 @@
     <!-- This may need to change -->
     <DefineConstants>$(DefineConstants);NATIVEAOT;TARGET_64BIT</DefineConstants>
     <!-- Package Metadata -->
-    <PackageId>Cosmos.Kernel.System.Core</PackageId>
+    <PackageId>Cosmos.Kernel.Core</PackageId>
     <Title>Cosmos Kernel Core</Title>
     <Description>Core kernel functionality for Cosmos including memory management, runtime, and fundamental kernel services.</Description>
     <PackageTags>cosmos;kernel;core;memory;heap;allocation;kernel-services;runtime</PackageTags>
     <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
     <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <!-- This assembly declares the experimental scheduler seam and consumes it itself. -->
+    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
+
+    <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
+         the scheduler seam plus the platform contract interfaces. -->
+    <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
 
   <!-- Architecture-specific source files (defines are set by Cosmos.ArchitecturePicker.props) -->
@@ -31,18 +37,19 @@
     <Compile Remove="Runtime\ExceptionHandling\ExceptionHelper.X64.cs" />
   </ItemGroup>
 
+  <!-- The metadata readers, TypeHashingAlgorithms, and ExceptionIDs used to be
+       linked from here too, but upstream declares their types public with no
+       define to flip them. They are vendored under Runtime\Internal\ instead,
+       alongside ReadyToRunHeader.cs, MethodTable.Runtime.cs and
+       TypeManagerHandle.cs. Runtime\Internal\README.md records where each
+       file came from and which ones are a visibility-only diff rather than a
+       rewrite. -->
   <ItemGroup>
     <Compile Include="$(ToolCommonPath)Internal\NativeFormat\*.cs">
       <Link>Runtime\Internal\NativeFormat\%(Filename).cs</Link>
     </Compile>
-    <Compile Include="$(ToolCommonPath)Internal\Metadata\NativeFormat\*.cs">
-      <Link>Runtime\Internal\NativeFormat\Metadata\%(Filename).cs</Link>
-    </Compile>
     <Compile Include="$(AotCommonPath)..\..\System.Private.StackTraceMetadata\src\Internal\StackTraceMetadata\MethodNameFormatter.cs">
       <Link>System.Private.StackTraceMetadata\Internal\StackTraceMetadata\MethodNameFormatter.cs</Link>
-    </Compile>
-    <Compile Include="$(ToolCommonPath)TypeSystem\Common\TypeHashingAlgorithms.cs">
-      <Link>TypeSystem\Common\TypeHashingAlgorithms.cs</Link>
     </Compile>
     <Compile Include="$(ToolCommonPath)Internal\Runtime\MetadataBlob.cs">
       <Link>Runtime\Internal\Runtime\MetadataBlob.cs</Link>
@@ -56,15 +63,66 @@
     <Compile Include="$(AotCommonPath)Internal\Runtime\MethodTable.cs">
       <Link>Runtime\Internal\Runtime\MethodTable.cs</Link>
     </Compile>
-    <Compile Include="$(AotRuntimeBasePath)System\Runtime\ExceptionIDs.cs">
-      <Link>Runtime\Internal\Runtime\ExceptionIDs.cs</Link>
-    </Compile>
   </ItemGroup>
 
+  <!-- Sources linked from the dotnet/runtime submodule above declare upstream
+       public types with no XML docs. The submodule's root .editorconfig
+       shields them from this repo's .editorconfig, so the API-tracking and
+       doc-requirement exclusions are handed to the compiler as a generated
+       global analyzer config naming each linked file. -->
+  <Target Name="_CosmosVendoredAnalyzerConfig" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <_VendoredGlobalConfigFile>$(IntermediateOutputPath)vendored.globalconfig</_VendoredGlobalConfigFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <_VendoredCompile Include="@(Compile)"
+                        Condition="$([System.String]::Copy('%(Compile.FullPath)').Replace('\', '/').Contains('/dotnet/runtime/'))" />
+      <_VendoredConfigLine Include="is_global = true" />
+      <_VendoredConfigLine Include="[$([System.String]::Copy('%(_VendoredCompile.FullPath)').Replace('\', '/'))]%0adotnet_diagnostic.RS0016.severity = none%0adotnet_diagnostic.RS0017.severity = none%0adotnet_diagnostic.CS1591.severity = none" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(_VendoredGlobalConfigFile)"
+                      Lines="@(_VendoredConfigLine)"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <EditorConfigFiles Include="$(_VendoredGlobalConfigFile)" />
+      <FileWrites Include="$(_VendoredGlobalConfigFile)" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
+    <!-- White-box runtime suite drives the module metadata and library
+         initializer plumbing the AOT runtime boots through. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Runtime" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.ARM64" />
+    <!-- HAL's ACPI layer reads the MCFG table through AcpiMcfgNative. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL" />
+    <!-- IPlatformInitializer's factory methods return the platform contracts
+         (IPortIO, ICpuOps, IPowerOps, IInterruptController). -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.Interfaces" />
+    <!-- Plugs read feature knobs (KnobsNative) and module metadata (ManagedModule). -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
+    <!-- White-box GC tests drive the CFI unwinder through ExceptionHelper. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.GarbageCollector" />
+    <!-- The aggregator bootstraps the scheduler (Initialize, CreateThread,
+         idle-thread setup) from its library initializer. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel" />
+    <!-- System's supported ring fronts Core internals (Serial log, memory
+         stats, thread kill) so kernels never reference Core directly. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.System" />
+    <!-- Arch HALs feed timer ticks and IRQ plumbing into Core. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
+    <!-- White-box scheduler suite reads Stride bookkeeping and drives the
+         sync primitives directly. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Threading" />
+    <!-- White-box suites over Core primitives: vector allocation and MSI
+         routing (Interrupts), copy routines and page allocation (Memory),
+         MMIO probes (Storage). -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Memory" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
   </ItemGroup>
 
   <ItemGroup>

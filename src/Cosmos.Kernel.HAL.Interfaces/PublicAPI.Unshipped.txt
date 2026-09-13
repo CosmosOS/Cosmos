@@ -1,0 +1,23 @@
+#nullable enable
+Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice
+Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.BlockCount.get -> ulong
+Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.BlockSize.get -> ulong
+Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.Flush() -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.Name.get -> string!
+Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress
+Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.CompareTo(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress? other) -> int
+Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.Equals(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress? other) -> bool
+Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.MACAddress(byte[]! address) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.MACAddress(byte[]! buffer, int offset) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.MACAddress(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! m) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.SoftwareTimer
+Cosmos.Kernel.HAL.Interfaces.Devices.SoftwareTimer.IsActive.get -> bool
+Cosmos.Kernel.HAL.Interfaces.Devices.SoftwareTimer.Recurring.get -> bool
+Cosmos.Kernel.HAL.Interfaces.Devices.SoftwareTimer.TimeoutNs.get -> ulong
+override Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.Equals(object? obj) -> bool
+override Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.GetHashCode() -> int
+override Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.ToString() -> string!
+static Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.Broadcast.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
+static Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.None.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!

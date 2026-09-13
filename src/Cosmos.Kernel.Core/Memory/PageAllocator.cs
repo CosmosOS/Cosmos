@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.Memory;
 /// <summary>
 /// a basic page allocator
 /// </summary>
-public static unsafe class PageAllocator
+internal static unsafe class PageAllocator
 {
     /// <summary>
     /// Native Intel page size.

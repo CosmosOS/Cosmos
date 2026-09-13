@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 
 
 namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
@@ -24,7 +24,7 @@ public static class UdpClientPlug
     [PlugMember(".ctor")]
     public static void Ctor(UdpClient aThis, IPEndPoint localEP)
     {
-        Serial.WriteString("[UdpClientPlug] Ctor(localEP)\n");
+        Log.WriteString("[UdpClientPlug] Ctor(localEP)\n");
 
         var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         int id = GetId(aThis);
@@ -37,7 +37,7 @@ public static class UdpClientPlug
     [PlugMember(".ctor")]
     public static void Ctor(UdpClient aThis, AddressFamily family)
     {
-        Serial.WriteString("[UdpClientPlug] Ctor(family)\n");
+        Log.WriteString("[UdpClientPlug] Ctor(family)\n");
 
         var socket = new Socket(family, SocketType.Dgram, ProtocolType.Udp);
         int id = GetId(aThis);
@@ -48,7 +48,7 @@ public static class UdpClientPlug
     [PlugMember(".ctor")]
     public static void Ctor(UdpClient aThis, int port, AddressFamily family)
     {
-        Serial.WriteString("[UdpClientPlug] Ctor(port, family)\n");
+        Log.WriteString("[UdpClientPlug] Ctor(port, family)\n");
 
         var socket = new Socket(family, SocketType.Dgram, ProtocolType.Udp);
         int id = GetId(aThis);
@@ -65,7 +65,7 @@ public static class UdpClientPlug
     [PlugMember(".ctor")]
     public static void Ctor(UdpClient aThis, string hostname, int port)
     {
-        Serial.WriteString("[UdpClientPlug] Ctor(hostname, port)\n");
+        Log.WriteString("[UdpClientPlug] Ctor(hostname, port)\n");
 
         var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         int id = GetId(aThis);
@@ -140,7 +140,7 @@ public static class UdpClientPlug
     [PlugMember]
     public static int Send(UdpClient aThis, byte[] dgram, int bytes)
     {
-        Serial.WriteString("[UdpClientPlug] Send(dgram, bytes)\n");
+        Log.WriteString("[UdpClientPlug] Send(dgram, bytes)\n");
 
         int id = GetId(aThis);
         if (!_clientSockets.TryGetValue(id, out var socket))
@@ -158,7 +158,7 @@ public static class UdpClientPlug
     [PlugMember]
     public static int Send(UdpClient aThis, byte[] dgram, int bytes, IPEndPoint endPoint)
     {
-        Serial.WriteString("[UdpClientPlug] Send(dgram, bytes, endPoint)\n");
+        Log.WriteString("[UdpClientPlug] Send(dgram, bytes, endPoint)\n");
 
         int id = GetId(aThis);
         if (!_clientSockets.TryGetValue(id, out var socket))
@@ -172,7 +172,7 @@ public static class UdpClientPlug
     [PlugMember]
     public static int Send(UdpClient aThis, byte[] dgram, int bytes, string hostname, int port)
     {
-        Serial.WriteString("[UdpClientPlug] Send(dgram, bytes, hostname, port)\n");
+        Log.WriteString("[UdpClientPlug] Send(dgram, bytes, hostname, port)\n");
 
         IPAddress address = IPAddress.Parse(hostname);
         var endPoint = new IPEndPoint(address, port);
@@ -189,7 +189,7 @@ public static class UdpClientPlug
     [PlugMember]
     public static byte[] Receive(UdpClient aThis, ref IPEndPoint remoteEP)
     {
-        Serial.WriteString("[UdpClientPlug] Receive()\n");
+        Log.WriteString("[UdpClientPlug] Receive()\n");
 
         int id = GetId(aThis);
         if (!_clientSockets.TryGetValue(id, out var socket))

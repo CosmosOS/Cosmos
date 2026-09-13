@@ -4,7 +4,7 @@ using Cosmos.Kernel.Core.X64.Bridge;
 
 namespace Cosmos.Kernel.Core.X64.Cpu;
 
-public class X64CpuOps : ICpuOps
+internal class X64CpuOps : ICpuOps
 {
     public void Halt() => InternalCpu.Halt();
 

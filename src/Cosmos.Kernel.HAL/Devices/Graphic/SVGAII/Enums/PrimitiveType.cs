@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
-public enum SVGA3dPrimitiveType
+internal enum SVGA3dPrimitiveType
 {
     SVGA3D_PRIMITIVE_INVALID = 0,
     SVGA3D_PRIMITIVE_TRIANGLELIST = 1,

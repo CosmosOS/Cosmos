@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// <see cref="AhciController"/> per match, so a system with two HBAs gets
 /// two instances and all of their ports show up in <see cref="Ahci.Ports"/>.
 /// </summary>
-public unsafe class AhciController
+internal unsafe class AhciController
 {
     /// <summary>Stride between consecutive ports' command lists inside the command region (1 KiB; AHCI's CLB alignment).</summary>
     private const uint PortStrideCLB = 0x400;

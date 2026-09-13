@@ -22,7 +22,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// can describe (asm entry stubs, native imports, IRQ entry — no CFI at all) or a frame's slot table
 /// is too large to decode.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     private const int MaxPreciseFrames = 256;
 

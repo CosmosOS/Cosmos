@@ -46,7 +46,7 @@ internal class GopCanvas : Canvas
             _driver = new GopDriver((uint*)fb->Address, (uint)fb->Width, (uint)fb->Height, (uint)fb->Pitch);
 
             // Update mode to match actual framebuffer resolution
-            this._mode = new Mode((uint)fb->Width, (uint)fb->Height, mode.ColorDepth);
+            this._mode = new Mode((int)fb->Width, (int)fb->Height, mode.ColorDepth);
 
             _refreshRate = ParseEdidRefreshRate(fb);
         }
@@ -114,17 +114,17 @@ internal class GopCanvas : Canvas
         return hz;
     }
 
-    public override void Disable()
+    internal override void Disable()
     {
         //_driver.DisableDisplay();
     }
 
-    public override string Name() => "GopCanvas";
+    public override string Name => "GopCanvas";
 
     public override Mode Mode
     {
         get => _mode;
-        set
+        protected internal set
         {
             // GOP/Limine cannot change the framebuffer mode after boot (SetMode is
             // a no-op), so a requested mode must not shadow the real framebuffer
@@ -136,7 +136,7 @@ internal class GopCanvas : Canvas
             // firmware can hand us (e.g. 1280x800).
             if (_driver != null)
             {
-                _mode = new Mode(_driver.Width, _driver.Height, value.ColorDepth);
+                _mode = new Mode((int)_driver.Width, (int)_driver.Height, value.ColorDepth);
             }
             else
             {
@@ -180,7 +180,7 @@ internal class GopCanvas : Canvas
     /// </list>
     /// </para>
     /// </summary>
-    public override List<Mode> AvailableModes { get; } = new()
+    public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
     {
         new Mode(320, 240, ColorDepth.ColorDepth32),
         new Mode(640, 480, ColorDepth.ColorDepth32),
@@ -272,14 +272,19 @@ internal class GopCanvas : Canvas
         }
     }
 
-    /*
-        * As DrawPoint() is the basic block of DrawLine() and DrawRect() and in theory of all the future other methods that will
-        * be implemented is better to not check the validity of the arguments here or it will repeat the check for any point
-        * to be drawn slowing down all.
-        */
+    // Every canvas clips at DrawPoint: a pixel outside the canvas is dropped,
+    // never drawn and never thrown for. Skipping the test is not the saving it
+    // looks like, because the same comparison then runs four times per pixel
+    // inside the driver's byte indexer, and a negative X wraps into the
+    // previous row instead of vanishing.
     public override void DrawPoint(Color aColor, int aX, int aY)
     {
         ThrowIfDriverNotInitialized();
+
+        if (aX < 0 || aX >= Width || aY < 0 || aY >= Height)
+        {
+            return;
+        }
 
         //uint offset;
 
@@ -324,7 +329,11 @@ internal class GopCanvas : Canvas
     public override void DrawPoint(uint aColor, int aX, int aY)
     {
         ThrowIfDriverNotInitialized();
-        //uint offset;
+
+        if (aX < 0 || aX >= Width || aY < 0 || aY >= Height)
+        {
+            return;
+        }
 
         switch (Mode.ColorDepth)
         {
@@ -353,8 +362,6 @@ internal class GopCanvas : Canvas
     public override void DrawArray(Color[] aColors, int aX, int aY, int aWidth, int aHeight)
     {
         ThrowIfDriverNotInitialized();
-        ThrowIfCoordNotValid(aX, aY);
-        ThrowIfCoordNotValid(aX + aWidth, aY + aHeight);
 
         // Convert Color[] to uint[] for bulk copy
         var pixels = new uint[aColors.Length];
@@ -380,27 +387,26 @@ internal class GopCanvas : Canvas
         _driver.CopyBuffer(aColors.AsMemory(startIndex), aX, aY, aWidth, aHeight);
     }
 
-    public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight, bool preventOffBoundPixels = true)
+    public override void DrawFilledRectangle(Color aColor, int aX, int aY, int aWidth, int aHeight)
     {
         ThrowIfDriverNotInitialized();
-        // ClearVRAM clears one uint at a time. So we clear pixelwise not byte wise. That's why we divide by 32 and not 8.
-        if (preventOffBoundPixels)
+
+        // Clamp unconditionally: the fill below goes straight into the
+        // framebuffer through an unchecked MemSet, so an origin outside the
+        // canvas is a write outside the framebuffer.
+        if (aX < 0) { aWidth += aX; aX = 0; }
+        if (aY < 0) { aHeight += aY; aY = 0; }
+        if (aX >= Mode.Width || aY >= Mode.Height)
         {
-            // Clamp to screen bounds
-            if (aX < 0) { aWidth += aX; aX = 0; }
-            if (aY < 0) { aHeight += aY; aY = 0; }
-            if (aX >= (int)Mode.Width || aY >= (int)Mode.Height)
-            {
-                return;
-            }
+            return;
+        }
 
-            aWidth = Math.Min(aWidth, (int)Mode.Width - aX);
-            aHeight = Math.Min(aHeight, (int)Mode.Height - aY);
+        aWidth = Math.Min(aWidth, Mode.Width - aX);
+        aHeight = Math.Min(aHeight, Mode.Height - aY);
 
-            if (aWidth <= 0 || aHeight <= 0)
-            {
-                return;
-            }
+        if (aWidth <= 0 || aHeight <= 0)
+        {
+            return;
         }
 
         var color = aColor.ToArgb();
@@ -412,42 +418,37 @@ internal class GopCanvas : Canvas
 
     public override void DrawRectangle(Color color, int x, int y, int width, int height)
     {
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
+        // The far edges sit on the last covered pixel, so the outline covers
+        // the same width x height area DrawFilledRectangle fills.
+        int right = x + width - 1;
+        int bottom = y + height - 1;
+
         if (color.A < 255)
         {
-            // Draw top edge from (x, y) to (x + width, y)
-            DrawLine(color, x, y, x + width, y);
-            // Draw left edge from (x, y) to (x, y + height)
-            DrawLine(color, x, y, x, y + height);
-            // Draw bottom edge from (x, y + height) to (x + width, y + height)
-            DrawLine(color, x, y + height, x + width, y + height);
-            // Draw right edge from (x + width, y) to (x + width, y + height)
-            DrawLine(color, x + width, y, x + width, y + height);
+            DrawLine(color, x, y, right, y);
+            DrawLine(color, x, y, x, bottom);
+            DrawLine(color, x, bottom, right, bottom);
+            DrawLine(color, right, y, right, bottom);
+            return;
         }
-        else
+
+        uint rawColor = (uint)color.ToArgb();
+
+        for (int posX = x; posX <= right; posX++)
         {
-            int rawColor = color.ToArgb();
-            // Draw top edge from (x, y) to (x + width, y)
-            for (int posX = x; posX < x + width; posX++)
-            {
-                DrawPoint((uint)rawColor, posX, y);
-            }
-            // Draw left edge from (x, y) to (x, y + height)
-            int newY = y + height;
-            for (int posX = x; posX < x + width; posX++)
-            {
-                DrawPoint((uint)rawColor, posX, newY);
-            }
-            // Draw bottom edge from (x, y + height) to (x + width, y + height)
-            for (int posY = y; posY < y + height; posY++)
-            {
-                DrawPoint((uint)rawColor, x, posY);
-            }
-            // Draw right edge from (x + width, y) to (x + width, y + height)
-            int newX = x + width;
-            for (int posY = y; posY < y + height; posY++)
-            {
-                DrawPoint((uint)rawColor, newX, posY);
-            }
+            DrawPoint(rawColor, posX, y);
+            DrawPoint(rawColor, posX, bottom);
+        }
+
+        for (int posY = y; posY <= bottom; posY++)
+        {
+            DrawPoint(rawColor, x, posY);
+            DrawPoint(rawColor, right, posY);
         }
     }
 
@@ -455,8 +456,8 @@ internal class GopCanvas : Canvas
     {
         ThrowIfDriverNotInitialized();
 
-        var width = (int)image.Width;
-        var height = (int)image.Height;
+        int width = image.Width;
+        int height = image.Height;
         var data = image.RawData;
 
         if (preventOffBoundPixels)
@@ -509,8 +510,8 @@ internal class GopCanvas : Canvas
 
         if (preventOffBoundPixels)
         {
-            var maxWidth = Math.Min(xWidth, (int)Mode.Width - aX);
-            var maxHeight = Math.Min(xHeight, (int)Mode.Height - aY);
+            int maxWidth = Math.Min(xWidth, Mode.Width - aX);
+            int maxHeight = Math.Min(xHeight, Mode.Height - aY);
 
             var startX = Math.Max(0, aX);
             var startY = Math.Max(0, aY);
@@ -589,12 +590,12 @@ internal class GopCanvas : Canvas
     {
         ThrowIfDriverNotInitialized();
 
-        Bitmap bitmap = new((uint)width, (uint)height, ColorDepth.ColorDepth32);
+        Bitmap bitmap = new(width, height, ColorDepth.ColorDepth32);
 
         int startX = Math.Max(0, x);
         int startY = Math.Max(0, y);
-        int endX = Math.Min(x + width, (int)Mode.Width);
-        int endY = Math.Min(y + height, (int)Mode.Height);
+        int endX = Math.Min(x + width, Mode.Width);
+        int endY = Math.Min(y + height, Mode.Height);
 
         int offsetX = Math.Max(0, -x);
         int offsetY = Math.Max(0, -y);

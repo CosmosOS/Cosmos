@@ -11,25 +11,25 @@ internal static class FatAttributes
 {
     // FAT predates POSIX permissions; we synthesize 0o755 / 0o644 and clear
     // write bits when ATTR_READ_ONLY is set so callers see plausible mode.
-    private const ModeEnum DirPermissions =
-        ModeEnum.OwnerRead | ModeEnum.OwnerWrite | ModeEnum.OwnerExecute |
-        ModeEnum.GroupRead | ModeEnum.GroupExecute |
-        ModeEnum.OtherRead | ModeEnum.OtherExecute;
+    private const VfsMode DirPermissions =
+        VfsMode.OwnerRead | VfsMode.OwnerWrite | VfsMode.OwnerExecute |
+        VfsMode.GroupRead | VfsMode.GroupExecute |
+        VfsMode.OtherRead | VfsMode.OtherExecute;
 
-    private const ModeEnum FilePermissions =
-        ModeEnum.OwnerRead | ModeEnum.OwnerWrite |
-        ModeEnum.GroupRead |
-        ModeEnum.OtherRead;
+    private const VfsMode FilePermissions =
+        VfsMode.OwnerRead | VfsMode.OwnerWrite |
+        VfsMode.GroupRead |
+        VfsMode.OtherRead;
 
-    private const ModeEnum WriteMask =
-        ModeEnum.OwnerWrite | ModeEnum.GroupWrite | ModeEnum.OtherWrite;
+    private const VfsMode WriteMask =
+        VfsMode.OwnerWrite | VfsMode.GroupWrite | VfsMode.OtherWrite;
 
-    public static ModeEnum ToMode(FatAttr attributes)
+    public static VfsMode ToMode(FatAttr attributes)
     {
         bool isDir = (attributes & FatAttr.Directory) != 0;
-        ModeEnum mode = isDir
-            ? ModeEnum.Directory | DirPermissions
-            : ModeEnum.RegularFile | FilePermissions;
+        VfsMode mode = isDir
+            ? VfsMode.Directory | DirPermissions
+            : VfsMode.RegularFile | FilePermissions;
 
         if ((attributes & FatAttr.ReadOnly) != 0)
         {
@@ -39,13 +39,13 @@ internal static class FatAttributes
         return mode;
     }
 
-    public static FatAttr ToFatAttr(ModeEnum mode)
+    public static FatAttr ToFatAttr(VfsMode mode)
     {
-        FatAttr attr = (mode & ModeEnum.FileTypeMask) == ModeEnum.Directory
+        FatAttr attr = (mode & VfsMode.FileTypeMask) == VfsMode.Directory
             ? FatAttr.Directory
             : FatAttr.None;
 
-        if ((mode & ModeEnum.OwnerWrite) == 0 && (mode & ModeEnum.FileTypeMask) != ModeEnum.Directory)
+        if ((mode & VfsMode.OwnerWrite) == 0 && (mode & VfsMode.FileTypeMask) != VfsMode.Directory)
         {
             attr |= FatAttr.ReadOnly;
         }

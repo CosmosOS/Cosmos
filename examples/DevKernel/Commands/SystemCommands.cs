@@ -1,5 +1,4 @@
 using System;
-using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Timer;
 using DevKernel.Shell;
@@ -115,18 +114,17 @@ internal static class SystemCommands
 #elif ARCH_ARM64
         Terminal.InfoLine("Architecture", "ARM64");
 #endif
-        Terminal.InfoLine("Console", KernelConsole.Default.Cols + "x" + KernelConsole.Default.Rows + " chars");
-
-        if (KernelConsole.Default.IsAvailable)
+        // Terminal writes through System.Console, which is backed by this same
+        // console, so reaching this line means it is initialized. The test is
+        // what tells the compiler Default is non-null.
+        if (KernelConsole.IsInitialized)
         {
+            Terminal.InfoLine("Console", KernelConsole.Default.Cols + "x" + KernelConsole.Default.Rows + " chars");
+
             Mode mode = KernelConsole.Default.Canvas.Mode;
             Terminal.InfoLine(
                 "Framebuffer",
-                mode.Width + "x" + mode.Height + "x" + (int)mode.ColorDepth + " (" + KernelConsole.Default.Canvas.Name() + ")");
-        }
-        else
-        {
-            Terminal.InfoLine("Framebuffer", "Disabled");
+                mode.Width + "x" + mode.Height + "x" + (int)mode.ColorDepth + " (" + KernelConsole.Default.Canvas.Name + ")");
         }
     }
 

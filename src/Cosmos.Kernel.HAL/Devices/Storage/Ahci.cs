@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// <see cref="AhciController"/> instances and all of their attached SATA
 /// drives show up in <see cref="Ports"/>.
 /// </summary>
-public static class Ahci
+internal static class Ahci
 {
     private static List<AhciController>? s_controllers;
     private static List<BlockDevice>? s_ports;
