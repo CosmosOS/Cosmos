@@ -58,9 +58,12 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     public nuint StackPointer { get; internal set; }
 
     /// <summary>
-    /// Entry point address the thread was created with.
+    /// Entry point address the thread was created with. Recorded by
+    /// <see cref="InitializeStack"/> for a debugger reading the control
+    /// block; the initial context carries its own copy, so nothing on the
+    /// switch path reads this one.
     /// </summary>
-    public nuint InstructionPointer { get; internal set; }
+    internal nuint InstructionPointer { get; set; }
 
     /// <summary>
     /// Lowest address of the thread's stack allocation.
@@ -82,9 +85,12 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     public ulong TotalRuntime { get; set; }
 
     /// <summary>
-    /// Timestamp at which the thread last became the current thread.
+    /// Timestamp at which the thread last became the current thread. Kept by
+    /// the manager; a policy that wants to age threads keeps its own stamp on
+    /// <see cref="SchedulerExtensible.SchedulerData"/> rather than reading
+    /// this one.
     /// </summary>
-    public ulong LastScheduledAt { get; internal set; }
+    internal ulong LastScheduledAt { get; set; }
 
     /// <summary>
     /// Deadline of the current timed wait, in timestamp ticks. Zero when
@@ -105,9 +111,15 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// on a thread that runs a free delegate.
     /// </summary>
     internal GCHandle<System.Threading.Thread> ManagedThread;
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    private object[][] _threadStaticStorage;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
+    /// <summary>
+    /// Backing store for the thread's <c>[ThreadStatic]</c> fields, handed to
+    /// CoreLib by reference. It starts null on purpose: CoreLib's
+    /// <c>ThreadStatics</c> tests the reference and allocates the first
+    /// module's row itself, so a thread that never touches a thread static
+    /// never pays for one.
+    /// </summary>
+    private object[][]? _threadStaticStorage;
 
 
     /// <summary>
@@ -168,7 +180,11 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
         State = SchedulerThreadState.Created;
     }
 
-    internal ref object[][] GetThreadStaticStorage()
+    /// <summary>
+    /// Hands CoreLib the thread's thread-static storage slot by reference so
+    /// it can allocate and grow it in place.
+    /// </summary>
+    internal ref object[][]? GetThreadStaticStorage()
     {
         return ref _threadStaticStorage;
     }

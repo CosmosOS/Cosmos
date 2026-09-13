@@ -84,9 +84,6 @@ internal sealed class SvgaII3DCanvas : Canvas3D
     /// <inheritdoc />
     public override string Name => "VMWareSVGAII3D";
 
-    /// <inheritdoc />
-    public override bool IsAccelerated => true;
-
     /// <summary>
     /// Gets or sets the current graphics mode. Setting the mode recreates the
     /// 3D render targets at the new resolution.

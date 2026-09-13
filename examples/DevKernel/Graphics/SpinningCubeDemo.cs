@@ -83,7 +83,7 @@ internal static class SpinningCubeDemo
             return;
         }
 
-        Log.Write("[Cube3D] Canvas " + canvas3D.Name + " " + canvas3D.Mode + ", accelerated: " + canvas3D.IsAccelerated + "\n");
+        Log.Write("[Cube3D] Canvas " + canvas3D.Name + " " + canvas3D.Mode + "\n");
 
         if (KernelFeatures.Mouse)
         {

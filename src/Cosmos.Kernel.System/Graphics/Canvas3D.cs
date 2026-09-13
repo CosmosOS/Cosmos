@@ -42,12 +42,6 @@ public abstract class Canvas3D : Canvas
     }
 
     /// <summary>
-    /// Whether rendering is performed by dedicated hardware rather than in
-    /// software.
-    /// </summary>
-    public abstract bool IsAccelerated { get; }
-
-    /// <summary>
     /// The camera every 3D draw call is seen through. The aspect ratio comes
     /// from the canvas <see cref="Canvas.Mode"/>.
     /// </summary>

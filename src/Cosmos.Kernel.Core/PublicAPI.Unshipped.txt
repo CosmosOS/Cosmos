@@ -38,8 +38,6 @@
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.CpuId.get -> uint
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.Flags.get -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.Id.get -> uint
-[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.InstructionPointer.get -> nuint
-[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.LastScheduledAt.get -> ulong
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.StackBase.get -> nuint
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.StackPointer.get -> nuint
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.StackSize.get -> nuint

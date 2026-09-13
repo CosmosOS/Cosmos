@@ -28,8 +28,9 @@ A [`SchedulerThread`](https://github.com/valentinbreiz/nativeaot-patcher/blob/ma
 | `State` | One of `Created`, `Ready`, `Running`, `Blocked`, `Sleeping`, `Dead` |
 | `Flags` | `IdleThread`, `Pinned`, `Managed`; bits 8 to 15 are reserved for schedulers |
 | `StackBase`, `StackSize`, `StackPointer` | The stack allocation and the saved stack pointer (see below) |
-| `InstructionPointer` | The entry point, staged into the initial context |
-| `LastScheduledAt`, `TotalRuntime`, `WakeupTime` | Accounting; `WakeupTime` is the sleep deadline in `Stopwatch` ticks |
+| `InstructionPointer` | The entry point, staged into the initial context. Manager bookkeeping, not on the seam |
+| `LastScheduledAt`, `WakeupTime` | Accounting kept by the manager, not on the seam; `WakeupTime` is the sleep deadline in `Stopwatch` ticks |
+| `TotalRuntime` | Accumulated CPU time, charged to the current thread by the active policy |
 | `AllocContext` | The thread's [TLAB](gc-concepts/tlab.md) (see [the GC article](garbage-collector.md#alloccontext-tlab)) |
 | `_threadStaticStorage` | The backing store for `[ThreadStatic]` fields, handed to CoreLib by ref |
 | `SchedulerData` | A single `object?` slot the active scheduler attaches its bookkeeping to (inherited from `SchedulerExtensible`) |
