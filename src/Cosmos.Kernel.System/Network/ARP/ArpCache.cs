@@ -20,7 +20,7 @@ internal static class ArpCache
     [MemberNotNull(nameof(Cache))]
     private static void EnsureCacheExists()
     {
-        Cache ??= new Dictionary<uint, MACAddress>();
+        Cache ??= [];
     }
 
     /// <summary>

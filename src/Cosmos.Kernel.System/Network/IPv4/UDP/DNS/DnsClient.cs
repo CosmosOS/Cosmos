@@ -149,7 +149,7 @@ public sealed class DnsClient : UdpClient
         }
 
         // Collect the A records for the final name.
-        List<Address> results = new();
+        List<Address> results = [];
         foreach (DnsAnswer record in answers)
         {
             if (record.Type == DnsRecordType.A &&

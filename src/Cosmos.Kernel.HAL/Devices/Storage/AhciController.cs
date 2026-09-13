@@ -148,7 +148,7 @@ internal unsafe class AhciController
     private ulong _abarPhys;
     private ulong _abarVirt;
     private GenericRegisters? _generic;
-    private readonly List<BlockDevice> _ports = new();
+    private readonly List<BlockDevice> _ports = [];
     private ulong _cmdRegionVirt;
     private ulong _cmdRegionPhys;
 

@@ -12,7 +12,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
     private const int ShortEntrySlotCount = 1;
 
     private readonly IBlockDevice _device;
-    private readonly Dictionary<uint, FatInode> _inodeCache = new();
+    private readonly Dictionary<uint, FatInode> _inodeCache = [];
 
     public FatBootSector Boot { get; }
     public FatTable Fat { get; }
@@ -371,7 +371,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
         // clusters are already zeroed above; only the partial cluster
         // holding the old EOF needs a read-modify-write, full pre-existing
         // clusters get the zero buffer written directly.
-        Span<byte> rmwBuffer = Span<byte>.Empty;
+        Span<byte> rmwBuffer = [];
         long pos = inode.Size;
         while (pos < newSize)
         {

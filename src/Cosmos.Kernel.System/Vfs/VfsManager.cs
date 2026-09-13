@@ -85,7 +85,7 @@ public static partial class VfsManager
     }
 
     private static readonly Dictionary<string, IVfsFilesystemType> s_registeredTypes = new(StringComparer.Ordinal);
-    private static readonly List<VfsMount> s_mounts = new();
+    private static readonly List<VfsMount> s_mounts = [];
     private static readonly string s_directorySeparatorString = Path.DirectorySeparatorChar.ToString();
 
     /// <summary>
@@ -372,7 +372,7 @@ public static partial class VfsManager
         }
 
         IVfsOpenFile openFile = new VfsOpenFile(leafName, inode, fileOperations);
-        VfsFileHandle handle = new VfsFileHandle(leafName, inode, openFile)
+        VfsFileHandle handle = new(leafName, inode, openFile)
         {
             OpenedPath = path,
             Tracked = true,

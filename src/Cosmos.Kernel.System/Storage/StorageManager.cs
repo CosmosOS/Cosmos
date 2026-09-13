@@ -89,7 +89,7 @@ public static class StorageManager
             return Array.Empty<Partition>();
         }
 
-        List<Partition> onDevice = new();
+        List<Partition> onDevice = [];
         for (int i = 0; i < s_partitions.Count; i++)
         {
             if (ReferenceEquals(s_partitions[i].Host, device))
@@ -114,7 +114,7 @@ public static class StorageManager
             return;
         }
 
-        s_partitions = new List<Partition>();
+        s_partitions = [];
         s_devices = new List<IBlockDevice>(MaxDevices);
     }
 

@@ -244,7 +244,7 @@ internal class PciManager
     {
         ThrowIfNotSetup();
 
-        List<PciDevice> matches = new();
+        List<PciDevice> matches = [];
         for (uint i = 0; i < Count; i++)
         {
             PciDevice xDevice = Devices[i];

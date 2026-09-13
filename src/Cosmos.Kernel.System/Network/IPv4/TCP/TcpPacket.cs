@@ -237,12 +237,14 @@ public class TcpPacket : IPPacket
 
         if (TcpHeaderLength > 20) //options
         {
-            Options = new List<TcpOption>();
+            Options = [];
 
             for (int i = 0; i < TcpDataLength; i++)
             {
-                TcpOption option = new();
-                option.Kind = RawData[DataOffset + 20 + i];
+                TcpOption option = new()
+                {
+                    Kind = RawData[DataOffset + 20 + i]
+                };
 
                 if (option.Kind != 1) //NOP
                 {

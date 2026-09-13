@@ -40,7 +40,7 @@ public class UdpClient : IDisposable
         return 0;
     }
 
-    private static readonly Dictionary<uint, UdpClient> s_clients = new();
+    private static readonly Dictionary<uint, UdpClient> s_clients = [];
     private readonly int _localPort;
     private int _destinationPort;
 

@@ -22,17 +22,17 @@ public static class SocketPlug
     private const int UdpPollTimeoutMs = 0;
 
     // Store protocol type per socket (public for cross-assembly access when patched)
-    public static readonly Dictionary<int, ProtocolType> _protocolTypes = new();
+    public static readonly Dictionary<int, ProtocolType> _protocolTypes = [];
     // Store TCP state machine per socket instance
-    internal static readonly Dictionary<int, Tcp> s_tcpStateMachines = new();
+    internal static readonly Dictionary<int, Tcp> s_tcpStateMachines = [];
     // Store UDP client per socket instance
-    public static readonly Dictionary<int, KernelUdpClient> _udpClients = new();
+    public static readonly Dictionary<int, KernelUdpClient> _udpClients = [];
     // Store bound endpoint per socket instance
-    public static readonly Dictionary<int, IPEndPoint> _endpoints = new();
+    public static readonly Dictionary<int, IPEndPoint> _endpoints = [];
     // Store local endpoint per socket instance
-    public static readonly Dictionary<int, IPEndPoint> _localEndPoints = new();
+    public static readonly Dictionary<int, IPEndPoint> _localEndPoints = [];
     // Store remote endpoint per socket instance
-    public static readonly Dictionary<int, IPEndPoint> _remoteEndPoints = new();
+    public static readonly Dictionary<int, IPEndPoint> _remoteEndPoints = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(Socket aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);

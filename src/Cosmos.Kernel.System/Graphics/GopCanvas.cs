@@ -182,21 +182,21 @@ internal class GopCanvas : Canvas
     /// </summary>
     public override IReadOnlyList<Mode> AvailableModes { get; } = new List<Mode>
     {
-        new Mode(320, 240, ColorDepth.ColorDepth32),
-        new Mode(640, 480, ColorDepth.ColorDepth32),
-        new Mode(800, 600, ColorDepth.ColorDepth32),
-        new Mode(1024, 768, ColorDepth.ColorDepth32),
+        new(320, 240, ColorDepth.ColorDepth32),
+        new(640, 480, ColorDepth.ColorDepth32),
+        new(800, 600, ColorDepth.ColorDepth32),
+        new(1024, 768, ColorDepth.ColorDepth32),
         /* The so called HD-Ready resolution */
-        new Mode(1280, 720, ColorDepth.ColorDepth32),
-        new Mode(1280, 768, ColorDepth.ColorDepth32),
-        new Mode(1280, 1024, ColorDepth.ColorDepth32),
+        new(1280, 720, ColorDepth.ColorDepth32),
+        new(1280, 768, ColorDepth.ColorDepth32),
+        new(1280, 1024, ColorDepth.ColorDepth32),
         /* A lot of HD-Ready screen uses this instead of 1280x720 */
-        new Mode(1366, 768, ColorDepth.ColorDepth32),
-        new Mode(1680, 1050, ColorDepth.ColorDepth32),
+        new(1366, 768, ColorDepth.ColorDepth32),
+        new(1680, 1050, ColorDepth.ColorDepth32),
         /* HDTV resolution */
-        new Mode(1920, 1080, ColorDepth.ColorDepth32),
+        new(1920, 1080, ColorDepth.ColorDepth32),
         /* HDTV resolution (16:10 AR) */
-        new Mode(1920, 1200, ColorDepth.ColorDepth32),
+        new(1920, 1200, ColorDepth.ColorDepth32),
     };
 
     public override Mode DefaultGraphicsMode => s_defaultMode;

@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 /// </summary>
 public sealed class IcmpClient : IDisposable
 {
-    private static readonly Dictionary<uint, IcmpClient> s_clients = new();
+    private static readonly Dictionary<uint, IcmpClient> s_clients = [];
 
     /// <summary>
     /// Destination address.

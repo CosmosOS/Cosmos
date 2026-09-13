@@ -96,7 +96,7 @@ public static class KeyboardManager
 
         s_queuedKeys = new Queue<KeyEvent>();
         s_scanMap = new USStandardLayout();
-        s_keyboards = new List<IKeyboardDevice>();
+        s_keyboards = [];
     }
 
     /// <summary>

@@ -161,7 +161,7 @@ internal unsafe class NvmeController
     // Unused once MSI-X is enabled.
     private readonly SchedMutex _polledIoMutex = new();
 
-    public List<NvmeNamespace> Namespaces { get; } = new();
+    public List<NvmeNamespace> Namespaces { get; } = [];
 
     /// <summary>
     /// True once I/O completions are delivered via MSI-X; false when the
@@ -262,8 +262,10 @@ internal unsafe class NvmeController
         _ioSlots = new IoSlot[IoQueueDepth - 1];
         for (int i = 0; i < _ioSlots.Length; i++)
         {
-            IoSlot slot = new();
-            slot.DmaBufferVirt = (ulong)PageAllocator.AllocPages(PageType.Unmanaged, 1, true);
+            IoSlot slot = new()
+            {
+                DmaBufferVirt = (ulong)PageAllocator.AllocPages(PageType.Unmanaged, 1, true)
+            };
             slot.DmaBufferPhys = PageAllocator.VirtualToPhysical(slot.DmaBufferVirt);
             _ioSlots[i] = slot;
         }

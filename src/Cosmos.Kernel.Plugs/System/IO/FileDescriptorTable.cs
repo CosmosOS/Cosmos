@@ -210,7 +210,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.EINVAL;
         }
 
-        ReadOnlySpan<byte> source = new ReadOnlySpan<byte>(buffer, count);
+        ReadOnlySpan<byte> source = new(buffer, count);
         int total = 0;
         while (total < count)
         {

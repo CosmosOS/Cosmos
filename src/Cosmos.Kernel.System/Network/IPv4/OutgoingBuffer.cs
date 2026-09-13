@@ -51,7 +51,7 @@ internal static class OutgoingBuffer
     /// <summary>
     /// The buffer s_queue. Initialized eagerly to avoid issues with interrupt context.
     /// </summary>
-    private static List<BufferEntry> s_queue = new();
+    private static List<BufferEntry> s_queue = [];
 
     /// <summary>
     /// Ensures the s_queue exists and is initialized.
@@ -59,7 +59,7 @@ internal static class OutgoingBuffer
     private static void EnsureQueueExists()
     {
         // Queue is now initialized at class load time, but keep this for safety
-        s_queue ??= new List<BufferEntry>();
+        s_queue ??= [];
     }
 
     /// <summary>

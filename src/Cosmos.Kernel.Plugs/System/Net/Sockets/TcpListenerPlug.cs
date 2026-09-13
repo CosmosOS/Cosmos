@@ -10,8 +10,8 @@ namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 public static class TcpListenerPlug
 {
     // Store listener state per instance
-    public static readonly Dictionary<int, Socket> _serverSockets = new();
-    public static readonly Dictionary<int, IPEndPoint> _serverSocketEPs = new();
+    public static readonly Dictionary<int, Socket> _serverSockets = [];
+    public static readonly Dictionary<int, IPEndPoint> _serverSocketEPs = [];
 
     // Use object memory address as unique ID
     public static unsafe int GetId(TcpListener aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
@@ -64,7 +64,7 @@ public static class TcpListenerPlug
     public static EndPoint? get_LocalEndpoint(TcpListener aThis)
     {
         int id = GetId(aThis);
-        if (_serverSockets.TryGetValue(id, out var socket) && socket.LocalEndPoint is not null)
+        if (_serverSockets.TryGetValue(id, out Socket? socket) && socket.LocalEndPoint is not null)
         {
             return socket.LocalEndPoint;
         }

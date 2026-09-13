@@ -223,7 +223,7 @@ internal sealed class FatTable
     /// </summary>
     public List<uint> GetChain(uint firstCluster)
     {
-        List<uint> chain = new();
+        List<uint> chain = [];
         uint current = firstCluster;
         uint guard = _boot.ClusterCount + FirstDataCluster;
 
@@ -491,7 +491,7 @@ internal sealed class FatTable
 
         Span<byte> buffer = LoadFatSector(sectorNumber);
 
-        Span<byte> next = Span<byte>.Empty;
+        Span<byte> next = [];
         if (spans)
         {
             next = _fatSpill;

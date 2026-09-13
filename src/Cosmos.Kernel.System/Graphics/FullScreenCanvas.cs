@@ -53,7 +53,7 @@ internal static class FullScreenCanvas
             PciDevice? svgaDevice = PciManager.GetDevice(VendorId.VmWare, DeviceId.SvgaiiAdapter);
             if (svgaDevice is not null)
             {
-                SvgaIIDriver driver = new SvgaIIDriver(svgaDevice);
+                SvgaIIDriver driver = new(svgaDevice);
                 Mode svgaMode = mode ?? SvgaIIRender.DefaultMode;
 
                 return driver.Is3DEnabled

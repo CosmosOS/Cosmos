@@ -17,7 +17,7 @@ public sealed class Png : Image
     /// <param name="path">Path to the PNG file.</param>
     public Png(string path) : base(0, 0, ColorDepth.ColorDepth32)
     {
-        using FileStream stream = new FileStream(path, FileMode.Open);
+        using FileStream stream = new(path, FileMode.Open);
         Create(stream);
     }
 
@@ -27,7 +27,7 @@ public sealed class Png : Image
     /// <param name="imageData">The bytes of the PNG file.</param>
     public Png(byte[] imageData) : base(0, 0, ColorDepth.ColorDepth32)
     {
-        using MemoryStream stream = new MemoryStream(imageData);
+        using MemoryStream stream = new(imageData);
         Create(stream);
     }
 

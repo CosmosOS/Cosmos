@@ -110,7 +110,7 @@ internal static class EfiRtc
 
     private static long DateToTicks(int year, int month, int day)
     {
-        int[] daysInMonth = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        int[] daysInMonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         int y = year - 1;
         long days = y * 365L + y / 4 - y / 100 + y / 400;
         for (int m = 1; m < month; m++)

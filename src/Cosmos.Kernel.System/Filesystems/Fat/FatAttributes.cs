@@ -128,7 +128,7 @@ internal static class FatAttributes
     private const int LeapQuadCenturyInterval = 400;
 
     /// <summary>Days per month (non-leap); compiler-emitted static data, no per-call allocation.</summary>
-    private static ReadOnlySpan<byte> DaysInMonth => new byte[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    private static ReadOnlySpan<byte> DaysInMonth => [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
     public static VfsTimespec UnpackDateTime(ushort fatDate, ushort fatTime, byte tenths)
     {

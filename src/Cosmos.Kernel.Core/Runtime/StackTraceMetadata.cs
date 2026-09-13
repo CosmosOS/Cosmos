@@ -135,7 +135,7 @@ namespace Cosmos.Kernel.Core.Runtime
                 else
                 {
                     // No stack trace metadata available
-                    _stacktraceDatas = Array.Empty<StackTraceData>();
+                    _stacktraceDatas = [];
                     Reader = null;
                 }
             }

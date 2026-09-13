@@ -22,7 +22,7 @@ public static partial class VfsManager
 
     /// <summary>Handles produced by <see cref="TryOpenFile"/>; consulted so unlinking
     /// an open file can defer to the last close.</summary>
-    private static readonly List<VfsFileHandle> s_openFileHandles = new();
+    private static readonly List<VfsFileHandle> s_openFileHandles = [];
 
     private static string s_currentDirectory = "/";
 

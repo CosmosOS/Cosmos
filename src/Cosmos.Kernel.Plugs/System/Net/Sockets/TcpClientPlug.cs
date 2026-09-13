@@ -9,8 +9,8 @@ namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 public static class TcpClientPlug
 {
     // Store client socket and data stream per instance
-    public static readonly Dictionary<int, Socket> _clientSockets = new();
-    public static readonly Dictionary<int, NetworkStream> _dataStreams = new();
+    public static readonly Dictionary<int, Socket> _clientSockets = [];
+    public static readonly Dictionary<int, NetworkStream> _dataStreams = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(TcpClient aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);

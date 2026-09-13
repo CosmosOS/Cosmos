@@ -65,7 +65,7 @@ internal sealed class FatInode : IVfsInode
             return CachedChain;
         }
 
-        List<uint> chain = FirstCluster >= FatTable.FirstDataCluster ? Superblock.Fat.GetChain(FirstCluster) : new List<uint>();
+        List<uint> chain = FirstCluster >= FatTable.FirstDataCluster ? Superblock.Fat.GetChain(FirstCluster) : [];
         CachedChain = chain;
         return chain;
     }

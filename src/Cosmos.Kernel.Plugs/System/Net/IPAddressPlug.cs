@@ -14,7 +14,7 @@ public static class IPAddressPlug
     public const int IPv6AddressBytes = 16;
 
     // Store address data per instance (public for cross-assembly access when patched)
-    public static readonly Dictionary<int, uint> _addresses = new();
+    public static readonly Dictionary<int, uint> _addresses = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(IPAddress aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
@@ -69,13 +69,13 @@ public static class IPAddressPlug
     {
         int id = GetId(aThis);
         uint addr = _addresses.TryGetValue(id, out uint a) ? a : 0;
-        return new byte[]
-        {
+        return
+        [
             (byte)(addr & 0xFF),
             (byte)((addr >> 8) & 0xFF),
             (byte)((addr >> 16) & 0xFF),
             (byte)((addr >> 24) & 0xFF)
-        };
+        ];
     }
 
     [PlugMember]
@@ -107,14 +107,14 @@ public static class IPAddressPlug
         {
             char d1 = (char)('0' + value / 10);
             char d0 = (char)('0' + value % 10);
-            return new string(new[] { d1, d0 });
+            return new string([d1, d0]);
         }
         else
         {
             char d2 = (char)('0' + value / 100);
             char d1 = (char)('0' + (value / 10) % 10);
             char d0 = (char)('0' + value % 10);
-            return new string(new[] { d2, d1, d0 });
+            return new string([d2, d1, d0]);
         }
     }
 
@@ -126,11 +126,13 @@ public static class IPAddressPlug
         {
             try
             {
-                byte[] addressArray = new byte[4];
-                addressArray[0] = byte.Parse(fragments[0]);
-                addressArray[1] = byte.Parse(fragments[1]);
-                addressArray[2] = byte.Parse(fragments[2]);
-                addressArray[3] = byte.Parse(fragments[3]);
+                byte[] addressArray =
+                [
+                    byte.Parse(fragments[0]),
+                    byte.Parse(fragments[1]),
+                    byte.Parse(fragments[2]),
+                    byte.Parse(fragments[3]),
+                ];
                 return new IPAddress(addressArray);
             }
             catch
@@ -158,19 +160,19 @@ public static class IPAddressPlug
     [PlugMember("get_Loopback")]
     public static IPAddress get_Loopback()
     {
-        return new IPAddress(new byte[] { 127, 0, 0, 1 });
+        return new IPAddress([127, 0, 0, 1]);
     }
 
     [PlugMember("get_Broadcast")]
     public static IPAddress get_Broadcast()
     {
-        return new IPAddress(new byte[] { 255, 255, 255, 255 });
+        return new IPAddress([255, 255, 255, 255]);
     }
 
     [PlugMember("get_None")]
     public static IPAddress get_None()
     {
-        return new IPAddress(new byte[] { 255, 255, 255, 255 });
+        return new IPAddress([255, 255, 255, 255]);
     }
 
     // Helper to get raw address value (public for cross-assembly access)

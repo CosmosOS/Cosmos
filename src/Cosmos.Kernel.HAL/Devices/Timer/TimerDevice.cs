@@ -14,7 +14,7 @@ internal abstract class TimerDevice : Device, ITimerDevice
     /// <summary>Nanoseconds in one millisecond.</summary>
     protected const ulong NanosecondsPerMillisecond = 1_000_000;
 
-    private readonly List<SoftwareTimer> _timers = new();
+    private readonly List<SoftwareTimer> _timers = [];
 
     /// <summary>
     /// Timers found due by the current <see cref="HandleTick"/>, so their

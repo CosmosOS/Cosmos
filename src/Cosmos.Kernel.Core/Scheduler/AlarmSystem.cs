@@ -39,7 +39,7 @@ internal static class AlarmSystem
     /// <summary>Wait used when no alarm is pending. Add signals the alarm thread early, so this is only a heartbeat.</summary>
     private const uint IdleWaitMs = 1000;
 
-    private static readonly List<Alarm> s_alarms = new();
+    private static readonly List<Alarm> s_alarms = [];
     private static readonly Mutex s_mutex = new();
     private static readonly ConditionVariable s_alarmsChanged = new();
     private static SysThread? s_thread;

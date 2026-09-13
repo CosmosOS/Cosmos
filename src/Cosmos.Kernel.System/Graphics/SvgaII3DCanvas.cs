@@ -534,7 +534,7 @@ internal sealed class SvgaII3DCanvas : Canvas3D
             Array.Copy(pixels, data, data.Length);
         }
 
-        Bitmap bitmap = new Bitmap(width, height, ColorDepth.ColorDepth32)
+        Bitmap bitmap = new(width, height, ColorDepth.ColorDepth32)
         {
             RawData = data,
         };

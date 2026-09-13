@@ -43,8 +43,8 @@ internal static class Ahci
 
         Serial.WriteString("[AHCI] Looking for AHCI controllers...\n");
 
-        s_controllers = new List<AhciController>();
-        s_ports = new List<BlockDevice>();
+        s_controllers = [];
+        s_ports = [];
 
         List<PciDevice> devices = PciManager.GetAllDevicesClass(
             ClassId.MassStorageController, SubclassId.SataController);

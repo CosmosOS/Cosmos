@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.System.Network.Config;
 /// </summary>
 public static class DnsConfig
 {
-    private static readonly List<Address> s_nameservers = new();
+    private static readonly List<Address> s_nameservers = [];
 
     /// <summary>
     /// The list of known DNS nameserver addresses. Use <see cref="Add"/> and

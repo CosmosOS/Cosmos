@@ -120,7 +120,7 @@ public static class MouseManager
 
         X = ScreenWidth / 2;
         Y = ScreenHeight / 2;
-        s_mice = new List<IMouseDevice>();
+        s_mice = [];
     }
 
     /// <summary>

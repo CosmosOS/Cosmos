@@ -206,7 +206,7 @@ public static class Gpt
     /// </summary>
     public static List<GptPartitionEntry> Parse(IBlockDevice device)
     {
-        List<GptPartitionEntry> partitions = new();
+        List<GptPartitionEntry> partitions = [];
         if (!TryReadEntryArrayLayout(device, out EntryArrayLayout layout))
         {
             return partitions;

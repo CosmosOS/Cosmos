@@ -35,7 +35,7 @@ public unsafe class Canvas
     /// The graphics modes this canvas accepts, in the order the driver reports
     /// them. <see cref="Mode"/> only accepts a mode from this list.
     /// </summary>
-    public virtual IReadOnlyList<Mode> AvailableModes => _availableModes ??= new Mode[] { Mode };
+    public virtual IReadOnlyList<Mode> AvailableModes => _availableModes ??= [Mode];
 
     /// <summary>
     /// The default graphics mode.
@@ -977,7 +977,7 @@ public unsafe class Canvas
     /// <returns>A new <see cref="Bitmap"/> containing the copied region.</returns>
     public virtual Bitmap GetImage(int x, int y, int width, int height)
     {
-        Bitmap bitmap = new Bitmap(width, height, ColorDepth.ColorDepth32);
+        Bitmap bitmap = new(width, height, ColorDepth.ColorDepth32);
 
         for (int posy = 0; posy < height; posy++)
         {

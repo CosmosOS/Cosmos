@@ -11,8 +11,8 @@ namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 public static class UdpClientPlug
 {
     // Store client socket per instance
-    public static readonly Dictionary<int, Socket> _clientSockets = new();
-    public static readonly Dictionary<int, bool> _active = new();
+    public static readonly Dictionary<int, Socket> _clientSockets = [];
+    public static readonly Dictionary<int, bool> _active = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(UdpClient aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);

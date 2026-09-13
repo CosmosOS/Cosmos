@@ -45,7 +45,7 @@ public static class Ebr
     /// </summary>
     public static List<MbrPartitionEntry> Parse(IBlockDevice device, ulong extendedStartSector)
     {
-        List<MbrPartitionEntry> logicals = new();
+        List<MbrPartitionEntry> logicals = [];
         if (device is null)
         {
             return logicals;
@@ -334,7 +334,7 @@ public static class Ebr
 
     private static List<ChainNode> WalkChain(IBlockDevice device, ulong extendedStartSector)
     {
-        List<ChainNode> nodes = new();
+        List<ChainNode> nodes = [];
         if (device is null)
         {
             return nodes;

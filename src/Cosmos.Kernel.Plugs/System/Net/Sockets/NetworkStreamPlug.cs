@@ -9,10 +9,10 @@ namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 public static class NetworkStreamPlug
 {
     // Store stream state per instance
-    public static readonly Dictionary<int, Socket> _streamSockets = new();
-    public static readonly Dictionary<int, bool> _ownsSocket = new();
-    public static readonly Dictionary<int, bool> _readable = new();
-    public static readonly Dictionary<int, bool> _writeable = new();
+    public static readonly Dictionary<int, Socket> _streamSockets = [];
+    public static readonly Dictionary<int, bool> _ownsSocket = [];
+    public static readonly Dictionary<int, bool> _readable = [];
+    public static readonly Dictionary<int, bool> _writeable = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(NetworkStream aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
@@ -181,7 +181,7 @@ public static class NetworkStreamPlug
     [PlugMember]
     public static void WriteByte(NetworkStream aThis, byte value)
     {
-        Write(aThis, new byte[] { value }, 0, 1);
+        Write(aThis, [value], 0, 1);
     }
 
     [PlugMember]

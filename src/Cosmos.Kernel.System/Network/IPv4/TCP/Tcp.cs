@@ -198,7 +198,7 @@ internal class Tcp : IDisposable
     /// <summary>
     /// A list of currently active connections.
     /// </summary>
-    private static List<Tcp> Connections { get; } = new();
+    private static List<Tcp> Connections { get; } = [];
 
     /// <summary>
     /// String / enum correspondance (used for debugging)

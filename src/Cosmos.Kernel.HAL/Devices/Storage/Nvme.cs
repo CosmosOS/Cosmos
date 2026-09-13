@@ -43,8 +43,8 @@ internal static class Nvme
 
         Serial.WriteString("[NVMe] Looking for NVMe controllers...\n");
 
-        s_controllers = new List<NvmeController>();
-        s_namespaces = new List<NvmeNamespace>();
+        s_controllers = [];
+        s_namespaces = [];
 
         List<PciDevice> devices = PciManager.GetAllDevicesClass(ClassId.MassStorageController, SubclassId.NvmController);
         if (devices.Count == 0)
