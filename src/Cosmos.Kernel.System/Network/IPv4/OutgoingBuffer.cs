@@ -22,10 +22,10 @@ internal static class OutgoingBuffer
             DHCP_REQUEST
         };
 
-        public INetworkDevice NIC;
-        public IPPacket Packet;
-        public EntryStatus Status;
-        public Address? NextHop;
+        public INetworkDevice NIC { get; }
+        public IPPacket Packet { get; }
+        public EntryStatus Status { get; set; }
+        public Address? NextHop { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BufferEntry"/> class.
@@ -34,16 +34,16 @@ internal static class OutgoingBuffer
         /// <param name="packet">The IP packet.</param>
         public BufferEntry(INetworkDevice nic, IPPacket packet)
         {
-            this.NIC = nic;
-            this.Packet = packet;
+            NIC = nic;
+            Packet = packet;
 
             if (Packet.DestinationIP.IsBroadcastAddress())
             {
-                this.Status = EntryStatus.DHCP_REQUEST;
+                Status = EntryStatus.DHCP_REQUEST;
             }
             else
             {
-                this.Status = EntryStatus.ADDED;
+                Status = EntryStatus.ADDED;
             }
         }
     }

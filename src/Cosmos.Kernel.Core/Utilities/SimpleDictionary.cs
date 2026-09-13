@@ -4,7 +4,6 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
 {
     private const int InitialCapacity = 16;
     private Entry[] _buckets;
-    private int _count;
 
     public SimpleDictionary() : this(InitialCapacity) { }
     public SimpleDictionary(int capacity)
@@ -13,7 +12,7 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
     }
 
 
-    public int Count => _count;
+    public int Count { get; private set; }
 
     public TValue this[TKey key]
     {
@@ -63,10 +62,10 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
             }
         }
 
-        _count++;
+        Count++;
 
         // Resize if needed
-        if (_count > _buckets.Length * 0.75)
+        if (Count > _buckets.Length * 0.75)
         {
             Resize();
         }
@@ -103,7 +102,7 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
     {
         var oldBuckets = _buckets;
         _buckets = new Entry[_buckets.Length * 2];
-        _count = 0;
+        Count = 0;
 
         foreach (var entry in oldBuckets)
         {
@@ -158,7 +157,7 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
                     previous.Next = current.Next;
                 }
 
-                _count--;
+                Count--;
                 return true;
             }
 

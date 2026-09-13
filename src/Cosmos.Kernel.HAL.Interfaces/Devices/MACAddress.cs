@@ -5,38 +5,21 @@ namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 /// </summary>
 public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
 {
+    // Filled on first read, not by initializers: an initializer would give this type a
+    // class constructor, and VirtioNet reads None while devices come up, before the
+    // scheduler has a current thread for the class-constructor lock to use.
     private static MACAddress? s_broadcast;
     private static MACAddress? s_none;
 
     /// <summary>
     /// The broadcast address (FF:FF:FF:FF:FF:FF).
     /// </summary>
-    public static MACAddress Broadcast
-    {
-        get
-        {
-            if (s_broadcast is null)
-            {
-                s_broadcast = new MACAddress([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
-            }
-            return s_broadcast;
-        }
-    }
+    public static MACAddress Broadcast => s_broadcast ??= new([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
 
     /// <summary>
     /// The all-zero address (00:00:00:00:00:00), used when no address is assigned.
     /// </summary>
-    public static MACAddress None
-    {
-        get
-        {
-            if (s_none is null)
-            {
-                s_none = new MACAddress([0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
-            }
-            return s_none;
-        }
-    }
+    public static MACAddress None => s_none ??= new([0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
 
     /// <summary>
     /// The six address bytes, most significant first. Internal because the
@@ -189,7 +172,6 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
         return (uint)value ^ (uint)(value >> 32);
     }
 
-    private uint _hash;
     /// <summary>
     /// Hash value for this mac. Used to uniquely identify each mac
     /// </summary>
@@ -197,12 +179,12 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     {
         get
         {
-            if (_hash == 0)
+            if (field == 0)
             {
-                _hash = To32BitNumber();
+                field = To32BitNumber();
             }
 
-            return _hash;
+            return field;
         }
     }
 

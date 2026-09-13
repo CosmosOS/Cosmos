@@ -40,7 +40,7 @@ internal static class InternalCpu
     public ref struct InterruptScope
     {
         private bool _disposed;
-        private ulong _savedFlags;
+        private readonly ulong _savedFlags;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public InterruptScope()

@@ -29,9 +29,9 @@ internal class PciManager
     /// <summary>PCI subclass 0x04 - PCI-to-PCI bridge.</summary>
     private const int PciToPciBridgeSubclass = 0x4;
 
-    public static PciDevice[]? Devices;
+    public static PciDevice[]? Devices { get; private set; }
 
-    public static uint Count = 0;
+    public static uint Count { get; private set; }
 
     public static void Setup()
     {

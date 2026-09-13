@@ -370,8 +370,7 @@ internal static unsafe partial class GarbageCollector
     /// </summary>
     public static ulong GetGCSegmentSizeBytes()
     {
-        // s_maxSegmentSize is a uint containing the configured segment size.
-        return s_maxSegmentSize;
+        return MaxSegmentSize;
     }
 
     /// <summary>
