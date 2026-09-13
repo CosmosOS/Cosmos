@@ -16,22 +16,22 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// <summary>
     /// The sender MAC address.
     /// </summary>
-    private protected MACAddress senderMac = null!;
+    private protected MACAddress _senderMac = null!;
 
     /// <summary>
     /// The target MAC address.
     /// </summary>
-    private protected MACAddress targetMac = null!;
+    private protected MACAddress _targetMac = null!;
 
     /// <summary>
     /// The sender IP address.
     /// </summary>
-    private protected Address senderIP = null!;
+    private protected Address _senderIP = null!;
 
     /// <summary>
     /// The target IP address.
     /// </summary>
-    private protected Address targetIP = null!;
+    private protected Address _targetIP = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArpPacketEthernet"/> class from a received
@@ -52,10 +52,10 @@ public abstract class ArpPacketEthernet : ArpPacket
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        senderMac = new MACAddress(RawData, 22);
-        senderIP = new Address(RawData, 28);
-        targetMac = new MACAddress(RawData, 32);
-        targetIP = new Address(RawData, 38);
+        _senderMac = new MACAddress(RawData, 22);
+        _senderIP = new Address(RawData, 28);
+        _targetMac = new MACAddress(RawData, 32);
+        _targetIP = new Address(RawData, 38);
     }
 
     /// <summary>
@@ -96,25 +96,25 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// Gets the sender hardware address (SHA). This is a snapshot parsed from
     /// <see cref="EthernetPacket.RawData"/> at construction.
     /// </summary>
-    public MACAddress SenderMac => senderMac;
+    public MACAddress SenderMac => _senderMac;
 
     /// <summary>
     /// Gets the target hardware address (THA), read from the ARP body, not from the Ethernet
     /// header. This is a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction.
     /// </summary>
-    public MACAddress TargetMac => targetMac;
+    public MACAddress TargetMac => _targetMac;
 
     /// <summary>
     /// Gets the sender protocol address (SPA). This is a snapshot parsed from
     /// <see cref="EthernetPacket.RawData"/> at construction.
     /// </summary>
-    public Address SenderIP => senderIP;
+    public Address SenderIP => _senderIP;
 
     /// <summary>
     /// Gets the target protocol address (TPA). This is a snapshot parsed from
     /// <see cref="EthernetPacket.RawData"/> at construction.
     /// </summary>
-    public Address TargetIP => targetIP;
+    public Address TargetIP => _targetIP;
 
     /// <summary>
     /// Returns a string listing the sender and target MAC addresses, sender and target IP
@@ -123,8 +123,8 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// <returns>A string representation of the packet.</returns>
     public override string ToString()
     {
-        return "IPv4 Ethernet ARP Packet SenderMac=" + senderMac + ", TargetMac=" + targetMac + ", SenderIP=" + senderIP +
-            ", TargetIP=" + targetIP + ", Operation=" + opCode;
+        return "IPv4 Ethernet ARP Packet SenderMac=" + _senderMac + ", TargetMac=" + _targetMac + ", SenderIP=" + _senderIP +
+            ", TargetIP=" + _targetIP + ", Operation=" + _opCode;
     }
 }
 
@@ -170,7 +170,7 @@ public class ArpReplyEthernet : ArpPacketEthernet
     /// <returns>A string representation of the packet.</returns>
     public override string ToString()
     {
-        return "ARP Reply Src=" + srcMAC + ", Dest=" + destMAC + ", Sender=" + senderIP + ", Target=" + targetIP;
+        return "ARP Reply Src=" + _srcMAC + ", Dest=" + _destMAC + ", Sender=" + _senderIP + ", Target=" + _targetIP;
     }
 }
 
@@ -219,6 +219,6 @@ public class ArpRequestEthernet : ArpPacketEthernet
     /// <returns>A string representation of the packet.</returns>
     public override string ToString()
     {
-        return "ARP Request Src=" + srcMAC + ", Dest=" + destMAC + ", Sender=" + senderIP + ", Target=" + targetIP;
+        return "ARP Request Src=" + _srcMAC + ", Dest=" + _destMAC + ", Sender=" + _senderIP + ", Target=" + _targetIP;
     }
 }

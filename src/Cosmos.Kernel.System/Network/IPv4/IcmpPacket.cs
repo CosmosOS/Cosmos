@@ -16,13 +16,13 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 public class IcmpPacket : IPPacket
 {
     /// <summary>Parsed ICMP type backing <see cref="IcmpType"/>.</summary>
-    private protected byte icmpType;
+    private protected byte _icmpType;
 
     /// <summary>Parsed ICMP code backing <see cref="IcmpCode"/>.</summary>
-    private protected byte icmpCode;
+    private protected byte _icmpCode;
 
     /// <summary>Parsed or computed ICMP checksum backing <see cref="IcmpCrc"/>.</summary>
-    private protected ushort icmpCRC;
+    private protected ushort _icmpCRC;
 
     private static int s_echoRequestsReplied;
     private static byte[]? s_lastEchoRequestData;
@@ -92,9 +92,9 @@ public class IcmpPacket : IPPacket
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        icmpType = RawData[DataOffset];
-        icmpCode = RawData[DataOffset + 1];
-        icmpCRC = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
+        _icmpType = RawData[DataOffset];
+        _icmpCode = RawData[DataOffset + 1];
+        _icmpCRC = (ushort)((RawData[DataOffset + 2] << 8) | RawData[DataOffset + 3]);
     }
 
     /// <summary>
@@ -123,10 +123,10 @@ public class IcmpPacket : IPPacket
         RawData[DataOffset + 6] = (byte)((seq >> 8) & 0xFF);
         RawData[DataOffset + 7] = (byte)((seq >> 0) & 0xFF);
 
-        icmpCRC = CalcIcmpCrc(icmpLength);
+        _icmpCRC = CalcIcmpCrc(icmpLength);
 
-        RawData[DataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
-        RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
+        RawData[DataOffset + 2] = (byte)((_icmpCRC >> 8) & 0xFF);
+        RawData[DataOffset + 3] = (byte)((_icmpCRC >> 0) & 0xFF);
         InitializeFields();
     }
 
@@ -146,18 +146,18 @@ public class IcmpPacket : IPPacket
     /// <summary>
     /// The ICMP packet type, a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction time.
     /// </summary>
-    public byte IcmpType => icmpType;
+    public byte IcmpType => _icmpType;
 
     /// <summary>
     /// The ICMP packet code, a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction time.
     /// </summary>
-    public byte IcmpCode => icmpCode;
+    public byte IcmpCode => _icmpCode;
 
     /// <summary>
     /// The ICMP checksum, a snapshot taken at construction time. It is
     /// computed in the constructors and never recomputed afterward.
     /// </summary>
-    public ushort IcmpCrc => icmpCRC;
+    public ushort IcmpCrc => _icmpCRC;
 
     /// <summary>
     /// The length in bytes of the ICMP payload: the IP payload length minus
@@ -188,7 +188,7 @@ public class IcmpPacket : IPPacket
     /// <returns>The description string.</returns>
     public override string ToString()
     {
-        return "ICMP Packet Src=" + SourceIP + ", Dest=" + DestinationIP + ", Type=" + icmpType + ", Code=" + icmpCode;
+        return "ICMP Packet Src=" + SourceIP + ", Dest=" + DestinationIP + ", Type=" + _icmpType + ", Code=" + _icmpCode;
     }
 }
 
@@ -204,10 +204,10 @@ public class IcmpPacket : IPPacket
 public class IcmpEchoRequest : IcmpPacket
 {
     /// <summary>Parsed ICMP identifier backing <see cref="IcmpId"/>.</summary>
-    private protected ushort icmpID;
+    private protected ushort _icmpID;
 
     /// <summary>Parsed ICMP sequence number backing <see cref="IcmpSequence"/>.</summary>
-    private protected ushort icmpSequence;
+    private protected ushort _icmpSequence;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IcmpEchoRequest"/> class
@@ -241,9 +241,9 @@ public class IcmpEchoRequest : IcmpPacket
 
         RawData[DataOffset + 2] = 0x00;
         RawData[DataOffset + 3] = 0x00;
-        icmpCRC = CalcIcmpCrc((ushort)(IcmpDataLength + 8));
-        RawData[DataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
-        RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
+        _icmpCRC = CalcIcmpCrc((ushort)(IcmpDataLength + 8));
+        RawData[DataOffset + 2] = (byte)((_icmpCRC >> 8) & 0xFF);
+        RawData[DataOffset + 3] = (byte)((_icmpCRC >> 0) & 0xFF);
     }
 
     /// <summary>
@@ -253,19 +253,19 @@ public class IcmpEchoRequest : IcmpPacket
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
-        icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
+        _icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
+        _icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
     }
 
     /// <summary>
     /// The ICMP echo identifier, a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction time.
     /// </summary>
-    public ushort IcmpId => icmpID;
+    public ushort IcmpId => _icmpID;
 
     /// <summary>
     /// The ICMP echo sequence number, a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction time.
     /// </summary>
-    public ushort IcmpSequence => icmpSequence;
+    public ushort IcmpSequence => _icmpSequence;
 
     /// <summary>
     /// Returns a string describing the request's source, destination, identifier, and sequence number.
@@ -273,7 +273,7 @@ public class IcmpEchoRequest : IcmpPacket
     /// <returns>The description string.</returns>
     public override string ToString()
     {
-        return "ICMP Echo Request Src=" + SourceIP + ", Dest=" + DestinationIP + ", ID=" + icmpID + ", Sequence=" + icmpSequence;
+        return "ICMP Echo Request Src=" + SourceIP + ", Dest=" + DestinationIP + ", ID=" + _icmpID + ", Sequence=" + _icmpSequence;
     }
 }
 
@@ -289,10 +289,10 @@ public class IcmpEchoRequest : IcmpPacket
 public class IcmpEchoReply : IcmpPacket
 {
     /// <summary>Parsed ICMP identifier backing <see cref="IcmpId"/>.</summary>
-    private protected ushort icmpID;
+    private protected ushort _icmpID;
 
     /// <summary>Parsed ICMP sequence number backing <see cref="IcmpSequence"/>.</summary>
-    private protected ushort icmpSequence;
+    private protected ushort _icmpSequence;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IcmpEchoReply"/> class
@@ -324,9 +324,9 @@ public class IcmpEchoReply : IcmpPacket
 
         RawData[DataOffset + 2] = 0x00;
         RawData[DataOffset + 3] = 0x00;
-        icmpCRC = CalcIcmpCrc((ushort)(IcmpDataLength + 8));
-        RawData[DataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
-        RawData[DataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
+        _icmpCRC = CalcIcmpCrc((ushort)(IcmpDataLength + 8));
+        RawData[DataOffset + 2] = (byte)((_icmpCRC >> 8) & 0xFF);
+        RawData[DataOffset + 3] = (byte)((_icmpCRC >> 0) & 0xFF);
     }
 
     /// <summary>
@@ -336,19 +336,19 @@ public class IcmpEchoReply : IcmpPacket
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
-        icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
+        _icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
+        _icmpSequence = (ushort)((RawData[DataOffset + 6] << 8) | RawData[DataOffset + 7]);
     }
 
     /// <summary>
     /// The ICMP echo identifier, a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction time.
     /// </summary>
-    public ushort IcmpId => icmpID;
+    public ushort IcmpId => _icmpID;
 
     /// <summary>
     /// The ICMP echo sequence number, a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction time.
     /// </summary>
-    public ushort IcmpSequence => icmpSequence;
+    public ushort IcmpSequence => _icmpSequence;
 
     /// <summary>
     /// Returns a string describing the reply's source, destination, identifier, and sequence number.
@@ -356,6 +356,6 @@ public class IcmpEchoReply : IcmpPacket
     /// <returns>The description string.</returns>
     public override string ToString()
     {
-        return "ICMP Echo Reply Src=" + SourceIP + ", Dest=" + DestinationIP + ", ID=" + icmpID + ", Sequence=" + icmpSequence;
+        return "ICMP Echo Reply Src=" + SourceIP + ", Dest=" + DestinationIP + ", ID=" + _icmpID + ", Sequence=" + _icmpSequence;
     }
 }

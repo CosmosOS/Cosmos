@@ -20,7 +20,7 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 public class IPPacket : EthernetPacket
 {
     /// <summary>Header length in 32-bit words, as parsed from the IHL field.</summary>
-    private protected byte ipHeaderLength;
+    private protected byte _ipHeaderLength;
     private static ushort s_nextFragmentID;
 
     /// <summary>
@@ -92,7 +92,7 @@ public class IPPacket : EthernetPacket
     {
         base.InitializeFields();
         IPVersion = (byte)((RawData[14] & 0xF0) >> 4);
-        ipHeaderLength = (byte)(RawData[14] & 0x0F);
+        _ipHeaderLength = (byte)(RawData[14] & 0x0F);
         TypeOfService = RawData[15];
         IPLength = (ushort)((RawData[16] << 8) | RawData[17]);
         FragmentID = (ushort)((RawData[18] << 8) | RawData[19]);
@@ -169,7 +169,7 @@ public class IPPacket : EthernetPacket
         RawData[14] = 0x45;
         RawData[15] = 0;
         IPLength = (ushort)(dataLength + 20);
-        ipHeaderLength = 5;
+        _ipHeaderLength = 5;
 
         RawData[16] = (byte)((IPLength >> 8) & 0xFF);
         RawData[17] = (byte)((IPLength >> 0) & 0xFF);
@@ -259,7 +259,7 @@ public class IPPacket : EthernetPacket
     /// <summary>
     /// Gets the length of the IP header, in bytes.
     /// </summary>
-    public ushort HeaderLength => (ushort)(ipHeaderLength * 4);
+    public ushort HeaderLength => (ushort)(_ipHeaderLength * 4);
 
     /// <summary>
     /// Gets the type of service.

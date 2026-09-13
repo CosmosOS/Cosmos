@@ -16,10 +16,10 @@ namespace Cosmos.Kernel.System.Network;
 public class EthernetPacket
 {
     /// <summary>Parsed source MAC address backing <see cref="SourceMac"/>.</summary>
-    private protected MACAddress srcMAC = null!;
+    private protected MACAddress _srcMAC = null!;
 
     /// <summary>Parsed destination MAC address backing <see cref="DestinationMac"/>.</summary>
-    private protected MACAddress destMAC = null!;
+    private protected MACAddress _destMAC = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EthernetPacket"/> class
@@ -42,8 +42,8 @@ public class EthernetPacket
     /// </summary>
     private protected virtual void InitializeFields()
     {
-        destMAC = new MACAddress(RawData, 0);
-        srcMAC = new MACAddress(RawData, 6);
+        _destMAC = new MACAddress(RawData, 0);
+        _srcMAC = new MACAddress(RawData, 6);
         EthernetType = (ushort)((RawData[12] << 8) | RawData[13]);
     }
 
@@ -93,7 +93,7 @@ public class EthernetPacket
     /// </summary>
     public MACAddress SourceMac
     {
-        get => srcMAC;
+        get => _srcMAC;
         internal set
         {
             for (int i = 0; i < 6; i++)
@@ -111,7 +111,7 @@ public class EthernetPacket
     /// </summary>
     public MACAddress DestinationMac
     {
-        get => destMAC;
+        get => _destMAC;
         internal set
         {
             for (int i = 0; i < 6; i++)
@@ -131,6 +131,6 @@ public class EthernetPacket
     /// <inheritdoc/>
     public override string ToString()
     {
-        return "Ethernet Packet : Src=" + srcMAC + ", Dest=" + destMAC + ", Type=" + EthernetType;
+        return "Ethernet Packet : Src=" + _srcMAC + ", Dest=" + _destMAC + ", Type=" + EthernetType;
     }
 }
