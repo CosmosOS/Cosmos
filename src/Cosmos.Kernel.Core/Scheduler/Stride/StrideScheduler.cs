@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Cosmos.Kernel.Core.CPU;
 
 namespace Cosmos.Kernel.Core.Scheduler.Stride;
 
@@ -428,7 +427,7 @@ internal class StrideScheduler : IScheduler
 
         // The manager holds only a spinlock here, which excludes another
         // caller but not the tick, and this rewrites the run queue.
-        using (InternalCpu.DisableInterruptsScope())
+        using (SchedulerManager.MaskInterrupts())
         {
             var cpuData = CpuDataOf(cpuState);
             var threadData = ThreadDataOf(thread);
@@ -462,8 +461,13 @@ internal class StrideScheduler : IScheduler
 
     public long GetPriority(SchedulerThread thread)
     {
-        var data = ThreadDataOf(thread);
-        return data != null ? (long)data.Tickets : 0;
+        // The tick can replace the thread's extension record between the read
+        // of the slot and the read of the field it holds.
+        using (SchedulerManager.MaskInterrupts())
+        {
+            StrideThreadData? data = ThreadDataOf(thread);
+            return data is not null ? (long)data.Tickets : 0;
+        }
     }
 
     // ========== Private Helpers ==========
@@ -568,7 +572,7 @@ internal class StrideScheduler : IScheduler
     /// </summary>
     private void RemoveThreadFromQueue(System.Collections.Generic.List<SchedulerThread> queue, SchedulerThread thread)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (SchedulerManager.MaskInterrupts())
         {
             for (int i = 0; i < queue.Count; i++)
             {
@@ -586,7 +590,7 @@ internal class StrideScheduler : IScheduler
     public int GetRunQueueCount(PerCpuState cpuState)
     {
         // Disable interrupts to prevent timer from modifying RunQueue while we read
-        using (InternalCpu.DisableInterruptsScope())
+        using (SchedulerManager.MaskInterrupts())
         {
             var cpuData = CpuDataOf(cpuState);
             return cpuData?.RunQueue.Count ?? 0;
@@ -596,7 +600,7 @@ internal class StrideScheduler : IScheduler
     public SchedulerThread? GetRunQueueThread(PerCpuState cpuState, int index)
     {
         // Disable interrupts to prevent timer from modifying RunQueue while we read
-        using (InternalCpu.DisableInterruptsScope())
+        using (SchedulerManager.MaskInterrupts())
         {
             var cpuData = CpuDataOf(cpuState);
             if (cpuData == null || index < 0 || index >= cpuData.RunQueue.Count)
