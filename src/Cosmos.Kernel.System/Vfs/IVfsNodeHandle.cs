@@ -5,9 +5,11 @@ using Cosmos.Kernel.HAL.Vfs;
 namespace Cosmos.Kernel.System.Vfs;
 
 /// <summary>
-/// Common surface for VFS nodes (files or directories). Every handle owns
-/// driver state and must be released, so the base interface is disposable and
-/// both handle kinds work in <c>using</c> blocks.
+/// Common surface for VFS nodes (files or directories). The interface is
+/// disposable so both handle kinds work in <c>using</c> blocks, but only a
+/// file handle has anything to release: it owns the open-file state the
+/// driver keeps for a read or write position. Disposing a directory handle
+/// does nothing, and a directory handle stays usable afterwards.
 /// </summary>
 public interface IVfsNodeHandle : IDisposable
 {

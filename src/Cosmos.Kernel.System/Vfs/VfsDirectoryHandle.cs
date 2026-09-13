@@ -22,9 +22,8 @@ internal sealed class VfsDirectoryHandle : IVfsDirectoryHandle
 
     public void Dispose()
     {
-        // Unlike VfsFileHandle there is no open-file state to release; the
-        // method is here because IVfsNodeHandle is disposable, so both handle
-        // kinds work in using blocks.
+        // Nothing to release: the open-file state VfsFileHandle disposes is
+        // the only thing a handle owns, and a directory does not open.
     }
 
     public bool TryReadDir(out IReadOnlyList<IVfsInode> entries)
