@@ -28,7 +28,7 @@ namespace Cosmos.Kernel.Tests.Graphic;
 public static unsafe class Canvas3DTests
 {
     /// <summary>Skip reason for the FIFO tests on cells without the adapter (the bare profile, and all of arm64).</summary>
-    public const string SkipNoDevice = "VMware SVGA II adapter not present — needs the vmware-svga profile";
+    public const string SkipNoDevice = "VMware SVGA II adapter not present, needs the vmware-svga profile";
 
     /// <summary>PCI vendor id of VMware.</summary>
     private const ushort VMwareVendorId = 0x15AD;
@@ -301,7 +301,7 @@ public static unsafe class Canvas3DTests
         at += HeaderBytes + 52;
 
         Assert.Equal(at, s_driver.GetFIFO(FIFO.NextCmd), "setup emits exactly these commands");
-        Assert.False(s_canvas.ReadsFrom3DScene, "no scene composed yet — GetImage reads the 2D framebuffer");
+        Assert.False(s_canvas.ReadsFrom3DScene, "no scene composed yet, GetImage reads the 2D framebuffer");
 
         Rewind(start);
     }

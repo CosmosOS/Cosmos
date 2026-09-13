@@ -500,7 +500,7 @@ public class Kernel : Sys.Kernel
 
         Assert.True(count > 0, "the dynamic range should not already be exhausted");
         Assert.True(!timerVectorHandedOut,
-            "the LAPIC timer vector must be outside the dynamic window — FreeVector+AllocateVector must never touch it");
+            "the LAPIC timer vector must be outside the dynamic window: FreeVector+AllocateVector must never touch it");
     }
 
 #else

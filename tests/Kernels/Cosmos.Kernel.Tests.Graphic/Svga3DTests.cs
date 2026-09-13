@@ -22,7 +22,7 @@ namespace Cosmos.Kernel.Tests.Graphic;
 public static unsafe class Svga3DTests
 {
     /// <summary>Skip reason for the FIFO tests on cells without the adapter (the bare profile, and all of arm64).</summary>
-    public const string SkipNoDevice = "VMware SVGA II adapter not present — needs the vmware-svga profile";
+    public const string SkipNoDevice = "VMware SVGA II adapter not present, needs the vmware-svga profile";
 
     /// <summary>PCI vendor id of VMware.</summary>
     private const ushort VMwareVendorId = 0x15AD;

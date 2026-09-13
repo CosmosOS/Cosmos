@@ -18,7 +18,7 @@ public class Kernel : Sys.Kernel
     // least one PCI device having been enumerated. A profile that disables
     // ACPI on arm64 (no MCFG, no FDT fallback for the ECAM base) lands
     // here and the device tests skip cleanly.
-    private const string SkipNoDevice = "no PCI devices enumerated — host bridge / ECAM not discovered";
+    private const string SkipNoDevice = "no PCI devices enumerated, host bridge / ECAM not discovered";
 
     /// <summary>Number of tests announced to the runner in TR.Start.</summary>
     private const int ExpectedTestCount = 6;

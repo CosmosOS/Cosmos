@@ -460,15 +460,32 @@ namespace Cosmos.TestRunner.Framework
             Log.WriteBytes(frame);
         }
 
+        /// <summary>Lowest character the parser accepts inside a protocol string.</summary>
+        private const char MinProtocolChar = ' ';
+        /// <summary>Highest character that survives one-byte encoding unchanged.</summary>
+        private const char MaxProtocolChar = (char)0x7E;
+        /// <summary>Stand-in written for a character the protocol cannot carry.</summary>
+        private const byte UnsupportedCharByte = (byte)'?';
+
         /// <summary>
-        /// Encode string to UTF-8 bytes (simplified, assumes ASCII for kernel)
+        /// Encode a protocol string as one byte per character. Anything
+        /// outside printable ASCII becomes <c>?</c>, because the engine's
+        /// parser treats a byte below 0x20 in a string field as proof that
+        /// the frame was assembled from interleaved UART bytes and drops the
+        /// whole message. Truncating a wider character produces exactly that:
+        /// an em dash (U+2014) truncates to 0x14, and a skip reason carrying
+        /// one was dropped as noise, which left the test sitting at the pass
+        /// its TestStart had already implied. The same held for a failure
+        /// message, so a real failure could be reported green.
         /// </summary>
+        /// <param name="str">String to encode.</param>
         private static byte[] EncodeString(string str)
         {
-            var bytes = new byte[str.Length];
+            byte[] bytes = new byte[str.Length];
             for (int i = 0; i < str.Length; i++)
             {
-                bytes[i] = (byte)str[i]; // ASCII only for simplicity
+                char c = str[i];
+                bytes[i] = c is >= MinProtocolChar and <= MaxProtocolChar ? (byte)c : UnsupportedCharByte;
             }
             return bytes;
         }
