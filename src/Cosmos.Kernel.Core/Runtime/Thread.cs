@@ -9,11 +9,15 @@ namespace Cosmos.Kernel.Core.Runtime;
 
 internal class Thread
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    private static object[][] s_threadData;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    /// <summary>
+    /// Thread-static storage of the one thread that exists when the scheduler
+    /// is compiled out. Null until CoreLib allocates it through the reference
+    /// below, the same way a scheduled thread's slot starts.
+    /// </summary>
+    private static object[][]? s_threadData;
+
     [RuntimeExport("RhGetThreadStaticStorage")]
-    internal static ref object[][] RhGetThreadStaticStorage()
+    internal static ref object[][]? RhGetThreadStaticStorage()
     {
         if (CosmosFeatures.SchedulerEnabled)
         {
