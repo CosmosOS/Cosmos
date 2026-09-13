@@ -3,6 +3,7 @@
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.HAL.Devices.Input;
 
@@ -274,6 +275,7 @@ internal unsafe class VirtioKeyboard : KeyboardDevice
             56 => 0x38,  // KEY_LEFTALT -> Left Alt
             57 => 0x39,  // KEY_SPACE -> Space
             58 => 0x3A,  // KEY_CAPSLOCK -> Caps Lock
+            100 => IKeyboardDevice.RightAltScanCode, // KEY_RIGHTALT -> Right Alt
 
             // Arrow keys (extended)
             103 => 0x48, // KEY_UP -> Up

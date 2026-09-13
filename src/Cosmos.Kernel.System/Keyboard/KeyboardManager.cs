@@ -24,6 +24,13 @@ public static class KeyboardManager
     private static ScanMapBase? s_scanMap;
 
     /// <summary>
+    /// Whether the key the active layout maps to <see cref="ConsoleKeyEx.AltGr"/>
+    /// is held. It converts as Control and Alt together, the way Windows
+    /// reports it, so a layout's third level lives in its Control+Alt column.
+    /// </summary>
+    private static bool s_altGrPressed;
+
+    /// <summary>
     /// The num-lock state.
     /// </summary>
     public static bool NumLock { get; private set; }
@@ -169,6 +176,10 @@ public static class KeyboardManager
         {
             AltPressed = !released;
         }
+        else if (s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.AltGr))
+        {
+            s_altGrPressed = !released;
+        }
         else
         {
             if (!released)
@@ -227,7 +238,14 @@ public static class KeyboardManager
             keyInfo = null;
             return false;
         }
-        keyInfo = s_scanMap.ConvertScanCode(scanCode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
+        keyInfo = s_scanMap.ConvertScanCode(
+            scanCode,
+            ControlPressed || s_altGrPressed,
+            ShiftPressed,
+            AltPressed || s_altGrPressed,
+            NumLock,
+            CapsLock,
+            ScrollLock);
         return keyInfo != null;
     }
 

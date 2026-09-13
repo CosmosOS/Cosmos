@@ -92,6 +92,8 @@ public sealed class USDvorakLayout : ScanMapBase
         // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, ConsoleKeyEx.LAlt));
+        /* Right Alt: a second Alt on this layout */
+        Keys.Add(new KeyMapping(RightAltScanCode, ConsoleKeyEx.RAlt));
         /* Space */
         Keys.Add(new KeyMapping(0x39, ' ', ConsoleKeyEx.Spacebar));
         /* Caps */
