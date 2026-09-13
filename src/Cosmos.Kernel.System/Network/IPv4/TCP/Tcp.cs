@@ -247,17 +247,24 @@ internal class Tcp : IDisposable
     {
         for (int i = 0; i < Connections.Count; i++)
         {
-            var con = Connections[i];
-            if (con.Equals(localPort, remotePort, localIp, remoteIp))
+            Tcp connection = Connections[i];
+            if (connection.Equals(localPort, remotePort, localIp, remoteIp))
             {
-                return con;
-            }
-            // Is this correct if clause? Shouldn't be there another loop?
-            if (con.LocalEndPoint.Port.Equals(localPort) && con.Status == Status.LISTEN)
-            {
-                return con;
+                return connection;
             }
         }
+
+        // A listener answers for any remote end, so it is only picked once no
+        // established connection matched.
+        for (int i = 0; i < Connections.Count; i++)
+        {
+            Tcp connection = Connections[i];
+            if (connection.LocalEndPoint.Port == localPort && connection.Status == Status.LISTEN)
+            {
+                return connection;
+            }
+        }
+
         return null;
     }
 
