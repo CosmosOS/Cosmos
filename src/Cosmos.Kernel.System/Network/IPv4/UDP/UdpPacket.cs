@@ -30,7 +30,7 @@ public class UdpPacket : IPPacket
     /// <param name="packetData">The raw packet data.</param>
     internal static void UDPHandler(byte[] packetData)
     {
-        var udpPacket = new UdpPacket(packetData);
+        UdpPacket udpPacket = new(packetData);
 
         Serial.WriteString("[UDP] Received from ");
         Serial.WriteString(udpPacket.SourceIP.ToString());

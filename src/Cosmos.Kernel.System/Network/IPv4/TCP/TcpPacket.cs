@@ -85,11 +85,11 @@ public class TcpPacket : IPPacket
     /// <param name="packetData">Packet data.</param>
     internal static void TCPHandler(byte[] packetData)
     {
-        var packet = new TcpPacket(packetData);
+        TcpPacket packet = new(packetData);
 
         if (packet.CheckCRC())
         {
-            var connection = Tcp.GetConnection(packet.DestinationPort, packet.SourcePort, packet.DestinationIP, packet.SourceIP);
+            Tcp? connection = Tcp.GetConnection(packet.DestinationPort, packet.SourcePort, packet.DestinationIP, packet.SourceIP);
 
             connection?.ReceiveData(packet);
         }
@@ -241,7 +241,7 @@ public class TcpPacket : IPPacket
 
             for (int i = 0; i < TcpDataLength; i++)
             {
-                var option = new TcpOption();
+                TcpOption option = new();
                 option.Kind = RawData[DataOffset + 20 + i];
 
                 if (option.Kind != 1) //NOP

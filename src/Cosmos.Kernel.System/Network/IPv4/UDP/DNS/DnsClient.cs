@@ -49,7 +49,7 @@ public sealed class DnsClient : UdpClient
         Address source = IPConfig.FindNetwork(_destination)
             ?? throw new InvalidOperationException("No network route to DNS server. Run 'netconfig' or 'dhcp' first.");
         _queryUrl = url;
-        var askpacket = new DnsPacketQuery(source, _destination!, url);
+        DnsPacketQuery askpacket = new(source, _destination!, url);
 
         OutgoingBuffer.AddPacket(askpacket);
         NetworkStack.Update();

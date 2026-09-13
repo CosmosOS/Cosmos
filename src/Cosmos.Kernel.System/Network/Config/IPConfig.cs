@@ -126,7 +126,7 @@ public class IPConfig
     {
         if (device != null)
         {
-            var config = new IPConfig(address, subnetMask, defaultGateway);
+            IPConfig config = new(address, subnetMask, defaultGateway);
             NetworkStack.ConfigIP(device, config);
             Serial.WriteString("[IPConfig] Config OK.\n");
             return true;

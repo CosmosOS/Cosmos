@@ -50,9 +50,9 @@ public class DhcpPacket : UdpPacket
     /// </summary>
     internal static void DHCPHandler(byte[] packetData)
     {
-        var dhcpPacket = new DhcpPacket(packetData);
+        DhcpPacket dhcpPacket = new(packetData);
 
-        var receiver = UdpClient.GetClient(dhcpPacket.DestinationPort);
+        UdpClient? receiver = UdpClient.GetClient(dhcpPacket.DestinationPort);
         receiver?.ReceiveData(dhcpPacket);
     }
 
@@ -164,7 +164,7 @@ public class DhcpPacket : UdpPacket
 
             for (int i = 0; i < RawData.Length - 282 && RawData[282 + i] != 0xFF; i += 2) //0xFF is DHCP packet end
             {
-                var option = new DhcpOption
+                DhcpOption option = new()
                 {
                     Type = RawData[282 + i],
                     Data = new byte[RawData[282 + i + 1]]
@@ -178,7 +178,7 @@ public class DhcpPacket : UdpPacket
                 i += option.Length;
             }
 
-            foreach (var option in Options)
+            foreach (DhcpOption option in Options)
             {
                 if (option.Type == 1) //Mask
                 {

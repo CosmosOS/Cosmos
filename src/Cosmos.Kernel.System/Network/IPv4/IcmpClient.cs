@@ -42,7 +42,7 @@ public sealed class IcmpClient : IDisposable
     /// <returns>If a client is connected to the given address, the <see cref="IcmpClient"/>; otherwise, <see langword="null"/>.</returns>
     internal static IcmpClient? GetClient(uint iphash)
     {
-        if (s_clients.TryGetValue(iphash, out var client))
+        if (s_clients.TryGetValue(iphash, out IcmpClient? client))
         {
             return client;
         }
@@ -103,7 +103,7 @@ public sealed class IcmpClient : IDisposable
         }
 
         Address source = IPConfig.FindNetwork(_destination) ?? throw new InvalidOperationException("No configured interface can reach the destination address.");
-        var request = new IcmpEchoRequest(source, _destination, id, sequence);
+        IcmpEchoRequest request = new(source, _destination, id, sequence);
         OutgoingBuffer.AddPacket(request);
         NetworkStack.Update();
     }
@@ -171,7 +171,7 @@ public sealed class IcmpClient : IDisposable
             return -1;
         }
 
-        var packet = new IcmpEchoReply(_rxBuffer.Dequeue().RawData);
+        IcmpEchoReply packet = new(_rxBuffer.Dequeue().RawData);
         source.Address = packet.SourceIP;
 
         return waited;

@@ -230,7 +230,7 @@ public class DnsPacket : UdpPacket
     /// </summary>
     internal string ParseName(byte[] rawData, ref int index)
     {
-        var url = new StringBuilder();
+        StringBuilder url = new();
 
         while (rawData[index] != 0x00 && index < rawData.Length)
         {
@@ -468,7 +468,7 @@ public class DnsPacketAnswer : DnsPacket
 
             for (int i = 0; i < Questions; i++)
             {
-                var query = new DnsQuery();
+                DnsQuery query = new();
                 query.Name = ParseName(RawData, ref index);
                 query.Type = (ushort)((RawData[index + 0] << 8) | RawData[index + 1]);
                 query.Class = (ushort)((RawData[index + 2] << 8) | RawData[index + 3]);
@@ -482,7 +482,7 @@ public class DnsPacketAnswer : DnsPacket
 
             for (int i = 0; i < AnswerRRs; i++)
             {
-                var answer = new DnsAnswer();
+                DnsAnswer answer = new();
                 answer.NameField = (ushort)((RawData[index + 0] << 8) | RawData[index + 1]);
                 answer.ResolvedName = ResolveRRName(answer.NameField, RawData, DataOffset + 8);
                 answer.Type = (ushort)((RawData[index + 2] << 8) | RawData[index + 3]);

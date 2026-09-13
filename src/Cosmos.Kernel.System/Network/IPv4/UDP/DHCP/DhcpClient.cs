@@ -58,7 +58,7 @@ public sealed class DhcpClient : UdpClient
             return -1;
         }
 
-        var packet = new DhcpPacket(_rxBuffer.Dequeue().RawData);
+        DhcpPacket packet = new(_rxBuffer.Dequeue().RawData);
 
         if (packet.Operation == 2) //Boot Reply
         {
@@ -97,7 +97,7 @@ public sealed class DhcpClient : UdpClient
             var destIp = DHCPServerAddress(networkDevice) ?? throw new Exception($"IP can not be null");
             Address source = IPConfig.FindNetwork(destIp)
                 ?? throw new Exception($"Address can not be null");
-            var dhcpRelease = new DhcpRelease(source, destIp, networkDevice.MacAddress);
+            DhcpRelease dhcpRelease = new(source, destIp, networkDevice.MacAddress);
 
             OutgoingBuffer.AddPacket(dhcpRelease);
             NetworkStack.Update();
@@ -129,7 +129,7 @@ public sealed class DhcpClient : UdpClient
 
             IPConfig.Enable(networkDevice, new Address(0, 0, 0, 0), new Address(0, 0, 0, 0), new Address(0, 0, 0, 0));
 
-            var dhcpDiscover = new DhcpDiscover(networkDevice.MacAddress);
+            DhcpDiscover dhcpDiscover = new(networkDevice.MacAddress);
             OutgoingBuffer.AddPacket(dhcpDiscover);
             NetworkStack.Update();
 
@@ -153,7 +153,7 @@ public sealed class DhcpClient : UdpClient
                 continue;
             }
 
-            var dhcpRequest = new DhcpRequest(networkDevice.MacAddress, requestedAddress);
+            DhcpRequest dhcpRequest = new(networkDevice.MacAddress, requestedAddress);
             OutgoingBuffer.AddPacket(dhcpRequest);
             NetworkStack.Update();
         }

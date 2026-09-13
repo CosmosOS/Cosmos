@@ -38,7 +38,7 @@ public static class NetworkStack
         if (MACMap.ContainsKey(mac.Hash))
         {
             // Find and remove old IP mapping
-            foreach (var pair in AddressMap)
+            foreach (KeyValuePair<uint, INetworkDevice> pair in AddressMap)
             {
                 if (pair.Value == device)
                 {

@@ -43,15 +43,15 @@ public class ArpPacket : EthernetPacket
     /// <param name="packetData">Packet data.</param>
     internal static void ARPHandler(byte[] packetData)
     {
-        var arpPacket = new ArpPacket(packetData);
+        ArpPacket arpPacket = new(packetData);
 
         if (arpPacket.Operation == 0x01)
         {
             // ARP Request
             if (arpPacket.HardwareType == 1 && arpPacket.ProtocolType == 0x0800)
             {
-                var arpRequest = new ArpRequestEthernet(packetData);
-                if (arpRequest.SenderIP == null)
+                ArpRequestEthernet arpRequest = new(packetData);
+                if (arpRequest.SenderIP is null)
                 {
                     Serial.WriteString("[ARP] SenderIP null in ARPHandler!\n");
                     return;
@@ -65,10 +65,10 @@ public class ArpPacket : EthernetPacket
                     Serial.WriteString(arpRequest.SenderIP.ToString());
                     Serial.WriteString("\n");
 
-                    var nic = NetworkStack.AddressMap[arpRequest.TargetIP.Id];
-                    var nicMac = new MACAddress(nic.MacAddress);
+                    INetworkDevice nic = NetworkStack.AddressMap[arpRequest.TargetIP.Id];
+                    MACAddress nicMac = new(nic.MacAddress);
 
-                    var reply = new ArpReplyEthernet(
+                    ArpReplyEthernet reply = new(
                         nicMac,
                         arpRequest.TargetIP,
                         arpRequest.SenderMac!,
@@ -84,7 +84,7 @@ public class ArpPacket : EthernetPacket
             // ARP Reply
             if (arpPacket.HardwareType == 1 && arpPacket.ProtocolType == 0x0800)
             {
-                var arpReply = new ArpReplyEthernet(packetData);
+                ArpReplyEthernet arpReply = new(packetData);
                 Serial.WriteString("[ARP] Reply received from ");
                 Serial.WriteString(arpReply.SenderIP!.ToString());
                 Serial.WriteString("\n");

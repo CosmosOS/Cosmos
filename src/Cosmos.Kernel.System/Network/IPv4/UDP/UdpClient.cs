@@ -192,7 +192,7 @@ public class UdpClient : IDisposable
         Serial.WriteString(source.ToString());
         Serial.WriteString("\n");
 
-        var packet = new UdpPacket(source, dest, (ushort)_localPort, (ushort)destPort, data);
+        UdpPacket packet = new(source, dest, (ushort)_localPort, (ushort)destPort, data);
         Serial.WriteString("[UdpClient] UdpPacket created, adding to outgoing buffer\n");
         OutgoingBuffer.AddPacket(packet);
         Serial.WriteString("[UdpClient] Packet added to outgoing buffer\n");

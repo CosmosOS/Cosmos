@@ -92,7 +92,7 @@ public static class SocketPlug
         {
             if (proto == ProtocolType.Tcp)
             {
-                if (s_tcpStateMachines.TryGetValue(id, out var sm))
+                if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
                 {
                     return sm.Status == Status.ESTABLISHED;
                 }
@@ -117,7 +117,7 @@ public static class SocketPlug
 
         if (proto == ProtocolType.Tcp)
         {
-            if (s_tcpStateMachines.TryGetValue(id, out var sm))
+            if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
             {
                 return sm.Data.Length;
             }
@@ -166,7 +166,7 @@ public static class SocketPlug
         {
             if (proto == ProtocolType.Tcp)
             {
-                if (s_tcpStateMachines.TryGetValue(id, out var sm))
+                if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
                 {
                     return sm.Status == Status.ESTABLISHED;
                 }
@@ -232,7 +232,7 @@ public static class SocketPlug
     {
         int id = GetId(aThis);
 
-        if (!s_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
         {
             Log.WriteString("[SocketPlug] TcpListener not started, starting...\n");
             StartTcp(aThis);
@@ -291,7 +291,7 @@ public static class SocketPlug
 
         // Use GetAddressBytes directly to avoid string parsing (byte.Parse can trigger resource loading)
         byte[] destBytes = address.GetAddressBytes();
-        var destAddr = new Address(destBytes[0], destBytes[1], destBytes[2], destBytes[3]);
+        Address destAddr = new(destBytes[0], destBytes[1], destBytes[2], destBytes[3]);
         client.Connect(destAddr, port);
 
         _remoteEndPoints[id] = new IPEndPoint(address, port);
@@ -422,7 +422,7 @@ public static class SocketPlug
     {
         Log.WriteString("[SocketPlug] SendTcp: entering\n");
         int id = GetId(aThis);
-        if (!s_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
         {
             Log.WriteString("[SocketPlug] Must establish a connection before sending data.\n");
             throw new InvalidOperationException("Must establish a connection before sending data.");
@@ -456,7 +456,7 @@ public static class SocketPlug
 
             for (int i = 0; i < chunks.Length; i++)
             {
-                var packet = new TcpPacket(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, i == chunks.Length - 1 ? (byte)(TcpFlags.PSH | TcpFlags.ACK) : (byte)TcpFlags.ACK, sm.TCB.SndWnd, 0, chunks[i]);
+                TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, i == chunks.Length - 1 ? (byte)(TcpFlags.PSH | TcpFlags.ACK) : (byte)TcpFlags.ACK, sm.TCB.SndWnd, 0, chunks[i]);
                 OutgoingBuffer.AddPacket(packet);
 
                 // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
@@ -476,7 +476,7 @@ public static class SocketPlug
             byte[] data = new byte[size];
             Buffer.BlockCopy(buffer, offset, data, 0, size);
 
-            var packet = new TcpPacket(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), sm.TCB.SndWnd, 0, data);
+            TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), sm.TCB.SndWnd, 0, data);
             Log.WriteString("[SocketPlug] SendTcp: adding to outgoing buffer\n");
             OutgoingBuffer.AddPacket(packet);
 
@@ -628,7 +628,7 @@ public static class SocketPlug
     public static int ReceiveTcp(Socket aThis, byte[] buffer, int offset, int size)
     {
         int id = GetId(aThis);
-        if (!s_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
         {
             Log.WriteString("[SocketPlug] Must establish a connection before receiving data.\n");
             throw new InvalidOperationException("Must establish a connection before receiving data.");
@@ -759,7 +759,7 @@ public static class SocketPlug
     {
         Log.WriteString("[SocketPlug] CloseTcp: entering\n");
         int id = GetId(aThis);
-        if (!s_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
         {
             Log.WriteString("[SocketPlug] CloseTcp: no state machine found, returning\n");
             return;

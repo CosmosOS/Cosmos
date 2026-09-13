@@ -685,7 +685,7 @@ public static class SchedulerManager
                 Serial.WriteString("\n");
                 unsafe
                 {
-                    var callback = (delegate* unmanaged<void>)managedCallback;
+                    delegate* unmanaged<void> callback = (delegate* unmanaged<void>)managedCallback;
                     callback();
                 }
             }

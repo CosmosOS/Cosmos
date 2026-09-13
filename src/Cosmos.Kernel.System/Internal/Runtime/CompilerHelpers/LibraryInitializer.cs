@@ -23,7 +23,7 @@ internal class LibraryInitializer
     /// </summary>
     public static void InitializeLibrary()
     {
-        var initializer = PlatformHAL.Initializer;
+        IPlatformInitializer? initializer = PlatformHAL.Initializer;
         if (initializer is not null)
         {
             // Initialize Timer Manager (skipped if CosmosEnableTimer=false)
@@ -41,8 +41,8 @@ internal class LibraryInitializer
                 {
                     Serial.WriteString("[KERNEL]   - Initializing keyboard manager...\n");
                     KeyboardManager.Initialize();
-                    var keyboards = initializer.GetKeyboardDevices();
-                    foreach (var keyboard in keyboards)
+                    IKeyboardDevice[] keyboards = initializer.GetKeyboardDevices();
+                    foreach (IKeyboardDevice keyboard in keyboards)
                     {
                         KeyboardManager.RegisterKeyboard(keyboard);
                     }
@@ -53,8 +53,8 @@ internal class LibraryInitializer
                 {
                     Serial.WriteString("[KERNEL]   - Initializing mouse manager...\n");
                     MouseManager.Initialize();
-                    var mice = initializer.GetMouseDevices();
-                    foreach (var mouse in mice)
+                    IMouseDevice[] mice = initializer.GetMouseDevices();
+                    foreach (IMouseDevice mouse in mice)
                     {
                         MouseManager.RegisterMouse(mouse);
                     }
@@ -65,8 +65,8 @@ internal class LibraryInitializer
                 {
                     Serial.WriteString("[KERNEL]   - Initializing network manager...\n");
                     NetworkManager.Initialize();
-                    var networkDevice = initializer.GetNetworkDevice();
-                    if (networkDevice != null)
+                    INetworkDevice? networkDevice = initializer.GetNetworkDevice();
+                    if (networkDevice is not null)
                     {
                         NetworkManager.RegisterDevice(networkDevice);
                     }

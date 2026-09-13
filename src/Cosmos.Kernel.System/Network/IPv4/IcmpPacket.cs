@@ -43,7 +43,7 @@ public class IcmpPacket : IPPacket
     /// <param name="packetData">The data of the packet.</param>
     internal static void ICMPHandler(byte[] packetData)
     {
-        var icmpPacket = new IcmpPacket(packetData);
+        IcmpPacket icmpPacket = new(packetData);
 
         switch (icmpPacket.IcmpType)
         {
@@ -52,14 +52,14 @@ public class IcmpPacket : IPPacket
                 Serial.WriteString(icmpPacket.SourceIP.ToString());
                 Serial.WriteString("\n");
 
-                var receiver = IcmpClient.GetClient(icmpPacket.SourceIP.Id);
+                IcmpClient? receiver = IcmpClient.GetClient(icmpPacket.SourceIP.Id);
                 // Deliver the typed reply so consumers see the identifier
                 // and sequence number, not just the base ICMP fields.
                 receiver?.ReceiveData(new IcmpEchoReply(packetData));
                 break;
             case 8: // Echo request
-                var request = new IcmpEchoRequest(packetData);
-                var reply = new IcmpEchoReply(request);
+                IcmpEchoRequest request = new(packetData);
+                IcmpEchoReply reply = new(request);
 
                 Serial.WriteString("[ICMP] Sending echo reply to ");
                 Serial.WriteString(reply.DestinationIP.ToString());

@@ -456,8 +456,8 @@ internal class GopCanvas : Canvas
     {
         ThrowIfDriverNotInitialized();
 
-        var width = image.Width;
-        var height = image.Height;
+        int width = image.Width;
+        int height = image.Height;
         var data = image.RawData;
 
         if (preventOffBoundPixels)
@@ -510,8 +510,8 @@ internal class GopCanvas : Canvas
 
         if (preventOffBoundPixels)
         {
-            var maxWidth = Math.Min(xWidth, Mode.Width - aX);
-            var maxHeight = Math.Min(xHeight, Mode.Height - aY);
+            int maxWidth = Math.Min(xWidth, Mode.Width - aX);
+            int maxHeight = Math.Min(xHeight, Mode.Height - aY);
 
             var startX = Math.Max(0, aX);
             var startY = Math.Max(0, aY);

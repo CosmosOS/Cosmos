@@ -153,7 +153,7 @@ public class Kernel : Sys.Kernel
         Log.WriteString("[Test] Starting DHCP auto-configuration...\n");
 
         // Use DHCP to auto-assign IP address
-        var dhcpClient = new DhcpClient();
+        DhcpClient dhcpClient = new();
 
         Log.WriteString("[Test] Sending DHCP Discover packet...\n");
         int result = dhcpClient.SendDiscoverPacket();
@@ -213,13 +213,13 @@ public class Kernel : Sys.Kernel
 
         // QEMU user networking: slirp answers ICMP echo requests to the
         // gateway address itself, so no host-side helper is needed.
-        var target = new Address(10, 0, 2, 2);
+        Address target = new(10, 0, 2, 2);
 
         Log.WriteString("[Test] Pinging ");
         Log.WriteString(target.ToString());
         Log.WriteString("...\n");
 
-        var icmpClient = new IcmpClient();
+        IcmpClient icmpClient = new();
         icmpClient.Connect(target);
         icmpClient.SendEcho();
 
@@ -519,11 +519,11 @@ public class Kernel : Sys.Kernel
             TestDHCPConfiguration();
         }
 
-        var target = new Address(10, 0, 2, 2);
+        Address target = new(10, 0, 2, 2);
         const ushort echoId = 0x4242;
         const ushort echoSequence = 9;
 
-        var icmpClient = new IcmpClient();
+        IcmpClient icmpClient = new();
         icmpClient.Connect(target);
 
         // Build the echo request ourselves instead of going through SendEcho,
@@ -576,11 +576,11 @@ public class Kernel : Sys.Kernel
             TestDHCPConfiguration();
         }
 
-        var gateway = new Address(10, 0, 2, 2);
+        Address gateway = new(10, 0, 2, 2);
         const ushort seamPort = 5559;
 
         // Bind a Cosmos UdpClient so the echo comes back as a packet object.
-        var udpClient = new CosmosUdpClient(seamPort);
+        CosmosUdpClient udpClient = new(seamPort);
 
         byte[] payload = Encoding.ASCII.GetBytes("COSMOS_SEAM_TEST");
         UdpPacket packet = new(s_localIP!, gateway, seamPort, TestPort, payload);
@@ -640,7 +640,7 @@ public class Kernel : Sys.Kernel
 
         // A source address no interface carries: Send must report the drop
         // instead of pretending the packet went out.
-        var unconfigured = new Address(192, 168, 250, 250);
+        Address unconfigured = new(192, 168, 250, 250);
         IcmpEchoRequest request = new(unconfigured, new Address(10, 0, 2, 2), 1, 1);
         Assert.True(!NetworkStack.Send(request), "Send should return false for a source address no interface carries");
     }
@@ -948,12 +948,12 @@ public class Kernel : Sys.Kernel
         Log.WriteString("[Test] Creating DNS client...\n");
 
         // Create DNS client
-        var dnsClient = new DnsClient();
+        DnsClient dnsClient = new();
 
         Assert.True(dnsClient != null, "DNS client should be created");
 
         // Configure DNS server (Cloudflare's public DNS)
-        var dnsServer = new Address(1, 1, 1, 1);
+        Address dnsServer = new(1, 1, 1, 1);
         DnsConfig.Add(dnsServer);
 
         Assert.True(DnsConfig.Nameservers.Count > 0, "DNS nameservers should be configured");
@@ -962,7 +962,7 @@ public class Kernel : Sys.Kernel
         bool foundCloudflare = false;
         for (int i = 0; i < DnsConfig.Nameservers.Count; i++)
         {
-            var ns = DnsConfig.Nameservers[i];
+            Address ns = DnsConfig.Nameservers[i];
             var parts = ns.Parts;
             if (parts[0] == 1 && parts[1] == 1 && parts[2] == 1 && parts[3] == 1)
             {
@@ -997,11 +997,11 @@ public class Kernel : Sys.Kernel
         Log.WriteString("[Test] Resolving valentin.bzh via DNS...\n");
 
         // Configure DNS server (Cloudflare's public DNS)
-        var dnsServer = new Address(1, 1, 1, 1);
+        Address dnsServer = new(1, 1, 1, 1);
         DnsConfig.Add(dnsServer);
 
         // Create DNS client and connect to DNS server
-        var dnsClient = new DnsClient();
+        DnsClient dnsClient = new();
         dnsClient.Connect(dnsServer);
 
         Log.WriteString("[Test] Connected to DNS server: ");
@@ -1061,8 +1061,8 @@ public class Kernel : Sys.Kernel
         Log.WriteString(domain);
         Log.WriteString("...\n");
 
-        var dnsServer = new Address(1, 1, 1, 1);
-        var dnsClient = new DnsClient();
+        Address dnsServer = new(1, 1, 1, 1);
+        DnsClient dnsClient = new();
         dnsClient.Connect(dnsServer);
 
         dnsClient.SendQuery(domain);
@@ -1109,10 +1109,10 @@ public class Kernel : Sys.Kernel
             TestDHCPConfiguration();
         }
 
-        var dnsServer = new Address(1, 1, 1, 1);
+        Address dnsServer = new(1, 1, 1, 1);
         DnsConfig.Add(dnsServer);
 
-        var dnsClient = new DnsClient();
+        DnsClient dnsClient = new();
         dnsClient.Connect(dnsServer);
 
         dnsClient.SendQuery("valentin.bzh");
@@ -1159,8 +1159,8 @@ public class Kernel : Sys.Kernel
         Log.WriteString(domain);
         Log.WriteString("...\n");
 
-        var dnsServer = new Address(1, 1, 1, 1);
-        var dnsClient = new DnsClient();
+        Address dnsServer = new(1, 1, 1, 1);
+        DnsClient dnsClient = new();
         dnsClient.Connect(dnsServer);
 
         dnsClient.SendQuery(domain);

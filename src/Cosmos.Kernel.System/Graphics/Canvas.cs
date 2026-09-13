@@ -1033,8 +1033,8 @@ public unsafe class Canvas
         int[] pixels = ScaleImage(image, w, h);
         if (preventOffBoundPixels)
         {
-            var maxWidth = Math.Min(w, Mode.Width - x);
-            var maxHeight = Math.Min(h, Mode.Height - y);
+            int maxWidth = Math.Min(w, Mode.Width - x);
+            int maxHeight = Math.Min(h, Mode.Height - y);
             for (int xi = 0; xi < maxWidth; xi++)
             {
                 for (int yi = 0; yi < maxHeight; yi++)

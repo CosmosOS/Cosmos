@@ -159,7 +159,7 @@ internal static class OutgoingBuffer
                     else
                     {
                         Serial.WriteString("[OutgoingBuffer] Sending ARP request\n");
-                        var arpRequest = new ArpRequestEthernet(
+                        ArpRequestEthernet arpRequest = new(
                             entry.NIC.MacAddress,
                             entry.Packet.SourceIP,
                             MACAddress.Broadcast,

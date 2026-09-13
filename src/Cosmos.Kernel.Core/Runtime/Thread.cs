@@ -21,7 +21,7 @@ internal class Thread
     {
         if (CosmosFeatures.SchedulerEnabled)
         {
-            var cpuState = SchedulerManager.CurrentCpuState;
+            PerCpuState? cpuState = SchedulerManager.CurrentCpuState;
             return ref cpuState.CurrentThread!.GetThreadStaticStorage();
         }
         else

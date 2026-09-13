@@ -113,8 +113,8 @@ internal class StrideScheduler : IScheduler
 
     public void OnThreadReady(PerCpuState cpuState, SchedulerThread thread)
     {
-        var cpuData = CpuDataOf(cpuState);
-        var threadData = ThreadDataOf(thread);
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
+        StrideThreadData? threadData = ThreadDataOf(thread);
 
         if (cpuData == null || threadData == null)
         {
@@ -167,8 +167,8 @@ internal class StrideScheduler : IScheduler
 
     public void OnThreadBlocked(PerCpuState cpuState, SchedulerThread thread)
     {
-        var cpuData = CpuDataOf(cpuState);
-        var threadData = ThreadDataOf(thread);
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
+        StrideThreadData? threadData = ThreadDataOf(thread);
 
         if (cpuData == null || threadData == null)
         {
@@ -186,13 +186,13 @@ internal class StrideScheduler : IScheduler
 
     public void OnThreadExit(PerCpuState cpuState, SchedulerThread thread)
     {
-        var cpuData = CpuDataOf(cpuState);
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
         if (cpuData == null)
         {
             return;
         }
 
-        var threadData = ThreadDataOf(thread);
+        StrideThreadData? threadData = ThreadDataOf(thread);
 
         // Remove from run queue using ReferenceEquals + RemoveAt
         // Note: List<T>.Remove/Contains crash due to EqualityComparer<T>.Default requiring broken runtime helpers
@@ -208,8 +208,8 @@ internal class StrideScheduler : IScheduler
 
     public void OnThreadYield(PerCpuState cpuState, SchedulerThread thread)
     {
-        var cpuData = CpuDataOf(cpuState);
-        var threadData = ThreadDataOf(thread);
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
+        StrideThreadData? threadData = ThreadDataOf(thread);
 
         if (cpuData == null || threadData == null)
         {
@@ -231,7 +231,7 @@ internal class StrideScheduler : IScheduler
 
     public SchedulerThread? PickNext(PerCpuState cpuState)
     {
-        var cpuData = CpuDataOf(cpuState);
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
 
         if (cpuData == null || cpuData.RunQueue.Count == 0)
         {
@@ -246,7 +246,7 @@ internal class StrideScheduler : IScheduler
 
     public void OnPickFailed(PerCpuState cpuState, SchedulerThread thread)
     {
-        var cpuData = CpuDataOf(cpuState);
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
         if (cpuData == null)
         {
             return;
@@ -267,13 +267,13 @@ internal class StrideScheduler : IScheduler
             return false;
         }
 
-        var cpuData = CpuDataOf(cpuState);
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
         if (cpuData == null)
         {
             return false;
         }
 
-        var threadData = ThreadDataOf(current);
+        StrideThreadData? threadData = ThreadDataOf(current);
 
         // Thread may have exited - its SchedulerData would be null
         if (threadData == null)
@@ -311,7 +311,7 @@ internal class StrideScheduler : IScheduler
         // Check for preemption
         if (cpuData.RunQueue.Count > 0)
         {
-            var nextData = ThreadDataOf(cpuData.RunQueue[0]);
+            StrideThreadData? nextData = ThreadDataOf(cpuData.RunQueue[0]);
             if (nextData != null && nextData.Pass < threadData.Pass)
             {
                 return true;
@@ -353,9 +353,9 @@ internal class StrideScheduler : IScheduler
 
     public void OnThreadMigrate(SchedulerThread thread, PerCpuState fromState, PerCpuState toState)
     {
-        var fromData = CpuDataOf(fromState);
-        var toData = CpuDataOf(toState);
-        var threadData = ThreadDataOf(thread);
+        StrideCpuData? fromData = CpuDataOf(fromState);
+        StrideCpuData? toData = CpuDataOf(toState);
+        StrideThreadData? threadData = ThreadDataOf(thread);
 
         if (fromData == null || toData == null || threadData == null)
         {
@@ -373,7 +373,7 @@ internal class StrideScheduler : IScheduler
 
     public void Balance(PerCpuState cpuState, PerCpuState[] allCpuStates)
     {
-        var cpuData = CpuDataOf(cpuState);
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
         if (cpuData == null || cpuData.RunQueue.Count > 0)
         {
             return;
@@ -389,7 +389,7 @@ internal class StrideScheduler : IScheduler
                 continue;
             }
 
-            var data = CpuDataOf(state);
+            StrideCpuData? data = CpuDataOf(state);
             if (data != null && data.RunQueue.Count > maxCount)
             {
                 maxCount = data.RunQueue.Count;
@@ -402,7 +402,7 @@ internal class StrideScheduler : IScheduler
             return;
         }
 
-        var busiestData = CpuDataOf(busiest);
+        StrideCpuData? busiestData = CpuDataOf(busiest);
         if (busiestData == null || busiestData.RunQueue.Count == 0)
         {
             return;
@@ -429,8 +429,8 @@ internal class StrideScheduler : IScheduler
         // caller but not the tick, and this rewrites the run queue.
         using (SchedulerManager.MaskInterrupts())
         {
-            var cpuData = CpuDataOf(cpuState);
-            var threadData = ThreadDataOf(thread);
+            StrideCpuData? cpuData = CpuDataOf(cpuState);
+            StrideThreadData? threadData = ThreadDataOf(thread);
 
             if (cpuData == null || threadData == null)
             {
@@ -529,7 +529,7 @@ internal class StrideScheduler : IScheduler
 
     private void InsertByPass(StrideCpuData cpuData, SchedulerThread thread)
     {
-        var threadData = ThreadDataOf(thread);
+        StrideThreadData? threadData = ThreadDataOf(thread);
         if (threadData == null)
         {
             return;
@@ -539,7 +539,7 @@ internal class StrideScheduler : IScheduler
 
         for (; index < cpuData.RunQueue.Count; index++)
         {
-            var otherData = ThreadDataOf(cpuData.RunQueue[index]);
+            StrideThreadData? otherData = ThreadDataOf(cpuData.RunQueue[index]);
             if (otherData == null)
             {
                 continue;
@@ -557,7 +557,7 @@ internal class StrideScheduler : IScheduler
     private ulong GetCpuLoad(uint cpuId)
     {
         var state = SchedulerManager.GetCpuState(cpuId);
-        var data = state != null ? CpuDataOf(state) : null;
+        StrideCpuData? data = state is not null ? CpuDataOf(state) : null;
         return data?.TotalTickets ?? 0;
     }
 
@@ -592,7 +592,7 @@ internal class StrideScheduler : IScheduler
         // Disable interrupts to prevent timer from modifying RunQueue while we read
         using (SchedulerManager.MaskInterrupts())
         {
-            var cpuData = CpuDataOf(cpuState);
+            StrideCpuData? cpuData = CpuDataOf(cpuState);
             return cpuData?.RunQueue.Count ?? 0;
         }
     }
@@ -602,7 +602,7 @@ internal class StrideScheduler : IScheduler
         // Disable interrupts to prevent timer from modifying RunQueue while we read
         using (SchedulerManager.MaskInterrupts())
         {
-            var cpuData = CpuDataOf(cpuState);
+            StrideCpuData? cpuData = CpuDataOf(cpuState);
             if (cpuData == null || index < 0 || index >= cpuData.RunQueue.Count)
             {
                 return null;
