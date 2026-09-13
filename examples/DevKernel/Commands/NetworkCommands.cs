@@ -257,7 +257,7 @@ internal static class NetworkCommands
 
         Terminal.Info("Resolving " + domain + "...");
 
-        Address dnsServer = new(CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet);
+        Address4 dnsServer = new(CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet);
         DNSConfig.Add(dnsServer);
 
         DnsClient dnsClient = new();
