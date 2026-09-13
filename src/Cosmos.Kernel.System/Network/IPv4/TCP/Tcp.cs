@@ -479,14 +479,14 @@ public class Tcp : IDisposable
             //Fill TCB
             TCB.SndUna = sequenceNumber;
             TCB.SndNxt = sequenceNumber;
-            TCB.SndWnd = Tcp.TcpWindowSize;
+            TCB.SndWnd = TcpWindowSize;
             TCB.SndUp = 0;
             TCB.SndWl1 = packet.SequenceNumber - 1;
             TCB.SndWl2 = 0;
             TCB.ISS = sequenceNumber;
 
             TCB.RcvNxt = packet.SequenceNumber + 1;
-            TCB.RcvWnd = Tcp.TcpWindowSize;
+            TCB.RcvWnd = TcpWindowSize;
             TCB.RcvUp = 0;
             TCB.IRS = packet.SequenceNumber;
 

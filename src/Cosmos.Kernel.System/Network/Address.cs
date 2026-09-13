@@ -5,7 +5,6 @@
  *                   Port of Cosmos Code.
  */
 
-using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.System.Network.IPv4;
 using Cosmos.Kernel.System.Network.IPv6;
@@ -43,7 +42,7 @@ public abstract class Address : IComparable<Address>
     /// <returns>The parsed address value or null when parsing fails.</returns>
     public static Address? Parse(ReadOnlySpan<char> addr)
     {
-       return Address4.Parse(addr) ?? Address6.Parse(addr);
+        return Parse(addr) ?? Address6.Parse(addr);
     }
 
     /// <summary>
@@ -112,9 +111,23 @@ public abstract class Address : IComparable<Address>
 
     public static bool operator !=(Address a, Address b) => !(a == b);
 
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (ReferenceEquals(obj, null))
+        {
+            return false;
+        }
+
+        throw new NotImplementedException();
+    }
 }
 
-public readonly ref struct MaskedAddress: IEquatable<MaskedAddress>
+public readonly ref struct MaskedAddress : IEquatable<MaskedAddress>
 {
     public uint Segment1 { get; }
     public uint Segment2 { get; }
@@ -127,7 +140,7 @@ public readonly ref struct MaskedAddress: IEquatable<MaskedAddress>
         Segment1 = segment1;
         AddressFamily = AddressFamily.IPv4;
     }
-    public MaskedAddress(uint segment1, uint  segment2, uint segment3, uint segment4)
+    public MaskedAddress(uint segment1, uint segment2, uint segment3, uint segment4)
     {
         Segment1 = segment1;
         Segment2 = segment2;
@@ -170,5 +183,10 @@ public readonly ref struct MaskedAddress: IEquatable<MaskedAddress>
             int part = index % 4;
             return (byte)(segment >> ((3 - part) * 8) & 0xFF);
         }
+    }
+
+    public override bool Equals(object obj)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -17,9 +17,9 @@ public class SVGAII3DCanvas : Canvas
 {
     private static readonly Mode s_defaultMode = new(1024, 768, ColorDepth.ColorDepth32);
 
-    private int _bytesPerPixel;
-    private int _pitch;
-    private int _stride;
+    private new int _bytesPerPixel;
+    private new int _pitch;
+    private new int _stride;
     private Mode _mode;
 
     /// <summary>

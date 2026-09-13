@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace Cosmos.Kernel.System.Network.IPv4;
 
-public sealed class Address4: Address, IComparable<Address4>, IEquatable<Address4>
+public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Address4>
 {
     /// <summary>
     /// The parts of the address.
@@ -158,7 +158,7 @@ public sealed class Address4: Address, IComparable<Address4>, IEquatable<Address
     public override bool IsLoopbackAddress => (Segment1 >> 24) == 127;
 
 
-    public override bool Equals([NotNullWhen(true)]object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return ReferenceEquals(this, obj) || obj is Address4 other && Equals(other);
     }
@@ -179,7 +179,7 @@ public sealed class Address4: Address, IComparable<Address4>, IEquatable<Address
         throw new ArgumentException($"Can bitwise operate {nameof(Address4)} with {nameof(Address4)} only");
     }
 
-    public bool Equals([NotNullWhen(true)]Address4? other)
+    public bool Equals([NotNullWhen(true)] Address4? other)
     {
         if (other is null)
         {

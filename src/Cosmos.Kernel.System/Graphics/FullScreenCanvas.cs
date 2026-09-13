@@ -74,7 +74,7 @@ public static class FullScreenCanvas
     /// </summary>
     public static Canvas GetFullScreenCanvas()
     {
-        if (!Cosmos.Kernel.Core.CosmosFeatures.GraphicsEnabled)
+        if (!CosmosFeatures.GraphicsEnabled)
         {
             throw new InvalidOperationException("Graphics support is disabled. Set CosmosEnableGraphics=true in your csproj to enable it.");
         }
@@ -90,7 +90,7 @@ public static class FullScreenCanvas
     /// </summary>
     public static Canvas GetFullScreenCanvas(Mode mode)
     {
-        if (!Cosmos.Kernel.Core.CosmosFeatures.GraphicsEnabled)
+        if (!CosmosFeatures.GraphicsEnabled)
         {
             throw new InvalidOperationException("Graphics support is disabled. Set CosmosEnableGraphics=true in your csproj to enable it.");
         }

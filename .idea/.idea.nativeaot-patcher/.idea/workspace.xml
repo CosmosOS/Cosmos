@@ -66,6 +66,13 @@
     <setting file="file://$PROJECT_DIR$/src/tests/Cosmos.Kernel.Tests.System/Network/IPv4/Address4Test.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/tests/Cosmos.Kernel.Tests.System/Network/IPv6/Address6Test.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/tests/Cosmos.Kernel.Tests.System/Network/MaskedAddressTest.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/examples/DevKernel/Commands/NetworkCommands.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Global.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Graphics/FullScreenCanvas.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/Address.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/IPv4/Address4.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/IPv4/TCP/Tcp.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/IPv6/Address6.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
     <commands />
@@ -382,10 +389,10 @@
           <line>508</line>
           <properties documentPath="$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/IPv6/Address6.cs" containingFunctionPresentation="Method 'ToString'">
             <startOffsets>
-              <option value="15981" />
+              <option value="15982" />
             </startOffsets>
             <endOffsets>
-              <option value="15996" />
+              <option value="15997" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="14" />

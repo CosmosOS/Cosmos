@@ -102,9 +102,9 @@ public static class KeyboardManager
         // Enable keyboard after callback is set (this registers IRQ handler)
         keyboard.Enable();
 
-        Cosmos.Kernel.Core.IO.Serial.Write("[KeyboardManager] Registered keyboard, total: ");
-        Cosmos.Kernel.Core.IO.Serial.WriteNumber((uint)s_keyboards.Count);
-        Cosmos.Kernel.Core.IO.Serial.Write("\n");
+        Core.IO.Serial.Write("[KeyboardManager] Registered keyboard, total: ");
+        Core.IO.Serial.WriteNumber((uint)s_keyboards.Count);
+        Core.IO.Serial.Write("\n");
     }
 
     /// <summary>
@@ -240,7 +240,7 @@ public static class KeyboardManager
         if (!s_readKeyEntered)
         {
             s_readKeyEntered = true;
-            Cosmos.Kernel.Core.IO.Serial.Write("[KeyboardManager] ReadKey() entered\n");
+            Core.IO.Serial.Write("[KeyboardManager] ReadKey() entered\n");
         }
 
         while (s_queuedKeys == null || s_queuedKeys.Count == 0)
@@ -267,7 +267,7 @@ public static class KeyboardManager
         if (!s_pollEntered)
         {
             s_pollEntered = true;
-            Cosmos.Kernel.Core.IO.Serial.Write("[KeyboardManager] PollKeyboards() first call\n");
+            Core.IO.Serial.Write("[KeyboardManager] PollKeyboards() first call\n");
         }
 
         if (s_keyboards == null)
@@ -278,11 +278,11 @@ public static class KeyboardManager
         s_pollCallCount++;
         if (s_pollCallCount % 100 == 0)
         {
-            Cosmos.Kernel.Core.IO.Serial.Write("[KeyboardManager] PollKeyboards #");
-            Cosmos.Kernel.Core.IO.Serial.WriteNumber(s_pollCallCount);
-            Cosmos.Kernel.Core.IO.Serial.Write(" keyboards=");
-            Cosmos.Kernel.Core.IO.Serial.WriteNumber((uint)s_keyboards.Count);
-            Cosmos.Kernel.Core.IO.Serial.Write("\n");
+            Core.IO.Serial.Write("[KeyboardManager] PollKeyboards #");
+            Core.IO.Serial.WriteNumber(s_pollCallCount);
+            Core.IO.Serial.Write(" keyboards=");
+            Core.IO.Serial.WriteNumber((uint)s_keyboards.Count);
+            Core.IO.Serial.Write("\n");
         }
 
         foreach (var keyboard in s_keyboards)

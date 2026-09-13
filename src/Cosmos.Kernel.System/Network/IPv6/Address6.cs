@@ -481,7 +481,7 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         return HashCode.Combine(Segment1, Segment2, Segment3, Segment4);
     }
 
-    public bool Equals([NotNullWhen(true)]Address6? other)
+    public bool Equals([NotNullWhen(true)] Address6? other)
     {
         if (other is null)
         {

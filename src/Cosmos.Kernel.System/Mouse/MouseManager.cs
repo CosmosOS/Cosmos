@@ -123,9 +123,9 @@ public static class MouseManager
         // Enable mouse after callback is set
         mouse.Enable();
 
-        Cosmos.Kernel.Core.IO.Serial.Write("[MouseManager] Registered mouse, total: ");
-        Cosmos.Kernel.Core.IO.Serial.WriteNumber((uint)s_mice.Count);
-        Cosmos.Kernel.Core.IO.Serial.Write("\n");
+        Core.IO.Serial.Write("[MouseManager] Registered mouse, total: ");
+        Core.IO.Serial.WriteNumber((uint)s_mice.Count);
+        Core.IO.Serial.Write("\n");
     }
 
     /// <summary>
