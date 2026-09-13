@@ -55,9 +55,9 @@ internal sealed class NetworkSession
     /// </summary>
     public void ConfigureStatic(INetworkDevice device)
     {
-        LocalIp = new Address(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGuestHostOctet);
-        GatewayIp = new Address(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGatewayHostOctet);
-        Address subnet = new(SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskHostOctet);
+        LocalIp = new Address4(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGuestHostOctet);
+        GatewayIp = new Address4(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGatewayHostOctet);
+        Address4 subnet = new(SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskHostOctet);
 
         NetworkStack.Initialize();
         IPConfig.Enable(device, LocalIp, subnet, GatewayIp);

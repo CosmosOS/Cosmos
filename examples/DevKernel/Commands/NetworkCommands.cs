@@ -266,7 +266,8 @@ internal static class NetworkCommands
 
         Address? resolvedIP = dnsClient.Receive(DnsReceiveTimeoutMs);
 
-        if (resolvedIP != null && resolvedIP.Id != 0)
+        // TODO support IPv6
+        if (resolvedIP != null && resolvedIP != Address4.Zero)
         {
             Terminal.Success(domain + " -> " + resolvedIP.ToString());
         }
