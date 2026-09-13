@@ -207,13 +207,9 @@ public class IPConfig
     /// <returns>Address value.</returns>
     internal static Address? FindRoute(Address destIP)
     {
-        // TODO is this correct implementation?
-        for (int c = 0; c < s_configs.Count; c++)
-        {
-            return s_configs[c].Config.DefaultGateway;
-        }
-
-        return null;
+        // There is no routing table: every non-local destination leaves
+        // through the first configured interface's default gateway.
+        return s_configs.Count > 0 ? s_configs[0].Config.DefaultGateway : null;
     }
 
     /// <summary>

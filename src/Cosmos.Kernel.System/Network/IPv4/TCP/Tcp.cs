@@ -362,11 +362,6 @@ internal class Tcp : IDisposable
         TCB = new TransmissionControlBlock();
     }
 
-    public void AssignData(ReadOnlySpan<byte> source, int offset, int count, int length)
-    {
-
-    }
-
     /// <summary>
     /// Handles incoming TCP packets according to the current connection status.
     /// </summary>
@@ -945,6 +940,5 @@ internal class Tcp : IDisposable
         {
             s_arrayPool.Return(_data);
         }
-        // TODO release managed resources here
     }
 }
