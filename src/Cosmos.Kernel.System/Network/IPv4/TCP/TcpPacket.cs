@@ -95,7 +95,7 @@ public class TcpPacket : IPPacket
         }
         else
         {
-            Serial.WriteString("[TCP] Checksum incorrect! Packet passed.\n");
+            Serial.WriteString("[TCP] Checksum incorrect, segment dropped.\n");
         }
     }
 
@@ -266,14 +266,6 @@ public class TcpPacket : IPPacket
     }
 
     /// <summary>
-    /// Add Option to TCP Packet.
-    /// </summary>
-    internal void AddOption(TcpOption option)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
     /// Add raw data to TCP Packet.
     /// </summary>
     internal void AddRawData(byte[] raw)
@@ -317,12 +309,15 @@ public class TcpPacket : IPPacket
     }
 
     /// <summary>
-    /// Check TCP Checksum
+    /// Verifies the checksum the segment arrived with. The ones'-complement
+    /// sum over the pseudo-header and the whole segment, the checksum field
+    /// included, is all ones when the bytes are intact, so the complement
+    /// <c>CalcOcCrc</c> returns is zero.
     /// </summary>
     private bool CheckCRC()
     {
-        // TODO: Implement proper checksum verification
-        return true;
+        byte[] header = MakeHeader();
+        return CalcOcCrc(header, 0, header.Length) == 0;
     }
 
     /// <summary>
