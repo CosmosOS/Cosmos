@@ -131,10 +131,7 @@ public class UdpClient : IDisposable
     /// </summary>
     public void Close()
     {
-        if (s_clients.ContainsKey((uint)_localPort))
-        {
-            s_clients.Remove((uint)_localPort);
-        }
+        s_clients.Remove((uint)_localPort);
     }
 
     /// <summary>

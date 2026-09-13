@@ -52,11 +52,6 @@ internal static class ArpCache
     {
         EnsureCacheExists();
 
-        if (!Cache.TryGetValue(ipAddress.Id, out MACAddress? resolve))
-        {
-            return null;
-        }
-
-        return resolve;
+        return Cache.TryGetValue(ipAddress.Id, out MACAddress? resolve) ? resolve : null;
     }
 }

@@ -307,10 +307,7 @@ public static class SocketPlug
         int id = GetId(aThis);
 
         // Create endpoint if not bound
-        if (!_endpoints.ContainsKey(id))
-        {
-            _endpoints[id] = new IPEndPoint(address, port);
-        }
+        _endpoints.TryAdd(id, new IPEndPoint(address, port));
 
         StartTcp(aThis);
         Tcp sm = s_tcpStateMachines[id];

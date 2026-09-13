@@ -76,7 +76,7 @@ public sealed class IcmpClient : IDisposable
     /// </summary>
     public void Close()
     {
-        if (_destination is not null && s_clients.ContainsKey(_destination.Id))
+        if (_destination is not null)
         {
             s_clients.Remove(_destination.Id);
         }
