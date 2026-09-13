@@ -690,18 +690,18 @@ public static class SchedulerManager
                 }
             }
         }
-        else if (thread.ManagedThread.IsAllocated)
+        else if (thread._managedThread.IsAllocated)
         {
             Serial.WriteString("[SCHED] ExitThread: stopping managed thread ");
             Serial.WriteNumber(thread.Id);
             Serial.WriteString(" from another context\n");
-            StopManagedThread(thread.ManagedThread.Target);
+            StopManagedThread(thread._managedThread.Target);
         }
 
-        if (thread.ManagedThread.IsAllocated)
+        if (thread._managedThread.IsAllocated)
         {
-            thread.ManagedThread.Dispose();
-            thread.ManagedThread = default;
+            thread._managedThread.Dispose();
+            thread._managedThread = default;
         }
 
         Serial.WriteString("[SCHED] ExitThread: entering DisableInterruptsScope for thread ");

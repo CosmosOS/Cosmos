@@ -135,7 +135,7 @@ internal static unsafe partial class libSystemNative
                 // CoreLib's handle in `parameter` lives only until the thread
                 // reports itself started; the mechanism keeps its own for the
                 // thread's whole life, so a kill can reach the managed side.
-                ManagedThread = new GCHandle<SysThread>(GCHandle<SysThread>.FromIntPtr(parameter).Target)
+                _managedThread = new GCHandle<SysThread>(GCHandle<SysThread>.FromIntPtr(parameter).Target)
             };
 
             nuint entryPoint = (nuint)(delegate* unmanaged<IntPtr, void>)&ThreadNative.EntryPointStub;

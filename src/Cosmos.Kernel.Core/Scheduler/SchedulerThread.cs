@@ -110,7 +110,7 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// killed while queued be stopped on the managed side too. Unallocated
     /// on a thread that runs a free delegate.
     /// </summary>
-    internal GCHandle<System.Threading.Thread> ManagedThread;
+    internal GCHandle<System.Threading.Thread> _managedThread;
 
     /// <summary>
     /// Backing store for the thread's <c>[ThreadStatic]</c> fields, handed to
@@ -120,7 +120,6 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// never pays for one.
     /// </summary>
     private object[][]? _threadStaticStorage;
-
 
     /// <summary>
     /// Default stack size for new threads (256KB). Must stay above CoreLib's
