@@ -65,7 +65,7 @@ public void OnThreadCreate(PerCpuState state, SchedulerThread thread)
 public bool OnTick(PerCpuState state, SchedulerThread current, ulong elapsedNs)
 {
     MyThreadData? data = current.SchedulerData as MyThreadData;
-    if (data == null) { return true; }   // not ours, or already exited
+    if (data is null) { return true; }   // not ours, or already exited
     ...
 }
 ```

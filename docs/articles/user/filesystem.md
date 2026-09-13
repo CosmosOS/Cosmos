@@ -146,7 +146,7 @@ Start by asking what scheme the disk already carries:
 
 ```csharp
 IBlockDevice? disk = StorageManager.PrimaryDevice;
-if (disk == null)
+if (disk is null)
 {
     Console.WriteLine("No disk");
     return;

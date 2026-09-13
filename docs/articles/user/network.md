@@ -95,12 +95,12 @@ There is no separate stack-initialization step. Configuring an address is what b
 `DhcpClient.SendDiscoverPacket()` runs the whole DISCOVER → OFFER → REQUEST → ACK exchange and applies the resulting configuration. It returns the elapsed milliseconds, or `-1` on timeout:
 
 ```csharp
-var dhcpClient = new DhcpClient();
+DhcpClient dhcpClient = new();
 
 if (dhcpClient.SendDiscoverPacket() != -1)
 {
     IPConfig? config = NetworkManager.Primary.IPConfig;
-    if (config != null)
+    if (config is not null)
     {
         Console.WriteLine("IP address: " + config.Address.ToString());
         Console.WriteLine("Subnet:     " + config.SubnetMask.ToString());
@@ -309,7 +309,7 @@ using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
 
 IPConfig? config = NetworkManager.Primary.IPConfig;
-if (config == null)
+if (config is null)
 {
     Console.WriteLine("The primary adapter has no IPv4 configuration.");
     return;

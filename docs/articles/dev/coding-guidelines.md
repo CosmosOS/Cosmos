@@ -187,7 +187,7 @@ public static class TimerManager
 {
     private static ITimerDevice? s_timer;
 
-    public static bool IsInitialized => s_timer != null;
+    public static bool IsInitialized => s_timer is not null;
 
     internal static void RegisterTimer(ITimerDevice timer) { ... }
     public static void Wait(uint ms) { ... }
