@@ -18,13 +18,18 @@
          trample the per-file severity=none exclusions (LibraryInitializer,
          KernelVersion.g.cs); its editorconfig error severity already works. -->
     <WarningsAsErrors>$(WarningsAsErrors);RS0017</WarningsAsErrors>
-    <!-- A tracked public surface must be documented: lift the repo-wide CS1591
-         suppression (props set NoWarn to ";1591;CS1998;..." so the delimited
-         token is always ";1591;"). The error severity comes from the
-         .editorconfig [*.cs] section, not WarningsAsErrors, so it only reaches
-         files this repo's .editorconfig governs; sources linked from the
-         dotnet/runtime submodule keep their default severity. -->
-    <NoWarn>$(NoWarn.Replace(';1591;', ';'))</NoWarn>
+  </PropertyGroup>
+
+  <!-- A tracked public surface must be documented, so CS1591 (missing XML doc)
+       is suppressed everywhere except there. Adding the suppression here is
+       what makes the condition possible: the props are imported before the
+       project body sets CosmosTrackPublicApi, so a property condition on the
+       flag is always false there. The error severity comes from the
+       .editorconfig [*.cs] section, not WarningsAsErrors, so it only reaches
+       files this repo's .editorconfig governs; sources linked from the
+       dotnet/runtime submodule keep their default severity. -->
+  <PropertyGroup Condition="'$(CosmosTrackPublicApi)' != 'true'">
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <Target Name="EnforceKernelReferenceRules" BeforeTargets="BeforeBuild">

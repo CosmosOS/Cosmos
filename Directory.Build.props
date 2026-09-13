@@ -9,7 +9,7 @@
     <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591;CS1998;NU1903;SYSLIB0011;</NoWarn>
+    <NoWarn>$(NoWarn);CS1998;NU1903;SYSLIB0011;</NoWarn>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
     <UseArtifactsOutput>true</UseArtifactsOutput>
