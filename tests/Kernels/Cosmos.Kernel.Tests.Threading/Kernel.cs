@@ -1512,14 +1512,14 @@ public class Kernel : Sys.Kernel
     /// </summary>
     private static bool RunQueueHolds(SchedulerThread? thread)
     {
-        if (thread == null)
+        if (thread is null)
         {
             return false;
         }
 
         IScheduler? scheduler = SchedulerManager.Current;
         PerCpuState? state = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId());
-        if (scheduler == null || state == null)
+        if (scheduler is null || state is null)
         {
             return false;
         }
@@ -1659,7 +1659,7 @@ public class Kernel : Sys.Kernel
     private static void TestBootPolicyIsStride()
     {
         IScheduler? current = SchedulerManager.Current;
-        Assert.True(current != null, "a scheduling policy must be installed at boot");
+        Assert.True(current is not null, "a scheduling policy must be installed at boot");
         Assert.Equal("Stride", current!.Name, "the boot default policy should be Stride");
     }
 
@@ -1694,9 +1694,9 @@ public class Kernel : Sys.Kernel
             "the installed policy should report its own name");
 
         PerCpuState? state = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId());
-        Assert.True(state != null && state.SchedulerData is RoundRobinCpuData,
+        Assert.True(state is not null && state.SchedulerData is RoundRobinCpuData,
             "InitializeCpu should attach fresh Round-Robin per-CPU data");
-        if (state != null)
+        if (state is not null)
         {
             Assert.Equal(0, s_roundRobin!.GetRunQueueCount(state),
                 "the incoming policy should start from an empty run queue");
@@ -1770,7 +1770,7 @@ public class Kernel : Sys.Kernel
             "PickNext must continue in FIFO order");
         Assert.True(ReferenceEquals(policy.PickNext(state), third),
             "PickNext must continue in FIFO order");
-        Assert.True(policy.PickNext(state) == null,
+        Assert.True(policy.PickNext(state) is null,
             "an empty run queue must pick nothing (the mechanism runs idle)");
     }
 
@@ -1852,7 +1852,7 @@ public class Kernel : Sys.Kernel
         policy.OnThreadExit(state, other);
         Assert.Equal(1, policy.GetRunQueueCount(state),
             "an exited thread must leave the run queue");
-        Assert.True(other.SchedulerData == null,
+        Assert.True(other.SchedulerData is null,
             "OnThreadExit must drop the thread's bookkeeping");
     }
 
@@ -2023,7 +2023,7 @@ public class Kernel : Sys.Kernel
             "the run queue should hold the three spinning workers");
         Assert.True(RunQueueHolds(s_gateAThread) && RunQueueHolds(s_gateBThread) && RunQueueHolds(s_gateCThread),
             "each spinning worker should be visible through the diagnostics hooks");
-        Assert.True(scheduler.GetRunQueueThread(state, OutOfRangeQueueIndex) == null,
+        Assert.True(scheduler.GetRunQueueThread(state, OutOfRangeQueueIndex) is null,
             "an out-of-range run-queue index must read as null");
 
         s_gateRelease = true;

@@ -432,7 +432,7 @@ internal class StrideScheduler : IScheduler
             StrideCpuData? cpuData = CpuDataOf(cpuState);
             StrideThreadData? threadData = ThreadDataOf(thread);
 
-            if (cpuData == null || threadData == null)
+            if (cpuData is null || threadData is null)
             {
                 return;
             }

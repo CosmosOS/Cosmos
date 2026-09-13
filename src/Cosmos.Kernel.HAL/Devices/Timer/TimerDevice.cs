@@ -146,7 +146,7 @@ internal abstract class TimerDevice : Device, ITimerDevice
             // A recurring timer that an earlier callback in this batch
             // cancelled must not fire. A one-shot is already off the registry
             // and committed to this firing.
-            if (timer == null || (timer.Recurring && !timer.IsActive))
+            if (timer is null || (timer.Recurring && !timer.IsActive))
             {
                 continue;
             }

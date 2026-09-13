@@ -15,7 +15,7 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     {
         get
         {
-            if (s_broadcast == null)
+            if (s_broadcast is null)
             {
                 s_broadcast = new MACAddress([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
             }
@@ -30,7 +30,7 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     {
         get
         {
-            if (s_none == null)
+            if (s_none is null)
             {
                 s_none = new MACAddress([0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
             }
@@ -51,7 +51,7 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     /// <param name="address">The six address bytes, most significant first.</param>
     public MACAddress(byte[] address)
     {
-        if (address == null || address.Length != 6)
+        if (address is null || address.Length != 6)
         {
             throw new ArgumentException("MACAddress is null or has wrong length", nameof(address));
         }
@@ -72,7 +72,7 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     /// <param name="offset">offset in buffer to start from</param>
     public MACAddress(byte[] buffer, int offset)
     {
-        if (buffer == null || buffer.Length < offset + 6)
+        if (buffer is null || buffer.Length < offset + 6)
         {
             throw new ArgumentException("buffer does not contain enough data starting at offset", nameof(buffer));
         }

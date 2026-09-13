@@ -188,7 +188,7 @@ internal static class SchedulerCommands
         s_alarmFireCount = 0;
 
         SoftwareTimer? timer = TimerManager.Schedule(static () => s_timerFireCount++, TimeSpan.FromMilliseconds(TimerDelayMs));
-        if (timer == null)
+        if (timer is null)
         {
             Terminal.Error("No timer device registered");
             return;

@@ -103,7 +103,7 @@ internal static unsafe partial class GarbageCollector
                 for (int i = 0; i < threads.Length; i++)
                 {
                     var thread = threads[i];
-                    if (thread != null && !object.ReferenceEquals(thread, current) && thread.State != SchedulerThreadState.Dead)
+                    if (thread is not null && !object.ReferenceEquals(thread, current) && thread.State != SchedulerThreadState.Dead)
                     {
                         ScanThreadStack(thread);
                     }

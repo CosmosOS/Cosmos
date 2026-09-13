@@ -154,7 +154,7 @@ public abstract class Canvas3D : Canvas
     {
         uint argb = (uint)color.ToArgb();
 
-        if (_cubeMesh == null || _cubeColor != argb)
+        if (_cubeMesh is null || _cubeColor != argb)
         {
             _cubeMesh?.Dispose();
             _cubeMesh = CreateUnitCube(argb);
@@ -174,7 +174,7 @@ public abstract class Canvas3D : Canvas
     {
         uint argb = (uint)color.ToArgb();
 
-        if (_lineMesh == null || _lineColor != argb)
+        if (_lineMesh is null || _lineColor != argb)
         {
             _lineMesh?.Dispose();
             _lineMesh = CreateUnitLine(argb);

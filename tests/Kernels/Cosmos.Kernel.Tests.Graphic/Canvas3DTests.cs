@@ -90,10 +90,10 @@ public static unsafe class Canvas3DTests
     private static Mesh? s_cube;
 
     /// <summary>True when the SVGA II adapter was enumerated on the PCI bus.</summary>
-    public static bool DevicePresent => s_device != null;
+    public static bool DevicePresent => s_device is not null;
 
     /// <summary>True when <see cref="TestSceneSetupFifo"/> constructed the inspected canvas.</summary>
-    public static bool Ready => s_canvas != null;
+    public static bool Ready => s_canvas is not null;
 
     /// <summary>
     /// Locate the SVGA II adapter on the PCI bus. Called once from BeforeRun;
@@ -101,7 +101,7 @@ public static unsafe class Canvas3DTests
     /// </summary>
     public static void Discover()
     {
-        if (PciManager.Devices == null)
+        if (PciManager.Devices is null)
         {
             return;
         }
@@ -446,7 +446,7 @@ public static unsafe class Canvas3DTests
     /// </summary>
     public static void TestCameraCachingFifo()
     {
-        if (s_cube == null)
+        if (s_cube is null)
         {
             Assert.Fail("cube mesh not built (TestDrawCubeFifo did not run)");
             return;

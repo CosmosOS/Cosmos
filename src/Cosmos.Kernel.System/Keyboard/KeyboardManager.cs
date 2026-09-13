@@ -82,7 +82,7 @@ public static class KeyboardManager
     {
         ThrowIfDisabled();
 
-        if (s_keyboards != null)
+        if (s_keyboards is not null)
         {
             return;
         }
@@ -206,7 +206,7 @@ public static class KeyboardManager
     {
         ThrowIfDisabled();
 
-        if (s_queuedKeys == null)
+        if (s_queuedKeys is null)
         {
             throw new InvalidOperationException("KeyboardManager not initialized!");
         }
@@ -246,7 +246,7 @@ public static class KeyboardManager
         // what makes the read safe against the interrupt that fills the queue.
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (s_queuedKeys != null && s_queuedKeys.TryDequeue(out KeyEvent? pending))
+            if (s_queuedKeys is not null && s_queuedKeys.TryDequeue(out KeyEvent? pending))
             {
                 key = pending;
                 return true;
@@ -270,7 +270,7 @@ public static class KeyboardManager
     {
         ThrowIfDisabled();
 
-        if (s_queuedKeys == null)
+        if (s_queuedKeys is null)
         {
             throw new InvalidOperationException("KeyboardManager not initialized!");
         }

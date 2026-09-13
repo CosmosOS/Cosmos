@@ -459,7 +459,7 @@ public static class SchedulerManager
         using (CPU.InternalCpu.DisableInterruptsScope())
         {
             SchedulerThread?[]? threads = s_allThreads;
-            if (threads == null)
+            if (threads is null)
             {
                 return 0;
             }
@@ -468,7 +468,7 @@ public static class SchedulerManager
             for (int i = 0; i < threads.Length; i++)
             {
                 SchedulerThread? t = threads[i];
-                if (t == null)
+                if (t is null)
                 {
                     continue;
                 }
@@ -523,7 +523,7 @@ public static class SchedulerManager
 
             for (int i = 0; i < s_allThreads.Length; i++)
             {
-                if (s_allThreads[i] == null)
+                if (s_allThreads[i] is null)
                 {
                     s_allThreads[i] = thread;
                     s_allThreadCount++;
@@ -1026,7 +1026,7 @@ public static class SchedulerManager
         for (int i = 0; i < s_allThreads.Length; i++)
         {
             SchedulerThread? thread = s_allThreads[i];
-            if (thread == null || thread.State != SchedulerThreadState.Sleeping)
+            if (thread is null || thread.State != SchedulerThreadState.Sleeping)
             {
                 continue;
             }

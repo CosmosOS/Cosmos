@@ -360,7 +360,7 @@ internal sealed class SvgaII3DCanvas : Canvas3D
             return;
         }
 
-        if (texture == null)
+        if (texture is null)
         {
             _driver3D.SetTextureState(_context,
             [
@@ -527,7 +527,7 @@ internal sealed class SvgaII3DCanvas : Canvas3D
         int[] data = new int[width * height];
         int[]? pixels = _driver3D.PresentToImage(_colorTarget, new SVGA3dRect((uint)x, (uint)y, (uint)width, (uint)height));
 
-        if (pixels != null)
+        if (pixels is not null)
         {
             // PresentToImage returns the driver's reused readback buffer;
             // copy so the bitmap survives the next readback.

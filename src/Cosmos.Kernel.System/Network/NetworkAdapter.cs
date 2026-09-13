@@ -74,7 +74,7 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
         get
         {
             INetworkDevice? device = Device;
-            return device == null ? null : Config.IPConfig.Get(device);
+            return device is null ? null : Config.IPConfig.Get(device);
         }
     }
 

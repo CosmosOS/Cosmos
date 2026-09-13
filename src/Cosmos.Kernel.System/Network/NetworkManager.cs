@@ -37,14 +37,14 @@ public static class NetworkManager
     /// Gets whether the network manager is initialized, which is what makes
     /// the device table exist.
     /// </summary>
-    public static bool IsInitialized => s_devices != null;
+    public static bool IsInitialized => s_devices is not null;
 
     /// <summary>
     /// Gets the primary network device. Internal: a kernel names a device with
     /// a <see cref="NetworkAdapter"/> rather than holding the contract.
     /// </summary>
     internal static INetworkDevice? PrimaryDevice =>
-        s_primaryIndex >= 0 && s_devices != null ? s_devices[s_primaryIndex] : null;
+        s_primaryIndex >= 0 && s_devices is not null ? s_devices[s_primaryIndex] : null;
 
     /// <summary>
     /// The adapter the ring uses when no other is named: the target of
@@ -117,7 +117,7 @@ public static class NetworkManager
     {
         ThrowIfDisabled();
 
-        if (s_devices != null)
+        if (s_devices is not null)
         {
             return;
         }

@@ -212,7 +212,7 @@ internal static class NetworkCommands
             while (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.Escape)
             {
                 byte[]? data = client.Receive(ref source, timeoutMs: 0);
-                if (data != null)
+                if (data is not null)
                 {
                     PrintDatagram(source, data);
                 }

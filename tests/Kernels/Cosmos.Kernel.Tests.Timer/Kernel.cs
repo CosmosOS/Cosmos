@@ -297,10 +297,10 @@ public class Kernel : Sys.Kernel
         // both managers refuse it and both accept a zero one-shot delay, which
         // simply fires on the next tick.
         Assert.True(
-            TimerManager.ScheduleRecurring(static () => { }, TimeSpan.Zero) == null,
+            TimerManager.ScheduleRecurring(static () => { }, TimeSpan.Zero) is null,
             "ScheduleRecurring: a zero period should be refused");
         Assert.True(
-            TimerManager.ScheduleRecurring(static () => { }, TimeSpan.FromMilliseconds(-50)) == null,
+            TimerManager.ScheduleRecurring(static () => { }, TimeSpan.FromMilliseconds(-50)) is null,
             "ScheduleRecurring: a negative period should be refused");
         Assert.True(
             AlarmManager.ScheduleRecurring(static () => { }, TimeSpan.Zero) == 0,
@@ -310,7 +310,7 @@ public class Kernel : Sys.Kernel
             "Alarm ScheduleRecurring: a negative period should be refused");
 
         SoftwareTimer? timer = TimerManager.Schedule(static () => { }, TimeSpan.Zero);
-        Assert.True(timer != null, "Schedule: a zero delay should still be scheduled");
+        Assert.True(timer is not null, "Schedule: a zero delay should still be scheduled");
         TimerManager.Cancel(timer);
 
         // Sub-millisecond periods used to round to zero and be refused; the
@@ -344,7 +344,7 @@ public class Kernel : Sys.Kernel
             },
             TimeSpan.FromMilliseconds(50));
 
-        Assert.True(canceller != null, "Reentrancy: the cancelling timer should be scheduled");
+        Assert.True(canceller is not null, "Reentrancy: the cancelling timer should be scheduled");
 
         TimerManager.Wait(300);
 

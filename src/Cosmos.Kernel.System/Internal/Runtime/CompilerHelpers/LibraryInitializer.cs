@@ -5,6 +5,8 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.HAL;
+using Cosmos.Kernel.HAL.Interfaces;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Keyboard;
 using Cosmos.Kernel.System.Mouse;
 using Cosmos.Kernel.System.Network;

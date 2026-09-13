@@ -195,7 +195,7 @@ internal static class MountCommands
     private static void PrintMountSource(VfsManager.VfsMount mount)
     {
         Partition? partition = mount.Partition;
-        if (partition == null || !StorageView.TryDescribePartition(partition, out int diskNumber, out int partitionNumber))
+        if (partition is null || !StorageView.TryDescribePartition(partition, out int diskNumber, out int partitionNumber))
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(mount.Name);

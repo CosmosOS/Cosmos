@@ -26,7 +26,7 @@ public static class TimerManager
     /// compiled out with CosmosEnableTimer=false, since every member of this
     /// class answers off that device.
     /// </summary>
-    public static bool IsInitialized => s_timer != null;
+    public static bool IsInitialized => s_timer is not null;
 
     /// <summary>
     /// Gets the registered timer device.
@@ -87,7 +87,7 @@ public static class TimerManager
         {
             ThrowIfDisabled();
 
-            if (s_timer == null)
+            if (s_timer is null)
             {
                 return;
             }
@@ -166,7 +166,7 @@ public static class TimerManager
     /// </returns>
     public static bool Cancel(SoftwareTimer? timer)
     {
-        if (timer == null || s_timer == null)
+        if (timer is null || s_timer is null)
         {
             return false;
         }

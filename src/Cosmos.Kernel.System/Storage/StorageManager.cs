@@ -47,7 +47,7 @@ public static class StorageManager
     /// Gets whether the storage manager is initialized, which is what makes
     /// the device table exist.
     /// </summary>
-    public static bool IsInitialized => s_devices != null;
+    public static bool IsInitialized => s_devices is not null;
 
     /// <summary>
     /// Gets the primary block device (first one registered), or
@@ -84,7 +84,7 @@ public static class StorageManager
     /// <param name="device">The device to list the partitions of.</param>
     public static IReadOnlyList<Partition> GetPartitions(IBlockDevice device)
     {
-        if (s_partitions == null || device == null)
+        if (s_partitions is null || device is null)
         {
             return Array.Empty<Partition>();
         }
@@ -109,7 +109,7 @@ public static class StorageManager
     {
         ThrowIfDisabled();
 
-        if (s_devices != null)
+        if (s_devices is not null)
         {
             return;
         }
@@ -154,7 +154,7 @@ public static class StorageManager
     {
         ThrowIfDisabled();
 
-        if (device == null || s_devices == null || s_devices.Count >= MaxDevices)
+        if (device is null || s_devices is null || s_devices.Count >= MaxDevices)
         {
             return;
         }
@@ -205,7 +205,7 @@ public static class StorageManager
     {
         ThrowIfDisabled();
 
-        if (s_partitions == null || device == null)
+        if (s_partitions is null || device is null)
         {
             return;
         }
@@ -327,7 +327,7 @@ public static class StorageManager
     /// storage support is disabled.</returns>
     public static IBlockDevice? GetDevice(int index)
     {
-        if (s_devices == null || index < 0 || index >= s_devices.Count)
+        if (s_devices is null || index < 0 || index >= s_devices.Count)
         {
             return null;
         }

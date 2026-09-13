@@ -192,7 +192,7 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         // coincidence, and silently ignoring the parameter left the caller
         // believing it had set the tick interval on both architectures.
         Serial.WriteString("[ARM64HAL] Starting Generic Timer for scheduling...\n");
-        if (_timer != null)
+        if (_timer is not null)
         {
             _timer.SetPeriod(quantumMs * 1_000_000UL);
             _timer.Start();

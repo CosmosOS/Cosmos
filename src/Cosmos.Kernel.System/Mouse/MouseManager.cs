@@ -113,7 +113,7 @@ public static class MouseManager
     {
         ThrowIfDisabled();
 
-        if (s_mice != null)
+        if (s_mice is not null)
         {
             return;
         }

@@ -71,7 +71,7 @@ internal static class OutgoingBuffer
     public static bool AddPacket(IPPacket packet)
     {
         var device = IPConfig.FindInterface(packet.SourceIP);
-        if (device == null)
+        if (device is null)
         {
             return false;
         }

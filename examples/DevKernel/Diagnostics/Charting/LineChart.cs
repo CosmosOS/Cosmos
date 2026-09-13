@@ -56,7 +56,7 @@ public static class LineChart
     {
         int height = zone.Height, width = zone.Width, x = zone.X, y = zone.Y;
 
-        int trackCount = markers == null ? 0 : markers.Length;
+        int trackCount = markers is null ? 0 : markers.Length;
 
         int lineHeight = OverlayLayout.LineHeight(font);
         int gutterHeight = trackCount * MarkerLaneHeightPx;
@@ -101,7 +101,7 @@ public static class LineChart
         }
 
         // Markers go under the curves so they never hide a value.
-        if (markers != null)
+        if (markers is not null)
         {
             DrawMarkers(canvas, markers, x, y, width, height);
         }
@@ -355,7 +355,7 @@ public static class LineChart
             remaining -= entryWidth;
         }
 
-        if (markers != null)
+        if (markers is not null)
         {
             foreach (ChartMarkers track in markers)
             {

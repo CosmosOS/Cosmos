@@ -360,7 +360,7 @@ public class KernelConsole
     /// </summary>
     private void ClearCells()
     {
-        if (_cells == null)
+        if (_cells is null)
         {
             return;
         }
@@ -482,7 +482,7 @@ public class KernelConsole
     /// </summary>
     private void DrawCharAt(int col, int row)
     {
-        if (_cells == null)
+        if (_cells is null)
         {
             return;
         }
@@ -512,7 +512,7 @@ public class KernelConsole
     /// </summary>
     private void RedrawInternal()
     {
-        if (_cells == null)
+        if (_cells is null)
         {
             return;
         }
@@ -545,7 +545,7 @@ public class KernelConsole
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (_cells == null)
+            if (_cells is null)
             {
                 return;
             }
@@ -623,7 +623,7 @@ public class KernelConsole
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (_cells == null)
+            if (_cells is null)
             {
                 return;
             }
@@ -651,7 +651,7 @@ public class KernelConsole
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (_cells == null)
+            if (_cells is null)
             {
                 return;
             }
@@ -769,7 +769,7 @@ public class KernelConsole
     /// </summary>
     private void Scroll()
     {
-        if (_cells == null)
+        if (_cells is null)
         {
             return;
         }

@@ -72,7 +72,7 @@ internal class InterruptEvent
         // subtracts tickets that OnThreadReady never added for it). Treat an
         // idle-thread caller — the main kernel thread — like the no-context
         // case and poll the latch instead.
-        if (currentThread != null && (currentThread.Flags & SchedulerThreadFlags.IdleThread) != 0)
+        if (currentThread is not null && (currentThread.Flags & SchedulerThreadFlags.IdleThread) != 0)
         {
             currentThread = null;
         }

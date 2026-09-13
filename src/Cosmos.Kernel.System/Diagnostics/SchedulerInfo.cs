@@ -43,7 +43,7 @@ public static class SchedulerInfo
     /// <summary>
     /// Whether a scheduler has been installed and per-CPU state exists.
     /// </summary>
-    public static bool IsInitialized => SchedulerManager.Current != null;
+    public static bool IsInitialized => SchedulerManager.Current is not null;
 
     /// <summary>
     /// Whether the scheduler is processing timer ticks and preempting
@@ -103,7 +103,7 @@ public static class SchedulerInfo
     public static bool TryGetThreadInSlot(int slot, out KernelThreadInfo info)
     {
         SchedulerThread?[]? threads = SchedulerManager.Threads;
-        if (threads == null || slot < 0 || slot >= threads.Length || threads[slot] is not SchedulerThread thread)
+        if (threads is null || slot < 0 || slot >= threads.Length || threads[slot] is not SchedulerThread thread)
         {
             info = default;
             return false;
@@ -124,7 +124,7 @@ public static class SchedulerInfo
         SchedulerThread? thread = cpuId < SchedulerManager.CpuCount
             ? SchedulerManager.GetCpuState(cpuId)?.CurrentThread
             : null;
-        if (thread == null)
+        if (thread is null)
         {
             info = default;
             return false;
@@ -143,7 +143,7 @@ public static class SchedulerInfo
     {
         IScheduler? scheduler = SchedulerManager.Current;
         PerCpuState? state = cpuId < SchedulerManager.CpuCount ? SchedulerManager.GetCpuState(cpuId) : null;
-        return scheduler != null && state != null ? scheduler.GetRunQueueCount(state) : 0;
+        return scheduler is not null && state is not null ? scheduler.GetRunQueueCount(state) : 0;
     }
 
     /// <summary>
@@ -163,8 +163,8 @@ public static class SchedulerInfo
     {
         IScheduler? scheduler = SchedulerManager.Current;
         PerCpuState? state = cpuId < SchedulerManager.CpuCount ? SchedulerManager.GetCpuState(cpuId) : null;
-        SchedulerThread? thread = scheduler != null && state != null ? scheduler.GetRunQueueThread(state, index) : null;
-        if (thread == null)
+        SchedulerThread? thread = scheduler is not null && state is not null ? scheduler.GetRunQueueThread(state, index) : null;
+        if (thread is null)
         {
             info = default;
             return false;
@@ -190,7 +190,7 @@ public static class SchedulerInfo
     {
         IScheduler? scheduler = SchedulerManager.Current;
         SchedulerThread?[]? threads = SchedulerManager.Threads;
-        if (scheduler == null || threads == null)
+        if (scheduler is null || threads is null)
         {
             return ThreadKillResult.NotFound;
         }
@@ -209,7 +209,7 @@ public static class SchedulerInfo
             }
         }
 
-        if (target == null)
+        if (target is null)
         {
             return ThreadKillResult.NotFound;
         }
@@ -222,7 +222,7 @@ public static class SchedulerInfo
         for (uint cpuId = 0; cpuId < SchedulerManager.CpuCount; cpuId++)
         {
             PerCpuState? state = SchedulerManager.GetCpuState(cpuId);
-            if (state == null)
+            if (state is null)
             {
                 continue;
             }
@@ -249,7 +249,7 @@ public static class SchedulerInfo
 
     private static KernelThreadInfo Snapshot(SchedulerThread thread)
     {
-        bool hasPriority = thread.SchedulerData != null;
+        bool hasPriority = thread.SchedulerData is not null;
         long priority = hasPriority ? SchedulerManager.Current?.GetPriority(thread) ?? 0 : 0;
         return new KernelThreadInfo(
             thread.Id,

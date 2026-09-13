@@ -448,7 +448,7 @@ public static partial class VfsManager
         }
 
         node = WrapNode(leafName, inode);
-        return node != null;
+        return node is not null;
     }
 
     private static bool TryResolve(string path, [NotNullWhen(true)] out IVfsInode? inode, [NotNullWhen(true)] out string? leafName)

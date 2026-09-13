@@ -16,7 +16,7 @@ public static class Power
     /// <see cref="Halt"/> itself needs no such check: it parks the CPU either
     /// way.
     /// </summary>
-    public static bool IsSupported => PlatformHAL.PowerOps != null;
+    public static bool IsSupported => PlatformHAL.PowerOps is not null;
 
     /// <summary>
     /// Park the CPU. Returns when an interrupt wakes it.

@@ -533,7 +533,7 @@ public class Kernel : Sys.Kernel
         Assert.True(NetworkStack.Send(request), "NetworkStack.Send should queue a packet with a configured source address");
 
         IcmpPacket? replyPacket = icmpClient.ReceivePacket(5000);
-        if (replyPacket == null)
+        if (replyPacket is null)
         {
             Log.WriteString("[Test] No reply packet within timeout\n");
             Assert.True(false, "Crafted echo request should get a reply packet");
@@ -589,7 +589,7 @@ public class Kernel : Sys.Kernel
         Assert.True(udpClient.Send(packet), "Crafted UDP packet should be queued through the client");
 
         UdpPacket? echo = udpClient.ReceivePacket(5000);
-        if (echo == null)
+        if (echo is null)
         {
             Log.WriteString("[Test] No echoed datagram within timeout\n");
             Assert.True(false, "Echo of the crafted UDP packet should come back as a packet object");
@@ -1118,7 +1118,7 @@ public class Kernel : Sys.Kernel
         dnsClient.SendQuery("valentin.bzh");
         Address? first = dnsClient.Receive(5000);
 
-        if (first == null)
+        if (first is null)
         {
             // The environment has no working DNS: the second query proves
             // nothing, so do not fail on it.
@@ -1133,8 +1133,8 @@ public class Kernel : Sys.Kernel
         dnsClient.SendQuery("github.com");
         Address? second = dnsClient.Receive(5000);
 
-        Assert.True(second != null, "a second query on the same DnsClient must resolve");
-        Assert.True(second == null || second.Id != 0, "the second answer should not be 0.0.0.0");
+        Assert.True(second is not null, "a second query on the same DnsClient must resolve");
+        Assert.True(second is null || second.Id != 0, "the second answer should not be 0.0.0.0");
 
         dnsClient.Close();
     }

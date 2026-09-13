@@ -582,7 +582,7 @@ Nullable reference types are enabled solution-wide (`<Nullable>enable</Nullable>
 | `?? throw` | Converting a nullable into a required value |
 | `ArgumentNullException.ThrowIfNull(arg)` | Argument validation at API boundaries |
 | `[MemberNotNull(...)]` guard helpers | Initialization checks the compiler can follow |
-| `is null` / `is not null` | All null tests (not `== null` / `!= null`) |
+| `is null` / `is not null` | All null tests (not `== null` / `!= null`). A pointer keeps `== null`: patterns are not allowed on pointer types |
 | Sentinel initialization (`= []`) | Fields where null and empty mean the same thing |
 
 ### Honest Annotations

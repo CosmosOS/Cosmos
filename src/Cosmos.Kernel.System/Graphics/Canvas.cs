@@ -66,7 +66,7 @@ public unsafe class Canvas
             _pitch = value.Width * _bytesPerPixel;
 
             int length = value.Width * value.Height;
-            if (_buffer != null && _buffer.Length != length)
+            if (_buffer is not null && _buffer.Length != length)
             {
                 _buffer = new int[length];
             }
@@ -207,7 +207,7 @@ public unsafe class Canvas
     /// <param name="color">The ARGB color to clear the screen with.</param>
     public virtual void Clear(int color)
     {
-        if (_buffer == null)
+        if (_buffer is null)
         {
             return;
         }
@@ -241,7 +241,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual void DrawPoint(Color color, int x, int y)
     {
-        if (_buffer == null)
+        if (_buffer is null)
         {
             return;
         }
@@ -272,7 +272,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual void DrawPoint(uint color, int x, int y)
     {
-        if (_buffer == null)
+        if (_buffer is null)
         {
             return;
         }
@@ -293,7 +293,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual void DrawPoint(int color, int x, int y)
     {
-        if (_buffer == null)
+        if (_buffer is null)
         {
             return;
         }
@@ -321,7 +321,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual Color GetPointColor(int x, int y)
     {
-        if (_buffer == null)
+        if (_buffer is null)
         {
             return Color.Black;
         }
@@ -341,7 +341,7 @@ public unsafe class Canvas
     /// <param name="y">The Y coordinate.</param>
     public virtual int GetRawPointColor(int x, int y)
     {
-        if (_buffer == null)
+        if (_buffer is null)
         {
             return 0;
         }

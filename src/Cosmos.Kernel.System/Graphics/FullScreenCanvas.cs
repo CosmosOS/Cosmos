@@ -31,7 +31,7 @@ internal static class FullScreenCanvas
     /// </summary>
     internal static void Disable()
     {
-        if (s_videoDriver == null)
+        if (s_videoDriver is null)
         {
             return;
         }
@@ -91,7 +91,7 @@ internal static class FullScreenCanvas
     {
         ThrowIfGraphicsDisabled();
 
-        if (s_videoDriver == null)
+        if (s_videoDriver is null)
         {
             s_videoDriver = CreateVideoDriver(mode);
         }

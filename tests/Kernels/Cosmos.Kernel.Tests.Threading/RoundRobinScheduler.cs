@@ -46,7 +46,7 @@ public sealed class RoundRobinScheduler : IScheduler
     public void OnThreadReady(PerCpuState cpuState, SchedulerThread thread)
     {
         RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-        if (cpuData == null)
+        if (cpuData is null)
         {
             return;
         }
@@ -60,7 +60,7 @@ public sealed class RoundRobinScheduler : IScheduler
     public void OnThreadBlocked(PerCpuState cpuState, SchedulerThread thread)
     {
         RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-        if (cpuData == null)
+        if (cpuData is null)
         {
             return;
         }
@@ -71,7 +71,7 @@ public sealed class RoundRobinScheduler : IScheduler
     public void OnThreadYield(PerCpuState cpuState, SchedulerThread thread)
     {
         RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-        if (cpuData == null)
+        if (cpuData is null)
         {
             return;
         }
@@ -84,7 +84,7 @@ public sealed class RoundRobinScheduler : IScheduler
     public void OnThreadExit(PerCpuState cpuState, SchedulerThread thread)
     {
         RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-        if (cpuData != null)
+        if (cpuData is not null)
         {
             RemoveFromQueue(cpuData, thread);
         }
@@ -97,7 +97,7 @@ public sealed class RoundRobinScheduler : IScheduler
     public SchedulerThread? PickNext(PerCpuState cpuState)
     {
         RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-        if (cpuData == null || cpuData.RunQueue.Count == 0)
+        if (cpuData is null || cpuData.RunQueue.Count == 0)
         {
             return null;
         }
@@ -110,7 +110,7 @@ public sealed class RoundRobinScheduler : IScheduler
     public void OnPickFailed(PerCpuState cpuState, SchedulerThread thread)
     {
         RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-        if (cpuData == null)
+        if (cpuData is null)
         {
             return;
         }
@@ -126,7 +126,7 @@ public sealed class RoundRobinScheduler : IScheduler
     public bool OnTick(PerCpuState cpuState, SchedulerThread current, ulong elapsedNs)
     {
         RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-        if (cpuData == null || current == null)
+        if (cpuData is null || current is null)
         {
             return false;
         }
@@ -134,7 +134,7 @@ public sealed class RoundRobinScheduler : IScheduler
         current.TotalRuntime += elapsedNs;
 
         RoundRobinThreadData? threadData = ThreadDataOf(current);
-        if (threadData == null)
+        if (threadData is null)
         {
             // Foreign bookkeeping (a thread created under the previously
             // installed policy) or a thread that already exited: rotate it at
@@ -175,7 +175,7 @@ public sealed class RoundRobinScheduler : IScheduler
     {
         RoundRobinCpuData? fromData = CpuDataOf(fromState);
         RoundRobinCpuData? toData = CpuDataOf(toState);
-        if (fromData == null || toData == null)
+        if (fromData is null || toData is null)
         {
             return;
         }
@@ -221,7 +221,7 @@ public sealed class RoundRobinScheduler : IScheduler
         using (SchedulerManager.MaskInterrupts())
         {
             RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-            if (cpuData == null || index < 0 || index >= cpuData.RunQueue.Count)
+            if (cpuData is null || index < 0 || index >= cpuData.RunQueue.Count)
             {
                 return null;
             }

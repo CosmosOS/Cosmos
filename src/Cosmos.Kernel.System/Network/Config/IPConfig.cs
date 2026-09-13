@@ -144,7 +144,7 @@ public class IPConfig
     public static bool Enable(Address address, Address subnetMask, Address defaultGateway)
     {
         INetworkDevice? device = NetworkManager.PrimaryDevice;
-        if (device == null)
+        if (device is null)
         {
             return false;
         }
@@ -163,7 +163,7 @@ public class IPConfig
     public static bool Enable(NetworkAdapter adapter, Address address, Address subnetMask, Address defaultGateway)
     {
         INetworkDevice? device = adapter.Device;
-        if (device == null)
+        if (device is null)
         {
             return false;
         }
