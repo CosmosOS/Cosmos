@@ -128,12 +128,12 @@ public static class TcpClientPlug
     {
         int id = GetId(aThis);
 
-        if (!_clientSockets.TryGetValue(id, out var socket) || socket == null)
+        if (!_clientSockets.TryGetValue(id, out Socket? socket))
         {
             throw new InvalidOperationException("TcpClient is not connected");
         }
 
-        if (_dataStreams.TryGetValue(id, out var stream) && stream != null)
+        if (_dataStreams.TryGetValue(id, out NetworkStream? stream))
         {
             return stream;
         }

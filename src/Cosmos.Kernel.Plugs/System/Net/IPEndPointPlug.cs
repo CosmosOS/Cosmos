@@ -73,7 +73,7 @@ public static class IPEndPointPlug
     public static AddressFamily get_AddressFamily(IPEndPoint aThis)
     {
         int id = GetId(aThis);
-        if (_addresses.TryGetValue(id, out var addr) && addr != null)
+        if (_addresses.TryGetValue(id, out IPAddress? addr))
         {
             return addr.AddressFamily;
         }

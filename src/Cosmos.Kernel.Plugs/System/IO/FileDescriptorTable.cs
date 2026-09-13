@@ -112,7 +112,7 @@ internal static unsafe class FileDescriptorTable
                 return PalError.EISDIR;
             }
 
-            if (!VfsManager.TryOpenFile(fullPath, out handle) || handle == null)
+            if (!VfsManager.TryOpenFile(fullPath, out handle))
             {
                 return PalError.EIO;
             }
@@ -137,7 +137,7 @@ internal static unsafe class FileDescriptorTable
                 return createError;
             }
 
-            if (!VfsManager.TryOpenFile(fullPath, out handle) || handle == null)
+            if (!VfsManager.TryOpenFile(fullPath, out handle))
             {
                 return PalError.EIO;
             }
@@ -512,7 +512,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.ENOTDIR;
         }
 
-        if (VfsManager.TryOpenDirectory(fullPath, out IVfsDirectoryHandle? target) && target != null
+        if (VfsManager.TryOpenDirectory(fullPath, out IVfsDirectoryHandle? target)
             && target.TryReadDir(out IReadOnlyList<IVfsInode> entries) && entries.Count > 0)
         {
             return PalError.ENOTEMPTY;
@@ -585,7 +585,7 @@ internal static unsafe class FileDescriptorTable
                 }
 
                 if (newIsDirectory
-                    && VfsManager.TryOpenDirectory(newFull, out IVfsDirectoryHandle? target) && target != null
+                    && VfsManager.TryOpenDirectory(newFull, out IVfsDirectoryHandle? target)
                     && target.TryReadDir(out IReadOnlyList<IVfsInode> entries) && entries.Count > 0)
                 {
                     return PalError.ENOTEMPTY;
@@ -679,7 +679,7 @@ internal static unsafe class FileDescriptorTable
                 return PalError.ENOTDIR;
             }
 
-            if (!VfsManager.TryOpenDirectory(fullPath, out IVfsDirectoryHandle? directory) || directory == null
+            if (!VfsManager.TryOpenDirectory(fullPath, out IVfsDirectoryHandle? directory)
                 || !directory.TryReadDir(out IReadOnlyList<IVfsInode> entries))
             {
                 return PalError.EIO;
@@ -827,7 +827,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.ENOTDIR;
         }
 
-        if (!VfsManager.TryOpenDirectory(parentPath, out IVfsDirectoryHandle? parent) || parent == null)
+        if (!VfsManager.TryOpenDirectory(parentPath, out IVfsDirectoryHandle? parent))
         {
             return PalError.EROFS;
         }
