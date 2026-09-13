@@ -394,6 +394,7 @@ Cosmos.Kernel.System.Network.IPv4.Address.Address(byte[]! buffer, int offset) ->
 Cosmos.Kernel.System.Network.IPv4.Address.Address(System.ReadOnlySpan<byte> buffer) -> void
 Cosmos.Kernel.System.Network.IPv4.Address.Address(uint address) -> void
 Cosmos.Kernel.System.Network.IPv4.Address.CompareTo(Cosmos.Kernel.System.Network.IPv4.Address? other) -> int
+Cosmos.Kernel.System.Network.IPv4.Address.Equals(Cosmos.Kernel.System.Network.IPv4.Address? other) -> bool
 Cosmos.Kernel.System.Network.IPv4.Address.Id.get -> uint
 Cosmos.Kernel.System.Network.IPv4.Address.Parts.get -> System.Collections.Immutable.ImmutableArray<byte>
 Cosmos.Kernel.System.Network.IPv4.EndPoint

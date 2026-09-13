@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.System.Network.Config;
 /// </summary>
 public static class DnsConfig
 {
-    private static readonly List<Address> s_nameservers = new();
+    private static readonly List<Address> s_nameservers = [];
 
     /// <summary>
     /// The list of known DNS nameserver addresses. Use <see cref="Add"/> and
@@ -53,7 +53,7 @@ public static class DnsConfig
                 break;
             }
         }
-        if (toRemove != null)
+        if (toRemove is not null)
         {
             s_nameservers.Remove(toRemove);
         }

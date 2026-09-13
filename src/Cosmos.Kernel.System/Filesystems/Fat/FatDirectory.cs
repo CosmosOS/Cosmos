@@ -204,7 +204,7 @@ internal static class FatDirectory
     /// </summary>
     internal static List<FatDirEntry> Parse(ReadOnlySpan<byte> buffer, bool fat32)
     {
-        List<FatDirEntry> result = new();
+        List<FatDirEntry> result = [];
         Span<char> lfnAccum = stackalloc char[LfnCharsPerEntry * MaxLfnEntries];
         int lfnLength = 0;
         int lfnEntryCount = 0;
@@ -426,10 +426,7 @@ internal static class FatDirectory
         // Writer-side rejection: 255 UCS-2 chars is the LFN cap, and our
         // own parser drops ordinals past 20 — longer names would leave
         // orphaned LFN slots behind on deletion.
-        if (longName.Length > MaxLfnNameLength)
-        {
-            throw new ArgumentOutOfRangeException(nameof(longName), "LFN names are limited to 255 characters.");
-        }
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(longName.Length, MaxLfnNameLength, nameof(longName));
 
         int entries = LfnEntryCountFor(longName);
         if (entries == 0)
@@ -525,7 +522,7 @@ internal static class FatDirectory
         ReadOnlySpan<char> baseName = dot >= 0 ? longName.AsSpan(0, dot) : longName.AsSpan();
         ReadOnlySpan<char> ext = dot >= 0 && dot + 1 < longName.Length
             ? longName.AsSpan(dot + 1)
-            : ReadOnlySpan<char>.Empty;
+            : [];
 
         int e = 0;
         for (int i = 0; i < ext.Length && e < ShortExtLength; i++)

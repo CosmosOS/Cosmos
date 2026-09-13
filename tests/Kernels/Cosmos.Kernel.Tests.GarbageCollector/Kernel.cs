@@ -47,6 +47,7 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_PageAccounting", TestGCPageAccounting);
         TR.Run("GC_DependentHandle", TestGCDependentHandle);
         TR.Run("GC_DependentHandleCleanup", TestGCDependentHandleCleanup);
+        TR.Run("GC_DependentHandleNullValue", TestGCDependentHandleNullValue);
         TR.Run("GC_HandleStoreIntegrity", TestGCHandleStoreIntegrity);
         TR.Run("GC_PinnedHeapReuse", TestGCPinnedHeapReuse);
         TR.Run("GC_StackScanPaddingStress", TestGCStackScanPaddingStress);
@@ -483,6 +484,23 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.Equal(0, count, "GC: ConditionalWeakTable entries cleared when key is dead");
+    }
+
+    private static void TestGCDependentHandleNullValue()
+    {
+        // A null value is a dependent handle with no secondary. SharedArrayPool registers
+        // its thread-local buckets that way, so the first formatted interpolated string
+        // leaves one behind; the mark phase must skip it instead of reading a mark bit
+        // through the null secondary.
+        ConditionalWeakTable<object, object?> table = new();
+        object key = new();
+        table.Add(key, null);
+
+        CoreGC.Collect();
+
+        bool found = table.TryGetValue(key, out object? value);
+        Assert.True(found && value is null, "GC: dependent handle with no secondary survives a collection");
+        GC.KeepAlive(key);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]

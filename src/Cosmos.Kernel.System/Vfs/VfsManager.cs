@@ -85,7 +85,7 @@ public static partial class VfsManager
     }
 
     private static readonly Dictionary<string, IVfsFilesystemType> s_registeredTypes = new(StringComparer.Ordinal);
-    private static readonly List<VfsMount> s_mounts = new();
+    private static readonly List<VfsMount> s_mounts = [];
     private static readonly string s_directorySeparatorString = Path.DirectorySeparatorChar.ToString();
 
     /// <summary>
@@ -366,13 +366,13 @@ public static partial class VfsManager
         }
 
         IFileOperations? fileOperations = inode.FileOperations;
-        if (fileOperations == null)
+        if (fileOperations is null)
         {
             return false;
         }
 
         IVfsOpenFile openFile = new VfsOpenFile(leafName, inode, fileOperations);
-        VfsFileHandle handle = new VfsFileHandle(leafName, inode, openFile)
+        VfsFileHandle handle = new(leafName, inode, openFile)
         {
             OpenedPath = path,
             Tracked = true,
@@ -425,7 +425,7 @@ public static partial class VfsManager
         }
 
         IFileOperations? fileOperations = inode.FileOperations;
-        if (fileOperations != null)
+        if (fileOperations is not null)
         {
             IVfsOpenFile openFile = new VfsOpenFile(name, inode, fileOperations);
             return new VfsFileHandle(name, inode, openFile);
@@ -462,7 +462,7 @@ public static partial class VfsManager
         }
 
         VfsMount? mount = FindMount(path);
-        if (mount == null)
+        if (mount is null)
         {
             return false;
         }
@@ -537,7 +537,7 @@ public static partial class VfsManager
                 continue;
             }
 
-            if (bestMatch == null || candidate.MountPoint.Length > bestMatch.MountPoint.Length)
+            if (bestMatch is null || candidate.MountPoint.Length > bestMatch.MountPoint.Length)
             {
                 bestMatch = candidate;
             }

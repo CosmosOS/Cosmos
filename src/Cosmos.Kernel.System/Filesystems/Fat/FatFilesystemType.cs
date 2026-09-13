@@ -48,7 +48,7 @@ public sealed class FatFilesystemType : IVfsFilesystemType
         superblock = null;
 
         IBlockDevice? device = ResolveDevice(source);
-        if (device == null)
+        if (device is null)
         {
             return false;
         }
@@ -88,13 +88,13 @@ public sealed class FatFilesystemType : IVfsFilesystemType
     public bool TryFormat(ReadOnlySpan<char> source, IVfsFormatOptions? options)
     {
         IBlockDevice? device = ResolveDevice(source);
-        if (device == null)
+        if (device is null)
         {
             return false;
         }
 
         FatFormatOptions? fatOptions = options as FatFormatOptions;
-        if (options != null && fatOptions == null)
+        if (options is not null && fatOptions is null)
         {
             return false;
         }
@@ -106,7 +106,7 @@ public sealed class FatFilesystemType : IVfsFilesystemType
     public bool TryDestroy(ReadOnlySpan<char> source)
     {
         IBlockDevice? device = ResolveDevice(source);
-        if (device == null)
+        if (device is null)
         {
             return false;
         }

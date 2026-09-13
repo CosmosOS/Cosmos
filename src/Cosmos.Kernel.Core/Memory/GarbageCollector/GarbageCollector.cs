@@ -147,9 +147,9 @@ internal static unsafe partial class GarbageCollector
     internal static GCHandleManager s_gCHandleManager = new();
 
     /// <summary>
-    /// Default segment size. Grows as needed.
+    /// Size requested from the segment manager for every new segment.
     /// </summary>
-    private static uint s_maxSegmentSize = (uint)PageAllocator.PageSize;
+    private const uint MaxSegmentSize = (uint)PageAllocator.PageSize;
 
     /// <summary>
     /// Lowest address across all GC segments (for fast heap range pre-check).
@@ -291,7 +291,7 @@ internal static unsafe partial class GarbageCollector
         s_freeMethodTable = MethodTable.Of<FreeMarker>();
 
         // Allocate initial segment
-        s_currentSegment = s_segmentManager.AllocateSegment(s_maxSegmentSize);
+        s_currentSegment = s_segmentManager.AllocateSegment(MaxSegmentSize);
         s_lastSegment = s_currentSegment;
         s_heapRangeDirty = true;
         RecomputeHeapRange();

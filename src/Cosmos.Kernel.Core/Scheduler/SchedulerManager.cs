@@ -79,7 +79,7 @@ public static class SchedulerManager
     /// execution context, so callers fall back to spin/polled paths
     /// instead of blocking.
     /// </summary>
-    public static bool IsReady => IsEnabled && s_cpuStates != null;
+    public static bool IsReady => IsEnabled && s_cpuStates is not null;
 
     private static void ThrowIfDisabled()
     {
@@ -344,7 +344,7 @@ public static class SchedulerManager
         PerCpuState? cpuState = CurrentCpuState;
         SchedulerThread? currentThread = cpuState?.CurrentThread;
 
-        if (currentThread == null)
+        if (currentThread is null)
         {
             Panic.Halt("No current thread in InvokeCurrentThreadStart");
         }
@@ -407,7 +407,7 @@ public static class SchedulerManager
         Serial.WriteNumber((uint)exitCode);
         Serial.WriteString("\n");
 
-        if (exitThread != null)
+        if (exitThread is not null)
         {
             ExitThread(GetCurrentCpuId(), exitThread);
         }
@@ -504,7 +504,7 @@ public static class SchedulerManager
     /// </summary>
     internal static void RegisterThread(SchedulerThread thread)
     {
-        if (s_allThreads == null)
+        if (s_allThreads is null)
         {
             return;
         }
@@ -542,7 +542,7 @@ public static class SchedulerManager
     /// </summary>
     internal static void UnregisterThread(SchedulerThread thread)
     {
-        if (s_allThreads == null)
+        if (s_allThreads is null)
         {
             return;
         }
@@ -799,7 +799,7 @@ public static class SchedulerManager
     internal static void Sleep(uint timeoutMs)
     {
         SchedulerThread? currentThread = CurrentCpuState?.CurrentThread;
-        if (currentThread != null)
+        if (currentThread is not null)
         {
             Sleep(currentThread.CpuId, currentThread, timeoutMs);
         }
@@ -827,7 +827,7 @@ public static class SchedulerManager
         var prev = state.CurrentThread;
         var next = s_currentScheduler.PickNext(state) ?? state.IdleThread;
 
-        if (next == null)
+        if (next is null)
         {
             state._lock.Release();
             return;
@@ -981,7 +981,7 @@ public static class SchedulerManager
             Serial.WriteString("\n");
         }
 
-        if (!s_enabled || s_currentScheduler == null || s_cpuStates == null)
+        if (!s_enabled || s_currentScheduler is null || s_cpuStates is null)
         {
             return;
         }
@@ -992,7 +992,7 @@ public static class SchedulerManager
         }
 
         var state = s_cpuStates[cpuId];
-        if (state.CurrentThread == null)
+        if (state.CurrentThread is null)
         {
             return;
         }
@@ -1016,7 +1016,7 @@ public static class SchedulerManager
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void CheckSleepingThreads(ulong elapsedNs)
     {
-        if (s_allThreads == null)
+        if (s_allThreads is null)
         {
             return;
         }
@@ -1059,7 +1059,7 @@ public static class SchedulerManager
     /// <param name="currentRsp">Current RSP (pointer to saved context on stack).</param>
     internal static void ReschedulePendingFromIrq(uint cpuId, nuint currentRsp)
     {
-        if (!s_enabled || s_currentScheduler == null || s_cpuStates == null || cpuId >= s_cpuCount)
+        if (!s_enabled || s_currentScheduler is null || s_cpuStates is null || cpuId >= s_cpuCount)
         {
             return;
         }
@@ -1108,7 +1108,7 @@ public static class SchedulerManager
         SchedulerThread? prev = state.CurrentThread;
         SchedulerThread? next = s_currentScheduler.PickNext(state) ?? state.IdleThread;
 
-        if (next == null)
+        if (next is null)
         {
             // No thread to switch to - just continue with current
             // This happens when all threads have exited
@@ -1128,7 +1128,7 @@ public static class SchedulerManager
             */
 
             // Save current thread's stack pointer
-            if (prev != null)
+            if (prev is not null)
             {
                 prev.StackPointer = currentRsp;
                 if (prev.State == SchedulerThreadState.Running)
@@ -1164,7 +1164,7 @@ public static class SchedulerManager
     {
         // This is for non-interrupt context switches (e.g., voluntary yield)
         // Not fully implemented - use ScheduleFromInterrupt for preemptive switching
-        if (next == null)
+        if (next is null)
         {
             return;
         }

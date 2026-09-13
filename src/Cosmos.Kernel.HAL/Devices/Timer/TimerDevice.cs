@@ -14,7 +14,7 @@ internal abstract class TimerDevice : Device, ITimerDevice
     /// <summary>Nanoseconds in one millisecond.</summary>
     protected const ulong NanosecondsPerMillisecond = 1_000_000;
 
-    private readonly List<SoftwareTimer> _timers = new();
+    private readonly List<SoftwareTimer> _timers = [];
 
     /// <summary>
     /// Timers found due by the current <see cref="HandleTick"/>, so their
@@ -57,7 +57,7 @@ internal abstract class TimerDevice : Device, ITimerDevice
     /// <param name="timer">Timer to register.</param>
     public virtual void RegisterTimer(SoftwareTimer timer)
     {
-        if (timer == null || timer.IsActive)
+        if (timer is null || timer.IsActive)
         {
             return;
         }
@@ -84,7 +84,7 @@ internal abstract class TimerDevice : Device, ITimerDevice
     /// </returns>
     public virtual bool UnregisterTimer(SoftwareTimer timer)
     {
-        if (timer == null)
+        if (timer is null)
         {
             return false;
         }

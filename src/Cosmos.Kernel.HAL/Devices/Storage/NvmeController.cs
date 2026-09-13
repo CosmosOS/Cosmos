@@ -161,7 +161,7 @@ internal unsafe class NvmeController
     // Unused once MSI-X is enabled.
     private readonly SchedMutex _polledIoMutex = new();
 
-    public List<NvmeNamespace> Namespaces { get; } = new();
+    public List<NvmeNamespace> Namespaces { get; } = [];
 
     /// <summary>
     /// True once I/O completions are delivered via MSI-X; false when the
@@ -185,7 +185,7 @@ internal unsafe class NvmeController
         pci.EnableBusMaster(true);
         pci.EnableMemory(true);
 
-        if (pci.BaseAddressBar == null || pci.BaseAddressBar.Length < 1)
+        if (pci.BaseAddressBar is null || pci.BaseAddressBar.Length < 1)
         {
             throw new Exception("[NVMe] Invalid BAR configuration");
         }
@@ -262,14 +262,16 @@ internal unsafe class NvmeController
         _ioSlots = new IoSlot[IoQueueDepth - 1];
         for (int i = 0; i < _ioSlots.Length; i++)
         {
-            IoSlot slot = new();
-            slot.DmaBufferVirt = (ulong)PageAllocator.AllocPages(PageType.Unmanaged, 1, true);
+            IoSlot slot = new()
+            {
+                DmaBufferVirt = (ulong)PageAllocator.AllocPages(PageType.Unmanaged, 1, true)
+            };
             slot.DmaBufferPhys = PageAllocator.VirtualToPhysical(slot.DmaBufferVirt);
             _ioSlots[i] = slot;
         }
 
         MsiXContext? ctx = MsiX.Enable(_pci);
-        if (ctx == null)
+        if (ctx is null)
         {
             Serial.WriteString("[NVMe] MSI-X unavailable, falling back to polled I/O\n");
             return;
@@ -468,17 +470,9 @@ internal unsafe class NvmeController
     /// </summary>
     private static void ValidateTransfer(int byteLength, ushort numLogicalBlocksMinusOne)
     {
-        if (numLogicalBlocksMinusOne != 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(numLogicalBlocksMinusOne),
-                "The single-PRP data path issues one logical block per command.");
-        }
-
-        if (byteLength <= 0 || (ulong)byteLength > PageAllocator.PageSize)
-        {
-            throw new ArgumentOutOfRangeException(nameof(byteLength),
-                "NVMe transfers are limited to one 4 KiB page (single-PRP data path).");
-        }
+        ArgumentOutOfRangeException.ThrowIfNotEqual(numLogicalBlocksMinusOne, 0, nameof(numLogicalBlocksMinusOne));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(byteLength);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan((ulong)byteLength, PageAllocator.PageSize, nameof(byteLength));
     }
 
     /// <summary>
@@ -509,7 +503,7 @@ internal unsafe class NvmeController
         SchedulerThread? current = SchedulerManager.IsReady
             ? SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId()).CurrentThread
             : null;
-        if (current == null)
+        if (current is null)
         {
             for (int i = 0; i < _ioSlots!.Length; i++)
             {
@@ -566,7 +560,7 @@ internal unsafe class NvmeController
             }
         }
 
-        if (waiter != null)
+        if (waiter is not null)
         {
             SchedulerManager.ReadyThread(waiter.CpuId, waiter);
         }
@@ -660,7 +654,7 @@ internal unsafe class NvmeController
     /// </summary>
     private void OnIoCompletion(ref IRQContext context)
     {
-        if (_ioSlots == null || _ioCqVirt == 0)
+        if (_ioSlots is null || _ioCqVirt == 0)
         {
             return;
         }

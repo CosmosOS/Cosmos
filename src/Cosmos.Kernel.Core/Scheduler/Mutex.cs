@@ -57,7 +57,7 @@ internal class Mutex : IDisposable
             ? SchedulerManager.CurrentCpuState?.CurrentThread
             : null;
 
-        if (currentThread == null)
+        if (currentThread is null)
         {
             return;
         }
@@ -78,7 +78,7 @@ internal class Mutex : IDisposable
             {
                 using (_lockGuard.AcquireIrqSafe())
                 {
-                    if (_ownerThread == null)
+                    if (_ownerThread is null)
                     {
                         _ownerThread = currentThread;
                         _recursionDepth = 1;
@@ -120,7 +120,7 @@ internal class Mutex : IDisposable
                     return;
                 }
 
-                if (_ownerThread == null)
+                if (_ownerThread is null)
                 {
                     if (queued)
                     {
@@ -195,14 +195,14 @@ internal class Mutex : IDisposable
             ? SchedulerManager.CurrentCpuState?.CurrentThread
             : null;
 
-        if (currentThread == null)
+        if (currentThread is null)
         {
             return true;
         }
 
         using (_lockGuard.AcquireIrqSafe())
         {
-            if (_ownerThread == null)
+            if (_ownerThread is null)
             {
                 _ownerThread = currentThread;
                 _recursionDepth = 1;
@@ -231,7 +231,7 @@ internal class Mutex : IDisposable
             ? SchedulerManager.CurrentCpuState?.CurrentThread
             : null;
 
-        if (currentThread == null)
+        if (currentThread is null)
         {
             return;
         }
@@ -267,7 +267,7 @@ internal class Mutex : IDisposable
             }
         }
 
-        if (toReady != null)
+        if (toReady is not null)
         {
             SchedulerManager.ReadyThread(toReady.CpuId, toReady);
         }
@@ -282,7 +282,7 @@ internal class Mutex : IDisposable
         {
             using (_lockGuard.AcquireIrqSafe())
             {
-                return _ownerThread != null;
+                return _ownerThread is not null;
             }
         }
     }

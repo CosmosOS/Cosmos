@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 /// </summary>
 public sealed class IcmpClient : IDisposable
 {
-    private static readonly Dictionary<uint, IcmpClient> s_clients = new();
+    private static readonly Dictionary<uint, IcmpClient> s_clients = [];
 
     /// <summary>
     /// Destination address.
@@ -29,10 +29,7 @@ public sealed class IcmpClient : IDisposable
     /// </summary>
     private void ThrowIfDisposed()
     {
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(IcmpClient));
-        }
+        ObjectDisposedException.ThrowIf(_disposed, this);
     }
 
     /// <summary>
@@ -79,7 +76,7 @@ public sealed class IcmpClient : IDisposable
     /// </summary>
     public void Close()
     {
-        if (_destination is not null && s_clients.ContainsKey(_destination.Id))
+        if (_destination is not null)
         {
             s_clients.Remove(_destination.Id);
         }

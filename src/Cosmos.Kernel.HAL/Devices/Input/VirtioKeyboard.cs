@@ -60,7 +60,7 @@ internal unsafe class VirtioKeyboard : KeyboardDevice
         }
 
         _eventQueue = _transport.CreateQueue(VirtioInput.EVENTQ, QueueSize);
-        if (_eventQueue == null)
+        if (_eventQueue is null)
         {
             Serial.Write("[VirtioKeyboard] ERROR: Failed to setup event queue\n");
             _transport.Fail();
@@ -85,7 +85,7 @@ internal unsafe class VirtioKeyboard : KeyboardDevice
 
     private void AddEventBuffer(int bufferIndex)
     {
-        if (_eventQueue == null)
+        if (_eventQueue is null)
         {
             return;
         }
@@ -114,7 +114,7 @@ internal unsafe class VirtioKeyboard : KeyboardDevice
 
     private void ProcessEvents()
     {
-        if (_eventQueue == null)
+        if (_eventQueue is null)
         {
             return;
         }
@@ -152,7 +152,7 @@ internal unsafe class VirtioKeyboard : KeyboardDevice
     /// </summary>
     public override void Poll()
     {
-        if (!_initialized || _eventQueue == null)
+        if (!_initialized || _eventQueue is null)
         {
             return;
         }

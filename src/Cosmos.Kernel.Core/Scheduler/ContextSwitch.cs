@@ -19,7 +19,7 @@ internal static class ContextSwitch
     /// <param name="next">Next thread to run.</param>
     public static void Switch(nuint currentRsp, SchedulerThread? current, SchedulerThread next)
     {
-        if (current != null)
+        if (current is not null)
         {
             current.StackPointer = currentRsp;
             current.State = SchedulerThreadState.Ready;

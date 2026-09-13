@@ -131,6 +131,6 @@ public class EthernetPacket
     /// <inheritdoc/>
     public override string ToString()
     {
-        return "Ethernet Packet : Src=" + _srcMAC + ", Dest=" + _destMAC + ", Type=" + EthernetType;
+        return $"Ethernet Packet : Src={_srcMAC}, Dest={_destMAC}, Type={EthernetType}";
     }
 }

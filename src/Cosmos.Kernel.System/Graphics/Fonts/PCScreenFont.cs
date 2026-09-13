@@ -68,7 +68,7 @@ public class PCScreenFont : Font
     {
         get
         {
-            if (s_default == null)
+            if (s_default is null)
             {
                 try
                 {

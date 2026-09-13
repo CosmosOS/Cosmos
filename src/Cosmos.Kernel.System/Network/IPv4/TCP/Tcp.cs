@@ -198,7 +198,7 @@ internal class Tcp : IDisposable
     /// <summary>
     /// A list of currently active connections.
     /// </summary>
-    private static List<Tcp> Connections { get; } = new();
+    private static List<Tcp> Connections { get; } = [];
 
     /// <summary>
     /// String / enum correspondance (used for debugging)
@@ -247,17 +247,24 @@ internal class Tcp : IDisposable
     {
         for (int i = 0; i < Connections.Count; i++)
         {
-            var con = Connections[i];
-            if (con.Equals(localPort, remotePort, localIp, remoteIp))
+            Tcp connection = Connections[i];
+            if (connection.Equals(localPort, remotePort, localIp, remoteIp))
             {
-                return con;
-            }
-            // Is this correct if clause? Shouldn't be there another loop?
-            if (con.LocalEndPoint.Port.Equals(localPort) && con.Status == Status.LISTEN)
-            {
-                return con;
+                return connection;
             }
         }
+
+        // A listener answers for any remote end, so it is only picked once no
+        // established connection matched.
+        for (int i = 0; i < Connections.Count; i++)
+        {
+            Tcp connection = Connections[i];
+            if (connection.LocalEndPoint.Port == localPort && connection.Status == Status.LISTEN)
+            {
+                return connection;
+            }
+        }
+
         return null;
     }
 
@@ -355,11 +362,6 @@ internal class Tcp : IDisposable
         TCB = new TransmissionControlBlock();
     }
 
-    public void AssignData(ReadOnlySpan<byte> source, int offset, int count, int length)
-    {
-
-    }
-
     /// <summary>
     /// Handles incoming TCP packets according to the current connection status.
     /// </summary>
@@ -429,7 +431,7 @@ internal class Tcp : IDisposable
                         ProcessCloseWait(packet);
                         break;
                     default:
-                        Serial.WriteString("[TCP] Unknown TCP connection state = " + (int)Status + "\n");
+                        Serial.WriteString($"[TCP] Unknown TCP connection state = {(int)Status}\n");
                         break;
                 }
             }
@@ -547,7 +549,7 @@ internal class Tcp : IDisposable
             else
             {
                 Status = Status.CLOSED;
-                Serial.WriteString("[TCP] Connection closed! (" + packet.GetFlags() + " received on SYN_SENT state)\n");
+                Serial.WriteString($"[TCP] Connection closed! ({packet.GetFlags()} received on SYN_SENT state)\n");
             }
         }
         else if (packet._ack)
@@ -938,6 +940,5 @@ internal class Tcp : IDisposable
         {
             s_arrayPool.Return(_data);
         }
-        // TODO release managed resources here
     }
 }

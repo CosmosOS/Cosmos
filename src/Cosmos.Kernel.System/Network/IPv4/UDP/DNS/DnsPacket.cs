@@ -372,7 +372,7 @@ public class DnsPacket : UdpPacket
     /// <inheritdoc/>
     public override string ToString()
     {
-        return "DNS Packet Src=" + SourceIP + ":" + SourcePort + ", Dest=" + DestinationIP + ":" + DestinationPort;
+        return $"DNS Packet Src={SourceIP}:{SourcePort}, Dest={DestinationIP}:{DestinationPort}";
     }
 }
 
@@ -464,26 +464,30 @@ public class DnsPacketAnswer : DnsPacket
         int index = DataOffset + 20;
         if (Questions > 0)
         {
-            Queries = new List<DnsQuery>();
+            Queries = [];
 
             for (int i = 0; i < Questions; i++)
             {
-                DnsQuery query = new();
-                query.Name = ParseName(RawData, ref index);
-                query.Type = (ushort)((RawData[index + 0] << 8) | RawData[index + 1]);
-                query.Class = (ushort)((RawData[index + 2] << 8) | RawData[index + 3]);
+                DnsQuery query = new()
+                {
+                    Name = ParseName(RawData, ref index),
+                    Type = (ushort)((RawData[index + 0] << 8) | RawData[index + 1]),
+                    Class = (ushort)((RawData[index + 2] << 8) | RawData[index + 3])
+                };
                 Queries.Add(query);
                 index += 4;
             }
         }
         if (AnswerRRs > 0)
         {
-            Answers = new List<DnsAnswer>();
+            Answers = [];
 
             for (int i = 0; i < AnswerRRs; i++)
             {
-                DnsAnswer answer = new();
-                answer.NameField = (ushort)((RawData[index + 0] << 8) | RawData[index + 1]);
+                DnsAnswer answer = new()
+                {
+                    NameField = (ushort)((RawData[index + 0] << 8) | RawData[index + 1])
+                };
                 answer.ResolvedName = ResolveRRName(answer.NameField, RawData, DataOffset + 8);
                 answer.Type = (ushort)((RawData[index + 2] << 8) | RawData[index + 3]);
                 answer.Class = (ushort)((RawData[index + 4] << 8) | RawData[index + 5]);

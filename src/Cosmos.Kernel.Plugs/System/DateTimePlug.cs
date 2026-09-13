@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Plugs.System;
 [Plug(typeof(DateTime))]
 public static partial class DateTimePlug
 {
-    private static readonly DateTime s_epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    private static readonly DateTime s_epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     /// <summary>
     /// Returns the current time as DateTime ticks from the platform RTC.
@@ -24,7 +24,7 @@ public static partial class DateTimePlug
     {
         if (KernelFeatures.Timer)
         {
-            if (RTC.Instance == null)
+            if (RTC.Instance is null)
             {
                 return 0;
             }

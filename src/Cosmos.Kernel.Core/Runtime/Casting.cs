@@ -19,7 +19,7 @@ internal static unsafe class Casting
     [RuntimeExport("RhTypeCast_IsInstanceOfAny")]
     public static object? RhTypeCast_IsInstanceOfAny(object obj, MethodTable** pTypeHandles, int count)
     {
-        if (obj == null)
+        if (obj is null)
         {
             return null;
         }
@@ -39,7 +39,7 @@ internal static unsafe class Casting
     [RuntimeExport("RhTypeCast_IsInstanceOfInterface")]
     public static bool RhTypeCast_IsInstanceOfInterface(object obj, MethodTable* interfaceTypeHandle)
     {
-        if (obj == null)
+        if (obj is null)
         {
             return false;
         }
@@ -60,7 +60,7 @@ internal static unsafe class Casting
     [RuntimeExport("RhTypeCast_CheckCastInterface")]
     public static object? RhTypeCast_CheckCastInterface(object obj, MethodTable* interfaceTypeHandle)
     {
-        if (obj == null)
+        if (obj is null)
         {
             return null;
         }
@@ -79,7 +79,7 @@ internal static unsafe class Casting
     [RuntimeExport("RhTypeCast_CheckCastClassSpecial")]
     internal static object? RhTypeCast_CheckCastClassSpecial(object obj, MethodTable* typeHandle, bool fThrow)
     {
-        if (obj == null)
+        if (obj is null)
         {
             return null;
         }

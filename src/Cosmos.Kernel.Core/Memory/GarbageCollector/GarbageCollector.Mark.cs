@@ -49,9 +49,13 @@ internal static unsafe partial class GarbageCollector
             var storeEnum = s_gCHandleManager.DependentHandleStore.GetEnumerator();
             while (storeEnum.MoveNext())
             {
-                if (storeEnum.Current->Object->IsMarked && !((GCObject*)storeEnum.Current->ExtraInfo)->IsMarked)
+                // No secondary means nothing to keep alive: ConditionalWeakTable stores a null
+                // value as a dependent handle without one (SharedArrayPool registers its
+                // thread-local buckets that way), so the mark bit must not be read through it.
+                GCObject* secondary = (GCObject*)storeEnum.Current->ExtraInfo;
+                if (secondary != null && storeEnum.Current->Object->IsMarked && !secondary->IsMarked)
                 {
-                    TryMarkRoot(storeEnum.Current->ExtraInfo);
+                    TryMarkRoot((nint)secondary);
                     markedNew = true;
                 }
             }
@@ -85,7 +89,7 @@ internal static unsafe partial class GarbageCollector
             SchedulerThread? current = SchedulerManager.CurrentCpuState?.CurrentThread;
 
             nuint stackEnd;
-            if (current != null && current.StackBase != 0 && current.StackSize != 0)
+            if (current is not null && current.StackBase != 0 && current.StackSize != 0)
             {
                 stackEnd = current.StackBase + current.StackSize;
             }
@@ -98,7 +102,7 @@ internal static unsafe partial class GarbageCollector
             PreciseScanCurrentThread(stackEnd);
 
             var threads = SchedulerManager.Threads;
-            if (threads != null)
+            if (threads is not null)
             {
                 for (int i = 0; i < threads.Length; i++)
                 {
@@ -133,7 +137,7 @@ internal static unsafe partial class GarbageCollector
     /// <param name="thread">The thread whose stack and registers to scan.</param>
     private static void ScanThreadStack(SchedulerThread thread)
     {
-        if (thread == null)
+        if (thread is null)
         {
             return;
         }

@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -35,7 +35,7 @@ public unsafe class Canvas
     /// The graphics modes this canvas accepts, in the order the driver reports
     /// them. <see cref="Mode"/> only accepts a mode from this list.
     /// </summary>
-    public virtual IReadOnlyList<Mode> AvailableModes => _availableModes ??= new Mode[] { Mode };
+    public virtual IReadOnlyList<Mode> AvailableModes => _availableModes ??= [Mode];
 
     /// <summary>
     /// The default graphics mode.
@@ -437,7 +437,7 @@ public unsafe class Canvas
         int srcWidth = canvas.Width;
         int srcHeight = canvas.Height;
 
-        if (srcBuffer != null)
+        if (srcBuffer is not null)
         {
             DrawArray(srcBuffer, x, y, srcWidth, srcHeight);
         }
@@ -823,7 +823,7 @@ public unsafe class Canvas
         // Using an array of points here is better than using something like a Dictionary of ints.
         if (points.Length < 3)
         {
-            throw new ArgumentException("A polygon requires more than 3 points.");
+            throw new ArgumentException("A polygon requires at least 3 points.", nameof(points));
         }
 
         for (int i = 0; i < points.Length - 1; i++)
@@ -977,7 +977,7 @@ public unsafe class Canvas
     /// <returns>A new <see cref="Bitmap"/> containing the copied region.</returns>
     public virtual Bitmap GetImage(int x, int y, int width, int height)
     {
-        Bitmap bitmap = new Bitmap(width, height, ColorDepth.ColorDepth32);
+        Bitmap bitmap = new(width, height, ColorDepth.ColorDepth32);
 
         for (int posy = 0; posy < height; posy++)
         {
@@ -1167,7 +1167,7 @@ public unsafe class Canvas
         {
             char c = str[i];
             TrueTypeGlyph? glyph = font.GetGlyph(c, sizePx);
-            if (glyph == null)
+            if (glyph is null)
             {
                 continue;
             }
@@ -1194,7 +1194,7 @@ public unsafe class Canvas
     private void DrawGlyph(TrueTypeGlyph glyph, Color color, int x, int y)
     {
         byte[]? coverage = glyph.Coverage;
-        if (coverage == null)
+        if (coverage is null)
         {
             return;
         }

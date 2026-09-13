@@ -22,7 +22,7 @@ public static partial class VfsManager
 
     /// <summary>Handles produced by <see cref="TryOpenFile"/>; consulted so unlinking
     /// an open file can defer to the last close.</summary>
-    private static readonly List<VfsFileHandle> s_openFileHandles = new();
+    private static readonly List<VfsFileHandle> s_openFileHandles = [];
 
     private static string s_currentDirectory = "/";
 
@@ -40,7 +40,7 @@ public static partial class VfsManager
     internal static bool TrySetCurrentDirectory(string path)
     {
         string? fullPath = MakeAbsolute(path);
-        if (fullPath == null || !TryStat(fullPath, out VfsStat stat))
+        if (fullPath is null || !TryStat(fullPath, out VfsStat stat))
         {
             return false;
         }
@@ -274,7 +274,7 @@ public static partial class VfsManager
 
         VfsMount? oldMount = FindMount(oldFullPath);
         VfsMount? newMount = FindMount(newFullPath);
-        if (newMount == null || !ReferenceEquals(oldMount, newMount))
+        if (newMount is null || !ReferenceEquals(oldMount, newMount))
         {
             return false;
         }
@@ -348,7 +348,7 @@ public static partial class VfsManager
         s_openFileHandles.Remove(handle);
 
         string? pending = handle.PendingUnlinkPath;
-        if (pending != null && !AnyOpenHandlePendingOn(pending))
+        if (pending is not null && !AnyOpenHandlePendingOn(pending))
         {
             RemoveEntryDirect(pending);
         }
@@ -375,7 +375,7 @@ public static partial class VfsManager
             // the reliable fallback there (OrdinalIgnoreCase for FAT-style
             // case-insensitive namespaces).
             if (string.Equals(handle.OpenedPath, fullPath, StringComparison.OrdinalIgnoreCase)
-                || (inode != null && ReferenceEquals(handle.Inode, inode)))
+                || (inode is not null && ReferenceEquals(handle.Inode, inode)))
             {
                 handle.PendingUnlinkPath = fullPath;
                 any = true;
@@ -440,7 +440,7 @@ public static partial class VfsManager
         {
             VfsFileHandle handle = s_openFileHandles[i];
             if (string.Equals(handle.OpenedPath, originalFullPath, StringComparison.OrdinalIgnoreCase)
-                || (backupInode != null && ReferenceEquals(handle.Inode, backupInode)))
+                || (backupInode is not null && ReferenceEquals(handle.Inode, backupInode)))
             {
                 handle.PendingUnlinkPath = backupPath;
                 pending = true;

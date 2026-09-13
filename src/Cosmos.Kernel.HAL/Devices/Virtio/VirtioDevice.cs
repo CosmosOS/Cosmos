@@ -111,7 +111,7 @@ internal static class VirtioDevice
         {
             VirtioMmioTransport? transport =
                 VirtioMmioTransport.TryProbe(busBase + slot * slotStride, irqBase + slot, irqEnable);
-            if (transport == null)
+            if (transport is null)
             {
                 continue;
             }
@@ -134,7 +134,7 @@ internal static class VirtioDevice
     /// </summary>
     public static void InitializePciBus()
     {
-        if (PciManager.Devices == null)
+        if (PciManager.Devices is null)
         {
             return;
         }
@@ -159,7 +159,7 @@ internal static class VirtioDevice
             }
 
             VirtioPciTransport? transport = VirtioPciTransport.TryCreate(pci);
-            if (transport == null)
+            if (transport is null)
             {
                 continue;
             }
@@ -183,7 +183,7 @@ internal static class VirtioDevice
             case VirtioTransport.DeviceTypeNetwork:
                 if (CosmosFeatures.NetworkEnabled)
                 {
-                    VirtioNet netDevice = new VirtioNet(transport);
+                    VirtioNet netDevice = new(transport);
                     netDevice.Initialize();
                     // Only advertise devices that came up: a NIC without an
                     // interrupt path never processes RX, so registering it
@@ -225,7 +225,7 @@ internal static class VirtioDevice
         {
             if (CosmosFeatures.MouseEnabled)
             {
-                VirtioMouse mouse = new VirtioMouse(transport);
+                VirtioMouse mouse = new(transport);
                 mouse.Initialize();
                 if (mouse.IsInitialized)
                 {
@@ -238,7 +238,7 @@ internal static class VirtioDevice
         // Keyboard devices support EV_KEY but not EV_REL.
         if (supportsKey && CosmosFeatures.KeyboardEnabled)
         {
-            VirtioKeyboard keyboard = new VirtioKeyboard(transport);
+            VirtioKeyboard keyboard = new(transport);
             keyboard.Initialize();
             if (keyboard.IsInitialized)
             {

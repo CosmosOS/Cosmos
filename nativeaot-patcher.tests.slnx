@@ -10,6 +10,7 @@
         <Project Path="tests\Cosmos.TestRunner.Engine\Cosmos.TestRunner.Engine.csproj"/>
         <Project Path="tests\Cosmos.TestRunner.Framework\Cosmos.TestRunner.Framework.csproj"/>
         <Project Path="tests\Cosmos.TestRunner.Protocol\Cosmos.TestRunner.Protocol.csproj"/>
+        <Project Path="src\tests\Cosmos.Kernel.Tests.System\Cosmos.Kernel.Tests.System.csproj"/>
     </Folder>
     <Folder Name="/tests/Kernels/">
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.File/Cosmos.Kernel.Tests.File.csproj"/>

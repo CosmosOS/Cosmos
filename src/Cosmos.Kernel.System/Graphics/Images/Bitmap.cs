@@ -20,15 +20,8 @@ public sealed class Bitmap : Image
     /// <exception cref="ArgumentOutOfRangeException">Thrown when either the width or height is lower than 0.</exception>
     public Bitmap(int width, int height, ColorDepth colorDepth) : base(width, height, colorDepth)
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (height < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(width);
+        ArgumentOutOfRangeException.ThrowIfNegative(height);
 
         RawData = new int[width * height];
     }
@@ -59,12 +52,12 @@ public sealed class Bitmap : Image
         {
             if (colorDepth == ColorDepth.ColorDepth32)
             {
-                RawData[i] = BitConverter.ToInt32(new byte[] { pixelData[i * 4], pixelData[i * 4 + 1], pixelData[i * 4 + 2], pixelData[i * 4 + 3] }, 0);
+                RawData[i] = BitConverter.ToInt32([pixelData[i * 4], pixelData[i * 4 + 1], pixelData[i * 4 + 2], pixelData[i * 4 + 3]], 0);
             }
             else
             {
                 // B, G, R input; 24bpp has no alpha, so the pixel is opaque.
-                RawData[i] = BitConverter.ToInt32(new byte[] { pixelData[i * 3], pixelData[i * 3 + 1], pixelData[i * 3 + 2], 255 }, 0);
+                RawData[i] = BitConverter.ToInt32([pixelData[i * 3], pixelData[i * 3 + 1], pixelData[i * 3 + 2], 255], 0);
             }
         }
     }
@@ -378,7 +371,7 @@ public sealed class Bitmap : Image
         position += 4;
 
         // Leave bytes 6 -> 10 empty
-        data = new byte[] { 0, 0, 0, 0 };
+        data = [0, 0, 0, 0];
         Array.Copy(data, 0, file, position, 4);
         position += 4;
 

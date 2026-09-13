@@ -220,7 +220,7 @@ internal sealed class VirtioPciTransport : VirtioTransport
         pci.EnableMemory(true);
         pci.EnableBusMaster(true);
 
-        VirtioPciTransport transport = new VirtioPciTransport(
+        VirtioPciTransport transport = new(
             pci,
             deviceType,
             MapRegion(commonPhys, commonLen),
@@ -263,7 +263,7 @@ internal sealed class VirtioPciTransport : VirtioTransport
     private void TrySetupMsix()
     {
         MsiXContext? context = MsiX.Enable(_pci);
-        if (context == null)
+        if (context is null)
         {
             return;
         }

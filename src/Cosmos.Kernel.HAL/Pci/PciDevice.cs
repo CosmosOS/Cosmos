@@ -198,7 +198,7 @@ internal class PciDevice : Device
     /// </summary>
     public ulong GetBar64Address(int barIndex)
     {
-        if (BaseAddressBar == null || barIndex < 0 || barIndex >= BaseAddressBar.Length)
+        if (BaseAddressBar is null || barIndex < 0 || barIndex >= BaseAddressBar.Length)
         {
             return 0;
         }

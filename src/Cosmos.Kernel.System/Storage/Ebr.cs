@@ -1,4 +1,4 @@
-﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
@@ -45,8 +45,8 @@ public static class Ebr
     /// </summary>
     public static List<MbrPartitionEntry> Parse(IBlockDevice device, ulong extendedStartSector)
     {
-        List<MbrPartitionEntry> logicals = new();
-        if (device == null)
+        List<MbrPartitionEntry> logicals = [];
+        if (device is null)
         {
             return logicals;
         }
@@ -334,8 +334,8 @@ public static class Ebr
 
     private static List<ChainNode> WalkChain(IBlockDevice device, ulong extendedStartSector)
     {
-        List<ChainNode> nodes = new();
-        if (device == null)
+        List<ChainNode> nodes = [];
+        if (device is null)
         {
             return nodes;
         }

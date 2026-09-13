@@ -533,7 +533,7 @@ internal unsafe class VMWareSVGAII3D
         }
         else
         {
-            throw new ArgumentException("Matrix must be 4x4 float");
+            throw new ArgumentException("Matrix must be 4x4 float", nameof(matrix4x4));
         }
     }
 
@@ -622,8 +622,8 @@ internal unsafe class VMWareSVGAII3D
         return cid;
     }
 
-    private static SVGAGuestPtr s_nextPtr = new SVGAGuestPtr { gmrId = 0, offset = 0 };
-    private static SVGAGuestPtr s_dmaStart = new SVGAGuestPtr { gmrId = 0, offset = 0 };
+    private static SVGAGuestPtr s_nextPtr = new() { gmrId = 0, offset = 0 };
+    private static SVGAGuestPtr s_dmaStart = new() { gmrId = 0, offset = 0 };
 
     private static uint s_dmaSize = 0;
     private const uint SVGA_GMR_FRAMEBUFFER = 0xFFFFFFFEu;

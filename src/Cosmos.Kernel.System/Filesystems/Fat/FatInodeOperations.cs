@@ -156,7 +156,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         Span<byte> clusterBuffer = new byte[_superblock.Boot.BytesPerCluster];
         // fatgen103: '..' stores 0 when the parent is the root directory
         // (the FAT32 root has a real cluster number, but '..' must not).
-        uint dotDotCluster = parent.Parent == null ? RootDotDotCluster : parent.FirstCluster;
+        uint dotDotCluster = parent.Parent is null ? RootDotDotCluster : parent.FirstCluster;
         WriteDotEntries(clusterBuffer, cluster, dotDotCluster);
         _superblock.WriteCluster(cluster, clusterBuffer);
 
@@ -184,7 +184,7 @@ internal sealed class FatInodeOperations : IInodeOperations
             return false;
         }
 
-        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match) || match == null)
+        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match))
         {
             return false;
         }
@@ -214,7 +214,7 @@ internal sealed class FatInodeOperations : IInodeOperations
             return false;
         }
 
-        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match) || match == null)
+        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match))
         {
             return false;
         }
@@ -247,7 +247,7 @@ internal sealed class FatInodeOperations : IInodeOperations
             return false;
         }
 
-        if (!_superblock.FindChildEntry(op, oldName, out FatDirEntry? match) || match == null)
+        if (!_superblock.FindChildEntry(op, oldName, out FatDirEntry? match))
         {
             return false;
         }
@@ -289,7 +289,7 @@ internal sealed class FatInodeOperations : IInodeOperations
     /// <summary>Rewrites the '..' entry (slot 1) of the directory rooted at <paramref name="dirCluster"/>.</summary>
     private void RewriteDotDot(uint dirCluster, FatInode newParent)
     {
-        uint parentCluster = newParent.Parent == null ? RootDotDotCluster : newParent.FirstCluster;
+        uint parentCluster = newParent.Parent is null ? RootDotDotCluster : newParent.FirstCluster;
         Span<byte> clusterBuffer = new byte[_superblock.Boot.BytesPerCluster];
         _superblock.ReadCluster(dirCluster, clusterBuffer);
         int offset = DotDotEntryOffset;

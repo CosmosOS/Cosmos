@@ -181,10 +181,8 @@ public static class Mbr
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is not 0..3.</exception>
     public static bool AddPartition(IBlockDevice device, int index, byte systemId, ulong startSector, ulong sectorCount)
     {
-        if ((uint)index >= MaxPartitions)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), "MBR primary partition index must be 0..3.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, MaxPartitions);
         // The on-disk LBA fields are 32-bit, so anything larger would be
         // truncated by the casts below; refuse it as Ebr.TryAddLogical does
         // rather than stamping a range the caller did not ask for.
@@ -278,10 +276,8 @@ public static class Mbr
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is not 0..3.</exception>
     public static void RemovePartition(IBlockDevice device, int index)
     {
-        if ((uint)index >= MaxPartitions)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), "MBR primary partition index must be 0..3.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, MaxPartitions);
 
         Span<byte> mbr = new byte[device.BlockSize];
         device.ReadBlock(MbrSectorLba, 1, mbr);
@@ -302,10 +298,8 @@ public static class Mbr
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is not 0..3.</exception>
     public static bool ResizePartition(IBlockDevice device, int index, ulong newSectorCount)
     {
-        if ((uint)index >= MaxPartitions)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), "MBR primary partition index must be 0..3.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, MaxPartitions);
         if (newSectorCount > LbaFieldMaxValue)
         {
             return false;
@@ -347,10 +341,8 @@ public static class Mbr
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is not 0..3.</exception>
     public static bool MovePartition(IBlockDevice device, int index, ulong newStartSector)
     {
-        if ((uint)index >= MaxPartitions)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), "MBR primary partition index must be 0..3.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, MaxPartitions);
         if (newStartSector > LbaFieldMaxValue)
         {
             return false;

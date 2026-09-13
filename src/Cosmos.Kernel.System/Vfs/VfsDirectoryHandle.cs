@@ -40,7 +40,7 @@ internal sealed class VfsDirectoryHandle : IVfsDirectoryHandle
         }
 
         child = VfsManager.WrapNode(name.ToString(), result);
-        return child != null;
+        return child is not null;
     }
 
     public bool TryCreateFile(ReadOnlySpan<char> name, VfsMode mode, [NotNullWhen(true)] out IVfsNodeHandle? child)
@@ -52,7 +52,7 @@ internal sealed class VfsDirectoryHandle : IVfsDirectoryHandle
         }
 
         child = VfsManager.WrapNode(name.ToString(), created);
-        return child != null;
+        return child is not null;
     }
 
     public bool TryCreateDirectory(ReadOnlySpan<char> name, VfsMode mode, [NotNullWhen(true)] out IVfsDirectoryHandle? child)
@@ -77,7 +77,7 @@ internal sealed class VfsDirectoryHandle : IVfsDirectoryHandle
         }
 
         child = VfsManager.WrapNode(name.ToString(), created);
-        return child != null;
+        return child is not null;
     }
 
     public bool TryUnlink(ReadOnlySpan<char> name)

@@ -22,10 +22,10 @@ internal static class OutgoingBuffer
             DHCP_REQUEST
         };
 
-        public INetworkDevice NIC;
-        public IPPacket Packet;
-        public EntryStatus Status;
-        public Address? NextHop;
+        public INetworkDevice NIC { get; }
+        public IPPacket Packet { get; }
+        public EntryStatus Status { get; set; }
+        public Address? NextHop { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BufferEntry"/> class.
@@ -34,16 +34,16 @@ internal static class OutgoingBuffer
         /// <param name="packet">The IP packet.</param>
         public BufferEntry(INetworkDevice nic, IPPacket packet)
         {
-            this.NIC = nic;
-            this.Packet = packet;
+            NIC = nic;
+            Packet = packet;
 
             if (Packet.DestinationIP.IsBroadcastAddress())
             {
-                this.Status = EntryStatus.DHCP_REQUEST;
+                Status = EntryStatus.DHCP_REQUEST;
             }
             else
             {
-                this.Status = EntryStatus.ADDED;
+                Status = EntryStatus.ADDED;
             }
         }
     }
@@ -51,7 +51,7 @@ internal static class OutgoingBuffer
     /// <summary>
     /// The buffer s_queue. Initialized eagerly to avoid issues with interrupt context.
     /// </summary>
-    private static List<BufferEntry> s_queue = new();
+    private static List<BufferEntry> s_queue = [];
 
     /// <summary>
     /// Ensures the s_queue exists and is initialized.
@@ -59,7 +59,7 @@ internal static class OutgoingBuffer
     private static void EnsureQueueExists()
     {
         // Queue is now initialized at class load time, but keep this for safety
-        s_queue ??= new List<BufferEntry>();
+        s_queue ??= [];
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ internal static class OutgoingBuffer
                 BufferEntry entry = s_queue[e];
                 if (entry.Status == BufferEntry.EntryStatus.ADDED)
                 {
-                    if (IPConfig.IsLocalAddress(entry.Packet.DestinationIP) == false)
+                    if (!IPConfig.IsLocalAddress(entry.Packet.DestinationIP))
                     {
                         Address? nextHop = IPConfig.FindRoute(entry.Packet.DestinationIP);
                         entry.NextHop = nextHop;

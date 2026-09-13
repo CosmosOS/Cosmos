@@ -20,7 +20,7 @@ internal static unsafe partial class libSystemNative
     [UnmanagedCallersOnly(EntryPoint = "SystemNative_GetCpuUtilization")]
     internal static unsafe double SystemNative_GetCpuUtilization(ProcessCpuInformation* previousCpuInfo)
     {
-        if (SchedulerManager.Threads == null)
+        if (SchedulerManager.Threads is null)
         {
             return 0.0;
         }

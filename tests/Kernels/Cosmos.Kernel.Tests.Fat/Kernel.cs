@@ -1006,7 +1006,7 @@ public class Kernel : Sys.Kernel
             FatFilesystemType fmt = new(valid);
             Assert.True(fmt.TryFormat(default, new FatFormatOptions()));
             valid.ReadBlock(BootSectorLba, 1, sector);
-            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs) && bs != null);
+            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs));
             Assert.True(ClusterToLbaThrows(bs!, ReservedClusterZero),
                 "ClusterToLba(0) must throw, not underflow into an exabyte LBA");
             Assert.True(ClusterToLbaThrows(bs!, bs!.ClusterCount + ClusterCountOvershoot),
@@ -1026,7 +1026,7 @@ public class Kernel : Sys.Kernel
             Assert.True(driver.TryFormat(default, new FatFormatOptions()));
             byte[] sector = new byte[SectorSizeBytes];
             disk.ReadBlock(BootSectorLba, 1, sector);
-            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs) && bs != null);
+            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs));
             FatTable table = new(disk, bs!);
 
             uint first = table.AllocateChain(ProbeChainClusters);
@@ -1067,7 +1067,7 @@ public class Kernel : Sys.Kernel
             MemoryBlockDevice disk32 = FatTestVolume.FormatFat32(
                 scratchDisk.Reconfigure("FATBOUND32", FatTestVolume.BlockSize, FatTestVolume.Fat32BlockCount));
             disk32.ReadBlock(BootSectorLba, 1, sector);
-            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs32) && bs32 != null);
+            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs32));
             FatTable table32 = new(disk32, bs32!);
             Assert.True(GetReturnsEocSafely(table32, Fat32WildCluster),
                 "a wild FAT32 cluster must resolve to EOC, not out-of-range I/O");
@@ -1210,7 +1210,7 @@ public class Kernel : Sys.Kernel
             IVfsInode root = sb!.Root;
             byte[] bpbSector = new byte[SectorSizeBytes];
             disk.ReadBlock(BootSectorLba, 1, bpbSector);
-            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs) && bs != null);
+            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs));
 
             // FstClusHI carries an EA handle on real FAT16 volumes.
             Assert.True(root.InodeOperations.Create(root, "EAFILE.TXT", VfsMode.RegularFile, out IVfsInode? ea));
@@ -1309,7 +1309,7 @@ public class Kernel : Sys.Kernel
             // A directory moved across parents must get its '..' rewritten.
             byte[] bpbSector = new byte[SectorSizeBytes];
             disk.ReadBlock(BootSectorLba, 1, bpbSector);
-            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs) && bs != null);
+            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs));
             Assert.True(root.InodeOperations.Mkdir(root, "MOVEME", VfsMode.Directory, out _));
             Assert.True(root.InodeOperations.Mkdir(root, "DEST", VfsMode.Directory, out IVfsInode? dest));
             Assert.True(root.InodeOperations.Rename(root, "MOVEME", dest!, "MOVEME"));
@@ -1348,7 +1348,7 @@ public class Kernel : Sys.Kernel
             Assert.True(dir!.InodeOperations.GetAttr(dir, out VfsStat dirStat));
             byte[] bpbSector = new byte[SectorSizeBytes];
             fat32Disk.ReadBlock(BootSectorLba, 1, bpbSector);
-            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs32) && bs32 != null);
+            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs32));
             Assert.Equal<uint>(RootDotDotClusterValue, ReadDotDotClusterLow(fat32Disk, bs32!, (uint)dirStat.Ino),
                 "'..' of a root child must store cluster 0 per the FAT spec");
         });

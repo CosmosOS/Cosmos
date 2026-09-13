@@ -89,7 +89,7 @@ public static class StorageManager
             return Array.Empty<Partition>();
         }
 
-        List<Partition> onDevice = new();
+        List<Partition> onDevice = [];
         for (int i = 0; i < s_partitions.Count; i++)
         {
             if (ReferenceEquals(s_partitions[i].Host, device))
@@ -114,7 +114,7 @@ public static class StorageManager
             return;
         }
 
-        s_partitions = new List<Partition>();
+        s_partitions = [];
         s_devices = new List<IBlockDevice>(MaxDevices);
     }
 
@@ -180,7 +180,7 @@ public static class StorageManager
             s_devices.Add(device);
 
             // First device becomes primary
-            if (s_primaryDevice == null)
+            if (s_primaryDevice is null)
             {
                 s_primaryDevice = device;
             }
@@ -231,7 +231,7 @@ public static class StorageManager
 
     private static void ScanPartitions(IBlockDevice device)
     {
-        if (s_partitions == null)
+        if (s_partitions is null)
         {
             return;
         }

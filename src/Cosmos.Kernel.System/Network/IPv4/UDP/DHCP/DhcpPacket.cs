@@ -160,7 +160,7 @@ public class DhcpPacket : UdpPacket
 
         if (RawData[282] != 0)
         {
-            Options = new List<DhcpOption>();
+            Options = [];
 
             for (int i = 0; i < RawData.Length - 282 && RawData[282 + i] != 0xFF; i += 2) //0xFF is DHCP packet end
             {

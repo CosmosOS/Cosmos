@@ -59,7 +59,7 @@ internal static unsafe class DebugLiveSnapshot
             return;
         }
         SchedulerThread?[]? threads = SchedulerManager.Threads;
-        if (threads == null)
+        if (threads is null)
         {
             return;
         }
@@ -78,7 +78,7 @@ internal static unsafe class DebugLiveSnapshot
         for (int i = 0; i < n; i++)
         {
             SchedulerThread? t = threads[i];
-            if (t == null)
+            if (t is null)
             {
                 continue;
             }

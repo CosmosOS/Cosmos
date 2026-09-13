@@ -105,7 +105,7 @@ public abstract class ScanMapBase
         {
             KeyMapping t = Keys[index];
 
-            if (t == null)
+            if (t is null)
             {
                 continue;
             }

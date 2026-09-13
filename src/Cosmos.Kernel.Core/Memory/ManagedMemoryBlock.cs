@@ -349,10 +349,7 @@ internal unsafe class ManagedMemoryBlock
     /// <exception cref="ArgumentOutOfRangeException">Thrown if string exceeds memory block bounds.</exception>
     public void WriteString(uint aByteOffset, string value)
     {
-        if (value.Length + aByteOffset > Size)
-        {
-            throw new ArgumentOutOfRangeException(nameof(value));
-        }
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Length + aByteOffset, Size, nameof(value));
 
         var dest = Span.Slice((int)aByteOffset, value.Length);
         for (int i = 0; i < value.Length; i++)

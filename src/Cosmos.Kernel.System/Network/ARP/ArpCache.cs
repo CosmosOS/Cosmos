@@ -20,7 +20,7 @@ internal static class ArpCache
     [MemberNotNull(nameof(Cache))]
     private static void EnsureCacheExists()
     {
-        Cache ??= new Dictionary<uint, MACAddress>();
+        Cache ??= [];
     }
 
     /// <summary>
@@ -40,14 +40,7 @@ internal static class ArpCache
             return;
         }
 
-        if (Cache.ContainsKey(ipHash) == false)
-        {
-            Cache.Add(ipHash, macAddress);
-        }
-        else
-        {
-            Cache[ipHash] = macAddress;
-        }
+        Cache[ipHash] = macAddress;
     }
 
     /// <summary>
@@ -59,11 +52,6 @@ internal static class ArpCache
     {
         EnsureCacheExists();
 
-        if (!Cache.TryGetValue(ipAddress.Id, out MACAddress? resolve))
-        {
-            return null;
-        }
-
-        return resolve;
+        return Cache.TryGetValue(ipAddress.Id, out MACAddress? resolve) ? resolve : null;
     }
 }

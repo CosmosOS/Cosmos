@@ -133,7 +133,7 @@ public static class NetworkManager
     /// <param name="device">The network device to register.</param>
     internal static void RegisterDevice(INetworkDevice device)
     {
-        if (device == null || s_devices == null || s_deviceCount >= s_devices.Length)
+        if (device is null || s_devices is null || s_deviceCount >= s_devices.Length)
         {
             return;
         }
@@ -154,7 +154,7 @@ public static class NetworkManager
     /// <returns>The network device, or null if not found.</returns>
     internal static INetworkDevice? GetDevice(int index)
     {
-        if (s_devices == null || index < 0 || index >= s_deviceCount)
+        if (s_devices is null || index < 0 || index >= s_deviceCount)
         {
             return null;
         }

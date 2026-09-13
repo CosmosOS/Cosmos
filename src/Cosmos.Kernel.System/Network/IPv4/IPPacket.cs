@@ -326,6 +326,6 @@ public class IPPacket : EthernetPacket
     /// <inheritdoc/>
     public override string ToString()
     {
-        return "IP Packet Src=" + SourceIP + ", Dest=" + DestinationIP + ", Protocol=" + Protocol + ", TTL=" + TTL + ", DataLen=" + DataLength;
+        return $"IP Packet Src={SourceIP}, Dest={DestinationIP}, Protocol={Protocol}, TTL={TTL}, DataLen={DataLength}";
     }
 }

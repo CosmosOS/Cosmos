@@ -18,12 +18,12 @@ public static class NetworkStack
     /// <summary>
     /// Maps IP (Internet Protocol) addresses to network devices.
     /// </summary>
-    internal static Dictionary<uint, INetworkDevice> AddressMap { get; } = new();
+    internal static Dictionary<uint, INetworkDevice> AddressMap { get; } = [];
 
     /// <summary>
     /// Maps MAC addresses to network devices.
     /// </summary>
-    internal static Dictionary<uint, INetworkDevice> MACMap { get; } = new();
+    internal static Dictionary<uint, INetworkDevice> MACMap { get; } = [];
 
     /// <summary>
     /// Configures an IP address on the given network device.

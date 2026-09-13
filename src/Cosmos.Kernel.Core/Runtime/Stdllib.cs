@@ -215,7 +215,7 @@ namespace Cosmos.Kernel.Core.Runtime
             ref object rawData = ref MemoryMarshal.GetArrayDataReference(array)!;
             ref object element = ref Unsafe.Add(ref rawData, index);
 
-            if (obj == null)
+            if (obj is null)
             {
                 element = null!;
                 return;

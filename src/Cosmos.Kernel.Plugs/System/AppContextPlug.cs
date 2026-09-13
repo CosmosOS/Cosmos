@@ -38,7 +38,7 @@ public static class AppContextPlug
 
                 Log.WriteString(key);
                 Log.WriteString(" = ");
-                Log.WriteString(value + "\n");
+                Log.WriteString($"{value}\n");
 
                 s_dataStore[key] = value;
 

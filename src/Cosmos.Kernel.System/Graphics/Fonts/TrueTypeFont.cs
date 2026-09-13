@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.System.Graphics.Fonts;
 public sealed class TrueTypeFont : Font
 {
     private readonly LunarLabs.Fonts.Font _font;
-    private readonly Dictionary<int, TrueTypeGlyph?> _glyphCache = new Dictionary<int, TrueTypeGlyph?>();
+    private readonly Dictionary<int, TrueTypeGlyph?> _glyphCache = [];
 
     /// <summary>
     /// The text size in pixels used when this font is drawn through the
@@ -192,7 +192,7 @@ public sealed class TrueTypeFont : Font
         {
             char c = text[i];
             TrueTypeGlyph? glyph = GetGlyph(c, sizePx);
-            if (glyph == null)
+            if (glyph is null)
             {
                 continue;
             }
@@ -245,7 +245,7 @@ public sealed class TrueTypeFont : Font
         }
 
         LunarLabs.Fonts.FontGlyph? rendered = _font.RenderGlyph(c, GetScale(sizePx));
-        if (rendered == null)
+        if (rendered is null)
         {
             return null;
         }
@@ -258,13 +258,13 @@ public sealed class TrueTypeFont : Font
 
     private static byte[] ReadAllBytes(string path)
     {
-        using FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+        using FileStream stream = new(path, FileMode.Open, FileAccess.Read);
         return ReadAllBytes(stream);
     }
 
     private static byte[] ReadAllBytes(Stream stream)
     {
-        using MemoryStream buffer = new MemoryStream();
+        using MemoryStream buffer = new();
         stream.CopyTo(buffer);
         return buffer.ToArray();
     }

@@ -21,8 +21,8 @@ internal static class SvgaIIRender
     /// <summary>
     /// The graphics modes supported by the SVGA II canvases.
     /// </summary>
-    public static List<Mode> CreateAvailableModes() => new()
-    {
+    public static List<Mode> CreateAvailableModes() =>
+    [
         /* VmWare may support 16-bit resolutions but CGS does not yet.
            That would require RGB32->RGB16 conversion. */
         new Mode(320, 200, ColorDepth.ColorDepth32),
@@ -51,7 +51,7 @@ internal static class SvgaIIRender
         new Mode(3200, 2048, ColorDepth.ColorDepth32),
         new Mode(3200, 2400, ColorDepth.ColorDepth32),
         new Mode(3840, 2400, ColorDepth.ColorDepth32),
-    };
+    ];
 
     /// <summary>
     /// Programs the device with the given mode and refreshes the canvas's
@@ -242,7 +242,7 @@ internal static class SvgaIIRender
             }
         }
 
-        Bitmap bitmap = new Bitmap(width, height, ColorDepth.ColorDepth32)
+        Bitmap bitmap = new(width, height, ColorDepth.ColorDepth32)
         {
             RawData = all,
         };

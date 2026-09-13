@@ -74,7 +74,7 @@ public static class Global
     {
         Serial.WriteString("[Global] StartKernel called\n");
 
-        if (s_kernel == null)
+        if (s_kernel is null)
         {
             Serial.WriteString("[Global] ERROR: No kernel registered!\n");
             Serial.WriteString("[Global] Check CosmosKernelClass property in your .csproj\n");

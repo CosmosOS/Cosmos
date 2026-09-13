@@ -97,7 +97,7 @@ internal static unsafe partial class ExceptionHelper
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ThrowExceptionWithContext(Exception ex, nuint throwAddress, nuint throwRbp, nuint throwRsp, void* pExInfo)
     {
-        if (ex == null)
+        if (ex is null)
         {
             FailFast("Null exception", ex);
             return;
@@ -125,7 +125,7 @@ internal static unsafe partial class ExceptionHelper
         // Print the message before the stack walk, in case the walk crashes. Avoid GetType().Name —
         // it allocates.
         string? msg = ex.Message;
-        if (msg != null)
+        if (msg is not null)
         {
             Serial.WriteString("Message: ");
             Serial.WriteString(msg);
@@ -341,7 +341,7 @@ internal static unsafe partial class ExceptionHelper
             && StackTraceMetadata.TryGetMethodNameFromStartAddress(methodStart, out string methodName))
         {
             ref string? stackTraceString = ref StackTraceMetadata.GetStackTraceString(ex);
-            stackTraceString = stackTraceString == null
+            stackTraceString = stackTraceString is null
                 ? methodName
                 : stackTraceString + Environment.NewLine + "at " + methodName;
         }

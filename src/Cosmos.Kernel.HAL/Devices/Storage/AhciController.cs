@@ -148,7 +148,7 @@ internal unsafe class AhciController
     private ulong _abarPhys;
     private ulong _abarVirt;
     private GenericRegisters? _generic;
-    private readonly List<BlockDevice> _ports = new();
+    private readonly List<BlockDevice> _ports = [];
     private ulong _cmdRegionVirt;
     private ulong _cmdRegionPhys;
 
@@ -358,7 +358,7 @@ internal unsafe class AhciController
 
     private void PrintVersion()
     {
-        if (_generic == null)
+        if (_generic is null)
         {
             Serial.WriteString("Unknown");
             return;
@@ -372,7 +372,7 @@ internal unsafe class AhciController
 
     private void GetCapabilities()
     {
-        if (_generic == null)
+        if (_generic is null)
         {
             return;
         }
@@ -401,7 +401,7 @@ internal unsafe class AhciController
 
     private void GetPorts()
     {
-        if (_generic == null)
+        if (_generic is null)
         {
             return;
         }

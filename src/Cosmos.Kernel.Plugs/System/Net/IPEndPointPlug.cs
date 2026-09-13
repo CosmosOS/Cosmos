@@ -9,8 +9,8 @@ namespace Cosmos.Kernel.Plugs.System.Net;
 public static class IPEndPointPlug
 {
     // Store endpoint data per instance in separate dictionaries
-    public static readonly Dictionary<int, IPAddress> _addresses = new();
-    public static readonly Dictionary<int, int> _ports = new();
+    public static readonly Dictionary<int, IPAddress> _addresses = [];
+    public static readonly Dictionary<int, int> _ports = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(IPEndPoint aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
@@ -73,7 +73,7 @@ public static class IPEndPointPlug
     public static AddressFamily get_AddressFamily(IPEndPoint aThis)
     {
         int id = GetId(aThis);
-        if (_addresses.TryGetValue(id, out var addr) && addr != null)
+        if (_addresses.TryGetValue(id, out IPAddress? addr))
         {
             return addr.AddressFamily;
         }

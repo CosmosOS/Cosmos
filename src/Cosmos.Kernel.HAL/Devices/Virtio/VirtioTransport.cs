@@ -129,7 +129,7 @@ internal abstract class VirtioTransport
         }
 
         uint queueSize = maxSize < preferredSize ? maxSize : preferredSize;
-        Virtqueue queue = new Virtqueue(queueSize);
+        Virtqueue queue = new(queueSize);
         if (!ActivateQueue(index, queue))
         {
             return null;

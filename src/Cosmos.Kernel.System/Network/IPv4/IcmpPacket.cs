@@ -188,7 +188,7 @@ public class IcmpPacket : IPPacket
     /// <returns>The description string.</returns>
     public override string ToString()
     {
-        return "ICMP Packet Src=" + SourceIP + ", Dest=" + DestinationIP + ", Type=" + _icmpType + ", Code=" + _icmpCode;
+        return $"ICMP Packet Src={SourceIP}, Dest={DestinationIP}, Type={_icmpType}, Code={_icmpCode}";
     }
 }
 
@@ -273,7 +273,7 @@ public class IcmpEchoRequest : IcmpPacket
     /// <returns>The description string.</returns>
     public override string ToString()
     {
-        return "ICMP Echo Request Src=" + SourceIP + ", Dest=" + DestinationIP + ", ID=" + _icmpID + ", Sequence=" + _icmpSequence;
+        return $"ICMP Echo Request Src={SourceIP}, Dest={DestinationIP}, ID={_icmpID}, Sequence={_icmpSequence}";
     }
 }
 
@@ -356,6 +356,6 @@ public class IcmpEchoReply : IcmpPacket
     /// <returns>The description string.</returns>
     public override string ToString()
     {
-        return "ICMP Echo Reply Src=" + SourceIP + ", Dest=" + DestinationIP + ", ID=" + _icmpID + ", Sequence=" + _icmpSequence;
+        return $"ICMP Echo Reply Src={SourceIP}, Dest={DestinationIP}, ID={_icmpID}, Sequence={_icmpSequence}";
     }
 }

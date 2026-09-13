@@ -370,8 +370,7 @@ internal static unsafe partial class GarbageCollector
     /// </summary>
     public static ulong GetGCSegmentSizeBytes()
     {
-        // s_maxSegmentSize is a uint containing the configured segment size.
-        return s_maxSegmentSize;
+        return MaxSegmentSize;
     }
 
     /// <summary>
@@ -511,13 +510,13 @@ internal static unsafe partial class GarbageCollector
         if (CosmosFeatures.SchedulerEnabled)
         {
             SchedulerThread?[]? threads = SchedulerManager.Threads;
-            if (threads != null)
+            if (threads is not null)
             {
                 int count = SchedulerManager.ThreadCount;
                 for (int i = 0; i < threads.Length && count > 0; i++)
                 {
                     SchedulerThread? thread = threads[i];
-                    if (thread != null)
+                    if (thread is not null)
                     {
                         if (thread._allocContext.AllocLimit != null && thread._allocContext.AllocPtr != null)
                         {
