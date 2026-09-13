@@ -89,6 +89,8 @@
   </Target>
 
   <ItemGroup>
+    <!-- White-box runtime suite drives the module metadata and library
+         initializer plumbing the AOT runtime boots through. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Runtime" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.ARM64" />
@@ -113,15 +115,12 @@
     <!-- White-box scheduler suite reads Stride bookkeeping and drives the
          sync primitives directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Threading" />
-    <!-- White-box suites over Core primitives: alarms (Timer), vector
-         allocation and MSI routing (Interrupts), copy routines and page
-         allocation (Memory), MMIO probes (Storage). -->
-    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
+    <!-- White-box suites over Core primitives: vector allocation and MSI
+         routing (Interrupts), copy routines and page allocation (Memory),
+         MMIO probes (Storage). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Memory" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
-    <!-- The Power suite asserts PlatformHAL wired up ICpuOps and IPowerOps. -->
-    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Power" />
   </ItemGroup>
 
   <ItemGroup>

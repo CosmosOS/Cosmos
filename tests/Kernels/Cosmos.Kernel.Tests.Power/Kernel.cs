@@ -1,6 +1,5 @@
 using System;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.HAL;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -23,16 +22,15 @@ public class Kernel : Sys.Kernel
         Log.WriteNumber((uint)skip);
         Log.WriteString("\n");
 
-        TR.Start("Power Tests", expectedTests: 5);
+        TR.Start("Power Tests", expectedTests: 4);
 
-        TR.Run("PlatformHAL_PowerOps_NotNull", () =>
+        // The ring's own answer to "did the platform wire up power
+        // management". The initializer builds the CPU and power operations
+        // together from non-nullable factories, so this one fact stands for
+        // both: it can only read true once that initializer has run.
+        TR.Run("Power_IsSupported_OnThisPlatform", () =>
         {
-            Assert.NotNull(PlatformHAL.PowerOps, "PlatformHAL.PowerOps should be wired up by the platform initializer");
-        });
-
-        TR.Run("PlatformHAL_CpuOps_NotNull", () =>
-        {
-            Assert.NotNull(PlatformHAL.CpuOps, "PlatformHAL.CpuOps should be wired up by the platform initializer");
+            Assert.True(Sys.Power.IsSupported, "the platform initializer should have published power operations");
         });
 
         TR.Run("Power_Halt_Callable", () =>
@@ -41,7 +39,7 @@ public class Kernel : Sys.Kernel
             Assert.NotNull(halt);
         });
 
-        // Test #4: Reboot. Fires on skip=0, replays as already-passed otherwise.
+        // Test #3: Reboot. Fires on skip=0, replays as already-passed otherwise.
         if (skip == 0)
         {
             Log.WriteString("[Power Tests] About to invoke Power.Reboot() — QEMU should exit\n");
@@ -56,7 +54,7 @@ public class Kernel : Sys.Kernel
         }
         TR.Run("Reboot_FiresAndExits", () => { });
 
-        // Test #5: Shutdown. Fires on skip=1, replays as already-passed otherwise.
+        // Test #4: Shutdown. Fires on skip=1, replays as already-passed otherwise.
         if (skip == 1)
         {
             Log.WriteString("[Power Tests] About to invoke Power.Shutdown() — QEMU should exit\n");

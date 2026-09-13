@@ -9,6 +9,16 @@ namespace Cosmos.Kernel.System;
 public static class Power
 {
     /// <summary>
+    /// Whether the platform can carry out <see cref="Reboot"/> and
+    /// <see cref="Shutdown"/>. False before the platform HAL is initialized
+    /// and on a platform that publishes no power operations, where both
+    /// members fall back to <see cref="Halt"/> and never return.
+    /// <see cref="Halt"/> itself needs no such check: it parks the CPU either
+    /// way.
+    /// </summary>
+    public static bool IsSupported => PlatformHAL.PowerOps != null;
+
+    /// <summary>
     /// Park the CPU. Returns when an interrupt wakes it.
     /// </summary>
     public static void Halt()

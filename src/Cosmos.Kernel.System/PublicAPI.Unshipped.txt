@@ -645,6 +645,7 @@ static Cosmos.Kernel.System.Network.NetworkManager.Ready.get -> bool
 static Cosmos.Kernel.System.Network.NetworkManager.Send(byte[]! data, int length) -> bool
 static Cosmos.Kernel.System.Network.NetworkStack.RemoveAllConfigIP() -> void
 static Cosmos.Kernel.System.Power.Halt() -> void
+static Cosmos.Kernel.System.Power.IsSupported.get -> bool
 static Cosmos.Kernel.System.Power.Reboot() -> void
 static Cosmos.Kernel.System.Power.Shutdown() -> void
 static Cosmos.Kernel.System.Storage.Ebr.MoveLogical(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, ulong extendedStartSector, int logicalIndex, ulong newStartSector) -> bool

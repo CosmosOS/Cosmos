@@ -93,13 +93,5 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.Graphic</_Parameter1>
     </AssemblyAttribute>
-    <!-- Both suites assert that HAL enumeration registered a timer device,
-         which TimerManager.Timer reports; ITimerDevice is internal. -->
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Cosmos.Kernel.Tests.Timer</_Parameter1>
-    </AssemblyAttribute>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Cosmos.Kernel.Tests.Interrupts</_Parameter1>
-    </AssemblyAttribute>
   </ItemGroup>
 </Project>

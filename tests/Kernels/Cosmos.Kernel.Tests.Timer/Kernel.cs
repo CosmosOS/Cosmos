@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
-using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Timer;
 using Cosmos.TestRunner.Framework;
 using BclTimer = System.Threading.Timer;
@@ -21,7 +21,7 @@ public class Kernel : Sys.Kernel
 {
     protected override void BeforeRun()
     {
-        Serial.WriteString("[Timer Tests] Starting test suite\n");
+        Log.WriteString("[Timer Tests] Starting test suite\n");
 
 #if ARCH_X64
         // x64: Stopwatch (2) + PIT (3) + TimerManager (7) + LAPIC (3) + DateTime (4) + AlarmManager (3) + BCL Timer (4) = 26
@@ -75,7 +75,7 @@ public class Kernel : Sys.Kernel
         TR.Run("BclTimer_Dispose_Stops", TestBclTimerDisposeStops);
         TR.Run("Task_Delay_Completes", TestTaskDelayCompletes);
 
-        Serial.WriteString("[Timer Tests] All tests completed\n");
+        Log.WriteString("[Timer Tests] All tests completed\n");
         TR.Finish();
     }
 
@@ -98,28 +98,28 @@ public class Kernel : Sys.Kernel
         Assert.True(RTC.Instance != null, "RTC: Instance should be initialized");
         Assert.True(RTC.Instance!.IsAvailable, "RTC: Should be initialized");
 
-        Serial.WriteString("[Timer Tests] RTC boot time ticks: ");
-        Serial.WriteNumber((ulong)RTC.Instance.BootTimeTicks);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] RTC boot time ticks: ");
+        Log.WriteNumber((ulong)RTC.Instance.BootTimeTicks);
+        Log.WriteString("\n");
     }
 
     private static void TestDateTimeNowValid()
     {
         DateTime now = DateTime.Now;
 
-        Serial.WriteString("[Timer Tests] DateTime.Now: ");
-        Serial.WriteNumber((ulong)now.Year);
-        Serial.WriteString("-");
-        Serial.WriteNumber((ulong)now.Month);
-        Serial.WriteString("-");
-        Serial.WriteNumber((ulong)now.Day);
-        Serial.WriteString(" ");
-        Serial.WriteNumber((ulong)now.Hour);
-        Serial.WriteString(":");
-        Serial.WriteNumber((ulong)now.Minute);
-        Serial.WriteString(":");
-        Serial.WriteNumber((ulong)now.Second);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] DateTime.Now: ");
+        Log.WriteNumber((ulong)now.Year);
+        Log.WriteString("-");
+        Log.WriteNumber((ulong)now.Month);
+        Log.WriteString("-");
+        Log.WriteNumber((ulong)now.Day);
+        Log.WriteString(" ");
+        Log.WriteNumber((ulong)now.Hour);
+        Log.WriteString(":");
+        Log.WriteNumber((ulong)now.Minute);
+        Log.WriteString(":");
+        Log.WriteNumber((ulong)now.Second);
+        Log.WriteString("\n");
 
         // Year should be >= 2020 (reasonable minimum for RTC)
         Assert.True(now.Year >= 2020, "DateTime: Year should be >= 2020");
@@ -137,11 +137,11 @@ public class Kernel : Sys.Kernel
 
         DateTime dt2 = DateTime.Now;
 
-        Serial.WriteString("[Timer Tests] DateTime dt1 ticks: ");
-        Serial.WriteNumber((ulong)dt1.Ticks);
-        Serial.WriteString(", dt2 ticks: ");
-        Serial.WriteNumber((ulong)dt2.Ticks);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] DateTime dt1 ticks: ");
+        Log.WriteNumber((ulong)dt1.Ticks);
+        Log.WriteString(", dt2 ticks: ");
+        Log.WriteNumber((ulong)dt2.Ticks);
+        Log.WriteString("\n");
 
         Assert.True(dt2 > dt1, "DateTime: Now should increment over time");
 
@@ -156,13 +156,13 @@ public class Kernel : Sys.Kernel
     {
         DateTime utcNow = DateTime.UtcNow;
 
-        Serial.WriteString("[Timer Tests] DateTime.UtcNow: ");
-        Serial.WriteNumber((ulong)utcNow.Year);
-        Serial.WriteString("-");
-        Serial.WriteNumber((ulong)utcNow.Month);
-        Serial.WriteString("-");
-        Serial.WriteNumber((ulong)utcNow.Day);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] DateTime.UtcNow: ");
+        Log.WriteNumber((ulong)utcNow.Year);
+        Log.WriteString("-");
+        Log.WriteNumber((ulong)utcNow.Month);
+        Log.WriteString("-");
+        Log.WriteNumber((ulong)utcNow.Day);
+        Log.WriteString("\n");
 
         // Should have Utc kind
         Assert.True(utcNow.Kind == DateTimeKind.Utc, "DateTime: UtcNow should have Utc kind");
@@ -181,11 +181,11 @@ public class Kernel : Sys.Kernel
 
         long ts2 = Stopwatch.GetTimestamp();
 
-        Serial.WriteString("[Timer Tests] Stopwatch ts1: ");
-        Serial.WriteNumber((ulong)ts1);
-        Serial.WriteString(", ts2: ");
-        Serial.WriteNumber((ulong)ts2);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Stopwatch ts1: ");
+        Log.WriteNumber((ulong)ts1);
+        Log.WriteString(", ts2: ");
+        Log.WriteNumber((ulong)ts2);
+        Log.WriteString("\n");
 
         Assert.True(ts2 > ts1, "Stopwatch: GetTimestamp() should return incrementing values");
     }
@@ -193,9 +193,9 @@ public class Kernel : Sys.Kernel
     {
         long freq = Stopwatch.Frequency;
 
-        Serial.WriteString("[Timer Tests] Stopwatch.Frequency: ");
-        Serial.WriteNumber((ulong)freq);
-        Serial.WriteString(" Hz\n");
+        Log.WriteString("[Timer Tests] Stopwatch.Frequency: ");
+        Log.WriteNumber((ulong)freq);
+        Log.WriteString(" Hz\n");
 
         // TSC frequency should be at least 100 MHz on x64; ARM64 generic timer is typically 62.5 MHz
 #if ARCH_X64
@@ -210,8 +210,9 @@ public class Kernel : Sys.Kernel
 
     private static void TestTimerManagerInitialized()
     {
-        Assert.True(TimerManager.IsInitialized, "TimerManager: Should be initialized");
-        Assert.True(TimerManager.Timer != null, "TimerManager: Should have a registered timer");
+        // IsInitialized is exactly "a timer device is registered": the ring
+        // publishes the fact, so the suite does not read the device itself.
+        Assert.True(TimerManager.IsInitialized, "TimerManager: a timer device should be registered");
     }
 
     private static void TestTimerManagerWait500ms()
@@ -224,9 +225,9 @@ public class Kernel : Sys.Kernel
         long frequency = Stopwatch.Frequency;
         long elapsedMs = (elapsed * 1000) / frequency;
 
-        Serial.WriteString("[Timer Tests] TimerManager Wait(500ms) - elapsed ms: ");
-        Serial.WriteNumber((ulong)elapsedMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] TimerManager Wait(500ms) - elapsed ms: ");
+        Log.WriteNumber((ulong)elapsedMs);
+        Log.WriteString("\n");
 
         // Check if within tolerance (250-1000ms for 500ms wait)
         bool inRange = elapsedMs >= 250 && elapsedMs <= 1000;
@@ -247,9 +248,9 @@ public class Kernel : Sys.Kernel
 
         TimerManager.Wait(300);
 
-        Serial.WriteString("[Timer Tests] One-shot fire count: ");
-        Serial.WriteNumber((ulong)s_oneShotFireCount);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] One-shot fire count: ");
+        Log.WriteNumber((ulong)s_oneShotFireCount);
+        Log.WriteString("\n");
 
         Assert.True(s_oneShotFireCount == 1, "Schedule: one-shot timer should fire exactly once");
         Assert.True(!timer.IsActive, "Schedule: one-shot timer should be inactive after firing");
@@ -266,9 +267,9 @@ public class Kernel : Sys.Kernel
         TimerManager.Wait(500);
 
         int count = s_recurringFireCount;
-        Serial.WriteString("[Timer Tests] Recurring fire count after 500ms: ");
-        Serial.WriteNumber((ulong)count);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Recurring fire count after 500ms: ");
+        Log.WriteNumber((ulong)count);
+        Log.WriteString("\n");
 
         Assert.True(TimerManager.Cancel(timer), "ScheduleRecurring: pending timer should be cancellable");
 
@@ -368,9 +369,9 @@ public class Kernel : Sys.Kernel
 
         TimerManager.Wait(500);
 
-        Serial.WriteString("[Timer Tests] Alarm fire count: ");
-        Serial.WriteNumber((ulong)s_alarmFireCount);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Alarm fire count: ");
+        Log.WriteNumber((ulong)s_alarmFireCount);
+        Log.WriteString("\n");
 
         Assert.True(s_alarmFireCount == 1, "Alarm: one-shot alarm should fire exactly once");
         Assert.True(!AlarmManager.Cancel(id), "Alarm: fired alarm should no longer be pending");
@@ -386,9 +387,9 @@ public class Kernel : Sys.Kernel
         TimerManager.Wait(500);
 
         int count = s_alarmRecurringCount;
-        Serial.WriteString("[Timer Tests] Recurring alarm count after 500ms: ");
-        Serial.WriteNumber((ulong)count);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Recurring alarm count after 500ms: ");
+        Log.WriteNumber((ulong)count);
+        Log.WriteString("\n");
 
         Assert.True(AlarmManager.Cancel(id), "Alarm: recurring alarm should be cancellable");
         Assert.True(count >= 3, "Alarm: recurring alarm should fire repeatedly (>= 3 in 500ms)");
@@ -421,9 +422,9 @@ public class Kernel : Sys.Kernel
             TimerManager.Wait(500);
         }
 
-        Serial.WriteString("[Timer Tests] BCL one-shot fire count: ");
-        Serial.WriteNumber((ulong)s_bclOneShotCount);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] BCL one-shot fire count: ");
+        Log.WriteNumber((ulong)s_bclOneShotCount);
+        Log.WriteString("\n");
 
         Assert.True(s_bclOneShotCount == 1, "System.Threading.Timer: one-shot should fire exactly once");
     }
@@ -438,9 +439,9 @@ public class Kernel : Sys.Kernel
             count = s_bclPeriodicCount;
         }
 
-        Serial.WriteString("[Timer Tests] BCL periodic fire count after 500ms: ");
-        Serial.WriteNumber((ulong)count);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] BCL periodic fire count after 500ms: ");
+        Log.WriteNumber((ulong)count);
+        Log.WriteString("\n");
 
         Assert.True(count >= 3, "System.Threading.Timer: periodic should fire repeatedly (>= 3 in 500ms)");
     }
@@ -470,11 +471,11 @@ public class Kernel : Sys.Kernel
             elapsedMs = (Stopwatch.GetTimestamp() - tsStart) * 1000 / Stopwatch.Frequency;
         }
 
-        Serial.WriteString("[Timer Tests] Task.Delay(100) completed=");
-        Serial.WriteNumber((ulong)(delay.IsCompleted ? 1 : 0));
-        Serial.WriteString(" after ms: ");
-        Serial.WriteNumber((ulong)elapsedMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Task.Delay(100) completed=");
+        Log.WriteNumber((ulong)(delay.IsCompleted ? 1 : 0));
+        Log.WriteString(" after ms: ");
+        Log.WriteNumber((ulong)elapsedMs);
+        Log.WriteString("\n");
 
         Assert.True(delay.IsCompleted, "Task.Delay(100) should complete");
         Assert.True(elapsedMs >= 50, "Task.Delay(100) should take at least ~100ms");
@@ -501,11 +502,11 @@ public class Kernel : Sys.Kernel
         // Calculate elapsed milliseconds: (elapsed * 1000) / frequency
         long elapsedMs = (elapsed * 1000) / frequency;
 
-        Serial.WriteString("[Timer Tests] PIT Wait(100ms) - elapsed ticks: ");
-        Serial.WriteNumber((ulong)elapsed);
-        Serial.WriteString(", elapsed ms: ");
-        Serial.WriteNumber((ulong)elapsedMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] PIT Wait(100ms) - elapsed ticks: ");
+        Log.WriteNumber((ulong)elapsed);
+        Log.WriteString(", elapsed ms: ");
+        Log.WriteNumber((ulong)elapsedMs);
+        Log.WriteString("\n");
 
         // Check if within tolerance (50-200ms for 100ms wait)
         bool inRange = elapsedMs >= 50 && elapsedMs <= 200;
@@ -529,13 +530,13 @@ public class Kernel : Sys.Kernel
         // ratio * 100 should be between 150 and 250
         long ratio100 = (elapsed200ms * 100) / elapsed100ms;
 
-        Serial.WriteString("[Timer Tests] PIT 100ms ticks: ");
-        Serial.WriteNumber((ulong)elapsed100ms);
-        Serial.WriteString(", 200ms ticks: ");
-        Serial.WriteNumber((ulong)elapsed200ms);
-        Serial.WriteString(", ratio*100: ");
-        Serial.WriteNumber((ulong)ratio100);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] PIT 100ms ticks: ");
+        Log.WriteNumber((ulong)elapsed100ms);
+        Log.WriteString(", 200ms ticks: ");
+        Log.WriteNumber((ulong)elapsed200ms);
+        Log.WriteString(", ratio*100: ");
+        Log.WriteNumber((ulong)ratio100);
+        Log.WriteString("\n");
 
         bool proportional = ratio100 >= 150 && ratio100 <= 250;
         Assert.True(proportional, "PIT: 200ms should take ~2x ticks of 100ms");
@@ -548,9 +549,9 @@ public class Kernel : Sys.Kernel
         Assert.True(LocalApic.IsInitialized, "LAPIC: Should be initialized");
         Assert.True(LocalApic.IsTimerCalibrated, "LAPIC: Timer should be calibrated");
 
-        Serial.WriteString("[Timer Tests] LAPIC ticks/ms: ");
-        Serial.WriteNumber(LocalApic.TicksPerMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] LAPIC ticks/ms: ");
+        Log.WriteNumber(LocalApic.TicksPerMs);
+        Log.WriteString("\n");
     }
 
     private static void TestLAPICWait100ms()
@@ -563,9 +564,9 @@ public class Kernel : Sys.Kernel
         long frequency = Stopwatch.Frequency;
         long elapsedMs = (elapsed * 1000) / frequency;
 
-        Serial.WriteString("[Timer Tests] LAPIC Wait(100ms) - elapsed ms: ");
-        Serial.WriteNumber((ulong)elapsedMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] LAPIC Wait(100ms) - elapsed ms: ");
+        Log.WriteNumber((ulong)elapsedMs);
+        Log.WriteString("\n");
 
         // Check if within tolerance (50-200ms for 100ms wait)
         bool inRange = elapsedMs >= 50 && elapsedMs <= 200;
@@ -588,13 +589,13 @@ public class Kernel : Sys.Kernel
         // ratio * 100 should be between 150 and 250
         long ratio100 = (elapsed200ms * 100) / elapsed100ms;
 
-        Serial.WriteString("[Timer Tests] LAPIC 100ms ticks: ");
-        Serial.WriteNumber((ulong)elapsed100ms);
-        Serial.WriteString(", 200ms ticks: ");
-        Serial.WriteNumber((ulong)elapsed200ms);
-        Serial.WriteString(", ratio*100: ");
-        Serial.WriteNumber((ulong)ratio100);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] LAPIC 100ms ticks: ");
+        Log.WriteNumber((ulong)elapsed100ms);
+        Log.WriteString(", 200ms ticks: ");
+        Log.WriteNumber((ulong)elapsed200ms);
+        Log.WriteString(", ratio*100: ");
+        Log.WriteNumber((ulong)ratio100);
+        Log.WriteString("\n");
 
         bool proportional = ratio100 >= 150 && ratio100 <= 250;
         Assert.True(proportional, "LAPIC: 200ms should take ~2x ticks of 100ms");

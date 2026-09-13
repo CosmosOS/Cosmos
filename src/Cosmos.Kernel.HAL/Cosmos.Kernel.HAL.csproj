@@ -46,7 +46,6 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Graphic" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />
-    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Power" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Virtio" />
