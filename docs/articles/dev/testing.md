@@ -1,17 +1,18 @@
 # Testing
 
-NativeAOT-Patcher has two complementary testing layers: **unit tests** that validate the build-time toolchain (patcher, scanner, analyzer) and **kernel integration tests** that run compiled kernel images inside QEMU and report results over a binary UART protocol.
+NativeAOT-Patcher has two complementary testing layers: **unit tests** that run in the host process, for the build-time toolchain (patcher, scanner, analyzer) and for kernel library logic that needs no hardware, and **kernel integration tests** that run compiled kernel images inside QEMU and report results over a binary UART protocol.
 
 ---
 
 ## Unit Tests
 
-Unit tests live in `tests/Cosmos.Tests.*` projects and are run with the standard .NET test runner. They do not require QEMU or any special infrastructure.
+Unit tests live in the `tests/Cosmos.Tests.*` projects (xunit) and in `src/tests/Cosmos.Kernel.Tests.System` (NUnit), and are run with the standard .NET test runner. They do not require QEMU or any special infrastructure.
 
 ### Running Unit Tests
 
 ```bash
-dotnet test
+dotnet test tests/Cosmos.Tests.Patcher            # one toolchain project
+dotnet test src/tests/Cosmos.Kernel.Tests.System   # the kernel library tests
 ```
 
 ### Test Projects
@@ -39,6 +40,13 @@ dotnet test
   - `PatchType_ShouldReplaceAllMethodsCorrectly`
   - `PatchType_ShouldPlugAssembly`
   - `AddMethod_BehaviorBeforeAndAfterPlug`
+- **Cosmos.Kernel.Tests.System**: Exercises `Cosmos.Kernel.System` logic that needs no hardware, in the host process. One nested fixture per member under test, holding an `InternalsVisibleTo` grant from the library.
+  - `AppendToData.WhenBothData_AndOtherAreEmpty_DataIsEmpty`
+  - `AppendToData.WhenDataIsNotEmpty_AndOtherIsEmpty_DataDoesNotChange`
+  - `AppendToData.WhenDataIsNotEmpty_AndOtherIsNotEmpty_OtherIsAppendedToData`
+  - `AdvanceDataOffset.WhenAdvancingByZero_NoChangesAreMade`
+  - `AdvanceDataOffset.WhenAdvancingByOneAndLengthIsTwo_OnlyLastElementRemains`
+  - `AdvanceDataOffset.WhenAdvancingByTwoAndLengthIsTwo_DataLengthIsZero`
 - **Cosmos.Tests.NativeWrapper**: Contains runtime assets; no unit tests.
 - **Cosmos.Tests.NativeLibrary**: Provides native code used in tests; no unit tests.
 
@@ -306,6 +314,8 @@ tests/
         ├── Kernel.cs
         └── Bootloader/limine.conf
 ```
+
+`src/tests/Cosmos.Kernel.Tests.System/` holds the host-side tests of `Cosmos.Kernel.System`. It sits under `src/` because it takes a project reference on the library and an `InternalsVisibleTo` grant from it.
 
 ---
 

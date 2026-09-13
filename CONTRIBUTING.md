@@ -98,7 +98,8 @@ The full rules are in the [Coding Guidelines](docs/articles/dev/coding-guideline
 See [Testing](docs/articles/dev/testing.md) for the two test layers.
 
 ```bash
-dotnet test                     # unit tests for the build toolchain (patcher, scanner, analyzer)
+dotnet test tests/Cosmos.Tests.Patcher            # one build-toolchain suite; Scanner, Tools, Build.* and BuildCache sit beside it
+dotnet test src/tests/Cosmos.Kernel.Tests.System   # host-side unit tests of Cosmos.Kernel.System
 make test KERNEL=Memory         # kernel integration suite in QEMU
 make test KERNEL=Memory ARCH=arm64
 ```
