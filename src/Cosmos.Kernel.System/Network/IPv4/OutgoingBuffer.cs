@@ -116,7 +116,7 @@ internal static class OutgoingBuffer
                 BufferEntry entry = s_queue[e];
                 if (entry.Status == BufferEntry.EntryStatus.ADDED)
                 {
-                    if (IPConfig.IsLocalAddress(entry.Packet.DestinationIP) == false)
+                    if (!IPConfig.IsLocalAddress(entry.Packet.DestinationIP))
                     {
                         Address? nextHop = IPConfig.FindRoute(entry.Packet.DestinationIP);
                         entry.NextHop = nextHop;

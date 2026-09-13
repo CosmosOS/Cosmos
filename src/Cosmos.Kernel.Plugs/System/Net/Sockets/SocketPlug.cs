@@ -246,7 +246,7 @@ public static class SocketPlug
             sm = s_tcpStateMachines[id];
         }
 
-        while (sm.WaitStatus(Status.ESTABLISHED) != true)
+        while (!sm.WaitStatus(Status.ESTABLISHED))
         {
             ;
         }
@@ -354,7 +354,7 @@ public static class SocketPlug
         sm.Status = Status.SYN_SENT;
         sm.SendEmptyPacket(TcpFlags.SYN);
 
-        if (sm.WaitStatus(Status.ESTABLISHED, 5000) == false)
+        if (!sm.WaitStatus(Status.ESTABLISHED, 5000))
         {
             throw new Exception("Failed to open TCP connection!");
         }

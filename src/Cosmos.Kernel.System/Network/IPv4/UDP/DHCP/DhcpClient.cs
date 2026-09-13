@@ -167,7 +167,7 @@ public sealed class DhcpClient : UdpClient
     /// <param name="message">Enable/Disable the displaying of messages about DHCP applying and conf.</param>
     private void Apply(DhcpPacket packet, bool message = false)
     {
-        if (_applied == false)
+        if (!_applied)
         {
             NetworkStack.RemoveAllConfigIP();
 

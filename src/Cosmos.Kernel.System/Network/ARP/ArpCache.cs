@@ -40,14 +40,7 @@ internal static class ArpCache
             return;
         }
 
-        if (Cache.ContainsKey(ipHash) == false)
-        {
-            Cache.Add(ipHash, macAddress);
-        }
-        else
-        {
-            Cache[ipHash] = macAddress;
-        }
+        Cache[ipHash] = macAddress;
     }
 
     /// <summary>
