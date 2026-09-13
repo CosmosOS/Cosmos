@@ -39,15 +39,15 @@ public sealed class TRStandardLayout : ScanMapBase
         /* 1 -> 9 */
         Keys.Add(new KeyMapping(0x29, '"', 'é', '"', '"', 'é', '"', '<', ConsoleKeyEx.NoName));
         Keys.Add(new KeyMapping(0x02, '1', '!', '1', '1', '!', '1', '>', ConsoleKeyEx.D1));
-        Keys.Add(new KeyMapping(0x03, '2', '@', '2', '2', '@', '2', '£', ConsoleKeyEx.D2));
-        Keys.Add(new KeyMapping(0x04, '3', '#', '3', '3', '#', '3', '#', ConsoleKeyEx.D3));
-        Keys.Add(new KeyMapping(0x05, '4', '$', '4', '4', '$', '4', '$', ConsoleKeyEx.D4));
+        Keys.Add(new KeyMapping(0x03, '2', '\'', '2', '2', '\'', '2', '£', ConsoleKeyEx.D2));
+        Keys.Add(new KeyMapping(0x04, '3', '^', '3', '3', '^', '3', '#', ConsoleKeyEx.D3));
+        Keys.Add(new KeyMapping(0x05, '4', '+', '4', '4', '+', '4', '$', ConsoleKeyEx.D4));
         Keys.Add(new KeyMapping(0x06, '5', '%', '5', '5', '%', '5', '½', ConsoleKeyEx.D5));
         Keys.Add(new KeyMapping(0x07, '6', '&', '6', '6', '&', '6', ConsoleKeyEx.D6));
         Keys.Add(new KeyMapping(0x08, '7', '/', '7', '7', '/', '7', '{', ConsoleKeyEx.D7));
         Keys.Add(new KeyMapping(0x09, '8', '(', '8', '8', '(', '8', '[', ConsoleKeyEx.D8));
         Keys.Add(new KeyMapping(0x0A, '9', ')', '9', '9', ')', '9', ']', ConsoleKeyEx.D9));
-        Keys.Add(new KeyMapping(0x0B, '0', '=', '0', '0', '=', '0', '}', ConsoleKeyEx.D0)); //Hata
+        Keys.Add(new KeyMapping(0x0B, '0', '=', '0', '0', '=', '0', '}', ConsoleKeyEx.D0));
         /* -, =, Bksp, Tab */
         Keys.Add(new KeyMapping(0x0C, '*', '?', '*', '*', '?', '*', '\\', ConsoleKeyEx.NoName));
         Keys.Add(new KeyMapping(0x0D, '-', '_', '-', '-', '_', '-', '|', ConsoleKeyEx.Minus));
@@ -61,7 +61,7 @@ public sealed class TRStandardLayout : ScanMapBase
         Keys.Add(new KeyMapping(0x14, 't', 'T', 't', 'T', 't', 'T', '₺', ConsoleKeyEx.T));
         Keys.Add(new KeyMapping(0x15, 'y', 'Y', 'y', 'Y', 'y', 'Y', ConsoleKeyEx.Y));
         Keys.Add(new KeyMapping(0x16, 'u', 'U', 'u', 'U', 'u', 'U', ConsoleKeyEx.U));
-        Keys.Add(new KeyMapping(0x17, 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'İ', ConsoleKeyEx.I));
+        Keys.Add(new KeyMapping(0x17, 'ı', 'I', 'ı', 'I', 'ı', 'I', 'i', 'İ', ConsoleKeyEx.I));
         Keys.Add(new KeyMapping(0x18, 'o', 'O', 'o', 'O', 'o', 'O', ConsoleKeyEx.O));
         Keys.Add(new KeyMapping(0x19, 'p', 'P', 'p', 'P', 'p', 'P', ConsoleKeyEx.P));
         Keys.Add(new KeyMapping(0x1A, 'ğ', 'Ğ', 'ğ', 'Ğ', 'ğ', 'Ğ', '¨', ConsoleKeyEx.LBracket));
@@ -91,7 +91,7 @@ public sealed class TRStandardLayout : ScanMapBase
         Keys.Add(new KeyMapping(0x31, 'n', 'N', 'n', 'N', 'n', 'N', ConsoleKeyEx.N));
         Keys.Add(new KeyMapping(0x32, 'm', 'M', 'm', 'M', 'm', 'M', ConsoleKeyEx.M));
         Keys.Add(new KeyMapping(0x33, 'ö', 'Ö', 'ö', 'Ö', 'ö', 'Ö', ConsoleKeyEx.NoName));
-        Keys.Add(new KeyMapping(0x34, 'ç', 'Ç', 'ç', 'ç', 'Ç', 'ç', ConsoleKeyEx.NoName));
+        Keys.Add(new KeyMapping(0x34, 'ç', 'Ç', 'ç', 'Ç', 'ç', 'Ç', ConsoleKeyEx.NoName));
         Keys.Add(new KeyMapping(0x35, '.', ':', '.', '.', ':', '.', ConsoleKeyEx.NoName)); // also numpad divide
         /* Right Shift */
         Keys.Add(new KeyMapping(0x1C, ConsoleKeyEx.Enter));

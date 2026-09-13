@@ -9,6 +9,7 @@ namespace Cosmos.Kernel.Tests.System.Keyboard.ScanMaps;
 public class TRStandardLayoutTest
 {
     // Set 1 make codes of the keys the cases below press.
+    private const byte Digit2 = 0x03;
     private const byte Digit7 = 0x08;
     private const byte Q = 0x10;
     private const byte DotlessI = 0x17;
@@ -67,6 +68,8 @@ public class TRStandardLayoutTest
 
         [TestCase(Q, false, ExpectedResult = 'q')]
         [TestCase(Q, true, ExpectedResult = 'Q')]
+        [TestCase(Digit2, true, ExpectedResult = '\'')]
+        [TestCase(DotlessI, false, ExpectedResult = 'ı')]
         public char WhenNoAltGr_ResultIsTheBaseOrShiftedLevel(byte scanCode, bool shift)
         {
             return Convert(scanCode, shift: shift).KeyChar;
