@@ -26,10 +26,16 @@ public unsafe class Canvas
     private int[]? _buffer;
 
     /// <summary>
+    /// The one mode a virtual canvas accepts: the one it is in. Rebuilt when
+    /// <see cref="Mode"/> is assigned, so reading it in a loop costs nothing.
+    /// </summary>
+    private Mode[]? _availableModes;
+
+    /// <summary>
     /// The graphics modes this canvas accepts, in the order the driver reports
     /// them. <see cref="Mode"/> only accepts a mode from this list.
     /// </summary>
-    public virtual IReadOnlyList<Mode> AvailableModes => new Mode[] { Mode };
+    public virtual IReadOnlyList<Mode> AvailableModes => _availableModes ??= new Mode[] { Mode };
 
     /// <summary>
     /// The default graphics mode.
@@ -54,6 +60,7 @@ public unsafe class Canvas
         protected internal set
         {
             _mode = value;
+            _availableModes = null;
             _bytesPerPixel = (int)value.ColorDepth / 8;
             _stride = (int)value.ColorDepth / 8;
             _pitch = value.Width * _bytesPerPixel;
