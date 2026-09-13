@@ -1084,18 +1084,29 @@ public static class SchedulerManager
     /// Performs scheduling from within an interrupt context.
     /// Picks next thread and sets up context switch if needed.
     /// </summary>
+    /// <remarks>
+    /// Nothing on this path may throw. It runs on the interrupt stack with
+    /// interrupts masked, where a throw has no handler to unwind to and the
+    /// dispatcher would walk an IRQ frame the CFI unwinder cannot describe.
+    /// The state the body needs is therefore checked and answered with a
+    /// no-op, not with the <c>ThrowIf</c> guards the callable members use.
+    /// Both callers already establish these conditions, so a check that
+    /// fails here is a bug elsewhere, not a caller error to report.
+    /// </remarks>
     /// <param name="cpuId">Current CPU ID.</param>
     /// <param name="currentRsp">Current RSP (pointer to saved context on stack).</param>
     internal static void ScheduleFromInterrupt(uint cpuId, nuint currentRsp)
     {
-        ThrowIfCpuStateNotInitialized();
-        ThrowIfSchedulerNotSet();
+        if (s_cpuStates is null || s_currentScheduler is null || cpuId >= s_cpuCount)
+        {
+            return;
+        }
 
-        var state = s_cpuStates[cpuId];
+        PerCpuState state = s_cpuStates[cpuId];
 
         // No lock needed - interrupts are already disabled in interrupt context
-        var prev = state.CurrentThread;
-        var next = s_currentScheduler.PickNext(state) ?? state.IdleThread;
+        SchedulerThread? prev = state.CurrentThread;
+        SchedulerThread? next = s_currentScheduler.PickNext(state) ?? state.IdleThread;
 
         if (next == null)
         {

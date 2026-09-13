@@ -17,7 +17,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 73;
+    private const int ExpectedTestCount = 74;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -51,6 +51,9 @@ public class Kernel : Sys.Kernel
 
     /// <summary>How long a Join on a killed thread may take before the test calls it a hang.</summary>
     private const int KillJoinTimeoutMs = 2000;
+
+    /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
+    private const uint UnregisteredCpuId = 4096;
 
     /// <summary>Polling interval (ms) while waiting on scheduler-test flags (worker holding, parked, woke, ...).</summary>
     private const int FlagPollIntervalMs = 50;
@@ -158,6 +161,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Thread_MaxStackSize_IsHonored", TestThreadMaxStackSizeHonored);
         TR.Run("Thread_MaxStackSize_TinyRequestIsFloored", TestThreadTinyStackSizeFloored);
         TR.Run("Thread_Kill_Queued_StopsManagedSide", TestKillQueuedThreadStopsManagedSide);
+        TR.Run("ScheduleFromInterrupt_UnregisteredCpu_IsNoOp", TestScheduleFromInterruptIgnoresUnregisteredCpu);
         TR.Run("Mutex_IdleThreadContention_KeepsTicketAccounting", TestMutexIdleThreadContention);
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
         TR.Run("Mutex_ThreeContenders_AllAcquire", TestMutexThreeContenders);
@@ -1007,6 +1011,28 @@ public class Kernel : Sys.Kernel
         Assert.True(victim.Join(KillJoinTimeoutMs), "Join must return once the killed thread's stop event is set");
         Assert.True((victim.ThreadState & ThreadState.Stopped) != 0, "the killed thread must read as Stopped");
         Assert.True(!victim.IsAlive, "the killed thread must not read as alive");
+    }
+
+    /// <summary>
+    /// The interrupt-context scheduling entry point answers state it cannot
+    /// use with a no-op. It runs on the interrupt stack with interrupts
+    /// masked, where a throw has no handler to unwind to, so a CPU id past
+    /// the registered count must return rather than raise.
+    /// </summary>
+    private static void TestScheduleFromInterruptIgnoresUnregisteredCpu()
+    {
+        bool threw = false;
+
+        try
+        {
+            SchedulerManager.ScheduleFromInterrupt(UnregisteredCpuId, currentRsp: 0);
+        }
+        catch (Exception)
+        {
+            threw = true;
+        }
+
+        Assert.False(threw, "an unregistered CPU id must leave the interrupt path silently, not raise");
     }
 
     private static void TestThreadStatics()
