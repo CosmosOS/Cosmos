@@ -59,7 +59,7 @@ public static partial class VfsManager
         /// <summary>Registered driver name (e.g. "fat").</summary>
         public string Name { get; }
 
-        /// <summary>Driver-specific backing-store identifier passed to <see cref="TryMount(string, global::System.ReadOnlySpan{char}, Cosmos.Kernel.HAL.Vfs.MountFlags, string, out VfsMount)"/> — for the FAT driver, this is the global partition index in <c>StorageManager.Partitions</c> as a decimal string.</summary>
+        /// <summary>Driver-specific backing-store identifier passed to <see cref="TryMount(string, global::System.ReadOnlySpan{char}, Cosmos.Kernel.HAL.Vfs.MountFlags, string, out VfsMount)"/>. For the FAT driver this is the global partition index in <c>StorageManager.Partitions</c> as a decimal string.</summary>
         public string Source { get; }
 
         /// <summary>Absolute path the filesystem is mounted at (e.g. "/").</summary>

@@ -24,7 +24,7 @@ internal class StrideCpuData
     /// Run queue sorted by Pass value (ascending). Pre-sized to the thread
     /// registry limit: InsertByPass runs in interrupt context (the tick's
     /// OnThreadYield and the sleep-expiry OnThreadReady), and a List growth
-    /// there is an allocation inside the tick — the case the plugging guide
+    /// there is an allocation inside the tick, the case the plugging guide
     /// forbids. Mutex and InterruptEvent pre-size their wait lists for the
     /// same reason.
     /// </summary>

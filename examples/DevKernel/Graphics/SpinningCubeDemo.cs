@@ -15,7 +15,7 @@ namespace DevKernel.Graphics;
 /// Full-screen 3D demo behind <c>cube</c>: a cube with one color per face
 /// spinning above a grid, rolling in the direction the mouse points away from
 /// the center of the screen, the further out the faster. Exercises the
-/// <see cref="Canvas3D"/> API end to end — mesh creation, camera, per-frame
+/// <see cref="Canvas3D"/> API end to end: mesh creation, camera, per-frame
 /// clear, world transforms and present. Runs until Escape.
 /// </summary>
 /// <remarks>

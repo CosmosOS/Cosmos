@@ -13,8 +13,8 @@ namespace Cosmos.Kernel.Tests.Graphic;
 /// mesh-layout and discovery tests hold on every cell. The FIFO tests drive
 /// the rotating-cube scene of the original 3D demo kernel through the public
 /// API on the vmware-svga profile and assert every command the SVGA backend
-/// emits — scene setup, camera and world transforms, clear, and the full
-/// draw payload — using the same disabled-device inspect-and-rewind
+/// emits (scene setup, camera and world transforms, clear, and the full
+/// draw payload) using the same disabled-device inspect-and-rewind
 /// technique as <see cref="Svga3DTests"/>: QEMU negotiates no 3D, so the
 /// guest half of the contract is what CI can pin down, and the device must
 /// stay disabled so the commands sit inert in FIFO memory. Two consequences:
@@ -123,7 +123,7 @@ public static unsafe class Canvas3DTests
     /// <summary>Read the FIFO dword at an arbitrary byte offset.</summary>
     private static uint FifoDword(uint byteOffset) => s_driver!.GetFIFO((FIFO)byteOffset);
 
-    /// <summary>NEXT_CMD before a command is written — where its header will land.</summary>
+    /// <summary>NEXT_CMD before a command is written: where its header will land.</summary>
     private static uint CaptureStart() => s_driver!.GetFIFO(FIFO.NextCmd);
 
     /// <summary>
@@ -196,7 +196,7 @@ public static unsafe class Canvas3DTests
     /// Constructing the SVGA 3D canvas must emit the exact scene-setup
     /// sequence the demo performed by hand: context, color+depth targets,
     /// viewport, depth range, the fixed-function render states, and the
-    /// untextured texture stage — including SVGA3D_INVALID_ID as the unbound
+    /// untextured texture stage, including SVGA3D_INVALID_ID as the unbound
     /// texture (the demo's -1 silently bound to the float overload).
     /// </summary>
     public static void TestSceneSetupFifo()
@@ -350,7 +350,7 @@ public static unsafe class Canvas3DTests
     /// One frame of the demo's rotating cube through the public API:
     /// ClearScene + DrawMesh must emit the view and projection computed from
     /// the camera, the clear, the world transform, and a draw payload with
-    /// the cube's two vertex streams and 12 indexed triangles — the same
+    /// the cube's two vertex streams and 12 indexed triangles, the same
     /// stream the demo built by hand.
     /// </summary>
     public static void TestDrawCubeFifo()
@@ -398,7 +398,7 @@ public static unsafe class Canvas3DTests
         at += HeaderBytes + 36;
 
         // The mesh is untextured and the stage was configured at setup, so
-        // the world transform comes next — no texture state in the stream.
+        // the world transform comes next, no texture state in the stream.
         at = AssertTransform(at, 1, world, "world");
 
         Assert.Equal(CmdDrawPrimitives, FifoDword(at), "draw command");

@@ -275,7 +275,7 @@ public static unsafe class Svga3DTests
     /// The single-box surface DMA used by the 3D readback path
     /// (PresentToImage, and Canvas3D's GetImage on a rendered scene) must
     /// encode the guest pointer, host image, transfer direction and copy box
-    /// exactly. Only the command is enqueued here — the fence/sync that
+    /// exactly. Only the command is enqueued here: the fence/sync that
     /// completes a real transfer needs a live device.
     /// </summary>
     public static void TestSurfaceDmaReadback()

@@ -652,7 +652,7 @@ public class Kernel : Sys.Kernel
     }
 
     // The writer reports refusal by return value now, so the try/catch this
-    // used to need is gone with it — and so is the arm64 EH dispatch failure
+    // used to need is gone with it, and so is the arm64 EH dispatch failure
     // that two inlined catch blocks alongside span locals once triggered.
     private static bool MbrAddPartitionRejects(int index, ulong startSector, ulong sectorCount)
     {

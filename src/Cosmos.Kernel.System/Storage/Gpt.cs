@@ -614,7 +614,7 @@ public static class Gpt
                 }
 
                 // Skip entries with exactly Parse's validity criteria so
-                // index stays aligned with Parse's output — one
+                // index stays aligned with Parse's output: one
                 // corrupt entry ahead of the target would otherwise shift
                 // every later index onto a different, healthy partition.
                 // This also guarantees mutators only see validated LBAs

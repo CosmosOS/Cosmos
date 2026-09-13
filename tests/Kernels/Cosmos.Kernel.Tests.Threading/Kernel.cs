@@ -92,7 +92,7 @@ public class Kernel : Sys.Kernel
     // The two policies are separated by one ratio, applied from both sides:
     // the 4x-ticket spinner must clear it under Stride, and neither spinner may
     // reach it under Round-Robin. 3/2 sits in the gap with margin on both
-    // arches — measured A/B was 1.92 (arm64 TCG) to 2.20 (x64) under Stride,
+    // arches: measured A/B was 1.92 (arm64 TCG) to 2.20 (x64) under Stride,
     // and 0.88 to 1.13 under Round-Robin whatever priority was requested.
     // Stride's ideal is 4x; the OnThreadYield pass floor erodes it to ~2x.
     /// <summary>Numerator of the share ratio separating the two policies.</summary>
@@ -761,7 +761,7 @@ public class Kernel : Sys.Kernel
         c3.Start();
 
         // The holder keeps the mutex across several ticks, so the two other
-        // contenders both queue up — the last one scans a non-empty
+        // contenders both queue up, and the last one scans a non-empty
         // _waitingThreads list.
         for (int i = 0; i < ContenderPollRetries && s_contenderAcquisitions < ContenderCount; i++)
         {
@@ -784,7 +784,7 @@ public class Kernel : Sys.Kernel
     // ===== Release hand-off (anti-barging) =====
     // Release used to clear ownership and merely ready the parked waiter;
     // until that waiter's retry ran, ANY thread could re-take the mutex and
-    // send the waiter to the back of the queue again — repeatable, so a
+    // send the waiter to the back of the queue again, repeatably, so a
     // waiter on a contended mutex could starve. The releaser's immediate
     // TryAcquire is the deterministic probe: with ownership handed off in
     // Release it must fail.
@@ -1484,7 +1484,7 @@ public class Kernel : Sys.Kernel
     // share, the live Stride -> Round-Robin switch, Round-Robin's semantics
     // (FIFO first-runs, quantum preemption, equal shares, priority ignored,
     // run-queue membership), and the switch back. Both swaps happen at
-    // quiescent points — every worker of the previous cells has exited — so
+    // quiescent points (every worker of the previous cells has exited), so
     // no thread is parked or queued across the policy change.
 
     private static RoundRobinScheduler? s_roundRobin;
@@ -1736,7 +1736,7 @@ public class Kernel : Sys.Kernel
     // InvokeCurrentThreadStart's preamble is re-queued at the TAIL by
     // OnThreadYield, so the order threads reach their delegate is not the
     // order they became ready. These cells drive the hooks on a synthetic
-    // PerCpuState instead — the policy keeps all its state in the data slots,
+    // PerCpuState instead: the policy keeps all its state in the data slots,
     // so a throwaway instance over throwaway Thread objects exercises the real
     // logic with no timer, no dispatch and no timing assumption at all.
 
@@ -1843,7 +1843,7 @@ public class Kernel : Sys.Kernel
             "blocking must remove the blocked thread, not its neighbour");
 
         // A preempted-but-still-runnable thread goes to the tail, behind the
-        // thread that was already waiting — that rotation is Round-Robin.
+        // thread that was already waiting, and that rotation is Round-Robin.
         policy.OnThreadYield(state, parked);
         Assert.True(ReferenceEquals(policy.GetRunQueueThread(state, 0), other)
             && ReferenceEquals(policy.GetRunQueueThread(state, 1), parked),
@@ -1916,7 +1916,7 @@ public class Kernel : Sys.Kernel
         spinner.Start();
 
         // The spinner never blocks, so every sample below requires the tick
-        // to preempt it at quantum expiry and rotate main back in — merely
+        // to preempt it at quantum expiry and rotate main back in: merely
         // reaching the asserts proves FIFO's bounded latency for main.
         TimerManager.Wait(PreemptSampleIntervalMs);
         uint sample1 = s_preemptCounter;

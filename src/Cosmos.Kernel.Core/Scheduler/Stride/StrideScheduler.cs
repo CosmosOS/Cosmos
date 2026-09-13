@@ -514,8 +514,8 @@ internal class StrideScheduler : IScheduler
         // first update, where LastPassUpdate is still 0 and the delta is the
         // whole timestamp, and the multi-million-second CNTPCT_EL0 readings
         // QEMU TCG produces on ARM64 (the test runner clamps those for the
-        // same reason). Either one both explodes GlobalPass — the yield floor
-        // then snaps every thread up to it, flattening ticket ratios — and can
+        // same reason). Either one both explodes GlobalPass (the yield floor
+        // then snaps every thread up to it, flattening ticket ratios) and can
         // overflow the multiply below.
         ulong maxElapsed = ticksPerQuantum * MaxCatchUpQuanta;
         if (elapsed > maxElapsed)

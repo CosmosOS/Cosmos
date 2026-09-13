@@ -42,7 +42,7 @@ public class Kernel : Sys.Kernel
         // Test #3: Reboot. Fires on skip=0, replays as already-passed otherwise.
         if (skip == 0)
         {
-            Log.WriteString("[Power Tests] About to invoke Power.Reboot() — QEMU should exit\n");
+            Log.WriteString("[Power Tests] About to invoke Power.Reboot(), QEMU should exit\n");
             TR.RunDestructive(
                 "Reboot_FiresAndExits",
                 () => Sys.Power.Reboot(),
@@ -57,7 +57,7 @@ public class Kernel : Sys.Kernel
         // Test #4: Shutdown. Fires on skip=1, replays as already-passed otherwise.
         if (skip == 1)
         {
-            Log.WriteString("[Power Tests] About to invoke Power.Shutdown() — QEMU should exit\n");
+            Log.WriteString("[Power Tests] About to invoke Power.Shutdown(), QEMU should exit\n");
             TR.RunDestructive(
                 "Shutdown_FiresAndExits",
                 () => Sys.Power.Shutdown(),
