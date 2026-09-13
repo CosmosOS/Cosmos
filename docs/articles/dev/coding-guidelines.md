@@ -593,16 +593,18 @@ private static void ThrowIfKeyboardDisabled()
 
 ### Argument Checks
 
-When the value tested is the parameter itself, the throw helpers replace the hand-written `if` and `throw`:
+When the check is one comparison, the throw helper replaces the hand-written `if` and `throw`. The parameter named is the one the value derives from, so a caller reading the exception finds the argument to fix:
 
 ```csharp
 ArgumentNullException.ThrowIfNull(device);
 ArgumentOutOfRangeException.ThrowIfNegative(width);
 ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, MaxPartitions);
-ArgumentOutOfRangeException.ThrowIfGreaterThan(offset, _dataLength);
+ArgumentOutOfRangeException.ThrowIfNotEqual(buffer.Length, 4, nameof(buffer));
+ArgumentOutOfRangeException.ThrowIfGreaterThan(blockCount, (ulong)data.Length / sector, nameof(blockCount));
+ObjectDisposedException.ThrowIf(_disposed, this);
 ```
 
-A check on a derived quantity (`buffer.Length != 4`) keeps the explicit `throw`, so the message can say what was measured. The parameter name is always `nameof(x)`, never a string literal.
+A range is two helpers, one per bound (`ThrowIfLessThan` then `ThrowIfGreaterThan`), not one hand-written `||`. A condition no helper expresses (`sectorCount > host.BlockCount - startSector`) keeps the explicit `throw`, and so does a check that must log before it throws. The parameter name is always `nameof(x)`, never a string literal, and never the message: `new ArgumentOutOfRangeException("Invalid offset or size")` names a parameter called `Invalid offset or size`.
 
 ### When to Panic vs. Throw
 
