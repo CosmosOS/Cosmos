@@ -7,6 +7,7 @@ abstract Cosmos.Kernel.System.Network.Address.IsZero.get -> bool
 abstract Cosmos.Kernel.System.Network.Address.OperatorBitwiseAnd(Cosmos.Kernel.System.Network.Address! other) -> Cosmos.Kernel.System.Network.MaskedAddress
 abstract Cosmos.Kernel.System.Network.Address.Parts.get -> Cosmos.Kernel.System.Network.MaskedAddress
 abstract Cosmos.Kernel.System.Network.Address.ToBytes() -> System.ReadOnlySpan<byte>
+override Cosmos.Kernel.System.Network.IPv6.Address6.Equals(object? obj) -> bool
 const Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.BootSectorLba = 0 -> ulong
 const Cosmos.Kernel.System.Filesystems.Fat.FatDirectory.AttributesOffset = 11 -> int
 const Cosmos.Kernel.System.Filesystems.Fat.FatDirectory.ClusterHighShift = 16 -> int

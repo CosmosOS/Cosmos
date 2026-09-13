@@ -26,7 +26,9 @@ public enum AddressNumericStyle
 /// <summary>
 /// Represents a IPv4 address.
 /// </summary>
+#pragma warning disable CS0660, CS0661 // Equals and GetHashCode are implemented in sub-classes
 public abstract class Address : IComparable<Address>
+#pragma warning restore CS0660, CS0661
 {
     public bool IsIpv4 => this is Address4;
     public bool IsIpv6 => !IsIpv4;
@@ -110,24 +112,11 @@ public abstract class Address : IComparable<Address>
     }
 
     public static bool operator !=(Address a, Address b) => !(a == b);
-
-    public override bool Equals(object obj)
-    {
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-
-        if (ReferenceEquals(obj, null))
-        {
-            return false;
-        }
-
-        throw new NotImplementedException();
-    }
 }
 
+#pragma warning disable CS0660, CS0661 // Equals and GetHashcode does not make sense here
 public readonly ref struct MaskedAddress : IEquatable<MaskedAddress>
+#pragma warning restore CS0660, CS0661
 {
     public uint Segment1 { get; }
     public uint Segment2 { get; }
