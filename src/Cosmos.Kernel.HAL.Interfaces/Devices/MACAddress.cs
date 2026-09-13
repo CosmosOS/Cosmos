@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 /// <summary>
 /// A 48-bit Ethernet MAC address.
 /// </summary>
-public class MACAddress : IComparable
+public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
 {
     private static MACAddress? s_broadcast;
     private static MACAddress? s_none;
@@ -99,19 +99,13 @@ public class MACAddress : IComparable
     /// Compare this address to another MAC address, byte by byte from the
     /// most significant byte.
     /// </summary>
-    /// <param name="obj">MAC address to compare against, or null.</param>
+    /// <param name="other">MAC address to compare against, or null.</param>
     /// <returns>Negative, zero, or positive following the ordering of the first differing byte. Null orders before any address.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="obj"/> is neither null nor a <see cref="MACAddress"/>.</exception>
-    public int CompareTo(object? obj)
+    public int CompareTo(MACAddress? other)
     {
-        if (obj is null)
+        if (other is null)
         {
             return 1;
-        }
-
-        if (obj is not MACAddress other)
-        {
-            throw new ArgumentException("obj is not a MACAddress", nameof(obj));
         }
 
         for (int i = 0; i < 6; i++)
@@ -127,13 +121,13 @@ public class MACAddress : IComparable
     }
 
     /// <summary>
-    /// Check whether another object is a MAC address holding the same six bytes.
+    /// Check whether another MAC address holds the same six bytes.
     /// </summary>
-    /// <param name="obj">Object to compare against.</param>
-    /// <returns>True when <paramref name="obj"/> is a <see cref="MACAddress"/> with the same six bytes, false for anything else including null.</returns>
-    public override bool Equals(object? obj)
+    /// <param name="other">MAC address to compare against, or null.</param>
+    /// <returns>True when <paramref name="other"/> holds the same six bytes, false otherwise and for null.</returns>
+    public bool Equals(MACAddress? other)
     {
-        if (obj is not MACAddress other)
+        if (other is null)
         {
             return false;
         }
@@ -147,6 +141,16 @@ public class MACAddress : IComparable
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Check whether another object is a MAC address holding the same six bytes.
+    /// </summary>
+    /// <param name="obj">Object to compare against.</param>
+    /// <returns>True when <paramref name="obj"/> is a <see cref="MACAddress"/> with the same six bytes, false for anything else including null.</returns>
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as MACAddress);
     }
 
     /// <summary>

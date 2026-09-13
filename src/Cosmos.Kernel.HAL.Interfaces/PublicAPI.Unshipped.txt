@@ -7,7 +7,8 @@ Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.Name.get -> string!
 Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
 Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
 Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress
-Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.CompareTo(object? obj) -> int
+Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.CompareTo(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress? other) -> int
+Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.Equals(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress? other) -> bool
 Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.MACAddress(byte[]! address) -> void
 Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.MACAddress(byte[]! buffer, int offset) -> void
 Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.MACAddress(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! m) -> void
