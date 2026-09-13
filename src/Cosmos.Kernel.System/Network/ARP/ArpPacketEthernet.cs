@@ -16,22 +16,22 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// <summary>
     /// The sender MAC address.
     /// </summary>
-    protected MACAddress senderMac = null!;
+    private protected MACAddress senderMac = null!;
 
     /// <summary>
     /// The target MAC address.
     /// </summary>
-    protected MACAddress targetMac = null!;
+    private protected MACAddress targetMac = null!;
 
     /// <summary>
     /// The sender IP address.
     /// </summary>
-    protected Address senderIP = null!;
+    private protected Address senderIP = null!;
 
     /// <summary>
     /// The target IP address.
     /// </summary>
-    protected Address targetIP = null!;
+    private protected Address targetIP = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArpPacketEthernet"/> class from a received
@@ -49,7 +49,7 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// <see cref="EthernetPacket.RawData"/> into the protected fields. Called once during
     /// construction; the parsed values are never refreshed afterwards.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         senderMac = new MACAddress(RawData, 22);
@@ -74,7 +74,7 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// <param name="packetSize">Total frame size in bytes.</param>
     /// <param name="arpTargetMac">Target hardware address (THA), the value written into the ARP
     /// body at offset 32; it can differ from the Ethernet destination, as in a broadcast request.</param>
-    protected ArpPacketEthernet(ushort operation, MACAddress senderMac, Address senderIP,
+    private protected ArpPacketEthernet(ushort operation, MACAddress senderMac, Address senderIP,
         MACAddress targetMac, Address targetIP, int packetSize, MACAddress arpTargetMac)
         : base(targetMac, senderMac, 1, 0x0800, 6, 4, operation, packetSize)
     {

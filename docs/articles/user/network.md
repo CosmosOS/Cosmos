@@ -296,6 +296,11 @@ The seam has three parts:
 | Transmit and inject | `NetworkStack.Send(IPPacket)` queues a built packet with ARP resolution; `NetworkStack.HandlePacket` injects a raw frame into the receive path |
 | Packet-level client I/O | `UdpClient.Send(UdpPacket)` / `UdpClient.ReceivePacket(timeout)`, `IcmpClient.Send(IcmpPacket)` / `IcmpClient.ReceivePacket(timeout)` |
 
+The seam is for building and reading the packet types the stack already
+speaks, not for adding new ones: their wire fields, header checksum helpers
+and the `InitializeFields` parse hook are internal to the stack, so a kernel
+constructs a packet and reads its properties rather than deriving its own.
+
 A crafted echo request, correlated with its reply by the identifier and sequence number the caller chose:
 
 ```csharp

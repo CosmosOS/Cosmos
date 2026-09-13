@@ -181,7 +181,7 @@ public class UdpPacket : IPPacket
     /// <see cref="EthernetPacket.RawData"/> into the header properties. Runs once during
     /// construction; the properties are snapshots and are not refreshed afterwards.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         SourcePort = (ushort)((RawData[DataOffset] << 8) | RawData[DataOffset + 1]);

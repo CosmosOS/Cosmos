@@ -20,7 +20,7 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 public class IPPacket : EthernetPacket
 {
     /// <summary>Header length in 32-bit words, as parsed from the IHL field.</summary>
-    protected byte ipHeaderLength;
+    private protected byte ipHeaderLength;
     private static ushort s_nextFragmentID;
 
     /// <summary>
@@ -88,7 +88,7 @@ public class IPPacket : EthernetPacket
     /// Initializes all internal fields.
     /// </summary>
     /// <exception cref="ArgumentException">Thrown if RawData is invalid or null.</exception>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         IPVersion = (byte)((RawData[14] & 0xF0) >> 4);
@@ -118,7 +118,7 @@ public class IPPacket : EthernetPacket
     /// <param name="source">Source address.</param>
     /// <param name="dest">Destination address.</param>
     /// <param name="flags">Raw value of header byte 20: the 3 flag bits followed by the upper 5 bits of the fragment offset.</param>
-    protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags)
+    private protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags)
         : this(GetSourceMAC(source), MACAddress.None, dataLength, protocol, source, dest, flags)
     { }
 
@@ -133,7 +133,7 @@ public class IPPacket : EthernetPacket
     /// <param name="dest">Destination address.</param>
     /// <param name="flags">Raw value of header byte 20: the 3 flag bits followed by the upper 5 bits of the fragment offset.</param>
     /// <param name="destMAC">Destination MAC address.</param>
-    protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags, MACAddress destMAC)
+    private protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags, MACAddress destMAC)
         : this(GetSourceMAC(source), destMAC, dataLength, protocol, source, dest, flags)
     { }
 
@@ -201,7 +201,7 @@ public class IPPacket : EthernetPacket
     /// </summary>
     /// <param name="offset">The offset, in bytes.</param>
     /// <param name="length">The length, in bytes.</param>
-    protected ushort CalcOcCrc(ushort offset, ushort length) => CalcOcCrc(RawData, offset, length);
+    private protected ushort CalcOcCrc(ushort offset, ushort length) => CalcOcCrc(RawData, offset, length);
 
     /// <summary>
     /// Computes the Internet ones'-complement checksum over a range of the
@@ -210,7 +210,7 @@ public class IPPacket : EthernetPacket
     /// <param name="buffer">The buffer to use.</param>
     /// <param name="offset">The offset, in bytes.</param>
     /// <param name="length">The length, in bytes.</param>
-    protected static ushort CalcOcCrc(byte[] buffer, ushort offset, int length)
+    private protected static ushort CalcOcCrc(byte[] buffer, ushort offset, int length)
     {
         return (ushort)~SumShortValues(buffer, offset, length);
     }
@@ -222,7 +222,7 @@ public class IPPacket : EthernetPacket
     /// <param name="buffer">The buffer to use.</param>
     /// <param name="offset">The offset, in bytes.</param>
     /// <param name="length">The length, in bytes.</param>
-    protected static ushort SumShortValues(byte[] buffer, int offset, int length)
+    private protected static ushort SumShortValues(byte[] buffer, int offset, int length)
     {
         uint chksum = 0;
         int end = offset + (length & ~1);
@@ -246,7 +246,7 @@ public class IPPacket : EthernetPacket
     /// <paramref name="headerLength"/> bytes of the IP header.
     /// </summary>
     /// <param name="headerLength">The length of the header, in bytes.</param>
-    protected ushort CalcIPCrc(ushort headerLength)
+    private protected ushort CalcIPCrc(ushort headerLength)
     {
         return CalcOcCrc(14, headerLength);
     }

@@ -16,10 +16,10 @@ namespace Cosmos.Kernel.System.Network;
 public class EthernetPacket
 {
     /// <summary>Parsed source MAC address backing <see cref="SourceMac"/>.</summary>
-    protected MACAddress srcMAC = null!;
+    private protected MACAddress srcMAC = null!;
 
     /// <summary>Parsed destination MAC address backing <see cref="DestinationMac"/>.</summary>
-    protected MACAddress destMAC = null!;
+    private protected MACAddress destMAC = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EthernetPacket"/> class
@@ -40,7 +40,7 @@ public class EthernetPacket
     /// constructor, before derived-type state exists) and again whenever a
     /// MAC address setter rewrites the buffer.
     /// </summary>
-    protected virtual void InitializeFields()
+    private protected virtual void InitializeFields()
     {
         destMAC = new MACAddress(RawData, 0);
         srcMAC = new MACAddress(RawData, 6);
@@ -52,7 +52,7 @@ public class EthernetPacket
     /// </summary>
     /// <param name="type">EtherType of the frame.</param>
     /// <param name="packetSize">Total frame size in bytes; the buffer is allocated here.</param>
-    protected EthernetPacket(ushort type, int packetSize)
+    private protected EthernetPacket(ushort type, int packetSize)
         : this(MACAddress.None, MACAddress.None, type, packetSize)
     {
     }
@@ -64,7 +64,7 @@ public class EthernetPacket
     /// <param name="src">Source MAC address.</param>
     /// <param name="type">EtherType of the frame.</param>
     /// <param name="packetSize">Total frame size in bytes; the buffer is allocated here.</param>
-    protected EthernetPacket(MACAddress dest, MACAddress src, ushort type, int packetSize)
+    private protected EthernetPacket(MACAddress dest, MACAddress src, ushort type, int packetSize)
     {
         RawData = new byte[packetSize];
         for (int i = 0; i < 6; i++)

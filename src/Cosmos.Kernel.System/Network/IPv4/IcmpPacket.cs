@@ -16,13 +16,13 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 public class IcmpPacket : IPPacket
 {
     /// <summary>Parsed ICMP type backing <see cref="IcmpType"/>.</summary>
-    protected byte icmpType;
+    private protected byte icmpType;
 
     /// <summary>Parsed ICMP code backing <see cref="IcmpCode"/>.</summary>
-    protected byte icmpCode;
+    private protected byte icmpCode;
 
     /// <summary>Parsed or computed ICMP checksum backing <see cref="IcmpCrc"/>.</summary>
-    protected ushort icmpCRC;
+    private protected ushort icmpCRC;
 
     private static int s_echoRequestsReplied;
     private static byte[]? s_lastEchoRequestData;
@@ -89,7 +89,7 @@ public class IcmpPacket : IPPacket
     /// Parses the ICMP type, code, and checksum snapshots from
     /// <see cref="EthernetPacket.RawData"/>, in addition to the base fields.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         icmpType = RawData[DataOffset];
@@ -138,7 +138,7 @@ public class IcmpPacket : IPPacket
     /// </summary>
     /// <param name="length">The number of bytes to sum: the ICMP header plus payload.</param>
     /// <returns>The checksum value.</returns>
-    protected ushort CalcIcmpCrc(ushort length)
+    private protected ushort CalcIcmpCrc(ushort length)
     {
         return CalcOcCrc(DataOffset, length);
     }
@@ -204,10 +204,10 @@ public class IcmpPacket : IPPacket
 public class IcmpEchoRequest : IcmpPacket
 {
     /// <summary>Parsed ICMP identifier backing <see cref="IcmpId"/>.</summary>
-    protected ushort icmpID;
+    private protected ushort icmpID;
 
     /// <summary>Parsed ICMP sequence number backing <see cref="IcmpSequence"/>.</summary>
-    protected ushort icmpSequence;
+    private protected ushort icmpSequence;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IcmpEchoRequest"/> class
@@ -250,7 +250,7 @@ public class IcmpEchoRequest : IcmpPacket
     /// Parses the identifier and sequence number snapshots from
     /// <see cref="EthernetPacket.RawData"/>, in addition to the base fields.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);
@@ -289,10 +289,10 @@ public class IcmpEchoRequest : IcmpPacket
 public class IcmpEchoReply : IcmpPacket
 {
     /// <summary>Parsed ICMP identifier backing <see cref="IcmpId"/>.</summary>
-    protected ushort icmpID;
+    private protected ushort icmpID;
 
     /// <summary>Parsed ICMP sequence number backing <see cref="IcmpSequence"/>.</summary>
-    protected ushort icmpSequence;
+    private protected ushort icmpSequence;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IcmpEchoReply"/> class
@@ -333,7 +333,7 @@ public class IcmpEchoReply : IcmpPacket
     /// Parses the identifier and sequence number snapshots from
     /// <see cref="EthernetPacket.RawData"/>, in addition to the base fields.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         icmpID = (ushort)((RawData[DataOffset + 4] << 8) | RawData[DataOffset + 5]);

@@ -148,7 +148,7 @@ public class DhcpPacket : UdpPacket
     /// <see cref="EthernetPacket.RawData"/>. Called once during construction; the resulting
     /// property values are snapshots that are not updated afterwards.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         Operation = RawData[42];

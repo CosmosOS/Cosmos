@@ -215,7 +215,7 @@ public class TcpPacket : IPPacket
     /// Parses the TCP header fields from <see cref="EthernetPacket.RawData"/> into the header properties, and the header options into <see cref="Options"/> when the header is longer than 20 bytes.
     /// Runs during construction; the properties are snapshots and do not track later changes to the raw bytes.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         SourcePort = (ushort)((RawData[DataOffset] << 8) | RawData[DataOffset + 1]);

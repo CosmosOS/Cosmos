@@ -15,27 +15,27 @@ public class ArpPacket : EthernetPacket
     /// <summary>
     /// The hardware type field (HTYPE) parsed from the frame at construction; 1 means Ethernet.
     /// </summary>
-    protected ushort hardwareType;
+    private protected ushort hardwareType;
 
     /// <summary>
     /// The protocol type field (PTYPE) parsed from the frame at construction; 0x0800 means IPv4.
     /// </summary>
-    protected ushort protocolType;
+    private protected ushort protocolType;
 
     /// <summary>
     /// The hardware address length field (HLEN) parsed from the frame at construction; 6 for Ethernet.
     /// </summary>
-    protected byte hardwareAddrLength;
+    private protected byte hardwareAddrLength;
 
     /// <summary>
     /// The protocol address length field (PLEN) parsed from the frame at construction; 4 for IPv4.
     /// </summary>
-    protected byte protocolAddrLength;
+    private protected byte protocolAddrLength;
 
     /// <summary>
     /// The operation code field (OPER) parsed from the frame at construction; 1 is a request, 2 is a reply.
     /// </summary>
-    protected ushort opCode;
+    private protected ushort opCode;
 
     /// <summary>
     /// Handles ARP packets.
@@ -109,7 +109,7 @@ public class ArpPacket : EthernetPacket
     /// from <see cref="EthernetPacket.RawData"/> into the protected fields. Called once during
     /// construction; the parsed values are never refreshed afterwards.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         hardwareType = (ushort)((RawData[14] << 8) | RawData[15]);
@@ -132,7 +132,7 @@ public class ArpPacket : EthernetPacket
     /// <param name="protoLen">Protocol address length in bytes (PLEN); 4 for IPv4.</param>
     /// <param name="operation">Operation code (OPER); 1 for a request, 2 for a reply.</param>
     /// <param name="packetSize">Total frame size in bytes.</param>
-    protected ArpPacket(MACAddress dest, MACAddress src, ushort hwType, ushort protoType,
+    private protected ArpPacket(MACAddress dest, MACAddress src, ushort hwType, ushort protoType,
         byte hwLen, byte protoLen, ushort operation, int packetSize)
         : base(dest, src, 0x0806, packetSize)
     {

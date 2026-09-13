@@ -213,7 +213,7 @@ public class DnsPacket : UdpPacket
     /// Parses the UDP fields, then captures the DNS header snapshot: transaction ID, flags and the
     /// question, answer, authority and additional record counts.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
         TransactionID = (ushort)((RawData[this.DataOffset + 8] << 8) | RawData[this.DataOffset + 9]);
@@ -261,7 +261,7 @@ public class DnsPacket : UdpPacket
     /// <param name="startIndex">The index of the first name byte.</param>
     /// <param name="messageBase">The index of the first byte of the DNS header, used to resolve pointer offsets.</param>
     /// <returns>The dotted domain name without a trailing dot, or an empty string when no labels are present.</returns>
-    protected static string ParseNameAt(byte[] rawData, int startIndex, int messageBase)
+    private protected static string ParseNameAt(byte[] rawData, int startIndex, int messageBase)
     {
         StringBuilder sb = new();
         int pos = startIndex;
@@ -313,7 +313,7 @@ public class DnsPacket : UdpPacket
     /// <param name="rawData">The buffer containing the DNS message.</param>
     /// <param name="messageBase">The index of the first byte of the DNS header.</param>
     /// <returns>The decompressed name, or null when the field is not a compression pointer (inline names are not handled).</returns>
-    protected static string? ResolveRRName(ushort nameField, byte[] rawData, int messageBase)
+    private protected static string? ResolveRRName(ushort nameField, byte[] rawData, int messageBase)
     {
         if ((nameField & 0xC000) != 0xC000)
         {
@@ -451,7 +451,7 @@ public class DnsPacketAnswer : DnsPacket
     /// Parses the DNS header, then the question and answer sections, resolving compressed names.
     /// Skips section parsing when the reply code is not <see cref="ReplyCode.OK"/>.
     /// </summary>
-    protected override void InitializeFields()
+    private protected override void InitializeFields()
     {
         base.InitializeFields();
 
