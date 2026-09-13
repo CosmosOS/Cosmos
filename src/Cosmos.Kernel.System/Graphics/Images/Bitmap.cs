@@ -20,15 +20,8 @@ public sealed class Bitmap : Image
     /// <exception cref="ArgumentOutOfRangeException">Thrown when either the width or height is lower than 0.</exception>
     public Bitmap(int width, int height, ColorDepth colorDepth) : base(width, height, colorDepth)
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(width));
-        }
-
-        if (height < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(height));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(width);
+        ArgumentOutOfRangeException.ThrowIfNegative(height);
 
         RawData = new int[width * height];
     }
