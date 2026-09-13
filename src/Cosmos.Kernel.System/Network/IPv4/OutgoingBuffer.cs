@@ -118,27 +118,28 @@ internal static class OutgoingBuffer
                 {
                     if (IPConfig.IsLocalAddress(entry.Packet.DestinationIP) == false)
                     {
-                        entry.NextHop = IPConfig.FindRoute(entry.Packet.DestinationIP);
-                        if (entry.NextHop == null)
+                        Address? nextHop = IPConfig.FindRoute(entry.Packet.DestinationIP);
+                        entry.NextHop = nextHop;
+                        if (nextHop is null)
                         {
                             s_queue.RemoveAt(e);
                             continue;
                         }
 
-                        if (ArpCache.Contains(entry.NextHop))
+                        MACAddress? nextHopMac = ArpCache.Resolve(nextHop);
+                        if (nextHopMac is not null)
                         {
-                            entry.Packet.DestinationMac = ArpCache.Resolve(entry.NextHop ?? throw new Exception($"{nameof(entry.NextHop)} can not be null"))
-                                ?? throw new Exception("DestinationMac can not be null");
+                            entry.Packet.DestinationMac = nextHopMac;
                             entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
                             s_queue.RemoveAt(e);
                         }
                         else
                         {
-                            var arpRequest = new ArpRequestEthernet(
+                            ArpRequestEthernet arpRequest = new(
                                 entry.NIC.MacAddress,
                                 entry.Packet.SourceIP,
                                 MACAddress.Broadcast,
-                                entry.NextHop,
+                                nextHop,
                                 MACAddress.None
                             );
                             entry.NIC.Send(arpRequest.RawData, arpRequest.RawData.Length);
@@ -147,10 +148,10 @@ internal static class OutgoingBuffer
                         continue;
                     }
 
-                    if (ArpCache.Contains(entry.Packet.DestinationIP))
+                    MACAddress? cachedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
+                    if (cachedMac is not null)
                     {
-                        entry.Packet.DestinationMac = ArpCache.Resolve(entry.Packet.DestinationIP)
-                                                      ?? throw new Exception("DestinationMac can not be null");
+                        entry.Packet.DestinationMac = cachedMac;
                         entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
                         Serial.WriteString("[OutgoingBuffer] Sent via ARP cache\n");
                         s_queue.RemoveAt(e);
@@ -176,20 +177,20 @@ internal static class OutgoingBuffer
                 }
                 else if (entry.Status == BufferEntry.EntryStatus.ARP_SENT)
                 {
-                    if (ArpCache.Contains(entry.Packet.DestinationIP))
+                    MACAddress? repliedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
+                    if (repliedMac is not null)
                     {
-                        entry.Packet.DestinationMac = ArpCache.Resolve(entry.Packet.DestinationIP)
-                            ?? throw new Exception("DestinationMac can not be null");
+                        entry.Packet.DestinationMac = repliedMac;
                         entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
                         s_queue.RemoveAt(e);
                     }
                 }
                 else if (entry.Status == BufferEntry.EntryStatus.ROUTE_ARP_SENT)
                 {
-                    if (entry.NextHop is not null && ArpCache.Contains(entry.NextHop))
+                    MACAddress? routedMac = entry.NextHop is null ? null : ArpCache.Resolve(entry.NextHop);
+                    if (routedMac is not null)
                     {
-                        entry.Packet.DestinationMac = ArpCache.Resolve(entry.NextHop)
-                                                      ?? throw new Exception("DestinationMac can not be null");
+                        entry.Packet.DestinationMac = routedMac;
                         entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
                         s_queue.RemoveAt(e);
                     }

@@ -24,16 +24,6 @@ internal static class ArpCache
     }
 
     /// <summary>
-    /// Checks whether the ARP cache contains the given IP.
-    /// </summary>
-    /// <param name="ipAddress">The IP address to check.</param>
-    internal static bool Contains(Address ipAddress)
-    {
-        EnsureCacheExists();
-        return Cache.ContainsKey(ipAddress.Id);
-    }
-
-    /// <summary>
     /// Updates the ARP cache.
     /// </summary>
     /// <param name="ipAddress">The IP address.</param>

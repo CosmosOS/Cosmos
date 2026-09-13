@@ -325,7 +325,8 @@ public static class SocketPlug
         byte[] remoteBytes = address.GetAddressBytes();
         sm.RemoteEndPoint.Address = new Address(remoteBytes[0], remoteBytes[1], remoteBytes[2], remoteBytes[3]);
         sm.RemoteEndPoint.Port = (ushort)port;
-        sm.LocalEndPoint.Address = NetworkManager.Primary.IPConfig?.Address ?? throw new Exception("No IPv4 configuration on the primary network device");
+        sm.LocalEndPoint.Address = NetworkManager.Primary.IPConfig?.Address
+            ?? throw new InvalidOperationException("No IPv4 configuration on the primary network device");
         sm.LocalEndPoint.Port = Tcp.GetDynamicPort();
 
         _remoteEndPoints[id] = new IPEndPoint(address, sm.RemoteEndPoint.Port);
