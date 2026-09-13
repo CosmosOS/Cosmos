@@ -1,6 +1,8 @@
 ﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 // Ported from Cosmos.System2/Keyboard/ScanMapBase.cs
 
+using Cosmos.Kernel.HAL.Interfaces.Devices;
+
 namespace Cosmos.Kernel.System.Keyboard;
 
 /// <summary>
@@ -10,6 +12,14 @@ public abstract class ScanMapBase
 {
     /// <summary>Mappings a layout is expected to declare, reserved up front.</summary>
     private const int InitialKeyCapacity = 105;
+
+    /// <summary>
+    /// Scan code the keyboard devices report for the right Alt key. A layout
+    /// maps it to <see cref="ConsoleKeyEx.AltGr"/> when the key selects its
+    /// third level, and to <see cref="ConsoleKeyEx.RAlt"/> when it is a second
+    /// Alt.
+    /// </summary>
+    internal const byte RightAltScanCode = IKeyboardDevice.RightAltScanCode;
 
     private bool _keysInitialized;
 

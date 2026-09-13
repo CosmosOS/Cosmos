@@ -90,6 +90,8 @@ public sealed class DEStandardLayout : ScanMapBase
         // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, ConsoleKeyEx.LAlt));
+        /* Right Alt: the third-level modifier on this layout */
+        Keys.Add(new KeyMapping(RightAltScanCode, ConsoleKeyEx.AltGr));
         /* Space */
         Keys.Add(new KeyMapping(0x39, ' ', ConsoleKeyEx.Spacebar));
         /* Caps */

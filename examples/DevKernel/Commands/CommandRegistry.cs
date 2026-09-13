@@ -14,6 +14,7 @@ internal static class CommandRegistry
         CommandShell shell = new();
 
         SystemCommands.Register(shell);
+        KeyboardCommands.Register(shell);
         MemoryCommands.Register(shell);
         SchedulerCommands.Register(shell);
         GraphicsCommands.Register(shell);
