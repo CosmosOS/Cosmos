@@ -184,7 +184,7 @@ internal sealed class FatInodeOperations : IInodeOperations
             return false;
         }
 
-        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match) || match is null)
+        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match))
         {
             return false;
         }
@@ -214,7 +214,7 @@ internal sealed class FatInodeOperations : IInodeOperations
             return false;
         }
 
-        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match) || match is null)
+        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match))
         {
             return false;
         }
@@ -247,7 +247,7 @@ internal sealed class FatInodeOperations : IInodeOperations
             return false;
         }
 
-        if (!_superblock.FindChildEntry(op, oldName, out FatDirEntry? match) || match is null)
+        if (!_superblock.FindChildEntry(op, oldName, out FatDirEntry? match))
         {
             return false;
         }

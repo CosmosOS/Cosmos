@@ -134,7 +134,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
         }
     }
 
-    public bool FindChildEntry(FatInode parent, ReadOnlySpan<char> name, out FatDirEntry? match)
+    public bool FindChildEntry(FatInode parent, ReadOnlySpan<char> name, [NotNullWhen(true)] out FatDirEntry? match)
     {
         match = null;
         byte[] data = ReadDirectoryData(parent);
