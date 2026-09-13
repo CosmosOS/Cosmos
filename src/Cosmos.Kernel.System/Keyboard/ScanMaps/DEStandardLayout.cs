@@ -18,8 +18,6 @@ public class DEStandardLayout : ScanMapBase
     /// <inheritdoc />
     protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>(101);
-
         #region Keys
 
         /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKeyEx */

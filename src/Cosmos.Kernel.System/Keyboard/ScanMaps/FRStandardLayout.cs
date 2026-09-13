@@ -11,8 +11,6 @@ public class FRStandardLayout : ScanMapBase
     /// <inheritdoc />
     protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>();
-
         #region Keys
         /*                       Scan  Norm Shift Num  Caps ShCaps ShNum ConsoleKeyEx */
         Keys.Add(new KeyMapping(0x00, ConsoleKeyEx.NoName));

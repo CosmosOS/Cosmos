@@ -20,8 +20,6 @@ public class GBStandardLayout : ScanMapBase
     /// </summary>
     protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>(105);
-
         #region Keys
 
         /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKeyEx */

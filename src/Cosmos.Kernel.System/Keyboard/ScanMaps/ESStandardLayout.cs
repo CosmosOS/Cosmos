@@ -18,8 +18,6 @@ public class ESStandardLayout : ScanMapBase
     /// <inheritdoc />
     protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>(105);
-
         #region Keys
 
         /*                       Scan Norm Shift Num Caps SCaps SNum AltGr ConsoleKeyEx */

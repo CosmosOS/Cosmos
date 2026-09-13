@@ -8,23 +8,39 @@ namespace Cosmos.Kernel.System.Keyboard;
 /// </summary>
 public abstract class ScanMapBase
 {
-    /// <summary>
-    /// The available key mappings.
-    /// </summary>
-    protected List<KeyMapping> Keys = null!;
+    /// <summary>Mappings a layout is expected to declare, reserved up front.</summary>
+    private const int InitialKeyCapacity = 105;
+
+    private bool _keysInitialized;
 
     /// <summary>
-    /// Fills <see cref="Keys"/> with this layout's mappings. Called once by
-    /// the base constructor, so a layout is usable the moment it is
-    /// constructed.
+    /// The available key mappings. The list is created here and stays the
+    /// same instance for the life of the layout; <see cref="InitializeKeys"/>
+    /// adds to it.
+    /// </summary>
+    protected List<KeyMapping> Keys { get; } = new(InitialKeyCapacity);
+
+    /// <summary>
+    /// Adds this layout's mappings to <see cref="Keys"/>. Called once, the
+    /// first time a scan code reaches the layout, so a derived layout's own
+    /// field initializers and constructor have already run by then.
     /// </summary>
     protected abstract void InitializeKeys();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ScanMapBase"/> class.
+    /// Runs <see cref="InitializeKeys"/> the first time the mappings are
+    /// needed. The base constructor deliberately does not call it: a virtual
+    /// call from a constructor reaches a derived layout before its own state
+    /// exists.
     /// </summary>
-    protected ScanMapBase()
+    private void EnsureKeysInitialized()
     {
+        if (_keysInitialized)
+        {
+            return;
+        }
+
+        _keysInitialized = true;
         InitializeKeys();
     }
 
@@ -41,6 +57,8 @@ public abstract class ScanMapBase
     /// <returns>The translated <see cref="KeyEvent"/>.</returns>
     internal KeyEvent? ConvertScanCode(byte scanKey, bool ctrl, bool shift, bool alt, bool numLock, bool capsLock, bool scrollLock)
     {
+        EnsureKeysInitialized();
+
         var keyEvent = new KeyEvent();
         bool found = false;
 
@@ -129,6 +147,8 @@ public abstract class ScanMapBase
     /// <param name="key">The virtual mapping key.</param>
     internal bool ScanCodeMatchesKey(byte scanCode, ConsoleKeyEx key)
     {
+        EnsureKeysInitialized();
+
         for (int i = 0; i < Keys.Count; i++)
         {
             if (Keys[i].ScanCode == scanCode && Keys[i].Key == key)

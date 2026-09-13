@@ -367,7 +367,7 @@ Cosmos.Kernel.System.Keyboard.KeyMapping.ShiftNumLock.set -> void
 Cosmos.Kernel.System.Keyboard.KeyMapping.Value.get -> char
 Cosmos.Kernel.System.Keyboard.KeyMapping.Value.set -> void
 Cosmos.Kernel.System.Keyboard.ScanMapBase
-Cosmos.Kernel.System.Keyboard.ScanMapBase.Keys -> System.Collections.Generic.List<Cosmos.Kernel.System.Keyboard.KeyMapping!>!
+Cosmos.Kernel.System.Keyboard.ScanMapBase.Keys.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Keyboard.KeyMapping!>!
 Cosmos.Kernel.System.Keyboard.ScanMapBase.ScanMapBase() -> void
 Cosmos.Kernel.System.Keyboard.ScanMaps.DEStandardLayout
 Cosmos.Kernel.System.Keyboard.ScanMaps.DEStandardLayout.DEStandardLayout() -> void
