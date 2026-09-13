@@ -98,13 +98,13 @@ Cosmos.Kernel.System.Graphics.Camera3D.Camera3D() -> void
 Cosmos.Kernel.System.Graphics.Camera3D.Camera3D(System.Numerics.Vector3 position, System.Numerics.Vector3 target) -> void
 Cosmos.Kernel.System.Graphics.Camera3D.Camera3D(System.Numerics.Vector3 position, System.Numerics.Vector3 target, System.Numerics.Vector3 up, float fovY) -> void
 Cosmos.Kernel.System.Graphics.Camera3D.FovY.get -> float
-Cosmos.Kernel.System.Graphics.Camera3D.FovY.set -> void
+Cosmos.Kernel.System.Graphics.Camera3D.FovY.init -> void
 Cosmos.Kernel.System.Graphics.Camera3D.Position.get -> System.Numerics.Vector3
-Cosmos.Kernel.System.Graphics.Camera3D.Position.set -> void
+Cosmos.Kernel.System.Graphics.Camera3D.Position.init -> void
 Cosmos.Kernel.System.Graphics.Camera3D.Target.get -> System.Numerics.Vector3
-Cosmos.Kernel.System.Graphics.Camera3D.Target.set -> void
+Cosmos.Kernel.System.Graphics.Camera3D.Target.init -> void
 Cosmos.Kernel.System.Graphics.Camera3D.Up.get -> System.Numerics.Vector3
-Cosmos.Kernel.System.Graphics.Camera3D.Up.set -> void
+Cosmos.Kernel.System.Graphics.Camera3D.Up.init -> void
 Cosmos.Kernel.System.Graphics.Canvas
 Cosmos.Kernel.System.Graphics.Canvas.Canvas() -> void
 Cosmos.Kernel.System.Graphics.Canvas.Canvas(Cosmos.Kernel.System.Graphics.Mode mode) -> void
@@ -160,14 +160,10 @@ Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.TrueTypeFont(string! path, int 
 Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.TrueTypeFont(System.IO.Stream! stream, int sizePx = 16) -> void
 Cosmos.Kernel.System.Graphics.Image
 Cosmos.Kernel.System.Graphics.Image.ColorDepth.get -> Cosmos.Kernel.System.Graphics.ColorDepth
-Cosmos.Kernel.System.Graphics.Image.ColorDepth.set -> void
 Cosmos.Kernel.System.Graphics.Image.Height.get -> int
-Cosmos.Kernel.System.Graphics.Image.Height.set -> void
 Cosmos.Kernel.System.Graphics.Image.Image(int width, int height, Cosmos.Kernel.System.Graphics.ColorDepth colorDepth) -> void
 Cosmos.Kernel.System.Graphics.Image.RawData.get -> int[]!
-Cosmos.Kernel.System.Graphics.Image.RawData.set -> void
 Cosmos.Kernel.System.Graphics.Image.Width.get -> int
-Cosmos.Kernel.System.Graphics.Image.Width.set -> void
 Cosmos.Kernel.System.Graphics.KernelConsole
 Cosmos.Kernel.System.Graphics.KernelConsole.Canvas.get -> Cosmos.Kernel.System.Graphics.Canvas!
 Cosmos.Kernel.System.Graphics.KernelConsole.Cols.get -> int

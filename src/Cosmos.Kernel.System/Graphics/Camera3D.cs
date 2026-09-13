@@ -11,22 +11,24 @@ namespace Cosmos.Kernel.System.Graphics;
 /// A default-initialized camera is still usable: <see cref="Up"/> falls back
 /// to <see cref="Vector3.UnitY"/> and <see cref="FovY"/> to 60 degrees when
 /// left unset, so object initializers may set only the members they care
-/// about.
+/// about. The members are init-only: a camera is replaced rather than
+/// edited, because <see cref="Canvas3D.Camera"/> hands back a copy and the
+/// backend only reloads its transforms when the property is assigned.
 /// </remarks>
-public struct Camera3D
+public readonly struct Camera3D
 {
-    private Vector3 _up;
-    private float _fovY;
+    private readonly Vector3 _up;
+    private readonly float _fovY;
 
     /// <summary>
     /// The position of the camera in world space.
     /// </summary>
-    public Vector3 Position { get; set; }
+    public Vector3 Position { get; init; }
 
     /// <summary>
     /// The point in world space the camera looks at.
     /// </summary>
-    public Vector3 Target { get; set; }
+    public Vector3 Target { get; init; }
 
     /// <summary>
     /// The up direction of the camera. Reads as <see cref="Vector3.UnitY"/>
@@ -35,7 +37,7 @@ public struct Camera3D
     public Vector3 Up
     {
         get => _up == default ? Vector3.UnitY : _up;
-        set => _up = value;
+        init => _up = value;
     }
 
     /// <summary>
@@ -45,7 +47,7 @@ public struct Camera3D
     public float FovY
     {
         get => _fovY <= 0f ? 60f : _fovY;
-        set => _fovY = value;
+        init => _fovY = value;
     }
 
     /// <summary>
