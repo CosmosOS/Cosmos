@@ -247,6 +247,29 @@ public enum ThreadFlags
 }
 ```
 
+### Types Compared by Value
+
+A type whose identity is its content (`Address`, `MACAddress`, `Mode`) is `sealed`, keeps its state in get-only members set by the constructor, and implements `IEquatable<T>` beside `Equals(object?)` and `GetHashCode()`. The three agree: two instances that are `Equals` hash alike, and `GetHashCode` never throws. Ordering, where it exists, is `IComparable<T>`, never the non-generic `IComparable`. A caller who needs the bytes gets a `ReadOnlySpan<byte>`; the backing array is never handed out, because a caller who can write it changes the identity behind every dictionary keyed on the value.
+
+```csharp
+public sealed class Address : IComparable<Address>, IEquatable<Address>
+{
+    public ImmutableArray<byte> Parts { get; }
+
+    public Address(ReadOnlySpan<byte> buffer) { ... }
+
+    public ReadOnlySpan<byte> ToSpan() => Parts.AsSpan();
+    public bool Equals(Address? other) => other is not null && Parts.SequenceEqual(other.Parts);
+    public override bool Equals(object? obj) => Equals(obj as Address);
+    public override int GetHashCode() => HashCode.Combine(Id);
+    public int CompareTo(Address? other) => other is null ? 1 : Id.CompareTo(other.Id);
+}
+```
+
+### Registered Instances
+
+When the subsystem must see every live instance (`Tcp.Connections`), the constructor is private and a static factory creates and registers the instance (`Tcp.CreateConnection`). The registry stays private, and removal disposes the instance so what it rented goes back to its pool.
+
 ---
 
 ## 5. Kernel Lifecycle
@@ -505,6 +528,17 @@ List<int> list = new();  // uses RhAllocateNewArray under the hood
 - Use `nint`/`nuint` for pointer arithmetic, not `int`/`uint`.
 - Use `stackalloc` for small, short-lived buffers instead of heap allocation.
 
+### Buffers
+
+| Buffer | Use |
+|--------|-----|
+| Small, fixed size, scoped to one call | `stackalloc` |
+| Variable size, held across calls (a receive buffer) | `ArrayPool<T>.Shared.Rent`, returned from `Dispose()` |
+| Read-only input | A `ReadOnlySpan<T>` parameter, not `byte[]` |
+| Copying | `source.CopyTo(destination)` on spans, not `Buffer.BlockCopy` |
+
+A rented array is at least as long as requested, not exactly as long, so the owner tracks the length and offset it uses and exposes the live part as a `ReadOnlySpan<T>`, never the array. `Tcp` is the model: `_data`, `_dataOffset` and `_dataLength` behind `Data => _data.AsSpan().Slice(_dataOffset, _dataLength)`, with `AppendToData` writing in place while the rented array has room and `Dispose` returning it.
+
 ### Critical Sections
 
 ```csharp
@@ -557,6 +591,19 @@ private static void ThrowIfKeyboardDisabled()
 // These paths cannot allocate (exception objects are heap-allocated)
 ```
 
+### Argument Checks
+
+When the value tested is the parameter itself, the throw helpers replace the hand-written `if` and `throw`:
+
+```csharp
+ArgumentNullException.ThrowIfNull(device);
+ArgumentOutOfRangeException.ThrowIfNegative(width);
+ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, MaxPartitions);
+ArgumentOutOfRangeException.ThrowIfGreaterThan(offset, _dataLength);
+```
+
+A check on a derived quantity (`buffer.Length != 4`) keeps the explicit `throw`, so the message can say what was measured. The parameter name is always `nameof(x)`, never a string literal.
+
 ### When to Panic vs. Throw
 
 | Situation | Action |
@@ -567,6 +614,8 @@ private static void ThrowIfKeyboardDisabled()
 | Missing feature at runtime, in a member that acts on it | `throw InvalidOperationException` naming the switch |
 | Missing feature at runtime, in a member that answers a question | Return `0`/`null`/`false`/empty |
 | User-facing error in kernel shell | `try/catch` + print error message |
+
+The type thrown is one a caller can catch by name: `InvalidOperationException`, `ArgumentException` and its subclasses, `NotSupportedException`. A bare `throw new Exception(...)` is not written (CA2201). Which channel a ring member uses to report failure, and when a `Try` returns `false` instead, is in [Public API Tracking](public-api.md#how-a-member-reports-failure).
 
 ---
 
@@ -584,6 +633,9 @@ Nullable reference types are enabled solution-wide (`<Nullable>enable</Nullable>
 | `[MemberNotNull(...)]` guard helpers | Initialization checks the compiler can follow |
 | `is null` / `is not null` | All null tests (not `== null` / `!= null`). A pointer keeps `== null`: patterns are not allowed on pointer types |
 | Sentinel initialization (`= []`) | Fields where null and empty mean the same thing |
+| `[NotNullWhen(true)]` on a `Try` method's `out` | The value a `true` return populates; see [How a member reports failure](public-api.md#how-a-member-reports-failure) |
+| `[MemberNotNullWhen(true, ...)]` on a `bool Initialize()` | A `true` return that proves a static member for the caller (`KernelConsole.Initialize` and `Default`) |
+| `T?[]` | An array whose slots can be empty (`IrqDelegate?[]`) |
 
 ### Honest Annotations
 
@@ -603,12 +655,12 @@ private byte[] _window = [];                 // not: private byte[]? _window;
 Managers with deferred initialization expose `ThrowIf*NotInitialized()` guards annotated with `[MemberNotNull(...)]` and call them at the top of public entry points (see [Managers](#4-class--type-design)). One call proves the field non-null for the rest of the method, with no `!` and no per-line checks:
 
 ```csharp
-private static PerCpuState[]? _cpuStates;
+private static PerCpuState[]? s_cpuStates;
 
-[MemberNotNull(nameof(_cpuStates))]
+[MemberNotNull(nameof(s_cpuStates))]
 private static void ThrowIfCpuStateNotInitialized()
 {
-    if (_cpuStates is null)
+    if (s_cpuStates is null)
     {
         throw new InvalidOperationException($"{nameof(SchedulerManager)} not initialized");
     }
@@ -618,10 +670,16 @@ public static void CreateThread(uint cpuId, Thread thread)
 {
     ThrowIfCpuStateNotInitialized();
 
-    PerCpuState state = _cpuStates[cpuId];   // no warning, no !
+    PerCpuState state = s_cpuStates[cpuId];   // no warning, no !
     // ...
 }
 ```
+
+The same attribute family covers a `bool` initializer: `[MemberNotNullWhen(true, nameof(Default))]` on `KernelConsole.Initialize()` lets the caller read `KernelConsole.Default` inside `if (KernelConsole.Initialize())` with no guard of its own.
+
+### Callers of a `Try`
+
+After an annotated `Try` returns `true`, its `out` is non-null and no call site re-tests it: `if (!TryOpen(path, out handle) || handle == null)` is written `if (!TryOpen(path, out handle))`. `Dictionary<TKey, TValue>.TryGetValue` is annotated by the BCL the same way, so `&& value != null` after it guards nothing when `TValue` is non-nullable. A redundant test is not harmless: it hides the one place where a guard is real.
 
 ### Required Values
 
@@ -715,7 +773,35 @@ public int Priority
     get => field;
     set => field = value >= 0 ? value : throw new ArgumentOutOfRangeException();
 }
+
+// Interpolation, not concatenation
+Serial.WriteString($"[{Table[(int)Status]}] {packet}\n");
+
+// required members for state the constructor cannot take; derive what follows from it
+public sealed class DhcpOption
+{
+    public required byte Type { get; init; }
+    public required byte[] Data { get; init; }
+    public byte Length => (byte)Data.Length;
+}
+
+// One dictionary call carries the answer
+if (!s_clients.TryGetValue(port, out UdpClient? client))
+{
+    return;
+}
+s_registeredTypes.TryAdd(name, filesystemType);
+cache[id] = mac;                        // upsert: no ContainsKey first
+
+// readonly on every field assigned only at its declaration or in a constructor
+private readonly Canvas _canvas;
+private static readonly ArrayPool<byte> s_arrayPool = ArrayPool<byte>.Shared;
+
+// Auto-property over a field behind a pass-through accessor
+public static KernelConsole? Default { get; private set; }
 ```
+
+Three limits on the last two. `readonly` on a field of a mutable struct type (`SpinLock`) is wrong: every method call would act on a defensive copy, and the lock would never be taken. The analyzer behind `dotnet_style_readonly_field` does not know which struct methods mutate, so its suggestion is taken for reference types and for structs with no mutating members only. A field a plug reaches by name (`[FieldAccess]`) stays a field: an auto-property's backing field has a compiler-generated name. And a static initializer that allocates is a class constructor, which runs on first touch through a lock that needs a current thread: a type read during device bring-up (`MACAddress.None` in the virtio-net driver) keeps its lazily filled statics, with a comment saying why.
 
 ### Avoid
 
@@ -744,6 +830,16 @@ if (ptr == null)                  // Bad
 if (ptr == null)                  // Good
 {
     return;
+}
+
+// Don't compare a bool to a literal
+if (applied == false)             // Bad
+if (!applied)                     // Good
+
+// Don't test a key, then index; the lookup answers once
+if (map.ContainsKey(key))         // Bad: two lookups
+{
+    device = map[key];
 }
 ```
 
@@ -835,9 +931,13 @@ Use sparingly, only when the code isn't self-explanatory:
 contextAddr = (contextAddr + 0xF) & ~(nuint)0xF;
 ```
 
+Commented-out code is deleted; the history keeps it. A `TODO` names what is missing and why it can wait; a doubt about the code (`// is this correct?`) is an issue, not a comment. A member with an empty body is not a placeholder: it is not written until it does something.
+
 ## 16. Testing
 
 For the full testing guide (unit tests, kernel integration tests, UART protocol, CI, writing test kernels), see [Testing](testing.md).
+
+Logic that needs no hardware (`Tcp` receive-buffer arithmetic, address parsing) is unit-tested in the host process from `src/tests/Cosmos.Kernel.Tests.System` (NUnit): one nested fixture per member under test, named after it, test names of the form `WhenX_AndY_ResultZ`, and `[TestCase(..., ExpectedResult = ...)]` for value tables. The project holds an `InternalsVisibleTo` grant from `Cosmos.Kernel.System`.
 
 **Code coverage:** Add the `run-coverage` label to a PR to trigger the coverage CI. It runs the kernel test suites and outputs which code paths are covered by the integration tests.
 
