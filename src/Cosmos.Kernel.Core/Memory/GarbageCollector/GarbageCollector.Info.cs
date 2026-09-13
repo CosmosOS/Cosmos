@@ -374,9 +374,20 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Populate a lightweight memory info snapshot.
-    /// Provide a best-effort implementation of RhGetMemoryInfo based on the GC state.
+    /// Computes every heap-wide metric from the current state of the GC, parsing the
+    /// segments, the free lists and the handle store at call time.
+    /// <para>
+    /// This is a live reading, not a snapshot unlike <see cref="GC.GetGCMemoryInfo()"/>.
+    /// Use it for memory monitor or a diagnostic dump.
+    /// </para>
     /// </summary>
+    /// <remarks>
+    /// Best-effort: these are the closest equivalents this collector can offer to the metrics
+    /// the runtime GC reports.
+    /// </remarks>
+    /// <seealso cref="GetLastGCMemoryInfo">
+    /// Use <see cref="GetLastGCMemoryInfo"/> in the general case, this method is specialized.
+    /// </seealso>
     public static SimpleMemoryInfo GetSimpleMemoryInfo()
     {
         SimpleMemoryInfo info = default;
@@ -395,6 +406,28 @@ internal static unsafe partial class GarbageCollector
         info.CondemnedGeneration = GetCondemnedGeneration();
 
         return info;
+    }
+
+    /// <summary>
+    /// Returns the heap-wide metrics took at the end of the last collection.
+    /// Equivalent to <see cref="GC.GetGCMemoryInfo()"/>.
+    /// <para>
+    /// These are the values <see cref="GC.GetGCMemoryInfo()"/> reports.
+    /// It follow what the BCL promises for every member of <see cref="GCMemoryInfo"/>.
+    /// All fields are zero until the first collection.
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    /// Best-effort: these are the closest equivalents this collector can offer to the metrics
+    /// the runtime GC reports.
+    /// </remarks>
+    /// <seealso cref="GetSimpleMemoryInfo">
+    /// Call <see cref="GetSimpleMemoryInfo"/> instead to recompute the same metrics from
+    /// the live state of the heap.
+    /// </seealso>
+    public static SimpleMemoryInfo GetLastGCMemoryInfo()
+    {
+        return s_lastGCMemoryInfo;
     }
 
     /// <summary>
@@ -552,6 +585,15 @@ internal static unsafe partial class GarbageCollector
     {
         totalCollections = s_totalCollections;
         totalObjectsFreed = s_totalObjectsFreed;
+    }
+
+    /// <summary>
+    /// Captures the live metrics as the new last-collection snapshot. Called once per
+    /// collection, at the very end of <see cref="Collect"/>.
+    /// </summary>
+    internal static void RecordLastGCMemoryInfo()
+    {
+        s_lastGCMemoryInfo = GetSimpleMemoryInfo();
     }
 
 }

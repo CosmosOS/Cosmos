@@ -223,6 +223,14 @@ internal static unsafe partial class GarbageCollector
     private static ulong s_lastGen0FragmentationAfter;
 
     /// <summary>
+    /// Heap-wide metrics as they stood at the end of the last collection.
+    /// This is what <see cref="GCMemoryInfo"/> reports.
+    /// Stays zeroed until the first collection runs.
+    /// Matches what the runtime reports before its first GC.
+    /// </summary>
+    private static SimpleMemoryInfo s_lastGCMemoryInfo;
+
+    /// <summary>
     /// Cumulative total of all bytes ever allocated through the GC.
     /// Increments on every allocation, never decrements.
     /// Used by <c>RhGetTotalAllocatedBytes</c> / <c>GC.GetTotalAllocatedBytes()</c>.
@@ -376,6 +384,10 @@ internal static unsafe partial class GarbageCollector
 
             s_totalCollections++;
             s_totalObjectsFreed += freedCount;
+
+            // Freeze the heap-wide metrics reported by GCMemoryInfo. Recorded after the
+            // counters above so the snapshot carries the index of this very collection.
+            RecordLastGCMemoryInfo();
 
             Serial.WriteString("[GC] Freed ");
             Serial.WriteNumber((uint)freedCount);

@@ -24,7 +24,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[GarbageCollector] BeforeRun() reached!\n");
         Serial.WriteString("[GarbageCollector] Starting tests...\n");
 
-        TR.Start("GarbageCollector Tests", expectedTests: 45);
+        TR.Start("GarbageCollector Tests", expectedTests: 46);
 
         // Garbage Collection Tests
         TR.Run("GC_IsEnabled", TestGCIsEnabled);
@@ -72,6 +72,7 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_Info_GetObjectGeneration", TestGCInfoGetObjectGeneration);
         TR.Run("GC_Info_GCSegmentSizeAndPercent", TestGCInfoGCSegmentSizeAndPercent);
         TR.Run("GC_Info_RhGetMemoryInfoWiring", TestGCInfoRhGetMemoryInfoWiring);
+        TR.Run("GC_Info_MemoryInfoFrozenBetweenCollections", TestGCInfoMemoryInfoFrozenBetweenCollections);
         TR.Run("GC_Variables", TestGCVariables);
 
         // TLAB (Thread-Local Allocation Buffer) Tests
@@ -1290,28 +1291,29 @@ public class Kernel : Sys.Kernel
     private static void TestGCInfoRhGetMemoryInfoWiring()
     {
         // System.GC.GetGCMemoryInfo() routes through RhGetMemoryInfo, which fills a
-        // GCMemoryInfoData struct from CoreGC.GetSimpleMemoryInfo() plus the
+        // GCMemoryInfoData struct from CoreGC.GetLastGCMemoryInfo() plus the
         // per-generation last-collect snapshots. The struct layout must match exactly.
         //
-        // Order matters: GC.GetGCMemoryInfo() allocates a GCMemoryInfoData class instance
-        // before populating it, which can consume a free-list block and shift FragmentedBytes.
-        // Read the runtime snapshot first, then take the direct snapshot — both then reflect
-        // the post-allocation heap state and must agree.
+        // Both sides read the same frozen snapshot, so the order of these two calls no
+        // longer matters: the GCMemoryInfoData instance that GC.GetGCMemoryInfo() allocates
+        // may still consume a free-list block, but that cannot shift the reported values.
+        CoreGC.Collect();
+
         GCMemoryInfo runtimeInfo = GC.GetGCMemoryInfo();
-        CoreGC.SimpleMemoryInfo direct = CoreGC.GetSimpleMemoryInfo();
+        CoreGC.SimpleMemoryInfo direct = CoreGC.GetLastGCMemoryInfo();
 
         Assert.Equal((long)direct.HeapSizeBytes, runtimeInfo.HeapSizeBytes,
-            "GC.Info: GCMemoryInfo.HeapSizeBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.HeapSizeBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.FragmentedBytes, runtimeInfo.FragmentedBytes,
-            "GC.Info: GCMemoryInfo.FragmentedBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.FragmentedBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.TotalCommittedBytes, runtimeInfo.TotalCommittedBytes,
-            "GC.Info: GCMemoryInfo.TotalCommittedBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.TotalCommittedBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.MemoryLoadBytes, runtimeInfo.MemoryLoadBytes,
-            "GC.Info: GCMemoryInfo.MemoryLoadBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.MemoryLoadBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.PromotedBytes, runtimeInfo.PromotedBytes,
-            "GC.Info: GCMemoryInfo.PromotedBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.PromotedBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.PinnedObjectsCount, runtimeInfo.PinnedObjectsCount,
-            "GC.Info: GCMemoryInfo.PinnedObjectsCount must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.PinnedObjectsCount must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.CollectionIndex, runtimeInfo.Index,
             "GC.Info: GCMemoryInfo.Index must equal CollectionIndex");
         Assert.Equal(direct.CondemnedGeneration, runtimeInfo.Generation,
@@ -1332,6 +1334,48 @@ public class Kernel : Sys.Kernel
             "GC.Info: GenerationInfo[0].FragmentationBeforeBytes must mirror GetLastGenFragmentationBefore(0)");
         Assert.Equal((long)CoreGC.GetLastGenFragmentationAfter(0), runtimeInfo.GenerationInfo[0].FragmentationAfterBytes,
             "GC.Info: GenerationInfo[0].FragmentationAfterBytes must mirror GetLastGenFragmentationAfter(0)");
+    }
+
+    private static void TestGCInfoMemoryInfoFrozenBetweenCollections()
+    {
+        // GCMemoryInfo describes the heap as of the last collection, so allocating must not
+        // move any of its values: only the next collection may. Regression guard for the
+        // live readings that used to be reported through RhGetMemoryInfo.
+        CoreGC.Collect();
+
+        GCMemoryInfo before = GC.GetGCMemoryInfo();
+
+        // This changes the live heap: it consumes free-list blocks to refill TLABs, which is
+        // exactly what used to shift FragmentedBytes between two reads.
+        AllocateGarbage(40, 256);
+
+        GCMemoryInfo after = GC.GetGCMemoryInfo();
+
+        // A heap-pressure collection may have run on its own during the allocations above;
+        // the freeze only has to hold as long as no collection happened in between.
+        if (before.Index == after.Index)
+        {
+            Assert.Equal(before.FragmentedBytes, after.FragmentedBytes,
+                "GC.Info: FragmentedBytes must not change without a collection");
+            Assert.Equal(before.HeapSizeBytes, after.HeapSizeBytes,
+                "GC.Info: HeapSizeBytes must not change without a collection");
+            Assert.Equal(before.TotalCommittedBytes, after.TotalCommittedBytes,
+                "GC.Info: TotalCommittedBytes must not change without a collection");
+            Assert.Equal(before.MemoryLoadBytes, after.MemoryLoadBytes,
+                "GC.Info: MemoryLoadBytes must not change without a collection");
+        }
+
+        // This GC only has generation 0, so the heap-wide fragmentation is by construction
+        // the fragmentation gen0 was left with by the last collection.
+        Assert.Equal(after.GenerationInfo[0].FragmentationAfterBytes, after.FragmentedBytes,
+            "GC.Info: FragmentedBytes must equal GenerationInfo[0].FragmentationAfterBytes");
+
+        // A collection is what publishes new values.
+        CoreGC.Collect();
+
+        GCMemoryInfo collected = GC.GetGCMemoryInfo();
+        Assert.True(collected.Index > after.Index,
+            "GC.Info: Index must advance after a collection");
     }
 
     private static void TestGCVariables()
