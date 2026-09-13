@@ -823,7 +823,7 @@ public unsafe class Canvas
         // Using an array of points here is better than using something like a Dictionary of ints.
         if (points.Length < 3)
         {
-            throw new ArgumentException("A polygon requires more than 3 points.");
+            throw new ArgumentException("A polygon requires at least 3 points.", nameof(points));
         }
 
         for (int i = 0; i < points.Length - 1; i++)

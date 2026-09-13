@@ -33,11 +33,7 @@ public static class TcpListenerPlug
     {
         Log.WriteString("[TcpListenerPlug] Ctor(localaddr, port)\n");
 
-        if (localaddr is null)
-        {
-            Log.WriteString("[TcpListenerPlug] localaddr is null!\n");
-            throw new ArgumentNullException(nameof(localaddr));
-        }
+        ArgumentNullException.ThrowIfNull(localaddr);
 
         Log.WriteString("[TcpListenerPlug] Getting ID\n");
         int id = GetId(aThis);

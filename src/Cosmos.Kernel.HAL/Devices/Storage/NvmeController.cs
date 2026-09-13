@@ -468,17 +468,9 @@ internal unsafe class NvmeController
     /// </summary>
     private static void ValidateTransfer(int byteLength, ushort numLogicalBlocksMinusOne)
     {
-        if (numLogicalBlocksMinusOne != 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(numLogicalBlocksMinusOne),
-                "The single-PRP data path issues one logical block per command.");
-        }
-
-        if (byteLength <= 0 || (ulong)byteLength > PageAllocator.PageSize)
-        {
-            throw new ArgumentOutOfRangeException(nameof(byteLength),
-                "NVMe transfers are limited to one 4 KiB page (single-PRP data path).");
-        }
+        ArgumentOutOfRangeException.ThrowIfNotEqual(numLogicalBlocksMinusOne, 0, nameof(numLogicalBlocksMinusOne));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(byteLength);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan((ulong)byteLength, PageAllocator.PageSize, nameof(byteLength));
     }
 
     /// <summary>

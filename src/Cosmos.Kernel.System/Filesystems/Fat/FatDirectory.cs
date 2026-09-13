@@ -426,10 +426,7 @@ internal static class FatDirectory
         // Writer-side rejection: 255 UCS-2 chars is the LFN cap, and our
         // own parser drops ordinals past 20 — longer names would leave
         // orphaned LFN slots behind on deletion.
-        if (longName.Length > MaxLfnNameLength)
-        {
-            throw new ArgumentOutOfRangeException(nameof(longName), "LFN names are limited to 255 characters.");
-        }
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(longName.Length, MaxLfnNameLength, nameof(longName));
 
         int entries = LfnEntryCountFor(longName);
         if (entries == 0)

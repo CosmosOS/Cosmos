@@ -343,10 +343,8 @@ public sealed class FatBootSector
         // subtraction underflows (cluster 0 yields an exabyte-range LBA),
         // above addresses past the volume — callers get a throw instead
         // of wild device I/O.
-        if (cluster < FatTable.FirstDataCluster || cluster > ClusterCount + 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(cluster));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(cluster, FatTable.FirstDataCluster);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(cluster, ClusterCount + 1);
         return DataStartLba + ((ulong)(cluster - FatTable.FirstDataCluster)) * SectorsPerCluster;
     }
 }

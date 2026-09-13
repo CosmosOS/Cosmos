@@ -40,11 +40,7 @@ public static class NetworkStreamPlug
     {
         Log.WriteString("[NetworkStreamPlug] Ctor(socket, access, ownsSocket)\n");
 
-        if (socket == null)
-        {
-            Log.WriteString("[NetworkStreamPlug] socket is null\n");
-            throw new ArgumentNullException(nameof(socket));
-        }
+        ArgumentNullException.ThrowIfNull(socket);
 
         if (!socket.Connected)
         {

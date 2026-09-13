@@ -29,10 +29,7 @@ public sealed class IcmpClient : IDisposable
     /// </summary>
     private void ThrowIfDisposed()
     {
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(IcmpClient));
-        }
+        ObjectDisposedException.ThrowIf(_disposed, this);
     }
 
     /// <summary>

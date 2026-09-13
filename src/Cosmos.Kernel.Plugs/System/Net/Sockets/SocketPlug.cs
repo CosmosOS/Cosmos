@@ -406,10 +406,7 @@ public static class SocketPlug
             throw new InvalidOperationException("UDP socket not connected");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         byte[] data = new byte[size];
         Buffer.BlockCopy(buffer, offset, data, 0, size);
@@ -439,11 +436,7 @@ public static class SocketPlug
             throw new Exception("Client must be connected before sending data.");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            Log.WriteString("[SocketPlug] Invalid offset or size\n");
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         int bytesSent = 0;
 
@@ -542,10 +535,7 @@ public static class SocketPlug
             _localEndPoints[id] = new IPEndPoint(IPAddress.Any, localPort);
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         if (remoteEP is not IPEndPoint ipep)
         {
@@ -606,10 +596,7 @@ public static class SocketPlug
             throw new InvalidOperationException("UDP socket not initialized");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         KernelEndPoint ep = new(Address.Zero, 0);
         byte[]? data = client.Receive(ref ep, UdpPollTimeoutMs);
@@ -634,11 +621,7 @@ public static class SocketPlug
             throw new InvalidOperationException("Must establish a connection before receiving data.");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            Log.WriteString("[SocketPlug] Receive Invalid offset or size\n");
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         // If data is already available, return it immediately (even if connection closed)
         if (sm.Data.Length > 0)
@@ -695,10 +678,7 @@ public static class SocketPlug
             throw new InvalidOperationException("UDP socket not initialized");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         KernelEndPoint ep = new(Address.Zero, 0);
         byte[]? data = client.Receive(ref ep, UdpPollTimeoutMs);
@@ -866,5 +846,14 @@ public static class SocketPlug
         }
 
         return result;
+    }
+
+    // Every Send and Receive shape takes (buffer, offset, size); the BCL
+    // throws ArgumentOutOfRangeException for a range outside the buffer.
+    private static void ThrowIfRangeInvalid(byte[] buffer, int offset, int size)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(offset);
+        ArgumentOutOfRangeException.ThrowIfNegative(size);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(size, buffer.Length - offset, nameof(size));
     }
 }

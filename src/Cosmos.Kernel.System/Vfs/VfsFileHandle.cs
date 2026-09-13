@@ -40,7 +40,7 @@ internal sealed class VfsFileHandle : IVfsFileHandle
 
     public long Read(Span<byte> buffer)
     {
-        EnsureNotDisposed();
+        ThrowIfDisposed();
         long bytesRead = _openFile.Operations.Read(_openFile, buffer);
         _openFile.Position += bytesRead;
         return bytesRead;
@@ -48,7 +48,7 @@ internal sealed class VfsFileHandle : IVfsFileHandle
 
     public long Write(ReadOnlySpan<byte> buffer)
     {
-        EnsureNotDisposed();
+        ThrowIfDisposed();
         long bytesWritten = _openFile.Operations.Write(_openFile, buffer);
         _openFile.Position += bytesWritten;
         return bytesWritten;
@@ -108,11 +108,8 @@ internal sealed class VfsFileHandle : IVfsFileHandle
         }
     }
 
-    private void EnsureNotDisposed()
+    private void ThrowIfDisposed()
     {
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(VfsFileHandle));
-        }
+        ObjectDisposedException.ThrowIf(_disposed, this);
     }
 }

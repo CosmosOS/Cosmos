@@ -251,11 +251,8 @@ internal class Sata : BlockDevice
     /// </summary>
     public void SendSata48Command(AtaCommands command, ulong start, uint count)
     {
-        if (count == 0 || count > MaxSectorsPerCommand)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count),
-                "SATA transfers are limited to the single-page bounce buffer.");
-        }
+        ArgumentOutOfRangeException.ThrowIfZero(count);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(count, MaxSectorsPerCommand);
 
         bool isWrite = command == AtaCommands.WriteDmaExt || command == AtaCommands.WriteDma;
         _ioLock.Acquire();
@@ -498,10 +495,7 @@ internal class Sata : BlockDevice
     public override void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
     {
         int sector = (int)BlockSize;
-        if (blockCount > (ulong)data.Length / (uint)sector)
-        {
-            throw new ArgumentOutOfRangeException(nameof(blockCount), "Span shorter than the requested transfer.");
-        }
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(blockCount, (ulong)data.Length / (uint)sector, nameof(blockCount));
 
         _ioLock.Acquire();
         try
@@ -526,10 +520,7 @@ internal class Sata : BlockDevice
     public override void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
     {
         int sector = (int)BlockSize;
-        if (blockCount > (ulong)data.Length / (uint)sector)
-        {
-            throw new ArgumentOutOfRangeException(nameof(blockCount), "Span shorter than the requested transfer.");
-        }
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(blockCount, (ulong)data.Length / (uint)sector, nameof(blockCount));
 
         _ioLock.Acquire();
         try

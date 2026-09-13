@@ -533,7 +533,7 @@ internal unsafe class VMWareSVGAII3D
         }
         else
         {
-            throw new ArgumentException("Matrix must be 4x4 float");
+            throw new ArgumentException("Matrix must be 4x4 float", nameof(matrix4x4));
         }
     }
 

@@ -74,10 +74,7 @@ public sealed class Address : IComparable<Address>, IEquatable<Address>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="buffer"/> is not exactly four bytes long.</exception>
     public Address(ReadOnlySpan<byte> buffer)
     {
-        if (buffer.Length != 4)
-        {
-            throw new ArgumentOutOfRangeException(nameof(buffer), "Buffer has to be 4 bytes long");
-        }
+        ArgumentOutOfRangeException.ThrowIfNotEqual(buffer.Length, 4, nameof(buffer));
 
         Parts = [.. buffer[0..4]];
 

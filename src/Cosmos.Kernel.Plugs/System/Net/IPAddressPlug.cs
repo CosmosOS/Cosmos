@@ -54,7 +54,7 @@ public static class IPAddressPlug
         else
         {
             Log.WriteString("[IPAddressPlug] Bad IP address format\n");
-            throw new ArgumentException("Bad IP address format");
+            throw new ArgumentException("Bad IP address format", nameof(address));
         }
     }
 
