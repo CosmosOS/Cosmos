@@ -10,6 +10,7 @@ using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Pci;
 
 namespace Internal.Runtime.CompilerHelpers;
@@ -25,12 +26,10 @@ internal class LibraryInitializer
     public static void InitializeLibrary()
     {
         // Get the platform initializer (registered by HAL.X64 or HAL.ARM64 module initializer)
-        var initializer = PlatformHAL.Initializer;
-        if (initializer == null)
+        IPlatformInitializer? initializer = PlatformHAL.Initializer;
+        if (initializer is null)
         {
-            Serial.WriteString("[KERNEL] ERROR: No platform initializer registered!\n");
-            Serial.WriteString("[KERNEL] Make sure Cosmos.Kernel.HAL.X64 or HAL.ARM64 is referenced.\n");
-            while (true) { }
+            Panic.Halt("No platform initializer registered. Reference Cosmos.Kernel.HAL.X64 or Cosmos.Kernel.HAL.ARM64.");
         }
 
         // Display architecture

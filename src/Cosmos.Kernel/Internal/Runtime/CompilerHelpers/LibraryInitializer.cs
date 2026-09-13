@@ -7,6 +7,7 @@ using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL;
+using Cosmos.Kernel.HAL.Interfaces;
 
 namespace Internal.Runtime.CompilerHelpers;
 
@@ -21,12 +22,13 @@ internal class LibraryInitializer
     public static void InitializeLibrary()
     {
         // Get the platform initializer (registered by HAL.X64 or HAL.ARM64 module initializer)
-        var initializer = PlatformHAL.Initializer;
+        IPlatformInitializer? initializer = PlatformHAL.Initializer;
 
-        if (initializer == null)
+        if (initializer is null)
         {
-            Serial.WriteString("[KERNEL] ERROR: No platform initializer registered!\n");
-            while (true) { }
+            // Qualified: this assembly has a Panic of its own, for CPU
+            // exceptions, and it has no Halt.
+            Cosmos.Kernel.Core.Panic.Halt("No platform initializer registered.");
         }
 
         // Initialize exception handlers (must be after InterruptManager)
