@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.System.Graphics;
 /// <summary>
 /// Represents a bitmap image.
 /// </summary>
-public class Bitmap : Image
+public sealed class Bitmap : Image
 {
     /// <summary>
     /// Initializes a new instance of <see cref="Bitmap"/> class.

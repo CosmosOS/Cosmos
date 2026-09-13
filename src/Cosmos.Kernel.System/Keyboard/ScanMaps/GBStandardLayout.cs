@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard English, Great Britain (GB) keyboard layout.
 /// </summary>
-public class GBStandardLayout : ScanMapBase
+public sealed class GBStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Create new instance of the <see cref="GBStandardLayout"/> class.

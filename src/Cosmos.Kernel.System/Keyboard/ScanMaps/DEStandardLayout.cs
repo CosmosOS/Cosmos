@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard German (DE) keyboard layout.
 /// </summary>
-public class DEStandardLayout : ScanMapBase
+public sealed class DEStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="DEStandardLayout"/> class.

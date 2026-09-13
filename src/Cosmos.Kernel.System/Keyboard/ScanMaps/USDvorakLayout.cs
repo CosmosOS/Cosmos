@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the US Dvorak keyboard layout.
 /// </summary>
-public class USDvorakLayout : ScanMapBase
+public sealed class USDvorakLayout : ScanMapBase
 {
     /// <summary>
     /// Create new instance of the <see cref="USDvorakLayout"/> class.

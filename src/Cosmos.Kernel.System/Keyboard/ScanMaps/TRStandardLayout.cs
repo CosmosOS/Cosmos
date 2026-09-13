@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard Turkish (TR) keyboard layout.
 /// </summary>
-public class TRStandardLayout : ScanMapBase
+public sealed class TRStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TRStandardLayout"/> class.

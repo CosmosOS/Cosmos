@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.System.Graphics.Fonts;
 /// (character, size) as grayscale coverage, so the same font instance can draw
 /// in any color without re-rasterizing.
 /// </summary>
-public class TrueTypeFont : Font
+public sealed class TrueTypeFont : Font
 {
     private readonly LunarLabs.Fonts.Font _font;
     private readonly Dictionary<int, TrueTypeGlyph?> _glyphCache = new Dictionary<int, TrueTypeGlyph?>();

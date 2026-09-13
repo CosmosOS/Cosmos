@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.System.Keyboard;
 /// <summary>
 /// Represents a physical to virtual key mapping.
 /// </summary>
-public class KeyMapping
+public sealed class KeyMapping
 {
     /// <summary>
     /// The physical scan-code that the mapping refers to.

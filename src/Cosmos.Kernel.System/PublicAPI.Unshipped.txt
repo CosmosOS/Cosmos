@@ -514,13 +514,6 @@ override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.MeasureString(string! 
 override Cosmos.Kernel.System.Graphics.Mode.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Graphics.Mode.GetHashCode() -> int
 override Cosmos.Kernel.System.Graphics.Mode.ToString() -> string!
-override Cosmos.Kernel.System.Keyboard.ScanMaps.DEStandardLayout.InitializeKeys() -> void
-override Cosmos.Kernel.System.Keyboard.ScanMaps.ESStandardLayout.InitializeKeys() -> void
-override Cosmos.Kernel.System.Keyboard.ScanMaps.FRStandardLayout.InitializeKeys() -> void
-override Cosmos.Kernel.System.Keyboard.ScanMaps.GBStandardLayout.InitializeKeys() -> void
-override Cosmos.Kernel.System.Keyboard.ScanMaps.TRStandardLayout.InitializeKeys() -> void
-override Cosmos.Kernel.System.Keyboard.ScanMaps.USDvorakLayout.InitializeKeys() -> void
-override Cosmos.Kernel.System.Keyboard.ScanMaps.USStandardLayout.InitializeKeys() -> void
 override Cosmos.Kernel.System.Network.IPv4.Address.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.IPv4.Address.GetHashCode() -> int
 override Cosmos.Kernel.System.Network.IPv4.Address.ToString() -> string!

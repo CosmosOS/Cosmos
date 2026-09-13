@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.System.Graphics;
 /// code by the vendored BigGustave decoder and SharpZipLib inflater (see the
 /// Credits page of the documentation).
 /// </summary>
-public class Png : Image
+public sealed class Png : Image
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Png"/> class, using the specified path to a PNG file.

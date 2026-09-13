@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.System.Network.IPv4.UDP.DNS;
 /// <summary>
 /// Used to manage a DNS connection to a server.
 /// </summary>
-public class DnsClient : UdpClient
+public sealed class DnsClient : UdpClient
 {
     private string? _queryUrl;
 

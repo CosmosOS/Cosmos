@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard English (US) keyboard layout.
 /// </summary>
-public class USStandardLayout : ScanMapBase
+public sealed class USStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="USStandardLayout"/> class.

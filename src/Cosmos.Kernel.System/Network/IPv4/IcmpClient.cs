@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 /// <summary>
 /// Used to manage the ICMP connection to a client.
 /// </summary>
-public class IcmpClient : IDisposable
+public sealed class IcmpClient : IDisposable
 {
     private static readonly Dictionary<uint, IcmpClient> s_clients = new();
 

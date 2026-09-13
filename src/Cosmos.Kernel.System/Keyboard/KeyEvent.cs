@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard;
 /// <summary>
 /// Represents a key-press event.
 /// </summary>
-public class KeyEvent
+public sealed class KeyEvent
 {
     /// <summary>
     /// Represents the type of the a <see cref="KeyEvent"/>.

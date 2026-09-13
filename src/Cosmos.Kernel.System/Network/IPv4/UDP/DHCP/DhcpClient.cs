@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.System.Network.IPv4.UDP.DHCP;
 /// <summary>
 /// Used to manage the DHCP connection to a server.
 /// </summary>
-public class DhcpClient : UdpClient
+public sealed class DhcpClient : UdpClient
 {
     /// <summary>
     /// Is DHCP asked check variable
