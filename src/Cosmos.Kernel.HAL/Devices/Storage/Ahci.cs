@@ -107,7 +107,7 @@ internal static class Ahci
         // delay on x64 — ARM64MemoryIO turned it into reads of an arbitrary
         // physical address, so COMRESET hold times were accidental there.
         IPlatformInitializer? init = PlatformHAL.Initializer;
-        if (init != null)
+        if (init is not null)
         {
             init.DelayMicroseconds((uint)ticks);
             return;

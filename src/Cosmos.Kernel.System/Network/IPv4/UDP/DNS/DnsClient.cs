@@ -101,13 +101,13 @@ public sealed class DnsClient : UdpClient
         }
 
         // Reject mismatched or unsolicited replies (e.g. spoofed/stray packets).
-        if (packet.Queries == null || packet.Queries.Count == 0 ||
+        if (packet.Queries is null || packet.Queries.Count == 0 ||
             !string.Equals(packet.Queries[0].Name, _queryUrl, StringComparison.OrdinalIgnoreCase))
         {
             return null;
         }
 
-        if (packet.Answers == null || packet.Answers.Count == 0)
+        if (packet.Answers is null || packet.Answers.Count == 0)
         {
             return null;
         }
@@ -131,10 +131,10 @@ public sealed class DnsClient : UdpClient
         {
             DnsAnswer? cname = answers.Find(a =>
                 a.Type == DnsRecordType.CNAME &&
-                a.ResolvedName != null &&
+                a.ResolvedName is not null &&
                 string.Equals(a.ResolvedName, current, StringComparison.OrdinalIgnoreCase));
 
-            if (cname?.CanonicalName == null)
+            if (cname?.CanonicalName is null)
             {
                 break;
             }
@@ -154,7 +154,7 @@ public sealed class DnsClient : UdpClient
         {
             if (record.Type == DnsRecordType.A &&
                 record.Address is { Length: 4 } &&
-                record.ResolvedName != null &&
+                record.ResolvedName is not null &&
                 string.Equals(record.ResolvedName, current, StringComparison.OrdinalIgnoreCase))
             {
                 results.Add(new Address(record.Address, 0));

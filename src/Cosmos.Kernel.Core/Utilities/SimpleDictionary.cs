@@ -38,7 +38,7 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
 
         var newEntry = new Entry(key, value);
 
-        if (_buckets[bucketIndex] == null)
+        if (_buckets[bucketIndex] is null)
         {
             _buckets[bucketIndex] = newEntry;
         }
@@ -52,7 +52,7 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
                     throw new ArgumentException("An item with the same key already exists.");
                 }
 
-                if (current.Next == null)
+                if (current.Next is null)
                 {
                     current.Next = newEntry;
                     break;
@@ -78,7 +78,7 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
 
         var current = _buckets[bucketIndex];
 
-        while (current != null)
+        while (current is not null)
         {
             if (current.Key.Equals(key))
             {
@@ -107,7 +107,7 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
         foreach (var entry in oldBuckets)
         {
             var current = entry;
-            while (current != null)
+            while (current is not null)
             {
                 Add(current.Key, current.Value);
                 current = current.Next;
@@ -144,11 +144,11 @@ internal class SimpleDictionary<TKey, TValue> where TKey : notnull
         Entry? current = _buckets[bucketIndex];
         Entry? previous = null;
 
-        while (current != null)
+        while (current is not null)
         {
             if (current.Key.Equals(key))
             {
-                if (previous == null)
+                if (previous is null)
                 {
                     _buckets[bucketIndex] = current.Next!;
                 }

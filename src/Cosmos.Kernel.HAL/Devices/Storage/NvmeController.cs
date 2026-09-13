@@ -185,7 +185,7 @@ internal unsafe class NvmeController
         pci.EnableBusMaster(true);
         pci.EnableMemory(true);
 
-        if (pci.BaseAddressBar == null || pci.BaseAddressBar.Length < 1)
+        if (pci.BaseAddressBar is null || pci.BaseAddressBar.Length < 1)
         {
             throw new Exception("[NVMe] Invalid BAR configuration");
         }
@@ -269,7 +269,7 @@ internal unsafe class NvmeController
         }
 
         MsiXContext? ctx = MsiX.Enable(_pci);
-        if (ctx == null)
+        if (ctx is null)
         {
             Serial.WriteString("[NVMe] MSI-X unavailable, falling back to polled I/O\n");
             return;
@@ -501,7 +501,7 @@ internal unsafe class NvmeController
         SchedulerThread? current = SchedulerManager.IsReady
             ? SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId()).CurrentThread
             : null;
-        if (current == null)
+        if (current is null)
         {
             for (int i = 0; i < _ioSlots!.Length; i++)
             {
@@ -558,7 +558,7 @@ internal unsafe class NvmeController
             }
         }
 
-        if (waiter != null)
+        if (waiter is not null)
         {
             SchedulerManager.ReadyThread(waiter.CpuId, waiter);
         }
@@ -652,7 +652,7 @@ internal unsafe class NvmeController
     /// </summary>
     private void OnIoCompletion(ref IRQContext context)
     {
-        if (_ioSlots == null || _ioCqVirt == 0)
+        if (_ioSlots is null || _ioCqVirt == 0)
         {
             return;
         }

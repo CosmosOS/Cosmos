@@ -145,7 +145,7 @@ public class UdpClient : IDisposable
     {
         ThrowIfDisposed();
 
-        if (_destination == null || _destinationPort == 0)
+        if (_destination is null || _destinationPort == 0)
         {
             throw new InvalidOperationException("Call Connect before using the Send overload that takes only the data.");
         }
@@ -176,7 +176,7 @@ public class UdpClient : IDisposable
         Serial.WriteString("\n");
 
         Address? source = IPConfig.FindNetwork(dest);
-        if (source == null)
+        if (source is null)
         {
             Serial.WriteString("[UdpClient] ERROR: IPConfig.FindNetwork returned null!\n");
             throw new InvalidOperationException("No configured interface can reach the destination address.");

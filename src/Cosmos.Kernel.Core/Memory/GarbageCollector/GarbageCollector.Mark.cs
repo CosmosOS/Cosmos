@@ -89,7 +89,7 @@ internal static unsafe partial class GarbageCollector
             SchedulerThread? current = SchedulerManager.CurrentCpuState?.CurrentThread;
 
             nuint stackEnd;
-            if (current != null && current.StackBase != 0 && current.StackSize != 0)
+            if (current is not null && current.StackBase != 0 && current.StackSize != 0)
             {
                 stackEnd = current.StackBase + current.StackSize;
             }
@@ -102,7 +102,7 @@ internal static unsafe partial class GarbageCollector
             PreciseScanCurrentThread(stackEnd);
 
             var threads = SchedulerManager.Threads;
-            if (threads != null)
+            if (threads is not null)
             {
                 for (int i = 0; i < threads.Length; i++)
                 {
@@ -137,7 +137,7 @@ internal static unsafe partial class GarbageCollector
     /// <param name="thread">The thread whose stack and registers to scan.</param>
     private static void ScanThreadStack(SchedulerThread thread)
     {
-        if (thread == null)
+        if (thread is null)
         {
             return;
         }

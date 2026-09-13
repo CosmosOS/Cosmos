@@ -231,7 +231,7 @@ public static class NetworkStreamPlug
         _readable.Remove(id);
         _writeable.Remove(id);
 
-        if (socket != null && owns)
+        if (socket is not null && owns)
         {
             socket.Close();
         }

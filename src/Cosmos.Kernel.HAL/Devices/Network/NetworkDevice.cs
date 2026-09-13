@@ -62,7 +62,7 @@ internal abstract class NetworkDevice : Device, INetworkDevice
     /// </summary>
     protected static string FormatMacAddress(byte[] mac)
     {
-        if (mac == null || mac.Length != 6)
+        if (mac is null || mac.Length != 6)
         {
             return "00:00:00:00:00:00";
         }

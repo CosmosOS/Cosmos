@@ -56,7 +56,7 @@ public static class TimerManager
     /// </summary>
     internal static void RegisterTimer(ITimerDevice timer)
     {
-        if (timer == null)
+        if (timer is null)
         {
             return;
         }
@@ -176,7 +176,7 @@ public static class TimerManager
 
     private static SoftwareTimer? ScheduleCore(Action callback, ulong timeoutNs, bool recurring)
     {
-        if (s_timer == null || callback == null)
+        if (s_timer is null || callback is null)
         {
             return null;
         }

@@ -23,7 +23,7 @@ public static class Power
     /// </summary>
     public static void Halt()
     {
-        if (PlatformHAL.CpuOps != null)
+        if (PlatformHAL.CpuOps is not null)
         {
             PlatformHAL.CpuOps.Halt();
         }

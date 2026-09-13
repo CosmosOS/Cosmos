@@ -272,7 +272,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
 
     public void UpdateInodeEntry(FatInode inode)
     {
-        if (inode.Parent == null || inode.DirEntryByteOffset < 0)
+        if (inode.Parent is null || inode.DirEntryByteOffset < 0)
         {
             return;
         }

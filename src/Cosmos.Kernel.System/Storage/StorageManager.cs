@@ -180,7 +180,7 @@ public static class StorageManager
             s_devices.Add(device);
 
             // First device becomes primary
-            if (s_primaryDevice == null)
+            if (s_primaryDevice is null)
             {
                 s_primaryDevice = device;
             }
@@ -231,7 +231,7 @@ public static class StorageManager
 
     private static void ScanPartitions(IBlockDevice device)
     {
-        if (s_partitions == null)
+        if (s_partitions is null)
         {
             return;
         }

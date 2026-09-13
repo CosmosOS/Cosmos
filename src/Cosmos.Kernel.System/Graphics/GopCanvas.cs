@@ -134,7 +134,7 @@ internal class GopCanvas : Canvas
             // framebuffer size is also deliberately NOT checked against
             // AvailableModes — that legacy VBE list doesn't contain every mode
             // firmware can hand us (e.g. 1280x800).
-            if (_driver != null)
+            if (_driver is not null)
             {
                 _mode = new Mode((int)_driver.Width, (int)_driver.Height, value.ColorDepth);
             }
@@ -553,7 +553,7 @@ internal class GopCanvas : Canvas
         ThrowIfDriverNotInitialized();
 
         var srcBuffer = canvas.GetBuffer();
-        if (srcBuffer != null)
+        if (srcBuffer is not null)
         {
             _driver.CopyBuffer(srcBuffer.AsMemory(), x, y, canvas.Width, canvas.Height);
         }

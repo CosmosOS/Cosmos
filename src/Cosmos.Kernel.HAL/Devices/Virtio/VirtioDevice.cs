@@ -111,7 +111,7 @@ internal static class VirtioDevice
         {
             VirtioMmioTransport? transport =
                 VirtioMmioTransport.TryProbe(busBase + slot * slotStride, irqBase + slot, irqEnable);
-            if (transport == null)
+            if (transport is null)
             {
                 continue;
             }
@@ -134,7 +134,7 @@ internal static class VirtioDevice
     /// </summary>
     public static void InitializePciBus()
     {
-        if (PciManager.Devices == null)
+        if (PciManager.Devices is null)
         {
             return;
         }
@@ -159,7 +159,7 @@ internal static class VirtioDevice
             }
 
             VirtioPciTransport? transport = VirtioPciTransport.TryCreate(pci);
-            if (transport == null)
+            if (transport is null)
             {
                 continue;
             }

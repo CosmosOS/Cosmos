@@ -64,7 +64,7 @@ public static class TcpListenerPlug
     public static EndPoint? get_LocalEndpoint(TcpListener aThis)
     {
         int id = GetId(aThis);
-        if (_serverSockets.TryGetValue(id, out var socket) && socket.LocalEndPoint != null)
+        if (_serverSockets.TryGetValue(id, out var socket) && socket.LocalEndPoint is not null)
         {
             return socket.LocalEndPoint;
         }

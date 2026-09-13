@@ -93,7 +93,7 @@ internal static class AlarmSystem
 
     private static ulong AddCore(TimeSpan delay, bool recurring, Action alarm)
     {
-        if (alarm == null)
+        if (alarm is null)
         {
             return 0;
         }
@@ -136,7 +136,7 @@ internal static class AlarmSystem
     /// </summary>
     private static void EnsureStartedLocked()
     {
-        if (s_thread != null)
+        if (s_thread is not null)
         {
             return;
         }

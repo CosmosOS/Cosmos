@@ -89,7 +89,7 @@ public sealed class DhcpClient : UdpClient
         for (int i = 0; i < NetworkManager.DeviceCount; i++)
         {
             var networkDevice = NetworkManager.GetDevice(i);
-            if (networkDevice == null)
+            if (networkDevice is null)
             {
                 continue;
             }
@@ -122,7 +122,7 @@ public sealed class DhcpClient : UdpClient
         for (int i = 0; i < NetworkManager.DeviceCount; i++)
         {
             var networkDevice = NetworkManager.GetDevice(i);
-            if (networkDevice == null)
+            if (networkDevice is null)
             {
                 continue;
             }
@@ -148,7 +148,7 @@ public sealed class DhcpClient : UdpClient
         for (int i = 0; i < NetworkManager.DeviceCount; i++)
         {
             var networkDevice = NetworkManager.GetDevice(i);
-            if (networkDevice == null)
+            if (networkDevice is null)
             {
                 continue;
             }
@@ -174,12 +174,12 @@ public sealed class DhcpClient : UdpClient
             for (int i = 0; i < NetworkManager.DeviceCount; i++)
             {
                 var networkDevice = NetworkManager.GetDevice(i);
-                if (networkDevice == null)
+                if (networkDevice is null)
                 {
                     continue;
                 }
 
-                if (packet.Client == null || packet.Client.ToString() == null)
+                if (packet.Client is null || packet.Client.ToString() is null)
                 {
                     throw new Exception("Parsing DHCP ACK Packet failed, can't apply network configuration.");
                 }
@@ -192,7 +192,7 @@ public sealed class DhcpClient : UdpClient
                     Serial.WriteString($"   DNS server  : {packet.DNS?.ToString() ?? "null"}\n");
 
                     IPConfig.Enable(networkDevice, packet.Client, packet.Subnet ?? new Address(255, 255, 255, 0), packet.Gateway ?? Address.Zero);
-                    if (packet.DNS != null)
+                    if (packet.DNS is not null)
                     {
                         DnsConfig.Add(packet.DNS);
                     }

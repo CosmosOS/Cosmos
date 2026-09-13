@@ -53,7 +53,7 @@ public static class DnsConfig
                 break;
             }
         }
-        if (toRemove != null)
+        if (toRemove is not null)
         {
             s_nameservers.Remove(toRemove);
         }

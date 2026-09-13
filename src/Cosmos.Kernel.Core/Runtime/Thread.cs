@@ -36,7 +36,7 @@ internal class Thread
         if (CosmosFeatures.SchedulerEnabled)
         {
             SchedulerThread? current = SchedulerManager.CurrentCpuState?.CurrentThread;
-            if (current != null && current.StackBase != 0)
+            if (current is not null && current.StackBase != 0)
             {
                 pStackLow = (nint)current.StackBase;
                 pStackHigh = (nint)(current.StackBase + current.StackSize);
@@ -96,7 +96,7 @@ internal class Thread
         if (CosmosFeatures.SchedulerEnabled)
         {
             SchedulerThread? thread = SchedulerManager.CurrentCpuState?.CurrentThread;
-            if (thread != null)
+            if (thread is not null)
             {
                 //TODO: Switch Threads (if possible)
                 SchedulerManager.YieldThread(SchedulerManager.GetCurrentCpuId(), thread);

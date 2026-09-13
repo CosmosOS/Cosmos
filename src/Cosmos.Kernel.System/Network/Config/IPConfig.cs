@@ -100,7 +100,7 @@ public class IPConfig
             {
                 return ipConfig.Address;
             }
-            if (defaultGw == null && ipConfig.DefaultGateway.CompareTo(Address.Zero) != 0)
+            if (defaultGw is null && ipConfig.DefaultGateway.CompareTo(Address.Zero) != 0)
             {
                 defaultGw = ipConfig.Address;
             }
@@ -124,7 +124,7 @@ public class IPConfig
     /// <returns><see langword="true"/> if the device was successfully enabled, <see langword="false"/> otherwise.</returns>
     internal static bool Enable(INetworkDevice device, Address address, Address subnetMask, Address defaultGateway)
     {
-        if (device != null)
+        if (device is not null)
         {
             IPConfig config = new(address, subnetMask, defaultGateway);
             NetworkStack.ConfigIP(device, config);

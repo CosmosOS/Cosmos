@@ -24,7 +24,7 @@ public static partial class DateTimePlug
     {
         if (KernelFeatures.Timer)
         {
-            if (RTC.Instance == null)
+            if (RTC.Instance is null)
             {
                 return 0;
             }

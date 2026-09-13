@@ -148,9 +148,9 @@ internal class PciManager
     }
 
     public static bool Exists(PciDevice pciDevice) =>
-        GetDevice((VendorId)pciDevice.VendorId, (DeviceId)pciDevice.DeviceId) != null;
+        GetDevice((VendorId)pciDevice.VendorId, (DeviceId)pciDevice.DeviceId) is not null;
 
-    public static bool Exists(VendorId aVendorID, DeviceId aDeviceID) => GetDevice(aVendorID, aDeviceID) != null;
+    public static bool Exists(VendorId aVendorID, DeviceId aDeviceID) => GetDevice(aVendorID, aDeviceID) is not null;
 
     /// <summary>
     /// Get device.

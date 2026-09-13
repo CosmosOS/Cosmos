@@ -66,7 +66,7 @@ public static class InteropSysPlug
 
         if (KernelFeatures.Timer)
         {
-            if (RTC.Instance == null)
+            if (RTC.Instance is null)
             {
                 return 0;
             }

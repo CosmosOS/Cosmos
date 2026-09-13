@@ -128,7 +128,7 @@ public static class MouseManager
     /// </summary>
     internal static void RegisterMouse(IMouseDevice mouse)
     {
-        if (s_mice == null || mouse == null)
+        if (s_mice is null || mouse is null)
         {
             return;
         }
@@ -195,7 +195,7 @@ public static class MouseManager
     /// </summary>
     internal static void Poll()
     {
-        if (s_mice == null)
+        if (s_mice is null)
         {
             return;
         }

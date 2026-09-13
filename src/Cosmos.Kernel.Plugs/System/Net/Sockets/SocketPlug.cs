@@ -422,7 +422,7 @@ public static class SocketPlug
             throw new InvalidOperationException("Must establish a connection before sending data.");
         }
 
-        if (sm.RemoteEndPoint.Address == null || sm.RemoteEndPoint.Port == 0)
+        if (sm.RemoteEndPoint.Address is null || sm.RemoteEndPoint.Port == 0)
         {
             Log.WriteString("[SocketPlug] Must establish a default remote host by calling Connect().\n");
             throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
@@ -598,7 +598,7 @@ public static class SocketPlug
         KernelEndPoint ep = new(Address.Zero, 0);
         byte[]? data = client.Receive(ref ep, UdpPollTimeoutMs);
 
-        if (data == null)
+        if (data is null)
         {
             return 0;
         }
@@ -680,7 +680,7 @@ public static class SocketPlug
         KernelEndPoint ep = new(Address.Zero, 0);
         byte[]? data = client.Receive(ref ep, UdpPollTimeoutMs);
 
-        if (data == null)
+        if (data is null)
         {
             return 0;
         }

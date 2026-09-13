@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -437,7 +437,7 @@ public unsafe class Canvas
         int srcWidth = canvas.Width;
         int srcHeight = canvas.Height;
 
-        if (srcBuffer != null)
+        if (srcBuffer is not null)
         {
             DrawArray(srcBuffer, x, y, srcWidth, srcHeight);
         }
@@ -1167,7 +1167,7 @@ public unsafe class Canvas
         {
             char c = str[i];
             TrueTypeGlyph? glyph = font.GetGlyph(c, sizePx);
-            if (glyph == null)
+            if (glyph is null)
             {
                 continue;
             }
@@ -1194,7 +1194,7 @@ public unsafe class Canvas
     private void DrawGlyph(TrueTypeGlyph glyph, Color color, int x, int y)
     {
         byte[]? coverage = glyph.Coverage;
-        if (coverage == null)
+        if (coverage is null)
         {
             return;
         }

@@ -76,7 +76,7 @@ internal class InterruptEvent
         {
             currentThread = null;
         }
-        if (currentThread == null)
+        if (currentThread is null)
         {
             // Single execution context: nothing to block, so spin on the
             // latch with interrupts enabled between checks. Deliberately no
@@ -222,7 +222,7 @@ internal class InterruptEvent
             }
         }
 
-        if (toReady != null)
+        if (toReady is not null)
         {
             SchedulerManager.ReadyThread(toReady.CpuId, toReady);
         }

@@ -145,7 +145,7 @@ public static class IPAddressPlug
     public static bool TryParse(string ipString, [NotNullWhen(true)] out IPAddress? address)
     {
         address = Parse(ipString);
-        return address != null;
+        return address is not null;
     }
 
     // Static property plugs for well-known addresses

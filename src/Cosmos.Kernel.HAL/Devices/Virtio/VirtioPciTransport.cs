@@ -263,7 +263,7 @@ internal sealed class VirtioPciTransport : VirtioTransport
     private void TrySetupMsix()
     {
         MsiXContext? context = MsiX.Enable(_pci);
-        if (context == null)
+        if (context is null)
         {
             return;
         }

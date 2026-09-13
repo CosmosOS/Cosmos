@@ -34,7 +34,7 @@ internal static class MsiRouting
     /// <summary>
     /// True once a platform has registered a binder (x64 LAPIC, ARM64 ITS, …).
     /// </summary>
-    public static bool IsAvailable => s_binder != null && s_binder.IsAvailable;
+    public static bool IsAvailable => s_binder is not null && s_binder.IsAvailable;
 
     /// <summary>
     /// Called once by the platform interrupt-controller initializer.
@@ -52,7 +52,7 @@ internal static class MsiRouting
     /// </summary>
     public static object? PrepareDevice(uint bus, uint slot, uint function, int entryCount)
     {
-        if (s_binder == null)
+        if (s_binder is null)
         {
             throw new System.PlatformNotSupportedException("MSI binder not registered");
         }
@@ -68,7 +68,7 @@ internal static class MsiRouting
     public static void BindEntry(object? deviceCtx, int entryIndex, InterruptManager.IrqDelegate handler,
                                   uint targetCpu, out ulong address, out uint data)
     {
-        if (s_binder == null)
+        if (s_binder is null)
         {
             throw new System.PlatformNotSupportedException("MSI binder not registered");
         }

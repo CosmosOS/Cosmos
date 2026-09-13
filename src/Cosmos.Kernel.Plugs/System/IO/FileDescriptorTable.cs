@@ -85,7 +85,7 @@ internal static unsafe class FileDescriptorTable
         fd = -1;
 
         string? fullPath = VfsManager.MakeAbsolute(path);
-        if (fullPath == null)
+        if (fullPath is null)
         {
             return PalError.ENOENT;
         }
@@ -164,7 +164,7 @@ internal static unsafe class FileDescriptorTable
         }
 
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null)
+        if (file is null)
         {
             return PalError.EBADF;
         }
@@ -181,7 +181,7 @@ internal static unsafe class FileDescriptorTable
         bytesRead = 0;
 
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null || !file.Readable)
+        if (file is null || !file.Readable)
         {
             return PalError.EBADF;
         }
@@ -200,7 +200,7 @@ internal static unsafe class FileDescriptorTable
         bytesWritten = 0;
 
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null || !file.Writable)
+        if (file is null || !file.Writable)
         {
             return PalError.EBADF;
         }
@@ -240,7 +240,7 @@ internal static unsafe class FileDescriptorTable
         bytesRead = 0;
 
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null || !file.Readable)
+        if (file is null || !file.Readable)
         {
             return PalError.EBADF;
         }
@@ -261,7 +261,7 @@ internal static unsafe class FileDescriptorTable
         bytesWritten = 0;
 
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null || !file.Writable)
+        if (file is null || !file.Writable)
         {
             return PalError.EBADF;
         }
@@ -282,7 +282,7 @@ internal static unsafe class FileDescriptorTable
         newPosition = -1;
 
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null)
+        if (file is null)
         {
             return PalError.EBADF;
         }
@@ -306,7 +306,7 @@ internal static unsafe class FileDescriptorTable
         status = default;
 
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null)
+        if (file is null)
         {
             return PalError.EBADF;
         }
@@ -323,7 +323,7 @@ internal static unsafe class FileDescriptorTable
     internal static PalError Fsync(int fd)
     {
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null)
+        if (file is null)
         {
             return PalError.EBADF;
         }
@@ -334,7 +334,7 @@ internal static unsafe class FileDescriptorTable
     internal static PalError Truncate(int fd, long length)
     {
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null)
+        if (file is null)
         {
             return PalError.EBADF;
         }
@@ -355,7 +355,7 @@ internal static unsafe class FileDescriptorTable
     internal static PalError SetDescriptorMode(int fd, int mode)
     {
         OpenFileState? file = GetOpenFile(fd);
-        if (file == null)
+        if (file is null)
         {
             return PalError.EBADF;
         }
@@ -367,7 +367,7 @@ internal static unsafe class FileDescriptorTable
     {
         OpenFileState? source = GetOpenFile(sourceFd);
         OpenFileState? destination = GetOpenFile(destinationFd);
-        if (source == null || destination == null || !source.Readable || !destination.Writable)
+        if (source is null || destination is null || !source.Readable || !destination.Writable)
         {
             return PalError.EBADF;
         }
@@ -419,7 +419,7 @@ internal static unsafe class FileDescriptorTable
         status = default;
 
         string? fullPath = VfsManager.MakeAbsolute(path);
-        if (fullPath == null)
+        if (fullPath is null)
         {
             return PalError.ENOENT;
         }
@@ -436,7 +436,7 @@ internal static unsafe class FileDescriptorTable
     internal static PalError UnlinkFile(string path)
     {
         string? fullPath = VfsManager.MakeAbsolute(path);
-        if (fullPath == null)
+        if (fullPath is null)
         {
             return PalError.ENOENT;
         }
@@ -462,7 +462,7 @@ internal static unsafe class FileDescriptorTable
     internal static PalError CreateDirectory(string path, int mode)
     {
         string? fullPath = VfsManager.MakeAbsolute(path);
-        if (fullPath == null)
+        if (fullPath is null)
         {
             return PalError.EINVAL;
         }
@@ -492,7 +492,7 @@ internal static unsafe class FileDescriptorTable
     internal static PalError RemoveDirectory(string path)
     {
         string? fullPath = VfsManager.MakeAbsolute(path);
-        if (fullPath == null)
+        if (fullPath is null)
         {
             return PalError.ENOENT;
         }
@@ -525,7 +525,7 @@ internal static unsafe class FileDescriptorTable
     {
         string? oldFull = VfsManager.MakeAbsolute(oldPath);
         string? newFull = VfsManager.MakeAbsolute(newPath);
-        if (oldFull == null || newFull == null)
+        if (oldFull is null || newFull is null)
         {
             return PalError.ENOENT;
         }
@@ -553,7 +553,7 @@ internal static unsafe class FileDescriptorTable
 
         VfsManager.VfsMount? oldMount = FindMount(oldFull, out _);
         VfsManager.VfsMount? newMount = FindMount(newFull, out _);
-        if (newMount == null)
+        if (newMount is null)
         {
             return PalError.ENOENT;
         }
@@ -599,7 +599,7 @@ internal static unsafe class FileDescriptorTable
     internal static PalError SetPathMode(string path, int mode)
     {
         string? fullPath = VfsManager.MakeAbsolute(path);
-        if (fullPath == null)
+        if (fullPath is null)
         {
             return PalError.ENOENT;
         }
@@ -624,7 +624,7 @@ internal static unsafe class FileDescriptorTable
     internal static PalError SetCurrentDirectory(string path)
     {
         string? fullPath = VfsManager.MakeAbsolute(path);
-        if (fullPath == null)
+        if (fullPath is null)
         {
             return PalError.ENOENT;
         }
@@ -649,7 +649,7 @@ internal static unsafe class FileDescriptorTable
         handle = IntPtr.Zero;
 
         string? fullPath = VfsManager.MakeAbsolute(path);
-        if (fullPath == null)
+        if (fullPath is null)
         {
             return PalError.ENOENT;
         }
@@ -691,8 +691,8 @@ internal static unsafe class FileDescriptorTable
             {
                 IVfsInode entry = entries[i];
                 names[i] = entry.Name;
-                bool directoryEntry = entry.FileOperations == null;
-                if (entry.InodeOperations != null && entry.InodeOperations.GetAttr(entry, out VfsStat entryStat))
+                bool directoryEntry = entry.FileOperations is null;
+                if (entry.InodeOperations is not null && entry.InodeOperations.GetAttr(entry, out VfsStat entryStat))
                 {
                     directoryEntry = entryStat.IsDirectory;
                 }
@@ -718,7 +718,7 @@ internal static unsafe class FileDescriptorTable
     internal static int ReadDirectoryStream(IntPtr handle, PalSys.DirectoryEntry* entry)
     {
         DirectoryStreamState? stream = GetDirectoryStream(handle);
-        if (stream == null)
+        if (stream is null)
         {
             return (int)PalError.EBADF;
         }
@@ -744,7 +744,7 @@ internal static unsafe class FileDescriptorTable
     internal static PalError CloseDirectoryStream(IntPtr handle)
     {
         DirectoryStreamState? stream = GetDirectoryStream(handle);
-        if (stream == null)
+        if (stream is null)
         {
             return PalError.EBADF;
         }
@@ -782,7 +782,7 @@ internal static unsafe class FileDescriptorTable
     {
         for (int i = 0; i < table.Length; i++)
         {
-            if (table[i] == null)
+            if (table[i] is null)
             {
                 return i;
             }
@@ -839,13 +839,13 @@ internal static unsafe class FileDescriptorTable
     {
         VfsStat attributes = default;
         attributes.Size = size;
-        return inode.InodeOperations != null
+        return inode.InodeOperations is not null
             && inode.InodeOperations.SetAttr(inode, SetAttrFlags.Size, in attributes);
     }
 
     private static PalError ApplyMode(IVfsInode inode, int mode)
     {
-        if (inode.InodeOperations == null || !inode.InodeOperations.GetAttr(inode, out VfsStat current))
+        if (inode.InodeOperations is null || !inode.InodeOperations.GetAttr(inode, out VfsStat current))
         {
             return PalError.EIO;
         }
@@ -910,7 +910,7 @@ internal static unsafe class FileDescriptorTable
         {
             VfsManager.VfsMount candidate = mounts[i];
             if (VfsManager.MountCovers(candidate.MountPoint, fullPath)
-                && (best == null || candidate.MountPoint.Length > best.MountPoint.Length))
+                && (best is null || candidate.MountPoint.Length > best.MountPoint.Length))
             {
                 best = candidate;
                 ordinal = i + 1;

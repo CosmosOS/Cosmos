@@ -366,7 +366,7 @@ public static partial class VfsManager
         }
 
         IFileOperations? fileOperations = inode.FileOperations;
-        if (fileOperations == null)
+        if (fileOperations is null)
         {
             return false;
         }
@@ -425,7 +425,7 @@ public static partial class VfsManager
         }
 
         IFileOperations? fileOperations = inode.FileOperations;
-        if (fileOperations != null)
+        if (fileOperations is not null)
         {
             IVfsOpenFile openFile = new VfsOpenFile(name, inode, fileOperations);
             return new VfsFileHandle(name, inode, openFile);
@@ -462,7 +462,7 @@ public static partial class VfsManager
         }
 
         VfsMount? mount = FindMount(path);
-        if (mount == null)
+        if (mount is null)
         {
             return false;
         }
@@ -537,7 +537,7 @@ public static partial class VfsManager
                 continue;
             }
 
-            if (bestMatch == null || candidate.MountPoint.Length > bestMatch.MountPoint.Length)
+            if (bestMatch is null || candidate.MountPoint.Length > bestMatch.MountPoint.Length)
             {
                 bestMatch = candidate;
             }

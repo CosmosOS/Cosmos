@@ -63,7 +63,7 @@ public static class KeyboardManager
     /// <summary>
     /// Whether a keyboard input is pending to be processed.
     /// </summary>
-    public static bool KeyAvailable => s_queuedKeys != null && s_queuedKeys.Count > 0;
+    public static bool KeyAvailable => s_queuedKeys is not null && s_queuedKeys.Count > 0;
 
     /// <summary>
     /// Throws when keyboard support is compiled out. Guards actions, not reads:
@@ -104,7 +104,7 @@ public static class KeyboardManager
     /// </summary>
     internal static void RegisterKeyboard(IKeyboardDevice keyboard)
     {
-        if (s_keyboards == null || keyboard == null)
+        if (s_keyboards is null || keyboard is null)
         {
             return;
         }
@@ -142,7 +142,7 @@ public static class KeyboardManager
     /// </summary>
     private static void HandleScanCode(byte scanCode, bool released)
     {
-        if (s_scanMap == null)
+        if (s_scanMap is null)
         {
             return;
         }
@@ -197,7 +197,7 @@ public static class KeyboardManager
     /// </summary>
     private static void UpdateLeds()
     {
-        if (s_keyboards == null)
+        if (s_keyboards is null)
         {
             return;
         }
@@ -233,7 +233,7 @@ public static class KeyboardManager
     /// </summary>
     private static bool GetKey(byte scanCode, out KeyEvent? keyInfo)
     {
-        if (s_scanMap == null)
+        if (s_scanMap is null)
         {
             keyInfo = null;
             return false;
@@ -246,7 +246,7 @@ public static class KeyboardManager
             NumLock,
             CapsLock,
             ScrollLock);
-        return keyInfo != null;
+        return keyInfo is not null;
     }
 
     /// <summary>
@@ -318,7 +318,7 @@ public static class KeyboardManager
     /// </summary>
     private static void PollKeyboards()
     {
-        if (s_keyboards == null)
+        if (s_keyboards is null)
         {
             return;
         }

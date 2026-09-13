@@ -174,7 +174,7 @@ public static class TcpClientPlug
         }
         _clientSockets.Remove(id);
 
-        if (stream != null)
+        if (stream is not null)
         {
             stream.Dispose();
         }

@@ -54,7 +54,7 @@ internal class ConditionVariable : IDisposable
         {
             currentThread = SchedulerManager.CurrentCpuState?.CurrentThread;
         }
-        while (currentThread == null);
+        while (currentThread is null);
 
         Serial.WriteString("[CV] Wait BEGIN thread=");
         Serial.WriteNumber(currentThread.Id);
@@ -100,7 +100,7 @@ internal class ConditionVariable : IDisposable
     public bool WaitTimeout(Mutex mutex, uint timeoutMs)
     {
         SchedulerThread? currentThread = SchedulerManager.CurrentCpuState?.CurrentThread;
-        if (currentThread == null)
+        if (currentThread is null)
         {
             return false;
         }

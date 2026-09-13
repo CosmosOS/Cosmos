@@ -358,7 +358,7 @@ internal unsafe class AhciController
 
     private void PrintVersion()
     {
-        if (_generic == null)
+        if (_generic is null)
         {
             Serial.WriteString("Unknown");
             return;
@@ -372,7 +372,7 @@ internal unsafe class AhciController
 
     private void GetCapabilities()
     {
-        if (_generic == null)
+        if (_generic is null)
         {
             return;
         }
@@ -401,7 +401,7 @@ internal unsafe class AhciController
 
     private void GetPorts()
     {
-        if (_generic == null)
+        if (_generic is null)
         {
             return;
         }

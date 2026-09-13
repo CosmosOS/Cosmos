@@ -321,7 +321,7 @@ public class KernelConsole
             return false;
         }
 
-        if (Default != null)
+        if (Default is not null)
         {
             return true;
         }
@@ -345,7 +345,7 @@ public class KernelConsole
     /// <see cref="Default"/> is non-null.
     /// </summary>
     [MemberNotNullWhen(true, nameof(Default))]
-    public static bool IsInitialized => Default != null;
+    public static bool IsInitialized => Default is not null;
 
     /// <summary>
     /// Gets the cell index for a given row and column.
@@ -467,7 +467,7 @@ public class KernelConsole
 
         // Get the background color of the current cell
         uint bgColor = _backgroundColor;
-        if (_cells != null && _cursorY < _rows && _cursorX < _cols)
+        if (_cells is not null && _cursorY < _rows && _cursorX < _cols)
         {
             int index = GetIndex(_cursorY, _cursorX);
             bgColor = _cells[index].BackgroundColor;

@@ -192,7 +192,7 @@ public sealed class TrueTypeFont : Font
         {
             char c = text[i];
             TrueTypeGlyph? glyph = GetGlyph(c, sizePx);
-            if (glyph == null)
+            if (glyph is null)
             {
                 continue;
             }
@@ -245,7 +245,7 @@ public sealed class TrueTypeFont : Font
         }
 
         LunarLabs.Fonts.FontGlyph? rendered = _font.RenderGlyph(c, GetScale(sizePx));
-        if (rendered == null)
+        if (rendered is null)
         {
             return null;
         }
