@@ -39,9 +39,11 @@
 
   <!-- The metadata readers, TypeHashingAlgorithms, and ExceptionIDs used to be
        linked from here too, but upstream declares their types public with no
-       define to flip them. They are vendored under Runtime\Internal\ with a
-       visibility-only diff (public -> internal), same precedent as
-       ReadyToRunHeader.cs and TypeManagerHandle.cs. -->
+       define to flip them. They are vendored under Runtime\Internal\ instead,
+       alongside ReadyToRunHeader.cs, MethodTable.Runtime.cs and
+       TypeManagerHandle.cs. Runtime\Internal\README.md records where each
+       file came from and which ones are a visibility-only diff rather than a
+       rewrite. -->
   <ItemGroup>
     <Compile Include="$(ToolCommonPath)Internal\NativeFormat\*.cs">
       <Link>Runtime\Internal\NativeFormat\%(Filename).cs</Link>
