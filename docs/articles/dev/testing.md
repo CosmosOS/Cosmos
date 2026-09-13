@@ -40,13 +40,25 @@ dotnet test src/tests/Cosmos.Kernel.Tests.System   # the kernel library tests
   - `PatchType_ShouldReplaceAllMethodsCorrectly`
   - `PatchType_ShouldPlugAssembly`
   - `AddMethod_BehaviorBeforeAndAfterPlug`
-- **Cosmos.Kernel.Tests.System**: Exercises `Cosmos.Kernel.System` logic that needs no hardware, in the host process. One nested fixture per member under test, holding an `InternalsVisibleTo` grant from the library.
+- **Cosmos.Kernel.Tests.System**: Exercises `Cosmos.Kernel.System` logic that needs no hardware, in the host process (`Tcp` receive buffer, `Address` identity and formatting). One nested fixture per member under test, holding an `InternalsVisibleTo` grant from the library.
   - `AppendToData.WhenBothData_AndOtherAreEmpty_DataIsEmpty`
   - `AppendToData.WhenDataIsNotEmpty_AndOtherIsEmpty_DataDoesNotChange`
   - `AppendToData.WhenDataIsNotEmpty_AndOtherIsNotEmpty_OtherIsAppendedToData`
   - `AdvanceDataOffset.WhenAdvancingByZero_NoChangesAreMade`
   - `AdvanceDataOffset.WhenAdvancingByOneAndLengthIsTwo_OnlyLastElementRemains`
   - `AdvanceDataOffset.WhenAdvancingByTwoAndLengthIsTwo_DataLengthIsZero`
+  - `Constructors.GivenPackedValue_SplitsItMostSignificantOctetFirst`
+  - `Constructors.GivenBufferAndOffset_ReadsFourBytesFromTheOffset`
+  - `Constructors.GivenSpanOfWrongLength_Throws`
+  - `Id.GivenOctets_PacksThemMostSignificantFirst`
+  - `Equality.GivenTheSameOctets_TwoInstancesAreEqualAndHashAlike`
+  - `Equality.GivenDifferentOctets_TwoInstancesAreNotEqual`
+  - `Equality.GivenNull_IsNotEqual`
+  - `CompareTo.GivenTwoAddresses_OrdersByPackedValue`
+  - `CompareTo.GivenNull_OrdersAfterIt`
+  - `Formatting.GivenAddress_WritesDottedDecimal`
+  - `IsBroadcastAddress.GivenAllOnes_IsTrue`
+  - `IsBroadcastAddress.GivenAnyOtherAddress_IsFalse`
 - **Cosmos.Tests.NativeWrapper**: Contains runtime assets; no unit tests.
 - **Cosmos.Tests.NativeLibrary**: Provides native code used in tests; no unit tests.
 
