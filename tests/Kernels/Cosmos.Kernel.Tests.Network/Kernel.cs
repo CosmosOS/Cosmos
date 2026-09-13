@@ -195,7 +195,7 @@ public class Kernel : Sys.Kernel
         Assert.True(device.OnPacketReceived != null, "Device should have packet handler registered after DHCP");
 
         // Verify we got a valid IP (not 0.0.0.0)
-        Assert.True(_localIP.Id != 0, "DHCP should assign a non-zero IP address");
+        Assert.True(_localIP != Address4.Zero, "DHCP should assign a non-zero IP address");
     }
 
     // ==================== ICMP Tests ====================
@@ -216,7 +216,7 @@ public class Kernel : Sys.Kernel
 
         // QEMU user networking: slirp answers ICMP echo requests to the
         // gateway address itself, so no host-side helper is needed.
-        var target = new Address(10, 0, 2, 2);
+        var target = new Address4(10, 0, 2, 2);
 
         Serial.WriteString("[Test] Pinging ");
         Serial.WriteString(target.ToString());
@@ -226,7 +226,7 @@ public class Kernel : Sys.Kernel
         icmpClient.Connect(target);
         icmpClient.SendEcho();
 
-        CosmosEndPoint endpoint = new CosmosEndPoint(Address.Zero, 0);
+        CosmosEndPoint endpoint = new CosmosEndPoint(Address4.Zero, 0);
         int time = icmpClient.Receive(ref endpoint, 5000);
 
         if (time >= 0)
@@ -821,7 +821,7 @@ public class Kernel : Sys.Kernel
         Assert.True(dnsClient != null, "DNS client should be created");
 
         // Configure DNS server (Cloudflare's public DNS)
-        var dnsServer = new Address(1, 1, 1, 1);
+        var dnsServer = new Address4(1, 1, 1, 1);
         DNSConfig.Add(dnsServer);
 
         Assert.True(DNSConfig.DNSNameservers.Count > 0, "DNS nameservers should be configured");
@@ -866,7 +866,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[Test] Resolving valentin.bzh via DNS...\n");
 
         // Configure DNS server (Cloudflare's public DNS)
-        var dnsServer = new Address(1, 1, 1, 1);
+        var dnsServer = new Address4(1, 1, 1, 1);
         DNSConfig.Add(dnsServer);
 
         // Create DNS client and connect to DNS server
@@ -896,7 +896,7 @@ public class Kernel : Sys.Kernel
             Serial.WriteString("\n");
 
             // Verify we got a valid IP (not 0.0.0.0)
-            Assert.True(resolvedIP.Id != 0, "Resolved IP should not be 0.0.0.0");
+            Assert.True(resolvedIP != Address4.Zero, "Resolved IP should not be 0.0.0.0");
             Assert.True(true, "DNS resolution for valentin.bzh succeeded");
         }
         else
@@ -931,7 +931,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString(domain);
         Serial.WriteString("...\n");
 
-        var dnsServer = new Address(1, 1, 1, 1);
+        var dnsServer = new Address4(1, 1, 1, 1);
         var dnsClient = new DnsClient();
         dnsClient.Connect(dnsServer);
 
@@ -948,7 +948,7 @@ public class Kernel : Sys.Kernel
             Serial.WriteString("\n");
 
             Assert.True(addresses.Count > 0, "CNAME chain should yield at least one A record");
-            Assert.True(addresses[0].Id != 0, "Resolved IP should not be 0.0.0.0");
+            Assert.True(addresses[0] != Address4.Zero, "Resolved IP should not be 0.0.0.0");
         }
         else
         {
@@ -981,13 +981,13 @@ public class Kernel : Sys.Kernel
         Serial.WriteString(domain);
         Serial.WriteString("...\n");
 
-        var dnsServer = new Address(1, 1, 1, 1);
+        var dnsServer = new Address4(1, 1, 1, 1);
         var dnsClient = new DnsClient();
         dnsClient.Connect(dnsServer);
 
         dnsClient.SendAsk(domain);
 
-        List<Address>? addresses = dnsClient.ReceiveAll(5000);
+        ImmutableList<Address4>? addresses = dnsClient.ReceiveAll(5000).Cast<Address4>().ToImmutableList(); // only IPv4 supported at this time
 
         if (addresses != null)
         {
@@ -1002,7 +1002,7 @@ public class Kernel : Sys.Kernel
                 Serial.WriteString(addresses[i].ToString());
                 Serial.WriteString("\n");
 
-                ImmutableArray<byte> bytes = addresses[i].Parts;
+                var bytes = addresses[i].Parts;
                 bool isOneOneOneOne = bytes[0] == 1 && bytes[1] == 1 && bytes[2] == 1 && bytes[3] == 1;
                 bool isOneZeroZeroOne = bytes[0] == 1 && bytes[1] == 0 && bytes[2] == 0 && bytes[3] == 1;
                 if (!isOneOneOneOne && !isOneZeroZeroOne)

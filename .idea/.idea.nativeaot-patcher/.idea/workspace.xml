@@ -73,6 +73,7 @@
     <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/IPv4/Address4.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/IPv4/TCP/Tcp.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/IPv6/Address6.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/tests/Kernels/Cosmos.Kernel.Tests.Network/Kernel.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
     <commands />
