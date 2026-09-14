@@ -3,6 +3,7 @@
 using System.Collections.Immutable;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.IPv4;
+using Cosmos.Kernel.System.Network.IPv6;
 using NUnit.Framework;
 
 namespace Cosmos.Kernel.Tests.System.Network;
@@ -94,6 +95,46 @@ public class AddressTest
 
             bool equals = actual == new MaskedAddress(0x12000078u);
             Assert.That(equals, Is.True);
+        }
+    }
+
+    public class Parse : AddressTest
+    {
+        [Test]
+        public void GivenDottedDecimal_ReturnsAddress4()
+        {
+            Address? actual = Address.Parse("192.168.1.10");
+
+            Assert.That(actual, Is.EqualTo(new Address4(192, 168, 1, 10)));
+        }
+
+        [Test]
+        public void GivenColonSeparatedHex_ReturnsAddress6()
+        {
+            Address? actual = Address.Parse("::1");
+
+            Assert.That(actual, Is.EqualTo(Address6.Loopback));
+        }
+
+        [TestCase("")]
+        [TestCase("not an address")]
+        [TestCase("1.2.3")]
+        public void GivenNeitherForm_ReturnsNull(string source)
+        {
+            Assert.That(Address.Parse(source), Is.Null);
+        }
+    }
+
+    public new class ToString : AddressTest
+    {
+        [Test]
+        public void GivenAddress4ThroughTheBaseType_WritesDottedDecimal()
+        {
+            Address address = new Address4(0xC0A8010Au);
+
+            string actual = address.ToString();
+
+            Assert.That(actual, Is.EqualTo("192.168.1.10"));
         }
     }
 }

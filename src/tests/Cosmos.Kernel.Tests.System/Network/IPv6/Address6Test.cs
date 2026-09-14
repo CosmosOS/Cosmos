@@ -131,6 +131,33 @@ public class Address6Test
         }
     }
 
+    public class ToBytes : Address6Test
+    {
+        [Test]
+        public void GivenLoopback_ReturnsSixteenBytesEndingInOne()
+        {
+            byte[] actual = Address6.Loopback.ToBytes().ToArray();
+
+            byte[] expected = new byte[16];
+            expected[15] = 1;
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GivenEveryByteDistinct_WritesEachSegmentMostSignificantFirst()
+        {
+            Address6 address = new(0x00112233u, 0x44556677u, 0x8899AABBu, 0xCCDDEEFFu);
+
+            byte[] actual = address.ToBytes().ToArray();
+
+            Assert.That(actual, Is.EqualTo(new byte[]
+            {
+                0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF,
+            }));
+        }
+    }
+
     public class AddressType : Address6Test
     {
         [TestCase("::ffff:c000:0280", ExpectedResult = IPv6AddressType.EmbeddedIPv4)]

@@ -82,13 +82,14 @@ public abstract class Address : IComparable<Address>
     public abstract bool IsBroadcastAddress { get; }
 
     /// <summary>
-    /// Parses an IP address in its string representation.
+    /// Parses an IP address in its string representation: dotted decimal for IPv4, colon
+    /// separated hexadecimal for IPv6.
     /// </summary>
     /// <param name="addr">The IP address as string.</param>
     /// <returns>The parsed address value or null when parsing fails.</returns>
     public static Address? Parse(ReadOnlySpan<char> addr)
     {
-        return Parse(addr) ?? Address6.Parse(addr);
+        return Address4.Parse(addr, AddressNumericStyle.Dec) ?? (Address?)Address6.Parse(addr);
     }
 
     /// <summary>

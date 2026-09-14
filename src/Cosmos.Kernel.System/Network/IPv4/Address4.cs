@@ -153,11 +153,11 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     }
 
     /// <summary>
-    /// Formats the address as four dotted hexadecimal octets.
+    /// Formats the address in dotted-decimal notation (e.g. <c>192.168.1.1</c>).
     /// </summary>
     public override string ToString()
     {
-        return ToString(AddressNumericStyle.Hex);
+        return ToString(AddressNumericStyle.Dec);
     }
 
     /// <summary>

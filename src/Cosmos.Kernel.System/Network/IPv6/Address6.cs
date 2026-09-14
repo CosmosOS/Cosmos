@@ -196,9 +196,9 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
     {
         Span<byte> data = new byte[16];
         SegmentToSpan(Segment1, data);
-        SegmentToSpan(Segment2, data[4..7]);
-        SegmentToSpan(Segment3, data[8..11]);
-        SegmentToSpan(Segment4, data[12..15]);
+        SegmentToSpan(Segment2, data[4..8]);
+        SegmentToSpan(Segment3, data[8..12]);
+        SegmentToSpan(Segment4, data[12..16]);
         return data;
     }
 
