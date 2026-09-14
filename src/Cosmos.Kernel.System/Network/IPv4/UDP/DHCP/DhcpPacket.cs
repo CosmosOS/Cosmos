@@ -73,7 +73,7 @@ public class DhcpPacket : UdpPacket
     /// <param name="sourceMac">The MAC address of the sending network device.</param>
     /// <param name="dhcpDataSize">The size in bytes of the DHCP options that follow the fixed BOOTP header.</param>
     public DhcpPacket(MACAddress sourceMac, ushort dhcpDataSize)
-        : this(Address.Zero, Address.Broadcast, sourceMac, dhcpDataSize)
+        : this(Address4.Zero, Address4.Broadcast, sourceMac, dhcpDataSize)
     { }
 
     /// <summary>
@@ -155,7 +155,7 @@ public class DhcpPacket : UdpPacket
 
         if (RawData[58] != 0)
         {
-            Client = new Address(RawData, 58);
+            Client = new Address4(RawData, 58);
         }
 
         if (RawData[282] != 0)
@@ -182,15 +182,15 @@ public class DhcpPacket : UdpPacket
             {
                 if (option.Type == 1) //Mask
                 {
-                    Subnet = new Address(option.Data, 0);
+                    Subnet = new Address4(option.Data, 0);
                 }
                 else if (option.Type == 3) //Router
                 {
-                    Gateway = new Address(option.Data, 0);
+                    Gateway = new Address4(option.Data, 0);
                 }
                 else if (option.Type == 6) //DNS
                 {
-                    DNS = new Address(option.Data, 0);
+                    DNS = new Address4(option.Data, 0);
                 }
             }
         }

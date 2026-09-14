@@ -44,7 +44,7 @@ public class IPPacket : EthernetPacket
         ArpCache.Update(ipPacket.SourceIP, ipPacket.SourceMac);
 
         // Check if packet is for us
-        bool isForUs = NetworkStack.AddressMap.ContainsKey(ipPacket.DestinationIP.Id);
+        bool isForUs = NetworkStack.AddressMap.ContainsKey(ipPacket.DestinationIP);
         bool isBroadcast = ipPacket.DestinationIP.Parts[3] == 255;
 
         if (isForUs || isBroadcast)
@@ -101,8 +101,8 @@ public class IPPacket : EthernetPacket
         TTL = RawData[22];
         Protocol = RawData[23];
         IPCRC = (ushort)((RawData[24] << 8) | RawData[25]);
-        SourceIP = new Address(RawData, 26);
-        DestinationIP = new Address(RawData, 30);
+        SourceIP = new Address4(RawData, 26);
+        DestinationIP = new Address4(RawData, 30);
         DataOffset = (ushort)(14 + HeaderLength);
     }
 
@@ -142,7 +142,7 @@ public class IPPacket : EthernetPacket
     /// </summary>
     private static MACAddress GetSourceMAC(Address sourceIP)
     {
-        if (NetworkStack.AddressMap.TryGetValue(sourceIP.Id, out INetworkDevice? device))
+        if (NetworkStack.AddressMap.TryGetValue(sourceIP, out INetworkDevice? device))
         {
             return device.MacAddress;
         }

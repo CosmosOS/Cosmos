@@ -104,7 +104,7 @@ public sealed class DhcpClient : UdpClient
 
             NetworkStack.RemoveAllConfigIP();
 
-            IPConfig.Enable(networkDevice, new Address(0, 0, 0, 0), new Address(0, 0, 0, 0), new Address(0, 0, 0, 0));
+            IPConfig.Enable(networkDevice, new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0));
         }
 
         Close();
@@ -127,7 +127,7 @@ public sealed class DhcpClient : UdpClient
                 continue;
             }
 
-            IPConfig.Enable(networkDevice, new Address(0, 0, 0, 0), new Address(0, 0, 0, 0), new Address(0, 0, 0, 0));
+            IPConfig.Enable(networkDevice, new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0));
 
             DhcpDiscover dhcpDiscover = new(networkDevice.MacAddress);
             OutgoingBuffer.AddPacket(dhcpDiscover);
@@ -191,7 +191,7 @@ public sealed class DhcpClient : UdpClient
                     Serial.WriteString($"   Gateway     : {packet.Gateway?.ToString() ?? "null"}\n");
                     Serial.WriteString($"   DNS server  : {packet.DNS?.ToString() ?? "null"}\n");
 
-                    IPConfig.Enable(networkDevice, packet.Client, packet.Subnet ?? new Address(255, 255, 255, 0), packet.Gateway ?? Address.Zero);
+                    IPConfig.Enable(networkDevice, packet.Client, packet.Subnet ?? new Address4(255, 255, 255, 0), packet.Gateway ?? Address4.Zero);
                     if (packet.DNS is not null)
                     {
                         DnsConfig.Add(packet.DNS);

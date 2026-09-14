@@ -45,7 +45,7 @@ public static class Global
         Serial.WriteString("[Global] Initialize() called\n");
 
         // Initialize graphics console (framebuffer + font)
-        if (Cosmos.Kernel.Core.CosmosFeatures.GraphicsEnabled)
+        if (Core.CosmosFeatures.GraphicsEnabled)
         {
             Serial.WriteString("[Global] Initializing KernelConsole...\n");
             if (KernelConsole.Initialize())

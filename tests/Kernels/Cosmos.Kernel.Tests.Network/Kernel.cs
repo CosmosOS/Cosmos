@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Immutable;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -193,7 +192,7 @@ public class Kernel : Sys.Kernel
         Assert.True(device.OnPacketReceived != null, "Device should have packet handler registered after DHCP");
 
         // Verify we got a valid IP (not 0.0.0.0)
-        Assert.True(s_localIP.Id != 0, "DHCP should assign a non-zero IP address");
+        Assert.True(s_localIP != Address4.Zero, "DHCP should assign a non-zero IP address");
     }
 
     // ==================== ICMP Tests ====================
@@ -213,7 +212,7 @@ public class Kernel : Sys.Kernel
 
         // QEMU user networking: slirp answers ICMP echo requests to the
         // gateway address itself, so no host-side helper is needed.
-        Address target = new(10, 0, 2, 2);
+        Address4 target = new(10, 0, 2, 2);
 
         Log.WriteString("[Test] Pinging ");
         Log.WriteString(target.ToString());
@@ -223,7 +222,7 @@ public class Kernel : Sys.Kernel
         icmpClient.Connect(target);
         icmpClient.SendEcho();
 
-        CosmosEndPoint endpoint = new CosmosEndPoint(Address.Zero, 0);
+        CosmosEndPoint endpoint = new CosmosEndPoint(Address4.Zero, 0);
         int time = icmpClient.Receive(ref endpoint, 5000);
 
         if (time >= 0)
@@ -519,7 +518,7 @@ public class Kernel : Sys.Kernel
             TestDHCPConfiguration();
         }
 
-        Address target = new(10, 0, 2, 2);
+        Address4 target = new(10, 0, 2, 2);
         const ushort echoId = 0x4242;
         const ushort echoSequence = 9;
 
@@ -576,7 +575,7 @@ public class Kernel : Sys.Kernel
             TestDHCPConfiguration();
         }
 
-        Address gateway = new(10, 0, 2, 2);
+        Address4 gateway = new(10, 0, 2, 2);
         const ushort seamPort = 5559;
 
         // Bind a Cosmos UdpClient so the echo comes back as a packet object.
@@ -640,8 +639,8 @@ public class Kernel : Sys.Kernel
 
         // A source address no interface carries: Send must report the drop
         // instead of pretending the packet went out.
-        Address unconfigured = new(192, 168, 250, 250);
-        IcmpEchoRequest request = new(unconfigured, new Address(10, 0, 2, 2), 1, 1);
+        Address4 unconfigured = new(192, 168, 250, 250);
+        IcmpEchoRequest request = new(unconfigured, new Address4(10, 0, 2, 2), 1, 1);
         Assert.True(!NetworkStack.Send(request), "Send should return false for a source address no interface carries");
     }
 
@@ -953,7 +952,7 @@ public class Kernel : Sys.Kernel
         Assert.True(dnsClient != null, "DNS client should be created");
 
         // Configure DNS server (Cloudflare's public DNS)
-        Address dnsServer = new(1, 1, 1, 1);
+        Address4 dnsServer = new(1, 1, 1, 1);
         DnsConfig.Add(dnsServer);
 
         Assert.True(DnsConfig.Nameservers.Count > 0, "DNS nameservers should be configured");
@@ -997,7 +996,7 @@ public class Kernel : Sys.Kernel
         Log.WriteString("[Test] Resolving valentin.bzh via DNS...\n");
 
         // Configure DNS server (Cloudflare's public DNS)
-        Address dnsServer = new(1, 1, 1, 1);
+        Address4 dnsServer = new(1, 1, 1, 1);
         DnsConfig.Add(dnsServer);
 
         // Create DNS client and connect to DNS server
@@ -1027,7 +1026,7 @@ public class Kernel : Sys.Kernel
             Log.WriteString("\n");
 
             // Verify we got a valid IP (not 0.0.0.0)
-            Assert.True(resolvedIP.Id != 0, "Resolved IP should not be 0.0.0.0");
+            Assert.True(resolvedIP != Address4.Zero, "Resolved IP should not be 0.0.0.0");
             Assert.True(true, "DNS resolution for valentin.bzh succeeded");
         }
         else
@@ -1061,7 +1060,7 @@ public class Kernel : Sys.Kernel
         Log.WriteString(domain);
         Log.WriteString("...\n");
 
-        Address dnsServer = new(1, 1, 1, 1);
+        Address4 dnsServer = new(1, 1, 1, 1);
         DnsClient dnsClient = new();
         dnsClient.Connect(dnsServer);
 
@@ -1078,7 +1077,7 @@ public class Kernel : Sys.Kernel
             Log.WriteString("\n");
 
             Assert.True(addresses.Count > 0, "CNAME chain should yield at least one A record");
-            Assert.True(addresses[0].Id != 0, "Resolved IP should not be 0.0.0.0");
+            Assert.True(addresses[0] != Address4.Zero, "Resolved IP should not be 0.0.0.0");
         }
         else
         {
@@ -1109,7 +1108,7 @@ public class Kernel : Sys.Kernel
             TestDHCPConfiguration();
         }
 
-        Address dnsServer = new(1, 1, 1, 1);
+        Address4 dnsServer = new(1, 1, 1, 1);
         DnsConfig.Add(dnsServer);
 
         DnsClient dnsClient = new();
@@ -1134,7 +1133,7 @@ public class Kernel : Sys.Kernel
         Address? second = dnsClient.Receive(5000);
 
         Assert.True(second is not null, "a second query on the same DnsClient must resolve");
-        Assert.True(second is null || second.Id != 0, "the second answer should not be 0.0.0.0");
+        Assert.True(second is null || !second.IsZero, "the second answer should not be 0.0.0.0");
 
         dnsClient.Close();
     }
@@ -1159,7 +1158,7 @@ public class Kernel : Sys.Kernel
         Log.WriteString(domain);
         Log.WriteString("...\n");
 
-        Address dnsServer = new(1, 1, 1, 1);
+        Address4 dnsServer = new(1, 1, 1, 1);
         DnsClient dnsClient = new();
         dnsClient.Connect(dnsServer);
 
@@ -1180,7 +1179,7 @@ public class Kernel : Sys.Kernel
                 Log.WriteString(addresses[i].ToString());
                 Log.WriteString("\n");
 
-                ImmutableArray<byte> bytes = addresses[i].Parts;
+                MaskedAddress bytes = addresses[i].Parts;
                 bool isOneOneOneOne = bytes[0] == 1 && bytes[1] == 1 && bytes[2] == 1 && bytes[3] == 1;
                 bool isOneZeroZeroOne = bytes[0] == 1 && bytes[1] == 0 && bytes[2] == 0 && bytes[3] == 1;
                 if (!isOneOneOneOne && !isOneZeroZeroOne)

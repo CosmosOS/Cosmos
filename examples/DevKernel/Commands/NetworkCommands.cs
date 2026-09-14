@@ -207,7 +207,7 @@ internal static class NetworkCommands
 
         using (UdpClient client = new(TestUdpPort))
         {
-            EndPoint source = new(Address.Zero, 0);
+            EndPoint source = new(Address4.Zero, 0);
 
             while (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.Escape)
             {
@@ -319,7 +319,7 @@ internal static class NetworkCommands
 
         Terminal.Info("Resolving " + domain + "...");
 
-        Address dnsServer = new(CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet);
+        Address4 dnsServer = new(CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet);
         DnsConfig.Add(dnsServer);
 
         DnsClient dnsClient = new();
@@ -328,7 +328,8 @@ internal static class NetworkCommands
 
         Address? resolvedIP = dnsClient.Receive(DnsReceiveTimeoutMs);
 
-        if (resolvedIP != null && resolvedIP.Id != 0)
+        // TODO support IPv6
+        if (resolvedIP != null && resolvedIP != Address4.Zero)
         {
             Terminal.Success(domain + " -> " + resolvedIP.ToString());
         }

@@ -59,7 +59,7 @@ public class ArpPacket : EthernetPacket
 
                 ArpCache.Update(arpRequest.SenderIP, arpRequest.SenderMac!);
 
-                if (NetworkStack.AddressMap.TryGetValue(arpRequest.TargetIP!.Id, out INetworkDevice? nic))
+                if (NetworkStack.AddressMap.TryGetValue(arpRequest.TargetIP!, out INetworkDevice? nic))
                 {
                     Serial.WriteString("[ARP] Request received from ");
                     Serial.WriteString(arpRequest.SenderIP.ToString());

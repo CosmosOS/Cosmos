@@ -49,7 +49,7 @@ public static class NetworkManager
     /// <summary>
     /// The adapter the ring uses when no other is named: the target of
     /// <see cref="Send"/>, of the primary shortcuts on this class, and of
-    /// <see cref="Config.IPConfig.Enable(IPv4.Address, IPv4.Address, IPv4.Address)"/>.
+    /// <see cref="Config.IPConfig.Enable(Address, Address, Address)"/>.
     /// It starts as the first device HAL enumeration registered.
     /// </summary>
     /// <exception cref="InvalidOperationException">Network support is disabled.</exception>

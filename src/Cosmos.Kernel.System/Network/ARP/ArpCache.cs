@@ -12,7 +12,7 @@ internal static class ArpCache
     /// <summary>
     /// The cache map.
     /// </summary>
-    public static Dictionary<uint, MACAddress>? Cache;
+    public static Dictionary<Address, MACAddress>? Cache;
 
     /// <summary>
     /// Ensures the cache map exists.
@@ -34,13 +34,12 @@ internal static class ArpCache
     internal static void Update(Address ipAddress, MACAddress macAddress)
     {
         EnsureCacheExists();
-        uint ipHash = ipAddress.Id;
-        if (ipHash == 0)
+        if (Equals(ipAddress, Address4.Zero))
         {
             return;
         }
 
-        Cache[ipHash] = macAddress;
+        Cache[ipAddress] = macAddress;
     }
 
     /// <summary>
@@ -52,6 +51,6 @@ internal static class ArpCache
     {
         EnsureCacheExists();
 
-        return Cache.TryGetValue(ipAddress.Id, out MACAddress? resolve) ? resolve : null;
+        return Cache.TryGetValue(ipAddress, out MACAddress? resolve) ? resolve : null;
     }
 }

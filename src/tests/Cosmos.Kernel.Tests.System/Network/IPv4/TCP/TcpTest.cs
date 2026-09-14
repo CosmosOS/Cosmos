@@ -13,7 +13,7 @@ public class TcpTest
     [SetUp]
     public void Setup()
     {
-        _target = Tcp.CreateConnection(0, 0, new Address(1, 2, 3, 4), new Address(1, 2, 3, 4));
+        _target = Tcp.CreateConnection(0, 0, new Address4(1, 2, 3, 4), new Address4(1, 2, 3, 4));
     }
 
     [TestFixture]

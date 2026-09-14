@@ -95,12 +95,12 @@ public class IPConfig
         {
             IPConfig ipConfig = entry.Config;
 
-            if ((ipConfig.Address.Id & ipConfig.SubnetMask.Id) ==
-                (destination.Id & ipConfig.SubnetMask.Id))
+            if ((ipConfig.Address & ipConfig.SubnetMask) ==
+                (destination & ipConfig.SubnetMask))
             {
                 return ipConfig.Address;
             }
-            if (defaultGw is null && ipConfig.DefaultGateway.CompareTo(Address.Zero) != 0)
+            if (defaultGw is null && !ipConfig.DefaultGateway.IsZero)
             {
                 defaultGw = ipConfig.Address;
             }
@@ -181,8 +181,8 @@ public class IPConfig
         {
             IPConfig ipConfig = s_configs[c].Config;
 
-            if ((ipConfig.Address.Id & ipConfig.SubnetMask.Id) ==
-                (destIP.Id & ipConfig.SubnetMask.Id))
+            if ((ipConfig.Address & ipConfig.SubnetMask) ==
+                (destIP & ipConfig.SubnetMask))
             {
                 return true;
             }
@@ -197,7 +197,7 @@ public class IPConfig
     /// <param name="sourceIP">Source IP.</param>
     internal static INetworkDevice? FindInterface(Address sourceIP)
     {
-        return NetworkStack.AddressMap.TryGetValue(sourceIP.Id, out INetworkDevice? device) ? device : null;
+        return NetworkStack.AddressMap.TryGetValue(sourceIP, out INetworkDevice? device) ? device : null;
     }
 
     /// <summary>

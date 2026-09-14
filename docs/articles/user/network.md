@@ -120,9 +120,9 @@ else
 
 ```csharp
 if (!IPConfig.Enable(
-        new Address(192, 168, 1, 69),     // local address
-        new Address(255, 255, 255, 0),    // subnet mask
-        new Address(192, 168, 1, 254)))   // gateway
+        new Address4(192, 168, 1, 69),     // local address
+        new Address4(255, 255, 255, 0),    // subnet mask
+        new Address4(192, 168, 1, 254)))   // gateway
 {
     Console.WriteLine("No adapter to configure");
 }
@@ -135,9 +135,9 @@ NetworkAdapter second = NetworkManager.GetAdapter(1);
 
 if (second.IsValid
     && IPConfig.Enable(second,
-        new Address(192, 168, 2, 69),
-        new Address(255, 255, 255, 0),
-        new Address(192, 168, 2, 254)))
+        new Address4(192, 168, 2, 69),
+        new Address4(255, 255, 255, 0),
+        new Address4(192, 168, 2, 254)))
 {
     Console.WriteLine("Configured the second adapter");
 }
@@ -257,10 +257,10 @@ To reach a listener inside QEMU user networking from your host, forward a host p
 DNS uses the Cosmos `DnsClient` (the .NET `Dns` class is not plugged yet). Register a nameserver, query one domain, and read the answer back:
 
 ```csharp
-DnsConfig.Add(new Address(1, 1, 1, 1));   // Cloudflare public DNS
+DnsConfig.Add(new Address4(1, 1, 1, 1));   // Cloudflare public DNS
 
 var dnsClient = new DnsClient();
-dnsClient.Connect(new Address(1, 1, 1, 1));
+dnsClient.Connect(new Address4(1, 1, 1, 1));
 
 /* Query a single domain name */
 dnsClient.SendQuery("github.com");
