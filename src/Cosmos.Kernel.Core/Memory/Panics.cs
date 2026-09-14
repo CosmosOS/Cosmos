@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.Core.Memory;
 /// <summary>
 /// panics used be the Memory sub system
 /// </summary>
-public static class Panics
+internal static class Panics
 {
     /// <summary>
     /// this page is not managed by a heap backend

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Vfs;
 
 namespace Cosmos.Kernel.System.Filesystems.Fat;
@@ -33,7 +34,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         _superblock = superblock;
     }
 
-    public bool Lookup(IVfsInode dir, ReadOnlySpan<char> name, out IVfsInode? child)
+    public bool Lookup(IVfsInode dir, ReadOnlySpan<char> name, [NotNullWhen(true)] out IVfsInode? child)
     {
         child = null;
         if (dir is not FatInode parent || !parent.IsDirectory)
@@ -108,7 +109,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         return true;
     }
 
-    public bool Create(IVfsInode dir, ReadOnlySpan<char> name, ModeEnum mode, out IVfsInode? inode)
+    public bool Create(IVfsInode dir, ReadOnlySpan<char> name, VfsMode mode, [NotNullWhen(true)] out IVfsInode? inode)
     {
         inode = null;
         if (dir is not FatInode parent || !parent.IsDirectory)
@@ -133,7 +134,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         return true;
     }
 
-    public bool Mkdir(IVfsInode dir, ReadOnlySpan<char> name, ModeEnum mode, out IVfsInode? inode)
+    public bool Mkdir(IVfsInode dir, ReadOnlySpan<char> name, VfsMode mode, [NotNullWhen(true)] out IVfsInode? inode)
     {
         inode = null;
         if (dir is not FatInode parent || !parent.IsDirectory)
@@ -155,7 +156,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         Span<byte> clusterBuffer = new byte[_superblock.Boot.BytesPerCluster];
         // fatgen103: '..' stores 0 when the parent is the root directory
         // (the FAT32 root has a real cluster number, but '..' must not).
-        uint dotDotCluster = parent.Parent == null ? RootDotDotCluster : parent.FirstCluster;
+        uint dotDotCluster = parent.Parent is null ? RootDotDotCluster : parent.FirstCluster;
         WriteDotEntries(clusterBuffer, cluster, dotDotCluster);
         _superblock.WriteCluster(cluster, clusterBuffer);
 
@@ -170,7 +171,7 @@ internal sealed class FatInodeOperations : IInodeOperations
         return true;
     }
 
-    public bool Symlink(IVfsInode dir, ReadOnlySpan<char> name, ReadOnlySpan<char> target, out IVfsInode? inode)
+    public bool Symlink(IVfsInode dir, ReadOnlySpan<char> name, ReadOnlySpan<char> target, [NotNullWhen(true)] out IVfsInode? inode)
     {
         inode = null;
         return false;
@@ -183,7 +184,7 @@ internal sealed class FatInodeOperations : IInodeOperations
             return false;
         }
 
-        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match) || match == null)
+        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match))
         {
             return false;
         }
@@ -213,7 +214,7 @@ internal sealed class FatInodeOperations : IInodeOperations
             return false;
         }
 
-        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match) || match == null)
+        if (!_superblock.FindChildEntry(parent, name, out FatDirEntry? match))
         {
             return false;
         }
@@ -246,7 +247,7 @@ internal sealed class FatInodeOperations : IInodeOperations
             return false;
         }
 
-        if (!_superblock.FindChildEntry(op, oldName, out FatDirEntry? match) || match == null)
+        if (!_superblock.FindChildEntry(op, oldName, out FatDirEntry? match))
         {
             return false;
         }
@@ -288,7 +289,7 @@ internal sealed class FatInodeOperations : IInodeOperations
     /// <summary>Rewrites the '..' entry (slot 1) of the directory rooted at <paramref name="dirCluster"/>.</summary>
     private void RewriteDotDot(uint dirCluster, FatInode newParent)
     {
-        uint parentCluster = newParent.Parent == null ? RootDotDotCluster : newParent.FirstCluster;
+        uint parentCluster = newParent.Parent is null ? RootDotDotCluster : newParent.FirstCluster;
         Span<byte> clusterBuffer = new byte[_superblock.Boot.BytesPerCluster];
         _superblock.ReadCluster(dirCluster, clusterBuffer);
         int offset = DotDotEntryOffset;

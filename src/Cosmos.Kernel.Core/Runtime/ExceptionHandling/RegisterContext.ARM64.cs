@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.Runtime;
 /// PAL_LIMITED_CONTEXT structure matching ARM64 assembly offsets.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 0x70)]
-public unsafe struct PAL_LIMITED_CONTEXT
+internal unsafe struct PAL_LIMITED_CONTEXT
 {
     [FieldOffset(0x00)] public nuint SP;    // Stack pointer
     [FieldOffset(0x08)] public nuint IP;    // Instruction pointer (PC/LR)
@@ -29,7 +29,7 @@ public unsafe struct PAL_LIMITED_CONTEXT
 /// Uses direct values instead of pointers to avoid stack corruption.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 0x68)]
-public unsafe struct REGDISPLAY
+internal unsafe struct REGDISPLAY
 {
     // Stack pointer for resume
     [FieldOffset(0x00)] public nuint SP;

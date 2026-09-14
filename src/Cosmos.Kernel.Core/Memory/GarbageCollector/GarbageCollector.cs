@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// Mark-and-sweep garbage collector with free list allocation.
 /// Manages GC heap segments, pinned heap, frozen segments, and GC handles.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     // --- Nested types ---
 
@@ -147,9 +147,9 @@ public static unsafe partial class GarbageCollector
     internal static GCHandleManager s_gCHandleManager = new();
 
     /// <summary>
-    /// Default segment size. Grows as needed.
+    /// Size requested from the segment manager for every new segment.
     /// </summary>
-    private static uint s_maxSegmentSize = (uint)PageAllocator.PageSize;
+    private const uint MaxSegmentSize = (uint)PageAllocator.PageSize;
 
     /// <summary>
     /// Lowest address across all GC segments (for fast heap range pre-check).
@@ -223,6 +223,14 @@ public static unsafe partial class GarbageCollector
     private static ulong s_lastGen0FragmentationAfter;
 
     /// <summary>
+    /// Heap-wide metrics as they stood at the end of the last collection.
+    /// This is what <see cref="GCMemoryInfo"/> reports.
+    /// Stays zeroed until the first collection runs.
+    /// Matches what the runtime reports before its first GC.
+    /// </summary>
+    private static SimpleMemoryInfo s_lastGCMemoryInfo;
+
+    /// <summary>
     /// Cumulative total of all bytes ever allocated through the GC.
     /// Increments on every allocation, never decrements.
     /// Used by <c>RhGetTotalAllocatedBytes</c> / <c>GC.GetTotalAllocatedBytes()</c>.
@@ -291,7 +299,7 @@ public static unsafe partial class GarbageCollector
         s_freeMethodTable = MethodTable.Of<FreeMarker>();
 
         // Allocate initial segment
-        s_currentSegment = s_segmentManager.AllocateSegment(s_maxSegmentSize);
+        s_currentSegment = s_segmentManager.AllocateSegment(MaxSegmentSize);
         s_lastSegment = s_currentSegment;
         s_heapRangeDirty = true;
         RecomputeHeapRange();
@@ -376,6 +384,10 @@ public static unsafe partial class GarbageCollector
 
             s_totalCollections++;
             s_totalObjectsFreed += freedCount;
+
+            // Freeze the heap-wide metrics reported by GCMemoryInfo. Recorded after the
+            // counters above so the snapshot carries the index of this very collection.
+            RecordLastGCMemoryInfo();
 
             Serial.WriteString("[GC] Freed ");
             Serial.WriteNumber((uint)freedCount);

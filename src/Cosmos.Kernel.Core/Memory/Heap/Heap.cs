@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.Memory.Heap;
 /// <summary>
 /// a basic Heap that uses PageAllocator
 /// </summary>
-public static unsafe class Heap
+internal static unsafe class Heap
 {
     /// <summary>
     /// Re-allocates or "re-sizes" data asigned to a pointer.

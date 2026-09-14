@@ -56,16 +56,16 @@ internal sealed class FatInode : IVfsInode
     public bool IsDirectory => (Attributes & FatAttr.Directory) != 0;
 
     public bool IsFixedRoot =>
-        Parent == null && Superblock.Boot.Type != FatType.Fat32 && Superblock.Boot.RootSectorCount > 0;
+        Parent is null && Superblock.Boot.Type != FatType.Fat32 && Superblock.Boot.RootSectorCount > 0;
 
     public List<uint> ResolveChain()
     {
-        if (CachedChain != null)
+        if (CachedChain is not null)
         {
             return CachedChain;
         }
 
-        List<uint> chain = FirstCluster >= FatTable.FirstDataCluster ? Superblock.Fat.GetChain(FirstCluster) : new List<uint>();
+        List<uint> chain = FirstCluster >= FatTable.FirstDataCluster ? Superblock.Fat.GetChain(FirstCluster) : [];
         CachedChain = chain;
         return chain;
     }

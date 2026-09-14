@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.HAL.Pci.Enums;
 
-public enum ClassId
+internal enum ClassId
 {
     PciDevice20 = 0x00,
     MassStorageController = 0x01,

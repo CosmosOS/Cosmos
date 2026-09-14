@@ -16,7 +16,7 @@ using Cosmos.Kernel.Core.Runtime;
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 
 /// <summary>Decodes one method's GCInfo blob. Construct, then query / <see cref="EnumerateLiveSlots"/>.</summary>
-public unsafe struct GcInfoDecoder
+internal unsafe struct GcInfoDecoder
 {
     private const uint NO_STACK_BASE_REGISTER = 0xFFFFFFFF;
 
@@ -26,15 +26,15 @@ public unsafe struct GcInfoDecoder
     public const int MaxSlots = 256;
 
     private GcInfoBitStreamReader _reader;
-    private uint _instructionOffset;
-    private uint _version;
+    private readonly uint _instructionOffset;
+    private readonly uint _version;
 
     private GcInfoHeaderFlags _headerFlags;
     private uint _codeLength;
     private uint _stackBaseRegister;
-    private uint _numSafePoints;
-    private uint _safePointIndex;
-    private uint _numInterruptibleRanges;
+    private readonly uint _numSafePoints;
+    private readonly uint _safePointIndex;
+    private readonly uint _numInterruptibleRanges;
     private uint _sizeOfStackOutgoingAndScratchArea;
 
     public GcInfoDecoder(byte* gcInfo, uint version, GcInfoDecoderFlags flags, uint instructionOffset)

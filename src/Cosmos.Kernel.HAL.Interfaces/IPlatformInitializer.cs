@@ -12,12 +12,32 @@ namespace Cosmos.Kernel.HAL.Interfaces;
 /// Interface for platform-specific HAL initialization.
 /// Implemented by HAL.X64 and HAL.ARM64.
 /// </summary>
-public interface IPlatformInitializer
+internal interface IPlatformInitializer
 {
+    /// <summary>
+    /// Human-readable platform name (e.g. "x86-64", "ARM64").
+    /// </summary>
     string PlatformName { get; }
+
+    /// <summary>
+    /// Architecture this initializer targets.
+    /// </summary>
     PlatformArchitecture Architecture { get; }
+
+    /// <summary>
+    /// Creates the platform-specific port I/O implementation.
+    /// </summary>
     IPortIO CreatePortIO();
+
+    /// <summary>
+    /// Creates the platform-specific CPU operations (halt, interrupt
+    /// enable/disable, etc.).
+    /// </summary>
     ICpuOps CreateCpuOps();
+
+    /// <summary>
+    /// Creates the platform-specific power operations (shutdown, reboot).
+    /// </summary>
     IPowerOps CreatePowerOps();
 
     /// <summary>
@@ -54,7 +74,7 @@ public interface IPlatformInitializer
 
     /// <summary>
     /// Busy-waits for at least <paramref name="microseconds"/> µs without
-    /// depending on interrupts or the scheduler — usable from phase-3
+    /// depending on interrupts or the scheduler, so it is usable from phase-3
     /// device init. x64 paces on legacy port-0x80 reads (~1 µs each);
     /// ARM64 polls the generic timer (CNTVCT/CNTFRQ).
     /// </summary>

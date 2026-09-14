@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.ARM64.Bridge;
 /// ARM64 exception vector setup import (writes VBAR_EL1 to install the
 /// exception vector table defined in Cosmos.Kernel.Native.ARM64).
 /// </summary>
-public static partial class Arm64ExceptionVectorNative
+internal static partial class Arm64ExceptionVectorNative
 {
     [LibraryImport("*", EntryPoint = "_native_arm64_init_exception_vectors")]
     [SuppressGCTransition]

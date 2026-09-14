@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// MADT lives in Cosmos.Kernel.Core.X64/Bridge/Import/AcpiMadtNative.cs;
 /// GIC info lives in Cosmos.Kernel.Core.ARM64/Bridge/Import/Gic/AcpiGicNative.cs.
 /// </summary>
-public static unsafe partial class AcpiMcfgNative
+internal static unsafe partial class AcpiMcfgNative
 {
     [LibraryImport("*", EntryPoint = "acpi_get_mcfg_info")]
     [SuppressGCTransition]

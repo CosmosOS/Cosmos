@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.System.Filesystems.Fat;
 /// on-disk metadata are untrusted: accessors treat anything outside the
 /// volume's data clusters as end-of-chain and never let it drive I/O.
 /// </summary>
-public sealed class FatTable
+internal sealed class FatTable
 {
     /// <summary>Entry value marking a free cluster.</summary>
     public const uint FreeCluster = 0x00000000;
@@ -223,7 +223,7 @@ public sealed class FatTable
     /// </summary>
     public List<uint> GetChain(uint firstCluster)
     {
-        List<uint> chain = new();
+        List<uint> chain = [];
         uint current = firstCluster;
         uint guard = _boot.ClusterCount + FirstDataCluster;
 
@@ -491,7 +491,7 @@ public sealed class FatTable
 
         Span<byte> buffer = LoadFatSector(sectorNumber);
 
-        Span<byte> next = Span<byte>.Empty;
+        Span<byte> next = [];
         if (spans)
         {
             next = _fatSpill;

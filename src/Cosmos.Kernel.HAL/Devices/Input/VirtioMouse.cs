@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.HAL.Devices.Input;
 /// Virtio-input mouse driver. Transport-agnostic: works over virtio MMIO
 /// (QEMU virt) and virtio PCI (q35 virtio-mouse-pci) alike.
 /// </summary>
-public unsafe class VirtioMouse : MouseDevice
+internal unsafe class VirtioMouse : MouseDevice
 {
     // Linux mouse button codes
     private const ushort BTN_LEFT = 0x110;
@@ -80,7 +80,7 @@ public unsafe class VirtioMouse : MouseDevice
         }
 
         _eventQueue = _transport.CreateQueue(VirtioInput.EVENTQ, QueueSize);
-        if (_eventQueue == null)
+        if (_eventQueue is null)
         {
             Serial.Write("[VirtioMouse] ERROR: Failed to setup event queue\n");
             _transport.Fail();
@@ -105,7 +105,7 @@ public unsafe class VirtioMouse : MouseDevice
 
     private void AddEventBuffer(int bufferIndex)
     {
-        if (_eventQueue == null)
+        if (_eventQueue is null)
         {
             return;
         }
@@ -134,7 +134,7 @@ public unsafe class VirtioMouse : MouseDevice
 
     private void ProcessEvents()
     {
-        if (_eventQueue == null)
+        if (_eventQueue is null)
         {
             return;
         }
@@ -215,7 +215,7 @@ public unsafe class VirtioMouse : MouseDevice
 
     public override void Poll()
     {
-        if (!_initialized || _eventQueue == null)
+        if (!_initialized || _eventQueue is null)
         {
             return;
         }

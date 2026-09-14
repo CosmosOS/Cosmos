@@ -22,7 +22,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// can describe (asm entry stubs, native imports, IRQ entry — no CFI at all) or a frame's slot table
 /// is too large to decode.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     private const int MaxPreciseFrames = 256;
 
@@ -136,7 +136,7 @@ public static unsafe partial class GarbageCollector
         // UnixNativeCodeManager::EnumGcRefs; this is the scan path that targets issue #227.
         CodeManagerFlags flags = (mi.IsFunclet && mi.IsFilter) ? CodeManagerFlags.NoReportUntracked : CodeManagerFlags.None;
 
-        GcInfoDecoder decoder = new GcInfoDecoder(mi.GcInfo, GcInfoEncoding.GCINFO_VERSION, GcInfoDecoderFlags.DECODE_GC_LIFETIMES, mi.CodeOffset);
+        GcInfoDecoder decoder = new(mi.GcInfo, GcInfoEncoding.GCINFO_VERSION, GcInfoDecoderFlags.DECODE_GC_LIFETIMES, mi.CodeOffset);
         bool fit = decoder.EnumerateLiveSlots(rd, reportScratchSlots: false, flags, &PreciseRootTrampoline, null);
         if (!fit)
         {

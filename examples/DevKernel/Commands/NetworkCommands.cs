@@ -1,6 +1,5 @@
 using System;
-using Cosmos.Kernel.HAL.Devices.Network;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
@@ -23,7 +22,7 @@ internal static class NetworkCommands
     /// <summary>UDP port used for the netsend/netlisten test traffic.</summary>
     private const ushort TestUdpPort = 5555;
 
-    /// <summary>Sentinel returned by <see cref="DHCPClient.SendDiscoverPacket"/> when no server answered before the timeout.</summary>
+    /// <summary>Sentinel returned by <see cref="DhcpClient.SendDiscoverPacket"/> when no server answered before the timeout.</summary>
     private const int DhcpTimeoutResult = -1;
 
     /// <summary>Octet value of the Cloudflare public DNS resolver 1.1.1.1.</summary>
@@ -34,6 +33,9 @@ internal static class NetworkCommands
 
     /// <summary>Payload sent by the netsend test packet.</summary>
     private const string TestPacketMessage = "Hello from CosmosOS!";
+
+    /// <summary>Maximum UDP payload bytes echoed to the console per datagram.</summary>
+    private const int UdpPreviewMaxBytes = 64;
 
     public static void Register(CommandShell shell)
     {
@@ -85,27 +87,30 @@ internal static class NetworkCommands
             });
     }
 
-    /// <summary>Returns the primary NIC, reporting its absence when there is none.</summary>
-    private static INetworkDevice? RequireDevice()
+    /// <summary>Reports the absence of a primary NIC, and whether one is present.</summary>
+    private static bool RequireDevice()
     {
-        INetworkDevice? device = NetworkManager.PrimaryDevice;
-        if (device == null)
+        if (NetworkManager.DeviceCount == 0)
         {
             Terminal.Error("No network device found");
+            return false;
         }
 
-        return device;
+        return true;
     }
 
     private static void ConfigureNetwork(NetworkSession session)
     {
-        INetworkDevice? device = RequireDevice();
-        if (device == null)
+        if (!RequireDevice())
         {
             return;
         }
 
-        session.ConfigureStatic(device);
+        if (!session.ConfigureStatic())
+        {
+            Terminal.Error("No adapter took the configuration");
+            return;
+        }
 
         Terminal.Success("Network configured!\n");
         Terminal.InfoLine("IP", session.LocalIp!.ToString());
@@ -114,22 +119,32 @@ internal static class NetworkCommands
 
     private static void ShowNetworkInfo(NetworkSession session)
     {
-        INetworkDevice? device = RequireDevice();
-        if (device == null)
+        if (!RequireDevice())
         {
             return;
         }
 
         Terminal.Header("Network Information:");
 
-        Terminal.InfoLine("Device", device.Name);
-        Terminal.InfoLine("MAC", device.MacAddress.ToString());
-        Terminal.StatusLine("Link", device.LinkUp ? "UP" : "DOWN", device.LinkUp ? ConsoleColor.Green : ConsoleColor.Red);
-        Terminal.StatusLine("Ready", device.Ready ? "YES" : "NO", device.Ready ? ConsoleColor.Green : ConsoleColor.Red);
+        Terminal.InfoLine("Device", NetworkManager.Name!);
+        Terminal.InfoLine("MAC", NetworkManager.MacAddress!.ToString());
+        Terminal.StatusLine("Link", NetworkManager.LinkUp ? "UP" : "DOWN", NetworkManager.LinkUp ? ConsoleColor.Green : ConsoleColor.Red);
+        Terminal.StatusLine("Ready", NetworkManager.Ready ? "YES" : "NO", NetworkManager.Ready ? ConsoleColor.Green : ConsoleColor.Red);
         Terminal.StatusLine(
             "Configured",
             session.IsConfigured ? "YES" : "NO",
             session.IsConfigured ? ConsoleColor.Green : ConsoleColor.Red);
+
+        if (NetworkManager.DeviceCount > 1)
+        {
+            Terminal.Header("Adapters:");
+            for (int i = 0; i < NetworkManager.DeviceCount; i++)
+            {
+                NetworkAdapter adapter = NetworkManager.GetAdapter(i);
+                string marker = adapter == NetworkManager.Primary ? " (primary)" : string.Empty;
+                Terminal.InfoLine($"[{i}] {adapter.Name}", $"{adapter.MacAddress}{marker}");
+            }
+        }
 
         if (session.IsConfigured && session.LocalIp != null)
         {
@@ -139,13 +154,12 @@ internal static class NetworkCommands
 
     private static void SendTestPacket(NetworkSession session)
     {
-        INetworkDevice? device = RequireDevice();
-        if (device == null)
+        if (!RequireDevice())
         {
             return;
         }
 
-        if (!device.Ready)
+        if (!NetworkManager.Ready)
         {
             Terminal.Error("Network device not ready");
             return;
@@ -162,32 +176,23 @@ internal static class NetworkCommands
             payload[i] = (byte)TestPacketMessage[i];
         }
 
-        // Broadcast MAC stands in for the ARP resolution the stack does not do yet.
-        UDPPacket packet = new(
-            session.LocalIp!,
-            session.GatewayIp!,
-            TestUdpPort,
-            TestUdpPort,
-            payload,
-            MACAddress.Broadcast);
-
         Terminal.Info("Sending UDP packet to " + session.GatewayIp!.ToString() + ":" + TestUdpPort + "...");
-        bool sent = device.Send(packet.RawData, packet.RawData.Length);
 
-        if (sent)
+        using (UdpClient client = new(TestUdpPort))
         {
-            Terminal.Success("Packet sent!\n");
+            client.Connect(session.GatewayIp!, TestUdpPort);
+            client.Send(payload);
         }
-        else
-        {
-            Terminal.Error("Failed to send packet\n");
-        }
+
+        // UdpClient.Send is void: the datagram is handed to the outgoing
+        // queue, which resolves ARP and hits the NIC without reporting back.
+        // Say what we know rather than claiming delivery.
+        Terminal.Success("Packet queued for transmission\n");
     }
 
     private static void StartListening(NetworkSession session)
     {
-        INetworkDevice? device = RequireDevice();
-        if (device == null)
+        if (!RequireDevice())
         {
             return;
         }
@@ -197,19 +202,78 @@ internal static class NetworkCommands
             ConfigureNetwork(session);
         }
 
-        Terminal.Info("Listening for UDP packets on port " + TestUdpPort + "...");
+        Terminal.Info("Listening for UDP packets on port " + TestUdpPort + "... (Esc to stop)");
         Terminal.Hint("Send from host: echo 'test' | nc -u localhost " + TestUdpPort);
+
+        using (UdpClient client = new(TestUdpPort))
+        {
+            EndPoint source = new(Address4.Zero, 0);
+
+            while (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.Escape)
+            {
+                byte[]? data = client.Receive(ref source, timeoutMs: 0);
+                if (data is not null)
+                {
+                    PrintDatagram(source, data);
+                }
+            }
+        }
+    }
+
+    /// <summary>Logs the full payload to serial, and a printable preview to the console.</summary>
+    private static void PrintDatagram(EndPoint source, byte[] data)
+    {
+        Log.Write("[UDP] Received datagram from ");
+        Log.WriteString(source.Address.ToString());
+        Log.Write(":");
+        Log.WriteNumber((ulong)source.Port);
+        Log.Write(" -> port ");
+        Log.WriteNumber((ulong)TestUdpPort);
+        Log.Write("\n");
+
+        Log.Write("[UDP] Payload (");
+        Log.WriteNumber((ulong)data.Length);
+        Log.Write(" bytes): ");
+
+        for (int i = 0; i < data.Length; i++)
+        {
+            char c = (char)data[i];
+            if (Ascii.IsPrintable(c))
+            {
+                Log.Write(c.ToString());
+            }
+        }
+
+        Log.Write("\n");
+
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.Write("[UDP] ");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Write(source.Address.ToString() + ":" + source.Port.ToString());
+        Console.ForegroundColor = ConsoleColor.Gray;
+        Console.Write(" -> ");
+        Console.ResetColor();
+
+        for (int i = 0; i < data.Length && i < UdpPreviewMaxBytes; i++)
+        {
+            char c = (char)data[i];
+            if (Ascii.IsPrintable(c))
+            {
+                Console.Write(c.ToString());
+            }
+        }
+
+        Console.WriteLine();
     }
 
     private static void RunDhcp(NetworkSession session)
     {
-        INetworkDevice? device = RequireDevice();
-        if (device == null)
+        if (!RequireDevice())
         {
             return;
         }
 
-        if (!device.Ready)
+        if (!NetworkManager.Ready)
         {
             Terminal.Error("Network device not ready");
             return;
@@ -217,26 +281,24 @@ internal static class NetworkCommands
 
         Terminal.Info("Starting DHCP auto-configuration...");
 
-        NetworkStack.Initialize();
-
-        DHCPClient dhcpClient = new();
+        DhcpClient dhcpClient = new();
         if (dhcpClient.SendDiscoverPacket() == DhcpTimeoutResult)
         {
             Terminal.Error("DHCP timeout - no response from server");
             return;
         }
 
-        IPConfig? netConfig = NetworkConfigManager.Get(device);
+        IPConfig? netConfig = NetworkManager.Primary.IPConfig;
         if (netConfig == null)
         {
             Terminal.Error("No network configuration after DHCP");
             return;
         }
 
-        session.AdoptLease(netConfig.IPAddress, netConfig.DefaultGateway);
+        session.AdoptLease(netConfig.Address, netConfig.DefaultGateway);
 
         Terminal.Success("DHCP configuration successful!");
-        Terminal.InfoLine("IP Address", netConfig.IPAddress.ToString());
+        Terminal.InfoLine("IP Address", netConfig.Address.ToString());
         Terminal.InfoLine("Subnet", netConfig.SubnetMask.ToString());
         Terminal.InfoLine("Gateway", netConfig.DefaultGateway.ToString());
         Console.WriteLine();
@@ -244,7 +306,7 @@ internal static class NetworkCommands
 
     private static void ResolveDns(NetworkSession session, string domain)
     {
-        if (RequireDevice() == null)
+        if (!RequireDevice())
         {
             return;
         }
@@ -258,11 +320,11 @@ internal static class NetworkCommands
         Terminal.Info("Resolving " + domain + "...");
 
         Address4 dnsServer = new(CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet, CloudflareDnsOctet);
-        DNSConfig.Add(dnsServer);
+        DnsConfig.Add(dnsServer);
 
         DnsClient dnsClient = new();
         dnsClient.Connect(dnsServer);
-        dnsClient.SendAsk(domain);
+        dnsClient.SendQuery(domain);
 
         Address? resolvedIP = dnsClient.Receive(DnsReceiveTimeoutMs);
 

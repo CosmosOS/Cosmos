@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.Memory;
 /// <summary>
 /// MemoryBlock class. Used to read and write to memory blocks.
 /// </summary>
-public class MemoryBlock
+internal class MemoryBlock
 {
     /// <summary>
     /// Memory block base address.
@@ -466,7 +466,7 @@ public class MemoryBlock
 /// <summary>
 /// MemoryBlock08 class.
 /// </summary>
-public class MemoryBlock08
+internal class MemoryBlock08
 {
     /// <summary>
     /// Base.
@@ -518,7 +518,7 @@ public class MemoryBlock08
 /// <summary>
 /// MemoryBlock16 class.
 /// </summary>
-public class MemoryBlock16
+internal class MemoryBlock16
 {
     /// <summary>
     /// Base.
@@ -571,7 +571,7 @@ public class MemoryBlock16
 /// <summary>
 /// MemoryBlock32 class.
 /// </summary>
-public class MemoryBlock32
+internal class MemoryBlock32
 {
     /// <summary>
     /// Base.

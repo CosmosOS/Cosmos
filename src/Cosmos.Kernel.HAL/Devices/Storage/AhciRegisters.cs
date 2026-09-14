@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// <summary>
 /// AHCI Generic Host Control Registers.
 /// </summary>
-public class GenericRegisters
+internal class GenericRegisters
 {
     /// <summary>CAP - Host Capabilities register offset (AHCI spec 3.1.1).</summary>
     private const ulong CapabilitiesOffset = 0x00;
@@ -122,7 +122,7 @@ public class GenericRegisters
 /// command issue, port reset) can reach controller state without going
 /// through globals.
 /// </summary>
-public class PortRegisters
+internal class PortRegisters
 {
     /// <summary>Size of one port register bank in bytes; port N starts at 0x100 + N * 0x80 (AHCI spec 3.3).</summary>
     private const uint PortRegisterSpanBytes = 0x80;
@@ -336,7 +336,7 @@ public class PortRegisters
 /// <summary>
 /// HBA Command Header structure.
 /// </summary>
-public class HbaCommandHeader
+internal class HbaCommandHeader
 {
     /// <summary>Size of one command header in bytes; slot N starts at CLB + N * 32 (AHCI spec 4.2.2).</summary>
     private const uint CommandHeaderSizeBytes = 32;
@@ -433,7 +433,7 @@ public class HbaCommandHeader
 /// HBA itself addresses this table via the physical CTBA written into the
 /// owning <see cref="HbaCommandHeader"/>.
 /// </summary>
-public class HbaCommandTable
+internal class HbaCommandTable
 {
     /// <summary>Offset of the PRDT within the command table; the CFIS, ACMD and reserved areas occupy the first 0x80 bytes (AHCI spec 4.2.3).</summary>
     private const int PrdtOffsetBytes = 0x80;
@@ -467,7 +467,7 @@ public class HbaCommandTable
 /// <summary>
 /// HBA PRDT Entry.
 /// </summary>
-public class HbaPrdtEntry
+internal class HbaPrdtEntry
 {
     /// <summary>Size of one PRDT entry in bytes; entry N starts at PRDT base + N * 0x10 (AHCI spec 4.2.3.3).</summary>
     private const uint PrdtEntrySizeBytes = 0x10;
@@ -533,7 +533,7 @@ public class HbaPrdtEntry
 /// <summary>
 /// FIS Register Host to Device.
 /// </summary>
-public class FisRegisterH2D
+internal class FisRegisterH2D
 {
     /// <summary>Number of 32-bit dwords in a Register H2D FIS (20 bytes / 4, SATA spec 10.5.4). Internal so <see cref="Sata"/> programs it into the command header CFL field.</summary>
     internal const int FisDwordCount = 5;

@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.HAL.Devices.Virtio;
 /// - Used ring: buffers returned by device
 /// The layout is transport-independent; the same rings work over MMIO and PCI.
 /// </summary>
-public unsafe class Virtqueue
+internal unsafe class Virtqueue
 {
     // Descriptor flags
     public const ushort VRING_DESC_F_NEXT = 1;      // Buffer continues via next field

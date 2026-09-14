@@ -11,6 +11,8 @@
     <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
     <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <!-- The socket plugs drive the TCP machinery through the experimental packet seam (COSMOS0002). -->
+    <NoWarn>$(NoWarn);COSMOS0002</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

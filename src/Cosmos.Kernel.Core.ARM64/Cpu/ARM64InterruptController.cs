@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Core.ARM64.Cpu;
 /// sparse GICv3 LPI lookup (INTID &gt;= 8192), EOI, and synchronous-exception
 /// fatal handling. Native imports live in Cosmos.Kernel.Core.ARM64/Bridge/Import/Arm64ExceptionVectorNative.cs.
 /// </summary>
-public class ARM64InterruptController : IInterruptController
+internal class ARM64InterruptController : IInterruptController
 {
     private bool _initialized;
     private uint _lastAckedIntId;
@@ -118,7 +118,7 @@ public class ARM64InterruptController : IInterruptController
     /// LPI must still be enabled in the redistributor's PROPBASER table by
     /// <see cref="GICv3Lpi"/> before it can fire. Throws on exhaustion.
     /// </summary>
-    public static uint AllocateLpi(InterruptManager.IrqDelegate handler)
+    internal static uint AllocateLpi(InterruptManager.IrqDelegate handler)
     {
         if (s_lpiHandlers == null)
         {

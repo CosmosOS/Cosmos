@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Cosmos.Kernel.Core.Memory;
+using Cosmos.Kernel.System.Diagnostics;
 using DevKernel.Diagnostics;
 using DevKernel.Shell;
-using KernelHeap = Cosmos.Kernel.Core.Memory.Heap.Heap;
 
 namespace DevKernel.Commands;
 
@@ -40,14 +39,14 @@ internal static class MemoryCommands
                 Name = "free",
                 Usage = "free",
                 Description = "Force a heap collection and report freed objects",
-                Execute = static (context, args) => Terminal.Info(KernelHeap.Collect() + " objects collected."),
+                Execute = static (context, args) => Terminal.Info(MemoryInfo.Collect() + " objects collected."),
             },
             new ShellCommand
             {
-                Name = "gc",
-                Usage = "gc",
+                Name = "gcstat",
+                Usage = "gcstat",
                 Description = "Give live information on the GC",
-                Execute = static (context, args) => GcMonitor.Run(),
+                Execute = static (context, args) => GcStat.Run(),
             },
             new ShellCommand
             {
@@ -68,10 +67,10 @@ internal static class MemoryCommands
     {
         Terminal.Header("Memory Information:");
 
-        ulong totalPages = PageAllocator.TotalPageCount;
-        ulong freePages = PageAllocator.FreePageCount;
+        ulong totalPages = MemoryInfo.TotalPages;
+        ulong freePages = MemoryInfo.FreePages;
         ulong usedPages = totalPages - freePages;
-        ulong pageSize = PageAllocator.PageSize;
+        ulong pageSize = MemoryInfo.PageSizeBytes;
 
         Terminal.InfoLine("Page Size", Units.ToKiB(pageSize).ToString() + " KB");
         Terminal.InfoLine("Total Pages", totalPages.ToString());

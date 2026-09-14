@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard English, Great Britain (GB) keyboard layout.
 /// </summary>
-public class GBStandardLayout : ScanMapBase
+public sealed class GBStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Create new instance of the <see cref="GBStandardLayout"/> class.
@@ -18,10 +18,8 @@ public class GBStandardLayout : ScanMapBase
     /// <summary>
     /// Init key list.
     /// </summary>
-    protected override void InitKeys()
+    protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>(105);
-
         #region Keys
 
         /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKeyEx */
@@ -94,6 +92,8 @@ public class GBStandardLayout : ScanMapBase
         // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, ConsoleKeyEx.LAlt));
+        /* Right Alt: a second Alt on this layout */
+        Keys.Add(new KeyMapping(RightAltScanCode, ConsoleKeyEx.RAlt));
         /* Space */
         Keys.Add(new KeyMapping(0x39, ' ', ConsoleKeyEx.Spacebar));
         /* Caps */

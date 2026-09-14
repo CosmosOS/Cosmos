@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Vfs;
 
@@ -11,7 +12,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
     private const int ShortEntrySlotCount = 1;
 
     private readonly IBlockDevice _device;
-    private readonly Dictionary<uint, FatInode> _inodeCache = new();
+    private readonly Dictionary<uint, FatInode> _inodeCache = [];
 
     public FatBootSector Boot { get; }
     public FatTable Fat { get; }
@@ -133,7 +134,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
         }
     }
 
-    public bool FindChildEntry(FatInode parent, ReadOnlySpan<char> name, out FatDirEntry? match)
+    public bool FindChildEntry(FatInode parent, ReadOnlySpan<char> name, [NotNullWhen(true)] out FatDirEntry? match)
     {
         match = null;
         byte[] data = ReadDirectoryData(parent);
@@ -181,7 +182,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
         FatAttr attr,
         uint firstCluster,
         uint size,
-        out FatInode? created)
+        [NotNullWhen(true)] out FatInode? created)
     {
         created = null;
         string longName = name.ToString();
@@ -271,7 +272,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
 
     public void UpdateInodeEntry(FatInode inode)
     {
-        if (inode.Parent == null || inode.DirEntryByteOffset < 0)
+        if (inode.Parent is null || inode.DirEntryByteOffset < 0)
         {
             return;
         }
@@ -370,7 +371,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
         // clusters are already zeroed above; only the partial cluster
         // holding the old EOF needs a read-modify-write, full pre-existing
         // clusters get the zero buffer written directly.
-        Span<byte> rmwBuffer = Span<byte>.Empty;
+        Span<byte> rmwBuffer = [];
         long pos = inode.Size;
         while (pos < newSize)
         {

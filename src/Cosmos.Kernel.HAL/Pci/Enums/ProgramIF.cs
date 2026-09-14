@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.HAL.Pci.Enums;
 
-public enum ProgramIf
+internal enum ProgramIf
 {
     // MassStorageController:
     SataVendorSpecific = 0x00,

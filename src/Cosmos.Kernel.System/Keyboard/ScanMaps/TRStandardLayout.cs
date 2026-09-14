@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard Turkish (TR) keyboard layout.
 /// </summary>
-public class TRStandardLayout : ScanMapBase
+public sealed class TRStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TRStandardLayout"/> class.
@@ -15,13 +15,12 @@ public class TRStandardLayout : ScanMapBase
     {
     }
 
-    protected override void InitKeys()
+    /// <inheritdoc />
+    protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>(100);
-
         #region Keys
 
-        /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKeyEx */
+        /*                       Scan Norm Shift Num Caps SCaps SNum AltGr AltGrShift ConsoleKeyEx */
         Keys.Add(new KeyMapping(0x00, ConsoleKeyEx.NoName));
         /* F1-F12 */
         Keys.Add(new KeyMapping(0x01, ConsoleKeyEx.Escape));
@@ -38,38 +37,38 @@ public class TRStandardLayout : ScanMapBase
         Keys.Add(new KeyMapping(0x57, ConsoleKeyEx.F11));
         Keys.Add(new KeyMapping(0x58, ConsoleKeyEx.F12));
         /* 1 -> 9 */
-        Keys.Add(new KeyMapping(0x29, '"', 'é', '"', '"', 'é', '"', ConsoleKeyEx.NoName));
-        Keys.Add(new KeyMapping(0x02, '1', '!', '1', '1', '!', '1', ConsoleKeyEx.D1));
-        Keys.Add(new KeyMapping(0x03, '2', '@', '2', '2', '@', '2', ConsoleKeyEx.D2));
-        Keys.Add(new KeyMapping(0x04, '3', '#', '3', '3', '#', '3', ConsoleKeyEx.D3));
-        Keys.Add(new KeyMapping(0x05, '4', '$', '4', '4', '$', '4', ConsoleKeyEx.D4));
-        Keys.Add(new KeyMapping(0x06, '5', '%', '5', '5', '%', '5', ConsoleKeyEx.D5));
+        Keys.Add(new KeyMapping(0x29, '"', 'é', '"', '"', 'é', '"', '<', ConsoleKeyEx.NoName));
+        Keys.Add(new KeyMapping(0x02, '1', '!', '1', '1', '!', '1', '>', ConsoleKeyEx.D1));
+        Keys.Add(new KeyMapping(0x03, '2', '\'', '2', '2', '\'', '2', '£', ConsoleKeyEx.D2));
+        Keys.Add(new KeyMapping(0x04, '3', '^', '3', '3', '^', '3', '#', ConsoleKeyEx.D3));
+        Keys.Add(new KeyMapping(0x05, '4', '+', '4', '4', '+', '4', '$', ConsoleKeyEx.D4));
+        Keys.Add(new KeyMapping(0x06, '5', '%', '5', '5', '%', '5', '½', ConsoleKeyEx.D5));
         Keys.Add(new KeyMapping(0x07, '6', '&', '6', '6', '&', '6', ConsoleKeyEx.D6));
-        Keys.Add(new KeyMapping(0x08, '7', '/', '7', '7', '/', '7', ConsoleKeyEx.D7));
-        Keys.Add(new KeyMapping(0x09, '8', '(', '8', '8', '(', '8', ConsoleKeyEx.D8));
-        Keys.Add(new KeyMapping(0x0A, '9', ')', '9', '9', ')', '9', ConsoleKeyEx.D9));
-        Keys.Add(new KeyMapping(0x0B, '0', '=', '0', '0', '=', '0', ConsoleKeyEx.D0)); //Hata
+        Keys.Add(new KeyMapping(0x08, '7', '/', '7', '7', '/', '7', '{', ConsoleKeyEx.D7));
+        Keys.Add(new KeyMapping(0x09, '8', '(', '8', '8', '(', '8', '[', ConsoleKeyEx.D8));
+        Keys.Add(new KeyMapping(0x0A, '9', ')', '9', '9', ')', '9', ']', ConsoleKeyEx.D9));
+        Keys.Add(new KeyMapping(0x0B, '0', '=', '0', '0', '=', '0', '}', ConsoleKeyEx.D0));
         /* -, =, Bksp, Tab */
-        Keys.Add(new KeyMapping(0x0C, '*', '?', '*', '*', '?', '*', ConsoleKeyEx.NoName));
-        Keys.Add(new KeyMapping(0x0D, '-', '_', '-', '-', '_', '-', ConsoleKeyEx.Minus));
+        Keys.Add(new KeyMapping(0x0C, '*', '?', '*', '*', '?', '*', '\\', ConsoleKeyEx.NoName));
+        Keys.Add(new KeyMapping(0x0D, '-', '_', '-', '-', '_', '-', '|', ConsoleKeyEx.Minus));
         Keys.Add(new KeyMapping(0x0E, ConsoleKeyEx.Backspace));
         Keys.Add(new KeyMapping(0x0F, '\t', ConsoleKeyEx.Tab));
         /*      QWERTYUIOP[] */
-        Keys.Add(new KeyMapping(0x10, 'q', 'Q', 'q', 'Q', 'q', 'Q', ConsoleKeyEx.Q));
+        Keys.Add(new KeyMapping(0x10, 'q', 'Q', 'q', 'Q', 'q', 'Q', '@', ConsoleKeyEx.Q));
         Keys.Add(new KeyMapping(0x11, 'w', 'W', 'w', 'W', 'w', 'W', ConsoleKeyEx.W));
-        Keys.Add(new KeyMapping(0x12, 'e', 'E', 'e', 'E', 'e', 'E', ConsoleKeyEx.E));
+        Keys.Add(new KeyMapping(0x12, 'e', 'E', 'e', 'E', 'e', 'E', '€', ConsoleKeyEx.E));
         Keys.Add(new KeyMapping(0x13, 'r', 'R', 'r', 'R', 'r', 'R', ConsoleKeyEx.R));
-        Keys.Add(new KeyMapping(0x14, 't', 'T', 't', 'T', 't', 'T', ConsoleKeyEx.T));
+        Keys.Add(new KeyMapping(0x14, 't', 'T', 't', 'T', 't', 'T', '₺', ConsoleKeyEx.T));
         Keys.Add(new KeyMapping(0x15, 'y', 'Y', 'y', 'Y', 'y', 'Y', ConsoleKeyEx.Y));
         Keys.Add(new KeyMapping(0x16, 'u', 'U', 'u', 'U', 'u', 'U', ConsoleKeyEx.U));
-        Keys.Add(new KeyMapping(0x17, 'i', 'I', 'i', 'I', 'i', 'I', ConsoleKeyEx.I));
+        Keys.Add(new KeyMapping(0x17, 'ı', 'I', 'ı', 'I', 'ı', 'I', 'i', 'İ', ConsoleKeyEx.I));
         Keys.Add(new KeyMapping(0x18, 'o', 'O', 'o', 'O', 'o', 'O', ConsoleKeyEx.O));
         Keys.Add(new KeyMapping(0x19, 'p', 'P', 'p', 'P', 'p', 'P', ConsoleKeyEx.P));
-        Keys.Add(new KeyMapping(0x1A, 'ğ', 'Ğ', 'ğ', 'Ğ', 'ğ', 'Ğ', ConsoleKeyEx.LBracket));
-        Keys.Add(new KeyMapping(0x1B, 'ü', 'Ü', 'ü', 'Ü', 'ü', 'Ü', ConsoleKeyEx.RBracket));
+        Keys.Add(new KeyMapping(0x1A, 'ğ', 'Ğ', 'ğ', 'Ğ', 'ğ', 'Ğ', '¨', ConsoleKeyEx.LBracket));
+        Keys.Add(new KeyMapping(0x1B, 'ü', 'Ü', 'ü', 'Ü', 'ü', 'Ü', '~', ConsoleKeyEx.RBracket));
         /* ASDFGHJKL;'` */
-        Keys.Add(new KeyMapping(0x1E, 'a', 'A', 'a', 'A', 'a', 'A', ConsoleKeyEx.A));
-        Keys.Add(new KeyMapping(0x1F, 's', 'S', 's', 'S', 's', 'S', ConsoleKeyEx.S));
+        Keys.Add(new KeyMapping(0x1E, 'a', 'A', 'a', 'A', 'a', 'A', 'æ', 'Æ', ConsoleKeyEx.A));
+        Keys.Add(new KeyMapping(0x1F, 's', 'S', 's', 'S', 's', 'S', 'ß', ConsoleKeyEx.S));
         Keys.Add(new KeyMapping(0x20, 'd', 'D', 'd', 'D', 'd', 'D', ConsoleKeyEx.D));
         Keys.Add(new KeyMapping(0x21, 'f', 'F', 'f', 'F', 'f', 'F', ConsoleKeyEx.F));
         Keys.Add(new KeyMapping(0x22, 'g', 'G', 'g', 'G', 'g', 'G', ConsoleKeyEx.G));
@@ -77,12 +76,12 @@ public class TRStandardLayout : ScanMapBase
         Keys.Add(new KeyMapping(0x24, 'j', 'J', 'j', 'J', 'j', 'J', ConsoleKeyEx.J));
         Keys.Add(new KeyMapping(0x25, 'k', 'K', 'k', 'K', 'k', 'K', ConsoleKeyEx.K));
         Keys.Add(new KeyMapping(0x26, 'l', 'L', 'l', 'L', 'l', 'L', ConsoleKeyEx.L));
-        Keys.Add(new KeyMapping(0x27, 'ş', 'Ş', 'ş', 'Ş', 'ş', 'Ş', ConsoleKeyEx.NoName));
+        Keys.Add(new KeyMapping(0x27, 'ş', 'Ş', 'ş', 'Ş', 'ş', 'Ş', '´', ConsoleKeyEx.NoName));
         Keys.Add(new KeyMapping(0x28, 'i', 'İ', 'i', 'İ', 'i', 'İ', ConsoleKeyEx.NoName));
-        Keys.Add(new KeyMapping(0x2B, ',', ';', ',', ',', ';', ';', ConsoleKeyEx.Comma));
+        Keys.Add(new KeyMapping(0x2B, ',', ';', ',', ',', ';', ';', '`', ConsoleKeyEx.Comma));
         /* Left Shift*/
         Keys.Add(new KeyMapping(0x2A, ConsoleKeyEx.LShift));
-        Keys.Add(new KeyMapping(0x56, '<', '>', '<', '<', '>', '>', ConsoleKeyEx.NoName));
+        Keys.Add(new KeyMapping(0x56, '<', '>', '<', '<', '>', '>', '|', ConsoleKeyEx.NoName));
         /* \ZXCVBNM,./ */
         Keys.Add(new KeyMapping(0x2C, 'z', 'Z', 'z', 'Z', 'z', 'Z', ConsoleKeyEx.Z));
         Keys.Add(new KeyMapping(0x2D, 'x', 'X', 'x', 'X', 'x', 'X', ConsoleKeyEx.X));
@@ -92,7 +91,7 @@ public class TRStandardLayout : ScanMapBase
         Keys.Add(new KeyMapping(0x31, 'n', 'N', 'n', 'N', 'n', 'N', ConsoleKeyEx.N));
         Keys.Add(new KeyMapping(0x32, 'm', 'M', 'm', 'M', 'm', 'M', ConsoleKeyEx.M));
         Keys.Add(new KeyMapping(0x33, 'ö', 'Ö', 'ö', 'Ö', 'ö', 'Ö', ConsoleKeyEx.NoName));
-        Keys.Add(new KeyMapping(0x34, 'ç', 'Ç', 'ç', 'ç', 'Ç', 'ç', ConsoleKeyEx.NoName));
+        Keys.Add(new KeyMapping(0x34, 'ç', 'Ç', 'ç', 'Ç', 'ç', 'Ç', ConsoleKeyEx.NoName));
         Keys.Add(new KeyMapping(0x35, '.', ':', '.', '.', ':', '.', ConsoleKeyEx.NoName)); // also numpad divide
         /* Right Shift */
         Keys.Add(new KeyMapping(0x1C, ConsoleKeyEx.Enter));
@@ -103,6 +102,8 @@ public class TRStandardLayout : ScanMapBase
         // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, ConsoleKeyEx.LAlt));
+        /* Right Alt: the third-level modifier on this layout */
+        Keys.Add(new KeyMapping(RightAltScanCode, ConsoleKeyEx.AltGr));
         /* Space */
         Keys.Add(new KeyMapping(0x39, ' ', ConsoleKeyEx.Spacebar));
         /* Caps */

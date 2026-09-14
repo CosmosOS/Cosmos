@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
@@ -16,18 +16,24 @@ namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 [Plug(typeof(Socket))]
 public static class SocketPlug
 {
+    // Receive timeout for the UDP socket paths. Zero because SO_RCVTIMEO is not
+    // plumbed through yet: these poll once and leave the waiting to the caller,
+    // which is what the counter spin they replaced effectively did, without
+    // burning the cycles.
+    private const int UdpPollTimeoutMs = 0;
+
     // Store protocol type per socket (public for cross-assembly access when patched)
-    public static readonly Dictionary<int, ProtocolType> _protocolTypes = new();
+    public static readonly Dictionary<int, ProtocolType> _protocolTypes = [];
     // Store TCP state machine per socket instance
-    public static readonly Dictionary<int, Tcp> _tcpStateMachines = new();
+    internal static readonly Dictionary<int, Tcp> s_tcpStateMachines = [];
     // Store UDP client per socket instance
-    public static readonly Dictionary<int, KernelUdpClient> _udpClients = new();
+    public static readonly Dictionary<int, KernelUdpClient> _udpClients = [];
     // Store bound endpoint per socket instance
-    public static readonly Dictionary<int, IPEndPoint> _endpoints = new();
+    public static readonly Dictionary<int, IPEndPoint> _endpoints = [];
     // Store local endpoint per socket instance
-    public static readonly Dictionary<int, IPEndPoint> _localEndPoints = new();
+    public static readonly Dictionary<int, IPEndPoint> _localEndPoints = [];
     // Store remote endpoint per socket instance
-    public static readonly Dictionary<int, IPEndPoint> _remoteEndPoints = new();
+    public static readonly Dictionary<int, IPEndPoint> _remoteEndPoints = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(Socket aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
@@ -46,35 +52,35 @@ public static class SocketPlug
 
     public static void CheckSocket(Socket aThis, SocketType socketType, ProtocolType protocolType)
     {
-        Serial.WriteString("[SocketPlug] CheckSocket called\n");
+        Log.WriteString("[SocketPlug] CheckSocket called\n");
         int id = GetId(aThis);
-        Serial.WriteString("[SocketPlug] GetId returned: ");
-        Serial.WriteNumber(id);
-        Serial.WriteString("\n");
+        Log.WriteString("[SocketPlug] GetId returned: ");
+        Log.WriteNumber(id);
+        Log.WriteString("\n");
 
         if (protocolType == ProtocolType.Udp)
         {
             if (socketType != SocketType.Dgram)
             {
-                Serial.WriteString("[SocketPlug] UDP requires Dgram socket type.\n");
+                Log.WriteString("[SocketPlug] UDP requires Dgram socket type.\n");
                 throw new NotSupportedException("UDP requires Dgram socket type.");
             }
             _protocolTypes[id] = ProtocolType.Udp;
-            Serial.WriteString("[SocketPlug] Created UDP socket\n");
+            Log.WriteString("[SocketPlug] Created UDP socket\n");
         }
         else if (protocolType == ProtocolType.Tcp)
         {
             if (socketType != SocketType.Stream)
             {
-                Serial.WriteString("[SocketPlug] TCP requires Stream socket type.\n");
+                Log.WriteString("[SocketPlug] TCP requires Stream socket type.\n");
                 throw new NotSupportedException("TCP requires Stream socket type.");
             }
             _protocolTypes[id] = ProtocolType.Tcp;
-            Serial.WriteString("[SocketPlug] Created TCP socket\n");
+            Log.WriteString("[SocketPlug] Created TCP socket\n");
         }
         else
         {
-            Serial.WriteString("[SocketPlug] Only TCP and UDP sockets supported.\n");
+            Log.WriteString("[SocketPlug] Only TCP and UDP sockets supported.\n");
             throw new NotImplementedException("Only TCP and UDP sockets supported.");
         }
     }
@@ -87,7 +93,7 @@ public static class SocketPlug
         {
             if (proto == ProtocolType.Tcp)
             {
-                if (_tcpStateMachines.TryGetValue(id, out var sm))
+                if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
                 {
                     return sm.Status == Status.ESTABLISHED;
                 }
@@ -112,7 +118,7 @@ public static class SocketPlug
 
         if (proto == ProtocolType.Tcp)
         {
-            if (_tcpStateMachines.TryGetValue(id, out var sm))
+            if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
             {
                 return sm.Data.Length;
             }
@@ -122,7 +128,7 @@ public static class SocketPlug
             if (_udpClients.TryGetValue(id, out var client))
             {
                 // Return approximate bytes available (count of packets in buffer)
-                return client.rxBuffer.Count > 0 ? client.rxBuffer.Count : 0;
+                return client._rxBuffer.Count > 0 ? client._rxBuffer.Count : 0;
             }
         }
 
@@ -161,7 +167,7 @@ public static class SocketPlug
         {
             if (proto == ProtocolType.Tcp)
             {
-                if (_tcpStateMachines.TryGetValue(id, out var sm))
+                if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
                 {
                     return sm.Status == Status.ESTABLISHED;
                 }
@@ -170,7 +176,7 @@ public static class SocketPlug
             {
                 if (_udpClients.TryGetValue(id, out var client))
                 {
-                    return client.rxBuffer.Count > 0;
+                    return client._rxBuffer.Count > 0;
                 }
             }
         }
@@ -190,9 +196,9 @@ public static class SocketPlug
             // Create UDP client with the bound port
             var client = new KernelUdpClient(ipep.Port);
             _udpClients[id] = client;
-            Serial.WriteString("[SocketPlug] UDP socket bound to port ");
-            Serial.WriteNumber((ulong)ipep.Port);
-            Serial.WriteString("\n");
+            Log.WriteString("[SocketPlug] UDP socket bound to port ");
+            Log.WriteNumber((ulong)ipep.Port);
+            Log.WriteString("\n");
         }
     }
 
@@ -211,7 +217,7 @@ public static class SocketPlug
         int id = GetId(aThis);
         if (!_endpoints.TryGetValue(id, out var ep))
         {
-            Serial.WriteString("[SocketPlug] Socket not bound\n");
+            Log.WriteString("[SocketPlug] Socket not bound\n");
             throw new InvalidOperationException("Socket not bound");
         }
 
@@ -219,7 +225,7 @@ public static class SocketPlug
         sm.LocalEndPoint.Port = (ushort)ep.Port;
         sm.Status = Status.LISTEN;
 
-        _tcpStateMachines[id] = sm;
+        s_tcpStateMachines[id] = sm;
     }
 
     [PlugMember]
@@ -227,21 +233,21 @@ public static class SocketPlug
     {
         int id = GetId(aThis);
 
-        if (!_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
         {
-            Serial.WriteString("[SocketPlug] TcpListener not started, starting...\n");
+            Log.WriteString("[SocketPlug] TcpListener not started, starting...\n");
             StartTcp(aThis);
-            sm = _tcpStateMachines[id];
+            sm = s_tcpStateMachines[id];
         }
 
         if (sm.Status == Status.CLOSED)
         {
             Tcp.RemoveConnection(sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address);
             StartTcp(aThis);
-            sm = _tcpStateMachines[id];
+            sm = s_tcpStateMachines[id];
         }
 
-        while (sm.WaitStatus(Status.ESTABLISHED) != true)
+        while (!sm.WaitStatus(Status.ESTABLISHED))
         {
             ;
         }
@@ -284,17 +290,17 @@ public static class SocketPlug
             _localEndPoints[id] = new IPEndPoint(IPAddress.Any, localPort);
         }
 
-        // Parse destination address
-        var destAddr = Address.Parse(address.ToString())
-            ?? throw new Exception("Address can not be null");
+        // Use GetAddressBytes directly to avoid string parsing (byte.Parse can trigger resource loading)
+        byte[] destBytes = address.GetAddressBytes();
+        Address4 destAddr = new(destBytes[0], destBytes[1], destBytes[2], destBytes[3]);
         client.Connect(destAddr, port);
 
         _remoteEndPoints[id] = new IPEndPoint(address, port);
-        Serial.WriteString("[SocketPlug] UDP connected to ");
-        Serial.WriteString(destAddr.ToString());
-        Serial.WriteString(":");
-        Serial.WriteNumber((ulong)port);
-        Serial.WriteString("\n");
+        Log.WriteString("[SocketPlug] UDP connected to ");
+        Log.WriteString(destAddr.ToString());
+        Log.WriteString(":");
+        Log.WriteNumber((ulong)port);
+        Log.WriteString("\n");
     }
 
     public static void ConnectTcp(Socket aThis, IPAddress address, int port)
@@ -302,23 +308,23 @@ public static class SocketPlug
         int id = GetId(aThis);
 
         // Create endpoint if not bound
-        if (!_endpoints.ContainsKey(id))
-        {
-            _endpoints[id] = new IPEndPoint(address, port);
-        }
+        _endpoints.TryAdd(id, new IPEndPoint(address, port));
 
         StartTcp(aThis);
-        var sm = _tcpStateMachines[id];
+        Tcp sm = s_tcpStateMachines[id];
 
         if (sm.Status == Status.ESTABLISHED)
         {
-            Serial.WriteString("[SocketPlug] Client must be closed before setting a new connection.\n");
+            Log.WriteString("[SocketPlug] Client must be closed before setting a new connection.\n");
             throw new Exception("Client must be closed before setting a new connection.");
         }
 
-        sm.RemoteEndPoint.Address = Address.Parse(address.ToString()) ?? throw new Exception("Address can not be null");
+        // Use GetAddressBytes directly to avoid string parsing (byte.Parse can trigger resource loading)
+        byte[] remoteBytes = address.GetAddressBytes();
+        sm.RemoteEndPoint.Address = new Address4(remoteBytes[0], remoteBytes[1], remoteBytes[2], remoteBytes[3]);
         sm.RemoteEndPoint.Port = (ushort)port;
-        sm.LocalEndPoint.Address = NetworkConfigManager.CurrentAddress ?? throw new Exception("CurrentAddress can not be null");
+        sm.LocalEndPoint.Address = NetworkManager.Primary.IPConfig?.Address
+            ?? throw new InvalidOperationException("No IPv4 configuration on the primary network device");
         sm.LocalEndPoint.Port = Tcp.GetDynamicPort();
 
         _remoteEndPoints[id] = new IPEndPoint(address, sm.RemoteEndPoint.Port);
@@ -344,9 +350,9 @@ public static class SocketPlug
         // Set status BEFORE sending packet to avoid race condition
         // (SendEmptyPacket calls NetworkStack.Update which can process incoming packets)
         sm.Status = Status.SYN_SENT;
-        sm.SendEmptyPacket(Flags.SYN);
+        sm.SendEmptyPacket(TcpFlags.SYN);
 
-        if (sm.WaitStatus(Status.ESTABLISHED, 5000) == false)
+        if (!sm.WaitStatus(Status.ESTABLISHED, 5000))
         {
             throw new Exception("Failed to open TCP connection!");
         }
@@ -398,10 +404,7 @@ public static class SocketPlug
             throw new InvalidOperationException("UDP socket not connected");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         byte[] data = new byte[size];
         Buffer.BlockCopy(buffer, offset, data, 0, size);
@@ -412,30 +415,26 @@ public static class SocketPlug
 
     public static int SendTcp(Socket aThis, byte[] buffer, int offset, int size)
     {
-        Serial.WriteString("[SocketPlug] SendTcp: entering\n");
+        Log.WriteString("[SocketPlug] SendTcp: entering\n");
         int id = GetId(aThis);
-        if (!_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
         {
-            Serial.WriteString("[SocketPlug] Must establish a connection before sending data.\n");
+            Log.WriteString("[SocketPlug] Must establish a connection before sending data.\n");
             throw new InvalidOperationException("Must establish a connection before sending data.");
         }
 
-        if (sm.RemoteEndPoint.Address == null || sm.RemoteEndPoint.Port == 0)
+        if (sm.RemoteEndPoint.Address is null || sm.RemoteEndPoint.Port == 0)
         {
-            Serial.WriteString("[SocketPlug] Must establish a default remote host by calling Connect().\n");
+            Log.WriteString("[SocketPlug] Must establish a default remote host by calling Connect().\n");
             throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
         }
         if (sm.Status != Status.ESTABLISHED)
         {
-            Serial.WriteString("[SocketPlug] Client must be connected before sending data.\n");
+            Log.WriteString("[SocketPlug] Client must be connected before sending data.\n");
             throw new Exception("Client must be connected before sending data.");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            Serial.WriteString("[SocketPlug] Invalid offset or size\n");
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         int bytesSent = 0;
 
@@ -448,7 +447,7 @@ public static class SocketPlug
 
             for (int i = 0; i < chunks.Length; i++)
             {
-                var packet = new TCPPacket(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, i == chunks.Length - 1 ? (byte)(Flags.PSH | Flags.ACK) : (byte)Flags.ACK, sm.TCB.SndWnd, 0, chunks[i]);
+                TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, i == chunks.Length - 1 ? (byte)(TcpFlags.PSH | TcpFlags.ACK) : (byte)TcpFlags.ACK, sm.TCB.SndWnd, 0, chunks[i]);
                 OutgoingBuffer.AddPacket(packet);
 
                 // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
@@ -464,43 +463,43 @@ public static class SocketPlug
         }
         else
         {
-            Serial.WriteString("[SocketPlug] SendTcp: preparing packet\n");
+            Log.WriteString("[SocketPlug] SendTcp: preparing packet\n");
             byte[] data = new byte[size];
             Buffer.BlockCopy(buffer, offset, data, 0, size);
 
-            var packet = new TCPPacket(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(Flags.PSH | Flags.ACK), sm.TCB.SndWnd, 0, data);
-            Serial.WriteString("[SocketPlug] SendTcp: adding to outgoing buffer\n");
+            TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), sm.TCB.SndWnd, 0, data);
+            Log.WriteString("[SocketPlug] SendTcp: adding to outgoing buffer\n");
             OutgoingBuffer.AddPacket(packet);
 
             // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
             sm.TCB.SndNxt += (uint)size;
             bytesSent = size;
 
-            Serial.WriteString("[SocketPlug] SendTcp: calling NetworkStack.Update\n");
+            Log.WriteString("[SocketPlug] SendTcp: calling NetworkStack.Update\n");
             NetworkStack.Update();
-            Serial.WriteString("[SocketPlug] SendTcp: NetworkStack.Update returned\n");
+            Log.WriteString("[SocketPlug] SendTcp: NetworkStack.Update returned\n");
 
             // Check if connection was closed during Update (e.g., by FIN from server)
             if (sm.Status == Status.CLOSED || sm.Status == Status.TIME_WAIT)
             {
-                Serial.WriteString("[SocketPlug] SendTcp: connection closed during send, returning early\n");
+                Log.WriteString("[SocketPlug] SendTcp: connection closed during send, returning early\n");
                 return bytesSent;
             }
 
-            Serial.WriteString("[SocketPlug] SendTcp: calling WaitAck\n");
+            Log.WriteString("[SocketPlug] SendTcp: calling WaitAck\n");
             WaitAck(sm);
-            Serial.WriteString("[SocketPlug] SendTcp: WaitAck returned, status=");
-            Serial.WriteNumber((ulong)sm.Status);
-            Serial.WriteString("\n");
+            Log.WriteString("[SocketPlug] SendTcp: WaitAck returned, status=");
+            Log.WriteNumber((ulong)sm.Status);
+            Log.WriteString("\n");
         }
 
-        Serial.WriteString("[SocketPlug] SendTcp: returning bytesSent=");
-        Serial.WriteNumber((ulong)bytesSent);
-        Serial.WriteString("\n");
+        Log.WriteString("[SocketPlug] SendTcp: returning bytesSent=");
+        Log.WriteNumber((ulong)bytesSent);
+        Log.WriteString("\n");
         return bytesSent;
     }
 
-    public static void WaitAck(Tcp sm)
+    internal static void WaitAck(Tcp sm)
     {
         bool ackReceived = false;
         uint expectedAckNumber = sm.TCB.SndNxt;
@@ -534,10 +533,7 @@ public static class SocketPlug
             _localEndPoints[id] = new IPEndPoint(IPAddress.Any, localPort);
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         if (remoteEP is not IPEndPoint ipep)
         {
@@ -551,13 +547,13 @@ public static class SocketPlug
         byte[] addrBytes = ipep.Address.GetAddressBytes();
         var destAddr = new Address4(addrBytes[0], addrBytes[1], addrBytes[2], addrBytes[3]);
 
-        Serial.WriteString("[SocketPlug] SendTo destAddr=");
-        Serial.WriteNumber(addrBytes[0]); Serial.WriteString(".");
-        Serial.WriteNumber(addrBytes[1]); Serial.WriteString(".");
-        Serial.WriteNumber(addrBytes[2]); Serial.WriteString(".");
-        Serial.WriteNumber(addrBytes[3]); Serial.WriteString(" port=");
-        Serial.WriteNumber(ipep.Port);
-        Serial.WriteString("\n");
+        Log.WriteString("[SocketPlug] SendTo destAddr=");
+        Log.WriteNumber(addrBytes[0]); Log.WriteString(".");
+        Log.WriteNumber(addrBytes[1]); Log.WriteString(".");
+        Log.WriteNumber(addrBytes[2]); Log.WriteString(".");
+        Log.WriteNumber(addrBytes[3]); Log.WriteString(" port=");
+        Log.WriteNumber(ipep.Port);
+        Log.WriteString("\n");
 
         client.Send(data, destAddr, ipep.Port);
         NetworkStack.Update();
@@ -598,27 +594,12 @@ public static class SocketPlug
             throw new InvalidOperationException("UDP socket not initialized");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
-        // Wait for data
-        int timeout = 0;
-        while (client.rxBuffer.Count < 1 && timeout < 100000)
-        {
-            timeout++;
-        }
+        KernelEndPoint ep = new(Address4.Zero, 0);
+        byte[]? data = client.Receive(ref ep, UdpPollTimeoutMs);
 
-        if (client.rxBuffer.Count < 1)
-        {
-            return 0;
-        }
-
-        var ep = new KernelEndPoint(Address4.Zero, 0);
-        byte[]? data = client.NonBlockingReceive(ref ep);
-
-        if (data == null)
+        if (data is null)
         {
             return 0;
         }
@@ -632,17 +613,13 @@ public static class SocketPlug
     public static int ReceiveTcp(Socket aThis, byte[] buffer, int offset, int size)
     {
         int id = GetId(aThis);
-        if (!_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
         {
-            Serial.WriteString("[SocketPlug] Must establish a connection before receiving data.\n");
+            Log.WriteString("[SocketPlug] Must establish a connection before receiving data.\n");
             throw new InvalidOperationException("Must establish a connection before receiving data.");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            Serial.WriteString("[SocketPlug] Receive Invalid offset or size\n");
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
         // If data is already available, return it immediately (even if connection closed)
         if (sm.Data.Length > 0)
@@ -699,27 +676,12 @@ public static class SocketPlug
             throw new InvalidOperationException("UDP socket not initialized");
         }
 
-        if (offset < 0 || size < 0 || (offset + size) > buffer.Length)
-        {
-            throw new ArgumentOutOfRangeException("Invalid offset or size");
-        }
+        ThrowIfRangeInvalid(buffer, offset, size);
 
-        // Wait for data
-        int timeout = 0;
-        while (client.rxBuffer.Count < 1 && timeout < 100000)
-        {
-            timeout++;
-        }
+        KernelEndPoint ep = new(Address4.Zero, 0);
+        byte[]? data = client.Receive(ref ep, UdpPollTimeoutMs);
 
-        if (client.rxBuffer.Count < 1)
-        {
-            return 0;
-        }
-
-        var ep = new KernelEndPoint(Address4.Zero, 0);
-        byte[]? data = client.NonBlockingReceive(ref ep);
-
-        if (data == null)
+        if (data is null)
         {
             return 0;
         }
@@ -773,27 +735,27 @@ public static class SocketPlug
 
     public static void CloseTcp(Socket aThis, int timeout)
     {
-        Serial.WriteString("[SocketPlug] CloseTcp: entering\n");
+        Log.WriteString("[SocketPlug] CloseTcp: entering\n");
         int id = GetId(aThis);
-        if (!_tcpStateMachines.TryGetValue(id, out var sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
         {
-            Serial.WriteString("[SocketPlug] CloseTcp: no state machine found, returning\n");
+            Log.WriteString("[SocketPlug] CloseTcp: no state machine found, returning\n");
             return;
         }
 
-        Serial.WriteString("[SocketPlug] CloseTcp: status=");
-        Serial.WriteNumber((ulong)sm.Status);
-        Serial.WriteString("\n");
+        Log.WriteString("[SocketPlug] CloseTcp: status=");
+        Log.WriteNumber((ulong)sm.Status);
+        Log.WriteString("\n");
 
         if (sm.Status == Status.CLOSED)
         {
-            Serial.WriteString("[SocketPlug] CloseTcp: already closed, cleaning up\n");
+            Log.WriteString("[SocketPlug] CloseTcp: already closed, cleaning up\n");
             Tcp.RemoveConnection(sm);
-            _tcpStateMachines.Remove(id);
+            s_tcpStateMachines.Remove(id);
             _endpoints.Remove(id);
             _localEndPoints.Remove(id);
             _remoteEndPoints.Remove(id);
-            Serial.WriteString("[SocketPlug] CloseTcp: cleanup done\n");
+            Log.WriteString("[SocketPlug] CloseTcp: cleanup done\n");
             return;
         }
         else if (sm.Status == Status.CLOSING || sm.Status == Status.CLOSE_WAIT)
@@ -806,11 +768,11 @@ public static class SocketPlug
             {
                 // The final ACK never arrived — detach instead of blocking
                 // forever; Tcp reaps the connection once it reaches CLOSED.
-                Serial.WriteString("[SocketPlug] CloseTcp: passive close pending, detaching connection\n");
+                Log.WriteString("[SocketPlug] CloseTcp: passive close pending, detaching connection\n");
                 sm.Detached = true;
             }
 
-            _tcpStateMachines.Remove(id);
+            s_tcpStateMachines.Remove(id);
             _endpoints.Remove(id);
             _localEndPoints.Remove(id);
             _remoteEndPoints.Remove(id);
@@ -820,7 +782,7 @@ public static class SocketPlug
         if (sm.Status == Status.LISTEN)
         {
             Tcp.RemoveConnection(sm);
-            _tcpStateMachines.Remove(id);
+            s_tcpStateMachines.Remove(id);
         }
         else if (sm.Status == Status.ESTABLISHED)
         {
@@ -830,7 +792,7 @@ public static class SocketPlug
             // passive close all the way to CLOSED, and an assignment after the
             // send would overwrite CLOSED with FIN_WAIT1 and hang the close.
             sm.Status = Status.FIN_WAIT1;
-            sm.SendEmptyPacket(Flags.FIN | Flags.ACK);
+            sm.SendEmptyPacket(TcpFlags.FIN | TcpFlags.ACK);
 
             // Wait for the peer to ACK our FIN. Once it is ACKed the close has
             // succeeded from the caller's point of view — the peer may hold
@@ -847,11 +809,11 @@ public static class SocketPlug
             {
                 // Half-close: detach the state machine so it finishes the
                 // handshake in the background; Tcp reaps it on CLOSED.
-                Serial.WriteString("[SocketPlug] CloseTcp: peer FIN pending, detaching connection\n");
+                Log.WriteString("[SocketPlug] CloseTcp: peer FIN pending, detaching connection\n");
                 sm.Detached = true;
             }
 
-            _tcpStateMachines.Remove(id);
+            s_tcpStateMachines.Remove(id);
         }
 
         _endpoints.Remove(id);
@@ -882,5 +844,14 @@ public static class SocketPlug
         }
 
         return result;
+    }
+
+    // Every Send and Receive shape takes (buffer, offset, size); the BCL
+    // throws ArgumentOutOfRangeException for a range outside the buffer.
+    private static void ThrowIfRangeInvalid(byte[] buffer, int offset, int size)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(offset);
+        ArgumentOutOfRangeException.ThrowIfNegative(size);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(size, buffer.Length - offset, nameof(size));
     }
 }

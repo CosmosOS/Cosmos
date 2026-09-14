@@ -94,7 +94,7 @@ internal static class MountCommands
 
     private static void FormatPartition(int diskNumber, int partitionNumber, string fsType)
     {
-        if (!StorageView.TryResolvePartition(diskNumber, partitionNumber, out int globalIndex, out Partition? target) || target == null)
+        if (!StorageView.TryResolvePartition(diskNumber, partitionNumber, out Partition? target))
         {
             Terminal.Error("Invalid disk/partition. Use 'lspart' to list.");
             return;
@@ -107,19 +107,19 @@ internal static class MountCommands
 
         // Refuse formatting a mounted partition: there is no umount command, so
         // the stale superblock would flush cached FAT and directory state with
-        // the old geometry over the fresh volume. mount.Source is the global
-        // partition index recorded at mount time.
+        // the old geometry over the fresh volume. VfsManager.TryFormat refuses
+        // this too; the loop is here for the message that names the mount point.
         for (int i = 0; i < VfsManager.Mounts.Count; i++)
         {
             VfsManager.VfsMount mount = VfsManager.Mounts[i];
-            if (int.TryParse(mount.Source, out int mountedIndex) && mountedIndex == globalIndex)
+            if (ReferenceEquals(mount.Partition, target))
             {
                 Terminal.Error("Partition is mounted at " + mount.MountPoint + ". Reboot before reformatting.");
                 return;
             }
         }
 
-        if (!VfsManager.TryFormat(FatBootstrap.DriverName, globalIndex.ToString(), options))
+        if (!VfsManager.TryFormat(FatBootstrap.DriverName, target, options))
         {
             ulong sizeMiB = Units.ToMiB(target.BlockCount * target.BlockSize);
             Terminal.Error("Format failed: partition is likely too small for " + fsType.ToUpper() +
@@ -132,7 +132,7 @@ internal static class MountCommands
 
     private static void MountPartition(int diskNumber, int partitionNumber, string mountPoint)
     {
-        if (!StorageView.TryResolvePartition(diskNumber, partitionNumber, out int globalIndex, out Partition? _))
+        if (!StorageView.TryResolvePartition(diskNumber, partitionNumber, out Partition? target))
         {
             Terminal.Error("Invalid disk/partition. Use 'lspart' to list.");
             return;
@@ -144,7 +144,7 @@ internal static class MountCommands
             return;
         }
 
-        if (!VfsManager.TryMount(FatBootstrap.DriverName, globalIndex.ToString(), MountFlags.None, mountPoint, out _))
+        if (!VfsManager.TryMount(FatBootstrap.DriverName, target, MountFlags.None, mountPoint, out _))
         {
             Terminal.Error("Mount failed (not FAT or unreadable).");
             return;
@@ -175,7 +175,7 @@ internal static class MountCommands
 
             PrintMountSource(mount);
 
-            if (mount.Superblock.SuperOperations.StatFs(mount.Superblock, out VfsStatFs stats))
+            if (VfsManager.TryStatFs(mount.MountPoint, out VfsStatFs stats))
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write(" (" + Units.ToMiB(stats.Blocks * stats.BlockSize) + " MiB)");
@@ -187,16 +187,15 @@ internal static class MountCommands
     }
 
     /// <summary>
-    /// For the FAT driver, <c>mount.Source</c> is the index into
-    /// <see cref="StorageManager.Partitions"/> <em>recorded at mount time</em>.
-    /// mkpart/rmpart/format rescans shift those indices, so a stale mapping must
-    /// not be presented as authoritative.
+    /// Names the backing store of a mount. <c>mount.Partition</c> is the
+    /// partition itself, so it keeps naming the same range across the rescans
+    /// mkpart/rmpart/format trigger; only the disk and slot it is reported
+    /// under are looked up fresh.
     /// </summary>
     private static void PrintMountSource(VfsManager.VfsMount mount)
     {
-        if (!int.TryParse(mount.Source, out int globalIndex)
-            || globalIndex < 0
-            || globalIndex >= StorageManager.Partitions.Count)
+        Partition? partition = mount.Partition;
+        if (partition is null || !StorageView.TryDescribePartition(partition, out int diskNumber, out int partitionNumber))
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(mount.Name);
@@ -204,14 +203,11 @@ internal static class MountCommands
             return;
         }
 
-        Partition partition = StorageManager.Partitions[globalIndex];
-        StorageView.TryResolveGlobalIndex(globalIndex, out int diskNumber, out int partitionNumber);
-
         Console.ForegroundColor = ConsoleColor.White;
         Console.Write("disk " + diskNumber + " part " + partitionNumber);
         Console.ResetColor();
         Console.ForegroundColor = ConsoleColor.Gray;
-        Console.Write("  " + partition.Name + " (index at mount time)");
+        Console.Write("  " + partition.Name);
         Console.ResetColor();
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.Write("  " + StorageView.DetectFilesystem(partition));

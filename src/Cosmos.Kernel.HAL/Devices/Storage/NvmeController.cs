@@ -9,7 +9,6 @@ using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Pci;
 using SchedMutex = Cosmos.Kernel.Core.Scheduler.Mutex;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
-using SchedThread = Cosmos.Kernel.Core.Scheduler.Thread;
 
 namespace Cosmos.Kernel.HAL.Devices.Storage;
 
@@ -39,7 +38,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// discovery.</item>
 /// </list>
 /// </summary>
-public unsafe class NvmeController
+internal unsafe class NvmeController
 {
     private const uint AdminQueueDepth = 8;
     private const uint IoQueueDepth = 8;
@@ -155,14 +154,14 @@ public unsafe class NvmeController
     // critical section so concurrent submits don't clobber _ioSqTail.
     private SchedSpinLock _slotLock;
     private SchedSpinLock _submitSqLock;
-    private readonly List<SchedThread> _slotWaiters = [];
+    private readonly List<SchedulerThread> _slotWaiters = [];
 
     // Polled-completion fallback path: serializes the entire submit/wait
     // sequence so concurrent callers don't race on _ioCqHead / _ioCqPhase.
     // Unused once MSI-X is enabled.
     private readonly SchedMutex _polledIoMutex = new();
 
-    public List<NvmeNamespace> Namespaces { get; } = new();
+    public List<NvmeNamespace> Namespaces { get; } = [];
 
     /// <summary>
     /// True once I/O completions are delivered via MSI-X; false when the
@@ -186,7 +185,7 @@ public unsafe class NvmeController
         pci.EnableBusMaster(true);
         pci.EnableMemory(true);
 
-        if (pci.BaseAddressBar == null || pci.BaseAddressBar.Length < 1)
+        if (pci.BaseAddressBar is null || pci.BaseAddressBar.Length < 1)
         {
             throw new Exception("[NVMe] Invalid BAR configuration");
         }
@@ -263,14 +262,16 @@ public unsafe class NvmeController
         _ioSlots = new IoSlot[IoQueueDepth - 1];
         for (int i = 0; i < _ioSlots.Length; i++)
         {
-            IoSlot slot = new();
-            slot.DmaBufferVirt = (ulong)PageAllocator.AllocPages(PageType.Unmanaged, 1, true);
+            IoSlot slot = new()
+            {
+                DmaBufferVirt = (ulong)PageAllocator.AllocPages(PageType.Unmanaged, 1, true)
+            };
             slot.DmaBufferPhys = PageAllocator.VirtualToPhysical(slot.DmaBufferVirt);
             _ioSlots[i] = slot;
         }
 
         MsiXContext? ctx = MsiX.Enable(_pci);
-        if (ctx == null)
+        if (ctx is null)
         {
             Serial.WriteString("[NVMe] MSI-X unavailable, falling back to polled I/O\n");
             return;
@@ -469,17 +470,9 @@ public unsafe class NvmeController
     /// </summary>
     private static void ValidateTransfer(int byteLength, ushort numLogicalBlocksMinusOne)
     {
-        if (numLogicalBlocksMinusOne != 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(numLogicalBlocksMinusOne),
-                "The single-PRP data path issues one logical block per command.");
-        }
-
-        if (byteLength <= 0 || (ulong)byteLength > PageAllocator.PageSize)
-        {
-            throw new ArgumentOutOfRangeException(nameof(byteLength),
-                "NVMe transfers are limited to one 4 KiB page (single-PRP data path).");
-        }
+        ArgumentOutOfRangeException.ThrowIfNotEqual(numLogicalBlocksMinusOne, 0, nameof(numLogicalBlocksMinusOne));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(byteLength);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan((ulong)byteLength, PageAllocator.PageSize, nameof(byteLength));
     }
 
     /// <summary>
@@ -507,10 +500,10 @@ public unsafe class NvmeController
     /// </summary>
     private int AcquireSlot()
     {
-        SchedThread? current = SchedulerManager.IsReady
+        SchedulerThread? current = SchedulerManager.IsReady
             ? SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId()).CurrentThread
             : null;
-        if (current == null)
+        if (current is null)
         {
             for (int i = 0; i < _ioSlots!.Length; i++)
             {
@@ -556,7 +549,7 @@ public unsafe class NvmeController
 
     private void ReleaseSlot(int index)
     {
-        SchedThread? waiter = null;
+        SchedulerThread? waiter = null;
         using (_slotLock.AcquireIrqSafe())
         {
             _ioSlots![index].InUse = false;
@@ -567,7 +560,7 @@ public unsafe class NvmeController
             }
         }
 
-        if (waiter != null)
+        if (waiter is not null)
         {
             SchedulerManager.ReadyThread(waiter.CpuId, waiter);
         }
@@ -661,7 +654,7 @@ public unsafe class NvmeController
     /// </summary>
     private void OnIoCompletion(ref IRQContext context)
     {
-        if (_ioSlots == null || _ioCqVirt == 0)
+        if (_ioSlots is null || _ioCqVirt == 0)
         {
             return;
         }

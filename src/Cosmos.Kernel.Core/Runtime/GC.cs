@@ -58,7 +58,10 @@ internal static unsafe class GC
         fixed (byte* pRawData = &rawData)
         {
             var data = (GCMemoryInfoDataStruct*)pRawData;
-            GarbageCollector.SimpleMemoryInfo info = GarbageCollector.GetSimpleMemoryInfo();
+
+            // I did the mistake once, the doc clearly specify that the memory info should not change bettewin GC.
+            // It's not writen in the public API, it's writen in System.Private.CoreLib
+            GarbageCollector.SimpleMemoryInfo info = GarbageCollector.GetLastGCMemoryInfo();
 
             // the ration 0.5 is arbitrary, should be change in the future
             data->_highMemoryLoadThresholdBytes = (long)(PageAllocator.RamSize / 2);

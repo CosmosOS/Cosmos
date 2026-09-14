@@ -1,5 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Network.Config;
+using Cosmos.Kernel.System.Timer;
 
 namespace Cosmos.Kernel.System.Network.IPv4.UDP;
 
@@ -8,15 +10,18 @@ namespace Cosmos.Kernel.System.Network.IPv4.UDP;
 /// </summary>
 public class UdpClient : IDisposable
 {
-    public static ushort DynamicPortStart = 49152;
+    private const ushort DynamicPortStart = 49152;
 
     private static ushort s_nextPort = 49152;
 
     /// <summary>
     /// Gets a dynamic port (simple incrementing approach for AOT compatibility).
     /// </summary>
-    /// <param name="tries"></param>
-    /// <returns></returns>
+    /// <param name="tries">How many consecutive ports to try before giving up.</param>
+    /// <returns>A port no live client is bound to, or 0 when
+    /// <paramref name="tries"/> consecutive candidates were all taken. Zero is
+    /// not a usable port, but it is also what an unbound client reports, so a
+    /// caller that keeps the value must not later read it back as a binding.</returns>
     public static ushort GetDynamicPort(int tries = 10)
     {
         for (int i = 0; i < tries; i++)
@@ -35,24 +40,35 @@ public class UdpClient : IDisposable
         return 0;
     }
 
-    private static readonly Dictionary<uint, UdpClient> s_clients = new();
+    private static readonly Dictionary<uint, UdpClient> s_clients = [];
     private readonly int _localPort;
     private int _destinationPort;
 
     /// <summary>
-    /// The _destination address.
+    /// Destination address.
     /// </summary>
     internal Address? _destination;
 
     /// <summary>
     /// The RX buffer queue.
     /// </summary>
-    public Queue<UDPPacket> rxBuffer;
+    internal Queue<UdpPacket> _rxBuffer;
+    private bool _disposed;
+
+    /// <summary>
+    /// Throws once <see cref="Dispose"/> has run. <see cref="Close"/> does not
+    /// arm this: closing only stops delivery to this client, and the DHCP flow
+    /// closes itself mid-exchange and keeps going.
+    /// </summary>
+    private void ThrowIfDisposed()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+    }
 
     /// <summary>
     /// Gets a UDP client running on the given port.
     /// </summary>
-    /// <param name="destPort">The _destination port.</param>
+    /// <param name="destPort">Destination port.</param>
     /// <returns>If a client is running on the given port, the <see cref="UdpClient"/>; otherwise, <see langword="null"/>.</returns>
     internal static UdpClient? GetClient(ushort destPort)
     {
@@ -73,15 +89,15 @@ public class UdpClient : IDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="UdpClient"/> class.
     /// </summary>
-    /// <param name="_localPort">Local port.</param>
-    public UdpClient(int _localPort)
+    /// <param name="localPort">Local port.</param>
+    public UdpClient(int localPort)
     {
-        rxBuffer = new Queue<UDPPacket>(8);
+        _rxBuffer = new Queue<UdpPacket>(8);
 
-        this._localPort = _localPort;
-        if (_localPort > 0)
+        _localPort = localPort;
+        if (localPort > 0)
         {
-            s_clients[(uint)_localPort] = this;
+            s_clients[(uint)localPort] = this;
         }
     }
 
@@ -100,10 +116,12 @@ public class UdpClient : IDisposable
     /// <summary>
     /// Connects to the given client.
     /// </summary>
-    /// <param name="dest">The _destination address.</param>
-    /// <param name="destPort">The _destination port.</param>
+    /// <param name="dest">Destination address.</param>
+    /// <param name="destPort">Destination port.</param>
     public void Connect(Address dest, int destPort)
     {
+        ThrowIfDisposed();
+
         _destination = dest;
         _destinationPort = destPort;
     }
@@ -113,21 +131,23 @@ public class UdpClient : IDisposable
     /// </summary>
     public void Close()
     {
-        if (s_clients.ContainsKey((uint)_localPort))
-        {
-            s_clients.Remove((uint)_localPort);
-        }
+        s_clients.Remove((uint)_localPort);
     }
 
     /// <summary>
     /// Sends data to the client.
     /// </summary>
     /// <param name="data">The data to send.</param>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
+    /// <exception cref="InvalidOperationException">No default remote host has
+    /// been set, or no configured interface can reach it.</exception>
     public void Send(byte[] data)
     {
-        if (_destination == null || _destinationPort == 0)
+        ThrowIfDisposed();
+
+        if (_destination is null || _destinationPort == 0)
         {
-            throw new InvalidOperationException("Must establish a default remote host by calling Connect() before using this Send() overload");
+            throw new InvalidOperationException("Call Connect before using the Send overload that takes only the data.");
         }
 
         Send(data, _destination, _destinationPort);
@@ -138,10 +158,15 @@ public class UdpClient : IDisposable
     /// Sends data to a remote host.
     /// </summary>
     /// <param name="data">The data to send.</param>
-    /// <param name="dest">The _destination address.</param>
-    /// <param name="destPort">The _destination port.</param>
+    /// <param name="dest">Destination address.</param>
+    /// <param name="destPort">Destination port.</param>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
+    /// <exception cref="InvalidOperationException">No configured interface can
+    /// reach <paramref name="dest"/>.</exception>
     public void Send(byte[] data, Address dest, int destPort)
     {
+        ThrowIfDisposed();
+
         Serial.WriteString("[UdpClient] Send to ");
         Serial.WriteString(dest.ToString());
         Serial.WriteString(":");
@@ -151,69 +176,121 @@ public class UdpClient : IDisposable
         Serial.WriteString("\n");
 
         Address? source = IPConfig.FindNetwork(dest);
-        if (source == null)
+        if (source is null)
         {
             Serial.WriteString("[UdpClient] ERROR: IPConfig.FindNetwork returned null!\n");
-            throw new InvalidOperationException("No network route to _destination");
+            throw new InvalidOperationException("No configured interface can reach the destination address.");
         }
 
         Serial.WriteString("[UdpClient] Source IP: ");
         Serial.WriteString(source.ToString());
         Serial.WriteString("\n");
 
-        var packet = new UDPPacket(source, dest, (ushort)_localPort, (ushort)destPort, data);
-        Serial.WriteString("[UdpClient] UDPPacket created, adding to outgoing buffer\n");
+        UdpPacket packet = new(source, dest, (ushort)_localPort, (ushort)destPort, data);
+        Serial.WriteString("[UdpClient] UdpPacket created, adding to outgoing buffer\n");
         OutgoingBuffer.AddPacket(packet);
         Serial.WriteString("[UdpClient] Packet added to outgoing buffer\n");
     }
 
     /// <summary>
-    /// Receives data from the given end-point (non-blocking).
+    /// Transmits a prebuilt UDP packet through the stack's outgoing queue, including ARP
+    /// resolution of the destination MAC address when it is not already known.
     /// </summary>
-    /// <param name="source">The source end point.</param>
-    public byte[]? NonBlockingReceive(ref EndPoint source)
+    /// <param name="packet">The packet to transmit.</param>
+    /// <returns><see langword="true"/> when the packet was queued for transmission;
+    /// <see langword="false"/> when no configured network interface matches the packet's
+    /// source address.</returns>
+    [Experimental(Experimentals.PacketSeamDiagId)]
+    public bool Send(UdpPacket packet)
     {
-        if (rxBuffer.Count < 1)
+        ThrowIfDisposed();
+
+        return Cosmos.Kernel.System.Network.NetworkStack.Send(packet);
+    }
+
+    /// <summary>
+    /// Receives a datagram, waiting up to <paramref name="timeoutMs"/> for one
+    /// to arrive.
+    /// </summary>
+    /// <param name="source">Carries the sender's end point back when a datagram arrives.</param>
+    /// <param name="timeoutMs">How long to wait, in milliseconds; 0 polls and returns at once.</param>
+    /// <returns>The datagram payload, or <see langword="null"/> when none arrived in time.</returns>
+    public byte[]? Receive(ref EndPoint source, int timeoutMs = 5000)
+    {
+        ThrowIfDisposed();
+
+        int waited = 0;
+        while (_rxBuffer.Count < 1 && waited < timeoutMs)
+        {
+            TimerManager.Wait(10);
+            waited += 10;
+        }
+
+        if (_rxBuffer.Count < 1)
         {
             return null;
         }
 
-        var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
+        UdpPacket packet = new(_rxBuffer.Dequeue().RawData);
         source.Address = packet.SourceIP;
         source.Port = packet.SourcePort;
 
-        return packet.UDPData;
+        return packet.GetUdpData();
     }
 
     /// <summary>
-    /// Receives data from the given end-point (blocking).
+    /// Waits for a datagram to arrive on this client's local port and returns the parsed
+    /// <see cref="UdpPacket"/> itself, without re-parsing. Unlike
+    /// <see cref="Receive"/>, which returns the payload
+    /// bytes alone, the returned packet exposes the ports, the source and destination
+    /// addresses, and the payload. Polls the receive buffer in 10 millisecond slices.
     /// </summary>
-    /// <param name="source">The source end point.</param>
-    public byte[] Receive(ref EndPoint source)
+    /// <param name="timeoutMs">Maximum time to wait in milliseconds; a non-positive value
+    /// checks the receive buffer once without waiting.</param>
+    /// <returns>The dequeued packet, or <see langword="null"/> when the timeout elapses with
+    /// no datagram queued.</returns>
+    [Experimental(Experimentals.PacketSeamDiagId)]
+    public UdpPacket? ReceivePacket(int timeoutMs = 5000)
     {
-        while (rxBuffer.Count < 1)
+        ThrowIfDisposed();
+
+        int waited = 0;
+        while (_rxBuffer.Count < 1 && waited < timeoutMs)
         {
-            ;
+            TimerManager.Wait(10);
+            waited += 10;
         }
 
-        var packet = new UDPPacket(rxBuffer.Dequeue().RawData);
-        source.Address = packet.SourceIP;
-        source.Port = packet.SourcePort;
+        if (_rxBuffer.Count < 1)
+        {
+            return null;
+        }
 
-        return packet.UDPData;
+        return _rxBuffer.Dequeue();
     }
 
     /// <summary>
     /// Receives data from the given packet.
     /// </summary>
     /// <param name="packet">Packet to receive.</param>
-    internal void ReceiveData(UDPPacket packet)
+    internal void ReceiveData(UdpPacket packet)
     {
-        rxBuffer.Enqueue(packet);
+        _rxBuffer.Enqueue(packet);
     }
 
+    /// <summary>
+    /// Closes the client and retires it. Unlike <see cref="Close"/>, which a
+    /// client reopens by connecting again, disposal is final: every other
+    /// member throws <see cref="ObjectDisposedException"/> afterwards.
+    /// </summary>
     public void Dispose()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
         Close();
     }
 }

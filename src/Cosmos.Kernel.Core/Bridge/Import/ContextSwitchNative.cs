@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// (Interrupts.s) and Cosmos.Kernel.Native.ARM64 (ContextSwitch.s) both
 /// export the same names, so no arch gating is needed here.
 /// </summary>
-public static unsafe partial class ContextSwitchNative
+internal static unsafe partial class ContextSwitchNative
 {
     [LibraryImport("*", EntryPoint = "_native_set_context_switch_sp")]
     [SuppressGCTransition]

@@ -9,10 +9,21 @@
     <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <DefineConstants>$(DefineConstants);ARCH_X64</DefineConstants>
+    <!-- Feeds timer ticks into the experimental scheduler seam (COSMOS0001). -->
+    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" />
     <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The Stopwatch plug reads the TSC through X64CpuNative. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
+    <!-- The platform initializer constructs X64InterruptController, which is
+         internal because IInterruptController is (Core.ARM64 already grants
+         its HAL counterpart for the same reason). -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
   </ItemGroup>
 </Project>

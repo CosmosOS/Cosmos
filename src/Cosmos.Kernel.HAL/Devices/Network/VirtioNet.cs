@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.HAL.Devices.Network;
 /// VirtIO network device driver. Transport-agnostic: works over virtio MMIO
 /// (QEMU virt virtio-net-device) and virtio PCI (virtio-net-pci) alike.
 /// </summary>
-public unsafe class VirtioNet : INetworkDevice
+internal unsafe class VirtioNet : INetworkDevice
 {
     // --- Constants ---
 
@@ -91,7 +91,7 @@ public unsafe class VirtioNet : INetworkDevice
 
     public bool Send(byte[] data, int length)
     {
-        if (!_networkInitialized || !_enabled || _txQueue == null || _txBuffers == null || data == null)
+        if (!_networkInitialized || !_enabled || _txQueue is null || _txBuffers == null || data is null)
         {
             return false;
         }
@@ -169,7 +169,7 @@ public unsafe class VirtioNet : INetworkDevice
         // Setup RX and TX queues
         _rxQueue = _transport.CreateQueue(RX_QUEUE, QUEUE_SIZE);
         _txQueue = _transport.CreateQueue(TX_QUEUE, QUEUE_SIZE);
-        if (_rxQueue == null || _txQueue == null)
+        if (_rxQueue is null || _txQueue is null)
         {
             Serial.Write("[VirtioNet] ERROR: Failed to setup queues\n");
             _transport.Fail();
@@ -236,7 +236,7 @@ public unsafe class VirtioNet : INetworkDevice
 
     private void InitializeRxBuffers()
     {
-        if (_rxQueue == null)
+        if (_rxQueue is null)
         {
             return;
         }
@@ -266,7 +266,7 @@ public unsafe class VirtioNet : INetworkDevice
 
     private void InitializeTxBuffers()
     {
-        if (_txQueue == null)
+        if (_txQueue is null)
         {
             return;
         }
@@ -301,7 +301,7 @@ public unsafe class VirtioNet : INetworkDevice
 
     private void ProcessRx()
     {
-        if (_rxQueue == null || _rxBuffers == null)
+        if (_rxQueue is null || _rxBuffers == null)
         {
             return;
         }
@@ -342,7 +342,7 @@ public unsafe class VirtioNet : INetworkDevice
                 received = true;
             }
 
-            if (packet != null)
+            if (packet is not null)
             {
                 OnPacketReceived?.Invoke(packet, packet.Length);
             }
@@ -358,7 +358,7 @@ public unsafe class VirtioNet : INetworkDevice
     /// <summary>Reclaims completed TX descriptors. Caller must hold _queueLock.</summary>
     private void ReclaimTxLocked()
     {
-        if (_txQueue == null)
+        if (_txQueue is null)
         {
             return;
         }

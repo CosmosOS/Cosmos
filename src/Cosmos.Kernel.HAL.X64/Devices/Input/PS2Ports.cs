@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.HAL.X64.Devices.Input;
 /// <summary>
 /// PS/2 controller IO port definitions.
 /// </summary>
-public static class PS2Ports
+internal static class PS2Ports
 {
     /// <summary>
     /// Data IO port (0x60) - Read/Write data to PS/2 devices.

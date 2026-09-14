@@ -61,7 +61,7 @@ namespace Cosmos.Kernel.Core.Runtime
         {
             //Serial.WriteString("[CID] Start\n");
 
-            if (pObject == null)
+            if (pObject is null)
             {
                 Serial.WriteString("[CID] Null\n");
                 throw new NullReferenceException("Attempted to invoke interface method on null object");
@@ -96,7 +96,7 @@ namespace Cosmos.Kernel.Core.Runtime
         [RuntimeExport("RhpResolveInterfaceMethod")]
         internal static IntPtr RhpResolveInterfaceMethod(object pObject, IntPtr pCell)
         {
-            if (pObject == null)
+            if (pObject is null)
             {
                 // Optimizer may perform code motion on dispatch such that it occurs independent of
                 // null check on "this" pointer. Allow for this case by returning back an invalid pointer.

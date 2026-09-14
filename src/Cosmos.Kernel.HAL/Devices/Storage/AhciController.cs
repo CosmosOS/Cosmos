@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// <see cref="AhciController"/> per match, so a system with two HBAs gets
 /// two instances and all of their ports show up in <see cref="Ahci.Ports"/>.
 /// </summary>
-public unsafe class AhciController
+internal unsafe class AhciController
 {
     /// <summary>Stride between consecutive ports' command lists inside the command region (1 KiB; AHCI's CLB alignment).</summary>
     private const uint PortStrideCLB = 0x400;
@@ -148,7 +148,7 @@ public unsafe class AhciController
     private ulong _abarPhys;
     private ulong _abarVirt;
     private GenericRegisters? _generic;
-    private readonly List<BlockDevice> _ports = new();
+    private readonly List<BlockDevice> _ports = [];
     private ulong _cmdRegionVirt;
     private ulong _cmdRegionPhys;
 
@@ -358,7 +358,7 @@ public unsafe class AhciController
 
     private void PrintVersion()
     {
-        if (_generic == null)
+        if (_generic is null)
         {
             Serial.WriteString("Unknown");
             return;
@@ -372,7 +372,7 @@ public unsafe class AhciController
 
     private void GetCapabilities()
     {
-        if (_generic == null)
+        if (_generic is null)
         {
             return;
         }
@@ -401,7 +401,7 @@ public unsafe class AhciController
 
     private void GetPorts()
     {
-        if (_generic == null)
+        if (_generic is null)
         {
             return;
         }

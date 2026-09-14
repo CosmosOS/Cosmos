@@ -10,7 +10,7 @@ using Internal.Runtime;
 namespace Cosmos.Kernel.Core.Runtime;
 
 
-public static unsafe class Memory
+internal static unsafe class Memory
 {
     [RuntimeExport("RhNewArray")]
     internal static unsafe void* RhNewArray(MethodTable* pEEType, int length)

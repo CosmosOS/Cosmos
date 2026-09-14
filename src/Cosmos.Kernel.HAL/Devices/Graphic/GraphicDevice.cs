@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic;
 /// <summary>
 /// Abstract base class for all graphic devices.
 /// </summary>
-public abstract class GraphicDevice : Device, IGraphicDevice
+internal abstract class GraphicDevice : Device, IGraphicDevice
 {
     /// <summary>
     /// Initialize the graphic device.

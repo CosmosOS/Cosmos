@@ -54,45 +54,58 @@ using Cosmos.Kernel.System.Timer;
 `NetworkManager` owns the detected NICs. Check that a device is there and ready before configuring anything:
 
 ```csharp
-var device = NetworkManager.PrimaryDevice;
-
-if (device != null)
+if (NetworkManager.DeviceCount > 0)
 {
-    Console.WriteLine("Device:  " + device.Name);
-    Console.WriteLine("MAC:     " + device.MacAddress.ToString());
-    Console.WriteLine("Link up: " + device.LinkUp);
-    Console.WriteLine("Ready:   " + device.Ready);
+    Console.WriteLine("Device:  " + NetworkManager.Name);
+    Console.WriteLine("MAC:     " + NetworkManager.MacAddress?.ToString());
+    Console.WriteLine("Link up: " + NetworkManager.LinkUp);
+    Console.WriteLine("Ready:   " + NetworkManager.Ready);
 }
 ```
 
-<!-- screenshot: console showing "Device: Intel E1000E", the MAC, "Link up: True", "Ready: True" -->
-![Network Device](images/network-device.png)
-
-## Initialize the network stack
-
-Before using any protocol, initialize the stack once (this hooks packet reception to the device):
+Those properties report the primary adapter, which is the one the ring uses when nothing else is named. With more than one NIC, enumerate them and pick a different primary:
 
 ```csharp
-NetworkStack.Initialize();
+for (int i = 0; i < NetworkManager.DeviceCount; i++)
+{
+    NetworkAdapter adapter = NetworkManager.GetAdapter(i);
+    Console.WriteLine($"[{i}] {adapter.Name}  {adapter.MacAddress}  link={adapter.LinkUp}");
+}
+
+NetworkAdapter second = NetworkManager.GetAdapter(1);
+if (second.IsValid)
+{
+    NetworkManager.Primary = second;
+}
 ```
+
+A `NetworkAdapter` is a handle, not the device: it carries the registration index, so a default-constructed one names nothing and `IsValid` is false. `GetAdapter` answers with such a handle for an index no device occupies, which is why the assignment above is guarded: the `Primary` setter throws `ArgumentException` on a handle that names nothing, and QEMU gives the kernel a single NIC by default, so `GetAdapter(1)` names nothing there.
+
+<!-- screenshot: console showing "Device: Intel E1000E", the MAC, "Link up: True", "Ready: True" -->
+![Network Device](images/network-device.png)
 
 ## Configure IPv4
 
 Like on any operating system, the kernel needs an IPv4 configuration (address, subnet mask, gateway) before it can talk to the network. It can be obtained dynamically through DHCP or set manually.
 
+There is no separate stack-initialization step. Configuring an address is what brings the stack up: it maps the address and the MAC to the device. `NetworkStack.RemoveAllConfigIP()` reverses it.
+
 ### Dynamically through DHCP
 
-`DHCPClient.SendDiscoverPacket()` runs the whole DISCOVER → OFFER → REQUEST → ACK exchange and applies the resulting configuration. It returns the elapsed milliseconds, or `-1` on timeout:
+`DhcpClient.SendDiscoverPacket()` runs the whole DISCOVER → OFFER → REQUEST → ACK exchange and applies the resulting configuration. It returns the elapsed milliseconds, or `-1` on timeout:
 
 ```csharp
-var dhcpClient = new DHCPClient();
+DhcpClient dhcpClient = new();
 
 if (dhcpClient.SendDiscoverPacket() != -1)
 {
-    IPConfig? config = NetworkConfigManager.Get(device);
-    Console.WriteLine("IP address: " + config.IPAddress.ToString());
-    Console.WriteLine("Subnet:     " + config.SubnetMask.ToString());
-    Console.WriteLine("Gateway:    " + config.DefaultGateway.ToString());
+    IPConfig? config = NetworkManager.Primary.IPConfig;
+    if (config is not null)
+    {
+        Console.WriteLine("IP address: " + config.Address.ToString());
+        Console.WriteLine("Subnet:     " + config.SubnetMask.ToString());
+        Console.WriteLine("Gateway:    " + config.DefaultGateway.ToString());
+    }
 }
 else
 {
@@ -106,16 +119,39 @@ else
 ### Manually
 
 ```csharp
-IPConfig.Enable(device,
-    new Address(192, 168, 1, 69),     // local address
-    new Address(255, 255, 255, 0),    // subnet mask
-    new Address(192, 168, 1, 254));   // gateway
+if (!IPConfig.Enable(
+        new Address4(192, 168, 1, 69),     // local address
+        new Address4(255, 255, 255, 0),    // subnet mask
+        new Address4(192, 168, 1, 254)))   // gateway
+{
+    Console.WriteLine("No adapter to configure");
+}
 ```
 
-### Get the local IP address
+That configures the primary adapter. To configure a specific one, pass its handle. `Enable` returns `false` when the handle names no device, which is what an index past the last adapter gives you:
 
 ```csharp
-Console.WriteLine(NetworkConfigManager.Get(device).IPAddress.ToString());
+NetworkAdapter second = NetworkManager.GetAdapter(1);
+
+if (second.IsValid
+    && IPConfig.Enable(second,
+        new Address4(192, 168, 2, 69),
+        new Address4(255, 255, 255, 0),
+        new Address4(192, 168, 2, 254)))
+{
+    Console.WriteLine("Configured the second adapter");
+}
+```
+
+DHCP needs no handle: `SendDiscoverPacket` runs the exchange on every registered device.
+
+### Read the configuration back
+
+Each adapter carries the configuration in force on it, or `null` while it is unconfigured:
+
+```csharp
+Console.WriteLine(NetworkManager.Primary.IPConfig?.Address.ToString());
+Console.WriteLine(NetworkManager.GetAdapter(1).IPConfig?.SubnetMask.ToString());
 ```
 
 ## UDP
@@ -218,19 +254,19 @@ To reach a listener inside QEMU user networking from your host, forward a host p
 
 ## DNS
 
-DNS uses the Cosmos `DnsClient` (the .NET `Dns` class is not plugged yet). Register a nameserver, ask for one domain, and read the answer back:
+DNS uses the Cosmos `DnsClient` (the .NET `Dns` class is not plugged yet). Register a nameserver, query one domain, and read the answer back:
 
 ```csharp
-DNSConfig.Add(new Address(1, 1, 1, 1));   // Cloudflare public DNS
+DnsConfig.Add(new Address4(1, 1, 1, 1));   // Cloudflare public DNS
 
 var dnsClient = new DnsClient();
-dnsClient.Connect(new Address(1, 1, 1, 1));
+dnsClient.Connect(new Address4(1, 1, 1, 1));
 
-/* Ask for a single domain name */
-dnsClient.SendAsk("github.com");
+/* Query a single domain name */
+dnsClient.SendQuery("github.com");
 
 /* Receive the answer (5 s timeout) */
-Address address = dnsClient.Receive(5000);
+Address? address = dnsClient.Receive(5000);
 if (address != null)
 {
     Console.WriteLine("github.com resolved to " + address.ToString());
@@ -242,17 +278,85 @@ dnsClient.Close();
 <!-- screenshot: console showing github.com resolved to an IP address -->
 ![DNS](images/network-dns.png)
 
+## Crafting packets
+
+The packet types behind the clients are public as an experimental seam: a kernel can build protocol packets itself, transmit them through the stack, and receive the parsed packet objects instead of payload bytes. The seam carries the `COSMOS0002` diagnostic ([Public API Tracking](../dev/public-api.md)); referencing it is a build error until the kernel project acknowledges the missing compatibility promise:
+
+```xml
+<PropertyGroup>
+  <NoWarn>$(NoWarn);COSMOS0002</NoWarn>
+</PropertyGroup>
+```
+
+The seam has three parts:
+
+| Part | Members |
+|------|---------|
+| Packet types | `EthernetPacket`, `ArpRequestEthernet`/`ArpReplyEthernet`, `IPPacket`, `IcmpEchoRequest`/`IcmpEchoReply`, `UdpPacket`, `DhcpDiscover`/`DhcpRequest`/`DhcpRelease`, `DnsPacketQuery`/`DnsPacketAnswer`, `TcpPacket` |
+| Transmit and inject | `NetworkStack.Send(IPPacket)` queues a built packet with ARP resolution; `NetworkStack.HandlePacket` injects a raw frame into the receive path |
+| Packet-level client I/O | `UdpClient.Send(UdpPacket)` / `UdpClient.ReceivePacket(timeout)`, `IcmpClient.Send(IcmpPacket)` / `IcmpClient.ReceivePacket(timeout)` |
+
+The seam is for building and reading the packet types the stack already
+speaks, not for adding new ones: their wire fields, header checksum helpers
+and the `InitializeFields` parse hook are internal to the stack, so a kernel
+constructs a packet and reads its properties rather than deriving its own.
+
+A crafted echo request, correlated with its reply by the identifier and sequence number the caller chose:
+
+```csharp
+using Cosmos.Kernel.System.Network;
+using Cosmos.Kernel.System.Network.Config;
+using Cosmos.Kernel.System.Network.IPv4;
+
+IPConfig? config = NetworkManager.Primary.IPConfig;
+if (config is null)
+{
+    Console.WriteLine("The primary adapter has no IPv4 configuration.");
+    return;
+}
+
+Address localIp = config.Address;
+Address gateway = config.DefaultGateway;
+
+IcmpClient icmp = new IcmpClient();
+icmp.Connect(gateway);
+
+IcmpEchoRequest request = new IcmpEchoRequest(localIp, gateway, id: 0x1234, sequence: 7);
+
+if (!NetworkStack.Send(request))
+{
+    Console.WriteLine("No interface carries " + localIp.ToString());
+    return;
+}
+
+if (icmp.ReceivePacket(5000) is IcmpEchoReply reply
+    && reply.IcmpId == 0x1234 && reply.IcmpSequence == 7)
+{
+    Console.WriteLine("reply from " + reply.SourceIP.ToString());
+}
+
+icmp.Close();
+```
+
+The contract the packet types actually implement:
+
+- A build constructor writes the complete frame, including lengths and checksums, at construction time; nothing is recomputed later, so header bytes must not be modified after construction.
+- Header properties are snapshots parsed from `RawData` at construction; writing to `RawData` does not refresh them.
+- A parse constructor (`new XxxPacket(byte[])`) aliases the caller's array without copying.
+- `NetworkStack.Send` resolves the sending device from the packet's source IP and returns `false` when no configured interface matches it; the destination MAC is resolved by ARP unless the destination is a broadcast.
+- A custom IP protocol is a subclass of `IPPacket`: pass the protocol number and payload length to a build constructor and write the payload at `DataOffset`.
+
 ## Current limitations
 
-- ICMP is not implemented yet: no ping, in either direction.
 - `System.Net.Dns` is not plugged; use the Cosmos `DnsClient` shown above.
 - No TLS, so no `HttpClient`/HTTPS: raw TCP only.
-- One NIC: the stack talks to `NetworkManager.PrimaryDevice`.
+- Several NICs are registered and configured, and outbound packets are routed by matching the source address against each interface's configuration, so `NetworkManager.Primary` decides only where the unrouted helpers (`NetworkManager.Send`, the no-handle `IPConfig.Enable`) go.
 - Half-close is not supported: `Close()` on an established TCP connection expects the peer to answer the FIN handshake within 5 seconds and throws if it keeps the connection open.
+- On the Cosmos `UdpClient` and `IcmpClient`, `Close()` and `Dispose()` are not the same door. `Close()` stops delivery to the client and an `IcmpClient` reopens with another `Connect()`; `Dispose()` (including the one a `using` block runs) retires the client for good, and every other member throws `ObjectDisposedException` afterwards.
 
 ## How it works
 
-Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over IPv4, ARP and Ethernet), which sends and receives frames through the `NetworkDevice` driver registered with `NetworkManager`. The Cosmos `DHCPClient` and `DnsClient` sit directly on the Cosmos UDP layer.
+Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over IPv4, ARP and Ethernet), which sends and receives frames through the `NetworkDevice` driver registered with `NetworkManager`. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer.
 
 ```
 TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
@@ -260,7 +364,7 @@ TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
 Socket plugs                                            (Cosmos.Kernel.Plugs)
         │
 Cosmos TCP state machine / UDP                          (Cosmos.Kernel.System.Network.IPv4)
-        │                                    DHCPClient / DnsClient ride UDP directly
+        │                                    DhcpClient / DnsClient ride UDP directly
 IPv4 / ARP / Ethernet
         │
 NetworkDevice driver                                    (Intel E1000E, virtio-net)

@@ -4,13 +4,9 @@
   "metadata": [
     {
       "src": [
-        { "src": "../src/Cosmos.Kernel.Boot.Limine", "files": [ "Cosmos.Kernel.Boot.Limine.csproj" ] },
         { "src": "../src/Cosmos.Kernel.Core", "files": [ "Cosmos.Kernel.Core.csproj" ] },
-        { "src": "../src/Cosmos.Kernel.Debug", "files": [ "Cosmos.Kernel.Debug.csproj" ] },
         { "src": "../src/Cosmos.Kernel.HAL", "files": [ "Cosmos.Kernel.HAL.csproj" ] },
-        { "src": "../src/Cosmos.Kernel.HAL.ARM64", "files": [ "Cosmos.Kernel.HAL.ARM64.csproj" ] },
         { "src": "../src/Cosmos.Kernel.HAL.Interfaces", "files": [ "Cosmos.Kernel.HAL.Interfaces.csproj" ] },
-        { "src": "../src/Cosmos.Kernel.HAL.X64", "files": [ "Cosmos.Kernel.HAL.X64.csproj" ] },
         { "src": "../src/Cosmos.Kernel.System", "files": [ "Cosmos.Kernel.System.csproj" ] }
       ],
       "dest": "api",

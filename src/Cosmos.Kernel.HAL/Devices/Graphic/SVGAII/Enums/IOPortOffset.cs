@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 /// <summary>
 /// IO port offset.
 /// </summary>
-public enum IOPortOffset : byte
+internal enum IOPortOffset : byte
 {
     /// <summary>
     /// Index.

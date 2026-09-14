@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// concurrent callers on the same namespace) execute in parallel up to
 /// the controller's I/O queue depth minus one (the NVMe queue-full rule).
 /// </summary>
-public unsafe class NvmeNamespace : BlockDevice
+internal unsafe class NvmeNamespace : BlockDevice
 {
     private readonly NvmeController _controller;
     private readonly uint _nsid;
@@ -40,10 +40,7 @@ public unsafe class NvmeNamespace : BlockDevice
         // Overflow-free guard (divide form): `(int)i * sector` wrapped for
         // >= 4M-block counts and could land back in range, silently copying
         // at wrong offsets instead of failing fast.
-        if (blockCount > (ulong)data.Length / (uint)sector)
-        {
-            throw new ArgumentOutOfRangeException(nameof(blockCount), "Span shorter than the requested transfer.");
-        }
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(blockCount, (ulong)data.Length / (uint)sector, nameof(blockCount));
 
         for (ulong i = 0; i < blockCount; i++)
         {
@@ -65,10 +62,7 @@ public unsafe class NvmeNamespace : BlockDevice
     public override void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
     {
         int sector = (int)BlockSize;
-        if (blockCount > (ulong)data.Length / (uint)sector)
-        {
-            throw new ArgumentOutOfRangeException(nameof(blockCount), "Span shorter than the requested transfer.");
-        }
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(blockCount, (ulong)data.Length / (uint)sector, nameof(blockCount));
 
         for (ulong i = 0; i < blockCount; i++)
         {

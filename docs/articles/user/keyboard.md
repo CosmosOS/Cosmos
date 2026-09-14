@@ -27,6 +27,9 @@ Keyboard support is behind a feature switch. Make sure your kernel's `.csproj` d
 These are the `using`s the snippets below rely on:
 
 ```csharp
+using System.Drawing;
+using Cosmos.Kernel.System.Graphics;
+using Cosmos.Kernel.System.Graphics.Fonts;
 using Cosmos.Kernel.System.Keyboard;
 using Cosmos.Kernel.System.Keyboard.ScanMaps;
 ```
@@ -111,9 +114,6 @@ while (running)
         }
     }
 
-    x = Math.Clamp(x, 0, canvas.Width - 60);
-    y = Math.Clamp(y, 0, canvas.Height - 60);
-
     canvas.Clear(Color.MidnightBlue);
     canvas.DrawString("Move the square with the arrow keys", font, Color.White, 40, 40);
     canvas.DrawFilledRectangle(Color.Gold, x, y, 60, 60);
@@ -143,6 +143,8 @@ while (running)
 
 The lock keys toggle their state on each press and update the keyboard LEDs. Held modifiers also arrive on every `KeyEvent` through its `Modifiers` flags, which is usually the more convenient form.
 
+AltGr is the right Alt key on the layouts that give their keys a third level (German, Spanish, Turkish). While it is held, a key converts through the layout's Control+Alt column and the `KeyEvent` carries both `Control` and `Alt` in its `Modifiers`, the way Windows reports the same key. `ControlPressed` and `AltPressed` stay the state of the physical Control and Alt keys. On the other layouts the right Alt is a second Alt.
+
 ## Keyboard layouts
 
 Key presses come out of the hardware as layout-neutral scan codes; a scan map turns them into characters. The default is US QWERTY, and `SetKeyLayout` switches at any time:
@@ -168,17 +170,26 @@ The switch is visible immediately: below, the same six physical keys are typed t
 <!-- video: typing the six keys right of Tab under the US layout ("qwerty"), switching to FRStandardLayout, typing them again ("azerty") -->
 <video src="images/keyboard-layouts.mp4" controls autoplay muted loop playsinline style="max-width:100%"></video>
 
-`KeyboardManager.GetKeyLayout()` returns the active scan map, and a custom layout is a class deriving from `ScanMapBase` that fills the `Keys` list with `KeyMapping` entries.
+`KeyboardManager.GetKeyLayout()` returns the active scan map, and a custom layout is a class deriving from `ScanMapBase` that overrides `InitializeKeys()` to fill the `Keys` list with `KeyMapping` entries. It runs once, the first time a scan code reaches the layout.
+
+Scan codes are set 1 make codes with the `E0` prefix of an extended key dropped, which is how the bundled layouts list the Windows keys and the navigation cluster. The one exception is the right Alt, whose bare code is the left Alt's: the drivers report it as `0x60`, a code set 1 leaves unused. A layout maps that code to `ConsoleKeyEx.AltGr` to make the key its third-level modifier, and to `ConsoleKeyEx.RAlt` to keep it a plain Alt. A layout that maps it to neither loses the key. The third level of a key is the `ctrlAlt` argument of `KeyMapping`, and `ctrlAltShift` is its fourth:
+
+```csharp
+/* Right Alt selects the third level on this layout */
+Keys.Add(new KeyMapping(0x60, ConsoleKeyEx.AltGr));
+/* Q: q, Q, and @ under AltGr */
+Keys.Add(new KeyMapping(0x10, 'q', 'Q', 'q', 'Q', 'q', 'Q', '@', ConsoleKeyEx.Q));
+```
 
 ## Current limitations
 
 - Key releases are not queued: `KeyEvent.Type` has a `Break` value, but only presses reach the buffer. Releases of Shift, Ctrl and Alt update the modifier state and are otherwise dropped.
-- The bundled scan maps cover the base and shifted characters only: AltGr combinations (`@`, `#`, `{` on AZERTY) and dead keys are not mapped.
+- The German, Spanish and Turkish scan maps carry their AltGr characters; the French and British ones do not yet (`@`, `#`, `{` on AZERTY), so their right Alt stays a plain Alt. Dead keys are not composed: the Turkish `¨`, `~`, `´` and `` ` `` come out as those characters.
 - Devices are detected once at boot; there is no keyboard hotplug.
 
 ## How it works
 
-Every key press raises an interrupt (IRQ1 for the PS/2 keyboard on x64, a virtio-input event on ARM64). The handler feeds the raw scan code to `KeyboardManager.HandleScanCode`, which routes lock and modifier keys to the state properties and converts everything else through the active scan map into a `KeyEvent`, queued in the key buffer. `ReadKey()` halts the CPU until an interrupt delivers the next event; `TryReadKey()` just dequeues. `Console.ReadLine` and `Console.ReadKey` are plugs on top of the same queue, so console input and raw key events never conflict.
+Every key press raises an interrupt (IRQ1 for the PS/2 keyboard on x64, a virtio-input event on ARM64). The handler feeds the raw scan code to `KeyboardManager`, which routes lock and modifier keys to the state properties and converts everything else through the active scan map into a `KeyEvent`, queued in the key buffer. `ReadKey()` halts the CPU until an interrupt delivers the next event; `TryReadKey()` just dequeues. `Console.ReadLine` and `Console.ReadKey` are plugs on top of the same queue, so console input and raw key events never conflict.
 
 ```
 Console.ReadLine / Console.ReadKey        (plugs, Cosmos.Kernel.Plugs)

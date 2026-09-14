@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core;
 /// These flags can be set via RuntimeHostConfigurationOption in csproj
 /// and are used by ILC for trimming.
 /// </summary>
-public static class CosmosFeatures
+internal static class CosmosFeatures
 {
     /// <summary>
     /// Controls interrupt setup (IDT/IRQ). Disabling this also disables Timer, Keyboard,

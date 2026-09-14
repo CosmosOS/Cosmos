@@ -8,7 +8,7 @@ namespace ICSharpCode.SharpZipLib
     /// <summary>
     /// Base exception for corrupt or unsupported compressed data.
     /// </summary>
-    public class SharpZipBaseException : Exception
+    internal class SharpZipBaseException : Exception
     {
         /// <summary>
         /// Initializes a new instance with a message describing the error.
@@ -22,7 +22,7 @@ namespace ICSharpCode.SharpZipLib
     /// <summary>
     /// Indicates that an error occurred while decoding a compressed stream.
     /// </summary>
-    public class StreamDecodingException : SharpZipBaseException
+    internal class StreamDecodingException : SharpZipBaseException
     {
         /// <summary>
         /// Initializes a new instance with a message describing the error.
@@ -36,7 +36,7 @@ namespace ICSharpCode.SharpZipLib
     /// <summary>
     /// Indicates that a value read from a compressed stream is out of its legal range.
     /// </summary>
-    public class ValueOutOfRangeException : StreamDecodingException
+    internal class ValueOutOfRangeException : StreamDecodingException
     {
         /// <summary>
         /// Initializes a new instance naming the out-of-range value.

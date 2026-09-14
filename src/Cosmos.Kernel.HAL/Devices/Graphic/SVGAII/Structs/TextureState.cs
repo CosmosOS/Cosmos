@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
-public struct SVGA3dTextureState
+internal struct SVGA3dTextureState
 {
     [FieldOffset(0)]
     public uint stage;

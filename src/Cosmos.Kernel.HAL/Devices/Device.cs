@@ -5,6 +5,6 @@ namespace Cosmos.Kernel.HAL.Devices;
 /// <summary>
 /// Base class for all hardware devices.
 /// </summary>
-public abstract class Device
+internal abstract class Device
 {
 }

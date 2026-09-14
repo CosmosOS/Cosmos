@@ -8,7 +8,7 @@ namespace ICSharpCode.SharpZipLib.Zip.Compression.Streams
     /// to repeat stuff.<br/>
     /// Author of the original java version : John Leuner
     /// </summary>
-    public class OutputWindow
+    internal class OutputWindow
     {
         #region Constants
 

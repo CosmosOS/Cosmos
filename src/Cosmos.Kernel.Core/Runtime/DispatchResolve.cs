@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using Internal.Runtime;
 
@@ -11,15 +12,6 @@ using Debug = System.Diagnostics.Debug;
 
 namespace Cosmos.Kernel.Core.Runtime
 {
-    /// <summary>
-    /// Exception thrown when an ambiguous interface implementation is detected (diamond problem)
-    /// </summary>
-    public class AmbiguousImplementationException : Exception
-    {
-        public AmbiguousImplementationException() { }
-        public AmbiguousImplementationException(string message) : base(message) { }
-        public AmbiguousImplementationException(string message, Exception innerException) : base(message, innerException) { }
-    }
     internal static unsafe class DispatchResolve
     {
         public static IntPtr FindInterfaceMethodImplementationTarget(MethodTable* pTgtType,

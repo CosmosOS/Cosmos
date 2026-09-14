@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.Core.Runtime;
 /// <summary>
 /// Runtime exception IDs.
 /// </summary>
-public enum ExceptionIDs
+internal enum ExceptionIDs
 {
     OutOfMemory = 1,
     NullReference = 2,
@@ -20,7 +20,7 @@ public enum ExceptionIDs
 /// <summary>
 /// Exception handling clauses as defined in ICodeManager.h.
 /// </summary>
-public enum EHClauseKind
+internal enum EHClauseKind
 {
     EH_CLAUSE_TYPED = 0,   // Catch handler for specific exception type
     EH_CLAUSE_FAULT = 1,   // Fault handler (like finally, runs on exception)
@@ -31,7 +31,7 @@ public enum EHClauseKind
 /// Exception handling clause structure matching NativeAOT format.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct EHClause
+internal unsafe struct EHClause
 {
     public EHClauseKind ClauseKind;
     public uint TryStartOffset;
@@ -44,7 +44,7 @@ public unsafe struct EHClause
 /// <summary>
 /// Stack frame information for the frame-pointer chain walker.
 /// </summary>
-public unsafe struct StackFrame
+internal unsafe struct StackFrame
 {
     public nuint ReturnAddress;   // Where this frame returns to
     public nuint FramePointer;    // RBP/FP value for this frame

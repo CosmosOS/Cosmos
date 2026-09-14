@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 /// <summary>
 /// ID values.
 /// </summary>
-public enum ID : uint
+internal enum ID : uint
 {
     /// <summary>
     /// Magic starting point.

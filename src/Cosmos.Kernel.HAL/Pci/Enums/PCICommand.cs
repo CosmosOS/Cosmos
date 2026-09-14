@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.HAL.Pci.Enums;
 
-public enum PciCommand : short
+internal enum PciCommand : short
 {
     Io = 0x1, /* Enable response in I/O space */
     Memory = 0x2, /* Enable response in Memory space */

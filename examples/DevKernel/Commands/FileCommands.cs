@@ -29,10 +29,10 @@ internal static class FileCommands
     /// Not const: a const field typed as an enum from another assembly forces Mono.Cecil to
     /// resolve that assembly when the patcher rewrites this one, which it cannot do.
     /// </summary>
-    private static readonly ModeEnum s_newFileMode = ModeEnum.RegularFile | ModeEnum.OwnerRead | ModeEnum.OwnerWrite;
+    private static readonly VfsMode s_newFileMode = VfsMode.RegularFile | VfsMode.OwnerRead | VfsMode.OwnerWrite;
 
     /// <summary>Mode bits of a directory the shell creates: owner readable, writable and traversable.</summary>
-    private static readonly ModeEnum s_newDirectoryMode = ModeEnum.Directory | ModeEnum.OwnerRead | ModeEnum.OwnerWrite | ModeEnum.OwnerExecute;
+    private static readonly VfsMode s_newDirectoryMode = VfsMode.Directory | VfsMode.OwnerRead | VfsMode.OwnerWrite | VfsMode.OwnerExecute;
 
     /// <summary>Substitute drawn for a byte that would not render on the console.</summary>
     private const char UnprintableGlyph = '.';
@@ -123,18 +123,11 @@ internal static class FileCommands
 
         if (target != VfsPath.Root)
         {
-            if (!VfsManager.TryOpenDirectory(target, out IVfsDirectoryHandle? dir) || dir == null)
+            if (!VfsManager.TryOpenDirectory(target, out IVfsDirectoryHandle? dir))
             {
-                Terminal.Error("No such directory: " + target);
-                return;
-            }
-
-            // TryOpenDirectory only checks the ops table, so a regular file
-            // opens fine — and every later ls/mkdir then fails with misleading
-            // errors.
-            if (!dir.TryStat(out VfsStat stat) || (stat.Mode & ModeEnum.FileTypeMask) != ModeEnum.Directory)
-            {
-                Terminal.Error("Not a directory: " + target);
+                Terminal.Error(VfsManager.TryStat(target, out _)
+                    ? "Not a directory: " + target
+                    : "No such directory: " + target);
                 return;
             }
         }
@@ -161,7 +154,7 @@ internal static class FileCommands
             return;
         }
 
-        if (!VfsManager.TryOpenDirectory(fullPath, out IVfsDirectoryHandle? dir) || dir == null)
+        if (!VfsManager.TryOpenDirectory(fullPath, out IVfsDirectoryHandle? dir))
         {
             Terminal.Error("Cannot open directory: " + fullPath);
             return;
@@ -210,8 +203,8 @@ internal static class FileCommands
     private static void PrintDirectoryEntry(IVfsInode entry)
     {
         VfsStat stat = default;
-        bool haveStat = entry.InodeOperations != null && entry.InodeOperations.GetAttr(entry, out stat);
-        bool isDirectory = haveStat && (stat.Mode & ModeEnum.FileTypeMask) == ModeEnum.Directory;
+        bool haveStat = entry.InodeOperations.GetAttr(entry, out stat);
+        bool isDirectory = haveStat && stat.IsDirectory;
 
         Console.Write("  ");
         if (isDirectory)
@@ -243,7 +236,7 @@ internal static class FileCommands
         }
 
         string fullPath = context.Resolve(path);
-        if (!VfsManager.TryOpenFile(fullPath, out IVfsFileHandle? file) || file == null)
+        if (!VfsManager.TryOpenFile(fullPath, out IVfsFileHandle? file))
         {
             Terminal.Error("File not found: " + fullPath);
             return;
@@ -290,7 +283,7 @@ internal static class FileCommands
         }
 
         string fullPath = context.Resolve(path);
-        if (!VfsGuards.TryOpenParent(fullPath, out IVfsDirectoryHandle? parentDir, out string leaf) || parentDir == null)
+        if (!VfsGuards.TryOpenParent(fullPath, out IVfsDirectoryHandle? parentDir, out string leaf))
         {
             return;
         }
@@ -312,7 +305,7 @@ internal static class FileCommands
         }
 
         string fullPath = context.Resolve(path);
-        if (!VfsGuards.TryOpenParent(fullPath, out IVfsDirectoryHandle? parentDir, out string leaf) || parentDir == null)
+        if (!VfsGuards.TryOpenParent(fullPath, out IVfsDirectoryHandle? parentDir, out string leaf))
         {
             return;
         }
@@ -334,7 +327,7 @@ internal static class FileCommands
         }
 
         string fullPath = context.Resolve(path);
-        if (!VfsGuards.TryOpenParent(fullPath, out IVfsDirectoryHandle? parentDir, out string leaf) || parentDir == null)
+        if (!VfsGuards.TryOpenParent(fullPath, out IVfsDirectoryHandle? parentDir, out string leaf))
         {
             return;
         }
@@ -363,15 +356,13 @@ internal static class FileCommands
 
         string fullPath = context.Resolve(path);
 
-        if (!VfsManager.TryOpenFile(fullPath, out IVfsFileHandle? file) || file == null)
+        if (!VfsManager.TryOpenFile(fullPath, out IVfsFileHandle? file))
         {
             (string parent, string leaf) = VfsPath.Split(fullPath);
             if (string.IsNullOrEmpty(leaf)
                 || !VfsManager.TryOpenDirectory(parent, out IVfsDirectoryHandle? parentDir)
-                || parentDir == null
                 || !parentDir.TryCreateFile(leaf, s_newFileMode, out _)
-                || !VfsManager.TryOpenFile(fullPath, out file)
-                || file == null)
+                || !VfsManager.TryOpenFile(fullPath, out file))
             {
                 Terminal.Error("Cannot open or create: " + fullPath);
                 return;
@@ -393,7 +384,13 @@ internal static class FileCommands
             }
 
             long written = file.Write(bytes);
-            file.Flush();
+
+            if (!file.TryFlush())
+            {
+                Terminal.Error("Wrote " + written + " bytes to " + fullPath + " but the flush failed");
+                return;
+            }
+
             Terminal.Success("Wrote " + written + " bytes to " + fullPath);
         }
         finally
@@ -409,8 +406,8 @@ internal static class FileCommands
     private static bool Truncate(IVfsFileHandle file)
     {
         VfsStat zeroSize = default;
-        zeroSize.Mode = ModeEnum.RegularFile;
+        zeroSize.Mode = VfsMode.RegularFile;
         zeroSize.Size = TruncatedSize;
-        return file.Inode.InodeOperations.SetAttr(file.Inode, SetAttrFlags.Size, zeroSize);
+        return file.TrySetAttr(SetAttrFlags.Size, zeroSize);
     }
 }

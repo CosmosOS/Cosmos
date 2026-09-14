@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 /// Update through the FIFO. The SVGA3D command layer is
 /// <see cref="VMWareSVGAII3D"/>, built on top of this driver.
 /// </summary>
-public unsafe class SvgaIIDriver : GraphicDevice
+internal unsafe class SvgaIIDriver : GraphicDevice
 {
     /// <summary>
     /// Video memory block.
@@ -66,6 +66,25 @@ public unsafe class SvgaIIDriver : GraphicDevice
     /// (composed host-side; QEMU's vmware-svga does not advertise it).
     /// </summary>
     public bool HasAlphaCursor => (Capabilities & (uint)Capability.AlphaCursor) != 0;
+
+    /// <summary>
+    /// SVGA_FIFO_CAP_3D_HWVERSION_REVISED: the host publishes its 3D version
+    /// in <see cref="Register3D.SVGA_FIFO_3D_HWVERSION_REVISED"/> rather than
+    /// in the original register, which sits in guest-writable FIFO space.
+    /// </summary>
+    private const uint FifoCap3DHwVersionRevised = 1 << 8;
+
+    /// <summary>
+    /// SVGA3D_HWVERSION_WS65_B1 (2.0), the oldest SVGA3D the command layer
+    /// targets. Anything below it counts as no 3D.
+    /// </summary>
+    private const uint MinimumHardwareVersion = 2u << 16;
+
+    /// <summary>
+    /// SVGA3D_HWVERSION_WS8_B1 (2.1), the SVGA3D version this driver declares
+    /// to the host. The host clamps what it publishes to it.
+    /// </summary>
+    private const uint GuestHardwareVersion = (2u << 16) | 1u;
 
     /// <summary>
     /// Whether the device negotiated SVGA3D support during FIFO initialization.
@@ -120,35 +139,7 @@ public unsafe class SvgaIIDriver : GraphicDevice
         _fifoMemory[(uint)FIFO.NextCmd] = _fifoMemory[(uint)FIFO.Min];
         _fifoMemory[(uint)FIFO.Stop] = _fifoMemory[(uint)FIFO.Min];
 
-        // SVGA3D negotiation lives here (not in the 3D layer) because SetMode
-        // re-runs InitializeFIFO, which resets the FIFO registers the
-        // negotiation writes to.
-        if (((Capabilities & 0x00008000) != 0) &&
-            ((Capabilities & (uint)Capability.Cap3D) != 0) &&
-            (_fifoMemory[(uint)FIFO.Min] > ((uint)Register3D.SVGA_FIFO_3D_HWVERSION << 2)))
-        {
-            WriteFifo3D(Register3D.SVGA_FIFO_3D_HWVERSION, ((2u) << 16) | (1u & 0xFFu));
-
-            Is3DEnabled = true;
-
-            if ((Capabilities & (1 << 8)) != 0)
-            {
-                HW3DVer = ReadFifo3D(Register3D.SVGA_FIFO_3D_HWVERSION_REVISED);
-
-                if (HW3DVer < (((2u) << 16) | (0u & 0xFFu)))
-                {
-                    Is3DEnabled = false;
-                }
-            }
-            else
-            {
-                Is3DEnabled = false;
-            }
-        }
-        else
-        {
-            Is3DEnabled = false;
-        }
+        DeclareGuestSvga3D();
 
         // No Register.Enable write here: the constructor runs InitializeFIFO
         // before any mode is set, and enabling the device with Width/Height
@@ -156,6 +147,79 @@ public unsafe class SvgaIIDriver : GraphicDevice
         // at 100% holding the BQL — guest, monitor and gdbstub all freeze).
         // SetMode enables the device once the mode registers are valid.
         WriteRegister(Register.ConfigDone, 1);
+
+        NegotiateSvga3D();
+    }
+
+    /// <summary>
+    /// Tells the host which SVGA3D version this driver speaks. Runs before
+    /// <see cref="Register.ConfigDone"/> hands the host the FIFO layout: the
+    /// host answers with its own version only for a guest that declared one,
+    /// and publishes 0 (which reads as "no 3D") for a guest that stayed
+    /// silent.
+    /// </summary>
+    private void DeclareGuestSvga3D()
+    {
+        if (!HasSvga3DFifoRegisters() ||
+            (ReadFifo3D(Register3D.SVGA_FIFO_CAPABILITIES) & FifoCap3DHwVersionRevised) == 0 ||
+            _fifoMemory[(uint)FIFO.Min] <= ((uint)Register3D.SVGA_FIFO_GUEST_3D_HWVERSION << 2))
+        {
+            return;
+        }
+
+        WriteFifo3D(Register3D.SVGA_FIFO_GUEST_3D_HWVERSION, GuestHardwareVersion);
+    }
+
+    /// <summary>
+    /// Reads back the SVGA3D version the host settled on. Negotiation lives
+    /// with FIFO initialization (not in the 3D layer) because SetMode re-runs
+    /// InitializeFIFO, which resets the FIFO registers it depends on.
+    /// </summary>
+    /// <remarks>
+    /// Must run after <see cref="Register.ConfigDone"/>: the host publishes
+    /// its read-only FIFO registers, the 3D hardware version among them, only
+    /// once the guest has handed it the FIFO layout.
+    /// </remarks>
+    private void NegotiateSvga3D()
+    {
+        Is3DEnabled = false;
+        HW3DVer = 0;
+
+        if (!HasSvga3DFifoRegisters())
+        {
+            return;
+        }
+
+        // Which register carries the version is a FIFO capability, published
+        // in the FIFO itself, not a device capability.
+        uint fifoCapabilities = ReadFifo3D(Register3D.SVGA_FIFO_CAPABILITIES);
+
+        HW3DVer = (fifoCapabilities & FifoCap3DHwVersionRevised) != 0
+            ? ReadFifo3D(Register3D.SVGA_FIFO_3D_HWVERSION_REVISED)
+            : ReadFifo3D(Register3D.SVGA_FIFO_3D_HWVERSION);
+
+        Is3DEnabled = HW3DVer >= MinimumHardwareVersion;
+
+        Serial.WriteString("[SVGAII] SVGA3D: fifocaps 0x");
+        Serial.WriteHex(fifoCapabilities);
+        Serial.WriteString(" hw 0x");
+        Serial.WriteHex(ReadFifo3D(Register3D.SVGA_FIFO_3D_HWVERSION));
+        Serial.WriteString(" rev 0x");
+        Serial.WriteHex(ReadFifo3D(Register3D.SVGA_FIFO_3D_HWVERSION_REVISED));
+        Serial.WriteString(" caps0 0x");
+        Serial.WriteHex(ReadFifo3D(Register3D.SVGA_FIFO_3D_CAPS));
+        Serial.WriteString(Is3DEnabled ? " enabled\n" : " disabled\n");
+    }
+
+    /// <summary>
+    /// Whether the device carries the FIFO registers the SVGA3D negotiation
+    /// reads and writes at all.
+    /// </summary>
+    private bool HasSvga3DFifoRegisters()
+    {
+        return (Capabilities & (uint)Capability.ExtendedFifo) != 0 &&
+               (Capabilities & (uint)Capability.Cap3D) != 0 &&
+               _fifoMemory[(uint)FIFO.Min] > ((uint)Register3D.SVGA_FIFO_3D_HWVERSION << 2);
     }
 
     /// <summary>

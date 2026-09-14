@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.HAL.ARM64.Devices.Timer;
 /// Uses the physical timer (CNTP_*) for scheduling interrupts.
 /// Native imports live in Cosmos.Kernel.Core.ARM64/Bridge/Import/GenericTimerNative.cs.
 /// </summary>
-public class GenericTimer : TimerDevice
+internal class GenericTimer : TimerDevice
 {
     /// <summary>
     /// Singleton instance of the Generic Timer.
@@ -102,15 +102,21 @@ public class GenericTimer : TimerDevice
     }
 
     /// <inheritdoc/>
-    public override void SetFrequency(uint frequency)
+    public override bool SetFrequency(uint frequency)
     {
-        if (frequency == 0)
+        // Above the counter frequency the period rounds down to fewer than one
+        // tick, and SetPeriod would store a zero comparator: the tick handler
+        // re-arms with SetTval(0), so the timer fires again on every eret and
+        // the CPU never leaves the handler. Past 1 GHz the period itself
+        // truncates to zero and the Frequency getter divides by it.
+        if (frequency == 0 || frequency > _timerFrequency)
         {
-            return;
+            return false;
         }
 
         ulong periodNs = 1_000_000_000UL / frequency;
         SetPeriod(periodNs);
+        return true;
     }
 
     /// <summary>

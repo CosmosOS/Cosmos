@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 
 /// <summary>
 /// Interface for block storage devices (SATA, NVMe, virtio-blk, etc.).
-/// Block-level read/write only — partitioning and filesystems sit above this.
+/// Block-level read/write only; partitioning and filesystems sit above this.
 ///
 /// <para>Error contract: <see cref="ReadBlock"/>, <see cref="WriteBlock"/>
 /// and <see cref="Flush"/> throw on failure (device error, timeout,

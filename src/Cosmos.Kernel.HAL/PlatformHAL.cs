@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL;
 /// <summary>
 /// Platform HAL manager - provides access to platform-specific hardware.
 /// </summary>
-public static class PlatformHAL
+internal static class PlatformHAL
 {
     /// <summary>
     /// Legacy POST diagnostic I/O port (0x80); a read takes ~1 µs on PC chipsets,

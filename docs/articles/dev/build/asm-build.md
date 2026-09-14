@@ -61,4 +61,4 @@ Notes:
 
 ## Related components
 
-- [`Cosmos.Build.Asm`](../../../../src/Cosmos.Build.Asm)
+- [`Cosmos.Build.Asm`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Asm)

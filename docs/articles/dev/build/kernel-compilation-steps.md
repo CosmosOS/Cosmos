@@ -77,12 +77,12 @@ flowchart TD
 
 ## Key Components
 
-- [`Cosmos.Sdk`](../../../../src/Cosmos.Sdk) - MSBuild SDK orchestration
-- [`Cosmos.Build.Patcher`](../../../../src/Cosmos.Build.Patcher) - IL patching infrastructure
-- [`Cosmos.Build.Ilc`](../../../../src/Cosmos.Build.Ilc) - NativeAOT integration
-- [`Cosmos.Build.Asm`](../../../../src/Cosmos.Build.Asm) - Assembly compilation
-- [`Cosmos.Build.CC`](../../../../src/Cosmos.Build.CC) - C compilation (Clang)
-- [`Cosmos.Build.Common`](../../../../src/Cosmos.Build.Common) - Linking and ISO creation
+- [`Cosmos.Sdk`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Sdk) - MSBuild SDK orchestration
+- [`Cosmos.Build.Patcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Patcher) - IL patching infrastructure
+- [`Cosmos.Build.Ilc`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Ilc) - NativeAOT integration
+- [`Cosmos.Build.Asm`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Asm) - Assembly compilation
+- [`Cosmos.Build.CC`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.CC) - C compilation (Clang)
+- [`Cosmos.Build.Common`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Common) - Linking and ISO creation
 
 ## Example Project
 

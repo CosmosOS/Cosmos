@@ -4,7 +4,7 @@ using Cosmos.Kernel.System.Keyboard;
 
 namespace Cosmos.Kernel.System.IO;
 
-public sealed class KeyboardTextReader : TextReader
+internal sealed class KeyboardTextReader : TextReader
 {
     public override int Read()
     {
@@ -20,15 +20,13 @@ public sealed class KeyboardTextReader : TextReader
 
     public override int Peek()
     {
-        return KeyboardManager.Peek().KeyChar;
+        return KeyboardManager.KeyAvailable ? KeyboardManager.Peek().KeyChar : -1;
     }
 
     public override string? ReadLine()
     {
-        if (KernelConsole.Default is null)
-        {
-            throw new Exception($"{nameof(KernelConsole)} is not initialized");
-        }
+        KernelConsole.ThrowIfKernelConsoleNotInitialized();
+
         var sb = new StringBuilder();
 
         // Track cursor position within input string
@@ -78,10 +76,7 @@ public sealed class KeyboardTextReader : TextReader
                             KernelConsole.Default.Write(' ');
                             KernelConsole.Default.MoveCursorLeft();
                         }
-                        if (KernelConsole.Default.IsAvailable)
-                        {
-                            KernelConsole.Default.Canvas.Display();
-                        }
+                        KernelConsole.Default.Canvas.Display();
                     }
                     break;
 
@@ -106,10 +101,7 @@ public sealed class KeyboardTextReader : TextReader
                         // Restore cursor position
                         KernelConsole.Default.SetCursorPosition(savedX, savedY);
 
-                        if (KernelConsole.Default.IsAvailable)
-                        {
-                            KernelConsole.Default.Canvas.Display();
-                        }
+                        KernelConsole.Default.Canvas.Display();
                     }
                     break;
 
@@ -118,10 +110,7 @@ public sealed class KeyboardTextReader : TextReader
                     {
                         cursorPos--;
                         KernelConsole.Default.MoveCursorLeft();
-                        if (KernelConsole.Default.IsAvailable)
-                        {
-                            KernelConsole.Default.Canvas.Display();
-                        }
+                        KernelConsole.Default.Canvas.Display();
                     }
                     break;
 
@@ -130,10 +119,7 @@ public sealed class KeyboardTextReader : TextReader
                     {
                         cursorPos++;
                         KernelConsole.Default.MoveCursorRight();
-                        if (KernelConsole.Default.IsAvailable)
-                        {
-                            KernelConsole.Default.Canvas.Display();
-                        }
+                        KernelConsole.Default.Canvas.Display();
                     }
                     break;
 
@@ -143,10 +129,7 @@ public sealed class KeyboardTextReader : TextReader
                     {
                         cursorPos--;
                         KernelConsole.Default.MoveCursorLeft();
-                        if (KernelConsole.Default.IsAvailable)
-                        {
-                            KernelConsole.Default.Canvas.Display();
-                        }
+                        KernelConsole.Default.Canvas.Display();
                     }
                     break;
 
@@ -156,10 +139,7 @@ public sealed class KeyboardTextReader : TextReader
                     {
                         cursorPos++;
                         KernelConsole.Default.MoveCursorRight();
-                        if (KernelConsole.Default.IsAvailable)
-                        {
-                            KernelConsole.Default.Canvas.Display();
-                        }
+                        KernelConsole.Default.Canvas.Display();
                     }
                     break;
 
@@ -192,10 +172,7 @@ public sealed class KeyboardTextReader : TextReader
                             cursorPos++;
                             KernelConsole.Default.Write(keyEvent.KeyChar);
                         }
-                        if (KernelConsole.Default.IsAvailable)
-                        {
-                            KernelConsole.Default.Canvas.Display();
-                        }
+                        KernelConsole.Default.Canvas.Display();
                     }
                     break;
             }

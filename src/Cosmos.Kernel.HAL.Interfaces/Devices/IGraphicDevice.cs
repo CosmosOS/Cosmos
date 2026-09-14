@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 /// <summary>
 /// Interface for graphic devices.
 /// </summary>
-public interface IGraphicDevice
+internal interface IGraphicDevice
 {
     /// <summary>
     /// Initialize the graphic device.

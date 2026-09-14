@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// <summary>
 /// Bridge functions that let C library code allocate from the Cosmos heap.
 /// </summary>
-public static unsafe class HeapNative
+internal static unsafe class HeapNative
 {
     /// <summary>
     /// Allocate memory from Cosmos heap

@@ -1,10 +1,9 @@
 namespace Cosmos.Kernel.Core.Utilities;
 
-public class SimpleDictionary<TKey, TValue> where TKey : notnull
+internal class SimpleDictionary<TKey, TValue> where TKey : notnull
 {
     private const int InitialCapacity = 16;
     private Entry[] _buckets;
-    private int _count;
 
     public SimpleDictionary() : this(InitialCapacity) { }
     public SimpleDictionary(int capacity)
@@ -13,7 +12,7 @@ public class SimpleDictionary<TKey, TValue> where TKey : notnull
     }
 
 
-    public int Count => _count;
+    public int Count { get; private set; }
 
     public TValue this[TKey key]
     {
@@ -39,7 +38,7 @@ public class SimpleDictionary<TKey, TValue> where TKey : notnull
 
         var newEntry = new Entry(key, value);
 
-        if (_buckets[bucketIndex] == null)
+        if (_buckets[bucketIndex] is null)
         {
             _buckets[bucketIndex] = newEntry;
         }
@@ -53,7 +52,7 @@ public class SimpleDictionary<TKey, TValue> where TKey : notnull
                     throw new ArgumentException("An item with the same key already exists.");
                 }
 
-                if (current.Next == null)
+                if (current.Next is null)
                 {
                     current.Next = newEntry;
                     break;
@@ -63,10 +62,10 @@ public class SimpleDictionary<TKey, TValue> where TKey : notnull
             }
         }
 
-        _count++;
+        Count++;
 
         // Resize if needed
-        if (_count > _buckets.Length * 0.75)
+        if (Count > _buckets.Length * 0.75)
         {
             Resize();
         }
@@ -79,7 +78,7 @@ public class SimpleDictionary<TKey, TValue> where TKey : notnull
 
         var current = _buckets[bucketIndex];
 
-        while (current != null)
+        while (current is not null)
         {
             if (current.Key.Equals(key))
             {
@@ -103,12 +102,12 @@ public class SimpleDictionary<TKey, TValue> where TKey : notnull
     {
         var oldBuckets = _buckets;
         _buckets = new Entry[_buckets.Length * 2];
-        _count = 0;
+        Count = 0;
 
         foreach (var entry in oldBuckets)
         {
             var current = entry;
-            while (current != null)
+            while (current is not null)
             {
                 Add(current.Key, current.Value);
                 current = current.Next;
@@ -145,11 +144,11 @@ public class SimpleDictionary<TKey, TValue> where TKey : notnull
         Entry? current = _buckets[bucketIndex];
         Entry? previous = null;
 
-        while (current != null)
+        while (current is not null)
         {
             if (current.Key.Equals(key))
             {
-                if (previous == null)
+                if (previous is null)
                 {
                     _buckets[bucketIndex] = current.Next!;
                 }
@@ -158,7 +157,7 @@ public class SimpleDictionary<TKey, TValue> where TKey : notnull
                     previous.Next = current.Next;
                 }
 
-                _count--;
+                Count--;
                 return true;
             }
 

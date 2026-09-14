@@ -1,0 +1,115 @@
+#nullable enable
+Cosmos.Kernel.HAL.Vfs.IFileOperations
+Cosmos.Kernel.HAL.Vfs.IFileOperations.Fsync(Cosmos.Kernel.HAL.Vfs.IVfsOpenFile! openFile) -> bool
+Cosmos.Kernel.HAL.Vfs.IFileOperations.Read(Cosmos.Kernel.HAL.Vfs.IVfsOpenFile! openFile, System.Span<byte> buffer) -> long
+Cosmos.Kernel.HAL.Vfs.IFileOperations.Release(Cosmos.Kernel.HAL.Vfs.IVfsOpenFile! openFile) -> void
+Cosmos.Kernel.HAL.Vfs.IFileOperations.Seek(Cosmos.Kernel.HAL.Vfs.IVfsOpenFile! openFile, long offset, Cosmos.Kernel.HAL.Vfs.SeekWhence whence, out long newPosition) -> bool
+Cosmos.Kernel.HAL.Vfs.IFileOperations.Write(Cosmos.Kernel.HAL.Vfs.IVfsOpenFile! openFile, System.ReadOnlySpan<byte> buffer) -> long
+Cosmos.Kernel.HAL.Vfs.IInodeOperations
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.Create(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, System.ReadOnlySpan<char> name, Cosmos.Kernel.HAL.Vfs.VfsMode mode, out Cosmos.Kernel.HAL.Vfs.IVfsInode? inode) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.GetAttr(Cosmos.Kernel.HAL.Vfs.IVfsInode! inode, out Cosmos.Kernel.HAL.Vfs.VfsStat stat) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.Lookup(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, System.ReadOnlySpan<char> name, out Cosmos.Kernel.HAL.Vfs.IVfsInode? child) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.Mkdir(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, System.ReadOnlySpan<char> name, Cosmos.Kernel.HAL.Vfs.VfsMode mode, out Cosmos.Kernel.HAL.Vfs.IVfsInode? inode) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.ReadDir(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, out System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Vfs.IVfsInode!>! entries) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.Rename(Cosmos.Kernel.HAL.Vfs.IVfsInode! oldParent, System.ReadOnlySpan<char> oldName, Cosmos.Kernel.HAL.Vfs.IVfsInode! newParent, System.ReadOnlySpan<char> newName) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.Rmdir(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, System.ReadOnlySpan<char> name) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.SetAttr(Cosmos.Kernel.HAL.Vfs.IVfsInode! inode, Cosmos.Kernel.HAL.Vfs.SetAttrFlags flags, in Cosmos.Kernel.HAL.Vfs.VfsStat attributes) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.Symlink(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, System.ReadOnlySpan<char> name, System.ReadOnlySpan<char> target, out Cosmos.Kernel.HAL.Vfs.IVfsInode? inode) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.Unlink(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, System.ReadOnlySpan<char> name) -> bool
+Cosmos.Kernel.HAL.Vfs.ISuperblockOperations
+Cosmos.Kernel.HAL.Vfs.ISuperblockOperations.Drop(Cosmos.Kernel.HAL.Vfs.IVfsSuperblock! superblock) -> void
+Cosmos.Kernel.HAL.Vfs.ISuperblockOperations.StatFs(Cosmos.Kernel.HAL.Vfs.IVfsSuperblock! superblock, out Cosmos.Kernel.HAL.Vfs.VfsStatFs statFs) -> bool
+Cosmos.Kernel.HAL.Vfs.ISuperblockOperations.Sync(Cosmos.Kernel.HAL.Vfs.IVfsSuperblock! superblock) -> bool
+Cosmos.Kernel.HAL.Vfs.IVfsFilesystemType
+Cosmos.Kernel.HAL.Vfs.IVfsFilesystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
+Cosmos.Kernel.HAL.Vfs.IVfsFilesystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.IVfsFormatOptions? options) -> bool
+Cosmos.Kernel.HAL.Vfs.IVfsFilesystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.MountFlags flags, out Cosmos.Kernel.HAL.Vfs.IVfsSuperblock? superblock) -> bool
+Cosmos.Kernel.HAL.Vfs.IVfsFormatOptions
+Cosmos.Kernel.HAL.Vfs.IVfsInode
+Cosmos.Kernel.HAL.Vfs.IVfsInode.FileOperations.get -> Cosmos.Kernel.HAL.Vfs.IFileOperations?
+Cosmos.Kernel.HAL.Vfs.IVfsInode.InodeOperations.get -> Cosmos.Kernel.HAL.Vfs.IInodeOperations!
+Cosmos.Kernel.HAL.Vfs.IVfsInode.Name.get -> string!
+Cosmos.Kernel.HAL.Vfs.IVfsOpenFile
+Cosmos.Kernel.HAL.Vfs.IVfsOpenFile.Inode.get -> Cosmos.Kernel.HAL.Vfs.IVfsInode!
+Cosmos.Kernel.HAL.Vfs.IVfsOpenFile.Operations.get -> Cosmos.Kernel.HAL.Vfs.IFileOperations!
+Cosmos.Kernel.HAL.Vfs.IVfsOpenFile.Position.get -> long
+Cosmos.Kernel.HAL.Vfs.IVfsOpenFile.Position.set -> void
+Cosmos.Kernel.HAL.Vfs.IVfsSuperblock
+Cosmos.Kernel.HAL.Vfs.IVfsSuperblock.BlockSize.get -> long
+Cosmos.Kernel.HAL.Vfs.IVfsSuperblock.MaxNameLength.get -> ulong
+Cosmos.Kernel.HAL.Vfs.IVfsSuperblock.Root.get -> Cosmos.Kernel.HAL.Vfs.IVfsInode!
+Cosmos.Kernel.HAL.Vfs.IVfsSuperblock.SuperOperations.get -> Cosmos.Kernel.HAL.Vfs.ISuperblockOperations!
+Cosmos.Kernel.HAL.Vfs.MountFlags
+Cosmos.Kernel.HAL.Vfs.MountFlags.NoDev = 4 -> Cosmos.Kernel.HAL.Vfs.MountFlags
+Cosmos.Kernel.HAL.Vfs.MountFlags.NoExec = 8 -> Cosmos.Kernel.HAL.Vfs.MountFlags
+Cosmos.Kernel.HAL.Vfs.MountFlags.None = 0 -> Cosmos.Kernel.HAL.Vfs.MountFlags
+Cosmos.Kernel.HAL.Vfs.MountFlags.NoSuid = 2 -> Cosmos.Kernel.HAL.Vfs.MountFlags
+Cosmos.Kernel.HAL.Vfs.MountFlags.ReadOnly = 1 -> Cosmos.Kernel.HAL.Vfs.MountFlags
+Cosmos.Kernel.HAL.Vfs.SeekWhence
+Cosmos.Kernel.HAL.Vfs.SeekWhence.Cur = 1 -> Cosmos.Kernel.HAL.Vfs.SeekWhence
+Cosmos.Kernel.HAL.Vfs.SeekWhence.End = 2 -> Cosmos.Kernel.HAL.Vfs.SeekWhence
+Cosmos.Kernel.HAL.Vfs.SeekWhence.Set = 0 -> Cosmos.Kernel.HAL.Vfs.SeekWhence
+Cosmos.Kernel.HAL.Vfs.SetAttrFlags
+Cosmos.Kernel.HAL.Vfs.SetAttrFlags.Atime = 16 -> Cosmos.Kernel.HAL.Vfs.SetAttrFlags
+Cosmos.Kernel.HAL.Vfs.SetAttrFlags.Ctime = 64 -> Cosmos.Kernel.HAL.Vfs.SetAttrFlags
+Cosmos.Kernel.HAL.Vfs.SetAttrFlags.Gid = 4 -> Cosmos.Kernel.HAL.Vfs.SetAttrFlags
+Cosmos.Kernel.HAL.Vfs.SetAttrFlags.Mode = 1 -> Cosmos.Kernel.HAL.Vfs.SetAttrFlags
+Cosmos.Kernel.HAL.Vfs.SetAttrFlags.Mtime = 32 -> Cosmos.Kernel.HAL.Vfs.SetAttrFlags
+Cosmos.Kernel.HAL.Vfs.SetAttrFlags.None = 0 -> Cosmos.Kernel.HAL.Vfs.SetAttrFlags
+Cosmos.Kernel.HAL.Vfs.SetAttrFlags.Size = 8 -> Cosmos.Kernel.HAL.Vfs.SetAttrFlags
+Cosmos.Kernel.HAL.Vfs.SetAttrFlags.Uid = 2 -> Cosmos.Kernel.HAL.Vfs.SetAttrFlags
+Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.BlockDevice = Cosmos.Kernel.HAL.Vfs.VfsMode.CharacterDevice | Cosmos.Kernel.HAL.Vfs.VfsMode.Directory -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.CharacterDevice = 8192 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.Directory = 16384 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.FileTypeMask = Cosmos.Kernel.HAL.Vfs.VfsMode.NamedPipe | Cosmos.Kernel.HAL.Vfs.VfsMode.CharacterDevice | Cosmos.Kernel.HAL.Vfs.VfsMode.Socket -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.GroupExecute = 8 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.GroupRead = 32 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.GroupWrite = 16 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.NamedPipe = 4096 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.OtherExecute = 1 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.OtherRead = 4 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.OtherWrite = 2 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.OwnerExecute = 64 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.OwnerRead = 256 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.OwnerWrite = 128 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.PermissionMask = Cosmos.Kernel.HAL.Vfs.VfsMode.OtherExecute | Cosmos.Kernel.HAL.Vfs.VfsMode.OtherWrite | Cosmos.Kernel.HAL.Vfs.VfsMode.OtherRead | Cosmos.Kernel.HAL.Vfs.VfsMode.GroupExecute | Cosmos.Kernel.HAL.Vfs.VfsMode.GroupWrite | Cosmos.Kernel.HAL.Vfs.VfsMode.GroupRead | Cosmos.Kernel.HAL.Vfs.VfsMode.OwnerExecute | Cosmos.Kernel.HAL.Vfs.VfsMode.OwnerWrite | Cosmos.Kernel.HAL.Vfs.VfsMode.OwnerRead -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.RegularFile = 32768 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.SetGroupId = 1024 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.SetUserId = 2048 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.Socket = Cosmos.Kernel.HAL.Vfs.VfsMode.Directory | Cosmos.Kernel.HAL.Vfs.VfsMode.RegularFile -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.Sticky = 512 -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsMode.SymbolicLink = Cosmos.Kernel.HAL.Vfs.VfsMode.CharacterDevice | Cosmos.Kernel.HAL.Vfs.VfsMode.RegularFile -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsStat
+Cosmos.Kernel.HAL.Vfs.VfsStat.Atime -> Cosmos.Kernel.HAL.Vfs.VfsTimespec
+Cosmos.Kernel.HAL.Vfs.VfsStat.BlkSize -> long
+Cosmos.Kernel.HAL.Vfs.VfsStat.Blocks -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStat.Ctime -> Cosmos.Kernel.HAL.Vfs.VfsTimespec
+Cosmos.Kernel.HAL.Vfs.VfsStat.Gid -> uint
+Cosmos.Kernel.HAL.Vfs.VfsStat.Ino -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStat.IsDirectory.get -> bool
+Cosmos.Kernel.HAL.Vfs.VfsStat.IsRegularFile.get -> bool
+Cosmos.Kernel.HAL.Vfs.VfsStat.IsSymbolicLink.get -> bool
+Cosmos.Kernel.HAL.Vfs.VfsStat.Mode -> Cosmos.Kernel.HAL.Vfs.VfsMode
+Cosmos.Kernel.HAL.Vfs.VfsStat.Mtime -> Cosmos.Kernel.HAL.Vfs.VfsTimespec
+Cosmos.Kernel.HAL.Vfs.VfsStat.NLink -> uint
+Cosmos.Kernel.HAL.Vfs.VfsStat.Rdev -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStat.Size -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStat.Uid -> uint
+Cosmos.Kernel.HAL.Vfs.VfsStat.VfsStat() -> void
+Cosmos.Kernel.HAL.Vfs.VfsStatFs
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.Bavail -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.Bfree -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.Blocks -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.BlockSize -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.Ffree -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.Files -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.Frsize -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.NameMax -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.Type -> ulong
+Cosmos.Kernel.HAL.Vfs.VfsStatFs.VfsStatFs() -> void
+Cosmos.Kernel.HAL.Vfs.VfsTimespec
+Cosmos.Kernel.HAL.Vfs.VfsTimespec.TvNsec -> long
+Cosmos.Kernel.HAL.Vfs.VfsTimespec.TvSec -> long
+Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec() -> void
+Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void

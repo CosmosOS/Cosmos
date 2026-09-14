@@ -1,4 +1,4 @@
-// This code is licensed under MIT license (see LICENSE for details)
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -8,35 +8,125 @@ using Cosmos.Kernel.System.Network.IPv4;
 
 namespace Cosmos.Kernel.System.Network.IPv6;
 
+/// <summary>
+/// The scope or role an IPv6 address has by its prefix, as <see cref="Address6.AddressType"/> reads it.
+/// </summary>
 public enum IPv6AddressType
 {
+    /// <summary>
+    /// An address assigned to several interfaces, delivered to the nearest one.
+    /// </summary>
     Anycast,
+
+    /// <summary>
+    /// A routable address in <c>2000::/3</c>.
+    /// </summary>
     GlobalUnicast,
+
+    /// <summary>
+    /// A link-local address in <c>fe80::/10</c>.
+    /// </summary>
     LinkLocal,
+
+    /// <summary>
+    /// The loopback address <c>::1</c>.
+    /// </summary>
     Loopback,
+
+    /// <summary>
+    /// The unspecified address <c>::</c>.
+    /// </summary>
     Unspecified,
+
+    /// <summary>
+    /// A unique local address in <c>fc00::/7</c>.
+    /// </summary>
     UniqueLocal,
+
+    /// <summary>
+    /// An IPv4 address carried in the low 32 bits, as in <c>::ffff:192.0.2.128</c>.
+    /// </summary>
     EmbeddedIPv4,
+
+    /// <summary>
+    /// A well-known multicast address in <c>ff00::/12</c>.
+    /// </summary>
     WellKnown,
+
+    /// <summary>
+    /// A transient multicast address.
+    /// </summary>
     Transient,
+
+    /// <summary>
+    /// A solicited-node multicast address in <c>ff02::1:ff00:0/104</c>.
+    /// </summary>
     SolicitedNode,
+
+    /// <summary>
+    /// Any address no other value describes.
+    /// </summary>
     Generic,
 }
 
+/// <summary>
+/// Represents an IPv6 address.
+/// </summary>
 public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
 {
+    /// <summary>
+    /// The unspecified address <c>::</c>.
+    /// </summary>
     public static readonly Address6 Zero = new(0, 0, 0, 0);
+
+    /// <summary>
+    /// The loopback address <c>::1</c>.
+    /// </summary>
     public static readonly Address6 Loopback = new(0, 0, 0, 1);
+
+    /// <summary>
+    /// Bytes 0 to 3 packed into one number, the first byte in the most significant position.
+    /// </summary>
     public uint Segment1 { get; }
+
+    /// <summary>
+    /// Bytes 4 to 7 packed into one number.
+    /// </summary>
     public uint Segment2 { get; }
+
+    /// <summary>
+    /// Bytes 8 to 11 packed into one number.
+    /// </summary>
     public uint Segment3 { get; }
+
+    /// <summary>
+    /// Bytes 12 to 15 packed into one number.
+    /// </summary>
     public uint Segment4 { get; }
+
+    /// <inheritdoc />
     public override bool IsZero => Equals(Zero);
+
+    /// <inheritdoc />
     public override MaskedAddress Parts => new(Segment1, Segment2, Segment3, Segment4);
-    // IPv6 has multicast
+
+    /// <summary>
+    /// Always <see langword="false"/>: IPv6 has multicast instead of broadcast.
+    /// </summary>
     public override bool IsBroadcastAddress => false;
+
+    /// <summary>
+    /// Whether this is the loopback address <c>::1</c>.
+    /// </summary>
     public override bool IsLoopbackAddress => Equals(Loopback);
 
+    /// <summary>
+    /// Creates an address from its four 32-bit segments.
+    /// </summary>
+    /// <param name="segment1">Bytes 0 to 3, most significant first.</param>
+    /// <param name="segment2">Bytes 4 to 7.</param>
+    /// <param name="segment3">Bytes 8 to 11.</param>
+    /// <param name="segment4">Bytes 12 to 15.</param>
     public Address6(uint segment1, uint segment2, uint segment3, uint segment4)
     {
         Segment1 = segment1;
@@ -45,6 +135,11 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         Segment4 = segment4;
     }
 
+    /// <summary>
+    /// Creates an address from its four 32-bit segments.
+    /// </summary>
+    /// <param name="segments">The four segments, most significant first.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="segments"/> is not exactly four values long.</exception>
     public Address6(ReadOnlySpan<uint> segments)
     {
         if (segments.Length != 4)
@@ -58,6 +153,17 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         Segment4 = segments[3];
     }
 
+    /// <summary>
+    /// Creates an address from its eight 16-bit groups, the ones written between colons.
+    /// </summary>
+    /// <param name="segment1A">Group 1, the most significant.</param>
+    /// <param name="segment1B">Group 2.</param>
+    /// <param name="segment2A">Group 3.</param>
+    /// <param name="segment2B">Group 4.</param>
+    /// <param name="segment3A">Group 5.</param>
+    /// <param name="segment3B">Group 6.</param>
+    /// <param name="segment4A">Group 7.</param>
+    /// <param name="segment4B">Group 8, the least significant.</param>
     public Address6(ushort segment1A, ushort segment1B, ushort segment2A, ushort segment2B,
         ushort segment3A, ushort segment3B, ushort segment4A, ushort segment4B)
     {
@@ -67,6 +173,11 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         Segment4 = (uint)(segment4A << 16 | segment4B);
     }
 
+    /// <summary>
+    /// Creates an address from its eight 16-bit groups, the ones written between colons.
+    /// </summary>
+    /// <param name="buffer">The eight groups, most significant first.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="buffer"/> is not exactly eight values long.</exception>
     public Address6(ReadOnlySpan<ushort> buffer)
     {
         if (buffer.Length != 8)
@@ -80,6 +191,7 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         Segment4 = (uint)(buffer[6] << 16 | buffer[7]);
     }
 
+    /// <inheritdoc />
     public override ReadOnlySpan<byte> ToBytes()
     {
         Span<byte> data = new byte[16];
@@ -90,6 +202,9 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         return data;
     }
 
+    /// <summary>
+    /// The eight 16-bit groups of the address, most significant first.
+    /// </summary>
     public ReadOnlySpan<ushort> ToUShorts()
     {
         Span<ushort> data = new ushort[8];
@@ -104,6 +219,9 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         return data;
     }
 
+    /// <summary>
+    /// Counts the colons in <paramref name="addr"/>.
+    /// </summary>
     internal static int CountSeparators(ReadOnlySpan<char> addr)
     {
         int result = 0;
@@ -118,6 +236,9 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         return result;
     }
 
+    /// <summary>
+    /// The scope or role the address has by its prefix.
+    /// </summary>
     public new IPv6AddressType AddressType
     {
         get
@@ -328,6 +449,12 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         return true;
     }
 
+    /// <summary>
+    /// Parses an IPv6 address in its colon-separated hexadecimal form, with or without a
+    /// <c>::</c> zero-group abbreviation.
+    /// </summary>
+    /// <param name="addr">The address text.</param>
+    /// <returns>The parsed address, or <see langword="null"/> when the text is not a valid address.</returns>
     public static new Address6? Parse(ReadOnlySpan<char> addr)
     {
         // check for illegal chars first
@@ -368,6 +495,11 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         return null;
     }
 
+    /// <summary>
+    /// Parses each of <paramref name="ranges"/> in <paramref name="addr"/> as a hexadecimal
+    /// group into <paramref name="addressValues"/>, in order.
+    /// </summary>
+    /// <returns><see langword="false"/> when a group is empty, longer than four characters or not hexadecimal.</returns>
     internal static bool FillFragments(Span<ushort> addressValues, ReadOnlySpan<char> addr, ReadOnlySpan<Range> ranges)
     {
         for (int i = 0; i < ranges.Length; i++)
@@ -429,6 +561,7 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         }
     }
 
+    /// <inheritdoc />
     protected override MaskedAddress OperatorBitwiseAnd(Address other)
     {
         if (other is Address6 otherAddress6)
@@ -443,6 +576,11 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         throw new ArgumentException($"Can bitwise operate {nameof(Address6)} with {nameof(Address4)} only");
     }
 
+    /// <summary>
+    /// Orders addresses by their numeric value, most significant segment first; a
+    /// <see langword="null"/> address sorts first.
+    /// </summary>
+    /// <param name="other">The address to compare with.</param>
     public int CompareTo(Address6? other)
     {
         if (other is null)
@@ -471,16 +609,23 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         return Segment4.CompareTo(other.Segment4);
     }
 
+    /// <inheritdoc />
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return ReferenceEquals(this, obj) || obj is Address6 other && Equals(other);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         return HashCode.Combine(Segment1, Segment2, Segment3, Segment4);
     }
 
+    /// <summary>
+    /// Checks whether <paramref name="other"/> holds the same sixteen bytes.
+    /// </summary>
+    /// <param name="other">The address to compare with, or <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> for the same sixteen bytes; <see langword="false"/> otherwise and for <see langword="null"/>.</returns>
     public bool Equals([NotNullWhen(true)] Address6? other)
     {
         if (other is null)
@@ -499,8 +644,17 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
                && Segment4 == other.Segment4;
     }
 
+    /// <summary>
+    /// Formats the address in its shortest form: lowercase hexadecimal groups without leading
+    /// zeros and the longest run of zero groups abbreviated to <c>::</c>.
+    /// </summary>
     public override string ToString() => ToString(leadingZeros: false);
 
+    /// <summary>
+    /// Formats the address as eight colon-separated hexadecimal groups.
+    /// </summary>
+    /// <param name="leadingZeros">Whether each group is padded to four digits.</param>
+    /// <param name="groupZeros">Whether the longest run of two or more zero groups is abbreviated to <c>::</c>.</param>
     public string ToString(bool leadingZeros = false, bool groupZeros = true)
     {
         string format = leadingZeros ? "x4" : "x";
@@ -549,6 +703,10 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Finds the longest run of at least two zero groups, the one <c>::</c> stands for.
+    /// </summary>
+    /// <returns>The start index and length of the run, or <see langword="null"/> when no group repeats zero.</returns>
     internal static (int Start, int Length)? FindLargestZeroGroup(ReadOnlySpan<ushort> data)
     {
         int? largestStart = null;

@@ -1,10 +1,9 @@
 using System;
 using System.Diagnostics;
-using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Timer;
 using Cosmos.TestRunner.Framework;
-using AlarmSystem = Cosmos.Kernel.Core.Scheduler.AlarmSystem;
 using BclTimer = System.Threading.Timer;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -22,11 +21,11 @@ public class Kernel : Sys.Kernel
 {
     protected override void BeforeRun()
     {
-        Serial.WriteString("[Timer Tests] Starting test suite\n");
+        Log.WriteString("[Timer Tests] Starting test suite\n");
 
 #if ARCH_X64
-        // x64: Stopwatch (2) + PIT (3) + TimerManager (5) + LAPIC (3) + DateTime (4) + AlarmSystem (3) + BCL Timer (4) = 24
-        TR.Start("Timer Tests", expectedTests: 24);
+        // x64: Stopwatch (2) + PIT (3) + TimerManager (7) + LAPIC (3) + DateTime (4) + AlarmManager (3) + BCL Timer (4) = 26
+        TR.Start("Timer Tests", expectedTests: 26);
 
         // PIT Tests (using Stopwatch for verification)
         TR.Run("PIT_Initialized", TestPITInitialized);
@@ -40,8 +39,8 @@ public class Kernel : Sys.Kernel
 
 #else
         // ARM64: No PIT or LAPIC, just basic timer manager tests
-        // Stopwatch (2) + TimerManager (5) + DateTime (4) + AlarmSystem (3) + BCL Timer (4) = 18
-        TR.Start("Timer Tests", expectedTests: 18);
+        // Stopwatch (2) + TimerManager (7) + DateTime (4) + AlarmManager (3) + BCL Timer (4) = 20
+        TR.Start("Timer Tests", expectedTests: 20);
 #endif
 
         // Stopwatch/TSC Tests - must run first to verify timing source
@@ -54,11 +53,13 @@ public class Kernel : Sys.Kernel
         TR.Run("TimerManager_Schedule_OneShot", TestScheduleOneShot);
         TR.Run("TimerManager_Schedule_Recurring", TestScheduleRecurring);
         TR.Run("TimerManager_Schedule_Cancel", TestScheduleCancel);
+        TR.Run("Deferred_RejectNonPositivePeriod", TestRejectNonPositivePeriod);
+        TR.Run("TimerManager_Callback_CancelsOtherTimers", TestCallbackCancelsOtherTimers);
 
-        // AlarmSystem Tests
-        TR.Run("AlarmSystem_Add_Fires", TestAlarmFires);
-        TR.Run("AlarmSystem_AddRecurring", TestAlarmRecurring);
-        TR.Run("AlarmSystem_Remove", TestAlarmRemove);
+        // Alarm Tests
+        TR.Run("Alarm_Schedule_Fires", TestAlarmFires);
+        TR.Run("Alarm_ScheduleRecurring", TestAlarmRecurring);
+        TR.Run("Alarm_Cancel", TestAlarmRemove);
 
         // DateTime/RTC Tests
         TR.Run("RTC_Initialized", TestRTCInitialized);
@@ -74,7 +75,7 @@ public class Kernel : Sys.Kernel
         TR.Run("BclTimer_Dispose_Stops", TestBclTimerDisposeStops);
         TR.Run("Task_Delay_Completes", TestTaskDelayCompletes);
 
-        Serial.WriteString("[Timer Tests] All tests completed\n");
+        Log.WriteString("[Timer Tests] All tests completed\n");
         TR.Finish();
     }
 
@@ -97,28 +98,28 @@ public class Kernel : Sys.Kernel
         Assert.True(RTC.Instance != null, "RTC: Instance should be initialized");
         Assert.True(RTC.Instance!.IsAvailable, "RTC: Should be initialized");
 
-        Serial.WriteString("[Timer Tests] RTC boot time ticks: ");
-        Serial.WriteNumber((ulong)RTC.Instance.BootTimeTicks);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] RTC boot time ticks: ");
+        Log.WriteNumber((ulong)RTC.Instance.BootTimeTicks);
+        Log.WriteString("\n");
     }
 
     private static void TestDateTimeNowValid()
     {
         DateTime now = DateTime.Now;
 
-        Serial.WriteString("[Timer Tests] DateTime.Now: ");
-        Serial.WriteNumber((ulong)now.Year);
-        Serial.WriteString("-");
-        Serial.WriteNumber((ulong)now.Month);
-        Serial.WriteString("-");
-        Serial.WriteNumber((ulong)now.Day);
-        Serial.WriteString(" ");
-        Serial.WriteNumber((ulong)now.Hour);
-        Serial.WriteString(":");
-        Serial.WriteNumber((ulong)now.Minute);
-        Serial.WriteString(":");
-        Serial.WriteNumber((ulong)now.Second);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] DateTime.Now: ");
+        Log.WriteNumber((ulong)now.Year);
+        Log.WriteString("-");
+        Log.WriteNumber((ulong)now.Month);
+        Log.WriteString("-");
+        Log.WriteNumber((ulong)now.Day);
+        Log.WriteString(" ");
+        Log.WriteNumber((ulong)now.Hour);
+        Log.WriteString(":");
+        Log.WriteNumber((ulong)now.Minute);
+        Log.WriteString(":");
+        Log.WriteNumber((ulong)now.Second);
+        Log.WriteString("\n");
 
         // Year should be >= 2020 (reasonable minimum for RTC)
         Assert.True(now.Year >= 2020, "DateTime: Year should be >= 2020");
@@ -136,11 +137,11 @@ public class Kernel : Sys.Kernel
 
         DateTime dt2 = DateTime.Now;
 
-        Serial.WriteString("[Timer Tests] DateTime dt1 ticks: ");
-        Serial.WriteNumber((ulong)dt1.Ticks);
-        Serial.WriteString(", dt2 ticks: ");
-        Serial.WriteNumber((ulong)dt2.Ticks);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] DateTime dt1 ticks: ");
+        Log.WriteNumber((ulong)dt1.Ticks);
+        Log.WriteString(", dt2 ticks: ");
+        Log.WriteNumber((ulong)dt2.Ticks);
+        Log.WriteString("\n");
 
         Assert.True(dt2 > dt1, "DateTime: Now should increment over time");
 
@@ -155,13 +156,13 @@ public class Kernel : Sys.Kernel
     {
         DateTime utcNow = DateTime.UtcNow;
 
-        Serial.WriteString("[Timer Tests] DateTime.UtcNow: ");
-        Serial.WriteNumber((ulong)utcNow.Year);
-        Serial.WriteString("-");
-        Serial.WriteNumber((ulong)utcNow.Month);
-        Serial.WriteString("-");
-        Serial.WriteNumber((ulong)utcNow.Day);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] DateTime.UtcNow: ");
+        Log.WriteNumber((ulong)utcNow.Year);
+        Log.WriteString("-");
+        Log.WriteNumber((ulong)utcNow.Month);
+        Log.WriteString("-");
+        Log.WriteNumber((ulong)utcNow.Day);
+        Log.WriteString("\n");
 
         // Should have Utc kind
         Assert.True(utcNow.Kind == DateTimeKind.Utc, "DateTime: UtcNow should have Utc kind");
@@ -180,11 +181,11 @@ public class Kernel : Sys.Kernel
 
         long ts2 = Stopwatch.GetTimestamp();
 
-        Serial.WriteString("[Timer Tests] Stopwatch ts1: ");
-        Serial.WriteNumber((ulong)ts1);
-        Serial.WriteString(", ts2: ");
-        Serial.WriteNumber((ulong)ts2);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Stopwatch ts1: ");
+        Log.WriteNumber((ulong)ts1);
+        Log.WriteString(", ts2: ");
+        Log.WriteNumber((ulong)ts2);
+        Log.WriteString("\n");
 
         Assert.True(ts2 > ts1, "Stopwatch: GetTimestamp() should return incrementing values");
     }
@@ -192,9 +193,9 @@ public class Kernel : Sys.Kernel
     {
         long freq = Stopwatch.Frequency;
 
-        Serial.WriteString("[Timer Tests] Stopwatch.Frequency: ");
-        Serial.WriteNumber((ulong)freq);
-        Serial.WriteString(" Hz\n");
+        Log.WriteString("[Timer Tests] Stopwatch.Frequency: ");
+        Log.WriteNumber((ulong)freq);
+        Log.WriteString(" Hz\n");
 
         // TSC frequency should be at least 100 MHz on x64; ARM64 generic timer is typically 62.5 MHz
 #if ARCH_X64
@@ -209,8 +210,9 @@ public class Kernel : Sys.Kernel
 
     private static void TestTimerManagerInitialized()
     {
-        Assert.True(TimerManager.IsInitialized, "TimerManager: Should be initialized");
-        Assert.True(TimerManager.Timer != null, "TimerManager: Should have a registered timer");
+        // IsInitialized is exactly "a timer device is registered": the ring
+        // publishes the fact, so the suite does not read the device itself.
+        Assert.True(TimerManager.IsInitialized, "TimerManager: a timer device should be registered");
     }
 
     private static void TestTimerManagerWait500ms()
@@ -223,9 +225,9 @@ public class Kernel : Sys.Kernel
         long frequency = Stopwatch.Frequency;
         long elapsedMs = (elapsed * 1000) / frequency;
 
-        Serial.WriteString("[Timer Tests] TimerManager Wait(500ms) - elapsed ms: ");
-        Serial.WriteNumber((ulong)elapsedMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] TimerManager Wait(500ms) - elapsed ms: ");
+        Log.WriteNumber((ulong)elapsedMs);
+        Log.WriteString("\n");
 
         // Check if within tolerance (250-1000ms for 500ms wait)
         bool inRange = elapsedMs >= 250 && elapsedMs <= 1000;
@@ -239,36 +241,37 @@ public class Kernel : Sys.Kernel
     private static void TestScheduleOneShot()
     {
         s_oneShotFireCount = 0;
-        SoftwareTimer? timer = TimerManager.Schedule(static () => s_oneShotFireCount++, 50);
+        SoftwareTimer? timer = TimerManager.Schedule(static () => s_oneShotFireCount++, TimeSpan.FromMilliseconds(50));
 
         Assert.True(timer != null, "Schedule: should return a timer");
         Assert.True(timer!.IsActive, "Schedule: timer should be active before firing");
 
         TimerManager.Wait(300);
 
-        Serial.WriteString("[Timer Tests] One-shot fire count: ");
-        Serial.WriteNumber((ulong)s_oneShotFireCount);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] One-shot fire count: ");
+        Log.WriteNumber((ulong)s_oneShotFireCount);
+        Log.WriteString("\n");
 
         Assert.True(s_oneShotFireCount == 1, "Schedule: one-shot timer should fire exactly once");
         Assert.True(!timer.IsActive, "Schedule: one-shot timer should be inactive after firing");
+        Assert.True(!TimerManager.Cancel(timer), "Schedule: fired timer should no longer be cancellable");
     }
 
     private static void TestScheduleRecurring()
     {
         s_recurringFireCount = 0;
-        SoftwareTimer? timer = TimerManager.ScheduleRecurring(static () => s_recurringFireCount++, 50);
+        SoftwareTimer? timer = TimerManager.ScheduleRecurring(static () => s_recurringFireCount++, TimeSpan.FromMilliseconds(50));
 
         Assert.True(timer != null, "ScheduleRecurring: should return a timer");
 
         TimerManager.Wait(500);
 
         int count = s_recurringFireCount;
-        Serial.WriteString("[Timer Tests] Recurring fire count after 500ms: ");
-        Serial.WriteNumber((ulong)count);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Recurring fire count after 500ms: ");
+        Log.WriteNumber((ulong)count);
+        Log.WriteString("\n");
 
-        TimerManager.Cancel(timer);
+        Assert.True(TimerManager.Cancel(timer), "ScheduleRecurring: pending timer should be cancellable");
 
         Assert.True(count >= 3, "ScheduleRecurring: timer should fire repeatedly (>= 3 in 500ms)");
         Assert.True(!timer!.IsActive, "ScheduleRecurring: cancelled timer should be inactive");
@@ -277,9 +280,10 @@ public class Kernel : Sys.Kernel
     private static void TestScheduleCancel()
     {
         s_cancelledFireCount = 0;
-        SoftwareTimer? timer = TimerManager.Schedule(static () => s_cancelledFireCount++, 200);
+        SoftwareTimer? timer = TimerManager.Schedule(static () => s_cancelledFireCount++, TimeSpan.FromMilliseconds(200));
 
-        TimerManager.Cancel(timer);
+        Assert.True(TimerManager.Cancel(timer), "Cancel: pending timer should be cancellable");
+        Assert.True(!TimerManager.Cancel(timer), "Cancel: Cancel should return false the second time");
 
         TimerManager.Wait(400);
 
@@ -287,7 +291,70 @@ public class Kernel : Sys.Kernel
         Assert.True(timer != null && !timer.IsActive, "Cancel: cancelled timer should be inactive");
     }
 
-    // ==================== AlarmSystem Tests ====================
+    private static void TestRejectNonPositivePeriod()
+    {
+        // A zero or negative period reloads to 0 and fires on every tick, so
+        // both managers refuse it and both accept a zero one-shot delay, which
+        // simply fires on the next tick.
+        Assert.True(
+            TimerManager.ScheduleRecurring(static () => { }, TimeSpan.Zero) is null,
+            "ScheduleRecurring: a zero period should be refused");
+        Assert.True(
+            TimerManager.ScheduleRecurring(static () => { }, TimeSpan.FromMilliseconds(-50)) is null,
+            "ScheduleRecurring: a negative period should be refused");
+        Assert.True(
+            AlarmManager.ScheduleRecurring(static () => { }, TimeSpan.Zero) == 0,
+            "Alarm ScheduleRecurring: a zero period should be refused");
+        Assert.True(
+            AlarmManager.ScheduleRecurring(static () => { }, TimeSpan.FromMilliseconds(-50)) == 0,
+            "Alarm ScheduleRecurring: a negative period should be refused");
+
+        SoftwareTimer? timer = TimerManager.Schedule(static () => { }, TimeSpan.Zero);
+        Assert.True(timer is not null, "Schedule: a zero delay should still be scheduled");
+        TimerManager.Cancel(timer);
+
+        // Sub-millisecond periods used to round to zero and be refused; the
+        // conversion is exact now, so the alarm is accepted and simply fires no
+        // faster than the scheduler tick.
+        ulong id = AlarmManager.ScheduleRecurring(static () => { }, TimeSpan.FromTicks(5000));
+        Assert.True(id != 0, "Alarm ScheduleRecurring: a sub-millisecond period should be accepted");
+        Assert.True(AlarmManager.Cancel(id), "Alarm ScheduleRecurring: the sub-millisecond alarm should be cancellable");
+    }
+
+    private static volatile int s_reentrantFireCount;
+    private static SoftwareTimer? s_reentrantFirst;
+    private static SoftwareTimer? s_reentrantSecond;
+
+    private static void TestCallbackCancelsOtherTimers()
+    {
+        // Cancelling from inside a timer callback mutates the registry the
+        // device is walking. The two victims are registered first, so they sit
+        // below the canceller in the registry and removing them shifts every
+        // index the walk has not reached yet.
+        s_reentrantFireCount = 0;
+        s_reentrantFirst = TimerManager.Schedule(static () => s_reentrantFireCount += 100, TimeSpan.FromSeconds(10));
+        s_reentrantSecond = TimerManager.Schedule(static () => s_reentrantFireCount += 100, TimeSpan.FromSeconds(10));
+
+        SoftwareTimer? canceller = TimerManager.Schedule(
+            static () =>
+            {
+                TimerManager.Cancel(s_reentrantFirst);
+                TimerManager.Cancel(s_reentrantSecond);
+                s_reentrantFireCount++;
+            },
+            TimeSpan.FromMilliseconds(50));
+
+        Assert.True(canceller is not null, "Reentrancy: the cancelling timer should be scheduled");
+
+        TimerManager.Wait(300);
+
+        Assert.True(s_reentrantFireCount == 1, "Reentrancy: only the cancelling timer should have fired");
+        Assert.True(!TimerManager.Cancel(s_reentrantFirst), "Reentrancy: the first victim should be gone");
+        Assert.True(!TimerManager.Cancel(s_reentrantSecond), "Reentrancy: the second victim should be gone");
+        Assert.True(!canceller!.IsActive, "Reentrancy: the one-shot canceller should be inactive");
+    }
+
+    // ==================== Alarm Tests ====================
 
     private static volatile int s_alarmFireCount;
     private static volatile int s_alarmRecurringCount;
@@ -296,49 +363,49 @@ public class Kernel : Sys.Kernel
     private static void TestAlarmFires()
     {
         s_alarmFireCount = 0;
-        ulong id = AlarmSystem.Add(TimeSpan.FromMilliseconds(50), static () => s_alarmFireCount++);
+        ulong id = AlarmManager.Schedule(static () => s_alarmFireCount++, TimeSpan.FromMilliseconds(50));
 
-        Assert.True(id != 0, "AlarmSystem: Add should return a valid ID");
+        Assert.True(id != 0, "Alarm: Schedule should return a valid ID");
 
         TimerManager.Wait(500);
 
-        Serial.WriteString("[Timer Tests] Alarm fire count: ");
-        Serial.WriteNumber((ulong)s_alarmFireCount);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Alarm fire count: ");
+        Log.WriteNumber((ulong)s_alarmFireCount);
+        Log.WriteString("\n");
 
-        Assert.True(s_alarmFireCount == 1, "AlarmSystem: one-shot alarm should fire exactly once");
-        Assert.True(!AlarmSystem.Remove(id), "AlarmSystem: fired alarm should no longer be pending");
+        Assert.True(s_alarmFireCount == 1, "Alarm: one-shot alarm should fire exactly once");
+        Assert.True(!AlarmManager.Cancel(id), "Alarm: fired alarm should no longer be pending");
     }
 
     private static void TestAlarmRecurring()
     {
         s_alarmRecurringCount = 0;
-        ulong id = AlarmSystem.AddRecurring(TimeSpan.FromMilliseconds(50), static () => s_alarmRecurringCount++);
+        ulong id = AlarmManager.ScheduleRecurring(static () => s_alarmRecurringCount++, TimeSpan.FromMilliseconds(50));
 
-        Assert.True(id != 0, "AlarmSystem: AddRecurring should return a valid ID");
+        Assert.True(id != 0, "Alarm: ScheduleRecurring should return a valid ID");
 
         TimerManager.Wait(500);
 
         int count = s_alarmRecurringCount;
-        Serial.WriteString("[Timer Tests] Recurring alarm count after 500ms: ");
-        Serial.WriteNumber((ulong)count);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Recurring alarm count after 500ms: ");
+        Log.WriteNumber((ulong)count);
+        Log.WriteString("\n");
 
-        Assert.True(AlarmSystem.Remove(id), "AlarmSystem: recurring alarm should be removable");
-        Assert.True(count >= 3, "AlarmSystem: recurring alarm should fire repeatedly (>= 3 in 500ms)");
+        Assert.True(AlarmManager.Cancel(id), "Alarm: recurring alarm should be cancellable");
+        Assert.True(count >= 3, "Alarm: recurring alarm should fire repeatedly (>= 3 in 500ms)");
     }
 
     private static void TestAlarmRemove()
     {
         s_alarmRemovedCount = 0;
-        ulong id = AlarmSystem.Add(TimeSpan.FromMilliseconds(200), static () => s_alarmRemovedCount++);
+        ulong id = AlarmManager.Schedule(static () => s_alarmRemovedCount++, TimeSpan.FromMilliseconds(200));
 
-        Assert.True(AlarmSystem.Remove(id), "AlarmSystem: pending alarm should be removable");
+        Assert.True(AlarmManager.Cancel(id), "Alarm: pending alarm should be cancellable");
 
         TimerManager.Wait(400);
 
-        Assert.True(s_alarmRemovedCount == 0, "AlarmSystem: removed alarm should not fire");
-        Assert.True(!AlarmSystem.Remove(id), "AlarmSystem: Remove should return false for unknown ID");
+        Assert.True(s_alarmRemovedCount == 0, "Alarm: cancelled alarm should not fire");
+        Assert.True(!AlarmManager.Cancel(id), "Alarm: Cancel should return false for unknown ID");
     }
 
     // ==================== System.Threading.Timer Tests ====================
@@ -355,9 +422,9 @@ public class Kernel : Sys.Kernel
             TimerManager.Wait(500);
         }
 
-        Serial.WriteString("[Timer Tests] BCL one-shot fire count: ");
-        Serial.WriteNumber((ulong)s_bclOneShotCount);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] BCL one-shot fire count: ");
+        Log.WriteNumber((ulong)s_bclOneShotCount);
+        Log.WriteString("\n");
 
         Assert.True(s_bclOneShotCount == 1, "System.Threading.Timer: one-shot should fire exactly once");
     }
@@ -372,9 +439,9 @@ public class Kernel : Sys.Kernel
             count = s_bclPeriodicCount;
         }
 
-        Serial.WriteString("[Timer Tests] BCL periodic fire count after 500ms: ");
-        Serial.WriteNumber((ulong)count);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] BCL periodic fire count after 500ms: ");
+        Log.WriteNumber((ulong)count);
+        Log.WriteString("\n");
 
         Assert.True(count >= 3, "System.Threading.Timer: periodic should fire repeatedly (>= 3 in 500ms)");
     }
@@ -404,11 +471,11 @@ public class Kernel : Sys.Kernel
             elapsedMs = (Stopwatch.GetTimestamp() - tsStart) * 1000 / Stopwatch.Frequency;
         }
 
-        Serial.WriteString("[Timer Tests] Task.Delay(100) completed=");
-        Serial.WriteNumber((ulong)(delay.IsCompleted ? 1 : 0));
-        Serial.WriteString(" after ms: ");
-        Serial.WriteNumber((ulong)elapsedMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] Task.Delay(100) completed=");
+        Log.WriteNumber((ulong)(delay.IsCompleted ? 1 : 0));
+        Log.WriteString(" after ms: ");
+        Log.WriteNumber((ulong)elapsedMs);
+        Log.WriteString("\n");
 
         Assert.True(delay.IsCompleted, "Task.Delay(100) should complete");
         Assert.True(elapsedMs >= 50, "Task.Delay(100) should take at least ~100ms");
@@ -435,11 +502,11 @@ public class Kernel : Sys.Kernel
         // Calculate elapsed milliseconds: (elapsed * 1000) / frequency
         long elapsedMs = (elapsed * 1000) / frequency;
 
-        Serial.WriteString("[Timer Tests] PIT Wait(100ms) - elapsed ticks: ");
-        Serial.WriteNumber((ulong)elapsed);
-        Serial.WriteString(", elapsed ms: ");
-        Serial.WriteNumber((ulong)elapsedMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] PIT Wait(100ms) - elapsed ticks: ");
+        Log.WriteNumber((ulong)elapsed);
+        Log.WriteString(", elapsed ms: ");
+        Log.WriteNumber((ulong)elapsedMs);
+        Log.WriteString("\n");
 
         // Check if within tolerance (50-200ms for 100ms wait)
         bool inRange = elapsedMs >= 50 && elapsedMs <= 200;
@@ -463,13 +530,13 @@ public class Kernel : Sys.Kernel
         // ratio * 100 should be between 150 and 250
         long ratio100 = (elapsed200ms * 100) / elapsed100ms;
 
-        Serial.WriteString("[Timer Tests] PIT 100ms ticks: ");
-        Serial.WriteNumber((ulong)elapsed100ms);
-        Serial.WriteString(", 200ms ticks: ");
-        Serial.WriteNumber((ulong)elapsed200ms);
-        Serial.WriteString(", ratio*100: ");
-        Serial.WriteNumber((ulong)ratio100);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] PIT 100ms ticks: ");
+        Log.WriteNumber((ulong)elapsed100ms);
+        Log.WriteString(", 200ms ticks: ");
+        Log.WriteNumber((ulong)elapsed200ms);
+        Log.WriteString(", ratio*100: ");
+        Log.WriteNumber((ulong)ratio100);
+        Log.WriteString("\n");
 
         bool proportional = ratio100 >= 150 && ratio100 <= 250;
         Assert.True(proportional, "PIT: 200ms should take ~2x ticks of 100ms");
@@ -482,9 +549,9 @@ public class Kernel : Sys.Kernel
         Assert.True(LocalApic.IsInitialized, "LAPIC: Should be initialized");
         Assert.True(LocalApic.IsTimerCalibrated, "LAPIC: Timer should be calibrated");
 
-        Serial.WriteString("[Timer Tests] LAPIC ticks/ms: ");
-        Serial.WriteNumber(LocalApic.TicksPerMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] LAPIC ticks/ms: ");
+        Log.WriteNumber(LocalApic.TicksPerMs);
+        Log.WriteString("\n");
     }
 
     private static void TestLAPICWait100ms()
@@ -497,9 +564,9 @@ public class Kernel : Sys.Kernel
         long frequency = Stopwatch.Frequency;
         long elapsedMs = (elapsed * 1000) / frequency;
 
-        Serial.WriteString("[Timer Tests] LAPIC Wait(100ms) - elapsed ms: ");
-        Serial.WriteNumber((ulong)elapsedMs);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] LAPIC Wait(100ms) - elapsed ms: ");
+        Log.WriteNumber((ulong)elapsedMs);
+        Log.WriteString("\n");
 
         // Check if within tolerance (50-200ms for 100ms wait)
         bool inRange = elapsedMs >= 50 && elapsedMs <= 200;
@@ -522,13 +589,13 @@ public class Kernel : Sys.Kernel
         // ratio * 100 should be between 150 and 250
         long ratio100 = (elapsed200ms * 100) / elapsed100ms;
 
-        Serial.WriteString("[Timer Tests] LAPIC 100ms ticks: ");
-        Serial.WriteNumber((ulong)elapsed100ms);
-        Serial.WriteString(", 200ms ticks: ");
-        Serial.WriteNumber((ulong)elapsed200ms);
-        Serial.WriteString(", ratio*100: ");
-        Serial.WriteNumber((ulong)ratio100);
-        Serial.WriteString("\n");
+        Log.WriteString("[Timer Tests] LAPIC 100ms ticks: ");
+        Log.WriteNumber((ulong)elapsed100ms);
+        Log.WriteString(", 200ms ticks: ");
+        Log.WriteNumber((ulong)elapsed200ms);
+        Log.WriteString(", ratio*100: ");
+        Log.WriteNumber((ulong)ratio100);
+        Log.WriteString("\n");
 
         bool proportional = ratio100 >= 150 && ratio100 <= 250;
         Assert.True(proportional, "LAPIC: 200ms should take ~2x ticks of 100ms");

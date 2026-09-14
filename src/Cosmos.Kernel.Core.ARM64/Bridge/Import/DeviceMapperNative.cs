@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.ARM64.Bridge;
 
-public static partial class DeviceMapperNative
+internal static partial class DeviceMapperNative
 {
     [LibraryImport("*", EntryPoint = "_native_arm64_read_ttbr1_el1")]
     [SuppressGCTransition]

@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 /// Reads a GCInfo bit stream. Mutable struct — pass by <c>ref</c> for sequential reads;
 /// copy by value to fork an independent cursor (matches <c>BitStreamReader</c>'s copy semantics).
 /// </summary>
-public unsafe struct GcInfoBitStreamReader
+internal unsafe struct GcInfoBitStreamReader
 {
     private const int BitsPerWord = 64;
 

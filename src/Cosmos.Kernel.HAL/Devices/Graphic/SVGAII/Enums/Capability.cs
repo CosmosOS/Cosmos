@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
 [Flags]
-public enum Capability
+internal enum Capability
 {
     /// <summary>
     /// None.

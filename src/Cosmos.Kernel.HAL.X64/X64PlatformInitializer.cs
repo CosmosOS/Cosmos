@@ -23,7 +23,7 @@ namespace Cosmos.Kernel.HAL.X64;
 /// <summary>
 /// X64 platform initializer - creates x64-specific HAL components.
 /// </summary>
-public class X64PlatformInitializer : IPlatformInitializer
+internal class X64PlatformInitializer : IPlatformInitializer
 {
     private PIT? _pit;
     private RTC? _rtc;

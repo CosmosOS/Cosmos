@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.HAL.Devices.Network;
 /// <summary>
 /// Abstract base class for all network devices.
 /// </summary>
-public abstract class NetworkDevice : Device, INetworkDevice
+internal abstract class NetworkDevice : Device, INetworkDevice
 {
     /// <summary>
     /// Event handler for packet received events.
@@ -62,7 +62,7 @@ public abstract class NetworkDevice : Device, INetworkDevice
     /// </summary>
     protected static string FormatMacAddress(byte[] mac)
     {
-        if (mac == null || mac.Length != 6)
+        if (mac is null || mac.Length != 6)
         {
             return "00:00:00:00:00:00";
         }

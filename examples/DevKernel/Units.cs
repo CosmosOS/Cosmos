@@ -12,7 +12,7 @@ internal static class Units
     public const ulong BytesPerMiB = BytesPerKiB * BytesPerKiB;
 
     /// <summary>Nanoseconds per millisecond, for converting scheduler times to ms (short alias of the kernel-wide constant).</summary>
-    public const ulong NsPerMs = Cosmos.Kernel.Core.Scheduler.SchedulerManager.NanosecondsPerMillisecond;
+    public const ulong NsPerMs = Cosmos.Kernel.System.Diagnostics.SchedulerInfo.NanosecondsPerMillisecond;
 
     /// <summary>Scale factor for expressing a ratio as a percentage.</summary>
     public const ulong PercentScale = 100;

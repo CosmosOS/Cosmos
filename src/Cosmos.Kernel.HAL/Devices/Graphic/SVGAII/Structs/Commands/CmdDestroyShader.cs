@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SVGA3dCmdDestroyShader
+internal struct SVGA3dCmdDestroyShader
 {
     public uint cid;
     public uint shid;

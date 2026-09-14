@@ -13,14 +13,14 @@ namespace Cosmos.Kernel.System.Graphics.Fonts;
 /// (character, size) as grayscale coverage, so the same font instance can draw
 /// in any color without re-rasterizing.
 /// </summary>
-public class TrueTypeFont : Font
+public sealed class TrueTypeFont : Font
 {
     private readonly LunarLabs.Fonts.Font _font;
-    private readonly Dictionary<int, TrueTypeGlyph?> _glyphCache = new Dictionary<int, TrueTypeGlyph?>();
+    private readonly Dictionary<int, TrueTypeGlyph?> _glyphCache = [];
 
     /// <summary>
     /// The text size in pixels used when this font is drawn through the
-    /// size-less <see cref="Canvas.DrawString(string, Font, System.Drawing.Color, int, int)"/>
+    /// size-less <see cref="Canvas.DrawString(string, Font, global::System.Drawing.Color, int, int)"/>
     /// overload that takes a plain <see cref="Font"/>.
     /// </summary>
     public int SizePx { get; set; }
@@ -59,6 +59,55 @@ public class TrueTypeFont : Font
     /// </summary>
     /// <param name="c">The character to look up.</param>
     public bool HasGlyph(char c) => _font.HasGlyph(c);
+
+    /// <inheritdoc cref="GetLineMetrics(int, out int, out int, out int)"/>
+    public void GetLineMetrics(out int ascent, out int descent, out int lineGap)
+        => GetLineMetrics(SizePx, out ascent, out descent, out lineGap);
+
+    /// <summary>
+    /// Gets the distance in pixels from the top of a text line to the baseline
+    /// at this font's <see cref="SizePx"/>.
+    /// </summary>
+    public int GetAscent() => GetAscent(SizePx);
+
+    /// <summary>
+    /// Gets the kerning adjustment in pixels for a pair of characters at this
+    /// font's <see cref="SizePx"/>.
+    /// </summary>
+    /// <param name="left">The left character of the pair.</param>
+    /// <param name="right">The right character of the pair.</param>
+    public int GetKerning(char left, char right) => GetKerning(left, right, SizePx);
+
+    /// <inheritdoc />
+    public override int GetLineHeight() => GetLineHeight(SizePx);
+
+    /// <inheritdoc />
+    public override int GetAdvance(char c) => GetAdvance(c, SizePx);
+
+    /// <inheritdoc />
+    public override int MeasureString(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+
+        return MeasureString(text, SizePx);
+    }
+
+    /// <inheritdoc />
+    public override int GetMaxAdvance()
+    {
+        int maxAdvance = 0;
+
+        for (char c = '!'; c <= '~'; c++)
+        {
+            int advance = GetAdvance(c, SizePx);
+            if (advance > maxAdvance)
+            {
+                maxAdvance = advance;
+            }
+        }
+
+        return maxAdvance;
+    }
 
     /// <summary>
     /// Gets the vertical metrics of the font at the given size. The ascent is
@@ -129,7 +178,7 @@ public class TrueTypeFont : Font
     public int GetKerning(char left, char right, int sizePx) => _font.GetKerning(left, right, GetScale(sizePx));
 
     /// <summary>
-    /// Measures the width in pixels that <see cref="Canvas.DrawString(string, TrueTypeFont, int, System.Drawing.Color, int, int)"/>
+    /// Measures the width in pixels that <see cref="Canvas.DrawString(string, TrueTypeFont, int, global::System.Drawing.Color, int, int)"/>
     /// would use to draw the given text at the given size.
     /// </summary>
     /// <param name="text">The text to measure.</param>
@@ -143,7 +192,7 @@ public class TrueTypeFont : Font
         {
             char c = text[i];
             TrueTypeGlyph? glyph = GetGlyph(c, sizePx);
-            if (glyph == null)
+            if (glyph is null)
             {
                 continue;
             }
@@ -196,7 +245,7 @@ public class TrueTypeFont : Font
         }
 
         LunarLabs.Fonts.FontGlyph? rendered = _font.RenderGlyph(c, GetScale(sizePx));
-        if (rendered == null)
+        if (rendered is null)
         {
             return null;
         }
@@ -209,13 +258,13 @@ public class TrueTypeFont : Font
 
     private static byte[] ReadAllBytes(string path)
     {
-        using FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+        using FileStream stream = new(path, FileMode.Open, FileAccess.Read);
         return ReadAllBytes(stream);
     }
 
     private static byte[] ReadAllBytes(Stream stream)
     {
-        using MemoryStream buffer = new MemoryStream();
+        using MemoryStream buffer = new();
         stream.CopyTo(buffer);
         return buffer.ToArray();
     }

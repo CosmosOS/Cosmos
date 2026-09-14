@@ -154,7 +154,7 @@ internal static class FatFormatter
 
     public static bool Format(IBlockDevice device, FatFormatOptions? options)
     {
-        if (device == null || device.BlockCount < MinDeviceSectors)
+        if (device is null || device.BlockCount < MinDeviceSectors)
         {
             return false;
         }
@@ -184,7 +184,7 @@ internal static class FatFormatter
 
     public static bool Destroy(IBlockDevice device)
     {
-        if (device == null || device.BlockCount < 1)
+        if (device is null || device.BlockCount < 1)
         {
             return false;
         }

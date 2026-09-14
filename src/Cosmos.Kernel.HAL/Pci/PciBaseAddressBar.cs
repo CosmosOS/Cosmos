@@ -1,6 +1,6 @@
 namespace Cosmos.Kernel.HAL.Pci;
 
-public class PciBaseAddressBar
+internal class PciBaseAddressBar
 {
     private ushort _prefetchable;
     private ushort _type;

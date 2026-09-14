@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.HAL.X64.Devices.Clock;
 /// CMOS Real-Time Clock (RTC) device for x64.
 /// Reads date/time from the hardware RTC.
 /// </summary>
-public class RTC : Device
+internal class RTC : Device
 {
     /// <summary>
     /// Singleton instance of the RTC.

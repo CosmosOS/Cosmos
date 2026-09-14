@@ -1,5 +1,5 @@
 using System;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 using DevKernel.Commands;
 using DevKernel.Shell;
 using DevKernel.Storage;
@@ -21,7 +21,7 @@ public class Kernel : Sys.Kernel
 
     protected override void BeforeRun()
     {
-        Serial.WriteString("[DevKernel] BeforeRun() called\n");
+        Log.WriteString("[DevKernel] BeforeRun() called\n");
 
         FatBootstrap.RegisterAndAutoMount();
 
@@ -82,7 +82,7 @@ public class Kernel : Sys.Kernel
 
     protected override void AfterRun()
     {
-        Serial.WriteString("[DevKernel] AfterRun() called\n");
+        Log.WriteString("[DevKernel] AfterRun() called\n");
         Console.WriteLine("Goodbye!");
     }
 }

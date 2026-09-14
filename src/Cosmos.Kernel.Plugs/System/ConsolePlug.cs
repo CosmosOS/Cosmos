@@ -1,6 +1,6 @@
 using System.Text;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core;
+using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.IO;
 using Cosmos.Kernel.System.Keyboard;
@@ -11,12 +11,12 @@ namespace Cosmos.Kernel.Plugs.System;
 public class ConsolePlug
 {
     // Track the start position for current input line (for proper backspace/delete handling)
-    private static int _inputStartX;
-    private static int _inputStartY;
+    private static int s_inputStartX;
+    private static int s_inputStartY;
 
     private static void ThrowIfKeyboardDisabled()
     {
-        if (!CosmosFeatures.KeyboardEnabled)
+        if (!KernelFeatures.Keyboard)
         {
             throw new InvalidOperationException("Console input requires keyboard support. Set CosmosEnableKeyboard=true in your csproj to enable it.");
         }
@@ -31,10 +31,7 @@ public class ConsolePlug
     {
         KernelConsole.ThrowIfKernelConsoleNotInitialized();
 
-        if (KernelConsole.Default.IsAvailable)
-        {
-            KernelConsole.Default.Canvas.Display();
-        }
+        KernelConsole.Default.Canvas.Display();
     }
 
     [PlugMember]

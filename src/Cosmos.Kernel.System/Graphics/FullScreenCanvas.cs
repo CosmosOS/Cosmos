@@ -1,69 +1,68 @@
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
 
 namespace Cosmos.Kernel.System.Graphics;
 
 /// <summary>
-/// Provides functionality to fetch canvases that write directly to the
-/// underlying display device.
+/// Detects the display device and hands out the canvas that drives it,
+/// caching one canvas until <see cref="Disable"/> gives the screen back.
 /// </summary>
-public static class FullScreenCanvas
+/// <remarks>
+/// Internal: a kernel reaches all of this through <see cref="Canvas"/>'s
+/// static full-screen members, which are the ring's single acquisition point.
+/// </remarks>
+internal static class FullScreenCanvas
 {
-    /// <summary>
-    /// Whether the CGS (Cosmos Graphics Subsystem) is currently in use.
-    /// </summary>
-    public static bool IsInUse { get; private set; }
+    private static Canvas? s_videoDriver;
 
     /// <summary>
-    /// Disables the specified graphics driver used, and returns to VGA text mode 80x25.
+    /// The canvas currently driving the screen, or <see langword="null"/> when
+    /// nothing has acquired it yet or the last one was disabled.
     /// </summary>
-    public static void Disable()
+    internal static Canvas? Current => s_videoDriver;
+
+    /// <summary>
+    /// Returns the display device to text mode and drops the cached canvas, so
+    /// a later acquisition builds a fresh one against a re-enabled device.
+    /// Keeping the disabled canvas cached would hand it straight back from the
+    /// next acquisition with the device still off.
+    /// </summary>
+    internal static void Disable()
     {
-        if (IsInUse)
+        if (s_videoDriver is null)
         {
-            s_videoDriver!.Disable();
-            IsInUse = false;
+            return;
         }
+
+        s_videoDriver.Disable();
+        s_videoDriver = null;
     }
 
-    private static Canvas? s_videoDriver = null;
-
     /// <summary>
-    /// Gets a <see cref="Canvas"/> instance, using an implementation based on
-    /// the currently used video driver.
+    /// Creates the canvas matching the detected display device. On the VMware
+    /// SVGA II adapter the canvas type depends on whether the device
+    /// negotiated 3D support, so users can discover 3D capability with
+    /// <c>canvas is Canvas3D</c>.
     /// </summary>
-    private static Canvas GetVideoDriver()
+    private static Canvas CreateVideoDriver(Mode? mode)
     {
         if (CosmosFeatures.PCIEnabled)
         {
             PciDevice? svgaDevice = PciManager.GetDevice(VendorId.VmWare, DeviceId.SvgaiiAdapter);
             if (svgaDevice is not null)
             {
-                return new SVGAII3DCanvas(svgaDevice);
+                SvgaIIDriver driver = new(svgaDevice);
+                Mode svgaMode = mode ?? SvgaIIRender.DefaultMode;
+
+                return driver.Is3DEnabled
+                    ? new SvgaII3DCanvas(driver, svgaMode)
+                    : new SvgaIICanvas(driver, svgaMode);
             }
         }
 
-        return new GopCanvas();
-    }
-
-    /// <summary>
-    /// Gets a <see cref="Canvas"/> instance, using an implementation based on
-    /// the currently used video driver, constructing the canvas with the given
-    /// <paramref name="mode"/>.
-    /// </summary>
-    private static Canvas GetVideoDriver(Mode mode)
-    {
-        if (CosmosFeatures.PCIEnabled)
-        {
-            PciDevice? svgaDevice = PciManager.GetDevice(VendorId.VmWare, DeviceId.SvgaiiAdapter);
-            if (svgaDevice is not null)
-            {
-                return new SVGAII3DCanvas(svgaDevice);
-            }
-        }
-
-        return new GopCanvas(mode);
+        return mode is null ? new GopCanvas() : new GopCanvas(mode.Value);
     }
 
     /// <summary>
@@ -72,67 +71,43 @@ public static class FullScreenCanvas
     /// return the same canvas without resetting the mode, so callers always see the real
     /// screen width/height.
     /// </summary>
-    public static Canvas GetFullScreenCanvas()
+    /// <exception cref="InvalidOperationException">Graphics support is compiled out.</exception>
+    internal static Canvas Get()
     {
-        if (!CosmosFeatures.GraphicsEnabled)
-        {
-            throw new InvalidOperationException("Graphics support is disabled. Set CosmosEnableGraphics=true in your csproj to enable it.");
-        }
+        ThrowIfGraphicsDisabled();
 
-        s_videoDriver ??= GetVideoDriver();
-
-        IsInUse = true;
+        s_videoDriver ??= CreateVideoDriver(null);
         return s_videoDriver;
     }
 
     /// <summary>
-    /// Gets a screen display canvas, and changes the display mode to the given <paramref name="mode"/>.
+    /// Gets the screen display canvas, changing the display mode to
+    /// <paramref name="mode"/>.
     /// </summary>
-    public static Canvas GetFullScreenCanvas(Mode mode)
+    /// <param name="mode">The display mode to switch to.</param>
+    /// <exception cref="InvalidOperationException">Graphics support is compiled out.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The display device does not support the mode.</exception>
+    internal static Canvas Get(Mode mode)
     {
-        if (!CosmosFeatures.GraphicsEnabled)
-        {
-            throw new InvalidOperationException("Graphics support is disabled. Set CosmosEnableGraphics=true in your csproj to enable it.");
-        }
+        ThrowIfGraphicsDisabled();
 
-        if (s_videoDriver == null)
+        if (s_videoDriver is null)
         {
-            s_videoDriver = GetVideoDriver(mode);
+            s_videoDriver = CreateVideoDriver(mode);
         }
         else
         {
             s_videoDriver.Mode = mode;
         }
 
-        IsInUse = true;
         return s_videoDriver;
     }
 
-    /// <summary>
-    /// Attempts to get a screen display canvas, and changes the display mode to the default.
-    /// </summary>
-    /// <returns><see langword="true"/> if the operation was successful; otherwise, <see langword="false"/>.</returns>
-    public static bool TryGetFullScreenCanvas(Mode mode, out Canvas? canvas)
+    private static void ThrowIfGraphicsDisabled()
     {
-        try
+        if (!CosmosFeatures.GraphicsEnabled)
         {
-            canvas = GetFullScreenCanvas(mode);
-            IsInUse = true;
-            return true;
+            throw new InvalidOperationException("Graphics support is disabled. Set CosmosEnableGraphics=true in your csproj to enable it.");
         }
-        catch
-        {
-        }
-
-        canvas = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Gets the currently used screen display canvas.
-    /// </summary>
-    public static Canvas? GetCurrentFullScreenCanvas()
-    {
-        return s_videoDriver;
     }
 }

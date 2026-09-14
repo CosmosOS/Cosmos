@@ -5,12 +5,12 @@ namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 /// <summary>
 /// Delegate for handling timer tick events.
 /// </summary>
-public delegate void TimerTickHandler();
+internal delegate void TimerTickHandler();
 
 /// <summary>
 /// Interface for timer devices.
 /// </summary>
-public interface ITimerDevice
+internal interface ITimerDevice
 {
     /// <summary>
     /// Initialize the timer device.
@@ -23,10 +23,15 @@ public interface ITimerDevice
     uint Frequency { get; }
 
     /// <summary>
-    /// Sets the timer frequency in Hz.
+    /// Sets the timer frequency in Hz. Devices divide a fixed input clock, so
+    /// each has a range it can express and rejects the rest.
     /// </summary>
     /// <param name="frequency">Frequency in Hz.</param>
-    void SetFrequency(uint frequency);
+    /// <returns>
+    /// True when the device accepted the frequency; false when it is outside
+    /// what the device can divide to, in which case the tick is unchanged.
+    /// </returns>
+    bool SetFrequency(uint frequency);
 
     /// <summary>
     /// Blocks for the specified number of milliseconds.
@@ -44,7 +49,8 @@ public interface ITimerDevice
     /// Unregisters a previously registered software timer.
     /// </summary>
     /// <param name="timer">Timer to unregister.</param>
-    void UnregisterTimer(SoftwareTimer timer);
+    /// <returns>True when the timer was registered and has been removed.</returns>
+    bool UnregisterTimer(SoftwareTimer timer);
 
     /// <summary>
     /// Event handler for timer tick events.

@@ -25,21 +25,30 @@ public sealed class FatFilesystemType : IVfsFilesystemType
 
     private readonly IBlockDevice? _injectedDevice;
 
+    /// <summary>
+    /// Creates a driver that resolves its device from the mount source string.
+    /// </summary>
     public FatFilesystemType()
     {
     }
 
+    /// <summary>
+    /// Creates a driver bound to a fixed device, used when the mount source is
+    /// empty (test seam).
+    /// </summary>
+    /// <param name="device">The block device holding the FAT volume.</param>
     public FatFilesystemType(IBlockDevice device)
     {
         _injectedDevice = device;
     }
 
+    /// <inheritdoc />
     public bool TryMount(ReadOnlySpan<char> source, MountFlags flags, [NotNullWhen(true)] out IVfsSuperblock? superblock)
     {
         superblock = null;
 
         IBlockDevice? device = ResolveDevice(source);
-        if (device == null)
+        if (device is null)
         {
             return false;
         }
@@ -47,7 +56,7 @@ public sealed class FatFilesystemType : IVfsFilesystemType
         Span<byte> bpb = new byte[device.BlockSize];
         device.ReadBlock(FatBootSector.BootSectorLba, BootSectorBlockCount, bpb);
 
-        if (!FatBootSector.TryParse(bpb, out FatBootSector? boot) || boot == null)
+        if (!FatBootSector.TryParse(bpb, out FatBootSector? boot))
         {
             return false;
         }
@@ -75,16 +84,17 @@ public sealed class FatFilesystemType : IVfsFilesystemType
         return true;
     }
 
+    /// <inheritdoc />
     public bool TryFormat(ReadOnlySpan<char> source, IVfsFormatOptions? options)
     {
         IBlockDevice? device = ResolveDevice(source);
-        if (device == null)
+        if (device is null)
         {
             return false;
         }
 
         FatFormatOptions? fatOptions = options as FatFormatOptions;
-        if (options != null && fatOptions == null)
+        if (options is not null && fatOptions is null)
         {
             return false;
         }
@@ -92,10 +102,11 @@ public sealed class FatFilesystemType : IVfsFilesystemType
         return FatFormatter.Format(device, fatOptions);
     }
 
+    /// <inheritdoc />
     public bool TryDestroy(ReadOnlySpan<char> source)
     {
         IBlockDevice? device = ResolveDevice(source);
-        if (device == null)
+        if (device is null)
         {
             return false;
         }

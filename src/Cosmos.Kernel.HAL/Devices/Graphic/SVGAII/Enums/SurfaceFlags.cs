@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
-public enum SVGA3dSurfaceFlags : uint
+internal enum SVGA3dSurfaceFlags : uint
 {
     SVGA3D_SURFACE_CUBEMAP = (1 << 0),
     SVGA3D_SURFACE_HINT_STATIC = (1 << 1),

@@ -8,7 +8,7 @@ Code copied into this repository (with local adaptations noted in a `README.md` 
 
 | Project | License | Used for | Location |
 |---|---|---|---|
-| [BigGustave](https://github.com/EliotJones/BigGustave) | Unlicense | PNG decoding (`Cosmos.Kernel.System.Graphics.Png`) | `src/Cosmos.Kernel.System/Graphics/Images/Png/` |
+| [BigGustave](https://github.com/EliotJones/BigGustave) | Unlicense | PNG decoding (`Cosmos.Kernel.System.Graphics.Png`) | `src/Cosmos.Kernel.System/Graphics/Images/BigGustave/` |
 | [SharpZipLib](https://github.com/icsharpcode/SharpZipLib) | MIT | Managed DEFLATE/zlib decompression for the PNG decoder | `src/Cosmos.Kernel.System/IO/Compression/SharpZipLib/` |
 | [LunarFonts](https://github.com/Relfos/LunarFonts) | MIT | TrueType loading and rasterization (`TrueTypeFont`) | `src/Cosmos.Kernel.System/Graphics/Fonts/TrueType/LunarFonts/` |
 | [Spleen](https://github.com/fcambus/spleen) | BSD-2-Clause | The default 16x32 console and canvas font | `src/Cosmos.Kernel.System/Graphics/Fonts/` |

@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic;
 /// UEFI GOP Video Driver.
 /// Provides video output via UEFI framebuffer.
 /// </summary>
-public unsafe class GopDriver : GraphicDevice
+internal unsafe class GopDriver : GraphicDevice
 {
     /// <summary>
     /// Returns true if the device was successfully initialized.

@@ -10,8 +10,17 @@ namespace Cosmos.Kernel.System;
 /// </summary>
 public abstract partial class Kernel
 {
-    protected bool mStarted;
-    protected bool mStopped;
+    /// <summary>
+    /// True once BeforeRun has completed and the Run loop is active.
+    /// </summary>
+    protected bool Started { get; private set; }
+
+    /// <summary>
+    /// True once <see cref="Stop"/> has been called. The Run loop exits after
+    /// the current <see cref="Run"/> returns; call <see cref="Stop"/> to end
+    /// the kernel, this is the read side of it.
+    /// </summary>
+    protected bool Stopped { get; private set; }
 
     /// <summary>
     /// Constructs a new Kernel instance.
@@ -43,10 +52,10 @@ public abstract partial class Kernel
         Serial.WriteString("[Kernel] Calling BeforeRun()...\n");
         BeforeRun();
 
-        mStarted = true;
+        Started = true;
 
         Serial.WriteString("[Kernel] Entering main loop...\n");
-        while (!mStopped)
+        while (!Stopped)
         {
             Serial.WriteString("[Kernel] Calling Run()...\n");
             Run();
@@ -71,7 +80,7 @@ public abstract partial class Kernel
     /// </summary>
     protected virtual void OnBoot()
     {
-        Global.Init();
+        Global.Initialize();
     }
 
     /// <summary>
@@ -101,6 +110,6 @@ public abstract partial class Kernel
     /// </summary>
     public void Stop()
     {
-        mStopped = true;
+        Stopped = true;
     }
 }

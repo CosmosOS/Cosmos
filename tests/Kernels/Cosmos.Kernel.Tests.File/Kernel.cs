@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Tests.File;
 // binds to Cosmos.Kernel.System.
 using global::System;
 using global::System.IO;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.HAL.Vfs;
 using Cosmos.Kernel.System.Filesystems.Fat;
 using Cosmos.Kernel.System.Vfs;
@@ -46,7 +46,7 @@ public class Kernel : Sys.Kernel
 
     protected override void BeforeRun()
     {
-        Serial.WriteString("[FileTests] BeforeRun() reached!\n");
+        Log.WriteString("[FileTests] BeforeRun() reached!\n");
 
         TR.Start("System.IO File Tests", expectedTests: ExpectedTestCount);
 
@@ -468,7 +468,7 @@ public class Kernel : Sys.Kernel
 
         TR.Finish();
 
-        Serial.WriteString("\n[Tests Complete - System Halting]\n");
+        Log.WriteString("\n[Tests Complete - System Halting]\n");
     }
 
     protected override void Run()

@@ -5,7 +5,42 @@
         <LangVersion>latestmajor</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
+             IBlockDevice, the one device contract kernels really implement and
+             drive (the Fat and File suites each supply a RAM disk, DevKernel
+             reads and writes blocks through it), MACAddress, which the packet
+             seam and NetworkManager both hand out, and SoftwareTimer as the
+             handle TimerManager.Schedule returns. SoftwareTimer's construction
+             and tick members stay internal: they belong to the timer device,
+             and a kernel calling them corrupts the registry. -->
+        <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
     </PropertyGroup>
+
+    <ItemGroup>
+        <!-- The rest are internal because no kernel can obtain or meaningfully
+             supply one: the boot contract (IPlatformInitializer), IGraphicDevice,
+             and the input, timer and network devices, whose only registration
+             callers are System's own LibraryInitializer wiring up HAL
+             enumeration. A kernel reads NetworkManager.Name/MacAddress/
+             LinkUp/Ready, never the device, exactly as it reads
+             KeyboardManager.ReadKey. -->
+        <InternalsVisibleTo Include="Cosmos.Kernel.HAL" />
+        <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
+        <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
+        <!-- The aggregator's and System's library initializers read
+             PlatformHAL.Initializer during boot, through var. -->
+        <InternalsVisibleTo Include="Cosmos.Kernel" />
+        <InternalsVisibleTo Include="Cosmos.Kernel.System" />
+        <!-- The white-box storage suite maps a high BAR through
+             PlatformHAL.Initializer.EnsureMmioMapped, and the virtio suite
+             holds the enumerated input devices it exercises. -->
+        <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
+        <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Virtio" />
+        <!-- The white-box network suite checks that the stack attached its
+             packet handler to the device, which the ring does not report. -->
+        <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Network" />
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Build.API\Cosmos.Build.API.csproj" />

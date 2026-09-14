@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the US Dvorak keyboard layout.
 /// </summary>
-public class USDvorakLayout : ScanMapBase
+public sealed class USDvorakLayout : ScanMapBase
 {
     /// <summary>
     /// Create new instance of the <see cref="USDvorakLayout"/> class.
@@ -18,10 +18,8 @@ public class USDvorakLayout : ScanMapBase
     /// <summary>
     /// Init key list.
     /// </summary>
-    protected override void InitKeys()
+    protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>();
-
         #region Keys
 
         /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKeyEx */
@@ -94,6 +92,8 @@ public class USDvorakLayout : ScanMapBase
         // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, ConsoleKeyEx.LAlt));
+        /* Right Alt: a second Alt on this layout */
+        Keys.Add(new KeyMapping(RightAltScanCode, ConsoleKeyEx.RAlt));
         /* Space */
         Keys.Add(new KeyMapping(0x39, ' ', ConsoleKeyEx.Spacebar));
         /* Caps */

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public unsafe struct SVGA3dCmdDefineSurface
+internal unsafe struct SVGA3dCmdDefineSurface
 {
     public uint sid;
     public SVGA3dSurfaceFlags flags;

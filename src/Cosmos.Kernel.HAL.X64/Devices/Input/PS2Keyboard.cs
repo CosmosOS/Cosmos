@@ -5,13 +5,14 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Input;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.HAL.X64.Devices.Input;
 
 /// <summary>
 /// PS/2 Keyboard driver.
 /// </summary>
-public class PS2Keyboard : KeyboardDevice
+internal class PS2Keyboard : KeyboardDevice
 {
     private enum Command : byte
     {
@@ -27,6 +28,15 @@ public class PS2Keyboard : KeyboardDevice
 
     // Flag to prevent multiple IRQ registrations
     private static bool s_irqRegistered;
+
+    /// <summary>Prefix byte the keyboard sends before an extended key's own code.</summary>
+    private const byte ExtendedPrefix = 0xE0;
+
+    /// <summary>Make code of the left Alt key, and of the right Alt key after the prefix.</summary>
+    private const byte AltScanCode = 0x38;
+
+    /// <summary>True between an <see cref="ExtendedPrefix"/> byte and the code that follows it.</summary>
+    private static bool s_extendedPending;
 
     /// <summary>
     /// Registers IRQ handler for keyboard interrupts.
@@ -128,11 +138,29 @@ public class PS2Keyboard : KeyboardDevice
             return;
         }
 
+        // An extended key is two bytes; remember the prefix and wait for the code.
+        if (scanCode == ExtendedPrefix)
+        {
+            s_extendedPending = true;
+            return;
+        }
+
+        bool extended = s_extendedPending;
+        s_extendedPending = false;
+
         bool released = (scanCode & 0x80) == 0x80;
 
         if (released)
         {
             scanCode = (byte)(scanCode ^ 0x80);
+        }
+
+        // Every other extended key keeps its bare code: the layouts already list
+        // the Windows keys and the navigation cluster that way. The right Alt
+        // is the one whose bare code is another key.
+        if (extended && scanCode == AltScanCode)
+        {
+            scanCode = IKeyboardDevice.RightAltScanCode;
         }
 
         // Use the instance's OnKeyPressed callback (set by KeyboardManager.RegisterKeyboard)

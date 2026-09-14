@@ -5,7 +5,7 @@ using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.HAL;
 
-public static class DebugInfo
+internal static class DebugInfo
 {
     private const string Dash = " --- ";
     private const string NewLine = "\n";

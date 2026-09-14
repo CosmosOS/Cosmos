@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.Core.Extensions;
 
-public static class ByteArray
+internal static class ByteArray
 {
     public static byte Read8(this byte[] memory, uint offset)
     {
@@ -78,15 +78,8 @@ public static class ByteArray
 
     public static void WriteString(this byte[] memory, uint offset, string value)
     {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
-
-        if (offset + value.Length > memory.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset));
-        }
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(offset + value.Length, memory.Length, nameof(offset));
 
         for (int i = 0; i < value.Length; i++)
         {
@@ -113,9 +106,6 @@ public static class ByteArray
 
     private static void ValidateRange(byte[] memory, uint offset, uint size)
     {
-        if (offset + size > memory.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(offset), "Offset outside array bounds.");
-        }
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(offset + size, (uint)memory.Length, nameof(offset));
     }
 }

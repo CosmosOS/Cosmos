@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.HAL.Devices.Virtio;
 /// virtio-pci devices (I/O BAR interface, no vendor capabilities) are not
 /// supported.
 /// </summary>
-public sealed class VirtioPciTransport : VirtioTransport
+internal sealed class VirtioPciTransport : VirtioTransport
 {
     /// <summary>PCI vendor ID of all virtio devices (Red Hat).</summary>
     public const ushort VirtioVendorId = 0x1AF4;
@@ -220,7 +220,7 @@ public sealed class VirtioPciTransport : VirtioTransport
         pci.EnableMemory(true);
         pci.EnableBusMaster(true);
 
-        VirtioPciTransport transport = new VirtioPciTransport(
+        VirtioPciTransport transport = new(
             pci,
             deviceType,
             MapRegion(commonPhys, commonLen),
@@ -263,7 +263,7 @@ public sealed class VirtioPciTransport : VirtioTransport
     private void TrySetupMsix()
     {
         MsiXContext? context = MsiX.Enable(_pci);
-        if (context == null)
+        if (context is null)
         {
             return;
         }

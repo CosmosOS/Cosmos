@@ -7,7 +7,7 @@ using Internal.StackTraceMetadata;
 
 namespace Cosmos.Kernel.Core.Runtime
 {
-    public static class StackTraceMetadata
+    internal static class StackTraceMetadata
     {
         /// <summary>
         /// Indicates whether stack trace metadata support is enabled.
@@ -69,7 +69,7 @@ namespace Cosmos.Kernel.Core.Runtime
                     {
                         // Validate handles before calling FormatMethodName to avoid BadImageFormatException
                         // during exception handling (which would cause recursive exception detection)
-                        if (resolver.Reader == null ||
+                        if (resolver.Reader is null ||
                             stackTraceData.OwningType.IsNil ||
                             stackTraceData.Name.IsNil ||
                             stackTraceData.Signature.IsNil)
@@ -135,7 +135,7 @@ namespace Cosmos.Kernel.Core.Runtime
                 else
                 {
                     // No stack trace metadata available
-                    _stacktraceDatas = Array.Empty<StackTraceData>();
+                    _stacktraceDatas = [];
                     Reader = null;
                 }
             }
@@ -230,7 +230,7 @@ namespace Cosmos.Kernel.Core.Runtime
             /// </summary>
             public bool TryGetStackTraceData(int rva, out StackTraceData data)
             {
-                if (_stacktraceDatas == null)
+                if (_stacktraceDatas is null)
                 {
                     // No stack trace metadata for this module
                     data = default;

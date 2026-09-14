@@ -1,7 +1,7 @@
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 
 namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 
@@ -9,10 +9,10 @@ namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 public static class NetworkStreamPlug
 {
     // Store stream state per instance
-    public static readonly Dictionary<int, Socket> _streamSockets = new();
-    public static readonly Dictionary<int, bool> _ownsSocket = new();
-    public static readonly Dictionary<int, bool> _readable = new();
-    public static readonly Dictionary<int, bool> _writeable = new();
+    public static readonly Dictionary<int, Socket> _streamSockets = [];
+    public static readonly Dictionary<int, bool> _ownsSocket = [];
+    public static readonly Dictionary<int, bool> _readable = [];
+    public static readonly Dictionary<int, bool> _writeable = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(NetworkStream aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
@@ -38,17 +38,13 @@ public static class NetworkStreamPlug
     [PlugMember(".ctor")]
     public static void Ctor(NetworkStream aThis, Socket socket, FileAccess access, bool ownsSocket)
     {
-        Serial.WriteString("[NetworkStreamPlug] Ctor(socket, access, ownsSocket)\n");
+        Log.WriteString("[NetworkStreamPlug] Ctor(socket, access, ownsSocket)\n");
 
-        if (socket == null)
-        {
-            Serial.WriteString("[NetworkStreamPlug] socket is null\n");
-            throw new ArgumentNullException(nameof(socket));
-        }
+        ArgumentNullException.ThrowIfNull(socket);
 
         if (!socket.Connected)
         {
-            Serial.WriteString("[NetworkStreamPlug] socket is not connected\n");
+            Log.WriteString("[NetworkStreamPlug] socket is not connected\n");
             throw new IOException("Socket not connected.");
         }
 
@@ -160,20 +156,20 @@ public static class NetworkStreamPlug
     [PlugMember]
     public static void Write(NetworkStream aThis, byte[] buffer, int offset, int count)
     {
-        Serial.WriteString("[NetworkStreamPlug] Write: entering, count=");
-        Serial.WriteNumber((ulong)count);
-        Serial.WriteString("\n");
+        Log.WriteString("[NetworkStreamPlug] Write: entering, count=");
+        Log.WriteNumber((ulong)count);
+        Log.WriteString("\n");
 
         int id = GetId(aThis);
         if (!_streamSockets.TryGetValue(id, out var socket))
         {
-            Serial.WriteString("[NetworkStreamPlug] Write: socket disposed\n");
+            Log.WriteString("[NetworkStreamPlug] Write: socket disposed\n");
             throw new ObjectDisposedException(nameof(NetworkStream));
         }
 
-        Serial.WriteString("[NetworkStreamPlug] Write: calling socket.Send\n");
+        Log.WriteString("[NetworkStreamPlug] Write: calling socket.Send\n");
         socket.Send(buffer, offset, count, SocketFlags.None);
-        Serial.WriteString("[NetworkStreamPlug] Write: socket.Send returned\n");
+        Log.WriteString("[NetworkStreamPlug] Write: socket.Send returned\n");
     }
 
     [PlugMember]
@@ -185,7 +181,7 @@ public static class NetworkStreamPlug
     [PlugMember]
     public static void WriteByte(NetworkStream aThis, byte value)
     {
-        Write(aThis, new byte[] { value }, 0, 1);
+        Write(aThis, [value], 0, 1);
     }
 
     [PlugMember]
@@ -235,7 +231,7 @@ public static class NetworkStreamPlug
         _readable.Remove(id);
         _writeable.Remove(id);
 
-        if (socket != null && owns)
+        if (socket is not null && owns)
         {
             socket.Close();
         }

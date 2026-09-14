@@ -10,6 +10,12 @@
     <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
     <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <!-- NVMe I/O waits block and wake threads through the experimental scheduler seam (COSMOS0001). -->
+    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
+
+    <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
+         the VFS contract types only. -->
+    <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Build.API\Cosmos.Build.API.csproj" />
@@ -22,5 +28,27 @@
 
   <!-- Multi-arch packaging support -->
   <Import Project="../Directory.MultiArch.targets" />
+
+  <ItemGroup>
+    <!-- System's internal canvases and managers sit directly on the HAL
+         drivers (GOP/SVGAII, AHCI/NVMe, PS/2 mouse, PCI discovery). -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.System" />
+    <!-- The aggregator initializes PlatformHAL from its library initializer. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel" />
+    <!-- Arch HALs implement the driver base classes and register devices. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
+    <!-- White-box suites over HAL internals: SVGAII FIFO wire format
+         (Graphic), MSI-X tables (Interrupts), PCI discovery (Pci),
+         platform power ops (Power), AHCI/NVMe registers (Storage),
+         the TimerDevice base and its software timers (Timer), virtio
+         transports (Virtio). -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Graphic" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Virtio" />
+  </ItemGroup>
 </Project>
 

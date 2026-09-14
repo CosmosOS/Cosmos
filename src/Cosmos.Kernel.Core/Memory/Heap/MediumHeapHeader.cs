@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.Core.Memory.Heap;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct MediumHeapHeader
+internal struct MediumHeapHeader
 {
     public ushort Size;
 }

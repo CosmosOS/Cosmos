@@ -7,104 +7,106 @@ using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL;
+using Cosmos.Kernel.HAL.Interfaces;
 
-namespace Internal.Runtime.CompilerHelpers
+namespace Internal.Runtime.CompilerHelpers;
+
+/// <summary>
+/// This class is responsible for initializing the library and its dependencies. It is called by the runtime before any managed code is executed.
+/// </summary>
+internal class LibraryInitializer
 {
     /// <summary>
-    /// This class is responsible for initializing the library and its dependencies. It is called by the runtime before any managed code is executed.
+    /// Miscellaneous initialization of core kernel services that depend on HAL, such as interrupts, exception handlers, and scheduler. This method is called by the runtime before any managed code is executed.
     /// </summary>
-    public class LibraryInitializer
+    public static void InitializeLibrary()
     {
-        /// <summary>
-        /// Miscellaneous initialization of core kernel services that depend on HAL, such as interrupts, exception handlers, and scheduler. This method is called by the runtime before any managed code is executed.
-        /// </summary>
-        public static void InitializeLibrary()
+        // Get the platform initializer (registered by HAL.X64 or HAL.ARM64 module initializer)
+        IPlatformInitializer? initializer = PlatformHAL.Initializer;
+
+        if (initializer is null)
         {
-            // Get the platform initializer (registered by HAL.X64 or HAL.ARM64 module initializer)
-            var initializer = PlatformHAL.Initializer;
-
-            if (initializer == null)
-            {
-                Serial.WriteString("[KERNEL] ERROR: No platform initializer registered!\n");
-                while (true) { }
-            }
-
-            // Initialize exception handlers (must be after InterruptManager)
-            if (InterruptManager.IsEnabled)
-            {
-                Serial.WriteString("[KERNEL]   - Initializing exception handlers...\n");
-                ExceptionHandler.Initialize();
-            }
-
-            // Initialize Scheduler
-            if (SchedulerManager.IsEnabled)
-            {
-                Serial.WriteString("[KERNEL]   - Initializing scheduler...\n");
-                InitializeScheduler(initializer.GetCpuCount());
-            }
-
-            // Start scheduler timer for preemptive scheduling (after all init is complete)
-            if (SchedulerManager.IsEnabled)
-            {
-                Serial.WriteString("[KERNEL]   - Starting scheduler timer...\n");
-                initializer.StartSchedulerTimer(10);  // 10ms quantum
-            }
+            // Qualified: this assembly has a Panic of its own, for CPU
+            // exceptions, and it has no Halt.
+            Cosmos.Kernel.Core.Panic.Halt("No platform initializer registered.");
         }
 
-        /// <summary>
-        /// Initializes the scheduler subsystem with idle threads for each CPU.
-        /// </summary>
-        private static void InitializeScheduler(uint cpuCount)
+        // Initialize exception handlers (must be after InterruptManager)
+        if (InterruptManager.IsEnabled)
         {
-            Serial.WriteString("[SCHED] Detected ");
-            Serial.WriteNumber(cpuCount);
-            Serial.WriteString(" CPU(s)\n");
-
-            // Initialize scheduler manager
-            SchedulerManager.Initialize(cpuCount);
-
-            // Set up stride scheduler
-            var scheduler = new StrideScheduler();
-            SchedulerManager.SetScheduler(scheduler);
-
-            Serial.WriteString("[SCHED] Using ");
-            Serial.WriteString(scheduler.Name);
-            Serial.WriteString(" scheduler\n");
-
-            // Create idle thread for each CPU
-            // The idle thread represents the main kernel - no separate stack needed
-            // When the shell is preempted, its context is saved to this thread
-            for (uint cpu = 0; cpu < cpuCount; cpu++)
-            {
-                var idleThread = new Cosmos.Kernel.Core.Scheduler.Thread
-                {
-                    Id = SchedulerManager.AllocateThreadId(),
-                    CpuId = cpu,
-                    State = Cosmos.Kernel.Core.Scheduler.ThreadState.Running,  // Already running (it's the current code!)
-                    Flags = ThreadFlags.Pinned | ThreadFlags.IdleThread
-                };
-
-                // DON'T initialize a separate stack - the idle thread IS the current execution
-                // When preempted, the IRQ stub saves context to the current stack
-                // and we store that RSP in StackPointer
-
-                // Register with scheduler (but don't add to run queue)
-                SchedulerManager.CreateThread(cpu, idleThread);
-
-                // Set as CPU's idle and current thread
-                SchedulerManager.SetupIdleThread(cpu, idleThread);
-
-                Serial.WriteString("[SCHED] Idle thread ");
-                Serial.WriteNumber(idleThread.Id);
-                Serial.WriteString(" (main kernel) for CPU ");
-                Serial.WriteNumber(cpu);
-                Serial.WriteString("\n");
-            }
-
-            // Enable scheduler (timer will start invoking it)
-            SchedulerManager.Enabled = true;
-            Serial.WriteString("[SCHED] Scheduler enabled\n");
-
+            Serial.WriteString("[KERNEL]   - Initializing exception handlers...\n");
+            ExceptionHandler.Initialize();
         }
+
+        // Initialize Scheduler
+        if (SchedulerManager.IsEnabled)
+        {
+            Serial.WriteString("[KERNEL]   - Initializing scheduler...\n");
+            InitializeScheduler(initializer.GetCpuCount());
+        }
+
+        // Start scheduler timer for preemptive scheduling (after all init is complete)
+        if (SchedulerManager.IsEnabled)
+        {
+            Serial.WriteString("[KERNEL]   - Starting scheduler timer...\n");
+            // Arm the timer at the reference quantum rather than a literal:
+            // Stride's fallback preemption test compares one tick's elapsed
+            // time against DefaultQuantumNs, so the two have to agree.
+            initializer.StartSchedulerTimer(
+                (uint)(SchedulerManager.DefaultQuantumNs / SchedulerManager.NanosecondsPerMillisecond));
+        }
+    }
+
+    /// <summary>
+    /// Initializes the scheduler subsystem: one idle thread per CPU, then the policy.
+    /// </summary>
+    private static void InitializeScheduler(uint cpuCount)
+    {
+        Serial.WriteString("[SCHED] Detected ");
+        Serial.WriteNumber(cpuCount);
+        Serial.WriteString(" CPU(s)\n");
+
+        SchedulerManager.Initialize(cpuCount);
+
+        // The idle thread of each CPU is the code running right now, so it
+        // gets no stack of its own: when the kernel is preempted, the IRQ stub
+        // saves the context to the current stack and keeps that RSP in
+        // StackPointer. It becomes the CPU's current thread before any policy
+        // is installed. Thread statics live on the current thread, and a
+        // policy hook may read a static whose class constructor has not run
+        // yet; the class constructor runner's lock identifies its holder by a
+        // thread static, so it needs a current thread to exist.
+        for (uint cpu = 0; cpu < cpuCount; cpu++)
+        {
+            SchedulerThread idleThread = new()
+            {
+                Id = SchedulerManager.AllocateThreadId(),
+                CpuId = cpu,
+                State = SchedulerThreadState.Running,
+                Flags = SchedulerThreadFlags.Pinned | SchedulerThreadFlags.IdleThread
+            };
+
+            SchedulerManager.SetupIdleThread(cpu, idleThread);
+
+            Serial.WriteString("[SCHED] Idle thread ");
+            Serial.WriteNumber(idleThread.Id);
+            Serial.WriteString(" (main kernel) for CPU ");
+            Serial.WriteNumber(cpu);
+            Serial.WriteString("\n");
+        }
+
+        // SetScheduler hands every registered thread to the incoming policy,
+        // so the idle threads reach OnThreadCreate already Running, the same
+        // way a thread alive across a later policy swap does.
+        StrideScheduler scheduler = new();
+        SchedulerManager.SetScheduler(scheduler);
+
+        Serial.WriteString("[SCHED] Using ");
+        Serial.WriteString(scheduler.Name);
+        Serial.WriteString(" scheduler\n");
+
+        // Enable scheduler (timer will start invoking it)
+        SchedulerManager.IsRunning = true;
+        Serial.WriteString("[SCHED] Scheduler enabled\n");
     }
 }

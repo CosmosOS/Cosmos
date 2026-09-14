@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.Core.IO;
 /// - x86-64: 16550 UART via port I/O (COM1 at 0x3F8)
 /// - ARM64: PL011 UART via MMIO (QEMU virt at 0x09000000)
 /// </summary>
-public static class Serial
+internal static class Serial
 {
     #region x86-64 16550 UART Constants
 
@@ -259,7 +259,7 @@ public static class Serial
         WriteNumber((ulong)number, true);
     }
 
-    public static void Write(params object?[] args)
+    public static void Write(params ReadOnlySpan<object?> args)
     {
         for (int i = 0; i < args.Length; i++)
         {

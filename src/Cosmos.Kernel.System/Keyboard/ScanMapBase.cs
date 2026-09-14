@@ -1,5 +1,7 @@
-// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 // Ported from Cosmos.System2/Keyboard/ScanMapBase.cs
+
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.System.Keyboard;
 
@@ -8,22 +10,48 @@ namespace Cosmos.Kernel.System.Keyboard;
 /// </summary>
 public abstract class ScanMapBase
 {
-    /// <summary>
-    /// The available key mappings.
-    /// </summary>
-    protected List<KeyMapping> Keys = null!;
+    /// <summary>Mappings a layout is expected to declare, reserved up front.</summary>
+    private const int InitialKeyCapacity = 105;
 
     /// <summary>
-    /// Initializes the key list.
+    /// Scan code the keyboard devices report for the right Alt key. A layout
+    /// maps it to <see cref="ConsoleKeyEx.AltGr"/> when the key selects its
+    /// third level, and to <see cref="ConsoleKeyEx.RAlt"/> when it is a second
+    /// Alt.
     /// </summary>
-    protected abstract void InitKeys();
+    internal const byte RightAltScanCode = IKeyboardDevice.RightAltScanCode;
+
+    private bool _keysInitialized;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ScanMapBase"/> class.
+    /// The available key mappings. The list is created here and stays the
+    /// same instance for the life of the layout; <see cref="InitializeKeys"/>
+    /// adds to it.
     /// </summary>
-    protected ScanMapBase()
+    protected List<KeyMapping> Keys { get; } = new(InitialKeyCapacity);
+
+    /// <summary>
+    /// Adds this layout's mappings to <see cref="Keys"/>. Called once, the
+    /// first time a scan code reaches the layout, so a derived layout's own
+    /// field initializers and constructor have already run by then.
+    /// </summary>
+    protected abstract void InitializeKeys();
+
+    /// <summary>
+    /// Runs <see cref="InitializeKeys"/> the first time the mappings are
+    /// needed. The base constructor deliberately does not call it: a virtual
+    /// call from a constructor reaches a derived layout before its own state
+    /// exists.
+    /// </summary>
+    private void EnsureKeysInitialized()
     {
-        InitKeys();
+        if (_keysInitialized)
+        {
+            return;
+        }
+
+        _keysInitialized = true;
+        InitializeKeys();
     }
 
     /// <summary>
@@ -37,8 +65,10 @@ public abstract class ScanMapBase
     /// <param name="capsLock">Whether caps-lock is active.</param>
     /// <param name="scrollLock">Whether scroll-lock is active.</param>
     /// <returns>The translated <see cref="KeyEvent"/>.</returns>
-    public KeyEvent? ConvertScanCode(byte scanKey, bool ctrl, bool shift, bool alt, bool numLock, bool capsLock, bool scrollLock)
+    internal KeyEvent? ConvertScanCode(byte scanKey, bool ctrl, bool shift, bool alt, bool numLock, bool capsLock, bool scrollLock)
     {
+        EnsureKeysInitialized();
+
         var keyEvent = new KeyEvent();
         bool found = false;
 
@@ -75,7 +105,7 @@ public abstract class ScanMapBase
         {
             KeyMapping t = Keys[index];
 
-            if (t == null)
+            if (t is null)
             {
                 continue;
             }
@@ -125,8 +155,10 @@ public abstract class ScanMapBase
     /// </summary>
     /// <param name="scanCode">The physical keyboard scan-code.</param>
     /// <param name="key">The virtual mapping key.</param>
-    public bool ScanCodeMatchesKey(byte scanCode, ConsoleKeyEx key)
+    internal bool ScanCodeMatchesKey(byte scanCode, ConsoleKeyEx key)
     {
+        EnsureKeysInitialized();
+
         for (int i = 0; i < Keys.Count; i++)
         {
             if (Keys[i].ScanCode == scanCode && Keys[i].Key == key)

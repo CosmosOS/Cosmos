@@ -2,15 +2,15 @@
 
 The scheduler is **[preemptive](sched-concepts/preemption.md)**, **[pluggable](scheduler-plugging.md)**, and by default **[virtual-time fair-share](sched-concepts/virtual-time-fair-share.md)**. Every context switch happens in interrupt context: the hardware tick lands, the interrupt stub has already saved the current thread's registers on its stack, and the scheduler decides which saved stack the interrupt returns into. There is no dedicated scheduler thread and, today, no working voluntary switch: a thread runs until an interrupt exit switches away from it (the tick, or a device interrupt whose handler woke another thread), until it parks on a blocking primitive, or until it exits. Each linked term has a short background note in the [glossary](scheduler-glossary.md); pluggable links to the how-to instead.
 
-The design splits **policy** from **mechanism**. Mechanism is fixed and shared: the thread registry, the lifecycle transitions, the timer-tick entry, the assembly that saves and restores registers, and the bridge the GC scans threads through. Policy, everything that decides *which* thread runs *when*, is a single interface, [`IScheduler`](../../../src/Cosmos.Kernel.Core/Scheduler/IScheduler.cs), that any algorithm can implement. The default implementation is [Stride](#the-stride-policy), a virtual-time fair-share scheduler; [Writing a scheduler](scheduler-plugging.md) shows how to replace it.
+The design splits **policy** from **mechanism**. Mechanism is fixed and shared: the thread registry, the lifecycle transitions, the timer-tick entry, the assembly that saves and restores registers, and the bridge the GC scans threads through. Policy, everything that decides *which* thread runs *when*, is a single interface, [`IScheduler`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/IScheduler.cs), that any algorithm can implement. The default implementation is [Stride](#the-stride-policy), a virtual-time fair-share scheduler; [Writing a scheduler](scheduler-plugging.md) shows how to replace it.
 
 <img src="images/diagrams/sched-mechanism-policy.svg" alt="The policy-mechanism split. Top box, mechanism, fixed: SchedulerManager for lifecycle dispatch, thread registry and tick entry; Thread and PerCpuState as extensible TCB and per-CPU state; the IRQ stubs in assembly for register save and restore; Mutex, ConditionVariable, Monitor and InterruptEvent parking and unparking through SchedulerManager; the GC stack-scan bridge walking the thread registry during collections. An arrow labeled IScheduler interface leads to the bottom box, policy, pluggable: StrideScheduler, the default virtual-time fair-share, and alternatives such as RoundRobin, MLFQ, EDF or FIFO sketched in Writing a scheduler." style="width:100%;min-width:620px;max-width:760px">
 
-At boot, [`LibraryInitializer`](../../../src/Cosmos.Kernel/Internal/Runtime/CompilerHelpers/LibraryInitializer.cs) wires the whole thing up when the feature switch is on: it calls `SchedulerManager.Initialize` with the CPU count, installs a `StrideScheduler`, creates one idle thread per CPU (the idle thread is the booting kernel itself, so it owns no separate stack), flips `SchedulerManager.Enabled`, and finally starts the scheduler timer with a 10 ms quantum. From that first tick on, the kernel's main flow is just the idle thread, preempted like any other.
+At boot, [`LibraryInitializer`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel/Internal/Runtime/CompilerHelpers/LibraryInitializer.cs) wires the whole thing up when the feature switch is on: it calls `SchedulerManager.Initialize` with the CPU count, creates one idle thread per CPU and makes it that CPU's current thread (the idle thread is the booting kernel itself, so it owns no separate stack), installs a `StrideScheduler` over them, flips `SchedulerManager.IsRunning`, and finally starts the scheduler timer with a 10 ms quantum. The idle threads come first because thread statics live on the current thread and a policy hook may run a class constructor, whose runner takes a lock keyed by a thread static. From that first tick on, the kernel's main flow is just the idle thread, preempted like any other.
 
 Everything the scheduler does is constrained by the two consumers that see its state from the outside: the timer interrupt and the garbage collector. The interrupt can fire at any [instruction boundary](sched-concepts/instruction-boundary.md): after one machine instruction, before the next, anywhere in the stream, splitting any code sequence longer than one instruction. So every state transition runs with interrupts disabled, and the blocking primitives follow a strict [park protocol](#the-park-protocol) so a wake-up arriving mid-transition is never lost. And the [garbage collector](garbage-collector.md) walks the [thread registry](#thread-registry) during collections, so every live thread must be registered and its saved state must be exactly where the registry says it is.
 
-The code lives in `src/Cosmos.Kernel.Core/Scheduler/`. [`SchedulerManager`](../../../src/Cosmos.Kernel.Core/Scheduler/SchedulerManager.cs) is the mechanism; `Stride/` holds the default policy; the synchronization primitives and the alarm service sit in their own files next to them. The architecture-specific register save and restore lives in the native projects. The full file map is in [Source files](#source-files) at the end of this article.
+The code lives in `src/Cosmos.Kernel.Core/Scheduler/`. [`SchedulerManager`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/SchedulerManager.cs) is the mechanism; `Stride/` holds the default policy; the synchronization primitives and the alarm service sit in their own files next to them. The architecture-specific register save and restore lives in the native projects. The full file map is in [Source files](#source-files) at the end of this article.
 
 ---
 
@@ -20,16 +20,17 @@ This section answers what a thread physically is: the control block, the stack i
 
 ### The Thread control block
 
-A [`Thread`](../../../src/Cosmos.Kernel.Core/Scheduler/Thread.cs) is a managed class on the GC heap:
+A [`SchedulerThread`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/SchedulerThread.cs) is a managed class on the GC heap:
 
 | Field | Purpose |
 |-------|---------|
 | `Id`, `CpuId` | Globally unique id (a bare incrementing counter) and the assigned CPU |
 | `State` | One of `Created`, `Ready`, `Running`, `Blocked`, `Sleeping`, `Dead` |
-| `Flags` | `KernelThread`, `IdleThread`, `Pinned`, `Managed`; bits 8 to 15 are reserved for schedulers |
+| `Flags` | `IdleThread`, `Pinned`, `Managed`; bits 8 to 15 are reserved for schedulers |
 | `StackBase`, `StackSize`, `StackPointer` | The stack allocation and the saved stack pointer (see below) |
-| `InstructionPointer` | The entry point, staged into the initial context |
-| `CreatedAt`, `LastScheduledAt`, `TotalRuntime`, `WakeupTime` | Accounting; `WakeupTime` is the sleep deadline in `Stopwatch` ticks |
+| `InstructionPointer` | The entry point, staged into the initial context. Manager bookkeeping, not on the seam |
+| `LastScheduledAt`, `WakeupTime` | Accounting kept by the manager, not on the seam; `WakeupTime` is the sleep deadline in `Stopwatch` ticks |
+| `TotalRuntime` | Accumulated CPU time, charged to the current thread by the active policy |
 | `AllocContext` | The thread's [TLAB](gc-concepts/tlab.md) (see [the GC article](garbage-collector.md#alloccontext-tlab)) |
 | `_threadStaticStorage` | The backing store for `[ThreadStatic]` fields, handed to CoreLib by ref |
 | `SchedulerData` | A single `object?` slot the active scheduler attaches its bookkeeping to (inherited from `SchedulerExtensible`) |
@@ -41,7 +42,7 @@ Two flags change behavior elsewhere:
 
 ### Per-thread stack
 
-`Thread.InitializeStack` allocates one contiguous block, `DefaultStackSize` = 256 KiB when the creator does not specify a size (explicit requests are honored down to a 64 KiB floor; see [Creation and first run](#creation-and-first-run)). The register context of a thread that has not yet run is fabricated at the bottom (the lowest address, rounded up to 16 bytes), and the usable call stack grows downward from the top toward it:
+`SchedulerThread.InitializeStack` allocates one contiguous block, `DefaultStackSize` = 256 KiB when the creator does not specify a size (explicit requests are honored down to a 64 KiB floor; see [Creation and first run](#creation-and-first-run)). The register context of a thread that has not yet run is fabricated at the bottom (the lowest address, rounded up to 16 bytes), and the usable call stack grows downward from the top toward it:
 
 <div style="overflow-x:auto">
 <img src="images/diagrams/sched-thread-stack.svg" alt="Layout of one thread stack at creation. The fabricated ThreadContext sits at the base, at StackBase rounded up to 16 bytes, and the initial StackPointer points at it. The usable stack occupies the rest, with live frames at the top growing downward. StackBase + StackSize marks the top. There is no guard page. After the first run, each preemption saves a fresh context at the interrupted stack position instead." style="width:100%;min-width:620px;max-width:760px">
@@ -50,13 +51,13 @@ Two flags change behavior elsewhere:
 `StackPointer` always points at the current saved context, so the IRQ stub knows where to restore from and the GC knows where a parked thread's saved state begins. For a `Created` thread that is the fabricated context at the base shown above, which the first run consumes; from then on, every preemption saves a fresh context at whatever stack position the interrupt hit, and `StackPointer` follows it. Two size floors matter (issue [#433](https://github.com/valentinbreiz/nativeaot-patcher/issues/433)):
 
 - `DefaultStackSize` must stay above 128 KiB, CoreLib's `MinExecutionStackSize`: `RuntimeHelpers.EnsureSufficientExecutionStack` compares the live stack pointer against the bounds the runtime reports, and a smaller stack makes it throw on every call.
-- The boot stack is separate: the kernel asks Limine for 1 MiB, and [`BootStack`](../../../src/Cosmos.Kernel.Core/Runtime/BootStack.cs) captures its top before any managed code runs. Code running before the scheduler starts (and the idle thread, which owns no allocation of its own) reports these bounds instead.
+- The boot stack is separate: the kernel asks Limine for 1 MiB, and [`BootStack`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Runtime/BootStack.cs) captures its top before any managed code runs. Code running before the scheduler starts (and the idle thread, which owns no allocation of its own) reports these bounds instead.
 
 There is no guard page: a thread that recurses past `StackBase` runs straight into whatever the allocator placed below it, and nothing detects the overflow.
 
 ### The saved context
 
-[`ThreadContext`](../../../src/Cosmos.Kernel.Core/Scheduler/ThreadContext.X64.cs) mirrors, field for field, the frame the IRQ stub pushes when an interrupt fires. That equivalence is the core trick: preempting a thread and creating a thread produce the same structure, so resuming either is the same code path.
+[`ThreadContext`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/ThreadContext.X64.cs) mirrors, field for field, the frame the IRQ stub pushes when an interrupt fires. That equivalence is the core trick: preempting a thread and creating a thread produce the same structure, so resuming either is the same code path.
 
 | | x64 (448 bytes) | ARM64 (816 bytes) |
 |---|---|---|
@@ -71,7 +72,7 @@ For a new thread, `ThreadContext.Initialize` fabricates the snapshot a preempted
 
 ### Thread registry
 
-`SchedulerManager` owns a flat, fixed `Thread?[256]` array (`Thread.MaxThreadCount`), allocated once at `Initialize` and exposed as `SchedulerManager.Threads`. Every live thread occupies one slot from `CreateThread` until `ExitThread` clears it; blocked and sleeping threads stay registered even though no run queue holds them.
+`SchedulerManager` owns a flat, fixed `SchedulerThread?[256]` array (`SchedulerThread.MaxThreadCount`), allocated once at `Initialize` and exposed as `SchedulerManager.Threads`. Every live thread occupies one slot from `CreateThread` until `ExitThread` clears it; blocked and sleeping threads stay registered even though no run queue holds them.
 
 <div style="overflow-x:auto">
 <img src="images/diagrams/sched-thread-registry.svg" alt="The thread registry: SchedulerManager.s_allThreads, a flat array of 256 slots allocated once at Initialize. Slots 0 to 3 point down at thread boxes: Thr 0 (idle, Running), Thr 1 (Ready), Thr 2 (Blocked), Thr 3 (Sleeping). Slot 4 is null, free. The elided middle leads to slot 255. The GC's mark phase iterates this array directly." style="width:100%;min-width:620px;max-width:760px">
@@ -117,7 +118,7 @@ Three details are deliberate:
 
 ### Creation and first run
 
-Threads are created through one seam: the `SystemNative_CreateThread` export in [`libSystemNative.cs`](../../../src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs), which backs CoreLib's `Interop.Sys.CreateThread` P/Invoke. So `new System.Threading.Thread(...).Start()` in kernel code flows through CoreLib into this export, which rounds the requested stack size up to a page multiple (floor 64 KiB), builds a `Scheduler.Thread` flagged `Managed`, points its context at the `ThreadNative.EntryPointStub` trampoline, and calls `CreateThread` plus `ReadyThread`. ([`ThreadPlug`](../../../src/Cosmos.Kernel.Plugs/System/Threading/ThreadPlug.cs) plugs only `Thread.Yield`, which reports success without yielding; `Thread.CreateThread` itself runs CoreLib's unmodified body.)
+Threads are created through one seam: the `SystemNative_CreateThread` export in [`libSystemNative.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs), which backs CoreLib's `Interop.Sys.CreateThread` P/Invoke. So `new System.Threading.Thread(...).Start()` in kernel code flows through CoreLib into this export, which rounds the requested stack size up to a page multiple (floor 64 KiB), builds a `SchedulerThread` flagged `Managed`, points its context at the `ThreadNative.EntryPointStub` trampoline, and calls `CreateThread` plus `ReadyThread`. ([`ThreadPlug`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Plugs/System/Threading/ThreadPlug.cs) plugs only `Thread.Yield`, which reports success without yielding; `Thread.CreateThread` itself runs CoreLib's unmodified body.)
 
 The first run of a `Created` thread cannot end in `iretq`, because there is no interrupted frame to return into. Instead the IRQ exit path is told (via a flag staged from C#) to take the new-thread tail: it loads the entry point and the fabricated initial stack pointer from the context, re-enabling interrupts along the way, and jumps. The landing point is always `EntryPointStub`, which forwards to `SchedulerManager.InvokeCurrentThreadStart`: it decodes the parameter (CoreLib `Thread.StartThread` for `Managed` threads, a `GCHandle<Action>` otherwise), runs it inside a catch-all so a throwing thread exits with code 1 instead of taking down the kernel, and ends in `ExitThread` followed by a halt loop. After that first entry, the thread is indistinguishable from any preempted thread.
 
@@ -178,7 +179,7 @@ sequenceDiagram
     end
 ```
 
-The policy never touches a register. Everything between the stub's save and restore is plain managed C# operating on `Thread` and `PerCpuState`; the handoff in each direction is one pointer. Two conditions guard the switch-out bookkeeping: `prev` is demoted to `Ready` only if it was `Running`, and `OnThreadYield` (the policy's re-queue hook) runs only if it ended up `Ready`. A thread that blocked or went to sleep just before the tick keeps its parked state and is not re-queued.
+The policy never touches a register. Everything between the stub's save and restore is plain managed C# operating on `SchedulerThread` and `PerCpuState`; the handoff in each direction is one pointer. Two conditions guard the switch-out bookkeeping: `prev` is demoted to `Ready` only if it was `Running`, and `OnThreadYield` (the policy's re-queue hook) runs only if it ended up `Ready`. A thread that blocked or went to sleep just before the tick keeps its parked state and is not re-queued.
 
 The staging itself is two writes into native globals: the new-thread flag first, then the target stack pointer (`_context_switch_target_rsp`; nonzero means switch). Every one of the 256 interrupt vectors checks that global on exit, so any interrupt can carry out a staged switch, not just the timer. The staging variables are single globals, one more thing that pins the kernel to one CPU for now.
 
@@ -196,7 +197,7 @@ Device interrupt handlers wake threads too: an NVMe completion fires on its MSI-
 
 [Stride scheduling](https://web.eecs.umich.edu/~mosharaf/Readings/Stride.pdf) is proportional-share scheduling with deterministic, virtual-time bookkeeping. Each thread holds `Tickets` (default 100), its share weight. From the tickets follows a `Stride`, the constant `Stride1` (2^20) divided by tickets, and a `Pass`, the thread's virtual time. The run queue stays sorted by `Pass` and `PickNext` always pops the lowest: the thread that has consumed the least of its share runs next. As a thread runs, its `Pass` advances proportionally to runtime (`Stride * elapsed / quantum`, so exactly one stride per full 10 ms quantum), and more tickets mean a smaller stride, a slower-rising `Pass`, and more CPU.
 
-Each CPU carries a `StrideCpuData`: the run queue (a `List<Thread>` kept sorted ascending by `Pass`), `TotalTickets` (the aggregate share, which doubles as the load metric), and `GlobalPass`, the CPU's own virtual clock, advanced at the aggregate rate (`Stride1 / TotalTickets` per quantum). `GlobalPass` is the reference point that wakeup placement and priority changes are computed against.
+Each CPU carries a `StrideCpuData`: the run queue (a `List<SchedulerThread>` kept sorted ascending by `Pass`), `TotalTickets` (the aggregate share, which doubles as the load metric), and `GlobalPass`, the CPU's own virtual clock, advanced at the aggregate rate (`Stride1 / TotalTickets` per quantum). `GlobalPass` is the reference point that wakeup placement and priority changes are computed against.
 
 <div style="overflow-x:auto">
 <img src="images/diagrams/sched-run-queue.svg" alt="One Stride run queue: StrideCpuData.RunQueue, a List of threads kept sorted ascending by Pass. Thr A with Pass 1042 sits at index 0, where PickNext pops. Thr B with Pass 1130 follows, then an elided middle, then Thr T with Pass 1320 at the tail, where Balance steals from. Each thread's StrideThreadData carries Tickets, Stride and Pass." style="width:100%;min-width:620px;max-width:760px">
@@ -237,7 +238,7 @@ Blocking synchronization sits on top of three manager calls, `BlockThread`, `Rea
 
 ### SpinLock and the IRQ-safe scope
 
-[`SpinLock`](../../../src/Cosmos.Kernel.Core/Scheduler/SpinLock.cs) is a single-word CAS lock with two acquire forms, and choosing the right one is the whole contract. Plain `Acquire`/`Release` is only safe for locks never touched from interrupt context: on one CPU, an interrupt handler that spins on a lock its own interrupted thread holds spins forever. `AcquireIrqSafe` returns a scope that disables interrupts before taking the lock and restores them after releasing it, in that order on both ends, so an interrupt can never fire while the lock is held on this CPU. Every lock in `Mutex`, `ConditionVariable`, and `InterruptEvent` is taken exclusively through `AcquireIrqSafe`: their wait sides hold the lock with interrupts masked, so a plain-acquire holder preempted mid-section would deadlock every other spinner, and `InterruptEvent`'s signal side additionally does run from interrupt handlers.
+[`SpinLock`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/SpinLock.cs) is a single-word CAS lock with two acquire forms, and choosing the right one is the whole contract. Plain `Acquire`/`Release` is only safe for locks never touched from interrupt context: on one CPU, an interrupt handler that spins on a lock its own interrupted thread holds spins forever. `AcquireIrqSafe` returns a scope that disables interrupts before taking the lock and restores them after releasing it, in that order on both ends, so an interrupt can never fire while the lock is held on this CPU. Every lock in `Mutex`, `ConditionVariable`, and `InterruptEvent` is taken exclusively through `AcquireIrqSafe`: their wait sides hold the lock with interrupts masked, so a plain-acquire holder preempted mid-section would deadlock every other spinner, and `InterruptEvent`'s signal side additionally does run from interrupt handlers.
 
 ### The park protocol
 
@@ -263,19 +264,19 @@ flowchart TD
 
 ### Mutex
 
-[`Mutex`](../../../src/Cosmos.Kernel.Core/Scheduler/Mutex.cs) is a recursive blocking lock: an owner reference, a recursion depth, and a FIFO wait list. A contended acquire parks by the protocol above on the first failed attempt; there is no spin-then-park stage. Release at depth zero performs a **direct hand-off**: still under the lock, it dequeues the head waiter and makes it the owner before readying it, so a running thread cannot barge in and retake the mutex during the waiter's wake-up latency. The woken waiter recognizes the hand-off (it owns the mutex it never explicitly acquired) and returns.
+[`Mutex`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/Mutex.cs) is a recursive blocking lock: an owner reference, a recursion depth, and a FIFO wait list. A contended acquire parks by the protocol above on the first failed attempt; there is no spin-then-park stage. Release at depth zero performs a **direct hand-off**: still under the lock, it dequeues the head waiter and makes it the owner before readying it, so a running thread cannot barge in and retake the mutex during the waiter's wake-up latency. The woken waiter recognizes the hand-off (it owns the mutex it never explicitly acquired) and returns.
 
 Two special cases: the idle thread never parks (blocking it would just get it re-picked as the idle fallback), so it spin-acquires with interrupts enabled between attempts. And with no thread context at all (scheduler off or not yet ready), `Acquire`/`Release` are no-ops and `TryAcquire` succeeds, so early-boot code can run through mutex-protected paths.
 
 ### ConditionVariable and Monitor
 
-[`ConditionVariable`](../../../src/Cosmos.Kernel.Core/Scheduler/ConditionVariable.cs) is wait/signal with mutex integration. `Wait(mutex)` inserts itself, releases the mutex, and blocks, all in one scope (rule 1; releasing the mutex outside the scope is the #357 bug), then re-acquires the mutex on wake. `WaitTimeout` parks through `MarkSleeping` with the deadline, and reports signaled-vs-timeout by membership (rule 3). `Signal` readies the FIFO head; `SignalAll` readies everyone.
+[`ConditionVariable`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/ConditionVariable.cs) is wait/signal with mutex integration. `Wait(mutex)` inserts itself, releases the mutex, and blocks, all in one scope (rule 1; releasing the mutex outside the scope is the #357 bug), then re-acquires the mutex on wake. `WaitTimeout` parks through `MarkSleeping` with the deadline, and reports signaled-vs-timeout by membership (rule 3). `Signal` readies the FIFO head; `SignalAll` readies everyone.
 
-[`Monitor`](../../../src/Cosmos.Kernel.Core/Scheduler/Monitor.cs) composes one `Mutex` and one `ConditionVariable` into the classic monitor shape; its `Signal`/`SignalAll` also release the mutex, so signaling exits the monitor.
+[`Monitor`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/Monitor.cs) composes one `Mutex` and one `ConditionVariable` into the classic monitor shape; its `Signal`/`SignalAll` also release the mutex, so signaling exits the monitor.
 
 ### InterruptEvent
 
-[`InterruptEvent`](../../../src/Cosmos.Kernel.Core/Scheduler/InterruptEvent.cs) is the interrupt-to-thread completion primitive: an interrupt handler signals it, a thread waits on it. The NVMe driver hangs one on every command slot and signals it from the MSI-X completion handler.
+[`InterruptEvent`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/InterruptEvent.cs) is the interrupt-to-thread completion primitive: an interrupt handler signals it, a thread waits on it. The NVMe driver hangs one on every command slot and signals it from the MSI-X completion handler.
 
 Signals are **counted**, not latched: two signals wake two waiters, and signals arriving with no waiter are banked and consumed one per future wait (auto-reset). The signal side is interrupt-safe by construction: it takes the IRQ-safe lock, bumps the count, dequeues one waiter, and calls `ReadyThread`, with no allocation and no interface dispatch on the path (the waiter list is pre-sized to four, so typical waits do not allocate under the lock the interrupt handler spins on either). The `ReadyThread` sets `_needReschedule`, so the woken waiter runs on this same interrupt's exit path (see [Waking from an interrupt handler](#waking-from-an-interrupt-handler)).
 
@@ -287,13 +288,20 @@ The wait side follows the park protocol, with two twists. Callers without park c
 
 Deferred work has two tiers, split by execution context. The rule is in the API docs of both: interrupt context must not block, thread context may.
 
-| | [`TimerManager.Schedule`](../../../src/Cosmos.Kernel.System/Timer/TimerManager.cs) | [`AlarmSystem`](../../../src/Cosmos.Kernel.Core/Scheduler/AlarmSystem.cs) |
+| | [`TimerManager`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.System/Timer/TimerManager.cs) | [`AlarmManager`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.System/Timer/AlarmManager.cs) |
 |---|---|---|
 | Callback runs in | interrupt context (the timer tick) | a dedicated kernel thread |
 | May block, take a Mutex | no | yes |
 | Resolution | the timer device's tick | the scheduler tick |
-| Backed by | `SoftwareTimer` registry on the timer device | a deadline-sorted list, a `Mutex`, a `ConditionVariable` |
-| One-shot / recurring | both | both (recurring minimum 1 ms) |
+| Backed by | `SoftwareTimer` registry on the timer device | [`AlarmSystem`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/AlarmSystem.cs): a deadline-sorted list, a `Mutex`, a `ConditionVariable` |
+| Scheduled with | `Schedule(Action, TimeSpan)`, `ScheduleRecurring(Action, TimeSpan)` | the same two signatures |
+| Handle | a `SoftwareTimer`, null when no timer device is registered | a `ulong` id, 0 when the scheduler is not running |
+| Cancelled with | `Cancel(SoftwareTimer?)` | `Cancel(ulong)` |
+| Cancel returns | true only when the timer was still pending | true only when the alarm was still pending |
+| Callable from | any context, the tick path included: the members mask interrupts | thread context only: every member takes the alarm list's mutex and parks if it is held |
+| One-shot / recurring | both (recurring period must be positive) | both (recurring period must be positive) |
+
+The two managers take the same arguments in the same order and report cancellation the same way, so the only thing the call site chooses is the context the *callback* runs in, which is what the manager name says. What does not converge is the context each manager may be called *from*: scheduling or cancelling an alarm parks on a mutex, so doing it from a `TimerManager` callback parks inside the timer interrupt and hangs. The handle types differ too, because an alarm is owned by `AlarmSystem`, which is internal to `Cosmos.Kernel.Core`, while a software timer is a public handle the device registry hands back.
 
 The first tier is hardware-near: `TimerDevice` keeps a registry of `SoftwareTimer` countdowns and drives them from its tick interrupt (`HandleTick`), invoking due callbacks right there in interrupt context. On x64 the PIT provides this tick, separate from the LAPIC scheduler tick; on ARM64 the single Generic Timer interrupt drives both, software timers first.
 
@@ -306,7 +314,7 @@ The second tier is a service built entirely on the primitives above, and doubles
 The scheduler is the GC's source of truth for stack roots; the full story is in [the GC article](garbage-collector.md#mark-phase). The scheduler-side contract has three parts:
 
 - **The registry is the root set.** The mark phase iterates `SchedulerManager.Threads` directly, a flat array walk with no interface dispatch and no allocation. Every registered, non-`Dead` thread gets scanned; a thread the registry does not hold does not exist for the GC.
-- **Parked threads are scanned conservatively from their saved state.** For each thread that is not currently running, the GC reads the saved `ThreadContext` through `Thread.GetContext()` and treats the saved general registers as root candidates (the SIMD area and the flags are skipped), then scans every pointer-sized word from `StackPointer` to the stack top. Precise scanning of parked threads needs return-address hijacking, tracked in issue [#385](https://github.com/valentinbreiz/nativeaot-patcher/issues/385).
+- **Parked threads are scanned conservatively from their saved state.** For each thread that is not currently running, the GC reads the saved `ThreadContext` through `SchedulerThread.GetContext()` and treats the saved general registers as root candidates (the SIMD area and the flags are skipped), then scans every pointer-sized word from `StackPointer` to the stack top. Precise scanning of parked threads needs return-address hijacking, tracked in issue [#385](https://github.com/valentinbreiz/nativeaot-patcher/issues/385).
 - **The triggering thread is scanned precisely.** The thread that entered `Collect` reached it through a managed call chain, so its stack is walked frame by frame from GCInfo (see [Precise Stack Scanning](garbage-collector-gcinfo.md)); the scheduler contributes the stack bounds.
 
 Conservative scanning is also why `TryMarkRoot` validates aggressively: a stack word is only a candidate if it points into the GC heap, and the `MethodTable` pointer found there must lie outside the heap and above `AddressSpace.KernelSpaceStart` (the kernel higher half) before it is dereferenced.
@@ -317,19 +325,19 @@ Collections run with interrupts disabled on the triggering thread, so no tick, n
 
 ## Runtime bridge
 
-The runtime and CoreLib see the scheduler through exports in [`Runtime/Thread.cs`](../../../src/Cosmos.Kernel.Core/Runtime/Thread.cs):
+The runtime and CoreLib see the scheduler through exports in [`Runtime/Thread.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Runtime/Thread.cs):
 
 | Export | Behavior |
 |--------|----------|
 | `RhGetCurrentThreadStackBounds` | The current thread's real `[StackBase, StackBase + StackSize)`; the boot stack's bounds before the scheduler runs, for the idle thread, and when the switch is off (issue [#433](https://github.com/valentinbreiz/nativeaot-patcher/issues/433)) |
 | `RhGetThreadStaticStorage` | Ref to the current thread's `[ThreadStatic]` backing store (a static spine when the switch is off) |
-| `RhGetDefaultStackSize` | `Thread.DefaultStackSize`, 256 KiB |
+| `RhGetDefaultStackSize` | `SchedulerThread.DefaultStackSize`, 256 KiB |
 | `RhSetThreadExitCallback` | Stores the callback `ExitThread` invokes; CoreLib uses it for managed thread cleanup |
 | `RhYield` | Re-queues the current thread (`YieldThread`) and halts until the next tick; see [What there is not](#what-there-is-not-a-voluntary-switch) |
 | `RhSpinWait` | A counted empty loop |
 | `RhGetThreadEntryPointAddress`, `RhSetCurrentThreadName` | Stubs: zero, and a serial log |
 
-The native side of switching is [`ContextSwitchNative`](../../../src/Cosmos.Kernel.Core/Bridge/Import/ContextSwitchNative.cs): five tiny `[SuppressGCTransition]` imports, identical on both architectures. The staging pair (`_native_set_context_switch_sp`, `_native_set_context_switch_new_thread`) and the staged-pointer getter (whose nonzero read doubles as the "switch already staged" guard) drive the exit path; `_native_get_sp` reads the live stack pointer for the GC's scan of a running thread; and `_native_capture_regdisplay` bootstraps the GC's precise stack walk.
+The native side of switching is [`ContextSwitchNative`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Bridge/Import/ContextSwitchNative.cs): five tiny `[SuppressGCTransition]` imports, identical on both architectures. The staging pair (`_native_set_context_switch_sp`, `_native_set_context_switch_new_thread`) and the staged-pointer getter (whose nonzero read doubles as the "switch already staged" guard) drive the exit path; `_native_get_sp` reads the live stack pointer for the GC's scan of a running thread; and `_native_capture_regdisplay` bootstraps the GC's precise stack walk.
 
 ---
 
@@ -337,9 +345,9 @@ The native side of switching is [`ContextSwitchNative`](../../../src/Cosmos.Kern
 
 The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfaced as `CosmosFeatures.SchedulerEnabled` and checked at three levels:
 
-- `SchedulerManager.IsEnabled` mirrors the switch. The creation entry points (`Initialize`, `CreateThread`, `ReadyThread`) throw when it is off; with the switch off nothing else is reachable, since no thread ever exists.
-- `SchedulerManager.Enabled` is the runtime arm switch. `LibraryInitializer` flips it only after the manager, the policy, and the idle threads are fully wired, and the interrupt-side entries (`OnTimerInterrupt`, `ReschedulePendingFromIrq`) return early until it is set, so the first tick cannot race a half-built scheduler.
-- `SchedulerManager.IsReady` (`IsEnabled` plus initialized state) is the guard for touching per-CPU state. `Mutex` and `InterruptEvent` check it literally; `ConditionVariable` and the runtime exports reach the same effect through the feature check plus null propagation on the CPU state. When the scheduler is not ready they degrade: `Mutex` becomes a no-op, `InterruptEvent` polls instead of parking, the stack bounds fall back to the boot stack.
+- `SchedulerManager.IsEnabled` (internal) mirrors the switch. The creation entry points (`Initialize`, `CreateThread`, `ReadyThread`) throw when it is off; with the switch off nothing else is reachable, since no thread ever exists. On the ring the same fact is `KernelFeatures.Scheduler` and `SchedulerInfo.IsSupported`.
+- `SchedulerManager.IsRunning` (internal) is the runtime arm switch, read on the ring as `SchedulerInfo.IsRunning`. `LibraryInitializer` flips it only after the manager, the policy, and the idle threads are fully wired, and the interrupt-side entries (`OnTimerInterrupt`, `ReschedulePendingFromIrq`) return early until it is set, so the first tick cannot race a half-built scheduler.
+- `SchedulerManager.IsReady` (`IsEnabled` plus initialized state) is the guard for touching per-CPU state, and the one of the three the seam publishes. `Mutex` and `InterruptEvent` check it literally; `ConditionVariable` and the runtime exports reach the same effect through the feature check plus null propagation on the CPU state. When the scheduler is not ready they degrade: `Mutex` becomes a no-op, `InterruptEvent` polls instead of parking, the stack bounds fall back to the boot stack.
 
 ---
 
@@ -358,7 +366,7 @@ The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfa
 
 ## Tests
 
-Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](../../../tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 58 tests (`make test KERNEL=Threading`):
+Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 58 tests (`make test KERNEL=Threading`):
 
 - thread lifecycle and concurrency (`Thread_Start_ExecutesDelegate`, `Thread_Multiple_CanRunConcurrently`),
 - stack sizing and the #433 floor (`Thread_MaxStackSize_IsHonored`, `Thread_MaxStackSize_TinyRequestIsFloored`, `Thread_EnsureSufficientExecutionStack_Passes`),
@@ -368,7 +376,7 @@ Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](../
 - interrupt events (`InterruptEvent_TwoWaiters_BothWake`),
 - the BCL surface above it all: delegates, `Task`, `async`/`await`, `ThreadPool`.
 
-[`Cosmos.Kernel.Tests.Timer`](../../../tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) runs 24 tests on x64 and 18 on ARM64 (`make test KERNEL=Timer`), covering both deferred-work tiers (`TimerManager_Schedule_*`, `AlarmSystem_*`), the BCL `System.Threading.Timer` on top of them, `Stopwatch`, `DateTime`, and the per-architecture timer hardware (PIT and LAPIC on x64).
+[`Cosmos.Kernel.Tests.Timer`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) runs 24 tests on x64 and 18 on ARM64 (`make test KERNEL=Timer`), covering both deferred-work tiers (`TimerManager_Schedule_*`, `AlarmSystem_*`), the BCL `System.Threading.Timer` on top of them, `Stopwatch`, `DateTime`, and the per-architecture timer hardware (PIT and LAPIC on x64).
 
 ---
 
@@ -376,23 +384,23 @@ Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](../
 
 | Area | Path |
 |------|------|
-| Policy interface | [`src/Cosmos.Kernel.Core/Scheduler/IScheduler.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/IScheduler.cs) |
-| Mechanism | [`SchedulerManager.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/SchedulerManager.cs), [`SchedulerExtensible.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/SchedulerExtensible.cs), [`PerCpuState.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/PerCpuState.cs) |
-| Thread control block | [`Thread.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/Thread.cs), [`ThreadState.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/ThreadState.cs) |
-| Saved context | [`ThreadContext.X64.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/ThreadContext.X64.cs), [`ThreadContext.ARM64.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/ThreadContext.ARM64.cs) |
-| Stride policy | [`Stride/StrideScheduler.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/Stride/StrideScheduler.cs), [`Stride/StrideThreadData.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/Stride/StrideThreadData.cs), [`Stride/StrideCpuData.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/Stride/StrideCpuData.cs) |
-| Synchronization | [`SpinLock.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/SpinLock.cs), [`Mutex.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/Mutex.cs), [`ConditionVariable.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/ConditionVariable.cs), [`Monitor.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/Monitor.cs), [`InterruptEvent.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/InterruptEvent.cs) |
-| Alarms | [`AlarmSystem.cs`](../../../src/Cosmos.Kernel.Core/Scheduler/AlarmSystem.cs) |
-| Software timers | [`src/Cosmos.Kernel.HAL.Interfaces/Devices/SoftwareTimer.cs`](../../../src/Cosmos.Kernel.HAL.Interfaces/Devices/SoftwareTimer.cs), [`src/Cosmos.Kernel.HAL/Devices/Timer/TimerDevice.cs`](../../../src/Cosmos.Kernel.HAL/Devices/Timer/TimerDevice.cs), [`src/Cosmos.Kernel.System/Timer/TimerManager.cs`](../../../src/Cosmos.Kernel.System/Timer/TimerManager.cs) |
-| Boot wiring | [`src/Cosmos.Kernel/Internal/Runtime/CompilerHelpers/LibraryInitializer.cs`](../../../src/Cosmos.Kernel/Internal/Runtime/CompilerHelpers/LibraryInitializer.cs) |
-| Thread creation seam | [`src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs`](../../../src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs), [`src/Cosmos.Kernel.Core/Bridge/Export/ThreadNative.cs`](../../../src/Cosmos.Kernel.Core/Bridge/Export/ThreadNative.cs) |
-| Runtime exports | [`src/Cosmos.Kernel.Core/Runtime/Thread.cs`](../../../src/Cosmos.Kernel.Core/Runtime/Thread.cs), [`src/Cosmos.Kernel.Core/Runtime/BootStack.cs`](../../../src/Cosmos.Kernel.Core/Runtime/BootStack.cs) |
-| Native staging imports | [`src/Cosmos.Kernel.Core/Bridge/Import/ContextSwitchNative.cs`](../../../src/Cosmos.Kernel.Core/Bridge/Import/ContextSwitchNative.cs) |
-| Managed Thread plug | [`src/Cosmos.Kernel.Plugs/System/Threading/ThreadPlug.cs`](../../../src/Cosmos.Kernel.Plugs/System/Threading/ThreadPlug.cs) |
-| x64 IRQ stub and exit paths | [`src/Cosmos.Kernel.Native.X64/CPU/Interrupts.s`](../../../src/Cosmos.Kernel.Native.X64/CPU/Interrupts.s) |
-| ARM64 IRQ stub and exit paths | [`src/Cosmos.Kernel.Native.ARM64/CPU/Interrupts.s`](../../../src/Cosmos.Kernel.Native.ARM64/CPU/Interrupts.s), [`src/Cosmos.Kernel.Native.ARM64/CPU/ContextSwitch.s`](../../../src/Cosmos.Kernel.Native.ARM64/CPU/ContextSwitch.s) |
-| Timer hardware | [`src/Cosmos.Kernel.Core.X64/Cpu/LocalApic.cs`](../../../src/Cosmos.Kernel.Core.X64/Cpu/LocalApic.cs), [`src/Cosmos.Kernel.HAL.X64/Devices/Timer/PIT.cs`](../../../src/Cosmos.Kernel.HAL.X64/Devices/Timer/PIT.cs), [`src/Cosmos.Kernel.HAL.ARM64/Devices/Timer/GenericTimer.cs`](../../../src/Cosmos.Kernel.HAL.ARM64/Devices/Timer/GenericTimer.cs) |
-| GC mark integration | [`src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Mark.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Mark.cs) |
+| Policy interface | [`src/Cosmos.Kernel.Core/Scheduler/IScheduler.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/IScheduler.cs) |
+| Mechanism | [`SchedulerManager.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/SchedulerManager.cs), [`SchedulerExtensible.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/SchedulerExtensible.cs), [`PerCpuState.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/PerCpuState.cs) |
+| Thread control block | [`SchedulerThread.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/SchedulerThread.cs), [`SchedulerThreadState.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/SchedulerThreadState.cs) |
+| Saved context | [`ThreadContext.X64.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/ThreadContext.X64.cs), [`ThreadContext.ARM64.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/ThreadContext.ARM64.cs) |
+| Stride policy | [`Stride/StrideScheduler.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/Stride/StrideScheduler.cs), [`Stride/StrideThreadData.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/Stride/StrideThreadData.cs), [`Stride/StrideCpuData.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/Stride/StrideCpuData.cs) |
+| Synchronization | [`SpinLock.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/SpinLock.cs), [`Mutex.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/Mutex.cs), [`ConditionVariable.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/ConditionVariable.cs), [`Monitor.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/Monitor.cs), [`InterruptEvent.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/InterruptEvent.cs) |
+| Alarms | [`AlarmSystem.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Scheduler/AlarmSystem.cs) |
+| Software timers | [`src/Cosmos.Kernel.HAL.Interfaces/Devices/SoftwareTimer.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.HAL.Interfaces/Devices/SoftwareTimer.cs), [`src/Cosmos.Kernel.HAL/Devices/Timer/TimerDevice.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.HAL/Devices/Timer/TimerDevice.cs), [`src/Cosmos.Kernel.System/Timer/TimerManager.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.System/Timer/TimerManager.cs) |
+| Boot wiring | [`src/Cosmos.Kernel/Internal/Runtime/CompilerHelpers/LibraryInitializer.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel/Internal/Runtime/CompilerHelpers/LibraryInitializer.cs) |
+| Thread creation seam | [`src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs), [`src/Cosmos.Kernel.Core/Bridge/Export/ThreadNative.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Bridge/Export/ThreadNative.cs) |
+| Runtime exports | [`src/Cosmos.Kernel.Core/Runtime/Thread.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Runtime/Thread.cs), [`src/Cosmos.Kernel.Core/Runtime/BootStack.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Runtime/BootStack.cs) |
+| Native staging imports | [`src/Cosmos.Kernel.Core/Bridge/Import/ContextSwitchNative.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Bridge/Import/ContextSwitchNative.cs) |
+| Managed Thread plug | [`src/Cosmos.Kernel.Plugs/System/Threading/ThreadPlug.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Plugs/System/Threading/ThreadPlug.cs) |
+| x64 IRQ stub and exit paths | [`src/Cosmos.Kernel.Native.X64/CPU/Interrupts.s`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Native.X64/CPU/Interrupts.s) |
+| ARM64 IRQ stub and exit paths | [`src/Cosmos.Kernel.Native.ARM64/CPU/Interrupts.s`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Native.ARM64/CPU/Interrupts.s), [`src/Cosmos.Kernel.Native.ARM64/CPU/ContextSwitch.s`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Native.ARM64/CPU/ContextSwitch.s) |
+| Timer hardware | [`src/Cosmos.Kernel.Core.X64/Cpu/LocalApic.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core.X64/Cpu/LocalApic.cs), [`src/Cosmos.Kernel.HAL.X64/Devices/Timer/PIT.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.HAL.X64/Devices/Timer/PIT.cs), [`src/Cosmos.Kernel.HAL.ARM64/Devices/Timer/GenericTimer.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.HAL.ARM64/Devices/Timer/GenericTimer.cs) |
+| GC mark integration | [`src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Mark.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Mark.cs) |
 
 ---
 

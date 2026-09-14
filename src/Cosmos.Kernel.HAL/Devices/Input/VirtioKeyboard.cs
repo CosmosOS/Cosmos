@@ -3,6 +3,7 @@
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.HAL.Devices.Input;
 
@@ -10,7 +11,7 @@ namespace Cosmos.Kernel.HAL.Devices.Input;
 /// Virtio-input keyboard driver. Transport-agnostic: works over virtio MMIO
 /// (QEMU virt) and virtio PCI (q35 virtio-keyboard-pci) alike.
 /// </summary>
-public unsafe class VirtioKeyboard : KeyboardDevice
+internal unsafe class VirtioKeyboard : KeyboardDevice
 {
     // Queue size
     private const uint QueueSize = 64;
@@ -59,7 +60,7 @@ public unsafe class VirtioKeyboard : KeyboardDevice
         }
 
         _eventQueue = _transport.CreateQueue(VirtioInput.EVENTQ, QueueSize);
-        if (_eventQueue == null)
+        if (_eventQueue is null)
         {
             Serial.Write("[VirtioKeyboard] ERROR: Failed to setup event queue\n");
             _transport.Fail();
@@ -84,7 +85,7 @@ public unsafe class VirtioKeyboard : KeyboardDevice
 
     private void AddEventBuffer(int bufferIndex)
     {
-        if (_eventQueue == null)
+        if (_eventQueue is null)
         {
             return;
         }
@@ -113,7 +114,7 @@ public unsafe class VirtioKeyboard : KeyboardDevice
 
     private void ProcessEvents()
     {
-        if (_eventQueue == null)
+        if (_eventQueue is null)
         {
             return;
         }
@@ -151,7 +152,7 @@ public unsafe class VirtioKeyboard : KeyboardDevice
     /// </summary>
     public override void Poll()
     {
-        if (!_initialized || _eventQueue == null)
+        if (!_initialized || _eventQueue is null)
         {
             return;
         }
@@ -274,6 +275,7 @@ public unsafe class VirtioKeyboard : KeyboardDevice
             56 => 0x38,  // KEY_LEFTALT -> Left Alt
             57 => 0x39,  // KEY_SPACE -> Space
             58 => 0x3A,  // KEY_CAPSLOCK -> Caps Lock
+            100 => IKeyboardDevice.RightAltScanCode, // KEY_RIGHTALT -> Right Alt
 
             // Arrow keys (extended)
             103 => 0x48, // KEY_UP -> Up

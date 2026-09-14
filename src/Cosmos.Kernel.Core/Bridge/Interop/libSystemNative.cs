@@ -1,8 +1,9 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
+using SysThread = System.Threading.Thread;
 
 namespace Cosmos.Kernel.Core.Bridge.Interop;
 
@@ -19,7 +20,7 @@ internal static unsafe partial class libSystemNative
     [UnmanagedCallersOnly(EntryPoint = "SystemNative_GetCpuUtilization")]
     internal static unsafe double SystemNative_GetCpuUtilization(ProcessCpuInformation* previousCpuInfo)
     {
-        if (SchedulerManager.Threads == null)
+        if (SchedulerManager.Threads is null)
         {
             return 0.0;
         }
@@ -107,7 +108,7 @@ internal static unsafe partial class libSystemNative
         // runs CoreLib's StartThread with the GCHandle<Thread> parameter itself.
         _ = startAddress;
 
-        if (!SchedulerManager.Enabled)
+        if (!SchedulerManager.IsRunning)
         {
             // Same behavior as before the scheduler existed: report success,
             // the thread simply never runs.
@@ -122,15 +123,19 @@ internal static unsafe partial class libSystemNative
 
         using (InternalCpu.DisableInterruptsScope())
         {
-            // Create scheduler thread with ThreadFlags.Managed set.
+            // Create scheduler thread with SchedulerThreadFlags.Managed set.
             // SchedulerManager.InvokeCurrentThreadStart evaluates it to
             // call the managed startup or not.
-            Scheduler.Thread thread = new Scheduler.Thread
+            SchedulerThread thread = new SchedulerThread
             {
                 Id = SchedulerManager.AllocateThreadId(),
                 CpuId = 0,
-                State = Scheduler.ThreadState.Created,
-                Flags = ThreadFlags.Managed
+                State = SchedulerThreadState.Created,
+                Flags = SchedulerThreadFlags.Managed,
+                // CoreLib's handle in `parameter` lives only until the thread
+                // reports itself started; the mechanism keeps its own for the
+                // thread's whole life, so a kill can reach the managed side.
+                _managedThread = new GCHandle<SysThread>(GCHandle<SysThread>.FromIntPtr(parameter).Target)
             };
 
             nuint entryPoint = (nuint)(delegate* unmanaged<IntPtr, void>)&ThreadNative.EntryPointStub;

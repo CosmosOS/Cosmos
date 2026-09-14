@@ -60,12 +60,17 @@
       <ExportsFile>$(IlcIntermediateOutputPath)$(AssemblyName).exports</ExportsFile>
     </PropertyGroup>
 
+    <!-- The runtime's own library initializers. Stage="Framework" places them after
+         the kernel's Runtime stage (the heap they allocate from) and before every
+         kernel library: System.Private.CoreLib's initializer creates the class
+         constructor runner, and no lazily constructed static can be read until it
+         exists. SortAutoInitialedAssemblies applies the stages. -->
     <ItemGroup Condition="$(IlcSystemModule) == 'System.Private.CoreLib'">
-      <AutoInitializedAssemblies Include="System.Private.CoreLib"/>
-      <AutoInitializedAssemblies Include="System.Private.StackTraceMetadata" Condition="$(StackTraceSupport) != 'false'"/>
-      <AutoInitializedAssemblies Include="System.Private.TypeLoader"/>
-      <AutoInitializedAssemblies Include="System.Private.Reflection.Execution" Condition="$(IlcDisableReflection) != 'true'"/>
-      <AutoInitializedAssemblies Include="System.Private.DisabledReflection" Condition="$(IlcDisableReflection) == 'true'"/>
+      <AutoInitializedAssemblies Include="System.Private.CoreLib" Stage="Framework"/>
+      <AutoInitializedAssemblies Include="System.Private.StackTraceMetadata" Stage="Framework" Condition="$(StackTraceSupport) != 'false'"/>
+      <AutoInitializedAssemblies Include="System.Private.TypeLoader" Stage="Framework"/>
+      <AutoInitializedAssemblies Include="System.Private.Reflection.Execution" Stage="Framework" Condition="$(IlcDisableReflection) != 'true'"/>
+      <AutoInitializedAssemblies Include="System.Private.DisabledReflection" Stage="Framework" Condition="$(IlcDisableReflection) == 'true'"/>
     </ItemGroup>
 
     <ItemGroup>

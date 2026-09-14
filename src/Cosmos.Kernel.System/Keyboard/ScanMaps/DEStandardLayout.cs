@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
 /// <summary>
 /// Represents the standard German (DE) keyboard layout.
 /// </summary>
-public class DEStandardLayout : ScanMapBase
+public sealed class DEStandardLayout : ScanMapBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="DEStandardLayout"/> class.
@@ -15,10 +15,9 @@ public class DEStandardLayout : ScanMapBase
     {
     }
 
-    protected override void InitKeys()
+    /// <inheritdoc />
+    protected override void InitializeKeys()
     {
-        Keys = new List<KeyMapping>(101);
-
         #region Keys
 
         /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKeyEx */
@@ -91,6 +90,8 @@ public class DEStandardLayout : ScanMapBase
         // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, ConsoleKeyEx.LAlt));
+        /* Right Alt: the third-level modifier on this layout */
+        Keys.Add(new KeyMapping(RightAltScanCode, ConsoleKeyEx.AltGr));
         /* Space */
         Keys.Add(new KeyMapping(0x39, ' ', ConsoleKeyEx.Spacebar));
         /* Caps */

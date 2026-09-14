@@ -8,6 +8,7 @@ namespace Cosmos.Kernel.HAL.Vfs;
 [Flags]
 public enum MountFlags : uint
 {
+    /// <summary>No mount options.</summary>
     None = 0,
     /// <summary>Read-only mount.</summary>
     ReadOnly = 1,

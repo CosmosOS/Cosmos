@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.HAL.Pci;
 
-public static class DeviceString
+internal static class DeviceString
 {
     public static string GetDeviceString(this PciDevice device)
     {

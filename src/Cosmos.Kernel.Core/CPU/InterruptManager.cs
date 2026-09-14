@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.Core.CPU;
 /// is delegated to the platform <see cref="IInterruptController"/>
 /// implementation in Cosmos.Kernel.Core.X64 / Cosmos.Kernel.Core.ARM64.
 /// </summary>
-public static class InterruptManager
+internal static class InterruptManager
 {
     /// <summary>
     /// Interrupt delegate signature.
@@ -58,7 +58,7 @@ public static class InterruptManager
     /// <param name="handler">Delegate to handle the interrupt.</param>
     public static void SetHandler(byte vector, IrqDelegate handler)
     {
-        if (s_irqHandlers == null)
+        if (s_irqHandlers is null)
         {
             Serial.Write("[InterruptManager] ERROR: s_irqHandlers is null! Initialize() must be called first.\n");
             return;
@@ -100,7 +100,7 @@ public static class InterruptManager
     /// </summary>
     public static byte AllocateVector(IrqDelegate handler)
     {
-        if (s_irqHandlers == null)
+        if (s_irqHandlers is null)
         {
             throw new System.InvalidOperationException("InterruptManager.Initialize must be called before AllocateVector");
         }
@@ -110,7 +110,7 @@ public static class InterruptManager
         {
             for (int v = s_nextDynamicVector; v <= DynamicVectorMax; v++)
             {
-                if (s_irqHandlers[v] == null)
+                if (s_irqHandlers[v] is null)
                 {
                     s_irqHandlers[v] = handler;
                     s_nextDynamicVector = v + 1;
@@ -120,7 +120,7 @@ public static class InterruptManager
             // Wrap once in case earlier vectors were freed.
             for (int v = DynamicVectorMin; v < s_nextDynamicVector; v++)
             {
-                if (s_irqHandlers[v] == null)
+                if (s_irqHandlers[v] is null)
                 {
                     s_irqHandlers[v] = handler;
                     s_nextDynamicVector = v + 1;
@@ -146,7 +146,7 @@ public static class InterruptManager
     /// </summary>
     public static void FreeVector(byte vector)
     {
-        if (s_irqHandlers == null || vector < DynamicVectorMin || vector > DynamicVectorMax)
+        if (s_irqHandlers is null || vector < DynamicVectorMin || vector > DynamicVectorMax)
         {
             return;
         }
@@ -174,7 +174,7 @@ public static class InterruptManager
         SetHandler(vector, handler);
 
         // Route the IRQ through the platform-specific controller
-        if (s_controller != null && s_controller.IsInitialized)
+        if (s_controller is not null && s_controller.IsInitialized)
         {
             Serial.Write("[InterruptManager] Routing IRQ ", irqNo, " -> vector 0x", vector.ToString("X"), NewLine);
             s_controller.RouteIrq(irqNo, vector, startMasked);

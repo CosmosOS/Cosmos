@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// <summary>
 /// Sweep phase: segment sweeping and heap range helpers.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     /// <summary>
     /// Executes the sweep phase across the GC-managed heaps: GC segments and the

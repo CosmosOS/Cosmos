@@ -1,6 +1,6 @@
 ## Overview
 
-`Cosmos.Patcher.Build` wires the [`Cosmos.Patcher`](../../../../src/Cosmos.Patcher) tool into the MSBuild pipeline. `Cosmos.Patcher` rewrites IL in candidate assemblies by applying CosmosOS-style plugs so that the .NET Core framework can run on NativeAOT targets. Static analysis is provided by [`Cosmos.Patcher.Analyzer`](../../../../src/Cosmos.Build.Analyzer.Patcher), which reports plug errors during C# compilation before any IL is rewritten.
+`Cosmos.Patcher.Build` wires the [`Cosmos.Patcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher) tool into the MSBuild pipeline. `Cosmos.Patcher` rewrites IL in candidate assemblies by applying CosmosOS-style plugs so that the .NET Core framework can run on NativeAOT targets. Static analysis is provided by [`Cosmos.Patcher.Analyzer`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Analyzer.Patcher), which reports plug errors during C# compilation before any IL is rewritten.
 
 ---
 
@@ -136,23 +136,23 @@ flowchart TD
 
 1. **SetupPatcher** gathers output and reference assemblies, resolves plug references, and stores them in `$(IntermediateOutputPath)/cosmos`.
 
-2. **FindPluggedAssembliesTask** uses [`PlugScanner.FindPluggedAssemblies`](../../../../src/Cosmos.Patcher/PlugScanner.cs) to cross-reference plug targets against the candidate assemblies and produces `AssembliesToPatch`.
+2. **FindPluggedAssembliesTask** uses [`PlugScanner.FindPluggedAssemblies`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/PlugScanner.cs) to cross-reference plug targets against the candidate assemblies and produces `AssembliesToPatch`.
 
-3. **RunPatcher** iterates over `AssembliesToPatch` and, for each assembly, the [`PatcherTask`](../../../../src/Cosmos.Build.Patcher/Tasks/PatcherTask.cs) launches the [`Cosmos.Patcher`](../../../../src/Cosmos.Patcher) CLI ([`Program`](../../../../src/Cosmos.Patcher/Program.cs) → [`PatchCommand.Execute`](../../../../src/Cosmos.Patcher/PatchCommand.cs)). Inside `Execute`:
+3. **RunPatcher** iterates over `AssembliesToPatch` and, for each assembly, the [`PatcherTask`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Patcher/Tasks/PatcherTask.cs) launches the [`Cosmos.Patcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher) CLI ([`Program`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/Program.cs) → [`PatchCommand.Execute`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/PatchCommand.cs)). Inside `Execute`:
    - The target assembly is loaded with `AssemblyDefinition.ReadAssembly` and plug assemblies are gathered.
-   - [`PlugScanner.LoadPlugs`](../../../../src/Cosmos.Patcher/PlugScanner.cs) discovers plug types in those assemblies.
-   - [`PlugPatcher.PatchAssembly`](../../../../src/Cosmos.Patcher/PlugPatcher.cs) groups plugs by their `[Plug]` target and patches each target type using:
-       - [`MethodResolver`](../../../../src/Cosmos.Patcher/Resolution/MethodResolver.cs) matches plug signatures (including constructors and `aThis` parameters) by name and parameter types.
-       - [`MethodPatcher`](../../../../src/Cosmos.Patcher/Patching/MethodPatcher.cs) swaps or clones IL and strips P/Invoke metadata.
-       - [`ILCloner`](../../../../src/Cosmos.Patcher/IL/ILCloner.cs) clones instructions, remaps parameters, and fixes branch targets.
-       - [`TypeImporter`](../../../../src/Cosmos.Patcher/IL/TypeImporter.cs) safely imports type/method/field references, fixing self-references that would cause invalid IL metadata.
-       - [`PropertyPatcher`](../../../../src/Cosmos.Patcher/Patching/PropertyPatcher.cs) wires getters and setters to plug implementations.
-       - [`FieldPatcher`](../../../../src/Cosmos.Patcher/Patching/FieldPatcher.cs) copies constant values and redirects field accesses.
+   - [`PlugScanner.LoadPlugs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/PlugScanner.cs) discovers plug types in those assemblies.
+   - [`PlugPatcher.PatchAssembly`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/PlugPatcher.cs) groups plugs by their `[Plug]` target and patches each target type using:
+       - [`MethodResolver`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/Resolution/MethodResolver.cs) matches plug signatures (including constructors and `aThis` parameters) by name and parameter types.
+       - [`MethodPatcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/Patching/MethodPatcher.cs) swaps or clones IL and strips P/Invoke metadata.
+       - [`ILCloner`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/IL/ILCloner.cs) clones instructions, remaps parameters, and fixes branch targets.
+       - [`TypeImporter`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/IL/TypeImporter.cs) safely imports type/method/field references, fixing self-references that would cause invalid IL metadata.
+       - [`PropertyPatcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/Patching/PropertyPatcher.cs) wires getters and setters to plug implementations.
+       - [`FieldPatcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher/Patching/FieldPatcher.cs) copies constant values and redirects field accesses.
    - The patched assembly is written to `PatcherOutputPath`.
 
 4. **CleanPatcher** deletes the patched output when the project is cleaned.
 
-5. [`Cosmos.Patcher.Analyzer`](../../../../src/Cosmos.Build.Analyzer.Patcher) validates plug rules during compilation to catch errors before patching.
+5. [`Cosmos.Patcher.Analyzer`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Analyzer.Patcher) validates plug rules during compilation to catch errors before patching.
 
 ---
 
@@ -169,5 +169,5 @@ Notes:
 
 ## Related components
 
-- [`Cosmos.Patcher`](../../../../src/Cosmos.Patcher)
-- [`Cosmos.Patcher.Analyzer`](../../../../src/Cosmos.Build.Analyzer.Patcher)
+- [`Cosmos.Patcher`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Patcher)
+- [`Cosmos.Patcher.Analyzer`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.Analyzer.Patcher)

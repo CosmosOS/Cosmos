@@ -35,14 +35,15 @@ The [Limine](https://limine-bootloader.org/) bootloader loads the kernel ELF pro
 
 ## Phase 3: how the managed kernel comes up
 
-Each Cosmos package contributes a *library initializer* that the runtime executes before any of your code, in dependency order:
+Each Cosmos package contributes a *library initializer* that the runtime executes before any of your code. The SDK orders them in three stages: the heap first, then the runtime's own initializers, then the kernel libraries, each after the packages it references.
 
-1. **Cosmos.Kernel.Core**: carves the heap out of the Limine memory map, initializes the garbage collector, then registers the type system (statics, static constructors, module initializers).
-2. **Cosmos.Kernel.HAL**: platform HAL, the interrupt controller, PCI enumeration over ECAM, platform hardware (APIC/GIC, device drivers such as the NIC), and the AHCI/NVMe storage controllers.
-3. **Cosmos.Kernel.System**: the service managers `TimerManager`, `KeyboardManager`, `MouseManager`, `NetworkManager`, `StorageManager`.
+1. **Cosmos.Kernel.Core**: carves the heap out of the Limine memory map, initializes the garbage collector, then registers the type system (statics, eager static constructors, module initializers). Nothing allocates before this step.
+2. **The runtime's own initializers** (`System.Private.CoreLib` and its companions): the preallocated `OutOfMemoryException`, the class constructor runner, the type loader and reflection callbacks, stack trace metadata. The class constructor runner is created here, so a static field whose type has a lazy static constructor can be read from this step on and not before.
+3. **Cosmos.Kernel.HAL**: platform HAL, the interrupt controller, PCI enumeration over ECAM, platform hardware (APIC/GIC, device drivers such as the NIC), and the AHCI/NVMe storage controllers.
 4. **Cosmos.Kernel**: CPU exception handlers and the scheduler (one idle thread per CPU, preemption on a 10 ms quantum).
+5. **Cosmos.Kernel.System**: the service managers `TimerManager`, `KeyboardManager`, `MouseManager`, `NetworkManager`, `StorageManager`.
 
-Every step in 2-4 is gated by a feature switch (`CosmosEnableInterrupts`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, all `true` by default). Set one to `false` in your `.csproj` and the corresponding subsystem is skipped here and compiled out of the kernel.
+Every step in 3-5 is gated by a feature switch (`CosmosEnableInterrupts`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, all `true` by default). Set one to `false` in your `.csproj` and the corresponding subsystem is skipped here and compiled out of the kernel.
 
 ## The generated entry point
 
@@ -74,13 +75,37 @@ public static class CosmosEntryPoint
 
 `Cosmos.Kernel.System.Kernel` is the abstract base class of every user kernel. Its `Start()` drives the whole lifecycle:
 
-1. Calls `OnBoot()`, whose default implementation runs `Global.Init()`: this initializes the graphical `KernelConsole`, which is what makes `Console.WriteLine` work.
+1. Calls `OnBoot()`, whose default implementation initializes the graphical `KernelConsole`, which is what makes `Console.WriteLine` work.
 2. Enables hardware interrupts (everything before this point ran with interrupts off).
 3. Turns off the early-boot text renderer: up to here, the boot log you see on screen is the serial log mirrored by a minimal framebuffer writer; from now on the screen belongs to `Console` and the [Canvas](graphics.md).
 4. Calls `BeforeRun()` once.
 5. Calls `Run()` in a loop until `Stop()` is called.
 6. Calls `AfterRun()` once.
 7. Halts the CPU. There is no operating system to return to: a kernel never exits.
+
+## Stopping the machine
+
+Step 7 above is where a kernel ends up on its own. `Power` is how you get there deliberately, and the three members differ in how far they go:
+
+```csharp
+using Cosmos.Kernel.System;
+
+Power.Halt();      // park this CPU until an interrupt wakes it
+Power.Reboot();    // restart the machine; does not return
+Power.Shutdown();  // power off; does not return
+```
+
+`Halt()` is the one that returns. It parks the CPU rather than spinning, so it is what an idle loop should call instead of `while (true) { }`, which burns a core and, on a single-CPU kernel, keeps the scheduler from making progress.
+
+`Reboot()` and `Shutdown()` do not return on success. Both route through the platform's power operations, and where the firmware offers none they fall back to parking the CPU forever rather than continuing, which is why the compiler treats them as never returning.
+
+To end the main loop without ending the machine, call `Stop()` on your kernel. `Run()` stops being called, `AfterRun()` runs once, and the CPU halts.
+
+Static code that has no `this` to call it on reaches the running instance through `Global.CurrentKernel`, which the generated entry point sets before your kernel starts:
+
+```csharp
+Global.CurrentKernel?.Stop();
+```
 
 ## A minimal kernel
 
@@ -121,11 +146,13 @@ An uncaught exception inside `Run()` propagates out of the loop, so wrap the bod
 ```csharp
 protected override void OnBoot()
 {
-    base.OnBoot();   // keep Global.Init() → KernelConsole; drop this line to boot headless
+    base.OnBoot();   // keep the KernelConsole setup; drop this line to boot headless
 
     // your early initialization here
 }
 ```
+
+A headless kernel that later wants `Console` output calls `KernelConsole.Initialize()` itself: it is the only route on the ring, `Console.WriteLine` does not bring the console up on its own. The call is idempotent, so it is safe whether or not `base.OnBoot()` already ran, and it returns `false` when graphics are compiled out.
 
 For total control you can override `Start()` itself and take over the lifecycle: the default implementation in [`Cosmos.Kernel.System/Kernel.cs`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.System/Kernel.cs) is small and a good starting point to copy from.
 
@@ -142,7 +169,7 @@ foreach (string arg in Environment.GetCommandLineArgs())
 
 ## Watching a boot
 
-Every phase above logs to the serial port (COM1), which `make run` and `cosmos run` connect to your terminal, the first thing to read when a kernel does not come up:
+Every phase above logs to the serial port (COM1), which `cosmos run` connects to your terminal, the first thing to read when a kernel does not come up:
 
 ```
 ========================================

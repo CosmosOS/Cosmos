@@ -6,7 +6,7 @@ using Cosmos.Kernel.HAL.Pci.Enums;
 
 namespace Cosmos.Kernel.HAL.Pci;
 
-public class PciManager
+internal class PciManager
 {
     /// <summary>Maximum number of PCI devices tracked in the device cache.</summary>
     private const int MaxDevices = 64;
@@ -29,9 +29,9 @@ public class PciManager
     /// <summary>PCI subclass 0x04 - PCI-to-PCI bridge.</summary>
     private const int PciToPciBridgeSubclass = 0x4;
 
-    public static PciDevice[]? Devices;
+    public static PciDevice[]? Devices { get; private set; }
 
-    public static uint Count = 0;
+    public static uint Count { get; private set; }
 
     public static void Setup()
     {
@@ -148,9 +148,9 @@ public class PciManager
     }
 
     public static bool Exists(PciDevice pciDevice) =>
-        GetDevice((VendorId)pciDevice.VendorId, (DeviceId)pciDevice.DeviceId) != null;
+        GetDevice((VendorId)pciDevice.VendorId, (DeviceId)pciDevice.DeviceId) is not null;
 
-    public static bool Exists(VendorId aVendorID, DeviceId aDeviceID) => GetDevice(aVendorID, aDeviceID) != null;
+    public static bool Exists(VendorId aVendorID, DeviceId aDeviceID) => GetDevice(aVendorID, aDeviceID) is not null;
 
     /// <summary>
     /// Get device.
@@ -244,7 +244,7 @@ public class PciManager
     {
         ThrowIfNotSetup();
 
-        List<PciDevice> matches = new();
+        List<PciDevice> matches = [];
         for (uint i = 0; i < Count; i++)
         {
             PciDevice xDevice = Devices[i];

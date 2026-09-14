@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 
-public enum SVGA3dDeclUsage
+internal enum SVGA3dDeclUsage
 {
     SVGA3D_DECLUSAGE_POSITION = 0,
     SVGA3D_DECLUSAGE_BLENDWEIGHT,

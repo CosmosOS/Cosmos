@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// <see cref="AhciController"/> instances and all of their attached SATA
 /// drives show up in <see cref="Ports"/>.
 /// </summary>
-public static class Ahci
+internal static class Ahci
 {
     private static List<AhciController>? s_controllers;
     private static List<BlockDevice>? s_ports;
@@ -43,8 +43,8 @@ public static class Ahci
 
         Serial.WriteString("[AHCI] Looking for AHCI controllers...\n");
 
-        s_controllers = new List<AhciController>();
-        s_ports = new List<BlockDevice>();
+        s_controllers = [];
+        s_ports = [];
 
         List<PciDevice> devices = PciManager.GetAllDevicesClass(
             ClassId.MassStorageController, SubclassId.SataController);
@@ -107,7 +107,7 @@ public static class Ahci
         // delay on x64 — ARM64MemoryIO turned it into reads of an arbitrary
         // physical address, so COMRESET hold times were accidental there.
         IPlatformInitializer? init = PlatformHAL.Initializer;
-        if (init != null)
+        if (init is not null)
         {
             init.DelayMicroseconds((uint)ticks);
             return;

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.X64.Bridge;
 
-public static partial class PortIoNative
+internal static partial class PortIoNative
 {
     [LibraryImport("*", EntryPoint = "_native_io_read_byte")]
     [SuppressGCTransition]

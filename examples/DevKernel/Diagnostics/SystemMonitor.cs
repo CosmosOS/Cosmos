@@ -1,12 +1,10 @@
 using System.Diagnostics;
 using System.Drawing;
-using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.Core.Memory;
+using Cosmos.Kernel.System;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
 using DevKernel.Graphics;
-using KernelGc = Cosmos.Kernel.Core.Memory.GarbageCollector.GarbageCollector;
-using KernelHeap = Cosmos.Kernel.Core.Memory.Heap.Heap;
 using MouseManager = Cosmos.Kernel.System.Mouse.MouseManager;
 
 namespace DevKernel.Diagnostics;
@@ -36,9 +34,12 @@ internal static class SystemMonitor
         long frameInterval = swFrequency / refreshRate;
         long lastFrameStart = Stopwatch.GetTimestamp();
 
-        Serial.Write("Testing Canvas with mode " + canvas.Mode + " @ " + refreshRate + " Hz\n");
+        Log.Write("Testing Canvas with mode " + canvas.Mode + " @ " + refreshRate + " Hz\n");
 
-        MouseManager.SetScreenSize((int)canvas.Mode.Width, (int)canvas.Mode.Height);
+        if (KernelFeatures.Mouse)
+        {
+            MouseManager.SetScreenSize(canvas.Mode.Width, canvas.Mode.Height);
+        }
 
         int x = OverlayLayout.TextMarginPx;
         int y = OverlayLayout.TextMarginPx;
@@ -72,7 +73,7 @@ internal static class SystemMonitor
 
             if (frames % GcCollectFrameInterval == 0)
             {
-                KernelHeap.Collect();
+                MemoryInfo.Collect();
             }
 
             canvas.Display();
@@ -81,13 +82,13 @@ internal static class SystemMonitor
         }
     }
 
-    /// <summary>Draws the page-allocator counters; returns the next free row.</summary>
+    /// <summary>Draws the memory counters; returns the next free row.</summary>
     private static int DrawMemorySection(Canvas canvas, PCScreenFont font, int x, int rowY, int lineHeight)
     {
-        ulong totalPages = PageAllocator.TotalPageCount;
-        ulong freePages = PageAllocator.FreePageCount;
+        ulong totalPages = MemoryInfo.TotalPages;
+        ulong freePages = MemoryInfo.FreePages;
         ulong usedPages = totalPages - freePages;
-        ulong pageSize = PageAllocator.PageSize;
+        ulong pageSize = MemoryInfo.PageSizeBytes;
 
         canvas.DrawString("Meminfo", font, Color.Cyan, x, rowY);
         rowY += lineHeight;
@@ -104,13 +105,11 @@ internal static class SystemMonitor
     /// <summary>Draws the collector counters; returns the next free row.</summary>
     private static int DrawGcSection(Canvas canvas, PCScreenFont font, int x, int rowY, int lineHeight)
     {
-        KernelGc.GetStats(out int totalCollections, out int totalObjectsFreed);
-
         canvas.DrawString("GCinfo", font, Color.Cyan, x, rowY);
         rowY += lineHeight;
-        canvas.DrawString("Collections: " + totalCollections, font, Color.White, x, rowY);
+        canvas.DrawString("Collections: " + MemoryInfo.TotalCollections, font, Color.White, x, rowY);
         rowY += lineHeight;
-        canvas.DrawString("Objects Freed: " + totalObjectsFreed, font, Color.White, x, rowY);
+        canvas.DrawString("Objects Freed: " + MemoryInfo.TotalObjectsFreed, font, Color.White, x, rowY);
         return rowY + lineHeight * OverlayLayout.SectionBreakRowCount;
     }
 

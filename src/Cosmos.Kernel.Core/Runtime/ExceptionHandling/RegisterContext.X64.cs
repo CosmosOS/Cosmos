@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.Runtime;
 /// PAL_LIMITED_CONTEXT structure matching x64 assembly offsets.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 0x50)]
-public unsafe struct PAL_LIMITED_CONTEXT
+internal unsafe struct PAL_LIMITED_CONTEXT
 {
     [FieldOffset(0x00)] public nuint IP;    // Instruction pointer (return address)
     [FieldOffset(0x08)] public nuint Rsp;   // Stack pointer
@@ -24,7 +24,7 @@ public unsafe struct PAL_LIMITED_CONTEXT
 /// REGDISPLAY structure for x64 funclet calls - matches assembly offsets exactly.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 0x88)]
-public unsafe struct REGDISPLAY
+internal unsafe struct REGDISPLAY
 {
     // Storage for register values
     [FieldOffset(0x00)] public nuint Rbx;

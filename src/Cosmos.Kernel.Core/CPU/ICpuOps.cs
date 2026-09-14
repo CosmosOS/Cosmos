@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.Core.CPU;
 /// <summary>
 /// Essential CPU operations for multi-architecture support
 /// </summary>
-public interface ICpuOps
+internal interface ICpuOps
 {
     /// <summary>
     /// Halt CPU

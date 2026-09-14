@@ -1,6 +1,6 @@
 namespace Cosmos.Kernel.HAL.Pci.Enums;
 
-public enum Config : byte
+internal enum Config : byte
 {
     VendorId = 0,
     DeviceId = 2,

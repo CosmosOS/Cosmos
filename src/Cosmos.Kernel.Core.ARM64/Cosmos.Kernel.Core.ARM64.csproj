@@ -9,10 +9,20 @@
     <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <DefineConstants>$(DefineConstants);ARCH_ARM64</DefineConstants>
+    <!-- Feeds timer ticks into the experimental scheduler seam (COSMOS0001). -->
+    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" />
     <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The ARM64 HAL maps MMIO ranges (DeviceMapperNative) and drives the
+         generic timer (GenericTimerNative). -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
+    <!-- The Stopwatch plug reads the counter through GenericTimerNative. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
   </ItemGroup>
 </Project>

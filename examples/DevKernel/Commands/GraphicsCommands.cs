@@ -1,5 +1,5 @@
 using System;
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 using DevKernel.Diagnostics;
 using DevKernel.Graphics;
 using DevKernel.Shell;
@@ -25,7 +25,7 @@ internal static class GraphicsCommands
                 Description = "Start graphics thread (draws color-cycling square)",
                 Execute = static (context, args) =>
                 {
-                    Serial.WriteString("[GfxThread] Starting graphics thread\n");
+                    Log.WriteString("[GfxThread] Starting graphics thread\n");
                     Terminal.Info("Starting graphics thread (draws color-cycling square)...");
 
                     ColorSquareWorker.Start();
@@ -40,6 +40,13 @@ internal static class GraphicsCommands
                 Usage = "startx",
                 Description = "Full-screen memory/GC/FPS monitor (runs until reset)",
                 Execute = static (context, args) => SystemMonitor.Run(),
+            },
+            new ShellCommand
+            {
+                Name = "cube",
+                Usage = "cube",
+                Description = "Spinning 3D cube rolled by the mouse (VMware SVGA II only, Esc to exit)",
+                Execute = static (context, args) => SpinningCubeDemo.Run(),
             });
     }
 }

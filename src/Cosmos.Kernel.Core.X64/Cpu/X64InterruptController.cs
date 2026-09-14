@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Core.X64.Cpu;
 /// X64 interrupt controller - manages IDT and APIC, owns the x64 dispatch
 /// path (vector lookup, EOI for hardware IRQs, fatal CPU-exception halt).
 /// </summary>
-public class X64InterruptController : IInterruptController
+internal class X64InterruptController : IInterruptController
 {
     /// <summary>Highest CPU-exception vector; vectors 0-31 are reserved for exceptions (SDM 3A §6.2).</summary>
     private const ulong MaxCpuExceptionVector = 31;

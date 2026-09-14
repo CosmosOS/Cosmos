@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.HAL.Devices.Input;
 /// <summary>
 /// Abstract base class for all keyboard devices.
 /// </summary>
-public abstract class KeyboardDevice : Device, IKeyboardDevice
+internal abstract class KeyboardDevice : Device, IKeyboardDevice
 {
     /// <summary>
     /// Event handler invoked when a key is pressed or released.
