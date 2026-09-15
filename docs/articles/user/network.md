@@ -8,7 +8,8 @@ The main differences if you come from Gen2:
 |---|---|---|
 | TCP | Standard `System.Net.Sockets` (plugged) | Standard `System.Net.Sockets` (plugged) |
 | UDP | Cosmos-specific `UdpClient` class | Standard `System.Net.Sockets.UdpClient` (plugged) |
-| DHCP / DNS | Cosmos client classes | Cosmos client classes (`Cosmos.Kernel.System.Network`) |
+| DHCP | Cosmos client class | Cosmos client class (`Cosmos.Kernel.System.Network`) |
+| DNS | Cosmos client class | Standard `System.Net.Dns` (plugged), or the Cosmos `DnsClient` |
 | NIC drivers | RTL8168, E1000, PCNET | Intel E1000E (x64), virtio-net (x64 PCI + ARM64 MMIO) |
 
 None of these protocols implements every feature of its RFC. If you find bugs or something abnormal, please [submit an issue](https://github.com/valentinbreiz/nativeaot-patcher/issues/new) on our repository.
@@ -280,7 +281,18 @@ To reach a listener inside QEMU user networking from your host, forward a host p
 
 ## DNS
 
-DNS uses the Cosmos `DnsClient` (the .NET `Dns` class is not plugged yet). Register a nameserver, query one domain, and read the answer back:
+Two APIs resolve a name: the standard `System.Net.Dns`, and the Cosmos `DnsClient`. Register a nameserver with either one, because there is no `resolv.conf` to read one from and DHCP is what normally supplies it:
+
+```csharp
+DnsConfig.Add(new Address4(1, 1, 1, 1));   // Cloudflare public DNS
+
+IPAddress[] addresses = Dns.GetHostAddresses("github.com");
+Console.WriteLine("github.com resolved to " + addresses[0].ToString());
+```
+
+`System.Net.Dns` reaches the Cosmos resolver through a plug on the platform layer that every one of its entry points funnels into, so the blocking overloads all work from that one plug. Two details differ from a desktop runtime: a failed lookup throws `SocketException` where the Cosmos client returns null, and `Dns.GetHostName()` reports `DnsConfig.HostName`, which nothing sets for you.
+
+The Cosmos `DnsClient` is the other way in, and the one to use when you want the reply packet or the whole answer list:
 
 ```csharp
 DnsConfig.Add(new Address4(1, 1, 1, 1));   // Cloudflare public DNS
@@ -401,7 +413,9 @@ The contract the packet types actually implement:
 
 ## Current limitations
 
-- `System.Net.Dns` is not plugged; use the Cosmos `DnsClient` shown above.
+- `System.Net.Dns` resolves A records only. `IPAddress` holds four bytes in the plugs, so there is nothing an AAAA answer could be returned in and `AddressFamily.InterNetworkV6` is refused outright. The Cosmos `DnsClient` has no such limit and returns `Address6` for an AAAA record.
+- Reverse lookups are not supported. `Dns.GetHostEntry(IPAddress)` needs a PTR query against `in-addr.arpa`, which the resolver does not send, so it throws rather than returning a name.
+- The asynchronous `Dns` overloads are unverified. `GetHostAddressesAsync` and the `Begin`/`End` pairs reach the same plug, but they get there by queueing the blocking call to the thread pool, which this kernel has not been exercised against. The blocking overloads are the tested path.
 - IPv6 stops at the link. There is a link-local address, Neighbor Discovery, ICMPv6 echo, and UDP and TCP now ride IPv6 through the same packet classes as IPv4, but there is no routing table, so every destination has to be on the link. No SLAAC or DHCPv6, no address configuration beyond the link-local address, and `IPAddress` stays IPv4-only in the socket plugs, so the standard .NET socket classes reach IPv4 only.
 - No TLS, so no `HttpClient`/HTTPS: raw TCP only.
 - Several NICs are registered and configured, and outbound packets are routed by matching the source address against each interface's configuration, so `NetworkManager.Primary` decides only where the unrouted helpers (`NetworkManager.Send`, the no-handle `IPConfig.Enable`) go.
@@ -410,7 +424,7 @@ The contract the packet types actually implement:
 
 ## How it works
 
-Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over both IP versions, with ARP and Ethernet under IPv4 and ICMPv6 and Neighbor Discovery under IPv6), which sends and receives frames through the `NetworkDevice` driver registered with `NetworkManager`. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer, `DhcpClient` over IPv4 only.
+Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`, and `NameResolutionPalPlug` for `Dns`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over both IP versions, with ARP and Ethernet under IPv4 and ICMPv6 and Neighbor Discovery under IPv6), which sends and receives frames through the `NetworkDevice` driver registered with `NetworkManager`. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer, `DhcpClient` over IPv4 only.
 
 ```
 TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
