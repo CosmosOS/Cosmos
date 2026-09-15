@@ -283,64 +283,45 @@ jobs:
           ' > /tmp/pages-root/versions.json
           cat /tmp/pages-root/versions.json
 
-      # Own gh-pages branch: the job token is enough.
-      - name: Publish frozen copy
+      # Everything this release changes on the Pages site, assembled into one
+      # tree: the frozen vX.Y.Z copy, the latest/ alias when this really is the
+      # newest release, and versions.json. It ships in a single deploy because
+      # peaceiris/actions-gh-pages starts an ssh-agent on a fixed socket path,
+      # so a second deploy_key step in the same job dies on the socket the
+      # first one left behind.
+      - name: Assemble Pages payload
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          mkdir -p "/tmp/pages-out/$version"
+          cp -r docs/_site/. "/tmp/pages-out/$version/"
+          if [[ "${{ steps.version.outputs.is_latest }}" == "true" ]]; then
+            mkdir -p /tmp/pages-out/latest
+            cp -r docs/_site/. /tmp/pages-out/latest/
+          fi
+          cp /tmp/pages-root/versions.json /tmp/pages-out/versions.json
+          find /tmp/pages-out -maxdepth 1 -mindepth 1 -printf '%f\n' | sort
+
+      # keep_files: the dev site build-docs.yml publishes at the root has to
+      # survive, and so do the frozen copies of earlier releases.
+      - name: Publish to gh-pages
         if: github.repository != 'CosmosOS/Cosmos'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: ${{ steps.target.outputs.pages_branch }}
-          publish_dir: ./docs/_site
-          destination_dir: ${{ steps.version.outputs.version }}
-
-      - name: Refresh latest alias
-        if: github.repository != 'CosmosOS/Cosmos' && steps.version.outputs.is_latest == 'true'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: ${{ steps.target.outputs.pages_branch }}
-          publish_dir: ./docs/_site
-          destination_dir: latest
-
-      - name: Publish versions.json
-        if: github.repository != 'CosmosOS/Cosmos'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: ${{ steps.target.outputs.pages_branch }}
-          publish_dir: /tmp/pages-root
+          publish_dir: /tmp/pages-out
           keep_files: true
 
       # Separate repository, so the job token does not reach it: same write
       # deploy key build-docs.yml uses for the dev site.
-      - name: Publish frozen copy to the org site
+      - name: Publish to the org site
         if: github.repository == 'CosmosOS/Cosmos'
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.GH_PAGES_DEPLOY_KEY }}
           external_repository: ${{ steps.target.outputs.pages_repository }}
           publish_branch: ${{ steps.target.outputs.pages_branch }}
-          publish_dir: ./docs/_site
-          destination_dir: ${{ steps.version.outputs.version }}
-
-      - name: Refresh latest alias on the org site
-        if: github.repository == 'CosmosOS/Cosmos' && steps.version.outputs.is_latest == 'true'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          deploy_key: ${{ secrets.GH_PAGES_DEPLOY_KEY }}
-          external_repository: ${{ steps.target.outputs.pages_repository }}
-          publish_branch: ${{ steps.target.outputs.pages_branch }}
-          publish_dir: ./docs/_site
-          destination_dir: latest
-
-      - name: Publish versions.json to the org site
-        if: github.repository == 'CosmosOS/Cosmos'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          deploy_key: ${{ secrets.GH_PAGES_DEPLOY_KEY }}
-          external_repository: ${{ steps.target.outputs.pages_repository }}
-          publish_branch: ${{ steps.target.outputs.pages_branch }}
-          publish_dir: /tmp/pages-root
+          publish_dir: /tmp/pages-out
           keep_files: true
 
   # ── Windows Installer ────────────────────────────────────────────────────────
