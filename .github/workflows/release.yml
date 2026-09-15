@@ -175,9 +175,12 @@ jobs:
         id: login
         uses: NuGet/login@v1
         with:
-          # The nuget.org profile that owns both the packages and the policy.
-          # Public (nuget.org/profiles/CosmosOS), so not a secret.
-          user: CosmosOS
+          # The user who CREATED the policy, not the CosmosOS profile that owns
+          # it. nuget.org looks the policy up by creator and answers a wrong
+          # guess with "No matching trust policy owned by user 'CosmosOS' was
+          # found" (HTTP 401). Public, so not a secret. If the policy is ever
+          # recreated by somebody else, this has to follow them.
+          user: valentinbreiz
 
       - name: Push to NuGet
         run: |
