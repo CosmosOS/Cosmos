@@ -7,6 +7,7 @@ using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
 using Cosmos.Kernel.System.Network.IPv4.TCP;
+using AddressFamily = System.Net.Sockets.AddressFamily;
 using KernelEndPoint = Cosmos.Kernel.System.Network.IPv4.EndPoint;
 using KernelUdpClient = Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient;
 
@@ -220,7 +221,7 @@ public static class SocketPlug
             throw new InvalidOperationException("Socket not bound");
         }
 
-        var sm = Tcp.CreateConnection((ushort)ep.Port, 0, Address.Zero, Address.Zero);
+        var sm = Tcp.CreateConnection((ushort)ep.Port, 0, Address4.Zero, Address4.Zero);
         sm.LocalEndPoint.Port = (ushort)ep.Port;
         sm.Status = Status.LISTEN;
 
@@ -251,8 +252,8 @@ public static class SocketPlug
             ;
         }
 
-        _remoteEndPoints[id] = new IPEndPoint(new IPAddress(sm.RemoteEndPoint.Address.ToSpan()), sm.RemoteEndPoint.Port);
-        _localEndPoints[id] = new IPEndPoint(new IPAddress(sm.LocalEndPoint.Address.ToSpan()), sm.LocalEndPoint.Port);
+        _remoteEndPoints[id] = new IPEndPoint(new IPAddress(sm.RemoteEndPoint.Address.ToBytes()), sm.RemoteEndPoint.Port);
+        _localEndPoints[id] = new IPEndPoint(new IPAddress(sm.LocalEndPoint.Address.ToBytes()), sm.LocalEndPoint.Port);
 
         return aThis;
     }
@@ -291,7 +292,7 @@ public static class SocketPlug
 
         // Use GetAddressBytes directly to avoid string parsing (byte.Parse can trigger resource loading)
         byte[] destBytes = address.GetAddressBytes();
-        Address destAddr = new(destBytes[0], destBytes[1], destBytes[2], destBytes[3]);
+        Address4 destAddr = new(destBytes[0], destBytes[1], destBytes[2], destBytes[3]);
         client.Connect(destAddr, port);
 
         _remoteEndPoints[id] = new IPEndPoint(address, port);
@@ -320,14 +321,14 @@ public static class SocketPlug
 
         // Use GetAddressBytes directly to avoid string parsing (byte.Parse can trigger resource loading)
         byte[] remoteBytes = address.GetAddressBytes();
-        sm.RemoteEndPoint.Address = new Address(remoteBytes[0], remoteBytes[1], remoteBytes[2], remoteBytes[3]);
+        sm.RemoteEndPoint.Address = new Address4(remoteBytes[0], remoteBytes[1], remoteBytes[2], remoteBytes[3]);
         sm.RemoteEndPoint.Port = (ushort)port;
         sm.LocalEndPoint.Address = NetworkManager.Primary.IPConfig?.Address
             ?? throw new InvalidOperationException("No IPv4 configuration on the primary network device");
         sm.LocalEndPoint.Port = Tcp.GetDynamicPort();
 
         _remoteEndPoints[id] = new IPEndPoint(address, sm.RemoteEndPoint.Port);
-        _localEndPoints[id] = new IPEndPoint(new IPAddress(sm.LocalEndPoint.Address.ToSpan()), sm.LocalEndPoint.Port);
+        _localEndPoints[id] = new IPEndPoint(new IPAddress(sm.LocalEndPoint.Address.ToBytes()), sm.LocalEndPoint.Port);
 
         // Simple sequence number generation
         uint sequenceNumber = (uint)(1000 + id);
@@ -544,7 +545,7 @@ public static class SocketPlug
 
         // Use GetAddressBytes directly to avoid string parsing (byte.Parse can trigger resource loading)
         byte[] addrBytes = ipep.Address.GetAddressBytes();
-        var destAddr = new Address(addrBytes[0], addrBytes[1], addrBytes[2], addrBytes[3]);
+        var destAddr = new Address4(addrBytes[0], addrBytes[1], addrBytes[2], addrBytes[3]);
 
         Log.WriteString("[SocketPlug] SendTo destAddr=");
         Log.WriteNumber(addrBytes[0]); Log.WriteString(".");
@@ -595,7 +596,7 @@ public static class SocketPlug
 
         ThrowIfRangeInvalid(buffer, offset, size);
 
-        KernelEndPoint ep = new(Address.Zero, 0);
+        KernelEndPoint ep = new(Address4.Zero, 0);
         byte[]? data = client.Receive(ref ep, UdpPollTimeoutMs);
 
         if (data is null)
@@ -677,7 +678,7 @@ public static class SocketPlug
 
         ThrowIfRangeInvalid(buffer, offset, size);
 
-        KernelEndPoint ep = new(Address.Zero, 0);
+        KernelEndPoint ep = new(Address4.Zero, 0);
         byte[]? data = client.Receive(ref ep, UdpPollTimeoutMs);
 
         if (data is null)
@@ -686,7 +687,7 @@ public static class SocketPlug
         }
 
         // Update the remote endpoint (use byte array to avoid endianness issues)
-        remoteEP = new IPEndPoint(new IPAddress(ep.Address.ToSpan()), ep.Port);
+        remoteEP = new IPEndPoint(new IPAddress(ep.Address.ToBytes()), ep.Port);
 
         int bytesToCopy = Math.Min(data.Length, size);
         Buffer.BlockCopy(data, 0, buffer, offset, bytesToCopy);

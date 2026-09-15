@@ -1,3 +1,4 @@
+using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
 
@@ -47,9 +48,9 @@ internal sealed class NetworkSession
     /// <returns>Whether an adapter took the configuration.</returns>
     public bool ConfigureStatic()
     {
-        LocalIp = new Address(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGuestHostOctet);
-        GatewayIp = new Address(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGatewayHostOctet);
-        Address subnet = new(SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskHostOctet);
+        LocalIp = new Address4(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGuestHostOctet);
+        GatewayIp = new Address4(QemuNetOctet1, QemuNetOctet2, QemuNetOctet3, QemuGatewayHostOctet);
+        Address4 subnet = new(SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskFullOctet, SubnetMaskHostOctet);
 
         IsConfigured = IPConfig.Enable(LocalIp, subnet, GatewayIp);
         return IsConfigured;

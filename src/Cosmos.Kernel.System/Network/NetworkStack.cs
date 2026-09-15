@@ -18,7 +18,7 @@ public static class NetworkStack
     /// <summary>
     /// Maps IP (Internet Protocol) addresses to network devices.
     /// </summary>
-    internal static Dictionary<uint, INetworkDevice> AddressMap { get; } = [];
+    internal static Dictionary<Address, INetworkDevice> AddressMap { get; } = [];
 
     /// <summary>
     /// Maps MAC addresses to network devices.
@@ -38,7 +38,7 @@ public static class NetworkStack
         if (MACMap.ContainsKey(mac.Hash))
         {
             // Find and remove old IP mapping
-            foreach (KeyValuePair<uint, INetworkDevice> pair in AddressMap)
+            foreach (KeyValuePair<Address, INetworkDevice> pair in AddressMap)
             {
                 if (pair.Value == device)
                 {
@@ -50,7 +50,7 @@ public static class NetworkStack
         }
 
         // Add new config
-        AddressMap.Add(ipAddress.Id, device);
+        AddressMap.Add(ipAddress, device);
         MACMap.Add(mac.Hash, device);
 
         // Register packet handler
@@ -70,7 +70,7 @@ public static class NetworkStack
     /// <param name="config">The IP configuration to apply.</param>
     /// <remarks>
     /// Internal: a kernel configures the primary device through
-    /// <see cref="Config.IPConfig.Enable(IPv4.Address, IPv4.Address, IPv4.Address)"/>,
+    /// <see cref="Config.IPConfig.Enable(Address, Address, Address)"/>,
     /// which is the public form of this and always was.
     /// </remarks>
     internal static void ConfigIP(INetworkDevice device, IPConfig config)
@@ -81,7 +81,7 @@ public static class NetworkStack
 
     /// <summary>
     /// Removes all IP configurations, clearing the stack's address and MAC
-    /// maps with them. The counterpart of <see cref="Config.IPConfig.Enable(IPv4.Address, IPv4.Address, IPv4.Address)"/>.
+    /// maps with them. The counterpart of <see cref="Config.IPConfig.Enable(Address, Address, Address)"/>.
     /// </summary>
     public static void RemoveAllConfigIP()
     {

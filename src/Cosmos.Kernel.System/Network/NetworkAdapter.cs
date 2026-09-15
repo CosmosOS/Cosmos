@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.System.Network;
 /// from <see cref="NetworkManager.GetAdapter(int)"/> or
 /// <see cref="NetworkManager.Primary"/>, and handed back to the ring to inspect
 /// that device or to configure it with
-/// <see cref="Config.IPConfig.Enable(NetworkAdapter, IPv4.Address, IPv4.Address, IPv4.Address)"/>.
+/// <see cref="Config.IPConfig.Enable(NetworkAdapter, Address, Address, Address)"/>.
 /// </summary>
 /// <remarks>
 /// The handle carries the device's registration index biased by one, so a
@@ -67,7 +67,7 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
     /// <summary>
     /// The IPv4 configuration in force on this device, or null when the device
     /// is unconfigured or the handle names none. Assign one with
-    /// <see cref="Config.IPConfig.Enable(NetworkAdapter, IPv4.Address, IPv4.Address, IPv4.Address)"/>.
+    /// <see cref="Config.IPConfig.Enable(NetworkAdapter, Address, Address, Address)"/>.
     /// </summary>
     public Config.IPConfig? IPConfig
     {

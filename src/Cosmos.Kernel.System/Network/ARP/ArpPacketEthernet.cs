@@ -53,9 +53,9 @@ public abstract class ArpPacketEthernet : ArpPacket
     {
         base.InitializeFields();
         _senderMac = new MACAddress(RawData, 22);
-        _senderIP = new Address(RawData, 28);
+        _senderIP = new Address4(RawData, 28);
         _targetMac = new MACAddress(RawData, 32);
-        _targetIP = new Address(RawData, 38);
+        _targetIP = new Address4(RawData, 38);
     }
 
     /// <summary>

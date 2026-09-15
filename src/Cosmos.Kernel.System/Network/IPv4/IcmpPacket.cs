@@ -52,7 +52,7 @@ public class IcmpPacket : IPPacket
                 Serial.WriteString(icmpPacket.SourceIP.ToString());
                 Serial.WriteString("\n");
 
-                IcmpClient? receiver = IcmpClient.GetClient(icmpPacket.SourceIP.Id);
+                IcmpClient? receiver = IcmpClient.GetClient(icmpPacket.SourceIP);
                 // Deliver the typed reply so consumers see the identifier
                 // and sequence number, not just the base ICMP fields.
                 receiver?.ReceiveData(new IcmpEchoReply(packetData));

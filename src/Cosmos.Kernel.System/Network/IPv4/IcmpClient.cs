@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 /// </summary>
 public sealed class IcmpClient : IDisposable
 {
-    private static readonly Dictionary<uint, IcmpClient> s_clients = [];
+    private static readonly Dictionary<Address, IcmpClient> s_clients = [];
 
     /// <summary>
     /// Destination address.
@@ -33,13 +33,13 @@ public sealed class IcmpClient : IDisposable
     }
 
     /// <summary>
-    /// Gets a client by its IP address hash.
+    /// Gets the client connected to a destination address.
     /// </summary>
-    /// <param name="iphash">The IP address hash.</param>
+    /// <param name="address">The destination address.</param>
     /// <returns>If a client is connected to the given address, the <see cref="IcmpClient"/>; otherwise, <see langword="null"/>.</returns>
-    internal static IcmpClient? GetClient(uint iphash)
+    internal static IcmpClient? GetClient(Address address)
     {
-        if (s_clients.TryGetValue(iphash, out IcmpClient? client))
+        if (s_clients.TryGetValue(address, out IcmpClient? client))
         {
             return client;
         }
@@ -68,7 +68,7 @@ public sealed class IcmpClient : IDisposable
         Close();
 
         _destination = dest;
-        s_clients[dest.Id] = this;
+        s_clients[dest] = this;
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public sealed class IcmpClient : IDisposable
     {
         if (_destination is not null)
         {
-            s_clients.Remove(_destination.Id);
+            s_clients.Remove(_destination);
         }
     }
 
