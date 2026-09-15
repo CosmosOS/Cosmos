@@ -29,7 +29,10 @@ public class InstallSettings : CommandSettings
 
 public class InstallCommand : AsyncCommand<InstallSettings>
 {
-    internal const string ToolsRepo = "valentinbreiz/nativeaot-patcher";
+    /// <summary>Repository whose <c>tools-latest</c> release carries the LLVM, QEMU, xorriso and GDB archives.</summary>
+    internal const string ToolsRepo = "CosmosOS/Cosmos";
+
+    /// <summary>Rolling release tag build-tools.yml republishes the toolchain archives under.</summary>
     internal const string ToolsReleaseTag = "tools-latest";
 
     public override async Task<int> ExecuteAsync(CommandContext context, InstallSettings settings)

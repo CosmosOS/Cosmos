@@ -5,8 +5,6 @@
     <Title>Cosmos Kernel HAL X64</Title>
     <Description>Hardware abstraction layer X64 implementation for Cosmos kernel.</Description>
     <PackageTags>cosmos;kernel;hal;x64;hardware</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <DefineConstants>$(DefineConstants);ARCH_X64</DefineConstants>
   </PropertyGroup>

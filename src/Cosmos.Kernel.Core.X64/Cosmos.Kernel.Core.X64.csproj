@@ -5,8 +5,6 @@
     <Title>Cosmos Kernel Core X64</Title>
     <Description>x64-specific Core bridges (LibraryImport declarations for native symbols consumed by Cosmos.Kernel.Core and Cosmos.Kernel.HAL.X64).</Description>
     <PackageTags>cosmos;kernel;core;x64;bridge;interop</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <DefineConstants>$(DefineConstants);ARCH_X64</DefineConstants>
     <!-- Feeds timer ticks into the experimental scheduler seam (COSMOS0001). -->

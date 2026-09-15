@@ -5,8 +5,6 @@
     <Title>Cosmos Kernel HAL ARM64</Title>
     <Description>Hardware abstraction layer ARM64 implementation for Cosmos kernel.</Description>
     <PackageTags>cosmos;kernel;hal;arm64;aarch64;hardware</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <DefineConstants>$(DefineConstants);ARCH_ARM64</DefineConstants>
     <!-- The generic timer feeds ticks into the experimental scheduler seam (COSMOS0001). -->

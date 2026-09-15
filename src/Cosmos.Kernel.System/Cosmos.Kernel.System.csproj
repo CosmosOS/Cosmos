@@ -16,8 +16,6 @@
     <Title>Cosmos Kernel System</Title>
     <Description>System utilities for Cosmos kernel development including keyboard, network, timer, and conversion utilities.</Description>
     <PackageTags>cosmos;kernel;system;utilities;keyboard;network;timer;conversion</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
   </PropertyGroup>
 

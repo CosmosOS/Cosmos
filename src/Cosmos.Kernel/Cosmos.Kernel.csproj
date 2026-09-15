@@ -11,8 +11,6 @@
     <Title>Cosmos Kernel Aggregator</Title>
     <Description>Aggregated Cosmos kernel components including boot, core, HAL, runtime, system and plugs.</Description>
     <PackageTags>cosmos;kernel;boot;core;hal;runtime;system;graphics;plugs</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <!-- The library initializer bootstraps the experimental scheduler seam (COSMOS0001). -->
     <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
