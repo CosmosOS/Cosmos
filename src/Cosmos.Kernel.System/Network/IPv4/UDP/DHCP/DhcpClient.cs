@@ -11,6 +11,8 @@ using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Timer;
 
+using Cosmos.Kernel.System.Network.UDP;
+
 namespace Cosmos.Kernel.System.Network.IPv4.UDP.DHCP;
 
 /// <summary>
@@ -99,7 +101,7 @@ public sealed class DhcpClient : UdpClient
                 ?? throw new Exception($"Address can not be null");
             DhcpRelease dhcpRelease = new(source, destIp, networkDevice.MacAddress);
 
-            OutgoingBuffer.AddPacket(dhcpRelease);
+            dhcpRelease.Network.Enqueue();
             NetworkStack.Update();
 
             NetworkStack.RemoveAllConfigIP();
@@ -130,7 +132,7 @@ public sealed class DhcpClient : UdpClient
             IPConfig.Enable(networkDevice, new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0));
 
             DhcpDiscover dhcpDiscover = new(networkDevice.MacAddress);
-            OutgoingBuffer.AddPacket(dhcpDiscover);
+            dhcpDiscover.Network.Enqueue();
             NetworkStack.Update();
 
             _applied = false;
@@ -154,7 +156,7 @@ public sealed class DhcpClient : UdpClient
             }
 
             DhcpRequest dhcpRequest = new(networkDevice.MacAddress, requestedAddress);
-            OutgoingBuffer.AddPacket(dhcpRequest);
+            dhcpRequest.Network.Enqueue();
             NetworkStack.Update();
         }
         return Receive();

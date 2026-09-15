@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.IPv4;
 
 namespace Cosmos.Kernel.System.Network.IPv6;
@@ -121,6 +122,11 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
     public override bool IsLoopbackAddress => Equals(Loopback);
 
     /// <summary>
+    /// Whether this is a multicast address, one in <c>ff00::/8</c>.
+    /// </summary>
+    internal bool IsMulticast => (Segment1 >> 24) == 0xFF;
+
+    /// <summary>
     /// Creates an address from its four 32-bit segments.
     /// </summary>
     /// <param name="segment1">Bytes 0 to 3, most significant first.</param>
@@ -191,6 +197,32 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         Segment4 = (uint)(buffer[6] << 16 | buffer[7]);
     }
 
+    /// <summary>
+    /// Creates an address from the sixteen bytes at <paramref name="offset"/> in
+    /// <paramref name="buffer"/>, most significant first.
+    /// </summary>
+    /// <param name="buffer">The buffer holding the address.</param>
+    /// <param name="offset">The offset of the first address byte.</param>
+    public Address6(byte[] buffer, int offset)
+        : this(new ReadOnlySpan<byte>(buffer, offset, 16))
+    {
+    }
+
+    /// <summary>
+    /// Creates an address from its sixteen bytes, most significant first.
+    /// </summary>
+    /// <param name="buffer">The sixteen address bytes.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="buffer"/> is not exactly sixteen bytes long.</exception>
+    public Address6(ReadOnlySpan<byte> buffer)
+    {
+        ArgumentOutOfRangeException.ThrowIfNotEqual(buffer.Length, 16, nameof(buffer));
+
+        Segment1 = ToUint32(buffer);
+        Segment2 = ToUint32(buffer[4..]);
+        Segment3 = ToUint32(buffer[8..]);
+        Segment4 = ToUint32(buffer[12..]);
+    }
+
     /// <inheritdoc />
     public override ReadOnlySpan<byte> ToBytes()
     {
@@ -217,6 +249,33 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
         data[6] = (ushort)(Segment4 >> 16);
         data[7] = (ushort)(Segment4 & 0xFFFF);
         return data;
+    }
+
+    /// <summary>
+    /// The link-local address a device derives from its MAC address
+    /// (RFC 4291 Appendix A): <c>fe80::/64</c> followed by the modified
+    /// EUI-64 interface identifier, the MAC with <c>ff:fe</c> inserted in the
+    /// middle and its universal/local bit inverted.
+    /// </summary>
+    /// <param name="mac">The device's MAC address.</param>
+    public static Address6 LinkLocalFor(MACAddress mac)
+    {
+        ArgumentNullException.ThrowIfNull(mac);
+
+        byte[] m = mac._bytes;
+        uint segment3 = ToUint32((byte)(m[0] ^ 0x02), m[1], m[2], 0xFF);
+        uint segment4 = ToUint32(0xFE, m[3], m[4], m[5]);
+        return new Address6(0xFE80_0000, 0, segment3, segment4);
+    }
+
+    /// <summary>
+    /// The solicited-node multicast group of this address (RFC 4291
+    /// section 2.7.1): <c>ff02::1:ff00:0/104</c> followed by its low 24 bits.
+    /// Neighbor Solicitations for the address are sent to this group.
+    /// </summary>
+    public Address6 ToSolicitedNodeMulticast()
+    {
+        return new Address6(0xFF02_0000, 0, 1, 0xFF00_0000 | (Segment4 & 0x00FF_FFFF));
     }
 
     /// <summary>

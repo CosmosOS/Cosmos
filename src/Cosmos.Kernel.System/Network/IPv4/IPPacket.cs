@@ -2,8 +2,8 @@
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.ARP;
-using Cosmos.Kernel.System.Network.IPv4.TCP;
-using Cosmos.Kernel.System.Network.IPv4.UDP;
+using Cosmos.Kernel.System.Network.TCP;
+using Cosmos.Kernel.System.Network.UDP;
 
 namespace Cosmos.Kernel.System.Network.IPv4;
 
@@ -11,16 +11,29 @@ namespace Cosmos.Kernel.System.Network.IPv4;
 /// An IPv4 packet over Ethernet. The build constructors write the complete
 /// IPv4 header, including the header checksum, at construction time; the
 /// checksum is never recomputed, so the header bytes must not be modified
-/// afterwards. Derive from this class to implement a custom IP protocol:
-/// pass the protocol number and payload length to a build constructor and
-/// write the payload into <see cref="EthernetPacket.RawData"/> from
-/// <see cref="DataOffset"/> onward.
+/// afterwards. Derive from this class to implement a custom IP protocol that
+/// only IPv4 carries: pass the protocol number and payload length to a build
+/// constructor and write the payload into
+/// <see cref="EthernetPacket.RawData"/> from <see cref="DataOffset"/> onward.
+/// A protocol that both versions carry composes an
+/// <see cref="InternetPacket"/> instead of deriving from this class, the way
+/// <see cref="UdpPacket"/> and <see cref="TcpPacket"/> do.
 /// </summary>
 [Experimental(Experimentals.PacketSeamDiagId)]
-public class IPPacket : EthernetPacket
+public class IPPacket : InternetPacket
 {
     /// <summary>Header length in 32-bit words, as parsed from the IHL field.</summary>
     private protected byte _ipHeaderLength;
+
+    /// <summary>Parsed source address backing <see cref="SourceIP"/>.</summary>
+    private Address _sourceIP = null!;
+
+    /// <summary>Parsed destination address backing <see cref="DestinationIP"/>.</summary>
+    private Address _destinationIP = null!;
+
+    /// <summary>Parsed payload offset backing <see cref="DataOffset"/>.</summary>
+    private ushort _dataOffset;
+
     private static ushort s_nextFragmentID;
 
     /// <summary>
@@ -51,14 +64,14 @@ public class IPPacket : EthernetPacket
         {
             switch (ipPacket.Protocol)
             {
-                case 1: // ICMP
+                case ProtocolIcmp:
                     IcmpPacket.ICMPHandler(packetData);
                     break;
-                case 6: // TCP
-                    TcpPacket.TCPHandler(packetData);
+                case ProtocolTcp:
+                    TcpPacket.TCPHandler(ipPacket);
                     break;
-                case 17: // UDP
-                    UdpPacket.UDPHandler(packetData);
+                case ProtocolUdp:
+                    UdpPacket.UDPHandler(ipPacket);
                     break;
             }
         }
@@ -101,9 +114,9 @@ public class IPPacket : EthernetPacket
         TTL = RawData[22];
         Protocol = RawData[23];
         IPCRC = (ushort)((RawData[24] << 8) | RawData[25]);
-        SourceIP = new Address4(RawData, 26);
-        DestinationIP = new Address4(RawData, 30);
-        DataOffset = (ushort)(14 + HeaderLength);
+        _sourceIP = new Address4(RawData, 26);
+        _destinationIP = new Address4(RawData, 30);
+        _dataOffset = (ushort)(14 + HeaderLength);
     }
 
     /// <summary>
@@ -118,7 +131,7 @@ public class IPPacket : EthernetPacket
     /// <param name="source">Source address.</param>
     /// <param name="dest">Destination address.</param>
     /// <param name="flags">Raw value of header byte 20: the 3 flag bits followed by the upper 5 bits of the fragment offset.</param>
-    private protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags)
+    internal IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags)
         : this(GetSourceMAC(source), MACAddress.None, dataLength, protocol, source, dest, flags)
     { }
 
@@ -133,7 +146,7 @@ public class IPPacket : EthernetPacket
     /// <param name="dest">Destination address.</param>
     /// <param name="flags">Raw value of header byte 20: the 3 flag bits followed by the upper 5 bits of the fragment offset.</param>
     /// <param name="destMAC">Destination MAC address.</param>
-    private protected IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags, MACAddress destMAC)
+    internal IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags, MACAddress destMAC)
         : this(GetSourceMAC(source), destMAC, dataLength, protocol, source, dest, flags)
     { }
 
@@ -164,7 +177,7 @@ public class IPPacket : EthernetPacket
     /// <param name="flags">Raw value of header byte 20: the 3 flag bits followed by the upper 5 bits of the fragment offset.</param>
     public IPPacket(MACAddress srcMAC, MACAddress destMAC, ushort dataLength, byte protocol,
         Address source, Address dest, byte flags)
-        : base(destMAC, srcMAC, 0x0800, dataLength + 14 + 20)
+        : base(destMAC, srcMAC, EtherTypeIPv4, dataLength + 14 + 20)
     {
         RawData[14] = 0x45;
         RawData[15] = 0;
@@ -204,44 +217,6 @@ public class IPPacket : EthernetPacket
     private protected ushort CalcOcCrc(ushort offset, ushort length) => CalcOcCrc(RawData, offset, length);
 
     /// <summary>
-    /// Computes the Internet ones'-complement checksum over a range of the
-    /// given buffer.
-    /// </summary>
-    /// <param name="buffer">The buffer to use.</param>
-    /// <param name="offset">The offset, in bytes.</param>
-    /// <param name="length">The length, in bytes.</param>
-    private protected static ushort CalcOcCrc(byte[] buffer, ushort offset, int length)
-    {
-        return (ushort)~SumShortValues(buffer, offset, length);
-    }
-
-    /// <summary>
-    /// Sums a range of the buffer as big-endian 16-bit words with
-    /// end-around carry, the accumulation step of the Internet checksum.
-    /// </summary>
-    /// <param name="buffer">The buffer to use.</param>
-    /// <param name="offset">The offset, in bytes.</param>
-    /// <param name="length">The length, in bytes.</param>
-    private protected static ushort SumShortValues(byte[] buffer, int offset, int length)
-    {
-        uint chksum = 0;
-        int end = offset + (length & ~1);
-        int i = offset;
-
-        while (i != end)
-        {
-            chksum += (uint)(((ushort)buffer[i++] << 8) + (ushort)buffer[i++]);
-        }
-        if (i != offset + length)
-        {
-            chksum += (uint)((ushort)buffer[i] << 8);
-        }
-        chksum = (chksum & 0xFFFF) + (chksum >> 16);
-        chksum = (chksum & 0xFFFF) + (chksum >> 16);
-        return (ushort)chksum;
-    }
-
-    /// <summary>
     /// Computes the IPv4 header checksum over the first
     /// <paramref name="headerLength"/> bytes of the IP header.
     /// </summary>
@@ -250,6 +225,35 @@ public class IPPacket : EthernetPacket
     {
         return CalcOcCrc(14, headerLength);
     }
+
+    /// <summary>
+    /// Whether a transport section must carry a checksum. False: IPv4 checksums
+    /// its own header, so UDP over IPv4 may leave its checksum field zero to
+    /// say it computed none.
+    /// </summary>
+    internal override bool TransportChecksumRequired => false;
+
+    /// <summary>
+    /// Computes a transport checksum with the IPv4 pseudo-header of RFC 793:
+    /// the source and destination addresses, a zero byte, the protocol number
+    /// and the transport length.
+    /// </summary>
+    /// <param name="protocol">The protocol number to put in the pseudo-header.</param>
+    /// <param name="length">The transport length: the whole section, header included.</param>
+    internal override ushort ComputeTransportChecksum(byte protocol, ushort length)
+    {
+        // The zero byte and the protocol byte pair up into one word, so the
+        // protocol number adds as-is.
+        uint sum = SumWords(RawData, 26, 8);
+        sum += protocol;
+        sum += length;
+        sum += SumWords(RawData, DataOffset, length);
+
+        return (ushort)~Fold(sum);
+    }
+
+    /// <inheritdoc/>
+    internal override bool Enqueue() => OutgoingBuffer.AddPacket(this);
 
     /// <summary>
     /// Gets the IP version of the packet.
@@ -305,23 +309,23 @@ public class IPPacket : EthernetPacket
     /// <summary>
     /// Gets the source IP address.
     /// </summary>
-    public Address SourceIP { get; private set; } = null!;
+    public override Address SourceIP => _sourceIP;
 
     /// <summary>
     /// Gets the destination IP address.
     /// </summary>
-    public Address DestinationIP { get; private set; } = null!;
+    public override Address DestinationIP => _destinationIP;
 
     /// <summary>
     /// Gets the offset of the IP payload from the start of the frame
     /// (Ethernet header plus IP header), in bytes.
     /// </summary>
-    public ushort DataOffset { get; private set; }
+    public override ushort DataOffset => _dataOffset;
 
     /// <summary>
     /// Gets the length of the IP payload, in bytes.
     /// </summary>
-    public ushort DataLength => (ushort)(IPLength - HeaderLength);
+    public override ushort DataLength => (ushort)(IPLength - HeaderLength);
 
     /// <inheritdoc/>
     public override string ToString()

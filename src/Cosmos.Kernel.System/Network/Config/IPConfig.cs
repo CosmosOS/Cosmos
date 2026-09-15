@@ -1,6 +1,7 @@
 ﻿using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.IPv4;
+using Cosmos.Kernel.System.Network.IPv6;
 
 namespace Cosmos.Kernel.System.Network.Config;
 
@@ -89,6 +90,11 @@ public class IPConfig
     /// <param name="destination">The destination IP address.</param>
     internal static Address? FindNetwork(Address destination)
     {
+        if (destination is Address6)
+        {
+            return FindNetwork6();
+        }
+
         Address? defaultGw = null;
 
         foreach (Entry entry in s_configs)
@@ -112,6 +118,19 @@ public class IPConfig
         }
 
         return defaultGw;
+    }
+
+    /// <summary>
+    /// The IPv6 address to send from. There is no IPv6 routing table and no
+    /// address configuration beyond the link-local address every device comes
+    /// up with, so every IPv6 destination is sourced from the primary
+    /// device's link-local address.
+    /// </summary>
+    /// <returns>The link-local address, or null when no device has one yet.</returns>
+    private static Address? FindNetwork6()
+    {
+        INetworkDevice? device = NetworkManager.PrimaryDevice;
+        return device is null ? null : NetworkStack.LinkLocalOf(device);
     }
 
     /// <summary>

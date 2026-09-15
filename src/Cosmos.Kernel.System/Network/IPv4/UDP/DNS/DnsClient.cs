@@ -8,6 +8,8 @@
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Timer;
 
+using Cosmos.Kernel.System.Network.UDP;
+
 namespace Cosmos.Kernel.System.Network.IPv4.UDP.DNS;
 
 /// <summary>
@@ -51,7 +53,7 @@ public sealed class DnsClient : UdpClient
         _queryUrl = url;
         DnsPacketQuery askpacket = new(source, _destination!, url);
 
-        OutgoingBuffer.AddPacket(askpacket);
+        askpacket.Network.Enqueue();
         NetworkStack.Update();
     }
 

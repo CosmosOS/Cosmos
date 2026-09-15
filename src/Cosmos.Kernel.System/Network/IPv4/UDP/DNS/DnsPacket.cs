@@ -10,6 +10,8 @@ using System.Text;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Network;
 
+using Cosmos.Kernel.System.Network.UDP;
+
 namespace Cosmos.Kernel.System.Network.IPv4.UDP.DNS;
 
 /// <summary>

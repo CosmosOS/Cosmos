@@ -9,7 +9,7 @@ using System.Buffers;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Network.Config;
 
-namespace Cosmos.Kernel.System.Network.IPv4.TCP;
+namespace Cosmos.Kernel.System.Network.TCP;
 
 /// <summary>
 /// Represents a TCP connection status.
@@ -857,7 +857,7 @@ internal class Tcp : IDisposable
     /// </summary>
     private void SendPacket(TcpPacket packet)
     {
-        OutgoingBuffer.AddPacket(packet);
+        packet.Network.Enqueue();
 
         // Increment SndNxt BEFORE NetworkStack.Update() so that incoming packets
         // processed during Update() see the correct value

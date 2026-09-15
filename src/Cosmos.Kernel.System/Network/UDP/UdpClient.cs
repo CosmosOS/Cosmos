@@ -3,7 +3,7 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Timer;
 
-namespace Cosmos.Kernel.System.Network.IPv4.UDP;
+namespace Cosmos.Kernel.System.Network.UDP;
 
 /// <summary>
 /// Used to manage the UDP connection to a client.
@@ -188,7 +188,7 @@ public class UdpClient : IDisposable
 
         UdpPacket packet = new(source, dest, (ushort)_localPort, (ushort)destPort, data);
         Serial.WriteString("[UdpClient] UdpPacket created, adding to outgoing buffer\n");
-        OutgoingBuffer.AddPacket(packet);
+        packet.Network.Enqueue();
         Serial.WriteString("[UdpClient] Packet added to outgoing buffer\n");
     }
 
@@ -205,7 +205,7 @@ public class UdpClient : IDisposable
     {
         ThrowIfDisposed();
 
-        return Cosmos.Kernel.System.Network.NetworkStack.Send(packet);
+        return NetworkStack.Send(packet.Network);
     }
 
     /// <summary>
@@ -231,7 +231,7 @@ public class UdpClient : IDisposable
             return null;
         }
 
-        UdpPacket packet = new(_rxBuffer.Dequeue().RawData);
+        UdpPacket packet = _rxBuffer.Dequeue();
         source.Address = packet.SourceIP;
         source.Port = packet.SourcePort;
 

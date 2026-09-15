@@ -487,8 +487,9 @@ internal class E1000E : PciDevice, INetworkDevice
         WriteMmio(REG_RDT, RxDescCount - 1);
         _rxTail = RxDescCount - 1;
 
-        // Enable receiver
-        uint rctl = RCTL_EN | RCTL_BAM | RCTL_BSIZE_2048 | RCTL_SECRC;
+        // Enable receiver. MPE: IPv6 Neighbor Discovery arrives on solicited-node
+        // multicast groups, which the empty multicast table would filter out.
+        uint rctl = RCTL_EN | RCTL_BAM | RCTL_MPE | RCTL_BSIZE_2048 | RCTL_SECRC;
         WriteMmio(REG_RCTL, rctl);
 
         Serial.Write("[E1000E] RX initialized\n");

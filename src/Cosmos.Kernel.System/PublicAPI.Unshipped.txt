@@ -406,6 +406,15 @@ Cosmos.Kernel.System.Network.Config.IPConfig
 Cosmos.Kernel.System.Network.Config.IPConfig.Address.get -> Cosmos.Kernel.System.Network.Address!
 Cosmos.Kernel.System.Network.Config.IPConfig.DefaultGateway.get -> Cosmos.Kernel.System.Network.Address!
 Cosmos.Kernel.System.Network.Config.IPConfig.SubnetMask.get -> Cosmos.Kernel.System.Network.Address!
+Cosmos.Kernel.System.Network.EndPoint
+Cosmos.Kernel.System.Network.EndPoint.Address.get -> Cosmos.Kernel.System.Network.Address!
+Cosmos.Kernel.System.Network.EndPoint.Address.set -> void
+Cosmos.Kernel.System.Network.EndPoint.CompareTo(Cosmos.Kernel.System.Network.EndPoint? other) -> int
+Cosmos.Kernel.System.Network.EndPoint.EndPoint(Cosmos.Kernel.System.Network.Address! addr, ushort port) -> void
+Cosmos.Kernel.System.Network.EndPoint.EndPoint(uint addr, ushort port) -> void
+Cosmos.Kernel.System.Network.EndPoint.Equals(Cosmos.Kernel.System.Network.EndPoint? other) -> bool
+Cosmos.Kernel.System.Network.EndPoint.Port.get -> ushort
+Cosmos.Kernel.System.Network.EndPoint.Port.set -> void
 Cosmos.Kernel.System.Network.IPv4.Address4
 Cosmos.Kernel.System.Network.IPv4.Address4.Address4(byte first, byte second, byte third, byte fourth) -> void
 Cosmos.Kernel.System.Network.IPv4.Address4.Address4(byte[]! buffer, int offset) -> void
@@ -416,21 +425,12 @@ Cosmos.Kernel.System.Network.IPv4.Address4.Equals(Cosmos.Kernel.System.Network.I
 Cosmos.Kernel.System.Network.IPv4.Address4.IsAPIPA() -> bool
 Cosmos.Kernel.System.Network.IPv4.Address4.Segment1.get -> uint
 Cosmos.Kernel.System.Network.IPv4.Address4.ToString(Cosmos.Kernel.System.Network.AddressNumericStyle numericStyle = Cosmos.Kernel.System.Network.AddressNumericStyle.Dec, bool leadingZeros = false) -> string!
-Cosmos.Kernel.System.Network.IPv4.EndPoint
-Cosmos.Kernel.System.Network.IPv4.EndPoint.Address.get -> Cosmos.Kernel.System.Network.Address!
-Cosmos.Kernel.System.Network.IPv4.EndPoint.Address.set -> void
-Cosmos.Kernel.System.Network.IPv4.EndPoint.CompareTo(Cosmos.Kernel.System.Network.IPv4.EndPoint? other) -> int
-Cosmos.Kernel.System.Network.IPv4.EndPoint.EndPoint(Cosmos.Kernel.System.Network.Address! addr, ushort port) -> void
-Cosmos.Kernel.System.Network.IPv4.EndPoint.EndPoint(uint addr, ushort port) -> void
-Cosmos.Kernel.System.Network.IPv4.EndPoint.Equals(Cosmos.Kernel.System.Network.IPv4.EndPoint? other) -> bool
-Cosmos.Kernel.System.Network.IPv4.EndPoint.Port.get -> ushort
-Cosmos.Kernel.System.Network.IPv4.EndPoint.Port.set -> void
 Cosmos.Kernel.System.Network.IPv4.IcmpClient
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.Close() -> void
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.Connect(Cosmos.Kernel.System.Network.Address! dest) -> void
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.Dispose() -> void
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.IcmpClient() -> void
-Cosmos.Kernel.System.Network.IPv4.IcmpClient.Receive(ref Cosmos.Kernel.System.Network.IPv4.EndPoint! source, int timeout = 5000) -> int
+Cosmos.Kernel.System.Network.IPv4.IcmpClient.Receive(ref Cosmos.Kernel.System.Network.EndPoint! source, int timeout = 5000) -> int
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.SendEcho(ushort id = 1, ushort sequence = 1) -> void
 Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpClient
 Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpClient.DhcpClient() -> void
@@ -442,17 +442,9 @@ Cosmos.Kernel.System.Network.IPv4.UDP.DNS.DnsClient.DnsClient() -> void
 Cosmos.Kernel.System.Network.IPv4.UDP.DNS.DnsClient.Receive(int timeout = 5000) -> Cosmos.Kernel.System.Network.Address?
 Cosmos.Kernel.System.Network.IPv4.UDP.DNS.DnsClient.ReceiveAll(int timeout = 5000) -> System.Collections.Generic.List<Cosmos.Kernel.System.Network.Address!>?
 Cosmos.Kernel.System.Network.IPv4.UDP.DNS.DnsClient.SendQuery(string! url) -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.Close() -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.Connect(Cosmos.Kernel.System.Network.Address! dest, int destPort) -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.Dispose() -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.Receive(ref Cosmos.Kernel.System.Network.IPv4.EndPoint! source, int timeoutMs = 5000) -> byte[]?
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.Send(byte[]! data) -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.Send(byte[]! data, Cosmos.Kernel.System.Network.Address! dest, int destPort) -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.UdpClient() -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.UdpClient(Cosmos.Kernel.System.Network.Address! dest, int destPort) -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.UdpClient(int localPort) -> void
 Cosmos.Kernel.System.Network.IPv6.Address6
+Cosmos.Kernel.System.Network.IPv6.Address6.Address6(byte[]! buffer, int offset) -> void
+Cosmos.Kernel.System.Network.IPv6.Address6.Address6(System.ReadOnlySpan<byte> buffer) -> void
 Cosmos.Kernel.System.Network.IPv6.Address6.Address6(System.ReadOnlySpan<uint> segments) -> void
 Cosmos.Kernel.System.Network.IPv6.Address6.Address6(System.ReadOnlySpan<ushort> buffer) -> void
 Cosmos.Kernel.System.Network.IPv6.Address6.Address6(uint segment1, uint segment2, uint segment3, uint segment4) -> void
@@ -466,7 +458,15 @@ Cosmos.Kernel.System.Network.IPv6.Address6.Segment2.get -> uint
 Cosmos.Kernel.System.Network.IPv6.Address6.Segment3.get -> uint
 Cosmos.Kernel.System.Network.IPv6.Address6.Segment4.get -> uint
 Cosmos.Kernel.System.Network.IPv6.Address6.ToString(bool leadingZeros = false, bool groupZeros = true) -> string!
+Cosmos.Kernel.System.Network.IPv6.Address6.ToSolicitedNodeMulticast() -> Cosmos.Kernel.System.Network.IPv6.Address6!
 Cosmos.Kernel.System.Network.IPv6.Address6.ToUShorts() -> System.ReadOnlySpan<ushort>
+Cosmos.Kernel.System.Network.IPv6.Icmpv6Client
+Cosmos.Kernel.System.Network.IPv6.Icmpv6Client.Close() -> void
+Cosmos.Kernel.System.Network.IPv6.Icmpv6Client.Connect(Cosmos.Kernel.System.Network.IPv6.Address6! dest) -> void
+Cosmos.Kernel.System.Network.IPv6.Icmpv6Client.Dispose() -> void
+Cosmos.Kernel.System.Network.IPv6.Icmpv6Client.Icmpv6Client() -> void
+Cosmos.Kernel.System.Network.IPv6.Icmpv6Client.Receive(ref Cosmos.Kernel.System.Network.EndPoint! source, int timeout = 5000) -> int
+Cosmos.Kernel.System.Network.IPv6.Icmpv6Client.SendEcho(ushort id = 1, ushort sequence = 1) -> void
 Cosmos.Kernel.System.Network.IPv6.IPv6AddressType
 Cosmos.Kernel.System.Network.IPv6.IPv6AddressType.Anycast = 0 -> Cosmos.Kernel.System.Network.IPv6.IPv6AddressType
 Cosmos.Kernel.System.Network.IPv6.IPv6AddressType.EmbeddedIPv4 = 6 -> Cosmos.Kernel.System.Network.IPv6.IPv6AddressType
@@ -495,6 +495,7 @@ Cosmos.Kernel.System.Network.NetworkAdapter.Equals(Cosmos.Kernel.System.Network.
 Cosmos.Kernel.System.Network.NetworkAdapter.Index.get -> int
 Cosmos.Kernel.System.Network.NetworkAdapter.IPConfig.get -> Cosmos.Kernel.System.Network.Config.IPConfig?
 Cosmos.Kernel.System.Network.NetworkAdapter.IsValid.get -> bool
+Cosmos.Kernel.System.Network.NetworkAdapter.LinkLocalAddress.get -> Cosmos.Kernel.System.Network.IPv6.Address6?
 Cosmos.Kernel.System.Network.NetworkAdapter.LinkUp.get -> bool
 Cosmos.Kernel.System.Network.NetworkAdapter.MacAddress.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress?
 Cosmos.Kernel.System.Network.NetworkAdapter.Name.get -> string?
@@ -502,6 +503,16 @@ Cosmos.Kernel.System.Network.NetworkAdapter.NetworkAdapter() -> void
 Cosmos.Kernel.System.Network.NetworkAdapter.Ready.get -> bool
 Cosmos.Kernel.System.Network.NetworkManager
 Cosmos.Kernel.System.Network.NetworkStack
+Cosmos.Kernel.System.Network.UDP.UdpClient
+Cosmos.Kernel.System.Network.UDP.UdpClient.Close() -> void
+Cosmos.Kernel.System.Network.UDP.UdpClient.Connect(Cosmos.Kernel.System.Network.Address! dest, int destPort) -> void
+Cosmos.Kernel.System.Network.UDP.UdpClient.Dispose() -> void
+Cosmos.Kernel.System.Network.UDP.UdpClient.Receive(ref Cosmos.Kernel.System.Network.EndPoint! source, int timeoutMs = 5000) -> byte[]?
+Cosmos.Kernel.System.Network.UDP.UdpClient.Send(byte[]! data) -> void
+Cosmos.Kernel.System.Network.UDP.UdpClient.Send(byte[]! data, Cosmos.Kernel.System.Network.Address! dest, int destPort) -> void
+Cosmos.Kernel.System.Network.UDP.UdpClient.UdpClient() -> void
+Cosmos.Kernel.System.Network.UDP.UdpClient.UdpClient(Cosmos.Kernel.System.Network.Address! dest, int destPort) -> void
+Cosmos.Kernel.System.Network.UDP.UdpClient.UdpClient(int localPort) -> void
 Cosmos.Kernel.System.Power
 Cosmos.Kernel.System.Storage.Ebr
 Cosmos.Kernel.System.Storage.Gpt
@@ -571,6 +582,9 @@ override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.MeasureString(string! 
 override Cosmos.Kernel.System.Graphics.Mode.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Graphics.Mode.GetHashCode() -> int
 override Cosmos.Kernel.System.Graphics.Mode.ToString() -> string!
+override Cosmos.Kernel.System.Network.EndPoint.Equals(object? obj) -> bool
+override Cosmos.Kernel.System.Network.EndPoint.GetHashCode() -> int
+override Cosmos.Kernel.System.Network.EndPoint.ToString() -> string!
 override Cosmos.Kernel.System.Network.IPv4.Address4.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.IPv4.Address4.GetHashCode() -> int
 override Cosmos.Kernel.System.Network.IPv4.Address4.IsBroadcastAddress.get -> bool
@@ -579,9 +593,6 @@ override Cosmos.Kernel.System.Network.IPv4.Address4.IsZero.get -> bool
 override Cosmos.Kernel.System.Network.IPv4.Address4.Parts.get -> Cosmos.Kernel.System.Network.MaskedAddress
 override Cosmos.Kernel.System.Network.IPv4.Address4.ToBytes() -> System.ReadOnlySpan<byte>
 override Cosmos.Kernel.System.Network.IPv4.Address4.ToString() -> string!
-override Cosmos.Kernel.System.Network.IPv4.EndPoint.Equals(object? obj) -> bool
-override Cosmos.Kernel.System.Network.IPv4.EndPoint.GetHashCode() -> int
-override Cosmos.Kernel.System.Network.IPv4.EndPoint.ToString() -> string!
 override Cosmos.Kernel.System.Network.IPv6.Address6.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.IPv6.Address6.GetHashCode() -> int
 override Cosmos.Kernel.System.Network.IPv6.Address6.IsBroadcastAddress.get -> bool
@@ -696,7 +707,7 @@ static Cosmos.Kernel.System.Network.Config.IPConfig.Enable(Cosmos.Kernel.System.
 static Cosmos.Kernel.System.Network.IPv4.Address4.Broadcast.get -> Cosmos.Kernel.System.Network.IPv4.Address4!
 static Cosmos.Kernel.System.Network.IPv4.Address4.CIDRToAddress(int cidr) -> Cosmos.Kernel.System.Network.IPv4.Address4?
 static Cosmos.Kernel.System.Network.IPv4.Address4.Parse(System.ReadOnlySpan<char> addr, Cosmos.Kernel.System.Network.AddressNumericStyle style) -> Cosmos.Kernel.System.Network.IPv4.Address4?
-static Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.GetDynamicPort(int tries = 10) -> ushort
+static Cosmos.Kernel.System.Network.IPv6.Address6.LinkLocalFor(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! mac) -> Cosmos.Kernel.System.Network.IPv6.Address6!
 static Cosmos.Kernel.System.Network.IPv6.Address6.Parse(System.ReadOnlySpan<char> addr) -> Cosmos.Kernel.System.Network.IPv6.Address6?
 static Cosmos.Kernel.System.Network.MaskedAddress.operator !=(Cosmos.Kernel.System.Network.MaskedAddress a, Cosmos.Kernel.System.Network.MaskedAddress b) -> bool
 static Cosmos.Kernel.System.Network.MaskedAddress.operator ==(Cosmos.Kernel.System.Network.MaskedAddress a, Cosmos.Kernel.System.Network.MaskedAddress b) -> bool
@@ -714,6 +725,7 @@ static Cosmos.Kernel.System.Network.NetworkManager.Primary.set -> void
 static Cosmos.Kernel.System.Network.NetworkManager.Ready.get -> bool
 static Cosmos.Kernel.System.Network.NetworkManager.Send(byte[]! data, int length) -> bool
 static Cosmos.Kernel.System.Network.NetworkStack.RemoveAllConfigIP() -> void
+static Cosmos.Kernel.System.Network.UDP.UdpClient.GetDynamicPort(int tries = 10) -> ushort
 static Cosmos.Kernel.System.Power.Halt() -> void
 static Cosmos.Kernel.System.Power.IsSupported.get -> bool
 static Cosmos.Kernel.System.Power.Reboot() -> void
@@ -832,6 +844,10 @@ virtual Cosmos.Kernel.System.Kernel.AfterRun() -> void
 virtual Cosmos.Kernel.System.Kernel.BeforeRun() -> void
 virtual Cosmos.Kernel.System.Kernel.OnBoot() -> void
 virtual Cosmos.Kernel.System.Kernel.Start() -> void
+[COSMOS0002]abstract Cosmos.Kernel.System.Network.InternetPacket.DataLength.get -> ushort
+[COSMOS0002]abstract Cosmos.Kernel.System.Network.InternetPacket.DataOffset.get -> ushort
+[COSMOS0002]abstract Cosmos.Kernel.System.Network.InternetPacket.DestinationIP.get -> Cosmos.Kernel.System.Network.Address!
+[COSMOS0002]abstract Cosmos.Kernel.System.Network.InternetPacket.SourceIP.get -> Cosmos.Kernel.System.Network.Address!
 [COSMOS0002]Cosmos.Kernel.System.Network.ARP.ArpPacket
 [COSMOS0002]Cosmos.Kernel.System.Network.ARP.ArpPacket.ArpPacket(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.ARP.ArpPacket.HardwareType.get -> ushort
@@ -855,6 +871,7 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.EthernetPacket.EthernetType.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.EthernetPacket.RawData.get -> byte[]!
 [COSMOS0002]Cosmos.Kernel.System.Network.EthernetPacket.SourceMac.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
+[COSMOS0002]Cosmos.Kernel.System.Network.InternetPacket
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IcmpClient.ReceivePacket(int timeoutMs = 5000) -> Cosmos.Kernel.System.Network.IPv4.IcmpPacket?
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IcmpClient.Send(Cosmos.Kernel.System.Network.IPv4.IcmpPacket! packet) -> bool
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IcmpEchoReply
@@ -876,9 +893,6 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IcmpPacket.IcmpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, byte type, byte code, ushort id, ushort seq, ushort icmpLength) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IcmpPacket.IcmpType.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.DataLength.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.DataOffset.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.DestinationIP.get -> Cosmos.Kernel.System.Network.Address!
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.FragmentID.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.FragmentOffset.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.HeaderLength.get -> ushort
@@ -889,37 +903,8 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.IPPacket(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! srcMAC, Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! destMAC, ushort dataLength, byte protocol, Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, byte flags) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.IPVersion.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.Protocol.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.SourceIP.get -> Cosmos.Kernel.System.Network.Address!
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.TTL.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.TypeOfService.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags.ACK = 16 -> Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags.FIN = 1 -> Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags.PSH = 8 -> Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags.RST = 4 -> Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags.SYN = 2 -> Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags.URG = 32 -> Cosmos.Kernel.System.Network.IPv4.TCP.TcpFlags
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpOption
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpOption.Data.get -> byte[]?
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpOption.Kind.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpOption.Length.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpOption.TcpOption() -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.AckNumber.get -> uint
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.Checksum.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.DestinationPort.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.FlagBits.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.GetFlags() -> string!
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.Options.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Network.IPv4.TCP.TcpOption!>?
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.SequenceNumber.get -> uint
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.SourcePort.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.TcpDataLength.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.TcpHeaderLength.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.TcpPacket(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.TcpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, uint sequenceNumber, uint ackNumber, ushort headerLength, byte flags, ushort windowSize, ushort urgentPointer) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.TcpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, uint sequenceNumber, uint ackNumber, ushort headerLength, byte flags, ushort windowSize, ushort urgentPointer, byte[]! data) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.UrgentPointer.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.WindowSize.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpDiscover
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpDiscover.DhcpDiscover(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpDiscover.DhcpDiscover(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! sourceMAC) -> void
@@ -982,19 +967,59 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DNS.ReplyCode.OK = 0 -> Cosmos.Kernel.System.Network.IPv4.UDP.DNS.ReplyCode
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DNS.ReplyCode.Refused = 5 -> Cosmos.Kernel.System.Network.IPv4.UDP.DNS.ReplyCode
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DNS.ReplyCode.ServerFailure = 2 -> Cosmos.Kernel.System.Network.IPv4.UDP.DNS.ReplyCode
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.ReceivePacket(int timeoutMs = 5000) -> Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket?
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient.Send(Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket! packet) -> bool
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.DestinationPort.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.GetUdpData() -> byte[]!
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.SourcePort.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.UdpDataLength.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.UdpLength.get -> ushort
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.UdpPacket(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data, Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! destMac) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength, Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! destMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags.ACK = 16 -> Cosmos.Kernel.System.Network.TCP.TcpFlags
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags.FIN = 1 -> Cosmos.Kernel.System.Network.TCP.TcpFlags
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags.PSH = 8 -> Cosmos.Kernel.System.Network.TCP.TcpFlags
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags.RST = 4 -> Cosmos.Kernel.System.Network.TCP.TcpFlags
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags.SYN = 2 -> Cosmos.Kernel.System.Network.TCP.TcpFlags
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags.URG = 32 -> Cosmos.Kernel.System.Network.TCP.TcpFlags
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpOption
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpOption.Data.get -> byte[]?
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpOption.Kind.get -> byte
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpOption.Length.get -> byte
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpOption.TcpOption() -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.AckNumber.get -> uint
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.Checksum.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.DestinationIP.get -> Cosmos.Kernel.System.Network.Address!
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.DestinationPort.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.FlagBits.get -> byte
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.GetFlags() -> string!
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.Network.get -> Cosmos.Kernel.System.Network.InternetPacket!
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.Options.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Network.TCP.TcpOption!>?
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.RawData.get -> byte[]!
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.SequenceNumber.get -> uint
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.SourceIP.get -> Cosmos.Kernel.System.Network.Address!
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.SourcePort.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.TcpDataLength.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.TcpHeaderLength.get -> byte
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.TcpPacket(byte[]! rawData) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.TcpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, uint sequenceNumber, uint ackNumber, ushort headerLength, byte flags, ushort windowSize, ushort urgentPointer) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.TcpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, uint sequenceNumber, uint ackNumber, ushort headerLength, byte flags, ushort windowSize, ushort urgentPointer, byte[]! data) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.UrgentPointer.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.VerifyChecksum() -> bool
+[COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpPacket.WindowSize.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpClient.ReceivePacket(int timeoutMs = 5000) -> Cosmos.Kernel.System.Network.UDP.UdpPacket?
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpClient.Send(Cosmos.Kernel.System.Network.UDP.UdpPacket! packet) -> bool
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.Checksum.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.DestinationIP.get -> Cosmos.Kernel.System.Network.Address!
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.DestinationPort.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.GetUdpData() -> byte[]!
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.Network.get -> Cosmos.Kernel.System.Network.InternetPacket!
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.RawData.get -> byte[]!
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.SourceIP.get -> Cosmos.Kernel.System.Network.Address!
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.SourcePort.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.UdpDataLength.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.UdpLength.get -> ushort
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.UdpPacket(byte[]! rawData) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data, Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! destMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength, Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! destMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.VerifyChecksum() -> bool
+[COSMOS0002]Cosmos.Kernel.System.Network.UDP.UdpPacket.WriteChecksum() -> void
 [COSMOS0002]override Cosmos.Kernel.System.Network.ARP.ArpPacket.ToString() -> string!
 [COSMOS0002]override Cosmos.Kernel.System.Network.ARP.ArpPacketEthernet.ToString() -> string!
 [COSMOS0002]override Cosmos.Kernel.System.Network.ARP.ArpReplyEthernet.ToString() -> string!
@@ -1003,9 +1028,13 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.IcmpEchoReply.ToString() -> string!
 [COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.IcmpEchoRequest.ToString() -> string!
 [COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.IcmpPacket.ToString() -> string!
+[COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.IPPacket.DataLength.get -> ushort
+[COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.IPPacket.DataOffset.get -> ushort
+[COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.IPPacket.DestinationIP.get -> Cosmos.Kernel.System.Network.Address!
+[COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.IPPacket.SourceIP.get -> Cosmos.Kernel.System.Network.Address!
 [COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.IPPacket.ToString() -> string!
-[COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.TCP.TcpPacket.ToString() -> string!
 [COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.UDP.DNS.DnsPacket.ToString() -> string!
-[COSMOS0002]override Cosmos.Kernel.System.Network.IPv4.UDP.UdpPacket.ToString() -> string!
+[COSMOS0002]override Cosmos.Kernel.System.Network.TCP.TcpPacket.ToString() -> string!
+[COSMOS0002]override Cosmos.Kernel.System.Network.UDP.UdpPacket.ToString() -> string!
 [COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.HandlePacket(byte[]! packetData, int length) -> void
-[COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.Send(Cosmos.Kernel.System.Network.IPv4.IPPacket! packet) -> bool
+[COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.Send(Cosmos.Kernel.System.Network.InternetPacket! packet) -> bool

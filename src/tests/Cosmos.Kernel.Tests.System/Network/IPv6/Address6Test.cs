@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Collections.Immutable;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.IPv4;
 using Cosmos.Kernel.System.Network.IPv6;
@@ -250,6 +251,82 @@ public class Address6Test
             yield return new([0, 0, 0, 8, 0, 2, 0, 0], (0, 3));
             yield return new([0, 1, 0, 8, 0, 2, 0, 0], (6, 2));
             yield return new([0x0, 0x0, 0x0, 0xFFFF, 0xC000, 0x0280], (0, 3)); // 192.0.2.128
+        }
+    }
+
+    public class LinkLocalFor : Address6Test
+    {
+        [Test]
+        public void GivenUniversalMac_InvertsTheUniversalBitAndInsertsFffe()
+        {
+            Address6 actual = Address6.LinkLocalFor(new MACAddress([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]));
+
+            Assert.That(actual, Is.EqualTo(Address6.Parse("fe80::5054:ff:fe12:3456")));
+        }
+
+        [Test]
+        public void GivenLocallyAdministeredMac_ClearsTheUniversalBit()
+        {
+            Address6 actual = Address6.LinkLocalFor(new MACAddress([0x02, 0x00, 0x00, 0x00, 0x00, 0x01]));
+
+            Assert.That(actual, Is.EqualTo(Address6.Parse("fe80::ff:fe00:1")));
+        }
+
+        [Test]
+        public void GivenLinkLocal_AddressTypeIsLinkLocal()
+        {
+            Address6 actual = Address6.LinkLocalFor(new MACAddress([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]));
+
+            Assert.That(actual.AddressType, Is.EqualTo(IPv6AddressType.LinkLocal));
+        }
+    }
+
+    public class ToSolicitedNodeMulticast : Address6Test
+    {
+        [TestCase("fe80::5054:ff:fe12:3456", ExpectedResult = "ff02::1:ff12:3456")]
+        [TestCase("fec0::2", ExpectedResult = "ff02::1:ff00:2")]
+        [TestCase("2001:db8::abcd:ef01", ExpectedResult = "ff02::1:ffcd:ef01")]
+        public string GivenAddress_AppendsItsLowTwentyFourBits(string address)
+        {
+            return Address6.Parse(address)!.ToSolicitedNodeMulticast().ToString();
+        }
+
+        [Test]
+        public void GivenAddress_ResultIsASolicitedNodeAddress()
+        {
+            Assert.That(Address6.Parse("fec0::2")!.ToSolicitedNodeMulticast().AddressType, Is.EqualTo(IPv6AddressType.SolicitedNode));
+        }
+    }
+
+    public class BytesConstructor : Address6Test
+    {
+        [Test]
+        public void GivenSixteenBytes_RoundTripsThroughToBytes()
+        {
+            byte[] bytes = Convert.FromHexString("fe80000000000000505400fffe123456");
+
+            Address6 actual = new(bytes);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(actual, Is.EqualTo(Address6.Parse("fe80::5054:ff:fe12:3456")));
+                Assert.That(actual.ToBytes().ToArray(), Is.EqualTo(bytes));
+            });
+        }
+
+        [Test]
+        public void GivenBufferAndOffset_ReadsSixteenBytesFromTheOffset()
+        {
+            byte[] buffer = new byte[20];
+            Address6.Parse("fec0::2")!.ToBytes().CopyTo(buffer.AsSpan(2));
+
+            Assert.That(new Address6(buffer, 2), Is.EqualTo(Address6.Parse("fec0::2")));
+        }
+
+        [Test]
+        public void GivenWrongLength_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => _ = new Address6(new byte[15]));
         }
     }
 }

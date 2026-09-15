@@ -8,14 +8,15 @@ using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
-using Cosmos.Kernel.System.Network.IPv4.TCP;
-using Cosmos.Kernel.System.Network.IPv4.UDP;
 using Cosmos.Kernel.System.Network.IPv4.UDP.DHCP;
 using Cosmos.Kernel.System.Network.IPv4.UDP.DNS;
+using Cosmos.Kernel.System.Network.IPv6;
+using Cosmos.Kernel.System.Network.TCP;
+using Cosmos.Kernel.System.Network.UDP;
 using Cosmos.Kernel.System.Timer;
 using Cosmos.TestRunner.Framework;
-using CosmosEndPoint = Cosmos.Kernel.System.Network.IPv4.EndPoint;
-using CosmosUdpClient = Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient;
+using CosmosEndPoint = Cosmos.Kernel.System.Network.EndPoint;
+using CosmosUdpClient = Cosmos.Kernel.System.Network.UDP.UdpClient;
 using DotNetTcpClient = System.Net.Sockets.TcpClient;
 using DotNetTcpListener = System.Net.Sockets.TcpListener;
 using DotNetUdpClient = System.Net.Sockets.UdpClient;
@@ -50,7 +51,7 @@ public class Kernel : Sys.Kernel
         Log.WriteString("[Network Tests] Starting test suite\n");
 
         // x64 has E1000E network driver
-        TR.Start("Network Tests", expectedTests: 18);
+        TR.Start("Network Tests", expectedTests: 21);
 
         // Network initialization tests
         TR.Run("Network_DeviceDetected", TestNetworkDeviceDetected);
@@ -60,6 +61,11 @@ public class Kernel : Sys.Kernel
         // ICMP tests
         TR.Run("ICMP_PingGateway", TestICMPPingGateway);
         TR.Run("ICMP_HostPing", TestICMPHostPing);
+
+        // IPv6 tests
+        TR.Run("IPv6_LinkLocalConfigured", TestIPv6LinkLocalConfigured);
+        TR.Run("ICMPv6_PingGateway", TestICMPv6PingGateway);
+        TR.Run("ICMPv6_HostPing", TestICMPv6HostPing);
 
         // UDP tests
         TR.Run("UDP_SendPacket", TestUDPSendPacket);
@@ -315,6 +321,188 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(hostAck, "Host should confirm it received a valid echo reply");
+    }
+
+    // ==================== IPv6 Tests ====================
+
+    private static void TestIPv6LinkLocalConfigured()
+    {
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        Address6? linkLocal = NetworkManager.Primary.LinkLocalAddress;
+        MACAddress? mac = NetworkManager.MacAddress;
+        if (linkLocal is null || mac is null)
+        {
+            Assert.True(false, "The primary adapter should carry a link-local address once configured");
+            return;
+        }
+
+        Log.WriteString("[Test] Link-local address: ");
+        Log.WriteString(linkLocal.ToString());
+        Log.WriteString("\n");
+
+        // RFC 4291 Appendix A, checked from the MAC text rather than through
+        // Address6.LinkLocalFor, so a wrong derivation cannot agree with itself.
+        byte[] macBytes = ParseMac(mac.ToString());
+        ReadOnlySpan<byte> bytes = linkLocal.ToBytes();
+
+        Assert.True(bytes[0] == 0xFE && bytes[1] == 0x80, "Link-local address should be in fe80::/64");
+
+        bool middleZero = true;
+        for (int i = 2; i < 8; i++)
+        {
+            if (bytes[i] != 0)
+            {
+                middleZero = false;
+            }
+        }
+        Assert.True(middleZero, "Bytes 2 to 7 of a link-local address should be zero");
+
+        Assert.True(bytes[8] == (byte)(macBytes[0] ^ 0x02) && bytes[9] == macBytes[1] && bytes[10] == macBytes[2]
+            && bytes[11] == 0xFF && bytes[12] == 0xFE
+            && bytes[13] == macBytes[3] && bytes[14] == macBytes[4] && bytes[15] == macBytes[5],
+            "Interface identifier should be the modified EUI-64 of the MAC address");
+    }
+
+    private static void TestICMPv6PingGateway()
+    {
+        if (!NetworkManager.Ready)
+        {
+            Assert.True(false, "Network device not ready");
+            return;
+        }
+
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        // QEMU user networking answers ICMPv6 echo requests to its own
+        // address fec0::2, once Neighbor Discovery has resolved it.
+        Address6 target = new(0xFEC0_0000, 0, 0, 2);
+
+        Log.WriteString("[Test] Pinging ");
+        Log.WriteString(target.ToString());
+        Log.WriteString("...\n");
+
+        Icmpv6Client client = new();
+        client.Connect(target);
+        client.SendEcho();
+
+        CosmosEndPoint endpoint = new(Address6.Zero, 0);
+        int time = client.Receive(ref endpoint, 5000);
+
+        if (time >= 0)
+        {
+            Log.WriteString("[Test] Echo reply from ");
+            Log.WriteString(endpoint.Address.ToString());
+            Log.WriteString(" in ");
+            Log.WriteNumber((ulong)time);
+            Log.WriteString(" ms\n");
+
+            Assert.True(endpoint.Address == target, "Echo reply should come from the pinged address");
+        }
+        else
+        {
+            Log.WriteString("[Test] No echo reply within timeout\n");
+            Assert.True(false, "Should receive ICMPv6 echo reply from gateway");
+        }
+
+        client.Close();
+    }
+
+    private static void TestICMPv6HostPing()
+    {
+        if (!NetworkManager.Ready)
+        {
+            Assert.True(false, "Network device not ready");
+            return;
+        }
+
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        // The test runner's IcmpTestServer resolves our link-local address
+        // with a Neighbor Solicitation, then pings it every 500 ms through the
+        // raw-Ethernet hub port. Phase 1: the solicitation was answered and at
+        // least one echo request replied to.
+        Log.WriteString("[Test] Waiting for ICMPv6 echo request from host...\n");
+
+        int waited = 0;
+        while (Icmpv6Packet.EchoRequestsReplied < 1 && waited < 10000)
+        {
+            TimerManager.Wait(100);
+            waited += 100;
+        }
+
+        if (Icmpv6Packet.EchoRequestsReplied < 1)
+        {
+            Log.WriteString("[Test] No ICMPv6 echo request received from host within timeout\n");
+            Assert.True(false, "Host ICMPv6 echo request should reach the kernel and be answered");
+            return;
+        }
+
+        Log.WriteString("[Test] Answered ");
+        Log.WriteNumber((ulong)Icmpv6Packet.EchoRequestsReplied);
+        Log.WriteString(" ICMPv6 echo request(s) from host\n");
+        Assert.True(NdpPacket.SolicitationsAnswered >= 1, "Host Neighbor Solicitation should have been answered");
+
+        // Phase 2: the host validates our echo reply (pseudo-header checksum
+        // and payload) and only then switches its request payload from
+        // COSMOS_PING6 to HOST_OK6, so seeing it proves the full round trip.
+        Log.WriteString("[Test] Waiting for HOST_OK6 acknowledgment payload...\n");
+
+        bool hostAck = false;
+        waited = 0;
+        while (!hostAck && waited < 10000)
+        {
+            byte[]? data = Icmpv6Packet.LastEchoRequestData;
+            if (data is not null && data.Length >= 8 &&
+                data[0] == (byte)'H' && data[1] == (byte)'O' && data[2] == (byte)'S' &&
+                data[3] == (byte)'T' && data[4] == (byte)'_' && data[5] == (byte)'O' &&
+                data[6] == (byte)'K' && data[7] == (byte)'6')
+            {
+                hostAck = true;
+            }
+            else
+            {
+                TimerManager.Wait(100);
+                waited += 100;
+            }
+        }
+
+        if (hostAck)
+        {
+            Log.WriteString("[Test] Host acknowledged a valid ICMPv6 echo reply\n");
+        }
+        else
+        {
+            Log.WriteString("[Test] No HOST_OK6 payload within timeout\n");
+        }
+
+        Assert.True(hostAck, "Host should confirm it received a valid ICMPv6 echo reply");
+    }
+
+    // Parses "52:54:00:12:34:56" into six bytes; MACAddress keeps its bytes internal.
+    private static byte[] ParseMac(string mac)
+    {
+        byte[] bytes = new byte[6];
+        for (int i = 0; i < 6; i++)
+        {
+            bytes[i] = (byte)((HexValue(mac[i * 3]) << 4) | HexValue(mac[i * 3 + 1]));
+        }
+
+        return bytes;
+    }
+
+    private static int HexValue(char digit)
+    {
+        return digit >= 'A' ? digit - 'A' + 10 : digit - '0';
     }
 
     // ==================== UDP Tests ====================
