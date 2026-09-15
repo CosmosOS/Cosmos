@@ -700,6 +700,8 @@ static Cosmos.Kernel.System.Network.Address.operator &(Cosmos.Kernel.System.Netw
 static Cosmos.Kernel.System.Network.Address.operator ==(Cosmos.Kernel.System.Network.Address! a, Cosmos.Kernel.System.Network.Address! b) -> bool
 static Cosmos.Kernel.System.Network.Address.Parse(System.ReadOnlySpan<char> addr) -> Cosmos.Kernel.System.Network.Address?
 static Cosmos.Kernel.System.Network.Config.DnsConfig.Add(Cosmos.Kernel.System.Network.Address! nameserver) -> void
+static Cosmos.Kernel.System.Network.Config.DnsConfig.HostName.get -> string!
+static Cosmos.Kernel.System.Network.Config.DnsConfig.HostName.set -> void
 static Cosmos.Kernel.System.Network.Config.DnsConfig.Nameservers.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.Network.Address!>!
 static Cosmos.Kernel.System.Network.Config.DnsConfig.Remove(Cosmos.Kernel.System.Network.Address! nameserver) -> void
 static Cosmos.Kernel.System.Network.Config.IPConfig.Enable(Cosmos.Kernel.System.Network.Address! address, Cosmos.Kernel.System.Network.Address! subnetMask, Cosmos.Kernel.System.Network.Address! defaultGateway) -> bool

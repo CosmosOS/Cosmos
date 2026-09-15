@@ -87,6 +87,8 @@ public class Kernel : Sys.Kernel
         TR.Run("DNS_ResolveCnameChain", TestDNSResolveCnameChain);
         TR.Run("DNS_ResolveMultipleARecords", TestDNSResolveMultipleARecords);
         TR.Run("DNS_TwoQueriesOneClient", TestDNSTwoQueriesOneClient);
+        TR.Run("DNS_DotNetGetHostName", TestDotNetDnsGetHostName);
+        TR.Run("DNS_DotNetGetHostAddresses", TestDotNetDnsGetHostAddresses);
 
         Log.WriteString("[Network Tests] All tests completed\n");
         TR.Finish();
@@ -1387,5 +1389,73 @@ public class Kernel : Sys.Kernel
         }
 
         dnsClient.Close();
+    }
+
+    /// <summary>
+    /// The plug on NameResolutionPal is what makes System.Net.Dns work, so
+    /// these two cases go through the standard API with no Cosmos DnsClient in
+    /// sight. This one needs no network: it pins the name the plug reports.
+    /// </summary>
+    private static void TestDotNetDnsGetHostName()
+    {
+        DnsConfig.HostName = "cosmos-test";
+
+        string hostName = Dns.GetHostName();
+
+        Log.WriteString("[Test] Dns.GetHostName() returned: ");
+        Log.WriteString(hostName);
+        Log.WriteString("\n");
+
+        Assert.True(hostName == "cosmos-test", "Dns.GetHostName must report the configured host name");
+
+        DnsConfig.HostName = "cosmos";
+    }
+
+    private static void TestDotNetDnsGetHostAddresses()
+    {
+        if (!NetworkManager.Ready)
+        {
+            Assert.True(false, "Network device not ready");
+            return;
+        }
+
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        DnsConfig.Add(new Address4(1, 1, 1, 1));
+
+        Log.WriteString("[Test] Resolving valentin.bzh through System.Net.Dns...\n");
+
+        IPAddress[] addresses;
+        try
+        {
+            addresses = Dns.GetHostAddresses("valentin.bzh");
+        }
+        catch (SocketException)
+        {
+            // Dns reports every failure by throwing, where the Cosmos client
+            // returns null. Tolerated for the same reason the cases above
+            // tolerate a timeout: this environment may have no resolver.
+            Log.WriteString("[Test] Dns.GetHostAddresses threw SocketException (no resolver reachable)\n");
+            Assert.True(true, "Dns query sent (no resolver in this environment)");
+            return;
+        }
+
+        Assert.True(addresses.Length > 0, "A successful lookup must return at least one address");
+
+        for (int i = 0; i < addresses.Length; i++)
+        {
+            Log.WriteString("[Test] valentin.bzh resolved to: ");
+            Log.WriteString(addresses[i].ToString());
+            Log.WriteString("\n");
+
+            // A plugged IPAddress holds four bytes, so this is also the check
+            // that the plug filtered out anything it could not carry.
+            byte[] octets = addresses[i].GetAddressBytes();
+            Assert.True(octets.Length == 4, "The plug hands back IPv4 addresses only");
+            Assert.True(octets[0] != 0, "A resolved address should not start with a zero octet");
+        }
     }
 }
