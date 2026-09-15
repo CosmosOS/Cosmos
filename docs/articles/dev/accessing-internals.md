@@ -39,7 +39,7 @@ private static extern ref string GetName(Partition partition);
 
 ## Limits
 
-- **Byref returns of inaccessible types throw.** An accessor cannot `ref`-return a field whose own type is inaccessible to the declaring assembly; the runtime rejects it by spec. This is why `ThreadPlug` does not plug `Thread.CreateThread`: the upstream body reads the private `StartHelper`, whose type cannot be byref-returned, so the seam runs below it instead (see the comment in [ThreadPlug.cs](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.Plugs/System/Threading/ThreadPlug.cs)).
+- **Byref returns of inaccessible types throw.** An accessor cannot `ref`-return a field whose own type is inaccessible to the declaring assembly; the runtime rejects it by spec. This is why `ThreadPlug` does not plug `Thread.CreateThread`: the upstream body reads the private `StartHelper`, whose type cannot be byref-returned, so the seam runs below it instead (see the comment in [ThreadPlug.cs](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Plugs/System/Threading/ThreadPlug.cs)).
 - **Resolution failures surface at the call site**, not as a compile error: a renamed or removed target member turns the accessor into a throwing stub.
 - **Signatures must match exactly**, including custom modifiers on the rare members that carry them.
 

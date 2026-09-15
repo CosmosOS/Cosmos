@@ -62,4 +62,4 @@ Notes:
 
 ## Related components
 
-- [`Cosmos.Build.GCC`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Build.GCC)
+- [`Cosmos.Build.GCC`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Build.CC)

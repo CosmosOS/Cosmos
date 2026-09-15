@@ -7,7 +7,7 @@
 
 ## Windows
 
-Download and run the latest installer from the [Releases](https://github.com/valentinbreiz/nativeaot-patcher/releases) page:
+Download and run the latest installer from the [Releases](https://github.com/CosmosOS/Cosmos/releases) page:
 
 ```
 CosmosSetup-<version>-windows.exe

@@ -71,7 +71,7 @@ while (true)
 <!-- video: the cursor dot following the mouse while the position readout updates and the L, M and R indicators light up as each button is pressed -->
 <video src="images/mouse-cursor.mp4" controls autoplay muted loop playsinline style="max-width:100%"></video>
 
-Call `SetScreenSize` once at startup: the manager clamps `X` and `Y` to those bounds (the default is 1024x768, which rarely matches the framebuffer). For a real arrow cursor, blit a small bitmap instead of the circle; the DevKernel has a ready-made one in [MouseCursor.cs](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/examples/DevKernel/Graphics/MouseCursor.cs).
+Call `SetScreenSize` once at startup: the manager clamps `X` and `Y` to those bounds (the default is 1024x768, which rarely matches the framebuffer). For a real arrow cursor, blit a small bitmap instead of the circle; the DevKernel has a ready-made one in [MouseCursor.cs](https://github.com/CosmosOS/Cosmos/blob/gen3/examples/DevKernel/Graphics/MouseCursor.cs).
 
 ## Painting with the mouse
 
