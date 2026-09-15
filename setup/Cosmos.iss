@@ -12,7 +12,7 @@
   #error "COSMOS_VERSION env var must be set when invoking ISCC (typically via 'cosmos install')"
 #endif
 #define MyAppPublisher "Cosmos Project"
-#define MyAppURL "https://github.com/CosmosOS/nativeaot-patcher"
+#define MyAppURL "https://github.com/CosmosOS/Cosmos"
 
 [Setup]
 AppId={{E5B3A550-47DB-4E3C-B714-C6D01F1E9F3C}
