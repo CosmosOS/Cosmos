@@ -112,4 +112,16 @@ public interface IInodeOperations
     /// <param name="attributes">Source values for the selected fields.</param>
     /// <returns>true on success; false when a selected change is not supported.</returns>
     bool SetAttr(IVfsInode inode, SetAttrFlags flags, in VfsStat attributes);
+
+    /// <summary>
+    /// Read the target of a symbolic link.
+    /// </summary>
+    /// <param name="symlink">Inode of the symbolic link.</param>
+    /// <param name="target">Link target on success.</param>
+    /// <returns>true when <paramref name="symlink"/> is a symbolic link and the target was read.</returns>
+    bool TryReadLink(IVfsInode symlink, out string? target)
+    {
+        target = null;
+        return false;
+    }
 }
