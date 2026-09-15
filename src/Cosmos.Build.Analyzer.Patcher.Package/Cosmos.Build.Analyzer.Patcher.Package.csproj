@@ -7,9 +7,7 @@
   <PropertyGroup>
     <PackageId>Cosmos.Build.Analyzer.Patcher</PackageId>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher.git</PackageProjectUrl>
     <!-- <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl> -->
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher.git</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>Cosmos.Patcher.Analyzer</Description>
     <PackageReleaseNotes>Release</PackageReleaseNotes>

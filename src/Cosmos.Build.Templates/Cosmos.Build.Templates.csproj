@@ -4,8 +4,6 @@
     <Title>Cosmos Build Templates</Title>
     <Description>Build templates and configuration files for Cosmos kernel development including linker scripts, bootloader configurations, and dotnet new project templates.</Description>
     <PackageTags>cosmos;build;templates;dotnet-new;kernel;os</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
 
     <PackageType>Template</PackageType>

@@ -12,8 +12,6 @@
     <Title>Cosmos Kernel Core</Title>
     <Description>Core kernel functionality for Cosmos including memory management, runtime, and fundamental kernel services.</Description>
     <PackageTags>cosmos;kernel;core;memory;heap;allocation;kernel-services;runtime</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <!-- This assembly declares the experimental scheduler seam and consumes it itself. -->
     <NoWarn>$(NoWarn);COSMOS0001</NoWarn>

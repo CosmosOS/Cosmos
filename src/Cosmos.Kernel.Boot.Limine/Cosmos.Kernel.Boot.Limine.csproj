@@ -7,8 +7,6 @@
     <Title>Cosmos Kernel Limine Boot Support</Title>
     <Description>Limine bootloader support for Cosmos kernel development including framebuffer and protocol structures.</Description>
     <PackageTags>cosmos;kernel;limine;bootloader;framebuffer;boot;protocol;uefi;bios</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
   </PropertyGroup>
 </Project>

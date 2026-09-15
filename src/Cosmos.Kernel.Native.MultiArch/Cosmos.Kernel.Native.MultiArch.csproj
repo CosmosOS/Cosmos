@@ -6,8 +6,6 @@
     <Title>Cosmos Kernel Multi-Arch Native C</Title>
     <Description>Shared native C sources for Cosmos kernel (x64 and arm64).</Description>
     <PackageTags>cosmos;kernel;native;c;multiarch</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
   </PropertyGroup>
 

@@ -8,8 +8,6 @@
     <Title>Cosmos Kernel X64 Native Assembly</Title>
     <Description>X64 (x86-64) native assembly routines for Cosmos kernel development including port I/O operations and CPU control.</Description>
     <PackageTags>cosmos;kernel;x64;x86_64;assembly;native;asm;port;io;in;out;cpu</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
   </PropertyGroup>
 

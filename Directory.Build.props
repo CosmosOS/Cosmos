@@ -20,6 +20,21 @@
   </PropertyGroup>
 
   <!--
+    Package identity shared by every Cosmos package. Gen3 ships from
+    CosmosOS/Cosmos and publishes under the CosmosOS profile on nuget.org, so
+    the repository links live here instead of being restated - and drifting -
+    in each packable csproj. Per-package identity (PackageId, Title,
+    Description, PackageTags) stays with the project it describes.
+  -->
+  <PropertyGroup>
+    <Authors>CosmosOS</Authors>
+    <Company>CosmosOS</Company>
+    <PackageProjectUrl>https://github.com/CosmosOS/Cosmos</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CosmosOS/Cosmos</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <!--
     Single source of truth for the version of every Cosmos package.
 
     The authoritative literal lives in `global.json` under
