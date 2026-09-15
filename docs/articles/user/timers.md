@@ -14,7 +14,7 @@ The two managers are the thing to read first. `TimerManager` runs a callback fro
 | `Schedule` hands back | A `SoftwareTimer` handle, or null | An alarm id, or 0 |
 | Feature switch | `CosmosEnableTimer` | `CosmosEnableScheduler` |
 
-If you find bugs or something abnormal, please [submit an issue](https://github.com/valentinbreiz/nativeaot-patcher/issues/new) on our repository.
+If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
 ---
 

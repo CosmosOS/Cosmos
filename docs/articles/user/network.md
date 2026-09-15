@@ -12,7 +12,7 @@ The main differences if you come from Gen2:
 | DNS | Cosmos client class | Standard `System.Net.Dns` (plugged), or the Cosmos `DnsClient` |
 | NIC drivers | RTL8168, E1000, PCNET | Intel E1000E (x64), virtio-net (x64 PCI + ARM64 MMIO) |
 
-None of these protocols implements every feature of its RFC. If you find bugs or something abnormal, please [submit an issue](https://github.com/valentinbreiz/nativeaot-patcher/issues/new) on our repository.
+None of these protocols implements every feature of its RFC. If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
 ## Enable networking in your kernel
 

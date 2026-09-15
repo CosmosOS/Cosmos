@@ -13,7 +13,7 @@ The main differences if you come from Gen2:
 | Cursor | Drawn by your code | Drawn by your code |
 | Devices | PS/2 mouse | PS/2 mouse with scroll wheel (x64), virtio-mouse (x64 PCI and ARM64 MMIO) |
 
-If you find bugs or something abnormal, please [submit an issue](https://github.com/valentinbreiz/nativeaot-patcher/issues/new) on our repository.
+If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
 ## Enable the mouse in your kernel
 

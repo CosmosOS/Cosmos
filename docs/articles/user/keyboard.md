@@ -12,7 +12,7 @@ The main differences if you come from Gen2:
 | Layouts | US, FR, DE, ES, GB, TR, Dvorak scan maps | Same set, in `Cosmos.Kernel.System.Keyboard.ScanMaps` |
 | Devices | PS/2 keyboard | PS/2 keyboard (x64), virtio-keyboard (x64 PCI and ARM64 MMIO) |
 
-If you find bugs or something abnormal, please [submit an issue](https://github.com/valentinbreiz/nativeaot-patcher/issues/new) on our repository.
+If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
 ## Enable the keyboard in your kernel
 
