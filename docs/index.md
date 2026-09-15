@@ -43,6 +43,20 @@ Architecture and internals, for contributors and the curious:
  - [Kernel Compilation Steps](articles/dev/build/kernel-compilation-steps.md): C# to bootable ISO, end to end.
  - [Cosmos.Build.Asm](articles/dev/build/asm-build.md), [Cosmos.Build.GCC](articles/dev/build/gcc-build.md), [Cosmos.Build.Patcher](articles/dev/build/patcher-build.md), [Cosmos.Build.Ilc](articles/dev/build/ilc-build.md): the build pipeline components.
 
+## Cross-referencing
+
+The API reference publishes a DocFX cross-reference map at [`/xrefmap.yml`](https://cosmosos.github.io/xrefmap.yml), covering every documented namespace, type and member. Another DocFX site consumes it by adding that URL to the `xref` list of its own `docfx.json`:
+
+```json
+{
+  "build": {
+    "xref": [ "https://cosmosos.github.io/xrefmap.yml" ]
+  }
+}
+```
+
+Cosmos types are then linked by UID instead of by URL, as `<xref:Cosmos.Kernel.System.Graphics.Canvas>` or its `@Cosmos.Kernel.System.Graphics.Canvas` shorthand. Each frozen release copy carries its own map beside it, at `/vX.Y.Z/xrefmap.yml` and `/latest/xrefmap.yml`.
+
 ## Resources
 - [Cosmos Gen3: The NativeAOT Era and the End of IL2CPU?](https://valentin.bzh/posts/3)
 - [NativeAOT Developer Workflow](https://github.com/dotnet/runtime/blob/main/docs/workflow/building/coreclr/nativeaot.md)
