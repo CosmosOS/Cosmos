@@ -410,12 +410,13 @@ jobs:
         run: |
           version="${{ needs.build-packages.outputs.version }}"
 
-          # CosmosOS/Cosmos keeps the naming its releases have carried since
-          # the Gen2 User Kits, with the build number in place of the old date
-          # stamp: "User Kit 3.0.85" rather than "v3.0.85". The tag stays
-          # v3.0.85 on both remotes, because that is what triggers this run.
+          # CosmosOS/Cosmos keeps the naming its releases have carried since the
+          # Gen2 User Kits: the UTC build date the kits were stamped with, plus
+          # the build it ships, so "User Kit 20260915 (3.0.85)" beside the old
+          # "User Kit 20221121". The tag stays v3.0.85 on both remotes, because
+          # that is what triggers this run and what versions the packages.
           if [[ "$GITHUB_REPOSITORY" == "CosmosOS/Cosmos" ]]; then
-            echo "name=User Kit $version" >> "$GITHUB_OUTPUT"
+            echo "name=User Kit $(date -u +%Y%m%d) ($version)" >> "$GITHUB_OUTPUT"
           else
             echo "name=v$version" >> "$GITHUB_OUTPUT"
           fi
