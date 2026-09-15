@@ -13,7 +13,7 @@ The main differences if you come from Gen2:
 | Text console | Separate VGA text mode | Rendered on the same canvas |
 | Colors | `System.Drawing.Color` | `System.Drawing.Color` |
 
-If you find bugs or something abnormal, please [submit an issue](https://github.com/valentinbreiz/nativeaot-patcher/issues/new) on our repository.
+If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
 ## Enable graphics in your kernel
 
