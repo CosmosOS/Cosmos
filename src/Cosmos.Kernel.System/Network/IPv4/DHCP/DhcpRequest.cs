@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.UDP;
 
-namespace Cosmos.Kernel.System.Network.IPv4.UDP.DHCP;
+namespace Cosmos.Kernel.System.Network.IPv4.DHCP;
 
 /// <summary>
 /// Represents a DHCPREQUEST packet, broadcast to request a previously offered address.

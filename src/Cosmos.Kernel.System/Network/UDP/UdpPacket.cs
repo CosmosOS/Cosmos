@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.System.Network.IPv4.UDP.DHCP;
+using Cosmos.Kernel.System.Network.IPv4.DHCP;
 
 namespace Cosmos.Kernel.System.Network.UDP;
 

@@ -431,6 +431,10 @@ Cosmos.Kernel.System.Network.IPv4.Address4.Equals(Cosmos.Kernel.System.Network.I
 Cosmos.Kernel.System.Network.IPv4.Address4.IsAPIPA() -> bool
 Cosmos.Kernel.System.Network.IPv4.Address4.Segment1.get -> uint
 Cosmos.Kernel.System.Network.IPv4.Address4.ToString(Cosmos.Kernel.System.Network.AddressNumericStyle numericStyle = Cosmos.Kernel.System.Network.AddressNumericStyle.Dec, bool leadingZeros = false) -> string!
+Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpClient
+Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpClient.DhcpClient() -> void
+Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpClient.SendDiscoverPacket() -> int
+Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpClient.SendReleasePacket() -> void
 Cosmos.Kernel.System.Network.IPv4.IcmpClient
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.Close() -> void
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.Connect(Cosmos.Kernel.System.Network.Address! dest) -> void
@@ -438,10 +442,6 @@ Cosmos.Kernel.System.Network.IPv4.IcmpClient.Dispose() -> void
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.IcmpClient() -> void
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.Receive(ref Cosmos.Kernel.System.Network.EndPoint! source, int timeout = 5000) -> int
 Cosmos.Kernel.System.Network.IPv4.IcmpClient.SendEcho(ushort id = 1, ushort sequence = 1) -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpClient
-Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpClient.DhcpClient() -> void
-Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpClient.SendDiscoverPacket() -> int
-Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpClient.SendReleasePacket() -> void
 Cosmos.Kernel.System.Network.IPv6.Address6
 Cosmos.Kernel.System.Network.IPv6.Address6.Address6(byte[]! buffer, int offset) -> void
 Cosmos.Kernel.System.Network.IPv6.Address6.Address6(System.ReadOnlySpan<byte> buffer) -> void
@@ -912,6 +912,32 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.EthernetPacket.RawData.get -> byte[]!
 [COSMOS0002]Cosmos.Kernel.System.Network.EthernetPacket.SourceMac.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
 [COSMOS0002]Cosmos.Kernel.System.Network.InternetPacket
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpDiscover
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpDiscover.DhcpDiscover(byte[]! rawData) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpDiscover.DhcpDiscover(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! sourceMAC) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpOption
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpOption.Data.get -> byte[]!
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpOption.Data.init -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpOption.DhcpOption() -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpOption.Length.get -> byte
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpOption.Type.get -> byte
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpOption.Type.init -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket.Client.get -> Cosmos.Kernel.System.Network.Address?
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket.DhcpPacket(byte[]! rawData) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket.DhcpPacket(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! sourceMac, ushort dhcpDataSize) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket.DhcpPacket(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! sourceMAC, ushort dhcpDataSize) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket.DNS.get -> Cosmos.Kernel.System.Network.Address?
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket.Gateway.get -> Cosmos.Kernel.System.Network.Address?
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket.Operation.get -> byte
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket.Options.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpOption!>?
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpPacket.Subnet.get -> Cosmos.Kernel.System.Network.Address?
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpRelease
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpRelease.DhcpRelease(byte[]! rawData) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpRelease.DhcpRelease(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! source) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpRequest
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpRequest.DhcpRequest(byte[]! rawData) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.DHCP.DhcpRequest.DhcpRequest(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! sourceMAC, Cosmos.Kernel.System.Network.Address! requestedAddress) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IcmpClient.ReceivePacket(int timeoutMs = 5000) -> Cosmos.Kernel.System.Network.IPv4.IcmpPacket?
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IcmpClient.Send(Cosmos.Kernel.System.Network.IPv4.IcmpPacket! packet) -> bool
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IcmpEchoReply
@@ -945,32 +971,6 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.Protocol.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.TTL.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.IPv4.IPPacket.TypeOfService.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpDiscover
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpDiscover.DhcpDiscover(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpDiscover.DhcpDiscover(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! sourceMAC) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpOption
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpOption.Data.get -> byte[]!
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpOption.Data.init -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpOption.DhcpOption() -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpOption.Length.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpOption.Type.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpOption.Type.init -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket.Client.get -> Cosmos.Kernel.System.Network.Address?
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket.DhcpPacket(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket.DhcpPacket(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! sourceMac, ushort dhcpDataSize) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket.DhcpPacket(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! sourceMAC, ushort dhcpDataSize) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket.DNS.get -> Cosmos.Kernel.System.Network.Address?
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket.Gateway.get -> Cosmos.Kernel.System.Network.Address?
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket.Operation.get -> byte
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket.Options.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpOption!>?
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpPacket.Subnet.get -> Cosmos.Kernel.System.Network.Address?
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpRelease
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpRelease.DhcpRelease(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpRelease.DhcpRelease(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! source) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpRequest
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpRequest.DhcpRequest(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.IPv4.UDP.DHCP.DhcpRequest.DhcpRequest(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! sourceMAC, Cosmos.Kernel.System.Network.Address! requestedAddress) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags
 [COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags.ACK = 16 -> Cosmos.Kernel.System.Network.TCP.TcpFlags
 [COSMOS0002]Cosmos.Kernel.System.Network.TCP.TcpFlags.FIN = 1 -> Cosmos.Kernel.System.Network.TCP.TcpFlags

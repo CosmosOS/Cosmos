@@ -12,7 +12,7 @@ using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.UDP;
 using Cosmos.Kernel.System.Timer;
 
-namespace Cosmos.Kernel.System.Network.IPv4.UDP.DHCP;
+namespace Cosmos.Kernel.System.Network.IPv4.DHCP;
 
 /// <summary>
 /// Used to manage the DHCP connection to a server.
