@@ -422,12 +422,15 @@ jobs:
 
           # Left alone, GitHub diffs against whatever release is newest, and on
           # CosmosOS/Cosmos that is the rolling tools-latest, which shares no
-          # history with the source. Pin the base to the previous v* release of
-          # this repository instead.
-          previous=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 \
+          # history with the source. Pin the base to the highest earlier Gen3
+          # release of this repository instead. The pattern has to be strict:
+          # CosmosOS/Cosmos also carries a v0.20150130 release from Gen2 that a
+          # looser `^v[0-9]` would happily pick.
+          previous=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 200 \
             --json tagName \
-            --jq '[.[] | select(.tagName | test("^v[0-9]"))] | .[0].tagName // ""')
-          if [[ -n "$previous" && "$previous" != "v$version" ]]; then
+            --jq '.[] | select(.tagName | test("^v[0-9]+\\.[0-9]+\\.[0-9]+$")) | .tagName' \
+            | grep -vx "v$version" | sort -Vr | head -1)
+          if [[ -n "$previous" ]]; then
             echo "generate=true" >> "$GITHUB_OUTPUT"
             echo "previous_tag=$previous" >> "$GITHUB_OUTPUT"
             echo "extra=" >> "$GITHUB_OUTPUT"
@@ -460,7 +463,7 @@ jobs:
             | Windows | `CosmosSetup-${{ needs.build-packages.outputs.version }}-windows.exe` | Requires .NET 10 SDK, run installer |
             | Linux / macOS | `dotnet tool install -g Cosmos.Tools && cosmos install` | Requires .NET 10 SDK |
 
-            Already installed? Run `cosmos update` to move to this release — or `dotnet tool update -g Cosmos.Tools && cosmos install` if your CLI predates the update command.
+            Already installed? Run `cosmos update` to move to this release, or `dotnet tool update -g Cosmos.Tools && cosmos install` if your CLI predates the update command.
 
             ### Prerequisites
 
