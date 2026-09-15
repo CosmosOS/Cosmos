@@ -401,7 +401,7 @@ while (true)
 <!-- video: the cube spinning above the grid, then rolling right, left, toward the camera and away as the mouse is pushed to each edge of the screen, the arrow on the ground showing the push direction -->
 <video src="images/graphics-3d-cube.mp4" controls autoplay muted loop playsinline style="max-width:100%"></video>
 
-The full demo, cube mesh and direction arrow included, is [SpinningCubeDemo.cs](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/examples/DevKernel/Graphics/SpinningCubeDemo.cs).
+The full demo, cube mesh and direction arrow included, is [SpinningCubeDemo.cs](https://github.com/CosmosOS/Cosmos/blob/gen3/examples/DevKernel/Graphics/SpinningCubeDemo.cs).
 
 ## Current limitations
 
@@ -413,7 +413,7 @@ The full demo, cube mesh and direction arrow included, is [SpinningCubeDemo.cs](
 
 ## How it works
 
-`Canvas.GetFullScreen()` returns the canvas for whichever display device the kernel found. Everywhere except a VMware SVGA II adapter that is the framebuffer the [Limine](https://limine-bootloader.org/) bootloader requests from the firmware (UEFI GOP) before handing control to the kernel; on that adapter it is the canvas driving the device, which is a `Canvas3D` when the adapter negotiates 3D (see [3D rendering](#3d-rendering)). This is why the same code works unmodified on x64 and ARM64: the kernel never touches a video card directly. Drawing calls land in a back buffer in ordinary memory; `Display()` copies the whole back buffer into the mapped framebuffer in one go. The kernel console ([`KernelConsole`](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/src/Cosmos.Kernel.System/Graphics/KernelConsole.cs)) renders `Console` output onto that same canvas with the default PSF font, calling `Display()` after every write.
+`Canvas.GetFullScreen()` returns the canvas for whichever display device the kernel found. Everywhere except a VMware SVGA II adapter that is the framebuffer the [Limine](https://limine-bootloader.org/) bootloader requests from the firmware (UEFI GOP) before handing control to the kernel; on that adapter it is the canvas driving the device, which is a `Canvas3D` when the adapter negotiates 3D (see [3D rendering](#3d-rendering)). This is why the same code works unmodified on x64 and ARM64: the kernel never touches a video card directly. Drawing calls land in a back buffer in ordinary memory; `Display()` copies the whole back buffer into the mapped framebuffer in one go. The kernel console ([`KernelConsole`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.System/Graphics/KernelConsole.cs)) renders `Console` output onto that same canvas with the default PSF font, calling `Display()` after every write.
 
 ```
 Canvas API (shapes, text, images)      (Cosmos.Kernel.System.Graphics)

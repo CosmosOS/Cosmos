@@ -154,7 +154,7 @@ public class BuildFixture
         }
 
         throw new InvalidOperationException(
-            "Could not find repo root. Run tests from within the nativeaot-patcher repository.");
+            "Could not find repo root. Run tests from within the Cosmos repository.");
     }
 
     private sealed class FileRestorer : IDisposable

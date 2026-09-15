@@ -19,7 +19,7 @@
       "description": "Display getting started instructions",
       "manualInstructions": [
         {
-          "text": "Your Cosmos kernel project has been created!\n\nGetting Started:\n\n1. Build for x64:\n   dotnet publish -r linux-x64\n\n2. Build for ARM64:\n   dotnet publish -r linux-arm64\n\n3. Test with QEMU (x64):\n   qemu-system-x86_64 -cdrom ./output-x64/KernelName.iso -m 512M -serial stdio\n\n4. Test with QEMU (ARM64):\n   qemu-system-aarch64 -M virt -cpu cortex-a72 -m 512M -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd -cdrom ./output-arm64/KernelName.iso -serial stdio\n\nArchitecture is auto-detected from RuntimeIdentifier. Switch anytime without reinstalling packages!\n\nDocumentation: https://github.com/valentinbreiz/nativeaot-patcher"
+          "text": "Your Cosmos kernel project has been created!\n\nGetting Started:\n\n1. Build for x64:\n   dotnet publish -r linux-x64\n\n2. Build for ARM64:\n   dotnet publish -r linux-arm64\n\n3. Test with QEMU (x64):\n   qemu-system-x86_64 -cdrom ./output-x64/KernelName.iso -m 512M -serial stdio\n\n4. Test with QEMU (ARM64):\n   qemu-system-aarch64 -M virt -cpu cortex-a72 -m 512M -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd -cdrom ./output-arm64/KernelName.iso -serial stdio\n\nArchitecture is auto-detected from RuntimeIdentifier. Switch anytime without reinstalling packages!\n\nDocumentation: https://cosmosos.github.io/"
         }
       ]
     }
