@@ -52,12 +52,21 @@ public static class InteropSysPlug
     /// Provides cryptographically secure random bytes.
     /// In a real kernel, this would use hardware RNG (RDRAND) if available.
     /// </summary>
+    /// <returns>Zero, which the caller reads as success. The target returns
+    /// <see langword="int"/> rather than <see langword="void"/>, unlike its
+    /// non-cryptographic sibling, and a plug whose return type disagrees with
+    /// the target patches in a body that leaves the wrong thing on the stack:
+    /// ILC then reports the method as always throwing on invalid IL.</returns>
     [PlugMember]
-    public static unsafe void GetCryptographicallySecureRandomBytes(byte* buffer, int length)
+    public static unsafe int GetCryptographicallySecureRandomBytes(byte* buffer, int length)
     {
         // For now, use the same non-crypto implementation
         // TODO: Use RDRAND instruction if available
         GetNonCryptographicallySecureRandomBytes(buffer, length);
+
+        // Anything but zero makes the caller throw CryptographicException, and
+        // the fallback generator has no failure mode.
+        return 0;
     }
 
     [PlugMember]
