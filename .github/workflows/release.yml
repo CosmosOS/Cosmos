@@ -403,24 +403,55 @@ jobs:
           path: installers
           merge-multiple: false
 
-      # CosmosOS/Cosmos keeps the naming its releases have carried since the
-      # Gen2 User Kits, with the build number in place of the old date stamp:
-      # "User Kit 3.0.85" rather than "v3.0.85". The tag itself stays v3.0.85
-      # on both remotes, because that is what triggers this workflow.
-      - name: Compose release name
-        id: name
+      - name: Compose release name and notes
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           version="${{ needs.build-packages.outputs.version }}"
+
+          # CosmosOS/Cosmos keeps the naming its releases have carried since
+          # the Gen2 User Kits, with the build number in place of the old date
+          # stamp: "User Kit 3.0.85" rather than "v3.0.85". The tag stays
+          # v3.0.85 on both remotes, because that is what triggers this run.
           if [[ "$GITHUB_REPOSITORY" == "CosmosOS/Cosmos" ]]; then
             echo "name=User Kit $version" >> "$GITHUB_OUTPUT"
           else
             echo "name=v$version" >> "$GITHUB_OUTPUT"
           fi
 
+          # Left alone, GitHub diffs against whatever release is newest, and on
+          # CosmosOS/Cosmos that is the rolling tools-latest, which shares no
+          # history with the source. Pin the base to the previous v* release of
+          # this repository instead.
+          previous=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 \
+            --json tagName \
+            --jq '[.[] | select(.tagName | test("^v[0-9]"))] | .[0].tagName // ""')
+          if [[ -n "$previous" && "$previous" != "v$version" ]]; then
+            echo "generate=true" >> "$GITHUB_OUTPUT"
+            echo "previous_tag=$previous" >> "$GITHUB_OUTPUT"
+            echo "extra=" >> "$GITHUB_OUTPUT"
+          else
+            # No earlier v* release here, so there is nothing to diff: the first
+            # Gen3 release on this remote points readers at the roadmap instead
+            # of a changelog against an unrelated tag.
+            echo "generate=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "extra<<RELEASE_EXTRA"
+              echo ""
+              echo "### What's in this release"
+              echo ""
+              echo "First Gen3 release published from this repository. See the"
+              echo "[roadmap](https://cosmosos.github.io/roadmap.html) for what"
+              echo "is done and what is next."
+              echo "RELEASE_EXTRA"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ steps.name.outputs.name }}
+          name: ${{ steps.release.outputs.name }}
           body: |
             ### Downloads
 
@@ -438,11 +469,12 @@ jobs:
             ### Quick Start
 
             - [Installation guide](https://cosmosos.github.io/articles/user/install.html)
-          # Append the auto-generated changelog (merged PRs / commits since the
-          # previous tag) below the download table. .github/release.yml groups
-          # those entries under Features, Bug Fixes and Improvements, the
-          # headings the Gen2 User Kit releases used.
-          generate_release_notes: true
+            ${{ steps.release.outputs.extra }}
+          # Append the changelog GitHub generates from the pull requests merged
+          # since previous_tag. Off for the first release on a remote, which has
+          # no earlier v* tag to compare against.
+          generate_release_notes: ${{ steps.release.outputs.generate }}
+          previous_tag: ${{ steps.release.outputs.previous_tag }}
           draft: false
           prerelease: false
           files: |
