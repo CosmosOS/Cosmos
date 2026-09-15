@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.System.Network.IPv6;
 
 namespace Cosmos.Kernel.System.Network;
 
@@ -75,6 +76,21 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
         {
             INetworkDevice? device = Device;
             return device is null ? null : Config.IPConfig.Get(device);
+        }
+    }
+
+    /// <summary>
+    /// The link-local IPv6 address the stack answers on for this device,
+    /// <c>fe80::/64</c> with an interface identifier derived from the MAC
+    /// address, or null while the device is unconfigured or the handle names
+    /// none. It comes up with the device's IPv4 configuration.
+    /// </summary>
+    public Address6? LinkLocalAddress
+    {
+        get
+        {
+            INetworkDevice? device = Device;
+            return device is null ? null : NetworkStack.LinkLocalOf(device);
         }
     }
 

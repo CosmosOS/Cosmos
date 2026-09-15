@@ -23,6 +23,14 @@ public static class DnsConfig
     public static IReadOnlyList<Address> Nameservers => s_nameservers;
 
     /// <summary>
+    /// The name this machine answers to. It is what the plugged
+    /// <c>System.Net.Dns.GetHostName</c> reports, and what resolving an empty
+    /// name resolves instead. Nothing in the kernel or in DHCP sets it, so it
+    /// keeps its default until a kernel assigns one.
+    /// </summary>
+    public static string HostName { get; set; } = "cosmos";
+
+    /// <summary>
     /// Registers a given DNS server.
     /// </summary>
     /// <param name="nameserver">The IP address of the target DNS server.</param>

@@ -8,8 +8,9 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.System.Network.UDP;
 
-namespace Cosmos.Kernel.System.Network.IPv4.UDP.DHCP;
+namespace Cosmos.Kernel.System.Network.IPv4.DHCP;
 
 /// <summary>
 /// Represents a single DHCP option parsed from the options section of a <see cref="DhcpPacket"/>.

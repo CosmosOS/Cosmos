@@ -1,7 +1,9 @@
-namespace Cosmos.Kernel.System.Network.IPv4;
+using Cosmos.Kernel.System.Network.IPv4;
+
+namespace Cosmos.Kernel.System.Network;
 
 /// <summary>
-/// Represents an IPv4 end-point.
+/// An address and port pair, of either IP version.
 /// </summary>
 public sealed class EndPoint : IComparable<EndPoint>, IEquatable<EndPoint>
 {
@@ -18,7 +20,7 @@ public sealed class EndPoint : IComparable<EndPoint>, IEquatable<EndPoint>
     /// <summary>
     /// Initializes a new instance of the <see cref="EndPoint"/> class.
     /// </summary>
-    /// <param name="addr">The IPv4 address.</param>
+    /// <param name="addr">The address.</param>
     /// <param name="port">The port.</param>
     public EndPoint(Address addr, ushort port)
     {
@@ -29,7 +31,7 @@ public sealed class EndPoint : IComparable<EndPoint>, IEquatable<EndPoint>
     /// <summary>
     /// Initializes a new instance of the <see cref="EndPoint"/> class.
     /// </summary>
-    /// <param name="addr">The IPv4 address.</param>
+    /// <param name="addr">The IPv4 address as a packed 32-bit value.</param>
     /// <param name="port">The port.</param>
     public EndPoint(uint addr, ushort port)
     {

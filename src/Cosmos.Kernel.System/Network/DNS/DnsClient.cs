@@ -6,9 +6,12 @@
 */
 
 using Cosmos.Kernel.System.Network.Config;
+using Cosmos.Kernel.System.Network.IPv4;
+using Cosmos.Kernel.System.Network.IPv6;
+using Cosmos.Kernel.System.Network.UDP;
 using Cosmos.Kernel.System.Timer;
 
-namespace Cosmos.Kernel.System.Network.IPv4.UDP.DNS;
+namespace Cosmos.Kernel.System.Network.DNS;
 
 /// <summary>
 /// Used to manage a DNS connection to a server.
@@ -37,9 +40,13 @@ public sealed class DnsClient : UdpClient
     /// Sends a DNS query for the given domain name string.
     /// </summary>
     /// <param name="url">The domain name string to query the DNS for.</param>
+    /// <param name="recordType">The record type to ask for, one of
+    /// <see cref="DnsRecordType"/>. Defaults to <see cref="DnsRecordType.A"/>.
+    /// Which version carries the query is decided by the server address passed
+    /// to <see cref="Connect(Address)"/>, not by this.</param>
     /// <exception cref="InvalidOperationException">No DNS server has been set
     /// with Connect, or no configured interface can reach it.</exception>
-    public void SendQuery(string url)
+    public void SendQuery(string url, ushort recordType = DnsRecordType.A)
     {
         if (_destination is null)
         {
@@ -49,9 +56,9 @@ public sealed class DnsClient : UdpClient
         Address source = IPConfig.FindNetwork(_destination)
             ?? throw new InvalidOperationException("No network route to DNS server. Run 'netconfig' or 'dhcp' first.");
         _queryUrl = url;
-        DnsPacketQuery askpacket = new(source, _destination!, url);
+        DnsPacketQuery askpacket = new(source, _destination!, url, recordType);
 
-        OutgoingBuffer.AddPacket(askpacket);
+        askpacket.Network.Enqueue();
         NetworkStack.Update();
     }
 
@@ -62,7 +69,7 @@ public sealed class DnsClient : UdpClient
     /// <returns>The first address for the queried name, or
     /// <see langword="null"/>. The null covers every way a lookup can fail
     /// (no reply before the timeout, a reply for a different name, a server
-    /// error code, a name that does not exist, a reply carrying no A record),
+    /// error code, a name that does not exist, a reply carrying no address record),
     /// so a caller that needs to tell them apart must read the reply packet
     /// itself off the seam.</returns>
     public Address? Receive(int timeout = 5000)
@@ -72,7 +79,7 @@ public sealed class DnsClient : UdpClient
     }
 
     /// <summary>
-    /// Resolves any CNAME chain and returns every A record for the final name.
+    /// Resolves any CNAME chain and returns every address record for the final name.
     /// </summary>
     /// <param name="timeout">The timeout value - by default 5000ms.</param>
     /// <returns>All resolved addresses, in server order, or
@@ -117,7 +124,7 @@ public sealed class DnsClient : UdpClient
     }
 
     /// <summary>
-    /// Follows a CNAME chain from <paramref name="name"/>, then collects the final A records.
+    /// Follows a CNAME chain from <paramref name="name"/>, then collects the final address records.
     /// </summary>
     private static List<Address>? ResolveAddresses(List<DnsAnswer> answers, string name)
     {
@@ -148,16 +155,26 @@ public sealed class DnsClient : UdpClient
             current = cname.CanonicalName;
         }
 
-        // Collect the A records for the final name.
+        // Collect the address records for the final name. A reply is free to
+        // carry both types, and the record length is what decides which
+        // address this is, so a record whose length disagrees with its type is
+        // skipped rather than read past.
         List<Address> results = [];
         foreach (DnsAnswer record in answers)
         {
-            if (record.Type == DnsRecordType.A &&
-                record.Address is { Length: 4 } &&
-                record.ResolvedName is not null &&
-                string.Equals(record.ResolvedName, current, StringComparison.OrdinalIgnoreCase))
+            if (record.ResolvedName is null ||
+                !string.Equals(record.ResolvedName, current, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (record.Type == DnsRecordType.A && record.Address is { Length: 4 })
             {
                 results.Add(new Address4(record.Address, 0));
+            }
+            else if (record.Type == DnsRecordType.AAAA && record.Address is { Length: 16 })
+            {
+                results.Add(new Address6(record.Address, 0));
             }
         }
 

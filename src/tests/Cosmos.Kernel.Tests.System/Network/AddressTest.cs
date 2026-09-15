@@ -137,4 +137,84 @@ public class AddressTest
             Assert.That(actual, Is.EqualTo("192.168.1.10"));
         }
     }
+
+    public class CompareTo : AddressTest
+    {
+        [Test]
+        public void GivenTwoAddress6_OrdersByValue()
+        {
+            Address low = Address6.Parse("fe80::1")!;
+            Address high = Address6.Parse("fe80::2")!;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(low.CompareTo(high), Is.LessThan(0));
+                Assert.That(high.CompareTo(low), Is.GreaterThan(0));
+                Assert.That(low.CompareTo(Address6.Parse("fe80::1")), Is.Zero);
+            });
+        }
+
+        [Test]
+        public void GivenTwoAddress4_OrdersByValue()
+        {
+            Address low = new Address4(10, 0, 2, 2);
+            Address high = new Address4(10, 0, 2, 15);
+
+            Assert.That(low.CompareTo(high), Is.LessThan(0));
+        }
+
+        [Test]
+        public void GivenDifferentFamilies_Throws()
+        {
+            Address v4 = new Address4(10, 0, 2, 2);
+            Address v6 = Address6.Parse("fe80::1")!;
+
+            Assert.Throws<ArgumentException>(() => v4.CompareTo(v6));
+        }
+    }
+
+    public class EqualityOperator : AddressTest
+    {
+        [Test]
+        public void GivenTwoEqualAddress6_IsTrue()
+        {
+            Address a = Address6.Parse("fe80::5054:ff:fe12:3456")!;
+            Address b = new Address6(0xFE80_0000, 0, 0x5054_00FF, 0xFE12_3456);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(a == b, Is.True);
+                Assert.That(a != b, Is.False);
+            });
+        }
+
+        [Test]
+        public void GivenTwoDifferentAddress6_IsFalse()
+        {
+            Address a = Address6.Parse("fe80::1")!;
+            Address b = Address6.Parse("fe80::2")!;
+
+            Assert.That(a == b, Is.False);
+        }
+
+        [Test]
+        public void GivenDifferentFamilies_IsFalse()
+        {
+            Assert.That(Address4.Zero == Address6.Zero, Is.False);
+        }
+
+        [Test]
+        public void GivenNull_IsFalse()
+        {
+            // Callers write `address != null` on the non-nullable type, so the
+            // operator has to answer for a null operand.
+            Address a = Address6.Parse("fe80::1")!;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(a == null!, Is.False);
+                Assert.That(a != null!, Is.True);
+            });
+        }
+    }
 }

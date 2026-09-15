@@ -26,7 +26,8 @@ public static class NetworkStack
     internal static Dictionary<uint, INetworkDevice> MACMap { get; } = [];
 
     /// <summary>
-    /// Configures an IP address on the given network device.
+    /// Configures an IP address on the given network device, together with
+    /// the link-local IPv6 address derived from the device's MAC address.
     /// </summary>
     /// <param name="device">The target network device.</param>
     /// <param name="ipAddress">The IP address to assign to the device.</param>
@@ -37,20 +38,15 @@ public static class NetworkStack
         // Remove old config if exists
         if (MACMap.ContainsKey(mac.Hash))
         {
-            // Find and remove old IP mapping
-            foreach (KeyValuePair<Address, INetworkDevice> pair in AddressMap)
-            {
-                if (pair.Value == device)
-                {
-                    AddressMap.Remove(pair.Key);
-                    break;
-                }
-            }
+            RemoveAddresses(device);
             MACMap.Remove(mac.Hash);
         }
 
-        // Add new config
+        // Add new config. The link-local IPv6 address needs nothing from the
+        // caller: it is derived from the MAC, so it comes up with the first
+        // configuration.
         AddressMap.Add(ipAddress, device);
+        AddressMap[IPv6.Address6.LinkLocalFor(mac)] = device;
         MACMap.Add(mac.Hash, device);
 
         // Register packet handler
@@ -77,6 +73,45 @@ public static class NetworkStack
     {
         ConfigIP(device, config.Address);
         IPConfig.Set(device, config);
+    }
+
+    /// <summary>
+    /// Forgets every address mapped to a device.
+    /// </summary>
+    /// <param name="device">The device being reconfigured.</param>
+    private static void RemoveAddresses(INetworkDevice device)
+    {
+        List<Address> stale = [];
+        foreach (KeyValuePair<Address, INetworkDevice> pair in AddressMap)
+        {
+            if (pair.Value == device)
+            {
+                stale.Add(pair.Key);
+            }
+        }
+
+        foreach (Address address in stale)
+        {
+            AddressMap.Remove(address);
+        }
+    }
+
+    /// <summary>
+    /// The link-local IPv6 address mapped to a device, or null while the
+    /// device is unconfigured.
+    /// </summary>
+    /// <param name="device">The device to look up.</param>
+    internal static IPv6.Address6? LinkLocalOf(INetworkDevice device)
+    {
+        foreach (KeyValuePair<Address, INetworkDevice> pair in AddressMap)
+        {
+            if (pair.Value == device && pair.Key is IPv6.Address6 address6)
+            {
+                return address6;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -108,21 +143,24 @@ public static class NetworkStack
 
         s_updating = true;
         OutgoingBuffer.Send();
+        IPv6.OutgoingBuffer.Send();
         s_updating = false;
     }
 
     /// <summary>
     /// Transmits a packet through the stack's outgoing queue: the sending
     /// device is resolved from the packet's source address, the destination
-    /// MAC is resolved by ARP for non-broadcast destinations, and the queue
-    /// is pumped before returning.
+    /// MAC address is resolved by ARP or by Neighbor Discovery depending on
+    /// the packet's version, and the queue is pumped before returning.
     /// </summary>
-    /// <param name="packet">A built packet, typically created through one of the packet type constructors.</param>
+    /// <param name="packet">A built packet, typically created through one of the
+    /// packet type constructors. A transport packet passes its
+    /// <c>Network</c> property here.</param>
     /// <returns>False when no configured interface matches the packet's source address; the packet is not queued in that case.</returns>
     [Experimental(Experimentals.PacketSeamDiagId)]
-    public static bool Send(IPPacket packet)
+    public static bool Send(InternetPacket packet)
     {
-        if (!OutgoingBuffer.AddPacket(packet))
+        if (!packet.Enqueue())
         {
             return false;
         }
@@ -133,7 +171,7 @@ public static class NetworkStack
 
     /// <summary>
     /// Injects a received Ethernet frame into the stack: the frame is
-    /// dispatched to the ARP or IPv4 handler by EtherType, exactly as a
+    /// dispatched to the ARP, IPv4 or IPv6 handler by EtherType, exactly as a
     /// frame arriving from a network device would be. This is the receive
     /// entry point registered on every configured device.
     /// </summary>
@@ -166,6 +204,10 @@ public static class NetworkStack
             case 0x0800: // IPv4
                 Serial.WriteString("[NetworkStack] -> IPv4\n");
                 IPPacket.IPv4Handler(packetData);
+                break;
+            case 0x86DD: // IPv6
+                Serial.WriteString("[NetworkStack] -> IPv6\n");
+                IPv6.IPv6Packet.IPv6Handler(packetData);
                 break;
             default:
                 Serial.WriteString("[NetworkStack] Unknown EtherType, ignoring\n");

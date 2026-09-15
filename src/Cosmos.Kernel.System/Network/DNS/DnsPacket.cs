@@ -9,8 +9,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Network;
+using Cosmos.Kernel.System.Network.UDP;
 
-namespace Cosmos.Kernel.System.Network.IPv4.UDP.DNS;
+namespace Cosmos.Kernel.System.Network.DNS;
 
 /// <summary>
 /// DNS reply codes (RCODE), carried in the lower four bits of the DNS header flags (RFC 1035).
@@ -50,12 +51,27 @@ public enum ReplyCode
 }
 
 /// <summary>
-/// DNS resource record types this stack understands (RFC 1035).
+/// The DNS resource record types this stack understands: the address record of
+/// each IP version, and the alias record that chains to them.
 /// </summary>
-internal static class DnsRecordType
+[Experimental(Experimentals.PacketSeamDiagId)]
+public static class DnsRecordType
 {
+    /// <summary>
+    /// An IPv4 host address (RFC 1035), whose record data is four bytes.
+    /// </summary>
     public const ushort A = 1;
+
+    /// <summary>
+    /// The canonical name behind an alias (RFC 1035), whose record data is a
+    /// domain name that a lookup follows before it reaches an address record.
+    /// </summary>
     public const ushort CNAME = 5;
+
+    /// <summary>
+    /// An IPv6 host address (RFC 3596), whose record data is sixteen bytes.
+    /// </summary>
+    public const ushort AAAA = 28;
 }
 
 /// <summary>
@@ -180,8 +196,8 @@ public class DnsPacket : UdpPacket
     /// question section itself is written by subclasses. Lengths and checksums are computed by the
     /// base constructors at construction and never recomputed.
     /// </summary>
-    /// <param name="source">The source IPv4 address.</param>
-    /// <param name="dest">The destination IPv4 address (the DNS server).</param>
+    /// <param name="source">The source address.</param>
+    /// <param name="dest">The destination address (the DNS server).</param>
     /// <param name="urlnb">The number of questions announced in the header.</param>
     /// <param name="len">The length in bytes of the DNS payload following the 12-byte DNS header.</param>
     public DnsPacket(Address source, Address dest, ushort urlnb, ushort len)
@@ -377,7 +393,7 @@ public class DnsPacket : UdpPacket
 }
 
 /// <summary>
-/// A DNS query packet that composes a single A/IN question for a given domain name.
+/// A DNS query packet that composes a single IN-class question for a given domain name.
 /// </summary>
 [Experimental(Experimentals.PacketSeamDiagId)]
 public class DnsPacketQuery : DnsPacket
@@ -391,14 +407,18 @@ public class DnsPacketQuery : DnsPacket
     { }
 
     /// <summary>
-    /// Composes a query with a single A/IN question for <paramref name="url"/>: the name is written
-    /// as length-prefixed labels followed by QTYPE 1 (A) and QCLASS 1 (IN). Lengths and checksums
-    /// are computed by the base constructors at construction and never recomputed.
+    /// Composes a query with a single IN-class question for <paramref name="url"/>: the name is
+    /// written as length-prefixed labels followed by <paramref name="recordType"/> as the QTYPE and
+    /// QCLASS 1 (IN). Lengths are computed by the base constructors, and the UDP checksum is
+    /// settled here once the question section is in place, which IPv6 requires.
     /// </summary>
-    /// <param name="source">The source IPv4 address.</param>
-    /// <param name="dest">The destination IPv4 address (the DNS server).</param>
+    /// <param name="source">The source address.</param>
+    /// <param name="dest">The destination address (the DNS server).</param>
     /// <param name="url">The domain name to resolve.</param>
-    public DnsPacketQuery(Address source, Address dest, string url)
+    /// <param name="recordType">The record type to ask for, one of <see cref="DnsRecordType"/>.
+    /// Defaults to <see cref="DnsRecordType.A"/>. This is independent of the IP version carrying
+    /// the query: either version can ask for either address record.</param>
+    public DnsPacketQuery(Address source, Address dest, string url, ushort recordType = DnsRecordType.A)
         : base(source, dest, 1, (ushort)(url.Length + url.Split('.').Length + 1 + 4))
     {
         int b = 0;
@@ -420,11 +440,17 @@ public class DnsPacketQuery : DnsPacket
 
         RawData[this.DataOffset + 20 + b] = 0x00;
 
-        RawData[this.DataOffset + 20 + b + 1] = 0x00;
-        RawData[this.DataOffset + 20 + b + 2] = 0x01;
+        RawData[this.DataOffset + 20 + b + 1] = (byte)((recordType >> 8) & 0xFF);
+        RawData[this.DataOffset + 20 + b + 2] = (byte)((recordType >> 0) & 0xFF);
 
         RawData[this.DataOffset + 20 + b + 3] = 0x00;
         RawData[this.DataOffset + 20 + b + 4] = 0x01;
+
+        // The question section is only complete now, and the length-taking UDP
+        // constructor leaves the checksum at zero. A zero is legal over IPv4,
+        // where it means "not computed", but RFC 8200 section 8.1 makes it
+        // illegal over IPv6, so an unsettled query would be dropped there.
+        WriteChecksum();
     }
 }
 

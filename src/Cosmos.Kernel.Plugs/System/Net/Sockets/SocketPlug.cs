@@ -6,10 +6,10 @@ using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
-using Cosmos.Kernel.System.Network.IPv4.TCP;
+using Cosmos.Kernel.System.Network.TCP;
 using AddressFamily = System.Net.Sockets.AddressFamily;
-using KernelEndPoint = Cosmos.Kernel.System.Network.IPv4.EndPoint;
-using KernelUdpClient = Cosmos.Kernel.System.Network.IPv4.UDP.UdpClient;
+using KernelEndPoint = Cosmos.Kernel.System.Network.EndPoint;
+using KernelUdpClient = Cosmos.Kernel.System.Network.UDP.UdpClient;
 
 namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 
@@ -448,7 +448,7 @@ public static class SocketPlug
             for (int i = 0; i < chunks.Length; i++)
             {
                 TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, i == chunks.Length - 1 ? (byte)(TcpFlags.PSH | TcpFlags.ACK) : (byte)TcpFlags.ACK, sm.TCB.SndWnd, 0, chunks[i]);
-                OutgoingBuffer.AddPacket(packet);
+                packet.Network.Enqueue();
 
                 // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
                 sm.TCB.SndNxt += (uint)chunks[i].Length;
@@ -469,7 +469,7 @@ public static class SocketPlug
 
             TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), sm.TCB.SndWnd, 0, data);
             Log.WriteString("[SocketPlug] SendTcp: adding to outgoing buffer\n");
-            OutgoingBuffer.AddPacket(packet);
+            packet.Network.Enqueue();
 
             // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
             sm.TCB.SndNxt += (uint)size;

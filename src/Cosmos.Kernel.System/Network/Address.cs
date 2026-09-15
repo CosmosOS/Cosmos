@@ -135,11 +135,11 @@ public abstract class Address : IComparable<Address>
     public abstract ReadOnlySpan<byte> ToBytes();
 
     /// <summary>
-    /// Orders two IPv4 addresses by their numeric value; a <see langword="null"/> address
-    /// sorts first.
+    /// Orders two addresses of the same family by their numeric value; a
+    /// <see langword="null"/> address sorts first.
     /// </summary>
     /// <param name="other">The address to compare with.</param>
-    /// <exception cref="ArgumentException">Either address is not an <see cref="Address4"/>.</exception>
+    /// <exception cref="ArgumentException">The two addresses are not of the same family.</exception>
     public int CompareTo(Address? other)
     {
         if (other is null)
@@ -150,6 +150,11 @@ public abstract class Address : IComparable<Address>
         if (this is Address4 address4 && other is Address4 otherAddress4)
         {
             return address4.CompareTo(otherAddress4);
+        }
+
+        if (this is Address6 address6 && other is Address6 otherAddress6)
+        {
+            return address6.CompareTo(otherAddress6);
         }
 
         throw new ArgumentException("Only addresses of same type can be compared", nameof(other));
@@ -186,11 +191,14 @@ public abstract class Address : IComparable<Address>
             return true;
         }
 
-        if (a is Address4 a4 && b is Address4 b4)
+        // Callers write `address != null` on the non-nullable type, so the
+        // operator answers for a null operand rather than dereferencing it.
+        if (a is null || b is null)
         {
-            return a4.Equals(b4);
+            return false;
         }
-        return false;
+
+        return a.Equals(b);
     }
 
     /// <summary>

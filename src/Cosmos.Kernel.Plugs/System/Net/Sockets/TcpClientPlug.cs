@@ -65,7 +65,7 @@ public static class TcpClientPlug
     [PlugMember("get_ReceiveBufferSize")]
     public static int get_ReceiveBufferSize(TcpClient aThis)
     {
-        return Cosmos.Kernel.System.Network.IPv4.TCP.Tcp.TcpWindowSize;
+        return Cosmos.Kernel.System.Network.TCP.Tcp.TcpWindowSize;
     }
 
     [PlugMember("set_ReceiveBufferSize")]
@@ -77,7 +77,7 @@ public static class TcpClientPlug
     [PlugMember("get_SendBufferSize")]
     public static int get_SendBufferSize(TcpClient aThis)
     {
-        return Cosmos.Kernel.System.Network.IPv4.TCP.Tcp.TcpWindowSize;
+        return Cosmos.Kernel.System.Network.TCP.Tcp.TcpWindowSize;
     }
 
     [PlugMember("set_SendBufferSize")]
