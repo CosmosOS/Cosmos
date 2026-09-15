@@ -45,7 +45,7 @@ Experimental seams carry diagnostic IDs:
 | ID | Seam |
 |----|------|
 | `COSMOS0001` | The scheduler policy seam: `IScheduler`, `SchedulerManager`, `SchedulerThread`, `PerCpuState`, `SchedulerExtensible`, `InterruptMaskScope`, `SchedulerThreadState`, `SchedulerThreadFlags` ([Scheduler - Writing a Scheduler](scheduler-plugging.md)) |
-| `COSMOS0002` | The packet seam: the protocol packet types (`EthernetPacket`, ARP, `IPPacket`, ICMP, `UdpPacket`, DHCP, DNS, `TcpPacket`), `NetworkStack.Send`/`HandlePacket`, and the client members that take or return packets ([Network - Crafting packets](../user/network.md#crafting-packets)) |
+| `COSMOS0002` | The packet seam: the protocol packet types (`EthernetPacket`, ARP, `InternetPacket`, `IPPacket`, ICMP, `UdpPacket`, DHCP, DNS, `TcpPacket`), `NetworkStack.Send`/`HandlePacket`, and the client members that take or return packets ([Network - Crafting packets](../user/network.md#crafting-packets)) |
 
 ---
 

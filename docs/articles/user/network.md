@@ -154,6 +154,30 @@ Console.WriteLine(NetworkManager.Primary.IPConfig?.Address.ToString());
 Console.WriteLine(NetworkManager.GetAdapter(1).IPConfig?.SubnetMask.ToString());
 ```
 
+## IPv6
+
+The IPv4 configuration also brings up a link-local IPv6 address on the device: `fe80::/64` with the interface identifier derived from its MAC address (RFC 4291 Appendix A). On QEMU's default NIC that is `fe80::5054:ff:fe12:3456`. Neighbor Discovery resolves on-link addresses the way ARP does for IPv4, and ICMPv6 echo works in both directions.
+
+```csharp
+Address6? linkLocal = NetworkManager.Primary.LinkLocalAddress;   // null until the device is configured
+
+Icmpv6Client ping = new();
+ping.Connect(new Address6(0xFEC0_0000, 0, 0, 2));               // QEMU user networking answers on fec0::2
+ping.SendEcho();
+
+EndPoint from = new(Address6.Zero, 0);
+int elapsedMs = ping.Receive(ref from, 5000);                  // -1 on timeout
+ping.Close();
+```
+
+| | IPv4 | IPv6 |
+|---|---|---|
+| Address | `IPConfig.Enable` or DHCP | Link-local, derived from the MAC |
+| Resolution | ARP | Neighbor Discovery (solicitation and advertisement) |
+| Ping | `IcmpClient` | `Icmpv6Client` |
+
+What IPv6 does not cover yet: addresses beyond link-local (Router Advertisements are ignored, no SLAAC or DHCPv6, so only on-link destinations are reachable), UDP and TCP over IPv6, and `AddressFamily.InterNetworkV6` on the .NET socket classes.
+
 ## UDP
 
 UDP uses the standard .NET `UdpClient`, no Cosmos-specific classes. Sends go out immediately; for receives, poll `Available` (a receive with nothing pending would block):
@@ -292,14 +316,28 @@ The seam has three parts:
 
 | Part | Members |
 |------|---------|
-| Packet types | `EthernetPacket`, `ArpRequestEthernet`/`ArpReplyEthernet`, `IPPacket`, `IcmpEchoRequest`/`IcmpEchoReply`, `UdpPacket`, `DhcpDiscover`/`DhcpRequest`/`DhcpRelease`, `DnsPacketQuery`/`DnsPacketAnswer`, `TcpPacket` |
-| Transmit and inject | `NetworkStack.Send(IPPacket)` queues a built packet with ARP resolution; `NetworkStack.HandlePacket` injects a raw frame into the receive path |
+| Packet types | `EthernetPacket`, `ArpRequestEthernet`/`ArpReplyEthernet`, `InternetPacket`, `IPPacket`, `IcmpEchoRequest`/`IcmpEchoReply`, `UdpPacket`, `DhcpDiscover`/`DhcpRequest`/`DhcpRelease`, `DnsPacketQuery`/`DnsPacketAnswer`, `TcpPacket` |
+| Transmit and inject | `NetworkStack.Send(InternetPacket)` queues a built packet and resolves its neighbor address; `NetworkStack.HandlePacket` injects a raw frame into the receive path |
 | Packet-level client I/O | `UdpClient.Send(UdpPacket)` / `UdpClient.ReceivePacket(timeout)`, `IcmpClient.Send(IcmpPacket)` / `IcmpClient.ReceivePacket(timeout)` |
 
 The seam is for building and reading the packet types the stack already
 speaks, not for adding new ones: their wire fields, header checksum helpers
 and the `InitializeFields` parse hook are internal to the stack, so a kernel
 constructs a packet and reads its properties rather than deriving its own.
+
+`UdpPacket` and `TcpPacket` serve both IP versions from one class. They do
+not derive from `IPPacket`; they hold the packet that carries them in a
+`Network` property, typed as the version-neutral `InternetPacket`. Build one
+by passing two addresses of the same version, and hand `packet.Network` to
+`NetworkStack.Send`:
+
+```csharp
+UdpPacket datagram = new UdpPacket(localIp, remoteIp, 5000, 4242, payload);
+NetworkStack.Send(datagram.Network);
+```
+
+A mismatched pair of addresses throws `ArgumentException` rather than
+truncating one of them.
 
 A crafted echo request, correlated with its reply by the identifier and sequence number the caller chose:
 
@@ -343,12 +381,14 @@ The contract the packet types actually implement:
 - A build constructor writes the complete frame, including lengths and checksums, at construction time; nothing is recomputed later, so header bytes must not be modified after construction.
 - Header properties are snapshots parsed from `RawData` at construction; writing to `RawData` does not refresh them.
 - A parse constructor (`new XxxPacket(byte[])`) aliases the caller's array without copying.
-- `NetworkStack.Send` resolves the sending device from the packet's source IP and returns `false` when no configured interface matches it; the destination MAC is resolved by ARP unless the destination is a broadcast.
-- A custom IP protocol is a subclass of `IPPacket`: pass the protocol number and payload length to a build constructor and write the payload at `DataOffset`.
+- `NetworkStack.Send` resolves the sending device from the packet's source IP and returns `false` when no configured interface matches it; the destination MAC is resolved by ARP over IPv4 and by Neighbor Discovery over IPv6, unless the destination is a broadcast or a multicast group.
+- The UDP checksum differs by version, and it is the one field that does. A build constructor that receives the payload writes the checksum; one that takes only a length leaves the field zero, which means "not computed" over IPv4 and is illegal over IPv6, so call `WriteChecksum()` once the payload is in place.
+- A protocol only IPv4 carries is a subclass of `IPPacket`: pass the protocol number and payload length to a build constructor and write the payload at `DataOffset`. A protocol both versions carry composes an `InternetPacket` instead, the way `UdpPacket` and `TcpPacket` do.
 
 ## Current limitations
 
 - `System.Net.Dns` is not plugged; use the Cosmos `DnsClient` shown above.
+- IPv6 stops at the link. There is a link-local address, Neighbor Discovery, ICMPv6 echo, and UDP and TCP now ride IPv6 through the same packet classes as IPv4, but there is no routing table, so every destination has to be on the link. No SLAAC or DHCPv6, no address configuration beyond the link-local address, and `IPAddress` stays IPv4-only in the socket plugs, so the standard .NET socket classes reach IPv4 only.
 - No TLS, so no `HttpClient`/HTTPS: raw TCP only.
 - Several NICs are registered and configured, and outbound packets are routed by matching the source address against each interface's configuration, so `NetworkManager.Primary` decides only where the unrouted helpers (`NetworkManager.Send`, the no-handle `IPConfig.Enable`) go.
 - Half-close is not supported: `Close()` on an established TCP connection expects the peer to answer the FIN handshake within 5 seconds and throws if it keeps the connection open.
@@ -356,7 +396,7 @@ The contract the packet types actually implement:
 
 ## How it works
 
-Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over IPv4, ARP and Ethernet), which sends and receives frames through the `NetworkDevice` driver registered with `NetworkManager`. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer.
+Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over IPv4, ARP and Ethernet, with ICMPv6 and Neighbor Discovery over IPv6), which sends and receives frames through the `NetworkDevice` driver registered with `NetworkManager`. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer.
 
 ```
 TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
@@ -365,7 +405,7 @@ Socket plugs                                            (Cosmos.Kernel.Plugs)
         │
 Cosmos TCP state machine / UDP                          (Cosmos.Kernel.System.Network.IPv4)
         │                                    DhcpClient / DnsClient ride UDP directly
-IPv4 / ARP / Ethernet
+IPv4 / ARP and IPv6 / Neighbor Discovery / Ethernet
         │
 NetworkDevice driver                                    (Intel E1000E, virtio-net)
 ```
