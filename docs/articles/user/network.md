@@ -1,6 +1,6 @@
 # Network
 
-In this article, we will discuss networking on Cosmos Gen3: how to bring the network stack up and send and receive packets. The available protocols are **ARP**, **IPv4**, **UDP**, **TCP**, **DHCP** and **DNS**.
+In this article, we will discuss networking on Cosmos Gen3: how to bring the network stack up and send and receive packets. The available protocols are **ARP**, **IPv4**, **IPv6**, **UDP**, **TCP**, **DHCP** and **DNS**.
 
 The main differences if you come from Gen2:
 
@@ -45,7 +45,7 @@ using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
 using Cosmos.Kernel.System.Network.IPv4.UDP.DHCP;
-using Cosmos.Kernel.System.Network.IPv4.UDP.DNS;
+using Cosmos.Kernel.System.Network.DNS;
 using Cosmos.Kernel.System.Timer;
 ```
 
@@ -175,8 +175,10 @@ ping.Close();
 | Address | `IPConfig.Enable` or DHCP | Link-local, derived from the MAC |
 | Resolution | ARP | Neighbor Discovery (solicitation and advertisement) |
 | Ping | `IcmpClient` | `Icmpv6Client` |
+| UDP and TCP | `UdpPacket`, `TcpPacket` | The same two classes, checksummed over the IPv6 pseudo-header |
+| DNS | `DnsClient`, A records | The same client, AAAA records |
 
-What IPv6 does not cover yet: addresses beyond link-local (Router Advertisements are ignored, no SLAAC or DHCPv6, so only on-link destinations are reachable), UDP and TCP over IPv6, and `AddressFamily.InterNetworkV6` on the .NET socket classes.
+What IPv6 does not cover yet: addresses beyond link-local (Router Advertisements are ignored, no SLAAC or DHCPv6, so only on-link destinations are reachable), and `AddressFamily.InterNetworkV6` on the .NET socket classes.
 
 ## UDP
 
@@ -299,6 +301,18 @@ if (address != null)
 dnsClient.Close();
 ```
 
+DNS is one protocol at both IP versions, so `DnsClient` serves both. Two things vary independently: the server address passed to `Connect` decides which version carries the query, and the record type passed to `SendQuery` decides which address family the answer holds. An IPv4 query can ask for an IPv6 address, and the reverse:
+
+```csharp
+/* Ask for the IPv6 address, over whichever version reaches the server */
+dnsClient.SendQuery("github.com", DnsRecordType.AAAA);
+
+/* Every address record for the name, after any CNAME chain */
+List<Address>? all = dnsClient.ReceiveAll(5000);
+```
+
+DHCP is the opposite case and stays IPv4-only: DHCPv6 is a different protocol, not this one over IPv6, sharing neither its ports, its message types, nor its option codes.
+
 <!-- screenshot: console showing github.com resolved to an IP address -->
 ![DNS](images/network-dns.png)
 
@@ -396,7 +410,7 @@ The contract the packet types actually implement:
 
 ## How it works
 
-Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over IPv4, ARP and Ethernet, with ICMPv6 and Neighbor Discovery over IPv6), which sends and receives frames through the `NetworkDevice` driver registered with `NetworkManager`. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer.
+Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over both IP versions, with ARP and Ethernet under IPv4 and ICMPv6 and Neighbor Discovery under IPv6), which sends and receives frames through the `NetworkDevice` driver registered with `NetworkManager`. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer, `DhcpClient` over IPv4 only.
 
 ```
 TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
