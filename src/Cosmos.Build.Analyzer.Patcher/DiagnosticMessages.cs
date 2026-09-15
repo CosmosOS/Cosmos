@@ -12,7 +12,7 @@ public sealed class DiagnosticMessages
         "Usage",
         DiagnosticSeverity.Error,
         true,
-        "Ensure that the member has a corresponding plug. See http://www.gocosmos.org/docs/plugs/missing/ for more information."
+        "Ensure that the member has a corresponding plug. See https://cosmosos.github.io/articles/dev/plugs.html for more information."
     );
 
     public static readonly DiagnosticDescriptor MemberCanNotBeUsed = new(
