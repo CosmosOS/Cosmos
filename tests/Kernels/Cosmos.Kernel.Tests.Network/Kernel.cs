@@ -17,6 +17,7 @@ using Cosmos.Kernel.System.Timer;
 using Cosmos.TestRunner.Framework;
 using CosmosEndPoint = Cosmos.Kernel.System.Network.EndPoint;
 using CosmosUdpClient = Cosmos.Kernel.System.Network.UDP.UdpClient;
+using DotNetDns = System.Net.Dns;
 using DotNetTcpClient = System.Net.Sockets.TcpClient;
 using DotNetTcpListener = System.Net.Sockets.TcpListener;
 using DotNetUdpClient = System.Net.Sockets.UdpClient;
@@ -1394,13 +1395,16 @@ public class Kernel : Sys.Kernel
     /// <summary>
     /// The plug on NameResolutionPal is what makes System.Net.Dns work, so
     /// these two cases go through the standard API with no Cosmos DnsClient in
-    /// sight. This one needs no network: it pins the name the plug reports.
+    /// sight, which is what the DotNetDns alias spells out. Nothing on the
+    /// Cosmos side is named Dns, so the alias is for the reader rather than to
+    /// break a tie. This case needs no network: it pins the name the plug
+    /// reports.
     /// </summary>
     private static void TestDotNetDnsGetHostName()
     {
         DnsConfig.HostName = "cosmos-test";
 
-        string hostName = Dns.GetHostName();
+        string hostName = DotNetDns.GetHostName();
 
         Log.WriteString("[Test] Dns.GetHostName() returned: ");
         Log.WriteString(hostName);
@@ -1431,14 +1435,14 @@ public class Kernel : Sys.Kernel
         IPAddress[] addresses;
         try
         {
-            addresses = Dns.GetHostAddresses("valentin.bzh");
+            addresses = DotNetDns.GetHostAddresses("valentin.bzh");
         }
         catch (SocketException)
         {
             // Dns reports every failure by throwing, where the Cosmos client
             // returns null. Tolerated for the same reason the cases above
             // tolerate a timeout: this environment may have no resolver.
-            Log.WriteString("[Test] Dns.GetHostAddresses threw SocketException (no resolver reachable)\n");
+            Log.WriteString("[Test] DotNetDns.GetHostAddresses threw SocketException (no resolver reachable)\n");
             Assert.True(true, "Dns query sent (no resolver in this environment)");
             return;
         }
