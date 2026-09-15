@@ -9,9 +9,8 @@
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Timer;
-
 using Cosmos.Kernel.System.Network.UDP;
+using Cosmos.Kernel.System.Timer;
 
 namespace Cosmos.Kernel.System.Network.IPv4.UDP.DHCP;
 
