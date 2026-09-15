@@ -51,7 +51,7 @@ public class Kernel : Sys.Kernel
         Log.WriteString("[Network Tests] Starting test suite\n");
 
         // x64 has E1000E network driver
-        TR.Start("Network Tests", expectedTests: 21);
+        TR.Start("Network Tests", expectedTests: 23);
 
         // Network initialization tests
         TR.Run("Network_DeviceDetected", TestNetworkDeviceDetected);
