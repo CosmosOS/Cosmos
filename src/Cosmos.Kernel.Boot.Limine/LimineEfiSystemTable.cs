@@ -70,8 +70,11 @@ public unsafe struct EfiRuntimeServices
     /// <summary>
     /// EFI_STATUS GetTime(OUT EFI_TIME *Time, OUT EFI_TIME_CAPABILITIES *Capabilities OPTIONAL)
     /// Returns 0 (EFI_SUCCESS) on success.
+    /// Kept untyped: EFIAPI is the Microsoft x64 convention on x86-64, not the
+    /// System V one a <c>delegate* unmanaged</c> call would use, so the kernel
+    /// invokes it through <c>Cosmos.Kernel.Core.Bridge.EfiNative.Call</c>.
     /// </summary>
-    public delegate* unmanaged<EfiTime*, void*, ulong> GetTime; // offset 24
+    public void* GetTime; // offset 24
 }
 
 /// <summary>

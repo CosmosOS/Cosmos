@@ -2,6 +2,7 @@
 
 using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.HAL.Devices.Clock;
@@ -9,7 +10,10 @@ namespace Cosmos.Kernel.HAL.Devices.Clock;
 /// <summary>
 /// Shared helper for reading wall-clock time via EFI Runtime Services GetTime().
 /// Works on any UEFI platform (x64 or ARM64) after ExitBootServices because
-/// EFI Runtime Services remain valid indefinitely.
+/// EFI Runtime Services remain valid indefinitely. Limine never calls
+/// SetVirtualAddressMap, so the service pointers are physical addresses; they
+/// are reachable because the kernel declares no Limine base revision and
+/// revision 0 identity-maps every memory map region.
 /// </summary>
 internal static class EfiRtc
 {
@@ -35,7 +39,7 @@ internal static class EfiRtc
         }
 
         EfiTime time = default;
-        ulong status = st->RuntimeServices->GetTime(&time, null);
+        ulong status = EfiNative.Call(st->RuntimeServices->GetTime, &time, null);
 
         Serial.Write("[RTC] EFI GetTime status: ");
         Serial.WriteNumber(status);
