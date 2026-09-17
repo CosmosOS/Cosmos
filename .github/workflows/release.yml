@@ -415,10 +415,45 @@ jobs:
             --json tagName \
             --jq '.[] | select(.tagName | test("^v[0-9]+\\.[0-9]+\\.[0-9]+$")) | .tagName' \
             | grep -vx "v$version" | sort -Vr | head -1)
-          if [[ -n "$previous" ]]; then
+          if [[ -n "$previous" && "$GITHUB_REPOSITORY" == "valentinbreiz/nativeaot-patcher" ]]; then
             echo "generate=true" >> "$GITHUB_OUTPUT"
             echo "previous_tag=$previous" >> "$GITHUB_OUTPUT"
             echo "extra=" >> "$GITHUB_OUTPUT"
+          elif [[ -n "$previous" ]]; then
+            # GitHub's generator only lists pull requests of the repository it
+            # runs in. On CosmosOS/Cosmos the commits arrive through the mirror
+            # and the pull requests that merged them live upstream, so it would
+            # print a bare compare link and nothing else. Walk the merge commits
+            # between the two tags and resolve each to its pull request instead:
+            # this repository first, so the list keeps working once pull
+            # requests merge here directly, then upstream, which carries the
+            # same SHAs. The lines follow GitHub's own format.
+            upstream=valentinbreiz/nativeaot-patcher
+            changes=""
+            for sha in $(gh api "repos/$GITHUB_REPOSITORY/compare/$previous...$GITHUB_SHA" --paginate \
+                           --jq '.commits[] | select(.parents | length > 1) | .sha'); do
+              line=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/pulls" \
+                       --jq '.[0] | select(. != null) | "* \(.title) by @\(.user.login) in \(.html_url)"')
+              if [[ -z "$line" ]]; then
+                line=$(gh api "repos/$upstream/commits/$sha/pulls" \
+                         --jq '.[0] | select(. != null) | "* \(.title) by @\(.user.login) in \(.html_url)"')
+              fi
+              [[ -n "$line" ]] && changes+="$line"$'\n'
+            done
+            echo "generate=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "extra<<RELEASE_EXTRA"
+              echo ""
+              echo "## What's Changed"
+              if [[ -n "$changes" ]]; then
+                printf '%s' "$changes"
+              else
+                echo "No pull requests were merged between $previous and v$version."
+              fi
+              echo ""
+              echo "**Full Changelog**: https://github.com/$GITHUB_REPOSITORY/compare/$previous...v$version"
+              echo "RELEASE_EXTRA"
+            } >> "$GITHUB_OUTPUT"
           else
             # No earlier v* release here, so there is nothing to diff: the first
             # Gen3 release on this remote points readers at the roadmap instead
@@ -460,7 +495,9 @@ jobs:
             ${{ steps.release.outputs.extra }}
           # Append the changelog GitHub generates from the pull requests merged
           # since previous_tag. Off for the first release on a remote, which has
-          # no earlier v* tag to compare against.
+          # no earlier v* tag to compare against, and off on CosmosOS/Cosmos,
+          # where the compose step builds the same list into `extra` because
+          # the pull requests live upstream.
           generate_release_notes: ${{ steps.release.outputs.generate }}
           previous_tag: ${{ steps.release.outputs.previous_tag }}
           draft: false
