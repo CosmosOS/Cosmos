@@ -107,6 +107,49 @@ public class UartMessageParserTests
         Assert.Equal(0, results.FailedTests);
     }
 
+    [Fact]
+    public void ParseUartLog_FailsStartedTestWithoutResultWhenSuiteIncomplete()
+    {
+        // A kernel that page-faults inside test 2 emits TestStart for it and
+        // then nothing: no result frame, no TestSuiteEnd. The placeholder
+        // status a TestStart creates must not survive as a pass.
+        List<byte> stream = new();
+        stream.AddRange(CreateFrame(Ds2Vs.TestSuiteStart, [2, 0, (byte)'S', (byte)'u', (byte)'i', (byte)'t', (byte)'e']));
+        stream.AddRange(CreateFrame(Ds2Vs.TestStart, [1, 0, (byte)'A']));
+        stream.AddRange(CreateFrame(Ds2Vs.TestPass, [1, 0, 5, 0, 0, 0]));
+        stream.AddRange(CreateFrame(Ds2Vs.TestStart, [2, 0, (byte)'B']));
+
+        string uartLog = Encoding.Latin1.GetString(stream.ToArray());
+        TestResults results = UartMessageParser.ParseUartLog(uartLog, "x64");
+
+        Assert.False(results.SuiteCompleted);
+        Assert.Equal(2, results.Tests.Count);
+        Assert.Equal(1, results.PassedTests);
+        Assert.Equal(1, results.FailedTests);
+        Assert.Equal(TestStatus.Failed, results.Tests[1].Status);
+        Assert.False(results.Tests[1].HasResult);
+        Assert.False(results.AllTestsPassed);
+    }
+
+    [Fact]
+    public void ParseUartLog_KeepsStartedTestWithoutResultWhenSuiteCompleted()
+    {
+        // With a validated TestSuiteEnd the suite did finish, so a missing
+        // result frame is UART corruption of a test that ran, not a crash;
+        // the placeholder pass stands and the run is judged by the counters.
+        List<byte> stream = new();
+        stream.AddRange(CreateFrame(Ds2Vs.TestSuiteStart, [1, 0, (byte)'S', (byte)'u', (byte)'i', (byte)'t', (byte)'e']));
+        stream.AddRange(CreateFrame(Ds2Vs.TestStart, [1, 0, (byte)'A']));
+        stream.AddRange(CreateFrame(Ds2Vs.TestSuiteEnd, [1, 0, 1, 0, 0, 0, 0, 0]));
+
+        string uartLog = Encoding.Latin1.GetString(stream.ToArray());
+        TestResults results = UartMessageParser.ParseUartLog(uartLog, "x64");
+
+        Assert.True(results.SuiteCompleted);
+        Assert.Equal(0, results.FailedTests);
+        Assert.False(results.Tests[0].HasResult);
+    }
+
     private static byte[] CreateFrame(byte command, byte[] payload)
     {
         List<byte> bytes = new();
