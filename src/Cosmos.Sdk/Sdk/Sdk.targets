@@ -49,10 +49,10 @@
 
   <!-- Resolve InteropAPI.txt from Cosmos.Kernel.Core. Without this, ILC
        has no DirectPInvokeList for project-referenced kernels and every
-       libSystem.Native P/Invoke (SystemNative_GetCpuUtilization etc.)
-       routes through the runtime's LoadLibrary fixup path instead of
-       being statically linked to the kernel's [UnmanagedCallersOnly]
-       exports in src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs. -->
+       libSystem.Native P/Invoke routes through the runtime's LoadLibrary
+       fixup path at run time instead of being resolved at link time against
+       the kernel's plugs and [UnmanagedCallersOnly] exports, so a missing
+       one becomes a crash instead of an undefined-symbol error. -->
   <Target Name="ResolveCosmosKernelCoreInteropAPI" BeforeTargets="CustomizeReferences">
     <ItemGroup>
       <_CosmosKernelCoreProjectRef Include="@(ProjectReference)" Condition="$([System.String]::Copy('%(Filename)').EndsWith('Cosmos.Kernel.Core'))" />

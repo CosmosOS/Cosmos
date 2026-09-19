@@ -353,6 +353,12 @@ internal static unsafe class InteropSysFilePlug
     [PlugMember]
     public static uint GetEUid() => 0;
 
+    /// <summary>Effective gid 0 matches the Gid the VFS reports on every node. With
+    /// <see cref="GetEUid"/> this keeps mode checks off the group database, which
+    /// the kernel does not have.</summary>
+    [PlugMember]
+    public static bool IsMemberOfGroup(uint gid) => gid == 0;
+
     private static string ErrorMessage(PalError error)
     {
         switch (error)
