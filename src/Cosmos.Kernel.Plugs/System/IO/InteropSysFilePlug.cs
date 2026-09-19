@@ -395,6 +395,12 @@ internal static unsafe class InteropSysFilePlug
                 return "Permission denied";
             case PalError.ENOTSUP:
                 return "Operation not supported";
+            case PalError.EAFNOSUPPORT:
+                return "Address family not supported by protocol";
+            case PalError.ENETUNREACH:
+                return "Network is unreachable";
+            case PalError.EHOSTNOTFOUND:
+                return "Name or service not known";
             default:
                 return "I/O error";
         }
