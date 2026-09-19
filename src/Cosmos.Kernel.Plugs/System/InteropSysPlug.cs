@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Text;
 using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Diagnostics;
@@ -102,28 +103,37 @@ public static class InteropSysPlug
     }
 
     /// <summary>
-    /// dlopen replacement. There is no dynamic library loading on bare metal, so
-    /// every load fails. This is what turns a call to an unplugged
-    /// libSystem.Native P/Invoke into a catchable <see cref="DllNotFoundException"/>:
-    /// without it, the lazy P/Invoke resolver recurses through its own unplugged
-    /// P/Invokes (LoadLibrary, GetProcessPath, ...) until the stack overflows and
-    /// the kernel triple-faults.
-    /// </summary>
-    [PlugMember]
-    internal static IntPtr LoadLibrary(string filename)
-    {
-        return IntPtr.Zero;
-    }
-
-    /// <summary>
-    /// The kernel image is the process. A fixed path keeps
-    /// <c>AppContext.BaseDirectory</c> (used by the P/Invoke resolver's library
-    /// search, among others) from re-entering an unresolvable P/Invoke.
+    /// The kernel image is the process; <c>Environment.ProcessPath</c> and
+    /// <c>AppContext.BaseDirectory</c> derive from this.
     /// </summary>
     [PlugMember]
     internal static string? GetProcessPath()
     {
         return "/kernel.elf";
+    }
+
+    /// <summary>
+    /// The runtime's last step once <c>FailFast</c> has written its report: on
+    /// Unix it ends the process. The kernel is the process, so park the CPU for
+    /// good. The report itself arrives through <see cref="LogError"/>.
+    /// </summary>
+    [PlugMember]
+    internal static void Abort()
+    {
+        while (true)
+        {
+            Power.Halt();
+        }
+    }
+
+    /// <summary>
+    /// Where the runtime writes its own diagnostics, the <c>FailFast</c> report
+    /// among them. There is no stderr; the serial log is where they go.
+    /// </summary>
+    [PlugMember]
+    internal static unsafe void LogError(byte* buffer, int count)
+    {
+        Log.WriteString(Encoding.UTF8.GetString(buffer, count));
     }
 
     [PlugMember]

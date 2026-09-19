@@ -52,7 +52,7 @@ public class Kernel : Sys.Kernel
         Log.WriteString("[Network Tests] Starting test suite\n");
 
         // x64 has E1000E network driver
-        TR.Start("Network Tests", expectedTests: 23);
+        TR.Start("Network Tests", expectedTests: 24);
 
         // Network initialization tests
         TR.Run("Network_DeviceDetected", TestNetworkDeviceDetected);
@@ -89,6 +89,7 @@ public class Kernel : Sys.Kernel
         TR.Run("DNS_ResolveMultipleARecords", TestDNSResolveMultipleARecords);
         TR.Run("DNS_TwoQueriesOneClient", TestDNSTwoQueriesOneClient);
         TR.Run("DNS_DotNetGetHostName", TestDotNetDnsGetHostName);
+        TR.Run("DNS_DotNetUnknownHostThrows", TestDotNetDnsUnknownHostThrows);
         TR.Run("DNS_DotNetGetHostAddresses", TestDotNetDnsGetHostAddresses);
 
         Log.WriteString("[Network Tests] All tests completed\n");
@@ -1413,6 +1414,36 @@ public class Kernel : Sys.Kernel
         Assert.True(hostName == "cosmos-test", "Dns.GetHostName must report the configured host name");
 
         DnsConfig.HostName = "cosmos";
+    }
+
+    /// <summary>
+    /// The failure side of System.Net.Dns: a name that cannot resolve must come
+    /// back as <see cref="SocketException"/>, which is how Dns reports every
+    /// lookup failure. The <c>.invalid</c> top-level domain is reserved
+    /// (RFC 6761), so a reachable resolver answers NXDOMAIN and the plug reports
+    /// HostNotFound; with no nameserver it reports NoRecovery; with no route it
+    /// reports NetworkUnreachable. All three surface as the one exception type
+    /// at this API, so the case holds in any environment and needs no host-side
+    /// server. Unlike GetHostName, the call crosses the BCL's own path before
+    /// the plug: host-name validation, the OS IPv6 support probe and the
+    /// name-resolution telemetry all run before NameResolutionPal is reached.
+    /// </summary>
+    private static void TestDotNetDnsUnknownHostThrows()
+    {
+        Log.WriteString("[Test] Resolving nonexistent.invalid through System.Net.Dns...\n");
+
+        try
+        {
+            IPAddress[] addresses = DotNetDns.GetHostAddresses("nonexistent.invalid");
+            Assert.Fail("Dns.GetHostAddresses must throw SocketException for a name that cannot resolve, but returned " + addresses.Length + " address(es)");
+        }
+        catch (SocketException ex)
+        {
+            Log.WriteString("[Test] SocketException: ");
+            Log.WriteString(ex.Message);
+            Log.WriteString("\n");
+            Assert.True(ex.SocketErrorCode != SocketError.Success, "A failed lookup must carry a socket error code");
+        }
     }
 
     private static void TestDotNetDnsGetHostAddresses()
