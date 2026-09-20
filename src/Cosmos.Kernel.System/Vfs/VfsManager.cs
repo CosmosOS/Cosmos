@@ -461,24 +461,108 @@ public static partial class VfsManager
             return false;
         }
 
-        VfsMount? mount = FindMount(path);
-        if (mount is null)
-        {
-            return false;
-        }
+        const int MaxSymlinkDepth = 8;
+        string currentPath = path;
+        int symlinkDepth = 0;
 
-        string relativePath = TrimMountPrefix(mount.MountPoint, path);
-        IVfsInode current = mount.Superblock.Root;
-
-        leafName = mount.MountPoint;
-        if (relativePath.Length == 0)
+        while (true)
         {
+            VfsMount? mount = FindMount(currentPath);
+            if (mount is null)
+            {
+                return false;
+            }
+
+            string relativePath = TrimMountPrefix(mount.MountPoint, currentPath);
+            IVfsInode current = mount.Superblock.Root;
+
+            leafName = mount.MountPoint;
+            if (relativePath.Length == 0)
+            {
+                inode = current;
+                return true;
+            }
+
+            string[] parts = relativePath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            bool restarted = false;
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                string segment = parts[i];
+                if (segment.Length == 0 || segment == ".")
+                {
+                    continue;
+                }
+
+                if (segment == "..")
+                {
+                    return false;
+                }
+
+                IInodeOperations operations = current.InodeOperations;
+                if (!operations.Lookup(current, segment, out IVfsInode? child))
+                {
+                    return false;
+                }
+
+                if (IsSymbolicLink(child))
+                {
+                    if (!child.InodeOperations.TryReadLink(child, out string? target) || target is null)
+                    {
+                        return false;
+                    }
+
+                    if (symlinkDepth >= MaxSymlinkDepth)
+                    {
+                        return false;
+                    }
+
+                    symlinkDepth++;
+
+                    string remaining = i + 1 < parts.Length
+                        ? string.Join(s_directorySeparatorString, parts, i + 1, parts.Length - (i + 1))
+                        : string.Empty;
+
+                    string parentPath = BuildParentPath(mount.MountPoint, parts, i);
+                    string newTarget = target.Length > 0 && target[0] == Path.DirectorySeparatorChar
+                        ? target
+                        : parentPath.Length == 1
+                            ? s_directorySeparatorString + target
+                            : parentPath + s_directorySeparatorString + target;
+
+                    if (!string.IsNullOrEmpty(remaining))
+                    {
+                        newTarget = newTarget.TrimEnd(Path.DirectorySeparatorChar) + s_directorySeparatorString + remaining;
+                    }
+
+                    currentPath = newTarget;
+                    restarted = true;
+                    break;
+                }
+
+                current = child;
+                leafName = segment;
+            }
+
+            if (restarted)
+            {
+                continue;
+            }
+
             inode = current;
             return true;
         }
+    }
 
-        string[] parts = relativePath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-        for (int i = 0; i < parts.Length; i++)
+    private static string BuildParentPath(string mountPoint, string[] parts, int index)
+    {
+        if (index == 0)
+        {
+            return mountPoint;
+        }
+
+        string parent = mountPoint;
+        for (int i = 0; i < index; i++)
         {
             string segment = parts[i];
             if (segment.Length == 0 || segment == ".")
@@ -486,23 +570,22 @@ public static partial class VfsManager
                 continue;
             }
 
-            if (segment == "..")
-            {
-                return false;
-            }
-
-            IInodeOperations operations = current.InodeOperations;
-            if (!operations.Lookup(current, segment, out IVfsInode? child))
-            {
-                return false;
-            }
-
-            current = child;
-            leafName = segment;
+            parent = parent == s_directorySeparatorString
+                ? s_directorySeparatorString + segment
+                : parent + s_directorySeparatorString + segment;
         }
 
-        inode = current;
-        return true;
+        return parent;
+    }
+
+    private static bool IsSymbolicLink(IVfsInode inode)
+    {
+        if (inode.InodeOperations.GetAttr(inode, out VfsStat stat))
+        {
+            return stat.IsSymbolicLink;
+        }
+
+        return false;
     }
 
     /// <summary>

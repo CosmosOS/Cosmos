@@ -42,6 +42,18 @@ Cosmos.Kernel.System.Diagnostics.ThreadKillResult.MarkedForExit = 2 -> Cosmos.Ke
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult.NotFound = 0 -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult.RefusedBlocked = 4 -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult.RefusedIdle = 3 -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.Ext2FilesystemType() -> void
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.Ext2FilesystemType(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> void
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.IVfsFormatOptions? options) -> bool
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.MountFlags flags, out Cosmos.Kernel.HAL.Vfs.IVfsSuperblock? superblock) -> bool
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.BlockSize.get -> uint
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.BlockSize.set -> void
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.Ext2FormatOptions() -> void
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.VolumeLabel.get -> string!
+Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.VolumeLabel.set -> void
 Cosmos.Kernel.System.Filesystems.Fat.FatBootSector
 Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.BytesPerCluster.get -> uint
 Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.BytesPerSector.get -> uint

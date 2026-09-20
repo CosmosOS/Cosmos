@@ -15,6 +15,7 @@ Cosmos.Kernel.HAL.Vfs.IInodeOperations.Rename(Cosmos.Kernel.HAL.Vfs.IVfsInode! o
 Cosmos.Kernel.HAL.Vfs.IInodeOperations.Rmdir(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, System.ReadOnlySpan<char> name) -> bool
 Cosmos.Kernel.HAL.Vfs.IInodeOperations.SetAttr(Cosmos.Kernel.HAL.Vfs.IVfsInode! inode, Cosmos.Kernel.HAL.Vfs.SetAttrFlags flags, in Cosmos.Kernel.HAL.Vfs.VfsStat attributes) -> bool
 Cosmos.Kernel.HAL.Vfs.IInodeOperations.Symlink(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, System.ReadOnlySpan<char> name, System.ReadOnlySpan<char> target, out Cosmos.Kernel.HAL.Vfs.IVfsInode? inode) -> bool
+Cosmos.Kernel.HAL.Vfs.IInodeOperations.TryReadLink(Cosmos.Kernel.HAL.Vfs.IVfsInode! symlink, out string? target) -> bool
 Cosmos.Kernel.HAL.Vfs.IInodeOperations.Unlink(Cosmos.Kernel.HAL.Vfs.IVfsInode! dir, System.ReadOnlySpan<char> name) -> bool
 Cosmos.Kernel.HAL.Vfs.ISuperblockOperations
 Cosmos.Kernel.HAL.Vfs.ISuperblockOperations.Drop(Cosmos.Kernel.HAL.Vfs.IVfsSuperblock! superblock) -> void
