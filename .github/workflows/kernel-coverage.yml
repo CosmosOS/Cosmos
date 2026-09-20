@@ -13,8 +13,6 @@ on:
 permissions:
   contents: read
   checks: write
-  issues: write
-  pull-requests: write
 
 jobs:
   # ── Setup ─────────────────────────────────────────────────────────────────────
@@ -170,8 +168,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, graphic-tests, power-tests, garbagecollector-tests]
     if: always() && (github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'run-coverage'))
-    permissions:
-      pull-requests: write
     steps:
       - name: 📥 Checkout (for aggregation script)
         uses: actions/checkout@v4
@@ -190,10 +186,21 @@ jobs:
         id: coverage
         run: python3 .github/scripts/aggregate-coverage.py
 
-      - name: 💬 Add Coverage PR Comment
-        if: steps.coverage.outputs.found_data == 'true'
-        uses: marocchino/sticky-pull-request-comment@v2
-        continue-on-error: true
+      # Posted by kernel-test-comment.yml, which runs with write access even
+      # when this run came from a fork; see the note there.
+      - name: 📝 Render Coverage PR Comment
+        if: steps.coverage.outputs.found_data == 'true' && (github.event_name == 'pull_request' || inputs.pr_number != '')
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+        run: |
+          mkdir -p pr-comment
+          cp /tmp/coverage_pr_comment.md pr-comment/body.md
+          echo "$PR_NUMBER" > pr-comment/pr-number
+
+      - name: 📤 Upload Coverage PR Comment
+        if: steps.coverage.outputs.found_data == 'true' && (github.event_name == 'pull_request' || inputs.pr_number != '')
+        uses: actions/upload-artifact@v4
         with:
-          header: code-coverage
-          path: /tmp/coverage_pr_comment.md
+          name: pr-comment-coverage
+          path: pr-comment/
+          retention-days: 7

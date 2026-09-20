@@ -434,7 +434,7 @@ Assert.Fail("Custom error message");
 3. Implement tests using `TestRunner.Framework`
 4. Add a CI job in `.github/workflows/kernel-tests.yml`:
    - Copy an existing `*-tests` job, rename it, and update the kernel path
-   - Add a corresponding `{name}-results` job for PR comments
+   - Add a corresponding `{name}-results` job, which renders the PR comment
    - Add the new job to the `test-summary` dependencies
 5. Add VS Code tasks in `.vscode/tasks.json`
 
@@ -446,9 +446,9 @@ The CI workflow (`.github/workflows/kernel-tests.yml`) runs kernel integration t
 
 **Jobs:**
 - `helloworld-tests`: Matrix build for x64/arm64
-- `helloworld-results`: Combined PR comment
+- `helloworld-results`: Renders the combined PR comment into a `pr-comment-helloworld` artifact
 - `memory-tests`: Matrix build for x64/arm64
-- `memory-results`: Combined PR comment
+- `memory-results`: Renders the combined PR comment into a `pr-comment-memory` artifact
 - `test-summary`: Final status summary
 
 **Triggers:**
@@ -456,7 +456,7 @@ The CI workflow (`.github/workflows/kernel-tests.yml`) runs kernel integration t
 - Pull requests (any branch)
 - Manual dispatch with architecture selection
 
-**PR Comments:** Each test suite posts a comment with separate rows for x64 and arm64, showing test counts, duration, and links to artifacts.
+**PR Comments:** Each test suite gets one comment with separate rows for x64 and arm64, showing test counts, duration, and links to artifacts. The `*-results` jobs only render the comment: a `pull_request` run for a pull request from a fork holds a read-only token and cannot post. `.github/workflows/kernel-test-comment.yml` runs on `workflow_run` once Kernel Tests or Kernel Coverage completes, in the base repository and with write access whatever the origin of the pull request, downloads the `pr-comment-*` artifacts and posts or updates the comments. It trusts the PR number in an artifact only when that pull request's head is the run's head commit, and GitHub runs it from the default branch, so a change to it takes effect after merge.
 
 **Artifacts (30-day retention):**
 - `test-results-{suite}-{arch}.xml`: JUnit XML results

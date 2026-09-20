@@ -166,10 +166,16 @@ jobs:
             echo 'EOF'
           } >> $GITHUB_OUTPUT
 
-      - name: 💬 Post PR Comment
+      # The comment is rendered here but posted by kernel-test-comment.yml.
+      # On a pull request from a fork this job runs with a read-only token,
+      # so posting from here silently failed for every outside contributor;
+      # a workflow_run job runs in the base repository with write access and
+      # only ever reads these artifacts. The body is data to that job, never
+      # instructions, and the PR number it names is checked against the
+      # run's head commit before anything is posted.
+      - name: 📝 Render PR Comment
         uses: actions/github-script@v7
         if: inputs.event_name == 'pull_request'
-        continue-on-error: true
         env:
           # The table embeds raw kernel failure messages from UART output.
           # It must reach the script as data (process.env), never spliced
@@ -179,6 +185,7 @@ jobs:
           RESULTS_TABLE: ${{ steps.parse.outputs.results_table }}
         with:
           script: |
+            const fs = require('fs');
             const suiteName = '${{ inputs.suite_name }}';
             const suiteId = '${{ inputs.suite_id }}';
             const kernelSrcUrl = 'https://github.com/${{ github.repository }}/blob/${{ inputs.head_ref }}/${{ inputs.kernel_path }}/Kernel.cs';
@@ -216,26 +223,14 @@ jobs:
               `📋 [View full test summary](https://github.com/${repo}/actions/runs/${runId}) | 📄 [Kernel.cs](${kernelSrcUrl})`
             ].join('\n');
 
-            const marker = `## 🧪 ${suiteName} Tests`;
-            const { data: comments } = await github.rest.issues.listComments({
-              owner,
-              repo: repoName,
-              issue_number: context.issue.number,
-            });
-            const botComment = comments.find(c => c.body.includes(marker));
+            fs.mkdirSync('pr-comment', { recursive: true });
+            fs.writeFileSync('pr-comment/body.md', body);
+            fs.writeFileSync('pr-comment/pr-number', String(context.payload.pull_request.number));
 
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner,
-                repo: repoName,
-                comment_id: botComment.id,
-                body: body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner,
-                repo: repoName,
-                issue_number: context.issue.number,
-                body: body
-              });
-            }
+      - name: 📤 Upload PR Comment
+        uses: actions/upload-artifact@v4
+        if: inputs.event_name == 'pull_request'
+        with:
+          name: pr-comment-${{ inputs.suite_id }}
+          path: pr-comment/
+          retention-days: 7
