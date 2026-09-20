@@ -9,7 +9,6 @@
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/dotnet.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/dotnet.yml?branch=gen3&label=.NET%20tests&logo=github" /></a>
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/kernel-tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/kernel-tests.yml?branch=gen3&label=kernel%20tests&logo=github" /></a>
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/release.yml?label=release&logo=github" /></a>
-  <a href="https://cosmosos.github.io/roadmap.html"><img src="https://img.shields.io/badge/gen3_release-90%25-yellow" /></a>
 </p>
 
 # Cosmos gen3
