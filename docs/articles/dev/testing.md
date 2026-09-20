@@ -6,7 +6,7 @@ NativeAOT-Patcher has two complementary testing layers: **unit tests** that run 
 
 ## Unit Tests
 
-Unit tests live in the `tests/Cosmos.Tests.*` projects (xunit) and in `src/tests/Cosmos.Kernel.Tests.System` (NUnit), and are run with the standard .NET test runner. They do not require QEMU or any special infrastructure.
+Unit tests live in the `tests/Cosmos.Tests.*` projects (xunit) and in `src/tests/Cosmos.Kernel.Tests.System` (NUnit), and are run with the standard .NET test runner. They do not require QEMU or any special infrastructure. CI runs each of them as its own job of the `.NET Tests` workflow (`.github/workflows/dotnet.yml`) on every push and pull request.
 
 ### Running Unit Tests
 
