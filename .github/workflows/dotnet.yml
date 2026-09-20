@@ -149,6 +149,42 @@ jobs:
           name: Cosmos.Tests.Build.Analyzer.Patcher-Results
           path: ./tests/Cosmos.Tests.Build.Analyzer.Patcher/TestResults/Cosmos.Tests.Build.Analyzer.Patcher.trx
 
+  kernel-system-tests:
+    name: Run Cosmos.Kernel.Tests.System
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        dotnet-version: [ 10.0.x ]
+    steps:
+      # Cosmos.Kernel.Core links sources from the dotnet/runtime submodule,
+      # so the library under test does not build without it.
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: 🛠️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: 🔄 Restore Dependencies
+        run: dotnet restore ./src/tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj
+
+      - name: 🔨 Build Cosmos.Kernel.Tests.System
+        run: dotnet build ./src/tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj --configuration Debug --no-restore
+
+      - name: 🚀 Run Tests
+        run: dotnet test ./src/tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj --no-build --configuration Debug --logger "trx;LogFileName=Cosmos.Kernel.Tests.System.trx"
+
+      - name: 📤 Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Cosmos.Kernel.Tests.System-Results
+          path: ./src/tests/Cosmos.Kernel.Tests.System/TestResults/Cosmos.Kernel.Tests.System.trx
+
   asm-tests:
     name: Run Cosmos.Build.Asm.Test
     runs-on: ${{ matrix.os }}
