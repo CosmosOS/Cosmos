@@ -22,6 +22,9 @@ public static class SocketPlug
     // burning the cycles.
     private const int UdpPollTimeoutMs = 0;
 
+    // Linger allowed for a TCP close that has to wait for the peer's FIN.
+    private const int DefaultCloseTimeoutMs = 5000;
+
     // Store protocol type per socket (public for cross-assembly access when patched)
     public static readonly Dictionary<int, ProtocolType> _protocolTypes = [];
     // Store TCP state machine per socket instance
@@ -698,7 +701,7 @@ public static class SocketPlug
     [PlugMember]
     public static void Close(Socket aThis)
     {
-        Close(aThis, 5000);
+        Close(aThis, DefaultCloseTimeoutMs);
     }
 
     [PlugMember]
@@ -824,7 +827,23 @@ public static class SocketPlug
     [PlugMember]
     public static void Dispose(Socket aThis)
     {
-        Close(aThis, 5000);
+        Close(aThis, DefaultCloseTimeoutMs);
+    }
+
+    /// <summary>
+    /// The BCL finalizer calls this with <paramref name="disposing"/> false, and
+    /// the BCL body then lingers on the native handle: shutdown, socket options,
+    /// pending-byte checks, every one a libSystem.Native import the kernel does
+    /// not carry. The kernel-side state is released by <see cref="Dispose(Socket)"/>
+    /// and <see cref="Close(Socket)"/>, so a finalizer pass has nothing to do.
+    /// </summary>
+    [PlugMember]
+    public static void Dispose(Socket aThis, bool disposing)
+    {
+        if (disposing)
+        {
+            Close(aThis, DefaultCloseTimeoutMs);
+        }
     }
 
     /// <summary>
