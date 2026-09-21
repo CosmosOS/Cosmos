@@ -15,7 +15,13 @@ namespace Cosmos.TestRunner.Engine;
 /// <param name="KeyboardDevice">Keyboard model, e.g. <c>virtio-keyboard-pci</c>.</param>
 /// <param name="MouseDevice">Mouse model, e.g. <c>virtio-mouse-pci</c>.</param>
 /// <param name="VgaAdapter">VGA adapter as a <c>-vga</c> backend name, e.g. <c>vmware</c> — replaces the default adapter rather than adding a second one.</param>
-public sealed record ProfileDevices(string? NetworkCard, string? KeyboardDevice, string? MouseDevice, string? VgaAdapter);
+/// <param name="GpuDevice">Display adapter attached as a <c>-device</c> line, e.g. <c>virtio-gpu-pci</c> — added alongside the default adapter rather than replacing it.</param>
+public sealed record ProfileDevices(
+    string? NetworkCard,
+    string? KeyboardDevice,
+    string? MouseDevice,
+    string? VgaAdapter,
+    string? GpuDevice = null);
 
 /// <summary>
 /// Interface for QEMU virtual machine hosts that can run test kernels

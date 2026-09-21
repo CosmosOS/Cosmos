@@ -122,9 +122,42 @@ public class ProfileCatalogTests
         Assert.Equal("vmware", svga.VgaAdapter);
 
         // The adapter is programmed through PCI port I/O, so the arm64 column
-        // runs only the bare (ramfb/GOP) cell.
-        TestProfile arm64Cell = Assert.Single(TestProfileLoader.LoadFor(suiteDir, "arm64"));
-        Assert.Equal("bare", arm64Cell.Name);
-        Assert.Null(arm64Cell.VgaAdapter);
+        // runs only the cells whose hardware the virt machine can present.
+        IReadOnlyList<TestProfile> arm64Cells = TestProfileLoader.LoadFor(suiteDir, "arm64");
+        Assert.DoesNotContain(arm64Cells, c => c.Name == "vmware-svga");
+        TestProfile bare = Assert.Single(arm64Cells, c => c.Name == "bare");
+        Assert.Null(bare.VgaAdapter);
+    }
+
+    // The virtio-gpu cell is the only run with a virtio GPU on the bus, and it
+    // has to stay ADDITIVE: it attaches the device with -device and leaves the
+    // machine default alone, because that default is what hands Limine the
+    // framebuffer the whole suite renders into. A well-meaning rewrite to
+    // "vga": "virtio" would still pass on x64 (which has the VGA-compatible
+    // virtio-vga) and break arm64, where QEMU refuses it outright.
+    [Fact]
+    public void GraphicSuiteCoversVirtioGpuOnBothArchitectures()
+    {
+        string suiteDir = Path.Combine(FindRepoRoot(), "tests", "Kernels", "Cosmos.Kernel.Tests.Graphic");
+
+        foreach (string architecture in Architectures)
+        {
+            IReadOnlyList<TestProfile> cells = TestProfileLoader.LoadFor(suiteDir, architecture);
+
+            TestProfile cell = Assert.Single(cells, c => c.Name == "virtio-gpu");
+            Assert.Equal("virtio-gpu-pci", cell.GpuDevice);
+            Assert.Null(cell.VgaAdapter);
+
+            // virtio-pci MSI-X is routed by the GICv3 ITS and virt defaults to
+            // GICv2, which has none; q35 rejects the property outright.
+            if (architecture == "arm64")
+            {
+                Assert.Equal("3", cell.MachineOptions["gic-version"]);
+            }
+            else
+            {
+                Assert.False(cell.MachineOptions.ContainsKey("gic-version"));
+            }
+        }
     }
 }
