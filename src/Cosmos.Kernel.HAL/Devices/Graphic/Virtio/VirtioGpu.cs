@@ -29,7 +29,7 @@ internal unsafe class VirtioGpu : GraphicDevice
         VirtioGpuCmd.VIRTIO_GPU_F_EDID;
 
     // Queue indices (virtio 1.x §5.7.3).
-    private const ushort CTRL_QUEUE   = 0;
+    private const ushort CTRL_QUEUE = 0;
     private const ushort CURSOR_QUEUE = 1;
 
     // virtio-gpu spec: queue size 0 is invalid; QEMU ships 64.
@@ -37,10 +37,10 @@ internal unsafe class VirtioGpu : GraphicDevice
 
     // Resource id 0 is reserved (VIRTIO_GPU_INVALID_RES_ID); start at 1.
     private const uint ScanoutResourceId = 1;
-    private const uint ScanoutId          = 0;
+    private const uint ScanoutId = 0;
 
     // Single scanout is the common case (one QEMU -device virtio-gpu).
-    private const uint DefaultWidth  = 1024;
+    private const uint DefaultWidth = 1024;
     private const uint DefaultHeight = 768;
 
     // --- Private fields ---
@@ -66,8 +66,8 @@ internal unsafe class VirtioGpu : GraphicDevice
     // width*height*4 (B8G8R8X8_UNORM, 32bpp). The host DMA's from this on
     // TRANSFER_TO_HOST_2D; CPU writes go through the same virtual address.
     private byte* _framebuffer;
-    private uint  _framebufferPhys;
-    private uint  _framebufferSize;
+    private uint _framebufferPhys;
+    private uint _framebufferSize;
 
     private uint _width;
     private uint _height;
@@ -84,9 +84,9 @@ internal unsafe class VirtioGpu : GraphicDevice
     public bool IsInitialized => _initialized;
     public bool Ready => _initialized;
 
-    public uint Width  => _width;
+    public uint Width => _width;
     public uint Height => _height;
-    public uint Pitch  => _pitch;
+    public uint Pitch => _pitch;
 
     /// <summary>
     /// Points to the framebuffer the CPU writes pixels into. Same backing as
@@ -130,7 +130,7 @@ internal unsafe class VirtioGpu : GraphicDevice
         Serial.WriteHex(features);
         Serial.Write("\n");
 
-        _ctrlQueue   = _transport.CreateQueue(CTRL_QUEUE,   QUEUE_SIZE);
+        _ctrlQueue = _transport.CreateQueue(CTRL_QUEUE, QUEUE_SIZE);
         _cursorQueue = _transport.CreateQueue(CURSOR_QUEUE, QUEUE_SIZE);
         if (_ctrlQueue is null || _cursorQueue is null)
         {
@@ -144,9 +144,9 @@ internal unsafe class VirtioGpu : GraphicDevice
         // 16-byte payload + 16-byte mem_entry = 48 bytes); the largest
         // response is RESP_DISPLAY_INFO (24 + 16 = 40 bytes). 64 bytes
         // covers both with room for the cursor queue's smaller payloads.
-        _cmdBuffer  = (byte*)MemoryOp.Alloc(64);
+        _cmdBuffer = (byte*)MemoryOp.Alloc(64);
         _respBuffer = (byte*)MemoryOp.Alloc(64);
-        MemoryOp.MemSet(_cmdBuffer,  0, 64);
+        MemoryOp.MemSet(_cmdBuffer, 0, 64);
         MemoryOp.MemSet(_respBuffer, 0, 64);
 
         ushort numScanouts = _transport.ReadDeviceConfig16(VirtioGpuCmd.ConfigNumScanoutsOffset);
@@ -167,9 +167,9 @@ internal unsafe class VirtioGpu : GraphicDevice
             dispW = DefaultWidth;
             dispH = DefaultHeight;
         }
-        _width  = dispW;
+        _width = dispW;
         _height = dispH;
-        _pitch  = dispW * 4;
+        _pitch = dispW * 4;
 
         if (!AllocateFramebuffer())
         {
@@ -220,7 +220,7 @@ internal unsafe class VirtioGpu : GraphicDevice
         Serial.Write(")\n");
     }
 
-    public void Enable()  => _enabled = true;
+    public void Enable() => _enabled = true;
     public void Disable() => _enabled = false;
 
     // --- IGraphicDevice surface ---
@@ -286,7 +286,7 @@ internal unsafe class VirtioGpu : GraphicDevice
             return;
         }
 
-        int clampedWidth  = Math.Min(width,  (int)_width  - x);
+        int clampedWidth = Math.Min(width, (int)_width - x);
         int clampedHeight = Math.Min(height, (int)_height - y);
 
         var span = pixels.Span;
@@ -314,7 +314,7 @@ internal unsafe class VirtioGpu : GraphicDevice
             return;
         }
 
-        int clampedWidth  = Math.Min(width,  (int)_width  - x);
+        int clampedWidth = Math.Min(width, (int)_width - x);
         int clampedHeight = Math.Min(height, (int)_height - y);
 
         var span = pixels.Span;
@@ -376,7 +376,7 @@ internal unsafe class VirtioGpu : GraphicDevice
             return false;
         }
 
-        width  = info->PModes.Rect.Width;
+        width = info->PModes.Rect.Width;
         height = info->PModes.Rect.Height;
         if (width == 0 || height == 0)
         {
@@ -421,7 +421,7 @@ internal unsafe class VirtioGpu : GraphicDevice
             },
             ResourceId = ScanoutResourceId,
             Format = VirtioGpuCmd.VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM,
-            Width  = _width,
+            Width = _width,
             Height = _height,
         };
 
@@ -441,7 +441,7 @@ internal unsafe class VirtioGpu : GraphicDevice
                 Type = VirtioGpuCmd.VIRTIO_GPU_CMD_RESOURCE_ATTACH_BACKING,
             },
             ResourceId = ScanoutResourceId,
-            NrEntries  = 1,
+            NrEntries = 1,
         };
 
         VirtioGpuMemEntry entry = new()
@@ -454,7 +454,7 @@ internal unsafe class VirtioGpu : GraphicDevice
         // Two-descriptor chain: cmd+attach header, then the mem_entry.
         return SendCommandChained(
             &attach, (uint)sizeof(VirtioGpuResourceAttachBacking),
-            &entry,  (uint)sizeof(VirtioGpuMemEntry),
+            &entry, (uint)sizeof(VirtioGpuMemEntry),
             VirtioGpuCmd.VIRTIO_GPU_RESP_OK_NODATA, out _);
     }
 
@@ -467,7 +467,7 @@ internal unsafe class VirtioGpu : GraphicDevice
                 Type = VirtioGpuCmd.VIRTIO_GPU_CMD_SET_SCANOUT,
             },
             Rect = new VirtioGpuRect { X = 0, Y = 0, Width = w, Height = h },
-            ScanoutId  = scanoutId,
+            ScanoutId = scanoutId,
             ResourceId = resourceId,
         };
 
@@ -604,7 +604,7 @@ internal unsafe class VirtioGpu : GraphicDevice
 
         using IrqLockScope scope = _queueLock.AcquireIrqSafe();
 
-        int cmdIdx  = _ctrlQueue.AllocDescriptor();
+        int cmdIdx = _ctrlQueue.AllocDescriptor();
         int paramIdx = _ctrlQueue.AllocDescriptor();
         int respIdx = _ctrlQueue.AllocDescriptor();
         if (cmdIdx < 0 || paramIdx < 0 || respIdx < 0)

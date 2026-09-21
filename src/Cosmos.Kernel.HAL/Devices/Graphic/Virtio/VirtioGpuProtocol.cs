@@ -13,29 +13,29 @@ namespace Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
 internal static class VirtioGpuCmd
 {
     // 2D resource commands (virtio 1.x §5.7.5)
-    public const uint VIRTIO_GPU_CMD_GET_DISPLAY_INFO    = 0x0100;
+    public const uint VIRTIO_GPU_CMD_GET_DISPLAY_INFO = 0x0100;
     public const uint VIRTIO_GPU_CMD_RESOURCE_CREATE_2D = 0x0101;
-    public const uint VIRTIO_GPU_CMD_RESOURCE_UNREF      = 0x0102;
-    public const uint VIRTIO_GPU_CMD_SET_SCANOUT         = 0x0103;
-    public const uint VIRTIO_GPU_CMD_RESOURCE_FLUSH      = 0x0104;
+    public const uint VIRTIO_GPU_CMD_RESOURCE_UNREF = 0x0102;
+    public const uint VIRTIO_GPU_CMD_SET_SCANOUT = 0x0103;
+    public const uint VIRTIO_GPU_CMD_RESOURCE_FLUSH = 0x0104;
     public const uint VIRTIO_GPU_CMD_TRANSFER_TO_HOST_2D = 0x0105;
     public const uint VIRTIO_GPU_CMD_RESOURCE_ATTACH_BACKING = 0x0106;
     public const uint VIRTIO_GPU_CMD_RESOURCE_DETACH_BACKING = 0x0107;
-    public const uint VIRTIO_GPU_CMD_GET_CAPSET_INFO     = 0x0108;
-    public const uint VIRTIO_GPU_CMD_GET_CAPSET          = 0x0109;
-    public const uint VIRTIO_GPU_CMD_GET_EDID            = 0x010A;
+    public const uint VIRTIO_GPU_CMD_GET_CAPSET_INFO = 0x0108;
+    public const uint VIRTIO_GPU_CMD_GET_CAPSET = 0x0109;
+    public const uint VIRTIO_GPU_CMD_GET_EDID = 0x010A;
 
     // Cursor commands go on the cursor queue (queue 1).
     public const uint VIRTIO_GPU_CMD_UPDATE_CURSOR = 0x0300;
-    public const uint VIRTIO_GPU_CMD_MOVE_CURSOR   = 0x0301;
+    public const uint VIRTIO_GPU_CMD_MOVE_CURSOR = 0x0301;
 
     // Response types returned on the control queue's used ring.
-    public const uint VIRTIO_GPU_RESP_OK_NODATA        = 0x1100;
-    public const uint VIRTIO_GPU_RESP_OK_DISPLAY_INFO  = 0x1101;
-    public const uint VIRTIO_GPU_RESP_OK_CAPSET_INFO   = 0x1102;
-    public const uint VIRTIO_GPU_RESP_OK_CAPSET        = 0x1103;
-    public const uint VIRTIO_GPU_RESP_OK_EDID          = 0x1104;
-    public const uint VIRTIO_GPU_RESP_ERR_UNSPEC       = 0x1200;
+    public const uint VIRTIO_GPU_RESP_OK_NODATA = 0x1100;
+    public const uint VIRTIO_GPU_RESP_OK_DISPLAY_INFO = 0x1101;
+    public const uint VIRTIO_GPU_RESP_OK_CAPSET_INFO = 0x1102;
+    public const uint VIRTIO_GPU_RESP_OK_CAPSET = 0x1103;
+    public const uint VIRTIO_GPU_RESP_OK_EDID = 0x1104;
+    public const uint VIRTIO_GPU_RESP_ERR_UNSPEC = 0x1200;
     public const uint VIRTIO_GPU_RESP_ERR_OUT_OF_MEMORY = 0x1201;
     public const uint VIRTIO_GPU_RESP_ERR_INVALID_SCANOUT_ID = 0x1202;
     public const uint VIRTIO_GPU_RESP_ERR_INVALID_RESOURCE_ID = 0x1203;
@@ -43,8 +43,8 @@ internal static class VirtioGpuCmd
     public const uint VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER = 0x1205;
 
     // Feature bits (virtio 1.x §5.7.4)
-    public const uint VIRTIO_GPU_F_VIRGL          = 1u << 0;
-    public const uint VIRTIO_GPU_F_EDID           = 1u << 1;
+    public const uint VIRTIO_GPU_F_VIRGL = 1u << 0;
+    public const uint VIRTIO_GPU_F_EDID = 1u << 1;
     public const uint VIRTIO_GPU_F_RESOURCE_UUID = 1u << 2;
     public const uint VIRTIO_GPU_F_RESOURCE_BLOB = 1u << 3;
 
@@ -52,17 +52,17 @@ internal static class VirtioGpuCmd
     public const uint VIRTIO_GPU_FLAG_FENCE = 1u << 0;
 
     // 2D pixel formats (virtio 1.x §5.7.7)
-    public const uint VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM  = 1;
-    public const uint VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM  = 2;
-    public const uint VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM  = 3;
-    public const uint VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM  = 4;
-    public const uint VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM  = 67;
-    public const uint VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM  = 68;
+    public const uint VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM = 1;
+    public const uint VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM = 2;
+    public const uint VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM = 3;
+    public const uint VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM = 4;
+    public const uint VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM = 67;
+    public const uint VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM = 68;
 
     // Device config space layout (virtio 1.x §5.7.2): u32 num_scanouts, u32 num_capsets, u32 events_read.
-    public const uint ConfigNumScanoutsOffset  = 0;
-    public const uint ConfigNumCapsetsOffset   = 4;
-    public const uint ConfigEventsReadOffset   = 8;
+    public const uint ConfigNumScanoutsOffset = 0;
+    public const uint ConfigNumCapsetsOffset = 4;
+    public const uint ConfigEventsReadOffset = 8;
 }
 
 /// <summary>
