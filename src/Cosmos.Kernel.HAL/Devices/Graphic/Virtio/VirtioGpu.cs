@@ -4,6 +4,7 @@ using System;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
+using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
@@ -304,9 +305,29 @@ internal unsafe class VirtioGpu : GraphicDevice
 
     public override void CopyBuffer(ReadOnlyMemory<int> pixels, int x, int y, int width, int height)
     {
-        // Reinterpret int as uint (same memory layout) and dispatch to the uint overload.
-        var span = global::System.Runtime.InteropServices.MemoryMarshal.Cast<int, uint>(pixels.Span);
-        CopyBuffer(span.AsMemory(), x, y, width, height);
+        if (x < 0 || y < 0 || width <= 0 || height <= 0)
+        {
+            return;
+        }
+        if (x >= (int)_width || y >= (int)_height)
+        {
+            return;
+        }
+
+        int clampedWidth  = Math.Min(width,  (int)_width  - x);
+        int clampedHeight = Math.Min(height, (int)_height - y);
+
+        var span = pixels.Span;
+        for (int row = 0; row < clampedHeight; row++)
+        {
+            int srcOffset = row * width;
+            int dstByteOffset = (y + row) * (int)_pitch + x * 4;
+            var rowPixels = span.Slice(srcOffset, clampedWidth);
+            fixed (int* pSrc = rowPixels)
+            {
+                MemoryOp.MemCopy(_framebuffer + dstByteOffset, (byte*)pSrc, clampedWidth * 4);
+            }
+        }
     }
 
     public override void Swap()
@@ -515,8 +536,14 @@ internal unsafe class VirtioGpu : GraphicDevice
         if (cmdIdx < 0 || respIdx < 0)
         {
             Serial.Write("[VirtioGpu] No descriptors available\n");
-            if (cmdIdx >= 0) _ctrlQueue.FreeDescriptor(cmdIdx);
-            if (respIdx >= 0) _ctrlQueue.FreeDescriptor(respIdx);
+            if (cmdIdx >= 0)
+            {
+                _ctrlQueue.FreeDescriptor(cmdIdx);
+            }
+            if (respIdx >= 0)
+            {
+                _ctrlQueue.FreeDescriptor(respIdx);
+            }
             return false;
         }
 
@@ -582,9 +609,18 @@ internal unsafe class VirtioGpu : GraphicDevice
         if (cmdIdx < 0 || paramIdx < 0 || respIdx < 0)
         {
             Serial.Write("[VirtioGpu] No descriptors available (chained)\n");
-            if (cmdIdx >= 0)  _ctrlQueue.FreeDescriptor(cmdIdx);
-            if (paramIdx >= 0) _ctrlQueue.FreeDescriptor(paramIdx);
-            if (respIdx >= 0) _ctrlQueue.FreeDescriptor(respIdx);
+            if (cmdIdx >= 0)
+            {
+                _ctrlQueue.FreeDescriptor(cmdIdx);
+            }
+            if (paramIdx >= 0)
+            {
+                _ctrlQueue.FreeDescriptor(paramIdx);
+            }
+            if (respIdx >= 0)
+            {
+                _ctrlQueue.FreeDescriptor(respIdx);
+            }
             return false;
         }
 
