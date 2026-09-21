@@ -137,6 +137,7 @@ internal struct VirtioGpuTransferToHost2D
 {
     public VirtioGpuCtrlHdr Hdr;
     public VirtioGpuRect Rect;
+    public ulong Offset;
     public uint ResourceId;
     public uint Padding;
 }
@@ -162,7 +163,6 @@ internal struct VirtioGpuResourceAttachBacking
     public VirtioGpuCtrlHdr Hdr;
     public uint ResourceId;
     public uint NrEntries;
-    public uint Padding;
 }
 
 /// <summary>

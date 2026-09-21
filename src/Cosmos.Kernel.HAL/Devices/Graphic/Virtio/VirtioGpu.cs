@@ -140,7 +140,7 @@ internal unsafe class VirtioGpu : GraphicDevice
         }
 
         // Scratch buffers for the synchronous command/response path. The
-        // largest 2D command is RESOURCE_ATTACH_BACKING (16-byte hdr +
+        // largest 2D command is RESOURCE_ATTACH_BACKING (24-byte hdr +
         // 16-byte payload + 16-byte mem_entry = 48 bytes); the largest
         // response is RESP_DISPLAY_INFO (24 + 16 = 40 bytes). 64 bytes
         // covers both with room for the cursor queue's smaller payloads.
@@ -442,7 +442,6 @@ internal unsafe class VirtioGpu : GraphicDevice
             },
             ResourceId = ScanoutResourceId,
             NrEntries  = 1,
-            Padding    = 0,
         };
 
         VirtioGpuMemEntry entry = new()
@@ -485,6 +484,8 @@ internal unsafe class VirtioGpu : GraphicDevice
                 Type = VirtioGpuCmd.VIRTIO_GPU_CMD_TRANSFER_TO_HOST_2D,
             },
             Rect = new VirtioGpuRect { X = x, Y = y, Width = w, Height = h },
+            // Byte offset into the backing store of the rect's top-left pixel.
+            Offset = (ulong)y * _pitch + (ulong)x * 4,
             ResourceId = resourceId,
             Padding = 0,
         };
