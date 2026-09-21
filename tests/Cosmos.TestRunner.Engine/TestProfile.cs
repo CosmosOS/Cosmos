@@ -47,6 +47,15 @@ public sealed record TestProfile
     public string? VgaAdapter { get; init; }
 
     /// <summary>
+    /// Display adapter to attach as a <c>-device</c> line (e.g.
+    /// <c>virtio-gpu-pci</c>), or null for none. Additive, unlike
+    /// <see cref="VgaAdapter"/>: the machine's default adapter stays and keeps
+    /// providing the framebuffer the bootloader hands the kernel, so this cell
+    /// differs from the bare one only by the extra device on the PCI bus.
+    /// </summary>
+    public string? GpuDevice { get; init; }
+
+    /// <summary>
     /// Architectures this profile applies to; null means any. Mirrors the
     /// modifier filter, for hardware that only one architecture can present
     /// (PS/2 on x64, virtio-mmio on the ARM64 virt machine).
@@ -480,6 +489,7 @@ public static class TestProfileLoader
                 KeyboardDevice = NullIfBlank(entry.Keyboard),
                 MouseDevice = NullIfBlank(entry.Mouse),
                 VgaAdapter = NullIfBlank(entry.Vga),
+                GpuDevice = NullIfBlank(entry.Gpu),
                 Architectures = entry.Architectures
             };
 
@@ -589,6 +599,7 @@ public static class TestProfileLoader
         string? Keyboard,
         string? Mouse,
         string? Vga,
+        string? Gpu,
         List<string>? Architectures,
         // Keyed by architecture, unlike a modifier's flat map: a modifier is
         // already scoped by its own "architectures" list, while a profile

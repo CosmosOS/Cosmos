@@ -154,6 +154,38 @@ public class QemuLauncherTests
         Assert.Throws<ArgumentException>(() => QemuLauncher.AppendVgaAdapter(args, "vmware -device rm"));
     }
 
+    // -device, not -vga: the adapter is ADDED beside the machine default so
+    // the firmware framebuffer Limine boots on survives. -vga would replace
+    // it, and on the arm64 virt machine "-vga virtio" is not even accepted.
+    [Fact]
+    public void AppendGpuDevice_EmitsDeviceForAModel()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendGpuDevice(args, "virtio-gpu-pci");
+        Assert.Equal(" -device virtio-gpu-pci", args.ToString());
+    }
+
+    // "none" is a sentinel here, unlike -vga none: there is no such -device.
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("none")]
+    [InlineData("NONE")]
+    public void AppendGpuDevice_AddsNothingWhenUnsetOrNone(string? model)
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendGpuDevice(args, model);
+        Assert.Equal(string.Empty, args.ToString());
+    }
+
+    [Fact]
+    public void AppendGpuDevice_RejectsCharactersOutsideOptionAlphabet()
+    {
+        StringBuilder args = new();
+        Assert.Throws<ArgumentException>(() => QemuLauncher.AppendGpuDevice(args, "virtio-gpu-pci -device rm"));
+    }
+
     [Theory]
     [InlineData("x64", "e1000e")]
     [InlineData("arm64", "virtio-net-device")]

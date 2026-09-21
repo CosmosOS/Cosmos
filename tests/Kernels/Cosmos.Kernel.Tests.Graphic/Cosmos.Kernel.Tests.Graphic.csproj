@@ -18,10 +18,14 @@
        run (GOP over stdvga VBE on x64, ramfb on arm64); `vmware-svga` swaps in
        the VMware SVGA II adapter — the display still runs GOP over the
        device's embedded Bochs VBE core, and the Svga3D_* FIFO tests bind the
-       SvgaIIDriver to the adapter without enabling it. -->
+       SvgaIIDriver to the adapter without enabling it; `virtio-gpu` adds a
+       virtio-gpu-pci alongside the default adapter on both arches, so the
+       display keeps booting on the firmware framebuffer while the virtio GPU
+       is on the bus for a driver to claim. -->
   <ItemGroup>
     <CosmosTestProfile Include="bare" />
     <CosmosTestProfile Include="vmware-svga" />
+    <CosmosTestProfile Include="virtio-gpu" />
   </ItemGroup>
 
   <!-- Architecture-specific HAL (using project references for development) -->
