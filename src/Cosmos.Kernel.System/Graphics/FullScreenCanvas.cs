@@ -1,5 +1,6 @@
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
+using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
 
@@ -41,13 +42,28 @@ internal static class FullScreenCanvas
     }
 
     /// <summary>
-    /// Creates the canvas matching the detected display device. On the VMware
-    /// SVGA II adapter the canvas type depends on whether the device
-    /// negotiated 3D support, so users can discover 3D capability with
+    /// Creates the canvas matching the detected display device. Order matters:
+    /// virtio-gpu is preferred over SVGA-II when both are present (the test
+    /// suite explicitly wires virtio-gpu-pci to check the new path), and GOP
+    /// is the fallback when neither PCI device is bound. On the VMware SVGA II
+    /// adapter the canvas type depends on whether the device negotiated 3D
+    /// support, so users can discover 3D capability with
     /// <c>canvas is Canvas3D</c>.
     /// </summary>
     private static Canvas CreateVideoDriver(Mode? mode)
     {
+        // virtio-gpu takes priority: a kernel that wired -device virtio-gpu-pci
+        // expects its driver to drive the display even when vmware-svga is
+        // also on the PCI bus.
+        if (CosmosFeatures.PCIEnabled && CosmosFeatures.GraphicsEnabled)
+        {
+            VirtioGpu? virtioGpu = VirtioDevice.GetDevice<VirtioGpu>();
+            if (virtioGpu is not null && virtioGpu.Ready)
+            {
+                return new VirtioGpuCanvas(virtioGpu);
+            }
+        }
+
         if (CosmosFeatures.PCIEnabled)
         {
             PciDevice? svgaDevice = PciManager.GetDevice(VendorId.VmWare, DeviceId.SvgaiiAdapter);
