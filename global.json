@@ -4,6 +4,6 @@
         "rollForward": "latestFeature"
     },
     "msbuild-sdks": {
-        "Cosmos.Sdk": "3.0.87"
+        "Cosmos.Sdk": "3.0.84"
     }
 }
