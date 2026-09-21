@@ -3,6 +3,7 @@
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
@@ -173,6 +174,7 @@ internal static class VirtioDevice
     {
         VirtioTransport.DeviceTypeNetwork => CosmosFeatures.NetworkEnabled,
         VirtioTransport.DeviceTypeInput => CosmosFeatures.KeyboardEnabled || CosmosFeatures.MouseEnabled,
+        VirtioTransport.DeviceTypeGpu => CosmosFeatures.GraphicsEnabled,
         _ => false,
     };
 
@@ -196,6 +198,17 @@ internal static class VirtioDevice
                 break;
             case VirtioTransport.DeviceTypeInput:
                 RegisterInputDevice(transport);
+                break;
+            case VirtioTransport.DeviceTypeGpu:
+                if (CosmosFeatures.GraphicsEnabled)
+                {
+                    VirtioGpu gpuDevice = new(transport);
+                    gpuDevice.Initialize();
+                    if (gpuDevice.Ready)
+                    {
+                        Add(gpuDevice);
+                    }
+                }
                 break;
             default:
                 Serial.Write("[VirtioDevice] Unsupported virtio device type ");
