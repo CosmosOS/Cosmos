@@ -430,6 +430,7 @@ jobs:
             # same SHAs. The lines follow GitHub's own format.
             upstream=valentinbreiz/nativeaot-patcher
             changes=""
+            seen=""
             for sha in $(gh api "repos/$GITHUB_REPOSITORY/compare/$previous...$GITHUB_SHA" --paginate \
                            --jq '.commits[] | select(.parents | length > 1) | .sha'); do
               line=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/pulls" \
@@ -438,7 +439,15 @@ jobs:
                 line=$(gh api "repos/$upstream/commits/$sha/pulls" \
                          --jq '.[0] | select(. != null) | "* \(.title) by @\(.user.login) in \(.html_url)"')
               fi
-              [[ -n "$line" ]] && changes+="$line"$'\n'
+              # One line per pull request. Every merge commit in the range
+              # resolves to the pull request that introduced it, so a branch
+              # that merged gen3 into itself, or a contributor's fork-side
+              # merges, would repeat the same line once per merge commit.
+              [[ -z "$line" ]] && continue
+              url=${line##* }
+              case " $seen " in *" $url "*) continue ;; esac
+              seen+=" $url"
+              changes+="$line"$'\n'
             done
             echo "generate=false" >> "$GITHUB_OUTPUT"
             {
