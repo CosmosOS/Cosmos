@@ -56,6 +56,20 @@ public sealed class QemuLaunchOptions
     /// second one alongside it.
     /// </summary>
     public string? VgaAdapter { get; init; }
+
+    /// <summary>
+    /// Display device attached as a <c>-device</c> line (e.g.
+    /// <c>virtio-gpu-pci</c>), or <c>null</c>/<c>"none"</c> to add none.
+    /// Unlike <see cref="VgaAdapter"/> this ADDS an adapter alongside the
+    /// machine's default one rather than replacing it, so the firmware keeps
+    /// the framebuffer it boots Limine on (VBE over q35's std VGA, ramfb on
+    /// virt) while the guest driver gets a second device to bind. That is the
+    /// only shape that works on both arches: <c>-vga virtio</c> resolves to
+    /// the VGA-compatible <c>virtio-vga</c> on q35, but the virt machine has
+    /// no such variant and rejects it with "Virtio VGA not available".
+    /// </summary>
+    public string? GpuDevice { get; init; }
+
     /// <summary>
     /// Disks to attach. Each <see cref="DiskAttachment"/> carries the image
     /// path, the controller type (ahci or nvme), and an optional comma-prefixed
@@ -225,6 +239,7 @@ public static class QemuLauncher
         AppendInputDevice(args, options.KeyboardDevice);
         AppendInputDevice(args, options.MouseDevice);
         AppendVgaAdapter(args, options.VgaAdapter);
+        AppendGpuDevice(args, options.GpuDevice);
 
         if (options.Debug)
         {
@@ -439,6 +454,26 @@ public static class QemuLauncher
 
         ValidateOptionToken(adapter, "vga adapter");
         args.Append($" -vga {adapter}");
+    }
+
+    /// <summary>
+    /// Attaches a display adapter as a <c>-device</c> line, additively: the
+    /// machine's default adapter stays, so this never disturbs the framebuffer
+    /// the bootloader came up on. <c>null</c>/empty and the sentinel
+    /// <c>"none"</c> add nothing. Emitted for both arches — q35 accepts
+    /// <c>virtio-gpu-pci</c> beside its std VGA, and virt accepts it beside
+    /// ramfb — so the catalog needs no architecture filter for it.
+    /// </summary>
+    internal static void AppendGpuDevice(StringBuilder args, string? model)
+    {
+        if (string.IsNullOrWhiteSpace(model)
+            || model.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        ValidateOptionToken(model, "gpu device model");
+        args.Append($" -device {model}");
     }
 
     /// <summary>

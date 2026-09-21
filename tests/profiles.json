@@ -1,11 +1,12 @@
 {
   // Global QEMU profile catalog. Two orthogonal axes:
   //   * profiles  — a hardware "shape": the disks, NIC ("nic"), input
-  //     devices ("keyboard"/"mouse") and VGA adapter ("vga", a -vga backend
+  //     devices ("keyboard"/"mouse"), VGA adapter ("vga", a -vga backend
   //     name that REPLACES the architecture default rather than adding a
-  //     second adapter) attached. An optional "architectures" filter pins a
-  //     profile to the arch that can present that hardware; a suite listing
-  //     per-arch profiles runs the matching one on each.
+  //     second adapter) and display device ("gpu", a -device model ADDED
+  //     alongside that default) attached. An optional "architectures" filter
+  //     pins a profile to the arch that can present that hardware; a suite
+  //     listing per-arch profiles runs the matching one on each.
   //   * modifiers — generic knobs that compose with a profile. Two flavors:
   //       - deviceOptions: per-disk-kind overrides (msix tuning, cache mode)
   //       - machineOptions: -M property overrides (gic-version, ...)
@@ -69,6 +70,35 @@
       "name": "vmware-svga",
       "architectures": ["x64"],
       "vga": "vmware"
+    },
+    {
+      // virtio-gpu on the PCI bus, ADDED next to the machine's default
+      // adapter rather than replacing it ("gpu", not "vga"). Two reasons it
+      // has to be additive:
+      //   * The default adapter is what the firmware hands Limine — VBE over
+      //     q35's std VGA, ramfb on virt — so keeping it means the suite's
+      //     existing framebuffer assertions still have a framebuffer, and the
+      //     cell differs from `bare` only by the device on the bus.
+      //   * -vga virtio would work on q35 (it resolves to the VGA-compatible
+      //     virtio-vga), but virt has no such variant and refuses it outright
+      //     with "Virtio VGA not available" — so one shape spanning both
+      //     arches has to go through -device.
+      //
+      // This is the cell the virtio-gpu driver actually runs in:
+      // FullScreenCanvas prefers a ready VirtioGpu over SVGA-II and GOP, so
+      // the suite's canvas tests render through VirtioGpuCanvas here and over
+      // the firmware framebuffer in the other cells — same assertions, both
+      // paths. A driver that fails to bind does not skip the cell, it falls
+      // back to GOP and passes quietly, so the binding itself is worth
+      // checking in the boot log ("[VirtioGpu] Initialization complete").
+      //
+      // gic-version=3 on arm64 for the same reason as virtio-pci: virtio-pci
+      // MSI-X is routed by the GICv3 ITS and virt defaults to GICv2, which has
+      // none. q35 rejects the property, hence the scoping.
+      "name": "virtio-gpu",
+      "architectures": ["x64", "arm64"],
+      "machineOptions": { "arm64": { "gic-version": "3" } },
+      "gpu": "virtio-gpu-pci"
     },
     {
       // Every virtio device kind the kernel has a driver for, over PCI.
