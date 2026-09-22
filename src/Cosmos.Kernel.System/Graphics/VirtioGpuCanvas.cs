@@ -161,6 +161,8 @@ internal unsafe class VirtioGpuCanvas : Canvas
             byte* fb = _driver.Framebuffer + dstByteOffset;
             MemoryOp.MemSet((uint*)fb, raw, aWidth);
         }
+        // Bypasses ClearScreen/DrawPixel/CopyBuffer, so mark the rect dirty by hand.
+        _driver.MarkDirty(aX, aY, aWidth, aHeight);
     }
 
     public override void DrawRectangle(Color color, int x, int y, int width, int height)
