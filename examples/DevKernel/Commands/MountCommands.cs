@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Cosmos.Kernel.HAL.Vfs;
 using Cosmos.Kernel.System.Filesystems.Fat;
 using Cosmos.Kernel.System.Storage;
@@ -62,6 +63,15 @@ internal static class MountCommands
             },
             new ShellCommand
             {
+                Name = "umount",
+                Usage = "umount <mountpoint>",
+                Description = "Flush and detach the filesystem at <mountpoint> (do it before pulling out a USB disk)",
+                MinArgs = 1,
+                MaxArgs = 1,
+                Execute = static (context, args) => Unmount(context, context.ResolveNormalized(args[0])),
+            },
+            new ShellCommand
+            {
                 Name = "mounts",
                 Usage = "mounts",
                 Description = "Show mounted filesystems",
@@ -105,16 +115,17 @@ internal static class MountCommands
             return;
         }
 
-        // Refuse formatting a mounted partition: there is no umount command, so
-        // the stale superblock would flush cached FAT and directory state with
-        // the old geometry over the fresh volume. VfsManager.TryFormat refuses
-        // this too; the loop is here for the message that names the mount point.
-        for (int i = 0; i < VfsManager.Mounts.Count; i++)
+        // Refuse formatting a mounted partition: the stale superblock would
+        // flush cached FAT and directory state with the old geometry over the
+        // fresh volume. VfsManager.TryFormat refuses this too; the loop is here
+        // for the message that names the mount point.
+        IReadOnlyList<VfsManager.VfsMount> mounts = VfsManager.Mounts;
+        for (int i = 0; i < mounts.Count; i++)
         {
-            VfsManager.VfsMount mount = VfsManager.Mounts[i];
+            VfsManager.VfsMount mount = mounts[i];
             if (ReferenceEquals(mount.Partition, target))
             {
-                Terminal.Error("Partition is mounted at " + mount.MountPoint + ". Reboot before reformatting.");
+                Terminal.Error("Partition is mounted at " + mount.MountPoint + ". Run 'umount " + mount.MountPoint + "' first.");
                 return;
             }
         }
@@ -151,6 +162,44 @@ internal static class MountCommands
         }
 
         Terminal.Success("Disk " + diskNumber + " partition " + partitionNumber + " mounted at " + mountPoint);
+    }
+
+    /// <summary>
+    /// Detaches the filesystem at <paramref name="mountPoint"/> after flushing
+    /// it, and leaves it when the shell was inside it.
+    /// </summary>
+    private static void Unmount(ShellContext context, string mountPoint)
+    {
+        bool unmounted;
+        try
+        {
+            unmounted = VfsManager.TryUnmount(mountPoint);
+        }
+        catch (IOException ex)
+        {
+            // The mount is gone already; only its last writes may be.
+            LeaveMountPoint(context, mountPoint);
+            Terminal.Error("Unmounted " + mountPoint + ", but its last writes may be lost: " + ex.Message);
+            return;
+        }
+
+        if (!unmounted)
+        {
+            Terminal.Error("Nothing is mounted at " + mountPoint + ". Use 'mounts' to list.");
+            return;
+        }
+
+        LeaveMountPoint(context, mountPoint);
+        Terminal.Success("Unmounted " + mountPoint);
+    }
+
+    /// <summary>Moves the shell to the root when its directory was under <paramref name="mountPoint"/>.</summary>
+    private static void LeaveMountPoint(ShellContext context, string mountPoint)
+    {
+        if (context.Cwd == mountPoint || context.Cwd.StartsWith(mountPoint + VfsPath.Separator, StringComparison.Ordinal))
+        {
+            context.Cwd = VfsPath.Root;
+        }
     }
 
     private static void ShowMountPoints()
