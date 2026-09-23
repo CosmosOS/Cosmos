@@ -103,9 +103,10 @@ public static partial class VfsManager
             return true;
         }
 
-        for (int i = 0; i < s_mounts.Count; i++)
+        VfsMount[] mounts = s_mounts;
+        for (int i = 0; i < mounts.Length; i++)
         {
-            if (string.Equals(s_mounts[i].MountPoint, fullPath, StringComparison.Ordinal))
+            if (string.Equals(mounts[i].MountPoint, fullPath, StringComparison.Ordinal))
             {
                 return true;
             }
@@ -138,10 +139,11 @@ public static partial class VfsManager
     /// listing of the virtual root shows while no filesystem is mounted at "/".</summary>
     internal static string[] GetVirtualRootEntries()
     {
-        var collected = new List<string>(s_mounts.Count);
-        for (int i = 0; i < s_mounts.Count; i++)
+        VfsMount[] mounts = s_mounts;
+        var collected = new List<string>(mounts.Length);
+        for (int i = 0; i < mounts.Length; i++)
         {
-            string mountPoint = s_mounts[i].MountPoint;
+            string mountPoint = mounts[i].MountPoint;
             if (mountPoint == s_directorySeparatorString)
             {
                 continue;

@@ -1,8 +1,11 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Vfs;
 using Cosmos.Kernel.System.Storage;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.System.Vfs;
 
@@ -85,11 +88,22 @@ public static partial class VfsManager
     }
 
     private static readonly Dictionary<string, IVfsFilesystemType> s_registeredTypes = new(StringComparer.Ordinal);
-    private static readonly List<VfsMount> s_mounts = [];
     private static readonly string s_directorySeparatorString = Path.DirectorySeparatorChar.ToString();
 
     /// <summary>
-    /// All currently active mounts in registration order.
+    /// The mount table. Replaced on every change, never changed in place:
+    /// the USB hot-plug thread detaches the mounts of a disk that was pulled
+    /// out while another thread may be resolving a path, and that thread
+    /// keeps walking the whole table it read.
+    /// </summary>
+    private static VfsMount[] s_mounts = [];
+
+    /// <summary>Serializes the replacement of <see cref="s_mounts"/>.</summary>
+    private static SchedSpinLock s_mountLock;
+
+    /// <summary>
+    /// All currently active mounts in registration order. The list returned
+    /// never changes; read the property again for a newer one.
     /// </summary>
     public static IReadOnlyList<VfsMount> Mounts => s_mounts;
 
@@ -179,7 +193,15 @@ public static partial class VfsManager
 
         string normalizedMountPoint = NormalizeMountPoint(mountPoint);
         mount = new VfsMount(name, source.ToString(), normalizedMountPoint, filesystemType, superblock, partition);
-        s_mounts.Add(mount);
+        s_mountLock.Acquire();
+        try
+        {
+            s_mounts = [.. s_mounts, mount];
+        }
+        finally
+        {
+            s_mountLock.Release();
+        }
 
         return true;
     }
@@ -238,6 +260,14 @@ public static partial class VfsManager
     /// <returns><c>true</c> on success, <c>false</c> if the driver is missing, the partition is not registered or mounted, or the format fails.</returns>
     public static bool TryFormat(string name, Partition partition, IVfsFormatOptions? options)
     {
+        // By the partition itself too: a disk unplugged or rescanned since
+        // the mount renumbers the partitions, so the index the mount recorded
+        // may no longer be this one's.
+        if (IsPartitionMounted(partition))
+        {
+            return false;
+        }
+
         int index = IndexOfPartition(partition);
         return index >= 0 && TryFormat(name, index.ToString(), options);
     }
@@ -264,26 +294,101 @@ public static partial class VfsManager
     }
 
     /// <summary>
-    /// Unmount the filesystem at <paramref name="mountPoint"/>: drops the
-    /// superblock (which flushes per the driver's Drop semantics) and
-    /// removes the mount from the table.
+    /// Unmount the filesystem at <paramref name="mountPoint"/>: removes the
+    /// mount from the table, then drops the superblock (which flushes per
+    /// the driver's Drop semantics).
     /// </summary>
     /// <returns><see langword="false"/> when no mount sits at
     /// <paramref name="mountPoint"/> once it is normalized. A driver whose
-    /// Drop fails does not report it here.</returns>
+    /// Drop fails does not report it here, and an exception its flush
+    /// throws reaches the caller with the mount already removed.</returns>
     public static bool TryUnmount(string mountPoint)
     {
         string normalizedMountPoint = NormalizeMountPoint(mountPoint);
-        for (int i = 0; i < s_mounts.Count; i++)
+        VfsMount? removed = null;
+        s_mountLock.Acquire();
+        try
         {
-            VfsMount current = s_mounts[i];
-            if (string.Equals(current.MountPoint, normalizedMountPoint, StringComparison.Ordinal))
+            List<VfsMount> kept = new(s_mounts.Length);
+            foreach (VfsMount current in s_mounts)
             {
-                current.Superblock.SuperOperations.Drop(current.Superblock);
-                s_mounts.RemoveAt(i);
+                if (removed is null && string.Equals(current.MountPoint, normalizedMountPoint, StringComparison.Ordinal))
+                {
+                    removed = current;
+                }
+                else
+                {
+                    kept.Add(current);
+                }
+            }
+
+            if (removed is not null)
+            {
+                s_mounts = kept.ToArray();
+            }
+        }
+        finally
+        {
+            s_mountLock.Release();
+        }
+
+        // Outside the lock: the flush writes to the disk.
+        removed?.Superblock.SuperOperations.Drop(removed.Superblock);
+        return removed is not null;
+    }
+
+    /// <summary>
+    /// Detaches every mount whose partition lives on <paramref name="host"/>,
+    /// a disk that is gone. The mounts leave the table without their driver
+    /// being asked to flush, since the disk takes no more writes; files still
+    /// open on them fail their next I/O.
+    /// </summary>
+    /// <param name="host">The disk that is gone.</param>
+    internal static void DetachMounts(IBlockDevice host)
+    {
+        List<VfsMount> detached = [];
+        s_mountLock.Acquire();
+        try
+        {
+            List<VfsMount> kept = new(s_mounts.Length);
+            foreach (VfsMount current in s_mounts)
+            {
+                if (current.Partition is not null && ReferenceEquals(current.Partition.Host, host))
+                {
+                    detached.Add(current);
+                }
+                else
+                {
+                    kept.Add(current);
+                }
+            }
+
+            s_mounts = kept.ToArray();
+        }
+        finally
+        {
+            s_mountLock.Release();
+        }
+
+        foreach (VfsMount mount in detached)
+        {
+            Serial.WriteString("[VFS] ");
+            Serial.WriteString(mount.MountPoint);
+            Serial.WriteString(" detached: its disk is gone\n");
+        }
+    }
+
+    /// <summary>True when a live mount was made on <paramref name="partition"/> itself.</summary>
+    private static bool IsPartitionMounted(Partition partition)
+    {
+        foreach (VfsMount current in s_mounts)
+        {
+            if (ReferenceEquals(current.Partition, partition))
+            {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -294,9 +399,10 @@ public static partial class VfsManager
     /// </summary>
     private static bool IsSourceMounted(string name, ReadOnlySpan<char> source)
     {
-        for (int i = 0; i < s_mounts.Count; i++)
+        VfsMount[] mounts = s_mounts;
+        for (int i = 0; i < mounts.Length; i++)
         {
-            VfsMount current = s_mounts[i];
+            VfsMount current = mounts[i];
             if (string.Equals(current.Name, name, StringComparison.Ordinal)
                 && source.SequenceEqual(current.Source))
             {
@@ -314,10 +420,10 @@ public static partial class VfsManager
     public static bool TryGetMount(string mountPoint, [NotNullWhen(true)] out VfsMount? mount)
     {
         string normalizedMountPoint = NormalizeMountPoint(mountPoint);
-
-        for (int i = 0; i < s_mounts.Count; i++)
+        VfsMount[] mounts = s_mounts;
+        for (int i = 0; i < mounts.Length; i++)
         {
-            VfsMount current = s_mounts[i];
+            VfsMount current = mounts[i];
             if (string.Equals(current.MountPoint, normalizedMountPoint, StringComparison.Ordinal))
             {
                 mount = current;
@@ -611,10 +717,10 @@ public static partial class VfsManager
     private static VfsMount? FindMount(string path)
     {
         VfsMount? bestMatch = null;
-
-        for (int i = 0; i < s_mounts.Count; i++)
+        VfsMount[] mounts = s_mounts;
+        for (int i = 0; i < mounts.Length; i++)
         {
-            VfsMount candidate = s_mounts[i];
+            VfsMount candidate = mounts[i];
             if (!MountCovers(candidate.MountPoint, path))
             {
                 continue;
