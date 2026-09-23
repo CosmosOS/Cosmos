@@ -113,7 +113,8 @@ public sealed class QemuLaunchOptions
 public enum DiskKind
 {
     Ahci,
-    Nvme
+    Nvme,
+    Usb
 }
 
 /// <summary>
@@ -362,10 +363,11 @@ public static class QemuLauncher
     }
 
     /// <summary>
-    /// Attach AHCI/SATA + NVMe disks. AHCI disks share one <c>ich9-ahci</c>
+    /// Attach AHCI/SATA, NVMe and USB disks. AHCI disks share one <c>ich9-ahci</c>
     /// controller and consume successive ports; NVMe disks each get a
     /// dedicated <c>nvme</c> controller so the guest exercises multi-controller
-    /// binding. Per-disk <see cref="DiskAttachment.ExtraDeviceOptions"/> is
+    /// binding; USB disks are <c>usb-storage</c> sticks on one shared
+    /// <c>qemu-xhci</c> controller. Per-disk <see cref="DiskAttachment.ExtraDeviceOptions"/> is
     /// appended after the standard device properties so profiles can flip
     /// things like <c>msix=off</c>.
     /// </summary>
@@ -373,7 +375,9 @@ public static class QemuLauncher
     {
         int ahciIndex = 0;
         int nvmeIndex = 0;
+        int usbIndex = 0;
         bool ahciControllerEmitted = false;
+        bool usbControllerEmitted = false;
 
         foreach (DiskAttachment disk in options.Disks)
         {
@@ -396,6 +400,18 @@ public static class QemuLauncher
                     args.Append($" -device nvme,id=nvme{nvmeIndex},drive=nvmedisk{nvmeIndex},serial=cosmos-nvme-{nvmeIndex}");
                     AppendDeviceOptions(args, disk.ExtraDeviceOptions);
                     nvmeIndex++;
+                    break;
+
+                case DiskKind.Usb:
+                    if (!usbControllerEmitted)
+                    {
+                        args.Append(" -device qemu-xhci,id=usbxhci0");
+                        usbControllerEmitted = true;
+                    }
+                    args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id=usbdisk{usbIndex},format=raw");
+                    args.Append($" -device usb-storage,drive=usbdisk{usbIndex},bus=usbxhci0.0");
+                    AppendDeviceOptions(args, disk.ExtraDeviceOptions);
+                    usbIndex++;
                     break;
             }
         }

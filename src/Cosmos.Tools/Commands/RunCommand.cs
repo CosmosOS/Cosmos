@@ -41,7 +41,7 @@ public class RunSettings : CommandSettings
     public bool Debug { get; set; }
 
     [CommandOption("--disk <SPEC>")]
-    [Description("Attach a disk image the kernel can use at boot. Format: 'path' or 'path,kind' where kind is ahci (default) or nvme. Repeatable.")]
+    [Description("Attach a disk image the kernel can use at boot. Format: 'path' or 'path,kind' where kind is ahci (default), nvme or usb. Repeatable.")]
     public string[] Disks { get; set; } = Array.Empty<string>();
 
     [CommandOption("--nic <MODEL>")]
@@ -185,6 +185,11 @@ public class RunCommand : AsyncCommand<RunSettings>
                 else if (suffix.Equals("nvme", StringComparison.OrdinalIgnoreCase))
                 {
                     kind = DiskKind.Nvme;
+                    path = spec[..comma];
+                }
+                else if (suffix.Equals("usb", StringComparison.OrdinalIgnoreCase))
+                {
+                    kind = DiskKind.Usb;
                     path = spec[..comma];
                 }
                 // Any other suffix is treated as part of the path (a filename that

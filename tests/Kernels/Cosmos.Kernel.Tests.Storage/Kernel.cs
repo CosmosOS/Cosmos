@@ -738,12 +738,12 @@ public class Kernel : Sys.Kernel
     // ==================== Profile ====================
 
     // The cell name encodes the controller it attached: ahci => sata*,
-    // nvme-* => nvme*. Proves the driver that bound matches the cell's
-    // intent. Device names are unique per instance ("sata0", "nvme0n1"),
-    // so only the driver prefix is pinned here.
+    // nvme-* => nvme*, usb => usb*. Proves the driver that bound matches the
+    // cell's intent. Device names are unique per instance ("sata0",
+    // "nvme0n1", "usb0"), so only the driver prefix is pinned here.
     private static void TestProfile_DeviceKindMatches()
     {
-        string expected = TR.ProfileHasPrefix("ahci") ? "sata" : "nvme";
+        string expected = TR.ProfileHasPrefix("ahci") ? "sata" : TR.ProfileHasPrefix("usb") ? "usb" : "nvme";
         Assert.True(HasOrdinalPrefix(s_dev!.Name, expected),
             "device name does not match the cell's controller kind");
     }
@@ -875,8 +875,11 @@ public class Kernel : Sys.Kernel
 
     private static void TestDevice_LargeTransfer()
     {
+        // Past every driver's per-command limit (one page, 8 sectors, for
+        // SATA; 64 KiB, 128 sectors, for USB mass storage), plus one block,
+        // so the split into several commands and a short last one are covered.
         const ulong lba = 1000;
-        const ulong blocks = 32;
+        const ulong blocks = 257;
         ulong total = blocks * s_dev!.BlockSize;
 
         Span<byte> writeBuf = new byte[total];

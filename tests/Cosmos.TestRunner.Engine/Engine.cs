@@ -331,7 +331,7 @@ public partial class Engine
         for (int i = 0; i < profile.Disks.Count; i++)
         {
             TestProfileDisk disk = profile.Disks[i];
-            string kindTag = disk.Kind == DiskKind.Ahci ? "ahci" : "nvme";
+            string kindTag = disk.Kind.ToString().ToLowerInvariant();
             string path = Path.Combine(
                 Path.GetTempPath(),
                 $"cosmos-test-disk-{suite}-{_config.Architecture}-{profileTag}-{kindTag}{i}.img");

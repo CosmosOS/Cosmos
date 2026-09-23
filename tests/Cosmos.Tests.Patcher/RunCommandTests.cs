@@ -38,6 +38,7 @@ public class RunCommandTests
     [InlineData("nvme", DiskKind.Nvme)]
     [InlineData("NVME", DiskKind.Nvme)]
     [InlineData("ahci", DiskKind.Ahci)]
+    [InlineData("usb", DiskKind.Usb)]
     public void ParseDisks_HonorsExplicitKindSuffix(string suffix, DiskKind expected)
     {
         string img = CreateTempImage();
