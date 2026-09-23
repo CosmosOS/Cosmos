@@ -9,5 +9,6 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 internal static class UsbClassCode
 {
     public const byte Hid = 0x03;
+    public const byte MassStorage = 0x08;
     public const byte Hub = 0x09;
 }

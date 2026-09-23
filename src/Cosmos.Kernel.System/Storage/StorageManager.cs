@@ -120,8 +120,9 @@ public static class StorageManager
 
     /// <summary>
     /// Registers every block device produced by the HAL storage drivers
-    /// (AHCI ports, NVMe namespaces). Called once during boot after the HAL
-    /// has initialized the controllers.
+    /// (AHCI ports, NVMe namespaces, then USB mass storage units, so an
+    /// internal disk stays the primary one). Called once during boot after
+    /// the HAL has initialized the controllers.
     /// </summary>
     internal static void RegisterHalDevices()
     {
@@ -140,6 +141,12 @@ public static class StorageManager
         for (int i = 0; i < nvmeNamespaces.Count; i++)
         {
             RegisterDevice(nvmeNamespaces[i]);
+        }
+
+        IReadOnlyList<UsbMassStorage> usbDisks = UsbMassStorageDriver.Disks;
+        for (int i = 0; i < usbDisks.Count; i++)
+        {
+            RegisterDevice(usbDisks[i]);
         }
     }
 

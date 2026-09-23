@@ -73,10 +73,10 @@ internal class LibraryInitializer
             }
 
             // Bring up USB host controllers and enumerate the devices behind
-            // them. Keyboards are its only client so far, hence the switch.
-            // Same ordering constraint as virtio: MSI-X needs the platform
-            // binder InitializeHardware installed.
-            if (CosmosFeatures.PCIEnabled && CosmosFeatures.KeyboardEnabled)
+            // them. Keyboards and mass storage are its clients so far, hence
+            // the switches. Same ordering constraint as virtio: MSI-X needs
+            // the platform binder InitializeHardware installed.
+            if (CosmosFeatures.PCIEnabled && (CosmosFeatures.KeyboardEnabled || CosmosFeatures.StorageEnabled))
             {
                 Serial.WriteString("[KERNEL]   - Initializing USB...\n");
                 UsbManager.Initialize();
