@@ -27,7 +27,7 @@ Storage support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot the kernel initializes `StorageManager`, which registers every AHCI and NVMe device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`.
+At boot the kernel initializes `StorageManager`, which registers every AHCI, NVMe and USB mass storage device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`. USB sticks and disks come up as `usb0`, `usb1`, ... after the internal disks, so the first internal disk stays the primary device. USB devices are only discovered at boot: plug the stick in before starting the kernel.
 
 To give your kernel a disk in QEMU, attach an image with `cosmos run`:
 
@@ -35,6 +35,7 @@ To give your kernel a disk in QEMU, attach an image with `cosmos run`:
 $ qemu-img create disk.img 64M
 $ cosmos run --disk disk.img            # attached as an AHCI disk (default)
 $ cosmos run --disk disk.img,nvme       # or as an NVMe namespace
+$ cosmos run --disk disk.img,usb        # or as a USB stick on an xHCI controller
 ```
 
 `--disk` is repeatable if you want several drives.
@@ -481,7 +482,7 @@ With **nothing mounted at all**, `System.IO` still degrades gracefully: `Directo
 
 ## How it works
 
-Your code calls the stock BCL, which bottoms out in the Unix PAL (`Interop.Sys.*` P/Invokes). Those ~45 entry points are [plugged](../dev/plugs.md) in `Cosmos.Kernel.Plugs`: a file-descriptor table adapts the PAL contract (fds, dir streams, PAL errnos) and delegates to `VfsManager`, which owns path resolution, the mount table, the current directory and open-handle semantics, and dispatches to the mounted filesystem driver, which reads and writes an `IBlockDevice` (AHCI or NVMe via `StorageManager`, RAM via `MemoryBlockDevice`).
+Your code calls the stock BCL, which bottoms out in the Unix PAL (`Interop.Sys.*` P/Invokes). Those ~45 entry points are [plugged](../dev/plugs.md) in `Cosmos.Kernel.Plugs`: a file-descriptor table adapts the PAL contract (fds, dir streams, PAL errnos) and delegates to `VfsManager`, which owns path resolution, the mount table, the current directory and open-handle semantics, and dispatches to the mounted filesystem driver, which reads and writes an `IBlockDevice` (AHCI, NVMe or USB mass storage via `StorageManager`, RAM via `MemoryBlockDevice`).
 
 ```
 File / Directory / FileStream          (stock BCL)
@@ -494,5 +495,5 @@ VfsManager                             (mounts, paths, CWD, open handles)
         │
 IVfsFilesystemType / IVfsSuperblock    (FAT driver)
         │
-IBlockDevice                           (AHCI, NVMe, MemoryBlockDevice)
+IBlockDevice                           (AHCI, NVMe, USB, MemoryBlockDevice)
 ```
