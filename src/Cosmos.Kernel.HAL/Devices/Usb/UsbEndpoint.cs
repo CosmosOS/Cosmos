@@ -39,6 +39,13 @@ internal sealed class UsbEndpoint
 
     /// <summary>bInterval, in the unit the device speed gives it (USB 2.0 §9.6.6).</summary>
     public byte Interval { get; }
+
+    /// <summary>
+    /// bMaxBurst of a SuperSpeed endpoint's companion descriptor: packets
+    /// past the first it can move in one burst (USB 3.2 §9.6.7). 0 below
+    /// SuperSpeed.
+    /// </summary>
+    public byte MaxBurst { get; internal set; }
 }
 
 /// <summary>Transfer type of an endpoint, from bmAttributes bits 1:0.</summary>

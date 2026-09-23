@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core.IO;
+using SchedMutex = Cosmos.Kernel.Core.Scheduler.Mutex;
 
 namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 
@@ -16,7 +17,8 @@ internal sealed unsafe partial class XhciController
     private const ulong DequeueCycleState = 1;
 
     // Synchronous control transfer state, under _eventLock. One at a time,
-    // like commands.
+    // like commands, which _controlMutex enforces.
+    private readonly SchedMutex _controlMutex = new();
     private XhciDevice? _transferDevice;
     private ulong _transferStatusTrb;
     private bool _transferCompleted;
@@ -28,50 +30,58 @@ internal sealed unsafe partial class XhciController
         ArgumentOutOfRangeException.ThrowIfLessThan(data.Length, (int)setup.Length, nameof(data));
         ArgumentOutOfRangeException.ThrowIfGreaterThan((int)setup.Length, XhciDma.PageSize, nameof(setup));
 
-        if (device.ControlEndpointHalted && !RecoverControlEndpoint(device))
+        _controlMutex.Acquire();
+        try
         {
-            return UsbTransferStatus.Error;
-        }
-
-        Span<byte> buffer = new(device.ControlBuffer, setup.Length);
-        if (!setup.IsDeviceToHost)
-        {
-            data.Slice(0, setup.Length).CopyTo(buffer);
-        }
-
-        using (_eventLock.AcquireIrqSafe())
-        {
-            _transferCompleted = false;
-            _transferDevice = device;
-            using (_ringLock.AcquireIrqSafe())
+            if (device.ControlEndpointHalted && !RecoverControlEndpoint(device))
             {
-                _transferStatusTrb = EnqueueControlTransfer(device, setup, device.ControlBufferAddress);
+                return UsbTransferStatus.Error;
             }
 
-            _regs.RingDoorbell(device.SlotId, XhciDevice.ControlEndpointId);
-        }
-
-        XhciCompletionCode code = WaitForControlTransfer();
-        if (code is XhciCompletionCode.Success or XhciCompletionCode.ShortPacket)
-        {
-            if (setup.IsDeviceToHost)
+            Span<byte> buffer = new(device.ControlBuffer, setup.Length);
+            if (!setup.IsDeviceToHost)
             {
-                buffer.CopyTo(data);
+                data.Slice(0, setup.Length).CopyTo(buffer);
             }
 
-            return UsbTransferStatus.Success;
-        }
+            using (_eventLock.AcquireIrqSafe())
+            {
+                _transferCompleted = false;
+                _transferDevice = device;
+                using (_ringLock.AcquireIrqSafe())
+                {
+                    _transferStatusTrb = EnqueueControlTransfer(device, setup, device.ControlBufferAddress);
+                }
 
-        if (code == XhciCompletionCode.Invalid)
+                _regs.RingDoorbell(device.SlotId, XhciDevice.ControlEndpointId);
+            }
+
+            XhciCompletionCode code = WaitForControlTransfer();
+            if (code is XhciCompletionCode.Success or XhciCompletionCode.ShortPacket)
+            {
+                if (setup.IsDeviceToHost)
+                {
+                    buffer.CopyTo(data);
+                }
+
+                return UsbTransferStatus.Success;
+            }
+
+            if (code == XhciCompletionCode.Invalid)
+            {
+                Serial.WriteString("[xHCI] Control transfer timed out\n");
+                return UsbTransferStatus.Timeout;
+            }
+
+            // Any error halts the endpoint on the controller side, a STALL
+            // included: it has to be reset before the next request can run.
+            RecoverControlEndpoint(device);
+            return code == XhciCompletionCode.StallError ? UsbTransferStatus.Stall : UsbTransferStatus.Error;
+        }
+        finally
         {
-            Serial.WriteString("[xHCI] Control transfer timed out\n");
-            return UsbTransferStatus.Timeout;
+            _controlMutex.Release();
         }
-
-        // Any error halts the endpoint on the controller side, a STALL
-        // included: it has to be reset before the next request can run.
-        RecoverControlEndpoint(device);
-        return code == XhciCompletionCode.StallError ? UsbTransferStatus.Stall : UsbTransferStatus.Error;
     }
 
     /// <summary>

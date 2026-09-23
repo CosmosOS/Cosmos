@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 /// A device slot of an <see cref="XhciController"/>: the controller's view
 /// of a <see cref="UsbDevice"/>. Owns the slot's input and output device
 /// contexts, the default control endpoint's ring and data buffers, and the
-/// interrupt pipes opened on it. Its route string and Transaction
+/// interrupt and bulk pipes opened on it. Its route string and Transaction
 /// Translator fields are derived from the parent hub at construction.
 /// </summary>
 internal sealed unsafe class XhciDevice : UsbDevice
@@ -34,6 +34,7 @@ internal sealed unsafe class XhciDevice : UsbDevice
     private readonly XhciController _controller;
     private readonly int _contextSize;
     private readonly XhciInterruptPipe?[] _pipes = new XhciInterruptPipe?[MaxEndpointId + 1];
+    private readonly XhciBulkPipe?[] _bulkPipes = new XhciBulkPipe?[MaxEndpointId + 1];
 
     public XhciDevice(XhciController controller, byte slotId, XhciDevice? parent, byte port, UsbSpeed speed, int contextSize)
         : base(controller, parent, port, speed)
@@ -116,6 +117,11 @@ internal sealed unsafe class XhciDevice : UsbDevice
 
     public uint* InputEndpointContext(byte endpointId) => (uint*)(InputContext + ((endpointId + 1) * _contextSize));
 
+    public uint* OutputEndpointContext(byte endpointId) => (uint*)(OutputContext + (endpointId * _contextSize));
+
+    /// <summary>Device Context Index of an endpoint: its number x 2, plus 1 for IN (xHCI 1.2 §4.5.1).</summary>
+    public static byte EndpointId(UsbEndpoint endpoint) => (byte)((endpoint.Number * 2) + (endpoint.IsIn ? 1 : 0));
+
     public void ClearInputContext() => new Span<byte>(InputContext, InputContextEntries * _contextSize).Clear();
 
     public void SetMaxPacketSize0(ushort maxPacketSize) => MaxPacketSize0 = maxPacketSize;
@@ -123,6 +129,10 @@ internal sealed unsafe class XhciDevice : UsbDevice
     public XhciInterruptPipe? GetPipe(byte endpointId) => endpointId <= MaxEndpointId ? _pipes[endpointId] : null;
 
     public void AddPipe(XhciInterruptPipe pipe) => _pipes[pipe.EndpointId] = pipe;
+
+    public XhciBulkPipe? GetBulkPipe(byte endpointId) => endpointId <= MaxEndpointId ? _bulkPipes[endpointId] : null;
+
+    public void AddBulkPipe(XhciBulkPipe pipe) => _bulkPipes[pipe.EndpointId] = pipe;
 
     /// <summary>The pipe whose recovery step is the command at <paramref name="commandAddress"/>, if any.</summary>
     public XhciInterruptPipe? FindPipeByCommand(ulong commandAddress)
@@ -147,6 +157,18 @@ internal sealed unsafe class XhciDevice : UsbDevice
     public override bool OpenInterruptPipe(UsbEndpoint endpoint, UsbInterruptHandler handler) =>
         _controller.OpenInterruptPipe(this, endpoint, handler);
 
+    public override bool OpenBulkEndpoint(UsbEndpoint endpoint) =>
+        _controller.OpenBulkPipe(this, endpoint);
+
+    public override UsbTransferStatus BulkIn(UsbEndpoint endpoint, Span<byte> data, out int transferred) =>
+        _controller.BulkIn(this, endpoint, data, out transferred);
+
+    public override UsbTransferStatus BulkOut(UsbEndpoint endpoint, ReadOnlySpan<byte> data, out int transferred) =>
+        _controller.BulkOut(this, endpoint, data, out transferred);
+
+    public override bool ResetEndpoint(UsbEndpoint endpoint) =>
+        _controller.ResetBulkPipe(this, endpoint);
+
     public override bool ConfigureAsHub(byte portCount, byte thinkTime) =>
         _controller.ConfigureHub(this, portCount, thinkTime);
 
@@ -154,6 +176,11 @@ internal sealed unsafe class XhciDevice : UsbDevice
     public void Free()
     {
         foreach (XhciInterruptPipe? pipe in _pipes)
+        {
+            pipe?.Free();
+        }
+
+        foreach (XhciBulkPipe? pipe in _bulkPipes)
         {
             pipe?.Free();
         }

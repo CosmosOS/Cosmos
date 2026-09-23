@@ -11,13 +11,13 @@ namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 /// xHCI host controller driver (eXtensible Host Controller Interface 1.2),
 /// the controller behind every USB port of a PC since ~2012 and of QEMU's
 /// qemu-xhci. Device-class agnostic: it addresses devices, runs control
-/// transfers, opens interrupt endpoints and registers hubs, and leaves
-/// what the devices are to the <see cref="UsbDriver"/>s.
+/// and bulk transfers, opens interrupt endpoints and registers hubs, and
+/// leaves what the devices are to the <see cref="UsbDriver"/>s.
 ///
-/// <para>Commands and control transfers are synchronous and only issued
-/// from thread context. Completions arrive on one event ring, drained by
-/// the MSI-X handler, by the synchronous waits themselves, and by
-/// <see cref="Poll"/> where MSI-X is unavailable.</para>
+/// <para>Commands, control transfers and bulk transfers are synchronous
+/// and only issued from thread context. Completions arrive on one event
+/// ring, drained by the MSI-X handler, by the synchronous waits
+/// themselves, and by <see cref="Poll"/> where MSI-X is unavailable.</para>
 ///
 /// <para>Two locks, always taken in this order: <c>_eventLock</c> covers
 /// the event ring and the state of the synchronous waits;
@@ -25,8 +25,8 @@ namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 /// Interrupt handlers of class drivers run under the event lock only, so
 /// they may queue transfers (keyboard LEDs) without deadlocking.</para>
 ///
-/// <para>Not implemented yet: bulk and isochronous endpoints, interrupt
-/// OUT endpoints, streams, and hot-plug (see <see cref="UsbManager"/>).</para>
+/// <para>Not implemented yet: isochronous endpoints, interrupt OUT
+/// endpoints, streams, and hot-plug (see <see cref="UsbManager"/>).</para>
 /// </summary>
 internal sealed unsafe partial class XhciController : UsbHostController
 {

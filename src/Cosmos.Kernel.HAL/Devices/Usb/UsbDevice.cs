@@ -42,6 +42,13 @@ internal abstract class UsbDevice
     private const int EndpointMaxPacketSizeOffset = 4;
     private const int EndpointIntervalOffset = 6;
 
+    // SuperSpeed Endpoint Companion descriptor (USB 3.2 §9.6.7).
+    private const int CompanionDescriptorLength = 6;
+    private const int CompanionMaxBurstOffset = 2;
+
+    /// <summary>ENDPOINT_HALT feature selector (USB 2.0 table 9-6).</summary>
+    internal const ushort EndpointHaltFeature = 0;
+
     /// <summary>Every descriptor starts with bLength then bDescriptorType.</summary>
     private const int DescriptorHeaderLength = 2;
 
@@ -110,6 +117,40 @@ internal abstract class UsbDevice
     public abstract bool OpenInterruptPipe(UsbEndpoint endpoint, UsbInterruptHandler handler);
 
     /// <summary>
+    /// Adds a bulk endpoint to the device's configuration, ready for
+    /// <see cref="BulkIn"/> or <see cref="BulkOut"/>.
+    /// </summary>
+    public abstract bool OpenBulkEndpoint(UsbEndpoint endpoint);
+
+    /// <summary>
+    /// Reads from an open bulk IN endpoint and waits. The transfer ends
+    /// early when the device sends a short packet, which is how it says it
+    /// has nothing more. Only call from thread context, one transfer per
+    /// endpoint at a time.
+    /// </summary>
+    /// <param name="endpoint">A bulk IN endpoint opened with <see cref="OpenBulkEndpoint"/>.</param>
+    /// <param name="data">Receives the data; its length is the most the transfer reads.</param>
+    /// <param name="transferred">Bytes received, set on failure too.</param>
+    public abstract UsbTransferStatus BulkIn(UsbEndpoint endpoint, Span<byte> data, out int transferred);
+
+    /// <summary>
+    /// Writes <paramref name="data"/> to an open bulk OUT endpoint and waits.
+    /// Same rules as <see cref="BulkIn"/>.
+    /// </summary>
+    /// <param name="endpoint">A bulk OUT endpoint opened with <see cref="OpenBulkEndpoint"/>.</param>
+    /// <param name="data">The data to send.</param>
+    /// <param name="transferred">Bytes the device accepted, set on failure too.</param>
+    public abstract UsbTransferStatus BulkOut(UsbEndpoint endpoint, ReadOnlySpan<byte> data, out int transferred);
+
+    /// <summary>
+    /// Returns the host side of an open bulk endpoint to its initial state:
+    /// nothing queued and the data toggle back to DATA0. A failed transfer
+    /// already leaves the host side able to run the next one; this is the
+    /// half of <see cref="ClearHalt"/> the device does not do.
+    /// </summary>
+    public abstract bool ResetEndpoint(UsbEndpoint endpoint);
+
+    /// <summary>
     /// Tells the host controller this device is a hub, so it can route
     /// transactions to the devices behind it.
     /// </summary>
@@ -124,6 +165,24 @@ internal abstract class UsbDevice
     /// <summary>Host-to-device control request with no data stage.</summary>
     public UsbTransferStatus ControlOut(UsbRequestType requestType, byte request, ushort value, ushort index) =>
         ControlTransfer(new UsbSetupPacket(requestType, request, value, index, 0), []);
+
+    /// <summary>
+    /// Clears a halted endpoint on both sides (USB 2.0 §9.4.5): the device
+    /// through CLEAR_FEATURE(ENDPOINT_HALT), which also restarts its data
+    /// toggle, then the host through <see cref="ResetEndpoint"/> so both
+    /// toggles agree again.
+    /// </summary>
+    public UsbTransferStatus ClearHalt(UsbEndpoint endpoint)
+    {
+        UsbTransferStatus status = ControlOut(UsbRequestType.Standard | UsbRequestType.Endpoint,
+            (byte)UsbStandardRequest.ClearFeature, EndpointHaltFeature, endpoint.Address);
+        if (status == UsbTransferStatus.Success && !ResetEndpoint(endpoint))
+        {
+            return UsbTransferStatus.Error;
+        }
+
+        return status;
+    }
 
     public UsbTransferStatus GetDescriptor(UsbDescriptorType type, byte index, Span<byte> buffer) =>
         ControlIn(UsbRequestType.Standard | UsbRequestType.Device, (byte)UsbStandardRequest.GetDescriptor,
@@ -181,6 +240,7 @@ internal abstract class UsbDevice
     private void ParseConfiguration(ReadOnlySpan<byte> configuration)
     {
         UsbInterface? current = null;
+        UsbEndpoint? lastEndpoint = null;
         int offset = 0;
         while (offset + DescriptorHeaderLength <= configuration.Length)
         {
@@ -195,6 +255,7 @@ internal abstract class UsbDevice
             if (type == UsbDescriptorType.Interface && length >= InterfaceDescriptorLength)
             {
                 current = null;
+                lastEndpoint = null;
                 if (descriptor[AlternateSettingOffset] == 0)
                 {
                     current = new UsbInterface(
@@ -207,11 +268,17 @@ internal abstract class UsbDevice
             }
             else if (type == UsbDescriptorType.Endpoint && length >= EndpointDescriptorLength && current is not null)
             {
-                current.Endpoints.Add(new UsbEndpoint(
+                lastEndpoint = new UsbEndpoint(
                     descriptor[EndpointAddressOffset],
                     descriptor[EndpointAttributesOffset],
                     ReadUInt16(descriptor, EndpointMaxPacketSizeOffset),
-                    descriptor[EndpointIntervalOffset]));
+                    descriptor[EndpointIntervalOffset]);
+                current.Endpoints.Add(lastEndpoint);
+            }
+            else if (type == UsbDescriptorType.SuperSpeedEndpointCompanion && length >= CompanionDescriptorLength && lastEndpoint is not null)
+            {
+                // The companion follows the endpoint descriptor it completes.
+                lastEndpoint.MaxBurst = descriptor[CompanionMaxBurstOffset];
             }
 
             offset += length;
