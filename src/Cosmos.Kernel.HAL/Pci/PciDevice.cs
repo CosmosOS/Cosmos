@@ -42,6 +42,8 @@ internal class PciDevice : Device
     private const int MaxCapabilityEntries = 48;
     /// <summary>Status register bit 4 — Capabilities List present.</summary>
     private const ushort StatusCapabilitiesListMask = 0x0010;
+    /// <summary>Header type bits 6:0, the layout; bit 7 only flags a multi-function device.</summary>
+    private const byte HeaderLayoutMask = 0x7F;
 
     // Type-0 header geometry (BAR slots start at Config.Bar0).
     /// <summary>Size in bytes of one BAR slot in configuration space.</summary>
@@ -157,7 +159,7 @@ internal class PciDevice : Device
         ClassCode = ReadRegister8((byte)Config.Class);
         SecondaryBusNumber = ReadRegister8((byte)Config.SecondaryBusNo);
 
-        HeaderType = (PciHeaderType)ReadRegister8((byte)Config.HeaderType);
+        HeaderType = (PciHeaderType)(ReadRegister8((byte)Config.HeaderType) & HeaderLayoutMask);
         Bist = (PciBist)ReadRegister8((byte)Config.Bist);
         InterruptPin = (PciInterruptPin)ReadRegister8((byte)Config.InterruptPin);
         InterruptLine = ReadRegister8((byte)Config.InterruptLine);
