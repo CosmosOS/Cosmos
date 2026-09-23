@@ -76,7 +76,7 @@ public static class CosmosEntryPoint
 `Cosmos.Kernel.System.Kernel` is the abstract base class of every user kernel. Its `Start()` drives the whole lifecycle:
 
 1. Calls `OnBoot()`, whose default implementation initializes the graphical `KernelConsole`, which is what makes `Console.WriteLine` work.
-2. Enables hardware interrupts (everything before this point ran with interrupts off).
+2. Enables hardware interrupts (everything before this point ran with interrupts off), then starts the USB hot-plug thread, which needs the scheduler's timer ticking.
 3. Turns off the early-boot text renderer: up to here, the boot log you see on screen is the serial log mirrored by a minimal framebuffer writer; from now on the screen belongs to `Console` and the [Canvas](graphics.md).
 4. Calls `BeforeRun()` once.
 5. Calls `Run()` in a loop until `Stop()` is called.

@@ -27,7 +27,9 @@ Storage support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot the kernel initializes `StorageManager`, which registers every AHCI, NVMe and USB mass storage device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`. USB sticks and disks come up as `usb0`, `usb1`, ... after the internal disks, so the first internal disk stays the primary device. USB devices are only discovered at boot: plug the stick in before starting the kernel.
+At boot the kernel initializes `StorageManager`, which registers every AHCI, NVMe and USB mass storage device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`. USB sticks and disks come up as `usb0`, `usb1`, ... after the internal disks, so the first internal disk stays the primary device.
+
+USB disks can also be plugged in and pulled out while the kernel runs. One plugged in is registered and scanned like a disk found at boot, under the lowest `usbN` name free. One pulled out leaves `StorageManager.Devices` and `StorageManager.Partitions`, the mounts made on its partitions with the `Partition` overload of `TryMount` (below) are detached, and files still open on it fail with `IOException`. A mount made from a source string names no disk, so it stays, and fails its I/O the same way. A detached mount is not flushed, since the disk is gone, so call `VfsManager.TryUnmount` before pulling a disk out. Both lists can change between two reads while a USB disk comes or goes: read `Devices` or `Partitions` once and index that copy.
 
 To give your kernel a disk in QEMU, attach an image with `cosmos run`:
 
@@ -38,7 +40,13 @@ $ cosmos run --disk disk.img,nvme       # or as an NVMe namespace
 $ cosmos run --disk disk.img,usb        # or as a USB stick on an xHCI controller
 ```
 
-`--disk` is repeatable if you want several drives.
+`--disk` is repeatable if you want several drives. A `usb` disk also gives the machine its xHCI controller, `usbxhci0`, which lets you plug another stick in and pull it out while the kernel runs, from the QEMU monitor (Ctrl+Alt+2 in the QEMU window):
+
+```console
+(qemu) drive_add 0 if=none,id=stick,file=stick.img,format=raw
+(qemu) device_add usb-storage,drive=stick,id=stick,bus=usbxhci0.0
+(qemu) device_del stick
+```
 
 ## Register a filesystem driver and mount it
 
