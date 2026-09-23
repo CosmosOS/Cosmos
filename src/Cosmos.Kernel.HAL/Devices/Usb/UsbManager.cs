@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// host controllers (<see cref="UsbHostController"/>, today
 /// <see cref="XhciController"/>), the shared enumeration here plus the
 /// <see cref="UsbDevice"/> model, and class drivers
-/// (<see cref="UsbDriver"/>).</para>
+/// (<see cref="UsbDriver"/>: <see cref="UsbHubDriver"/>).</para>
 ///
 /// <para>Devices are enumerated once, at boot: hot-plug needs a thread to
 /// run enumeration outside the interrupt that reports the port change, and
@@ -51,7 +51,7 @@ internal static class UsbManager
             return;
         }
 
-        s_drivers = [];
+        s_drivers = [new UsbHubDriver()];
         s_devices = [];
 
         List<UsbHostController> controllers = [];
@@ -111,7 +111,7 @@ internal static class UsbManager
     /// Addresses the device just reset on <paramref name="port"/>, reads its
     /// descriptors, selects its first configuration and offers each of its
     /// interfaces to the class drivers. Called for root ports by the host
-    /// controller and for hub ports by the hub class driver.
+    /// controller and for hub ports by <see cref="UsbHubDriver"/>.
     /// </summary>
     /// <returns>The configured device, or null when enumeration failed.</returns>
     internal static UsbDevice? EnumerateDevice(UsbHostController host, UsbDevice? parentHub, byte port, UsbSpeed speed)
