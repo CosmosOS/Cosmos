@@ -10,5 +10,8 @@ internal enum ProgramIf
     SataSerialStorageBus = 0x02,
     SasSerialStorageBus = 0x01,
     NvmNvmhci = 0x01,
-    NvmNvmExpress = 0x02
+    NvmNvmExpress = 0x02,
+
+    // SerialBusController / UsbController:
+    UsbXhci = 0x30
 }

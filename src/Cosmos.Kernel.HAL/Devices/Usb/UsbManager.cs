@@ -1,6 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.Devices.Usb.Xhci;
+using Cosmos.Kernel.HAL.Pci;
+using Cosmos.Kernel.HAL.Pci.Enums;
 
 namespace Cosmos.Kernel.HAL.Devices.Usb;
 
@@ -10,9 +13,10 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// and binds class drivers to their interfaces.
 ///
 /// <para>The stack is split in three layers so each can grow on its own:
-/// host controllers (<see cref="UsbHostController"/>), the shared
-/// enumeration here plus the <see cref="UsbDevice"/> model, and class
-/// drivers (<see cref="UsbDriver"/>).</para>
+/// host controllers (<see cref="UsbHostController"/>, today
+/// <see cref="XhciController"/>), the shared enumeration here plus the
+/// <see cref="UsbDevice"/> model, and class drivers
+/// (<see cref="UsbDriver"/>).</para>
 ///
 /// <para>Devices are enumerated once, at boot: hot-plug needs a thread to
 /// run enumeration outside the interrupt that reports the port change, and
@@ -37,7 +41,7 @@ internal static class UsbManager
         (IReadOnlyList<UsbDevice>?)s_devices ?? Array.Empty<UsbDevice>();
 
     /// <summary>
-    /// Registers the built-in class drivers, starts the host controllers and
+    /// Registers the built-in class drivers, starts every xHCI controller and
     /// enumerates the devices behind their root ports. Idempotent.
     /// </summary>
     public static void Initialize()
@@ -51,6 +55,33 @@ internal static class UsbManager
         s_devices = [];
 
         List<UsbHostController> controllers = [];
+        List<PciDevice> pciDevices = PciManager.GetAllDevicesClass(ClassId.SerialBusController, SubclassId.UsbController);
+        foreach (PciDevice pci in pciDevices)
+        {
+            if (pci.ProgIf != (byte)ProgramIf.UsbXhci)
+            {
+                Serial.WriteString("[USB] Skipping non-xHCI USB controller (prog-if 0x");
+                Serial.WriteHex((uint)pci.ProgIf);
+                Serial.WriteString(")\n");
+                continue;
+            }
+
+            // One controller failing (firmware that never releases it, a
+            // reset that never completes) must not cost the others.
+            try
+            {
+                XhciController controller = new(pci, controllers.Count);
+                controller.Initialize();
+                pci.Claimed = true;
+                controllers.Add(controller);
+            }
+            catch (Exception ex)
+            {
+                Serial.WriteString("[USB] xHCI controller init failed: ");
+                Serial.WriteString(ex.Message);
+                Serial.WriteString("\n");
+            }
+        }
 
         if (controllers.Count == 0)
         {

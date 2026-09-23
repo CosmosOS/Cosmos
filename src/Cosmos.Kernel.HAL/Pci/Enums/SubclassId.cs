@@ -14,5 +14,8 @@ internal enum SubclassId
     SataController = 0x06,
     SasController = 0x07,
     NvmController = 0x08,
-    UnknownMassStorage = 0x09
+    UnknownMassStorage = 0x09,
+
+    // SerialBusController:
+    UsbController = 0x03
 }
