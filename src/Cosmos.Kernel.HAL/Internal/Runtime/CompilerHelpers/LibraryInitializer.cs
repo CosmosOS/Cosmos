@@ -9,6 +9,7 @@ using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Devices.Storage;
+using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Pci;
@@ -69,6 +70,16 @@ internal class LibraryInitializer
             {
                 Serial.WriteString("[KERNEL]   - Scanning for virtio PCI devices...\n");
                 VirtioDevice.InitializePciBus();
+            }
+
+            // Bring up USB host controllers and enumerate the devices behind
+            // them. Keyboards are its only client so far, hence the switch.
+            // Same ordering constraint as virtio: MSI-X needs the platform
+            // binder InitializeHardware installed.
+            if (CosmosFeatures.PCIEnabled && CosmosFeatures.KeyboardEnabled)
+            {
+                Serial.WriteString("[KERNEL]   - Initializing USB...\n");
+                UsbManager.Initialize();
             }
 
             // Initialize storage controllers (AHCI for SATA, NVMe for PCIe).

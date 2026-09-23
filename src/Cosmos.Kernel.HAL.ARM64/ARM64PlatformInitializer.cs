@@ -10,6 +10,7 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Power;
 using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
 using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
+using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces;
@@ -161,7 +162,7 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        return VirtioDevice.GetKeyboards();
+        return [.. VirtioDevice.GetKeyboards(), .. UsbKeyboardDriver.GetKeyboards()];
     }
 
     public IMouseDevice[] GetMouseDevices()

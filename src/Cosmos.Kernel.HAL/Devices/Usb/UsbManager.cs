@@ -1,6 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
@@ -16,7 +18,8 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// host controllers (<see cref="UsbHostController"/>, today
 /// <see cref="XhciController"/>), the shared enumeration here plus the
 /// <see cref="UsbDevice"/> model, and class drivers
-/// (<see cref="UsbDriver"/>: <see cref="UsbHubDriver"/>).</para>
+/// (<see cref="UsbDriver"/>: <see cref="UsbHubDriver"/>,
+/// <see cref="UsbKeyboardDriver"/>).</para>
 ///
 /// <para>Devices are enumerated once, at boot: hot-plug needs a thread to
 /// run enumeration outside the interrupt that reports the port change, and
@@ -52,6 +55,11 @@ internal static class UsbManager
         }
 
         s_drivers = [new UsbHubDriver()];
+        if (CosmosFeatures.KeyboardEnabled)
+        {
+            s_drivers.Add(new UsbKeyboardDriver());
+        }
+
         s_devices = [];
 
         List<UsbHostController> controllers = [];
