@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Cosmos.TestRunner.Engine.Protocol;
 using Cosmos.TestRunner.Protocol;
 using Cosmos.Tools.Launcher;
 
@@ -45,7 +46,7 @@ public class QemuX64Host : IQemuHost
         _memoryMb = memoryMb;
     }
 
-    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null)
+    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuHotPlug? hotPlug = null)
     {
         if (!File.Exists(isoPath))
         {
@@ -84,7 +85,8 @@ public class QemuX64Host : IQemuHost
             KeyboardDevice = devices?.KeyboardDevice,
             MouseDevice = devices?.MouseDevice,
             VgaAdapter = devices?.VgaAdapter,
-            GpuDevice = devices?.GpuDevice
+            GpuDevice = devices?.GpuDevice,
+            MonitorPort = hotPlug?.Port
         });
         var startInfo = QemuLauncher.ToProcessStartInfo(plan);
         if (_qemuBinaryOverride is not null)
@@ -118,13 +120,14 @@ public class QemuX64Host : IQemuHost
             icmpServer?.Start();
 
             process.Start();
+            hotPlug?.Attach(cts.Token);
 
             // Capture stderr asynchronously for diagnostics
             var stderrTask = process.StandardError.ReadToEndAsync();
 
             // Monitor UART log for the suite-end marker or a stall after a test
             // was reached, while waiting for QEMU to exit on its own.
-            var monitorTask = MonitorUartLogAsync(uartLogPath, cts.Token);
+            var monitorTask = MonitorUartLogAsync(uartLogPath, hotPlug, cts.Token);
             var processTask = process.WaitForExitAsync(cts.Token);
 
             var completedTask = await Task.WhenAny(monitorTask, processTask);
@@ -269,7 +272,7 @@ public class QemuX64Host : IQemuHost
     /// op fired but didn't exit QEMU"). Returns <see cref="UartMonitorOutcome.NotFinished"/>
     /// only on cancellation.
     /// </summary>
-    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, CancellationToken cancellationToken)
+    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, QemuHotPlug? hotPlug, CancellationToken cancellationToken)
     {
         long lastPosition = 0;
         int endMarkerIndex = 0;
@@ -280,6 +283,7 @@ public class QemuX64Host : IQemuHost
         // UART, so a "no growth" check would never fire; "no protocol magic"
         // does, since the test framework emits no more frames once hung.
         DateTime lastMagicAt = DateTime.UtcNow;
+        HostRequestScanner hostRequests = new();
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -298,6 +302,14 @@ public class QemuX64Host : IQemuHost
                         for (int i = 0; i < bytesRead; i++)
                         {
                             byte b = buffer[i];
+
+                            // The guest's test waits for what it asked, so it is
+                            // done now rather than after the run.
+                            if (hostRequests.Feed(b) is string request)
+                            {
+                                await QemuHotPlug.DispatchAsync(hotPlug, request, cancellationToken);
+                                lastMagicAt = DateTime.UtcNow;
+                            }
 
                             if (b == TestEndMarker[endMarkerIndex])
                             {

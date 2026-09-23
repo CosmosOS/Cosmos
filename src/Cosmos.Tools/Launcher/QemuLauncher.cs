@@ -107,6 +107,14 @@ public sealed class QemuLaunchOptions
     /// </summary>
     public string? CpuModel { get; init; }
 
+    /// <summary>
+    /// TCP port on 127.0.0.1 that QEMU connects its QMP monitor to at
+    /// startup, or <c>null</c> for no monitor. Lets a test runner change the
+    /// machine under a running guest, such as pulling a USB stick out. The
+    /// port must already be listening: QEMU exits when it cannot connect.
+    /// </summary>
+    public int? MonitorPort { get; init; }
+
     public IReadOnlyList<string> ExtraArgs { get; init; } = Array.Empty<string>();
 }
 
@@ -152,6 +160,15 @@ public static class QemuLauncher
     /// hubbed with slirp: frames are 4-byte big-endian-length-prefixed Ethernet.
     /// </summary>
     private const int NetworkTestRawSocketPort = 5560;
+
+    /// <summary>QEMU id of the xHCI controller USB disks sit on; its root hub is the bus <c>usbxhci0.0</c>.</summary>
+    public const string UsbControllerId = "usbxhci0";
+
+    /// <summary>QEMU id of the drive behind the <paramref name="index"/>th USB disk.</summary>
+    public static string UsbDriveId(int index) => $"usbdisk{index}";
+
+    /// <summary>QEMU id of the <paramref name="index"/>th USB disk's usb-storage device, the one to unplug.</summary>
+    public static string UsbDeviceId(int index) => $"usbstick{index}";
 
     public static async Task<QemuLaunchPlan> BuildAsync(QemuLaunchOptions options)
     {
@@ -241,6 +258,11 @@ public static class QemuLauncher
         AppendInputDevice(args, options.MouseDevice);
         AppendVgaAdapter(args, options.VgaAdapter);
         AppendGpuDevice(args, options.GpuDevice);
+
+        if (options.MonitorPort is int monitorPort)
+        {
+            args.Append($" -chardev socket,id=qmp0,host=127.0.0.1,port={monitorPort} -mon chardev=qmp0,mode=control");
+        }
 
         if (options.Debug)
         {
@@ -405,11 +427,11 @@ public static class QemuLauncher
                 case DiskKind.Usb:
                     if (!usbControllerEmitted)
                     {
-                        args.Append(" -device qemu-xhci,id=usbxhci0");
+                        args.Append($" -device qemu-xhci,id={UsbControllerId}");
                         usbControllerEmitted = true;
                     }
-                    args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id=usbdisk{usbIndex},format=raw");
-                    args.Append($" -device usb-storage,drive=usbdisk{usbIndex},bus=usbxhci0.0");
+                    args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={UsbDriveId(usbIndex)},format=raw");
+                    args.Append($" -device usb-storage,drive={UsbDriveId(usbIndex)},bus={UsbControllerId}.0,id={UsbDeviceId(usbIndex)}");
                     AppendDeviceOptions(args, disk.ExtraDeviceOptions);
                     usbIndex++;
                     break;

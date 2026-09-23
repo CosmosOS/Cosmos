@@ -196,6 +196,10 @@ public class UartMessageParser
                 // consumed as a valid message; no parsing into TestResults needed.
                 return true;
 
+            case Ds2Vs.HostRequest:
+                // Acted on live by the QEMU host while the guest ran.
+                return true;
+
             default:
                 return false;
         }

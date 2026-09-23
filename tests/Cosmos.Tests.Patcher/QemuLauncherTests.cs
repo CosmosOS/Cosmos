@@ -44,8 +44,8 @@ public class QemuLauncherTests
 
         string text = args.ToString();
         Assert.Equal(text.IndexOf("qemu-xhci", StringComparison.Ordinal), text.LastIndexOf("qemu-xhci", StringComparison.Ordinal));
-        Assert.Contains("-device usb-storage,drive=usbdisk0,bus=usbxhci0.0", text);
-        Assert.Contains("-device usb-storage,drive=usbdisk1,bus=usbxhci0.0", text);
+        Assert.Contains("-device usb-storage,drive=usbdisk0,bus=usbxhci0.0,id=usbstick0", text);
+        Assert.Contains("-device usb-storage,drive=usbdisk1,bus=usbxhci0.0,id=usbstick1", text);
     }
 
     [Fact]
