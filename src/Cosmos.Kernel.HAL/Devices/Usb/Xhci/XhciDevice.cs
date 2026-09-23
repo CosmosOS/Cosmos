@@ -134,6 +134,22 @@ internal sealed unsafe class XhciDevice : UsbDevice
 
     public void AddBulkPipe(XhciBulkPipe pipe) => _bulkPipes[pipe.EndpointId] = pipe;
 
+    /// <summary>
+    /// Waits until no bulk transfer runs on the device: each one holds its
+    /// pipe's mutex for as long as it runs.
+    /// </summary>
+    public void WaitForBulkTransfers()
+    {
+        foreach (XhciBulkPipe? pipe in _bulkPipes)
+        {
+            if (pipe is not null)
+            {
+                pipe.Mutex.Acquire();
+                pipe.Mutex.Release();
+            }
+        }
+    }
+
     /// <summary>The pipe whose recovery step is the command at <paramref name="commandAddress"/>, if any.</summary>
     public XhciInterruptPipe? FindPipeByCommand(ulong commandAddress)
     {

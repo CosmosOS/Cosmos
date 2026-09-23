@@ -25,8 +25,13 @@ namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 /// Interrupt handlers of class drivers run under the event lock only, so
 /// they may queue transfers (keyboard LEDs) without deadlocking.</para>
 ///
+/// <para>Root port changes raise a Port Status Change Event, which only
+/// wakes <see cref="UsbManager"/>'s hot-plug thread (after making the
+/// transfers of a device that left fail at once); the ports themselves are
+/// handled on that thread, in <see cref="HandlePortChanges"/>.</para>
+///
 /// <para>Not implemented yet: isochronous endpoints, interrupt OUT
-/// endpoints, streams, and hot-plug (see <see cref="UsbManager"/>).</para>
+/// endpoints and streams.</para>
 /// </summary>
 internal sealed unsafe partial class XhciController : UsbHostController
 {
@@ -192,6 +197,8 @@ internal sealed unsafe partial class XhciController : UsbHostController
         }
     }
 
+    public override bool IsPolled => !_msiXEnabled;
+
     public override void ReleaseDevice(UsbDevice device)
     {
         if (device is not XhciDevice xhciDevice || xhciDevice.HostController != this)
@@ -199,12 +206,26 @@ internal sealed unsafe partial class XhciController : UsbHostController
             return;
         }
 
+        // A transfer still waiting on the device gives up once it sees it
+        // disconnected, then drops the lock it runs under: holding each of
+        // those locks once guarantees none is left using what is freed below.
+        xhciDevice.MarkDisconnected();
+        _controlMutex.Acquire();
+        _controlMutex.Release();
+        xhciDevice.WaitForBulkTransfers();
+
         byte slotId = xhciDevice.SlotId;
         ExecuteCommand(0, XhciTrb.TypeField(XhciTrbType.DisableSlotCommand) | ((uint)slotId << XhciTrb.SlotIdShift), out _);
+
+        // Past the event lock no event reaches the device's pipes, past the
+        // ring lock no fire-and-forget transfer is mid-enqueue on its rings.
         using (_eventLock.AcquireIrqSafe())
         {
-            _devices[slotId] = null;
-            _deviceContextArray[slotId] = 0;
+            using (_ringLock.AcquireIrqSafe())
+            {
+                _devices[slotId] = null;
+                _deviceContextArray[slotId] = 0;
+            }
         }
 
         xhciDevice.Free();

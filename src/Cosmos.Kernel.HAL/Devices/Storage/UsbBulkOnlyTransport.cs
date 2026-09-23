@@ -70,6 +70,12 @@ internal sealed class UsbBulkOnlyTransport
         _bulkOut = bulkOut;
     }
 
+    /// <summary>The USB device the interface belongs to.</summary>
+    public UsbDevice Device => _device;
+
+    /// <summary>bInterfaceNumber of the mass storage interface.</summary>
+    public byte InterfaceNumber => _interfaceNumber;
+
     /// <summary>Opens both bulk endpoints.</summary>
     public bool Open() => _device.OpenBulkEndpoint(_bulkIn) && _device.OpenBulkEndpoint(_bulkOut);
 
@@ -202,10 +208,16 @@ internal sealed class UsbBulkOnlyTransport
     /// <summary>
     /// Brings the device back in step after a transport failure: Bulk-Only
     /// Mass Storage Reset, then the halt of both bulk endpoints cleared
-    /// (BOT 1.0 §5.3.4).
+    /// (BOT 1.0 §5.3.4). A device that left the bus is not reset: there is
+    /// nothing left to bring back.
     /// </summary>
     private BulkOnlyStatus ResetRecovery(string reason)
     {
+        if (_device.IsDisconnected)
+        {
+            return BulkOnlyStatus.TransportError;
+        }
+
         Serial.WriteString("[USB storage] ");
         Serial.WriteString(reason);
         Serial.WriteString(", resetting the device\n");

@@ -13,6 +13,8 @@ internal sealed unsafe partial class XhciController
     private const uint PortPower = 1u << 9;
     private const int PortSpeedShift = 10;
     private const uint PortSpeedMask = 0xF;
+    private const uint PortConnectChange = 1u << 17;
+    private const uint PortEnableChange = 1u << 18;
     private const uint PortWarmResetChange = 1u << 19;
     private const uint PortResetChange = 1u << 21;
     private const uint PortWarmReset = 1u << 31;
@@ -54,6 +56,10 @@ internal sealed unsafe partial class XhciController
     /// <summary>TRSTRCY: recovery after a reset before the device must answer (USB 2.0 §7.1.7.5).</summary>
     private const uint PortResetRecoveryMs = 10;
 
+    /// <summary>TATTDB: a connection must be stable this long before the port is reset (USB 2.0 §7.1.7.3).</summary>
+    private const uint ConnectDebounceMs = 100;
+
+    /// <summary>Set once the boot probe is done: port changes before it are the probe's own.</summary>
     private bool _rootPortsProbed;
 
     public override void ProbeRootPorts()
@@ -79,6 +85,38 @@ internal sealed unsafe partial class XhciController
         }
 
         _rootPortsProbed = true;
+    }
+
+    public override void HandlePortChanges()
+    {
+        for (int i = 1; i <= _regs.MaxPorts; i++)
+        {
+            byte port = (byte)i;
+            uint portsc = _regs.ReadPortSc(port);
+            uint changes = portsc & PortChangeBits;
+            if (changes == 0)
+            {
+                continue;
+            }
+
+            // Cleared before the port is looked at, so a change landing
+            // meanwhile raises an event of its own.
+            _regs.WritePortSc(port, Neutral(portsc) | changes);
+
+            // A port the controller disabled on its own, after an error on
+            // the bus, lost its device as surely as one that was unplugged.
+            bool disabledByError = (changes & PortEnableChange) != 0 && (portsc & PortEnabled) == 0;
+            if ((changes & PortConnectChange) == 0 && !disabledByError)
+            {
+                continue;
+            }
+
+            UsbManager.DisconnectPort(this, null, port);
+            if ((portsc & PortConnected) != 0 && WaitForStableConnection(port))
+            {
+                ProbeRootPort(port);
+            }
+        }
     }
 
     /// <summary>Records which root ports are USB 2 and which USB 3 (xHCI 1.2 §7.2).</summary>
@@ -127,6 +165,35 @@ internal sealed unsafe partial class XhciController
 
         UsbManager.DelayMilliseconds(PortResetRecoveryMs);
         UsbManager.EnumerateDevice(this, null, port, speed);
+    }
+
+    /// <summary>Waits out the connect debounce; false when the device went away meanwhile.</summary>
+    private bool WaitForStableConnection(byte port)
+    {
+        UsbManager.DelayMilliseconds(ConnectDebounceMs);
+        return (_regs.ReadPortSc(port) & PortConnected) != 0;
+    }
+
+    /// <summary>
+    /// Makes the devices behind a root port that lost its connection fail
+    /// their transfers at once, instead of when the hot-plug thread gets to
+    /// the port: a thread waiting on one of them would otherwise wait out
+    /// its whole timeout. Interrupt context, under the event lock.
+    /// </summary>
+    private void MarkRootPortDisconnected(byte port)
+    {
+        if (port == 0 || port > _regs.MaxPorts || (_regs.ReadPortSc(port) & PortConnected) != 0)
+        {
+            return;
+        }
+
+        foreach (XhciDevice? device in _devices)
+        {
+            if (device is not null && device.RootPortNumber == port)
+            {
+                device.MarkDisconnected();
+            }
+        }
     }
 
     private bool ResetPort(byte port, bool warm)

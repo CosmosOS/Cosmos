@@ -62,6 +62,11 @@ internal sealed unsafe partial class XhciController
         pipe.Mutex.Acquire();
         try
         {
+            if (device.IsDisconnected)
+            {
+                return UsbTransferStatus.Disconnected;
+            }
+
             while (transferred < data.Length)
             {
                 int length = Math.Min(data.Length - transferred, pipe.BufferLength);
@@ -96,6 +101,11 @@ internal sealed unsafe partial class XhciController
         pipe.Mutex.Acquire();
         try
         {
+            if (device.IsDisconnected)
+            {
+                return UsbTransferStatus.Disconnected;
+            }
+
             while (transferred < data.Length)
             {
                 int length = Math.Min(data.Length - transferred, pipe.BufferLength);
@@ -133,6 +143,11 @@ internal sealed unsafe partial class XhciController
         pipe.Mutex.Acquire();
         try
         {
+            if (device.IsDisconnected)
+            {
+                return false;
+            }
+
             if (XhciContext.GetEndpointState(device.OutputEndpointContext(pipe.EndpointId)) == XhciEndpointState.Halted)
             {
                 return StopBulkPipe(device, pipe);
@@ -201,11 +216,18 @@ internal sealed unsafe partial class XhciController
             _regs.RingDoorbell(device.SlotId, pipe.EndpointId);
         }
 
-        XhciCompletionCode code = WaitForBulkTransfer(pipe, out uint residualLength);
+        XhciCompletionCode code = WaitForBulkTransfer(device, pipe, out uint residualLength);
         transferred = code == XhciCompletionCode.Invalid ? 0 : length - (int)Math.Min(residualLength, (uint)length);
         if (code is XhciCompletionCode.Success or XhciCompletionCode.ShortPacket)
         {
             return UsbTransferStatus.Success;
+        }
+
+        // Whatever the transfer ended with, a device that left has nothing
+        // to recover: its slot is about to be disabled.
+        if (device.IsDisconnected)
+        {
+            return UsbTransferStatus.Disconnected;
         }
 
         WritePipePrefix(device, pipe.EndpointId);
@@ -231,15 +253,18 @@ internal sealed unsafe partial class XhciController
         };
     }
 
-    /// <returns>The completion code, or <see cref="XhciCompletionCode.Invalid"/> on timeout.</returns>
-    private XhciCompletionCode WaitForBulkTransfer(XhciBulkPipe pipe, out uint residualLength)
+    /// <returns>
+    /// The completion code, or <see cref="XhciCompletionCode.Invalid"/> on
+    /// timeout and when <paramref name="device"/> left the bus meanwhile.
+    /// </returns>
+    private XhciCompletionCode WaitForBulkTransfer(XhciDevice device, XhciBulkPipe pipe, out uint residualLength)
     {
         for (uint waitedUs = 0; ; waitedUs += WaitPollIntervalUs)
         {
             using (_eventLock.AcquireIrqSafe())
             {
                 DrainEvents();
-                if (pipe.Completed || waitedUs >= BulkTimeoutMs * MicrosecondsPerMillisecond)
+                if (pipe.Completed || device.IsDisconnected || waitedUs >= BulkTimeoutMs * MicrosecondsPerMillisecond)
                 {
                     pipe.PendingTrb = 0;
                     residualLength = pipe.ResidualLength;

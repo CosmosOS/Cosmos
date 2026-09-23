@@ -63,6 +63,11 @@ internal sealed class UsbKeyboard : KeyboardDevice
 
     public bool IsInitialized { get; private set; }
 
+    public UsbDevice Device => _device;
+
+    /// <summary>bInterfaceNumber of the keyboard interface.</summary>
+    public byte InterfaceNumber => _interfaceNumber;
+
     /// <summary>Always false: reports are pushed from the interrupt pipe, there is no buffer to query.</summary>
     public override bool KeyAvailable => false;
 

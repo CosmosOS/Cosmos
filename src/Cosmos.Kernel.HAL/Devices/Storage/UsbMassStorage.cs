@@ -10,7 +10,9 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// One logical unit of a USB mass storage device (a USB stick, a card
 /// reader slot, a USB disk) as a block device. It speaks the SCSI block
 /// commands (SBC-3) the mass storage class carries, over the interface's
-/// <see cref="UsbBulkOnlyTransport"/>.
+/// <see cref="UsbBulkOnlyTransport"/>. Once the device is unplugged
+/// (<see cref="IsRemoved"/>) every read, write and flush throws
+/// <see cref="IOException"/>.
 /// </summary>
 internal sealed class UsbMassStorage : BlockDevice
 {
@@ -94,11 +96,20 @@ internal sealed class UsbMassStorage : BlockDevice
     {
         _transport = transport;
         _lun = lun;
+        Index = index;
         _name = BuildDeviceName("usb", index);
     }
 
     /// <inheritdoc />
     public override string Name => _name;
+
+    /// <summary>Number of the device name, unique among the units present.</summary>
+    public uint Index { get; }
+
+    public UsbBulkOnlyTransport Transport => _transport;
+
+    /// <summary>The device was unplugged: nothing reaches the unit any more.</summary>
+    public bool IsRemoved => _transport.Device.IsDisconnected;
 
     /// <summary>
     /// Identifies the logical unit and waits for its medium: INQUIRY, TEST
@@ -156,6 +167,7 @@ internal sealed class UsbMassStorage : BlockDevice
     /// <inheritdoc />
     public override void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
     {
+        ThrowIfRemoved();
         ThrowIfOutOfRange(blockNo, blockCount, (ulong)data.Length);
 
         Span<byte> sense = stackalloc byte[UsbBulkOnlyTransport.SenseLength];
@@ -178,6 +190,7 @@ internal sealed class UsbMassStorage : BlockDevice
     /// <inheritdoc />
     public override void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
     {
+        ThrowIfRemoved();
         ThrowIfOutOfRange(blockNo, blockCount, (ulong)data.Length);
 
         Span<byte> sense = stackalloc byte[UsbBulkOnlyTransport.SenseLength];
@@ -204,6 +217,7 @@ internal sealed class UsbMassStorage : BlockDevice
     /// </remarks>
     public override void Flush()
     {
+        ThrowIfRemoved();
         if (_synchronizeCacheUnsupported)
         {
             return;
@@ -226,14 +240,15 @@ internal sealed class UsbMassStorage : BlockDevice
     /// <summary>
     /// Runs a command, again when it fails for a reason that says nothing
     /// about the command: a UNIT ATTENTION (the device telling of a reset
-    /// or a medium change) or a transport error the transport recovered from.
+    /// or a medium change) or a transport error the transport recovered from,
+    /// unless the error was the device leaving.
     /// </summary>
     private BulkOnlyStatus Execute(ReadOnlySpan<byte> command, Span<byte> dataIn, ReadOnlySpan<byte> dataOut, Span<byte> sense, out uint residue)
     {
         for (int attempt = 1; ; attempt++)
         {
             BulkOnlyStatus status = _transport.Execute(_lun, command, dataIn, dataOut, sense, out residue);
-            bool transient = status == BulkOnlyStatus.TransportError
+            bool transient = (status == BulkOnlyStatus.TransportError && !IsRemoved)
                 || (status == BulkOnlyStatus.Failed && SenseKey(sense) == SenseKeyUnitAttention);
             if (!transient || attempt >= CommandAttempts)
             {
@@ -361,6 +376,14 @@ internal sealed class UsbMassStorage : BlockDevice
         }
     }
 
+    private void ThrowIfRemoved()
+    {
+        if (IsRemoved)
+        {
+            throw new IOException("USB mass storage device " + _name + " was removed.");
+        }
+    }
+
     /// <summary>Throws the error of a command that did not complete in full.</summary>
     private void ThrowIfFailed(string commandName, BulkOnlyStatus status, uint residue, ReadOnlySpan<byte> sense)
     {
@@ -368,6 +391,9 @@ internal sealed class UsbMassStorage : BlockDevice
         {
             return;
         }
+
+        // Pulled out mid-command: that is the error, not the command.
+        ThrowIfRemoved();
 
         // The message stays constant: this can run while partitions are
         // scanned at boot, before CoreLib number formatting is safe.
