@@ -245,7 +245,7 @@ After the final `TestSuiteEnd` message the kernel also sends an 8-byte terminati
 
 ### Commands (Kernel → Host, `Ds2Vs`)
 
-Test-runner-specific commands occupy the range **100-106**. The original CosmosOS debug commands (0-25) are also defined but are not used by the test runner.
+Test-runner-specific commands occupy the range **100-109**. The original CosmosOS debug commands (0-25) are also defined but are not used by the test runner.
 
 | Command | Value | Payload format | Description |
 |---------|-------|----------------|-------------|
@@ -256,6 +256,9 @@ Test-runner-specific commands occupy the range **100-106**. The original CosmosO
 | `TestSkip` | 104 | `[TestNumber: 2 LE][SkipReason: UTF-8]` | Sent when a test is explicitly skipped |
 | `TestSuiteEnd` | 105 | `[Total: 2 LE][Passed: 2 LE][Failed: 2 LE]` | Sent once when the test suite ends |
 | `ArchitectureInfo` | 106 | `[ArchId: 1][CpuCount: 1]` | Sent on kernel startup (arch IDs: 1=x86, 2=x64, 3=ARM32, 4=ARM64) |
+| `CoverageData` | 107 | `[HitCount: 2 LE][MethodId: 2 LE]...` | Sent after the suite ends by a kernel built with coverage |
+| `TestDestructiveReached` | 108 | `[TestNumber: 2 LE]` | Sent by `TR.RunDestructive` right before an action that never returns (reboot, shutdown) |
+| `HostRequest` | 109 | `[Request: ASCII]` | Asks the engine to change the machine under the running guest (see below) |
 
 ### Message Flow
 
@@ -278,6 +281,17 @@ A typical session looks like this:
 `tests/Cosmos.TestRunner.Engine/Protocol/UartMessageParser.cs` reads the raw UART log captured by QEMU (`uart-output.log`), scans byte-by-byte for the magic signature, validates the command byte and length, then dispatches to the appropriate parse helper.
 
 Corruption detection: the `TestSuiteEnd` payload is validated by checking `total == passed + failed`. If this invariant does not hold (e.g. due to a timer-interrupt interleave corrupting UART bytes), the end message is ignored and results fall back to the individually tracked counters.
+
+### Host Requests
+
+A test calls `TR.RequestHost(request)` when it needs the machine changed under it, and the engine carries the request out through QEMU's QMP monitor as soon as the frame shows up on the UART:
+
+| Request | Effect |
+|---------|--------|
+| `usb-unplug [n]` | Pulls USB stick `n` (0 by default) off the xHCI controller |
+| `usb-plug [n]` | Plugs it back in, on the same disk image |
+
+Nothing replies. The test waits for the change itself, and must see it within 10 s: that long without a protocol message and the engine takes the kernel for hung. Only a profile that attaches a USB disk launches QEMU with a monitor; the engine logs and drops a request from any other. The Storage suite's `UsbHotPlug_*` tests are the example.
 
 ### Host → Kernel Commands (`Vs2Ds`)
 

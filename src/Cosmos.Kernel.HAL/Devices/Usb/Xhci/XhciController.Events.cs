@@ -10,9 +10,6 @@ internal sealed unsafe partial class XhciController
     /// <summary>Recoveries of an interrupt pipe without a good transfer in between before it is given up.</summary>
     private const int MaxPipeRecoveries = 3;
 
-    /// <summary>ENDPOINT_HALT feature selector (USB 2.0 table 9-6).</summary>
-    private const ushort EndpointHaltFeature = 0;
-
     /// <summary>MSI-X handler of interrupter 0. Allocation-free.</summary>
     private void OnInterrupt(ref IRQContext context)
     {
@@ -44,11 +41,12 @@ internal sealed unsafe partial class XhciController
 
                 case XhciTrbType.PortStatusChangeEvent:
                     // Port resets during the boot probe raise these too;
-                    // only a change after it is a (re)plug.
+                    // only a change after it is a (re)plug. The port itself
+                    // is handled on the hot-plug thread.
                     if (_rootPortsProbed)
                     {
-                        WritePortPrefix(trb.PortId);
-                        Serial.WriteString("status changed; hot-plug is not supported yet\n");
+                        MarkRootPortDisconnected(trb.PortId);
+                        UsbManager.NotifyPortChange();
                     }
 
                     break;
@@ -113,6 +111,21 @@ internal sealed unsafe partial class XhciController
             return;
         }
 
+        XhciBulkPipe? bulkPipe = device.GetBulkPipe(trb.EndpointId);
+        if (bulkPipe is not null)
+        {
+            // Events for a TRB nobody waits on any more (a Stop Endpoint
+            // after a timeout reports the abandoned one) are dropped.
+            if (bulkPipe.PendingTrb != 0 && trb.Parameter == bulkPipe.PendingTrb)
+            {
+                bulkPipe.CompletionCode = code;
+                bulkPipe.ResidualLength = trb.ResidualLength;
+                bulkPipe.Completed = true;
+            }
+
+            return;
+        }
+
         XhciInterruptPipe? pipe = device.GetPipe(trb.EndpointId);
         if (pipe is null || pipe.State != XhciPipeState.Running || !pipe.TryGetBuffer(trb.Parameter, out ulong buffer))
         {
@@ -145,8 +158,15 @@ internal sealed unsafe partial class XhciController
     /// </summary>
     private void StartPipeRecovery(XhciDevice device, XhciInterruptPipe pipe, XhciCompletionCode code, ulong failedBuffer)
     {
+        // A device that left fails every transfer; there is nothing to recover.
+        if (device.IsDisconnected)
+        {
+            pipe.State = XhciPipeState.Stopped;
+            return;
+        }
+
         pipe.ConsecutiveErrors++;
-        WritePipePrefix(device, pipe);
+        WritePipePrefix(device, pipe.EndpointId);
         Serial.WriteString("transfer error, completion code ");
         Serial.WriteNumber((uint)code);
         if (pipe.ConsecutiveErrors > MaxPipeRecoveries)
@@ -210,7 +230,7 @@ internal sealed unsafe partial class XhciController
                 if (pipe.StalledByDevice)
                 {
                     device.SubmitControlTransfer(new UsbSetupPacket(UsbRequestType.Standard | UsbRequestType.Endpoint,
-                        (byte)UsbStandardRequest.ClearFeature, EndpointHaltFeature, pipe.EndpointAddress, 0), []);
+                        (byte)UsbStandardRequest.ClearFeature, UsbDevice.EndpointHaltFeature, pipe.EndpointAddress, 0), []);
                 }
 
                 pipe.State = XhciPipeState.Running;
@@ -237,18 +257,18 @@ internal sealed unsafe partial class XhciController
     private static void StopPipe(XhciDevice device, XhciInterruptPipe pipe, XhciCompletionCode code)
     {
         pipe.State = XhciPipeState.Stopped;
-        WritePipePrefix(device, pipe);
+        WritePipePrefix(device, pipe.EndpointId);
         Serial.WriteString("recovery failed, completion code ");
         Serial.WriteNumber((uint)code);
         Serial.WriteString("\n");
     }
 
-    private static void WritePipePrefix(XhciDevice device, XhciInterruptPipe pipe)
+    private static void WritePipePrefix(XhciDevice device, byte endpointId)
     {
         Serial.WriteString("[xHCI] Slot ");
         Serial.WriteNumber((uint)device.SlotId);
         Serial.WriteString(" endpoint ");
-        Serial.WriteNumber((uint)pipe.EndpointId);
+        Serial.WriteNumber((uint)endpointId);
         Serial.WriteString(": ");
     }
 }

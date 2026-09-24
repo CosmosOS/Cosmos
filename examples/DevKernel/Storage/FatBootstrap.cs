@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cosmos.Kernel.HAL.Vfs;
 using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Diagnostics;
@@ -15,9 +16,6 @@ internal static class FatBootstrap
 {
     /// <summary>Name the FAT driver is registered under in the VFS.</summary>
     public const string DriverName = "fat";
-
-    /// <summary>Global partition index the boot-time auto-mount tries, as a VfsManager source string.</summary>
-    private const string AutoMountSource = "0";
 
     /// <summary>Mount point used by the boot-time auto-mount.</summary>
     private const string AutoMountPoint = "/mnt";
@@ -38,12 +36,15 @@ internal static class FatBootstrap
 
         Log.WriteString("[DevKernel] FAT driver registered\n");
 
-        if (!KernelFeatures.Storage || StorageManager.Partitions.Count == 0)
+        IReadOnlyList<Partition> partitions = StorageManager.Partitions;
+        if (!KernelFeatures.Storage || partitions.Count == 0)
         {
             return;
         }
 
-        if (VfsManager.TryMount(DriverName, AutoMountSource, MountFlags.None, AutoMountPoint, out _))
+        // Mounted by the partition itself rather than its index, so the mount
+        // knows its disk: /mnt goes away with a USB stick that is pulled out.
+        if (VfsManager.TryMount(DriverName, partitions[0], MountFlags.None, AutoMountPoint, out _))
         {
             Log.WriteString("[DevKernel] FAT mounted on /mnt from partition 0\n");
         }

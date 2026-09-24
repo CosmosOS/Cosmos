@@ -17,6 +17,7 @@ internal enum XhciTrbType : byte
     ConfigureEndpointCommand = 12,
     EvaluateContextCommand = 13,
     ResetEndpointCommand = 14,
+    StopEndpointCommand = 15,
     SetTrDequeuePointerCommand = 16,
 
     TransferEvent = 32,

@@ -31,6 +31,7 @@ internal static unsafe class XhciContext
     private const int SlotContextDwords = 4;
 
     // Endpoint Context (xHCI 1.2 §6.2.3).
+    private const uint EndpointStateMask = 0x7;
     private const int IntervalShift = 16;
     private const int MaxEsitPayloadHighShift = 24;
     private const int MaxEsitPayloadHighInputShift = 16;
@@ -49,10 +50,16 @@ internal static unsafe class XhciContext
     /// <summary>Input Control Context add flag for the endpoint at Device Context Index <paramref name="endpointId"/>.</summary>
     public static uint EndpointFlag(byte endpointId) => 1u << endpointId;
 
-    public static void SetAddFlags(uint* inputControl, uint flags)
+    public static void SetAddFlags(uint* inputControl, uint flags) => SetFlags(inputControl, 0, flags);
+
+    /// <summary>
+    /// Sets both flag sets of the Input Control Context. A context both
+    /// dropped and added is reinitialized from the input context.
+    /// </summary>
+    public static void SetFlags(uint* inputControl, uint dropFlags, uint addFlags)
     {
-        inputControl[DropFlagsDword] = 0;
-        inputControl[AddFlagsDword] = flags;
+        inputControl[DropFlagsDword] = dropFlags;
+        inputControl[AddFlagsDword] = addFlags;
     }
 
     public static void WriteSlot(uint* slot, uint routeString, UsbSpeed speed, byte contextEntries, byte rootPort, byte ttHubSlotId, byte ttPort)
@@ -88,6 +95,10 @@ internal static unsafe class XhciContext
     public static void SetContextEntries(uint* slot, byte entries) =>
         slot[0] = (slot[0] & ~(ContextEntriesMask << ContextEntriesShift)) | ((uint)entries << ContextEntriesShift);
 
+    /// <summary>EP State of an Output Endpoint Context, the one the controller keeps up to date.</summary>
+    public static XhciEndpointState GetEndpointState(uint* endpoint) =>
+        (XhciEndpointState)(Volatile.Read(ref endpoint[0]) & EndpointStateMask);
+
     public static void WriteEndpoint(uint* endpoint, XhciEndpointType type, ushort maxPacketSize, byte maxBurst, byte interval,
         ulong dequeuePointer, bool cycleState, ushort averageTrbLength, uint maxEsitPayload)
     {
@@ -102,6 +113,16 @@ internal static unsafe class XhciContext
     }
 }
 
+/// <summary>Endpoint Context EP State field (xHCI 1.2 table 6-8).</summary>
+internal enum XhciEndpointState : byte
+{
+    Disabled = 0,
+    Running = 1,
+    Halted = 2,
+    Stopped = 3,
+    Error = 4
+}
+
 /// <summary>Endpoint Context EP Type field (xHCI 1.2 table 6-9).</summary>
 internal enum XhciEndpointType : byte
 {
@@ -113,4 +134,3 @@ internal enum XhciEndpointType : byte
     BulkIn = 6,
     InterruptIn = 7
 }
-

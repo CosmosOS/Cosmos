@@ -355,12 +355,12 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Storage
       timeout_x64: 90
       timeout_arm64: 180
-      # arm64 expands to 12 matrix cells ({ahci,nvme} x gic/acpi modifier
+      # arm64 expands to 18 matrix cells ({ahci,nvme,usb} x gic/acpi modifier
       # subsets) at up to 180s each; a 5-minute budget would kill the step
       # before OutputHandlerXml writes results whenever one cell hangs. The
       # job budget must stay above the step budget plus setup/build time.
-      step_timeout_minutes: 45
-      job_timeout_minutes: 60
+      step_timeout_minutes: 60
+      job_timeout_minutes: 75
 
   storage-results:
     needs: storage-tests

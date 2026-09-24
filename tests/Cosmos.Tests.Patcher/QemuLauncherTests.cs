@@ -28,6 +28,28 @@ public class QemuLauncherTests
     }
 
     [Fact]
+    public void AppendStorageArgs_PutsUsbDisksOnOneXhciController()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks =
+            [
+                new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.Usb },
+                new DiskAttachment { Path = "/tmp/b.img", Kind = DiskKind.Usb }
+            ]
+        });
+
+        string text = args.ToString();
+        Assert.Contains("-device qemu-xhci,id=usbxhci0", text);
+        Assert.Equal(text.IndexOf("qemu-xhci", StringComparison.Ordinal), text.LastIndexOf("qemu-xhci", StringComparison.Ordinal));
+        Assert.Contains("-device usb-storage,drive=usbdisk0,bus=usbxhci0.0,id=usbstick0", text);
+        Assert.Contains("-device usb-storage,drive=usbdisk1,bus=usbxhci0.0,id=usbstick1", text);
+    }
+
+    [Fact]
     public void AppendStorageArgs_RejectsQuotesInDrivePaths()
     {
         StringBuilder args = new();

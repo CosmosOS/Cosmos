@@ -17,5 +17,8 @@ internal enum UsbTransferStatus
     Timeout,
 
     /// <summary>Any other host controller or bus error (babble, transaction error, ...).</summary>
-    Error
+    Error,
+
+    /// <summary>The device left the bus; nothing sent to it will run again.</summary>
+    Disconnected
 }

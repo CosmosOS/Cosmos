@@ -32,7 +32,7 @@ internal static class StorageView
 
         if (StorageManager.DeviceCount == 0)
         {
-            Terminal.Warning("No storage devices discovered. Attach a SATA disk to QEMU and reboot.");
+            Terminal.Warning("No storage devices discovered. Plug in a USB disk, or attach a SATA or NVMe disk and reboot.");
             return false;
         }
 

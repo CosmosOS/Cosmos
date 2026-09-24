@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 
 /// <summary>
 /// Descriptor types (USB 2.0 §9.4 table 9-5, hub class §11.23.2.1,
-/// USB 3.2 §10.15.2.1).
+/// USB 3.2 table 9-6 and §10.15.2.1).
 /// </summary>
 internal enum UsbDescriptorType : byte
 {
@@ -13,5 +13,6 @@ internal enum UsbDescriptorType : byte
     Interface = 0x04,
     Endpoint = 0x05,
     Hub = 0x29,
-    SuperSpeedHub = 0x2A
+    SuperSpeedHub = 0x2A,
+    SuperSpeedEndpointCompanion = 0x30
 }

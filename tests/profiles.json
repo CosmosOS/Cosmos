@@ -37,6 +37,16 @@
       ]
     },
     {
+      // A USB stick: usb-storage (SCSI over the Bulk-Only Transport) on a
+      // qemu-xhci controller, which attaches it at SuperSpeed. Covers the
+      // xHCI bulk endpoints and the mass storage class driver under the same
+      // block-device assertions as the ahci and nvme cells.
+      "name": "usb",
+      "disks": [
+        { "type": "usb" }
+      ]
+    },
+    {
       // Intel E1000E NIC — the historical x64 default, kept as an explicit
       // cell so the driver keeps its coverage now that the NIC is a choice.
       "name": "e1000e",

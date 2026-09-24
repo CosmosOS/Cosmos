@@ -14,7 +14,14 @@ internal sealed unsafe class XhciRing
 
     private readonly XhciTrb* _trbs;
     private int _enqueueIndex;
-    private bool _cycleState = true;
+
+    public ulong PhysicalAddress { get; }
+
+    /// <summary>The producer cycle state, which a Set TR Dequeue Pointer command passes as DCS.</summary>
+    public bool CycleState { get; private set; } = true;
+
+    /// <summary>Physical address of the next TRB <see cref="Enqueue"/> will write.</summary>
+    public ulong EnqueuePointer => PhysicalAddress + ((ulong)_enqueueIndex * XhciTrb.Size);
 
     public XhciRing()
     {
@@ -26,14 +33,6 @@ internal sealed unsafe class XhciRing
         link->Parameter = physicalAddress;
         link->Control = XhciTrb.TypeField(XhciTrbType.Link) | XhciTrb.ToggleCycle;
     }
-
-    public ulong PhysicalAddress { get; }
-
-    /// <summary>The producer cycle state, which a Set TR Dequeue Pointer command passes as DCS.</summary>
-    public bool CycleState => _cycleState;
-
-    /// <summary>Physical address of the next TRB <see cref="Enqueue"/> will write.</summary>
-    public ulong EnqueuePointer => PhysicalAddress + ((ulong)_enqueueIndex * XhciTrb.Size);
 
     /// <summary>
     /// Writes one TRB and hands it to the controller. The cycle bit in
@@ -54,7 +53,7 @@ internal sealed unsafe class XhciRing
             // Chain carries across the link so a TD the wrap splits stays one TD (xHCI 1.2 §4.11.5.1).
             Publish(&_trbs[_enqueueIndex], XhciTrb.TypeField(XhciTrbType.Link) | XhciTrb.ToggleCycle | (control & XhciTrb.Chain));
             _enqueueIndex = 0;
-            _cycleState = !_cycleState;
+            CycleState = !CycleState;
         }
 
         return address;
@@ -81,6 +80,6 @@ internal sealed unsafe class XhciRing
         // The cycle bit is what hands the TRB over, so the rest of the TRB
         // has to be visible before the control dword lands.
         XhciDma.Barrier();
-        Volatile.Write(ref trb->Control, (control & ~XhciTrb.Cycle) | (_cycleState ? XhciTrb.Cycle : 0));
+        Volatile.Write(ref trb->Control, (control & ~XhciTrb.Cycle) | (CycleState ? XhciTrb.Cycle : 0));
     }
 }

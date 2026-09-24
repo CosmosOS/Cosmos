@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Cosmos.Kernel.System.Diagnostics;
 using DevKernel.Commands;
 using DevKernel.Shell;
@@ -58,7 +59,7 @@ public class Kernel : Sys.Kernel
         try
         {
             string? input = Console.ReadLine();
-            if (input == null)
+            if (input is null)
             {
                 // No console left to read from; end the main loop rather than
                 // spin on it forever.
@@ -72,6 +73,12 @@ public class Kernel : Sys.Kernel
             }
 
             _shell.Shell.Execute(_shell, input);
+        }
+        catch (IOException ex)
+        {
+            // A disk that fails, or is pulled out mid-command, fails that
+            // command only: USB disks come and go while the shell runs.
+            Terminal.Error($"I/O error: {ex.Message}");
         }
         catch (Exception ex)
         {

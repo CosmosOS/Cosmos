@@ -27,7 +27,9 @@ Storage support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot the kernel initializes `StorageManager`, which registers every AHCI and NVMe device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`.
+At boot the kernel initializes `StorageManager`, which registers every AHCI, NVMe and USB mass storage device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`. USB sticks and disks come up as `usb0`, `usb1`, ... after the internal disks, so the first internal disk stays the primary device.
+
+USB disks can also be plugged in and pulled out while the kernel runs. One plugged in is registered and scanned like a disk found at boot, under the lowest `usbN` name free. One pulled out leaves `StorageManager.Devices` and `StorageManager.Partitions`, the mounts made on its partitions with the `Partition` overload of `TryMount` (below) are detached, and files still open on it fail with `IOException`. A mount made from a source string names no disk, so it stays, and fails its I/O the same way. A detached mount is not flushed, since the disk is gone, so call `VfsManager.TryUnmount` before pulling a disk out. Both lists can change between two reads while a USB disk comes or goes: read `Devices` or `Partitions` once and index that copy.
 
 To give your kernel a disk in QEMU, attach an image with `cosmos run`:
 
@@ -35,9 +37,16 @@ To give your kernel a disk in QEMU, attach an image with `cosmos run`:
 $ qemu-img create disk.img 64M
 $ cosmos run --disk disk.img            # attached as an AHCI disk (default)
 $ cosmos run --disk disk.img,nvme       # or as an NVMe namespace
+$ cosmos run --disk disk.img,usb        # or as a USB stick on an xHCI controller
 ```
 
-`--disk` is repeatable if you want several drives.
+`--disk` is repeatable if you want several drives. A `usb` disk also gives the machine its xHCI controller, `usbxhci0`, which lets you plug another stick in and pull it out while the kernel runs, from the QEMU monitor (Ctrl+Alt+2 in the QEMU window):
+
+```console
+(qemu) drive_add 0 if=none,id=stick,file=stick.img,format=raw
+(qemu) device_add usb-storage,drive=stick,id=stick,bus=usbxhci0.0
+(qemu) device_del stick
+```
 
 ## Register a filesystem driver and mount it
 
@@ -481,7 +490,7 @@ With **nothing mounted at all**, `System.IO` still degrades gracefully: `Directo
 
 ## How it works
 
-Your code calls the stock BCL, which bottoms out in the Unix PAL (`Interop.Sys.*` P/Invokes). Those ~45 entry points are [plugged](../dev/plugs.md) in `Cosmos.Kernel.Plugs`: a file-descriptor table adapts the PAL contract (fds, dir streams, PAL errnos) and delegates to `VfsManager`, which owns path resolution, the mount table, the current directory and open-handle semantics, and dispatches to the mounted filesystem driver, which reads and writes an `IBlockDevice` (AHCI or NVMe via `StorageManager`, RAM via `MemoryBlockDevice`).
+Your code calls the stock BCL, which bottoms out in the Unix PAL (`Interop.Sys.*` P/Invokes). Those ~45 entry points are [plugged](../dev/plugs.md) in `Cosmos.Kernel.Plugs`: a file-descriptor table adapts the PAL contract (fds, dir streams, PAL errnos) and delegates to `VfsManager`, which owns path resolution, the mount table, the current directory and open-handle semantics, and dispatches to the mounted filesystem driver, which reads and writes an `IBlockDevice` (AHCI, NVMe or USB mass storage via `StorageManager`, RAM via `MemoryBlockDevice`).
 
 ```
 File / Directory / FileStream          (stock BCL)
@@ -494,5 +503,5 @@ VfsManager                             (mounts, paths, CWD, open handles)
         │
 IVfsFilesystemType / IVfsSuperblock    (FAT driver)
         │
-IBlockDevice                           (AHCI, NVMe, MemoryBlockDevice)
+IBlockDevice                           (AHCI, NVMe, USB, MemoryBlockDevice)
 ```

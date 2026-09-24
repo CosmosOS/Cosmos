@@ -7,15 +7,6 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// </summary>
 internal readonly struct UsbSetupPacket
 {
-    public UsbSetupPacket(UsbRequestType requestType, byte request, ushort value, ushort index, ushort length)
-    {
-        RequestType = requestType;
-        Request = request;
-        Value = value;
-        Index = index;
-        Length = length;
-    }
-
     public UsbRequestType RequestType { get; }
     public byte Request { get; }
     public ushort Value { get; }
@@ -25,6 +16,15 @@ internal readonly struct UsbSetupPacket
     public ushort Length { get; }
 
     public bool IsDeviceToHost => (RequestType & UsbRequestType.DeviceToHost) != 0;
+
+    public UsbSetupPacket(UsbRequestType requestType, byte request, ushort value, ushort index, ushort length)
+    {
+        RequestType = requestType;
+        Request = request;
+        Value = value;
+        Index = index;
+        Length = length;
+    }
 
     /// <summary>
     /// The packet in its little-endian wire layout, as one 64-bit value: the

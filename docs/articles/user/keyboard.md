@@ -185,7 +185,7 @@ Keys.Add(new KeyMapping(0x10, 'q', 'Q', 'q', 'Q', 'q', 'Q', '@', ConsoleKeyEx.Q)
 
 - Key releases are not queued: `KeyEvent.Type` has a `Break` value, but only presses reach the buffer. Releases of Shift, Ctrl and Alt update the modifier state and are otherwise dropped.
 - The German, Spanish and Turkish scan maps carry their AltGr characters; the French and British ones do not yet (`@`, `#`, `{` on AZERTY), so their right Alt stays a plain Alt. Dead keys are not composed: the Turkish `¨`, `~`, `´` and `` ` `` come out as those characters.
-- Devices are detected once at boot; there is no keyboard hotplug.
+- PS/2 and virtio keyboards are detected once at boot. Only a USB keyboard can be plugged in and pulled out while the kernel runs; a modifier held on one pulled out stays down until pressed on another keyboard.
 
 ## How it works
 

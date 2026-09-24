@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core.IO;
+using SchedMutex = Cosmos.Kernel.Core.Scheduler.Mutex;
 
 namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 
@@ -38,8 +39,10 @@ internal sealed unsafe partial class XhciController
     private const int FullSpeedMaxIntervalExponent = 10;
     private const int HighSpeedMaxInterval = 16;
 
-    // Synchronous command state, under _eventLock. One command at a time:
-    // commands are only issued from the single-threaded enumeration.
+    // Synchronous command state, under _eventLock. One command at a time,
+    // which _commandMutex enforces: enumeration issues commands, and so
+    // does the recovery of an endpoint, from whichever thread hit the error.
+    private readonly SchedMutex _commandMutex = new();
     private ulong _pendingCommand;
     private bool _commandCompleted;
     private XhciCompletionCode _commandCode;
@@ -128,22 +131,14 @@ internal sealed unsafe partial class XhciController
             return false;
         }
 
-        // Device Context Index: endpoint number x 2, plus 1 for IN (xHCI 1.2 §4.5.1).
-        byte endpointId = (byte)((endpoint.Number * 2) + 1);
+        byte endpointId = XhciDevice.EndpointId(endpoint);
 
         // For a high-speed periodic endpoint, Max Burst is the number of
         // additional transactions per microframe (xHCI 1.2 §6.2.3.4).
         int maxEsitPayload = endpoint.MaxPacketSize * (endpoint.AdditionalTransactions + 1);
         XhciInterruptPipe pipe = new(endpointId, endpoint.Address, maxEsitPayload, handler);
 
-        device.ClearInputContext();
-        XhciContext.SetAddFlags(device.InputControlContext, XhciContext.SlotFlag | XhciContext.EndpointFlag(endpointId));
-        XhciContext.CopySlot(device.OutputSlotContext, device.InputSlotContext);
-        if (XhciContext.GetContextEntries(device.InputSlotContext) < endpointId)
-        {
-            XhciContext.SetContextEntries(device.InputSlotContext, endpointId);
-        }
-
+        PrepareEndpointInput(device, endpointId, reinitialize: false);
         XhciContext.WriteEndpoint(device.InputEndpointContext(endpointId), XhciEndpointType.InterruptIn,
             endpoint.MaxPacketSize, endpoint.AdditionalTransactions, InterruptInterval(device.Speed, endpoint.Interval),
             pipe.Ring.PhysicalAddress, pipe.Ring.CycleState, (ushort)maxEsitPayload, (uint)maxEsitPayload);
@@ -167,6 +162,25 @@ internal sealed unsafe partial class XhciController
 
         _regs.RingDoorbell(device.SlotId, endpointId);
         return true;
+    }
+
+    /// <summary>
+    /// Fills the input context of a Configure Endpoint command that adds the
+    /// endpoint at <paramref name="endpointId"/>, or drops and adds it back
+    /// when <paramref name="reinitialize"/>: the Slot Context copied from the
+    /// controller's, its Context Entries covering the endpoint. The caller
+    /// writes the Endpoint Context.
+    /// </summary>
+    private static void PrepareEndpointInput(XhciDevice device, byte endpointId, bool reinitialize)
+    {
+        uint endpointFlag = XhciContext.EndpointFlag(endpointId);
+        device.ClearInputContext();
+        XhciContext.SetFlags(device.InputControlContext, reinitialize ? endpointFlag : 0, XhciContext.SlotFlag | endpointFlag);
+        XhciContext.CopySlot(device.OutputSlotContext, device.InputSlotContext);
+        if (XhciContext.GetContextEntries(device.InputSlotContext) < endpointId)
+        {
+            XhciContext.SetContextEntries(device.InputSlotContext, endpointId);
+        }
     }
 
     /// <summary>Tells the controller the default endpoint's real packet size once the device descriptor gave it.</summary>
@@ -198,31 +212,39 @@ internal sealed unsafe partial class XhciController
     /// <returns>The completion code, or <see cref="XhciCompletionCode.Invalid"/> on timeout.</returns>
     private XhciCompletionCode ExecuteCommand(ulong parameter, uint control, out byte slotId)
     {
-        using (_eventLock.AcquireIrqSafe())
-        {
-            _commandCompleted = false;
-            using (_ringLock.AcquireIrqSafe())
-            {
-                _pendingCommand = _commandRing.Enqueue(parameter, 0, control);
-            }
-
-            _regs.RingDoorbell(0, 0);
-        }
-
-        for (uint waitedUs = 0; ; waitedUs += WaitPollIntervalUs)
+        _commandMutex.Acquire();
+        try
         {
             using (_eventLock.AcquireIrqSafe())
             {
-                DrainEvents();
-                if (_commandCompleted || waitedUs >= CommandTimeoutMs * MicrosecondsPerMillisecond)
+                _commandCompleted = false;
+                using (_ringLock.AcquireIrqSafe())
                 {
-                    _pendingCommand = 0;
-                    slotId = _commandCompleted ? _commandSlotId : (byte)0;
-                    return _commandCompleted ? _commandCode : XhciCompletionCode.Invalid;
+                    _pendingCommand = _commandRing.Enqueue(parameter, 0, control);
                 }
+
+                _regs.RingDoorbell(0, 0);
             }
 
-            PlatformHAL.Initializer?.DelayMicroseconds(WaitPollIntervalUs);
+            for (uint waitedUs = 0; ; waitedUs += WaitPollIntervalUs)
+            {
+                using (_eventLock.AcquireIrqSafe())
+                {
+                    DrainEvents();
+                    if (_commandCompleted || waitedUs >= CommandTimeoutMs * MicrosecondsPerMillisecond)
+                    {
+                        _pendingCommand = 0;
+                        slotId = _commandCompleted ? _commandSlotId : (byte)0;
+                        return _commandCompleted ? _commandCode : XhciCompletionCode.Invalid;
+                    }
+                }
+
+                PlatformHAL.Initializer?.DelayMicroseconds(WaitPollIntervalUs);
+            }
+        }
+        finally
+        {
+            _commandMutex.Release();
         }
     }
 

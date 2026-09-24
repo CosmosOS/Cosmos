@@ -11,13 +11,13 @@ namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 /// xHCI host controller driver (eXtensible Host Controller Interface 1.2),
 /// the controller behind every USB port of a PC since ~2012 and of QEMU's
 /// qemu-xhci. Device-class agnostic: it addresses devices, runs control
-/// transfers, opens interrupt endpoints and registers hubs, and leaves
-/// what the devices are to the <see cref="UsbDriver"/>s.
+/// and bulk transfers, opens interrupt endpoints and registers hubs, and
+/// leaves what the devices are to the <see cref="UsbDriver"/>s.
 ///
-/// <para>Commands and control transfers are synchronous and only issued
-/// from thread context. Completions arrive on one event ring, drained by
-/// the MSI-X handler, by the synchronous waits themselves, and by
-/// <see cref="Poll"/> where MSI-X is unavailable.</para>
+/// <para>Commands, control transfers and bulk transfers are synchronous
+/// and only issued from thread context. Completions arrive on one event
+/// ring, drained by the MSI-X handler, by the synchronous waits
+/// themselves, and by <see cref="Poll"/> where MSI-X is unavailable.</para>
 ///
 /// <para>Two locks, always taken in this order: <c>_eventLock</c> covers
 /// the event ring and the state of the synchronous waits;
@@ -25,8 +25,13 @@ namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 /// Interrupt handlers of class drivers run under the event lock only, so
 /// they may queue transfers (keyboard LEDs) without deadlocking.</para>
 ///
-/// <para>Not implemented yet: bulk and isochronous endpoints, interrupt
-/// OUT endpoints, streams, and hot-plug (see <see cref="UsbManager"/>).</para>
+/// <para>Root port changes raise a Port Status Change Event, which only
+/// wakes <see cref="UsbManager"/>'s hot-plug thread (after making the
+/// transfers of a device that left fail at once); the ports themselves are
+/// handled on that thread, in <see cref="HandlePortChanges"/>.</para>
+///
+/// <para>Not implemented yet: isochronous endpoints, interrupt OUT
+/// endpoints and streams.</para>
 /// </summary>
 internal sealed unsafe partial class XhciController : UsbHostController
 {
@@ -102,6 +107,10 @@ internal sealed unsafe partial class XhciController : UsbHostController
     private SchedSpinLock _ringLock;
     private bool _msiXEnabled;
 
+    public override string Name => "xHCI";
+
+    public override bool IsPolled => !_msiXEnabled;
+
     public XhciController(PciDevice pci, int index)
     {
         _pci = pci;
@@ -129,8 +138,6 @@ internal sealed unsafe partial class XhciController : UsbHostController
         _eventRing = new XhciEventRing();
         _deviceContextArray = (ulong*)XhciDma.AllocPages(1, out _deviceContextArrayAddress);
     }
-
-    public override string Name => "xHCI";
 
     public override void Initialize()
     {
@@ -199,12 +206,26 @@ internal sealed unsafe partial class XhciController : UsbHostController
             return;
         }
 
+        // A transfer still waiting on the device gives up once it sees it
+        // disconnected, then drops the lock it runs under: holding each of
+        // those locks once guarantees none is left using what is freed below.
+        xhciDevice.MarkDisconnected();
+        _controlMutex.Acquire();
+        _controlMutex.Release();
+        xhciDevice.WaitForBulkTransfers();
+
         byte slotId = xhciDevice.SlotId;
-        ExecuteCommand(0, XhciTrb.TypeField(XhciTrbType.DisableSlotCommand) | ((uint)slotId << XhciTrb.SlotIdShift), out _);
+        ExecuteCommand(0, SlotCommand(XhciTrbType.DisableSlotCommand, slotId), out _);
+
+        // Past the event lock no event reaches the device's pipes, past the
+        // ring lock no fire-and-forget transfer is mid-enqueue on its rings.
         using (_eventLock.AcquireIrqSafe())
         {
-            _devices[slotId] = null;
-            _deviceContextArray[slotId] = 0;
+            using (_ringLock.AcquireIrqSafe())
+            {
+                _devices[slotId] = null;
+                _deviceContextArray[slotId] = 0;
+            }
         }
 
         xhciDevice.Free();
