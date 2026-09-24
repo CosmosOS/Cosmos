@@ -55,16 +55,6 @@ internal abstract class UsbDevice
     /// <summary>Written by the hot-plug thread, read by whichever thread waits on a transfer.</summary>
     private volatile bool _disconnected;
 
-    protected UsbDevice(UsbHostController hostController, UsbDevice? parent, byte portNumber, UsbSpeed speed)
-    {
-        HostController = hostController;
-        Parent = parent;
-        PortNumber = portNumber;
-        Speed = speed;
-        RootPortNumber = parent?.RootPortNumber ?? portNumber;
-        HubDepth = parent is null ? 0 : parent.HubDepth + 1;
-    }
-
     public UsbHostController HostController { get; }
 
     /// <summary>The hub this device is attached to, or null for a device on a root port.</summary>
@@ -101,6 +91,16 @@ internal abstract class UsbDevice
     /// one already waiting stops waiting.
     /// </summary>
     public bool IsDisconnected => _disconnected;
+
+    protected UsbDevice(UsbHostController hostController, UsbDevice? parent, byte portNumber, UsbSpeed speed)
+    {
+        HostController = hostController;
+        Parent = parent;
+        PortNumber = portNumber;
+        Speed = speed;
+        RootPortNumber = parent?.RootPortNumber ?? portNumber;
+        HubDepth = parent is null ? 0 : parent.HubDepth + 1;
+    }
 
     /// <summary>
     /// Makes the device's transfers fail from now on. <see cref="UsbManager"/>

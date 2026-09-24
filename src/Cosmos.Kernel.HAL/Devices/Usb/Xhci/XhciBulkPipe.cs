@@ -19,27 +19,6 @@ internal sealed unsafe class XhciBulkPipe
 
     private readonly byte* _pages;
 
-    /// <param name="endpointId">Device Context Index of the endpoint.</param>
-    /// <param name="endpoint">The endpoint descriptor.</param>
-    public XhciBulkPipe(byte endpointId, UsbEndpoint endpoint)
-    {
-        EndpointId = endpointId;
-        Endpoint = endpoint;
-        _pages = XhciDma.AllocPages(BufferPages, out ulong pagesAddress);
-
-        // The pages are page aligned but not 64 KiB aligned, so they may
-        // straddle one boundary: one TRB covers the longer side of it. When
-        // they are aligned, the boundary is their end and they all count.
-        ulong end = pagesAddress + ((ulong)BufferPages * (ulong)XhciDma.PageSize);
-        ulong boundary = ((pagesAddress / TrbBufferBoundary) + 1) * TrbBufferBoundary;
-        bool afterBoundary = end - boundary > boundary - pagesAddress;
-        ulong start = afterBoundary ? boundary : pagesAddress;
-        Buffer = _pages + (start - pagesAddress);
-        BufferAddress = start;
-        BufferLength = (int)((afterBoundary ? end : boundary) - start);
-        Ring = new XhciRing();
-    }
-
     public byte EndpointId { get; }
     public UsbEndpoint Endpoint { get; }
     public XhciRing Ring { get; }
@@ -63,6 +42,27 @@ internal sealed unsafe class XhciBulkPipe
 
     /// <summary>Bytes of the pending TRB the controller did not transfer.</summary>
     public uint ResidualLength { get; set; }
+
+    /// <param name="endpointId">Device Context Index of the endpoint.</param>
+    /// <param name="endpoint">The endpoint descriptor.</param>
+    public XhciBulkPipe(byte endpointId, UsbEndpoint endpoint)
+    {
+        EndpointId = endpointId;
+        Endpoint = endpoint;
+        _pages = XhciDma.AllocPages(BufferPages, out ulong pagesAddress);
+
+        // The pages are page aligned but not 64 KiB aligned, so they may
+        // straddle one boundary: one TRB covers the longer side of it. When
+        // they are aligned, the boundary is their end and they all count.
+        ulong end = pagesAddress + ((ulong)BufferPages * (ulong)XhciDma.PageSize);
+        ulong boundary = ((pagesAddress / TrbBufferBoundary) + 1) * TrbBufferBoundary;
+        bool afterBoundary = end - boundary > boundary - pagesAddress;
+        ulong start = afterBoundary ? boundary : pagesAddress;
+        Buffer = _pages + (start - pagesAddress);
+        BufferAddress = start;
+        BufferLength = (int)((afterBoundary ? end : boundary) - start);
+        Ring = new XhciRing();
+    }
 
     public void Free()
     {

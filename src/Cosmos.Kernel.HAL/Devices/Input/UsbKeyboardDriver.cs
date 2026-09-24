@@ -20,7 +20,11 @@ internal sealed class UsbKeyboardDriver : UsbDriver
 
     /// <summary>
     /// The keyboards present. Replaced on every change, never changed in
-    /// place, so a reader on another thread still sees a whole list.
+    /// place, so a reader on another thread still sees a whole list. Null
+    /// rather than <c>[]</c> until the first one binds: an initializer would
+    /// give this type a class constructor, and <see cref="TryBind"/> first
+    /// runs while devices come up, before the scheduler has a current thread
+    /// for the class-constructor lock to use.
     /// </summary>
     private static UsbKeyboard[]? s_keyboards;
 

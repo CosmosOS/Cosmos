@@ -152,7 +152,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
         }
 
         IKeyboardDevice[] ps2 = _ps2Controller != null ? PS2Controller.GetKeyboardDevices() : [];
-        return Concat(Concat(ps2, VirtioDevice.GetKeyboards()), UsbKeyboardDriver.GetKeyboards());
+        return [.. ps2, .. VirtioDevice.GetKeyboards(), .. UsbKeyboardDriver.GetKeyboards()];
     }
 
     public IMouseDevice[] GetMouseDevices()

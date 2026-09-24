@@ -57,14 +57,12 @@ public class QemuX64Host : IQemuHost
             };
         }
 
-        // Ensure UART log directory exists
-        var logDir = Path.GetDirectoryName(uartLogPath);
+        string? logDir = Path.GetDirectoryName(uartLogPath);
         if (!string.IsNullOrEmpty(logDir) && !Directory.Exists(logDir))
         {
             Directory.CreateDirectory(logDir);
         }
 
-        // Delete existing UART log
         if (File.Exists(uartLogPath))
         {
             File.Delete(uartLogPath);
@@ -88,16 +86,15 @@ public class QemuX64Host : IQemuHost
             GpuDevice = devices?.GpuDevice,
             MonitorPort = hotPlug?.Port
         });
-        var startInfo = QemuLauncher.ToProcessStartInfo(plan);
+        ProcessStartInfo startInfo = QemuLauncher.ToProcessStartInfo(plan);
         if (_qemuBinaryOverride is not null)
         {
             startInfo.FileName = _qemuBinaryOverride;
         }
 
-        using var process = new Process { StartInfo = startInfo };
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
+        using Process process = new() { StartInfo = startInfo };
+        using CancellationTokenSource cts = new(TimeSpan.FromSeconds(timeoutSeconds));
 
-        // Only create test servers for network tests
         UdpTestServer? udpServer = null;
         TcpTestServer? tcpServer = null;
         IcmpTestServer? icmpServer = null;
@@ -123,14 +120,14 @@ public class QemuX64Host : IQemuHost
             hotPlug?.Attach(cts.Token);
 
             // Capture stderr asynchronously for diagnostics
-            var stderrTask = process.StandardError.ReadToEndAsync();
+            Task<string> stderrTask = process.StandardError.ReadToEndAsync();
 
             // Monitor UART log for the suite-end marker or a stall after a test
             // was reached, while waiting for QEMU to exit on its own.
-            var monitorTask = MonitorUartLogAsync(uartLogPath, hotPlug, cts.Token);
-            var processTask = process.WaitForExitAsync(cts.Token);
+            Task<UartMonitorOutcome> monitorTask = MonitorUartLogAsync(uartLogPath, hotPlug, cts.Token);
+            Task processTask = process.WaitForExitAsync(cts.Token);
 
-            var completedTask = await Task.WhenAny(monitorTask, processTask);
+            Task completedTask = await Task.WhenAny(monitorTask, processTask);
 
             if (completedTask == monitorTask)
             {
@@ -156,18 +153,17 @@ public class QemuX64Host : IQemuHost
             // Give UART log a moment to flush
             await Task.Delay(QemuHostDefaults.UartFlushDelayMs);
 
-            // Stop test servers if running
-            if (udpServer != null)
+            if (udpServer is not null)
             {
                 await udpServer.StopAsync();
             }
 
-            if (tcpServer != null)
+            if (tcpServer is not null)
             {
                 await tcpServer.StopAsync();
             }
 
-            if (icmpServer != null)
+            if (icmpServer is not null)
             {
                 await icmpServer.StopAsync();
             }
@@ -179,7 +175,6 @@ public class QemuX64Host : IQemuHost
                 Console.WriteLine($"[QEMU stderr] {stderr.Trim()}");
             }
 
-            // Read UART log
             string uartLog = string.Empty;
             if (File.Exists(uartLogPath))
             {
@@ -206,18 +201,17 @@ public class QemuX64Host : IQemuHost
             // Give UART log a moment to flush
             await Task.Delay(QemuHostDefaults.UartFlushDelayMs);
 
-            // Stop test servers if running
-            if (udpServer != null)
+            if (udpServer is not null)
             {
                 await udpServer.StopAsync();
             }
 
-            if (tcpServer != null)
+            if (tcpServer is not null)
             {
                 await tcpServer.StopAsync();
             }
 
-            if (icmpServer != null)
+            if (icmpServer is not null)
             {
                 await icmpServer.StopAsync();
             }
@@ -239,18 +233,17 @@ public class QemuX64Host : IQemuHost
         }
         catch (Exception ex)
         {
-            // Stop test servers on error if running
-            if (udpServer != null)
+            if (udpServer is not null)
             {
                 await udpServer.StopAsync();
             }
 
-            if (tcpServer != null)
+            if (tcpServer is not null)
             {
                 await tcpServer.StopAsync();
             }
 
-            if (icmpServer != null)
+            if (icmpServer is not null)
             {
                 await icmpServer.StopAsync();
             }
@@ -291,11 +284,11 @@ public class QemuX64Host : IQemuHost
             {
                 if (File.Exists(uartLogPath))
                 {
-                    using var fs = new FileStream(uartLogPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using FileStream fs = new(uartLogPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     if (fs.Length > lastPosition)
                     {
                         fs.Seek(lastPosition, SeekOrigin.Begin);
-                        var buffer = new byte[fs.Length - lastPosition];
+                        byte[] buffer = new byte[fs.Length - lastPosition];
                         int bytesRead = await fs.ReadAsync(buffer, cancellationToken);
                         lastPosition += bytesRead;
 

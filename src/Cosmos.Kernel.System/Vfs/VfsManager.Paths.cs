@@ -140,7 +140,7 @@ public static partial class VfsManager
     internal static string[] GetVirtualRootEntries()
     {
         VfsMount[] mounts = s_mounts;
-        var collected = new List<string>(mounts.Length);
+        List<string> collected = new(mounts.Length);
         for (int i = 0; i < mounts.Length; i++)
         {
             string mountPoint = mounts[i].MountPoint;

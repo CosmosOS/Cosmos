@@ -14,8 +14,8 @@ using Cosmos.Kernel.System.Storage;
 using Cosmos.Kernel.System.Vfs;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
-using TR = Cosmos.TestRunner.Framework.TestRunner;
 using SysThread = System.Threading.Thread;
+using TR = Cosmos.TestRunner.Framework.TestRunner;
 
 namespace Cosmos.Kernel.Tests.Storage;
 
@@ -387,7 +387,7 @@ public class Kernel : Sys.Kernel
     private const string HotPlugFileName = "HOTPLUG.TXT";
 
     /// <summary>Path of <see cref="HotPlugFileName"/> under the mount.</summary>
-    private const string HotPlugFilePath = HotPlugMountPoint + "/" + HotPlugFileName;
+    private const string HotPlugFilePath = $"{HotPlugMountPoint}/{HotPlugFileName}";
 
     /// <summary>The stick as it was before the unplug, for the cells that check what it left behind.</summary>
     private static UsbMassStorage? s_unpluggedDisk;
@@ -476,7 +476,7 @@ public class Kernel : Sys.Kernel
         }
 
         // ==================== Device (single-disk round-trip) ====================
-        bool dev = s_dev != null;
+        bool dev = s_dev is not null;
         TR.RunIf(dev, "Device_BlockGeometry_Sane",         TestDevice_BlockGeometrySane,        SkipNoDevice);
         TR.RunIf(dev, "Device_WriteRead_SingleBlock",      TestDevice_WriteReadSingleBlock,     SkipNoDevice);
         TR.RunIf(dev, "Device_WriteRead_MultiBlock",       TestDevice_WriteReadMultiBlock,      SkipNoDevice);
@@ -583,7 +583,7 @@ public class Kernel : Sys.Kernel
         TR.RunIf(hotPlug, "UsbHotPlug_ReplugRegistersDisk",   TestUsbHotPlug_ReplugRegistersDisk,   hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_ReplugKeepsData",       TestUsbHotPlug_ReplugKeepsData,       hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_UnplugDetachesMount",   TestUsbHotPlug_UnplugDetachesMount,   hotPlugSkip);
-        dev = s_dev != null;
+        dev = s_dev is not null;
 
         // ==================== Boot persistence (destructive: reboots QEMU) ====================
         // Boot 0 stamps a fresh GPT with one partition and reboots; boot 1's

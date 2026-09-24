@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System.Text;
 using Cosmos.TestRunner.Protocol;
 
@@ -23,13 +25,13 @@ internal sealed class HostRequestScanner
     /// <summary>Longest request accepted; a longer length field means the header was noise.</summary>
     private const int MaxRequestBytes = 256;
 
-    private static readonly byte[] Magic =
-    {
+    private static readonly byte[] s_magic =
+    [
         Consts.SerialSignatureByte0,
         Consts.SerialSignatureByte1,
         Consts.SerialSignatureByte2,
         Consts.SerialSignatureByte3
-    };
+    ];
 
     private readonly byte[] _header = new byte[HeaderLengthBytes];
     private int _headerLength;
@@ -55,16 +57,16 @@ internal sealed class HostRequestScanner
             return request;
         }
 
-        if (_headerLength < Magic.Length)
+        if (_headerLength < s_magic.Length)
         {
             // A byte that breaks the magic may still start the next one.
-            if (value == Magic[_headerLength])
+            if (value == s_magic[_headerLength])
             {
                 _header[_headerLength++] = value;
             }
             else
             {
-                _headerLength = value == Magic[0] ? 1 : 0;
+                _headerLength = value == s_magic[0] ? 1 : 0;
             }
 
             return null;

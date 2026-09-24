@@ -19,15 +19,6 @@ internal sealed class UsbEndpoint
     private const int AdditionalTransactionsShift = 11;
     private const ushort AdditionalTransactionsMask = 0x3;
 
-    public UsbEndpoint(byte address, byte attributes, ushort maxPacketSize, byte interval)
-    {
-        Address = address;
-        Type = (UsbEndpointType)(attributes & TransferTypeMask);
-        MaxPacketSize = (ushort)(maxPacketSize & MaxPacketSizeMask);
-        AdditionalTransactions = (byte)((maxPacketSize >> AdditionalTransactionsShift) & AdditionalTransactionsMask);
-        Interval = interval;
-    }
-
     /// <summary>bEndpointAddress: the endpoint number with the direction in bit 7.</summary>
     public byte Address { get; }
 
@@ -46,13 +37,13 @@ internal sealed class UsbEndpoint
     /// SuperSpeed.
     /// </summary>
     public byte MaxBurst { get; internal set; }
-}
 
-/// <summary>Transfer type of an endpoint, from bmAttributes bits 1:0.</summary>
-internal enum UsbEndpointType : byte
-{
-    Control = 0,
-    Isochronous = 1,
-    Bulk = 2,
-    Interrupt = 3
+    public UsbEndpoint(byte address, byte attributes, ushort maxPacketSize, byte interval)
+    {
+        Address = address;
+        Type = (UsbEndpointType)(attributes & TransferTypeMask);
+        MaxPacketSize = (ushort)(maxPacketSize & MaxPacketSizeMask);
+        AdditionalTransactions = (byte)((maxPacketSize >> AdditionalTransactionsShift) & AdditionalTransactionsMask);
+        Interval = interval;
+    }
 }

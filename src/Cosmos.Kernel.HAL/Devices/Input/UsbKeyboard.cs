@@ -47,26 +47,17 @@ internal sealed class UsbKeyboard : KeyboardDevice
     private const byte LedCapsLock = 1 << 1;
     private const byte LedScrollLock = 1 << 2;
 
-    private readonly UsbDevice _device;
-    private readonly byte _interfaceNumber;
     private readonly UsbEndpoint _endpoint;
     private readonly byte[] _previousReport = new byte[BootReportLength];
     private bool _enabled;
     private byte _leds;
 
-    public UsbKeyboard(UsbDevice device, byte interfaceNumber, UsbEndpoint endpoint)
-    {
-        _device = device;
-        _interfaceNumber = interfaceNumber;
-        _endpoint = endpoint;
-    }
-
     public bool IsInitialized { get; private set; }
 
-    public UsbDevice Device => _device;
+    public UsbDevice Device { get; }
 
     /// <summary>bInterfaceNumber of the keyboard interface.</summary>
-    public byte InterfaceNumber => _interfaceNumber;
+    public byte InterfaceNumber { get; }
 
     /// <summary>Always false: reports are pushed from the interrupt pipe, there is no buffer to query.</summary>
     public override bool KeyAvailable => false;
@@ -91,13 +82,20 @@ internal sealed class UsbKeyboard : KeyboardDevice
     private static ReadOnlySpan<byte> ModifierScanCodes =>
         [0x1D, 0x2A, 0x38, 0x5B, 0x1D, 0x36, IKeyboardDevice.RightAltScanCode, 0x5C];
 
+    public UsbKeyboard(UsbDevice device, byte interfaceNumber, UsbEndpoint endpoint)
+    {
+        Device = device;
+        InterfaceNumber = interfaceNumber;
+        _endpoint = endpoint;
+    }
+
     /// <summary>
     /// Switches the interface to boot protocol and starts polling its
     /// interrupt endpoint. <see cref="IsInitialized"/> reports the outcome.
     /// </summary>
     public override void Initialize()
     {
-        if (_device.ControlOut(UsbRequestType.Class | UsbRequestType.Interface, SetProtocolRequest, BootProtocol, _interfaceNumber) != UsbTransferStatus.Success)
+        if (Device.ControlOut(UsbRequestType.Class | UsbRequestType.Interface, SetProtocolRequest, BootProtocol, InterfaceNumber) != UsbTransferStatus.Success)
         {
             Serial.WriteString("[UsbKeyboard] SET_PROTOCOL(boot) failed\n");
             return;
@@ -105,9 +103,9 @@ internal sealed class UsbKeyboard : KeyboardDevice
 
         // Report on change only (duration 0). A keyboard may stall this
         // optional request and still work, so the result is not checked.
-        _device.ControlOut(UsbRequestType.Class | UsbRequestType.Interface, SetIdleRequest, 0, _interfaceNumber);
+        Device.ControlOut(UsbRequestType.Class | UsbRequestType.Interface, SetIdleRequest, 0, InterfaceNumber);
 
-        if (!_device.OpenInterruptPipe(_endpoint, OnReport))
+        if (!Device.OpenInterruptPipe(_endpoint, OnReport))
         {
             Serial.WriteString("[UsbKeyboard] Could not open the report endpoint\n");
             return;
@@ -131,13 +129,13 @@ internal sealed class UsbKeyboard : KeyboardDevice
     public override void UpdateLeds()
     {
         ReadOnlySpan<byte> report = [_leds];
-        _device.SubmitControlTransfer(
-            new UsbSetupPacket(UsbRequestType.Class | UsbRequestType.Interface, SetReportRequest, OutputReport, _interfaceNumber, (ushort)report.Length),
+        Device.SubmitControlTransfer(
+            new UsbSetupPacket(UsbRequestType.Class | UsbRequestType.Interface, SetReportRequest, OutputReport, InterfaceNumber, (ushort)report.Length),
             report);
     }
 
     /// <summary>Processes pending reports where interrupts are not delivered.</summary>
-    public override void Poll() => _device.HostController.Poll();
+    public override void Poll() => Device.HostController.Poll();
 
     /// <summary>Report handler of the interrupt pipe; runs in interrupt context.</summary>
     private void OnReport(ReadOnlySpan<byte> report)

@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,6 +44,9 @@ public sealed class QemuHotPlug : IAsyncDisposable
     private StreamReader? _reader;
     private StreamWriter? _writer;
 
+    /// <summary>Port QEMU connects its monitor to (<see cref="QemuLaunchOptions.MonitorPort"/>).</summary>
+    public int Port { get; }
+
     private QemuHotPlug(IReadOnlyList<DiskAttachment> sticks)
     {
         _sticks = sticks;
@@ -56,9 +61,6 @@ public sealed class QemuHotPlug : IAsyncDisposable
         Port = ((IPEndPoint)_listener.LocalEndpoint).Port;
     }
 
-    /// <summary>Port QEMU connects its monitor to (<see cref="QemuLaunchOptions.MonitorPort"/>).</summary>
-    public int Port { get; }
-
     /// <summary>
     /// An instance for a run attaching <paramref name="disks"/>, or null
     /// when none of them is a USB stick, so nothing can be plugged.
@@ -70,10 +72,7 @@ public sealed class QemuHotPlug : IAsyncDisposable
     }
 
     /// <summary>Takes QEMU's monitor connection. Called once QEMU was started.</summary>
-    public void Attach(CancellationToken cancellationToken)
-    {
-        _connected ??= ConnectAsync(cancellationToken);
-    }
+    public void Attach(CancellationToken cancellationToken) => _connected ??= ConnectAsync(cancellationToken);
 
     /// <summary>
     /// Carries out one request of the guest. A request that fails is
@@ -99,6 +98,10 @@ public sealed class QemuHotPlug : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Waits for the monitor connection attempt to settle, then closes the
+    /// connection and stops listening.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (_connected is not null)
@@ -183,7 +186,7 @@ public sealed class QemuHotPlug : IAsyncDisposable
             {
                 ["driver"] = "usb-storage",
                 ["drive"] = driveId,
-                ["bus"] = QemuLauncher.UsbControllerId + ".0",
+                ["bus"] = $"{QemuLauncher.UsbControllerId}.0",
                 ["id"] = deviceId
             },
             cancellationToken);
@@ -205,18 +208,23 @@ public sealed class QemuHotPlug : IAsyncDisposable
     /// <summary>Runs one QMP command and returns what it returned; a QMP error throws.</summary>
     private async Task<JsonNode?> ExecuteAsync(string command, JsonObject? arguments, CancellationToken cancellationToken)
     {
+        if (_reader is null || _writer is null)
+        {
+            throw new InvalidOperationException("QEMU's monitor was never attached");
+        }
+
         JsonObject message = new() { ["execute"] = command };
         if (arguments is not null)
         {
             message["arguments"] = arguments;
         }
 
-        await _writer!.WriteLineAsync(message.ToJsonString().AsMemory(), cancellationToken);
+        await _writer.WriteLineAsync(message.ToJsonString().AsMemory(), cancellationToken);
         await _writer.FlushAsync(cancellationToken);
 
         while (true)
         {
-            string line = await _reader!.ReadLineAsync(cancellationToken) ?? throw new IOException("QEMU closed its monitor");
+            string line = await _reader.ReadLineAsync(cancellationToken) ?? throw new IOException("QEMU closed its monitor");
             if (JsonNode.Parse(line) is not JsonObject reply)
             {
                 continue;

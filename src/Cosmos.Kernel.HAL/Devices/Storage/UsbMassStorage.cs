@@ -84,32 +84,30 @@ internal sealed class UsbMassStorage : BlockDevice
     private const int ReadyAttempts = 50;
     private const uint ReadyRetryDelayMs = 100;
 
-    private readonly UsbBulkOnlyTransport _transport;
     private readonly byte _lun;
-    private readonly string _name;
     private bool _synchronizeCacheUnsupported;
+
+    /// <inheritdoc />
+    public override string Name { get; }
+
+    /// <summary>Number of the device name, unique among the units present.</summary>
+    public uint Index { get; }
+
+    public UsbBulkOnlyTransport Transport { get; }
+
+    /// <summary>The device was unplugged: nothing reaches the unit any more.</summary>
+    public bool IsRemoved => Transport.Device.IsDisconnected;
 
     /// <param name="transport">The transport of the interface the unit belongs to.</param>
     /// <param name="lun">The unit's number on that interface.</param>
     /// <param name="index">Number of the device name, "usb" + index.</param>
     public UsbMassStorage(UsbBulkOnlyTransport transport, byte lun, uint index)
     {
-        _transport = transport;
+        Transport = transport;
         _lun = lun;
         Index = index;
-        _name = BuildDeviceName("usb", index);
+        Name = BuildDeviceName("usb", index);
     }
-
-    /// <inheritdoc />
-    public override string Name => _name;
-
-    /// <summary>Number of the device name, unique among the units present.</summary>
-    public uint Index { get; }
-
-    public UsbBulkOnlyTransport Transport => _transport;
-
-    /// <summary>The device was unplugged: nothing reaches the unit any more.</summary>
-    public bool IsRemoved => _transport.Device.IsDisconnected;
 
     /// <summary>
     /// Identifies the logical unit and waits for its medium: INQUIRY, TEST
@@ -247,7 +245,7 @@ internal sealed class UsbMassStorage : BlockDevice
     {
         for (int attempt = 1; ; attempt++)
         {
-            BulkOnlyStatus status = _transport.Execute(_lun, command, dataIn, dataOut, sense, out residue);
+            BulkOnlyStatus status = Transport.Execute(_lun, command, dataIn, dataOut, sense, out residue);
             bool transient = (status == BulkOnlyStatus.TransportError && !IsRemoved)
                 || (status == BulkOnlyStatus.Failed && SenseKey(sense) == SenseKeyUnitAttention);
             if (!transient || attempt >= CommandAttempts)
@@ -380,7 +378,7 @@ internal sealed class UsbMassStorage : BlockDevice
     {
         if (IsRemoved)
         {
-            throw new IOException("USB mass storage device " + _name + " was removed.");
+            throw new IOException($"USB mass storage device {Name} was removed.");
         }
     }
 
@@ -411,7 +409,7 @@ internal sealed class UsbMassStorage : BlockDevice
             WriteSense(sense);
         }
 
-        throw new IOException("USB mass storage " + commandName + " failed on " + _name + ".");
+        throw new IOException($"USB mass storage {commandName} failed on {Name}.");
     }
 
     private static byte SenseKey(ReadOnlySpan<byte> sense) => (byte)(sense[SenseKeyOffset] & SenseKeyMask);
@@ -449,7 +447,7 @@ internal sealed class UsbMassStorage : BlockDevice
     private void WriteLogPrefix()
     {
         Serial.WriteString("[USB storage] ");
-        Serial.WriteString(_name);
+        Serial.WriteString(Name);
         Serial.WriteString(" (LUN ");
         Serial.WriteNumber((uint)_lun);
         Serial.WriteString("): ");

@@ -10,7 +10,7 @@ internal sealed unsafe partial class XhciController
     /// Budget for one bulk TRB. Generous: a flash drive may stall a write
     /// for seconds while it erases, and a USB disk spins up.
     /// </summary>
-    private const uint BulkTimeoutMs = 10000;
+    private const uint BulkTimeoutMs = 10_000;
 
     /// <summary>Average TRB length the spec recommends for bulk endpoints (xHCI 1.2 §4.14.1.1).</summary>
     private const ushort BulkAverageTrbLength = 3072;

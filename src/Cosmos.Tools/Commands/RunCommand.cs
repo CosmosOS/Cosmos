@@ -167,7 +167,7 @@ public class RunCommand : AsyncCommand<RunSettings>
     /// </summary>
     internal static List<DiskAttachment> ParseDisks(string[] specs)
     {
-        var disks = new List<DiskAttachment>(specs.Length);
+        List<DiskAttachment> disks = new(specs.Length);
         foreach (string spec in specs)
         {
             string path = spec;

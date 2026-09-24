@@ -134,4 +134,3 @@ internal enum XhciEndpointType : byte
     BulkIn = 6,
     InterruptIn = 7
 }
-

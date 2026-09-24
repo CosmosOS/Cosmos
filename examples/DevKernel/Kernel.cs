@@ -59,7 +59,7 @@ public class Kernel : Sys.Kernel
         try
         {
             string? input = Console.ReadLine();
-            if (input == null)
+            if (input is null)
             {
                 // No console left to read from; end the main loop rather than
                 // spin on it forever.

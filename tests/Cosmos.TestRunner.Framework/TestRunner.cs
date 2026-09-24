@@ -200,10 +200,7 @@ namespace Cosmos.TestRunner.Framework
         /// waits for the change to show up, and must see it within the
         /// engine's stall window (10 s without a protocol message).
         /// </summary>
-        public static void RequestHost(string request)
-        {
-            SendMessage(HostRequest, EncodeString(request));
-        }
+        public static void RequestHost(string request) => SendMessage(HostRequest, EncodeString(request));
 
         /// <summary>
         /// Reads the <c>skip=N</c> integer from the Limine kernel cmdline.

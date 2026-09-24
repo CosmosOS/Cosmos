@@ -27,15 +27,18 @@ internal sealed class UsbMassStorageDriver : UsbDriver
     /// <summary>
     /// The units present. Replaced on every change, never changed in place,
     /// so a thread reading <see cref="Disks"/> while the hot-plug thread
-    /// adds or removes one still sees a whole list.
+    /// adds or removes one still sees a whole list. Null rather than
+    /// <c>[]</c> until the first one binds: an initializer would give this
+    /// type a class constructor, and <see cref="TryBind"/> first runs while
+    /// devices come up, before the scheduler has a current thread for the
+    /// class-constructor lock to use.
     /// </summary>
     private static UsbMassStorage[]? s_disks;
 
     public override string Name => "mass storage";
 
     /// <summary>Every logical unit present, in enumeration order (empty before USB enumeration).</summary>
-    public static IReadOnlyList<UsbMassStorage> Disks =>
-        (IReadOnlyList<UsbMassStorage>?)s_disks ?? Array.Empty<UsbMassStorage>();
+    public static IReadOnlyList<UsbMassStorage> Disks => s_disks ?? [];
 
     /// <summary>
     /// Called with every unit that becomes usable, after it joined

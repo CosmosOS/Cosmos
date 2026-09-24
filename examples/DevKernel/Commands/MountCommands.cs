@@ -125,7 +125,7 @@ internal static class MountCommands
             VfsManager.VfsMount mount = mounts[i];
             if (ReferenceEquals(mount.Partition, target))
             {
-                Terminal.Error("Partition is mounted at " + mount.MountPoint + ". Run 'umount " + mount.MountPoint + "' first.");
+                Terminal.Error($"Partition is mounted at {mount.MountPoint}. Run 'umount {mount.MountPoint}' first.");
                 return;
             }
         }
@@ -179,24 +179,24 @@ internal static class MountCommands
         {
             // The mount is gone already; only its last writes may be.
             LeaveMountPoint(context, mountPoint);
-            Terminal.Error("Unmounted " + mountPoint + ", but its last writes may be lost: " + ex.Message);
+            Terminal.Error($"Unmounted {mountPoint}, but its last writes may be lost: {ex.Message}");
             return;
         }
 
         if (!unmounted)
         {
-            Terminal.Error("Nothing is mounted at " + mountPoint + ". Use 'mounts' to list.");
+            Terminal.Error($"Nothing is mounted at {mountPoint}. Use 'mounts' to list.");
             return;
         }
 
         LeaveMountPoint(context, mountPoint);
-        Terminal.Success("Unmounted " + mountPoint);
+        Terminal.Success($"Unmounted {mountPoint}");
     }
 
     /// <summary>Moves the shell to the root when its directory was under <paramref name="mountPoint"/>.</summary>
     private static void LeaveMountPoint(ShellContext context, string mountPoint)
     {
-        if (context.Cwd == mountPoint || context.Cwd.StartsWith(mountPoint + VfsPath.Separator, StringComparison.Ordinal))
+        if (context.Cwd == mountPoint || context.Cwd.StartsWith($"{mountPoint}{VfsPath.Separator}", StringComparison.Ordinal))
         {
             context.Cwd = VfsPath.Root;
         }

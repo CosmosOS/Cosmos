@@ -1,7 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Core.IO;
-
 namespace Cosmos.Kernel.HAL.Devices.Usb;
 
 /// <summary>
@@ -77,6 +75,13 @@ internal sealed class UsbHub
     /// <summary>Ports the status change endpoint reported and the hot-plug thread has not looked at yet, as its bitmap.</summary>
     private uint _pendingChanges;
 
+    public UsbDevice Device { get; }
+    public byte PortCount { get; }
+    public bool IsSuperSpeed { get; }
+
+    /// <summary>Last port a device can be enumerated on.</summary>
+    private int LastPort => Math.Min((int)PortCount, MaxRoutablePort);
+
     /// <param name="device">The hub.</param>
     /// <param name="portCount">bNbrPorts from its hub descriptor.</param>
     public UsbHub(UsbDevice device, byte portCount)
@@ -85,13 +90,6 @@ internal sealed class UsbHub
         PortCount = portCount;
         IsSuperSpeed = device.Speed >= UsbSpeed.Super;
     }
-
-    public UsbDevice Device { get; }
-    public byte PortCount { get; }
-    public bool IsSuperSpeed { get; }
-
-    /// <summary>Last port a device can be enumerated on.</summary>
-    private int LastPort => Math.Min((int)PortCount, MaxRoutablePort);
 
     /// <summary>Powers every port, waits for power to be good and the connections to settle.</summary>
     /// <param name="powerOnToPowerGoodMs">bPwrOn2PwrGood from the hub descriptor, in milliseconds.</param>

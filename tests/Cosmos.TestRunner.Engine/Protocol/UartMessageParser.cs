@@ -143,7 +143,6 @@ public class UartMessageParser
             return false;
         }
 
-        // Validate we have enough data for payload
         if (offset + HeaderLengthBytes + length > data.Length)
         {
             return false;
@@ -155,7 +154,6 @@ public class UartMessageParser
         // Only advance offset after we've validated this is a real message
         offset += HeaderLengthBytes + length;
 
-        // Parse based on command
         switch (command)
         {
             case Ds2Vs.TestSuiteStart:

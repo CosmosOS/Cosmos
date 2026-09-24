@@ -197,8 +197,6 @@ public static class StorageManager
 
             s_devices = [.. devices, device];
             s_partitions = [.. Partitions, .. partitions];
-
-            // First device becomes primary
             s_primaryDevice ??= device;
         }
         finally

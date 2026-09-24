@@ -187,7 +187,7 @@ public static class QemuLauncher
                 $"or install qemu-system-{(options.Architecture == "x64" ? "x86_64" : "aarch64")} system-wide.");
         }
 
-        var args = new StringBuilder();
+        StringBuilder args = new();
 
         // Single rule, all OSes: when QEMU is bundled, point it at the bundle's
         // share/qemu/ for BIOS/firmware lookup. The MSYS2 Windows build never

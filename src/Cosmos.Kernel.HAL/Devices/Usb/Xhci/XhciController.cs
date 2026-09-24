@@ -107,6 +107,10 @@ internal sealed unsafe partial class XhciController : UsbHostController
     private SchedSpinLock _ringLock;
     private bool _msiXEnabled;
 
+    public override string Name => "xHCI";
+
+    public override bool IsPolled => !_msiXEnabled;
+
     public XhciController(PciDevice pci, int index)
     {
         _pci = pci;
@@ -134,8 +138,6 @@ internal sealed unsafe partial class XhciController : UsbHostController
         _eventRing = new XhciEventRing();
         _deviceContextArray = (ulong*)XhciDma.AllocPages(1, out _deviceContextArrayAddress);
     }
-
-    public override string Name => "xHCI";
 
     public override void Initialize()
     {
@@ -197,8 +199,6 @@ internal sealed unsafe partial class XhciController : UsbHostController
         }
     }
 
-    public override bool IsPolled => !_msiXEnabled;
-
     public override void ReleaseDevice(UsbDevice device)
     {
         if (device is not XhciDevice xhciDevice || xhciDevice.HostController != this)
@@ -215,7 +215,7 @@ internal sealed unsafe partial class XhciController : UsbHostController
         xhciDevice.WaitForBulkTransfers();
 
         byte slotId = xhciDevice.SlotId;
-        ExecuteCommand(0, XhciTrb.TypeField(XhciTrbType.DisableSlotCommand) | ((uint)slotId << XhciTrb.SlotIdShift), out _);
+        ExecuteCommand(0, SlotCommand(XhciTrbType.DisableSlotCommand, slotId), out _);
 
         // Past the event lock no event reaches the device's pipes, past the
         // ring lock no fire-and-forget transfer is mid-enqueue on its rings.
