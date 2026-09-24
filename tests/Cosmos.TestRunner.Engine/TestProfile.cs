@@ -579,8 +579,9 @@ public static class TestProfileLoader
         {
             "ahci" or "sata" => DiskKind.Ahci,
             "nvme" => DiskKind.Nvme,
+            "usb" => DiskKind.Usb,
             _ => throw new InvalidOperationException(
-                $"{path}: {context} references unknown device kind '{type}'. Expected 'ahci' or 'nvme'.")
+                $"{path}: {context} references unknown device kind '{type}'. Expected 'ahci', 'nvme' or 'usb'.")
         };
     }
 

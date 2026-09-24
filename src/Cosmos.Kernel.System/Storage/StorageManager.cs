@@ -5,12 +5,18 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Filesystems.Fat;
+using Cosmos.Kernel.System.Vfs;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.System.Storage;
 
 /// <summary>
-/// Manages block storage devices.
+/// Manages block storage devices. The tables change after boot too, when a
+/// USB disk is plugged in or pulled out, from the USB hot-plug thread: each
+/// is replaced whole on every change, so a list read from
+/// <see cref="Devices"/>, <see cref="Partitions"/> or
+/// <see cref="GetPartitions"/> never changes under its reader. Read it once
+/// and index that copy: a second read may be a newer table.
 /// </summary>
 public static class StorageManager
 {
@@ -18,10 +24,10 @@ public static class StorageManager
     private const int MaxDevices = 8;
 
     private static IBlockDevice? s_primaryDevice;
-    private static List<IBlockDevice>? s_devices;
-    private static List<Partition>? s_partitions;
+    private static IBlockDevice[]? s_devices;
+    private static Partition[]? s_partitions;
 
-    /// <summary>Guards every mutation of the device and partition tables.</summary>
+    /// <summary>Serializes the replacement of the device and partition tables.</summary>
     private static SchedSpinLock s_mutationLock;
 
     /// <summary>
@@ -59,7 +65,7 @@ public static class StorageManager
     /// <summary>
     /// Gets the number of registered block devices.
     /// </summary>
-    public static int DeviceCount => s_devices?.Count ?? 0;
+    public static int DeviceCount => s_devices?.Length ?? 0;
 
     /// <summary>
     /// Every registered block device, in registration order. Empty before
@@ -84,17 +90,18 @@ public static class StorageManager
     /// <param name="device">The device to list the partitions of.</param>
     public static IReadOnlyList<Partition> GetPartitions(IBlockDevice device)
     {
-        if (s_partitions is null || device is null)
+        Partition[]? partitions = s_partitions;
+        if (partitions is null || device is null)
         {
             return Array.Empty<Partition>();
         }
 
         List<Partition> onDevice = [];
-        for (int i = 0; i < s_partitions.Count; i++)
+        for (int i = 0; i < partitions.Length; i++)
         {
-            if (ReferenceEquals(s_partitions[i].Host, device))
+            if (ReferenceEquals(partitions[i].Host, device))
             {
-                onDevice.Add(s_partitions[i]);
+                onDevice.Add(partitions[i]);
             }
         }
 
@@ -115,13 +122,15 @@ public static class StorageManager
         }
 
         s_partitions = [];
-        s_devices = new List<IBlockDevice>(MaxDevices);
+        s_devices = [];
     }
 
     /// <summary>
     /// Registers every block device produced by the HAL storage drivers
-    /// (AHCI ports, NVMe namespaces). Called once during boot after the HAL
-    /// has initialized the controllers.
+    /// (AHCI ports, NVMe namespaces, then USB mass storage units, so an
+    /// internal disk stays the primary one), and follows the USB disks
+    /// plugged in or pulled out from then on. Called once during boot after
+    /// the HAL has initialized the controllers.
     /// </summary>
     internal static void RegisterHalDevices()
     {
@@ -129,6 +138,11 @@ public static class StorageManager
         {
             return;
         }
+
+        // Before the boot disks are read, so none can slip between the two;
+        // one reported twice is registered once.
+        UsbMassStorageDriver.DiskAttached = RegisterDevice;
+        UsbMassStorageDriver.DiskDetached = UnregisterDevice;
 
         IReadOnlyList<BlockDevice> ports = Ahci.Ports;
         for (int i = 0; i < ports.Count; i++)
@@ -140,6 +154,12 @@ public static class StorageManager
         for (int i = 0; i < nvmeNamespaces.Count; i++)
         {
             RegisterDevice(nvmeNamespaces[i]);
+        }
+
+        IReadOnlyList<UsbMassStorage> usbDisks = UsbMassStorageDriver.Disks;
+        for (int i = 0; i < usbDisks.Count; i++)
+        {
+            RegisterDevice(usbDisks[i]);
         }
     }
 
@@ -154,43 +174,86 @@ public static class StorageManager
     {
         ThrowIfDisabled();
 
-        if (device is null || s_devices is null || s_devices.Count >= MaxDevices)
+        if (device is null || s_devices is null || IsRegistered(device) || s_devices.Length >= MaxDevices)
         {
             return;
         }
 
-        // Serializes s_devices/s_partitions mutation for post-boot callers
-        // (device hotplug paths, tests); reads are still unsynchronized —
-        // enumerating Partitions while another thread rescans remains the
-        // caller's problem. Re-registering a known device is a no-op: this is
-        // public, so a second RegisterHalDevices call would otherwise
-        // double-count the device and duplicate every partition under
-        // identical names.
+        // The scan reads the disk, so it runs before the lock, and only its
+        // result is published under it. Re-registering a known device is a
+        // no-op: this is public, so a second RegisterHalDevices call would
+        // otherwise double-count the device and duplicate every partition
+        // under identical names.
+        List<Partition> partitions = ScanPartitions(device);
+
         s_mutationLock.Acquire();
         try
         {
-            for (int i = 0; i < s_devices.Count; i++)
+            IBlockDevice[] devices = s_devices;
+            if (IsRegistered(device) || devices.Length >= MaxDevices)
             {
-                if (ReferenceEquals(s_devices[i], device))
-                {
-                    return;
-                }
+                return;
             }
 
-            s_devices.Add(device);
-
-            // First device becomes primary
-            if (s_primaryDevice is null)
-            {
-                s_primaryDevice = device;
-            }
-
-            ScanPartitions(device);
+            s_devices = [.. devices, device];
+            s_partitions = [.. Partitions, .. partitions];
+            s_primaryDevice ??= device;
         }
         finally
         {
             s_mutationLock.Release();
         }
+    }
+
+    /// <summary>
+    /// Forgets a block device that is gone (a USB disk pulled out): it
+    /// leaves <see cref="Devices"/>, its partitions leave
+    /// <see cref="Partitions"/>, and the filesystems mounted from them are
+    /// detached from the VFS without a flush, since the device can take no
+    /// more writes. When it was the primary device, the first one left
+    /// takes its place.
+    /// </summary>
+    /// <param name="device">The device that is gone.</param>
+    internal static void UnregisterDevice(IBlockDevice device)
+    {
+        if (s_devices is null)
+        {
+            return;
+        }
+
+        s_mutationLock.Acquire();
+        try
+        {
+            if (!IsRegistered(device))
+            {
+                return;
+            }
+
+            List<IBlockDevice> devices = [];
+            foreach (IBlockDevice other in s_devices)
+            {
+                if (!ReferenceEquals(other, device))
+                {
+                    devices.Add(other);
+                }
+            }
+
+            s_devices = devices.ToArray();
+            s_partitions = WithoutPartitionsOf(device);
+            if (ReferenceEquals(s_primaryDevice, device))
+            {
+                s_primaryDevice = devices.Count > 0 ? devices[0] : null;
+            }
+        }
+        finally
+        {
+            s_mutationLock.Release();
+        }
+
+        Serial.WriteString("[StorageManager] ");
+        Serial.WriteString(device.Name);
+        Serial.WriteString(" unregistered\n");
+        VfsManager.DetachMounts(device);
     }
 
     /// <summary>
@@ -210,18 +273,16 @@ public static class StorageManager
             return;
         }
 
+        List<Partition> partitions = ScanPartitions(device);
+
         s_mutationLock.Acquire();
         try
         {
-            for (int i = s_partitions.Count - 1; i >= 0; i--)
+            // Unplugged while it was scanned: nothing left to rescan.
+            if (IsRegistered(device))
             {
-                if (ReferenceEquals(s_partitions[i].Host, device))
-                {
-                    s_partitions.RemoveAt(i);
-                }
+                s_partitions = [.. WithoutPartitionsOf(device), .. partitions];
             }
-
-            ScanPartitions(device);
         }
         finally
         {
@@ -229,13 +290,43 @@ public static class StorageManager
         }
     }
 
-    private static void ScanPartitions(IBlockDevice device)
+    private static bool IsRegistered(IBlockDevice device)
     {
-        if (s_partitions is null)
+        IBlockDevice[]? devices = s_devices;
+        if (devices is null)
         {
-            return;
+            return false;
         }
 
+        for (int i = 0; i < devices.Length; i++)
+        {
+            if (ReferenceEquals(devices[i], device))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static Partition[] WithoutPartitionsOf(IBlockDevice device)
+    {
+        List<Partition> kept = [];
+        foreach (Partition partition in Partitions)
+        {
+            if (!ReferenceEquals(partition.Host, device))
+            {
+                kept.Add(partition);
+            }
+        }
+
+        return kept.ToArray();
+    }
+
+    /// <summary>Reads the partition table of <paramref name="device"/>; empty when there is none or it cannot be read.</summary>
+    private static List<Partition> ScanPartitions(IBlockDevice device)
+    {
+        List<Partition> partitions = [];
         try
         {
             if (Gpt.IsGpt(device))
@@ -247,9 +338,9 @@ public static class StorageManager
                 for (int i = 0; i < entries.Count; i++)
                 {
                     GptPartitionEntry e = entries[i];
-                    s_partitions.Add(new Partition(device, e.StartSector, e.SectorCount, (uint)i));
+                    partitions.Add(new Partition(device, e.StartSector, e.SectorCount, (uint)i));
                 }
-                return;
+                return partitions;
             }
 
             if (Mbr.IsMbr(device))
@@ -262,7 +353,7 @@ public static class StorageManager
                 for (int i = 0; i < entries.Count; i++)
                 {
                     MbrPartitionEntry e = entries[i];
-                    s_partitions.Add(new Partition(device, e.StartSector, e.SectorCount, slot));
+                    partitions.Add(new Partition(device, e.StartSector, e.SectorCount, slot));
                     slot++;
                 }
 
@@ -273,14 +364,14 @@ public static class StorageManager
                     for (int i = 0; i < logicals.Count; i++)
                     {
                         MbrPartitionEntry e = logicals[i];
-                        s_partitions.Add(new Partition(device, e.StartSector, e.SectorCount, slot));
+                        partitions.Add(new Partition(device, e.StartSector, e.SectorCount, slot));
                         slot++;
                     }
                 }
 
                 if (slot > 0)
                 {
-                    return;
+                    return partitions;
                 }
             }
 
@@ -303,7 +394,7 @@ public static class StorageManager
                 Serial.WriteString("[StorageManager] Unpartitioned filesystem volume detected on ");
                 Serial.WriteString(device.Name);
                 Serial.WriteString("\n");
-                s_partitions.Add(new Partition(device, 0, device.BlockCount, 0u));
+                partitions.Add(new Partition(device, 0, device.BlockCount, 0u));
             }
         }
         catch (Exception)
@@ -317,6 +408,8 @@ public static class StorageManager
             Serial.WriteString(device.Name);
             Serial.WriteString("\n");
         }
+
+        return partitions;
     }
 
     /// <summary>
@@ -327,11 +420,12 @@ public static class StorageManager
     /// storage support is disabled.</returns>
     public static IBlockDevice? GetDevice(int index)
     {
-        if (s_devices is null || index < 0 || index >= s_devices.Count)
+        IBlockDevice[]? devices = s_devices;
+        if (devices is null || index < 0 || index >= devices.Length)
         {
             return null;
         }
 
-        return s_devices[index];
+        return devices[index];
     }
 }

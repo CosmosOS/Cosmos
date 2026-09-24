@@ -1,6 +1,7 @@
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Cpu;
+using Cosmos.Kernel.HAL.Devices.Usb;
 
 namespace Cosmos.Kernel.System;
 
@@ -45,6 +46,15 @@ public abstract partial class Kernel
         {
             Serial.WriteString("[Kernel] Enabling interrupts...\n");
             InternalCpu.EnableInterrupts();
+        }
+
+        // USB hot-plug runs on a thread of its own, which only a scheduler
+        // tick can start, so it waits for interrupts. Same switches as the
+        // USB bring-up, so a kernel without USB trims it all.
+        if (Core.CosmosFeatures.SchedulerEnabled && Core.CosmosFeatures.PCIEnabled
+            && (Core.CosmosFeatures.KeyboardEnabled || Core.CosmosFeatures.StorageEnabled))
+        {
+            UsbManager.StartHotPlug();
         }
 
         EarlyGop.Enabled = false;

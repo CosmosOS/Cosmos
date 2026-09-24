@@ -1,7 +1,5 @@
 ## Gen2/Gen3 Feature Comparison
 
-![Gen3 Release Progress](https://img.shields.io/badge/Gen3_First_Release-92%25-yellow?style=for-the-badge)
-
 | Feature | Gen2 | Gen3 | Notes |
 |---------|------|-------------|-------|
 | Low level assembly access | ✅ | ✅ | Before X# now x64 NASM + ARM64 GAS assembly. |
@@ -35,6 +33,7 @@ Beyond Gen2 parity, Gen3 brings new capabilities:
 | **Threading & Scheduler** | ✅ | Priority-based stride scheduler (x64 + ARM64). `lock` keyword supported. |
 | **Feature Flags** | ✅ |  |
 | **Cosmos Vs Code Extension** | ✅ |  |
+| **USB Support** | ✅ | xHCI host controller with hubs and hot-plug (x64 + ARM64). HID boot keyboard and mass storage (Bulk-Only Transport). No USB mouse or EHCI yet. |
 
 ## Future Releases
 
@@ -43,7 +42,6 @@ Features planned after first release:
 | Feature | Status | Notes |
 |---------|--------|-------|
 | **SMP (Symmetric Multiprocessing)** | ❌ Not Started | Multi-core AP boot, per-CPU scheduling, load balancer. |
-| **USB Support** | ❌ Not Started | XHCI/EHCI host controller drivers, USB HID (keyboard/mouse), mass storage. |
 | **HTTPS** | ❌ Not Started | TLS/SSL implementation, certificate handling, secure sockets. |
 | **Generational GC** | ❌ Not Started | Replace current mark-and-sweep with generational collector (Gen0/Gen1/Gen2) for better performance. |
 | **Code execution** | ❌ Not Started | Userland WASM VM |

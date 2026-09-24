@@ -9,6 +9,7 @@ using Cosmos.Kernel.Core.X64;
 using Cosmos.Kernel.Core.X64.Cpu;
 using Cosmos.Kernel.Core.X64.IO;
 using Cosmos.Kernel.Core.X64.Power;
+using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces;
@@ -151,7 +152,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
         }
 
         IKeyboardDevice[] ps2 = _ps2Controller != null ? PS2Controller.GetKeyboardDevices() : [];
-        return Concat(ps2, VirtioDevice.GetKeyboards());
+        return [.. ps2, .. VirtioDevice.GetKeyboards(), .. UsbKeyboardDriver.GetKeyboards()];
     }
 
     public IMouseDevice[] GetMouseDevices()

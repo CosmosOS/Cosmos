@@ -26,6 +26,9 @@ internal class PciManager
     /// <summary>PCI class code 0x06 - Bridge device.</summary>
     private const int BridgeClassCode = 0x6;
 
+    /// <summary>PCI subclass 0x00 - host bridge.</summary>
+    private const int HostBridgeSubclass = 0x0;
+
     /// <summary>PCI subclass 0x04 - PCI-to-PCI bridge.</summary>
     private const int PciToPciBridgeSubclass = 0x4;
 
@@ -39,23 +42,26 @@ internal class PciManager
         Serial.WriteString("[PciManager] Setup Clearing List.\n");
         Devices = new PciDevice[MaxDevices];
         Serial.WriteString("[PciManager] Setup Cleared List.\n");
-        if ((PciDevice.GetHeaderType(0x0, 0x0, 0x0) & MultifunctionBit) == 0)
+        CheckBus(0x0);
+
+        // A multi-function 00:00 may hold one host bridge per root bus,
+        // function N serving bus N. Other functions live there too (the
+        // IOMMU at 00:00.2 on AMD) and the numbering has gaps, so every
+        // function is looked at and only host bridges add a bus.
+        if ((PciDevice.GetHeaderType(0x0, 0x0, 0x0) & MultifunctionBit) != 0)
         {
-            CheckBus(0x0);
-        }
-        else
-        {
-            for (ushort fn = 0; fn < MaxFunctionsPerDevice; fn++)
+            for (ushort fn = 1; fn < MaxFunctionsPerDevice; fn++)
             {
-                Serial.WriteString("[PciManager] Setup ");
-                Serial.WriteNumber(fn);
-                Serial.WriteString("\n");
-                if (PciDevice.GetVendorId(0x0, 0x0, fn) != InvalidVendorId)
+                if (PciDevice.GetVendorId(0x0, 0x0, fn) == InvalidVendorId)
                 {
-                    break;
+                    continue;
                 }
 
-                CheckBus(fn);
+                PciDevice function = new(0x0, 0x0, fn);
+                if (function.ClassCode == BridgeClassCode && function.Subclass == HostBridgeSubclass)
+                {
+                    CheckBus(fn);
+                }
             }
         }
 
