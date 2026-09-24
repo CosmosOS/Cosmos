@@ -471,4 +471,5 @@ src/Cosmos.Kernel/Bootstrap/kmain_version.h
 
 global.json
 
-.claude
+.claude/*
+!.claude/agents/

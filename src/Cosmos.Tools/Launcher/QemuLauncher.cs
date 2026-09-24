@@ -107,13 +107,22 @@ public sealed class QemuLaunchOptions
     /// </summary>
     public string? CpuModel { get; init; }
 
+    /// <summary>
+    /// TCP port on 127.0.0.1 that QEMU connects its QMP monitor to at
+    /// startup, or <c>null</c> for no monitor. Lets a test runner change the
+    /// machine under a running guest, such as pulling a USB stick out. The
+    /// port must already be listening: QEMU exits when it cannot connect.
+    /// </summary>
+    public int? MonitorPort { get; init; }
+
     public IReadOnlyList<string> ExtraArgs { get; init; } = Array.Empty<string>();
 }
 
 public enum DiskKind
 {
     Ahci,
-    Nvme
+    Nvme,
+    Usb
 }
 
 /// <summary>
@@ -152,6 +161,15 @@ public static class QemuLauncher
     /// </summary>
     private const int NetworkTestRawSocketPort = 5560;
 
+    /// <summary>QEMU id of the xHCI controller USB disks sit on; its root hub is the bus <c>usbxhci0.0</c>.</summary>
+    public const string UsbControllerId = "usbxhci0";
+
+    /// <summary>QEMU id of the drive behind the <paramref name="index"/>th USB disk.</summary>
+    public static string UsbDriveId(int index) => $"usbdisk{index}";
+
+    /// <summary>QEMU id of the <paramref name="index"/>th USB disk's usb-storage device, the one to unplug.</summary>
+    public static string UsbDeviceId(int index) => $"usbstick{index}";
+
     public static async Task<QemuLaunchPlan> BuildAsync(QemuLaunchOptions options)
     {
         CommandToolDefinition tool = options.Architecture switch
@@ -169,7 +187,7 @@ public static class QemuLauncher
                 $"or install qemu-system-{(options.Architecture == "x64" ? "x86_64" : "aarch64")} system-wide.");
         }
 
-        var args = new StringBuilder();
+        StringBuilder args = new();
 
         // Single rule, all OSes: when QEMU is bundled, point it at the bundle's
         // share/qemu/ for BIOS/firmware lookup. The MSYS2 Windows build never
@@ -240,6 +258,11 @@ public static class QemuLauncher
         AppendInputDevice(args, options.MouseDevice);
         AppendVgaAdapter(args, options.VgaAdapter);
         AppendGpuDevice(args, options.GpuDevice);
+
+        if (options.MonitorPort is int monitorPort)
+        {
+            args.Append($" -chardev socket,id=qmp0,host=127.0.0.1,port={monitorPort} -mon chardev=qmp0,mode=control");
+        }
 
         if (options.Debug)
         {
@@ -362,10 +385,11 @@ public static class QemuLauncher
     }
 
     /// <summary>
-    /// Attach AHCI/SATA + NVMe disks. AHCI disks share one <c>ich9-ahci</c>
+    /// Attach AHCI/SATA, NVMe and USB disks. AHCI disks share one <c>ich9-ahci</c>
     /// controller and consume successive ports; NVMe disks each get a
     /// dedicated <c>nvme</c> controller so the guest exercises multi-controller
-    /// binding. Per-disk <see cref="DiskAttachment.ExtraDeviceOptions"/> is
+    /// binding; USB disks are <c>usb-storage</c> sticks on one shared
+    /// <c>qemu-xhci</c> controller. Per-disk <see cref="DiskAttachment.ExtraDeviceOptions"/> is
     /// appended after the standard device properties so profiles can flip
     /// things like <c>msix=off</c>.
     /// </summary>
@@ -373,7 +397,9 @@ public static class QemuLauncher
     {
         int ahciIndex = 0;
         int nvmeIndex = 0;
+        int usbIndex = 0;
         bool ahciControllerEmitted = false;
+        bool usbControllerEmitted = false;
 
         foreach (DiskAttachment disk in options.Disks)
         {
@@ -396,6 +422,18 @@ public static class QemuLauncher
                     args.Append($" -device nvme,id=nvme{nvmeIndex},drive=nvmedisk{nvmeIndex},serial=cosmos-nvme-{nvmeIndex}");
                     AppendDeviceOptions(args, disk.ExtraDeviceOptions);
                     nvmeIndex++;
+                    break;
+
+                case DiskKind.Usb:
+                    if (!usbControllerEmitted)
+                    {
+                        args.Append($" -device qemu-xhci,id={UsbControllerId}");
+                        usbControllerEmitted = true;
+                    }
+                    args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={UsbDriveId(usbIndex)},format=raw");
+                    args.Append($" -device usb-storage,drive={UsbDriveId(usbIndex)},bus={UsbControllerId}.0,id={UsbDeviceId(usbIndex)}");
+                    AppendDeviceOptions(args, disk.ExtraDeviceOptions);
+                    usbIndex++;
                     break;
             }
         }

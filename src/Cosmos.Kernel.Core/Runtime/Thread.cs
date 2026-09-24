@@ -10,24 +10,24 @@ namespace Cosmos.Kernel.Core.Runtime;
 internal class Thread
 {
     /// <summary>
-    /// Thread-static storage of the one thread that exists when the scheduler
-    /// is compiled out. Null until CoreLib allocates it through the reference
-    /// below, the same way a scheduled thread's slot starts.
+    /// Thread-static storage of the boot code while it is not a scheduler
+    /// thread: always when the scheduler is compiled out, and otherwise
+    /// until the scheduler makes it CPU 0's idle thread, which happens after
+    /// HAL initialization (an exception thrown there reads thread statics).
+    /// Null until CoreLib allocates it through the reference below, the same
+    /// way a scheduled thread's slot starts.
     /// </summary>
     private static object[][]? s_threadData;
 
     [RuntimeExport("RhGetThreadStaticStorage")]
     internal static ref object[][]? RhGetThreadStaticStorage()
     {
-        if (CosmosFeatures.SchedulerEnabled)
+        if (CosmosFeatures.SchedulerEnabled && SchedulerManager.CurrentCpuState?.CurrentThread is { } current)
         {
-            PerCpuState? cpuState = SchedulerManager.CurrentCpuState;
-            return ref cpuState.CurrentThread!.GetThreadStaticStorage();
+            return ref current.GetThreadStaticStorage();
         }
-        else
-        {
-            return ref s_threadData;
-        }
+
+        return ref s_threadData;
     }
 
     [RuntimeExport("RhGetCurrentThreadStackBounds")]
