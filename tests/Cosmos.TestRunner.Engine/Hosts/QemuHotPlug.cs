@@ -99,11 +99,16 @@ public sealed class QemuHotPlug : IAsyncDisposable
     }
 
     /// <summary>
-    /// Waits for the monitor connection attempt to settle, then closes the
-    /// connection and stops listening.
+    /// Stops listening, waits for the monitor connection attempt to settle,
+    /// then closes the connection.
     /// </summary>
     public async ValueTask DisposeAsync()
     {
+        // QEMU is gone by now. If it exited before connecting its monitor,
+        // only stopping the listener ends the accept: the token it waits on
+        // belongs to a source the host disposed without cancelling.
+        _listener.Stop();
+
         if (_connected is not null)
         {
             try
@@ -112,12 +117,11 @@ public sealed class QemuHotPlug : IAsyncDisposable
             }
             catch (Exception)
             {
-                // Already reported by the request that needed the monitor.
+                // Reported by the request that needed the monitor, if any.
             }
         }
 
         _client?.Dispose();
-        _listener.Stop();
     }
 
     private async Task RunAsync(string request, CancellationToken cancellationToken)
