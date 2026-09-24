@@ -193,6 +193,16 @@ namespace Cosmos.TestRunner.Framework
         }
 
         /// <summary>
+        /// Asks the test engine to change the machine under the running
+        /// guest: <c>usb-unplug</c> pulls the profile's USB stick out and
+        /// <c>usb-plug</c> puts it back (both take an optional stick index,
+        /// 0 by default). Returns at once, since nothing replies: the test
+        /// waits for the change to show up, and must see it within the
+        /// engine's stall window (10 s without a protocol message).
+        /// </summary>
+        public static void RequestHost(string request) => SendMessage(HostRequest, EncodeString(request));
+
+        /// <summary>
         /// Reads the <c>skip=N</c> integer from the Limine kernel cmdline.
         /// The test runner sets this on each re-launch when a previous boot
         /// fired a test that exited QEMU (Reboot, Shutdown). Returns 0 if
@@ -409,6 +419,7 @@ namespace Cosmos.TestRunner.Framework
         private const byte TestSkip = 104;
         private const byte TestSuiteEnd = 105;
         private const byte TestDestructiveReached = 108;
+        private const byte HostRequest = 109;
 
         /// <summary>Byte 0 (least significant) of the protocol magic signature 0x19740807 (SerialSignature from Consts.cs), sent little-endian.</summary>
         private const byte SerialSignatureByte0 = 0x07;

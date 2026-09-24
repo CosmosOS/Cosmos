@@ -17,6 +17,11 @@ internal sealed unsafe class XhciEventRing
     private int _dequeueIndex;
     private bool _cycleState = true;
 
+    public ulong SegmentTableAddress { get; }
+
+    /// <summary>Physical address of the next TRB to consume, the value ERDP is written with.</summary>
+    public ulong DequeuePointer => _segmentAddress + ((ulong)_dequeueIndex * XhciTrb.Size);
+
     public XhciEventRing()
     {
         _trbs = (XhciTrb*)XhciDma.AllocPages(1, out _segmentAddress);
@@ -27,11 +32,6 @@ internal sealed unsafe class XhciEventRing
         table[1] = TrbCount;
         SegmentTableAddress = tableAddress;
     }
-
-    public ulong SegmentTableAddress { get; }
-
-    /// <summary>Physical address of the next TRB to consume, the value ERDP is written with.</summary>
-    public ulong DequeuePointer => _segmentAddress + ((ulong)_dequeueIndex * XhciTrb.Size);
 
     public bool TryDequeue(out XhciTrb trb)
     {

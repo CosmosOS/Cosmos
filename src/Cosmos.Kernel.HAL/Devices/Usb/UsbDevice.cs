@@ -52,15 +52,8 @@ internal abstract class UsbDevice
     /// <summary>Every descriptor starts with bLength then bDescriptorType.</summary>
     private const int DescriptorHeaderLength = 2;
 
-    protected UsbDevice(UsbHostController hostController, UsbDevice? parent, byte portNumber, UsbSpeed speed)
-    {
-        HostController = hostController;
-        Parent = parent;
-        PortNumber = portNumber;
-        Speed = speed;
-        RootPortNumber = parent?.RootPortNumber ?? portNumber;
-        HubDepth = parent is null ? 0 : parent.HubDepth + 1;
-    }
+    /// <summary>Written by the hot-plug thread, read by whichever thread waits on a transfer.</summary>
+    private volatile bool _disconnected;
 
     public UsbHostController HostController { get; }
 
@@ -91,6 +84,30 @@ internal abstract class UsbDevice
     public byte ConfigurationValue { get; private set; }
 
     public List<UsbInterface> Interfaces { get; } = [];
+
+    /// <summary>
+    /// The device left the bus, or is being released. From then on every
+    /// transfer fails with <see cref="UsbTransferStatus.Disconnected"/>, and
+    /// one already waiting stops waiting.
+    /// </summary>
+    public bool IsDisconnected => _disconnected;
+
+    protected UsbDevice(UsbHostController hostController, UsbDevice? parent, byte portNumber, UsbSpeed speed)
+    {
+        HostController = hostController;
+        Parent = parent;
+        PortNumber = portNumber;
+        Speed = speed;
+        RootPortNumber = parent?.RootPortNumber ?? portNumber;
+        HubDepth = parent is null ? 0 : parent.HubDepth + 1;
+    }
+
+    /// <summary>
+    /// Makes the device's transfers fail from now on. <see cref="UsbManager"/>
+    /// calls it before the class drivers let go of a device that left, and
+    /// the host controller before it frees one.
+    /// </summary>
+    internal void MarkDisconnected() => _disconnected = true;
 
     /// <summary>
     /// Runs a control transfer on the default pipe and waits for it. For a

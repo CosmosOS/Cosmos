@@ -18,21 +18,6 @@ internal sealed unsafe class XhciInterruptPipe
     private readonly int _bufferSize;
     private readonly int _bufferCount;
 
-    /// <param name="endpointId">Device Context Index of the endpoint.</param>
-    /// <param name="endpointAddress">bEndpointAddress, used to clear a device-side halt.</param>
-    /// <param name="transferSize">Bytes one service interval can deliver (Max ESIT Payload).</param>
-    /// <param name="handler">Receives every completed transfer.</param>
-    public XhciInterruptPipe(byte endpointId, byte endpointAddress, int transferSize, UsbInterruptHandler handler)
-    {
-        EndpointId = endpointId;
-        EndpointAddress = endpointAddress;
-        _handler = handler;
-        _bufferSize = Math.Clamp(transferSize, 1, XhciDma.PageSize);
-        _bufferCount = Math.Min(MaxBuffers, XhciDma.PageSize / _bufferSize);
-        _buffers = XhciDma.AllocPages(1, out _buffersAddress);
-        Ring = new XhciRing();
-    }
-
     public byte EndpointId { get; }
     public byte EndpointAddress { get; }
     public XhciRing Ring { get; }
@@ -49,6 +34,21 @@ internal sealed unsafe class XhciInterruptPipe
 
     /// <summary>The failure was a STALL, so the device halted its endpoint too.</summary>
     public bool StalledByDevice { get; set; }
+
+    /// <param name="endpointId">Device Context Index of the endpoint.</param>
+    /// <param name="endpointAddress">bEndpointAddress, used to clear a device-side halt.</param>
+    /// <param name="transferSize">Bytes one service interval can deliver (Max ESIT Payload).</param>
+    /// <param name="handler">Receives every completed transfer.</param>
+    public XhciInterruptPipe(byte endpointId, byte endpointAddress, int transferSize, UsbInterruptHandler handler)
+    {
+        EndpointId = endpointId;
+        EndpointAddress = endpointAddress;
+        _handler = handler;
+        _bufferSize = Math.Clamp(transferSize, 1, XhciDma.PageSize);
+        _bufferCount = Math.Min(MaxBuffers, XhciDma.PageSize / _bufferSize);
+        _buffers = XhciDma.AllocPages(1, out _buffersAddress);
+        Ring = new XhciRing();
+    }
 
     /// <summary>Queues every buffer. The caller holds the ring lock and rings the doorbell.</summary>
     public void QueueAll()

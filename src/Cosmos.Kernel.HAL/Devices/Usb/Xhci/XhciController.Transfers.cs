@@ -33,6 +33,11 @@ internal sealed unsafe partial class XhciController
         _controlMutex.Acquire();
         try
         {
+            if (device.IsDisconnected)
+            {
+                return UsbTransferStatus.Disconnected;
+            }
+
             if (device.ControlEndpointHalted && !RecoverControlEndpoint(device))
             {
                 return UsbTransferStatus.Error;
@@ -56,7 +61,7 @@ internal sealed unsafe partial class XhciController
                 _regs.RingDoorbell(device.SlotId, XhciDevice.ControlEndpointId);
             }
 
-            XhciCompletionCode code = WaitForControlTransfer();
+            XhciCompletionCode code = WaitForControlTransfer(device);
             if (code is XhciCompletionCode.Success or XhciCompletionCode.ShortPacket)
             {
                 if (setup.IsDeviceToHost)
@@ -65,6 +70,13 @@ internal sealed unsafe partial class XhciController
                 }
 
                 return UsbTransferStatus.Success;
+            }
+
+            // Whatever the transfer ended with, a device that left has
+            // nothing to recover: its slot is about to be disabled.
+            if (device.IsDisconnected)
+            {
+                return UsbTransferStatus.Disconnected;
             }
 
             if (code == XhciCompletionCode.Invalid)
@@ -90,13 +102,20 @@ internal sealed unsafe partial class XhciController
     /// </summary>
     internal bool SubmitControlTransfer(XhciDevice device, UsbSetupPacket setup, ReadOnlySpan<byte> data)
     {
-        if (setup.IsDeviceToHost || setup.Length > XhciDma.PageSize || data.Length < setup.Length || device.ControlEndpointHalted)
+        if (setup.IsDeviceToHost || setup.Length > XhciDma.PageSize || data.Length < setup.Length)
         {
             return false;
         }
 
         using (_ringLock.AcquireIrqSafe())
         {
+            // Checked under the ring lock, which ReleaseDevice takes after
+            // marking the device and before freeing its ring.
+            if (device.IsDisconnected || device.ControlEndpointHalted)
+            {
+                return false;
+            }
+
             data.Slice(0, setup.Length).CopyTo(new Span<byte>(device.AsyncControlBuffer, setup.Length));
             EnqueueControlTransfer(device, setup, device.AsyncControlBufferAddress);
         }
@@ -132,15 +151,18 @@ internal sealed unsafe partial class XhciController
             XhciTrb.TypeField(XhciTrbType.StatusStage) | XhciTrb.InterruptOnCompletion | (statusIn ? XhciTrb.DirectionIn : 0));
     }
 
-    /// <returns>The completion code, or <see cref="XhciCompletionCode.Invalid"/> on timeout.</returns>
-    private XhciCompletionCode WaitForControlTransfer()
+    /// <returns>
+    /// The completion code, or <see cref="XhciCompletionCode.Invalid"/> on
+    /// timeout and when <paramref name="device"/> left the bus meanwhile.
+    /// </returns>
+    private XhciCompletionCode WaitForControlTransfer(XhciDevice device)
     {
         for (uint waitedUs = 0; ; waitedUs += WaitPollIntervalUs)
         {
             using (_eventLock.AcquireIrqSafe())
             {
                 DrainEvents();
-                if (_transferCompleted || waitedUs >= TransferTimeoutMs * MicrosecondsPerMillisecond)
+                if (_transferCompleted || device.IsDisconnected || waitedUs >= TransferTimeoutMs * MicrosecondsPerMillisecond)
                 {
                     _transferDevice = null;
                     _transferStatusTrb = 0;

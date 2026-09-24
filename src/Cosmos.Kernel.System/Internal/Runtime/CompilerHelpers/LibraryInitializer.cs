@@ -5,6 +5,7 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.HAL;
+using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Keyboard;
@@ -48,6 +49,10 @@ internal class LibraryInitializer
                     {
                         KeyboardManager.RegisterKeyboard(keyboard);
                     }
+
+                    // USB keyboards plugged in or pulled out from now on.
+                    UsbKeyboardDriver.KeyboardAttached = KeyboardManager.RegisterKeyboard;
+                    UsbKeyboardDriver.KeyboardDetached = KeyboardManager.UnregisterKeyboard;
                 }
 
                 // Initialize Mouse Manager and register mouse

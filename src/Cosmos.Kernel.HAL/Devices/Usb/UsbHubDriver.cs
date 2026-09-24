@@ -6,33 +6,14 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 
 /// <summary>
 /// Hub class driver (USB 2.0 chapter 11, USB 3.2 chapter 10). Registers the
-/// hub with the host controller, powers and resets every port, and
-/// enumerates the devices behind them. The status-change endpoint is not
-/// used: ports are probed once, at boot, by GET_STATUS on the default pipe.
+/// hub with the host controller, then hands it to a <see cref="UsbHub"/>,
+/// which powers and resets every port, enumerates the devices behind them,
+/// and follows the ports that change afterwards.
 /// </summary>
 internal sealed class UsbHubDriver : UsbDriver
 {
     /// <summary>SET_HUB_DEPTH (USB 3.2 §10.16.2.9).</summary>
     private const byte SetHubDepthRequest = 0x0C;
-
-    // Port feature selectors (USB 2.0 table 11-17).
-    private const ushort PortFeatureReset = 4;
-    private const ushort PortFeaturePower = 8;
-    private const ushort PortFeatureConnectionChange = 16;
-    private const ushort PortFeatureResetChange = 20;
-
-    // wPortStatus bits (USB 2.0 §11.24.2.7.1; bits 0, 1 and 4 mean the same on a SuperSpeed hub).
-    private const ushort PortStatusConnection = 1 << 0;
-    private const ushort PortStatusEnable = 1 << 1;
-    private const ushort PortStatusReset = 1 << 4;
-    private const ushort PortStatusLowSpeed = 1 << 9;
-    private const ushort PortStatusHighSpeed = 1 << 10;
-
-    /// <summary>wPortChange C_PORT_RESET (USB 2.0 §11.24.2.7.2).</summary>
-    private const ushort PortChangeReset = 1 << 4;
-
-    /// <summary>GET_STATUS on a port returns wPortStatus then wPortChange.</summary>
-    private const int PortStatusLength = 4;
 
     // Hub descriptor (USB 2.0 §11.23.2.1; the SuperSpeed hub descriptor of
     // USB 3.2 §10.15.2.1 keeps these offsets). Only the fields through
@@ -46,21 +27,34 @@ internal sealed class UsbHubDriver : UsbDriver
     private const int ThinkTimeShift = 5;
     private const int ThinkTimeMask = 0x3;
 
-    /// <summary>A route string holds one 4-bit port number per tier (USB 3.2 §8.9), so higher ports are unreachable.</summary>
-    private const int MaxRoutablePort = 15;
-
     private const uint PowerOnToPowerGoodUnitMs = 2;
 
-    /// <summary>TATTDB: connect debounce before a port may be reset (USB 2.0 §7.1.7.3).</summary>
-    private const uint ConnectDebounceMs = 100;
-
-    /// <summary>TRSTRCY: recovery after a reset before the device must answer (USB 2.0 §7.1.7.5).</summary>
-    private const uint ResetRecoveryMs = 10;
-
-    private const uint PortResetTimeoutMs = 500;
-    private const uint PortResetPollMs = 10;
+    /// <summary>Hubs bound so far. Changed by the boot path, then by the hot-plug thread only.</summary>
+    private static List<UsbHub>? s_hubs;
 
     public override string Name => "hub";
+
+    /// <summary>
+    /// Lets every hub handle the ports its status change endpoint reported.
+    /// Hot-plug thread only.
+    /// </summary>
+    public static void HandlePortChanges()
+    {
+        if (s_hubs is null)
+        {
+            return;
+        }
+
+        // A hub handling its ports may enumerate another hub or disconnect
+        // one, which changes the list; work from a copy.
+        foreach (UsbHub hub in s_hubs.ToArray())
+        {
+            if (!hub.Device.IsDisconnected)
+            {
+                hub.HandlePortChanges();
+            }
+        }
+    }
 
     public override bool TryBind(UsbDevice device, UsbInterface usbInterface)
     {
@@ -102,102 +96,41 @@ internal sealed class UsbHubDriver : UsbDriver
         Serial.WriteNumber((uint)portCount);
         Serial.WriteString(" port(s)\n");
 
-        for (int port = 1; port <= portCount; port++)
+        UsbHub hub = new(device, portCount);
+        hub.PowerPorts(descriptor[PowerOnToPowerGoodOffset] * PowerOnToPowerGoodUnitMs);
+        hub.ProbePorts();
+
+        // Listening only after the probe keeps the changes it made (the
+        // resets, the connections it cleared) from coming back as reports;
+        // a device plugged in meanwhile leaves its change bit set, which the
+        // hub reports as soon as the endpoint is polled.
+        if (!hub.ListenForChanges(usbInterface))
         {
-            SetPortFeature(device, (byte)port, PortFeaturePower);
+            Log(device, "status change endpoint unavailable, ports will not be followed\n");
         }
 
-        UsbManager.DelayMilliseconds((descriptor[PowerOnToPowerGoodOffset] * PowerOnToPowerGoodUnitMs) + ConnectDebounceMs);
-
-        int lastPort = Math.Min((int)portCount, MaxRoutablePort);
-        for (int port = 1; port <= lastPort; port++)
-        {
-            ProbePort(device, (byte)port, superSpeed);
-        }
-
+        (s_hubs ??= []).Add(hub);
         return true;
     }
 
-    private static void ProbePort(UsbDevice hub, byte port, bool superSpeed)
+    public override void Disconnect(UsbDevice device, UsbInterface usbInterface)
     {
-        if (!TryGetPortStatus(hub, port, out ushort status, out _) || (status & PortStatusConnection) == 0)
+        if (s_hubs is null)
         {
             return;
         }
 
-        ClearPortFeature(hub, port, PortFeatureConnectionChange);
-
-        // A USB 2.0 port only enables through a reset; a SuperSpeed port
-        // trains its link on connect and needs one only when it did not.
-        if ((!superSpeed || (status & PortStatusEnable) == 0) && !ResetPort(hub, port, out status))
+        for (int i = 0; i < s_hubs.Count; i++)
         {
-            Log(hub, "port reset timed out\n");
-            return;
-        }
-
-        if ((status & PortStatusEnable) == 0)
-        {
-            Log(hub, "port did not enable after reset\n");
-            return;
-        }
-
-        UsbSpeed speed = superSpeed ? UsbSpeed.Super
-            : (status & PortStatusLowSpeed) != 0 ? UsbSpeed.Low
-            : (status & PortStatusHighSpeed) != 0 ? UsbSpeed.High
-            : UsbSpeed.Full;
-
-        UsbManager.DelayMilliseconds(ResetRecoveryMs);
-        UsbManager.EnumerateDevice(hub.HostController, hub, port, speed);
-    }
-
-    private static bool ResetPort(UsbDevice hub, byte port, out ushort status)
-    {
-        status = 0;
-        if (SetPortFeature(hub, port, PortFeatureReset) != UsbTransferStatus.Success)
-        {
-            return false;
-        }
-
-        for (uint elapsedMs = 0; elapsedMs < PortResetTimeoutMs; elapsedMs += PortResetPollMs)
-        {
-            UsbManager.DelayMilliseconds(PortResetPollMs);
-            if (!TryGetPortStatus(hub, port, out status, out ushort change))
+            if (s_hubs[i].Device == device)
             {
-                return false;
-            }
-
-            if ((change & PortChangeReset) != 0 && (status & PortStatusReset) == 0)
-            {
-                ClearPortFeature(hub, port, PortFeatureResetChange);
-                return true;
+                s_hubs.RemoveAt(i);
+                return;
             }
         }
-
-        return false;
     }
 
-    private static bool TryGetPortStatus(UsbDevice hub, byte port, out ushort status, out ushort change)
-    {
-        Span<byte> data = stackalloc byte[PortStatusLength];
-        if (hub.ControlIn(UsbRequestType.Class | UsbRequestType.Other, (byte)UsbStandardRequest.GetStatus, 0, port, data) != UsbTransferStatus.Success)
-        {
-            status = 0;
-            change = 0;
-            return false;
-        }
-
-        status = (ushort)(data[0] | (data[1] << 8));
-        change = (ushort)(data[2] | (data[3] << 8));
-        return true;
-    }
-
-    private static UsbTransferStatus SetPortFeature(UsbDevice hub, byte port, ushort feature) =>
-        hub.ControlOut(UsbRequestType.Class | UsbRequestType.Other, (byte)UsbStandardRequest.SetFeature, feature, port);
-
-    private static UsbTransferStatus ClearPortFeature(UsbDevice hub, byte port, ushort feature) =>
-        hub.ControlOut(UsbRequestType.Class | UsbRequestType.Other, (byte)UsbStandardRequest.ClearFeature, feature, port);
-
-    private static void Log(UsbDevice hub, string message)
+    internal static void Log(UsbDevice hub, string message)
     {
         Serial.WriteString("[USB] hub ");
         Serial.WriteHex((uint)hub.VendorId);

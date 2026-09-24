@@ -73,29 +73,6 @@ internal sealed class XhciRegisters
     private readonly ulong _runtimeBase;
     private readonly ulong _doorbellBase;
 
-    public XhciRegisters(ulong baseVirtAddress)
-    {
-        _capabilityBase = baseVirtAddress;
-        _operationalBase = baseVirtAddress + Native.MMIO.Read8(baseVirtAddress + CapLengthOffset);
-        _runtimeBase = baseVirtAddress + (Native.MMIO.Read32(baseVirtAddress + RuntimeOffsetOffset) & RuntimeOffsetMask);
-        _doorbellBase = baseVirtAddress + (Native.MMIO.Read32(baseVirtAddress + DoorbellArrayOffsetOffset) & DoorbellOffsetMask);
-
-        uint hcsParams1 = Native.MMIO.Read32(baseVirtAddress + HcsParams1Offset);
-        MaxSlots = (byte)(hcsParams1 & MaxSlotsMask);
-        MaxPorts = (byte)((hcsParams1 >> MaxPortsShift) & MaxPortsMask);
-
-        uint hcsParams2 = Native.MMIO.Read32(baseVirtAddress + HcsParams2Offset);
-        uint scratchpadHigh = (hcsParams2 >> ScratchpadHighShift) & ScratchpadPartMask;
-        uint scratchpadLow = (hcsParams2 >> ScratchpadLowShift) & ScratchpadPartMask;
-        MaxScratchpadBuffers = (int)((scratchpadHigh << ScratchpadHighPartBits) | scratchpadLow);
-
-        uint hccParams1 = Native.MMIO.Read32(baseVirtAddress + HccParams1Offset);
-        Is64BitCapable = (hccParams1 & AddressCapability64) != 0;
-        ContextSize = (hccParams1 & ContextSize64) != 0 ? 64 : 32;
-        HasPortPowerControl = (hccParams1 & PortPowerControl) != 0;
-        ExtendedCapabilitiesAddress = ((hccParams1 >> ExtendedCapabilitiesShift) & ExtendedCapabilitiesMask) << 2;
-    }
-
     public ulong CapabilityBase => _capabilityBase;
 
     /// <summary>Highest byte offset from BAR0 the driver touches, so the whole block can be mapped.</summary>
@@ -186,6 +163,29 @@ internal sealed class XhciRegisters
     public ulong Erdp
     {
         set => Write64(_runtimeBase + Interrupter0Offset + ErdpOffset, value);
+    }
+
+    public XhciRegisters(ulong baseVirtAddress)
+    {
+        _capabilityBase = baseVirtAddress;
+        _operationalBase = baseVirtAddress + Native.MMIO.Read8(baseVirtAddress + CapLengthOffset);
+        _runtimeBase = baseVirtAddress + (Native.MMIO.Read32(baseVirtAddress + RuntimeOffsetOffset) & RuntimeOffsetMask);
+        _doorbellBase = baseVirtAddress + (Native.MMIO.Read32(baseVirtAddress + DoorbellArrayOffsetOffset) & DoorbellOffsetMask);
+
+        uint hcsParams1 = Native.MMIO.Read32(baseVirtAddress + HcsParams1Offset);
+        MaxSlots = (byte)(hcsParams1 & MaxSlotsMask);
+        MaxPorts = (byte)((hcsParams1 >> MaxPortsShift) & MaxPortsMask);
+
+        uint hcsParams2 = Native.MMIO.Read32(baseVirtAddress + HcsParams2Offset);
+        uint scratchpadHigh = (hcsParams2 >> ScratchpadHighShift) & ScratchpadPartMask;
+        uint scratchpadLow = (hcsParams2 >> ScratchpadLowShift) & ScratchpadPartMask;
+        MaxScratchpadBuffers = (int)((scratchpadHigh << ScratchpadHighPartBits) | scratchpadLow);
+
+        uint hccParams1 = Native.MMIO.Read32(baseVirtAddress + HccParams1Offset);
+        Is64BitCapable = (hccParams1 & AddressCapability64) != 0;
+        ContextSize = (hccParams1 & ContextSize64) != 0 ? 64 : 32;
+        HasPortPowerControl = (hccParams1 & PortPowerControl) != 0;
+        ExtendedCapabilitiesAddress = ((hccParams1 >> ExtendedCapabilitiesShift) & ExtendedCapabilitiesMask) << 2;
     }
 
     /// <summary>Reads PORTSC of a 1-based root port.</summary>

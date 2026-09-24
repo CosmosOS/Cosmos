@@ -36,6 +36,38 @@ internal sealed unsafe class XhciDevice : UsbDevice
     private readonly XhciInterruptPipe?[] _pipes = new XhciInterruptPipe?[MaxEndpointId + 1];
     private readonly XhciBulkPipe?[] _bulkPipes = new XhciBulkPipe?[MaxEndpointId + 1];
 
+    public byte SlotId { get; }
+
+    /// <summary>Route string of the Slot Context: the hub port at each tier below the root port.</summary>
+    public uint RouteString { get; }
+
+    /// <summary>Slot of the high-speed hub whose TT serves this device, 0 when none does.</summary>
+    public byte TtHubSlotId { get; }
+
+    /// <summary>Port of that hub the device's subtree hangs off.</summary>
+    public byte TtPortNumber { get; }
+
+    public byte* OutputContext { get; }
+    public ulong OutputContextAddress { get; }
+    public byte* InputContext { get; }
+    public ulong InputContextAddress { get; }
+    public XhciRing ControlRing { get; }
+
+    /// <summary>Data stage buffer of synchronous control transfers.</summary>
+    public byte* ControlBuffer { get; }
+    public ulong ControlBufferAddress { get; }
+
+    /// <summary>Data stage buffer of fire-and-forget control transfers, kept apart so they never race a synchronous one.</summary>
+    public byte* AsyncControlBuffer { get; }
+    public ulong AsyncControlBufferAddress { get; }
+
+    /// <summary>A fire-and-forget control transfer failed and left the default endpoint halted.</summary>
+    public bool ControlEndpointHalted { get; set; }
+
+    public uint* InputControlContext => (uint*)InputContext;
+    public uint* InputSlotContext => (uint*)(InputContext + _contextSize);
+    public uint* OutputSlotContext => (uint*)OutputContext;
+
     public XhciDevice(XhciController controller, byte slotId, XhciDevice? parent, byte port, UsbSpeed speed, int contextSize)
         : base(controller, parent, port, speed)
     {
@@ -83,38 +115,6 @@ internal sealed unsafe class XhciDevice : UsbDevice
         ControlRing = new XhciRing();
     }
 
-    public byte SlotId { get; }
-
-    /// <summary>Route string of the Slot Context: the hub port at each tier below the root port.</summary>
-    public uint RouteString { get; }
-
-    /// <summary>Slot of the high-speed hub whose TT serves this device, 0 when none does.</summary>
-    public byte TtHubSlotId { get; }
-
-    /// <summary>Port of that hub the device's subtree hangs off.</summary>
-    public byte TtPortNumber { get; }
-
-    public byte* OutputContext { get; }
-    public ulong OutputContextAddress { get; }
-    public byte* InputContext { get; }
-    public ulong InputContextAddress { get; }
-    public XhciRing ControlRing { get; }
-
-    /// <summary>Data stage buffer of synchronous control transfers.</summary>
-    public byte* ControlBuffer { get; }
-    public ulong ControlBufferAddress { get; }
-
-    /// <summary>Data stage buffer of fire-and-forget control transfers, kept apart so they never race a synchronous one.</summary>
-    public byte* AsyncControlBuffer { get; }
-    public ulong AsyncControlBufferAddress { get; }
-
-    /// <summary>A fire-and-forget control transfer failed and left the default endpoint halted.</summary>
-    public bool ControlEndpointHalted { get; set; }
-
-    public uint* InputControlContext => (uint*)InputContext;
-    public uint* InputSlotContext => (uint*)(InputContext + _contextSize);
-    public uint* OutputSlotContext => (uint*)OutputContext;
-
     public uint* InputEndpointContext(byte endpointId) => (uint*)(InputContext + ((endpointId + 1) * _contextSize));
 
     public uint* OutputEndpointContext(byte endpointId) => (uint*)(OutputContext + (endpointId * _contextSize));
@@ -133,6 +133,22 @@ internal sealed unsafe class XhciDevice : UsbDevice
     public XhciBulkPipe? GetBulkPipe(byte endpointId) => endpointId <= MaxEndpointId ? _bulkPipes[endpointId] : null;
 
     public void AddBulkPipe(XhciBulkPipe pipe) => _bulkPipes[pipe.EndpointId] = pipe;
+
+    /// <summary>
+    /// Waits until no bulk transfer runs on the device: each one holds its
+    /// pipe's mutex for as long as it runs.
+    /// </summary>
+    public void WaitForBulkTransfers()
+    {
+        foreach (XhciBulkPipe? pipe in _bulkPipes)
+        {
+            if (pipe is not null)
+            {
+                pipe.Mutex.Acquire();
+                pipe.Mutex.Release();
+            }
+        }
+    }
 
     /// <summary>The pipe whose recovery step is the command at <paramref name="commandAddress"/>, if any.</summary>
     public XhciInterruptPipe? FindPipeByCommand(ulong commandAddress)

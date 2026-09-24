@@ -230,7 +230,7 @@ public partial class Engine
         // profile runs don't see each other's writes.
         IReadOnlyList<DiskAttachment> disks = CreateProfileDisks(profile);
 
-        var combinedLog = new StringBuilder();
+        StringBuilder combinedLog = new();
         QemuRunResult? lastResult = null;
 
         try
@@ -245,9 +245,13 @@ public partial class Engine
                     Console.WriteLine($"[Engine] Re-launching kernel for boot #{boot} (skip={boot})");
                 }
 
+                // Every boot starts with the sticks plugged in, and a QEMU of
+                // its own to connect a monitor.
+                await using QemuHotPlug? hotPlug = QemuHotPlug.For(disks);
                 QemuRunResult result = await _qemuHost.RunKernelAsync(
                     bootIsoPath, bootLogPath, _config.TimeoutSeconds, _config.ShouldShowDisplay, enableNetworkTesting, disks, profile.MachineOptions,
-                    new ProfileDevices(profile.NetworkCard, profile.KeyboardDevice, profile.MouseDevice, profile.VgaAdapter, profile.GpuDevice));
+                    new ProfileDevices(profile.NetworkCard, profile.KeyboardDevice, profile.MouseDevice, profile.VgaAdapter, profile.GpuDevice),
+                    hotPlug);
 
                 combinedLog.Append(result.UartLog);
                 lastResult = result;
@@ -326,7 +330,7 @@ public partial class Engine
 
         string suite = Path.GetFileName(_config.KernelProjectPath.TrimEnd('/', '\\'));
         string profileTag = profile.IsDefault ? "default" : profile.Name;
-        var attachments = new List<DiskAttachment>(profile.Disks.Count);
+        List<DiskAttachment> attachments = new(profile.Disks.Count);
 
         for (int i = 0; i < profile.Disks.Count; i++)
         {
@@ -340,7 +344,7 @@ public partial class Engine
             {
                 File.Delete(path);
             }
-            using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+            using (FileStream fs = new(path, FileMode.Create, FileAccess.Write))
             {
                 fs.SetLength(TestDiskSizeBytes);
             }

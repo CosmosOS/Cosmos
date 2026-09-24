@@ -9,14 +9,6 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// </summary>
 internal sealed class UsbInterface
 {
-    public UsbInterface(byte number, byte interfaceClass, byte subclass, byte protocol)
-    {
-        Number = number;
-        Class = interfaceClass;
-        Subclass = subclass;
-        Protocol = protocol;
-    }
-
     public byte Number { get; }
     public byte Class { get; }
     public byte Subclass { get; }
@@ -25,6 +17,14 @@ internal sealed class UsbInterface
 
     /// <summary>The driver that bound this interface, or null while none has.</summary>
     public UsbDriver? Driver { get; set; }
+
+    public UsbInterface(byte number, byte interfaceClass, byte subclass, byte protocol)
+    {
+        Number = number;
+        Class = interfaceClass;
+        Subclass = subclass;
+        Protocol = protocol;
+    }
 
     /// <summary>
     /// First endpoint of the given transfer type and direction, or null when

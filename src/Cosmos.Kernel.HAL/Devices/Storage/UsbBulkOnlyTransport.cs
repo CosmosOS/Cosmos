@@ -55,23 +55,27 @@ internal sealed class UsbBulkOnlyTransport
     private const int RequestSenseCommandLength = 6;
     private const int RequestSenseAllocationLengthOffset = 4;
 
-    private readonly UsbDevice _device;
-    private readonly byte _interfaceNumber;
     private readonly UsbEndpoint _bulkIn;
     private readonly UsbEndpoint _bulkOut;
     private readonly SchedMutex _mutex = new();
     private uint _tag;
 
+    /// <summary>The USB device the interface belongs to.</summary>
+    public UsbDevice Device { get; }
+
+    /// <summary>bInterfaceNumber of the mass storage interface.</summary>
+    public byte InterfaceNumber { get; }
+
     public UsbBulkOnlyTransport(UsbDevice device, byte interfaceNumber, UsbEndpoint bulkIn, UsbEndpoint bulkOut)
     {
-        _device = device;
-        _interfaceNumber = interfaceNumber;
+        Device = device;
+        InterfaceNumber = interfaceNumber;
         _bulkIn = bulkIn;
         _bulkOut = bulkOut;
     }
 
     /// <summary>Opens both bulk endpoints.</summary>
-    public bool Open() => _device.OpenBulkEndpoint(_bulkIn) && _device.OpenBulkEndpoint(_bulkOut);
+    public bool Open() => Device.OpenBulkEndpoint(_bulkIn) && Device.OpenBulkEndpoint(_bulkOut);
 
     /// <summary>
     /// Highest LUN number of the device (GET MAX LUN, BOT 1.0 §3.2). A
@@ -80,8 +84,8 @@ internal sealed class UsbBulkOnlyTransport
     public byte GetMaxLun()
     {
         Span<byte> maxLun = stackalloc byte[1];
-        UsbTransferStatus status = _device.ControlIn(UsbRequestType.Class | UsbRequestType.Interface,
-            GetMaxLunRequest, 0, _interfaceNumber, maxLun);
+        UsbTransferStatus status = Device.ControlIn(UsbRequestType.Class | UsbRequestType.Interface,
+            GetMaxLunRequest, 0, InterfaceNumber, maxLun);
         return status == UsbTransferStatus.Success ? Math.Min(maxLun[0], MaxLun) : (byte)0;
     }
 
@@ -152,7 +156,7 @@ internal sealed class UsbBulkOnlyTransport
         cbw[CbwCommandLengthOffset] = (byte)command.Length;
         command.CopyTo(cbw.Slice(CbwCommandOffset));
 
-        if (_device.BulkOut(_bulkOut, cbw, out _) != UsbTransferStatus.Success)
+        if (Device.BulkOut(_bulkOut, cbw, out _) != UsbTransferStatus.Success)
         {
             return ResetRecovery("command transport failed");
         }
@@ -162,10 +166,10 @@ internal sealed class UsbBulkOnlyTransport
         if (dataLength != 0)
         {
             UsbEndpoint endpoint = isIn ? _bulkIn : _bulkOut;
-            UsbTransferStatus data = isIn ? _device.BulkIn(_bulkIn, dataIn, out _) : _device.BulkOut(_bulkOut, dataOut, out _);
+            UsbTransferStatus data = isIn ? Device.BulkIn(_bulkIn, dataIn, out _) : Device.BulkOut(_bulkOut, dataOut, out _);
             if (data == UsbTransferStatus.Stall)
             {
-                _device.ClearHalt(endpoint);
+                Device.ClearHalt(endpoint);
             }
             else if (data != UsbTransferStatus.Success)
             {
@@ -175,11 +179,11 @@ internal sealed class UsbBulkOnlyTransport
 
         // A STALL on the CSW is retried once after clearing it (§5.3.3, figure 2).
         Span<byte> csw = stackalloc byte[CswLength];
-        UsbTransferStatus status = _device.BulkIn(_bulkIn, csw, out int received);
+        UsbTransferStatus status = Device.BulkIn(_bulkIn, csw, out int received);
         if (status == UsbTransferStatus.Stall)
         {
-            _device.ClearHalt(_bulkIn);
-            status = _device.BulkIn(_bulkIn, csw, out received);
+            Device.ClearHalt(_bulkIn);
+            status = Device.BulkIn(_bulkIn, csw, out received);
         }
 
         if (status != UsbTransferStatus.Success
@@ -202,17 +206,23 @@ internal sealed class UsbBulkOnlyTransport
     /// <summary>
     /// Brings the device back in step after a transport failure: Bulk-Only
     /// Mass Storage Reset, then the halt of both bulk endpoints cleared
-    /// (BOT 1.0 §5.3.4).
+    /// (BOT 1.0 §5.3.4). A device that left the bus is not reset: there is
+    /// nothing left to bring back.
     /// </summary>
     private BulkOnlyStatus ResetRecovery(string reason)
     {
+        if (Device.IsDisconnected)
+        {
+            return BulkOnlyStatus.TransportError;
+        }
+
         Serial.WriteString("[USB storage] ");
         Serial.WriteString(reason);
         Serial.WriteString(", resetting the device\n");
 
-        _device.ControlOut(UsbRequestType.Class | UsbRequestType.Interface, MassStorageResetRequest, 0, _interfaceNumber);
-        _device.ClearHalt(_bulkIn);
-        _device.ClearHalt(_bulkOut);
+        Device.ControlOut(UsbRequestType.Class | UsbRequestType.Interface, MassStorageResetRequest, 0, InterfaceNumber);
+        Device.ClearHalt(_bulkIn);
+        Device.ClearHalt(_bulkOut);
         return BulkOnlyStatus.TransportError;
     }
 }

@@ -4,6 +4,7 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Devices.Storage;
+using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
@@ -13,6 +14,7 @@ using Cosmos.Kernel.System.Storage;
 using Cosmos.Kernel.System.Vfs;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
+using SysThread = System.Threading.Thread;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
 
 namespace Cosmos.Kernel.Tests.Storage;
@@ -36,7 +38,7 @@ public class Kernel : Sys.Kernel
     private const string SkipNoHost = "no block device bound for partition-table tests";
 
     /// <summary>Total tests this suite reports per profile; the breakdown is at the TR.Start call site.</summary>
-    private const ushort ExpectedTestCount = 68;
+    private const ushort ExpectedTestCount = 73;
 
     /// <summary>Block devices the engine attaches per QEMU profile; any other count is a bind or double-registration regression.</summary>
     private const int AttachedDisksPerProfile = 1;
@@ -353,14 +355,51 @@ public class Kernel : Sys.Kernel
     /// <summary>Low-byte mask folding the 32-bit pattern accumulator into a byte.</summary>
     private const uint ByteMask = 0xFF;
 
+    /// <summary>Asks the engine to pull the profile's USB stick out (see TR.RequestHost).</summary>
+    private const string UsbUnplugRequest = "usb-unplug";
+
+    /// <summary>Asks the engine to plug the stick back in, on the same image.</summary>
+    private const string UsbPlugRequest = "usb-plug";
+
+    /// <summary>
+    /// Longest wait for the hot-plug thread to follow a plug or an unplug.
+    /// Well inside the engine's stall window: 10 s without a protocol
+    /// message and it kills the guest.
+    /// </summary>
+    private const int HotPlugTimeoutMs = 8000;
+
+    /// <summary>How often a hot-plug wait looks at the storage manager again.</summary>
+    private const int HotPlugPollMs = 50;
+
+    /// <summary>Sector stamped right before the unplug and read back once the stick is plugged in again.</summary>
+    private const ulong HotPlugMarkerLba = 6000;
+
+    /// <summary>XOR seed of the pattern stamped at <see cref="HotPlugMarkerLba"/>.</summary>
+    private const byte HotPlugXorSeed = 0x3E;
+
+    /// <summary>Name the hot-plug cell registers the FAT driver under.</summary>
+    private const string HotPlugDriverName = "fat-hotplug";
+
+    /// <summary>Where the hot-plug cell mounts the stick's partition.</summary>
+    private const string HotPlugMountPoint = "/usbstick";
+
+    /// <summary>File written through that mount before the stick is pulled out.</summary>
+    private const string HotPlugFileName = "HOTPLUG.TXT";
+
+    /// <summary>Path of <see cref="HotPlugFileName"/> under the mount.</summary>
+    private const string HotPlugFilePath = $"{HotPlugMountPoint}/{HotPlugFileName}";
+
+    /// <summary>The stick as it was before the unplug, for the cells that check what it left behind.</summary>
+    private static UsbMassStorage? s_unpluggedDisk;
+
     protected override void BeforeRun()
     {
         Serial.WriteString("[Storage] BeforeRun() reached!\n");
 
         // 3 manager + 1 boot-scan + 2 profile + 13 device + 7 partition
         // + 37 partition-lifecycle (MBR mutation, EBR chain, PartitionManager,
-        // superfloppy) + 2 bounds probes + 2 mmio/pci + 1 boot-reboot
-        // = 68 tests per profile.
+        // superfloppy) + 2 bounds probes + 2 mmio/pci + 5 USB hot-plug
+        // + 1 boot-reboot = 73 tests per profile.
         TR.Start("Storage Block Device Tests", expectedTests: ExpectedTestCount);
 
         bool hasDevice = StorageManager.DeviceCount > 0;
@@ -437,7 +476,7 @@ public class Kernel : Sys.Kernel
         }
 
         // ==================== Device (single-disk round-trip) ====================
-        bool dev = s_dev != null;
+        bool dev = s_dev is not null;
         TR.RunIf(dev, "Device_BlockGeometry_Sane",         TestDevice_BlockGeometrySane,        SkipNoDevice);
         TR.RunIf(dev, "Device_WriteRead_SingleBlock",      TestDevice_WriteReadSingleBlock,     SkipNoDevice);
         TR.RunIf(dev, "Device_WriteRead_MultiBlock",       TestDevice_WriteReadMultiBlock,      SkipNoDevice);
@@ -531,6 +570,20 @@ public class Kernel : Sys.Kernel
         TR.Skip("Mmio_HighBar_RemappedOnDemand", "x64 mapper cell; arm64 installs Device mappings via DeviceMapper");
         TR.Skip("Pci_GetBar64_ReadsLiveConfig", "BAR relocation probe is x64-only (same harness as the mapper cell)");
 #endif
+
+        // ==================== USB hot-plug (pulls the stick out and back in) ====================
+        // The engine plugs the stick in and out when asked, through QEMU's
+        // monitor. After the block I/O and partition cells, so a hot-plug
+        // regression cannot take them down; before the reboot cell, which
+        // writes to whatever stick is plugged in by then.
+        string hotPlugSkip = HotPlugSkipReason();
+        bool hotPlug = hotPlugSkip.Length == 0;
+        TR.RunIf(hotPlug, "UsbHotPlug_UnplugUnregistersDisk", TestUsbHotPlug_UnplugUnregistersDisk, hotPlugSkip);
+        TR.RunIf(hotPlug, "UsbHotPlug_RemovedDiskFailsIo",    TestUsbHotPlug_RemovedDiskFailsIo,    hotPlugSkip);
+        TR.RunIf(hotPlug, "UsbHotPlug_ReplugRegistersDisk",   TestUsbHotPlug_ReplugRegistersDisk,   hotPlugSkip);
+        TR.RunIf(hotPlug, "UsbHotPlug_ReplugKeepsData",       TestUsbHotPlug_ReplugKeepsData,       hotPlugSkip);
+        TR.RunIf(hotPlug, "UsbHotPlug_UnplugDetachesMount",   TestUsbHotPlug_UnplugDetachesMount,   hotPlugSkip);
+        dev = s_dev is not null;
 
         // ==================== Boot persistence (destructive: reboots QEMU) ====================
         // Boot 0 stamps a fresh GPT with one partition and reboots; boot 1's
@@ -1199,6 +1252,226 @@ public class Kernel : Sys.Kernel
     private static IVfsFileHandle? OpenVfsFile(string path)
     {
         return VfsManager.TryOpenFile(path, out IVfsFileHandle? file) ? file : null;
+    }
+
+    // ==================== USB hot-plug ====================
+
+    // Empty when the cell can pull its stick out: a USB cell whose stick
+    // bound, with the hot-plug thread running. It cannot run on x64 with
+    // ACPI off, where the scheduler's timer never starts.
+    private static string HotPlugSkipReason()
+    {
+        if (!TR.ProfileHasPrefix("usb"))
+        {
+            return "not a USB profile";
+        }
+
+        if (s_dev is not UsbMassStorage)
+        {
+            return SkipNoDevice;
+        }
+
+        return UsbManager.IsHotPlugRunning ? string.Empty : "USB hot-plug thread not running (scheduler timer not ticking)";
+    }
+
+    // Pulling the stick out must take it out of the storage manager and the
+    // USB storage driver, and mark the object they handed out removed. The
+    // sector stamped first is read back once the stick is plugged in again.
+    private static void TestUsbHotPlug_UnplugUnregistersDisk()
+    {
+        UsbMassStorage disk = (UsbMassStorage)s_dev!;
+        disk.WriteBlock(HotPlugMarkerLba, 1, HotPlugMarker((int)disk.BlockSize));
+        disk.Flush();
+
+        s_unpluggedDisk = disk;
+        TR.RequestHost(UsbUnplugRequest);
+        bool gone = WaitForDeviceCount(0);
+        s_dev = null;
+
+        Assert.True(gone, "the stick is still registered after being unplugged");
+        Assert.Equal(0, UsbMassStorageDriver.Disks.Count, "the USB storage driver still lists the stick");
+        Assert.True(disk.IsRemoved, "the unplugged stick is not marked removed");
+    }
+
+    // I/O on a stick that is gone must fail as an IOException, not wait for
+    // a transfer that never completes or hand back stale bytes.
+    private static void TestUsbHotPlug_RemovedDiskFailsIo()
+    {
+        Assert.NotNull(s_unpluggedDisk);
+        if (s_unpluggedDisk is null)
+        {
+            return;
+        }
+
+        Span<byte> buffer = new byte[s_unpluggedDisk.BlockSize];
+        try
+        {
+            s_unpluggedDisk.ReadBlock(HotPlugMarkerLba, 1, buffer);
+            Assert.Fail("reading the unplugged stick did not throw");
+        }
+        catch (IOException)
+        {
+            // Expected.
+        }
+    }
+
+    // Plugged back in, the stick must come back as a new device with its
+    // old name (the lowest usbN free) and geometry.
+    private static void TestUsbHotPlug_ReplugRegistersDisk()
+    {
+        TR.RequestHost(UsbPlugRequest);
+        Assert.True(WaitForDeviceCount(1), "the stick did not come back after being plugged in");
+        if (StorageManager.DeviceCount != 1)
+        {
+            return;
+        }
+
+        s_dev = StorageManager.GetDevice(0);
+        Assert.True(s_dev is UsbMassStorage, "the device that came back is not a USB stick");
+        Assert.False(ReferenceEquals(s_dev, s_unpluggedDisk), "the removed device object came back");
+        if (s_unpluggedDisk is not null)
+        {
+            Assert.Equal(s_unpluggedDisk.Name, s_dev!.Name, "a stick plugged back in gets its name back");
+            Assert.Equal<ulong>(s_unpluggedDisk.BlockCount, s_dev.BlockCount, "block count of the stick plugged back in");
+        }
+    }
+
+    private static void TestUsbHotPlug_ReplugKeepsData()
+    {
+        Assert.NotNull(s_dev);
+        if (s_dev is null)
+        {
+            return;
+        }
+
+        byte[] actual = new byte[s_dev.BlockSize];
+        s_dev.ReadBlock(HotPlugMarkerLba, 1, actual);
+        Assert.Equal(HotPlugMarker((int)s_dev.BlockSize), actual, "the sector written before the unplug");
+    }
+
+    // A filesystem mounted from the stick's partition must be detached when
+    // the stick goes, and the partition dropped with it. Plugged back in,
+    // the partition is found again and the file written before is there.
+    private static void TestUsbHotPlug_UnplugDetachesMount()
+    {
+        Assert.NotNull(s_dev);
+        if (s_dev is null)
+        {
+            return;
+        }
+
+        // A superfloppy, as in TestPartition_SuperfloppyMountsByIndex: one
+        // partition covering the whole stick.
+        Span<byte> zero = new byte[(int)s_dev.BlockSize];
+        for (ulong lba = 0; lba < SuperfloppyWipeHeadSectors; lba++)
+        {
+            s_dev.WriteBlock(lba, 1, zero);
+        }
+        Assert.True(new FatFilesystemType(s_dev).TryFormat(string.Empty, null), "FAT format of the stick must succeed");
+        StorageManager.RescanPartitions(s_dev);
+
+        _ = VfsManager.RegisterFilesystem(HotPlugDriverName, new FatFilesystemType());
+        if (!MountStickPartition())
+        {
+            return;
+        }
+
+        byte[] payload = HotPlugMarker(SuperfloppyPayloadBytes);
+        Assert.True(VfsManager.TryOpenDirectory(HotPlugMountPoint, out IVfsDirectoryHandle? root));
+        Assert.True(root!.TryCreateFile(HotPlugFileName, VfsMode.RegularFile, out _));
+        using (IVfsFileHandle? writer = OpenVfsFile(HotPlugFilePath))
+        {
+            Assert.NotNull(writer);
+            Assert.Equal<long>(payload.Length, writer!.Write(payload));
+            Assert.True(writer.TryFlush());
+        }
+
+        TR.RequestHost(UsbUnplugRequest);
+        Assert.True(WaitForDeviceCount(0), "the stick is still registered after being unplugged");
+        s_dev = null;
+        Assert.False(IsMounted(HotPlugMountPoint), "the mount outlived its stick");
+        Assert.Equal(0, StorageManager.Partitions.Count, "the stick's partition outlived it");
+
+        TR.RequestHost(UsbPlugRequest);
+        Assert.True(WaitForDeviceCount(1), "the stick did not come back after being plugged in");
+        if (StorageManager.DeviceCount != 1)
+        {
+            return;
+        }
+
+        s_dev = StorageManager.GetDevice(0);
+        if (!MountStickPartition())
+        {
+            return;
+        }
+
+        using (IVfsFileHandle? reader = OpenVfsFile(HotPlugFilePath))
+        {
+            Assert.NotNull(reader);
+            byte[] readBack = new byte[payload.Length];
+            Assert.Equal<long>(payload.Length, reader!.Read(readBack));
+            Assert.Equal(payload, readBack, "the file written before the unplug");
+        }
+
+        // The reboot cell rewrites the stick underneath.
+        Assert.True(VfsManager.TryUnmount(HotPlugMountPoint));
+    }
+
+    // Mounts the stick's one partition at HotPlugMountPoint through the
+    // partition overload, the kind of mount a removed disk takes along.
+    private static bool MountStickPartition()
+    {
+        IReadOnlyList<Partition> partitions = StorageManager.GetPartitions(s_dev!);
+        Assert.Equal(1, partitions.Count, "the stick must carry exactly one whole-disk partition");
+        if (partitions.Count != 1)
+        {
+            return false;
+        }
+
+        bool mounted = VfsManager.TryMount(HotPlugDriverName, partitions[0], MountFlags.None, HotPlugMountPoint, out _);
+        Assert.True(mounted, "mount of the stick's partition must succeed");
+        return mounted;
+    }
+
+    private static bool IsMounted(string mountPoint)
+    {
+        foreach (VfsManager.VfsMount mount in VfsManager.Mounts)
+        {
+            if (mount.MountPoint == mountPoint)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Waits for the hot-plug thread to bring the storage manager to
+    // `count` devices, sleeping so that thread gets to run.
+    private static bool WaitForDeviceCount(int count)
+    {
+        for (int waitedMs = 0; StorageManager.DeviceCount != count; waitedMs += HotPlugPollMs)
+        {
+            if (waitedMs >= HotPlugTimeoutMs)
+            {
+                return false;
+            }
+
+            SysThread.Sleep(HotPlugPollMs);
+        }
+
+        return true;
+    }
+
+    private static byte[] HotPlugMarker(int length)
+    {
+        byte[] marker = new byte[length];
+        for (int i = 0; i < marker.Length; i++)
+        {
+            marker[i] = (byte)(i ^ HotPlugXorSeed);
+        }
+
+        return marker;
     }
 
     // Attach a partition starting at an arbitrary LBA, write to its LBA 0,

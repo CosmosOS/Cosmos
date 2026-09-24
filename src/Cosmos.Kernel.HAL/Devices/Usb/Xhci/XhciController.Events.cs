@@ -41,11 +41,12 @@ internal sealed unsafe partial class XhciController
 
                 case XhciTrbType.PortStatusChangeEvent:
                     // Port resets during the boot probe raise these too;
-                    // only a change after it is a (re)plug.
+                    // only a change after it is a (re)plug. The port itself
+                    // is handled on the hot-plug thread.
                     if (_rootPortsProbed)
                     {
-                        WritePortPrefix(trb.PortId);
-                        Serial.WriteString("status changed; hot-plug is not supported yet\n");
+                        MarkRootPortDisconnected(trb.PortId);
+                        UsbManager.NotifyPortChange();
                     }
 
                     break;
@@ -157,6 +158,13 @@ internal sealed unsafe partial class XhciController
     /// </summary>
     private void StartPipeRecovery(XhciDevice device, XhciInterruptPipe pipe, XhciCompletionCode code, ulong failedBuffer)
     {
+        // A device that left fails every transfer; there is nothing to recover.
+        if (device.IsDisconnected)
+        {
+            pipe.State = XhciPipeState.Stopped;
+            return;
+        }
+
         pipe.ConsecutiveErrors++;
         WritePipePrefix(device, pipe.EndpointId);
         Serial.WriteString("transfer error, completion code ");

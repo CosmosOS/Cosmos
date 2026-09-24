@@ -19,7 +19,13 @@ public static class KeyboardManager
     /// </summary>
     public static bool IsEnabled => CosmosFeatures.KeyboardEnabled;
 
-    private static List<IKeyboardDevice>? s_keyboards;
+    /// <summary>
+    /// The registered keyboards. Replaced on every change, never changed in
+    /// place: a USB keyboard can come or go on the hot-plug thread while a
+    /// key press walks the list in interrupt context. Changed by the boot
+    /// path, then by that thread only.
+    /// </summary>
+    private static IKeyboardDevice[]? s_keyboards;
     private static Queue<KeyEvent>? s_queuedKeys;
     private static ScanMapBase? s_scanMap;
 
@@ -110,13 +116,42 @@ public static class KeyboardManager
         }
 
         keyboard.OnKeyPressed = HandleScanCode;
-        s_keyboards.Add(keyboard);
+        s_keyboards = [.. s_keyboards, keyboard];
 
         // Enable keyboard after callback is set (this registers IRQ handler)
         keyboard.Enable();
 
         Core.IO.Serial.Write("[KeyboardManager] Registered keyboard, total: ");
-        Core.IO.Serial.WriteNumber((uint)s_keyboards.Count);
+        Core.IO.Serial.WriteNumber((uint)s_keyboards.Length);
+        Core.IO.Serial.Write("\n");
+    }
+
+    /// <summary>
+    /// Forgets a keyboard that is gone (a USB keyboard pulled out). Its
+    /// keys stop arriving; a modifier it held down stays down until pressed
+    /// on another keyboard.
+    /// </summary>
+    internal static void UnregisterKeyboard(IKeyboardDevice keyboard)
+    {
+        if (s_keyboards is null)
+        {
+            return;
+        }
+
+        List<IKeyboardDevice> kept = new(s_keyboards.Length);
+        foreach (IKeyboardDevice other in s_keyboards)
+        {
+            if (!ReferenceEquals(other, keyboard))
+            {
+                kept.Add(other);
+            }
+        }
+
+        s_keyboards = kept.ToArray();
+        keyboard.OnKeyPressed = null;
+
+        Core.IO.Serial.Write("[KeyboardManager] Unregistered keyboard, total: ");
+        Core.IO.Serial.WriteNumber((uint)s_keyboards.Length);
         Core.IO.Serial.Write("\n");
     }
 
