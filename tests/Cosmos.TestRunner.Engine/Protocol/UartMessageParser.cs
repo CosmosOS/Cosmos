@@ -129,7 +129,7 @@ public class UartMessageParser
         byte command = data[offset + CommandOffset];
 
         // Only proceed if this looks like a valid protocol command
-        if (command < Ds2Vs.TestSuiteStart || command > Ds2Vs.TestDestructiveReached)
+        if (command < Ds2Vs.TestSuiteStart || command > Ds2Vs.HostRequest)
         {
             return false;
         }
