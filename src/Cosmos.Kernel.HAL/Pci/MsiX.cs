@@ -54,7 +54,8 @@ internal static class MsiX
     /// Locates and enables the MSI-X capability on <paramref name="pci"/>:
     /// maps the table BAR via HHDM, masks every entry, sets MSI-X Enable,
     /// clears Function Mask, and disables INTx for the device. Returns
-    /// null if the device has no MSI-X capability.
+    /// null if the device has no MSI-X capability or the platform cannot
+    /// route it. <see cref="Disable"/> undoes it. Thread context only.
     /// </summary>
     public static unsafe MsiXContext? Enable(PciDevice pci)
     {
@@ -90,7 +91,7 @@ internal static class MsiX
         // The table BAR is not necessarily the register BAR the driver
         // already mapped (QEMU's NVMe puts the table in its own BAR): make
         // sure both ends of the table's HHDM alias are device-mapped before
-        // the masking loop below dereferences it. No-op on x64.
+        // the masking loop below dereferences it. No-op on x64 below 4 GiB.
         PlatformHAL.Initializer?.EnsureMmioMapped(barPhys + tableOffset);
         PlatformHAL.Initializer?.EnsureMmioMapped(barPhys + tableOffset + (ulong)tableSize * EntryStride - 1);
 
@@ -103,7 +104,7 @@ internal static class MsiX
         }
 
         // Per-arch device prep (ARM64 ITS allocates an ITT + MAPDs the
-        // device here; x64 returns null). A binder that cannot route this
+        // device here; x64 tracks vectors). A binder that cannot route this
         // device (e.g. its ITS DeviceID exceeds the device table) throws —
         // turn that into "no MSI-X" so the driver takes its polled
         // fallback instead of enabling MSI-X that can never deliver.
@@ -126,28 +127,84 @@ internal static class MsiX
         ushort cmd = pci.ReadRegister16((byte)Config.Command);
         pci.WriteRegister16((byte)Config.Command, (ushort)(cmd | (ushort)PciCommand.InterruptDisable));
 
-        return new MsiXContext(tableVirt, tableSize, deviceCtx);
+        return new MsiXContext(pci, cap, tableVirt, tableSize, deviceCtx);
     }
 
     /// <summary>
     /// Allocate a routing slot (IDT vector on x64, LPI on ARM64) for
     /// <paramref name="handler"/> via <see cref="MsiRouting"/>, then
     /// program entry <paramref name="index"/> to deliver to it and unmask.
+    /// Thread context only.
     /// </summary>
     public static void SetEntry(MsiXContext ctx, int index, InterruptManager.IrqDelegate handler, uint targetCpu = 0)
     {
-        if (index < 0 || index >= ctx.EntryCount)
+        ProgramEntry(ctx, index, handler, targetCpu);
+        Native.MMIO.Write32(EntryAddress(ctx, index) + EntryVectorControl, 0);
+    }
+
+    /// <summary>
+    /// Same as <see cref="SetEntry"/>, but entry <paramref name="index"/> is
+    /// left masked, so a driver still being built never sees the vector
+    /// fire. A message the device raises meanwhile is held in its Pending
+    /// Bit Array and delivered once <see cref="UnmaskEntry"/> runs. Thread
+    /// context only.
+    /// </summary>
+    public static void SetEntryMasked(MsiXContext ctx, int index, InterruptManager.IrqDelegate handler, uint targetCpu = 0) =>
+        ProgramEntry(ctx, index, handler, targetCpu);
+
+    /// <summary>
+    /// Undoes <see cref="Enable"/>: sets Function Mask, masks every entry,
+    /// clears MSI-X Enable with Function Mask left set, then hands each
+    /// entry's vector / LPI and the device's routing state back to the
+    /// platform binder. <paramref name="ctx"/> is dead afterwards; a new
+    /// <see cref="Enable"/> on the function starts over.
+    /// <para>
+    /// The Command register is left alone, so INTx stays disabled as
+    /// Enable left it and the function raises no interrupt at all. Enable
+    /// does not record what that bit held before, so the owner that saved
+    /// the Command register restores it.
+    /// </para>
+    /// <para>Thread context only: the binder's allocators take plain spinlocks.</para>
+    /// </summary>
+    /// <exception cref="System.ArgumentException"><paramref name="ctx"/> was not returned by <see cref="Enable"/>.</exception>
+    public static void Disable(MsiXContext ctx)
+    {
+        PciDevice device = ctx.Device
+            ?? throw new System.ArgumentException("Only a context returned by MsiX.Enable has a function to disable", nameof(ctx));
+        byte msgCtrlRegister = (byte)(ctx.CapabilityOffset + MsgCtrlOffset);
+
+        // Function Mask first: one config write masks every vector at once,
+        // and config space answers even with memory decode off.
+        ushort msgCtrl = (ushort)(device.ReadRegister16(msgCtrlRegister) | MsgCtrlFunctionMask);
+        device.WriteRegister16(msgCtrlRegister, msgCtrl);
+
+        // Per-entry masks leave the table as Enable expects to find it, but
+        // only with memory decode on: Function Mask already covers every
+        // entry, and a table write the function does not decode is an
+        // unclaimed posted write, dropped on x64 and an asynchronous abort
+        // on some ARM64 root complexes.
+        if ((device.Command & PciCommand.Memory) != 0)
         {
-            throw new System.ArgumentOutOfRangeException(nameof(index));
+            for (int i = 0; i < ctx.EntryCount; i++)
+            {
+                Native.MMIO.Write32(EntryAddress(ctx, i) + EntryVectorControl, VectorControlMask);
+            }
         }
 
-        MsiRouting.BindEntry(ctx.DeviceCtx, index, handler, targetCpu, out ulong address, out uint data);
+        device.WriteRegister16(msgCtrlRegister, (ushort)(msgCtrl & ~MsgCtrlEnable));
 
-        ulong entry = ctx.TableVirt + (ulong)index * EntryStride;
-        Native.MMIO.Write32(entry + EntryAddrLo, (uint)address);
-        Native.MMIO.Write32(entry + EntryAddrHi, (uint)(address >> AddrHighDwordShift));
-        Native.MMIO.Write32(entry + EntryData, data);
-        Native.MMIO.Write32(entry + EntryVectorControl, 0);
+        // Read back: an ECAM store can retire before the config write
+        // reaches the function, and the read cannot complete ahead of it.
+        // The function has stopped signalling before any vector goes back
+        // to the allocator for another device to be handed.
+        _ = device.ReadRegister16(msgCtrlRegister);
+
+        for (int i = 0; i < ctx.EntryCount; i++)
+        {
+            MsiRouting.UnbindEntry(ctx.DeviceCtx, i);
+        }
+
+        MsiRouting.ReleaseDevice(ctx.DeviceCtx);
     }
 
     public static void MaskEntry(MsiXContext ctx, int index)
@@ -171,13 +228,39 @@ internal static class MsiX
         ulong entry = ctx.TableVirt + (ulong)index * EntryStride;
         Native.MMIO.Write32(entry + EntryVectorControl, 0);
     }
+
+    /// <summary>
+    /// Masks entry <paramref name="index"/>, binds a routing slot for
+    /// <paramref name="handler"/> and writes the message address and data,
+    /// leaving the entry masked. The mask comes first because an entry
+    /// whose address or data changes while unmasked is undefined (PCI 3.0
+    /// §6.8.3.5), which matters when an entry is bound a second time.
+    /// </summary>
+    private static void ProgramEntry(MsiXContext ctx, int index, InterruptManager.IrqDelegate handler, uint targetCpu)
+    {
+        System.ArgumentOutOfRangeException.ThrowIfNegative(index);
+        System.ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, ctx.EntryCount);
+
+        ulong entry = EntryAddress(ctx, index);
+        Native.MMIO.Write32(entry + EntryVectorControl, VectorControlMask);
+
+        MsiRouting.BindEntry(ctx.DeviceCtx, index, handler, targetCpu, out ulong address, out uint data);
+
+        Native.MMIO.Write32(entry + EntryAddrLo, (uint)address);
+        Native.MMIO.Write32(entry + EntryAddrHi, (uint)(address >> AddrHighDwordShift));
+        Native.MMIO.Write32(entry + EntryData, data);
+    }
+
+    private static ulong EntryAddress(MsiXContext ctx, int index) => ctx.TableVirt + (ulong)index * EntryStride;
 }
 
 /// <summary>
 /// Handle returned by <see cref="MsiX.Enable"/> identifying the mapped
 /// MSI-X table for a device. Carries the platform-binder's per-device
 /// state (e.g. ARM64 ITS DeviceID + ITT pointer) so subsequent
-/// <see cref="MsiX.SetEntry"/> calls can route through the same context.
+/// <see cref="MsiX.SetEntry"/> calls can route through the same context,
+/// and the function and capability offset <see cref="MsiX.Disable"/>
+/// writes.
 /// </summary>
 internal readonly struct MsiXContext
 {
@@ -185,6 +268,28 @@ internal readonly struct MsiXContext
     public int EntryCount { get; }
     public object? DeviceCtx { get; }
 
+    /// <summary>The function whose capability this context programs; null for a table-only context.</summary>
+    public PciDevice? Device { get; }
+
+    /// <summary>Config-space offset of the MSI-X capability; 0 for a table-only context.</summary>
+    public byte CapabilityOffset { get; }
+
+    /// <summary>Context for the MSI-X capability of <paramref name="device"/>, as <see cref="MsiX.Enable"/> builds it.</summary>
+    public MsiXContext(PciDevice device, byte capabilityOffset, ulong tableVirt, int entryCount, object? deviceCtx)
+    {
+        Device = device;
+        CapabilityOffset = capabilityOffset;
+        TableVirt = tableVirt;
+        EntryCount = entryCount;
+        DeviceCtx = deviceCtx;
+    }
+
+    /// <summary>
+    /// Table-only context: entries can be programmed and masked, but there
+    /// is no Message Control to write, so <see cref="MsiX.Disable"/>
+    /// refuses it. The white-box interrupt tests build one over a scratch
+    /// page so they never touch a live device's table.
+    /// </summary>
     public MsiXContext(ulong tableVirt, int entryCount, object? deviceCtx)
     {
         TableVirt = tableVirt;
