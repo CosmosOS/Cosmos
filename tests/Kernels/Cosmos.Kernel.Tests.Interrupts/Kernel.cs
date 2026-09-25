@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
@@ -31,8 +32,16 @@ namespace Cosmos.Kernel.Tests.Interrupts;
 // whose driver uses INTx), restoring its registers afterwards.
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests per cell: 11 cross-arch + 6 arch-specific.</summary>
-    private const int ExpectedTestCount = 17;
+    /// <summary>Total tests per cell: 12 cross-arch + 6 arch-specific.</summary>
+    private const int ExpectedTestCount = 18;
+
+#if ARCH_X64
+    /// <summary>RFLAGS.IF (bit 9): set while maskable interrupts are delivered.</summary>
+    private const ulong InterruptEnableFlag = 1UL << 9;
+#else
+    /// <summary>DAIF.I (bit 7): set while IRQs are masked.</summary>
+    private const ulong IrqMaskFlag = 1UL << 7;
+#endif
 
     /// <summary>First vector of the dynamic MSI/MSI-X allocation window [0x40, 0xFE].</summary>
     private const byte DynamicVectorFirst = 0x40;
@@ -99,11 +108,22 @@ public class Kernel : Sys.Kernel
     /// <summary>A function with an MSI-X capability nobody enabled and memory decode on, or null when the cell has none.</summary>
     private static PciDevice? s_idleMsiXFunction;
 
+    /// <summary>Whether interrupts were enabled when <see cref="OnBoot"/> began.</summary>
+    private static bool s_interruptsEnabledAtOnBoot;
+
+    protected override void OnBoot()
+    {
+        // Read before the base class brings up the console, so this is the
+        // state Global.StartKernel handed the kernel.
+        s_interruptsEnabledAtOnBoot = AreInterruptsEnabled();
+        base.OnBoot();
+    }
+
     protected override void BeforeRun()
     {
         Serial.WriteString("[Interrupts] BeforeRun() reached!\n");
 
-        // 11 cross-arch + 6 arch-specific = 17 tests per cell.
+        // 12 cross-arch + 6 arch-specific = 18 tests per cell.
         TR.Start("Interrupt System Tests", expectedTests: ExpectedTestCount);
 
         s_idleMsiXFunction = FindIdleMsiXFunction();
@@ -114,6 +134,7 @@ public class Kernel : Sys.Kernel
 
         // ==================== Cross-arch ====================
         TR.Run("InterruptManager_Enabled", TestInterruptManagerEnabled);
+        TR.Run("Boot_OnBootRunsWithInterruptsEnabled", TestOnBootRunsWithInterruptsEnabled);
         TR.Run("TimerSource_Registered", TestTimerSourceRegistered);
         TR.Run("VectorAllocator_ReturnsDistinctDynamicVectors", TestVectorAllocatorDistinct);
         TR.Run("VectorAllocator_ReusesFreedSlots", TestVectorAllocatorReusesFreedSlots);
@@ -183,6 +204,29 @@ public class Kernel : Sys.Kernel
     private static void TestInterruptManagerEnabled()
     {
         Assert.True(InterruptManager.IsEnabled, "InterruptManager should report enabled");
+    }
+
+    // Global.StartKernel enables interrupts before it calls the kernel's
+    // Start, so OnBoot already runs with them on. x64 has them on from the
+    // IDT load in HAL bring-up, and ARM64 from storage bring-up when the
+    // kernel has storage, so only an ARM64 kernel without storage reaches
+    // StartKernel with them still masked.
+    private static void TestOnBootRunsWithInterruptsEnabled()
+    {
+        Assert.True(s_interruptsEnabledAtOnBoot, "interrupts should already be enabled when OnBoot runs");
+    }
+
+    // Reads the interrupt-enable state without changing it: the save call
+    // masks, and the restore puts back exactly what it read.
+    private static bool AreInterruptsEnabled()
+    {
+        ulong flags = CpuNative.SaveIrqAndDisable();
+        CpuNative.RestoreIrq(flags);
+#if ARCH_X64
+        return (flags & InterruptEnableFlag) != 0;
+#else
+        return (flags & IrqMaskFlag) == 0;
+#endif
     }
 
     // A registered timer device is the periodic interrupt source that drives
