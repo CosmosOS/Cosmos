@@ -2808,9 +2808,10 @@ public class Kernel : Sys.Kernel
         nvmePci.WriteRegister16((byte)Config.Command, command);
 
         uint vsHigh;
+        bool mapped;
         try
         {
-            PlatformHAL.Initializer?.EnsureMmioMapped(HighBarPhys);
+            mapped = PlatformHAL.Initializer?.EnsureMmioMapped(HighBarPhys) == true;
             vsHigh = Native.MMIO.Read32(HighBarPhys + hhdm + NvmeRegisters.VsOffset);
         }
         finally
@@ -2823,6 +2824,7 @@ public class Kernel : Sys.Kernel
             nvmePci.WriteRegister16((byte)Config.Command, command);
         }
 
+        Assert.True(mapped, "EnsureMmioMapped must report the high BAR's block as mapped");
         Assert.True(vsHigh == vsOrig, "VS read through the remapped high BAR must match the original");
     }
 
