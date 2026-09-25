@@ -129,6 +129,16 @@ internal class PciDevice : Device
     /// </summary>
     private static SchedSpinLock s_configLock;
 
+    /// <summary>
+    /// Makes <see cref="TryClaim"/>'s test of <see cref="Owner"/> and its
+    /// write one step. The full-screen canvas claims its adapter lazily from
+    /// whichever thread first asks for the screen, so a claim can race
+    /// another driver's; without the lock both could see the function free
+    /// and both would program it. IRQ-safe so the holder is not preempted
+    /// while another thread spins on it.
+    /// </summary>
+    private static SchedSpinLock s_ownerLock;
+
     public readonly PciBaseAddressBar[]? BaseAddressBar;
 
     public byte InterruptLine { get; private set; }
@@ -140,9 +150,18 @@ internal class PciDevice : Device
     }
 
     /// <summary>
-    /// Has this device been claimed by a driver
+    /// Name of the driver that owns this function (one of
+    /// <see cref="PciOwner"/>'s names), <see cref="PciOwner.Gop"/> when the
+    /// function is only reserved as the boot display, or null when nothing
+    /// owns it. Written through <see cref="TryClaim"/> only.
     /// </summary>
-    public bool Claimed { get; set; }
+    public string? Owner { get; private set; }
+
+    /// <summary>
+    /// True when a driver owns this function. The boot display reservation
+    /// does not count: a built-in display driver may still take that function.
+    /// </summary>
+    public bool Claimed => Owner is not null and not PciOwner.Gop;
 
     public PciDevice(uint bus, uint slot, uint function)
     {
@@ -195,6 +214,41 @@ internal class PciDevice : Device
         }
 
         Serial.WriteString("[PciDevice] Init Done \n");
+    }
+
+    /// <summary>
+    /// Records <paramref name="owner"/> as the driver that owns this function
+    /// unless a different driver already owns it. A function that is free,
+    /// only reserved as the boot display, or already owned by
+    /// <paramref name="owner"/> is taken. A refusal is logged.
+    /// </summary>
+    /// <param name="owner">The claiming driver's name, one of <see cref="PciOwner"/>'s.</param>
+    /// <returns>True when <paramref name="owner"/> owns the function on return.</returns>
+    public bool TryClaim(string owner)
+    {
+        string? current;
+        using (s_ownerLock.AcquireIrqSafe())
+        {
+            current = Owner;
+            if (current is null || current == PciOwner.Gop || current == owner)
+            {
+                Owner = owner;
+                return true;
+            }
+        }
+
+        Serial.WriteString("[PciDevice] ");
+        Serial.WriteNumber(Bus);
+        Serial.WriteString(":");
+        Serial.WriteNumber(Slot);
+        Serial.WriteString(".");
+        Serial.WriteNumber(Function);
+        Serial.WriteString(" is owned by ");
+        Serial.WriteString(current);
+        Serial.WriteString(", refused to ");
+        Serial.WriteString(owner);
+        Serial.WriteString("\n");
+        return false;
     }
 
     public void EnableDevice() => Command |= PciCommand.Master | PciCommand.Io | PciCommand.Memory;

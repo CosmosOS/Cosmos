@@ -1,7 +1,5 @@
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Cpu;
-using Cosmos.Kernel.HAL.Devices.Usb;
 
 namespace Cosmos.Kernel.System;
 
@@ -32,8 +30,11 @@ public abstract partial class Kernel
     }
 
     /// <summary>
-    /// Starts the kernel lifecycle.
-    /// Called by the generated entry point.
+    /// Runs the kernel lifecycle: <see cref="OnBoot"/>, <see cref="BeforeRun"/>,
+    /// the <see cref="Run"/> loop, then <see cref="AfterRun"/>. Called by
+    /// <see cref="Global.StartKernel"/> once interrupts are enabled and USB
+    /// hot-plug is started, so an override that replaces this lifecycle
+    /// keeps both.
     /// </summary>
     public virtual void Start()
     {
@@ -41,21 +42,6 @@ public abstract partial class Kernel
 
         Serial.WriteString("[Kernel] Calling OnBoot()...\n");
         OnBoot();
-
-        if (InterruptManager.IsEnabled)
-        {
-            Serial.WriteString("[Kernel] Enabling interrupts...\n");
-            InternalCpu.EnableInterrupts();
-        }
-
-        // USB hot-plug runs on a thread of its own, which only a scheduler
-        // tick can start, so it waits for interrupts. Same switches as the
-        // USB bring-up, so a kernel without USB trims it all.
-        if (Core.CosmosFeatures.SchedulerEnabled && Core.CosmosFeatures.PCIEnabled
-            && (Core.CosmosFeatures.KeyboardEnabled || Core.CosmosFeatures.StorageEnabled))
-        {
-            UsbManager.StartHotPlug();
-        }
 
         EarlyGop.Enabled = false;
 
@@ -85,8 +71,10 @@ public abstract partial class Kernel
     }
 
     /// <summary>
-    /// Called once during boot, before BeforeRun().
-    /// Override to customize system initialization.
+    /// Called once during boot, before BeforeRun(). Interrupts are already
+    /// enabled (unless the Interrupts switch is off), and USB hot-plug is
+    /// already started where it could start. Override to customize system
+    /// initialization.
     /// </summary>
     protected virtual void OnBoot()
     {

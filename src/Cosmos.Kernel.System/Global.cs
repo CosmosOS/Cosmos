@@ -1,4 +1,6 @@
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.System.Graphics;
 
 namespace Cosmos.Kernel.System;
@@ -12,6 +14,12 @@ public static class Global
     /// The registered kernel instance that will be started.
     /// </summary>
     private static Kernel? s_kernel;
+
+    /// <summary>
+    /// Set by the first <see cref="StartKernel"/>, which never returns, so a
+    /// second call can only come from the kernel it started.
+    /// </summary>
+    private static bool s_started;
 
     /// <summary>
     /// Gets the current kernel instance, or <see langword="null"/> until
@@ -68,8 +76,14 @@ public static class Global
     }
 
     /// <summary>
-    /// Starts the registered kernel. Called by the CosmosEntryPoint.
+    /// Starts the registered kernel, once. Enables interrupts (unless the
+    /// Interrupts switch is off) and starts USB hot-plug, then calls
+    /// <see cref="Kernel.Start"/>, so <see cref="Kernel.OnBoot"/>,
+    /// <see cref="Kernel.BeforeRun"/> and <see cref="Kernel.Run"/> all run
+    /// with interrupts on, and a kernel that overrides Start keeps both.
+    /// Called by the generated entry point; it does not return.
     /// </summary>
+    /// <exception cref="InvalidOperationException">StartKernel already ran.</exception>
     public static void StartKernel()
     {
         Serial.WriteString("[Global] StartKernel called\n");
@@ -85,6 +99,38 @@ public static class Global
 
             // Halt
             while (true) { }
+        }
+
+        if (s_started)
+        {
+            throw new InvalidOperationException("Global.StartKernel already ran; the generated entry point calls it once.");
+        }
+
+        s_started = true;
+
+        // On x64 the IDT load already unmasked interrupts during HAL
+        // bring-up; on ARM64 they stay masked from boot until here, or until
+        // storage bring-up needed them. Enabled before the kernel's Start
+        // rather than inside it, so OnBoot runs with them on on both
+        // architectures and an override of Start cannot lose them.
+        if (InterruptManager.IsEnabled)
+        {
+            Serial.WriteString("[Global] Enabling interrupts...\n");
+            InternalCpu.EnableInterrupts();
+        }
+
+        // After interrupts, since the thread only runs once the scheduler
+        // switches to it, and last before the kernel runs: once started, the
+        // hot-plug thread is the only writer of the USB device list, so
+        // boot-time USB binding has to be over by then. Nested single-switch
+        // guards, not one &&: ILC folds each on its own only, so a kernel
+        // without the scheduler or without USB trims the hot-plug thread.
+        if (Core.CosmosFeatures.SchedulerEnabled)
+        {
+            if (Core.CosmosFeatures.UsbEnabled)
+            {
+                UsbManager.StartHotPlug();
+            }
         }
 
         Serial.WriteString("[Global] Starting kernel...\n");

@@ -38,7 +38,14 @@ public class Kernel : Sys.Kernel
     private const string SkipNoHost = "no block device bound for partition-table tests";
 
     /// <summary>Total tests this suite reports per profile; the breakdown is at the TR.Start call site.</summary>
-    private const ushort ExpectedTestCount = 73;
+    private const ushort ExpectedTestCount = 75;
+
+    // PCI owner names of the three controller drivers, spelled out rather
+    // than read from PciOwner so a renamed constant is caught instead of
+    // compared against itself.
+    private const string AhciOwner = "ahci";
+    private const string NvmeOwner = "nvme";
+    private const string XhciOwner = "xhci";
 
     /// <summary>Block devices the engine attaches per QEMU profile; any other count is a bind or double-registration regression.</summary>
     private const int AttachedDisksPerProfile = 1;
@@ -392,14 +399,23 @@ public class Kernel : Sys.Kernel
     /// <summary>The stick as it was before the unplug, for the cells that check what it left behind.</summary>
     private static UsbMassStorage? s_unpluggedDisk;
 
+    /// <summary>Whether the USB hot-plug thread was running when <see cref="OnBoot"/> began.</summary>
+    private static bool s_hotPlugRunningAtOnBoot;
+
+    protected override void OnBoot()
+    {
+        s_hotPlugRunningAtOnBoot = UsbManager.IsHotPlugRunning;
+        base.OnBoot();
+    }
+
     protected override void BeforeRun()
     {
         Serial.WriteString("[Storage] BeforeRun() reached!\n");
 
-        // 3 manager + 1 boot-scan + 2 profile + 13 device + 7 partition
+        // 3 manager + 1 boot-scan + 3 profile + 13 device + 7 partition
         // + 37 partition-lifecycle (MBR mutation, EBR chain, PartitionManager,
-        // superfloppy) + 2 bounds probes + 2 mmio/pci + 5 USB hot-plug
-        // + 1 boot-reboot = 73 tests per profile.
+        // superfloppy) + 2 bounds probes + 2 mmio/pci + 6 USB hot-plug
+        // + 1 boot-reboot = 75 tests per profile.
         TR.Start("Storage Block Device Tests", expectedTests: ExpectedTestCount);
 
         bool hasDevice = StorageManager.DeviceCount > 0;
@@ -474,6 +490,8 @@ public class Kernel : Sys.Kernel
             TR.Skip("Profile_NvmeInterruptModeMatches", "interrupt mode not pinned by this cell");
 #endif
         }
+
+        TR.RunIf(hasDevice, "Profile_ControllerOwnsPciFunction", TestProfile_ControllerOwnsPciFunction, SkipNoDevice);
 
         // ==================== Device (single-disk round-trip) ====================
         bool dev = s_dev is not null;
@@ -576,6 +594,7 @@ public class Kernel : Sys.Kernel
         // monitor. After the block I/O and partition cells, so a hot-plug
         // regression cannot take them down; before the reboot cell, which
         // writes to whatever stick is plugged in by then.
+        TR.RunIf(TR.ProfileHasPrefix("usb"), "UsbHotPlug_StartedBeforeOnBoot", TestUsbHotPlug_StartedBeforeOnBoot, "not a USB profile");
         string hotPlugSkip = HotPlugSkipReason();
         bool hotPlug = hotPlugSkip.Length == 0;
         TR.RunIf(hotPlug, "UsbHotPlug_UnplugUnregistersDisk", TestUsbHotPlug_UnplugUnregistersDisk, hotPlugSkip);
@@ -819,6 +838,34 @@ public class Kernel : Sys.Kernel
         }
 
         return true;
+    }
+
+    // The controller behind the cell's disk records its driver as the owner
+    // of its PCI function. AHCI and NVMe take ownership only once the
+    // controller came up, and a bound disk means it did, so the owner must
+    // be there; xHCI takes it once the host controller is running.
+    private static void TestProfile_ControllerOwnsPciFunction()
+    {
+        if (TR.ProfileHasPrefix("ahci"))
+        {
+            Assert.True(Ahci.Controllers.Count > 0, "the ahci cell's disk should sit behind an AHCI controller");
+            for (int i = 0; i < Ahci.Controllers.Count; i++)
+            {
+                Assert.True(Ahci.Controllers[i].Device.Owner == AhciOwner, "every AHCI controller that came up should own its PCI function");
+            }
+
+            return;
+        }
+
+        if (TR.ProfileHasPrefix("usb"))
+        {
+            PciDevice? xhci = PciManager.GetDeviceClass(ClassId.SerialBusController, SubclassId.UsbController, ProgramIf.UsbXhci);
+            Assert.True(xhci?.Owner == XhciOwner, "the xHCI controller carrying the stick should own its PCI function");
+            return;
+        }
+
+        PciDevice? nvme = PciManager.GetDeviceClass(ClassId.MassStorageController, SubclassId.NvmController);
+        Assert.True(nvme?.Owner == NvmeOwner, "the NVMe controller should own its PCI function");
     }
 
     // A gicv3 cell must come up MSI-X (arm64 GICv3 ITS routes it); a gicv2 cell
@@ -1272,6 +1319,15 @@ public class Kernel : Sys.Kernel
         }
 
         return UsbManager.IsHotPlugRunning ? string.Empty : "USB hot-plug thread not running (scheduler timer not ticking)";
+    }
+
+    // Global.StartKernel starts hot-plug before it hands over to the kernel,
+    // so whether the thread runs is settled by the time OnBoot begins: the
+    // thread is already running where the scheduler switches to it, and
+    // never starts later where it does not (x64 with ACPI off).
+    private static void TestUsbHotPlug_StartedBeforeOnBoot()
+    {
+        Assert.Equal(UsbManager.IsHotPlugRunning, s_hotPlugRunningAtOnBoot, "the hot-plug thread should be started before OnBoot, not after");
     }
 
     // Pulling the stick out must take it out of the storage manager and the

@@ -40,6 +40,9 @@
     <CosmosEnableFat Condition="'$(CosmosEnableFat)' == ''">true</CosmosEnableFat>
     <CosmosEnableGraphics Condition="'$(CosmosEnableGraphics)' == ''">true</CosmosEnableGraphics>
     <CosmosEnableScheduler Condition="'$(CosmosEnableScheduler)' == ''">true</CosmosEnableScheduler>
+    <!-- CosmosEnableUsb has no default here: it follows CosmosEnableKeyboard and
+         CosmosEnableStorage, which the kernel project sets after this file is
+         imported, so Sdk.targets defaults it once their values are final. -->
     <!-- CosmosDefaultFont has no default: when unset, PCScreenFont falls back to its
          embedded Fonts.DefaultFont.psf. Set it to the manifest resource name of a PSF
          embedded in the kernel project to override the default console font. -->
@@ -69,6 +72,7 @@
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Network.Enabled" Value="$(CosmosEnableNetwork)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Storage.Enabled" Value="$(CosmosEnableStorage)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Filesystems.Fat.Enabled" Value="$(CosmosEnableFat)" Trim="true"/>
+    <RuntimeHostConfigurationOption Include="Cosmos.Kernel.HAL.Usb.Enabled" Value="$(CosmosEnableUsb)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Graphics.Enabled" Value="$(CosmosEnableGraphics)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.Core.Scheduler.Enabled" Value="$(CosmosEnableScheduler)" Trim="true"/>
     <!-- Key must match PCScreenFont.Default.DefaultFontKey ("...Fonts.DefaultFont");

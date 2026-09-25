@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.System.Diagnostics;
@@ -9,6 +10,7 @@ using Cosmos.Kernel.System.Timer;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using Monitor = System.Threading.Monitor;
+using Stopwatch = System.Diagnostics.Stopwatch;
 using SysThread = System.Threading.Thread;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
 
@@ -17,7 +19,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 74;
+    private const int ExpectedTestCount = 78;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -51,6 +53,9 @@ public class Kernel : Sys.Kernel
 
     /// <summary>How long a Join on a killed thread may take before the test calls it a hang.</summary>
     private const int KillJoinTimeoutMs = 2000;
+
+    /// <summary>Milliseconds per second, to turn Stopwatch ticks into the milliseconds KernelThread bounds its wait in.</summary>
+    private const long MillisecondsPerSecond = 1000;
 
     /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
     private const uint UnregisteredCpuId = 4096;
@@ -113,6 +118,7 @@ public class Kernel : Sys.Kernel
 
     // Shared state for thread tests
     private static volatile bool s_threadExecuted;
+    private static volatile bool s_kernelThreadRan;
     private static volatile int s_sharedCounter;
     private static volatile int s_thread1Counter;
     private static volatile int s_thread2Counter;
@@ -161,6 +167,8 @@ public class Kernel : Sys.Kernel
         TR.Run("Thread_MaxStackSize_IsHonored", TestThreadMaxStackSizeHonored);
         TR.Run("Thread_MaxStackSize_TinyRequestIsFloored", TestThreadTinyStackSizeFloored);
         TR.Run("Thread_Kill_Queued_StopsManagedSide", TestKillQueuedThreadStopsManagedSide);
+        TR.Run("KernelThread_TryStart_RunsEntry", TestKernelThreadTryStartRunsEntry);
+        TR.Run("KernelThread_TryStart_NoSwitch_GivesUpAndReaps", TestKernelThreadTryStartGivesUpWithoutSwitch);
         TR.Run("ScheduleFromInterrupt_UnregisteredCpu_IsNoOp", TestScheduleFromInterruptIgnoresUnregisteredCpu);
         TR.Run("Mutex_IdleThreadContention_KeepsTicketAccounting", TestMutexIdleThreadContention);
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
@@ -1011,6 +1019,55 @@ public class Kernel : Sys.Kernel
         Assert.True(victim.Join(KillJoinTimeoutMs), "Join must return once the killed thread's stop event is set");
         Assert.True((victim.ThreadState & ThreadState.Stopped) != 0, "the killed thread must read as Stopped");
         Assert.True(!victim.IsAlive, "the killed thread must not read as alive");
+    }
+
+    // The kernel's own threads (USB hot-plug) start through KernelThread
+    // rather than CoreLib's Thread: TryStart returns once the new thread
+    // began, and the entry then runs on it.
+    private static void TestKernelThreadTryStartRunsEntry()
+    {
+        s_kernelThreadRan = false;
+
+        bool started = KernelThread.TryStart(() => s_kernelThreadRan = true);
+        for (int i = 0; i < FlagPollRetries && !s_kernelThreadRan; i++)
+        {
+            TimerManager.Wait(FlagPollIntervalMs);
+        }
+
+        Assert.True(started, "TryStart should report the thread started while the scheduler switches threads");
+        Assert.True(s_kernelThreadRan, "the thread TryStart started should run its entry");
+    }
+
+    // With interrupts masked nothing switches to the new thread, as on a
+    // machine whose timer never ticks. TryStart must give up after its bound
+    // instead of spinning like CoreLib's Thread.Start, and take the thread
+    // off the scheduler, so that it never runs its entry. Counted inside the
+    // masked scope, where no other thread can come or go.
+    private static void TestKernelThreadTryStartGivesUpWithoutSwitch()
+    {
+        s_kernelThreadRan = false;
+
+        bool started;
+        long elapsedTicks;
+        int threadsBefore;
+        int threadsAfter;
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            threadsBefore = SchedulerManager.ThreadCount;
+            long begin = Stopwatch.GetTimestamp();
+            started = KernelThread.TryStart(() => s_kernelThreadRan = true);
+            elapsedTicks = Stopwatch.GetTimestamp() - begin;
+            threadsAfter = SchedulerManager.ThreadCount;
+        }
+
+        // Ticks again from here: a thread left queued would run now.
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        long elapsedMs = elapsedTicks * MillisecondsPerSecond / Stopwatch.Frequency;
+        Assert.False(started, "TryStart should give up on a thread nothing switches to");
+        Assert.True(elapsedMs >= KernelThread.StartTimeoutMs, "TryStart should wait its full bound before giving up");
+        Assert.Equal(threadsBefore, threadsAfter, "the thread TryStart gave up on should leave the thread registry");
+        Assert.False(s_kernelThreadRan, "the thread TryStart gave up on should never run its entry");
     }
 
     /// <summary>

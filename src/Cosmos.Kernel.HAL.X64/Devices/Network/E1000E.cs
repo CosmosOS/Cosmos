@@ -106,6 +106,11 @@ internal class E1000E : PciDevice, INetworkDevice
     /// </summary>
     public static E1000E? Instance { get; private set; }
 
+    // The function as PciManager enumerated it. This driver is a PciDevice
+    // too, but a second object for the same function that no scan reads, so
+    // ownership is recorded here and not on the driver itself.
+    private readonly PciDevice _enumerated;
+
     private readonly ulong _mmioBase;
     private MACAddress? _macAddress;
     private bool _networkInitialized;
@@ -165,11 +170,11 @@ internal class E1000E : PciDevice, INetworkDevice
     /// <summary>
     /// Creates a new E1000E driver instance.
     /// </summary>
-    /// <param name="bus">PCI bus number.</param>
-    /// <param name="slot">PCI slot number.</param>
-    /// <param name="function">PCI function number.</param>
-    public E1000E(uint bus, uint slot, uint function) : base(bus, slot, function)
+    /// <param name="enumerated">The function <see cref="PciManager"/> enumerated for the NIC.</param>
+    public E1000E(PciDevice enumerated) : base(enumerated.Bus, enumerated.Slot, enumerated.Function)
     {
+        _enumerated = enumerated;
+
         // Get MMIO base address from BAR0
         if (BaseAddressBar is { Length: > 0 })
         {
@@ -189,47 +194,47 @@ internal class E1000E : PciDevice, INetworkDevice
         PciDevice? device;
 
         device = PciManager.GetDevice(Pci.Enums.VendorId.Intel, Pci.Enums.DeviceId.E82574L);
-        if (device != null && !device.Claimed)
+        if (device is not null && !device.Claimed)
         {
-            return new E1000E(device.Bus, device.Slot, device.Function);
+            return new E1000E(device);
         }
 
         device = PciManager.GetDevice(Pci.Enums.VendorId.Intel, Pci.Enums.DeviceId.E82574IT);
-        if (device != null && !device.Claimed)
+        if (device is not null && !device.Claimed)
         {
-            return new E1000E(device.Bus, device.Slot, device.Function);
+            return new E1000E(device);
         }
 
         device = PciManager.GetDevice(Pci.Enums.VendorId.Intel, Pci.Enums.DeviceId.E82574);
-        if (device != null && !device.Claimed)
+        if (device is not null && !device.Claimed)
         {
-            return new E1000E(device.Bus, device.Slot, device.Function);
+            return new E1000E(device);
         }
 
         // Additional E1000E device IDs
         device = PciManager.GetDevice(Pci.Enums.VendorId.Intel, Pci.Enums.DeviceId.Pch82577Lm);
-        if (device != null && !device.Claimed)
+        if (device is not null && !device.Claimed)
         {
-            return new E1000E(device.Bus, device.Slot, device.Function);
+            return new E1000E(device);
         }
 
         device = PciManager.GetDevice(Pci.Enums.VendorId.Intel, Pci.Enums.DeviceId.Pch82577Lc);
-        if (device != null && !device.Claimed)
+        if (device is not null && !device.Claimed)
         {
-            return new E1000E(device.Bus, device.Slot, device.Function);
+            return new E1000E(device);
         }
 
         device = PciManager.GetDevice(Pci.Enums.VendorId.Intel, Pci.Enums.DeviceId.Pch82578Dm);
-        if (device != null && !device.Claimed)
+        if (device is not null && !device.Claimed)
         {
-            return new E1000E(device.Bus, device.Slot, device.Function);
+            return new E1000E(device);
         }
 
         // Also check by class (Network Controller = 0x02, Ethernet = 0x00)
         device = PciManager.GetDeviceClass(Pci.Enums.ClassId.NetworkController, (Pci.Enums.SubclassId)0x00, (Pci.Enums.ProgramIf)0x00);
-        if (device != null && !device.Claimed && device.VendorId == (ushort)Pci.Enums.VendorId.Intel)
+        if (device is not null && !device.Claimed && device.VendorId == (ushort)Pci.Enums.VendorId.Intel)
         {
-            return new E1000E(device.Bus, device.Slot, device.Function);
+            return new E1000E(device);
         }
 
         return null;
@@ -258,7 +263,9 @@ internal class E1000E : PciDevice, INetworkDevice
         // Enable PCI bus mastering and memory space
         EnableMemory(true);
         EnableBusMaster(true);
-        Claimed = true;
+        // Cannot be refused: FindAndCreate only returns an unclaimed function,
+        // and no other driver binds between it and here.
+        _ = _enumerated.TryClaim(PciOwner.E1000E);
 
         // Reset the device
         Reset();

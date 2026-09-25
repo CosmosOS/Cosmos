@@ -86,6 +86,11 @@ internal static class Ahci
                 continue;
             }
 
+            // Owned only once the controller works, so a function this
+            // driver gave up on stays free for another one. Cannot be
+            // refused: storage binds at boot, before any other driver can
+            // own a SATA function.
+            _ = device.TryClaim(PciOwner.Ahci);
             s_controllers.Add(controller);
             for (int p = 0; p < controller.Ports.Count; p++)
             {

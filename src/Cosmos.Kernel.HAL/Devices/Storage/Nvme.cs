@@ -64,6 +64,11 @@ internal static class Nvme
             {
                 NvmeController controller = new(device, index: i);
                 controller.Initialize();
+                // Owned only once the controller works, so a function this
+                // driver gave up on stays free for another one. Cannot be
+                // refused: storage binds at boot, before any other driver can
+                // own an NVMe function.
+                _ = device.TryClaim(PciOwner.Nvme);
                 s_controllers.Add(controller);
 
                 for (int n = 0; n < controller.Namespaces.Count; n++)

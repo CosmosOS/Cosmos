@@ -8,7 +8,6 @@ using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
-using SysThread = System.Threading.Thread;
 
 namespace Cosmos.Kernel.HAL.Devices.Usb;
 
@@ -42,17 +41,12 @@ internal static class UsbManager
     /// <summary>How often the hot-plug thread polls a controller whose port changes raise no interrupt.</summary>
     private const uint PollIntervalMs = 250;
 
-    /// <summary>Longest wait for the scheduler's first tick: a few of its 10 ms quanta.</summary>
-    private const uint SchedulerTickWaitMs = 50;
-
     private static List<UsbHostController>? s_controllers;
     private static List<UsbDriver>? s_drivers;
     private static List<UsbDevice>? s_devices;
 
     /// <summary>Signaled from interrupt context by every port change report; the hot-plug thread waits on it.</summary>
     private static InterruptEvent? s_portChange;
-
-    private static SysThread? s_hotPlugThread;
 
     public static bool IsInitialized => s_controllers is not null;
 
@@ -61,7 +55,7 @@ internal static class UsbManager
     /// devices plugged in or pulled out; before that, and when it could not
     /// start, the devices are the ones found at boot.
     /// </summary>
-    public static bool IsHotPlugRunning => s_hotPlugThread is not null;
+    public static bool IsHotPlugRunning { get; private set; }
 
     /// <summary>Host controllers that came up (empty before <see cref="Initialize"/>).</summary>
     public static IReadOnlyList<UsbHostController> Controllers =>
@@ -117,7 +111,9 @@ internal static class UsbManager
             {
                 XhciController controller = new(pci, controllers.Count);
                 controller.Initialize();
-                pci.Claimed = true;
+                // Cannot be refused: this scan runs at boot, before any
+                // other driver can own a USB host controller.
+                _ = pci.TryClaim(PciOwner.Xhci);
                 controllers.Add(controller);
             }
             catch (Exception ex)
@@ -155,29 +151,29 @@ internal static class UsbManager
     /// <summary>
     /// Starts following the devices plugged in and pulled out of the
     /// controllers <see cref="Initialize"/> brought up. Needs the scheduler
-    /// running and its timer ticking, so interrupts enabled: without them,
+    /// running and switching threads, so interrupts enabled: without them,
     /// and in a kernel built without the scheduler, the devices are the ones
-    /// found at boot. Idempotent.
+    /// found at boot. Idempotent once it succeeded.
     /// </summary>
     public static void StartHotPlug()
     {
-        if (s_hotPlugThread is not null || s_controllers is not { Count: > 0 } || !SchedulerManager.IsRunning)
+        if (IsHotPlugRunning || s_controllers is not { Count: > 0 } || !SchedulerManager.IsRunning)
         {
             return;
         }
 
-        // Thread.Start returns once the new thread ran, and only a scheduler
-        // tick can run it: with a timer that never started (x64 with ACPI
-        // off has nothing to calibrate the LAPIC timer against), Start would
-        // wait forever.
-        if (!WaitForSchedulerTick())
+        // The thread only runs once the scheduler switches to it. A timer
+        // that never started (x64 with ACPI off has nothing to calibrate the
+        // LAPIC timer against) or never schedules would leave CoreLib's
+        // Thread.Start spinning forever; KernelThread gives up after a few
+        // quanta and makes sure the thread never runs later.
+        if (!KernelThread.TryStart(RunHotPlug))
         {
             Serial.WriteString("[USB] Scheduler timer not ticking, hot-plug disabled\n");
             return;
         }
 
-        s_hotPlugThread = new SysThread(RunHotPlug);
-        s_hotPlugThread.Start();
+        IsHotPlugRunning = true;
     }
 
     /// <summary>
@@ -257,22 +253,6 @@ internal static class UsbManager
 
     internal static void DelayMilliseconds(uint milliseconds) =>
         PlatformHAL.Initializer?.DelayMicroseconds(milliseconds * MicrosecondsPerMillisecond);
-
-    /// <summary>True once the scheduler timer has fired, waiting a few quanta for it.</summary>
-    private static bool WaitForSchedulerTick()
-    {
-        for (uint waitedMs = 0; SchedulerManager.TickPeriodNs == 0; waitedMs++)
-        {
-            if (waitedMs >= SchedulerTickWaitMs)
-            {
-                return false;
-            }
-
-            DelayMilliseconds(1);
-        }
-
-        return true;
-    }
 
     /// <summary>
     /// Hot-plug thread: lets every controller and hub handle their changed

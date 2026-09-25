@@ -70,4 +70,11 @@ public static class KernelFeatures
     /// (<c>CosmosEnableFat</c>). Requires Storage.
     /// </summary>
     public static bool Fat => CosmosFeatures.FatEnabled;
+
+    /// <summary>
+    /// Whether the USB stack is enabled (<c>CosmosEnableUsb</c>).
+    /// Requires PCI. When the property is not set, it is on only if
+    /// Keyboard or Storage is on.
+    /// </summary>
+    public static bool Usb => CosmosFeatures.UsbEnabled;
 }

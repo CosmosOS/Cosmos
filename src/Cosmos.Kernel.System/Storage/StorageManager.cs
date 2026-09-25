@@ -140,9 +140,14 @@ public static class StorageManager
         }
 
         // Before the boot disks are read, so none can slip between the two;
-        // one reported twice is registered once.
-        UsbMassStorageDriver.DiskAttached = RegisterDevice;
-        UsbMassStorageDriver.DiskDetached = UnregisterDevice;
+        // one reported twice is registered once. Both USB blocks sit behind
+        // USB's own switch so a kernel without USB never references the USB
+        // mass storage driver and ILC trims it.
+        if (CosmosFeatures.UsbEnabled)
+        {
+            UsbMassStorageDriver.DiskAttached = RegisterDevice;
+            UsbMassStorageDriver.DiskDetached = UnregisterDevice;
+        }
 
         IReadOnlyList<BlockDevice> ports = Ahci.Ports;
         for (int i = 0; i < ports.Count; i++)
@@ -156,10 +161,13 @@ public static class StorageManager
             RegisterDevice(nvmeNamespaces[i]);
         }
 
-        IReadOnlyList<UsbMassStorage> usbDisks = UsbMassStorageDriver.Disks;
-        for (int i = 0; i < usbDisks.Count; i++)
+        if (CosmosFeatures.UsbEnabled)
         {
-            RegisterDevice(usbDisks[i]);
+            IReadOnlyList<UsbMassStorage> usbDisks = UsbMassStorageDriver.Disks;
+            for (int i = 0; i < usbDisks.Count; i++)
+            {
+                RegisterDevice(usbDisks[i]);
+            }
         }
     }
 
