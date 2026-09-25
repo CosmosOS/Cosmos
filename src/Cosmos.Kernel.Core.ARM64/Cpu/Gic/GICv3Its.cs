@@ -25,7 +25,9 @@ namespace Cosmos.Kernel.Core.ARM64.Cpu;
 /// <item>Issues one <c>MAPC</c> at init time mapping collection 0 to the
 /// boot CPU's redistributor.</item>
 /// <item>Exposes <see cref="MapDevice"/> (issues <c>MAPD</c>) and
-/// <see cref="MapEvent"/> (issues <c>MAPTI</c>) for the MSI-X binder.</item>
+/// <see cref="MapEvent"/> (issues <c>MAPTI</c>) for the MSI-X binder, and
+/// their inverses <see cref="DiscardEvent"/> (<c>DISCARD</c>) and
+/// <see cref="UnmapDevice"/> (<c>MAPD</c> V=0) for its teardown.</item>
 /// </list>
 ///
 /// Single-CPU only: every (DeviceID, EventID) is mapped to collection 0.
@@ -135,10 +137,11 @@ public static unsafe class GICv3Its
     private const byte CMD_MAPTI = 0x0A;
     private const byte CMD_INV = 0x0C;
     private const byte CMD_SYNC = 0x05;
+    private const byte CMD_DISCARD = 0x0F;
 
     // Valid bit shared by MAPC / MAPD encodings, cmd[2] bit 63.
     private const ulong CMD_VALID = 1UL << 63;
-    // DeviceID lives in the upper 32 bits of cmd[0] for MAPD/MAPTI/INV.
+    // DeviceID lives in the upper 32 bits of cmd[0] for MAPD/MAPTI/INV/DISCARD.
     private const int CMD_DEVICE_ID_SHIFT = 32;
     // MAPTI encodes the LPI INTID in the upper 32 bits of cmd[1].
     private const int MAPTI_LPI_SHIFT = 32;
@@ -331,13 +334,17 @@ public static unsafe class GICv3Its
     /// <summary>
     /// Allocate an ITT for <paramref name="deviceId"/> and issue MAPD.
     /// <paramref name="maxEvents"/> is rounded up to the next power of two
-    /// (minimum 2, the ITS hardware lower bound).
+    /// (minimum 2, the ITS hardware lower bound). Returns the ITT's virtual
+    /// address, which the caller hands back to <see cref="UnmapDevice"/>
+    /// (0 when the ITS is not initialized and nothing was mapped). The
+    /// DeviceID must not be mapped already: unmap it first. Thread context
+    /// only: the command queue lock is a plain spinlock.
     /// </summary>
-    public static void MapDevice(uint deviceId, uint maxEvents)
+    public static ulong MapDevice(uint deviceId, uint maxEvents)
     {
         if (!s_initialized)
         {
-            return;
+            return 0;
         }
 
         // The flat device table is indexed by DeviceID value: a MAPD past
@@ -384,6 +391,31 @@ public static unsafe class GICv3Its
         EnqueueMapd(deviceId, ittPhys, sizeField, valid: true);
         EnqueueSync();
         FlushCommandQueue();
+        return ittVirt;
+    }
+
+    /// <summary>
+    /// Issue MAPD with V=0 for <paramref name="deviceId"/>, wait for the ITS
+    /// to consume it, then free the ITT <see cref="MapDevice"/> returned.
+    /// The ITS reads the ITT until the unmap completes, so the page goes
+    /// back to the allocator only after the flush. DISCARD every mapped
+    /// event first: the unmap drops the translations but not the LPIs they
+    /// pointed at. Thread context only: the command queue lock is a plain
+    /// spinlock.
+    /// </summary>
+    internal static void UnmapDevice(uint deviceId, ulong ittVirt)
+    {
+        if (!s_initialized || ittVirt == 0)
+        {
+            return;
+        }
+
+        // Size and ITT_addr are ignored when V=0 (IHI 0069, MAPD); the real
+        // address is passed anyway so the command reads like the MAPD it undoes.
+        EnqueueMapd(deviceId, PageAllocator.VirtualToPhysical(ittVirt), 0, valid: false);
+        EnqueueSync();
+        FlushCommandQueue();
+        PageAllocator.Free((void*)ittVirt);
     }
 
     /// <summary>
@@ -405,6 +437,26 @@ public static unsafe class GICv3Its
         // prop-table byte alone never propagates — the only path that
         // refreshes the cache is an ITS INV / INVALL command.
         EnqueueInv(deviceId, eventId);
+        EnqueueSync();
+        FlushCommandQueue();
+    }
+
+    /// <summary>
+    /// Undo <see cref="MapEvent"/>: DISCARD removes the (deviceId, eventId)
+    /// translation and the pending state of the LPI it pointed at, and the
+    /// SYNC that follows waits for the redistributor to apply that. Once
+    /// this returns the LPI can be freed and handed to another device: a
+    /// late write of this EventID no longer translates, and nothing left
+    /// pending can fire under the next owner's handler. Thread context
+    /// only: the command queue lock is a plain spinlock.
+    /// </summary>
+    internal static void DiscardEvent(uint deviceId, uint eventId)
+    {
+        if (!s_initialized)
+        {
+            return;
+        }
+        EnqueueDiscard(deviceId, eventId);
         EnqueueSync();
         FlushCommandQueue();
     }
@@ -552,6 +604,17 @@ public static unsafe class GICv3Its
     {
         s_cmdLock.Acquire();
         ulong c0 = CMD_INV | ((ulong)deviceId << CMD_DEVICE_ID_SHIFT);
+        ulong c1 = (ulong)eventId;
+        EnqueueRaw(c0, c1, 0, 0);
+        s_cmdLock.Release();
+    }
+
+    private static void EnqueueDiscard(uint deviceId, uint eventId)
+    {
+        s_cmdLock.Acquire();
+        // Same layout as INV (IHI 0069, DISCARD): DeviceID in cmd[0][63:32],
+        // EventID in cmd[1][31:0], cmd[2] and cmd[3] RES0.
+        ulong c0 = CMD_DISCARD | ((ulong)deviceId << CMD_DEVICE_ID_SHIFT);
         ulong c1 = (ulong)eventId;
         EnqueueRaw(c0, c1, 0, 0);
         s_cmdLock.Release();

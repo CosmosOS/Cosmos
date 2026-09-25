@@ -64,11 +64,12 @@ internal class ARM64InterruptController : IInterruptController
     private const uint EcDataAbortCurrentEl = 0x25;
     /// <summary>ESR_EL1 EC: SP alignment fault (EC = 0b100110).</summary>
     private const uint EcSpAlignmentFault = 0x26;
-    private static InterruptManager.IrqDelegate[]? s_lpiHandlers;
+    private static InterruptManager.IrqDelegate?[]? s_lpiHandlers;
     private static int s_nextLpiOffset;
 
-    // Guards s_lpiHandlers RMW in AllocateLpi so concurrent device probes
-    // can't both grab the same slot and silently drop one handler.
+    // Guards s_lpiHandlers RMW in AllocateLpi and FreeLpi so concurrent
+    // device probes can't both grab the same slot and silently drop one
+    // handler.
     private static Scheduler.SpinLock s_lpiLock;
 
     public bool IsInitialized => _initialized;
@@ -83,7 +84,7 @@ internal class ARM64InterruptController : IInterruptController
 
         // Allocate the LPI handler table before the GIC (and therefore ITS)
         // comes online — Arm64MsiBinder can call AllocateLpi mid-bring-up.
-        s_lpiHandlers = new InterruptManager.IrqDelegate[LpiHandlerCount];
+        s_lpiHandlers = new InterruptManager.IrqDelegate?[LpiHandlerCount];
 
         // Initialize the GIC (Generic Interrupt Controller)
         GIC.Initialize();
@@ -152,6 +153,35 @@ internal class ARM64InterruptController : IInterruptController
             s_lpiLock.Release();
         }
         throw new System.InvalidOperationException("ARM64InterruptController: LPI range exhausted");
+    }
+
+    /// <summary>
+    /// Releases an LPI returned by <see cref="AllocateLpi"/>: clears its
+    /// handler so the slot can be handed out again (the allocator's wrap
+    /// pass picks freed slots back up). DISCARD every ITS event mapped to
+    /// it first (<see cref="GICv3Its.DiscardEvent"/>): that removes the
+    /// translation and the pending state, so the next owner never runs on
+    /// an interrupt meant for this one. The LPI stays enabled in the
+    /// configuration table; the next <see cref="GICv3Lpi.EnableLpi"/> writes
+    /// the same byte. INTIDs outside the dispatch window are ignored.
+    /// Thread context only: <see cref="s_lpiLock"/> is a plain spinlock.
+    /// </summary>
+    internal static void FreeLpi(uint lpi)
+    {
+        if (s_lpiHandlers is null || lpi < LpiBase || lpi - LpiBase >= (uint)s_lpiHandlers.Length)
+        {
+            return;
+        }
+
+        s_lpiLock.Acquire();
+        try
+        {
+            s_lpiHandlers[(int)(lpi - LpiBase)] = null;
+        }
+        finally
+        {
+            s_lpiLock.Release();
+        }
     }
 
     public void Dispatch(ref IRQContext ctx)
