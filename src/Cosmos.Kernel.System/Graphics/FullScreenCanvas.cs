@@ -46,10 +46,10 @@ internal static class FullScreenCanvas
     /// Creates the canvas matching the detected display device. Order matters:
     /// virtio-gpu is preferred over SVGA-II when both are present (the test
     /// suite explicitly wires virtio-gpu-pci to check the new path), and GOP
-    /// is the fallback when neither PCI device is bound. On the VMware SVGA II
-    /// adapter the canvas type depends on whether the device negotiated 3D
-    /// support, so users can discover 3D capability with
-    /// <c>canvas is Canvas3D</c>.
+    /// is the fallback when neither PCI device is bound or another driver
+    /// owns the SVGA II adapter. On the VMware SVGA II adapter the canvas
+    /// type depends on whether the device negotiated 3D support, so users can
+    /// discover 3D capability with <c>canvas is Canvas3D</c>.
     /// </summary>
     private static Canvas CreateVideoDriver(Mode? mode)
     {
@@ -67,8 +67,13 @@ internal static class FullScreenCanvas
 
         if (CosmosFeatures.PCIEnabled)
         {
+            // Taken before the constructor programs the adapter. TryClaim
+            // tests and records ownership in one step because this runs on
+            // whichever thread first asks for the screen; an adapter another
+            // driver owns leaves the screen to GOP. A boot display
+            // reservation is no obstacle, this being the adapter's driver.
             PciDevice? svgaDevice = PciManager.GetDevice(VendorId.VmWare, DeviceId.SvgaiiAdapter);
-            if (svgaDevice is not null)
+            if (svgaDevice is not null && svgaDevice.TryClaim(PciOwner.VmwareSvga))
             {
                 SvgaIIDriver driver = new(svgaDevice);
                 Mode svgaMode = mode ?? SvgaIIRender.DefaultMode;

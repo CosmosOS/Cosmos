@@ -151,7 +151,8 @@ internal static class VirtioDevice
 
             // Leave devices we have no driver for untouched (e.g. the
             // virtio-scsi boot CD on ARM64 — still owned by firmware state).
-            if (!WantsDeviceType(deviceType))
+            string? owner = BuiltInOwner(deviceType);
+            if (owner is null)
             {
                 Serial.Write("[VirtioDevice] Skipping virtio PCI device type ");
                 Serial.WriteNumber(deviceType);
@@ -165,17 +166,29 @@ internal static class VirtioDevice
                 continue;
             }
 
-            pci.Claimed = true;
+            // Claimed before the driver comes up: TryCreate has already
+            // mapped the function and set up its MSI-X, so even when the
+            // driver then fails, no other driver should start from that state.
+            if (!pci.TryClaim(owner))
+            {
+                continue;
+            }
+
             RegisterFromTransport(transport);
         }
     }
 
-    private static bool WantsDeviceType(uint deviceType) => deviceType switch
+    /// <summary>
+    /// Names the built-in driver that binds a virtio PCI function of
+    /// <paramref name="deviceType"/>, or null when this kernel has none: the
+    /// type has no driver, or its feature is switched off.
+    /// </summary>
+    private static string? BuiltInOwner(uint deviceType) => deviceType switch
     {
-        VirtioTransport.DeviceTypeNetwork => CosmosFeatures.NetworkEnabled,
-        VirtioTransport.DeviceTypeInput => CosmosFeatures.KeyboardEnabled || CosmosFeatures.MouseEnabled,
-        VirtioTransport.DeviceTypeGpu => CosmosFeatures.GraphicsEnabled,
-        _ => false,
+        VirtioTransport.DeviceTypeNetwork => CosmosFeatures.NetworkEnabled ? PciOwner.VirtioNet : null,
+        VirtioTransport.DeviceTypeInput => CosmosFeatures.KeyboardEnabled || CosmosFeatures.MouseEnabled ? PciOwner.VirtioInput : null,
+        VirtioTransport.DeviceTypeGpu => CosmosFeatures.GraphicsEnabled ? PciOwner.VirtioGpu : null,
+        _ => null,
     };
 
     private static void RegisterFromTransport(VirtioTransport transport)

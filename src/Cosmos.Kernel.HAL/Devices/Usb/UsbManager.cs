@@ -117,7 +117,9 @@ internal static class UsbManager
             {
                 XhciController controller = new(pci, controllers.Count);
                 controller.Initialize();
-                pci.Claimed = true;
+                // Cannot be refused: this scan runs at boot, before any
+                // other driver can own a USB host controller.
+                _ = pci.TryClaim(PciOwner.Xhci);
                 controllers.Add(controller);
             }
             catch (Exception ex)
