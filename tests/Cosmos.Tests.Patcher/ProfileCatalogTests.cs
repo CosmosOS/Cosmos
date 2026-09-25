@@ -129,6 +129,87 @@ public class ProfileCatalogTests
         Assert.Null(bare.VgaAdapter);
     }
 
+    // The "devices" and "usb" axes are additive: a profile naming neither
+    // must emit, byte for byte, the arguments it emitted before they existed.
+    // Pinned on the cells that run through the code the axes share: a USB
+    // stick (the xHCI controller the "usb" axis now joins, with the ids
+    // QemuHotPlug addresses the stick by) and a NIC (AppendNetworkCardArgs,
+    // which the "devices" axis reuses for its NIC models).
+    [Theory]
+    [InlineData("Storage", "usb", "x64")]
+    [InlineData("Storage", "usb", "arm64")]
+    public void UsbStickProfileKeepsItsOriginalArguments(string suiteName, string profileName, string architecture)
+    {
+        TestProfile cell = LoadCell(suiteName, profileName, architecture);
+
+        Assert.Empty(cell.UsbDevices);
+        Assert.Equal(
+            " -device qemu-xhci,id=usbxhci0" +
+            " -drive file=\"/tmp/disk0.img\",if=none,id=usbdisk0,format=raw" +
+            " -device usb-storage,drive=usbdisk0,bus=usbxhci0.0,id=usbstick0",
+            ProfileLaunchArgs.For(cell, architecture));
+    }
+
+    [Theory]
+    [InlineData("x64", "virtio-pci", " -netdev user,id=net0 -device virtio-net-pci,netdev=net0 -device virtio-keyboard-pci -device virtio-mouse-pci")]
+    [InlineData("arm64", "virtio-mmio", " -netdev user,id=net0 -device virtio-net-device,netdev=net0 -device virtio-keyboard-device -device virtio-mouse-device")]
+    public void VirtioProfilesKeepTheirOriginalArguments(string architecture, string profileName, string expected)
+    {
+        TestProfile cell = LoadCell("Virtio", profileName, architecture);
+
+        Assert.Empty(cell.Devices);
+        Assert.Equal(expected, ProfileLaunchArgs.For(cell, architecture));
+    }
+
+    // The Drivers suite's cells are the only runs with hardware no built-in
+    // driver claims, and the driver kit's binding cells will be written
+    // against them. Losing one would fail nothing: the suite would just stop
+    // presenting that device. Pinned here are the cells, what each attaches,
+    // and the arguments that attach it.
+    [Theory]
+    [InlineData("x64", "edu", " -device edu")]
+    [InlineData("x64", "rtl8139", " -netdev user,id=devnet0 -device rtl8139,netdev=devnet0")]
+    [InlineData("x64", "usb-mouse", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0")]
+    [InlineData("arm64", "edu", " -device edu")]
+    [InlineData("arm64", "rtl8139", " -netdev user,id=devnet0 -device rtl8139,netdev=devnet0")]
+    [InlineData("arm64", "e1000e-arm64", " -netdev user,id=devnet0 -device e1000e,netdev=devnet0")]
+    [InlineData("arm64", "usb-mouse", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0")]
+    public void DriversSuiteAttachesOneUnclaimedDevicePerProfile(string architecture, string profileName, string expected)
+    {
+        TestProfile cell = LoadCell("Drivers", profileName, architecture);
+
+        Assert.Empty(cell.Disks);
+        Assert.Null(cell.NetworkCard);
+        Assert.Equal(expected, ProfileLaunchArgs.For(cell, architecture));
+    }
+
+    // The E1000E built-in claims the 82574L on x64, so only arm64 presents it
+    // unclaimed, and a driver there gets MSI-X only through the GICv3 ITS.
+    // The USB mouse runs on both GICs: xHCI takes MSI-X on GICv3 and is
+    // polled on GICv2.
+    [Fact]
+    public void DriversSuiteCoversTheGicVersionsItsCellsNeed()
+    {
+        string suiteDir = Path.Combine(FindRepoRoot(), "tests", "Kernels", "Cosmos.Kernel.Tests.Drivers");
+
+        IReadOnlyList<TestProfile> x64Cells = TestProfileLoader.LoadFor(suiteDir, "x64");
+        string[] x64Names = ["edu", "rtl8139", "usb-mouse"];
+        Assert.Equal(x64Names, x64Cells.Select(c => c.Name).ToArray());
+        Assert.All(x64Cells, c => Assert.False(c.MachineOptions.ContainsKey("gic-version")));
+
+        IReadOnlyList<TestProfile> arm64Cells = TestProfileLoader.LoadFor(suiteDir, "arm64");
+        Assert.Equal("3", Assert.Single(arm64Cells, c => c.Name == "e1000e-arm64+gicv3").MachineOptions["gic-version"]);
+        Assert.Equal("2", Assert.Single(arm64Cells, c => c.Name == "usb-mouse+gicv2").MachineOptions["gic-version"]);
+        Assert.Equal("3", Assert.Single(arm64Cells, c => c.Name == "usb-mouse+gicv3").MachineOptions["gic-version"]);
+    }
+
+    /// <summary>Loads one suite for one architecture and returns its bare cell for <paramref name="profileName"/>.</summary>
+    private static TestProfile LoadCell(string suiteName, string profileName, string architecture)
+    {
+        string suiteDir = Path.Combine(FindRepoRoot(), "tests", "Kernels", $"Cosmos.Kernel.Tests.{suiteName}");
+        return Assert.Single(TestProfileLoader.LoadFor(suiteDir, architecture), c => c.Name == profileName);
+    }
+
     // The virtio-gpu cell is the only run with a virtio GPU on the bus, and it
     // has to stay ADDITIVE: it attaches the device with -device and leaves the
     // machine default alone, because that default is what hands Limine the

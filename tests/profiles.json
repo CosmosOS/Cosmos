@@ -150,6 +150,46 @@
       "nic": "virtio-net-device",
       "keyboard": "virtio-keyboard-device",
       "mouse": "virtio-mouse-device"
+    },
+    {
+      // The four profiles below are the Drivers suite's cells: hardware no
+      // built-in driver claims, left for a user driver to bind. Each adds
+      // one piece of it to the machine's defaults, so the suite can pin that
+      // exactly one such function or interface came up and that nothing
+      // owns it.
+      //
+      // QEMU's educational device (1234:11e8): an MMIO BAR with an ID
+      // register, a factorial unit, an interrupt it raises on request and a
+      // DMA engine.
+      "name": "edu",
+      "architectures": ["x64", "arm64"],
+      "devices": ["edu"]
+    },
+    {
+      // Realtek RTL8139 (10ec:8139), which no built-in driver takes on
+      // either arch. Its user-mode netdev gives it a DHCP server to get a
+      // lease from; like "nic", that drops QEMU's default NIC.
+      "name": "rtl8139",
+      "architectures": ["x64", "arm64"],
+      "devices": ["rtl8139"]
+    },
+    {
+      // Intel 82574L (8086:10d3). The E1000E built-in claims it on x64, so
+      // only arm64 presents it unclaimed. No gic-version here: a suite pins
+      // the GIC with the gicv2/gicv3 modifiers, and a modifier overwrites a
+      // profile's own -M value rather than conflicting with it, so a GICv3
+      // pin here would turn silently into GICv2 under +gicv2.
+      "name": "e1000e-arm64",
+      "architectures": ["arm64"],
+      "devices": ["e1000e"]
+    },
+    {
+      // A USB mouse on a qemu-xhci root port, and no USB stick. The xHCI
+      // built-in owns the controller; no class driver takes a HID mouse
+      // interface (class 3, subclass 1, protocol 2), so it stays unbound.
+      "name": "usb-mouse",
+      "architectures": ["x64", "arm64"],
+      "usb": ["usb-mouse"]
     }
   ],
   "modifiers": [

@@ -74,6 +74,7 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 |-------|-------|-------------|
 | **HelloWorld** | 3 | Basic arithmetic, boolean logic, integer comparison |
 | **Memory** | 85 | Boxing/unboxing, memory allocation, collections, memory copy, GC |
+| **Drivers** | 7 per cell | Hardware no built-in driver claims: enumerated, and left free for a driver kernels register |
 
 #### HelloWorld Tests
 
@@ -127,6 +128,25 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 - `GC_WeakReference`, `GC_LargeAllocCollect`, `GC_StructArraySurvival`
 - `GC_DictSurvival`, `GC_PageAccounting`, `GC_DependentHandle`
 - `GC_DependentHandleCleanup`, `GC_HandleStoreIntegrity`, `GC_PinnedHeapReuse`
+
+#### Drivers Tests
+
+The groundwork for the driver kit. Each [profile](#hardware-profiles) attaches one piece of hardware that no built-in driver claims, and the suite checks that the kernel sees it and leaves it free. The binding tests arrive with the driver engine and build on these cells.
+
+| Profile | Architectures | Hardware |
+|---------|---------------|----------|
+| `edu` | x64, arm64 | QEMU's edu test device (1234:11e8) |
+| `rtl8139` | x64, arm64 | A Realtek RTL8139 NIC (10ec:8139) with a user-mode netdev |
+| `e1000e-arm64` | arm64 | An Intel 82574L NIC (8086:10d3), which the E1000E built-in claims on x64 only |
+| `usb-mouse` | x64, arm64 | A USB mouse on a `qemu-xhci` root port, and no USB stick |
+
+The `gicv2` and `gicv3` modifiers run every profile on both GICs on arm64, so x64 has 3 cells and arm64 has 12. Every cell reports the same 7 tests, and each test is skipped on the cells whose profile attaches other hardware:
+
+- `Profile_Recognized`: the cell's profile is one of the four above, since a profile the suite does not know would otherwise skip everything
+- `Pci_ProfileFunctionEnumeratedOnce`, `Pci_ProfileFunctionClassMatches`, `Pci_ProfileFunctionUnowned`: the profile's PCI function was enumerated exactly once, with the expected base class and subclass, and has no owner
+- `Usb_XhciOwnedByXhci`, `Usb_MouseEnumeratedOnce`, `Usb_MouseInterfaceUnbound`: the xHCI controller is owned by `xhci`, exactly one device presents a HID boot mouse interface (class 3, subclass 1, protocol 2), and no class driver is bound to it
+
+The suite reads HAL internals through a temporary `InternalsVisibleTo` grant, which goes away once the driver kit's public API lands.
 
 ### Running Kernel Tests
 
