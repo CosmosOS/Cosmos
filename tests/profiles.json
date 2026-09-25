@@ -4,9 +4,22 @@
   //     devices ("keyboard"/"mouse"), VGA adapter ("vga", a -vga backend
   //     name that REPLACES the architecture default rather than adding a
   //     second adapter) and display device ("gpu", a -device model ADDED
-  //     alongside that default) attached. An optional "architectures" filter
-  //     pins a profile to the arch that can present that hardware; a suite
-  //     listing per-arch profiles runs the matching one on each.
+  //     alongside that default) attached, plus two list axes:
+  //       - "devices": extra -device models, e.g. ["edu"] or ["rtl8139"].
+  //         Each must be a model ProfileDeviceModels (test runner) knows,
+  //         so a typo fails the catalog load rather than QEMU. A NIC model
+  //         gets a user-mode netdev of its own, and like "nic" that drops
+  //         QEMU's default NIC.
+  //       - "usb": USB models, e.g. ["usb-mouse", "usb-kbd"], checked the
+  //         same way and placed on one qemu-xhci controller, the one a USB
+  //         disk uses when the profile has one. This is the axis for USB
+  //         devices: "mouse"/"keyboard" emit a bare -device, and neither q35
+  //         nor virt has a USB bus of its own to put it on.
+  //     Entries are plain strings, not objects, and a model appears once per
+  //     profile, counting "nic", "keyboard", "mouse" and "gpu" too.
+  //     An optional "architectures" filter pins a profile to the arch that
+  //     can present that hardware; a suite listing per-arch profiles runs
+  //     the matching one on each.
   //   * modifiers — generic knobs that compose with a profile. Two flavors:
   //       - deviceOptions: per-disk-kind overrides (msix tuning, cache mode)
   //       - machineOptions: -M property overrides (gic-version, ...)

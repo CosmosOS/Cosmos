@@ -82,6 +82,25 @@ public sealed class QemuLaunchOptions
     public IReadOnlyList<DiskAttachment> Disks { get; init; } = Array.Empty<DiskAttachment>();
 
     /// <summary>
+    /// Extra <c>-device</c> models attached after the NIC, input and display
+    /// selections, or empty for none. A NIC model
+    /// (<see cref="DeviceAttachment.IsNetworkCard"/>) gets a user-mode netdev
+    /// of its own, <c>devnet0</c> for the first. Passing any <c>-netdev</c>
+    /// makes QEMU leave out its default NIC, so a NIC here replaces that
+    /// default exactly as <see cref="NetworkCard"/> does.
+    /// </summary>
+    public IReadOnlyList<DeviceAttachment> Devices { get; init; } = Array.Empty<DeviceAttachment>();
+
+    /// <summary>
+    /// USB device models (e.g. <c>usb-mouse</c>, <c>usb-kbd</c>) placed on the
+    /// root hub of the <c>qemu-xhci</c> controller that USB disks use, which
+    /// is added for them when no USB disk already brought it. Needed on both
+    /// x64 (q35) and ARM64 (virt), since neither machine has a USB bus of its
+    /// own for a bare <c>-device usb-*</c> to land on.
+    /// </summary>
+    public IReadOnlyList<string> UsbDevices { get; init; } = Array.Empty<string>();
+
+    /// <summary>
     /// Extra <c>-M</c> machine properties spliced after the architecture
     /// defaults (e.g. <c>{"gic-version", "2"}</c> on ARM64 to force GICv2).
     /// Empty by default. Caller is responsible for passing properties that
@@ -161,7 +180,10 @@ public static class QemuLauncher
     /// </summary>
     private const int NetworkTestRawSocketPort = 5560;
 
-    /// <summary>QEMU id of the xHCI controller USB disks sit on; its root hub is the bus <c>usbxhci0.0</c>.</summary>
+    /// <summary>Netdev id of the NIC a launch selects with <see cref="QemuLaunchOptions.NetworkCard"/>.</summary>
+    private const string DefaultNetdevId = "net0";
+
+    /// <summary>QEMU id of the xHCI controller USB disks and USB devices sit on; its root hub is the bus <c>usbxhci0.0</c>.</summary>
     public const string UsbControllerId = "usbxhci0";
 
     /// <summary>QEMU id of the drive behind the <paramref name="index"/>th USB disk.</summary>
@@ -235,6 +257,37 @@ public static class QemuLauncher
             args.Append(" -serial stdio");
         }
 
+        AppendAttachedDevices(args, options);
+
+        if (options.MonitorPort is int monitorPort)
+        {
+            args.Append($" -chardev socket,id=qmp0,host=127.0.0.1,port={monitorPort} -mon chardev=qmp0,mode=control");
+        }
+
+        if (options.Debug)
+        {
+            args.Append(" -s -S");
+        }
+
+        foreach (string extra in options.ExtraArgs)
+        {
+            args.Append(' ');
+            args.Append(extra);
+        }
+
+        return new QemuLaunchPlan(resolved.Path, args.ToString().TrimStart(), resolved.Source);
+    }
+
+    /// <summary>
+    /// Emits what the guest gets besides the machine, its boot drive and its
+    /// disks: the NIC (through the network-testing hub when asked), the input
+    /// devices, the display adapters, then <see cref="QemuLaunchOptions.Devices"/>.
+    /// Kept apart from <see cref="BuildAsync"/> because nothing in it depends
+    /// on the host, so a test can pin the exact arguments a profile produces
+    /// without resolving a QEMU binary or probing for KVM.
+    /// </summary>
+    internal static void AppendAttachedDevices(StringBuilder args, QemuLaunchOptions options)
+    {
         if (options.EnableNetworkTesting)
         {
             string nic = ResolveNetworkTestNic(options.Architecture, options.NetworkCard);
@@ -258,24 +311,7 @@ public static class QemuLauncher
         AppendInputDevice(args, options.MouseDevice);
         AppendVgaAdapter(args, options.VgaAdapter);
         AppendGpuDevice(args, options.GpuDevice);
-
-        if (options.MonitorPort is int monitorPort)
-        {
-            args.Append($" -chardev socket,id=qmp0,host=127.0.0.1,port={monitorPort} -mon chardev=qmp0,mode=control");
-        }
-
-        if (options.Debug)
-        {
-            args.Append(" -s -S");
-        }
-
-        foreach (string extra in options.ExtraArgs)
-        {
-            args.Append(' ');
-            args.Append(extra);
-        }
-
-        return new QemuLaunchPlan(resolved.Path, args.ToString().TrimStart(), resolved.Source);
+        AppendExtraDevices(args, options.Devices);
     }
 
     private static void AppendX64Args(StringBuilder args, QemuLaunchOptions options)
@@ -385,11 +421,12 @@ public static class QemuLauncher
     }
 
     /// <summary>
-    /// Attach AHCI/SATA, NVMe and USB disks. AHCI disks share one <c>ich9-ahci</c>
+    /// Attach AHCI/SATA, NVMe and USB disks, then the
+    /// <see cref="QemuLaunchOptions.UsbDevices"/>. AHCI disks share one <c>ich9-ahci</c>
     /// controller and consume successive ports; NVMe disks each get a
     /// dedicated <c>nvme</c> controller so the guest exercises multi-controller
     /// binding; USB disks are <c>usb-storage</c> sticks on one shared
-    /// <c>qemu-xhci</c> controller. Per-disk <see cref="DiskAttachment.ExtraDeviceOptions"/> is
+    /// <c>qemu-xhci</c> controller, which the USB devices then join. Per-disk <see cref="DiskAttachment.ExtraDeviceOptions"/> is
     /// appended after the standard device properties so profiles can flip
     /// things like <c>msix=off</c>.
     /// </summary>
@@ -427,7 +464,7 @@ public static class QemuLauncher
                 case DiskKind.Usb:
                     if (!usbControllerEmitted)
                     {
-                        args.Append($" -device qemu-xhci,id={UsbControllerId}");
+                        AppendUsbController(args);
                         usbControllerEmitted = true;
                     }
                     args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={UsbDriveId(usbIndex)},format=raw");
@@ -437,15 +474,71 @@ public static class QemuLauncher
                     break;
             }
         }
+
+        AppendUsbDevices(args, options.UsbDevices, usbControllerEmitted);
+    }
+
+    private static void AppendUsbController(StringBuilder args) =>
+        args.Append($" -device qemu-xhci,id={UsbControllerId}");
+
+    /// <summary>
+    /// Places each USB device model on the root hub of the xHCI controller,
+    /// adding the controller first unless a USB disk already did
+    /// (<paramref name="controllerPresent"/>). One controller serves both: a
+    /// second one would give the guest a second xHCI function to bring up,
+    /// changing what the cell tests. The explicit <c>bus=</c> pins each device
+    /// to the controller whose bus <c>QemuHotPlug</c> plugs sticks back into.
+    /// </summary>
+    internal static void AppendUsbDevices(StringBuilder args, IReadOnlyList<string> models, bool controllerPresent)
+    {
+        if (models.Count == 0)
+        {
+            return;
+        }
+
+        if (!controllerPresent)
+        {
+            AppendUsbController(args);
+        }
+
+        foreach (string model in models)
+        {
+            ValidateOptionToken(model, "USB device model");
+            args.Append($" -device {model},bus={UsbControllerId}.0");
+        }
+    }
+
+    /// <summary>
+    /// Attaches each extra device model as a <c>-device</c> line, in order. A
+    /// NIC model goes through <see cref="AppendNetworkCardArgs"/> with a netdev
+    /// of its own (<c>devnet0</c>, <c>devnet1</c>, ...), so it never collides
+    /// with <c>net0</c>, which the profile's own NIC and the network-testing
+    /// hub use.
+    /// </summary>
+    internal static void AppendExtraDevices(StringBuilder args, IReadOnlyList<DeviceAttachment> devices)
+    {
+        int networkCardIndex = 0;
+        foreach (DeviceAttachment device in devices)
+        {
+            if (device.IsNetworkCard)
+            {
+                AppendNetworkCardArgs(args, device.Model, $"devnet{networkCardIndex}");
+                networkCardIndex++;
+                continue;
+            }
+
+            ValidateOptionToken(device.Model, "device model");
+            args.Append($" -device {device.Model}");
+        }
     }
 
     /// <summary>
     /// Emits the NIC selection: <c>"none"</c> disables QEMU's default card with
-    /// <c>-nic none</c>; any other value attaches a user-mode NIC of that model.
-    /// The model is validated as an option token so it can't splice extra
-    /// arguments into the command line.
+    /// <c>-nic none</c>; any other value attaches a user-mode NIC of that model
+    /// on the netdev <paramref name="netdevId"/>. The model is validated as an
+    /// option token so it can't splice extra arguments into the command line.
     /// </summary>
-    internal static void AppendNetworkCardArgs(StringBuilder args, string card)
+    internal static void AppendNetworkCardArgs(StringBuilder args, string card, string netdevId = DefaultNetdevId)
     {
         if (card.Equals("none", StringComparison.OrdinalIgnoreCase))
         {
@@ -454,7 +547,7 @@ public static class QemuLauncher
         }
 
         ValidateOptionToken(card, "network card model");
-        args.Append($" -netdev user,id=net0 -device {card},netdev=net0");
+        args.Append($" -netdev user,id={netdevId} -device {card},netdev={netdevId}");
     }
 
     /// <summary>

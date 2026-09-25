@@ -16,12 +16,16 @@ namespace Cosmos.TestRunner.Engine;
 /// <param name="MouseDevice">Mouse model, e.g. <c>virtio-mouse-pci</c>.</param>
 /// <param name="VgaAdapter">VGA adapter as a <c>-vga</c> backend name, e.g. <c>vmware</c> — replaces the default adapter rather than adding a second one.</param>
 /// <param name="GpuDevice">Display adapter attached as a <c>-device</c> line, e.g. <c>virtio-gpu-pci</c> — added alongside the default adapter rather than replacing it.</param>
+/// <param name="Devices">Extra <c>-device</c> models from the profile's "devices" axis, e.g. <c>edu</c>; null or empty for none.</param>
+/// <param name="UsbDevices">USB models from the profile's "usb" axis, e.g. <c>usb-mouse</c>, placed on the xHCI controller USB disks share; null or empty for none.</param>
 public sealed record ProfileDevices(
     string? NetworkCard,
     string? KeyboardDevice,
     string? MouseDevice,
     string? VgaAdapter,
-    string? GpuDevice = null);
+    string? GpuDevice = null,
+    IReadOnlyList<DeviceAttachment>? Devices = null,
+    IReadOnlyList<string>? UsbDevices = null);
 
 /// <summary>
 /// Interface for QEMU virtual machine hosts that can run test kernels
@@ -43,7 +47,7 @@ public interface IQemuHost
     /// <param name="enableNetworkTesting">Enable UDP test server for network tests (default false)</param>
     /// <param name="disks">Per-profile disk attachments. AHCI entries share one <c>ich9-ahci</c> controller; NVMe entries each get their own <c>nvme</c> controller; USB entries share one <c>qemu-xhci</c> controller. Per-disk extra device options (e.g. <c>msix=off</c>) flow through.</param>
     /// <param name="machineOptions">Extra <c>-M</c> properties (e.g. <c>{"gic-version", "2"}</c> on ARM64). Caller is responsible for passing arch-appropriate keys.</param>
-    /// <param name="devices">Per-profile NIC and input device models; null leaves the architecture defaults in place.</param>
+    /// <param name="devices">Per-profile NIC, input, display, extra and USB device models; null leaves the architecture defaults in place.</param>
     /// <param name="hotPlug">Carries out the guest's requests to plug its USB sticks in and out, through the QMP monitor QEMU is launched with; null when the run attaches none.</param>
     /// <returns>Exit code and UART log content</returns>
     Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuHotPlug? hotPlug = null);
