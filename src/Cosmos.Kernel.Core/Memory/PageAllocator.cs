@@ -67,6 +67,17 @@ internal static unsafe class PageAllocator
     private static byte* s_heapEnd;
 
     /// <summary>
+    /// Guards the RAT and <see cref="FreePageCount"/> in <see cref="AllocPages"/>
+    /// and <see cref="Free(uint)"/>. IRQ-safe because the masked heap and
+    /// preemptible driver threads both allocate pages. Held over RAT reads
+    /// and writes only: anything under it that allocates or throws would
+    /// re-enter <see cref="AllocPages"/> with interrupts masked and spin on
+    /// itself. Plain zeroed static data, so it works from the first
+    /// allocation in <see cref="InitializeHeap"/>, before any thread exists.
+    /// </summary>
+    private static Scheduler.SpinLock s_ratLock;
+
+    /// <summary>
     /// Size of heap.
     /// </summary>
     public static ulong RamSize;
@@ -525,62 +536,61 @@ internal static unsafe class PageAllocator
     /// </summary>
     /// <param name="aType">A type of pages to alloc.</param>
     /// <param name="aPageCount">Number of pages to alloc. (default = 1)</param>
-    /// <param name="zero"></param>
+    /// <param name="zero">When true, the pages are cleared before they are returned.</param>
     /// <returns>A pointer to the first page on success, null on failure.</returns>
     public static void* AllocPages(PageType aType, ulong aPageCount = 1, bool zero = false)
     {
-        Serial.WriteString("[PageAllocator] AllocPages - Type: ");
-        Serial.WriteNumber((uint)aType);
-        Serial.WriteString(", Count: ");
-        Serial.WriteNumber(aPageCount);
-        Serial.WriteString(", Free: ");
-        Serial.WriteNumber(FreePageCount);
-        Serial.WriteString("\n");
+        byte* pageAddress;
 
-        byte* startPage = null;
+        // The scan and the mark are one step under the lock: a preemption
+        // between finding an empty run and claiming it would let another
+        // thread claim the same pages.
+        using (s_ratLock.AcquireIrqSafe())
+        {
+            byte* startPage = null;
 
-        // Could combine with an external method or delegate, but will slow things down
-        // unless we can force it to be inlined.
-        // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
-        uint xCount = 0;
-        if (aPageCount == 1)
-        {
-            for (byte* ptr = s_mRAT; ptr < s_mRAT + TotalPageCount; ptr++)
+            // Could combine with an external method or delegate, but will slow things down
+            // unless we can force it to be inlined.
+            // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
+            uint xCount = 0;
+            if (aPageCount == 1)
             {
-                if ((PageType)(*ptr) == PageType.Empty)
+                for (byte* ptr = s_mRAT; ptr < s_mRAT + TotalPageCount; ptr++)
                 {
-                    startPage = ptr;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            // This loop will FAIL if s_mRAT is ever 0. This should be impossible though
-            // so we don't bother to account for such a case. xPos would also have issues.
-            for (byte* ptr = s_mRAT + TotalPageCount - 1; ptr >= s_mRAT; ptr--)
-            {
-                if (*ptr == (byte)PageType.Empty)
-                {
-                    if (++xCount == aPageCount)
+                    if ((PageType)(*ptr) == PageType.Empty)
                     {
                         startPage = ptr;
                         break;
                     }
                 }
-                else
+            }
+            else
+            {
+                // This loop will FAIL if s_mRAT is ever 0. This should be impossible though
+                // so we don't bother to account for such a case. xPos would also have issues.
+                for (byte* ptr = s_mRAT + TotalPageCount - 1; ptr >= s_mRAT; ptr--)
                 {
-                    xCount = 0;
+                    if (*ptr == (byte)PageType.Empty)
+                    {
+                        if (++xCount == aPageCount)
+                        {
+                            startPage = ptr;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        xCount = 0;
+                    }
                 }
             }
-        }
 
-        // If we found enough space, mark it as used.
-        if (startPage != null)
-        {
+            if (startPage == null)
+            {
+                return null;
+            }
+
             long offset = startPage - s_mRAT;
-            byte* pageAddress = RamStart + (ulong)offset * PageSize;
-
             if ((ulong)offset >= TotalPageCount)
             {
                 return null;
@@ -593,22 +603,24 @@ internal static unsafe class PageAllocator
                 s_mRAT[(ulong)offset + i] = (byte)PageType.Extension;
             }
 
-            if (zero)
-            {
-                ulong* ptr = (ulong*)pageAddress;
-                ulong count = (PageSize * aPageCount) / sizeof(ulong);
-                for (ulong i = 0; i < count; i++)
-                {
-                    ptr[i] = 0;
-                }
-            }
-
             FreePageCount -= aPageCount;
-
-            return pageAddress;
+            pageAddress = RamStart + (ulong)offset * PageSize;
         }
 
-        return null;
+        // Cleared after the lock is released: the run is already marked as
+        // ours, and clearing a large run with interrupts masked would hold
+        // off every IRQ for as long as the clear takes.
+        if (zero)
+        {
+            ulong* ptr = (ulong*)pageAddress;
+            ulong count = (PageSize * aPageCount) / sizeof(ulong);
+            for (ulong i = 0; i < count; i++)
+            {
+                ptr[i] = 0;
+            }
+        }
+
+        return pageAddress;
     }
 
     /// <summary>
@@ -661,26 +673,36 @@ internal static unsafe class PageAllocator
     /// <param name="aPageIdx">A index to the page to be freed.</param>
     public static void Free(uint aPageIdx)
     {
-        byte* p = s_mRAT + aPageIdx;
-        *p = (byte)PageType.Empty;
-        FreePageCount++;
-        for (; p < s_mRAT + TotalPageCount;)
+        // Same lock as AllocPages: a concurrent scan must not see a run
+        // half-released, and FreePageCount is a read-modify-write.
+        using (s_ratLock.AcquireIrqSafe())
         {
-            if (*++p != (byte)PageType.Extension)
-            {
-                break;
-            }
-
+            byte* p = s_mRAT + aPageIdx;
+            byte* ratEnd = s_mRAT + TotalPageCount;
             *p = (byte)PageType.Empty;
             FreePageCount++;
+
+            // Bound checked before the read: a run that ends on the last page
+            // must not read the byte past the RAT to look for more Extension entries.
+            for (p++; p < ratEnd && *p == (byte)PageType.Extension; p++)
+            {
+                *p = (byte)PageType.Empty;
+                FreePageCount++;
+            }
         }
     }
 
     /// <summary>
     /// Free the page this pointer points to
     /// </summary>
-    /// <param name="aPtr"></param>
+    /// <param name="aPtr">A pointer into the run to free.</param>
+    /// <remarks>
+    /// The head lookup runs outside the lock: it only walks entries of the
+    /// caller's own run, which nothing else writes, and it can throw, which
+    /// allocates and would re-enter <see cref="AllocPages"/> under the lock.
+    /// </remarks>
     public static void Free(void* aPtr) => Free(GetFirstPageAllocatorIndex(aPtr));
+
     /// <summary>
     /// Fills out per-PageType counts by scanning the RAT. Returns zeros when
     /// the heap is not yet initialized. Used by the live-debug snapshot so
