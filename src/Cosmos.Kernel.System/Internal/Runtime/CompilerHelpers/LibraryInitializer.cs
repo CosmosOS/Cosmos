@@ -50,9 +50,14 @@ internal class LibraryInitializer
                         KeyboardManager.RegisterKeyboard(keyboard);
                     }
 
-                    // USB keyboards plugged in or pulled out from now on.
-                    UsbKeyboardDriver.KeyboardAttached = KeyboardManager.RegisterKeyboard;
-                    UsbKeyboardDriver.KeyboardDetached = KeyboardManager.UnregisterKeyboard;
+                    // USB keyboards plugged in or pulled out from now on. Nested
+                    // under USB's own switch so a kernel without USB never
+                    // references the USB keyboard driver and ILC trims it.
+                    if (CosmosFeatures.UsbEnabled)
+                    {
+                        UsbKeyboardDriver.KeyboardAttached = KeyboardManager.RegisterKeyboard;
+                        UsbKeyboardDriver.KeyboardDetached = KeyboardManager.UnregisterKeyboard;
+                    }
                 }
 
                 // Initialize Mouse Manager and register mouse

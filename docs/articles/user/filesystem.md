@@ -27,7 +27,7 @@ Storage support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot the kernel initializes `StorageManager`, which registers every AHCI, NVMe and USB mass storage device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`. USB sticks and disks come up as `usb0`, `usb1`, ... after the internal disks, so the first internal disk stays the primary device.
+At boot the kernel initializes `StorageManager`, which registers every AHCI, NVMe and USB mass storage device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`. USB sticks and disks come up as `usb0`, `usb1`, ... after the internal disks, so the first internal disk stays the primary device. They also need the USB stack, `CosmosEnableUsb`, which is on by default whenever `CosmosEnableStorage` is. Setting it to `false` keeps AHCI and NVMe disks and drops USB ones.
 
 USB disks can also be plugged in and pulled out while the kernel runs. One plugged in is registered and scanned like a disk found at boot, under the lowest `usbN` name free. One pulled out leaves `StorageManager.Devices` and `StorageManager.Partitions`, the mounts made on its partitions with the `Partition` overload of `TryMount` (below) are detached, and files still open on it fail with `IOException`. A mount made from a source string names no disk, so it stays, and fails its I/O the same way. A detached mount is not flushed, since the disk is gone, so call `VfsManager.TryUnmount` before pulling a disk out. Both lists can change between two reads while a USB disk comes or goes: read `Devices` or `Partitions` once and index that copy.
 

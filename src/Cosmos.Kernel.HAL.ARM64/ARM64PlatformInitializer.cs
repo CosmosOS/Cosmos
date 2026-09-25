@@ -165,7 +165,10 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        return [.. VirtioDevice.GetKeyboards(), .. UsbKeyboardDriver.GetKeyboards()];
+        // Behind USB's own switch so a kernel without USB never references
+        // the USB keyboard driver and ILC trims it.
+        IKeyboardDevice[] usb = CosmosFeatures.UsbEnabled ? UsbKeyboardDriver.GetKeyboards() : [];
+        return [.. VirtioDevice.GetKeyboards(), .. usb];
     }
 
     public IMouseDevice[] GetMouseDevices()
