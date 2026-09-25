@@ -53,14 +53,20 @@ internal interface IPlatformInitializer
     void PreparePciMapping(ulong ecamBase);
 
     /// <summary>
-    /// Maps a physical MMIO region so the HHDM-virtual alias is accessible
-    /// with Device-memory attributes. Called by HAL device drivers (AHCI,
-    /// NVMe, etc.) before touching their BARs. ARM64 installs a Device
-    /// mapping in TTBR1 via <c>DeviceMapper.EnsureMapped</c>; x64's existing
-    /// page tables already cover MMIO so it's a no-op.
+    /// Maps the 2 MiB block containing a physical MMIO address so its
+    /// HHDM-virtual alias is accessible with Device-memory attributes.
+    /// Called by HAL device drivers (AHCI, NVMe, etc.) before touching their
+    /// BARs. ARM64 installs a Device mapping in TTBR1 via
+    /// <c>DeviceMapper.EnsureMapped</c>; x64 maps only blocks above 4 GiB,
+    /// since Limine's page tables already cover the low 4 GiB.
     /// </summary>
     /// <param name="physBase">Physical base address of the MMIO region.</param>
-    void EnsureMmioMapped(ulong physBase);
+    /// <returns>
+    /// True when the block is mapped on return, including when it already
+    /// was; false when it could not be mapped and its HHDM alias must not be
+    /// dereferenced.
+    /// </returns>
+    bool EnsureMmioMapped(ulong physBase);
 
     /// <summary>
     /// Full data-synchronization barrier ordering prior normal-memory

@@ -4,6 +4,7 @@ using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.X64.Bridge;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.Core.X64.Cpu;
 
@@ -43,29 +44,62 @@ public static unsafe class DeviceMapper
     private const ulong TableIndexMask = 0x1FF;
 
     /// <summary>
+    /// Serializes page-table walks and edits. Without it, two threads
+    /// mapping blocks under the same empty PML4 or PDPT slot can each
+    /// allocate a table and link it: the second link overwrites the first,
+    /// and the mappings made through the first table vanish with it.
+    /// IRQ-safe so a preemption never parks a holder mid-edit while another
+    /// thread spins on it. Lock order: this lock may take the
+    /// <see cref="PageAllocator"/> lock beneath it (table allocation), never
+    /// the reverse, and nothing under it may call <see cref="EnsureMapped"/>
+    /// again: the lock is not reentrant.
+    /// </summary>
+    private static SchedSpinLock s_lock;
+
+    /// <summary>
     /// Ensures the 2 MiB block containing <paramref name="physBase"/> is
     /// mapped at (phys + HHDM offset). No-op when the block is already
     /// mapped (in particular the whole Limine-covered low 4 GiB). Safe to
-    /// call multiple times.
+    /// call multiple times and from concurrent threads.
     /// </summary>
-    public static void EnsureMapped(ulong physBase)
+    /// <returns>
+    /// True when the block is mapped on return, whether this call installed
+    /// the mapping or found one; false when there is no HHDM or a page-table
+    /// allocation failed.
+    /// </returns>
+    public static bool EnsureMapped(ulong physBase)
     {
         if (Limine.HHDM.Response == null)
         {
-            return;
+            return false;
         }
 
         ulong hhdm = Limine.HHDM.Response->Offset;
         ulong alignedPhys = physBase & Align2MiB;
         ulong virt = alignedPhys + hhdm;
 
+        using (s_lock.AcquireIrqSafe())
+        {
+            return MapBlock(alignedPhys, virt, hhdm);
+        }
+    }
+
+    /// <summary>
+    /// Walks CR3's tables to the PD slot covering <paramref name="virt"/>
+    /// and installs a 2 MiB UC mapping there when nothing maps it yet.
+    /// Caller holds <see cref="s_lock"/>.
+    /// </summary>
+    private static bool MapBlock(ulong alignedPhys, ulong virt, ulong hhdm)
+    {
         // The tables themselves live in low RAM, which the HHDM covers.
         ulong* pml4 = (ulong*)((X64CpuNative.ReadCr3() & AddrMask) + hhdm);
 
+        // A PML4 entry cannot be a huge page (PS is reserved there), so
+        // null here can only mean the table allocation failed.
         ulong* pdpt = GetOrCreateTable(pml4, (int)((virt >> Pml4Shift) & TableIndexMask), hhdm);
         if (pdpt == null)
         {
-            return;
+            return false;
         }
 
         int pdptIndex = (int)((virt >> PdptShift) & TableIndexMask);
@@ -73,20 +107,21 @@ public static unsafe class DeviceMapper
         if ((pdptEntry & FlagPresent) != 0 && (pdptEntry & FlagPageSize) != 0)
         {
             // 1 GiB page already covers this block (Limine's low-4-GiB map).
-            return;
+            return true;
         }
 
+        // The 1 GiB case returned above, so null is an allocation failure.
         ulong* pd = GetOrCreateTable(pdpt, pdptIndex, hhdm);
         if (pd == null)
         {
-            return;
+            return false;
         }
 
         int pdIndex = (int)((virt >> PdShift) & TableIndexMask);
         if ((pd[pdIndex] & FlagPresent) != 0)
         {
             // A 2 MiB page or a 4 KiB table already maps this block.
-            return;
+            return true;
         }
 
         Serial.WriteString("[DeviceMapper] Mapping MMIO phys 0x");
@@ -101,13 +136,15 @@ public static unsafe class DeviceMapper
                     | FlagCacheDisable | FlagWriteThrough
                     | FlagPageSize | FlagNoExecute;
         X64CpuNative.InvalidatePage(virt);
+        return true;
     }
 
     /// <summary>
     /// Follows <paramref name="parent"/>[<paramref name="index"/>] to its
     /// child table, allocating and linking a zeroed one when the entry is
     /// not present. Returns null when the entry is a huge page (caller
-    /// handles that as already-mapped) or the allocation fails.
+    /// handles that as already-mapped) or the allocation fails. Caller
+    /// holds <see cref="s_lock"/>.
     /// </summary>
     private static ulong* GetOrCreateTable(ulong* parent, int index, ulong hhdm)
     {
