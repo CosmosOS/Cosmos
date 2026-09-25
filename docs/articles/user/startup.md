@@ -23,7 +23,7 @@ kmain()           native C bootstrap (Cosmos.Kernel/Bootstrap/kmain.c)
     ├─ Phase 1    CPU: enable SIMD, initialize the serial port
     ├─ Phase 2    Platform: RSDP + HHDM from Limine, early ACPI parse (MADT, MCFG)
     ├─ Phase 3    Managed runtime: heap, GC, type system, library initializers
-    └─ Phase 4    User kernel: Main(argc, argv) → Kernel.Start()
+    └─ Phase 4    User kernel: Main(argc, argv) → Global.StartKernel() → Kernel.Start()
 ```
 
 The [Limine](https://limine-bootloader.org/) bootloader loads the kernel ELF produced by the build pipeline, and jumps to `kmain()`, a small C bootstrap compiled into every kernel. From there:
@@ -43,7 +43,11 @@ Each Cosmos package contributes a *library initializer* that the runtime execute
 4. **Cosmos.Kernel**: CPU exception handlers and the scheduler (one idle thread per CPU, preemption on a 10 ms quantum).
 5. **Cosmos.Kernel.System**: the service managers `TimerManager`, `KeyboardManager`, `MouseManager`, `NetworkManager`, `StorageManager`.
 
-Every step in 3-5 is gated by a feature switch (`CosmosEnableInterrupts`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, all `true` by default). Set one to `false` in your `.csproj` and the corresponding subsystem is skipped here and compiled out of the kernel.
+Interrupts are not in the same state on both architectures during these steps. On x64, loading the IDT in step 3 also unmasks interrupts, so the rest of the bring-up runs with them on. On ARM64 they stay masked until step 5 needs them for its first disk reads (only when `CosmosEnableStorage` is on), and otherwise until `Global.StartKernel()` (below).
+
+Every step in 3-5 is gated by a feature switch (`CosmosEnableInterrupts`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, all `true` by default, and `CosmosEnableUsb`, whose default is derived from two of them). Set one to `false` in your `.csproj` and the corresponding subsystem is skipped here and compiled out of the kernel.
+
+`CosmosEnableUsb` gates the USB host controllers of step 3 and the keyboard and mass storage drivers behind them. Left unset, it is on when `CosmosEnableKeyboard` or `CosmosEnableStorage` is on, and off when both are off: a kernel with neither that still wants USB sets it to `true`. It is always off when `CosmosEnablePCI` is off, whatever the project sets, and so also when `CosmosEnableInterrupts` is off, which turns PCI off.
 
 ## The generated entry point
 
@@ -69,23 +73,28 @@ public static class CosmosEntryPoint
 </PropertyGroup>
 ```
 
-`Global.StartKernel()` then calls `Start()` on the registered instance.
+The constructor of your kernel runs inside `Main`, before `StartKernel()`, so the interrupt state it sees is whatever phase 3 left: do not rely on it either way.
+
+`Global.StartKernel()` runs once; calling it again throws `InvalidOperationException`. Before your kernel gets control it:
+
+1. Enables hardware interrupts, on both architectures (unless `CosmosEnableInterrupts` is `false`, in which case they stay masked throughout).
+2. Starts the USB hot-plug thread, which follows the USB devices plugged in and pulled out from then on. It needs the scheduler to switch to it: when nothing does within 50 ms, as on x64 with ACPI off where the scheduler's timer never starts, hot-plug stays off and the USB devices are the ones found at boot.
+3. Calls `Start()` on the registered instance.
 
 ## Sys.Kernel.Start()
 
-`Cosmos.Kernel.System.Kernel` is the abstract base class of every user kernel. Its `Start()` drives the whole lifecycle:
+`Cosmos.Kernel.System.Kernel` is the abstract base class of every user kernel. Its `Start()` drives the whole lifecycle, with interrupts already enabled (unless the Interrupts switch is off):
 
 1. Calls `OnBoot()`, whose default implementation initializes the graphical `KernelConsole`, which is what makes `Console.WriteLine` work.
-2. Enables hardware interrupts (everything before this point ran with interrupts off), then starts the USB hot-plug thread, which needs the scheduler's timer ticking.
-3. Turns off the early-boot text renderer: up to here, the boot log you see on screen is the serial log mirrored by a minimal framebuffer writer; from now on the screen belongs to `Console` and the [Canvas](graphics.md).
-4. Calls `BeforeRun()` once.
-5. Calls `Run()` in a loop until `Stop()` is called.
-6. Calls `AfterRun()` once.
-7. Halts the CPU. There is no operating system to return to: a kernel never exits.
+2. Turns off the early-boot text renderer: up to here, the boot log you see on screen is the serial log mirrored by a minimal framebuffer writer; from now on the screen belongs to `Console` and the [Canvas](graphics.md).
+3. Calls `BeforeRun()` once.
+4. Calls `Run()` in a loop until `Stop()` is called.
+5. Calls `AfterRun()` once.
+6. Halts the CPU. There is no operating system to return to: a kernel never exits.
 
 ## Stopping the machine
 
-Step 7 above is where a kernel ends up on its own. `Power` is how you get there deliberately, and the three members differ in how far they go:
+Step 6 above is where a kernel ends up on its own. `Power` is how you get there deliberately, and the three members differ in how far they go:
 
 ```csharp
 using Cosmos.Kernel.System;
@@ -141,7 +150,7 @@ An uncaught exception inside `Run()` propagates out of the loop, so wrap the bod
 
 ## Customizing startup
 
-`OnBoot()` runs *before* interrupts are enabled and before the console exists, the right place for early hardware setup:
+`OnBoot()` runs before the console exists, the right place for early hardware setup. Interrupts are already enabled by then, on x64 and ARM64 alike, and USB hot-plug, when it could start, is already running, so a USB device can come or go while it runs:
 
 ```csharp
 protected override void OnBoot()
@@ -154,7 +163,7 @@ protected override void OnBoot()
 
 A headless kernel that later wants `Console` output calls `KernelConsole.Initialize()` itself: it is the only route on the ring, `Console.WriteLine` does not bring the console up on its own. The call is idempotent, so it is safe whether or not `base.OnBoot()` already ran, and it returns `false` when graphics are compiled out.
 
-For total control you can override `Start()` itself and take over the lifecycle: the default implementation in [`Cosmos.Kernel.System/Kernel.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.System/Kernel.cs) is small and a good starting point to copy from.
+For total control you can override `Start()` itself and take over the lifecycle: the default implementation in [`Cosmos.Kernel.System/Kernel.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.System/Kernel.cs) is small and a good starting point to copy from. Interrupts and USB hot-plug are set up by `Global.StartKernel()` before it calls `Start()`, so an override keeps both.
 
 ## The kernel command line
 
@@ -190,8 +199,10 @@ Every phase above logs to the serial port (COM1), which `cosmos run` connects to
 [KERNEL]   - Initializing scheduler...
 [KMAIN] Phase 4: User kernel
 [Global] Registering kernel
+[Global] StartKernel called
+[Global] Enabling interrupts...
+[Global] Starting kernel...
 [Kernel] Calling OnBoot()...
-[Kernel] Enabling interrupts...
 [Kernel] Calling BeforeRun()...
 [Kernel] Entering main loop...
 [Kernel] Calling Run()...
