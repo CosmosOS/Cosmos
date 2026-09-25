@@ -99,8 +99,8 @@ internal class LibraryInitializer
             // completion IRQs. Disposing the scope only RESTORES the
             // prior state: on ARM64 IRQs were still masked from boot
             // at this point, so explicitly unmask before doing I/O.
-            // The kernel re-enables IRQs again in Kernel.Start; this
-            // call is idempotent.
+            // Global.StartKernel enables IRQs again before the kernel
+            // starts; this call is idempotent.
             if (StorageManager.IsEnabled)
             {
                 if (InterruptManager.IsEnabled)
