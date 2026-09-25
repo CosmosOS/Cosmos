@@ -25,7 +25,7 @@ namespace Cosmos.Kernel.Tests.Virtio;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Number of tests announced to the runner in TR.Start.</summary>
-    private const int ExpectedTestCount = 10;
+    private const int ExpectedTestCount = 12;
 
     /// <summary>Reason surfaced for the PCI-transport tests when the cell runs virtio over MMIO.</summary>
     private const string SkipNotPci = "this cell presents virtio over MMIO";
@@ -35,6 +35,11 @@ public class Kernel : Sys.Kernel
 
     /// <summary>Transport name the MMIO transport reports.</summary>
     private const string MmioTransportName = "MMIO";
+
+    // Owner names, spelled out rather than read from PciOwner so a renamed
+    // constant is caught instead of compared against itself.
+    private const string VirtioNetOwner = "virtio-net";
+    private const string VirtioInputOwner = "virtio-input";
 
     // True when this cell put a virtio function on the PCI bus.
     //
@@ -65,7 +70,7 @@ public class Kernel : Sys.Kernel
         s_keyboards = VirtioDevice.GetKeyboards();
         s_mice = VirtioDevice.GetMice();
         s_virtioNetFunction = FindVirtioFunction(VirtioTransport.DeviceTypeNetwork);
-        s_isPciCell = s_virtioNetFunction != null;
+        s_isPciCell = s_virtioNetFunction is not null;
 
         // ==================== Binding ====================
         TR.Run("Net_DriverBound", TestNet_DriverBound);
@@ -82,6 +87,8 @@ public class Kernel : Sys.Kernel
         TR.RunIf(s_isPciCell, "Pci_FunctionClaimed",     TestPci_FunctionClaimed,     SkipNotPci);
         TR.RunIf(s_isPciCell, "Pci_MsiXActive",          TestPci_MsiXActive,          SkipNotPci);
         TR.RunIf(s_isPciCell, "Pci_Version1Negotiated",  TestPci_Version1Negotiated,  SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_NetOwnerRecorded",    TestPci_NetOwnerRecorded,    SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_InputOwnerRecorded",  TestPci_InputOwnerRecorded,  SkipNotPci);
 
         TR.Finish();
 
@@ -246,6 +253,41 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(s_net.Transport.Version1Negotiated, "virtio-pci should negotiate VIRTIO_F_VERSION_1");
+    }
+
+    // The owner names the driver, not just the fact of a claim, and virtio
+    // names each device type on its own: the NIC and the input functions
+    // must not end up under one shared name.
+    private static void TestPci_NetOwnerRecorded()
+    {
+        Assert.True(s_virtioNetFunction?.Owner == VirtioNetOwner, "the virtio-net PCI function should be owned by virtio-net");
+    }
+
+    // Keyboard and mouse are both virtio-input functions, claimed before the
+    // scan probes which of the two a function is, so both carry one name.
+    private static void TestPci_InputOwnerRecorded()
+    {
+        PciDevice[]? devices = PciManager.Devices;
+        if (devices is null)
+        {
+            Assert.Fail("PCI was never enumerated");
+            return;
+        }
+
+        int inputFunctions = 0;
+        for (uint i = 0; i < PciManager.Count; i++)
+        {
+            PciDevice device = devices[i];
+            if (device.VendorId != VirtioPciTransport.VirtioVendorId || VirtioPciTransport.GetDeviceType(device) != VirtioTransport.DeviceTypeInput)
+            {
+                continue;
+            }
+
+            inputFunctions++;
+            Assert.True(device.Owner == VirtioInputOwner, "every virtio-input PCI function should be owned by virtio-input");
+        }
+
+        Assert.True(inputFunctions > 0, "the virtio-pci cell attaches a keyboard and a mouse");
     }
 
     // ==================== Helpers ====================

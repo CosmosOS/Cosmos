@@ -36,7 +36,7 @@ public class Kernel : Sys.Kernel
     protected override void BeforeRun()
     {
         Log.WriteString("[Graphic Tests] Starting test suite\n");
-        TR.Start("Graphic Tests", expectedTests: 23);
+        TR.Start("Graphic Tests", expectedTests: 25);
 
         TR.Run("PCScreenFont_ChangeFont", TestPCScreenFont);
         TR.Run("Bitmap_Basic", TestBitmaps);
@@ -45,6 +45,14 @@ public class Kernel : Sys.Kernel
         TR.Run("Canvas_Basic", TestCanvasDrawing);
         TR.Run("VirtualCanvas_Basic", TestVirtualCanvas);
         TR.Run("Canvas_CopyPixels_Overlap", TestCopyPixelsOverlap);
+
+        // ==================== Display function ownership ====================
+        // Who owns each display function once boot is done: the boot display
+        // is reserved as gop unless its driver took it, and the virtio GPU is
+        // its driver's.
+        DisplayOwnerTests.Discover();
+        TR.Run("Pci_BootDisplayOwner", DisplayOwnerTests.TestBootDisplayOwner);
+        TR.RunIf(DisplayOwnerTests.VirtioGpuPresent, "Pci_VirtioGpuOwner", DisplayOwnerTests.TestVirtioGpuOwner, DisplayOwnerTests.SkipNoVirtioGpu);
 
         // ==================== SVGA3D command layer ====================
         // Struct sizes are host-independent and run on every cell; the FIFO
