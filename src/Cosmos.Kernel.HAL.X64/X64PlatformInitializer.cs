@@ -45,14 +45,14 @@ internal class X64PlatformInitializer : IPlatformInitializer
         // which bypasses the MMU — no memory mapping needed.
     }
 
-    public void EnsureMmioMapped(ulong physBase)
+    public bool EnsureMmioMapped(ulong physBase)
     {
         // Limine's blanket map (base revision 0) only covers the low 4 GiB
         // plus memory-map regions; a 64-bit BAR relocated above 4 GiB is in
         // neither, and touching its HHDM alias would page-fault. Install an
         // on-demand UC mapping for it (no-op for already-mapped regions,
         // i.e. everything below 4 GiB).
-        DeviceMapper.EnsureMapped(physBase);
+        return DeviceMapper.EnsureMapped(physBase);
     }
 
     public void DmaBarrier()

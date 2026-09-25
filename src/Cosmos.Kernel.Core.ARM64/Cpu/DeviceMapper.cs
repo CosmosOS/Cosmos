@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core.ARM64.Bridge;
 using Cosmos.Kernel.Core.IO;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.Core.ARM64.Cpu;
 
@@ -29,37 +30,60 @@ public static unsafe class DeviceMapper
 
     private static bool s_spareL2Used;
 
+    /// <summary>
+    /// Serializes page-table walks and edits, including the check-then-set
+    /// of <see cref="s_spareL2Used"/>: two threads splitting at once would
+    /// both fill the single spare L2 table for different 1 GiB blocks, and
+    /// one L1 slot would end up pointing at the other's addresses. IRQ-safe
+    /// so a preemption never parks a holder mid-edit while another thread
+    /// spins on it. Lock order: this lock may take the PageAllocator lock
+    /// beneath it, never the reverse, and nothing under it may call
+    /// <see cref="EnsureMapped"/> again: the lock is not reentrant.
+    /// </summary>
+    private static SchedSpinLock s_lock;
+
     // ── Public API ──────────────────────────────────────────────────
 
     /// <summary>
     /// Ensures a physical MMIO address is mapped as Device memory in the
     /// TTBR1 page tables so it can be accessed at (phys + HHDM_OFFSET).
-    /// Safe to call multiple times; no-ops if the mapping already exists.
+    /// Safe to call multiple times and from concurrent threads; no-ops if
+    /// the mapping already exists.
     /// </summary>
-    public static void EnsureMapped(ulong physBase)
+    /// <returns>
+    /// True when the 2 MiB block is Device-mapped on return, whether this
+    /// call installed the mapping or found one; false when there is no HHDM
+    /// or the tables cannot reach the block (missing L0/L1 entry, no spare
+    /// L2 table left to split a 1 GiB block, no Device MAIR attribute).
+    /// </returns>
+    public static bool EnsureMapped(ulong physBase)
     {
         if (Limine.HHDM.Response == null)
         {
-            return;
+            return false;
         }
 
         ulong hhdm = Limine.HHDM.Response->Offset;
-        MapPage(physBase, hhdm);
+        using (s_lock.AcquireIrqSafe())
+        {
+            return MapPage(physBase, hhdm);
+        }
     }
 
     // ── Core mapping logic ──────────────────────────────────────────
 
-    private static void MapPage(ulong physBase, ulong hhdmOffset)
+    /// <summary>
+    /// Walks TTBR1 to the L2 slot covering <paramref name="physBase"/> and
+    /// installs a 2 MiB Device block there unless one is already present.
+    /// Silent when nothing changes: drivers call this for both ends of every
+    /// region they touch, so the already-mapped path is the common one.
+    /// Caller holds <see cref="s_lock"/>.
+    /// </summary>
+    private static bool MapPage(ulong physBase, ulong hhdmOffset)
     {
         // 2MiB-align
         ulong aligned = physBase & BLOCK_2MB_ADDR_MASK;
         ulong virtAddr = aligned + hhdmOffset;
-
-        Serial.Write("[DeviceMapper] Mapping phys 0x");
-        Serial.WriteHex(aligned);
-        Serial.Write(" → virt 0x");
-        Serial.WriteHex(virtAddr);
-        Serial.Write("\n");
 
         // ── Find Device memory MAIR index ────────────────────────
         ulong mair = DeviceMapperNative.ReadMair();
@@ -67,11 +91,8 @@ public static unsafe class DeviceMapper
         if (deviceIdx < 0)
         {
             Serial.Write("[DeviceMapper] ERROR: No Device MAIR index found!\n");
-            return;
+            return false;
         }
-        Serial.Write("[DeviceMapper] Device MAIR index = ");
-        Serial.WriteNumber((uint)deviceIdx);
-        Serial.Write("\n");
 
         // ── Read TTBR1 and walk page tables ──────────────────────
         ulong ttbr1Phys = DeviceMapperNative.ReadTtbr1() & ADDR_MASK;
@@ -84,21 +105,15 @@ public static unsafe class DeviceMapper
         int l0idx = (int)((aligned >> 39) & 0x1FF);
         ulong l0entry = l0[l0idx];
 
-        Serial.Write("[DeviceMapper] L0[");
-        Serial.WriteNumber((uint)l0idx);
-        Serial.Write("] = 0x");
-        Serial.WriteHex(l0entry);
-        Serial.Write("\n");
-
         if ((l0entry & DESC_VALID) == 0)
         {
-            Serial.Write("[DeviceMapper] ERROR: L0 entry invalid\n");
-            return;
+            WriteEntryError("L0", l0idx, l0entry, "invalid", aligned);
+            return false;
         }
         if ((l0entry & DESC_TABLE) == 0)
         {
-            Serial.Write("[DeviceMapper] ERROR: L0 is block (unexpected)\n");
-            return;
+            WriteEntryError("L0", l0idx, l0entry, "is block (unexpected)", aligned);
+            return false;
         }
 
         // Follow L0 table → L1
@@ -106,26 +121,17 @@ public static unsafe class DeviceMapper
         int l1idx = (int)((aligned >> 30) & 0x1FF);
         ulong l1entry = l1[l1idx];
 
-        Serial.Write("[DeviceMapper] L1[");
-        Serial.WriteNumber((uint)l1idx);
-        Serial.Write("] = 0x");
-        Serial.WriteHex(l1entry);
-        Serial.Write("\n");
-
         ulong* l2;
 
         if ((l1entry & DESC_VALID) == 0)
         {
-            Serial.Write("[DeviceMapper] ERROR: L1 entry invalid\n");
-            return;
+            WriteEntryError("L1", l1idx, l1entry, "invalid", aligned);
+            return false;
         }
         else if ((l1entry & DESC_TABLE) != 0)
         {
             // Table descriptor → follow to L2
             l2 = (ulong*)((l1entry & ADDR_MASK) + hhdmOffset);
-            Serial.Write("[DeviceMapper] L1 is table → L2 at 0x");
-            Serial.WriteHex((ulong)l2);
-            Serial.Write("\n");
         }
         else
         {
@@ -135,19 +141,13 @@ public static unsafe class DeviceMapper
             if (l2 == null)
             {
                 Serial.Write("[DeviceMapper] ERROR: Failed to split L1 block\n");
-                return;
+                return false;
             }
         }
 
         // ── Write L2 entry ───────────────────────────────────────
         int l2idx = (int)((aligned >> 21) & 0x1FF);
         ulong l2entry = l2[l2idx];
-
-        Serial.Write("[DeviceMapper] L2[");
-        Serial.WriteNumber((uint)l2idx);
-        Serial.Write("] = 0x");
-        Serial.WriteHex(l2entry);
-        Serial.Write("\n");
 
         // Check if existing mapping already has Device attributes
         if ((l2entry & DESC_VALID) != 0)
@@ -156,8 +156,7 @@ public static unsafe class DeviceMapper
             byte existingAttr = (byte)((mair >> (existingIdx * 8)) & 0xFF);
             if (existingAttr == 0x00 || existingAttr == 0x04)
             {
-                Serial.Write("[DeviceMapper] L2 already Device-mapped, skipping\n");
-                return;
+                return true;
             }
             Serial.Write("[DeviceMapper] L2 valid but Normal memory (MAIR attr=0x");
             Serial.WriteHex(existingAttr);
@@ -180,7 +179,13 @@ public static unsafe class DeviceMapper
                    | DESC_UXN
                    | DESC_VALID;
 
-        Serial.Write("[DeviceMapper] Writing L2 descriptor: 0x");
+        Serial.Write("[DeviceMapper] Mapping phys 0x");
+        Serial.WriteHex(aligned);
+        Serial.Write(" → virt 0x");
+        Serial.WriteHex(virtAddr);
+        Serial.Write(": L2[");
+        Serial.WriteNumber((uint)l2idx);
+        Serial.Write("] = 0x");
         Serial.WriteHex(desc);
         Serial.Write("\n");
 
@@ -192,13 +197,32 @@ public static unsafe class DeviceMapper
 
         // Final TLB flush for the new mapping
         DeviceMapperNative.FlushTlb(virtAddr >> 12);
+        return true;
+    }
 
-        Serial.Write("[DeviceMapper] Mapping complete\n");
+    /// <summary>
+    /// Logs a walk failure with the offending descriptor: the walk itself
+    /// prints nothing, so this line is the only record of where it stopped.
+    /// </summary>
+    private static void WriteEntryError(string level, int index, ulong entry, string problem, ulong aligned)
+    {
+        Serial.Write("[DeviceMapper] ERROR: mapping phys 0x");
+        Serial.WriteHex(aligned);
+        Serial.Write(": ");
+        Serial.Write(level);
+        Serial.Write("[");
+        Serial.WriteNumber((uint)index);
+        Serial.Write("] = 0x");
+        Serial.WriteHex(entry);
+        Serial.Write(" ");
+        Serial.Write(problem);
+        Serial.Write("\n");
     }
 
     /// <summary>
     /// Splits a 1GiB L1 block descriptor into 512 × 2MiB L2 block descriptors,
-    /// preserving the original attributes for all entries.
+    /// preserving the original attributes for all entries. Caller holds
+    /// <see cref="s_lock"/>.
     /// </summary>
     private static ulong* SplitL1Block(ulong* l1, int l1idx, ulong l1entry, ulong hhdmOffset)
     {
