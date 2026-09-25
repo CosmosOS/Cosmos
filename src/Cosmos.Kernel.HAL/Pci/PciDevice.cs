@@ -3,8 +3,10 @@
 using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.Pci.Enums;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.HAL.Pci;
 
@@ -116,6 +118,16 @@ internal class PciDevice : Device
 
     // ECAM Base Address (discovered from ACPI MCFG table at runtime)
     private static ulong s_pciEcamBase;
+
+    /// <summary>
+    /// Pairs each CONFIG_ADDRESS write with the CONFIG_DATA access that
+    /// follows it. Mechanism #1 is two port operations on one shared
+    /// address latch: a thread preempted between them resumes against
+    /// whatever register another thread selected meanwhile. IRQ-safe so the
+    /// holder cannot be preempted while others spin. ECAM needs no lock:
+    /// each access there is a single load or store.
+    /// </summary>
+    private static SchedSpinLock s_configLock;
 
     public readonly PciBaseAddressBar[]? BaseAddressBar;
 
@@ -330,8 +342,10 @@ internal class PciDevice : Device
         return Native.MMIO.Read8(addr);
 #else
         uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        PlatformHAL.PortIO.WriteDWord(ConfigAddressPort, xAddr);
-        return (byte)((PlatformHAL.PortIO.ReadDWord(ConfigDataPort) >> (offset % ConfigDwordSizeBytes * BitsPerByte)) & ConfigByteMask);
+        using (SelectConfigAddress(xAddr))
+        {
+            return (byte)((PlatformHAL.PortIO.ReadDWord(ConfigDataPort) >> (offset % ConfigDwordSizeBytes * BitsPerByte)) & ConfigByteMask);
+        }
 #endif
     }
 
@@ -342,13 +356,15 @@ internal class PciDevice : Device
         Native.MMIO.Write8(addr, value);
 #else
         uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        PlatformHAL.PortIO.WriteDWord(ConfigAddressPort, xAddr);
         // PCI Configuration Mechanism #1 mirrors the 32-bit data port at
         // 0xCFC..0xCFF. A byte access to offset N within the dword must
         // hit port 0xCFC + (N & 3), otherwise the byte lands at the wrong
         // position in the dword.
         ushort dataPort = (ushort)(ConfigDataPort + (offset & ConfigByteLaneMask));
-        PlatformHAL.PortIO.WriteByte(dataPort, value);
+        using (SelectConfigAddress(xAddr))
+        {
+            PlatformHAL.PortIO.WriteByte(dataPort, value);
+        }
 #endif
     }
 
@@ -376,8 +392,10 @@ internal class PciDevice : Device
         return Native.MMIO.Read16(addr);
 #else
         uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        PlatformHAL.PortIO.WriteDWord(ConfigAddressPort, xAddr);
-        return (ushort)((PlatformHAL.PortIO.ReadDWord(ConfigDataPort) >> (offset % ConfigDwordSizeBytes * BitsPerByte)) & ConfigWordMask);
+        using (SelectConfigAddress(xAddr))
+        {
+            return (ushort)((PlatformHAL.PortIO.ReadDWord(ConfigDataPort) >> (offset % ConfigDwordSizeBytes * BitsPerByte)) & ConfigWordMask);
+        }
 #endif
     }
 
@@ -388,11 +406,13 @@ internal class PciDevice : Device
         Native.MMIO.Write16(addr, value);
 #else
         uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        PlatformHAL.PortIO.WriteDWord(ConfigAddressPort, xAddr);
         // 16-bit access at offset 2 within the dword must hit port 0xCFE,
         // not 0xCFC — see WriteConfig8 for the rationale.
         ushort dataPort = (ushort)(ConfigDataPort + (offset & ConfigWordLaneMask));
-        PlatformHAL.PortIO.WriteWord(dataPort, value);
+        using (SelectConfigAddress(xAddr))
+        {
+            PlatformHAL.PortIO.WriteWord(dataPort, value);
+        }
 #endif
     }
 
@@ -403,8 +423,10 @@ internal class PciDevice : Device
         return Native.MMIO.Read32(addr);
 #else
         uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        PlatformHAL.PortIO.WriteDWord(ConfigAddressPort, xAddr);
-        return PlatformHAL.PortIO.ReadDWord(ConfigDataPort);
+        using (SelectConfigAddress(xAddr))
+        {
+            return PlatformHAL.PortIO.ReadDWord(ConfigDataPort);
+        }
 #endif
     }
 
@@ -415,8 +437,10 @@ internal class PciDevice : Device
         Native.MMIO.Write32(addr, value);
 #else
         uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        PlatformHAL.PortIO.WriteDWord(ConfigAddressPort, xAddr);
-        PlatformHAL.PortIO.WriteDWord(ConfigDataPort, value);
+        using (SelectConfigAddress(xAddr))
+        {
+            PlatformHAL.PortIO.WriteDWord(ConfigDataPort, value);
+        }
 #endif
     }
 
@@ -427,6 +451,18 @@ internal class PciDevice : Device
     /// </summary>
     private static uint GetAddressBase(uint aBus, uint aSlot, uint aFunction) =>
         ConfigEnableBit | (aBus << ConfigBusShift) | ((aSlot & ConfigSlotMask) << ConfigSlotShift) | ((aFunction & ConfigFunctionMask) << ConfigFunctionShift);
+
+    /// <summary>
+    /// Takes <see cref="s_configLock"/> and writes CONFIG_ADDRESS. The caller
+    /// makes its CONFIG_DATA access inside the returned scope, so the latch
+    /// still holds <paramref name="address"/> when that access lands.
+    /// </summary>
+    private static IrqLockScope SelectConfigAddress(uint address)
+    {
+        IrqLockScope scope = s_configLock.AcquireIrqSafe();
+        PlatformHAL.PortIO.WriteDWord(ConfigAddressPort, address);
+        return scope;
+    }
 
     /// <summary>
     /// Sets the ECAM base address (physical) discovered from ACPI MCFG.
