@@ -36,6 +36,8 @@ using Cosmos.Kernel.System.Keyboard.ScanMaps;
 
 There is nothing to initialize by hand: at boot the kernel probes the PS/2 controller and the virtio bus, and registers every keyboard it finds with `KeyboardManager`.
 
+USB keyboards also need the USB stack, `CosmosEnableUsb`. You do not have to set it: left unset, it is on whenever `CosmosEnableKeyboard` is. Setting it to `false` keeps PS/2 and virtio keyboards and drops USB ones.
+
 ## Reading a line
 
 `Console.ReadLine()` works the way it does everywhere else in .NET, so most kernels never need anything more:

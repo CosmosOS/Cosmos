@@ -151,8 +151,11 @@ internal class X64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        IKeyboardDevice[] ps2 = _ps2Controller != null ? PS2Controller.GetKeyboardDevices() : [];
-        return [.. ps2, .. VirtioDevice.GetKeyboards(), .. UsbKeyboardDriver.GetKeyboards()];
+        IKeyboardDevice[] ps2 = _ps2Controller is not null ? PS2Controller.GetKeyboardDevices() : [];
+        // Behind USB's own switch so a kernel without USB never references
+        // the USB keyboard driver and ILC trims it.
+        IKeyboardDevice[] usb = CosmosFeatures.UsbEnabled ? UsbKeyboardDriver.GetKeyboards() : [];
+        return [.. ps2, .. VirtioDevice.GetKeyboards(), .. usb];
     }
 
     public IMouseDevice[] GetMouseDevices()

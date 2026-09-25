@@ -680,6 +680,7 @@ static Cosmos.Kernel.System.KernelFeatures.Scheduler.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Storage.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Timer.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Uart.get -> bool
+static Cosmos.Kernel.System.KernelFeatures.Usb.get -> bool
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.AltPressed.get -> bool
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.CapsLock.get -> bool
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.ControlPressed.get -> bool

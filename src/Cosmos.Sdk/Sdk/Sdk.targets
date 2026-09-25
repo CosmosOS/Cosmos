@@ -20,6 +20,18 @@
     <CosmosEnableStorage   Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableStorage>
     <!-- Storage off → no block device for filesystems to mount on -->
     <CosmosEnableFat       Condition="'$(CosmosEnableStorage)' == 'false'">false</CosmosEnableFat>
+    <!-- USB default: on while one of its built-in class drivers (USB keyboard,
+         USB mass storage) has a subsystem to feed. Decided here, after the lines
+         above, because it reads the final Keyboard and Storage values. A value
+         the project set, including true with both off, is kept. -->
+    <CosmosEnableUsb       Condition="'$(CosmosEnableUsb)' == '' AND ('$(CosmosEnableKeyboard)' == 'true' OR '$(CosmosEnableStorage)' == 'true')">true</CosmosEnableUsb>
+    <CosmosEnableUsb       Condition="'$(CosmosEnableUsb)' == ''">false</CosmosEnableUsb>
+    <!-- PCI off → no xHCI controller to find. That also covers Interrupts off,
+         which turned PCI off above. USB follows no other switch: without MSI-X
+         xHCI polls its event ring, its delays come from the platform rather than
+         from the Timer switch, and the hot-plug thread's need for the scheduler
+         is checked where that thread is started. -->
+    <CosmosEnableUsb       Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableUsb>
   </PropertyGroup>
 
   <!-- Disable standard ILLink - Cosmos uses custom NativeAOT compilation via Cosmos.Build.Ilc -->
