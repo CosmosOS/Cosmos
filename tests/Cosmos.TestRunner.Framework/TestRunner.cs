@@ -455,9 +455,8 @@ namespace Cosmos.TestRunner.Framework
         internal static void SendMessage(byte command, byte[] payload)
         {
             // The protocol shares the UART with diagnostic traces written from IRQ handlers
-            // and other threads ([SCHED]/[CV] wake logs). A frame must go out as one
-            // uninterrupted byte sequence, so it is assembled up front and emitted through
-            // the atomic Log.WriteBytes.
+            // and other threads. A frame must go out as one uninterrupted byte sequence, so
+            // it is assembled up front and emitted through the atomic Log.WriteBytes.
             ushort length = (ushort)payload.Length;
             byte[] frame = new byte[HeaderSizeBytes + payload.Length];
             frame[0] = SerialSignatureByte0;
