@@ -669,8 +669,11 @@ internal unsafe class NvmeController
             }
 
             // Read barrier: don't consume CID/status (or the DMA'd payload
-            // they guard) ahead of the device-written phase bit.
-            PlatformHAL.Initializer?.DmaBarrier();
+            // they guard) ahead of the device-written phase bit. All of it
+            // is DMA memory with no MMIO access in between, so this is a
+            // load-to-load ordering that dmb oshld covers; the Core native
+            // also keeps an interface call out of the ISR.
+            DmaOrdering.ReadBarrier();
 
             ushort cid = cqe.CommandIdentifier;
             uint sc = cqe.StatusCode;
