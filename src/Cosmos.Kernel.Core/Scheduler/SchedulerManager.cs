@@ -56,11 +56,8 @@ public static class SchedulerManager
     /// <summary>Timer ticks between debug-live snapshot refreshes (~100ms at 100Hz).</summary>
     private const uint SnapshotRefreshTickInterval = 10;
 
-    /// <summary>Number of initial timer ticks that are always logged to serial.</summary>
+    /// <summary>Number of initial timer ticks logged to serial, to show at boot that the tick is live.</summary>
     private const uint InitialTickLogCount = 10;
-
-    /// <summary>After the initial ticks, log every Nth timer tick to avoid flooding serial output.</summary>
-    private const uint TickLogInterval = 50;
 
     /// <summary>
     /// Whether scheduler support is compiled into this kernel
@@ -614,7 +611,7 @@ public static class SchedulerManager
 
         using (CPU.InternalCpu.DisableInterruptsScope())
         {
-            var state = s_cpuStates[cpuId];
+            PerCpuState state = s_cpuStates[cpuId];
 
             // Only set to Ready if not a new thread (Created).
             // New threads stay Created until they actually start running.
@@ -629,13 +626,9 @@ public static class SchedulerManager
             // Ask the next hardware-IRQ exit to reschedule: when this wake
             // comes from an ISR (InterruptEvent.Signal), the woken thread
             // would otherwise sit in the run queue until the next timer tick.
+            // No per-wake log here: this runs with interrupts masked, often
+            // from an ISR, and each polled UART byte would stall every IRQ.
             state._needReschedule = true;
-
-            Serial.WriteString("[SCHED] Thread ");
-            Serial.WriteNumber(thread.Id);
-            Serial.WriteString(" is now ready, RSP=");
-            Serial.WriteHexWithPrefix((ulong)thread.StackPointer);
-            Serial.WriteString("\n");
         }
     }
 
@@ -654,12 +647,9 @@ public static class SchedulerManager
             // Ask the next IRQ exit to switch away (same as ReadyThread): a
             // blocked current thread otherwise keeps re-entering its halt
             // loop until the quantum tick preempts it — or forever when the
-            // periodic tick is not running.
+            // periodic tick is not running. Not logged, for the same reason
+            // as ReadyThread: interrupts are masked here.
             state._needReschedule = true;
-
-            Serial.WriteString("[SCHED] BlockThread id=");
-            Serial.WriteNumber(thread.Id);
-            Serial.WriteString("\n");
         }
     }
 
@@ -971,8 +961,11 @@ public static class SchedulerManager
             Cosmos.Kernel.Core.Runtime.DebugLiveMemorySnapshot.Update();
         }
 
-        // Log first 10 ticks and then every 50 ticks
-        if (s_tickCount <= InitialTickLogCount || s_tickCount % TickLogInterval == 0)
+        // Only the first ticks are logged, to show at boot that the tick is
+        // live. This runs in the timer ISR with interrupts masked, and a
+        // periodic line would stall every IRQ on polled UART bytes for the
+        // whole uptime.
+        if (s_tickCount <= InitialTickLogCount)
         {
             Serial.WriteString("[SCHED] Tick ");
             Serial.WriteNumber(s_tickCount);
@@ -991,7 +984,7 @@ public static class SchedulerManager
             return;
         }
 
-        var state = s_cpuStates[cpuId];
+        PerCpuState state = s_cpuStates[cpuId];
         if (state.CurrentThread is null)
         {
             return;
@@ -1034,11 +1027,9 @@ public static class SchedulerManager
             // Check if wakeup time has been reached
             if (currentTime >= thread.WakeupTime)
             {
-                Serial.WriteString("[SCHED] Waking sleeping thread ");
-                Serial.WriteNumber(thread.Id);
-                Serial.WriteString(" (time expired)\n");
-
-                // Wake the thread by marking it as ready
+                // Wake the thread by marking it as ready. Not logged, for the
+                // same reason as ReadyThread: this is the timer ISR, with
+                // interrupts masked.
                 thread.WakeupTime = 0;
                 ReadyThread(thread.CpuId, thread);
             }

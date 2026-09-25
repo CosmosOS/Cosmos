@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.CPU;
-using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.Core.Scheduler;
 
@@ -56,10 +55,6 @@ internal class ConditionVariable : IDisposable
         }
         while (currentThread is null);
 
-        Serial.WriteString("[CV] Wait BEGIN thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString("\n");
-
         using (_lockGuard.AcquireIrqSafe())
         {
             if (!ContainsWaiterLocked(currentThread))
@@ -79,16 +74,8 @@ internal class ConditionVariable : IDisposable
             InternalCpu.Halt();
         }
 
-        Serial.WriteString("[CV] Wait WOKE thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString("\n");
-
         // Reacquire the mutex before returning
         mutex.Acquire();
-
-        Serial.WriteString("[CV] Wait END thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString("\n");
     }
 
     /// <summary>
@@ -104,12 +91,6 @@ internal class ConditionVariable : IDisposable
         {
             return false;
         }
-
-        Serial.WriteString("[CV] WaitTimeout BEGIN thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString(" timeoutMs=");
-        Serial.WriteNumber(timeoutMs);
-        Serial.WriteString("\n");
 
         // Same atomic insert+release+park section as Wait — the old order (release, then
         // insert) additionally lost any Signal landing between the two: it found no waiters.
@@ -128,10 +109,6 @@ internal class ConditionVariable : IDisposable
         {
             InternalCpu.Halt();
         }
-
-        Serial.WriteString("[CV] WaitTimeout WOKE thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString("\n");
 
         // Signaled iff Signal/SignalAll removed this thread from the wait list before the
         // timeout fired. On timeout the stale entry must be removed here, or a later Signal
@@ -199,16 +176,8 @@ internal class ConditionVariable : IDisposable
                 SchedulerThread waitingThread = _waitingThreads[0];
                 _waitingThreads.RemoveAt(0);
 
-                Serial.WriteString("[CV] Signal -> ReadyThread id=");
-                Serial.WriteNumber(waitingThread.Id);
-                Serial.WriteString("\n");
-
                 // Wake the thread by marking it ready
                 SchedulerManager.ReadyThread(waitingThread.CpuId, waitingThread);
-            }
-            else
-            {
-                Serial.WriteString("[CV] Signal (no waiters)\n");
             }
         }
     }
