@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// deriving from this class and registering it in
 /// <see cref="UsbManager.Initialize"/>.
 /// </summary>
-internal abstract class UsbDriver
+internal abstract class UsbClassDriver
 {
     /// <summary>Short name used in enumeration logs.</summary>
     public abstract string Name { get; }

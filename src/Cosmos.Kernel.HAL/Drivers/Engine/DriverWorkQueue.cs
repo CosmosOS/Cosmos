@@ -35,6 +35,14 @@ internal static class DriverWorkQueue
     private static bool? s_started;
 
     /// <summary>
+    /// The item whose callback the thread runs now, null between two. Set
+    /// under the lock, as the item is taken off the queue, so that once a
+    /// binding's items are dropped, which takes the lock too, this tells
+    /// whether one of them had already started.
+    /// </summary>
+    private static volatile DeviceWorkItem? s_running;
+
+    /// <summary>
     /// Starts the driver-work thread unless it is already running. Called
     /// from a driver's Probe only; probes run one at a time, so no second
     /// caller can race the first.
@@ -89,6 +97,15 @@ internal static class DriverWorkQueue
     internal static void Wake() => s_wake?.Signal();
 
     /// <summary>
+    /// True while the driver-work thread runs the callback of a work item
+    /// <paramref name="context"/> created. A USB unplug asks, once it has
+    /// dropped the binding's items, so the driver's Remove does not run
+    /// while one of its callbacks still does.
+    /// </summary>
+    internal static bool IsRunningItemOf(DeviceContext context) =>
+        s_running is { } item && item.Context == context;
+
+    /// <summary>
     /// The driver-work thread: waits to be woken, then runs every item
     /// queued, and waits again. The wake-ups are counted, so one that comes
     /// while items run is not lost; at worst it finds the queue empty.
@@ -106,13 +123,15 @@ internal static class DriverWorkQueue
             while (TryDequeue() is { } item)
             {
                 item.Run();
+                s_running = null;
             }
         }
     }
 
     /// <summary>
     /// Takes the first item off the queue whose callback should run,
-    /// skipping any item disarmed while it waited. Null when none is left.
+    /// skipping any item disarmed while it waited, and records it as the
+    /// one running. Null when none is left.
     /// </summary>
     private static DeviceWorkItem? TryDequeue()
     {
@@ -129,6 +148,7 @@ internal static class DriverWorkQueue
                 item.NextQueued = null;
                 if (item.TakeForRunLocked())
                 {
+                    s_running = item;
                     return item;
                 }
             }

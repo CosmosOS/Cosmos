@@ -8,12 +8,16 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// A mouse a driver published through <see cref="DeviceContext.PublishMouse"/>:
 /// what the driver reports through it moves the kernel's pointer, exactly as
 /// a built-in mouse does. Reports reach the mouse manager once the driver's
-/// Probe returned Bound; a report made before that, or through the reporter
-/// of an attempt that was declined or failed, is dropped.
+/// Probe returned Bound; a report made before that, through the reporter of
+/// an attempt that was declined or failed, or once the kit withdrew the
+/// mouse because its USB device left the bus, is dropped.
 /// </summary>
 internal sealed class MouseReporter
 {
     private readonly PublishedMouse _mouse;
+
+    /// <summary>The adapter the kit delivers to the mouse manager, and withdraws from it when a USB device leaves.</summary>
+    internal PublishedMouse Device => _mouse;
 
     /// <summary>Puts a reporter in front of <paramref name="mouse"/>, the adapter the kit delivers to the mouse manager.</summary>
     internal MouseReporter(PublishedMouse mouse)

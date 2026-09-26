@@ -12,7 +12,9 @@ namespace Cosmos.Kernel.HAL.Drivers.Engine;
 /// the stack see it: a <see cref="NetworkDevice"/> like the built-in ones.
 /// The stack's sends go to the driver's <see cref="NetworkTransmitHandler"/>,
 /// and the frames the driver delivers through its <see cref="NetworkLink"/>
-/// go to the stack's <see cref="NetworkDevice.OnPacketReceived"/>.
+/// go to the stack's <see cref="NetworkDevice.OnPacketReceived"/>. A USB
+/// driver's link is withdrawn when its device leaves the bus, and carries
+/// nothing from then on.
 /// </summary>
 internal sealed class PublishedNetworkDevice : NetworkDevice
 {
@@ -35,8 +37,9 @@ internal sealed class PublishedNetworkDevice : NetworkDevice
     private volatile bool _linkUp;
 
     /// <summary>
-    /// Where a published link stands. It starts <see cref="Queued"/> and
-    /// leaves that state once, for good.
+    /// Where a published link stands. It starts <see cref="Queued"/>, and
+    /// moves forward only: <see cref="Gone"/> and <see cref="Withdrawn"/> are
+    /// final.
     /// </summary>
     private enum LinkState
     {
@@ -47,7 +50,10 @@ internal sealed class PublishedNetworkDevice : NetworkDevice
         Live,
 
         /// <summary>Dropped with the attempt that published it, which was declined or failed.</summary>
-        Gone
+        Gone,
+
+        /// <summary>Taken back out of the network manager: its USB device left the bus.</summary>
+        Withdrawn
     }
 
     /// <summary>The driver's registered name and the device's path, such as <c>rtl8139 pci/0000:00:03.0</c>.</summary>
@@ -59,8 +65,14 @@ internal sealed class PublishedNetworkDevice : NetworkDevice
     /// <summary>What the driver last reported through <see cref="NetworkLink.SetLinkState"/>; false until it does.</summary>
     public override bool LinkUp => _linkUp;
 
-    /// <summary>True once the kit delivered the link, unless it was disabled since.</summary>
-    public override bool Ready => _state == LinkState.Live && _enabled;
+    /// <summary>True once the kit delivered the link, unless it was disabled or withdrawn since.</summary>
+    public override bool Ready => CarriesTraffic;
+
+    /// <summary>Whether frames go through the link now: it is live and enabled.</summary>
+    private bool CarriesTraffic => _state == LinkState.Live && _enabled;
+
+    /// <summary>True once the kit withdrew the link; sends through it fail, and frames delivered through it are dropped.</summary>
+    internal bool IsWithdrawn => _state == LinkState.Withdrawn;
 
     /// <summary>Creates the link <paramref name="context"/>'s driver publishes. Thread context.</summary>
     /// <param name="context">The binding attempt that published it, which names it and its log lines.</param>
@@ -102,11 +114,15 @@ internal sealed class PublishedNetworkDevice : NetworkDevice
     /// </summary>
     /// <param name="data">The frame.</param>
     /// <param name="length">How many bytes of <paramref name="data"/> the frame is.</param>
-    /// <returns>False when the link does not carry traffic, the length is out of range, or the driver refused the frame.</returns>
+    /// <returns>
+    /// False when the link does not carry traffic (not delivered yet,
+    /// disabled, dropped, or withdrawn because its USB device left), the
+    /// length is out of range, or the driver refused the frame.
+    /// </returns>
     public override bool Send(byte[] data, int length)
     {
         // First, and cheap: a link that is not live never reaches the driver.
-        if (_state != LinkState.Live || !_enabled)
+        if (!CarriesTraffic)
         {
             return false;
         }
@@ -120,6 +136,17 @@ internal sealed class PublishedNetworkDevice : NetworkDevice
         {
             using (_transmitLock.AcquireIrqSafe())
             {
+                // Again, now that interrupts are masked. The stack sends from
+                // threads, and one preempted after the check above can
+                // resume after the USB hot-plug thread withdrew the link and
+                // ran the driver's Remove. From here to the handler's return
+                // no other thread runs on this single CPU, so a Withdraw
+                // that returned is seen, and none can start meanwhile.
+                if (!CarriesTraffic)
+                {
+                    return false;
+                }
+
                 return _transmit(new ReadOnlySpan<byte>(data, 0, length));
             }
         }
@@ -139,7 +166,7 @@ internal sealed class PublishedNetworkDevice : NetworkDevice
     internal void Deliver(ReadOnlySpan<byte> frame)
     {
         // Checked before the copy, so a link nobody listens on allocates nothing.
-        if (_state != LinkState.Live || !_enabled || frame.IsEmpty || OnPacketReceived is null)
+        if (!CarriesTraffic || frame.IsEmpty || OnPacketReceived is null)
         {
             return;
         }
@@ -150,10 +177,15 @@ internal sealed class PublishedNetworkDevice : NetworkDevice
         // interrupt handlers, and the stack relies on it: it takes no lock of
         // its own. Masking interrupts here gives a frame delivered from a
         // thread the same footing, so no other frame, and no timer callback,
-        // runs the stack halfway through this one.
+        // runs the stack halfway through this one. The link is checked again
+        // inside, as in Send: the USB hot-plug thread may have withdrawn it
+        // since the check above.
         using (InternalCpu.DisableInterruptsScope())
         {
-            OnPacketReceived?.Invoke(copy, copy.Length);
+            if (CarriesTraffic)
+            {
+                OnPacketReceived?.Invoke(copy, copy.Length);
+            }
         }
     }
 
@@ -166,4 +198,14 @@ internal sealed class PublishedNetworkDevice : NetworkDevice
     /// goes anywhere.
     /// </summary>
     internal void Drop() => _state = LinkState.Gone;
+
+    /// <summary>
+    /// Withdraws a live link whose USB device left the bus. Called by the
+    /// kit before it asks the network manager to let go of it, so a send the
+    /// stack still makes through it fails, and a frame the driver still
+    /// delivers is dropped, even meanwhile. Once it returned, the driver's
+    /// transmit handler is not called again, even by a send that was already
+    /// past Send's first check: Send checks again with interrupts masked.
+    /// </summary>
+    internal void Withdraw() => _state = LinkState.Withdrawn;
 }

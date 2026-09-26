@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.HAL.Drivers.Usb;
+
 namespace Cosmos.Kernel.HAL.Devices.Usb;
 
 /// <summary>
@@ -117,7 +119,24 @@ internal abstract class UsbDevice
     /// </summary>
     /// <param name="setup">The request; its Length is the data stage size.</param>
     /// <param name="data">At least <see cref="UsbSetupPacket.Length"/> bytes.</param>
-    public abstract UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data);
+    public UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data) =>
+        ControlTransfer(setup, data, out _);
+
+    /// <summary>
+    /// Runs a control transfer on the default pipe, waits for it, and
+    /// reports how many bytes its data stage moved: fewer than
+    /// <see cref="UsbSetupPacket.Length"/> when a device-to-host request
+    /// ended with a short packet, which is how a device answers with less
+    /// than was asked for. Same rules as the overload without the count.
+    /// </summary>
+    /// <param name="setup">The request; its Length is the data stage size.</param>
+    /// <param name="data">At least <see cref="UsbSetupPacket.Length"/> bytes.</param>
+    /// <param name="transferred">
+    /// Bytes the data stage moved when the transfer succeeds, 0 otherwise.
+    /// For a device-to-host request, only that many bytes at the start of
+    /// <paramref name="data"/> are the device's.
+    /// </param>
+    public abstract UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data, out int transferred);
 
     /// <summary>
     /// Queues a host-to-device control transfer and returns without waiting

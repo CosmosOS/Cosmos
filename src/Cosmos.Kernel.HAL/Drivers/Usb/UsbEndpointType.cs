@@ -1,6 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.HAL.Devices.Usb;
+namespace Cosmos.Kernel.HAL.Drivers.Usb;
 
 /// <summary>Transfer type of an endpoint, from bmAttributes bits 1:0.</summary>
 internal enum UsbEndpointType : byte

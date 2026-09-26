@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.HAL.Devices.Usb;
+using Cosmos.Kernel.HAL.Drivers.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.HAL.Devices.Input;
@@ -13,7 +14,7 @@ namespace Cosmos.Kernel.HAL.Devices.Input;
 /// The keyboards plugged in or pulled out after boot are reported through
 /// <see cref="KeyboardAttached"/> and <see cref="KeyboardDetached"/>.
 /// </summary>
-internal sealed class UsbKeyboardDriver : UsbDriver
+internal sealed class UsbKeyboardDriver : UsbClassDriver
 {
     private const byte BootInterfaceSubclass = 0x01;
     private const byte KeyboardProtocol = 0x01;
@@ -28,7 +29,13 @@ internal sealed class UsbKeyboardDriver : UsbDriver
     /// </summary>
     private static UsbKeyboard[]? s_keyboards;
 
-    public override string Name => "HID boot keyboard";
+    /// <summary>
+    /// The driver's <see cref="Name"/>, which the driver kit also refuses as
+    /// a registration name: the device list names an interface's owner by it.
+    /// </summary>
+    internal const string DriverName = "HID boot keyboard";
+
+    public override string Name => DriverName;
 
     /// <summary>
     /// Called with every keyboard that becomes usable: on the boot path

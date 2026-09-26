@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.Drivers.Usb;
 
 namespace Cosmos.Kernel.HAL.Devices.Usb;
 
@@ -10,7 +11,7 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// which powers and resets every port, enumerates the devices behind them,
 /// and follows the ports that change afterwards.
 /// </summary>
-internal sealed class UsbHubDriver : UsbDriver
+internal sealed class UsbHubDriver : UsbClassDriver
 {
     /// <summary>SET_HUB_DEPTH (USB 3.2 §10.16.2.9).</summary>
     private const byte SetHubDepthRequest = 0x0C;
@@ -32,7 +33,13 @@ internal sealed class UsbHubDriver : UsbDriver
     /// <summary>Hubs bound so far. Changed by the boot path, then by the hot-plug thread only.</summary>
     private static List<UsbHub>? s_hubs;
 
-    public override string Name => "hub";
+    /// <summary>
+    /// The driver's <see cref="Name"/>, which the driver kit also refuses as
+    /// a registration name: the device list names an interface's owner by it.
+    /// </summary>
+    internal const string DriverName = "hub";
+
+    public override string Name => DriverName;
 
     /// <summary>
     /// Lets every hub handle the ports its status change endpoint reported.

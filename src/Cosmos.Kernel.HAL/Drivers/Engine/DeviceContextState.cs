@@ -18,5 +18,12 @@ internal enum DeviceContextState
     Bound,
 
     /// <summary>The attempt was declined or failed, and the engine released what it acquired.</summary>
-    TornDown
+    TornDown,
+
+    /// <summary>
+    /// The bound USB device left its bus: the engine withdrew what the
+    /// driver published, ran its Remove, and the binding is over. Its
+    /// transfers answer Disconnected.
+    /// </summary>
+    Removed
 }

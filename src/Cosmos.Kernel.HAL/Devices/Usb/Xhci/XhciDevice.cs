@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.HAL.Drivers.Usb;
+
 namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 
 /// <summary>
@@ -164,8 +166,8 @@ internal sealed unsafe class XhciDevice : UsbDevice
         return null;
     }
 
-    public override UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data) =>
-        _controller.ControlTransfer(this, setup, data);
+    public override UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data, out int transferred) =>
+        _controller.ControlTransfer(this, setup, data, out transferred);
 
     public override bool SubmitControlTransfer(UsbSetupPacket setup, ReadOnlySpan<byte> data) =>
         _controller.SubmitControlTransfer(this, setup, data);

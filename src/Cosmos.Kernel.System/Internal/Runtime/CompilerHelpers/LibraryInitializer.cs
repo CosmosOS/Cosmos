@@ -73,12 +73,22 @@ internal class LibraryInitializer
                     }
 
                     // Mice the kernel's registered drivers publish, delivered
-                    // by the driver pass after the platform's. Nested under
-                    // PCI's own switch: registered drivers bind PCI functions
-                    // only, and a kernel without PCI trims the driver engine.
+                    // by the driver pass after the platform's, or by the USB
+                    // hot-plug thread. Nested under PCI's own switch: every
+                    // driver the kit binds sits on PCI, a USB one behind a
+                    // PCI host controller, and a kernel without PCI trims
+                    // the driver engine.
                     if (CosmosFeatures.PCIEnabled)
                     {
                         DriverCore.MouseSink = MouseManager.RegisterMouse;
+
+                        // A USB driver's mouse leaves with its device. Nested
+                        // under USB's own switch, so a kernel without USB
+                        // trims the unregistration.
+                        if (CosmosFeatures.UsbEnabled)
+                        {
+                            DriverCore.MouseWithdrawSink = MouseManager.UnregisterMouse;
+                        }
                     }
                 }
 
@@ -94,12 +104,20 @@ internal class LibraryInitializer
                     }
 
                     // Network links the kernel's registered drivers publish,
-                    // registered by the driver pass after the platform's
-                    // device, which therefore stays primary. Nested under
-                    // PCI's switch, as the mouse sink is.
+                    // registered by the driver pass, or the USB hot-plug
+                    // thread, after the platform's device, which therefore
+                    // stays primary. Nested under PCI's switch, as the mouse
+                    // sink is.
                     if (CosmosFeatures.PCIEnabled)
                     {
                         DriverCore.NetworkSink = NetworkManager.RegisterDevice;
+
+                        // A USB driver's link leaves with its device, as its
+                        // mouse does.
+                        if (CosmosFeatures.UsbEnabled)
+                        {
+                            DriverCore.NetworkWithdrawSink = NetworkManager.UnregisterDevice;
+                        }
                     }
                 }
 
