@@ -134,18 +134,21 @@ $MultiArchProjects = @(
 Write-Host "Building all multi-arch packages for x64..." -ForegroundColor Cyan
 dotnet build src/Cosmos.Kernel/Cosmos.Kernel.csproj -c Release -r linux-x64 -p:CosmosArch=x64 --no-incremental
 
-# Stage x64 builds
+# Stage x64 builds: the assembly and its XML docs, which the package
+# ships next to it so a kernel's IDE shows them.
 Write-Host "Staging x64 builds..." -ForegroundColor Cyan
 foreach ($proj in $MultiArchProjects) {
     New-Item -ItemType Directory -Force -Path "artifacts/multiarch/$proj/x64" | Out-Null
-    $sourcePath1 = "artifacts/bin/$proj/release_linux-x64/$proj.dll"
-    $sourcePath2 = "artifacts/bin/$proj/release/$proj.dll"
     $destPath = "artifacts/multiarch/$proj/x64/"
+    foreach ($ext in @("dll", "xml")) {
+        $sourcePath1 = "artifacts/bin/$proj/release_linux-x64/$proj.$ext"
+        $sourcePath2 = "artifacts/bin/$proj/release/$proj.$ext"
 
-    if (Test-Path $sourcePath1) {
-        Copy-Item $sourcePath1 $destPath -ErrorAction SilentlyContinue
-    } elseif (Test-Path $sourcePath2) {
-        Copy-Item $sourcePath2 $destPath -ErrorAction SilentlyContinue
+        if (Test-Path $sourcePath1) {
+            Copy-Item $sourcePath1 $destPath -ErrorAction SilentlyContinue
+        } elseif (Test-Path $sourcePath2) {
+            Copy-Item $sourcePath2 $destPath -ErrorAction SilentlyContinue
+        }
     }
 }
 
@@ -153,18 +156,21 @@ foreach ($proj in $MultiArchProjects) {
 Write-Host "Building all multi-arch packages for arm64..." -ForegroundColor Cyan
 dotnet build src/Cosmos.Kernel/Cosmos.Kernel.csproj -c Release -r linux-arm64 -p:CosmosArch=arm64 --no-incremental
 
-# Stage arm64 builds
+# Stage arm64 builds: the assembly and its XML docs, which the package
+# ships next to it so a kernel's IDE shows them.
 Write-Host "Staging arm64 builds..." -ForegroundColor Cyan
 foreach ($proj in $MultiArchProjects) {
     New-Item -ItemType Directory -Force -Path "artifacts/multiarch/$proj/arm64" | Out-Null
-    $sourcePath1 = "artifacts/bin/$proj/release_linux-arm64/$proj.dll"
-    $sourcePath2 = "artifacts/bin/$proj/release/$proj.dll"
     $destPath = "artifacts/multiarch/$proj/arm64/"
+    foreach ($ext in @("dll", "xml")) {
+        $sourcePath1 = "artifacts/bin/$proj/release_linux-arm64/$proj.$ext"
+        $sourcePath2 = "artifacts/bin/$proj/release/$proj.$ext"
 
-    if (Test-Path $sourcePath1) {
-        Copy-Item $sourcePath1 $destPath -ErrorAction SilentlyContinue
-    } elseif (Test-Path $sourcePath2) {
-        Copy-Item $sourcePath2 $destPath -ErrorAction SilentlyContinue
+        if (Test-Path $sourcePath1) {
+            Copy-Item $sourcePath1 $destPath -ErrorAction SilentlyContinue
+        } elseif (Test-Path $sourcePath2) {
+            Copy-Item $sourcePath2 $destPath -ErrorAction SilentlyContinue
+        }
     }
 }
 

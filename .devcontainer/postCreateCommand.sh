@@ -134,24 +134,30 @@ MULTIARCH_PROJECTS=(
 echo "Building all multi-arch packages for x64..."
 dotnet build src/Cosmos.Kernel/Cosmos.Kernel.csproj -c Release -r linux-x64 -p:CosmosArch=x64 --no-incremental
 
-# Stage x64 builds
+# Stage x64 builds: the assembly and its XML docs, which the package
+# ships next to it so a kernel's IDE shows them.
 echo "Staging x64 builds..."
 for proj in "${MULTIARCH_PROJECTS[@]}"; do
     mkdir -p "artifacts/multiarch/$proj/x64"
-    cp "artifacts/bin/$proj/release_linux-x64/$proj.dll" "artifacts/multiarch/$proj/x64/" 2>/dev/null || \
-    cp "artifacts/bin/$proj/release/$proj.dll" "artifacts/multiarch/$proj/x64/" 2>/dev/null || true
+    for ext in dll xml; do
+        cp "artifacts/bin/$proj/release_linux-x64/$proj.$ext" "artifacts/multiarch/$proj/x64/" 2>/dev/null || \
+        cp "artifacts/bin/$proj/release/$proj.$ext" "artifacts/multiarch/$proj/x64/" 2>/dev/null || true
+    done
 done
 
 # Build all multi-arch packages for arm64
 echo "Building all multi-arch packages for arm64..."
 dotnet build src/Cosmos.Kernel/Cosmos.Kernel.csproj -c Release -r linux-arm64 -p:CosmosArch=arm64 --no-incremental
 
-# Stage arm64 builds
+# Stage arm64 builds: the assembly and its XML docs, which the package
+# ships next to it so a kernel's IDE shows them.
 echo "Staging arm64 builds..."
 for proj in "${MULTIARCH_PROJECTS[@]}"; do
     mkdir -p "artifacts/multiarch/$proj/arm64"
-    cp "artifacts/bin/$proj/release_linux-arm64/$proj.dll" "artifacts/multiarch/$proj/arm64/" 2>/dev/null || \
-    cp "artifacts/bin/$proj/release/$proj.dll" "artifacts/multiarch/$proj/arm64/" 2>/dev/null || true
+    for ext in dll xml; do
+        cp "artifacts/bin/$proj/release_linux-arm64/$proj.$ext" "artifacts/multiarch/$proj/arm64/" 2>/dev/null || \
+        cp "artifacts/bin/$proj/release/$proj.$ext" "artifacts/multiarch/$proj/arm64/" 2>/dev/null || true
+    done
 done
 
 # No ref assembly needed - NuGet will select the correct RID-specific assembly

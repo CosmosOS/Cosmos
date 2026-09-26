@@ -7,7 +7,14 @@
     Package structure:
       build/{PackageId}.props                      - Adds correct reference based on RID
       runtimes/linux-x64/lib/{tfm}/Assembly.dll    - x64 assembly
+      runtimes/linux-x64/lib/{tfm}/Assembly.xml    - x64 XML docs
       runtimes/linux-arm64/lib/{tfm}/Assembly.dll  - arm64 assembly
+      runtimes/linux-arm64/lib/{tfm}/Assembly.xml  - arm64 XML docs
+
+    The staging step of .devcontainer/postCreateCommand.sh (and .ps1) copies
+    each arch's dll and xml into artifacts/multiarch/{Project}/{arch}/. The
+    xml sits next to the dll the generated props references, which is where
+    the reference resolution looks for it, so a kernel's IDE shows the docs.
 
     Usage: Set IsMultiArchPackage=true and import this file.
   -->
@@ -42,6 +49,16 @@
     </None>
     <None Include="$(MultiArchStagingBase)arm64/$(AssemblyName).dll"
           Condition="Exists('$(MultiArchStagingBase)arm64/$(AssemblyName).dll')">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/linux-arm64/lib/$(_MultiArchTFM)/</PackagePath>
+    </None>
+    <None Include="$(MultiArchStagingBase)x64/$(AssemblyName).xml"
+          Condition="Exists('$(MultiArchStagingBase)x64/$(AssemblyName).xml')">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/linux-x64/lib/$(_MultiArchTFM)/</PackagePath>
+    </None>
+    <None Include="$(MultiArchStagingBase)arm64/$(AssemblyName).xml"
+          Condition="Exists('$(MultiArchStagingBase)arm64/$(AssemblyName).xml')">
       <Pack>true</Pack>
       <PackagePath>runtimes/linux-arm64/lib/$(_MultiArchTFM)/</PackagePath>
     </None>
@@ -104,8 +121,8 @@
           Condition="'$(IsMultiArchPackage)' == 'true'">
     <Message Importance="High" Text="Including multi-arch files for $(PackageId):" />
     <Message Importance="High" Text="  props: build/$(PackageId).props" />
-    <Message Importance="High" Text="  x64: runtimes/linux-x64/lib/$(_MultiArchTFM)/$(AssemblyName).dll" />
-    <Message Importance="High" Text="  arm64: runtimes/linux-arm64/lib/$(_MultiArchTFM)/$(AssemblyName).dll" />
+    <Message Importance="High" Text="  x64: runtimes/linux-x64/lib/$(_MultiArchTFM)/$(AssemblyName).dll (+ .xml)" />
+    <Message Importance="High" Text="  arm64: runtimes/linux-arm64/lib/$(_MultiArchTFM)/$(AssemblyName).dll (+ .xml)" />
   </Target>
 
 </Project>
