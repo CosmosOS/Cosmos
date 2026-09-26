@@ -18,9 +18,12 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// attempt is declined or fails, the kit releases all of it, and when a
 /// bound USB device leaves its bus, the kit withdraws what the driver
 /// published and stops its work items and events, so a driver never writes
-/// teardown code of its own.
+/// teardown code of its own. Only the kit creates one: a driver receives
+/// the <see cref="Pci.PciDeviceContext"/> or
+/// <see cref="Usb.UsbDeviceContext"/> of its attempt as Probe's argument.
 /// </summary>
-internal abstract class DeviceContext
+[Experimental(Experimentals.DriverKitDiagId)]
+public abstract class DeviceContext
 {
     /// <summary>
     /// Longest busy-wait handed to the platform in one call, in microseconds.
@@ -66,14 +69,15 @@ internal abstract class DeviceContext
     /// function (segment, bus, device and function, in hexadecimal) or
     /// <c>usb/1-2.1:1.0</c> for a USB interface (host controller, the root
     /// port and each hub port below it, configuration value and interface
-    /// number, in decimal).
+    /// number, in decimal). Any context: reading it allocates nothing.
     /// </summary>
     public string Path { get; }
 
     /// <summary>
     /// True while the device is on its bus: false once a USB device was
-    /// unplugged. A PCI function never leaves it in this version, so a PCI
-    /// context always reports true.
+    /// unplugged, from before the kit calls the driver's Remove. A PCI
+    /// function never leaves it in this version, so a PCI context always
+    /// reports true. Any context, interrupt handlers included.
     /// </summary>
     public bool IsPresent => _present;
 
@@ -106,6 +110,10 @@ internal abstract class DeviceContext
     /// </summary>
     /// <param name="duration">How long to wait; zero returns at once.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="duration"/> is negative.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// No platform is registered to busy-wait on, which only happens before
+    /// the HAL is brought up, never in a callback the kit makes.
+    /// </exception>
     public void Delay(TimeSpan duration)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(duration, TimeSpan.Zero);
@@ -156,6 +164,7 @@ internal abstract class DeviceContext
     /// False when there is no thread to run it: the scheduler is compiled
     /// out, or it did not start the driver-work thread.
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="callback"/> is null.</exception>
     /// <exception cref="InvalidOperationException">Called outside the driver's Probe.</exception>
     public bool TryCreateWorkItem(Action callback, [NotNullWhen(true)] out DeviceWorkItem? workItem)
     {
@@ -223,6 +232,7 @@ internal abstract class DeviceContext
     /// <param name="address">The device's MAC address, which the stack sends from.</param>
     /// <param name="transmit">Called for each frame the stack sends, with interrupts masked, one call at a time.</param>
     /// <returns>The link the driver delivers received frames and link changes through.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="address"/> or <paramref name="transmit"/> is null.</exception>
     /// <exception cref="InvalidOperationException">
     /// Called outside the driver's Probe, or the kernel is built without
     /// network support.

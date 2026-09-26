@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
 
 /// <summary>
@@ -9,9 +11,13 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// lives until its device leaves the bus, when the kit calls
 /// <see cref="Remove"/>. The kit offers a driver only the interfaces no
 /// built-in class driver (hub, keyboard, mass storage) took; neither the
-/// host controller nor the built-ins know the driver exists.
+/// host controller nor the built-ins know the driver exists. A driver
+/// overrides <see cref="Probe"/>, and <see cref="Remove"/> if it needs to,
+/// as <c>protected override</c>; an assembly that Cosmos.Kernel.HAL grants
+/// its internals to overrides them as <c>protected internal override</c>.
 /// </summary>
-internal abstract class UsbDriver
+[Experimental(Experimentals.DriverKitDiagId)]
+public abstract class UsbDriver
 {
     /// <summary>
     /// Decides whether this driver takes the interface behind

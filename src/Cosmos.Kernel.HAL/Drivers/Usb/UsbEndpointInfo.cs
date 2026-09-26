@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Devices.Usb;
 
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
@@ -9,9 +10,13 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// (USB 2.0 §9.6.6). A driver hands it back to
 /// <see cref="UsbDeviceContext.OpenInterruptIn"/> or
 /// <see cref="UsbDeviceContext.TryOpenBulk"/>, which find the endpoint by
-/// its <see cref="Address"/> in the context's interface.
+/// its <see cref="Address"/> in the context's interface. A plain value:
+/// every member can be read in any context. A <c>default</c> value names
+/// endpoint 0, which is no endpoint of an interface, so the context refuses
+/// to open it.
 /// </summary>
-internal readonly struct UsbEndpointInfo
+[Experimental(Experimentals.DriverKitDiagId)]
+public readonly struct UsbEndpointInfo
 {
     /// <summary>bEndpointAddress: the endpoint number in bits 3:0, the direction in bit 7.</summary>
     public byte Address { get; }

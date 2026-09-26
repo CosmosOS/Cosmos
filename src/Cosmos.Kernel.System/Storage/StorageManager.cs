@@ -146,7 +146,7 @@ public static class StorageManager
         if (CosmosFeatures.UsbEnabled)
         {
             UsbMassStorageDriver.DiskAttached = RegisterDevice;
-            UsbMassStorageDriver.DiskDetached = UnregisterDevice;
+            UsbMassStorageDriver.DiskDetached = static disk => UnregisterDevice(disk);
         }
 
         IReadOnlyList<BlockDevice> ports = Ahci.Ports;
@@ -214,19 +214,36 @@ public static class StorageManager
     }
 
     /// <summary>
-    /// Forgets a block device that is gone (a USB disk pulled out): it
-    /// leaves <see cref="Devices"/>, its partitions leave
-    /// <see cref="Partitions"/>, and the filesystems mounted from them are
-    /// detached from the VFS without a flush, since the device can take no
-    /// more writes. When it was the primary device, the first one left
-    /// takes its place.
+    /// Forgets a block device that is gone, such as a USB disk pulled out:
+    /// a USB driver's Remove calls it for the disk it registered with
+    /// <see cref="RegisterDevice"/>. The device leaves <see cref="Devices"/>,
+    /// its partitions leave <see cref="Partitions"/>, and the filesystems
+    /// mounted from them are detached from the VFS without a flush, since
+    /// the device can take no more writes. When it was the primary device,
+    /// the first one left takes its place. Thread context: it allocates, and
+    /// takes the manager's and the VFS's locks.
     /// </summary>
     /// <param name="device">The device that is gone.</param>
-    internal static void UnregisterDevice(IBlockDevice device)
+    /// <returns>
+    /// True when the device was registered and is now forgotten. False when
+    /// it was not registered, which includes every device of a kernel built
+    /// without storage support, so a cleanup path needs no check of its own.
+    /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="device"/> is null.</exception>
+    public static bool UnregisterDevice(IBlockDevice device)
     {
+        ArgumentNullException.ThrowIfNull(device);
+
+        // The switch alone, so ILC folds it and a kernel without storage
+        // trims the rest: nothing could have registered the device.
+        if (!CosmosFeatures.StorageEnabled)
+        {
+            return false;
+        }
+
         if (s_devices is null)
         {
-            return;
+            return false;
         }
 
         s_mutationLock.Acquire();
@@ -234,7 +251,7 @@ public static class StorageManager
         {
             if (!IsRegistered(device))
             {
-                return;
+                return false;
             }
 
             List<IBlockDevice> devices = [];
@@ -262,6 +279,7 @@ public static class StorageManager
         Serial.WriteString(device.Name);
         Serial.WriteString(" unregistered\n");
         VfsManager.DetachMounts(device);
+        return true;
     }
 
     /// <summary>

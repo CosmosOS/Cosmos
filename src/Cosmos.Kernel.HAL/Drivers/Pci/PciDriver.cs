@@ -1,14 +1,20 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.Drivers.Pci;
 
 /// <summary>
 /// Base class of a driver for PCI functions. The kit creates one instance
 /// per function it offers the driver, through the registration's factory,
 /// and calls <see cref="Probe"/> on it once. A bound instance lives as long
-/// as the kernel: a PCI function is never unbound in this version.
+/// as the kernel: a PCI function is never unbound in this version. A driver
+/// overrides <see cref="Probe"/> as <c>protected override</c>; an assembly
+/// that Cosmos.Kernel.HAL grants its internals to overrides it as
+/// <c>protected internal override</c>.
 /// </summary>
-internal abstract class PciDriver
+[Experimental(Experimentals.DriverKitDiagId)]
+public abstract class PciDriver
 {
     /// <summary>
     /// Decides whether this driver takes the function behind

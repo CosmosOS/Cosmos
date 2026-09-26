@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 
 namespace Cosmos.Kernel.HAL.Drivers;
@@ -12,9 +13,12 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// <see cref="DeviceContext.TryCreateWorkItem"/> and owned by the binding:
 /// scheduled during Probe, it runs once Probe returned Bound, and it never
 /// runs if the attempt is declined or fails, nor once the USB device it was
-/// created for left the bus.
+/// created for left the bus. An exception the callback throws is logged
+/// with the driver's name and the device's path, and the item never runs
+/// again.
 /// </summary>
-internal sealed class DeviceWorkItem
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class DeviceWorkItem
 {
     private readonly DeviceContext _context;
     private readonly Action _callback;
@@ -53,8 +57,8 @@ internal sealed class DeviceWorkItem
     }
 
     /// <summary>
-    /// Asks for the callback to run once on the driver-work thread. IRQ-safe:
-    /// it allocates nothing and takes an IRQ-safe lock only, so the
+    /// Asks for the callback to run once on the driver-work thread. Any
+    /// context: it allocates nothing and takes an IRQ-safe lock only, so the
     /// driver's interrupt handler may call it. Scheduling again while the
     /// item waits to run does nothing; once the callback has started, a new
     /// Schedule runs it again after it returns.

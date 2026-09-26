@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Devices.Usb;
 
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
@@ -14,9 +15,10 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// <see cref="Interface(byte, byte)"/> entry, which beats a class-only
 /// <see cref="Interface(byte)"/> entry, and the earlier registration wins a
 /// tie. A <c>default(UsbMatch)</c> matches nothing, and a registration
-/// refuses it.
+/// refuses it. The factories run in any context and throw nothing.
 /// </summary>
-internal readonly struct UsbMatch
+[Experimental(Experimentals.DriverKitDiagId)]
+public readonly struct UsbMatch
 {
     private readonly ushort _vendorId;
     private readonly ushort _productId;

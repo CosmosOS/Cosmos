@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Scheduler;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
@@ -10,7 +11,12 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// guard state its handler shares with thread context: entering masks
 /// interrupts on this CPU, then spins until the lock is free, so the
 /// handler can never interrupt a holder on the same CPU and wait for it
-/// forever. Hold it briefly, and never across a wait. Not re-entrant.
+/// forever. Hold it briefly, and never across a wait. Not re-entrant: a
+/// holder that enters it again spins forever. The kernel runs on one CPU in
+/// this version, and a holder runs with interrupts masked, so nothing else
+/// runs until it lets go. Create one in thread context, as any object, such
+/// as in the driver's constructor or its Probe, never in an interrupt
+/// handler.
 /// </summary>
 /// <example>
 /// <code>
@@ -20,7 +26,8 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// }
 /// </code>
 /// </example>
-internal sealed class IrqSafeLock
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class IrqSafeLock
 {
     // Not readonly: SpinLock is a mutable struct, and a readonly field would
     // hand every call a defensive copy that no one else sees locked.
@@ -28,14 +35,16 @@ internal sealed class IrqSafeLock
 
     /// <summary>
     /// Masks interrupts and takes the lock. Disposing the returned scope
-    /// releases the lock, then puts the interrupt mask back as it was.
+    /// releases the lock, then puts the interrupt mask back as it was. Any
+    /// context, interrupt handlers included: it allocates nothing.
     /// </summary>
     /// <returns>The held lock, to dispose once, typically through <c>using</c>.</returns>
     public Scope EnterScope() => new(_lock.AcquireIrqSafe());
 
     /// <summary>
     /// The held lock, returned by <see cref="EnterScope"/>. A ref struct, so
-    /// it cannot outlive the method that took the lock.
+    /// it cannot outlive the method that took the lock. A <c>default</c>
+    /// scope holds nothing, and disposing it does nothing.
     /// </summary>
     public ref struct Scope
     {
@@ -52,7 +61,8 @@ internal sealed class IrqSafeLock
 
         /// <summary>
         /// Releases the lock, then restores the interrupt mask as it was
-        /// before <see cref="EnterScope"/>. A second call does nothing.
+        /// before <see cref="EnterScope"/>. A second call does nothing. Any
+        /// context.
         /// </summary>
         public void Dispose()
         {

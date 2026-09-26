@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 
@@ -14,7 +15,8 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// binding: once the binding attempt is declined or fails, or the USB
 /// device it was created for leaves the bus, every Wait returns false.
 /// </summary>
-internal sealed class DeviceEvent
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class DeviceEvent
 {
     private readonly DeviceContext _context;
     private readonly InterruptEvent _event = new();
@@ -29,8 +31,10 @@ internal sealed class DeviceEvent
 
     /// <summary>
     /// Signals the event: wakes one waiting thread, or lets the next
-    /// <see cref="Wait"/> return at once. IRQ-safe: it allocates nothing and
-    /// takes an IRQ-safe lock only, so an interrupt handler may call it.
+    /// <see cref="Wait"/> return at once. Any context: it allocates nothing
+    /// and takes an IRQ-safe lock only, so an interrupt handler may call it.
+    /// Signalling an event whose binding is gone does nothing harmful: its
+    /// Wait returns false whatever the count.
     /// </summary>
     public void Signal() => _event.Signal();
 

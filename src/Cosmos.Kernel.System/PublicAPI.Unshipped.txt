@@ -781,6 +781,7 @@ static Cosmos.Kernel.System.Storage.StorageManager.Partitions.get -> System.Coll
 static Cosmos.Kernel.System.Storage.StorageManager.PrimaryDevice.get -> Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice?
 static Cosmos.Kernel.System.Storage.StorageManager.RegisterDevice(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> void
 static Cosmos.Kernel.System.Storage.StorageManager.RescanPartitions(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> void
+static Cosmos.Kernel.System.Storage.StorageManager.UnregisterDevice(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> bool
 static Cosmos.Kernel.System.Timer.AlarmManager.Cancel(ulong id) -> bool
 static Cosmos.Kernel.System.Timer.AlarmManager.Schedule(System.Action! callback, System.TimeSpan delay) -> ulong
 static Cosmos.Kernel.System.Timer.AlarmManager.ScheduleRecurring(System.Action! callback, System.TimeSpan period) -> ulong
@@ -1057,3 +1058,17 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]override Cosmos.Kernel.System.Network.UDP.UdpPacket.ToString() -> string!
 [COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.HandlePacket(byte[]! packetData, int length) -> void
 [COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.Send(Cosmos.Kernel.System.Network.InternetPacket! packet) -> bool
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo.Class.get -> byte
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo.DeviceId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo.DeviceInfo() -> void
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo.DriverName.get -> string?
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo.Path.get -> string!
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo.Protocol.get -> byte
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo.Subclass.get -> byte
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo.VendorId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.System.Drivers.DriverManager
+[COSMOS0003]static Cosmos.Kernel.System.Drivers.DriverManager.Devices.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.Drivers.DeviceInfo>!
+[COSMOS0003]static Cosmos.Kernel.System.Drivers.DriverManager.Register(Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration! registration) -> bool
+[COSMOS0003]static Cosmos.Kernel.System.Drivers.DriverManager.Register(Cosmos.Kernel.HAL.Drivers.Usb.UsbDriverRegistration! registration) -> bool
+[COSMOS0003]virtual Cosmos.Kernel.System.Kernel.RegisterDrivers() -> void

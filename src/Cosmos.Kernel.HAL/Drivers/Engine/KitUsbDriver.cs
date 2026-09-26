@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.HAL.Drivers.Engine;
 /// keyboard and mass storage built-ins, so those keep the first pick of
 /// every interface, at boot and when a device is plugged in later. The
 /// interfaces present at boot are left to the driver pass, which runs once
-/// the kernel constructor registered its drivers; after it, a device the
+/// the kernel registered its drivers; after it, a device the
 /// hot-plug thread enumerates gets the same ranked offering through
 /// <see cref="TryBind"/>. The binding of the registration that took an
 /// interface is kept with it, in <see cref="UsbInterface.DriverContext"/>,

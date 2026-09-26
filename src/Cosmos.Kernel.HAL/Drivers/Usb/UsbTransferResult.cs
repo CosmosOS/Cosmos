@@ -1,12 +1,15 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
 
 /// <summary>
 /// How a USB transfer that moves data ended: its status, and how many bytes
-/// it moved.
+/// it moved. A plain value: every member can be read in any context.
 /// </summary>
-internal readonly struct UsbTransferResult
+[Experimental(Experimentals.DriverKitDiagId)]
+public readonly struct UsbTransferResult
 {
     /// <summary>How the transfer ended.</summary>
     public UsbTransferStatus Status { get; }

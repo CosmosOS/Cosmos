@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Devices.Usb;
 
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
@@ -7,9 +8,11 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// <summary>
 /// One interface of a device's active configuration, alternate setting 0,
 /// as its interface descriptor declares it (USB 2.0 §9.6.5), with its
-/// endpoints. It describes; it opens nothing.
+/// endpoints. It describes; it opens nothing. Read when the context was
+/// built, so every member can be read in any context, and none allocates.
 /// </summary>
-internal sealed class UsbInterfaceInfo
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class UsbInterfaceInfo
 {
     private readonly UsbEndpointInfo[] _endpoints;
 

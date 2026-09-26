@@ -37,8 +37,9 @@ internal static class DriverCore
     /// <see cref="Register(UsbDriverRegistration)"/> throw with when a
     /// driver's factory or Probe calls them. The pass closes registration
     /// before the first factory runs, so the closed check would refuse such
-    /// a call too; the Drivers suite compares against this message to tell
-    /// that the re-entrancy check is the one that did.
+    /// a call too; the Drivers suite looks for "from its factory or its
+    /// Probe" in the message to tell that the re-entrancy check is the one
+    /// that did, so keep those words.
     /// </summary>
     internal const string RegisterFromDriverCallbackMessage = "A driver cannot register drivers from its factory or its Probe.";
 
@@ -66,7 +67,7 @@ internal static class DriverCore
     /// <summary>
     /// Set once the pass is over. Until then <see cref="KitUsbDriver"/>
     /// leaves every interface alone: the ones present at boot are the pass's
-    /// to offer, once the kernel constructor registered its drivers.
+    /// to offer, once the kernel registered its drivers.
     /// </summary>
     private static volatile bool s_passCompleted;
 
@@ -134,7 +135,8 @@ internal static class DriverCore
     /// <summary>
     /// Registers a PCI driver, to be offered the functions no built-in driver
     /// owns when the driver pass runs. Registration is open until then: from
-    /// the kernel's constructor, before Global.StartKernel.
+    /// the kernel's constructor, or from its RegisterDrivers override, which
+    /// Global.StartKernel calls right before the pass.
     /// </summary>
     /// <param name="registration">The driver's name, factory and match table.</param>
     /// <returns>
@@ -160,8 +162,9 @@ internal static class DriverCore
     /// Registers a USB class driver, to be offered the interfaces no
     /// built-in class driver took: those present at boot when the driver
     /// pass runs, and those of every device plugged in later. Registration
-    /// is open until the pass: from the kernel's constructor, before
-    /// Global.StartKernel.
+    /// is open until the pass: from the kernel's constructor, or from its
+    /// RegisterDrivers override, which Global.StartKernel calls right before
+    /// the pass.
     /// </summary>
     /// <param name="registration">The driver's name, factory and match table.</param>
     /// <returns>
@@ -226,7 +229,7 @@ internal static class DriverCore
 
         if (closed)
         {
-            throw new InvalidOperationException("Driver registration closed when the driver pass ran; register drivers from the kernel's constructor.");
+            throw new InvalidOperationException("Driver registration closed when the driver pass ran; register drivers from the kernel's RegisterDrivers override or its constructor.");
         }
 
         if (nameTaken)
@@ -561,7 +564,8 @@ internal static class DriverCore
     /// One binding attempt: builds the context, creates the driver through
     /// the registration's factory and runs its Probe. A bound function is
     /// claimed under the registration's name and its context kept; any
-    /// other outcome, an exception included, tears the attempt down.
+    /// other outcome, an exception or a null driver from the factory
+    /// included, tears the attempt down.
     /// </summary>
     /// <returns>True when the driver bound the function.</returns>
     private static bool TryBind(PciDevice function, string path, PciDriverRegistration registration)
@@ -573,9 +577,23 @@ internal static class DriverCore
         s_inDriverCallback = true;
         try
         {
-            PciDriver driver = registration.Factory();
-            context.BeginProbe();
-            result = driver.Probe(context);
+            // Nullable, whatever the delegate's annotation says: a factory
+            // built without nullable analysis, or one handing out pooled
+            // instances, can return null. Calling Probe on it would not throw
+            // a NullReferenceException the catch below could count as a
+            // failure: the load from address 0 is a page fault, which halts
+            // the kernel without naming the driver.
+            PciDriver? driver = registration.Factory();
+            if (driver is null)
+            {
+                result = ProbeResult.Failed;
+                failure = "the factory returned null";
+            }
+            else
+            {
+                context.BeginProbe();
+                result = driver.Probe(context);
+            }
         }
         catch (Exception exception)
         {
@@ -731,9 +749,10 @@ internal static class DriverCore
     /// One binding attempt on a USB interface: builds the context, creates
     /// the driver through the registration's factory and runs its Probe. A
     /// bound interface keeps the context; any other outcome, an exception
-    /// included, tears the attempt down. <paramref name="openedEndpoint"/>
-    /// tells whether the attempt opened an endpoint, interrupt or bulk,
-    /// whatever its outcome: a declined or failed one then ends the offering.
+    /// or a null driver from the factory included, tears the attempt down.
+    /// <paramref name="openedEndpoint"/> tells whether the attempt opened an
+    /// endpoint, interrupt or bulk, whatever its outcome: a declined or
+    /// failed one then ends the offering.
     /// </summary>
     /// <returns>True when the driver bound the interface.</returns>
     private static bool TryBind(UsbDevice device, UsbInterface usbInterface, string path, UsbDriverRegistration registration,
@@ -746,10 +765,21 @@ internal static class DriverCore
         s_inDriverCallback = true;
         try
         {
-            UsbDriver driver = registration.Factory();
-            context.Driver = driver;
-            context.BeginProbe();
-            result = driver.Probe(context);
+            // Nullable for the reason the PCI attempt gives: a null driver
+            // would page fault on Probe and halt the kernel, and must fail
+            // this attempt instead.
+            UsbDriver? driver = registration.Factory();
+            if (driver is null)
+            {
+                result = ProbeResult.Failed;
+                failure = "the factory returned null";
+            }
+            else
+            {
+                context.Driver = driver;
+                context.BeginProbe();
+                result = driver.Probe(context);
+            }
         }
         catch (Exception exception)
         {

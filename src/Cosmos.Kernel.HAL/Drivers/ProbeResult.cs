@@ -1,11 +1,14 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.Drivers;
 
 /// <summary>
 /// What a driver's Probe reports about the device it was offered.
 /// </summary>
-internal enum ProbeResult
+[Experimental(Experimentals.DriverKitDiagId)]
+public enum ProbeResult
 {
     /// <summary>
     /// The driver took the device. The kit keeps the context, and everything
@@ -24,7 +27,7 @@ internal enum ProbeResult
     /// The driver handles the device but could not bring it up. The kit
     /// releases whatever the probe acquired, logs the failure, and offers the
     /// device to the next candidate. An exception thrown from the factory or
-    /// from Probe counts as this result.
+    /// from Probe, and a factory that returns null, count as this result.
     /// </summary>
     Failed
 }

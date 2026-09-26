@@ -1,15 +1,19 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Pci;
 
 namespace Cosmos.Kernel.HAL.Drivers.Pci;
 
 /// <summary>
 /// The PCI function a driver was offered: the IDs it is matched on, and
-/// read access to its configuration space. Config accesses go through the
-/// platform's configuration mechanism and are for thread context only.
+/// read access to its configuration space. The IDs were read when PCI was
+/// enumerated, so they can be read in any context; config accesses go
+/// through the platform's configuration mechanism and are for thread
+/// context only.
 /// </summary>
-internal sealed class PciFunction
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class PciFunction
 {
     /// <summary>
     /// Bytes of configuration space reachable today. Offsets are ushort so
@@ -42,7 +46,7 @@ internal sealed class PciFunction
         _device = device;
     }
 
-    /// <summary>Reads the configuration byte at <paramref name="offset"/>.</summary>
+    /// <summary>Reads the configuration byte at <paramref name="offset"/>. Thread context only.</summary>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> is past the configuration space.</exception>
     public byte ReadConfig8(ushort offset)
     {
@@ -50,7 +54,7 @@ internal sealed class PciFunction
         return _device.ReadRegister8((byte)offset);
     }
 
-    /// <summary>Reads the 16-bit configuration register at <paramref name="offset"/>, a multiple of 2.</summary>
+    /// <summary>Reads the 16-bit configuration register at <paramref name="offset"/>, a multiple of 2. Thread context only.</summary>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> is past the configuration space or misaligned.</exception>
     public ushort ReadConfig16(ushort offset)
     {
@@ -58,7 +62,7 @@ internal sealed class PciFunction
         return _device.ReadRegister16((byte)offset);
     }
 
-    /// <summary>Reads the 32-bit configuration register at <paramref name="offset"/>, a multiple of 4.</summary>
+    /// <summary>Reads the 32-bit configuration register at <paramref name="offset"/>, a multiple of 4. Thread context only.</summary>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> is past the configuration space or misaligned.</exception>
     public uint ReadConfig32(ushort offset)
     {
@@ -68,7 +72,8 @@ internal sealed class PciFunction
 
     /// <summary>
     /// Finds the first capability with ID <paramref name="id"/> in the
-    /// function's capability list.
+    /// function's capability list. Thread context only: it walks the list
+    /// through configuration space.
     /// </summary>
     /// <param name="id">The capability ID, such as 0x11 for MSI-X.</param>
     /// <param name="offset">The capability's config offset when found; 0 otherwise.</param>

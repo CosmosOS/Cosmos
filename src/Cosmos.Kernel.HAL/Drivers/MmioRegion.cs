@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Memory;
 
@@ -14,10 +15,13 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// write that tells it to look, and a read is followed by a DMA read
 /// barrier, so no later load from DMA memory runs ahead of the register read
 /// that said the data is there. The accessors neither allocate nor block and
-/// may run in an interrupt handler; a bad offset throws, which halts the
-/// kernel there.
+/// may run in any context, interrupt handlers included; a bad offset throws,
+/// which halts the kernel there. Mapped during Probe through
+/// <see cref="Pci.PciDeviceContext.TryMapBar"/> and owned by the binding:
+/// once the attempt is declined or fails, every access throws.
 /// </summary>
-internal sealed class MmioRegion
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class MmioRegion
 {
     /// <summary>Virtual address of the window's first byte.</summary>
     private readonly ulong _address;
@@ -25,7 +29,7 @@ internal sealed class MmioRegion
     /// <summary>Set when the attempt that mapped the window is torn down; every access throws from then on.</summary>
     private bool _invalidated;
 
-    /// <summary>Size of the window in bytes. An access of n bytes is valid at any multiple of n up to Length minus n.</summary>
+    /// <summary>Size of the window in bytes. An access of n bytes is valid at any multiple of n up to Length minus n. Any context.</summary>
     public ulong Length { get; }
 
     internal MmioRegion(ulong address, ulong length)

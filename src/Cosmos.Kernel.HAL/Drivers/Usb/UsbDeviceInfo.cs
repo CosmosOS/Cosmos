@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Devices.Usb;
 
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
@@ -8,9 +9,11 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// The device an offered interface belongs to, as its device descriptor
 /// declares it (USB 2.0 §9.6.1), with every interface of its active
 /// configuration. A driver bound to one interface can read its siblings
-/// here, but it drives only its own.
+/// here, but it drives only its own. Read when the context was built, so
+/// every member can be read in any context.
 /// </summary>
-internal sealed class UsbDeviceInfo
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class UsbDeviceInfo
 {
     private readonly UsbInterfaceInfo[] _interfaces;
 

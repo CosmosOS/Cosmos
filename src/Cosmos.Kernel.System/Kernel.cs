@@ -1,3 +1,6 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 
@@ -32,9 +35,9 @@ public abstract partial class Kernel
     /// <summary>
     /// Runs the kernel lifecycle: <see cref="OnBoot"/>, <see cref="BeforeRun"/>,
     /// the <see cref="Run"/> loop, then <see cref="AfterRun"/>. Called by
-    /// <see cref="Global.StartKernel"/> once interrupts are enabled and USB
-    /// hot-plug is started, so an override that replaces this lifecycle
-    /// keeps both.
+    /// <see cref="Global.StartKernel"/> once interrupts are enabled, the
+    /// driver pass has run and USB hot-plug is started, so an override that
+    /// replaces this lifecycle keeps all three.
     /// </summary>
     public virtual void Start()
     {
@@ -71,10 +74,57 @@ public abstract partial class Kernel
     }
 
     /// <summary>
+    /// Called once, by <see cref="Global.StartKernel"/>, for the kernel to
+    /// register its own PCI and USB class drivers through
+    /// <see cref="Drivers.DriverManager"/>. It runs on the boot
+    /// thread with interrupts on, after the built-in drivers bound their
+    /// devices during HAL bring-up and right before the driver pass offers
+    /// the registered drivers what the built-ins left; then USB hot-plug
+    /// starts and <see cref="OnBoot"/> runs. The boot thread is the idle
+    /// thread, so the override must not sleep or block. Registration closes
+    /// as the pass starts. A kernel built without PCI
+    /// (<c>CosmosEnablePCI=false</c>) never calls it, so ILC trims the
+    /// override and the drivers only it registers.
+    /// Registering from the kernel's constructor works too, but the
+    /// constructor runs in every build, where only the kernel's own
+    /// <see cref="KernelFeatures"/> guards trim the drivers, and with
+    /// interrupts in an unspecified state: prefer this override. The default
+    /// registers nothing. An exception it throws leaves StartKernel, as one
+    /// from OnBoot would.
+    /// </summary>
+    /// <example>
+    /// One switch per <c>if</c>: ILC folds a single switch only, so a
+    /// kernel built without the subsystem trims the driver.
+    /// <code>
+    /// protected override void RegisterDrivers()
+    /// {
+    ///     if (KernelFeatures.Usb)
+    ///     {
+    ///         if (KernelFeatures.Mouse)
+    ///         {
+    ///             DriverManager.Register(UsbBootMouseDriver.CreateRegistration());
+    ///         }
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
+    [Experimental(Cosmos.Kernel.HAL.Drivers.Experimentals.DriverKitDiagId)]
+    protected virtual void RegisterDrivers()
+    {
+    }
+
+    /// <summary>
+    /// Lets <see cref="Global.StartKernel"/> call the protected
+    /// <see cref="RegisterDrivers"/> hook.
+    /// </summary>
+    internal void InvokeRegisterDrivers() => RegisterDrivers();
+
+    /// <summary>
     /// Called once during boot, before BeforeRun(). Interrupts are already
-    /// enabled (unless the Interrupts switch is off), and USB hot-plug is
-    /// already started where it could start. Override to customize system
-    /// initialization.
+    /// enabled (unless the Interrupts switch is off), the driver pass has
+    /// offered the drivers registered in <see cref="RegisterDrivers"/> every
+    /// device the built-ins left, and USB hot-plug is already started where
+    /// it could start. Override to customize system initialization.
     /// </summary>
     protected virtual void OnBoot()
     {

@@ -9,7 +9,8 @@
 
     <!-- SchedulerInfo fronts the experimental scheduler seam (COSMOS0001). -->
     <!-- COSMOS0002: this assembly declares the experimental packet seam and consumes it itself. -->
-    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0002</NoWarn>
+    <!-- COSMOS0003: DriverManager, DeviceInfo and Kernel.RegisterDrivers are the System half of the experimental driver kit seam, over HAL's seam types. -->
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0002;COSMOS0003</NoWarn>
 
     <!-- Package Metadata -->
     <PackageId>Cosmos.Kernel.System</PackageId>

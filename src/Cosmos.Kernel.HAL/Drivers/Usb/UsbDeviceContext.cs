@@ -24,7 +24,8 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// the driver's Remove, and ends the binding: from then on every transfer
 /// answers <see cref="UsbTransferStatus.Disconnected"/>.
 /// </summary>
-internal sealed class UsbDeviceContext : DeviceContext
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class UsbDeviceContext : DeviceContext
 {
     /// <summary>
     /// Most bytes one control request moves in this version: the host
@@ -43,10 +44,10 @@ internal sealed class UsbDeviceContext : DeviceContext
     private List<byte>? _interruptEndpoints;
     private List<UsbBulkPipe>? _bulkPipes;
 
-    /// <summary>The device the interface belongs to, with every interface of its active configuration.</summary>
+    /// <summary>The device the interface belongs to, with every interface of its active configuration. Any context.</summary>
     public UsbDeviceInfo Device { get; }
 
-    /// <summary>The interface on offer, one of <see cref="UsbDeviceInfo.Interfaces"/>.</summary>
+    /// <summary>The interface on offer, one of <see cref="UsbDeviceInfo.Interfaces"/>. Any context.</summary>
     public UsbInterfaceInfo Interface { get; }
 
     /// <summary>
@@ -179,6 +180,7 @@ internal sealed class UsbDeviceContext : DeviceContext
     /// endpoint of this interface, or when the host controller refused to
     /// open it.
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="handler"/> is null.</exception>
     /// <exception cref="InvalidOperationException">Called outside the driver's Probe, or the endpoint is already open.</exception>
     public bool OpenInterruptIn(UsbEndpointInfo endpoint, UsbReportHandler handler)
     {

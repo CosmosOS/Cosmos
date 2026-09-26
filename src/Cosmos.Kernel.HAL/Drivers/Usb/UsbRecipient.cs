@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
 
 /// <summary>
@@ -7,7 +9,8 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// bmRequestType, bits 4:0 (USB 2.0 §9.3.1). For an interface or an
 /// endpoint, the request's index names which one.
 /// </summary>
-internal enum UsbRecipient
+[Experimental(Experimentals.DriverKitDiagId)]
+public enum UsbRecipient
 {
     /// <summary>The device as a whole.</summary>
     Device,

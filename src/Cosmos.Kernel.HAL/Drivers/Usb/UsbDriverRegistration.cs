@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Devices.Usb;
 
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
@@ -7,9 +8,11 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// <summary>
 /// A USB class driver as the kernel registers it: the name its interfaces
 /// are owned under, how to create one driver instance per interface, and
-/// which interfaces to offer it.
+/// which interfaces to offer it. A kernel passes it to DriverManager.Register,
+/// in Cosmos.Kernel.System.Drivers.
 /// </summary>
-internal sealed class UsbDriverRegistration
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class UsbDriverRegistration
 {
     /// <summary>A private copy of the caller's match table, so it cannot change once registered.</summary>
     private readonly UsbMatch[] _matches;
@@ -17,7 +20,7 @@ internal sealed class UsbDriverRegistration
     /// <summary>
     /// The driver's name, recorded as the owner of every interface it binds.
     /// PCI and USB registrations share one set of names, which also holds
-    /// every built-in driver's.
+    /// every built-in driver's. Any context.
     /// </summary>
     public string Name { get; }
 
@@ -25,7 +28,11 @@ internal sealed class UsbDriverRegistration
     internal Func<UsbDriver> Factory { get; }
 
     /// <summary>
-    /// Creates a registration.
+    /// Creates a registration. Thread context: it copies
+    /// <paramref name="matches"/> into a new array. The factory runs later,
+    /// once per interface the driver is offered, in the same context as
+    /// <see cref="UsbDriver.Probe"/>; an exception it throws, or a null it
+    /// returns, counts as a failed probe.
     /// </summary>
     /// <param name="name">
     /// The driver's name: the owner recorded on every interface it binds,
@@ -33,7 +40,11 @@ internal sealed class UsbDriverRegistration
     /// <c>usb-boot-mouse</c>, unique among the registered drivers, PCI ones
     /// included.
     /// </param>
-    /// <param name="factory">Creates one driver instance for each interface the driver is offered.</param>
+    /// <param name="factory">
+    /// Creates one driver instance for each interface the driver is offered.
+    /// A factory that returns null fails that attempt, as
+    /// <see cref="ProbeResult.Failed"/> does.
+    /// </param>
     /// <param name="matches">The interfaces to offer the driver; copied.</param>
     /// <exception cref="ArgumentException">
     /// <paramref name="name"/> is empty, <paramref name="matches"/> is

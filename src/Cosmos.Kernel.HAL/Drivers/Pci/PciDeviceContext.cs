@@ -26,9 +26,10 @@ namespace Cosmos.Kernel.HAL.Drivers.Pci;
 /// publications and the work items and cancels the events, restores the
 /// Command register with bus mastering off, frees the DMA memory, turns
 /// MSI-X off and gives its vector back, and invalidates the regions, in
-/// that order.
+/// that order. A bound function is never released in this version.
 /// </summary>
-internal sealed class PciDeviceContext : DeviceContext
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class PciDeviceContext : DeviceContext
 {
     /// <summary>The one MSI-X entry this version programs: the handler's vector 0.</summary>
     private const int MsiXEntry = 0;
@@ -92,7 +93,7 @@ internal sealed class PciDeviceContext : DeviceContext
     /// <summary>Set by the first TryRequestInterrupts, whatever it answered: the request is made once per attempt.</summary>
     private bool _interruptsRequested;
 
-    /// <summary>The function on offer: its IDs and its configuration space.</summary>
+    /// <summary>The function on offer: its IDs and its configuration space. Any context.</summary>
     public PciFunction Function { get; }
 
     /// <summary>
@@ -218,9 +219,9 @@ internal sealed class PciDeviceContext : DeviceContext
     /// </returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is not 0 to 5.</exception>
     /// <exception cref="InvalidOperationException">Called outside the driver's Probe.</exception>
-    public bool TryMapIoBar(int index, [NotNullWhen(true)] out PortRegion? region)
+    public bool TryMapIOBar(int index, [NotNullWhen(true)] out PortRegion? region)
     {
-        ThrowIfNotProbing(nameof(TryMapIoBar));
+        ThrowIfNotProbing(nameof(TryMapIOBar));
         ArgumentOutOfRangeException.ThrowIfNegative(index);
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, BarCount);
 
@@ -328,6 +329,7 @@ internal sealed class PciDeviceContext : DeviceContext
     /// route, and no ticking timer to poll from (ARM64 without the
     /// scheduler, x64 with ACPI off, or a kernel without the timer).
     /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="handler"/> is null.</exception>
     /// <exception cref="InvalidOperationException">Called outside the driver's Probe, or a second time in the same Probe.</exception>
     public bool TryRequestInterrupts(DeviceInterruptHandler handler)
     {
@@ -362,7 +364,7 @@ internal sealed class PciDeviceContext : DeviceContext
         return false;
     }
 
-    /// <summary>Writes the configuration byte at <paramref name="offset"/>. Thread context only.</summary>
+    /// <summary>Writes <paramref name="value"/> to the configuration byte at <paramref name="offset"/>. Thread context only.</summary>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> is below 0x40, the header the kit manages, or past the configuration space.</exception>
     /// <exception cref="InvalidOperationException">The binding attempt was declined or failed.</exception>
     public void WriteConfig8(ushort offset, byte value)
@@ -371,7 +373,7 @@ internal sealed class PciDeviceContext : DeviceContext
         _device.WriteRegister8((byte)offset, value);
     }
 
-    /// <summary>Writes the 16-bit configuration register at <paramref name="offset"/>, a multiple of 2. Thread context only.</summary>
+    /// <summary>Writes <paramref name="value"/> to the 16-bit configuration register at <paramref name="offset"/>, a multiple of 2. Thread context only.</summary>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> is below 0x40, the header the kit manages, past the configuration space, or misaligned.</exception>
     /// <exception cref="InvalidOperationException">The binding attempt was declined or failed.</exception>
     public void WriteConfig16(ushort offset, ushort value)
@@ -380,7 +382,7 @@ internal sealed class PciDeviceContext : DeviceContext
         _device.WriteRegister16((byte)offset, value);
     }
 
-    /// <summary>Writes the 32-bit configuration register at <paramref name="offset"/>, a multiple of 4. Thread context only.</summary>
+    /// <summary>Writes <paramref name="value"/> to the 32-bit configuration register at <paramref name="offset"/>, a multiple of 4. Thread context only.</summary>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> is below 0x40, the header the kit manages, past the configuration space, or misaligned.</exception>
     /// <exception cref="InvalidOperationException">The binding attempt was declined or failed.</exception>
     public void WriteConfig32(ushort offset, uint value)

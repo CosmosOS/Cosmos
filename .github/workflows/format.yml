@@ -26,6 +26,13 @@ jobs:
         with:
           submodules: recursive
 
+      # The PublicAPI analyzer records a driver kit symbol as stable API
+      # unless it carries [Experimental("COSMOS0003")]; this fails the job on
+      # a seam line without the [COSMOS0003] prefix, and on the prefix
+      # anywhere outside the seam. Needs no build, so it runs first.
+      - name: Check Experimental API Declarations
+        run: bash ./.github/scripts/check-experimental-api.sh
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:

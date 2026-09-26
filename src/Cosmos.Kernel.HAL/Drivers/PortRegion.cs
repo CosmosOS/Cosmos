@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Memory;
 
@@ -10,10 +11,13 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// BAR. Only x64 has port space: on other architectures the kit never
 /// creates one. Checked and ordered like <see cref="MmioRegion"/>, so a
 /// driver can move between the two kinds of BAR without rethinking its
-/// barriers; the accessors neither allocate nor block and may run in an
-/// interrupt handler.
+/// barriers; the accessors neither allocate nor block and may run in any
+/// context, interrupt handlers included. Mapped during Probe through
+/// <see cref="Pci.PciDeviceContext.TryMapIOBar"/> and owned by the binding:
+/// once the attempt is declined or fails, every access throws.
 /// </summary>
-internal sealed class PortRegion
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class PortRegion
 {
     /// <summary>First port of the window.</summary>
     private readonly ushort _basePort;
@@ -21,7 +25,7 @@ internal sealed class PortRegion
     /// <summary>Set when the attempt that mapped the window is torn down; every access throws from then on.</summary>
     private bool _invalidated;
 
-    /// <summary>Number of ports in the window. An access of n bytes is valid at any multiple of n up to Length minus n.</summary>
+    /// <summary>Number of ports in the window. An access of n bytes is valid at any multiple of n up to Length minus n. Any context.</summary>
     public ushort Length { get; }
 
     internal PortRegion(ushort basePort, ushort length)

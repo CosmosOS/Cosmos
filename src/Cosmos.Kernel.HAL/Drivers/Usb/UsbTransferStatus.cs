@@ -1,13 +1,17 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
 
 /// <summary>
 /// Outcome of a synchronous USB transfer, independent of the host
 /// controller that carried it.
 /// </summary>
-internal enum UsbTransferStatus
+[Experimental(Experimentals.DriverKitDiagId)]
+public enum UsbTransferStatus
 {
+    /// <summary>The transfer completed.</summary>
     Success,
 
     /// <summary>The device answered STALL: the request is not supported or the endpoint is halted.</summary>

@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Memory;
 
 namespace Cosmos.Kernel.HAL.Drivers;
@@ -11,9 +12,13 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// assumed coherent: no cache maintenance is needed, only ordering, which the
 /// register accessors provide around each MMIO access and
 /// <see cref="ReadBarrier"/> and <see cref="WriteBarrier"/> provide between
-/// two accesses to DMA memory.
+/// two accesses to DMA memory. Allocated during Probe through
+/// <see cref="Pci.PciDeviceContext.TryAllocateDma"/> and owned by the
+/// binding: freed when the attempt is declined or fails, kept for as long as
+/// the binding lasts otherwise.
 /// </summary>
-internal sealed class DmaBuffer
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class DmaBuffer
 {
     /// <summary>Virtual address of the buffer's first byte.</summary>
     private readonly ulong _address;
@@ -23,14 +28,18 @@ internal sealed class DmaBuffer
 
     /// <summary>
     /// The address the device uses for the buffer's first byte: the physical
-    /// address today, an IOMMU address once the kit programs one.
+    /// address today, an IOMMU address once the kit programs one. Any
+    /// context.
     /// </summary>
     public ulong DeviceAddress { get; }
 
-    /// <summary>Size of the buffer in bytes, as requested.</summary>
+    /// <summary>Size of the buffer in bytes, as requested. Any context.</summary>
     public int Length { get; }
 
-    /// <summary>The buffer as the CPU reads and writes it. Allocation-free, so an interrupt handler may use it.</summary>
+    /// <summary>
+    /// The buffer as the CPU reads and writes it. Any context: it allocates
+    /// nothing, so an interrupt handler may use it.
+    /// </summary>
     /// <exception cref="InvalidOperationException">The binding attempt that allocated the buffer was torn down, and its memory freed.</exception>
     public unsafe Span<byte> Span
     {
@@ -56,7 +65,9 @@ internal sealed class DmaBuffer
     /// Orders loads from DMA memory: every load before it completes before
     /// any load after it. Use after reading a device-written flag, such as a
     /// descriptor's done bit, and before reading what the flag says is valid,
-    /// when no register read comes in between. Allocation-free.
+    /// when no register read comes in between. Any context: it allocates
+    /// nothing. A <c>dmb oshld</c> on ARM64; no instruction on x64, whose
+    /// loads are not reordered with each other.
     /// </summary>
     public static void ReadBarrier() => DmaOrdering.ReadBarrier();
 
@@ -64,7 +75,9 @@ internal sealed class DmaBuffer
     /// Orders stores to DMA memory: every store before it is visible to the
     /// device before any store after it. Use between filling a descriptor and
     /// the store that hands it to the device, when no register write comes in
-    /// between. Allocation-free.
+    /// between. Any context: it allocates nothing. A <c>dmb oshst</c> on
+    /// ARM64; no instruction on x64, whose stores are not reordered with
+    /// each other.
     /// </summary>
     public static void WriteBarrier() => DmaOrdering.WriteBarrier();
 

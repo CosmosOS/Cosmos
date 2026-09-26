@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
@@ -14,11 +15,12 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// Bound, after the devices the built-in drivers registered, so a built-in
 /// device that registered stays the primary one.
 /// </summary>
-internal sealed class NetworkLink
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class NetworkLink
 {
     private readonly PublishedNetworkDevice _device;
 
-    /// <summary>The MAC address the link was published with, which the stack sends from.</summary>
+    /// <summary>The MAC address the link was published with, which the stack sends from. Any context.</summary>
     public MACAddress Address => _device.MacAddress;
 
     /// <summary>The adapter the kit delivers to the network manager, and withdraws from it when a USB device leaves.</summary>
@@ -39,15 +41,17 @@ internal sealed class NetworkLink
     /// arrives while the stack has not configured the link, before the
     /// driver's Probe returned Bound, on the link of an attempt that was
     /// declined or failed, or once the kit withdrew the link because its USB
-    /// device left the bus, is dropped.
+    /// device left the bus, is dropped. It throws nothing of its own; an
+    /// exception from the stack's receive path reaches the caller, and a
+    /// work item that lets one escape is logged and disarmed.
     /// </summary>
     /// <param name="frame">The frame, from the destination MAC address to the end of the payload, without the CRC.</param>
     public void Deliver(ReadOnlySpan<byte> frame) => _device.Deliver(frame);
 
     /// <summary>
     /// Records whether the link to the network is up, which the network
-    /// manager reports. IRQ-safe: the driver's interrupt handler may call it
-    /// when the device signals a link change.
+    /// manager reports. Any context: the driver's interrupt handler may call
+    /// it when the device signals a link change.
     /// </summary>
     /// <param name="isUp">True when the device reports a link.</param>
     public void SetLinkState(bool isUp) => _device.SetLinkState(isUp);

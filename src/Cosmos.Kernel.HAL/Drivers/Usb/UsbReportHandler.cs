@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
 
 /// <summary>
@@ -10,7 +12,9 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// throw, block, take a lock other than an <see cref="IrqSafeLock"/>, call
 /// through an interface or build a string; a <see cref="MouseReporter"/>,
 /// a <see cref="DeviceWorkItem"/> and a <see cref="DeviceEvent"/> are safe
-/// to call.
+/// to call. It never runs before the driver's Probe returned Bound, nor
+/// once the attempt was declined or failed or the device left the bus.
 /// </summary>
 /// <param name="report">The report, as long as the device sent it; valid only during the call.</param>
-internal delegate void UsbReportHandler(ReadOnlySpan<byte> report);
+[Experimental(Experimentals.DriverKitDiagId)]
+public delegate void UsbReportHandler(ReadOnlySpan<byte> report);

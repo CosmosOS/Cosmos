@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Pci;
 
 namespace Cosmos.Kernel.HAL.Drivers.Pci;
@@ -10,9 +11,11 @@ namespace Cosmos.Kernel.HAL.Drivers.Pci;
 /// <see cref="Device"/> entry beats a three-part <see cref="Class(byte, byte, byte)"/>
 /// entry, which beats a two-part <see cref="Class(byte, byte)"/> entry, and
 /// the earlier registration wins a tie. A <c>default(PciMatch)</c> matches
-/// nothing, and a registration refuses it.
+/// nothing, and a registration refuses it. The factories run in any
+/// context and throw nothing.
 /// </summary>
-internal readonly struct PciMatch
+[Experimental(Experimentals.DriverKitDiagId)]
+public readonly struct PciMatch
 {
     private readonly ushort _vendorId;
     private readonly ushort _deviceId;

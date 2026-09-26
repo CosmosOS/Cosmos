@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Devices.Usb;
 using SchedMutex = Cosmos.Kernel.Core.Scheduler.Mutex;
 
@@ -16,7 +17,8 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// <see cref="UsbTransferStatus.Disconnected"/>, before and after the kit
 /// called the driver's Remove.
 /// </summary>
-internal sealed class UsbBulkPipe
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class UsbBulkPipe
 {
     private readonly UsbDevice _device;
     private readonly UsbEndpoint _endpoint;

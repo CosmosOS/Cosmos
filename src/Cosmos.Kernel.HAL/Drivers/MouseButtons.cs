@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.Drivers;
 
 /// <summary>
@@ -8,7 +10,8 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// cast that byte's low three bits straight to this type.
 /// </summary>
 [Flags]
-internal enum MouseButtons
+[Experimental(Experimentals.DriverKitDiagId)]
+public enum MouseButtons
 {
     /// <summary>No button is held.</summary>
     None = 0,

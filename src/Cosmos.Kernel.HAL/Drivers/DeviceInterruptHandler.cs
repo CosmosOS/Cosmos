@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.Drivers;
 
 /// <summary>
@@ -16,4 +18,5 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// status to find out.
 /// </summary>
 /// <param name="vector">Which of the binding's interrupts fired: always 0 in this version, which grants one.</param>
-internal delegate void DeviceInterruptHandler(int vector);
+[Experimental(Experimentals.DriverKitDiagId)]
+public delegate void DeviceInterruptHandler(int vector);

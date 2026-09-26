@@ -78,8 +78,9 @@ public static class Global
 
     /// <summary>
     /// Starts the registered kernel, once. Enables interrupts (unless the
-    /// Interrupts switch is off), binds the drivers the kernel registered and
-    /// starts USB hot-plug, then calls
+    /// Interrupts switch is off), calls <see cref="Kernel.RegisterDrivers"/>
+    /// and binds the drivers the kernel registered (both only in a kernel
+    /// built with PCI), starts USB hot-plug, then calls
     /// <see cref="Kernel.Start"/>, so <see cref="Kernel.OnBoot"/>,
     /// <see cref="Kernel.BeforeRun"/> and <see cref="Kernel.Run"/> all run
     /// with interrupts on, and a kernel that overrides Start keeps all three.
@@ -121,15 +122,18 @@ public static class Global
             InternalCpu.EnableInterrupts();
         }
 
-        // The drivers the kernel registered from its constructor bind here,
-        // to the PCI functions the built-in drivers left free during HAL
-        // bring-up. After interrupts, so a probe runs with them on on both
-        // architectures; before hot-plug starts, so the boot thread is the
-        // only one binding devices while the pass runs; and before the
-        // kernel's Start, so OnBoot finds them bound. PCI's switch alone, so
-        // ILC folds it and a kernel without PCI trims the whole engine.
+        // The kernel registers its drivers, from RegisterDrivers or earlier
+        // from its constructor, and they bind here, to the PCI functions and
+        // USB interfaces the built-in drivers left free during HAL bring-up.
+        // After interrupts, so RegisterDrivers and every probe run with them
+        // on on both architectures; before hot-plug starts, so the boot
+        // thread is the only one binding devices while the pass runs; and
+        // before the kernel's Start, so OnBoot finds them bound. PCI's switch
+        // alone, so ILC folds it: a kernel without PCI never calls
+        // RegisterDrivers, and trims its override and the whole engine.
         if (Core.CosmosFeatures.PCIEnabled)
         {
+            s_kernel.InvokeRegisterDrivers();
             DriverCore.BindUserDrivers();
         }
 

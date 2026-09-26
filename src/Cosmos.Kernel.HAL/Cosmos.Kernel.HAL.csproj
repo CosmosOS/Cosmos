@@ -9,10 +9,11 @@
     <PackageTags>cosmos;kernel;hal;abstraction;architecture;hardware</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <!-- NVMe I/O waits block and wake threads through the experimental scheduler seam (COSMOS0001). -->
-    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
+    <!-- COSMOS0003: this assembly declares the experimental driver kit seam and consumes it itself. -->
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
-         the VFS contract types only. -->
+         the VFS contract types, and the driver kit seam under COSMOS0003. -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
   <ItemGroup>

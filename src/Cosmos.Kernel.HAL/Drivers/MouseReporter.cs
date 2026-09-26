@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 
 namespace Cosmos.Kernel.HAL.Drivers;
@@ -12,7 +13,8 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// an attempt that was declined or failed, or once the kit withdrew the
 /// mouse because its USB device left the bus, is dropped.
 /// </summary>
-internal sealed class MouseReporter
+[Experimental(Experimentals.DriverKitDiagId)]
+public sealed class MouseReporter
 {
     private readonly PublishedMouse _mouse;
 
@@ -27,9 +29,9 @@ internal sealed class MouseReporter
 
     /// <summary>
     /// Reports one movement of the mouse and the buttons held down after it.
-    /// IRQ-safe: it allocates nothing and masks interrupts only while it
+    /// Any context: it allocates nothing and masks interrupts only while it
     /// hands the report on, so the driver's interrupt handler may call it,
-    /// and so may a thread.
+    /// and so may a thread. It throws nothing of its own.
     /// </summary>
     /// <param name="deltaX">Horizontal movement since the last report; positive moves right.</param>
     /// <param name="deltaY">Vertical movement since the last report; positive moves down, as on screen.</param>
