@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Debug;
 
 namespace Cosmos.Kernel.Core.Memory.Heap;
@@ -450,14 +449,9 @@ internal static unsafe class SmallHeap
     /// <returns>Byte pointer to the start of the block.</returns>
     public static byte* Alloc(uint aSize)
     {
-        // Cosmos.Kernel.Core.IO.Serial.WriteString("[SmallHeap] Alloc - size: ");
-        // Cosmos.Kernel.Core.IO.Serial.WriteNumber(aSize);
-        // Cosmos.Kernel.Core.IO.Serial.WriteString("\n");
-
         SMTBlock* pageBlock = GetFirstWithSpace(aSize);
         if (pageBlock == null) // This happens when the page is full and we need to allocate a new page for this size
         {
-            // Cosmos.Kernel.Core.IO.Serial.WriteString("[SmallHeap] No space found, creating new page\n");
             CreatePage(SMT,
                 GetRoundedSize(
                     aSize)); // CreatePage will try add this page to any page of the SMT until it finds one with space
@@ -465,7 +459,6 @@ internal static unsafe class SmallHeap
             if (pageBlock == null)
             {
                 //this means that we cant allocate another page
-                InternalCpu.EnableInterrupts();
                 Cosmos.Kernel.Core.IO.Serial.WriteString("[SmallHeap] ERROR: Failed to allocate new page!\n");
                 Debugger.SendKernelPanic(Panics.SmallHeap.AddPage);
             }
@@ -477,27 +470,11 @@ internal static unsafe class SmallHeap
         ulong elementSize = roundedSize + PrefixBytes;
         ulong positions = PageAllocator.PageSize / elementSize;
 
-        // Cosmos.Kernel.Core.IO.Serial.WriteString("[SmallHeap] PagePtr: 0x");
-        // Cosmos.Kernel.Core.IO.Serial.WriteHex((ulong)pageBlock->PagePtr);
-        // Cosmos.Kernel.Core.IO.Serial.WriteString(", RoundedSize: ");
-        // Cosmos.Kernel.Core.IO.Serial.WriteNumber(roundedSize);
-        // Cosmos.Kernel.Core.IO.Serial.WriteString(", ElementSize: ");
-        // Cosmos.Kernel.Core.IO.Serial.WriteNumber(elementSize);
-        // Cosmos.Kernel.Core.IO.Serial.WriteString(", PageSize: ");
-        // Cosmos.Kernel.Core.IO.Serial.WriteNumber(PageAllocator.PageSize);
-        // Cosmos.Kernel.Core.IO.Serial.WriteString(", Positions: ");
-        // Cosmos.Kernel.Core.IO.Serial.WriteNumber(positions);
-        // Cosmos.Kernel.Core.IO.Serial.WriteString("\n");
-
         for (ulong i = 0; i < positions; i++)
         {
             if (page[i * elementSize / 2] == 0)
             {
                 // we have found an empty slot
-                // Cosmos.Kernel.Core.IO.Serial.WriteString("[SmallHeap] Found free slot at position ");
-                // Cosmos.Kernel.Core.IO.Serial.WriteNumber(i);
-                // Cosmos.Kernel.Core.IO.Serial.WriteString(", allocating at 0x");
-
                 // update SMT block info
                 pageBlock->SpacesLeft--;
 
@@ -508,8 +485,6 @@ internal static unsafe class SmallHeap
 
                 // Return pointer after prefix bytes (8-byte aligned on ARM64, 4-byte on x64)
                 byte* result = slotPtr + PrefixBytes;
-                // Cosmos.Kernel.Core.IO.Serial.WriteHex((ulong)result);
-                // Cosmos.Kernel.Core.IO.Serial.WriteString("\n");
 
                 return result;
             }
@@ -529,6 +504,11 @@ internal static unsafe class SmallHeap
     /// Free a object
     /// </summary>
     /// <param name="aPtr">A pointer to the start object.</param>
+    /// <remarks>
+    /// Leaves the interrupt flag alone: <see cref="Heap.Free"/>'s masked scope
+    /// owns it, and enabling interrupts here would unmask them inside that
+    /// scope and inside every critical section the caller nested it in.
+    /// </remarks>
     public static void Free(void* aPtr)
     {
         // Get header at PrefixBytes offset before the allocation
@@ -538,7 +518,6 @@ internal static unsafe class SmallHeap
         if (size == 0)
         {
             // double free, this object has already been freed
-            InternalCpu.EnableInterrupts();
             Debugger.DoBochsBreak();
             Debugger.DoSendNumber((uint)aPtr);
             Debugger.SendKernelPanic(Panics.SmallHeap.DoubleFree);
@@ -578,7 +557,6 @@ internal static unsafe class SmallHeap
                 if (blockPtr->PagePtr == allocatedOnPage)
                 {
                     blockPtr->SpacesLeft++;
-                    InternalCpu.EnableInterrupts();
                     return;
                 }
 
@@ -589,7 +567,6 @@ internal static unsafe class SmallHeap
         }
 
         // this shouldnt happen
-        InternalCpu.EnableInterrupts();
         Debugger.DoSendNumber((uint)aPtr);
         Debugger.DoSendNumber((uint)SMT);
         Debugger.SendKernelPanic(Panics.SmallHeap.FailedFree);

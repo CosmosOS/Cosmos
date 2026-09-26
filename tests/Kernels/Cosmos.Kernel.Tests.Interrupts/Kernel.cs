@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
+using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.Pci;
+using Cosmos.Kernel.HAL.Pci.Enums;
 using Cosmos.Kernel.System.Timer;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -23,11 +25,14 @@ namespace Cosmos.Kernel.Tests.Interrupts;
 // and gicv3 QEMU profiles (tests/profiles.json) so BOTH interrupt-controller
 // paths are covered deterministically rather than depending on the machine
 // default. End-to-end MSI *delivery* (a device raising an MSI through the ITS)
-// stays covered by the Storage suite's NVMe assertions.
+// stays covered by the Storage suite's NVMe assertions. The MSI-X teardown
+// cells program a scratch table through the real binder, and only borrow a
+// live function whose MSI-X nobody has enabled (x64: the default e1000e NIC,
+// whose driver uses INTx), restoring its registers afterwards.
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests per cell: 6 cross-arch + 6 arch-specific.</summary>
-    private const int ExpectedTestCount = 12;
+    /// <summary>Total tests per cell: 11 cross-arch + 6 arch-specific.</summary>
+    private const int ExpectedTestCount = 17;
 
     /// <summary>First vector of the dynamic MSI/MSI-X allocation window [0x40, 0xFE].</summary>
     private const byte DynamicVectorFirst = 0x40;
@@ -53,13 +58,59 @@ public class Kernel : Sys.Kernel
     private const uint MsiXVectorControlMaskBit = 1;
     /// <summary>Out-of-range entry index used to probe UnmaskEntry rejection.</summary>
     private const int MsiXOutOfRangeIndex = 5;
+    /// <summary>Byte stride between MSI-X table entries (PCI 3.0 §6.8.2).</summary>
+    private const int MsiXEntryStride = 16;
+    /// <summary>Message Address (low dword) offset within an MSI-X table entry (PCI 3.0 §6.8.2).</summary>
+    private const int MsiXMessageAddressOffset = 0;
+    /// <summary>Message Upper Address offset within an MSI-X table entry (PCI 3.0 §6.8.2).</summary>
+    private const int MsiXMessageUpperAddressOffset = 4;
+    /// <summary>Message Data offset within an MSI-X table entry (PCI 3.0 §6.8.2).</summary>
+    private const int MsiXMessageDataOffset = 8;
+    /// <summary>Offset of Message Control within the MSI-X capability (PCI 3.0 §6.8.2.3).</summary>
+    private const byte MsiXMessageControlOffset = 2;
+    /// <summary>Message Control bit 15: MSI-X Enable.</summary>
+    private const ushort MsiXEnableBit = 1 << 15;
+    /// <summary>Message Control bit 14: Function Mask.</summary>
+    private const ushort MsiXFunctionMaskBit = 1 << 14;
+    /// <summary>Largest MSI-X table a function can expose (Table Size is 11 bits, PCI 3.0 §6.8.2.3); more entries than either arch has vectors or LPIs, so binding them all drains the allocator.</summary>
+    private const int MsiXMaxTableSize = 2048;
+
+    // A function no QEMU machine the suite runs populates (00:1f.7). The
+    // binder only turns it into a routing key (ARM64: ITS DeviceID 0xFF, well
+    // inside the flat device table), so the cells below exercise the real
+    // PrepareDevice/BindEntry/UnbindEntry/ReleaseDevice path, ITS commands
+    // included, without touching a device.
+    private const uint SyntheticBus = 0;
+    private const uint SyntheticSlot = 31;
+    private const uint SyntheticFunction = 7;
+
+    /// <summary>Owner hand-overs per remap cell: each one would orphan an ITT page without the unmap, so the leak dwarfs the slack below.</summary>
+    private const int RemapRounds = 64;
+    /// <summary>Entries per remapped context: a one-page ITT on ARM64.</summary>
+    private const int RemapEntryCount = 64;
+    /// <summary>
+    /// Pages the remap cell tolerates losing: half a page per round. The
+    /// contexts it allocates grow the GC heap by about a quarter page per
+    /// round (15 pages over 64 rounds on arm64, 6 on x64), and an orphaned
+    /// ITT costs a full page per round on top of that.
+    /// </summary>
+    private const ulong RemapLeakSlackPages = RemapRounds / 2;
+
+    /// <summary>A function with an MSI-X capability nobody enabled and memory decode on, or null when the cell has none.</summary>
+    private static PciDevice? s_idleMsiXFunction;
 
     protected override void BeforeRun()
     {
         Serial.WriteString("[Interrupts] BeforeRun() reached!\n");
 
-        // 6 cross-arch + 6 arch-specific = 12 tests per cell.
+        // 11 cross-arch + 6 arch-specific = 17 tests per cell.
         TR.Start("Interrupt System Tests", expectedTests: ExpectedTestCount);
+
+        s_idleMsiXFunction = FindIdleMsiXFunction();
+        bool routing = MsiRouting.IsAvailable;
+        bool liveFunction = routing && s_idleMsiXFunction is not null;
+        const string NoRouting = "no MSI routing in this cell (GICv2 has no ITS)";
+        const string NoIdleFunction = "needs MSI routing and an MSI-X function no driver has enabled (arm64: virtio-net owns the only one)";
 
         // ==================== Cross-arch ====================
         TR.Run("InterruptManager_Enabled", TestInterruptManagerEnabled);
@@ -67,6 +118,11 @@ public class Kernel : Sys.Kernel
         TR.Run("VectorAllocator_ReturnsDistinctDynamicVectors", TestVectorAllocatorDistinct);
         TR.Run("VectorAllocator_ReusesFreedSlots", TestVectorAllocatorReusesFreedSlots);
         TR.Run("MsiX_TableAccessors_BoundsChecked", TestMsiXTableAccessorsBoundsChecked);
+        TR.RunIf(routing, "MsiX_SetEntryMasked_LeavesEntryMasked", TestMsiXSetEntryMaskedLeavesEntryMasked, NoRouting);
+        TR.RunIf(routing, "MsiRouting_UnbindEntry_ReturnsSlot", TestMsiRoutingUnbindEntryReturnsSlot, NoRouting);
+        TR.RunIf(routing, "MsiRouting_PrepareDevice_RemapDoesNotLeak", TestMsiRoutingRemapDoesNotLeak, NoRouting);
+        TR.RunIf(liveFunction, "MsiX_Disable_ClearsEnableAndMasksEntries", TestMsiXDisableClearsEnableAndMasks, NoIdleFunction);
+        TR.RunIf(liveFunction, "MsiX_EnableDisableEnable_SameFunction", TestMsiXEnableDisableEnable, NoIdleFunction);
         TR.Run("TimerInterrupt_WakesSleepingThread", TestTimerInterruptWakesSleepingThread);
 
 #if ARCH_X64
@@ -292,6 +348,344 @@ public class Kernel : Sys.Kernel
         {
             return true;
         }
+    }
+
+    // SetEntryMasked must bind and write the message like SetEntry but leave
+    // the mask bit set, so a half-built driver never sees the vector. The
+    // scratch table starts zeroed (every entry unmasked), so an entry that
+    // stays unmasked reads back 0. SetEntry is probed on the other entry to
+    // pin that existing callers still get an unmasked entry.
+    private static unsafe void TestMsiXSetEntryMaskedLeavesEntryMasked()
+    {
+        void* table = PageAllocator.AllocPages(PageType.Unmanaged, 1, zero: true);
+        Assert.True(table != null, "probe table allocation must succeed");
+        if (table == null)
+        {
+            return;
+        }
+
+        object? device = MsiRouting.PrepareDevice(SyntheticBus, SyntheticSlot, SyntheticFunction, MsiXProbeEntryCount);
+        MsiXContext ctx = new MsiXContext((ulong)table, MsiXProbeEntryCount, device);
+        byte* entry = (byte*)table + MsiXProbeEntryOffset;
+
+        MsiX.SetEntryMasked(ctx, MsiXProbeEntryIndex, NoopHandler);
+        uint maskedControl = *(uint*)(entry + MsiXVectorControlOffset);
+        uint maskedAddress = *(uint*)(entry + MsiXMessageAddressOffset);
+
+        MsiX.SetEntry(ctx, 0, NoopHandler);
+        uint unmaskedControl = *(uint*)((byte*)table + MsiXVectorControlOffset);
+
+        MsiRouting.ReleaseDevice(device);
+        PageAllocator.Free(table);
+
+        Assert.True(maskedControl == MsiXVectorControlMaskBit, "SetEntryMasked must leave the entry's mask bit set");
+        Assert.True(maskedAddress != 0, "SetEntryMasked must still write the message address");
+        Assert.True(unmaskedControl == 0, "SetEntry must keep unmasking the entry it programs");
+    }
+
+    // Binds entries of one oversized synthetic function until the vector /
+    // LPI allocator runs dry, unbinds one, and proves the next bind succeeds
+    // on the slot that came back. Then ReleaseDevice must return every slot
+    // the function still held: a second function drains exactly as many.
+    private static void TestMsiRoutingUnbindEntryReturnsSlot()
+    {
+        object? device = MsiRouting.PrepareDevice(SyntheticBus, SyntheticSlot, SyntheticFunction, MsiXMaxTableSize);
+        int bound = BindUntilExhausted(device);
+        bool exhausted = bound > 0 && bound < MsiXMaxTableSize;
+
+        MsiRouting.UnbindEntry(device, bound / 2);
+        bool reboundAfterUnbind = exhausted && TryBindEntry(device, bound);
+        MsiRouting.ReleaseDevice(device);
+
+        int boundAfterRelease = CountFreeSlots();
+
+        Serial.WriteString("[Interrupts] MSI slots bound before exhaustion: ");
+        Serial.WriteNumber((ulong)bound);
+        Serial.WriteString(", after release: ");
+        Serial.WriteNumber((ulong)boundAfterRelease);
+        Serial.WriteString("\n");
+
+        Assert.True(exhausted, "binding 2048 entries should run the vector / LPI allocator dry");
+        Assert.True(reboundAfterUnbind, "UnbindEntry must return the entry's vector / LPI to the allocator");
+        Assert.True(boundAfterRelease == bound, "ReleaseDevice must return every vector / LPI the function still held");
+    }
+
+    // The second driver's MsiX.Enable case: an owner prepares and binds the
+    // function, never releases it (no driver disables MSI-X today), and a
+    // second owner prepares it again, binds and releases. Each take-over
+    // must free what the first owner held: on ARM64 the DeviceID mapping and
+    // its ITT, or every round orphans a page; on both arches the slot it
+    // bound, or every round loses one (64 of x64's 175 vectors). The
+    // abandoned contexts are released afterwards: the take-over already
+    // retired them, so those releases must free nothing, where a second
+    // teardown would free each ITT twice and push the free count up by a
+    // page per round. One warm-up round keeps first-use heap growth out of
+    // the page measurement.
+    private static void TestMsiRoutingRemapDoesNotLeak()
+    {
+        MsiRouting.ReleaseDevice(RemapRound(out _));
+
+        object?[] abandoned = new object?[RemapRounds];
+        int slotsBefore = CountFreeSlots();
+        ulong freeBefore = PageAllocator.FreePageCount;
+
+        int failedRounds = 0;
+        for (int i = 0; i < RemapRounds; i++)
+        {
+            abandoned[i] = RemapRound(out bool bothBound);
+            if (!bothBound)
+            {
+                failedRounds++;
+            }
+        }
+
+        ulong freeAfterTakeOvers = PageAllocator.FreePageCount;
+        // Counted before the stale releases, which would hand back any slot
+        // a take-over failed to free and hide the leak.
+        int slotsAfterTakeOvers = CountFreeSlots();
+        for (int i = 0; i < abandoned.Length; i++)
+        {
+            MsiRouting.ReleaseDevice(abandoned[i]);
+        }
+
+        ulong freeAfterStaleReleases = PageAllocator.FreePageCount;
+        Serial.WriteString("[Interrupts] free pages before remap rounds: ");
+        Serial.WriteNumber(freeBefore);
+        Serial.WriteString(", after take-overs: ");
+        Serial.WriteNumber(freeAfterTakeOvers);
+        Serial.WriteString(", after stale releases: ");
+        Serial.WriteNumber(freeAfterStaleReleases);
+        Serial.WriteString("; free MSI slots before: ");
+        Serial.WriteNumber((ulong)slotsBefore);
+        Serial.WriteString(", after take-overs: ");
+        Serial.WriteNumber((ulong)slotsAfterTakeOvers);
+        Serial.WriteString("\n");
+
+        Assert.True(failedRounds == 0, "every owner must be able to bind after preparing the function");
+        Assert.True(freeAfterTakeOvers + RemapLeakSlackPages >= freeBefore, "re-preparing a mapped function must free the earlier ITT, not leak it");
+        Assert.True(slotsAfterTakeOvers == slotsBefore, "re-preparing a function must free the vector / LPI its earlier owner bound");
+        Assert.True(freeAfterStaleReleases <= freeAfterTakeOvers + RemapLeakSlackPages, "releasing a context a later PrepareDevice took over must free nothing twice");
+    }
+
+    // Returns the first owner's context, abandoned without a release.
+    private static object? RemapRound(out bool bothBound)
+    {
+        object? first = MsiRouting.PrepareDevice(SyntheticBus, SyntheticSlot, SyntheticFunction, RemapEntryCount);
+        bool firstBound = TryBindEntry(first, 0);
+        object? second = MsiRouting.PrepareDevice(SyntheticBus, SyntheticSlot, SyntheticFunction, RemapEntryCount);
+        bool secondBound = TryBindEntry(second, 0);
+        MsiRouting.ReleaseDevice(second);
+
+        bothBound = firstBound && secondBound;
+        return first;
+    }
+
+    // Slots free right now: binds a fresh context of the synthetic function
+    // until the vector / LPI allocator is dry, then releases it again.
+    private static int CountFreeSlots()
+    {
+        object? probe = MsiRouting.PrepareDevice(SyntheticBus, SyntheticSlot, SyntheticFunction, MsiXMaxTableSize);
+        int free = BindUntilExhausted(probe);
+        MsiRouting.ReleaseDevice(probe);
+        return free;
+    }
+
+    private static int BindUntilExhausted(object? device)
+    {
+        int bound = 0;
+        while (bound < MsiXMaxTableSize && TryBindEntry(device, bound))
+        {
+            bound++;
+        }
+
+        return bound;
+    }
+
+    // Single try/catch per helper (arm64 EH inlining quirk, see
+    // TryAllocateVector). False once the vector / LPI allocator is dry.
+    private static bool TryBindEntry(object? device, int index)
+    {
+        try
+        {
+            MsiRouting.BindEntry(device, index, NoopHandler, 0, out _, out _);
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+    }
+
+    // On a live function: Enable turns MSI-X on, a masked program stays
+    // masked in the device's own table, and Disable clears Enable, leaves
+    // Function Mask set and masks every entry. Enable masks every entry
+    // itself, so they are unmasked before Disable for the last check to
+    // depend on it; Function Mask goes on first, through config space, so
+    // the live function cannot signal an unmasked entry meanwhile.
+    private static void TestMsiXDisableClearsEnableAndMasks()
+    {
+        if (s_idleMsiXFunction is not PciDevice device)
+        {
+            Assert.Fail("the gate found an idle MSI-X function, so it must still be recorded");
+            return;
+        }
+
+        byte cap = device.FindCapability(MsiX.CapId);
+        byte msgCtrlRegister = (byte)(cap + MsiXMessageControlOffset);
+        ushort savedCommand = device.ReadRegister16((byte)Config.Command);
+        ushort savedMsgCtrl = device.ReadRegister16(msgCtrlRegister);
+
+        MsiXContext? enabled = MsiX.Enable(device);
+        Assert.True(enabled is not null, "Enable must succeed on a function with MSI-X and a routing backend");
+        if (enabled is not MsiXContext ctx)
+        {
+            return;
+        }
+
+        ushort enabledMsgCtrl = device.ReadRegister16(msgCtrlRegister);
+        MsiX.SetEntryMasked(ctx, 0, NoopHandler);
+        uint programmedControl = Native.MMIO.Read32(ctx.TableVirt + MsiXVectorControlOffset);
+
+        device.WriteRegister16(msgCtrlRegister, (ushort)(device.ReadRegister16(msgCtrlRegister) | MsiXFunctionMaskBit));
+        for (int i = 0; i < ctx.EntryCount; i++)
+        {
+            MsiX.UnmaskEntry(ctx, i);
+        }
+
+        int maskedBeforeDisable = CountMaskedEntries(ctx);
+
+        MsiX.Disable(ctx);
+        ushort disabledMsgCtrl = device.ReadRegister16(msgCtrlRegister);
+        int maskedAfterDisable = CountMaskedEntries(ctx);
+
+        RestoreFunction(device, msgCtrlRegister, savedMsgCtrl, savedCommand);
+
+        Assert.True((enabledMsgCtrl & MsiXEnableBit) != 0, "Enable must set MSI-X Enable");
+        Assert.True((programmedControl & MsiXVectorControlMaskBit) != 0, "SetEntryMasked must leave the live entry masked");
+        Assert.True(maskedBeforeDisable == 0, "every entry must read back unmasked before Disable, or the mask check below proves nothing");
+        Assert.True((disabledMsgCtrl & MsiXEnableBit) == 0, "Disable must clear MSI-X Enable");
+        Assert.True((disabledMsgCtrl & MsiXFunctionMaskBit) != 0, "Disable must leave Function Mask set");
+        Assert.True(maskedAfterDisable == ctx.EntryCount, "Disable must mask every table entry");
+    }
+
+    private static int CountMaskedEntries(MsiXContext ctx)
+    {
+        int masked = 0;
+        for (int i = 0; i < ctx.EntryCount; i++)
+        {
+            ulong control = ctx.TableVirt + (ulong)(i * MsiXEntryStride) + MsiXVectorControlOffset;
+            if ((Native.MMIO.Read32(control) & MsiXVectorControlMaskBit) != 0)
+            {
+                masked++;
+            }
+        }
+
+        return masked;
+    }
+
+    // A second owner must be able to enable the same function after the
+    // first disabled it: fresh routing context, MSI-X on again with Function
+    // Mask clear, and an entry that programs. Disable must have released the
+    // first routing context before the second Enable, which would otherwise
+    // retire it itself; entry 0's message is cleared in between, so the
+    // address read back is the second program's and not the first one's.
+    private static void TestMsiXEnableDisableEnable()
+    {
+        if (s_idleMsiXFunction is not PciDevice device)
+        {
+            Assert.Fail("the gate found an idle MSI-X function, so it must still be recorded");
+            return;
+        }
+
+        byte cap = device.FindCapability(MsiX.CapId);
+        byte msgCtrlRegister = (byte)(cap + MsiXMessageControlOffset);
+        ushort savedCommand = device.ReadRegister16((byte)Config.Command);
+        ushort savedMsgCtrl = device.ReadRegister16(msgCtrlRegister);
+
+        MsiXContext? first = MsiX.Enable(device);
+        Assert.True(first is not null, "the first Enable must succeed");
+        if (first is not MsiXContext firstCtx)
+        {
+            return;
+        }
+
+        MsiX.SetEntryMasked(firstCtx, 0, NoopHandler);
+        MsiX.Disable(firstCtx);
+        bool firstContextReleased = !TryBindEntry(firstCtx.DeviceCtx, 0);
+        if (!firstContextReleased)
+        {
+            MsiRouting.ReleaseDevice(firstCtx.DeviceCtx);
+        }
+
+        // MSI-X is off and every entry masked: clearing the message cannot
+        // make the function signal anything.
+        ulong firstEntry = firstCtx.TableVirt;
+        Native.MMIO.Write32(firstEntry + MsiXMessageAddressOffset, 0);
+        Native.MMIO.Write32(firstEntry + MsiXMessageUpperAddressOffset, 0);
+        Native.MMIO.Write32(firstEntry + MsiXMessageDataOffset, 0);
+
+        MsiXContext? second = MsiX.Enable(device);
+        Assert.True(second is not null, "Enable after Disable must succeed on the same function");
+        if (second is not MsiXContext secondCtx)
+        {
+            RestoreFunction(device, msgCtrlRegister, savedMsgCtrl, savedCommand);
+            return;
+        }
+
+        ushort reenabledMsgCtrl = device.ReadRegister16(msgCtrlRegister);
+        MsiX.SetEntryMasked(secondCtx, 0, NoopHandler);
+        ulong entry = secondCtx.TableVirt;
+        uint address = Native.MMIO.Read32(entry + MsiXMessageAddressOffset);
+        uint control = Native.MMIO.Read32(entry + MsiXVectorControlOffset);
+        MsiX.Disable(secondCtx);
+
+        RestoreFunction(device, msgCtrlRegister, savedMsgCtrl, savedCommand);
+
+        Assert.True(firstContextReleased, "Disable must release the routing context, so binding through it fails");
+        Assert.True((reenabledMsgCtrl & MsiXEnableBit) != 0, "the second Enable must set MSI-X Enable again");
+        Assert.True((reenabledMsgCtrl & MsiXFunctionMaskBit) == 0, "the second Enable must clear the Function Mask Disable left set");
+        Assert.True(address != 0, "an entry of the re-enabled function must program");
+        Assert.True((control & MsiXVectorControlMaskBit) != 0, "the re-programmed entry must stay masked");
+    }
+
+    // Puts back what the borrowed function's driver had: Message Control
+    // (MSI-X off) and the Command register, whose INTx Disable bit Enable
+    // set and Disable leaves for the owner to restore.
+    private static void RestoreFunction(PciDevice device, byte msgCtrlRegister, ushort savedMsgCtrl, ushort savedCommand)
+    {
+        device.WriteRegister16(msgCtrlRegister, savedMsgCtrl);
+        device.WriteRegister16((byte)Config.Command, savedCommand);
+    }
+
+    // The first function with an MSI-X capability that is not enabled and
+    // whose memory decode is on, so its table is reachable. Only such a
+    // function can be borrowed without taking interrupts from a driver.
+    private static PciDevice? FindIdleMsiXFunction()
+    {
+        PciDevice[]? devices = PciManager.Devices;
+        if (devices is null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < PciManager.Count && i < devices.Length; i++)
+        {
+            PciDevice device = devices[i];
+            byte cap = device.FindCapability(MsiX.CapId);
+            if (cap == 0)
+            {
+                continue;
+            }
+
+            ushort msgCtrl = device.ReadRegister16((byte)(cap + MsiXMessageControlOffset));
+            ushort command = device.ReadRegister16((byte)Config.Command);
+            if ((msgCtrl & MsiXEnableBit) == 0 && (command & (ushort)PciCommand.Memory) != 0)
+            {
+                return device;
+            }
+        }
+
+        return null;
     }
 
 #if ARCH_X64

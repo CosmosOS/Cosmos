@@ -54,17 +54,20 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         }
     }
 
-    public void EnsureMmioMapped(ulong physBase)
+    public bool EnsureMmioMapped(ulong physBase)
     {
         // Limine's HHDM on aarch64 only covers RAM with Normal-cacheable
         // attributes; device MMIO has to be mapped explicitly as Device
         // memory so register reads/writes aren't reordered or cached.
         // Safe to call repeatedly — DeviceMapper.EnsureMapped no-ops if the
-        // mapping already exists.
-        if (physBase != 0)
+        // mapping already exists. Address 0 is an unassigned BAR, not a
+        // device: nothing is mapped for it.
+        if (physBase == 0)
         {
-            DeviceMapper.EnsureMapped(physBase);
+            return false;
         }
+
+        return DeviceMapper.EnsureMapped(physBase);
     }
 
     public void DmaBarrier()
