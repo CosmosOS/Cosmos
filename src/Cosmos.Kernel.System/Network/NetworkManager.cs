@@ -78,7 +78,7 @@ public static class NetworkManager
     /// <returns>A handle to that device, or one whose <see cref="NetworkAdapter.IsValid"/> is false when there is none.</returns>
     public static NetworkAdapter GetAdapter(int index)
     {
-        return index >= 0 && index < s_deviceCount ? new NetworkAdapter(index) : default;
+        return index >= 0 && index < DeviceCount ? new NetworkAdapter(index) : default;
     }
 
     /// <summary>
@@ -107,7 +107,7 @@ public static class NetworkManager
     /// <summary>
     /// Gets the number of registered network devices.
     /// </summary>
-    public static int DeviceCount => s_deviceCount;
+    public static int DeviceCount => Volatile.Read(ref s_deviceCount);
 
     /// <summary>
     /// Initializes the network manager. Called once during boot, before the
@@ -133,18 +133,24 @@ public static class NetworkManager
     /// <param name="device">The network device to register.</param>
     internal static void RegisterDevice(INetworkDevice device)
     {
-        if (device is null || s_devices is null || s_deviceCount >= s_devices.Length)
+        INetworkDevice?[]? devices = s_devices;
+        int index = s_deviceCount;
+        if (device is null || devices is null || index >= devices.Length)
         {
             return;
         }
 
-        s_devices[s_deviceCount++] = device;
-
-        // First device becomes primary
+        // The slot, and the primary index when this is the first device,
+        // before the count that makes them visible: a device a driver
+        // publishes registers from the driver pass, while other code may
+        // already walk the table up to the count.
+        devices[index] = device;
         if (s_primaryIndex < 0)
         {
-            s_primaryIndex = s_deviceCount - 1;
+            s_primaryIndex = index;
         }
+
+        Volatile.Write(ref s_deviceCount, index + 1);
     }
 
     /// <summary>
@@ -154,7 +160,7 @@ public static class NetworkManager
     /// <returns>The network device, or null if not found.</returns>
     internal static INetworkDevice? GetDevice(int index)
     {
-        if (s_devices is null || index < 0 || index >= s_deviceCount)
+        if (s_devices is null || index < 0 || index >= DeviceCount)
         {
             return null;
         }
