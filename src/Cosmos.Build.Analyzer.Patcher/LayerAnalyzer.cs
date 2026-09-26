@@ -9,17 +9,29 @@ namespace Cosmos.Build.Analyzer.Patcher
     /// <summary>
     /// Roslyn diagnostic analyzer that enforces Cosmos kernel layer dependencies.
     /// The layer is inferred purely from the assembly name — no MSBuild markers needed.
-    /// Plug assemblies (any assembly that declares a <c>[Plug]</c> class) are exempt and
-    /// may reference all layers freely.
+    /// Plug assemblies (any assembly named <c>*.Plugs</c>) are exempt and may reference
+    /// all layers freely.
     /// <para>
-    /// Allowed references (strict — no skipping layers):
+    /// Allowed references (strict — no skipping layers, with one exception):
     /// <list type="bullet">
-    ///   <item>User     → System</item>
+    ///   <item>User     → System, HAL</item>
     ///   <item>System   → HAL</item>
     ///   <item>HAL      → HAL, Core</item>
     ///   <item>Core     → Native</item>
     ///   <item>Native   → (nothing)</item>
     /// </list>
+    /// User may skip System to reach the HAL because the driver kit, the seam a kernel
+    /// writes its own PCI and USB drivers against, lives there
+    /// (<c>Cosmos.Kernel.HAL.Drivers</c>, experimental COSMOS0003), next to the device
+    /// contracts the System API already hands out (<c>IBlockDevice</c>,
+    /// <c>MACAddress</c> in <c>Cosmos.Kernel.HAL.Interfaces</c>).
+    /// </para>
+    /// <para>
+    /// The check runs on the compilation's metadata references, not on the symbols the
+    /// code uses: a user kernel is any assembly not named <c>Cosmos.*</c> that references
+    /// a layer assembly, and every referenced layer assembly is checked whether the code
+    /// touches it or not. <c>Cosmos.*</c> assemblies outside the layers (the aggregator,
+    /// Plugs, Debug, Boot, the <c>Cosmos.Kernel.Tests.*</c> kernels) are not checked.
     /// </para>
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -164,7 +176,8 @@ namespace Cosmos.Build.Analyzer.Patcher
         {
             return current switch
             {
-                KernelLayer.User => referenced == KernelLayer.System,
+                // The HAL is allowed for the driver kit (see the class summary).
+                KernelLayer.User => referenced == KernelLayer.System || referenced == KernelLayer.Hal,
                 KernelLayer.System => referenced == KernelLayer.Hal,
                 KernelLayer.Hal => referenced == KernelLayer.Hal || referenced == KernelLayer.Core,
                 KernelLayer.Core => referenced == KernelLayer.Native,

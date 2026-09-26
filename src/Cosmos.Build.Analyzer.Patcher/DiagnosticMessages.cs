@@ -63,7 +63,8 @@ public sealed class DiagnosticMessages
         "Architecture",
         DiagnosticSeverity.Warning,
         true,
-        "Cosmos kernel layers must only reference the layer immediately below them. " +
+        "Cosmos kernel layers must only reference the layer immediately below them, " +
+        "except that a user kernel may also reference the HAL, where the driver kit lives. " +
         "Layer order (lowest to highest): Native, Core, HAL, System, User."
     );
 
