@@ -80,7 +80,7 @@ if (second.IsValid)
 }
 ```
 
-A `NetworkAdapter` is a handle, not the device: it carries the registration index, so a default-constructed one names nothing and `IsValid` is false. `GetAdapter` answers with such a handle for an index no device occupies, which is why the assignment above is guarded: the `Primary` setter throws `ArgumentException` on a handle that names nothing, and QEMU gives the kernel a single NIC by default, so `GetAdapter(1)` names nothing there.
+A `NetworkAdapter` is a handle, not the device: it names the one device it was taken for, never whatever sits at that index later, so a default-constructed one names nothing and `IsValid` is false, and so does one whose device has left the network manager since. `GetAdapter` answers with such a handle for an index no device occupies, which is why the assignment above is guarded: the `Primary` setter throws `ArgumentException` on a handle that names nothing, and QEMU gives the kernel a single NIC by default, so `GetAdapter(1)` names nothing there.
 
 <!-- screenshot: console showing "Device: Intel E1000E", the MAC, "Link up: True", "Ready: True" -->
 ![Network Device](images/network-device.png)

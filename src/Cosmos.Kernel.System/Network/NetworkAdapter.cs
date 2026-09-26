@@ -13,33 +13,45 @@ namespace Cosmos.Kernel.System.Network;
 /// <see cref="Config.IPConfig.Enable(NetworkAdapter, Address, Address, Address)"/>.
 /// </summary>
 /// <remarks>
-/// The handle carries the device's registration index biased by one, so a
-/// default-constructed value names no device rather than silently naming the
-/// first one.
+/// The handle carries the generation stamp the manager gave the device when
+/// it registered it, not the device's index. A network device a USB driver
+/// published leaves the manager when its device is pulled out, the devices
+/// registered after it move down one index, and a device registered later
+/// can take the index it had: an index would then name another device,
+/// while the stamp names the one registration it was taken from, or none.
+/// A default-constructed value carries stamp 0, which no registration gets,
+/// so it names no device rather than silently naming the first one.
 /// </remarks>
 public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
 {
-    // One past the registration index. Slot 0 is the default-constructed
-    // handle and belongs to no device.
-    private readonly int _slot;
+    /// <summary>
+    /// The generation stamp the handle names its device by; 0 for the
+    /// default-constructed handle, which belongs to no device.
+    /// </summary>
+    internal int Generation { get; }
 
-    internal NetworkAdapter(int index)
+    internal NetworkAdapter(int generation)
     {
-        _slot = index + 1;
+        Generation = generation;
     }
 
     /// <summary>
-    /// The device's registration index, or -1 for a handle that names none.
+    /// The device's index among the registered devices now, the one
+    /// <see cref="NetworkManager.GetAdapter(int)"/> takes, or -1 for a
+    /// handle that names none: a default handle, or one whose device was
+    /// unregistered. A device registered after one that is unregistered
+    /// moves down one index.
     /// </summary>
-    public int Index => _slot - 1;
+    public int Index => NetworkManager.IndexOf(Generation);
 
     /// <summary>
     /// Whether this handle still names a registered device. False for a
-    /// default-constructed handle.
+    /// default-constructed handle, and once the device was unregistered: a
+    /// USB network device pulled out.
     /// </summary>
-    public bool IsValid => _slot > 0 && _slot <= NetworkManager.DeviceCount;
+    public bool IsValid => Device is not null;
 
-    internal INetworkDevice? Device => IsValid ? NetworkManager.GetDevice(Index) : null;
+    internal INetworkDevice? Device => NetworkManager.FindDevice(Generation);
 
     /// <summary>
     /// The device's name, or null when the handle names no device.
@@ -98,10 +110,10 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
     /// Whether two handles name the same registered device.
     /// </summary>
     /// <param name="other">The handle to compare against.</param>
-    /// <returns>True when both name the same device, or both name none.</returns>
+    /// <returns>True when both were taken from the same registration of a device, or both are default handles.</returns>
     public bool Equals(NetworkAdapter other)
     {
-        return _slot == other._slot;
+        return Generation == other.Generation;
     }
 
     /// <summary>
@@ -115,12 +127,13 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
     }
 
     /// <summary>
-    /// Get a hash code derived from the registration index.
+    /// Get a hash code derived from the device's generation stamp, which,
+    /// unlike its index, never changes.
     /// </summary>
     /// <returns>Hash code for this handle.</returns>
     public override int GetHashCode()
     {
-        return _slot;
+        return Generation;
     }
 
     /// <summary>

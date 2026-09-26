@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
@@ -16,7 +17,13 @@ public static class MouseManager
     /// </summary>
     public static bool IsEnabled => CosmosFeatures.MouseEnabled;
 
-    private static List<IMouseDevice>? s_mice;
+    /// <summary>
+    /// The registered mice. Replaced on every change, never changed in
+    /// place: a mouse a USB driver published can come or go on the USB
+    /// hot-plug thread while another thread walks the list. Changed by the
+    /// boot path, then by that thread only.
+    /// </summary>
+    private static IMouseDevice[]? s_mice;
 
     /// <summary>
     /// Current X position (screen coordinates).
@@ -139,14 +146,78 @@ public static class MouseManager
             mouseDevice.OnMouseEvent = HandleMouseEvent;
         }
 
-        s_mice.Add(mouse);
+        s_mice = [.. s_mice, mouse];
 
         // Enable mouse after callback is set
         mouse.Enable();
 
         Core.IO.Serial.Write("[MouseManager] Registered mouse, total: ");
-        Core.IO.Serial.WriteNumber((uint)s_mice.Count);
+        Core.IO.Serial.WriteNumber((uint)s_mice.Length);
         Core.IO.Serial.Write("\n");
+    }
+
+    /// <summary>
+    /// Forgets a mouse that is gone: one a USB driver published, whose
+    /// device was pulled out. It is disabled and its event handler cleared,
+    /// so a report it still makes moves nothing, and the buttons are
+    /// released. A mouse that is not registered is left alone.
+    /// </summary>
+    internal static void UnregisterMouse(IMouseDevice mouse)
+    {
+        IMouseDevice[]? mice = s_mice;
+        if (mice is null || !Contains(mice, mouse))
+        {
+            return;
+        }
+
+        List<IMouseDevice> kept = new(mice.Length);
+        foreach (IMouseDevice other in mice)
+        {
+            if (!ReferenceEquals(other, mouse))
+            {
+                kept.Add(other);
+            }
+        }
+
+        s_mice = kept.ToArray();
+        mouse.Disable();
+        if (mouse is MouseDevice mouseDevice)
+        {
+            mouseDevice.OnMouseEvent = null;
+        }
+
+        // The buttons are the last report's, whichever mouse sent it, and a
+        // mouse pulled out with a button held never sends the release: the
+        // button would stay held for as long as no other mouse reports. A
+        // button another mouse holds comes back with that mouse's next
+        // report. Interrupts off, as the reports that set them run in
+        // interrupt handlers, so none lands between the three writes.
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            LeftButton = false;
+            RightButton = false;
+            MiddleButton = false;
+        }
+
+        Core.IO.Serial.Write("[MouseManager] Unregistered mouse, total: ");
+        Core.IO.Serial.WriteNumber((uint)s_mice.Length);
+        Core.IO.Serial.Write("\n");
+    }
+
+    /// <summary>Whether <paramref name="mouse"/> is registered now.</summary>
+    internal static bool IsRegistered(IMouseDevice mouse) => s_mice is { } mice && Contains(mice, mouse);
+
+    private static bool Contains(IMouseDevice[] mice, IMouseDevice mouse)
+    {
+        foreach (IMouseDevice other in mice)
+        {
+            if (ReferenceEquals(other, mouse))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -195,12 +266,12 @@ public static class MouseManager
     /// </summary>
     internal static void Poll()
     {
-        if (s_mice is null)
+        if (s_mice is not { } mice)
         {
             return;
         }
 
-        foreach (var mouse in s_mice)
+        foreach (IMouseDevice mouse in mice)
         {
             mouse.Poll();
         }
