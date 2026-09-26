@@ -5,6 +5,7 @@ using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.Core.Runtime.GcInfo;
+using Internal.Runtime;
 
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 
@@ -151,10 +152,10 @@ internal static unsafe partial class GarbageCollector
     /// <summary>
     /// <see cref="GcInfoDecoder.EnumerateLiveSlots"/> callback: marks each reported root via
     /// <see cref="TryMarkRoot"/>. <paramref name="pObjRef"/> is null for scratch registers Cosmos's
-    /// REGDISPLAY does not track (skipped). An interior pointer (<c>GC_CALL_INTERIOR</c>) is passed
-    /// through as-is — <see cref="TryMarkRoot"/>'s MethodTable check then drops a non-header byref,
-    /// the same hole the conservative scanner has; pinned (<c>GC_CALL_PINNED</c>) is a no-op for the
-    /// non-moving mark phase.
+    /// REGDISPLAY does not track (skipped). An interior pointer (<c>GC_CALL_INTERIOR</c>: a byref or a
+    /// span) is resolved to the object that contains it by <see cref="GetParentObject"/>, and marks
+    /// nothing when it lies in no object; pinned (<c>GC_CALL_PINNED</c>) is a no-op for the non-moving
+    /// mark phase.
     /// </summary>
     private static void PreciseRootTrampoline(void* ctx, nuint* pObjRef, uint gcRefFlags)
     {
@@ -165,47 +166,112 @@ internal static unsafe partial class GarbageCollector
 
         if ((gcRefFlags & GcRefFlags.GC_CALL_INTERIOR) != 0)
         {
-            // An interior pointer is reported. Find the parent object in the GC heap and mark it.
-            // Check if we are dealing with a pinned object, we need to use the correct segment list.
-            void* obj = (gcRefFlags & GcRefFlags.GC_CALL_PINNED) != 0
-                        ? GetParentObject((void*)*pObjRef, s_pinnedSegmentManager.Segments)
-                        : GetParentObject((void*)*pObjRef, s_segmentManager.Segments);
+            GCObject* parent = GetParentObject((byte*)*pObjRef);
+            if (parent != null)
+            {
+                TryMarkRoot((nint)parent);
+            }
 
-            TryMarkRoot((nint)obj);
             return;
         }
+
         TryMarkRoot((nint)(*pObjRef));
     }
 
-    private static void* GetParentObject(void* obj, GCSegment* s_segments)
+    /// <summary>
+    /// Resolves an interior pointer to the GC object that contains it.
+    /// </summary>
+    /// <remarks>
+    /// The segment is found by address in both the SOH and the pinned lists. The slot's
+    /// <c>GC_CALL_PINNED</c> flag cannot choose the list: it describes the stack slot (a <c>fixed</c>
+    /// local), not the heap the object was allocated on, and the pinned sweep's free runs feed the
+    /// shared free lists, so SOH TLABs can sit inside pinned segments.
+    /// </remarks>
+    /// <param name="interior">The pointer reported by the GCInfo decoder.</param>
+    /// <returns>
+    /// The containing object, or <c>null</c> when the pointer is outside every segment or lies in a
+    /// free block, filler or unallocated space.
+    /// </returns>
+    private static GCObject* GetParentObject(byte* interior)
     {
-        var segment = s_segments;
-
-        while (segment != null)
+        GCSegment* segment = s_segmentManager.GetSegmentContaining(interior);
+        if (segment == null)
         {
-            if (obj >= segment->Start && obj < segment->End)
-            {
-                var start = segment->FindClosestObjectBelow((nint)obj);
-
-                var segEnum = new GCSegment.Enumerator((byte*)start, (byte*)obj);
-
-                while (segEnum.MoveNext())
-                {
-                    var current = segEnum.Current;
-                    if (current == obj)
-                    {
-                        return current;
-                    }
-
-                    if (obj > current && obj < (byte*)current + current->ComputeSize())
-                    {
-                        return current;
-                    }
-                }
-            }
-            segment = segment->Next;
+            segment = s_pinnedSegmentManager.GetSegmentContaining(interior);
         }
 
-        return obj;
+        return segment != null ? FindObjectContaining(segment, interior) : null;
+    }
+
+    /// <summary>
+    /// Walks <paramref name="segment"/> from its first object to the object whose extent covers
+    /// <paramref name="interior"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The walk steps with the rules of <see cref="SweepSegment"/>, so the object it returns is one the
+    /// sweep also visits as an object start and unmarks: a <see cref="FreeBlock"/> advances by its
+    /// <see cref="FreeBlock.Size"/>, a header word that cannot be a MethodTable (zeroed TLAB gap,
+    /// reserved header slot, stale heap pointer) by one pointer, and an object by its size rounded up
+    /// the way the allocator rounds it. <see cref="GCObject.ComputeSize"/> alone is not a stride:
+    /// strings and byte, char and short arrays have sizes that are not pointer multiples.
+    /// </para>
+    /// <para>
+    /// It starts at <see cref="GCSegment.Start"/>, not at a brick-table entry. Objects allocated inside
+    /// a TLAB, and TLABs refilled from the free list, are never recorded in the brick table, and its
+    /// entries are never cleared when a sweep or a free-list refill reshapes the segment, so an entry
+    /// can point inside a live object. The cost is one walk of one segment per precise interior root,
+    /// and segments are sized for one TLAB refill or one large allocation.
+    /// </para>
+    /// </remarks>
+    /// <param name="segment">The segment that contains <paramref name="interior"/>.</param>
+    /// <param name="interior">The address to resolve.</param>
+    /// <returns>The containing object, or <c>null</c> when no object covers the address.</returns>
+    private static GCObject* FindObjectContaining(GCSegment* segment, byte* interior)
+    {
+        if (interior >= segment->Bump)
+        {
+            return null;
+        }
+
+        byte* ptr = segment->Start;
+        while (ptr < segment->Bump)
+        {
+            GCObject* obj = (GCObject*)ptr;
+
+            // Masked: the walk runs mid-mark, so objects already reached carry the mark bit.
+            MethodTable* mt = obj->GetMethodTable();
+            bool isObject = false;
+            uint size;
+
+            if (mt == s_freeMethodTable)
+            {
+                size = (uint)((FreeBlock*)ptr)->Size;
+            }
+            else if (mt == null || (ulong)mt < AddressSpace.KernelSpaceStart || IsInGCHeap((nint)mt))
+            {
+                size = (uint)sizeof(nint);
+            }
+            else
+            {
+                size = Align(obj->ComputeSize());
+                isObject = true;
+            }
+
+            // The sweep stops at the same entry, so nothing past it is ever an object start.
+            if (size == 0 || size > (uint)(segment->End - ptr))
+            {
+                return null;
+            }
+
+            if (interior < ptr + size)
+            {
+                return isObject ? obj : null;
+            }
+
+            ptr += size;
+        }
+
+        return null;
     }
 }
