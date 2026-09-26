@@ -6,6 +6,7 @@ using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Devices.Input;
+using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Keyboard;
@@ -70,6 +71,15 @@ internal class LibraryInitializer
                     {
                         MouseManager.RegisterMouse(mouse);
                     }
+
+                    // Mice the kernel's registered drivers publish, delivered
+                    // by the driver pass after the platform's. Nested under
+                    // PCI's own switch: registered drivers bind PCI functions
+                    // only, and a kernel without PCI trims the driver engine.
+                    if (CosmosFeatures.PCIEnabled)
+                    {
+                        DriverCore.MouseSink = MouseManager.RegisterMouse;
+                    }
                 }
 
                 // Initialize Network Manager and register platform network device
@@ -81,6 +91,15 @@ internal class LibraryInitializer
                     if (networkDevice is not null)
                     {
                         NetworkManager.RegisterDevice(networkDevice);
+                    }
+
+                    // Network links the kernel's registered drivers publish,
+                    // registered by the driver pass after the platform's
+                    // device, which therefore stays primary. Nested under
+                    // PCI's switch, as the mouse sink is.
+                    if (CosmosFeatures.PCIEnabled)
+                    {
+                        DriverCore.NetworkSink = NetworkManager.RegisterDevice;
                     }
                 }
 

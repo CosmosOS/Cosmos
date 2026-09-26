@@ -1,6 +1,7 @@
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Usb;
+using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.System.Graphics;
 
 namespace Cosmos.Kernel.System;
@@ -77,10 +78,11 @@ public static class Global
 
     /// <summary>
     /// Starts the registered kernel, once. Enables interrupts (unless the
-    /// Interrupts switch is off) and starts USB hot-plug, then calls
+    /// Interrupts switch is off), binds the drivers the kernel registered and
+    /// starts USB hot-plug, then calls
     /// <see cref="Kernel.Start"/>, so <see cref="Kernel.OnBoot"/>,
     /// <see cref="Kernel.BeforeRun"/> and <see cref="Kernel.Run"/> all run
-    /// with interrupts on, and a kernel that overrides Start keeps both.
+    /// with interrupts on, and a kernel that overrides Start keeps all three.
     /// Called by the generated entry point; it does not return.
     /// </summary>
     /// <exception cref="InvalidOperationException">StartKernel already ran.</exception>
@@ -117,6 +119,18 @@ public static class Global
         {
             Serial.WriteString("[Global] Enabling interrupts...\n");
             InternalCpu.EnableInterrupts();
+        }
+
+        // The drivers the kernel registered from its constructor bind here,
+        // to the PCI functions the built-in drivers left free during HAL
+        // bring-up. After interrupts, so a probe runs with them on on both
+        // architectures; before hot-plug starts, so the boot thread is the
+        // only one binding devices while the pass runs; and before the
+        // kernel's Start, so OnBoot finds them bound. PCI's switch alone, so
+        // ILC folds it and a kernel without PCI trims the whole engine.
+        if (Core.CosmosFeatures.PCIEnabled)
+        {
+            DriverCore.BindUserDrivers();
         }
 
         // After interrupts, since the thread only runs once the scheduler
