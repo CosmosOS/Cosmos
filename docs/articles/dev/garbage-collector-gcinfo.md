@@ -117,7 +117,7 @@ flowchart TD
     register slot: saved register location,
     stack slot: base register + offset"]
     RESOLVE --> MARK["For each reported ref:
-    interior: GetParentObject() via brick table,
+    interior: GetParentObject() walks its segment,
     then TryMarkRoot()"]
     STEP --> UNWIND
     MARK --> UNWIND["UnwindOneFrameWithCFI():
@@ -128,7 +128,7 @@ flowchart TD
 Per reported slot, the callback (`PreciseRootTrampoline`) does one of two things:
 
 - A plain reference is passed to `TryMarkRoot` directly; the usual heap-range and `MethodTable` checks are harmless belt and braces on a precisely reported root.
-- A slot flagged `GC_CALL_INTERIOR` holds a pointer into the middle of an object (a byref, a span's reference). The callback resolves it to the containing object with `GetParentObject`, through the owning segment's [brick table](garbage-collector.md#brick-table); the step-by-step mechanism is in [Garbage Collector: Interior pointers](garbage-collector.md#interior-pointers). This is the fix for objects reachable only through a byref (issue [#384](https://github.com/valentinbreiz/nativeaot-patcher/issues/384)).
+- A slot flagged `GC_CALL_INTERIOR` holds a pointer into the middle of an object (a byref, a span's reference). The callback resolves it to the containing object with `GetParentObject`, which finds the segment holding the address in either chain and walks it from its first object; the step-by-step mechanism is in [Garbage Collector: Interior pointers](garbage-collector.md#interior-pointers). The slot's `GC_CALL_PINNED` flag plays no part: it says the slot is a pinned local (a `fixed` statement's), not which heap the object is on. An address that lies in no object marks nothing. This is the fix for objects reachable only through a byref (issue [#384](https://github.com/valentinbreiz/nativeaot-patcher/issues/384)).
 
 Frames without GCInfo come in two kinds. A hand-written asm trampoline that still carries `.cfi` directives (`RhpCallCatchFunclet`, `RhpCallFilterFunclet`, `RhpThrowEx`) is stepped through reporting nothing: the managed frames on either side cover its register save locations, and the in-flight exception object stays reported because managed frames deeper on the stack (the funclet body's exception local, the managed dispatcher `RhThrowEx` that the stub calls) hold it in slots their own GCInfo describes. A frame with no CFI at all (interrupt entry stubs, the bootloader) ends the walk: the scanner conservatively scans the remaining stack range and stops rather than crashing. The same conservative tail runs if the unwinder fails mid-walk or a method's slot table overflows the decoder's fixed buffer. Two exits are harsher: an unwound frame that fails the sanity checks (an IP of zero, a stack pointer that does not increase or leaves the stack) or a walk that exhausts its 256-frame cap stops the scan with no conservative tail, and any older frames go unscanned for that collection.
 
@@ -159,5 +159,5 @@ Until then, threads other than the GC-triggering one keep the conservative scan 
 | `_native_capture_regdisplay` stub | `src/Cosmos.Kernel.Native.X64/CPU/ContextCapture.s`, `src/Cosmos.Kernel.Native.ARM64/CPU/ContextCapture.s`, [`ContextSwitchNative.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Bridge/Import/ContextSwitchNative.cs) | seeds the initial `REGDISPLAY` for the GC-triggering thread |
 | `.dotnet_eh_table` kept, with `__dotnet_eh_table_start/end` | [`linker.x64.ld`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Build.Templates/Linker/linker.x64.ld), [`linker.arm64.ld`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Build.Templates/Linker/linker.arm64.ld) | GCInfo is reachable at runtime via the FDE LSDA |
 | Conservative scan (parked threads) | [`GarbageCollector.Mark.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Mark.cs) | `ScanThreadStack` / `ScanMemoryRange` / `TryMarkRoot`; what remains until hijacking lands |
-| Tests | `tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector` | `GC_GcInfoDecoder`, `GC_PreciseStackScan`, `GC_FuncletNoFalseRoot`, `GC_FuncletNoCrashOnAllocInCatch`, `GC_StackScanPaddingStress`, `GC_InteriorPointerRoot` |
+| Tests | `tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector` | `GC_GcInfoDecoder`, `GC_PreciseStackScan`, `GC_FuncletNoFalseRoot`, `GC_FuncletNoCrashOnAllocInCatch`, `GC_StackScanPaddingStress`, `GC_InteriorPointerRoot`, `GC_InteriorPointerRootMidTlab`, `GC_InteriorPointerRootPinnedHeap`, `GC_InteriorPointerRootFixed` |
 | Hijack stub | not yet written | [#385](https://github.com/valentinbreiz/nativeaot-patcher/issues/385), phase 4 of the epic |
