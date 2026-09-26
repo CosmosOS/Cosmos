@@ -5,7 +5,7 @@ using Cosmos.Kernel.HAL.Drivers;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// A driver for the Realtek RTL8139 (10ec:8139), written against the driver
@@ -24,7 +24,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// is then offered the RTL8139 after all of them, so the ranking cell still
 /// sees them in order, and it declines every other NIC.
 /// </remarks>
-internal sealed class Rtl8139Driver : PciDriver
+public sealed class Rtl8139Driver : PciDriver
 {
     /// <summary>The registration's name, and the owner the RTL8139 gets.</summary>
     public const string Name = "rtl8139";
@@ -35,6 +35,8 @@ internal sealed class Rtl8139Driver : PciDriver
     /// <summary>The RTL8139's device ID.</summary>
     public const ushort DeviceId = 0x8139;
 
+    private const byte NetworkClassCode = 0x02;
+    private const byte EthernetSubclass = 0x00;
     private const int RegisterBar = 1;
     private const ulong ThirtyTwoBitBus = uint.MaxValue;
 
@@ -167,10 +169,17 @@ internal sealed class Rtl8139Driver : PciDriver
     /// <summary>Frames the chip took from the stack's sends.</summary>
     public static int Transmits => Volatile.Read(ref s_transmits);
 
+    /// <summary>
+    /// The registration the kernel passes to DriverManager.Register: every
+    /// Ethernet controller by class and subclass, for the ranking reason in
+    /// the remarks above; its Probe declines all but the RTL8139.
+    /// </summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
+    public static PciDriverRegistration CreateRegistration() =>
+        new(Name, static () => new Rtl8139Driver(), PciMatch.Class(NetworkClassCode, EthernetSubclass));
+
     /// <inheritdoc />
-    // protected internal, not protected: this assembly sees the HAL's
-    // internals, so the override must keep the base's full accessibility.
-    protected internal override ProbeResult Probe(PciDeviceContext context)
+    protected override ProbeResult Probe(PciDeviceContext context)
     {
         ProbeLog.Record(Name);
         PciFunction function = context.Function;
@@ -216,15 +225,18 @@ internal sealed class Rtl8139Driver : PciDriver
             return Fail(context, "no MSI-X and no ticking timer to poll with");
         }
 
-        // Only once the chip is reset: it must not master into the buffers
-        // with state firmware left behind.
-        context.EnableBusMastering();
         registers.Write32(ReceiveBufferStart, (uint)receiveBuffer.DeviceAddress);
         for (int slot = 0; slot < TransmitSlotCount; slot++)
         {
             registers.Write32(TransmitAddress0 + (ulong)(slot * sizeof(uint)),
                 (uint)transmitBuffer.DeviceAddress + (uint)(slot * TransmitSlotLength));
         }
+
+        // Only once the chip is reset and knows where its buffers are, so it
+        // can never master through an address firmware left behind; and
+        // before the receiver and transmitter are enabled below, which is
+        // when it starts to.
+        context.EnableBusMastering();
 
         // RCR before the receiver is enabled: writing it also starts the
         // chip's ring at the buffer's first byte, where _receiveOffset starts.

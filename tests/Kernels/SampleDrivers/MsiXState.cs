@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Drivers;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// Reads a function's MSI-X state the way a driver can, through the kit's
@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// PCI 3.0 §6.8.2: the capability's Message Control and Table Offset/BIR
 /// registers, and 16-byte table entries whose last dword is Vector Control.
 /// </summary>
-internal static class MsiXState
+public static class MsiXState
 {
     private const byte CapabilityId = 0x11;
     private const ushort MessageControlOffset = 0x02;

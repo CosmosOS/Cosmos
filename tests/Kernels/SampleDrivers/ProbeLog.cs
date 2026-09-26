@@ -1,6 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// The names of the suite's registrations whose Probe ran, in the order the
@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// device plugged back in may come back at the path it had, so the hot-plug
 /// cells read only what was recorded since they plugged it.
 /// </summary>
-internal static class ProbeLog
+public static class ProbeLog
 {
     // Created on first use rather than by a static initializer, which would
     // make a class constructor run from inside the driver pass. The two

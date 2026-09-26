@@ -4,7 +4,7 @@ using Cosmos.Kernel.HAL.Drivers;
 using Cosmos.Kernel.HAL.Drivers.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// A driver matching HID interfaces with no boot subclass (03/00), which
@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// when the tablet is pulled out. Every binding publishes a MAC address of
 /// its own, numbered by instance, so the cells tell the links apart.
 /// </summary>
-internal sealed class UsbTabletLinkDriver : UsbDriver
+public sealed class UsbTabletLinkDriver : UsbDriver
 {
     /// <summary>The registration's name.</summary>
     public const string Name = "usb-tablet-link";
@@ -69,13 +69,14 @@ internal sealed class UsbTabletLinkDriver : UsbDriver
     /// <summary>The MAC address the binding of instance <paramref name="instance"/> publishes: locally administered, its last byte the instance number.</summary>
     public static MACAddress AddressOf(int instance) => new MACAddress([0x02, 0x00, 0x00, 0x00, 0x7A, (byte)instance]);
 
-    /// <summary>The registration the kernel passes to Register: HID with no boot subclass, whatever the protocol.</summary>
+    /// <summary>The registration the kernel passes to DriverManager.Register: HID with no boot subclass, whatever the protocol.</summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
     public static UsbDriverRegistration CreateRegistration() =>
         new(Name, static () => new UsbTabletLinkDriver(),
             UsbMatch.Interface(UsbBootMouseDriver.HidClass, UsbTabletFailingDriver.NoSubclass));
 
     /// <inheritdoc />
-    protected internal override ProbeResult Probe(UsbDeviceContext context)
+    protected override ProbeResult Probe(UsbDeviceContext context)
     {
         ProbeLog.Record(Name, context.Path);
         Context = context;
@@ -89,10 +90,10 @@ internal sealed class UsbTabletLinkDriver : UsbDriver
     }
 
     /// <summary>Records that the tablet left the bus, and whether the kit had withdrawn the link and cleared IsPresent by then.</summary>
-    protected internal override void Remove(UsbDeviceContext context)
+    protected override void Remove(UsbDeviceContext context)
     {
         PresentAtRemove = context.IsPresent;
-        LinkWithdrawnAtRemove = Link is { } link && link.Device.IsWithdrawn;
+        LinkWithdrawnAtRemove = Link is { } link && new PublishedLinkView(link).IsWithdrawn;
         IsBound = false;
         Interlocked.Increment(ref s_removeCalls);
     }

@@ -3,7 +3,7 @@
 using Cosmos.Kernel.HAL.Drivers;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// An Ethernet class driver that binds the 82574L (8086:10d3) only, and
@@ -14,11 +14,13 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// loses, so they are offered each NIC first and the ranking cell still
 /// sees them in order; every other NIC it declines.
 /// </summary>
-internal sealed class E1000EInterruptDriver : PciDriver
+public sealed class E1000EInterruptDriver : PciDriver
 {
     /// <summary>The registration's name, and the owner the 82574L gets.</summary>
     public const string Name = "e1000e-irq";
 
+    private const byte NetworkClassCode = 0x02;
+    private const byte EthernetSubclass = 0x00;
     private const ushort IntelVendorId = 0x8086;
     private const ushort I82574LDeviceId = 0x10D3;
 
@@ -58,8 +60,17 @@ internal sealed class E1000EInterruptDriver : PciDriver
     /// </summary>
     public static int HandlerCalls => Volatile.Read(ref s_handlerCalls);
 
+    /// <summary>
+    /// The registration the kernel passes to DriverManager.Register: every
+    /// Ethernet controller by class and subclass, since its Probe declines
+    /// all but the 82574L.
+    /// </summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
+    public static PciDriverRegistration CreateRegistration() =>
+        new(Name, static () => new E1000EInterruptDriver(), PciMatch.Class(NetworkClassCode, EthernetSubclass));
+
     /// <inheritdoc />
-    protected internal override ProbeResult Probe(PciDeviceContext context)
+    protected override ProbeResult Probe(PciDeviceContext context)
     {
         ProbeLog.Record(Name);
         PciFunction function = context.Function;

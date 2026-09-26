@@ -3,7 +3,7 @@
 using Cosmos.Kernel.HAL.Drivers;
 using Cosmos.Kernel.HAL.Drivers.Usb;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// A driver for QEMU's USB tablet, a HID interface with no boot subclass or
@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// a tablet plugged in later, it declines having opened nothing, which lets
 /// the kit offer the tablet to the next candidate.
 /// </summary>
-internal sealed class UsbTabletFailingDriver : UsbDriver
+public sealed class UsbTabletFailingDriver : UsbDriver
 {
     /// <summary>The registration's name.</summary>
     public const string Name = "usb-tablet-fails";
@@ -51,8 +51,16 @@ internal sealed class UsbTabletFailingDriver : UsbDriver
     /// <summary>Calls of the failed attempt's report handler.</summary>
     public static int HandlerCalls => Volatile.Read(ref s_handlerCalls);
 
+    /// <summary>
+    /// The registration the kernel passes to DriverManager.Register: the
+    /// tablet's interface exactly, HID with no boot subclass or protocol.
+    /// </summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
+    public static UsbDriverRegistration CreateRegistration() =>
+        new(Name, static () => new UsbTabletFailingDriver(), UsbMatch.Interface(UsbBootMouseDriver.HidClass, NoSubclass, NoProtocol));
+
     /// <inheritdoc />
-    protected internal override ProbeResult Probe(UsbDeviceContext context)
+    protected override ProbeResult Probe(UsbDeviceContext context)
     {
         ProbeLog.Record(Name, context.Path);
         if (Interlocked.Increment(ref s_probes) > 1)

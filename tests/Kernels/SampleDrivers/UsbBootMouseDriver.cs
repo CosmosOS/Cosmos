@@ -2,10 +2,9 @@
 
 using System.Diagnostics;
 using Cosmos.Kernel.HAL.Drivers;
-using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Drivers.Usb;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// The driver kit's sample HID boot-protocol mouse driver, with what the
@@ -21,7 +20,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// the static record describes the latest binding, and the instance count
 /// how many the factory created.
 /// </summary>
-internal sealed class UsbBootMouseDriver : UsbDriver
+public sealed class UsbBootMouseDriver : UsbDriver
 {
     /// <summary>The registration's name.</summary>
     public const string Name = "usb-boot-mouse";
@@ -195,14 +194,13 @@ internal sealed class UsbBootMouseDriver : UsbDriver
         Interlocked.Increment(ref s_instances);
     }
 
-    /// <summary>The registration the kernel passes to Register.</summary>
+    /// <summary>The registration the kernel passes to DriverManager.Register: the HID boot mouse interface.</summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
     public static UsbDriverRegistration CreateRegistration() =>
         new(Name, static () => new UsbBootMouseDriver(), UsbMatch.Interface(HidClass, BootSubclass, MouseProtocol));
 
     /// <inheritdoc />
-    // protected internal, not protected: this assembly sees the HAL's
-    // internals, so the override must keep the base's full accessibility.
-    protected internal override ProbeResult Probe(UsbDeviceContext context)
+    protected override ProbeResult Probe(UsbDeviceContext context)
     {
         ProbeLog.Record(Name, context.Path);
         Probed = true;
@@ -261,13 +259,13 @@ internal sealed class UsbBootMouseDriver : UsbDriver
     /// then: the context not present, the mouse withdrawn, no work item of
     /// the binding running.
     /// </summary>
-    protected internal override void Remove(UsbDeviceContext context)
+    protected override void Remove(UsbDeviceContext context)
     {
         Volatile.Write(ref s_removeStartedAt, Stopwatch.GetTimestamp());
         RemovedContext = context;
         PresentAtRemove = context.IsPresent;
-        MouseWithdrawnAtRemove = _mouse is { } mouse && mouse.Device.IsWithdrawn;
-        WorkRunningAtRemove = DriverWorkQueue.IsRunningItemOf(context);
+        MouseWithdrawnAtRemove = _mouse is { } mouse && new PublishedMouseView(mouse).IsWithdrawn;
+        WorkRunningAtRemove = KitInternals.IsRunningWorkItemOf(context);
         Interlocked.Increment(ref s_removeCalls);
     }
 

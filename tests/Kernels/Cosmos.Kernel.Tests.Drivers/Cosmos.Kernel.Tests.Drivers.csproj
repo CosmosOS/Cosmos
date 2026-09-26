@@ -12,6 +12,10 @@
          Mouse must stay on too: the suite's drivers publish a network link,
          which the rtl8139 cells take a DHCP lease through, and mice. -->
     <CosmosEnableStorage>false</CosmosEnableStorage>
+    <!-- The kernel registers the suite's drivers through the experimental
+         driver kit seam (COSMOS0003): DriverManager, from its constructor
+         and its RegisterDrivers override. -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
   <!--
@@ -39,11 +43,21 @@
     <CosmosTestModifier Include="gicv3" />
   </ItemGroup>
 
+  <!--
+    No Cosmos assembly grants this kernel InternalsVisibleTo: it builds
+    against the driver kit's public seam, as a user kernel does. What its
+    cells check beyond that seam, they read through the documented
+    [UnsafeAccessor] helpers in Internals/ and in the library's Internals/.
+  -->
+
   <!-- Core kernel packages (using project references for development) -->
   <ItemGroup>
     <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
     <ProjectReference Include="../../../src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
     <ProjectReference Include="../../Cosmos.TestRunner.Framework/Cosmos.TestRunner.Framework.csproj" />
+    <!-- The suite's drivers: a plain class library over the seam, compiled
+         for this build's architecture like the rest of the references. -->
+    <ProjectReference Include="../SampleDrivers/SampleDrivers.csproj" />
   </ItemGroup>
 
   <!-- Architecture-specific HAL (using project references for development) -->

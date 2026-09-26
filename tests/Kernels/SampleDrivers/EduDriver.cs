@@ -3,7 +3,7 @@
 using Cosmos.Kernel.HAL.Drivers;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// A driver for QEMU's edu device (1234:11e8), written against the driver
@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// assert on that afterwards. It binds whatever it saw, so one wrong
 /// register fails its own cell and not the ranking cells as well.
 /// </summary>
-internal sealed class EduDriver : PciDriver
+public sealed class EduDriver : PciDriver
 {
     /// <summary>The registration's name, and the owner the edu function gets.</summary>
     public const string Name = "edu";
@@ -260,10 +260,13 @@ internal sealed class EduDriver : PciDriver
     /// <summary>edu's interrupt status register now; 0 when BAR 0 never mapped.</summary>
     public static uint ReadInterruptStatus() => Registers?.Read32(InterruptStatusRegister) ?? 0;
 
+    /// <summary>The registration the kernel passes to DriverManager.Register: edu by device ID.</summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
+    public static PciDriverRegistration CreateRegistration() =>
+        new(Name, static () => new EduDriver(), PciMatch.Device(VendorId, DeviceId));
+
     /// <inheritdoc />
-    // protected internal, not protected: this assembly sees the HAL's
-    // internals, so the override must keep the base's full accessibility.
-    protected internal override ProbeResult Probe(PciDeviceContext context)
+    protected override ProbeResult Probe(PciDeviceContext context)
     {
         ProbeLog.Record(Name);
         Probed = true;

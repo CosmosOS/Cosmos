@@ -1,10 +1,10 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.HAL.Drivers;
-using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Drivers.Usb;
+using Cosmos.Kernel.System.Drivers;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// A driver matching QEMU's HID devices by vendor and product ID, the most
@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// having opened nothing: each interface then goes on to the next
 /// candidate.
 /// </summary>
-internal sealed class UsbHidDeviceDriver : UsbDriver
+public sealed class UsbHidDeviceDriver : UsbDriver
 {
     /// <summary>The registration's name.</summary>
     public const string Name = "usb-qemu-hid";
@@ -55,7 +55,17 @@ internal sealed class UsbHidDeviceDriver : UsbDriver
     /// <summary>True when some Probe found no interrupt IN endpoint to try TryOpenBulk on.</summary>
     public static bool InterruptEndpointMissing { get; private set; }
 
-    /// <summary>The registration's factory: tries to register, then creates the driver.</summary>
+    /// <summary>
+    /// The registration the kernel passes to DriverManager.Register: QEMU's
+    /// HID devices by vendor and product ID, with <see cref="Create"/> as its
+    /// factory.
+    /// </summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
+    public static UsbDriverRegistration CreateRegistration() =>
+        new(Name, Create, UsbMatch.Device(UsbDescriptors.QemuHidVendorId, UsbDescriptors.QemuHidProductId));
+
+    /// <summary>The registration's factory: tries to register, then creates the driver. Called by the kit on the thread that offers an interface.</summary>
+    /// <returns>A new driver.</returns>
     public static UsbDriver Create()
     {
         FactoryRegisterMessage = TryRegister();
@@ -63,7 +73,7 @@ internal sealed class UsbHidDeviceDriver : UsbDriver
     }
 
     /// <inheritdoc />
-    protected internal override ProbeResult Probe(UsbDeviceContext context)
+    protected override ProbeResult Probe(UsbDeviceContext context)
     {
         ProbeLog.Record(Name, context.Path);
         Probes++;
@@ -99,7 +109,7 @@ internal sealed class UsbHidDeviceDriver : UsbDriver
     {
         try
         {
-            DriverCore.Register(new UsbDriverRegistration(NestedName, static () => new UsbRecordingDriver(NestedName, ProbeResult.Declined),
+            DriverManager.Register(UsbRecordingDriver.CreateRegistration(NestedName, ProbeResult.Declined,
                 UsbMatch.Device(UsbDescriptors.QemuHidVendorId, UsbDescriptors.QemuHidProductId)));
             return null;
         }

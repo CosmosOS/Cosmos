@@ -37,4 +37,7 @@
     <Folder Name="/src/Tests/">
         <Project Path="src/tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj" />
     </Folder>
+    <Folder Name="/tests/Kernels/">
+        <Project Path="tests/Kernels/SampleDrivers/SampleDrivers.csproj" />
+    </Folder>
 </Solution>

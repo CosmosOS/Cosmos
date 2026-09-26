@@ -4,7 +4,7 @@ using Cosmos.Kernel.HAL.Drivers;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// A driver for the edu function that acquires what a real driver would,
@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// publication reached its manager, and ranks first among the edu drivers
 /// so every later candidate runs after its teardown.
 /// </summary>
-internal sealed class ThrowingDriver : PciDriver
+public sealed class ThrowingDriver : PciDriver
 {
     /// <summary>The registration's name.</summary>
     public const string Name = "edu-throws";
@@ -85,8 +85,17 @@ internal sealed class ThrowingDriver : PciDriver
     /// <summary>Runs of the failed attempt's work item.</summary>
     public static int WorkRuns => Volatile.Read(ref s_workRuns);
 
+    /// <summary>
+    /// The registration the kernel passes to DriverManager.Register: edu by
+    /// device ID, so it ties with the other edu device matches and is offered
+    /// edu in registration order.
+    /// </summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
+    public static PciDriverRegistration CreateRegistration() =>
+        new(Name, static () => new ThrowingDriver(), PciMatch.Device(EduDriver.VendorId, EduDriver.DeviceId));
+
     /// <inheritdoc />
-    protected internal override ProbeResult Probe(PciDeviceContext context)
+    protected override ProbeResult Probe(PciDeviceContext context)
     {
         ProbeLog.Record(Name);
 
@@ -102,7 +111,7 @@ internal sealed class ThrowingDriver : PciDriver
 
         context.EnableBusMastering();
         InterruptsGranted = context.TryRequestInterrupts(OnInterrupt);
-        PollTimer = PciContextInternals.PollTimer(context);
+        PollTimer = KitInternals.PollTimer(context);
         Event = context.CreateEvent();
         if (context.TryCreateWorkItem(OnWork, out DeviceWorkItem? workItem))
         {

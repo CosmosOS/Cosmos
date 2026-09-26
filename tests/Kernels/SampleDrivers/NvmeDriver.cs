@@ -4,7 +4,7 @@ using System.Buffers.Binary;
 using Cosmos.Kernel.HAL.Drivers;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// A minimal NVMe driver, matched by class, that binds the controller the
@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// consumes it either way, so the NVMe cells see the interrupt of a real
 /// command reach the handler, after Bound and never before.
 /// </summary>
-internal sealed class NvmeDriver : PciDriver
+public sealed class NvmeDriver : PciDriver
 {
     /// <summary>
     /// The registration's name, and the owner the NVMe function gets. Not
@@ -28,6 +28,11 @@ internal sealed class NvmeDriver : PciDriver
 
     /// <summary>What the Identify Controller data starts with on QEMU: its PCI vendor ID.</summary>
     public const ushort ExpectedIdentifyVendorId = FailingNvmeDriver.VendorId;
+
+    // An NVMe controller: mass storage, non-volatile memory, NVM Express.
+    private const byte MassStorageClassCode = 0x01;
+    private const byte NonVolatileMemorySubclass = 0x08;
+    private const byte NvmeProgrammingInterface = 0x02;
 
     // Registers (NVMe 1.4 §3.1). CAP, ASQ and ACQ are 64-bit.
     private const int RegisterBar = 0;
@@ -100,6 +105,9 @@ internal sealed class NvmeDriver : PciDriver
     /// <summary>True once Probe ran.</summary>
     public static bool Probed { get; private set; }
 
+    /// <summary>The context Probe was handed, to read the function's state once Bound.</summary>
+    public static PciDeviceContext? Context { get; private set; }
+
     /// <summary>The Command register as Probe found it, after the failed attempt's teardown.</summary>
     public static ushort CommandAtProbe { get; private set; }
 
@@ -163,11 +171,20 @@ internal sealed class NvmeDriver : PciDriver
     /// <summary>The command ID the Identify was submitted with.</summary>
     public static ushort SubmittedCommandId => IdentifyCommandId;
 
+    /// <summary>
+    /// The registration the kernel passes to DriverManager.Register: an NVM
+    /// Express controller by class, subclass and programming interface.
+    /// </summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
+    public static PciDriverRegistration CreateRegistration() =>
+        new(Name, static () => new NvmeDriver(), PciMatch.Class(MassStorageClassCode, NonVolatileMemorySubclass, NvmeProgrammingInterface));
+
     /// <inheritdoc />
-    protected internal override ProbeResult Probe(PciDeviceContext context)
+    protected override ProbeResult Probe(PciDeviceContext context)
     {
         ProbeLog.Record(Name);
         Probed = true;
+        Context = context;
         CommandAtProbe = context.Function.ReadConfig16(CommandOffset);
         MsiXEnabledAtProbe = MsiXState.IsEnabled(context.Function);
         FreePagesAtProbe = KernelState.FreePages;

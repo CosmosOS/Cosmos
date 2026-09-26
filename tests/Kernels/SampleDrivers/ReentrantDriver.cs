@@ -1,10 +1,10 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.HAL.Drivers;
-using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Drivers.Pci;
+using Cosmos.Kernel.System.Drivers;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// A driver for the edu function that tries to register another driver
@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// and declines. Ranked above the driver that binds edu, so it also shows a
 /// declined candidate passing the function on.
 /// </summary>
-internal sealed class ReentrantDriver : PciDriver
+public sealed class ReentrantDriver : PciDriver
 {
     /// <summary>The registration's name.</summary>
     public const string Name = "edu-reentrant";
@@ -35,7 +35,16 @@ internal sealed class ReentrantDriver : PciDriver
     /// </summary>
     public static string? ProbeRegisterMessage { get; private set; }
 
-    /// <summary>The registration's factory: tries to register, then creates the driver.</summary>
+    /// <summary>
+    /// The registration the kernel passes to DriverManager.Register: edu by
+    /// device ID, with <see cref="Create"/> as its factory.
+    /// </summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
+    public static PciDriverRegistration CreateRegistration() =>
+        new(Name, Create, PciMatch.Device(EduDriver.VendorId, EduDriver.DeviceId));
+
+    /// <summary>The registration's factory: tries to register, then creates the driver. Called by the kit during the pass.</summary>
+    /// <returns>A new driver.</returns>
     public static PciDriver Create()
     {
         FactoryRan = true;
@@ -44,7 +53,7 @@ internal sealed class ReentrantDriver : PciDriver
     }
 
     /// <inheritdoc />
-    protected internal override ProbeResult Probe(PciDeviceContext context)
+    protected override ProbeResult Probe(PciDeviceContext context)
     {
         ProbeLog.Record(Name);
         ProbeRegisterMessage = TryRegister();
@@ -61,7 +70,7 @@ internal sealed class ReentrantDriver : PciDriver
     {
         try
         {
-            DriverCore.Register(new PciDriverRegistration(NestedName, static () => new RecordingDriver(NestedName, ProbeResult.Declined),
+            DriverManager.Register(RecordingDriver.CreateRegistration(NestedName, ProbeResult.Declined,
                 PciMatch.Device(EduDriver.VendorId, EduDriver.DeviceId)));
             return null;
         }

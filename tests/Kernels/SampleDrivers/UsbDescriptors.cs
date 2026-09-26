@@ -1,13 +1,13 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// What the USB cells read from a device's descriptors, and the IDs QEMU's
 /// HID devices present: its usb-mouse and usb-tablet share one vendor and
 /// product ID and tell each other apart by their interface only.
 /// </summary>
-internal static class UsbDescriptors
+public static class UsbDescriptors
 {
     /// <summary>idVendor of QEMU's HID devices.</summary>
     public const ushort QemuHidVendorId = 0x0627;

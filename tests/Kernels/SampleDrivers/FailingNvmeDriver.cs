@@ -4,7 +4,7 @@ using Cosmos.Kernel.HAL.Drivers;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
-namespace Cosmos.Kernel.Tests.Drivers;
+namespace SampleDrivers;
 
 /// <summary>
 /// A driver for QEMU's NVMe controller (1b36:0010) that acquires
@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// vector, the DMA pages and MSI-X Enable must all be back as they were,
 /// and a poll timer, where the kit polled instead, stopped.
 /// </summary>
-internal sealed class FailingNvmeDriver : PciDriver
+public sealed class FailingNvmeDriver : PciDriver
 {
     /// <summary>The registration's name.</summary>
     public const string Name = "nvme-fails";
@@ -75,8 +75,17 @@ internal sealed class FailingNvmeDriver : PciDriver
     /// <summary>Calls of the failed attempt's interrupt handler.</summary>
     public static int HandlerCalls => Volatile.Read(ref s_handlerCalls);
 
+    /// <summary>
+    /// The registration the kernel passes to DriverManager.Register: QEMU's
+    /// NVMe controller by device ID, which outranks the class match
+    /// registered before it.
+    /// </summary>
+    /// <returns>A registration named <see cref="Name"/>.</returns>
+    public static PciDriverRegistration CreateRegistration() =>
+        new(Name, static () => new FailingNvmeDriver(), PciMatch.Device(VendorId, DeviceId));
+
     /// <inheritdoc />
-    protected internal override ProbeResult Probe(PciDeviceContext context)
+    protected override ProbeResult Probe(PciDeviceContext context)
     {
         ProbeLog.Record(Name);
         Probed = true;
@@ -89,7 +98,7 @@ internal sealed class FailingNvmeDriver : PciDriver
         }
 
         InterruptsGranted = context.TryRequestInterrupts(OnInterrupt);
-        PollTimer = PciContextInternals.PollTimer(context);
+        PollTimer = KitInternals.PollTimer(context);
         BoundVectorsAfterRequest = KernelState.BoundVectors;
         MsiXEnabledAfterRequest = MsiXState.IsEnabled(context.Function);
         if (MsiXState.TryMapEntry0Control(context, out MmioRegion? table, out ulong entryControl))

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The Drivers suite's PCI and USB drivers, built the way a third-party
+    driver library is: a plain class library over the driver kit's public
+    seam, with no Cosmos.Sdk and no InternalsVisibleTo grant from any Cosmos
+    assembly. So a driver overrides Probe and Remove as protected, and hands
+    the kernel a CreateRegistration() to register from its RegisterDrivers
+    override rather than registering itself from a module initializer.
+
+    Its name is not a Cosmos.* one on purpose, as a third party's would not
+    be. Neither build step keys on it: the LayerAnalyzer runs only in a
+    project that adds it, as Cosmos.Sdk does for a kernel and each Cosmos
+    layer project does for itself, and a plain library does not; the patcher
+    copies a referenced assembly to ILC unchanged unless a plug targets a
+    type in it, which none does here.
+
+    What the cells observe beyond the seam, the instrumentation reads through
+    the documented [UnsafeAccessor] helpers in Internals/.
+
+    The suite references it, so each build of the suite compiles it for that
+    build's architecture, through the same global properties as the HAL.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <!-- The drivers are written against the experimental driver kit seam (COSMOS0003). -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The driver kit seam. -->
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL/Cosmos.Kernel.HAL.csproj" />
+    <!-- DriverManager, which two drivers call from inside the pass, and the
+         thread and memory facts the instrumentation records. -->
+    <ProjectReference Include="../../../src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
+  </ItemGroup>
+
+</Project>

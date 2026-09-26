@@ -2,24 +2,21 @@
 
 using System.Buffers.Binary;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using Cosmos.Build.API.Enum;
-using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Devices.Usb;
+using System.Runtime.InteropServices;
 using Cosmos.Kernel.HAL.Drivers;
-using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 using Cosmos.Kernel.HAL.Drivers.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.HAL.Pci;
-using Cosmos.Kernel.HAL.Pci.Enums;
 using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.Drivers;
 using Cosmos.Kernel.System.Mouse;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.IPv4;
 using Cosmos.Kernel.System.Network.IPv4.DHCP;
+using Cosmos.Kernel.System.Timer;
 using Cosmos.TestRunner.Framework;
+using SampleDrivers;
 using Sys = Cosmos.Kernel.System;
 using SysThread = System.Threading.Thread;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -32,19 +29,22 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// this kernel leaves free by building without Storage) put one function on
 /// the bus, and the usb-hid profile puts a HID boot mouse and a tablet
 /// behind an xHCI controller, with a keyboard the built-in USB keyboard
-/// driver takes. The kernel registers its test drivers, PCI
-/// and USB, from its constructor, the driver pass in Global.StartKernel
-/// offers them the free functions and interfaces, and the cells check what
-/// came of it: the registration rules, the ranking, the teardown of failed
-/// attempts, the interrupts, work items and events the kit hands out, the
-/// mouse and network link drivers publish, on edu a driver that drives the
-/// device's registers, DMA engine and polled interrupt, on the RTL8139 a NIC
-/// driver whose link gets a DHCP lease through the kernel's network stack,
-/// on NVMe a failed attempt with MSI-X followed by a driver that gets it
-/// again and takes a real command's completion interrupt, and on USB a boot
-/// mouse driver that binds after a device match declined and whose reports
-/// reach it only once bound, and a tablet driver that opens its endpoint and
-/// fails, which leaves the tablet to no other driver. The USB cells then
+/// driver takes. The kernel registers its test drivers, PCI and USB, from
+/// the sample driver library (SampleDrivers) through DriverManager: one from
+/// its constructor and the rest from its RegisterDrivers override. The
+/// driver pass in Global.StartKernel offers them the free functions and
+/// interfaces, and the cells check what came of it: when RegisterDrivers
+/// runs, the device list DriverManager reports, the registration rules, the
+/// ranking, the teardown of failed attempts, the interrupts, work items and
+/// events the kit hands out, the mouse and network link drivers publish, on
+/// edu a driver that drives the device's registers, DMA engine and polled
+/// interrupt, on the RTL8139 a NIC driver whose link gets a DHCP lease
+/// through the kernel's network stack, on NVMe a failed attempt with MSI-X
+/// followed by a driver that gets it again and takes a real command's
+/// completion interrupt, and on USB a boot mouse driver that binds after a
+/// device match declined and whose reports reach it only once bound, and a
+/// tablet driver that opens its endpoint and fails, which leaves the tablet
+/// to no other driver. The USB cells then
 /// have the test engine move, pull out and plug back in the USB devices:
 /// QEMU's pointer movement reaches the mouse manager through the boot mouse
 /// driver, pulling the mouse out runs the unplug teardown and the driver's
@@ -52,6 +52,14 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// a tablet plugged back in goes to a driver whose network link leaves the
 /// network manager when the tablet is pulled out again, and the keyboard
 /// plugged back in goes to the built-in driver again.
+///
+/// The suite holds no InternalsVisibleTo grant: it builds against the
+/// driver kit's public seam, as a user kernel does. What the cells check
+/// beyond it (a function's owner before the pass, the USB stack's own
+/// records, the interrupt vector table, the managers' and the network
+/// stack's hold on a published device) is read through the documented
+/// [UnsafeAccessor] helpers in Internals/ and in the library's Internals/,
+/// each of which throws, failing its cell, should its target move.
 ///
 /// One kernel binary serves every cell of an architecture, so the hardware a
 /// cell presents is read from the profile name the engine puts on the kernel
@@ -61,7 +69,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Number of tests announced to the runner in TR.Start.</summary>
-    private const int ExpectedTestCount = 80;
+    private const int ExpectedTestCount = 91;
 
     // Base profile names, spelled as in tests/profiles.json. A cell name is
     // one of them followed by "+modifier" for each modifier composed onto it.
@@ -114,17 +122,16 @@ public class Kernel : Sys.Kernel
     private const byte EthernetSubclass = 0x00;
     private const byte EthernetProgIf = 0x00;
 
-    // An NVMe controller: mass storage, non-volatile memory, NVM Express.
+    // An NVMe controller: mass storage, non-volatile memory.
     private const byte MassStorageClassCode = 0x01;
     private const byte NonVolatileMemorySubclass = 0x08;
-    private const byte NvmeProgIf = 0x02;
 
     // An xHCI controller: serial bus controller, USB, programming interface 0x30.
     private const byte SerialBusClassCode = 0x0C;
     private const byte UsbSubclass = 0x03;
     private const byte XhciProgIf = 0x30;
 
-    // Owner names, spelled out rather than read from PciOwner so a renamed
+    // Owner names, spelled out rather than read from the kit so a renamed
     // constant is caught instead of compared against itself.
     private const string XhciOwner = "xhci";
     private const string GopOwner = "gop";
@@ -153,6 +160,14 @@ public class Kernel : Sys.Kernel
     private const string UsbKeyboardName = "HID boot keyboard";
     private const string MassStorageName = "mass storage";
 
+    /// <summary>
+    /// The part of the message Register throws with from inside a driver's
+    /// factory or Probe that tells it from the one it throws once the pass
+    /// closed registration, which a call made during the pass would also
+    /// get. The full message is the engine's own, and internal.
+    /// </summary>
+    private const string RegisterFromDriverCallbackMessagePart = "from its factory or its Probe";
+
     // The suite's registrations besides the edu driver and its two
     // edu-matching siblings. The class ones register before the ones that
     // must beat them, so only the kind of match can put them behind.
@@ -163,6 +178,11 @@ public class Kernel : Sys.Kernel
     private const string LateUsbName = "late-usb";
     private const string InvalidName = "invalid";
 
+    // Registrations whose factory returns null, one per bus, each tied
+    // with the drivers after it and so offered their device before them.
+    private const string NullFactoryName = "edu-null-factory";
+    private const string UsbNullFactoryName = "usb-mouse-null-factory";
+
     // The suite's USB registrations besides the boot mouse, the tablet and
     // the device-match drivers. The class-only match registers first and
     // would bind any HID interface it were offered, so only its rank keeps
@@ -171,16 +191,19 @@ public class Kernel : Sys.Kernel
     private const string UsbHidClassName = "usb-hid-class";
     private const string UsbMouseDeclinesName = "usb-mouse-declines";
 
-    /// <summary>Registrations the constructor expects Register to accept.</summary>
-    private const int AcceptedRegistrationCount = 10;
+    /// <summary>PCI registrations the constructor and RegisterDrivers expect Register to accept, together.</summary>
+    private const int AcceptedRegistrationCount = 11;
 
-    /// <summary>USB registrations the constructor expects Register to accept.</summary>
-    private const int AcceptedUsbRegistrationCount = 6;
+    /// <summary>USB registrations RegisterDrivers expects Register to accept.</summary>
+    private const int AcceptedUsbRegistrationCount = 7;
 
     /// <summary>
-    /// Order in which the mouse interface should have been offered: the
-    /// device match, then the two boot mouse matches in registration order,
-    /// up to the boot mouse driver, which binds it. Never the class match.
+    /// Order in which the mouse interface should have been probed: the
+    /// device match, then the boot mouse matches in registration order, up
+    /// to the boot mouse driver, which binds it. Never the class match. The
+    /// null factory's registration, the first boot mouse match, is offered
+    /// the interface between the device match and the declining one, but
+    /// never probes: see <see cref="TestUsbRanking_NullFactoryFailsAttempt"/>.
     /// </summary>
     private const string ExpectedMouseProbeOrder = $"{UsbHidDeviceDriver.Name},{UsbMouseDeclinesName},{UsbBootMouseDriver.Name}";
 
@@ -303,6 +326,19 @@ public class Kernel : Sys.Kernel
     /// <summary>What the path of every USB interface in the device list starts with.</summary>
     private const string UsbPathPrefix = "usb/";
 
+    /// <summary>What the path of every PCI function in the device list starts with.</summary>
+    private const string PciPathPrefix = "pci/";
+
+    /// <summary>
+    /// Longest RegisterDrivers waits for a software timer to fire, in
+    /// milliseconds of Stopwatch time: many ticks on both architectures, x64
+    /// ticking about every 55 ms.
+    /// </summary>
+    private const long RegisterDriversTimerWaitMilliseconds = 1000;
+
+    /// <summary>The driver name on the log lines of the context the teardown cell quiets the tablet through.</summary>
+    private const string SuiteContextName = "drivers-suite";
+
     /// <summary>
     /// Times each withdrawal race cell hands the CPU to its thread and acts
     /// when it gets it back. The thread is preempted wherever the timer
@@ -340,7 +376,7 @@ public class Kernel : Sys.Kernel
     // driver pass ran.
     private static bool s_functionFoundBeforePass;
     private static string? s_ownerBeforePass;
-    private static PciCommand s_commandBeforePass;
+    private static ushort s_commandBeforePass;
 
     /// <summary>
     /// Network devices registered when the kernel was constructed: the
@@ -348,7 +384,47 @@ public class Kernel : Sys.Kernel
     /// </summary>
     private static int s_networkDevicesBeforePass;
 
-    // What Register answered in the constructor.
+    // Stamps from one counter, in the order the constructor, RegisterDrivers
+    // and OnBoot ran.
+    private static int s_sequence;
+    private static int s_constructorSequence;
+    private static int s_registerDriversSequence;
+    private static int s_onBootSequence;
+
+    // What RegisterDrivers saw while it ran: how often it ran, on which
+    // thread, whether an interrupt was delivered meanwhile, how many Probes
+    // had run by then, and, on the usb-hid cell, the owners of two devices a
+    // built-in driver binds.
+    private static int s_registerDriversCalls;
+    private static bool s_registerDriversThreadKnown;
+    private static uint s_registerDriversThreadId;
+    private static bool s_registerDriversOnIdleThread;
+    private static bool s_interruptsDeliveredInRegisterDrivers;
+    private static int s_probesBeforeRegisterDrivers;
+    private static string? s_xhciOwnerAtRegisterDrivers;
+    private static string? s_keyboardOwnerAtRegisterDrivers;
+
+    /// <summary>Set from the timer interrupt by the software timer RegisterDrivers schedules.</summary>
+    private static volatile bool s_proofTimerFired;
+
+    // DriverManager.Devices' length in the constructor and in RegisterDrivers.
+    private static int s_devicesInConstructor;
+    private static int s_devicesInRegisterDrivers;
+
+    // Whether Register(null) threw ArgumentNullException in RegisterDrivers.
+    private static bool s_nullPciRegistrationThrew;
+    private static bool s_nullUsbRegistrationThrew;
+
+    /// <summary>What Register answered for the registration the constructor makes.</summary>
+    private static bool s_constructorRegistrationAccepted;
+
+    // Calls of the factories that return null. The PCI one runs in the
+    // pass; the USB one in the pass, then on the hot-plug thread each time
+    // the mouse is plugged back in, after the cell that reads it.
+    private static int s_nullFactoryCalls;
+    private static int s_usbNullFactoryCalls;
+
+    // What Register answered in the constructor and in RegisterDrivers.
     private static int s_acceptedRegistrations;
     private static bool s_duplicateNameAccepted;
     private static bool s_builtInNameAccepted;
@@ -378,7 +454,7 @@ public class Kernel : Sys.Kernel
     private static MouseReporter? s_unpluggedMouse;
     private static DeviceWorkItem? s_unpluggedWorkItem;
     private static DeviceEvent? s_unpluggedEvent;
-    private static UsbInterface? s_unpluggedMouseInterface;
+    private static UsbInterfaceState? s_unpluggedMouseInterface;
 
     // The network manager as it stood before the tablet's link joined it.
     private static int s_networkDevicesBeforeLink;
@@ -388,40 +464,87 @@ public class Kernel : Sys.Kernel
     // The first link, as the cell that pulls the tablet out captured it:
     // the handle to it, and the device behind it.
     private static NetworkAdapter s_staleLinkAdapter;
-    private static PublishedNetworkDevice? s_staleLinkDevice;
+    private static PublishedLinkView? s_staleLinkDevice;
 
     // Shared by the withdrawal race cells and the thread each one starts:
     // what the thread works on, what it saw, and when to stop.
     private static volatile bool s_raceStop;
-    private static volatile PublishedNetworkDevice? s_raceLink;
-    private static PublishedNetworkDevice? s_sendingLink;
+    private static volatile PublishedLinkView? s_raceLink;
+    private static PublishedLinkView? s_sendingLink;
     private static int s_raceTransmits;
     private static int s_transmitsAfterWithdraw;
-    private static PublishedNetworkDevice? s_deliveringLink;
-    private static int s_raceFrames;
-    private static int s_framesAfterWithdraw;
     private static Address4? s_routeDestination;
     private static Address? s_routeSource;
     private static int s_routeLookups;
     private static int s_routeLookupFailures;
     private static string? s_routeLookupError;
 
-    /// <summary>True in the x64 build, whose local APIC routes MSI-X on every cell and binds a dynamic vector per entry.</summary>
-    private static bool IsX64 => PlatformHAL.Architecture == PlatformArchitecture.X64;
+    /// <summary>
+    /// True in the x64 build, whose local APIC routes MSI-X on every cell and
+    /// binds a dynamic vector per entry. A constant of the build: NativeAOT
+    /// compiles CoreLib for the one architecture.
+    /// </summary>
+    private static bool IsX64 => RuntimeInformation.ProcessArchitecture == Architecture.X64;
 
     /// <summary>
-    /// Runs before Global.StartKernel, so before the driver pass: records the
-    /// profile's PCI function as the built-in drivers left it, then registers
-    /// the suite's drivers, the only point where registration is open.
+    /// Runs before Global.StartKernel, so before RegisterDrivers and the
+    /// driver pass: records the profile's PCI function and USB interfaces as
+    /// the built-in drivers left them, then registers one of the suite's
+    /// drivers, which the pass ranks together with those RegisterDrivers
+    /// adds. Registration is open here too; RegisterDrivers is where a kernel
+    /// is meant to register, and registers the rest.
     /// </summary>
     public Kernel()
     {
+        s_constructorSequence = ++s_sequence;
         SelectCellHardware();
         CaptureFunctionBeforePass();
         CaptureUsbInterfacesBeforePass();
         s_networkDevicesBeforePass = NetworkManager.DeviceCount;
-        RegisterTestDrivers();
-        RegisterUsbTestDrivers();
+        s_devicesInConstructor = DriverManager.Devices.Count;
+
+        // One switch per if, as in RegisterDrivers: the driver publishes a
+        // mouse and a network link before it throws.
+        if (Sys.KernelFeatures.Pci)
+        {
+            if (Sys.KernelFeatures.Mouse)
+            {
+                if (Sys.KernelFeatures.Network)
+                {
+                    s_constructorRegistrationAccepted = DriverManager.Register(ThrowingDriver.CreateRegistration());
+                    Accept(s_constructorRegistrationAccepted);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Records what the kernel sees while Global.StartKernel runs it, then
+    /// registers the rest of the suite's drivers, the same set on every
+    /// cell: each cell's hardware decides which of them the pass offers
+    /// anything to. One feature switch per if, so ILC folds each and a
+    /// kernel built without the subsystem trims the drivers behind it.
+    /// </summary>
+    protected override void RegisterDrivers()
+    {
+        RecordRegisterDriversContext();
+        RecordNullRegistrations();
+
+        if (Sys.KernelFeatures.Pci)
+        {
+            RegisterTestDrivers();
+            if (Sys.KernelFeatures.Usb)
+            {
+                RegisterUsbTestDrivers();
+            }
+        }
+    }
+
+    /// <summary>Records that OnBoot ran, after RegisterDrivers and the pass, then boots as the base kernel does.</summary>
+    protected override void OnBoot()
+    {
+        s_onBootSequence = ++s_sequence;
+        base.OnBoot();
     }
 
     protected override void BeforeRun()
@@ -434,6 +557,17 @@ public class Kernel : Sys.Kernel
 
         // ==================== Profile ====================
         TR.Run("Profile_Recognized", TestProfile_Recognized);
+
+        // ==================== RegisterDrivers ====================
+        TR.Run("RegisterDrivers_RanOnceOnBootThread",       TestRegisterDrivers_RanOnceOnBootThread);
+        TR.Run("RegisterDrivers_RanWithInterruptsEnabled",  TestRegisterDrivers_RanWithInterruptsEnabled);
+        TR.Run("RegisterDrivers_RanBeforePassAndOnBoot",    TestRegisterDrivers_RanBeforePassAndOnBoot);
+        TR.RunIf(s_isUsbCell, "RegisterDrivers_RanAfterBuiltInsBound", TestRegisterDrivers_RanAfterBuiltInsBound, SkipNotUsbCell);
+
+        // ==================== DriverManager ====================
+        TR.Run("DriverManager_DevicesEmptyUntilPass",  TestDriverManager_DevicesEmptyUntilPass);
+        TR.Run("DriverManager_DevicesListedAfterPass", TestDriverManager_DevicesListedAfterPass);
+        TR.RunIf(s_isPciCell, "DriverManager_DeviceInfoDescribesPciFunction", TestDriverManager_DeviceInfoDescribesPciFunction, SkipNotPciCell);
 
         // ==================== PCI ====================
         TR.RunIf(s_isPciCell, "Pci_ProfileFunctionEnumeratedOnce",    TestPci_ProfileFunctionEnumeratedOnce,    SkipNotPciCell);
@@ -456,12 +590,16 @@ public class Kernel : Sys.Kernel
         TR.Run("Register_UsbInvalidRegistrationThrows", TestRegister_UsbInvalidRegistrationThrows);
         TR.Run("Register_UsbAfterPassThrows",           TestRegister_UsbAfterPassThrows);
         TR.RunIf(s_isUsbCell, "Register_FromUsbDriverCallbackThrows", TestRegister_FromUsbDriverCallbackThrows, SkipNotUsbCell);
+        TR.Run("Register_NullThrowsArgumentNull", TestRegister_NullThrowsArgumentNull);
+        TR.RunIf(s_isEduCell, "Register_ConstructorRegistrationRanksWithOverride", TestRegister_ConstructorRegistrationRanksWithOverride, SkipNotEduCell);
 
         // ==================== Ranking ====================
         TR.RunIf(s_isEduCell, "Ranking_DeviceMatchBeatsClassMatch",       TestRanking_DeviceMatchBeatsClassMatch,       SkipNotEduCell);
         TR.RunIf(s_isEduCell || s_isNvmeCell, "Ranking_FailedAndDeclinedFallThrough", TestRanking_FailedAndDeclinedFallThrough, SkipNotEduOrNvmeCell);
         TR.RunIf(s_isNicCell, "Ranking_ClassWithInterfaceBeatsClass",     TestRanking_ClassWithInterfaceBeatsClass,     SkipNotNicCell);
         TR.RunIf(s_isUsbCell, "UsbRanking_DeviceMatchFallsThroughToBootMouse", TestUsbRanking_DeviceMatchFallsThroughToBootMouse, SkipNotUsbCell);
+        TR.RunIf(s_isEduCell, "Ranking_NullFactoryFailsAttempt",    TestRanking_NullFactoryFailsAttempt,    SkipNotEduCell);
+        TR.RunIf(s_isUsbCell, "UsbRanking_NullFactoryFailsAttempt", TestUsbRanking_NullFactoryFailsAttempt, SkipNotUsbCell);
 
         // ==================== Teardown ====================
         TR.RunIf(s_isPciCell, "Teardown_RestoresCommandRegister",         TestTeardown_RestoresCommandRegister,         SkipNotPciCell);
@@ -519,6 +657,9 @@ public class Kernel : Sys.Kernel
         TR.RunIf(s_isUsbCell, "UsbContext_ProbeOnlyMembersThrowAfterProbe", TestUsbContext_ProbeOnlyMembersThrowAfterProbe, SkipNotUsbCell);
         TR.RunIf(s_isUsbCell, "UsbContext_OpenRefusesOtherEndpoints",      TestUsbContext_OpenRefusesOtherEndpoints,      SkipNotUsbCell);
 
+        // Before the hot-plug cells, which pull the mouse out.
+        TR.RunIf(s_isUsbCell, "DriverManager_DeviceInfoDescribesUsbInterface", TestDriverManager_DeviceInfoDescribesUsbInterface, SkipNotUsbCell);
+
         // Before the mouse cell: it stops the idle reports this one needs.
         TR.RunIf(s_isUsbCell, "UsbInterrupts_ReportsOnlyAfterBound",       TestUsbInterrupts_ReportsOnlyAfterBound,       SkipNotUsbCell);
         TR.RunIf(s_isUsbCell, "UsbBind_PublishedMouseMovesPointer",        TestUsbBind_PublishedMouseMovesPointer,        SkipNotUsbCell);
@@ -544,7 +685,6 @@ public class Kernel : Sys.Kernel
         TR.RunIf(s_isUsbCell, "UsbTabletUnplug_LinkLeavesNetworkManager",       TestUsbTabletUnplug_LinkLeavesNetworkManager,       SkipNotUsbCell);
         TR.RunIf(s_isUsbCell, "UsbTabletReplug_StaleAdapterNamesNoNewLink",     TestUsbTabletReplug_StaleAdapterNamesNoNewLink,     SkipNotUsbCell);
         TR.RunIf(s_isUsbCell, "LinkWithdraw_SendInFlightNeverTransmits",        TestLinkWithdraw_SendInFlightNeverTransmits,        SkipNotUsbCell);
-        TR.RunIf(s_isUsbCell, "LinkWithdraw_DeliverInFlightNeverReachesStack",  TestLinkWithdraw_DeliverInFlightNeverReachesStack,  SkipNotUsbCell);
         TR.RunIf(s_isUsbCell, "LinkWithdraw_RouteLookupSurvivesRemoval",        TestLinkWithdraw_RouteLookupSurvivesRemoval,        SkipNotUsbCell);
         TR.RunIf(s_isUsbCell, "UsbKeyboardUnplug_BuiltInLetsGo",                TestUsbKeyboardUnplug_BuiltInLetsGo,                SkipNotUsbCell);
         TR.RunIf(s_isUsbCell, "UsbKeyboardReplug_BuiltInKeepsItsInterface",     TestUsbKeyboardReplug_BuiltInKeepsItsInterface,     SkipNotUsbCell);
@@ -577,6 +717,137 @@ public class Kernel : Sys.Kernel
         Assert.True(s_isPciCell || s_isUsbCell, "the cell's profile is not one this suite has expectations for");
     }
 
+    // ==================== RegisterDrivers ====================
+
+    // Global.StartKernel calls the override once, on the boot thread: its
+    // CPU's idle thread, which goes on to run OnBoot, BeforeRun and these
+    // cells.
+    private static void TestRegisterDrivers_RanOnceOnBootThread()
+    {
+        Assert.Equal(1, s_registerDriversCalls, "RegisterDrivers should run exactly once");
+        Assert.True(s_registerDriversThreadKnown, "the scheduler had no current thread while RegisterDrivers ran");
+        Assert.True(s_registerDriversOnIdleThread, "RegisterDrivers should run on the boot thread, its CPU's idle thread");
+        Assert.True(s_registerDriversThreadId == s_bootThreadId,
+            $"RegisterDrivers ran on thread {s_registerDriversThreadId}, not on the boot thread {s_bootThreadId}");
+    }
+
+    // StartKernel enables interrupts before it calls the override, on both
+    // architectures: a software timer scheduled there, which only the timer
+    // interrupt runs, fired while RegisterDrivers waited for it.
+    private static void TestRegisterDrivers_RanWithInterruptsEnabled()
+    {
+        Assert.True(s_interruptsDeliveredInRegisterDrivers,
+            $"a software timer scheduled in RegisterDrivers did not fire within {RegisterDriversTimerWaitMilliseconds} ms: no interrupt was delivered");
+    }
+
+    // After the constructor and before the pass, which probes a registered
+    // driver as soon as it starts and had probed none yet, and before OnBoot.
+    private static void TestRegisterDrivers_RanBeforePassAndOnBoot()
+    {
+        Assert.True(s_constructorSequence < s_registerDriversSequence, "RegisterDrivers ran before the kernel's constructor");
+        Assert.Equal(0, s_probesBeforeRegisterDrivers, "registered drivers were probed before RegisterDrivers ran: the pass ran first");
+        Assert.True(ProbeLog.Count > 0, "no registered driver was probed after RegisterDrivers: the pass never ran");
+        Assert.True(s_onBootSequence > s_registerDriversSequence, "OnBoot should run after RegisterDrivers");
+    }
+
+    // The built-in drivers bind during HAL bring-up, and RegisterDrivers
+    // comes after them: when it ran, the xHCI controller was already the USB
+    // stack's and the keyboard's interface the built-in keyboard driver's.
+    // Read from the PCI and USB stacks, since the public device list is
+    // empty until the pass.
+    private static void TestRegisterDrivers_RanAfterBuiltInsBound()
+    {
+        Assert.True(s_xhciOwnerAtRegisterDrivers == XhciOwner,
+            $"the xHCI controller should be owned by {XhciOwner} when RegisterDrivers runs, was {s_xhciOwnerAtRegisterDrivers ?? "unowned"}");
+        Assert.True(s_keyboardOwnerAtRegisterDrivers == UsbKeyboardName,
+            $"the keyboard's interface should be owned by {UsbKeyboardName} when RegisterDrivers runs, was {s_keyboardOwnerAtRegisterDrivers ?? "unowned"}");
+    }
+
+    // ==================== DriverManager ====================
+
+    // The pass publishes the device list: it is empty while the kernel is
+    // constructed and while RegisterDrivers runs.
+    private static void TestDriverManager_DevicesEmptyUntilPass()
+    {
+        Assert.Equal(0, s_devicesInConstructor, "DriverManager.Devices should be empty in the kernel's constructor");
+        Assert.Equal(0, s_devicesInRegisterDrivers, "DriverManager.Devices should be empty in RegisterDrivers, before the pass");
+    }
+
+    // After the pass it lists at least every enumerated function, and a
+    // second read while nothing changed returns the same list rather than a
+    // new copy.
+    private static void TestDriverManager_DevicesListedAfterPass()
+    {
+        int functions = PciFunctions.Enumerate().Length;
+        IReadOnlyList<DeviceInfo> first = DriverManager.Devices;
+        IReadOnlyList<DeviceInfo> second = DriverManager.Devices;
+        if (!ReferenceEquals(first, second))
+        {
+            // The USB hot-plug thread may have published a new list in
+            // between; a list rebuilt on every read differs again.
+            first = second;
+            second = DriverManager.Devices;
+        }
+
+        Assert.True(functions > 0, "PCI enumeration found no function");
+        Assert.True(first.Count >= functions, $"DriverManager.Devices should list every enumerated function, lists {first.Count} entries for {functions} functions");
+        Assert.True(ReferenceEquals(first, second), "a second read of DriverManager.Devices while nothing changed should return the same list");
+    }
+
+    // The entry for the cell's function sits at the path its bus position
+    // gives, names the driver that bound it, and carries the IDs and class
+    // triple enumeration read.
+    private static void TestDriverManager_DeviceInfoDescribesPciFunction()
+    {
+        PciFunctionState? function = PciFunctions.Find(s_expectedVendorId, s_expectedDeviceId);
+        if (function is null)
+        {
+            Assert.Fail("the profile's PCI function was not enumerated");
+            return;
+        }
+
+        if (FindRecord(DriverManager.Devices, function.Path) is not { } info)
+        {
+            Assert.Fail($"DriverManager.Devices has no entry at {function.Path}");
+            return;
+        }
+
+        string expected = BoundDriverName();
+        Assert.True(info.DriverName == expected, $"{function.Path} should be listed as owned by {expected}, is {info.DriverName ?? "nothing"}");
+        Assert.Equal(s_expectedVendorId, info.VendorId, "DeviceInfo.VendorId should be the function's vendor ID");
+        Assert.Equal(s_expectedDeviceId, info.DeviceId, "DeviceInfo.DeviceId should be the function's device ID");
+        Assert.Equal(s_expectedClassCode, info.Class, "DeviceInfo.Class should be the function's base class");
+        Assert.Equal(s_expectedSubclass, info.Subclass, "DeviceInfo.Subclass should be the function's subclass");
+        Assert.Equal(function.Function.ProgrammingInterface, info.Protocol, "DeviceInfo.Protocol should be the function's programming interface");
+    }
+
+    // The entry for the mouse's interface sits at the path its position on
+    // the bus gives, names the boot mouse driver, and carries the device's
+    // vendor ID, its product ID as the device ID, and the interface's class
+    // triple.
+    private static void TestDriverManager_DeviceInfoDescribesUsbInterface()
+    {
+        UsbInterfaceState? mouse = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, MouseProtocol);
+        if (mouse is null)
+        {
+            Assert.Fail("no HID boot mouse interface enumerated");
+            return;
+        }
+
+        if (FindRecord(DriverManager.Devices, mouse.Path) is not { } info)
+        {
+            Assert.Fail($"DriverManager.Devices has no entry at {mouse.Path}");
+            return;
+        }
+
+        Assert.True(info.DriverName == UsbBootMouseDriver.Name, $"{mouse.Path} should be listed as owned by {UsbBootMouseDriver.Name}, is {info.DriverName ?? "nothing"}");
+        Assert.Equal(UsbDescriptors.QemuHidVendorId, info.VendorId, "DeviceInfo.VendorId should be the device's idVendor");
+        Assert.Equal(UsbDescriptors.QemuHidProductId, info.DeviceId, "DeviceInfo.DeviceId should be the device's idProduct");
+        Assert.Equal(HidClass, info.Class, "DeviceInfo.Class should be the interface's bInterfaceClass");
+        Assert.Equal(BootInterfaceSubclass, info.Subclass, "DeviceInfo.Subclass should be the interface's bInterfaceSubClass");
+        Assert.Equal(MouseProtocol, info.Protocol, "DeviceInfo.Protocol should be the interface's bInterfaceProtocol");
+    }
+
     // ==================== PCI ====================
 
     // Exactly once: the profile attaches the model once. Zero means
@@ -584,22 +855,21 @@ public class Kernel : Sys.Kernel
     // test drivers match, changing what the other cells test.
     private static void TestPci_ProfileFunctionEnumeratedOnce()
     {
-        Assert.Equal(1, CountFunctions(s_expectedVendorId, s_expectedDeviceId),
-            "the profile's PCI function should be enumerated exactly once");
+        Assert.Equal(1, CountListedFunctions(s_expectedVendorId, s_expectedDeviceId),
+            "the profile's PCI function should be enumerated, and listed, exactly once");
     }
 
     // A driver can match on class instead of IDs, so the class and subclass
     // the kernel read are pinned too.
     private static void TestPci_ProfileFunctionClassMatches()
     {
-        PciDevice? function = FindFunction(s_expectedVendorId, s_expectedDeviceId);
-        if (function is null)
+        if (FindListedFunction(s_expectedVendorId, s_expectedDeviceId) is not { } function)
         {
             Assert.Fail("the profile's PCI function was not enumerated");
             return;
         }
 
-        Assert.Equal(s_expectedClassCode, function.ClassCode, "the profile's PCI function reports the wrong base class");
+        Assert.Equal(s_expectedClassCode, function.Class, "the profile's PCI function reports the wrong base class");
         Assert.Equal(s_expectedSubclass, function.Subclass, "the profile's PCI function reports the wrong subclass");
     }
 
@@ -617,15 +887,14 @@ public class Kernel : Sys.Kernel
     // the RTL8139 driver, once the other Ethernet class drivers declined it.
     private static void TestPci_ProfileFunctionOwnerAfterPass()
     {
-        PciDevice? function = FindFunction(s_expectedVendorId, s_expectedDeviceId);
-        if (function is null)
+        if (FindListedFunction(s_expectedVendorId, s_expectedDeviceId) is not { } function)
         {
             Assert.Fail("the profile's PCI function was not enumerated");
             return;
         }
 
         string expected = BoundDriverName();
-        Assert.True(function.Owner == expected, $"the profile's function should be owned by {expected}, is {function.Owner ?? "unowned"}");
+        Assert.True(function.DriverName == expected, $"the profile's function should be owned by {expected}, is {function.DriverName ?? "unowned"}");
     }
 
     // ==================== USB ====================
@@ -635,30 +904,29 @@ public class Kernel : Sys.Kernel
     // neither q35 nor virt has an xHCI controller of its own.
     private static void TestUsb_XhciOwnedByXhci()
     {
-        Assert.Equal(1, CountXhciFunctions(), "the profile's xHCI controller should be enumerated exactly once");
+        Assert.Equal(1, CountListedXhciFunctions(), "the profile's xHCI controller should be enumerated exactly once");
 
-        PciDevice? xhci = FindXhciFunction();
-        if (xhci is null)
+        if (FindListedXhciFunction() is not { } xhci)
         {
             Assert.Fail("no xHCI controller enumerated");
             return;
         }
 
-        Assert.True(xhci.Owner == XhciOwner, "the xHCI controller should be owned by xhci");
+        Assert.True(xhci.DriverName == XhciOwner, "the xHCI controller should be owned by xhci");
     }
 
     // Enumeration read the mouse's configuration. Exactly one boot mouse
     // interface: the profile's tablet is HID too, but no boot device.
     private static void TestUsb_MouseEnumeratedOnce()
     {
-        Assert.Equal(1, CountInterfaces(HidClass, BootInterfaceSubclass, MouseProtocol), "exactly one USB device should present a HID boot mouse interface");
+        Assert.Equal(1, CountListedInterfaces(HidClass, BootInterfaceSubclass, MouseProtocol), "exactly one USB device should present a HID boot mouse interface");
     }
 
     // Exactly one: the no fall-through cells need one interface the device
     // match and the tablet driver match, and the profile attaches one tablet.
     private static void TestUsb_TabletEnumeratedOnce()
     {
-        Assert.Equal(1, CountInterfaces(HidClass, TabletSubclass, TabletProtocol), "exactly one USB device should present a HID interface with no boot subclass, the tablet's");
+        Assert.Equal(1, CountListedInterfaces(HidClass, TabletSubclass, TabletProtocol), "exactly one USB device should present a HID interface with no boot subclass, the tablet's");
     }
 
     // No class driver takes a HID mouse: the keyboard driver matches the
@@ -671,7 +939,7 @@ public class Kernel : Sys.Kernel
         Assert.True(s_mouseFoundBeforePass, "no HID boot mouse interface was enumerated when the kernel was constructed");
         Assert.Null(s_mouseOwnerBeforePass, "no class driver should have bound the HID boot mouse interface before the pass");
 
-        UsbInterface? mouse = FindInterface(HidClass, BootInterfaceSubclass, MouseProtocol, out _);
+        UsbInterfaceState? mouse = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, MouseProtocol);
         if (mouse is null)
         {
             Assert.Fail("no HID boot mouse interface enumerated");
@@ -680,7 +948,7 @@ public class Kernel : Sys.Kernel
 
         Assert.True(mouse.DriverName == UsbBootMouseDriver.Name,
             $"the HID boot mouse interface should be owned by {UsbBootMouseDriver.Name}, is {mouse.DriverName ?? "unowned"}");
-        Assert.True(mouse.Driver == KitUsbDriver.Instance, "the USB stack should record the kit's class driver as the mouse interface's driver");
+        Assert.True(mouse.IsHeldByKit, "the USB stack should record the kit's class driver as the mouse interface's driver");
         Assert.True(mouse.DriverContext is not null && mouse.DriverContext == UsbBootMouseDriver.Context,
             "the mouse interface should keep the context its driver bound it with");
     }
@@ -720,7 +988,7 @@ public class Kernel : Sys.Kernel
         bool threw = false;
         try
         {
-            DriverCore.Register(new PciDriverRegistration(LateName, CreateInvalid, PciMatch.Device(EduDriver.VendorId, EduDriver.DeviceId)));
+            DriverManager.Register(new PciDriverRegistration(LateName, CreateInvalid, PciMatch.Device(EduDriver.VendorId, EduDriver.DeviceId)));
         }
         catch (InvalidOperationException)
         {
@@ -733,13 +1001,15 @@ public class Kernel : Sys.Kernel
     // The pass closes registration before the first factory runs, so
     // Register from a factory or a Probe would throw even without the
     // engine's re-entrancy flag. The message tells the two checks apart,
-    // and it must be the flag's.
+    // and it must be the flag's: the drivers catch InvalidOperationException
+    // only, and the cell looks for the part of the message that names the
+    // driver callback.
     private static void TestRegister_FromDriverCallbackThrows()
     {
         Assert.True(ReentrantDriver.FactoryRan, "the reentrant driver's factory never ran");
-        Assert.True(ReentrantDriver.FactoryRegisterMessage == DriverCore.RegisterFromDriverCallbackMessage,
+        Assert.True(IsDriverCallbackRefusal(ReentrantDriver.FactoryRegisterMessage),
             $"Register from inside a factory should be refused by the re-entrancy check, threw {ReentrantDriver.FactoryRegisterMessage ?? "nothing"}");
-        Assert.True(ReentrantDriver.ProbeRegisterMessage == DriverCore.RegisterFromDriverCallbackMessage,
+        Assert.True(IsDriverCallbackRefusal(ReentrantDriver.ProbeRegisterMessage),
             $"Register from inside Probe should be refused by the re-entrancy check, threw {ReentrantDriver.ProbeRegisterMessage ?? "nothing"}");
     }
 
@@ -783,7 +1053,7 @@ public class Kernel : Sys.Kernel
         bool threw = false;
         try
         {
-            DriverCore.Register(new UsbDriverRegistration(LateUsbName, CreateInvalidUsb, UsbMatch.Interface(HidClass)));
+            DriverManager.Register(new UsbDriverRegistration(LateUsbName, CreateInvalidUsb, UsbMatch.Interface(HidClass)));
         }
         catch (InvalidOperationException)
         {
@@ -798,20 +1068,48 @@ public class Kernel : Sys.Kernel
     private static void TestRegister_FromUsbDriverCallbackThrows()
     {
         Assert.True(UsbHidDeviceDriver.Probes > 0, "the device-matching USB driver was never probed");
-        Assert.True(UsbHidDeviceDriver.FactoryRegisterMessage == DriverCore.RegisterFromDriverCallbackMessage,
+        Assert.True(IsDriverCallbackRefusal(UsbHidDeviceDriver.FactoryRegisterMessage),
             $"Register from inside a USB driver's factory should be refused by the re-entrancy check, threw {UsbHidDeviceDriver.FactoryRegisterMessage ?? "nothing"}");
-        Assert.True(UsbHidDeviceDriver.ProbeRegisterMessage == DriverCore.RegisterFromDriverCallbackMessage,
+        Assert.True(IsDriverCallbackRefusal(UsbHidDeviceDriver.ProbeRegisterMessage),
             $"Register from inside a USB driver's Probe should be refused by the re-entrancy check, threw {UsbHidDeviceDriver.ProbeRegisterMessage ?? "nothing"}");
+    }
+
+    // A null registration is an argument error, whether registration is
+    // open or closed: ArgumentNullException from both overloads, in
+    // RegisterDrivers and after the pass, rather than a false return or
+    // the closed-registration InvalidOperationException.
+    private static void TestRegister_NullThrowsArgumentNull()
+    {
+        Assert.True(s_nullPciRegistrationThrew, "Register of a null PCI registration in RegisterDrivers should throw ArgumentNullException");
+        Assert.True(s_nullUsbRegistrationThrew, "Register of a null USB registration in RegisterDrivers should throw ArgumentNullException");
+        Assert.True(ThrowsArgumentNull(static () => DriverManager.Register(NullPciRegistration())),
+            "Register of a null PCI registration after the pass should throw ArgumentNullException");
+        Assert.True(ThrowsArgumentNull(static () => DriverManager.Register(NullUsbRegistration())),
+            "Register of a null USB registration after the pass should throw ArgumentNullException");
+    }
+
+    // The constructor registered edu-throws, and RegisterDrivers, later,
+    // edu-reentrant and edu, which match edu the same way. The pass ranks the
+    // registrations of both as one list, equal matches in registration order,
+    // so the constructor's was offered edu first and passed it on to them.
+    private static void TestRegister_ConstructorRegistrationRanksWithOverride()
+    {
+        Assert.True(s_constructorRegistrationAccepted, "the registration made in the kernel's constructor should be accepted");
+        Assert.True(s_constructorSequence < s_registerDriversSequence, "RegisterDrivers ran before the kernel's constructor");
+        string order = ProbeLog.Describe();
+        Assert.True(order == ExpectedEduProbeOrder,
+            $"edu should be offered to {ThrowingDriver.Name}, registered in the constructor, then to the equal matches RegisterDrivers registered, as {ExpectedEduProbeOrder}; it was offered as {order}");
     }
 
     // ==================== Ranking ====================
 
-    // The class registration came first, yet the device registrations were
-    // offered edu before it, and one of them bound before it was reached.
+    // The class registration came before three of the device
+    // registrations, yet the device registrations were offered edu before
+    // it, and one of them bound before it was reached.
     private static void TestRanking_DeviceMatchBeatsClassMatch()
     {
-        PciDevice? edu = FindFunction(EduDriver.VendorId, EduDriver.DeviceId);
-        Assert.True(edu is not null && edu.Owner == EduDriver.Name, "edu should be owned by the device-matching edu driver");
+        DeviceInfo? edu = FindListedFunction(EduDriver.VendorId, EduDriver.DeviceId);
+        Assert.True(edu is { } found && found.DriverName == EduDriver.Name, "edu should be owned by the device-matching edu driver");
         Assert.False(ProbeLog.Recorded(EduClassName), $"the class match should never have been probed, probes ran {ProbeLog.Describe()}");
     }
 
@@ -847,16 +1145,48 @@ public class Kernel : Sys.Kernel
     // fall-through cell.
     private static void TestUsbRanking_DeviceMatchFallsThroughToBootMouse()
     {
-        UsbInterface? mouse = FindInterface(HidClass, BootInterfaceSubclass, MouseProtocol, out UsbDevice? device);
-        if (mouse is null || device is null)
+        UsbInterfaceState? mouse = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, MouseProtocol);
+        if (mouse is null)
         {
             Assert.Fail("no HID boot mouse interface enumerated");
             return;
         }
 
-        string order = ProbeLog.Describe(ExpectedUsbPath(device, mouse));
+        string order = ProbeLog.Describe(mouse.Path);
         Assert.True(order == ExpectedMouseProbeOrder, $"the mouse interface should be offered as {ExpectedMouseProbeOrder}, was {order}");
         Assert.False(ProbeLog.Recorded(UsbHidClassName), $"the class-only match should never have been offered an interface, probes ran {ProbeLog.Describe()}");
+    }
+
+    // A factory that returns null breaks its delegate's non-null promise,
+    // as one built without nullable analysis, or one handing out an empty
+    // pool slot, can. The kit must fail that attempt as it does a factory
+    // that throws, and pass edu on to the drivers after it: calling Probe on
+    // the null would page fault and halt the kernel before any cell ran.
+    // Ranked ahead of edu-reentrant and edu, the factory ran once, and edu
+    // still went to the edu driver.
+    private static void TestRanking_NullFactoryFailsAttempt()
+    {
+        Assert.Equal(1, s_nullFactoryCalls, "the factory that returns null should have been called once, for edu");
+        DeviceInfo? edu = FindListedFunction(EduDriver.VendorId, EduDriver.DeviceId);
+        Assert.True(edu is { } found && found.DriverName == EduDriver.Name,
+            $"edu should still be owned by the edu driver after {NullFactoryName}'s attempt failed");
+    }
+
+    // As on PCI, for the USB pass: the attempt whose factory returned null
+    // opened nothing, so the mouse interface went on to the boot mouse
+    // matches registered after it, and the boot mouse driver bound it.
+    private static void TestUsbRanking_NullFactoryFailsAttempt()
+    {
+        Assert.Equal(1, s_usbNullFactoryCalls, "the USB factory that returns null should have been called once, for the mouse interface");
+        UsbInterfaceState? mouse = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, MouseProtocol);
+        if (mouse is null)
+        {
+            Assert.Fail("no HID boot mouse interface enumerated");
+            return;
+        }
+
+        Assert.True(mouse.DriverName == UsbBootMouseDriver.Name,
+            $"the mouse interface should still be owned by {UsbBootMouseDriver.Name} after {UsbNullFactoryName}'s attempt failed, is {mouse.DriverName ?? "unowned"}");
     }
 
     // ==================== Teardown ====================
@@ -898,7 +1228,7 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(probed, $"{boundDriver} was never probed");
-        ushort before = (ushort)s_commandBeforePass;
+        ushort before = s_commandBeforePass;
         ushort expected = (ushort)((before & ~BusMasterBit) | InterruptDisableBit);
         Assert.True(found == expected, $"{boundDriver} should find Command 0x{expected:X4}, found 0x{found:X4} (0x{before:X4} before the pass)");
     }
@@ -935,7 +1265,7 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(ThrowsInvalidOperation(() => context.TryMapBar(0, out _)), "TryMapBar after Probe should throw InvalidOperationException");
-        Assert.True(ThrowsInvalidOperation(() => context.TryMapIoBar(0, out _)), "TryMapIoBar after Probe should throw InvalidOperationException");
+        Assert.True(ThrowsInvalidOperation(() => context.TryMapIOBar(0, out _)), "TryMapIOBar after Probe should throw InvalidOperationException");
         Assert.True(ThrowsInvalidOperation(() => context.TryAllocateDma(1, ulong.MaxValue, out _)), "TryAllocateDma after Probe should throw InvalidOperationException");
         Assert.True(ThrowsInvalidOperation(context.EnableBusMastering), "EnableBusMastering after Probe should throw InvalidOperationException");
         Assert.True(ThrowsInvalidOperation(() => context.TryRequestInterrupts(static _ => { })), "TryRequestInterrupts after Probe should throw InvalidOperationException");
@@ -944,8 +1274,8 @@ public class Kernel : Sys.Kernel
         Assert.True(ThrowsInvalidOperation(() => context.PublishMouse()), "PublishMouse after Probe should throw InvalidOperationException");
         Assert.True(ThrowsInvalidOperation(() => context.PublishNetworkLink(MACAddress.None, static _ => false)), "PublishNetworkLink after Probe should throw InvalidOperationException");
         Assert.True(context.IsPresent, "a bound PCI function is always present");
-        Assert.True(context.Path == ExpectedPath(FindFunction(EduDriver.VendorId, EduDriver.DeviceId)),
-            $"the context's path {context.Path} should name the edu function");
+        string? expectedPath = PciFunctions.Find(EduDriver.VendorId, EduDriver.DeviceId)?.Path;
+        Assert.True(context.Path == expectedPath, $"the context's path {context.Path} should name the edu function, {expectedPath ?? "which was not enumerated"}");
     }
 
     // Config writes stay open after Probe, in thread context, but never below
@@ -1320,7 +1650,7 @@ public class Kernel : Sys.Kernel
         Assert.True(registered is not null && registered.Equals(address),
             $"the registered device should have the RTL8139's address {address}, has {registered?.ToString() ?? "none"}");
 
-        string expectedName = $"{Rtl8139Driver.Name} {ExpectedPath(FindFunction(Rtl8139Driver.VendorId, Rtl8139Driver.DeviceId))}";
+        string expectedName = $"{Rtl8139Driver.Name} {PciFunctions.Find(Rtl8139Driver.VendorId, Rtl8139Driver.DeviceId)?.Path}";
         Assert.True(adapter.Name == expectedName, $"the registered device should be named {expectedName}, is {adapter.Name ?? "unnamed"}");
         Assert.True(adapter.Ready, "the link should be ready once delivered");
         Assert.True(Rtl8139Driver.LinkUpAtProbe, "the RTL8139 should report its link up");
@@ -1438,15 +1768,15 @@ public class Kernel : Sys.Kernel
 
         Assert.True(NvmeDriver.Entry0MaskedInProbe, "MSI-X entry 0 should be programmed masked during Probe");
         MmioRegion? table = NvmeDriver.MsiXTable;
-        PciDevice? function = FindFunction(s_expectedVendorId, s_expectedDeviceId);
-        if (table is null || function is null)
+        PciDeviceContext? context = NvmeDriver.Context;
+        if (table is null || context is null)
         {
             Assert.Fail("the NVMe controller's MSI-X table did not map");
             return;
         }
 
         Assert.True((table.Read32(NvmeDriver.Entry0Control) & MsiXState.EntryMaskBit) == 0, "MSI-X entry 0 should be unmasked once the binding is Bound");
-        Assert.True(((ushort)function.Command & BusMasterBit) != 0, "bus mastering, which an MSI-X message needs, should be on once the binding is Bound");
+        Assert.True((context.Function.ReadConfig16(CommandOffset) & BusMasterBit) != 0, "bus mastering, which an MSI-X message needs, should be on once the binding is Bound");
     }
 
     // The Identify completed during Probe, while the kit held the interrupt
@@ -1531,8 +1861,8 @@ public class Kernel : Sys.Kernel
     private static void TestUsbContext_ProbeOnlyMembersThrowAfterProbe()
     {
         UsbDeviceContext? context = UsbBootMouseDriver.Context;
-        UsbInterface? mouse = FindInterface(HidClass, BootInterfaceSubclass, MouseProtocol, out UsbDevice? device);
-        if (context is null || mouse is null || device is null)
+        UsbInterfaceState? mouse = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, MouseProtocol);
+        if (context is null || mouse is null)
         {
             Assert.Fail("the boot mouse driver was never probed");
             return;
@@ -1548,13 +1878,12 @@ public class Kernel : Sys.Kernel
         Assert.True(ThrowsInvalidOperation(() => context.PublishMouse()), "PublishMouse after Probe should throw InvalidOperationException");
         Assert.True(context.IsPresent, "a bound interface whose device is on the bus is present");
 
-        string expectedPath = ExpectedUsbPath(device, mouse);
-        Assert.True(context.Path == expectedPath, $"the context's path {context.Path} should be {expectedPath}");
+        Assert.True(context.Path == mouse.Path, $"the context's path {context.Path} should be {mouse.Path}");
 
         UsbDeviceInfo info = context.Device;
         Assert.True(info.VendorId == UsbDescriptors.QemuHidVendorId && info.ProductId == UsbDescriptors.QemuHidProductId,
             $"the context should describe {UsbDescriptors.QemuHidVendorId:X4}:{UsbDescriptors.QemuHidProductId:X4}, describes {info.VendorId:X4}:{info.ProductId:X4}");
-        Assert.Equal(device.Interfaces.Count, info.Interfaces.Count, "the context should describe every interface of the device");
+        Assert.Equal(mouse.DeviceInterfaceCount, info.Interfaces.Count, "the context should describe every interface of the device");
         Assert.True(usbInterface.Number == mouse.Number && usbInterface.Class == HidClass && usbInterface.Subclass == BootInterfaceSubclass
             && usbInterface.Protocol == MouseProtocol, "the context should describe the mouse interface");
         Assert.True((endpoint.Address & 0x80) != 0 && endpoint.MaxPacketSize > 0 && endpoint.Interval > 0,
@@ -1633,19 +1962,19 @@ public class Kernel : Sys.Kernel
         Assert.True(s_tabletFoundBeforePass, "no tablet interface was enumerated when the kernel was constructed");
         Assert.Null(s_tabletOwnerBeforePass, "no class driver should have bound the tablet interface before the pass");
 
-        UsbInterface? tablet = FindInterface(HidClass, TabletSubclass, TabletProtocol, out UsbDevice? device);
-        if (tablet is null || device is null)
+        UsbInterfaceState? tablet = UsbInterfaces.Find(HidClass, TabletSubclass, TabletProtocol);
+        if (tablet is null)
         {
             Assert.Fail("no tablet interface enumerated");
             return;
         }
 
         Assert.True(UsbTabletFailingDriver.InterruptPipeOpened, "the tablet driver's OpenInterruptIn should return true");
-        string order = ProbeLog.Describe(ExpectedUsbPath(device, tablet));
+        string order = ProbeLog.Describe(tablet.Path);
         Assert.True(order == ExpectedTabletProbeOrder, $"the tablet interface should be offered as {ExpectedTabletProbeOrder}, was {order}");
         Assert.False(ProbeLog.Recorded(UsbHidClassName), $"the class-only match should never have been offered the tablet, probes ran {ProbeLog.Describe()}");
         Assert.False(ProbeLog.Recorded(UsbTabletLinkDriver.Name), $"the link driver should never have been offered the tablet at boot, probes ran {ProbeLog.Describe()}");
-        Assert.Null(tablet.Driver, "the tablet interface should be left without a driver");
+        Assert.False(tablet.HasClassDriver, "the tablet interface should be left without a driver");
         Assert.Null(tablet.DriverContext, "the tablet interface should keep no binding");
         Assert.Null(tablet.DriverName, "the tablet interface should have no owner");
     }
@@ -1657,8 +1986,8 @@ public class Kernel : Sys.Kernel
     {
         UsbDeviceContext? context = UsbTabletFailingDriver.Context;
         MouseReporter? mouse = UsbTabletFailingDriver.Mouse;
-        UsbInterface? tablet = FindInterface(HidClass, TabletSubclass, TabletProtocol, out UsbDevice? device);
-        if (context is null || mouse is null || tablet is null || device is null)
+        UsbInterfaceState? tablet = UsbInterfaces.Find(HidClass, TabletSubclass, TabletProtocol);
+        if (context is null || mouse is null || tablet is null)
         {
             Assert.Fail("the tablet driver never got as far as publishing a mouse");
             return;
@@ -1683,8 +2012,10 @@ public class Kernel : Sys.Kernel
         Assert.Equal(0, UsbTabletFailingDriver.HandlerCalls, "the failed attempt's report handler ran");
 
         // Quiet for the rest of the run, through the USB stack itself: the
-        // seam refuses, the attempt being over.
-        device.ControlOut(UsbRequestType.Class | UsbRequestType.Interface, UsbBootMouseDriver.SetIdleRequest, UsbBootMouseDriver.ReportOnChange, tablet.Number);
+        // attempt's own context refuses, the attempt being over, so the
+        // request goes through a context no driver holds.
+        _ = tablet.CreateContext(SuiteContextName).ControlOut(UsbRequestKind.Class, UsbRecipient.Interface,
+            UsbBootMouseDriver.SetIdleRequest, UsbBootMouseDriver.ReportOnChange, tablet.Number);
     }
 
     // ==================== USB hot-plug ====================
@@ -1697,7 +2028,7 @@ public class Kernel : Sys.Kernel
     // came through it, not through x64's PS/2 mouse.
     private static void TestUsbHotPlug_PointerMoveReachesBootMouseDriver()
     {
-        Assert.True(UsbManager.IsHotPlugRunning, "the USB hot-plug thread should run: the scheduler switches threads on every cell of this suite");
+        Assert.True(UsbInterfaces.IsHotPlugRunning, "the USB hot-plug thread should run: the scheduler switches threads on every cell of this suite");
         CheckPointerMoveThroughBootMouse();
     }
 
@@ -1712,7 +2043,7 @@ public class Kernel : Sys.Kernel
         MouseReporter? mouse = UsbBootMouseDriver.Mouse;
         DeviceWorkItem? workItem = UsbBootMouseDriver.WorkItem;
         DeviceEvent? deviceEvent = UsbBootMouseDriver.Event;
-        UsbInterface? usbInterface = FindInterface(HidClass, BootInterfaceSubclass, MouseProtocol, out _);
+        UsbInterfaceState? usbInterface = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, MouseProtocol);
         if (context is null || mouse is null || workItem is null || deviceEvent is null || usbInterface is null)
         {
             Assert.Fail("the boot mouse driver's binding lacks its context, mouse, work item, event or interface");
@@ -1767,10 +2098,10 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        PublishedMouse published = mouse.Device;
-        Assert.False(MouseManager.IsRegistered(published), "the unplugged mouse's published mouse is still registered with the mouse manager");
+        PublishedMouseView published = new(mouse);
+        Assert.False(SystemInternals.IsRegistered(published), "the unplugged mouse's published mouse is still registered with the mouse manager");
         Assert.True(published.IsWithdrawn, "the kit should mark the unplugged mouse's published mouse withdrawn");
-        Assert.Null(published.OnMouseEvent, "the mouse manager should clear the handler of a mouse it let go of");
+        Assert.False(published.HasEventHandler, "the mouse manager should clear the handler of a mouse it let go of");
         Assert.False(MouseManager.LeftButton, "the left button the mouse held when it was pulled out should be released");
 
         MouseManager.SetPosition(PointerStartX, PointerStartY);
@@ -1781,13 +2112,14 @@ public class Kernel : Sys.Kernel
     }
 
     // The binding is over. The context reports the device gone and answers
-    // Disconnected to control requests rather than throwing: a driver's
-    // thread may still hold it. The Probe-only members throw, and the
-    // interface the mouse had keeps no binding.
+    // Disconnected to control requests rather than throwing, as a context
+    // whose attempt failed does: a driver's thread may still hold it. The
+    // Probe-only members throw, and the interface the mouse had keeps no
+    // binding.
     private static void TestUsbUnplug_StaleContextAnswersDisconnected()
     {
         UsbDeviceContext? context = s_unpluggedMouseContext;
-        UsbInterface? usbInterface = s_unpluggedMouseInterface;
+        UsbInterfaceState? usbInterface = s_unpluggedMouseInterface;
         if (context is null || usbInterface is null)
         {
             Assert.Fail("the unplug cell captured no context");
@@ -1795,7 +2127,6 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.False(context.IsPresent, "the context of a mouse pulled out should not be present");
-        Assert.True(context.State == DeviceContextState.Removed, "the context of a mouse pulled out should end Removed");
 
         Span<byte> descriptor = stackalloc byte[UsbDescriptors.DeviceDescriptorLength];
         UsbTransferResult result = context.ControlIn(UsbRequestKind.Standard, UsbRecipient.Device, UsbDescriptors.GetDescriptorRequest,
@@ -1810,7 +2141,7 @@ public class Kernel : Sys.Kernel
         Assert.True(ThrowsInvalidOperation(() => context.PublishMouse()), "PublishMouse on an unplugged context should throw InvalidOperationException");
         Assert.True(ThrowsInvalidOperation(() => context.CreateEvent()), "CreateEvent on an unplugged context should throw InvalidOperationException");
         Assert.Null(usbInterface.DriverContext, "the interface of a mouse pulled out should keep no binding");
-        Assert.Null(usbInterface.Driver, "the interface of a mouse pulled out should have no class driver");
+        Assert.False(usbInterface.HasClassDriver, "the interface of a mouse pulled out should have no class driver");
     }
 
     // What the binding scheduled and waited on is cancelled: its work item
@@ -1848,7 +2179,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        bool gone = WaitUntil(() => FindRecord(DriverCore.Devices, path) is null, HotPlugWaitMilliseconds);
+        bool gone = WaitUntil(() => FindRecord(DriverManager.Devices, path) is null, HotPlugWaitMilliseconds);
         Assert.True(gone, $"{path} should leave the device list once the mouse is pulled out");
         Assert.Null(FindUsbRecord(HidClass, BootInterfaceSubclass, MouseProtocol), "no boot mouse interface should be listed while the mouse is out");
     }
@@ -1874,7 +2205,8 @@ public class Kernel : Sys.Kernel
 
         Assert.Equal(instancesBefore + 1, UsbBootMouseDriver.Instances, "the factory should create one new driver for the mouse plugged back in");
         Assert.True(context != s_unpluggedMouseContext, "the mouse plugged back in should be bound through a new context");
-        Assert.True(context.IsPresent && context.State == DeviceContextState.Bound, "the new binding's context should be present and Bound");
+        Assert.True(context.IsPresent, "the new binding's context should be present");
+        Assert.True(ThrowsInvalidOperation(() => context.CreateEvent()), "the new binding's Probe should be over, so CreateEvent throws");
         Assert.True(UsbBootMouseDriver.ProbeThreadId != s_bootThreadId && !UsbBootMouseDriver.ProbeOnIdleThread,
             "the mouse plugged back in should be probed on the hot-plug thread, not the boot thread");
 
@@ -1898,11 +2230,12 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        Assert.True(MouseManager.IsRegistered(mouse.Device), "the new binding's mouse should be registered with the mouse manager");
-        Assert.NotNull(mouse.Device.OnMouseEvent, "the mouse manager should wire the new mouse's handler");
-        Assert.False(MouseManager.IsRegistered(old.Device), "the unplugged binding's mouse came back into the mouse manager");
+        PublishedMouseView current = new(mouse);
+        Assert.True(SystemInternals.IsRegistered(current), "the new binding's mouse should be registered with the mouse manager");
+        Assert.True(current.HasEventHandler, "the mouse manager should wire the new mouse's handler");
+        Assert.False(SystemInternals.IsRegistered(new PublishedMouseView(old)), "the unplugged binding's mouse came back into the mouse manager");
 
-        DeviceRecord? listed = FindRecord(DriverCore.Devices, context.Path);
+        DeviceInfo? listed = FindRecord(DriverManager.Devices, context.Path);
         if (listed is not { } record)
         {
             Assert.Fail($"the device list has no entry for {context.Path}");
@@ -1939,17 +2272,17 @@ public class Kernel : Sys.Kernel
     // its interface from the device list.
     private static void TestUsbTabletUnplug_UnboundInterfaceLeavesDeviceList()
     {
-        UsbInterface? tablet = FindInterface(HidClass, TabletSubclass, TabletProtocol, out UsbDevice? device);
-        if (tablet is null || device is null)
+        UsbInterfaceState? tablet = UsbInterfaces.Find(HidClass, TabletSubclass, TabletProtocol);
+        if (tablet is null)
         {
             Assert.Fail("no tablet interface enumerated");
             return;
         }
 
         Assert.Null(tablet.DriverName, "the tablet should still have no driver before it is pulled out");
-        string path = ExpectedUsbPath(device, tablet);
+        string path = tablet.Path;
         TR.RequestUsbDeviceUnplug(TabletUsbIndex);
-        bool gone = WaitUntil(() => FindRecord(DriverCore.Devices, path) is null, HotPlugWaitMilliseconds);
+        bool gone = WaitUntil(() => FindRecord(DriverManager.Devices, path) is null, HotPlugWaitMilliseconds);
         Assert.True(gone, $"{path} should leave the device list once the tablet is pulled out");
         Assert.Equal(0, UsbTabletLinkDriver.RemoveCalls, "no driver bound the tablet, so no Remove should run");
     }
@@ -2020,12 +2353,12 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        PublishedNetworkDevice device = link.Device;
+        PublishedLinkView device = new(link);
         // A private network QEMU's user-mode NIC does not use.
         Address4 address = new(192, 168, 77, 2);
         Assert.True(IPConfig.Enable(adapter, address, new Address4(255, 255, 255, 0), Address4.Zero), "configuring the link should succeed");
         Assert.True(adapter.IPConfig is { } config && config.Address.Equals(address), "configuring the link should record its address");
-        Assert.NotNull(NetworkStack.LinkLocalOf(device), "configuring the link should map a link-local IPv6 address to it");
+        Assert.NotNull(SystemInternals.LinkLocalOf(device), "configuring the link should map a link-local IPv6 address to it");
 
         byte[] frame = new byte[MinimumFrameLength];
         int transmits = UsbTabletLinkDriver.Transmits;
@@ -2070,13 +2403,13 @@ public class Kernel : Sys.Kernel
         int transmitsBefore = UsbTabletLinkDriver.Transmits;
         Assert.False(device.Send(frame, frame.Length), "a send through the unplugged link should fail");
         Assert.Equal(transmitsBefore, UsbTabletLinkDriver.Transmits, "a send through the unplugged link reached its transmit handler");
-        Assert.Null(device.OnPacketReceived, "the stack should stop taking frames from the unplugged link");
+        Assert.False(device.HasReceiveHandler, "the stack should stop taking frames from the unplugged link");
 
         Assert.False(adapter.IsValid, "a handle to the unplugged link should name no device");
         Assert.Null(adapter.Name, "a handle to the unplugged link should have no name");
         Assert.Equal(-1, adapter.Index, "a handle to the unplugged link should have no index");
-        Assert.Null(NetworkStack.LinkLocalOf(device), "the stack still maps the unplugged link's addresses to it");
-        Assert.Null(IPConfig.Get(device), "the stack still holds the unplugged link's configuration");
+        Assert.Null(SystemInternals.LinkLocalOf(device), "the stack still maps the unplugged link's addresses to it");
+        Assert.Null(SystemInternals.GetConfig(device), "the stack still holds the unplugged link's configuration");
     }
 
     // Plugged back in once more, the tablet gets a new link, which takes the
@@ -2084,7 +2417,8 @@ public class Kernel : Sys.Kernel
     // device: an index alone would name the new link.
     private static void TestUsbTabletReplug_StaleAdapterNamesNoNewLink()
     {
-        if (s_staleLinkDevice is null)
+        PublishedLinkView? stale = s_staleLinkDevice;
+        if (stale is null)
         {
             Assert.Fail("the unplug cell captured no link");
             return;
@@ -2103,7 +2437,7 @@ public class Kernel : Sys.Kernel
 
         NetworkAdapter fresh = NetworkManager.GetAdapter(index);
         MACAddress? registered = fresh.MacAddress;
-        Assert.True(link.Device != s_staleLinkDevice, "the tablet plugged back in again should publish a new link");
+        Assert.False(ReferenceEquals(new PublishedLinkView(link).Device, stale.Device), "the tablet plugged back in again should publish a new link");
         Assert.True(registered is not null && registered.Equals(link.Address),
             $"the new link should take the index the first one had, {index}, where {registered?.ToString() ?? "nothing"} is");
         Assert.False(s_staleLinkAdapter.IsValid, "a handle to the unplugged link names the link that took its index");
@@ -2139,7 +2473,7 @@ public class Kernel : Sys.Kernel
         int rounds = 0;
         while (rounds < LinkRaceRounds)
         {
-            PublishedNetworkDevice link = new(context, address, CountRaceTransmit);
+            PublishedLinkView link = PublishedLinkView.Create(context, address, CountRaceTransmit);
             link.Initialize();
             int transmits = Volatile.Read(ref s_raceTransmits);
             s_raceLink = link;
@@ -2164,53 +2498,6 @@ public class Kernel : Sys.Kernel
             "a send that was preempted before the transmit handler reached it after the link was withdrawn");
     }
 
-    // The same race the other way: a driver's thread delivers frames back
-    // to back through a link, and this one withdraws the link each time the
-    // scheduler hands it the CPU back, wherever the timer stopped the
-    // deliverer, including between Deliver's first check and the stack. The
-    // stack lets go of the link only after it was withdrawn, so its receive
-    // handler, which this cell's stands in for, is still set then. Once
-    // Withdraw returned, no frame delivered through that link may reach it.
-    private static void TestLinkWithdraw_DeliverInFlightNeverReachesStack()
-    {
-        UsbDeviceContext? context = UsbTabletLinkDriver.Context;
-        if (context is null)
-        {
-            Assert.Fail("the link driver was never probed, so no context can name the race's links");
-            return;
-        }
-
-        MACAddress address = new([0x02, 0x00, 0x00, 0x00, 0x7B, 0x02]);
-        s_raceStop = false;
-        s_raceLink = null;
-        SysThread deliverer = new(DeliverBackToBack);
-        deliverer.Start();
-
-        int rounds = 0;
-        while (rounds < LinkRaceRounds)
-        {
-            PublishedNetworkDevice link = new(context, address, RefuseFrame);
-            link.OnPacketReceived = CountRaceFrame;
-            link.Initialize();
-            int frames = Volatile.Read(ref s_raceFrames);
-            s_raceLink = link;
-            if (!WaitUntil(() => Volatile.Read(ref s_raceFrames) > frames))
-            {
-                break;
-            }
-
-            link.Withdraw();
-            rounds++;
-        }
-
-        s_raceStop = true;
-        bool stopped = deliverer.Join(RaceThreadJoinMilliseconds);
-        Assert.Equal(LinkRaceRounds, rounds, "the delivering thread stopped reaching the receive handler of a live link");
-        Assert.True(stopped, "the delivering thread never returned");
-        Assert.Equal(0, Volatile.Read(ref s_framesAfterWithdraw),
-            "a frame whose delivery was preempted before the stack reached it after the link was withdrawn");
-    }
-
     // The stack picks the address a packet leaves from by walking the
     // configured interfaces, from whatever thread sends, and the USB
     // hot-plug thread takes an unplugged link's configuration out of that
@@ -2232,14 +2519,14 @@ public class Kernel : Sys.Kernel
         // key the configurations: they are never delivered, so they carry
         // nothing.
         Address4 mask = new(255, 255, 255, 0);
-        PublishedNetworkDevice passed = new(context, new MACAddress([0x02, 0x00, 0x00, 0x00, 0x7C, 0x01]), RefuseFrame);
-        PublishedNetworkDevice matched = new(context, new MACAddress([0x02, 0x00, 0x00, 0x00, 0x7C, 0x02]), RefuseFrame);
-        PublishedNetworkDevice toggled = new(context, new MACAddress([0x02, 0x00, 0x00, 0x00, 0x7C, 0x03]), RefuseFrame);
-        IPConfig passedConfig = new(new Address4(192, 168, 79, 1), mask, Address4.Zero);
-        IPConfig matchedConfig = new(new Address4(192, 168, 80, 1), mask, Address4.Zero);
-        IPConfig toggledConfig = new(new Address4(192, 168, 81, 1), mask, Address4.Zero);
-        IPConfig.Set(passed, passedConfig);
-        IPConfig.Set(matched, matchedConfig);
+        PublishedLinkView passed = PublishedLinkView.Create(context, new MACAddress([0x02, 0x00, 0x00, 0x00, 0x7C, 0x01]), RefuseFrame);
+        PublishedLinkView matched = PublishedLinkView.Create(context, new MACAddress([0x02, 0x00, 0x00, 0x00, 0x7C, 0x02]), RefuseFrame);
+        PublishedLinkView toggled = PublishedLinkView.Create(context, new MACAddress([0x02, 0x00, 0x00, 0x00, 0x7C, 0x03]), RefuseFrame);
+        IPConfig passedConfig = SystemInternals.NewConfig(new Address4(192, 168, 79, 1), mask, Address4.Zero);
+        IPConfig matchedConfig = SystemInternals.NewConfig(new Address4(192, 168, 80, 1), mask, Address4.Zero);
+        IPConfig toggledConfig = SystemInternals.NewConfig(new Address4(192, 168, 81, 1), mask, Address4.Zero);
+        SystemInternals.SetConfig(passed, passedConfig);
+        SystemInternals.SetConfig(matched, matchedConfig);
 
         s_routeDestination = new Address4(192, 168, 80, 2);
         s_routeSource = matchedConfig.Address;
@@ -2260,11 +2547,11 @@ public class Kernel : Sys.Kernel
 
             if (rounds % 2 == 0)
             {
-                IPConfig.Set(toggled, toggledConfig);
+                SystemInternals.SetConfig(toggled, toggledConfig);
             }
             else
             {
-                IPConfig.Remove(toggled);
+                SystemInternals.RemoveConfig(toggled);
             }
 
             rounds++;
@@ -2272,15 +2559,15 @@ public class Kernel : Sys.Kernel
 
         s_raceStop = true;
         bool stopped = walker.Join(RaceThreadJoinMilliseconds);
-        IPConfig.Remove(toggled);
-        IPConfig.Remove(matched);
-        IPConfig.Remove(passed);
+        SystemInternals.RemoveConfig(toggled);
+        SystemInternals.RemoveConfig(matched);
+        SystemInternals.RemoveConfig(passed);
 
         Assert.Equal(LinkRaceRounds, rounds, "the lookup thread stopped looking source addresses up");
         Assert.True(stopped, "the lookup thread never returned");
         Assert.Equal(0, Volatile.Read(ref s_routeLookupFailures),
             $"a source address lookup failed while a configuration was added or taken out: {s_routeLookupError ?? "it found another address"}");
-        Assert.Null(IPConfig.Get(toggled), "the configuration the cell added and took out is still recorded");
+        Assert.Null(SystemInternals.GetConfig(toggled), "the configuration the cell added and took out is still recorded");
     }
 
     /// <summary>
@@ -2319,40 +2606,6 @@ public class Kernel : Sys.Kernel
         return true;
     }
 
-    /// <summary>
-    /// The delivery race's thread: delivers a frame through the race's
-    /// current link, back to back, until the cell stops it, as a driver's
-    /// receive work item does.
-    /// </summary>
-    private static void DeliverBackToBack()
-    {
-        byte[] frame = new byte[MinimumFrameLength];
-        while (!s_raceStop)
-        {
-            if (s_raceLink is { } link)
-            {
-                s_deliveringLink = link;
-                link.Deliver(frame);
-            }
-        }
-    }
-
-    /// <summary>
-    /// The delivery race links' receive handler, standing in for the
-    /// stack's, on the delivering thread with interrupts masked: counts the
-    /// frame, and counts it as a failure when the link it came through was
-    /// withdrawn already.
-    /// </summary>
-    private static void CountRaceFrame(byte[] data, int length)
-    {
-        if (s_deliveringLink is { IsWithdrawn: true })
-        {
-            s_framesAfterWithdraw++;
-        }
-
-        Volatile.Write(ref s_raceFrames, s_raceFrames + 1);
-    }
-
     /// <summary>The transmit handler of the race links nothing sends through.</summary>
     private static bool RefuseFrame(ReadOnlySpan<byte> frame) => false;
 
@@ -2376,7 +2629,7 @@ public class Kernel : Sys.Kernel
         {
             try
             {
-                Address? found = IPConfig.FindNetwork(destination);
+                Address? found = SystemInternals.FindNetwork(destination);
                 if (found is null || !found.Equals(expected))
                 {
                     s_routeLookupFailures++;
@@ -2402,8 +2655,8 @@ public class Kernel : Sys.Kernel
         Assert.True(s_keyboardOwnerBeforePass == UsbKeyboardName,
             $"the built-in keyboard driver should own the keyboard before the pass, {s_keyboardOwnerBeforePass ?? "nothing"} did");
         string? bootPath = s_keyboardPathBeforePass;
-        UsbInterface? keyboard = FindInterface(HidClass, BootInterfaceSubclass, KeyboardProtocol, out UsbDevice? device);
-        if (bootPath is null || keyboard is null || device is null)
+        UsbInterfaceState? keyboard = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, KeyboardProtocol);
+        if (bootPath is null || keyboard is null)
         {
             Assert.Fail("no HID boot keyboard interface enumerated");
             return;
@@ -2411,8 +2664,8 @@ public class Kernel : Sys.Kernel
 
         string offered = ProbeLog.Describe(bootPath);
         Assert.True(offered.Length == 0, $"no registered driver should be offered the keyboard the built-in took, it was offered to {offered}");
-        Assert.True(device.VendorId == UsbDescriptors.QemuHidVendorId && device.ProductId == UsbDescriptors.QemuHidProductId,
-            $"the keyboard should present QEMU's HID IDs, which the device match registration matches, presents {device.VendorId:X4}:{device.ProductId:X4}");
+        Assert.True(keyboard.VendorId == UsbDescriptors.QemuHidVendorId && keyboard.ProductId == UsbDescriptors.QemuHidProductId,
+            $"the keyboard should present QEMU's HID IDs, which the device match registration matches, presents {keyboard.VendorId:X4}:{keyboard.ProductId:X4}");
         Assert.True(keyboard.DriverName == UsbKeyboardName, $"the keyboard should still be the built-in's, is {keyboard.DriverName ?? "nothing"}'s");
 
         TR.RequestUsbDeviceUnplug(KeyboardUsbIndex);
@@ -2439,36 +2692,35 @@ public class Kernel : Sys.Kernel
     // now: built-ins, the boot display, the edu driver and nothing alike.
     private static void TestDeviceList_MatchesEveryFunction()
     {
-        IReadOnlyList<DeviceRecord> records = DriverCore.Devices;
-        PciDevice[]? devices = PciManager.Devices;
-        if (devices is null)
+        IReadOnlyList<DeviceInfo> records = DriverManager.Devices;
+        PciFunctionState[] functions = PciFunctions.Enumerate();
+        if (functions.Length == 0)
         {
             Assert.Fail("PCI was not set up");
             return;
         }
 
-        Assert.True(records.Count >= (int)PciManager.Count, $"the device list should hold every enumerated function, holds {records.Count} entries for {PciManager.Count} functions");
-        for (uint i = 0; i < PciManager.Count; i++)
+        Assert.True(records.Count >= functions.Length, $"the device list should hold every enumerated function, holds {records.Count} entries for {functions.Length} functions");
+        foreach (PciFunctionState function in functions)
         {
-            PciDevice function = devices[i];
-            string path = ExpectedPath(function);
-            DeviceRecord? record = FindRecord(records, path);
-            if (record is not { } found)
+            string path = function.Path;
+            if (FindRecord(records, path) is not { } found)
             {
                 Assert.Fail($"the device list has no entry for {path}");
                 return;
             }
 
+            PciFunction id = function.Function;
             Assert.True(found.DriverName == function.Owner, $"{path} should be listed as owned by {function.Owner ?? "nothing"}, is {found.DriverName ?? "nothing"}");
-            Assert.True(found.VendorId == function.VendorId && found.DeviceId == function.DeviceId, $"{path} is listed with the wrong IDs");
-            Assert.True(found.Class == function.ClassCode && found.Subclass == function.Subclass && found.Protocol == function.ProgIf,
+            Assert.True(found.VendorId == id.VendorId && found.DeviceId == id.DeviceId, $"{path} is listed with the wrong IDs");
+            Assert.True(found.Class == id.BaseClass && found.Subclass == id.Subclass && found.Protocol == id.ProgrammingInterface,
                 $"{path} is listed with the wrong class");
         }
 
-        int functions = Math.Min((int)PciManager.Count, records.Count);
-        for (int i = 1; i < functions; i++)
+        int listed = Math.Min(functions.Length, records.Count);
+        for (int i = 1; i < listed; i++)
         {
-            Assert.True(BusOrderKey(records[i - 1].Path, devices) < BusOrderKey(records[i].Path, devices),
+            Assert.True(BusOrderKey(records[i - 1].Path, functions) < BusOrderKey(records[i].Path, functions),
                 $"{records[i - 1].Path} is listed before {records[i].Path}");
         }
     }
@@ -2481,37 +2733,26 @@ public class Kernel : Sys.Kernel
     // tablet's the link driver's and the keyboard's the built-in's.
     private static void TestDeviceList_ListsEveryUsbInterface()
     {
-        IReadOnlyList<DeviceRecord> records = DriverCore.Devices;
-        IReadOnlyList<UsbDevice> devices = UsbManager.Devices;
-        int interfaceCount = 0;
-        for (int i = 0; i < devices.Count; i++)
-        {
-            interfaceCount += devices[i].Interfaces.Count;
-        }
-
-        int index = (int)PciManager.Count;
-        Assert.Equal(index + interfaceCount, records.Count, "the device list should hold every enumerated function, then every USB interface");
+        IReadOnlyList<DeviceInfo> records = DriverManager.Devices;
+        UsbInterfaceState[] interfaces = UsbInterfaces.Enumerate();
+        int index = PciFunctions.Enumerate().Length;
+        Assert.Equal(index + interfaces.Length, records.Count, "the device list should hold every enumerated function, then every USB interface");
         if (s_isUsbCell)
         {
-            Assert.True(interfaceCount >= 3, "the usb-hid profile's mouse, tablet and keyboard should all be listed");
+            Assert.True(interfaces.Length >= 3, "the usb-hid profile's mouse, tablet and keyboard should all be listed");
         }
 
-        for (int i = 0; i < devices.Count; i++)
+        for (int i = 0; i < interfaces.Length && index < records.Count; i++, index++)
         {
-            UsbDevice device = devices[i];
-            List<UsbInterface> interfaces = device.Interfaces;
-            for (int j = 0; j < interfaces.Count && index < records.Count; j++, index++)
-            {
-                UsbInterface usbInterface = interfaces[j];
-                DeviceRecord record = records[index];
-                string path = ExpectedUsbPath(device, usbInterface);
-                Assert.True(record.Path == path, $"entry {index} should be {path}, is {record.Path}");
-                Assert.True(record.DriverName == ExpectedUsbOwner(usbInterface),
-                    $"{path} should be listed as owned by {ExpectedUsbOwner(usbInterface) ?? "nothing"}, is {record.DriverName ?? "nothing"}");
-                Assert.True(record.VendorId == device.VendorId && record.DeviceId == device.ProductId, $"{path} is listed with the wrong IDs");
-                Assert.True(record.Class == usbInterface.Class && record.Subclass == usbInterface.Subclass && record.Protocol == usbInterface.Protocol,
-                    $"{path} is listed with the wrong class");
-            }
+            UsbInterfaceState usbInterface = interfaces[i];
+            DeviceInfo record = records[index];
+            string path = usbInterface.Path;
+            string? owner = ExpectedUsbOwner(usbInterface);
+            Assert.True(record.Path == path, $"entry {index} should be {path}, is {record.Path}");
+            Assert.True(record.DriverName == owner, $"{path} should be listed as owned by {owner ?? "nothing"}, is {record.DriverName ?? "nothing"}");
+            Assert.True(record.VendorId == usbInterface.VendorId && record.DeviceId == usbInterface.ProductId, $"{path} is listed with the wrong IDs");
+            Assert.True(record.Class == usbInterface.Class && record.Subclass == usbInterface.Subclass && record.Protocol == usbInterface.Protocol,
+                $"{path} is listed with the wrong class");
         }
     }
 
@@ -2626,7 +2867,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        PciDevice? function = FindFunction(s_expectedVendorId, s_expectedDeviceId);
+        PciFunctionState? function = PciFunctions.Find(s_expectedVendorId, s_expectedDeviceId);
         if (function is null)
         {
             return;
@@ -2634,7 +2875,7 @@ public class Kernel : Sys.Kernel
 
         s_functionFoundBeforePass = true;
         s_ownerBeforePass = function.Owner;
-        s_commandBeforePass = function.Command;
+        s_commandBeforePass = function.Function.ReadConfig16(CommandOffset);
     }
 
     /// <summary>Records the usb-hid profile's mouse, tablet and keyboard interfaces as the built-in class drivers left them.</summary>
@@ -2645,71 +2886,159 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        UsbInterface? mouse = FindInterface(HidClass, BootInterfaceSubclass, MouseProtocol, out _);
+        UsbInterfaceState? mouse = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, MouseProtocol);
         if (mouse is not null)
         {
             s_mouseFoundBeforePass = true;
             s_mouseOwnerBeforePass = mouse.DriverName;
         }
 
-        UsbInterface? tablet = FindInterface(HidClass, TabletSubclass, TabletProtocol, out _);
+        UsbInterfaceState? tablet = UsbInterfaces.Find(HidClass, TabletSubclass, TabletProtocol);
         if (tablet is not null)
         {
             s_tabletFoundBeforePass = true;
             s_tabletOwnerBeforePass = tablet.DriverName;
         }
 
-        UsbInterface? keyboard = FindInterface(HidClass, BootInterfaceSubclass, KeyboardProtocol, out UsbDevice? keyboardDevice);
-        if (keyboard is not null && keyboardDevice is not null)
+        UsbInterfaceState? keyboard = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, KeyboardProtocol);
+        if (keyboard is not null)
         {
             s_keyboardOwnerBeforePass = keyboard.DriverName;
-            s_keyboardPathBeforePass = ExpectedUsbPath(keyboardDevice, keyboard);
+            s_keyboardPathBeforePass = keyboard.Path;
         }
     }
 
     /// <summary>
-    /// Registers the suite's drivers, the same set on every cell: each cell's
-    /// hardware decides which of them the pass offers anything to. Then tries
-    /// the names Register must refuse.
+    /// Records, from inside RegisterDrivers, how often it ran and when, on
+    /// which thread, whether an interrupt is delivered while it runs, how
+    /// many Probes had run and what DriverManager.Devices held by then, and
+    /// on the usb-hid cell the owners of the xHCI controller and of the
+    /// keyboard's interface, which built-in drivers bind.
+    /// </summary>
+    private static void RecordRegisterDriversContext()
+    {
+        s_registerDriversCalls++;
+        s_registerDriversSequence = ++s_sequence;
+        s_registerDriversThreadKnown = KernelState.TryGetCurrentThread(out s_registerDriversThreadId, out s_registerDriversOnIdleThread);
+        s_probesBeforeRegisterDrivers = ProbeLog.Count;
+        s_devicesInRegisterDrivers = DriverManager.Devices.Count;
+        s_interruptsDeliveredInRegisterDrivers = SoftwareTimerFires();
+        if (s_isUsbCell)
+        {
+            s_xhciOwnerAtRegisterDrivers = PciFunctions.FindXhci()?.Owner;
+            s_keyboardOwnerAtRegisterDrivers = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, KeyboardProtocol)?.DriverName;
+        }
+    }
+
+    /// <summary>
+    /// Schedules a one-shot software timer, which only the timer interrupt
+    /// runs, and spins until it fired or
+    /// <see cref="RegisterDriversTimerWaitMilliseconds"/> passed.
+    /// </summary>
+    /// <returns>Whether it fired, so whether an interrupt was delivered meanwhile.</returns>
+    private static bool SoftwareTimerFires()
+    {
+        s_proofTimerFired = false;
+        SoftwareTimer? timer;
+
+        // Scheduled with interrupts masked: the x64 PIT reprograms its
+        // counter after the registration's own masked scope, and a tick in
+        // between can stop it for good, and with it every poll the kit runs.
+        using (new IrqSafeLock().EnterScope())
+        {
+            timer = TimerManager.Schedule(static () => s_proofTimerFired = true, TimeSpan.FromMilliseconds(1));
+        }
+
+        if (timer is null)
+        {
+            return false;
+        }
+
+        bool fired = WaitUntil(static () => s_proofTimerFired, RegisterDriversTimerWaitMilliseconds);
+        TimerManager.Cancel(timer);
+        return fired;
+    }
+
+    /// <summary>
+    /// Registers null through both overloads, while registration is open,
+    /// and records whether each threw ArgumentNullException. Any other
+    /// exception is recorded as a miss too: escaping RegisterDrivers, it
+    /// would end the boot instead of failing the cell that checks this.
+    /// </summary>
+    private static void RecordNullRegistrations()
+    {
+        s_nullPciRegistrationThrew = ThrowsOnlyArgumentNull(static () => DriverManager.Register(NullPciRegistration()));
+        s_nullUsbRegistrationThrew = ThrowsOnlyArgumentNull(static () => DriverManager.Register(NullUsbRegistration()));
+    }
+
+    /// <summary>True when <paramref name="action"/> throws ArgumentNullException; false when it throws nothing or anything else.</summary>
+    private static bool ThrowsOnlyArgumentNull(Action action)
+    {
+        try
+        {
+            action();
+            return false;
+        }
+        catch (ArgumentNullException)
+        {
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Registers the suite's PCI drivers other than the constructor's,
+    /// the same set on every cell: each cell's hardware decides which of
+    /// them the pass offers anything to. Then tries the names Register must
+    /// refuse. A driver that publishes a mouse or a network link registers
+    /// behind that switch too, one switch per if.
     /// </summary>
     private static void RegisterTestDrivers()
     {
         PciMatch eduDevice = PciMatch.Device(EduDriver.VendorId, EduDriver.DeviceId);
 
         // Would bind edu if it were ever offered it: a ranking that put it
-        // ahead of the device matches would show as edu's owner.
-        Accept(DriverCore.Register(new PciDriverRegistration(EduClassName,
-            static () => new RecordingDriver(EduClassName, ProbeResult.Bound), PciMatch.Class(UnclassifiedClassCode, OtherSubclass))));
-        Accept(DriverCore.Register(new PciDriverRegistration(ThrowingDriver.Name, static () => new ThrowingDriver(), eduDevice)));
-        Accept(DriverCore.Register(new PciDriverRegistration(ReentrantDriver.Name, ReentrantDriver.Create, eduDevice)));
-        Accept(DriverCore.Register(new PciDriverRegistration(EduDriver.Name, static () => new EduDriver(), eduDevice)));
+        // ahead of the device matches registered after it would show as
+        // edu's owner.
+        Accept(DriverManager.Register(RecordingDriver.CreateRegistration(EduClassName, ProbeResult.Bound,
+            PciMatch.Class(UnclassifiedClassCode, OtherSubclass))));
 
-        Accept(DriverCore.Register(new PciDriverRegistration(NicClassName,
-            static () => new RecordingDriver(NicClassName, ProbeResult.Declined), PciMatch.Class(NetworkClassCode, EthernetSubclass))));
-        Accept(DriverCore.Register(new PciDriverRegistration(NicClassWithInterfaceName,
-            static () => new RecordingDriver(NicClassWithInterfaceName, ProbeResult.Declined),
+        // Ties with the two edu drivers after it, so it is offered edu
+        // before them; its factory returns null.
+        Accept(DriverManager.Register(new PciDriverRegistration(NullFactoryName, CreateNullDriver, eduDevice)));
+        Accept(DriverManager.Register(ReentrantDriver.CreateRegistration()));
+        if (Sys.KernelFeatures.Mouse)
+        {
+            Accept(DriverManager.Register(EduDriver.CreateRegistration()));
+        }
+
+        Accept(DriverManager.Register(RecordingDriver.CreateRegistration(NicClassName, ProbeResult.Declined,
+            PciMatch.Class(NetworkClassCode, EthernetSubclass))));
+        Accept(DriverManager.Register(RecordingDriver.CreateRegistration(NicClassWithInterfaceName, ProbeResult.Declined,
             PciMatch.Class(NetworkClassCode, EthernetSubclass, EthernetProgIf))));
 
         // After the Ethernet class driver it ties with, so that one is still
         // offered each NIC first.
-        Accept(DriverCore.Register(new PciDriverRegistration(E1000EInterruptDriver.Name,
-            static () => new E1000EInterruptDriver(), PciMatch.Class(NetworkClassCode, EthernetSubclass))));
+        Accept(DriverManager.Register(E1000EInterruptDriver.CreateRegistration()));
 
         // Last of the Ethernet class drivers, so every other one is offered
         // the RTL8139 before it binds it.
-        Accept(DriverCore.Register(new PciDriverRegistration(Rtl8139Driver.Name,
-            static () => new Rtl8139Driver(), PciMatch.Class(NetworkClassCode, EthernetSubclass))));
+        if (Sys.KernelFeatures.Network)
+        {
+            Accept(DriverManager.Register(Rtl8139Driver.CreateRegistration()));
+        }
 
         // The class match first: only its lower rank puts it behind the
         // device match registered after it.
-        Accept(DriverCore.Register(new PciDriverRegistration(NvmeDriver.Name,
-            static () => new NvmeDriver(), PciMatch.Class(MassStorageClassCode, NonVolatileMemorySubclass, NvmeProgIf))));
-        Accept(DriverCore.Register(new PciDriverRegistration(FailingNvmeDriver.Name,
-            static () => new FailingNvmeDriver(), PciMatch.Device(FailingNvmeDriver.VendorId, FailingNvmeDriver.DeviceId))));
+        Accept(DriverManager.Register(NvmeDriver.CreateRegistration()));
+        Accept(DriverManager.Register(FailingNvmeDriver.CreateRegistration()));
 
-        s_duplicateNameAccepted = DriverCore.Register(new PciDriverRegistration(EduDriver.Name, CreateInvalid, eduDevice));
-        s_builtInNameAccepted = DriverCore.Register(new PciDriverRegistration(XhciOwner, CreateInvalid, eduDevice));
-        s_bootDisplayNameAccepted = DriverCore.Register(new PciDriverRegistration(GopOwner, CreateInvalid, eduDevice));
+        s_duplicateNameAccepted = DriverManager.Register(new PciDriverRegistration(EduDriver.Name, CreateInvalid, eduDevice));
+        s_builtInNameAccepted = DriverManager.Register(new PciDriverRegistration(XhciOwner, CreateInvalid, eduDevice));
+        s_bootDisplayNameAccepted = DriverManager.Register(new PciDriverRegistration(GopOwner, CreateInvalid, eduDevice));
     }
 
     private static void Accept(bool accepted)
@@ -2732,35 +3061,40 @@ public class Kernel : Sys.Kernel
         // Would bind any HID interface it were ever offered: a ranking that
         // put it ahead of a more specific match would show as the owner of
         // the mouse, and a fall-through past the tablet driver as the tablet's.
-        AcceptUsb(DriverCore.Register(new UsbDriverRegistration(UsbHidClassName,
-            static () => new UsbRecordingDriver(UsbHidClassName, ProbeResult.Bound), hidClass)));
-        AcceptUsb(DriverCore.Register(new UsbDriverRegistration(UsbHidDeviceDriver.Name, UsbHidDeviceDriver.Create,
-            UsbMatch.Device(UsbDescriptors.QemuHidVendorId, UsbDescriptors.QemuHidProductId))));
+        AcceptUsb(DriverManager.Register(UsbRecordingDriver.CreateRegistration(UsbHidClassName, ProbeResult.Bound, hidClass)));
+        AcceptUsb(DriverManager.Register(UsbHidDeviceDriver.CreateRegistration()));
 
-        // Ties with the boot mouse driver, and registers first, so it is
-        // offered the mouse before it.
-        AcceptUsb(DriverCore.Register(new UsbDriverRegistration(UsbMouseDeclinesName,
-            static () => new UsbRecordingDriver(UsbMouseDeclinesName, ProbeResult.Declined),
+        // Both tie with the boot mouse driver and register first, so they
+        // are offered the mouse before it: the first has a factory that
+        // returns null, the second declines.
+        AcceptUsb(DriverManager.Register(new UsbDriverRegistration(UsbNullFactoryName, CreateNullUsbDriver,
             UsbMatch.Interface(HidClass, BootInterfaceSubclass, MouseProtocol))));
-        AcceptUsb(DriverCore.Register(UsbBootMouseDriver.CreateRegistration()));
-        AcceptUsb(DriverCore.Register(new UsbDriverRegistration(UsbTabletFailingDriver.Name,
-            static () => new UsbTabletFailingDriver(), UsbMatch.Interface(HidClass, TabletSubclass, TabletProtocol))));
+        AcceptUsb(DriverManager.Register(UsbRecordingDriver.CreateRegistration(UsbMouseDeclinesName, ProbeResult.Declined,
+            UsbMatch.Interface(HidClass, BootInterfaceSubclass, MouseProtocol))));
+        if (Sys.KernelFeatures.Mouse)
+        {
+            AcceptUsb(DriverManager.Register(UsbBootMouseDriver.CreateRegistration()));
+            AcceptUsb(DriverManager.Register(UsbTabletFailingDriver.CreateRegistration()));
+        }
 
         // Would bind the tablet if it were offered it: at boot only a fall
         // through past the tablet driver's failure could give it the tablet,
         // and once the tablet driver declines a tablet plugged in later, it
         // takes that one.
-        AcceptUsb(DriverCore.Register(UsbTabletLinkDriver.CreateRegistration()));
+        if (Sys.KernelFeatures.Network)
+        {
+            AcceptUsb(DriverManager.Register(UsbTabletLinkDriver.CreateRegistration()));
+        }
 
-        s_usbDuplicateNameAccepted = DriverCore.Register(new UsbDriverRegistration(UsbBootMouseDriver.Name, CreateInvalidUsb, hidClass));
-        s_usbNamedAfterPciAccepted = DriverCore.Register(new UsbDriverRegistration(EduDriver.Name, CreateInvalidUsb, hidClass));
-        s_pciNamedAfterUsbAccepted = DriverCore.Register(new PciDriverRegistration(UsbBootMouseDriver.Name, CreateInvalid,
+        s_usbDuplicateNameAccepted = DriverManager.Register(new UsbDriverRegistration(UsbBootMouseDriver.Name, CreateInvalidUsb, hidClass));
+        s_usbNamedAfterPciAccepted = DriverManager.Register(new UsbDriverRegistration(EduDriver.Name, CreateInvalidUsb, hidClass));
+        s_pciNamedAfterUsbAccepted = DriverManager.Register(new PciDriverRegistration(UsbBootMouseDriver.Name, CreateInvalid,
             PciMatch.Device(EduDriver.VendorId, EduDriver.DeviceId)));
-        s_usbHubNameAccepted = DriverCore.Register(new UsbDriverRegistration(HubName, CreateInvalidUsb, hidClass));
-        s_usbKeyboardNameAccepted = DriverCore.Register(new UsbDriverRegistration(UsbKeyboardName, CreateInvalidUsb, hidClass));
-        s_usbMassStorageNameAccepted = DriverCore.Register(new UsbDriverRegistration(MassStorageName, CreateInvalidUsb, hidClass));
-        s_usbNamedAfterPciBuiltInAccepted = DriverCore.Register(new UsbDriverRegistration(XhciOwner, CreateInvalidUsb, hidClass));
-        s_pciNamedAfterUsbBuiltInAccepted = DriverCore.Register(new PciDriverRegistration(HubName, CreateInvalid,
+        s_usbHubNameAccepted = DriverManager.Register(new UsbDriverRegistration(HubName, CreateInvalidUsb, hidClass));
+        s_usbKeyboardNameAccepted = DriverManager.Register(new UsbDriverRegistration(UsbKeyboardName, CreateInvalidUsb, hidClass));
+        s_usbMassStorageNameAccepted = DriverManager.Register(new UsbDriverRegistration(MassStorageName, CreateInvalidUsb, hidClass));
+        s_usbNamedAfterPciBuiltInAccepted = DriverManager.Register(new UsbDriverRegistration(XhciOwner, CreateInvalidUsb, hidClass));
+        s_pciNamedAfterUsbBuiltInAccepted = DriverManager.Register(new PciDriverRegistration(HubName, CreateInvalid,
             PciMatch.Device(EduDriver.VendorId, EduDriver.DeviceId)));
     }
 
@@ -2777,6 +3111,24 @@ public class Kernel : Sys.Kernel
 
     /// <summary>Factory of the USB registrations that must never reach the pass; a driver that declines if one did.</summary>
     private static UsbDriver CreateInvalidUsb() => new UsbRecordingDriver(InvalidName, ProbeResult.Declined);
+
+    /// <summary>
+    /// Factory of <see cref="NullFactoryName"/>: counts the call and returns
+    /// null, typed as a driver the compiler takes for non-null, the way
+    /// <see cref="NullPciRegistration"/> hands out a null registration.
+    /// </summary>
+    private static PciDriver CreateNullDriver()
+    {
+        s_nullFactoryCalls++;
+        return (new PciDriver[1])[0];
+    }
+
+    /// <summary>As <see cref="CreateNullDriver"/>, for <see cref="UsbNullFactoryName"/>.</summary>
+    private static UsbDriver CreateNullUsbDriver()
+    {
+        s_usbNullFactoryCalls++;
+        return (new UsbDriver[1])[0];
+    }
 
     /// <summary>
     /// True when the cell's base profile is <paramref name="profile"/>: the
@@ -2796,41 +3148,25 @@ public class Kernel : Sys.Kernel
     }
 
     /// <summary>
-    /// The path the kit documents for <paramref name="function"/>, as in
-    /// <c>pci/0000:00:04.0</c>: segment 0000, then bus and device as two hex
-    /// digits and the function as one; null for no function.
+    /// Sort key of the enumerated function at <paramref name="path"/>: bus,
+    /// then device, then function. Past every real key when no function has
+    /// that path, which fails the order check.
     /// </summary>
-    [return: NotNullIfNotNull(nameof(function))]
-    private static string? ExpectedPath(PciDevice? function)
+    private static ulong BusOrderKey(string path, PciFunctionState[] functions)
     {
-        if (function is null)
+        foreach (PciFunctionState function in functions)
         {
-            return null;
-        }
-
-        return $"pci/0000:{function.Bus:x2}:{function.Slot:x2}.{function.Function:x}";
-    }
-
-    /// <summary>
-    /// Sort key of the enumerated function listed at <paramref name="path"/>:
-    /// bus, then device, then function. Past every real key when no
-    /// function has that path, which fails the order check.
-    /// </summary>
-    private static ulong BusOrderKey(string path, PciDevice[] devices)
-    {
-        for (uint i = 0; i < PciManager.Count; i++)
-        {
-            PciDevice function = devices[i];
-            if (ExpectedPath(function) == path)
+            if (function.Path == path)
             {
-                return ((ulong)function.Bus << 16) | ((ulong)function.Slot << 8) | function.Function;
+                return function.BusOrderKey;
             }
         }
 
         return ulong.MaxValue;
     }
 
-    private static DeviceRecord? FindRecord(IReadOnlyList<DeviceRecord> records, string path)
+    /// <summary>The entry of <paramref name="records"/> at <paramref name="path"/>, or null.</summary>
+    private static DeviceInfo? FindRecord(IReadOnlyList<DeviceInfo> records, string path)
     {
         for (int i = 0; i < records.Count; i++)
         {
@@ -2850,12 +3186,12 @@ public class Kernel : Sys.Kernel
     /// function with the same class code, such as a VGA adapter's 03/00/00,
     /// is not a USB interface.
     /// </summary>
-    private static DeviceRecord? FindUsbRecord(byte interfaceClass, byte subclass, byte protocol)
+    private static DeviceInfo? FindUsbRecord(byte interfaceClass, byte subclass, byte protocol)
     {
-        IReadOnlyList<DeviceRecord> records = DriverCore.Devices;
+        IReadOnlyList<DeviceInfo> records = DriverManager.Devices;
         for (int i = 0; i < records.Count; i++)
         {
-            DeviceRecord record = records[i];
+            DeviceInfo record = records[i];
             if (record.Path.StartsWith(UsbPathPrefix, StringComparison.Ordinal)
                 && record.Class == interfaceClass && record.Subclass == subclass && record.Protocol == protocol)
             {
@@ -2866,7 +3202,7 @@ public class Kernel : Sys.Kernel
         return null;
     }
 
-    private static bool IsOwnedBy(DeviceRecord? record, string owner) => record is { } found && found.DriverName == owner;
+    private static bool IsOwnedBy(DeviceInfo? record, string owner) => record is { } found && found.DriverName == owner;
 
     /// <summary>
     /// Asks QEMU to move the usb-mouse with the left button held, then to let
@@ -2943,19 +3279,34 @@ public class Kernel : Sys.Kernel
         }
     }
 
-    /// <summary>Number of enumerated functions with the given vendor and device id.</summary>
-    private static int CountFunctions(ushort vendorId, ushort deviceId)
+    private static bool ThrowsArgumentNull(Action action)
     {
-        PciDevice[]? devices = PciManager.Devices;
-        if (devices is null)
+        try
         {
-            return 0;
+            action();
+            return false;
         }
-
-        int count = 0;
-        for (uint i = 0; i < PciManager.Count; i++)
+        catch (ArgumentNullException)
         {
-            if (devices[i].VendorId == vendorId && devices[i].DeviceId == deviceId)
+            return true;
+        }
+    }
+
+    /// <summary>True when <paramref name="record"/> is a PCI function.</summary>
+    private static bool IsPciRecord(DeviceInfo record) => record.Path.StartsWith(PciPathPrefix, StringComparison.Ordinal);
+
+    /// <summary>True when <paramref name="record"/> is an xHCI controller's PCI function.</summary>
+    private static bool IsXhciRecord(DeviceInfo record) =>
+        IsPciRecord(record) && record.Class == SerialBusClassCode && record.Subclass == UsbSubclass && record.Protocol == XhciProgIf;
+
+    /// <summary>Number of PCI functions the device list holds with the given vendor and device id.</summary>
+    private static int CountListedFunctions(ushort vendorId, ushort deviceId)
+    {
+        IReadOnlyList<DeviceInfo> records = DriverManager.Devices;
+        int count = 0;
+        for (int i = 0; i < records.Count; i++)
+        {
+            if (IsPciRecord(records[i]) && records[i].VendorId == vendorId && records[i].DeviceId == deviceId)
             {
                 count++;
             }
@@ -2964,42 +3315,29 @@ public class Kernel : Sys.Kernel
         return count;
     }
 
-    /// <summary>First enumerated function with the given vendor and device id, or null.</summary>
-    private static PciDevice? FindFunction(ushort vendorId, ushort deviceId)
+    /// <summary>The first PCI function the device list holds with the given vendor and device id, or null.</summary>
+    private static DeviceInfo? FindListedFunction(ushort vendorId, ushort deviceId)
     {
-        PciDevice[]? devices = PciManager.Devices;
-        if (devices is null)
+        IReadOnlyList<DeviceInfo> records = DriverManager.Devices;
+        for (int i = 0; i < records.Count; i++)
         {
-            return null;
-        }
-
-        for (uint i = 0; i < PciManager.Count; i++)
-        {
-            if (devices[i].VendorId == vendorId && devices[i].DeviceId == deviceId)
+            if (IsPciRecord(records[i]) && records[i].VendorId == vendorId && records[i].DeviceId == deviceId)
             {
-                return devices[i];
+                return records[i];
             }
         }
 
         return null;
     }
 
-    private static bool IsXhci(PciDevice device) =>
-        device.ClassCode == SerialBusClassCode && device.Subclass == UsbSubclass && device.ProgIf == XhciProgIf;
-
-    /// <summary>Number of enumerated xHCI controllers.</summary>
-    private static int CountXhciFunctions()
+    /// <summary>Number of xHCI controllers the device list holds.</summary>
+    private static int CountListedXhciFunctions()
     {
-        PciDevice[]? devices = PciManager.Devices;
-        if (devices is null)
-        {
-            return 0;
-        }
-
+        IReadOnlyList<DeviceInfo> records = DriverManager.Devices;
         int count = 0;
-        for (uint i = 0; i < PciManager.Count; i++)
+        for (int i = 0; i < records.Count; i++)
         {
-            if (IsXhci(devices[i]))
+            if (IsXhciRecord(records[i]))
             {
                 count++;
             }
@@ -3008,97 +3346,37 @@ public class Kernel : Sys.Kernel
         return count;
     }
 
-    /// <summary>First enumerated xHCI controller, or null.</summary>
-    private static PciDevice? FindXhciFunction()
+    /// <summary>The first xHCI controller the device list holds, or null.</summary>
+    private static DeviceInfo? FindListedXhciFunction()
     {
-        PciDevice[]? devices = PciManager.Devices;
-        if (devices is null)
+        IReadOnlyList<DeviceInfo> records = DriverManager.Devices;
+        for (int i = 0; i < records.Count; i++)
         {
-            return null;
-        }
-
-        for (uint i = 0; i < PciManager.Count; i++)
-        {
-            if (IsXhci(devices[i]))
+            if (IsXhciRecord(records[i]))
             {
-                return devices[i];
+                return records[i];
             }
         }
 
         return null;
     }
 
-    private static bool IsInterface(UsbInterface usbInterface, byte interfaceClass, byte subclass, byte protocol) =>
-        usbInterface.Class == interfaceClass && usbInterface.Subclass == subclass && usbInterface.Protocol == protocol;
-
-    /// <summary>Number of interfaces with the given class, subclass and protocol across every enumerated USB device.</summary>
-    private static int CountInterfaces(byte interfaceClass, byte subclass, byte protocol)
+    /// <summary>Number of USB interfaces the device list holds with the given class, subclass and protocol.</summary>
+    private static int CountListedInterfaces(byte interfaceClass, byte subclass, byte protocol)
     {
-        IReadOnlyList<UsbDevice> devices = UsbManager.Devices;
+        IReadOnlyList<DeviceInfo> records = DriverManager.Devices;
         int count = 0;
-        for (int i = 0; i < devices.Count; i++)
+        for (int i = 0; i < records.Count; i++)
         {
-            List<UsbInterface> interfaces = devices[i].Interfaces;
-            for (int j = 0; j < interfaces.Count; j++)
+            DeviceInfo record = records[i];
+            if (record.Path.StartsWith(UsbPathPrefix, StringComparison.Ordinal)
+                && record.Class == interfaceClass && record.Subclass == subclass && record.Protocol == protocol)
             {
-                if (IsInterface(interfaces[j], interfaceClass, subclass, protocol))
-                {
-                    count++;
-                }
+                count++;
             }
         }
 
         return count;
-    }
-
-    /// <summary>First interface with the given class, subclass and protocol of any enumerated USB device, and that device; null for none.</summary>
-    private static UsbInterface? FindInterface(byte interfaceClass, byte subclass, byte protocol, out UsbDevice? device)
-    {
-        IReadOnlyList<UsbDevice> devices = UsbManager.Devices;
-        for (int i = 0; i < devices.Count; i++)
-        {
-            List<UsbInterface> interfaces = devices[i].Interfaces;
-            for (int j = 0; j < interfaces.Count; j++)
-            {
-                if (IsInterface(interfaces[j], interfaceClass, subclass, protocol))
-                {
-                    device = devices[i];
-                    return interfaces[j];
-                }
-            }
-        }
-
-        device = null;
-        return null;
-    }
-
-    /// <summary>
-    /// The path the kit documents for <paramref name="usbInterface"/> of
-    /// <paramref name="device"/>, as in <c>usb/1-2.1:1.0</c>: the bus, which
-    /// is the host controller's position from 1, a dash, the root port then
-    /// each hub port below it joined with dots, a colon, the configuration
-    /// value, a dot and the interface number, all in decimal.
-    /// </summary>
-    private static string ExpectedUsbPath(UsbDevice device, UsbInterface usbInterface)
-    {
-        IReadOnlyList<UsbHostController> controllers = UsbManager.Controllers;
-        int bus = 0;
-        for (int i = 0; i < controllers.Count; i++)
-        {
-            if (controllers[i] == device.HostController)
-            {
-                bus = i + 1;
-                break;
-            }
-        }
-
-        string ports = $"{device.PortNumber}";
-        for (UsbDevice? hub = device.Parent; hub is not null; hub = hub.Parent)
-        {
-            ports = $"{hub.PortNumber}.{ports}";
-        }
-
-        return $"usb/{bus}-{ports}:{device.ConfigurationValue}.{usbInterface.Number}";
     }
 
     /// <summary>
@@ -3108,25 +3386,44 @@ public class Kernel : Sys.Kernel
     /// built-in. The tablet has no driver until the hot-plug cells plug it
     /// back in, and the link driver's from then on.
     /// </summary>
-    private static string? ExpectedUsbOwner(UsbInterface usbInterface)
+    private static string? ExpectedUsbOwner(UsbInterfaceState usbInterface)
     {
-        if (IsInterface(usbInterface, HidClass, BootInterfaceSubclass, MouseProtocol))
+        if (usbInterface.Is(HidClass, BootInterfaceSubclass, MouseProtocol))
         {
             return UsbBootMouseDriver.Name;
         }
 
-        if (IsInterface(usbInterface, HidClass, TabletSubclass, TabletProtocol))
+        if (usbInterface.Is(HidClass, TabletSubclass, TabletProtocol))
         {
             return UsbTabletLinkDriver.IsBound ? UsbTabletLinkDriver.Name : null;
         }
 
-        if (IsInterface(usbInterface, HidClass, BootInterfaceSubclass, KeyboardProtocol))
+        if (usbInterface.Is(HidClass, BootInterfaceSubclass, KeyboardProtocol))
         {
             return UsbKeyboardName;
         }
 
-        return usbInterface.Driver?.Name;
+        return usbInterface.ClassDriverName;
     }
+
+    /// <summary>
+    /// Null, typed as a registration the compiler takes for non-null: an
+    /// array's slots start null, and flow analysis does not track them. How
+    /// a cell hands null to a parameter that must refuse it without the
+    /// null-forgiving operator.
+    /// </summary>
+    private static PciDriverRegistration NullPciRegistration() => (new PciDriverRegistration[1])[0];
+
+    /// <summary>As <see cref="NullPciRegistration"/>, for the USB overload.</summary>
+    private static UsbDriverRegistration NullUsbRegistration() => (new UsbDriverRegistration[1])[0];
+
+    /// <summary>
+    /// True when <paramref name="message"/> is the one Register throws with
+    /// from inside a driver's factory or Probe, rather than the one it throws
+    /// once registration closed; false for no message.
+    /// </summary>
+    private static bool IsDriverCallbackRefusal(string? message) =>
+        message is not null && message.Contains(RegisterFromDriverCallbackMessagePart, StringComparison.Ordinal);
 
     /// <summary>A transfer status for a message; the enum's own ToString needs metadata the kernel may not keep.</summary>
     private static string DescribeStatus(UsbTransferStatus? status) => status switch
