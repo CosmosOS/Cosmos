@@ -10,7 +10,7 @@
   //         so a typo fails the catalog load rather than QEMU. A NIC model
   //         gets a user-mode netdev of its own, and like "nic" that drops
   //         QEMU's default NIC.
-  //       - "usb": USB models, e.g. ["usb-mouse", "usb-kbd"], checked the
+  //       - "usb": USB models, e.g. ["usb-mouse", "usb-tablet"], checked the
   //         same way and placed on one qemu-xhci controller, the one a USB
   //         disk uses when the profile has one. This is the axis for USB
   //         devices: "mouse"/"keyboard" emit a bare -device, and neither q35
@@ -154,9 +154,8 @@
     {
       // The four profiles below are the Drivers suite's cells: hardware no
       // built-in driver claims, left for a user driver to bind. Each adds
-      // one piece of it to the machine's defaults, so the suite can pin that
-      // exactly one such function or interface came up and that nothing
-      // owns it.
+      // it to the machine's defaults once, so the suite can pin that exactly
+      // one such function or interface came up and that nothing owns it.
       //
       // QEMU's educational device (1234:11e8): an MMIO BAR with an ID
       // register, a factorial unit, an interrupt it raises on request and a
@@ -184,12 +183,18 @@
       "devices": ["e1000e"]
     },
     {
-      // A USB mouse on a qemu-xhci root port, and no USB stick. The xHCI
-      // built-in owns the controller; no class driver takes a HID mouse
-      // interface (class 3, subclass 1, protocol 2), so it stays unbound.
-      "name": "usb-mouse",
+      // A USB mouse, a USB tablet and a USB keyboard on qemu-xhci root
+      // ports, and no USB stick. The xHCI built-in owns the controller; no
+      // class driver takes a HID mouse interface (class 3, subclass 1,
+      // protocol 2) or the tablet's (class 3, no boot subclass or protocol),
+      // so both are left to the suite's USB drivers, while the built-in
+      // keyboard driver takes the keyboard's (class 3, subclass 1, protocol
+      // 1) before any of them. All three share QEMU's HID IDs, 0627:0001.
+      // The suite pulls each one out and plugs it back in by its index in
+      // this list, so the order is part of the suite.
+      "name": "usb-hid",
       "architectures": ["x64", "arm64"],
-      "usb": ["usb-mouse"]
+      "usb": ["usb-mouse", "usb-tablet", "usb-kbd"]
     }
   ],
   "modifiers": [

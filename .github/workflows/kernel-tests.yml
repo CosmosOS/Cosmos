@@ -355,7 +355,7 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Drivers
       timeout_x64: 60
       timeout_arm64: 90
-      # arm64 expands to 15 cells ({edu,rtl8139,e1000e-arm64,usb-mouse,nvme}
+      # arm64 expands to 15 cells ({edu,rtl8139,e1000e-arm64,usb-hid,nvme}
       # x {bare,gicv2,gicv3}) at up to 90 s each, x64 to 4. The step budget
       # covers every arm64 cell hanging plus the build, so OutputHandlerXml
       # still writes results; the job budget must stay above it plus setup.

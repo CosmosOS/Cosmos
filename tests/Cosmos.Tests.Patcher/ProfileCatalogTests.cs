@@ -169,11 +169,11 @@ public class ProfileCatalogTests
     [Theory]
     [InlineData("x64", "edu", " -device edu")]
     [InlineData("x64", "rtl8139", " -netdev user,id=devnet0 -device rtl8139,netdev=devnet0")]
-    [InlineData("x64", "usb-mouse", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0")]
+    [InlineData("x64", "usb-hid", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0,id=usbdev0 -device usb-tablet,bus=usbxhci0.0,id=usbdev1 -device usb-kbd,bus=usbxhci0.0,id=usbdev2")]
     [InlineData("arm64", "edu", " -device edu")]
     [InlineData("arm64", "rtl8139", " -netdev user,id=devnet0 -device rtl8139,netdev=devnet0")]
     [InlineData("arm64", "e1000e-arm64", " -netdev user,id=devnet0 -device e1000e,netdev=devnet0")]
-    [InlineData("arm64", "usb-mouse", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0")]
+    [InlineData("arm64", "usb-hid", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0,id=usbdev0 -device usb-tablet,bus=usbxhci0.0,id=usbdev1 -device usb-kbd,bus=usbxhci0.0,id=usbdev2")]
     public void DriversSuiteAttachesOneUnclaimedDevicePerProfile(string architecture, string profileName, string expected)
     {
         TestProfile cell = LoadCell("Drivers", profileName, architecture);
@@ -185,7 +185,7 @@ public class ProfileCatalogTests
 
     // The E1000E built-in claims the 82574L on x64, so only arm64 presents it
     // unclaimed, and a driver there gets MSI-X only through the GICv3 ITS.
-    // The USB mouse runs on both GICs: xHCI takes MSI-X on GICv3 and is
+    // The USB devices run on both GICs: xHCI takes MSI-X on GICv3 and is
     // polled on GICv2.
     [Fact]
     public void DriversSuiteCoversTheGicVersionsItsCellsNeed()
@@ -193,14 +193,14 @@ public class ProfileCatalogTests
         string suiteDir = Path.Combine(FindRepoRoot(), "tests", "Kernels", "Cosmos.Kernel.Tests.Drivers");
 
         IReadOnlyList<TestProfile> x64Cells = TestProfileLoader.LoadFor(suiteDir, "x64");
-        string[] x64Names = ["edu", "rtl8139", "usb-mouse"];
+        string[] x64Names = ["edu", "rtl8139", "usb-hid", "nvme"];
         Assert.Equal(x64Names, x64Cells.Select(c => c.Name).ToArray());
         Assert.All(x64Cells, c => Assert.False(c.MachineOptions.ContainsKey("gic-version")));
 
         IReadOnlyList<TestProfile> arm64Cells = TestProfileLoader.LoadFor(suiteDir, "arm64");
         Assert.Equal("3", Assert.Single(arm64Cells, c => c.Name == "e1000e-arm64+gicv3").MachineOptions["gic-version"]);
-        Assert.Equal("2", Assert.Single(arm64Cells, c => c.Name == "usb-mouse+gicv2").MachineOptions["gic-version"]);
-        Assert.Equal("3", Assert.Single(arm64Cells, c => c.Name == "usb-mouse+gicv3").MachineOptions["gic-version"]);
+        Assert.Equal("2", Assert.Single(arm64Cells, c => c.Name == "usb-hid+gicv2").MachineOptions["gic-version"]);
+        Assert.Equal("3", Assert.Single(arm64Cells, c => c.Name == "usb-hid+gicv3").MachineOptions["gic-version"]);
     }
 
     /// <summary>Loads one suite for one architecture and returns its bare cell for <paramref name="profileName"/>.</summary>

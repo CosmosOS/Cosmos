@@ -91,5 +91,12 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.Graphic</_Parameter1>
     </AssemblyAttribute>
+    <!-- Temporary, like HAL's grant to the same suite: the driver kit's USB
+         cells (Drivers) check that pulling a device out takes the mouse and
+         the network link its driver published out of MouseManager,
+         NetworkManager and the stack's address maps. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Cosmos.Kernel.Tests.Drivers</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 </Project>

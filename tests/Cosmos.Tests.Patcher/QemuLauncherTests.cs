@@ -54,7 +54,7 @@ public class QemuLauncherTests
     {
         StringBuilder args = new();
         QemuLauncher.AppendUsbDevices(args, ["usb-mouse"], controllerPresent: false);
-        Assert.Equal(" -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0", args.ToString());
+        Assert.Equal(" -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0,id=usbdev0", args.ToString());
     }
 
     [Fact]
@@ -62,7 +62,34 @@ public class QemuLauncherTests
     {
         StringBuilder args = new();
         QemuLauncher.AppendUsbDevices(args, ["usb-kbd"], controllerPresent: true);
-        Assert.Equal(" -device usb-kbd,bus=usbxhci0.0", args.ToString());
+        Assert.Equal(" -device usb-kbd,bus=usbxhci0.0,id=usbdev0", args.ToString());
+    }
+
+    // The ids are what QemuHotPlug unplugs each device by and which
+    // UsbDeviceId hands it: entry n is usbdev<n>, in list order.
+    [Fact]
+    public void AppendUsbDevices_GivesEachDeviceTheIdOfItsListPosition()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendUsbDevices(args, ["usb-mouse", "usb-tablet", "usb-kbd"], controllerPresent: true);
+
+        Assert.Equal(
+            " -device usb-mouse,bus=usbxhci0.0,id=usbdev0" +
+            " -device usb-tablet,bus=usbxhci0.0,id=usbdev1" +
+            " -device usb-kbd,bus=usbxhci0.0,id=usbdev2",
+            args.ToString());
+        Assert.Equal("usbdev2", QemuLauncher.UsbDeviceId(2));
+    }
+
+    // Storage's hot-plug addresses its sticks by these; the usb axis's ids
+    // must not take their place.
+    [Fact]
+    public void UsbStickIds_StayApartFromTheUsbDeviceIds()
+    {
+        Assert.Equal("usbstick0", QemuLauncher.UsbStickId(0));
+        Assert.Equal("usbdisk0", QemuLauncher.UsbDriveId(0));
+        Assert.Equal("usbxhci0", QemuLauncher.UsbControllerId);
+        Assert.NotEqual(QemuLauncher.UsbStickId(0), QemuLauncher.UsbDeviceId(0));
     }
 
     // No devices, no controller: a USB-less cell must not grow an xHCI

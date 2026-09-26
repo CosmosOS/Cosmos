@@ -96,7 +96,8 @@ public sealed class QemuLaunchOptions
     /// root hub of the <c>qemu-xhci</c> controller that USB disks use, which
     /// is added for them when no USB disk already brought it. Needed on both
     /// x64 (q35) and ARM64 (virt), since neither machine has a USB bus of its
-    /// own for a bare <c>-device usb-*</c> to land on.
+    /// own for a bare <c>-device usb-*</c> to land on. Entry n gets the QEMU
+    /// id <see cref="QemuLauncher.UsbDeviceId"/>(n).
     /// </summary>
     public IReadOnlyList<string> UsbDevices { get; init; } = Array.Empty<string>();
 
@@ -190,7 +191,13 @@ public static class QemuLauncher
     public static string UsbDriveId(int index) => $"usbdisk{index}";
 
     /// <summary>QEMU id of the <paramref name="index"/>th USB disk's usb-storage device, the one to unplug.</summary>
-    public static string UsbDeviceId(int index) => $"usbstick{index}";
+    public static string UsbStickId(int index) => $"usbstick{index}";
+
+    /// <summary>
+    /// QEMU id of the <paramref name="index"/>th <see cref="QemuLaunchOptions.UsbDevices"/>
+    /// entry, the one a test runner unplugs or plugs back in.
+    /// </summary>
+    public static string UsbDeviceId(int index) => $"usbdev{index}";
 
     public static async Task<QemuLaunchPlan> BuildAsync(QemuLaunchOptions options)
     {
@@ -468,7 +475,7 @@ public static class QemuLauncher
                         usbControllerEmitted = true;
                     }
                     args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={UsbDriveId(usbIndex)},format=raw");
-                    args.Append($" -device usb-storage,drive={UsbDriveId(usbIndex)},bus={UsbControllerId}.0,id={UsbDeviceId(usbIndex)}");
+                    args.Append($" -device usb-storage,drive={UsbDriveId(usbIndex)},bus={UsbControllerId}.0,id={UsbStickId(usbIndex)}");
                     AppendDeviceOptions(args, disk.ExtraDeviceOptions);
                     usbIndex++;
                     break;
@@ -487,7 +494,8 @@ public static class QemuLauncher
     /// (<paramref name="controllerPresent"/>). One controller serves both: a
     /// second one would give the guest a second xHCI function to bring up,
     /// changing what the cell tests. The explicit <c>bus=</c> pins each device
-    /// to the controller whose bus <c>QemuHotPlug</c> plugs sticks back into.
+    /// to the controller whose bus <c>QemuHotPlug</c> plugs devices back into,
+    /// and the <see cref="UsbDeviceId"/> is what it unplugs them by.
     /// </summary>
     internal static void AppendUsbDevices(StringBuilder args, IReadOnlyList<string> models, bool controllerPresent)
     {
@@ -501,10 +509,10 @@ public static class QemuLauncher
             AppendUsbController(args);
         }
 
-        foreach (string model in models)
+        for (int i = 0; i < models.Count; i++)
         {
-            ValidateOptionToken(model, "USB device model");
-            args.Append($" -device {model},bus={UsbControllerId}.0");
+            ValidateOptionToken(models[i], "USB device model");
+            args.Append($" -device {models[i]},bus={UsbControllerId}.0,id={UsbDeviceId(i)}");
         }
     }
 

@@ -48,7 +48,7 @@ public interface IQemuHost
     /// <param name="disks">Per-profile disk attachments. AHCI entries share one <c>ich9-ahci</c> controller; NVMe entries each get their own <c>nvme</c> controller; USB entries share one <c>qemu-xhci</c> controller. Per-disk extra device options (e.g. <c>msix=off</c>) flow through.</param>
     /// <param name="machineOptions">Extra <c>-M</c> properties (e.g. <c>{"gic-version", "2"}</c> on ARM64). Caller is responsible for passing arch-appropriate keys.</param>
     /// <param name="devices">Per-profile NIC, input, display, extra and USB device models; null leaves the architecture defaults in place.</param>
-    /// <param name="hotPlug">Carries out the guest's requests to plug its USB sticks in and out, through the QMP monitor QEMU is launched with; null when the run attaches none.</param>
+    /// <param name="hotPlug">Carries out the guest's requests to plug its USB sticks and USB devices in and out and to move its USB mice, through the QMP monitor QEMU is launched with; null when the run attaches no USB stick or USB device.</param>
     /// <returns>Exit code and UART log content</returns>
     Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuHotPlug? hotPlug = null);
 }
