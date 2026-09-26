@@ -29,7 +29,7 @@ flowchart LR;
 | Project | Purpose |
 |---------|---------|
 | **Cosmos.Kernel.System** | High-level OS APIs: Console, Graphics, Network, Timer, Mouse. The layer user kernels interact with. |
-| **Cosmos.Kernel.HAL** | Hardware Abstraction Layer: shared logic, platform registration (`PlatformHAL`), device managers, arch-independent drivers (AHCI, NVMe, virtio, xHCI with the USB class drivers). |
+| **Cosmos.Kernel.HAL** | Hardware Abstraction Layer: shared logic, platform registration (`PlatformHAL`), device managers, arch-independent drivers (AHCI, NVMe, virtio, xHCI with the USB class drivers), and the internal driver kit engine (`Drivers/`) that binds the PCI and USB drivers a kernel registers. `UsbManager` offers each USB interface to its `UsbClassDriver`s in order: the hub, keyboard and mass storage built-ins, then the kit's `KitUsbDriver`, so a registered driver only ever gets what no built-in took, at boot and on hot-plug. |
 | **Cosmos.Kernel.HAL.Interfaces** | Pure interfaces, no implementations. Public: `IBlockDevice`, which kernels implement and drive directly, `MACAddress`, and `SoftwareTimer` as a read-only handle. Internal: the boot contract `IPlatformInitializer`, `IGraphicDevice`, the input, timer and network devices, and `SoftwareTimer`'s construction and tick members. |
 | **Cosmos.Kernel.HAL.X64** | x86-64 HAL implementations (PCI, APIC, PS/2, ACPI, etc.). |
 | **Cosmos.Kernel.HAL.ARM64** | ARM64 HAL implementations (GIC, PL011, generic timer, etc.). |

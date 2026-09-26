@@ -94,6 +94,17 @@ internal sealed unsafe partial class XhciController
         bool succeeded = code is XhciCompletionCode.Success or XhciCompletionCode.ShortPacket;
         if (trb.EndpointId == XhciDevice.ControlEndpointId)
         {
+            // The device answered a device-to-host request with less than
+            // it was asked for. Not the end of the transfer: the Status
+            // Stage runs next and reports it; this only says how much of
+            // the data stage was left unfilled.
+            if (device == _transferDevice && code == XhciCompletionCode.ShortPacket
+                && _transferDataTrb != 0 && trb.Parameter == _transferDataTrb)
+            {
+                _transferResidual = trb.ResidualLength;
+                return;
+            }
+
             // An error ends a transfer on whichever stage it hit; success
             // only counts once the Status Stage completes.
             if (device == _transferDevice && (trb.Parameter == _transferStatusTrb || !succeeded))

@@ -52,7 +52,14 @@ internal static class ProfileDeviceModels
     private static readonly string[] s_devicesAxisModels = [.. s_deviceModels, .. s_networkCardModels];
 
     /// <summary>USB models, placed on the xHCI root hub.</summary>
-    private static readonly string[] s_usbModels = ["usb-mouse", "usb-kbd"];
+    private static readonly string[] s_usbModels =
+    [
+        "usb-mouse",
+        "usb-kbd",
+        // A HID interface with no boot subclass or protocol, which no
+        // built-in class driver takes, beside the mouse's boot one.
+        "usb-tablet"
+    ];
 
     /// <summary>
     /// Checks a profile's <c>"devices"</c> list and resolves each entry to

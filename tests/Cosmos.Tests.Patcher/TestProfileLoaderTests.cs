@@ -284,7 +284,7 @@ public class TestProfileLoaderTests : IDisposable
         },
         {
           "name": "hid",
-          "usb": ["usb-mouse", "usb-kbd"]
+          "usb": ["usb-mouse", "usb-kbd", "usb-tablet"]
         },
         {
           "name": "stick-and-hid",
@@ -336,7 +336,7 @@ public class TestProfileLoaderTests : IDisposable
 
         TestProfile profile = Assert.Single(TestProfileLoader.LoadFor(_suiteDir, "arm64"));
 
-        Assert.Equal(new[] { "usb-mouse", "usb-kbd" }, profile.UsbDevices);
+        Assert.Equal(new[] { "usb-mouse", "usb-kbd", "usb-tablet" }, profile.UsbDevices);
         Assert.Empty(profile.Devices);
     }
 
@@ -388,7 +388,8 @@ public class TestProfileLoaderTests : IDisposable
     }
 
     // Neither q35 nor virt has a USB bus of its own, so the axis brings the
-    // controller; bus= pins each device to it.
+    // controller; bus= pins each device to it, and the id, in list order, is
+    // what QemuHotPlug unplugs it by.
     [Theory]
     [InlineData("x64")]
     [InlineData("arm64")]
@@ -400,14 +401,16 @@ public class TestProfileLoaderTests : IDisposable
 
         Assert.Equal(
             " -device qemu-xhci,id=usbxhci0" +
-            " -device usb-mouse,bus=usbxhci0.0" +
-            " -device usb-kbd,bus=usbxhci0.0",
+            " -device usb-mouse,bus=usbxhci0.0,id=usbdev0" +
+            " -device usb-kbd,bus=usbxhci0.0,id=usbdev1" +
+            " -device usb-tablet,bus=usbxhci0.0,id=usbdev2",
             ProfileLaunchArgs.For(profile, architecture));
     }
 
     // One controller, not two: a second would be a second xHCI function for
     // the kernel to bring up. The stick keeps the ids QemuHotPlug unplugs and
-    // re-plugs it by (usbdisk0, usbstick0, bus usbxhci0.0).
+    // re-plugs it by (usbdisk0, usbstick0, bus usbxhci0.0), and the devices'
+    // ids count from 0 whatever sticks come before them.
     [Theory]
     [InlineData("x64")]
     [InlineData("arm64")]
@@ -422,8 +425,8 @@ public class TestProfileLoaderTests : IDisposable
             " -device qemu-xhci,id=usbxhci0" +
             " -drive file=\"/tmp/disk0.img\",if=none,id=usbdisk0,format=raw" +
             " -device usb-storage,drive=usbdisk0,bus=usbxhci0.0,id=usbstick0" +
-            " -device usb-mouse,bus=usbxhci0.0" +
-            " -device usb-kbd,bus=usbxhci0.0",
+            " -device usb-mouse,bus=usbxhci0.0,id=usbdev0" +
+            " -device usb-kbd,bus=usbxhci0.0,id=usbdev1",
             args);
         Assert.Equal(args.IndexOf("qemu-xhci", StringComparison.Ordinal), args.LastIndexOf("qemu-xhci", StringComparison.Ordinal));
     }

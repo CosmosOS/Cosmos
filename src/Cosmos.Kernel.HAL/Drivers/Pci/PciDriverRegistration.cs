@@ -26,7 +26,8 @@ internal sealed class PciDriverRegistration
     /// <param name="name">
     /// The driver's name: the owner recorded on every function it binds, and
     /// the prefix of its log lines. A short lowercase name, such as
-    /// <c>rtl8139</c>, unique among the registered drivers.
+    /// <c>rtl8139</c>, unique among the registered drivers, USB ones
+    /// included.
     /// </param>
     /// <param name="factory">Creates one driver instance for each function the driver is offered.</param>
     /// <param name="matches">The functions to offer the driver; copied.</param>

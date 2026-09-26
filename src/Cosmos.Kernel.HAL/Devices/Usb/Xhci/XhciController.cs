@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 /// the controller behind every USB port of a PC since ~2012 and of QEMU's
 /// qemu-xhci. Device-class agnostic: it addresses devices, runs control
 /// and bulk transfers, opens interrupt endpoints and registers hubs, and
-/// leaves what the devices are to the <see cref="UsbDriver"/>s.
+/// leaves what the devices are to the <see cref="UsbClassDriver"/>s.
 ///
 /// <para>Commands, control transfers and bulk transfers are synchronous
 /// and only issued from thread context. Completions arrive on one event

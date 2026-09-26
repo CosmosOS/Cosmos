@@ -3,6 +3,7 @@
 using System.Buffers.Binary;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Usb;
+using Cosmos.Kernel.HAL.Drivers.Usb;
 using SchedMutex = Cosmos.Kernel.Core.Scheduler.Mutex;
 
 namespace Cosmos.Kernel.HAL.Devices.Storage;

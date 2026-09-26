@@ -13,4 +13,9 @@
     <ProjectReference Include="../../src/Cosmos.Tools/Cosmos.Tools.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The host tests pin how a guest's host requests parse and which QMP events a pointer request sends. -->
+    <InternalsVisibleTo Include="Cosmos.Tests.Patcher" />
+  </ItemGroup>
+
 </Project>

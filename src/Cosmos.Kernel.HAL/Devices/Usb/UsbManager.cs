@@ -6,6 +6,8 @@ using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Devices.Usb.Xhci;
+using Cosmos.Kernel.HAL.Drivers.Engine;
+using Cosmos.Kernel.HAL.Drivers.Usb;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
 
@@ -21,8 +23,10 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// host controllers (<see cref="UsbHostController"/>, today
 /// <see cref="XhciController"/>), the shared enumeration here plus the
 /// <see cref="UsbDevice"/> model, and class drivers
-/// (<see cref="UsbDriver"/>: <see cref="UsbHubDriver"/>,
-/// <see cref="UsbKeyboardDriver"/>, <see cref="UsbMassStorageDriver"/>).</para>
+/// (<see cref="UsbClassDriver"/>: <see cref="UsbHubDriver"/>,
+/// <see cref="UsbKeyboardDriver"/>, <see cref="UsbMassStorageDriver"/>, and
+/// last <see cref="KitUsbDriver"/>, which stands for the drivers a kernel
+/// registers).</para>
 ///
 /// <para>Hot-plug runs on a thread of its own, which
 /// <see cref="StartHotPlug"/> starts once the scheduler runs. A port change
@@ -42,7 +46,7 @@ internal static class UsbManager
     private const uint PollIntervalMs = 250;
 
     private static List<UsbHostController>? s_controllers;
-    private static List<UsbDriver>? s_drivers;
+    private static List<UsbClassDriver>? s_drivers;
     private static List<UsbDevice>? s_devices;
 
     /// <summary>Signaled from interrupt context by every port change report; the hot-plug thread waits on it.</summary>
@@ -69,8 +73,9 @@ internal static class UsbManager
         (IReadOnlyList<UsbDevice>?)s_devices ?? Array.Empty<UsbDevice>();
 
     /// <summary>
-    /// Registers the built-in class drivers, starts every xHCI controller and
-    /// enumerates the devices behind their root ports. Idempotent.
+    /// Registers the built-in class drivers, then the driver kit's behind
+    /// them, starts every xHCI controller and enumerates the devices behind
+    /// their root ports. Idempotent.
     /// </summary>
     public static void Initialize()
     {
@@ -89,6 +94,10 @@ internal static class UsbManager
         {
             s_drivers.Add(new UsbMassStorageDriver());
         }
+
+        // Last: the drivers a kernel registers are offered only what every
+        // built-in left, on hot-plug as at boot.
+        s_drivers.Add(KitUsbDriver.Instance);
 
         s_devices = [];
         s_portChange = new InterruptEvent();
@@ -226,6 +235,10 @@ internal static class UsbManager
 
         s_devices?.Add(device);
         BindDrivers(device);
+
+        // Once the driver pass published the device list, the enumerating
+        // thread keeps it current; the boot-time enumeration runs before.
+        DriverCore.RefreshDevices();
         return device;
     }
 
@@ -249,6 +262,7 @@ internal static class UsbManager
         // driver below waits on a device that will never answer.
         MarkDisconnected(device);
         Disconnect(device);
+        DriverCore.RefreshDevices();
     }
 
     internal static void DelayMilliseconds(uint milliseconds) =>
@@ -391,7 +405,7 @@ internal static class UsbManager
 
         foreach (UsbInterface usbInterface in device.Interfaces)
         {
-            UsbDriver? driver = usbInterface.Driver;
+            UsbClassDriver? driver = usbInterface.Driver;
             if (driver is null)
             {
                 continue;
@@ -439,7 +453,7 @@ internal static class UsbManager
 
         foreach (UsbInterface usbInterface in device.Interfaces)
         {
-            foreach (UsbDriver driver in s_drivers)
+            foreach (UsbClassDriver driver in s_drivers)
             {
                 if (TryBind(driver, device, usbInterface))
                 {
@@ -454,7 +468,9 @@ internal static class UsbManager
             Serial.WriteString(" (class 0x");
             Serial.WriteHex((uint)usbInterface.Class);
             Serial.WriteString("): ");
-            Serial.WriteString(usbInterface.Driver?.Name ?? "no driver");
+            // The registration's name for an interface a kernel's driver
+            // took, not the driver kit's.
+            Serial.WriteString(usbInterface.DriverName ?? "no driver");
             Serial.WriteString("\n");
         }
     }
@@ -464,7 +480,7 @@ internal static class UsbManager
     /// interface instead of aborting the enumeration of every device after it
     /// (the hub driver enumerates whole subtrees from inside its bind).
     /// </summary>
-    private static bool TryBind(UsbDriver driver, UsbDevice device, UsbInterface usbInterface)
+    private static bool TryBind(UsbClassDriver driver, UsbDevice device, UsbInterface usbInterface)
     {
         try
         {

@@ -11,7 +11,8 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// the handler itself only schedules it. Created during Probe through
 /// <see cref="DeviceContext.TryCreateWorkItem"/> and owned by the binding:
 /// scheduled during Probe, it runs once Probe returned Bound, and it never
-/// runs if the attempt is declined or fails.
+/// runs if the attempt is declined or fails, nor once the USB device it was
+/// created for left the bus.
 /// </summary>
 internal sealed class DeviceWorkItem
 {
@@ -35,12 +36,15 @@ internal sealed class DeviceWorkItem
         /// <summary>The binding is Bound: a Schedule queues the item for the driver-work thread.</summary>
         Armed,
 
-        /// <summary>The attempt was torn down, or the callback threw: Schedule refuses.</summary>
+        /// <summary>The attempt was torn down, its USB device left, or the callback threw: Schedule refuses.</summary>
         Disarmed
     }
 
     /// <summary>The next item in the driver-work queue. Guarded by the queue's lock.</summary>
     internal DeviceWorkItem? NextQueued { get; set; }
+
+    /// <summary>The binding that created the item, which a USB unplug waits on while the item runs.</summary>
+    internal DeviceContext Context => _context;
 
     internal DeviceWorkItem(DeviceContext context, Action callback)
     {
@@ -58,7 +62,7 @@ internal sealed class DeviceWorkItem
     /// <returns>
     /// True when the item is now waiting to run. False when it already was,
     /// or when it can never run again: its binding attempt was declined or
-    /// failed, or its callback threw.
+    /// failed, its USB device left the bus, or its callback threw.
     /// </returns>
     public bool Schedule()
     {
@@ -117,8 +121,9 @@ internal sealed class DeviceWorkItem
     }
 
     /// <summary>
-    /// Called when the binding attempt is torn down: a Schedule made during
-    /// Probe is forgotten, and the item never runs.
+    /// Called when the binding attempt is torn down, or its USB device left
+    /// the bus: a Schedule not yet run is forgotten, and the item never runs
+    /// again. A callback already running finishes.
     /// </summary>
     internal void Drop()
     {

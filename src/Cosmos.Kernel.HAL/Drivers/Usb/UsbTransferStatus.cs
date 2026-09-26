@@ -1,6 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.HAL.Devices.Usb;
+namespace Cosmos.Kernel.HAL.Drivers.Usb;
 
 /// <summary>
 /// Outcome of a synchronous USB transfer, independent of the host

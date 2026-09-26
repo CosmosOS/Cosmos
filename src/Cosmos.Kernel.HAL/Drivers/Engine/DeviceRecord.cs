@@ -3,13 +3,15 @@
 namespace Cosmos.Kernel.HAL.Drivers.Engine;
 
 /// <summary>
-/// One device as the driver pass left it: where it sits, which driver owns
-/// it, and the IDs drivers match on. The engine's device list is made of
-/// these, built-in drivers' devices included.
+/// One device as the driver pass left it, or as the USB stack last changed
+/// it: where it sits, which driver owns it, and the IDs drivers match on.
+/// A PCI function is one device, and so is each interface of a USB device.
+/// The engine's device list is made of these, built-in drivers' devices
+/// included.
 /// </summary>
 internal readonly struct DeviceRecord
 {
-    /// <summary>Where the device sits, such as <c>pci/0000:00:04.0</c>.</summary>
+    /// <summary>Where the device sits, such as <c>pci/0000:00:04.0</c> or <c>usb/1-2.1:1.0</c>.</summary>
     public string Path { get; }
 
     /// <summary>
@@ -22,16 +24,16 @@ internal readonly struct DeviceRecord
     /// <summary>The vendor ID.</summary>
     public ushort VendorId { get; }
 
-    /// <summary>The device ID.</summary>
+    /// <summary>The device ID; for a USB interface, its device's product ID.</summary>
     public ushort DeviceId { get; }
 
-    /// <summary>The base class code.</summary>
+    /// <summary>The base class code; for a USB interface, the interface's class.</summary>
     public byte Class { get; }
 
-    /// <summary>The subclass code.</summary>
+    /// <summary>The subclass code; for a USB interface, the interface's subclass.</summary>
     public byte Subclass { get; }
 
-    /// <summary>The protocol: a PCI function's programming interface.</summary>
+    /// <summary>The protocol: a PCI function's programming interface, or a USB interface's protocol.</summary>
     public byte Protocol { get; }
 
     internal DeviceRecord(string path, string? driverName, ushort vendorId, ushort deviceId, byte baseClass, byte subclass, byte protocol)

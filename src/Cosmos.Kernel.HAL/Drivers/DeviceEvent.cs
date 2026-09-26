@@ -11,15 +11,15 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// are counted: each <see cref="Signal"/> lets one <see cref="Wait"/>
 /// return, whether it came before that Wait or during it. Created during
 /// Probe through <see cref="DeviceContext.CreateEvent"/> and owned by the
-/// binding: once the binding attempt is declined or fails, every Wait
-/// returns false.
+/// binding: once the binding attempt is declined or fails, or the USB
+/// device it was created for leaves the bus, every Wait returns false.
 /// </summary>
 internal sealed class DeviceEvent
 {
     private readonly DeviceContext _context;
     private readonly InterruptEvent _event = new();
 
-    /// <summary>Set when the binding attempt is torn down; every Wait returns false from then on.</summary>
+    /// <summary>Set when the binding attempt is torn down or its USB device left; every Wait returns false from then on.</summary>
     private volatile bool _cancelled;
 
     internal DeviceEvent(DeviceContext context)
@@ -42,7 +42,8 @@ internal sealed class DeviceEvent
     /// </summary>
     /// <returns>
     /// True when a signal was consumed. False once the binding attempt that
-    /// created the event was declined or failed, without waiting.
+    /// created the event was declined or failed, or its USB device left the
+    /// bus, without waiting.
     /// </returns>
     /// <exception cref="InvalidOperationException">
     /// The Probe that created the event is still running. Its interrupts are
@@ -74,7 +75,8 @@ internal sealed class DeviceEvent
 
     /// <summary>
     /// Makes every <see cref="Wait"/>, running or to come, return false.
-    /// Called when the binding attempt that created the event is torn down.
+    /// Called when the binding attempt that created the event is torn down,
+    /// and when its USB device leaves the bus.
     /// </summary>
     internal void Cancel()
     {

@@ -2,6 +2,7 @@
 
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Usb;
+using Cosmos.Kernel.HAL.Drivers.Usb;
 
 namespace Cosmos.Kernel.HAL.Devices.Storage;
 
@@ -16,7 +17,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// are reported through <see cref="DiskAttached"/> and
 /// <see cref="DiskDetached"/>.
 /// </summary>
-internal sealed class UsbMassStorageDriver : UsbDriver
+internal sealed class UsbMassStorageDriver : UsbClassDriver
 {
     /// <summary>bInterfaceSubClass: the SCSI transparent command set (USB MSC overview §2).</summary>
     private const byte ScsiTransparentSubclass = 0x06;
@@ -35,7 +36,13 @@ internal sealed class UsbMassStorageDriver : UsbDriver
     /// </summary>
     private static UsbMassStorage[]? s_disks;
 
-    public override string Name => "mass storage";
+    /// <summary>
+    /// The driver's <see cref="Name"/>, which the driver kit also refuses as
+    /// a registration name: the device list names an interface's owner by it.
+    /// </summary>
+    internal const string DriverName = "mass storage";
+
+    public override string Name => DriverName;
 
     /// <summary>Every logical unit present, in enumeration order (empty before USB enumeration).</summary>
     public static IReadOnlyList<UsbMassStorage> Disks => s_disks ?? [];

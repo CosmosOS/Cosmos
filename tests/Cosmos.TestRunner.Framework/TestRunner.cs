@@ -196,11 +196,43 @@ namespace Cosmos.TestRunner.Framework
         /// Asks the test engine to change the machine under the running
         /// guest: <c>usb-unplug</c> pulls the profile's USB stick out and
         /// <c>usb-plug</c> puts it back (both take an optional stick index,
-        /// 0 by default). Returns at once, since nothing replies: the test
-        /// waits for the change to show up, and must see it within the
-        /// engine's stall window (10 s without a protocol message).
+        /// 0 by default). The profile's <c>"usb"</c> devices have their own
+        /// requests, which <see cref="RequestUsbDeviceUnplug"/>,
+        /// <see cref="RequestUsbDevicePlug"/> and
+        /// <see cref="RequestUsbPointerMove"/> send. Returns at once, since
+        /// nothing replies: the test waits for the change to show up, and
+        /// must see it within the engine's stall window (10 s without a
+        /// protocol message).
         /// </summary>
         public static void RequestHost(string request) => SendMessage(HostRequest, EncodeString(request));
+
+        /// <summary>
+        /// Asks the test engine to pull entry <paramref name="index"/> of the
+        /// profile's <c>"usb"</c> list (0 for the first) off the xHCI
+        /// controller. Returns at once, as <see cref="RequestHost"/> does.
+        /// </summary>
+        public static void RequestUsbDeviceUnplug(int index) => RequestHost($"{UsbDeviceUnplugRequest} {index}");
+
+        /// <summary>
+        /// Asks the test engine to plug entry <paramref name="index"/> of the
+        /// profile's <c>"usb"</c> list back in, as a new device of the same
+        /// model on the same controller. Returns at once, as
+        /// <see cref="RequestHost"/> does.
+        /// </summary>
+        public static void RequestUsbDevicePlug(int index) => RequestHost($"{UsbDevicePlugRequest} {index}");
+
+        /// <summary>
+        /// Asks the test engine to move entry <paramref name="index"/> of the
+        /// profile's <c>"usb"</c> list, which must be a <c>usb-mouse</c>, by
+        /// (<paramref name="deltaX"/>, <paramref name="deltaY"/>), right and
+        /// down, and then hold <paramref name="buttons"/>: 1 left, 2 right,
+        /// 4 middle, the bits of a HID boot mouse report's first byte. QEMU
+        /// folds one request into the mouse's next report, so a click takes
+        /// two requests: one pressing the button, one releasing it. Returns
+        /// at once, as <see cref="RequestHost"/> does.
+        /// </summary>
+        public static void RequestUsbPointerMove(int index, int deltaX, int deltaY, int buttons = 0) =>
+            RequestHost($"{UsbPointerMoveRequest} {index} {deltaX} {deltaY} {buttons}");
 
         /// <summary>
         /// Reads the <c>skip=N</c> integer from the Limine kernel cmdline.
@@ -420,6 +452,11 @@ namespace Cosmos.TestRunner.Framework
         private const byte TestSuiteEnd = 105;
         private const byte TestDestructiveReached = 108;
         private const byte HostRequest = 109;
+
+        // Host request words (must match Cosmos.TestRunner.Engine/Hosts/HostRequest.cs)
+        private const string UsbDeviceUnplugRequest = "usb-device-unplug";
+        private const string UsbDevicePlugRequest = "usb-device-plug";
+        private const string UsbPointerMoveRequest = "usb-pointer-move";
 
         /// <summary>Byte 0 (least significant) of the protocol magic signature 0x19740807 (SerialSignature from Consts.cs), sent little-endian.</summary>
         private const byte SerialSignatureByte0 = 0x07;

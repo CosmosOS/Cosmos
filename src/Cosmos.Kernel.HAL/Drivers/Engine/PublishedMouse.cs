@@ -10,7 +10,8 @@ namespace Cosmos.Kernel.HAL.Drivers.Engine;
 /// <see cref="MouseDevice"/> like the built-in ones, so the manager wires
 /// its <see cref="MouseDevice.OnMouseEvent"/> the same way. The driver
 /// reports through the <see cref="MouseReporter"/> in front of it; nothing
-/// is polled.
+/// is polled. A USB driver's mouse is withdrawn when its device leaves the
+/// bus, and stays silent from then on.
 /// </summary>
 internal sealed class PublishedMouse : MouseDevice
 {
@@ -20,6 +21,15 @@ internal sealed class PublishedMouse : MouseDevice
     /// reaches the manager, so it is never enabled and its reports go nowhere.
     /// </summary>
     private volatile bool _enabled;
+
+    /// <summary>
+    /// Set when the kit withdrew the mouse, as its USB device left the bus:
+    /// every report is dropped from then on, and nothing enables it again.
+    /// </summary>
+    private volatile bool _withdrawn;
+
+    /// <summary>True once the kit withdrew the mouse; its reports go nowhere.</summary>
+    internal bool IsWithdrawn => _withdrawn;
 
     /// <summary>Always false: the driver pushes each report, there is nothing to read.</summary>
     public override bool DataAvailable => false;
@@ -38,11 +48,26 @@ internal sealed class PublishedMouse : MouseDevice
         }
     }
 
-    /// <summary>Lets reports through to <see cref="MouseDevice.OnMouseEvent"/>. The mouse manager calls it once it is listening.</summary>
-    public override void Enable() => _enabled = true;
+    /// <summary>
+    /// Lets reports through to <see cref="MouseDevice.OnMouseEvent"/>. The
+    /// mouse manager calls it once it is listening. A withdrawn mouse stays
+    /// silent.
+    /// </summary>
+    public override void Enable() => _enabled = !_withdrawn;
 
     /// <summary>Drops every report from now on, until <see cref="Enable"/>.</summary>
     public override void Disable() => _enabled = false;
+
+    /// <summary>
+    /// Silences the mouse for good: its USB device left the bus. Called by
+    /// the kit before it asks the mouse manager to let go of it, so a report
+    /// the driver still makes goes nowhere even meanwhile.
+    /// </summary>
+    internal void Withdraw()
+    {
+        _withdrawn = true;
+        _enabled = false;
+    }
 
     /// <summary>
     /// Records one report and hands it to the mouse manager. IRQ-safe:
@@ -59,7 +84,7 @@ internal sealed class PublishedMouse : MouseDevice
 
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (!_enabled)
+            if (!_enabled || _withdrawn)
             {
                 return;
             }

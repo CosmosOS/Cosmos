@@ -1,8 +1,10 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
@@ -13,8 +15,10 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// A driver's handle on one device it was offered, whatever bus the device
 /// sits on. The kit builds one for each binding attempt and hands it to the
 /// driver's Probe. Everything acquired through it belongs to it: when the
-/// attempt is declined or fails, the kit releases all of it, so a driver
-/// never writes teardown code of its own.
+/// attempt is declined or fails, the kit releases all of it, and when a
+/// bound USB device leaves its bus, the kit withdraws what the driver
+/// published and stops its work items and events, so a driver never writes
+/// teardown code of its own.
 /// </summary>
 internal abstract class DeviceContext
 {
@@ -25,30 +29,53 @@ internal abstract class DeviceContext
     /// </summary>
     private const long MaximumDelayChunkMicroseconds = 1_000_000;
 
+    /// <summary>
+    /// Longest a USB unplug waits for a work item of the binding that is
+    /// running when the device leaves, in milliseconds of Stopwatch time,
+    /// before it calls the driver's Remove anyway.
+    /// </summary>
+    private const long RunningWorkItemWaitMilliseconds = 1000;
+
+    /// <summary>How long the unplug sleeps between two looks at the running work item, in milliseconds.</summary>
+    private const uint RunningWorkItemPollMilliseconds = 10;
+
+    private const long MillisecondsPerSecond = 1000;
+
     private const string MouseDisabledMessage = "Mouse support is disabled. Set CosmosEnableMouse=true in the kernel's csproj to publish a mouse.";
     private const string NetworkDisabledMessage = "Network support is disabled. Set CosmosEnableNetwork=true in the kernel's csproj to publish a network link.";
 
-    // What Probe created, which Bound arms and teardown drops. Null until
-    // the first one: most attempts create neither.
+    // What Probe created, which Bound arms, and teardown or a USB unplug
+    // drops. Null until the first one: most attempts create neither.
     private List<DeviceEvent>? _events;
     private List<DeviceWorkItem>? _workItems;
 
     // What Probe published, held until Bound delivers it to the managers or
-    // teardown drops it. Null until the first one.
+    // teardown drops it; once delivered, kept until a USB unplug withdraws
+    // it from the managers. Null until the first one.
     private List<PublishedMouse>? _mice;
     private List<PublishedNetworkDevice>? _networkLinks;
 
     /// <summary>
+    /// Cleared on the USB hot-plug thread when the device leaves its bus,
+    /// while a work item on the driver-work thread may be reading it.
+    /// </summary>
+    private volatile bool _present = true;
+
+    /// <summary>
     /// Where the device sits, such as <c>pci/0000:00:04.0</c> for a PCI
-    /// function (segment, bus, device and function, in hexadecimal).
+    /// function (segment, bus, device and function, in hexadecimal) or
+    /// <c>usb/1-2.1:1.0</c> for a USB interface (host controller, the root
+    /// port and each hub port below it, configuration value and interface
+    /// number, in decimal).
     /// </summary>
     public string Path { get; }
 
     /// <summary>
-    /// True while the device is on its bus. A PCI function never leaves it in
-    /// this version, so a PCI context always reports true.
+    /// True while the device is on its bus: false once a USB device was
+    /// unplugged. A PCI function never leaves it in this version, so a PCI
+    /// context always reports true.
     /// </summary>
-    public bool IsPresent { get; } = true;
+    public bool IsPresent => _present;
 
     /// <summary>Name of the registration this context was built for, which prefixes its log lines.</summary>
     internal string DriverName { get; }
@@ -152,7 +179,8 @@ internal abstract class DeviceContext
     /// kernel's pointer like a built-in mouse. The kit hands it to the mouse
     /// manager right after Probe returns Bound, before the interrupts are
     /// armed; if the attempt is declined or fails, it is dropped and its
-    /// reports go nowhere. Probe only.
+    /// reports go nowhere, and once a USB device leaves its bus, the kit
+    /// takes it back out of the mouse manager. Probe only.
     /// </summary>
     /// <returns>The reporter the driver calls, typically from its interrupt handler.</returns>
     /// <exception cref="InvalidOperationException">
@@ -188,7 +216,9 @@ internal abstract class DeviceContext
     /// network manager right after Probe returns Bound, before the
     /// interrupts are armed, and after every device a built-in driver
     /// registered, so the primary device does not change. If the attempt is
-    /// declined or fails, the link is dropped. Probe only.
+    /// declined or fails, the link is dropped; once a USB device leaves its
+    /// bus, the kit takes it back out of the network manager, and the stack
+    /// forgets its addresses. Probe only.
     /// </summary>
     /// <param name="address">The device's MAC address, which the stack sends from.</param>
     /// <param name="transmit">Called for each frame the stack sends, with interrupts masked, one call at a time.</param>
@@ -221,6 +251,9 @@ internal abstract class DeviceContext
 
     /// <summary>Marks the start of the driver's Probe: resources can be acquired until it returns.</summary>
     internal void BeginProbe() => State = DeviceContextState.Probing;
+
+    /// <summary>Records that the device left its bus, which only a USB device does in this version.</summary>
+    private protected void MarkNotPresent() => _present = false;
 
     /// <summary>
     /// Records that Probe returned Bound and the engine kept the binding,
@@ -317,6 +350,71 @@ internal abstract class DeviceContext
             _networkLinks = null;
         }
 
+        DropWorkAndCancelEvents();
+    }
+
+    /// <summary>
+    /// The second step of a USB unplug, once the reports are disarmed:
+    /// takes what the driver published back out of the managers. Each
+    /// publication is marked withdrawn before its manager lets go of it, so
+    /// a report through the driver's <see cref="MouseReporter"/>, or a send
+    /// through its <see cref="NetworkLink"/>'s device, goes nowhere from the
+    /// first instant on, whatever the manager does. A manager that throws is
+    /// logged with the driver's name and the device's path, and the next
+    /// publication is still withdrawn.
+    /// </summary>
+    private protected void WithdrawPublications()
+    {
+        if (_mice is { } mice)
+        {
+            for (int i = 0; i < mice.Count; i++)
+            {
+                PublishedMouse mouse = mice[i];
+                mouse.Withdraw();
+                try
+                {
+                    DriverCore.MouseWithdrawSink?.Invoke(mouse);
+                    WriteLog("withdrew its mouse");
+                }
+                catch (Exception exception)
+                {
+                    WriteLog($"the mouse manager failed to withdraw its mouse: {exception.Message}");
+                }
+            }
+
+            _mice = null;
+        }
+
+        if (_networkLinks is { } links)
+        {
+            for (int i = 0; i < links.Count; i++)
+            {
+                PublishedNetworkDevice link = links[i];
+                link.Withdraw();
+                try
+                {
+                    DriverCore.NetworkWithdrawSink?.Invoke(link);
+                    WriteLog($"withdrew network link {link.MacAddress}");
+                }
+                catch (Exception exception)
+                {
+                    WriteLog($"the network manager failed to withdraw its link: {exception.Message}");
+                }
+            }
+
+            _networkLinks = null;
+        }
+    }
+
+    /// <summary>
+    /// Forgets the binding's work items, so a queued one never runs and
+    /// every later Schedule is refused, and cancels its events, so every
+    /// Wait returns false. A callback already running on the driver-work
+    /// thread is not stopped; a USB unplug waits for it with
+    /// <see cref="WaitForRunningWorkItem"/>.
+    /// </summary>
+    private protected void DropWorkAndCancelEvents()
+    {
         if (_workItems is { } workItems)
         {
             for (int i = 0; i < workItems.Count; i++)
@@ -331,6 +429,37 @@ internal abstract class DeviceContext
             {
                 events[i].Cancel();
             }
+        }
+    }
+
+    /// <summary>
+    /// Waits, on the USB hot-plug thread, while the driver-work thread runs
+    /// a work item of this binding, for up to a second of Stopwatch time: a
+    /// callback that started before the device left may still be using what
+    /// the driver's Remove is about to let go of. Its items were dropped
+    /// before, so none starts after it. It sleeps between looks, so the
+    /// driver-work thread gets the CPU it needs to finish. An item still
+    /// running after a second is logged, and Remove runs anyway: a callback
+    /// stuck on a device that is gone must not stall every later hot-plug.
+    /// </summary>
+    private protected void WaitForRunningWorkItem()
+    {
+        if (_workItems is null)
+        {
+            return;
+        }
+
+        long limit = Stopwatch.Frequency / MillisecondsPerSecond * RunningWorkItemWaitMilliseconds;
+        long startedAt = Stopwatch.GetTimestamp();
+        while (DriverWorkQueue.IsRunningItemOf(this))
+        {
+            if (Stopwatch.GetTimestamp() - startedAt >= limit)
+            {
+                WriteLog($"a work item was still running {RunningWorkItemWaitMilliseconds} ms after the device left; Remove runs anyway");
+                return;
+            }
+
+            SchedulerManager.Sleep(RunningWorkItemPollMilliseconds);
         }
     }
 

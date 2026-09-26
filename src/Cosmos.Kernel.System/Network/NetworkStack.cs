@@ -78,7 +78,7 @@ public static class NetworkStack
     /// <summary>
     /// Forgets every address mapped to a device.
     /// </summary>
-    /// <param name="device">The device being reconfigured.</param>
+    /// <param name="device">The device being reconfigured or taken out.</param>
     private static void RemoveAddresses(INetworkDevice device)
     {
         List<Address> stale = [];
@@ -94,6 +94,38 @@ public static class NetworkStack
         {
             AddressMap.Remove(address);
         }
+    }
+
+    /// <summary>
+    /// Forgets a device that left the network manager: every address mapped
+    /// to it, its MAC address and its IPv4 configuration, and it no longer
+    /// hands the stack what it receives. The network manager's
+    /// unregistration calls it, with interrupts off, so no receive path runs
+    /// the stack halfway through.
+    /// </summary>
+    /// <param name="device">The device that left.</param>
+    internal static void RemoveDevice(INetworkDevice device)
+    {
+        RemoveAddresses(device);
+
+        // Found by the device each entry maps to, as for the addresses above,
+        // rather than by the key its MAC address gives now.
+        List<uint> staleMacs = [];
+        foreach (KeyValuePair<uint, INetworkDevice> pair in MACMap)
+        {
+            if (pair.Value == device)
+            {
+                staleMacs.Add(pair.Key);
+            }
+        }
+
+        foreach (uint mac in staleMacs)
+        {
+            MACMap.Remove(mac);
+        }
+
+        IPConfig.Remove(device);
+        device.OnPacketReceived = null;
     }
 
     /// <summary>

@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.Drivers.Usb;
 using SchedMutex = Cosmos.Kernel.Core.Scheduler.Mutex;
 
 namespace Cosmos.Kernel.HAL.Devices.Usb.Xhci;

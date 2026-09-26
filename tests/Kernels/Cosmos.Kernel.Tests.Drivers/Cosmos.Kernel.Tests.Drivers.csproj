@@ -8,7 +8,7 @@
     <!-- Without Storage the built-in NVMe driver is never brought up, which
          leaves the nvme cell's controller free for the suite's own NVMe
          drivers. Nothing else in the suite needs Storage; USB, which the
-         usb-mouse cell needs, stays on because Keyboard does. Network and
+         usb-hid cell needs, stays on because Keyboard does. Network and
          Mouse must stay on too: the suite's drivers publish a network link,
          which the rtl8139 cells take a DHCP lease through, and mice. -->
     <CosmosEnableStorage>false</CosmosEnableStorage>
@@ -18,21 +18,22 @@
     One cell per piece of hardware a user driver will bind, none of which a
     built-in driver claims: QEMU's edu test device and an RTL8139 NIC on both
     arches, an 82574L (e1000e) on arm64 only, since the E1000E built-in takes
-    it on x64, a USB mouse behind an xHCI controller with no USB stick, and
-    an NVMe controller, free because this kernel builds without Storage.
+    it on x64, a USB mouse and tablet behind an xHCI controller with no USB
+    stick, next to a USB keyboard the built-in keyboard driver takes, and an
+    NVMe controller, free because this kernel builds without Storage.
     Definitions live in tests/profiles.json.
 
     The gic* modifiers are arm64-only and apply to every profile, which gives
     the e1000e and nvme cells their GICv3 run (MSI-X through the ITS) and
-    GICv2 run (polled), and the USB mouse both interrupt paths (xHCI MSI-X
-    on GICv3, polled on GICv2). x64 = 4 cells; arm64 = 5 profiles x
+    GICv2 run (polled), and the USB devices both interrupt paths (xHCI
+    MSI-X on GICv3, polled on GICv2). x64 = 4 cells; arm64 = 5 profiles x
     {bare, gicv2, gicv3} = 15 cells.
   -->
   <ItemGroup>
     <CosmosTestProfile Include="edu" />
     <CosmosTestProfile Include="rtl8139" />
     <CosmosTestProfile Include="e1000e-arm64" />
-    <CosmosTestProfile Include="usb-mouse" />
+    <CosmosTestProfile Include="usb-hid" />
     <CosmosTestProfile Include="nvme" />
     <CosmosTestModifier Include="gicv2" />
     <CosmosTestModifier Include="gicv3" />

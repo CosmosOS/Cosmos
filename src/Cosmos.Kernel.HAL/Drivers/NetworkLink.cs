@@ -21,6 +21,9 @@ internal sealed class NetworkLink
     /// <summary>The MAC address the link was published with, which the stack sends from.</summary>
     public MACAddress Address => _device.MacAddress;
 
+    /// <summary>The adapter the kit delivers to the network manager, and withdraws from it when a USB device leaves.</summary>
+    internal PublishedNetworkDevice Device => _device;
+
     /// <summary>Puts a link in front of <paramref name="device"/>, the adapter the kit delivers to the network manager.</summary>
     internal NetworkLink(PublishedNetworkDevice device)
     {
@@ -34,8 +37,9 @@ internal sealed class NetworkLink
     /// stack keeps, and runs the stack's receive path with interrupts
     /// masked, as the built-in drivers' interrupt handlers do. A frame that
     /// arrives while the stack has not configured the link, before the
-    /// driver's Probe returned Bound, or on the link of an attempt that was
-    /// declined or failed, is dropped.
+    /// driver's Probe returned Bound, on the link of an attempt that was
+    /// declined or failed, or once the kit withdrew the link because its USB
+    /// device left the bus, is dropped.
     /// </summary>
     /// <param name="frame">The frame, from the destination MAC address to the end of the payload, without the CRC.</param>
     public void Deliver(ReadOnlySpan<byte> frame) => _device.Deliver(frame);

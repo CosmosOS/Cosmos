@@ -1,4 +1,5 @@
-﻿using Cosmos.Kernel.Core.IO;
+﻿using Cosmos.Kernel.Core.CPU;
+using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.IPv4;
 using Cosmos.Kernel.System.Network.IPv6;
@@ -29,9 +30,13 @@ public class IPConfig
     /// <summary>
     /// Every configured interface. This is the only store: routing lookups and
     /// per-device lookups read the same list, so neither can drift from the
-    /// other.
+    /// other. Replaced whole on every change, never changed in place: a
+    /// network device a USB driver published leaves on the USB hot-plug
+    /// thread, which takes its entry out while a kernel thread may be halfway
+    /// through a walk choosing a source address, and the array that walk read
+    /// stays as it was.
     /// </summary>
-    private static readonly List<Entry> s_configs = new();
+    private static Entry[] s_configs = [];
 
     /// <summary>
     /// Record the configuration now in force on a device, replacing any
@@ -41,16 +46,52 @@ public class IPConfig
     /// <param name="config">The configuration applied to it.</param>
     internal static void Set(INetworkDevice device, IPConfig config)
     {
-        for (int i = 0; i < s_configs.Count; i++)
+        Entry entry = new(device, config);
+
+        // Interrupts off from the read to the publication, so on this single
+        // CPU no other writer, such as the hot-plug thread taking an unplugged
+        // device out, runs in between and has its change lost.
+        using (InternalCpu.DisableInterruptsScope())
         {
-            if (s_configs[i].Device == device)
+            Entry[] configs = s_configs;
+            for (int i = 0; i < configs.Length; i++)
             {
-                s_configs[i] = new Entry(device, config);
-                return;
+                if (configs[i].Device == device)
+                {
+                    Entry[] replaced = [.. configs];
+                    replaced[i] = entry;
+                    s_configs = replaced;
+                    return;
+                }
+            }
+
+            s_configs = [.. configs, entry];
+        }
+    }
+
+    /// <summary>
+    /// Forget the configuration of a device that left the network manager,
+    /// so no route leaves through it any more.
+    /// </summary>
+    /// <param name="device">The device that left.</param>
+    internal static void Remove(INetworkDevice device)
+    {
+        // As in Set: no other writer runs between the read and the publication.
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            Entry[] configs = s_configs;
+            for (int i = 0; i < configs.Length; i++)
+            {
+                if (configs[i].Device == device)
+                {
+                    Entry[] kept = new Entry[configs.Length - 1];
+                    configs.AsSpan(0, i).CopyTo(kept);
+                    configs.AsSpan(i + 1).CopyTo(kept.AsSpan(i));
+                    s_configs = kept;
+                    return;
+                }
             }
         }
-
-        s_configs.Add(new Entry(device, config));
     }
 
     /// <summary>
@@ -61,7 +102,7 @@ public class IPConfig
     /// </summary>
     internal static void RemoveAll()
     {
-        s_configs.Clear();
+        s_configs = [];
     }
 
     /// <summary>
@@ -196,9 +237,9 @@ public class IPConfig
     /// <param name="destIP">The address to check.</param>
     internal static bool IsLocalAddress(Address destIP)
     {
-        for (int c = 0; c < s_configs.Count; c++)
+        foreach (Entry entry in s_configs)
         {
-            IPConfig ipConfig = s_configs[c].Config;
+            IPConfig ipConfig = entry.Config;
 
             if ((ipConfig.Address & ipConfig.SubnetMask) ==
                 (destIP & ipConfig.SubnetMask))
@@ -227,8 +268,10 @@ public class IPConfig
     internal static Address? FindRoute(Address destIP)
     {
         // There is no routing table: every non-local destination leaves
-        // through the first configured interface's default gateway.
-        return s_configs.Count > 0 ? s_configs[0].Config.DefaultGateway : null;
+        // through the first configured interface's default gateway. One read
+        // of the list, so the length checked is the one indexed.
+        Entry[] configs = s_configs;
+        return configs.Length > 0 ? configs[0].Config.DefaultGateway : null;
     }
 
     /// <summary>
