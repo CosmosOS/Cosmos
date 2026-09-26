@@ -90,6 +90,8 @@ public class QemuARM64Host : IQemuHost
                 MouseDevice = devices?.MouseDevice,
                 VgaAdapter = devices?.VgaAdapter,
                 GpuDevice = devices?.GpuDevice,
+                Devices = devices?.Devices ?? Array.Empty<DeviceAttachment>(),
+                UsbDevices = devices?.UsbDevices ?? Array.Empty<string>(),
                 MonitorPort = hotPlug?.Port,
                 AllowGuestShutdown = true
             });

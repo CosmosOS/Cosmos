@@ -56,6 +56,21 @@ public sealed record TestProfile
     public string? GpuDevice { get; init; }
 
     /// <summary>
+    /// Extra <c>-device</c> models from the profile's <c>"devices"</c> axis
+    /// (e.g. <c>edu</c>, <c>rtl8139</c>), in catalog order and already checked
+    /// against <see cref="ProfileDeviceModels"/>. Additive: they join the NIC,
+    /// input and display selections rather than replacing any of them.
+    /// </summary>
+    public IReadOnlyList<DeviceAttachment> Devices { get; init; } = Array.Empty<DeviceAttachment>();
+
+    /// <summary>
+    /// USB device models from the profile's <c>"usb"</c> axis (e.g.
+    /// <c>usb-mouse</c>), placed on the one xHCI controller the launcher adds,
+    /// which is also the one a USB disk uses.
+    /// </summary>
+    public IReadOnlyList<string> UsbDevices { get; init; } = Array.Empty<string>();
+
+    /// <summary>
     /// Architectures this profile applies to; null means any. Mirrors the
     /// modifier filter, for hardware that only one architecture can present
     /// (PS/2 on x64, virtio-mmio on the ARM64 virt machine).
@@ -173,8 +188,8 @@ internal sealed record TestModifier
         }
 
         // `with` rather than a fresh record: everything a modifier does not
-        // touch (NIC, input devices, VGA adapter, arch filter) has to survive
-        // the overlay.
+        // touch (NIC, input devices, VGA adapter, extra and USB devices, arch
+        // filter) has to survive the overlay.
         return baseProfile with
         {
             Name = $"{baseProfile.Name}+{Name}",
@@ -442,11 +457,14 @@ public static class TestProfileLoader
             // The common one is writing a profile's machineOptions flat
             // ({"gic-version": "3"}) instead of keyed by architecture, which
             // fails here because the value is a string where an object is
-            // expected.
-            throw new InvalidOperationException(
-                $"{path}: could not be parsed. Note that a profile's 'machineOptions' is keyed by architecture " +
-                $"({string.Join(", ", KnownArchitectures)}), e.g. \"machineOptions\": {{ \"arm64\": {{ \"gic-version\": \"3\" }} }}. " +
-                $"Parser error: {ex.Message}", ex);
+            // expected. In the device lists it is the reverse: an entry
+            // written as an object, the way "disks" entries are.
+            string hint = IsDeviceListPath(ex.Path)
+                ? $"Note that a profile's '{ProfileDeviceModels.DevicesAxis}' and '{ProfileDeviceModels.UsbAxis}' axes list QEMU model names as strings, " +
+                  "e.g. \"devices\": [\"edu\"] or \"usb\": [\"usb-mouse\"]. "
+                : $"Note that a profile's 'machineOptions' is keyed by architecture ({string.Join(", ", KnownArchitectures)}), " +
+                  "e.g. \"machineOptions\": { \"arm64\": { \"gic-version\": \"3\" } }. ";
+            throw new InvalidOperationException($"{path}: could not be parsed. {hint}Parser error: {ex.Message}", ex);
         }
         if (parsed?.Profiles == null || parsed.Profiles.Count == 0)
         {
@@ -481,15 +499,30 @@ public static class TestProfileLoader
                 }
             }
 
+            string? networkCard = NullIfBlank(entry.Nic);
+            string? keyboard = NullIfBlank(entry.Keyboard);
+            string? mouse = NullIfBlank(entry.Mouse);
+            string? gpu = NullIfBlank(entry.Gpu);
+
+            // The -device models the fixed axes already attach. "vga" is left
+            // out: it names a -vga backend, not a -device model.
+            Dictionary<string, string> fixedAxisModels = new(StringComparer.Ordinal);
+            AddFixedAxisModel(fixedAxisModels, networkCard, "nic");
+            AddFixedAxisModel(fixedAxisModels, keyboard, "keyboard");
+            AddFixedAxisModel(fixedAxisModels, mouse, "mouse");
+            AddFixedAxisModel(fixedAxisModels, gpu, "gpu");
+
             profiles[entry.Name] = new TestProfile
             {
                 Name = entry.Name,
                 Disks = disks,
-                NetworkCard = NullIfBlank(entry.Nic),
-                KeyboardDevice = NullIfBlank(entry.Keyboard),
-                MouseDevice = NullIfBlank(entry.Mouse),
+                NetworkCard = networkCard,
+                KeyboardDevice = keyboard,
+                MouseDevice = mouse,
                 VgaAdapter = NullIfBlank(entry.Vga),
-                GpuDevice = NullIfBlank(entry.Gpu),
+                GpuDevice = gpu,
+                Devices = ProfileDeviceModels.ResolveDevices(path, entry.Name, entry.Devices, fixedAxisModels),
+                UsbDevices = ProfileDeviceModels.ResolveUsbDevices(path, entry.Name, entry.Usb, fixedAxisModels),
                 Architectures = entry.Architectures
             };
 
@@ -573,6 +606,20 @@ public static class TestProfileLoader
     private static string? NullIfBlank(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
+    /// <summary>True when the parser stopped inside a profile's "devices" or "usb" list (e.g. <c>$.profiles[3].devices[0]</c>).</summary>
+    private static bool IsDeviceListPath(string? jsonPath) =>
+        jsonPath is not null
+        && (jsonPath.Contains($".{ProfileDeviceModels.DevicesAxis}", StringComparison.OrdinalIgnoreCase)
+            || jsonPath.Contains($".{ProfileDeviceModels.UsbAxis}", StringComparison.OrdinalIgnoreCase));
+
+    private static void AddFixedAxisModel(Dictionary<string, string> models, string? model, string axis)
+    {
+        if (model is not null)
+        {
+            models.TryAdd(model, axis);
+        }
+    }
+
     private static DiskKind ParseDiskKind(string path, string context, string? type)
     {
         return (type ?? string.Empty).ToLowerInvariant() switch
@@ -601,6 +648,8 @@ public static class TestProfileLoader
         string? Mouse,
         string? Vga,
         string? Gpu,
+        List<string?>? Devices,
+        List<string?>? Usb,
         List<string>? Architectures,
         // Keyed by architecture, unlike a modifier's flat map: a modifier is
         // already scoped by its own "architectures" list, while a profile

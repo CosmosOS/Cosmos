@@ -74,6 +74,7 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 |-------|-------|-------------|
 | **HelloWorld** | 3 | Basic arithmetic, boolean logic, integer comparison |
 | **Memory** | 85 | Boxing/unboxing, memory allocation, collections, memory copy, GC |
+| **Drivers** | 7 per cell | Hardware no built-in driver claims: enumerated, and left free for a driver kernels register |
 
 #### HelloWorld Tests
 
@@ -127,6 +128,25 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 - `GC_WeakReference`, `GC_LargeAllocCollect`, `GC_StructArraySurvival`
 - `GC_DictSurvival`, `GC_PageAccounting`, `GC_DependentHandle`
 - `GC_DependentHandleCleanup`, `GC_HandleStoreIntegrity`, `GC_PinnedHeapReuse`
+
+#### Drivers Tests
+
+The groundwork for the driver kit. Each [profile](#hardware-profiles) attaches one piece of hardware that no built-in driver claims, and the suite checks that the kernel sees it and leaves it free. The binding tests arrive with the driver engine and build on these cells.
+
+| Profile | Architectures | Hardware |
+|---------|---------------|----------|
+| `edu` | x64, arm64 | QEMU's edu test device (1234:11e8) |
+| `rtl8139` | x64, arm64 | A Realtek RTL8139 NIC (10ec:8139) with a user-mode netdev |
+| `e1000e-arm64` | arm64 | An Intel 82574L NIC (8086:10d3), which the E1000E built-in claims on x64 only |
+| `usb-mouse` | x64, arm64 | A USB mouse on a `qemu-xhci` root port, and no USB stick |
+
+The `gicv2` and `gicv3` modifiers run every profile on both GICs on arm64, so x64 has 3 cells and arm64 has 12. Every cell reports the same 7 tests, and each test is skipped on the cells whose profile attaches other hardware:
+
+- `Profile_Recognized`: the cell's profile is one of the four above, since a profile the suite does not know would otherwise skip everything
+- `Pci_ProfileFunctionEnumeratedOnce`, `Pci_ProfileFunctionClassMatches`, `Pci_ProfileFunctionUnowned`: the profile's PCI function was enumerated exactly once, with the expected base class and subclass, and has no owner
+- `Usb_XhciOwnedByXhci`, `Usb_MouseEnumeratedOnce`, `Usb_MouseInterfaceUnbound`: the xHCI controller is owned by `xhci`, exactly one device presents a HID boot mouse interface (class 3, subclass 1, protocol 2), and no class driver is bound to it
+
+The suite reads HAL internals through a temporary `InternalsVisibleTo` grant, which goes away once the driver kit's public API lands.
 
 ### Running Kernel Tests
 
@@ -222,6 +242,39 @@ ALL TESTS PASSED
 | 0 | All tests passed (skipped tests are acceptable) |
 | 1 | Tests failed or execution error |
 | 137 | Timeout (SIGKILL) |
+
+### Hardware Profiles
+
+A suite can run its whole test list against more than one machine. The hardware shapes, called profiles, and the knobs that compose with them, called modifiers, are declared once in `tests/profiles.json`, whose header comment is the reference. A suite opts in with `<CosmosTestProfile Include="..." />` and `<CosmosTestModifier Include="..." />` items in its csproj. The engine runs one cell per profile and per conflict-free combination of the modifiers that apply to it, and prefixes each test name with `[profile]` or `[profile+modifier]`. A suite that opts into nothing runs once, on the architecture defaults.
+
+A profile describes its hardware with these keys:
+
+| Key | Value | QEMU effect |
+|-----|-------|-------------|
+| `disks` | `[{ "type": "ahci" \| "nvme" \| "usb", "options": { ... } }]` | A fresh 256 MiB image per disk. AHCI disks share one `ich9-ahci`, each NVMe disk gets its own controller, USB sticks share one `qemu-xhci`. |
+| `nic` | A NIC model, or `none` | Replaces QEMU's default NIC with a user-mode one. |
+| `keyboard`, `mouse` | A model, or `ps2`/`none` for nothing | A bare `-device` line. |
+| `vga` | A `-vga` backend | Replaces the default display adapter. |
+| `gpu` | A model | Adds a display adapter beside the default one. |
+| `devices` | A list of models: `edu`, `rtl8139`, `e1000e` | One `-device` line each. A NIC model gets a user-mode netdev of its own (`devnet0`, `devnet1`, ...), and like `nic` that removes QEMU's default NIC. |
+| `usb` | A list of models: `usb-mouse`, `usb-kbd` | One `qemu-xhci` controller (`usbxhci0`) with each device on its root hub. A profile that also has a USB disk puts both on that same controller. |
+| `machineOptions` | `-M` properties keyed by architecture | For example `{ "arm64": { "gic-version": "3" } }`. |
+| `architectures` | `["x64"]`, `["arm64"]` or both | Pins the profile to the architectures that can present its hardware. |
+
+Use `usb` for USB devices. `"mouse": "usb-mouse"` emits a bare `-device usb-mouse`, and neither q35 nor virt has a USB bus of its own for it, so QEMU refuses to start unless a USB disk happens to bring a controller.
+
+`devices` and `usb` take plain model names, checked against the list in `tests/Cosmos.TestRunner.Engine/ProfileDeviceModels.cs`. The catalog load fails with a message naming the profile when a model is unknown, listed twice, already attached by one of the profile's `nic`, `keyboard`, `mouse` or `gpu` keys, or when a list is empty or has a blank entry. `ProfileCatalogTests` loads the real catalog for every suite on both architectures, so such a mistake fails the host test job before any kernel is built. A model is added to that list once QEMU attaches it on both q35 and virt, since the loader has no per-architecture check of its own.
+
+```jsonc
+{
+  // Example only: QEMU's edu test device and a USB mouse and keyboard.
+  "name": "edu-and-hid",
+  "devices": ["edu"],
+  "usb": ["usb-mouse", "usb-kbd"]
+}
+```
+
+A modifier overlays `machineOptions` (for example `gic-version`) or per-disk-kind `deviceOptions` (for example NVMe `msix=off`) onto every profile it applies to. Its own `architectures` filter skips it on the other architecture.
 
 ---
 

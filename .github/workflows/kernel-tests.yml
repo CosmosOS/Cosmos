@@ -345,6 +345,34 @@ jobs:
       event_name: ${{ github.event_name }}
       head_ref: ${{ github.head_ref || github.ref_name }}
 
+  # ── Drivers ───────────────────────────────────────────────────────────────────
+  drivers-tests:
+    needs: setup
+    uses: ./.github/workflows/kernel-test-run.yml
+    with:
+      suite_name: Drivers
+      suite_id: drivers
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Drivers
+      timeout_x64: 60
+      timeout_arm64: 90
+      # arm64 expands to 12 cells ({edu,rtl8139,e1000e-arm64,usb-mouse} x
+      # {bare,gicv2,gicv3}) at up to 90 s each, x64 to 3. The step budget
+      # covers every arm64 cell hanging plus the build, so OutputHandlerXml
+      # still writes results; the job budget must stay above it plus setup.
+      step_timeout_minutes: 25
+      job_timeout_minutes: 40
+
+  drivers-results:
+    needs: drivers-tests
+    if: always()
+    uses: ./.github/workflows/kernel-test-results.yml
+    with:
+      suite_name: Drivers
+      suite_id: drivers
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Drivers
+      event_name: ${{ github.event_name }}
+      head_ref: ${{ github.head_ref || github.ref_name }}
+
   # ── Storage ───────────────────────────────────────────────────────────────────
   storage-tests:
     needs: setup
@@ -455,7 +483,7 @@ jobs:
     # read `needs.<suite>-tests.result`, and the `needs` context only exposes
     # direct dependencies — without the *-tests entries every row evaluates
     # to an empty string and renders "Failed" regardless of the real outcome.
-    needs: [ helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, math-tests, graphic-tests, power-tests, garbagecollector-tests, interrupts-tests, pci-tests, virtio-tests, storage-tests, fat-tests, file-tests, helloworld-results, memory-results, typecasting-results, timer-results, network-results, runtime-results, threading-results, math-results, graphic-results, power-results, garbagecollector-results, interrupts-results, pci-results, virtio-results, storage-results, fat-results, file-results ]
+    needs: [ helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, math-tests, graphic-tests, power-tests, garbagecollector-tests, interrupts-tests, pci-tests, virtio-tests, drivers-tests, storage-tests, fat-tests, file-tests, helloworld-results, memory-results, typecasting-results, timer-results, network-results, runtime-results, threading-results, math-results, graphic-results, power-results, garbagecollector-results, interrupts-results, pci-results, virtio-results, drivers-results, storage-results, fat-results, file-results ]
     if: always()
     steps:
       - name: 📊 Generate Summary
@@ -488,6 +516,7 @@ jobs:
           add_row "GarbageCollector" "${{ needs.garbagecollector-tests.result }}"
           add_row "Interrupts"       "${{ needs.interrupts-tests.result }}"
           add_row "Pci"              "${{ needs.pci-tests.result }}"
+          add_row "Drivers"          "${{ needs.drivers-tests.result }}"
           add_row "Storage"          "${{ needs.storage-tests.result }}"
           add_row "Fat"              "${{ needs.fat-tests.result }}"
           add_row "File"             "${{ needs.file-tests.result }}"

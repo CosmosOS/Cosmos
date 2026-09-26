@@ -50,6 +50,47 @@ public class QemuLauncherTests
     }
 
     [Fact]
+    public void AppendUsbDevices_AddsTheControllerWhenNoUsbDiskDid()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendUsbDevices(args, ["usb-mouse"], controllerPresent: false);
+        Assert.Equal(" -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0", args.ToString());
+    }
+
+    [Fact]
+    public void AppendUsbDevices_JoinsTheControllerAUsbDiskAdded()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendUsbDevices(args, ["usb-kbd"], controllerPresent: true);
+        Assert.Equal(" -device usb-kbd,bus=usbxhci0.0", args.ToString());
+    }
+
+    // No devices, no controller: a USB-less cell must not grow an xHCI
+    // function for the kernel to bring up.
+    [Fact]
+    public void AppendUsbDevices_AddsNothingForNoDevices()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendUsbDevices(args, [], controllerPresent: false);
+        Assert.Equal(string.Empty, args.ToString());
+    }
+
+    [Fact]
+    public void AppendUsbDevices_RejectsCharactersOutsideOptionAlphabet()
+    {
+        StringBuilder args = new();
+        Assert.Throws<ArgumentException>(() => QemuLauncher.AppendUsbDevices(args, ["usb-mouse -device rm"], controllerPresent: true));
+    }
+
+    [Fact]
+    public void AppendExtraDevices_RejectsCharactersOutsideOptionAlphabet()
+    {
+        StringBuilder args = new();
+        Assert.Throws<ArgumentException>(() =>
+            QemuLauncher.AppendExtraDevices(args, [new DeviceAttachment { Model = "edu -device rm" }]));
+    }
+
+    [Fact]
     public void AppendStorageArgs_RejectsQuotesInDrivePaths()
     {
         StringBuilder args = new();
@@ -103,6 +144,14 @@ public class QemuLauncherTests
         StringBuilder args = new();
         QemuLauncher.AppendNetworkCardArgs(args, model);
         Assert.Equal($" -netdev user,id=net0 -device {model},netdev=net0", args.ToString());
+    }
+
+    [Fact]
+    public void AppendNetworkCardArgs_AttachesTheNicToTheNetdevItIsGiven()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendNetworkCardArgs(args, "rtl8139", "devnet0");
+        Assert.Equal(" -netdev user,id=devnet0 -device rtl8139,netdev=devnet0", args.ToString());
     }
 
     [Theory]

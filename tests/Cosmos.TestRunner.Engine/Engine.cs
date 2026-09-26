@@ -250,7 +250,7 @@ public partial class Engine
                 await using QemuHotPlug? hotPlug = QemuHotPlug.For(disks);
                 QemuRunResult result = await _qemuHost.RunKernelAsync(
                     bootIsoPath, bootLogPath, _config.TimeoutSeconds, _config.ShouldShowDisplay, enableNetworkTesting, disks, profile.MachineOptions,
-                    new ProfileDevices(profile.NetworkCard, profile.KeyboardDevice, profile.MouseDevice, profile.VgaAdapter, profile.GpuDevice),
+                    new ProfileDevices(profile.NetworkCard, profile.KeyboardDevice, profile.MouseDevice, profile.VgaAdapter, profile.GpuDevice, profile.Devices, profile.UsbDevices),
                     hotPlug);
 
                 combinedLog.Append(result.UartLog);

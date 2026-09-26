@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Cosmos.Sdk" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <!--
+    One cell per piece of hardware a user driver will bind, none of which a
+    built-in driver claims: QEMU's edu test device and an RTL8139 NIC on both
+    arches, an 82574L (e1000e) on arm64 only, since the E1000E built-in takes
+    it on x64, and a USB mouse behind an xHCI controller with no USB stick.
+    Definitions live in tests/profiles.json.
+
+    The gic* modifiers are arm64-only and apply to every profile, which gives
+    the e1000e cell its GICv3 run (MSI-X through the ITS) and the USB mouse
+    both interrupt paths (xHCI MSI-X on GICv3, polled on GICv2). x64 = 3
+    cells; arm64 = 4 profiles x {bare, gicv2, gicv3} = 12 cells.
+  -->
+  <ItemGroup>
+    <CosmosTestProfile Include="edu" />
+    <CosmosTestProfile Include="rtl8139" />
+    <CosmosTestProfile Include="e1000e-arm64" />
+    <CosmosTestProfile Include="usb-mouse" />
+    <CosmosTestModifier Include="gicv2" />
+    <CosmosTestModifier Include="gicv3" />
+  </ItemGroup>
+
+  <!-- Core kernel packages (using project references for development) -->
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
+    <ProjectReference Include="../../../src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
+    <ProjectReference Include="../../Cosmos.TestRunner.Framework/Cosmos.TestRunner.Framework.csproj" />
+  </ItemGroup>
+
+  <!-- Architecture-specific HAL (using project references for development) -->
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_X64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_ARM64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
+  </ItemGroup>
+
+</Project>
