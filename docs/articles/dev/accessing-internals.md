@@ -50,6 +50,6 @@ private static extern ref string GetName(Partition partition);
 In order of preference:
 
 1. The supported surface (`Cosmos.Kernel.System` plus the contract interfaces). If it is missing something a kernel legitimately needs, open an issue: extending the ring is the intended fix.
-2. An `[Experimental]` seam where one exists (the scheduler seam, [Scheduler - Writing a Scheduler](scheduler-plugging.md)).
+2. An `[Experimental]` seam where one exists: the scheduler seam ([Scheduler - Writing a Scheduler](scheduler-plugging.md)), the packet seam ([Network - Crafting packets](../user/network.md#crafting-packets)), or the driver kit for hardware the built-in drivers leave alone ([Drivers](../user/drivers.md)).
 3. A [plug](plugs.md), when the goal is replacing behavior rather than reaching state.
 4. `[UnsafeAccessor]`/`[UnsafeAccessorType]`, accepting that any release may break it.

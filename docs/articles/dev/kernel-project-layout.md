@@ -1,12 +1,13 @@
 # Kernel Project Layout
 
-The Cosmos kernel is composed of layered projects to enforce a clean dependency graph. Dependencies flow **downward only**: a project must never reference a project above it in the hierarchy.
+The Cosmos kernel is composed of layered projects to enforce a clean dependency graph. Dependencies flow **downward only**: a project must never reference a project above it in the hierarchy. A user kernel programs against `Cosmos.Kernel.System`, and reaches `Cosmos.Kernel.HAL` directly for one thing only: the driver kit, the experimental seam (COSMOS0003) its own PCI and USB drivers are written against.
 
 ## Dependency Graph
 
 ```mermaid
 flowchart LR;
 	UsersKernel-->Cosmos.Kernel.System;
+	UsersKernel-->Cosmos.Kernel.HAL;
     Cosmos.Kernel.System-->Cosmos.Kernel.HAL;
 	Cosmos.Kernel.Plugs-->Cosmos.Kernel.System;
     Cosmos.Kernel.Plugs-->Cosmos.Kernel.HAL;
@@ -29,7 +30,7 @@ flowchart LR;
 | Project | Purpose |
 |---------|---------|
 | **Cosmos.Kernel.System** | High-level OS APIs: Console, Graphics, Network, Timer, Mouse. The layer user kernels interact with. |
-| **Cosmos.Kernel.HAL** | Hardware Abstraction Layer: shared logic, platform registration (`PlatformHAL`), device managers, arch-independent drivers (AHCI, NVMe, virtio, xHCI with the USB class drivers), and the internal driver kit engine (`Drivers/`) that binds the PCI and USB drivers a kernel registers. `UsbManager` offers each USB interface to its `UsbClassDriver`s in order: the hub, keyboard and mass storage built-ins, then the kit's `KitUsbDriver`, so a registered driver only ever gets what no built-in took, at boot and on hot-plug. |
+| **Cosmos.Kernel.HAL** | Hardware Abstraction Layer: shared logic, platform registration (`PlatformHAL`), device managers, arch-independent drivers (AHCI, NVMe, virtio, xHCI with the USB class drivers), and the driver kit (`Drivers/`): the public, experimental seam (COSMOS0003) a kernel writes its PCI and USB drivers against, and the internal engine (`Drivers/Engine/`) that binds the drivers a kernel registers. `UsbManager` offers each USB interface to its `UsbClassDriver`s in order: the hub, keyboard and mass storage built-ins, then the kit's `KitUsbDriver`, so a registered driver only ever gets what no built-in took, at boot and on hot-plug. |
 | **Cosmos.Kernel.HAL.Interfaces** | Pure interfaces, no implementations. Public: `IBlockDevice`, which kernels implement and drive directly, `MACAddress`, and `SoftwareTimer` as a read-only handle. Internal: the boot contract `IPlatformInitializer`, `IGraphicDevice`, the input, timer and network devices, and `SoftwareTimer`'s construction and tick members. |
 | **Cosmos.Kernel.HAL.X64** | x86-64 HAL implementations (PCI, APIC, PS/2, ACPI, etc.). |
 | **Cosmos.Kernel.HAL.ARM64** | ARM64 HAL implementations (GIC, PL011, generic timer, etc.). |
@@ -51,11 +52,12 @@ flowchart LR;
 | **Cosmos.Build.CC** | Clang cross-compilation for x64 and ARM64 bare-metal targets. |
 | **Cosmos.Build.Common** | Shared build props, architecture picker. |
 | **Cosmos.Build.API** | Plug attributes (`[Plug]`, `[PlugMember]`) and enums. |
-| **Cosmos.Build.Analyzer.Patcher** | Roslyn analyzer for plug correctness. |
+| **Cosmos.Build.Analyzer.Patcher** | Roslyn analyzers for plug correctness and for the layer rules below (`LayerAnalyzer`, warning NAOT0007). |
 
 ## Rules
 
 - **Never** reference upward (Core must not reference HAL or System)
+- Reference only the layer directly below: User → System, System → HAL, HAL → HAL and Core, Core → Native. The one exception is User → HAL, for the driver kit. `LayerAnalyzer` checks every layer assembly a project references, by assembly name, and warns (NAOT0007) on any other edge; `*.Plugs` assemblies and the `Cosmos.*` assemblies outside the layers (the aggregator, Debug, Boot, the `Cosmos.Kernel.Tests.*` kernels) are exempt
 - **Never** reference a platform-specific HAL project from Core
 - Cross-cutting concerns (memory, scheduler, serial) go in **Core**
 - Platform-specific implementations go in **HAL.X64** / **HAL.ARM64**

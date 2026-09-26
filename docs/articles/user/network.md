@@ -24,7 +24,7 @@ Network support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot the kernel detects the NIC and registers it with `NetworkManager`. On x64 both **Intel E1000E** (QEMU's default q35 NIC, preferred when present) and **virtio-net-pci** are supported, so `cosmos run` needs no extra flags. On ARM64 attach a virtio NIC explicitly:
+At boot the kernel detects the NIC and registers it with `NetworkManager`; a NIC the built-in drivers do not know can be driven by a driver of your own, through the [driver kit](drivers.md). On x64 both **Intel E1000E** (QEMU's default q35 NIC, preferred when present) and **virtio-net-pci** are supported, so `cosmos run` needs no extra flags. On ARM64 attach a virtio NIC explicitly:
 
 ```console
 $ cosmos run                          # x64: default e1000e NIC, user-mode networking

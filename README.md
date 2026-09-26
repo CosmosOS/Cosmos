@@ -32,7 +32,7 @@ Cosmos gen2 (the current public Cosmos OS) compiles C# IL to x86 assembly throug
 - Exception handling
 - Interrupts (APIC on x64, GIC on ARM64)
 - ACPI (via [LAI](https://github.com/managarm/lai))
-- PCI and MMIO drivers
+- PCI and MMIO drivers, and an experimental [driver kit](https://cosmosos.github.io/articles/user/drivers.html) for writing your own PCI and USB drivers
 - UART serial
 - [Cosmos Graphics Subsystem](https://cosmosos.github.io/articles/user/graphics.html)
 - [Keyboard](https://cosmosos.github.io/articles/user/keyboard.html) and [Mouse](https://cosmosos.github.io/articles/user/mouse.html) input

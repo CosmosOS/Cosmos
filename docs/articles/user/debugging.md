@@ -66,6 +66,31 @@ The serial port itself is behind the `CosmosEnableUART` feature switch. With it 
 
 ---
 
+## Debugging a driver
+
+A driver written with the [driver kit](drivers.md) is easiest to follow through the serial log: the kit writes a `[Drivers]` line for every step it takes on the driver's behalf, and the driver's own `context.WriteLog(message)` lines carry the same prefix, followed by the driver's registered name and the device's path.
+
+| Line | Means |
+|---|---|
+| `[Drivers] Registered rtl8139` | `DriverManager.Register` accepted the registration |
+| `[Drivers] Refused to register rtl8139: the name is taken` | Another registration, or a built-in driver, already has the name; `Register` returned false |
+| `[Drivers] No driver registered` | The pass ran with nothing to offer devices to |
+| `[Drivers] pci/0000:00:04.0 kept by xhci` | A built-in driver (or the `gop` reservation) owns the function, so no registered driver is offered it |
+| `[Drivers] pci/0000:00:03.0 -> rtl8139 (device match)` | The driver bound the device, and which kind of match ranked it |
+| `[Drivers] pci/0000:00:03.0 -> rtl8139 declined` | `Probe` returned `Declined`; the next candidate is offered the device |
+| `[Drivers] pci/0000:00:03.0 -> rtl8139 failed: ...` | The attempt failed, and why: `Probe returned Failed`, the message of an exception the factory or `Probe` threw, or `the factory returned null` |
+| `[Drivers] pci/0000:00:05.0 -> no driver` | No registration matched the device, or every candidate declined or failed |
+| `[Drivers] rtl8139 pci/0000:00:03.0: interrupts polled from the timer` | What `TryRequestInterrupts` got: `interrupts through MSI-X`, this, or `no interrupts: ...` |
+| `[Drivers] rtl8139 pci/0000:00:03.0: BAR 0 is not an assigned memory BAR` | Why a `Try` member of the context returned false; DMA and endpoint refusals are logged the same way |
+| `[Drivers] rtl8139 pci/0000:00:03.0: work item threw and will not run again: ...` | A work item's callback threw; it is disarmed |
+| `[Drivers] usb/1-5:1.0 -> usb-boot-mouse removed: the device left the bus` | A USB binding ended on unplug, after the driver's `Remove` |
+
+`DriverManager.Devices` shows the outcome, every PCI function and USB interface with the driver that owns it; DevKernel's `lsdev` command prints it.
+
+`Probe`, work items and `Remove` run in thread context, and a breakpoint in them stops as it does anywhere else in the kernel. The interrupt and report handlers are harder: they run with interrupts masked, a polled one on every timer tick, and they cannot log, since `WriteLog` builds a string. Count what a handler sees in fields, and log the counts from a work item or from the kernel. A handler that throws halts the kernel, and the panic names the driver and the device: `[Drivers] rtl8139 pci/0000:00:03.0: the interrupt handler threw`, after the exception's message.
+
+---
+
 ## Known limitations
 
 - Source-link and variable-inspection bugs exist in the VS Code debugging experience (see the [roadmap](../../roadmap.md)); stepping and breakpoints work, but inspecting some locals can show wrong or missing values.

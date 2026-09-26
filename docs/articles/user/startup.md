@@ -39,7 +39,7 @@ Each Cosmos package contributes a *library initializer* that the runtime execute
 
 1. **Cosmos.Kernel.Core**: carves the heap out of the Limine memory map, initializes the garbage collector, then registers the type system (statics, eager static constructors, module initializers). Nothing allocates before this step.
 2. **The runtime's own initializers** (`System.Private.CoreLib` and its companions): the preallocated `OutOfMemoryException`, the class constructor runner, the type loader and reflection callbacks, stack trace metadata. The class constructor runner is created here, so a static field whose type has a lazy static constructor can be read from this step on and not before.
-3. **Cosmos.Kernel.HAL**: platform HAL, the interrupt controller, PCI enumeration over ECAM, platform hardware (APIC/GIC, device drivers such as the NIC), the USB host controllers with their keyboard and mass storage drivers, and the AHCI/NVMe storage controllers.
+3. **Cosmos.Kernel.HAL**: platform HAL, the interrupt controller, PCI enumeration over ECAM, platform hardware (APIC/GIC, device drivers such as the NIC), the USB host controllers with their keyboard and mass storage drivers, and the AHCI/NVMe storage controllers. These are the built-in drivers; the [drivers your kernel registers](drivers.md) bind later, in `Global.StartKernel()`.
 4. **Cosmos.Kernel**: CPU exception handlers and the scheduler (one idle thread per CPU, preemption on a 10 ms quantum).
 5. **Cosmos.Kernel.System**: the service managers `TimerManager`, `KeyboardManager`, `MouseManager`, `NetworkManager`, `StorageManager`.
 
@@ -73,13 +73,14 @@ public static class CosmosEntryPoint
 </PropertyGroup>
 ```
 
-The constructor of your kernel runs inside `Main`, before `StartKernel()`, so the interrupt state it sees is whatever phase 3 left: do not rely on it either way.
+The constructor of your kernel runs inside `Main`, before `StartKernel()`, so the interrupt state it sees is whatever phase 3 left: do not rely on it either way. It can register drivers, but `RegisterDrivers()` (below) is the place for that.
 
 `Global.StartKernel()` runs once; calling it again throws `InvalidOperationException`. Before your kernel gets control it:
 
 1. Enables hardware interrupts, on both architectures (unless `CosmosEnableInterrupts` is `false`, in which case they stay masked throughout).
-2. Starts the USB hot-plug thread, which follows the USB devices plugged in and pulled out from then on. It needs the scheduler to switch to it: when nothing does within 50 ms, as on x64 with ACPI off where the scheduler's timer never starts, hot-plug stays off and the USB devices are the ones found at boot.
-3. Calls `Start()` on the registered instance.
+2. Calls your kernel's `RegisterDrivers()`, then runs the driver pass, which offers every PCI function and USB interface the built-in drivers left to the drivers the kernel registered (see [Drivers](drivers.md)). Registration closes as the pass starts. Both steps run on the boot thread, and only in a kernel built with PCI (`CosmosEnablePCI`): without it, `RegisterDrivers()` is never called.
+3. Starts the USB hot-plug thread, which follows the USB devices plugged in and pulled out from then on, and offers each new one to the built-in drivers, then to the registered ones. It needs the scheduler to switch to it: when nothing does within 50 ms, as on x64 with ACPI off where the scheduler's timer never starts, hot-plug stays off and the USB devices are the ones found at boot.
+4. Calls `Start()` on the registered instance.
 
 ## Sys.Kernel.Start()
 
@@ -150,7 +151,7 @@ An uncaught exception inside `Run()` propagates out of the loop, so wrap the bod
 
 ## Customizing startup
 
-`OnBoot()` runs before the console exists, the right place for early hardware setup. Interrupts are already enabled by then, on x64 and ARM64 alike, and USB hot-plug, when it could start, is already running, so a USB device can come or go while it runs:
+`OnBoot()` runs before the console exists, the right place for early hardware setup. Interrupts are already enabled by then, on x64 and ARM64 alike, the drivers the kernel registered have been offered their devices, and USB hot-plug, when it could start, is already running, so a USB device can come or go while it runs:
 
 ```csharp
 protected override void OnBoot()
@@ -163,7 +164,7 @@ protected override void OnBoot()
 
 A headless kernel that later wants `Console` output calls `KernelConsole.Initialize()` itself: it is the only route on the ring, `Console.WriteLine` does not bring the console up on its own. The call is idempotent, so it is safe whether or not `base.OnBoot()` already ran, and it returns `false` when graphics are compiled out.
 
-For total control you can override `Start()` itself and take over the lifecycle: the default implementation in [`Cosmos.Kernel.System/Kernel.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.System/Kernel.cs) is small and a good starting point to copy from. Interrupts and USB hot-plug are set up by `Global.StartKernel()` before it calls `Start()`, so an override keeps both.
+For total control you can override `Start()` itself and take over the lifecycle: the default implementation in [`Cosmos.Kernel.System/Kernel.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.System/Kernel.cs) is small and a good starting point to copy from. Interrupts, the registered drivers and USB hot-plug are set up by `Global.StartKernel()` before it calls `Start()`, so an override keeps all three.
 
 ## The kernel command line
 
@@ -201,6 +202,7 @@ Every phase above logs to the serial port (COM1), which `cosmos run` connects to
 [Global] Registering kernel
 [Global] StartKernel called
 [Global] Enabling interrupts...
+[Drivers] No driver registered
 [Global] Starting kernel...
 [Kernel] Calling OnBoot()...
 [Kernel] Calling BeforeRun()...

@@ -152,7 +152,7 @@ Two more knobs on `MouseManager`:
 
 - Only relative pointing devices are supported. There is no absolute (tablet) input, so inside a VM window the guest pointer does not track the host cursor one to one.
 - Horizontal wheel tilt is ignored; only the vertical wheel reaches `ScrollDelta`.
-- Devices are detected once at boot; there is no mouse hotplug.
+- The built-in mice are detected once at boot; there is no mouse hotplug. A USB mouse driver a kernel registers through the [driver kit](drivers.md) does follow hot-plug.
 
 ## How it works
 

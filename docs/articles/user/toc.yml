@@ -14,5 +14,7 @@
   href: keyboard.md
 - name: Mouse
   href: mouse.md
+- name: Drivers
+  href: drivers.md
 - name: Debugging with VSCode and QEMU
   href: debugging.md

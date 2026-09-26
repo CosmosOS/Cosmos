@@ -22,6 +22,7 @@ Everything you need to create, build and run your own Cosmos kernel:
  - [Graphics](articles/user/graphics.md): draw shapes, text and images on the screen with the Canvas API.
  - [Keyboard](articles/user/keyboard.md): read lines, key events and layouts through `Console` and `KeyboardManager`.
  - [Mouse](articles/user/mouse.md): pointer position, buttons and scroll wheel through `MouseManager`.
+ - [Drivers](articles/user/drivers.md): write your own PCI and USB drivers with the experimental driver kit, and register them from your kernel.
  - [Debugging with VSCode and QEMU](articles/user/debugging.md): set breakpoints in your kernel with remote GDB.
 
 ## Contributor Docs

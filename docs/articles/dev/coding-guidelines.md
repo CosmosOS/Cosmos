@@ -28,12 +28,12 @@ This document establishes the coding style and architecture patterns for Cosmos 
 
 ### Layer Dependency Rules
 
-The project is split into strict layers. Dependencies flow **downward only**. These rules are **enforced at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`.
+The project is split into strict layers. Dependencies flow **downward only**, each layer to the one directly below it, with one exception: a user kernel may also reference `Cosmos.Kernel.HAL`, where the driver kit its own PCI and USB drivers are written against lives (`Cosmos.Kernel.HAL.Drivers`, experimental COSMOS0003). These rules are **checked at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which warns (NAOT0007) on any other reference.
 
 ```
 User Kernel (DevKernel, test kernels)
     └── Cosmos.Kernel.System        ← high-level OS APIs (Console, Graphics, Network)
-         └── Cosmos.Kernel.HAL      ← hardware abstraction (shared logic)
+         └── Cosmos.Kernel.HAL      ← hardware abstraction (shared logic); also the driver kit, which user kernels reference directly
               ├── Cosmos.Kernel.HAL.X64        ← x64-specific HAL implementations
               ├── Cosmos.Kernel.HAL.ARM64      ← ARM64-specific HAL implementations
               └── Cosmos.Kernel.HAL.Interfaces ← pure interfaces, no implementations
@@ -307,6 +307,7 @@ public class Kernel : Cosmos.Kernel.System.Kernel
 
 **Rules:**
 - Override `OnBoot()` only to customize boot (the default brings up `KernelConsole`).
+- Override `RegisterDrivers()` to register the kernel's own PCI and USB drivers through `DriverManager`, one feature switch per `if` (see [Drivers](../user/drivers.md)); it runs before `OnBoot()`, and only in a kernel built with PCI.
 - Override `BeforeRun()` for one-time setup after the system is ready.
 - `Run()` is the main loop body, keep it focused.
 - Call `Stop()` to exit the main loop cleanly.
@@ -949,8 +950,8 @@ Logic that needs no hardware (`Tcp` receive-buffer arithmetic, address parsing) 
 
 Three rules decide what is `public` (the full policy and its mechanisms live in [Public API Tracking](public-api.md)):
 
-1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types its signatures expose (the `HAL.Interfaces` device interfaces, the `HAL.Vfs` contracts, Core's platform interfaces). Only that surface is tracked, documented, and covered by deprecation cycles.
-2. **Chosen experimental seams.** An extension point outside the ring is opened deliberately and marked `[Experimental("COSMOSxxxx")]`: usable now, no compatibility promise, promoted by removing the attribute. Never open a seam by just making something public.
+1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types a kernel obtains or supplies through it (`IBlockDevice`, `MACAddress` and `SoftwareTimer` in `HAL.Interfaces`, the `HAL.Vfs` contracts). Only that surface is tracked, documented, and covered by deprecation cycles.
+2. **Chosen experimental seams.** An extension point outside the ring is opened deliberately and marked `[Experimental("COSMOSxxxx")]`: usable now, no compatibility promise, promoted by removing the attribute. Never open a seam by just making something public. There are three: the scheduler policy (COSMOS0001, Core), the packet types (COSMOS0002, System) and the driver kit (COSMOS0003, `Cosmos.Kernel.HAL.Drivers` with its registration side in System). Every public type of a seam carries the attribute, enums and delegates included, and the assembly that declares a seam suppresses its ID in its `.csproj`, with a comment saying why.
 3. **Everything else is `internal`.** Visibility is not the extension mechanism. First-party assemblies and white-box test kernels use `InternalsVisibleTo`; external code uses `[UnsafeAccessor]` ([Accessing internals](accessing-internals.md)) at its own risk.
 
 Practical rules that follow:
