@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.Drivers;
 using DevKernel.Commands;
+using DevKernel.Drivers;
 using DevKernel.Shell;
 using DevKernel.Storage;
 using Sys = Cosmos.Kernel.System;
@@ -19,6 +21,30 @@ public class Kernel : Sys.Kernel
     private const string BannerRule = "========================================";
 
     private readonly ShellContext _shell = new(CommandRegistry.CreateDefault());
+
+    /// <summary>
+    /// Registers DevKernel's own drivers (<c>Drivers/</c>). Runs in
+    /// StartKernel with interrupts on, after the built-in drivers bound their
+    /// devices and before OnBoot, and only in a kernel built with PCI, so it
+    /// needs no PCI guard of its own. One switch per <c>if</c>: ILC folds a
+    /// single condition in Debug builds, so a kernel built without the
+    /// subsystem a driver publishes to trims that driver.
+    /// </summary>
+    protected override void RegisterDrivers()
+    {
+        if (Sys.KernelFeatures.Network)
+        {
+            DriverManager.Register(Rtl8139Driver.CreateRegistration());
+        }
+
+        if (Sys.KernelFeatures.Usb)
+        {
+            if (Sys.KernelFeatures.Mouse)
+            {
+                DriverManager.Register(UsbBootMouseDriver.CreateRegistration());
+            }
+        }
+    }
 
     protected override void BeforeRun()
     {

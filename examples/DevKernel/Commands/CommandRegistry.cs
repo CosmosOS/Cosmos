@@ -17,6 +17,7 @@ internal static class CommandRegistry
         KeyboardCommands.Register(shell);
         MemoryCommands.Register(shell);
         SchedulerCommands.Register(shell);
+        DriverCommands.Register(shell);
         GraphicsCommands.Register(shell);
         NetworkCommands.Register(shell);
         DiskCommands.Register(shell);
