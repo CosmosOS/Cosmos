@@ -58,4 +58,13 @@ internal static class PciOwner
 
     /// <summary>VMware SVGA II adapter, taken when the full-screen canvas first drives it.</summary>
     public const string VmwareSvga = "vmware-svga";
+
+    /// <summary>
+    /// True when <paramref name="name"/> is one of the names above. A driver
+    /// a kernel registers cannot take one: the owner would no longer say
+    /// whether a built-in or a registered driver has the function, and
+    /// <see cref="Gop"/> would read as the boot display's reservation.
+    /// </summary>
+    public static bool IsBuiltIn(string name) =>
+        name is Gop or E1000E or VirtioNet or VirtioInput or VirtioGpu or Xhci or Ahci or Nvme or VmwareSvga;
 }

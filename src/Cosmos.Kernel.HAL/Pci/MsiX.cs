@@ -131,6 +131,34 @@ internal static class MsiX
     }
 
     /// <summary>
+    /// Where the MSI-X table of <paramref name="pci"/> lives, as its
+    /// capability describes it: the BAR slot that holds it (the BIR, which
+    /// a malformed capability can set to a slot past the last BAR), the
+    /// table's offset in that BAR, and its length in bytes. Lets an owner
+    /// map the table and turn memory decoding on before <see cref="Enable"/>
+    /// writes to it. Thread context only.
+    /// </summary>
+    /// <returns>False when the function has no MSI-X capability.</returns>
+    public static bool TryGetTable(PciDevice pci, out int barIndex, out ulong offset, out ulong length)
+    {
+        byte cap = pci.FindCapability(CapId);
+        if (cap == 0)
+        {
+            barIndex = 0;
+            offset = 0;
+            length = 0;
+            return false;
+        }
+
+        ushort msgCtrl = pci.ReadRegister16((byte)(cap + MsgCtrlOffset));
+        uint tableBirOff = pci.ReadRegister32((byte)(cap + TableOffsetBirOffset));
+        barIndex = (int)(tableBirOff & TableBirMask);
+        offset = tableBirOff & TableOffsetMask;
+        length = (ulong)((msgCtrl & MsgCtrlTableSizeMask) + 1) * EntryStride;
+        return true;
+    }
+
+    /// <summary>
     /// Allocate a routing slot (IDT vector on x64, LPI on ARM64) for
     /// <paramref name="handler"/> via <see cref="MsiRouting"/>, then
     /// program entry <paramref name="index"/> to deliver to it and unmask.

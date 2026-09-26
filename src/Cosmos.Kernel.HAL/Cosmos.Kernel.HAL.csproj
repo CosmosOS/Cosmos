@@ -47,7 +47,8 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Virtio" />
-    <!-- Temporary: the driver kit's cells (Drivers) read PCI owners and USB
+    <!-- Temporary: the driver kit's cells (Drivers) register their drivers
+         through the kit's internal engine and read PCI owners and USB
          interfaces here until the kit's public seam lands; from then on the
          suite builds against that seam and this grant is removed. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Drivers" />
