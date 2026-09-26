@@ -74,7 +74,7 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 |-------|-------|-------------|
 | **HelloWorld** | 3 | Basic arithmetic, boolean logic, integer comparison |
 | **Memory** | 85 | Boxing/unboxing, memory allocation, collections, memory copy, GC |
-| **Drivers** | 7 per cell | Hardware no built-in driver claims: enumerated, and left free for a driver kernels register |
+| **Drivers** | 47 per cell | The driver kit: registration, ranking, interrupts, work items, events, publications and teardown of registered drivers, on hardware no built-in driver claims |
 
 #### HelloWorld Tests
 
@@ -131,22 +131,44 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 
 #### Drivers Tests
 
-The groundwork for the driver kit. Each [profile](#hardware-profiles) attaches one piece of hardware that no built-in driver claims, and the suite checks that the kernel sees it and leaves it free. The binding tests arrive with the driver engine and build on these cells.
+The driver kit. Each [profile](#hardware-profiles) attaches one piece of hardware that no built-in driver claims. The kernel is built with `CosmosEnableStorage=false`, so the built-in NVMe driver never takes the `nvme` profile's controller; every other switch keeps its default, and Network and Mouse must stay on, since the drivers publish a network link and mice to their managers. The kernel registers its test drivers from its constructor, the driver pass in `Global.StartKernel` offers them the free PCI functions, and the tests check what came of it.
 
 | Profile | Architectures | Hardware |
 |---------|---------------|----------|
 | `edu` | x64, arm64 | QEMU's edu test device (1234:11e8) |
-| `rtl8139` | x64, arm64 | A Realtek RTL8139 NIC (10ec:8139) with a user-mode netdev |
+| `rtl8139` | x64, arm64 | A Realtek RTL8139 NIC (10ec:8139) with a user-mode netdev, whose DHCP server the suite's RTL8139 driver gets a lease from, and no other NIC |
 | `e1000e-arm64` | arm64 | An Intel 82574L NIC (8086:10d3), which the E1000E built-in claims on x64 only |
 | `usb-mouse` | x64, arm64 | A USB mouse on a `qemu-xhci` root port, and no USB stick |
+| `nvme` | x64, arm64 | QEMU's NVMe controller (1b36:0010), free because the suite builds without Storage |
 
-The `gicv2` and `gicv3` modifiers run every profile on both GICs on arm64, so x64 has 3 cells and arm64 has 12. Every cell reports the same 7 tests, and each test is skipped on the cells whose profile attaches other hardware:
+The `gicv2` and `gicv3` modifiers run every profile on both GICs on arm64, so x64 has 4 cells and arm64 has 15. MSI-X is expected on x64 and on the `+gicv3` cells, whose ITS routes it; the arm64 cells without it (the bare cell is GICv2) expect polled interrupts. The same drivers are registered on every cell:
 
-- `Profile_Recognized`: the cell's profile is one of the four above, since a profile the suite does not know would otherwise skip everything
-- `Pci_ProfileFunctionEnumeratedOnce`, `Pci_ProfileFunctionClassMatches`, `Pci_ProfileFunctionUnowned`: the profile's PCI function was enumerated exactly once, with the expected base class and subclass, and has no owner
+- an `edu-class` driver matching edu by class, registered first, and three drivers matching edu by device ID: `edu-throws`, which maps BAR 0, allocates DMA memory, requests interrupts, creates an event and two work items, schedules one of them, and publishes a mouse and a network link, then throws from Probe; `edu-reentrant`, which tries to register a driver from its factory and its Probe and then declines; and `edu`, which binds, drives the device, publishes a mouse, requests interrupts (polled: edu has no MSI-X) and raises one it keeps pending until Probe returns
+- four Ethernet class drivers: two, with and without the programming interface, that decline; `e1000e-irq`, registered after them, which binds the 82574L only and requests its interrupts; and `rtl8139`, registered last, which binds the RTL8139 only, through memory BAR 1 on both architectures, with 32-bit DMA buffers, polled interrupts (the chip has no MSI-X) and a receive work item, and publishes a network link whose transmit handler feeds the chip
+- `nvme-identify`, matching NVMe by class, and `nvme-fails`, registered after it but matching by device ID, which requests interrupts, allocates 64 pages of DMA memory and fails; `nvme-identify` then binds the controller, requests interrupts again and submits an Identify Controller command whose completion arrives during Probe
+
+Every cell reports the same 47 tests, and each test is skipped on the cells whose profile attaches other hardware:
+
+- `Profile_Recognized`: the cell's profile is one of the five above, since a profile the suite does not know would otherwise skip everything
+- `Pci_ProfileFunctionEnumeratedOnce`, `Pci_ProfileFunctionClassMatches`: the profile's PCI function was enumerated exactly once, with the expected base class and subclass
+- `Pci_ProfileFunctionUnownedBeforePass`, `Pci_ProfileFunctionOwnerAfterPass`: the function had no owner when the kernel was constructed; after the pass, edu is owned by `edu`, the 82574L by `e1000e-irq`, NVMe by `nvme-identify`, and the RTL8139 by `rtl8139`
 - `Usb_XhciOwnedByXhci`, `Usb_MouseEnumeratedOnce`, `Usb_MouseInterfaceUnbound`: the xHCI controller is owned by `xhci`, exactly one device presents a HID boot mouse interface (class 3, subclass 1, protocol 2), and no class driver is bound to it
+- `Register_TakenNameRefused`, `Register_InvalidRegistrationThrows`, `Register_AfterPassThrows`, `Register_FromDriverCallbackThrows`: a second registration under a taken name, or a built-in's name such as `xhci` or `gop`, is refused; an empty name, no match entries or a default `PciMatch` throw `ArgumentException`; `Register` after the pass, or from a factory or a Probe, throws `InvalidOperationException`, from a factory or a Probe with the re-entrancy check's message, since the closed registration alone would refuse those calls too
+- `Ranking_DeviceMatchBeatsClassMatch`, `Ranking_FailedAndDeclinedFallThrough`, `Ranking_ClassWithInterfaceBeatsClass`: device matches are offered edu before the class match registered ahead of them, in registration order, each failed or declined attempt passing the function on, and on NVMe the failing device match is offered the controller before the class match registered ahead of it; on the NIC cells the class match with a programming interface is offered the function before those without, which follow in registration order: `rtl8139` comes last, after `e1000e-irq` declined the RTL8139
+- `Teardown_RestoresCommandRegister`, `Teardown_InvalidatesRegionAndBuffer`: a failed or declined attempt writes the Command register back as it found it but with bus mastering off, and every attempt starts with bus mastering off, so the driver that binds finds the register as the kernel constructor did, bus mastering off, plus the INTx disable, and the region and DMA buffer it handed out throw from then on
+- `Context_ProbeOnlyMembersThrowAfterProbe`, `Context_WriteConfigSparesHeader`, `Function_ReadsConfigSpace`, `Mmio_MapsWholeBar`, `Mmio_RefusesBadAccesses`: the bound edu context refuses resources, interrupts, events, work items and publications after Probe, and config writes below 0x40, reads config space and finds edu's MSI capability, and maps the whole 1 MiB BAR behind bounds and alignment checks
+- `Edu_Identification`, `Edu_Liveness`, `Edu_Factorial`, `Edu_Dma`: the edu driver reads 0x010000ed from the identification register, the complement of what it wrote from the liveness register and 10! from the factorial unit, and round-trips a buffer through edu's DMA engine, whose 28-bit limit the allocator can only meet on x64: on arm64, whose RAM starts at 1 GiB, the test passes when the allocation fails and the lowest free page lies above the limit
+- `Interrupts_RequestOncePerAttempt`, `Interrupts_HandlerIdleUntilBound`, `Interrupts_PolledHandlerServicesDevice`, `Interrupts_TornDownHandlerNeverRuns`: on edu both attempts are granted polled interrupts and a second request throws; the interrupt raised in Probe is still pending when Probe returns and is serviced once Bound; an interrupt raised through edu's `0x60` register reaches the handler, which acknowledges it through `0x64` and signals an event a thread then waits on; and the failed attempt's handler, never armed, never runs, and its poll timer is off the platform timer
+- `Interrupts_E1000EModeFollowsGic`: on the `+gicv3` cell the 82574L gets MSI-X through the ITS, entry 0 masked during Probe and unmasked on Bound with bus mastering on; on the others it is polled, and its handler runs on every tick
+- `WorkItem_ScheduledInProbeRunsAfterBound`, `WorkItem_ScheduledFromHandlerRunsOnDriverWork`, `WorkItem_DroppedWithFailedAttempt`: a work item scheduled in Probe (a second Schedule returning false while it is pending) runs once, after Bound, on the `driver-work` thread; one scheduled from the interrupt handler runs there too; the failed attempt's scheduled work item never runs, and neither it nor the one it never scheduled can be scheduled any more
+- `Event_WaitThrowsInProbe`, `Event_TornDownWaitReturnsFalse`: `DeviceEvent.Wait` throws inside Probe and returns false on a failed attempt's event
+- `Lock_IrqSafeLockMasksInterrupts`: while an `IrqSafeLock` is held the polled edu handler is not called, it is again once the scope ends, and the lock can be entered again
+- `Publish_MouseMovesPointer`, `Publish_DroppedWithFailedAttempt`: a report the edu handler makes, in interrupt context, through the mouse edu's Probe published moves `MouseManager`'s pointer, wheel and buttons; the mouse and the network link the failed attempt published never reach their managers: the network device count is what it was when the kernel was constructed, and a report through that mouse moves nothing
+- `Rtl8139_LinkRegistered`, `Rtl8139_PolledHandlerRuns`, `Rtl8139_DhcpLease`: the RTL8139 driver's link is the one registered network device and the primary one, with the chip's MAC address, the driver's name and path, and its link up; its polled handler runs; and `DhcpClient` gets a lease through it, the Discover and Request leaving through the transmit handler and the Offer and Ack coming back through the handler, the receive work item on the `driver-work` thread and the link's `Deliver`
+- `Nvme_FailedAttemptRequestedInterrupts`, `Nvme_TeardownReleasedInterrupts`, `Nvme_RebindGetsInterruptsAgain`, `Nvme_CompletionInterruptAfterBound`: the failing attempt gets MSI-X where it is expected (entry 0 masked, one interrupt vector bound on x64) and polling elsewhere; after its teardown MSI-X Enable is off, the vector is free again on x64, the poll timer is off the platform timer on the polled cells, and its DMA pages are back; `nvme-identify` gets interrupts the same way again, with the entry unmasked and bus mastering on once Bound; and the Identify's completion, which arrived during Probe, reaches the handler only after Bound, from the replayed MSI-X message or the first poll, with a successful status and QEMU's vendor ID in the data
+- `DeviceList_MatchesEveryFunction`: the engine's device list holds every enumerated function once, in bus order, with its owner and IDs
 
-The suite reads HAL internals through a temporary `InternalsVisibleTo` grant, which goes away once the driver kit's public API lands.
+The suite reads HAL internals, and Core's interrupt vector table, through temporary `InternalsVisibleTo` grants, which go away once the driver kit's public API lands. The PCI context's poll timer, a private field, is read through `[UnsafeAccessor]`.
 
 ### Running Kernel Tests
 

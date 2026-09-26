@@ -121,6 +121,11 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Memory" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
+    <!-- Temporary, like its HAL grant: the driver kit's cells (Drivers) count
+         the dynamic interrupt vectors a failed binding attempt must give
+         back. Removed with the HAL grant once the suite builds against the
+         kit's public seam. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Drivers" />
   </ItemGroup>
 
   <ItemGroup>
