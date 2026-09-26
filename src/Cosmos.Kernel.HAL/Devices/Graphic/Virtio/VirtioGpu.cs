@@ -73,6 +73,15 @@ internal unsafe class VirtioGpu : GraphicDevice
     private uint _height;
     private uint _pitch;   // bytes per scanline (width * 4)
 
+    // Bounding box of framebuffer writes since the last Swap(); Swap() only
+    // transfers/flushes this region instead of the whole scanout. Empty
+    // (_dirty == false) means nothing changed and Swap() is a no-op.
+    private bool _dirty;
+    private uint _dirtyX0;
+    private uint _dirtyY0;
+    private uint _dirtyX1;
+    private uint _dirtyY1;
+
     private bool _initialized;
     private bool _enabled;
 
@@ -93,6 +102,44 @@ internal unsafe class VirtioGpu : GraphicDevice
     /// the device DMA's from on TRANSFER_TO_HOST_2D; there is no second copy.
     /// </summary>
     public byte* Framebuffer => _framebuffer;
+
+    /// <summary>
+    /// Extends the pending dirty rectangle to cover the given region. Called
+    /// internally by ClearScreen/DrawPixel/CopyBuffer, and by the canvas for
+    /// writes that go straight through <see cref="Framebuffer"/> (DrawFilledRectangle).
+    /// </summary>
+    public void MarkDirty(int x, int y, int width, int height)
+    {
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
+        uint x0 = (uint)Math.Max(0, x);
+        uint y0 = (uint)Math.Max(0, y);
+        uint x1 = (uint)Math.Min((int)_width, x + width);
+        uint y1 = (uint)Math.Min((int)_height, y + height);
+        if (x0 >= x1 || y0 >= y1)
+        {
+            return;
+        }
+
+        if (!_dirty)
+        {
+            _dirtyX0 = x0;
+            _dirtyY0 = y0;
+            _dirtyX1 = x1;
+            _dirtyY1 = y1;
+            _dirty = true;
+        }
+        else
+        {
+            _dirtyX0 = Math.Min(_dirtyX0, x0);
+            _dirtyY0 = Math.Min(_dirtyY0, y0);
+            _dirtyX1 = Math.Max(_dirtyX1, x1);
+            _dirtyY1 = Math.Max(_dirtyY1, y1);
+        }
+    }
 
     // --- Constructor ---
 
@@ -240,6 +287,7 @@ internal unsafe class VirtioGpu : GraphicDevice
         {
             fb[i] = color;
         }
+        MarkDirty(0, 0, (int)_width, (int)_height);
     }
 
     public override void DrawPixel(uint color, int x, int y)
@@ -250,6 +298,7 @@ internal unsafe class VirtioGpu : GraphicDevice
         }
         uint offset = (uint)(y * _pitch + x * 4);
         ((uint*)_framebuffer)[offset / 4] = color;
+        MarkDirty(x, y, 1, 1);
     }
 
     public override uint GetPixel(int x, int y)
@@ -301,6 +350,7 @@ internal unsafe class VirtioGpu : GraphicDevice
                 MemoryOp.MemCopy(_framebuffer + dstByteOffset, (byte*)pSrc, clampedWidth * 4);
             }
         }
+        MarkDirty(x, y, clampedWidth, clampedHeight);
     }
 
     public override void CopyBuffer(ReadOnlyMemory<int> pixels, int x, int y, int width, int height)
@@ -328,6 +378,7 @@ internal unsafe class VirtioGpu : GraphicDevice
                 MemoryOp.MemCopy(_framebuffer + dstByteOffset, (byte*)pSrc, clampedWidth * 4);
             }
         }
+        MarkDirty(x, y, clampedWidth, clampedHeight);
     }
 
     public override void Swap()
@@ -337,12 +388,21 @@ internal unsafe class VirtioGpu : GraphicDevice
             return;
         }
 
-        // Push the whole framebuffer to the host and flush the dirty rect.
-        // TransferToHost2D and ResourceFlush both block on the response, so
-        // a Swap costs two round-trips on the control queue. Optimizing this
-        // (deferred flush, fence pipelining) is left for later.
-        TransferToHost2D(ScanoutResourceId, 0, 0, _width, _height);
-        ResourceFlush(ScanoutResourceId, 0, 0, _width, _height);
+        if (!_dirty)
+        {
+            return;
+        }
+
+        // Push only the region touched since the last Swap and flush the same
+        // rect, instead of the whole framebuffer. TransferToHost2D and
+        // ResourceFlush both block on the response, so a Swap still costs two
+        // round-trips on the control queue; shrinking the rect is what keeps
+        // those round-trips cheap. Fence pipelining is left for later.
+        uint dirtyWidth = _dirtyX1 - _dirtyX0;
+        uint dirtyHeight = _dirtyY1 - _dirtyY0;
+        TransferToHost2D(ScanoutResourceId, _dirtyX0, _dirtyY0, dirtyWidth, dirtyHeight);
+        ResourceFlush(ScanoutResourceId, _dirtyX0, _dirtyY0, dirtyWidth, dirtyHeight);
+        _dirty = false;
     }
 
     // --- 2D command helpers ---
