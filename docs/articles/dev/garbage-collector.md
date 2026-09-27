@@ -101,11 +101,13 @@ Segment allocation lives in [`GCSegmentManager`](https://github.com/CosmosOS/Cos
 
 ### Brick table
 
-During marking the GC sometimes holds an address that points into the middle of an object rather than at its start: a `ref` to an array element, or the reference inside a `Span<T>` (see [Interior pointers](#interior-pointers)). To mark the object it must first find where the object starts, and heap memory offers no way back: objects sit end to end with no back-pointers, so the only guaranteed way to find a start from an arbitrary interior address is to walk the segment from `Start`, object by object, until reaching the one that contains the address. For a large segment that is far too slow to do once per pointer.
+During marking the GC sometimes holds an address that points into the middle of an object rather than at its start: a `ref` to an array element, or the reference inside a `Span<T>` (see [Interior pointers](#interior-pointers)). To mark the object it must first find where the object starts, and heap memory offers no way back: objects sit end to end with no back-pointers, so the only guaranteed way to find a start from an arbitrary interior address is to walk the segment from `Start`, object by object, until reaching the one that contains the address.
 
-The brick table is the shortcut. Each segment carries a coarse index that records where recent objects start, so a lookup can jump close to the target and walk forward only a short distance instead of starting from the beginning. The standard .NET GC keeps a brick table for exactly the same job, which is where the name comes from.
+The brick table was meant to shorten that walk: a coarse per-segment index of where objects start, so a lookup could jump close to the target and walk forward only a short distance. The standard .NET GC keeps a brick table for the same job, which is where the name comes from.
 
-The mechanics: the usable region is divided into chunks of 255 pointer-sized slots (about 2 KiB, sized so a slot index fits in one byte), and the table stores one byte per chunk holding the 1-based slot index of the last recorded object start in that chunk (0 means none). `GCSegment.MarkObject(addr)` records starts at allocation time: on the pinned heap that is every object, but on the regular heap only each buffer bump-allocated from the segment, which in practice means each TLAB. So the first object of a TLAB is recorded, the objects that follow inside it are not, and a TLAB recycled from the free list adds no entry at all. Entries are therefore hints, not truth: `FindClosestObjectBelow(addr)` scans the table backwards for the nearest recorded start at or below the address, and the caller walks forward object by object from there until it reaches the object containing the address. The forward walk is what guarantees correctness; the table only shortens it.
+The mechanics: the usable region is divided into chunks of 255 pointer-sized slots (about 2 KiB, sized so a slot index fits in one byte), and the table stores one byte per chunk holding the 1-based slot index of the last recorded object start in that chunk (0 means none). `GCSegment.MarkObject(addr)` records starts at allocation time: on the pinned heap that is every object, but on the regular heap only each buffer bump-allocated from the segment, which in practice means each TLAB.
+
+The table is currently written but never read, because its entries are not a safe place to start a walk. They are incomplete: the objects that follow the first one inside a TLAB are never recorded, and a TLAB recycled from the free list adds no entry at all. They are also stale: nothing clears an entry when a sweep pulls `Bump` back or a free-list refill reuses the space, and `MarkObject` only ever raises an entry, so an old entry can point into the middle of a live object, where a walk would read object data as headers. The interior-pointer lookup therefore always walks from `Start`. That stays cheap because segments are small: a new segment is sized for the request that needed it, which is at least one page, 8 KiB for a TLAB refill, or one large object.
 
 ### Segment chains
 
@@ -401,33 +403,34 @@ The scanner starts a cursor at `obj + startOffset` and, for every array element,
 
 A `ref` into an array element, a `Span<T>`'s `_reference`, or any other byref can be the only live reference to an object. Such a pointer does not point at the object header, so `TryMarkRoot`'s MethodTable check would discard it and the object would be collected while still in use (issue [#384](https://github.com/valentinbreiz/nativeaot-patcher/issues/384), fixed by the interior-pointer support from [#376](https://github.com/valentinbreiz/nativeaot-patcher/issues/376) for precisely scanned frames; conservatively scanned threads still miss them, see [Limitations and evolution](#limitations-and-evolution)).
 
-The precise stack scan fixes this for the GC-triggering thread. GCInfo tags byref slots with `GC_CALL_INTERIOR`, and the scan's root callback resolves them before marking:
+The precise stack scan fixes this for the GC-triggering thread. GCInfo tags byref slots with `GC_CALL_INTERIOR`, and the scan's root callback resolves them to their containing object with `GetParentObject` before marking:
 
 ```mermaid
 flowchart TD
-    BYREF["Byref slot tagged GC_CALL_INTERIOR"] --> PINQ{"GC_CALL_PINNED too?"}
-    PINQ -->|yes| SEGP["Find the segment containing
-    the address in the pinned chain"]
-    PINQ -->|no| SEGR["Find the segment containing
-    the address in the regular chain"]
-    SEGP --> FOUND{"Segment found?"}
-    SEGR --> FOUND
-    FOUND -->|no| PASS["Pass the value through unchanged:
-    TryMarkRoot's normal validation
-    discards it"]
-    FOUND -->|yes| BRICK["Brick table: closest recorded
-    object start at or below the address
-    (FindClosestObjectBelow)"]
-    BRICK --> WALK["Enumerate objects forward
-    (GCSegment.Enumerator, stepping by
-    ComputeSize) until the object whose
-    range contains the address"]
-    WALK --> MARK["Mark that object"]
+    BYREF["Byref slot tagged GC_CALL_INTERIOR"] --> SEG["Find the segment containing
+    the address: regular chain,
+    then pinned chain"]
+    SEG --> FOUND{"Segment found, and
+    address below its Bump?"}
+    FOUND -->|no| NONE["Mark nothing"]
+    FOUND -->|yes| WALK["Walk from Start with the sweep's rules:
+    free block by its Size, filler word
+    by one word, object by its aligned size"]
+    WALK --> HIT{"Address inside
+    an object?"}
+    HIT -->|"no (free block or filler)"| NONE
+    HIT -->|yes| MARK["TryMarkRoot on that object"]
 ```
 
-The brick table entry the lookup lands on may be a few objects behind the target (see [Brick table](#brick-table)); the forward walk covers the distance.
+Three choices in that lookup are deliberate:
 
-The conservative scan still only accepts pointers that hit an object header exactly. `GC_InteriorPointerRoot` is the acceptance test: an `int[2100]` reachable only through a `ref int` into element 8 must survive a collection followed by allocation churn.
+- **Both chains, by address.** A slot's `GC_CALL_PINNED` flag describes the stack slot (a pinned local, which is what a `fixed` statement creates), not the heap the object came from: a `fixed` pointer into a regular-heap array and a plain `Span<T>` over a `GC.AllocateArray<T>(n, pinned: true)` array are both ordinary. The pinned sweep's free runs also feed the shared free lists, so a regular-heap TLAB can sit inside a pinned segment.
+- **From `Start`.** The [brick table](#brick-table) is not a safe place to start a walk, so every lookup walks its segment from the first object.
+- **The [sweep](#sweep-phase)'s stepping rules.** The walk classifies each word the way `SweepSegment` does and steps over objects by `Align(ComputeSize())`, the size the allocator reserved, so the object it finds is one `SweepSegment` also visits as an object start and unmarks for the next cycle. `ComputeSize()` alone is not a stride: strings and arrays of 1- or 2-byte elements have sizes that are not pointer multiples.
+
+An address that lands in a free block, in filler, or past `Bump` marks nothing, rather than being handed to `TryMarkRoot` as if it were a header.
+
+The conservative scan still only accepts pointers that hit an object header exactly. `GC_InteriorPointerRoot` is the acceptance test: an `int[2100]` reachable only through a `ref int` into element 8 must survive a collection followed by allocation churn. The first two choices have cells of their own: `GC_InteriorPointerRootMidTlab` roots an array that sits behind another object in its TLAB, so its start was never recorded in the brick table; `GC_InteriorPointerRootPinnedHeap` roots a pinned-heap array through a plain byref; and `GC_InteriorPointerRootFixed` roots a regular-heap array through a `fixed` pointer only.
 
 ### Handles during marking
 
@@ -516,11 +519,11 @@ Retiring the conservative path is the keystone: once every thread can be scanned
 
 ## Tests
 
-The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 45 tests (`make test KERNEL=GarbageCollector`). Highlights:
+The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 50 tests (`make test KERNEL=GarbageCollector`). Highlights:
 
 - exact collection accounting (`GC_CollectBasic`, `GC_UnreachableExactCount`),
 - weak and dependent handle behavior (`GC_WeakReference`, `GC_DependentHandle`, `GC_DependentHandleCleanup`),
-- interior pointer roots (`GC_InteriorPointerRoot`, the acceptance test for #384),
+- interior pointer roots (`GC_InteriorPointerRoot`, the acceptance test for #384, and `GC_InteriorPointerRootMidTlab`, `GC_InteriorPointerRootPinnedHeap`, `GC_InteriorPointerRootFixed`),
 - statics reachability through the handle spine (`GC_StaticOnlyReachability`),
 - precise stack scanning and funclet frames (`GC_PreciseStackScan`, `GC_FuncletNoFalseRoot`, `GC_FuncletNoCrashOnAllocInCatch`, `GC_StackScanPaddingStress`),
 - the malloc heaps staying untouched (`GC_MallocHeapNotSwept`),
