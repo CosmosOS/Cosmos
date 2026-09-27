@@ -49,7 +49,7 @@ For the full dependency graph, project descriptions, and rules, see [Kernel Proj
 ### When to Create a New Project
 
 - New hardware device category → new interface in `Cosmos.Kernel.HAL.Interfaces`, implementations in `Cosmos.Kernel.HAL.X64`/`Cosmos.Kernel.HAL.ARM64`. Cross-platform HAL devices go to `Cosmos.Kernel.HAL`.
-- A built-in driver for a PCI or USB device family, once the driver kit offers everything it needs → `Cosmos.Kernel.HAL.Drivers`, in a folder of its own under its subsystem's (`Storage/Ahci/`, `Storage/UsbMassStorage/`, namespaces following the folders), written against the kit's public seam only, with a `CreateRegistration()` added to the `BuiltInDrivers` catalogue. `Cosmos.Kernel.HAL` keeps the mechanisms (PCI, MSI-X, DMA, the USB host stack, the kit); see [Kernel Project Layout](kernel-project-layout.md#mechanisms-and-policies).
+- A built-in driver for a PCI or USB device family, once the driver kit offers everything it needs → `Cosmos.Kernel.HAL.Drivers`, in a folder of its own under the bus it binds (`Pci/Ahci/`, `Usb/MassStorage/`, namespaces following the folders), written against the kit's public seam only, with a `CreateRegistration()` added to the `BuiltInDrivers` catalogue. `Cosmos.Kernel.HAL` keeps the mechanisms (PCI, MSI-X, DMA, the USB host stack, the kit); see [Kernel Project Layout](kernel-project-layout.md#mechanisms-and-policies).
 - New OS-level feature, user API exposed → in `Cosmos.Kernel.System`.
 - New low-level runtime concern → in `Cosmos.Kernel.Core`.
 
