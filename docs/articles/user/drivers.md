@@ -9,7 +9,7 @@ The main differences if you come from Gen2:
 | | Gen2 | Gen3 |
 |---|---|---|
 | Hardware access | Kernel code drives PCI, I/O ports and interrupts itself | A registered driver is handed one device at a time, through a context that owns every resource it acquires |
-| Binding | The kernel looks its device up and starts the driver | The kit offers each PCI function and USB interface the built-in drivers left to the best-matching registered driver |
+| Binding | The kernel looks its device up and starts the driver | The kit offers each PCI function and USB interface HAL's built-in drivers left to the best-matching registered driver, the kit's own built-ins (AHCI, NVMe) among them |
 | Cleanup | The driver's own code | The kit's: a failed probe, and a USB device pulled out, are torn down for the driver |
 
 If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
@@ -150,11 +150,11 @@ From then on the USB mouse moves `MouseManager`'s pointer like a built-in one, a
 
 ### When registration happens
 
-`Global.StartKernel` calls `RegisterDrivers` once, on the boot thread, with interrupts on: after the built-in drivers bound their devices during HAL bring-up, and before the driver pass offers the registered drivers what the built-ins left, before USB hot-plug starts and before `OnBoot`. See [Kernel Startup](startup.md) for the whole order. A kernel built without PCI never calls it, so ILC trims the override and every driver only it registers.
+`Global.StartKernel` calls `RegisterDrivers` once, on the boot thread, with interrupts on: after the built-in drivers HAL brings up bound their devices during HAL bring-up, after it registered the built-in drivers written against the kit (see [Built-in drivers](#built-in-drivers)), and before the driver pass offers all those drivers what HAL's built-ins left, before USB hot-plug starts and before `OnBoot`. See [Kernel Startup](startup.md) for the whole order. A kernel built without PCI never calls it, so ILC trims the override and every driver only it registers.
 
 Registration closes as the pass starts. `DriverManager.Register` called later, from any thread, throws `InvalidOperationException`, and so does a call from inside a driver's factory, `Probe` or `Remove`. There is no way to add a driver once the kernel runs.
 
-Registering from the kernel's constructor works too. The pass ranks those registrations together with the ones `RegisterDrivers` makes, and a constructor registration, being earlier, wins a tie. Prefer `RegisterDrivers`: the constructor runs in every build, with interrupts in no defined state, while `RegisterDrivers` runs only where PCI is compiled in, with interrupts on.
+Registering from the kernel's constructor works too. The pass ranks those registrations together with the ones `RegisterDrivers` makes, and a constructor registration, being earlier, wins a tie against them, though never against a built-in. Prefer `RegisterDrivers`: the constructor runs in every build, with interrupts in no defined state, while `RegisterDrivers` runs only where PCI is compiled in, with interrupts on.
 
 ### What Register answers
 
@@ -210,7 +210,7 @@ For USB, where a driver binds one interface at a time:
 | `UsbMatch.Interface(class, subclass)` | Interfaces with that class and subclass |
 | `UsbMatch.Interface(class)` | Interfaces with that class |
 
-When several registrations match a device, the one whose best entry is most specific is offered it first, in the order of the tables above, and registration order breaks a tie. The device goes down that list until a `Probe` returns `Bound`. `Declined`, `Failed`, an exception thrown from the factory or `Probe`, and a factory that returns null all tear the attempt down and pass the device to the next candidate (for USB, only while the attempt opened no endpoint, see [USB drivers](#usb-drivers)). Every decision is logged:
+When several registrations match a device, the one whose best entry is most specific is offered it first, in the order of the tables above. A tie goes to a built-in driver the kit binds, then to the earlier registration. The device goes down that list until a `Probe` returns `Bound`. `Declined`, `Failed`, an exception thrown from the factory or `Probe`, and a factory that returns null all tear the attempt down and pass the device to the next candidate (for USB, only while the attempt opened no endpoint, see [USB drivers](#usb-drivers)). Every decision is logged:
 
 ```
 [Drivers] pci/0000:00:03.0 -> rtl8139 (device match)
@@ -219,11 +219,15 @@ When several registrations match a device, the one whose best entry is most spec
 [Drivers] pci/0000:00:05.0 -> no driver
 ```
 
-### Built-in drivers come first
+### Built-in drivers
 
-The built-in drivers bind during HAL bring-up, before any of your code runs, and keep what they take: the pass skips every PCI function with an owner, and USB offers every interface to the hub, keyboard and mass storage drivers before the kit's. A registered driver cannot take a device from a built-in at run time. To drive a device a built-in claims, build the kernel without the switch that brings that built-in up: the Drivers test suite builds without `CosmosEnableStorage`, which leaves the NVMe controller to its own driver.
+The built-in drivers come in two kinds.
 
-Two built-ins reach further than their name suggests:
+Most are brought up by HAL itself, during HAL bring-up, before any of your code runs: virtio, xHCI with its hub, keyboard and mass storage drivers, and E1000E on x64. They keep what they take: the pass skips every PCI function with an owner, and USB offers every interface to the hub, keyboard and mass storage drivers before the kit's. A registered driver cannot take a device from one of these at run time. To drive a device one of them claims, build the kernel without the switch that brings it up.
+
+The others are kit drivers, written against the same public seam as yours, in the `Cosmos.Kernel.HAL.Drivers` assembly: today AHCI, which matches `PciMatch.Class(0x01, 0x06, 0x01)` and publishes each SATA disk it finds, and NVMe, which matches `PciMatch.Class(0x01, 0x08, 0x02)` and publishes each namespace it can drive. `Global.StartKernel` registers them behind the kernel's feature switches (both with `CosmosEnableStorage`), before it calls `RegisterDrivers`, and they bind in the pass like any registration, with two differences: their names are the reserved built-in names (`ahci`, `nvme`), and they win every tie, even against a driver your constructor registered earlier. Only a strictly more specific match takes a device from one: a `PciMatch.Device(vendorId, deviceId)` entry for your controller, or a class triple against a class-only built-in. That is how a kernel replaces a built-in on one controller it knows better, with no rebuild of the built-in. A kernel built without `CosmosEnableStorage` registers neither, and ILC keeps none of their code: the Drivers test suite builds that way, which leaves the NVMe controller to its own sample driver.
+
+Two of HAL's built-ins reach further than their name suggests:
 
 - On x64, the built-in E1000E driver takes every Intel Ethernet controller (class `02/00/00`) it finds, not only the 82574 family, so QEMU's `e1000` is never offered to a registered driver there.
 - The display function the boot framebuffer lives in is reserved as `gop` when PCI is enumerated, so no registered driver can resize or reprogram the BAR the console draws into.
@@ -239,7 +243,7 @@ A driver's code runs in five places, and what it may do depends on which:
 | Factory, `Probe` | The boot thread during the pass, which is CPU 0's idle thread; the USB hot-plug thread for a USB device plugged in later. Do not depend on which | On | Allocate, acquire resources through the context, synchronous USB transfers, `Delay`, `WriteLog`, throw (counts as `Failed`) | Sleep or block, including `DeviceEvent.Wait`: it throws on an event this `Probe` created, and on any other event it would block the probing thread; `DriverManager.Register`, which throws |
 | `UsbDriver.Remove` | The USB hot-plug thread | On | USB transfers (they answer `Disconnected`), `StorageManager.UnregisterDevice`, `WriteLog` | Acquire resources (the Probe-only members throw); `Register` |
 | `DeviceInterruptHandler`, `UsbReportHandler` | Interrupt context: the device's MSI-X vector, the timer interrupt when polled, the xHCI interrupt, or a thread draining the xHCI's events with interrupts masked | Masked | Region accessors, `DmaBuffer.Span`, `IrqSafeLock`, `DeviceWorkItem.Schedule`, `DeviceEvent.Signal`, `MouseReporter.Report`, `NetworkLink.SetLinkState`, `IsPresent` | Allocate, throw, block, take any lock but an `IrqSafeLock`, call through an interface, build a string (so no `WriteLog`) |
-| `DeviceWorkItem` callback | The kit's `driver-work` thread, one item at a time | On | Anything a thread may do: allocate, `DeviceEvent.Wait`, transfers, `NetworkLink.Deliver`, `StorageManager.RegisterDevice` | Acquire resources; `Register` |
+| `DeviceWorkItem` callback | The kit's `driver-work` thread, one item at a time | On | Anything a thread may do: allocate, `DeviceEvent.Wait`, transfers, `NetworkLink.Deliver`, `PublishBlockDevice` | Acquire resources; `Register` |
 | `NetworkTransmitHandler` | The thread the network stack sends from, one call at a time | Masked | Region accessors, `DmaBuffer`, `IrqSafeLock` | Block |
 
 The handlers never run before `Probe` returned `Bound`. A polling tick or a USB report that comes during `Probe` is dropped. An MSI-X message the device raises during `Probe` is not: it waits in the masked entry and reaches the handler once `Probe` returned `Bound` (see [Interrupts](#interrupts)), so a handler reads the device's own status rather than assuming one call per event, and must expect a call for something `Probe` already handled. Nothing reaches a handler once its attempt is torn down.
@@ -276,7 +280,7 @@ An exception from a work item is logged with the driver's name and the device's 
 
 ### What the context hands out
 
-Everything a driver acquires comes from its `PciDeviceContext`, during `Probe` only: the acquiring members throw `InvalidOperationException` anywhere else. Before `Probe` runs, the kit has sized every BAR (with decoding off), saved the Command register, and turned the function's INTx line and bus mastering off.
+Everything a driver acquires comes from its `PciDeviceContext`, during `Probe` only: the acquiring members throw `InvalidOperationException` anywhere else. Before `Probe` runs, the kit has sized every BAR (with decoding off), saved the Command register, and turned the function's INTx line and bus mastering off, and MSI-X too if firmware left it on: MSI-X Enable is set only while the kit delivers the driver's interrupts through it.
 
 | Member | What it gives |
 |---|---|
@@ -287,7 +291,7 @@ Everything a driver acquires comes from its `PciDeviceContext`, during `Probe` o
 | `EnableBusMastering()` | Lets the function master the bus. Call it once the device is reset and its DMA addresses are programmed |
 | `TryRequestInterrupts(handler)` | The function's interrupts, see [Interrupts](#interrupts) |
 | `CreateEvent()`, `TryCreateWorkItem(callback, out item)` | See [Work items and events](#work-items-and-events) |
-| `PublishMouse()`, `PublishNetworkLink(address, transmit)` | See [Publishing to the kernel](#publishing-to-the-kernel) |
+| `PublishMouse()`, `PublishNetworkLink(address, transmit)`, `PublishBlockDevice(device)` | See [Publishing to the kernel](#publishing-to-the-kernel) |
 | `WriteConfig8/16/32(offset, value)` | Config writes at offset `0x40` and above, in thread context, during `Probe` and after it; the header below `0x40` is the kit's, and a write there throws `ArgumentOutOfRangeException` |
 
 `MmioRegion` and `PortRegion` check every access: an offset past the end, or not a multiple of the access size, throws `ArgumentOutOfRangeException`, and every access to a region of an attempt that was torn down throws `InvalidOperationException`. They also order the device's view of memory for you: each write is preceded by a DMA write barrier, so the device sees the descriptors the CPU filled before the register write that tells it to look, and each read is followed by a DMA read barrier, so nothing read from DMA memory afterwards runs ahead of the register that said it is there. Between two DMA-memory accesses with no register access in between, use `DmaBuffer.WriteBarrier()` and `DmaBuffer.ReadBarrier()`.
@@ -371,7 +375,7 @@ INTx and plain MSI are never used. `TryRequestInterrupts` returns false when the
 
 `TryCreateWorkItem(callback, out item)` creates a `DeviceWorkItem` whose callback runs on the kit's `driver-work` thread each time the item is scheduled. `Schedule()` may be called from anywhere, the interrupt handler included; it returns false when the item already waits to run or can never run again. A work item scheduled during `Probe` runs once `Probe` returned `Bound`, and never if the attempt is declined or fails. The first `TryCreateWorkItem` starts the thread; it returns false when there is no scheduler to run it.
 
-`CreateEvent()` creates a `DeviceEvent`: the handler `Signal()`s it, a thread `Wait()`s for it. Signals are counted. `Wait()` returns false once the binding is gone, and throws inside the `Probe` that created the event, since the interrupts that would signal it are armed only after `Bound`. On the idle thread it polls instead of blocking. There is no `Wait` with a timeout yet.
+`CreateEvent()` creates a `DeviceEvent`: the handler `Signal()`s it, a thread `Wait()`s for it. Signals are counted. `Wait()` returns false once the binding is gone, and throws inside the `Probe` that created the event, since the interrupts that would signal it are armed only after `Bound`. On the idle thread it polls instead of blocking. `Wait(timeout)` does the same, and also returns false once `timeout` passes without a signal: the wait for a driver that must turn a lost interrupt into an error rather than a hang, as the built-in NVMe driver does. A blocked thread still gives the CPU up, and the scheduler wakes it on the first tick after the timeout.
 
 This is the RTL8139's receive work item, which hands every frame in the ring to the network stack:
 
@@ -411,7 +415,7 @@ A PCI function a driver bound stays bound for the life of the kernel: there is n
 
 ## Publishing to the kernel
 
-A driver does not talk to the kernel's managers itself: it publishes what its device is, and the kit delivers it right after `Probe` returns `Bound`, before the interrupts are armed, on the thread that ran the probe. What a failed attempt published is dropped and never reaches a manager.
+A driver does not talk to the kernel's managers itself: it publishes what its device is, and the kit delivers it right after `Probe` returns `Bound`, before the interrupts are armed, on the thread that ran the probe. What a failed attempt published is dropped and never reaches a manager. A disk may also be published later, from a work item, see below.
 
 **A mouse.** `PublishMouse()` returns a `MouseReporter`. Each `Report(deltaX, deltaY, wheel, buttons)` moves `MouseManager`'s pointer exactly as a built-in mouse does: positive `deltaY` moves down, a negative `wheel` scrolls up, and `buttons` is a `MouseButtons` of the buttons held after the move. `Report` allocates nothing and may be called from the interrupt handler. See [Mouse](mouse.md) for what the kernel reads back.
 
@@ -447,19 +451,14 @@ private bool Transmit(ReadOnlySpan<byte> frame)
 
 `PublishMouse` and `PublishNetworkLink` throw `InvalidOperationException` in a kernel built without mouse or network support, which is why DevKernel registers each driver behind the switch it publishes to.
 
-**A disk.** There is no disk publication in the kit: a block driver implements `IBlockDevice` and registers it with the public `StorageManager.RegisterDevice`, which scans it for partitions straight away, with real reads (see [File System](filesystem.md)). An interrupt-driven PCI driver cannot do that from `Probe`, since its interrupts are armed only after `Bound`: it registers from a work item scheduled in `Probe`, which runs once they are. A USB driver, whose bulk transfers are synchronous, may register from `Probe`, as the last step before it returns `Bound`: a disk registered by an attempt that then fails stays registered. `RegisterDevice` throws when the kernel is built without storage, so guard the driver with `KernelFeatures.Storage`. A USB driver withdraws its disk in `Remove`:
+**A disk.** `PublishBlockDevice(device)` publishes a disk the driver implements as an `IBlockDevice`, the way the built-in AHCI and NVMe drivers publish each SATA disk and NVMe namespace they find. The kit registers it with `StorageManager`, which reads its partition table through it straight away, with real reads (see [File System](filesystem.md)), on the thread that delivers it, and ranks it among the kernel's disks by the primary-disk rule: a disk that cannot leave the machine before one that can (a USB driver's is one that can), then AHCI disks, then NVMe namespaces, then any other, then by the PCI function behind them, then in registration order. Where the driver publishes it decides when those reads happen:
 
-```csharp
-protected override void Remove(UsbDeviceContext context)
-{
-    if (_disk is { } disk)
-    {
-        StorageManager.UnregisterDevice(disk);
-    }
-}
-```
+- From `Probe`, the disk is delivered right after `Probe` returns `Bound`, before the interrupts are armed, so its I/O must complete without them, by polling the device, at least until the handler first runs. AHCI always polls, and so do a USB driver's bulk transfers, which are synchronous. NVMe completes through MSI-X, but until its handler first runs, which the kit lets happen only once it armed it, the thread that issued a command polls the completion queue itself: the partition scan the delivery starts completes that way, and the commands after it wait for the interrupt. The disk is registered when the pass returns, with no thread to wait for.
+- From one of the binding's own work items, once `Bound`, the disk is delivered before the call returns, on the `driver-work` thread, with the interrupts armed. An interrupt-driven driver, whose I/O waits for its completion interrupt, publishes from there: from a work item scheduled in `Probe`, which runs once `Probe` returned `Bound`. The partition scan holds the `driver-work` thread meanwhile, and it runs one work item at a time, so the disk's completions must reach its I/O from the interrupt handler, with `DeviceEvent.Signal`, never through another work item, which would wait for the scan that waits for it.
 
-`UnregisterDevice` detaches the filesystems mounted from the disk, without a flush, and returns false for a device that was never registered, including every device of a kernel built without storage, so a cleanup path needs no check of its own.
+Anywhere else, `PublishBlockDevice` throws `InvalidOperationException`, and so it does in a kernel built without storage support, so guard the driver with `KernelFeatures.Storage`. A disk an attempt published from `Probe` is dropped if the attempt then fails, and never reaches `StorageManager`. When a USB device leaves the bus, the kit takes its disks back out of `StorageManager` before the driver's `Remove` runs, which detaches the filesystems mounted from them without a flush, and every read, write or flush through them throws `IOException` from then on. The disk's `Name` must be unique among the kernel's disks, such as `sata0`, since its partitions are named after it.
+
+A driver in the kernel project, which references `Cosmos.Kernel.System`, can still register a disk with the public `StorageManager.RegisterDevice` itself and take it out in `Remove` with `StorageManager.UnregisterDevice`; publishing does both for it, and is the only way for a driver library that references the kit alone.
 
 Keyboards and graphics have no publication: a driver cannot feed `KeyboardManager`, and a GPU driver can hand out its own `Canvas` but cannot become the console.
 
@@ -489,9 +488,9 @@ Check everything you can before opening, the descriptors and the control request
 **When the device is pulled out**, the kit ends the binding on the hot-plug thread, before the USB stack frees the device's pipes, in this order:
 
 1. `IsPresent` turns false, and the report handlers stop being called.
-2. What the driver published leaves its manager: the mouse is taken out of `MouseManager`, releasing the buttons it held, and the network link out of `NetworkManager`, the stack forgetting its addresses.
+2. What the driver published leaves its manager: the mouse is taken out of `MouseManager`, releasing the buttons it held, the network link out of `NetworkManager`, the stack forgetting its addresses, and the disks out of `StorageManager`, their filesystems detached.
 3. The work items are dropped and the events cancelled; a work item already running gets up to a second to return, and an overrun is logged.
-4. The driver's `Remove(context)` runs, for what the kit does not know about, such as a disk it registered. The default does nothing.
+4. The driver's `Remove(context)` runs, for what the kit does not know about, such as a disk it registered with `StorageManager` itself. The default does nothing.
 5. The context is left answering: every transfer, through it or its bulk pipes, returns `UsbTransferStatus.Disconnected`, and the Probe-only members throw.
 
 The next time the device is plugged in, the factory creates a new driver instance for it, with a new context.
@@ -553,7 +552,7 @@ Pin the version with brackets. ILC compiles the kernel without `--resilient`, so
 
 Override `Probe` and `Remove` as `protected override`. Only an assembly that `Cosmos.Kernel.HAL` grants its internals to (`InternalsVisibleTo`: `Cosmos.Kernel.System`, `Cosmos.Kernel`, the arch HALs and a few of the repository's test kernels) sees them as `protected internal`, and has to override them that way, or the build fails with CS0507.
 
-The repository's Drivers test suite builds its drivers this way, as the library `tests/Kernels/SampleDrivers`, referenced as a project by the kernel; a driver library taken from a NuGet feed is not covered by a test yet.
+The repository builds drivers this way twice. The built-in drivers written against the kit, in `src/Cosmos.Kernel.HAL.Drivers`, take no `InternalsVisibleTo` grant, so they reach the kit through its public seam only, exactly as your library does; `Global.StartKernel` registers them. The Drivers test suite builds its drivers as the library `tests/Kernels/SampleDrivers`, referenced as a project by the kernel. A driver library taken from a NuGet feed is not covered by a test yet.
 
 ## Architecture differences
 
@@ -570,13 +569,12 @@ The interrupt polling interval differs too, about 55 ms on x64 against 10 ms on 
 
 - The kit is experimental: its API can change in any release, which is why a driver library pins the exact version.
 - Registration closes when the pass starts. A driver cannot be registered once the kernel runs.
-- A registered driver cannot displace a built-in one at run time; build without the built-in's switch instead.
+- A registered driver cannot displace one of the built-ins HAL brings up at run time; build without the built-in's switch instead. It can take a device from a kit built-in (AHCI, NVMe) with a more specific match.
 - A PCI binding is never released: no remove, rebind or shutdown for PCI.
 - There is no shutdown quiesce: `Power.Shutdown` and `Power.Reboot` give drivers no callback, so a device can still be doing DMA when the machine goes down, and nothing is flushed first.
 - The kernel runs on one CPU. `IrqSafeLock` masks interrupts and spins, which is all a single CPU needs.
 - One interrupt per binding, with no way to mask it; no INTx or plain MSI.
-- `DeviceEvent.Wait` has no timeout.
-- No keyboard or graphics publication, and no disk publication: disks go through `StorageManager`.
+- No keyboard or graphics publication.
 - USB: one interface per driver, alternate setting 0 only, no isochronous or interrupt OUT endpoints, at most 4096 bytes per control request, and no second candidate once an attempt opened an endpoint.
 - `DeviceInfo` does not say why a device has no driver; the serial log does.
 - Nothing checks the interrupt-context rules at build time.
@@ -585,12 +583,13 @@ The interrupt polling interval differs too, about 55 ms on x64 against 10 ms on 
 
 ## How it works
 
-The built-in drivers bind during HAL bring-up, before any kernel code runs. The drivers you register bind late, in one pass that `Global.StartKernel` runs on the boot thread, then on the USB hot-plug thread for every device plugged in afterwards:
+HAL's built-in drivers bind during HAL bring-up, before any kernel code runs. The kit's built-in drivers and the drivers you register bind late, in one pass that `Global.StartKernel` runs on the boot thread, then on the USB hot-plug thread for every device plugged in afterwards:
 
 ```
-HAL bring-up         built-in drivers bind: virtio, xHCI (+ hub, keyboard, mass storage), AHCI, NVMe, E1000E (x64)
+HAL bring-up         HAL's built-in drivers bind: virtio, xHCI (+ hub, keyboard, mass storage), E1000E (x64)
         │
 Global.StartKernel   interrupts on
+        ├─ built-in kit drivers         AHCI, NVMe (with storage), registered ahead of yours (only with PCI)
         ├─ Kernel.RegisterDrivers()     your registrations (only with PCI)
         ├─ the driver pass              every free PCI function, then every free USB interface,
         │                               offered to the matching drivers, best match first
@@ -599,4 +598,4 @@ Global.StartKernel   interrupts on
         └─ Kernel.Start()               OnBoot, BeforeRun, Run
 ```
 
-Each binding attempt gets a context that records everything the driver acquires through it, which is what lets the kit undo a failed attempt and end a USB binding without the driver's help. The kit lives in `Cosmos.Kernel.HAL` (`Cosmos.Kernel.HAL.Drivers`, `.Pci` and `.Usb`), its registration side in `Cosmos.Kernel.System.Drivers`.
+Each binding attempt gets a context that records everything the driver acquires through it, which is what lets the kit undo a failed attempt and end a USB binding without the driver's help. The kit lives in the assembly `Cosmos.Kernel.HAL` (namespaces `Cosmos.Kernel.HAL.Drivers`, `.Pci` and `.Usb`), its registration side in `Cosmos.Kernel.System.Drivers`, and the built-in drivers written against it in the assembly `Cosmos.Kernel.HAL.Drivers` (namespace `Cosmos.Kernel.HAL.Drivers.BuiltIn`, and `.BuiltIn.Storage.Ahci` and `.BuiltIn.Storage.Nvme` for AHCI and NVMe).

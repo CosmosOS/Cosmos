@@ -30,11 +30,14 @@ Three rules decide what is public:
 
 The enforcement test is mechanical: `examples/DevKernel` must compile with no `InternalsVisibleTo` grant. If DevKernel needs a symbol, the symbol becomes public or gets a `Cosmos.Kernel.System` facade; if it does not, the symbol stays internal.
 
+The driver kit has the same test on its own side. `Cosmos.Kernel.HAL.Drivers`, the built-in drivers written against the kit, takes no `InternalsVisibleTo` grant, on purpose, as DevKernel takes none for the ring: it is written exactly as a third-party driver library is, so it compiling proves the kit's public seam is enough for a real driver. A built-in driver that needs an internal means the seam is missing something, and the fix is the seam, not a grant.
+
 | Assembly | Surface |
 |----------|---------|
 | `Cosmos.Kernel.System` | The supported ring |
 | `Cosmos.Kernel.HAL.Interfaces` | `IBlockDevice`, `MACAddress` and `SoftwareTimer` as a read-only handle, tracked; the boot, graphics, input, timer and network contracts internal |
-| `Cosmos.Kernel.HAL` | VFS contracts and the driver kit seam (`[Experimental]`), tracked; the kit's engine, the built-in drivers, PCI and ports internal |
+| `Cosmos.Kernel.HAL` | VFS contracts and the driver kit seam (`[Experimental]`), tracked; the kit's engine, the built-in drivers HAL brings up, PCI and ports internal |
+| `Cosmos.Kernel.HAL.Drivers` | The built-in drivers written against the kit: the catalogue `BuiltInDrivers` in `Cosmos.Kernel.HAL.Drivers.BuiltIn`, and each driver's sealed class with its registration factory in a namespace below it named after its subsystem and itself (`AhciDriver` in `.BuiltIn.Storage.Ahci`, `NvmeDriver` in `.BuiltIn.Storage.Nvme`), part of the driver kit seam (`[Experimental]`), tracked; the drivers' internals internal, and no `InternalsVisibleTo` either way |
 | `Cosmos.Kernel.Core` | The scheduler seam (`[Experimental]`) and nothing else, tracked |
 | Arch assemblies, Native, Plugs, Debug, Boot.Limine, `Cosmos.Kernel` | Internal, `InternalsVisibleTo` for first-party |
 
@@ -46,7 +49,7 @@ Experimental seams carry diagnostic IDs:
 |----|------|
 | `COSMOS0001` | The scheduler policy seam: `IScheduler`, `SchedulerManager`, `SchedulerThread`, `PerCpuState`, `SchedulerExtensible`, `InterruptMaskScope`, `SchedulerThreadState`, `SchedulerThreadFlags` ([Scheduler - Writing a Scheduler](scheduler-plugging.md)) |
 | `COSMOS0002` | The packet seam: the protocol packet types (`EthernetPacket`, ARP, `InternetPacket`, `IPPacket`, ICMP, `UdpPacket`, DHCP, DNS, `TcpPacket`), `NetworkStack.Send`/`HandlePacket`, and the client members that take or return packets ([Network - Crafting packets](../user/network.md#crafting-packets)) |
-| `COSMOS0003` | The driver kit: every public type of `Cosmos.Kernel.HAL.Drivers`, `.Pci` and `.Usb` (the `PciDriver` and `UsbDriver` base classes, their registrations and match entries, the device contexts, `MmioRegion`, `PortRegion`, `DmaBuffer`, work items, events, `IrqSafeLock`, the mouse and network publications, the USB descriptors, transfer results and enums, and the handler delegates), plus `DriverManager` and `DeviceInfo` in `Cosmos.Kernel.System.Drivers` and the `Kernel.RegisterDrivers` hook. `Cosmos.Kernel.HAL.Drivers.Engine` stays internal ([Drivers](../user/drivers.md)) |
+| `COSMOS0003` | The driver kit: every public type of `Cosmos.Kernel.HAL.Drivers`, `.Pci` and `.Usb` (the `PciDriver` and `UsbDriver` base classes, their registrations and match entries, the device contexts, `MmioRegion`, `PortRegion`, `DmaBuffer`, work items, events, `IrqSafeLock`, the mouse, network and disk publications, the USB descriptors, transfer results and enums, and the handler delegates), plus `DriverManager` and `DeviceInfo` in `Cosmos.Kernel.System.Drivers`, the `Kernel.RegisterDrivers` hook, and the built-in drivers' catalogue and registrations in `Cosmos.Kernel.HAL.Drivers.BuiltIn` and the namespaces below it (the assembly `Cosmos.Kernel.HAL.Drivers`). `Cosmos.Kernel.HAL.Drivers.Engine` stays internal ([Drivers](../user/drivers.md)) |
 
 ---
 
@@ -151,9 +154,9 @@ Two things this section looked at and left alone. `Manager` means the ring's ent
 
 ## The declared surface
 
-Projects opt in with `<CosmosTrackPublicApi>true</CosmosTrackPublicApi>` in their `.csproj` (wired in `Directory.Build.props`). That covers `Cosmos.Kernel.System`, `Cosmos.Kernel.Core`, `Cosmos.Kernel.HAL`, and `Cosmos.Kernel.HAL.Interfaces`.
+Projects opt in with `<CosmosTrackPublicApi>true</CosmosTrackPublicApi>` in their `.csproj` (wired in `Directory.Build.props`). That covers `Cosmos.Kernel.System`, `Cosmos.Kernel.Core`, `Cosmos.Kernel.HAL`, `Cosmos.Kernel.HAL.Interfaces` and `Cosmos.Kernel.HAL.Drivers`.
 
-The API site publishes those same four projects and no others: `docs/docfx.json` lists them, and an assembly that is not tracked is not published. The two lists drifted apart once already, which put `Cosmos.Kernel.Boot.Limine`'s 28 public types and `Cosmos.Kernel.Debug`'s one on the site under a policy that calls both internal, alongside two entries that emitted nothing only because they happen to declare no public type at all.
+The API site publishes those same five projects and no others: `docs/docfx.json` lists them, and an assembly that is not tracked is not published. The two lists drifted apart once already, which put `Cosmos.Kernel.Boot.Limine`'s 28 public types and `Cosmos.Kernel.Debug`'s one on the site under a policy that calls both internal, alongside two entries that emitted nothing only because they happen to declare no public type at all.
 
 The rule points one way. An untracked assembly with public types left in it is not a reason to publish it; it is the backlog the last row of the policy table describes.
 

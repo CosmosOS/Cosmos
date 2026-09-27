@@ -28,11 +28,12 @@ This document establishes the coding style and architecture patterns for Cosmos 
 
 ### Layer Dependency Rules
 
-The project is split into strict layers. Dependencies flow **downward only**, each layer to the one directly below it, with one exception: a user kernel may also reference `Cosmos.Kernel.HAL`, where the driver kit its own PCI and USB drivers are written against lives (`Cosmos.Kernel.HAL.Drivers`, experimental COSMOS0003). These rules are **checked at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which warns (NAOT0007) on any other reference.
+The project is split into strict layers. Dependencies flow **downward only**, each layer to the one directly below it, with one exception: a user kernel may also reference `Cosmos.Kernel.HAL`, where the driver kit its own PCI and USB drivers are written against lives (namespace `Cosmos.Kernel.HAL.Drivers`, experimental COSMOS0003). These rules are **checked at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which warns (NAOT0007) on any other reference.
 
 ```
 User Kernel (DevKernel, test kernels)
     └── Cosmos.Kernel.System        ← high-level OS APIs (Console, Graphics, Network)
+         ├── Cosmos.Kernel.HAL.Drivers ← the built-in drivers written against the driver kit (AHCI, NVMe); HAL layer, no InternalsVisibleTo
          └── Cosmos.Kernel.HAL      ← hardware abstraction (shared logic); also the driver kit, which user kernels reference directly
               ├── Cosmos.Kernel.HAL.X64        ← x64-specific HAL implementations
               ├── Cosmos.Kernel.HAL.ARM64      ← ARM64-specific HAL implementations
@@ -48,6 +49,7 @@ For the full dependency graph, project descriptions, and rules, see [Kernel Proj
 ### When to Create a New Project
 
 - New hardware device category → new interface in `Cosmos.Kernel.HAL.Interfaces`, implementations in `Cosmos.Kernel.HAL.X64`/`Cosmos.Kernel.HAL.ARM64`. Cross-platform HAL devices go to `Cosmos.Kernel.HAL`.
+- A built-in driver for a PCI device family, once the driver kit offers everything it needs → `Cosmos.Kernel.HAL.Drivers`, in a folder of its own under its subsystem's (`Storage/Ahci/`, namespaces following the folders), written against the kit's public seam only, with a `CreateRegistration()` added to the `BuiltInDrivers` catalogue. `Cosmos.Kernel.HAL` keeps the mechanisms (PCI, MSI-X, DMA, the USB host stack, the kit); see [Kernel Project Layout](kernel-project-layout.md#mechanisms-and-policies).
 - New OS-level feature, user API exposed → in `Cosmos.Kernel.System`.
 - New low-level runtime concern → in `Cosmos.Kernel.Core`.
 
@@ -951,7 +953,7 @@ Logic that needs no hardware (`Tcp` receive-buffer arithmetic, address parsing) 
 Three rules decide what is `public` (the full policy and its mechanisms live in [Public API Tracking](public-api.md)):
 
 1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types a kernel obtains or supplies through it (`IBlockDevice`, `MACAddress` and `SoftwareTimer` in `HAL.Interfaces`, the `HAL.Vfs` contracts). Only that surface is tracked, documented, and covered by deprecation cycles.
-2. **Chosen experimental seams.** An extension point outside the ring is opened deliberately and marked `[Experimental("COSMOSxxxx")]`: usable now, no compatibility promise, promoted by removing the attribute. Never open a seam by just making something public. There are three: the scheduler policy (COSMOS0001, Core), the packet types (COSMOS0002, System) and the driver kit (COSMOS0003, `Cosmos.Kernel.HAL.Drivers` with its registration side in System). Every public type of a seam carries the attribute, enums and delegates included, and the assembly that declares a seam suppresses its ID in its `.csproj`, with a comment saying why.
+2. **Chosen experimental seams.** An extension point outside the ring is opened deliberately and marked `[Experimental("COSMOSxxxx")]`: usable now, no compatibility promise, promoted by removing the attribute. Never open a seam by just making something public. There are three: the scheduler policy (COSMOS0001, Core), the packet types (COSMOS0002, System) and the driver kit (COSMOS0003, the `Cosmos.Kernel.HAL.Drivers` namespaces in HAL, with its registration side in System and the built-in drivers' registrations in the `Cosmos.Kernel.HAL.Drivers` assembly). Every public type of a seam carries the attribute, enums and delegates included, and the assembly that declares a seam suppresses its ID in its `.csproj`, with a comment saying why.
 3. **Everything else is `internal`.** Visibility is not the extension mechanism. First-party assemblies and white-box test kernels use `InternalsVisibleTo`; external code uses `[UnsafeAccessor]` ([Accessing internals](accessing-internals.md)) at its own risk.
 
 Practical rules that follow:

@@ -23,6 +23,7 @@ Run the script from the root of the repository:
    - Native runtime packages for x64 and ARM64 (`Cosmos.Kernel.Native.*`)
    - Architecture-independent kernel packages (`Cosmos.Kernel.HAL.Interfaces`, `Cosmos.Kernel.Debug`, `Cosmos.Kernel.Boot.Limine`)
    - Architecture-specific HAL packages (`Cosmos.Kernel.HAL.X64`, `Cosmos.Kernel.HAL.ARM64`)
+   - The built-in drivers written against the driver kit (`Cosmos.Kernel.HAL.Drivers`), architecture-independent; the multi-arch passes below rebuild it with `Cosmos.Kernel.System`, which references it
    - Multi-arch kernel packages built for both `linux-x64` and `linux-arm64` (`Cosmos.Kernel.Core`, `Cosmos.Kernel.HAL`, `Cosmos.Kernel.System`, `Cosmos.Kernel.Plugs`, `Cosmos.Kernel`)
    - SDK and templates (`Cosmos.Sdk`, `Cosmos.Build.Templates`)
 5. **Restores** the main solution (`nativeaot-patcher.slnx`).

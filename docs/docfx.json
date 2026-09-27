@@ -7,6 +7,7 @@
         { "src": "../src/Cosmos.Kernel.Core", "files": [ "Cosmos.Kernel.Core.csproj" ] },
         { "src": "../src/Cosmos.Kernel.HAL", "files": [ "Cosmos.Kernel.HAL.csproj" ] },
         { "src": "../src/Cosmos.Kernel.HAL.Interfaces", "files": [ "Cosmos.Kernel.HAL.Interfaces.csproj" ] },
+        { "src": "../src/Cosmos.Kernel.HAL.Drivers", "files": [ "Cosmos.Kernel.HAL.Drivers.csproj" ] },
         { "src": "../src/Cosmos.Kernel.System", "files": [ "Cosmos.Kernel.System.csproj" ] }
       ],
       "dest": "api",

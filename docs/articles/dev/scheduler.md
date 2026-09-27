@@ -105,7 +105,7 @@ stateDiagram-v2
 | `CreateThread` | none (`InitializeStack` already set `Created`) | `OnThreadCreate` | registers the thread in the registry |
 | `ReadyThread` | `Ready`, unless the thread is still `Created` | `OnThreadReady` | sets the per-CPU `_needReschedule` flag |
 | `BlockThread` | `Blocked` | `OnThreadBlocked` | sets `_needReschedule` |
-| `MarkSleeping` | `Sleeping`, after computing `WakeupTime` | `OnThreadBlocked` | no halt; the caller parks itself (see [the park protocol](#the-park-protocol)) |
+| `MarkSleeping` | `Sleeping`, after computing `WakeupTime` | `OnThreadBlocked` | sets `_needReschedule`; no halt, the caller parks itself (see [the park protocol](#the-park-protocol)) |
 | `Sleep` | via `MarkSleeping` | | then halts once, only if still `Sleeping` |
 | `YieldThread` | none | `OnThreadYield` | |
 | `ExitThread` | `Dead` | `OnThreadExit` | runs the exit callback, returns the TLAB to the GC, clears the registry slot |
@@ -187,7 +187,7 @@ The staging itself is two writes into native globals: the new-thread flag first,
 
 ### Waking from an interrupt handler
 
-Device interrupt handlers wake threads too: an NVMe completion fires on its MSI-X vector and signals an [`InterruptEvent`](#interruptevent) whose waiter must run. The tick path alone would leave that thread queued for up to a full quantum, so wake-ups take a shortcut. `ReadyThread` (and `BlockThread`) set a per-CPU `_needReschedule` flag, and the interrupt dispatcher calls `ReschedulePendingFromIrq` when a handled hardware interrupt exits: if the flag is set and no switch is already staged for this interrupt, it runs `ScheduleFromInterrupt` right there, on the device interrupt's own exit path. The already-staged check matters: the timer handler may have staged a switch during the same interrupt, and a second `ScheduleFromInterrupt` would save this frame's stack pointer into a thread whose real context lives elsewhere.
+Device interrupt handlers wake threads too: an NVMe completion fires on its MSI-X vector and signals an [`InterruptEvent`](#interruptevent) whose waiter must run. The tick path alone would leave that thread queued for up to a full quantum, so wake-ups take a shortcut. `ReadyThread` (and `BlockThread` and `MarkSleeping`, so a parked current thread is switched out at the first interrupt rather than waking from its halt and running on) set a per-CPU `_needReschedule` flag, and the interrupt dispatcher calls `ReschedulePendingFromIrq` when a handled hardware interrupt exits: if the flag is set and no switch is already staged for this interrupt, it runs `ScheduleFromInterrupt` right there, on the device interrupt's own exit path. The already-staged check matters: the timer handler may have staged a switch during the same interrupt, and a second `ScheduleFromInterrupt` would save this frame's stack pointer into a thread whose real context lives elsewhere.
 
 ### What there is not: a voluntary switch
 
@@ -278,11 +278,11 @@ Two special cases: the idle thread never parks (blocking it would just get it re
 
 ### InterruptEvent
 
-[`InterruptEvent`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/InterruptEvent.cs) is the interrupt-to-thread completion primitive: an interrupt handler signals it, a thread waits on it. The NVMe driver hangs one on every command slot and signals it from the MSI-X completion handler.
+[`InterruptEvent`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/InterruptEvent.cs) is the interrupt-to-thread completion primitive: an interrupt handler signals it, a thread waits on it. The driver kit's `DeviceEvent` wraps one, and the built-in NVMe driver hangs one of those on every command slot and signals it from its MSI-X completion handler.
 
-Signals are **counted**, not latched: two signals wake two waiters, and signals arriving with no waiter are banked and consumed one per future wait (auto-reset). The signal side is interrupt-safe by construction: it takes the IRQ-safe lock, bumps the count, dequeues one waiter, and calls `ReadyThread`, with no allocation and no interface dispatch on the path (the waiter list is pre-sized to four, so typical waits do not allocate under the lock the interrupt handler spins on either). The `ReadyThread` sets `_needReschedule`, so the woken waiter runs on this same interrupt's exit path (see [Waking from an interrupt handler](#waking-from-an-interrupt-handler)).
+Signals are **counted**, not latched: two signals wake two waiters, and signals arriving with no waiter are banked and consumed one per future wait (auto-reset). The signal side is interrupt-safe by construction: it takes the IRQ-safe lock, bumps the count, dequeues the first waiter that is still parked (blocked, or in a timed sleep), and calls `ReadyThread` before it lets the lock go, with no allocation and no interface dispatch on the path. A waiter in any other state was already woken, by its deadline or for another reason, and readying it again would queue it twice; readying under the lock keeps a timer tick from waking a timed waiter in between (the waiter list is pre-sized to four, so typical waits do not allocate under the lock the interrupt handler spins on either). The `ReadyThread` sets `_needReschedule`, so the woken waiter runs on this same interrupt's exit path (see [Waking from an interrupt handler](#waking-from-an-interrupt-handler)).
 
-The wait side follows the park protocol, with two twists. Callers without park capability (the idle thread, or code running before the scheduler is ready) poll the signal count with interrupts enabled between checks and deliberately never halt: if the signaling interrupt fired just before a halt, no further interrupt might ever arrive to end it. And `Wait(maxIterations)` bounds the wait by loop passes, a hang-breaker for lost device interrupts rather than a clock.
+The wait side follows the park protocol, with two twists. Callers without park capability (the idle thread, or code running before the scheduler is ready) poll the signal count with interrupts enabled between checks and deliberately never halt: if the signaling interrupt fired just before a halt, no further interrupt might ever arrive to end it. And `Wait(timeout)` is a hang-breaker for lost device interrupts: the polling caller reads the Stopwatch between polls, and a parked caller sleeps with a wake deadline instead of blocking, as `ConditionVariable.WaitTimeout` does, so the tick wakes it once the deadline passed, and it takes itself off the waiter list before it returns false.
 
 ---
 
