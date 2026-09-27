@@ -3,11 +3,739 @@
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Ahci.AhciDriver
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.E1000e.E1000eDriver
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme.NvmeDriver
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.AlphaBlend = 8192 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.AlphaCursor = 512 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.Cap3D = 16384 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.Cursor = 32 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.CursorByPass = 64 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.CursorByPass2 = 128 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.DisplayTopology = 524288 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.EigthBitEmulation = 256 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.ExtendedFifo = 32768 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.Glyph = 1024 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.GlyphClipping = 2048 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.Gmr = 1048576 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.Gmr2 = 4194304 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.IrqMask = 262144 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.LecacyOffscreen = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.MultiMon = 65536 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.None = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.Offscreen1 = 4096 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.PitchLock = 131072 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.RasterOp = 16 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.RectCopy = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.RectFill = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.RectPatFill = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.ScreenObject2 = 8388608 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.SurfaceCopy = 65536 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.ThreeD = 16384 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability.Traces = 2097152 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Capability
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ClearFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ClearFlags.Color = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ClearFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ClearFlags.Depth = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ClearFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ClearFlags.Stencil = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ClearFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face.SVGA3D_FACE_BACK = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face.SVGA3D_FACE_FRONT = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face.SVGA3D_FACE_FRONT_BACK = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face.SVGA3D_FACE_INVALID = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face.SVGA3D_FACE_MAX = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face.SVGA3D_FACE_NONE = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO.Max = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO.Min = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO.NextCmd = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO.Stop = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.CLEAR = 1057 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DEFINE_ALPHA_CURSOR = 22 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DEFINE_BITMAP = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DEFINE_BITMAP_SCANLINE = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DEFINE_CONTEXT = 1045 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DEFINE_CURSOR = 19 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DEFINE_PIXMAP = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DEFINE_PIXMAP_SCANLINE = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DEFINE_SURFACE = 1040 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DEFINE_SURFACE_V2 = 1070 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DESTROY_CONTEXT = 1046 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DESTROY_SHADER = 1060 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DESTROY_SURFACE = 1041 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DISPLAY_CURSOR = 20 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.DRAW_PRIMITIVES = 1063 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.FREE_OBJECT = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.MOVE_CURSOR = 21 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.PRESENT = 1058 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_BITMAP_COPY = 10 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_BITMAP_FILL = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_COPY = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_FILL = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_PIXMAP_COPY = 11 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_PIXMAP_FILL = 9 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_ROP_BITMAP_COPY = 17 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_ROP_BITMAP_FILL = 15 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_ROP_COPY = 14 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_ROP_FILL = 13 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_ROP_PIXMAP_COPY = 18 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.RECT_ROP_PIXMAP_FILL = 16 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SETLIGHTDATA = 1053 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SETLIGHTENABLE = 1054 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SETMATERIAL = 1052 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SETRENDERSTATE = 1049 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SETTEXTURESTATE = 1051 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SETTRANSFORM = 1047 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SETVIEWPORT = 1055 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SETZRANGE = 1048 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SET_RENDER_TARGET = 1050 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SET_SHADER = 1061 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SET_SHADER_CONST = 1062 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SET_VIEWPORT = 1055 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SET_ZRANGE = 1048 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SHADER_DEFINE = 1059 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SURFACE_COPY = 1042 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.SURFACE_DMA = 1044 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand.Update = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFOCommand
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID.Invalid = 4294967295 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID.Magic = 9437184 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID.V0 = 2415919104 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID.V1 = 2415919105 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID.V2 = 2415919106 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ID
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.IOPortOffset
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.IOPortOffset.Bios = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.IOPortOffset
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.IOPortOffset.Index = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.IOPortOffset
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.IOPortOffset.IRQ = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.IOPortOffset
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.IOPortOffset.Value = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.IOPortOffset
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType.SVGA3D_LIGHTTYPE_DIRECTIONAL = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType.SVGA3D_LIGHTTYPE_INVALID = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType.SVGA3D_LIGHTTYPE_MAX = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType.SVGA3D_LIGHTTYPE_POINT = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType.SVGA3D_LIGHTTYPE_SPOT1 = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType.SVGA3D_LIGHTTYPE_SPOT2 = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.BitsPerPixel = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.BlueMask = 11 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Busy = 22 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.BytesPerLine = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Capabilities = 17 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Capabilities3D = 34 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.ConfigDone = 20 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.CursorCount = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.CursorID = 24 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.CursorOn = 27 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.CursorX = 25 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.CursorY = 26 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Depth = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Enable = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Enable3D = 32 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.FifoNumRegisters = 293 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.FrameBufferOffset = 14 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.FrameBufferSize = 16 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.FrameBufferStart = 13 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.GreenMask = 10 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Guest3DScratchSize = 33 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.GuestID = 23 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Height = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.HostBitsPerPixel = 28 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.ID = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.MaxHeight = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.MaxWidth = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.MemRegs = 30 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.MemSize = 19 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.MemStart = 18 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.NumDisplays = 31 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.PitchLock = 32 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.PseudoColor = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.RedMask = 9 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.ScratchSize = 29 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Sync = 21 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.VRamSize = 15 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register.Width = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_3D_CAPS = 32 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_3D_CAPS_LAST = 287 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_3D_HWVERSION = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_3D_HWVERSION_REVISED = 17 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_BUSY = 290 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_CAPABILITIES = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_CURSOR_COUNT = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_CURSOR_LAST_UPDATED = 13 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_CURSOR_ON = 9 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_CURSOR_SCREEN_ID = 15 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_CURSOR_X = 10 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_CURSOR_Y = 11 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_DEAD = 16 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_FENCE = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_FENCE_GOAL = 289 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_FLAGS = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_GUEST_3D_HWVERSION = 288 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_MAX = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_MIN = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_NEXT_CMD = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_NUM_REGS = 291 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_PITCHLOCK = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_RESERVED = 14 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D.SVGA_FIFO_STOP = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.Clear3D(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ClearFlags flags, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect ClearRect, uint color = 0, float depth = 1, uint stencil = 0) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.CreateStaticArrayBuffer<T>(System.ReadOnlySpan<T> data) -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.DefineContext() -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.DefineShader(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType type, byte[]! bytecode) -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.DefineSurface(uint width, uint height, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat format) -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.DefineSurfaceFromImage(int[]! image, uint width, uint height) -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.DestroyContext(uint cid) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.DestroyShader(uint cid, uint shid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType type) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.DestroySurface(uint sid) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.DrawPrimitives(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexDecl[]! decls, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveRange[]! ranges) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.EnqueueSurfaceDma(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId image, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGAGuestPtr target, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect rect, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransferType transfer) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.HW3DVer.get -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.Is3DEnabled.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.PopDMABuffer() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.Present(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId image, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect PresentRect) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.PresentToImage(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId image, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect rect) -> int[]?
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.ReserveFIFO3D(uint cmd, uint cmdSize) -> void*
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetDepthRange(uint cid, float min, float max) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetLightData(uint cid, uint index, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData data) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetLightEnable(uint cid, uint index, bool enabled) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetMaterial(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face face, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dMaterial material) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetRenderState(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderState[]! states) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetRenderTarget(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderTargetType type, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId target) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetShader(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType type, uint shid) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetShaderUniform<T>(uint cid, uint reg, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType type, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderConstType ctype, T value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetTextureState(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureState[]! states) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetTransform<T>(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType type, T matrix4x4) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SetViewport(uint cid, Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect rect) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.Svga3D(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface! driver) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.SVGA3DUtil_AllocDMABuffer(uint size, out Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGAGuestPtr ptr) -> void*
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D.TestDebugBuffer() -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Svga3D._lastDMASize -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArray
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArray.offset -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArray.stride -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArray.surfaceId -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArray.SVGA3dArray() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArrayRangeHint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArrayRangeHint.first -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArrayRangeHint.last -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArrayRangeHint.SVGA3dArrayRangeHint() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdClear
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdClear.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdClear.color -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdClear.depth -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdClear.flag -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.ClearFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdClear.stencil -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdClear.SVGA3dCmdClear() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineContext
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineContext.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineContext.SVGA3dCmdDefineContext() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineShader
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineShader.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineShader.shid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineShader.SVGA3dCmdDefineShader() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineShader.type -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineSurface
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineSurface.face -> uint*
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineSurface.flags -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineSurface.format -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineSurface.sid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDefineSurface.SVGA3dCmdDefineSurface() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDestroyShader
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDestroyShader.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDestroyShader.shid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDestroyShader.SVGA3dCmdDestroyShader() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDestroyShader.type -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDrawPrimitives
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDrawPrimitives.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDrawPrimitives.numRanges -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDrawPrimitives.numVertexDecls -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdDrawPrimitives.SVGA3dCmdDrawPrimitives() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdHeader
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdHeader.id -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdHeader.size -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdHeader.SVGA3dCmdHeader() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdPresent
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdPresent.sid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdPresent.SVGA3dCmdPresent() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightData
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightData.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightData.data -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightData.index -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightData.SVGA3dCmdSetLightData() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightEnabled
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightEnabled.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightEnabled.enabled -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightEnabled.index -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetLightEnabled.SVGA3dCmdSetLightEnabled() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetMaterial
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetMaterial.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetMaterial.face -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Face
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetMaterial.material -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dMaterial
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetMaterial.SVGA3dCmdSetMaterial() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetRenderState
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetRenderState.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetRenderState.SVGA3dCmdSetRenderState() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetRenderTarget
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetRenderTarget.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetRenderTarget.SVGA3dCmdSetRenderTarget() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetRenderTarget.target -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetRenderTarget.type -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderTargetType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShader
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShader.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShader.shid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShader.SVGA3dCmdSetShader() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShader.type -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShaderConst
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShaderConst.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShaderConst.ctype -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderConstType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShaderConst.reg -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShaderConst.SVGA3dCmdSetShaderConst() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShaderConst.type -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetShaderConst.values -> uint*
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetTextureState
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetTextureState.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetTextureState.SVGA3dCmdSetTextureState() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetTransform
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetTransform.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetTransform.matrix -> float*
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetTransform.SVGA3dCmdSetTransform() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetTransform.type -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetViewport
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetViewport.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetViewport.rect -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetViewport.SVGA3dCmdSetViewport() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetZRange
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetZRange.cid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetZRange.range -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dZRange
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSetZRange.SVGA3dCmdSetZRange() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSurfaceDMA
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSurfaceDMA.guest -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dGuestImage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSurfaceDMA.host -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSurfaceDMA.SVGA3dCmdSurfaceDMA() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCmdSurfaceDMA.transfer -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransferType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.d -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.h -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.srcx -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.srcy -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.srcz -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.SVGA3dCopyBox() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.w -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.x -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.y -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyBox.z -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyRect
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyRect.h -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyRect.srcx -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyRect.srcy -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyRect.SVGA3dCopyRect() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyRect.w -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyRect.x -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dCopyRect.y -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod.SVGA3D_DECLMETHOD_CROSSUV = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod.SVGA3D_DECLMETHOD_DEFAULT = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod.SVGA3D_DECLMETHOD_LOOKUP = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod.SVGA3D_DECLMETHOD_LOOKUPPRESAMPLED = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod.SVGA3D_DECLMETHOD_PARTIALU = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod.SVGA3D_DECLMETHOD_PARTIALV = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod.SVGA3D_DECLMETHOD_UV = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_D3DCOLOR = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_DEC3N = 14 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_FLOAT1 = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_FLOAT16_2 = 15 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_FLOAT16_4 = 16 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_FLOAT2 = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_FLOAT3 = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_FLOAT4 = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_MAX = 17 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_SHORT2 = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_SHORT2N = 9 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_SHORT4 = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_SHORT4N = 10 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_UBYTE4 = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_UBYTE4N = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_UDEC3 = 13 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_USHORT2N = 11 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType.SVGA3D_DECLTYPE_USHORT4N = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_BINORMAL = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_BLENDINDICES = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_BLENDWEIGHT = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_COLOR = 10 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_DEPTH = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_FOG = 11 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_MAX = 14 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_NORMAL = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_POSITION = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_POSITIONT = 9 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_PSIZE = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_SAMPLE = 13 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_TANGENT = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_TESSFACTOR = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage.SVGA3D_DECLUSAGE_TEXCOORD = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dGuestImage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dGuestImage.pitch -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dGuestImage.ptr -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGAGuestPtr
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dGuestImage.SVGA3dGuestImage() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.ambient -> System.Numerics.Vector4
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.attenuation -> System.Numerics.Vector3
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.diffuse -> System.Numerics.Vector4
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.direction -> System.Numerics.Vector4
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.falloff -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.inWorldSpace -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.phi -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.position -> System.Numerics.Vector4
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.range -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.specular -> System.Numerics.Vector4
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.SVGA3dLightData() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.theta -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dLightData.type -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.LightType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dMaterial
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dMaterial.ambient -> System.Numerics.Vector4
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dMaterial.diffuse -> System.Numerics.Vector4
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dMaterial.emissive -> System.Numerics.Vector4
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dMaterial.shininess -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dMaterial.specular -> System.Numerics.Vector4
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dMaterial.SVGA3dMaterial() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveRange
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveRange.indexArray -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArray
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveRange.indexBias -> int
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveRange.indexWidth -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveRange.primitiveCount -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveRange.primType -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveRange.SVGA3dPrimitiveRange() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType.SVGA3D_PRIMITIVE_INVALID = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType.SVGA3D_PRIMITIVE_LINELIST = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType.SVGA3D_PRIMITIVE_LINESTRIP = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType.SVGA3D_PRIMITIVE_MAX = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType.SVGA3D_PRIMITIVE_POINTLIST = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType.SVGA3D_PRIMITIVE_TRIANGLEFAN = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType.SVGA3D_PRIMITIVE_TRIANGLELIST = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType.SVGA3D_PRIMITIVE_TRIANGLESTRIP = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dPrimitiveType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect.h -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect.SVGA3dRect() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect.SVGA3dRect(uint x, uint y, uint w, uint h) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect.w -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect.x -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRect.y -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderState
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderState.floatValue -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderState.state -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderState.SVGA3dRenderState() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderState.SVGA3dRenderState(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName State, float value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderState.SVGA3dRenderState(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName State, uint value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderState.uintValue -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_ALPHAFUNC = 37 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_ALPHAREF = 42 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_ALPHATESTENABLE = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_AMBIENT = 26 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_AMBIENTMATERIALSOURCE = 51 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_ANTIALIASEDLINEENABLE = 89 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_BLENDCOLOR = 56 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_BLENDENABLE = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_BLENDEQUATION = 34 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_BLENDEQUATIONALPHA = 96 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_CCWSTENCILFAIL = 59 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_CCWSTENCILFUNC = 58 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_CCWSTENCILPASS = 61 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_CCWSTENCILZFAIL = 60 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_CLIPPING = 68 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_CLIPPLANEENABLE = 27 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_COLORWRITEENABLE = 47 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_COLORWRITEENABLE1 = 90 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_COLORWRITEENABLE2 = 91 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_COLORWRITEENABLE3 = 92 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_COORDINATETYPE = 44 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_CULLMODE = 35 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_DEPTHBIAS = 64 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_DIFFUSEMATERIALSOURCE = 49 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_DITHERENABLE = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_DSTBLEND = 33 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_DSTBLENDALPHA = 95 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_EMISSIVEMATERIALSOURCE = 52 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_FILLMODE = 29 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_FOGCOLOR = 25 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_FOGDENSITY = 18 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_FOGENABLE = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_FOGEND = 17 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_FOGMODE = 28 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_FOGSTART = 16 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_FRONTWINDING = 43 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_INDEXEDVERTEXBLENDENABLE = 87 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_INVALID = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_LASTPIXEL = 67 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_LIGHTINGENABLE = 9 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_LINEAA = 98 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_LINEPATTERN = 31 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_LINEWIDTH = 99 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_LOCALVIEWER = 54 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_MAX = 100 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_MULTISAMPLEANTIALIAS = 85 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_MULTISAMPLEMASK = 86 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_NORMALIZENORMALS = 10 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_OUTPUTGAMMA = 65 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_POINTSCALEENABLE = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_POINTSCALE_A = 22 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_POINTSCALE_B = 23 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_POINTSCALE_C = 24 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_POINTSIZE = 19 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_POINTSIZEMAX = 21 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_POINTSIZEMIN = 20 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_POINTSPRITEENABLE = 11 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_RANGEFOGENABLE = 46 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_SCISSORTESTENABLE = 55 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_SEPARATEALPHABLENDENABLE = 93 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_SHADEMODE = 30 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_SLOPESCALEDEPTHBIAS = 63 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_SPECULARENABLE = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_SPECULARMATERIALSOURCE = 50 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_SRCBLEND = 32 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_SRCBLENDALPHA = 94 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_STENCILENABLE = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_STENCILENABLE2SIDED = 57 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_STENCILFAIL = 39 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_STENCILFUNC = 38 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_STENCILMASK = 14 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_STENCILPASS = 41 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_STENCILREF = 13 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_STENCILWRITEMASK = 15 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_STENCILZFAIL = 40 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_TEXTUREFACTOR = 53 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_TRANSPARENCYANTIALIAS = 97 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_TWEENFACTOR = 88 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_VERTEXBLEND = 62 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_VERTEXMATERIALENABLE = 48 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP0 = 69 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP1 = 70 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP10 = 79 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP11 = 80 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP12 = 81 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP13 = 82 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP14 = 83 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP15 = 84 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP2 = 71 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP3 = 72 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP4 = 73 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP5 = 74 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP6 = 75 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP7 = 76 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP8 = 77 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_WRAP9 = 78 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_ZBIAS = 45 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_ZENABLE = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_ZFUNC = 36 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_ZVISIBLE = 66 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName.SVGA3D_RS_ZWRITEENABLE = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderTargetType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderTargetType.Color = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderTargetType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderTargetType.Depth = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dRenderTargetType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderConstType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderConstType.SVGA3D_CONST_TYPE_BOOL = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderConstType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderConstType.SVGA3D_CONST_TYPE_FLOAT = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderConstType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderConstType.SVGA3D_CONST_TYPE_INT = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderConstType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType.SVGA3D_SHADERTYPE_MAX = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType.SVGA3D_SHADERTYPE_PS = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType.SVGA3D_SHADERTYPE_VS = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dShaderType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSize
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSize.depth -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSize.height -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSize.SVGA3dSize() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSize.width -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_AUTOGENMIPMAPS = 1024 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_CUBEMAP = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_HINT_DEPTHSTENCIL = 128 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_HINT_DYNAMIC = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_HINT_INDEXBUFFER = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_HINT_RENDERTARGET = 64 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_HINT_STATIC = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_HINT_TEXTURE = 32 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_HINT_VERTEXBUFFER = 16 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_HINT_WRITEONLY = 256 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags.SVGA3D_SURFACE_MASKABLE_ANTIALIAS = 512 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFlags
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_A16B16G16R16 = 41 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_A2R10G10B10 = 26 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_A2W10V10U10 = 31 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_A8R8G8B8 = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_ALPHA8 = 32 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_ARGB_S10E5 = 24 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_ARGB_S23E8 = 25 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_AYUV = 45 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_BC4_UNORM = 108 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_BC5_UNORM = 111 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_BUFFER = 37 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_BUMPL6V5U5 = 21 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_BUMPL8V8U8 = 23 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_BUMPU8V8 = 20 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_BUMPX8L8V8U8 = 22 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_CxV8U8 = 29 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_DXT1 = 15 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_DXT2 = 16 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_DXT3 = 17 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_DXT4 = 18 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_DXT5 = 19 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_FORMAT_INVALID = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_FORMAT_MAX = 121 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_G16R16 = 40 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_LUMINANCE16 = 13 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_LUMINANCE4_ALPHA4 = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_LUMINANCE8 = 11 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_LUMINANCE8_ALPHA8 = 14 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_NV12 = 44 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_Q8W8V8U8 = 28 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_RG_S10E5 = 35 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_RG_S23E8 = 36 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_R_S10E5 = 33 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_R_S23E8 = 34 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_UYVY = 42 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_V16U16 = 39 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_V8U8 = 27 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_X8L8V8U8 = 30 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_X8R8G8B8 = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_YUY2 = 43 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_Z_D16 = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_Z_D24S8_INT = 120 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_Z_D24X8 = 38 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_Z_D32 = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_Z_DF16 = 118 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat.SVGA3D_Z_DF24 = 119 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceFormat
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId.face -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId.mipmap -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId.sid -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dSurfaceImageId.SVGA3dSurfaceImageId() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureState
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureState.floatValue -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureState.stage -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureState.state -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureState.SVGA3dTextureState() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureState.SVGA3dTextureState(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName State, float value, uint stage = 0) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureState.SVGA3dTextureState(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName State, uint value, uint stage = 0) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureState.value -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_ADDRESSU = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_ADDRESSV = 9 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_ADDRESSW = 24 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_ALPHAARG0 = 29 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_ALPHAARG1 = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_ALPHAARG2 = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_ALPHAOP = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_BIND_TEXTURE = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_BORDERCOLOR = 13 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_BUMPENVLOFFSET = 27 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_BUMPENVLSCALE = 26 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_BUMPENVMAT00 = 17 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_BUMPENVMAT01 = 18 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_BUMPENVMAT10 = 19 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_BUMPENVMAT11 = 20 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_COLORARG0 = 28 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_COLORARG1 = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_COLORARG2 = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_COLOROP = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_GAMMA = 25 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_INVALID = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_MAGFILTER = 11 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_MAX = 30 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_MINFILTER = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_MIPFILTER = 10 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_TEXCOORDGEN = 16 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_TEXCOORDINDEX = 14 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_TEXTURETRANSFORMFLAGS = 15 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_TEXTURE_ANISOTROPIC_LEVEL = 23 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_TEXTURE_LOD_BIAS = 22 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName.SVGA3D_TS_TEXTURE_MIPMAP_LEVEL = 21 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTextureStateName
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransferType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransferType.SVGA3D_READ_HOST_VRAM = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransferType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransferType.SVGA3D_WRITE_HOST_VRAM = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransferType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_INVALID = 0 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_MAX = 15 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_PROJECTION = 3 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_TEXTURE0 = 4 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_TEXTURE1 = 5 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_TEXTURE2 = 6 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_TEXTURE3 = 7 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_TEXTURE4 = 8 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_TEXTURE5 = 9 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_TEXTURE6 = 10 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_TEXTURE7 = 11 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_VIEW = 2 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_WORLD = 1 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_WORLD1 = 12 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_WORLD2 = 13 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType.SVGA3D_TRANSFORM_WORLD3 = 14 -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dTransformType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexArrayIdentity
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexArrayIdentity.method -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclMethod
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexArrayIdentity.SVGA3dVertexArrayIdentity() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexArrayIdentity.type -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexArrayIdentity.usage -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dDeclUsage
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexArrayIdentity.usageIndex -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexDecl
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexDecl.array -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArray
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexDecl.identity -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexArrayIdentity
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexDecl.rangeHint -> Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dArrayRangeHint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dVertexDecl.SVGA3dVertexDecl() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dZRange
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dZRange.max -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dZRange.min -> float
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGA3dZRange.SVGA3dZRange() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaDriver
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGAGuestPtr
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGAGuestPtr.gmrId -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGAGuestPtr.offset -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SVGAGuestPtr.SVGAGuestPtr() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Capabilities.get -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.ClearScreen(uint color) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.ClearVRAM(int aStart, int aCount, int value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Copy(uint x, uint y, uint newX, uint newY, uint width, uint height) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.CopyBuffer(System.ReadOnlyMemory<int> pixels, int x, int y, int width, int height) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.CopyBuffer(System.ReadOnlyMemory<uint> pixels, int x, int y, int width, int height) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.DefineAlphaCursor(uint hotspotX, uint hotspotY, uint width, uint height, int[]! data) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.DefineCursor() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Disable() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.DrawPixel(uint color, int x, int y) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Enable() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Fill(uint x, uint y, uint width, uint height, uint color) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.FrameOffset.get -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.FrameSize.get -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.GetFIFO(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO cmd) -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.GetPixel(int x, int y) -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.GetVRAM(int sourceByteOffset, int[]! dest, int destIndex, int count) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.HasAlphaCursor.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Height.get -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.HW3DVer.get -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Initialize() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.InitializeFIFO() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Is3DEnabled.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Pitch.get -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.ReadFifo3D(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D reg) -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.ReadRegister(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register register) -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.ReserveFIFO(uint bytes) -> void*
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.SetCursor(bool visible, uint x, uint y) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.SetFIFO(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.FIFO cmd, uint value) -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.SetMode(uint width, uint height, uint depth = 32) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Swap() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Update(uint x, uint y, uint width, uint height) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.WaitForFifo() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.Width.get -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.WriteFifo3D(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register3D reg, uint value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.WriteRegister(Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.Register register, uint value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaSurface.WriteToFifo(uint value) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Input.VirtioInputDriver
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Net.VirtioNetDriver
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.BootKeyboard.BootKeyboardDriver
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.MassStorage.MassStorageDriver
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci.XhciDriver
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreatePciDisplayRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!>!
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreatePciInputRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!>!
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreatePciNetworkRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!>!
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreatePciStorageRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!>!
@@ -17,6 +745,7 @@
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Ahci.AhciDriver.CreateRegistration() -> Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.E1000e.E1000eDriver.CreateRegistration() -> Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme.NvmeDriver.CreateRegistration() -> Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga.SvgaDriver.CreateRegistration() -> Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Input.VirtioInputDriver.CreateRegistration() -> Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Net.VirtioNetDriver.CreateRegistration() -> Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration!
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.BootKeyboard.BootKeyboardDriver.CreateRegistration() -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDriverRegistration!

@@ -8,6 +8,7 @@ using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Keyboard;
 using Cosmos.Kernel.System.Mouse;
 using Cosmos.Kernel.System.Network;
@@ -149,6 +150,32 @@ internal class LibraryInitializer
                         if (CosmosFeatures.UsbEnabled)
                         {
                             DriverCore.BlockDeviceWithdrawSink = static disk => StorageManager.UnregisterDevice(disk);
+                        }
+                    }
+                }
+
+                // Initialize Display Manager (manager-level state only)
+                if (DisplayManager.IsEnabled)
+                {
+                    Serial.WriteString("[KERNEL]   - Initializing display manager...\n");
+                    DisplayManager.Initialize();
+
+                    // Displays the kit's drivers publish, the built-in SVGA II
+                    // driver's among them, registered by the driver pass,
+                    // before anything asks for the screen. Nested under PCI's
+                    // switch, as the mouse sink is: a display arrives on that
+                    // bus or not at all, the boot framebuffer being firmware's
+                    // and not a driver's.
+                    if (CosmosFeatures.PCIEnabled)
+                    {
+                        DriverCore.DisplaySink = DisplayManager.RegisterDisplay;
+
+                        // No bus that can lose a device carries a display
+                        // today, so this is only ever reached by a driver the
+                        // kit tears down; it still gives the screen back.
+                        if (CosmosFeatures.UsbEnabled)
+                        {
+                            DriverCore.DisplayWithdrawSink = DisplayManager.UnregisterDisplay;
                         }
                     }
                 }

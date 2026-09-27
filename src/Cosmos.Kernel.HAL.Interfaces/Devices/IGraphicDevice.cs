@@ -5,10 +5,23 @@ using System;
 namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 
 /// <summary>
-/// Interface for graphic devices.
+/// One display a canvas can drive, whatever put it there: a bus driver the
+/// driver kit bound and published, or a framebuffer firmware handed over.
+/// Public for the same reason <see cref="IBlockDevice"/> is — a driver
+/// outside this assembly publishes one through the kit — and, like that one,
+/// every member runs on whichever thread asked for the screen.
 /// </summary>
-internal interface IGraphicDevice
+public interface IGraphicDevice
 {
+    /// <summary>Width of the visible framebuffer in pixels.</summary>
+    uint Width { get; }
+
+    /// <summary>Height of the visible framebuffer in pixels.</summary>
+    uint Height { get; }
+
+    /// <summary>Bytes from the start of one scanline to the start of the next, which is not always the width times the pixel size.</summary>
+    uint Pitch { get; }
+
     /// <summary>
     /// Initialize the graphic device.
     /// </summary>
@@ -66,7 +79,23 @@ internal interface IGraphicDevice
     void CopyBuffer(ReadOnlyMemory<int> pixels, int x, int y, int width, int height);
 
     /// <summary>
+    /// Fills <paramref name="count"/> pixels of video memory from
+    /// <paramref name="startByteOffset"/> with <paramref name="value"/>, the
+    /// bulk clear a scanline-at-a-time canvas needs.
+    /// </summary>
+    /// <param name="startByteOffset">Byte offset in the frame buffer.</param>
+    /// <param name="count">Number of pixels to write.</param>
+    /// <param name="value">ARGB color value.</param>
+    void ClearVRAM(int startByteOffset, int count, int value);
+
+    /// <summary>
     /// Swap the back buffer to the screen.
     /// </summary>
     void Swap();
+
+    /// <summary>
+    /// Gives the screen back, so the device stops scanning out this canvas's
+    /// framebuffer and a later acquisition builds a fresh one against it.
+    /// </summary>
+    void Disable();
 }

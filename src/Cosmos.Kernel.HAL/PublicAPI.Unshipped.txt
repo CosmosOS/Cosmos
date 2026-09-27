@@ -122,6 +122,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceContext.IsPresent.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceContext.Path.get -> string!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceContext.PublishBlockDevice(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceContext.PublishDisplay(Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice! device) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceContext.PublishKeyboard() -> Cosmos.Kernel.HAL.DriverKit.KeyboardReporter!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceContext.PublishKeyboard(Cosmos.Kernel.HAL.DriverKit.KeyboardLedHandler! updateLeds) -> Cosmos.Kernel.HAL.DriverKit.KeyboardReporter!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceContext.PublishMouse() -> Cosmos.Kernel.HAL.DriverKit.MouseReporter!
@@ -146,6 +147,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.IrqSafeLock.Scope.Dispose() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.IrqSafeLock.Scope.Scope() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.MmioRegion
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.MmioRegion.GetSpan(ulong offset, int length) -> System.Span<byte>
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.MmioRegion.Length.get -> ulong
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.MmioRegion.Read16(ulong offset) -> ushort
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.MmioRegion.Read32(ulong offset) -> uint

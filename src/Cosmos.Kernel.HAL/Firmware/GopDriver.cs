@@ -33,10 +33,10 @@ internal unsafe class GopDriver : GraphicDevice
 
     protected readonly ManagedMemoryBlock lastbuffer;
 
-    public uint Width;
-    public uint Height;
-    public uint Pitch;
-    public uint Stride;
+    public override uint Width { get; }
+    public override uint Height { get; }
+    public override uint Pitch { get; }
+    public uint Stride { get; }
     private bool _initialized;
 
     public GopDriver(uint* baseAddress, uint width, uint height, uint pitch)
@@ -57,6 +57,15 @@ internal unsafe class GopDriver : GraphicDevice
     /// <summary>
     /// Initializes the UEFI video device.
     /// </summary>
+    /// <summary>
+    /// Nothing to give back: the bootloader set this mode before the kernel
+    /// ran and nothing here can unset it, so the screen keeps whatever the
+    /// last canvas drew.
+    /// </summary>
+    public override void Disable()
+    {
+    }
+
     public override void Initialize()
     {
         _initialized = true;
@@ -97,7 +106,7 @@ internal unsafe class GopDriver : GraphicDevice
         }
     }
 
-    public void ClearVRAM(int aStart, int aCount, int value)
+    public override void ClearVRAM(int aStart, int aCount, int value)
     {
         lastbuffer.Fill(aStart, aCount, value);
     }

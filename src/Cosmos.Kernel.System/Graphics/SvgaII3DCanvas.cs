@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
-using Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga;
 
 namespace Cosmos.Kernel.System.Graphics;
 
@@ -29,7 +29,7 @@ internal sealed class SvgaII3DCanvas : Canvas3D
     private const float NearPlane = 0.1f;
     private const float FarPlane = 1000f;
 
-    private readonly VMWareSVGAII3D _driver3D;
+    private readonly Svga3D _driver3D;
     private readonly uint _context;
     private SVGA3dSurfaceImageId _colorTarget;
     private SVGA3dSurfaceImageId _depthTarget;
@@ -43,7 +43,7 @@ internal sealed class SvgaII3DCanvas : Canvas3D
     /// <summary>
     /// The 2D display driver, bound to the SVGA II PCI device.
     /// </summary>
-    public SvgaIIDriver Driver { get; }
+    public SvgaSurface Driver { get; }
 
     /// <summary>
     /// Creates a canvas on the given SVGA II driver in the given mode. The
@@ -52,7 +52,7 @@ internal sealed class SvgaII3DCanvas : Canvas3D
     /// <param name="driver">The initialized VMware SVGA II display driver.</param>
     /// <param name="mode">The graphics mode to set; must be one of <see cref="AvailableModes"/>.</param>
     /// <exception cref="ArgumentOutOfRangeException">The mode is not supported by this driver.</exception>
-    public SvgaII3DCanvas(SvgaIIDriver driver, Mode mode)
+    public SvgaII3DCanvas(SvgaSurface driver, Mode mode)
         : this(driver, mode, applyMode: true)
     {
     }
@@ -64,7 +64,7 @@ internal sealed class SvgaII3DCanvas : Canvas3D
     /// sit inert in FIFO memory for inspection instead of being consumed
     /// (QEMU's vmware-svga cannot parse them).
     /// </summary>
-    internal SvgaII3DCanvas(SvgaIIDriver driver, Mode mode, bool applyMode)
+    internal SvgaII3DCanvas(SvgaSurface driver, Mode mode, bool applyMode)
         : base(mode)
     {
         Driver = driver;
@@ -75,14 +75,14 @@ internal sealed class SvgaII3DCanvas : Canvas3D
             SvgaIIRender.ApplyMode(this, driver, mode);
         }
 
-        _driver3D = new VMWareSVGAII3D(driver);
+        _driver3D = new Svga3D(driver);
         _context = _driver3D.DefineContext();
         CreateRenderTargets();
         ApplySceneDefaults();
     }
 
     /// <inheritdoc />
-    public override string Name => "VMWareSVGAII3D";
+    public override string Name => "Svga3D";
 
     /// <summary>
     /// Gets or sets the current graphics mode. Setting the mode recreates the

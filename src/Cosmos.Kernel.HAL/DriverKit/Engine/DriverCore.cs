@@ -162,6 +162,20 @@ internal static class DriverCore
     internal static Action<PublishedMouse>? MouseWithdrawSink { get; set; }
 
     /// <summary>
+    /// Hands a published display to the display manager, installed by
+    /// System's initializer when graphics support is on and left null when it
+    /// is off, which is what makes <see cref="DeviceContext.PublishDisplay"/>
+    /// refuse.
+    /// </summary>
+    internal static Action<PublishedDisplay>? DisplaySink { get; set; }
+
+    /// <summary>
+    /// Takes a display back out of the display manager when its device leaves
+    /// the bus. Installed beside <see cref="DisplaySink"/>.
+    /// </summary>
+    internal static Action<PublishedDisplay>? DisplayWithdrawSink { get; set; }
+
+    /// <summary>
     /// Takes a keyboard a USB driver published back out of the keyboard
     /// manager once its device left the bus: installed like
     /// <see cref="MouseWithdrawSink"/>, next to <see cref="KeyboardSink"/>.

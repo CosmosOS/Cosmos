@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga;
 
 namespace Cosmos.Kernel.System.Graphics;
 
@@ -57,7 +57,7 @@ internal static class SvgaIIRender
     /// Programs the device with the given mode and refreshes the canvas's
     /// pixel-layout metrics.
     /// </summary>
-    public static void ApplyMode(Canvas canvas, SvgaIIDriver driver, Mode mode)
+    public static void ApplyMode(Canvas canvas, SvgaSurface driver, Mode mode)
     {
         driver.SetMode((uint)mode.Width, (uint)mode.Height, (uint)mode.ColorDepth);
 
@@ -69,7 +69,7 @@ internal static class SvgaIIRender
     /// <summary>
     /// Draws an alpha-blended point through the device.
     /// </summary>
-    public static void DrawPoint(Canvas canvas, SvgaIIDriver driver, Color color, int x, int y)
+    public static void DrawPoint(Canvas canvas, SvgaSurface driver, Color color, int x, int y)
     {
         if (x < 0 || x >= canvas.Width || y < 0 || y >= canvas.Height)
         {
@@ -92,7 +92,7 @@ internal static class SvgaIIRender
     /// <summary>
     /// Draws a raw ARGB point through the device, clipped to the canvas.
     /// </summary>
-    public static void DrawRawPoint(Canvas canvas, SvgaIIDriver driver, uint color, int x, int y)
+    public static void DrawRawPoint(Canvas canvas, SvgaSurface driver, uint color, int x, int y)
     {
         if (x < 0 || x >= canvas.Width || y < 0 || y >= canvas.Height)
         {
@@ -119,7 +119,7 @@ internal static class SvgaIIRender
     /// <summary>
     /// Fills a rectangle through the device's VRAM fill operation.
     /// </summary>
-    public static void DrawFilledRectangle(Canvas canvas, SvgaIIDriver driver, Color color, int xStart, int yStart, int width, int height)
+    public static void DrawFilledRectangle(Canvas canvas, SvgaSurface driver, Color color, int xStart, int yStart, int width, int height)
     {
         // Clamp both corners, and unconditionally: ClearVRAM resolves to an
         // unchecked MemSet at Base + offset, so a negative origin here is a
@@ -197,7 +197,7 @@ internal static class SvgaIIRender
     /// operation. See <see cref="Canvas.CopyPixels"/> for the clipping and
     /// overlap contract.
     /// </summary>
-    public static void CopyPixels(Canvas canvas, SvgaIIDriver driver, int srcX, int srcY, int dstX, int dstY, int width, int height)
+    public static void CopyPixels(Canvas canvas, SvgaSurface driver, int srcX, int srcY, int dstX, int dstY, int width, int height)
     {
         int left = Math.Max(0, Math.Max(-srcX, -dstX));
         int top = Math.Max(0, Math.Max(-srcY, -dstY));
@@ -217,7 +217,7 @@ internal static class SvgaIIRender
     /// Reads a rectangle of pixels back from VRAM into a bitmap. Pixels
     /// outside the canvas read as 0, as they do on every other canvas.
     /// </summary>
-    public static Bitmap GetImage(Canvas canvas, SvgaIIDriver driver, int x, int y, int width, int height)
+    public static Bitmap GetImage(Canvas canvas, SvgaSurface driver, int x, int y, int width, int height)
     {
         int[] all = new int[width * height];
 
@@ -253,7 +253,7 @@ internal static class SvgaIIRender
     /// <summary>
     /// Draws an image through the device's buffer copy operation.
     /// </summary>
-    public static void DrawImage(Canvas canvas, SvgaIIDriver driver, Image image, int x, int y, bool preventOffBoundPixels)
+    public static void DrawImage(Canvas canvas, SvgaSurface driver, Image image, int x, int y, bool preventOffBoundPixels)
     {
         int width = image.Width;
         int height = image.Height;
@@ -299,7 +299,7 @@ internal static class SvgaIIRender
     /// <summary>
     /// Draws a cropped image through the device's buffer copy operation.
     /// </summary>
-    public static void CroppedDrawImage(Canvas canvas, SvgaIIDriver driver, Image image, int x, int y, int width, int height, bool preventOffBoundPixels)
+    public static void CroppedDrawImage(Canvas canvas, SvgaSurface driver, Image image, int x, int y, int width, int height, bool preventOffBoundPixels)
     {
         int[] data = image.RawData;
 

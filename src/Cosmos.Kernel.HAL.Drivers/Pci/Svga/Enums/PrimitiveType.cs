@@ -1,0 +1,17 @@
+using System.Diagnostics.CodeAnalysis;
+using System;
+
+namespace Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga;
+
+[Experimental("COSMOS0003")]
+public enum SVGA3dPrimitiveType
+{
+    SVGA3D_PRIMITIVE_INVALID = 0,
+    SVGA3D_PRIMITIVE_TRIANGLELIST = 1,
+    SVGA3D_PRIMITIVE_POINTLIST = 2,
+    SVGA3D_PRIMITIVE_LINELIST = 3,
+    SVGA3D_PRIMITIVE_LINESTRIP = 4,
+    SVGA3D_PRIMITIVE_TRIANGLESTRIP = 5,
+    SVGA3D_PRIMITIVE_TRIANGLEFAN = 6,
+    SVGA3D_PRIMITIVE_MAX
+}

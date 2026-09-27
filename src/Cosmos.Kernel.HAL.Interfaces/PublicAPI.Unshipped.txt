@@ -6,6 +6,20 @@ Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.Flush() -> void
 Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.Name.get -> string!
 Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
 Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.ClearScreen(uint color) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.ClearVRAM(int startByteOffset, int count, int value) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.CopyBuffer(System.ReadOnlyMemory<int> pixels, int x, int y, int width, int height) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.CopyBuffer(System.ReadOnlyMemory<uint> pixels, int x, int y, int width, int height) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.Disable() -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.DrawPixel(uint color, int x, int y) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.GetPixel(int x, int y) -> uint
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.GetVRAM(int sourceByteOffset, int[] dest, int destIndex, int count) -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.Height.get -> uint
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.Initialize() -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.Pitch.get -> uint
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.Swap() -> void
+Cosmos.Kernel.HAL.Interfaces.Devices.IGraphicDevice.Width.get -> uint
 Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress
 Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.CompareTo(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress? other) -> int
 Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress.Equals(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress? other) -> bool

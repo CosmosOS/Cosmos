@@ -49,6 +49,7 @@ public abstract class DeviceContext
     private const string MouseDisabledMessage = "Mouse support is disabled. Set CosmosEnableMouse=true in the kernel's csproj to publish a mouse.";
     private const string NetworkDisabledMessage = "Network support is disabled. Set CosmosEnableNetwork=true in the kernel's csproj to publish a network link.";
     private const string StorageDisabledMessage = "Storage support is disabled. Set CosmosEnableStorage=true in the kernel's csproj to publish a disk.";
+    private const string GraphicsDisabledMessage = "Graphics support is disabled. Set CosmosEnableGraphics=true in the kernel's csproj to publish a display.";
 
     // What Probe created, which Bound arms, and teardown or a USB unplug
     // drops. Null until the first one: most attempts create neither.
@@ -66,6 +67,7 @@ public abstract class DeviceContext
     // the driver-work thread while the USB hot-plug thread withdraws them:
     // guarded by _publicationLock from Bound on.
     private List<PublishedBlockDevice>? _blockDevices;
+    private List<PublishedDisplay>? _displays;
 
     /// <summary>
     /// Makes a work item's disk and a USB unplug's withdrawal one step each.
@@ -292,6 +294,48 @@ public abstract class DeviceContext
     }
 
     /// <summary>
+    /// Publishes a display: the kernel's display manager hands it to whoever
+    /// asks for the screen, and every canvas drawn on it reaches
+    /// <paramref name="device"/>. The kit registers it with the display
+    /// manager right after Probe returns Bound, before the interrupts are
+    /// armed; if the attempt is declined or fails, it is dropped and nothing
+    /// is ever drawn through it. Probe only.
+    /// </summary>
+    /// <remarks>
+    /// A driver publishes the display it has brought far enough to scan out,
+    /// and does not program a mode here: the pass binds long before anything
+    /// asks for the screen, and the boot console is still drawing into the
+    /// framebuffer firmware set up. The mode is the canvas's to choose, when
+    /// it acquires the display.
+    /// </remarks>
+    /// <param name="device">The driver's display, which the manager calls from whichever thread holds the screen.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="device"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Called outside the driver's Probe, or the kernel is built without
+    /// graphics support.
+    /// </exception>
+    public void PublishDisplay(IGraphicDevice device)
+    {
+        ThrowIfNotProbing(nameof(PublishDisplay));
+        ArgumentNullException.ThrowIfNull(device);
+
+        // The switch alone first, as in PublishMouse, so ILC folds it and a
+        // kernel without graphics support trims the adapter.
+        if (!CosmosFeatures.GraphicsEnabled)
+        {
+            throw new InvalidOperationException(GraphicsDisabledMessage);
+        }
+
+        if (DriverCore.DisplaySink is null)
+        {
+            throw new InvalidOperationException(GraphicsDisabledMessage);
+        }
+
+        PublishedDisplay display = new(this, device);
+        (_displays ??= []).Add(display);
+    }
+
+    /// <summary>
     /// Publishes a network interface: the kernel's network stack sends
     /// through <paramref name="transmit"/>, and the driver hands it received
     /// frames through the returned link. The kit registers it with the
@@ -507,6 +551,28 @@ public abstract class DeviceContext
             }
         }
 
+        if (_displays is { } displays)
+        {
+            for (int i = 0; i < displays.Count; i++)
+            {
+                PublishedDisplay display = displays[i];
+                if (!display.TryGoLive())
+                {
+                    continue;
+                }
+
+                try
+                {
+                    DriverCore.DisplaySink?.Invoke(display);
+                    WriteLog("published a display");
+                }
+                catch (Exception exception)
+                {
+                    WriteLog($"the display manager refused its display: {exception.Message}");
+                }
+            }
+        }
+
         if (_networkLinks is { } links)
         {
             for (int i = 0; i < links.Count; i++)
@@ -594,6 +660,16 @@ public abstract class DeviceContext
         _keyboards = null;
         _mice = null;
 
+        if (_displays is { } displays)
+        {
+            for (int i = 0; i < displays.Count; i++)
+            {
+                displays[i].Drop();
+            }
+
+            _displays = null;
+        }
+
         if (_networkLinks is { } links)
         {
             for (int i = 0; i < links.Count; i++)
@@ -669,6 +745,26 @@ public abstract class DeviceContext
             }
 
             _mice = null;
+        }
+
+        if (_displays is { } displays)
+        {
+            for (int i = 0; i < displays.Count; i++)
+            {
+                PublishedDisplay display = displays[i];
+                display.Withdraw();
+                try
+                {
+                    DriverCore.DisplayWithdrawSink?.Invoke(display);
+                    WriteLog("withdrew its display");
+                }
+                catch (Exception exception)
+                {
+                    WriteLog($"the display manager failed to withdraw its display: {exception.Message}");
+                }
+            }
+
+            _displays = null;
         }
 
         if (_networkLinks is { } links)

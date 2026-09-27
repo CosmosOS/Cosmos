@@ -84,9 +84,9 @@ internal unsafe class VirtioGpu : GraphicDevice
     public bool IsInitialized => _initialized;
     public bool Ready => _initialized;
 
-    public uint Width => _width;
-    public uint Height => _height;
-    public uint Pitch => _pitch;
+    public override uint Width => _width;
+    public override uint Height => _height;
+    public override uint Pitch => _pitch;
 
     /// <summary>
     /// Points to the framebuffer the CPU writes pixels into. Same backing as
@@ -221,7 +221,7 @@ internal unsafe class VirtioGpu : GraphicDevice
     }
 
     public void Enable() => _enabled = true;
-    public void Disable() => _enabled = false;
+    public override void Disable() => _enabled = false;
 
     // --- IGraphicDevice surface ---
 
@@ -239,6 +239,29 @@ internal unsafe class VirtioGpu : GraphicDevice
         for (uint i = 0; i < pixels; i++)
         {
             fb[i] = color;
+        }
+    }
+
+    /// <summary>
+    /// Fills <paramref name="count"/> pixels from
+    /// <paramref name="startByteOffset"/>, clamped to the framebuffer so a
+    /// canvas clearing a partly off-screen rectangle writes nothing past it.
+    /// </summary>
+    public override void ClearVRAM(int startByteOffset, int count, int value)
+    {
+        if (_framebuffer is null || startByteOffset < 0 || count <= 0)
+        {
+            return;
+        }
+
+        uint available = _framebufferSize > (uint)startByteOffset
+            ? (_framebufferSize - (uint)startByteOffset) / sizeof(uint)
+            : 0;
+        uint pixels = Math.Min((uint)count, available);
+        uint* fb = (uint*)(_framebuffer + startByteOffset);
+        for (uint i = 0; i < pixels; i++)
+        {
+            fb[i] = (uint)value;
         }
     }
 

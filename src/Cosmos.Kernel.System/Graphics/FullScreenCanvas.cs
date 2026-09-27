@@ -1,9 +1,7 @@
 using Cosmos.Kernel.Core;
-using Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga;
 using Cosmos.Kernel.HAL.Devices.Virtio.Gpu;
 using Cosmos.Kernel.HAL.Devices.Virtio;
-using Cosmos.Kernel.HAL.Pci;
-using Cosmos.Kernel.HAL.Pci.Enums;
 
 namespace Cosmos.Kernel.System.Graphics;
 
@@ -65,23 +63,17 @@ internal static class FullScreenCanvas
             }
         }
 
-        if (CosmosFeatures.PCIEnabled)
+        // A display the driver kit bound and published in the driver pass,
+        // long before anything asked for the screen. The driver brought the
+        // adapter up but programmed no mode, which is the canvas's to choose
+        // here.
+        if (DisplayManager.Primary is SvgaSurface svga)
         {
-            // Taken before the constructor programs the adapter. TryClaim
-            // tests and records ownership in one step because this runs on
-            // whichever thread first asks for the screen; an adapter another
-            // driver owns leaves the screen to GOP. A boot display
-            // reservation is no obstacle, this being the adapter's driver.
-            PciDevice? svgaDevice = PciManager.GetDevice(VendorId.VmWare, DeviceId.SvgaiiAdapter);
-            if (svgaDevice is not null && svgaDevice.TryClaim(PciOwner.VmwareSvga))
-            {
-                SvgaIIDriver driver = new(svgaDevice);
-                Mode svgaMode = mode ?? SvgaIIRender.DefaultMode;
+            Mode svgaMode = mode ?? SvgaIIRender.DefaultMode;
 
-                return driver.Is3DEnabled
-                    ? new SvgaII3DCanvas(driver, svgaMode)
-                    : new SvgaIICanvas(driver, svgaMode);
-            }
+            return svga.Is3DEnabled
+                ? new SvgaII3DCanvas(svga, svgaMode)
+                : new SvgaIICanvas(svga, svgaMode);
         }
 
         return mode is null ? new GopCanvas() : new GopCanvas(mode.Value);

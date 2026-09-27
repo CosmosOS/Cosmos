@@ -13,6 +13,9 @@ internal abstract class GraphicDevice : Device, IGraphicDevice
     /// <summary>
     /// Initialize the graphic device.
     /// </summary>
+    public abstract uint Width { get; }
+    public abstract uint Height { get; }
+    public abstract uint Pitch { get; }
     public abstract void Initialize();
     public abstract void ClearScreen(uint color);
     public abstract void DrawPixel(uint color, int x, int y);
@@ -20,5 +23,7 @@ internal abstract class GraphicDevice : Device, IGraphicDevice
     public abstract void GetVRAM(int sourceByteOffset, int[] dest, int destIndex, int count);
     public abstract void CopyBuffer(ReadOnlyMemory<uint> pixels, int x, int y, int width, int height);
     public abstract void CopyBuffer(ReadOnlyMemory<int> pixels, int x, int y, int width, int height);
+    public abstract void ClearVRAM(int startByteOffset, int count, int value);
     public abstract void Swap();
+    public abstract void Disable();
 }

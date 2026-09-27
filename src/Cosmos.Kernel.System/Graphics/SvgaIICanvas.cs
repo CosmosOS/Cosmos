@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga;
 
 namespace Cosmos.Kernel.System.Graphics;
 
@@ -17,7 +17,7 @@ internal class SvgaIICanvas : Canvas
     /// <summary>
     /// The 2D display driver, bound to the SVGA II PCI device.
     /// </summary>
-    public SvgaIIDriver Driver { get; }
+    public SvgaSurface Driver { get; }
 
     /// <summary>
     /// Creates a canvas on the given SVGA II driver in the given mode.
@@ -25,7 +25,7 @@ internal class SvgaIICanvas : Canvas
     /// <param name="driver">The initialized VMware SVGA II display driver.</param>
     /// <param name="mode">The graphics mode to set; must be one of <see cref="AvailableModes"/>.</param>
     /// <exception cref="ArgumentOutOfRangeException">The mode is not supported by this driver.</exception>
-    public SvgaIICanvas(SvgaIIDriver driver, Mode mode)
+    public SvgaIICanvas(SvgaSurface driver, Mode mode)
         : base(mode)
     {
         Driver = driver;

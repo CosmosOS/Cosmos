@@ -6,6 +6,7 @@ using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Ahci;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.E1000e;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Input;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Net;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.BootKeyboard;
@@ -86,6 +87,14 @@ public static class BuiltInDrivers
         PciDriverRegistration[] registrations = [VirtioInputDriver.CreateRegistration()];
         return registrations;
     }
+
+    /// <summary>
+    /// The display drivers, registered when the kernel has graphics support:
+    /// the VMware SVGA II adapter. The boot framebuffer is not among them,
+    /// being firmware's and not a device any bus enumerates.
+    /// </summary>
+    public static IReadOnlyList<PciDriverRegistration> CreatePciDisplayRegistrations() =>
+        [SvgaDriver.CreateRegistration()];
 
     /// <summary>
     /// Creates the registrations of the built-in storage drivers that bind a

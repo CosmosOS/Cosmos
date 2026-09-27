@@ -33,6 +33,8 @@
     <RootNamespace>Cosmos.Kernel.HAL.Drivers.BuiltIn</RootNamespace>
     <!-- COSMOS0003: the drivers are written against the experimental driver kit,
          and the registrations this assembly exposes are part of that seam. -->
+    <!-- The SVGA II driver walks its framebuffer and command FIFO through pointers. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):

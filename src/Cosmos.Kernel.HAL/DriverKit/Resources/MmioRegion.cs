@@ -119,6 +119,39 @@ public sealed class MmioRegion
     }
 
     /// <summary>
+    /// A span over <paramref name="length"/> bytes of the window at
+    /// <paramref name="offset"/>, for the bulk work the accessors above
+    /// cannot do: a framebuffer cleared, blitted or read back a scanline at a
+    /// time, or a command FIFO written in place. The bounds are checked here,
+    /// once, and the span is then plain memory: no alignment rule, no
+    /// per-access barrier, and no check that the binding still owns the
+    /// window, so a driver takes one only for the length of the operation and
+    /// never stores it. Mixing the two is fine as long as the driver issues
+    /// <see cref="DmaBuffer.WriteBarrier"/> itself before the register write
+    /// that tells the device to look at what the span wrote.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> is negative, or the range runs past the window.</exception>
+    /// <exception cref="InvalidOperationException">The binding attempt that mapped the window was torn down.</exception>
+    public unsafe Span<byte> GetSpan(ulong offset, int length)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(length);
+
+        if (_invalidated)
+        {
+            throw new InvalidOperationException("The binding attempt that mapped this region was torn down.");
+        }
+
+        // As in AddressOf: written as a remainder so an offset near
+        // ulong.MaxValue cannot wrap past the end of the window.
+        if (offset > Length || Length - offset < (ulong)length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(length), "The range runs past the end of the region.");
+        }
+
+        return new Span<byte>((void*)(_address + offset), length);
+    }
+
+    /// <summary>
     /// Makes every later access throw. Called when the binding attempt that
     /// mapped the window is torn down, so a driver still holding the region
     /// gets an exception rather than writing to a device that is no longer

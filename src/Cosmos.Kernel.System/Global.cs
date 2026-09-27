@@ -224,6 +224,15 @@ public static class Global
             }
         }
 
+        if (Core.CosmosFeatures.GraphicsEnabled)
+        {
+            IReadOnlyList<PciDriverRegistration> display = BuiltInDrivers.CreatePciDisplayRegistrations();
+            for (int i = 0; i < display.Count; i++)
+            {
+                DriverCore.RegisterBuiltIn(display[i]);
+            }
+        }
+
         // The virtio-input driver publishes a keyboard or a mouse depending
         // on the device it binds, so either switch is reason to register it.
         // Two ifs rather than one ||, so each branch still tests a single
