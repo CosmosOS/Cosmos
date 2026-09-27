@@ -3,9 +3,9 @@
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Cosmos.Kernel.HAL.Drivers;
-using Cosmos.Kernel.HAL.Drivers.Pci;
-using Cosmos.Kernel.HAL.Drivers.Usb;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Drivers;

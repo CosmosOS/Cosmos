@@ -55,14 +55,14 @@ public class LayerAnalyzerTests
     public async Task WhenUserKernelImportsTheDriverKit_ReportsNothing()
     {
         const string code = """
-            using Cosmos.Kernel.HAL.Drivers;
+            using Cosmos.Kernel.HAL.DriverKit;
             using Cosmos.Kernel.System.Drivers;
 
             namespace MyKernel;
 
             public sealed class Driver
             {
-                public Cosmos.Kernel.HAL.Drivers.Marker? Device { get; set; }
+                public Cosmos.Kernel.HAL.DriverKit.Marker? Device { get; set; }
             }
             """;
 
@@ -130,7 +130,8 @@ public class LayerAnalyzerTests
     /// Runs the layer analyzer over a project named <paramref name="assemblyName"/>
     /// holding <paramref name="code"/> and referencing one in-memory assembly per
     /// name in <paramref name="references"/>, each declaring a public
-    /// <c>Marker</c> class in the namespace <c>{name}.Drivers</c>.
+    /// <c>Marker</c> class in the namespaces <c>{name}.Drivers</c> and
+    /// <c>{name}.DriverKit</c>, the two the layer rules are written about.
     /// </summary>
     private static async Task<ImmutableArray<Diagnostic>> GetLayerDiagnosticsAsync(
         string assemblyName, string code, params string[] references)
@@ -155,7 +156,10 @@ public class LayerAnalyzerTests
     {
         CSharpCompilation layer = CSharpCompilation.Create(
             assemblyName,
-            [CSharpSyntaxTree.ParseText($"namespace {assemblyName}.Drivers {{ public class Marker {{ }} }}")],
+            [
+                CSharpSyntaxTree.ParseText($"namespace {assemblyName}.Drivers {{ public class Marker {{ }} }}"),
+                CSharpSyntaxTree.ParseText($"namespace {assemblyName}.DriverKit {{ public class Marker {{ }} }}")
+            ],
             [s_corlibReference],
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
         return layer.ToMetadataReference();

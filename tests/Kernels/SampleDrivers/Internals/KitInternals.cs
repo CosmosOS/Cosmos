@@ -1,8 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Runtime.CompilerServices;
-using Cosmos.Kernel.HAL.Drivers;
-using Cosmos.Kernel.HAL.Drivers.Pci;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace SampleDrivers;
@@ -26,7 +26,7 @@ namespace SampleDrivers;
 /// </remarks>
 internal static class KitInternals
 {
-    private const string DriverWorkQueueType = "Cosmos.Kernel.HAL.Drivers.Engine.DriverWorkQueue, Cosmos.Kernel.HAL";
+    private const string DriverWorkQueueType = "Cosmos.Kernel.HAL.DriverKit.Engine.DriverWorkQueue, Cosmos.Kernel.HAL";
 
     /// <summary>
     /// The timer polling <paramref name="context"/>'s interrupt handler, or

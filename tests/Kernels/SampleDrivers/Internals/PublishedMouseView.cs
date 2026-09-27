@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Runtime.CompilerServices;
-using Cosmos.Kernel.HAL.Drivers;
+using Cosmos.Kernel.HAL.DriverKit;
 
 namespace SampleDrivers;
 
@@ -15,7 +15,7 @@ namespace SampleDrivers;
 /// </summary>
 public sealed class PublishedMouseView
 {
-    private const string PublishedMouseType = "Cosmos.Kernel.HAL.Drivers.Engine.PublishedMouse, Cosmos.Kernel.HAL";
+    private const string PublishedMouseType = "Cosmos.Kernel.HAL.DriverKit.Engine.PublishedMouse, Cosmos.Kernel.HAL";
     private const string MouseDeviceType = "Cosmos.Kernel.HAL.Devices.Input.MouseDevice, Cosmos.Kernel.HAL";
     private const string MouseEventHandlerType = "Cosmos.Kernel.HAL.Devices.Input.MouseEventHandler, Cosmos.Kernel.HAL";
 

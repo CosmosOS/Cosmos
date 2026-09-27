@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Runtime.CompilerServices;
-using Cosmos.Kernel.HAL.Drivers;
+using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace SampleDrivers;
@@ -18,7 +18,7 @@ namespace SampleDrivers;
 /// </summary>
 public sealed class PublishedLinkView
 {
-    private const string PublishedNetworkDeviceType = "Cosmos.Kernel.HAL.Drivers.Engine.PublishedNetworkDevice, Cosmos.Kernel.HAL";
+    private const string PublishedNetworkDeviceType = "Cosmos.Kernel.HAL.DriverKit.Engine.PublishedNetworkDevice, Cosmos.Kernel.HAL";
     private const string NetworkDeviceType = "Cosmos.Kernel.HAL.Devices.Network.NetworkDevice, Cosmos.Kernel.HAL";
     private const string PacketReceivedHandlerType = "Cosmos.Kernel.HAL.Interfaces.Devices.PacketReceivedHandler, Cosmos.Kernel.HAL.Interfaces";
 

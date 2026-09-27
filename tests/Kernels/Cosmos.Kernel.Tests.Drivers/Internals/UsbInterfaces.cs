@@ -2,7 +2,7 @@
 
 using System.Collections;
 using System.Runtime.CompilerServices;
-using Cosmos.Kernel.HAL.Drivers.Usb;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 
 namespace Cosmos.Kernel.Tests.Drivers;
 
@@ -27,11 +27,11 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </remarks>
 internal static class UsbInterfaces
 {
-    private const string UsbManagerType = "Cosmos.Kernel.HAL.Devices.Usb.UsbManager, Cosmos.Kernel.HAL";
-    private const string UsbDeviceType = "Cosmos.Kernel.HAL.Devices.Usb.UsbDevice, Cosmos.Kernel.HAL";
-    private const string UsbInterfaceType = "Cosmos.Kernel.HAL.Devices.Usb.UsbInterface, Cosmos.Kernel.HAL";
-    private const string UsbClassDriverType = "Cosmos.Kernel.HAL.Devices.Usb.UsbClassDriver, Cosmos.Kernel.HAL";
-    private const string KitUsbDriverType = "Cosmos.Kernel.HAL.Drivers.Engine.KitUsbDriver, Cosmos.Kernel.HAL";
+    private const string UsbManagerType = "Cosmos.Kernel.HAL.Usb.UsbManager, Cosmos.Kernel.HAL";
+    private const string UsbDeviceType = "Cosmos.Kernel.HAL.Usb.UsbDevice, Cosmos.Kernel.HAL";
+    private const string UsbInterfaceType = "Cosmos.Kernel.HAL.Usb.UsbInterface, Cosmos.Kernel.HAL";
+    private const string UsbClassDriverType = "Cosmos.Kernel.HAL.Usb.UsbClassDriver, Cosmos.Kernel.HAL";
+    private const string KitUsbDriverType = "Cosmos.Kernel.HAL.DriverKit.Engine.KitUsbDriver, Cosmos.Kernel.HAL";
     private const string DeviceListType = $"System.Collections.Generic.IReadOnlyList`1[[{UsbDeviceType}]]";
     private const string InterfaceListType = $"System.Collections.Generic.List`1[[{UsbInterfaceType}]]";
 
