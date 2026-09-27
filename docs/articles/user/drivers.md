@@ -27,7 +27,7 @@ Referencing the kit is a build error until the kernel project acknowledges that 
 
 The diagnostic is raised where your code names a kit type or calls `DriverManager`, not where it overrides a kit member: an empty `RegisterDrivers` override compiles without the suppression, and the first `DriverManager.Register` in it does not.
 
-The kit needs PCI (`CosmosEnablePCI`, on by default). A USB driver also needs `CosmosEnableUsb`, which is on by default only when `CosmosEnableKeyboard` or `CosmosEnableStorage` is on: a kernel with neither that wants USB drivers sets it to `true`. What a driver publishes needs its subsystem too: `CosmosEnableMouse` for a mouse, `CosmosEnableNetwork` for a network link, `CosmosEnableStorage` for a disk, and a work item needs `CosmosEnableScheduler`.
+The kit needs PCI (`CosmosEnablePCI`, on by default). A USB driver also needs `CosmosEnableUsb`, which is on by default only when `CosmosEnableKeyboard` or `CosmosEnableStorage` is on: a kernel with neither that wants USB drivers sets it to `true`. What a driver publishes needs its subsystem too: `CosmosEnableKeyboard` for a keyboard, `CosmosEnableMouse` for a mouse, `CosmosEnableNetwork` for a network link, `CosmosEnableStorage` for a disk, and a work item needs `CosmosEnableScheduler`.
 
 Nothing else is referenced: the kit lives in `Cosmos.Kernel.HAL`, which every kernel gets through `Cosmos.Kernel.System`, and the layer rules let a kernel use it directly for this. These are the `using`s the snippets below rely on:
 
@@ -48,7 +48,7 @@ using Cosmos.Kernel.System.Storage;
 
 A driver is a class deriving from `PciDriver` or `UsbDriver`, with one abstract member, `Probe`. The kit creates one instance per device it offers the driver, through a factory you give it, and calls `Probe` once with a context for that device. `Probe` answers `Bound` to keep the device, `Declined` when the device is not one it handles after all, or `Failed` when it could not bring it up.
 
-This is the whole of DevKernel's USB boot mouse driver, `examples/DevKernel/Drivers/UsbBootMouseDriver.cs`, without its documentation comments. No built-in driver takes a boot mouse interface (the built-in keyboard driver takes the boot keyboard one), so the kit offers it to this driver:
+This is the whole of DevKernel's USB boot mouse driver, `examples/DevKernel/Drivers/UsbBootMouseDriver.cs`, without its documentation comments. No built-in driver takes a boot mouse interface (the built-in boot keyboard driver takes the boot keyboard one), so the kit offers it to this driver:
 
 ```csharp
 internal sealed class UsbBootMouseDriver : UsbDriver
@@ -223,9 +223,9 @@ When several registrations match a device, the one whose best entry is most spec
 
 The built-in drivers come in two kinds.
 
-Some are brought up by HAL itself, during HAL bring-up, before any of your code runs: virtio. HAL's USB core adds its hub and keyboard class drivers, which bind during the pass, as soon as the built-in xHCI driver publishes a controller to it. They keep what they take: the pass skips every PCI function with an owner, and USB offers every interface to the hub and keyboard drivers before the kit's. A registered driver cannot take a device from one of these at run time. To drive a device one of them claims, build the kernel without the switch that brings it up.
+Some are brought up by HAL itself, during HAL bring-up, before any of your code runs: the virtio GPU on the PCI bus, and every virtio device on the ARM64 virt machine's virtio-mmio window, which the kit has no seam for. HAL's USB core adds its hub class driver, which binds during the pass, as soon as the built-in xHCI driver publishes a controller to it. They keep what they take: the pass skips every PCI function with an owner, and USB offers every interface to the hub driver before the kit's. A registered driver cannot take a device from one of these at run time. To drive a device one of them claims, build the kernel without the switch that brings it up.
 
-The others are kit drivers, written against the same public seam as yours, in the `Cosmos.Kernel.HAL.Drivers` assembly: today xHCI, which matches `PciMatch.Class(0x0C, 0x03, 0x30)` and publishes the host controller the USB core enumerates every USB device behind; AHCI, which matches `PciMatch.Class(0x01, 0x06, 0x01)` and publishes each SATA disk it finds; NVMe, which matches `PciMatch.Class(0x01, 0x08, 0x02)` and publishes each namespace it can drive; E1000E, which matches `PciMatch.Class(0x02, 0x00, 0x00)`, takes the Intel controllers among them and publishes each one's link; virtio-net, which matches the virtio network device IDs and publishes the link of each one on the PCI bus; and USB mass storage, which matches `UsbMatch.Interface(0x08, 0x06, 0x50)`, SCSI over the Bulk-Only Transport, and publishes each logical unit with a medium as `usb0`, `usb1`, ..., the lowest number no unit present uses. `Global.StartKernel` registers them behind the kernel's feature switches (xHCI with `CosmosEnableUsb`, AHCI and NVMe with `CosmosEnableStorage`, E1000E and virtio-net with `CosmosEnableNetwork`, mass storage with `CosmosEnableStorage` and `CosmosEnableUsb`), before it calls `RegisterDrivers`, and they bind like any registration, in the pass and, for mass storage, on the hot-plug thread for the sticks plugged in later, with two differences: their names are the reserved built-in names (`xhci`, `ahci`, `nvme`, `e1000e`, `virtio-net`, `mass storage`), and they win every tie, even against a driver your constructor registered earlier. Only a strictly more specific match takes a device from one: a `PciMatch.Device(vendorId, deviceId)` entry for your controller or a `UsbMatch.Device(vendorId, productId)` entry for your stick, or a class triple against a class-only built-in. That is how a kernel replaces a built-in on one device it knows better, with no rebuild of the built-in. A kernel built without `CosmosEnableStorage` registers none of them, and ILC keeps none of their code: the Drivers test suite builds that way, which leaves the NVMe controller to its own sample driver.
+The others are kit drivers, written against the same public seam as yours, in the `Cosmos.Kernel.HAL.Drivers` assembly: today xHCI, which matches `PciMatch.Class(0x0C, 0x03, 0x30)` and publishes the host controller the USB core enumerates every USB device behind; AHCI, which matches `PciMatch.Class(0x01, 0x06, 0x01)` and publishes each SATA disk it finds; NVMe, which matches `PciMatch.Class(0x01, 0x08, 0x02)` and publishes each namespace it can drive; E1000E, which matches `PciMatch.Class(0x02, 0x00, 0x00)`, takes the Intel controllers among them and publishes each one's link; virtio-net, which matches the virtio network device IDs and publishes the link of each one on the PCI bus; virtio-input, which matches the virtio input device ID and publishes each device on the PCI bus as the keyboard or the mouse its event types say it is; USB mass storage, which matches `UsbMatch.Interface(0x08, 0x06, 0x50)`, SCSI over the Bulk-Only Transport, and publishes each logical unit with a medium as `usb0`, `usb1`, ..., the lowest number no unit present uses; and the USB boot keyboard, which matches `UsbMatch.Interface(0x03, 0x01, 0x01)` and publishes each USB keyboard, lock lamps included. `Global.StartKernel` registers them behind the kernel's feature switches (xHCI with `CosmosEnableUsb`, AHCI and NVMe with `CosmosEnableStorage`, E1000E and virtio-net with `CosmosEnableNetwork`, virtio-input with either `CosmosEnableKeyboard` or `CosmosEnableMouse`, the boot keyboard with `CosmosEnableKeyboard` and `CosmosEnableUsb`, mass storage with `CosmosEnableStorage` and `CosmosEnableUsb`), before it calls `RegisterDrivers`, and they bind like any registration, in the pass and, for the USB ones, on the hot-plug thread for the devices plugged in later, with two differences: their names are the reserved built-in names (`xhci`, `ahci`, `nvme`, `e1000e`, `virtio-net`, `virtio-input`, `HID boot keyboard`, `mass storage`), and they win every tie, even against a driver your constructor registered earlier. Only a strictly more specific match takes a device from one: a `PciMatch.Device(vendorId, deviceId)` entry for your controller or a `UsbMatch.Device(vendorId, productId)` entry for your stick, or a class triple against a class-only built-in. That is how a kernel replaces a built-in on one device it knows better, with no rebuild of the built-in. A kernel built without `CosmosEnableStorage` registers none of them, and ILC keeps none of their code: the Drivers test suite builds that way, which leaves the NVMe controller to its own sample driver.
 
 Two of the built-ins reach further than their name suggests:
 
@@ -242,7 +242,7 @@ A driver's code runs in five places, and what it may do depends on which:
 |---|---|---|---|---|
 | Factory, `Probe` | The boot thread during the pass, which is CPU 0's idle thread; the USB hot-plug thread for a USB device plugged in later. Do not depend on which | On | Allocate, acquire resources through the context, synchronous USB transfers, `Delay`, `WriteLog`, throw (counts as `Failed`) | Sleep or block, including `DeviceEvent.Wait`: it throws on an event this `Probe` created, and on any other event it would block the probing thread; `DriverManager.Register`, which throws |
 | `UsbDriver.Remove` | The USB hot-plug thread | On | USB transfers (they answer `Disconnected`), `StorageManager.UnregisterDevice`, `WriteLog` | Acquire resources (the Probe-only members throw); `Register` |
-| `DeviceInterruptHandler`, `UsbReportHandler` | Interrupt context: the device's MSI-X vector, the timer interrupt when polled, the xHCI interrupt, or a thread draining the xHCI's events with interrupts masked | Masked | Region accessors, `DmaBuffer.Span`, `IrqSafeLock`, `DeviceWorkItem.Schedule`, `DeviceEvent.Signal`, `MouseReporter.Report`, `NetworkLink.SetLinkState`, `IsPresent` | Allocate, throw, block, take any lock but an `IrqSafeLock`, call through an interface, build a string (so no `WriteLog`) |
+| `DeviceInterruptHandler`, `UsbReportHandler` | Interrupt context: the device's MSI-X vector, the timer interrupt when polled, the xHCI interrupt, or a thread draining the xHCI's events with interrupts masked | Masked | Region accessors, `DmaBuffer.Span`, `IrqSafeLock`, `DeviceWorkItem.Schedule`, `DeviceEvent.Signal`, `KeyboardReporter.Report`, `MouseReporter.Report`, `NetworkLink.SetLinkState`, `IsPresent` | Allocate, throw, block, take any lock but an `IrqSafeLock`, call through an interface, build a string (so no `WriteLog`) |
 | `DeviceWorkItem` callback | The kit's `driver-work` thread, one item at a time | On | Anything a thread may do: allocate, `DeviceEvent.Wait`, transfers, `NetworkLink.Deliver`, `PublishBlockDevice` | Acquire resources; `Register` |
 | `NetworkTransmitHandler` | The thread the network stack sends from, one call at a time | Masked | Region accessors, `DmaBuffer`, `IrqSafeLock` | Block |
 
@@ -291,7 +291,7 @@ Everything a driver acquires comes from its `PciDeviceContext`, during `Probe` o
 | `EnableBusMastering()` | Lets the function master the bus. Call it once the device is reset and its DMA addresses are programmed |
 | `TryRequestInterrupts(handler)` | The function's interrupts, see [Interrupts](#interrupts) |
 | `CreateEvent()`, `TryCreateWorkItem(callback, out item)` | See [Work items and events](#work-items-and-events) |
-| `PublishMouse()`, `PublishNetworkLink(address, transmit)`, `PublishBlockDevice(device)` | See [Publishing to the kernel](#publishing-to-the-kernel) |
+| `PublishKeyboard()`, `PublishMouse()`, `PublishNetworkLink(address, transmit)`, `PublishBlockDevice(device)` | See [Publishing to the kernel](#publishing-to-the-kernel) |
 | `WriteConfig8/16/32(offset, value)` | Config writes at offset `0x40` and above, in thread context, during `Probe` and after it; the header below `0x40` is the kit's, and a write there throws `ArgumentOutOfRangeException` |
 
 `MmioRegion` and `PortRegion` check every access: an offset past the end, or not a multiple of the access size, throws `ArgumentOutOfRangeException`, and every access to a region of an attempt that was torn down throws `InvalidOperationException`. They also order the device's view of memory for you: each write is preceded by a DMA write barrier, so the device sees the descriptors the CPU filled before the register write that tells it to look, and each read is followed by a DMA read barrier, so nothing read from DMA memory afterwards runs ahead of the register that said it is there. Between two DMA-memory accesses with no register access in between, use `DmaBuffer.WriteBarrier()` and `DmaBuffer.ReadBarrier()`.
@@ -417,6 +417,8 @@ A PCI function a driver bound stays bound for the life of the kernel: there is n
 
 A driver does not talk to the kernel's managers itself: it publishes what its device is, and the kit delivers it right after `Probe` returns `Bound`, before the interrupts are armed, on the thread that ran the probe. What a failed attempt published is dropped and never reaches a manager. A disk may also be published later, from a work item, see below.
 
+**A keyboard.** `PublishKeyboard()` returns a `KeyboardReporter`. Each `Report(scanCode, released)` types into `KeyboardManager`'s key queue exactly as a built-in keyboard does, so `Console.ReadKey` and `KeyboardManager.ReadKey` see it (`KeyboardReporter` — see [Keyboard](keyboard.md)). The code is a PS/2 set 1 make code with the `0xE0` prefix of an extended key dropped, except the right Alt key, which is `KeyboardReporter.RightAltScanCode`; a device that speaks another code set is translated by its driver, and 0 reports nothing. `Report` allocates nothing and may be called from the interrupt handler. `PublishKeyboard(updateLeds)` adds the lock lamps: the kit tracks them from the lock keys the driver reports and calls `updateLeds` with the `KeyboardLeds` to show whenever the manager toggles one — inside the very report that carried the lock key, so it runs in the driver's reporting context and a driver with a transfer to make records the lamps and schedules a work item, which is what the built-in USB boot keyboard driver does.
+
 **A mouse.** `PublishMouse()` returns a `MouseReporter`. Each `Report(deltaX, deltaY, wheel, buttons)` moves `MouseManager`'s pointer exactly as a built-in mouse does: positive `deltaY` moves down, a negative `wheel` scrolls up, and `buttons` is a `MouseButtons` of the buttons held after the move. `Report` allocates nothing and may be called from the interrupt handler. See [Mouse](mouse.md) for what the kernel reads back.
 
 **A network interface.** `PublishNetworkLink(address, transmit)` publishes a device with its MAC address; the network stack sends through `transmit` and the driver hands it received frames through the returned `NetworkLink`. The kit registers it with `NetworkManager` after the devices the built-in drivers registered, so the primary device does not change unless there was none, and from then on DHCP, UDP and TCP run over it (see [Network](network.md)). `Deliver(frame)` is for thread context, typically a work item: it copies the frame into a new array the stack keeps, runs the stack's receive path with interrupts masked, and drops the frame while the stack has not configured the link. `SetLinkState(isUp)` may be called from anywhere. The transmit handler gets one frame at a time, with interrupts masked, and answers false when the device cannot take it now:
@@ -449,7 +451,7 @@ private bool Transmit(ReadOnlySpan<byte> frame)
 }
 ```
 
-`PublishMouse` and `PublishNetworkLink` throw `InvalidOperationException` in a kernel built without mouse or network support, which is why DevKernel registers each driver behind the switch it publishes to.
+`PublishKeyboard`, `PublishMouse` and `PublishNetworkLink` throw `InvalidOperationException` in a kernel built without keyboard, mouse or network support, which is why DevKernel registers each driver behind the switch it publishes to.
 
 **A disk.** `PublishBlockDevice(device)` publishes a disk the driver implements as an `IBlockDevice`, the way the built-in AHCI, NVMe and USB mass storage drivers publish each SATA disk, NVMe namespace and logical unit they find. The kit registers it with `StorageManager`, which reads its partition table through it straight away, with real reads (see [File System](filesystem.md)), on the thread that delivers it, and ranks it among the kernel's disks by the primary-disk rule: a disk that cannot leave the machine before one that can (a USB driver's is one that can), then AHCI disks, then NVMe namespaces, then any other, then by the PCI function behind them, then in registration order. Where the driver publishes it decides when those reads happen:
 
@@ -460,11 +462,11 @@ Anywhere else, `PublishBlockDevice` throws `InvalidOperationException`, and so i
 
 A driver in the kernel project, which references `Cosmos.Kernel.System`, can still register a disk with the public `StorageManager.RegisterDevice` itself and take it out in `Remove` with `StorageManager.UnregisterDevice`; publishing does both for it, and is the only way for a driver library that references the kit alone.
 
-Keyboards and graphics have no publication: a driver cannot feed `KeyboardManager`, and a GPU driver can hand out its own `Canvas` but cannot become the console.
+Graphics have no publication: a GPU driver can hand out its own `Canvas`, but it cannot become the console.
 
 ## USB drivers
 
-USB drivers bind interfaces, not devices. The USB stack offers every interface of a configured device to HAL's class drivers first (hub, boot keyboard), then to the kit, which ranks the registered drivers, the built-in mass storage driver among them: at boot for the devices already there, during the pass, and on the USB hot-plug thread for every device plugged in later. Neither the host controller nor HAL's class drivers know a registered driver exists.
+USB drivers bind interfaces, not devices. The USB stack offers every interface of a configured device to HAL's own class driver first, the hub driver, then to the kit, which ranks the registered drivers, the built-in boot keyboard and mass storage drivers among them: at boot for the devices already there, during the pass, and on the USB hot-plug thread for every device plugged in later. Neither the host controller nor the hub driver knows a registered driver exists.
 
 `UsbDeviceContext` gives the driver:
 
@@ -569,12 +571,12 @@ The interrupt polling interval differs too, about 55 ms on x64 against 10 ms on 
 
 - The kit is experimental: its API can change in any release, which is why a driver library pins the exact version.
 - Registration closes when the pass starts. A driver cannot be registered once the kernel runs.
-- A registered driver cannot displace one of the built-ins HAL brings up at run time; build without the built-in's switch instead. It can take a device from a kit built-in (AHCI, NVMe, USB mass storage) with a more specific match.
+- A registered driver cannot displace one of the built-ins HAL brings up at run time; build without the built-in's switch instead. It can take a device from a kit built-in (AHCI, NVMe, E1000E, virtio-net, virtio-input, USB mass storage, the USB boot keyboard) with a more specific match.
 - A PCI binding is never released: no remove, rebind or shutdown for PCI.
 - There is no shutdown quiesce: `Power.Shutdown` and `Power.Reboot` give drivers no callback, so a device can still be doing DMA when the machine goes down, and nothing is flushed first.
 - The kernel runs on one CPU. `IrqSafeLock` masks interrupts and spins, which is all a single CPU needs.
 - One interrupt per binding, with no way to mask it; no INTx or plain MSI.
-- No keyboard or graphics publication.
+- No graphics publication.
 - USB: one interface per driver, alternate setting 0 only, no isochronous or interrupt OUT endpoints, at most 4096 bytes per control request, and no second candidate once an attempt opened an endpoint.
 - `DeviceInfo` does not say why a device has no driver; the serial log does.
 - Nothing checks the interrupt-context rules at build time.
@@ -586,16 +588,18 @@ The interrupt polling interval differs too, about 55 ms on x64 against 10 ms on 
 HAL's built-in drivers bind during HAL bring-up, before any kernel code runs. The kit's built-in drivers and the drivers you register bind late, in one pass that `Global.StartKernel` runs on the boot thread, then on the USB hot-plug thread for every device plugged in afterwards:
 
 ```
-HAL bring-up         HAL's built-in drivers bind: virtio, xHCI (+ hub, keyboard)
+HAL bring-up         HAL's built-in drivers bind: virtio GPU and virtio-mmio, then hub
         │
 Global.StartKernel   interrupts on
-        ├─ built-in kit drivers         AHCI, NVMe (with storage), E1000E, virtio-net (with network),
-        │                               USB mass storage (with storage and USB), registered ahead of
-        │                               yours (only with PCI)
+        ├─ built-in kit drivers         xHCI (with USB), AHCI, NVMe (with storage), E1000E,
+        │                               virtio-net (with network), virtio-input (with keyboard or
+        │                               mouse), USB mass storage (with storage and USB), the USB boot
+        │                               keyboard (with keyboard and USB), registered ahead of yours
+        │                               (only with PCI)
         ├─ Kernel.RegisterDrivers()     your registrations (only with PCI)
         ├─ the driver pass              every free PCI function, then every free USB interface,
         │                               offered to the matching drivers, best match first
-        ├─ USB hot-plug thread starts   later devices: HAL's class drivers first, then the kit's;
+        ├─ USB hot-plug thread starts   later devices: HAL's hub driver first, then the kit's;
         │                               unplug runs the teardown and Remove
         └─ Kernel.Start()               OnBoot, BeforeRun, Run
 ```

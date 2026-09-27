@@ -39,7 +39,7 @@ Each Cosmos package contributes a *library initializer* that the runtime execute
 
 1. **Cosmos.Kernel.Core**: carves the heap out of the Limine memory map, initializes the garbage collector, then registers the type system (statics, eager static constructors, module initializers). Nothing allocates before this step.
 2. **The runtime's own initializers** (`System.Private.CoreLib` and its companions): the preallocated `OutOfMemoryException`, the class constructor runner, the type loader and reflection callbacks, stack trace metadata. The class constructor runner is created here, so a static field whose type has a lazy static constructor can be read from this step on and not before.
-3. **Cosmos.Kernel.HAL**: platform HAL, the interrupt controller, PCI enumeration over ECAM, platform hardware (APIC/GIC, device drivers such as the NIC), and the USB host controllers with their hub and keyboard drivers. These are HAL's built-in drivers; the built-in AHCI, NVMe and USB mass storage drivers, which are written against the [driver kit](drivers.md), and the drivers your kernel registers bind later, in `Global.StartKernel()`.
+3. **Cosmos.Kernel.HAL**: platform HAL, the interrupt controller, PCI enumeration over ECAM, platform hardware (APIC/GIC, device drivers such as the NIC), and the USB host controllers with their hub driver. These are HAL's built-in drivers; the built-in AHCI, NVMe, E1000E, virtio-net, virtio-input, USB mass storage and USB boot keyboard drivers, which are written against the [driver kit](drivers.md), and the drivers your kernel registers bind later, in `Global.StartKernel()`.
 4. **Cosmos.Kernel**: CPU exception handlers and the scheduler (one idle thread per CPU, preemption on a 10 ms quantum).
 5. **Cosmos.Kernel.System**: the service managers `TimerManager`, `KeyboardManager`, `MouseManager`, `NetworkManager`, `StorageManager`.
 
@@ -47,7 +47,7 @@ Interrupts are not in the same state on both architectures during these steps. O
 
 Every step in 3-5 is gated by a feature switch (`CosmosEnableInterrupts`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, all `true` by default, and `CosmosEnableUsb`, whose default is derived from two of them). Set one to `false` in your `.csproj` and the corresponding subsystem is skipped here and compiled out of the kernel.
 
-`CosmosEnableUsb` gates the USB host controllers of step 3, the keyboard driver behind them, and the built-in USB mass storage driver `Global.StartKernel()` registers. Left unset, it is on when `CosmosEnableKeyboard` or `CosmosEnableStorage` is on, and off when both are off: a kernel with neither that still wants USB sets it to `true`. It is always off when `CosmosEnablePCI` is off, whatever the project sets, and so also when `CosmosEnableInterrupts` is off, which turns PCI off.
+`CosmosEnableUsb` gates the USB host controllers of step 3 and the built-in USB boot keyboard and mass storage drivers `Global.StartKernel()` registers behind them. Left unset, it is on when `CosmosEnableKeyboard` or `CosmosEnableStorage` is on, and off when both are off: a kernel with neither that still wants USB sets it to `true`. It is always off when `CosmosEnablePCI` is off, whatever the project sets, and so also when `CosmosEnableInterrupts` is off, which turns PCI off.
 
 ## The generated entry point
 
