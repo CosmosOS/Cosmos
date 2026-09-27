@@ -177,8 +177,9 @@ public static class Global
     /// the kernel's switches: that assembly sees no switch, so the guards
     /// live here. One switch per <c>if</c>, since ILC folds a single switch
     /// only: a kernel built without USB keeps no xHCI or USB mass storage
-    /// code, and one built without storage keeps no AHCI, NVMe or USB mass
-    /// storage code. They go through the kit's built-in path, which takes
+    /// code, one built without storage keeps no AHCI, NVMe or USB mass
+    /// storage code, and one built without network keeps no virtio-net code.
+    /// They go through the kit's built-in path, which takes
     /// the names reserved for built-ins and ranks them ahead of every
     /// registration the kernel makes, so a built-in wins a tie and only a
     /// strictly more specific match takes a device from it.
@@ -191,6 +192,15 @@ public static class Global
             for (int i = 0; i < usbHosts.Count; i++)
             {
                 DriverCore.RegisterBuiltIn(usbHosts[i]);
+            }
+        }
+
+        if (Core.CosmosFeatures.NetworkEnabled)
+        {
+            IReadOnlyList<PciDriverRegistration> network = BuiltInDrivers.CreatePciNetworkRegistrations();
+            for (int i = 0; i < network.Count; i++)
+            {
+                DriverCore.RegisterBuiltIn(network[i]);
             }
         }
 

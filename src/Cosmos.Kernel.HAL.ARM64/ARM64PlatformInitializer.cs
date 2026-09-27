@@ -181,6 +181,9 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
 
     public INetworkDevice? GetNetworkDevice()
     {
+        // A virtio NIC on the virt machine's virtio-mmio window, the one the
+        // MMIO scan brought up. One on the PCI bus is the built-in virtio-net
+        // kit driver's, which publishes its link in the driver pass instead.
         return VirtioDevice.GetDevice<VirtioNet>();
     }
 

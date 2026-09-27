@@ -17,6 +17,15 @@ namespace Cosmos.Kernel.HAL.Devices.Virtio;
 /// window layout (QEMU virt on ARM64); the PCI scan runs on every architecture
 /// from the shared HAL initialization after PCI enumeration.
 /// </summary>
+/// <remarks>
+/// Network devices are the one type this scan no longer binds on the PCI bus:
+/// the built-in <c>virtio-net</c> driver of Cosmos.Kernel.HAL.Drivers takes
+/// them in the driver pass, so <see cref="InitializePciBus"/> leaves every
+/// network function untouched and unclaimed for it. A network device on the
+/// MMIO window has no PCI function and no kit seam to bind through, so
+/// <see cref="InitializeMmioBus"/> still brings it up here, through
+/// <see cref="VirtioNet"/>.
+/// </remarks>
 // Note: This class is eagerly constructed at startup because accessing s_devices causes issues otherwise.
 [EagerStaticClassConstruction]
 internal static class VirtioDevice
@@ -130,8 +139,10 @@ internal static class VirtioDevice
     }
 
     /// <summary>
-    /// Binds drivers to the virtio PCI functions discovered by
-    /// <see cref="PciManager.Setup"/>. Runs on both architectures.
+    /// Binds HAL's own drivers to the virtio PCI functions discovered by
+    /// <see cref="PciManager.Setup"/>: the input and GPU devices. Runs on
+    /// both architectures. Network functions are left for the driver pass,
+    /// which offers them to the built-in <c>virtio-net</c> kit driver.
     /// </summary>
     public static void InitializePciBus()
     {
@@ -180,12 +191,14 @@ internal static class VirtioDevice
 
     /// <summary>
     /// Names the built-in driver that binds a virtio PCI function of
-    /// <paramref name="deviceType"/>, or null when this kernel has none: the
-    /// type has no driver, or its feature is switched off.
+    /// <paramref name="deviceType"/> here, in HAL, or null when this scan
+    /// leaves the function alone: the type has no driver, its feature is
+    /// switched off, or a driver kit driver binds it in the driver pass
+    /// instead, as the built-in <c>virtio-net</c> driver does for every
+    /// network device on the PCI bus.
     /// </summary>
     private static string? BuiltInOwner(uint deviceType) => deviceType switch
     {
-        VirtioTransport.DeviceTypeNetwork => CosmosFeatures.NetworkEnabled ? PciOwner.VirtioNet : null,
         VirtioTransport.DeviceTypeInput => CosmosFeatures.KeyboardEnabled || CosmosFeatures.MouseEnabled ? PciOwner.VirtioInput : null,
         VirtioTransport.DeviceTypeGpu => CosmosFeatures.GraphicsEnabled ? PciOwner.VirtioGpu : null,
         _ => null,
@@ -195,6 +208,9 @@ internal static class VirtioDevice
     {
         switch (transport.DeviceType)
         {
+            // Only ever reached from the MMIO scan: BuiltInOwner names no
+            // owner for a network function, so the PCI scan skips those
+            // before it builds a transport for them.
             case VirtioTransport.DeviceTypeNetwork:
                 if (CosmosFeatures.NetworkEnabled)
                 {

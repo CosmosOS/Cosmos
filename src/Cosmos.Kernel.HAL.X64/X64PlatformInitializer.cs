@@ -9,7 +9,6 @@ using Cosmos.Kernel.Core.X64;
 using Cosmos.Kernel.Core.X64.Cpu;
 using Cosmos.Kernel.Core.X64.IO;
 using Cosmos.Kernel.Core.X64.Power;
-using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
@@ -170,13 +169,12 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
     public INetworkDevice? GetNetworkDevice()
     {
-        if (_networkDevice != null)
-        {
-            return _networkDevice;
-        }
-
-        // Virtio-net over PCI, discovered by the shared virtio PCI scan.
-        return VirtioDevice.GetDevice<VirtioNet>();
+        // The E1000E, the one NIC HAL drives on this architecture. A virtio
+        // NIC arrives on the PCI bus here, where the built-in virtio-net kit
+        // driver binds it in the driver pass and publishes its link, and q35
+        // has no virtio-mmio window for HAL's own virtio-net driver to find
+        // one on.
+        return _networkDevice;
     }
 
     private static T[] Concat<T>(T[] first, T[] second)

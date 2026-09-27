@@ -3,7 +3,10 @@
     The built-in drivers written as driver kit drivers: one folder per bus
     (Pci, Usb) and one per driver below it, each exposing a registration, and
     BuiltInDrivers, the catalogue Global.StartKernel registers behind the
-    kernel's feature switches.
+    kernel's feature switches. Where several device types share a transport,
+    a family folder sits between the two and holds it: Pci/Virtio/ carries
+    the virtio-over-PCI transport and the split rings, with Pci/Virtio/Net/
+    the one driver built on them so far.
     Cosmos.Kernel.HAL keeps the mechanisms (PCI enumeration, MSI-X, mapping,
     DMA, the USB core and the kit itself); this assembly holds the policies,
     host controller drivers included.
