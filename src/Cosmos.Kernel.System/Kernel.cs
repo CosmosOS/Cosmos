@@ -79,9 +79,11 @@ public abstract partial class Kernel
     /// <see cref="Drivers.DriverManager"/>. It runs on the boot thread with
     /// interrupts on, after the built-in drivers HAL brings up bound their
     /// devices during HAL bring-up, after the built-in drivers written
-    /// against the kit (AHCI and NVMe) were registered, and right before the driver
-    /// pass offers all those drivers what HAL's built-ins left; then USB
-    /// hot-plug starts and <see cref="OnBoot"/> runs. A kit built-in wins a
+    /// against the kit (xHCI, AHCI, NVMe and USB mass storage) were
+    /// registered, and right before the driver pass offers all those drivers
+    /// what HAL's built-ins left; the pass is also where the USB bus comes
+    /// up, when xHCI publishes its controller. Then USB hot-plug starts and
+    /// <see cref="OnBoot"/> runs. A kit built-in wins a
     /// tie against the drivers registered here, however early. The boot
     /// thread is the idle thread, so the override must not sleep or block.
     /// Registration closes as the pass starts. A kernel built without PCI

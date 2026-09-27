@@ -13,9 +13,10 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// before the driver pass, which class driver the USB stack records for it,
 /// the binding it keeps, and whether the hot-plug thread runs. The USB
 /// stack's lists are not locked, so these are read at points where the
-/// hot-plug thread is not changing them: before or during the pass, or once a hot-plug
-/// wait on <see cref="Cosmos.Kernel.System.Drivers.DriverManager.Devices"/>,
-/// which is safe to read meanwhile, has seen the change. Thread context.
+/// hot-plug thread is not changing them: before or during the pass, or
+/// once a hot-plug wait on
+/// <see cref="Cosmos.Kernel.System.Drivers.DriverManager.Devices"/>, which
+/// is safe to read meanwhile, has seen the change. Thread context.
 /// </summary>
 /// <remarks>
 /// Reached through <see cref="UnsafeAccessorAttribute"/> and
