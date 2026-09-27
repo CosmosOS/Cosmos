@@ -152,7 +152,7 @@ public class Kernel : Sys.Kernel
     private const byte TabletSubclass = UsbTabletFailingDriver.NoSubclass;
     private const byte TabletProtocol = UsbTabletFailingDriver.NoProtocol;
 
-    /// <summary>bInterfaceProtocol of a boot keyboard (HID 1.11 §4.3), which QEMU's usb-kbd declares and the built-in keyboard driver takes.</summary>
+    /// <summary>bInterfaceProtocol of a boot keyboard (HID 1.11 §4.3), which QEMU's usb-kbd declares and the built-in boot keyboard driver takes.</summary>
     private const byte KeyboardProtocol = 0x01;
 
     // Entries of the usb-hid profile's "usb" list, in tests/profiles.json,
@@ -161,8 +161,8 @@ public class Kernel : Sys.Kernel
     private const int TabletUsbIndex = 1;
     private const int KeyboardUsbIndex = 2;
 
-    // The built-in USB class drivers' names, spelled out for the same reason
-    // as the owner names above.
+    // The names of HAL's own hub driver and of the kit's built-in USB
+    // drivers, spelled out for the same reason as the owner names above.
     private const string HubName = "hub";
     private const string UsbKeyboardName = "HID boot keyboard";
     private const string MassStorageName = "mass storage";
@@ -213,6 +213,16 @@ public class Kernel : Sys.Kernel
     /// never probes: see <see cref="TestUsbRanking_NullFactoryFailsAttempt"/>.
     /// </summary>
     private const string ExpectedMouseProbeOrder = $"{UsbHidDeviceDriver.Name},{UsbMouseDeclinesName},{UsbBootMouseDriver.Name}";
+
+    /// <summary>
+    /// Order in which the keyboard interface should have been offered: the
+    /// device match alone, which opens nothing and declines, after which
+    /// the built-in boot keyboard driver's class, subclass and protocol
+    /// match binds it. The class match, which also matches it, is never
+    /// offered it: only a strictly more specific match is offered a
+    /// built-in's device first.
+    /// </summary>
+    private const string ExpectedKeyboardProbeOrder = UsbHidDeviceDriver.Name;
 
     /// <summary>
     /// Order in which the tablet interface should have been offered: the
@@ -942,13 +952,13 @@ public class Kernel : Sys.Kernel
         Assert.Equal(1, CountListedInterfaces(HidClass, TabletSubclass, TabletProtocol), "exactly one USB device should present a HID interface with no boot subclass, the tablet's");
     }
 
-    // No class driver of HAL's takes a HID mouse: the keyboard driver
-    // matches the keyboard protocol only, the hub driver another class, and
-    // the built-in mass storage driver binds through the kit like any other
-    // kit driver. The pass brings the bus up, by binding the xHCI
-    // controller, and then gives the interface to the boot mouse driver,
-    // through the kit's class driver, which the USB stack hands it back to
-    // on disconnect.
+    // Nothing else takes a HID mouse: HAL's hub driver, its one class
+    // driver, matches another class, and the built-in boot keyboard and
+    // mass storage drivers bind through the kit like any other kit driver,
+    // on matches the mouse does not answer. The pass brings the bus up, by
+    // binding the xHCI controller, and then gives the interface to the boot
+    // mouse driver, through the kit's class driver, which the USB stack
+    // hands it back to on disconnect.
     private static void TestUsb_MouseInterfaceBoundByPass()
     {
         Assert.Equal(0, s_usbInterfacesBeforePass, "no USB interface should be enumerated before the pass, which binds the controller");
@@ -1941,13 +1951,13 @@ public class Kernel : Sys.Kernel
             $"the interrupt IN endpoint 0x{endpoint.Address:X2} should have the IN bit, a packet size and an interval");
     }
 
-    // The device match asked, in each of its two Probes, for a bulk pipe on
-    // the interface's interrupt endpoint and for an interrupt pipe on an
+    // The device match asked, in each of its three Probes, for a bulk pipe
+    // on the interface's interrupt endpoint and for an interrupt pipe on an
     // endpoint the interface lacks. Both returned false and opened nothing,
     // so its declines let each interface go on to the next candidate.
     private static void TestUsbContext_OpenRefusesOtherEndpoints()
     {
-        Assert.Equal(2, UsbHidDeviceDriver.Probes, "the device match should be offered both of QEMU's HID interfaces, the mouse's and the tablet's");
+        Assert.Equal(3, UsbHidDeviceDriver.Probes, "the device match should be offered all three of QEMU's HID interfaces, the mouse's, the tablet's and the keyboard's");
         Assert.False(UsbHidDeviceDriver.InterruptEndpointMissing, "each HID interface should have an interrupt IN endpoint");
         Assert.False(UsbHidDeviceDriver.BulkOpenOfInterruptEndpointAccepted, "TryOpenBulk on an interrupt endpoint should return false");
         Assert.False(UsbHidDeviceDriver.InterruptOpenOfMissingEndpointAccepted, "OpenInterruptIn on an endpoint the interface lacks should return false");
@@ -2695,9 +2705,11 @@ public class Kernel : Sys.Kernel
 
     // QEMU's keyboard presents QEMU's HID IDs, which the device match
     // registration matches, and a HID interface, which the class match
-    // does; the built-in keyboard driver took it as the USB core enumerated
-    // it, inside the pass's xHCI probe, so the pass offered it to neither
-    // registered driver. Pulled out, the built-in lets go and the hot-plug
+    // does. The pass offered it to the device match first, since a device
+    // match is the most specific there is, and that one declined having
+    // opened nothing; the built-in boot keyboard driver took it next, on
+    // its class, subclass and protocol match, which left the class match
+    // never offered it. Pulled out, the built-in lets go and the hot-plug
     // thread drops it from the device list.
     private static void TestUsbKeyboardUnplug_BuiltInLetsGo()
     {
@@ -2709,7 +2721,8 @@ public class Kernel : Sys.Kernel
         }
 
         string offered = ProbeLog.Describe(keyboard.Path);
-        Assert.True(offered.Length == 0, $"no registered driver should be offered the keyboard the built-in took, it was offered to {offered}");
+        Assert.True(offered == ExpectedKeyboardProbeOrder,
+            $"the keyboard should be offered as {ExpectedKeyboardProbeOrder}, was {(offered.Length == 0 ? "no one" : offered)}");
         Assert.True(keyboard.VendorId == UsbDescriptors.QemuHidVendorId && keyboard.ProductId == UsbDescriptors.QemuHidProductId,
             $"the keyboard should present QEMU's HID IDs, which the device match registration matches, presents {keyboard.VendorId:X4}:{keyboard.ProductId:X4}");
         Assert.True(keyboard.DriverName == UsbKeyboardName, $"the keyboard should still be the built-in's, is {keyboard.DriverName ?? "nothing"}'s");
@@ -2719,9 +2732,10 @@ public class Kernel : Sys.Kernel
         Assert.True(gone, "the keyboard's interface should leave the device list once it is pulled out");
     }
 
-    // Plugged back in, the keyboard goes to the built-in again, which comes
-    // before the kit in the USB stack's class drivers: no registered driver
-    // is offered it on the hot-plug thread either.
+    // Plugged back in, the keyboard is offered the same way on the hot-plug
+    // thread: the device match declines it again and the built-in takes it
+    // back. A built-in keeps what it binds across a replug, and the class
+    // match is no closer to it than it was at boot.
     private static void TestUsbKeyboardReplug_BuiltInKeepsItsInterface()
     {
         int probesBefore = ProbeLog.Count;
@@ -2729,7 +2743,11 @@ public class Kernel : Sys.Kernel
         bool bound = WaitUntil(static () => IsOwnedBy(FindUsbRecord(HidClass, BootInterfaceSubclass, KeyboardProtocol), UsbKeyboardName),
             HotPlugWaitMilliseconds);
         Assert.True(bound, $"the keyboard plugged back in should be listed as owned by {UsbKeyboardName}");
-        Assert.Equal(probesBefore, ProbeLog.Count, $"no registered driver should be offered the keyboard plugged back in, probes ran {ProbeLog.Describe()}");
+
+        UsbInterfaceState? keyboard = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, KeyboardProtocol);
+        string order = keyboard is null ? string.Empty : ProbeLog.DescribeSince(probesBefore, keyboard.Path);
+        Assert.True(order == ExpectedKeyboardProbeOrder,
+            $"the keyboard plugged back in should be offered as {ExpectedKeyboardProbeOrder}, was {(order.Length == 0 ? "no one" : order)}");
     }
 
     // ==================== Device list ====================

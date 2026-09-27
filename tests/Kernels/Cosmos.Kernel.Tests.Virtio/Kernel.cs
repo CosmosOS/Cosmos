@@ -5,6 +5,8 @@ using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
+using Cosmos.Kernel.System.Keyboard;
+using Cosmos.Kernel.System.Mouse;
 using Cosmos.Kernel.System.Network;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -23,27 +25,32 @@ namespace Cosmos.Kernel.Tests.Virtio;
 /// arm64 runs both an MMIO cell and a PCI one. The same kernel binary serves
 /// every cell of an architecture, so the transport is detected at runtime.
 ///
-/// The two transports are driven by different code since virtio-net moved to
-/// the driver kit: a NIC on the PCI bus is bound by the built-in
-/// <c>virtio-net</c> kit driver in <c>Cosmos.Kernel.HAL.Drivers</c>, during
-/// the driver pass, while one on the virt machine's MMIO window is still
-/// HAL's own <c>VirtioNet</c>, bound during HAL bring-up. So what each cell
-/// can be asked differs, and the tests are in three groups: what both must
-/// end in (a NIC registered with the network manager, addressed and up),
-/// what only the MMIO cell has (HAL's driver object), and what only the PCI
-/// cell has (an owned, claimed PCI function with MSI-X enabled on it).
-/// Input is HAL's on both transports.
+/// The two transports are driven by different code since virtio-net and
+/// virtio-input moved to the driver kit: a NIC, a keyboard or a mouse on the
+/// PCI bus is bound by the built-in <c>virtio-net</c> or <c>virtio-input</c>
+/// kit driver in <c>Cosmos.Kernel.HAL.Drivers</c>, during the driver pass,
+/// while one on the virt machine's MMIO window is still HAL's own
+/// <c>VirtioNet</c>, <c>VirtioKeyboard</c> or <c>VirtioMouse</c>, bound
+/// during HAL bring-up. So what each cell can be asked differs, and the
+/// tests are in three groups: what both must end in (a NIC registered with
+/// the network manager, addressed and up), what only the MMIO cell has
+/// (HAL's driver objects), and what only the PCI cell has (owned, claimed
+/// PCI functions with MSI-X enabled on the NIC's, and the input devices in
+/// the kernel's managers).
 /// </summary>
 public class Kernel : Sys.Kernel
 {
     /// <summary>Number of tests announced to the runner in TR.Start.</summary>
-    private const int ExpectedTestCount = 12;
+    private const int ExpectedTestCount = 13;
 
     /// <summary>Reason surfaced for the PCI-transport tests when the cell runs virtio over MMIO.</summary>
     private const string SkipNotPci = "this cell presents virtio over MMIO";
 
     /// <summary>Reason surfaced for the MMIO-transport tests when the cell runs virtio over PCI.</summary>
-    private const string SkipNotMmio = "this cell presents virtio over PCI, where the kit's driver owns the NIC";
+    private const string SkipNotMmio = "this cell presents virtio over PCI, where the kit's drivers own the devices";
+
+    /// <summary>Input functions the virtio-pci profile attaches: one keyboard and one mouse.</summary>
+    private const int PciInputFunctions = 2;
 
     /// <summary>Transport name the MMIO transport reports.</summary>
     private const string MmioTransportName = "MMIO";
@@ -104,19 +111,18 @@ public class Kernel : Sys.Kernel
         TR.Run("Net_LinkUp", TestNet_LinkUp);
         TR.Run("Net_MacAddressProgrammed", TestNet_MacAddressProgrammed);
 
-        // ==================== Input ====================
-        TR.Run("Input_KeyboardBound", TestInput_KeyboardBound);
-        TR.Run("Input_MouseBound", TestInput_MouseBound);
-
         // ==================== MMIO transport ====================
         TR.RunIf(!s_isPciCell, "Mmio_DriverBound",         TestMmio_DriverBound,         SkipNotMmio);
         TR.RunIf(!s_isPciCell, "Mmio_Version1Negotiated",  TestMmio_Version1Negotiated,  SkipNotMmio);
+        TR.RunIf(!s_isPciCell, "Mmio_KeyboardBound",       TestMmio_KeyboardBound,       SkipNotMmio);
+        TR.RunIf(!s_isPciCell, "Mmio_MouseBound",          TestMmio_MouseBound,          SkipNotMmio);
 
         // ==================== PCI transport ====================
-        TR.RunIf(s_isPciCell, "Pci_FunctionClaimed",     TestPci_FunctionClaimed,     SkipNotPci);
-        TR.RunIf(s_isPciCell, "Pci_MsiXEnabled",         TestPci_MsiXEnabled,         SkipNotPci);
-        TR.RunIf(s_isPciCell, "Pci_NetOwnerRecorded",    TestPci_NetOwnerRecorded,    SkipNotPci);
-        TR.RunIf(s_isPciCell, "Pci_InputOwnerRecorded",  TestPci_InputOwnerRecorded,  SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_FunctionClaimed",       TestPci_FunctionClaimed,       SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_MsiXEnabled",           TestPci_MsiXEnabled,           SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_NetOwnerRecorded",      TestPci_NetOwnerRecorded,      SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_InputOwnerRecorded",    TestPci_InputOwnerRecorded,    SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_InputDevicesPublished", TestPci_InputDevicesPublished, SkipNotPci);
 
         TR.Finish();
 
@@ -199,23 +205,6 @@ public class Kernel : Sys.Kernel
         Assert.False(mac.Equals(MACAddress.None), "the MAC address read from device config should not be all zeros");
     }
 
-    // ==================== Input ====================
-    //
-    // Both profiles attach a virtio keyboard and mouse, and both transports
-    // bind them in HAL. Binding them exercises the event-type probe in the
-    // registry, which reads the input config select/subsel window — a
-    // different device-config access pattern from the NIC's flat MAC read.
-
-    private static void TestInput_KeyboardBound()
-    {
-        Assert.True(s_keyboards.Length > 0, "a virtio keyboard should have bound");
-    }
-
-    private static void TestInput_MouseBound()
-    {
-        Assert.True(s_mice.Length > 0, "a virtio mouse should have bound");
-    }
-
     // ==================== MMIO transport ====================
 
     // The registry only accepts a device once Initialize() succeeded, so a
@@ -253,6 +242,24 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(s_net.Transport.Version1Negotiated, "the MMIO transport should negotiate VIRTIO_F_VERSION_1");
+    }
+
+    // Both profiles attach a virtio keyboard and a mouse, and binding them
+    // exercises the event-type probe that tells the two apart: it reads the
+    // input config select/subsel window, a different device-config access
+    // pattern from the NIC's flat MAC read. On the MMIO window that probe is
+    // HAL's own registry, so the devices it built are what there is to find.
+    // The PCI cell's are the kit driver's, which publishes them straight to
+    // the managers: Pci_InputDevicesPublished.
+
+    private static void TestMmio_KeyboardBound()
+    {
+        Assert.True(s_keyboards.Length > 0, "a virtio keyboard should have bound on the MMIO window");
+    }
+
+    private static void TestMmio_MouseBound()
+    {
+        Assert.True(s_mice.Length > 0, "a virtio mouse should have bound on the MMIO window");
     }
 
     // ==================== PCI transport ====================
@@ -303,9 +310,10 @@ public class Kernel : Sys.Kernel
         Assert.True(s_virtioNetFunction?.Owner == VirtioNetOwner, "the virtio-net PCI function should be owned by virtio-net");
     }
 
-    // Keyboard and mouse are both virtio-input functions, claimed by HAL's own
-    // virtio scan before it probes which of the two a function is, so both
-    // carry one name.
+    // Keyboard and mouse are both virtio-input functions, and one kit driver
+    // binds either, so both carry its registration's name. The owner is only
+    // recorded once its Probe returned Bound, so a claimed, owned function is
+    // a device the driver brought up, and two of them are both of the cell's.
     private static void TestPci_InputOwnerRecorded()
     {
         PciDevice[]? devices = PciManager.Devices;
@@ -325,10 +333,24 @@ public class Kernel : Sys.Kernel
             }
 
             inputFunctions++;
+            Assert.True(device.Claimed, "every virtio-input PCI function should be claimed by the driver that bound it");
             Assert.True(device.Owner == VirtioInputOwner, "every virtio-input PCI function should be owned by virtio-input");
         }
 
-        Assert.True(inputFunctions > 0, "the virtio-pci cell attaches a keyboard and a mouse");
+        Assert.Equal(PciInputFunctions, inputFunctions, "the virtio-pci cell attaches a keyboard and a mouse, and both should have bound");
+    }
+
+    // What the two functions were published as, which is the one thing the
+    // owner does not say: the driver reads the event types each device
+    // reports and publishes a keyboard for one and a mouse for the other. On
+    // arm64 the counts are exactly those two, since the virt machine has no
+    // PS/2 controller; on x64 q35's PS/2 keyboard and mouse are registered
+    // beside them, which is why this asks for at least one of each rather
+    // than exactly one.
+    private static void TestPci_InputDevicesPublished()
+    {
+        Assert.True(KeyboardManager.DeviceCount > 0, "the virtio keyboard should have reached the keyboard manager");
+        Assert.True(MouseManager.DeviceCount > 0, "the virtio mouse should have reached the mouse manager");
     }
 
     // ==================== Helpers ====================
