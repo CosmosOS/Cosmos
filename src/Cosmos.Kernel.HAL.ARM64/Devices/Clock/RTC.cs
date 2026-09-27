@@ -6,7 +6,7 @@ using Cosmos.Kernel.Core.ARM64.Cpu;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
 using Cosmos.Kernel.HAL.Devices;
-using Cosmos.Kernel.HAL.Devices.Clock;
+using Cosmos.Kernel.HAL.Firmware;
 
 namespace Cosmos.Kernel.HAL.ARM64.Devices.Clock;
 

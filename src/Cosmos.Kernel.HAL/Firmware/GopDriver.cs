@@ -2,13 +2,22 @@
 
 using System;
 using Cosmos.Kernel.Core.Memory;
+using Cosmos.Kernel.HAL.Devices.Graphic;
 
-namespace Cosmos.Kernel.HAL.Devices.Graphic;
+namespace Cosmos.Kernel.HAL.Firmware;
 
 /// <summary>
-/// UEFI GOP Video Driver.
-/// Provides video output via UEFI framebuffer.
+/// The linear framebuffer the bootloader hands over, which firmware set the
+/// mode on through the UEFI Graphics Output Protocol before the kernel ran.
 /// </summary>
+/// <remarks>
+/// This is a firmware surface, not a bus device: there is no function to
+/// enumerate and no BAR to map, so it can never become a driver kit driver.
+/// <c>GopCanvas</c> constructs it from
+/// <c>Limine.Framebuffer.Response->Framebuffers[0]</c>, and
+/// <see cref="Pci.PciOwner.Gop"/> reserves the display function at
+/// enumeration so nothing bound later reprograms the BAR being scanned out.
+/// </remarks>
 internal unsafe class GopDriver : GraphicDevice
 {
     /// <summary>

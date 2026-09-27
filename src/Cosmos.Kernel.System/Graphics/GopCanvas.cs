@@ -5,6 +5,7 @@ using System.Drawing;
 using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Graphic;
+using Cosmos.Kernel.HAL.Firmware;
 
 namespace Cosmos.Kernel.System.Graphics;
 

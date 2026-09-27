@@ -436,7 +436,7 @@ internal unsafe class SvgaIIDriver : GraphicDevice
     }
 
     /// <summary>
-    /// Fill a back-buffer row. Same shape as <see cref="GopDriver.ClearVRAM"/>:
+    /// Fill a back-buffer row. Same shape as <see cref="Firmware.GopDriver.ClearVRAM"/>:
     /// byte offset within the frame, count in dwords.
     /// </summary>
     public void ClearVRAM(int aStart, int aCount, int value)
