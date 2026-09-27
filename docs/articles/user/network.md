@@ -10,7 +10,7 @@ The main differences if you come from Gen2:
 | UDP | Cosmos-specific `UdpClient` class | Standard `System.Net.Sockets.UdpClient` (plugged) |
 | DHCP | Cosmos client class | Cosmos client class (`Cosmos.Kernel.System.Network`) |
 | DNS | Cosmos client class | Standard `System.Net.Dns` (plugged), or the Cosmos `DnsClient` |
-| NIC drivers | RTL8168, E1000, PCNET | Intel E1000E (x64), virtio-net (x64 PCI + ARM64 MMIO) |
+| NIC drivers | RTL8168, E1000, PCNET | Intel E1000E, virtio-net (PCI on both arches, MMIO on ARM64) |
 
 None of these protocols implements every feature of its RFC. If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
@@ -24,7 +24,7 @@ Network support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot the kernel detects the NIC and registers it with `NetworkManager`; a NIC the built-in drivers do not know can be driven by a driver of your own, through the [driver kit](drivers.md). On x64 both **Intel E1000E** (QEMU's default q35 NIC, preferred when present) and **virtio-net-pci** are supported, so `cosmos run` needs no extra flags. On ARM64 attach a virtio NIC explicitly:
+At boot the kernel detects the NIC and registers it with `NetworkManager`; a NIC the built-in drivers do not know can be driven by a driver of your own, through the [driver kit](drivers.md). Both **Intel E1000E** and **virtio-net-pci** are supported on either architecture, and on x64 the E1000E is QEMU's default q35 NIC, so `cosmos run` needs no extra flags there. On ARM64 attach a NIC explicitly:
 
 ```console
 $ cosmos run                          # x64: default e1000e NIC, user-mode networking
@@ -435,5 +435,5 @@ Cosmos TCP state machine / UDP                          (Cosmos.Kernel.System.Ne
         │                                    DhcpClient / DnsClient ride UDP directly
 IPv4 / ARP and IPv6 / Neighbor Discovery / Ethernet
         │
-NetworkDevice driver                                    (Intel E1000E, virtio-net)
+NIC driver                                              (Intel E1000E, virtio-net)
 ```
