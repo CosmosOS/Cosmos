@@ -141,6 +141,7 @@ public class Kernel : Sys.Kernel
     // constant is caught instead of compared against itself.
     private const string XhciOwner = "xhci";
     private const string GopOwner = "gop";
+    private const string VirtioNetOwner = "virtio-net";
 
     // A HID interface that declares the boot mouse protocol (HID 1.11
     // §4.2-§4.3), as QEMU's usb-mouse does. QEMU's usb-tablet declares
@@ -1651,7 +1652,13 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        Assert.Equal(s_networkDevicesBeforePass, NetworkManager.DeviceCount, "the failed attempt's link should never join the network manager");
+        // The links that did join are the ones drivers that bound published,
+        // which on a cell whose default NIC is a virtio network device on the
+        // PCI bus is the built-in virtio-net driver's: it binds in this same
+        // pass. The failed attempt adds none, which is what this counts, and
+        // the addresses below show none of the ones there is its.
+        int expectedDevices = s_networkDevicesBeforePass + BuiltInNetworkLinksBound();
+        Assert.Equal(expectedDevices, NetworkManager.DeviceCount, "the failed attempt's link should never join the network manager");
         for (int i = 0; i < NetworkManager.DeviceCount; i++)
         {
             MACAddress? registered = NetworkManager.GetAdapter(i).MacAddress;
@@ -3315,6 +3322,29 @@ public class Kernel : Sys.Kernel
 
     /// <summary>True when <paramref name="record"/> is a PCI function.</summary>
     private static bool IsPciRecord(DeviceInfo record) => record.Path.StartsWith(PciPathPrefix, StringComparison.Ordinal);
+
+    /// <summary>
+    /// Network links the built-in drivers published during the pass, one per
+    /// device the virtio-net driver bound: the cells that leave QEMU's default
+    /// NIC in place get a virtio network device on the PCI bus, which is that
+    /// driver's, and it publishes a link for it as any driver does. The NICs
+    /// HAL itself drives, the E1000E and a virtio NIC on a virtio-mmio window,
+    /// are registered before the pass and counted in the count taken then.
+    /// </summary>
+    private static int BuiltInNetworkLinksBound()
+    {
+        int links = 0;
+        IReadOnlyList<DeviceInfo> devices = DriverManager.Devices;
+        for (int i = 0; i < devices.Count; i++)
+        {
+            if (devices[i].DriverName == VirtioNetOwner)
+            {
+                links++;
+            }
+        }
+
+        return links;
+    }
 
     /// <summary>True when <paramref name="record"/> is an xHCI controller's PCI function.</summary>
     private static bool IsXhciRecord(DeviceInfo record) =>

@@ -5,6 +5,7 @@ using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
+using Cosmos.Kernel.System.Network;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -21,6 +22,17 @@ namespace Cosmos.Kernel.Tests.Virtio;
 /// the architecture: x64 runs PCI only (q35 has no virtio-mmio window) while
 /// arm64 runs both an MMIO cell and a PCI one. The same kernel binary serves
 /// every cell of an architecture, so the transport is detected at runtime.
+///
+/// The two transports are driven by different code since virtio-net moved to
+/// the driver kit: a NIC on the PCI bus is bound by the built-in
+/// <c>virtio-net</c> kit driver in <c>Cosmos.Kernel.HAL.Drivers</c>, during
+/// the driver pass, while one on the virt machine's MMIO window is still
+/// HAL's own <c>VirtioNet</c>, bound during HAL bring-up. So what each cell
+/// can be asked differs, and the tests are in three groups: what both must
+/// end in (a NIC registered with the network manager, addressed and up),
+/// what only the MMIO cell has (HAL's driver object), and what only the PCI
+/// cell has (an owned, claimed PCI function with MSI-X enabled on it).
+/// Input is HAL's on both transports.
 /// </summary>
 public class Kernel : Sys.Kernel
 {
@@ -30,16 +42,31 @@ public class Kernel : Sys.Kernel
     /// <summary>Reason surfaced for the PCI-transport tests when the cell runs virtio over MMIO.</summary>
     private const string SkipNotPci = "this cell presents virtio over MMIO";
 
-    /// <summary>Transport name the PCI transport reports.</summary>
-    private const string PciTransportName = "PCI";
+    /// <summary>Reason surfaced for the MMIO-transport tests when the cell runs virtio over PCI.</summary>
+    private const string SkipNotMmio = "this cell presents virtio over PCI, where the kit's driver owns the NIC";
 
     /// <summary>Transport name the MMIO transport reports.</summary>
     private const string MmioTransportName = "MMIO";
+
+    /// <summary>The name HAL's own virtio-net driver registers itself under.</summary>
+    private const string MmioDeviceName = "VirtioNet";
 
     // Owner names, spelled out rather than read from PciOwner so a renamed
     // constant is caught instead of compared against itself.
     private const string VirtioNetOwner = "virtio-net";
     private const string VirtioInputOwner = "virtio-input";
+
+    /// <summary>
+    /// What the kit names a link it publishes: the driver's name, a space,
+    /// then the device's path. Only the prefix is asserted here; that the
+    /// suffix is the function's path is the Drivers suite's ground.
+    /// </summary>
+    private const string KitLinkNamePrefix = VirtioNetOwner + " ";
+
+    // MSI-X capability fields (PCI 3.0 §6.8.2), read to show a driver enabled
+    // message-signalled interrupts on the function.
+    private const byte MsiXMessageControlOffset = 0x02;
+    private const ushort MsiXEnableBit = 0x8000;
 
     // True when this cell put a virtio function on the PCI bus.
     //
@@ -50,15 +77,13 @@ public class Kernel : Sys.Kernel
     // failure leaves the PCI tests running — and failing.
     private static bool s_isPciCell;
 
-    /// <summary>Bytes in a MAC address.</summary>
-    private const int MacAddressLength = 6;
-
     // Captured once in BeforeRun so a state change between tests cannot show
     // up as cross-test interference.
     private static VirtioNet? s_net;
     private static IKeyboardDevice[] s_keyboards = Array.Empty<IKeyboardDevice>();
     private static IMouseDevice[] s_mice = Array.Empty<IMouseDevice>();
     private static PciDevice? s_virtioNetFunction;
+    private static NetworkAdapter s_adapter;
 
     protected override void BeforeRun()
     {
@@ -71,11 +96,11 @@ public class Kernel : Sys.Kernel
         s_mice = VirtioDevice.GetMice();
         s_virtioNetFunction = FindVirtioFunction(VirtioTransport.DeviceTypeNetwork);
         s_isPciCell = s_virtioNetFunction is not null;
+        s_adapter = NetworkManager.Primary;
 
-        // ==================== Binding ====================
-        TR.Run("Net_DriverBound", TestNet_DriverBound);
-        TR.Run("Net_TransportMatchesCell", TestNet_TransportMatchesCell);
-        TR.Run("Net_DeviceReady", TestNet_DeviceReady);
+        // ==================== The NIC, either transport ====================
+        TR.Run("Net_AdapterRegistered", TestNet_AdapterRegistered);
+        TR.Run("Net_AdapterReady", TestNet_AdapterReady);
         TR.Run("Net_LinkUp", TestNet_LinkUp);
         TR.Run("Net_MacAddressProgrammed", TestNet_MacAddressProgrammed);
 
@@ -83,10 +108,13 @@ public class Kernel : Sys.Kernel
         TR.Run("Input_KeyboardBound", TestInput_KeyboardBound);
         TR.Run("Input_MouseBound", TestInput_MouseBound);
 
+        // ==================== MMIO transport ====================
+        TR.RunIf(!s_isPciCell, "Mmio_DriverBound",         TestMmio_DriverBound,         SkipNotMmio);
+        TR.RunIf(!s_isPciCell, "Mmio_Version1Negotiated",  TestMmio_Version1Negotiated,  SkipNotMmio);
+
         // ==================== PCI transport ====================
         TR.RunIf(s_isPciCell, "Pci_FunctionClaimed",     TestPci_FunctionClaimed,     SkipNotPci);
-        TR.RunIf(s_isPciCell, "Pci_MsiXActive",          TestPci_MsiXActive,          SkipNotPci);
-        TR.RunIf(s_isPciCell, "Pci_Version1Negotiated",  TestPci_Version1Negotiated,  SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_MsiXEnabled",         TestPci_MsiXEnabled,         SkipNotPci);
         TR.RunIf(s_isPciCell, "Pci_NetOwnerRecorded",    TestPci_NetOwnerRecorded,    SkipNotPci);
         TR.RunIf(s_isPciCell, "Pci_InputOwnerRecorded",  TestPci_InputOwnerRecorded,  SkipNotPci);
 
@@ -103,101 +131,80 @@ public class Kernel : Sys.Kernel
         Cosmos.Kernel.System.Power.Halt();
     }
 
-    // ==================== Binding ====================
+    // ==================== The NIC, either transport ====================
+    //
+    // Whichever code drove it, a virtio NIC has to come out as a device in the
+    // network manager, and the name says which code that was: the kit names a
+    // link it publishes after the driver and the function, while HAL's own
+    // driver reports its type name. So this also catches a NIC bound over the
+    // wrong path — a PCI cell whose function HAL claimed, or an MMIO one that
+    // somehow came up through the kit.
 
-    // The registry only accepts a device once Initialize() succeeded, so a
-    // null here means the whole probe → transport → driver chain failed, not
-    // merely that the NIC is unhappy.
-    private static void TestNet_DriverBound()
+    private static void TestNet_AdapterRegistered()
     {
-        Assert.NotNull(s_net, "virtio-net driver should have bound to the attached NIC");
-    }
+        Assert.Equal(1, NetworkManager.DeviceCount, "the cell's virtio NIC should be the one network device");
 
-    // Cross-checks the bus against the driver: if this cell put a virtio
-    // function on the PCI bus, the driver must have come up over the PCI
-    // transport, and otherwise over MMIO. Catches a silent fallback to the
-    // wrong transport, which would otherwise look like a healthy device
-    // while none of the PCI-specific paths were ever exercised.
-    private static void TestNet_TransportMatchesCell()
-    {
-        if (s_net == null)
+        string? name = s_adapter.Name;
+        if (name is null)
         {
-            Assert.Fail("no virtio-net device bound");
+            Assert.Fail("the registered network device should have a name");
             return;
         }
 
-        Log.WriteString("[Test] Transport: ");
-        Log.WriteString(s_net.Transport.TransportName);
+        Log.WriteString("[Test] Network device: ");
+        Log.WriteString(name);
         Log.WriteString("\n");
 
-        string expected = s_isPciCell ? PciTransportName : MmioTransportName;
-        Assert.Equal(expected, s_net.Transport.TransportName);
-    }
-
-    // Ready is only set after queues are configured, buffers are posted and an
-    // interrupt source was secured — the driver now refuses to come up
-    // without one, so this also covers MSI-X binding on the PCI cell.
-    private static void TestNet_DeviceReady()
-    {
-        if (s_net == null)
+        if (s_isPciCell)
         {
-            Assert.Fail("no virtio-net device bound");
+            Assert.True(name.StartsWith(KitLinkNamePrefix, StringComparison.Ordinal),
+                $"a NIC on the PCI bus should be the kit driver's link, named \"{KitLinkNamePrefix}<path>\", is \"{name}\"");
             return;
         }
 
-        Assert.True(s_net.Ready, "virtio-net should report ready after initialization");
+        Assert.Equal(MmioDeviceName, name);
+    }
+
+    // Ready is only set once the driver has its queues configured, its receive
+    // buffers posted and an interrupt path secured, and for a kit link only
+    // once the pass delivered it to the network manager.
+    private static void TestNet_AdapterReady()
+    {
+        Assert.True(s_adapter.Ready, "the virtio NIC should report ready once registered");
     }
 
     private static void TestNet_LinkUp()
     {
-        if (s_net == null)
-        {
-            Assert.Fail("no virtio-net device bound");
-            return;
-        }
-
         // QEMU's user-mode backend brings the link up immediately, so a down
         // link means the status field was read from the wrong config offset.
-        Assert.True(s_net.LinkUp, "virtio-net link should be up with QEMU user networking");
+        Assert.True(s_adapter.LinkUp, "the virtio NIC's link should be up with QEMU user networking");
     }
 
     // The MAC is read byte-by-byte out of the device configuration region,
-    // which on PCI is a separate BAR window located through its own vendor
-    // capability. An all-zero address means those reads landed nowhere.
+    // which on PCI is a window located through its own vendor capability. An
+    // all-zero address means those reads landed nowhere.
     private static void TestNet_MacAddressProgrammed()
     {
-        if (s_net == null)
+        MACAddress? mac = s_adapter.MacAddress;
+        if (mac is null)
         {
-            Assert.Fail("no virtio-net device bound");
+            Assert.Fail("the registered network device should have a MAC address");
             return;
-        }
-
-        MACAddress mac = s_net.MacAddress;
-        Assert.NotNull(mac);
-
-        bool anyNonZero = false;
-        for (int i = 0; i < MacAddressLength; i++)
-        {
-            if (mac._bytes[i] != 0)
-            {
-                anyNonZero = true;
-                break;
-            }
         }
 
         Log.WriteString("[Test] MAC: ");
         Log.WriteString(mac.ToString());
         Log.WriteString("\n");
 
-        Assert.True(anyNonZero, "MAC address read from device config should not be all zeros");
+        Assert.False(mac.Equals(MACAddress.None), "the MAC address read from device config should not be all zeros");
     }
 
     // ==================== Input ====================
     //
-    // Both profiles attach a virtio keyboard and mouse. Binding them exercises
-    // the event-type probe in the registry, which reads the input config
-    // select/subsel window — a different device-config access pattern from the
-    // NIC's flat MAC read.
+    // Both profiles attach a virtio keyboard and mouse, and both transports
+    // bind them in HAL. Binding them exercises the event-type probe in the
+    // registry, which reads the input config select/subsel window — a
+    // different device-config access pattern from the NIC's flat MAC read.
 
     private static void TestInput_KeyboardBound()
     {
@@ -209,62 +216,96 @@ public class Kernel : Sys.Kernel
         Assert.True(s_mice.Length > 0, "a virtio mouse should have bound");
     }
 
+    // ==================== MMIO transport ====================
+
+    // The registry only accepts a device once Initialize() succeeded, so a
+    // null here means the whole probe → transport → driver chain failed, not
+    // merely that the NIC is unhappy. On a PCI cell there is nothing for this
+    // path to find: the kit's driver owns that function, and HAL's virtio
+    // scan leaves every network function to it.
+    private static void TestMmio_DriverBound()
+    {
+        if (s_net is null)
+        {
+            Assert.Fail("HAL's virtio-net driver should have bound the NIC on the MMIO window");
+            return;
+        }
+
+        Log.WriteString("[Test] Transport: ");
+        Log.WriteString(s_net.Transport.TransportName);
+        Log.WriteString("\n");
+
+        Assert.Equal(MmioTransportName, s_net.Transport.TransportName);
+        Assert.True(s_net.Ready, "the MMIO virtio-net device should report ready after initialization");
+    }
+
+    // A modern virtio device must land on VERSION_1, which is what selects the
+    // 12-byte net header. Negotiating it away while the driver still sized the
+    // header for it would corrupt every frame. The kit's driver requires the
+    // feature and fails its probe without it, so on the PCI cell a bound,
+    // owned function is the same statement — which Pci_NetOwnerRecorded makes.
+    private static void TestMmio_Version1Negotiated()
+    {
+        if (s_net is null)
+        {
+            Assert.Fail("no virtio-net device bound over MMIO");
+            return;
+        }
+
+        Assert.True(s_net.Transport.Version1Negotiated, "the MMIO transport should negotiate VIRTIO_F_VERSION_1");
+    }
+
     // ==================== PCI transport ====================
 
-    // Claimed is set by the virtio PCI scan when it takes ownership. If the
-    // function is enumerated but unclaimed, capability parsing rejected the
-    // device and the driver never saw it.
+    // Claimed is set when a driver takes the function: the kit does it for
+    // every device it binds. If the function is enumerated but unclaimed, the
+    // kit driver declined or failed it — capability parsing rejected the
+    // device, or the device refused a step of the handshake.
     private static void TestPci_FunctionClaimed()
     {
         // Non-null is the gate for this test, so asserting it here would be a
         // tautology; ownership is the real claim. A function that enumerates
-        // but stays unclaimed still fails Net_DriverBound, so the two together
-        // separate "capability parsing rejected it" from "it was never there".
+        // but stays unclaimed also leaves Net_AdapterRegistered failing, so
+        // the two together separate "the driver rejected it" from "it was
+        // never there".
         Assert.True(s_virtioNetFunction!.Claimed, "the virtio-net PCI function should be claimed by the driver");
     }
 
-    // MSI-X is the only interrupt path the PCI transport offers (there is no
-    // INTx fallback — PCI interrupt lines are level-low and shared, which the
-    // available line routing cannot express), so this failing means the device
-    // would run blind even if everything else bound.
+    // MSI-X is the interrupt path the kit routes where the platform can, and
+    // the driver points the device's configuration and queue vectors at the
+    // entry the kit programmed. The bit being set is that path in place; the
+    // kit falls back to polling the handler from the timer where it is not,
+    // which is why this asserts the function, not the frames.
     //
     // This is the assertion the arm64 PCI cell exists for: the same MsiRouting
     // call lands on the LAPIC on x64 and on the GICv3 ITS on arm64, and only
     // this cell covers the latter.
-    private static void TestPci_MsiXActive()
+    private static void TestPci_MsiXEnabled()
     {
-        VirtioPciTransport? transport = s_net?.Transport as VirtioPciTransport;
-        Assert.NotNull(transport, "virtio-net should be running over the PCI transport");
-        if (transport != null)
+        PciDevice function = s_virtioNetFunction!;
+        byte capability = function.FindCapability(MsiX.CapId);
+        if (capability == 0)
         {
-            Assert.True(transport.MsiXActive, "MSI-X should be enabled for the virtio-net PCI function");
-        }
-    }
-
-    // Modern virtio-pci must land on VERSION_1, which is what selects the
-    // 12-byte net header. Negotiating it away here while the driver still
-    // sized the header for it would corrupt every frame.
-    private static void TestPci_Version1Negotiated()
-    {
-        if (s_net == null)
-        {
-            Assert.Fail("no virtio-net device bound");
+            Assert.Fail("the virtio-net PCI function should have an MSI-X capability");
             return;
         }
 
-        Assert.True(s_net.Transport.Version1Negotiated, "virtio-pci should negotiate VIRTIO_F_VERSION_1");
+        ushort control = function.ReadRegister16((byte)(capability + MsiXMessageControlOffset));
+        Assert.True((control & MsiXEnableBit) != 0, "MSI-X should be enabled for the virtio-net PCI function");
     }
 
     // The owner names the driver, not just the fact of a claim, and virtio
     // names each device type on its own: the NIC and the input functions
-    // must not end up under one shared name.
+    // must not end up under one shared name. For the NIC the name is the kit
+    // registration's, which is reserved so nothing else can record it.
     private static void TestPci_NetOwnerRecorded()
     {
         Assert.True(s_virtioNetFunction?.Owner == VirtioNetOwner, "the virtio-net PCI function should be owned by virtio-net");
     }
 
-    // Keyboard and mouse are both virtio-input functions, claimed before the
-    // scan probes which of the two a function is, so both carry one name.
+    // Keyboard and mouse are both virtio-input functions, claimed by HAL's own
+    // virtio scan before it probes which of the two a function is, so both
+    // carry one name.
     private static void TestPci_InputOwnerRecorded()
     {
         PciDevice[]? devices = PciManager.Devices;
