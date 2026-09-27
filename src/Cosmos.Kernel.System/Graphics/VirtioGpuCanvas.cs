@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using Cosmos.Kernel.Core.Memory;
-using Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
+using Cosmos.Kernel.HAL.Devices.Virtio.Gpu;
 
 namespace Cosmos.Kernel.System.Graphics;
 

@@ -3,9 +3,8 @@
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
-using Cosmos.Kernel.HAL.Devices.Input;
-using Cosmos.Kernel.HAL.Devices.Network;
+using Cosmos.Kernel.HAL.Devices.Virtio.Gpu;
+using Cosmos.Kernel.HAL.Devices.Virtio.Mmio;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
 

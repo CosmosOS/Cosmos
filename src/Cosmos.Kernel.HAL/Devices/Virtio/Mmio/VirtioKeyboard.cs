@@ -2,14 +2,19 @@
 
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
-using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
-namespace Cosmos.Kernel.HAL.Devices.Input;
+namespace Cosmos.Kernel.HAL.Devices.Virtio.Mmio;
 
 /// <summary>
-/// Virtio-input keyboard driver. Transport-agnostic: works over virtio MMIO
-/// (QEMU virt) and virtio PCI (q35 virtio-keyboard-pci) alike.
+/// HAL's virtio-input keyboard driver, for the devices on a virtio-mmio
+/// window (QEMU <c>virt</c>). The class takes a <see cref="VirtioTransport"/>
+/// and has no bus in it, but only the MMIO scan reaches it: an input function
+/// on the PCI bus is left unclaimed for the built-in <c>virtio-input</c>
+/// driver of Cosmos.Kernel.HAL.Drivers, which drives keyboard and mouse alike
+/// through the kit's public seam. This driver exists because the kit has no
+/// seam for the virtio-mmio bus yet; when it gains one, this file goes.
 /// </summary>
 internal unsafe class VirtioKeyboard : KeyboardDevice
 {

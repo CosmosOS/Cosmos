@@ -2,7 +2,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Kernel.HAL.Devices.Input;
+namespace Cosmos.Kernel.HAL.Devices.Virtio.Mmio;
 
 /// <summary>
 /// Virtio-input protocol constants (virtio spec 5.8) and the Linux evdev event

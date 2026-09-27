@@ -3,11 +3,11 @@
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Scheduler;
-using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
-namespace Cosmos.Kernel.HAL.Devices.Network;
+namespace Cosmos.Kernel.HAL.Devices.Virtio.Mmio;
 
 /// <summary>
 /// VirtIO network device driver. Transport-agnostic: works over virtio MMIO

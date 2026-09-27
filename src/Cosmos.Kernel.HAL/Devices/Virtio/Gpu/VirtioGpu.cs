@@ -5,10 +5,10 @@ using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Scheduler;
-using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.Devices.Graphic;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
-namespace Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
+namespace Cosmos.Kernel.HAL.Devices.Virtio.Gpu;
 
 /// <summary>
 /// VirtIO GPU device driver, 2D path only. Transport-agnostic: works over

@@ -2,7 +2,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
+namespace Cosmos.Kernel.HAL.Devices.Virtio.Gpu;
 
 /// <summary>
 /// virtio-gpu command opcodes and on-wire structs (virtio 1.x spec section 5.7).

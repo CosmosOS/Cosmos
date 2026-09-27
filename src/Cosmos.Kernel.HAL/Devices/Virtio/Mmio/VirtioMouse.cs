@@ -2,13 +2,15 @@
 
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
-using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.Devices.Input;
 
-namespace Cosmos.Kernel.HAL.Devices.Input;
+namespace Cosmos.Kernel.HAL.Devices.Virtio.Mmio;
 
 /// <summary>
-/// Virtio-input mouse driver. Transport-agnostic: works over virtio MMIO
-/// (QEMU virt) and virtio PCI (q35 virtio-mouse-pci) alike.
+/// HAL's virtio-input mouse driver, for the devices on a virtio-mmio window
+/// (QEMU <c>virt</c>); the PCI ones belong to the built-in
+/// <c>virtio-input</c> driver of Cosmos.Kernel.HAL.Drivers. See
+/// <see cref="VirtioKeyboard"/> for why both exist.
 /// </summary>
 internal unsafe class VirtioMouse : MouseDevice
 {
