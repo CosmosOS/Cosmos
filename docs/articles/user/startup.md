@@ -39,15 +39,15 @@ Each Cosmos package contributes a *library initializer* that the runtime execute
 
 1. **Cosmos.Kernel.Core**: carves the heap out of the Limine memory map, initializes the garbage collector, then registers the type system (statics, eager static constructors, module initializers). Nothing allocates before this step.
 2. **The runtime's own initializers** (`System.Private.CoreLib` and its companions): the preallocated `OutOfMemoryException`, the class constructor runner, the type loader and reflection callbacks, stack trace metadata. The class constructor runner is created here, so a static field whose type has a lazy static constructor can be read from this step on and not before.
-3. **Cosmos.Kernel.HAL**: platform HAL, the interrupt controller, PCI enumeration over ECAM, platform hardware (APIC/GIC, device drivers such as the NIC), and the USB host controllers with their keyboard and mass storage drivers. These are HAL's built-in drivers; the built-in AHCI and NVMe drivers, which are written against the [driver kit](drivers.md), and the drivers your kernel registers bind later, in `Global.StartKernel()`.
+3. **Cosmos.Kernel.HAL**: platform HAL, the interrupt controller, PCI enumeration over ECAM, platform hardware (APIC/GIC, device drivers such as the NIC), and the USB host controllers with their hub and keyboard drivers. These are HAL's built-in drivers; the built-in AHCI, NVMe and USB mass storage drivers, which are written against the [driver kit](drivers.md), and the drivers your kernel registers bind later, in `Global.StartKernel()`.
 4. **Cosmos.Kernel**: CPU exception handlers and the scheduler (one idle thread per CPU, preemption on a 10 ms quantum).
 5. **Cosmos.Kernel.System**: the service managers `TimerManager`, `KeyboardManager`, `MouseManager`, `NetworkManager`, `StorageManager`.
 
-Interrupts are not in the same state on both architectures during these steps. On x64, loading the IDT in step 3 also unmasks interrupts, so the rest of the bring-up runs with them on. On ARM64 they stay masked until step 5 needs them for its first disk reads (only when `CosmosEnableStorage` is on), and otherwise until `Global.StartKernel()` (below).
+Interrupts are not in the same state on both architectures during these steps. On x64, loading the IDT in step 3 also unmasks interrupts, so the rest of the bring-up runs with them on. On ARM64 they stay masked until `Global.StartKernel()` (below).
 
 Every step in 3-5 is gated by a feature switch (`CosmosEnableInterrupts`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, all `true` by default, and `CosmosEnableUsb`, whose default is derived from two of them). Set one to `false` in your `.csproj` and the corresponding subsystem is skipped here and compiled out of the kernel.
 
-`CosmosEnableUsb` gates the USB host controllers of step 3 and the keyboard and mass storage drivers behind them. Left unset, it is on when `CosmosEnableKeyboard` or `CosmosEnableStorage` is on, and off when both are off: a kernel with neither that still wants USB sets it to `true`. It is always off when `CosmosEnablePCI` is off, whatever the project sets, and so also when `CosmosEnableInterrupts` is off, which turns PCI off.
+`CosmosEnableUsb` gates the USB host controllers of step 3, the keyboard driver behind them, and the built-in USB mass storage driver `Global.StartKernel()` registers. Left unset, it is on when `CosmosEnableKeyboard` or `CosmosEnableStorage` is on, and off when both are off: a kernel with neither that still wants USB sets it to `true`. It is always off when `CosmosEnablePCI` is off, whatever the project sets, and so also when `CosmosEnableInterrupts` is off, which turns PCI off.
 
 ## The generated entry point
 
@@ -78,7 +78,7 @@ The constructor of your kernel runs inside `Main`, before `StartKernel()`, so th
 `Global.StartKernel()` runs once; calling it again throws `InvalidOperationException`. Before your kernel gets control it:
 
 1. Enables hardware interrupts, on both architectures (unless `CosmosEnableInterrupts` is `false`, in which case they stay masked throughout).
-2. Registers the built-in drivers written against the driver kit (AHCI and NVMe, when `CosmosEnableStorage` is on), calls your kernel's `RegisterDrivers()`, then runs the driver pass, which offers every PCI function and USB interface HAL's built-in drivers left to those drivers (see [Drivers](drivers.md)). The SATA disks and NVMe namespaces are found, and registered with `StorageManager`, during the pass. Registration closes as the pass starts. All three steps run on the boot thread, and only in a kernel built with PCI (`CosmosEnablePCI`): without it, `RegisterDrivers()` is never called.
+2. Registers the built-in drivers written against the driver kit (AHCI and NVMe when `CosmosEnableStorage` is on, USB mass storage when `CosmosEnableUsb` is on too), calls your kernel's `RegisterDrivers()`, then runs the driver pass, which offers every PCI function and USB interface HAL's built-in drivers left to those drivers (see [Drivers](drivers.md)). The SATA disks, NVMe namespaces and USB sticks present are found, and registered with `StorageManager`, during the pass. Registration closes as the pass starts. All three steps run on the boot thread, and only in a kernel built with PCI (`CosmosEnablePCI`): without it, `RegisterDrivers()` is never called.
 3. Starts the USB hot-plug thread, which follows the USB devices plugged in and pulled out from then on, and offers each new one to the built-in drivers, then to the registered ones. It needs the scheduler to switch to it: when nothing does within 50 ms, as on x64 with ACPI off where the scheduler's timer never starts, hot-plug stays off and the USB devices are the ones found at boot.
 4. Calls `Start()` on the registered instance.
 
@@ -151,7 +151,7 @@ An uncaught exception inside `Run()` propagates out of the loop, so wrap the bod
 
 ## Customizing startup
 
-`OnBoot()` runs before the console exists, the right place for early hardware setup. Interrupts are already enabled by then, on x64 and ARM64 alike, the built-in AHCI and NVMe drivers and the drivers the kernel registered have been offered their devices, and USB hot-plug, when it could start, is already running, so a USB device can come or go while it runs:
+`OnBoot()` runs before the console exists, the right place for early hardware setup. Interrupts are already enabled by then, on x64 and ARM64 alike, the built-in AHCI, NVMe and USB mass storage drivers and the drivers the kernel registered have been offered their devices, and USB hot-plug, when it could start, is already running, so a USB device can come or go while it runs:
 
 ```csharp
 protected override void OnBoot()
@@ -203,6 +203,7 @@ Every phase above logs to the serial port (COM1), which `cosmos run` connects to
 [Global] Enabling interrupts...
 [Drivers] Registered built-in ahci
 [Drivers] Registered built-in nvme
+[Drivers] Registered built-in mass storage
 [Drivers] The platform timer ticks: interrupts can be polled
 [Drivers] pci/0000:00:1f.2 -> ahci (class and interface match)
 [Global] Starting kernel...

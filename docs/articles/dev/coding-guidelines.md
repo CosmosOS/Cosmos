@@ -33,7 +33,7 @@ The project is split into strict layers. Dependencies flow **downward only**, ea
 ```
 User Kernel (DevKernel, test kernels)
     └── Cosmos.Kernel.System        ← high-level OS APIs (Console, Graphics, Network)
-         ├── Cosmos.Kernel.HAL.Drivers ← the built-in drivers written against the driver kit (AHCI, NVMe); HAL layer, no InternalsVisibleTo
+         ├── Cosmos.Kernel.HAL.Drivers ← the built-in drivers written against the driver kit (AHCI, NVMe, USB mass storage); HAL layer, no InternalsVisibleTo
          └── Cosmos.Kernel.HAL      ← hardware abstraction (shared logic); also the driver kit, which user kernels reference directly
               ├── Cosmos.Kernel.HAL.X64        ← x64-specific HAL implementations
               ├── Cosmos.Kernel.HAL.ARM64      ← ARM64-specific HAL implementations
@@ -49,7 +49,7 @@ For the full dependency graph, project descriptions, and rules, see [Kernel Proj
 ### When to Create a New Project
 
 - New hardware device category → new interface in `Cosmos.Kernel.HAL.Interfaces`, implementations in `Cosmos.Kernel.HAL.X64`/`Cosmos.Kernel.HAL.ARM64`. Cross-platform HAL devices go to `Cosmos.Kernel.HAL`.
-- A built-in driver for a PCI device family, once the driver kit offers everything it needs → `Cosmos.Kernel.HAL.Drivers`, in a folder of its own under its subsystem's (`Storage/Ahci/`, namespaces following the folders), written against the kit's public seam only, with a `CreateRegistration()` added to the `BuiltInDrivers` catalogue. `Cosmos.Kernel.HAL` keeps the mechanisms (PCI, MSI-X, DMA, the USB host stack, the kit); see [Kernel Project Layout](kernel-project-layout.md#mechanisms-and-policies).
+- A built-in driver for a PCI or USB device family, once the driver kit offers everything it needs → `Cosmos.Kernel.HAL.Drivers`, in a folder of its own under its subsystem's (`Storage/Ahci/`, `Storage/UsbMassStorage/`, namespaces following the folders), written against the kit's public seam only, with a `CreateRegistration()` added to the `BuiltInDrivers` catalogue. `Cosmos.Kernel.HAL` keeps the mechanisms (PCI, MSI-X, DMA, the USB host stack, the kit); see [Kernel Project Layout](kernel-project-layout.md#mechanisms-and-policies).
 - New OS-level feature, user API exposed → in `Cosmos.Kernel.System`.
 - New low-level runtime concern → in `Cosmos.Kernel.Core`.
 

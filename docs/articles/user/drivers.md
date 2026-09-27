@@ -9,7 +9,7 @@ The main differences if you come from Gen2:
 | | Gen2 | Gen3 |
 |---|---|---|
 | Hardware access | Kernel code drives PCI, I/O ports and interrupts itself | A registered driver is handed one device at a time, through a context that owns every resource it acquires |
-| Binding | The kernel looks its device up and starts the driver | The kit offers each PCI function and USB interface HAL's built-in drivers left to the best-matching registered driver, the kit's own built-ins (AHCI, NVMe) among them |
+| Binding | The kernel looks its device up and starts the driver | The kit offers each PCI function and USB interface HAL's built-in drivers left to the best-matching registered driver, the kit's own built-ins (AHCI, NVMe, USB mass storage) among them |
 | Cleanup | The driver's own code | The kit's: a failed probe, and a USB device pulled out, are torn down for the driver |
 
 If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
@@ -223,9 +223,9 @@ When several registrations match a device, the one whose best entry is most spec
 
 The built-in drivers come in two kinds.
 
-Most are brought up by HAL itself, during HAL bring-up, before any of your code runs: virtio, xHCI with its hub, keyboard and mass storage drivers, and E1000E on x64. They keep what they take: the pass skips every PCI function with an owner, and USB offers every interface to the hub, keyboard and mass storage drivers before the kit's. A registered driver cannot take a device from one of these at run time. To drive a device one of them claims, build the kernel without the switch that brings it up.
+Most are brought up by HAL itself, during HAL bring-up, before any of your code runs: virtio, xHCI with its hub and keyboard drivers, and E1000E on x64. They keep what they take: the pass skips every PCI function with an owner, and USB offers every interface to the hub and keyboard drivers before the kit's. A registered driver cannot take a device from one of these at run time. To drive a device one of them claims, build the kernel without the switch that brings it up.
 
-The others are kit drivers, written against the same public seam as yours, in the `Cosmos.Kernel.HAL.Drivers` assembly: today AHCI, which matches `PciMatch.Class(0x01, 0x06, 0x01)` and publishes each SATA disk it finds, and NVMe, which matches `PciMatch.Class(0x01, 0x08, 0x02)` and publishes each namespace it can drive. `Global.StartKernel` registers them behind the kernel's feature switches (both with `CosmosEnableStorage`), before it calls `RegisterDrivers`, and they bind in the pass like any registration, with two differences: their names are the reserved built-in names (`ahci`, `nvme`), and they win every tie, even against a driver your constructor registered earlier. Only a strictly more specific match takes a device from one: a `PciMatch.Device(vendorId, deviceId)` entry for your controller, or a class triple against a class-only built-in. That is how a kernel replaces a built-in on one controller it knows better, with no rebuild of the built-in. A kernel built without `CosmosEnableStorage` registers neither, and ILC keeps none of their code: the Drivers test suite builds that way, which leaves the NVMe controller to its own sample driver.
+The others are kit drivers, written against the same public seam as yours, in the `Cosmos.Kernel.HAL.Drivers` assembly: today AHCI, which matches `PciMatch.Class(0x01, 0x06, 0x01)` and publishes each SATA disk it finds; NVMe, which matches `PciMatch.Class(0x01, 0x08, 0x02)` and publishes each namespace it can drive; and USB mass storage, which matches `UsbMatch.Interface(0x08, 0x06, 0x50)`, SCSI over the Bulk-Only Transport, and publishes each logical unit with a medium as `usb0`, `usb1`, ..., the lowest number no unit present uses. `Global.StartKernel` registers them behind the kernel's feature switches (AHCI and NVMe with `CosmosEnableStorage`, mass storage with `CosmosEnableStorage` and `CosmosEnableUsb`), before it calls `RegisterDrivers`, and they bind like any registration, in the pass and, for mass storage, on the hot-plug thread for the sticks plugged in later, with two differences: their names are the reserved built-in names (`ahci`, `nvme`, `mass storage`), and they win every tie, even against a driver your constructor registered earlier. Only a strictly more specific match takes a device from one: a `PciMatch.Device(vendorId, deviceId)` entry for your controller or a `UsbMatch.Device(vendorId, productId)` entry for your stick, or a class triple against a class-only built-in. That is how a kernel replaces a built-in on one device it knows better, with no rebuild of the built-in. A kernel built without `CosmosEnableStorage` registers none of them, and ILC keeps none of their code: the Drivers test suite builds that way, which leaves the NVMe controller to its own sample driver.
 
 Two of HAL's built-ins reach further than their name suggests:
 
@@ -451,7 +451,7 @@ private bool Transmit(ReadOnlySpan<byte> frame)
 
 `PublishMouse` and `PublishNetworkLink` throw `InvalidOperationException` in a kernel built without mouse or network support, which is why DevKernel registers each driver behind the switch it publishes to.
 
-**A disk.** `PublishBlockDevice(device)` publishes a disk the driver implements as an `IBlockDevice`, the way the built-in AHCI and NVMe drivers publish each SATA disk and NVMe namespace they find. The kit registers it with `StorageManager`, which reads its partition table through it straight away, with real reads (see [File System](filesystem.md)), on the thread that delivers it, and ranks it among the kernel's disks by the primary-disk rule: a disk that cannot leave the machine before one that can (a USB driver's is one that can), then AHCI disks, then NVMe namespaces, then any other, then by the PCI function behind them, then in registration order. Where the driver publishes it decides when those reads happen:
+**A disk.** `PublishBlockDevice(device)` publishes a disk the driver implements as an `IBlockDevice`, the way the built-in AHCI, NVMe and USB mass storage drivers publish each SATA disk, NVMe namespace and logical unit they find. The kit registers it with `StorageManager`, which reads its partition table through it straight away, with real reads (see [File System](filesystem.md)), on the thread that delivers it, and ranks it among the kernel's disks by the primary-disk rule: a disk that cannot leave the machine before one that can (a USB driver's is one that can), then AHCI disks, then NVMe namespaces, then any other, then by the PCI function behind them, then in registration order. Where the driver publishes it decides when those reads happen:
 
 - From `Probe`, the disk is delivered right after `Probe` returns `Bound`, before the interrupts are armed, so its I/O must complete without them, by polling the device, at least until the handler first runs. AHCI always polls, and so do a USB driver's bulk transfers, which are synchronous. NVMe completes through MSI-X, but until its handler first runs, which the kit lets happen only once it armed it, the thread that issued a command polls the completion queue itself: the partition scan the delivery starts completes that way, and the commands after it wait for the interrupt. The disk is registered when the pass returns, with no thread to wait for.
 - From one of the binding's own work items, once `Bound`, the disk is delivered before the call returns, on the `driver-work` thread, with the interrupts armed. An interrupt-driven driver, whose I/O waits for its completion interrupt, publishes from there: from a work item scheduled in `Probe`, which runs once `Probe` returned `Bound`. The partition scan holds the `driver-work` thread meanwhile, and it runs one work item at a time, so the disk's completions must reach its I/O from the interrupt handler, with `DeviceEvent.Signal`, never through another work item, which would wait for the scan that waits for it.
@@ -464,7 +464,7 @@ Keyboards and graphics have no publication: a driver cannot feed `KeyboardManage
 
 ## USB drivers
 
-USB drivers bind interfaces, not devices. The USB stack offers every interface of a configured device to the built-in class drivers first (hub, boot keyboard, mass storage), then to the kit, which ranks the registered drivers: at boot for the devices already there, during the pass, and on the USB hot-plug thread for every device plugged in later. Neither the host controller nor the built-ins know a registered driver exists.
+USB drivers bind interfaces, not devices. The USB stack offers every interface of a configured device to HAL's class drivers first (hub, boot keyboard), then to the kit, which ranks the registered drivers, the built-in mass storage driver among them: at boot for the devices already there, during the pass, and on the USB hot-plug thread for every device plugged in later. Neither the host controller nor HAL's class drivers know a registered driver exists.
 
 `UsbDeviceContext` gives the driver:
 
@@ -569,7 +569,7 @@ The interrupt polling interval differs too, about 55 ms on x64 against 10 ms on 
 
 - The kit is experimental: its API can change in any release, which is why a driver library pins the exact version.
 - Registration closes when the pass starts. A driver cannot be registered once the kernel runs.
-- A registered driver cannot displace one of the built-ins HAL brings up at run time; build without the built-in's switch instead. It can take a device from a kit built-in (AHCI, NVMe) with a more specific match.
+- A registered driver cannot displace one of the built-ins HAL brings up at run time; build without the built-in's switch instead. It can take a device from a kit built-in (AHCI, NVMe, USB mass storage) with a more specific match.
 - A PCI binding is never released: no remove, rebind or shutdown for PCI.
 - There is no shutdown quiesce: `Power.Shutdown` and `Power.Reboot` give drivers no callback, so a device can still be doing DMA when the machine goes down, and nothing is flushed first.
 - The kernel runs on one CPU. `IrqSafeLock` masks interrupts and spins, which is all a single CPU needs.
@@ -586,16 +586,17 @@ The interrupt polling interval differs too, about 55 ms on x64 against 10 ms on 
 HAL's built-in drivers bind during HAL bring-up, before any kernel code runs. The kit's built-in drivers and the drivers you register bind late, in one pass that `Global.StartKernel` runs on the boot thread, then on the USB hot-plug thread for every device plugged in afterwards:
 
 ```
-HAL bring-up         HAL's built-in drivers bind: virtio, xHCI (+ hub, keyboard, mass storage), E1000E (x64)
+HAL bring-up         HAL's built-in drivers bind: virtio, xHCI (+ hub, keyboard), E1000E (x64)
         │
 Global.StartKernel   interrupts on
-        ├─ built-in kit drivers         AHCI, NVMe (with storage), registered ahead of yours (only with PCI)
+        ├─ built-in kit drivers         AHCI, NVMe (with storage), USB mass storage (with storage and
+        │                               USB), registered ahead of yours (only with PCI)
         ├─ Kernel.RegisterDrivers()     your registrations (only with PCI)
         ├─ the driver pass              every free PCI function, then every free USB interface,
         │                               offered to the matching drivers, best match first
-        ├─ USB hot-plug thread starts   later devices: built-ins first, then your drivers;
+        ├─ USB hot-plug thread starts   later devices: HAL's class drivers first, then the kit's;
         │                               unplug runs the teardown and Remove
         └─ Kernel.Start()               OnBoot, BeforeRun, Run
 ```
 
-Each binding attempt gets a context that records everything the driver acquires through it, which is what lets the kit undo a failed attempt and end a USB binding without the driver's help. The kit lives in the assembly `Cosmos.Kernel.HAL` (namespaces `Cosmos.Kernel.HAL.Drivers`, `.Pci` and `.Usb`), its registration side in `Cosmos.Kernel.System.Drivers`, and the built-in drivers written against it in the assembly `Cosmos.Kernel.HAL.Drivers` (namespace `Cosmos.Kernel.HAL.Drivers.BuiltIn`, and `.BuiltIn.Storage.Ahci` and `.BuiltIn.Storage.Nvme` for AHCI and NVMe).
+Each binding attempt gets a context that records everything the driver acquires through it, which is what lets the kit undo a failed attempt and end a USB binding without the driver's help. The kit lives in the assembly `Cosmos.Kernel.HAL` (namespaces `Cosmos.Kernel.HAL.Drivers`, `.Pci` and `.Usb`), its registration side in `Cosmos.Kernel.System.Drivers`, and the built-in drivers written against it in the assembly `Cosmos.Kernel.HAL.Drivers` (namespace `Cosmos.Kernel.HAL.Drivers.BuiltIn`, and `.BuiltIn.Storage.Ahci`, `.BuiltIn.Storage.Nvme` and `.BuiltIn.Storage.UsbMassStorage` for AHCI, NVMe and USB mass storage).

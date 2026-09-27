@@ -86,6 +86,7 @@ A driver written with the [driver kit](drivers.md) is easiest to follow through 
 | `[Drivers] rtl8139 pci/0000:00:03.0: BAR 0 is not an assigned memory BAR` | Why a `Try` member of the context returned false; DMA and endpoint refusals are logged the same way |
 | `[Drivers] rtl8139 pci/0000:00:03.0: work item threw and will not run again: ...` | A work item's callback threw; it is disarmed |
 | `[Drivers] nvme pci/0000:00:04.0: I/O completions through MSI-X vector 0` | How the built-in NVMe driver completes I/O once its handler runs: this, or `I/O completions polled by the waiting thread` where the kit could only poll the handler from the timer, or grant no interrupt |
+| `[Drivers] mass storage usb/1-1:1.0: usb0 (LUN 0): QEMU QEMU HARDDISK, 524288 blocks of 512 bytes` | The built-in USB mass storage driver brought a logical unit up, or why it left one out: `no medium`, `not a disk (peripheral 0x05), skipped`, `INQUIRY failed`, `never became ready, ...` |
 | `[Drivers] ahci pci/0000:00:03.0: published disk sata0` | `StorageManager` took a disk the driver published, after reading its partition table; a USB driver's disk logs `withdrew disk <name>` when it leaves with its device |
 | `[Drivers] usb/1-5:1.0 -> usb-boot-mouse removed: the device left the bus` | A USB binding ended on unplug, after the driver's `Remove` |
 
