@@ -11,13 +11,18 @@ namespace Cosmos.Kernel.System.Drivers;
 
 /// <summary>
 /// Where a kernel registers its own PCI and USB class drivers, and reads
-/// which driver owns every device. The built-in drivers bind during HAL
-/// bring-up, before any kernel code runs, and keep what they take; the
-/// drivers registered here are offered what they left, by one pass that
-/// <see cref="Global.StartKernel"/> runs right after
-/// <see cref="Kernel.RegisterDrivers"/> and before <see cref="Kernel.OnBoot"/>,
-/// then, for a USB driver, every device plugged in later, after the
-/// built-ins had their pick. Registration closes when that pass starts.
+/// which driver owns every device. The built-in drivers HAL brings up
+/// itself (virtio, xHCI with its hub, keyboard and mass storage drivers,
+/// and E1000E on x64) bind during HAL bring-up, before any kernel code
+/// runs, and keep what they take. The drivers registered here, and the
+/// built-in drivers written against the driver kit (AHCI and NVMe), are
+/// offered what those left, by one pass that <see cref="Global.StartKernel"/>
+/// runs right after <see cref="Kernel.RegisterDrivers"/> and before
+/// <see cref="Kernel.OnBoot"/>, then, for a USB driver, every device plugged
+/// in later, after the built-ins had their pick. A kit built-in wins a tie
+/// against a driver registered here, and a registration whose match is
+/// strictly more specific takes the device from it. Registration closes
+/// when that pass starts.
 /// </summary>
 /// <remarks>
 /// Register from the kernel's <see cref="Kernel.RegisterDrivers"/> override,
@@ -91,9 +96,12 @@ public static class DriverManager
 
     /// <summary>
     /// Registers a PCI driver, to be offered the PCI functions no built-in
-    /// driver owns when the driver pass runs, most specific match first,
-    /// until one driver's Probe returns Bound. Thread context, from the
-    /// kernel's <see cref="Kernel.RegisterDrivers"/> override or its
+    /// driver took during HAL bring-up when the driver pass runs, most
+    /// specific match first, until one driver's Probe returns Bound. Of two
+    /// equally specific matches, a built-in driver the kit binds, such as
+    /// AHCI's class match, is offered the function first; a device match
+    /// (<see cref="PciMatch.Device"/>) comes ahead of it. Thread context,
+    /// from the kernel's <see cref="Kernel.RegisterDrivers"/> override or its
     /// constructor.
     /// </summary>
     /// <param name="registration">The driver's name, factory and match table.</param>

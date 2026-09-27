@@ -121,6 +121,16 @@ echo "Verifying HAL packages..."
 ls -la artifacts/package/release/Cosmos.Kernel.HAL.X64.*.nupkg
 ls -la artifacts/package/release/Cosmos.Kernel.HAL.ARM64.*.nupkg
 
+# The built-in drivers written against the driver kit. Architecture-independent,
+# so a plain package like HAL.Interfaces; it references the multi-arch HAL, which
+# its build compiles on the way. System references it, so the multi-arch passes
+# below rebuild and repack it with the rest; packed here so the package exists
+# whatever they do.
+echo "Building and packing the built-in driver package..."
+dotnet build src/Cosmos.Kernel.HAL.Drivers/Cosmos.Kernel.HAL.Drivers.csproj -c Release -p:GeneratePackageOnBuild=false
+dotnet pack src/Cosmos.Kernel.HAL.Drivers/Cosmos.Kernel.HAL.Drivers.csproj -c Release --no-build -o artifacts/package/release
+ls -la artifacts/package/release/Cosmos.Kernel.HAL.Drivers.*.nupkg
+
 # Multi-arch packages (have #if ARCH_* conditional code or depend on multi-arch)
 MULTIARCH_PROJECTS=(
     "Cosmos.Kernel.Core"

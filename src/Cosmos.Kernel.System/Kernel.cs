@@ -76,13 +76,15 @@ public abstract partial class Kernel
     /// <summary>
     /// Called once, by <see cref="Global.StartKernel"/>, for the kernel to
     /// register its own PCI and USB class drivers through
-    /// <see cref="Drivers.DriverManager"/>. It runs on the boot
-    /// thread with interrupts on, after the built-in drivers bound their
-    /// devices during HAL bring-up and right before the driver pass offers
-    /// the registered drivers what the built-ins left; then USB hot-plug
-    /// starts and <see cref="OnBoot"/> runs. The boot thread is the idle
-    /// thread, so the override must not sleep or block. Registration closes
-    /// as the pass starts. A kernel built without PCI
+    /// <see cref="Drivers.DriverManager"/>. It runs on the boot thread with
+    /// interrupts on, after the built-in drivers HAL brings up bound their
+    /// devices during HAL bring-up, after the built-in drivers written
+    /// against the kit (AHCI and NVMe) were registered, and right before the driver
+    /// pass offers all those drivers what HAL's built-ins left; then USB
+    /// hot-plug starts and <see cref="OnBoot"/> runs. A kit built-in wins a
+    /// tie against the drivers registered here, however early. The boot
+    /// thread is the idle thread, so the override must not sleep or block.
+    /// Registration closes as the pass starts. A kernel built without PCI
     /// (<c>CosmosEnablePCI=false</c>) never calls it, so ILC trims the
     /// override and the drivers only it registers.
     /// Registering from the kernel's constructor works too, but the
@@ -122,9 +124,11 @@ public abstract partial class Kernel
     /// <summary>
     /// Called once during boot, before BeforeRun(). Interrupts are already
     /// enabled (unless the Interrupts switch is off), the driver pass has
-    /// offered the drivers registered in <see cref="RegisterDrivers"/> every
-    /// device the built-ins left, and USB hot-plug is already started where
-    /// it could start. Override to customize system initialization.
+    /// offered the kit's built-in drivers (AHCI and NVMe, whose disks are registered
+    /// by now) and the drivers registered in <see cref="RegisterDrivers"/>
+    /// every device HAL's built-ins left, and USB hot-plug is already
+    /// started where it could start. Override to customize system
+    /// initialization.
     /// </summary>
     protected virtual void OnBoot()
     {

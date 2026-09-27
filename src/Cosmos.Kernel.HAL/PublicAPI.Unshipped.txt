@@ -121,6 +121,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.Delay(System.TimeSpan duration) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.IsPresent.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.Path.get -> string!
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.PublishBlockDevice(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.PublishMouse() -> Cosmos.Kernel.HAL.Drivers.MouseReporter!
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.PublishNetworkLink(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! address, Cosmos.Kernel.HAL.Drivers.NetworkTransmitHandler! transmit) -> Cosmos.Kernel.HAL.Drivers.NetworkLink!
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.TryCreateWorkItem(System.Action! callback, out Cosmos.Kernel.HAL.Drivers.DeviceWorkItem? workItem) -> bool
@@ -128,6 +129,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceEvent
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceEvent.Signal() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceEvent.Wait() -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceEvent.Wait(System.TimeSpan timeout) -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceInterruptHandler
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceWorkItem
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceWorkItem.Schedule() -> bool

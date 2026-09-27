@@ -235,6 +235,40 @@ internal static class MsiX
         MsiRouting.ReleaseDevice(ctx.DeviceCtx);
     }
 
+    /// <summary>
+    /// Turns MSI-X off on a function that has it on with no context here to
+    /// show for it: one firmware left enabled. Function Mask first, then
+    /// Enable cleared, both through config space, which the function answers
+    /// whatever its Command register says; the table is left alone, since
+    /// nothing here mapped it. <see cref="Enable"/> takes the function back
+    /// from this state. Thread context only.
+    /// </summary>
+    /// <returns>True when MSI-X was on and is now off.</returns>
+    public static bool TryDisableLeftover(PciDevice pci)
+    {
+        byte capability = pci.FindCapability(CapId);
+        if (capability == 0)
+        {
+            return false;
+        }
+
+        byte msgCtrlRegister = (byte)(capability + MsgCtrlOffset);
+        ushort msgCtrl = pci.ReadRegister16(msgCtrlRegister);
+        if ((msgCtrl & MsgCtrlEnable) == 0)
+        {
+            return false;
+        }
+
+        msgCtrl |= MsgCtrlFunctionMask;
+        pci.WriteRegister16(msgCtrlRegister, msgCtrl);
+        pci.WriteRegister16(msgCtrlRegister, (ushort)(msgCtrl & ~MsgCtrlEnable));
+
+        // Read back, as Disable does: the function has stopped signalling
+        // before the caller goes on.
+        _ = pci.ReadRegister16(msgCtrlRegister);
+        return true;
+    }
+
     public static void MaskEntry(MsiXContext ctx, int index)
     {
         if (index < 0 || index >= ctx.EntryCount)

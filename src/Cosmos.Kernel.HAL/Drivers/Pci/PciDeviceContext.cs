@@ -19,8 +19,9 @@ namespace Cosmos.Kernel.HAL.Drivers.Pci;
 /// sizing writes), saved the Command register, turned the function's INTx
 /// line off, since no registered driver gets a line interrupt and a
 /// function left asserting one must not fire into a vector someone else
-/// owns, and turned bus mastering off, since firmware may have left it on
-/// for a controller it drove. BARs, DMA memory, bus mastering and
+/// owns, turned off an MSI-X firmware left enabled, and turned bus
+/// mastering off, since firmware may have left it on for a controller it
+/// drove. BARs, DMA memory, bus mastering and
 /// interrupts are then handed out during Probe only. When the attempt is
 /// declined or fails, the kit disarms the interrupts, drops the
 /// publications and the work items and cancels the events, restores the
@@ -155,7 +156,21 @@ public sealed class PciDeviceContext : DeviceContext
         // off. INTx off for the rest of the attempt, and for good if it binds.
         device.Command = restoredCommand | PciCommand.InterruptDisable;
 
-        return new PciDeviceContext(driverName, path, device, restoredCommand, barBases, barLengths, barIsIo);
+        // MSI-X off if firmware left it on. The kit turns it on itself when
+        // a driver asks for interrupts and the platform can route it; left
+        // on otherwise, the function would send its messages through a table
+        // nothing here programmed as soon as a driver turns bus mastering on,
+        // and a driver reading MSI-X Enable to learn how its interrupts come
+        // would read it wrong.
+        bool leftoverMsiX = MsiX.TryDisableLeftover(device);
+
+        PciDeviceContext context = new(driverName, path, device, restoredCommand, barBases, barLengths, barIsIo);
+        if (leftoverMsiX)
+        {
+            context.WriteLog("turned off the MSI-X firmware left enabled");
+        }
+
+        return context;
     }
 
     /// <summary>

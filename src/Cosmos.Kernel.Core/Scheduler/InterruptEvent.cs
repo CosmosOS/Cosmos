@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics;
 using Cosmos.Kernel.Core.CPU;
 
 namespace Cosmos.Kernel.Core.Scheduler;
@@ -26,6 +27,14 @@ internal class InterruptEvent
     /// <summary>Initial waiter-list capacity: pre-sized so Wait's first Add doesn't heap-allocate under the IRQ-off spinlock; driver flows park at most one or two waiters.</summary>
     private const int InitialWaiterCapacity = 4;
 
+    /// <summary>The deadline of an untimed wait: a Stopwatch timestamp no clock reaches.</summary>
+    private const long NoDeadline = long.MaxValue;
+
+    /// <summary>Longest timed wait, in milliseconds: the most a sleeping thread's wake deadline takes.</summary>
+    private const ulong MaxTimeoutMilliseconds = uint.MaxValue;
+
+    private const long MillisecondsPerSecond = 1000;
+
     private SpinLock _lockGuard;
     private uint _pendingSignals;
     private readonly List<SchedulerThread> _waiters;
@@ -49,20 +58,28 @@ internal class InterruptEvent
     /// latch instead of blocking, so single-context kernels still get
     /// correct completion semantics.
     /// </summary>
-    public void Wait() => WaitCore(0);
+    public void Wait() => WaitCore(NoDeadline);
 
     /// <summary>
-    /// Bounded variant of <see cref="Wait()"/>: returns false when the wait
-    /// loop exhausts <paramref name="maxIterations"/> without consuming a
-    /// signal. Iterations are loop passes — IF-enabled latch polls on the
-    /// no-context/idle path, interrupt wake-ups on the blocked path — so
-    /// this is a hang-breaker for lost device interrupts, not a clock.
+    /// Timed variant of <see cref="Wait()"/>: returns false when
+    /// <paramref name="timeout"/> passes without a signal to consume, a
+    /// hang-breaker for lost device interrupts. A blocked caller sleeps with
+    /// a wake deadline instead of blocking, the way
+    /// <see cref="ConditionVariable.WaitTimeout"/> does, so it still gives
+    /// the CPU up and the scheduler wakes it on the first tick past the
+    /// deadline; the polling caller reads the Stopwatch between polls.
     /// </summary>
-    public bool Wait(ulong maxIterations) => WaitCore(maxIterations);
-
-    private bool WaitCore(ulong maxIterations)
+    /// <param name="timeout">How long to wait at most: zero looks once, and anything past <see cref="uint.MaxValue"/> milliseconds waits that long.</param>
+    /// <returns>True when a signal was consumed; false when the timeout passed first.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="timeout"/> is negative.</exception>
+    public bool Wait(TimeSpan timeout)
     {
-        ulong iterations = 0;
+        ArgumentOutOfRangeException.ThrowIfLessThan(timeout, TimeSpan.Zero);
+        return WaitCore(DeadlineAfter(timeout));
+    }
+
+    private bool WaitCore(long deadline)
+    {
         SchedulerThread? currentThread = SchedulerManager.IsReady
             ? SchedulerManager.CurrentCpuState?.CurrentThread
             : null;
@@ -95,78 +112,116 @@ internal class InterruptEvent
                     }
                 }
 
-                if (maxIterations != 0 && ++iterations >= maxIterations)
+                if (Stopwatch.GetTimestamp() >= deadline)
                 {
                     return false;
                 }
             }
         }
 
-        while (true)
+        try
         {
-            // IRQ-safe: holding the plain spinlock with IF=1 deadlocks
-            // when the matching ISR-side Signal fires on the same CPU
-            // (single-CPU spinlock against itself).
-            using (_lockGuard.AcquireIrqSafe())
+            while (true)
             {
-                if (_pendingSignals > 0)
-                {
-                    _pendingSignals--;
-                    return true;
-                }
-
-                // ReferenceEquals scan (not List.Contains) to match
-                // RemoveWaiterLocked and the scheduler's own convention of
-                // avoiding EqualityComparer<T>.Default in kernel paths.
-                if (!ContainsWaiterLocked(currentThread))
-                {
-                    _waiters.Add(currentThread);
-                }
-
-                // Block while interrupts are still masked by the scope:
-                // if the ISR-side Signal fired between the waiter-list
-                // insertion and BlockThread, ReadyThread would hit a
-                // still-Running thread and the subsequent BlockThread
-                // would bury the wakeup forever (lost-wakeup race). With
-                // the transition done under the scope, Signal can only
-                // observe a genuinely Blocked thread.
-                SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
-            }
-
-            // Only park the CPU while still Blocked: if a Signal (or an
-            // unrelated ReadyThread) raced in between the scope-dispose and
-            // this point, the thread is already Ready/Running and halting
-            // would sleep it until the next unrelated interrupt instead of
-            // retrying the latch immediately. A wake racing in after this
-            // check costs at most one timer tick — no worse than the
-            // unconditional halt it replaces.
-            if (currentThread.State == SchedulerThreadState.Blocked)
-            {
-                InternalCpu.Halt();
-            }
-            // On wake, retry: either a Signal targeted us (we were removed
-            // from _waiters) or we got readied for another reason; in
-            // either case re-check state under the lock.
-
-            if (maxIterations != 0 && ++iterations >= maxIterations)
-            {
+                // IRQ-safe: holding the plain spinlock with IF=1 deadlocks
+                // when the matching ISR-side Signal fires on the same CPU
+                // (single-CPU spinlock against itself).
                 using (_lockGuard.AcquireIrqSafe())
                 {
-                    // Consume a signal that raced in just before giving up,
-                    // and otherwise leave the waiter list clean so a later
-                    // Signal can't dequeue a thread that is no longer waiting.
                     if (_pendingSignals > 0)
                     {
                         _pendingSignals--;
+
+                        // A Signal that woke this thread took it off the
+                        // list; a deadline, or a wake for another reason,
+                        // did not, and a later Signal must not find it there.
+                        RemoveWaiterLocked(currentThread);
                         return true;
                     }
 
-                    RemoveWaiterLocked(currentThread);
+                    long now = Stopwatch.GetTimestamp();
+                    if (now >= deadline)
+                    {
+                        RemoveWaiterLocked(currentThread);
+                        return false;
+                    }
+
+                    // ReferenceEquals scan (not List.Contains) to match
+                    // RemoveWaiterLocked and the scheduler's own convention of
+                    // avoiding EqualityComparer<T>.Default in kernel paths.
+                    if (!ContainsWaiterLocked(currentThread))
+                    {
+                        _waiters.Add(currentThread);
+                    }
+
+                    // Park while interrupts are still masked by the scope:
+                    // if the ISR-side Signal fired between the waiter-list
+                    // insertion and the park, ReadyThread would hit a
+                    // still-Running thread and the park that followed would
+                    // bury the wakeup forever (lost-wakeup race). With the
+                    // transition done under the scope, Signal can only
+                    // observe a genuinely parked thread. A timed wait sleeps
+                    // with a wake deadline instead, so the scheduler's tick
+                    // wakes it once the deadline passes.
+                    if (deadline == NoDeadline)
+                    {
+                        SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
+                    }
+                    else
+                    {
+                        SchedulerManager.MarkSleeping(currentThread.CpuId, currentThread, MillisecondsUntil(now, deadline));
+                    }
                 }
 
-                return false;
+                // Only park the CPU while still parked: if a Signal (or an
+                // unrelated ReadyThread) raced in between the scope-dispose
+                // and this point, the thread is already Ready/Running and
+                // halting would sleep it until the next unrelated interrupt
+                // instead of retrying the latch immediately. A wake racing
+                // in after this check costs at most one timer tick — no
+                // worse than the unconditional halt it replaces. Halted
+                // again for as long as it stays parked: an interrupt that
+                // woke the CPU before the scheduler switched this thread out
+                // must not send it round the loop, which would park it a
+                // second time (the scheduler taking its tickets twice) or
+                // return with it still marked parked.
+                while (currentThread.State is SchedulerThreadState.Blocked or SchedulerThreadState.Sleeping)
+                {
+                    InternalCpu.Halt();
+                }
+
+                // On wake, retry: a Signal targeted us, the deadline passed,
+                // or we got readied for another reason; in every case
+                // re-check state under the lock.
             }
         }
+        finally
+        {
+            // Left set by a Signal that woke a timed sleep before its
+            // deadline, as ConditionVariable.WaitTimeout clears it.
+            currentThread.WakeupTime = 0;
+        }
+    }
+
+    /// <summary>The Stopwatch timestamp <paramref name="timeout"/> from now, rounded up to the millisecond.</summary>
+    private static long DeadlineAfter(TimeSpan timeout)
+    {
+        ulong milliseconds = (ulong)(timeout.Ticks / TimeSpan.TicksPerMillisecond);
+        if (timeout.Ticks % TimeSpan.TicksPerMillisecond != 0)
+        {
+            milliseconds++;
+        }
+
+        milliseconds = Math.Min(milliseconds, MaxTimeoutMilliseconds);
+        return Stopwatch.GetTimestamp() + (long)milliseconds * (Stopwatch.Frequency / MillisecondsPerSecond);
+    }
+
+    /// <summary>The milliseconds from <paramref name="now"/> to <paramref name="deadline"/>, rounded up, as a sleep takes them.</summary>
+    private static uint MillisecondsUntil(long now, long deadline)
+    {
+        long ticksPerMillisecond = Stopwatch.Frequency / MillisecondsPerSecond;
+        ulong milliseconds = (ulong)((deadline - now + ticksPerMillisecond - 1) / ticksPerMillisecond);
+        return (uint)Math.Min(milliseconds, MaxTimeoutMilliseconds);
     }
 
     private bool ContainsWaiterLocked(SchedulerThread thread)
@@ -210,22 +265,40 @@ internal class InterruptEvent
         // IRQ-safe acquire — Signal runs in ISR context; using the plain
         // Acquire would deadlock against a same-CPU mainline Wait that is
         // already holding the lock when the ISR fires.
-        SchedulerThread? toReady = null;
         using (_lockGuard.AcquireIrqSafe())
         {
             _pendingSignals++;
 
-            if (_waiters.Count > 0)
+            // Readied under the scope, with interrupts masked: released
+            // first, a timer tick could wake a timed waiter by its deadline
+            // in between, and readying it a second time would queue it twice.
+            if (TakeParkedWaiterLocked() is { } toReady)
             {
-                toReady = _waiters[0];
-                _waiters.RemoveAt(0);
+                SchedulerManager.ReadyThread(toReady.CpuId, toReady);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Takes the first waiter off the list that is still parked, blocked or
+    /// in a timed sleep. One in any other state was already woken, by its
+    /// deadline or for another reason, and readying it again would queue it
+    /// twice: it takes itself off the list when it runs. Caller holds
+    /// <see cref="_lockGuard"/>.
+    /// </summary>
+    private SchedulerThread? TakeParkedWaiterLocked()
+    {
+        for (int i = 0; i < _waiters.Count; i++)
+        {
+            SchedulerThread waiter = _waiters[i];
+            if (waiter.State is SchedulerThreadState.Blocked or SchedulerThreadState.Sleeping)
+            {
+                _waiters.RemoveAt(i);
+                return waiter;
             }
         }
 
-        if (toReady is not null)
-        {
-            SchedulerManager.ReadyThread(toReady.CpuId, toReady);
-        }
+        return null;
     }
 
     /// <summary>

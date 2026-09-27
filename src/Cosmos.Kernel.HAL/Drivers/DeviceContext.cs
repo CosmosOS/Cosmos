@@ -8,6 +8,7 @@ using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.HAL.Drivers;
 
@@ -46,6 +47,7 @@ public abstract class DeviceContext
 
     private const string MouseDisabledMessage = "Mouse support is disabled. Set CosmosEnableMouse=true in the kernel's csproj to publish a mouse.";
     private const string NetworkDisabledMessage = "Network support is disabled. Set CosmosEnableNetwork=true in the kernel's csproj to publish a network link.";
+    private const string StorageDisabledMessage = "Storage support is disabled. Set CosmosEnableStorage=true in the kernel's csproj to publish a disk.";
 
     // What Probe created, which Bound arms, and teardown or a USB unplug
     // drops. Null until the first one: most attempts create neither.
@@ -57,6 +59,17 @@ public abstract class DeviceContext
     // it from the managers. Null until the first one.
     private List<PublishedMouse>? _mice;
     private List<PublishedNetworkDevice>? _networkLinks;
+
+    // The disks, which a bound driver's work item may add to as well, on
+    // the driver-work thread while the USB hot-plug thread withdraws them:
+    // guarded by _publicationLock from Bound on.
+    private List<PublishedBlockDevice>? _blockDevices;
+
+    /// <summary>
+    /// Makes a work item's disk and a USB unplug's withdrawal one step each.
+    /// Not readonly: SpinLock is a mutable struct.
+    /// </summary>
+    private SchedSpinLock _publicationLock;
 
     /// <summary>
     /// Cleared on the USB hot-plug thread when the device leaves its bus,
@@ -259,6 +272,90 @@ public abstract class DeviceContext
         return new NetworkLink(device);
     }
 
+    /// <summary>
+    /// Publishes a disk the driver implements. The kernel's storage manager
+    /// registers it like a built-in disk: it reads its partition table
+    /// through it at once, on the thread the kit delivers it on, and ranks
+    /// it among the other disks by the primary-disk rule. From Probe, the
+    /// kit delivers it right after Probe returns Bound, before the
+    /// interrupts are armed, on the thread that ran the probe, so a disk
+    /// published there must complete its I/O without the driver's
+    /// interrupts, by polling its device, at least until the handler first
+    /// runs, since the partition scan comes before it can. From one of the
+    /// binding's own work items, once Bound, the kit delivers it before the
+    /// call returns, on the driver-work thread, with the driver's interrupts
+    /// armed: where a disk that waits for its completion interrupt is
+    /// published. The partition scan then holds that thread, which runs one
+    /// work item at a time, so the disk's completions must reach its I/O
+    /// through the interrupt handler (<see cref="DeviceEvent.Signal"/>), never
+    /// through another work item, which could not run until the scan
+    /// returned. If the attempt is declined or fails, a disk published in
+    /// Probe is dropped; once a USB device leaves its bus, the kit takes its
+    /// disks back out of the storage manager, which detaches the filesystems
+    /// mounted from them without a flush, and every I/O through them throws
+    /// from then on.
+    /// </summary>
+    /// <param name="device">
+    /// The disk, which the storage manager calls from any thread. Its
+    /// <see cref="IBlockDevice.Name"/> must be unique among the kernel's
+    /// disks, such as <c>sata0</c>.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="device"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Called outside the driver's Probe and outside the binding's own work
+    /// items, or the kernel is built without storage support.
+    /// </exception>
+    public void PublishBlockDevice(IBlockDevice device)
+    {
+        bool probing = State == DeviceContextState.Probing;
+        if (!probing && !(State == DeviceContextState.Bound && DriverWorkQueue.IsCurrentItemOf(this)))
+        {
+            throw new InvalidOperationException($"{nameof(PublishBlockDevice)} can only be called from the driver's Probe or from one of the binding's work items.");
+        }
+
+        ArgumentNullException.ThrowIfNull(device);
+
+        // The switch alone first, as in PublishMouse.
+        if (!CosmosFeatures.StorageEnabled)
+        {
+            throw new InvalidOperationException(StorageDisabledMessage);
+        }
+
+        if (DriverCore.BlockDeviceSink is null)
+        {
+            throw new InvalidOperationException(StorageDisabledMessage);
+        }
+
+        PublishedBlockDevice disk = new(this, device);
+        if (probing)
+        {
+            (_blockDevices ??= []).Add(disk);
+            return;
+        }
+
+        // A USB unplug clears IsPresent before it takes the list to withdraw
+        // it, so under the lock a disk either lands in the list the unplug
+        // withdraws, or finds the device gone and is dropped here.
+        bool recorded;
+        using (_publicationLock.AcquireIrqSafe())
+        {
+            recorded = IsPresent;
+            if (recorded)
+            {
+                (_blockDevices ??= []).Add(disk);
+            }
+        }
+
+        if (!recorded)
+        {
+            disk.Drop();
+            WriteLog($"dropped disk {disk.Name}: the device left the bus");
+            return;
+        }
+
+        DeliverBlockDevice(disk);
+    }
+
     /// <summary>Marks the start of the driver's Probe: resources can be acquired until it returns.</summary>
     internal void BeginProbe() => State = DeviceContextState.Probing;
 
@@ -296,8 +393,11 @@ public abstract class DeviceContext
 
     /// <summary>
     /// Hands what Probe published to the managers, on the thread that ran
-    /// the probe. A manager that throws is logged with the driver's name and
-    /// the device's path; the binding stands, only that publication is lost.
+    /// the probe: the mice, then the network links, then the disks, whose
+    /// partition tables the storage manager reads here, before the driver's
+    /// interrupts are armed. A manager that throws is logged with the
+    /// driver's name and the device's path; the binding stands, only that
+    /// publication is lost.
     /// </summary>
     private void DeliverPublications()
     {
@@ -336,6 +436,59 @@ public abstract class DeviceContext
                 }
             }
         }
+
+        if (_blockDevices is { } disks)
+        {
+            for (int i = 0; i < disks.Count; i++)
+            {
+                DeliverBlockDevice(disks[i]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Hands one disk to the storage manager, which scans its partition
+    /// table through it before it returns, on the calling thread: the
+    /// probing thread for a disk Probe published, the driver-work thread for
+    /// one a work item did. A manager that throws is logged; the binding
+    /// stands.
+    /// </summary>
+    private void DeliverBlockDevice(PublishedBlockDevice disk)
+    {
+        // Live first, so the manager's partition scan reaches the driver. A
+        // disk dropped or withdrawn before this point is not delivered.
+        if (!disk.TryGoLive())
+        {
+            return;
+        }
+
+        try
+        {
+            bool registered = DriverCore.BlockDeviceSink?.Invoke(disk) ?? false;
+            WriteLog(registered
+                ? $"published disk {disk.Name}"
+                : $"the storage manager holds as many disks as it can and did not take disk {disk.Name}");
+        }
+        catch (Exception exception)
+        {
+            WriteLog($"the storage manager refused disk {disk.Name}: {exception.Message}");
+        }
+
+        // A USB unplug that withdrew a work item's disk while the manager was
+        // still registering it found nothing to unregister yet, so the disk
+        // is taken back out here. Unregistering a disk the manager no longer
+        // holds does nothing.
+        if (disk.IsWithdrawn)
+        {
+            try
+            {
+                DriverCore.BlockDeviceWithdrawSink?.Invoke(disk);
+            }
+            catch (Exception exception)
+            {
+                WriteLog($"the storage manager failed to withdraw disk {disk.Name}: {exception.Message}");
+            }
+        }
     }
 
     /// <summary>
@@ -360,6 +513,17 @@ public abstract class DeviceContext
             _networkLinks = null;
         }
 
+        // Only Probe added to it: a work item never ran for this attempt.
+        if (_blockDevices is { } disks)
+        {
+            for (int i = 0; i < disks.Count; i++)
+            {
+                disks[i].Drop();
+            }
+
+            _blockDevices = null;
+        }
+
         DropWorkAndCancelEvents();
     }
 
@@ -369,7 +533,8 @@ public abstract class DeviceContext
     /// publication is marked withdrawn before its manager lets go of it, so
     /// a report through the driver's <see cref="MouseReporter"/>, or a send
     /// through its <see cref="NetworkLink"/>'s device, goes nowhere from the
-    /// first instant on, whatever the manager does. A manager that throws is
+    /// first instant on, and an I/O through one of its disks throws,
+    /// whatever the manager does. A manager that throws is
     /// logged with the driver's name and the device's path, and the next
     /// publication is still withdrawn.
     /// </summary>
@@ -413,6 +578,33 @@ public abstract class DeviceContext
             }
 
             _networkLinks = null;
+        }
+
+        // Taken under the lock, since a work item may be adding one: the
+        // device is already marked gone, so none lands in the list after.
+        List<PublishedBlockDevice>? disks;
+        using (_publicationLock.AcquireIrqSafe())
+        {
+            disks = _blockDevices;
+            _blockDevices = null;
+        }
+
+        if (disks is not null)
+        {
+            for (int i = 0; i < disks.Count; i++)
+            {
+                PublishedBlockDevice disk = disks[i];
+                disk.Withdraw();
+                try
+                {
+                    DriverCore.BlockDeviceWithdrawSink?.Invoke(disk);
+                    WriteLog($"withdrew disk {disk.Name}");
+                }
+                catch (Exception exception)
+                {
+                    WriteLog($"the storage manager failed to withdraw disk {disk.Name}: {exception.Message}");
+                }
+            }
         }
     }
 

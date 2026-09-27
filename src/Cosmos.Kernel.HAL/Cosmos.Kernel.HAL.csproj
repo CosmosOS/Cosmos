@@ -8,7 +8,7 @@
     <Description>Hardware abstraction layer base for multi-architecture kernel development.</Description>
     <PackageTags>cosmos;kernel;hal;abstraction;architecture;hardware</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
-    <!-- NVMe I/O waits block and wake threads through the experimental scheduler seam (COSMOS0001). -->
+    <!-- The USB hot-plug thread and the driver kit's work queue start, block and find threads through the experimental scheduler seam (COSMOS0001). -->
     <!-- COSMOS0003: this assembly declares the experimental driver kit seam and consumes it itself. -->
     <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
@@ -30,7 +30,8 @@
 
   <ItemGroup>
     <!-- System's internal canvases and managers sit directly on the HAL
-         drivers (GOP/SVGAII, AHCI/NVMe, PS/2 mouse, PCI discovery). -->
+         drivers (GOP/SVGAII, PS/2 mouse, PCI discovery) and on the
+         driver kit's engine (its sinks and built-in registration). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
     <!-- The aggregator initializes PlatformHAL from its library initializer. -->
     <InternalsVisibleTo Include="Cosmos.Kernel" />
@@ -39,7 +40,8 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box suites over HAL internals: SVGAII FIFO wire format
          (Graphic), MSI-X tables (Interrupts), PCI discovery (Pci),
-         platform power ops (Power), AHCI/NVMe registers (Storage),
+         platform power ops (Power), the PCI owners and the BARs of the
+         AHCI and NVMe controllers (Storage),
          the TimerDevice base and its software timers (Timer), virtio
          transports (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Graphic" />

@@ -17,7 +17,8 @@ namespace Cosmos.Kernel.HAL.Drivers.Engine;
 /// x64, where the PIT runs one-shot at its longest count and is reloaded
 /// on each tick, and every 10 ms on ARM64, whose generic timer ticks at the
 /// scheduler's quantum. Only a timer that actually ticks can poll, so the
-/// driver pass checks that once, before the first probe.
+/// driver pass checks that once, before the first probe, whenever a PCI
+/// driver is registered.
 /// </summary>
 /// <remarks>
 /// On ARM64 the generic timer is started by the scheduler, so it never
@@ -50,7 +51,8 @@ internal static class InterruptPolling
     /// <see cref="TickWaitMilliseconds"/> of Stopwatch time for it to fire.
     /// The Stopwatch reads a counter that runs whether or not any interrupt
     /// comes (the TSC on x64, the generic timer's count on ARM64), so the
-    /// wait ends either way. Runs once, from the driver pass, with interrupts on.
+    /// wait ends either way. Runs at most once, from the driver pass, with
+    /// interrupts on.
     /// </summary>
     internal static void CheckTimerTicks()
     {

@@ -121,6 +121,16 @@ Write-Host "Verifying HAL packages..." -ForegroundColor Yellow
 Get-ChildItem -Path "artifacts/package/release/Cosmos.Kernel.HAL.X64.*.nupkg" | ForEach-Object { Write-Host $_.Name }
 Get-ChildItem -Path "artifacts/package/release/Cosmos.Kernel.HAL.ARM64.*.nupkg" | ForEach-Object { Write-Host $_.Name }
 
+# The built-in drivers written against the driver kit. Architecture-independent,
+# so a plain package like HAL.Interfaces; it references the multi-arch HAL, which
+# its build compiles on the way. System references it, so the multi-arch passes
+# below rebuild and repack it with the rest; packed here so the package exists
+# whatever they do.
+Write-Host "Building and packing the built-in driver package..." -ForegroundColor Cyan
+dotnet build src/Cosmos.Kernel.HAL.Drivers/Cosmos.Kernel.HAL.Drivers.csproj -c Release -p:GeneratePackageOnBuild=false
+dotnet pack src/Cosmos.Kernel.HAL.Drivers/Cosmos.Kernel.HAL.Drivers.csproj -c Release --no-build -o artifacts/package/release
+Get-ChildItem -Path "artifacts/package/release/Cosmos.Kernel.HAL.Drivers.*.nupkg" | ForEach-Object { Write-Host $_.Name }
+
 # Multi-arch packages list
 $MultiArchProjects = @(
     "Cosmos.Kernel.Core",

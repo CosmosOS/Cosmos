@@ -23,6 +23,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" PrivateAssets="none" />
     <ProjectReference Include="..\Cosmos.Kernel.HAL\Cosmos.Kernel.HAL.csproj" PrivateAssets="none" />
+    <!-- The built-in drivers written against the driver kit, which
+         Global.StartKernel registers: through this reference every kernel
+         gets them, as a dependency of this package, with no PackageReference
+         of its own. A plain package, so the default edge carries its lib. -->
+    <ProjectReference Include="..\Cosmos.Kernel.HAL.Drivers\Cosmos.Kernel.HAL.Drivers.csproj" />
     <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 

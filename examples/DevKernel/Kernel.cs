@@ -24,11 +24,13 @@ public class Kernel : Sys.Kernel
 
     /// <summary>
     /// Registers DevKernel's own drivers (<c>Drivers/</c>). Runs in
-    /// StartKernel with interrupts on, after the built-in drivers bound their
-    /// devices and before OnBoot, and only in a kernel built with PCI, so it
-    /// needs no PCI guard of its own. One switch per <c>if</c>: ILC folds a
-    /// single condition in Debug builds, so a kernel built without the
-    /// subsystem a driver publishes to trims that driver.
+    /// StartKernel with interrupts on: after the built-in drivers HAL brings
+    /// up bound their devices and the kit's built-ins (AHCI) were
+    /// registered, before the pass binds them all and before OnBoot. Only a
+    /// kernel built with PCI calls it, so it needs no PCI guard of its own.
+    /// One switch per <c>if</c>: ILC folds a single condition in Debug
+    /// builds, so a kernel built without the subsystem a driver publishes to
+    /// trims that driver.
     /// </summary>
     protected override void RegisterDrivers()
     {

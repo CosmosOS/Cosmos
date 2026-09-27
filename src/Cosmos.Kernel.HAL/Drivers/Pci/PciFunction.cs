@@ -26,6 +26,9 @@ public sealed class PciFunction
     /// <summary>The vendor ID, config offset 0x00.</summary>
     public ushort VendorId => _device.VendorId;
 
+    /// <summary>The enumerated function, whose bus, device and function number the storage manager's primary-disk rule reads.</summary>
+    internal PciDevice Device => _device;
+
     /// <summary>The device ID, config offset 0x02.</summary>
     public ushort DeviceId => _device.DeviceId;
 

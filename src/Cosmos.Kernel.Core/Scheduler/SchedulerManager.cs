@@ -779,6 +779,12 @@ public static class SchedulerManager
 
             s_currentScheduler.OnThreadBlocked(cpuState, thread);
             thread.State = SchedulerThreadState.Sleeping;
+
+            // Ask the next IRQ exit to switch away, as BlockThread does: a
+            // sleeping current thread otherwise wakes from its halt at any
+            // interrupt, before the tick switches it out, and a caller that
+            // loops would park it a second time, taking its tickets twice.
+            cpuState._needReschedule = true;
         }
     }
 

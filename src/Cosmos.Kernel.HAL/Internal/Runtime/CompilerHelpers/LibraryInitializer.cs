@@ -8,7 +8,6 @@ using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces;
@@ -85,16 +84,9 @@ internal class LibraryInitializer
                 UsbManager.Initialize();
             }
 
-            // Initialize storage controllers (AHCI for SATA, NVMe for PCIe).
-            // Both drivers are architecture-independent and live in HAL.
-            if (CosmosFeatures.StorageEnabled)
-            {
-                Serial.WriteString("[KERNEL]   - Initializing AHCI...\n");
-                Ahci.Initialize();
-
-                Serial.WriteString("[KERNEL]   - Initializing NVMe...\n");
-                Nvme.Initialize();
-            }
+            // No storage controller is brought up here: AHCI and NVMe are
+            // driver kit drivers in Cosmos.Kernel.HAL.Drivers, which
+            // Global.StartKernel registers and the driver pass binds.
         }
     }
 }

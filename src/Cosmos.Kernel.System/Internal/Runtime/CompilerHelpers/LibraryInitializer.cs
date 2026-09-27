@@ -126,14 +126,31 @@ internal class LibraryInitializer
                 {
                     Serial.WriteString("[KERNEL]   - Initializing storage manager...\n");
                     StorageManager.Initialize();
+
+                    // Disks the kit's drivers publish, the built-in AHCI and
+                    // NVMe drivers' among them, registered by the driver
+                    // pass, a bound driver's work item, or the USB hot-plug
+                    // thread.
+                    // Nested under PCI's switch, as the mouse sink is.
+                    if (CosmosFeatures.PCIEnabled)
+                    {
+                        DriverCore.BlockDeviceSink = StorageManager.TryRegisterDevice;
+
+                        // A USB driver's disk leaves with its device, as its
+                        // mouse does.
+                        if (CosmosFeatures.UsbEnabled)
+                        {
+                            DriverCore.BlockDeviceWithdrawSink = static disk => StorageManager.UnregisterDevice(disk);
+                        }
+                    }
                 }
             }
 
             // Storage device registration runs OUTSIDE the
             // DisableInterruptsScope: ScanPartitions issues real I/O
-            // (LBA 0 read for MBR/GPT detection), and interrupt-driven
-            // drivers like NVMe need IF=1 / DAIF.I=0 to receive
-            // completion IRQs. Disposing the scope only RESTORES the
+            // (LBA 0 read for MBR/GPT detection), and an interrupt-driven
+            // driver needs IF=1 / DAIF.I=0 to receive its completion
+            // IRQs. Disposing the scope only RESTORES the
             // prior state: on ARM64 IRQs were still masked from boot
             // at this point, so explicitly unmask before doing I/O.
             // Global.StartKernel enables IRQs again before the kernel

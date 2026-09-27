@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    The built-in drivers written as driver kit drivers: one file per device
+    family, each exposing a registration, and BuiltInDrivers, the catalogue
+    Global.StartKernel registers behind the kernel's feature switches.
+    Cosmos.Kernel.HAL keeps the mechanisms (PCI enumeration, MSI-X, mapping,
+    DMA, the USB host stack and the kit itself); this assembly holds the
+    policies.
+
+    It takes no InternalsVisibleTo grant from any Cosmos assembly, on
+    purpose: it is written exactly as a third-party driver library is, so it
+    compiling at all proves the kit's public seam is enough for a real
+    driver, the way examples/DevKernel proves the supported ring is. A driver
+    here that needs an internal means the seam is missing something.
+
+    A plain package, not a multi-arch one: nothing here is architecture
+    specific, the kit's public surface is the same on both architectures
+    (HAL's single PublicAPI file holds both builds to it), and the per-RID
+    HAL and Core reach a kernel through Cosmos.Kernel.System's references,
+    as they do for Cosmos.Kernel.HAL.Interfaces. System references this
+    project, so every kernel gets it without a PackageReference of its own.
+  -->
+  <PropertyGroup>
+    <PackageId>Cosmos.Kernel.HAL.Drivers</PackageId>
+    <Title>Cosmos Kernel Built-in Drivers</Title>
+    <Description>The built-in PCI drivers of Cosmos kernels, written against the driver kit.</Description>
+    <PackageTags>cosmos;kernel;hal;drivers;ahci</PackageTags>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <RootNamespace>Cosmos.Kernel.HAL.Drivers.BuiltIn</RootNamespace>
+    <!-- COSMOS0003: the drivers are written against the experimental driver kit,
+         and the registrations this assembly exposes are part of that seam. -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+
+    <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
+         one registration factory per driver and the catalogue, under COSMOS0003. -->
+    <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Kernel.HAL\Cosmos.Kernel.HAL.csproj" />
+    <ProjectReference Include="..\Cosmos.Kernel.HAL.Interfaces\Cosmos.Kernel.HAL.Interfaces.csproj" />
+    <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+</Project>

@@ -1,7 +1,11 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Usb;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn;
 using Cosmos.Kernel.HAL.Drivers.Engine;
+using Cosmos.Kernel.HAL.Drivers.Pci;
 using Cosmos.Kernel.System.Graphics;
 
 namespace Cosmos.Kernel.System;
@@ -78,9 +82,11 @@ public static class Global
 
     /// <summary>
     /// Starts the registered kernel, once. Enables interrupts (unless the
-    /// Interrupts switch is off), calls <see cref="Kernel.RegisterDrivers"/>
-    /// and binds the drivers the kernel registered (both only in a kernel
-    /// built with PCI), starts USB hot-plug, then calls
+    /// Interrupts switch is off), registers the built-in drivers written
+    /// against the driver kit (AHCI and NVMe with storage), calls
+    /// <see cref="Kernel.RegisterDrivers"/> and binds those drivers and the
+    /// kernel's (all only in a kernel built with PCI), starts USB hot-plug,
+    /// then calls
     /// <see cref="Kernel.Start"/>, so <see cref="Kernel.OnBoot"/>,
     /// <see cref="Kernel.BeforeRun"/> and <see cref="Kernel.Run"/> all run
     /// with interrupts on, and a kernel that overrides Start keeps all three.
@@ -122,9 +128,10 @@ public static class Global
             InternalCpu.EnableInterrupts();
         }
 
-        // The kernel registers its drivers, from RegisterDrivers or earlier
-        // from its constructor, and they bind here, to the PCI functions and
-        // USB interfaces the built-in drivers left free during HAL bring-up.
+        // The built-in drivers written against the kit are registered here,
+        // then the kernel registers its own, from RegisterDrivers or earlier
+        // from its constructor, and they all bind here, to the PCI functions
+        // and USB interfaces the drivers HAL brings up itself left free.
         // After interrupts, so RegisterDrivers and every probe run with them
         // on on both architectures; before hot-plug starts, so the boot
         // thread is the only one binding devices while the pass runs; and
@@ -133,6 +140,7 @@ public static class Global
         // RegisterDrivers, and trims its override and the whole engine.
         if (Core.CosmosFeatures.PCIEnabled)
         {
+            RegisterBuiltInDrivers();
             s_kernel.InvokeRegisterDrivers();
             DriverCore.BindUserDrivers();
         }
@@ -157,5 +165,28 @@ public static class Global
         // If kernel.Start() returns, halt the system
         Serial.WriteString("[Global] Kernel.Start() returned, halting...\n");
         while (true) { }
+    }
+
+    /// <summary>
+    /// Registers the catalogue of Cosmos.Kernel.HAL.Drivers, the built-in
+    /// drivers written against the driver kit, subsystem by subsystem behind
+    /// the kernel's switches: that assembly sees no switch, so the guards
+    /// live here. One switch per <c>if</c>, since ILC folds a single switch
+    /// only: a kernel built without storage keeps no AHCI or NVMe code. They
+    /// go through the kit's built-in path, which takes the names reserved
+    /// for built-ins and ranks them ahead of every registration the kernel
+    /// makes, so a built-in wins a tie and only a strictly more specific
+    /// match takes a device from it.
+    /// </summary>
+    private static void RegisterBuiltInDrivers()
+    {
+        if (Core.CosmosFeatures.StorageEnabled)
+        {
+            IReadOnlyList<PciDriverRegistration> storage = BuiltInDrivers.CreateStorageRegistrations();
+            for (int i = 0; i < storage.Count; i++)
+            {
+                DriverCore.RegisterBuiltIn(storage[i]);
+            }
+        }
     }
 }

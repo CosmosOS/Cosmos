@@ -308,8 +308,8 @@ public sealed class UsbDeviceContext : DeviceContext
         MarkNotPresent();
         DisarmReports();
 
-        // 2. The mouse and the network link the driver published leave
-        // their managers, silenced first.
+        // 2. The mice, the network links and the disks the driver
+        // published leave their managers, silenced first.
         WithdrawPublications();
 
         // 3. No work item of the binding starts again and no Wait on its

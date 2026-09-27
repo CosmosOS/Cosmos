@@ -2,7 +2,9 @@
 # Checks that the driver kit seam is declared experimental in every
 # src/**/PublicAPI.*.txt, and that nothing else is.
 #
-# The seam is everything in Cosmos.Kernel.HAL.Drivers(.Pci/.Usb) and
+# The seam is everything in the Cosmos.Kernel.HAL.Drivers namespaces (the
+# kit's own, .Pci and .Usb in Cosmos.Kernel.HAL, and .BuiltIn, the built-in
+# drivers' registrations in the Cosmos.Kernel.HAL.Drivers assembly) and
 # Cosmos.Kernel.System.Drivers, plus the Kernel.RegisterDrivers hook. The
 # PublicAPI analyzer prefixes a symbol's line with [COSMOS0003] only when the
 # symbol carries [Experimental("COSMOS0003")], so a public seam type that lost

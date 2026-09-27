@@ -42,6 +42,9 @@ internal static class DriverWorkQueue
     /// </summary>
     private static volatile DeviceWorkItem? s_running;
 
+    /// <summary>The driver-work thread, recorded as it starts; null before.</summary>
+    private static volatile SchedulerThread? s_workerThread;
+
     /// <summary>
     /// Starts the driver-work thread unless it is already running. Called
     /// from a driver's Probe only; probes run one at a time, so no second
@@ -106,6 +109,19 @@ internal static class DriverWorkQueue
         s_running is { } item && item.Context == context;
 
     /// <summary>
+    /// True when the caller is the driver-work thread, running the callback
+    /// of a work item <paramref name="context"/> created: what lets
+    /// <see cref="DeviceContext.PublishBlockDevice"/> accept a disk from a
+    /// bound driver's work item and from nowhere else. The thread is checked
+    /// as well as the item, since another thread can ask while that callback
+    /// runs.
+    /// </summary>
+    internal static bool IsCurrentItemOf(DeviceContext context) =>
+        IsRunningItemOf(context)
+        && s_workerThread is { } worker
+        && ReferenceEquals(SchedulerManager.CurrentCpuState?.CurrentThread, worker);
+
+    /// <summary>
     /// The driver-work thread: waits to be woken, then runs every item
     /// queued, and waits again. The wake-ups are counted, so one that comes
     /// while items run is not lost; at worst it finds the queue empty.
@@ -117,6 +133,7 @@ internal static class DriverWorkQueue
             return;
         }
 
+        s_workerThread = SchedulerManager.CurrentCpuState?.CurrentThread;
         while (true)
         {
             wake.Wait();

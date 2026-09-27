@@ -36,7 +36,7 @@ internal abstract class BlockDevice : Device, IBlockDevice
     // works fine once the kernel is up. Names are therefore built digit by
     // digit, like Serial.WriteNumber.
 
-    /// <summary>Builds a device name like "sata0" without CoreLib int formatting.</summary>
+    /// <summary>Builds a device name like "usb0" without CoreLib int formatting.</summary>
     protected static string BuildDeviceName(string prefix, uint number)
     {
         Span<char> buffer = stackalloc char[MaxNameLength];
@@ -55,19 +55,9 @@ internal abstract class BlockDevice : Device, IBlockDevice
         return new string(buffer[..pos]);
     }
 
-    /// <summary>Builds a device name like "nvme0n1" without CoreLib int formatting.</summary>
-    protected static string BuildDeviceName(string prefix, uint number, string infix, uint secondNumber)
-    {
-        Span<char> buffer = stackalloc char[MaxNameLength];
-        int pos = Append(buffer, 0, prefix);
-        pos = AppendDigits(buffer, pos, number);
-        pos = Append(buffer, pos, infix);
-        pos = AppendDigits(buffer, pos, secondNumber);
-        return new string(buffer[..pos]);
-    }
-
-    // Longest possible name: a worst-case host name ("nvme" + 10 digits +
-    // "n" + 10 digits) plus a partition suffix ("p" + 10 digits).
+    // Longest possible name: a worst-case host name (an NVMe namespace's,
+    // "nvme" + 10 digits + "n" + 10 digits) plus a partition suffix ("p" +
+    // 10 digits).
     private const int MaxNameLength = 48;
 
     /// <summary>Radix used when converting a number to its decimal digits.</summary>

@@ -1,0 +1,7 @@
+#nullable enable
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Ahci.AhciDriver
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Nvme.NvmeDriver
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreateStorageRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!>!
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Ahci.AhciDriver.CreateRegistration() -> Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Nvme.NvmeDriver.CreateRegistration() -> Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!

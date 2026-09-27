@@ -14,21 +14,25 @@ using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 namespace Cosmos.Kernel.HAL.Drivers.Engine;
 
 /// <summary>
-/// The driver kit's engine. It keeps the drivers a kernel registers, runs
+/// The driver kit's engine. It keeps the drivers registered with it, runs
 /// the one pass that binds them to the PCI functions and USB interfaces no
-/// built-in driver took, offers the USB interfaces plugged in later the
-/// same way, ends a USB binding when its device is pulled out, and
-/// publishes what every device ended up owned by.
+/// built-in driver took during HAL bring-up, offers the USB interfaces
+/// plugged in later the same way, ends a USB binding when its device is
+/// pulled out, and publishes what every device ended up owned by.
 /// </summary>
 /// <remarks>
-/// Built-in drivers bind during HAL bring-up, before any kernel code runs,
-/// and keep what they claim. Registered drivers bind late, in
-/// <see cref="BindUserDrivers"/>, which Global.StartKernel runs once, on
+/// Two kinds of built-in driver exist. The ones HAL brings up itself bind
+/// during HAL bring-up, before any kernel code runs, and keep what they
+/// claim. The ones written against the kit (Cosmos.Kernel.HAL.Drivers,
+/// such as AHCI and NVMe) are registered here by Global.StartKernel through
+/// <see cref="RegisterBuiltIn"/>, and bind in the pass like any other
+/// registration, except that they win every tie. Registered drivers bind
+/// in <see cref="BindUserDrivers"/>, which Global.StartKernel runs once, on
 /// the boot thread with interrupts on, before the kernel starts; a USB
-/// device plugged in afterwards goes to the built-ins first, then, through
-/// <see cref="KitUsbDriver"/>, to the registered USB drivers, on the USB
-/// hot-plug thread, which also runs <see cref="RemoveUsbBinding"/> when one
-/// is pulled out. A PCI binding is never released.
+/// device plugged in afterwards goes to HAL's built-ins first, then,
+/// through <see cref="KitUsbDriver"/>, to the registered USB drivers, on
+/// the USB hot-plug thread, which also runs <see cref="RemoveUsbBinding"/>
+/// when one is pulled out. A PCI binding is never released.
 /// </remarks>
 internal static class DriverCore
 {
@@ -51,8 +55,17 @@ internal static class DriverCore
     /// </summary>
     private static SchedSpinLock s_lock;
 
-    /// <summary>The PCI registrations, in registration order; null until the first one.</summary>
+    /// <summary>
+    /// The PCI registrations: the built-in ones first, in registration
+    /// order, then the kernel's, in registration order. Null until the first
+    /// one. The candidates for a function keep this order among equally
+    /// specific matches, which is what makes a built-in win a tie against a
+    /// driver the kernel registered earlier, from its constructor.
+    /// </summary>
     private static List<PciDriverRegistration>? s_pciRegistrations;
+
+    /// <summary>How many of <see cref="s_pciRegistrations"/>' first entries are built-in.</summary>
+    private static int s_builtInPciCount;
 
     /// <summary>
     /// The USB registrations, in registration order; null until the first
@@ -124,6 +137,23 @@ internal static class DriverCore
     internal static Action<PublishedNetworkDevice>? NetworkWithdrawSink { get; set; }
 
     /// <summary>
+    /// Where the disks drivers publish are delivered: the storage manager's
+    /// registration, which scans the disk's partition table through it and
+    /// answers whether it took the disk. Installed like <see cref="MouseSink"/>
+    /// when the kernel has storage support. Null without it, and
+    /// <see cref="DeviceContext.PublishBlockDevice"/> then throws.
+    /// </summary>
+    internal static Func<PublishedBlockDevice, bool>? BlockDeviceSink { get; set; }
+
+    /// <summary>
+    /// Takes a disk a USB driver published back out of the storage manager
+    /// once its device left the bus, which detaches the filesystems mounted
+    /// from it: installed like <see cref="MouseWithdrawSink"/>, next to
+    /// <see cref="BlockDeviceSink"/>.
+    /// </summary>
+    internal static Action<PublishedBlockDevice>? BlockDeviceWithdrawSink { get; set; }
+
+    /// <summary>
     /// Every PCI function, in bus, device and function order, then every
     /// interface of every configured USB device, in the USB stack's device
     /// order, each with the driver that owns it: built-in drivers, registered
@@ -155,7 +185,38 @@ internal static class DriverCore
             return false;
         }
 
-        return Register(registration.Name, registration, null);
+        return Register(registration.Name, registration, null, builtIn: false);
+    }
+
+    /// <summary>
+    /// Registers one of the built-in PCI drivers written against the kit,
+    /// which Global.StartKernel does from the catalogue in
+    /// Cosmos.Kernel.HAL.Drivers, behind the kernel's feature switches, right
+    /// before it calls the kernel's RegisterDrivers. Unlike
+    /// <see cref="Register(PciDriverRegistration)"/>, it takes a built-in
+    /// name, which keeps the name the device list and the tests know the
+    /// driver by (<c>ahci</c>, <c>nvme</c>) and still reserved against a kernel, and it
+    /// ranks the driver ahead of every registration the kernel made, even
+    /// one made earlier from the kernel's constructor: a built-in wins a tie,
+    /// and only a strictly more specific match takes a device from it.
+    /// </summary>
+    /// <param name="registration">The driver's name, factory and match table.</param>
+    /// <returns>
+    /// True when the driver will take part in the pass. False when PCI is
+    /// compiled out, or when a registration by that name already exists.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// Called from a driver's factory, Probe or Remove, or after the pass
+    /// closed registration.
+    /// </exception>
+    internal static bool RegisterBuiltIn(PciDriverRegistration registration)
+    {
+        if (!CosmosFeatures.PCIEnabled)
+        {
+            return false;
+        }
+
+        return Register(registration.Name, registration, null, builtIn: true);
     }
 
     /// <summary>
@@ -185,20 +246,22 @@ internal static class DriverCore
             return false;
         }
 
-        return Register(registration.Name, null, registration);
+        return Register(registration.Name, null, registration, builtIn: false);
     }
 
     /// <summary>
-    /// The rules both kinds of registration share: one name space, since a
+    /// The rules every kind of registration shares: one name space, since a
     /// name is what the device list identifies a driver by, and one window,
     /// from boot to the pass. Exactly one of <paramref name="pci"/> and
-    /// <paramref name="usb"/> is set.
+    /// <paramref name="usb"/> is set, and <paramref name="builtIn"/> only
+    /// with <paramref name="pci"/>.
     /// </summary>
-    private static bool Register(string name, PciDriverRegistration? pci, UsbDriverRegistration? usb)
+    private static bool Register(string name, PciDriverRegistration? pci, UsbDriverRegistration? usb, bool builtIn)
     {
         // A built-in's name would make the device list lie about who owns a
-        // device, and "gop" would read as the boot display's reservation.
-        bool nameTaken = IsBuiltInName(name);
+        // device, and "gop" would read as the boot display's reservation. The
+        // built-in drivers the kit binds are the ones those names belong to.
+        bool nameTaken = !builtIn && IsBuiltInName(name);
         bool inDriverCallback;
         bool closed;
         using (s_lock.AcquireIrqSafe())
@@ -212,7 +275,17 @@ internal static class DriverCore
                 {
                     if (pci is not null)
                     {
-                        (s_pciRegistrations ??= []).Add(pci);
+                        List<PciDriverRegistration> registrations = s_pciRegistrations ??= [];
+                        if (builtIn)
+                        {
+                            // Behind the other built-ins, ahead of the kernel's.
+                            registrations.Insert(s_builtInPciCount, pci);
+                            s_builtInPciCount++;
+                        }
+                        else
+                        {
+                            registrations.Add(pci);
+                        }
                     }
                     else if (usb is not null)
                     {
@@ -238,7 +311,7 @@ internal static class DriverCore
             return false;
         }
 
-        Serial.WriteString($"[Drivers] Registered {name}\n");
+        Serial.WriteString(builtIn ? $"[Drivers] Registered built-in {name}\n" : $"[Drivers] Registered {name}\n");
         return true;
     }
 
@@ -278,9 +351,10 @@ internal static class DriverCore
 
         if (pciRegistrations is not null)
         {
-            // Once, before the first probe, and only with a PCI driver to
-            // offer anything to: whether a probe that asks for interrupts can
-            // be polled when MSI-X is out of reach. A USB driver asks for none.
+            // Once, before the first probe: whether a probe that asks for
+            // interrupts can be polled when MSI-X is out of reach. A USB
+            // driver asks for none, but any PCI one may, the built-in NVMe
+            // driver among them.
             InterruptPolling.CheckTimerTicks();
 
             for (int i = 0; i < functions.Length; i++)
@@ -531,8 +605,10 @@ internal static class DriverCore
     /// <summary>
     /// The registrations that match <paramref name="function"/>, most
     /// specific match first: a device match, then a class match with a
-    /// programming interface, then a class match. Ties keep registration
-    /// order, so the earlier registration is offered the function first.
+    /// programming interface, then a class match. Ties keep the order of
+    /// <see cref="s_pciRegistrations"/>, built-ins first, then registration
+    /// order, so of two equally specific matches the built-in, or else the
+    /// earlier registration, is offered the function first.
     /// </summary>
     private static List<PciDriverRegistration> RankCandidates(PciDevice function, List<PciDriverRegistration> registrations)
     {

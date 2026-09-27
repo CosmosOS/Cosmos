@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// <summary>
 /// Hands a signal from a driver's interrupt handler to a thread that waits
 /// for it, such as a work item waiting for a command to complete. Signals
-/// are counted: each <see cref="Signal"/> lets one <see cref="Wait"/>
+/// are counted: each <see cref="Signal"/> lets one <see cref="Wait()"/>
 /// return, whether it came before that Wait or during it. Created during
 /// Probe through <see cref="DeviceContext.CreateEvent"/> and owned by the
 /// binding: once the binding attempt is declined or fails, or the USB
@@ -31,7 +31,7 @@ public sealed class DeviceEvent
 
     /// <summary>
     /// Signals the event: wakes one waiting thread, or lets the next
-    /// <see cref="Wait"/> return at once. Any context: it allocates nothing
+    /// <see cref="Wait()"/> return at once. Any context: it allocates nothing
     /// and takes an IRQ-safe lock only, so an interrupt handler may call it.
     /// Signalling an event whose binding is gone does nothing harmful: its
     /// Wait returns false whatever the count.
@@ -55,17 +55,65 @@ public sealed class DeviceEvent
     /// </exception>
     public bool Wait()
     {
-        if (_context.State == DeviceContextState.Probing)
-        {
-            throw new InvalidOperationException("A DeviceEvent cannot be waited on during the Probe that created it: the binding's interrupts are armed only after Probe returns Bound.");
-        }
-
+        ThrowIfProbing();
         if (_cancelled)
         {
             return false;
         }
 
         _event.Wait();
+        return ConsumedSignal();
+    }
+
+    /// <summary>
+    /// Blocks until the event is signalled or <paramref name="timeout"/>
+    /// passes, then consumes the signal: the wait to use where a lost
+    /// interrupt must end in an error rather than a hang. Thread context
+    /// only. A blocked thread gives the CPU up as in <see cref="Wait()"/>
+    /// and is woken on the first scheduler tick after the timeout; on the
+    /// idle thread, which polls, and in a kernel without the scheduler, the
+    /// timeout is read from the Stopwatch between polls.
+    /// </summary>
+    /// <param name="timeout">How long to wait at most; zero looks once.</param>
+    /// <returns>
+    /// True when a signal was consumed. False when the timeout passed first,
+    /// or once the binding attempt that created the event was declined or
+    /// failed, or its USB device left the bus.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="timeout"/> is negative.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// The Probe that created the event is still running. Its interrupts are
+    /// armed only once Probe returns Bound, so no signal could come.
+    /// </exception>
+    public bool Wait(TimeSpan timeout)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(timeout, TimeSpan.Zero);
+        ThrowIfProbing();
+        if (_cancelled)
+        {
+            return false;
+        }
+
+        return _event.Wait(timeout) && ConsumedSignal();
+    }
+
+    /// <summary>
+    /// Makes every <see cref="Wait()"/>, running or to come, return false.
+    /// Called when the binding attempt that created the event is torn down,
+    /// and when its USB device leaves the bus.
+    /// </summary>
+    internal void Cancel()
+    {
+        _cancelled = true;
+        _event.Signal();
+    }
+
+    /// <summary>
+    /// Says whether the signal a wait just consumed was a real one, rather
+    /// than the one <see cref="Cancel"/> sent.
+    /// </summary>
+    private bool ConsumedSignal()
+    {
         if (_cancelled)
         {
             // Cancel signals once. Passing that wake-up on lets the next
@@ -77,14 +125,12 @@ public sealed class DeviceEvent
         return true;
     }
 
-    /// <summary>
-    /// Makes every <see cref="Wait"/>, running or to come, return false.
-    /// Called when the binding attempt that created the event is torn down,
-    /// and when its USB device leaves the bus.
-    /// </summary>
-    internal void Cancel()
+    /// <summary>Throws when the Probe that created the event is still running, which no signal could reach.</summary>
+    private void ThrowIfProbing()
     {
-        _cancelled = true;
-        _event.Signal();
+        if (_context.State == DeviceContextState.Probing)
+        {
+            throw new InvalidOperationException("A DeviceEvent cannot be waited on during the Probe that created it: the binding's interrupts are armed only after Probe returns Bound.");
+        }
     }
 }

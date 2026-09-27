@@ -255,7 +255,7 @@ dotnet_diagnostic.RS0027.severity = none
 # repo-wide [*.cs] entry would fire in every project) and never reaches the
 # sources linked from the dotnet/runtime submodule, which sit under the
 # submodule's own root .editorconfig.
-[src/Cosmos.Kernel.{System,Core,HAL,HAL.Interfaces}/**.cs]
+[src/Cosmos.Kernel.{System,Core,HAL,HAL.Interfaces,HAL.Drivers}/**.cs]
 dotnet_diagnostic.CS1591.severity = error
 
 # CS1591 only guarantees that a member has a comment. These four say the

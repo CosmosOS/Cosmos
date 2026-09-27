@@ -10,6 +10,7 @@
         <Project Path="src/Cosmos.Kernel.Debug/Cosmos.Kernel.Debug.csproj" />
         <Project Path="src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
         <Project Path="src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj" />
+        <Project Path="src/Cosmos.Kernel.HAL.Drivers/Cosmos.Kernel.HAL.Drivers.csproj" />
         <Project Path="src/Cosmos.Kernel.HAL/Cosmos.Kernel.HAL.csproj" />
         <Project Path="src/Cosmos.Kernel.Native.ARM64/Cosmos.Kernel.Native.ARM64.csproj" />
         <Project Path="src/Cosmos.Kernel.Native.X64/Cosmos.Kernel.Native.X64.csproj" />

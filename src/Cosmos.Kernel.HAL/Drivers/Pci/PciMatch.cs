@@ -9,10 +9,11 @@ namespace Cosmos.Kernel.HAL.Drivers.Pci;
 /// One entry of a PCI driver's match table: the functions a registration is
 /// offered. When several registrations match a function, a
 /// <see cref="Device"/> entry beats a three-part <see cref="Class(byte, byte, byte)"/>
-/// entry, which beats a two-part <see cref="Class(byte, byte)"/> entry, and
-/// the earlier registration wins a tie. A <c>default(PciMatch)</c> matches
-/// nothing, and a registration refuses it. The factories run in any
-/// context and throw nothing.
+/// entry, which beats a two-part <see cref="Class(byte, byte)"/> entry. Of
+/// two equally specific matches, a built-in driver the kit binds (AHCI, NVMe) is
+/// offered the function first, then the earlier registration. A
+/// <c>default(PciMatch)</c> matches nothing, and a registration refuses it.
+/// The factories run in any context and throw nothing.
 /// </summary>
 [Experimental(Experimentals.DriverKitDiagId)]
 public readonly struct PciMatch

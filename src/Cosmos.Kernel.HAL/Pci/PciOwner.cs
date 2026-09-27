@@ -50,10 +50,18 @@ internal static class PciOwner
     /// <summary>xHCI USB host controller.</summary>
     public const string Xhci = "xhci";
 
-    /// <summary>AHCI SATA host bus adapter.</summary>
+    /// <summary>
+    /// AHCI SATA host bus adapter. Written by the driver kit, as the name the
+    /// built-in AHCI driver of Cosmos.Kernel.HAL.Drivers is registered under:
+    /// kept here so no kernel can register a driver by that name.
+    /// </summary>
     public const string Ahci = "ahci";
 
-    /// <summary>NVMe controller.</summary>
+    /// <summary>
+    /// NVMe controller. Written by the driver kit, as the name the built-in
+    /// NVMe driver of Cosmos.Kernel.HAL.Drivers is registered under: kept
+    /// here so no kernel can register a driver by that name.
+    /// </summary>
     public const string Nvme = "nvme";
 
     /// <summary>VMware SVGA II adapter, taken when the full-screen canvas first drives it.</summary>
