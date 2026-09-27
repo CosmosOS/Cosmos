@@ -20,7 +20,7 @@ public class Kernel : Sys.Kernel
     // here and the device tests skip cleanly.
     private const string SkipNoDevice = "no PCI devices enumerated, host bridge / ECAM not discovered";
 
-    /// <summary>Reason surfaced when the machine has no Intel NIC for E1000E to bind (arm64 virt's default NIC is virtio).</summary>
+    /// <summary>Reason surfaced when the machine has no Intel NIC for the built-in E1000E driver to bind (arm64 virt's default NIC is virtio).</summary>
     private const string SkipNoIntelNic = "no Intel Ethernet function on this machine";
 
     /// <summary>Number of tests announced to the runner in TR.Start.</summary>
@@ -226,9 +226,10 @@ public class Kernel : Sys.Kernel
         Assert.False(copy.TryClaim(GopOwner), "a reservation should never displace a driver");
     }
 
-    // E1000E is a PciDevice itself, a second object for its NIC's function.
-    // An owner recorded on that object would leave the function PciManager
-    // holds looking free to every other driver, so it must land on the latter.
+    // The E1000E driver is a kit built-in, so the kit records its name on
+    // the function PciManager enumerated when the driver binds in the pass.
+    // An owner recorded anywhere else would leave that function looking free
+    // to every other driver.
     private static void TestOwner_E1000EOnEnumeratedFunction()
     {
         PciDevice? nic = FindFunction(IntelVendorId, NetworkClassCode);

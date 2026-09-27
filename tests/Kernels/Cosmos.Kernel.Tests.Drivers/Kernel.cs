@@ -232,18 +232,21 @@ public class Kernel : Sys.Kernel
     private const string ExpectedEduProbeOrder = $"{ThrowingDriver.Name},{ReentrantDriver.Name},{EduDriver.Name}";
 
     /// <summary>
-    /// Order in which the pass should have probed the 82574L: the class
-    /// match with a programming interface first, then the class matches in
-    /// registration order, up to the interrupt driver, which binds it.
+    /// Order in which the pass should have probed the 82574L: the interrupt
+    /// driver alone, which names the device and so outranks every class
+    /// match, the built-in E1000E driver's included, and binds it.
     /// </summary>
-    private const string ExpectedE1000EProbeOrder = $"{NicClassWithInterfaceName},{NicClassName},{E1000EInterruptDriver.Name}";
+    private const string ExpectedE1000EProbeOrder = E1000EInterruptDriver.Name;
 
     /// <summary>
-    /// Order in which the pass should have probed the RTL8139: as the
-    /// 82574L, with the interrupt driver declining it, then the RTL8139
-    /// driver, registered last, which binds it.
+    /// Order in which the pass should have probed the RTL8139: the class
+    /// match with a programming interface first, then the class matches in
+    /// registration order, up to the RTL8139 driver, registered last, which
+    /// binds it. The interrupt driver names the 82574L, so it is never
+    /// offered this NIC, and neither is the built-in E1000E driver's own
+    /// class match, which the kit skips once one of these binds.
     /// </summary>
-    private const string ExpectedRtl8139ProbeOrder = $"{ExpectedE1000EProbeOrder},{Rtl8139Driver.Name}";
+    private const string ExpectedRtl8139ProbeOrder = $"{NicClassWithInterfaceName},{NicClassName},{Rtl8139Driver.Name}";
 
     /// <summary>Order in which the pass should have probed the NVMe controller: the device match, registered last, first.</summary>
     private const string ExpectedNvmeProbeOrder = $"{FailingNvmeDriver.Name},{NvmeDriver.Name}";
@@ -1135,12 +1138,13 @@ public class Kernel : Sys.Kernel
         Assert.True(order == expected, $"the profile's function should be probed as {expected}, was {order}");
     }
 
-    // Registered first, the class-only match is still offered the NIC after
-    // the one naming the programming interface too, and the interrupt
-    // driver's and the RTL8139 driver's equal class matches, registered
-    // later, after both, in registration order. The first two decline; the
-    // interrupt driver binds the 82574L and declines the RTL8139, which the
-    // RTL8139 driver then binds.
+    // Registered first, the class-only match is still offered the RTL8139
+    // after the one naming the programming interface too, and the RTL8139
+    // driver's equal class match, registered later, after both. The first two
+    // decline and the RTL8139 driver binds it. On the 82574L none of them is
+    // reached: the interrupt driver names that device, which beats every
+    // class match, the built-in E1000E driver's among them, and takes the NIC
+    // from it.
     private static void TestRanking_ClassWithInterfaceBeatsClass()
     {
         string expected = s_isE1000ECell ? ExpectedE1000EProbeOrder : ExpectedRtl8139ProbeOrder;
@@ -3325,11 +3329,12 @@ public class Kernel : Sys.Kernel
 
     /// <summary>
     /// Network links the built-in drivers published during the pass, one per
-    /// device the virtio-net driver bound: the cells that leave QEMU's default
-    /// NIC in place get a virtio network device on the PCI bus, which is that
-    /// driver's, and it publishes a link for it as any driver does. The NICs
-    /// HAL itself drives, the E1000E and a virtio NIC on a virtio-mmio window,
-    /// are registered before the pass and counted in the count taken then.
+    /// device the virtio-net driver bound. Every cell of this suite turns
+    /// QEMU's default NIC off or attaches a NIC of its own that a driver here
+    /// takes, so there is normally none; the count is taken all the same, so
+    /// a cell that does present one to a built-in still adds up. A virtio NIC
+    /// on a virtio-mmio window is HAL's own, registered before the pass and
+    /// counted in the count taken then.
     /// </summary>
     private static int BuiltInNetworkLinksBound()
     {

@@ -165,27 +165,31 @@ public class ProfileCatalogTests
     // driver claims, and the driver kit's binding cells will be written
     // against them. Losing one would fail nothing: the suite would just stop
     // presenting that device. Pinned here are the cells, what each attaches,
-    // and the arguments that attach it.
+    // and the arguments that attach it. A cell that is not about a NIC turns
+    // QEMU's default card off, so the built-in E1000E and virtio-net drivers
+    // have no Ethernet function to claim beside the one the cell is for.
     [Theory]
-    [InlineData("x64", "edu", " -device edu")]
+    [InlineData("x64", "edu", " -nic none -device edu")]
     [InlineData("x64", "rtl8139", " -netdev user,id=devnet0 -device rtl8139,netdev=devnet0")]
-    [InlineData("x64", "usb-hid", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0,id=usbdev0 -device usb-tablet,bus=usbxhci0.0,id=usbdev1 -device usb-kbd,bus=usbxhci0.0,id=usbdev2")]
-    [InlineData("arm64", "edu", " -device edu")]
+    [InlineData("x64", "usb-hid", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0,id=usbdev0 -device usb-tablet,bus=usbxhci0.0,id=usbdev1 -device usb-kbd,bus=usbxhci0.0,id=usbdev2 -nic none")]
+    [InlineData("arm64", "edu", " -nic none -device edu")]
     [InlineData("arm64", "rtl8139", " -netdev user,id=devnet0 -device rtl8139,netdev=devnet0")]
     [InlineData("arm64", "e1000e-arm64", " -netdev user,id=devnet0 -device e1000e,netdev=devnet0")]
-    [InlineData("arm64", "usb-hid", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0,id=usbdev0 -device usb-tablet,bus=usbxhci0.0,id=usbdev1 -device usb-kbd,bus=usbxhci0.0,id=usbdev2")]
+    [InlineData("arm64", "usb-hid", " -device qemu-xhci,id=usbxhci0 -device usb-mouse,bus=usbxhci0.0,id=usbdev0 -device usb-tablet,bus=usbxhci0.0,id=usbdev1 -device usb-kbd,bus=usbxhci0.0,id=usbdev2 -nic none")]
     public void DriversSuiteAttachesOneUnclaimedDevicePerProfile(string architecture, string profileName, string expected)
     {
         TestProfile cell = LoadCell("Drivers", profileName, architecture);
 
         Assert.Empty(cell.Disks);
-        Assert.Null(cell.NetworkCard);
         Assert.Equal(expected, ProfileLaunchArgs.For(cell, architecture));
     }
 
-    // The E1000E built-in claims the 82574L on x64, so only arm64 presents it
-    // unclaimed, and a driver there gets MSI-X only through the GICv3 ITS.
-    // The USB devices run on both GICs: xHCI takes MSI-X on GICv3 and is
+    // The built-in E1000E driver takes every Intel Ethernet controller on
+    // either architecture, and the suite's interrupt driver names the 82574L,
+    // which is the more specific match and so takes it back. The cell is
+    // arm64-only because what it shows is which way the GIC of the day
+    // delivers the interrupt: MSI-X through a GICv3 ITS, polled on GICv2.
+    // The USB devices run on both GICs too: xHCI takes MSI-X on GICv3 and is
     // polled on GICv2.
     [Fact]
     public void DriversSuiteCoversTheGicVersionsItsCellsNeed()

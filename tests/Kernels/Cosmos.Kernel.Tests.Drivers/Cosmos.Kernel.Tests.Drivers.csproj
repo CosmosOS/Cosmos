@@ -19,12 +19,15 @@
   </PropertyGroup>
 
   <!--
-    One cell per piece of hardware a user driver will bind, none of which a
-    built-in driver claims: QEMU's edu test device and an RTL8139 NIC on both
-    arches, an 82574L (e1000e) on arm64 only, since the E1000E built-in takes
-    it on x64, a USB mouse and tablet behind an xHCI controller with no USB
-    stick, next to a USB keyboard the built-in keyboard driver takes, and an
-    NVMe controller, free because this kernel builds without Storage.
+    One cell per piece of hardware a user driver will bind: QEMU's edu test
+    device and an RTL8139 NIC on both arches, neither of which a built-in
+    claims; an 82574L (e1000e) on arm64, which the built-in E1000E driver
+    matches by class and the suite's driver takes back by naming its device
+    ID; a USB mouse and tablet behind an xHCI controller with no USB stick,
+    next to a USB keyboard the built-in keyboard driver takes; and an NVMe
+    controller, free because this kernel builds without Storage. The cells
+    that are not about a NIC turn QEMU's default card off, so no Ethernet
+    function comes up beside the one the cell attaches.
     Definitions live in tests/profiles.json.
 
     The gic* modifiers are arm64-only and apply to every profile, which gives

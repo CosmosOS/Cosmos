@@ -51,7 +51,8 @@ public class Kernel : Sys.Kernel
     {
         Log.WriteString("[Network Tests] Starting test suite\n");
 
-        // x64 has E1000E network driver
+        // The cell's NIC is bound by a built-in driver of the kit, which
+        // published its link before these run.
         TR.Start("Network Tests", expectedTests: 24);
 
         // Network initialization tests

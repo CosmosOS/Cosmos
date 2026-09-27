@@ -43,8 +43,9 @@ internal static class ProfileDeviceModels
     [
         // Realtek RTL8139 (10ec:8139), which no built-in driver claims.
         "rtl8139",
-        // Intel 82574L (8086:10d3). The E1000E built-in claims it on x64
-        // only, so on arm64 it is a NIC no built-in driver takes.
+        // Intel 82574L (8086:10d3), which the built-in E1000E driver claims
+        // by class on either architecture, and a driver naming it by device
+        // ID takes back.
         "e1000e"
     ];
 

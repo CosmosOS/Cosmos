@@ -28,8 +28,9 @@ namespace Cosmos.Kernel.Tests.Interrupts;
 // default. End-to-end MSI *delivery* (a device raising an MSI through the ITS)
 // stays covered by the Storage suite's NVMe assertions. The MSI-X teardown
 // cells program a scratch table through the real binder, and only borrow a
-// live function whose MSI-X nobody has enabled (x64: the default e1000e NIC,
-// whose driver uses INTx), restoring its registers afterwards.
+// live function whose MSI-X nobody has enabled: the machine's default NIC,
+// which this suite builds without Network so no built-in driver takes it.
+// Their registers are restored afterwards.
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total tests per cell: 12 cross-arch + 6 arch-specific.</summary>
@@ -130,7 +131,7 @@ public class Kernel : Sys.Kernel
         bool routing = MsiRouting.IsAvailable;
         bool liveFunction = routing && s_idleMsiXFunction is not null;
         const string NoRouting = "no MSI routing in this cell (GICv2 has no ITS)";
-        const string NoIdleFunction = "needs MSI routing and an MSI-X function no driver has enabled (arm64: virtio-net owns the only one)";
+        const string NoIdleFunction = "needs MSI routing and an MSI-X function no driver has enabled";
 
         // ==================== Cross-arch ====================
         TR.Run("InterruptManager_Enabled", TestInterruptManagerEnabled);

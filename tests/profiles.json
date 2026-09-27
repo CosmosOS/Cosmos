@@ -44,7 +44,11 @@
       ]
     },
     {
+      // No NIC: the Drivers suite runs on this profile for a controller its
+      // own NVMe drivers can bind, and QEMU's default card would put an
+      // Ethernet function on the bus next to it that a built-in claims.
       "name": "nvme",
+      "nic": "none",
       "disks": [
         { "type": "nvme" }
       ]
@@ -62,8 +66,12 @@
     {
       // Intel E1000E NIC — the historical x64 default, kept as an explicit
       // cell so the driver keeps its coverage now that the NIC is a choice.
+      // On both arches since the driver became a built-in of the driver kit,
+      // where nothing in it is architecture specific: the arm64 run needs a
+      // GICv3 so the ITS can route its MSI-X, as virtio-net-pci's does.
       "name": "e1000e",
-      "architectures": ["x64"],
+      "architectures": ["x64", "arm64"],
+      "machineOptions": { "arm64": { "gic-version": "3" } },
       "nic": "e1000e"
     },
     {
@@ -156,12 +164,16 @@
       // built-in driver claims, left for a user driver to bind. Each adds
       // it to the machine's defaults once, so the suite can pin that exactly
       // one such function or interface came up and that nothing owns it.
+      // A cell that is not about a NIC turns QEMU's default card off, so the
+      // only Ethernet function on the bus is the one the cell attaches.
       //
       // QEMU's educational device (1234:11e8): an MMIO BAR with an ID
       // register, a factorial unit, an interrupt it raises on request and a
-      // DMA engine.
+      // DMA engine. No NIC: the cell is about the one device it names, and
+      // QEMU's default card would add an Ethernet function beside it.
       "name": "edu",
       "architectures": ["x64", "arm64"],
+      "nic": "none",
       "devices": ["edu"]
     },
     {
@@ -173,11 +185,14 @@
       "devices": ["rtl8139"]
     },
     {
-      // Intel 82574L (8086:10d3). The E1000E built-in claims it on x64, so
-      // only arm64 presents it unclaimed. No gic-version here: a suite pins
-      // the GIC with the gicv2/gicv3 modifiers, and a modifier overwrites a
-      // profile's own -M value rather than conflicting with it, so a GICv3
-      // pin here would turn silently into GICv2 under +gicv2.
+      // Intel 82574L (8086:10d3). The built-in E1000E driver matches it by
+      // class, and the suite's own driver names its device ID, which is the
+      // more specific match and takes the NIC back. arm64 only, because what
+      // the cell shows is which way the GIC of the day delivers the
+      // interrupt. No gic-version here: a suite pins the GIC with the
+      // gicv2/gicv3 modifiers, and a modifier overwrites a profile's own -M
+      // value rather than conflicting with it, so a GICv3 pin here would turn
+      // silently into GICv2 under +gicv2.
       "name": "e1000e-arm64",
       "architectures": ["arm64"],
       "devices": ["e1000e"]
@@ -192,8 +207,10 @@
       // 1) before any of them. All three share QEMU's HID IDs, 0627:0001.
       // The suite pulls each one out and plugs it back in by its index in
       // this list, so the order is part of the suite.
+      // No NIC, for the reason the edu cell gives.
       "name": "usb-hid",
       "architectures": ["x64", "arm64"],
+      "nic": "none",
       "usb": ["usb-mouse", "usb-tablet", "usb-kbd"]
     }
   ],

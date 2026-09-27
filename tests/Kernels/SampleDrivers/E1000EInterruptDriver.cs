@@ -6,21 +6,21 @@ using Cosmos.Kernel.HAL.Drivers.Pci;
 namespace SampleDrivers;
 
 /// <summary>
-/// An Ethernet class driver that binds the 82574L (8086:10d3) only, and
-/// only requests its interrupts: on the e1000e-arm64 cells it shows which
-/// way the kit delivers them, MSI-X through a GICv3 ITS or polled on
-/// GICv2, and that an MSI-X entry is programmed masked and unmasked on
-/// Bound. Registered after the other Ethernet class drivers, whose ties it
-/// loses, so they are offered each NIC first and the ranking cell still
-/// sees them in order; every other NIC it declines.
+/// A driver naming the 82574L (8086:10d3), which only requests its
+/// interrupts: on the e1000e-arm64 cells it shows which way the kit delivers
+/// them, MSI-X through a GICv3 ITS or polled on GICv2, and that an MSI-X
+/// entry is programmed masked and unmasked on Bound. It names the device
+/// rather than the Ethernet class so that it beats the built-in E1000E
+/// driver, whose class match would otherwise be offered the NIC first and
+/// take it: a strictly more specific match is what takes a device from a
+/// built-in, and this cell is where the kit proves it. No other NIC is
+/// offered to it.
 /// </summary>
 public sealed class E1000EInterruptDriver : PciDriver
 {
     /// <summary>The registration's name, and the owner the 82574L gets.</summary>
     public const string Name = "e1000e-irq";
 
-    private const byte NetworkClassCode = 0x02;
-    private const byte EthernetSubclass = 0x00;
     private const ushort IntelVendorId = 0x8086;
     private const ushort I82574LDeviceId = 0x10D3;
 
@@ -33,7 +33,7 @@ public sealed class E1000EInterruptDriver : PciDriver
     /// <summary>True once Probe ran on the 82574L.</summary>
     public static bool Probed { get; private set; }
 
-    /// <summary>The Command register as Probe found it, after the Ethernet class drivers declined.</summary>
+    /// <summary>The Command register as Probe found it, the first driver the NIC was offered to.</summary>
     public static ushort CommandAtProbe { get; private set; }
 
     /// <summary>What TryRequestInterrupts answered.</summary>
@@ -61,24 +61,18 @@ public sealed class E1000EInterruptDriver : PciDriver
     public static int HandlerCalls => Volatile.Read(ref s_handlerCalls);
 
     /// <summary>
-    /// The registration the kernel passes to DriverManager.Register: every
-    /// Ethernet controller by class and subclass, since its Probe declines
-    /// all but the 82574L.
+    /// The registration the kernel passes to DriverManager.Register: the
+    /// 82574L by vendor and device ID, the one NIC this driver takes.
     /// </summary>
     /// <returns>A registration named <see cref="Name"/>.</returns>
     public static PciDriverRegistration CreateRegistration() =>
-        new(Name, static () => new E1000EInterruptDriver(), PciMatch.Class(NetworkClassCode, EthernetSubclass));
+        new(Name, static () => new E1000EInterruptDriver(), PciMatch.Device(IntelVendorId, I82574LDeviceId));
 
     /// <inheritdoc />
     protected override ProbeResult Probe(PciDeviceContext context)
     {
         ProbeLog.Record(Name);
         PciFunction function = context.Function;
-        if (function.VendorId != IntelVendorId || function.DeviceId != I82574LDeviceId)
-        {
-            return ProbeResult.Declined;
-        }
-
         Probed = true;
         Context = context;
         CommandAtProbe = function.ReadConfig16(CommandOffset);

@@ -9,15 +9,15 @@
     <NoWarn>$(NoWarn);COSMOS0002</NoWarn>
   </PropertyGroup>
 
-  <!-- Run the whole protocol suite once per NIC driver, two cells per arch:
-       E1000E and virtio-net-pci on x64, virtio-net over MMIO and over PCI on
-       arm64. This is the data-path coverage for the virtio drivers —
-       DHCP/UDP/TCP/DNS over their rings — as opposed to the Virtio suite,
-       which only proves the devices bind.
+  <!-- Run the whole protocol suite once per NIC driver: E1000E and
+       virtio-net-pci on both arches, virtio-net over MMIO on arm64. This is
+       the data-path coverage for the built-in NIC drivers — DHCP/UDP/TCP/DNS
+       over their rings — as opposed to the Virtio suite, which only proves
+       the devices bind.
 
-       Both transports now run on both arches, so a regression in the shared
-       virtio code has to survive four independent protocol runs, and the two
-       PCI cells differ exactly in their MSI backend (LAPIC vs GICv3 ITS). -->
+       Every driver now runs on both arches, so a regression in one has to
+       survive two independent protocol runs, and the PCI cells of a driver
+       differ exactly in their MSI backend (LAPIC vs GICv3 ITS). -->
   <ItemGroup>
     <CosmosTestProfile Include="e1000e" />
     <CosmosTestProfile Include="virtio-net-pci" />
