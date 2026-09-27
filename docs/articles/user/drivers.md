@@ -35,9 +35,9 @@ Nothing else is referenced: the kit lives in `Cosmos.Kernel.HAL`, which every ke
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
-using Cosmos.Kernel.HAL.Drivers;
-using Cosmos.Kernel.HAL.Drivers.Pci;
-using Cosmos.Kernel.HAL.Drivers.Usb;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Drivers;
@@ -604,4 +604,4 @@ Global.StartKernel   interrupts on
         └─ Kernel.Start()               OnBoot, BeforeRun, Run
 ```
 
-Each binding attempt gets a context that records everything the driver acquires through it, which is what lets the kit undo a failed attempt and end a USB binding without the driver's help. The kit lives in the assembly `Cosmos.Kernel.HAL` (namespaces `Cosmos.Kernel.HAL.Drivers`, `.Pci` and `.Usb`), its registration side in `Cosmos.Kernel.System.Drivers`, and the built-in drivers written against it in the assembly `Cosmos.Kernel.HAL.Drivers`, one namespace per bus and driver below `Cosmos.Kernel.HAL.Drivers.BuiltIn` (`.BuiltIn.Pci.Ahci` and `.BuiltIn.Pci.Nvme` for the drivers that bind a PCI function, `.BuiltIn.Usb.Xhci` and `.BuiltIn.Usb.MassStorage` for the USB stack's host controller and class driver).
+Each binding attempt gets a context that records everything the driver acquires through it, which is what lets the kit undo a failed attempt and end a USB binding without the driver's help. The kit lives in the assembly `Cosmos.Kernel.HAL` (namespaces `Cosmos.Kernel.HAL.DriverKit`, `.Pci` and `.Usb`), its registration side in `Cosmos.Kernel.System.Drivers`, and the built-in drivers written against it in the assembly `Cosmos.Kernel.HAL.Drivers`, one namespace per bus and driver below `Cosmos.Kernel.HAL.Drivers.BuiltIn` (`.BuiltIn.Pci.Ahci` and `.BuiltIn.Pci.Nvme` for the drivers that bind a PCI function, `.BuiltIn.Usb.Xhci` and `.BuiltIn.Usb.MassStorage` for the USB stack's host controller and class driver).
