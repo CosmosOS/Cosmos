@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.HAL.DriverKit;
+
 namespace Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Ahci.Ata;
 
 /// <summary>

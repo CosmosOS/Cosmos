@@ -5,7 +5,7 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Drivers.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Keyboard;

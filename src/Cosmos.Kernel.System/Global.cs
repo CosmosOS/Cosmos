@@ -2,11 +2,11 @@
 
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Devices.Usb;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn;
-using Cosmos.Kernel.HAL.Drivers.Engine;
-using Cosmos.Kernel.HAL.Drivers.Pci;
-using Cosmos.Kernel.HAL.Drivers.Usb;
+using Cosmos.Kernel.HAL.Usb;
 using Cosmos.Kernel.System.Graphics;
 
 namespace Cosmos.Kernel.System;

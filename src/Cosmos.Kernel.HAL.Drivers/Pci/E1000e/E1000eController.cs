@@ -1,8 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.E1000e.Registers;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.E1000e.Rings;
-using Cosmos.Kernel.HAL.Drivers.Pci;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.E1000e;

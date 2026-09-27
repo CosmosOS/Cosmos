@@ -1,0 +1,48 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
+namespace Cosmos.Kernel.HAL.DriverKit;
+
+/// <summary>
+/// Diagnostic IDs of the experimental API seams exposed by
+/// Cosmos.Kernel.HAL. An experimental API is usable today but carries no
+/// compatibility promise; referencing one produces an error with the ID
+/// below until the caller suppresses it, which is the caller's
+/// acknowledgement of that contract.
+/// </summary>
+internal static class Experimentals
+{
+    /// <summary>
+    /// The driver kit seam, which lets a kernel register its own PCI and USB
+    /// class drivers. In Cosmos.Kernel.HAL.DriverKit: <see cref="ProbeResult"/>,
+    /// <see cref="DeviceContext"/>, <see cref="MmioRegion"/>,
+    /// <see cref="PortRegion"/>, <see cref="DmaBuffer"/>,
+    /// <see cref="DeviceInterruptHandler"/>, <see cref="DeviceWorkItem"/>,
+    /// <see cref="DeviceEvent"/>, <see cref="IrqSafeLock"/>,
+    /// <see cref="KeyboardReporter"/>, <see cref="KeyboardLeds"/>,
+    /// <see cref="KeyboardLedHandler"/>,
+    /// <see cref="MouseReporter"/>, <see cref="MouseButtons"/>,
+    /// <see cref="NetworkLink"/> and <see cref="NetworkTransmitHandler"/>. In
+    /// Cosmos.Kernel.HAL.DriverKit.Pci: <see cref="Pci.PciDriver"/>,
+    /// <see cref="Pci.PciDriverRegistration"/>, <see cref="Pci.PciMatch"/>,
+    /// <see cref="Pci.PciDeviceContext"/> and <see cref="Pci.PciFunction"/>.
+    /// In Cosmos.Kernel.HAL.DriverKit.Usb, the class driver side:
+    /// <see cref="Usb.UsbDriver"/>,
+    /// <see cref="Usb.UsbDriverRegistration"/>, <see cref="Usb.UsbMatch"/>,
+    /// <see cref="Usb.UsbDeviceContext"/>, <see cref="Usb.UsbDeviceInfo"/>,
+    /// <see cref="Usb.UsbInterfaceInfo"/>, <see cref="Usb.UsbEndpointInfo"/>,
+    /// <see cref="Usb.UsbBulkPipe"/>, <see cref="Usb.UsbTransferResult"/> and
+    /// <see cref="Usb.UsbReportHandler"/>; the host controller side, which a
+    /// PCI driver implements and publishes through
+    /// <see cref="Pci.PciDeviceContext.PublishUsbHostController"/>:
+    /// <see cref="Usb.UsbHostController"/>, <see cref="Usb.UsbHostDevice"/>,
+    /// <see cref="Usb.UsbBus"/> and <see cref="Usb.UsbSetupPacket"/>; and the
+    /// <see cref="Usb.UsbEndpointType"/>, <see cref="Usb.UsbTransferStatus"/>,
+    /// <see cref="Usb.UsbDirection"/>, <see cref="Usb.UsbRequestKind"/>,
+    /// <see cref="Usb.UsbRecipient"/> and <see cref="Usb.UsbSpeed"/> enums.
+    /// Cosmos.Kernel.System adds the
+    /// registration side under the same ID: its DriverManager and DeviceInfo,
+    /// and the Kernel.RegisterDrivers hook. The engine behind the seam,
+    /// Cosmos.Kernel.HAL.DriverKit.Engine, stays internal.
+    /// </summary>
+    internal const string DriverKitDiagId = "COSMOS0003";
+}

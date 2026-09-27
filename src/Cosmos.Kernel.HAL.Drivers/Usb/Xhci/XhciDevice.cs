@@ -1,9 +1,10 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Runtime.InteropServices;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci.Pipes;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci.Rings;
-using Cosmos.Kernel.HAL.Drivers.Usb;
 
 namespace Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci;
 

@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.HAL.Drivers.Pci;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 
 namespace Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci;
 

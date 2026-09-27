@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.HAL.Drivers.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.System.Drivers;
 
@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.System.Drivers;
 /// can be read in any context. Only the kit creates one; a <c>default</c>
 /// value has an empty <see cref="Path"/> and describes no device.
 /// </summary>
-[Experimental(Cosmos.Kernel.HAL.Drivers.Experimentals.DriverKitDiagId)]
+[Experimental(Cosmos.Kernel.HAL.DriverKit.Experimentals.DriverKitDiagId)]
 public readonly struct DeviceInfo
 {
     /// <summary>Null only in a <c>default</c> value, which <see cref="Path"/> reads as empty.</summary>

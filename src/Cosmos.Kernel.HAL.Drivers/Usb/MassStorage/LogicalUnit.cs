@@ -1,9 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Buffers.Binary;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.MassStorage.BulkOnly;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.MassStorage.Scsi;
-using Cosmos.Kernel.HAL.Drivers.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.MassStorage;

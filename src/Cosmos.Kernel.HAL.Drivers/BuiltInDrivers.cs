@@ -1,6 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Ahci;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.E1000e;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme;
@@ -9,8 +11,6 @@ using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Net;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.BootKeyboard;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.MassStorage;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci;
-using Cosmos.Kernel.HAL.Drivers.Pci;
-using Cosmos.Kernel.HAL.Drivers.Usb;
 
 namespace Cosmos.Kernel.HAL.Drivers.BuiltIn;
 

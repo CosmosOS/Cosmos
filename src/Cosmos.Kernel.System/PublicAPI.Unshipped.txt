@@ -1071,6 +1071,6 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0003]Cosmos.Kernel.System.Drivers.DeviceInfo.VendorId.get -> ushort
 [COSMOS0003]Cosmos.Kernel.System.Drivers.DriverManager
 [COSMOS0003]static Cosmos.Kernel.System.Drivers.DriverManager.Devices.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.Drivers.DeviceInfo>!
-[COSMOS0003]static Cosmos.Kernel.System.Drivers.DriverManager.Register(Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration! registration) -> bool
-[COSMOS0003]static Cosmos.Kernel.System.Drivers.DriverManager.Register(Cosmos.Kernel.HAL.Drivers.Usb.UsbDriverRegistration! registration) -> bool
+[COSMOS0003]static Cosmos.Kernel.System.Drivers.DriverManager.Register(Cosmos.Kernel.HAL.DriverKit.Pci.PciDriverRegistration! registration) -> bool
+[COSMOS0003]static Cosmos.Kernel.System.Drivers.DriverManager.Register(Cosmos.Kernel.HAL.DriverKit.Usb.UsbDriverRegistration! registration) -> bool
 [COSMOS0003]virtual Cosmos.Kernel.System.Kernel.RegisterDrivers() -> void

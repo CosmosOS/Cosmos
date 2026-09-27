@@ -3,9 +3,9 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
-using Cosmos.Kernel.HAL.Drivers.Engine;
-using Cosmos.Kernel.HAL.Drivers.Pci;
-using Cosmos.Kernel.HAL.Drivers.Usb;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 
 namespace Cosmos.Kernel.System.Drivers;
 
@@ -32,7 +32,7 @@ namespace Cosmos.Kernel.System.Drivers;
 /// <see cref="KernelFeatures"/> switches its driver needs, one switch per
 /// <c>if</c>, so a kernel built without them trims the driver.
 /// </remarks>
-[Experimental(Cosmos.Kernel.HAL.Drivers.Experimentals.DriverKitDiagId)]
+[Experimental(Cosmos.Kernel.HAL.DriverKit.Experimentals.DriverKitDiagId)]
 public static class DriverManager
 {
     /// <summary>

@@ -112,7 +112,7 @@ public abstract partial class Kernel
     /// }
     /// </code>
     /// </example>
-    [Experimental(Cosmos.Kernel.HAL.Drivers.Experimentals.DriverKitDiagId)]
+    [Experimental(Cosmos.Kernel.HAL.DriverKit.Experimentals.DriverKitDiagId)]
     protected virtual void RegisterDrivers()
     {
     }

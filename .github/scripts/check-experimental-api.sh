@@ -2,14 +2,15 @@
 # Checks that the driver kit seam is declared experimental in every
 # src/**/PublicAPI.*.txt, and that nothing else is.
 #
-# The seam is everything in the Cosmos.Kernel.HAL.Drivers namespaces (the
-# kit's own, .Pci and .Usb in Cosmos.Kernel.HAL, and .BuiltIn, the built-in
-# drivers' registrations in the Cosmos.Kernel.HAL.Drivers assembly) and
-# Cosmos.Kernel.System.Drivers, plus the Kernel.RegisterDrivers hook. The
-# PublicAPI analyzer prefixes a symbol's line with [COSMOS0003] only when the
-# symbol carries [Experimental("COSMOS0003")], so a public seam type that lost
-# its attribute would otherwise be recorded, and later shipped, as stable API
-# without anyone noticing. Two rules:
+# The seam is everything in the Cosmos.Kernel.HAL.DriverKit namespaces (the
+# kit's own, .Pci and .Usb in Cosmos.Kernel.HAL), everything in
+# Cosmos.Kernel.HAL.Drivers.BuiltIn (the built-in drivers' registrations, in
+# the Cosmos.Kernel.HAL.Drivers assembly) and Cosmos.Kernel.System.Drivers,
+# plus the Kernel.RegisterDrivers hook. The PublicAPI analyzer prefixes a
+# symbol's line with [COSMOS0003] only when the symbol carries
+# [Experimental("COSMOS0003")], so a public seam type that lost its attribute
+# would otherwise be recorded, and later shipped, as stable API without anyone
+# noticing. Two rules:
 #   1. A line that names the seam anywhere (as the declared symbol, or in a
 #      signature) carries the [COSMOS0003] prefix: a stable member cannot
 #      expose a seam type either.
@@ -28,12 +29,12 @@ root="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 diag_id='COSMOS0003'
 
 # Rule 1: anywhere in the line. The character class after each name keeps
-# a namespace such as Cosmos.Kernel.HAL.DriversExtra out of the seam.
-names_seam='Cosmos\.Kernel\.(HAL|System)\.Drivers([^A-Za-z0-9_]|$)|Cosmos\.Kernel\.System\.Kernel\.RegisterDrivers([^A-Za-z0-9_]|$)'
+# a namespace such as Cosmos.Kernel.HAL.DriverKitExtra out of the seam.
+names_seam='Cosmos\.Kernel\.HAL\.(DriverKit|Drivers)([^A-Za-z0-9_]|$)|Cosmos\.Kernel\.System\.Drivers([^A-Za-z0-9_]|$)|Cosmos\.Kernel\.System\.Kernel\.RegisterDrivers([^A-Za-z0-9_]|$)'
 
 # Rule 2: the declared symbol, which is the first token once the removal
 # marker, the ID and the modifiers are stripped.
-declares_seam='^(Cosmos\.Kernel\.(HAL|System)\.Drivers\.|Cosmos\.Kernel\.System\.Kernel\.RegisterDrivers\()'
+declares_seam='^(Cosmos\.Kernel\.HAL\.(DriverKit|Drivers)\.|Cosmos\.Kernel\.System\.Drivers\.|Cosmos\.Kernel\.System\.Kernel\.RegisterDrivers\()'
 
 mapfile -t files < <(find "$root/src" -name 'PublicAPI.*.txt' -not -path '*/obj/*' -not -path '*/bin/*' | sort)
 if [[ ${#files[@]} -eq 0 ]]; then

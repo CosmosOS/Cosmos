@@ -2,8 +2,8 @@
 
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Drivers.Engine;
-using Cosmos.Kernel.HAL.Drivers.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;

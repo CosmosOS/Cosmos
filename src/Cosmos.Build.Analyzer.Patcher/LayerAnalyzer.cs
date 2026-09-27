@@ -22,7 +22,7 @@ namespace Cosmos.Build.Analyzer.Patcher
     /// </list>
     /// User may skip System to reach the HAL because the driver kit, the seam a kernel
     /// writes its own PCI and USB drivers against, lives there
-    /// (<c>Cosmos.Kernel.HAL.Drivers</c>, experimental COSMOS0003), next to the device
+    /// (<c>Cosmos.Kernel.HAL.DriverKit</c>, experimental COSMOS0003), next to the device
     /// contracts the System API already hands out (<c>IBlockDevice</c>,
     /// <c>MACAddress</c> in <c>Cosmos.Kernel.HAL.Interfaces</c>).
     /// </para>

@@ -3,9 +3,10 @@
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme.Commands;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme.Registers;
-using Cosmos.Kernel.HAL.Drivers.Pci;
 
 namespace Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme;
 

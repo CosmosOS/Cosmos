@@ -2,8 +2,8 @@
 
 using System;
 using System.Buffers.Binary;
-using Cosmos.Kernel.HAL.Drivers;
-using Cosmos.Kernel.HAL.Drivers.Pci;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace DevKernel.Drivers;

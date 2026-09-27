@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Buffers.Binary;
+using Cosmos.Kernel.HAL.DriverKit;
 
 namespace Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci.Rings;
 
