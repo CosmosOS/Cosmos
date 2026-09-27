@@ -386,6 +386,17 @@ internal sealed class VirtioPciTransport
     internal byte ReadDeviceConfig8(ulong offset) =>
         _deviceConfig is { } window ? window.Read8(_deviceConfigOffset + offset) : (byte)0;
 
+    /// <summary>
+    /// Writes a byte of the device-specific configuration, and does nothing
+    /// on a device that exposes none. A few device types take a request in
+    /// that window and answer in it, virtio-input's select and subselect
+    /// among them (virtio 1.2 §5.8.4).
+    /// </summary>
+    /// <param name="offset">The offset in that window.</param>
+    /// <param name="value">The byte to write.</param>
+    internal void WriteDeviceConfig8(ulong offset, byte value) =>
+        _deviceConfig?.Write8(_deviceConfigOffset + offset, value);
+
     /// <summary>Reads a 16-bit field of the device-specific configuration, zero on a device that exposes none.</summary>
     /// <param name="offset">The offset in that window, a multiple of 2.</param>
     /// <returns>The field.</returns>

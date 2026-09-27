@@ -122,6 +122,8 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.IsPresent.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.Path.get -> string!
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.PublishBlockDevice(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.PublishKeyboard() -> Cosmos.Kernel.HAL.Drivers.KeyboardReporter!
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.PublishKeyboard(Cosmos.Kernel.HAL.Drivers.KeyboardLedHandler! updateLeds) -> Cosmos.Kernel.HAL.Drivers.KeyboardReporter!
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.PublishMouse() -> Cosmos.Kernel.HAL.Drivers.MouseReporter!
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.PublishNetworkLink(Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress! address, Cosmos.Kernel.HAL.Drivers.NetworkTransmitHandler! transmit) -> Cosmos.Kernel.HAL.Drivers.NetworkLink!
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.DeviceContext.TryCreateWorkItem(System.Action! callback, out Cosmos.Kernel.HAL.Drivers.DeviceWorkItem? workItem) -> bool
@@ -153,6 +155,14 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.MmioRegion.Write32(ulong offset, uint value) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.MmioRegion.Write64(ulong offset, ulong value) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.MmioRegion.Write8(ulong offset, byte value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.KeyboardLedHandler
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.KeyboardLeds
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.KeyboardLeds.CapsLock = 2 -> Cosmos.Kernel.HAL.Drivers.KeyboardLeds
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.KeyboardLeds.None = 0 -> Cosmos.Kernel.HAL.Drivers.KeyboardLeds
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.KeyboardLeds.NumLock = 1 -> Cosmos.Kernel.HAL.Drivers.KeyboardLeds
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.KeyboardLeds.ScrollLock = 4 -> Cosmos.Kernel.HAL.Drivers.KeyboardLeds
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.KeyboardReporter
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.KeyboardReporter.Report(byte scanCode, bool released) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.MouseButtons
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.MouseButtons.Left = 1 -> Cosmos.Kernel.HAL.Drivers.MouseButtons
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.MouseButtons.Middle = 4 -> Cosmos.Kernel.HAL.Drivers.MouseButtons
@@ -319,6 +329,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.OpenInterruptPipe(Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo endpoint, Cosmos.Kernel.HAL.Drivers.Usb.UsbReportHandler! handler) -> bool
 [COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.ResetEndpoint(Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo endpoint) -> bool
 [COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.SubmitControlTransfer(Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket setup, System.ReadOnlySpan<byte> data) -> bool
+[COSMOS0003]const Cosmos.Kernel.HAL.Drivers.KeyboardReporter.RightAltScanCode = 96 -> byte
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.DmaBuffer.ReadBarrier() -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.DmaBuffer.WriteBarrier() -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.Pci.PciMatch.Class(byte baseClass, byte subclass) -> Cosmos.Kernel.HAL.Drivers.Pci.PciMatch
@@ -329,6 +340,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.Usb.UsbMatch.Interface(byte interfaceClass, byte subclass) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbMatch
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.Usb.UsbMatch.Interface(byte interfaceClass, byte subclass, byte protocol) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbMatch
 [COSMOS0003]virtual Cosmos.Kernel.HAL.Drivers.DeviceInterruptHandler.Invoke(int vector) -> void
+[COSMOS0003]virtual Cosmos.Kernel.HAL.Drivers.KeyboardLedHandler.Invoke(Cosmos.Kernel.HAL.Drivers.KeyboardLeds leds) -> void
 [COSMOS0003]virtual Cosmos.Kernel.HAL.Drivers.NetworkTransmitHandler.Invoke(System.ReadOnlySpan<byte> frame) -> bool
 [COSMOS0003]virtual Cosmos.Kernel.HAL.Drivers.Usb.UsbDriver.Remove(Cosmos.Kernel.HAL.Drivers.Usb.UsbDeviceContext! context) -> void
 [COSMOS0003]virtual Cosmos.Kernel.HAL.Drivers.Usb.UsbReportHandler.Invoke(System.ReadOnlySpan<byte> report) -> void

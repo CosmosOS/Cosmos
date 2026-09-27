@@ -45,6 +45,7 @@ public abstract class DeviceContext
 
     private const long MillisecondsPerSecond = 1000;
 
+    private const string KeyboardDisabledMessage = "Keyboard support is disabled. Set CosmosEnableKeyboard=true in the kernel's csproj to publish a keyboard.";
     private const string MouseDisabledMessage = "Mouse support is disabled. Set CosmosEnableMouse=true in the kernel's csproj to publish a mouse.";
     private const string NetworkDisabledMessage = "Network support is disabled. Set CosmosEnableNetwork=true in the kernel's csproj to publish a network link.";
     private const string StorageDisabledMessage = "Storage support is disabled. Set CosmosEnableStorage=true in the kernel's csproj to publish a disk.";
@@ -57,6 +58,7 @@ public abstract class DeviceContext
     // What Probe published, held until Bound delivers it to the managers or
     // teardown drops it; once delivered, kept until a USB unplug withdraws
     // it from the managers. Null until the first one.
+    private List<PublishedKeyboard>? _keyboards;
     private List<PublishedMouse>? _mice;
     private List<PublishedNetworkDevice>? _networkLinks;
 
@@ -194,6 +196,64 @@ public abstract class DeviceContext
         workItem = new DeviceWorkItem(this, callback);
         (_workItems ??= []).Add(workItem);
         return true;
+    }
+
+    /// <summary>
+    /// Publishes a keyboard the driver reports through, which types into the
+    /// kernel's key queue like a built-in keyboard. The kit hands it to the
+    /// keyboard manager right after Probe returns Bound, before the
+    /// interrupts are armed; if the attempt is declined or fails, it is
+    /// dropped and its reports go nowhere, and once a USB device leaves its
+    /// bus, the kit takes it back out of the keyboard manager. Probe only.
+    /// </summary>
+    /// <returns>The reporter the driver calls, typically from its interrupt handler.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Called outside the driver's Probe, or the kernel is built without
+    /// keyboard support.
+    /// </exception>
+    public KeyboardReporter PublishKeyboard() => PublishKeyboardCore(null);
+
+    /// <summary>
+    /// Publishes a keyboard whose lock lamps the driver can set, as
+    /// <see cref="PublishKeyboard()"/> does otherwise. The kit tracks the
+    /// lamps from the lock keys the driver reports and hands them to
+    /// <paramref name="updateLeds"/> whenever the kernel's keyboard manager
+    /// toggles one. Probe only.
+    /// </summary>
+    /// <param name="updateLeds">Called with the lamps to show, in the context the driver reported the lock key from.</param>
+    /// <returns>The reporter the driver calls, typically from its interrupt handler.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="updateLeds"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Called outside the driver's Probe, or the kernel is built without
+    /// keyboard support.
+    /// </exception>
+    public KeyboardReporter PublishKeyboard(KeyboardLedHandler updateLeds)
+    {
+        ArgumentNullException.ThrowIfNull(updateLeds);
+        return PublishKeyboardCore(updateLeds);
+    }
+
+    /// <summary>The body both <see cref="PublishKeyboard()"/> overloads share.</summary>
+    /// <param name="updateLeds">The lamp path, or null for a keyboard that shows none.</param>
+    private KeyboardReporter PublishKeyboardCore(KeyboardLedHandler? updateLeds)
+    {
+        ThrowIfNotProbing(nameof(PublishKeyboard));
+
+        // The switch alone first, as in PublishMouse.
+        if (!CosmosFeatures.KeyboardEnabled)
+        {
+            throw new InvalidOperationException(KeyboardDisabledMessage);
+        }
+
+        // Installed by System's initializer whenever the switch is on.
+        if (DriverCore.KeyboardSink is null)
+        {
+            throw new InvalidOperationException(KeyboardDisabledMessage);
+        }
+
+        PublishedKeyboard keyboard = new(updateLeds);
+        (_keyboards ??= []).Add(keyboard);
+        return new KeyboardReporter(keyboard);
     }
 
     /// <summary>
@@ -406,7 +466,8 @@ public abstract class DeviceContext
 
     /// <summary>
     /// Hands what Probe published to the managers, on the thread that ran
-    /// the probe: the mice, then the network links, then the disks, whose
+    /// the probe: the keyboards, then the mice, then the network links, then
+    /// the disks, whose
     /// partition tables the storage manager reads here, before the driver's
     /// interrupts are armed. A manager that throws is logged with the
     /// driver's name and the device's path; the binding stands, only that
@@ -414,6 +475,22 @@ public abstract class DeviceContext
     /// </summary>
     private void DeliverPublications()
     {
+        if (_keyboards is { } keyboards)
+        {
+            for (int i = 0; i < keyboards.Count; i++)
+            {
+                try
+                {
+                    DriverCore.KeyboardSink?.Invoke(keyboards[i]);
+                    WriteLog("published a keyboard");
+                }
+                catch (Exception exception)
+                {
+                    WriteLog($"the keyboard manager refused its keyboard: {exception.Message}");
+                }
+            }
+        }
+
         if (_mice is { } mice)
         {
             for (int i = 0; i < mice.Count; i++)
@@ -512,8 +589,9 @@ public abstract class DeviceContext
     /// </summary>
     private protected void DropQueuedAndCancelEvents()
     {
-        // A dropped mouse was never enabled, so its reports already go
-        // nowhere; forgetting it is all there is to do.
+        // A dropped keyboard or mouse was never enabled, so its reports
+        // already go nowhere; forgetting them is all there is to do.
+        _keyboards = null;
         _mice = null;
 
         if (_networkLinks is { } links)
@@ -553,6 +631,26 @@ public abstract class DeviceContext
     /// </summary>
     private protected void WithdrawPublications()
     {
+        if (_keyboards is { } keyboards)
+        {
+            for (int i = 0; i < keyboards.Count; i++)
+            {
+                PublishedKeyboard keyboard = keyboards[i];
+                keyboard.Withdraw();
+                try
+                {
+                    DriverCore.KeyboardWithdrawSink?.Invoke(keyboard);
+                    WriteLog("withdrew its keyboard");
+                }
+                catch (Exception exception)
+                {
+                    WriteLog($"the keyboard manager failed to withdraw its keyboard: {exception.Message}");
+                }
+            }
+
+            _keyboards = null;
+        }
+
         if (_mice is { } mice)
         {
             for (int i = 0; i < mice.Count; i++)

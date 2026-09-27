@@ -1,9 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
-using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Drivers.Usb;
 
@@ -20,10 +18,10 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// driver kit and published from a PCI driver's Probe, such as the built-in
 /// xHCI driver of Cosmos.Kernel.HAL.Drivers), the shared enumeration here
 /// plus the <see cref="UsbDevice"/> model, and class drivers
-/// (<see cref="UsbClassDriver"/>: <see cref="UsbHubDriver"/>,
-/// <see cref="UsbKeyboardDriver"/>, and last <see cref="KitUsbDriver"/>,
-/// which stands for the drivers the kit binds, the built-in mass storage
-/// driver of Cosmos.Kernel.HAL.Drivers and the kernel's own).</para>
+/// (<see cref="UsbClassDriver"/>: <see cref="UsbHubDriver"/>, and last
+/// <see cref="KitUsbDriver"/>, which stands for the drivers the kit binds,
+/// the built-in mass storage and boot keyboard drivers of
+/// Cosmos.Kernel.HAL.Drivers among them, and the kernel's own).</para>
 ///
 /// <para>A controller arrives during the driver pass, when the kit delivers
 /// what its driver published: <see cref="AddController"/> gives it a bus
@@ -75,28 +73,23 @@ internal static class UsbManager
 
     /// <summary>
     /// Takes a host controller a PCI driver published: gives it the next bus
-    /// number and enumerates the devices on its root ports, binding the
-    /// hub and keyboard drivers as it goes; the kit's own USB drivers are
-    /// offered what those left once the pass reaches its USB step. Called by
-    /// the kit when it delivers the publication, on the boot thread during
-    /// the driver pass, before the controller's driver has its interrupts
-    /// armed. The first controller also brings up the class drivers.
+    /// number and enumerates the devices on its root ports, binding the hub
+    /// driver as it goes; the kit's own USB drivers are offered what it left
+    /// once the pass reaches its USB step. Called by the kit when it delivers
+    /// the publication, on the boot thread during the driver pass, before the
+    /// controller's driver has its interrupts armed. The first controller
+    /// also brings up the class drivers.
     /// </summary>
     /// <param name="controller">The published controller.</param>
     internal static void AddController(UsbHostController controller)
     {
         if (s_buses is null || s_controllers is null || s_drivers is null)
         {
-            s_drivers = [new UsbHubDriver()];
-            if (CosmosFeatures.KeyboardEnabled)
-            {
-                s_drivers.Add(new UsbKeyboardDriver());
-            }
-
-            // Last: the drivers the kit binds, mass storage among them, are
-            // offered only what HAL's own class drivers left, on hot-plug as
-            // at boot.
-            s_drivers.Add(KitUsbDriver.Instance);
+            // HAL's hub driver first, then the drivers the kit binds, the
+            // built-in mass storage and boot keyboard drivers among them,
+            // which are offered only what the hub driver left, on hot-plug
+            // as at boot.
+            s_drivers = [new UsbHubDriver(), KitUsbDriver.Instance];
 
             s_devices = [];
             s_portChange = new InterruptEvent();

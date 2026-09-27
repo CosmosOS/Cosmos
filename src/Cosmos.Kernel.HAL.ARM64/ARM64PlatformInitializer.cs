@@ -164,8 +164,10 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        // USB keyboards come later, from the driver pass, through
-        // UsbKeyboardDriver.KeyboardAttached.
+        // The virtio keyboards on the virt machine's virtio-mmio window, the
+        // ones the MMIO scan brought up. One on the PCI bus is the built-in
+        // virtio-input kit driver's, and a USB one the built-in boot keyboard
+        // driver's; both publish their keyboards in the driver pass instead.
         return VirtioDevice.GetKeyboards();
     }
 
@@ -176,6 +178,7 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
+        // The virtio mice on the MMIO window, as in GetKeyboardDevices.
         return VirtioDevice.GetMice();
     }
 

@@ -684,6 +684,7 @@ static Cosmos.Kernel.System.KernelFeatures.Usb.get -> bool
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.AltPressed.get -> bool
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.CapsLock.get -> bool
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.ControlPressed.get -> bool
+static Cosmos.Kernel.System.Keyboard.KeyboardManager.DeviceCount.get -> int
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.GetKeyLayout() -> Cosmos.Kernel.System.Keyboard.ScanMapBase?
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.IsEnabled.get -> bool
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.KeyAvailable.get -> bool
@@ -694,6 +695,7 @@ static Cosmos.Kernel.System.Keyboard.KeyboardManager.ScrollLock.get -> bool
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.SetKeyLayout(Cosmos.Kernel.System.Keyboard.ScanMapBase! scanMap) -> void
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.ShiftPressed.get -> bool
 static Cosmos.Kernel.System.Keyboard.KeyboardManager.TryReadKey(out Cosmos.Kernel.System.Keyboard.KeyEvent? key) -> bool
+static Cosmos.Kernel.System.Mouse.MouseManager.DeviceCount.get -> int
 static Cosmos.Kernel.System.Mouse.MouseManager.IsEnabled.get -> bool
 static Cosmos.Kernel.System.Mouse.MouseManager.LeftButton.get -> bool
 static Cosmos.Kernel.System.Mouse.MouseManager.MiddleButton.get -> bool

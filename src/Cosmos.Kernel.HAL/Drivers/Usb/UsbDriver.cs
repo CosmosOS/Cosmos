@@ -10,10 +10,10 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// registration's factory, and calls <see cref="Probe"/> on it once. A
 /// bound instance lives until its device leaves the bus, when the kit
 /// calls <see cref="Remove"/>. The kit offers a driver only the interfaces
-/// HAL's own class drivers (hub, keyboard) did not take, ranked against the
-/// other registrations, the built-in mass storage driver's among them;
-/// neither the host controller nor HAL's class drivers know the driver
-/// exists. A driver overrides <see cref="Probe"/>, and <see cref="Remove"/>
+/// HAL's own hub driver did not take, ranked against the other
+/// registrations, the built-in mass storage and boot keyboard drivers'
+/// among them; neither the host controller nor HAL's hub driver knows the
+/// driver exists. A driver overrides <see cref="Probe"/>, and <see cref="Remove"/>
 /// if it needs to, as <c>protected override</c>; an assembly that
 /// Cosmos.Kernel.HAL grants its internals to overrides them as
 /// <c>protected internal override</c>.

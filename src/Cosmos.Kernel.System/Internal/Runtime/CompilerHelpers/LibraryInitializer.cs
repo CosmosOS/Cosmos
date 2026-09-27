@@ -5,7 +5,6 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
@@ -51,14 +50,22 @@ internal class LibraryInitializer
                         KeyboardManager.RegisterKeyboard(keyboard);
                     }
 
-                    // USB keyboards, which the driver pass brings in, then the
-                    // hot-plug thread as they come and go. Nested under USB's
-                    // own switch so a kernel without USB never references the
-                    // USB keyboard driver and ILC trims it.
-                    if (CosmosFeatures.UsbEnabled)
+                    // Keyboards the kernel's registered drivers publish, the
+                    // built-in virtio-input and USB boot keyboard drivers'
+                    // among them, delivered by the driver pass after the
+                    // platform's, or by the USB hot-plug thread. Nested under
+                    // PCI's own switch, as the mouse sink is.
+                    if (CosmosFeatures.PCIEnabled)
                     {
-                        UsbKeyboardDriver.KeyboardAttached = KeyboardManager.RegisterKeyboard;
-                        UsbKeyboardDriver.KeyboardDetached = KeyboardManager.UnregisterKeyboard;
+                        DriverCore.KeyboardSink = KeyboardManager.RegisterKeyboard;
+
+                        // A USB driver's keyboard leaves with its device.
+                        // Nested under USB's own switch, so a kernel without
+                        // USB trims the unregistration.
+                        if (CosmosFeatures.UsbEnabled)
+                        {
+                            DriverCore.KeyboardWithdrawSink = KeyboardManager.UnregisterKeyboard;
+                        }
                     }
                 }
 

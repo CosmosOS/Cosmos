@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// <summary>
 /// A USB class driver of the USB core. <see cref="UsbManager"/> offers every
 /// interface of a newly configured device to each of its drivers in turn:
-/// HAL's hub and keyboard drivers, then <see cref="Drivers.Engine.KitUsbDriver"/>,
+/// HAL's hub driver, then <see cref="Drivers.Engine.KitUsbDriver"/>,
 /// which stands for every driver the kit binds. The first one whose
 /// <see cref="TryBind"/> returns true owns the interface until
 /// <see cref="Disconnect"/> takes it back. Support for a new kind of device

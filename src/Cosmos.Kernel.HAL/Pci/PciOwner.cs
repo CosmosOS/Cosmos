@@ -15,10 +15,11 @@ namespace Cosmos.Kernel.HAL.Pci;
 /// the opt-out addresses <c>virtio-net</c> alone, and a driver that replaces
 /// it must still find the input and GPU functions owned by their built-ins.
 /// An input function is <c>virtio-input</c> whether a keyboard or a mouse
-/// driver ends up on it, because HAL's virtio scan claims the function before
-/// it probes which of the two it is. That scan no longer claims a network
-/// function at all: <c>virtio-net</c> is a kit driver's name now, and the
-/// kit records it when the driver binds in the pass.
+/// ends up published from it, because one driver serves both and the kit
+/// records its registration's name. HAL's own virtio scan claims neither the
+/// network nor the input functions any more: <c>virtio-net</c> and
+/// <c>virtio-input</c> are kit drivers' names now, and the kit records them
+/// when those drivers bind in the pass. The GPU is still HAL's.
 /// </para>
 /// <para>
 /// USB class drivers (<c>HID boot keyboard</c>, <c>mass storage</c>) own USB
@@ -54,7 +55,14 @@ internal static class PciOwner
     /// </summary>
     public const string VirtioNet = "virtio-net";
 
-    /// <summary>virtio input device over PCI, keyboard or mouse.</summary>
+    /// <summary>
+    /// virtio input device over PCI, keyboard or mouse. Written by the driver
+    /// kit, as the name the built-in virtio-input driver of
+    /// Cosmos.Kernel.HAL.Drivers is registered under: kept here so no kernel
+    /// can register a driver by that name. HAL's own virtio keyboard and
+    /// mouse drivers, which drive the devices on a virtio-mmio window, own no
+    /// PCI function and record nothing.
+    /// </summary>
     public const string VirtioInput = "virtio-input";
 
     /// <summary>virtio GPU over PCI.</summary>

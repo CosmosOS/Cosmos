@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.HAL.Drivers.Engine;
 /// <summary>
 /// The USB drivers the kit binds, the built-in mass storage driver and the
 /// kernel's own, as the USB stack sees them: one class driver, last in
-/// <see cref="UsbManager"/>'s list, behind HAL's hub and keyboard drivers,
+/// <see cref="UsbManager"/>'s list, behind HAL's hub driver,
 /// so those keep the first pick of every interface, at boot and when a
 /// device is plugged in later. The
 /// interfaces present at boot are left to the driver pass, which runs once
@@ -44,9 +44,9 @@ internal sealed class KitUsbDriver : UsbClassDriver
     internal static KitUsbDriver Instance => s_instance ??= new KitUsbDriver();
 
     /// <summary>
-    /// Offers <paramref name="usbInterface"/>, which HAL's hub and keyboard
-    /// drivers left, to the kit's USB registrations that match it, the
-    /// built-in mass storage driver's included, best match first. Always
+    /// Offers <paramref name="usbInterface"/>, which HAL's hub driver left,
+    /// to the kit's USB registrations that match it, the built-in mass
+    /// storage and boot keyboard drivers' included, best match first. Always
     /// false before the driver pass ran, which offers the interfaces present
     /// at boot itself, and when no USB driver is registered.
     /// </summary>

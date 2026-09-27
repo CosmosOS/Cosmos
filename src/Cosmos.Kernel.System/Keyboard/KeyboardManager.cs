@@ -72,6 +72,14 @@ public static class KeyboardManager
     public static bool KeyAvailable => s_queuedKeys is not null && s_queuedKeys.Count > 0;
 
     /// <summary>
+    /// How many keyboards are registered: the platform's, then every one a
+    /// driver published, less those withdrawn when their USB device left.
+    /// Zero before the manager is initialized and when keyboard support is
+    /// compiled out.
+    /// </summary>
+    public static int DeviceCount => s_keyboards?.Length ?? 0;
+
+    /// <summary>
     /// Throws when keyboard support is compiled out. Guards actions, not reads:
     /// a read answers honestly (0, null, false, empty) so a kernel can branch
     /// on it, and an action names the switch to set instead of failing

@@ -9,7 +9,6 @@ using Cosmos.Kernel.Core.X64;
 using Cosmos.Kernel.Core.X64.Cpu;
 using Cosmos.Kernel.Core.X64.IO;
 using Cosmos.Kernel.Core.X64.Power;
-using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.X64.Devices.Clock;
@@ -130,11 +129,13 @@ internal class X64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        IKeyboardDevice[] ps2 = _ps2Controller is not null ? PS2Controller.GetKeyboardDevices() : [];
-
-        // USB keyboards come later, from the driver pass, through
-        // UsbKeyboardDriver.KeyboardAttached.
-        return [.. ps2, .. VirtioDevice.GetKeyboards()];
+        // PS/2 only: the virtio keyboards this architecture sees are all on
+        // the PCI bus, where the built-in virtio-input kit driver binds them
+        // in the driver pass and publishes them, and q35 has no virtio-mmio
+        // window for HAL's own virtio keyboard driver to find one on. USB
+        // keyboards come from the pass too, through the built-in boot
+        // keyboard driver.
+        return _ps2Controller is not null ? PS2Controller.GetKeyboardDevices() : [];
     }
 
     public IMouseDevice[] GetMouseDevices()
@@ -144,8 +145,8 @@ internal class X64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        IMouseDevice[] ps2 = _ps2Controller != null ? PS2Controller.GetMouseDevices() : [];
-        return Concat(ps2, VirtioDevice.GetMice());
+        // PS/2 only, for the reason given in GetKeyboardDevices.
+        return _ps2Controller is not null ? PS2Controller.GetMouseDevices() : [];
     }
 
     public INetworkDevice? GetNetworkDevice()
@@ -155,32 +156,6 @@ internal class X64PlatformInitializer : IPlatformInitializer
         // pass and publish their links, and q35 has no virtio-mmio window for
         // HAL's own virtio-net driver to find one on.
         return null;
-    }
-
-    private static T[] Concat<T>(T[] first, T[] second)
-    {
-        if (first.Length == 0)
-        {
-            return second;
-        }
-
-        if (second.Length == 0)
-        {
-            return first;
-        }
-
-        T[] combined = new T[first.Length + second.Length];
-        for (int i = 0; i < first.Length; i++)
-        {
-            combined[i] = first[i];
-        }
-
-        for (int i = 0; i < second.Length; i++)
-        {
-            combined[first.Length + i] = second[i];
-        }
-
-        return combined;
     }
 
     public unsafe uint GetCpuCount()

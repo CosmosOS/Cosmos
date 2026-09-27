@@ -2,7 +2,6 @@
 
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 using Cosmos.Kernel.HAL.Drivers.Usb;
@@ -15,16 +14,17 @@ namespace Cosmos.Kernel.HAL.Drivers.Engine;
 /// <summary>
 /// The driver kit's engine. It keeps the drivers registered with it, runs
 /// the one pass that binds them to the PCI functions no built-in driver
-/// took during HAL bring-up and to the USB interfaces HAL's hub and
-/// keyboard drivers left, offers the USB interfaces plugged in later the
-/// same way, ends a USB binding when its device is pulled out, and
-/// publishes what every device ended up owned by.
+/// took during HAL bring-up and to the USB interfaces HAL's hub driver
+/// left, offers the USB interfaces plugged in later the same way, ends a
+/// USB binding when its device is pulled out, and publishes what every
+/// device ended up owned by.
 /// </summary>
 /// <remarks>
 /// Two kinds of built-in driver exist. The ones HAL brings up itself bind
 /// during HAL bring-up, before any kernel code runs, and keep what they
 /// claim. The ones written against the kit (Cosmos.Kernel.HAL.Drivers:
-/// xHCI, AHCI, NVMe and USB mass storage) are registered here by
+/// xHCI, AHCI, NVMe, E1000E, virtio-net, virtio-input, USB mass storage and
+/// the USB boot keyboard) are registered here by
 /// Global.StartKernel through <see cref="RegisterBuiltIn(PciDriverRegistration)"/>
 /// and <see cref="RegisterBuiltIn(UsbDriverRegistration)"/>, and bind in
 /// the pass like any other registration, except that they win every tie;
@@ -33,7 +33,7 @@ namespace Cosmos.Kernel.HAL.Drivers.Engine;
 /// drivers bind in <see cref="BindUserDrivers"/>, which
 /// Global.StartKernel runs once, on the boot thread with interrupts on,
 /// before the kernel starts; a USB device plugged in afterwards goes to
-/// HAL's hub and keyboard drivers first, then, through
+/// HAL's hub driver first, then, through
 /// <see cref="KitUsbDriver"/>, to the kit's USB registrations, on the USB
 /// hot-plug thread, which also runs <see cref="RemoveUsbBinding"/>
 /// when one is pulled out. A PCI binding is never released.
@@ -58,6 +58,13 @@ internal static class DriverCore
     /// reserves the built-in PCI drivers' names.
     /// </summary>
     private const string UsbMassStorageName = "mass storage";
+
+    /// <summary>
+    /// The name the built-in USB keyboard driver of
+    /// Cosmos.Kernel.HAL.Drivers registers under, reserved like
+    /// <see cref="UsbMassStorageName"/>.
+    /// </summary>
+    private const string UsbBootKeyboardName = "HID boot keyboard";
 
     /// <summary>
     /// Makes a registration's checks and its append one step against the
@@ -121,6 +128,15 @@ internal static class DriverCore
     private static DeviceRecord[]? s_devices;
 
     /// <summary>
+    /// Where the keyboards drivers publish are delivered: the keyboard
+    /// manager's registration, which System installs from its library
+    /// initializer when the kernel has keyboard support, since HAL cannot
+    /// reference System. Null without it, and
+    /// <see cref="DeviceContext.PublishKeyboard()"/> then throws.
+    /// </summary>
+    internal static Action<PublishedKeyboard>? KeyboardSink { get; set; }
+
+    /// <summary>
     /// Where the mice drivers publish are delivered: the mouse manager's
     /// registration, which System installs from its library initializer when
     /// the kernel has mouse support, since HAL cannot reference System. Null
@@ -144,6 +160,13 @@ internal static class DriverCore
     /// can have published a mouse.
     /// </summary>
     internal static Action<PublishedMouse>? MouseWithdrawSink { get; set; }
+
+    /// <summary>
+    /// Takes a keyboard a USB driver published back out of the keyboard
+    /// manager once its device left the bus: installed like
+    /// <see cref="MouseWithdrawSink"/>, next to <see cref="KeyboardSink"/>.
+    /// </summary>
+    internal static Action<PublishedKeyboard>? KeyboardWithdrawSink { get; set; }
 
     /// <summary>
     /// Takes a network link a USB driver published back out of the network
@@ -237,8 +260,8 @@ internal static class DriverCore
 
     /// <summary>
     /// Registers a USB class driver, to be offered the interfaces HAL's own
-    /// class drivers (hub, keyboard) left: those present at boot when the driver
-    /// pass runs, and those of every device plugged in later. Registration
+    /// hub driver left: those present at boot when the driver pass runs, and
+    /// those of every device plugged in later. Registration
     /// is open until the pass: from the kernel's constructor, or from its
     /// RegisterDrivers override, which Global.StartKernel calls right before
     /// the pass.
@@ -541,13 +564,13 @@ internal static class DriverCore
 
     /// <summary>
     /// True when <paramref name="name"/> is a built-in driver's: a PCI
-    /// owner, or a built-in USB class driver's name, which the USB stack
-    /// logs and the device list shows as the owner of its interfaces.
+    /// owner, HAL's own hub driver, or a built-in USB driver of the kit,
+    /// whose name the device list shows as the owner of its interfaces.
     /// </summary>
     private static bool IsBuiltInName(string name) =>
         PciOwner.IsBuiltIn(name)
         || name == UsbHubDriver.DriverName
-        || name == UsbKeyboardDriver.DriverName
+        || name == UsbBootKeyboardName
         || name == UsbMassStorageName;
 
     /// <summary>True when a registration named <paramref name="name"/> exists, PCI or USB. The caller holds <see cref="s_lock"/>.</summary>

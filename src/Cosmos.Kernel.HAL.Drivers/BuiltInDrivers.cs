@@ -4,7 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Ahci;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.E1000e;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Input;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Net;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.BootKeyboard;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.MassStorage;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci;
 using Cosmos.Kernel.HAL.Drivers.Pci;
@@ -72,6 +74,20 @@ public static class BuiltInDrivers
     }
 
     /// <summary>
+    /// Creates the registrations of the built-in input drivers that bind a
+    /// PCI function: the virtio-input driver, which binds the virtio
+    /// keyboards and mice on the PCI bus and publishes each as the keyboard
+    /// or the mouse it turns out to be. Any context: it only allocates the
+    /// registrations.
+    /// </summary>
+    /// <returns>New registrations, in the order they are to be registered.</returns>
+    public static IReadOnlyList<PciDriverRegistration> CreatePciInputRegistrations()
+    {
+        PciDriverRegistration[] registrations = [VirtioInputDriver.CreateRegistration()];
+        return registrations;
+    }
+
+    /// <summary>
     /// Creates the registrations of the built-in storage drivers that bind a
     /// USB interface: the mass storage driver, which binds the SCSI over
     /// Bulk-Only interfaces of USB sticks, card readers and USB disks and
@@ -82,6 +98,19 @@ public static class BuiltInDrivers
     public static IReadOnlyList<UsbDriverRegistration> CreateUsbMassStorageRegistrations()
     {
         UsbDriverRegistration[] registrations = [MassStorageDriver.CreateRegistration()];
+        return registrations;
+    }
+
+    /// <summary>
+    /// Creates the registrations of the built-in input drivers that bind a
+    /// USB interface: the boot keyboard driver, which binds the HID
+    /// interfaces of USB keyboards and publishes each as a keyboard. Any
+    /// context: it only allocates the registrations.
+    /// </summary>
+    /// <returns>New registrations, in the order they are to be registered.</returns>
+    public static IReadOnlyList<UsbDriverRegistration> CreateUsbInputRegistrations()
+    {
+        UsbDriverRegistration[] registrations = [BootKeyboardDriver.CreateRegistration()];
         return registrations;
     }
 }

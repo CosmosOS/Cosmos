@@ -99,6 +99,14 @@ public static class MouseManager
     }
 
     /// <summary>
+    /// How many mice are registered: the platform's, then every one a
+    /// driver published, less those withdrawn when their USB device left.
+    /// Zero before the manager is initialized and when mouse support is
+    /// compiled out.
+    /// </summary>
+    public static int DeviceCount => s_mice?.Length ?? 0;
+
+    /// <summary>
     /// Throws when mouse support is compiled out. Guards actions, not reads:
     /// a read answers honestly (0, null, false, empty) so a kernel can branch
     /// on it, and an action names the switch to set instead of failing

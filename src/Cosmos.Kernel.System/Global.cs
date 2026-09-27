@@ -176,9 +176,11 @@ public static class Global
     /// drivers written against the driver kit, subsystem by subsystem behind
     /// the kernel's switches: that assembly sees no switch, so the guards
     /// live here. One switch per <c>if</c>, since ILC folds a single switch
-    /// only: a kernel built without USB keeps no xHCI or USB mass storage
-    /// code, one built without storage keeps no AHCI, NVMe or USB mass
-    /// storage code, and one built without network keeps no virtio-net code.
+    /// only: a kernel built without USB keeps no xHCI, USB mass storage or
+    /// USB keyboard code, one built without storage keeps no AHCI, NVMe or
+    /// USB mass storage code, one built without network keeps no virtio-net
+    /// code, and one built without either input switch keeps no
+    /// virtio-input code.
     /// They go through the kit's built-in path, which takes
     /// the names reserved for built-ins and ranks them ahead of every
     /// registration the kernel makes, so a built-in wins a tie and only a
@@ -220,6 +222,42 @@ public static class Global
                     DriverCore.RegisterBuiltIn(usbStorage[i]);
                 }
             }
+        }
+
+        // The virtio-input driver publishes a keyboard or a mouse depending
+        // on the device it binds, so either switch is reason to register it.
+        // Two ifs rather than one ||, so each branch still tests a single
+        // switch for ILC to fold; the driver is registered once either way.
+        if (Core.CosmosFeatures.KeyboardEnabled)
+        {
+            RegisterPciInputDrivers();
+
+            if (Core.CosmosFeatures.UsbEnabled)
+            {
+                IReadOnlyList<UsbDriverRegistration> usbInput = BuiltInDrivers.CreateUsbInputRegistrations();
+                for (int i = 0; i < usbInput.Count; i++)
+                {
+                    DriverCore.RegisterBuiltIn(usbInput[i]);
+                }
+            }
+        }
+        else if (Core.CosmosFeatures.MouseEnabled)
+        {
+            RegisterPciInputDrivers();
+        }
+    }
+
+    /// <summary>
+    /// Registers the built-in input drivers that bind a PCI function, which
+    /// <see cref="RegisterBuiltInDrivers"/> reaches from either input
+    /// switch.
+    /// </summary>
+    private static void RegisterPciInputDrivers()
+    {
+        IReadOnlyList<PciDriverRegistration> input = BuiltInDrivers.CreatePciInputRegistrations();
+        for (int i = 0; i < input.Count; i++)
+        {
+            DriverCore.RegisterBuiltIn(input[i]);
         }
     }
 }

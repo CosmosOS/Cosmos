@@ -18,6 +18,8 @@ internal static class Experimentals
     /// <see cref="PortRegion"/>, <see cref="DmaBuffer"/>,
     /// <see cref="DeviceInterruptHandler"/>, <see cref="DeviceWorkItem"/>,
     /// <see cref="DeviceEvent"/>, <see cref="IrqSafeLock"/>,
+    /// <see cref="KeyboardReporter"/>, <see cref="KeyboardLeds"/>,
+    /// <see cref="KeyboardLedHandler"/>,
     /// <see cref="MouseReporter"/>, <see cref="MouseButtons"/>,
     /// <see cref="NetworkLink"/> and <see cref="NetworkTransmitHandler"/>. In
     /// Cosmos.Kernel.HAL.Drivers.Pci: <see cref="Pci.PciDriver"/>,
