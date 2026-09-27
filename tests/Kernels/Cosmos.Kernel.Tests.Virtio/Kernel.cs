@@ -1,10 +1,11 @@
 using System;
-using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.Devices.Virtio.Mmio;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Keyboard;
 using Cosmos.Kernel.System.Mouse;
 using Cosmos.Kernel.System.Network;
