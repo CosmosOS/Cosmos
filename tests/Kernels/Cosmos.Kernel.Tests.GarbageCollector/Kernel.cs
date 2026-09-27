@@ -24,7 +24,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[GarbageCollector] BeforeRun() reached!\n");
         Serial.WriteString("[GarbageCollector] Starting tests...\n");
 
-        TR.Start("GarbageCollector Tests", expectedTests: 46);
+        TR.Start("GarbageCollector Tests", expectedTests: 50);
 
         // Garbage Collection Tests
         TR.Run("GC_IsEnabled", TestGCIsEnabled);
@@ -57,9 +57,15 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_FuncletNoCrashOnAllocInCatch", TestGCFuncletNoCrashOnAllocInCatch);
         TR.Run("GC_ThrowThroughDeepChain", TestGCThrowThroughDeepChain);
 
-        // GC Soundness Tests. GC_InteriorPointerRoot FAILS until interior-pointer
-        // support (#376) lands — it is the acceptance test for #384.
+        // GC Soundness Tests. GC_InteriorPointerRoot is the acceptance test for #384;
+        // GC_InteriorPointerRootMidTlab pins the interior-pointer lookup to a layout
+        // where the parent's start was never recorded in the brick table. The PinnedHeap
+        // and Fixed cells cross the slot's GC_CALL_PINNED flag with the heap the parent
+        // lives on, since the lookup must not take one for the other.
         TR.Run("GC_InteriorPointerRoot", TestGCInteriorPointerRoot);
+        TR.Run("GC_InteriorPointerRootMidTlab", TestGCInteriorPointerRootMidTlab);
+        TR.Run("GC_InteriorPointerRootPinnedHeap", TestGCInteriorPointerRootPinnedHeap);
+        TR.Run("GC_InteriorPointerRootFixed", TestGCInteriorPointerRootFixed);
         TR.Run("GC_StaticOnlyReachability", TestGCStaticOnlyReachability);
         TR.Run("GC_MultithreadChurnUnderCollect", TestGCMultithreadChurnUnderCollect);
         TR.Run("GC_MallocHeapNotSwept", TestGCMallocHeapNotSwept);
@@ -958,6 +964,108 @@ public class Kernel : Sys.Kernel
 
         Assert.Equal(0x5A5A0008, r,
             "GC: an object whose only root is an interior pointer (byref/Span) must survive collection (#384)");
+    }
+
+    /// <summary>
+    /// Allocates a small array at the current TLAB's bump pointer and returns a byref to its first
+    /// element, with a weak reference to the array. A non-null bump pointer always sits behind the
+    /// first object of its TLAB, so the array is neither its segment's nor its TLAB's first object,
+    /// whatever the boot heap layout: a lookup that only knows recorded TLAB starts (the brick
+    /// table) cannot find it. NoInlining so the array reference dies with this frame and the byref
+    /// is its only root.
+    /// </summary>
+    /// <param name="weak">Receives a weak reference to the array.</param>
+    /// <param name="midTlab"><c>true</c> when the array was placed behind another object in its TLAB.</param>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static unsafe ref int LeakInteriorRefMidTlab(out WeakReference weak, out bool midTlab)
+    {
+        int[] arr = [];
+        midTlab = false;
+
+        // The first attempt after a collection finds no TLAB and opens one; any attempt can also
+        // land on a refill. Either way the next attempt starts behind an object.
+        for (int attempt = 0; attempt < 8 && !midTlab; attempt++)
+        {
+            nint allocPtr = (nint)CoreGC.GetCurrentAllocContext().AllocPtr;
+            arr = new int[4];
+            midTlab = allocPtr != 0 && Unsafe.As<int[], nint>(ref arr) == allocPtr;
+        }
+
+        arr[0] = 0x5A5B0000;
+        weak = new WeakReference(arr);
+        return ref arr[0];
+    }
+
+    private static void TestGCInteriorPointerRootMidTlab()
+    {
+        ref int r = ref LeakInteriorRefMidTlab(out WeakReference weak, out bool midTlab);
+
+        Assert.True(midTlab, "GC: the array must be allocated behind another object in its TLAB");
+
+        CoreGC.Collect();
+
+        // Freeing the array would also free its weak handle: this does not depend on whether a
+        // later allocation reuses and overwrites the array's memory.
+        Assert.True(weak.IsAlive,
+            "GC: an array whose only root is a byref must survive collection when it is not its TLAB's first object");
+        Assert.True(weak.Target is int[] target && Unsafe.AreSame(ref target[0], ref r) && r == 0x5A5B0000,
+            "GC: the byref must still point into the surviving array");
+    }
+
+    /// <summary>
+    /// Allocates an <c>int[8]</c> through <see cref="GC.AllocateArray{T}(int, bool)"/> and returns a
+    /// byref to its first element, with a weak reference to the array. NoInlining so the array
+    /// reference dies with this frame and the byref is its only root.
+    /// </summary>
+    /// <param name="pinned"><c>true</c> to allocate the array on the pinned object heap.</param>
+    /// <param name="marker">The value stored in the first element.</param>
+    /// <param name="weak">Receives a weak reference to the array.</param>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static ref int LeakSmallArrayInteriorRef(bool pinned, int marker, out WeakReference weak)
+    {
+        int[] arr = GC.AllocateArray<int>(8, pinned);
+        arr[0] = marker;
+        weak = new WeakReference(arr);
+        return ref arr[0];
+    }
+
+    private static void TestGCInteriorPointerRootPinnedHeap()
+    {
+        ulong pinnedBytesBefore = CoreGC.GetCurrentAllocContext().AllocBytesUoh;
+
+        // A plain byref: the decoder reports it without GC_CALL_PINNED, yet the array sits in a
+        // pinned segment.
+        ref int r = ref LeakSmallArrayInteriorRef(pinned: true, marker: 0x5A5C0000, out WeakReference weak);
+
+        Assert.True(CoreGC.GetCurrentAllocContext().AllocBytesUoh > pinnedBytesBefore,
+            "GC: the array must be allocated on the pinned object heap");
+
+        CoreGC.Collect();
+
+        Assert.True(weak.IsAlive,
+            "GC: a pinned-heap array whose only root is a byref must survive collection");
+        Assert.True(weak.Target is int[] target && Unsafe.AreSame(ref target[0], ref r) && r == 0x5A5C0000,
+            "GC: the byref must still point into the surviving pinned-heap array");
+    }
+
+    private static unsafe void TestGCInteriorPointerRootFixed()
+    {
+        WeakReference weak;
+        bool alive;
+        int value;
+
+        // The fixed statement's pinned local is reported with GC_CALL_PINNED, yet the array sits
+        // on the regular heap. That local is the array's only root while Collect runs.
+        fixed (int* p = &LeakSmallArrayInteriorRef(pinned: false, marker: 0x5A5D0000, out weak))
+        {
+            CoreGC.Collect();
+            alive = weak.IsAlive;
+            value = *p;
+        }
+
+        Assert.True(alive,
+            "GC: a regular-heap array whose only root is a fixed (pinned) byref must survive collection");
+        Assert.Equal(0x5A5D0000, value, "GC: the fixed pointer must still point into the surviving array");
     }
 
     /// <summary>Holds the only reference to the statics-reachability test array.</summary>
