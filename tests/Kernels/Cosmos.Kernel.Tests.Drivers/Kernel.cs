@@ -929,8 +929,9 @@ public class Kernel : Sys.Kernel
         Assert.Equal(1, CountListedInterfaces(HidClass, TabletSubclass, TabletProtocol), "exactly one USB device should present a HID interface with no boot subclass, the tablet's");
     }
 
-    // No class driver takes a HID mouse: the keyboard driver matches the
-    // keyboard protocol only, the hub and mass storage drivers other classes.
+    // No class driver of HAL's takes a HID mouse: the keyboard driver
+    // matches the keyboard protocol only, the hub driver another class, and
+    // the built-in mass storage driver binds in the pass, through the kit.
     // So the interface was free when the kernel was constructed, and the
     // pass then gave it to the boot mouse driver, through the kit's class
     // driver, which the USB stack hands it back to on disconnect.

@@ -5,6 +5,7 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Devices.Usb;
+using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
@@ -46,6 +47,7 @@ public class Kernel : Sys.Kernel
     private const string AhciOwner = "ahci";
     private const string NvmeOwner = "nvme";
     private const string XhciOwner = "xhci";
+    private const string MassStorageOwner = "mass storage";
 
     /// <summary>Block devices the engine attaches per QEMU profile; any other count is a bind or double-registration regression.</summary>
     private const int AttachedDisksPerProfile = 1;
@@ -385,7 +387,7 @@ public class Kernel : Sys.Kernel
     private const string HotPlugFilePath = $"{HotPlugMountPoint}/{HotPlugFileName}";
 
     /// <summary>The stick as it was before the unplug, for the cells that check what it left behind.</summary>
-    private static UsbMassStorage? s_unpluggedDisk;
+    private static IBlockDevice? s_unpluggedDisk;
 
     /// <summary>Whether the USB hot-plug thread was running when <see cref="OnBoot"/> began.</summary>
     private static bool s_hotPlugRunningAtOnBoot;
@@ -427,11 +429,10 @@ public class Kernel : Sys.Kernel
         // ==================== Boot persistence (works with Boot_RebootAfterGptWrite) ====================
         // Runs before anything mutates partition state: on boot 0 the engine's
         // fresh image must scan clean; on boot 1 the boot-time scan must have
-        // found the GPT written before the reboot. Pins the boot-time scans:
-        // USB's in the init window (phase 3), which regressed once without
-        // CI noticing (interpolated partition names triple-faulted phase 3
-        // on any populated disk), and AHCI's and NVMe's in the driver pass,
-        // where the kit delivers the disks the drivers published.
+        // found the GPT written before the reboot. Pins the boot-time scan,
+        // which runs in the driver pass for every profile's disk, AHCI, NVMe
+        // and USB alike, where the kit delivers the disks the drivers
+        // published.
         TR.RunIf(hasDevice, "Boot_PartitionScanMatchesBootState", TestBoot_PartitionScanMatchesBootState, SkipNoDevice);
 
         // ==================== Profile (assert the cell's hardware path) ====================
@@ -596,8 +597,8 @@ public class Kernel : Sys.Kernel
 
         // ==================== Boot persistence (destructive: reboots QEMU) ====================
         // Boot 0 stamps a fresh GPT with one partition and reboots; boot 1's
-        // Boot_PartitionScanMatchesBootState (above) then proves the phase-3
-        // boot-time scan survives a populated disk and names the partition.
+        // Boot_PartitionScanMatchesBootState (above) then proves the driver
+        // pass's boot-time scan survives a populated disk and names the partition.
         // Last on purpose: everything before it must have reported already.
         int skip = TR.GetSkipCount();
         if (!dev)
@@ -637,9 +638,9 @@ public class Kernel : Sys.Kernel
     }
 
     // Re-registering an already-known device must be a no-op: RegisterDevice
-    // is public and unguarded (unlike Initialize), so a second
-    // RegisterHalDevices call would otherwise double-count the device and
-    // duplicate every partition under identical names.
+    // is public and unguarded (unlike Initialize), so a second call would
+    // otherwise double-count the device and duplicate every partition under
+    // identical names.
     private static void TestManager_DuplicateRegistrationIgnored()
     {
         int before = StorageManager.DeviceCount;
@@ -654,7 +655,8 @@ public class Kernel : Sys.Kernel
     // Boot 0 boots the engine's fresh blank image; boot 1 boots the GPT
     // written by Boot_RebootAfterGptWrite. Asserting against the boot-time
     // scan result (before any test mutates partition state) pins the
-    // phase-3 partition scan path end to end, including partition naming.
+    // driver pass's partition scan path end to end, including partition
+    // naming.
     private static void TestBoot_PartitionScanMatchesBootState()
     {
         int partitionsOnDevice = 0;
@@ -762,12 +764,11 @@ public class Kernel : Sys.Kernel
     }
 
     // The primary disk is the profile's own, under the name it had before
-    // the AHCI and NVMe drivers moved to the driver kit. Their disks now
-    // register from the driver pass in Global.StartKernel, after the USB
-    // disks present at boot, so what keeps an internal disk primary is the
-    // storage manager's primary-disk rule, not the order the drivers
-    // registered in. The rule orders Devices, so the primary disk is the
-    // first of them.
+    // the AHCI, NVMe and USB mass storage drivers moved to the driver kit.
+    // Their disks register from the driver pass in Global.StartKernel, in
+    // the order the drivers bind, so what keeps an internal disk primary is
+    // the storage manager's primary-disk rule, not that order. The rule
+    // orders Devices, so the primary disk is the first of them.
     private static void TestManager_PrimaryIsProfileDisk()
     {
         IBlockDevice? primary = StorageManager.PrimaryDevice;
@@ -814,11 +815,12 @@ public class Kernel : Sys.Kernel
     // The controller behind the cell's disk records its driver as the owner
     // of its PCI function. AHCI and NVMe take ownership only once the
     // controller came up, and a bound disk means it did, so the owner must
-    // be there; xHCI takes it once the host controller is running. AHCI and
-    // NVMe are driver kit drivers: the kit writes the owner as the pass
-    // binds them, and their controllers are read off PCI, since the
-    // drivers' own types are internal to an assembly that grants no test
-    // its internals.
+    // be there; xHCI takes it once the host controller is running, and the
+    // stick's interface records the mass storage driver. AHCI, NVMe and
+    // mass storage are driver kit drivers: the kit writes the owner as the
+    // pass binds them, and what they bound is read off PCI and the kit's
+    // device list, since the drivers' own types are internal to an assembly
+    // that grants no test its internals.
     private static void TestProfile_ControllerOwnsPciFunction()
     {
         if (TR.ProfileHasPrefix("ahci"))
@@ -844,6 +846,7 @@ public class Kernel : Sys.Kernel
         {
             PciDevice? xhci = PciManager.GetDeviceClass(ClassId.SerialBusController, SubclassId.UsbController, ProgramIf.UsbXhci);
             Assert.True(xhci?.Owner == XhciOwner, "the xHCI controller carrying the stick should own its PCI function");
+            Assert.Equal(AttachedDisksPerProfile, CountOwnedBy(MassStorageOwner), "the mass storage driver should own the stick's interface");
             return;
         }
 
@@ -868,6 +871,26 @@ public class Kernel : Sys.Kernel
         {
             Assert.False(actual, "expected NVMe polled fallback but the controller enabled MSI-X");
         }
+    }
+
+    /// <summary>
+    /// How many entries of the kit's device list, PCI functions and USB
+    /// interfaces, <paramref name="owner"/> owns. The pass published the
+    /// list, and nothing was plugged in or pulled out since.
+    /// </summary>
+    private static int CountOwnedBy(string owner)
+    {
+        IReadOnlyList<DeviceRecord> devices = DriverCore.Devices;
+        int owned = 0;
+        for (int i = 0; i < devices.Count; i++)
+        {
+            if (devices[i].DriverName == owner)
+            {
+                owned++;
+            }
+        }
+
+        return owned;
     }
 
     /// <summary>The cell's NVMe controller, the only one the nvme profiles attach; null on a cell without one.</summary>
@@ -1310,7 +1333,7 @@ public class Kernel : Sys.Kernel
             return "not a USB profile";
         }
 
-        if (s_dev is not UsbMassStorage)
+        if (s_dev is not PublishedBlockDevice { IsRemovable: true })
         {
             return SkipNoDevice;
         }
@@ -1327,12 +1350,19 @@ public class Kernel : Sys.Kernel
         Assert.Equal(UsbManager.IsHotPlugRunning, s_hotPlugRunningAtOnBoot, "the hot-plug thread should be started before OnBoot, not after");
     }
 
-    // Pulling the stick out must take it out of the storage manager and the
-    // USB storage driver, and mark the object they handed out removed. The
-    // sector stamped first is read back once the stick is plugged in again.
+    // Pulling the stick out must take it out of the storage manager, and
+    // the kit must withdraw the disk it handed the manager, before the
+    // manager lets go of it. The sector stamped first is read back once the
+    // stick is plugged in again.
     private static void TestUsbHotPlug_UnplugUnregistersDisk()
     {
-        UsbMassStorage disk = (UsbMassStorage)s_dev!;
+        IBlockDevice? disk = s_dev;
+        Assert.NotNull(disk);
+        if (disk is null)
+        {
+            return;
+        }
+
         disk.WriteBlock(HotPlugMarkerLba, 1, HotPlugMarker((int)disk.BlockSize));
         disk.Flush();
 
@@ -1342,8 +1372,7 @@ public class Kernel : Sys.Kernel
         s_dev = null;
 
         Assert.True(gone, "the stick is still registered after being unplugged");
-        Assert.Equal(0, UsbMassStorageDriver.Disks.Count, "the USB storage driver still lists the stick");
-        Assert.True(disk.IsRemoved, "the unplugged stick is not marked removed");
+        Assert.True(disk is PublishedBlockDevice { IsWithdrawn: true }, "the kit did not withdraw the unplugged stick");
     }
 
     // I/O on a stick that is gone must fail as an IOException, not wait for
@@ -1380,7 +1409,7 @@ public class Kernel : Sys.Kernel
         }
 
         s_dev = StorageManager.GetDevice(0);
-        Assert.True(s_dev is UsbMassStorage, "the device that came back is not a USB stick");
+        Assert.True(s_dev is PublishedBlockDevice { IsRemovable: true }, "the device that came back is not a USB stick");
         Assert.False(ReferenceEquals(s_dev, s_unpluggedDisk), "the removed device object came back");
         if (s_unpluggedDisk is not null)
         {
