@@ -383,9 +383,9 @@ internal sealed class VirtioPciTransport : VirtioTransport
 
         // No INTx fallback: PCI INTx lines are level-low and shared, while
         // the IOAPIC line routing available here programs edge/active-high
-        // and installing a handler would clobber whichever driver (e.g.
-        // E1000E) already owns the shared line. Every stock virtio-pci
-        // device exposes MSI-X; without it the device runs in polled mode.
+        // and installing a handler would clobber whichever driver already
+        // owns the shared line. Every stock virtio-pci device exposes
+        // MSI-X; without it the device runs in polled mode.
         Serial.Write("[VirtioPci] No MSI-X; device runs in polled mode\n");
         return false;
     }

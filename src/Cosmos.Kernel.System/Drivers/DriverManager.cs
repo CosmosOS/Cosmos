@@ -12,10 +12,10 @@ namespace Cosmos.Kernel.System.Drivers;
 /// <summary>
 /// Where a kernel registers its own PCI and USB class drivers, and reads
 /// which driver owns every device. The built-in drivers HAL brings up
-/// itself (virtio, and E1000E on x64) bind during HAL bring-up, before any
-/// kernel code runs, and keep what they take. The drivers registered here,
-/// and the built-in drivers written against the driver kit (xHCI, AHCI,
-/// NVMe and USB mass storage), are offered what those left, by one pass
+/// itself (virtio) bind during HAL bring-up, before any kernel code runs,
+/// and keep what they take. The drivers registered here, and the built-in
+/// drivers written against the driver kit (xHCI, AHCI, NVMe, E1000E,
+/// virtio-net and USB mass storage), are offered what those left, by one pass
 /// that <see cref="Global.StartKernel"/> runs right after
 /// <see cref="Kernel.RegisterDrivers"/> and before
 /// <see cref="Kernel.OnBoot"/>. A USB driver is offered the interfaces of

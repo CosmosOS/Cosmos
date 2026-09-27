@@ -14,7 +14,6 @@ using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.X64.Devices.Clock;
 using Cosmos.Kernel.HAL.X64.Devices.Input;
-using Cosmos.Kernel.HAL.X64.Devices.Network;
 using Cosmos.Kernel.HAL.X64.Devices.Timer;
 
 namespace Cosmos.Kernel.HAL.X64;
@@ -27,7 +26,6 @@ internal class X64PlatformInitializer : IPlatformInitializer
     private PIT? _pit;
     private RTC? _rtc;
     private PS2Controller? _ps2Controller;
-    private E1000E? _networkDevice;
 
     public string PlatformName => "x86-64";
     public PlatformArchitecture Architecture => PlatformArchitecture.X64;
@@ -108,23 +106,6 @@ internal class X64PlatformInitializer : IPlatformInitializer
             _ps2Controller = new PS2Controller();
             _ps2Controller.Initialize();
         }
-
-        // Try to find E1000E network device (if network feature enabled)
-        if (CosmosFeatures.NetworkEnabled)
-        {
-            Serial.WriteString("[X64HAL] Looking for E1000E network device...\n");
-            _networkDevice = E1000E.FindAndCreate();
-            if (_networkDevice != null)
-            {
-                Serial.WriteString("[X64HAL] E1000E device found, initializing...\n");
-                _networkDevice.Initialize();
-                _networkDevice.RegisterIRQHandler();
-            }
-            else
-            {
-                Serial.WriteString("[X64HAL] No E1000E device found\n");
-            }
-        }
     }
 
     public ITimerDevice CreateTimer()
@@ -169,12 +150,11 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
     public INetworkDevice? GetNetworkDevice()
     {
-        // The E1000E, the one NIC HAL drives on this architecture. A virtio
-        // NIC arrives on the PCI bus here, where the built-in virtio-net kit
-        // driver binds it in the driver pass and publishes its link, and q35
-        // has no virtio-mmio window for HAL's own virtio-net driver to find
-        // one on.
-        return _networkDevice;
+        // None: this architecture's NICs all arrive on the PCI bus, where the
+        // built-in E1000E and virtio-net kit drivers bind them in the driver
+        // pass and publish their links, and q35 has no virtio-mmio window for
+        // HAL's own virtio-net driver to find one on.
+        return null;
     }
 
     private static T[] Concat<T>(T[] first, T[] second)

@@ -37,7 +37,12 @@ internal static class PciOwner
     /// </summary>
     public const string Gop = "gop";
 
-    /// <summary>Intel 82574 (E1000E) network driver, x64 only.</summary>
+    /// <summary>
+    /// Intel gigabit Ethernet controller. Written by the driver kit, as the
+    /// name the built-in E1000E driver of Cosmos.Kernel.HAL.Drivers is
+    /// registered under: kept here so no kernel can register a driver by that
+    /// name.
+    /// </summary>
     public const string E1000E = "e1000e";
 
     /// <summary>

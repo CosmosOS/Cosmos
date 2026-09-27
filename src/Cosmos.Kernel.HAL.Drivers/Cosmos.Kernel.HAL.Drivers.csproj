@@ -28,7 +28,7 @@
     <PackageId>Cosmos.Kernel.HAL.Drivers</PackageId>
     <Title>Cosmos Kernel Built-in Drivers</Title>
     <Description>The built-in PCI and USB drivers of Cosmos kernels, written against the driver kit.</Description>
-    <PackageTags>cosmos;kernel;hal;drivers;ahci;nvme;usb;xhci</PackageTags>
+    <PackageTags>cosmos;kernel;hal;drivers;ahci;nvme;usb;xhci;e1000e;virtio</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <RootNamespace>Cosmos.Kernel.HAL.Drivers.BuiltIn</RootNamespace>
     <!-- COSMOS0003: the drivers are written against the experimental driver kit,

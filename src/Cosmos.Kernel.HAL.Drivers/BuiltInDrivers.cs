@@ -2,6 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Ahci;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.E1000e;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Virtio.Net;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.MassStorage;
@@ -57,14 +58,16 @@ public static class BuiltInDrivers
 
     /// <summary>
     /// Creates the registrations of the built-in network drivers that bind a
-    /// PCI function: the virtio-net driver, which binds the virtio network
-    /// devices on the PCI bus and publishes each one's link to the kernel's
-    /// network stack. Any context: it only allocates the registrations.
+    /// PCI function: the E1000E driver, which binds Intel's gigabit Ethernet
+    /// controllers, and the virtio-net driver, which binds the virtio network
+    /// devices on the PCI bus. Each publishes its device's link to the
+    /// kernel's network stack. Any context: it only allocates the
+    /// registrations.
     /// </summary>
     /// <returns>New registrations, in the order they are to be registered.</returns>
     public static IReadOnlyList<PciDriverRegistration> CreatePciNetworkRegistrations()
     {
-        PciDriverRegistration[] registrations = [VirtioNetDriver.CreateRegistration()];
+        PciDriverRegistration[] registrations = [E1000eDriver.CreateRegistration(), VirtioNetDriver.CreateRegistration()];
         return registrations;
     }
 
