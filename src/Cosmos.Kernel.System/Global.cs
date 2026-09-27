@@ -6,6 +6,7 @@ using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Drivers.Pci;
+using Cosmos.Kernel.HAL.Drivers.Usb;
 using Cosmos.Kernel.System.Graphics;
 
 namespace Cosmos.Kernel.System;
@@ -83,7 +84,8 @@ public static class Global
     /// <summary>
     /// Starts the registered kernel, once. Enables interrupts (unless the
     /// Interrupts switch is off), registers the built-in drivers written
-    /// against the driver kit (AHCI and NVMe with storage), calls
+    /// against the driver kit (AHCI and NVMe with storage, USB mass storage
+    /// with storage and USB), calls
     /// <see cref="Kernel.RegisterDrivers"/> and binds those drivers and the
     /// kernel's (all only in a kernel built with PCI), starts USB hot-plug,
     /// then calls
@@ -118,10 +120,10 @@ public static class Global
         s_started = true;
 
         // On x64 the IDT load already unmasked interrupts during HAL
-        // bring-up; on ARM64 they stay masked from boot until here, or until
-        // storage bring-up needed them. Enabled before the kernel's Start
-        // rather than inside it, so OnBoot runs with them on on both
-        // architectures and an override of Start cannot lose them.
+        // bring-up; on ARM64 they stay masked from boot until here. Enabled
+        // before the kernel's Start rather than inside it, so OnBoot runs
+        // with them on on both architectures and an override of Start cannot
+        // lose them.
         if (InterruptManager.IsEnabled)
         {
             Serial.WriteString("[Global] Enabling interrupts...\n");
@@ -172,11 +174,12 @@ public static class Global
     /// drivers written against the driver kit, subsystem by subsystem behind
     /// the kernel's switches: that assembly sees no switch, so the guards
     /// live here. One switch per <c>if</c>, since ILC folds a single switch
-    /// only: a kernel built without storage keeps no AHCI or NVMe code. They
-    /// go through the kit's built-in path, which takes the names reserved
-    /// for built-ins and ranks them ahead of every registration the kernel
-    /// makes, so a built-in wins a tie and only a strictly more specific
-    /// match takes a device from it.
+    /// only: a kernel built without storage keeps no AHCI, NVMe or USB mass
+    /// storage code, and one built without USB keeps no USB mass storage
+    /// code. They go through the kit's built-in path, which takes the names
+    /// reserved for built-ins and ranks them ahead of every registration the
+    /// kernel makes, so a built-in wins a tie and only a strictly more
+    /// specific match takes a device from it.
     /// </summary>
     private static void RegisterBuiltInDrivers()
     {
@@ -186,6 +189,15 @@ public static class Global
             for (int i = 0; i < storage.Count; i++)
             {
                 DriverCore.RegisterBuiltIn(storage[i]);
+            }
+
+            if (Core.CosmosFeatures.UsbEnabled)
+            {
+                IReadOnlyList<UsbDriverRegistration> usbStorage = BuiltInDrivers.CreateUsbStorageRegistrations();
+                for (int i = 0; i < usbStorage.Count; i++)
+                {
+                    DriverCore.RegisterBuiltIn(usbStorage[i]);
+                }
             }
         }
     }

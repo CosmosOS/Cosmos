@@ -2,7 +2,6 @@
 
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
@@ -31,12 +30,12 @@ namespace Cosmos.Kernel.System.Storage;
 /// order, then in registration order. The first is
 /// <see cref="PrimaryDevice"/>, and <see cref="Partitions"/> follows the
 /// same order, so the primary disk's partitions, when it has any, come
-/// first. The rule is what keeps an internal disk primary now that the AHCI
-/// and NVMe drivers register their disks from the driver pass in
-/// Global.StartKernel, after the USB disks present at boot registered
-/// during the library initializers. It orders the disks
-/// the manager holds: at most 8, taken first come, so once 8 are registered
-/// a later disk is refused whatever its rank.
+/// first. The drivers publish their disks from the driver pass in
+/// Global.StartKernel in the order they bind, and a USB stick plugged in
+/// later registers after them, so the rule, not that order, is what keeps
+/// an internal disk primary. It orders the disks the manager holds: at
+/// most 8, taken first come, so once 8 are registered a later disk is
+/// refused whatever its rank.
 /// </remarks>
 public static class StorageManager
 {
@@ -141,7 +140,7 @@ public static class StorageManager
 
     /// <summary>
     /// Initializes the storage manager. Called once during boot, before the
-    /// HAL block devices are registered.
+    /// driver pass delivers the disks the drivers publish.
     /// </summary>
     internal static void Initialize()
     {
@@ -155,39 +154,6 @@ public static class StorageManager
         s_partitions = [];
         s_ranks = [];
         s_devices = [];
-    }
-
-    /// <summary>
-    /// Registers every block device the storage drivers HAL brings up
-    /// itself produced (the USB mass storage units), and follows the USB
-    /// disks plugged in or pulled out from then on. Called once during boot
-    /// after the HAL has initialized the controllers. The disks the kit's
-    /// drivers publish, the AHCI and NVMe drivers' among them, register
-    /// later, from the driver pass, and the primary-disk rule ranks them
-    /// into place.
-    /// </summary>
-    internal static void RegisterHalDevices()
-    {
-        if (!IsEnabled)
-        {
-            return;
-        }
-
-        // Behind USB's own switch, so a kernel without USB never references
-        // the USB mass storage driver and ILC trims it.
-        if (CosmosFeatures.UsbEnabled)
-        {
-            // Hooked before the boot disks are read, so none can slip
-            // between the two; one reported twice is registered once.
-            UsbMassStorageDriver.DiskAttached = RegisterDevice;
-            UsbMassStorageDriver.DiskDetached = static disk => UnregisterDevice(disk);
-
-            IReadOnlyList<UsbMassStorage> usbDisks = UsbMassStorageDriver.Disks;
-            for (int i = 0; i < usbDisks.Count; i++)
-            {
-                RegisterDevice(usbDisks[i]);
-            }
-        }
     }
 
     /// <summary>
@@ -226,7 +192,7 @@ public static class StorageManager
 
         // The scan reads the disk, so it runs before the lock, and only its
         // result is published under it. Re-registering a known device is a
-        // no-op: this is public, so a second RegisterHalDevices call would
+        // no-op: this is public, so a second RegisterDevice call would
         // otherwise double-count the device and duplicate every partition
         // under identical names.
         List<Partition> partitions = ScanPartitions(device);
@@ -432,14 +398,14 @@ public static class StorageManager
     /// <summary>
     /// Where <paramref name="device"/> stands in the primary-disk rule. A
     /// disk a driver published through the kit carries its binding, which
-    /// says whether it can leave the bus and which PCI function it sits on;
-    /// a USB mass storage unit can leave; anything else is a fixed disk of
-    /// no kind the manager knows.
+    /// says whether it can leave the bus, as every USB driver's can, and
+    /// which PCI function it sits on; anything else is a fixed disk of no
+    /// kind the manager knows.
     /// </summary>
     private static DiskRank RankOf(IBlockDevice device, ulong sequence)
     {
-        // Each switch alone, so ILC folds it: a kernel without PCI or without
-        // USB keeps neither the kit's adapter nor the USB disk here.
+        // The switch alone, so ILC folds it: a kernel without PCI keeps no
+        // kit adapter here.
         if (CosmosFeatures.PCIEnabled)
         {
             if (device is PublishedBlockDevice published)
@@ -450,14 +416,6 @@ public static class StorageManager
                 }
 
                 return new DiskRank(published.IsRemovable, KindOf(function), AddressOf(function.Device), sequence);
-            }
-        }
-
-        if (CosmosFeatures.UsbEnabled)
-        {
-            if (device is UsbMassStorage)
-            {
-                return new DiskRank(true, DiskKind.Other, DiskRank.NoPciAddress, sequence);
             }
         }
 
@@ -576,8 +534,7 @@ public static class StorageManager
             // Best-effort scan: a flaky device shouldn't block storage init —
             // but say so, or a real device fault (NVMe timeout throw per the
             // IBlockDevice error contract) is indistinguishable from "no
-            // partition table". String-only output: this can run in the
-            // phase-3 window where int formatting is off-limits.
+            // partition table".
             Serial.WriteString("[StorageManager] Partition scan failed on ");
             Serial.WriteString(device.Name);
             Serial.WriteString("\n");

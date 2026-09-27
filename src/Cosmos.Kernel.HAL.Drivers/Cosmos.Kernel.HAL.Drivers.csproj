@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
-    The built-in drivers written as driver kit drivers: one file per device
+    The built-in drivers written as driver kit drivers: one folder per device
     family, each exposing a registration, and BuiltInDrivers, the catalogue
     Global.StartKernel registers behind the kernel's feature switches.
     Cosmos.Kernel.HAL keeps the mechanisms (PCI enumeration, MSI-X, mapping,
@@ -23,8 +23,8 @@
   <PropertyGroup>
     <PackageId>Cosmos.Kernel.HAL.Drivers</PackageId>
     <Title>Cosmos Kernel Built-in Drivers</Title>
-    <Description>The built-in PCI drivers of Cosmos kernels, written against the driver kit.</Description>
-    <PackageTags>cosmos;kernel;hal;drivers;ahci</PackageTags>
+    <Description>The built-in PCI and USB drivers of Cosmos kernels, written against the driver kit.</Description>
+    <PackageTags>cosmos;kernel;hal;drivers;ahci;nvme;usb</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <RootNamespace>Cosmos.Kernel.HAL.Drivers.BuiltIn</RootNamespace>
     <!-- COSMOS0003: the drivers are written against the experimental driver kit,

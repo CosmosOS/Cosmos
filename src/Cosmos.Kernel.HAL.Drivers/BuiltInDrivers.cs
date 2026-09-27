@@ -3,18 +3,20 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Ahci;
 using Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Nvme;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.UsbMassStorage;
 using Cosmos.Kernel.HAL.Drivers.Pci;
+using Cosmos.Kernel.HAL.Drivers.Usb;
 
 namespace Cosmos.Kernel.HAL.Drivers.BuiltIn;
 
 /// <summary>
 /// The catalogue of the built-in drivers written against the driver kit,
-/// one method per subsystem. <c>Global.StartKernel</c> registers what it
-/// returns before the kernel's own <c>RegisterDrivers</c> runs, each
-/// subsystem behind that subsystem's feature switch: this assembly cannot
+/// one method per subsystem and bus. <c>Global.StartKernel</c> registers
+/// what it returns before the kernel's own <c>RegisterDrivers</c> runs,
+/// each behind the feature switches of what it needs: this assembly cannot
 /// read the switches itself, so the caller guards, and a kernel built
-/// without the subsystem never calls the method and trims the drivers it
-/// names. A kernel does not call it: these drivers are registered by the
+/// without them never calls the method and trims the drivers it names. A
+/// kernel does not call it: these drivers are registered by the
 /// time the kernel's RegisterDrivers runs, and a kernel's registration of
 /// a built-in name is refused.
 /// </summary>
@@ -33,6 +35,19 @@ public static class BuiltInDrivers
     public static IReadOnlyList<PciDriverRegistration> CreateStorageRegistrations()
     {
         PciDriverRegistration[] registrations = [AhciDriver.CreateRegistration(), NvmeDriver.CreateRegistration()];
+        return registrations;
+    }
+
+    /// <summary>
+    /// Creates the registrations of the built-in USB storage drivers: the
+    /// mass storage driver, which binds the SCSI over Bulk-Only interfaces
+    /// of USB sticks, card readers and USB disks and publishes their logical
+    /// units. Any context: it only allocates the registrations.
+    /// </summary>
+    /// <returns>New registrations, in the order they are to be registered.</returns>
+    public static IReadOnlyList<UsbDriverRegistration> CreateUsbStorageRegistrations()
+    {
+        UsbDriverRegistration[] registrations = [UsbMassStorageDriver.CreateRegistration()];
         return registrations;
     }
 }

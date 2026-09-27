@@ -36,15 +36,6 @@ internal abstract class BlockDevice : Device, IBlockDevice
     // works fine once the kernel is up. Names are therefore built digit by
     // digit, like Serial.WriteNumber.
 
-    /// <summary>Builds a device name like "usb0" without CoreLib int formatting.</summary>
-    protected static string BuildDeviceName(string prefix, uint number)
-    {
-        Span<char> buffer = stackalloc char[MaxNameLength];
-        int pos = Append(buffer, 0, prefix);
-        pos = AppendDigits(buffer, pos, number);
-        return new string(buffer[..pos]);
-    }
-
     /// <summary>Builds a partition name like "sata0p1" without CoreLib int formatting.</summary>
     protected internal static string BuildDeviceName(string prefix, string infix, uint number)
     {

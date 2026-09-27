@@ -3,7 +3,6 @@
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Input;
-using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Drivers.Pci;
 using Cosmos.Kernel.HAL.Drivers.Usb;
@@ -23,15 +22,17 @@ namespace Cosmos.Kernel.HAL.Drivers.Engine;
 /// <remarks>
 /// Two kinds of built-in driver exist. The ones HAL brings up itself bind
 /// during HAL bring-up, before any kernel code runs, and keep what they
-/// claim. The ones written against the kit (Cosmos.Kernel.HAL.Drivers,
-/// such as AHCI and NVMe) are registered here by Global.StartKernel through
-/// <see cref="RegisterBuiltIn"/>, and bind in the pass like any other
-/// registration, except that they win every tie. Registered drivers bind
-/// in <see cref="BindUserDrivers"/>, which Global.StartKernel runs once, on
-/// the boot thread with interrupts on, before the kernel starts; a USB
-/// device plugged in afterwards goes to HAL's built-ins first, then,
-/// through <see cref="KitUsbDriver"/>, to the registered USB drivers, on
-/// the USB hot-plug thread, which also runs <see cref="RemoveUsbBinding"/>
+/// claim. The ones written against the kit (Cosmos.Kernel.HAL.Drivers:
+/// AHCI, NVMe and USB mass storage) are registered here by
+/// Global.StartKernel through <see cref="RegisterBuiltIn(PciDriverRegistration)"/>
+/// and <see cref="RegisterBuiltIn(UsbDriverRegistration)"/>, and bind in
+/// the pass like any other registration, except that they win every tie.
+/// Registered drivers bind in <see cref="BindUserDrivers"/>, which
+/// Global.StartKernel runs once, on the boot thread with interrupts on,
+/// before the kernel starts; a USB device plugged in afterwards goes to
+/// HAL's hub and keyboard drivers first, then, through
+/// <see cref="KitUsbDriver"/>, to the kit's USB registrations, on the USB
+/// hot-plug thread, which also runs <see cref="RemoveUsbBinding"/>
 /// when one is pulled out. A PCI binding is never released.
 /// </remarks>
 internal static class DriverCore
@@ -46,6 +47,14 @@ internal static class DriverCore
     /// that did, so keep those words.
     /// </summary>
     internal const string RegisterFromDriverCallbackMessage = "A driver cannot register drivers from its factory or its Probe.";
+
+    /// <summary>
+    /// The name the built-in mass storage driver of Cosmos.Kernel.HAL.Drivers
+    /// registers under. Reserved against a kernel's registration whether or
+    /// not the kernel was built with storage, as <see cref="PciOwner"/>
+    /// reserves the built-in PCI drivers' names.
+    /// </summary>
+    private const string UsbMassStorageName = "mass storage";
 
     /// <summary>
     /// Makes a registration's checks and its append one step against the
@@ -68,11 +77,15 @@ internal static class DriverCore
     private static int s_builtInPciCount;
 
     /// <summary>
-    /// The USB registrations, in registration order; null until the first
+    /// The USB registrations, ordered as <see cref="s_pciRegistrations"/>
+    /// is: the built-in ones first, then the kernel's. Null until the first
     /// one. Frozen once the pass closed registration, which is what lets the
     /// hot-plug thread read it without the lock.
     /// </summary>
     private static List<UsbDriverRegistration>? s_usbRegistrations;
+
+    /// <summary>How many of <see cref="s_usbRegistrations"/>' first entries are built-in.</summary>
+    private static int s_builtInUsbCount;
 
     /// <summary>Set when the pass starts; from then on either Register throws.</summary>
     private static bool s_registrationClosed;
@@ -220,8 +233,8 @@ internal static class DriverCore
     }
 
     /// <summary>
-    /// Registers a USB class driver, to be offered the interfaces no
-    /// built-in class driver took: those present at boot when the driver
+    /// Registers a USB class driver, to be offered the interfaces HAL's own
+    /// class drivers (hub, keyboard) left: those present at boot when the driver
     /// pass runs, and those of every device plugged in later. Registration
     /// is open until the pass: from the kernel's constructor, or from its
     /// RegisterDrivers override, which Global.StartKernel calls right before
@@ -250,11 +263,38 @@ internal static class DriverCore
     }
 
     /// <summary>
+    /// Registers one of the built-in USB class drivers written against the
+    /// kit, as <see cref="RegisterBuiltIn(PciDriverRegistration)"/> does a
+    /// PCI one: it takes a built-in name (<c>mass storage</c>), and it ranks
+    /// the driver ahead of every USB registration the kernel made, so a
+    /// built-in wins a tie and only a strictly more specific match, such as
+    /// a kernel driver for one product, takes an interface from it.
+    /// </summary>
+    /// <param name="registration">The driver's name, factory and match table.</param>
+    /// <returns>
+    /// True when the driver will be offered interfaces. False when USB is
+    /// compiled out, or when a registration by that name already exists.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// Called from a driver's factory, Probe or Remove, or after the pass
+    /// closed registration.
+    /// </exception>
+    internal static bool RegisterBuiltIn(UsbDriverRegistration registration)
+    {
+        // The switch alone, as in Register.
+        if (!CosmosFeatures.UsbEnabled)
+        {
+            return false;
+        }
+
+        return Register(registration.Name, null, registration, builtIn: true);
+    }
+
+    /// <summary>
     /// The rules every kind of registration shares: one name space, since a
     /// name is what the device list identifies a driver by, and one window,
     /// from boot to the pass. Exactly one of <paramref name="pci"/> and
-    /// <paramref name="usb"/> is set, and <paramref name="builtIn"/> only
-    /// with <paramref name="pci"/>.
+    /// <paramref name="usb"/> is set.
     /// </summary>
     private static bool Register(string name, PciDriverRegistration? pci, UsbDriverRegistration? usb, bool builtIn)
     {
@@ -289,7 +329,16 @@ internal static class DriverCore
                     }
                     else if (usb is not null)
                     {
-                        (s_usbRegistrations ??= []).Add(usb);
+                        List<UsbDriverRegistration> registrations = s_usbRegistrations ??= [];
+                        if (builtIn)
+                        {
+                            registrations.Insert(s_builtInUsbCount, usb);
+                            s_builtInUsbCount++;
+                        }
+                        else
+                        {
+                            registrations.Add(usb);
+                        }
                     }
                 }
             }
@@ -383,8 +432,8 @@ internal static class DriverCore
 
     /// <summary>
     /// Offers <paramref name="usbInterface"/> of a device the USB stack just
-    /// enumerated after boot, which no built-in class driver took, to the
-    /// registered USB drivers that match it, best match first. The
+    /// enumerated after boot, which none of HAL's own class drivers took,
+    /// to the registered USB drivers that match it, best match first. The
     /// <see cref="KitUsbDriver"/>'s bind, on the hot-plug thread; for a
     /// device behind a hub, inside the hub's own bind.
     /// </summary>
@@ -495,7 +544,7 @@ internal static class DriverCore
         PciOwner.IsBuiltIn(name)
         || name == UsbHubDriver.DriverName
         || name == UsbKeyboardDriver.DriverName
-        || name == UsbMassStorageDriver.DriverName;
+        || name == UsbMassStorageName;
 
     /// <summary>True when a registration named <paramref name="name"/> exists, PCI or USB. The caller holds <see cref="s_lock"/>.</summary>
     private static bool IsRegistered(string name)
@@ -792,8 +841,10 @@ internal static class DriverCore
     /// The registrations that match <paramref name="usbInterface"/> of
     /// <paramref name="device"/>, most specific match first: a device match,
     /// then an interface match on class, subclass and protocol, then on
-    /// class and subclass, then on class. Ties keep registration order, so
-    /// the earlier registration is offered the interface first.
+    /// class and subclass, then on class. Ties keep the order of
+    /// <see cref="s_usbRegistrations"/>, built-ins first, then registration
+    /// order, so of two equally specific matches the built-in, or else the
+    /// earlier registration, is offered the interface first.
     /// </summary>
     private static List<UsbDriverRegistration> RankCandidates(UsbDevice device, UsbInterface usbInterface, List<UsbDriverRegistration> registrations)
     {

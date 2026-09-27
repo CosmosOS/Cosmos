@@ -4,7 +4,6 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Devices.Input;
-using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Drivers.Usb;
@@ -24,9 +23,9 @@ namespace Cosmos.Kernel.HAL.Devices.Usb;
 /// <see cref="XhciController"/>), the shared enumeration here plus the
 /// <see cref="UsbDevice"/> model, and class drivers
 /// (<see cref="UsbClassDriver"/>: <see cref="UsbHubDriver"/>,
-/// <see cref="UsbKeyboardDriver"/>, <see cref="UsbMassStorageDriver"/>, and
-/// last <see cref="KitUsbDriver"/>, which stands for the drivers a kernel
-/// registers).</para>
+/// <see cref="UsbKeyboardDriver"/>, and last <see cref="KitUsbDriver"/>,
+/// which stands for the drivers the kit binds, the built-in mass storage
+/// driver of Cosmos.Kernel.HAL.Drivers and the kernel's own).</para>
 ///
 /// <para>Hot-plug runs on a thread of its own, which
 /// <see cref="StartHotPlug"/> starts once the scheduler runs. A port change
@@ -90,13 +89,9 @@ internal static class UsbManager
             s_drivers.Add(new UsbKeyboardDriver());
         }
 
-        if (CosmosFeatures.StorageEnabled)
-        {
-            s_drivers.Add(new UsbMassStorageDriver());
-        }
-
-        // Last: the drivers a kernel registers are offered only what every
-        // built-in left, on hot-plug as at boot.
+        // Last: the drivers the kit binds, mass storage among them, are
+        // offered only what HAL's own class drivers left, on hot-plug as at
+        // boot.
         s_drivers.Add(KitUsbDriver.Instance);
 
         s_devices = [];

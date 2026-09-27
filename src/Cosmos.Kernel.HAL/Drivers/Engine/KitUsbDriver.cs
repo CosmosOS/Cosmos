@@ -5,10 +5,11 @@ using Cosmos.Kernel.HAL.Devices.Usb;
 namespace Cosmos.Kernel.HAL.Drivers.Engine;
 
 /// <summary>
-/// The USB drivers a kernel registered, as the USB stack sees them: one
-/// class driver, last in <see cref="UsbManager"/>'s list, behind the hub,
-/// keyboard and mass storage built-ins, so those keep the first pick of
-/// every interface, at boot and when a device is plugged in later. The
+/// The USB drivers the kit binds, the built-in mass storage driver and the
+/// kernel's own, as the USB stack sees them: one class driver, last in
+/// <see cref="UsbManager"/>'s list, behind HAL's hub and keyboard drivers,
+/// so those keep the first pick of every interface, at boot and when a
+/// device is plugged in later. The
 /// interfaces present at boot are left to the driver pass, which runs once
 /// the kernel registered its drivers; after it, a device the
 /// hot-plug thread enumerates gets the same ranked offering through
@@ -43,12 +44,13 @@ internal sealed class KitUsbDriver : UsbClassDriver
     internal static KitUsbDriver Instance => s_instance ??= new KitUsbDriver();
 
     /// <summary>
-    /// Offers <paramref name="usbInterface"/>, which no built-in took, to the
-    /// registered USB drivers that match it, best match first. Always false
-    /// before the driver pass ran, which offers the interfaces present at
-    /// boot itself, and when no USB driver is registered.
+    /// Offers <paramref name="usbInterface"/>, which HAL's hub and keyboard
+    /// drivers left, to the kit's USB registrations that match it, the
+    /// built-in mass storage driver's included, best match first. Always
+    /// false before the driver pass ran, which offers the interfaces present
+    /// at boot itself, and when no USB driver is registered.
     /// </summary>
-    /// <returns>True when a registered driver bound the interface.</returns>
+    /// <returns>True when a kit driver bound the interface.</returns>
     public override bool TryBind(UsbDevice device, UsbInterface usbInterface) =>
         DriverCore.OfferHotPluggedInterface(device, usbInterface);
 

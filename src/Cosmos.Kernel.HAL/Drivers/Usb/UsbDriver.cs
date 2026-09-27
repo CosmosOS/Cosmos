@@ -5,16 +5,18 @@ using System.Diagnostics.CodeAnalysis;
 namespace Cosmos.Kernel.HAL.Drivers.Usb;
 
 /// <summary>
-/// Base class of a USB class driver a kernel registers. The kit creates one
-/// instance per interface it offers the driver, through the registration's
-/// factory, and calls <see cref="Probe"/> on it once. A bound instance
-/// lives until its device leaves the bus, when the kit calls
-/// <see cref="Remove"/>. The kit offers a driver only the interfaces no
-/// built-in class driver (hub, keyboard, mass storage) took; neither the
-/// host controller nor the built-ins know the driver exists. A driver
-/// overrides <see cref="Probe"/>, and <see cref="Remove"/> if it needs to,
-/// as <c>protected override</c>; an assembly that Cosmos.Kernel.HAL grants
-/// its internals to overrides them as <c>protected internal override</c>.
+/// Base class of a USB class driver written against the kit. The kit
+/// creates one instance per interface it offers the driver, through the
+/// registration's factory, and calls <see cref="Probe"/> on it once. A
+/// bound instance lives until its device leaves the bus, when the kit
+/// calls <see cref="Remove"/>. The kit offers a driver only the interfaces
+/// HAL's own class drivers (hub, keyboard) did not take, ranked against the
+/// other registrations, the built-in mass storage driver's among them;
+/// neither the host controller nor HAL's class drivers know the driver
+/// exists. A driver overrides <see cref="Probe"/>, and <see cref="Remove"/>
+/// if it needs to, as <c>protected override</c>; an assembly that
+/// Cosmos.Kernel.HAL grants its internals to overrides them as
+/// <c>protected internal override</c>.
 /// </summary>
 [Experimental(Experimentals.DriverKitDiagId)]
 public abstract class UsbDriver
