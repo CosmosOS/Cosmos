@@ -69,7 +69,13 @@ namespace Cosmos.Kernel.Tests.Drivers;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Number of tests announced to the runner in TR.Start.</summary>
-    private const int ExpectedTestCount = 91;
+    private const int ExpectedTestCount = 92;
+
+    /// <summary>
+    /// Bytes in a page of DMA memory: what the kit rounds an allocation up
+    /// to, and the boundary it starts a buffer on.
+    /// </summary>
+    private const int DmaPageBytes = 4096;
 
     // Base profile names, spelled as in tests/profiles.json. A cell name is
     // one of them followed by "+modifier" for each modifier composed onto it.
@@ -402,7 +408,7 @@ public class Kernel : Sys.Kernel
     private static bool s_interruptsDeliveredInRegisterDrivers;
     private static int s_probesBeforeRegisterDrivers;
     private static string? s_xhciOwnerAtRegisterDrivers;
-    private static string? s_keyboardOwnerAtRegisterDrivers;
+    private static int s_usbInterfacesAtRegisterDrivers;
 
     /// <summary>Set from the timer interrupt by the software timer RegisterDrivers schedules.</summary>
     private static volatile bool s_proofTimerFired;
@@ -439,14 +445,10 @@ public class Kernel : Sys.Kernel
     private static bool s_usbNamedAfterPciBuiltInAccepted;
     private static bool s_pciNamedAfterUsbBuiltInAccepted;
 
-    // The USB interfaces of the usb-hid profile as the constructor found
-    // them, before the driver pass ran.
-    private static bool s_mouseFoundBeforePass;
-    private static string? s_mouseOwnerBeforePass;
-    private static bool s_tabletFoundBeforePass;
-    private static string? s_tabletOwnerBeforePass;
-    private static string? s_keyboardOwnerBeforePass;
-    private static string? s_keyboardPathBeforePass;
+    // The USB bus as the constructor found it, before the driver pass ran:
+    // the pass binds the xHCI controller, so nothing of it exists yet.
+    private static int s_usbInterfacesBeforePass;
+    private static string? s_xhciOwnerBeforePass;
 
     // The mouse's binding as the unplug cell captured it before pulling the
     // mouse out, for the cells after it.
@@ -562,7 +564,7 @@ public class Kernel : Sys.Kernel
         TR.Run("RegisterDrivers_RanOnceOnBootThread",       TestRegisterDrivers_RanOnceOnBootThread);
         TR.Run("RegisterDrivers_RanWithInterruptsEnabled",  TestRegisterDrivers_RanWithInterruptsEnabled);
         TR.Run("RegisterDrivers_RanBeforePassAndOnBoot",    TestRegisterDrivers_RanBeforePassAndOnBoot);
-        TR.RunIf(s_isUsbCell, "RegisterDrivers_RanAfterBuiltInsBound", TestRegisterDrivers_RanAfterBuiltInsBound, SkipNotUsbCell);
+        TR.RunIf(s_isUsbCell, "RegisterDrivers_RanBeforeUsbBroughtUp", TestRegisterDrivers_RanBeforeUsbBroughtUp, SkipNotUsbCell);
 
         // ==================== DriverManager ====================
         TR.Run("DriverManager_DevicesEmptyUntilPass",  TestDriverManager_DevicesEmptyUntilPass);
@@ -607,6 +609,7 @@ public class Kernel : Sys.Kernel
 
         // ==================== Context ====================
         TR.RunIf(s_isEduCell, "Context_ProbeOnlyMembersThrowAfterProbe",  TestContext_ProbeOnlyMembersThrowAfterProbe,  SkipNotEduCell);
+        TR.RunIf(s_isEduCell, "Context_DmaAllocatedAndFreedOnceBound",   TestContext_DmaAllocatedAndFreedOnceBound,   SkipNotEduCell);
         TR.RunIf(s_isEduCell, "Context_WriteConfigSparesHeader",          TestContext_WriteConfigSparesHeader,          SkipNotEduCell);
         TR.RunIf(s_isEduCell, "Function_ReadsConfigSpace",                TestFunction_ReadsConfigSpace,                SkipNotEduCell);
         TR.RunIf(s_isEduCell, "Mmio_MapsWholeBar",                        TestMmio_MapsWholeBar,                        SkipNotEduCell);
@@ -750,17 +753,23 @@ public class Kernel : Sys.Kernel
         Assert.True(s_onBootSequence > s_registerDriversSequence, "OnBoot should run after RegisterDrivers");
     }
 
-    // The built-in drivers bind during HAL bring-up, and RegisterDrivers
-    // comes after them: when it ran, the xHCI controller was already the USB
-    // stack's and the keyboard's interface the built-in keyboard driver's.
-    // Read from the PCI and USB stacks, since the public device list is
-    // empty until the pass.
-    private static void TestRegisterDrivers_RanAfterBuiltInsBound()
+    // The xHCI driver is a kit built-in now, so the whole USB bus comes up
+    // in the driver pass, which runs after RegisterDrivers: when the kernel
+    // was constructed and when RegisterDrivers ran, the controller's function
+    // was unowned and no USB device was enumerated. The pass then binds the
+    // controller, which publishes it to the USB core, and the devices behind
+    // it appear. Read from the PCI and USB stacks, since the public device
+    // list is empty until the pass.
+    private static void TestRegisterDrivers_RanBeforeUsbBroughtUp()
     {
-        Assert.True(s_xhciOwnerAtRegisterDrivers == XhciOwner,
-            $"the xHCI controller should be owned by {XhciOwner} when RegisterDrivers runs, was {s_xhciOwnerAtRegisterDrivers ?? "unowned"}");
-        Assert.True(s_keyboardOwnerAtRegisterDrivers == UsbKeyboardName,
-            $"the keyboard's interface should be owned by {UsbKeyboardName} when RegisterDrivers runs, was {s_keyboardOwnerAtRegisterDrivers ?? "unowned"}");
+        Assert.Null(s_xhciOwnerBeforePass, "no driver should own the xHCI controller when the kernel is constructed");
+        Assert.Equal(0, s_usbInterfacesBeforePass, "no USB device should be enumerated when the kernel is constructed");
+        Assert.Null(s_xhciOwnerAtRegisterDrivers,
+            $"no driver should own the xHCI controller when RegisterDrivers runs, {s_xhciOwnerAtRegisterDrivers ?? "none"} did");
+        Assert.Equal(0, s_usbInterfacesAtRegisterDrivers, "no USB device should be enumerated when RegisterDrivers runs");
+
+        Assert.True(PciFunctions.FindXhci()?.Owner == XhciOwner, "the pass should leave the xHCI controller owned by xhci");
+        Assert.True(UsbInterfaces.Enumerate().Length > 0, "the pass should leave the profile's USB devices enumerated");
     }
 
     // ==================== DriverManager ====================
@@ -931,14 +940,14 @@ public class Kernel : Sys.Kernel
 
     // No class driver of HAL's takes a HID mouse: the keyboard driver
     // matches the keyboard protocol only, the hub driver another class, and
-    // the built-in mass storage driver binds in the pass, through the kit.
-    // So the interface was free when the kernel was constructed, and the
-    // pass then gave it to the boot mouse driver, through the kit's class
-    // driver, which the USB stack hands it back to on disconnect.
+    // the built-in mass storage driver binds through the kit like any other
+    // kit driver. The pass brings the bus up, by binding the xHCI
+    // controller, and then gives the interface to the boot mouse driver,
+    // through the kit's class driver, which the USB stack hands it back to
+    // on disconnect.
     private static void TestUsb_MouseInterfaceBoundByPass()
     {
-        Assert.True(s_mouseFoundBeforePass, "no HID boot mouse interface was enumerated when the kernel was constructed");
-        Assert.Null(s_mouseOwnerBeforePass, "no class driver should have bound the HID boot mouse interface before the pass");
+        Assert.Equal(0, s_usbInterfacesBeforePass, "no USB interface should be enumerated before the pass, which binds the controller");
 
         UsbInterfaceState? mouse = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, MouseProtocol);
         if (mouse is null)
@@ -1254,8 +1263,8 @@ public class Kernel : Sys.Kernel
 
     // ==================== Context ====================
 
-    // Resources are handed out during Probe only, so a bound context refuses
-    // them afterwards.
+    // Resources other than DMA memory are handed out during Probe only, so a
+    // bound context refuses them afterwards.
     private static void TestContext_ProbeOnlyMembersThrowAfterProbe()
     {
         PciDeviceContext? context = EduDriver.Context;
@@ -1267,7 +1276,6 @@ public class Kernel : Sys.Kernel
 
         Assert.True(ThrowsInvalidOperation(() => context.TryMapBar(0, out _)), "TryMapBar after Probe should throw InvalidOperationException");
         Assert.True(ThrowsInvalidOperation(() => context.TryMapIOBar(0, out _)), "TryMapIOBar after Probe should throw InvalidOperationException");
-        Assert.True(ThrowsInvalidOperation(() => context.TryAllocateDma(1, ulong.MaxValue, out _)), "TryAllocateDma after Probe should throw InvalidOperationException");
         Assert.True(ThrowsInvalidOperation(context.EnableBusMastering), "EnableBusMastering after Probe should throw InvalidOperationException");
         Assert.True(ThrowsInvalidOperation(() => context.TryRequestInterrupts(static _ => { })), "TryRequestInterrupts after Probe should throw InvalidOperationException");
         Assert.True(ThrowsInvalidOperation(() => context.CreateEvent()), "CreateEvent after Probe should throw InvalidOperationException");
@@ -1277,6 +1285,37 @@ public class Kernel : Sys.Kernel
         Assert.True(context.IsPresent, "a bound PCI function is always present");
         string? expectedPath = PciFunctions.Find(EduDriver.VendorId, EduDriver.DeviceId)?.Path;
         Assert.True(context.Path == expectedPath, $"the context's path {context.Path} should name the edu function, {expectedPath ?? "which was not enumerated"}");
+    }
+
+    // DMA memory stays open once Bound, for what a driver finds later, such
+    // as a host controller's devices: a buffer comes page aligned and
+    // zeroed, FreeDma gives it back and makes it throw, and a second free,
+    // or a free of another binding's buffer, is refused.
+    private static void TestContext_DmaAllocatedAndFreedOnceBound()
+    {
+        PciDeviceContext? context = EduDriver.Context;
+        if (context is null)
+        {
+            Assert.Fail("the edu driver was never probed");
+            return;
+        }
+
+        if (!context.TryAllocateDma(DmaPageBytes, ulong.MaxValue, out DmaBuffer? buffer))
+        {
+            Assert.Fail("TryAllocateDma once Bound should return a buffer");
+            return;
+        }
+
+        Assert.Equal(0UL, buffer.DeviceAddress % DmaPageBytes, "the buffer should start on a page boundary");
+        Assert.True(buffer.Span.IndexOfAnyExcept((byte)0) < 0, "the buffer should come zeroed");
+
+        context.FreeDma(buffer);
+        Assert.True(ThrowsInvalidOperation(() => buffer.Span.Clear()), "a freed buffer should throw InvalidOperationException");
+        Assert.True(ThrowsArgumentException(() => context.FreeDma(buffer)), "a second FreeDma of the same buffer should throw ArgumentException");
+
+        DmaBuffer? foreign = ThrowingDriver.Buffer;
+        Assert.True(foreign is not null && ThrowsArgumentException(() => context.FreeDma(foreign)),
+            "FreeDma of a buffer another binding allocated should throw ArgumentException");
     }
 
     // Config writes stay open after Probe, in thread context, but never below
@@ -1960,9 +1999,6 @@ public class Kernel : Sys.Kernel
     // tablet stays without a driver.
     private static void TestUsbNoFallThrough_TabletOfferingEnds()
     {
-        Assert.True(s_tabletFoundBeforePass, "no tablet interface was enumerated when the kernel was constructed");
-        Assert.Null(s_tabletOwnerBeforePass, "no class driver should have bound the tablet interface before the pass");
-
         UsbInterfaceState? tablet = UsbInterfaces.Find(HidClass, TabletSubclass, TabletProtocol);
         if (tablet is null)
         {
@@ -2648,22 +2684,20 @@ public class Kernel : Sys.Kernel
 
     // QEMU's keyboard presents QEMU's HID IDs, which the device match
     // registration matches, and a HID interface, which the class match
-    // does; the built-in keyboard driver took it at boot, so the pass
-    // offered it to neither. Pulled out, the built-in lets go and the
-    // hot-plug thread drops it from the device list.
+    // does; the built-in keyboard driver took it as the USB core enumerated
+    // it, inside the pass's xHCI probe, so the pass offered it to neither
+    // registered driver. Pulled out, the built-in lets go and the hot-plug
+    // thread drops it from the device list.
     private static void TestUsbKeyboardUnplug_BuiltInLetsGo()
     {
-        Assert.True(s_keyboardOwnerBeforePass == UsbKeyboardName,
-            $"the built-in keyboard driver should own the keyboard before the pass, {s_keyboardOwnerBeforePass ?? "nothing"} did");
-        string? bootPath = s_keyboardPathBeforePass;
         UsbInterfaceState? keyboard = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, KeyboardProtocol);
-        if (bootPath is null || keyboard is null)
+        if (keyboard is null)
         {
             Assert.Fail("no HID boot keyboard interface enumerated");
             return;
         }
 
-        string offered = ProbeLog.Describe(bootPath);
+        string offered = ProbeLog.Describe(keyboard.Path);
         Assert.True(offered.Length == 0, $"no registered driver should be offered the keyboard the built-in took, it was offered to {offered}");
         Assert.True(keyboard.VendorId == UsbDescriptors.QemuHidVendorId && keyboard.ProductId == UsbDescriptors.QemuHidProductId,
             $"the keyboard should present QEMU's HID IDs, which the device match registration matches, presents {keyboard.VendorId:X4}:{keyboard.ProductId:X4}");
@@ -2879,7 +2913,11 @@ public class Kernel : Sys.Kernel
         s_commandBeforePass = function.Function.ReadConfig16(CommandOffset);
     }
 
-    /// <summary>Records the usb-hid profile's mouse, tablet and keyboard interfaces as the built-in class drivers left them.</summary>
+    /// <summary>
+    /// Records the USB bus as the kernel's constructor finds it, before the
+    /// driver pass: the xHCI driver is a kit built-in, so the controller is
+    /// unowned and nothing is enumerated behind it yet.
+    /// </summary>
     private static void CaptureUsbInterfacesBeforePass()
     {
         if (!s_isUsbCell)
@@ -2887,34 +2925,16 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        UsbInterfaceState? mouse = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, MouseProtocol);
-        if (mouse is not null)
-        {
-            s_mouseFoundBeforePass = true;
-            s_mouseOwnerBeforePass = mouse.DriverName;
-        }
-
-        UsbInterfaceState? tablet = UsbInterfaces.Find(HidClass, TabletSubclass, TabletProtocol);
-        if (tablet is not null)
-        {
-            s_tabletFoundBeforePass = true;
-            s_tabletOwnerBeforePass = tablet.DriverName;
-        }
-
-        UsbInterfaceState? keyboard = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, KeyboardProtocol);
-        if (keyboard is not null)
-        {
-            s_keyboardOwnerBeforePass = keyboard.DriverName;
-            s_keyboardPathBeforePass = keyboard.Path;
-        }
+        s_usbInterfacesBeforePass = UsbInterfaces.Enumerate().Length;
+        s_xhciOwnerBeforePass = PciFunctions.FindXhci()?.Owner;
     }
 
     /// <summary>
     /// Records, from inside RegisterDrivers, how often it ran and when, on
     /// which thread, whether an interrupt is delivered while it runs, how
     /// many Probes had run and what DriverManager.Devices held by then, and
-    /// on the usb-hid cell the owners of the xHCI controller and of the
-    /// keyboard's interface, which built-in drivers bind.
+    /// on the usb-hid cell that the USB bus is still down: its controller is
+    /// bound by the pass, which runs next.
     /// </summary>
     private static void RecordRegisterDriversContext()
     {
@@ -2927,7 +2947,7 @@ public class Kernel : Sys.Kernel
         if (s_isUsbCell)
         {
             s_xhciOwnerAtRegisterDrivers = PciFunctions.FindXhci()?.Owner;
-            s_keyboardOwnerAtRegisterDrivers = UsbInterfaces.Find(HidClass, BootInterfaceSubclass, KeyboardProtocol)?.DriverName;
+            s_usbInterfacesAtRegisterDrivers = UsbInterfaces.Enumerate().Length;
         }
     }
 

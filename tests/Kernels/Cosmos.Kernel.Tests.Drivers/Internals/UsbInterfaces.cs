@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// before the driver pass, which class driver the USB stack records for it,
 /// the binding it keeps, and whether the hot-plug thread runs. The USB
 /// stack's lists are not locked, so these are read at points where the
-/// hot-plug thread is not changing them: before the pass, or once a hot-plug
+/// hot-plug thread is not changing them: before or during the pass, or once a hot-plug
 /// wait on <see cref="Cosmos.Kernel.System.Drivers.DriverManager.Devices"/>,
 /// which is safe to read meanwhile, has seen the change. Thread context.
 /// </summary>
@@ -29,11 +29,9 @@ internal static class UsbInterfaces
     private const string UsbManagerType = "Cosmos.Kernel.HAL.Devices.Usb.UsbManager, Cosmos.Kernel.HAL";
     private const string UsbDeviceType = "Cosmos.Kernel.HAL.Devices.Usb.UsbDevice, Cosmos.Kernel.HAL";
     private const string UsbInterfaceType = "Cosmos.Kernel.HAL.Devices.Usb.UsbInterface, Cosmos.Kernel.HAL";
-    private const string UsbHostControllerType = "Cosmos.Kernel.HAL.Devices.Usb.UsbHostController, Cosmos.Kernel.HAL";
     private const string UsbClassDriverType = "Cosmos.Kernel.HAL.Devices.Usb.UsbClassDriver, Cosmos.Kernel.HAL";
     private const string KitUsbDriverType = "Cosmos.Kernel.HAL.Drivers.Engine.KitUsbDriver, Cosmos.Kernel.HAL";
     private const string DeviceListType = $"System.Collections.Generic.IReadOnlyList`1[[{UsbDeviceType}]]";
-    private const string ControllerListType = $"System.Collections.Generic.IReadOnlyList`1[[{UsbHostControllerType}]]";
     private const string InterfaceListType = $"System.Collections.Generic.List`1[[{UsbInterfaceType}]]";
 
     /// <summary>True once the USB hot-plug thread started.</summary>
@@ -53,7 +51,6 @@ internal static class UsbInterfaces
     public static UsbInterfaceState[] Enumerate()
     {
         IList devices = (IList)GetDevices(null);
-        IList controllers = (IList)GetControllers(null);
         List<UsbInterfaceState> found = [];
         for (int i = 0; i < devices.Count; i++)
         {
@@ -63,7 +60,7 @@ internal static class UsbInterfaces
                 continue;
             }
 
-            string devicePath = $"usb/{BusOf(device, controllers)}-{PortsOf(device)}:{GetConfigurationValue(device)}";
+            string devicePath = $"usb/{BusOf(device)}-{PortsOf(device)}:{GetConfigurationValue(device)}";
             IList interfaces = (IList)GetInterfaces(device);
             for (int j = 0; j < interfaces.Count; j++)
             {
@@ -115,22 +112,10 @@ internal static class UsbInterfaces
     }
 
     /// <summary>
-    /// The bus of <paramref name="device"/>: its host controller's position
-    /// among the controllers that came up, from 1; 0 when it is not among them.
+    /// The bus of <paramref name="device"/>: the number the USB core gave
+    /// its host controller when the driver pass delivered it, from 1.
     /// </summary>
-    private static int BusOf(object device, IList controllers)
-    {
-        object controller = GetHostController(device);
-        for (int i = 0; i < controllers.Count; i++)
-        {
-            if (ReferenceEquals(controllers[i], controller))
-            {
-                return i + 1;
-            }
-        }
-
-        return 0;
-    }
+    private static int BusOf(object device) => GetBusNumber(GetBus(device));
 
     /// <summary>The root port, then each hub port down to <paramref name="device"/>, joined with dots.</summary>
     private static string PortsOf(object device)
@@ -151,10 +136,6 @@ internal static class UsbInterfaces
     [return: UnsafeAccessorType(DeviceListType)]
     private static extern object GetDevices([UnsafeAccessorType(UsbManagerType)] object? manager);
 
-    [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "get_Controllers")]
-    [return: UnsafeAccessorType(ControllerListType)]
-    private static extern object GetControllers([UnsafeAccessorType(UsbManagerType)] object? manager);
-
     [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "get_Instance")]
     [return: UnsafeAccessorType(KitUsbDriverType)]
     private static extern object GetKitDriver([UnsafeAccessorType(KitUsbDriverType)] object? driver);
@@ -163,9 +144,13 @@ internal static class UsbInterfaces
     [return: UnsafeAccessorType(InterfaceListType)]
     private static extern object GetInterfaces([UnsafeAccessorType(UsbDeviceType)] object device);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_HostController")]
-    [return: UnsafeAccessorType(UsbHostControllerType)]
-    private static extern object GetHostController([UnsafeAccessorType(UsbDeviceType)] object device);
+    /// <summary>The bus the device was enumerated on, which its path's bus number comes from.</summary>
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_Bus")]
+    private static extern UsbBus GetBus([UnsafeAccessorType(UsbDeviceType)] object device);
+
+    /// <summary>The bus number the USB core gave the controller, from 1.</summary>
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_Number")]
+    private static extern int GetBusNumber(UsbBus bus);
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_Parent")]
     [return: UnsafeAccessorType(UsbDeviceType)]
