@@ -167,7 +167,9 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.NetworkTransmitHandler
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Pci.PciDeviceContext
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Pci.PciDeviceContext.EnableBusMastering() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Pci.PciDeviceContext.FreeDma(Cosmos.Kernel.HAL.Drivers.DmaBuffer! buffer) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Pci.PciDeviceContext.Function.get -> Cosmos.Kernel.HAL.Drivers.Pci.PciFunction!
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Pci.PciDeviceContext.PublishUsbHostController(Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController! controller) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Pci.PciDeviceContext.TryAllocateDma(int length, ulong maximumDeviceAddress, out Cosmos.Kernel.HAL.Drivers.DmaBuffer? buffer) -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Pci.PciDeviceContext.TryMapBar(int index, out Cosmos.Kernel.HAL.Drivers.MmioRegion? region) -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Pci.PciDeviceContext.TryMapIOBar(int index, out Cosmos.Kernel.HAL.Drivers.PortRegion? region) -> bool
@@ -209,6 +211,10 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbBulkPipe.ClearHalt() -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbBulkPipe.Read(System.Span<byte> buffer) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferResult
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbBulkPipe.Write(System.ReadOnlySpan<byte> data) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferResult
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbBus
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbBus.DisconnectPort(byte rootPort) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbBus.EnumerateDevice(byte rootPort, Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed speed) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbBus.NotifyPortChange() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbDeviceContext
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbDeviceContext.ControlIn(Cosmos.Kernel.HAL.Drivers.Usb.UsbRequestKind kind, Cosmos.Kernel.HAL.Drivers.Usb.UsbRecipient recipient, byte request, ushort value, ushort index, System.Span<byte> data) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferResult
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbDeviceContext.ControlOut(Cosmos.Kernel.HAL.Drivers.Usb.UsbRequestKind kind, Cosmos.Kernel.HAL.Drivers.Usb.UsbRecipient recipient, byte request, ushort value, ushort index) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus
@@ -233,9 +239,11 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbDriverRegistration.Name.get -> string!
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbDriverRegistration.UsbDriverRegistration(string! name, System.Func<Cosmos.Kernel.HAL.Drivers.Usb.UsbDriver!>! factory, params System.ReadOnlySpan<Cosmos.Kernel.HAL.Drivers.Usb.UsbMatch> matches) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo.AdditionalTransactions.get -> byte
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo.Address.get -> byte
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo.Direction.get -> Cosmos.Kernel.HAL.Drivers.Usb.UsbDirection
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo.Interval.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo.MaxBurst.get -> byte
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo.MaxPacketSize.get -> ushort
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo.Type.get -> Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointType
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo.UsbEndpointInfo() -> void
@@ -244,6 +252,12 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointType.Control = 0 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointType
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointType.Interrupt = 3 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointType
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointType.Isochronous = 1 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointType
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController.UsbHostController() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.IsDisconnected.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.MarkDisconnected() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.UsbHostDevice() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbInterfaceInfo
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbInterfaceInfo.Class.get -> byte
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbInterfaceInfo.Endpoints.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo>!
@@ -263,6 +277,23 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbRequestKind.Class = 1 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbRequestKind
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbRequestKind.Standard = 0 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbRequestKind
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbRequestKind.Vendor = 2 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbRequestKind
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket.Direction.get -> Cosmos.Kernel.HAL.Drivers.Usb.UsbDirection
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket.Index.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket.Length.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket.Request.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket.RequestType.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket.ToUInt64() -> ulong
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket.UsbSetupPacket() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket.UsbSetupPacket(Cosmos.Kernel.HAL.Drivers.Usb.UsbDirection direction, Cosmos.Kernel.HAL.Drivers.Usb.UsbRequestKind kind, Cosmos.Kernel.HAL.Drivers.Usb.UsbRecipient recipient, byte request, ushort value, ushort index, ushort length) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket.Value.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed.Full = 1 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed.High = 3 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed.Low = 2 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed.Super = 4 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed.SuperPlus = 5 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed.Unknown = 0 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferResult
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferResult.Length.get -> int
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferResult.Status.get -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus
@@ -273,6 +304,21 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus.Stall = 1 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus.Success = 0 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus.Timeout = 2 -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController.AddressDevice(Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice? parentHub, byte port, Cosmos.Kernel.HAL.Drivers.Usb.UsbSpeed speed) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice?
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController.HandlePortChanges(Cosmos.Kernel.HAL.Drivers.Usb.UsbBus! bus) -> void
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController.IsPolled.get -> bool
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController.Name.get -> string!
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController.Poll() -> void
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController.ProbeRootPorts(Cosmos.Kernel.HAL.Drivers.Usb.UsbBus! bus) -> void
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostController.ReleaseDevice(Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice! device) -> void
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.BulkIn(Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo endpoint, System.Span<byte> data, out int transferred) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.BulkOut(Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo endpoint, System.ReadOnlySpan<byte> data, out int transferred) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.ConfigureAsHub(byte portCount, byte thinkTime) -> bool
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.ControlTransfer(Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket setup, System.Span<byte> data, out int transferred) -> Cosmos.Kernel.HAL.Drivers.Usb.UsbTransferStatus
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.OpenBulkEndpoint(Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo endpoint) -> bool
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.OpenInterruptPipe(Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo endpoint, Cosmos.Kernel.HAL.Drivers.Usb.UsbReportHandler! handler) -> bool
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.ResetEndpoint(Cosmos.Kernel.HAL.Drivers.Usb.UsbEndpointInfo endpoint) -> bool
+[COSMOS0003]abstract Cosmos.Kernel.HAL.Drivers.Usb.UsbHostDevice.SubmitControlTransfer(Cosmos.Kernel.HAL.Drivers.Usb.UsbSetupPacket setup, System.ReadOnlySpan<byte> data) -> bool
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.DmaBuffer.ReadBarrier() -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.DmaBuffer.WriteBarrier() -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.Drivers.Pci.PciMatch.Class(byte baseClass, byte subclass) -> Cosmos.Kernel.HAL.Drivers.Pci.PciMatch

@@ -2,21 +2,19 @@
 
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Drivers.Usb;
 
 namespace Cosmos.Kernel.HAL.Drivers.Engine;
 
 /// <summary>
 /// Stands between an interrupt IN pipe and a driver's
-/// <see cref="UsbReportHandler"/>: <see cref="OnReport"/> is the
-/// <see cref="UsbInterruptHandler"/> the host controller calls for every
-/// completed transfer. The pipe starts transferring the moment it is
-/// opened, during Probe, and the host controller can never close it, so
-/// every report reaches this trampoline; only an armed one passes it on.
-/// Reports that arrive before the binding is Bound, after an attempt that
-/// opened the pipe was declined or failed, or after the device left are
-/// dropped, never buffered.
+/// <see cref="UsbReportHandler"/>: <see cref="OnReport"/> is the handler
+/// the host controller calls for every completed transfer. The pipe starts
+/// transferring the moment it is opened, during Probe, and the host
+/// controller can never close it, so every report reaches this trampoline;
+/// only an armed one passes it on. Reports that arrive before the binding
+/// is Bound, after an attempt that opened the pipe was declined or failed,
+/// or after the device left are dropped, never buffered.
 /// </summary>
 internal sealed class UsbReportTrampoline
 {

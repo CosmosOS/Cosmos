@@ -10,7 +10,6 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Power;
 using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
 using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
-using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces;
@@ -165,10 +164,9 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        // Behind USB's own switch so a kernel without USB never references
-        // the USB keyboard driver and ILC trims it.
-        IKeyboardDevice[] usb = CosmosFeatures.UsbEnabled ? UsbKeyboardDriver.GetKeyboards() : [];
-        return [.. VirtioDevice.GetKeyboards(), .. usb];
+        // USB keyboards come later, from the driver pass, through
+        // UsbKeyboardDriver.KeyboardAttached.
+        return VirtioDevice.GetKeyboards();
     }
 
     public IMouseDevice[] GetMouseDevices()

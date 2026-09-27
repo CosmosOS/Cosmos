@@ -10,7 +10,8 @@ namespace Cosmos.Kernel.HAL.Drivers.Usb;
 /// (USB 2.0 §9.6.6). A driver hands it back to
 /// <see cref="UsbDeviceContext.OpenInterruptIn"/> or
 /// <see cref="UsbDeviceContext.TryOpenBulk"/>, which find the endpoint by
-/// its <see cref="Address"/> in the context's interface. A plain value:
+/// its <see cref="Address"/> in the context's interface, and the kit hands
+/// it to the <see cref="UsbHostDevice"/> that opens it. A plain value:
 /// every member can be read in any context. A <c>default</c> value names
 /// endpoint 0, which is no endpoint of an interface, so the context refuses
 /// to open it.
@@ -33,6 +34,19 @@ public readonly struct UsbEndpointInfo
     /// <summary>bInterval: how often an interrupt endpoint is polled, in the unit the device's speed gives it.</summary>
     public byte Interval { get; }
 
+    /// <summary>
+    /// Transactions a high-speed interrupt or isochronous endpoint moves per
+    /// microframe past the first: wMaxPacketSize bits 12:11. 0 for any other.
+    /// </summary>
+    public byte AdditionalTransactions { get; }
+
+    /// <summary>
+    /// Packets a SuperSpeed endpoint moves in one burst past the first:
+    /// bMaxBurst of its SuperSpeed Endpoint Companion descriptor (USB 3.2
+    /// §9.6.7). 0 below SuperSpeed.
+    /// </summary>
+    public byte MaxBurst { get; }
+
     /// <summary>Describes <paramref name="endpoint"/>.</summary>
     internal UsbEndpointInfo(UsbEndpoint endpoint)
     {
@@ -41,5 +55,7 @@ public readonly struct UsbEndpointInfo
         Direction = endpoint.IsIn ? UsbDirection.In : UsbDirection.Out;
         MaxPacketSize = endpoint.MaxPacketSize;
         Interval = endpoint.Interval;
+        AdditionalTransactions = endpoint.AdditionalTransactions;
+        MaxBurst = endpoint.MaxBurst;
     }
 }

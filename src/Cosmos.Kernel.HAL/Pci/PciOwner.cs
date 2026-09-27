@@ -19,7 +19,7 @@ namespace Cosmos.Kernel.HAL.Pci;
 /// probes which of the two it is.
 /// </para>
 /// <para>
-/// USB class drivers (<c>usb-keyboard</c>, <c>usb-mass-storage</c>) own USB
+/// USB class drivers (<c>HID boot keyboard</c>, <c>mass storage</c>) own USB
 /// interfaces, never a PCI function: the xHCI host controller that carries
 /// them is owned by <see cref="Xhci"/>.
 /// </para>
@@ -47,7 +47,11 @@ internal static class PciOwner
     /// <summary>virtio GPU over PCI.</summary>
     public const string VirtioGpu = "virtio-gpu";
 
-    /// <summary>xHCI USB host controller.</summary>
+    /// <summary>
+    /// xHCI USB host controller. Written by the driver kit, as the name the
+    /// built-in xHCI driver of Cosmos.Kernel.HAL.Drivers is registered under:
+    /// kept here so no kernel can register a driver by that name.
+    /// </summary>
     public const string Xhci = "xhci";
 
     /// <summary>

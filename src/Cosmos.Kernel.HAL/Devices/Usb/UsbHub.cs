@@ -180,7 +180,7 @@ internal sealed class UsbHub
             return;
         }
 
-        UsbManager.DisconnectPort(Device.HostController, Device, port);
+        UsbManager.DisconnectPort(Device.Bus, Device, port);
         if ((status & PortStatusConnection) != 0 && WaitForStableConnection(port))
         {
             ProbePort(port);
@@ -223,7 +223,7 @@ internal sealed class UsbHub
             : UsbSpeed.Full;
 
         UsbManager.DelayMilliseconds(ResetRecoveryMs);
-        UsbManager.EnumerateDevice(Device.HostController, Device, port, speed);
+        UsbManager.EnumerateDevice(Device.Bus, Device, port, speed);
     }
 
     private bool ResetPort(byte port, out ushort status)

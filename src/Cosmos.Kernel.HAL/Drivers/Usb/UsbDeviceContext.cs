@@ -104,7 +104,7 @@ public sealed class UsbDeviceContext : DeviceContext
     {
         ThrowIfTornDown();
         ArgumentOutOfRangeException.ThrowIfGreaterThan(data.Length, MaximumControlDataLength, nameof(data));
-        UsbRequestType requestType = RequestType(kind, recipient) | UsbRequestType.DeviceToHost;
+        UsbRequestType requestType = UsbSetupPacket.RequestTypeOf(kind, recipient) | UsbRequestType.DeviceToHost;
         if (!IsPresent)
         {
             return new UsbTransferResult(UsbTransferStatus.Disconnected, 0);
@@ -152,7 +152,7 @@ public sealed class UsbDeviceContext : DeviceContext
     {
         ThrowIfTornDown();
         ArgumentOutOfRangeException.ThrowIfGreaterThan(data.Length, MaximumControlDataLength, nameof(data));
-        UsbRequestType requestType = RequestType(kind, recipient);
+        UsbRequestType requestType = UsbSetupPacket.RequestTypeOf(kind, recipient);
         if (!IsPresent)
         {
             return UsbTransferStatus.Disconnected;
@@ -390,28 +390,5 @@ public sealed class UsbDeviceContext : DeviceContext
         }
 
         return null;
-    }
-
-    /// <summary>bmRequestType's type and recipient fields for a request of <paramref name="kind"/> to <paramref name="recipient"/>.</summary>
-    private static UsbRequestType RequestType(UsbRequestKind kind, UsbRecipient recipient)
-    {
-        UsbRequestType type = kind switch
-        {
-            UsbRequestKind.Standard => UsbRequestType.Standard,
-            UsbRequestKind.Class => UsbRequestType.Class,
-            UsbRequestKind.Vendor => UsbRequestType.Vendor,
-            _ => throw new ArgumentOutOfRangeException(nameof(kind))
-        };
-
-        UsbRequestType target = recipient switch
-        {
-            UsbRecipient.Device => UsbRequestType.Device,
-            UsbRecipient.Interface => UsbRequestType.Interface,
-            UsbRecipient.Endpoint => UsbRequestType.Endpoint,
-            UsbRecipient.Other => UsbRequestType.Other,
-            _ => throw new ArgumentOutOfRangeException(nameof(recipient))
-        };
-
-        return type | target;
     }
 }

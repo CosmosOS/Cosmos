@@ -14,20 +14,23 @@ namespace Cosmos.Kernel.HAL.Drivers.Engine;
 
 /// <summary>
 /// The driver kit's engine. It keeps the drivers registered with it, runs
-/// the one pass that binds them to the PCI functions and USB interfaces no
-/// built-in driver took during HAL bring-up, offers the USB interfaces
-/// plugged in later the same way, ends a USB binding when its device is
-/// pulled out, and publishes what every device ended up owned by.
+/// the one pass that binds them to the PCI functions no built-in driver
+/// took during HAL bring-up and to the USB interfaces HAL's hub and
+/// keyboard drivers left, offers the USB interfaces plugged in later the
+/// same way, ends a USB binding when its device is pulled out, and
+/// publishes what every device ended up owned by.
 /// </summary>
 /// <remarks>
 /// Two kinds of built-in driver exist. The ones HAL brings up itself bind
 /// during HAL bring-up, before any kernel code runs, and keep what they
 /// claim. The ones written against the kit (Cosmos.Kernel.HAL.Drivers:
-/// AHCI, NVMe and USB mass storage) are registered here by
+/// xHCI, AHCI, NVMe and USB mass storage) are registered here by
 /// Global.StartKernel through <see cref="RegisterBuiltIn(PciDriverRegistration)"/>
 /// and <see cref="RegisterBuiltIn(UsbDriverRegistration)"/>, and bind in
-/// the pass like any other registration, except that they win every tie.
-/// Registered drivers bind in <see cref="BindUserDrivers"/>, which
+/// the pass like any other registration, except that they win every tie;
+/// the USB devices exist from the moment the pass binds their host
+/// controller, whose driver publishes it to the USB core. Registered
+/// drivers bind in <see cref="BindUserDrivers"/>, which
 /// Global.StartKernel runs once, on the boot thread with interrupts on,
 /// before the kernel starts; a USB device plugged in afterwards goes to
 /// HAL's hub and keyboard drivers first, then, through
@@ -208,7 +211,7 @@ internal static class DriverCore
     /// before it calls the kernel's RegisterDrivers. Unlike
     /// <see cref="Register(PciDriverRegistration)"/>, it takes a built-in
     /// name, which keeps the name the device list and the tests know the
-    /// driver by (<c>ahci</c>, <c>nvme</c>) and still reserved against a kernel, and it
+    /// driver by (<c>xhci</c>, <c>ahci</c>, <c>nvme</c>) and still reserved against a kernel, and it
     /// ranks the driver ahead of every registration the kernel made, even
     /// one made earlier from the kernel's constructor: a built-in wins a tie,
     /// and only a strictly more specific match takes a device from it.
@@ -530,10 +533,11 @@ internal static class DriverCore
     /// port then the port of each hub below it joined with dots, a colon,
     /// the configuration value, a dot and the interface number, all in
     /// decimal, such as <c>usb/1-2.1:1.0</c>. The bus is the host
-    /// controller's position among the USB stack's controllers, from 1.
+    /// controller's position among the USB stack's controllers, from 1: the
+    /// order the pass delivered them in.
     /// </summary>
     internal static string PathOf(UsbDevice device, UsbInterface usbInterface) =>
-        $"usb/{BusNumberOf(device.HostController)}-{PortChainOf(device)}:{device.ConfigurationValue}.{usbInterface.Number}";
+        $"usb/{device.Bus.Number}-{PortChainOf(device)}:{device.ConfigurationValue}.{usbInterface.Number}";
 
     /// <summary>
     /// True when <paramref name="name"/> is a built-in driver's: a PCI
@@ -950,27 +954,6 @@ internal static class DriverCore
         UsbMatchKind.ClassWithSubclass => "interface subclass match",
         _ => "interface class match"
     };
-
-    /// <summary>
-    /// <paramref name="controller"/>'s bus number: its position among the
-    /// USB stack's controllers, from 1, which is also the order they were
-    /// brought up in.
-    /// </summary>
-    private static int BusNumberOf(UsbHostController controller)
-    {
-        IReadOnlyList<UsbHostController> controllers = UsbManager.Controllers;
-        for (int i = 0; i < controllers.Count; i++)
-        {
-            if (controllers[i] == controller)
-            {
-                return i + 1;
-            }
-        }
-
-        // Only a controller still being brought up is missing from the list,
-        // and nothing is offered before bring-up is over.
-        return 0;
-    }
 
     /// <summary>The root port <paramref name="device"/> hangs off, then the port of each hub below it, joined with dots.</summary>
     private static string PortChainOf(UsbDevice device) =>

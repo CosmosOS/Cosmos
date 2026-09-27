@@ -8,7 +8,6 @@ using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Pci;
@@ -71,22 +70,11 @@ internal class LibraryInitializer
                 VirtioDevice.InitializePciBus();
             }
 
-            // Bring up USB host controllers and enumerate the devices behind
-            // them. Same ordering constraint as virtio: MSI-X needs the
-            // platform binder InitializeHardware installed. USB's own switch
-            // alone, not PCI && (Keyboard || Storage): Sdk.targets already
-            // turns it off with PCI and derives its default from Keyboard and
-            // Storage, and a compound guard does not fold in Debug IL, so ILC
-            // would keep the whole USB stack in a kernel that turned it off.
-            if (CosmosFeatures.UsbEnabled)
-            {
-                Serial.WriteString("[KERNEL]   - Initializing USB...\n");
-                UsbManager.Initialize();
-            }
-
-            // No storage controller is brought up here: AHCI and NVMe are
-            // driver kit drivers in Cosmos.Kernel.HAL.Drivers, which
-            // Global.StartKernel registers and the driver pass binds.
+            // No USB host controller and no storage controller is brought up
+            // here: xHCI, AHCI and NVMe are driver kit drivers in
+            // Cosmos.Kernel.HAL.Drivers, which Global.StartKernel registers
+            // and the driver pass binds; the USB core enumerates an xHCI's
+            // devices when the pass delivers the controller.
         }
     }
 }

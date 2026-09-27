@@ -51,9 +51,10 @@ internal class LibraryInitializer
                         KeyboardManager.RegisterKeyboard(keyboard);
                     }
 
-                    // USB keyboards plugged in or pulled out from now on. Nested
-                    // under USB's own switch so a kernel without USB never
-                    // references the USB keyboard driver and ILC trims it.
+                    // USB keyboards, which the driver pass brings in, then the
+                    // hot-plug thread as they come and go. Nested under USB's
+                    // own switch so a kernel without USB never references the
+                    // USB keyboard driver and ILC trims it.
                     if (CosmosFeatures.UsbEnabled)
                     {
                         UsbKeyboardDriver.KeyboardAttached = KeyboardManager.RegisterKeyboard;

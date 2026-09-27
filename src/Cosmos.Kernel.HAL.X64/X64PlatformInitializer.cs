@@ -9,7 +9,6 @@ using Cosmos.Kernel.Core.X64;
 using Cosmos.Kernel.Core.X64.Cpu;
 using Cosmos.Kernel.Core.X64.IO;
 using Cosmos.Kernel.Core.X64.Power;
-using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Interfaces;
@@ -152,10 +151,10 @@ internal class X64PlatformInitializer : IPlatformInitializer
         }
 
         IKeyboardDevice[] ps2 = _ps2Controller is not null ? PS2Controller.GetKeyboardDevices() : [];
-        // Behind USB's own switch so a kernel without USB never references
-        // the USB keyboard driver and ILC trims it.
-        IKeyboardDevice[] usb = CosmosFeatures.UsbEnabled ? UsbKeyboardDriver.GetKeyboards() : [];
-        return [.. ps2, .. VirtioDevice.GetKeyboards(), .. usb];
+
+        // USB keyboards come later, from the driver pass, through
+        // UsbKeyboardDriver.KeyboardAttached.
+        return [.. ps2, .. VirtioDevice.GetKeyboards()];
     }
 
     public IMouseDevice[] GetMouseDevices()

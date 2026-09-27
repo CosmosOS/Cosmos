@@ -4,38 +4,39 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Devices.Input;
-using Cosmos.Kernel.HAL.Devices.Usb.Xhci;
 using Cosmos.Kernel.HAL.Drivers.Engine;
 using Cosmos.Kernel.HAL.Drivers.Usb;
-using Cosmos.Kernel.HAL.Pci;
-using Cosmos.Kernel.HAL.Pci.Enums;
 
 namespace Cosmos.Kernel.HAL.Devices.Usb;
 
 /// <summary>
-/// USB stack entry point. Brings up every supported host controller found
-/// on PCI, enumerates the devices present at boot (through hubs as well),
-/// binds class drivers to their interfaces, and follows the devices plugged
-/// in and pulled out afterwards.
+/// The kit's USB core. Takes the host controllers PCI drivers publish,
+/// enumerates the devices behind them (through hubs as well), binds class
+/// drivers to their interfaces, and follows the devices plugged in and
+/// pulled out afterwards.
 ///
 /// <para>The stack is split in three layers so each can grow on its own:
-/// host controllers (<see cref="UsbHostController"/>, today
-/// <see cref="XhciController"/>), the shared enumeration here plus the
-/// <see cref="UsbDevice"/> model, and class drivers
+/// host controllers (<see cref="UsbHostController"/>, written against the
+/// driver kit and published from a PCI driver's Probe, such as the built-in
+/// xHCI driver of Cosmos.Kernel.HAL.Drivers), the shared enumeration here
+/// plus the <see cref="UsbDevice"/> model, and class drivers
 /// (<see cref="UsbClassDriver"/>: <see cref="UsbHubDriver"/>,
 /// <see cref="UsbKeyboardDriver"/>, and last <see cref="KitUsbDriver"/>,
 /// which stands for the drivers the kit binds, the built-in mass storage
 /// driver of Cosmos.Kernel.HAL.Drivers and the kernel's own).</para>
 ///
-/// <para>Hot-plug runs on a thread of its own, which
-/// <see cref="StartHotPlug"/> starts once the scheduler runs. A port change
-/// is reported in interrupt context (a root port's status change event, a
-/// hub's status change endpoint), where nothing can be enumerated, so the
-/// report only wakes the thread (<see cref="NotifyPortChange"/>), and the
-/// thread asks every controller and every hub which of their ports
-/// changed. Enumeration, driver binding and disconnects after boot all run
-/// on it, one at a time: <see cref="Devices"/> is only changed by the boot
-/// path, then by this thread.</para>
+/// <para>A controller arrives during the driver pass, when the kit delivers
+/// what its driver published: <see cref="AddController"/> gives it a bus
+/// and enumerates what sits on its root ports, on the boot thread. Hot-plug
+/// runs on a thread of its own, which <see cref="StartHotPlug"/> starts
+/// once the pass is over. A port change is reported in interrupt context (a
+/// root port's status change event, a hub's status change endpoint), where
+/// nothing can be enumerated, so the report only wakes the thread
+/// (<see cref="NotifyPortChange"/>), and the thread asks every controller
+/// and every hub which of their ports changed. Enumeration, driver binding
+/// and disconnects after the pass all run on it, one at a time:
+/// <see cref="Devices"/> is only changed by the pass, then by this
+/// thread.</para>
 /// </summary>
 internal static class UsbManager
 {
@@ -44,6 +45,9 @@ internal static class UsbManager
     /// <summary>How often the hot-plug thread polls a controller whose port changes raise no interrupt.</summary>
     private const uint PollIntervalMs = 250;
 
+    // Null until the first controller arrives: a kernel whose pass binds
+    // none never builds the class drivers.
+    private static List<UsbBus>? s_buses;
     private static List<UsbHostController>? s_controllers;
     private static List<UsbClassDriver>? s_drivers;
     private static List<UsbDevice>? s_devices;
@@ -51,117 +55,86 @@ internal static class UsbManager
     /// <summary>Signaled from interrupt context by every port change report; the hot-plug thread waits on it.</summary>
     private static InterruptEvent? s_portChange;
 
-    public static bool IsInitialized => s_controllers is not null;
-
     /// <summary>
     /// True once <see cref="StartHotPlug"/> started the thread that follows
     /// devices plugged in or pulled out; before that, and when it could not
-    /// start, the devices are the ones found at boot.
+    /// start, the devices are the ones found during the driver pass.
     /// </summary>
     public static bool IsHotPlugRunning { get; private set; }
 
-    /// <summary>Host controllers that came up (empty before <see cref="Initialize"/>).</summary>
+    /// <summary>Host controllers delivered so far, in delivery order, which is also their bus numbers' (empty before the first).</summary>
     public static IReadOnlyList<UsbHostController> Controllers =>
         (IReadOnlyList<UsbHostController>?)s_controllers ?? Array.Empty<UsbHostController>();
 
     /// <summary>
     /// Every device enumerated and configured, hubs included. Changed by the
-    /// boot path, then by the hot-plug thread only.
+    /// driver pass, then by the hot-plug thread only.
     /// </summary>
     public static IReadOnlyList<UsbDevice> Devices =>
         (IReadOnlyList<UsbDevice>?)s_devices ?? Array.Empty<UsbDevice>();
 
     /// <summary>
-    /// Registers the built-in class drivers, then the driver kit's behind
-    /// them, starts every xHCI controller and enumerates the devices behind
-    /// their root ports. Idempotent.
+    /// Takes a host controller a PCI driver published: gives it the next bus
+    /// number and enumerates the devices on its root ports, binding the
+    /// hub and keyboard drivers as it goes; the kit's own USB drivers are
+    /// offered what those left once the pass reaches its USB step. Called by
+    /// the kit when it delivers the publication, on the boot thread during
+    /// the driver pass, before the controller's driver has its interrupts
+    /// armed. The first controller also brings up the class drivers.
     /// </summary>
-    public static void Initialize()
+    /// <param name="controller">The published controller.</param>
+    internal static void AddController(UsbHostController controller)
     {
-        if (s_controllers is not null)
+        if (s_buses is null || s_controllers is null || s_drivers is null)
         {
-            return;
-        }
-
-        s_drivers = [new UsbHubDriver()];
-        if (CosmosFeatures.KeyboardEnabled)
-        {
-            s_drivers.Add(new UsbKeyboardDriver());
-        }
-
-        // Last: the drivers the kit binds, mass storage among them, are
-        // offered only what HAL's own class drivers left, on hot-plug as at
-        // boot.
-        s_drivers.Add(KitUsbDriver.Instance);
-
-        s_devices = [];
-        s_portChange = new InterruptEvent();
-
-        List<UsbHostController> controllers = [];
-        List<PciDevice> pciDevices = PciManager.GetAllDevicesClass(ClassId.SerialBusController, SubclassId.UsbController);
-        foreach (PciDevice pci in pciDevices)
-        {
-            if (pci.ProgIf != (byte)ProgramIf.UsbXhci)
+            s_drivers = [new UsbHubDriver()];
+            if (CosmosFeatures.KeyboardEnabled)
             {
-                Serial.WriteString("[USB] Skipping non-xHCI USB controller (prog-if 0x");
-                Serial.WriteHex((uint)pci.ProgIf);
-                Serial.WriteString(")\n");
-                continue;
+                s_drivers.Add(new UsbKeyboardDriver());
             }
 
-            // One controller failing (firmware that never releases it, a
-            // reset that never completes) must not cost the others.
-            try
-            {
-                XhciController controller = new(pci, controllers.Count);
-                controller.Initialize();
-                // Cannot be refused: this scan runs at boot, before any
-                // other driver can own a USB host controller.
-                _ = pci.TryClaim(PciOwner.Xhci);
-                controllers.Add(controller);
-            }
-            catch (Exception ex)
-            {
-                Serial.WriteString("[USB] xHCI controller init failed: ");
-                Serial.WriteString(ex.Message);
-                Serial.WriteString("\n");
-            }
+            // Last: the drivers the kit binds, mass storage among them, are
+            // offered only what HAL's own class drivers left, on hot-plug as
+            // at boot.
+            s_drivers.Add(KitUsbDriver.Instance);
+
+            s_devices = [];
+            s_portChange = new InterruptEvent();
+            s_controllers = [];
+            s_buses = [];
         }
 
-        if (controllers.Count == 0)
+        // Listed before its ports are probed, so the devices behind it find
+        // their bus number. The pass is the only thread that adds one, and
+        // the hot-plug thread starts after it.
+        UsbBus bus = new(controller, s_buses.Count + 1);
+        s_buses.Add(bus);
+        s_controllers.Add(controller);
+
+        try
         {
-            Serial.WriteString("[USB] No usable USB host controller\n");
+            bus.ProbeRootPorts();
         }
-
-        foreach (UsbHostController controller in controllers)
+        catch (Exception ex)
         {
-            try
-            {
-                controller.ProbeRootPorts();
-            }
-            catch (Exception ex)
-            {
-                Serial.WriteString("[USB] ");
-                Serial.WriteString(controller.Name);
-                Serial.WriteString(" port probe failed: ");
-                Serial.WriteString(ex.Message);
-                Serial.WriteString("\n");
-            }
+            Serial.WriteString("[USB] ");
+            Serial.WriteString(controller.Name);
+            Serial.WriteString(" port probe failed: ");
+            Serial.WriteString(ex.Message);
+            Serial.WriteString("\n");
         }
-
-        s_controllers = controllers;
     }
 
     /// <summary>
     /// Starts following the devices plugged in and pulled out of the
-    /// controllers <see cref="Initialize"/> brought up. Needs the scheduler
-    /// running and switching threads, so interrupts enabled: without them,
-    /// and in a kernel built without the scheduler, the devices are the ones
-    /// found at boot. Idempotent once it succeeded.
+    /// controllers the driver pass delivered. Needs the scheduler running
+    /// and switching threads, so interrupts enabled: without them, and in a
+    /// kernel built without the scheduler, the devices are the ones found
+    /// during the pass. Idempotent once it succeeded.
     /// </summary>
     public static void StartHotPlug()
     {
-        if (IsHotPlugRunning || s_controllers is not { Count: > 0 } || !SchedulerManager.IsRunning)
+        if (IsHotPlugRunning || s_buses is not { Count: > 0 } || !SchedulerManager.IsRunning)
         {
             return;
         }
@@ -183,30 +156,34 @@ internal static class UsbManager
     /// <summary>
     /// Wakes the hot-plug thread to look at the ports again. Safe from
     /// interrupt context: host controllers call it for a root port change,
-    /// hubs for a report of their status change endpoint.
+    /// through <see cref="UsbBus.NotifyPortChange"/>, hubs for a report of
+    /// their status change endpoint.
     /// </summary>
     public static void NotifyPortChange() => s_portChange?.Signal();
 
     /// <summary>
     /// Addresses the device just reset on <paramref name="port"/>, reads its
     /// descriptors, selects its first configuration and offers each of its
-    /// interfaces to the class drivers. Called for root ports by the host
-    /// controller and for hub ports by <see cref="UsbHubDriver"/>.
+    /// interfaces to the class drivers. Called for root ports through the
+    /// controller's <see cref="UsbBus"/> and for hub ports by
+    /// <see cref="UsbHubDriver"/>.
     /// </summary>
     /// <returns>The configured device, or null when enumeration failed.</returns>
-    internal static UsbDevice? EnumerateDevice(UsbHostController host, UsbDevice? parentHub, byte port, UsbSpeed speed)
+    internal static UsbDevice? EnumerateDevice(UsbBus bus, UsbDevice? parentHub, byte port, UsbSpeed speed)
     {
-        UsbDevice? device = host.AddressDevice(parentHub, port, speed);
-        if (device is null)
+        UsbHostController controller = bus.Controller;
+        UsbHostDevice? host = controller.AddressDevice(parentHub?.Host, port, speed);
+        if (host is null)
         {
             return null;
         }
 
+        UsbDevice device = new(bus, host, parentHub, port, speed);
         if (!device.ReadDescriptors())
         {
             WriteDevicePrefix(device);
             Serial.WriteString("could not read descriptors\n");
-            host.ReleaseDevice(device);
+            controller.ReleaseDevice(host);
             return null;
         }
 
@@ -224,7 +201,7 @@ internal static class UsbManager
         {
             WriteDevicePrefix(device);
             Serial.WriteString("SET_CONFIGURATION failed\n");
-            host.ReleaseDevice(device);
+            controller.ReleaseDevice(host);
             return null;
         }
 
@@ -239,15 +216,15 @@ internal static class UsbManager
 
     /// <summary>
     /// Disconnects the device on <paramref name="port"/> of
-    /// <paramref name="parentHub"/> (a root port of <paramref name="host"/>
+    /// <paramref name="parentHub"/> (a root port of <paramref name="bus"/>
     /// when null) and, when it is a hub, every device behind it: the class
     /// drivers let go of them, then the host controller frees them. Nothing
     /// happens when no device was enumerated on that port. Hot-plug thread
     /// only.
     /// </summary>
-    internal static void DisconnectPort(UsbHostController host, UsbDevice? parentHub, byte port)
+    internal static void DisconnectPort(UsbBus bus, UsbDevice? parentHub, byte port)
     {
-        UsbDevice? device = FindDevice(host, parentHub, port);
+        UsbDevice? device = FindDevice(bus, parentHub, port);
         if (device is null)
         {
             return;
@@ -271,7 +248,7 @@ internal static class UsbManager
     /// </summary>
     private static void RunHotPlug()
     {
-        if (s_controllers is not { } controllers)
+        if (s_buses is not { } buses)
         {
             return;
         }
@@ -279,16 +256,16 @@ internal static class UsbManager
         Serial.WriteString("[USB] Hot-plug thread started\n");
         while (true)
         {
-            foreach (UsbHostController controller in controllers)
+            foreach (UsbBus bus in buses)
             {
                 try
                 {
-                    controller.HandlePortChanges();
+                    bus.HandlePortChanges();
                 }
                 catch (Exception ex)
                 {
                     Serial.WriteString("[USB] ");
-                    Serial.WriteString(controller.Name);
+                    Serial.WriteString(bus.Controller.Name);
                     Serial.WriteString(" port change failed: ");
                     Serial.WriteString(ex.Message);
                     Serial.WriteString("\n");
@@ -306,7 +283,7 @@ internal static class UsbManager
                 Serial.WriteString("\n");
             }
 
-            WaitForPortChange(controllers);
+            WaitForPortChange(buses);
         }
     }
 
@@ -315,12 +292,12 @@ internal static class UsbManager
     /// nothing by interrupt is polled instead, which also delivers what its
     /// hubs report.
     /// </summary>
-    private static void WaitForPortChange(List<UsbHostController> controllers)
+    private static void WaitForPortChange(List<UsbBus> buses)
     {
         bool polled = false;
-        foreach (UsbHostController controller in controllers)
+        foreach (UsbBus bus in buses)
         {
-            polled |= controller.IsPolled;
+            polled |= bus.Controller.IsPolled;
         }
 
         if (!polled)
@@ -330,16 +307,16 @@ internal static class UsbManager
         }
 
         SchedulerManager.Sleep(PollIntervalMs);
-        foreach (UsbHostController controller in controllers)
+        foreach (UsbBus bus in buses)
         {
-            if (controller.IsPolled)
+            if (bus.Controller.IsPolled)
             {
-                controller.Poll();
+                bus.Controller.Poll();
             }
         }
     }
 
-    private static UsbDevice? FindDevice(UsbHostController host, UsbDevice? parentHub, byte port)
+    private static UsbDevice? FindDevice(UsbBus bus, UsbDevice? parentHub, byte port)
     {
         if (s_devices is null)
         {
@@ -348,7 +325,7 @@ internal static class UsbManager
 
         foreach (UsbDevice device in s_devices)
         {
-            if (device.HostController == host && device.Parent == parentHub && device.PortNumber == port)
+            if (device.Bus == bus && device.Parent == parentHub && device.PortNumber == port)
             {
                 return device;
             }
@@ -436,7 +413,7 @@ internal static class UsbManager
             }
         }
 
-        device.HostController.ReleaseDevice(device);
+        device.HostController.ReleaseDevice(device.Host);
     }
 
     private static void BindDrivers(UsbDevice device)

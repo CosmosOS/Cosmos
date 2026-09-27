@@ -9,10 +9,10 @@ namespace Cosmos.Kernel.HAL.Devices.Input;
 /// <summary>
 /// USB class driver for keyboards: binds every HID interface that declares
 /// the boot keyboard protocol (HID 1.11 §4.2-§4.3), which every PC keyboard
-/// does so firmware can use it, and exposes them to the platform
-/// initializer the way <see cref="Virtio.VirtioDevice.GetKeyboards"/> does.
-/// The keyboards plugged in or pulled out after boot are reported through
-/// <see cref="KeyboardAttached"/> and <see cref="KeyboardDetached"/>.
+/// does so firmware can use it. The keyboards come and go through
+/// <see cref="KeyboardAttached"/> and <see cref="KeyboardDetached"/>: the
+/// USB core first enumerates during the driver pass, after the platform
+/// initializer listed its own keyboards, so none is there to list.
 /// </summary>
 internal sealed class UsbKeyboardDriver : UsbClassDriver
 {
@@ -20,12 +20,10 @@ internal sealed class UsbKeyboardDriver : UsbClassDriver
     private const byte KeyboardProtocol = 0x01;
 
     /// <summary>
-    /// The keyboards present. Replaced on every change, never changed in
-    /// place, so a reader on another thread still sees a whole list. Null
-    /// rather than <c>[]</c> until the first one binds: an initializer would
-    /// give this type a class constructor, and <see cref="TryBind"/> first
-    /// runs while devices come up, before the scheduler has a current thread
-    /// for the class-constructor lock to use.
+    /// The keyboards present, which <see cref="Disconnect"/> looks the
+    /// unplugged one up in. Replaced on every change, never changed in place.
+    /// Null rather than <c>[]</c> until the first one binds: an initializer
+    /// would give this type a class constructor.
     /// </summary>
     private static UsbKeyboard[]? s_keyboards;
 
@@ -38,26 +36,14 @@ internal sealed class UsbKeyboardDriver : UsbClassDriver
     public override string Name => DriverName;
 
     /// <summary>
-    /// Called with every keyboard that becomes usable: on the boot path
-    /// before anyone listens, then on the hot-plug thread.
+    /// Called with every keyboard that becomes usable: on the boot thread
+    /// during the driver pass, then on the hot-plug thread. System's library
+    /// initializer hooks the keyboard manager here, before either runs.
     /// </summary>
     public static Action<UsbKeyboard>? KeyboardAttached { get; set; }
 
     /// <summary>Called on the hot-plug thread with every keyboard that was unplugged.</summary>
     public static Action<UsbKeyboard>? KeyboardDetached { get; set; }
-
-    /// <summary>Keyboards present (empty when none, or before USB enumeration).</summary>
-    public static IKeyboardDevice[] GetKeyboards()
-    {
-        UsbKeyboard[] present = s_keyboards ?? [];
-        IKeyboardDevice[] keyboards = new IKeyboardDevice[present.Length];
-        for (int i = 0; i < keyboards.Length; i++)
-        {
-            keyboards[i] = present[i];
-        }
-
-        return keyboards;
-    }
 
     public override bool TryBind(UsbDevice device, UsbInterface usbInterface)
     {

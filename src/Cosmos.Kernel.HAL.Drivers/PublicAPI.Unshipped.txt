@@ -1,10 +1,13 @@
 #nullable enable
 [COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers
-[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Ahci.AhciDriver
-[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Nvme.NvmeDriver
-[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.UsbMassStorage.UsbMassStorageDriver
-[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreateStorageRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!>!
-[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreateUsbStorageRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Drivers.Usb.UsbDriverRegistration!>!
-[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Ahci.AhciDriver.CreateRegistration() -> Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!
-[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.Nvme.NvmeDriver.CreateRegistration() -> Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!
-[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Storage.UsbMassStorage.UsbMassStorageDriver.CreateRegistration() -> Cosmos.Kernel.HAL.Drivers.Usb.UsbDriverRegistration!
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Ahci.AhciDriver
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme.NvmeDriver
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.MassStorage.MassStorageDriver
+[COSMOS0003]Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci.XhciDriver
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreatePciStorageRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!>!
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreateUsbHostRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!>!
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.BuiltInDrivers.CreateUsbMassStorageRegistrations() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Drivers.Usb.UsbDriverRegistration!>!
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Ahci.AhciDriver.CreateRegistration() -> Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Nvme.NvmeDriver.CreateRegistration() -> Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.MassStorage.MassStorageDriver.CreateRegistration() -> Cosmos.Kernel.HAL.Drivers.Usb.UsbDriverRegistration!
+[COSMOS0003]static Cosmos.Kernel.HAL.Drivers.BuiltIn.Usb.Xhci.XhciDriver.CreateRegistration() -> Cosmos.Kernel.HAL.Drivers.Pci.PciDriverRegistration!

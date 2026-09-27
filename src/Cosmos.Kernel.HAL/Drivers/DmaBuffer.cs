@@ -12,10 +12,12 @@ namespace Cosmos.Kernel.HAL.Drivers;
 /// assumed coherent: no cache maintenance is needed, only ordering, which the
 /// register accessors provide around each MMIO access and
 /// <see cref="ReadBarrier"/> and <see cref="WriteBarrier"/> provide between
-/// two accesses to DMA memory. Allocated during Probe through
-/// <see cref="Pci.PciDeviceContext.TryAllocateDma"/> and owned by the
-/// binding: freed when the attempt is declined or fails, kept for as long as
-/// the binding lasts otherwise.
+/// two accesses to DMA memory. Allocated through
+/// <see cref="Pci.PciDeviceContext.TryAllocateDma"/>, during Probe or once
+/// the binding is Bound, and owned by the binding: freed when the attempt is
+/// declined or fails, or when the driver gives it back through
+/// <see cref="Pci.PciDeviceContext.FreeDma"/>, kept for as long as the
+/// binding lasts otherwise.
 /// </summary>
 [Experimental(Experimentals.DriverKitDiagId)]
 public sealed class DmaBuffer
@@ -23,8 +25,8 @@ public sealed class DmaBuffer
     /// <summary>Virtual address of the buffer's first byte.</summary>
     private readonly ulong _address;
 
-    /// <summary>Set once the attempt that allocated the buffer is torn down and its pages are freed.</summary>
-    private bool _released;
+    /// <summary>Set once the buffer's pages are freed: its attempt was torn down, or the driver freed it.</summary>
+    private volatile bool _released;
 
     /// <summary>
     /// The address the device uses for the buffer's first byte: the physical
@@ -40,14 +42,14 @@ public sealed class DmaBuffer
     /// The buffer as the CPU reads and writes it. Any context: it allocates
     /// nothing, so an interrupt handler may use it.
     /// </summary>
-    /// <exception cref="InvalidOperationException">The binding attempt that allocated the buffer was torn down, and its memory freed.</exception>
+    /// <exception cref="InvalidOperationException">The buffer's memory was freed: the binding attempt that allocated it was torn down, or the driver freed it.</exception>
     public unsafe Span<byte> Span
     {
         get
         {
             if (_released)
             {
-                throw new InvalidOperationException("The binding attempt that allocated this buffer was torn down, and its memory freed.");
+                throw new InvalidOperationException("This buffer's memory was freed: the binding attempt that allocated it was torn down, or the driver freed it.");
             }
 
             return new Span<byte>((void*)_address, Length);
@@ -84,7 +86,7 @@ public sealed class DmaBuffer
     /// <summary>
     /// Frees the buffer's pages and makes <see cref="Span"/> throw. Called
     /// when the binding attempt that allocated it is torn down, once the
-    /// device can no longer master into it.
+    /// device can no longer master into it, and when the driver frees it.
     /// </summary>
     internal unsafe void Release()
     {

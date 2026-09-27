@@ -3,13 +3,17 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Build.API.Enum;
 using Cosmos.Kernel.Boot.Limine;
+using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Memory;
+using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Drivers.Engine;
+using Cosmos.Kernel.HAL.Drivers.Usb;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.HAL.Drivers.Pci;
 
@@ -21,13 +25,15 @@ namespace Cosmos.Kernel.HAL.Drivers.Pci;
 /// function left asserting one must not fire into a vector someone else
 /// owns, turned off an MSI-X firmware left enabled, and turned bus
 /// mastering off, since firmware may have left it on for a controller it
-/// drove. BARs, DMA memory, bus mastering and
-/// interrupts are then handed out during Probe only. When the attempt is
-/// declined or fails, the kit disarms the interrupts, drops the
-/// publications and the work items and cancels the events, restores the
-/// Command register with bus mastering off, frees the DMA memory, turns
-/// MSI-X off and gives its vector back, and invalidates the regions, in
-/// that order. A bound function is never released in this version.
+/// drove. BARs, bus mastering and interrupts are then handed out during
+/// Probe only; DMA memory during Probe, and again once the binding is
+/// Bound, for what a driver finds later, such as the devices plugged into a
+/// USB host controller. When the attempt is declined or fails, the kit
+/// disarms the interrupts, drops the publications and the work items and
+/// cancels the events, restores the Command register with bus mastering
+/// off, frees the DMA memory, turns MSI-X off and gives its vector back,
+/// and invalidates the regions, in that order. A bound function is never
+/// released in this version.
 /// </summary>
 [Experimental(Experimentals.DriverKitDiagId)]
 public sealed class PciDeviceContext : DeviceContext
@@ -64,6 +70,8 @@ public sealed class PciDeviceContext : DeviceContext
     /// </summary>
     private const ushort FirstDriverConfigOffset = 0x40;
 
+    private const string UsbDisabledMessage = "USB support is disabled. Set CosmosEnableUsb=true in the kernel's csproj to publish a USB host controller.";
+
     private readonly PciDevice _device;
 
     /// <summary>
@@ -83,6 +91,16 @@ public sealed class PciDeviceContext : DeviceContext
     private readonly MmioRegion?[] _mmioRegions = new MmioRegion?[BarCount];
     private readonly PortRegion?[] _portRegions = new PortRegion?[BarCount];
     private readonly List<DmaBuffer> _dmaBuffers = new();
+
+    /// <summary>
+    /// Guards <see cref="_dmaBuffers"/> once the binding is Bound, when any
+    /// thread the driver runs on may allocate or free. Not readonly:
+    /// SpinLock is a mutable struct.
+    /// </summary>
+    private SchedSpinLock _dmaLock;
+
+    /// <summary>The USB host controller Probe published, delivered on Bound; null when none was.</summary>
+    private UsbHostController? _usbHostController;
 
     // The interrupts TryRequestInterrupts granted: the trampoline in front
     // of the driver's handler, and exactly one of the MSI-X table it was
@@ -269,7 +287,11 @@ public sealed class PciDeviceContext : DeviceContext
 
     /// <summary>
     /// Allocates zeroed, physically contiguous memory the function can
-    /// reach by DMA, whole pages at a time. Probe only.
+    /// reach by DMA, whole pages at a time: the buffer starts on a 4096-byte
+    /// page boundary. Probe, or thread context once the binding is Bound,
+    /// for what the driver only finds later, such as the devices plugged
+    /// into a USB host controller; <see cref="FreeDma"/> gives such memory
+    /// back.
     /// </summary>
     /// <param name="length">Bytes the driver needs.</param>
     /// <param name="maximumDeviceAddress">
@@ -284,10 +306,10 @@ public sealed class PciDeviceContext : DeviceContext
     /// limit, as on ARM64 for a 28-bit device, the call always fails.
     /// </returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> is zero or negative.</exception>
-    /// <exception cref="InvalidOperationException">Called outside the driver's Probe.</exception>
+    /// <exception cref="InvalidOperationException">Called outside the driver's Probe while the binding is not Bound.</exception>
     public unsafe bool TryAllocateDma(int length, ulong maximumDeviceAddress, [NotNullWhen(true)] out DmaBuffer? buffer)
     {
-        ThrowIfNotProbing(nameof(TryAllocateDma));
+        ThrowIfNotProbingOrBound(nameof(TryAllocateDma));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(length);
 
         buffer = null;
@@ -309,8 +331,42 @@ public sealed class PciDeviceContext : DeviceContext
         }
 
         buffer = new DmaBuffer((ulong)pages, deviceAddress, length);
-        _dmaBuffers.Add(buffer);
+        using (_dmaLock.AcquireIrqSafe())
+        {
+            _dmaBuffers.Add(buffer);
+        }
+
         return true;
+    }
+
+    /// <summary>
+    /// Frees a buffer this binding allocated, once the function can no longer
+    /// reach it: the driver has taken it out of every structure the device
+    /// reads, such as a USB host controller's slot of a device that left.
+    /// From then on the buffer's <see cref="DmaBuffer.Span"/> throws. Probe,
+    /// or thread context once the binding is Bound.
+    /// </summary>
+    /// <param name="buffer">A buffer <see cref="TryAllocateDma"/> returned to this binding.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="buffer"/> is null.</exception>
+    /// <exception cref="ArgumentException"><paramref name="buffer"/> is not this binding's, or was already freed.</exception>
+    /// <exception cref="InvalidOperationException">Called outside the driver's Probe while the binding is not Bound.</exception>
+    public void FreeDma(DmaBuffer buffer)
+    {
+        ThrowIfNotProbingOrBound(nameof(FreeDma));
+        ArgumentNullException.ThrowIfNull(buffer);
+
+        bool owned;
+        using (_dmaLock.AcquireIrqSafe())
+        {
+            owned = _dmaBuffers.Remove(buffer);
+        }
+
+        if (!owned)
+        {
+            throw new ArgumentException("The buffer was not allocated by this binding, or was already freed.", nameof(buffer));
+        }
+
+        buffer.Release();
     }
 
     /// <summary>
@@ -379,6 +435,45 @@ public sealed class PciDeviceContext : DeviceContext
         return false;
     }
 
+    /// <summary>
+    /// Publishes the USB host controller the driver brought up. The kit hands
+    /// it to its USB core right after Probe returns Bound, after the other
+    /// publications and before the interrupts are armed, on the thread that
+    /// ran the probe: the core gives it a bus and calls its
+    /// <see cref="UsbHostController.ProbeRootPorts"/> there, which enumerates
+    /// the devices on its root ports and binds HAL's hub and keyboard drivers
+    /// to them, so every transfer it waits on must complete by polling the
+    /// controller. The kit's own USB drivers are offered the interfaces those
+    /// left later in the pass. If the attempt is declined or fails, the
+    /// controller is dropped, never probed; the driver stops it first. Probe
+    /// only, once per binding.
+    /// </summary>
+    /// <param name="controller">The controller, running, with its root ports not yet probed.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="controller"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Called outside the driver's Probe, or a second time in the same Probe,
+    /// or the kernel is built without USB support.
+    /// </exception>
+    public void PublishUsbHostController(UsbHostController controller)
+    {
+        ThrowIfNotProbing(nameof(PublishUsbHostController));
+        ArgumentNullException.ThrowIfNull(controller);
+
+        // The switch alone first, so ILC folds it and a kernel without USB
+        // trims the USB core.
+        if (!CosmosFeatures.UsbEnabled)
+        {
+            throw new InvalidOperationException(UsbDisabledMessage);
+        }
+
+        if (_usbHostController is not null)
+        {
+            throw new InvalidOperationException("PublishUsbHostController can be called once per Probe.");
+        }
+
+        _usbHostController = controller;
+    }
+
     /// <summary>Writes <paramref name="value"/> to the configuration byte at <paramref name="offset"/>. Thread context only.</summary>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> is below 0x40, the header the kit manages, or past the configuration space.</exception>
     /// <exception cref="InvalidOperationException">The binding attempt was declined or failed.</exception>
@@ -445,6 +540,7 @@ public sealed class PciDeviceContext : DeviceContext
         // during Probe never runs, and a thread waiting on one of the
         // attempt's events is told it is over.
         DropQueuedAndCancelEvents();
+        _usbHostController = null;
 
         // 3. The Command register as the attempt found it, but with an
         // endpoint's bus mastering off even if firmware had left it on: no
@@ -459,7 +555,9 @@ public sealed class PciDeviceContext : DeviceContext
         // nor ahead of a DMA write the function sent before it.
         _ = _device.Command;
 
-        // 4. DMA memory, now that nothing can reach it.
+        // 4. DMA memory, now that nothing can reach it. No lock: only a
+        // Bound binding allocates from another thread, and this one never
+        // was.
         for (int i = 0; i < _dmaBuffers.Count; i++)
         {
             _dmaBuffers[i].Release();
@@ -485,6 +583,26 @@ public sealed class PciDeviceContext : DeviceContext
             _mmioRegions[i] = null;
             _portRegions[i]?.Invalidate();
             _portRegions[i] = null;
+        }
+    }
+
+    /// <summary>
+    /// Hands the published USB host controller to the USB core, which
+    /// probes its root ports before this returns. The core logs a probe that
+    /// throws; the binding stands either way.
+    /// </summary>
+    private protected override void DeliverUsbHostController()
+    {
+        // The switch alone first, as in PublishUsbHostController.
+        if (!CosmosFeatures.UsbEnabled)
+        {
+            return;
+        }
+
+        if (_usbHostController is { } controller)
+        {
+            WriteLog($"published USB host controller {controller.Name}");
+            UsbManager.AddController(controller);
         }
     }
 

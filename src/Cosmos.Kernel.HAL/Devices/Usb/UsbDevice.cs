@@ -5,12 +5,13 @@ using Cosmos.Kernel.HAL.Drivers.Usb;
 namespace Cosmos.Kernel.HAL.Devices.Usb;
 
 /// <summary>
-/// A device addressed on a USB bus. The host controller that addressed it
-/// derives from this type to carry its own per-device state and implements
-/// the transfer primitives; class drivers only ever program against this
-/// type, so they work unchanged on any host controller.
+/// A device configured on a USB bus, as the USB core and the class drivers
+/// see it: its place in the tree, what its descriptors declare, and its
+/// interfaces. The transfers go to <see cref="Host"/>, the host
+/// controller's own view of the device, so a class driver works unchanged
+/// on any host controller.
 /// </summary>
-internal abstract class UsbDevice
+internal sealed class UsbDevice
 {
     private const int DeviceDescriptorLength = 18;
     private const int ConfigurationHeaderLength = 9;
@@ -49,15 +50,19 @@ internal abstract class UsbDevice
     private const int CompanionMaxBurstOffset = 2;
 
     /// <summary>ENDPOINT_HALT feature selector (USB 2.0 table 9-6).</summary>
-    internal const ushort EndpointHaltFeature = 0;
+    private const ushort EndpointHaltFeature = 0;
 
     /// <summary>Every descriptor starts with bLength then bDescriptorType.</summary>
     private const int DescriptorHeaderLength = 2;
 
-    /// <summary>Written by the hot-plug thread, read by whichever thread waits on a transfer.</summary>
-    private volatile bool _disconnected;
+    /// <summary>The bus the device was enumerated on.</summary>
+    public UsbBus Bus { get; }
 
-    public UsbHostController HostController { get; }
+    /// <summary>The host controller that addressed the device and carries its transfers.</summary>
+    public UsbHostController HostController => Bus.Controller;
+
+    /// <summary>The host controller's own view of the device, which runs its transfers.</summary>
+    public UsbHostDevice Host { get; }
 
     /// <summary>The hub this device is attached to, or null for a device on a root port.</summary>
     public UsbDevice? Parent { get; }
@@ -72,9 +77,6 @@ internal abstract class UsbDevice
     public int HubDepth { get; }
 
     public UsbSpeed Speed { get; }
-
-    /// <summary>bMaxPacketSize0 in bytes, set by the host controller while addressing the device.</summary>
-    public ushort MaxPacketSize0 { get; protected set; }
 
     public ushort VendorId { get; private set; }
     public ushort ProductId { get; private set; }
@@ -92,11 +94,17 @@ internal abstract class UsbDevice
     /// transfer fails with <see cref="UsbTransferStatus.Disconnected"/>, and
     /// one already waiting stops waiting.
     /// </summary>
-    public bool IsDisconnected => _disconnected;
+    public bool IsDisconnected => Host.IsDisconnected;
 
-    protected UsbDevice(UsbHostController hostController, UsbDevice? parent, byte portNumber, UsbSpeed speed)
+    /// <param name="bus">The bus the device was enumerated on.</param>
+    /// <param name="host">What the bus's controller returned when it addressed the device.</param>
+    /// <param name="parent">The hub the device hangs off, null for a root port.</param>
+    /// <param name="portNumber">The port on <paramref name="parent"/>, or the root port.</param>
+    /// <param name="speed">The speed the port reported.</param>
+    public UsbDevice(UsbBus bus, UsbHostDevice host, UsbDevice? parent, byte portNumber, UsbSpeed speed)
     {
-        HostController = hostController;
+        Bus = bus;
+        Host = host;
         Parent = parent;
         PortNumber = portNumber;
         Speed = speed;
@@ -106,21 +114,20 @@ internal abstract class UsbDevice
 
     /// <summary>
     /// Makes the device's transfers fail from now on. <see cref="UsbManager"/>
-    /// calls it before the class drivers let go of a device that left, and
-    /// the host controller before it frees one.
+    /// calls it before the class drivers let go of a device that left.
     /// </summary>
-    internal void MarkDisconnected() => _disconnected = true;
+    internal void MarkDisconnected() => Host.MarkDisconnected();
 
     /// <summary>
     /// Runs a control transfer on the default pipe and waits for it. For a
     /// device-to-host request the device's data lands in
     /// <paramref name="data"/>; otherwise <paramref name="data"/> is sent.
-    /// Only call from thread context: it polls for the completion.
+    /// Thread context only.
     /// </summary>
     /// <param name="setup">The request; its Length is the data stage size.</param>
     /// <param name="data">At least <see cref="UsbSetupPacket.Length"/> bytes.</param>
     public UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data) =>
-        ControlTransfer(setup, data, out _);
+        Host.ControlTransfer(setup, data, out _);
 
     /// <summary>
     /// Runs a control transfer on the default pipe, waits for it, and
@@ -136,27 +143,31 @@ internal abstract class UsbDevice
     /// For a device-to-host request, only that many bytes at the start of
     /// <paramref name="data"/> are the device's.
     /// </param>
-    public abstract UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data, out int transferred);
+    public UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data, out int transferred) =>
+        Host.ControlTransfer(setup, data, out transferred);
 
     /// <summary>
     /// Queues a host-to-device control transfer and returns without waiting
     /// for it: the form usable from interrupt context (e.g. keyboard LEDs).
     /// </summary>
     /// <returns><see langword="false"/> when the transfer could not be queued.</returns>
-    public abstract bool SubmitControlTransfer(UsbSetupPacket setup, ReadOnlySpan<byte> data);
+    public bool SubmitControlTransfer(UsbSetupPacket setup, ReadOnlySpan<byte> data) =>
+        Host.SubmitControlTransfer(setup, data);
 
     /// <summary>
     /// Opens an interrupt IN endpoint and keeps transfers queued on it for
     /// as long as the device lives, handing every completed one to
     /// <paramref name="handler"/>.
     /// </summary>
-    public abstract bool OpenInterruptPipe(UsbEndpoint endpoint, UsbInterruptHandler handler);
+    public bool OpenInterruptPipe(UsbEndpoint endpoint, UsbReportHandler handler) =>
+        Host.OpenInterruptPipe(new UsbEndpointInfo(endpoint), handler);
 
     /// <summary>
     /// Adds a bulk endpoint to the device's configuration, ready for
     /// <see cref="BulkIn"/> or <see cref="BulkOut"/>.
     /// </summary>
-    public abstract bool OpenBulkEndpoint(UsbEndpoint endpoint);
+    public bool OpenBulkEndpoint(UsbEndpoint endpoint) =>
+        Host.OpenBulkEndpoint(new UsbEndpointInfo(endpoint));
 
     /// <summary>
     /// Reads from an open bulk IN endpoint and waits. The transfer ends
@@ -167,7 +178,8 @@ internal abstract class UsbDevice
     /// <param name="endpoint">A bulk IN endpoint opened with <see cref="OpenBulkEndpoint"/>.</param>
     /// <param name="data">Receives the data; its length is the most the transfer reads.</param>
     /// <param name="transferred">Bytes received, set on failure too.</param>
-    public abstract UsbTransferStatus BulkIn(UsbEndpoint endpoint, Span<byte> data, out int transferred);
+    public UsbTransferStatus BulkIn(UsbEndpoint endpoint, Span<byte> data, out int transferred) =>
+        Host.BulkIn(new UsbEndpointInfo(endpoint), data, out transferred);
 
     /// <summary>
     /// Writes <paramref name="data"/> to an open bulk OUT endpoint and waits.
@@ -176,15 +188,8 @@ internal abstract class UsbDevice
     /// <param name="endpoint">A bulk OUT endpoint opened with <see cref="OpenBulkEndpoint"/>.</param>
     /// <param name="data">The data to send.</param>
     /// <param name="transferred">Bytes the device accepted, set on failure too.</param>
-    public abstract UsbTransferStatus BulkOut(UsbEndpoint endpoint, ReadOnlySpan<byte> data, out int transferred);
-
-    /// <summary>
-    /// Returns the host side of an open bulk endpoint to its initial state:
-    /// nothing queued and the data toggle back to DATA0. A failed transfer
-    /// already leaves the host side able to run the next one; this is the
-    /// half of <see cref="ClearHalt"/> the device does not do.
-    /// </summary>
-    public abstract bool ResetEndpoint(UsbEndpoint endpoint);
+    public UsbTransferStatus BulkOut(UsbEndpoint endpoint, ReadOnlySpan<byte> data, out int transferred) =>
+        Host.BulkOut(new UsbEndpointInfo(endpoint), data, out transferred);
 
     /// <summary>
     /// Tells the host controller this device is a hub, so it can route
@@ -192,7 +197,7 @@ internal abstract class UsbDevice
     /// </summary>
     /// <param name="portCount">bNbrPorts from the hub descriptor.</param>
     /// <param name="thinkTime">TT think time from wHubCharacteristics bits 6:5 (high-speed hubs only).</param>
-    public abstract bool ConfigureAsHub(byte portCount, byte thinkTime);
+    public bool ConfigureAsHub(byte portCount, byte thinkTime) => Host.ConfigureAsHub(portCount, thinkTime);
 
     /// <summary>Device-to-host control request; the data stage is <paramref name="data"/>.Length bytes.</summary>
     public UsbTransferStatus ControlIn(UsbRequestType requestType, byte request, ushort value, ushort index, Span<byte> data) =>
@@ -205,14 +210,14 @@ internal abstract class UsbDevice
     /// <summary>
     /// Clears a halted endpoint on both sides (USB 2.0 §9.4.5): the device
     /// through CLEAR_FEATURE(ENDPOINT_HALT), which also restarts its data
-    /// toggle, then the host through <see cref="ResetEndpoint"/> so both
-    /// toggles agree again.
+    /// toggle, then the host through <see cref="UsbHostDevice.ResetEndpoint"/>
+    /// so both toggles agree again.
     /// </summary>
     public UsbTransferStatus ClearHalt(UsbEndpoint endpoint)
     {
         UsbTransferStatus status = ControlOut(UsbRequestType.Standard | UsbRequestType.Endpoint,
             (byte)UsbStandardRequest.ClearFeature, EndpointHaltFeature, endpoint.Address);
-        if (status == UsbTransferStatus.Success && !ResetEndpoint(endpoint))
+        if (status == UsbTransferStatus.Success && !Host.ResetEndpoint(new UsbEndpointInfo(endpoint)))
         {
             return UsbTransferStatus.Error;
         }

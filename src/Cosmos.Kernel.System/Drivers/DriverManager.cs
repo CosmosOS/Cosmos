@@ -12,17 +12,18 @@ namespace Cosmos.Kernel.System.Drivers;
 /// <summary>
 /// Where a kernel registers its own PCI and USB class drivers, and reads
 /// which driver owns every device. The built-in drivers HAL brings up
-/// itself (virtio, xHCI with its hub and keyboard drivers, and E1000E on
-/// x64) bind during HAL bring-up, before any kernel code runs, and keep
-/// what they take. The drivers registered here, and the built-in drivers
-/// written against the driver kit (AHCI, NVMe and USB mass storage), are
-/// offered what those left, by one pass that <see cref="Global.StartKernel"/>
-/// runs right after <see cref="Kernel.RegisterDrivers"/> and before
-/// <see cref="Kernel.OnBoot"/>, then, for a USB driver, every device plugged
-/// in later, after the built-ins had their pick. A kit built-in wins a tie
-/// against a driver registered here, and a registration whose match is
-/// strictly more specific takes the device from it. Registration closes
-/// when that pass starts.
+/// itself (virtio, and E1000E on x64) bind during HAL bring-up, before any
+/// kernel code runs, and keep what they take. The drivers registered here,
+/// and the built-in drivers written against the driver kit (xHCI, AHCI,
+/// NVMe and USB mass storage), are offered what those left, by one pass
+/// that <see cref="Global.StartKernel"/> runs right after
+/// <see cref="Kernel.RegisterDrivers"/> and before
+/// <see cref="Kernel.OnBoot"/>. A USB driver is offered the interfaces of
+/// the devices behind the host controllers the pass bound, once HAL's hub
+/// and keyboard drivers had their pick, then of every device plugged in
+/// later. A kit built-in wins a tie against a driver registered here, and a
+/// registration whose match is strictly more specific takes the device
+/// from it. Registration closes when that pass starts.
 /// </summary>
 /// <remarks>
 /// Register from the kernel's <see cref="Kernel.RegisterDrivers"/> override,

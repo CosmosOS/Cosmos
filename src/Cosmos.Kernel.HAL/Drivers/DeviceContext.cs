@@ -368,12 +368,14 @@ public abstract class DeviceContext
     /// binding: the interrupt handler starts running, and the work items
     /// scheduled during Probe are queued. Delivery comes first, so the
     /// handler and the work items find their mouse and link already wired
-    /// to the kernel.
+    /// to the kernel, and a USB host controller is handed to the USB core,
+    /// which enumerates its root ports, last before the arming.
     /// </summary>
     internal void MarkBound()
     {
         State = DeviceContextState.Bound;
         DeliverPublications();
+        DeliverUsbHostController();
         ArmInterrupts();
 
         if (_workItems is { } workItems)
@@ -390,6 +392,17 @@ public abstract class DeviceContext
     /// handler. Called once, when the binding becomes Bound.
     /// </summary>
     private protected abstract void ArmInterrupts();
+
+    /// <summary>
+    /// Hands the USB host controller Probe published to the USB core, on the
+    /// thread that ran the probe, once the other publications are delivered
+    /// and before the interrupts are armed. Only a PCI binding can publish
+    /// one.
+    /// </summary>
+    private protected virtual void DeliverUsbHostController()
+    {
+        // Empty on purpose: a USB binding has no way to publish one.
+    }
 
     /// <summary>
     /// Hands what Probe published to the managers, on the thread that ran
@@ -676,6 +689,20 @@ public abstract class DeviceContext
         if (State != DeviceContextState.Probing)
         {
             throw new InvalidOperationException($"{member} can only be called from the driver's Probe.");
+        }
+    }
+
+    /// <summary>
+    /// Throws unless the driver's Probe is running or the binding is Bound:
+    /// for what a driver may also take once it holds the device for good,
+    /// since no teardown can race it then.
+    /// </summary>
+    /// <param name="member">The member the driver called, for the message.</param>
+    private protected void ThrowIfNotProbingOrBound(string member)
+    {
+        if (State is not (DeviceContextState.Probing or DeviceContextState.Bound))
+        {
+            throw new InvalidOperationException($"{member} can only be called from the driver's Probe or once the binding is Bound.");
         }
     }
 

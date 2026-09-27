@@ -11,10 +11,10 @@ internal enum DeviceContextState
     /// <summary>Built by the engine; its driver's Probe has not started.</summary>
     Created,
 
-    /// <summary>The driver's Probe is running: the only time resources can be acquired.</summary>
+    /// <summary>The driver's Probe is running: the only time most resources can be acquired.</summary>
     Probing,
 
-    /// <summary>Probe returned Bound and the engine recorded the binding.</summary>
+    /// <summary>Probe returned Bound and the engine recorded the binding; a PCI binding may still allocate DMA memory.</summary>
     Bound,
 
     /// <summary>The attempt was declined or failed, and the engine released what it acquired.</summary>

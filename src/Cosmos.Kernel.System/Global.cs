@@ -84,11 +84,11 @@ public static class Global
     /// <summary>
     /// Starts the registered kernel, once. Enables interrupts (unless the
     /// Interrupts switch is off), registers the built-in drivers written
-    /// against the driver kit (AHCI and NVMe with storage, USB mass storage
-    /// with storage and USB), calls
+    /// against the driver kit (xHCI with USB, AHCI and NVMe with storage,
+    /// USB mass storage with storage and USB), calls
     /// <see cref="Kernel.RegisterDrivers"/> and binds those drivers and the
-    /// kernel's (all only in a kernel built with PCI), starts USB hot-plug,
-    /// then calls
+    /// kernel's (all only in a kernel built with PCI), which is when the USB
+    /// devices are enumerated, starts USB hot-plug, then calls
     /// <see cref="Kernel.Start"/>, so <see cref="Kernel.OnBoot"/>,
     /// <see cref="Kernel.BeforeRun"/> and <see cref="Kernel.Run"/> all run
     /// with interrupts on, and a kernel that overrides Start keeps all three.
@@ -133,7 +133,9 @@ public static class Global
         // The built-in drivers written against the kit are registered here,
         // then the kernel registers its own, from RegisterDrivers or earlier
         // from its constructor, and they all bind here, to the PCI functions
-        // and USB interfaces the drivers HAL brings up itself left free.
+        // the drivers HAL brings up itself left free, and to the USB
+        // interfaces of the devices the xHCI driver's controllers carry,
+        // which the USB core enumerates as the pass binds each controller.
         // After interrupts, so RegisterDrivers and every probe run with them
         // on on both architectures; before hot-plug starts, so the boot
         // thread is the only one binding devices while the pass runs; and
@@ -174,18 +176,27 @@ public static class Global
     /// drivers written against the driver kit, subsystem by subsystem behind
     /// the kernel's switches: that assembly sees no switch, so the guards
     /// live here. One switch per <c>if</c>, since ILC folds a single switch
-    /// only: a kernel built without storage keeps no AHCI, NVMe or USB mass
-    /// storage code, and one built without USB keeps no USB mass storage
-    /// code. They go through the kit's built-in path, which takes the names
-    /// reserved for built-ins and ranks them ahead of every registration the
-    /// kernel makes, so a built-in wins a tie and only a strictly more
-    /// specific match takes a device from it.
+    /// only: a kernel built without USB keeps no xHCI or USB mass storage
+    /// code, and one built without storage keeps no AHCI, NVMe or USB mass
+    /// storage code. They go through the kit's built-in path, which takes
+    /// the names reserved for built-ins and ranks them ahead of every
+    /// registration the kernel makes, so a built-in wins a tie and only a
+    /// strictly more specific match takes a device from it.
     /// </summary>
     private static void RegisterBuiltInDrivers()
     {
+        if (Core.CosmosFeatures.UsbEnabled)
+        {
+            IReadOnlyList<PciDriverRegistration> usbHosts = BuiltInDrivers.CreateUsbHostRegistrations();
+            for (int i = 0; i < usbHosts.Count; i++)
+            {
+                DriverCore.RegisterBuiltIn(usbHosts[i]);
+            }
+        }
+
         if (Core.CosmosFeatures.StorageEnabled)
         {
-            IReadOnlyList<PciDriverRegistration> storage = BuiltInDrivers.CreateStorageRegistrations();
+            IReadOnlyList<PciDriverRegistration> storage = BuiltInDrivers.CreatePciStorageRegistrations();
             for (int i = 0; i < storage.Count; i++)
             {
                 DriverCore.RegisterBuiltIn(storage[i]);
@@ -193,7 +204,7 @@ public static class Global
 
             if (Core.CosmosFeatures.UsbEnabled)
             {
-                IReadOnlyList<UsbDriverRegistration> usbStorage = BuiltInDrivers.CreateUsbStorageRegistrations();
+                IReadOnlyList<UsbDriverRegistration> usbStorage = BuiltInDrivers.CreateUsbMassStorageRegistrations();
                 for (int i = 0; i < usbStorage.Count; i++)
                 {
                     DriverCore.RegisterBuiltIn(usbStorage[i]);
