@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 using System.Numerics;
-using Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.TestRunner.Framework;
@@ -85,7 +85,7 @@ public static unsafe class Canvas3DTests
     private const uint TextureSid = 444;
 
     private static PciDevice? s_device;
-    private static SvgaIIDriver? s_driver;
+    private static SvgaSurface? s_driver;
     private static SvgaII3DCanvas? s_canvas;
     private static Mesh? s_cube;
 
@@ -203,7 +203,8 @@ public static unsafe class Canvas3DTests
     {
         try
         {
-            s_driver = new SvgaIIDriver(s_device!);
+            // As in Svga3DTests: the published display, not a new binding.
+            s_driver = (SvgaSurface)DisplayManager.Primary!;
         }
         catch (Exception ex)
         {

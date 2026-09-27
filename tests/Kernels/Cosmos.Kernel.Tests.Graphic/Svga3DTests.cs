@@ -1,13 +1,14 @@
 using System;
 using System.Numerics;
-using Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
+using Cosmos.Kernel.HAL.Drivers.BuiltIn.Pci.Svga;
+using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.TestRunner.Framework;
 
 namespace Cosmos.Kernel.Tests.Graphic;
 
 /// <summary>
-/// Wire-format tests for the SVGA3D command layer (<see cref="VMWareSVGAII3D"/>).
+/// Wire-format tests for the SVGA3D command layer (<see cref="Svga3D"/>).
 /// QEMU's vmware-svga device negotiates no 3D capability, so the commands can
 /// never be executed host-side; what CAN be validated under QEMU is the guest
 /// half of the contract: each call must place a correctly formed command —
@@ -58,8 +59,8 @@ public static unsafe class Svga3DTests
     private const uint TestCid = 7;
 
     private static PciDevice? s_device;
-    private static SvgaIIDriver? s_driver;
-    private static VMWareSVGAII3D? s_svga3d;
+    private static SvgaSurface? s_driver;
+    private static Svga3D? s_svga3d;
 
     /// <summary>True when the SVGA II adapter was enumerated on the PCI bus.</summary>
     public static bool DevicePresent => s_device != null;
@@ -131,9 +132,12 @@ public static unsafe class Svga3DTests
     {
         try
         {
-            SvgaIIDriver driver = new SvgaIIDriver(s_device!);
+            // The kit bound the adapter in the driver pass and published
+            // it; the suite drives that instance rather than a second one of
+            // its own, which the adapter would not survive.
+            SvgaSurface driver = (SvgaSurface)DisplayManager.Primary!;
             s_driver = driver;
-            s_svga3d = new VMWareSVGAII3D(driver);
+            s_svga3d = new Svga3D(driver);
         }
         catch (Exception ex)
         {

@@ -97,9 +97,12 @@ public static class DisplayOwnerTests
         }
 
         Assert.True(bootDisplay == vga, "the VGA-compatible adapter holding the boot framebuffer should be the function reserved");
+        // The built-in SVGA driver binds in the driver pass, before any
+        // canvas exists, so a VMware adapter is already its own by the time
+        // the suite runs; anything else keeps the boot reservation.
         bool takenByDriver = vga.VendorId == VMwareVendorId;
         string expected = takenByDriver ? VmwareSvgaOwner : GopOwner;
-        Assert.True(vga.Owner == expected, "the boot display should be reserved as gop, or owned by vmware-svga once the canvas took it");
+        Assert.True(vga.Owner == expected, "the boot display should be reserved as gop, or owned by vmware-svga once the kit bound it");
         Assert.Equal(takenByDriver ? 0 : 1, reserved, "only the boot display should be reserved as gop");
     }
 
