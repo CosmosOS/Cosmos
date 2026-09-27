@@ -179,23 +179,11 @@ public class Kernel : Sys.Kernel
     /// <summary>Sectors past the device end where the corrupt EBR next pointer lands, so the chain walk must stop rather than read it.</summary>
     private const ulong WildNextOvershootSectors = 10;
 
-    /// <summary>NSID of the controller's single namespace (NVMe namespace IDs are 1-based).</summary>
-    private const uint NvmeNamespaceId = 1;
+    /// <summary>Offset of Message Control within the MSI-X capability (PCI 3.0 §6.8.2.3).</summary>
+    private const byte MsiXMessageControlOffset = 2;
 
-    /// <summary>NVMe 0's-based Number of Logical Blocks value for a one-block transfer (NVMe spec: NLB is zero-based).</summary>
-    private const ushort NvmeSingleBlockNlb = 0;
-
-    /// <summary>Scratch LBA the NVMe short-span cell writes, clear of every other test window.</summary>
-    private const ulong ShortSpanLba = 4242;
-
-    /// <summary>Fill byte of the full-block write whose residue must not leak into the short-span tail.</summary>
-    private const byte ShortSpanResidueFill = 0xA5;
-
-    /// <summary>Length of the deliberately short span handed to NvmeController.Write (bytes, less than one sector).</summary>
-    private const int ShortSpanLengthBytes = 100;
-
-    /// <summary>Fill byte of the short-span payload.</summary>
-    private const byte ShortSpanFill = 0x5B;
+    /// <summary>Message Control bit 15: MSI-X Enable.</summary>
+    private const ushort MsiXEnableBit = 1 << 15;
 
     /// <summary>XOR seed decorrelating the single-block round-trip pattern from a plain index ramp.</summary>
     private const byte SingleBlockXorSeed = 0xA5;
@@ -412,7 +400,7 @@ public class Kernel : Sys.Kernel
     {
         Serial.WriteString("[Storage] BeforeRun() reached!\n");
 
-        // 3 manager + 1 boot-scan + 3 profile + 13 device + 7 partition
+        // 4 manager + 1 boot-scan + 3 profile + 12 device + 7 partition
         // + 37 partition-lifecycle (MBR mutation, EBR chain, PartitionManager,
         // superfloppy) + 2 bounds probes + 2 mmio/pci + 6 USB hot-plug
         // + 1 boot-reboot = 75 tests per profile.
@@ -434,13 +422,16 @@ public class Kernel : Sys.Kernel
 #endif
         TR.RunIf(deviceExpected, "Manager_ExactlyOneDevice", TestManager_ExactlyOneDevice, SkipNoDevice);
         TR.RunIf(hasDevice, "Manager_DuplicateRegistrationIgnored", TestManager_DuplicateRegistrationIgnored, SkipNoDevice);
+        TR.RunIf(hasDevice, "Manager_PrimaryIsProfileDisk", TestManager_PrimaryIsProfileDisk, SkipNoDevice);
 
         // ==================== Boot persistence (works with Boot_RebootAfterGptWrite) ====================
         // Runs before anything mutates partition state: on boot 0 the engine's
-        // fresh image must scan clean; on boot 1 the boot-time (phase-3) scan
-        // must have found the GPT written before the reboot. Pins the init-window
-        // partition scan, which regressed once without CI noticing (interpolated
-        // partition names triple-faulted phase 3 on any populated disk).
+        // fresh image must scan clean; on boot 1 the boot-time scan must have
+        // found the GPT written before the reboot. Pins the boot-time scans:
+        // USB's in the init window (phase 3), which regressed once without
+        // CI noticing (interpolated partition names triple-faulted phase 3
+        // on any populated disk), and AHCI's and NVMe's in the driver pass,
+        // where the kit delivers the disks the drivers published.
         TR.RunIf(hasDevice, "Boot_PartitionScanMatchesBootState", TestBoot_PartitionScanMatchesBootState, SkipNoDevice);
 
         // ==================== Profile (assert the cell's hardware path) ====================
@@ -453,7 +444,7 @@ public class Kernel : Sys.Kernel
         {
             TR.Skip("Profile_NvmeInterruptModeMatches", "not an NVMe profile");
         }
-        else if (Nvme.Controllers.Count == 0)
+        else if (NvmeFunction() is not { Owner: NvmeOwner })
         {
             TR.Skip("Profile_NvmeInterruptModeMatches", SkipNoDevice);
         }
@@ -507,7 +498,6 @@ public class Kernel : Sys.Kernel
         TR.RunIf(dev, "Device_LBA_Stride_Sweep",           TestDevice_LBAStrideSweep,           SkipNoDevice);
         TR.RunIf(dev, "Device_RandomOrder_ReadAfterWrite", TestDevice_RandomOrderReadAfterWrite, SkipNoDevice);
         TR.RunIf(dev, "Device_Multiblock_TailBoundary",    TestDevice_MultiblockTailBoundary,   SkipNoDevice);
-        TR.RunIf(dev && TR.ProfileHasPrefix("nvme"), "Nvme_ShortSpanWritesDeterministicTail", TestNvme_ShortSpanTail, "NVMe controller API is nvme-profile only");
 
         // ==================== Partition (MBR/GPT, partition translation) ====================
         // These run last because they overwrite LBA 0..33, which the device
@@ -755,42 +745,6 @@ public class Kernel : Sys.Kernel
         Assert.Equal(0, Gpt.Parse(s_dev!).Count, "entry overlapping the GPT structures must be rejected");
     }
 
-    // The NvmeController.Read/Write public API accepts spans shorter than
-    // the device transfer; the bounce tail must then be deterministic
-    // (zeroed), not the previous command's residue leaking to disk.
-    private static void TestNvme_ShortSpanTail()
-    {
-        NvmeController controller = Nvme.Controllers[0];
-        uint nsid = NvmeNamespaceId;
-        ulong lba = ShortSpanLba;
-        int sector = (int)s_dev!.BlockSize;
-
-        byte[] full = new byte[sector];
-        for (int i = 0; i < sector; i++)
-        {
-            full[i] = ShortSpanResidueFill;
-        }
-        controller.Write(nsid, lba, full, NvmeSingleBlockNlb);
-
-        byte[] shortSpan = new byte[ShortSpanLengthBytes];
-        for (int i = 0; i < shortSpan.Length; i++)
-        {
-            shortSpan[i] = ShortSpanFill;
-        }
-        controller.Write(nsid, lba, shortSpan, NvmeSingleBlockNlb);
-
-        byte[] readBack = new byte[sector];
-        controller.Read(nsid, lba, readBack, NvmeSingleBlockNlb);
-        for (int i = 0; i < shortSpan.Length; i++)
-        {
-            Assert.Equal(ShortSpanFill, readBack[i], "short-span payload");
-        }
-        for (int i = shortSpan.Length; i < sector; i++)
-        {
-            Assert.Equal((byte)0, readBack[i], "tail must be zeroed, not stale bounce residue");
-        }
-    }
-
     // ==================== Manager ====================
 
     private static void TestManager_StorageInitialized()
@@ -805,6 +759,23 @@ public class Kernel : Sys.Kernel
     private static void TestManager_ExactlyOneDevice()
     {
         Assert.Equal(AttachedDisksPerProfile, StorageManager.DeviceCount);
+    }
+
+    // The primary disk is the profile's own, under the name it had before
+    // the AHCI and NVMe drivers moved to the driver kit. Their disks now
+    // register from the driver pass in Global.StartKernel, after the USB
+    // disks present at boot, so what keeps an internal disk primary is the
+    // storage manager's primary-disk rule, not the order the drivers
+    // registered in. The rule orders Devices, so the primary disk is the
+    // first of them.
+    private static void TestManager_PrimaryIsProfileDisk()
+    {
+        IBlockDevice? primary = StorageManager.PrimaryDevice;
+        Assert.True(primary is not null, "a cell with a disk has a primary disk");
+        Assert.True(ReferenceEquals(primary, StorageManager.GetDevice(0)), "the primary disk is the first of Devices");
+
+        string expected = TR.ProfileHasPrefix("ahci") ? "sata0" : TR.ProfileHasPrefix("usb") ? "usb0" : "nvme0n1";
+        Assert.True(primary?.Name == expected, "the primary disk is the profile's disk, named as before");
     }
 
     // ==================== Profile ====================
@@ -843,17 +814,29 @@ public class Kernel : Sys.Kernel
     // The controller behind the cell's disk records its driver as the owner
     // of its PCI function. AHCI and NVMe take ownership only once the
     // controller came up, and a bound disk means it did, so the owner must
-    // be there; xHCI takes it once the host controller is running.
+    // be there; xHCI takes it once the host controller is running. AHCI and
+    // NVMe are driver kit drivers: the kit writes the owner as the pass
+    // binds them, and their controllers are read off PCI, since the
+    // drivers' own types are internal to an assembly that grants no test
+    // its internals.
     private static void TestProfile_ControllerOwnsPciFunction()
     {
         if (TR.ProfileHasPrefix("ahci"))
         {
-            Assert.True(Ahci.Controllers.Count > 0, "the ahci cell's disk should sit behind an AHCI controller");
-            for (int i = 0; i < Ahci.Controllers.Count; i++)
+            List<PciDevice> sata = PciManager.GetAllDevicesClass(ClassId.MassStorageController, SubclassId.SataController);
+            int controllers = 0;
+            for (int i = 0; i < sata.Count; i++)
             {
-                Assert.True(Ahci.Controllers[i].Device.Owner == AhciOwner, "every AHCI controller that came up should own its PCI function");
+                if ((ProgramIf)sata[i].ProgIf != ProgramIf.SataAhci)
+                {
+                    continue;
+                }
+
+                controllers++;
+                Assert.True(sata[i].Owner == AhciOwner, "every AHCI controller should own its PCI function");
             }
 
+            Assert.True(controllers > 0, "the ahci cell's disk should sit behind an AHCI controller");
             return;
         }
 
@@ -864,16 +847,19 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        PciDevice? nvme = PciManager.GetDeviceClass(ClassId.MassStorageController, SubclassId.NvmController);
-        Assert.True(nvme?.Owner == NvmeOwner, "the NVMe controller should own its PCI function");
+        Assert.True(NvmeFunction()?.Owner == NvmeOwner, "the NVMe controller should own its PCI function");
     }
 
     // A gicv3 cell must come up MSI-X (arm64 GICv3 ITS routes it); a gicv2 cell
     // must fall back to polled (no ITS). The bool is the cell's expected mode
-    // (true = MSI-X), supplied by the adaptive RunIf overload.
+    // (true = MSI-X), supplied by the adaptive RunIf overload. Read off the
+    // function's MSI-X capability, which the kit enables only when it grants
+    // the driver MSI-X: the driver's own state is internal to an assembly
+    // that grants no test its internals. The call site runs it only on a
+    // cell whose NVMe function the driver owns.
     private static void TestProfile_NvmeInterruptMode(bool expectMsix)
     {
-        bool actual = Nvme.Controllers[0].IsMsiXEnabled;
+        bool actual = NvmeFunction() is { } nvme && IsMsiXEnabled(nvme);
         if (expectMsix)
         {
             Assert.True(actual, "expected NVMe MSI-X interrupts but the controller is polled");
@@ -882,6 +868,17 @@ public class Kernel : Sys.Kernel
         {
             Assert.False(actual, "expected NVMe polled fallback but the controller enabled MSI-X");
         }
+    }
+
+    /// <summary>The cell's NVMe controller, the only one the nvme profiles attach; null on a cell without one.</summary>
+    private static PciDevice? NvmeFunction() =>
+        PciManager.GetDeviceClass(ClassId.MassStorageController, SubclassId.NvmController);
+
+    /// <summary>True when <paramref name="function"/> has an MSI-X capability with MSI-X Enable set.</summary>
+    private static bool IsMsiXEnabled(PciDevice function)
+    {
+        byte capability = function.FindCapability(MsiX.CapId);
+        return capability != 0 && (function.ReadRegister16((byte)(capability + MsiXMessageControlOffset)) & MsiXEnableBit) != 0;
     }
 
     // ==================== Device ====================
@@ -2622,8 +2619,9 @@ public class Kernel : Sys.Kernel
     // One try/catch per method on purpose (cf. MbrAddPartitionRejects):
     // -1 marks "Parse threw", which every caller asserts against. Exception
     // (not ArgumentOutOfRangeException) because a past-end read surfaces
-    // driver-specific errors — AHCI raises "SATA Fatal error: Command
-    // aborted" and leaves the port wedged for every later test.
+    // driver-specific errors — AHCI raises an IOException, "SATA fatal
+    // error: command aborted.", and leaves the port wedged for every later
+    // test.
     private static int EbrParseCountSafe(IBlockDevice host)
     {
         try
@@ -2817,6 +2815,9 @@ public class Kernel : Sys.Kernel
     /// <summary>Index of the NVMe controller's 64-bit register BAR (BAR0).</summary>
     private const int NvmeRegisterBarIndex = 0;
 
+    /// <summary>Offset of VS, the NVMe Version register, in the register BAR (NVMe 1.4 §3.1.2).</summary>
+    private const ulong NvmeVersionRegisterOffset = 0x08;
+
     /// <summary>Mask of the type bits in a memory BAR's lower dword (bits 0-2), composed from the PciDevice BAR field layout.</summary>
     private const uint PciBarTypeMask = (PciDevice.BarTypeMask << PciDevice.BarTypeShift) | PciDevice.BarIoSpaceMask;
 
@@ -2851,7 +2852,7 @@ public class Kernel : Sys.Kernel
 
         ulong origPhys = ((ulong)barHigh << PciDevice.BarUpperHalfShift) | (barLow & PciDevice.BarMemoryAddressMask);
         ulong hhdm = HhdmOffset();
-        uint vsOrig = Native.MMIO.Read32(origPhys + hhdm + NvmeRegisters.VsOffset);
+        uint vsOrig = Native.MMIO.Read32(origPhys + hhdm + NvmeVersionRegisterOffset);
         Assert.True(vsOrig != 0 && vsOrig != MmioAllOnesValue, "NVMe VS must read sane at the original BAR");
 
         // Quiesce decode while the BAR moves, like firmware would. No block
@@ -2868,7 +2869,7 @@ public class Kernel : Sys.Kernel
         try
         {
             mapped = PlatformHAL.Initializer?.EnsureMmioMapped(HighBarPhys) == true;
-            vsHigh = Native.MMIO.Read32(HighBarPhys + hhdm + NvmeRegisters.VsOffset);
+            vsHigh = Native.MMIO.Read32(HighBarPhys + hhdm + NvmeVersionRegisterOffset);
         }
         finally
         {
