@@ -158,7 +158,7 @@ one screen:
   static factory sits with the constructors it stands in for.
 
 If you want a model for the full separator form in a new file,
-`Cosmos.Kernel.HAL/Devices/Network/VirtioNet.cs` is the one file that
+`Cosmos.Kernel.HAL/Devices/Virtio/Mmio/VirtioNet.cs` is the one file that
 demonstrates it. Do not convert an existing file to it.
 
 ### Using Directives
