@@ -74,6 +74,7 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 |-------|-------|-------------|
 | **HelloWorld** | 3 | Basic arithmetic, boolean logic, integer comparison |
 | **Memory** | 85 | Boxing/unboxing, memory allocation, collections, memory copy, GC |
+| **Drivers** | 27 | Driver kit over the synthetic bus: manifest, arbitration, publish, interrupts, deferred work, teardown, children |
 
 #### HelloWorld Tests
 
@@ -128,6 +129,35 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 - `GC_DictSurvival`, `GC_PageAccounting`, `GC_DependentHandle`
 - `GC_DependentHandleCleanup`, `GC_HandleStoreIntegrity`, `GC_PinnedHeapReuse`
 
+#### Drivers Tests
+
+A white-box suite (`InternalsVisibleTo` from `Cosmos.Kernel.HAL` and `Cosmos.Kernel.System`) that declares its own `[Driver]` classes and drives them through the synthetic bus, with no hardware behind any node. It builds with `CosmosEnableMouse` off and with one `CosmosDriverExclude` and one `CosmosDriverInclude` item, so the manifest policy is under test too. Every assertion reads `DriverInfo` or the suite's own drivers and consumer, never the serial log.
+
+**Manifest (6 tests):**
+- `Manifest_HighPriorityDriver_Present`, `Manifest_MouseFeatureDriver_Absent`, `Manifest_ExcludedDriver_Absent`
+- `Manifest_OptInDriver_Present`, `Manifest_OptOutDriver_Absent`, `Manifest_Order_FollowsDeclarationOrder`
+
+**Engine (2 tests):**
+- `Engine_Started_WithWorker`, `BootPath_NodeFromConstructor_Bound`
+
+**Arbitration (5 tests):**
+- `Arbitration_ByPriority`, `Arbitration_BySpecificity`, `Arbitration_TieByManifestOrder`
+- `Decline_UnwindsResources`, `ThrowingProbe_RecordedAsFailed`
+
+**Keyboard device (7 tests):**
+- `Publish_ReachesConsumer`, `WindowAndDma_Contents`
+- `Interrupt_HandlerReadsWindow_ReportsKey`, `Interrupt_WorkItemRunsOnWorker`, `Interrupt_MaskUnmask`
+- `Periodic_FiresAtLeastThreeTimes`, `BlockingHandler_FaultRecorded`
+
+**Retract (3 tests):**
+- `Retract_DetachOrderAndAccounting`, `Retract_DriverThreadExited`, `Retract_SinkReportDiscarded`
+
+**Children (3 tests):**
+- `Children_PublishedFromProbe`, `UnmatchedNode_UnboundWithNoOffers`, `Children_RetractedWithParent`
+
+**Diagnostics (1 test):**
+- `DriverInfo_OutOfRange_ReturnsFalse`
+
 ### Running Kernel Tests
 
 #### From VS Code
@@ -177,6 +207,7 @@ dotnet run --project tests/Cosmos.TestRunner.Engine/Cosmos.TestRunner.Engine.csp
 |-------|-----|-------|
 | HelloWorld | 60 s | 90 s |
 | Memory | 180 s | 300 s |
+| Drivers | 60 s | 120 s |
 
 ### Output Formats
 
