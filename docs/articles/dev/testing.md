@@ -132,11 +132,13 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 
 #### Drivers Tests
 
-A white-box suite (`InternalsVisibleTo` from `Cosmos.Kernel.HAL`) that declares its own `[Driver]` classes and drives them through the synthetic bus, with no hardware behind any node. It builds with `CosmosEnableMouse` off and with one `CosmosDriverExclude` and one `CosmosDriverInclude` item, so the manifest policy is under test too. Every assertion reads `DriverInfo` or the suite's own drivers and consumer, never the serial log.
+The suite is two projects. `tests/Kernels/Cosmos.Kernel.Tests.Drivers` is the kernel: the harness (`Kernel.cs` and `TestKeyboardConsumer`) with an `InternalsVisibleTo` grant from `Cosmos.Kernel.HAL`, which it spends on one thing, installing its consumer through the internal `DeviceRegistry.SetConsumer`. `tests/Kernels/Cosmos.Kernel.Tests.Drivers.Library` holds every `[Driver]` class the suite drives and the state and identity types they need: a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, listed in `CosmosDriverAssemblyNames`) with no grant from any project, written over the public seam only, so its compiling is the proof that a third party can write each of those drivers. The kernel references the library, drives its drivers through the synthetic bus with no hardware behind any node, and waits for the kit through `SyntheticBus.WaitForQueuedJobs`. It builds with `CosmosEnableMouse` off and with one `CosmosDriverExclude` and one `CosmosDriverInclude` item naming the library's types, so the manifest policy is under test too. Every assertion reads `DriverInfo` or the suite's own drivers and consumer, never the serial log.
+
+Manifest order for the library's drivers follows the referenced-assembly rule: the generator sorts them by assembly name and then by full type name, both ordinal, after the kernel's own drivers. `Manifest_Order_ReferencedByTypeName` asserts that `TieFirstDriver` precedes `TieSecondDriver` on that rule alone (`F` sorts before `S`); where the two are declared plays no part. `Interrupt_WorkItemDeferredToWorker` proves deferral without asking the engine where it ran: the handler notes the work item's run count as it returns, with interrupts still disabled, so an unchanged count means the item did not run inside `RaiseInterrupt`, and the run seen after `WaitForQueuedJobs` is the worker's.
 
 **Manifest (6 tests):**
 - `Manifest_HighPriorityDriver_Present`, `Manifest_MouseFeatureDriver_Absent`, `Manifest_ExcludedDriver_Absent`
-- `Manifest_OptInDriver_Present`, `Manifest_OptOutDriver_Absent`, `Manifest_Order_FollowsDeclarationOrder`
+- `Manifest_OptInDriver_Present`, `Manifest_OptOutDriver_Absent`, `Manifest_Order_ReferencedByTypeName`
 
 **Engine (2 tests):**
 - `Engine_Started_WithWorker`, `BootPath_NodeFromConstructor_Bound`
@@ -147,7 +149,7 @@ A white-box suite (`InternalsVisibleTo` from `Cosmos.Kernel.HAL`) that declares 
 
 **Keyboard device (7 tests):**
 - `Publish_ReachesConsumer`, `WindowAndDma_Contents`
-- `Interrupt_HandlerReadsWindow_ReportsKey`, `Interrupt_WorkItemRunsOnWorker`, `Interrupt_MaskUnmask`
+- `Interrupt_HandlerReadsWindow_ReportsKey`, `Interrupt_WorkItemDeferredToWorker`, `Interrupt_MaskUnmask`
 - `Periodic_FiresAtLeastThreeTimes`, `BlockingHandler_FaultRecorded`
 
 **Retract (3 tests):**

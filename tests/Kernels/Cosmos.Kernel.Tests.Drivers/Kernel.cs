@@ -4,10 +4,9 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
-using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Synthetic;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.Tests.Drivers.Drivers;
+using Cosmos.Kernel.Tests.Drivers.Library;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using SysThread = System.Threading.Thread;
@@ -25,6 +24,15 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// drivers and consumer, never the serial log. One node is published from
 /// the constructor, before the driver stage, to cover the boot path; the
 /// rest are published from the tests, which is the hot-plug path.
+/// <para>
+/// The suite is two projects. This kernel is the harness: it holds an
+/// <c>InternalsVisibleTo</c> grant from <c>Cosmos.Kernel.HAL</c> for one
+/// purpose, installing <see cref="TestKeyboardConsumer"/> through the
+/// internal <see cref="DeviceRegistry"/>. The drivers it drives live in
+/// <c>Cosmos.Kernel.Tests.Drivers.Library</c>, a driver assembly with no
+/// grant at all, written over the public seam only, so their compiling is
+/// the proof that a third party can write every one of them.
+/// </para>
 /// </summary>
 public class Kernel : Sys.Kernel
 {
@@ -87,7 +95,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Manifest_ExcludedDriver_Absent", TestManifestExcludedDriverAbsent);
         TR.Run("Manifest_OptInDriver_Present", TestManifestOptInDriverPresent);
         TR.Run("Manifest_OptOutDriver_Absent", TestManifestOptOutDriverAbsent);
-        TR.Run("Manifest_Order_FollowsDeclarationOrder", TestManifestOrderFollowsDeclarationOrder);
+        TR.Run("Manifest_Order_ReferencedByTypeName", TestManifestOrderReferencedByTypeName);
 
         // ==================== Engine ====================
         TR.Run("Engine_Started_WithWorker", TestEngineStartedWithWorker);
@@ -104,7 +112,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Publish_ReachesConsumer", TestPublishReachesConsumer);
         TR.Run("WindowAndDma_Contents", TestWindowAndDmaContents);
         TR.Run("Interrupt_HandlerReadsWindow_ReportsKey", TestInterruptHandlerReadsWindowReportsKey);
-        TR.Run("Interrupt_WorkItemRunsOnWorker", TestInterruptWorkItemRunsOnWorker);
+        TR.Run("Interrupt_WorkItemDeferredToWorker", TestInterruptWorkItemDeferredToWorker);
         TR.Run("Interrupt_MaskUnmask", TestInterruptMaskUnmask);
         TR.Run("Periodic_FiresAtLeastThreeTimes", TestPeriodicFiresAtLeastThreeTimes);
         TR.Run("BlockingHandler_FaultRecorded", TestBlockingHandlerFaultRecorded);
@@ -178,16 +186,19 @@ public class Kernel : Sys.Kernel
         Assert.Null(RecordingDriver.Find<OptOutDriver>(), "the registry should hold no OptOutDriver");
     }
 
-    // The two tie drivers are declared in one file, first before second, so
-    // their manifest positions follow the declaration order whatever order
-    // the compiler gives the files.
-    private static void TestManifestOrderFollowsDeclarationOrder()
+    // The library's drivers are referenced-assembly drivers, which the
+    // generator orders by assembly name and then by full type name, both
+    // ordinal. Both tie drivers share the assembly and the namespace, so
+    // only the type name decides, and TieFirstDriver sorts before
+    // TieSecondDriver (F before S). Declaration order plays no part.
+    private static void TestManifestOrderReferencedByTypeName()
     {
         int first = FindDriverIndex(nameof(TieFirstDriver));
         int second = FindDriverIndex(nameof(TieSecondDriver));
         Assert.True(first >= 0, "TieFirstDriver should be in the manifest");
         Assert.True(second >= 0, "TieSecondDriver should be in the manifest");
-        Assert.True(first < second, "manifest order should follow declaration order within a file");
+        Assert.True(string.CompareOrdinal(typeof(TieFirstDriver).FullName, typeof(TieSecondDriver).FullName) < 0, "the test relies on TieFirstDriver sorting before TieSecondDriver by full type name");
+        Assert.True(first < second, "referenced drivers should sit in the manifest in ordinal order of their full type names");
     }
 
     // ==================== Engine ====================
@@ -272,7 +283,7 @@ public class Kernel : Sys.Kernel
 
         // Drains anything the declined probe left queued: a work item the
         // unwind failed to cancel would run here and show up below.
-        DriverEngine.WaitForQueuedJobs();
+        SyntheticBus.WaitForQueuedJobs();
 
         Assert.True(TryFindOffer(node.Path, 0, out DeviceOfferInfo offer), "the declined offer should be recorded");
         Assert.True(offer.DriverName == nameof(DecliningDriver), "the keyed driver should be offered first");
@@ -380,7 +391,7 @@ public class Kernel : Sys.Kernel
         access.Window[KeyboardState.ScanCodeOffset] = TestScanCode;
         access.Window[KeyboardState.FlagsOffset] = 0;
         bool raised = SyntheticBus.RaiseInterrupt(node, 0);
-        DriverEngine.WaitForQueuedJobs();
+        SyntheticBus.WaitForQueuedJobs();
 
         Assert.True(raised, "a connected, unmasked source should run the handler");
         Assert.Equal(interruptsBefore + 1, state.InterruptCount, "the handler should have run once");
@@ -390,14 +401,19 @@ public class Kernel : Sys.Kernel
 
         access.Window[KeyboardState.FlagsOffset] = ReleasedFlag;
         raised = SyntheticBus.RaiseInterrupt(node, 0);
-        DriverEngine.WaitForQueuedJobs();
+        SyntheticBus.WaitForQueuedJobs();
 
         Assert.True(raised, "the second raise should run the handler");
         Assert.True(_keyboardConsumer.LastReleased, "a set release flag is a key release");
         Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info) && info.FaultCount == 0, "a well-behaved handler records no fault");
     }
 
-    private void TestInterruptWorkItemRunsOnWorker()
+    // A work item a handler schedules is deferred to the kit worker, never
+    // run inside the dispatch. The handler notes the run count as it
+    // returns, with interrupts still disabled, so that reading is exact:
+    // unchanged means the item did not run inside RaiseInterrupt, and the
+    // one run WaitForQueuedJobs then drains is the worker's.
+    private void TestInterruptWorkItemDeferredToWorker()
     {
         if (!TryGetKeyboard(out DeviceNode? node, out KeyboardState? state, out _))
         {
@@ -406,10 +422,10 @@ public class Kernel : Sys.Kernel
 
         int runsBefore = state.KeyWorkRuns;
         Assert.True(SyntheticBus.RaiseInterrupt(node, 0), "the raise should run the handler");
-        DriverEngine.WaitForQueuedJobs();
+        Assert.Equal(runsBefore, state.KeyWorkRunsAtHandlerExit, "the work item should not run inside RaiseInterrupt");
 
-        Assert.Equal(runsBefore + 1, state.KeyWorkRuns, "the work item the handler scheduled should have run once");
-        Assert.True(state.KeyWorkRanOnWorker, "the work item should run on the kit worker");
+        SyntheticBus.WaitForQueuedJobs();
+        Assert.Equal(runsBefore + 1, state.KeyWorkRuns, "the work item the handler scheduled should have run once, after WaitForQueuedJobs");
     }
 
     private void TestInterruptMaskUnmask()
@@ -435,7 +451,7 @@ public class Kernel : Sys.Kernel
         handle.Unmask();
         Assert.False(handle.IsMasked, "the handle should report unmasked");
         Assert.True(SyntheticBus.RaiseInterrupt(node, 0), "an unmasked source is delivered again");
-        DriverEngine.WaitForQueuedJobs();
+        SyntheticBus.WaitForQueuedJobs();
         Assert.Equal(interruptsBefore + 1, state.InterruptCount, "the handler should run once unmasked");
     }
 
@@ -455,7 +471,7 @@ public class Kernel : Sys.Kernel
         while (state.PeriodicRuns - runsBefore < PeriodicMinimumRuns && Stopwatch.GetTimestamp() < deadline)
         {
             SysThread.Sleep(PollSleepMilliseconds);
-            DriverEngine.WaitForQueuedJobs();
+            SyntheticBus.WaitForQueuedJobs();
         }
 
         int runs = state.PeriodicRuns - runsBefore;
@@ -479,7 +495,7 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(SyntheticBus.RaiseInterrupt(node, 0), "the first raise should run the handler");
-        DriverEngine.WaitForQueuedJobs();
+        SyntheticBus.WaitForQueuedJobs();
 
         Assert.Equal(1, state.HandlerRuns, "the handler should have been entered once");
         Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info), "the block node should be in the tree");
@@ -510,7 +526,7 @@ public class Kernel : Sys.Kernel
         PublishedDevice? published = _keyboardConsumer.LastPublished;
 
         SyntheticBus.Retract(node);
-        DriverEngine.WaitForQueuedJobs();
+        SyntheticBus.WaitForQueuedJobs();
 
         Assert.True(driver is not null && driver.DetachCount == 1, "OnDetach should run once for the bound device");
         Assert.True(driver is not null && driver.LastDetachReason.Cause == DetachCause.Retracted, "the bus retracted the node itself");
@@ -576,7 +592,7 @@ public class Kernel : Sys.Kernel
     private void TestChildrenPublishedFromProbe()
     {
         DeviceNode bus = SyntheticBus.Publish(BusDriver.Key, []);
-        DriverEngine.WaitForQueuedJobs();
+        SyntheticBus.WaitForQueuedJobs();
         _busNode = bus;
         BusState? busState = bus.Binding?.DriverState as BusState;
         _busState = busState;
@@ -629,7 +645,7 @@ public class Kernel : Sys.Kernel
         Assert.True(child is { DetachCount: 0 }, "the child driver should still hold its device");
 
         SyntheticBus.Retract(bus);
-        DriverEngine.WaitForQueuedJobs();
+        SyntheticBus.WaitForQueuedJobs();
 
         Assert.True(child is not null && child.DetachCount == 1, "the child driver should be detached once");
         Assert.True(child is not null && child.LastDetachReason.Cause == DetachCause.ParentRetracted, "the child should be told its parent went away");
