@@ -9,6 +9,11 @@
     <SelfContained>true</SelfContained>
     <PublishTrimmed>true</PublishTrimmed>
     <IlcSystemModule>System.Private.CoreLib</IlcSystemModule>
+    <!-- Write the generated entry point and driver manifest under obj/ (the
+         generated/ folder of the intermediate path), so a kernel author can read
+         which drivers the build registered. A project that sets the property
+         itself keeps its value. -->
+    <EmitCompilerGeneratedFiles Condition="'$(EmitCompilerGeneratedFiles)' == ''">true</EmitCompilerGeneratedFiles>
 
     <!-- We require Microsoft.NET.Sdk for building propertly -->
     <_ImportMicrosoftNETSdkFromCosmosSdk Condition=" '$(UsingMicrosoftNETSdk)' == '' ">true</_ImportMicrosoftNETSdkFromCosmosSdk>

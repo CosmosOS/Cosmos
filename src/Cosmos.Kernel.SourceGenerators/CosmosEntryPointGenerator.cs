@@ -1,4 +1,5 @@
-﻿using System.CodeDom.Compiler;
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -6,39 +7,85 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Cosmos.Kernel.SourceGenerators;
 
-[Generator]
-public class CosmosEntryPointGenerator : IIncrementalGenerator
+/// <summary>
+/// Generates a kernel's two boot files from one pipeline keyed on the
+/// <c>CosmosKernelClass</c> build property: <c>CosmosEntryPoint.g.cs</c>, the
+/// <c>Main</c> that registers the drivers, then the kernel, and starts it;
+/// and <c>DriverManifest.g.cs</c>, the list of <c>[Driver]</c> classes the
+/// kernel carries, guarded by the feature switches they depend on and
+/// filtered by the project's <c>CosmosDriverExclude</c> and
+/// <c>CosmosDriverInclude</c> items. Neither file is generated when the
+/// property is empty; the manifest is generated, with an empty
+/// <c>Register</c>, when no driver survives.
+/// </summary>
+[Generator(LanguageNames.CSharp)]
+public sealed class CosmosEntryPointGenerator : IIncrementalGenerator
 {
+    private const string EntryPointHintName = "CosmosEntryPoint.g.cs";
+    private const string ManifestHintName = "DriverManifest.g.cs";
+
+    /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        IncrementalValueProvider<GeneratorOptions> options = context.AnalyzerConfigOptionsProvider
+            .Select(static (provider, _) => GeneratorOptions.From(provider.GlobalOptions));
 
-        // Access project properties
-        var projectProperty = context.AnalyzerConfigOptionsProvider
-            .Select((options, _) =>
-                options.GlobalOptions.TryGetValue("build_property.CosmosKernelClass", out var value)
-                    ? value
-                    : null);
+        IncrementalValueProvider<EquatableArray<DriverCandidate>> sourceDrivers = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                DriverDiscovery.DriverAttributeMetadataName,
+                static (node, _) => node is ClassDeclarationSyntax or RecordDeclarationSyntax,
+                static (syntaxContext, cancellationToken) => DriverDiscovery.FromSource(syntaxContext, cancellationToken))
+            .Collect()
+            .Select(static (candidates, _) => new EquatableArray<DriverCandidate>(candidates));
 
-        // Register only if property is filled
-        context.RegisterSourceOutput(projectProperty, (spc, cosmosKernelClass) =>
+        IncrementalValueProvider<EquatableArray<DriverCandidate>> referencedDrivers = context.CompilationProvider
+            .Select(static (compilation, cancellationToken) => DriverDiscovery.FromReferences(compilation, cancellationToken));
+
+        IncrementalValueProvider<((GeneratorOptions Options, EquatableArray<DriverCandidate> Source) Left, EquatableArray<DriverCandidate> Referenced)> input =
+            options.Combine(sourceDrivers).Combine(referencedDrivers);
+
+        context.RegisterSourceOutput(input, static (productionContext, value) =>
+            Emit(productionContext, value.Left.Options, value.Left.Source, value.Referenced));
+    }
+
+    private static void Emit(
+        SourceProductionContext context,
+        GeneratorOptions options,
+        EquatableArray<DriverCandidate> sourceDrivers,
+        EquatableArray<DriverCandidate> referencedDrivers)
+    {
+        if (options.KernelClass is null)
         {
-            if (!string.IsNullOrEmpty(cosmosKernelClass))
-            {
-                spc.AddSource("CosmosEntryPoint.g.cs", SourceText.From($@"
-// Auto-generated
-namespace Cosmos.Kernel.System.Internal;
+            return;
+        }
 
-[global::System.CodeDom.Compiler.GeneratedCode(""{typeof(CosmosEntryPointGenerator).FullName}"", ""{typeof(CosmosEntryPointGenerator).Assembly.GetName().Version}"")]
-public static class CosmosEntryPoint
-{{
-    public static void Main()
-    {{
-        Cosmos.Kernel.System.Global.RegisterKernel(new global::{cosmosKernelClass}());
-        Cosmos.Kernel.System.Global.StartKernel();
-    }}
-}}
-", Encoding.UTF8));
-            }
-        });
+        string generatedCodeAttribute = GeneratedCodeAttribute();
+        context.AddSource(EntryPointHintName, SourceText.From(EntryPointSource(options.KernelClass, generatedCodeAttribute), Encoding.UTF8));
+
+        string manifest = DriverManifestBuilder.Build(context, options, sourceDrivers, referencedDrivers, generatedCodeAttribute);
+        context.AddSource(ManifestHintName, SourceText.From(manifest, Encoding.UTF8));
+    }
+
+    private static string GeneratedCodeAttribute()
+    {
+        Type generator = typeof(CosmosEntryPointGenerator);
+        return $"[global::System.CodeDom.Compiler.GeneratedCode(\"{generator.FullName}\", \"{generator.Assembly.GetName().Version}\")]";
+    }
+
+    private static string EntryPointSource(string kernelClass, string generatedCodeAttribute)
+    {
+        StringBuilder builder = new();
+        builder.Append("// <auto-generated/>\n");
+        builder.Append("namespace Cosmos.Kernel.System.Internal;\n\n");
+        builder.Append("/// <summary>The kernel's entry point: registers the drivers in the manifest, then the kernel, and starts it.</summary>\n");
+        builder.Append(generatedCodeAttribute).Append('\n');
+        builder.Append("public static class CosmosEntryPoint\n{\n");
+        builder.Append("    /// <summary>Called by the runtime startup code once the managed world is up.</summary>\n");
+        builder.Append("    public static void Main()\n    {\n");
+        builder.Append("        global::Cosmos.Kernel.System.Internal.DriverManifest.Register();\n");
+        builder.Append("        global::Cosmos.Kernel.System.Global.RegisterKernel(new global::").Append(kernelClass).Append("());\n");
+        builder.Append("        global::Cosmos.Kernel.System.Global.StartKernel();\n");
+        builder.Append("    }\n}\n");
+        return builder.ToString();
     }
 }

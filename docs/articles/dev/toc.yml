@@ -34,3 +34,5 @@
   href: build/patcher-build.md
 - name: Cosmos.Build.Ilc
   href: build/ilc-build.md
+- name: Driver Manifest
+  href: build/driver-manifest.md
