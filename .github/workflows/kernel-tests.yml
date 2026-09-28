@@ -402,7 +402,7 @@ jobs:
       head_ref: ${{ github.head_ref || github.ref_name }}
 
   # ── Drivers ───────────────────────────────────────────────────────────────────
-  # Driver kit over the synthetic bus: no hardware, one bare cell per arch.
+  # bare on both arches; the hardware half runs on q35's default NIC on x64.
   drivers-tests:
     needs: setup
     uses: ./.github/workflows/kernel-test-run.yml

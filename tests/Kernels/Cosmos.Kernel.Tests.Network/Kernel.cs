@@ -51,7 +51,11 @@ public class Kernel : Sys.Kernel
     {
         Log.WriteString("[Network Tests] Starting test suite\n");
 
-        // x64 has E1000E network driver
+        // The NIC is a profile axis (tests/profiles.json). On x64 the e1000e cell's
+        // controller, the same 82574L that q35 adds by default, attached here by the
+        // profile's nic axis, is bound by the driver kit's E1000EDriver
+        // (Cosmos.Kernel.Drivers); the virtio-net cells come from the HAL's virtio
+        // drivers on both arches.
         TR.Start("Network Tests", expectedTests: 24);
 
         // Network initialization tests

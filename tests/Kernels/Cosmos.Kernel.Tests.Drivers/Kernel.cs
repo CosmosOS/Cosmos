@@ -2,10 +2,14 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.Drivers;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Synthetic;
+using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.Tests.Drivers.Library;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -25,6 +29,13 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// the constructor, before the driver stage, to cover the boot path; the
 /// rest are published from the tests, which is the hot-plug path.
 /// <para>
+/// The hardware half runs the kit over the machine's real buses: the PCI
+/// host node on both architectures, and on x64 the 82574L that q35 adds
+/// when a cell names no NIC, bound by <see cref="E1000EDriver"/> from
+/// <c>Cosmos.Kernel.Drivers</c> and published to the ring. virt's default
+/// NIC is virtio, which the HAL drives, so the E1000E tests skip on arm64.
+/// </para>
+/// <para>
 /// The suite is two projects. This kernel is the harness: it holds an
 /// <c>InternalsVisibleTo</c> grant from <c>Cosmos.Kernel.HAL</c> for one
 /// purpose, installing <see cref="TestKeyboardConsumer"/> through the
@@ -36,8 +47,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 3 retract, 3 children, 1 diagnostics.</summary>
-    private const int ExpectedTestCount = 27;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 3 retract, 3 children, 1 diagnostics, 5 hardware.</summary>
+    private const int ExpectedTestCount = 32;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -60,6 +71,75 @@ public class Kernel : Sys.Kernel
     /// <summary>Flags register value for a key release.</summary>
     private const byte ReleasedFlag = 1;
 
+    /// <summary>Bus name of the root nodes the machine description publishes, the PCI host among them.</summary>
+    private const string PlatformBusName = "platform";
+
+    /// <summary>Bus name of the function nodes the PCI host driver publishes.</summary>
+    private const string PciBusName = "pci";
+
+    /// <summary>Prefix shared by the host's compatible strings (pci-host-legacy on x64, pci-host-ecam-generic on arm64), which the platform node's description lists.</summary>
+    private const string PciHostCompatiblePrefix = "pci-host-";
+
+    /// <summary>Start of a function node's description for Intel's 82574L (vendor 8086, device 10d3), the e1000e q35 adds by default.</summary>
+    private const string E1000EDescriptionPrefix = "8086:10d3";
+
+    /// <summary>Skip reason of the E1000E tests on a machine whose bus carries no 82574L.</summary>
+    private const string SkipNoE1000E = "no e1000e on this machine";
+
+    /// <summary>
+    /// Kit resources the E1000E probe holds at least: the BAR0 window (1),
+    /// the two descriptor rings and their two buffer areas (4), the drain
+    /// work item (1) and the periodic drain (1), which is 7; the interrupt
+    /// handle makes 8 when the platform routed the function's line. The
+    /// lock is recorded but not a resource.
+    /// </summary>
+    private const int E1000EMinimumHeldResourceCount = 7;
+
+    /// <summary>Kit resources the E1000E probe holds when the platform routed the function's line: the seven above and the interrupt handle.</summary>
+    private const int E1000ELineHeldResourceCount = E1000EMinimumHeldResourceCount + 1;
+
+    /// <summary>How long the link test waits for the link to come up.</summary>
+    private const int LinkWindowMilliseconds = 2000;
+
+    /// <summary>Bytes of the smallest Ethernet frame without its checksum, which the controller appends.</summary>
+    private const int MinimumFrameBytes = 60;
+
+    /// <summary>Bytes of an Ethernet address.</summary>
+    private const int MacAddressBytes = 6;
+
+    /// <summary>Offset of the destination address in a frame.</summary>
+    private const int DestinationOffset = 0;
+
+    /// <summary>Offset of the source address in a frame.</summary>
+    private const int SourceOffset = MacAddressBytes;
+
+    /// <summary>Offset of the EtherType in a frame; its high byte comes first.</summary>
+    private const int EtherTypeOffset = 2 * MacAddressBytes;
+
+    /// <summary>Offset of the EtherType's low byte in a frame.</summary>
+    private const int EtherTypeLowByteOffset = EtherTypeOffset + 1;
+
+    /// <summary>The IEEE 802 local experimental EtherType 1, which no stack in the ring claims, so the frame goes out and nobody answers.</summary>
+    private const ushort ExperimentalEtherType = 0x88B5;
+
+    /// <summary>Bits per byte, for splitting the EtherType into its two bytes.</summary>
+    private const int BitsPerByte = 8;
+
+    /// <summary>Every byte of the broadcast address.</summary>
+    private const byte BroadcastByte = 0xFF;
+
+    /// <summary>Characters of an address in the text form MACAddress exposes: six hex pairs and five colons.</summary>
+    private const int MacAddressTextLength = 17;
+
+    /// <summary>Characters per address byte in that text form: the pair and its separator.</summary>
+    private const int MacAddressTextStride = 3;
+
+    /// <summary>Bits per hex digit.</summary>
+    private const int BitsPerHexDigit = 4;
+
+    /// <summary>Value of the first hex letter, a or A.</summary>
+    private const int HexLetterBase = 10;
+
     private readonly TestKeyboardConsumer _keyboardConsumer = new();
     private readonly DeviceNode _bootNode;
     private DeviceNode? _keyboardNode;
@@ -67,6 +147,7 @@ public class Kernel : Sys.Kernel
     private SyntheticAccess? _keyboardAccess;
     private DeviceNode? _busNode;
     private BusState? _busState;
+    private string? _e1000ePath;
 
     /// <summary>
     /// Publishes the boot node. The constructor runs before
@@ -129,6 +210,19 @@ public class Kernel : Sys.Kernel
 
         // ==================== Diagnostics ====================
         TR.Run("DriverInfo_OutOfRange_ReturnsFalse", TestDriverInfoOutOfRangeReturnsFalse);
+
+        // ==================== Hardware ====================
+        // The host test is unconditional: the default cell on either arch
+        // carries a PCI host. The E1000E tests need the 82574L q35 adds
+        // when a cell names no NIC; virt's default NIC is virtio, so they
+        // skip there. The node is looked up once, here, and read by path.
+        _e1000ePath = FindE1000EPath();
+        bool hasE1000E = _e1000ePath is not null;
+        TR.Run("Hardware_PciHost_Bound", TestHardwarePciHostBound);
+        TR.RunIf(hasE1000E, "Hardware_E1000E_NodeBound", TestHardwareE1000ENodeBound, SkipNoE1000E);
+        TR.RunIf(hasE1000E, "Hardware_E1000E_DeviceConsumed", TestHardwareE1000EDeviceConsumed, SkipNoE1000E);
+        TR.RunIf(hasE1000E, "Hardware_E1000E_LinkUp", TestHardwareE1000ELinkUp, SkipNoE1000E);
+        TR.RunIf(hasE1000E, "Hardware_E1000E_Transmit", TestHardwareE1000ETransmit, SkipNoE1000E);
 
         TR.Finish();
 
@@ -671,7 +765,318 @@ public class Kernel : Sys.Kernel
         Assert.False(DriverInfo.TryGetOffer(0, int.MaxValue, out _), "an offer index out of range yields no offer");
     }
 
+    // ==================== Hardware ====================
+    //
+    // The kit over the machine's real buses, read through DriverInfo and
+    // the ring like every other group; the transmit test alone reaches
+    // into the tree through the HAL grant, for the driver's counters.
+
+    private static void TestHardwarePciHostBound()
+    {
+        Assert.True(TryFindHostNode(out DeviceNodeInfo host), "a platform node whose description names a pci-host compatible should be in the tree");
+        Assert.True(host.State == DeviceNodeState.Bound, "the host node should be bound");
+        Assert.True(host.DriverName == nameof(PciHostDriver), "PciHostDriver should hold the host node");
+    }
+
+    private void TestHardwareE1000ENodeBound()
+    {
+        if (!TryGetE1000E(out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        Assert.True(info.State == DeviceNodeState.Bound, "the E1000E driver should hold the 82574L");
+        Assert.True(info.DriverName == nameof(E1000EDriver), "E1000EDriver should hold the 82574L");
+        Assert.Equal(1, info.PublishedDeviceCount, "the binding should publish one network interface");
+        Assert.True(info.HeldResourceCount >= E1000EMinimumHeldResourceCount, "the binding should hold the window, the four DMA buffers, the drain and the periodic drain at least");
+
+        E1000EState? state = FindE1000EState(path);
+        Assert.NotNull(state);
+        if (state is null)
+        {
+            return;
+        }
+
+        int expectedHeld = state.HasLine ? E1000ELineHeldResourceCount : E1000EMinimumHeldResourceCount;
+        Assert.Equal(expectedHeld, info.HeldResourceCount, "the binding should hold exactly the probe's resources, the interrupt handle among them when the line connected");
+    }
+
+    private void TestHardwareE1000EDeviceConsumed()
+    {
+        if (!TryGetE1000E(out string? path, out _))
+        {
+            return;
+        }
+
+        int deviceIndex = FindNetworkDeviceIndex(path);
+        Assert.True(deviceIndex >= 0, "the 82574L's interface should be in the published list as a network device");
+        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.IsConsumed, "the ring's network manager should have taken the interface");
+            Assert.True(device.DriverName == nameof(E1000EDriver), "the published device should name its driver");
+        }
+
+        if (!TryGetPrimaryE1000EState(path, out E1000EState? state))
+        {
+            return;
+        }
+
+        Assert.True(NetworkManager.DeviceCount >= 1, "the network manager should hold at least the kit's interface");
+        MACAddress? macAddress = NetworkManager.MacAddress;
+        Assert.NotNull(macAddress);
+        Assert.True(macAddress is not null && !macAddress.Equals(MACAddress.None), "the primary device's address should not be all zero");
+        Assert.True(macAddress is not null && macAddress.Equals(state.MacAddress), "the primary device's address should be the 82574L's");
+    }
+
+    // The probe reads the link once; the drain, on the line and every 50 ms,
+    // keeps it current. QEMU's e1000e reports the link up from the start,
+    // so the window is slack for a slow first drain, not a wait for
+    // auto-negotiation.
+    private void TestHardwareE1000ELinkUp()
+    {
+        if (!TryGetE1000E(out string? path, out _) || !TryGetPrimaryE1000EState(path, out _))
+        {
+            return;
+        }
+
+        long deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * LinkWindowMilliseconds / TR.MillisecondsPerSecond;
+        while (!NetworkManager.LinkUp && Stopwatch.GetTimestamp() < deadline)
+        {
+            SysThread.Sleep(PollSleepMilliseconds);
+        }
+
+        Assert.True(NetworkManager.LinkUp, "the primary device's link should be up within the window");
+    }
+
+    // A broadcast frame with the experimental EtherType goes out through
+    // the ring's primary device, which on this cell is the kit's e1000e,
+    // and lands on the driver's transmit counter.
+    private void TestHardwareE1000ETransmit()
+    {
+        if (!TryGetE1000E(out string? path, out _))
+        {
+            return;
+        }
+
+        if (!TryGetPrimaryE1000EState(path, out E1000EState? state))
+        {
+            return;
+        }
+
+        byte[] frame = new byte[MinimumFrameBytes];
+        Assert.True(TryBuildBroadcastFrame(state.MacAddress, frame), "the device's address should parse into the frame's source");
+
+        int transmittedBefore = state.FramesTransmitted;
+        bool sent = NetworkManager.Send(frame, frame.Length);
+        Assert.True(sent, "the ring should queue the frame on the primary device");
+        Assert.Equal(transmittedBefore + 1, state.FramesTransmitted, "the driver should count the one frame the ring queued");
+    }
+
     // ==================== Helpers ====================
+
+    /// <summary>
+    /// Finds the PCI host's platform node: the node on the platform bus
+    /// whose description (the identity's compatible strings) names a
+    /// pci-host compatible. Compared ordinally, as every string in kernel
+    /// test code is.
+    /// </summary>
+    /// <param name="host">The host node's snapshot when found.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private static bool TryFindHostNode(out DeviceNodeInfo host)
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+                && info.BusName == PlatformBusName
+                && info.Description.Contains(PciHostCompatiblePrefix, StringComparison.Ordinal))
+            {
+                host = info;
+                return true;
+            }
+        }
+
+        host = default;
+        return false;
+    }
+
+    /// <summary>
+    /// Finds the path of the first function node describing an 82574L,
+    /// whatever its state: the E1000E tests decide from the hardware's
+    /// presence, not from the binding, so a probe that failed shows up as
+    /// a failed test rather than a skip.
+    /// </summary>
+    /// <returns>The node's path, or null when no such function is on the bus.</returns>
+    private static string? FindE1000EPath()
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+                && info.BusName == PciBusName
+                && info.Description.StartsWith(E1000EDescriptionPrefix, StringComparison.Ordinal))
+            {
+                return info.Path;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>Hands back the 82574L's path and a fresh snapshot of its node, or fails the test when BeforeRun found none.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private bool TryGetE1000E([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    {
+        path = _e1000ePath;
+        if (path is null || !TryFindNode(path, out info))
+        {
+            Assert.Fail("the 82574L node was not found by BeforeRun");
+            info = default;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>Finds the published network device whose node has the given path.</summary>
+    /// <param name="nodePath">The path of the node whose driver published the device.</param>
+    /// <returns>Its position in the published list, or -1.</returns>
+    private static int FindNetworkDeviceIndex(string nodePath)
+    {
+        int count = DriverInfo.DeviceCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Network && info.NodePath == nodePath)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Finds the driver state of the node with the given path in the tree
+    /// itself, through the HAL grant: the counters the transmit test reads
+    /// are on the state, which no diagnostic snapshot carries.
+    /// </summary>
+    /// <param name="path">The node's path.</param>
+    /// <returns>The state, or null when the node is not bound by the E1000E driver.</returns>
+    private static E1000EState? FindE1000EState(string path)
+    {
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            DeviceNode node = nodes[i];
+            if (node.Path == path)
+            {
+                return node.Binding?.DriverState as E1000EState;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Hands back the 82574L's driver state and checks that the ring's
+    /// primary device is that interface, since the ring-facing tests read
+    /// the primary's address and link and must be reading the driver under
+    /// test. Fails the test when the state is missing or another device is
+    /// primary.
+    /// </summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="state">The driver state when found.</param>
+    /// <returns>True when the state is there and its interface is the primary device.</returns>
+    private static bool TryGetPrimaryE1000EState(string path, [NotNullWhen(true)] out E1000EState? state)
+    {
+        state = FindE1000EState(path);
+        Assert.NotNull(state);
+        if (state is null)
+        {
+            return false;
+        }
+
+        bool isPrimary = NetworkManager.Name == state.Name;
+        Assert.True(isPrimary, "the kit's e1000e should be the ring's primary device on this cell");
+        return isPrimary;
+    }
+
+    /// <summary>
+    /// Fills a frame addressed to everyone: the broadcast destination, the
+    /// device's own address as the source, the experimental EtherType and
+    /// a zero payload. The payload is whatever length the buffer leaves.
+    /// </summary>
+    /// <param name="source">The address to send from.</param>
+    /// <param name="frame">The buffer to fill, at least the header long.</param>
+    /// <returns>True when the source address parsed and the frame is filled.</returns>
+    private static bool TryBuildBroadcastFrame(MACAddress source, Span<byte> frame)
+    {
+        frame.Clear();
+        frame.Slice(DestinationOffset, MacAddressBytes).Fill(BroadcastByte);
+        if (!TryParseMacAddress(source.ToString(), frame.Slice(SourceOffset, MacAddressBytes)))
+        {
+            return false;
+        }
+
+        frame[EtherTypeOffset] = (byte)(ExperimentalEtherType >> BitsPerByte);
+        frame[EtherTypeLowByteOffset] = unchecked((byte)ExperimentalEtherType);
+        return true;
+    }
+
+    /// <summary>
+    /// Decodes the text form of an address, six hex pairs joined by
+    /// colons, into its bytes. MACAddress hands its bytes only to the HAL
+    /// and the ring; the text form is the public one.
+    /// </summary>
+    /// <param name="text">The address as MACAddress prints it.</param>
+    /// <param name="bytes">Where the six bytes go.</param>
+    /// <returns>True when the text had the expected shape.</returns>
+    private static bool TryParseMacAddress(string text, Span<byte> bytes)
+    {
+        if (text.Length != MacAddressTextLength || bytes.Length != MacAddressBytes)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < MacAddressBytes; i++)
+        {
+            int offset = i * MacAddressTextStride;
+            int high = HexDigitValue(text[offset]);
+            int low = HexDigitValue(text[offset + 1]);
+            if (high < 0 || low < 0)
+            {
+                return false;
+            }
+
+            bytes[i] = (byte)((high << BitsPerHexDigit) | low);
+        }
+
+        return true;
+    }
+
+    /// <summary>Value of one hex digit in either case, or -1 for any other character.</summary>
+    /// <param name="digit">The character to decode.</param>
+    private static int HexDigitValue(char digit)
+    {
+        if (digit >= '0' && digit <= '9')
+        {
+            return digit - '0';
+        }
+
+        if (digit >= 'a' && digit <= 'f')
+        {
+            return digit - 'a' + HexLetterBase;
+        }
+
+        if (digit >= 'A' && digit <= 'F')
+        {
+            return digit - 'A' + HexLetterBase;
+        }
+
+        return -1;
+    }
 
     private bool TryGetKeyboard([NotNullWhen(true)] out DeviceNode? node, [NotNullWhen(true)] out KeyboardState? state, [NotNullWhen(true)] out SyntheticAccess? access)
     {

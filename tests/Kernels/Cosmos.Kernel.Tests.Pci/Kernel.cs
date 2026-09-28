@@ -1,6 +1,6 @@
 using System;
-using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.HAL.Pci;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -20,8 +20,8 @@ public class Kernel : Sys.Kernel
     // here and the device tests skip cleanly.
     private const string SkipNoDevice = "no PCI devices enumerated, host bridge / ECAM not discovered";
 
-    /// <summary>Number of tests announced to the runner in TR.Start.</summary>
-    private const int ExpectedTestCount = 6;
+    /// <summary>Number of tests announced to the runner in TR.Start: 2 manager, 4 config space, 3 host.</summary>
+    private const int ExpectedTestCount = 9;
 
     /// <summary>All-ones vendor/device id returned by an unmapped or empty config-space read (PCI spec: 0xFFFF = no device).</summary>
     private const ushort AllOnesId = 0xFFFF;
@@ -34,6 +34,24 @@ public class Kernel : Sys.Kernel
 
     /// <summary>Vendor ID register offset in PCI configuration space (16-bit, offset 0x00).</summary>
     private const byte VendorIdRegisterOffset = 0x00;
+
+    /// <summary>Bus name of the root nodes the machine description publishes, the PCI host among them.</summary>
+    private const string PlatformBusName = "platform";
+
+    /// <summary>Bus name of the function nodes the PCI host driver publishes.</summary>
+    private const string PciBusName = "pci";
+
+    /// <summary>Name of the driver kit's PCI host driver, as DriverInfo reports it.</summary>
+    private const string PciHostDriverName = "PciHostDriver";
+
+    /// <summary>Prefix shared by the host's compatible strings (pci-host-legacy on x64, pci-host-ecam-generic on arm64), which the platform node's description lists.</summary>
+    private const string PciHostCompatiblePrefix = "pci-host-";
+
+    /// <summary>Resources every function node carries: one per base address register slot, assigned or not (PCI type 0 headers have six).</summary>
+    private const int PciFunctionResourceCount = 6;
+
+    /// <summary>Interrupt sources every function node carries: its legacy line, routed or not.</summary>
+    private const int PciFunctionInterruptCount = 1;
 
     protected override void BeforeRun()
     {
@@ -56,10 +74,19 @@ public class Kernel : Sys.Kernel
         TR.Run("Manager_HasDevices", TestManager_HasDevices);
 
         // ==================== ConfigSpace ====================
-        TR.RunIf(anyDevice, "ConfigSpace_VendorId_NotAllOnes",     TestConfigSpace_VendorIdNotAllOnes,     SkipNoDevice);
-        TR.RunIf(anyDevice, "ConfigSpace_DeviceId_NotAllOnes",     TestConfigSpace_DeviceIdNotAllOnes,     SkipNoDevice);
-        TR.RunIf(anyDevice, "ConfigSpace_ClassCode_InRange",       TestConfigSpace_ClassCodeInRange,       SkipNoDevice);
-        TR.RunIf(anyDevice, "ConfigSpace_VendorRead_StableAcrossCalls", TestConfigSpace_VendorReadStable,  SkipNoDevice);
+        TR.RunIf(anyDevice, "ConfigSpace_VendorId_NotAllOnes", TestConfigSpace_VendorIdNotAllOnes, SkipNoDevice);
+        TR.RunIf(anyDevice, "ConfigSpace_DeviceId_NotAllOnes", TestConfigSpace_DeviceIdNotAllOnes, SkipNoDevice);
+        TR.RunIf(anyDevice, "ConfigSpace_ClassCode_InRange", TestConfigSpace_ClassCodeInRange, SkipNoDevice);
+        TR.RunIf(anyDevice, "ConfigSpace_VendorRead_StableAcrossCalls", TestConfigSpace_VendorReadStable, SkipNoDevice);
+
+        // ==================== Host ====================
+        // Unconditional like Manager_HasDevices: the default cell on either
+        // arch carries a PCI host (the port mechanism on q35, ECAM from
+        // MCFG on virt with EDK2), so a missing or unbound host node is a
+        // regression in the machine description or the host driver.
+        TR.Run("Host_PlatformNode_BoundByPciHostDriver", TestHost_PlatformNodeBoundByPciHostDriver);
+        TR.Run("Host_PublishesPciNodes", TestHost_PublishesPciNodes);
+        TR.Run("Host_NodeCount_MatchesLegacyScan", TestHost_NodeCountMatchesLegacyScan);
 
         TR.Finish();
 
@@ -125,5 +152,99 @@ public class Kernel : Sys.Kernel
         ushort first = s_firstDevice!.ReadRegister16(VendorIdRegisterOffset);
         ushort second = s_firstDevice.ReadRegister16(VendorIdRegisterOffset);
         Assert.Equal(first, second);
+    }
+
+    // ==================== Host ====================
+    //
+    // The driver kit's view of the same bus, read through DriverInfo only:
+    // the platform node the machine description publishes for the PCI
+    // host, the PciHostDriver that binds it, and the function nodes the
+    // driver publishes beneath it. PciManager's legacy scan walks the same
+    // configuration space, so the two enumerations are checked against
+    // each other.
+
+    private static void TestHost_PlatformNodeBoundByPciHostDriver()
+    {
+        Assert.True(TryFindHostNode(out DeviceNodeInfo host), "a platform node whose description names a pci-host compatible should be in the tree");
+        Assert.True(host.State == DeviceNodeState.Bound, "the host node should be bound");
+        Assert.True(host.DriverName == PciHostDriverName, "PciHostDriver should hold the host node");
+    }
+
+    private static void TestHost_PublishesPciNodes()
+    {
+        if (!TryFindHostNode(out DeviceNodeInfo host))
+        {
+            Assert.Fail("the host node was not found");
+            return;
+        }
+
+        int published = 0;
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (!DriverInfo.TryGetNode(i, out DeviceNodeInfo info) || info.BusName != PciBusName || info.ParentPath != host.Path)
+            {
+                continue;
+            }
+
+            published++;
+            Assert.Equal(PciFunctionResourceCount, info.ResourceCount, "a function node carries one resource per BAR slot: " + info.Path);
+            Assert.Equal(PciFunctionInterruptCount, info.InterruptCount, "a function node carries its legacy line as one source: " + info.Path);
+        }
+
+        Assert.True(published >= 1, "the host driver should have published at least one function node under the host");
+    }
+
+    private static void TestHost_NodeCountMatchesLegacyScan()
+    {
+        int pciNodes = CountNodesOnBus(PciBusName);
+        uint legacyCount = PciManager.Count;
+        Assert.True((uint)pciNodes >= legacyCount, "the kit should publish at least every function the legacy scan enumerated");
+    }
+
+    // ==================== Helpers ====================
+
+    /// <summary>
+    /// Finds the PCI host's platform node: the node on the platform bus
+    /// whose description (the identity's compatible strings) names a
+    /// pci-host compatible. Compared ordinally, as every string in kernel
+    /// test code is.
+    /// </summary>
+    /// <param name="host">The host node's snapshot when found.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private static bool TryFindHostNode(out DeviceNodeInfo host)
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+                && info.BusName == PlatformBusName
+                && info.Description.Contains(PciHostCompatiblePrefix, StringComparison.Ordinal))
+            {
+                host = info;
+                return true;
+            }
+        }
+
+        host = default;
+        return false;
+    }
+
+    /// <summary>Counts the nodes of the tree on the named bus, whatever their state.</summary>
+    /// <param name="busName">The bus name to count, compared ordinally.</param>
+    /// <returns>How many nodes sit on that bus.</returns>
+    private static int CountNodesOnBus(string busName)
+    {
+        int matches = 0;
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info) && info.BusName == busName)
+            {
+                matches++;
+            }
+        }
+
+        return matches;
     }
 }
