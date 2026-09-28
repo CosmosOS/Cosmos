@@ -76,6 +76,52 @@ public class DriverAssemblyAnalyzerTests
         }
         """;
 
+    private const string GrantingAnotherCode = """
+        using System.Runtime.CompilerServices;
+
+        [assembly: InternalsVisibleTo("OtherLib")]
+
+        namespace Cosmos.Kernel.Fake
+        {
+            internal class Hidden
+            {
+            }
+        }
+        """;
+
+    private const string PolyfilledUnsafeAccessorCode = """
+        namespace System.Runtime.CompilerServices
+        {
+            internal enum UnsafeAccessorKind
+            {
+                Field,
+            }
+
+            internal sealed class UnsafeAccessorAttribute : System.Attribute
+            {
+                public UnsafeAccessorAttribute(UnsafeAccessorKind kind)
+                {
+                }
+
+                public string? Name { get; set; }
+            }
+        }
+
+        namespace DriverLib
+        {
+            public class Target
+            {
+                private int _count;
+            }
+
+            public static class Hatch
+            {
+                [System.Runtime.CompilerServices.UnsafeAccessor(System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "_count")]
+                public static extern ref int GetCount(Target target);
+            }
+        }
+        """;
+
     private static readonly MetadataReference s_corlibReference =
         MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 
@@ -154,6 +200,26 @@ public class DriverAssemblyAnalyzerTests
         ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(PlainCode, [notGranting], isDriverAssembly: true);
 
         Assert.DoesNotContain(diagnostics, d => d.Id == DiagnosticMessages.DriverAssemblyGrantedInternals.Id);
+    }
+
+    [Fact]
+    public async Task InternalsGrant_ToAnotherAssembly_IsSilent()
+    {
+        MetadataReference granting = FakeAssembly.Emit("Cosmos.Kernel.Fake", GrantingAnotherCode);
+
+        ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(PlainCode, [granting], isDriverAssembly: true);
+
+        Assert.DoesNotContain(diagnostics, d => d.Id == DiagnosticMessages.DriverAssemblyGrantedInternals.Id);
+    }
+
+    [Fact]
+    public async Task UnsafeAccessor_PolyfilledInTheDriverAssembly_Reports()
+    {
+        // The attribute declared in source shadows the runtime's: caught by its full name all the same.
+        ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(PolyfilledUnsafeAccessorCode, [], isDriverAssembly: true);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics, d => d.Id == DiagnosticMessages.DriverAssemblyUsesUnsafeAccessor.Id);
+        Assert.Contains("'GetCount'", diagnostic.GetMessage());
     }
 
     [Fact]
