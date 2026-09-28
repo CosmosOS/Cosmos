@@ -29,6 +29,14 @@ internal static class DriverEngine
     private static EngineJob? s_tail;
     private static readonly InterruptEvent s_wake = new();
 
+    /// <summary>
+    /// How many node jobs (arrivals and retractions) were ever queued, so a
+    /// waiter can tell whether the jobs its fence covered queued more. Work
+    /// item jobs are not counted: periodic items would keep it moving.
+    /// Written under <see cref="s_queueLock"/>.
+    /// </summary>
+    private static int s_nodeJobsQueued;
+
     private static SchedulerThread? s_worker;
     private static EngineMode s_mode;
     private static bool s_draining;
@@ -50,8 +58,9 @@ internal static class DriverEngine
 
     /// <summary>
     /// Starts the engine: logs the manifest, starts the worker (or settles
-    /// for inline mode), and offers every node published so far. Returns once
-    /// those offers are done. Called once from the kernel start path.
+    /// for inline mode), and offers every node published so far. Returns
+    /// once every node, the children a bus driver published from its probe
+    /// included, has been offered. Called once from the kernel start path.
     /// </summary>
     public static void Start()
     {
@@ -100,13 +109,19 @@ internal static class DriverEngine
     }
 
     /// <summary>
-    /// Returns once every job queued before the call has run: a fence goes
-    /// to the back of the queue and the caller waits for it, so work a test
-    /// or a bus just caused (an offer, a teardown, a work item a handler
-    /// scheduled) is complete on return, while work queued afterwards, such
-    /// as periodic items, does not hold it up. From the worker or inside a
-    /// drain it returns at once, since waiting there would wait for itself;
-    /// before <see cref="Start"/> nothing runs, so it returns too.
+    /// Returns once every job queued before the call has run, and every
+    /// node job those jobs queued in turn: a fence goes to the back of the
+    /// queue and the caller waits for it; when a job that ran ahead of the
+    /// fence published or retracted a node, another fence follows, until one
+    /// completes with no node job queued while it was in flight. So work a
+    /// test or a bus just caused (an offer, the children a bus driver's
+    /// probe published, a teardown, a work item a handler scheduled) is
+    /// complete on return, while work queued afterwards that is not a node
+    /// job, such as periodic items, does not hold it up. From the worker or
+    /// inside a drain it returns at once, since waiting there would wait for
+    /// itself; before <see cref="Start"/> nothing runs, so it returns too.
+    /// Inline mode drains once: the loop already running picks nested jobs
+    /// up itself.
     /// </summary>
     public static void WaitForQueuedJobs()
     {
@@ -121,7 +136,18 @@ internal static class DriverEngine
             return;
         }
 
-        Submit(new EngineJob(EngineJobKind.Fence) { Completion = new InterruptEvent() });
+        int seen;
+        do
+        {
+            seen = Volatile.Read(ref s_nodeJobsQueued);
+            if (!Submit(new EngineJob(EngineJobKind.Fence) { Completion = new InterruptEvent() }))
+            {
+                // Released early: the caller's own binding is being torn
+                // down, and the teardown waits to join the caller.
+                return;
+            }
+        }
+        while (Volatile.Read(ref s_nodeJobsQueued) != seen);
     }
 
     /// <summary>
@@ -235,8 +261,10 @@ internal static class DriverEngine
 
     /// <summary>
     /// Tears a node down now, on the calling job: its binding (children
-    /// first, inside it), then the node is marked retracted and the bus's
-    /// allocation for it released unless resources leaked. Worker or drain only.
+    /// first, inside it), then the node is marked retracted, the bus's
+    /// after-teardown hook runs when the node had a binding, and the bus's
+    /// allocation for it is released unless resources leaked. Worker or
+    /// drain only.
     /// </summary>
     internal static void TeardownNode(DeviceNode node, DetachCause cause, bool hardwarePresent)
     {
@@ -254,6 +282,22 @@ internal static class DriverEngine
             // Retracted whatever the teardown managed: a node left pending
             // with a half-dead binding would be offered or torn down again.
             node.State = NodeState.Retracted;
+
+            // Even when resources leaked: a function whose driver thread is
+            // stuck still has its bus mastering turned off. A node nobody
+            // bound is left alone: a legacy driver may operate its function.
+            if (node.Binding is not null && node.AccessObject is INodeHooks hooks)
+            {
+                try
+                {
+                    hooks.AfterTeardown(hardwarePresent);
+                }
+                catch (Exception exception)
+                {
+                    DriverLog.HookThrew(node, "after teardown", exception.Message);
+                }
+            }
+
             if (node.LeakedResourceCount == 0)
             {
                 node.BusResource?.Release();
@@ -265,11 +309,19 @@ internal static class DriverEngine
 
     private static InterruptEvent? NewCompletion() => IsStarted && HasWorker && !IsOnWorker ? new InterruptEvent() : null;
 
-    private static void Submit(EngineJob job, DeviceBinding? owner = null)
+    /// <summary>Queues a job and, when it carries a completion, waits for it.</summary>
+    /// <param name="job">The job.</param>
+    /// <param name="owner">The binding submitting it, when a driver does; null otherwise.</param>
+    /// <returns>False when the wait was given up because the caller's own binding is being torn down; true otherwise, for a job nobody waits on too.</returns>
+    private static bool Submit(EngineJob job, DeviceBinding? owner = null)
     {
         using (s_queueLock.AcquireIrqSafe())
         {
             EnqueueLocked(job);
+            if (job.Kind is EngineJobKind.NodeArrived or EngineJobKind.NodeRetracted)
+            {
+                s_nodeJobsQueued++;
+            }
         }
 
         s_wake.Signal();
@@ -284,17 +336,19 @@ internal static class DriverEngine
                     // The worker is tearing down the caller's own binding and
                     // will wait to join this thread; the job stays queued and
                     // runs afterwards, against a node that is then retracted.
-                    return;
+                    return false;
                 }
             }
 
-            return;
+            return true;
         }
 
         if (IsStarted && !HasWorker)
         {
             RunPending();
         }
+
+        return true;
     }
 
     /// <summary>

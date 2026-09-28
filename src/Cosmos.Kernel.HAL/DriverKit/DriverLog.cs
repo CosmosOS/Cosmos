@@ -91,6 +91,18 @@ internal static class DriverLog
     internal static void TeardownStepThrew(DeviceNode node, Driver driver, string step, string message) =>
         WriteLine($"{node.Path} {driver.Name} teardown step \"{step}\" threw: {message}");
 
+    /// <summary>A bus hook threw and the engine went on: <c>pci:0000:00:03.0 bus hook "quiesce" threw: message</c>.</summary>
+    internal static void HookThrew(DeviceNode node, string step, string message) =>
+        WriteLine($"{node.Path} bus hook \"{step}\" threw: {message}");
+
+    /// <summary>A node was left unbound with no offer because the bus could not quiesce it: <c>pci:0000:00:03.0 not offered: reason</c>.</summary>
+    internal static void NodeSkipped(DeviceNode node, string reason) =>
+        WriteLine($"{node.Path} not offered: {reason}");
+
+    /// <summary>An ECAM window could not be mapped past a bus, so the host ends there: <c>pci host at 0x3f000000: buses 10 to ff not mapped, enumeration ends at bus 0f</c>.</summary>
+    internal static void EcamWindowClamped(ulong physicalBase, byte firstUnmappedBus, byte endBus, byte lastMappedBus) =>
+        WriteLine($"pci host at 0x{physicalBase:x}: buses {firstUnmappedBus:x2} to {endBus:x2} not mapped, enumeration ends at bus {lastMappedBus:x2}");
+
     /// <summary>A kit-internal work item, or the worker itself, threw: <c>engine: message</c>.</summary>
     internal static void EngineError(string message) => WriteLine($"engine: {message}");
 

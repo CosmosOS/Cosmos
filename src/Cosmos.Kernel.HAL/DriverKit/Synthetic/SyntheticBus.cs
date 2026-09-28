@@ -76,12 +76,14 @@ public static class SyntheticBus
     }
 
     /// <summary>
-    /// Returns once every kit job queued before the call has run: an offer
-    /// a publish caused, a teardown a retract queued from a driver, a work
-    /// item a handler scheduled. The test hook for asserting after
-    /// <see cref="RaiseInterrupt"/>; work queued afterwards, such as periodic
-    /// items, does not hold it up. Thread context, not from a driver thread
-    /// of a binding that is being torn down.
+    /// Returns once every kit job queued before the call has run, and every
+    /// node job those queued in turn: an offer a publish caused, the
+    /// children a bus driver's probe published, a teardown a retract queued
+    /// from a driver, a work item a handler scheduled. The test hook for
+    /// asserting after <see cref="RaiseInterrupt"/>; work queued afterwards
+    /// that is not a node job, such as periodic items, does not hold it up.
+    /// Thread context, not from a driver thread of a binding that is being
+    /// torn down.
     /// </summary>
     public static void WaitForQueuedJobs()
     {

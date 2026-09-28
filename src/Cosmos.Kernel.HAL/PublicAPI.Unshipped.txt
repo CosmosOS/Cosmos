@@ -137,6 +137,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.AllocateDma(int length, int alignment) -> Cosmos.Kernel.HAL.DriverKit.DmaBuffer!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.CreateEvent() -> Cosmos.Kernel.HAL.DriverKit.DeviceEvent!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.CreateLock() -> Cosmos.Kernel.HAL.DriverKit.DeviceLock!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.CreateWorkItem(System.Action! callback) -> Cosmos.Kernel.HAL.DriverKit.WorkItem!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.Delay(uint microseconds) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.DetachEvent.get -> Cosmos.Kernel.HAL.DriverKit.DeviceEvent!
@@ -166,6 +167,11 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceEvent.Signal() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceIdentity
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceIdentity.DeviceIdentity() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceLock
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceLock.Acquire() -> Cosmos.Kernel.HAL.DriverKit.DeviceLockScope
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceLockScope
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceLockScope.DeviceLockScope() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceLockScope.Dispose() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceMatch
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceMatch.DeviceMatch() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceNode
@@ -201,11 +207,13 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResource
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResource.Base.get -> ulong
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResource.DeviceResource() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResource.IsNone.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResource.Kind.get -> Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResource.Length.get -> ulong
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResource.PhysicalBase.get -> ulong
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind.MemoryWindow = 0 -> Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind.None = 3 -> Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind.PortRange = 1 -> Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind.RamWindow = 2 -> Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode
@@ -302,6 +310,68 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.NodeState.Pending = 0 -> Cosmos.Kernel.HAL.DriverKit.NodeState
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.NodeState.Retracted = 3 -> Cosmos.Kernel.HAL.DriverKit.NodeState
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.NodeState.Unbound = 2 -> Cosmos.Kernel.HAL.DriverKit.NodeState
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.Bars.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.Pci.PciBar>
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.EnableBusMastering(bool enable) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.EnableIoSpace(bool enable) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.EnableMemorySpace(bool enable) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.FindCapability(byte capabilityId, byte after = 0) -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.InterruptLine.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.InterruptPin.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.IsMsiXCapable.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.MessageInterruptCount.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.ReadConfig16(ushort offset) -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.ReadConfig32(ushort offset) -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.ReadConfig8(ushort offset) -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.WriteConfig16(ushort offset, ushort value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.WriteConfig32(ushort offset, uint value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.WriteConfig8(ushort offset, byte value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciBar
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciBar.Base.get -> ulong
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciBar.Index.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciBar.Is64Bit.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciBar.IsAssigned.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciBar.IsIo.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciBar.IsPrefetchable.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciBar.Length.get -> ulong
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciBar.PciBar() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.Access.get -> Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.Identity.get -> Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.Interrupts.get -> Cosmos.Kernel.HAL.DriverKit.InterruptSource![]!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.PciFunctionDescription() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.Resources.get -> Cosmos.Kernel.HAL.DriverKit.DeviceResource[]!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.EndBus.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.ReadConfig16(byte bus, byte device, byte function, ushort offset) -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.ReadConfig32(byte bus, byte device, byte function, ushort offset) -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.ReadConfig8(byte bus, byte device, byte function, ushort offset) -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.Segment.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.StartBus.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.TryDescribeFunction(byte bus, byte device, byte function, out Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription description) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.WriteConfig16(byte bus, byte device, byte function, ushort offset, ushort value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.WriteConfig32(byte bus, byte device, byte function, ushort offset, uint value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess.WriteConfig8(byte bus, byte device, byte function, ushort offset, byte value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Bus.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.ClassCode.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Device.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.DeviceId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Function.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.HeaderType.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.ProgIf.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Revision.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Segment.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Subclass.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.SubsystemId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.SubsystemVendorId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.VendorId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciMatch
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciMatch.PciMatch(ushort? vendorId = null, ushort? deviceId = null, ushort? subsystemVendorId = null, ushort? subsystemId = null, byte? classCode = null, byte? subclass = null, byte? progIf = null, byte? revision = null) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Platform.PlatformIdentity
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Platform.PlatformIdentity.Compatible.get -> System.Collections.Generic.IReadOnlyList<string!>!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Platform.PlatformIdentity.PlatformIdentity(string! address, System.Collections.Generic.IReadOnlyList<string!>! compatible) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Platform.PlatformMatch
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.ProbeOutcome
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.ProbeOutcome.Bound = 0 -> Cosmos.Kernel.HAL.DriverKit.ProbeOutcome
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.ProbeOutcome.Declined = 1 -> Cosmos.Kernel.HAL.DriverKit.ProbeOutcome
@@ -335,12 +405,23 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.WorkItem
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.WorkItem.IsCancelled.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.WorkItem.Schedule() -> bool
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Address.get -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.BusName.get -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Describe() -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Pci.PciMatch.Matches(Cosmos.Kernel.HAL.DriverKit.DeviceIdentity! identity) -> bool
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Pci.PciMatch.Specificity.get -> int
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Platform.PlatformIdentity.Address.get -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Platform.PlatformIdentity.BusName.get -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Platform.PlatformIdentity.Describe() -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Platform.PlatformMatch.Matches(Cosmos.Kernel.HAL.DriverKit.DeviceIdentity! identity) -> bool
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Platform.PlatformMatch.Specificity.get -> int
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticIdentity.Address.get -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticIdentity.BusName.get -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticIdentity.Describe() -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticMatch.Matches(Cosmos.Kernel.HAL.DriverKit.DeviceIdentity! identity) -> bool
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticMatch.Specificity.get -> int
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DeviceResource.MemoryWindow(ulong physicalBase, ulong length) -> Cosmos.Kernel.HAL.DriverKit.DeviceResource
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DeviceResource.None.get -> Cosmos.Kernel.HAL.DriverKit.DeviceResource
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DeviceResource.PortRange(ushort basePort, ushort count) -> Cosmos.Kernel.HAL.DriverKit.DeviceResource
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DeviceResource.RamWindow(ulong virtualBase, ulong physicalBase, ulong length) -> Cosmos.Kernel.HAL.DriverKit.DeviceResource
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DmaBuffer.ReadBarrier() -> void
@@ -349,6 +430,8 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DmaConstraints.None.get -> Cosmos.Kernel.HAL.DriverKit.DmaConstraints
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DriverRegistry.Drivers.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.DriverKit.Driver!>!
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DriverRegistry.Register(Cosmos.Kernel.HAL.DriverKit.Driver! driver) -> void
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Platform.PlatformMatch.Any() -> Cosmos.Kernel.HAL.DriverKit.Platform.PlatformMatch!
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Platform.PlatformMatch.Compatible(string! value) -> Cosmos.Kernel.HAL.DriverKit.Platform.PlatformMatch!
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.ProbeResult.Bound.get -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.ProbeResult.Declined(string! reason) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.ProbeResult.Failed(string! reason) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult

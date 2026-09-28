@@ -43,6 +43,24 @@ internal class X64InterruptController : IInterruptController
         }
     }
 
+    /// <inheritdoc/>
+    public void MaskIrq(byte irqNo)
+    {
+        if (ApicManager.IsInitialized)
+        {
+            ApicManager.MaskIrq(irqNo);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void UnmaskIrq(byte irqNo)
+    {
+        if (ApicManager.IsInitialized)
+        {
+            ApicManager.UnmaskIrq(irqNo);
+        }
+    }
+
     public unsafe void Dispatch(ref IRQContext ctx)
     {
         InterruptManager.IrqDelegate?[]? handlers = InterruptManager.s_irqHandlers;

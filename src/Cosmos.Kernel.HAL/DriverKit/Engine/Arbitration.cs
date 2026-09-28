@@ -7,7 +7,11 @@ namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 /// registered driver with a matching entry, by priority (highest first),
 /// then by the specificity of its best match (highest first), then by
 /// manifest position (earliest first). Each candidate gets a fresh binding;
-/// the first to return bound keeps the node. Worker only.
+/// the first to return bound keeps the node. A bus whose access object
+/// implements <see cref="INodeHooks"/> quiesces the hardware before the
+/// first probe, quiets it again after each probe that did not bind (before
+/// the probe's memory is freed) and restores it when nobody binds; with no
+/// candidate the hooks are not called. Worker only.
 /// </summary>
 internal static class Arbitration
 {
@@ -26,6 +30,11 @@ internal static class Arbitration
         {
             node.State = NodeState.Unbound;
             DriverLog.NoDriver(node);
+            return;
+        }
+
+        if (!Quiesce(node))
+        {
             return;
         }
 
@@ -53,12 +62,84 @@ internal static class Arbitration
                 return;
             }
 
+            Quiet(node);
             int released = binding.Unwind();
             node.AddOffer(new DeviceOffer(driver.Name, driver.Priority, candidates[i].Specificity, result.Outcome, result.Reason, released));
             DriverLog.Offer(node, driver, result);
         }
 
         node.State = NodeState.Unbound;
+        Restore(node);
+    }
+
+    /// <summary>
+    /// Runs the bus's <see cref="INodeHooks.BeforeFirstOffer"/>, when the
+    /// node has one. A hook that throws leaves the node unbound with no
+    /// offer: a driver must not see a function the bus could not quiet.
+    /// </summary>
+    /// <returns>False when the node was skipped.</returns>
+    private static bool Quiesce(DeviceNode node)
+    {
+        if (node.AccessObject is not INodeHooks hooks)
+        {
+            return true;
+        }
+
+        try
+        {
+            hooks.BeforeFirstOffer();
+            return true;
+        }
+        catch (Exception exception)
+        {
+            DriverLog.HookThrew(node, "quiesce", exception.Message);
+            node.State = NodeState.Unbound;
+            DriverLog.NodeSkipped(node, exception.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Runs the bus's <see cref="INodeHooks.AfterOfferDeclined"/>, when the
+    /// node has one, before the binding of a probe that did not bind is
+    /// unwound: whatever the probe armed stops before its memory is freed.
+    /// </summary>
+    private static void Quiet(DeviceNode node)
+    {
+        if (node.AccessObject is not INodeHooks hooks)
+        {
+            return;
+        }
+
+        try
+        {
+            hooks.AfterOfferDeclined();
+        }
+        catch (Exception exception)
+        {
+            DriverLog.HookThrew(node, "quiet", exception.Message);
+        }
+    }
+
+    /// <summary>
+    /// Runs the bus's <see cref="INodeHooks.AfterUnbound"/>, when the node
+    /// has one, so a function nobody bound is left as firmware left it.
+    /// </summary>
+    private static void Restore(DeviceNode node)
+    {
+        if (node.AccessObject is not INodeHooks hooks)
+        {
+            return;
+        }
+
+        try
+        {
+            hooks.AfterUnbound();
+        }
+        catch (Exception exception)
+        {
+            DriverLog.HookThrew(node, "restore", exception.Message);
+        }
     }
 
     private static Candidate[] Collect(DeviceNode node)

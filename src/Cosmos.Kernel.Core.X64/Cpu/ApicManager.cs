@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.Core.X64.Cpu;
@@ -62,13 +63,15 @@ public static class ApicManager
     }
 
     /// <summary>
-    /// Routes an ISA IRQ to an interrupt vector.
-    /// Handles IRQ overrides from MADT automatically.
+    /// Routes an ISA IRQ to an interrupt vector, on the GSI its MADT
+    /// interrupt source override names when there is one. The I/O APIC
+    /// register pair runs with interrupts disabled: it shares one IOREGSEL
+    /// latch with <see cref="MaskIrq"/>, which a handler may call.
     /// </summary>
     /// <param name="irq">ISA IRQ number (0-15).</param>
     /// <param name="vector">Target interrupt vector.</param>
     /// <param name="startMasked">If true, the IRQ starts masked and must be explicitly unmasked.</param>
-    public static unsafe void RouteIrq(byte irq, byte vector, bool startMasked = false)
+    public static void RouteIrq(byte irq, byte vector, bool startMasked = false)
     {
         if (!s_initialized)
         {
@@ -76,28 +79,12 @@ public static class ApicManager
             return;
         }
 
-        MadtInfo* madtPtr = AcpiMadt.GetMadtInfoPtr();
-        if (madtPtr == null)
-        {
-            return;
-        }
-
-        MadtInfo madt = *madtPtr;
-
-        // Check for IRQ override
-        IrqOverride? irqOverride = null;
-        foreach (var iso in madt.Overrides)
-        {
-            if (iso.Source == irq)
-            {
-                irqOverride = iso;
-                break;
-            }
-        }
-
-        // Route through I/O APIC
+        IrqOverride? irqOverride = FindOverride(irq);
         byte targetApicId = LocalApic.GetId();
-        IoApic.RouteIrq(irq, vector, targetApicId, irqOverride, startMasked);
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            IoApic.RouteIrq(irq, vector, targetApicId, irqOverride, startMasked);
+        }
     }
 
     /// <summary>
@@ -110,19 +97,66 @@ public static class ApicManager
     }
 
     /// <summary>
-    /// Masks (disables) an IRQ at the I/O APIC level.
+    /// Masks (disables) an ISA IRQ at the I/O APIC level, on the same GSI
+    /// <see cref="RouteIrq"/> programmed for it (the MADT override applied).
+    /// The IOREGSEL/IOWIN pair runs with interrupts disabled, since a
+    /// handler masking its own line would otherwise cut another caller's
+    /// pair in half. Allocation-free; any context.
     /// </summary>
+    /// <param name="irq">ISA IRQ number (0-15).</param>
     public static void MaskIrq(byte irq)
     {
-        IoApic.MaskIrq(irq);
+        uint gsi = ResolveGsi(irq);
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            IoApic.MaskIrq(gsi);
+        }
     }
 
     /// <summary>
-    /// Unmasks (enables) an IRQ at the I/O APIC level.
+    /// Unmasks (enables) an ISA IRQ at the I/O APIC level, on the same GSI
+    /// <see cref="RouteIrq"/> programmed for it. Same rules as
+    /// <see cref="MaskIrq"/>. Allocation-free; any context.
     /// </summary>
+    /// <param name="irq">ISA IRQ number (0-15).</param>
     public static void UnmaskIrq(byte irq)
     {
-        IoApic.UnmaskIrq(irq);
+        uint gsi = ResolveGsi(irq);
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            IoApic.UnmaskIrq(gsi);
+        }
+    }
+
+    /// <summary>The GSI an ISA IRQ arrives on: its MADT override's, or the IRQ number itself.</summary>
+    /// <param name="irq">ISA IRQ number (0-15).</param>
+    private static uint ResolveGsi(byte irq) => FindOverride(irq) is { } irqOverride ? irqOverride.Gsi : irq;
+
+    /// <summary>
+    /// The MADT interrupt source override for <paramref name="irq"/>, when
+    /// firmware declares one: the GSI the ISA line really arrives on, with
+    /// its polarity and trigger. Read in place from the table the early
+    /// ACPI parse filled. Allocation-free; any context.
+    /// </summary>
+    /// <param name="irq">ISA IRQ number (0-15).</param>
+    private static unsafe IrqOverride? FindOverride(byte irq)
+    {
+        MadtInfo* madtPtr = AcpiMadt.GetMadtInfoPtr();
+        if (madtPtr == null)
+        {
+            return null;
+        }
+
+        ReadOnlySpan<IrqOverride> overrides = madtPtr->Overrides;
+        for (int i = 0; i < overrides.Length; i++)
+        {
+            if (overrides[i].Source == irq)
+            {
+                return overrides[i];
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
