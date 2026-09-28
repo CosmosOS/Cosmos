@@ -10,7 +10,7 @@ The main differences if you come from Gen2:
 | UDP | Cosmos-specific `UdpClient` class | Standard `System.Net.Sockets.UdpClient` (plugged) |
 | DHCP | Cosmos client class | Cosmos client class (`Cosmos.Kernel.System.Network`) |
 | DNS | Cosmos client class | Standard `System.Net.Dns` (plugged), or the Cosmos `DnsClient` |
-| NIC drivers | RTL8168, E1000, PCNET | Intel E1000E (x64), virtio-net (x64 PCI + ARM64 MMIO) |
+| NIC drivers | RTL8168, E1000, PCNET | Intel E1000E over the driver kit (any machine with a PCI host node; QEMU's default q35 NIC on x64), virtio-net (x64 PCI + ARM64 MMIO) |
 
 None of these protocols implements every feature of its RFC. If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
@@ -24,7 +24,7 @@ Network support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot the kernel detects the NIC and registers it with `NetworkManager`. On x64 both **Intel E1000E** (QEMU's default q35 NIC, preferred when present) and **virtio-net-pci** are supported, so `cosmos run` needs no extra flags. On ARM64 attach a virtio NIC explicitly:
+At boot a NIC reaches `NetworkManager` one of two ways. An **Intel E1000E** is bound by `E1000EDriver`, a driver kit driver in `Cosmos.Kernel.Drivers` that every kernel carries: the PCI host driver publishes the function, the driver brings it up and publishes an interface named `e1000e`, and the manager's consumer registers it ([Writing a Driver](drivers.md#pci-devices)). A **virtio-net** device is detected by the HAL and registered by the System initializer, before the driver stage. On x64 both work, so `cosmos run` needs no extra flags: QEMU's q35 default NIC is an e1000e. The first registered device is the primary; the virtio device, when there is one, is registered before the driver stage runs and so comes ahead of the kit's `e1000e`. On ARM64 attach a virtio NIC explicitly:
 
 ```console
 $ cosmos run                          # x64: default e1000e NIC, user-mode networking
@@ -82,7 +82,7 @@ if (second.IsValid)
 
 A `NetworkAdapter` is a handle, not the device: it carries the registration index, so a default-constructed one names nothing and `IsValid` is false. `GetAdapter` answers with such a handle for an index no device occupies, which is why the assignment above is guarded: the `Primary` setter throws `ArgumentException` on a handle that names nothing, and QEMU gives the kernel a single NIC by default, so `GetAdapter(1)` names nothing there.
 
-<!-- screenshot: console showing "Device: Intel E1000E", the MAC, "Link up: True", "Ready: True" -->
+<!-- screenshot: console showing "Device: e1000e", the MAC, "Link up: True", "Ready: True" -->
 ![Network Device](images/network-device.png)
 
 ## Configure IPv4
@@ -419,12 +419,13 @@ The contract the packet types actually implement:
 - IPv6 stops at the link. There is a link-local address, Neighbor Discovery, ICMPv6 echo, and UDP and TCP now ride IPv6 through the same packet classes as IPv4, but there is no routing table, so every destination has to be on the link. No SLAAC or DHCPv6, no address configuration beyond the link-local address, and `IPAddress` stays IPv4-only in the socket plugs, so the standard .NET socket classes reach IPv4 only.
 - No TLS, so no `HttpClient`/HTTPS: raw TCP only.
 - Several NICs are registered and configured, and outbound packets are routed by matching the source address against each interface's configuration, so `NetworkManager.Primary` decides only where the unrouted helpers (`NetworkManager.Send`, the no-handle `IPConfig.Enable`) go.
+- An interface the driver kit withdraws leaves the manager's table, but its IP configuration is not removed and `NetworkAdapter` handles stay positional, so a handle taken before the withdrawal may name the device that moved into its slot.
 - Half-close is not supported: `Close()` on an established TCP connection expects the peer to answer the FIN handshake within 5 seconds and throws if it keeps the connection open.
 - On the Cosmos `UdpClient` and `IcmpClient`, `Close()` and `Dispose()` are not the same door. `Close()` stops delivery to the client and an `IcmpClient` reopens with another `Connect()`; `Dispose()` (including the one a `using` block runs) retires the client for good, and every other member throws `ObjectDisposedException` afterwards.
 
 ## How it works
 
-Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`, and `NameResolutionPalPlug` for `Dns`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over both IP versions, with ARP and Ethernet under IPv4 and ICMPv6 and Neighbor Discovery under IPv6), which sends and receives frames through the `NetworkDevice` driver registered with `NetworkManager`. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer, `DhcpClient` over IPv4 only.
+Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`, and `NameResolutionPalPlug` for `Dns`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over both IP versions, with ARP and Ethernet under IPv4 and ICMPv6 and Neighbor Discovery under IPv6), which sends and receives frames through the network device registered with `NetworkManager`: an interface a driver kit driver published (the E1000E), or the HAL's virtio device. A frame the kit driver receives is handed to the stack on the kit's worker thread, with interrupts disabled for the handler's duration. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer, `DhcpClient` over IPv4 only.
 
 ```
 TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
@@ -435,5 +436,5 @@ Cosmos TCP state machine / UDP                          (Cosmos.Kernel.System.Ne
         │                                    DhcpClient / DnsClient ride UDP directly
 IPv4 / ARP and IPv6 / Neighbor Discovery / Ethernet
         │
-NetworkDevice driver                                    (Intel E1000E, virtio-net)
+Network device                                          (e1000e over the driver kit, virtio-net)
 ```

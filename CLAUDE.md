@@ -62,6 +62,8 @@ Kernel features are toggled via MSBuild properties in kernel `.csproj` files (al
 - `src/Cosmos.Kernel.Core/Runtime/` - Runtime stubs (RhpThrowEx, exception handling, etc.)
 - `src/Cosmos.Kernel.Core/Memory/` - Memory allocation
 - `src/Cosmos.Kernel.System/` - Higher-level services (Graphics, Network, Input, Timer, IO)
+- `src/Cosmos.Kernel.HAL/DriverKit/` - The driver kit (bindings, bus kinds: synthetic, platform, PCI)
+- `src/Cosmos.Kernel.Drivers/` - Shipped drivers over the kit (PCI host, E1000E); a User-layer driver assembly, one RID-less package
 - `examples/DevKernel/` - Development kernel (use for testing changes)
 - `tests/Kernels/` - 8 kernel test suites
 - `dotnet/runtime/` - .NET runtime submodule (release/10.0 branch)

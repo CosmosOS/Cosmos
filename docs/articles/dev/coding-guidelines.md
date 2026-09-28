@@ -32,6 +32,7 @@ The project is split into strict layers. Dependencies flow **downward only**. Th
 
 ```
 User Kernel (DevKernel, test kernels)
+Cosmos.Kernel.Drivers (the shipped drivers, a driver assembly held to the User layer)
     └── Cosmos.Kernel.System        ← high-level OS APIs (Console, Graphics, Network)
          └── Cosmos.Kernel.HAL      ← hardware abstraction (shared logic)
               ├── Cosmos.Kernel.HAL.X64        ← x64-specific HAL implementations
@@ -47,7 +48,8 @@ For the full dependency graph, project descriptions, and rules, see [Kernel Proj
 
 ### When to Create a New Project
 
-- New hardware device category → new interface in `Cosmos.Kernel.HAL.Interfaces`, implementations in `Cosmos.Kernel.HAL.X64`/`Cosmos.Kernel.HAL.ARM64`. Cross-platform HAL devices go to `Cosmos.Kernel.HAL`.
+- A driver for a device the driver kit's buses reach (a PCI function today) → a `[Driver]` class in `Cosmos.Kernel.Drivers`, written over the public seam ([Writing a Driver](../user/drivers.md)); the aggregator carries the package, so every kernel gets it.
+- New hardware device category the kit does not cover yet → new interface in `Cosmos.Kernel.HAL.Interfaces`, implementations in `Cosmos.Kernel.HAL.X64`/`Cosmos.Kernel.HAL.ARM64`. Cross-platform HAL devices go to `Cosmos.Kernel.HAL`.
 - New OS-level feature, user API exposed → in `Cosmos.Kernel.System`.
 - New low-level runtime concern → in `Cosmos.Kernel.Core`.
 
@@ -370,6 +372,8 @@ internal class X64PlatformInitializer : IPlatformInitializer
 ```
 
 ### Adding a New Device
+
+For a device the driver kit reaches (a PCI function today), write a `[Driver]` class in `Cosmos.Kernel.Drivers` over the kit and publish the device through its binding; the steps below are for a device the kit does not cover yet.
 
 1. Define the interface in `Cosmos.Kernel.HAL.Interfaces/Devices/`.
 2. Implement in `Cosmos.Kernel.HAL.X64/` and `Cosmos.Kernel.HAL.ARM64/`.

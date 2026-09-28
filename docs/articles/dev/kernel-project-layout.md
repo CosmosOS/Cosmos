@@ -7,6 +7,8 @@ The Cosmos kernel is composed of layered projects to enforce a clean dependency 
 ```mermaid
 flowchart LR;
 	UsersKernel-->Cosmos.Kernel.System;
+    Cosmos.Kernel.Drivers-->Cosmos.Kernel.System;
+    Cosmos.Kernel.Drivers-->Cosmos.Kernel.HAL;
     Cosmos.Kernel.System-->Cosmos.Kernel.HAL;
 	Cosmos.Kernel.Plugs-->Cosmos.Kernel.System;
     Cosmos.Kernel.Plugs-->Cosmos.Kernel.HAL;
@@ -29,6 +31,7 @@ flowchart LR;
 | Project | Purpose |
 |---------|---------|
 | **Cosmos.Kernel.System** | High-level OS APIs: Console, Graphics, Network, Timer, Mouse. The layer user kernels interact with. |
+| **Cosmos.Kernel.Drivers** | The drivers Cosmos ships over the driver kit: the PCI host driver and the Intel E1000E driver. A User-layer driver assembly (`CosmosDriverAssembly`), held by the layer analyzer to what a kernel author can name, with no `InternalsVisibleTo` grant from any project; one RID-less `lib/net10.0` package, since it holds no architecture-specific code. Referenced by Cosmos.Kernel, so every kernel carries its drivers in the manifest. |
 | **Cosmos.Kernel.HAL** | Hardware Abstraction Layer: shared logic, platform registration (`PlatformHAL`), device managers, arch-independent drivers (AHCI, NVMe, virtio, xHCI with the USB class drivers). |
 | **Cosmos.Kernel.HAL.Interfaces** | Pure interfaces, no implementations. Public: `IBlockDevice`, which kernels implement and drive directly, `MACAddress`, and `SoftwareTimer` as a read-only handle. Internal: the boot contract `IPlatformInitializer`, `IGraphicDevice`, the input, timer and network devices, and `SoftwareTimer`'s construction and tick members. |
 | **Cosmos.Kernel.HAL.X64** | x86-64 HAL implementations (PCI, APIC, PS/2, ACPI, etc.). |
@@ -39,7 +42,7 @@ flowchart LR;
 | **Cosmos.Kernel.Native.MultiArch** | Cross-platform native C code (ACPI, libc stubs). |
 | **Cosmos.Kernel.Plugs** | IL-level method replacements for BCL types (`Console`, `Thread`, `Environment`, etc.). |
 | **Cosmos.Kernel.Boot.Limine** | Limine bootloader protocol integration. |
-| **Cosmos.Kernel** | The aggregator every kernel references. Pulls in Boot.Limine, Core, HAL, HAL.Interfaces, Plugs and System, ships the `kmain` bootstrap C sources, and holds the library initializer that wires up the CPU exception handlers and the scheduler. No public types. |
+| **Cosmos.Kernel** | The aggregator every kernel references. Pulls in Boot.Limine, Core, Drivers, HAL, HAL.Interfaces, Plugs and System, ships the `kmain` bootstrap C sources, and holds the library initializer that wires up the CPU exception handlers and the scheduler. No public types. |
 
 ## Build System Projects
 
@@ -61,5 +64,6 @@ flowchart LR;
 - Platform-specific implementations go in **HAL.X64** / **HAL.ARM64**
 - User-facing APIs go in **System**
 - All hardware interfaces are defined in **HAL.Interfaces**
+- A driver written over the driver kit for a device the kit's buses reach goes in **Drivers**, which references only System and HAL and never the arch assemblies
 
 For coding style and implementation patterns, see [Coding Guidelines](coding-guidelines.md).
