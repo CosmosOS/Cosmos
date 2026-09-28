@@ -317,6 +317,11 @@ internal static unsafe partial class GarbageCollector
         }
 
         s_pinnedSegmentManager.Segments = newHead;
+        // The tail follows the rebuilt order, as the regular heap's reorder
+        // keeps it: an append through a tail that moved out of last place
+        // overwrites that segment's link and drops every segment after it
+        // from the list, so their objects are never found from a root again.
+        s_pinnedSegmentManager.TailSegment = tail;
         s_currentPinnedSegment = semiHead != null ? semiHead : freeHead;
 
         s_heapRangeDirty = true;
