@@ -77,6 +77,7 @@ Cosmos.Kernel.System.Diagnostics.MemoryInfo
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo.DriverName.get -> string?
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo.IsConsumed.get -> bool
+Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo.IsWithdrawn.get -> bool
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo.Kind.get -> Cosmos.Kernel.System.Diagnostics.PublishedDeviceKind
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo.Name.get -> string!
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo.NodePath.get -> string?

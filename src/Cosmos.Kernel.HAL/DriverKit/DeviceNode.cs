@@ -31,6 +31,7 @@ internal sealed class DeviceNode
         _access = access;
         Parent = parent;
         Path = string.Concat(identity.BusName, ":", identity.Address);
+        Description = identity.Describe();
     }
 
     /// <summary>The node's name in the log and the diagnostics view: bus name, colon, bus address.</summary>
@@ -38,6 +39,9 @@ internal sealed class DeviceNode
 
     /// <summary>What the bus knows about the device.</summary>
     public DeviceIdentity Identity { get; }
+
+    /// <summary>The identity in words, built once so a diagnostics read allocates nothing.</summary>
+    public string Description { get; }
 
     /// <summary>The windows and port ranges a driver may map, by index.</summary>
     public IReadOnlyList<DeviceResource> Resources => _resources;

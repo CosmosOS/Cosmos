@@ -4,20 +4,21 @@ namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
 /// Point-in-time snapshot of one device a driver published, produced by
-/// <see cref="DriverInfo.TryGetDevice"/>. Only devices currently published
-/// appear: a withdrawn device leaves the list, so the snapshot never shows
-/// one. The snapshot is taken without locking the kit, so a device being
-/// withdrawn concurrently may still be listed for one job.
+/// <see cref="DriverInfo.TryGetDevice"/>. A withdrawn device leaves the
+/// list, but the snapshot is taken without locking the kit, so a device being
+/// withdrawn concurrently may still be listed for one job; <see cref="IsWithdrawn"/>
+/// tells that case apart.
 /// </summary>
 public readonly struct PublishedDeviceInfo
 {
-    internal PublishedDeviceInfo(PublishedDeviceKind kind, string name, string? nodePath, string? driverName, bool isConsumed)
+    internal PublishedDeviceInfo(PublishedDeviceKind kind, string name, string? nodePath, string? driverName, bool isConsumed, bool isWithdrawn)
     {
         Kind = kind;
         Name = name;
         NodePath = nodePath;
         DriverName = driverName;
         IsConsumed = isConsumed;
+        IsWithdrawn = isWithdrawn;
     }
 
     /// <summary>What kind of device this is.</summary>
@@ -45,4 +46,10 @@ public readonly struct PublishedDeviceInfo
     /// in which case the device's reports are discarded.
     /// </summary>
     public bool IsConsumed { get; }
+
+    /// <summary>
+    /// Whether the device has been withdrawn: true only for a device caught
+    /// between its withdrawal and its removal from the list.
+    /// </summary>
+    public bool IsWithdrawn { get; }
 }
