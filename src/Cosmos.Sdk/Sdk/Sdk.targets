@@ -34,6 +34,24 @@
     <CosmosEnableUsb       Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableUsb>
   </PropertyGroup>
 
+  <!-- Driver policy: a kernel project drops a driver from its manifest with
+       <CosmosDriverExclude Include="Full.Type.Name" /> and opts into a
+       [Driver(Default = false)] one with <CosmosDriverInclude Include="..." />.
+       The manifest generator reads the two lists as build properties (declared
+       CompilerVisibleProperty in Cosmos.Kernel.SourceGenerators.props), so the
+       items are joined here. It has to happen in a target: item references do
+       not expand inside an evaluation-time PropertyGroup, and the properties
+       must exist before the compiler's editorconfig is written. The separator
+       is a comma, not MSBuild's semicolon: the compiler reads that file as an
+       editorconfig, where a semicolon starts a comment and would cut the list
+       after its first name. -->
+  <Target Name="CosmosCollectDriverPolicy" BeforeTargets="GenerateMSBuildEditorConfigFileCore">
+    <PropertyGroup>
+      <CosmosDriverExcludeList Condition="'@(CosmosDriverExclude)' != ''">@(CosmosDriverExclude, ',')</CosmosDriverExcludeList>
+      <CosmosDriverIncludeList Condition="'@(CosmosDriverInclude)' != ''">@(CosmosDriverInclude, ',')</CosmosDriverIncludeList>
+    </PropertyGroup>
+  </Target>
+
   <!-- Disable standard ILLink - Cosmos uses custom NativeAOT compilation via Cosmos.Build.Ilc -->
   <!-- This prevents the "Missing predefined 'System.NotSupportedException' type" error -->
   <Target Name="_RunILLink" />
