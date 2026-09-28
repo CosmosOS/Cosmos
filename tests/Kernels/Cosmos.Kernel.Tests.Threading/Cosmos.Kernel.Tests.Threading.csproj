@@ -9,6 +9,20 @@
     <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
   </PropertyGroup>
 
+  <!-- The share and ticket cells measure the policies with this suite's own
+       threads only. The shipped E1000E driver, bound to q35's default NIC on
+       x64, schedules a 50 ms periodic drain on the driver kit's worker, so a
+       thread outside the suite wakes and blocks twenty times a second while
+       a cell runs: the suite's Round-Robin policy then shares two equal
+       spinners two to one instead of evenly, and the ticket total moves
+       between the idle-contention cell's two reads. The driver is left out of
+       this kernel's manifest so the cells keep measuring the policies and
+       not the worker; how the test policy rotates around a thread that wakes
+       and blocks is a question for the policy, not for the driver. -->
+  <ItemGroup>
+    <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.E1000EDriver" />
+  </ItemGroup>
+
   <!-- Core kernel packages (using project references for development) -->
   <ItemGroup>
     <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
