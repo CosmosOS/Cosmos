@@ -10,21 +10,20 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// Diagnostic view of the driver kit: whether the engine has started and how
 /// it runs, the driver manifest, the device tree with every offer made for
 /// each node, and the devices drivers have published. All reads are
-/// allocation-free and safe to poll from a monitor loop, except that the
-/// snapshot structs copy references out and
-/// <see cref="DeviceNodeInfo.Description"/> is built by the bus on each read.
-/// Snapshots are taken without locking the kit, so a node or device whose
-/// offer, teardown or withdrawal is running on the kit worker may read one
-/// job stale.
+/// allocation-free and safe to poll from a monitor loop; the snapshot structs
+/// copy references out. Snapshots are taken without locking the kit, so a
+/// node or device whose offer, teardown or withdrawal is running on the kit
+/// worker may read one job stale.
 /// <para>
 /// Three shapes report "nothing there", and which one a member uses follows
 /// from what it is. A plain read answers with its own empty value, so
 /// <see cref="IsStarted"/> and <see cref="HasWorker"/> are false and
-/// <see cref="NodeCount"/>, <see cref="DeviceCount"/> and
-/// <see cref="TotalHeldResourceCount"/> are 0 before the engine starts, with
-/// no separate error channel. <see cref="DriverCount"/> is the one count
-/// that can be non-zero before then, because the manifest registers its
-/// drivers ahead of the start. A read that must hand back a whole snapshot
+/// <see cref="DeviceCount"/> and <see cref="TotalHeldResourceCount"/> are 0
+/// before the engine starts, with no separate error channel.
+/// <see cref="DriverCount"/> and <see cref="NodeCount"/> can be non-zero
+/// before then: the manifest registers its drivers ahead of the start, and a
+/// bus may publish nodes ahead of it, which sit pending until the start
+/// offers them. A read that must hand back a whole snapshot
 /// cannot express absence in the snapshot itself, so
 /// <see cref="TryGetDriver"/>, <see cref="TryGetNode"/>,
 /// <see cref="TryGetOffer"/> and <see cref="TryGetDevice"/> are
@@ -200,7 +199,8 @@ public static class DriverInfo
             device.Name,
             binding?.Node.Path,
             binding?.Driver.Name,
-            device.IsConsumed);
+            device.IsConsumed,
+            device.IsWithdrawn);
         return true;
     }
 
@@ -219,7 +219,7 @@ public static class DriverInfo
         return new DeviceNodeInfo(
             node.Path,
             node.Identity.BusName,
-            node.Identity.Describe(),
+            node.Description,
             binding?.Driver.Name,
             MapState(state),
             node.Parent?.Path,

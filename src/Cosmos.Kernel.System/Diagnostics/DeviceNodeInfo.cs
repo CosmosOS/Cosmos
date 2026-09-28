@@ -10,10 +10,10 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// depend on its binding can lag the log by one line.
 /// <para>
 /// It carries what a monitor can render off an unlocked read: identity,
-/// state, the driver that holds it, and counts. The resources, interrupt
-/// sources and offers themselves are reached by index through
-/// <see cref="DriverInfo.TryGetOffer"/> and the counts here, which bound
-/// those indexes.
+/// state, the driver that holds it, and counts. The offers themselves are
+/// reached by index through <see cref="DriverInfo.TryGetOffer"/>, bounded by
+/// <see cref="OfferCount"/>; <see cref="ResourceCount"/> and
+/// <see cref="InterruptCount"/> are counts only.
 /// </para>
 /// </summary>
 public readonly struct DeviceNodeInfo
@@ -60,8 +60,7 @@ public readonly struct DeviceNodeInfo
 
     /// <summary>
     /// The device's identity in the bus's own words, as the bus describes it
-    /// for the log. Built by the bus on each read, so this is the one field of
-    /// the snapshot that is not a copied reference.
+    /// for the log.
     /// </summary>
     public string Description { get; }
 
