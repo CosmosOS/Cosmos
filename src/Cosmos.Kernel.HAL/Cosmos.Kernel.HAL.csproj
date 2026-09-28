@@ -47,6 +47,8 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Virtio" />
+    <!-- Drivers: writes [Driver] classes against the driver kit and drives the synthetic bus. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Drivers" />
   </ItemGroup>
 </Project>
 
