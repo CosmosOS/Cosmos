@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -12,7 +14,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// <see cref="Feature"/> ties the registration to a feature switch.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-internal sealed class DriverAttribute : Attribute
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class DriverAttribute : Attribute
 {
     /// <summary>
     /// The feature switch the driver depends on. The manifest guards the

@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -8,7 +10,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// drivers match a node, the kit offers the highest priority first, then the
 /// most specific match, then the earliest manifest position.
 /// </summary>
-internal abstract class DeviceMatch
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public abstract class DeviceMatch
 {
     /// <summary>Number of identity fields the match constrains; more is more specific.</summary>
     public abstract int Specificity { get; }

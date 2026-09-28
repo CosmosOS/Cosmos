@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Synthetic;
 
 /// <summary>
@@ -8,7 +10,8 @@ namespace Cosmos.Kernel.HAL.DriverKit.Synthetic;
 /// resource 0, so a test can read what a driver wrote through its
 /// <see cref="RegisterWindow"/> and write what the driver will read.
 /// </summary>
-internal sealed unsafe class SyntheticAccess
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed unsafe class SyntheticAccess
 {
     private readonly SyntheticPage? _page;
     private readonly int _windowBytes;

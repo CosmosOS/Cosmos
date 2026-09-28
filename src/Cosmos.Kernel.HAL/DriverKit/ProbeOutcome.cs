@@ -1,9 +1,12 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>How an offer of a device to a driver ended.</summary>
-internal enum ProbeOutcome
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public enum ProbeOutcome
 {
     /// <summary>The driver took the device; its binding stays live.</summary>
     Bound,

@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -14,7 +16,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// lock, so a raise cannot see a half-built connection and a handler never
 /// runs after <see cref="Disconnect"/> returned.
 /// </summary>
-internal abstract class InterruptSource
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public abstract class InterruptSource
 {
     /// <summary>The source in words, for the log: "line 11", "message 0 of 4", "synthetic 0".</summary>
     public abstract string Describe();

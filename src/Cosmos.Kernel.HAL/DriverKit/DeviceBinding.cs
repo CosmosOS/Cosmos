@@ -25,7 +25,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// <see cref="IsDetaching"/> is true no new resource can be acquired.
 /// </para>
 /// </summary>
-internal sealed unsafe partial class DeviceBinding
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed unsafe partial class DeviceBinding
 {
     /// <summary>How long teardown waits for each driver thread to exit.</summary>
     internal const uint JoinTimeoutMilliseconds = 500;

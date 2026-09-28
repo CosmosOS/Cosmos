@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Devices;
 
 /// <summary>
@@ -7,7 +9,8 @@ namespace Cosmos.Kernel.HAL.DriverKit.Devices;
 /// <see cref="DeviceBinding.PublishDisplay"/>. Kit-owned; see <see cref="KeyboardSink"/>.
 /// Allocation-free; any context.
 /// </summary>
-internal sealed class DisplaySink
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class DisplaySink
 {
     private readonly PublishedDevice _device;
 

@@ -8,6 +8,8 @@
     <!-- Off on purpose: MouseFeatureDriver is tied to the mouse feature and the
          suite asserts the manifest leaves it out. -->
     <CosmosEnableMouse>false</CosmosEnableMouse>
+    <!-- The suite is written over the experimental driver kit seam (COSMOS0003). -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
   <!-- Synthetic devices only, so one cell per architecture is enough.

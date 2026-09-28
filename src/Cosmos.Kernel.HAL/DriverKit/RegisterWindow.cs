@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
@@ -19,7 +20,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// against the window's bounds and the access width's alignment. The
 /// accessors neither allocate nor block, so an interrupt handler may use them.
 /// </summary>
-internal sealed class RegisterWindow : IKitResource
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class RegisterWindow : IKitResource
 {
     private readonly ulong _address;
     private readonly bool _isPortRange;

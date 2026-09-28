@@ -1,11 +1,13 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Devices;
 
 /// <summary>What a network driver implements and hands to <see cref="DeviceBinding.PublishNetwork"/>. Called by the ring in thread context.</summary>
-internal interface INetworkInterface
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public interface INetworkInterface
 {
     /// <summary>The interface's name.</summary>
     string Name { get; }

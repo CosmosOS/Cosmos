@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Devices;
 
 /// <summary>
@@ -8,7 +10,8 @@ namespace Cosmos.Kernel.HAL.DriverKit.Devices;
 /// ring's keyboard consumer at call time and drops the report when the device
 /// was withdrawn or nobody listens. Allocation-free; any context.
 /// </summary>
-internal sealed class KeyboardSink
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class KeyboardSink
 {
     private readonly PublishedDevice _device;
 

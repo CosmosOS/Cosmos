@@ -1,10 +1,13 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Devices;
 
 /// <summary>Keyboard indicator lights.</summary>
 [Flags]
-internal enum KeyboardLeds : byte
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public enum KeyboardLeds : byte
 {
     /// <summary>No indicator.</summary>
     None = 0,

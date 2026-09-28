@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Scheduler;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
@@ -11,7 +12,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// wait, so a handler holding the event cannot block on it. Teardown cancels
 /// it, and every waiter then returns false, at once and forever.
 /// </summary>
-internal sealed class DeviceEvent
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class DeviceEvent
 {
     private readonly InterruptEvent _event = new();
     private volatile bool _cancelled;

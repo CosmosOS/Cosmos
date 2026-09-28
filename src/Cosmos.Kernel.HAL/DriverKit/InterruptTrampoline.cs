@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
@@ -14,7 +15,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// delivery, and a preallocated work item logs it in thread context. Nothing
 /// here allocates: the message kept is the exception's own.
 /// </summary>
-internal sealed class InterruptTrampoline
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class InterruptTrampoline
 {
     private readonly InterruptHandler _handler;
     private readonly InterruptContext _context;

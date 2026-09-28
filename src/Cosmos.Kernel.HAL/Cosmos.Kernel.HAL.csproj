@@ -9,7 +9,8 @@
     <PackageTags>cosmos;kernel;hal;abstraction;architecture;hardware</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <!-- NVMe I/O waits block and wake threads through the experimental scheduler seam (COSMOS0001). -->
-    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
+    <!-- COSMOS0003: this assembly declares the experimental driver kit seam and consumes it itself. -->
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
          the VFS contract types only. -->
@@ -26,6 +27,28 @@
 
   <!-- Multi-arch packaging support -->
   <Import Project="../Directory.MultiArch.targets" />
+
+  <!-- The driver kit is an experimental seam: every public symbol under
+       Cosmos.Kernel.HAL.DriverKit carries [Experimental("COSMOS0003")], which
+       the public API analyzer records as a [COSMOS0003] prefix on the symbol's
+       line. A kit line without the prefix means a type lost the attribute,
+       which is how a promotion to the stable surface happens by accident, so
+       the build fails on it. Promoting the kit for real is a deliberate change
+       of this target. -->
+  <Target Name="CosmosGuardDriverKitPromotion" AfterTargets="Build">
+    <ReadLinesFromFile File="$(MSBuildProjectDirectory)/PublicAPI.Shipped.txt">
+      <Output TaskParameter="Lines" ItemName="_CosmosPublicApiLine" />
+    </ReadLinesFromFile>
+    <ReadLinesFromFile File="$(MSBuildProjectDirectory)/PublicAPI.Unshipped.txt">
+      <Output TaskParameter="Lines" ItemName="_CosmosPublicApiLine" />
+    </ReadLinesFromFile>
+    <ItemGroup>
+      <_CosmosPromotedKitLine Include="@(_CosmosPublicApiLine)"
+                              Condition="$([System.String]::Copy('%(Identity)').Contains('Cosmos.Kernel.HAL.DriverKit')) And !$([System.String]::Copy('%(Identity)').StartsWith('[COSMOS0003]')) And !$([System.String]::Copy('%(Identity)').StartsWith('*REMOVED*'))" />
+    </ItemGroup>
+    <Error Condition="'@(_CosmosPromotedKitLine)' != ''"
+           Text="A driver kit symbol is public without the [COSMOS0003] prefix in PublicAPI.*.txt: '%(_CosmosPromotedKitLine.Identity)'. Every type under Cosmos.Kernel.HAL.DriverKit carries [Experimental(Experimentals.DriverKitSeamDiagId)]; promoting the kit out of the seam is a deliberate change of the CosmosGuardDriverKitPromotion target." />
+  </Target>
 
   <ItemGroup>
     <!-- System's internal canvases and managers sit directly on the HAL

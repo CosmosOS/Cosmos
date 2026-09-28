@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// back what the driver acquired, for a device going away and for a probe
 /// that declined or failed.
 /// </summary>
-internal sealed partial class DeviceBinding
+public sealed partial class DeviceBinding
 {
     /// <summary>
     /// Tears the binding down for a device going away. Worker only. The

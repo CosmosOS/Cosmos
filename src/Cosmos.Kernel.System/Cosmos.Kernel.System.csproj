@@ -9,7 +9,7 @@
 
     <!-- SchedulerInfo fronts the experimental scheduler seam (COSMOS0001). -->
     <!-- COSMOS0002: this assembly declares the experimental packet seam and consumes it itself. -->
-    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0002</NoWarn>
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0002;COSMOS0003</NoWarn>
 
     <!-- Package Metadata -->
     <PackageId>Cosmos.Kernel.System</PackageId>

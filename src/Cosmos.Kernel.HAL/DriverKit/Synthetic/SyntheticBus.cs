@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
@@ -12,7 +13,8 @@ namespace Cosmos.Kernel.HAL.DriverKit.Synthetic;
 /// <see cref="DeviceBinding.MapRegion"/> and the test can see each other's
 /// writes without remapping normal memory as device memory.
 /// </summary>
-internal static class SyntheticBus
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public static class SyntheticBus
 {
     /// <summary>
     /// Publishes a device. After <see cref="DriverEngine.Start"/>, returns once
@@ -71,6 +73,20 @@ internal static class SyntheticBus
         }
 
         DriverEngine.RetractNode(node, hardwarePresent);
+    }
+
+    /// <summary>
+    /// Returns once every kit job queued before the call has run: an offer
+    /// a publish caused, a teardown a retract queued from a driver, a work
+    /// item a handler scheduled. The test hook for asserting after
+    /// <see cref="RaiseInterrupt"/>; work queued afterwards, such as periodic
+    /// items, does not hold it up. Thread context, not from a driver thread
+    /// of a binding that is being torn down.
+    /// </summary>
+    public static void WaitForQueuedJobs()
+    {
+        InterruptContextGuard.ThrowIfInHandler(nameof(WaitForQueuedJobs));
+        DriverEngine.WaitForQueuedJobs();
     }
 
     /// <summary>

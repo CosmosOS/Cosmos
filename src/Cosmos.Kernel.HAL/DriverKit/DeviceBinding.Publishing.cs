@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// the ring, and child nodes a bus driver puts in the tree. Both are
 /// withdrawn by teardown ahead of everything else the driver holds.
 /// </summary>
-internal sealed partial class DeviceBinding
+public sealed partial class DeviceBinding
 {
     /// <summary>Publishes a keyboard. The ring's keyboard manager, when present, receives it at once.</summary>
     /// <param name="keyboard">The driver's keyboard contract.</param>

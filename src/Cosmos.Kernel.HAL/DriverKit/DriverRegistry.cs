@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
@@ -11,7 +12,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// here is the order drivers are offered a node when priority and
 /// specificity tie.
 /// </summary>
-internal static class DriverRegistry
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public static class DriverRegistry
 {
     private static Driver[] s_drivers = [];
 

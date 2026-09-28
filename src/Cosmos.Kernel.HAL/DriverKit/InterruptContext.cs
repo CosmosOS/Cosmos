@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -8,7 +10,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// and never blocks; the handler has no other route to the kit, which is how
 /// blocking from interrupt context stays unreachable by type.
 /// </summary>
-internal sealed class InterruptContext
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class InterruptContext
 {
     private readonly InterruptHandle _handle;
 

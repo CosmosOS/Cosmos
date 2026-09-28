@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -8,7 +10,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// <see cref="Failed"/> make the kit release the binding's ledger in reverse
 /// order and record the reason with the offer.
 /// </summary>
-internal readonly struct ProbeResult
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public readonly struct ProbeResult
 {
     private ProbeResult(ProbeOutcome outcome, string? reason)
     {

@@ -1,9 +1,12 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Devices;
 
 /// <summary>A display's geometry and pixel format.</summary>
-internal readonly struct DisplayMode
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public readonly struct DisplayMode
 {
     /// <summary>Creates a mode.</summary>
     /// <param name="width">Width in pixels.</param>

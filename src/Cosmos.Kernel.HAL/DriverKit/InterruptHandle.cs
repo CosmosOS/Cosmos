@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -8,7 +10,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// disconnects it at teardown. A handler that throws leaves its source
 /// masked, with the fault recorded on the node; the driver may unmask again.
 /// </summary>
-internal sealed class InterruptHandle
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class InterruptHandle
 {
     private readonly InterruptSource _source;
     private volatile bool _masked;
