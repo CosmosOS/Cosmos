@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The drivers Cosmos ships, written over the public driver kit seam exactly
+    as a kernel author's driver library would be: a driver assembly holding no
+    InternalsVisibleTo grant from any project. Directory.Build.props lists it
+    in CosmosDriverAssemblyNames and the CosmosForbidDriverAssemblyGrants
+    target fails any project that grants it internals, so the compiler is the
+    proof that every driver here calls only what a third party can call. The
+    assembly holds no architecture-specific code by construction (no
+    conditional compilation on the architecture, nothing from the runtime
+    layer or the per-architecture HAL assemblies, which the layer analyzer
+    refuses), so it ships as one lib/net10.0 image over the HAL and System
+    public surfaces, which are the same on both architectures. Cosmos.Kernel
+    references it, so every kernel gets the drivers with the aggregator.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- Package Metadata -->
+    <PackageId>Cosmos.Kernel.Drivers</PackageId>
+    <Title>Cosmos Kernel Drivers</Title>
+    <Description>The drivers Cosmos ships, written over the driver kit</Description>
+    <PackageTags>cosmos;kernel;drivers;pci;network;e1000e</PackageTags>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+
+    <!-- Held to the surface a third party gets: the layer analyzer treats it as a
+         User assembly, NAOT0008 forbids UnsafeAccessor in it and NAOT0009 any grant to it. -->
+    <CosmosDriverAssembly>true</CosmosDriverAssembly>
+    <!-- The drivers are written over the experimental driver kit seam (COSMOS0003). -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+
+    <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
+         the driver classes the manifest constructs and the state object the
+         Drivers suite reads back. The lines carry no [COSMOS0003] prefix: the
+         drivers derive from the experimental kit but are not themselves experimental. -->
+    <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
+  </PropertyGroup>
+
+  <!-- The analyzer package's build props declare this item for a library that
+       references the package; this one references the analyzer project, so it
+       declares the item itself. -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="CosmosDriverAssembly" />
+  </ItemGroup>
+
+  <!-- The kit and the ring, nothing lower: what a kernel author's driver library references. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Kernel.HAL\Cosmos.Kernel.HAL.csproj" />
+    <ProjectReference Include="..\Cosmos.Kernel.System\Cosmos.Kernel.System.csproj" />
+    <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>
