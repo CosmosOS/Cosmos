@@ -45,6 +45,26 @@
            />
   </Target>
 
+  <!--
+    A driver assembly (one named in CosmosDriverAssemblyNames, declared in
+    Directory.Build.props) holds no InternalsVisibleTo grant from any project, and the
+    compiler is then the proof that it uses only the public driver kit seam: the assembly
+    can call only what a third party can call. This target keeps that proof from eroding
+    quietly. A grant naming a driver assembly, whether as an InternalsVisibleTo item or as
+    an AssemblyAttribute item for InternalsVisibleToAttribute, fails the granting project's
+    build. The fix is never the grant: add the missing capability to the driver kit.
+  -->
+  <Target Name="CosmosForbidDriverAssemblyGrants" BeforeTargets="BeforeBuild" Condition="'$(CosmosDriverAssemblyNames)' != ''">
+    <ItemGroup>
+      <_CosmosForbiddenDriverGrant Include="@(InternalsVisibleTo)"
+                                   Condition="$([System.String]::Copy(';$(CosmosDriverAssemblyNames);').Contains(';%(Identity);'))" />
+      <_CosmosForbiddenDriverGrant Include="@(AssemblyAttribute->'%(_Parameter1)')"
+                                   Condition="('%(AssemblyAttribute.Identity)' == 'System.Runtime.CompilerServices.InternalsVisibleToAttribute' or '%(AssemblyAttribute.Identity)' == 'System.Runtime.CompilerServices.InternalsVisibleTo') and $([System.String]::Copy(';$(CosmosDriverAssemblyNames);').Contains(';%(AssemblyAttribute._Parameter1);'))" />
+    </ItemGroup>
+    <Error Condition="'@(_CosmosForbiddenDriverGrant)' != ''"
+           Text="$(MSBuildProjectName) grants InternalsVisibleTo to a driver assembly (@(_CosmosForbiddenDriverGrant, ', ')). A driver assembly uses only the public driver kit seam, and the compiler is the proof; remove the grant and add the missing capability to the driver kit instead. The list of driver assemblies is CosmosDriverAssemblyNames in Directory.Build.props." />
+  </Target>
+
   <!-- Clang is the same binary name on all platforms — no per-platform resolution needed.
        CCPath defaults to 'clang' in Cosmos.Build.CC.props. -->
 

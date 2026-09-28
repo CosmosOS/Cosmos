@@ -23,6 +23,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath=""/>
+    <!-- Imported by every project that references the package: declares the
+         CompilerVisibleProperty the driver assembly rules read. -->
+    <None Include="build\Cosmos.Build.Analyzer.Patcher.props" Pack="true" PackagePath="build\" />
   </ItemGroup>
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
