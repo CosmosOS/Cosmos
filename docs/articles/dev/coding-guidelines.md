@@ -28,7 +28,7 @@ This document establishes the coding style and architecture patterns for Cosmos 
 
 ### Layer Dependency Rules
 
-The project is split into strict layers. Dependencies flow **downward only**. These rules are **enforced at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`.
+The project is split into strict layers. Dependencies flow **downward only**. These rules are **enforced at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which judges a project on the types and members its code names, not on the reference list restore builds, and reports each assembly used across a boundary once, at its first use. A user kernel, and a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, see [Public API Tracking](public-api.md)), may also name what `Cosmos.Kernel.HAL` offers for the driver kit seam and the device contracts in `Cosmos.Kernel.HAL.Interfaces`.
 
 ```
 User Kernel (DevKernel, test kernels)
