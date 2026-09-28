@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics;
 using Cosmos.Kernel.Core.CPU;
 
 namespace Cosmos.Kernel.Core.Scheduler;
@@ -9,7 +10,8 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// to be signaled from an ISR and waited on from a normal thread.
 ///
 /// <para><see cref="Wait()"/> blocks the caller via <see cref="SchedulerManager.BlockThread"/>
-/// until <see cref="Signal"/> is called. <see cref="Signal"/> only walks
+/// until <see cref="Signal"/> is called; <see cref="Wait(uint)"/> gives up
+/// after a deadline. <see cref="Signal"/> only walks
 /// internal state with the spinlock held and calls
 /// <see cref="SchedulerManager.ReadyThread"/> — no allocation, no
 /// interface dispatch — so it is safe from interrupt context.</para>
@@ -25,6 +27,8 @@ internal class InterruptEvent
 {
     /// <summary>Initial waiter-list capacity: pre-sized so Wait's first Add doesn't heap-allocate under the IRQ-off spinlock; driver flows park at most one or two waiters.</summary>
     private const int InitialWaiterCapacity = 4;
+
+    private const long MillisecondsPerSecond = 1000;
 
     private SpinLock _lockGuard;
     private uint _pendingSignals;
@@ -169,6 +173,137 @@ internal class InterruptEvent
         }
     }
 
+    /// <summary>
+    /// Timed variant of <see cref="Wait()"/>: blocks until a signal is
+    /// consumed or <paramref name="timeoutMilliseconds"/> elapse, whichever
+    /// comes first. Unlike <see cref="Wait(ulong)"/> this is a clock: the
+    /// waiter sleeps with a wake deadline the timer tick honours, so it
+    /// returns false about one tick after the deadline even when no signal
+    /// ever arrives. Without a scheduler thread context (scheduler feature
+    /// off, pre-scheduler boot code, or the idle thread) it polls the latch
+    /// with interrupts enabled until the deadline, and never halts, because
+    /// a halt with no interrupt to end it would never return.
+    /// </summary>
+    /// <param name="timeoutMilliseconds">Longest time to wait, in milliseconds.</param>
+    /// <returns>True when a signal was consumed; false when the deadline passed first.</returns>
+    public bool Wait(uint timeoutMilliseconds)
+    {
+        long ticksPerMillisecond = Stopwatch.Frequency / MillisecondsPerSecond;
+        long deadline = Stopwatch.GetTimestamp() + ticksPerMillisecond * timeoutMilliseconds;
+
+        SchedulerThread? currentThread = SchedulerManager.IsReady
+            ? SchedulerManager.CurrentCpuState?.CurrentThread
+            : null;
+        // Same rule as WaitCore: the idle thread is the scheduler's fallback
+        // and must never be put to sleep, so it polls like the no-context case.
+        if (currentThread is not null && (currentThread.Flags & SchedulerThreadFlags.IdleThread) != 0)
+        {
+            currentThread = null;
+        }
+
+        if (currentThread is null)
+        {
+            while (true)
+            {
+                if (TryConsume())
+                {
+                    return true;
+                }
+
+                if (Stopwatch.GetTimestamp() >= deadline)
+                {
+                    return false;
+                }
+            }
+        }
+
+        while (true)
+        {
+            // Consume-or-enqueue and the sleep transition form one IRQ-off
+            // section, for the same lost-wakeup reason as WaitCore: a Signal
+            // landing between the insert and MarkSleeping would ready a
+            // still-Running thread, and the sleep would then bury the wake.
+            using (_lockGuard.AcquireIrqSafe())
+            {
+                if (_pendingSignals > 0)
+                {
+                    _pendingSignals--;
+                    return true;
+                }
+
+                long remainingTicks = deadline - Stopwatch.GetTimestamp();
+                if (remainingTicks <= 0)
+                {
+                    RemoveWaiterLocked(currentThread);
+                    return false;
+                }
+
+                if (!ContainsWaiterLocked(currentThread))
+                {
+                    _waiters.Add(currentThread);
+                }
+
+                // Round up so the deadline is never undershot, and never pass
+                // 0, which MarkSleeping reads as "wake on the next tick".
+                long remainingMilliseconds = (remainingTicks + ticksPerMillisecond - 1) / ticksPerMillisecond;
+                SchedulerManager.MarkSleeping(currentThread.CpuId, currentThread, (uint)Math.Max(1, remainingMilliseconds));
+            }
+
+            // Only park while still Sleeping: a wake that landed between the
+            // scope-dispose and here has already readied the thread, and a
+            // halt would sleep it until the next unrelated interrupt.
+            if (currentThread.State == SchedulerThreadState.Sleeping)
+            {
+                InternalCpu.Halt();
+            }
+
+            // Back here means the scheduler switched to this thread again:
+            // Signal dequeued and readied it, the tick readied it at the
+            // deadline, or something unrelated readied it. Which one is
+            // settled under the lock: a Signal removes its waiter and leaves
+            // a pending count for it; the tick leaves the waiter in place.
+            using (_lockGuard.AcquireIrqSafe())
+            {
+                currentThread.WakeupTime = 0;
+
+                if (!ContainsWaiterLocked(currentThread))
+                {
+                    if (_pendingSignals > 0)
+                    {
+                        _pendingSignals--;
+                        return true;
+                    }
+
+                    // Dequeued by a Signal whose count a poller consumed
+                    // first: re-arm below with what is left of the deadline.
+                }
+                else if (Stopwatch.GetTimestamp() >= deadline)
+                {
+                    RemoveWaiterLocked(currentThread);
+                    return false;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Consumes one pending signal without waiting. Safe from any context.
+    /// </summary>
+    /// <returns>True when a signal was pending and is now consumed.</returns>
+    public bool TryConsume()
+    {
+        using (_lockGuard.AcquireIrqSafe())
+        {
+            if (_pendingSignals > 0)
+            {
+                _pendingSignals--;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private bool ContainsWaiterLocked(SchedulerThread thread)
     {
         for (int i = 0; i < _waiters.Count; i++)
@@ -224,7 +359,17 @@ internal class InterruptEvent
 
         if (toReady is not null)
         {
-            SchedulerManager.ReadyThread(toReady.CpuId, toReady);
+            // A timed waiter may already have been readied by its deadline
+            // (the tick) while still listed here; readying it a second time
+            // would queue it twice. Masked so the tick cannot slip in between
+            // the look and the ready on this CPU.
+            using (InternalCpu.DisableInterruptsScope())
+            {
+                if (toReady.State == SchedulerThreadState.Blocked || toReady.State == SchedulerThreadState.Sleeping)
+                {
+                    SchedulerManager.ReadyThread(toReady.CpuId, toReady);
+                }
+            }
         }
     }
 

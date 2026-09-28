@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Cosmos.Kernel.Core.Bridge;
@@ -16,7 +17,7 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// has run, and only a scheduler switch runs it. A timer that never ticks
 /// (x64 with ACPI off, where nothing calibrates the LAPIC timer), or one
 /// that ticks without scheduling (a boot CPU whose APIC ID is not 0), keeps
-/// that call spinning forever. <see cref="TryStart"/> builds the thread on
+/// that call spinning forever. <see cref="TryStart(Action)"/> builds the thread on
 /// the scheduler directly, as <c>SystemNative_CreateThread</c> does for
 /// CoreLib, and gives it <see cref="StartTimeoutMs"/> of
 /// <see cref="Stopwatch"/> time to report that it runs. The Stopwatch
@@ -53,15 +54,25 @@ internal static unsafe partial class KernelThread
     /// queue at once; one that ran but was preempted before it looked at
     /// the handshake returns as soon as it resumes.
     /// </returns>
-    internal static bool TryStart(Action entry)
+    internal static bool TryStart(Action entry) => TryStart(entry, out _);
+
+    /// <summary>
+    /// <see cref="TryStart(Action)"/> that also hands back the thread, for a
+    /// caller that later needs to know whether it has exited.
+    /// </summary>
+    /// <param name="entry">The thread's body; the thread exits when it returns.</param>
+    /// <param name="thread">The started thread, or null when the start failed.</param>
+    /// <returns>True once the thread began; see <see cref="TryStart(Action)"/>.</returns>
+    internal static bool TryStart(Action entry, [NotNullWhen(true)] out SchedulerThread? thread)
     {
+        thread = null;
         if (!SchedulerManager.IsRunning)
         {
             return false;
         }
 
         StartHandshake handshake = new(entry);
-        SchedulerThread thread = new()
+        SchedulerThread started = new()
         {
             Id = SchedulerManager.AllocateThreadId(),
             CpuId = 0,
@@ -76,15 +87,15 @@ internal static unsafe partial class KernelThread
         nuint entryPoint = (nuint)(delegate* unmanaged<IntPtr, void>)&ThreadNative.EntryPointStub;
 #if ARCH_ARM64
         // ARM64 has no code segment: the context ignores the selector.
-        thread.InitializeStack(entryPoint, 0, parameter);
+        started.InitializeStack(entryPoint, 0, parameter);
 #else
-        thread.InitializeStack(entryPoint, (ushort)GetCurrentCodeSelector(), parameter);
+        started.InitializeStack(entryPoint, (ushort)GetCurrentCodeSelector(), parameter);
 #endif
 
         using (InternalCpu.DisableInterruptsScope())
         {
-            SchedulerManager.CreateThread(thread.CpuId, thread);
-            SchedulerManager.ReadyThread(thread.CpuId, thread);
+            SchedulerManager.CreateThread(started.CpuId, started);
+            SchedulerManager.ReadyThread(started.CpuId, started);
         }
 
         // Spin rather than halt: when no interrupt comes, a halt never ends.
@@ -101,6 +112,7 @@ internal static unsafe partial class KernelThread
             if (!handshake.TryAbandon())
             {
                 // It began between the last look and the verdict.
+                thread = started;
                 return true;
             }
 
@@ -110,9 +122,9 @@ internal static unsafe partial class KernelThread
             // CPU on, and with a timer that never ticks the caller would not
             // run again. A thread that never ran holds nothing, so it goes
             // now, with the handle InvokeCurrentThreadStart would have freed.
-            if (thread.State == SchedulerThreadState.Created)
+            if (started.State == SchedulerThreadState.Created)
             {
-                SchedulerManager.ExitThread(thread.CpuId, thread);
+                SchedulerManager.ExitThread(started.CpuId, started);
                 handle.Dispose();
             }
         }
