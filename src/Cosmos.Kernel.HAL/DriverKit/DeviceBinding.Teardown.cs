@@ -20,6 +20,8 @@ internal sealed partial class DeviceBinding
     /// acquisition. A thread that does not stop in
     /// <see cref="JoinTimeoutMilliseconds"/> keeps the memory it may still
     /// touch: those resources leak on purpose and the node says how many.
+    /// A step that throws is logged and the walk goes on, so a misbehaving
+    /// consumer or source never leaves a handler connected or memory held.
     /// </summary>
     /// <param name="reason">Why, and whether the hardware is still there.</param>
     internal void Teardown(DetachReason reason) => Release(reason, runOnDetach: true);
@@ -65,30 +67,60 @@ internal sealed partial class DeviceBinding
             memory = _memory.ToArray();
         }
 
+        int leakedCount = memory.Length + (Node.BusResource is null ? 0 : 1);
+
         // 1. Children, leaf first: each child's own teardown runs its children first.
         for (int i = 0; i < children.Length; i++)
         {
-            DriverEngine.TeardownNode(children[i], DetachCause.ParentRetracted, reason.HardwarePresent);
+            try
+            {
+                DriverEngine.TeardownNode(children[i], DetachCause.ParentRetracted, reason.HardwarePresent);
+            }
+            catch (Exception exception)
+            {
+                DriverLog.TeardownStepThrew(Node, Driver, "child teardown", exception.Message);
+            }
         }
 
         // 2. Published devices: consumers are told, sinks go quiet.
         for (int i = 0; i < devices.Length; i++)
         {
-            DeviceRegistry.Withdraw(devices[i]);
-            DriverLog.Withdrew(Node, Driver, devices[i]);
+            try
+            {
+                DeviceRegistry.Withdraw(devices[i]);
+                DriverLog.Withdrew(Node, Driver, devices[i]);
+            }
+            catch (Exception exception)
+            {
+                DriverLog.TeardownStepThrew(Node, Driver, "withdraw", exception.Message);
+            }
         }
 
         // 3. Interrupts: masked and disconnected, handlers never run again.
         for (int i = 0; i < handles.Length; i++)
         {
-            handles[i].Disconnect();
+            try
+            {
+                handles[i].Disconnect();
+            }
+            catch (Exception exception)
+            {
+                DriverLog.TeardownStepThrew(Node, Driver, "interrupt disconnect", exception.Message);
+            }
         }
 
         // 4. Deferred work stops, every waiter wakes, threads are joined.
         DetachEvent.Cancel();
         for (int i = 0; i < periodic.Length; i++)
         {
-            periodic[i].Cancel();
+            try
+            {
+                periodic[i].Cancel();
+            }
+            catch (Exception exception)
+            {
+                DriverLog.TeardownStepThrew(Node, Driver, "periodic cancel", exception.Message);
+            }
         }
 
         for (int i = 0; i < workItems.Length; i++)
@@ -112,7 +144,7 @@ internal sealed partial class DeviceBinding
             if (!threads[i].TryJoin(JoinTimeoutMilliseconds))
             {
                 leaked = true;
-                DriverLog.ThreadDidNotStop(Node, Driver, threads[i].Name, JoinTimeoutMilliseconds, memory.Length);
+                DriverLog.ThreadDidNotStop(Node, Driver, threads[i].Name, JoinTimeoutMilliseconds, leakedCount);
             }
         }
 
@@ -132,13 +164,20 @@ internal sealed partial class DeviceBinding
         // 6. Memory, reverse order; kept when a thread may still touch it.
         if (leaked)
         {
-            Node.LeakedResourceCount = memory.Length + (Node.BusResource is null ? 0 : 1);
+            Node.LeakedResourceCount = leakedCount;
         }
         else
         {
             for (int i = memory.Length - 1; i >= 0; i--)
             {
-                memory[i].Release();
+                try
+                {
+                    memory[i].Release();
+                }
+                catch (Exception exception)
+                {
+                    DriverLog.TeardownStepThrew(Node, Driver, "release", exception.Message);
+                }
             }
         }
 

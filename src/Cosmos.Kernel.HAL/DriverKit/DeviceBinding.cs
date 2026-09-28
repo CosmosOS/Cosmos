@@ -35,7 +35,7 @@ internal sealed unsafe partial class DeviceBinding
     /// <summary>
     /// Guards <see cref="_detaching"/> and every list below. IRQ-safe so a
     /// preemption never parks a holder while another thread spins on it.
-    /// Nothing under it allocates, maps, or calls out.
+    /// Nothing under it maps or calls out; the lists may grow.
     /// </summary>
     private SchedSpinLock _lock;
     private volatile bool _detaching;
@@ -335,25 +335,25 @@ internal sealed unsafe partial class DeviceBinding
     public bool TryStartThread(string name, Action entry, [NotNullWhen(true)] out DriverThread? thread)
     {
         ThrowIfNotThreadContext(nameof(TryStartThread));
-        using (_lock.AcquireIrqSafe())
-        {
-            ThrowIfDetachingLocked(nameof(TryStartThread));
-        }
 
-        if (!KernelThread.TryStart(entry, out SchedulerThread? started))
+        // Recorded before it starts, so a teardown that begins in between
+        // joins it, and the thread is known as this binding's from its first
+        // instruction (it retracting its own node is refused on that basis).
+        DriverThread created = new(name, entry);
+        Record(_threads, created, nameof(TryStartThread));
+
+        if (!KernelThread.TryStart(created.Run, out _))
         {
+            using (_lock.AcquireIrqSafe())
+            {
+                Remove(_threads, created);
+            }
+
             thread = null;
             return false;
         }
 
-        // Recorded whatever the flag says now: the thread runs, so teardown
-        // must join it.
-        thread = new DriverThread(name, started);
-        using (_lock.AcquireIrqSafe())
-        {
-            _threads.Add(thread);
-        }
-
+        thread = created;
         return true;
     }
 
@@ -407,11 +407,8 @@ internal sealed unsafe partial class DeviceBinding
 
     private DeviceResource ResourceAt(int resourceIndex)
     {
-        if (resourceIndex < 0 || resourceIndex >= Node.Resources.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(resourceIndex), resourceIndex, "The node has no resource at this index.");
-        }
-
+        ArgumentOutOfRangeException.ThrowIfNegative(resourceIndex);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceIndex, Node.Resources.Count);
         return Node.Resources[resourceIndex];
     }
 
@@ -453,12 +450,9 @@ internal sealed unsafe partial class DeviceBinding
 
     private static DmaBuffer? AllocateDmaCore(int length, int alignment)
     {
-        if (length <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(length), length, "A DMA buffer has at least one byte.");
-        }
-
-        if (alignment <= 0 || (alignment & (alignment - 1)) != 0)
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(length);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(alignment);
+        if ((alignment & (alignment - 1)) != 0)
         {
             throw new ArgumentOutOfRangeException(nameof(alignment), alignment, "The alignment is a power of two.");
         }
@@ -529,5 +523,5 @@ internal sealed unsafe partial class DeviceBinding
 
     [DoesNotReturn]
     private static void ThrowDetaching(string member) =>
-        throw new InvalidOperationException(string.Concat(member, " cannot be called once the binding is being torn down."));
+        throw new InvalidOperationException($"{member} cannot be called once the binding is being torn down.");
 }

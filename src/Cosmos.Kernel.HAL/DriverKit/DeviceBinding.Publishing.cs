@@ -69,7 +69,7 @@ internal sealed partial class DeviceBinding
             Node.AddChild(child);
         }
 
-        DriverEngine.PublishNode(child);
+        DriverEngine.PublishNode(child, this);
         return child;
     }
 
@@ -89,31 +89,41 @@ internal sealed partial class DeviceBinding
             throw new ArgumentException("The node is not a child of this binding's node.", nameof(child));
         }
 
-        DriverEngine.RetractNode(child, hardwarePresent);
+        DriverEngine.RetractNode(child, hardwarePresent, this);
     }
 
     private PublishedDevice Publish(DeviceKind kind, string name, object device, string member)
     {
         ThrowIfNotThreadContext(member);
-        using (_lock.AcquireIrqSafe())
-        {
-            ThrowIfDetachingLocked(member);
-        }
 
-        PublishedDevice published = DeviceRegistry.Publish(kind, name, device, this, DeviceProvenance.Driver);
+        // Listed on the binding before any consumer hears of it, so a probe
+        // that fails afterwards, or a consumer that throws, leaves nothing
+        // published that the unwind does not withdraw.
+        PublishedDevice published = DeviceRegistry.Add(kind, name, device, this, DeviceProvenance.Driver);
         bool late;
         using (_lock.AcquireIrqSafe())
         {
-            _devices.Add(published);
             late = _detaching;
+            if (!late)
+            {
+                _devices.Add(published);
+            }
         }
 
         if (late)
         {
-            // Teardown began while the registry was told: it may have taken
-            // its snapshot without this device, so withdraw it here.
             DeviceRegistry.Withdraw(published);
             ThrowDetaching(member);
+        }
+
+        try
+        {
+            DeviceRegistry.Notify(published);
+        }
+        catch
+        {
+            DeviceRegistry.Withdraw(published);
+            throw;
         }
 
         DriverLog.Published(Node, Driver, published);
@@ -121,5 +131,5 @@ internal sealed partial class DeviceBinding
     }
 
     private static string DisplayName(IDisplay display) =>
-        string.Concat(display.Mode.Width.ToString(), "x", display.Mode.Height.ToString(), "x", display.Mode.BitsPerPixel.ToString());
+        $"{display.Mode.Width}x{display.Mode.Height}x{display.Mode.BitsPerPixel}";
 }
