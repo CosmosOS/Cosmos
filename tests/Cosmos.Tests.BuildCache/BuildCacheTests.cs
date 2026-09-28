@@ -35,6 +35,7 @@
 // | T11 ASM hash   | -                   | -                   | edit/revert RT      | -                   | -                   | -                   |
 // | T12 CC hash    | -                   | -                   | -                   | edit/revert RT      | -                   | -                   |
 // | T13 Clean+cache | runs -> OK hit      | runs -> OK hit      | runs -> snapshot eq | runs -> snapshot eq | runs -> OK hit      | runs -> OK hit      |
+// | T14 Switch flip | OK hit              | rebuilds (mtime)    | OK snapshot eq      | OK snapshot eq      | rebuilds (mtime)    | rebuilds (mtime)    |
 // |-----------------------------------------------------------------------------------------------------------------------------------------------------|
 //
 // =====================================================================
@@ -505,5 +506,50 @@ public class BuildCacheTests : IClassFixture<BuildFixture>
         BuildResult result2 = _fixture.Build();
         Assert.True(result2.Success, $"No-change rebuild failed:\n{result2.Output}");
         AssertAllCacheHits(result2, "no-change after clean rebuild");
+    }
+
+    // ==================================================================
+    // TEST 14: Feature switch flip -> ILC + linker + ISO rebuild.
+    //          The managed assemblies are byte-identical, so the patcher stays
+    //          cached; only the ILC response file changes (its runtimeknob
+    //          arguments), and the ILC cache must key on it. ASM and CC are
+    //          untouched. Flipping back rebuilds once more, then every step
+    //          hits its cache again.
+    // ==================================================================
+    [Fact, TestPriority(14)]
+    public void T14_FeatureSwitchChange_RebuildsIlc()
+    {
+        DateTime elfBefore = File.GetLastWriteTimeUtc(_fixture.ElfFile);
+        DateTime isoBefore = File.GetLastWriteTimeUtc(_fixture.IsoFile);
+        DateTime ilcBefore = File.GetLastWriteTimeUtc(_fixture.IlcOutput);
+        DateTime ilcHashBefore = File.GetLastWriteTimeUtc(_fixture.IlcHashFile);
+        Dictionary<string, DateTime> asmObjBefore = SnapshotDir(_fixture.AsmObjDir, "*.obj");
+        Dictionary<string, DateTime> cObjBefore = SnapshotDir(_fixture.CObjDir, "*.o");
+
+        Thread.Sleep(1100);
+        BuildResult flipped = _fixture.Build("-p:CosmosEnableMouse=false");
+
+        Assert.True(flipped.Success, $"Build with the mouse switched off failed:\n{flipped.Output}");
+
+        // Nothing managed changed, so the patcher must not run; ILC must.
+        Assert.Contains("Patcher cache hit", flipped.Stdout);
+        Assert.Contains("[ILC] Compiling:", flipped.Stdout);
+        Assert.NotEqual(ilcBefore, File.GetLastWriteTimeUtc(_fixture.IlcOutput));
+        Assert.NotEqual(ilcHashBefore, File.GetLastWriteTimeUtc(_fixture.IlcHashFile));
+        Assert.NotEqual(elfBefore, File.GetLastWriteTimeUtc(_fixture.ElfFile));
+        Assert.NotEqual(isoBefore, File.GetLastWriteTimeUtc(_fixture.IsoFile));
+
+        AssertSnapshotEqual(asmObjBefore, SnapshotDir(_fixture.AsmObjDir, "*.obj"), "ASM .obj after feature switch flip");
+        AssertSnapshotEqual(cObjBefore, SnapshotDir(_fixture.CObjDir, "*.o"), "CC .o after feature switch flip");
+
+        // Back to the default: the response file changes again, so ILC runs
+        // again; a further build then hits every cache.
+        BuildResult restored = _fixture.Build();
+        Assert.True(restored.Success, $"Build with the mouse switched back on failed:\n{restored.Output}");
+        Assert.Contains("[ILC] Compiling:", restored.Stdout);
+
+        BuildResult verify = _fixture.Build();
+        Assert.True(verify.Success, $"Verify build failed:\n{verify.Output}");
+        AssertAllCacheHits(verify, "after feature switch revert");
     }
 }
