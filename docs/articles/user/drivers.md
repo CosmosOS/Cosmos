@@ -8,7 +8,7 @@ The main differences if you come from Gen2:
 |---|---|---|
 | Base class | `Cosmos.HAL.Device` | `Cosmos.Kernel.HAL.DriverKit.Driver` |
 | Registration | By hand, in `Cosmos.HAL.Global` or the kernel | A generated manifest registers every `[Driver]` class the kernel can see |
-| Hardware access | `IOPort`, `PCIDevice`, raw memory | A `DeviceBinding`: register windows, bulk regions, DMA memory, interrupts |
+| Hardware access | `IOPort`, `PCIDevice`, raw memory | A `DeviceBinding`: register windows, bulk regions, DMA memory, interrupts; a `PciAccess` for a PCI function's configuration space |
 | Device removal | None | The kit tears the binding down in a fixed order; the driver frees nothing itself |
 | Testing | On the hardware | Over the synthetic bus, in a test kernel, identically on x64 and ARM64 |
 
@@ -28,8 +28,9 @@ See [Public API Tracking](../dev/public-api.md) for how experimental seams fit t
 
 The kit is being built in stages. What exists today:
 
-- **One bus kind: the synthetic bus.** A node reaches the kit only through `SyntheticBus.Publish`. PCI, virtio, USB, PS/2 and platform nodes are later stages, so a driver for real hardware cannot be bound yet, and the device drivers the kernel ships (PS/2, virtio, the NICs, the storage controllers) still live in the HAL outside the kit.
-- **No kernel manager consumes a published device yet.** `PublishKeyboard` records the keyboard, logs it and hands back a working sink, but `KeyboardManager` does not subscribe to the kit, so a key reported through the sink reaches nobody until a later stage, and the log line says `(no consumer)`. The same holds for pointers, network interfaces, block devices and displays.
+- **Three bus kinds: the synthetic bus, the platform bus and PCI.** A test publishes synthetic nodes through `SyntheticBus.Publish`; the machine description in the arch HAL seeds the platform bus with the machine's PCI host node at boot; and the PCI host driver, bound to that node, publishes one PCI node per function it finds, which is how a driver for real hardware is offered its device ([Buses](#buses), [PCI devices](#pci-devices)). Virtio, USB and PS/2 nodes are later stages, and the device drivers the kernel ships for them (PS/2, virtio-net and the other virtio devices, the storage and USB host controllers) still live in the HAL outside the kit; a PCI function one of those operates is sized like every other and otherwise left as it is unless a kit driver matches it.
+- **One kernel manager consumes a published device: the network manager.** `NetworkManager` installs its consumer before the driver stage, so an interface a driver publishes through `PublishNetwork` becomes an adapter the ring, the stack and the clients use, and the log line says `(consumed)`. `PublishKeyboard`, `PublishPointer`, `PublishBlockDevice` and `PublishDisplay` record the device, log it `(no consumer)` and hand back a working sink, but their managers do not subscribe to the kit yet, so what is reported through those sinks reaches nobody until a later stage.
+- **The drivers Cosmos ships over the kit live in `Cosmos.Kernel.Drivers`**: `PciHostDriver` and the Intel `E1000EDriver`, written over the public seam as a third party would write them. Every kernel gets the package through `Cosmos.Kernel`, so both are in its manifest; [Project settings](#project-settings) says how to drop one.
 - **Everything else on this page is implemented and tested**: the manifest, arbitration, the binding and its ledger, both execution contexts and the guard, teardown, the diagnostics view, and the synthetic bus. The Drivers test suite exercises all of it on x64 and ARM64, and its drivers are the models for the samples below.
 
 ## What a driver is
@@ -38,8 +39,8 @@ The kit has five nouns and one verb.
 
 | Noun | What it is | Who creates it |
 |------|------------|----------------|
-| **Node** (`DeviceNode`) | One piece of hardware the kernel can see: an identity on a bus, a list of resources (memory windows, port ranges, RAM windows) and interrupt sources, and a bus-specific access object | A bus (today the synthetic bus), or a bus driver publishing a child |
-| **Bus kind** | The schema a node on that bus follows: what its identity looks like, how a driver matches it, what its access object can do | The kit; the synthetic bus is the one kind today |
+| **Node** (`DeviceNode`) | One piece of hardware the kernel can see: an identity on a bus, a list of resources (memory windows, port ranges, RAM windows) and interrupt sources, and a bus-specific access object | A bus (the synthetic bus for a test, the platform bus for the root nodes the machine description seeds), or a bus driver publishing a child (the PCI host driver, one per function) |
+| **Bus kind** | The schema a node on that bus follows: what its identity looks like, how a driver matches it, what its access object can do | The kit; three kinds today: synthetic, platform and PCI |
 | **Driver** (`Driver`) | A class declaring a name, a match table, a priority, and one entry point that receives a node and either takes it or does not | You, in the kernel project or in a driver library |
 | **Binding** (`DeviceBinding`) | The ownership record between one driver and one node: every resource the driver acquired, every device it published, every child node it created. The driver reaches hardware and the kernel *only* through it | The kit, once per offer |
 | **Device** | What a driver hands the kernel: an object implementing one of the kit's device kinds (`IKeyboard`, `IPointer`, `INetworkInterface`, `IBlockDevice`, `IDisplay`) | The driver, through its binding |
@@ -77,15 +78,22 @@ One instance per class: the manifest constructs each driver once, and that insta
 
 ## Where a driver runs
 
-The driver stage runs from `Kernel.Start`, after the module initializers have brought up the heap, the interrupt controller, the scheduler and its tick, and after interrupts are enabled. The kit logs the manifest, starts its worker thread, offers every node published so far, and returns once each driver has answered. Only then do `OnBoot` and `BeforeRun` run, so a device a driver bound is usable from there on. The serial log of a kernel with no drivers shows the stage between the two `[Kernel]` lines:
+The driver stage runs from `Kernel.Start`, after the module initializers have brought up the heap, the interrupt controller, the scheduler and its tick, and after interrupts are enabled. The kit logs the manifest, starts its worker thread, offers every node published so far, and returns once every node has been offered, the children a bus driver published from its probe included. Only then do `OnBoot` and `BeforeRun` run, so a device a driver bound is usable from there on. The serial log of an x64 kernel with no drivers of its own shows the stage between the two `[Kernel]` lines: the manifest holds the two drivers Cosmos ships, the PCI host node the platform bus seeded is offered first, and the functions the host driver found are offered after it, each one bound by a driver or left `no driver`:
 
 ```
 [Kernel] Enabling interrupts...
 [Kernel] Starting drivers...
-[Drivers] manifest: (empty)
+[Drivers] manifest: E1000EDriver(prio 0) PciHostDriver(prio 0)
 [Drivers] engine started, worker thread
+[Drivers] platform:pci@cf8 candidates: PciHostDriver(prio 0, spec 1)
+[Drivers] platform:pci@cf8 PciHostDriver: 6 functions on 1 buses
+[Drivers] platform:pci@cf8 offer PciHostDriver -> bound
+[Drivers] pci:0000:00:00.0 no driver
+...
 [Kernel] Calling OnBoot()...
 ```
+
+A kernel built with `CosmosEnablePCI` off has no host node and no `PciHostDriver`; `E1000EDriver` is guarded by `CosmosEnableNetwork` instead, so it stays in the manifest while that switch is on and is never offered a node. The manifest is `(empty)` only when both switches are off and the kernel declares no driver of its own.
 
 A node published after boot (a hot-plug, or a test publishing a synthetic node from `BeforeRun`) takes the same path: it is queued for the worker, offered there, and the publisher waits until the offer is done. See [Kernel Startup](startup.md) for the rest of the boot sequence.
 
@@ -123,11 +131,11 @@ The rule is also enforced at run time, in every build. Every method of `DeviceBi
 
 ## Identity and matches
 
-A bus knows a device before any driver looks at it, and it says so in a `DeviceIdentity`: `BusName` (the bus the device sits on), `Address` (its address in the bus's own notation) and `Describe()` (the identity in words, for the log). The node's `Path` is the two joined with a colon, `synthetic:kbd`, and it is how the log and the diagnostics view name the node.
+A bus knows a device before any driver looks at it, and it says so in a `DeviceIdentity`: `BusName` (the bus the device sits on), `Address` (its address in the bus's own notation) and `Describe()` (the identity in words, for the log). The node's `Path` is the two joined with a colon (`synthetic:kbd`, `platform:pci@cf8`, `pci:0000:00:03.0`), and it is how the log and the diagnostics view name the node.
 
 A driver's match table is a `ReadOnlySpan<DeviceMatch>`. Each `DeviceMatch` is a predicate over an identity, `Matches(DeviceIdentity)`, plus a `Specificity`: how many identity fields it constrains. Each bus kind brings its identity type and its match type as a pair, and a driver never sees a transport, only the identity.
 
-Today there is one pair. `SyntheticIdentity` carries a `Key` the test chose, and `SyntheticMatch` has two shapes:
+There are three pairs today. `SyntheticIdentity` carries a `Key` the test chose, and `SyntheticMatch` has two shapes:
 
 ```csharp
 // This device and no other: specificity 1.
@@ -137,7 +145,7 @@ private readonly DeviceMatch[] _matches = [SyntheticMatch.Key("kbd")];
 private readonly DeviceMatch[] _matches = [SyntheticMatch.Any()];
 ```
 
-Later bus kinds add their own pairs (a PCI match over any subset of vendor, device, class and subclass with masks; a virtio match by device type; a USB match by class or by vendor and product), and a driver for one of them reads the same way: a table of matches and nothing about how the node was found.
+`PlatformIdentity` and `PlatformMatch` are the pair of the platform bus, and `PciIdentity` and `PciMatch` the pair of PCI; both are described with their buses below, and a driver for either reads the same way: a table of matches and nothing about how the node was found. Later bus kinds (a virtio match by device type, a USB match by class or by vendor and product) add their pairs the same way.
 
 When a node appears, the kit collects every registered driver with a matching entry and orders them: by `Priority` (highest first), then by the specificity of the driver's best match (highest first), then by manifest position (earliest first). The log prints the order:
 
@@ -377,6 +385,23 @@ if (!binding.TryStartThread("kbd-thread", state.ThreadMain, out DriverThread? th
 
 A `DriverThread` exposes its `Name` and `HasExited`. A driver thread cannot retract its own node (the teardown would wait to join the thread that is waiting on the teardown); the kit refuses that with an exception.
 
+### Device locks
+
+`binding.CreateLock()` returns a `DeviceLock`, for a device that is entered from more than one context at once: a `Transmit` the ring calls from its own thread while the driver's work item, delivering a frame, re-enters it through the stack's synchronous reply; a handler and a thread sharing a register sequence. It is created in thread context and recorded on the binding: it holds no resource, does not count in `HeldResourceCount` and needs no release. `Acquire()` returns a `DeviceLockScope`, a `ref struct` a `using` binds to; the holder runs with interrupts disabled until the scope is disposed, which restores the interrupt state the acquire found, so a handler can never spin on a thread that holds the lock and one scope nests inside another. It is not reentrant (a holder that acquires again spins forever), and it is never held across `Sleep`, `Wait`, `Delay`, a sink call or a publish. The E1000E's `Transmit` runs under its lock, and its drain takes the lock only around its own ring index update, never across a `Receive`:
+
+```csharp
+public bool Transmit(ReadOnlySpan<byte> frame)
+{
+    using (_lock.Acquire())
+    {
+        // check the ring, copy the frame, write the descriptor,
+        // DmaBuffer.WriteBarrier(), then advance the tail register
+    }
+
+    return true;
+}
+```
+
 ### Publishing a device
 
 A device kind is the smallest interface the kernel needs, plus a kit-owned **sink** through which the driver pushes events. Lifecycle is not on the interface, because the binding owns lifecycle; publish and withdraw are enable and disable.
@@ -389,7 +414,7 @@ A device kind is the smallest interface the kernel needs, plus a kit-owned **sin
 | Block device | `IBlockDevice`, the existing public contract | nothing | nothing to report |
 | Display | `IDisplay { DisplayMode Mode; DeviceRegion? Framebuffer; void Flush(x, y, width, height); }` | `DisplaySink` | `ModeChanged()` |
 
-`binding.PublishKeyboard(keyboard)`, `PublishPointer`, `PublishNetwork`, `PublishBlockDevice` and `PublishDisplay` are the five calls. Every sink is allocation-free and callable from any context, a handler included; it finds the kernel's consumer for its kind at call time and drops the report when the device was withdrawn or nobody listens. A kernel built without a kind, or, today, any kernel at all, therefore gets a sink that discards rather than a throw the driver could not anticipate. The published device is withdrawn by teardown ahead of everything else the driver holds, and the log records both ends:
+`binding.PublishKeyboard(keyboard)`, `PublishPointer`, `PublishNetwork`, `PublishBlockDevice` and `PublishDisplay` are the five calls. Every sink is allocation-free; it finds the kernel's consumer for its kind at call time and drops the report when the device was withdrawn or nobody listens. A kernel built without a kind, or one whose manager does not subscribe to the kit yet (every kind but the network today), therefore gets a sink that discards rather than a throw the driver could not anticipate. The published device is withdrawn by teardown ahead of everything else the driver holds, and the log records both ends:
 
 ```
 [Drivers] synthetic:kbd synthetic-keyboard published keyboard "synthetic-kbd" (no consumer)
@@ -397,6 +422,8 @@ A device kind is the smallest interface the kernel needs, plus a kit-owned **sin
 ```
 
 A display driver publishes its device in whatever scanout state it found it and programs no mode of its own; the display's `Mode` is what it is, and `Framebuffer` is a `DeviceRegion` the driver mapped or `null`.
+
+The network kind is the one with a consumer. `NetworkManager.Initialize` installs it through `DeviceRegistry.SetConsumer(DeviceKind.Network, ...)` before the driver stage runs, so a published `INetworkInterface` is an adapter in the manager's table by the time `PublishNetwork` returns, under the interface's `Name` (`e1000e` for the shipped driver, which is what `NetworkManager.Name` reports when that interface is the primary), and it leaves the table through `NetworkManager.UnregisterDevice` when teardown withdraws it. The first registered device is the primary: the HAL's virtio device, which the System initializer registers before the driver stage, when the machine has one, otherwise the first kit interface. Two rules come with the kind. `NetworkSink.Receive` is called from thread context, the kit worker in practice, and never from an interrupt handler: the consumer copies the frame into an array and runs the stack's handler with interrupts disabled, which restores the atomicity the stack had while it ran inside the driver's interrupt handler, so a driver whose handler sees a frame hands it to a work item, as the E1000E's drain does. `LinkChanged` only writes a flag and may be reported from any context. Withdrawing an interface takes it out of the manager's table, but its IP configuration is not removed and `NetworkAdapter` handles stay positional, so a handle taken before the withdrawal may name the device that moved into its slot.
 
 ### Publishing child nodes
 
@@ -450,7 +477,7 @@ public override ProbeResult Probe(DeviceBinding binding)
 }
 ```
 
-The `resources` array carries `DeviceResource.MemoryWindow(physicalBase, length)`, `DeviceResource.PortRange(basePort, count)` or `DeviceResource.RamWindow(virtualBase, physicalBase, length)` entries; the `interrupts` array carries `InterruptSource` implementations the bus provides, each implementing `Describe()` and the four protected members (`TryConnectCore`, `MaskCore`, `UnmaskCore`, `DisconnectCore`) that the kit calls through its own internal forwarders, so a driver holding a source can neither connect nor mask it behind the kit's back.
+The `resources` array carries `DeviceResource.MemoryWindow(physicalBase, length)`, `DeviceResource.PortRange(basePort, count)`, `DeviceResource.RamWindow(virtualBase, physicalBase, length)` or `DeviceResource.None` entries (the last is a slot with nothing assigned, kept so the indices after it stay what the hardware numbers them; `MapRegisters` and `MapRegion` refuse it with `InvalidOperationException`); the `interrupts` array carries `InterruptSource` implementations the bus provides, each implementing `Describe()` and the four protected members (`TryConnectCore`, `MaskCore`, `UnmaskCore`, `DisconnectCore`) that the kit calls through its own internal forwarders, so a driver holding a source can neither connect nor mask it behind the kit's back.
 
 ### Logging
 
@@ -498,6 +525,103 @@ A step that throws is logged (`teardown step "withdraw" threw`) and the walk goe
 [Drivers] synthetic:kbd retracted
 ```
 
+## Buses
+
+Two bus kinds carry real hardware today, and they nest: the **platform bus** holds the root nodes a machine description seeds because nothing enumerates them, and the **PCI host driver**, bound to one of those nodes, publishes the functions it finds as PCI nodes beneath it. A driver for a PCI device sees neither mechanism; it is offered a `pci:` node like any other.
+
+### Platform nodes
+
+A platform node is named the way a device tree names it. `PlatformIdentity(address, compatible)` takes the node's address in `name@hex` form (`pci@cf8`, `pci@3f000000`) and at least one compatible string, most specific first; `BusName` is `platform`, so the path is `platform:pci@cf8`, and `Describe()` prints `compatible ` followed by the strings joined with commas. The strings are copied, exposed as `Compatible` and compared ordinally. `PlatformMatch` has two shapes: `PlatformMatch.Compatible("pci-host-legacy")` matches every platform node whose list contains the string (specificity 1), and `PlatformMatch.Any()` matches every platform node (specificity 0).
+
+Only a machine description publishes platform nodes; `PlatformBus.Publish` is internal to the HAL, because the arch HAL assembly is where a machine is described. Each `IPlatformInitializer` implements `PublishPlatformNodes`, which the HAL library initializer calls right after `InitializeHardware`, with interrupts still disabled and inside a `try`/`catch` that logs `Platform nodes not published: message` and lets the boot go on. The nodes wait in the engine's queue until `Kernel.Start` runs the driver stage. What the two descriptions publish, when `CosmosEnableInterrupts` and `CosmosEnablePCI` are on:
+
+| Machine | Node | Resources | Access object |
+|---------|------|-----------|---------------|
+| x64 | `platform:pci@cf8`, compatible `pci-host-legacy` | `PortRange(0xCF8, 8)`, documentary: the access object reaches the ports itself | `PciHostAccess.ForPorts(0, 0, 255)`: segment 0, buses 0 to 255 over the `0xCF8`/`0xCFC` mechanism. q35's MCFG is not used on x64 |
+| ARM64 | `platform:pci@<base>`, the MCFG base in hex, compatible `pci-host-ecam-generic` | `MemoryWindow(base, length)` over the buses the host serves, one megabyte per bus | `PciHostAccess.ForEcam(base, segment, startBus, endBus)`: the ECAM window, mapped as device memory |
+
+`ForEcam` maps the window bus by bus from the start bus up and ends the host's range at the last bus it could map: the buses before are served, the rest are logged as `pci host at 0x...: buses xx to yy not mapped, enumeration ends at bus zz`, and a window whose first bus cannot be mapped is an `InvalidOperationException` that the initializer's `catch` turns into the log line above. An ARM64 machine without an MCFG entry logs `No MCFG entry: no PCI host node published` and publishes nothing, so the driver stage finds no host there and no PCI driver is offered a node.
+
+The host node's access object is a `PciHostAccess`: `Segment`, `StartBus` and `EndBus`; `ReadConfig8`, `ReadConfig16`, `ReadConfig32` and `WriteConfig8/16/32` taking `(bus, device, function, offset)`, for raw configuration access from any context (`ArgumentOutOfRangeException` for a bus outside the host's range, a device past 31, a function past 7, or an offset past the mechanism's 256 or 4096 bytes); and `TryDescribeFunction(bus, device, function, out PciFunctionDescription)`, thread context, which returns `false` for a bus outside the range or a vendor id reading `0xFFFF` or `0x0000`, and otherwise reads the header, sizes the base address registers and hands back the four arguments of `PublishChild` as `Identity`, `Resources`, `Interrupts` and `Access`.
+
+### The PCI host driver
+
+`PciHostDriver` in `Cosmos.Kernel.Drivers` is `[Driver(Feature = DriverFeature.Pci)]` and matches `PlatformMatch.Compatible("pci-host-ecam-generic")` and `PlatformMatch.Compatible("pci-host-legacy")`. Its probe asks the node for its `PciHostAccess` through `binding.Node.TryGetAccess` (and declines with `the node carries no PCI host access` otherwise), then walks the buses as the HAL's legacy scan does: the host's start bus first; on each bus, devices 0 to 31, function 0 and, when the header type has the multi-function bit, functions 1 to 7; every function `TryDescribeFunction` accepts is published with `binding.PublishChild(d.Identity, d.Resources, d.Interrupts, d.Access)`. A PCI-to-PCI bridge (class `06`, subclass `04`, type 1 header) queues its secondary bus, read at offset `0x19`; on the legacy host, a host bridge (class `06`, subclass `00`) at function N of device `00:00` queues bus N. Each bus is walked once and only within the host's range. The probe logs one line, `N functions on M buses`, and returns `Bound`; the children are offered once it returns, and the driver stage does not return before all of them have been. The driver keeps no state and has no `OnDetach`: the kit retracts every child with the host node.
+
+## PCI devices
+
+A PCI node is what the host driver publishes for one function: an identity read from the header, six resources that are its base address registers, one interrupt source that is its legacy line, and a `PciAccess` for everything else. The shipped `E1000EDriver` is the model for a driver over one, and the snippets below are its steps.
+
+### Identity and match
+
+`PciIdentity` is the header as the host read it, once: `Segment`, `Bus`, `Device`, `Function`; `VendorId`, `DeviceId`; `SubsystemVendorId` and `SubsystemId` (type 0 headers only, zero otherwise); `ClassCode`, `Subclass`, `ProgIf`, `Revision`; and `HeaderType`, 0 for a device, 1 for a PCI-to-PCI bridge, 2 for a CardBus bridge, with the multi-function bit stripped. `BusName` is `pci` and `Address` is `ssss:bb:dd.f`, all hexadecimal, so the path is `pci:0000:00:03.0`. `Describe()` prints `8086:10d3 class 02.00.00`: vendor and device id, then class, subclass and programming interface, which is what `DeviceNodeInfo.Description` shows for the node.
+
+`PciMatch` has one constructor with eight optional fields, `vendorId`, `deviceId`, `subsystemVendorId`, `subsystemId`, `classCode`, `subclass`, `progIf` and `revision`: every field given must equal the function's, every field left `null` is not looked at, and the specificity is the number of fields given.
+
+```csharp
+using Cosmos.Kernel.HAL.DriverKit.Pci;
+
+private readonly DeviceMatch[] _matches =
+[
+    new PciMatch(vendorId: 0x8086, deviceId: 0x10D3),   // one chip: specificity 2
+    new PciMatch(classCode: 0x02),                      // every network controller: specificity 1
+];
+```
+
+A match with no field set throws `ArgumentException` (`a PCI match constrains at least one field`). That is deliberate: the kit quiesces a function before the first driver looks at it (below), and until the HAL's own PCI drivers move into the kit, a catch-all driver would quiesce the functions they operate. Prefer the chips a driver was tested on to a class match for the same reason; the shipped E1000E matches six Intel device ids and nothing else.
+
+### The access object
+
+`binding.Node.Access<PciAccess>()` is the function's configuration space and what the driver turns on in it. All of it is any context and allocation-free:
+
+- `ReadConfig8`, `ReadConfig16`, `ReadConfig32` and `WriteConfig8/16/32` take a register offset in this function's space; an offset past the mechanism's size (256 bytes over the ports, 4096 over ECAM) or off the access width's alignment is `ArgumentOutOfRangeException`.
+- `FindCapability(capabilityId, after = 0)` walks the capability list, from its head or from the entry after `after`, bounded to 48 entries, and returns the capability's offset or 0.
+- `EnableBusMastering(bool)`, `EnableMemorySpace(bool)` and `EnableIoSpace(bool)` are read-modify-writes of the Command register under the mechanism's lock. A driver enables what it uses: decoding is what makes the windows answer, bus mastering is what lets the device write to DMA memory.
+- `InterruptLine` and `InterruptPin` are registers `0x3C` and `0x3D` as firmware wrote them, read at describe time.
+- `IsMsiXCapable` and `MessageInterruptCount` (the MSI-X table size, 0 without the capability) say what the function could do with message-signalled interrupts; see the note at the end of [The legacy line](#the-legacy-line).
+- `Bars` is the six base address registers as the host sized them (next).
+
+Behind the access object, for the kit only, the function is quiesced and restored around the offers. Before the first probe, when at least one driver is a candidate, the kit snapshots Command (and MSI-X Message Control) and turns bus mastering off, disables the legacy line and, when firmware left MSI-X enabled, disables it with the function mask set. After a probe that declined, failed or threw, the same quiescing runs again before the probe's memory is freed, so a ring the probe armed cannot write into pages the kit is about to release. When every candidate declined, the snapshot is written back, so a function a HAL driver still operates keeps its bus mastering and its MSI-X. After a bound driver's teardown with the hardware present, the function is quiesced once more. A bound driver owns the state from its probe on, and a node no driver matches is not touched at all. A hook that throws is logged `bus hook "quiesce" threw: message`, and when it is the first one the node is left `Unbound` with no offer (`not offered: message`), since a driver must not see a function the bus could not quiet.
+
+### BAR resources
+
+`Node.Resources` of a PCI node always has six entries, one per base address register, sized at describe time. Slot `i` is `DeviceResource.MemoryWindow(base, length)` for an assigned memory register, `DeviceResource.PortRange(base, count)` for an assigned I/O register inside the 16-bit port space (a range running past it is clipped), and `DeviceResource.None` for everything else: a register firmware left at zero, the upper half of a 64-bit register, an I/O register at port zero or above `0xFFFF`, and all six slots of a bridge (header types 1 and 2 are not sized). `Node.Resources.Count` counts every slot, and `MapRegisters` or `MapRegion` on a `None` slot throws `InvalidOperationException` (`resource i is not assigned`), so a driver checks first. `pci.Bars[i]` is the register's own view, a `PciBar`: `Index`, `IsAssigned`, `IsIo`, `Is64Bit`, `IsPrefetchable`, `Base` (a physical address, or the first port) and `Length` (bytes, or ports; 0 when unassigned). The E1000E's first step reads as:
+
+```csharp
+PciAccess pci = binding.Node.Access<PciAccess>();
+PciBar bar0 = pci.Bars[0];
+if (!bar0.IsAssigned || bar0.IsIo || bar0.Length < 0x20000)
+{
+    return ProbeResult.Declined("BAR0 is not a memory window of 128 KiB");
+}
+
+RegisterWindow registers = binding.MapRegisters(0);
+pci.EnableMemorySpace(true);
+pci.EnableBusMastering(true);
+```
+
+Sizing writes all ones to each register and reads the mask back, so for its duration the function decodes neither memory nor I/O while bus mastering stays as it was; it runs with interrupts disabled and the early framebuffer console paused, because the serial log mirrors every byte into a framebuffer whose register may be the one being sized. A 64-bit register is sized with both halves together; a 64-bit register in the last slot is malformed and reported unassigned.
+
+### The legacy line
+
+`Node.Interrupts` of a PCI node is exactly one source, the function's legacy interrupt line, which `Describe()` prints as `line 11` or `line (none)`. `TryRequestInterrupt` on it returns `false` on ARM64, where the line register names nothing; when the register is 0 or `0xFF`; when the line is below 3 or above 15 (the lowest three are the platform's own, and a higher register names no routable input); when the interrupt controller is not initialized; when another handler already holds the line (the PIT, the PS/2 controller or another function: a shared line is refused rather than shared); and when the source is already connected. On success the line is routed as the x64 platform routes an ISA IRQ, edge-triggered and active-high, the handler is installed, and only then is the function's INTx disable bit cleared, so a function whose interrupt is already pending asserts the line after the entry is open. `Mask` and `Unmask` go to the controller; disconnecting clears the handler and sets INTx disable again.
+
+That routing is validated on QEMU and nowhere else: on a real chipset the line register is not the GSI and INTx is level-triggered, so a line that connected may never fire there. A PCI driver therefore pairs the line with a periodic drain rather than trusting it, which is the pattern the E1000E follows:
+
+```csharp
+WorkItem drain = binding.CreateWorkItem(state.Drain);
+state.DrainWork = drain;
+
+bool hasLine = binding.TryRequestInterrupt(binding.Node.Interrupts[0], state.OnInterrupt, out _);
+bool polling = binding.TrySchedulePeriodic(50, drain);
+if (!hasLine && !polling)
+{
+    return ProbeResult.Declined("no interrupt and no timer to poll with");
+}
+```
+
+The drain is idempotent, so the handler and the timer can both schedule it: the handler acknowledges the device and schedules the drain, the timer runs it every period whatever happened, an edge lost while the line was masked is recovered within a period, and a line that is routed but dead still yields a working device. The E1000E's handler reads the cause register (which clears it), counts the interrupt and schedules the drain when a frame arrived, the ring ran low or the link changed; its probe logs which of the two it got, `line 11` or `no line`, and `polling every 50 ms` or `no polling`. Message-signalled interrupt sources (MSI and MSI-X) are the next stage's work, with the first driver that needs them; `MessageInterruptCount` already reports what the function offers.
+
 ## Observing drivers
 
 Everything the kit does is one line in the serial log, prefixed `[Drivers]`, and the same fact in the `DriverInfo` facade of `Cosmos.Kernel.System.Diagnostics`, so a test asserts on the facade and a human reads the log, and the two cannot drift.
@@ -519,6 +643,8 @@ The log lines, in the order a device's life produces them:
 | `synthetic:k A thread "name" did not stop in 500 ms; 3 resources leaked` | Teardown could not join a thread |
 | `synthetic:k A OnDetach threw: message` | The detach hook threw |
 | `synthetic:k retracted` | The node left the tree |
+| `pci:0000:00:03.0 bus hook "quiesce" threw: message` | A bus hook threw (`quiesce`, `quiet`, `restore` or `after teardown`); after `quiesce` the node is `not offered: message` |
+| `pci host at 0x...: buses xx to yy not mapped, enumeration ends at bus zz` | An ECAM window could not be mapped whole; the host serves the buses before it |
 
 `DriverInfo` is read-only, allocation-free and safe to poll: `IsStarted`, `HasWorker`, `DriverCount`, `NodeCount`, `DeviceCount`, `GetTotalHeldResourceCount()`, and four `Try` reads that snapshot one entry by index. `TryGetDriver(index, out DriverEntryInfo)` walks the manifest (`Name`, `Priority`). `TryGetNode(index, out DeviceNodeInfo)` walks every node ever published, retracted ones included: `Path`, `BusName`, `Description`, `DriverName`, `State` (`Pending`, `Bound`, `Unbound`, `Retracted`), `ParentPath`, the resource, interrupt, offer and child counts, `HeldResourceCount`, `PublishedDeviceCount`, `LeakedResourceCount`, `FaultCount` and `LastFault`. `TryGetOffer(nodeIndex, offerIndex, out DeviceOfferInfo)` replays a node's arbitration (`DriverName`, `Priority`, `Specificity`, `Outcome`, `Reason`, `ReleasedResourceCount`). `TryGetDevice(index, out PublishedDeviceInfo)` lists what is published (`Kind`, `Name`, `NodePath`, `DriverName`, `IsConsumed`, `IsWithdrawn`).
 
@@ -624,7 +750,7 @@ The sample leaves package versions to central package management, as the kernel 
 - `NAOT0008`: no `[UnsafeAccessor]` or `[UnsafeAccessorType]` anywhere in it, which closes the one hatch that would reach internals without a grant.
 - `NAOT0009`: no `Cosmos.*` assembly it references grants it `InternalsVisibleTo`.
 
-In the tree, `CosmosDriverAssemblyNames` in `Directory.Build.props` lists every driver assembly: today that is the Drivers suite's library, `Cosmos.Kernel.Tests.Drivers.Library`, plus the name `Cosmos.Kernel.Drivers`, reserved for the package a later stage moves the shipped drivers into. A capability a driver there needs and a third party cannot reach is a build failure, and the fix is to add it to the kit for everyone. The kernel that consumes the library adds a `ProjectReference` or `PackageReference` to it and its own `<NoWarn>` line; the library's drivers then appear in the kernel's manifest after the kernel's own, ordered by assembly name and then type name.
+In the tree, `CosmosDriverAssemblyNames` in `Directory.Build.props` lists every driver assembly: today that is `Cosmos.Kernel.Drivers`, the package the shipped drivers live in, and the Drivers suite's library, `Cosmos.Kernel.Tests.Drivers.Library`. Both are built under `CosmosDriverAssembly` with no grant from any project, so the compiler is the proof that the shipped drivers call only what a kernel author can call; a capability a driver there needs and a third party cannot reach is a build failure, and the fix is to add it to the kit for everyone. `Cosmos.Kernel.Drivers` is one RID-less `lib/net10.0` package, because an assembly written over the seam holds no architecture-specific code by construction, and `Cosmos.Kernel` references it, so a kernel gets it with the aggregator and needs no reference of its own. The kernel that consumes the library adds a `ProjectReference` or `PackageReference` to it and its own `<NoWarn>` line; the library's drivers then appear in the kernel's manifest after the kernel's own, ordered by assembly name and then type name.
 
 ### Excluding and opting in
 
@@ -639,6 +765,16 @@ Policy lives in the kernel's `.csproj`, not in code. Names are full type names, 
 </ItemGroup>
 ```
 
+The drivers Cosmos ships are dropped the same way, by full type name. A kernel that brings its own Ethernet driver, or wants the function left as firmware set it up, keeps the Intel driver out of its manifest:
+
+```xml
+<ItemGroup>
+  <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.E1000EDriver" />
+</ItemGroup>
+```
+
+Excluding `Cosmos.Kernel.Drivers.PciHostDriver` goes further: no PCI node is published then, and every PCI driver in the manifest stays idle.
+
 An excluded driver is dropped whatever its `Default`; a driver with `Default = false` is registered only when named. An item that matches no `[Driver]` class the kernel can see is reported as `COSMOSGEN002`, which is how a stale entry shows up. `[Driver(Feature = DriverFeature.X)]` is the third lever: the driver rides the kernel's feature switch and is trimmed with it. Reading the generated `DriverManifest.g.cs` under `obj/` is the quickest way to check what a kernel carries.
 
 ## Checklist
@@ -649,7 +785,8 @@ An excluded driver is dropped whatever its `Default`; a driver with `Default = f
 4. Keep the handler to registers, DMA memory, sinks and the three `InterruptContext` members; hand everything else to a work item. Never allocate or block there: the guard stops the call and masks the source.
 5. Order DMA with `DmaBuffer.WriteBarrier()` before handing a descriptor over and `DmaBuffer.ReadBarrier()` after reading a device-written flag; register accesses carry their own.
 6. Check the `Try` results: `TryRequestInterrupt`, `TryAllocateDma`, `TrySchedulePeriodic`, `TryStartThread` all say `false` when the platform or the kernel's switches cannot provide it.
-7. Write driver threads as a loop on `IsDetaching` around `binding.Wait`, and return promptly once it turns true.
-8. Put hardware quiescing in `OnDetach`, and only when `reason.HardwarePresent` is true.
-9. Write a test kernel over the synthetic bus: publish, raise, `WaitForQueuedJobs`, retract, and assert through `DriverInfo` and the driver's own state.
-10. Add `<NoWarn>$(NoWarn);COSMOS0003</NoWarn>` to the project, and `<CosmosDriverAssembly>true</CosmosDriverAssembly>` to a library, with its drivers `public`.
+7. For a PCI function, decline on `PciAccess.Bars` before mapping, turn on decoding and bus mastering through `PciAccess` yourself, and pair the legacy line with a periodic drain, since the line is not routable everywhere.
+8. Write driver threads as a loop on `IsDetaching` around `binding.Wait`, and return promptly once it turns true.
+9. Put hardware quiescing in `OnDetach`, and only when `reason.HardwarePresent` is true.
+10. Write a test kernel over the synthetic bus: publish, raise, `WaitForQueuedJobs`, retract, and assert through `DriverInfo` and the driver's own state.
+11. Add `<NoWarn>$(NoWarn);COSMOS0003</NoWarn>` to the project, and `<CosmosDriverAssembly>true</CosmosDriverAssembly>` to a library, with its drivers `public`.

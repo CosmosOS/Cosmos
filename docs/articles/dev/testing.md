@@ -75,7 +75,8 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 |-------|-------|-------------|
 | **HelloWorld** | 3 | Basic arithmetic, boolean logic, integer comparison |
 | **Memory** | 85 | Boxing/unboxing, memory allocation, collections, memory copy, GC |
-| **Drivers** | 27 | Driver kit over the synthetic bus: manifest, arbitration, publish, interrupts, deferred work, teardown, children |
+| **Drivers** | 32 | Driver kit over the synthetic bus: manifest, arbitration, publish, interrupts, deferred work, teardown, children; on x64, the PCI host and the E1000E driver on q35's default NIC |
+| **Pci** | 9 | The legacy PCI manager's configuration space reads, and the driver kit's PCI host node and its children through `DriverInfo` |
 
 #### HelloWorld Tests
 
@@ -132,7 +133,7 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 
 #### Drivers Tests
 
-The suite is two projects. `tests/Kernels/Cosmos.Kernel.Tests.Drivers` is the kernel: the harness (`Kernel.cs` and `TestKeyboardConsumer`) with an `InternalsVisibleTo` grant from `Cosmos.Kernel.HAL`, which it spends on its consumer only: `TestKeyboardConsumer` derives from the internal `KeyboardConsumer` and is installed through the internal `DeviceRegistry.SetConsumer`. `tests/Kernels/Cosmos.Kernel.Tests.Drivers.Library` holds every `[Driver]` class the suite drives and the state and identity types they need: a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, listed in `CosmosDriverAssemblyNames`) with no grant from any project, written over the public seam only, so its compiling is the proof that a third party can write each of those drivers. The kernel references the library, drives its drivers through the synthetic bus with no hardware behind any node, and waits for the kit through `SyntheticBus.WaitForQueuedJobs`. It builds with `CosmosEnableMouse` off and with one `CosmosDriverExclude` and one `CosmosDriverInclude` item naming the library's types, so the manifest policy is under test too. Every assertion reads `DriverInfo` or the suite's own drivers and consumer, never the serial log.
+The suite is two projects. `tests/Kernels/Cosmos.Kernel.Tests.Drivers` is the kernel: the harness (`Kernel.cs` and `TestKeyboardConsumer`) with an `InternalsVisibleTo` grant from `Cosmos.Kernel.HAL`, which it spends on its consumer and, in the hardware group, on reaching the shipped E1000E's state through `DriverEngine.Nodes`: `TestKeyboardConsumer` derives from the internal `KeyboardConsumer` and is installed through the internal `DeviceRegistry.SetConsumer`. `tests/Kernels/Cosmos.Kernel.Tests.Drivers.Library` holds every `[Driver]` class the suite drives and the state and identity types they need: a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, listed in `CosmosDriverAssemblyNames`) with no grant from any project, written over the public seam only, so its compiling is the proof that a third party can write each of those drivers. The kernel references the library, drives the library's drivers through the synthetic bus with no hardware behind any node and the shipped drivers on what the machine carries (the Hardware group below), and waits for the kit through `SyntheticBus.WaitForQueuedJobs`. It builds with `CosmosEnableMouse` off and with one `CosmosDriverExclude` and one `CosmosDriverInclude` item naming the library's types, so the manifest policy is under test too. Every assertion reads `DriverInfo` or the suite's own drivers and consumer, never the serial log.
 
 Manifest order for the library's drivers follows the referenced-assembly rule: the generator sorts them by assembly name and then by full type name, both ordinal, after the kernel's own drivers. `Manifest_Order_ReferencedByTypeName` asserts that `TieFirstDriver` precedes `TieSecondDriver` on that rule alone (`F` sorts before `S`); where the two are declared plays no part. `Interrupt_WorkItemDeferredToWorker` proves deferral without asking the engine where it ran: the handler notes the work item's run count as it returns, with interrupts still disabled, so an unchanged count means the item did not run inside `RaiseInterrupt`, and the run seen after `WaitForQueuedJobs` is the worker's.
 
@@ -160,6 +161,16 @@ Manifest order for the library's drivers follows the referenced-assembly rule: t
 
 **Diagnostics (1 test):**
 - `DriverInfo_OutOfRange_ReturnsFalse`
+
+**Hardware (5 tests):**
+- `Hardware_PciHost_Bound`, `Hardware_E1000E_NodeBound`, `Hardware_E1000E_DeviceConsumed`
+- `Hardware_E1000E_LinkUp`, `Hardware_E1000E_Transmit`
+
+The hardware group runs the shipped drivers on real (emulated) hardware without a profile of its own: QEMU's q35 adds a default e1000e whenever a cell passes no `-netdev`, so the suite's bare x64 cell already carries the controller, while virt's default NIC is virtio, so the four E1000E tests skip on arm64 with `no e1000e on this machine`. Their gate is a `DriverInfo` node with `BusName` `pci` whose `Description` starts with `8086:10d3`. `Hardware_PciHost_Bound` is unconditional: a `platform` node whose description contains `pci-host-` is `Bound` by `PciHostDriver`. `Hardware_E1000E_NodeBound` reads that the function is `Bound` by `E1000EDriver` with one published device and at least seven held resources (the register window, the four DMA buffers, the drain work item and its periodic registration, plus the interrupt handle when the line connected); `Hardware_E1000E_DeviceConsumed` finds a published device of kind `Network` at that node path with `IsConsumed` true and a non-zero `NetworkManager.MacAddress`; `Hardware_E1000E_LinkUp` polls `NetworkManager.LinkUp` for up to 2 s; and `Hardware_E1000E_Transmit` spends the kernel's HAL grant on reaching the node's `E1000EState` through `DriverEngine.Nodes`, sends a 60-byte broadcast frame through `NetworkManager.Send` and asserts `FramesTransmitted` grew.
+
+#### Pci Tests
+
+`tests/Kernels/Cosmos.Kernel.Tests.Pci` keeps its six configuration space tests over the legacy PCI manager and adds three that read the driver kit through `DriverInfo` only, on both architectures (arm64's EDK2 boot carries ACPI, so MCFG is present and the ECAM host node exists there): `Host_PlatformNode_BoundByPciHostDriver` (a `platform` node whose description contains `pci-host-` is `Bound` with `DriverName` `PciHostDriver`), `Host_PublishesPciNodes` (at least one `pci` node has the host's path as `ParentPath`, and every such node has `ResourceCount` 6 and `InterruptCount` 1) and `Host_NodeCount_MatchesLegacyScan` (the `pci` nodes number at least `PciManager.Count`).
 
 ### Running Kernel Tests
 
@@ -211,6 +222,7 @@ dotnet run --project tests/Cosmos.TestRunner.Engine/Cosmos.TestRunner.Engine.csp
 | HelloWorld | 60 s | 90 s |
 | Memory | 180 s | 300 s |
 | Drivers | 60 s | 120 s |
+| Pci | 60 s | 90 s |
 
 ### Output Formats
 
