@@ -1,0 +1,48 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
+namespace Cosmos.Kernel.System.Diagnostics;
+
+/// <summary>
+/// Point-in-time snapshot of one device a driver published, produced by
+/// <see cref="DriverInfo.TryGetDevice"/>. Only devices currently published
+/// appear: a withdrawn device leaves the list, so the snapshot never shows
+/// one. The snapshot is taken without locking the kit, so a device being
+/// withdrawn concurrently may still be listed for one job.
+/// </summary>
+public readonly struct PublishedDeviceInfo
+{
+    internal PublishedDeviceInfo(PublishedDeviceKind kind, string name, string? nodePath, string? driverName, bool isConsumed)
+    {
+        Kind = kind;
+        Name = name;
+        NodePath = nodePath;
+        DriverName = driverName;
+        IsConsumed = isConsumed;
+    }
+
+    /// <summary>What kind of device this is.</summary>
+    public PublishedDeviceKind Kind { get; }
+
+    /// <summary>The name the driver gave the device.</summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// Path of the device node whose driver published the device, or
+    /// <see langword="null"/> when no binding stands behind it (a device the
+    /// firmware handed over).
+    /// </summary>
+    public string? NodePath { get; }
+
+    /// <summary>
+    /// Name of the driver that published the device, or <see langword="null"/>
+    /// when no binding stands behind it.
+    /// </summary>
+    public string? DriverName { get; }
+
+    /// <summary>
+    /// Whether the kernel's manager for this kind of device received it. False
+    /// when no consumer was installed for the kind at the time of publication,
+    /// in which case the device's reports are discarded.
+    /// </summary>
+    public bool IsConsumed { get; }
+}
