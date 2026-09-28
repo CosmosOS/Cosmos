@@ -1,0 +1,23 @@
+#nullable enable
+Cosmos.Kernel.Drivers.E1000EDriver
+Cosmos.Kernel.Drivers.E1000EDriver.E1000EDriver() -> void
+Cosmos.Kernel.Drivers.E1000EState
+Cosmos.Kernel.Drivers.E1000EState.FramesReceived.get -> int
+Cosmos.Kernel.Drivers.E1000EState.FramesTransmitted.get -> int
+Cosmos.Kernel.Drivers.E1000EState.HasLine.get -> bool
+Cosmos.Kernel.Drivers.E1000EState.InterruptCount.get -> int
+Cosmos.Kernel.Drivers.E1000EState.IsPolling.get -> bool
+Cosmos.Kernel.Drivers.E1000EState.LinkChanges.get -> int
+Cosmos.Kernel.Drivers.E1000EState.LinkUp.get -> bool
+Cosmos.Kernel.Drivers.E1000EState.MacAddress.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
+Cosmos.Kernel.Drivers.E1000EState.Name.get -> string!
+Cosmos.Kernel.Drivers.E1000EState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
+Cosmos.Kernel.Drivers.PciHostDriver
+Cosmos.Kernel.Drivers.PciHostDriver.PciHostDriver() -> void
+override Cosmos.Kernel.Drivers.E1000EDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.E1000EDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.E1000EDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.E1000EDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.PciHostDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.PciHostDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.PciHostDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult

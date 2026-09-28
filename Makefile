@@ -68,6 +68,8 @@ api:
 		--diagnostics RS0016 RS0017 --severity info
 	dotnet format analyzers src/Cosmos.Kernel.HAL.Interfaces/Cosmos.Kernel.HAL.Interfaces.csproj \
 		--diagnostics RS0016 RS0017 --severity info
+	dotnet format analyzers src/Cosmos.Kernel.Drivers/Cosmos.Kernel.Drivers.csproj \
+		--diagnostics RS0016 RS0017 --severity info
 
 build:
 	dotnet publish -c Debug -r $(RID) \

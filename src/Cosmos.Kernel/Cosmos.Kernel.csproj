@@ -32,6 +32,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel.Boot.Limine\Cosmos.Kernel.Boot.Limine.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" PrivateAssets="none" />
+    <!-- The drivers Cosmos ships (single-arch lib/net10.0): default assets, like HAL.Interfaces. -->
+    <ProjectReference Include="..\Cosmos.Kernel.Drivers\Cosmos.Kernel.Drivers.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.HAL\Cosmos.Kernel.HAL.csproj" PrivateAssets="none" />
     <ProjectReference Include="..\Cosmos.Kernel.HAL.Interfaces\Cosmos.Kernel.HAL.Interfaces.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj" PrivateAssets="none" />
