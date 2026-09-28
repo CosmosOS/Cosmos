@@ -13,8 +13,11 @@ namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 /// them one at a time. Probes, teardowns and work items therefore never
 /// overlap. Without a scheduler the engine runs inline: the thread that
 /// publishes or retracts drains the queue itself, and a probe that publishes
-/// a child leaves it for the drain that is already running. Every wait on
-/// the engine watches the worker and panics if it died, rather than hang.
+/// a child leaves it for the drain that is already running. A caller waits
+/// for its own job, or for a fence queued behind everything pending, never
+/// for the queue to be empty: periodic work would keep that from ever being
+/// true. Every wait on the engine watches the worker and panics if it died,
+/// rather than hang.
 /// </summary>
 internal static class DriverEngine
 {
@@ -24,9 +27,6 @@ internal static class DriverEngine
     private static SchedSpinLock s_queueLock;
     private static EngineJob? s_head;
     private static EngineJob? s_tail;
-    private static bool s_running;
-    private static int s_quiescenceWaiters;
-    private static readonly InterruptEvent s_quiescent = new();
     private static readonly InterruptEvent s_wake = new();
 
     private static SchedulerThread? s_worker;
@@ -70,7 +70,7 @@ internal static class DriverEngine
 
         s_mode = mode;
         DriverLog.Started(HasWorker);
-        WaitUntilQuiescent();
+        WaitForQueuedJobs();
     }
 
     /// <summary>
@@ -100,11 +100,15 @@ internal static class DriverEngine
     }
 
     /// <summary>
-    /// Returns once the queue is empty and no job is running. From the worker
-    /// or inside a drain it returns at once, since waiting there would wait
-    /// for itself; before <see cref="Start"/> nothing runs, so it returns too.
+    /// Returns once every job queued before the call has run: a fence goes
+    /// to the back of the queue and the caller waits for it, so work a test
+    /// or a bus just caused (an offer, a teardown, a work item a handler
+    /// scheduled) is complete on return, while work queued afterwards, such
+    /// as periodic items, does not hold it up. From the worker or inside a
+    /// drain it returns at once, since waiting there would wait for itself;
+    /// before <see cref="Start"/> nothing runs, so it returns too.
     /// </summary>
-    public static void WaitUntilQuiescent()
+    public static void WaitForQueuedJobs()
     {
         if (!IsStarted || IsOnWorker || s_draining)
         {
@@ -117,36 +121,7 @@ internal static class DriverEngine
             return;
         }
 
-        while (true)
-        {
-            using (s_queueLock.AcquireIrqSafe())
-            {
-                if (s_head is null && !s_running)
-                {
-                    return;
-                }
-
-                s_quiescenceWaiters++;
-            }
-
-            if (!s_quiescent.Wait(PollMilliseconds))
-            {
-                using (s_queueLock.AcquireIrqSafe())
-                {
-                    if (s_quiescenceWaiters > 0)
-                    {
-                        s_quiescenceWaiters--;
-                    }
-                    else
-                    {
-                        // Signaled after the timeout: take the signal meant for us.
-                        s_quiescent.TryConsume();
-                    }
-                }
-
-                PanicIfWorkerDied();
-            }
-        }
+        Submit(new EngineJob(EngineJobKind.Fence) { Completion = new InterruptEvent() });
     }
 
     /// <summary>
@@ -329,14 +304,6 @@ internal static class DriverEngine
             job = s_head;
             if (job is null)
             {
-                s_running = false;
-                int waiters = s_quiescenceWaiters;
-                s_quiescenceWaiters = 0;
-                for (int i = 0; i < waiters; i++)
-                {
-                    s_quiescent.Signal();
-                }
-
                 return false;
             }
 
@@ -348,7 +315,6 @@ internal static class DriverEngine
 
             job.Next = null;
             job.IsQueued = false;
-            s_running = true;
             return true;
         }
     }
@@ -388,8 +354,11 @@ internal static class DriverEngine
                 case EngineJobKind.NodeRetracted:
                     TeardownNode(job.Node!, DetachCause.Retracted, job.HardwarePresent);
                     break;
-                default:
+                case EngineJobKind.RunWorkItem:
                     RunWorkItem(job.Item!);
+                    break;
+                default:
+                    // A fence: its completion below is the whole job.
                     break;
             }
         }

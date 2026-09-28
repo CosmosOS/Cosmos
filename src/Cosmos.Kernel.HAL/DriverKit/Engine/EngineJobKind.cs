@@ -13,4 +13,7 @@ internal enum EngineJobKind
 
     /// <summary>Run a driver's work item.</summary>
     RunWorkItem,
+
+    /// <summary>Run nothing: a marker whose completion says every job queued before it has run.</summary>
+    Fence,
 }
