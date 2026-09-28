@@ -12,11 +12,13 @@ using Cosmos.Kernel.Core.X64.Power;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Platform;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.X64.Devices.Clock;
 using Cosmos.Kernel.HAL.X64.Devices.Input;
-using Cosmos.Kernel.HAL.X64.Devices.Network;
 using Cosmos.Kernel.HAL.X64.Devices.Timer;
 
 namespace Cosmos.Kernel.HAL.X64;
@@ -26,10 +28,24 @@ namespace Cosmos.Kernel.HAL.X64;
 /// </summary>
 internal class X64PlatformInitializer : IPlatformInitializer
 {
+    /// <summary>The CONFIG_ADDRESS port of the legacy PCI configuration mechanism.</summary>
+    private const ushort LegacyConfigAddressPort = 0xCF8;
+
+    /// <summary>Ports the legacy mechanism occupies: CONFIG_ADDRESS and CONFIG_DATA, four bytes each.</summary>
+    private const ushort LegacyConfigPortCount = 8;
+
+    /// <summary>The PCI segment group the legacy mechanism reaches.</summary>
+    private const ushort LegacyPciSegment = 0;
+
+    /// <summary>The first bus the legacy mechanism decodes.</summary>
+    private const byte LegacyFirstBus = 0;
+
+    /// <summary>The last bus the legacy mechanism decodes: the bus field of CONFIG_ADDRESS is eight bits.</summary>
+    private const byte LegacyLastBus = 255;
+
     private PIT? _pit;
     private RTC? _rtc;
     private PS2Controller? _ps2Controller;
-    private E1000E? _networkDevice;
 
     public string PlatformName => "x86-64";
     public PlatformArchitecture Architecture => PlatformArchitecture.X64;
@@ -42,7 +58,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
     public void PreparePciMapping(ulong ecamBase)
     {
         // x64 uses legacy port I/O (0xCF8/0xCFC) for PCI config access,
-        // which bypasses the MMU — no memory mapping needed.
+        // which bypasses the MMU, so no memory mapping is needed.
     }
 
     public bool EnsureMmioMapped(ulong physBase)
@@ -59,7 +75,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
     {
         // x86-64's total store order already makes normal-memory stores
         // visible before a subsequent MMIO (UC) store, and keeps loads in
-        // program order — no fence instruction is required here.
+        // program order, so no fence instruction is required here.
     }
 
     /// <inheritdoc />
@@ -110,23 +126,28 @@ internal class X64PlatformInitializer : IPlatformInitializer
             _ps2Controller = new PS2Controller();
             _ps2Controller.Initialize();
         }
+    }
 
-        // Try to find E1000E network device (if network feature enabled)
-        if (CosmosFeatures.NetworkEnabled)
+    /// <summary>
+    /// The q35 machine description: one PCI host node over the legacy port
+    /// mechanism, buses 0 to 255 of segment 0, which the PCI host driver
+    /// enumerates. q35's MCFG is not used on x64 because sub-4 GiB MMIO
+    /// carries Limine's cacheable attributes there, and the ports need no
+    /// mapping at all. Thread context, interrupts disabled, from the HAL
+    /// library initializer; nothing when PCI is compiled out.
+    /// </summary>
+    public void PublishPlatformNodes()
+    {
+        if (!CosmosFeatures.PCIEnabled)
         {
-            Serial.WriteString("[X64HAL] Looking for E1000E network device...\n");
-            _networkDevice = E1000E.FindAndCreate();
-            if (_networkDevice != null)
-            {
-                Serial.WriteString("[X64HAL] E1000E device found, initializing...\n");
-                _networkDevice.Initialize();
-                _networkDevice.RegisterIRQHandler();
-            }
-            else
-            {
-                Serial.WriteString("[X64HAL] No E1000E device found\n");
-            }
+            return;
         }
+
+        Serial.WriteString("[X64HAL] Publishing the legacy PCI host node...\n");
+        PlatformIdentity identity = new("pci@cf8", ["pci-host-legacy"]);
+        DeviceResource[] resources = [DeviceResource.PortRange(LegacyConfigAddressPort, LegacyConfigPortCount)];
+        PciHostAccess host = PciHostAccess.ForPorts(LegacyPciSegment, LegacyFirstBus, LegacyLastBus);
+        PlatformBus.Publish(identity, resources, [], host);
     }
 
     public ITimerDevice CreateTimer()
@@ -171,12 +192,9 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
     public INetworkDevice? GetNetworkDevice()
     {
-        if (_networkDevice != null)
-        {
-            return _networkDevice;
-        }
-
-        // Virtio-net over PCI, discovered by the shared virtio PCI scan.
+        // Virtio-net over PCI, discovered by the shared virtio PCI scan. The
+        // Intel controllers are bound by the driver kit's E1000E driver and
+        // reach the ring through its network consumer, not through here.
         return VirtioDevice.GetDevice<VirtioNet>();
     }
 

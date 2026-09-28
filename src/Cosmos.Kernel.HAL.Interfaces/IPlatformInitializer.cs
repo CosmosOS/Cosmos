@@ -93,6 +93,15 @@ internal interface IPlatformInitializer
     void InitializeHardware();
 
     /// <summary>
+    /// Publishes the root platform nodes of this machine into the driver
+    /// kit: the PCI host today, every device no bus enumerates later. Called
+    /// once from the HAL library initializer after
+    /// <see cref="InitializeHardware"/>, with interrupts disabled; the nodes
+    /// are offered when the driver stage runs.
+    /// </summary>
+    void PublishPlatformNodes();
+
+    /// <summary>
     /// Creates and initializes the platform timer device.
     /// </summary>
     ITimerDevice CreateTimer();

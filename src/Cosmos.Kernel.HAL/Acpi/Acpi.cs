@@ -39,6 +39,26 @@ internal static unsafe class AcpiMcfg
     }
 
     /// <summary>
+    /// Copies the MCFG entry ACPI reported (base address, segment, first and
+    /// last bus), for the machine description that publishes the PCI host
+    /// node. Thread context; allocation-free.
+    /// </summary>
+    /// <param name="info">The entry, or default when there is none.</param>
+    /// <returns>False when ACPI was unavailable or the MCFG table was not found.</returns>
+    public static bool TryGetInfo(out McfgInfo info)
+    {
+        McfgInfo* mcfg = (McfgInfo*)AcpiMcfgNative.GetMcfgInfo();
+        if (mcfg != null && mcfg->Found != 0)
+        {
+            info = *mcfg;
+            return true;
+        }
+
+        info = default;
+        return false;
+    }
+
+    /// <summary>
     /// Gets the PCI ECAM physical base address from ACPI MCFG.
     /// Returns 0 if MCFG table was not found.
     /// </summary>
