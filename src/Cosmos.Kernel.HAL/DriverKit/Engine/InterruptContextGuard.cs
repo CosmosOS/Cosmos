@@ -47,7 +47,7 @@ internal static class InterruptContextGuard
 
         if (s_synthetic)
         {
-            throw new InvalidOperationException(string.Concat(member, " cannot be called from an interrupt handler; hand the work to a work item."));
+            throw new InvalidOperationException($"{member} cannot be called from an interrupt handler; hand the work to a work item.");
         }
 
         Panic.Halt(member);

@@ -267,7 +267,7 @@ public class Kernel : Sys.Kernel
     private static void TestDeclineUnwindsResources()
     {
         DecliningDriver? declining = RecordingDriver.Find<DecliningDriver>();
-        int heldBefore = DriverInfo.TotalHeldResourceCount;
+        int heldBefore = DriverInfo.GetTotalHeldResourceCount();
         DeviceNode node = SyntheticBus.Publish(DecliningDriver.Key, [], interruptCount: 0, windowBytes: DecliningDriver.WindowBytes);
 
         // Drains anything the declined probe left queued: a work item the
@@ -279,7 +279,7 @@ public class Kernel : Sys.Kernel
         Assert.True(offer.Outcome == DeviceOfferOutcome.Declined, "the offer should be recorded as declined");
         Assert.True(offer.Reason == DecliningDriver.Reason, "the offer should carry the driver's reason");
         Assert.Equal(DecliningDriver.AcquiredResourceCount, offer.ReleasedResourceCount, "the offer should count what the probe had acquired");
-        Assert.Equal(heldBefore, DriverInfo.TotalHeldResourceCount, "a declined probe should leave the held total unchanged");
+        Assert.Equal(heldBefore, DriverInfo.GetTotalHeldResourceCount(), "a declined probe should leave the held total unchanged");
 
         Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info), "the decline node should be in the tree");
         Assert.Equal(2, info.OfferCount, "the catch-all should be offered after the decline");
@@ -506,7 +506,7 @@ public class Kernel : Sys.Kernel
         KeyboardDriver? driver = RecordingDriver.Find<KeyboardDriver>();
         int devicesBefore = DriverInfo.DeviceCount;
         int withdrawnBefore = _keyboardConsumer.WithdrawnCount;
-        int heldBefore = DriverInfo.TotalHeldResourceCount;
+        int heldBefore = DriverInfo.GetTotalHeldResourceCount();
         PublishedDevice? published = _keyboardConsumer.LastPublished;
 
         SyntheticBus.Retract(node);
@@ -527,7 +527,7 @@ public class Kernel : Sys.Kernel
         Assert.True(info.DriverName == nameof(KeyboardDriver), "the node still names the driver that held it last");
         Assert.Equal(0, info.HeldResourceCount, "a retracted node holds nothing");
         Assert.Equal(0, info.PublishedDeviceCount, "a retracted node publishes nothing");
-        Assert.Equal(heldBefore - state.ExpectedHeldResourceCount, DriverInfo.TotalHeldResourceCount, "the held total should drop by what the binding held");
+        Assert.Equal(heldBefore - state.ExpectedHeldResourceCount, DriverInfo.GetTotalHeldResourceCount(), "the held total should drop by what the binding held");
         Assert.True(node.Binding is { IsDetaching: true }, "the binding should be flagged as detaching");
         Assert.True(access.Window.IsEmpty, "the RAM page should have gone back to the allocator");
     }

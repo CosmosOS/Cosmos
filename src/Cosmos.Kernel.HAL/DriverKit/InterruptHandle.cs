@@ -12,7 +12,6 @@ internal sealed class InterruptHandle
 {
     private readonly InterruptSource _source;
     private volatile bool _masked;
-    private InterruptTrampoline? _trampoline;
 
     internal InterruptHandle(InterruptSource source)
     {
@@ -40,17 +39,13 @@ internal sealed class InterruptHandle
     }
 
     /// <summary>The dispatcher connected for this handle.</summary>
-    internal InterruptTrampoline? Trampoline
-    {
-        get => _trampoline;
-        set => _trampoline = value;
-    }
+    internal InterruptTrampoline? Trampoline { get; set; }
 
     /// <summary>Masks the source and disconnects the handler for good. Teardown only.</summary>
     internal void Disconnect()
     {
         _masked = true;
-        _trampoline?.MarkDisconnected();
+        Trampoline?.MarkDisconnected();
         _source.Disconnect();
     }
 }

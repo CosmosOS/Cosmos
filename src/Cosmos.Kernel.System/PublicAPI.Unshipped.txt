@@ -672,10 +672,10 @@ override Cosmos.Kernel.System.Network.NetworkAdapter.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.NetworkAdapter.GetHashCode() -> int
 static Cosmos.Kernel.System.Diagnostics.DriverInfo.DeviceCount.get -> int
 static Cosmos.Kernel.System.Diagnostics.DriverInfo.DriverCount.get -> int
+static Cosmos.Kernel.System.Diagnostics.DriverInfo.GetTotalHeldResourceCount() -> int
 static Cosmos.Kernel.System.Diagnostics.DriverInfo.HasWorker.get -> bool
 static Cosmos.Kernel.System.Diagnostics.DriverInfo.IsStarted.get -> bool
 static Cosmos.Kernel.System.Diagnostics.DriverInfo.NodeCount.get -> int
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.TotalHeldResourceCount.get -> int
 static Cosmos.Kernel.System.Diagnostics.DriverInfo.TryGetDevice(int index, out Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo info) -> bool
 static Cosmos.Kernel.System.Diagnostics.DriverInfo.TryGetDriver(int index, out Cosmos.Kernel.System.Diagnostics.DriverEntryInfo info) -> bool
 static Cosmos.Kernel.System.Diagnostics.DriverInfo.TryGetNode(int index, out Cosmos.Kernel.System.Diagnostics.DeviceNodeInfo info) -> bool

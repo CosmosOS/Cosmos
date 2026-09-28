@@ -43,7 +43,9 @@ internal sealed class PublishedDevice
     /// <summary>True once withdrawn; sinks discard reports from then on.</summary>
     public bool IsWithdrawn => _withdrawn;
 
+    /// <summary>Records that a consumer received the device. Registry only.</summary>
     internal void MarkConsumed() => _consumed = true;
 
+    /// <summary>Stops every sink report from here on. Registry only.</summary>
     internal void MarkWithdrawn() => _withdrawn = true;
 }

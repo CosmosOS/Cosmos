@@ -28,15 +28,9 @@ internal static class SyntheticBus
     public static DeviceNode Publish(string key, byte[] data, int interruptCount = 0, int windowBytes = 0)
     {
         InterruptContextGuard.ThrowIfInHandler(nameof(Publish));
-        if (interruptCount < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(interruptCount), interruptCount, "The interrupt count is not negative.");
-        }
-
-        if (windowBytes < 0 || (ulong)windowBytes > PageAllocator.PageSize)
-        {
-            throw new ArgumentOutOfRangeException(nameof(windowBytes), windowBytes, "The window is at most one page.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(interruptCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(windowBytes);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan((ulong)windowBytes, PageAllocator.PageSize, nameof(windowBytes));
 
         SyntheticPage? page = null;
         DeviceResource[] resources = [];
@@ -91,10 +85,8 @@ internal static class SyntheticBus
     public static bool RaiseInterrupt(DeviceNode node, int index)
     {
         InterruptContextGuard.ThrowIfInHandler(nameof(RaiseInterrupt));
-        if (index < 0 || index >= node.Interrupts.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), index, "The node has no interrupt at this index.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, node.Interrupts.Count);
 
         if (!DriverEngine.IsStarted)
         {

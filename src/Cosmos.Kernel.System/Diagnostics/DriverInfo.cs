@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// Three shapes report "nothing there", and which one a member uses follows
 /// from what it is. A plain read answers with its own empty value, so
 /// <see cref="IsStarted"/> and <see cref="HasWorker"/> are false and
-/// <see cref="DeviceCount"/> and <see cref="TotalHeldResourceCount"/> are 0
+/// <see cref="DeviceCount"/> and <see cref="GetTotalHeldResourceCount"/> are 0
 /// before the engine starts, with no separate error channel.
 /// <see cref="DriverCount"/> and <see cref="NodeCount"/> can be non-zero
 /// before then: the manifest registers its drivers ahead of the start, and a
@@ -28,8 +28,11 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// <see cref="TryGetDriver"/>, <see cref="TryGetNode"/>,
 /// <see cref="TryGetOffer"/> and <see cref="TryGetDevice"/> are
 /// <c>Try</c> members and the bool carries that answer: false for an index
-/// out of range, which before the start is every index. Nothing here acts on
-/// the kit, so nothing throws.
+/// out of range, which before the start is every device and offer index,
+/// while a driver or node index can already be valid then, as said above.
+/// <see cref="GetTotalHeldResourceCount"/> is a method because it adds the
+/// counts up on every call rather than handing back a value the kit holds.
+/// Nothing here acts on the kit, so nothing throws.
 /// </para>
 /// </summary>
 public static class DriverInfo
@@ -78,23 +81,20 @@ public static class DriverInfo
     /// what a retraction could not take back is per node, in
     /// <see cref="DeviceNodeInfo.LeakedResourceCount"/>.
     /// </summary>
-    public static int TotalHeldResourceCount
+    public static int GetTotalHeldResourceCount()
     {
-        get
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        int total = 0;
+        for (int i = 0; i < nodes.Count; i++)
         {
-            IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
-            int total = 0;
-            for (int i = 0; i < nodes.Count; i++)
+            DeviceNode node = nodes[i];
+            if (node.State == NodeState.Bound && node.Binding is DeviceBinding binding)
             {
-                DeviceNode node = nodes[i];
-                if (node.State == NodeState.Bound && node.Binding is DeviceBinding binding)
-                {
-                    total += binding.HeldResourceCount;
-                }
+                total += binding.HeldResourceCount;
             }
-
-            return total;
         }
+
+        return total;
     }
 
     /// <summary>
