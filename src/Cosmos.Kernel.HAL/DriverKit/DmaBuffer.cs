@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
@@ -17,7 +18,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// is collected when nothing references an array, and a device holds no
 /// reference.
 /// </summary>
-internal sealed unsafe class DmaBuffer : IKitResource
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed unsafe class DmaBuffer : IKitResource
 {
     /// <summary>Virtual address of the first byte, inside the pages freed on release.</summary>
     private readonly ulong _address;

@@ -1,12 +1,15 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
 /// What a device can address, for <see cref="DeviceBinding.AllocateDma"/>.
 /// The default asks for nothing beyond the alignment.
 /// </summary>
-internal readonly struct DmaConstraints
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public readonly struct DmaConstraints
 {
     private DmaConstraints(bool below4GiB)
     {

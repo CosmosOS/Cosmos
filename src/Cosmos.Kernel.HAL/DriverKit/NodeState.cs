@@ -1,9 +1,12 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>Where a <see cref="DeviceNode"/> is in its life.</summary>
-internal enum NodeState
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public enum NodeState
 {
     /// <summary>Published, not yet offered to any driver.</summary>
     Pending,

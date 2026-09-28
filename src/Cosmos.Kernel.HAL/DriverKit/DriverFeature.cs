@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -10,7 +12,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// members mirror the properties of <c>Cosmos.Kernel.System.KernelFeatures</c>
 /// by name; a host-side test keeps the two lists equal.
 /// </summary>
-internal enum DriverFeature
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public enum DriverFeature
 {
     /// <summary>No feature: the driver is registered in every kernel that carries its assembly.</summary>
     None,

@@ -1,9 +1,12 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Synthetic;
 
 /// <summary>The identity of a synthetic device: a key the test chose. Path is <c>synthetic:key</c>.</summary>
-internal sealed class SyntheticIdentity : DeviceIdentity
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class SyntheticIdentity : DeviceIdentity
 {
     internal SyntheticIdentity(string key)
     {

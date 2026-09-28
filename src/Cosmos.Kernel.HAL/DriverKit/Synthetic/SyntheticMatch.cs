@@ -1,9 +1,12 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Synthetic;
 
 /// <summary>A match over synthetic identities: one key (specificity 1) or any synthetic device (specificity 0).</summary>
-internal sealed class SyntheticMatch : DeviceMatch
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class SyntheticMatch : DeviceMatch
 {
     private readonly string? _key;
 

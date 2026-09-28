@@ -1,9 +1,12 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Devices;
 
 /// <summary>What a display driver implements and hands to <see cref="DeviceBinding.PublishDisplay"/>. Called by the ring in thread context.</summary>
-internal interface IDisplay
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public interface IDisplay
 {
     /// <summary>The current mode.</summary>
     DisplayMode Mode { get; }

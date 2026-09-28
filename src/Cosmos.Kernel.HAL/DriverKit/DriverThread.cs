@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
@@ -10,7 +11,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// Its body loops on the binding's events until <see cref="DeviceBinding.IsDetaching"/>
 /// turns true, then returns; teardown joins it with a bounded wait.
 /// </summary>
-internal sealed class DriverThread
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class DriverThread
 {
     private readonly Action _entry;
     private SchedulerThread? _thread;

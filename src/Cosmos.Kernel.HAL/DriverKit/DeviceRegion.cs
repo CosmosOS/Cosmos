@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
@@ -13,7 +14,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// <see cref="DmaBuffer.WriteBarrier"/> and <see cref="DmaBuffer.ReadBarrier"/>.
 /// The accessors neither allocate nor block.
 /// </summary>
-internal sealed unsafe class DeviceRegion : IKitResource
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed unsafe class DeviceRegion : IKitResource
 {
     private readonly ulong _address;
 

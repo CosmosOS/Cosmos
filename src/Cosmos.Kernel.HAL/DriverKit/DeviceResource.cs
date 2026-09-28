@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -9,7 +11,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// whatever the architecture, and the kit maps it with the attributes the
 /// architecture needs.
 /// </summary>
-internal readonly struct DeviceResource
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public readonly struct DeviceResource
 {
     /// <summary>Number of I/O ports an x64 machine decodes.</summary>
     private const uint PortSpaceSize = 0x10000;

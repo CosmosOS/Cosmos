@@ -1,12 +1,15 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
 /// The kind of a <see cref="DeviceResource"/>: what its base and length mean
 /// and how the kit maps it.
 /// </summary>
-internal enum DeviceResourceKind
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public enum DeviceResourceKind
 {
     /// <summary>
     /// A window of physical address space the device decodes: base is a

@@ -13,7 +13,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// can say what happened to it. Lists a reader may see while the worker
 /// appends are copy-on-write arrays, so a snapshot is always consistent.
 /// </summary>
-internal sealed class DeviceNode
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public sealed class DeviceNode
 {
     private readonly DeviceResource[] _resources;
     private readonly InterruptSource[] _interrupts;

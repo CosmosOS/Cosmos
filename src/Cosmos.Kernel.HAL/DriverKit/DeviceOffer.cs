@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -7,7 +9,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// diagnostics view: which drivers were tried, in what order, and why each
 /// one passed.
 /// </summary>
-internal readonly struct DeviceOffer
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public readonly struct DeviceOffer
 {
     internal DeviceOffer(string driverName, int priority, int specificity, ProbeOutcome outcome, string? reason, int releasedResourceCount)
     {

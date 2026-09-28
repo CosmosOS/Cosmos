@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
@@ -22,7 +24,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// context and reach only what the binding says they may.
 /// </para>
 /// </summary>
-internal abstract class Driver
+[Experimental(Experimentals.DriverKitSeamDiagId)]
+public abstract class Driver
 {
     /// <summary>The driver's name, as it appears in the log and the diagnostics view.</summary>
     public abstract string Name { get; }
