@@ -26,7 +26,7 @@ Every type under `Cosmos.Kernel.HAL.DriverKit` (`Driver`, `DriverAttribute`, `De
 
 See [Public API Tracking](../dev/public-api.md) for how experimental seams fit the surface policy.
 
-The kit is being built in stages, so what exists today is worth stating before anything else:
+The kit is being built in stages. What exists today:
 
 - **One bus kind: the synthetic bus.** A node reaches the kit only through `SyntheticBus.Publish`. PCI, virtio, USB, PS/2 and platform nodes are later stages, so a driver for real hardware cannot be bound yet, and the device drivers the kernel ships (PS/2, virtio, the NICs, the storage controllers) still live in the HAL outside the kit.
 - **No kernel manager consumes a published device yet.** `PublishKeyboard` records the keyboard, logs it and hands back a working sink, but `KeyboardManager` does not subscribe to the kit, so a key reported through the sink reaches nobody until a later stage, and the log line says `(no consumer)`. The same holds for pointers, network interfaces, block devices and displays.
@@ -146,7 +146,7 @@ When a node appears, the kit collects every registered driver with a matching en
 [Drivers] synthetic:prio offer HighPriorityDriver -> bound
 ```
 
-Each candidate is offered the node with a fresh binding, and the first to return `Bound` keeps it. A node no driver matched is logged `no driver` and stays in the tree as `Unbound`, so the diagnostics view can show it. Priority is how a kernel's own driver overrides a framework one for the same hardware: return more than `0` and match at least as specifically.
+Each candidate is offered the node with a fresh binding, and the first to return `Bound` keeps it. A node no driver matched is logged `no driver` and stays in the tree as `Unbound`, so the diagnostics view can show it. Priority is how a kernel's own driver overrides a framework one for the same hardware: return more than `0`; specificity only breaks a tie in priority.
 
 ## Probe and the binding
 
@@ -327,7 +327,7 @@ The `InterruptHandle` masks and unmasks from any context (`Mask()`, `Unmask()`, 
 
 `binding.CreateEvent()` returns a `DeviceEvent`: a counted signal between a handler and a thread. A handler signals it, through `context.Signal(evt)` or `evt.Signal()`; a thread waits through `binding.Wait(evt, timeoutMilliseconds)`, which is the only way to wait, so a handler holding the event cannot block on it. `Wait` returns `true` when a signal was consumed, `false` on timeout, and `false` at once and forever once teardown began (`evt.IsCancelled`).
 
-The binding also carries `DetachEvent`, cancelled first when teardown begins, so a thread that waits on it, or on any event of the binding, wakes, finds `IsDetaching` true and returns.
+The binding also carries `DetachEvent`, cancelled first among the events once teardown reaches them (step 5 below), so a thread that waits on it, or on any event of the binding, wakes, finds `IsDetaching` true and returns.
 
 Two more thread-context waits live on the binding: `Delay(microseconds)` busy-waits on the platform's calibrated source, for a register that needs a moment, and `Sleep(milliseconds)` gives up the CPU (a scheduler sleep on a driver thread or the worker, a busy wait without a scheduler).
 
@@ -485,7 +485,7 @@ Removal, whether a bus retracting a node, a parent binding going away, or a test
 2. Child nodes are retracted, recursively; leaf bindings go first.
 3. Published devices are withdrawn: the consumer, when there is one, is told, and every sink goes quiet.
 4. Interrupt handles are masked at the controller and disconnected; no handler of this binding runs again.
-5. `DetachEvent` and every event are cancelled, periodic work is unregistered, work items are cancelled and taken out of the queue, and driver threads are joined with the 500 ms bound.
+5. `DetachEvent` is cancelled, periodic work is unregistered, work items are cancelled and taken out of the queue, every other event is cancelled, and driver threads are joined with the 500 ms bound.
 6. `Driver.OnDetach(binding, reason)` runs.
 7. Memory is released in reverse order of acquisition: DMA buffers freed, regions and windows invalidated. When a thread did not stop, this step is skipped and the node's `LeakedResourceCount` says how much stays allocated.
 
@@ -529,7 +529,7 @@ for (int i = 0; i < DriverInfo.NodeCount; i++)
 {
     if (DriverInfo.TryGetNode(i, out DeviceNodeInfo node))
     {
-        Console.WriteLine($"{node.Path} {node.State} {node.DriverName ?? "-"} held {node.HeldResourceCount}");
+        Console.WriteLine($"{node.Path} {node.DriverName ?? "no driver"} held {node.HeldResourceCount}");
     }
 }
 ```
@@ -544,7 +544,7 @@ The synthetic bus exists so that a driver's binding, arbitration, decline and re
 |--------|--------------|
 | `Publish(key, data, interruptCount = 0, windowBytes = 0)` | Publishes a node at `synthetic:key`. `data` is a byte array the driver can read through the node's `SyntheticAccess`; `interruptCount` is how many sources the node has; `windowBytes` (up to one page) gives it a RAM-backed register window as resource 0. After the driver stage it returns once the node was offered; before it, it returns at once and the stage offers the node |
 | `Retract(node, hardwarePresent = false)` | Takes the node away; returns once its binding was torn down. `hardwarePresent` is what the driver's `DetachReason.HardwarePresent` says, false as for a hot-unplug by default |
-| `RaiseInterrupt(node, index)` | Runs the handler connected to that source in a synthetic dispatch, with interrupts masked and the guard on; returns `false` when nothing is connected or the source is masked |
+| `RaiseInterrupt(node, index)` | Runs the handler connected to that source in a synthetic dispatch, with interrupts masked and the guard on; returns `false` before the driver stage has run, when nothing is connected, or when the source is masked |
 | `WaitForQueuedJobs()` | Returns once every kit job queued before the call has run: a work item a handler scheduled, a teardown a driver queued. The hook for asserting after `RaiseInterrupt` |
 
 The node's access object, `node.Access<SyntheticAccess>()`, is how the test sees the device from the other side: `Data` are the bytes it attached, `HasWindow` says whether resource 0 exists, and `Window` is the register window's memory as the test sees it, so a test can write what the driver's handler will read and read what the probe wrote. `Window` is empty once the node was retracted and the page released.
@@ -616,9 +616,11 @@ A driver that ships on its own is a class library that references `Cosmos.Kernel
 </Project>
 ```
 
+The sample leaves package versions to central package management, as the kernel projects in the tree do; a library without a `Directory.Packages.props` gives each reference the `Version` its kernel uses.
+
 `CosmosDriverAssembly` is what makes the library's build the proof that it uses only what any kernel author can use. The analyzer package, which every kernel already gets through the SDK, brings the `CompilerVisibleProperty` that lets its rules read the property, and enforces three things on such an assembly:
 
-- It is a **User** layer assembly whatever its name, judged on the types and members its code names rather than on the reference list restore builds: it may name what `Cosmos.Kernel.System` offers, what `Cosmos.Kernel.HAL` offers for the kit, and the device contracts in `Cosmos.Kernel.HAL.Interfaces` that the kit's surface names (`IBlockDevice`, `MACAddress`), and nothing lower. `Cosmos.Kernel.HAL.X64`, `Cosmos.Kernel.HAL.ARM64` and `Cosmos.Kernel.Core` sit on the reference list because the HAL was built against them; naming a type or member from one of them is `NAOT0007`.
+- It is a **User** layer assembly whatever its name, judged on the types and members its code names rather than on the reference list restore builds: it may name what `Cosmos.Kernel.System` offers, what `Cosmos.Kernel.HAL` offers for the kit, and the device contracts in `Cosmos.Kernel.HAL.Interfaces` that the kit's surface names (`IBlockDevice`, `MACAddress`), and nothing lower. `Cosmos.Kernel.Core` sits on the reference list because the HAL and the ring were built against it, as do `Cosmos.Kernel.Boot.Limine` and the `Cosmos.Build.*` assemblies; naming a type or member from `Cosmos.Kernel.Core` is `NAOT0007`.
 - `NAOT0008`: no `[UnsafeAccessor]` or `[UnsafeAccessorType]` anywhere in it, which closes the one hatch that would reach internals without a grant.
 - `NAOT0009`: no `Cosmos.*` assembly it references grants it `InternalsVisibleTo`.
 

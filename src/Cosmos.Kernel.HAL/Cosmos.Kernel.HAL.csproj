@@ -13,7 +13,7 @@
     <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
-         the VFS contract types only. -->
+         the VFS contract types and the driver kit seam (COSMOS0003). -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
   <ItemGroup>
