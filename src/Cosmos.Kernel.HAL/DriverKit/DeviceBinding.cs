@@ -17,7 +17,9 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// written to its ledger: windows, regions, DMA memory, interrupts, events,
 /// work items, periodic work, threads, published devices, child nodes. When
 /// the driver declines, fails, or the device goes away, the kit releases the
-/// ledger in a fixed order and the driver frees nothing itself.
+/// ledger in a fixed order and the driver frees nothing itself. A
+/// <see cref="DeviceLock"/> is the one thing on the ledger that is nothing
+/// to release: it is recorded for the diagnostics only.
 /// <para>
 /// Every member here is thread context: probe, work items, driver threads.
 /// Called from an interrupt handler, a member stops with an exception naming
@@ -50,6 +52,7 @@ public sealed unsafe partial class DeviceBinding
     private readonly List<DriverThread> _threads = new();
     private readonly List<PublishedDevice> _devices = new();
     private readonly List<DeviceNode> _children = new();
+    private readonly List<DeviceLock> _locks = new();
 
     internal DeviceBinding(DeviceNode node, Driver driver)
     {
@@ -91,6 +94,9 @@ public sealed unsafe partial class DeviceBinding
     /// <summary>Devices the binding has published and not yet withdrawn.</summary>
     internal int PublishedDeviceCount => _devices.Count;
 
+    /// <summary>Locks the driver created through <see cref="CreateLock"/>; not resources, not released.</summary>
+    internal int LockCount => _locks.Count;
+
     /// <summary>True when the calling code runs on one of this binding's driver threads.</summary>
     internal bool IsCurrentThreadOwned
     {
@@ -119,7 +125,7 @@ public sealed unsafe partial class DeviceBinding
     /// <param name="resourceIndex">Index into <see cref="DeviceNode.Resources"/>.</param>
     /// <exception cref="ArgumentOutOfRangeException">No such resource.</exception>
     /// <exception cref="PlatformNotSupportedException">A port range on an architecture without port I/O.</exception>
-    /// <exception cref="InvalidOperationException">The window overlaps the kernel heap, cannot be mapped, the binding is being torn down, or the caller is an interrupt handler.</exception>
+    /// <exception cref="InvalidOperationException">The slot is unassigned (<see cref="DeviceResource.None"/>), the window overlaps the kernel heap, cannot be mapped, the binding is being torn down, or the caller is an interrupt handler.</exception>
     public RegisterWindow MapRegisters(int resourceIndex)
     {
         ThrowIfNotThreadContext(nameof(MapRegisters));
@@ -153,7 +159,7 @@ public sealed unsafe partial class DeviceBinding
     /// <param name="caching">The caching the driver wants; recorded on the region.</param>
     /// <exception cref="ArgumentOutOfRangeException">No such resource.</exception>
     /// <exception cref="ArgumentException">The resource is a port range.</exception>
-    /// <exception cref="InvalidOperationException">The window overlaps the kernel heap, cannot be mapped, the binding is being torn down, or the caller is an interrupt handler.</exception>
+    /// <exception cref="InvalidOperationException">The slot is unassigned (<see cref="DeviceResource.None"/>), the window overlaps the kernel heap, cannot be mapped, the binding is being torn down, or the caller is an interrupt handler.</exception>
     public DeviceRegion MapRegion(int resourceIndex, RegionCaching caching)
     {
         ThrowIfNotThreadContext(nameof(MapRegion));
@@ -276,6 +282,21 @@ public sealed unsafe partial class DeviceBinding
         DeviceEvent evt = new();
         Record(_events, evt, nameof(CreateEvent));
         return evt;
+    }
+
+    /// <summary>
+    /// Creates a lock for a device entered from more than one context at
+    /// once; see <see cref="DeviceLock"/>. Recorded for the diagnostics
+    /// only: it holds no resource, is not counted among them and needs no
+    /// release.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The binding is being torn down, or the caller is an interrupt handler.</exception>
+    public DeviceLock CreateLock()
+    {
+        ThrowIfNotThreadContext(nameof(CreateLock));
+        DeviceLock created = new();
+        Record(_locks, created, nameof(CreateLock));
+        return created;
     }
 
     /// <summary>Creates a work item that runs <paramref name="callback"/> on the kit worker when scheduled.</summary>
@@ -406,11 +427,18 @@ public sealed unsafe partial class DeviceBinding
         DriverLog.DriverMessage(Node, Driver, message);
     }
 
+    /// <summary>The resource at <paramref name="resourceIndex"/>, once it is known to exist and to be assigned.</summary>
     private DeviceResource ResourceAt(int resourceIndex)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(resourceIndex);
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceIndex, Node.Resources.Count);
-        return Node.Resources[resourceIndex];
+        DeviceResource resource = Node.Resources[resourceIndex];
+        if (resource.IsNone)
+        {
+            throw new InvalidOperationException($"resource {resourceIndex} is not assigned");
+        }
+
+        return resource;
     }
 
     private static void ThrowIfNoPortIO()
@@ -423,7 +451,7 @@ public sealed unsafe partial class DeviceBinding
 
     /// <summary>
     /// The virtual address of a memory window: the HHDM alias, once the
-    /// platform has mapped both ends of it. Refuses a window that overlaps
+    /// platform has mapped every block of it. Refuses a window that overlaps
     /// the kernel heap, which on ARM64 would turn heap pages into device
     /// memory.
     /// </summary>
@@ -435,10 +463,7 @@ public sealed unsafe partial class DeviceBinding
             throw new InvalidOperationException("The window overlaps the kernel heap.");
         }
 
-        IPlatformInitializer? initializer = PlatformHAL.Initializer;
-        if (initializer is null
-            || !initializer.EnsureMmioMapped(resource.PhysicalBase)
-            || !initializer.EnsureMmioMapped(resource.PhysicalBase + resource.Length - 1))
+        if (!DeviceMemory.EnsureWindowMapped(resource.PhysicalBase, resource.Length))
         {
             throw new InvalidOperationException("The window cannot be mapped.");
         }

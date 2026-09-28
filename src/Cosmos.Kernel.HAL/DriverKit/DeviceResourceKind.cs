@@ -31,4 +31,11 @@ public enum DeviceResourceKind
     /// it, heap included, into uncacheable device memory.
     /// </summary>
     RamWindow,
+
+    /// <summary>
+    /// No resource: a slot the bus keeps so the indices after it stay
+    /// stable (a PCI function's six BARs) with nothing assigned to it. The
+    /// binding refuses to map it.
+    /// </summary>
+    None,
 }

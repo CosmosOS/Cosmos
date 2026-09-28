@@ -19,7 +19,12 @@ public sealed class NetworkSink
         _device = device;
     }
 
-    /// <summary>Reports a received frame; the span is valid for the call only.</summary>
+    /// <summary>
+    /// Reports a received frame; the span is valid for the call only. The
+    /// ring's consumer needs thread context (it copies the frame), so a
+    /// network driver delivers from a work item; a driver that must deliver
+    /// from its handler waits for a preallocated pool in the ring.
+    /// </summary>
     /// <param name="frame">The frame, without checksum.</param>
     public void Receive(ReadOnlySpan<byte> frame)
     {

@@ -34,10 +34,11 @@ public abstract partial class Kernel
 
     /// <summary>
     /// Starts the kernel lifecycle. Called by the generated entry point.
-    /// Interrupts are enabled and the driver stage runs first, so
-    /// <see cref="OnBoot"/> and everything after it see the devices the
-    /// kernel's drivers bound; a kernel that overrides this method owns that
-    /// whole sequence.
+    /// Interrupts are enabled and the driver stage runs first, returning
+    /// once every node, the children a bus driver published from its probe
+    /// included, has been offered, so <see cref="OnBoot"/> and everything
+    /// after it see the devices the kernel's drivers bound; a kernel that
+    /// overrides this method owns that whole sequence.
     /// </summary>
     public virtual void Start()
     {
@@ -50,7 +51,8 @@ public abstract partial class Kernel
         }
 
         // The driver stage: offers every node published so far to the
-        // drivers in the manifest, and returns once they have all answered.
+        // drivers in the manifest, children included, and returns once
+        // every one of them has been offered.
         Serial.WriteString("[Kernel] Starting drivers...\n");
         DriverEngine.Start();
 

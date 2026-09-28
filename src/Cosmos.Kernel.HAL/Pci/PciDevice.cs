@@ -1,12 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Boot.Limine;
-using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.Pci.Enums;
-using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.HAL.Pci;
 
@@ -75,59 +71,6 @@ internal class PciDevice : Device
 
     /// <summary>Command register flags set by EnableMemory: I/O Space, Memory Space and Bus Master (bits 2:0).</summary>
     private const ushort CommandEnableFlags = (ushort)(PciCommand.Io | PciCommand.Memory | PciCommand.Master);
-
-    // x86 Configuration Mechanism #1 (CONFIG_ADDRESS) encoding.
-    /// <summary>CONFIG_ADDRESS I/O port of Configuration Mechanism #1 (0xCF8).</summary>
-    private const ushort ConfigAddressPort = 0xCF8;
-    /// <summary>CONFIG_DATA I/O port of Configuration Mechanism #1 (32-bit window at 0xCFC..0xCFF).</summary>
-    private const ushort ConfigDataPort = 0xCFC;
-    /// <summary>Enable bit (bit 31) of the CONFIG_ADDRESS value for Configuration Mechanism #1.</summary>
-    private const uint ConfigEnableBit = 0x80000000;
-    /// <summary>Shift placing the bus number into CONFIG_ADDRESS bits 23:16.</summary>
-    private const int ConfigBusShift = 16;
-    /// <summary>Mask for the 5-bit device (slot) number.</summary>
-    private const uint ConfigSlotMask = 0x1F;
-    /// <summary>Shift placing the slot number into CONFIG_ADDRESS bits 15:11.</summary>
-    private const int ConfigSlotShift = 11;
-    /// <summary>Mask for the 3-bit function number.</summary>
-    private const uint ConfigFunctionMask = 0x07;
-    /// <summary>Shift placing the function number into CONFIG_ADDRESS bits 10:8.</summary>
-    private const int ConfigFunctionShift = 8;
-    /// <summary>Mask aligning a config-space offset down to its containing dword.</summary>
-    private const byte ConfigDwordAlignMask = 0xFC;
-    /// <summary>Byte-lane mask: offset of a byte within the 32-bit data window at 0xCFC..0xCFF.</summary>
-    private const byte ConfigByteLaneMask = 3;
-    /// <summary>Word-lane mask: offset of a 16-bit word within the 32-bit data window.</summary>
-    private const byte ConfigWordLaneMask = 2;
-    /// <summary>Number of bytes in one config-space dword.</summary>
-    private const int ConfigDwordSizeBytes = 4;
-    /// <summary>Number of bits per byte, used to convert a byte lane into a shift amount.</summary>
-    private const int BitsPerByte = 8;
-    /// <summary>Mask extracting one byte from the 32-bit config data value.</summary>
-    private const uint ConfigByteMask = 0xFF;
-    /// <summary>Mask extracting one word from the 32-bit config data value.</summary>
-    private const uint ConfigWordMask = 0xFFFF;
-
-    // PCIe ECAM (Enhanced Configuration Access Mechanism) address encoding.
-    /// <summary>Shift placing the bus number into ECAM address bits 27:20.</summary>
-    private const int EcamBusShift = 20;
-    /// <summary>Shift placing the device (slot) number into ECAM address bits 19:15.</summary>
-    private const int EcamSlotShift = 15;
-    /// <summary>Shift placing the function number into ECAM address bits 14:12.</summary>
-    private const int EcamFunctionShift = 12;
-
-    // ECAM Base Address (discovered from ACPI MCFG table at runtime)
-    private static ulong s_pciEcamBase;
-
-    /// <summary>
-    /// Pairs each CONFIG_ADDRESS write with the CONFIG_DATA access that
-    /// follows it. Mechanism #1 is two port operations on one shared
-    /// address latch: a thread preempted between them resumes against
-    /// whatever register another thread selected meanwhile. IRQ-safe so the
-    /// holder cannot be preempted while others spin. ECAM needs no lock:
-    /// each access there is a single load or store.
-    /// </summary>
-    private static SchedSpinLock s_configLock;
 
     public readonly PciBaseAddressBar[]? BaseAddressBar;
 
@@ -335,158 +278,46 @@ internal class PciDevice : Device
 
     #region ConfigSpaceAccess
 
-    private static byte ReadConfig8(ushort bus, ushort slot, ushort func, byte offset)
-    {
-#if ARCH_ARM64
-        ulong addr = GetEcamAddress(bus, slot, func, offset);
-        return Native.MMIO.Read8(addr);
-#else
-        uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        using (SelectConfigAddress(xAddr))
-        {
-            return (byte)((PlatformHAL.PortIO.ReadDWord(ConfigDataPort) >> (offset % ConfigDwordSizeBytes * BitsPerByte)) & ConfigByteMask);
-        }
-#endif
-    }
+    // The six primitives every legacy path lands on: the mechanism is
+    // PciConfigSpace.Legacy, chosen per architecture by SetEcamBase, so
+    // the port and ECAM paths compile on both architectures.
 
-    private static void WriteConfig8(ushort bus, ushort slot, ushort func, byte offset, byte value)
-    {
-#if ARCH_ARM64
-        ulong addr = GetEcamAddress(bus, slot, func, offset);
-        Native.MMIO.Write8(addr, value);
-#else
-        uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        // PCI Configuration Mechanism #1 mirrors the 32-bit data port at
-        // 0xCFC..0xCFF. A byte access to offset N within the dword must
-        // hit port 0xCFC + (N & 3), otherwise the byte lands at the wrong
-        // position in the dword.
-        ushort dataPort = (ushort)(ConfigDataPort + (offset & ConfigByteLaneMask));
-        using (SelectConfigAddress(xAddr))
-        {
-            PlatformHAL.PortIO.WriteByte(dataPort, value);
-        }
-#endif
-    }
+    private static byte ReadConfig8(ushort bus, ushort slot, ushort func, byte offset) =>
+        PciConfigSpace.Legacy.Read8((byte)bus, (byte)slot, (byte)func, offset);
 
-    private static bool s_firstAccessLogged = false;
+    private static void WriteConfig8(ushort bus, ushort slot, ushort func, byte offset, byte value) =>
+        PciConfigSpace.Legacy.Write8((byte)bus, (byte)slot, (byte)func, offset, value);
 
-    private static ushort ReadConfig16(ushort bus, ushort slot, ushort func, byte offset)
-    {
-#if ARCH_ARM64
-        ulong addr = GetEcamAddress(bus, slot, func, offset);
-        if (!s_firstAccessLogged)
-        {
-            Serial.WriteString("[PciDevice] First ECAM Read: Bus ");
-            Serial.WriteNumber(bus);
-            Serial.WriteString(" Slot ");
-            Serial.WriteNumber(slot);
-            Serial.WriteString(" Func ");
-            Serial.WriteNumber(func);
-            Serial.WriteString(" Offset ");
-            Serial.WriteNumber(offset);
-            Serial.WriteString(" -> Addr 0x");
-            Serial.WriteHex(addr);
-            Serial.WriteString("\n");
-            s_firstAccessLogged = true;
-        }
-        return Native.MMIO.Read16(addr);
-#else
-        uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        using (SelectConfigAddress(xAddr))
-        {
-            return (ushort)((PlatformHAL.PortIO.ReadDWord(ConfigDataPort) >> (offset % ConfigDwordSizeBytes * BitsPerByte)) & ConfigWordMask);
-        }
-#endif
-    }
+    private static ushort ReadConfig16(ushort bus, ushort slot, ushort func, byte offset) =>
+        PciConfigSpace.Legacy.Read16((byte)bus, (byte)slot, (byte)func, offset);
 
-    private static void WriteConfig16(ushort bus, ushort slot, ushort func, byte offset, ushort value)
-    {
-#if ARCH_ARM64
-        ulong addr = GetEcamAddress(bus, slot, func, offset);
-        Native.MMIO.Write16(addr, value);
-#else
-        uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        // 16-bit access at offset 2 within the dword must hit port 0xCFE,
-        // not 0xCFC — see WriteConfig8 for the rationale.
-        ushort dataPort = (ushort)(ConfigDataPort + (offset & ConfigWordLaneMask));
-        using (SelectConfigAddress(xAddr))
-        {
-            PlatformHAL.PortIO.WriteWord(dataPort, value);
-        }
-#endif
-    }
+    private static void WriteConfig16(ushort bus, ushort slot, ushort func, byte offset, ushort value) =>
+        PciConfigSpace.Legacy.Write16((byte)bus, (byte)slot, (byte)func, offset, value);
 
-    private static uint ReadConfig32(ushort bus, ushort slot, ushort func, byte offset)
-    {
-#if ARCH_ARM64
-        ulong addr = GetEcamAddress(bus, slot, func, offset);
-        return Native.MMIO.Read32(addr);
-#else
-        uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        using (SelectConfigAddress(xAddr))
-        {
-            return PlatformHAL.PortIO.ReadDWord(ConfigDataPort);
-        }
-#endif
-    }
+    private static uint ReadConfig32(ushort bus, ushort slot, ushort func, byte offset) =>
+        PciConfigSpace.Legacy.Read32((byte)bus, (byte)slot, (byte)func, offset);
 
-    private static void WriteConfig32(ushort bus, ushort slot, ushort func, byte offset, uint value)
-    {
-#if ARCH_ARM64
-        ulong addr = GetEcamAddress(bus, slot, func, offset);
-        Native.MMIO.Write32(addr, value);
-#else
-        uint xAddr = GetAddressBase(bus, slot, func) | (uint)(offset & ConfigDwordAlignMask);
-        using (SelectConfigAddress(xAddr))
-        {
-            PlatformHAL.PortIO.WriteDWord(ConfigDataPort, value);
-        }
-#endif
-    }
+    private static void WriteConfig32(ushort bus, ushort slot, ushort func, byte offset, uint value) =>
+        PciConfigSpace.Legacy.Write32((byte)bus, (byte)slot, (byte)func, offset, value);
 
     #endregion
 
     /// <summary>
-    /// Get address base for x86 Configuration Mechanism #1.
-    /// </summary>
-    private static uint GetAddressBase(uint aBus, uint aSlot, uint aFunction) =>
-        ConfigEnableBit | (aBus << ConfigBusShift) | ((aSlot & ConfigSlotMask) << ConfigSlotShift) | ((aFunction & ConfigFunctionMask) << ConfigFunctionShift);
-
-    /// <summary>
-    /// Takes <see cref="s_configLock"/> and writes CONFIG_ADDRESS. The caller
-    /// makes its CONFIG_DATA access inside the returned scope, so the latch
-    /// still holds <paramref name="address"/> when that access lands.
-    /// </summary>
-    private static IrqLockScope SelectConfigAddress(uint address)
-    {
-        IrqLockScope scope = s_configLock.AcquireIrqSafe();
-        PlatformHAL.PortIO.WriteDWord(ConfigAddressPort, address);
-        return scope;
-    }
-
-    /// <summary>
-    /// Sets the ECAM base address (physical) discovered from ACPI MCFG.
-    /// Called by LibraryInitializer before PCI scanning.
+    /// Chooses the configuration mechanism of the legacy paths for this
+    /// architecture (<see cref="PciConfigSpace.SelectLegacy"/>) from the
+    /// ECAM base ACPI MCFG reports, 0 when the table is absent. Called by
+    /// the HAL library initializer before the PCI scan.
     /// </summary>
     internal static void SetEcamBase(ulong physBase)
     {
-        s_pciEcamBase = physBase;
         if (physBase != 0)
         {
             Serial.WriteString("[PciDevice] ECAM base from ACPI MCFG: 0x");
             Serial.WriteHex(physBase);
             Serial.WriteString("\n");
         }
-    }
 
-    /// <summary>
-    /// Get ECAM address for ARM64 (returns virtual address via HHDM).
-    /// </summary>
-    private static unsafe ulong GetEcamAddress(ushort bus, ushort slot, ushort func, byte offset)
-    {
-        ulong phys = s_pciEcamBase + ((ulong)bus << EcamBusShift) + ((ulong)slot << EcamSlotShift) + ((ulong)func << EcamFunctionShift) + offset;
-        ulong hhdmOffset = Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : 0;
-        return phys + hhdmOffset;
+        PciConfigSpace.SelectLegacy(physBase);
     }
 
     /// <summary>

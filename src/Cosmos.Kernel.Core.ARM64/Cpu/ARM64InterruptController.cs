@@ -113,6 +113,14 @@ internal class ARM64InterruptController : IInterruptController
         Serial.Write("\n");
     }
 
+    /// <summary>Disables the INTID at the GIC; <paramref name="irqNo"/> is the INTID, as <see cref="RouteIrq"/> treats it. Allocation-free; any context.</summary>
+    /// <param name="irqNo">The INTID.</param>
+    public void MaskIrq(byte irqNo) => GIC.DisableInterrupt(irqNo);
+
+    /// <summary>Enables the INTID at the GIC; <paramref name="irqNo"/> is the INTID, as <see cref="RouteIrq"/> treats it. Allocation-free; any context.</summary>
+    /// <param name="irqNo">The INTID.</param>
+    public void UnmaskIrq(byte irqNo) => GIC.EnableInterrupt(irqNo);
+
     /// <summary>
     /// Allocates an unused LPI (GICv3 ITS), registers <paramref name="handler"/>,
     /// and returns the absolute INTID (&gt;= <see cref="LpiBase"/>). The matching

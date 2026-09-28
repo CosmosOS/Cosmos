@@ -6,10 +6,11 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 
 /// <summary>
 /// One resource of a <see cref="DeviceNode"/>: a memory window, a port range
-/// or a RAM-backed window a driver asks the binding to map by index.
-/// Architecture-neutral by construction: a window is a physical range
-/// whatever the architecture, and the kit maps it with the attributes the
-/// architecture needs.
+/// or a RAM-backed window a driver asks the binding to map by index, or an
+/// unassigned slot (<see cref="None"/>) a bus keeps so the indices stay
+/// what its hardware numbers them. Architecture-neutral by construction: a
+/// window is a physical range whatever the architecture, and the kit maps
+/// it with the attributes the architecture needs.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct DeviceResource
@@ -42,6 +43,15 @@ public readonly struct DeviceResource
 
     /// <summary>Length of a window in bytes, or number of ports in a range.</summary>
     public ulong Length { get; }
+
+    /// <summary>True for <see cref="None"/>: a slot nothing is assigned to.</summary>
+    public bool IsNone => Kind == DeviceResourceKind.None;
+
+    /// <summary>
+    /// An unassigned slot, kept so the indices of the slots after it stay
+    /// stable; the binding refuses to map it.
+    /// </summary>
+    public static DeviceResource None => new(DeviceResourceKind.None, 0, 0, 0);
 
     /// <summary>A window of device registers or device memory at <paramref name="physicalBase"/>.</summary>
     /// <param name="physicalBase">Physical address of the first byte.</param>
