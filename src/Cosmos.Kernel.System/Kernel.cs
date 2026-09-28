@@ -2,6 +2,7 @@ using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Cpu;
 using Cosmos.Kernel.HAL.Devices.Usb;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.System;
 
@@ -32,21 +33,26 @@ public abstract partial class Kernel
     }
 
     /// <summary>
-    /// Starts the kernel lifecycle.
-    /// Called by the generated entry point.
+    /// Starts the kernel lifecycle. Called by the generated entry point.
+    /// Interrupts are enabled and the driver stage runs first, so
+    /// <see cref="OnBoot"/> and everything after it see the devices the
+    /// kernel's drivers bound; a kernel that overrides this method owns that
+    /// whole sequence.
     /// </summary>
     public virtual void Start()
     {
         Serial.WriteString("[Kernel] Starting kernel...\n");
-
-        Serial.WriteString("[Kernel] Calling OnBoot()...\n");
-        OnBoot();
 
         if (InterruptManager.IsEnabled)
         {
             Serial.WriteString("[Kernel] Enabling interrupts...\n");
             InternalCpu.EnableInterrupts();
         }
+
+        // The driver stage: offers every node published so far to the
+        // drivers in the manifest, and returns once they have all answered.
+        Serial.WriteString("[Kernel] Starting drivers...\n");
+        DriverEngine.Start();
 
         // USB hot-plug runs on a thread of its own, which only a scheduler
         // tick can start, so it waits for interrupts. Same switches as the
@@ -56,6 +62,9 @@ public abstract partial class Kernel
         {
             UsbManager.StartHotPlug();
         }
+
+        Serial.WriteString("[Kernel] Calling OnBoot()...\n");
+        OnBoot();
 
         EarlyGop.Enabled = false;
 
@@ -85,8 +94,9 @@ public abstract partial class Kernel
     }
 
     /// <summary>
-    /// Called once during boot, before BeforeRun().
-    /// Override to customize system initialization.
+    /// Called once during boot, before BeforeRun(), with interrupts enabled
+    /// and the driver stage complete. Override to customize system
+    /// initialization.
     /// </summary>
     protected virtual void OnBoot()
     {
