@@ -12,22 +12,42 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// </summary>
 internal sealed class DriverThread
 {
-    private readonly SchedulerThread _thread;
+    private readonly Action _entry;
+    private SchedulerThread? _thread;
+    private volatile bool _exited;
 
-    internal DriverThread(string name, SchedulerThread thread)
+    internal DriverThread(string name, Action entry)
     {
         Name = name;
-        _thread = thread;
+        _entry = entry;
     }
 
     /// <summary>The name the driver gave the thread, for the log.</summary>
     public string Name { get; }
 
     /// <summary>True once the thread's body returned.</summary>
-    public bool HasExited => _thread.State == SchedulerThreadState.Dead;
+    public bool HasExited => _exited || (_thread is not null && _thread.State == SchedulerThreadState.Dead);
 
     /// <summary>True when the calling code runs on this thread.</summary>
-    internal bool IsCurrent => ReferenceEquals(KitTime.CurrentThread, _thread);
+    internal bool IsCurrent => _thread is not null && ReferenceEquals(KitTime.CurrentThread, _thread);
+
+    /// <summary>
+    /// The thread's real entry: notes which scheduler thread it runs on
+    /// before the driver's body gets its first instruction, so the binding
+    /// recognises the thread from the start, then runs the body.
+    /// </summary>
+    internal void Run()
+    {
+        _thread = KitTime.CurrentThread;
+        try
+        {
+            _entry();
+        }
+        finally
+        {
+            _exited = true;
+        }
+    }
 
     /// <summary>
     /// Waits for the thread to exit. Teardown only, from the worker.

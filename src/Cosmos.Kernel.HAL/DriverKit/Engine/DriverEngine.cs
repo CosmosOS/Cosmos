@@ -127,10 +127,14 @@ internal static class DriverEngine
     /// <summary>
     /// Puts a node in the tree and queues its offer. Off the worker, after
     /// start, returns once the node was offered; from the worker, inside a
-    /// drain, or before start, returns at once and the offer follows.
+    /// drain, or before start, returns at once and the offer follows. A
+    /// driver thread whose own binding starts detaching while it waits is
+    /// released early, with the offer still queued: the teardown would
+    /// otherwise wait to join a thread that waits on the teardown.
     /// </summary>
     /// <param name="node">A pending node.</param>
-    internal static void PublishNode(DeviceNode node)
+    /// <param name="owner">The binding publishing the node, when a driver does; null for a bus.</param>
+    internal static void PublishNode(DeviceNode node, DeviceBinding? owner = null)
     {
         using (s_nodesLock.AcquireIrqSafe())
         {
@@ -140,23 +144,25 @@ internal static class DriverEngine
             s_nodes = nodes;
         }
 
-        Submit(new EngineJob(EngineJobKind.NodeArrived) { Node = node, Completion = NewCompletion() });
+        Submit(new EngineJob(EngineJobKind.NodeArrived) { Node = node, Completion = NewCompletion() }, owner);
     }
 
     /// <summary>
-    /// Queues a node's teardown. Same completion rule as <see cref="PublishNode"/>.
+    /// Queues a node's teardown. Same completion and early-release rules as
+    /// <see cref="PublishNode"/>.
     /// </summary>
     /// <param name="node">The node.</param>
     /// <param name="hardwarePresent">Whether the hardware is still there to be quiesced.</param>
+    /// <param name="owner">The binding retracting the node, when a driver does; null for a bus.</param>
     /// <exception cref="InvalidOperationException">Called from one of the node's own driver threads, which the teardown would have to join.</exception>
-    internal static void RetractNode(DeviceNode node, bool hardwarePresent)
+    internal static void RetractNode(DeviceNode node, bool hardwarePresent, DeviceBinding? owner = null)
     {
         if (node.Binding is { } binding && binding.IsCurrentThreadOwned)
         {
             throw new InvalidOperationException("A node cannot be retracted from its own driver's thread.");
         }
 
-        Submit(new EngineJob(EngineJobKind.NodeRetracted) { Node = node, HardwarePresent = hardwarePresent, Completion = NewCompletion() });
+        Submit(new EngineJob(EngineJobKind.NodeRetracted) { Node = node, HardwarePresent = hardwarePresent, Completion = NewCompletion() }, owner);
     }
 
     /// <summary>Queues a work item's job. Allocation-free; any context.</summary>
@@ -239,19 +245,27 @@ internal static class DriverEngine
             return;
         }
 
-        node.Binding?.Teardown(new DetachReason(cause, hardwarePresent));
-        node.State = NodeState.Retracted;
-        if (node.LeakedResourceCount == 0)
+        try
         {
-            node.BusResource?.Release();
+            node.Binding?.Teardown(new DetachReason(cause, hardwarePresent));
         }
+        finally
+        {
+            // Retracted whatever the teardown managed: a node left pending
+            // with a half-dead binding would be offered or torn down again.
+            node.State = NodeState.Retracted;
+            if (node.LeakedResourceCount == 0)
+            {
+                node.BusResource?.Release();
+            }
 
-        DriverLog.Retracted(node);
+            DriverLog.Retracted(node);
+        }
     }
 
     private static InterruptEvent? NewCompletion() => IsStarted && HasWorker && !IsOnWorker ? new InterruptEvent() : null;
 
-    private static void Submit(EngineJob job)
+    private static void Submit(EngineJob job, DeviceBinding? owner = null)
     {
         using (s_queueLock.AcquireIrqSafe())
         {
@@ -265,6 +279,13 @@ internal static class DriverEngine
             while (!job.Completion.Wait(PollMilliseconds))
             {
                 PanicIfWorkerDied();
+                if (IsCallerDetaching(owner))
+                {
+                    // The worker is tearing down the caller's own binding and
+                    // will wait to join this thread; the job stays queued and
+                    // runs afterwards, against a node that is then retracted.
+                    return;
+                }
             }
 
             return;
@@ -274,6 +295,29 @@ internal static class DriverEngine
         {
             RunPending();
         }
+    }
+
+    /// <summary>
+    /// True when the calling thread belongs to a binding that is being torn
+    /// down: the one given, or, for a call that names none, any bound node's.
+    /// </summary>
+    private static bool IsCallerDetaching(DeviceBinding? owner)
+    {
+        if (owner is not null)
+        {
+            return owner.IsDetaching;
+        }
+
+        IReadOnlyList<DeviceNode> nodes = s_nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            if (nodes[i].Binding is { IsDetaching: true } binding && binding.IsCurrentThreadOwned)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void EnqueueLocked(EngineJob job)

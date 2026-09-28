@@ -11,6 +11,9 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// </summary>
 internal readonly struct DeviceResource
 {
+    /// <summary>Number of I/O ports an x64 machine decodes.</summary>
+    private const uint PortSpaceSize = 0x10000;
+
     private DeviceResource(DeviceResourceKind kind, ulong baseAddress, ulong physicalBase, ulong length)
     {
         Kind = kind;
@@ -55,7 +58,12 @@ internal readonly struct DeviceResource
 
     /// <summary>A range of I/O ports starting at <paramref name="basePort"/>.</summary>
     /// <param name="basePort">First port of the range.</param>
-    /// <param name="count">Number of ports.</param>
-    public static DeviceResource PortRange(ushort basePort, ushort count) =>
-        new(DeviceResourceKind.PortRange, basePort, 0, count);
+    /// <param name="count">Number of ports, at least one; the range ends within the 16-bit port space.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is zero or the range runs past port 0xFFFF.</exception>
+    public static DeviceResource PortRange(ushort basePort, ushort count)
+    {
+        ArgumentOutOfRangeException.ThrowIfZero(count);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan((uint)basePort + count, PortSpaceSize, nameof(count));
+        return new DeviceResource(DeviceResourceKind.PortRange, basePort, 0, count);
+    }
 }
