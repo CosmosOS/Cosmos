@@ -8,7 +8,8 @@
     <!-- Off on purpose: MouseFeatureDriver is tied to the mouse feature and the
          suite asserts the manifest leaves it out. -->
     <CosmosEnableMouse>false</CosmosEnableMouse>
-    <!-- The suite is written over the experimental driver kit seam (COSMOS0003). -->
+    <!-- The harness reads the experimental driver kit seam (COSMOS0003); the
+         drivers themselves live in Cosmos.Kernel.Tests.Drivers.Library. -->
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
@@ -19,10 +20,18 @@
   </ItemGroup>
 
   <!-- Manifest policy under test: a default driver dropped by name, and an
-       opt-in driver ([Driver(Default = false)]) taken in by name. -->
+       opt-in driver ([Driver(Default = false)]) taken in by name. Both are
+       referenced-assembly drivers, named by their full type name in the library. -->
   <ItemGroup>
-    <CosmosDriverExclude Include="Cosmos.Kernel.Tests.Drivers.Drivers.ExcludedDriver" />
-    <CosmosDriverInclude Include="Cosmos.Kernel.Tests.Drivers.Drivers.OptInDriver" />
+    <CosmosDriverExclude Include="Cosmos.Kernel.Tests.Drivers.Library.ExcludedDriver" />
+    <CosmosDriverInclude Include="Cosmos.Kernel.Tests.Drivers.Library.OptInDriver" />
+  </ItemGroup>
+
+  <!-- The suite's drivers: a driver assembly with no InternalsVisibleTo grant,
+       written over the public seam only. This kernel keeps its own HAL grant for
+       the harness (TestKeyboardConsumer through DeviceRegistry.SetConsumer). -->
+  <ItemGroup>
+    <ProjectReference Include="../Cosmos.Kernel.Tests.Drivers.Library/Cosmos.Kernel.Tests.Drivers.Library.csproj" />
   </ItemGroup>
 
   <!-- Core kernel packages (using project references for development) -->
