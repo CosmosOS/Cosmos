@@ -13,6 +13,9 @@ using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.Devices.Virtio;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Platform;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
@@ -35,6 +38,9 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     private const ulong VirtioMmioSlotSize = 0x200;
     private const uint VirtioMmioSlotCount = 32;
     private const uint VirtioMmioIrqBase = 48;
+
+    /// <summary>Shift of the bus number in an ECAM address: 1 MiB of configuration space per bus.</summary>
+    private const int EcamBusShift = 20;
 
     private GenericTimer? _timer;
 
@@ -126,6 +132,38 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
                 VirtioMmioIrqBase, EnableVirtioIrq);
         }
 
+    }
+
+    /// <summary>
+    /// The virt machine description: one PCI host node over the ECAM window
+    /// ACPI's MCFG reports, which the PCI host driver enumerates. Without an
+    /// MCFG entry (ACPI off, no DTB parsing yet) no host is published and
+    /// the legacy scan stays the only PCI path. Thread context, interrupts
+    /// disabled, from the HAL library initializer; nothing when PCI is
+    /// compiled out.
+    /// </summary>
+    public void PublishPlatformNodes()
+    {
+        if (!CosmosFeatures.PCIEnabled)
+        {
+            return;
+        }
+
+        if (!AcpiMcfg.TryGetInfo(out AcpiMcfg.McfgInfo mcfg))
+        {
+            Serial.WriteString("[ARM64HAL] No MCFG entry: no PCI host node published\n");
+            return;
+        }
+
+        Serial.WriteString("[ARM64HAL] Publishing the ECAM PCI host node...\n");
+        PciHostAccess host = PciHostAccess.ForEcam(mcfg.BaseAddress, mcfg.Segment, mcfg.StartBus, mcfg.EndBus);
+
+        // The window the node reports is the host's range, not the table's:
+        // the access ends its range at the last bus it could map.
+        ulong windowLength = (ulong)(host.EndBus - host.StartBus + 1) << EcamBusShift;
+        PlatformIdentity identity = new($"pci@{mcfg.BaseAddress:x}", ["pci-host-ecam-generic"]);
+        DeviceResource[] resources = [DeviceResource.MemoryWindow(mcfg.BaseAddress, windowLength)];
+        PlatformBus.Publish(identity, resources, [], host);
     }
 
     /// <summary>

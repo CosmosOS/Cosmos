@@ -7,8 +7,9 @@
     <PackageTags>cosmos;kernel;hal;arm64;aarch64;hardware</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <DefineConstants>$(DefineConstants);ARCH_ARM64</DefineConstants>
-    <!-- The generic timer feeds ticks into the experimental scheduler seam (COSMOS0001). -->
-    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
+    <!-- The generic timer feeds ticks into the experimental scheduler seam (COSMOS0001);
+         the machine description seeds the platform bus through the experimental driver kit seam (COSMOS0003). -->
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" />

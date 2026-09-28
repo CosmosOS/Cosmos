@@ -62,6 +62,23 @@ internal class LibraryInitializer
             Serial.WriteString("[KERNEL]   - Initializing platform hardware...\n");
             initializer.InitializeHardware();
 
+            // Seed the driver kit's platform bus with this machine's root
+            // nodes (the PCI host). Interrupts are still disabled and the
+            // nodes wait in the engine's queue until Kernel.Start runs the
+            // driver stage. A machine description that throws costs the kit
+            // its nodes, not the boot.
+            Serial.WriteString("[KERNEL]   - Publishing platform nodes...\n");
+            try
+            {
+                initializer.PublishPlatformNodes();
+            }
+            catch (Exception exception)
+            {
+                Serial.WriteString("[KERNEL]   - Platform nodes not published: ");
+                Serial.WriteString(exception.Message);
+                Serial.WriteString("\n");
+            }
+
             // Bind drivers to virtio PCI devices on any architecture.
             // Must run after InitializeHardware: MSI-X routing needs the
             // platform MSI binder (LAPIC on x64, GICv3 ITS on ARM64).
