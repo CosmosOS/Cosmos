@@ -52,7 +52,7 @@ A driver is a class marked `[Cosmos.Kernel.HAL.DriverKit.Driver]`. The generator
 
 | Source | Which classes | Order |
 |--------|---------------|-------|
-| The kernel project itself | Every marked class, whatever its accessibility | By file path (ordinal), then by position in the file |
+| The kernel project itself | Every marked class the assembly can construct from its top level (a private nested class is reported with `COSMOSGEN001` and left out) | By file path (ordinal), then by position in the file |
 | Referenced assemblies that reference `Cosmos.Kernel.HAL` (or are it) | Marked classes the kernel assembly can see: public ones, and internal ones under an `InternalsVisibleTo` grant | By assembly name, then by full type name, both ordinal |
 
 The kernel's own drivers come first, then the referenced ones. An assembly that does not reference `Cosmos.Kernel.HAL` is not searched: it cannot carry the attribute.
@@ -80,7 +80,7 @@ A kernel project shapes its manifest with two item types:
 
 Names are full type names in C# form, without `global::`, with nested types joined by dots (`MyOS.Drivers.Bus.Child`). An excluded driver is dropped whatever its `Default`. A driver with `Default = false` is registered only when a `CosmosDriverInclude` item names it. An item that matches no `[Driver]` class the kernel can see is reported (`COSMOSGEN002`), which is how a stale or misspelled entry shows up.
 
-Policy is applied before validation: a driver the kernel excludes or does not opt into is never inspected, so the diagnostics below describe what the manifest would register.
+Policy is applied before validation: a driver the kernel excludes or does not opt into is never reported, so the diagnostics below describe what the manifest would register.
 
 ## Diagnostics
 

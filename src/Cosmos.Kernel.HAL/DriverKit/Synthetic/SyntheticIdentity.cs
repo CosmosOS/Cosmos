@@ -20,5 +20,5 @@ internal sealed class SyntheticIdentity : DeviceIdentity
     public override string Address => Key;
 
     /// <inheritdoc/>
-    public override string Describe() => string.Concat("key ", Key);
+    public override string Describe() => $"key {Key}";
 }

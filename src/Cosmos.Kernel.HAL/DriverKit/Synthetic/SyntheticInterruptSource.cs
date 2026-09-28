@@ -34,7 +34,7 @@ internal sealed class SyntheticInterruptSource : InterruptSource
     public bool IsMasked => _masked;
 
     /// <inheritdoc/>
-    public override string Describe() => string.Concat("synthetic ", Index.ToString());
+    public override string Describe() => $"synthetic {Index}";
 
     /// <summary>
     /// Delivers one interrupt. Thread context.

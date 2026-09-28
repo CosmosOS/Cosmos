@@ -32,6 +32,7 @@ dotnet test src/tests/Cosmos.Kernel.Tests.System   # the kernel library tests
   - `LoadPlugs_ShouldIgnoreClassesWithoutPlugAttribute`
   - `LoadPlugs_ShouldHandleOptionalPlugs`
   - `FindPluggedAssemblies_ShouldReturnMatchingAssemblies`
+- **Cosmos.Tests.SourceGenerators**: Runs `CosmosEntryPointGenerator` on in-memory compilations and checks the generated entry point, the driver manifest and the `COSMOSGEN` diagnostics exactly; `FeatureParityTests` keeps `DriverFeature`, `KernelFeatures` and the test stubs in step, and `ReferencedDriverTests` covers drivers from referenced assemblies, public and under an `InternalsVisibleTo` grant.
 - **Cosmos.Tests.Patcher**: Ensures that plugs are applied successfully to target methods and types.
   - `PatchAssembly_ShouldSkipWhenNoMatchingPlugs`
   - `PatchObjectWithAThis_ShouldPlugInstanceCorrectly`
@@ -131,7 +132,7 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 
 #### Drivers Tests
 
-A white-box suite (`InternalsVisibleTo` from `Cosmos.Kernel.HAL` and `Cosmos.Kernel.System`) that declares its own `[Driver]` classes and drives them through the synthetic bus, with no hardware behind any node. It builds with `CosmosEnableMouse` off and with one `CosmosDriverExclude` and one `CosmosDriverInclude` item, so the manifest policy is under test too. Every assertion reads `DriverInfo` or the suite's own drivers and consumer, never the serial log.
+A white-box suite (`InternalsVisibleTo` from `Cosmos.Kernel.HAL`) that declares its own `[Driver]` classes and drives them through the synthetic bus, with no hardware behind any node. It builds with `CosmosEnableMouse` off and with one `CosmosDriverExclude` and one `CosmosDriverInclude` item, so the manifest policy is under test too. Every assertion reads `DriverInfo` or the suite's own drivers and consumer, never the serial log.
 
 **Manifest (6 tests):**
 - `Manifest_HighPriorityDriver_Present`, `Manifest_MouseFeatureDriver_Absent`, `Manifest_ExcludedDriver_Absent`
@@ -361,6 +362,7 @@ tests/
 ├── Cosmos.Tests.Build.Analyzer.Patcher/ # Unit tests: plug analyzer
 ├── Cosmos.Tests.Scanner/            # Unit tests: plug scanner
 ├── Cosmos.Tests.Patcher/            # Unit tests: IL patcher
+├── Cosmos.Tests.SourceGenerators/   # Unit tests: entry point and driver manifest generator
 ├── Cosmos.Tests.NativeWrapper/      # Runtime assets (no tests)
 ├── Cosmos.Tests.NativeLibrary/      # Native code for tests (no tests)
 └── Kernels/                         # Kernel test projects

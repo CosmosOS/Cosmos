@@ -104,7 +104,7 @@ internal static class Arbitration
         string text = string.Empty;
         for (int i = 0; i < candidates.Length; i++)
         {
-            text = string.Concat(text, " ", candidates[i].Driver.Name, "(prio ", candidates[i].Driver.Priority.ToString(), ", spec ", candidates[i].Specificity.ToString(), ")");
+            text = $"{text} {candidates[i].Driver.Name}(prio {candidates[i].Driver.Priority}, spec {candidates[i].Specificity})";
         }
 
         return text;

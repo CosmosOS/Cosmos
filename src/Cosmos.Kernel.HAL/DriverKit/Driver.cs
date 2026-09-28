@@ -11,9 +11,9 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// is offered every node it matches, so fields on the driver are shared
 /// across bindings: state that belongs to one device lives on objects the
 /// driver creates in <see cref="Probe"/> and hangs off
-/// <see cref="DeviceBinding.DriverState"/>. Probes run one at a time on the
-/// kit worker; driver threads and work items of two bindings do run
-/// concurrently.
+/// <see cref="DeviceBinding.DriverState"/>. Probes, teardowns and work items
+/// run one at a time on the kit worker; only driver threads run concurrently,
+/// with each other and with the worker.
 /// </para>
 /// <para>
 /// Execution contexts: <see cref="Probe"/> and <see cref="OnDetach"/> run in

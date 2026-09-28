@@ -30,7 +30,7 @@ internal sealed class DeviceNode
         _interrupts = interrupts;
         _access = access;
         Parent = parent;
-        Path = string.Concat(identity.BusName, ":", identity.Address);
+        Path = $"{identity.BusName}:{identity.Address}";
         Description = identity.Describe();
     }
 
