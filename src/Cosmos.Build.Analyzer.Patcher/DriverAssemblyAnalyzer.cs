@@ -136,13 +136,8 @@ public sealed class DriverAssemblyAnalyzer : DiagnosticAnalyzer
     {
         Compilation compilation = context.Compilation;
 
-        foreach (MetadataReference reference in compilation.References)
+        foreach (IAssemblySymbol referenced in compilation.SourceModule.ReferencedAssemblySymbols)
         {
-            if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol referenced)
-            {
-                continue;
-            }
-
             if (!referenced.Name.StartsWith(CosmosAssemblyPrefix, System.StringComparison.Ordinal))
             {
                 continue;
