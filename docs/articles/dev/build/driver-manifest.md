@@ -34,7 +34,7 @@ internal static class DriverManifest
 }
 ```
 
-One `Register` call per driver, each constructing the driver with its parameterless constructor. The manifest is generated even when no driver survives: its `Register` body is then empty, so a kernel that cannot see `DriverRegistry` at all (see [Stage 1 visibility](#stage-1-visibility)) still compiles.
+One `Register` call per driver, each constructing the driver with its parameterless constructor. The manifest is generated even when no driver survives: its `Register` body is then empty and references nothing from the HAL, so a kernel that has not suppressed the kit's diagnostic id (see [Visibility](#visibility)) still compiles.
 
 With `EmitCompilerGeneratedFiles` on, which `Cosmos.Sdk` sets by default, both files are written under the intermediate directory:
 
@@ -104,9 +104,19 @@ The generator reads three build properties, made visible to it by `CompilerVisib
 
 Two details of that target are worth knowing when touching it. The items are joined inside a target rather than in an evaluation-time `PropertyGroup`, because an item reference does not expand there; the target runs `BeforeTargets="GenerateMSBuildEditorConfigFileCore"`, which is the step that writes the compiler's editorconfig. And the separator is a comma: the compiler reads that file as an editorconfig, where a semicolon starts a comment, so a semicolon-joined list would be cut after its first name.
 
-## Stage 1 visibility
+## Visibility
 
-In stage 1 of the driver kit, `Driver`, `DriverAttribute` and `DriverRegistry` are internal to `Cosmos.Kernel.HAL`. Only an assembly with an `InternalsVisibleTo` grant from the HAL can declare a `[Driver]` class, and only such a kernel compiles a non-empty manifest; every other kernel gets the empty `Register()`, which references nothing from the HAL. When the kit becomes public the same generated code compiles for every kernel, with no change to the generator.
+The kit is public, under the experimental seam `COSMOS0003`: `Driver`, `DriverAttribute`, `DriverRegistry` and every other type in `Cosmos.Kernel.HAL.DriverKit` carry `[Experimental("COSMOS0003")]`, so a kernel or a library that declares a `[Driver]` class suppresses that id in its `.csproj`, and a driver library also declares itself a driver assembly:
+
+```xml
+<PropertyGroup>
+  <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+  <!-- A class library of drivers only: held to the public surface by the analyzer. -->
+  <CosmosDriverAssembly>true</CosmosDriverAssembly>
+</PropertyGroup>
+```
+
+A kernel that has neither suppressed the id nor declared a driver still gets the empty `Register()`, which references nothing from the HAL and compiles without the suppression. [Writing a Driver](../../user/drivers.md) covers the kit and the project lines from the driver author's side; [Public API Tracking](../public-api.md) covers what a driver assembly is held to.
 
 ## Testing
 
