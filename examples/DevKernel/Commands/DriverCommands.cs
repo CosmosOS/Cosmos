@@ -53,8 +53,9 @@ internal static class DriverCommands
 
     /// <summary>
     /// Publishes the synthetic device under <see cref="SampleDriver.Key"/>, or
-    /// takes it away again, and returns once the engine has offered or torn
-    /// down the node, so <c>drivers</c> shows the result at once.
+    /// takes it away again. After the driver stage, the bus returns once the
+    /// engine has offered or torn down the node, so <c>drivers</c> shows the
+    /// result at once.
     /// </summary>
     private static void SampleDevice(string action)
     {
@@ -68,8 +69,7 @@ internal static class DriverCommands
                 }
 
                 s_sampleNode = SyntheticBus.Publish(SampleDriver.Key, []);
-                SyntheticBus.WaitForQueuedJobs();
-                Terminal.Success("published " + s_sampleNode.Path + ", now " + s_sampleNode.State);
+                Terminal.Success("published " + s_sampleNode.Path + ", now " + StateName(s_sampleNode.State));
                 break;
 
             case "retract":
@@ -80,7 +80,6 @@ internal static class DriverCommands
                 }
 
                 SyntheticBus.Retract(s_sampleNode);
-                SyntheticBus.WaitForQueuedJobs();
                 Terminal.Success("retracted " + s_sampleNode.Path);
                 s_sampleNode = null;
                 break;
@@ -90,6 +89,16 @@ internal static class DriverCommands
                 break;
         }
     }
+
+    /// <summary>The name of a kit node state, spelled out: formatting an enum needs reflection.</summary>
+    private static string StateName(NodeState state) => state switch
+    {
+        NodeState.Pending => "pending",
+        NodeState.Bound => "bound",
+        NodeState.Unbound => "unbound",
+        NodeState.Retracted => "retracted",
+        _ => "unknown",
+    };
 
     private static void ShowDriverInfo()
     {
