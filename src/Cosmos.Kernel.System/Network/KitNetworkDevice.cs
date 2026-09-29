@@ -9,8 +9,7 @@ namespace Cosmos.Kernel.System.Network;
 /// The ring's view of a network interface a driver kit driver published:
 /// an <see cref="INetworkDevice"/> over the <see cref="INetworkInterface"/>,
 /// so the stack, its configuration and its clients keep their one contract
-/// while the kit's devices and the HAL's virtio device share the manager's
-/// table during the migration. Created by <see cref="KitNetworkConsumer"/>
+/// over the kit's devices. Created by <see cref="KitNetworkConsumer"/>
 /// on the kit worker when the interface is published; frames reach
 /// <see cref="OnPacketReceived"/> through the consumer, and link changes
 /// land in <see cref="LinkUp"/>. The reads are any context.

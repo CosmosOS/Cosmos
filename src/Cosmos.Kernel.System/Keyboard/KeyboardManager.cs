@@ -4,13 +4,18 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
+using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Keyboard.ScanMaps;
 
 namespace Cosmos.Kernel.System.Keyboard;
 
 /// <summary>
-/// Manages keyboard input from physical keyboards.
+/// Manages keyboard input from physical keyboards: the platform's keyboards,
+/// registered at boot, USB keyboards as they come and go, and every keyboard
+/// a driver kit driver publishes, which the manager's
+/// <see cref="KitKeyboardConsumer"/> registers from the kit worker and
+/// unregisters when it is withdrawn.
 /// </summary>
 public static class KeyboardManager
 {
@@ -21,9 +26,10 @@ public static class KeyboardManager
 
     /// <summary>
     /// The registered keyboards. Replaced on every change, never changed in
-    /// place: a USB keyboard can come or go on the hot-plug thread while a
-    /// key press walks the list in interrupt context. Changed by the boot
-    /// path, then by that thread only.
+    /// place: a USB keyboard can come or go on the hot-plug thread, and a
+    /// kit keyboard on the kit worker, while a key press walks the list in
+    /// interrupt context. Changed by the boot path, then by those threads
+    /// only.
     /// </summary>
     private static IKeyboardDevice[]? s_keyboards;
     private static Queue<KeyEvent>? s_queuedKeys;
@@ -89,7 +95,9 @@ public static class KeyboardManager
 
     /// <summary>
     /// Initializes the keyboard manager. Called once during boot, before the
-    /// platform keyboards are registered.
+    /// platform keyboards are registered and before the driver stage runs,
+    /// so the keyboard consumer it installs sees every keyboard a kit driver
+    /// publishes.
     /// </summary>
     internal static void Initialize()
     {
@@ -103,11 +111,16 @@ public static class KeyboardManager
         s_queuedKeys = new Queue<KeyEvent>();
         s_scanMap = new USStandardLayout();
         s_keyboards = [];
+        DeviceRegistry.SetConsumer(DeviceKind.Keyboard, new KitKeyboardConsumer());
     }
 
     /// <summary>
-    /// Registers a keyboard device with the manager.
+    /// Registers a keyboard device with the manager. Thread context, from
+    /// the boot path, from the USB hot-plug thread or from the kit worker
+    /// when a published keyboard is consumed; the list is replaced, never
+    /// changed in place.
     /// </summary>
+    /// <param name="keyboard">The keyboard to register; nothing when it is null or the manager is not initialized.</param>
     internal static void RegisterKeyboard(IKeyboardDevice keyboard)
     {
         if (s_keyboards is null || keyboard is null)
@@ -127,10 +140,13 @@ public static class KeyboardManager
     }
 
     /// <summary>
-    /// Forgets a keyboard that is gone (a USB keyboard pulled out). Its
-    /// keys stop arriving; a modifier it held down stays down until pressed
-    /// on another keyboard.
+    /// Forgets a keyboard that is gone (a USB keyboard pulled out, a kit
+    /// keyboard withdrawn). Its keys stop arriving; a modifier it held down
+    /// stays down until pressed on another keyboard. Thread context, from
+    /// the USB hot-plug thread or from the kit worker; the list is replaced,
+    /// never changed in place.
     /// </summary>
+    /// <param name="keyboard">The keyboard to remove; nothing when it is not registered.</param>
     internal static void UnregisterKeyboard(IKeyboardDevice keyboard)
     {
         if (s_keyboards is null)

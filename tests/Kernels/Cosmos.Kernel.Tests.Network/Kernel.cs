@@ -54,8 +54,10 @@ public class Kernel : Sys.Kernel
         // The NIC is a profile axis (tests/profiles.json). On x64 the e1000e cell's
         // controller, the same 82574L that q35 adds by default, attached here by the
         // profile's nic axis, is bound by the driver kit's E1000EDriver
-        // (Cosmos.Kernel.Drivers); the virtio-net cells come from the HAL's virtio
-        // drivers on both arches.
+        // (Cosmos.Kernel.Drivers); the virtio-net cells are bound by the kit's
+        // VirtioNetDriver over either transport, PCI on both arches and MMIO on
+        // arm64, through the VirtioPciTransportDriver or VirtioMmioTransportDriver
+        // node above it.
         TR.Start("Network Tests", expectedTests: 24);
 
         // Network initialization tests
@@ -296,7 +298,7 @@ public class Kernel : Sys.Kernel
         Assert.True(true, "Host echo request received and answered");
 
         // Phase 2: the host validates our echo reply (checksum + payload) and
-        // only then switches its request payload from COSMOS_PING to HOST_OK —
+        // only then switches its request payload from COSMOS_PING to HOST_OK:
         // seeing it proves the full host->guest->host round trip.
         Log.WriteString("[Test] Waiting for HOST_OK acknowledgment payload...\n");
 

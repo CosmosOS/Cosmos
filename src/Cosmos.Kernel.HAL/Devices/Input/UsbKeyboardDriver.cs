@@ -9,7 +9,8 @@ namespace Cosmos.Kernel.HAL.Devices.Input;
 /// USB class driver for keyboards: binds every HID interface that declares
 /// the boot keyboard protocol (HID 1.11 §4.2-§4.3), which every PC keyboard
 /// does so firmware can use it, and exposes them to the platform
-/// initializer the way <see cref="Virtio.VirtioDevice.GetKeyboards"/> does.
+/// initializer through <see cref="GetKeyboards"/> (the PS/2 controller does
+/// the same on x64; virtio keyboards reach the ring through the driver kit).
 /// The keyboards plugged in or pulled out after boot are reported through
 /// <see cref="KeyboardAttached"/> and <see cref="KeyboardDetached"/>.
 /// </summary>

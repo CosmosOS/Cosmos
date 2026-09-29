@@ -5,6 +5,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- The suite reads the experimental driver kit seam (COSMOS0003): the
+         tree through DriverEngine.Nodes and the drivers' state objects. -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
   <!-- Transport is a property of the cell, not of the architecture. x64 has

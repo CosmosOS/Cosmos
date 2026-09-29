@@ -25,7 +25,7 @@
     <PackageId>Cosmos.Kernel.Drivers</PackageId>
     <Title>Cosmos Kernel Drivers</Title>
     <Description>The drivers Cosmos ships, written over the driver kit</Description>
-    <PackageTags>cosmos;kernel;drivers;pci;network;e1000e</PackageTags>
+    <PackageTags>cosmos;kernel;drivers;pci;network;e1000e;virtio</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
 
     <!-- Held to the surface a third party gets: the layer analyzer treats it as a

@@ -10,8 +10,6 @@ using Cosmos.Kernel.Core.X64.Cpu;
 using Cosmos.Kernel.Core.X64.IO;
 using Cosmos.Kernel.Core.X64.Power;
 using Cosmos.Kernel.HAL.Devices.Input;
-using Cosmos.Kernel.HAL.Devices.Network;
-using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Platform;
@@ -172,11 +170,13 @@ internal class X64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
+        // PS/2 and USB keyboards: virtio input is a kit driver now,
+        // published to the keyboard consumer.
         IKeyboardDevice[] ps2 = _ps2Controller is not null ? PS2Controller.GetKeyboardDevices() : [];
         // Behind USB's own switch so a kernel without USB never references
         // the USB keyboard driver and ILC trims it.
         IKeyboardDevice[] usb = CosmosFeatures.UsbEnabled ? UsbKeyboardDriver.GetKeyboards() : [];
-        return [.. ps2, .. VirtioDevice.GetKeyboards(), .. usb];
+        return [.. ps2, .. usb];
     }
 
     public IMouseDevice[] GetMouseDevices()
@@ -186,42 +186,9 @@ internal class X64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        IMouseDevice[] ps2 = _ps2Controller != null ? PS2Controller.GetMouseDevices() : [];
-        return Concat(ps2, VirtioDevice.GetMice());
-    }
-
-    public INetworkDevice? GetNetworkDevice()
-    {
-        // Virtio-net over PCI, discovered by the shared virtio PCI scan. The
-        // Intel controllers are bound by the driver kit's E1000E driver and
-        // reach the ring through its network consumer, not through here.
-        return VirtioDevice.GetDevice<VirtioNet>();
-    }
-
-    private static T[] Concat<T>(T[] first, T[] second)
-    {
-        if (first.Length == 0)
-        {
-            return second;
-        }
-
-        if (second.Length == 0)
-        {
-            return first;
-        }
-
-        T[] combined = new T[first.Length + second.Length];
-        for (int i = 0; i < first.Length; i++)
-        {
-            combined[i] = first[i];
-        }
-
-        for (int i = 0; i < second.Length; i++)
-        {
-            combined[first.Length + i] = second[i];
-        }
-
-        return combined;
+        // PS/2 mice only: virtio input is a kit driver now, published to
+        // the pointer consumer.
+        return _ps2Controller is not null ? PS2Controller.GetMouseDevices() : [];
     }
 
     public unsafe uint GetCpuCount()

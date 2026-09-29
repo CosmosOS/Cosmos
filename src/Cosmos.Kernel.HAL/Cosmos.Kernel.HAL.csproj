@@ -60,10 +60,10 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box suites over HAL internals: SVGAII FIFO wire format
-         (Graphic), MSI-X tables (Interrupts), PCI discovery (Pci),
-         platform power ops (Power), AHCI/NVMe registers (Storage),
-         the TimerDevice base and its software timers (Timer), virtio
-         transports (Virtio). -->
+         (Graphic), MSI-X tables (Interrupts), PCI discovery and the nodes'
+         PciAccess (Pci), platform power ops (Power), AHCI/NVMe registers
+         (Storage), the TimerDevice base and its software timers (Timer),
+         the tree and the bindings' driver state (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Graphic" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />

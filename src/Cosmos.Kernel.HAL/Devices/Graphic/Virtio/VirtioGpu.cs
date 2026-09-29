@@ -11,9 +11,12 @@ using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 namespace Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
 
 /// <summary>
-/// VirtIO GPU device driver, 2D path only. Transport-agnostic: works over
-/// virtio MMIO (QEMU virt virtio-gpu-device) and virtio PCI (virtio-gpu-pci)
-/// alike. The driver allocates one host 2D resource sized to the scanout,
+/// VirtIO GPU device driver, 2D path only. PCI only, over the HAL's
+/// <see cref="VirtioPciTransport"/> (virtio-gpu-pci), until the display
+/// stage moves it into the driver kit with the display kinds; the MMIO
+/// transport is a kit driver now, so a virtio-gpu-device slot is left to the
+/// kit, which has no GPU driver yet. <see cref="VirtioGpuProbe"/> finds the
+/// function. The driver allocates one host 2D resource sized to the scanout,
 /// attaches a physically-contiguous guest backing buffer, and pushes dirty
 /// rectangles through TRANSFER_TO_HOST_2D + RESOURCE_FLUSH on Swap().
 /// No virgl / 3D path: this is a full guest-side 2D GPU driver, not host-GPU
@@ -49,7 +52,7 @@ internal unsafe class VirtioGpu : GraphicDevice
 
     // Guards the control queue's descriptor table and the used-ring cursor,
     // touched from both thread context (DrawPixel / Swap) and interrupt
-    // context (OnDeviceInterrupt). Mirrors VirtioNet's _queueLock pattern.
+    // context (OnDeviceInterrupt).
     private SchedSpinLock _queueLock;
 
     private Virtqueue? _ctrlQueue;
@@ -78,7 +81,7 @@ internal unsafe class VirtioGpu : GraphicDevice
 
     // --- Properties ---
 
-    /// <summary>The transport this device was bound over (MMIO or PCI).</summary>
+    /// <summary>The HAL PCI transport this device was bound over.</summary>
     public VirtioTransport Transport => _transport;
 
     public bool IsInitialized => _initialized;
@@ -204,7 +207,7 @@ internal unsafe class VirtioGpu : GraphicDevice
         {
             // Graphics has a polled fallback the network stack doesn't: the
             // kernel can pump Swap() unconditionally. But the simpler
-            // choice for the initial port is to fail loudly — a driver that
+            // choice for the initial port is to fail loudly: a driver that
             // silently runs in polled mode is hard to debug.
             Serial.Write("[VirtioGpu] ERROR: No interrupt path available; disabling device\n");
             _initialized = false;
@@ -390,8 +393,8 @@ internal unsafe class VirtioGpu : GraphicDevice
         _framebufferSize = _width * _height * 4;
         uint pageCount = (_framebufferSize + (uint)PageAllocator.PageSize - 1) / (uint)PageAllocator.PageSize;
 
-        // HeapLarge gives page-aligned, GC-stable, physically-contiguous pages
-        // — the same allocator Virtqueue uses for its descriptor table. The
+        // HeapLarge gives page-aligned, GC-stable, physically-contiguous pages,
+        // the same allocator Virtqueue uses for its descriptor table. The
         // host DMA's from this, so physical contiguity matters.
         _framebuffer = (byte*)PageAllocator.AllocPages(PageType.HeapLarge, pageCount, true);
         if (_framebuffer is null)
@@ -567,7 +570,7 @@ internal unsafe class VirtioGpu : GraphicDevice
         while (!_ctrlQueue.GetUsedBuffer(out id, out len))
         {
             // Spin until the device completes. On a healthy device this is
-            // microseconds; on a wedged one we'd hang — the test harness
+            // microseconds; on a wedged one we'd hang, and the test harness
             // catches that with a timeout.
         }
 

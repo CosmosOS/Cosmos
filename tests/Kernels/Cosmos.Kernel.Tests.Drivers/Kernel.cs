@@ -33,7 +33,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// host node on both architectures, and on x64 the 82574L that q35 adds
 /// when a cell names no NIC, bound by <see cref="E1000EDriver"/> from
 /// <c>Cosmos.Kernel.Drivers</c> and published to the ring. virt's default
-/// NIC is virtio, which the HAL drives, so the E1000E tests skip on arm64.
+/// NIC is a virtio-net-pci function that the kit's VirtioNetDriver binds, so
+/// the E1000E tests skip on arm64.
 /// </para>
 /// <para>
 /// The suite is two projects. This kernel is the harness: it holds an
@@ -214,8 +215,9 @@ public class Kernel : Sys.Kernel
         // ==================== Hardware ====================
         // The host test is unconditional: the default cell on either arch
         // carries a PCI host. The E1000E tests need the 82574L q35 adds
-        // when a cell names no NIC; virt's default NIC is virtio, so they
-        // skip there. The node is looked up once, here, and read by path.
+        // when a cell names no NIC; virt's default NIC is a virtio-net-pci
+        // function that the kit's VirtioNetDriver binds, so they skip there.
+        // The node is looked up once, here, and read by path.
         _e1000ePath = FindE1000EPath();
         bool hasE1000E = _e1000ePath is not null;
         TR.Run("Hardware_PciHost_Bound", TestHardwarePciHostBound);
