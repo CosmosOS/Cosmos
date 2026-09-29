@@ -14,7 +14,7 @@
 | Test Framework | ✅ | ✅  |  |
 | Debugger| ✅ | 🟡 Partial | Source link + variables bugs in vscode |
 | CPU/FPU accelerated math | ✅ | ✅ | x64 only: x87 FPU (sin/cos/tan/exp/log/atan) |
-| Cosmos Graphic Subsystem | ✅ | ✅ | UEFI GOP framebuffer via Limine only. |
+| Cosmos Graphic Subsystem | ✅ | ✅ | The firmware framebuffer via Limine, plus the virtio-gpu and VMware SVGA II display drivers over the driver kit (SVGA3D on the latter). |
 | Network interface | ✅ | ✅ | |
 | Timer / Clock | ✅ | ✅ | |
 | Keyboard Input | ✅ | ✅ | |

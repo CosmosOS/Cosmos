@@ -1,13 +1,13 @@
 {
   // Global QEMU profile catalog. Two orthogonal axes:
-  //   * profiles  — a hardware "shape": the disks, NIC ("nic"), input
+  //   * profiles: a hardware "shape": the disks, NIC ("nic"), input
   //     devices ("keyboard"/"mouse"), VGA adapter ("vga", a -vga backend
   //     name that REPLACES the architecture default rather than adding a
   //     second adapter) and display device ("gpu", a -device model ADDED
   //     alongside that default) attached. An optional "architectures" filter
   //     pins a profile to the arch that can present that hardware; a suite
   //     listing per-arch profiles runs the matching one on each.
-  //   * modifiers — generic knobs that compose with a profile. Two flavors:
+  //   * modifiers: generic knobs that compose with a profile. Two flavors:
   //       - deviceOptions: per-disk-kind overrides (msix tuning, cache mode)
   //       - machineOptions: -M property overrides (gic-version, ...)
   //     plus an optional architectures filter so arch-specific knobs (GIC) are
@@ -47,14 +47,14 @@
       ]
     },
     {
-      // Intel E1000E NIC — the historical x64 default, kept as an explicit
+      // Intel E1000E NIC, the historical x64 default, kept as an explicit
       // cell so the driver keeps its coverage now that the NIC is a choice.
       "name": "e1000e",
       "architectures": ["x64"],
       "nic": "e1000e"
     },
     {
-      // virtio-net over PCI, NIC only — the data-path cell for the network
+      // virtio-net over PCI, NIC only: the data-path cell for the network
       // suite. One shape on both arches; only the MSI backend differs
       // underneath (LAPIC on x64, GICv3 ITS on arm64).
       "name": "virtio-net-pci",
@@ -63,20 +63,20 @@
       "nic": "virtio-net-pci"
     },
     {
-      // virtio-net over MMIO — what the arm64 virt machine presents, and
+      // virtio-net over MMIO, what the arm64 virt machine presents, and
       // what the suite ran with before NICs became a profile axis.
       "name": "virtio-net-mmio",
       "architectures": ["arm64"],
       "nic": "virtio-net-device"
     },
     {
-      // VMware SVGA II adapter in place of the default stdvga. The kernel has
-      // no SVGAII driver yet — the suite drives GOP on both cells — so today
-      // this proves the firmware-framebuffer path is adapter-agnostic: the
-      // device embeds a std VGA core with Bochs VBE, so Limine still hands
-      // the kernel a framebuffer. Becomes the SVGAII driver cell once that
-      // driver is ported. x64-only because the device is programmed through
-      // PCI port I/O.
+      // VMware SVGA II adapter in place of the default stdvga: the
+      // VmwareSvgaDriver cell. The driver binds the adapter and publishes
+      // its own display, and the firmware display Limine set up on the same
+      // adapter is retired ("firmware display "framebuffer" retired: inside
+      // pci:0000:00:01.0 bar 1"), so the manager lists the driver's display
+      // alone and the SVGA facet and FIFO wire tests run here. x64-only
+      // because the device is programmed through PCI port I/O.
       "name": "vmware-svga",
       "architectures": ["x64"],
       "vga": "vmware"
@@ -85,22 +85,22 @@
       // virtio-gpu on the PCI bus, ADDED next to the machine's default
       // adapter rather than replacing it ("gpu", not "vga"). Two reasons it
       // has to be additive:
-      //   * The default adapter is what the firmware hands Limine — VBE over
-      //     q35's std VGA, ramfb on virt — so keeping it means the suite's
-      //     existing framebuffer assertions still have a framebuffer, and the
-      //     cell differs from `bare` only by the device on the bus.
+      //   * The default adapter is what the firmware hands Limine (VBE over
+      //     q35's std VGA, ramfb on virt), so keeping it means the firmware
+      //     display stays published beside the driver's, and the cell
+      //     differs from `bare` only by the device on the bus.
       //   * -vga virtio would work on q35 (it resolves to the VGA-compatible
       //     virtio-vga), but virt has no such variant and refuses it outright
-      //     with "Virtio VGA not available" — so one shape spanning both
+      //     with "Virtio VGA not available", so one shape spanning both
       //     arches has to go through -device.
       //
-      // This is the cell the virtio-gpu driver actually runs in:
-      // FullScreenCanvas prefers a ready VirtioGpu over SVGA-II and GOP, so
-      // the suite's canvas tests render through VirtioGpuCanvas here and over
-      // the firmware framebuffer in the other cells — same assertions, both
-      // paths. A driver that fails to bind does not skip the cell, it falls
-      // back to GOP and passes quietly, so the binding itself is worth
-      // checking in the boot log ("[VirtioGpu] Initialization complete").
+      // This is the cell the virtio-gpu driver actually runs in: the
+      // VirtioGpuDriver publishes a display the manager prefers over the
+      // firmware one, so the suite's canvas tests render through it here and
+      // over the firmware framebuffer on bare, same assertions, both paths.
+      // The suite derives the cell from the device tree and fails when the
+      // driver did not bind; the binding shows in the boot log as
+      // "offer VirtioGpuDriver -> bound".
       //
       // gic-version=3 on arm64 for the same reason as virtio-pci: virtio-pci
       // MSI-X is routed by the GICv3 ITS and virt defaults to GICv2, which has
@@ -119,8 +119,8 @@
       // both columns.
       //
       // gic-version=3 is required on arm64, not cosmetic: MSI-X is routed by
-      // the GICv3 ITS, and the virt machine defaults to GICv2, which has none
-      // — MsiRouting would never get a binder and the transport would refuse
+      // the GICv3 ITS, and the virt machine defaults to GICv2, which has none:
+      // MsiRouting would never get a binder and the transport would refuse
       // to bring the device up. q35 rejects the property, hence the scoping.
       "name": "virtio-pci",
       "architectures": ["x64", "arm64"],
