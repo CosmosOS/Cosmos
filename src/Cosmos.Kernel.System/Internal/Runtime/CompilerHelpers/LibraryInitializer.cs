@@ -8,6 +8,7 @@ using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Keyboard;
 using Cosmos.Kernel.System.Mouse;
 using Cosmos.Kernel.System.Network;
@@ -78,6 +79,15 @@ internal class LibraryInitializer
                 {
                     Serial.WriteString("[KERNEL]   - Initializing network manager...\n");
                     NetworkManager.Initialize();
+                }
+
+                // Initialize Display Manager; its consumer lists the firmware
+                // framebuffer the engine publishes at its start and every
+                // display a kit driver publishes once the driver stage runs.
+                if (DisplayManager.IsEnabled)
+                {
+                    Serial.WriteString("[KERNEL]   - Initializing display manager...\n");
+                    DisplayManager.Initialize();
                 }
 
                 // Initialize Storage Manager (manager-level state only)

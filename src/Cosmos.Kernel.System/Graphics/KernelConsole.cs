@@ -306,13 +306,14 @@ public class KernelConsole
     }
 
     /// <summary>
-    /// Initializes the default (global) console on the hardware framebuffer.
+    /// Initializes the default (global) console on the primary display.
     /// Idempotent: a second call leaves the existing console in place, so a
     /// kernel that overrides <see cref="Kernel.OnBoot"/> may call this whether
     /// or not it also called <c>base.OnBoot()</c>.
     /// </summary>
     /// <returns>True when <see cref="Default"/> is available, false when
-    /// graphics are compiled out.</returns>
+    /// graphics are compiled out, no display is published, or the display
+    /// has no mode.</returns>
     [MemberNotNullWhen(true, nameof(Default))]
     public static bool Initialize()
     {
@@ -326,7 +327,21 @@ public class KernelConsole
             return true;
         }
 
-        var canvas = Canvas.GetFullScreen();
+        // No display, no console: the kernel has no framebuffer from the
+        // bootloader and no display driver bound a device.
+        if (DisplayManager.Primary is null)
+        {
+            return false;
+        }
+
+        Canvas canvas = Canvas.GetFullScreen();
+
+        // A display without a mode gives a zero-sized canvas, which no font
+        // cell fits.
+        if (canvas.Width == 0 || canvas.Height == 0)
+        {
+            return false;
+        }
 
         Default = new KernelConsole(canvas);
 

@@ -19,8 +19,8 @@
 
     <ItemGroup>
         <!-- The rest are internal because no kernel can obtain or meaningfully
-             supply one: the boot contract (IPlatformInitializer), IGraphicDevice,
-             and the input, timer and network devices, whose only registration
+             supply one: the boot contract (IPlatformInitializer) and the
+             input, timer and network devices, whose only registration
              callers are System's own LibraryInitializer wiring up HAL
              enumeration. A kernel reads NetworkManager.Name/MacAddress/
              LinkUp/Ready, never the device, exactly as it reads

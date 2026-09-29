@@ -51,20 +51,20 @@
   </Target>
 
   <ItemGroup>
-    <!-- System's internal canvases and managers sit directly on the HAL
-         drivers (GOP/SVGAII, AHCI/NVMe, PS/2 mouse, PCI discovery). -->
+    <!-- System's managers sit directly on the HAL drivers (AHCI/NVMe, PS/2
+         mouse, PCI discovery) and install their kit consumers through the
+         internal DeviceRegistry (keyboard, mouse, network, display). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
     <!-- The aggregator initializes PlatformHAL from its library initializer. -->
     <InternalsVisibleTo Include="Cosmos.Kernel" />
     <!-- Arch HALs implement the driver base classes and register devices. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
-    <!-- White-box suites over HAL internals: SVGAII FIFO wire format
-         (Graphic), MSI-X tables (Interrupts), PCI discovery and the nodes'
-         PciAccess (Pci), platform power ops (Power), AHCI/NVMe registers
-         (Storage), the TimerDevice base and its software timers (Timer),
-         the tree and the bindings' driver state (Virtio). -->
-    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Graphic" />
+    <!-- White-box suites over HAL internals: MSI-X tables (Interrupts),
+         PCI discovery and the nodes' PciAccess (Pci), platform power ops
+         (Power), AHCI/NVMe registers (Storage), the TimerDevice base and its
+         software timers (Timer), the tree and the bindings' driver state
+         (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />

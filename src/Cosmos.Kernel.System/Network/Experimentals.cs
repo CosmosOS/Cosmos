@@ -16,4 +16,12 @@ internal static class Experimentals
     /// the client members that accept or return packet objects.
     /// </summary>
     internal const string PacketSeamDiagId = "COSMOS0002";
+
+    /// <summary>
+    /// The driver kit seam, the id the HAL's kit types carry, shared so one
+    /// suppression covers the seam on both sides: the ring's
+    /// <see cref="Graphics.ICanvas3DFactory"/>, which a display driver
+    /// implements beside the kit's facets.
+    /// </summary>
+    internal const string DriverKitSeamDiagId = "COSMOS0003";
 }

@@ -9,6 +9,7 @@ using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Synthetic;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.Tests.Drivers.Library;
 using Cosmos.TestRunner.Framework;
@@ -23,9 +24,10 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// any node: the manifest the build generated (content, policy and order),
 /// arbitration, the unwinding of a declined or failed probe, publishing to a
 /// consumer, interrupt delivery in a synthetic dispatch, deferred work,
-/// periodic work, driver threads, teardown order and accounting, and child
-/// nodes. Every assertion reads <see cref="DriverInfo"/> or the suite's own
-/// drivers and consumer, never the serial log. One node is published from
+/// periodic work, driver threads, teardown order and accounting, child
+/// nodes, and a display published to the ring's display manager. Every
+/// assertion reads <see cref="DriverInfo"/>, the display manager or the
+/// suite's own drivers and consumer, never the serial log. One node is published from
 /// the constructor, before the driver stage, to cover the boot path; the
 /// rest are published from the tests, which is the hot-plug path.
 /// <para>
@@ -48,8 +50,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 3 retract, 3 children, 1 diagnostics, 5 hardware.</summary>
-    private const int ExpectedTestCount = 32;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 3 retract, 3 children, 1 diagnostics, 5 hardware.</summary>
+    private const int ExpectedTestCount = 33;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -198,6 +200,9 @@ public class Kernel : Sys.Kernel
         TR.Run("Interrupt_MaskUnmask", TestInterruptMaskUnmask);
         TR.Run("Periodic_FiresAtLeastThreeTimes", TestPeriodicFiresAtLeastThreeTimes);
         TR.Run("BlockingHandler_FaultRecorded", TestBlockingHandlerFaultRecorded);
+
+        // ==================== Display device ====================
+        TR.Run("Publish_Display_ReachesDisplayManager", TestPublishDisplayReachesDisplayManager);
 
         // ==================== Retract ====================
         TR.Run("Retract_DetachOrderAndAccounting", TestRetractDetachOrderAndAccounting);
@@ -603,6 +608,82 @@ public class Kernel : Sys.Kernel
         Assert.Equal(1, state.HandlerRuns, "the handler should not run again while masked");
     }
 
+    // ==================== Display device ====================
+
+    // The ring's display manager consumes the display kind: a display a
+    // driver publishes joins its list ahead of the firmware framebuffer and
+    // leaves it when the node is retracted. The state is read back through
+    // the manager's handle, which keeps answering after the withdrawal.
+    private static void TestPublishDisplayReachesDisplayManager()
+    {
+        int displaysBefore = DisplayManager.Count;
+        DisplayDevice? primaryBefore = DisplayManager.Primary;
+        Assert.True(primaryBefore is null || primaryBefore.IsFirmware, "before the publish only the firmware framebuffer, if any, is a display");
+
+        DeviceNode node = SyntheticBus.Publish(DisplayDriver.Key, []);
+        SyntheticBus.WaitForQueuedJobs();
+
+        DisplayState? state = node.Binding?.DriverState as DisplayState;
+        Assert.NotNull(state, "the display driver should hold the node");
+        if (state is null)
+        {
+            SyntheticBus.Retract(node);
+            SyntheticBus.WaitForQueuedJobs();
+            return;
+        }
+
+        Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info), "the display node should be in the tree");
+        Assert.True(info.State == DeviceNodeState.Bound, "the display driver should hold the node");
+        Assert.True(info.DriverName == nameof(DisplayDriver), "the display driver should hold the node");
+        Assert.Equal(1, info.PublishedDeviceCount, "the binding should hold one published device");
+
+        Assert.Equal(displaysBefore + 1, DisplayManager.Count, "the display manager should list one more display");
+        DisplayDevice? display = FindDisplay(DisplayState.DisplayName);
+        Assert.NotNull(display, "the manager should list the synthetic display by name");
+        if (display is null)
+        {
+            SyntheticBus.Retract(node);
+            SyntheticBus.WaitForQueuedJobs();
+            return;
+        }
+
+        Assert.True(display.DriverName == nameof(DisplayDriver), "the display should name its driver");
+        Assert.True(display.NodePath == node.Path, "the display should name its node");
+        Assert.False(display.IsFirmware, "a driver's display is not the firmware one");
+        Assert.False(display.IsWithdrawn, "a published display is not withdrawn");
+        Assert.Equal(DisplayState.ModeWidth, display.Width, "the display reports the driver's width");
+        Assert.Equal(DisplayState.ModeHeight, display.Height, "the display reports the driver's height");
+        Assert.Equal(DisplayState.ModeBitsPerPixel, display.BitsPerPixel, "the display reports the driver's depth");
+        Assert.Equal(DisplayState.ModePitch, display.Pitch, "the display reports the driver's pitch");
+        Assert.True(ReferenceEquals(DisplayManager.Primary, display), "a driver display is preferred over the firmware one");
+        Assert.True(display.TryGetFacet(out DisplayState? facet) && ReferenceEquals(facet, state), "the driver's state is found as a facet of the display");
+        Assert.False(display.TryGetFacet<IDisplayModes>(out _), "a display in one fixed mode has no modes facet");
+
+        int deviceIndex = FindDisplayDeviceIndex(node.Path);
+        Assert.True(deviceIndex >= 0, "the display should be in the published list under its node");
+        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.IsConsumed, "the display manager should have consumed the display");
+            Assert.True(device.DriverName == nameof(DisplayDriver), "the published device should name its driver");
+            Assert.True(device.Name == DisplayState.DisplayName, "the published device should carry the driver's name for it");
+        }
+
+        SyntheticBus.Retract(node);
+        SyntheticBus.WaitForQueuedJobs();
+
+        Assert.True(display.IsWithdrawn, "the handle should report the withdrawal");
+        Assert.Equal(0, display.Width, "a withdrawn display reports a zero mode");
+        Assert.Equal(0, display.Height, "a withdrawn display reports a zero mode");
+        Assert.Equal(0, display.BitsPerPixel, "a withdrawn display reports a zero mode");
+        Assert.Equal(0, display.RefreshRate, "a withdrawn display reports no refresh rate");
+        Assert.False(display.TryGetFacet<DisplayState>(out _), "a withdrawn display has no facet");
+        Assert.Equal(displaysBefore, DisplayManager.Count, "the display manager should have dropped the display");
+        Assert.Null(FindDisplay(DisplayState.DisplayName), "the withdrawn display should have left the manager's list");
+        Assert.True(ReferenceEquals(DisplayManager.Primary, primaryBefore), "the primary should be the firmware display again, or none");
+        Assert.True(FindDisplayDeviceIndex(node.Path) < 0, "the withdrawn display should have left the published list");
+        Assert.Equal(0, state.FlushCount, "a display without a framebuffer receives no flush");
+    }
+
     // ==================== Retract ====================
 
     // Teardown order: devices withdrawn (the consumer is told), interrupts
@@ -951,6 +1032,40 @@ public class Kernel : Sys.Kernel
         for (int i = 0; i < count; i++)
         {
             if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Network && info.NodePath == nodePath)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>Finds the display the manager lists under the given name.</summary>
+    /// <param name="name">The driver's name for the display.</param>
+    /// <returns>The manager's handle, or null when no display of that name is listed.</returns>
+    private static DisplayDevice? FindDisplay(string name)
+    {
+        int count = DisplayManager.Count;
+        for (int i = 0; i < count; i++)
+        {
+            if (DisplayManager.TryGet(i, out DisplayDevice? display) && display.Name == name)
+            {
+                return display;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>Finds the published display device whose node has the given path.</summary>
+    /// <param name="nodePath">The path of the node whose driver published the device.</param>
+    /// <returns>Its position in the published list, or -1.</returns>
+    private static int FindDisplayDeviceIndex(string nodePath)
+    {
+        int count = DriverInfo.DeviceCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Display && info.NodePath == nodePath)
             {
                 return i;
             }
