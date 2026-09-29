@@ -40,12 +40,12 @@ public sealed partial class DeviceBinding
     public void PublishBlockDevice(IBlockDevice device) =>
         Publish(DeviceKind.Block, device.Name, device, nameof(PublishBlockDevice));
 
-    /// <summary>Publishes a display.</summary>
+    /// <summary>Publishes a display under <see cref="IDisplay.Name"/>. The ring's display manager, when present, receives it at once.</summary>
     /// <param name="display">The driver's display contract.</param>
     /// <returns>The sink the driver reports mode changes to.</returns>
     /// <exception cref="InvalidOperationException">The binding is being torn down, or the caller is an interrupt handler.</exception>
     public DisplaySink PublishDisplay(IDisplay display) =>
-        new(Publish(DeviceKind.Display, DisplayName(display), display, nameof(PublishDisplay)));
+        new(Publish(DeviceKind.Display, display.Name, display, nameof(PublishDisplay)));
 
     /// <summary>
     /// Puts a device the driver found on its bus into the tree beneath this
@@ -129,7 +129,4 @@ public sealed partial class DeviceBinding
         DriverLog.Published(Node, Driver, published);
         return published;
     }
-
-    private static string DisplayName(IDisplay display) =>
-        $"{display.Mode.Width}x{display.Mode.Height}x{display.Mode.BitsPerPixel}";
 }

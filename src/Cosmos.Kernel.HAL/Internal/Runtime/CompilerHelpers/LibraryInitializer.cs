@@ -11,6 +11,7 @@ using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
 using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Devices.Usb;
+using Cosmos.Kernel.HAL.Firmware;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Pci;
 
@@ -121,6 +122,17 @@ internal class LibraryInitializer
                 Serial.WriteString("[KERNEL]   - Initializing NVMe...\n");
                 Nvme.Initialize();
             }
+        }
+
+        // Record the framebuffer the bootloader handed over, for the driver
+        // stage to publish as the firmware display. Outside the interrupts
+        // block: the framebuffer is there whenever graphics are on, as the
+        // early console reads it. The graphics switch alone, so a kernel
+        // that turned it off carries no firmware display.
+        if (CosmosFeatures.GraphicsEnabled)
+        {
+            Serial.WriteString("[KERNEL]   - Recording the firmware framebuffer...\n");
+            BootFirmware.DiscoverBootDisplay();
         }
     }
 }

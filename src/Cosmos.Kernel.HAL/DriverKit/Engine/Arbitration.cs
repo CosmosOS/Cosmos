@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.HAL.DriverKit.Devices;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 
 /// <summary>
@@ -11,7 +13,9 @@ namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 /// implements <see cref="INodeHooks"/> quiesces the hardware before the
 /// first probe, quiets it again after each probe that did not bind (before
 /// the probe's memory is freed) and restores it when nobody binds; with no
-/// candidate the hooks are not called. Worker only.
+/// candidate the hooks are not called. Once a driver binds a PCI function,
+/// the firmware display inside one of its memory windows is retired. Worker
+/// only.
 /// </summary>
 internal static class Arbitration
 {
@@ -59,6 +63,7 @@ internal static class Arbitration
                 node.State = NodeState.Bound;
                 node.AddOffer(new DeviceOffer(driver.Name, driver.Priority, candidates[i].Specificity, ProbeOutcome.Bound, null, 0));
                 DriverLog.Offer(node, driver, result);
+                DeviceRegistry.RetireFirmwareDisplaysBehind(node);
                 return;
             }
 

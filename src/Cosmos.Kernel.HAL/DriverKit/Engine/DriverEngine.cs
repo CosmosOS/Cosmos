@@ -3,6 +3,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.Firmware;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Engine;
@@ -57,7 +59,8 @@ internal static class DriverEngine
     internal static bool IsOnWorker => s_worker is not null && ReferenceEquals(KitTime.CurrentThread, s_worker);
 
     /// <summary>
-    /// Starts the engine: logs the manifest, starts the worker (or settles
+    /// Starts the engine: logs the manifest, publishes the firmware display
+    /// when the bootloader handed one over, starts the worker (or settles
     /// for inline mode), and offers every node published so far. Returns
     /// once every node, the children a bus driver published from its probe
     /// included, has been offered. Called once from the kernel start path.
@@ -70,6 +73,24 @@ internal static class DriverEngine
         }
 
         DriverLog.Manifest(DriverRegistry.Drivers);
+
+        // Before the worker exists and before any offer runs, so the
+        // retirement rule sees the firmware display when a driver binds the
+        // function holding it. A consumer that throws costs the kit the
+        // firmware display, not the boot: PublishFirmware has withdrawn it.
+        if (BootFirmware.BootDisplay is { } display)
+        {
+            try
+            {
+                PublishedDevice device = DeviceRegistry.PublishFirmware(DeviceKind.Display, display.Name, display);
+                DriverLog.FirmwarePublished(device);
+            }
+            catch (Exception exception)
+            {
+                DriverLog.EngineError(exception.Message);
+            }
+        }
+
         EngineMode mode = EngineMode.Inline;
         if (CosmosFeatures.SchedulerEnabled && KernelThread.TryStart(WorkerMain, out SchedulerThread? worker))
         {

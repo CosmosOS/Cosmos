@@ -16,7 +16,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// device wrote and the data it guards. A <see cref="RegisterWindow"/> access
 /// carries its own barriers. Managed arrays are not DMA memory: the pinned heap
 /// is collected when nothing references an array, and a device holds no
-/// reference.
+/// reference. <see cref="Region"/> is the same memory as a
+/// <see cref="DeviceRegion"/>, for a display whose framebuffer is DMA memory.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed unsafe class DmaBuffer : IKitResource
@@ -29,6 +30,9 @@ public sealed unsafe class DmaBuffer : IKitResource
 
     /// <summary>First byte of the pages the buffer was carved from, what the allocator gets back.</summary>
     private readonly ulong _pagesAddress;
+
+    /// <summary>The one region over the buffer, created with it; invalidated by <see cref="Release"/>.</summary>
+    private readonly DeviceRegion _region;
 
     /// <summary>Set once the pages are freed; every access throws from then on. Checked in every build.</summary>
     private volatile bool _released;
@@ -45,6 +49,29 @@ public sealed unsafe class DmaBuffer : IKitResource
         _pagesAddress = pagesAddress;
         PhysicalAddress = physicalAddress;
         Length = length;
+        _region = new DeviceRegion(address, (ulong)length, RegionCaching.Normal);
+    }
+
+    /// <summary>
+    /// The buffer as a <see cref="DeviceRegion"/>, one instance for the
+    /// buffer's lifetime, created with it. Throws once released, and the
+    /// region itself throws from then on, so a driver that handed it out
+    /// (an <see cref="Devices.IDisplay.Framebuffer"/> over DMA memory) never
+    /// exposes freed pages. The region is not in the binding's ledger: the
+    /// buffer's own release invalidates it. Any context; allocation-free.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The binding that allocated the buffer was torn down and its memory freed.</exception>
+    public DeviceRegion Region
+    {
+        get
+        {
+            if (_released)
+            {
+                throw new InvalidOperationException(ReleasedMessage);
+            }
+
+            return _region;
+        }
     }
 
     /// <summary>The buffer as the CPU reads and writes it. Allocation-free, so an interrupt handler may use it.</summary>
@@ -100,7 +127,7 @@ public sealed unsafe class DmaBuffer : IKitResource
     /// </summary>
     public static void WriteBarrier() => DmaOrdering.WriteBarrier();
 
-    /// <summary>Frees the pages and makes every later <see cref="Span"/> throw. Teardown only.</summary>
+    /// <summary>Frees the pages and makes every later <see cref="Span"/> and <see cref="Region"/> access throw. Teardown only.</summary>
     internal void Release()
     {
         if (_released)
@@ -109,6 +136,7 @@ public sealed unsafe class DmaBuffer : IKitResource
         }
 
         _released = true;
+        _region.Invalidate();
         PageAllocator.Free((void*)_pagesAddress);
     }
 

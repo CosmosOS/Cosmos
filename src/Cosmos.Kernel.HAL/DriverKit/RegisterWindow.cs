@@ -17,8 +17,10 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// said the data is there. Over a memory window the accesses are device-memory
 /// loads and stores; over a port range on x64 they are <c>in</c> and
 /// <c>out</c>, and the same driver code works over either. Offsets are checked
-/// against the window's bounds and the access width's alignment. The
-/// accessors neither allocate nor block, so an interrupt handler may use them.
+/// against the window's bounds, and over a memory window against the access
+/// width's alignment; ports are byte addressed, so a port range accepts any
+/// offset. The accessors neither allocate nor block, so an interrupt handler
+/// may use them.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class RegisterWindow : IKitResource
@@ -29,7 +31,7 @@ public sealed class RegisterWindow : IKitResource
     /// <summary>Set by the binding's teardown; every access throws from then on. Checked in every build.</summary>
     private volatile bool _invalidated;
 
-    /// <summary>Length of the window in bytes (or ports). An access of n bytes is valid at any multiple of n up to Length minus n.</summary>
+    /// <summary>Length of the window in bytes (or ports). An access of n bytes is valid at any multiple of n up to Length minus n over a memory window, and at any offset up to Length minus n over a port range.</summary>
     public ulong Length { get; }
 
     internal RegisterWindow(ulong address, ulong length, bool isPortRange)
@@ -51,7 +53,7 @@ public sealed class RegisterWindow : IKitResource
         return value;
     }
 
-    /// <summary>Reads the 16-bit register at <paramref name="offset"/>, a multiple of 2.</summary>
+    /// <summary>Reads the 16-bit register at <paramref name="offset"/>, a multiple of 2 over a memory window; any offset over a port range.</summary>
     /// <param name="offset">Offset from the start of the window.</param>
     /// <exception cref="ArgumentOutOfRangeException">The access runs past the window or is misaligned.</exception>
     /// <exception cref="InvalidOperationException">The binding that mapped the window was torn down.</exception>
@@ -63,7 +65,7 @@ public sealed class RegisterWindow : IKitResource
         return value;
     }
 
-    /// <summary>Reads the 32-bit register at <paramref name="offset"/>, a multiple of 4.</summary>
+    /// <summary>Reads the 32-bit register at <paramref name="offset"/>, a multiple of 4 over a memory window; any offset over a port range.</summary>
     /// <param name="offset">Offset from the start of the window.</param>
     /// <exception cref="ArgumentOutOfRangeException">The access runs past the window or is misaligned.</exception>
     /// <exception cref="InvalidOperationException">The binding that mapped the window was torn down.</exception>
@@ -107,7 +109,7 @@ public sealed class RegisterWindow : IKitResource
         }
     }
 
-    /// <summary>Writes <paramref name="value"/> to the 16-bit register at <paramref name="offset"/>, a multiple of 2.</summary>
+    /// <summary>Writes <paramref name="value"/> to the 16-bit register at <paramref name="offset"/>, a multiple of 2 over a memory window; any offset over a port range.</summary>
     /// <param name="offset">Offset from the start of the window.</param>
     /// <param name="value">Value to write.</param>
     /// <exception cref="ArgumentOutOfRangeException">The access runs past the window or is misaligned.</exception>
@@ -126,7 +128,7 @@ public sealed class RegisterWindow : IKitResource
         }
     }
 
-    /// <summary>Writes <paramref name="value"/> to the 32-bit register at <paramref name="offset"/>, a multiple of 4.</summary>
+    /// <summary>Writes <paramref name="value"/> to the 32-bit register at <paramref name="offset"/>, a multiple of 4 over a memory window; any offset over a port range.</summary>
     /// <param name="offset">Offset from the start of the window.</param>
     /// <param name="value">Value to write.</param>
     /// <exception cref="ArgumentOutOfRangeException">The access runs past the window or is misaligned.</exception>
@@ -179,7 +181,8 @@ public sealed class RegisterWindow : IKitResource
     /// <summary>
     /// Address (or port) of an access of <paramref name="size"/> bytes at
     /// <paramref name="offset"/>, after checking that the window is still
-    /// valid, that the access fits in it and that it is naturally aligned.
+    /// valid, that the access fits in it and, over a memory window, that it
+    /// is naturally aligned.
     /// </summary>
     private ulong AddressOf(ulong offset, ulong size)
     {
@@ -195,9 +198,11 @@ public sealed class RegisterWindow : IKitResource
             throw new ArgumentOutOfRangeException(nameof(offset), offset, "The access runs past the end of the register window.");
         }
 
-        // A misaligned access is split or refused differently by each
-        // architecture and device, so it is refused here on all of them.
-        if ((offset & (size - 1)) != 0)
+        // A misaligned memory access is split or refused differently by each
+        // architecture and device, so it is refused here on all of them. x86
+        // port I/O is byte addressed (the SVGA value port sits at base + 1
+        // and is a 32-bit port), so a port range accepts any offset.
+        if (!_isPortRange && (offset & (size - 1)) != 0)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, "The offset is not a multiple of the access width.");
         }

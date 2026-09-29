@@ -10,8 +10,11 @@ namespace Cosmos.Kernel.HAL.DriverKit.Devices;
 /// allocate nor throw, where interface dispatch has cold paths that do both.
 /// <para>
 /// Contexts: <see cref="OnPublished"/> and <see cref="OnWithdrawn"/> run in
-/// thread context on the kit worker, inside the publishing driver's probe or
-/// the binding's teardown. The report methods of the derived classes run in
+/// thread context, never concurrently: on the kit worker inside the
+/// publishing driver's probe or the binding's teardown, or, for a device of
+/// firmware provenance, on the boot thread before the engine started
+/// (<see cref="DeviceRegistry.PublishFirmware"/>) and from the offer that
+/// retires it. The report methods of the derived classes run in
 /// the sink caller's context, interrupt context included, and must follow
 /// the handler rules: no allocation, no blocking.
 /// </para>
