@@ -18,9 +18,8 @@ namespace Cosmos.Kernel.Drivers;
 /// fallback, since PCI lines are level and shared and the platform routing
 /// is edge; a function whose messages cannot be routed (ARM64 without an
 /// ITS, the virt machine's default GICv2) is published with no interrupt
-/// entry and its leaf polls or declines. The virtio-gpu function stays with
-/// the HAL's graphics driver until the display stage. <see cref="Probe"/>
-/// and <see cref="OnDetach"/> run in thread context on the kit worker.
+/// entry and its leaf polls or declines. <see cref="Probe"/> and
+/// <see cref="OnDetach"/> run in thread context on the kit worker.
 /// </summary>
 [Driver(Feature = DriverFeature.Pci)]
 public sealed class VirtioPciTransportDriver : Driver
@@ -118,11 +117,6 @@ public sealed class VirtioPciTransportDriver : Driver
         else
         {
             return ProbeResult.Declined("not a virtio function");
-        }
-
-        if (type == (uint)VirtioDeviceType.Gpu)
-        {
-            return ProbeResult.Declined("virtio-gpu is driven by the HAL's graphics driver until the display stage");
         }
 
         // 2. The capability walk: the first capability of each type is kept.

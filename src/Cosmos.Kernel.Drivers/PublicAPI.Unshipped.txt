@@ -14,6 +14,23 @@ Cosmos.Kernel.Drivers.E1000EState.Name.get -> string!
 Cosmos.Kernel.Drivers.E1000EState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
 Cosmos.Kernel.Drivers.PciHostDriver
 Cosmos.Kernel.Drivers.PciHostDriver.PciHostDriver() -> void
+Cosmos.Kernel.Drivers.VirtioGpuDriver
+Cosmos.Kernel.Drivers.VirtioGpuDriver.VirtioGpuDriver() -> void
+Cosmos.Kernel.Drivers.VirtioGpuState
+Cosmos.Kernel.Drivers.VirtioGpuState.CommandsSent.get -> int
+Cosmos.Kernel.Drivers.VirtioGpuState.Flush(int x, int y, int width, int height) -> void
+Cosmos.Kernel.Drivers.VirtioGpuState.FlushCount.get -> int
+Cosmos.Kernel.Drivers.VirtioGpuState.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion?
+Cosmos.Kernel.Drivers.VirtioGpuState.HasInterrupt.get -> bool
+Cosmos.Kernel.Drivers.VirtioGpuState.Height.get -> int
+Cosmos.Kernel.Drivers.VirtioGpuState.InterruptCount.get -> int
+Cosmos.Kernel.Drivers.VirtioGpuState.IsFaulted.get -> bool
+Cosmos.Kernel.Drivers.VirtioGpuState.IsPolling.get -> bool
+Cosmos.Kernel.Drivers.VirtioGpuState.Mode.get -> Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode
+Cosmos.Kernel.Drivers.VirtioGpuState.Name.get -> string!
+Cosmos.Kernel.Drivers.VirtioGpuState.ScanoutCount.get -> int
+Cosmos.Kernel.Drivers.VirtioGpuState.Version1Negotiated.get -> bool
+Cosmos.Kernel.Drivers.VirtioGpuState.Width.get -> int
 Cosmos.Kernel.Drivers.VirtioInputDriver
 Cosmos.Kernel.Drivers.VirtioInputDriver.VirtioInputDriver() -> void
 Cosmos.Kernel.Drivers.VirtioInputState
@@ -46,6 +63,41 @@ Cosmos.Kernel.Drivers.VirtioNetState.Version1Negotiated.get -> bool
 Cosmos.Kernel.Drivers.VirtioPciTransport
 Cosmos.Kernel.Drivers.VirtioPciTransportDriver
 Cosmos.Kernel.Drivers.VirtioPciTransportDriver.VirtioPciTransportDriver() -> void
+Cosmos.Kernel.Drivers.VmwareSvga3DState
+Cosmos.Kernel.Drivers.VmwareSvgaDriver
+Cosmos.Kernel.Drivers.VmwareSvgaDriver.VmwareSvgaDriver() -> void
+Cosmos.Kernel.Drivers.VmwareSvgaState
+Cosmos.Kernel.Drivers.VmwareSvgaState.Capabilities.get -> uint
+Cosmos.Kernel.Drivers.VmwareSvgaState.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Canvas3D!
+Cosmos.Kernel.Drivers.VmwareSvgaState.FifoMax.get -> uint
+Cosmos.Kernel.Drivers.VmwareSvgaState.FifoMin.get -> uint
+Cosmos.Kernel.Drivers.VmwareSvgaState.Flush(int x, int y, int width, int height) -> void
+Cosmos.Kernel.Drivers.VmwareSvgaState.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion?
+Cosmos.Kernel.Drivers.VmwareSvgaState.Is3DNegotiated.get -> bool
+Cosmos.Kernel.Drivers.VmwareSvgaState.IsEnabled.get -> bool
+Cosmos.Kernel.Drivers.VmwareSvgaState.Mode.get -> Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode
+Cosmos.Kernel.Drivers.VmwareSvgaState.Modes.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode>
+Cosmos.Kernel.Drivers.VmwareSvgaState.Name.get -> string!
+Cosmos.Kernel.Drivers.VmwareSvgaState.NextCommand.get -> uint
+Cosmos.Kernel.Drivers.VmwareSvgaState.NextCommand.set -> void
+Cosmos.Kernel.Drivers.VmwareSvgaState.ReadFifo(uint byteOffset) -> uint
+Cosmos.Kernel.Drivers.VmwareSvgaState.Set(int x, int y, bool visible) -> void
+Cosmos.Kernel.Drivers.VmwareSvgaState.SetEnabled(bool enabled) -> void
+Cosmos.Kernel.Drivers.VmwareSvgaState.Svga3DVersion.get -> uint
+Cosmos.Kernel.Drivers.VmwareSvgaState.TryDefine(int hotspotX, int hotspotY, int width, int height, System.ReadOnlySpan<uint> pixels) -> bool
+Cosmos.Kernel.Drivers.VmwareSvgaState.TrySetMode(int width, int height, int bitsPerPixel) -> bool
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.Capabilities.get -> uint
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Canvas3D!
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.FifoMax.get -> uint
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.FifoMin.get -> uint
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.Is3DNegotiated.get -> bool
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.IsEnabled.get -> bool
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.NextCommand.get -> uint
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.NextCommand.set -> void
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.ReadFifo(uint byteOffset) -> uint
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.SetEnabled(bool enabled) -> void
+[COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.Svga3DVersion.get -> uint
 override Cosmos.Kernel.Drivers.E1000EDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.E1000EDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.E1000EDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
@@ -53,6 +105,10 @@ override Cosmos.Kernel.Drivers.E1000EDriver.Probe(Cosmos.Kernel.HAL.DriverKit.De
 override Cosmos.Kernel.Drivers.PciHostDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.PciHostDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.PciHostDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.VirtioGpuDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.VirtioGpuDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.VirtioGpuDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.VirtioGpuDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.VirtioInputDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.VirtioInputDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.VirtioInputDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
@@ -106,3 +162,7 @@ override Cosmos.Kernel.Drivers.VirtioPciTransportDriver.Matches.get -> System.Re
 override Cosmos.Kernel.Drivers.VirtioPciTransportDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.VirtioPciTransportDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.VirtioPciTransportDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.VmwareSvgaDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.VmwareSvgaDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.VmwareSvgaDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.VmwareSvgaDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
