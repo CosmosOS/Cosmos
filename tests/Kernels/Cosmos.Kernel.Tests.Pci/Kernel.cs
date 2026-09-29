@@ -1,4 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.TestRunner.Framework;
@@ -50,8 +55,14 @@ public class Kernel : Sys.Kernel
     /// <summary>Resources every function node carries: one per base address register slot, assigned or not (PCI type 0 headers have six).</summary>
     private const int PciFunctionResourceCount = 6;
 
-    /// <summary>Interrupt sources every function node carries: its legacy line, routed or not.</summary>
-    private const int PciFunctionInterruptCount = 1;
+    /// <summary>Line interrupt sources every function node carries first: its legacy line, routed or not, before any message source.</summary>
+    private const int PciFunctionLineCount = 1;
+
+    /// <summary>Prefix of the description of a function's legacy line source ("line 11" or "line (none)").</summary>
+    private const string LineSourcePrefix = "line";
+
+    /// <summary>Prefix of the description of a function's first message source, completed by the size of its MSI-X table.</summary>
+    private const string FirstMessageSourcePrefix = "message 0 of ";
 
     protected override void BeforeRun()
     {
@@ -66,7 +77,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Manager_Initialized", TestManager_Initialized);
         // Unconditional on purpose: this suite's only cell is the default
         // q35/virt machine, where zero enumerated devices is an enumeration
-        // regression — the one thing this suite exists to catch — not an
+        // regression, the one thing this suite exists to catch, not an
         // environment condition. Gating it on anyDevice (= Count > 0) made
         // it a tautology that converted such a regression into 5 skips and
         // a green CI. anyDevice keeps gating only the per-device
@@ -104,7 +115,7 @@ public class Kernel : Sys.Kernel
     // ==================== Manager ====================
 
     // Devices array is allocated by PciManager.Setup() during boot, even when
-    // zero devices end up being found. A null array means Setup never ran —
+    // zero devices end up being found. A null array means Setup never ran,
     // a kernel-init regression, not a "no PCI on this profile" condition.
     private static void TestManager_Initialized()
     {
@@ -156,12 +167,14 @@ public class Kernel : Sys.Kernel
 
     // ==================== Host ====================
     //
-    // The driver kit's view of the same bus, read through DriverInfo only:
+    // The driver kit's view of the same bus, enumerated through DriverInfo:
     // the platform node the machine description publishes for the PCI
     // host, the PciHostDriver that binds it, and the function nodes the
-    // driver publishes beneath it. PciManager's legacy scan walks the same
-    // configuration space, so the two enumerations are checked against
-    // each other.
+    // driver publishes beneath it. The per-function interrupt check reads
+    // the kit node itself through the suite's HAL grant, since the expected
+    // count depends on the function's MSI-X table, which the snapshot does
+    // not carry. PciManager's legacy scan walks the same configuration
+    // space, so the two enumerations are checked against each other.
 
     private static void TestHost_PlatformNodeBoundByPciHostDriver()
     {
@@ -189,7 +202,22 @@ public class Kernel : Sys.Kernel
 
             published++;
             Assert.Equal(PciFunctionResourceCount, info.ResourceCount, "a function node carries one resource per BAR slot: " + info.Path);
-            Assert.Equal(PciFunctionInterruptCount, info.InterruptCount, "a function node carries its legacy line as one source: " + info.Path);
+
+            if (!TryFindKitNode(info.Path, out DeviceNode? node))
+            {
+                Assert.Fail("the function node should be in the engine's tree: " + info.Path);
+                continue;
+            }
+
+            PciAccess pci = node.Access<PciAccess>();
+            int expectedInterrupts = PciFunctionLineCount
+                + (pci.IsMsiXCapable ? Math.Min(pci.MessageInterruptCount, PciHostAccess.MaxDescribedMessages) : 0);
+            Assert.Equal(expectedInterrupts, info.InterruptCount, "a function node carries its legacy line first, then one source per described message: " + info.Path);
+            Assert.True(node.Interrupts[0].Describe().StartsWith(LineSourcePrefix, StringComparison.Ordinal), "the first source of a function node should be its legacy line: " + info.Path);
+            if (pci.IsMsiXCapable)
+            {
+                Assert.True(string.Equals(node.Interrupts[1].Describe(), FirstMessageSourcePrefix + pci.MessageInterruptCount, StringComparison.Ordinal), "the second source of an MSI-X capable function should be its first message: " + info.Path);
+            }
         }
 
         Assert.True(published >= 1, "the host driver should have published at least one function node under the host");
@@ -227,6 +255,32 @@ public class Kernel : Sys.Kernel
         }
 
         host = default;
+        return false;
+    }
+
+    /// <summary>
+    /// Finds the kit node with the given path in the engine's tree itself,
+    /// through the HAL grant: the access object and the interrupt sources
+    /// the host test reads are on the node, which no diagnostic snapshot
+    /// carries. Paths are compared ordinally.
+    /// </summary>
+    /// <param name="path">The node's path, as DriverInfo reports it.</param>
+    /// <param name="node">The node when found.</param>
+    /// <returns>True when a node with that path is in the tree.</returns>
+    private static bool TryFindKitNode(string path, [NotNullWhen(true)] out DeviceNode? node)
+    {
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            DeviceNode candidate = nodes[i];
+            if (string.Equals(candidate.Path, path, StringComparison.Ordinal))
+            {
+                node = candidate;
+                return true;
+            }
+        }
+
+        node = null;
         return false;
     }
 

@@ -84,6 +84,9 @@ public sealed class PciAccess : INodeHooks
         _messageInterruptCount = _msiXCapability == 0
             ? 0
             : (ReadConfig16((ushort)(_msiXCapability + MsiXMessageControlOffset)) & MsiXTableSizeMask) + 1;
+        MessageTable = _msiXCapability == 0
+            ? null
+            : new PciMessageTable(this, _msiXCapability, _messageInterruptCount);
     }
 
     /// <summary>The six base address registers as the host sized them; the resource at the same index is the mappable form.</summary>
@@ -100,6 +103,9 @@ public sealed class PciAccess : INodeHooks
 
     /// <summary>The MSI-X table size (Message Control's table size plus one), or 0 without the capability.</summary>
     public int MessageInterruptCount => _messageInterruptCount;
+
+    /// <summary>The MSI-X table the kit programs for the function's message interrupt sources; null without the capability.</summary>
+    internal PciMessageTable? MessageTable { get; }
 
     /// <summary>The mechanism the function is reached through.</summary>
     internal PciConfigSpace ConfigSpace => _configSpace;

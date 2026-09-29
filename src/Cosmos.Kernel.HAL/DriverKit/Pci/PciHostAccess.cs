@@ -82,6 +82,15 @@ public sealed class PciHostAccess
     /// <summary>Bytes of ECAM per bus.</summary>
     private const ulong EcamBusSize = 1UL << EcamBusShift;
 
+    /// <summary>
+    /// How many message interrupt sources a function's description
+    /// carries at most, after its legacy line. A function with a larger
+    /// MSI-X table (an NVMe controller advertises up to 2048 entries) is
+    /// offered its first 32 messages; a driver that needs more is a later
+    /// extension of the description.
+    /// </summary>
+    internal const int MaxDescribedMessages = 32;
+
     private readonly PciConfigSpace _configSpace;
 
     internal PciHostAccess(PciConfigSpace configSpace, ushort segment, byte startBus, byte endBus)
@@ -228,9 +237,11 @@ public sealed class PciHostAccess
     /// <summary>
     /// Reads a function's header and builds what a host driver publishes
     /// for it: its identity, six resources (one per base address register,
-    /// sized here with decoding off; see the remarks), its legacy line as
-    /// the one interrupt source, and its <see cref="PciAccess"/>. Thread
-    /// context.
+    /// sized here with decoding off; see the remarks), its interrupt
+    /// sources (the legacy line first, then one message source per MSI-X
+    /// table entry up to <see cref="MaxDescribedMessages"/> when the
+    /// function has the capability), and its <see cref="PciAccess"/>.
+    /// Thread context.
     /// </summary>
     /// <remarks>
     /// Sizing writes all ones to each register and reads the mask back, so
@@ -301,7 +312,18 @@ public sealed class PciHostAccess
         }
 
         PciAccess access = new(_configSpace, bus, device, function, headerType, bars, interruptLine, interruptPin);
-        InterruptSource[] interrupts = [new PciLineInterruptSource(access)];
+        PciMessageTable? table = access.MessageTable;
+        int messageCount = table is null ? 0 : Math.Min(table.EntryCount, MaxDescribedMessages);
+        InterruptSource[] interrupts = new InterruptSource[1 + messageCount];
+        interrupts[0] = new PciLineInterruptSource(access);
+        if (table is not null)
+        {
+            for (int message = 0; message < messageCount; message++)
+            {
+                interrupts[1 + message] = new PciMessageInterruptSource(table, message);
+            }
+        }
+
         description = new PciFunctionDescription(identity, resources, interrupts, access);
         return true;
     }

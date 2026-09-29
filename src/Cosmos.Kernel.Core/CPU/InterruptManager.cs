@@ -87,10 +87,10 @@ internal static class InterruptManager
     }
 
     // Dynamic vector allocations (MSI / MSI-X) start above the legacy
-    // ISA-IRQ window (0x20–0x2F) and any future arch-reserved range
-    // (0x30–0x3F), and stop below the platform-claimed high vectors: the
+    // ISA-IRQ window (0x20 to 0x2F) and any future arch-reserved range
+    // (0x30 to 0x3F), and stop below the platform-claimed high vectors: the
     // x64 LAPIC timer (0xEF) and APIC spurious (0xFF) are registered via
-    // SetHandler and must never be handed out — or freed — as dynamic
+    // SetHandler and must never be handed out, or freed, as dynamic
     // slots.
     private const byte DynamicVectorMin = 0x40;
     private const byte DynamicVectorMax = 0xEE;
@@ -148,9 +148,9 @@ internal static class InterruptManager
     /// clears its handler so the slot can be handed out again (the
     /// allocator's wrap pass picks freed slots back up). Without this, every
     /// consumer teardown would permanently leak one of the 175 dynamic slots
-    /// and leave a stale delegate rooted — and invokable — in the table.
-    /// Vectors outside the dynamic range — including the platform-claimed
-    /// LAPIC timer and spurious vectors above it — are ignored.
+    /// and leave a stale delegate rooted, and invokable, in the table.
+    /// Vectors outside the dynamic range, including the platform-claimed
+    /// LAPIC timer and spurious vectors above it, are ignored.
     /// </summary>
     public static void FreeVector(byte vector)
     {
@@ -208,6 +208,16 @@ internal static class InterruptManager
     /// <param name="irqNo">IRQ index (0-15 for ISA IRQs).</param>
     public static bool HasIrqHandler(byte irqNo) =>
         s_irqHandlers is not null && s_irqHandlers[(byte)(IsaIrqVectorBase + irqNo)] is not null;
+
+    /// <summary>
+    /// True when a handler is registered on a raw vector: the twin of
+    /// <see cref="HasIrqHandler"/> for platforms that dispatch by
+    /// controller id (ARM64, where the slot is the INTID) rather than by
+    /// an ISA line's remapped vector. Any context.
+    /// </summary>
+    /// <param name="vector">Interrupt vector index.</param>
+    public static bool HasHandler(byte vector) =>
+        s_irqHandlers is not null && s_irqHandlers[vector] is not null;
 
     /// <summary>
     /// Masks a hardware IRQ at the controller; nothing before the controller

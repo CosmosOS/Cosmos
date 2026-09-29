@@ -94,10 +94,13 @@ internal interface IPlatformInitializer
 
     /// <summary>
     /// Publishes the root platform nodes of this machine into the driver
-    /// kit: the PCI host today, every device no bus enumerates later. Called
+    /// kit: the PCI host on both architectures, and on ARM64 one node per
+    /// occupied slot of the virt machine's virtio-mmio window, whatever the
+    /// feature switches and whether or not ACPI described anything. Called
     /// once from the HAL library initializer after
     /// <see cref="InitializeHardware"/>, with interrupts disabled; the nodes
-    /// are offered when the driver stage runs.
+    /// are offered when the driver stage runs, and a node's lines are only
+    /// described here, connected by the driver that binds it.
     /// </summary>
     void PublishPlatformNodes();
 

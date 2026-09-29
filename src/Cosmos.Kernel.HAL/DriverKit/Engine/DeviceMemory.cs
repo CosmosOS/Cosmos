@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.HAL.Interfaces;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Engine;
@@ -16,6 +17,15 @@ internal static class DeviceMemory
 {
     /// <summary>The block size both device mappers install: 2 MiB.</summary>
     public const ulong MappingBlockSize = 2 * 1024 * 1024;
+
+    /// <summary>
+    /// Limine's higher-half direct map offset: a physical address plus it is
+    /// the kernel's virtual alias of the same bytes, which is where a mapped
+    /// window is reached. 0 without a bootloader response. Any context;
+    /// allocation-free.
+    /// </summary>
+    internal static unsafe ulong HhdmOffset() =>
+        Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : 0;
 
     /// <summary>
     /// Asks the platform to map every block of the window that starts at

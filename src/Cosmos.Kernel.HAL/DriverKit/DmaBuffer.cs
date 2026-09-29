@@ -21,6 +21,9 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed unsafe class DmaBuffer : IKitResource
 {
+    /// <summary>The message of the exception every access throws once the pages are freed; the kit's ring code throws the same one.</summary>
+    internal const string ReleasedMessage = "The binding that allocated this DMA buffer was torn down, and its memory freed.";
+
     /// <summary>Virtual address of the first byte, inside the pages freed on release.</summary>
     private readonly ulong _address;
 
@@ -52,12 +55,36 @@ public sealed unsafe class DmaBuffer : IKitResource
         {
             if (_released)
             {
-                throw new InvalidOperationException("The binding that allocated this DMA buffer was torn down, and its memory freed.");
+                throw new InvalidOperationException(ReleasedMessage);
             }
 
             return new Span<byte>((void*)_address, Length);
         }
     }
+
+    /// <summary>
+    /// The virtual address of the first byte, for the kit's own ring code
+    /// (a virtqueue captures its ring pointers from it once, in thread
+    /// context). Throws once released, as <see cref="Span"/> does, so no kit
+    /// code can capture a pointer from a freed buffer. Any context;
+    /// allocation-free.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The binding that allocated the buffer was torn down and its memory freed.</exception>
+    internal ulong Address
+    {
+        get
+        {
+            if (_released)
+            {
+                throw new InvalidOperationException(ReleasedMessage);
+            }
+
+            return _address;
+        }
+    }
+
+    /// <summary>True once the pages went back to the allocator: a volatile read, for the kit's ring code to refuse a ring access. Any context; allocation-free.</summary>
+    internal bool IsReleased => _released;
 
     /// <summary>
     /// Orders loads from DMA memory: every load before it completes before
