@@ -225,6 +225,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceRegion.Caching.get -> Cosmos.Kernel.HAL.DriverKit.RegionCaching
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceRegion.Length.get -> ulong
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceRegion.Pointer.get -> byte*
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceRegion.Slice(ulong offset, ulong length) -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceRegion.Span.get -> System.Span<byte>
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResource
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResource.Base.get -> ulong
@@ -242,8 +243,11 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.BitsPerPixel.get -> int
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.DisplayMode() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.DisplayMode(int width, int height, int pitch, int bitsPerPixel) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.DisplayMode(int width, int height, int pitch, int bitsPerPixel, int refreshRate) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.Height.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.IsEmpty.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.Pitch.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.RefreshRate.get -> int
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.Width.get -> int
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplaySink
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplaySink.ModeChanged() -> void
@@ -251,6 +255,13 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplay.Flush(int x, int y, int width, int height) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplay.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion?
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplay.Mode.get -> Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplay.Name.get -> string!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplayModes
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplayModes.Modes.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode>
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplayModes.TrySetMode(int width, int height, int bitsPerPixel) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IHardwareCursor
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IHardwareCursor.Set(int x, int y, bool visible) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IHardwareCursor.TryDefine(int hotspotX, int hotspotY, int width, int height, System.ReadOnlySpan<uint> pixels) -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IKeyboard
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IKeyboard.Name.get -> string!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IKeyboard.SetLeds(Cosmos.Kernel.HAL.DriverKit.Devices.KeyboardLeds leds) -> void
@@ -282,6 +293,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DmaBuffer
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DmaBuffer.Length.get -> int
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DmaBuffer.PhysicalAddress.get -> ulong
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DmaBuffer.Region.get -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DmaBuffer.Span.get -> System.Span<byte>
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DmaConstraints
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DmaConstraints.Below4GiB.get -> bool

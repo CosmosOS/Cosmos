@@ -61,6 +61,14 @@ internal static class DriverLog
     internal static void Published(DeviceNode node, Driver driver, PublishedDevice device) =>
         WriteLine($"{node.Path} {driver.Name} published {KindName(device.Kind)} \"{device.Name}\" {(device.IsConsumed ? "(consumed)" : "(no consumer)")}");
 
+    /// <summary>The engine published a firmware device: <c>firmware published display "framebuffer" (consumed)</c>.</summary>
+    internal static void FirmwarePublished(PublishedDevice device) =>
+        WriteLine($"firmware published {KindName(device.Kind)} \"{device.Name}\" {(device.IsConsumed ? "(consumed)" : "(no consumer)")}");
+
+    /// <summary>A firmware display was withdrawn because a driver bound the function holding it: <c>firmware display "framebuffer" retired: inside pci:0000:00:01.0 bar 1</c>.</summary>
+    internal static void FirmwareRetired(PublishedDevice device, DeviceNode node, int barIndex) =>
+        WriteLine($"firmware {KindName(device.Kind)} \"{device.Name}\" retired: inside {node.Path} bar {barIndex}");
+
     /// <summary>A published device was withdrawn: <c>synthetic:k High withdrew keyboard "name"</c>.</summary>
     internal static void Withdrew(DeviceNode node, Driver driver, PublishedDevice device) =>
         WriteLine($"{node.Path} {driver.Name} withdrew {KindName(device.Kind)} \"{device.Name}\"");
