@@ -32,7 +32,7 @@ internal static class DriverManifest
         global::Cosmos.Kernel.HAL.DriverKit.DriverRegistry.Register(new global::MyOS.Drivers.BoardDriver());
         if (global::Cosmos.Kernel.System.KernelFeatures.Network)
         {
-            global::Cosmos.Kernel.HAL.DriverKit.DriverRegistry.Register(new global::Acme.Drivers.VirtioNetDriver());
+            global::Cosmos.Kernel.HAL.DriverKit.DriverRegistry.Register(new global::Acme.Drivers.AcmeNicDriver());
         }
     }
 }
@@ -78,7 +78,7 @@ A kernel project shapes its manifest with two item types:
 ```xml
 <ItemGroup>
   <!-- Drop a driver the build would otherwise register. -->
-  <CosmosDriverExclude Include="Acme.Drivers.VirtioNetDriver" />
+  <CosmosDriverExclude Include="Acme.Drivers.AcmeNicDriver" />
   <!-- Register a driver declared [Driver(Default = false)]. -->
   <CosmosDriverInclude Include="Acme.Drivers.ExperimentalGpu" />
 </ItemGroup>

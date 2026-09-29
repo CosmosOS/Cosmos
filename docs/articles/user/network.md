@@ -10,7 +10,7 @@ The main differences if you come from Gen2:
 | UDP | Cosmos-specific `UdpClient` class | Standard `System.Net.Sockets.UdpClient` (plugged) |
 | DHCP | Cosmos client class | Cosmos client class (`Cosmos.Kernel.System.Network`) |
 | DNS | Cosmos client class | Standard `System.Net.Dns` (plugged), or the Cosmos `DnsClient` |
-| NIC drivers | RTL8168, E1000, PCNET | Intel E1000E over the driver kit (any machine with a PCI host node; QEMU's default q35 NIC on x64), virtio-net (x64 PCI + ARM64 MMIO) |
+| NIC drivers | RTL8168, E1000, PCNET | Intel E1000E over the driver kit (any machine with a PCI host node; QEMU's default q35 NIC on x64), virtio-net over the driver kit (PCI on both architectures, MMIO on ARM64) |
 
 None of these protocols implements every feature of its RFC. If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
@@ -24,15 +24,15 @@ Network support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot a NIC reaches `NetworkManager` one of two ways. An **Intel E1000E** is bound by `E1000EDriver`, a driver kit driver in `Cosmos.Kernel.Drivers` that every kernel carries: the PCI host driver publishes the function, the driver brings it up and publishes an interface named `e1000e`, and the manager's consumer registers it ([Writing a Driver](drivers.md#pci-devices)). A **virtio-net** device is detected by the HAL and registered by the System initializer, before the driver stage. On x64 both work, so `cosmos run` needs no extra flags: QEMU's q35 default NIC is an e1000e. The first registered device is the primary; the virtio device, when there is one, is registered before the driver stage runs and so comes ahead of the kit's `e1000e`. On ARM64 attach a virtio NIC explicitly:
+At boot a NIC reaches `NetworkManager` through the driver kit, whichever it is; both drivers ship in `Cosmos.Kernel.Drivers`, which every kernel carries. An **Intel E1000E** is bound by `E1000EDriver`: the PCI host driver publishes the function, the driver brings it up and publishes an interface named `e1000e`, and the manager's consumer registers it ([Writing a Driver](drivers.md#pci-devices)). A **virtio-net** device is bound by `VirtioNetDriver` over either transport: the virtio PCI transport driver publishes a virtio node beneath the function, the virtio MMIO transport driver one beneath the virt machine's slot, and the same leaf driver binds both and publishes an interface named `virtio-net` ([Virtio devices](drivers.md#virtio-devices)). The first interface a kit driver publishes is the primary, in the order the driver stage binds them. On x64 `cosmos run` needs no extra flags: QEMU's q35 default NIC is an e1000e. On ARM64 attach a virtio NIC explicitly:
 
 ```console
 $ cosmos run                          # x64: default e1000e NIC, user-mode networking
-$ cosmos run --nic virtio-net-pci     # x64: virtio NIC over PCI
+$ cosmos run --nic virtio-net-pci     # x64 or arm64: virtio NIC over PCI
 $ cosmos run --nic virtio-net-device  # arm64: virtio NIC over MMIO
 ```
 
-Virtio-pci devices deliver interrupts via MSI-X, which on ARM64 requires a GICv3 ITS (`-M virt,gic-version=3`); `cosmos run` launches ARM64 with QEMU's default GICv2, so use the MMIO variant there.
+A virtio PCI function delivers its interrupts as MSI-X messages, which on ARM64 the GICv3 ITS routes (`-M virt,gic-version=3`); `cosmos run` launches ARM64 with QEMU's default GICv2, which has no ITS, so there the PCI NIC is published with no interrupt entry and `VirtioNetDriver` runs it polled, draining its receive queue every 50 ms. `--nic virtio-net-pci` therefore works on the default ARM64 launch too, while the MMIO NIC runs on its GIC line and is the interrupt-driven choice there.
 
 With QEMU *user-mode networking* (the default), your kernel lives in a private `10.0.2.0/24` network: the host is reachable at **10.0.2.2**, QEMU's built-in DHCP server assigns addresses, and outbound UDP/TCP is NATed to the real network.
 
@@ -425,7 +425,7 @@ The contract the packet types actually implement:
 
 ## How it works
 
-Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`, and `NameResolutionPalPlug` for `Dns`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over both IP versions, with ARP and Ethernet under IPv4 and ICMPv6 and Neighbor Discovery under IPv6), which sends and receives frames through the network device registered with `NetworkManager`: an interface a driver kit driver published (the E1000E), or the HAL's virtio device. A frame the kit driver receives is handed to the stack on the kit's worker thread, with interrupts disabled for the handler's duration. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer, `DhcpClient` over IPv4 only.
+Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`, and `NameResolutionPalPlug` for `Dns`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over both IP versions, with ARP and Ethernet under IPv4 and ICMPv6 and Neighbor Discovery under IPv6), which sends and receives frames through the network device registered with `NetworkManager`: an interface a driver kit driver published, the E1000E's or the virtio-net's. A frame the kit driver receives is handed to the stack on the kit's worker thread, with interrupts disabled for the handler's duration. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer, `DhcpClient` over IPv4 only.
 
 ```
 TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
@@ -436,5 +436,5 @@ Cosmos TCP state machine / UDP                          (Cosmos.Kernel.System.Ne
         │                                    DhcpClient / DnsClient ride UDP directly
 IPv4 / ARP and IPv6 / Neighbor Discovery / Ethernet
         │
-Network device                                          (e1000e over the driver kit, virtio-net)
+Network device                                          (e1000e or virtio-net, over the driver kit)
 ```
