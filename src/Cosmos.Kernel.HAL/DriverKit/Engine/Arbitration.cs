@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.Core;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Engine;
@@ -63,7 +64,11 @@ internal static class Arbitration
                 node.State = NodeState.Bound;
                 node.AddOffer(new DeviceOffer(driver.Name, driver.Priority, candidates[i].Specificity, ProbeOutcome.Bound, null, 0));
                 DriverLog.Offer(node, driver, result);
-                DeviceRegistry.RetireFirmwareDisplaysBehind(node);
+                if (CosmosFeatures.GraphicsEnabled)
+                {
+                    DeviceRegistry.RetireFirmwareDisplaysBehind(node);
+                }
+
                 return;
             }
 
