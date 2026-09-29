@@ -12,17 +12,27 @@ public sealed class Texture : IDisposable
     private bool _disposed;
 
     /// <summary>
-    /// The canvas that created this texture.
+    /// The canvas that created this texture; only its meshes can map it.
     /// </summary>
-    internal Canvas3D Owner { get; }
+    public Canvas3D Owner { get; }
 
     /// <summary>
     /// Backend-specific resource data, owned by the canvas that created the
-    /// texture. The canvas clears it when it releases the device resource,
-    /// so the slot is set exactly while that resource exists.
+    /// texture, which reaches it through <see cref="Canvas3D.DriverDataOf(Texture)"/>
+    /// and <see cref="Canvas3D.SetDriverData(Texture, object?)"/>. The canvas
+    /// clears it when it releases the device resource, so the slot is set
+    /// exactly while that resource exists.
     /// </summary>
     internal object? DriverData { get; set; }
 
+    /// <summary>
+    /// Creates a texture handle owned by <paramref name="owner"/>; the canvas
+    /// calls this through <see cref="Canvas3D.CreateTextureHandle"/>.
+    /// </summary>
+    /// <param name="owner">The canvas that uploaded the texture.</param>
+    /// <param name="width">The width of the texture in pixels.</param>
+    /// <param name="height">The height of the texture in pixels.</param>
+    /// <param name="driverData">The backend's state for the texture.</param>
     internal Texture(Canvas3D owner, int width, int height, object? driverData)
     {
         Owner = owner;
@@ -41,7 +51,10 @@ public sealed class Texture : IDisposable
     /// </summary>
     public int Height { get; }
 
-    internal bool IsDisposed => _disposed;
+    /// <summary>
+    /// Whether <see cref="Dispose"/> ran: a mesh mapping a disposed texture can no longer be drawn.
+    /// </summary>
+    public bool IsDisposed => _disposed;
 
     /// <summary>
     /// Releases the device memory held by this texture. A mesh that still

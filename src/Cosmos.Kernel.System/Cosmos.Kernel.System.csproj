@@ -86,10 +86,5 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.Fat</_Parameter1>
     </AssemblyAttribute>
-    <!-- White-box 3D wire tests drive the internal SVGA canvas with the
-         device disabled and inspect the commands it places in the FIFO. -->
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Cosmos.Kernel.Tests.Graphic</_Parameter1>
-    </AssemblyAttribute>
   </ItemGroup>
 </Project>

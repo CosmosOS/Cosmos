@@ -8,7 +8,6 @@ using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
 using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Firmware;
@@ -81,27 +80,9 @@ internal class LibraryInitializer
                 Serial.WriteString("\n");
             }
 
-            // Bring up the HAL's virtio-gpu over its PCI function on any
-            // architecture; every other virtio function is bound by the
-            // driver kit's transport drivers when the driver stage runs.
-            // Must run after InitializeHardware: MSI-X routing needs the
-            // platform MSI binder (LAPIC on x64, GICv3 ITS on ARM64). Two
-            // nested single-switch guards, not PCI && Graphics: a compound
-            // guard does not fold in Debug IL, so each switch is tested
-            // alone and a kernel that turned either off carries no HAL
-            // virtio-gpu stack.
-            if (CosmosFeatures.PCIEnabled)
-            {
-                if (CosmosFeatures.GraphicsEnabled)
-                {
-                    Serial.WriteString("[KERNEL]   - Probing for a virtio-gpu PCI function...\n");
-                    VirtioGpuProbe.InitializePciBus();
-                }
-            }
-
             // Bring up USB host controllers and enumerate the devices behind
-            // them. Same ordering constraint as virtio: MSI-X needs the
-            // platform binder InitializeHardware installed. USB's own switch
+            // them. Must run after InitializeHardware: MSI-X routing needs
+            // the platform MSI binder (LAPIC on x64, GICv3 ITS on ARM64). USB's own switch
             // alone, not PCI && (Keyboard || Storage): Sdk.targets already
             // turns it off with PCI and derives its default from Keyboard and
             // Storage, and a compound guard does not fold in Debug IL, so ILC

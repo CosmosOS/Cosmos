@@ -13,21 +13,31 @@ public sealed class Mesh : IDisposable
     private bool _disposed;
 
     /// <summary>
-    /// The canvas that created this mesh.
+    /// The canvas that created this mesh; only it can draw the mesh.
     /// </summary>
-    internal Canvas3D Owner { get; }
+    public Canvas3D Owner { get; }
 
     /// <summary>
     /// How the indices of this mesh assemble into primitives.
     /// </summary>
-    internal MeshTopology Topology { get; }
+    public MeshTopology Topology { get; }
 
     /// <summary>
     /// Backend-specific resource data, owned by the canvas that created the
-    /// mesh.
+    /// mesh, which reaches it through <see cref="Canvas3D.DriverDataOf(Mesh)"/>
+    /// and <see cref="Canvas3D.SetDriverData(Mesh, object?)"/>.
     /// </summary>
     internal object? DriverData { get; set; }
 
+    /// <summary>
+    /// Creates a mesh handle owned by <paramref name="owner"/>; the canvas
+    /// calls this through <see cref="Canvas3D.CreateMeshHandle"/>.
+    /// </summary>
+    /// <param name="owner">The canvas that uploaded the mesh.</param>
+    /// <param name="vertexCount">The number of vertices in the mesh.</param>
+    /// <param name="indexCount">The number of indices in the mesh.</param>
+    /// <param name="texture">The texture mapped onto the mesh, or null.</param>
+    /// <param name="topology">How the indices assemble into primitives.</param>
     internal Mesh(Canvas3D owner, int vertexCount, int indexCount, Texture? texture, MeshTopology topology)
     {
         Owner = owner;
@@ -53,7 +63,10 @@ public sealed class Mesh : IDisposable
     /// </summary>
     public Texture? Texture { get; }
 
-    internal bool IsDisposed => _disposed;
+    /// <summary>
+    /// Whether <see cref="Dispose"/> ran: a disposed mesh can no longer be drawn.
+    /// </summary>
+    public bool IsDisposed => _disposed;
 
     /// <summary>
     /// Releases the device memory held by this mesh. Any <see cref="Texture"/>
@@ -74,7 +87,7 @@ public sealed class Mesh : IDisposable
 /// <summary>
 /// How the indices of a mesh assemble into primitives.
 /// </summary>
-internal enum MeshTopology
+public enum MeshTopology
 {
     /// <summary>Every three indices form a triangle.</summary>
     Triangles,
