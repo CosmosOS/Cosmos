@@ -78,16 +78,21 @@ internal static class DriverEngine
         // retirement rule sees the firmware display when a driver binds the
         // function holding it. A consumer that throws costs the kit the
         // firmware display, not the boot: PublishFirmware has withdrawn it.
-        if (BootFirmware.BootDisplay is { } display)
+        // Behind the graphics switch, so a kernel without graphics carries
+        // no firmware display type at all.
+        if (CosmosFeatures.GraphicsEnabled)
         {
-            try
+            if (BootFirmware.BootDisplay is { } display)
             {
-                PublishedDevice device = DeviceRegistry.PublishFirmware(DeviceKind.Display, display.Name, display);
-                DriverLog.FirmwarePublished(device);
-            }
-            catch (Exception exception)
-            {
-                DriverLog.EngineError(exception.Message);
+                try
+                {
+                    PublishedDevice device = DeviceRegistry.PublishFirmware(DeviceKind.Display, display.Name, display);
+                    DriverLog.FirmwarePublished(device);
+                }
+                catch (Exception exception)
+                {
+                    DriverLog.EngineError(exception.Message);
+                }
             }
         }
 
