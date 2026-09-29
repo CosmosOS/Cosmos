@@ -72,16 +72,12 @@ internal class LibraryInitializer
                     }
                 }
 
-                // Initialize Network Manager and register platform network device
+                // Initialize Network Manager; its consumer registers every
+                // interface a kit driver publishes once the driver stage runs.
                 if (NetworkManager.IsEnabled)
                 {
                     Serial.WriteString("[KERNEL]   - Initializing network manager...\n");
                     NetworkManager.Initialize();
-                    INetworkDevice? networkDevice = initializer.GetNetworkDevice();
-                    if (networkDevice is not null)
-                    {
-                        NetworkManager.RegisterDevice(networkDevice);
-                    }
                 }
 
                 // Initialize Storage Manager (manager-level state only)

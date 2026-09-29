@@ -12,8 +12,6 @@ using Cosmos.Kernel.Core.Power;
 using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
 using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
 using Cosmos.Kernel.HAL.Devices.Input;
-using Cosmos.Kernel.HAL.Devices.Network;
-using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Platform;
@@ -131,16 +129,6 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         // Initialize RTC (reads boot wall-clock time from PL031 if available)
         Serial.WriteString("[ARM64HAL] Initializing RTC...\n");
         new RTC().Initialize();
-
-        if (CosmosFeatures.KeyboardEnabled || CosmosFeatures.MouseEnabled || CosmosFeatures.NetworkEnabled)
-        {
-            DeviceMapper.EnsureMapped(VirtioMmioBase);
-            // Scan for virtio devices
-            Serial.WriteString("[ARM64HAL] Scanning for virtio devices...\n");
-            VirtioDevice.InitializeMmioBus(VirtioMmioBase, VirtioMmioSlotSize, VirtioMmioSlotCount,
-                VirtioMmioIrqBase, EnableVirtioIrq);
-        }
-
     }
 
     /// <summary>
@@ -201,8 +189,9 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     private static void PublishVirtioMmioNodes()
     {
         // The window is Device-mapped before its registers are read (the
-        // HHDM alias of an unmapped device address faults); the call is
-        // idempotent, InitializeHardware maps the same block.
+        // HHDM alias of an unmapped device address faults); this is the one
+        // place the window is mapped, the transport driver maps its slot
+        // again through the kit's register window when it binds.
         if (!DeviceMapper.EnsureMapped(VirtioMmioBase))
         {
             Serial.WriteString("[ARM64HAL] virtio-mmio window not mapped: no virtio-mmio nodes published\n");
@@ -250,21 +239,6 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         return phys;
     }
 
-    /// <summary>
-    /// Wires a virtio MMIO interrupt line: handler into the dense table, then
-    /// GIC configuration. The handler must be installed BEFORE enabling the
-    /// interrupt: virtio MMIO lines are level-triggered, and the GIC fires
-    /// immediately on enable if the line is already asserted.
-    /// </summary>
-    private static void EnableVirtioIrq(uint intid, InterruptManager.IrqDelegate handler)
-    {
-        InterruptManager.SetHandler((byte)intid, handler);
-
-        GIC.ConfigureInterrupt(intid, false);
-        GIC.SetPriority(intid, 0x80);
-        GIC.EnableInterrupt(intid);
-    }
-
     public ITimerDevice CreateTimer()
     {
         if (!CosmosFeatures.TimerEnabled)
@@ -287,25 +261,18 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        // Behind USB's own switch so a kernel without USB never references
-        // the USB keyboard driver and ILC trims it.
-        IKeyboardDevice[] usb = CosmosFeatures.UsbEnabled ? UsbKeyboardDriver.GetKeyboards() : [];
-        return [.. VirtioDevice.GetKeyboards(), .. usb];
+        // USB keyboards only: virtio input is a kit driver now, published
+        // to the keyboard consumer. Behind USB's own switch so a kernel
+        // without USB never references the USB keyboard driver and ILC
+        // trims it.
+        return CosmosFeatures.UsbEnabled ? UsbKeyboardDriver.GetKeyboards() : [];
     }
 
     public IMouseDevice[] GetMouseDevices()
     {
-        if (!CosmosFeatures.MouseEnabled)
-        {
-            return [];
-        }
-
-        return VirtioDevice.GetMice();
-    }
-
-    public INetworkDevice? GetNetworkDevice()
-    {
-        return VirtioDevice.GetDevice<VirtioNet>();
+        // The platform has no mouse of its own: virtio input is a kit
+        // driver now, published to the pointer consumer.
+        return [];
     }
 
     public uint GetCpuCount()

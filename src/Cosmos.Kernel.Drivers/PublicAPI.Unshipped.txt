@@ -14,6 +14,38 @@ Cosmos.Kernel.Drivers.E1000EState.Name.get -> string!
 Cosmos.Kernel.Drivers.E1000EState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
 Cosmos.Kernel.Drivers.PciHostDriver
 Cosmos.Kernel.Drivers.PciHostDriver.PciHostDriver() -> void
+Cosmos.Kernel.Drivers.VirtioInputDriver
+Cosmos.Kernel.Drivers.VirtioInputDriver.VirtioInputDriver() -> void
+Cosmos.Kernel.Drivers.VirtioInputState
+Cosmos.Kernel.Drivers.VirtioInputState.EventsProcessed.get -> int
+Cosmos.Kernel.Drivers.VirtioInputState.HasInterrupt.get -> bool
+Cosmos.Kernel.Drivers.VirtioInputState.InterruptCount.get -> int
+Cosmos.Kernel.Drivers.VirtioInputState.IsMouse.get -> bool
+Cosmos.Kernel.Drivers.VirtioInputState.IsPolling.get -> bool
+Cosmos.Kernel.Drivers.VirtioInputState.Name.get -> string!
+Cosmos.Kernel.Drivers.VirtioInputState.SetLeds(Cosmos.Kernel.HAL.DriverKit.Devices.KeyboardLeds leds) -> void
+Cosmos.Kernel.Drivers.VirtioMmioTransport
+Cosmos.Kernel.Drivers.VirtioMmioTransportDriver
+Cosmos.Kernel.Drivers.VirtioMmioTransportDriver.VirtioMmioTransportDriver() -> void
+Cosmos.Kernel.Drivers.VirtioNetDriver
+Cosmos.Kernel.Drivers.VirtioNetDriver.VirtioNetDriver() -> void
+Cosmos.Kernel.Drivers.VirtioNetState
+Cosmos.Kernel.Drivers.VirtioNetState.AnyLayoutNegotiated.get -> bool
+Cosmos.Kernel.Drivers.VirtioNetState.FramesReceived.get -> int
+Cosmos.Kernel.Drivers.VirtioNetState.FramesTransmitted.get -> int
+Cosmos.Kernel.Drivers.VirtioNetState.HasInterrupt.get -> bool
+Cosmos.Kernel.Drivers.VirtioNetState.InterruptCount.get -> int
+Cosmos.Kernel.Drivers.VirtioNetState.InterruptEntryCount.get -> int
+Cosmos.Kernel.Drivers.VirtioNetState.IsPolling.get -> bool
+Cosmos.Kernel.Drivers.VirtioNetState.LinkChanges.get -> int
+Cosmos.Kernel.Drivers.VirtioNetState.LinkUp.get -> bool
+Cosmos.Kernel.Drivers.VirtioNetState.MacAddress.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
+Cosmos.Kernel.Drivers.VirtioNetState.Name.get -> string!
+Cosmos.Kernel.Drivers.VirtioNetState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
+Cosmos.Kernel.Drivers.VirtioNetState.Version1Negotiated.get -> bool
+Cosmos.Kernel.Drivers.VirtioPciTransport
+Cosmos.Kernel.Drivers.VirtioPciTransportDriver
+Cosmos.Kernel.Drivers.VirtioPciTransportDriver.VirtioPciTransportDriver() -> void
 override Cosmos.Kernel.Drivers.E1000EDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.E1000EDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.E1000EDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
@@ -21,3 +53,56 @@ override Cosmos.Kernel.Drivers.E1000EDriver.Probe(Cosmos.Kernel.HAL.DriverKit.De
 override Cosmos.Kernel.Drivers.PciHostDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.PciHostDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.PciHostDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.VirtioInputDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.VirtioInputDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.VirtioInputDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.VirtioInputDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.ActivateQueue(ushort index, in Cosmos.Kernel.HAL.DriverKit.Virtio.VirtqueueLayout layout) -> bool
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.AfterReset() -> void
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.AssignConfigInterrupt(int entry) -> bool
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.AssignQueueInterrupt(ushort index, int entry) -> bool
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.DeviceType.get -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioDeviceType
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.InterruptEntryCount.get -> int
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.IsQueueReady(ushort index) -> bool
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.NotifyQueue(ushort index) -> void
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.ReadAndAcknowledgeInterrupt() -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioInterruptStatus
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.ReadConfig16(uint offset) -> ushort
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.ReadConfig32(uint offset) -> uint
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.ReadConfig8(uint offset) -> byte
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.ReadDeviceFeatures() -> ulong
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.ReadQueueMaxSize(ushort index) -> ushort
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.ReadStatus() -> byte
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.SupportsFeaturesOk.get -> bool
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.WriteConfig8(uint offset, byte value) -> void
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.WriteDriverFeatures(ulong features) -> void
+override Cosmos.Kernel.Drivers.VirtioMmioTransport.WriteStatus(byte status) -> void
+override Cosmos.Kernel.Drivers.VirtioMmioTransportDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.VirtioMmioTransportDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.VirtioMmioTransportDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.VirtioNetDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.VirtioNetDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.VirtioNetDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.VirtioNetDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.VirtioPciTransport.ActivateQueue(ushort index, in Cosmos.Kernel.HAL.DriverKit.Virtio.VirtqueueLayout layout) -> bool
+override Cosmos.Kernel.Drivers.VirtioPciTransport.AfterReset() -> void
+override Cosmos.Kernel.Drivers.VirtioPciTransport.AssignConfigInterrupt(int entry) -> bool
+override Cosmos.Kernel.Drivers.VirtioPciTransport.AssignQueueInterrupt(ushort index, int entry) -> bool
+override Cosmos.Kernel.Drivers.VirtioPciTransport.DeviceType.get -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioDeviceType
+override Cosmos.Kernel.Drivers.VirtioPciTransport.InterruptEntryCount.get -> int
+override Cosmos.Kernel.Drivers.VirtioPciTransport.IsQueueReady(ushort index) -> bool
+override Cosmos.Kernel.Drivers.VirtioPciTransport.NotifyQueue(ushort index) -> void
+override Cosmos.Kernel.Drivers.VirtioPciTransport.ReadAndAcknowledgeInterrupt() -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioInterruptStatus
+override Cosmos.Kernel.Drivers.VirtioPciTransport.ReadConfig16(uint offset) -> ushort
+override Cosmos.Kernel.Drivers.VirtioPciTransport.ReadConfig32(uint offset) -> uint
+override Cosmos.Kernel.Drivers.VirtioPciTransport.ReadConfig8(uint offset) -> byte
+override Cosmos.Kernel.Drivers.VirtioPciTransport.ReadDeviceFeatures() -> ulong
+override Cosmos.Kernel.Drivers.VirtioPciTransport.ReadQueueMaxSize(ushort index) -> ushort
+override Cosmos.Kernel.Drivers.VirtioPciTransport.ReadStatus() -> byte
+override Cosmos.Kernel.Drivers.VirtioPciTransport.SupportsFeaturesOk.get -> bool
+override Cosmos.Kernel.Drivers.VirtioPciTransport.WriteConfig8(uint offset, byte value) -> void
+override Cosmos.Kernel.Drivers.VirtioPciTransport.WriteDriverFeatures(ulong features) -> void
+override Cosmos.Kernel.Drivers.VirtioPciTransport.WriteStatus(byte status) -> void
+override Cosmos.Kernel.Drivers.VirtioPciTransportDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.VirtioPciTransportDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.VirtioPciTransportDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.VirtioPciTransportDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult

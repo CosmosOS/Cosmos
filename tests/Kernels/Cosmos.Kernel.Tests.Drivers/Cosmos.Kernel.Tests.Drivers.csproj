@@ -16,8 +16,9 @@
   <!-- One bare cell per architecture: the synthetic groups need no hardware,
        and the hardware group reads what the machine carries by default (the
        PCI host on both arches; q35's default e1000e on x64, while virt's
-       default NIC is virtio and belongs to the HAL, so the E1000E tests skip
-       there). Definitions live in tests/profiles.json. -->
+       default NIC is a virtio-net-pci function that the kit's VirtioNetDriver
+       binds, so the E1000E tests skip there). Definitions live in
+       tests/profiles.json. -->
   <ItemGroup>
     <CosmosTestProfile Include="bare" />
   </ItemGroup>

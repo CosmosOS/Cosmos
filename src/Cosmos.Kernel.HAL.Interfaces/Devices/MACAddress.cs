@@ -6,8 +6,9 @@ namespace Cosmos.Kernel.HAL.Interfaces.Devices;
 public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
 {
     // Filled on first read, not by initializers: an initializer would give this type a
-    // class constructor, and VirtioNet reads None while devices come up, before the
-    // scheduler has a current thread for the class-constructor lock to use.
+    // class constructor, and the type is reachable from any device bring-up path, before
+    // the scheduler has a current thread for the class-constructor lock to use. No current
+    // caller reads these before the scheduler exists; the lazy fill keeps it that way.
     private static MACAddress? s_broadcast;
     private static MACAddress? s_none;
 

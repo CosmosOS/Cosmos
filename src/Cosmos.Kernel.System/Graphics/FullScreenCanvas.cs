@@ -1,7 +1,6 @@
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.HAL.Devices.Graphic.SVGAII;
 using Cosmos.Kernel.HAL.Devices.Graphic.Virtio;
-using Cosmos.Kernel.HAL.Devices.Virtio;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
 
@@ -55,13 +54,17 @@ internal static class FullScreenCanvas
     {
         // virtio-gpu takes priority: a kernel that wired -device virtio-gpu-pci
         // expects its driver to drive the display even when vmware-svga is
-        // also on the PCI bus.
-        if (CosmosFeatures.PCIEnabled && CosmosFeatures.GraphicsEnabled)
+        // also on the PCI bus. One switch per test, so a kernel without PCI
+        // or without graphics trims the probe and the GPU driver away.
+        if (CosmosFeatures.PCIEnabled)
         {
-            VirtioGpu? virtioGpu = VirtioDevice.GetDevice<VirtioGpu>();
-            if (virtioGpu is not null && virtioGpu.Ready)
+            if (CosmosFeatures.GraphicsEnabled)
             {
-                return new VirtioGpuCanvas(virtioGpu);
+                VirtioGpu? virtioGpu = VirtioGpuProbe.Device;
+                if (virtioGpu is not null && virtioGpu.Ready)
+                {
+                    return new VirtioGpuCanvas(virtioGpu);
+                }
             }
         }
 

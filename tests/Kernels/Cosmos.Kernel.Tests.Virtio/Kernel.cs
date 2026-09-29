@@ -1,10 +1,12 @@
-using System;
-using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.HAL.Devices.Input;
-using Cosmos.Kernel.HAL.Devices.Network;
-using Cosmos.Kernel.HAL.Devices.Virtio;
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
+using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.Drivers;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.HAL.Pci;
+using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.Network;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -12,60 +14,103 @@ using TR = Cosmos.TestRunner.Framework.TestRunner;
 namespace Cosmos.Kernel.Tests.Virtio;
 
 /// <summary>
-/// Covers virtio device binding over both transports. The suite's profiles
-/// attach a virtio NIC, keyboard and mouse on every cell, so the bind tests
-/// are unconditional: if a device is missing, that is the regression this
-/// suite exists to catch, not an environment condition.
-///
+/// Covers virtio device binding through the driver kit over both
+/// transports. The suite's profiles attach a virtio NIC, keyboard and mouse
+/// on every cell, so the bind tests are unconditional: if a device is
+/// missing, that is the regression this suite exists to catch, not an
+/// environment condition. Every assertion reads <see cref="DriverInfo"/>,
+/// the ring's <see cref="NetworkManager"/> or the state a binding holds,
+/// never the serial log.
+/// <para>
 /// Which transport a cell presents is a property of the QEMU profile, not of
 /// the architecture: x64 runs PCI only (q35 has no virtio-mmio window) while
 /// arm64 runs both an MMIO cell and a PCI one. The same kernel binary serves
-/// every cell of an architecture, so the transport is detected at runtime.
+/// every cell of an architecture, so the transport is detected at runtime
+/// from the tree: on a PCI cell the function node is bound by
+/// <see cref="VirtioPciTransportDriver"/>, on an MMIO cell the platform slot
+/// by <see cref="VirtioMmioTransportDriver"/>, and either publishes one
+/// virtio node per device whose path names the transport. The leaf drivers,
+/// <see cref="VirtioNetDriver"/> and <see cref="VirtioInputDriver"/>, bind
+/// that node the same way on both, which is what the shared tests prove.
+/// </para>
+/// <para>
+/// The kernel holds an <c>InternalsVisibleTo</c> grant from
+/// <c>Cosmos.Kernel.HAL</c> for one purpose: reaching a node's binding state
+/// through <see cref="DriverEngine.Nodes"/>, for the flags
+/// <see cref="VirtioNetState"/> records and no diagnostic snapshot carries.
+/// </para>
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Number of tests announced to the runner in TR.Start.</summary>
-    private const int ExpectedTestCount = 10;
+    /// <summary>Total tests: 6 net, 2 input, 2 PCI transport, 2 MMIO transport.</summary>
+    private const int ExpectedTestCount = 12;
 
-    /// <summary>Reason surfaced for the PCI-transport tests when the cell runs virtio over MMIO.</summary>
+    /// <summary>Reason surfaced for the PCI transport tests when the cell runs virtio over MMIO.</summary>
     private const string SkipNotPci = "this cell presents virtio over MMIO";
 
-    /// <summary>Transport name the PCI transport reports.</summary>
-    private const string PciTransportName = "PCI";
+    /// <summary>Reason surfaced for the MMIO transport tests when the cell runs virtio over PCI.</summary>
+    private const string SkipNotMmio = "this cell presents virtio over PCI";
 
-    /// <summary>Transport name the MMIO transport reports.</summary>
-    private const string MmioTransportName = "MMIO";
+    /// <summary>Bus name of the nodes a virtio transport driver publishes.</summary>
+    private const string VirtioBusName = "virtio";
 
-    // True when this cell put a virtio function on the PCI bus.
+    /// <summary>Bus name of the function nodes the PCI host driver publishes.</summary>
+    private const string PciBusName = "pci";
+
+    /// <summary>Bus name of the root nodes the machine description publishes, the virtio-mmio slots among them.</summary>
+    private const string PlatformBusName = "platform";
+
+    /// <summary>Start of a virtio node's description for a network device (type 1); the trailing space keeps type 18 out.</summary>
+    private const string NetDescriptionPrefix = "type 1 ";
+
+    /// <summary>Start of a virtio node's description for an input device (type 18).</summary>
+    private const string InputDescriptionPrefix = "type 18 ";
+
+    /// <summary>Start of a function node's description for a modern virtio-net function (vendor 1af4, device 0x1040 + 1).</summary>
+    private const string ModernNetFunctionPrefix = "1af4:1041";
+
+    /// <summary>Start of a function node's description for a transitional virtio-net function (vendor 1af4, legacy device id 0x1000).</summary>
+    private const string TransitionalNetFunctionPrefix = "1af4:1000";
+
+    /// <summary>The compatible string a virtio-mmio slot's platform node lists in its description.</summary>
+    private const string MmioCompatible = "virtio,mmio";
+
+    /// <summary>Start of the path of a virtio node published by the PCI transport.</summary>
+    private const string PciPathPrefix = "virtio:pci:";
+
+    /// <summary>Start of the path of a virtio node published by the MMIO transport.</summary>
+    private const string MmioPathPrefix = "virtio:mmio:";
+
+    /// <summary>Children a transport node has: the one virtio node it publishes for its device.</summary>
+    private const int TransportChildCount = 1;
+
+    // True when this cell put a virtio-net function on the PCI bus.
     //
-    // Deliberately derived from PCI *enumeration*, not from the bound driver:
-    // gating on the driver would mean a device that failed to bind takes its
-    // own PCI tests down with it into a green skip, which is precisely the
-    // regression this suite exists to catch. Keyed off the hardware, a bind
-    // failure leaves the PCI tests running — and failing.
+    // Deliberately derived from the function node's presence in the tree,
+    // not from the bound driver: gating on the driver would mean a device
+    // that failed to bind takes its own PCI tests down with it into a green
+    // skip, which is precisely the regression this suite exists to catch.
+    // Keyed off the hardware, a bind failure leaves the PCI tests running,
+    // and failing.
     private static bool s_isPciCell;
 
-    /// <summary>Bytes in a MAC address.</summary>
-    private const int MacAddressLength = 6;
+    // Captured once in BeforeRun, as paths: a test takes a fresh snapshot of
+    // its node, and nothing here retracts a node between tests.
+    private static string? s_netPath;
+    private static string[] s_inputPaths = [];
+    private static string? s_pciFunctionPath;
 
-    // Captured once in BeforeRun so a state change between tests cannot show
-    // up as cross-test interference.
-    private static VirtioNet? s_net;
-    private static IKeyboardDevice[] s_keyboards = Array.Empty<IKeyboardDevice>();
-    private static IMouseDevice[] s_mice = Array.Empty<IMouseDevice>();
-    private static PciDevice? s_virtioNetFunction;
-
+    /// <inheritdoc/>
     protected override void BeforeRun()
     {
         Log.WriteString("[Virtio] BeforeRun() reached!\n");
 
         TR.Start("Virtio Device Tests", expectedTests: ExpectedTestCount);
 
-        s_net = VirtioDevice.GetDevice<VirtioNet>();
-        s_keyboards = VirtioDevice.GetKeyboards();
-        s_mice = VirtioDevice.GetMice();
-        s_virtioNetFunction = FindVirtioFunction(VirtioTransport.DeviceTypeNetwork);
-        s_isPciCell = s_virtioNetFunction != null;
+        s_netPath = FindNodePath(VirtioBusName, NetDescriptionPrefix);
+        s_inputPaths = FindInputPaths();
+        s_pciFunctionPath = FindNodePath(PciBusName, ModernNetFunctionPrefix) ?? FindNodePath(PciBusName, TransitionalNetFunctionPrefix);
+        s_isPciCell = s_pciFunctionPath is not null;
 
         // ==================== Binding ====================
         TR.Run("Net_DriverBound", TestNet_DriverBound);
@@ -73,203 +118,427 @@ public class Kernel : Sys.Kernel
         TR.Run("Net_DeviceReady", TestNet_DeviceReady);
         TR.Run("Net_LinkUp", TestNet_LinkUp);
         TR.Run("Net_MacAddressProgrammed", TestNet_MacAddressProgrammed);
+        TR.Run("Net_InterruptConnected", TestNet_InterruptConnected);
 
         // ==================== Input ====================
         TR.Run("Input_KeyboardBound", TestInput_KeyboardBound);
         TR.Run("Input_MouseBound", TestInput_MouseBound);
 
         // ==================== PCI transport ====================
-        TR.RunIf(s_isPciCell, "Pci_FunctionClaimed",     TestPci_FunctionClaimed,     SkipNotPci);
-        TR.RunIf(s_isPciCell, "Pci_MsiXActive",          TestPci_MsiXActive,          SkipNotPci);
-        TR.RunIf(s_isPciCell, "Pci_Version1Negotiated",  TestPci_Version1Negotiated,  SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_FunctionBoundByTransport", TestPci_FunctionBoundByTransport, SkipNotPci);
+        TR.RunIf(s_isPciCell, "Pci_Version1Negotiated", TestPci_Version1Negotiated, SkipNotPci);
+
+        // ==================== MMIO transport ====================
+        TR.RunIf(!s_isPciCell, "Mmio_SlotBoundByTransport", TestMmio_SlotBoundByTransport, SkipNotMmio);
+        TR.RunIf(!s_isPciCell, "Mmio_AnyLayoutNegotiated", TestMmio_AnyLayoutNegotiated, SkipNotMmio);
 
         TR.Finish();
 
         Log.WriteString("\n[Tests Complete - System Halting]\n");
     }
 
+    /// <inheritdoc/>
     protected override void Run() => Stop();
 
+    /// <inheritdoc/>
     protected override void AfterRun()
     {
         TR.Complete();
-        Cosmos.Kernel.System.Power.Halt();
+        Sys.Power.Halt();
     }
 
     // ==================== Binding ====================
 
-    // The registry only accepts a device once Initialize() succeeded, so a
-    // null here means the whole probe → transport → driver chain failed, not
-    // merely that the NIC is unhappy.
+    // The virtio node exists only once a transport driver bound the
+    // function or the slot and published it, so a missing node means the
+    // transport half failed; a node in any state but Bound means the leaf
+    // probe did.
     private static void TestNet_DriverBound()
     {
-        Assert.NotNull(s_net, "virtio-net driver should have bound to the attached NIC");
+        if (!TryGetNetNode(out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        Log.WriteString("[Test] Net node: ");
+        Log.WriteString(path);
+        Log.WriteString("\n");
+
+        Assert.True(info.State == DeviceNodeState.Bound, "the virtio-net node should be bound");
+        Assert.True(info.DriverName == nameof(VirtioNetDriver), "VirtioNetDriver should hold the virtio-net node");
     }
 
-    // Cross-checks the bus against the driver: if this cell put a virtio
-    // function on the PCI bus, the driver must have come up over the PCI
-    // transport, and otherwise over MMIO. Catches a silent fallback to the
-    // wrong transport, which would otherwise look like a healthy device
+    // Cross-checks the bus against the path: if this cell put a virtio
+    // function on the PCI bus, the node must have been published by the PCI
+    // transport, and otherwise by the MMIO one. Catches a silent fallback to
+    // the wrong transport, which would otherwise look like a healthy device
     // while none of the PCI-specific paths were ever exercised.
     private static void TestNet_TransportMatchesCell()
     {
-        if (s_net == null)
+        if (!TryGetNetNode(out string? path, out _))
         {
-            Assert.Fail("no virtio-net device bound");
             return;
         }
 
-        Log.WriteString("[Test] Transport: ");
-        Log.WriteString(s_net.Transport.TransportName);
-        Log.WriteString("\n");
-
-        string expected = s_isPciCell ? PciTransportName : MmioTransportName;
-        Assert.Equal(expected, s_net.Transport.TransportName);
+        string expected = s_isPciCell ? PciPathPrefix : MmioPathPrefix;
+        Assert.True(path.StartsWith(expected, StringComparison.Ordinal), "the virtio-net node's path should name the transport this cell presents: " + path);
     }
 
-    // Ready is only set after queues are configured, buffers are posted and an
-    // interrupt source was secured — the driver now refuses to come up
-    // without one, so this also covers MSI-X binding on the PCI cell.
+    // The driver publishes its interface only after the queues are created,
+    // the receive ring is posted, a wake was secured and DRIVER_OK was set,
+    // and the ring's consumer takes it from there; so a consumed device that
+    // the manager reports ready covers the whole bring-up on this cell.
     private static void TestNet_DeviceReady()
     {
-        if (s_net == null)
+        if (!TryGetNetNode(out string? path, out _))
         {
-            Assert.Fail("no virtio-net device bound");
             return;
         }
 
-        Assert.True(s_net.Ready, "virtio-net should report ready after initialization");
+        int deviceIndex = FindDeviceIndex(PublishedDeviceKind.Network, path);
+        Assert.True(deviceIndex >= 0, "the virtio-net interface should be in the published list as a network device");
+        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.IsConsumed, "the ring's network manager should have taken the interface");
+        }
+
+        Assert.True(NetworkManager.DeviceCount >= 1, "the network manager should hold at least the kit's interface");
+        Assert.True(NetworkManager.Ready, "the primary device should report ready after the probe");
     }
 
     private static void TestNet_LinkUp()
     {
-        if (s_net == null)
-        {
-            Assert.Fail("no virtio-net device bound");
-            return;
-        }
-
         // QEMU's user-mode backend brings the link up immediately, so a down
-        // link means the status field was read from the wrong config offset.
-        Assert.True(s_net.LinkUp, "virtio-net link should be up with QEMU user networking");
+        // link means the status word was read from the wrong config offset.
+        Assert.True(NetworkManager.LinkUp, "virtio-net link should be up with QEMU user networking");
     }
 
-    // The MAC is read byte-by-byte out of the device configuration region,
-    // which on PCI is a separate BAR window located through its own vendor
-    // capability. An all-zero address means those reads landed nowhere.
+    // The MAC is read byte by byte out of the device-specific configuration
+    // region, which on PCI is located through its own vendor capability (on
+    // QEMU an offset inside the same BAR as the common configuration; the
+    // transport reads 0 without that capability or past its length). An
+    // all-zero address means those reads landed nowhere.
     private static void TestNet_MacAddressProgrammed()
     {
-        if (s_net == null)
-        {
-            Assert.Fail("no virtio-net device bound");
-            return;
-        }
-
-        MACAddress mac = s_net.MacAddress;
+        MACAddress? mac = NetworkManager.MacAddress;
         Assert.NotNull(mac);
-
-        bool anyNonZero = false;
-        for (int i = 0; i < MacAddressLength; i++)
+        if (mac is null)
         {
-            if (mac._bytes[i] != 0)
-            {
-                anyNonZero = true;
-                break;
-            }
+            return;
         }
 
         Log.WriteString("[Test] MAC: ");
         Log.WriteString(mac.ToString());
         Log.WriteString("\n");
 
-        Assert.True(anyNonZero, "MAC address read from device config should not be all zeros");
+        Assert.False(mac.Equals(MACAddress.None), "MAC address read from device config should not be all zeros");
+    }
+
+    // Every cell routes one wake for the receive queue: MSI-X over PCI (the
+    // LAPIC on x64, the GICv3 ITS on arm64, which is why the PCI cells set
+    // gic-version=3) and the GIC line over MMIO. A driver that fell back to
+    // the periodic drain would still pass every other test here, so the
+    // flags are read off the binding's state.
+    private static void TestNet_InterruptConnected()
+    {
+        if (!TryGetNetState(out VirtioNetState? state))
+        {
+            return;
+        }
+
+        Assert.True(state.HasInterrupt, "the receive queue's source should be connected on every cell");
+        Assert.False(state.IsPolling, "a driver with an interrupt should not run the periodic drain");
     }
 
     // ==================== Input ====================
     //
-    // Both profiles attach a virtio keyboard and mouse. Binding them exercises
-    // the event-type probe in the registry, which reads the input config
-    // select/subsel window — a different device-config access pattern from the
-    // NIC's flat MAC read.
+    // Both profiles attach a virtio keyboard and mouse. Binding them
+    // exercises the event-type probe, which reads the input config
+    // select/subsel window, a different device-config access pattern from
+    // the NIC's flat MAC read, and the ring's keyboard and pointer
+    // consumers, which take what the driver publishes.
 
     private static void TestInput_KeyboardBound()
     {
-        Assert.True(s_keyboards.Length > 0, "a virtio keyboard should have bound");
+        AssertInputBound(PublishedDeviceKind.Keyboard, "keyboard");
     }
 
     private static void TestInput_MouseBound()
     {
-        Assert.True(s_mice.Length > 0, "a virtio mouse should have bound");
+        AssertInputBound(PublishedDeviceKind.Pointer, "pointer");
     }
 
     // ==================== PCI transport ====================
 
-    // Claimed is set by the virtio PCI scan when it takes ownership. If the
-    // function is enumerated but unclaimed, capability parsing rejected the
-    // device and the driver never saw it.
-    private static void TestPci_FunctionClaimed()
+    // The transport driver matches every virtio function; a function that
+    // enumerates but is not bound by it means capability parsing rejected
+    // the device, and the leaf never saw a node. The one child is that node.
+    private static void TestPci_FunctionBoundByTransport()
     {
-        // Non-null is the gate for this test, so asserting it here would be a
-        // tautology; ownership is the real claim. A function that enumerates
-        // but stays unclaimed still fails Net_DriverBound, so the two together
-        // separate "capability parsing rejected it" from "it was never there".
-        Assert.True(s_virtioNetFunction!.Claimed, "the virtio-net PCI function should be claimed by the driver");
-    }
-
-    // MSI-X is the only interrupt path the PCI transport offers (there is no
-    // INTx fallback — PCI interrupt lines are level-low and shared, which the
-    // available line routing cannot express), so this failing means the device
-    // would run blind even if everything else bound.
-    //
-    // This is the assertion the arm64 PCI cell exists for: the same MsiRouting
-    // call lands on the LAPIC on x64 and on the GICv3 ITS on arm64, and only
-    // this cell covers the latter.
-    private static void TestPci_MsiXActive()
-    {
-        VirtioPciTransport? transport = s_net?.Transport as VirtioPciTransport;
-        Assert.NotNull(transport, "virtio-net should be running over the PCI transport");
-        if (transport != null)
+        if (!TryGetPciFunction(out DeviceNodeInfo info))
         {
-            Assert.True(transport.MsiXActive, "MSI-X should be enabled for the virtio-net PCI function");
-        }
-    }
-
-    // Modern virtio-pci must land on VERSION_1, which is what selects the
-    // 12-byte net header. Negotiating it away here while the driver still
-    // sized the header for it would corrupt every frame.
-    private static void TestPci_Version1Negotiated()
-    {
-        if (s_net == null)
-        {
-            Assert.Fail("no virtio-net device bound");
             return;
         }
 
-        Assert.True(s_net.Transport.Version1Negotiated, "virtio-pci should negotiate VIRTIO_F_VERSION_1");
+        Assert.True(info.State == DeviceNodeState.Bound, "the virtio-net function should be bound");
+        Assert.True(info.DriverName == nameof(VirtioPciTransportDriver), "VirtioPciTransportDriver should hold the virtio-net function");
+        Assert.Equal(TransportChildCount, info.ChildCount, "the transport should publish one virtio node for the function");
+    }
+
+    // Modern virtio-pci must land on VERSION_1, which is what selects the
+    // 12-byte net header. Negotiating it away while the driver still sized
+    // the header for it would corrupt every frame. QEMU's virtio-mmio is
+    // legacy by default, so the MMIO cell does not assert it.
+    private static void TestPci_Version1Negotiated()
+    {
+        if (!TryGetNetState(out VirtioNetState? state))
+        {
+            return;
+        }
+
+        Assert.True(state.Version1Negotiated, "virtio-pci should negotiate VIRTIO_F_VERSION_1");
+    }
+
+    // ==================== MMIO transport ====================
+
+    // The machine description publishes one platform node per virtio-mmio
+    // slot that presents a device; the transport driver binds it and
+    // publishes the virtio node beneath. This is the assertion that catches
+    // a lost MMIO window, which only this cell can see: with no slot in the
+    // tree there is nothing for the net tests to fail on but the absence.
+    private static void TestMmio_SlotBoundByTransport()
+    {
+        int count = DriverInfo.NodeCount;
+        int slots = 0;
+        for (int i = 0; i < count; i++)
+        {
+            if (!DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+                || info.BusName != PlatformBusName
+                || !info.Description.Contains(MmioCompatible, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            slots++;
+            Assert.True(info.State == DeviceNodeState.Bound, "a virtio-mmio slot should be bound: " + info.Path);
+            Assert.True(info.DriverName == nameof(VirtioMmioTransportDriver), "VirtioMmioTransportDriver should hold the slot: " + info.Path);
+            Assert.Equal(TransportChildCount, info.ChildCount, "the transport should publish one virtio node for the slot: " + info.Path);
+        }
+
+        Assert.True(slots > 0, "a platform node whose description names virtio,mmio should be in the tree");
+    }
+
+    // QEMU's virtio-mmio is legacy by default, and on the legacy interface
+    // VIRTIO_F_ANY_LAYOUT (any_layout defaults on) is the only way the
+    // driver keeps the net header and the frame in one descriptor; without
+    // it the probe declines, so a bound node with the bit clear is a
+    // negotiation bug.
+    private static void TestMmio_AnyLayoutNegotiated()
+    {
+        if (!TryGetNetState(out VirtioNetState? state))
+        {
+            return;
+        }
+
+        Assert.True(state.AnyLayoutNegotiated, "the legacy MMIO device should negotiate VIRTIO_F_ANY_LAYOUT");
     }
 
     // ==================== Helpers ====================
 
     /// <summary>
-    /// Finds the first enumerated PCI function that is a virtio device of the
-    /// given type, or null when none is present (the MMIO cell).
+    /// Asserts that one of the virtio-input nodes captured by BeforeRun is
+    /// bound by <see cref="VirtioInputDriver"/> and published a device of
+    /// the given kind that the ring consumed.
     /// </summary>
-    private static PciDevice? FindVirtioFunction(uint deviceType)
+    /// <param name="kind">The kind the driver publishes for the device.</param>
+    /// <param name="name">The kind in words, for the messages.</param>
+    private static void AssertInputBound(PublishedDeviceKind kind, string name)
     {
-        if (PciManager.Devices == null)
+        Assert.True(s_inputPaths.Length > 0, "virtio-input nodes should be in the tree");
+
+        bool found = false;
+        for (int i = 0; i < s_inputPaths.Length; i++)
         {
-            return null;
+            string path = s_inputPaths[i];
+            if (!TryFindNode(path, out DeviceNodeInfo info)
+                || info.State != DeviceNodeState.Bound
+                || info.DriverName != nameof(VirtioInputDriver))
+            {
+                continue;
+            }
+
+            int deviceIndex = FindDeviceIndex(kind, path);
+            if (deviceIndex >= 0
+                && DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device)
+                && device.IsConsumed)
+            {
+                found = true;
+                break;
+            }
         }
 
-        for (uint i = 0; i < PciManager.Count; i++)
+        Assert.True(found, "a virtio-input node bound by VirtioInputDriver should publish a consumed " + name);
+    }
+
+    /// <summary>
+    /// Finds the path of the first node on the given bus whose description
+    /// starts with the given text, whatever its state. Compared ordinally,
+    /// as every string in kernel test code is.
+    /// </summary>
+    /// <param name="busName">The bus the node sits on.</param>
+    /// <param name="descriptionPrefix">Start of the node's description.</param>
+    /// <returns>The node's path, or null when no such node is in the tree.</returns>
+    private static string? FindNodePath(string busName, string descriptionPrefix)
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
         {
-            PciDevice device = PciManager.Devices[i];
-            if (device.VendorId == VirtioPciTransport.VirtioVendorId && VirtioPciTransport.GetDeviceType(device) == deviceType)
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+                && info.BusName == busName
+                && info.Description.StartsWith(descriptionPrefix, StringComparison.Ordinal))
             {
-                return device;
+                return info.Path;
             }
         }
 
         return null;
     }
+
+    /// <summary>
+    /// Collects the paths of every virtio node describing an input device
+    /// (type 18), whatever its state, in publication order.
+    /// </summary>
+    /// <returns>The paths; empty when no input device is in the tree.</returns>
+    private static string[] FindInputPaths()
+    {
+        int count = DriverInfo.NodeCount;
+        int matches = 0;
+        for (int i = 0; i < count; i++)
+        {
+            if (IsInputNode(i))
+            {
+                matches++;
+            }
+        }
+
+        string[] paths = new string[matches];
+        int next = 0;
+        for (int i = 0; i < count && next < matches; i++)
+        {
+            if (IsInputNode(i) && DriverInfo.TryGetNode(i, out DeviceNodeInfo info))
+            {
+                paths[next] = info.Path;
+                next++;
+            }
+        }
+
+        return paths;
+    }
+
+    /// <summary>Whether the node at the given position is a virtio node describing an input device.</summary>
+    /// <param name="index">Publication position of the node.</param>
+    /// <returns>True for a virtio node of type 18.</returns>
+    private static bool IsInputNode(int index) =>
+        DriverInfo.TryGetNode(index, out DeviceNodeInfo info)
+        && info.BusName == VirtioBusName
+        && info.Description.StartsWith(InputDescriptionPrefix, StringComparison.Ordinal);
+
+    /// <summary>Hands back the virtio-net node's path and a fresh snapshot of it, or fails the test when BeforeRun found none.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private static bool TryGetNetNode([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    {
+        path = s_netPath;
+        if (path is null || !TryFindNode(path, out info))
+        {
+            Assert.Fail("no virtio-net node was found by BeforeRun");
+            info = default;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>Hands back a fresh snapshot of the virtio-net function's node, or fails the test when BeforeRun found none.</summary>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private static bool TryGetPciFunction(out DeviceNodeInfo info)
+    {
+        string? path = s_pciFunctionPath;
+        if (path is null || !TryFindNode(path, out info))
+        {
+            Assert.Fail("no virtio-net PCI function was found by BeforeRun");
+            info = default;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Hands back the virtio-net node's driver state, read from the tree
+    /// itself through the HAL grant: the flags the interrupt and negotiation
+    /// tests read are on the state, which no diagnostic snapshot carries.
+    /// Fails the test when the node is missing or not bound by the net
+    /// driver.
+    /// </summary>
+    /// <param name="state">The driver state when found.</param>
+    /// <returns>True when the state is there.</returns>
+    private static bool TryGetNetState([NotNullWhen(true)] out VirtioNetState? state)
+    {
+        state = null;
+        if (!TryGetNetNode(out string? path, out _))
+        {
+            return false;
+        }
+
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            DeviceNode node = nodes[i];
+            if (node.Path == path)
+            {
+                state = node.Binding?.DriverState as VirtioNetState;
+                break;
+            }
+        }
+
+        Assert.NotNull(state, "the virtio-net node's binding should hold a VirtioNetState");
+        return state is not null;
+    }
+
+    /// <summary>Finds the published device of the given kind whose node has the given path.</summary>
+    /// <param name="kind">The kind of device.</param>
+    /// <param name="nodePath">The path of the node whose driver published the device.</param>
+    /// <returns>Its position in the published list, or -1.</returns>
+    private static int FindDeviceIndex(PublishedDeviceKind kind, string nodePath)
+    {
+        int count = DriverInfo.DeviceCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == kind && info.NodePath == nodePath)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static int FindNodeIndex(string path)
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info) && info.Path == path)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static bool TryFindNode(string path, out DeviceNodeInfo info) => DriverInfo.TryGetNode(FindNodeIndex(path), out info);
 }

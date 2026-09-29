@@ -120,12 +120,6 @@ internal interface IPlatformInitializer
     IMouseDevice[] GetMouseDevices();
 
     /// <summary>
-    /// Gets network devices available on this platform.
-    /// Returns null if no network device found.
-    /// </summary>
-    INetworkDevice? GetNetworkDevice();
-
-    /// <summary>
     /// Gets the number of CPUs detected on this platform.
     /// </summary>
     uint GetCpuCount();

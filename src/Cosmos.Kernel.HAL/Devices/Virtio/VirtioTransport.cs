@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.HAL.Devices.Virtio;
@@ -14,19 +13,13 @@ namespace Cosmos.Kernel.HAL.Devices.Virtio;
 internal delegate void VirtioInterruptHandler(uint isrStatus);
 
 /// <summary>
-/// Wires a platform line interrupt (e.g. a GIC SPI) to a transport dispatch
-/// handler. Supplied by the platform initializer that owns the bus, so the
-/// shared transport stays free of per-arch interrupt-controller calls.
-/// </summary>
-internal delegate void VirtioIrqEnable(uint intid, InterruptManager.IrqDelegate handler);
-
-/// <summary>
-/// Transport-independent core of a virtio device (virtio spec 1.x): device
-/// status handshake, feature negotiation, virtqueue setup, notifications,
-/// interrupts, and device-specific config access. Device drivers (VirtioNet,
-/// VirtioKeyboard, VirtioMouse) are written against this class only;
-/// <see cref="VirtioMmioTransport"/> and <see cref="VirtioPciTransport"/>
-/// implement the per-transport register access.
+/// Transport-independent core of the HAL's virtio device handling (virtio
+/// spec 1.x): device status handshake, feature negotiation, virtqueue setup,
+/// notifications, interrupts, and device-specific config access. It serves
+/// the HAL's <see cref="Graphic.Virtio.VirtioGpu"/> only, over
+/// <see cref="VirtioPciTransport"/>, until the display stage moves
+/// virtio-gpu into the driver kit; every other virtio device is driven by
+/// the kit's transport drivers and leaf drivers in Cosmos.Kernel.Drivers.
 /// </summary>
 internal abstract class VirtioTransport
 {
@@ -148,8 +141,8 @@ internal abstract class VirtioTransport
     protected void AddStatus(byte bits) => SetStatus((byte)(GetStatus() | bits));
 
     /// <summary>
-    /// Transport hook run right after device reset (legacy MMIO guest page
-    /// size, PCI MSI-X config vector — reset clears both).
+    /// Transport hook run right after device reset (the PCI MSI-X config
+    /// vector, which the reset clears).
     /// </summary>
     protected virtual void AfterReset()
     {

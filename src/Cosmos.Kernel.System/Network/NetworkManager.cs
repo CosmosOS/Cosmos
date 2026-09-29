@@ -8,12 +8,11 @@ using Cosmos.Kernel.HAL.Interfaces.Devices;
 namespace Cosmos.Kernel.System.Network;
 
 /// <summary>
-/// Manages network devices: the HAL's virtio device, which the System
-/// initializer registers at boot, and every interface a driver kit driver
-/// publishes, which the manager's <see cref="KitNetworkConsumer"/> registers
-/// from the kit worker and unregisters when it is withdrawn. The table is
-/// updated with interrupts disabled, so a registration from the worker and
-/// a read from the ring's thread never see it half-written.
+/// Manages network devices: every interface a driver kit driver publishes,
+/// which the manager's <see cref="KitNetworkConsumer"/> registers from the
+/// kit worker and unregisters when it is withdrawn. The table is updated
+/// with interrupts disabled, so a registration from the worker and a read
+/// from the ring's thread never see it half-written.
 /// </summary>
 public static class NetworkManager
 {
@@ -57,9 +56,8 @@ public static class NetworkManager
     /// The adapter the ring uses when no other is named: the target of
     /// <see cref="Send"/>, of the primary shortcuts on this class, and of
     /// <see cref="Config.IPConfig.Enable(Address, Address, Address)"/>.
-    /// It starts as the first device registered: the HAL's virtio device,
-    /// which the System initializer registers before the driver stage, ahead
-    /// of any device a kit driver publishes.
+    /// It starts as the first device registered: the first interface a kit
+    /// driver publishes, in the order the driver stage binds them.
     /// </summary>
     /// <exception cref="InvalidOperationException">Network support is disabled.</exception>
     /// <exception cref="ArgumentException">Thrown when the assigned handle names no registered device.</exception>
@@ -141,8 +139,9 @@ public static class NetworkManager
 
     /// <summary>
     /// Registers a network device with the manager; the first registered
-    /// becomes the primary. Thread context, from the System initializer or
-    /// from the kit worker; the table is updated with interrupts disabled.
+    /// becomes the primary. Thread context, from the kit worker when a
+    /// published interface is consumed; the table is updated with interrupts
+    /// disabled.
     /// </summary>
     /// <param name="device">The network device to register.</param>
     /// <returns>False when the device is null, the manager is not initialized or the table's eight slots are taken; the device is not registered then.</returns>

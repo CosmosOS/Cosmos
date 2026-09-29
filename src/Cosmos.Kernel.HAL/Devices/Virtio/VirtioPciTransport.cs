@@ -10,13 +10,15 @@ using Cosmos.Kernel.HAL.Pci.Enums;
 namespace Cosmos.Kernel.HAL.Devices.Virtio;
 
 /// <summary>
-/// Virtio PCI transport (virtio spec section 4.1), modern interface only: the
-/// common/notify/ISR/device config regions are located through vendor-specific
-/// PCI capabilities pointing into BARs. Interrupts use MSI-X through the
-/// arch-neutral <see cref="MsiX"/>/MsiRouting path (LAPIC on x64, GICv3 ITS on
-/// ARM64); without MSI-X the device runs in polled mode. Legacy-only
-/// virtio-pci devices (I/O BAR interface, no vendor capabilities) are not
-/// supported.
+/// The HAL's virtio PCI transport (virtio spec section 4.1), modern interface
+/// only: the common/notify/ISR/device config regions are located through
+/// vendor-specific PCI capabilities pointing into BARs. Interrupts use MSI-X
+/// through the arch-neutral <see cref="MsiX"/>/MsiRouting path (LAPIC on x64,
+/// GICv3 ITS on ARM64); without MSI-X the device runs in polled mode.
+/// Legacy-only virtio-pci devices (I/O BAR interface, no vendor capabilities)
+/// are not supported. It serves <see cref="Graphic.Virtio.VirtioGpu"/> only
+/// until the display stage; every other virtio-pci function is bound by the
+/// driver kit's VirtioPciTransportDriver.
 /// </summary>
 internal sealed class VirtioPciTransport : VirtioTransport
 {
@@ -32,7 +34,7 @@ internal sealed class VirtioPciTransport : VirtioTransport
 
     /// <summary>PCI vendor-specific capability ID carrying virtio structure locations.</summary>
     private const byte VendorCapabilityId = 0x09;
-    /// <summary>Status register bit 4 — Capabilities List present.</summary>
+    /// <summary>Status register bit 4, Capabilities List present.</summary>
     private const ushort StatusCapabilitiesListMask = 0x0010;
     /// <summary>Upper bound on capability-list entries (cap area spans 0x40..0xFF, 4-byte aligned).</summary>
     private const int MaxCapabilityEntries = 48;
@@ -94,8 +96,8 @@ internal sealed class VirtioPciTransport : VirtioTransport
 
     /// <summary>
     /// True when MSI-X was enabled and a vector bound. False means the device
-    /// has no usable MSI-X and therefore no interrupt source — drivers that
-    /// need one refuse to start.
+    /// has no usable MSI-X and therefore no interrupt source, so a driver
+    /// that needs one refuses to start.
     /// </summary>
     public bool MsiXActive => _msixActive;
 
@@ -169,7 +171,7 @@ internal sealed class VirtioPciTransport : VirtioTransport
         uint notifyMultiplier = 0;
 
         // FindCapability only returns the first match of a cap ID, and virtio
-        // needs several vendor-specific (0x09) capabilities — walk the list.
+        // needs several vendor-specific (0x09) capabilities, so walk the list.
         byte capOffset = (byte)(pci.ReadRegister8((byte)Config.CapabilityPointer) & CapabilityPointerMask);
         for (int i = 0; capOffset != 0 && i < MaxCapabilityEntries; i++)
         {
@@ -350,7 +352,7 @@ internal sealed class VirtioPciTransport : VirtioTransport
         WriteCommon32(CommonQueueDevice, (uint)queue.UsedRingAddr);
         WriteCommon32(CommonQueueDevice + 4, (uint)(queue.UsedRingAddr >> 32));
 
-        // The per-queue doorbell address is static — cache it for NotifyQueue.
+        // The per-queue doorbell address is static: cache it for NotifyQueue.
         ushort notifyOff = ReadCommon16(CommonQueueNotifyOff);
         _notifyAddresses[index] = _notifyBase + (ulong)notifyOff * _notifyOffMultiplier;
 
@@ -361,7 +363,7 @@ internal sealed class VirtioPciTransport : VirtioTransport
     public override void NotifyQueue(ushort index)
     {
         // Ring/descriptor writes are Normal memory, the doorbell is Device
-        // memory — order them before the store the device acts on.
+        // memory: order them before the store the device acts on.
         PlatformHAL.Initializer?.DmaBarrier();
         Native.MMIO.Write16(_notifyAddresses[index], index);
     }
@@ -384,10 +386,11 @@ internal sealed class VirtioPciTransport : VirtioTransport
         // No INTx fallback: PCI INTx lines are level-low and shared, while
         // the IOAPIC line routing available here programs edge/active-high
         // and installing a handler would clobber whichever driver already
-        // owns the shared line (the driver kit's PCI line source refuses a
-        // line another handler holds for the same reason). Every stock
-        // virtio-pci device exposes MSI-X; without it the device runs in
-        // polled mode.
+        // owns the shared line. The driver kit's PCI line source refuses a
+        // line another handler holds for the same reason, and the kit's
+        // VirtioPciTransportDriver gives virtio no INTx fallback either.
+        // Every stock virtio-pci device exposes MSI-X; without it the GPU
+        // runs in polled mode.
         Serial.Write("[VirtioPci] No MSI-X; device runs in polled mode\n");
         return false;
     }
@@ -395,7 +398,7 @@ internal sealed class VirtioPciTransport : VirtioTransport
     private void HandleMsiInterrupt(ref IRQContext context)
     {
         // MSI-X delivery is edge-style and per-device; the ISR register is
-        // not used. Report a queue notification — drivers drain their rings.
+        // not used. Report a queue notification: the driver drains its rings.
         _handler?.Invoke(IsrQueue);
     }
 

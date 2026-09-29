@@ -2,12 +2,16 @@
 
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.HAL.Devices.Input;
+using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.System.Mouse;
 
 /// <summary>
-/// Manages mouse input from physical mouse devices.
+/// Manages mouse input from physical mouse devices: the platform's mice,
+/// registered at boot, and every pointer a driver kit driver publishes,
+/// which the manager's <see cref="KitPointerConsumer"/> registers from the
+/// kit worker and unregisters when it is withdrawn.
 /// </summary>
 public static class MouseManager
 {
@@ -16,7 +20,13 @@ public static class MouseManager
     /// </summary>
     public static bool IsEnabled => CosmosFeatures.MouseEnabled;
 
-    private static List<IMouseDevice>? s_mice;
+    /// <summary>
+    /// The registered mice. Replaced on every change, never changed in
+    /// place: a kit pointer can come or go on the kit worker while
+    /// <see cref="Poll"/> walks the list on the ring's thread. Changed by the
+    /// boot path, then by the worker only.
+    /// </summary>
+    private static IMouseDevice[]? s_mice;
 
     /// <summary>
     /// Current X position (screen coordinates).
@@ -107,7 +117,9 @@ public static class MouseManager
 
     /// <summary>
     /// Initializes the mouse manager. Called once during boot, before the
-    /// platform mice are registered.
+    /// platform mice are registered and before the driver stage runs, so
+    /// the pointer consumer it installs sees every pointer a kit driver
+    /// publishes.
     /// </summary>
     internal static void Initialize()
     {
@@ -121,11 +133,15 @@ public static class MouseManager
         X = ScreenWidth / 2;
         Y = ScreenHeight / 2;
         s_mice = [];
+        DeviceRegistry.SetConsumer(DeviceKind.Pointer, new KitPointerConsumer());
     }
 
     /// <summary>
-    /// Registers a mouse device with the manager.
+    /// Registers a mouse device with the manager. Thread context, from the
+    /// boot path or from the kit worker when a published pointer is
+    /// consumed; the list is replaced, never changed in place.
     /// </summary>
+    /// <param name="mouse">The mouse to register; nothing when it is null or the manager is not initialized.</param>
     internal static void RegisterMouse(IMouseDevice mouse)
     {
         if (s_mice is null || mouse is null)
@@ -139,13 +155,47 @@ public static class MouseManager
             mouseDevice.OnMouseEvent = HandleMouseEvent;
         }
 
-        s_mice.Add(mouse);
+        s_mice = [.. s_mice, mouse];
 
         // Enable mouse after callback is set
         mouse.Enable();
 
         Core.IO.Serial.Write("[MouseManager] Registered mouse, total: ");
-        Core.IO.Serial.WriteNumber((uint)s_mice.Count);
+        Core.IO.Serial.WriteNumber((uint)s_mice.Length);
+        Core.IO.Serial.Write("\n");
+    }
+
+    /// <summary>
+    /// Forgets a mouse that is gone (a kit pointer withdrawn). Its reports
+    /// stop arriving; the cursor and the button flags keep their last
+    /// values. Thread context, from the kit worker; the list is replaced,
+    /// never changed in place.
+    /// </summary>
+    /// <param name="mouse">The mouse to remove; nothing when it is not registered.</param>
+    internal static void UnregisterMouse(IMouseDevice mouse)
+    {
+        if (s_mice is null)
+        {
+            return;
+        }
+
+        List<IMouseDevice> kept = new(s_mice.Length);
+        foreach (IMouseDevice other in s_mice)
+        {
+            if (!ReferenceEquals(other, mouse))
+            {
+                kept.Add(other);
+            }
+        }
+
+        s_mice = kept.ToArray();
+        if (mouse is MouseDevice mouseDevice)
+        {
+            mouseDevice.OnMouseEvent = null;
+        }
+
+        Core.IO.Serial.Write("[MouseManager] Unregistered mouse, total: ");
+        Core.IO.Serial.WriteNumber((uint)s_mice.Length);
         Core.IO.Serial.Write("\n");
     }
 
@@ -191,16 +241,19 @@ public static class MouseManager
     }
 
     /// <summary>
-    /// Polls all registered mice for events.
+    /// Polls all registered mice for events. Thread context; walks the
+    /// list as it was when the walk began, since a registration from the
+    /// worker replaces the array rather than changing it.
     /// </summary>
     internal static void Poll()
     {
-        if (s_mice is null)
+        IMouseDevice[]? mice = s_mice;
+        if (mice is null)
         {
             return;
         }
 
-        foreach (var mouse in s_mice)
+        foreach (IMouseDevice mouse in mice)
         {
             mouse.Poll();
         }

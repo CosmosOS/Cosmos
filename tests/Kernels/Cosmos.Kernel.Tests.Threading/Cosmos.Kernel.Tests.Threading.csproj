@@ -18,9 +18,15 @@
        between the idle-contention cell's two reads. The driver is left out of
        this kernel's manifest so the cells keep measuring the policies and
        not the worker; how the test policy rotates around a thread that wakes
-       and blocks is a question for the policy, not for the driver. -->
+       and blocks is a question for the policy, not for the driver. On arm64
+       the virt machine's default NIC is a virtio-net-pci function; without
+       gic-version=3 the machine has no ITS, so the kit routes no message
+       interrupt to it and VirtioNetDriver falls back to a 50 ms periodic
+       drain on the worker, the same wake the E1000E exclusion removes on
+       x64, so it is left out too. -->
   <ItemGroup>
     <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.E1000EDriver" />
+    <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.VirtioNetDriver" />
   </ItemGroup>
 
   <!-- Core kernel packages (using project references for development) -->
