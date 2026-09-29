@@ -24,8 +24,8 @@
     <!-- Package Metadata -->
     <PackageId>Cosmos.Kernel.Drivers</PackageId>
     <Title>Cosmos Kernel Drivers</Title>
-    <Description>The drivers Cosmos ships, written over the driver kit</Description>
-    <PackageTags>cosmos;kernel;drivers;pci;network;e1000e;virtio</PackageTags>
+    <Description>The drivers Cosmos ships, written over the driver kit: the PCI host, E1000E, the virtio transports, virtio-net, virtio-input, and the virtio-gpu and VMware SVGA II display drivers</Description>
+    <PackageTags>cosmos;kernel;drivers;pci;network;e1000e;virtio;virtio-gpu;vmware-svga;display</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
 
     <!-- Held to the surface a third party gets: the layer analyzer treats it as a
@@ -35,9 +35,12 @@
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
-         the driver classes the manifest constructs and the state object the
-         Drivers suite reads back. The lines carry no [COSMOS0003] prefix: the
-         drivers derive from the experimental kit but are not themselves experimental. -->
+         the driver classes the manifest constructs, the state objects the
+         Drivers and Graphic suites read back (the display states among them,
+         with their kit facets), and the ISvgaAdapter test seam. The lines carry
+         no [COSMOS0003] prefix, since the drivers derive from the experimental
+         kit but are not themselves experimental, except ISvgaAdapter's, which
+         is experimental and carries it. -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
 

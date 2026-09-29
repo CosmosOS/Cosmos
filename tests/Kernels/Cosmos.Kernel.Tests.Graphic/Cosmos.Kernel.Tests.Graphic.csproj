@@ -6,7 +6,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <!-- The display tests read the experimental driver kit seam (COSMOS0003):
-         the IDisplayModes facet through DisplayDevice.TryGetFacet. -->
+         the IDisplayModes, IHardwareCursor and ISvgaAdapter facets and the
+         ICanvas3DFactory through DisplayDevice.TryGetFacet. -->
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
@@ -20,12 +21,15 @@
   <!-- Hardware matrix (tests/profiles.json). The display is a kit display on
        every cell, and the primary one is what the console draws on: on
        `bare` the firmware framebuffer (VBE over q35's std VGA on x64, ramfb
-       on arm64); on `vmware-svga`, once the display drivers land, the VMware
-       SVGA II adapter through VmwareSvgaDriver, with the firmware framebuffer
-       retired since it was the same device; on `virtio-gpu`, which adds a
-       virtio-gpu-pci beside the default adapter on both arches, the
-       VirtioGpuDriver's display beside the firmware one. Until those drivers
-       land the firmware framebuffer is the only display on every cell. -->
+       on arm64); on `vmware-svga` the VMware SVGA II adapter through
+       VmwareSvgaDriver, with the firmware framebuffer retired since it was
+       the same device; on `virtio-gpu`, which adds a virtio-gpu-pci beside
+       the default adapter on both arches, the VirtioGpuDriver's display
+       beside the firmware one. Every cell registers the same 24 tests: the
+       SVGA facet and FIFO wire tests skip without the adapter, the
+       virtio-gpu state test skips without the device, and the cell is read
+       from the device tree so a driver that failed to bind fails the suite
+       instead of skipping it. -->
   <ItemGroup>
     <CosmosTestProfile Include="bare" />
     <CosmosTestProfile Include="vmware-svga" />
