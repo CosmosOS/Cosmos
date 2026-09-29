@@ -468,11 +468,8 @@ public sealed unsafe partial class DeviceBinding
             throw new InvalidOperationException("The window cannot be mapped.");
         }
 
-        return resource.PhysicalBase + HhdmOffset();
+        return resource.PhysicalBase + DeviceMemory.HhdmOffset();
     }
-
-    private static ulong HhdmOffset() =>
-        Boot.Limine.Limine.HHDM.Response != null ? Boot.Limine.Limine.HHDM.Response->Offset : 0;
 
     private static DmaBuffer? AllocateDmaCore(int length, int alignment)
     {

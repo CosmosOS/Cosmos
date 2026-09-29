@@ -28,7 +28,7 @@ public readonly struct PciFunctionDescription
     [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "The array is handed to PublishChild unchanged.")]
     public DeviceResource[] Resources { get; }
 
-    /// <summary>The function's interrupt sources: its legacy line, at index 0.</summary>
+    /// <summary>The function's interrupt sources: its legacy line at index 0, then one message source per described MSI-X table entry.</summary>
     [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "The array is handed to PublishChild unchanged.")]
     public InterruptSource[] Interrupts { get; }
 

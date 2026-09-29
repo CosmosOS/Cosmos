@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Build.API.Enum;
+using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.ARM64.Cpu;
 using Cosmos.Kernel.Core.ARM64.IO;
@@ -32,12 +33,20 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     /// <summary>Crude spin iterations (dsb sy + isb barriers) per microsecond used when firmware left CNTFRQ unprogrammed.</summary>
     private const uint FallbackSpinLoopsPerMicrosecond = 100;
 
-    // QEMU virt virtio MMIO window: 32 slots of 0x200 bytes at 0x0a000000,
-    // with consecutive SPIs starting at 16 (INTID 48).
+    /// <summary>Physical base of the virt machine's virtio-mmio window: 32 slots of 0x200 bytes, the machine's hardcoded table, not an ACPI node.</summary>
     private const ulong VirtioMmioBase = 0x0a000000;
+    /// <summary>Bytes per virtio-mmio slot: one register window.</summary>
     private const ulong VirtioMmioSlotSize = 0x200;
+    /// <summary>Slots in the virtio-mmio window.</summary>
     private const uint VirtioMmioSlotCount = 32;
+    /// <summary>INTID of slot 0's line: SPI 16, the slots' SPIs are consecutive (INTID 48 + slot).</summary>
     private const uint VirtioMmioIrqBase = 48;
+    /// <summary>Offset of the virtio-mmio MagicValue register in a slot (virtio 4.2.2).</summary>
+    private const ulong VirtioMmioMagicRegister = 0x000;
+    /// <summary>Offset of the virtio-mmio DeviceID register in a slot: 0 in an empty slot.</summary>
+    private const ulong VirtioMmioDeviceIdRegister = 0x008;
+    /// <summary>The MagicValue a virtio-mmio slot reads: "virt" in little endian.</summary>
+    private const uint VirtioMmioMagic = 0x74726976;
 
     /// <summary>Shift of the bus number in an ECAM address: 1 MiB of configuration space per bus.</summary>
     private const int EcamBusShift = 20;
@@ -65,7 +74,7 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         // Limine's HHDM on aarch64 only covers RAM with Normal-cacheable
         // attributes; device MMIO has to be mapped explicitly as Device
         // memory so register reads/writes aren't reordered or cached.
-        // Safe to call repeatedly — DeviceMapper.EnsureMapped no-ops if the
+        // Safe to call repeatedly: DeviceMapper.EnsureMapped no-ops if the
         // mapping already exists. Address 0 is an unassigned BAR, not a
         // device: nothing is mapped for it.
         if (physBase == 0)
@@ -135,14 +144,28 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     }
 
     /// <summary>
-    /// The virt machine description: one PCI host node over the ECAM window
-    /// ACPI's MCFG reports, which the PCI host driver enumerates. Without an
-    /// MCFG entry (ACPI off, no DTB parsing yet) no host is published and
-    /// the legacy scan stays the only PCI path. Thread context, interrupts
-    /// disabled, from the HAL library initializer; nothing when PCI is
-    /// compiled out.
+    /// The virt machine description. One PCI host node over the ECAM
+    /// window ACPI's MCFG reports, which the PCI host driver enumerates,
+    /// when PCI is compiled in and an MCFG entry exists (without one, ACPI
+    /// off and no DTB parsing yet, no host is published and the legacy
+    /// scan stays the only PCI path). Then one platform node per occupied
+    /// slot of the virtio-mmio window, always: the window is the virt
+    /// machine's hardcoded table, not an ACPI node, so an acpi-off boot and
+    /// a PCI-off kernel keep their MMIO devices. Thread context, interrupts
+    /// disabled, from the HAL library initializer; the lines are only
+    /// described here, the transport driver connects them at bind time.
     /// </summary>
     public void PublishPlatformNodes()
+    {
+        PublishPciHostNode();
+        PublishVirtioMmioNodes();
+    }
+
+    /// <summary>
+    /// Publishes the ECAM PCI host node; nothing when PCI is compiled out
+    /// or the MCFG entry is missing. Thread context, interrupts disabled.
+    /// </summary>
+    private static void PublishPciHostNode()
     {
         if (!CosmosFeatures.PCIEnabled)
         {
@@ -167,9 +190,70 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     }
 
     /// <summary>
+    /// Publishes one "virtio,mmio" platform node per occupied slot of the
+    /// virt machine's virtio-mmio window, whatever the feature switches and
+    /// whether or not ACPI described anything: the slot's register window
+    /// and its GIC line, routed through <see cref="GicLineRouting"/>. A
+    /// slot whose magic does not match or whose device id reads 0 is empty
+    /// and gets no node; the transport driver validates the slot again at
+    /// bind time. Thread context, interrupts disabled.
+    /// </summary>
+    private static void PublishVirtioMmioNodes()
+    {
+        // The window is Device-mapped before its registers are read (the
+        // HHDM alias of an unmapped device address faults); the call is
+        // idempotent, InitializeHardware maps the same block.
+        if (!DeviceMapper.EnsureMapped(VirtioMmioBase))
+        {
+            Serial.WriteString("[ARM64HAL] virtio-mmio window not mapped: no virtio-mmio nodes published\n");
+            return;
+        }
+
+        Serial.WriteString("[ARM64HAL] Publishing the virtio-mmio nodes...\n");
+        for (uint slot = 0; slot < VirtioMmioSlotCount; slot++)
+        {
+            ulong slotBase = VirtioMmioBase + slot * VirtioMmioSlotSize;
+            if (Native.MMIO.Read32(PhysToVirt(slotBase + VirtioMmioMagicRegister)) != VirtioMmioMagic)
+            {
+                continue;
+            }
+
+            if (Native.MMIO.Read32(PhysToVirt(slotBase + VirtioMmioDeviceIdRegister)) == 0)
+            {
+                continue;
+            }
+
+            uint line = VirtioMmioIrqBase + slot;
+            PlatformIdentity identity = new($"virtio_mmio@{slotBase:x}", ["virtio,mmio"]);
+            DeviceResource[] resources = [DeviceResource.MemoryWindow(slotBase, VirtioMmioSlotSize)];
+            InterruptSource[] interrupts = [new PlatformLineInterruptSource(line, GicLineRouting.Instance)];
+            PlatformBus.Publish(identity, resources, interrupts, null);
+        }
+    }
+
+    /// <summary>
+    /// The HHDM alias of a physical device address: the Device-memory
+    /// mapping <see cref="DeviceMapper"/> installs lives under Limine's
+    /// higher-half offset, and the raw physical address would hit the
+    /// cacheable identity mapping. The address itself without an HHDM
+    /// response. Any context.
+    /// </summary>
+    /// <param name="phys">The physical address.</param>
+    private static unsafe ulong PhysToVirt(ulong phys)
+    {
+        ulong hhdmOffset = Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : 0;
+        if (hhdmOffset != 0 && phys < hhdmOffset)
+        {
+            return phys + hhdmOffset;
+        }
+
+        return phys;
+    }
+
+    /// <summary>
     /// Wires a virtio MMIO interrupt line: handler into the dense table, then
     /// GIC configuration. The handler must be installed BEFORE enabling the
-    /// interrupt — virtio MMIO lines are level-triggered, and the GIC fires
+    /// interrupt: virtio MMIO lines are level-triggered, and the GIC fires
     /// immediately on enable if the line is already asserted.
     /// </summary>
     private static void EnableVirtioIrq(uint intid, InterruptManager.IrqDelegate handler)

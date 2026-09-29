@@ -3,6 +3,7 @@
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Virtio;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
 
@@ -102,6 +103,10 @@ internal static class DriverLog
     /// <summary>An ECAM window could not be mapped past a bus, so the host ends there: <c>pci host at 0x3f000000: buses 10 to ff not mapped, enumeration ends at bus 0f</c>.</summary>
     internal static void EcamWindowClamped(ulong physicalBase, byte firstUnmappedBus, byte endBus, byte lastMappedBus) =>
         WriteLine($"pci host at 0x{physicalBase:x}: buses {firstUnmappedBus:x2} to {endBus:x2} not mapped, enumeration ends at bus {lastMappedBus:x2}");
+
+    /// <summary>A virtio device did not acknowledge a reset in time, and the kit went on as if it had: <c>virtio type 1: status did not return to 0 within 100 ms after reset</c>. Keyed on the type: the access has no node when the handshake starts.</summary>
+    internal static void VirtioResetTimedOut(VirtioDeviceType deviceType, uint timeoutMilliseconds) =>
+        WriteLine($"virtio type {(uint)deviceType}: status did not return to 0 within {timeoutMilliseconds} ms after reset");
 
     /// <summary>A kit-internal work item, or the worker itself, threw: <c>engine: message</c>.</summary>
     internal static void EngineError(string message) => WriteLine($"engine: {message}");
