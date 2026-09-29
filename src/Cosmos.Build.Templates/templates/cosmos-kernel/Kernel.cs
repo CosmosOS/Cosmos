@@ -29,6 +29,7 @@ public class Kernel : Sys.Kernel
                 Console.WriteLine("  help     - Show this help message");
                 Console.WriteLine("  clear    - Clear the screen");
                 Console.WriteLine("  halt     - Halt the system");
+                Console.WriteLine("  shutdown - Shutdown the system");
                 break;
 
             case "clear":
@@ -38,6 +39,11 @@ public class Kernel : Sys.Kernel
             case "halt":
                 Console.WriteLine("Halting system...");
                 Stop();
+                break;
+            
+            case "shutdown":
+                Console.WriteLine("Shutting down system...");
+                Sys.Power.Shutdown();
                 break;
 
             default:
