@@ -10,7 +10,7 @@ The main differences if you come from Gen2:
 | `Console.ReadLine` / `Console.ReadKey` | Plugged, backed by the manager | Plugged, backed by the manager |
 | Key events | `KeyEvent` (`KeyChar`, `Key`, `Modifiers`) | Same |
 | Layouts | US, FR, DE, ES, GB, TR, Dvorak scan maps | Same set, in `Cosmos.Kernel.System.Keyboard.ScanMaps` |
-| Devices | PS/2 keyboard | PS/2 keyboard (x64), virtio-keyboard (x64 PCI and ARM64 MMIO) |
+| Devices | PS/2 keyboard | PS/2 keyboard (x64), virtio-keyboard over the driver kit (PCI on both architectures, MMIO on ARM64) |
 
 If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
@@ -34,7 +34,7 @@ using Cosmos.Kernel.System.Keyboard;
 using Cosmos.Kernel.System.Keyboard.ScanMaps;
 ```
 
-There is nothing to initialize by hand: at boot the kernel probes the PS/2 controller and the virtio bus, and registers every keyboard it finds with `KeyboardManager`.
+There is nothing to initialize by hand: at boot the kernel probes the PS/2 controller and registers the keyboard it finds with `KeyboardManager`, and a virtio keyboard is bound by the driver kit's `VirtioInputDriver` during the driver stage and published to the manager's consumer, which registers it the same way ([Writing a Driver](drivers.md#virtio-devices)).
 
 USB keyboards also need the USB stack, `CosmosEnableUsb`. You do not have to set it: left unset, it is on whenever `CosmosEnableKeyboard` is. Setting it to `false` keeps PS/2 and virtio keyboards and drops USB ones.
 
@@ -143,7 +143,7 @@ while (running)
 | `NumLock` | Num Lock is toggled on |
 | `ScrollLock` | Scroll Lock is toggled on |
 
-The lock keys toggle their state on each press and update the keyboard LEDs. Held modifiers also arrive on every `KeyEvent` through its `Modifiers` flags, which is usually the more convenient form.
+The lock keys toggle their state on each press and update the keyboard LEDs (a virtio keyboard's stay as they are: the driver does not drive the device's status queue). Held modifiers also arrive on every `KeyEvent` through its `Modifiers` flags, which is usually the more convenient form.
 
 AltGr is the right Alt key on the layouts that give their keys a third level (German, Spanish, Turkish). While it is held, a key converts through the layout's Control+Alt column and the `KeyEvent` carries both `Control` and `Alt` in its `Modifiers`, the way Windows reports the same key. `ControlPressed` and `AltPressed` stay the state of the physical Control and Alt keys. On the other layouts the right Alt is a second Alt.
 
@@ -187,11 +187,11 @@ Keys.Add(new KeyMapping(0x10, 'q', 'Q', 'q', 'Q', 'q', 'Q', '@', ConsoleKeyEx.Q)
 
 - Key releases are not queued: `KeyEvent.Type` has a `Break` value, but only presses reach the buffer. Releases of Shift, Ctrl and Alt update the modifier state and are otherwise dropped.
 - The German, Spanish and Turkish scan maps carry their AltGr characters; the French and British ones do not yet (`@`, `#`, `{` on AZERTY), so their right Alt stays a plain Alt. Dead keys are not composed: the Turkish `¨`, `~`, `´` and `` ` `` come out as those characters.
-- PS/2 and virtio keyboards are detected once at boot. Only a USB keyboard can be plugged in and pulled out while the kernel runs; a modifier held on one pulled out stays down until pressed on another keyboard.
+- A PS/2 keyboard is detected once at boot, and a virtio keyboard once, when the driver stage offers its device. Only a USB keyboard can be plugged in and pulled out while the kernel runs; a modifier held on one pulled out stays down until pressed on another keyboard.
 
 ## How it works
 
-Every key press raises an interrupt (IRQ1 for the PS/2 keyboard on x64, a virtio-input event on ARM64). The handler feeds the raw scan code to `KeyboardManager`, which routes lock and modifier keys to the state properties and converts everything else through the active scan map into a `KeyEvent`, queued in the key buffer. `ReadKey()` halts the CPU until an interrupt delivers the next event; `TryReadKey()` just dequeues. `Console.ReadLine` and `Console.ReadKey` are plugs on top of the same queue, so console input and raw key events never conflict.
+Every key press on the PS/2 keyboard raises IRQ1 on x64, and its handler feeds the raw scan code to `KeyboardManager`. A virtio keyboard delivers an event record on its queue instead: the queue's interrupt (an MSI-X message over PCI, the slot's GIC line over MMIO) schedules the driver's drain on the driver kit's worker, or the drain runs every 20 ms when no interrupt could be routed, and the drain converts the Linux key code to the same set 1 scan code and reports it through the keyboard sink to the manager's consumer, which feeds `KeyboardManager` as the PS/2 handler does. The manager routes lock and modifier keys to the state properties and converts everything else through the active scan map into a `KeyEvent`, queued in the key buffer. `ReadKey()` halts the CPU until an interrupt delivers the next event; `TryReadKey()` just dequeues. `Console.ReadLine` and `Console.ReadKey` are plugs on top of the same queue, so console input and raw key events never conflict.
 
 ```
 Console.ReadLine / Console.ReadKey        (plugs, Cosmos.Kernel.Plugs)
@@ -200,5 +200,5 @@ KeyboardManager ── KeyEvent queue ◀── scan map (active layout)
         │                                    ▲
         │                              raw scan codes
         │                                    │
-PS/2 keyboard, IRQ1 (x64)  /  virtio-keyboard (x64 PCI, ARM64 MMIO)
+PS/2 keyboard, IRQ1 (x64)  /  virtio-keyboard over the driver kit (PCI, MMIO)
 ```

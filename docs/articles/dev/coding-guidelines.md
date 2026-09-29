@@ -158,7 +158,7 @@ one screen:
   static factory sits with the constructors it stands in for.
 
 If you want a model for the full separator form in a new file,
-`Cosmos.Kernel.HAL/Devices/Network/VirtioNet.cs` is the one file that
+`Cosmos.Kernel.HAL/Devices/Graphic/Virtio/VirtioGpu.cs` is the one file that
 demonstrates it. Do not convert an existing file to it.
 
 ### Using Directives
@@ -356,7 +356,6 @@ internal class X64PlatformInitializer : IPlatformInitializer
     public ITimerDevice CreateTimer() => new X64Timer();
     public IKeyboardDevice[] GetKeyboardDevices() => [new PS2Keyboard()];
     public IMouseDevice[] GetMouseDevices() => [new PS2Mouse()];
-    public INetworkDevice? GetNetworkDevice() => /* PCI probe */ null;
     public uint GetCpuCount() => /* ACPI/MADT */ 1;
 
     public void InitializeHardware()
@@ -807,7 +806,7 @@ private static readonly ArrayPool<byte> s_arrayPool = ArrayPool<byte>.Shared;
 public static KernelConsole? Default { get; private set; }
 ```
 
-Three limits on the last two. `readonly` on a field of a mutable struct type (`SpinLock`) is wrong: every method call would act on a defensive copy, and the lock would never be taken. The analyzer behind `dotnet_style_readonly_field` does not know which struct methods mutate, so its suggestion is taken for reference types and for structs with no mutating members only. A field a plug reaches by name (`[FieldAccess]`) stays a field: an auto-property's backing field has a compiler-generated name. And a static initializer that allocates is a class constructor, which runs on first touch through a lock that needs a current thread: a type read during device bring-up (`MACAddress.None` in the virtio-net driver) keeps its lazily filled statics, with a comment saying why.
+Three limits on the last two. `readonly` on a field of a mutable struct type (`SpinLock`) is wrong: every method call would act on a defensive copy, and the lock would never be taken. The analyzer behind `dotnet_style_readonly_field` does not know which struct methods mutate, so its suggestion is taken for reference types and for structs with no mutating members only. A field a plug reaches by name (`[FieldAccess]`) stays a field: an auto-property's backing field has a compiler-generated name. And a static initializer that allocates is a class constructor, which runs on first touch through a lock that needs a current thread: a type reachable from device bring-up (`MACAddress`, whose `None` and `Broadcast` any driver may read) keeps its lazily filled statics, with a comment saying why.
 
 ### Avoid
 

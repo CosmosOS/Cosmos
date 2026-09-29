@@ -11,7 +11,7 @@ The main differences if you come from Gen2:
 | Position | `X`, `Y` clamped to the screen size | Same |
 | Scroll wheel | `ScrollDelta` + `ResetScrollDelta()` | Same |
 | Cursor | Drawn by your code | Drawn by your code |
-| Devices | PS/2 mouse | PS/2 mouse with scroll wheel (x64), virtio-mouse (x64 PCI and ARM64 MMIO) |
+| Devices | PS/2 mouse | PS/2 mouse with scroll wheel (x64), virtio-mouse over the driver kit (PCI on both architectures, MMIO on ARM64) |
 
 If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
@@ -34,7 +34,7 @@ using Cosmos.Kernel.System.Graphics.Fonts;
 using Cosmos.Kernel.System.Mouse;
 ```
 
-Like the keyboard, the mouse is detected and registered at boot; `MouseManager` is ready as soon as your kernel runs.
+Like the keyboard, a PS/2 mouse is detected and registered at boot, and a virtio mouse is bound by the driver kit's `VirtioInputDriver` during the driver stage and published to the manager's consumer, which registers it ([Writing a Driver](drivers.md#virtio-devices)); `MouseManager` is ready as soon as your kernel runs.
 
 ## Position and buttons
 
@@ -152,16 +152,16 @@ Two more knobs on `MouseManager`:
 
 - Only relative pointing devices are supported. There is no absolute (tablet) input, so inside a VM window the guest pointer does not track the host cursor one to one.
 - Horizontal wheel tilt is ignored; only the vertical wheel reaches `ScrollDelta`.
-- Devices are detected once at boot; there is no mouse hotplug.
+- A PS/2 mouse is detected once at boot, and a virtio mouse once, when the driver stage offers its device; there is no mouse hotplug.
 
 ## How it works
 
-On x64 the PS/2 mouse raises IRQ12 for every byte of a movement packet: 3 bytes of buttons and X/Y deltas, extended to 4 by the scroll wheel byte once the driver has enabled the IntelliMouse protocol (the magic sample-rate sequence 200, 100, 80 at boot). On ARM64 (and over PCI on x64) the virtio-input device delivers the same information as event records. Either way the driver hands the deltas to `MouseManager`, which applies `Sensitivity`, adds them to `X` and `Y`, clamps to the screen size and updates the button booleans; wheel deltas accumulate in `ScrollDelta` until a poller consumes them. Your render loop only ever reads state, which is why no locking is needed.
+On x64 the PS/2 mouse raises IRQ12 for every byte of a movement packet: 3 bytes of buttons and X/Y deltas, extended to 4 by the scroll wheel byte once the driver has enabled the IntelliMouse protocol (the magic sample-rate sequence 200, 100, 80 at boot). A virtio mouse delivers the same information as event records on its queue, over PCI or MMIO: the driver kit's `VirtioInputDriver` drains them on the kit's worker (woken by the queue's interrupt, or every 20 ms when none could be routed), folds the axis and button events into one report per sync event, and hands it through the pointer sink to the manager's consumer. Either way the deltas reach `MouseManager`, which applies `Sensitivity`, adds them to `X` and `Y`, clamps to the screen size and updates the button booleans; wheel deltas accumulate in `ScrollDelta` until a poller consumes them. Your render loop only ever reads state, which is why no locking is needed.
 
 ```
 Render loop (reads X/Y, buttons, ScrollDelta)
         │
 MouseManager ── Sensitivity, screen clamping, ScrollDelta accumulation
         │
-PS/2 mouse, IRQ12 (x64)  /  virtio-mouse (x64 PCI, ARM64 MMIO)
+PS/2 mouse, IRQ12 (x64)  /  virtio-mouse over the driver kit (PCI, MMIO)
 ```
