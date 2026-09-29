@@ -143,11 +143,12 @@ This is only allowed now in `Cosmos.Kernel.Core` but this may change in the futu
 
 There is no separator convention to follow. Four garbage-collector files carry
 `// --- Section Name ---` headers, written three weeks before this page was,
-and one driver file was later written to match them. The other 353 non-vendored
-files in the four tracked assemblies do not, no file has ever been converted,
-and no analyzer checks it. Neither is there a member order to describe: across
-131 types with three or more kinds of member there are 93 distinct orders, and
-the best-fitting single order covers 43 of them.
+and the display driver files in `Cosmos.Kernel.Drivers` were later written to
+match them. The other 353 non-vendored files in the four tracked assemblies do
+not, no file has ever been converted, and no analyzer checks it. Neither is
+there a member order to describe: across 131 types with three or more kinds of
+member there are 93 distinct orders, and the best-fitting single order covers
+43 of them.
 
 Two orderings are still worth following, because a reader checks them inside
 one screen:
@@ -158,8 +159,8 @@ one screen:
   static factory sits with the constructors it stands in for.
 
 If you want a model for the full separator form in a new file,
-`Cosmos.Kernel.HAL/Devices/Graphic/Virtio/VirtioGpu.cs` is the one file that
-demonstrates it. Do not convert an existing file to it.
+`Cosmos.Kernel.Drivers/VirtioGpuDriver.cs` is the file that demonstrates it.
+Do not convert an existing file to it.
 
 ### Using Directives
 
