@@ -9,6 +9,7 @@ using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Threading;
 using Cosmos.Kernel.System.Input.Layouts;
+using Cosmos.Kernel.System.Sessions;
 
 namespace Cosmos.Kernel.System.Input;
 
@@ -86,9 +87,22 @@ public static class KeyboardManager
     public static bool AltPressed { get; private set; }
 
     /// <summary>
-    /// Whether a keyboard input is pending to be processed.
+    /// Whether a keyboard input is pending to be processed. Once console
+    /// sessions route the keyboard, it is the calling thread's session's
+    /// input, as for every read member here.
     /// </summary>
-    public static bool KeyAvailable => s_queuedKeys is not null && s_queuedKeys.Count > 0;
+    public static bool KeyAvailable => KeyRouter is null
+        ? s_queuedKeys is not null && s_queuedKeys.Count > 0
+        : SessionManager.Current?.KeyAvailable ?? false;
+
+    /// <summary>
+    /// While set, every key goes here instead of the queue: the console
+    /// sessions' router, installed once a second session exists, hands it to
+    /// the session on the display, and the read members read the calling
+    /// thread's session. It runs where the key is decoded, which for a PS/2
+    /// keyboard is its interrupt handler, so it must not block.
+    /// </summary>
+    internal static Action<KeyEvent>? KeyRouter { get; set; }
 
     /// <summary>
     /// Throws when keyboard support is compiled out. Guards actions, not reads:
@@ -201,6 +215,12 @@ public static class KeyboardManager
     /// </summary>
     private static void Enqueue(KeyEvent keyEvent)
     {
+        if (KeyRouter is { } router)
+        {
+            router(keyEvent);
+            return;
+        }
+
         using (InternalCpu.DisableInterruptsScope())
         {
             s_queuedKeys?.Enqueue(keyEvent);
@@ -343,6 +363,14 @@ public static class KeyboardManager
     public static KeyEvent Peek()
     {
         ThrowIfDisabled();
+
+        if (KeyRouter is not null)
+        {
+            return SessionManager.RequireCurrent().TryPeekKey(out KeyEvent? routed)
+                ? routed
+                : throw new InvalidOperationException("No key is waiting.");
+        }
+
         ThrowIfNotInitialized();
 
         using (InternalCpu.DisableInterruptsScope())
@@ -381,6 +409,17 @@ public static class KeyboardManager
     /// here that does not throw for an empty queue.</returns>
     public static bool TryReadKey([NotNullWhen(true)] out KeyEvent? key)
     {
+        if (KeyRouter is not null)
+        {
+            if (SessionManager.Current is { } session)
+            {
+                return session.TryReadKey(out key);
+            }
+
+            key = default;
+            return false;
+        }
+
         // One call rather than Count-then-Dequeue, so an empty queue is the
         // bool this member returns rather than a throw out of it. The mask is
         // what makes the read safe against the interrupt that fills the queue.
@@ -406,9 +445,17 @@ public static class KeyboardManager
     /// <see cref="KeyEvent"/> and so has no value meaning "no key", and with
     /// the feature off it would otherwise wait forever on an interrupt no
     /// keyboard will raise.</exception>
+    /// <exception cref="EndOfStreamException">The keyboard is routed to console
+    /// sessions and the calling thread's session was closed.</exception>
     public static KeyEvent ReadKey()
     {
         ThrowIfDisabled();
+
+        if (KeyRouter is not null)
+        {
+            return SessionManager.RequireCurrent().ReadKey();
+        }
+
         ThrowIfNotInitialized();
 
         while (true)
