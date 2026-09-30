@@ -88,6 +88,8 @@ A `KeyEvent` carries three things:
 
 The standard `Console.ReadKey()` also works and returns a regular `ConsoleKeyInfo`; the `ReadKey(true)` overload suppresses the echo. It is a thin wrapper over `KeyboardManager.ReadKey()`, so use whichever fits your code.
 
+Once a kernel opens a second console session, the keyboard types into the session on the display, and both `Console` and `KeyboardManager` read the keys of the calling thread's session ([Console Sessions and Telnet](sessions.md)).
+
 ## Polling without blocking
 
 A render loop cannot afford to block on `ReadKey()`. `KeyboardManager.TryReadKey()` dequeues a pending key press and returns `false` when there is none, so the frame goes on. Here it drives a square over a canvas from the [Graphics](graphics.md) article:

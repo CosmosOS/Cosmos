@@ -41,7 +41,7 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
   - `PatchType_ShouldReplaceAllMethodsCorrectly`
   - `PatchType_ShouldPlugAssembly`
   - `AddMethod_BehaviorBeforeAndAfterPlug`
-- **Cosmos.Kernel.Tests.System**: Exercises `Cosmos.Kernel.System` logic that needs no hardware, in the host process (`TcpConnection` receive buffer, `Address` identity and formatting, the WAV reading of `WaveHeader`, `MemoryAudioStream` and `WaveAudioStream`, the last one over an in-memory `IVfsFileHandle`, and the square wave `ToneAudioStream` generates for `Console.Beep`). One nested fixture per member under test, holding an `InternalsVisibleTo` grant from the library.
+- **Cosmos.Kernel.Tests.System**: Exercises `Cosmos.Kernel.System` logic that needs no hardware, in the host process (`TcpConnection` receive buffer, `Address` identity and formatting, the WAV reading of `WaveHeader`, `MemoryAudioStream` and `WaveAudioStream`, the last one over an in-memory `IVfsFileHandle`, the square wave `ToneAudioStream` generates for `Console.Beep`, and the Telnet server's `TelnetDecoder`: option negotiation, window size, key sequences). One nested fixture per member under test, holding an `InternalsVisibleTo` grant from the library.
   - `AppendToData.WhenBothData_AndOtherAreEmpty_DataIsEmpty`
   - `AppendToData.WhenDataIsNotEmpty_AndOtherIsEmpty_DataDoesNotChange`
   - `AppendToData.WhenDataIsNotEmpty_AndOtherIsNotEmpty_OtherIsAppendedToData`
@@ -60,6 +60,7 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
   - `Formatting.GivenAddress_WritesDottedDecimal`
   - `IsBroadcastAddress.GivenAllOnes_IsTrue`
   - `IsBroadcastAddress.GivenAnyOtherAddress_IsFalse`
+  - `TelnetDecoderTest.Negotiate`, `TelnetDecoderTest.WindowColumns` and `TelnetDecoderTest.Decode`: the server's opening offers, the answers to a client's negotiation (none for an acknowledgement, a refusal for an unsupported option), the NAWS window size (escaped, split between segments, capped), and the keys decoded from text, line ends, control characters, UTF-8 and the arrow, editing and function-key sequences
 - **Cosmos.Tests.NativeWrapper**: Contains runtime assets; no unit tests.
 - **Cosmos.Tests.NativeLibrary**: Provides native code used in tests; no unit tests.
 
