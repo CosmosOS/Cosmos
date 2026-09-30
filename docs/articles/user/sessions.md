@@ -98,9 +98,11 @@ The server negotiates the way a terminal expects:
 Under QEMU user networking, forward a host port to the guest's port 23, then connect from the host:
 
 ```
-$ qemu-system-x86_64 ... -nic user,model=e1000e,hostfwd=tcp::2323-:23
+$ cosmos run --nic e1000e --hostfwd tcp::2323-:23
 $ telnet localhost 2323
 ```
+
+With plain QEMU, the forward is an option of the user-mode NIC: `-nic user,model=e1000e,hostfwd=tcp::2323-:23`.
 
 > [!WARNING]
 > Telnet sends everything in the clear, and the server asks for no password: anyone who reaches the port gets a shell. Serve it on a network you trust, such as QEMU's private user network.
