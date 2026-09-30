@@ -47,6 +47,13 @@ public sealed partial class DeviceBinding
     public DisplaySink PublishDisplay(IDisplay display) =>
         new(Publish(DeviceKind.Display, display.Name, display, nameof(PublishDisplay)));
 
+    /// <summary>Publishes an audio output under <see cref="IAudioOutput.Name"/>. The ring's audio manager, when present, receives it at once.</summary>
+    /// <param name="output">The driver's audio output contract.</param>
+    /// <returns>The sink the driver reports buffer completions and format changes to.</returns>
+    /// <exception cref="InvalidOperationException">The binding is being torn down, or the caller is an interrupt handler.</exception>
+    public AudioSink PublishAudio(IAudioOutput output) =>
+        new(Publish(DeviceKind.Audio, output.Name, output, nameof(PublishAudio)));
+
     /// <summary>
     /// Puts a device the driver found on its bus into the tree beneath this
     /// node, to be offered to drivers. From the worker (a probe, a work item)

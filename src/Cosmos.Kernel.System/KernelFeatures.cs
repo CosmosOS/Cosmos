@@ -77,4 +77,10 @@ public static class KernelFeatures
     /// Keyboard or Storage is on.
     /// </summary>
     public static bool Usb => CosmosFeatures.UsbEnabled;
+
+    /// <summary>
+    /// Whether the audio stack is enabled (<c>CosmosEnableAudio</c>).
+    /// Requires PCI.
+    /// </summary>
+    public static bool Audio => CosmosFeatures.AudioEnabled;
 }

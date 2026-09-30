@@ -23,4 +23,7 @@ internal enum DeviceKind
 
     /// <summary>A display: <see cref="IDisplay"/>, reported through a <see cref="DisplaySink"/>.</summary>
     Display,
+
+    /// <summary>An audio output: <see cref="IAudioOutput"/>, reported through an <see cref="AudioSink"/>.</summary>
+    Audio,
 }

@@ -171,6 +171,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.MapRegion(int resourceIndex, Cosmos.Kernel.HAL.DriverKit.RegionCaching caching) -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.MapRegisters(int resourceIndex) -> Cosmos.Kernel.HAL.DriverKit.RegisterWindow!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.Node.get -> Cosmos.Kernel.HAL.DriverKit.DeviceNode!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.PublishAudio(Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput! output) -> Cosmos.Kernel.HAL.DriverKit.Devices.AudioSink!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.PublishBlockDevice(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.PublishChild(Cosmos.Kernel.HAL.DriverKit.DeviceIdentity! identity, Cosmos.Kernel.HAL.DriverKit.DeviceResource[]! resources, Cosmos.Kernel.HAL.DriverKit.InterruptSource![]! interrupts, object? access) -> Cosmos.Kernel.HAL.DriverKit.DeviceNode!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.PublishDisplay(Cosmos.Kernel.HAL.DriverKit.Devices.IDisplay! display) -> Cosmos.Kernel.HAL.DriverKit.Devices.DisplaySink!
@@ -239,6 +240,24 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind.None = 3 -> Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind.PortRange = 1 -> Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind.RamWindow = 2 -> Cosmos.Kernel.HAL.DriverKit.DeviceResourceKind
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth.Bits16 = 2 -> Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth.Bits24 = 3 -> Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth.Bits32 = 4 -> Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth.Bits8 = 1 -> Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.AudioFormat() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.AudioFormat(Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth bitDepth, byte channels, bool signed) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.BitDepth.get -> Cosmos.Kernel.HAL.DriverKit.Devices.AudioBitDepth
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.Channels.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.ChannelSize.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.Equals(Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat other) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.FrameSize.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.IsEmpty.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.Signed.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioSink
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioSink.BufferCompleted() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.AudioSink.FormatChanged() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.BitsPerPixel.get -> int
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.DisplayMode() -> void
@@ -251,6 +270,17 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplayMode.Width.get -> int
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplaySink
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.DisplaySink.ModeChanged() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.Format.get -> Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.IsRunning.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.Name.get -> string!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.SampleRate.get -> uint
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.Start() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.Stop() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.SupportedFormats.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat>
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.TrySetFormat(Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat format, uint sampleRate) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.WritableBytes.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IAudioOutput.Write(System.ReadOnlySpan<byte> frames) -> int
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplay
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplay.Flush(int x, int y, int width, int height) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IDisplay.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion?
@@ -307,6 +337,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverAttribute.Feature.get -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverAttribute.Feature.set -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Audio = 13 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Fat = 9 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Graphics = 10 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Interrupts = 1 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
@@ -508,6 +539,8 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.WorkItem
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.WorkItem.IsCancelled.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.WorkItem.Schedule() -> bool
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.Equals(object? obj) -> bool
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.GetHashCode() -> int
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Address.get -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.BusName.get -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity.Describe() -> string!
@@ -532,6 +565,9 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DeviceResource.None.get -> Cosmos.Kernel.HAL.DriverKit.DeviceResource
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DeviceResource.PortRange(ushort basePort, ushort count) -> Cosmos.Kernel.HAL.DriverKit.DeviceResource
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DeviceResource.RamWindow(ulong virtualBase, ulong physicalBase, ulong length) -> Cosmos.Kernel.HAL.DriverKit.DeviceResource
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.operator !=(Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat left, Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat right) -> bool
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.operator ==(Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat left, Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat right) -> bool
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat.Stereo16.get -> Cosmos.Kernel.HAL.DriverKit.Devices.AudioFormat
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DmaBuffer.ReadBarrier() -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DmaBuffer.WriteBarrier() -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.DmaConstraints.Addressable32Bit.get -> Cosmos.Kernel.HAL.DriverKit.DmaConstraints

@@ -110,4 +110,14 @@ internal static class CosmosFeatures
     [FeatureSwitchDefinition("Cosmos.Kernel.HAL.Usb.Enabled")]
     public static bool UsbEnabled =>
         AppContext.TryGetSwitch("Cosmos.Kernel.HAL.Usb.Enabled", out bool enabled) ? enabled : true;
+
+    /// <summary>
+    /// Controls the audio stack: the HD Audio controller driver and the
+    /// audio manager the ring reaches it through. Requires PCI; the MSBuild
+    /// cascade in Sdk.targets disables this when PCI is off.
+    /// Set via CosmosEnableAudio property in csproj.
+    /// </summary>
+    [FeatureSwitchDefinition("Cosmos.Kernel.System.Audio.Enabled")]
+    public static bool AudioEnabled =>
+        AppContext.TryGetSwitch("Cosmos.Kernel.System.Audio.Enabled", out bool enabled) ? enabled : true;
 }

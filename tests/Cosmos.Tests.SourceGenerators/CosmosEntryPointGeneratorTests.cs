@@ -271,14 +271,14 @@ public sealed class CosmosEntryPointGeneratorTests
     public Task WhenFeatureHasNoKernelFeaturesProperty_ReportsGen003AndLeavesItOut() =>
         new ManifestTest(includeKitStubs: false)
             .WithKernelClass(KitStubs.KernelClass)
-            .WithSource("/stubs/DriverKit.cs", KitStubs.Hal("internal", extraFeature: "Audio"))
+            .WithSource("/stubs/DriverKit.cs", KitStubs.Hal("internal", extraFeature: "Bluetooth"))
             .WithSource("/k/Drivers.cs", Prelude + """
                 namespace MyOS.Drivers
                 {
-                    [{|#0:Driver(Feature = DriverFeature.Audio)|}]
-                    internal sealed class Sound : Driver
+                    [{|#0:Driver(Feature = DriverFeature.Bluetooth)|}]
+                    internal sealed class Radio : Driver
                     {
-                        public override string Name => "sound";
+                        public override string Name => "radio";
                     }
 
                     [Driver(Feature = DriverFeature.Usb)]
@@ -290,6 +290,6 @@ public sealed class CosmosEntryPointGeneratorTests
                 """)
             .ExpectEntryPoint(KitStubs.KernelClass)
             .ExpectManifest(GeneratedText.GuardedRegistration("Usb", "MyOS.Drivers.Hub"))
-            .ExpectDiagnostic(Diagnostics.FeatureUnmapped(0, "MyOS.Drivers.Sound", "Audio"))
+            .ExpectDiagnostic(Diagnostics.FeatureUnmapped(0, "MyOS.Drivers.Radio", "Bluetooth"))
             .RunAsync();
 }

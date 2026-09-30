@@ -32,6 +32,11 @@
          from the Timer switch, and the hot-plug thread's need for the scheduler
          is checked where that thread is started. -->
     <CosmosEnableUsb       Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableUsb>
+    <!-- PCI off → no HD Audio controller to find. That also covers Interrupts
+         off, which turned PCI off above. The stream is driven by the codec's
+         own clock and topped up from the kit worker, so audio rides no other
+         switch; without a scheduler the ring is written inline instead. -->
+    <CosmosEnableAudio     Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableAudio>
   </PropertyGroup>
 
   <!-- Driver policy: a kernel project drops a driver from its manifest with
