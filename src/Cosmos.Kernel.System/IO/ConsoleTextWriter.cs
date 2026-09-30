@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Text;
-using Cosmos.Kernel.System.Graphics;
+using Cosmos.Kernel.System.Sessions;
 
 namespace Cosmos.Kernel.System.IO;
 
@@ -9,10 +9,9 @@ internal sealed class ConsoleTextWriter : TextWriter
     public override Encoding Encoding => Encoding.Default;
     public override void Write(char value)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.Write(value);
-        KernelConsole.Default.Canvas.Display();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.Write(value);
+        session.Flush();
     }
     public override void Write(string? value)
     {
@@ -21,17 +20,15 @@ internal sealed class ConsoleTextWriter : TextWriter
             return;
         }
 
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.Write(value);
-        KernelConsole.Default.Canvas.Display();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.Write(value);
+        session.Flush();
     }
 
     public override void Write(ReadOnlySpan<char> buffer)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.Write(buffer);
-        KernelConsole.Default.Canvas.Display();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.Write(buffer);
+        session.Flush();
     }
 }

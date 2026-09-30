@@ -50,6 +50,11 @@ public class KernelConsole
     private bool _cursorVisible = true;
     private bool _cursorDrawn = false;
 
+    // Whether this console paints the canvas. A hidden console keeps its
+    // cells and cursor current and draws nothing, so several consoles can
+    // share one canvas with only the one on screen touching it.
+    private bool _visible = true;
+
     // Console color palette (standard 16 colors)
     private static readonly uint[] s_palette =
     [
@@ -87,6 +92,34 @@ public class KernelConsole
         _cols = canvas.Width / _charWidth;
         _rows = canvas.Height / _charHeight;
         _cells = new Cell[_cols * _rows];
+
+        ClearCells();
+    }
+
+    /// <summary>
+    /// Creates a hidden console with a grid of its own size on the given
+    /// canvas: the screen of a console session, which keeps its cells while
+    /// another session is on screen and paints them once
+    /// <see cref="IsVisible"/> is set. A grid wider or taller than the canvas
+    /// is kept whole and drawn clipped.
+    /// </summary>
+    /// <param name="canvas">The canvas to render to while visible.</param>
+    /// <param name="font">The font to use.</param>
+    /// <param name="cols">Number of columns.</param>
+    /// <param name="rows">Number of rows.</param>
+    internal KernelConsole(Canvas canvas, Font font, int cols, int rows)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(cols, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(rows, 1);
+
+        _canvas = canvas;
+        _font = font;
+        ApplyFontMetrics(_font);
+
+        _cols = cols;
+        _rows = rows;
+        _cells = new Cell[_cols * _rows];
+        _visible = false;
 
         ClearCells();
     }
@@ -164,8 +197,11 @@ public class KernelConsole
 
                     ClearCells();
 
-                    _canvas.Clear((int)_backgroundColor);
-                    _canvas.Display();
+                    if (_visible)
+                    {
+                        _canvas.Clear((int)_backgroundColor);
+                        _canvas.Display();
+                    }
 
                     _font = value;
                 }
@@ -280,6 +316,101 @@ public class KernelConsole
     /// Gets the canvas this console renders to.
     /// </summary>
     public Canvas Canvas => _canvas;
+
+    /// <summary>
+    /// Gets or sets whether this console paints its canvas. Showing a console
+    /// repaints the whole canvas from its cells; hiding it leaves the canvas
+    /// to whichever console is shown next, while writes keep updating the
+    /// cells. The caller flushes the canvas. Thread-safe.
+    /// </summary>
+    internal bool IsVisible
+    {
+        get => _visible;
+        set
+        {
+            using (InternalCpu.DisableInterruptsScope())
+            {
+                _lock.Acquire();
+                try
+                {
+                    if (_visible == value)
+                    {
+                        return;
+                    }
+
+                    _visible = value;
+
+                    // Whatever caret was painted now belongs to the canvas,
+                    // which the next console shown paints over.
+                    _cursorDrawn = false;
+
+                    if (_visible)
+                    {
+                        RedrawInternal();
+                    }
+                }
+                finally
+                {
+                    _lock.Release();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Resizes the grid, keeping the cells that fit. When the grid loses rows
+    /// the top ones go, so the cursor's line stays on screen, as a terminal
+    /// window does when it shrinks. Thread-safe.
+    /// </summary>
+    /// <param name="cols">New number of columns.</param>
+    /// <param name="rows">New number of rows.</param>
+    internal void Resize(int cols, int rows)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(cols, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(rows, 1);
+
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            _lock.Acquire();
+            try
+            {
+                if (_cells is null || (cols == _cols && rows == _rows))
+                {
+                    return;
+                }
+
+                Cell[] cells = new Cell[cols * rows];
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    cells[i] = Cell.Empty(_foregroundColor, _backgroundColor);
+                }
+
+                int dropped = Math.Max(0, _cursorY + 1 - rows);
+                int keptRows = Math.Min(rows, _rows - dropped);
+                int keptCols = Math.Min(cols, _cols);
+                for (int row = 0; row < keptRows; row++)
+                {
+                    for (int col = 0; col < keptCols; col++)
+                    {
+                        cells[row * cols + col] = _cells[GetIndex(row + dropped, col)];
+                    }
+                }
+
+                _cells = cells;
+                _cols = cols;
+                _rows = rows;
+                _cursorX = Math.Min(_cursorX, cols - 1);
+                _cursorY -= dropped;
+                _cursorDrawn = false;
+
+                RedrawInternal();
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        }
+    }
 
     /// <summary>
     /// Sets the foreground color from ConsoleColor enum.
@@ -453,7 +584,7 @@ public class KernelConsole
     /// </summary>
     private void DrawCursor()
     {
-        if (!_cursorVisible || _cursorDrawn)
+        if (!_visible || !_cursorVisible || _cursorDrawn || !FitsCanvas(_cursorX, _cursorY))
         {
             return;
         }
@@ -497,7 +628,7 @@ public class KernelConsole
     /// </summary>
     private void DrawCharAt(int col, int row)
     {
-        if (_cells is null)
+        if (!_visible || _cells is null || !FitsCanvas(col, row))
         {
             return;
         }
@@ -523,11 +654,21 @@ public class KernelConsole
     }
 
     /// <summary>
+    /// Whether a cell lies wholly on the canvas. Always true for a console
+    /// sized from its canvas; a session screen sized by a remote terminal can
+    /// be larger, and its cells past the edge are not drawn.
+    /// </summary>
+    private bool FitsCanvas(int col, int row)
+    {
+        return (col + 1) * _charWidth <= _canvas.Width && (row + 1) * _charHeight <= _canvas.Height;
+    }
+
+    /// <summary>
     /// Internal redraw (must be called with lock held).
     /// </summary>
     private void RedrawInternal()
     {
-        if (_cells is null)
+        if (!_visible || _cells is null)
         {
             return;
         }
@@ -824,7 +965,11 @@ public class KernelConsole
             {
                 EraseCursor();
                 ClearCells();
-                _canvas.Clear((int)_backgroundColor);
+                if (_visible)
+                {
+                    _canvas.Clear((int)_backgroundColor);
+                }
+
                 _cursorX = 0;
                 _cursorY = 0;
                 DrawCursor();

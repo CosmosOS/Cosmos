@@ -1,37 +1,22 @@
 using System.Text;
 using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.System;
-using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.IO;
 using Cosmos.Kernel.System.Keyboard;
+using Cosmos.Kernel.System.Sessions;
 
 namespace Cosmos.Kernel.Plugs.System;
 
 [Plug(typeof(Console))]
 public class ConsolePlug
 {
-    // Track the start position for current input line (for proper backspace/delete handling)
-    private static int s_inputStartX;
-    private static int s_inputStartY;
-
-    private static void ThrowIfKeyboardDisabled()
+    private static void ThrowIfKeyboardDisabled(ConsoleSession session)
     {
-        if (!KernelFeatures.Keyboard)
+        // A remote session's keys come from the network, not the keyboard.
+        if (!session.IsRemote && !KernelFeatures.Keyboard)
         {
             throw new InvalidOperationException("Console input requires keyboard support. Set CosmosEnableKeyboard=true in your csproj to enable it.");
         }
-    }
-
-    /// <summary>
-    /// Flushes the console back buffer to the screen. The console only draws
-    /// into the canvas back buffer, so every mutation visible to the user
-    /// (writes, cursor moves) must be followed by a flush.
-    /// </summary>
-    private static void DisplayCanvas()
-    {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.Canvas.Display();
     }
 
     [PlugMember]
@@ -58,147 +43,121 @@ public class ConsolePlug
     [PlugMember]
     public static void Clear()
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.Clear();
-        DisplayCanvas();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.Clear();
+        session.Flush();
     }
 
     [PlugMember]
     public static ConsoleColor get_ForegroundColor()
     {
-        // Return white as default - we don't track the reverse mapping
-        return ConsoleColor.White;
+        return SessionManager.RequireCurrent().ForegroundColor;
     }
 
     [PlugMember]
     public static void set_ForegroundColor(ConsoleColor value)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.SetForegroundColor(value);
+        SessionManager.RequireCurrent().ForegroundColor = value;
     }
 
     [PlugMember]
     public static ConsoleColor get_BackgroundColor()
     {
-        // Return black as default - we don't track the reverse mapping
-        return ConsoleColor.Black;
+        return SessionManager.RequireCurrent().BackgroundColor;
     }
 
     [PlugMember]
     public static void set_BackgroundColor(ConsoleColor value)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.SetBackgroundColor(value);
+        SessionManager.RequireCurrent().BackgroundColor = value;
     }
 
     [PlugMember]
     public static void ResetColor()
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.ResetColors();
+        SessionManager.RequireCurrent().ResetColors();
     }
 
     [PlugMember]
     public static int get_CursorLeft()
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        return KernelConsole.Default.CursorX;
+        return SessionManager.RequireCurrent().CursorLeft;
     }
 
     [PlugMember]
     public static void set_CursorLeft(int value)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.CursorX = value;
-        DisplayCanvas();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.SetCursorPosition(value, session.CursorTop);
+        session.Flush();
     }
 
     [PlugMember]
     public static int get_CursorTop()
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        return KernelConsole.Default.CursorY;
+        return SessionManager.RequireCurrent().CursorTop;
     }
 
     [PlugMember]
     public static void set_CursorTop(int value)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.CursorY = value;
-        DisplayCanvas();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.SetCursorPosition(session.CursorLeft, value);
+        session.Flush();
     }
 
     [PlugMember]
     public static void SetCursorPosition(int left, int top)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.SetCursorPosition(left, top);
-        DisplayCanvas();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.SetCursorPosition(left, top);
+        session.Flush();
     }
 
     [PlugMember]
     public static bool get_CursorVisible()
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        return KernelConsole.Default.CursorVisible;
+        return SessionManager.RequireCurrent().CursorVisible;
     }
 
     [PlugMember]
     public static void set_CursorVisible(bool value)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.CursorVisible = value;
-        DisplayCanvas();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.CursorVisible = value;
+        session.Flush();
     }
 
     [PlugMember]
     public static int get_WindowWidth()
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        return KernelConsole.Default.Cols;
+        return SessionManager.RequireCurrent().Cols;
     }
 
     [PlugMember]
     public static int get_WindowHeight()
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        return KernelConsole.Default.Rows;
+        return SessionManager.RequireCurrent().Rows;
     }
 
     [PlugMember]
     public static int get_BufferWidth()
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        return KernelConsole.Default.Cols;
+        return SessionManager.RequireCurrent().Cols;
     }
 
     [PlugMember]
     public static int get_BufferHeight()
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        return KernelConsole.Default.Rows;
+        return SessionManager.RequireCurrent().Rows;
     }
 
     [PlugMember]
     public static bool get_KeyAvailable()
     {
-        ThrowIfKeyboardDisabled();
-        return KeyboardManager.KeyAvailable;
+        ConsoleSession session = SessionManager.RequireCurrent();
+        ThrowIfKeyboardDisabled(session);
+        return session.KeyAvailable;
     }
 
     [PlugMember]
@@ -207,15 +166,15 @@ public class ConsolePlug
     [PlugMember]
     public static ConsoleKeyInfo ReadKey(bool intercept)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-        ThrowIfKeyboardDisabled();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        ThrowIfKeyboardDisabled(session);
 
-        var keyEvent = KeyboardManager.ReadKey();
+        KeyEvent keyEvent = session.ReadKey();
 
         if (!intercept && keyEvent.KeyChar != '\0')
         {
-            KernelConsole.Default.Write(keyEvent.KeyChar);
-            DisplayCanvas();
+            session.Write(keyEvent.KeyChar);
+            session.Flush();
         }
 
         return ToConsoleKeyInfo(keyEvent);

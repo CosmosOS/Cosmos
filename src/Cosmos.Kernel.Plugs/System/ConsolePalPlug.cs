@@ -1,6 +1,5 @@
 using System.Text;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.IO;
 
@@ -61,23 +60,23 @@ public class ConsolePalPlug
     }
 
     private static KeyboardTextReader StdInReader => field ??= new();
+
+    /// <summary>
+    /// Standard input, which reads the calling thread's console session. It
+    /// is made whether or not keyboard support is compiled in: a remote
+    /// session reads the network, and a local one with no keyboard reads as
+    /// the end of input.
+    /// </summary>
     [PlugMember]
     public static TextReader GetOrCreateReader()
     {
-        if (KernelFeatures.Keyboard)
+        if (Console.IsInputRedirected || Console.InputEncoding != Encoding.Default)
         {
-            if (Console.IsInputRedirected || Console.InputEncoding != Encoding.Default)
-            {
-                Stream stream = OpenStandardInput();
-                //TODO: Once lock keyword works, call 'TextReader.Syncronize' to get a thread save reader.
-                return new StreamReader(stream, Console.InputEncoding, detectEncodingFromByteOrderMarks: false, 4096, leaveOpen: true);
-            }
+            Stream stream = OpenStandardInput();
+            // TODO: Once the lock keyword works, call 'TextReader.Synchronized' to get a thread-safe reader.
+            return new StreamReader(stream, Console.InputEncoding, detectEncodingFromByteOrderMarks: false, 4096, leaveOpen: true);
+        }
 
-            return StdInReader;
-        }
-        else
-        {
-            return TextReader.Null;
-        }
+        return StdInReader;
     }
 }
