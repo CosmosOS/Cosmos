@@ -55,8 +55,9 @@ internal interface IPlatformInitializer
     /// <summary>
     /// Maps the 2 MiB block containing a physical MMIO address so its
     /// HHDM-virtual alias is accessible with Device-memory attributes.
-    /// Called by HAL device drivers (AHCI, NVMe, etc.) before touching their
-    /// BARs. ARM64 installs a Device mapping in TTBR1 via
+    /// Called by the driver kit's register mapper, by the HAL's xHCI driver
+    /// and by its MSI-X table mapper before touching their BARs. ARM64
+    /// installs a Device mapping in TTBR1 via
     /// <c>DeviceMapper.EnsureMapped</c>; x64 maps only blocks above 4 GiB,
     /// since Limine's page tables already cover the low 4 GiB.
     /// </summary>

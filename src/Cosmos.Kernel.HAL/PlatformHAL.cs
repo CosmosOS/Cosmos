@@ -15,8 +15,7 @@ internal static class PlatformHAL
 {
     /// <summary>
     /// Legacy POST diagnostic I/O port (0x80); a read takes ~1 µs on PC chipsets,
-    /// used for calibration-free delays (shared by the AHCI wait loop and the x64
-    /// platform initializer).
+    /// used for calibration-free delays by the x64 platform initializer.
     /// </summary>
     public const ushort LegacyPostPort = 0x80;
 

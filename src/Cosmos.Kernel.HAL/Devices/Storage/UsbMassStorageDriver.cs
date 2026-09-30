@@ -10,8 +10,8 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// SCSI commands over the Bulk-Only Transport, which USB sticks, card
 /// readers and USB disks all do, and exposes each logical unit with a
 /// medium as a <see cref="UsbMassStorage"/> for the storage manager to
-/// register, the way <see cref="Ahci.Ports"/> and
-/// <see cref="Nvme.Namespaces"/> are. The units found at boot are read
+/// register by hand (the AHCI and NVMe disks reach it through the driver
+/// kit's block consumer instead). The units found at boot are read
 /// from <see cref="Disks"/>; the ones plugged in or pulled out afterwards
 /// are reported through <see cref="DiskAttached"/> and
 /// <see cref="DiskDetached"/>.
