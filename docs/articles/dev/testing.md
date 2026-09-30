@@ -45,6 +45,8 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
   - `AppendToData.WhenBothData_AndOtherAreEmpty_DataIsEmpty`
   - `AppendToData.WhenDataIsNotEmpty_AndOtherIsEmpty_DataDoesNotChange`
   - `AppendToData.WhenDataIsNotEmpty_AndOtherIsNotEmpty_OtherIsAppendedToData`
+  - `AppendToData.WhenPartOfDataWasRead_AndOtherIsAppended_TheUnreadDataIsKept`
+  - `AppendToData.WhenPartOfDataWasRead_AndOtherOutgrowsTheBuffer_TheUnreadDataIsKept`
   - `AdvanceDataOffset.WhenAdvancingByZero_NoChangesAreMade`
   - `AdvanceDataOffset.WhenAdvancingByOneAndLengthIsTwo_OnlyLastElementRemains`
   - `AdvanceDataOffset.WhenAdvancingByTwoAndLengthIsTwo_DataLengthIsZero`
