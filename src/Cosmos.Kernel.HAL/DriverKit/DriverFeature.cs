@@ -53,4 +53,7 @@ public enum DriverFeature
 
     /// <summary><c>CosmosEnableUsb</c>.</summary>
     Usb,
+
+    /// <summary><c>CosmosEnableAudio</c>.</summary>
+    Audio,
 }

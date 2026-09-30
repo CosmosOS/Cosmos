@@ -207,6 +207,7 @@ Cosmos.Kernel.HAL/
   Timers/                    ← internal: TickSource, TimerEntry
   Internal/                  ← the LibraryInitializer ILC finds by full name
   Devices/                   ← what a device is, a folder per category
+    Audio/                   ← IAudioOutput, AudioFormat, AudioSink, AudioConsumer
     Display/                 ← IDisplay, its facets, DisplayMode, DisplaySink, DisplayConsumer, FirmwareDisplay
     Input/
     Network/                 ← INetworkInterface, NetworkSink, NetworkConsumer, MacAddress

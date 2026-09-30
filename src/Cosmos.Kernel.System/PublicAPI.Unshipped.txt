@@ -929,6 +929,7 @@ static Cosmos.Kernel.System.Input.MouseManager.X.get -> int
 static Cosmos.Kernel.System.Input.MouseManager.Y.get -> int
 static Cosmos.Kernel.System.Internal.KernelEntry.Start(Cosmos.Kernel.System.Kernel! kernel) -> void
 static Cosmos.Kernel.System.Kernel.Current.get -> Cosmos.Kernel.System.Kernel?
+static Cosmos.Kernel.System.KernelFeatures.Audio.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Fat.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Graphics.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Interrupts.get -> bool
