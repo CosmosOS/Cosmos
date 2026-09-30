@@ -6,7 +6,7 @@ using Cosmos.Kernel.HAL.DriverKit.Synthetic;
 namespace Cosmos.Kernel.Tests.Drivers.Library;
 
 /// <summary>
-/// Binds the <c>block</c> device and connects a handler that sleeps through
+/// Binds the <c>blocking</c> device and connects a handler that sleeps through
 /// the binding, which is forbidden in interrupt context. The kit must turn
 /// that into a recorded fault, leave the source masked and keep running.
 /// </summary>
@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Tests.Drivers.Library;
 public sealed class BlockingHandlerDriver : RecordingDriver
 {
     /// <summary>The synthetic key this driver matches.</summary>
-    public const string Key = "block";
+    public const string Key = "blocking";
 
     private readonly DeviceMatch[] _matches = [SyntheticMatch.Key(Key)];
 

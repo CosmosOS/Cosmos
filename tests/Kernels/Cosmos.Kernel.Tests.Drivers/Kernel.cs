@@ -11,6 +11,7 @@ using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Network;
+using Cosmos.Kernel.System.Storage;
 using Cosmos.Kernel.Tests.Drivers.Library;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -25,9 +26,10 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// arbitration, the unwinding of a declined or failed probe, publishing to a
 /// consumer, interrupt delivery in a synthetic dispatch, deferred work,
 /// periodic work, driver threads, teardown order and accounting, child
-/// nodes, and a display published to the ring's display manager. Every
-/// assertion reads <see cref="DriverInfo"/>, the display manager or the
-/// suite's own drivers and consumer, never the serial log. One node is published from
+/// nodes, a display published to the ring's display manager, and a block
+/// device published to the ring's storage manager. Every assertion reads
+/// <see cref="DriverInfo"/>, the display manager, the storage manager or
+/// the suite's own drivers and consumer, never the serial log. One node is published from
 /// the constructor, before the driver stage, to cover the boot path; the
 /// rest are published from the tests, which is the hot-plug path.
 /// <para>
@@ -50,8 +52,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 3 retract, 3 children, 1 diagnostics, 5 hardware.</summary>
-    private const int ExpectedTestCount = 33;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware.</summary>
+    private const int ExpectedTestCount = 34;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -203,6 +205,9 @@ public class Kernel : Sys.Kernel
 
         // ==================== Display device ====================
         TR.Run("Publish_Display_ReachesDisplayManager", TestPublishDisplayReachesDisplayManager);
+
+        // ==================== Block device ====================
+        TR.Run("Publish_Block_ReachesStorageManager", TestPublishBlockReachesStorageManager);
 
         // ==================== Retract ====================
         TR.Run("Retract_DetachOrderAndAccounting", TestRetractDetachOrderAndAccounting);
@@ -599,7 +604,7 @@ public class Kernel : Sys.Kernel
         SyntheticBus.WaitForQueuedJobs();
 
         Assert.Equal(1, state.HandlerRuns, "the handler should have been entered once");
-        Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info), "the block node should be in the tree");
+        Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info), "the blocking node should be in the tree");
         Assert.Equal(1, info.FaultCount, "the guard's exception should be recorded as one fault");
         Assert.NotNull(info.LastFault);
         Assert.True(info.State == DeviceNodeState.Bound, "a fault does not tear the binding down");
@@ -682,6 +687,72 @@ public class Kernel : Sys.Kernel
         Assert.True(ReferenceEquals(DisplayManager.Primary, primaryBefore), "the primary should be the firmware display again, or none");
         Assert.True(FindDisplayDeviceIndex(node.Path) < 0, "the withdrawn display should have left the published list");
         Assert.Equal(0, state.FlushCount, "a display without a framebuffer receives no flush");
+    }
+
+    // ==================== Block device ====================
+
+    // The ring's storage manager consumes the block kind: a disk a driver
+    // publishes is registered and scanned inside the probe, takes its
+    // place in the manager's tables (ahead of any hand-registered disk, so
+    // it is the primary when nothing else is there) and leaves them when
+    // the node is retracted. The UART carries the manager's registered and
+    // unregistered lines for it; they are read from the log, not asserted.
+    private static void TestPublishBlockReachesStorageManager()
+    {
+        int disksBefore = StorageManager.DeviceCount;
+        int devicesBefore = DriverInfo.DeviceCount;
+        IBlockDevice? primaryBefore = StorageManager.PrimaryDevice;
+        BlockDriver? driver = RecordingDriver.Find<BlockDriver>();
+        int probesBefore = driver?.ProbeCount ?? 0;
+        int detachesBefore = driver?.DetachCount ?? 0;
+
+        DeviceNode node = SyntheticBus.Publish(BlockDriver.Key, []);
+        SyntheticBus.WaitForQueuedJobs();
+
+        BlockState? state = node.Binding?.DriverState as BlockState;
+        Assert.NotNull(state, "the block driver should hold the node");
+        if (state is null)
+        {
+            SyntheticBus.Retract(node);
+            SyntheticBus.WaitForQueuedJobs();
+            return;
+        }
+
+        Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info), "the block node should be in the tree");
+        Assert.True(info.State == DeviceNodeState.Bound, "the block driver should hold the node");
+        Assert.True(info.DriverName == nameof(BlockDriver), "the block driver should hold the node");
+        Assert.Equal(1, info.PublishedDeviceCount, "the binding should hold one published device");
+
+        Assert.Equal(disksBefore + 1, StorageManager.DeviceCount, "the storage manager should list one more device");
+        Assert.True(HoldsDevice(StorageManager.Devices, state), "the storage manager should list the synthetic disk");
+        Assert.Equal(0, StorageManager.GetPartitions(state).Count, "a blank disk has no partitions");
+        if (disksBefore == 0)
+        {
+            Assert.True(ReferenceEquals(StorageManager.PrimaryDevice, state), "the only disk should be the primary device");
+        }
+
+        Assert.Equal(devicesBefore + 1, DriverInfo.DeviceCount, "the published list should hold one more device");
+        int deviceIndex = FindBlockDeviceIndex(node.Path);
+        Assert.True(deviceIndex >= 0, "the disk should be in the published list under its node");
+        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.IsConsumed, "the storage manager should have consumed the disk");
+            Assert.False(device.IsWithdrawn, "a published disk is not withdrawn");
+            Assert.True(device.DriverName == nameof(BlockDriver), "the published device should name its driver");
+            Assert.True(device.Name == BlockState.DeviceName, "the published device should carry the driver's name for it");
+        }
+
+        SyntheticBus.Retract(node);
+        SyntheticBus.WaitForQueuedJobs();
+
+        Assert.Equal(disksBefore, StorageManager.DeviceCount, "the storage manager should have dropped the disk");
+        Assert.False(HoldsDevice(StorageManager.Devices, state), "the withdrawn disk should have left the manager's list");
+        Assert.True(ReferenceEquals(StorageManager.PrimaryDevice, primaryBefore), "the primary device should be what it was before, or none");
+        Assert.Equal(devicesBefore, DriverInfo.DeviceCount, "the withdrawn disk should have left the published list");
+        Assert.True(FindBlockDeviceIndex(node.Path) < 0, "the withdrawn disk should have left the published list");
+        Assert.True(driver is not null && driver.ProbeCount == probesBefore + 1, "the block driver should have been probed once");
+        Assert.True(driver is not null && driver.DetachCount == detachesBefore + 1, "the block driver should have been detached once");
+        Assert.Equal(0, state.FlushCount, "nothing writes to the synthetic disk, so nothing flushes it");
     }
 
     // ==================== Retract ====================
@@ -1072,6 +1143,39 @@ public class Kernel : Sys.Kernel
         }
 
         return -1;
+    }
+
+    /// <summary>Finds the published block device whose node has the given path.</summary>
+    /// <param name="nodePath">The path of the node whose driver published the device.</param>
+    /// <returns>Its position in the published list, or -1.</returns>
+    private static int FindBlockDeviceIndex(string nodePath)
+    {
+        int count = DriverInfo.DeviceCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.NodePath == nodePath)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>Whether <paramref name="devices"/> holds <paramref name="device"/> by reference.</summary>
+    /// <param name="devices">The manager's list, read once.</param>
+    /// <param name="device">The device looked for.</param>
+    private static bool HoldsDevice(IReadOnlyList<IBlockDevice> devices, IBlockDevice device)
+    {
+        for (int i = 0; i < devices.Count; i++)
+        {
+            if (ReferenceEquals(devices[i], device))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
