@@ -24,6 +24,7 @@ abstract Cosmos.Kernel.System.Sessions.ConsoleSession.IsRemote.get -> bool
 abstract Cosmos.Kernel.System.Sessions.ConsoleSession.Name.get -> string!
 const Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.NanosecondsPerMillisecond = 1000000 -> ulong
 const Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.BootSectorLba = 0 -> ulong
+const Cosmos.Kernel.System.Network.Telnet.TelnetServer.DefaultPort = 23 -> ushort
 const Cosmos.Kernel.System.Sessions.SessionManager.MaxSessions = 12 -> int
 const Cosmos.Kernel.System.Storage.Gpt.FirstUsableLba = 34 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.PrimaryHeaderLba = 1 -> ulong
@@ -797,6 +798,12 @@ Cosmos.Kernel.System.Network.NetworkAdapter.NetworkAdapter() -> void
 Cosmos.Kernel.System.Network.NetworkAdapter.Ready.get -> bool
 Cosmos.Kernel.System.Network.NetworkManager
 Cosmos.Kernel.System.Network.NetworkStack
+Cosmos.Kernel.System.Network.Telnet.TelnetServer
+Cosmos.Kernel.System.Network.Telnet.TelnetServer.IsRunning.get -> bool
+Cosmos.Kernel.System.Network.Telnet.TelnetServer.Port.get -> ushort
+Cosmos.Kernel.System.Network.Telnet.TelnetServer.Start() -> void
+Cosmos.Kernel.System.Network.Telnet.TelnetServer.Stop() -> void
+Cosmos.Kernel.System.Network.Telnet.TelnetServer.TelnetServer(System.Action<Cosmos.Kernel.System.Sessions.ConsoleSession!>! shell, ushort port = 23) -> void
 Cosmos.Kernel.System.Network.UdpClient
 Cosmos.Kernel.System.Network.UdpClient.Close() -> void
 Cosmos.Kernel.System.Network.UdpClient.Connect(Cosmos.Kernel.System.Network.Address! dest, int destPort) -> void
