@@ -196,11 +196,12 @@ public static class StorageManager
     }
 
     /// <summary>
-    /// Registers every block device produced by the HAL storage drivers
-    /// (AHCI ports, NVMe namespaces, then USB mass storage units, so an
-    /// internal disk stays the primary one), and follows the USB disks
-    /// plugged in or pulled out from then on. Called once during boot after
-    /// the HAL has initialized the controllers.
+    /// Registers the USB mass storage units the HAL's USB stack found at
+    /// boot and follows the USB disks plugged in or pulled out from then
+    /// on. The AHCI and NVMe disks do not pass through here: the driver
+    /// kit's storage drivers publish them during the driver stage and the
+    /// manager's block consumer registers them as they arrive. Called once
+    /// during boot after the HAL has initialized the USB stack.
     /// </summary>
     internal static void RegisterHalDevices()
     {
@@ -217,18 +218,6 @@ public static class StorageManager
         {
             UsbMassStorageDriver.DiskAttached = RegisterDevice;
             UsbMassStorageDriver.DiskDetached = UnregisterDevice;
-        }
-
-        IReadOnlyList<BlockDevice> ports = Ahci.Ports;
-        for (int i = 0; i < ports.Count; i++)
-        {
-            RegisterDevice(ports[i]);
-        }
-
-        IReadOnlyList<NvmeNamespace> nvmeNamespaces = Nvme.Namespaces;
-        for (int i = 0; i < nvmeNamespaces.Count; i++)
-        {
-            RegisterDevice(nvmeNamespaces[i]);
         }
 
         if (CosmosFeatures.UsbEnabled)

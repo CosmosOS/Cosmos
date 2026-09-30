@@ -1,4 +1,28 @@
 #nullable enable
+Cosmos.Kernel.Drivers.AhciDriver
+Cosmos.Kernel.Drivers.AhciDriver.AhciDriver() -> void
+Cosmos.Kernel.Drivers.AhciPort
+Cosmos.Kernel.Drivers.AhciPort.BlockCount.get -> ulong
+Cosmos.Kernel.Drivers.AhciPort.BlockSize.get -> ulong
+Cosmos.Kernel.Drivers.AhciPort.Controller.get -> Cosmos.Kernel.Drivers.AhciState!
+Cosmos.Kernel.Drivers.AhciPort.Firmware.get -> string!
+Cosmos.Kernel.Drivers.AhciPort.Flush() -> void
+Cosmos.Kernel.Drivers.AhciPort.Model.get -> string!
+Cosmos.Kernel.Drivers.AhciPort.Name.get -> string!
+Cosmos.Kernel.Drivers.AhciPort.PortNumber.get -> uint
+Cosmos.Kernel.Drivers.AhciPort.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
+Cosmos.Kernel.Drivers.AhciPort.Serial.get -> string!
+Cosmos.Kernel.Drivers.AhciPort.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
+Cosmos.Kernel.Drivers.AhciState
+Cosmos.Kernel.Drivers.AhciState.CommandSlots.get -> int
+Cosmos.Kernel.Drivers.AhciState.CommandsIssued.get -> int
+Cosmos.Kernel.Drivers.AhciState.ImplementedPorts.get -> uint
+Cosmos.Kernel.Drivers.AhciState.Index.get -> int
+Cosmos.Kernel.Drivers.AhciState.PortCount.get -> int
+Cosmos.Kernel.Drivers.AhciState.Supports64Bit.get -> bool
+Cosmos.Kernel.Drivers.AhciState.SupportsCommandListOverride.get -> bool
+Cosmos.Kernel.Drivers.AhciState.Timeouts.get -> int
+Cosmos.Kernel.Drivers.AhciState.Version.get -> uint
 Cosmos.Kernel.Drivers.E1000EDriver
 Cosmos.Kernel.Drivers.E1000EDriver.E1000EDriver() -> void
 Cosmos.Kernel.Drivers.E1000EState
@@ -12,6 +36,26 @@ Cosmos.Kernel.Drivers.E1000EState.LinkUp.get -> bool
 Cosmos.Kernel.Drivers.E1000EState.MacAddress.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
 Cosmos.Kernel.Drivers.E1000EState.Name.get -> string!
 Cosmos.Kernel.Drivers.E1000EState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
+Cosmos.Kernel.Drivers.NvmeDriver
+Cosmos.Kernel.Drivers.NvmeDriver.NvmeDriver() -> void
+Cosmos.Kernel.Drivers.NvmeNamespace
+Cosmos.Kernel.Drivers.NvmeNamespace.BlockCount.get -> ulong
+Cosmos.Kernel.Drivers.NvmeNamespace.BlockSize.get -> ulong
+Cosmos.Kernel.Drivers.NvmeNamespace.Controller.get -> Cosmos.Kernel.Drivers.NvmeState!
+Cosmos.Kernel.Drivers.NvmeNamespace.Flush() -> void
+Cosmos.Kernel.Drivers.NvmeNamespace.Name.get -> string!
+Cosmos.Kernel.Drivers.NvmeNamespace.NamespaceId.get -> uint
+Cosmos.Kernel.Drivers.NvmeNamespace.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
+Cosmos.Kernel.Drivers.NvmeNamespace.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
+Cosmos.Kernel.Drivers.NvmeState
+Cosmos.Kernel.Drivers.NvmeState.CommandsSent.get -> int
+Cosmos.Kernel.Drivers.NvmeState.DoorbellStride.get -> uint
+Cosmos.Kernel.Drivers.NvmeState.HasInterrupt.get -> bool
+Cosmos.Kernel.Drivers.NvmeState.Index.get -> int
+Cosmos.Kernel.Drivers.NvmeState.InterruptCount.get -> int
+Cosmos.Kernel.Drivers.NvmeState.IsPolling.get -> bool
+Cosmos.Kernel.Drivers.NvmeState.NamespaceCount.get -> int
+Cosmos.Kernel.Drivers.NvmeState.Timeouts.get -> int
 Cosmos.Kernel.Drivers.PciHostDriver
 Cosmos.Kernel.Drivers.PciHostDriver.PciHostDriver() -> void
 Cosmos.Kernel.Drivers.VirtioGpuDriver
@@ -98,10 +142,18 @@ Cosmos.Kernel.Drivers.VmwareSvgaState.TrySetMode(int width, int height, int bits
 [COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.ReadFifo(uint byteOffset) -> uint
 [COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.SetEnabled(bool enabled) -> void
 [COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.Svga3DVersion.get -> uint
+override Cosmos.Kernel.Drivers.AhciDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.AhciDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.AhciDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.AhciDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.E1000EDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.E1000EDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.E1000EDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.E1000EDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.NvmeDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.NvmeDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.NvmeDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.NvmeDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.PciHostDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.PciHostDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.PciHostDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult

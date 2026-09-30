@@ -8,7 +8,7 @@
     <Description>Hardware abstraction layer base for multi-architecture kernel development.</Description>
     <PackageTags>cosmos;kernel;hal;abstraction;architecture;hardware</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
-    <!-- NVMe I/O waits block and wake threads through the experimental scheduler seam (COSMOS0001). -->
+    <!-- The driver kit's worker thread, its waits and delays and the USB hot-plug thread go through the experimental scheduler seam (COSMOS0001). -->
     <!-- COSMOS0003: this assembly declares the experimental driver kit seam and consumes it itself. -->
     <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
@@ -51,9 +51,9 @@
   </Target>
 
   <ItemGroup>
-    <!-- System's managers sit directly on the HAL drivers (AHCI/NVMe, PS/2
-         mouse, PCI discovery) and install their kit consumers through the
-         internal DeviceRegistry (keyboard, mouse, network, display). -->
+    <!-- System's managers sit directly on the HAL drivers (PS/2 mouse, PCI
+         discovery, USB mass storage) and install their kit consumers through
+         the internal DeviceRegistry (keyboard, mouse, network, display, block). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
     <!-- The aggregator initializes PlatformHAL from its library initializer. -->
     <InternalsVisibleTo Include="Cosmos.Kernel" />
@@ -62,7 +62,8 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box suites over HAL internals: MSI-X tables (Interrupts),
          PCI discovery and the nodes' PciAccess (Pci), platform power ops
-         (Power), AHCI/NVMe registers (Storage), the TimerDevice base and its
+         (Power), the block device base class and the USB mass storage driver
+         (Storage), the TimerDevice base and its
          software timers (Timer), the tree and the bindings' driver state
          (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />

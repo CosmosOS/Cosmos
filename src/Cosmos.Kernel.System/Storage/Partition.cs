@@ -59,8 +59,9 @@ public sealed class Partition : IBlockDevice
         // Overflow-safe, and the only containment in the stack: CheckBounds
         // measures a request against BlockCount, which is whatever was passed
         // here, so an oversized view turns in-bounds-looking calls into host
-        // I/O off the end of the disk. Neither Sata nor NvmeNamespace
-        // range-checks the LBA it is handed.
+        // I/O off the end of the disk. Neither the AHCI port nor the NVMe
+        // namespace the kit's drivers publish range-checks the LBA it is
+        // handed.
         if (startSector > host.BlockCount || sectorCount > host.BlockCount - startSector)
         {
             throw new ArgumentOutOfRangeException(nameof(sectorCount), "Partition extends beyond the end of its host device.");
