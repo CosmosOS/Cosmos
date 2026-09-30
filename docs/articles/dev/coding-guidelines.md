@@ -183,8 +183,8 @@ Cosmos.Kernel.Drivers/
 
 The bus kind is the one the driver matches on, named after its match type:
 `Pci`, `Platform`, `Ps2`, `Usb` or `Virtio`. The category is `Bus` for a bus
-driver and otherwise names what the driver publishes: `Display`, `Input` (a
-keyboard or pointer), `Network` or `Storage` (a block device). The driver
+driver and otherwise names what the driver publishes: `Audio`, `Display`,
+`Input` (a keyboard or pointer), `Network` or `Storage` (a block device). The driver
 folder is the class name without `Driver`, unless a type inside the folder
 already has that name, since a namespace must not share its name with one of
 its types: the transport drivers sit in `VirtioPci` and `VirtioMmio`, beside
