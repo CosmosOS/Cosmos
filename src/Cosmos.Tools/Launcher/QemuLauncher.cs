@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using Cosmos.Tools.Platform;
 
 namespace Cosmos.Tools.Launcher;
@@ -30,6 +31,18 @@ public sealed class QemuLaunchOptions
     /// forwards and rejects <c>"none"</c>.
     /// </summary>
     public string? NetworkCard { get; init; }
+
+    /// <summary>
+    /// Host ports forwarded to the guest, each in QEMU's <c>hostfwd</c> form
+    /// <c>[tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport</c> (e.g.
+    /// <c>tcp::2323-:23</c> makes the guest's port 23 reachable at
+    /// <c>localhost:2323</c>). A forward is an option of the user-mode
+    /// backend, so it goes on the one the guest's NIC rides on: the backend
+    /// <see cref="NetworkCard"/> builds, the network-testing hub's, or, with no
+    /// card chosen, a <c>-nic user</c> standing in for QEMU's default NIC,
+    /// which takes no options. Rejected when the card is <c>"none"</c>.
+    /// </summary>
+    public IReadOnlyList<string> HostForwards { get; init; } = [];
 
     /// <summary>
     /// Keyboard device attached to the guest, or <c>null</c> to add none.
@@ -321,6 +334,7 @@ public static class QemuLauncher
             // guest NIC. The stream port exists because slirp cannot forward
             // host-sourced ICMP; the runner must be listening before QEMU starts.
             args.Append($" -netdev user,id=net0,hostfwd=udp::{NetworkTestUdpPort}-:{NetworkTestUdpPort},hostfwd=tcp::{NetworkTestTcpPort}-:{NetworkTestTcpPort}");
+            AppendHostForwards(args, options.HostForwards);
             args.Append($" -netdev stream,id=rawnet0,addr.type=inet,addr.host=127.0.0.1,addr.port={NetworkTestRawSocketPort}");
             args.Append(" -netdev hubport,id=hubport0,hubid=0,netdev=net0");
             args.Append(" -netdev hubport,id=hubport1,hubid=0,netdev=rawnet0");
@@ -329,7 +343,14 @@ public static class QemuLauncher
         }
         else if (options.NetworkCard is not null)
         {
-            AppendNetworkCardArgs(args, options.NetworkCard);
+            AppendNetworkCardArgs(args, options.NetworkCard, options.HostForwards);
+        }
+        else if (options.HostForwards.Count > 0)
+        {
+            // QEMU's default NIC takes no options, so a forward swaps it for
+            // a user-mode NIC of the machine's default model.
+            args.Append(" -nic user");
+            AppendHostForwards(args, options.HostForwards);
         }
 
         AppendInputDevice(args, options.KeyboardDevice);
@@ -602,21 +623,54 @@ public static class QemuLauncher
 
     /// <summary>
     /// Emits the NIC selection: <c>"none"</c> disables QEMU's default card with
-    /// <c>-nic none</c>; any other value attaches a user-mode NIC of that model.
-    /// The model is validated as an option token so it can't splice extra
-    /// arguments into the command line.
+    /// <c>-nic none</c>; any other value attaches a user-mode NIC of that model,
+    /// with <paramref name="hostForwards"/> on its backend. The model is
+    /// validated as an option token so it can't splice extra arguments into
+    /// the command line.
     /// </summary>
-    internal static void AppendNetworkCardArgs(StringBuilder args, string card)
+    internal static void AppendNetworkCardArgs(StringBuilder args, string card, IReadOnlyList<string>? hostForwards = null)
     {
         if (card.Equals("none", StringComparison.OrdinalIgnoreCase))
         {
+            if (hostForwards is { Count: > 0 })
+            {
+                throw new ArgumentException("Port forwards need a network card, but the network card is set to \"none\".");
+            }
+
             args.Append(" -nic none");
             return;
         }
 
         ValidateOptionToken(card, "network card model");
-        args.Append($" -netdev user,id=net0 -device {card},netdev=net0");
+        args.Append(" -netdev user,id=net0");
+        AppendHostForwards(args, hostForwards ?? []);
+        args.Append($" -device {card},netdev=net0");
     }
+
+    /// <summary>
+    /// Appends a <c>,hostfwd=</c> option per forward to the user-mode backend
+    /// just written. Each forward must be a whole QEMU <c>hostfwd</c> rule,
+    /// <c>[tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport</c> with IPv4
+    /// addresses, so a value can neither end the backend's options early nor
+    /// splice new arguments into the command line.
+    /// </summary>
+    internal static void AppendHostForwards(StringBuilder args, IReadOnlyList<string> hostForwards)
+    {
+        foreach (string forward in hostForwards)
+        {
+            string rule = forward.Trim();
+            Match match = Regex.Match(rule, @"^(?:tcp|udp)?:[0-9.]*:([0-9]{1,5})-[0-9.]*:([0-9]{1,5})$");
+            if (!match.Success || !IsPort(match.Groups[1].Value) || !IsPort(match.Groups[2].Value))
+            {
+                throw new ArgumentException(
+                    $"Port forward must look like [tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport, such as tcp::2323-:23, found: {forward}");
+            }
+
+            args.Append($",hostfwd={rule}");
+        }
+    }
+
+    private static bool IsPort(string value) => int.Parse(value) is >= 1 and <= 65535;
 
     /// <summary>
     /// Attaches an input device (keyboard/mouse) as a <c>-device</c> line.
