@@ -115,6 +115,47 @@ public class QemuLauncherTests
         Assert.Throws<ArgumentException>(() => QemuLauncher.AppendNetworkCardArgs(args, model));
     }
 
+    [Fact]
+    public void AppendNetworkCardArgs_PutsHostForwardsOnTheCardsBackend()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendNetworkCardArgs(args, "e1000e", ["tcp::2323-:23", "udp:127.0.0.1:5000-10.0.2.15:53"]);
+        Assert.Equal(
+            " -netdev user,id=net0,hostfwd=tcp::2323-:23,hostfwd=udp:127.0.0.1:5000-10.0.2.15:53 -device e1000e,netdev=net0",
+            args.ToString());
+    }
+
+    [Fact]
+    public void AppendNetworkCardArgs_RejectsHostForwardsWithoutACard()
+    {
+        StringBuilder args = new();
+
+        Assert.Throws<ArgumentException>(() => QemuLauncher.AppendNetworkCardArgs(args, "none", ["tcp::2323-:23"]));
+    }
+
+    [Theory]
+    [InlineData(":2323-:23")] // the host address field is missing
+    [InlineData("sctp::2323-:23")]
+    [InlineData("tcp::2323-:23,hostfwd=tcp::1-:2")] // a comma would add backend options
+    [InlineData("tcp::2323-:23 -device rm")] // whitespace injects new argv tokens
+    [InlineData("tcp::0-:23")]
+    [InlineData("tcp::2323-:65536")]
+    [InlineData("tcp::２３２３-:23")] // non-ASCII digits
+    public void AppendHostForwards_RejectsAnythingButAWholeRule(string forward)
+    {
+        StringBuilder args = new();
+
+        Assert.Throws<ArgumentException>(() => QemuLauncher.AppendHostForwards(args, [forward]));
+    }
+
+    [Fact]
+    public void AppendHostForwards_TakesARuleWithoutAProtocol()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendHostForwards(args, [" ::8080-:80 "]);
+        Assert.Equal(",hostfwd=::8080-:80", args.ToString());
+    }
+
     [Theory]
     [InlineData("virtio-keyboard-device")]
     [InlineData("virtio-mouse-device")]

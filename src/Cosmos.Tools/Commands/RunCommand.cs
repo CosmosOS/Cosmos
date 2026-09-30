@@ -48,6 +48,10 @@ public class RunSettings : CommandSettings
     [Description("Network card exposed to the guest: 'none' for no card, or a QEMU model like e1000e or virtio-net-device. Omit to keep QEMU's default NIC.")]
     public string? Nic { get; set; }
 
+    [CommandOption("--hostfwd <RULE>")]
+    [Description("Forward a host port to the guest, in QEMU's hostfwd form [[tcp|udp]]:[[hostaddr]]:hostport-[[guestaddr]]:guestport. E.g. tcp::2323-:23 reaches the guest's port 23 at localhost:2323. Repeatable. Needs a network card: with --nic omitted, QEMU's default NIC is replaced by a user-mode one of the same model.")]
+    public string[] HostForwards { get; set; } = [];
+
     [CommandOption("--keyboard <MODEL>")]
     [Description("Keyboard device to attach. Default: virtio-keyboard-device on arm64, none on x64 (PS/2 is built into the chipset). 'ps2'/'none' add nothing.")]
     public string? Keyboard { get; set; }
@@ -103,6 +107,7 @@ public class RunCommand : AsyncCommand<RunSettings>
                 SerialOutputFile = null, // CLI: serial → stdio
                 Disks = disks,
                 NetworkCard = settings.Nic,
+                HostForwards = settings.HostForwards,
                 KeyboardDevice = ResolveInputDevice(settings.Arch, settings.Keyboard, "virtio-keyboard-device"),
                 MouseDevice = ResolveInputDevice(settings.Arch, settings.Mouse, "virtio-mouse-device"),
                 AudioDevice = settings.Audio,
