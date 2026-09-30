@@ -8,6 +8,7 @@ using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.System.Audio;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Keyboard;
 using Cosmos.Kernel.System.Mouse;
@@ -88,6 +89,14 @@ internal class LibraryInitializer
                 {
                     Serial.WriteString("[KERNEL]   - Initializing display manager...\n");
                     DisplayManager.Initialize();
+                }
+
+                // Initialize Audio Manager; its consumer lists every audio
+                // output a kit driver publishes once the driver stage runs.
+                if (AudioManager.IsEnabled)
+                {
+                    Serial.WriteString("[KERNEL]   - Initializing audio manager...\n");
+                    AudioManager.Initialize();
                 }
 
                 // Initialize Storage Manager (manager-level state only)
