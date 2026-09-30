@@ -48,6 +48,17 @@ public sealed class QemuLaunchOptions
     public string? MouseDevice { get; init; }
 
     /// <summary>
+    /// Audio controller attached to the guest as a <c>-device</c> line (e.g.
+    /// <c>intel-hda</c>), or <c>null</c>/<c>"none"</c> to add none. An HD Audio
+    /// controller is a bus rather than an endpoint, so a codec is attached
+    /// alongside it: the controller on its own enumerates on PCI with nothing
+    /// answering behind it, and a guest driver finds no converter to play
+    /// through. The host backend is left to QEMU, which opens a default one
+    /// when the command line names no <c>-audiodev</c>.
+    /// </summary>
+    public string? AudioDevice { get; init; }
+
+    /// <summary>
     /// VGA adapter exposed to the guest, as a <c>-vga</c> backend name (e.g.
     /// <c>vmware</c>, <c>virtio</c>, <c>none</c>). <c>null</c> keeps the
     /// architecture default (stdvga on q35, nothing beyond ramfb on virt).
@@ -256,6 +267,7 @@ public static class QemuLauncher
 
         AppendInputDevice(args, options.KeyboardDevice);
         AppendInputDevice(args, options.MouseDevice);
+        AppendAudioDevice(args, options.AudioDevice);
         AppendVgaAdapter(args, options.VgaAdapter);
         AppendGpuDevice(args, options.GpuDevice);
 
@@ -474,6 +486,25 @@ public static class QemuLauncher
 
         ValidateOptionToken(model, "input device model");
         args.Append($" -device {model}");
+    }
+
+    /// <summary>
+    /// Attaches the audio controller together with the codec that answers on
+    /// it. <c>null</c>/empty and <c>"none"</c> add nothing. The codec is not a
+    /// separate choice: every controller this accepts is an HD Audio one, and
+    /// <c>hda-duplex</c> is the codec that presents both a line-out and a
+    /// line-in on it.
+    /// </summary>
+    internal static void AppendAudioDevice(StringBuilder args, string? model)
+    {
+        if (string.IsNullOrWhiteSpace(model)
+            || model.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        ValidateOptionToken(model, "audio device model");
+        args.Append($" -device {model} -device hda-duplex");
     }
 
     /// <summary>
