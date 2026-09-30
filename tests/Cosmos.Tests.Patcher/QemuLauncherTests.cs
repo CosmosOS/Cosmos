@@ -321,6 +321,35 @@ public class QemuLauncherTests
         Assert.Throws<ArgumentException>(() => QemuLauncher.AppendInputDevice(args, "virtio-keyboard-device -device rm"));
     }
 
+    [Theory]
+    [InlineData("intel-hda")]
+    [InlineData("ich9-intel-hda")]
+    public void AppendAudioDevice_EmitsControllerAndCodecForAModel(string model)
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendAudioDevice(args, model);
+        Assert.Equal($" -device {model} -device hda-duplex", args.ToString());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("none")]
+    [InlineData("NONE")]
+    public void AppendAudioDevice_AddsNothingWhenUnsetOrNone(string? model)
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendAudioDevice(args, model);
+        Assert.Equal(string.Empty, args.ToString());
+    }
+
+    [Fact]
+    public void AppendAudioDevice_RejectsCharactersOutsideOptionAlphabet()
+    {
+        StringBuilder args = new();
+        Assert.Throws<ArgumentException>(() => QemuLauncher.AppendAudioDevice(args, "intel-hda -device rm"));
+    }
+
     // "none" passes through deliberately: it is QEMU's own spelling for "no
     // VGA adapter", not a sentinel of ours like the input devices' "ps2".
     [Theory]
