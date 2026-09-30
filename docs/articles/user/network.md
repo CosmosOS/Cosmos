@@ -268,7 +268,7 @@ client.Close();
 listener.Stop();
 ```
 
-To reach a listener inside QEMU user networking from your host, forward a host port to the guest. With plain QEMU that is `-nic user,model=e1000e,hostfwd=tcp::4444-:4444`, then connect to `localhost:4444` on the host.
+To reach a listener inside QEMU user networking from your host, forward a host port to the guest with `cosmos run --hostfwd tcp::4444-:4444` (repeatable; plain QEMU spells it `-nic user,model=e1000e,hostfwd=tcp::4444-:4444`), then connect to `localhost:4444` on the host.
 
 For an interactive shell over the network, `TelnetServer` gives every client a console session of its own ([Console Sessions and Telnet](sessions.md)).
 
