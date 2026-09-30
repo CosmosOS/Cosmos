@@ -903,18 +903,20 @@ internal class Tcp : IDisposable
         Span<byte> target;
         // if new data fits into existing buffer, then no need to allocate a new one and write there
         // just append to existing buffer
-        if (_dataOffset + _dataLength + other.Length <= _dataLength)
+        if (_dataOffset + _dataLength + other.Length <= _data.Length)
         {
             target = _data.AsSpan(_dataOffset + _dataLength);
             other.CopyTo(target);
             _dataLength += other.Length;
             return;
         }
-        int realDataLength = _dataLength - _dataOffset;
-        int requiredLength = realDataLength + other.Length;
+
+        // _dataLength already excludes the bytes a reader consumed, so the
+        // live data is _dataLength bytes from _dataOffset.
+        int requiredLength = _dataLength + other.Length;
         byte[] result = ArrayPool<byte>.Shared.Rent(requiredLength);
-        Buffer.BlockCopy(_data, _dataOffset, result, 0, realDataLength);
-        target = result.AsSpan(realDataLength);
+        _data.AsSpan(_dataOffset, _dataLength).CopyTo(result);
+        target = result.AsSpan(_dataLength);
         other.CopyTo(target);
         if (_data.Length > 0)
         {
