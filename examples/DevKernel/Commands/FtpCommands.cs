@@ -4,14 +4,14 @@ using System;
 using System.IO;
 using System.Net;
 using Cosmos.Kernel.System.Diagnostics;
-using CosmosFtpServer;
+using Cosmos.Network.Ftp;
 using DevKernel.Shell;
 using SysThread = System.Threading.Thread;
 
 namespace DevKernel.Commands;
 
 /// <summary>
-/// The FTP server of the CosmosFtpServer package, serving a directory of the
+/// The FTP server of the Cosmos.Network.Ftp package, serving a directory of the
 /// VFS on a thread of its own so the shell stays usable.
 /// </summary>
 internal static class FtpCommands

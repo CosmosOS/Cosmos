@@ -275,11 +275,11 @@ To reach a listener inside QEMU user networking from your host, forward a host p
 
 ## FTP server
 
-The [CosmosFtpServer](https://github.com/CosmosOS/CosmosFtp) package serves a directory of the VFS over FTP. Version 2 is the Gen3 one; 1.x is for Gen2. Add `<PackageReference Include="CosmosFtpServer" Version="2.0.0" />` to your kernel and start the server once the network is configured and a filesystem is mounted:
+The [Cosmos.Network.Ftp](https://github.com/CosmosOS/Cosmos.Network.Ftp) package serves a directory of the VFS over FTP. Version 2 is the Gen3 one; 1.x is for Gen2. Add `<PackageReference Include="Cosmos.Network.Ftp" Version="2.0.0" />` to your kernel and start the server once the network is configured and a filesystem is mounted:
 
 ```csharp
 using System.Threading;
-using CosmosFtpServer;
+using Cosmos.Network.Ftp;
 
 FtpServer server = new("/mnt");
 new Thread(server.Listen).Start(); // Listen() serves every client until server.Close()
