@@ -450,7 +450,7 @@ public static class SocketPlug
 
             for (int i = 0; i < chunks.Length; i++)
             {
-                TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, i == chunks.Length - 1 ? (byte)(TcpFlags.PSH | TcpFlags.ACK) : (byte)TcpFlags.ACK, sm.TCB.SndWnd, 0, chunks[i]);
+                TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, i == chunks.Length - 1 ? (byte)(TcpFlags.PSH | TcpFlags.ACK) : (byte)TcpFlags.ACK, (ushort)sm.TCB.RcvWnd, 0, chunks[i]);
                 packet.Network.Enqueue();
 
                 // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
@@ -470,7 +470,7 @@ public static class SocketPlug
             byte[] data = new byte[size];
             Buffer.BlockCopy(buffer, offset, data, 0, size);
 
-            TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), sm.TCB.SndWnd, 0, data);
+            TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), (ushort)sm.TCB.RcvWnd, 0, data);
             Log.WriteString("[SocketPlug] SendTcp: adding to outgoing buffer\n");
             packet.Network.Enqueue();
 

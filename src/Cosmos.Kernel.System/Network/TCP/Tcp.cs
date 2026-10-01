@@ -852,7 +852,7 @@ internal class Tcp : IDisposable
     public void SendEmptyPacket(TcpFlags flag)
     {
         SendPacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
-            TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
+            TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, (ushort)TCB.RcvWnd, 0));
     }
 
     /// <summary>
@@ -861,7 +861,7 @@ internal class Tcp : IDisposable
     internal void SendEmptyPacket(TcpFlags flag, uint sequenceNumber)
     {
         SendPacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
-            sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
+            sequenceNumber, TCB.RcvNxt, 20, (byte)flag, (ushort)TCB.RcvWnd, 0));
     }
 
     /// <summary>

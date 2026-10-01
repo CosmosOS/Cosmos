@@ -90,7 +90,7 @@ internal sealed class TcpStream
                     _connection.LocalEndPoint.Address, _connection.RemoteEndPoint.Address,
                     _connection.LocalEndPoint.Port, _connection.RemoteEndPoint.Port,
                     tcb.SndNxt, tcb.RcvNxt, TcpPacket.TcpHeaderMinimumLength,
-                    (byte)(TcpFlags.PSH | TcpFlags.ACK), tcb.SndWnd, 0, data.Slice(0, length).ToArray());
+                    (byte)(TcpFlags.PSH | TcpFlags.ACK), (ushort)tcb.RcvWnd, 0, data.Slice(0, length).ToArray());
                 packet.Network.Enqueue();
 
                 // Advanced before the queue is pumped, so an acknowledgement
