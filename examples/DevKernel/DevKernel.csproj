@@ -41,6 +41,18 @@
     <PackageReference Include="Cosmos.Network.Telnet" />
   </ItemGroup>
 
+  <!-- The Lua interpreter behind the lua command (CosmosOS/Cosmos.Executable.Lua),
+       built from a clone next to this repository the same way. -->
+  <PropertyGroup>
+    <CosmosExecutableLuaProject>$(MSBuildThisFileDirectory)../../../Cosmos.Executable.Lua/src/Cosmos.Executable.Lua/Cosmos.Executable.Lua.csproj</CosmosExecutableLuaProject>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(CosmosExecutableLuaProject)')">
+    <ProjectReference Include="$(CosmosExecutableLuaProject)" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('$(CosmosExecutableLuaProject)')">
+    <PackageReference Include="Cosmos.Executable.Lua" />
+  </ItemGroup>
+
   <!-- DevKernel-specific C files -->
   <ItemGroup>
     <GCCProject Include="./src/C/" />
