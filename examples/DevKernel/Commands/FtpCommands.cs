@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Net;
 using Cosmos.Kernel.System.Diagnostics;
 using CosmosFtpServer;
 using DevKernel.Shell;
@@ -28,9 +29,9 @@ internal static class FtpCommands
             new ShellCommand
             {
                 Name = "ftpd",
-                Usage = "ftpd [dir] [port]|stop",
+                Usage = "ftpd [dir] [port] [pasv-ip]|stop",
                 Description = "Serve a directory over FTP (default: this one, port 21)",
-                MaxArgs = 2,
+                MaxArgs = 3,
                 Execute = static (context, args) => RunFtpd(context, args),
             });
     }
@@ -64,12 +65,23 @@ internal static class FtpCommands
             return;
         }
 
+        // The address PASV replies name, for a guest behind QEMU's NAT:
+        // 127.0.0.1 lets a client on the host, such as FileZilla, that
+        // connects where the reply says reach the forwarded passive ports.
+        IPAddress? passiveAddress = null;
+        if (args.Count > 2 && !IPAddress.TryParse(args[2], out passiveAddress))
+        {
+            Terminal.Error($"Invalid IPv4 address: {args[2]}");
+            return;
+        }
+
         FtpServer server;
         try
         {
             server = new FtpServer(root, port)
             {
                 Log = static message => Log.WriteString($"{message}\n"),
+                PassiveAddress = passiveAddress,
             };
         }
         catch (DirectoryNotFoundException ex)
@@ -81,6 +93,11 @@ internal static class FtpCommands
         new SysThread(() => Serve(server)).Start();
         s_ftp = server;
         Terminal.Success($"FTP server serving {root} on port {port}, passive ports {server.PassivePortMin}-{server.PassivePortMax}.");
+
+        if (passiveAddress is null)
+        {
+            Terminal.Hint("Under QEMU, add 127.0.0.1 as pasv-ip for clients that connect where PASV says, such as FileZilla.");
+        }
 
         if (!context.Network.IsConfigured)
         {
