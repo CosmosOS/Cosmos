@@ -276,18 +276,18 @@ listener.Stop();
 
 To reach a listener inside QEMU user networking from your host, forward a host port to the guest with `cosmos run --hostfwd tcp::4444-:4444` (repeatable; plain QEMU spells it `-nic user,model=e1000e,hostfwd=tcp::4444-:4444`), then connect to `localhost:4444` on the host.
 
-For an interactive shell over the network, `TelnetServer` gives every client a console session of its own ([Console Sessions and Telnet](sessions.md)).
+For an interactive shell over the network, the [Cosmos.Network.Telnet](https://github.com/CosmosOS/Cosmos.Network.Telnet) package's `TelnetServer` gives every client a console session of its own ([Console Sessions and Telnet](sessions.md)).
 
 <!-- screenshot: console showing "Listening on port 4444...", "Client connected!" and the received message -->
 ![TCP Server](images/network-tcp-server.png)
 
 ## FTP server
 
-The [CosmosFtpServer](https://github.com/CosmosOS/CosmosFtp) package serves a directory of the VFS over FTP. Version 2 is the Gen3 one; 1.x is for Gen2. Add `<PackageReference Include="CosmosFtpServer" Version="2.0.0" />` to your kernel and start the server once the network is configured and a filesystem is mounted:
+The [Cosmos.Network.Ftp](https://github.com/CosmosOS/Cosmos.Network.Ftp) package serves a directory of the VFS over FTP. Version 2 is the Gen3 one; 1.x is for Gen2. Add `<PackageReference Include="Cosmos.Network.Ftp" Version="2.0.0" />` to your kernel and start the server once the network is configured and a filesystem is mounted:
 
 ```csharp
 using System.Threading;
-using CosmosFtpServer;
+using Cosmos.Network.Ftp;
 
 FtpServer server = new("/mnt");
 new Thread(server.Listen).Start(); // Listen() serves every client until server.Close()
