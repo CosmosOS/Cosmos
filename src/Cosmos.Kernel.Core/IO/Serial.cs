@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.Core.IO;
 /// - x86-64: 16550 UART via port I/O (COM1 at 0x3F8)
 /// - ARM64: PL011 UART via MMIO (QEMU virt at 0x09000000)
 /// </summary>
-internal static class Serial
+public static class Serial
 {
     #region x86-64 16550 UART Constants
 
@@ -22,6 +22,10 @@ internal static class Serial
 
     // Line Status Register bits
     private const byte LSR_TX_EMPTY = 0x20;      // Transmit buffer empty
+    private const byte LSR_DATA_READY = 0x01;    // Data ready
+
+    // Interrupt Enable Register bits
+    private const byte IER_RX_ENABLE = 0x01;     // Enable Received Data Available interrupt
 
     // Line Control Register values
     private const byte LCR_DLAB = 0x80;          // Divisor Latch Access Bit
@@ -151,6 +155,9 @@ internal static class Serial
 
             // Enable DTR, RTS, and OUT2 (required for interrupts)
             Native.IO.Write8(COM1_BASE + REG_MCR, MCR_DTR_RTS_OUT2);
+
+            // Enable receiver interrupt
+            Native.IO.Write8(COM1_BASE + REG_IER, IER_RX_ENABLE);
 #endif
         }
     }
@@ -309,5 +316,54 @@ internal static class Serial
                     break;
             }
         }
+    }
+
+    /// <summary>
+    /// Attempt to read a byte from the serial port without blocking.
+    /// </summary>
+    /// <param name="data">The byte read, if available.</param>
+    /// <returns>true if a byte was read; false if no data is ready.</returns>
+    public static bool TryRead(out byte data)
+    {
+        if (!CosmosFeatures.UARTEnabled)
+        {
+            data = 0;
+            return false;
+        }
+
+#if ARCH_ARM64
+        // PL011: check RXFE (Receive FIFO Empty) flag in Flag Register (bit 4)
+        uint fr = Native.MMIO.Read32(PL011_BASE + PL011_FR);
+        if ((fr & (1u << 4)) != 0) // RXFE = 1 means empty
+        {
+            data = 0;
+            return false;
+        }
+        data = (byte)Native.MMIO.Read8(PL011_BASE + PL011_DR);
+        return true;
+#else
+        // 16550: check LSR Data Ready bit
+        byte lsr = Native.IO.Read8(COM1_BASE + REG_LSR);
+        if ((lsr & LSR_DATA_READY) == 0)
+        {
+            data = 0;
+            return false;
+        }
+        data = Native.IO.Read8(COM1_BASE + REG_DATA);
+        return true;
+#endif
+    }
+
+    /// <summary>
+    /// Blocking read of a single byte from the serial port.
+    /// </summary>
+    public static byte Read()
+    {
+        byte b;
+        while (!TryRead(out b))
+        {
+            // busy-wait; could yield in a more sophisticated implementation
+        }
+        return b;
     }
 }

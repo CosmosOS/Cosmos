@@ -1,1 +1,6 @@
 #nullable enable
+T:Cosmos.Kernel.Core.IO.Serial
+M:Cosmos.Kernel.Core.IO.Serial.ComInit
+M:Cosmos.Kernel.Core.IO.Serial.ComWrite(System.Byte)
+M:Cosmos.Kernel.Core.IO.Serial.TryRead(System.Byte@)
+M:Cosmos.Kernel.Core.IO.Serial.Read
