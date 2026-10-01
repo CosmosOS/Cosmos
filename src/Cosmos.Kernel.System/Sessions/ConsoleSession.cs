@@ -12,18 +12,25 @@ namespace Cosmos.Kernel.System.Sessions;
 /// <summary>
 /// One console that <see cref="Console"/> can be bound to: a screen, and the
 /// keys typed at it. The local virtual consoles and the connections of a
-/// Telnet server are all sessions. <see cref="SessionManager"/> numbers
-/// them, shows one of them on the display, and binds every thread to one,
-/// so the same <see cref="Console"/> calls read and write whichever session
-/// the calling thread belongs to.
+/// remote terminal server, such as the Cosmos.Network.Telnet package's, are
+/// all sessions. <see cref="SessionManager"/> numbers them, shows one of
+/// them on the display, and binds every thread to one, so the same
+/// <see cref="Console"/> calls read and write whichever session the calling
+/// thread belongs to.
 /// </summary>
 /// <remarks>
-/// Every session keeps its screen as a <see cref="KernelConsole"/> grid, on
-/// the display's canvas but hidden until the session is shown, so a session
-/// can be switched to at any time, a remote one included. A remote session
-/// also sends every change to its terminal as it happens. Output runs with
-/// interrupts masked, so the screen and the remote terminal see one
-/// thread's changes in the order it made them.
+/// <para>Every session keeps its screen as a <see cref="KernelConsole"/>
+/// grid, on the display's canvas but hidden until the session is shown, so
+/// a session can be switched to at any time, a remote one included. Output
+/// runs with interrupts masked, so the screen and a remote terminal see one
+/// thread's changes in the order it made them.</para>
+/// <para>A library adds a remote session by deriving from this class: the
+/// <see cref="ConsoleSession(int, int)"/> constructor gives it a screen,
+/// <see cref="EnqueueInput"/> takes the keys its terminal sends, and the
+/// <c>On</c> hooks tell it every change to send there. The hooks that report
+/// a change run inside it, with interrupts masked: they record what changed
+/// and return, without blocking, waiting or doing I/O. Only
+/// <see cref="OnFlush"/> and <see cref="OnClosed"/> run unmasked.</para>
 /// </remarks>
 public abstract class ConsoleSession
 {
@@ -76,10 +83,10 @@ public abstract class ConsoleSession
     internal KernelConsole Screen { get; }
 
     /// <summary>The text colour a program set, or null while the colours are the defaults.</summary>
-    private protected ConsoleColor? ExplicitForeground { get; private set; }
+    protected ConsoleColor? ExplicitForeground { get; private set; }
 
     /// <summary>The background colour a program set, or null while the colours are the defaults.</summary>
-    private protected ConsoleColor? ExplicitBackground { get; private set; }
+    protected ConsoleColor? ExplicitBackground { get; private set; }
 
     /// <summary>What a reader blocks on: signaled for every key queued, when the session closes, and by whatever else brings input, such as a remote session's connection.</summary>
     private protected InterruptEvent InputSignal { get; } = new();
@@ -114,11 +121,11 @@ public abstract class ConsoleSession
         }
     }
 
-    /// <summary>The cursor's column.</summary>
-    internal int CursorLeft => Screen.CursorX;
+    /// <summary>The cursor's column, from 0.</summary>
+    protected internal int CursorLeft => Screen.CursorX;
 
-    /// <summary>The cursor's row.</summary>
-    internal int CursorTop => Screen.CursorY;
+    /// <summary>The cursor's row, from 0.</summary>
+    protected internal int CursorTop => Screen.CursorY;
 
     /// <summary>Whether the cursor is drawn.</summary>
     internal bool CursorVisible
@@ -154,6 +161,22 @@ public abstract class ConsoleSession
     private protected ConsoleSession(KernelConsole screen)
     {
         Screen = screen;
+    }
+
+    /// <summary>
+    /// Creates a session of a remote terminal: its screen is a grid of
+    /// <paramref name="cols"/> by <paramref name="rows"/> characters in the
+    /// kernel console's font, on the display's canvas but hidden until the
+    /// session is shown. <see cref="SessionManager.TryRegister"/> lists the
+    /// session, then <see cref="SessionManager.Start"/> runs a thread on it.
+    /// </summary>
+    /// <param name="cols">Width of the screen, in characters.</param>
+    /// <param name="rows">Height of the screen, in characters.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="cols"/> or <paramref name="rows"/> is less than 1.</exception>
+    /// <exception cref="InvalidOperationException">The kernel console is not initialized.</exception>
+    protected ConsoleSession(int cols, int rows)
+        : this(CreateScreen(cols, rows))
+    {
     }
 
     /// <summary>
@@ -273,7 +296,7 @@ public abstract class ConsoleSession
     /// keyboard's interrupt handler included: the queue only grows, and so
     /// allocates, once <see cref="InputQueueCapacity"/> keys wait unread.
     /// </summary>
-    internal void EnqueueInput(KeyEvent key)
+    protected internal void EnqueueInput(KeyEvent key)
     {
         using (InternalCpu.DisableInterruptsScope())
         {
@@ -330,46 +353,75 @@ public abstract class ConsoleSession
     /// <exception cref="EndOfStreamException">The session was closed.</exception>
     internal KeyEvent ReadKey() => WaitForKey() ?? throw new EndOfStreamException($"The console session {Name} was closed.");
 
+    /// <summary>
+    /// Resizes the screen, keeping the cells that fit: a remote session
+    /// follows its terminal's window this way. When the screen loses rows the
+    /// top ones go, so the cursor's line stays on screen, and
+    /// <see cref="OnCursorMoved"/> reports where the cursor ended up. Any
+    /// thread.
+    /// </summary>
+    /// <param name="cols">New width, in characters.</param>
+    /// <param name="rows">New height, in characters.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="cols"/> or <paramref name="rows"/> is less than 1.</exception>
+    protected void Resize(int cols, int rows)
+    {
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            Screen.Resize(cols, rows);
+            OnCursorMoved();
+        }
+    }
+
     /// <summary>Takes in whatever input arrived: keys from the keyboard or the network, window size changes. Called by every read.</summary>
     private protected virtual void PollInput()
     {
     }
 
-    /// <summary>A character went to the screen: a printable one, a line feed, a carriage return or a backspace.</summary>
+    /// <summary>A character went to the screen: a printable one, a line feed, a carriage return or a backspace. Runs with interrupts masked.</summary>
     /// <param name="value">The character.</param>
     /// <param name="wrapped">Whether writing a printable character filled the line, so the cursor went on to the next one.</param>
-    private protected virtual void OnWritten(char value, bool wrapped)
+    protected virtual void OnWritten(char value, bool wrapped)
     {
     }
 
-    /// <summary>The screen was cleared.</summary>
-    private protected virtual void OnCleared()
+    /// <summary>The screen was cleared and the cursor homed. Runs with interrupts masked.</summary>
+    protected virtual void OnCleared()
     {
     }
 
-    /// <summary>The cursor was moved without writing.</summary>
-    private protected virtual void OnCursorMoved()
+    /// <summary>The cursor was moved without writing, or the screen was resized. Runs with interrupts masked.</summary>
+    protected virtual void OnCursorMoved()
     {
     }
 
-    /// <summary>The cursor was shown or hidden.</summary>
-    private protected virtual void OnCursorVisibilityChanged(bool visible)
+    /// <summary>The cursor was shown or hidden. Runs with interrupts masked.</summary>
+    /// <param name="visible">Whether the cursor is now drawn.</param>
+    protected virtual void OnCursorVisibilityChanged(bool visible)
     {
     }
 
-    /// <summary>The colours changed.</summary>
-    private protected virtual void OnColorsChanged()
+    /// <summary>The colours changed; <see cref="ExplicitForeground"/> and <see cref="ExplicitBackground"/> hold them. Runs with interrupts masked.</summary>
+    protected virtual void OnColorsChanged()
     {
     }
 
-    /// <summary>A write finished and should be shown.</summary>
-    private protected virtual void OnFlush()
+    /// <summary>A write finished and should be shown. Runs unmasked, on the writing thread.</summary>
+    protected virtual void OnFlush()
     {
     }
 
-    /// <summary>The session was closed; releases what it holds.</summary>
-    private protected virtual void OnClosed()
+    /// <summary>The session was closed; releases what it holds. Runs once, unmasked, on the thread that closed it, which may be any.</summary>
+    protected virtual void OnClosed()
     {
+    }
+
+    /// <summary>A hidden screen of a remote session, in the kernel console's font.</summary>
+    private static KernelConsole CreateScreen(int cols, int rows)
+    {
+        KernelConsole.ThrowIfKernelConsoleNotInitialized();
+
+        KernelConsole console = KernelConsole.Default;
+        return new KernelConsole(console.Canvas, console.Font, cols, rows);
     }
 
     /// <summary>Writes one character. The caller masks interrupts.</summary>

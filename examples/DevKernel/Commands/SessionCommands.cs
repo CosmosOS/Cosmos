@@ -1,16 +1,14 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System;
-using Cosmos.Kernel.System.Network.Telnet;
 using Cosmos.Kernel.System.Sessions;
 using DevKernel.Shell;
 
 namespace DevKernel.Commands;
 
 /// <summary>
-/// Console sessions: the virtual consoles on the display, the Telnet server
-/// that gives every connection a session of its own, and switching between
-/// them.
+/// Console sessions: the virtual consoles on the display, and switching
+/// between them.
 /// </summary>
 internal static class SessionCommands
 {
@@ -22,9 +20,6 @@ internal static class SessionCommands
 
     /// <summary>Width of the session-name column of the listing.</summary>
     private const int NameColumnWidth = 24;
-
-    /// <summary>The Telnet server <c>telnetd</c> started, if any.</summary>
-    private static TelnetServer? s_telnet;
 
     public static void Register(CommandShell shell)
     {
@@ -63,14 +58,6 @@ internal static class SessionCommands
             },
             new ShellCommand
             {
-                Name = "telnetd",
-                Usage = "telnetd [port|stop]",
-                Description = "Serve a shell over Telnet (default port 23)",
-                MaxArgs = 1,
-                Execute = static (context, args) => RunTelnetd(context, args.Count > 0 ? args[0] : null),
-            },
-            new ShellCommand
-            {
                 Name = "exit",
                 Aliases = ["logout"],
                 Usage = "exit",
@@ -94,7 +81,7 @@ internal static class SessionCommands
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write(session.Name.PadRight(NameColumnWidth));
             Console.ResetColor();
-            string kind = session.IsRemote ? "telnet " : "local  ";
+            string kind = session.IsRemote ? "remote " : "local  ";
             Console.WriteLine($"{kind}{session.Cols}x{session.Rows}");
         }
 
@@ -130,56 +117,6 @@ internal static class SessionCommands
         catch (InvalidOperationException ex)
         {
             Terminal.Error(ex.Message);
-        }
-    }
-
-    private static void RunTelnetd(ShellContext context, string? argument)
-    {
-        if (argument == "stop")
-        {
-            if (s_telnet is not { IsRunning: true })
-            {
-                Terminal.Error("The Telnet server is not running.");
-                return;
-            }
-
-            s_telnet.Stop();
-            Terminal.Success("Telnet server stopped; open sessions stay connected.");
-            return;
-        }
-
-        if (s_telnet is { IsRunning: true })
-        {
-            Terminal.Error($"The Telnet server already runs on port {s_telnet.Port}.");
-            return;
-        }
-
-        ushort port = TelnetServer.DefaultPort;
-        if (argument is not null && (!ushort.TryParse(argument, out port) || port == 0))
-        {
-            Terminal.Error($"Invalid port: {argument}");
-            return;
-        }
-
-        TelnetServer server = new(session => SessionShells.Run(session, context.CreateSibling()), port);
-        try
-        {
-            server.Start();
-        }
-        catch (InvalidOperationException ex)
-        {
-            // Networking or the scheduler compiled out, or no console: this
-            // command fails, the shell goes on.
-            Terminal.Error(ex.Message);
-            return;
-        }
-
-        s_telnet = server;
-        Terminal.Success($"Telnet server listening on port {port}.");
-
-        if (!context.Network.IsConfigured)
-        {
-            Terminal.Hint("The network is not configured yet: run 'dhcp' or 'netconfig'.");
         }
     }
 

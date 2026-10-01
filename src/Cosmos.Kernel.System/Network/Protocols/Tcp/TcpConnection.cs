@@ -9,7 +9,6 @@
 
 using System.Buffers;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.System.Timers;
 
 namespace Cosmos.Kernel.System.Network.Protocols.Tcp;
@@ -114,13 +113,6 @@ internal class TcpConnection : IDisposable
     /// The received bytes not yet consumed through <see cref="AdvanceDataOffset"/>.
     /// </summary>
     public ReadOnlySpan<byte> Data => _data.AsSpan().Slice(_dataOffset, _dataLength);
-
-    /// <summary>
-    /// Signaled when a segment brings data or changes the connection's
-    /// status, so a thread can block until there is something to read or
-    /// the handshake moved, rather than poll.
-    /// </summary>
-    internal InterruptEvent? ReceiveSignal { get; set; }
 
     private TcpConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
     {
@@ -261,15 +253,7 @@ internal class TcpConnection : IDisposable
     /// </summary>
     internal void ReceiveData(TcpPacket packet)
     {
-        int dataLength = _dataLength;
-        Status status = Status;
-
         ReceiveDataInternal(packet);
-
-        if (_dataLength != dataLength || Status != status)
-        {
-            ReceiveSignal?.Signal();
-        }
 
         // A detached connection has no owner left to clean it up — reap it
         // from the connection table once the state machine lands on CLOSED.
