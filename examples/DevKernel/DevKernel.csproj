@@ -15,6 +15,20 @@
     <PackageReference Include="Cosmos.Kernel.System" />
   </ItemGroup>
 
+  <!-- The FTP server behind the ftpd command (CosmosOS/CosmosFtp). A clone of
+       that repository next to this one is built from source, so a change to
+       the server can be tried in the DevKernel before it is published;
+       otherwise the package comes from nuget.org. -->
+  <PropertyGroup>
+    <CosmosFtpServerProject>$(MSBuildThisFileDirectory)../../../CosmosFtp/src/CosmosFtpServer/CosmosFtpServer.csproj</CosmosFtpServerProject>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(CosmosFtpServerProject)')">
+    <ProjectReference Include="$(CosmosFtpServerProject)" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('$(CosmosFtpServerProject)')">
+    <PackageReference Include="CosmosFtpServer" />
+  </ItemGroup>
+
   <!-- DevKernel-specific C files -->
   <ItemGroup>
     <GCCProject Include="./src/C/" />

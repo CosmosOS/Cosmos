@@ -21,6 +21,7 @@ internal static class CommandRegistry
         DriverCommands.Register(shell);
         GraphicsCommands.Register(shell);
         NetworkCommands.Register(shell);
+        FtpCommands.Register(shell);
         AudioCommands.Register(shell);
         DiskCommands.Register(shell);
         PartitionCommands.Register(shell);
