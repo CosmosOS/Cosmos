@@ -293,7 +293,7 @@ FtpServer server = new("/mnt");
 new Thread(server.Listen).Start(); // Listen() serves every client until server.Close()
 ```
 
-Clients see `/mnt` as `/` and cannot leave it. Leaving `Authenticate` unset lets any user name in with any password; set it to check credentials. Transfers are passive, on ports 50000 to 50009 by default (`PassivePortMin` and `PassivePortMax`), so under QEMU user networking forward those as well as the control port: `cosmos run --hostfwd tcp::2121-:21 --hostfwd tcp::50000-:50000 ...`, then `curl ftp://localhost:2121/`. The DevKernel serves its working directory with `ftpd [dir] [port]` and stops with `ftpd stop`.
+Clients see `/mnt` as `/` and cannot leave it. Leaving `Authenticate` unset lets any user name in with any password; set it to check credentials. Transfers are passive, on ports 50000 to 50009 by default (`PassivePortMin` and `PassivePortMax`), so under QEMU user networking forward those as well as the control port: `cosmos run --hostfwd tcp::2121-:21 --hostfwd tcp::50000-:50000 ...`, then `curl ftp://localhost:2121/`. A `PASV` reply names the guest's own address, 10.0.2.15, which the host cannot reach: curl ignores it, but FileZilla connects to it, so set `PassiveAddress = IPAddress.Loopback` for `PASV` to name 127.0.0.1 instead. The DevKernel serves its working directory with `ftpd [dir] [port] [pasv-ip]`, `ftpd /mnt 21 127.0.0.1` under QEMU, and stops with `ftpd stop`.
 
 ## DNS
 
