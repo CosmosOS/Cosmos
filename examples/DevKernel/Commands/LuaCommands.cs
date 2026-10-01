@@ -7,7 +7,7 @@ using DevKernel.Shell;
 namespace DevKernel.Commands;
 
 /// <summary>
-/// The Lua 5.2 interpreter of the Cosmos.Executable.Lua package, on the
+/// The Lua 5.3 interpreter of the Cosmos.Executable.Lua package, on the
 /// shell's console session: a script, a chunk, or the interactive prompt.
 /// </summary>
 internal static class LuaCommands
@@ -48,7 +48,7 @@ internal static class LuaCommands
         {
             if (args.Count == 0)
             {
-                Terminal.Hint("Lua 5.2 (UniLua). os.exit() leaves the prompt.");
+                Terminal.Hint("Lua 5.3. os.exit() leaves the prompt.");
                 lua.RunPrompt();
             }
             else if (args[0] == ChunkOption)
