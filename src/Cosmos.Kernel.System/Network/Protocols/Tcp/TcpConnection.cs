@@ -499,24 +499,27 @@ internal class TcpConnection : IDisposable
                 return;
             }
 
-            if (packet._psh)
+            // Data is taken from every segment that carries it, PSH or not: a
+            // peer sets PSH on the last segment of a write only. Only the
+            // segment that continues the stream is taken, since one after a
+            // gap would be appended as if it came next. Every segment is
+            // acknowledged, which moves the peer's window on and, after a gap,
+            // has it resend from RcvNxt.
+            if (packet.TcpDataLength > 0)
             {
-                Serial.WriteString("[TCP] PSH received, data length: ");
-                Serial.WriteNumber((ulong)packet.TcpDataLength);
-                Serial.WriteString(", storing data\n");
+                if (packet.SequenceNumber != TCB.RcvNxt)
+                {
+                    SendEmptyPacket(TcpFlags.ACK);
+                    return;
+                }
 
                 TCB.RcvNxt += packet.TcpDataLength;
 
                 AppendToData(packet.TcpData);
 
-                Serial.WriteString("[TCP] Data buffer now has ");
-                Serial.WriteNumber((ulong)_data.Length);
-                Serial.WriteString(" bytes\n");
-
-                // Handle FIN flag within PSH handling if both are set
                 if (packet._fin)
                 {
-                    Serial.WriteString("[TCP] PSH+FIN received, closing\n");
+                    Serial.WriteString("[TCP] Data+FIN received, closing\n");
                     TCB.RcvNxt++;
 
                     SendEmptyPacket(TcpFlags.ACK);
@@ -545,13 +548,6 @@ internal class TcpConnection : IDisposable
                 WaitAndClose();
 
                 return;
-            }
-
-            if (packet.TcpDataLength > 0 && packet.SequenceNumber >= TCB.RcvNxt) // packet sequencing
-            {
-                TCB.RcvNxt += packet.TcpDataLength;
-
-                AppendToData(packet.TcpData);
             }
         }
         if (packet._rst)
