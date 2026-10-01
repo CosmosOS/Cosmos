@@ -37,6 +37,9 @@ public static class SocketPlug
     public static readonly Dictionary<int, IPEndPoint> _localEndPoints = [];
     // Store remote endpoint per socket instance
     public static readonly Dictionary<int, IPEndPoint> _remoteEndPoints = [];
+    // Sockets Listen() was called on: each holds a listening connection, which
+    // a completed handshake turns into the connection Accept() hands out
+    internal static readonly HashSet<int> s_listeningSockets = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(Socket aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
@@ -172,7 +175,18 @@ public static class SocketPlug
             {
                 if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
                 {
-                    return sm.Status == Status.ESTABLISHED;
+                    return mode switch
+                    {
+                        // A listener is readable once a connection waits to be
+                        // accepted, a connected socket once a read would not
+                        // block: data waits, or the peer closed its side and
+                        // the read returns 0.
+                        SelectMode.SelectRead => s_listeningSockets.Contains(id)
+                            ? HasPendingConnection(sm)
+                            : sm.Data.Length > 0 || HasPeerClosed(sm),
+                        SelectMode.SelectWrite => sm.Status is Status.ESTABLISHED or Status.CLOSE_WAIT,
+                        _ => false,
+                    };
                 }
             }
             else if (proto == ProtocolType.Udp)
@@ -185,6 +199,16 @@ public static class SocketPlug
         }
         return false;
     }
+
+    // Whether a listening connection completed a handshake, which Accept()
+    // hands out even if it has closed since: a listening connection only
+    // reaches CLOSED through ESTABLISHED, and what the peer sent before
+    // closing is still to be read.
+    private static bool HasPendingConnection(Tcp sm) =>
+        sm.Status is not (Status.LISTEN or Status.SYN_RECEIVED);
+
+    private static bool HasPeerClosed(Tcp sm) =>
+        sm.Status is Status.CLOSE_WAIT or Status.LAST_ACK or Status.CLOSING or Status.TIME_WAIT or Status.CLOSED;
 
     [PlugMember]
     public static void Bind(Socket aThis, global::System.Net.EndPoint localEP)
@@ -212,6 +236,7 @@ public static class SocketPlug
         if (_protocolTypes.TryGetValue(id, out var proto) && proto == ProtocolType.Tcp)
         {
             StartTcp(aThis);
+            s_listeningSockets.Add(id);
         }
     }
 
@@ -243,22 +268,22 @@ public static class SocketPlug
             sm = s_tcpStateMachines[id];
         }
 
-        if (sm.Status == Status.CLOSED)
+        while (!HasPendingConnection(sm))
         {
-            Tcp.RemoveConnection(sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address);
-            StartTcp(aThis);
-            sm = s_tcpStateMachines[id];
+            sm.WaitStatus(Status.ESTABLISHED, 10);
         }
 
-        while (!sm.WaitStatus(Status.ESTABLISHED))
-        {
-            ;
-        }
+        // The connection goes to a new socket and the listener listens afresh
+        // on a connection of its own, as accept() leaves a BSD listener: the
+        // next peer can connect while this one is served.
+        Socket accepted = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        int acceptedId = GetId(accepted);
+        s_tcpStateMachines[acceptedId] = sm;
+        _remoteEndPoints[acceptedId] = new IPEndPoint(new IPAddress(sm.RemoteEndPoint.Address.ToBytes()), sm.RemoteEndPoint.Port);
+        _localEndPoints[acceptedId] = new IPEndPoint(new IPAddress(sm.LocalEndPoint.Address.ToBytes()), sm.LocalEndPoint.Port);
 
-        _remoteEndPoints[id] = new IPEndPoint(new IPAddress(sm.RemoteEndPoint.Address.ToBytes()), sm.RemoteEndPoint.Port);
-        _localEndPoints[id] = new IPEndPoint(new IPAddress(sm.LocalEndPoint.Address.ToBytes()), sm.LocalEndPoint.Port);
-
-        return aThis;
+        StartTcp(aThis);
+        return accepted;
     }
 
     [PlugMember]
@@ -718,6 +743,7 @@ public static class SocketPlug
             else
             {
                 CloseTcp(aThis, timeout);
+                s_listeningSockets.Remove(id);
             }
             _protocolTypes.Remove(id);
         }
