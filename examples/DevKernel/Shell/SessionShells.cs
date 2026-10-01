@@ -7,8 +7,8 @@ using Sys = Cosmos.Kernel.System;
 namespace DevKernel.Shell;
 
 /// <summary>
-/// Starts shells on console sessions other than the primary console, such
-/// as the virtual consoles the kernel opens at boot.
+/// Starts shells on console sessions other than the primary console: the
+/// virtual consoles the kernel opens at boot, and the Telnet connections.
 /// </summary>
 internal static class SessionShells
 {
