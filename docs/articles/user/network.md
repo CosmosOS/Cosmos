@@ -273,6 +273,20 @@ To reach a listener inside QEMU user networking from your host, forward a host p
 <!-- screenshot: console showing "Listening on port 4444...", "Client connected!" and the received message -->
 ![TCP Server](images/network-tcp-server.png)
 
+## FTP server
+
+The [CosmosFtpServer](https://github.com/CosmosOS/CosmosFtp) package serves a directory of the VFS over FTP. Version 2 is the Gen3 one; 1.x is for Gen2. Add `<PackageReference Include="CosmosFtpServer" Version="2.0.0" />` to your kernel and start the server once the network is configured and a filesystem is mounted:
+
+```csharp
+using System.Threading;
+using CosmosFtpServer;
+
+FtpServer server = new("/mnt");
+new Thread(server.Listen).Start(); // Listen() serves every client until server.Close()
+```
+
+Clients see `/mnt` as `/` and cannot leave it. Leaving `Authenticate` unset lets any user name in with any password; set it to check credentials. Transfers are passive, on ports 50000 to 50009 by default (`PassivePortMin` and `PassivePortMax`), so under QEMU user networking forward those as well as the control port: `cosmos run --hostfwd tcp::2121-:21 --hostfwd tcp::50000-:50000 ...`, then `curl ftp://localhost:2121/`. The DevKernel serves its working directory with `ftpd [dir] [port]` and stops with `ftpd stop`.
+
 ## DNS
 
 Two APIs resolve a name: the standard `System.Net.Dns`, and the Cosmos `DnsClient`. Register a nameserver with either one, because there is no `resolv.conf` to read one from and DHCP is what normally supplies it:
