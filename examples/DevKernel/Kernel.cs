@@ -84,7 +84,7 @@ public class Kernel : Sys.Kernel
             }
         }
 
-        Terminal.Hint($"Alt+F1..F{BootVirtualConsoles + 1} switches between the consoles; 'telnetd' serves shells over Telnet.");
+        Terminal.Hint($"Alt+F1..F{BootVirtualConsoles + 1} switches between the consoles.");
     }
 
     protected override void AfterRun()

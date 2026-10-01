@@ -215,18 +215,35 @@ public static class SessionManager
     internal static ConsoleSession RequireCurrent() => Current ?? throw new InvalidOperationException($"{nameof(KernelConsole)} is not initialized");
 
     /// <summary>
-    /// Gives a session the lowest free number, and starts routing the
-    /// keyboard once there are two sessions.
+    /// Lists a session under the lowest free number, and starts routing the
+    /// keyboard once there are two sessions. A session a library creates,
+    /// such as a remote terminal's, is listed this way before
+    /// <see cref="Start(ConsoleSession, Action)"/> runs a thread on it.
     /// </summary>
-    /// <returns>False when <see cref="MaxSessions"/> sessions are open.</returns>
-    internal static bool TryRegister(ConsoleSession session)
+    /// <param name="session">The session; one already listed keeps its number.</param>
+    /// <returns>False when <see cref="MaxSessions"/> sessions are open, or the session was closed.</returns>
+    public static bool TryRegister(ConsoleSession session)
     {
+        ArgumentNullException.ThrowIfNull(session);
+
         _ = Primary;
 
         int count = 0;
         bool registered = false;
         using (InternalCpu.DisableInterruptsScope())
         {
+            // Checked masked: a session closed before this point is not
+            // listed, one closed after it is unlisted by its Close().
+            if (session.IsClosed)
+            {
+                return false;
+            }
+
+            if (session.Id != 0)
+            {
+                return true;
+            }
+
             s_slots ??= new ConsoleSession?[MaxSessions];
             for (int i = 0; i < s_slots.Length; i++)
             {

@@ -24,7 +24,6 @@ abstract Cosmos.Kernel.System.Sessions.ConsoleSession.IsRemote.get -> bool
 abstract Cosmos.Kernel.System.Sessions.ConsoleSession.Name.get -> string!
 const Cosmos.Kernel.System.Diagnostics.SchedulerInfo.NanosecondsPerMillisecond = 1000000 -> ulong
 const Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.BootSectorLba = 0 -> ulong
-const Cosmos.Kernel.System.Network.Telnet.TelnetServer.DefaultPort = 23 -> ushort
 const Cosmos.Kernel.System.Sessions.SessionManager.MaxSessions = 12 -> int
 const Cosmos.Kernel.System.Storage.Gpt.FirstUsableLba = 34 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.PrimaryHeaderLba = 1 -> ulong
@@ -655,12 +654,6 @@ Cosmos.Kernel.System.Network.NetworkAdapter.NetworkAdapter() -> void
 Cosmos.Kernel.System.Network.NetworkAdapter.Ready.get -> bool
 Cosmos.Kernel.System.Network.NetworkManager
 Cosmos.Kernel.System.Network.NetworkStack
-Cosmos.Kernel.System.Network.Telnet.TelnetServer
-Cosmos.Kernel.System.Network.Telnet.TelnetServer.IsRunning.get -> bool
-Cosmos.Kernel.System.Network.Telnet.TelnetServer.Port.get -> ushort
-Cosmos.Kernel.System.Network.Telnet.TelnetServer.Start() -> void
-Cosmos.Kernel.System.Network.Telnet.TelnetServer.Stop() -> void
-Cosmos.Kernel.System.Network.Telnet.TelnetServer.TelnetServer(System.Action<Cosmos.Kernel.System.Sessions.ConsoleSession!>! shell, ushort port = 23) -> void
 Cosmos.Kernel.System.Network.UDP.UdpClient
 Cosmos.Kernel.System.Network.UDP.UdpClient.Close() -> void
 Cosmos.Kernel.System.Network.UDP.UdpClient.Connect(Cosmos.Kernel.System.Network.Address! dest, int destPort) -> void
@@ -675,9 +668,16 @@ Cosmos.Kernel.System.Power
 Cosmos.Kernel.System.Sessions.ConsoleSession
 Cosmos.Kernel.System.Sessions.ConsoleSession.Close() -> void
 Cosmos.Kernel.System.Sessions.ConsoleSession.Cols.get -> int
+Cosmos.Kernel.System.Sessions.ConsoleSession.ConsoleSession(int cols, int rows) -> void
+Cosmos.Kernel.System.Sessions.ConsoleSession.CursorLeft.get -> int
+Cosmos.Kernel.System.Sessions.ConsoleSession.CursorTop.get -> int
+Cosmos.Kernel.System.Sessions.ConsoleSession.EnqueueInput(Cosmos.Kernel.System.Keyboard.KeyEvent! key) -> void
+Cosmos.Kernel.System.Sessions.ConsoleSession.ExplicitBackground.get -> System.ConsoleColor?
+Cosmos.Kernel.System.Sessions.ConsoleSession.ExplicitForeground.get -> System.ConsoleColor?
 Cosmos.Kernel.System.Sessions.ConsoleSession.Id.get -> int
 Cosmos.Kernel.System.Sessions.ConsoleSession.IsActive.get -> bool
 Cosmos.Kernel.System.Sessions.ConsoleSession.IsClosed.get -> bool
+Cosmos.Kernel.System.Sessions.ConsoleSession.Resize(int cols, int rows) -> void
 Cosmos.Kernel.System.Sessions.ConsoleSession.Rows.get -> int
 Cosmos.Kernel.System.Sessions.SessionManager
 Cosmos.Kernel.System.Storage.Ebr
@@ -950,6 +950,7 @@ static Cosmos.Kernel.System.Sessions.SessionManager.Primary.get -> Cosmos.Kernel
 static Cosmos.Kernel.System.Sessions.SessionManager.GetSessions() -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.Sessions.ConsoleSession!>!
 static Cosmos.Kernel.System.Sessions.SessionManager.Start(Cosmos.Kernel.System.Sessions.ConsoleSession! session, System.Action! body) -> void
 static Cosmos.Kernel.System.Sessions.SessionManager.Switch(int id) -> bool
+static Cosmos.Kernel.System.Sessions.SessionManager.TryRegister(Cosmos.Kernel.System.Sessions.ConsoleSession! session) -> bool
 static Cosmos.Kernel.System.Storage.Ebr.MoveLogical(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, ulong extendedStartSector, int logicalIndex, ulong newStartSector) -> bool
 static Cosmos.Kernel.System.Storage.Ebr.Parse(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, ulong extendedStartSector) -> System.Collections.Generic.List<Cosmos.Kernel.System.Storage.MbrPartitionEntry!>!
 static Cosmos.Kernel.System.Storage.Ebr.RemoveLogical(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device, ulong extendedStartSector, int logicalIndex) -> bool
@@ -1067,6 +1068,13 @@ virtual Cosmos.Kernel.System.Kernel.AfterRun() -> void
 virtual Cosmos.Kernel.System.Kernel.BeforeRun() -> void
 virtual Cosmos.Kernel.System.Kernel.OnBoot() -> void
 virtual Cosmos.Kernel.System.Kernel.Start() -> void
+virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnCleared() -> void
+virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnClosed() -> void
+virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnColorsChanged() -> void
+virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnCursorMoved() -> void
+virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnCursorVisibilityChanged(bool visible) -> void
+virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnFlush() -> void
+virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnWritten(char value, bool wrapped) -> void
 [COSMOS0002]abstract Cosmos.Kernel.System.Network.InternetPacket.DataLength.get -> ushort
 [COSMOS0002]abstract Cosmos.Kernel.System.Network.InternetPacket.DataOffset.get -> ushort
 [COSMOS0002]abstract Cosmos.Kernel.System.Network.InternetPacket.DestinationIP.get -> Cosmos.Kernel.System.Network.Address!
