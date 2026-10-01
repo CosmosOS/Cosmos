@@ -26,6 +26,7 @@ internal static class CommandRegistry
         PartitionCommands.Register(shell);
         MountCommands.Register(shell);
         FileCommands.Register(shell);
+        LuaCommands.Register(shell);
 
         return shell;
     }
