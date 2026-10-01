@@ -11,8 +11,10 @@ namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 /// </summary>
 internal static unsafe partial class ExceptionHelper
 {
-    // Maximum stack frames to walk.
-    private const int MAX_STACK_FRAMES = 64;
+    // Maximum stack frames to walk: a guard against a corrupt frame chain, the walk ends at
+    // the bottom of the stack first. Deep enough for a throw a few hundred frames below its
+    // catch, as an interpreter's error raised from nested callbacks is.
+    private const int MAX_STACK_FRAMES = 4096;
 
     // Assembly funclet callers - use nint for object reference since P/Invoke doesn't support object.
     [LibraryImport("*", EntryPoint = "RhpCallCatchFunclet")]
@@ -491,6 +493,14 @@ internal static unsafe partial class ExceptionHelper
 
             // Clauses this exception already entered must not re-catch their own rethrow.
             if (skipActiveClauses && IsActiveCatchClause(framePointer, methodStart + handlerOffset))
+            {
+                continue;
+            }
+
+            // A typed clause catches its type and the types derived from it, nothing else:
+            // `catch (A) {} catch (B) {}` must leave a B to the second clause.
+            if (kind == EHClauseKind.EH_CLAUSE_TYPED
+                && Casting.RhTypeCast_IsInstanceOfClass(ex, (Internal.Runtime.MethodTable*)targetType) is null)
             {
                 continue;
             }
