@@ -270,82 +270,86 @@ internal static unsafe partial class GarbageCollector
         s_segmentManager.TailSegment = tail;
         s_lastSegment = semiHead != null ? semiHead : freeHead;
         s_currentSegment = s_lastSegment;
-
-        s_heapRangeDirty = true;
     }
 
     // --- Helpers ---
 
     /// <summary>
     /// Checks if a pointer falls within any GC heap segment (including pinned segments).
-    /// Uses a cached min/max range for a fast pre-check before walking the segment list.
     /// </summary>
     /// <param name="ptr">The pointer to test.</param>
     /// <returns><c>true</c> if <paramref name="ptr"/> is inside a GC or pinned heap segment; otherwise, <c>false</c>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsInGCHeap(nint ptr)
     {
-        if (s_heapRangeDirty)
-        {
-            RecomputeHeapRange();
-        }
-
-        byte* p = (byte*)ptr;
-
-        // Fast reject: outside the bounding box of all GC segments
-        if (p < s_gcHeapMin || p >= s_gcHeapMax)
-        {
-            // Check pinned heap
-            return IsInPinnedHeap(ptr);
-        }
-
-        // Walk segments to confirm
-        GCSegment* segment = s_segmentManager.Segments;
-        while (segment != null)
-        {
-            if (p >= segment->Start && p < segment->End)
-            {
-                return true;
-            }
-
-            segment = segment->Next;
-        }
-
-        // Inside bounding box but in a gap between segments - check pinned heap
-        return IsInPinnedHeap(ptr);
+        return GetSegmentContaining((byte*)ptr) != null;
     }
 
     /// <summary>
-    /// Recomputes the cached heap min/max range from the current segment list.
+    /// Finds the segment, regular or pinned, whose object area contains a pointer.
     /// </summary>
-    private static void RecomputeHeapRange()
+    /// <remarks>
+    /// Both segment managers take their segments from the page allocator as
+    /// <see cref="PageType.GCHeap"/> runs, with the <see cref="GCSegment"/> at the start of the run,
+    /// so the page allocator's table finds the segment without walking the segment lists. Segments
+    /// are sized for one TLAB refill or one large allocation, so a full heap has tens of thousands of
+    /// them, and the mark phase looks up every reference it follows: a walk per lookup made a
+    /// collection take time in the square of the heap size.
+    /// </remarks>
+    /// <param name="ptr">The pointer to look up.</param>
+    /// <returns>The segment, or <c>null</c> when the pointer is in no segment's object area.</returns>
+    private static GCSegment* GetSegmentContaining(byte* ptr)
     {
-        if (s_segmentManager.Segments == null)
+        if (PageAllocator.GetAllocation(ptr, out byte* start) != PageType.GCHeap)
         {
-            s_gcHeapMin = (byte*)0;
-            s_gcHeapMax = (byte*)0;
-            s_heapRangeDirty = false;
-            return;
+            return null;
         }
 
-        byte* min = s_segmentManager.Segments->Start;
-        byte* max = s_segmentManager.Segments->End;
+        var segment = (GCSegment*)start;
+        return ptr >= segment->Start && ptr < segment->End ? segment : null;
+    }
 
-        for (GCSegment* seg = s_segmentManager.Segments->Next; seg != null; seg = seg->Next)
+    /// <summary>
+    /// One step of a walk over a segment's objects: the size of the entry at
+    /// <paramref name="ptr"/>.
+    /// </summary>
+    /// <remarks>
+    /// The walk steps with the rules of <see cref="SweepSegment"/>, so the objects it finds are the
+    /// ones the sweep also visits as object starts and unmarks: a <see cref="FreeBlock"/> advances by
+    /// its <see cref="FreeBlock.Size"/>, a header word that cannot be a MethodTable (zeroed TLAB gap,
+    /// reserved header slot, stale heap pointer) by one pointer, and an object by its size rounded up
+    /// the way the allocator rounds it. <see cref="GCObject.ComputeSize"/> alone is not a stride:
+    /// strings and byte, char and short arrays have sizes that are not pointer multiples.
+    /// </remarks>
+    /// <param name="segment">The segment being walked.</param>
+    /// <param name="ptr">The entry, between the segment's start and its bump pointer.</param>
+    /// <param name="isObject">Whether the entry is an object.</param>
+    /// <returns>
+    /// The size of the entry, or 0 where the sweep stops: nothing past it is ever an object start.
+    /// </returns>
+    private static uint GetHeapEntrySize(GCSegment* segment, byte* ptr, out bool isObject)
+    {
+        var obj = (GCObject*)ptr;
+
+        // Masked: walks also run mid-mark, when objects already reached carry the mark bit.
+        MethodTable* mt = obj->GetMethodTable();
+        isObject = false;
+        uint size;
+
+        if (mt == s_freeMethodTable)
         {
-            if (seg->Start < min)
-            {
-                min = seg->Start;
-            }
-
-            if (seg->End > max)
-            {
-                max = seg->End;
-            }
+            size = (uint)((FreeBlock*)ptr)->Size;
+        }
+        else if (mt == null || (ulong)mt < AddressSpace.KernelSpaceStart || IsInGCHeap((nint)mt))
+        {
+            size = (uint)sizeof(nint);
+        }
+        else
+        {
+            size = Align(obj->ComputeSize());
+            isObject = true;
         }
 
-        s_gcHeapMin = min;
-        s_gcHeapMax = max;
-        s_heapRangeDirty = false;
+        return size == 0 || size > (uint)(segment->End - ptr) ? 0 : size;
     }
 }

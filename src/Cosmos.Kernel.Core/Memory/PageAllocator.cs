@@ -668,6 +668,46 @@ internal static unsafe class PageAllocator
     }
 
     /// <summary>
+    /// Gets the allocation an address falls in: the first page of the run <see cref="AllocPages"/>
+    /// handed out, and the type the run was allocated with.
+    /// </summary>
+    /// <remarks>
+    /// Reads the address's RAT entry, and the entries before it while they are
+    /// <see cref="PageType.Extension"/>: the cost depends on the size of the run, not on how many
+    /// runs there are. Takes no lock: the caller keeps the run from being freed meanwhile (the
+    /// garbage collector runs with interrupts disabled).
+    /// </remarks>
+    /// <param name="aPtr">Any address.</param>
+    /// <param name="aStart">The first page of the run, or <c>null</c> when the address is in none.</param>
+    /// <returns>
+    /// The type of the run, or <see cref="PageType.Empty"/> for an address outside the heap or in a
+    /// free page.
+    /// </returns>
+    public static PageType GetAllocation(void* aPtr, out byte* aStart)
+    {
+        aStart = null;
+        if (aPtr < RamStart || aPtr >= RamStart + TotalPageCount * PageSize)
+        {
+            return PageType.Empty;
+        }
+
+        byte* entry = s_mRAT + (ulong)((byte*)aPtr - RamStart) / PageSize;
+        while (*entry == (byte)PageType.Extension && entry > s_mRAT)
+        {
+            entry--;
+        }
+
+        var type = (PageType)(*entry);
+        if (type == PageType.Empty || type == PageType.Extension)
+        {
+            return PageType.Empty;
+        }
+
+        aStart = RamStart + (ulong)(entry - s_mRAT) * PageSize;
+        return type;
+    }
+
+    /// <summary>
     /// Free page.
     /// </summary>
     /// <param name="aPageIdx">A index to the page to be freed.</param>

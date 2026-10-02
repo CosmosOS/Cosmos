@@ -25,6 +25,9 @@ internal static unsafe partial class GarbageCollector
     private static void MarkPhase()
     {
         s_markStackCount = 0;
+        s_markStackFull = false;
+        s_markOverflowMin = null;
+        s_markOverflowMax = null;
         ScanStackRoots();
         ScanGCHandles();
     }
@@ -278,9 +281,9 @@ internal static unsafe partial class GarbageCollector
     /// <summary>
     /// Marks an object and everything reachable from it. <paramref name="value"/> must be an
     /// object start (a handle target, a precise GCInfo slot, a GCDesc reference); a word found by
-    /// conservative scanning goes through <see cref="TryMarkConservativeRoot"/> first. Validates
-    /// that the pointer looks like a valid GC object (MethodTable outside heap) before marking and
-    /// enumerating its references. Uses an iterative mark stack to avoid deep recursion.
+    /// conservative scanning goes through <see cref="TryMarkConservativeRoot"/> first. Uses an
+    /// iterative mark stack to avoid deep recursion; what a full stack cannot take is found again
+    /// by <see cref="ProcessMarkOverflow"/> before this returns.
     /// </summary>
     /// <param name="value">Object pointer to mark.</param>
     [MethodImpl(MethodImplOptions.NoOptimization)]
@@ -293,44 +296,146 @@ internal static unsafe partial class GarbageCollector
             return;
         }
 
-        PushMarkStack(value);
+        MarkAndPush((GCObject*)value);
+        DrainMarkStack();
 
+        while (s_markOverflowMin != null)
+        {
+            ProcessMarkOverflow();
+        }
+    }
+
+    /// <summary>
+    /// Marks an object the mark phase reached and, when it has references, pushes it for
+    /// <see cref="DrainMarkStack"/> to follow them. Validates that the pointer looks like a valid
+    /// GC object (MethodTable outside heap) first. An object is marked when it is pushed, as the
+    /// .NET collector does, so a reference to an object reached already is never pushed again, and
+    /// a rescan after an overflow only pushes what is still unmarked.
+    /// </summary>
+    /// <param name="obj">The object reached.</param>
+    private static void MarkAndPush(GCObject* obj)
+    {
+        // Validate MethodTable - must point outside heap (to kernel code)
+        nuint mtPtr = (nuint)obj->MethodTable & ~(nuint)1;
+        if (mtPtr == 0 || IsInGCHeap((nint)mtPtr))
+        {
+            return;
+        }
+
+        // MethodTable must be in kernel address space (higher-half).
+        // Reject pointers in userspace range — they're garbage from conservative scanning.
+        if (mtPtr < AddressSpace.KernelSpaceStart)
+        {
+            return;
+        }
+
+        if (obj->IsMarked)
+        {
+            return;
+        }
+
+        obj->Mark();
+
+        if (((MethodTable*)mtPtr)->ContainsGCPointers && !PushMarkStack((nint)obj))
+        {
+            NoteMarkOverflow(obj);
+        }
+    }
+
+    /// <summary>
+    /// Follows the references of the objects on the mark stack until it is empty.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoOptimization)]
+    private static void DrainMarkStack()
+    {
         while (s_markStackCount > 0)
         {
-            nint ptr = PopMarkStack();
-            var obj = (GCObject*)ptr;
+            var obj = (GCObject*)PopMarkStack();
+            EnumerateReferences(obj, obj->GetMethodTable());
+        }
+    }
 
-            // Validate MethodTable - must point outside heap (to kernel code)
-            nuint mtPtr = (nuint)obj->MethodTable & ~(nuint)1;
-            if (mtPtr == 0 || IsInGCHeap((nint)mtPtr))
+    /// <summary>
+    /// Records a marked object whose references a full mark stack left unfollowed.
+    /// </summary>
+    /// <param name="obj">The object that could not be pushed.</param>
+    private static void NoteMarkOverflow(GCObject* obj)
+    {
+        byte* p = (byte*)obj;
+        if (s_markOverflowMin == null || p < s_markOverflowMin)
+        {
+            s_markOverflowMin = p;
+        }
+
+        if (p > s_markOverflowMax)
+        {
+            s_markOverflowMax = p;
+        }
+    }
+
+    /// <summary>
+    /// Follows the references of the marked objects a full mark stack could not take, as the .NET
+    /// collector recovers from a mark stack overflow. Those objects lie between
+    /// <see cref="s_markOverflowMin"/> and <see cref="s_markOverflowMax"/>: the heap is walked over
+    /// that range, and every marked object with references there has them followed again, the
+    /// stack drained after each. An object scanned already finds its references marked and pushes
+    /// nothing; the objects the stack overflows on meanwhile make up the range of the next round.
+    /// </summary>
+    private static void ProcessMarkOverflow()
+    {
+        byte* min = s_markOverflowMin;
+        byte* max = s_markOverflowMax;
+        s_markOverflowMin = null;
+        s_markOverflowMax = null;
+
+        RescanMarkedObjects(s_segmentManager.Segments, min, max);
+        RescanMarkedObjects(s_pinnedSegmentManager.Segments, min, max);
+    }
+
+    /// <summary>
+    /// Follows again the references of the marked objects of a segment list that lie between
+    /// <paramref name="min"/> and <paramref name="max"/>.
+    /// </summary>
+    /// <param name="segment">The first segment of the list.</param>
+    /// <param name="min">The lowest object address to rescan.</param>
+    /// <param name="max">The highest object address to rescan.</param>
+    private static void RescanMarkedObjects(GCSegment* segment, byte* min, byte* max)
+    {
+        for (; segment != null; segment = segment->Next)
+        {
+            if (segment->Bump <= min || segment->Start > max)
             {
                 continue;
             }
 
-            // MethodTable must be in kernel address space (higher-half).
-            // Reject pointers in userspace range — they're garbage from conservative scanning.
-            if (mtPtr < AddressSpace.KernelSpaceStart)
+            byte* ptr = segment->Start;
+            while (ptr < segment->Bump && ptr <= max)
             {
-                continue;
-            }
+                uint size = GetHeapEntrySize(segment, ptr, out bool isObject);
+                if (size == 0)
+                {
+                    break;
+                }
 
-            if (obj->IsMarked)
-            {
-                continue;
-            }
+                var obj = (GCObject*)ptr;
+                if (isObject && ptr >= min && obj->IsMarked)
+                {
+                    MethodTable* mt = obj->GetMethodTable();
+                    if (mt->ContainsGCPointers)
+                    {
+                        EnumerateReferences(obj, mt);
+                        DrainMarkStack();
+                    }
+                }
 
-            obj->Mark();
-
-            MethodTable* mt = obj->GetMethodTable();
-            if (mt->ContainsGCPointers)
-            {
-                EnumerateReferences(obj, mt);
+                ptr += size;
             }
         }
     }
 
     /// <summary>
-    /// Enumerates object references described by the GCDesc and pushes them onto the mark stack.
+    /// Enumerates object references described by the GCDesc and marks them, pushing those with
+    /// references of their own onto the mark stack.
     /// Handles both fixed-layout objects (positive series count) and arrays of structs (negative series count).
     /// </summary>
     /// <param name="obj">The object whose references to enumerate.</param>
@@ -361,7 +466,7 @@ internal static unsafe partial class GarbageCollector
                     nint refValue = ptr[i];
                     if (refValue != 0 && IsInGCHeap(refValue))
                     {
-                        PushMarkStack(refValue);
+                        MarkAndPush((GCObject*)refValue);
                     }
                 }
 
@@ -393,7 +498,7 @@ internal static unsafe partial class GarbageCollector
                         nint refValue = *ptr;
                         if (refValue != 0 && IsInGCHeap(refValue))
                         {
-                            PushMarkStack(refValue);
+                            MarkAndPush((GCObject*)refValue);
                         }
 
                         ptr++;
@@ -407,20 +512,30 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Pushes a potential object pointer onto the mark stack. Expands the stack if full.
+    /// Pushes an object onto the mark stack. Expands the stack if full.
     /// </summary>
-    /// <param name="ptr">The pointer to push.</param>
-    private static void PushMarkStack(nint ptr)
+    /// <param name="ptr">The object to push.</param>
+    /// <returns>
+    /// <c>false</c> when the stack is full and cannot grow: the caller records the overflow for
+    /// <see cref="ProcessMarkOverflow"/>.
+    /// </returns>
+    private static bool PushMarkStack(nint ptr)
     {
         if (s_markStackCount >= s_markStackCapacity)
         {
+            if (s_markStackFull)
+            {
+                return false;
+            }
+
             // Expand mark stack
             ulong newPageCount = (s_markStackPageCount + 1) * 2;
             nint* newStack = (nint*)PageAllocator.AllocPages(PageType.Unmanaged, newPageCount, true);
             if (newStack == null)
             {
                 Serial.WriteString("[GC] WARNING: Mark stack overflow\n");
-                return;
+                s_markStackFull = true;
+                return false;
             }
 
             for (int i = 0; i < s_markStackCount; i++)
@@ -435,6 +550,7 @@ internal static unsafe partial class GarbageCollector
         }
 
         s_markStack[s_markStackCount++] = ptr;
+        return true;
     }
 
     /// <summary>

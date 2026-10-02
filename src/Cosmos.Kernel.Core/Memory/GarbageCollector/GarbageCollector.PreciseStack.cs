@@ -182,8 +182,8 @@ internal static unsafe partial class GarbageCollector
     /// Resolves an interior pointer to the GC object that contains it.
     /// </summary>
     /// <remarks>
-    /// The segment is found by address in both the SOH and the pinned lists. The slot's
-    /// <c>GC_CALL_PINNED</c> flag cannot choose the list: it describes the stack slot (a <c>fixed</c>
+    /// The segment is found by address, in the SOH or the pinned heap. The slot's
+    /// <c>GC_CALL_PINNED</c> flag cannot choose the heap: it describes the stack slot (a <c>fixed</c>
     /// local), not the heap the object was allocated on, and the pinned sweep's free runs feed the
     /// shared free lists, so SOH TLABs can sit inside pinned segments.
     /// </remarks>
@@ -196,12 +196,7 @@ internal static unsafe partial class GarbageCollector
     /// </returns>
     private static GCObject* GetParentObject(byte* interior)
     {
-        GCSegment* segment = s_segmentManager.GetSegmentContaining(interior);
-        if (segment == null)
-        {
-            segment = s_pinnedSegmentManager.GetSegmentContaining(interior);
-        }
-
+        GCSegment* segment = GetSegmentContaining(interior);
         return segment != null ? FindObjectContaining(segment, interior) : null;
     }
 
@@ -211,12 +206,8 @@ internal static unsafe partial class GarbageCollector
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The walk steps with the rules of <see cref="SweepSegment"/>, so the object it returns is one the
-    /// sweep also visits as an object start and unmarks: a <see cref="FreeBlock"/> advances by its
-    /// <see cref="FreeBlock.Size"/>, a header word that cannot be a MethodTable (zeroed TLAB gap,
-    /// reserved header slot, stale heap pointer) by one pointer, and an object by its size rounded up
-    /// the way the allocator rounds it. <see cref="GCObject.ComputeSize"/> alone is not a stride:
-    /// strings and byte, char and short arrays have sizes that are not pointer multiples.
+    /// The walk steps with <see cref="GetHeapEntrySize"/>, so the object it returns is one the sweep
+    /// also visits as an object start and unmarks.
     /// </para>
     /// <para>
     /// It starts at <see cref="GCSegment.Start"/>, not at a brick-table entry. Objects allocated inside
@@ -240,36 +231,15 @@ internal static unsafe partial class GarbageCollector
         byte* ptr = segment->Start;
         while (ptr < segment->Bump)
         {
-            GCObject* obj = (GCObject*)ptr;
-
-            // Masked: the walk runs mid-mark, so objects already reached carry the mark bit.
-            MethodTable* mt = obj->GetMethodTable();
-            bool isObject = false;
-            uint size;
-
-            if (mt == s_freeMethodTable)
-            {
-                size = (uint)((FreeBlock*)ptr)->Size;
-            }
-            else if (mt == null || (ulong)mt < AddressSpace.KernelSpaceStart || IsInGCHeap((nint)mt))
-            {
-                size = (uint)sizeof(nint);
-            }
-            else
-            {
-                size = Align(obj->ComputeSize());
-                isObject = true;
-            }
-
-            // The sweep stops at the same entry, so nothing past it is ever an object start.
-            if (size == 0 || size > (uint)(segment->End - ptr))
+            uint size = GetHeapEntrySize(segment, ptr, out bool isObject);
+            if (size == 0)
             {
                 return null;
             }
 
             if (interior < ptr + size)
             {
-                return isObject ? obj : null;
+                return isObject ? (GCObject*)ptr : null;
             }
 
             ptr += size;

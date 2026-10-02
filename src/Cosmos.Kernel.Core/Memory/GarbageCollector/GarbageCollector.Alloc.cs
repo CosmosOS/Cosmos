@@ -184,7 +184,6 @@ internal static unsafe partial class GarbageCollector
         {
             return null;
         }
-        s_heapRangeDirty = true;
         s_lastSegment = newSegment;
         s_currentSegment = newSegment;
 
@@ -391,7 +390,6 @@ internal static unsafe partial class GarbageCollector
             return null;
         }
 
-        s_heapRangeDirty = true;
         s_lastSegment = newSegment;
         s_currentSegment = newSegment;
 
