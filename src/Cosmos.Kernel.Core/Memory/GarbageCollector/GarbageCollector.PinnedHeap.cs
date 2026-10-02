@@ -120,13 +120,34 @@ internal static unsafe partial class GarbageCollector
         while (ptr < segment->Bump)
         {
             var obj = (GCObject*)ptr;
+            MethodTable* mt = obj->GetMethodTable();
+
+            // A free block from an earlier sweep, as in SweepSegment. Walked as an object, it
+            // was counted freed again at every collection, and the walk went on from its marker
+            // type's base size through the stale bytes the block covers.
+            if (mt == s_freeMethodTable)
+            {
+                uint blockSize = (uint)((FreeBlock*)ptr)->Size;
+                if (blockSize == 0 || blockSize > (uint)(segment->End - ptr))
+                {
+                    break;
+                }
+
+                if (freeRunStart == null)
+                {
+                    freeRunStart = ptr;
+                }
+
+                freeRunSize += blockSize;
+                ptr += blockSize;
+                continue;
+            }
 
             // Validate MethodTable. Anything that is not a plausible MethodTable —
             // null (zeroed gap), a value below kernel space (data, e.g. the runtime
             // object header written at objRef-4 of the following object), or a stale
             // pointer into the GC heap — is dead filler. Fold it into the free run so
             // the run stays contiguous and the trailing reset can reach Bump.
-            MethodTable* mt = obj->GetMethodTable();
             if (mt == null || (ulong)mt < AddressSpace.KernelSpaceStart || IsInGCHeap((nint)mt))
             {
                 if (freeRunStart == null)
