@@ -407,13 +407,15 @@ internal static unsafe partial class GarbageCollector
     // --- Internal methods ---
 
     /// <summary>
-    /// Allocates memory for a managed object. Called by the runtime allocation helpers.
+    /// Allocates a managed object and stores its header. Called by the runtime allocation helpers.
     /// Uses per-thread TLAB fast path for non-pinned allocations.
     /// </summary>
     /// <param name="size">Requested object size in bytes.</param>
+    /// <param name="pMT">MethodTable stored in the object's header.</param>
+    /// <param name="length">Component count stored for an array or a string; ignored for any other type.</param>
     /// <param name="flags">Runtime allocation flags (e.g., pinned object heap).</param>
     /// <returns>Pointer to the allocated object, or <c>null</c> if allocation fails.</returns>
-    internal static GCObject* AllocObject(nint size, GC_ALLOC_FLAGS flags)
+    internal static GCObject* AllocObject(nint size, MethodTable* pMT, int length, GC_ALLOC_FLAGS flags)
     {
         if (!s_initialized)
         {
@@ -427,9 +429,25 @@ internal static unsafe partial class GarbageCollector
         // AllocLimit (seen as delta=104 in #382 debugging). RefillAllocContext
         // and Collect already disable interrupts internally; the scope nests
         // via saved flags.
+        // The header is stored inside the scope too: until its MethodTable is
+        // set the object is a zeroed block, which a collection run by another
+        // thread (after a tick preempts this one) neither marks nor walks as an
+        // object, so the sweep folds it into a free run and a later allocation
+        // overlaps it. An array's Length must be in place as well, or the heap
+        // walk sizes it as an empty array.
         using (InternalCpu.DisableInterruptsScope())
         {
-            return AllocObjectCore(size, flags);
+            GCObject* result = AllocObjectCore(size, flags);
+            if (result != null)
+            {
+                result->MethodTable = pMT;
+                if (pMT->HasComponentSize)
+                {
+                    result->Length = length;
+                }
+            }
+
+            return result;
         }
     }
 
