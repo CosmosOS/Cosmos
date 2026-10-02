@@ -2,5 +2,15 @@
 T:Cosmos.Kernel.Core.IO.Serial
 M:Cosmos.Kernel.Core.IO.Serial.ComInit
 M:Cosmos.Kernel.Core.IO.Serial.ComWrite(System.Byte)
-M:Cosmos.Kernel.Core.IO.Serial.TryRead(System.Byte@)
 M:Cosmos.Kernel.Core.IO.Serial.Read
+M:Cosmos.Kernel.Core.IO.Serial.TryRead(System.Byte@)
+M:Cosmos.Kernel.Core.IO.Serial.Write(System.ReadOnlySpan{System.Object})
+M:Cosmos.Kernel.Core.IO.Serial.WriteString(System.String)
+M:Cosmos.Kernel.Core.IO.Serial.WriteNumber(System.UInt64,System.Boolean)
+M:Cosmos.Kernel.Core.IO.Serial.WriteNumber(System.UInt32,System.Boolean)
+M:Cosmos.Kernel.Core.IO.Serial.WriteNumber(System.Int32,System.Boolean)
+M:Cosmos.Kernel.Core.IO.Serial.WriteNumber(System.Int64,System.Boolean)
+M:Cosmos.Kernel.Core.IO.Serial.WriteHex(System.UInt64)
+M:Cosmos.Kernel.Core.IO.Serial.WriteHex(System.UInt32)
+M:Cosmos.Kernel.Core.IO.Serial.WriteHexWithPrefix(System.UInt64)
+M:Cosmos.Kernel.Core.IO.Serial.WriteHexWithPrefix(System.UInt32)
