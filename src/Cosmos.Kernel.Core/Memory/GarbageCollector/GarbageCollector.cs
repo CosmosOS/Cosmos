@@ -119,6 +119,13 @@ internal static unsafe partial class GarbageCollector
     private static bool s_freeListsInitialized;
 
     /// <summary>
+    /// Total size of the blocks on the free lists, kept as blocks go on and off them: the
+    /// fragmentation metrics read it instead of walking the lists, which hold every gap a sweep
+    /// leaves, and the scheduler tick reads them for the debug snapshot.
+    /// </summary>
+    private static ulong s_freeListBytes;
+
+    /// <summary>
     /// MethodTable pointer used to tag <see cref="FreeBlock"/> entries in the heap.
     /// </summary>
     private static MethodTable* s_freeMethodTable;
@@ -364,6 +371,8 @@ internal static unsafe partial class GarbageCollector
             {
                 s_freeLists[i] = null;
             }
+
+            s_freeListBytes = 0;
 
             // Mark reachable objects
             MarkPhase();

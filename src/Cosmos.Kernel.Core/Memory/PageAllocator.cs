@@ -67,6 +67,20 @@ internal static unsafe class PageAllocator
     private static byte* s_heapEnd;
 
     /// <summary>
+    /// RAT index where the search for a single page starts: no page below it is empty, as
+    /// <see cref="AllocPages"/> moves it past the page it takes and <see cref="Free(uint)"/> back
+    /// to a page it frees.
+    /// </summary>
+    private static ulong s_singlePageHint;
+
+    /// <summary>
+    /// RAT index below which the search for a run of pages starts: the first page of the last run
+    /// taken, or above it when a run above it was freed since. Empty runs too short for a request
+    /// can lie above it, so a search that finds nothing below it scans the whole RAT.
+    /// </summary>
+    private static ulong s_runHint;
+
+    /// <summary>
     /// Guards the RAT and <see cref="FreePageCount"/> in <see cref="AllocPages"/>
     /// and <see cref="Free(uint)"/>. IRQ-safe because the masked heap and
     /// preemptible driver threads both allocate pages. Held over RAT reads
@@ -547,41 +561,26 @@ internal static unsafe class PageAllocator
         // thread claim the same pages.
         using (s_ratLock.AcquireIrqSafe())
         {
-            byte* startPage = null;
-
-            // Could combine with an external method or delegate, but will slow things down
-            // unless we can force it to be inlined.
             // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
-            uint xCount = 0;
+            // Each search starts where the last one of its kind ended, and scans the whole
+            // RAT before it fails: starting from the bottom (or the top) every time scanned
+            // every page allocated so far, which made filling the memory take time in the
+            // square of its size.
+            byte* startPage;
             if (aPageCount == 1)
             {
-                for (byte* ptr = s_mRAT; ptr < s_mRAT + TotalPageCount; ptr++)
+                startPage = FindEmptyPage(s_mRAT + s_singlePageHint);
+                if (startPage == null && s_singlePageHint != 0)
                 {
-                    if ((PageType)(*ptr) == PageType.Empty)
-                    {
-                        startPage = ptr;
-                        break;
-                    }
+                    startPage = FindEmptyPage(s_mRAT);
                 }
             }
             else
             {
-                // This loop will FAIL if s_mRAT is ever 0. This should be impossible though
-                // so we don't bother to account for such a case. xPos would also have issues.
-                for (byte* ptr = s_mRAT + TotalPageCount - 1; ptr >= s_mRAT; ptr--)
+                startPage = FindEmptyRun(s_mRAT + s_runHint, aPageCount);
+                if (startPage == null && s_runHint != TotalPageCount)
                 {
-                    if (*ptr == (byte)PageType.Empty)
-                    {
-                        if (++xCount == aPageCount)
-                        {
-                            startPage = ptr;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        xCount = 0;
-                    }
+                    startPage = FindEmptyRun(s_mRAT + TotalPageCount, aPageCount);
                 }
             }
 
@@ -594,6 +593,15 @@ internal static unsafe class PageAllocator
             if ((ulong)offset >= TotalPageCount)
             {
                 return null;
+            }
+
+            if (aPageCount == 1)
+            {
+                s_singlePageHint = (ulong)offset + 1;
+            }
+            else
+            {
+                s_runHint = (ulong)offset;
             }
 
             s_mRAT[offset] = (byte)aType;
@@ -621,6 +629,54 @@ internal static unsafe class PageAllocator
         }
 
         return pageAddress;
+    }
+
+    /// <summary>
+    /// Scans the RAT upwards from <paramref name="from"/> for an empty page.
+    /// </summary>
+    /// <param name="from">The RAT entry to start at.</param>
+    /// <returns>The entry of the empty page, or <c>null</c> when there is none from there.</returns>
+    private static byte* FindEmptyPage(byte* from)
+    {
+        for (byte* ptr = from; ptr < s_mRAT + TotalPageCount; ptr++)
+        {
+            if ((PageType)(*ptr) == PageType.Empty)
+            {
+                return ptr;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Scans the RAT downwards from below <paramref name="end"/> for a run of empty pages.
+    /// </summary>
+    /// <param name="end">The RAT entry above the first one to look at.</param>
+    /// <param name="aPageCount">The number of pages of the run.</param>
+    /// <returns>The entry of the first page of the run, or <c>null</c> when there is none below <paramref name="end"/>.</returns>
+    private static byte* FindEmptyRun(byte* end, ulong aPageCount)
+    {
+        ulong xCount = 0;
+
+        // This loop will FAIL if s_mRAT is ever 0. This should be impossible though
+        // so we don't bother to account for such a case. xPos would also have issues.
+        for (byte* ptr = end - 1; ptr >= s_mRAT; ptr--)
+        {
+            if (*ptr == (byte)PageType.Empty)
+            {
+                if (++xCount == aPageCount)
+                {
+                    return ptr;
+                }
+            }
+            else
+            {
+                xCount = 0;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -728,6 +784,18 @@ internal static unsafe class PageAllocator
             {
                 *p = (byte)PageType.Empty;
                 FreePageCount++;
+            }
+
+            // The searches of AllocPages find the pages again
+            if (aPageIdx < s_singlePageHint)
+            {
+                s_singlePageHint = aPageIdx;
+            }
+
+            ulong runEnd = (ulong)(p - s_mRAT);
+            if (runEnd > s_runHint)
+            {
+                s_runHint = runEnd;
             }
         }
     }

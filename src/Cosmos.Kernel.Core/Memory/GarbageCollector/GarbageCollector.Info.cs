@@ -1,7 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Runtime.InteropServices;
-using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
@@ -152,32 +151,7 @@ internal static unsafe partial class GarbageCollector
             return 0;
         }
 
-        ulong fragmented = 0;
-        if (s_freeListsInitialized && s_freeLists != null)
-        {
-            for (int i = 0; i < NumSizeClasses; i++)
-            {
-                FreeBlock* cur = s_freeLists[i];
-                int guard = 0;
-                while (cur != null)
-                {
-                    // Defensive cycle guard: a corrupted free list must degrade the
-                    // metric, not hang the collection inside DisableInterrupts.
-                    if (++guard > 1_000_000)
-                    {
-                        Serial.WriteString("[GC] BUG: free-list cycle detected walking class ");
-                        Serial.WriteNumber((uint)i);
-                        Serial.WriteString("\n");
-                        break;
-                    }
-
-                    fragmented += (uint)cur->Size;
-                    cur = cur->Next;
-                }
-            }
-        }
-
-        return fragmented;
+        return s_freeListBytes;
     }
 
     public static ulong GetPinnedObjectsCount()
@@ -476,43 +450,12 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Returns the total size in bytes of the specified generation.
-    /// Computes current fragmentation by summing sizes of free blocks in all free lists.
-    /// Other generations return 0.
+    /// Returns the current fragmentation of the specified generation: the total size of the free
+    /// blocks on the free lists. Other generations return 0.
     /// </summary>
     public static ulong GetCurrentFragmentation(int gen)
     {
-        if (gen != 0)
-        {
-            return 0;
-        }
-
-        ulong fragmented = 0;
-        if (s_freeListsInitialized && s_freeLists != null)
-        {
-            for (int i = 0; i < NumSizeClasses; i++)
-            {
-                FreeBlock* cur = s_freeLists[i];
-                int guard = 0;
-                while (cur != null)
-                {
-                    // Defensive cycle guard: a corrupted free list must degrade the
-                    // metric, not hang the collection inside DisableInterrupts.
-                    if (++guard > 1_000_000)
-                    {
-                        Serial.WriteString("[GC] BUG: free-list cycle detected walking class ");
-                        Serial.WriteNumber((uint)i);
-                        Serial.WriteString("\n");
-                        break;
-                    }
-
-                    fragmented += (uint)cur->Size;
-                    cur = cur->Next;
-                }
-            }
-        }
-
-        return fragmented;
+        return gen == 0 ? s_freeListBytes : 0;
     }
 
     /// <summary>
