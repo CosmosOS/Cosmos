@@ -2,6 +2,7 @@
 // Ported from Cosmos.HAL2/PS2Controller.cs
 
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.Devices.Input;
@@ -36,6 +37,20 @@ internal class PS2Controller : Device
 
     public const byte Ack = 0xFA;
     public const uint WAIT_TIMEOUT = 100000;
+
+    /// <summary>Status bit 0: a byte is waiting in the output buffer.</summary>
+    private const byte StatusOutputFull = 0x01;
+
+    /// <summary>Status bit 5: the waiting byte came from the second port.</summary>
+    private const byte StatusSecondPortData = 0x20;
+
+    /// <summary>
+    /// The configuration byte as last written. It is not read back once the
+    /// devices report: the reply shares the output buffer with their bytes, so a
+    /// key or a mouse byte would be read and written back as the configuration,
+    /// and the keyboard IRQ handler would take the reply for a key.
+    /// </summary>
+    private byte _configByte;
 
     public bool IsDualChannel;
     public bool SelfTestPassed;
@@ -125,7 +140,20 @@ internal class PS2Controller : Device
             SendCommand(Command.EnableSecondPS2Port);
         }
 
+        // configByte was read while the first port was disabled: clear the clock
+        // disable bit (4, 5) of each port just enabled, or this write disables it again
+        if (FirstPortTestPassed)
+        {
+            configByte = (byte)(configByte & ~0b0001_0000);
+        }
+
+        if (SecondPortTestPassed)
+        {
+            configByte = (byte)(configByte & ~0b0010_0000);
+        }
+
         SendCommand(Command.SetConfigurationByte, configByte);
+        _configByte = configByte;
 
         if (FirstPortTestPassed)
         {
@@ -267,22 +295,19 @@ internal class PS2Controller : Device
             return;
         }
 
-        // Read current configuration byte
-        SendCommand(Command.GetConfigurationByte);
-        byte configByte = ReadData();
-
-        // Set the interrupt enable bit for the requested port
+        // Set the interrupt enable bit for the requested port (in the cached
+        // configuration byte: see _configByte)
         if (port == 1)
         {
-            configByte |= 0b01;  // Bit 0: First port interrupt enable
+            _configByte |= 0b01;  // Bit 0: First port interrupt enable
         }
         else
         {
-            configByte |= 0b10;  // Bit 1: Second port interrupt enable
+            _configByte |= 0b10;  // Bit 1: Second port interrupt enable
         }
 
         // Write updated configuration byte
-        SendCommand(Command.SetConfigurationByte, configByte);
+        SendCommand(Command.SetConfigurationByte, _configByte);
 
         // Drain any spurious data that might have arrived
         while ((Native.IO.Read8(PS2Ports.Status) & 0x01) != 0)
@@ -313,6 +338,42 @@ internal class PS2Controller : Device
 
         // Unmask at I/O APIC
         Cosmos.Kernel.Core.X64.Cpu.ApicManager.UnmaskIrq(irq);
+
+        // The line is edge-triggered and the I/O APIC drops an edge on a masked
+        // pin: a byte that came since the drain keeps its line high with no
+        // interrupt to come, and as both ports share the output buffer, neither
+        // would interrupt again. Hand it to its device; the next byte raises an edge.
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            HandleOutputBuffer();
+        }
+    }
+
+    /// <summary>
+    /// Reads the byte waiting in the output buffer, if any, and hands it to
+    /// the device it came from (status bit 5). Both IRQ handlers call it
+    /// instead of reading the data port blindly: on a spurious interrupt the
+    /// data port repeats its last byte, and a byte must never reach the other
+    /// device's handler. IRQ context or interrupts disabled.
+    /// </summary>
+    internal static void HandleOutputBuffer()
+    {
+        byte status = Native.IO.Read8(PS2Ports.Status);
+        if ((status & StatusOutputFull) == 0)
+        {
+            return;
+        }
+
+        byte data = Native.IO.Read8(PS2Ports.Data);
+
+        if ((status & StatusSecondPortData) != 0)
+        {
+            PS2Mouse.HandleByte(data);
+        }
+        else
+        {
+            PS2Keyboard.HandleScanCode(data);
+        }
     }
 
     /// <summary>

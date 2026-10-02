@@ -129,9 +129,18 @@ internal class PS2Keyboard : KeyboardDevice
     /// </summary>
     private static void StaticHandleIRQ(ref IRQContext context)
     {
-        // Read scancode from port 0x60
-        byte scanCode = Native.IO.Read8(0x60);
+        // Status first, then the byte goes to the device it came from
+        PS2Controller.HandleOutputBuffer();
 
+        // EOI is sent by InterruptManager.Dispatch after this handler returns
+    }
+
+    /// <summary>
+    /// Handles one byte from the first PS/2 port. IRQ context or interrupts disabled.
+    /// </summary>
+    /// <param name="scanCode">The byte read from the data port.</param>
+    internal static void HandleScanCode(byte scanCode)
+    {
         // Skip invalid scan codes (0x00 and 0xFF are invalid)
         if (scanCode == 0 || scanCode == 0xFF)
         {
@@ -168,8 +177,6 @@ internal class PS2Keyboard : KeyboardDevice
         {
             s_instance.OnKeyPressed.Invoke(scanCode, released);
         }
-
-        // EOI is sent by InterruptManager.Dispatch after this handler returns
     }
 
     /// <summary>

@@ -3,6 +3,7 @@
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.Core.X64.Cpu;
 using Cosmos.Kernel.HAL.Devices.Input;
 
 namespace Cosmos.Kernel.HAL.X64.Devices.Input;
@@ -32,6 +33,15 @@ internal class PS2Mouse : MouseDevice
     private static byte[] s_packet = new byte[4];
     private static int s_packetIndex = 0;
     private static bool s_hasScrollWheel = false;
+
+    /// <summary>
+    /// The bytes of one packet arrive about a millisecond apart: a partial
+    /// packet whose next byte comes later than this lost its other bytes.
+    /// </summary>
+    private const ulong ResyncMilliseconds = 100;
+
+    /// <summary>TSC value when the last packet byte arrived.</summary>
+    private static ulong s_lastByteTsc;
 
     /// <summary>
     /// Registers IRQ handler for mouse interrupts.
@@ -147,8 +157,36 @@ internal class PS2Mouse : MouseDevice
     /// </summary>
     private static void StaticHandleIRQ(ref IRQContext context)
     {
-        // Read byte from port 0x60
-        byte data = Native.IO.Read8(0x60);
+        // Status first, then the byte goes to the device it came from
+        PS2Controller.HandleOutputBuffer();
+
+        // EOI is sent by InterruptManager.Dispatch after this handler returns
+    }
+
+    /// <summary>
+    /// Handles one byte from the second PS/2 port. IRQ context or interrupts disabled.
+    /// </summary>
+    /// <param name="data">The byte read from the data port.</param>
+    internal static void HandleByte(byte data)
+    {
+        // The packets have no framing: one lost or extra byte (a command ACK, a
+        // byte read elsewhere) would shift every packet after it for good. A
+        // partial packet whose next byte is late lost the rest of its bytes.
+        ulong now = X64CpuOps.ReadTSC();
+        if (s_packetIndex != 0 && now - s_lastByteTsc > (ulong)X64CpuOps.TscFrequency / 1000 * ResyncMilliseconds)
+        {
+            s_packetIndex = 0;
+        }
+
+        s_lastByteTsc = now;
+
+        // Byte 0 always has bit 3 set, and no overflow bit (6, 7) in a packet
+        // worth decoding: skip any other byte until one can start a packet. This
+        // also skips ACK 0xFA, resend 0xFE, BAT 0xAA and 0x00.
+        if (s_packetIndex == 0 && (data & 0xC8) != 0x08)
+        {
+            return;
+        }
 
         // Add to packet buffer
         s_packet[s_packetIndex] = data;
@@ -159,13 +197,6 @@ internal class PS2Mouse : MouseDevice
         if (s_packetIndex >= packetSize)
         {
             s_packetIndex = 0;
-
-            // Validate packet (bit 3 of first byte should always be 1)
-            if ((s_packet[0] & 0x08) != 0x08)
-            {
-                // Invalid packet, skip it
-                return;
-            }
 
             // Parse packet
             bool leftButton = (s_packet[0] & 0x01) != 0;
@@ -206,8 +237,6 @@ internal class PS2Mouse : MouseDevice
                 s_instance.OnMouseEvent?.Invoke(deltaX, deltaY, deltaZ, leftButton, rightButton, middleButton);
             }
         }
-
-        // EOI is sent by InterruptManager.Dispatch after this handler returns
     }
 
     /// <summary>
