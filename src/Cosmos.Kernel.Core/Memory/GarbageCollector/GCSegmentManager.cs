@@ -7,9 +7,13 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 internal unsafe struct GCSegmentManager
 {
     /// <summary>
-    /// Default segment size. Grows as needed.
+    /// Smallest run of pages a segment takes; larger requests get a run of their size. A segment
+    /// sized for one TLAB refill (8 KB) took three pages whose last third no refill fits in, so a
+    /// third of the heap never held a TLAB; and the three-page holes such segments leave were too
+    /// small for any larger request, which the page allocator then looked for through its whole
+    /// table. Sixteen pages hold seven refills.
     /// </summary>
-    private static readonly uint s_minSegmentSize = (uint)PageAllocator.PageSize;
+    private const ulong MinSegmentPages = 16;
 
     /// <summary>
     /// Bytes excluded from the tail of every <see cref="GarbageCollector.FreeBlock"/> so the runtime object
@@ -28,11 +32,23 @@ internal unsafe struct GCSegmentManager
     /// <returns>Pointer to the initialized segment, or <c>null</c> if page allocation fails.</returns>
     public GCSegment* AllocateSegment(uint requestedSize)
     {
-        uint size = requestedSize < s_minSegmentSize ? s_minSegmentSize : requestedSize;
-        long totalSlots = size / IntPtr.Size;
-        uint brickTableLength = Align((uint)((totalSlots + GCSegment.SlotsPerChunk - 1) / GCSegment.SlotsPerChunk));
-        uint totalSize = size + (uint)sizeof(GCSegment) + ReservedHeaderSlotSize + brickTableLength;
-        ulong pageCount = (totalSize + PageAllocator.PageSize - 1) / PageAllocator.PageSize;
+        // The header (this struct, the reserved slot and the brick table) shares the run with the
+        // objects. The brick table gets an entry per chunk of the whole run, so it covers every
+        // object start the run can hold, however much room the rounding up to pages leaves.
+        ulong pageCount = MinSegmentPages;
+        uint brickTableLength;
+        while (true)
+        {
+            long totalSlots = (long)(pageCount * PageAllocator.PageSize) / IntPtr.Size;
+            brickTableLength = Align((uint)((totalSlots + GCSegment.SlotsPerChunk - 1) / GCSegment.SlotsPerChunk));
+            ulong totalSize = (ulong)requestedSize + Align((uint)sizeof(GCSegment)) + ReservedHeaderSlotSize + brickTableLength;
+            if (totalSize <= pageCount * PageAllocator.PageSize)
+            {
+                break;
+            }
+
+            pageCount = (totalSize + PageAllocator.PageSize - 1) / PageAllocator.PageSize;
+        }
 
         var memory = (byte*)PageAllocator.AllocPages(PageType.GCHeap, pageCount, true);
         if (memory == null)
