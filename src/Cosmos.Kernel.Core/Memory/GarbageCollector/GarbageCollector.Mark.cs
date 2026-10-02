@@ -2,7 +2,6 @@
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Internal.Runtime;
@@ -142,98 +141,92 @@ internal static unsafe partial class GarbageCollector
             return;
         }
 
-        if (thread.State != SchedulerThreadState.Running)
-        {
-            Scheduler.ThreadContext* ctx = thread.GetContext();
-            if (ctx != null)
-            {
-#if ARCH_ARM64
-                // Scan all general-purpose registers X0-X30
-                TryMarkRoot((nint)ctx->X0);
-                TryMarkRoot((nint)ctx->X1);
-                TryMarkRoot((nint)ctx->X2);
-                TryMarkRoot((nint)ctx->X3);
-                TryMarkRoot((nint)ctx->X4);
-                TryMarkRoot((nint)ctx->X5);
-                TryMarkRoot((nint)ctx->X6);
-                TryMarkRoot((nint)ctx->X7);
-                TryMarkRoot((nint)ctx->X8);
-                TryMarkRoot((nint)ctx->X9);
-                TryMarkRoot((nint)ctx->X10);
-                TryMarkRoot((nint)ctx->X11);
-                TryMarkRoot((nint)ctx->X12);
-                TryMarkRoot((nint)ctx->X13);
-                TryMarkRoot((nint)ctx->X14);
-                TryMarkRoot((nint)ctx->X15);
-                TryMarkRoot((nint)ctx->X16);
-                TryMarkRoot((nint)ctx->X17);
-                TryMarkRoot((nint)ctx->X18);
-                TryMarkRoot((nint)ctx->X19);
-                TryMarkRoot((nint)ctx->X20);
-                TryMarkRoot((nint)ctx->X21);
-                TryMarkRoot((nint)ctx->X22);
-                TryMarkRoot((nint)ctx->X23);
-                TryMarkRoot((nint)ctx->X24);
-                TryMarkRoot((nint)ctx->X25);
-                TryMarkRoot((nint)ctx->X26);
-                TryMarkRoot((nint)ctx->X27);
-                TryMarkRoot((nint)ctx->X28);
-                TryMarkRoot((nint)ctx->X29);  // FP (Frame Pointer)
-                TryMarkRoot((nint)ctx->X30);  // LR (Link Register)
-                TryMarkRoot((nint)ctx->Sp);   // Stack Pointer
-                TryMarkRoot((nint)ctx->Elr);  // Exception Link Register (return address)
-#else
-                // x64: Scan all general-purpose registers
-                TryMarkRoot((nint)ctx->Rax);
-                TryMarkRoot((nint)ctx->Rbx);
-                TryMarkRoot((nint)ctx->Rcx);
-                TryMarkRoot((nint)ctx->Rdx);
-                TryMarkRoot((nint)ctx->Rsi);
-                TryMarkRoot((nint)ctx->Rdi);
-                TryMarkRoot((nint)ctx->Rbp);
-                TryMarkRoot((nint)ctx->R8);
-                TryMarkRoot((nint)ctx->R9);
-                TryMarkRoot((nint)ctx->R10);
-                TryMarkRoot((nint)ctx->R11);
-                TryMarkRoot((nint)ctx->R12);
-                TryMarkRoot((nint)ctx->R13);
-                TryMarkRoot((nint)ctx->R14);
-                TryMarkRoot((nint)ctx->R15);
-#endif
-            }
-        }
-
-        // Determine stack range to scan
-        nuint stackStart;
-        nuint stackEnd;
-
+        // ScanStackRoots never passes the current thread, so a thread still marked Running here is
+        // another CPU's: the idle thread of an application processor, which Cosmos does not start
+        // yet. It never ran, so it has no saved context and no stack. Scanning it from this CPU's
+        // stack pointer up to BootStack.Top read, on a multi-core machine, whatever memory lies
+        // between the collecting thread's stack and the boot stack.
         if (thread.State == SchedulerThreadState.Running)
         {
-            // For the currently running thread, thread.StackPointer is stale (saved
-            // during the last context switch). Use the actual RSP instead.
-            stackStart = ContextSwitchNative.GetSp();
+            return;
+        }
 
-            if (thread.StackBase != 0 && thread.StackSize != 0)
-            {
-                // Regular scheduled thread with allocated stack
-                stackEnd = thread.StackBase + thread.StackSize;
-            }
-            else
-            {
-                // Boot/idle thread uses the bootloader's stack — no StackBase/StackSize.
-                stackEnd = GetCurrentStackEndForBootStack();
-            }
+        Scheduler.ThreadContext* ctx = thread.GetContext();
+        if (ctx != null)
+        {
+#if ARCH_ARM64
+            // Scan all general-purpose registers X0-X30
+            TryMarkConservativeRoot((nint)ctx->X0);
+            TryMarkConservativeRoot((nint)ctx->X1);
+            TryMarkConservativeRoot((nint)ctx->X2);
+            TryMarkConservativeRoot((nint)ctx->X3);
+            TryMarkConservativeRoot((nint)ctx->X4);
+            TryMarkConservativeRoot((nint)ctx->X5);
+            TryMarkConservativeRoot((nint)ctx->X6);
+            TryMarkConservativeRoot((nint)ctx->X7);
+            TryMarkConservativeRoot((nint)ctx->X8);
+            TryMarkConservativeRoot((nint)ctx->X9);
+            TryMarkConservativeRoot((nint)ctx->X10);
+            TryMarkConservativeRoot((nint)ctx->X11);
+            TryMarkConservativeRoot((nint)ctx->X12);
+            TryMarkConservativeRoot((nint)ctx->X13);
+            TryMarkConservativeRoot((nint)ctx->X14);
+            TryMarkConservativeRoot((nint)ctx->X15);
+            TryMarkConservativeRoot((nint)ctx->X16);
+            TryMarkConservativeRoot((nint)ctx->X17);
+            TryMarkConservativeRoot((nint)ctx->X18);
+            TryMarkConservativeRoot((nint)ctx->X19);
+            TryMarkConservativeRoot((nint)ctx->X20);
+            TryMarkConservativeRoot((nint)ctx->X21);
+            TryMarkConservativeRoot((nint)ctx->X22);
+            TryMarkConservativeRoot((nint)ctx->X23);
+            TryMarkConservativeRoot((nint)ctx->X24);
+            TryMarkConservativeRoot((nint)ctx->X25);
+            TryMarkConservativeRoot((nint)ctx->X26);
+            TryMarkConservativeRoot((nint)ctx->X27);
+            TryMarkConservativeRoot((nint)ctx->X28);
+            TryMarkConservativeRoot((nint)ctx->X29);  // FP (Frame Pointer)
+            TryMarkConservativeRoot((nint)ctx->X30);  // LR (Link Register)
+            TryMarkConservativeRoot((nint)ctx->Sp);   // Stack Pointer
+            TryMarkConservativeRoot((nint)ctx->Elr);  // Exception Link Register (return address)
+#else
+            // x64: Scan all general-purpose registers
+            TryMarkConservativeRoot((nint)ctx->Rax);
+            TryMarkConservativeRoot((nint)ctx->Rbx);
+            TryMarkConservativeRoot((nint)ctx->Rcx);
+            TryMarkConservativeRoot((nint)ctx->Rdx);
+            TryMarkConservativeRoot((nint)ctx->Rsi);
+            TryMarkConservativeRoot((nint)ctx->Rdi);
+            TryMarkConservativeRoot((nint)ctx->Rbp);
+            TryMarkConservativeRoot((nint)ctx->R8);
+            TryMarkConservativeRoot((nint)ctx->R9);
+            TryMarkConservativeRoot((nint)ctx->R10);
+            TryMarkConservativeRoot((nint)ctx->R11);
+            TryMarkConservativeRoot((nint)ctx->R12);
+            TryMarkConservativeRoot((nint)ctx->R13);
+            TryMarkConservativeRoot((nint)ctx->R14);
+            TryMarkConservativeRoot((nint)ctx->R15);
+#endif
+        }
+
+        // The saved context, and the suspended thread's frames above it, start at StackPointer.
+        nuint stackStart = thread.StackPointer;
+        nuint stackEnd;
+        if (thread.StackBase != 0 && thread.StackSize != 0)
+        {
+            stackEnd = thread.StackBase + thread.StackSize;
+        }
+        else if (stackStart != 0 && thread.CpuId == 0 && (thread.Flags & SchedulerThreadFlags.IdleThread) != 0)
+        {
+            // The boot/idle thread (the kernel's main thread) has no StackBase/StackSize: it
+            // runs on the bootloader stack, where the IRQ stub that switched it out saved its
+            // context, at StackPointer. Skipping it lost every main-thread stack root whenever
+            // another thread collected.
+            stackEnd = GetCurrentStackEndForBootStack();
         }
         else
         {
-            // Suspended thread — use saved StackPointer
-            if (thread.StackBase == 0 || thread.StackSize == 0)
-            {
-                return;
-            }
-
-            stackStart = thread.StackPointer;
-            stackEnd = thread.StackBase + thread.StackSize;
+            return;
         }
 
         if (stackStart < stackEnd)
@@ -251,16 +244,45 @@ internal static unsafe partial class GarbageCollector
     {
         for (nint* ptr = start; ptr < end; ptr++)
         {
-            TryMarkRoot(*ptr);
+            TryMarkConservativeRoot(*ptr);
         }
     }
 
     /// <summary>
-    /// Attempts to mark a potential object reference. Validates that the pointer looks like a
-    /// valid GC object (MethodTable outside heap) before marking and enumerating its references.
-    /// Uses an iterative mark stack to avoid deep recursion.
+    /// Marks the object a conservatively scanned word (a stack slot, a saved register) refers to.
+    /// The word may be an object reference, an interior pointer (a byref, a span, the <c>this</c>
+    /// of a struct method called on a field) or any value that happens to fall in the heap, so it
+    /// is first resolved to the object whose extent contains it by <see cref="GetParentObject"/>.
+    /// Handing the raw value to <see cref="TryMarkRoot"/> read whatever word it pointed at as a
+    /// MethodTable: a field holding a kernel address (the GCHandle in
+    /// <c>ThreadWaitInfo._waitMonitor</c>, reached through the <c>LowLevelMonitor</c> byref a
+    /// waiting thread keeps in a callee-saved register) passed the MethodTable checks and had the
+    /// mark bit ORed into it for good, since the sweep only unmarks object starts; and the object
+    /// that contains an interior pointer was not kept alive.
     /// </summary>
-    /// <param name="value">Potential object pointer to investigate.</param>
+    /// <param name="value">The word found on the stack or in a saved register.</param>
+    private static void TryMarkConservativeRoot(nint value)
+    {
+        if (!IsInGCHeap(value))
+        {
+            return;
+        }
+
+        GCObject* obj = GetParentObject((byte*)value);
+        if (obj != null)
+        {
+            TryMarkRoot((nint)obj);
+        }
+    }
+
+    /// <summary>
+    /// Marks an object and everything reachable from it. <paramref name="value"/> must be an
+    /// object start (a handle target, a precise GCInfo slot, a GCDesc reference); a word found by
+    /// conservative scanning goes through <see cref="TryMarkConservativeRoot"/> first. Validates
+    /// that the pointer looks like a valid GC object (MethodTable outside heap) before marking and
+    /// enumerating its references. Uses an iterative mark stack to avoid deep recursion.
+    /// </summary>
+    /// <param name="value">Object pointer to mark.</param>
     [MethodImpl(MethodImplOptions.NoOptimization)]
     private static void TryMarkRoot(nint value)
     {
