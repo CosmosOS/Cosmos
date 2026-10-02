@@ -82,9 +82,13 @@ public static class Serial
     private const string FALSE = "FALSE";
 
     /// <summary>
-    /// Write a single byte to the serial port.
-    /// Waits for transmit buffer to be ready before writing.
+    /// Writes a single byte to the serial port.
     /// </summary>
+    /// <param name="value">The byte value to write.</param>
+    /// <remarks>
+    /// Waits for the transmit buffer to be ready before writing.
+    /// This method is a no-op if UART is disabled via <see cref="CosmosFeatures.UARTEnabled"/>
+    /// </remarks>
     public static void ComWrite(byte value)
     {
         if (CosmosFeatures.UARTEnabled)
@@ -109,9 +113,12 @@ public static class Serial
     }
 
     /// <summary>
-    /// Initialize the serial port for 115200 baud, 8N1.
-    /// Called from managed Kernel.Initialize()
+    /// Initializes the serial port for 115200 baud, 8 data bits, no parity, 1 stop bit (8N1).
     /// </summary>
+    /// <remarks>
+    /// Called from managed Kernel.Initialize().
+    /// This method is a no-op if UART is disabled via <see cref="CosmosFeatures.UARTEnabled"/>
+    /// </remarks>
     public static void ComInit()
     {
         if (CosmosFeatures.UARTEnabled)
@@ -162,6 +169,13 @@ public static class Serial
         }
     }
 
+    /// <summary>
+    /// Writes a string to the serial port, character by character.
+    /// </summary>
+    /// <param name="str">The string to write.</param>
+    /// <remarks>
+    /// Also echoes each character to the early GOP (graphics output protocol) display for debugging.
+    /// </remarks>
     public static unsafe void WriteString(string str)
     {
         fixed (char* ptr = str)
@@ -174,6 +188,14 @@ public static class Serial
         }
     }
 
+    /// <summary>
+    /// Writes an unsigned 64-bit integer to the serial port in decimal or hexadecimal format.
+    /// </summary>
+    /// <param name="number">The number to write.</param>
+    /// <param name="hex">If true, writes in hexadecimal; otherwise, writes in decimal.</param>
+    /// <remarks>
+    /// Also echoes each digit to the early GOP display for debugging.
+    /// </remarks>
     public static unsafe void WriteNumber(ulong number, bool hex = false)
     {
         if (number == 0)
@@ -211,11 +233,21 @@ public static class Serial
         }
     }
 
+    /// <summary>
+    /// Writes an unsigned 32-bit integer to the serial port in decimal or hexadecimal format.
+    /// </summary>
+    /// <param name="number">The number to write.</param>
+    /// <param name="hex">If true, writes in hexadecimal; otherwise, writes in decimal.</param>
     public static void WriteNumber(uint number, bool hex = false)
     {
         WriteNumber((ulong)number, hex);
     }
 
+    /// <summary>
+    /// Writes a signed 32-bit integer to the serial port in decimal or hexadecimal format.
+    /// </summary>
+    /// <param name="number">The number to write.</param>
+    /// <param name="hex">If true, writes in hexadecimal; otherwise, writes in decimal.</param>
     public static void WriteNumber(int number, bool hex = false)
     {
         if (number < 0)
@@ -230,6 +262,11 @@ public static class Serial
         }
     }
 
+    /// <summary>
+    /// Writes a signed 64-bit integer to the serial port in decimal or hexadecimal format.
+    /// </summary>
+    /// <param name="number">The number to write.</param>
+    /// <param name="hex">If true, writes in hexadecimal; otherwise, writes in decimal.</param>
     public static void WriteNumber(long number, bool hex = false)
     {
         if (number < 0)
@@ -244,28 +281,51 @@ public static class Serial
         }
     }
 
+    /// <summary>
+    /// Writes an unsigned 64-bit integer to the serial port in hexadecimal format.
+    /// </summary>
+    /// <param name="number">The number to write.</param>
     public static void WriteHex(ulong number)
     {
         WriteNumber(number, true);
     }
 
+    /// <summary>
+    /// Writes an unsigned 32-bit integer to the serial port in hexadecimal format.
+    /// </summary>
+    /// <param name="number">The number to write.</param>
     public static void WriteHex(uint number)
     {
         WriteNumber((ulong)number, true);
     }
 
+    /// <summary>
+    /// Writes an unsigned 64-bit integer to the serial port in hexadecimal format with "0x" prefix.
+    /// </summary>
+    /// <param name="number">The number to write.</param>
     public static void WriteHexWithPrefix(ulong number)
     {
         WriteString("0x");
         WriteNumber(number, true);
     }
 
+    /// <summary>
+    /// Writes an unsigned 32-bit integer to the serial port in hexadecimal format with "0x" prefix.
+    /// </summary>
+    /// <param name="number">The number to write.</param>
     public static void WriteHexWithPrefix(uint number)
     {
         WriteString("0x");
         WriteNumber((ulong)number, true);
     }
 
+    /// <summary>
+    /// Writes multiple objects to the serial port, formatting each according to its type.
+    /// </summary>
+    /// <param name="args">The objects to write. Supported types: null, string, char, numeric types, bool, byte, byte[].</param>
+    /// <remarks>
+    /// Each object is formatted and written sequentially. Unknown types use ToString().
+    /// </remarks>
     public static void Write(params ReadOnlySpan<object?> args)
     {
         for (int i = 0; i < args.Length; i++)
@@ -319,10 +379,13 @@ public static class Serial
     }
 
     /// <summary>
-    /// Attempt to read a byte from the serial port without blocking.
+    /// Attempts to read a byte from the serial port without blocking.
     /// </summary>
-    /// <param name="data">The byte read, if available.</param>
-    /// <returns>true if a byte was read; false if no data is ready.</returns>
+    /// <param name="data">When this method returns, contains the byte read if available; otherwise, 0.</param>
+    /// <returns><see langword="true"/> if a byte was read; <see langword="false"/> if no data is ready.</returns>
+    /// <remarks>
+    /// This method is a no-op and returns false if UART is disabled via <see cref="CosmosFeatures.UARTEnabled"/>
+    /// </remarks>
     public static bool TryRead(out byte data)
     {
         if (!CosmosFeatures.UARTEnabled)
@@ -355,8 +418,12 @@ public static class Serial
     }
 
     /// <summary>
-    /// Blocking read of a single byte from the serial port.
+    /// Reads a single byte from the serial port, blocking until data is available.
     /// </summary>
+    /// <returns>The byte read from the serial port.</returns>
+    /// <remarks>
+    /// Busy-waits until a byte is available. In a more sophisticated implementation, this could yield.
+    /// </remarks>
     public static byte Read()
     {
         byte b;

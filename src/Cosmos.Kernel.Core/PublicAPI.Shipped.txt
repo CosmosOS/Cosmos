@@ -1,16 +1,16 @@
 #nullable enable
-T:Cosmos.Kernel.Core.IO.Serial
-M:Cosmos.Kernel.Core.IO.Serial.ComInit
-M:Cosmos.Kernel.Core.IO.Serial.ComWrite(System.Byte)
-M:Cosmos.Kernel.Core.IO.Serial.Read
-M:Cosmos.Kernel.Core.IO.Serial.TryRead(System.Byte@)
-M:Cosmos.Kernel.Core.IO.Serial.Write(System.ReadOnlySpan{System.Object})
-M:Cosmos.Kernel.Core.IO.Serial.WriteString(System.String)
-M:Cosmos.Kernel.Core.IO.Serial.WriteNumber(System.UInt64,System.Boolean)
-M:Cosmos.Kernel.Core.IO.Serial.WriteNumber(System.UInt32,System.Boolean)
-M:Cosmos.Kernel.Core.IO.Serial.WriteNumber(System.Int32,System.Boolean)
-M:Cosmos.Kernel.Core.IO.Serial.WriteNumber(System.Int64,System.Boolean)
-M:Cosmos.Kernel.Core.IO.Serial.WriteHex(System.UInt64)
-M:Cosmos.Kernel.Core.IO.Serial.WriteHex(System.UInt32)
-M:Cosmos.Kernel.Core.IO.Serial.WriteHexWithPrefix(System.UInt64)
-M:Cosmos.Kernel.Core.IO.Serial.WriteHexWithPrefix(System.UInt32)
+Cosmos.Kernel.Core.IO.Serial
+static Cosmos.Kernel.Core.IO.Serial.ComInit() -> void
+static Cosmos.Kernel.Core.IO.Serial.ComWrite(byte value) -> void
+static Cosmos.Kernel.Core.IO.Serial.Read() -> byte
+static Cosmos.Kernel.Core.IO.Serial.TryRead(out byte data) -> bool
+static Cosmos.Kernel.Core.IO.Serial.Write(params System.ReadOnlySpan<object?> args) -> void
+static Cosmos.Kernel.Core.IO.Serial.WriteString(string str) -> void
+static Cosmos.Kernel.Core.IO.Serial.WriteNumber(ulong number, bool hex = false) -> void
+static Cosmos.Kernel.Core.IO.Serial.WriteNumber(uint number, bool hex = false) -> void
+static Cosmos.Kernel.Core.IO.Serial.WriteNumber(int number, bool hex = false) -> void
+static Cosmos.Kernel.Core.IO.Serial.WriteNumber(long number, bool hex = false) -> void
+static Cosmos.Kernel.Core.IO.Serial.WriteHex(ulong number) -> void
+static Cosmos.Kernel.Core.IO.Serial.WriteHex(uint number) -> void
+static Cosmos.Kernel.Core.IO.Serial.WriteHexWithPrefix(ulong number) -> void
+static Cosmos.Kernel.Core.IO.Serial.WriteHexWithPrefix(uint number) -> void
