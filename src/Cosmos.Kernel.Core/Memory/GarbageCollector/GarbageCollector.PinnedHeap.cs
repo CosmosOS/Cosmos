@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.IO;
 using Internal.Runtime;
 
@@ -87,29 +86,6 @@ internal static unsafe partial class GarbageCollector
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Checks if a pointer falls within any pinned heap segment.
-    /// </summary>
-    /// <param name="ptr">The pointer to test.</param>
-    /// <returns><c>true</c> if <paramref name="ptr"/> is inside a pinned segment; otherwise, <c>false</c>.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool IsInPinnedHeap(nint ptr)
-    {
-        byte* p = (byte*)ptr;
-        GCSegment* segment = s_pinnedSegmentManager.Segments;
-        while (segment != null)
-        {
-            if (p >= segment->Start && p < segment->End)
-            {
-                return true;
-            }
-
-            segment = segment->Next;
-        }
-
-        return false;
     }
 
     /// <summary>
@@ -323,7 +299,5 @@ internal static unsafe partial class GarbageCollector
         // from the list, so their objects are never found from a root again.
         s_pinnedSegmentManager.TailSegment = tail;
         s_currentPinnedSegment = semiHead != null ? semiHead : freeHead;
-
-        s_heapRangeDirty = true;
     }
 }

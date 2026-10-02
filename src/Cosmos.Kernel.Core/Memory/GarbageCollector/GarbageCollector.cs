@@ -152,21 +152,6 @@ internal static unsafe partial class GarbageCollector
     private const uint MaxSegmentSize = (uint)PageAllocator.PageSize;
 
     /// <summary>
-    /// Lowest address across all GC segments (for fast heap range pre-check).
-    /// </summary>
-    private static byte* s_gcHeapMin;
-
-    /// <summary>
-    /// Highest address across all GC segments (for fast heap range pre-check).
-    /// </summary>
-    private static byte* s_gcHeapMax;
-
-    /// <summary>
-    /// Set to <c>true</c> when segments are added or removed, triggering a range recomputation.
-    /// </summary>
-    private static bool s_heapRangeDirty;
-
-    /// <summary>
     /// Stack used during the mark phase for iterative object traversal.
     /// </summary>
     private static nint* s_markStack;
@@ -185,6 +170,24 @@ internal static unsafe partial class GarbageCollector
     /// Number of pages currently backing the mark stack.
     /// </summary>
     private static ulong s_markStackPageCount = 1;
+
+    /// <summary>
+    /// Set when the mark stack could not grow during this collection. A collection runs when the
+    /// heap is out of pages, so a failed growth would fail again: the rest of the mark phase works
+    /// within the capacity it has.
+    /// </summary>
+    private static bool s_markStackFull;
+
+    /// <summary>
+    /// Lowest address of a marked object that a full mark stack left unscanned, or <c>null</c>
+    /// when there is none. See <see cref="ProcessMarkOverflow"/>.
+    /// </summary>
+    private static byte* s_markOverflowMin;
+
+    /// <summary>
+    /// Highest address of a marked object that a full mark stack left unscanned.
+    /// </summary>
+    private static byte* s_markOverflowMax;
 
     /// <summary>
     /// Whether the GC has been initialized.
@@ -301,8 +304,6 @@ internal static unsafe partial class GarbageCollector
         // Allocate initial segment
         s_currentSegment = s_segmentManager.AllocateSegment(MaxSegmentSize);
         s_lastSegment = s_currentSegment;
-        s_heapRangeDirty = true;
-        RecomputeHeapRange();
         if (s_segmentManager.Segments == null)
         {
             Serial.WriteString("[GC] ERROR: Failed to allocate initial segment\n");
@@ -376,7 +377,6 @@ internal static unsafe partial class GarbageCollector
             // Reorder segments and free empty ones
             ReorderSegmentsAndFreeEmpty();
             ReorderPinnedSegmentsAndFreeEmpty();
-            RecomputeHeapRange();
 
             // Record post-GC metrics
             s_lastGen0SizeAfter = GetGenerationSize(0);

@@ -76,25 +76,6 @@ internal unsafe struct GCSegmentManager
     }
 
     /// <summary>
-    /// Returns the segment containing the specified pointer, or <c>null</c> if the pointer is not within any segment.
-    /// </summary>
-    /// <param name="ptr">The pointer to check.</param>
-    /// <returns></returns>
-    public readonly GCSegment* GetSegmentContaining(void* ptr)
-    {
-        var current = Segments;
-        while (current != null)
-        {
-            if (ptr >= current->Start && ptr < current->End)
-            {
-                return current;
-            }
-            current = current->Next;
-        }
-        return null;
-    }
-
-    /// <summary>
     /// Frees a GC segment.
     /// </summary>
     /// <param name="segment">The segment to free.</param>
