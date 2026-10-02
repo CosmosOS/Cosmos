@@ -97,6 +97,10 @@ internal sealed class FatSuperblock : IVfsSuperblock
 
     public FatInode GetOrCreateInode(FatInode parent, FatDirEntry entry)
     {
+        // TODO: one inode per file, empty files included. The cache is keyed by first cluster, which an
+        // empty file does not have: each open of one gets an inode of its own, so a handle opened
+        // before another wrote to the file reads it as empty still (files.lua of the Lua 5.5 test
+        // suite, which reads through one handle what it wrote through another).
         if (entry.FirstCluster >= FatTable.FirstDataCluster && _inodeCache.TryGetValue(entry.FirstCluster, out FatInode? cached))
         {
             cached.Name = entry.Name;
