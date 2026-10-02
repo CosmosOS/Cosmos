@@ -187,7 +187,9 @@ internal static unsafe partial class GarbageCollector
     /// local), not the heap the object was allocated on, and the pinned sweep's free runs feed the
     /// shared free lists, so SOH TLABs can sit inside pinned segments.
     /// </remarks>
-    /// <param name="interior">The pointer reported by the GCInfo decoder.</param>
+    /// <param name="interior">
+    /// The pointer reported by the GCInfo decoder, or a word found by conservative scanning.
+    /// </param>
     /// <returns>
     /// The containing object, or <c>null</c> when the pointer is outside every segment or lies in a
     /// free block, filler or unallocated space.
@@ -220,8 +222,9 @@ internal static unsafe partial class GarbageCollector
     /// It starts at <see cref="GCSegment.Start"/>, not at a brick-table entry. Objects allocated inside
     /// a TLAB, and TLABs refilled from the free list, are never recorded in the brick table, and its
     /// entries are never cleared when a sweep or a free-list refill reshapes the segment, so an entry
-    /// can point inside a live object. The cost is one walk of one segment per precise interior root,
-    /// and segments are sized for one TLAB refill or one large allocation.
+    /// can point inside a live object. The cost is one walk of one segment per interior root (a precise
+    /// interior slot, or a conservatively scanned word that falls in the heap), and segments are sized
+    /// for one TLAB refill or one large allocation.
     /// </para>
     /// </remarks>
     /// <param name="segment">The segment that contains <paramref name="interior"/>.</param>
