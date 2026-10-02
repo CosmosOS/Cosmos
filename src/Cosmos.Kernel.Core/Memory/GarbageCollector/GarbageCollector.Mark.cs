@@ -53,9 +53,11 @@ internal static unsafe partial class GarbageCollector
             {
                 // No secondary means nothing to keep alive: ConditionalWeakTable stores a null
                 // value as a dependent handle without one (SharedArrayPool registers its
-                // thread-local buckets that way), so the mark bit must not be read through it.
+                // thread-local buckets that way), so the mark bit must not be read through it;
+                // nor through a null primary, which a collection leaves when the primary dies.
+                GCObject* primary = storeEnum.Current->Object;
                 GCObject* secondary = (GCObject*)storeEnum.Current->ExtraInfo;
-                if (secondary != null && storeEnum.Current->Object->IsMarked && !secondary->IsMarked)
+                if (secondary != null && primary != null && primary->IsMarked && !secondary->IsMarked)
                 {
                     TryMarkRoot((nint)secondary);
                     markedNew = true;

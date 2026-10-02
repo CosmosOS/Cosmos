@@ -377,8 +377,8 @@ internal static unsafe partial class GarbageCollector
             // Mark reachable objects
             MarkPhase();
 
-            // Free Weak GC Handles
-            s_gCHandleManager.FreeWeakHandles();
+            // Clear the weak and dependent GC handles whose targets died
+            s_gCHandleManager.ClearWeakHandles();
 
             // Sweep and rebuild free lists
             freedCount = SweepPhase();
