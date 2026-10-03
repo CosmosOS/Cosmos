@@ -1684,4 +1684,193 @@ internal static class Math
 
     [RuntimeExport("tanhf")]
     internal static float tanhf(float x) => (float)tanh(x);
+
+    // --------------- inverse hyperbolics (after fdlibm s_asinh.c / e_acosh.c / e_atanh.c) ---------------
+    // log1p is not ported: Log1p computes it from log (Goldberg's correction), close to
+    // fdlibm's accuracy where these call it.
+
+    /// <summary>log(1 + y), keeping the precision of a small y that 1 + y rounds.</summary>
+    private static double Log1p(double y)
+    {
+        double u = 1.0 + y;
+        if (u == 1.0)
+        {
+            return y;
+        }
+
+        return FdlibmLog(u) * (y / (u - 1.0));
+    }
+
+    [RuntimeExport("asinh")]
+    internal static double asinh(double x)
+    {
+        if (double.IsNaN(x) || double.IsInfinity(x))
+        {
+            return x + x; /* preserves NaN and signed infinity */
+        }
+
+        double ax = Abs(x);
+        double w;
+
+        /* |x| < 2^-28: asinh(x) = x to double precision */
+        if (ax < 3.7252902984619141e-09)
+        {
+            return x;
+        }
+
+        if (ax > 268435456.0) /* |x| > 2^28 */
+        {
+            w = FdlibmLog(ax) + LN2;
+        }
+        else if (ax > 2.0)
+        {
+            w = FdlibmLog(2.0 * ax + 1.0 / (sqrt(x * x + 1.0) + ax));
+        }
+        else
+        {
+            double t = x * x;
+            w = Log1p(ax + t / (1.0 + sqrt(1.0 + t)));
+        }
+
+        return x > 0 ? w : -w;
+    }
+
+    [RuntimeExport("asinhf")]
+    internal static float asinhf(float x) => (float)asinh(x);
+
+    [RuntimeExport("acosh")]
+    internal static double acosh(double x)
+    {
+        if (double.IsNaN(x) || x < 1.0)
+        {
+            return double.NaN;
+        }
+
+        if (double.IsPositiveInfinity(x))
+        {
+            return x;
+        }
+
+        if (x == 1.0)
+        {
+            return 0.0;
+        }
+
+        if (x > 268435456.0) /* x > 2^28: acosh(x) = log(2x) */
+        {
+            return FdlibmLog(x) + LN2;
+        }
+
+        if (x > 2.0)
+        {
+            return FdlibmLog(2.0 * x - 1.0 / (x + sqrt(x * x - 1.0)));
+        }
+
+        /* 1 < x <= 2 */
+        double t = x - 1.0;
+        return Log1p(t + sqrt(2.0 * t + t * t));
+    }
+
+    [RuntimeExport("acoshf")]
+    internal static float acoshf(float x) => (float)acosh(x);
+
+    [RuntimeExport("atanh")]
+    internal static double atanh(double x)
+    {
+        if (double.IsNaN(x))
+        {
+            return double.NaN;
+        }
+
+        double ax = Abs(x);
+
+        if (ax > 1.0)
+        {
+            return double.NaN;
+        }
+
+        if (ax == 1.0)
+        {
+            return x > 0 ? double.PositiveInfinity : double.NegativeInfinity;
+        }
+
+        /* |x| < 2^-28: atanh(x) = x to double precision */
+        if (ax < 3.7252902984619141e-09)
+        {
+            return x;
+        }
+
+        double t = ax < 0.5
+            ? 0.5 * Log1p(2.0 * ax + 2.0 * ax * ax / (1.0 - ax))
+            : 0.5 * Log1p((ax + ax) / (1.0 - ax));
+
+        return x >= 0 ? t : -t;
+    }
+
+    [RuntimeExport("atanhf")]
+    internal static float atanhf(float x) => (float)atanh(x);
+
+    // --------------- cbrt (after fdlibm s_cbrt.c) ---------------
+
+    [RuntimeExport("cbrt")]
+    internal static double cbrt(double x)
+    {
+        const int B1 = 715094163; /* B1 = (682-0.03306235651)*2**20 */
+        const int B2 = 696219795; /* B2 = (664-0.03306235651)*2**20 */
+        const double C = 5.42857142857142815906e-01; /* 19/35 */
+        const double D = -7.05306122448979611050e-01; /* -864/1225 */
+        const double E = 1.41428571428571436819e+00; /* 99/70 */
+        const double F = 1.60714285714285720630e+00; /* 45/28 */
+        const double G = 3.57142857142857150787e-01; /* 5/14 */
+
+        int hx = HighWord(x);
+        int sign = hx & unchecked((int)0x80000000);
+        hx ^= sign;
+
+        if (hx >= 0x7ff00000)
+        {
+            return x + x; /* cbrt(NaN, INF) is itself */
+        }
+
+        if ((hx | LowWord(x)) == 0)
+        {
+            return x; /* cbrt(0) is itself */
+        }
+
+        x = SetHighWord(x, hx); /* x <- |x| */
+
+        /* rough cbrt to 5 bits */
+        double t;
+        if (hx < 0x00100000) /* subnormal */
+        {
+            t = SetHighWord(0.0, 0x43500000); /* t = 2^54 */
+            t *= x;
+            t = SetHighWord(t, HighWord(t) / 3 + B2);
+        }
+        else
+        {
+            t = SetHighWord(0.0, hx / 3 + B1);
+        }
+
+        /* new cbrt to 23 bits */
+        double r = t * t / x;
+        double s = C + r * t;
+        t *= G + F / (s + E + D / s);
+
+        /* chop to 20 bits and make it larger than cbrt(x) */
+        t = SetLowWord(t, 0);
+        t = SetHighWord(t, HighWord(t) + 1);
+
+        /* one Newton step to 53 bits, error under 0.667 ulps */
+        s = t * t;
+        r = x / s;
+        double w = t + t;
+        r = (r - t) / (w + r);
+        t = t + t * r;
+
+        return SetHighWord(t, HighWord(t) | sign); /* restore the sign */
+    }
+
+    [RuntimeExport("cbrtf")]
+    internal static float cbrtf(float x) => (float)cbrt(x);
 }
