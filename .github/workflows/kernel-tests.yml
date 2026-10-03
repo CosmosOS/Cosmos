@@ -228,6 +228,31 @@ jobs:
       event_name: ${{ github.event_name }}
       head_ref: ${{ github.head_ref || github.ref_name }}
 
+  # ── Random ────────────────────────────────────────────────────────────────────
+  # x64 cells have RDSEED/RDRAND (KVM host or -cpu max); arm64's cortex-a72
+  # has no FEAT_RNG, so that cell seeds from timer jitter alone.
+  random-tests:
+    needs: setup
+    uses: ./.github/workflows/kernel-test-run.yml
+    with:
+      suite_name: Random
+      suite_id: random
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Random
+      timeout_x64: 90
+      timeout_arm64: 180
+      step_timeout_minutes: 10
+
+  random-results:
+    needs: random-tests
+    if: always()
+    uses: ./.github/workflows/kernel-test-results.yml
+    with:
+      suite_name: Random
+      suite_id: random
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Random
+      event_name: ${{ github.event_name }}
+      head_ref: ${{ github.head_ref || github.ref_name }}
+
   # ── Graphic ───────────────────────────────────────────────────────────────────
   graphic-tests:
     needs: setup
@@ -512,7 +537,7 @@ jobs:
     # read `needs.<suite>-tests.result`, and the `needs` context only exposes
     # direct dependencies: without the *-tests entries every row evaluates
     # to an empty string and renders "Failed" regardless of the real outcome.
-    needs: [ helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, math-tests, graphic-tests, audio-tests, power-tests, garbagecollector-tests, interrupts-tests, drivers-tests, pci-tests, virtio-tests, storage-tests, fat-tests, file-tests, helloworld-results, memory-results, typecasting-results, timer-results, network-results, runtime-results, threading-results, math-results, graphic-results, audio-results, power-results, garbagecollector-results, interrupts-results, drivers-results, pci-results, virtio-results, storage-results, fat-results, file-results ]
+    needs: [ helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, math-tests, random-tests, graphic-tests, audio-tests, power-tests, garbagecollector-tests, interrupts-tests, drivers-tests, pci-tests, virtio-tests, storage-tests, fat-tests, file-tests, helloworld-results, memory-results, typecasting-results, timer-results, network-results, runtime-results, threading-results, math-results, random-results, graphic-results, audio-results, power-results, garbagecollector-results, interrupts-results, drivers-results, pci-results, virtio-results, storage-results, fat-results, file-results ]
     if: always()
     steps:
       - name: 📊 Generate Summary
@@ -539,6 +564,7 @@ jobs:
           add_row "Network"          "${{ needs.network-tests.result }}"
           add_row "Runtime"          "${{ needs.runtime-tests.result }}"
           add_row "Math"             "${{ needs.math-tests.result }}"
+          add_row "Random"           "${{ needs.random-tests.result }}"
           add_row "Threading"        "${{ needs.threading-tests.result }}"
           add_row "Graphic"          "${{ needs.graphic-tests.result }}"
           add_row "Audio"            "${{ needs.audio-tests.result }}"

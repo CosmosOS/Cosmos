@@ -125,6 +125,9 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Memory" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
+    <!-- White-box CSPRNG suite: known-answer tests of the BLAKE2s and ChaCha20
+         primitives, and which entropy source seeded KernelRandom. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Random" />
   </ItemGroup>
 
   <ItemGroup>
