@@ -10,7 +10,7 @@ The main differences if you come from Gen2:
 | UDP | Cosmos-specific `UdpClient` class | Standard `System.Net.Sockets.UdpClient` (plugged) |
 | DHCP | Cosmos client class | Cosmos client class (`Cosmos.Kernel.System.Network`) |
 | DNS | Cosmos client class | Standard `System.Net.Dns` (plugged), or the Cosmos `DnsClient` |
-| NIC drivers | RTL8168, E1000, PCNET | Intel E1000E over the driver kit (any machine with a PCI host node; QEMU's default q35 NIC on x64), virtio-net over the driver kit (PCI on both architectures, MMIO on ARM64) |
+| NIC drivers | RTL8168, E1000, PCNET | Intel E1000E over the driver kit (any machine with a PCI host node; QEMU's default q35 NIC on x64), which also binds the 8254x e1000 of QEMU and VirtualBox (82540EM) and VMware (82545EM), virtio-net over the driver kit (PCI on both architectures, MMIO on ARM64) |
 
 None of these protocols implements every feature of its RFC. If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 

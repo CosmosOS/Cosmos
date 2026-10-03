@@ -715,7 +715,7 @@ private readonly DeviceMatch[] _matches =
 ];
 ```
 
-A match must set at least one field. Prefer the device ids you tested over a class match: the shipped E1000E matches six Intel device ids and nothing else.
+A match must set at least one field. Prefer the device ids you tested over a class match: the shipped E1000E matches eight Intel device ids and nothing else.
 
 ### The access object
 
