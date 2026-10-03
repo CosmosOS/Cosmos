@@ -76,3 +76,12 @@ RhpInitialDynamicInterfaceDispatch:
 
     // Tail-call to the resolved method address (in x16)
     br      x16
+
+// void* get_initial_dynamic_interface_dispatch(void)
+// The stub RhNewInterfaceDispatchCell puts in the cells it creates at runtime
+// (the type loader's generic dictionaries).
+.global get_initial_dynamic_interface_dispatch
+get_initial_dynamic_interface_dispatch:
+    adrp    x0, RhpInitialDynamicInterfaceDispatch
+    add     x0, x0, :lo12:RhpInitialDynamicInterfaceDispatch
+    ret

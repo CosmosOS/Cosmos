@@ -4,6 +4,7 @@
 using System;
 using System.Runtime;
 using System.Runtime.InteropServices;
+using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory.Heap;
 using Internal.Runtime;
@@ -276,7 +277,10 @@ namespace Cosmos.Kernel.Core.Runtime
         }
 
         /// <summary>
-        /// Create a new interface dispatch cell
+        /// Create a new interface dispatch cell. The type loader asks for one per interface call
+        /// in the generic dictionaries it builds at runtime (a shared generic method or type
+        /// instantiated over types the compiler did not see, as a generic virtual method can be);
+        /// shared code then calls through the cell's stub.
         /// </summary>
         [RuntimeExport("RhNewInterfaceDispatchCell")]
         internal static IntPtr RhNewInterfaceDispatchCell(MethodTable* pInterface, int slotNumber)
@@ -291,9 +295,10 @@ namespace Cosmos.Kernel.Core.Runtime
             }
 
             // Initialize the dispatch cell
-            // Cell[0].m_pStub would point to RhpInitialDynamicInterfaceDispatch in a full implementation
+            // Cell[0].m_pStub is the stub a call through the cell jumps to: it resolves the target
+            // with RhpCidResolve. (A null stub sends the call to address 0.)
             // Cell[0].m_pCache contains the interface type pointer with flag bit set
-            pCell[0].m_pStub = 0; // Would be address of RhpInitialDynamicInterfaceDispatch
+            pCell[0].m_pStub = InterfaceDispatchNative.GetInitialDynamicInterfaceDispatch();
             pCell[0].m_pCache = ((nuint)pInterface) | InterfaceDispatchCell.IDC_CachePointerIsInterfacePointerOrMetadataToken;
 
             // Cell[1] contains slot number
