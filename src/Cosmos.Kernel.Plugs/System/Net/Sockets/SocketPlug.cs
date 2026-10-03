@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Protocols.Tcp;
@@ -124,7 +125,7 @@ public static class SocketPlug
         {
             if (s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
             {
-                return sm.Data.Length;
+                return sm.DataLength;
             }
         }
         else if (proto == ProtocolType.Udp)
@@ -181,7 +182,7 @@ public static class SocketPlug
                         // the read returns 0.
                         SelectMode.SelectRead => s_listeningSockets.Contains(id)
                             ? HasPendingConnection(sm)
-                            : sm.Data.Length > 0 || HasPeerClosed(sm),
+                            : sm.DataLength > 0 || HasPeerClosed(sm),
                         SelectMode.SelectWrite => sm.Status is Status.ESTABLISHED or Status.CLOSE_WAIT,
                         _ => false,
                     };
@@ -247,9 +248,14 @@ public static class SocketPlug
             throw new InvalidOperationException("Socket not bound");
         }
 
+        // Masked while the connection joins the table: the kit worker looks
+        // connections up in it. Nothing in between can throw, so the restore
+        // is an explicit call.
+        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
         TcpConnection sm = TcpConnection.CreateConnection((ushort)ep.Port, 0, Address4.Zero, Address4.Zero);
         sm.LocalEndPoint.Port = (ushort)ep.Port;
         sm.Status = Status.LISTEN;
+        mask.Dispose();
 
         s_tcpStateMachines[id] = sm;
     }
@@ -590,7 +596,12 @@ public static class SocketPlug
     [PlugMember]
     public static int Receive(Socket aThis, Span<byte> buffer, SocketFlags socketFlags)
     {
-        return Receive(aThis, buffer.ToArray(), 0, buffer.Length, socketFlags);
+        // The bytes land in an array first and are copied back: the read
+        // consumes them, so a dropped copy would lose them.
+        byte[] received = new byte[buffer.Length];
+        int count = Receive(aThis, received, 0, received.Length, socketFlags);
+        received.AsSpan(0, count).CopyTo(buffer);
+        return count;
     }
 
     [PlugMember]
@@ -647,21 +658,27 @@ public static class SocketPlug
 
         ThrowIfRangeInvalid(buffer, offset, size);
 
-        // If data is already available, return it immediately (even if connection closed)
-        if (sm.Data.Length > 0)
+        // The bytes are taken through ReadData, which copies and consumes
+        // them in one step with interrupts masked: the kit worker appends to
+        // the same buffer and can preempt this thread anywhere else.
+        Span<byte> target = buffer.AsSpan(offset, size);
+
+        // If data is already available, return it immediately (even if connection closed).
+        // A zero here means another reader on this socket took the bytes
+        // first: this read then waits below, as returning 0 would read as
+        // the end of the stream.
+        if (sm.DataLength > 0)
         {
-            int bytesToCopy = Math.Min(sm.Data.Length, size);
-            Span<byte> target = buffer.AsSpan(offset, bytesToCopy);
-            sm.Data.Slice(0, bytesToCopy).CopyTo(target);
-
-            sm.AdvanceDataOffset(bytesToCopy);
-
-            return bytesToCopy;
+            int read = sm.ReadData(target);
+            if (read > 0)
+            {
+                return read;
+            }
         }
 
         // Wait for data only if connection is still active
         int timeout = 0;
-        while (sm.Data.Length == 0 && timeout < 100_000)
+        while (sm.DataLength == 0 && timeout < 100_000)
         {
             // Allow reading data in ESTABLISHED, CLOSE_WAIT, or FIN_WAIT states
             if (sm.Status != Status.ESTABLISHED &&
@@ -674,18 +691,8 @@ public static class SocketPlug
             timeout++;
         }
 
-        if (sm.Data.Length == 0)
-        {
-            return 0;
-        }
-
-        int bytes = Math.Min(sm.Data.Length, size);
-        Span<byte> finalTarget = buffer.AsSpan(offset, bytes);
-        sm.Data.Slice(0, bytes).CopyTo(finalTarget);
-
-        sm.AdvanceDataOffset(bytes);
-
-        return bytes;
+        // Zero when nothing arrived in the meantime.
+        return sm.ReadData(target);
     }
 
     [PlugMember]
@@ -787,16 +794,12 @@ public static class SocketPlug
         }
         else if (sm.Status == Status.CLOSING || sm.Status == Status.CLOSE_WAIT)
         {
-            if (sm.WaitStatus(Status.CLOSED, timeout))
-            {
-                TcpConnection.RemoveConnection(sm);
-            }
-            else
+            sm.WaitStatus(Status.CLOSED, timeout);
+            if (!RemoveOrDetach(sm))
             {
                 // The final ACK never arrived — detach instead of blocking
                 // forever; TcpConnection reaps the connection once it reaches CLOSED.
                 Log.WriteString("[SocketPlug] CloseTcp: passive close pending, detaching connection\n");
-                sm.Detached = true;
             }
 
             s_tcpStateMachines.Remove(id);
@@ -818,8 +821,14 @@ public static class SocketPlug
             // peer's immediate FIN|ACK inline. Under ESTABLISHED that runs the
             // passive close all the way to CLOSED, and an assignment after the
             // send would overwrite CLOSED with FIN_WAIT1 and hang the close.
-            sm.Status = Status.FIN_WAIT1;
-            sm.SendEmptyPacket(TcpFlags.FIN | TcpFlags.ACK);
+            // The check and the assignment are one masked step for the same
+            // reason: the kit worker can take the peer's FIN between them and
+            // run the passive close, which sends our FIN itself, and whose
+            // LAST_ACK or CLOSED the assignment would overwrite.
+            if (TryChangeStatus(sm, Status.ESTABLISHED, Status.FIN_WAIT1))
+            {
+                sm.SendEmptyPacket(TcpFlags.FIN | TcpFlags.ACK);
+            }
 
             // Wait for the peer to ACK our FIN. Once it is ACKed the close has
             // succeeded from the caller's point of view — the peer may hold
@@ -828,16 +837,11 @@ public static class SocketPlug
             // peer's own FIN.
             sm.WaitLeaveStatus(Status.FIN_WAIT1, timeout);
 
-            if (sm.Status == Status.CLOSED)
-            {
-                TcpConnection.RemoveConnection(sm);
-            }
-            else
+            if (!RemoveOrDetach(sm))
             {
                 // Half-close: detach the state machine so it finishes the
                 // handshake in the background; TcpConnection reaps it on CLOSED.
                 Log.WriteString("[SocketPlug] CloseTcp: peer FIN pending, detaching connection\n");
-                sm.Detached = true;
             }
 
             s_tcpStateMachines.Remove(id);
@@ -846,6 +850,44 @@ public static class SocketPlug
         _endpoints.Remove(id);
         _localEndPoints.Remove(id);
         _remoteEndPoints.Remove(id);
+    }
+
+    // Moves the connection to status unless the kit worker moved it away from
+    // expected first. One masked step: the worker changes the status from
+    // segments and can preempt this thread between the check and the write.
+    private static bool TryChangeStatus(TcpConnection sm, Status expected, Status status)
+    {
+        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
+        bool changed = sm.Status == expected;
+        if (changed)
+        {
+            sm.Status = status;
+        }
+
+        mask.Dispose();
+        return changed;
+    }
+
+    // Removes a closed connection, or detaches one still closing for TcpConnection to
+    // reap once it reaches CLOSED; true when it was removed. One masked step:
+    // TcpConnection reaps only a detached connection, so a CLOSED the kit worker reached
+    // between the check and the flag would leave the connection in the table
+    // for good. Nothing in it can throw, so the restore is an explicit call.
+    private static bool RemoveOrDetach(TcpConnection sm)
+    {
+        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
+        bool closed = sm.Status == Status.CLOSED;
+        if (closed)
+        {
+            TcpConnection.RemoveConnection(sm);
+        }
+        else
+        {
+            sm.Detached = true;
+        }
+
+        mask.Dispose();
+        return closed;
     }
 
     [PlugMember]

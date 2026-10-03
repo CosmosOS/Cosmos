@@ -70,6 +70,17 @@ public class TcpConnectionTest
             byte[] expected = [3, .. other];
             Assert.That(_target.Data.ToArray(), Is.EqualTo(expected));
         }
+
+        [Test]
+        public void WhenAllDataWasRead_AndOtherIsAppended_OnlyOtherIsKept()
+        {
+            _target.AppendToData([0, 1, 2]);
+            _target.AdvanceDataOffset(3);
+
+            _target.AppendToData([3, 4]);
+
+            Assert.That(_target.Data.ToArray(), Is.EqualTo(new byte[] { 3, 4 }));
+        }
     }
 
     [TestFixture]
