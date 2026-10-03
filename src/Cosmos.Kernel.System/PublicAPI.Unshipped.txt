@@ -243,7 +243,6 @@ Cosmos.Kernel.System.Graphics.Canvas.Canvas(Cosmos.Kernel.System.Graphics.Displa
 Cosmos.Kernel.System.Graphics.Canvas.Canvas(int width, int height, Cosmos.Kernel.System.Graphics.ColorDepth colorDepth = Cosmos.Kernel.System.Graphics.ColorDepth.ColorDepth32) -> void
 Cosmos.Kernel.System.Graphics.Canvas.CheckIfModeIsValid(Cosmos.Kernel.System.Graphics.Mode mode) -> bool
 Cosmos.Kernel.System.Graphics.Canvas.Clear() -> void
-Cosmos.Kernel.System.Graphics.Canvas.DrawImageAlpha(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, bool preventOffBoundPixels = true) -> void
 Cosmos.Kernel.System.Graphics.Canvas.GetBuffer() -> int[]?
 Cosmos.Kernel.System.Graphics.Canvas.Height.get -> int
 Cosmos.Kernel.System.Graphics.Canvas.ThrowIfModeIsNotValid(Cosmos.Kernel.System.Graphics.Mode mode) -> void
@@ -1024,7 +1023,7 @@ virtual Cosmos.Kernel.System.Graphics.Canvas.AvailableModes.get -> System.Collec
 virtual Cosmos.Kernel.System.Graphics.Canvas.Clear(int color) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.Clear(System.Drawing.Color color) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.CopyPixels(int srcX, int srcY, int dstX, int dstY, int width, int height) -> void
-virtual Cosmos.Kernel.System.Graphics.Canvas.CroppedDrawImage(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, int maxWidth, int maxHeight, bool preventOffBoundPixels = true) -> void
+virtual Cosmos.Kernel.System.Graphics.Canvas.CroppedDrawImage(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, int maxWidth, int maxHeight, byte opacity = 255) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DefaultGraphicsMode.get -> Cosmos.Kernel.System.Graphics.Mode
 virtual Cosmos.Kernel.System.Graphics.Canvas.Disable() -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.Display() -> void
@@ -1032,15 +1031,17 @@ virtual Cosmos.Kernel.System.Graphics.Canvas.DrawArc(System.Drawing.Color color,
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawArray(int[]! colors, int x, int y, int width, int height) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawArray(int[]! colors, int x, int y, int width, int height, int startIndex) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawArray(System.Drawing.Color[]! colors, int x, int y, int width, int height) -> void
-virtual Cosmos.Kernel.System.Graphics.Canvas.DrawCanvas(Cosmos.Kernel.System.Graphics.Canvas! canvas, int x, int y) -> void
+virtual Cosmos.Kernel.System.Graphics.Canvas.DrawCanvas(Cosmos.Kernel.System.Graphics.Canvas! canvas, int x, int y, byte opacity = 255) -> void
+virtual Cosmos.Kernel.System.Graphics.Canvas.DrawCanvas(Cosmos.Kernel.System.Graphics.Canvas! canvas, int x, int y, int width, int height, byte opacity = 255) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawChar(char c, Cosmos.Kernel.System.Graphics.Fonts.Font! font, System.Drawing.Color color, int x, int y) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawCircle(System.Drawing.Color color, int xCenter, int yCenter, int radius) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawEllipse(System.Drawing.Color color, int xCenter, int yCenter, int xR, int yR) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawFilledCircle(System.Drawing.Color color, int x0, int y0, int radius) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawFilledEllipse(System.Drawing.Color color, int xCenter, int yCenter, int xR, int yR) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawFilledRectangle(System.Drawing.Color color, int xStart, int yStart, int width, int height) -> void
-virtual Cosmos.Kernel.System.Graphics.Canvas.DrawImage(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, bool preventOffBoundPixels = true) -> void
-virtual Cosmos.Kernel.System.Graphics.Canvas.DrawImage(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, int w, int h, bool preventOffBoundPixels = true) -> void
+virtual Cosmos.Kernel.System.Graphics.Canvas.DrawImage(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, byte opacity = 255) -> void
+virtual Cosmos.Kernel.System.Graphics.Canvas.DrawImage(Cosmos.Kernel.System.Graphics.Image! image, int x, int y, int width, int height, byte opacity = 255) -> void
+virtual Cosmos.Kernel.System.Graphics.Canvas.DrawImage(Cosmos.Kernel.System.Graphics.Image! image, System.Drawing.Rectangle destination, System.Drawing.Rectangle source, byte opacity = 255) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawLine(System.Drawing.Color color, int x1, int y1, int x2, int y2) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawPoint(int color, int x, int y) -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.DrawPoint(System.Drawing.Color color, int x, int y) -> void
