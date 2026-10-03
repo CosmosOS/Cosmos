@@ -351,8 +351,16 @@ namespace LunarLabs.Fonts
 
         private GlyphBitmap GetGlyphBitmap(float scale_x, float scale_y, float shift_x, float shift_y, int glyph, out int xoff, out int yoff)
         {
-            var vertices = GetGlyphShape(glyph)
-                ?? throw new Exception($"Vertices can not be null");
+            var vertices = GetGlyphShape(glyph);
+
+            // A glyph without an outline (a no-break or thin space, a zero-width character) draws
+            // nothing: an empty bitmap, the pen only advances.
+            if (vertices is null || vertices.Count == 0)
+            {
+                xoff = 0;
+                yoff = 0;
+                return new GlyphBitmap(0, 0);
+            }
 
             if (scale_x == 0)
                 scale_x = scale_y;
@@ -376,7 +384,9 @@ namespace LunarLabs.Fonts
 
             if (w <= 0 || h <= 0)
             {
-                throw new Exception("invalid glyph size");
+                xoff = 0;
+                yoff = 0;
+                return new GlyphBitmap(0, 0);
             }
 
             // now we get the size
