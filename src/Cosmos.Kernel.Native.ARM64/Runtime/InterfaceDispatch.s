@@ -77,6 +77,14 @@ RhpInitialDynamicInterfaceDispatch:
     // Tail-call to the resolved method address (in x16)
     br      x16
 
+// void* get_interface_dispatch_cache(void)
+// No cache of resolved calls here yet (the x64 stub has one): null, so
+// CachedInterfaceDispatch.Remember keeps nothing.
+.global get_interface_dispatch_cache
+get_interface_dispatch_cache:
+    mov     x0, #0
+    ret
+
 // void* get_initial_dynamic_interface_dispatch(void)
 // The stub RhNewInterfaceDispatchCell puts in the cells it creates at runtime
 // (the type loader's generic dictionaries).

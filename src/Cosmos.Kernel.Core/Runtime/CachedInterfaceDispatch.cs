@@ -4,7 +4,9 @@
 using System;
 using System.Runtime;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Cosmos.Kernel.Core.Bridge;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory.Heap;
 using Internal.Runtime;
@@ -44,6 +46,21 @@ namespace Cosmos.Kernel.Core.Runtime
         public uint VTableOffset;
     }
 
+    /// <summary>
+    /// An entry of the cache of resolved interface calls, as InterfaceDispatch.s
+    /// lays it out: the target of a call through <see cref="Cell"/> on an object
+    /// of type <see cref="Type"/>. <see cref="Sequence"/> is odd while the entry
+    /// is written, and changes with every write.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal unsafe struct DispatchCacheEntry
+    {
+        public nuint Cell;
+        public MethodTable* Type;
+        public nuint Target;
+        public nuint Sequence;
+    }
+
     internal enum DispatchCellType : byte
     {
         InterfaceAndSlot = 0x0,
@@ -53,6 +70,18 @@ namespace Cosmos.Kernel.Core.Runtime
 
     internal static unsafe class CachedInterfaceDispatch
     {
+        /// <summary>The cache's entries: 1 &lt;&lt; CacheBits, as InterfaceDispatch.s allocates them.</summary>
+        private const int CacheBits = 12;
+
+        /// <summary>The hash's multiplier: the stub's imul immediate, -1640531535 (0x9E3779B1), sign-extended.</summary>
+        private const ulong HashMultiplier = 0xFFFFFFFF9E3779B1;
+
+        /// <summary>The cache of resolved calls, once asked for; null before, and where the stub has none.</summary>
+        private static DispatchCacheEntry* s_cache;
+
+        /// <summary>Whether the platform's stub has a cache, once asked.</summary>
+        private static bool s_cacheKnown;
+
         /// <summary>
         /// Main entry point for interface dispatch resolution.
         /// Called from RhpInitialDynamicInterfaceDispatch to resolve interface method calls.
@@ -83,6 +112,7 @@ namespace Cosmos.Kernel.Core.Runtime
             if (pTargetCode != IntPtr.Zero)
             {
                 //Serial.WriteString("[CID] OK\n");
+                Remember(pCell, pObject.GetMethodTable(), pTargetCode);
                 return pTargetCode;
             }
 
@@ -266,14 +296,78 @@ namespace Cosmos.Kernel.Core.Runtime
         }
 
         /// <summary>
-        /// Search the dispatch cell cache for a matching entry
+        /// The target cached for a call through <paramref name="pCell"/> on an
+        /// object of type <paramref name="pInstanceType"/>, as the dispatch stub
+        /// looks it up; zero when none is.
         /// </summary>
         private static IntPtr RhpSearchDispatchCellCache(IntPtr pCell, MethodTable* pInstanceType)
         {
-            // In a simple implementation, we don't maintain a separate cache
-            // The dispatch cell itself serves as the cache after first resolution
-            // For now, always return Zero to trigger resolution
-            return IntPtr.Zero;
+            DispatchCacheEntry* entry = EntryFor(pCell, pInstanceType);
+            if (entry == null)
+            {
+                return IntPtr.Zero;
+            }
+
+            nuint sequence = Volatile.Read(ref entry->Sequence);
+            if ((sequence & 1) != 0 || entry->Cell != (nuint)pCell || entry->Type != pInstanceType)
+            {
+                return IntPtr.Zero;
+            }
+
+            nuint target = entry->Target;
+            return Volatile.Read(ref entry->Sequence) == sequence ? (IntPtr)target : IntPtr.Zero;
+        }
+
+        /// <summary>
+        /// Caches the target resolved for a call through <paramref name="cell"/>
+        /// on an object of type <paramref name="type"/>, in place of whatever
+        /// the entry held: the next such call jumps there from the stub, without
+        /// resolving it again (which walks the type's interface and dispatch
+        /// maps, and saves and restores every argument register).
+        /// </summary>
+        /// <remarks>
+        /// A cell's target only depends on the type: the dispatch cells of the
+        /// image, and the ones <see cref="RhNewInterfaceDispatchCell"/> makes for
+        /// the type loader, live as long as the kernel. The entry is written with
+        /// interrupts off, so that no thread reads it half-written (Cosmos runs
+        /// on one CPU), and its sequence changes: a stub that read part of it
+        /// before the thread writing it took the CPU sees the change, and
+        /// resolves the call.
+        /// </remarks>
+        private static void Remember(IntPtr cell, MethodTable* type, IntPtr target)
+        {
+            DispatchCacheEntry* entry = EntryFor(cell, type);
+            if (entry == null)
+            {
+                return;
+            }
+
+            InternalCpu.InterruptScope scope = InternalCpu.DisableInterruptsScope();
+            nuint sequence = entry->Sequence;
+            Volatile.Write(ref entry->Sequence, sequence + 1);
+            entry->Cell = (nuint)cell;
+            entry->Type = type;
+            entry->Target = (nuint)target;
+            Volatile.Write(ref entry->Sequence, sequence + 2);
+            scope.Dispose();
+        }
+
+        /// <summary>The cache entry of <paramref name="cell"/> and <paramref name="type"/>, as the stub finds it; null without a cache.</summary>
+        private static DispatchCacheEntry* EntryFor(IntPtr cell, MethodTable* type)
+        {
+            if (!s_cacheKnown)
+            {
+                s_cache = (DispatchCacheEntry*)InterfaceDispatchNative.GetInterfaceDispatchCache();
+                s_cacheKnown = true;
+            }
+
+            if (s_cache == null)
+            {
+                return null;
+            }
+
+            ulong hash = unchecked(((ulong)(nuint)cell ^ (ulong)type) * HashMultiplier) >> (64 - CacheBits);
+            return s_cache + (nint)hash;
         }
 
         /// <summary>

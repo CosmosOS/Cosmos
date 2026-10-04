@@ -15,9 +15,20 @@
 
 .extern RhpCidResolve
 
-// Initial dispatch on an interface when we don't have a cache yet.
-// This is the entry point called from interface dispatch sites before
-// the dispatch cell has been resolved.
+// The calls resolved so far: 4096 entries of 32 bytes (cell, type, target,
+// sequence), each at the index a hash of its cell and its type gives.
+// CachedInterfaceDispatch.Remember writes them, the sequence odd meanwhile;
+// the stub below reads them without a lock.
+.bss
+.balign 64
+g_interfaceDispatchCache:
+    .zero 4096 * 32
+
+.text
+
+// Dispatch on an interface: the target from the cache of resolved calls,
+// else resolved by RhpCidResolve (which caches it). Every dispatch site
+// calls it, its cell never changes.
 //
 // On entry (System V ABI):
 //   rdi = 'this' pointer (the object we're dispatching on)
@@ -32,8 +43,39 @@
 .global RhpInitialDynamicInterfaceDispatch
 .balign 16
 RhpInitialDynamicInterfaceDispatch:
-    // Trigger an AV if we're dispatching on a null this.
-    cmp     byte ptr [rdi], 0
+    // The object's type. On a null this, the AV the caller expects.
+    mov     rax, [rdi]
+
+    // The cache entry of this cell and type, at
+    // ((cell ^ type) * 0x9E3779B1) >> 52, times 32 (as Remember computes
+    // it). rax and r10 carry no argument: they are free until the target.
+    mov     r10, rax
+    xor     r10, r11
+    imul    r10, r10, -1640531535
+    shr     r10, 52
+    shl     r10, 5
+    lea     rax, [rip + g_interfaceDispatchCache]
+    add     r10, rax
+    mov     rax, [rdi]
+
+    // A hit: the entry holds this cell and this type, and was not written
+    // while it was read (its sequence even, and the same after).
+    push    qword ptr [r10 + 24]
+    test    byte ptr [rsp], 1
+    jnz     .Lresolve
+    cmp     r11, [r10]
+    jne     .Lresolve
+    cmp     rax, [r10 + 8]
+    jne     .Lresolve
+    mov     rax, [r10 + 16]
+    mov     r10, [r10 + 24]
+    cmp     r10, [rsp]
+    jne     .Lresolve
+    add     rsp, 8
+    jmp     rax
+
+.Lresolve:
+    add     rsp, 8
 
     // Allocate stack frame: 6 integer regs (48) + 8 XMM regs (128) = 176 bytes
     // Plus 8 bytes padding for 16-byte alignment = 184 bytes total
@@ -94,6 +136,14 @@ RhpInitialDynamicInterfaceDispatch:
 
     // Tail-call to the resolved method address (in r10)
     jmp     r10
+
+// void* get_interface_dispatch_cache(void)
+// The cache RhpInitialDynamicInterfaceDispatch looks calls up in, for
+// CachedInterfaceDispatch.Remember to fill.
+.global get_interface_dispatch_cache
+get_interface_dispatch_cache:
+    lea     rax, [rip + g_interfaceDispatchCache]
+    ret
 
 // void* get_initial_dynamic_interface_dispatch(void)
 // The stub RhNewInterfaceDispatchCell puts in the cells it creates at runtime

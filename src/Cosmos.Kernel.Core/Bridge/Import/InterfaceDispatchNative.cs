@@ -18,4 +18,11 @@ internal static unsafe partial class InterfaceDispatchNative
     [LibraryImport("*", EntryPoint = "get_initial_dynamic_interface_dispatch")]
     [SuppressGCTransition]
     public static partial nuint GetInitialDynamicInterfaceDispatch();
+
+    /// <summary>The cache of resolved calls <c>RhpInitialDynamicInterfaceDispatch</c>
+    /// looks up before resolving one (<c>CachedInterfaceDispatch.Remember</c>
+    /// fills it); 0 where the stub has none (ARM64).</summary>
+    [LibraryImport("*", EntryPoint = "get_interface_dispatch_cache")]
+    [SuppressGCTransition]
+    public static partial nuint GetInterfaceDispatchCache();
 }
