@@ -187,7 +187,7 @@ The staging itself is two writes into native globals: the new-thread flag first,
 
 ### Waking from an interrupt handler
 
-Device interrupt handlers wake threads too: an NVMe completion fires on its MSI-X vector and signals an [`InterruptEvent`](#interruptevent) whose waiter must run. The tick path alone would leave that thread queued for up to a full quantum, so wake-ups take a shortcut. `ReadyThread` (and `BlockThread`) set a per-CPU `_needReschedule` flag, and the interrupt dispatcher calls `ReschedulePendingFromIrq` when a handled hardware interrupt exits: if the flag is set and no switch is already staged for this interrupt, it runs `ScheduleFromInterrupt` right there, on the device interrupt's own exit path. The already-staged check matters: the timer handler may have staged a switch during the same interrupt, and a second `ScheduleFromInterrupt` would save this frame's stack pointer into a thread whose real context lives elsewhere.
+Device interrupt handlers wake threads too: the NVMe driver's message interrupt handler signals a driver kit `DeviceEvent`, an [`InterruptEvent`](#interruptevent) underneath, whose waiter must run. The tick path alone would leave that thread queued for up to a full quantum, so wake-ups take a shortcut. `ReadyThread` (and `BlockThread`) set a per-CPU `_needReschedule` flag, and the interrupt dispatcher calls `ReschedulePendingFromIrq` when a handled hardware interrupt exits: if the flag is set and no switch is already staged for this interrupt, it runs `ScheduleFromInterrupt` right there, on the device interrupt's own exit path. The already-staged check matters: the timer handler may have staged a switch during the same interrupt, and a second `ScheduleFromInterrupt` would save this frame's stack pointer into a thread whose real context lives elsewhere.
 
 ### What there is not: a voluntary switch
 
@@ -278,7 +278,7 @@ Two special cases: the idle thread never parks (blocking it would just get it re
 
 ### InterruptEvent
 
-[`InterruptEvent`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/InterruptEvent.cs) is the interrupt-to-thread completion primitive: an interrupt handler signals it, a thread waits on it. The NVMe driver hangs one on every command slot and signals it from the MSI-X completion handler.
+[`InterruptEvent`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/InterruptEvent.cs) is the interrupt-to-thread completion primitive: an interrupt handler signals it, a thread waits on it. The driver kit's `DeviceEvent` wraps one: the NVMe driver in `Cosmos.Kernel.Drivers` creates one per command slot through its binding and signals it from its message interrupt handler, through `InterruptContext.Signal`, when the slot's completion lands.
 
 Signals are **counted**, not latched: two signals wake two waiters, and signals arriving with no waiter are banked and consumed one per future wait (auto-reset). The signal side is interrupt-safe by construction: it takes the IRQ-safe lock, bumps the count, dequeues one waiter, and calls `ReadyThread`, with no allocation and no interface dispatch on the path (the waiter list is pre-sized to four, so typical waits do not allocate under the lock the interrupt handler spins on either). The `ReadyThread` sets `_needReschedule`, so the woken waiter runs on this same interrupt's exit path (see [Waking from an interrupt handler](#waking-from-an-interrupt-handler)).
 

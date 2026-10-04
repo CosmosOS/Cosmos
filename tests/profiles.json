@@ -25,12 +25,26 @@
       "name": "bare"
     },
     {
+      // One disk on an ich9-ahci controller the engine adds to the machine.
+      // The kit's AhciDriver binds the controller, publishes the disk
+      // as sata0 and the storage manager registers and scans it inside the
+      // probe ("[StorageManager] sata0 registered by AhciDriver (primary)").
+      // The cell proves the polled SATA command path, one page per command,
+      // under the block-device, partition and reboot assertions, and that
+      // the disk shows in DriverInfo as a consumed block device.
       "name": "ahci",
       "disks": [
         { "type": "ahci" }
       ]
     },
     {
+      // One NVMe controller with one namespace. The kit's NvmeDriver binds
+      // it, publishes the namespace as nvme0n1 and the storage manager
+      // registers and scans it inside the probe. The cell proves the NVMe
+      // queue path under the same assertions, in interrupt mode where the
+      // platform routes message 1 (x64, arm64 with gicv3) and polled where
+      // it cannot (gicv2), which Profile_NvmeInterruptModeMatches pins, and
+      // on x64 the 64-bit BAR relocation probes.
       "name": "nvme",
       "disks": [
         { "type": "nvme" }

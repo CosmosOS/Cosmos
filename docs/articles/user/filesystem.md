@@ -27,9 +27,9 @@ Storage support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot the kernel initializes `StorageManager`, which registers every AHCI, NVMe and USB mass storage device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`. USB sticks and disks come up as `usb0`, `usb1`, ... after the internal disks, so the first internal disk stays the primary device. They also need the USB stack, `CosmosEnableUsb`, which is on by default whenever `CosmosEnableStorage` is. Setting it to `false` keeps AHCI and NVMe disks and drops USB ones.
+At boot the kernel initializes `StorageManager`, which installs its consumer of the [driver kit](drivers.md)'s block devices. The kit's AHCI and NVMe drivers then publish every SATA disk (`sata0`, `sata1`, ...) and every NVMe namespace (`nvme0n1`, ...) they find during the driver stage, and the manager registers each one as it is published and scans its MBR/GPT partition table into `StorageManager.Partitions` before the publish returns. USB sticks and disks still come from the USB stack, as `usb0`, `usb1`, ...; they need `CosmosEnableUsb`, which is on by default whenever `CosmosEnableStorage` is, and setting it to `false` keeps AHCI and NVMe disks and drops USB ones. The manager keeps its tables in one order, which decides the primary device: a kit disk before a USB one, in `Devices`, in `Partitions` and as `PrimaryDevice`; among kit disks the lowest node path; then registration order. So the first internal disk stays the primary whichever registered first, and a kit disk arriving after a USB stick moves ahead of it and renumbers `Partitions`, which is why a mount by `Partition` (below) is preferred to one by index string.
 
-USB disks can also be plugged in and pulled out while the kernel runs. One plugged in is registered and scanned like a disk found at boot, under the lowest `usbN` name free. One pulled out leaves `StorageManager.Devices` and `StorageManager.Partitions`, the mounts made on its partitions with the `Partition` overload of `TryMount` (below) are detached, and files still open on it fail with `IOException`. A mount made from a source string names no disk, so it stays, and fails its I/O the same way. A detached mount is not flushed, since the disk is gone, so call `VfsManager.TryUnmount` before pulling a disk out. Both lists can change between two reads while a USB disk comes or goes: read `Devices` or `Partitions` once and index that copy.
+USB disks can also be plugged in and pulled out while the kernel runs. One plugged in is registered and scanned like a disk found at boot, under the lowest `usbN` name free. One pulled out leaves `StorageManager.Devices` and `StorageManager.Partitions`, the mounts made on its partitions with the `Partition` overload of `TryMount` (below) are detached, and files still open on it fail with `IOException`. A kit disk leaves the same way when the kit withdraws it, which no PCI bus does today; a file still open on one then fails with the driver's own exception (the NVMe driver throws `IOException` while it detaches) or, once the kit has released the driver's memory, with the kit's `InvalidOperationException`, since the ring does not wrap the driver's device. A mount made from a source string names no disk, so it stays, and fails its I/O the same way. A detached mount is not flushed, since the disk is gone, so call `VfsManager.TryUnmount` before pulling a disk out. Both lists can change between two reads while a USB disk comes or goes: read `Devices` or `Partitions` once and index that copy.
 
 To give your kernel a disk in QEMU, attach an image with `cosmos run`:
 
@@ -490,7 +490,7 @@ With **nothing mounted at all**, `System.IO` still degrades gracefully: `Directo
 
 ## How it works
 
-Your code calls the stock BCL, which bottoms out in the Unix PAL (`Interop.Sys.*` P/Invokes). Those ~45 entry points are [plugged](../dev/plugs.md) in `Cosmos.Kernel.Plugs`: a file-descriptor table adapts the PAL contract (fds, dir streams, PAL errnos) and delegates to `VfsManager`, which owns path resolution, the mount table, the current directory and open-handle semantics, and dispatches to the mounted filesystem driver, which reads and writes an `IBlockDevice` (AHCI, NVMe or USB mass storage via `StorageManager`, RAM via `MemoryBlockDevice`).
+Your code calls the stock BCL, which bottoms out in the Unix PAL (`Interop.Sys.*` P/Invokes). Those ~45 entry points are [plugged](../dev/plugs.md) in `Cosmos.Kernel.Plugs`: a file-descriptor table adapts the PAL contract (fds, dir streams, PAL errnos) and delegates to `VfsManager`, which owns path resolution, the mount table, the current directory and open-handle semantics, and dispatches to the mounted filesystem driver, which reads and writes an `IBlockDevice` (a SATA disk or an NVMe namespace published by the driver kit's `AhciDriver` or `NvmeDriver`, or a USB mass storage unit, all via `StorageManager`; RAM via `MemoryBlockDevice`).
 
 ```
 File / Directory / FileStream          (stock BCL)
@@ -503,5 +503,5 @@ VfsManager                             (mounts, paths, CWD, open handles)
         │
 IVfsFilesystemType / IVfsSuperblock    (FAT driver)
         │
-IBlockDevice                           (AHCI, NVMe, USB, MemoryBlockDevice)
+IBlockDevice                           (the kit's AHCI and NVMe drivers, USB, MemoryBlockDevice)
 ```

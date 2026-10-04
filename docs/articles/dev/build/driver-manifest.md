@@ -61,7 +61,7 @@ A driver is a class marked `[Cosmos.Kernel.HAL.DriverKit.Driver]`. The generator
 
 The kernel's own drivers come first, then the referenced ones. An assembly that does not reference `Cosmos.Kernel.HAL` is not searched: it cannot carry the attribute.
 
-The drivers Cosmos ships take the second path. `Cosmos.Kernel.Drivers` holds `PciHostDriver` and `VirtioPciTransportDriver` (under the `Pci` feature), `E1000EDriver` and `VirtioNetDriver` (under `Network`), `VirtioGpuDriver` and `VmwareSvgaDriver` (under `Graphics`), and `VirtioMmioTransportDriver` and `VirtioInputDriver` (no feature), and the `Cosmos.Kernel` aggregator every kernel references carries the package, so all eight are in every kernel's manifest after its own drivers, ordered by their full type names, without the kernel referencing the package itself.
+The drivers Cosmos ships take the second path. `Cosmos.Kernel.Drivers` holds `PciHostDriver` and `VirtioPciTransportDriver` (under the `Pci` feature), `E1000EDriver` and `VirtioNetDriver` (under `Network`), `VirtioGpuDriver` and `VmwareSvgaDriver` (under `Graphics`), `AhciDriver` and `NvmeDriver` (under `Storage`), and `VirtioMmioTransportDriver` and `VirtioInputDriver` (no feature), and the `Cosmos.Kernel` aggregator every kernel references carries the package, so all ten are in every kernel's manifest after its own drivers, ordered by their full type names, without the kernel referencing the package itself.
 
 To be registered a class must be concrete (not abstract, not static), non-generic, derive from `Cosmos.Kernel.HAL.DriverKit.Driver`, and have a parameterless constructor the kernel assembly can call. A marked class that fails one of these is reported (`COSMOSGEN001`) and left out.
 
