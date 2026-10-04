@@ -7,6 +7,7 @@ using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Synthetic;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
@@ -38,7 +39,12 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// when a cell names no NIC, bound by <see cref="E1000EDriver"/> from
 /// <c>Cosmos.Kernel.Drivers</c> and published to the ring. virt's default
 /// NIC is a virtio-net-pci function that the kit's VirtioNetDriver binds, so
-/// the E1000E tests skip on arm64.
+/// the E1000E tests skip on arm64. The usb-kbd cell adds a qemu-xhci
+/// controller with a usb-kbd plugged in at boot: the USB keyboard group
+/// proves the kit's Usb bus kind over it, the decline-after-open
+/// fall-through to the shipped <see cref="UsbKeyboardDriver"/>, and the
+/// unplug and replug the engine performs over QMP when a test asks; the
+/// group skips on the bare cell, which has no controller.
 /// </para>
 /// <para>
 /// The suite is two projects. This kernel is the harness: it holds an
@@ -52,8 +58,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware.</summary>
-    private const int ExpectedTestCount = 34;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard.</summary>
+    private const int ExpectedTestCount = 40;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -145,6 +151,46 @@ public class Kernel : Sys.Kernel
     /// <summary>Value of the first hex letter, a or A.</summary>
     private const int HexLetterBase = 10;
 
+    /// <summary>Bus name of the interface nodes the kit's Usb bus kind publishes.</summary>
+    private const string UsbBusName = "usb";
+
+    /// <summary>The end of a function node's description for an xHCI controller: class 0C, subclass 03, programming interface 30.</summary>
+    private const string XhciClassDescription = "class 0c.03.30";
+
+    /// <summary>The end of an interface node's description for a HID boot keyboard: interface class 03, subclass 01, protocol 01.</summary>
+    private const string UsbKeyboardDescriptionSuffix = "class 03.01.01";
+
+    /// <summary>The name the shipped driver publishes its keyboard under.</summary>
+    private const string UsbKeyboardName = "usb-keyboard";
+
+    /// <summary>Asks the engine to pull the cell's USB keyboard out (see TR.RequestHost).</summary>
+    private const string UsbKeyboardUnplugRequest = "usb-kbd-unplug";
+
+    /// <summary>Asks the engine to plug it back in.</summary>
+    private const string UsbKeyboardPlugRequest = "usb-kbd-plug";
+
+    /// <summary>
+    /// Longest wait for the hot-plug thread and the kit worker to follow a
+    /// plug or an unplug. Well inside the engine's stall window: 10 s
+    /// without a protocol message and it kills the guest.
+    /// </summary>
+    private const int HotPlugTimeoutMilliseconds = 8000;
+
+    /// <summary>How long a hot-plug wait sleeps between looks, so those threads get to run.</summary>
+    private const int HotPlugPollMilliseconds = 50;
+
+    /// <summary>Skip reason of the USB keyboard tests on a cell whose bus carries no xHCI controller.</summary>
+    private const string SkipNoXhci = "no xHCI controller on this cell";
+
+    /// <summary>The HID output report lighting Num Lock (bit 0) and Caps Lock (bit 1).</summary>
+    private const byte NumLockCapsLockReport = 0x03;
+
+    /// <summary>The HID output report lighting Scroll Lock (bit 2).</summary>
+    private const byte ScrollLockReport = 0x04;
+
+    /// <summary>Specificity of a USB match on the interface class, subclass and protocol: the shipped keyboard driver's and the declining driver's.</summary>
+    private const int UsbKeyboardMatchSpecificity = 3;
+
     private readonly TestKeyboardConsumer _keyboardConsumer = new();
     private readonly DeviceNode _bootNode;
     private DeviceNode? _keyboardNode;
@@ -153,6 +199,9 @@ public class Kernel : Sys.Kernel
     private DeviceNode? _busNode;
     private BusState? _busState;
     private string? _e1000ePath;
+    private string? _xhciPath;
+    private string? _usbKeyboardPath;
+    private DeviceNode? _usbKeyboardNode;
 
     /// <summary>
     /// Publishes the boot node. The constructor runs before
@@ -235,6 +284,19 @@ public class Kernel : Sys.Kernel
         TR.RunIf(hasE1000E, "Hardware_E1000E_DeviceConsumed", TestHardwareE1000EDeviceConsumed, SkipNoE1000E);
         TR.RunIf(hasE1000E, "Hardware_E1000E_LinkUp", TestHardwareE1000ELinkUp, SkipNoE1000E);
         TR.RunIf(hasE1000E, "Hardware_E1000E_Transmit", TestHardwareE1000ETransmit, SkipNoE1000E);
+
+        // ==================== USB keyboard ====================
+        // The usb-kbd cell carries a qemu-xhci controller with a usb-kbd plugged
+        // in at boot; the engine unplugs and replugs it over QMP when asked. On
+        // the bare cell there is no controller and the group skips.
+        _xhciPath = FindXhciPath();
+        bool hasXhci = _xhciPath is not null;
+        TR.RunIf(hasXhci, "Usb_XhciHost_Bound", TestUsbXhciHostBound, SkipNoXhci);
+        TR.RunIf(hasXhci, "Usb_Keyboard_BoundAfterDecline", TestUsbKeyboardBoundAfterDecline, SkipNoXhci);
+        TR.RunIf(hasXhci, "Usb_Keyboard_SetLedsRoundTrip", TestUsbKeyboardSetLedsRoundTrip, SkipNoXhci);
+        TR.RunIf(hasXhci, "Usb_Keyboard_Unplug_RetractsNode", TestUsbKeyboardUnplugRetractsNode, SkipNoXhci);
+        TR.RunIf(hasXhci, "Usb_Keyboard_Replug_PublishesAgain", TestUsbKeyboardReplugPublishesAgain, SkipNoXhci);
+        TR.RunIf(hasXhci, "Usb_Keyboard_Replug_SetLeds", TestUsbKeyboardReplugSetLeds, SkipNoXhci);
 
         TR.Finish();
 
@@ -1027,6 +1089,214 @@ public class Kernel : Sys.Kernel
         Assert.Equal(transmittedBefore + 1, state.FramesTransmitted, "the driver should count the one frame the ring queued");
     }
 
+    // ==================== USB keyboard ====================
+    //
+    // The kit's Usb bus kind over the cell's qemu-xhci controller: the host
+    // driver bound and running its hot-plug thread, the keyboard interface
+    // bound by the shipped driver after the suite's higher-priority driver
+    // opened its pipe and declined, an LED write through the state object,
+    // then one unplug and one replug the engine performs over QMP. The
+    // shipped drivers are no RecordingDriver, so their detach shows through
+    // the node, the kit's counts and the suite's consumer.
+
+    private void TestUsbXhciHostBound()
+    {
+        if (!TryGetXhci(out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        Assert.True(info.State == DeviceNodeState.Bound, "the xHCI driver should hold the controller");
+        Assert.True(info.DriverName == nameof(XhciDriver), "XhciDriver should hold the controller");
+        Assert.True(info.ChildCount >= 1, "the controller should have published the keyboard's interface node under it");
+        Assert.True(info.HeldResourceCount >= 1, "the binding should hold the controller's register window at least");
+
+        XhciState? state = FindDriverState<XhciState>(path);
+        Assert.NotNull(state);
+        if (state is null)
+        {
+            return;
+        }
+
+        Assert.True(state.HotPlugRunning, "TryStartThread needs the scheduler");
+        Assert.True(state.HasInterrupt != state.IsPolling, "the controller takes its events from a message interrupt or polls, never both or neither");
+        Assert.True(state.Bus.DeviceCount >= 1, "the bus should carry the keyboard plugged in at boot");
+        Assert.Equal(1, state.Bus.Ordinal, "the cell's one controller is bus 1");
+    }
+
+    // The keyboard published at boot went to the ring's consumer, so the
+    // keyboard manager holds it; the suite's consumer, installed afterwards,
+    // never saw it and its published count is not read here.
+    private void TestUsbKeyboardBoundAfterDecline()
+    {
+        string? path = FindUsbKeyboardPath();
+        Assert.NotNull(path, "the usb-kbd cell should carry a HID boot keyboard interface");
+        if (path is null)
+        {
+            return;
+        }
+
+        _usbKeyboardPath = path;
+        _usbKeyboardNode = FindNode(path);
+        Assert.NotNull(_usbKeyboardNode, "the keyboard's node should be in the tree");
+
+        Assert.True(TryFindNode(path, out DeviceNodeInfo info), "the keyboard node should be in the tree");
+        Assert.True(info.State == DeviceNodeState.Bound, "the keyboard interface should be bound");
+        Assert.True(info.DriverName == nameof(UsbKeyboardDriver), "UsbKeyboardDriver should hold the keyboard interface");
+        Assert.True(info.ParentPath == _xhciPath, "the interface node should sit under the controller's node");
+        Assert.True(info.BusName == UsbBusName, "the interface node sits on the usb bus");
+        Assert.Equal(0, info.ResourceCount, "a USB interface node carries no resources");
+        Assert.Equal(0, info.InterruptCount, "a USB interface node carries no interrupt sources");
+        Assert.Equal(2, info.OfferCount, "the declining driver and then the shipped driver should have been offered the node");
+        Assert.Equal(1, info.PublishedDeviceCount, "the binding should publish one keyboard");
+
+        Assert.True(TryFindOffer(path, 0, out DeviceOfferInfo declined), "the declined offer should be recorded");
+        Assert.True(declined.DriverName == nameof(UsbDeclineDriver), "the higher priority driver should be offered first");
+        Assert.Equal(UsbDeclineDriver.ClaimedPriority, declined.Priority, "the offer should record the declining driver's priority");
+        Assert.Equal(UsbKeyboardMatchSpecificity, declined.Specificity, "the offer should record the three-field match");
+        Assert.True(declined.Outcome == DeviceOfferOutcome.Declined, "the first offer should be declined");
+        Assert.True(declined.Reason == UsbDeclineDriver.Reason, "the offer should carry the driver's reason");
+        Assert.Equal(1, declined.ReleasedResourceCount, "the kit should have closed the pipe the declining probe opened");
+
+        Assert.True(TryFindOffer(path, 1, out DeviceOfferInfo bound), "the bound offer should be recorded");
+        Assert.True(bound.DriverName == nameof(UsbKeyboardDriver), "the shipped driver should be offered second");
+        Assert.True(bound.Outcome == DeviceOfferOutcome.Bound, "the second offer should be bound");
+
+        UsbDeclineDriver? declining = RecordingDriver.Find<UsbDeclineDriver>();
+        Assert.True(declining is not null && declining.ProbeCount >= 1 && declining.PipeOpens >= 1, "the declining driver should have been probed and opened the pipe");
+
+        int deviceIndex = FindDeviceIndex(UsbKeyboardName);
+        Assert.True(deviceIndex >= 0, "the keyboard should be in the published list");
+        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.Kind == PublishedDeviceKind.Keyboard, "the published device should be a keyboard");
+            Assert.True(device.IsConsumed, "the keyboard consumer should have taken the keyboard");
+            Assert.False(device.IsWithdrawn, "the keyboard should still be published");
+            Assert.True(device.DriverName == nameof(UsbKeyboardDriver), "the published device should name its driver");
+            Assert.True(device.NodePath == path, "the published device should name the interface node");
+        }
+    }
+
+    private void TestUsbKeyboardSetLedsRoundTrip()
+    {
+        if (!TryGetUsbKeyboardState(out UsbKeyboardState? state))
+        {
+            return;
+        }
+
+        int writes = state.LedWrites;
+        state.SetLeds(KeyboardLeds.NumLock | KeyboardLeds.CapsLock);
+
+        Assert.Equal(writes + 1, state.LedWrites, "SetLeds should write one output report");
+        Assert.Equal(NumLockCapsLockReport, state.LastLedReport, "the report should carry the HID Num Lock and Caps Lock bits");
+        Assert.True(state.LastLedStatus == UsbTransferStatus.Success, "the keyboard should accept the output report");
+    }
+
+    // The node leaves the tree on the kit worker, in the teardown's last
+    // step; the bus releases the device on the hot-plug thread, after the
+    // slot is disabled. The wait covers both.
+    private void TestUsbKeyboardUnplugRetractsNode()
+    {
+        if (!TryGetXhci(out string? xhciPath, out DeviceNodeInfo hostBefore) || !TryGetUsbKeyboard(out string? path, out DeviceNode? node))
+        {
+            return;
+        }
+
+        XhciState? state = FindDriverState<XhciState>(xhciPath);
+        Assert.NotNull(state);
+        if (state is null)
+        {
+            return;
+        }
+
+        int childrenBefore = hostBefore.ChildCount;
+        int nodesBefore = DriverInfo.NodeCount;
+        int devicesBefore = DriverInfo.DeviceCount;
+        int withdrawnBefore = _keyboardConsumer.WithdrawnCount;
+
+        TR.RequestHost(UsbKeyboardUnplugRequest);
+
+        Assert.True(WaitUntil(() => !TryFindNode(path, out _) && state.Bus.DeviceCount == 0), "the keyboard node should leave the tree and the bus should release its device after the unplug");
+        Assert.True(node.State == NodeState.Retracted, "the node should be retracted");
+        Assert.True(node.Binding is { IsDetaching: true }, "the binding should be flagged as detaching");
+        Assert.True(FindDeviceIndex(UsbKeyboardName) < 0, "the withdrawn keyboard should have left the published list");
+        Assert.Equal(devicesBefore - 1, DriverInfo.DeviceCount, "the published list should have shrunk by one");
+        Assert.Equal(withdrawnBefore + 1, _keyboardConsumer.WithdrawnCount, "the consumer should be told the keyboard is gone");
+        Assert.Equal(nodesBefore - 1, DriverInfo.NodeCount, "the node count should drop by one");
+        Assert.True(TryFindNode(xhciPath, out DeviceNodeInfo hostAfter), "the controller's node should still be in the tree");
+        Assert.Equal(childrenBefore - 1, hostAfter.ChildCount, "a retracted child leaves its parent's count");
+        Assert.Equal(0, state.Bus.DeviceCount, "the bus should carry no device once the keyboard is gone");
+        Assert.True(state.PipesClosed >= 1, "the controller should have closed the keyboard's report pipe");
+    }
+
+    // The root port QEMU picks for the replug is its own (the next free
+    // one), so the new path is logged, not asserted.
+    private void TestUsbKeyboardReplugPublishesAgain()
+    {
+        if (!TryGetXhci(out string? xhciPath, out DeviceNodeInfo hostBefore))
+        {
+            return;
+        }
+
+        XhciState? state = FindDriverState<XhciState>(xhciPath);
+        Assert.NotNull(state);
+        if (state is null)
+        {
+            return;
+        }
+
+        int publishedBefore = _keyboardConsumer.PublishedCount;
+        int nodesBefore = DriverInfo.NodeCount;
+        int childrenBefore = hostBefore.ChildCount;
+
+        TR.RequestHost(UsbKeyboardPlugRequest);
+
+        Assert.True(WaitUntil(() => FindUsbKeyboardPath() is { } found && TryFindNode(found, out DeviceNodeInfo foundInfo) && foundInfo.State == DeviceNodeState.Bound && state.Bus.DeviceCount == 1), "the keyboard should be bound again after the replug");
+
+        DeviceNode? oldNode = _usbKeyboardNode;
+        string? path = FindUsbKeyboardPath();
+        Assert.NotNull(path, "the replugged keyboard's interface should be in the tree");
+        if (path is null)
+        {
+            return;
+        }
+
+        _usbKeyboardPath = path;
+        _usbKeyboardNode = FindNode(path);
+        Assert.True(_usbKeyboardNode is not null && !ReferenceEquals(_usbKeyboardNode, oldNode), "the replug should publish a new node");
+        Log.WriteString("[DriversTests] replugged keyboard at ");
+        Log.WriteString(path);
+        Log.WriteString("\n");
+
+        Assert.True(TryFindNode(path, out DeviceNodeInfo info), "the new keyboard node should be in the tree");
+        Assert.True(info.State == DeviceNodeState.Bound, "the new keyboard interface should be bound");
+        Assert.True(info.DriverName == nameof(UsbKeyboardDriver), "UsbKeyboardDriver should hold the new interface");
+        Assert.Equal(2, info.OfferCount, "the declining driver and then the shipped driver should have been offered the new node");
+        Assert.True(TryFindOffer(path, 0, out DeviceOfferInfo declined), "the declined offer should be recorded");
+        Assert.True(declined.DriverName == nameof(UsbDeclineDriver) && declined.Outcome == DeviceOfferOutcome.Declined, "the declining driver should have declined the new node first");
+
+        Assert.Equal(publishedBefore + 1, _keyboardConsumer.PublishedCount, "the suite's consumer should be handed the replugged keyboard");
+        Assert.True(_keyboardConsumer.LastPublished is { Device: IKeyboard keyboard } && keyboard.Name == UsbKeyboardName, "the published device should be the shipped driver's keyboard");
+        Assert.Equal(nodesBefore + 1, DriverInfo.NodeCount, "the node count should grow by one");
+        Assert.True(TryFindNode(xhciPath, out DeviceNodeInfo hostAfter), "the controller's node should still be in the tree");
+        Assert.Equal(childrenBefore + 1, hostAfter.ChildCount, "the controller should count its child again");
+        Assert.True(FindDeviceIndex(UsbKeyboardName) >= 0, "the keyboard should be back in the published list");
+    }
+
+    private void TestUsbKeyboardReplugSetLeds()
+    {
+        if (!TryGetUsbKeyboardState(out UsbKeyboardState? state))
+        {
+            return;
+        }
+
+        state.SetLeds(KeyboardLeds.ScrollLock);
+
+        Assert.Equal(ScrollLockReport, state.LastLedReport, "the report should carry the HID Scroll Lock bit");
+        Assert.True(state.LastLedStatus == UsbTransferStatus.Success, "the replugged keyboard should accept the output report");
+        Assert.Equal(1, state.LedWrites, "a fresh state should count this write alone");
+    }
+
     // ==================== Helpers ====================
 
     /// <summary>
@@ -1090,6 +1360,152 @@ public class Kernel : Sys.Kernel
             Assert.Fail("the 82574L node was not found by BeforeRun");
             info = default;
             return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Finds the path of the first function node describing an xHCI
+    /// controller, whatever its state: the USB tests decide from the
+    /// hardware's presence, as the E1000E tests do, so a probe that failed
+    /// shows up as a failed test rather than a skip.
+    /// </summary>
+    /// <returns>The node's path, or null when no such function is on the bus.</returns>
+    private static string? FindXhciPath()
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+                && info.BusName == PciBusName
+                && info.Description.Contains(XhciClassDescription, StringComparison.Ordinal))
+            {
+                return info.Path;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Finds the path of the first usb node describing a HID boot keyboard
+    /// interface that is not retracted; compared ordinally, since the kernel
+    /// runtime does not plug the culture-sensitive comparisons.
+    /// </summary>
+    /// <returns>The node's path, or null when no live keyboard interface is in the tree.</returns>
+    private static string? FindUsbKeyboardPath()
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+                && info.BusName == UsbBusName
+                && info.Description.EndsWith(UsbKeyboardDescriptionSuffix, StringComparison.Ordinal)
+                && info.State != DeviceNodeState.Retracted)
+            {
+                return info.Path;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>Hands back the controller's path and a fresh snapshot of its node, or fails the test when BeforeRun found none.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private bool TryGetXhci([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    {
+        path = _xhciPath;
+        if (path is null || !TryFindNode(path, out info))
+        {
+            Assert.Fail("the xHCI controller's node was not found by BeforeRun");
+            info = default;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>Hands back the keyboard interface's path and node as the bound test recorded them, or fails the test when it did not.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="node">The node itself.</param>
+    /// <returns>True when both were recorded.</returns>
+    private bool TryGetUsbKeyboard([NotNullWhen(true)] out string? path, [NotNullWhen(true)] out DeviceNode? node)
+    {
+        path = _usbKeyboardPath;
+        node = _usbKeyboardNode;
+        if (path is null || node is null)
+        {
+            Assert.Fail("the USB keyboard was not set up by the bound test");
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>Hands back the shipped keyboard driver's state on the keyboard interface recorded last, or fails the test.</summary>
+    /// <param name="state">The driver state when found.</param>
+    /// <returns>True when the interface is bound by the shipped driver.</returns>
+    private bool TryGetUsbKeyboardState([NotNullWhen(true)] out UsbKeyboardState? state)
+    {
+        state = null;
+        if (!TryGetUsbKeyboard(out string? path, out _))
+        {
+            return false;
+        }
+
+        state = FindDriverState<UsbKeyboardState>(path);
+        Assert.NotNull(state, "the keyboard interface should be bound by UsbKeyboardDriver");
+        return state is not null;
+    }
+
+    /// <summary>Finds the node with the given path in the tree itself, through the HAL grant.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <returns>The node, or null when no node has that path.</returns>
+    private static DeviceNode? FindNode(string path)
+    {
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            DeviceNode node = nodes[i];
+            if (node.Path == path)
+            {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Finds the driver state of the node with the given path in the tree
+    /// itself, through the HAL grant: the counters the USB tests read are on
+    /// the state, which no diagnostic snapshot carries.
+    /// </summary>
+    /// <typeparam name="TState">The driver state's class.</typeparam>
+    /// <param name="path">The node's path.</param>
+    /// <returns>The state, or null when the node is not bound by a driver keeping that state.</returns>
+    private static TState? FindDriverState<TState>(string path) where TState : class => FindNode(path)?.Binding?.DriverState as TState;
+
+    /// <summary>
+    /// Waits for a hot-plug to show up, sleeping so the hot-plug thread and
+    /// the kit worker get to run, for at most the hot-plug budget.
+    /// </summary>
+    /// <param name="condition">What the test waits for.</param>
+    /// <returns>True when the condition held within the budget.</returns>
+    private static bool WaitUntil(Func<bool> condition)
+    {
+        long deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * HotPlugTimeoutMilliseconds / TR.MillisecondsPerSecond;
+        while (!condition())
+        {
+            if (Stopwatch.GetTimestamp() >= deadline)
+            {
+                return false;
+            }
+
+            SysThread.Sleep(HotPlugPollMilliseconds);
         }
 
         return true;

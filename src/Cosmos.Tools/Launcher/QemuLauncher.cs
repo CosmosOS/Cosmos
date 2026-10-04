@@ -73,7 +73,7 @@ public sealed class QemuLaunchOptions
     /// <summary>
     /// Disks to attach. Each <see cref="DiskAttachment"/> carries the image
     /// path, the controller type (ahci or nvme), and an optional comma-prefixed
-    /// suffix appended to the QEMU <c>-device</c> line — used by test profiles
+    /// suffix appended to the QEMU <c>-device</c> line, used by test profiles
     /// to toggle things like <c>msix=off</c> or <c>msix_qsize=1</c>. AHCI disks
     /// share one <c>ich9-ahci</c> controller across successive ports; NVMe
     /// disks each get a dedicated <c>nvme</c> controller. Honoured on x64 (q35)
@@ -128,7 +128,7 @@ public enum DiskKind
 /// <summary>
 /// One disk image to expose to the guest. <see cref="ExtraDeviceOptions"/> is
 /// appended verbatim to the QEMU <c>-device</c> line (without the leading
-/// comma — the launcher inserts that), so a profile can pass things like
+/// comma, the launcher inserts that), so a profile can pass things like
 /// <c>"msix=off"</c> or <c>"msix_qsize=1"</c> to exercise the kernel's
 /// interrupt-fallback paths.
 /// </summary>
@@ -161,8 +161,14 @@ public static class QemuLauncher
     /// </summary>
     private const int NetworkTestRawSocketPort = 5560;
 
-    /// <summary>QEMU id of the xHCI controller USB disks sit on; its root hub is the bus <c>usbxhci0.0</c>.</summary>
+    /// <summary>QEMU id of the xHCI controller USB disks and the USB keyboard sit on; its root hub is the bus <c>usbxhci0.0</c>.</summary>
     public const string UsbControllerId = "usbxhci0";
+
+    /// <summary>The keyboard model a profile names to get a USB keyboard on the xHCI controller, and QEMU's driver name for it.</summary>
+    public const string UsbKeyboardModel = "usb-kbd";
+
+    /// <summary>QEMU id of the USB keyboard plugged in at boot, the one to unplug.</summary>
+    public const string UsbKeyboardId = "usbkbd0";
 
     /// <summary>QEMU id of the drive behind the <paramref name="index"/>th USB disk.</summary>
     public static string UsbDriveId(int index) => $"usbdisk{index}";
@@ -193,7 +199,7 @@ public static class QemuLauncher
         // share/qemu/ for BIOS/firmware lookup. The MSYS2 Windows build never
         // auto-discovers its data dir, and even the Linux/macOS build's runtime
         // search depends on the build's compile-time prefix matching the install
-        // prefix — we ship a portable bundle, so neither holds. Explicit -L is
+        // prefix: we ship a portable bundle, so neither holds. Explicit -L is
         // the only universally reliable mechanism.
         if (resolved.Source == ToolSource.Bundle)
         {
@@ -317,12 +323,12 @@ public static class QemuLauncher
         {
             args.Append(" -vga std");
         }
-        AppendStorageArgs(args, options);
+        AppendUsbKeyboardArgs(args, options, AppendStorageArgs(args, options));
     }
 
     private static void AppendArm64Args(StringBuilder args, QemuLaunchOptions options)
     {
-        // -bios takes a bare filename when not absolute — QEMU resolves it
+        // -bios takes a bare filename when not absolute: QEMU resolves it
         // through its data dir search, which our `-L "<exe>/../share/qemu"`
         // (added above when Source==Bundle) points at the bundle's
         // edk2-aarch64-code.fd. No separate firmware-lookup logic needed.
@@ -335,18 +341,18 @@ public static class QemuLauncher
         args.Append($" -cpu {cpu} -m {options.MemoryMb}M");
         args.Append(" -bios edk2-aarch64-code.fd");
         // -cdrom takes its filename verbatim (no option parsing), so commas
-        // must NOT be doubled here — only the quote rejection in BuildAsync
+        // must NOT be doubled here: only the quote rejection in BuildAsync
         // applies.
         args.Append($" -cdrom \"{options.IsoPath}\"");
         args.Append(" -boot d -no-reboot");
         // ramfb is required for Limine framebuffer support even when headless.
         args.Append(" -device ramfb");
-        AppendStorageArgs(args, options);
+        AppendUsbKeyboardArgs(args, options, AppendStorageArgs(args, options));
     }
 
     /// <summary>
     /// True when the x64 guest can run under KVM: Linux x64 host with an
-    /// openable /dev/kvm (the open is the canonical access check — it also
+    /// openable /dev/kvm (the open is the canonical access check, which also
     /// catches "exists but not in the kvm group"). Set COSMOS_NO_KVM=1 to
     /// force TCG, e.g. to reproduce a TCG-only bug.
     /// </summary>
@@ -393,7 +399,8 @@ public static class QemuLauncher
     /// appended after the standard device properties so profiles can flip
     /// things like <c>msix=off</c>.
     /// </summary>
-    internal static void AppendStorageArgs(StringBuilder args, QemuLaunchOptions options)
+    /// <returns>True when the xHCI controller was emitted, so the USB keyboard can share it.</returns>
+    internal static bool AppendStorageArgs(StringBuilder args, QemuLaunchOptions options)
     {
         int ahciIndex = 0;
         int nvmeIndex = 0;
@@ -437,6 +444,30 @@ public static class QemuLauncher
                     break;
             }
         }
+
+        return usbControllerEmitted;
+    }
+
+    /// <summary>
+    /// Attaches the USB keyboard when <see cref="QemuLaunchOptions.KeyboardDevice"/>
+    /// is <see cref="UsbKeyboardModel"/>: on the xHCI controller the USB
+    /// disks emitted, or on one added here when the run has no USB disk, so
+    /// the keyboard always sits on <c>usbxhci0.0</c> under the id the engine
+    /// unplugs and replugs.
+    /// </summary>
+    internal static void AppendUsbKeyboardArgs(StringBuilder args, QemuLaunchOptions options, bool controllerEmitted)
+    {
+        if (!string.Equals(options.KeyboardDevice, UsbKeyboardModel, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (!controllerEmitted)
+        {
+            args.Append($" -device qemu-xhci,id={UsbControllerId}");
+        }
+
+        args.Append($" -device {UsbKeyboardModel},bus={UsbControllerId}.0,id={UsbKeyboardId}");
     }
 
     /// <summary>
@@ -460,14 +491,17 @@ public static class QemuLauncher
     /// <summary>
     /// Attaches an input device (keyboard/mouse) as a <c>-device</c> line.
     /// <c>null</c>/empty and the sentinels <c>"none"</c>/<c>"ps2"</c> add
-    /// nothing — PS/2 is part of the x64 chipset, not a device you attach — so
+    /// nothing (PS/2 is part of the x64 chipset, not a device you attach), so
     /// only real QEMU models (e.g. <c>virtio-keyboard-device</c>) are emitted.
+    /// <see cref="UsbKeyboardModel"/> adds nothing here either: that keyboard
+    /// goes on the xHCI controller through <see cref="AppendUsbKeyboardArgs"/>.
     /// </summary>
     internal static void AppendInputDevice(StringBuilder args, string? model)
     {
         if (string.IsNullOrWhiteSpace(model)
             || model.Equals("none", StringComparison.OrdinalIgnoreCase)
-            || model.Equals("ps2", StringComparison.OrdinalIgnoreCase))
+            || model.Equals("ps2", StringComparison.OrdinalIgnoreCase)
+            || model.Equals(UsbKeyboardModel, StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
@@ -478,8 +512,8 @@ public static class QemuLauncher
 
     /// <summary>
     /// Selects the guest's VGA adapter as a <c>-vga</c> backend. <c>null</c>/empty
-    /// keeps the architecture default; any other value — including QEMU's own
-    /// <c>none</c> — is passed through. Emitted for both arches: the profile
+    /// keeps the architecture default; any other value, including QEMU's own
+    /// <c>none</c>, is passed through. Emitted for both arches: the profile
     /// catalog's architecture filter is what keeps an adapter off a machine
     /// that cannot present it.
     /// </summary>
@@ -498,9 +532,9 @@ public static class QemuLauncher
     /// Attaches a display adapter as a <c>-device</c> line, additively: the
     /// machine's default adapter stays, so this never disturbs the framebuffer
     /// the bootloader came up on. <c>null</c>/empty and the sentinel
-    /// <c>"none"</c> add nothing. Emitted for both arches — q35 accepts
+    /// <c>"none"</c> add nothing. Emitted for both arches (q35 accepts
     /// <c>virtio-gpu-pci</c> beside its std VGA, and virt accepts it beside
-    /// ramfb — so the catalog needs no architecture filter for it.
+    /// ramfb), so the catalog needs no architecture filter for it.
     /// </summary>
     internal static void AppendGpuDevice(StringBuilder args, string? model)
     {
@@ -544,7 +578,7 @@ public static class QemuLauncher
         {
             return;
         }
-        // Allow callers to pass "msix=off" or ",msix=off" — normalize to a
+        // Allow callers to pass "msix=off" or ",msix=off": normalize to a
         // single leading comma so it splices cleanly onto the -device line.
         string trimmed = extra.Trim();
         ValidateOptionToken(trimmed, "ExtraDeviceOptions");
@@ -557,7 +591,7 @@ public static class QemuLauncher
 
     /// <summary>
     /// Validates and escapes a path spliced into a QEMU <c>-drive file=</c>
-    /// value: commas are doubled (QEMU's option-parser escape — an unescaped
+    /// value: commas are doubled (QEMU's option-parser escape; an unescaped
     /// comma truncates the filename and turns the remainder into bogus drive
     /// options), and quotes are rejected because the surrounding
     /// <c>file="…"</c> token has no way to carry one through the argument
@@ -579,7 +613,7 @@ public static class QemuLauncher
     }
 
     // QEMU option splices (-M properties, -device properties) only ever need
-    // [A-Za-z0-9_.,=-]. Anything else — whitespace above all — would leave
+    // [A-Za-z0-9_.,=-]. Anything else, whitespace above all, would leave
     // the current token and splice new arguments into the command line, so
     // reject it instead of passing it through.
     private static void ValidateOptionToken(string value, string what)

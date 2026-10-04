@@ -245,9 +245,9 @@ public partial class Engine
                     Console.WriteLine($"[Engine] Re-launching kernel for boot #{boot} (skip={boot})");
                 }
 
-                // Every boot starts with the sticks plugged in, and a QEMU of
-                // its own to connect a monitor.
-                await using QemuHotPlug? hotPlug = QemuHotPlug.For(disks);
+                // Every boot starts with the sticks and the keyboard plugged
+                // in, and a QEMU of its own to connect a monitor.
+                await using QemuHotPlug? hotPlug = QemuHotPlug.For(disks, profile.KeyboardDevice);
                 QemuRunResult result = await _qemuHost.RunKernelAsync(
                     bootIsoPath, bootLogPath, _config.TimeoutSeconds, _config.ShouldShowDisplay, enableNetworkTesting, disks, profile.MachineOptions,
                     new ProfileDevices(profile.NetworkCard, profile.KeyboardDevice, profile.MouseDevice, profile.VgaAdapter, profile.GpuDevice),
@@ -263,19 +263,19 @@ public partial class Engine
                 }
 
                 // No suite-end marker: either the boot reached a destructive test
-                // (RunDestructive — Power.Reboot/Shutdown) and the guest exited /
+                // (RunDestructive: Power.Reboot/Shutdown) and the guest exited /
                 // hung on purpose, or the kernel crashed mid-suite. The two are
                 // distinguished by the TestDestructiveReached sentinel emitted by
                 // RunDestructive immediately before invoking the destructive
                 // action. Without that marker, treat this boot as a real failure
-                // and let the suite fail — re-launching would just mask the bug.
+                // and let the suite fail: re-launching would just mask the bug.
                 if (!UartLogShowsDestructiveProgress(result.UartLog))
                 {
                     break;
                 }
 
                 string exitReason = result.TimedOut ? "timed out" : "guest exited";
-                Console.WriteLine($"[Engine] Boot #{boot} {exitReason} after a destructive test was reached — re-launching.");
+                Console.WriteLine($"[Engine] Boot #{boot} {exitReason} after a destructive test was reached, re-launching.");
             }
         }
         finally
@@ -375,7 +375,7 @@ public partial class Engine
         // bring-up crash, triple fault, QEMU launch failure) contributes
         // zero tests and zero expected count. Without a sentinel it is
         // invisible to AllTestsPassed once other cells contribute passing
-        // tests — the exact cells this matrix exists to pin (gicv2/gicv3/
+        // tests, the exact cells this matrix exists to pin (gicv2/gicv3/
         // acpi-off hardware paths) would vanish from CI without failing it.
         if (profileResults.Tests.Count == 0 && profileResults.ExpectedTestCount == 0)
         {
@@ -427,7 +427,7 @@ public partial class Engine
     /// + command 108). Used to distinguish "destructive test was reached, then
     /// the kernel exited/hung as expected" (continue to next boot, advancing
     /// skip=N) from "the kernel crashed or hung in a non-destructive test"
-    /// (real failure — bail out and let the suite fail).
+    /// (real failure: bail out and let the suite fail).
     /// </summary>
     private static bool UartLogShowsDestructiveProgress(string uartLog)
     {
@@ -553,8 +553,8 @@ public partial class Engine
         results.UartLog = qemuResult.UartLog ?? string.Empty;
         results.ErrorMessage = qemuResult.ErrorMessage ?? string.Empty;
 
-        // If the suite completed normally (TestSuiteEnd received and validated), all tests ran —
-        // no need to synthesise failures for missing tests.
+        // If the suite completed normally (TestSuiteEnd received and validated), all tests ran,
+        // so there is no need to synthesise failures for missing tests.
         if (!results.SuiteCompleted && results.ExpectedTestCount > 0 && results.Tests.Count < results.ExpectedTestCount)
         {
             int actualCount = results.Tests.Count;
@@ -599,7 +599,7 @@ public partial class Engine
 
         Console.WriteLine($"[Coverage] Using coverage map: {mapPath}");
 
-        // Parse coverage map — one ID may map to multiple methods (plug aliases share target ID)
+        // Parse coverage map: one ID may map to multiple methods (plug aliases share target ID)
         var allMethods = new List<(int Id, string Assembly, string Type, string Method)>();
         foreach (var line in File.ReadAllLines(mapPath))
         {

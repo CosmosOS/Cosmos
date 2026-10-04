@@ -16,11 +16,11 @@ using Cosmos.Tools.Launcher;
 namespace Cosmos.TestRunner.Engine.Hosts;
 
 /// <summary>
-/// Plugs the profile's USB sticks in and out of the running guest when one
-/// of its tests asks (<see cref="Ds2Vs.HostRequest"/>), through QEMU's QMP
-/// monitor. QEMU connects the monitor to <see cref="Port"/> at startup, so
-/// an instance exists, and listens, before QEMU is launched. One instance
-/// serves one QEMU run.
+/// Plugs the profile's USB sticks and the USB keyboard in and out of the
+/// running guest when one of its tests asks (<see cref="Ds2Vs.HostRequest"/>),
+/// through QEMU's QMP monitor. QEMU connects the monitor to <see cref="Port"/>
+/// at startup, so an instance exists, and listens, before QEMU is launched.
+/// One instance serves one QEMU run.
 /// </summary>
 public sealed class QemuHotPlug : IAsyncDisposable
 {
@@ -30,14 +30,29 @@ public sealed class QemuHotPlug : IAsyncDisposable
     /// <summary>Plugs stick n (0 when omitted) back in, on the same image.</summary>
     public const string UsbPlugRequest = "usb-plug";
 
+    /// <summary>Pulls the profile's USB keyboard off the xHCI controller.</summary>
+    public const string UsbKeyboardUnplugRequest = "usb-kbd-unplug";
+
+    /// <summary>Plugs it back in.</summary>
+    public const string UsbKeyboardPlugRequest = "usb-kbd-plug";
+
     private readonly TcpListener _listener;
     private readonly IReadOnlyList<DiskAttachment> _sticks;
+
+    /// <summary>Whether the profile attaches a USB keyboard at all.</summary>
+    private readonly bool _keyboard;
 
     /// <summary>QEMU id of each stick's device, null while it is unplugged.</summary>
     private readonly string?[] _deviceIds;
 
+    /// <summary>QEMU id of the keyboard's device, null while it is unplugged.</summary>
+    private string? _keyboardId;
+
     /// <summary>Numbers the devices and drives of each plug, whose ids QEMU may not have released yet.</summary>
     private int _plugCount;
+
+    /// <summary>Numbers the keyboard's plugs, for the same reason.</summary>
+    private int _keyboardPlugCount;
 
     private Task? _connected;
     private TcpClient? _client;
@@ -47,9 +62,11 @@ public sealed class QemuHotPlug : IAsyncDisposable
     /// <summary>Port QEMU connects its monitor to (<see cref="QemuLaunchOptions.MonitorPort"/>).</summary>
     public int Port { get; }
 
-    private QemuHotPlug(IReadOnlyList<DiskAttachment> sticks)
+    private QemuHotPlug(IReadOnlyList<DiskAttachment> sticks, bool keyboard)
     {
         _sticks = sticks;
+        _keyboard = keyboard;
+        _keyboardId = keyboard ? QemuLauncher.UsbKeyboardId : null;
         _deviceIds = new string?[sticks.Count];
         for (int i = 0; i < sticks.Count; i++)
         {
@@ -62,13 +79,16 @@ public sealed class QemuHotPlug : IAsyncDisposable
     }
 
     /// <summary>
-    /// An instance for a run attaching <paramref name="disks"/>, or null
-    /// when none of them is a USB stick, so nothing can be plugged.
+    /// An instance for a run attaching <paramref name="disks"/> and the
+    /// keyboard model <paramref name="keyboardDevice"/>, or null when none of
+    /// the disks is a USB stick and the keyboard is not
+    /// <see cref="QemuLauncher.UsbKeyboardModel"/>, so nothing can be plugged.
     /// </summary>
-    public static QemuHotPlug? For(IReadOnlyList<DiskAttachment> disks)
+    public static QemuHotPlug? For(IReadOnlyList<DiskAttachment> disks, string? keyboardDevice)
     {
         List<DiskAttachment> sticks = disks.Where(d => d.Kind == DiskKind.Usb).ToList();
-        return sticks.Count == 0 ? null : new QemuHotPlug(sticks);
+        bool keyboard = string.Equals(keyboardDevice, QemuLauncher.UsbKeyboardModel, StringComparison.OrdinalIgnoreCase);
+        return sticks.Count == 0 && !keyboard ? null : new QemuHotPlug(sticks, keyboard);
     }
 
     /// <summary>Takes QEMU's monitor connection. Called once QEMU was started.</summary>
@@ -83,7 +103,7 @@ public sealed class QemuHotPlug : IAsyncDisposable
     {
         if (hotPlug is null)
         {
-            Console.WriteLine($"[HotPlug] Ignored '{request}': the profile attaches no USB stick");
+            Console.WriteLine($"[HotPlug] Ignored '{request}': the profile attaches no USB device");
             return;
         }
 
@@ -127,25 +147,56 @@ public sealed class QemuHotPlug : IAsyncDisposable
     private async Task RunAsync(string request, CancellationToken cancellationToken)
     {
         string[] words = request.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        int index = 0;
-        if (words.Length == 0 || words.Length > 2
-            || (words.Length == 2 && !int.TryParse(words[1], out index))
-            || index < 0 || index >= _sticks.Count)
+        if (words.Length == 0)
         {
-            throw new InvalidOperationException($"no such USB stick (the profile attaches {_sticks.Count})");
+            throw new InvalidOperationException("unknown request");
         }
 
         await (_connected ?? throw new InvalidOperationException("QEMU's monitor was never attached"));
         switch (words[0])
         {
             case UsbUnplugRequest:
-                await UnplugAsync(index, cancellationToken);
+                await UnplugAsync(StickIndex(words), cancellationToken);
                 break;
             case UsbPlugRequest:
-                await PlugAsync(index, cancellationToken);
+                await PlugAsync(StickIndex(words), cancellationToken);
+                break;
+            case UsbKeyboardUnplugRequest:
+                RequireKeyboard(words);
+                await UnplugKeyboardAsync(cancellationToken);
+                break;
+            case UsbKeyboardPlugRequest:
+                RequireKeyboard(words);
+                await PlugKeyboardAsync(cancellationToken);
                 break;
             default:
                 throw new InvalidOperationException("unknown request");
+        }
+    }
+
+    /// <summary>The stick a request names: its second word, 0 when omitted, below the number of sticks.</summary>
+    private int StickIndex(string[] words)
+    {
+        int index = 0;
+        if (words.Length > 2 || (words.Length == 2 && !int.TryParse(words[1], out index)) || index < 0 || index >= _sticks.Count)
+        {
+            throw new InvalidOperationException($"no such USB stick (the profile attaches {_sticks.Count})");
+        }
+
+        return index;
+    }
+
+    /// <summary>Checks a keyboard request against the run: no index, and a profile with the keyboard.</summary>
+    private void RequireKeyboard(string[] words)
+    {
+        if (words.Length > 1)
+        {
+            throw new InvalidOperationException("the keyboard request takes no index");
+        }
+
+        if (!_keyboard)
+        {
+            throw new InvalidOperationException("the profile attaches no USB keyboard");
         }
     }
 
@@ -195,6 +246,37 @@ public sealed class QemuHotPlug : IAsyncDisposable
             },
             cancellationToken);
         _deviceIds[index] = deviceId;
+    }
+
+    private async Task UnplugKeyboardAsync(CancellationToken cancellationToken)
+    {
+        string deviceId = _keyboardId ?? throw new InvalidOperationException("the USB keyboard is already unplugged");
+        await ExecuteAsync("device_del", new JsonObject { ["id"] = deviceId }, cancellationToken);
+        _keyboardId = null;
+    }
+
+    private async Task PlugKeyboardAsync(CancellationToken cancellationToken)
+    {
+        if (_keyboardId is not null)
+        {
+            throw new InvalidOperationException("the USB keyboard is already plugged in");
+        }
+
+        _keyboardPlugCount++;
+        string deviceId = $"{QemuLauncher.UsbKeyboardId}p{_keyboardPlugCount}";
+
+        // No drive: the keyboard is the device alone, on the same root hub
+        // the command line put it on.
+        await ExecuteAsync(
+            "device_add",
+            new JsonObject
+            {
+                ["driver"] = QemuLauncher.UsbKeyboardModel,
+                ["bus"] = $"{QemuLauncher.UsbControllerId}.0",
+                ["id"] = deviceId
+            },
+            cancellationToken);
+        _keyboardId = deviceId;
     }
 
     private async Task ConnectAsync(CancellationToken cancellationToken)

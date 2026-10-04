@@ -49,6 +49,47 @@ public class QemuLauncherTests
         Assert.Contains("-device usb-storage,drive=usbdisk1,bus=usbxhci0.0,id=usbstick1", text);
     }
 
+    // The keyboard rides the xHCI controller the USB disks share, under the
+    // id the engine unplugs; a run with no USB disk gets the controller from
+    // the keyboard itself, and never twice.
+    [Fact]
+    public void AppendUsbKeyboardArgs_PutsTheKeyboardOnOneXhciController()
+    {
+        QemuLaunchOptions keyboardOnly = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            KeyboardDevice = "usb-kbd"
+        };
+        StringBuilder args = new();
+        QemuLauncher.AppendUsbKeyboardArgs(args, keyboardOnly, QemuLauncher.AppendStorageArgs(args, keyboardOnly));
+
+        string text = args.ToString();
+        Assert.Contains("-device qemu-xhci,id=usbxhci0", text);
+        Assert.Equal(text.IndexOf("qemu-xhci", StringComparison.Ordinal), text.LastIndexOf("qemu-xhci", StringComparison.Ordinal));
+        Assert.Contains(" -device usb-kbd,bus=usbxhci0.0,id=usbkbd0", text);
+
+        // The shared input path adds nothing for it, so the keyboard is emitted once.
+        args.Clear();
+        QemuLauncher.AppendInputDevice(args, "usb-kbd");
+        Assert.Equal(string.Empty, args.ToString());
+
+        QemuLaunchOptions withDisk = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            KeyboardDevice = "usb-kbd",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.Usb }]
+        };
+        args.Clear();
+        QemuLauncher.AppendUsbKeyboardArgs(args, withDisk, QemuLauncher.AppendStorageArgs(args, withDisk));
+
+        text = args.ToString();
+        Assert.Equal(text.IndexOf("qemu-xhci", StringComparison.Ordinal), text.LastIndexOf("qemu-xhci", StringComparison.Ordinal));
+        Assert.Contains("-device usb-storage,drive=usbdisk0,bus=usbxhci0.0,id=usbstick0", text);
+        Assert.Contains(" -device usb-kbd,bus=usbxhci0.0,id=usbkbd0", text);
+    }
+
     [Fact]
     public void AppendStorageArgs_RejectsQuotesInDrivePaths()
     {
@@ -145,7 +186,7 @@ public class QemuLauncherTests
         Assert.Throws<ArgumentException>(() => QemuLauncher.AppendInputDevice(args, "virtio-keyboard-device -device rm"));
     }
 
-    // "none" passes through deliberately — it is QEMU's own spelling for "no
+    // "none" passes through deliberately: it is QEMU's own spelling for "no
     // VGA adapter", not a sentinel of ours like the input devices' "ps2".
     [Theory]
     [InlineData("vmware")]

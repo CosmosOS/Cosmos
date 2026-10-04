@@ -61,6 +61,18 @@
       ]
     },
     {
+      // A USB keyboard (usb-kbd) on a qemu-xhci controller, plugged in at
+      // boot. The kit's XhciDriver binds the controller and publishes the
+      // keyboard's HID interface as a usb: node, which UsbKeyboardDriver
+      // binds after the Drivers suite's UsbDeclineDriver opened its pipe
+      // and declined. The suite then unplugs and replugs it through the
+      // engine's usb-kbd-unplug and usb-kbd-plug host requests. The
+      // keyboard is a USB 2 device: QEMU's xHCI numbers its USB 3 ports
+      // 1 to 4 and its USB 2 ports 5 to 8, so the node is usb:1-5:0.
+      "name": "usb-kbd",
+      "keyboard": "usb-kbd"
+    },
+    {
       // Intel E1000E NIC, the historical x64 default, kept as an explicit
       // cell so the driver keeps its coverage now that the NIC is a choice.
       "name": "e1000e",

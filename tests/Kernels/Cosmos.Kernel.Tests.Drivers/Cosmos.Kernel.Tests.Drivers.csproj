@@ -13,14 +13,17 @@
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
-  <!-- One bare cell per architecture: the synthetic groups need no hardware,
-       and the hardware group reads what the machine carries by default (the
-       PCI host on both arches; q35's default e1000e on x64, while virt's
-       default NIC is a virtio-net-pci function that the kit's VirtioNetDriver
-       binds, so the E1000E tests skip there). Definitions live in
+  <!-- Two cells per architecture: bare, where the synthetic groups need no
+       hardware and the hardware group reads what the machine carries by
+       default (the PCI host on both arches; q35's default e1000e on x64, while
+       virt's default NIC is a virtio-net-pci function that the kit's
+       VirtioNetDriver binds, so the E1000E tests skip there), and usb-kbd,
+       which adds a qemu-xhci controller with a usb-kbd plugged in at boot for
+       the USB keyboard group; that group skips on bare. Definitions live in
        tests/profiles.json. -->
   <ItemGroup>
     <CosmosTestProfile Include="bare" />
+    <CosmosTestProfile Include="usb-kbd" />
   </ItemGroup>
 
   <!-- Manifest policy under test: a default driver dropped by name, and an
