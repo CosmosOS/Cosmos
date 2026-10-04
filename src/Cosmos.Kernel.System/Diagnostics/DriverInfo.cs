@@ -60,10 +60,10 @@ public static class DriverInfo
     public static int DriverCount => DriverRegistry.Drivers.Count;
 
     /// <summary>
-    /// Number of nodes ever published to the tree, retracted ones included,
-    /// and the bound for the node index of <see cref="TryGetNode"/> and
-    /// <see cref="TryGetOffer"/>. Nodes are never removed, so an index stays
-    /// valid once it is.
+    /// Number of nodes in the tree, and the bound for the node index of
+    /// <see cref="TryGetNode"/> and <see cref="TryGetOffer"/>. A retracted
+    /// node leaves the list, so the positions after it shift down by one,
+    /// as a withdrawn device does in <see cref="DeviceCount"/>.
     /// </summary>
     public static int NodeCount => DriverEngine.Nodes.Count;
 
@@ -77,7 +77,7 @@ public static class DriverInfo
     /// <summary>
     /// Kit resources held by every bound node's binding, summed: register
     /// windows, regions, DMA buffers, interrupt handles, work items, periodic
-    /// work, events and threads. Nodes in any other state contribute nothing;
+    /// work, events, threads and USB pipes. Nodes in any other state contribute nothing;
     /// what a retraction could not take back is per node, in
     /// <see cref="DeviceNodeInfo.LeakedResourceCount"/>.
     /// </summary>

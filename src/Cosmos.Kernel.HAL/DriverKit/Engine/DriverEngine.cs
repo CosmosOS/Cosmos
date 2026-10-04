@@ -52,7 +52,7 @@ internal static class DriverEngine
     /// <summary>True when a worker thread runs the jobs; false before start and in inline mode.</summary>
     public static bool HasWorker => s_mode == EngineMode.Worker;
 
-    /// <summary>Every node ever published, in publication order, retracted ones included. A snapshot.</summary>
+    /// <summary>Every node in the tree, in publication order; a retracted node has left it. A snapshot.</summary>
     public static IReadOnlyList<DeviceNode> Nodes => s_nodes;
 
     /// <summary>True when the calling code runs on the worker thread.</summary>
@@ -287,7 +287,9 @@ internal static class DriverEngine
 
     /// <summary>
     /// Tears a node down now, on the calling job: its binding (children
-    /// first, inside it), then the node is marked retracted, the bus's
+    /// first, inside it), then the node is marked retracted and leaves the
+    /// tree (a node retracted on its own leaves its parent's children too;
+    /// one retracted with its parent stays on the dead parent), the bus's
     /// after-teardown hook runs when the node had a binding, and the bus's
     /// allocation for it is released unless resources leaked. Worker or
     /// drain only.
@@ -308,6 +310,15 @@ internal static class DriverEngine
             // Retracted whatever the teardown managed: a node left pending
             // with a half-dead binding would be offered or torn down again.
             node.State = NodeState.Retracted;
+
+            // Off the parent before off the list: a reader that no longer
+            // finds the node already sees the parent's child count reduced.
+            if (cause == DetachCause.Retracted && node.Parent?.Binding is { } parentBinding)
+            {
+                parentBinding.RemoveChild(node);
+            }
+
+            RemoveFromTree(node);
 
             // Even when resources leaked: a function whose driver thread is
             // stuck still has its bus mastering turned off. A node nobody
@@ -330,6 +341,26 @@ internal static class DriverEngine
             }
 
             DriverLog.Retracted(node);
+        }
+    }
+
+    /// <summary>Takes a retracted node out of <see cref="s_nodes"/>, the inverse of <see cref="PublishNode"/>'s insert.</summary>
+    private static void RemoveFromTree(DeviceNode node)
+    {
+        using (s_nodesLock.AcquireIrqSafe())
+        {
+            DeviceNode[] current = s_nodes;
+            for (int i = 0; i < current.Length; i++)
+            {
+                if (ReferenceEquals(current[i], node))
+                {
+                    DeviceNode[] nodes = new DeviceNode[current.Length - 1];
+                    Array.Copy(current, nodes, i);
+                    Array.Copy(current, i + 1, nodes, i, current.Length - i - 1);
+                    s_nodes = nodes;
+                    return;
+                }
+            }
         }
     }
 

@@ -90,13 +90,13 @@ public readonly struct DeviceNodeInfo
     /// </summary>
     public int OfferCount { get; }
 
-    /// <summary>Number of nodes the node's driver published beneath it, retracted ones included.</summary>
+    /// <summary>Children still in the tree: nodes the node's driver published beneath it, less those retracted on their own or by a probe's unwind.</summary>
     public int ChildCount { get; }
 
     /// <summary>
     /// Kit resources the node's binding holds right now: register windows,
     /// regions, DMA buffers, interrupt handles, work items, periodic work,
-    /// events and threads. Zero unless <see cref="State"/> is
+    /// events, threads and USB pipes. Zero unless <see cref="State"/> is
     /// <see cref="DeviceNodeState.Bound"/>: a node with no live binding holds
     /// nothing, and what a retraction could not take back is
     /// <see cref="LeakedResourceCount"/>.

@@ -2,6 +2,7 @@
 
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
 
@@ -15,7 +16,8 @@ public sealed partial class DeviceBinding
     /// <summary>
     /// Tears the binding down for a device going away. Worker only. The
     /// order: the flag first, so nothing new is acquired; child nodes;
-    /// published devices; interrupts; deferred work, events and threads;
+    /// published devices; interrupts; USB pipes; deferred work, events and
+    /// threads;
     /// <see cref="Driver.OnDetach"/>; then memory, in reverse order of
     /// acquisition. A thread that does not stop in
     /// <see cref="JoinTimeoutMilliseconds"/> keeps the memory it may still
@@ -39,6 +41,7 @@ public sealed partial class DeviceBinding
         DeviceNode[] children;
         PublishedDevice[] devices;
         InterruptHandle[] handles;
+        UsbPipeResource[] pipes;
         WorkItem[] workItems;
         WorkItem[] kitItems;
         PeriodicWork[] periodic;
@@ -59,6 +62,7 @@ public sealed partial class DeviceBinding
             children = _children.ToArray();
             devices = _devices.ToArray();
             handles = _handles.ToArray();
+            pipes = _pipes.ToArray();
             workItems = _workItems.ToArray();
             kitItems = _kitItems.ToArray();
             periodic = _periodic.ToArray();
@@ -79,6 +83,21 @@ public sealed partial class DeviceBinding
             catch (Exception exception)
             {
                 DriverLog.TeardownStepThrew(Node, Driver, "child teardown", exception.Message);
+            }
+        }
+
+        // 1b. A probe's unwind leaves the node alive for the next candidate:
+        //     the children it published are off the node, so Children
+        //     names only nodes still in the tree. A teardown keeps them on
+        //     the dead parent.
+        if (!runOnDetach)
+        {
+            using (_lock.AcquireIrqSafe())
+            {
+                for (int i = 0; i < children.Length; i++)
+                {
+                    Node.RemoveChild(children[i]);
+                }
             }
         }
 
@@ -106,6 +125,20 @@ public sealed partial class DeviceBinding
             catch (Exception exception)
             {
                 DriverLog.TeardownStepThrew(Node, Driver, "interrupt disconnect", exception.Message);
+            }
+        }
+
+        // 3b. Pipes: stopped and dropped on the controller while the ring they
+        //     point at is still allocated; a waiter on one wakes with Stopped.
+        for (int i = 0; i < pipes.Length; i++)
+        {
+            try
+            {
+                pipes[i].Release();
+            }
+            catch (Exception exception)
+            {
+                DriverLog.TeardownStepThrew(Node, Driver, "pipe close", exception.Message);
             }
         }
 

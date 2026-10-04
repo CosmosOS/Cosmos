@@ -772,6 +772,7 @@ public class Kernel : Sys.Kernel
         int withdrawnBefore = _keyboardConsumer.WithdrawnCount;
         int heldBefore = DriverInfo.GetTotalHeldResourceCount();
         PublishedDevice? published = _keyboardConsumer.LastPublished;
+        int nodesBefore = DriverInfo.NodeCount;
 
         SyntheticBus.Retract(node);
         SyntheticBus.WaitForQueuedJobs();
@@ -786,11 +787,10 @@ public class Kernel : Sys.Kernel
         Assert.Equal(devicesBefore - 1, DriverInfo.DeviceCount, "the published list should have shrunk by one");
         Assert.True(FindDeviceIndex(state.Name) < 0, "the withdrawn keyboard should have left the published list");
 
-        Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info), "the retracted node stays in the tree");
-        Assert.True(info.State == DeviceNodeState.Retracted, "the node should be retracted");
-        Assert.True(info.DriverName == nameof(KeyboardDriver), "the node still names the driver that held it last");
-        Assert.Equal(0, info.HeldResourceCount, "a retracted node holds nothing");
-        Assert.Equal(0, info.PublishedDeviceCount, "a retracted node publishes nothing");
+        Assert.False(TryFindNode(node.Path, out _), "a retracted node leaves the tree");
+        Assert.Equal(nodesBefore - 1, DriverInfo.NodeCount, "the node count should drop by one");
+        Assert.True(node.State == NodeState.Retracted, "the node should be retracted");
+        Assert.True(node.Binding is { Driver.Name: nameof(KeyboardDriver) }, "the node still names the driver that held it last");
         Assert.Equal(heldBefore - state.ExpectedHeldResourceCount, DriverInfo.GetTotalHeldResourceCount(), "the held total should drop by what the binding held");
         Assert.True(node.Binding is { IsDetaching: true }, "the binding should be flagged as detaching");
         Assert.True(access.Window.IsEmpty, "the RAM page should have gone back to the allocator");
@@ -809,7 +809,7 @@ public class Kernel : Sys.Kernel
         Assert.True(state.ThreadExited, "the driver thread should have returned once the binding began detaching");
         Assert.True(state.ThreadExitedBeforeDetach, "the join should precede OnDetach");
         Assert.True(state.Thread is { HasExited: true }, "the kit should see the thread as exited");
-        Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info) && info.LeakedResourceCount == 0, "a thread that stopped in time leaks nothing");
+        Assert.True(node.LeakedResourceCount == 0, "a thread that stopped in time leaks nothing");
     }
 
     private void TestRetractSinkReportDiscarded()
@@ -891,6 +891,7 @@ public class Kernel : Sys.Kernel
         ChildDriver? child = RecordingDriver.Find<ChildDriver>();
         BusDriver? busDriver = RecordingDriver.Find<BusDriver>();
         Assert.True(child is { DetachCount: 0 }, "the child driver should still hold its device");
+        int nodesBefore = DriverInfo.NodeCount;
 
         SyntheticBus.Retract(bus);
         SyntheticBus.WaitForQueuedJobs();
@@ -900,10 +901,10 @@ public class Kernel : Sys.Kernel
         Assert.True(child is not null && !child.LastDetachReason.HardwarePresent, "the child inherits the parent's hardware state");
         Assert.True(busDriver is not null && busDriver.DetachCount == 1 && busDriver.LastDetachReason.Cause == DetachCause.Retracted, "the bus driver should see its own retraction");
 
-        Assert.True(TryFindNode(busState.Child.Path, out DeviceNodeInfo childInfo) && childInfo.State == DeviceNodeState.Retracted, "the child should be retracted");
-        Assert.True(TryFindNode(busState.Orphan.Path, out DeviceNodeInfo orphanInfo) && orphanInfo.State == DeviceNodeState.Retracted, "the orphan should be retracted");
-        Assert.True(TryFindNode(bus.Path, out DeviceNodeInfo busInfo) && busInfo.State == DeviceNodeState.Retracted, "the bus node should be retracted");
-        Assert.Equal(2, busInfo.ChildCount, "retracted children stay counted");
+        Assert.False(TryFindNode(busState.Child.Path, out _) || TryFindNode(busState.Orphan.Path, out _) || TryFindNode(bus.Path, out _), "a retracted parent and its children leave the tree");
+        Assert.Equal(nodesBefore - 3, DriverInfo.NodeCount, "the three nodes should leave the count");
+        Assert.True(busState.Child.State == NodeState.Retracted && busState.Orphan.State == NodeState.Retracted && bus.State == NodeState.Retracted, "all three should be retracted");
+        Assert.Equal(2, bus.Children.Count, "children retracted with their parent stay on the parent");
     }
 
     // ==================== Diagnostics ====================

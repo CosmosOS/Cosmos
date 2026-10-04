@@ -8,10 +8,11 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// <summary>
 /// A device a bus found, in the kit's tree: its identity, the resources and
 /// interrupt sources it exposes, the bus's own access object, and where it
-/// is in its life. Every node ever published stays in
-/// <see cref="DriverEngine.Nodes"/> with its state, so the diagnostics view
-/// can say what happened to it. Lists a reader may see while the worker
-/// appends are copy-on-write arrays, so a snapshot is always consistent.
+/// is in its life. A node stays in <see cref="DriverEngine.Nodes"/> with its
+/// state until it is retracted, when it leaves the list; the object keeps
+/// its state, its offers and its last binding for whoever still holds it.
+/// Lists a reader may see while the worker changes them are copy-on-write
+/// arrays, so a snapshot is always consistent.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class DeviceNode
@@ -62,7 +63,7 @@ public sealed class DeviceNode
     /// <summary>Every offer made for the node, in order, with its outcome.</summary>
     public IReadOnlyList<DeviceOffer> Offers => _offers;
 
-    /// <summary>Nodes published beneath this one by its driver, retracted ones included.</summary>
+    /// <summary>Nodes published beneath this one by its driver that are still in the tree: one retracted on its own or by a probe's unwind leaves it, those retracted with this node stay.</summary>
     public IReadOnlyList<DeviceNode> Children => _children;
 
     /// <summary>How many interrupt handler exceptions the node's driver has had.</summary>
@@ -125,6 +126,23 @@ public sealed class DeviceNode
         Array.Copy(_children, children, _children.Length);
         children[_children.Length] = child;
         _children = children;
+    }
+
+    /// <summary>Takes a child retracted on its own, or by a probe's unwind, off the list. Worker, under the parent binding's lock.</summary>
+    internal void RemoveChild(DeviceNode child)
+    {
+        DeviceNode[] current = _children;
+        for (int i = 0; i < current.Length; i++)
+        {
+            if (ReferenceEquals(current[i], child))
+            {
+                DeviceNode[] children = new DeviceNode[current.Length - 1];
+                Array.Copy(current, children, i);
+                Array.Copy(current, i + 1, children, i, current.Length - i - 1);
+                _children = children;
+                return;
+            }
+        }
     }
 
     /// <summary>Records a handler exception. Interrupt context: keeps the message reference, formats nothing.</summary>

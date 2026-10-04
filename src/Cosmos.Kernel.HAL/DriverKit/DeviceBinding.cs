@@ -5,6 +5,7 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
@@ -15,7 +16,8 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// A driver's handle on one device, created for each offer and kept while
 /// the driver is bound. Everything a driver acquires goes through it and is
 /// written to its ledger: windows, regions, DMA memory, interrupts, events,
-/// work items, periodic work, threads, published devices, child nodes. When
+/// work items, periodic work, threads, USB pipes, published devices, child
+/// nodes. When
 /// the driver declines, fails, or the device goes away, the kit releases the
 /// ledger in a fixed order and the driver frees nothing itself. A
 /// <see cref="DeviceLock"/> is the one thing on the ledger that is nothing
@@ -53,6 +55,7 @@ public sealed unsafe partial class DeviceBinding
     private readonly List<PublishedDevice> _devices = new();
     private readonly List<DeviceNode> _children = new();
     private readonly List<DeviceLock> _locks = new();
+    private readonly List<UsbPipeResource> _pipes = new();
 
     internal DeviceBinding(DeviceNode node, Driver driver)
     {
@@ -87,9 +90,9 @@ public sealed unsafe partial class DeviceBinding
     /// </summary>
     public DeviceEvent DetachEvent { get; }
 
-    /// <summary>Kit resources the binding holds: windows, regions, DMA buffers, interrupts, work items, periodic work, events and threads.</summary>
+    /// <summary>Kit resources the binding holds: windows, regions, DMA buffers, interrupts, work items, periodic work, events, threads and USB pipes.</summary>
     internal int HeldResourceCount =>
-        _memory.Count + _handles.Count + _workItems.Count + _periodic.Count + _events.Count + _threads.Count;
+        _memory.Count + _handles.Count + _workItems.Count + _periodic.Count + _events.Count + _threads.Count + _pipes.Count;
 
     /// <summary>Devices the binding has published and not yet withdrawn.</summary>
     internal int PublishedDeviceCount => _devices.Count;
@@ -500,6 +503,59 @@ public sealed unsafe partial class DeviceBinding
         ulong address = ((ulong)pages + mask) & ~mask;
         ulong physical = PageAllocator.VirtualToPhysical(address);
         return new DmaBuffer(address, physical, length, (ulong)pages);
+    }
+
+    /// <summary>Puts a USB pipe on the ledger; a pipe opened after teardown began is closed again and the member refused.</summary>
+    /// <param name="pipe">The pipe's ledger entry.</param>
+    /// <param name="member">The access member recording it, for the exception.</param>
+    /// <exception cref="InvalidOperationException">The binding is being torn down.</exception>
+    internal void RecordPipe(UsbPipeResource pipe, string member) => Record(_pipes, pipe, member);
+
+    /// <summary>Takes a USB pipe off the ledger, for an early close by the driver.</summary>
+    /// <param name="pipe">The pipe's ledger entry.</param>
+    internal void RemovePipe(UsbPipeResource pipe)
+    {
+        using (_lock.AcquireIrqSafe())
+        {
+            Remove(_pipes, pipe);
+        }
+    }
+
+    /// <summary>The ledger entry whose pipe is <paramref name="pipe"/>, or null when the pipe was not opened through this binding.</summary>
+    /// <param name="pipe">The pipe to look up.</param>
+    internal UsbPipeResource? FindPipe(UsbPipe pipe)
+    {
+        using (_lock.AcquireIrqSafe())
+        {
+            for (int i = 0; i < _pipes.Count; i++)
+            {
+                if (ReferenceEquals(_pipes[i].Pipe, pipe))
+                {
+                    return _pipes[i];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Takes a child retracted on its own out of this binding's list and
+    /// off the node's children. Worker, from the child's teardown; nothing
+    /// is removed once this binding is itself detaching, so the children a
+    /// parent's teardown tears down stay on the dead parent.
+    /// </summary>
+    /// <param name="child">The retracted child.</param>
+    internal void RemoveChild(DeviceNode child)
+    {
+        using (_lock.AcquireIrqSafe())
+        {
+            if (!_detaching)
+            {
+                Remove(_children, child);
+                Node.RemoveChild(child);
+            }
+        }
     }
 
     private void Record<T>(List<T> list, T resource, string member) where T : class

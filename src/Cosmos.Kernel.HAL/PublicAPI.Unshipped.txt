@@ -127,6 +127,18 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.InterruptSource.MaskCore() -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.InterruptSource.TryConnectCore(Cosmos.Kernel.HAL.DriverKit.InterruptTrampoline! trampoline) -> bool
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.InterruptSource.UnmaskCore() -> void
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.BulkInCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe, System.Span<byte> data, out int transferred) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.BulkOutCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe, System.ReadOnlySpan<byte> data, out int transferred) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.ClosePipeCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe) -> void
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.ConfigureAsHubCore(byte portCount, byte thinkTime) -> bool
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.ControlTransferCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket setup, System.Span<byte> data) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.OnDisconnectedCore() -> void
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.OpenBulkPipeCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint! endpoint) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe?
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.OpenInterruptPipeCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint! endpoint, Cosmos.Kernel.HAL.DriverKit.Usb.UsbReportHandler! handler) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe?
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.ResetEndpointCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe) -> bool
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbHostController.AddressDeviceCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice? parentHub, byte port, Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed speed) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice?
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbHostController.Name.get -> string!
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbHostController.ReleaseDeviceCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice! device, bool hostPresent) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioTransport.ActivateQueue(ushort index, in Cosmos.Kernel.HAL.DriverKit.Virtio.VirtqueueLayout layout) -> bool
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioTransport.AfterReset() -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioTransport.AssignConfigInterrupt(int entry) -> bool
@@ -146,6 +158,39 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioTransport.WriteConfig8(uint offset, byte value) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioTransport.WriteDriverFeatures(ulong features) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioTransport.WriteStatus(byte status) -> void
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.MaxControlTransferLength = 4096 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbClassCode.Hid = 3 -> byte
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbClassCode.Hub = 9 -> byte
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbClassCode.MassStorage = 8 -> byte
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.CharacteristicsOffset = 3 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.ConnectDebounceMs = 100 -> uint
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.HubChangeBit = 1 -> uint
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.HubDescriptorLength = 7 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.HubRecipient = Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Class -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.MaxRoutablePort = 15 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortChangeConnection = 1 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortChangeEnable = 2 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortChangeReset = 16 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortCountOffset = 2 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortFeatureConnectionChange = 16 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortFeaturePower = 8 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortFeatureReset = 4 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortFeatureResetChange = 20 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortRecipient = Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Other | Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Class -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortResetPollMs = 10 -> uint
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortResetTimeoutMs = 500 -> uint
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortStatusConnection = 1 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortStatusEnable = 2 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortStatusHighSpeed = 1024 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortStatusLowSpeed = 512 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PortStatusReset = 16 -> ushort
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PowerOnToPowerGoodOffset = 5 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.PowerOnToPowerGoodUnitMs = 2 -> uint
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.ResetRecoveryMs = 10 -> uint
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.SetHubDepthRequest = 12 -> byte
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.StatusLength = 4 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.ThinkTimeMask = 3 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.ThinkTimeShift = 5 -> int
 [COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioAccess.MaxQueues = 8 -> int
 [COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioAccess.ResetPollMicroseconds = 10 -> uint
 [COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioAccess.ResetTimeoutMilliseconds = 100 -> uint
@@ -436,6 +481,146 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticIdentity
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticIdentity.Key.get -> string!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticMatch
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.AttachChild(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, byte port, Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed speed) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.BulkIn(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe, System.Span<byte> data, out int transferred) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.BulkOut(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe, System.ReadOnlySpan<byte> data, out int transferred) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.ClearHalt(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.ClosePipe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.Configuration.get -> System.ReadOnlySpan<byte>
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.ConfigureAsHub(byte portCount, byte thinkTime) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.ControlIn(Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType requestType, byte request, ushort value, ushort index, System.Span<byte> data) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.ControlOut(Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType requestType, byte request, ushort value, ushort index) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.ControlOut(Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType requestType, byte request, ushort value, ushort index, System.ReadOnlySpan<byte> data) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.ControlTransfer(Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket setup, System.Span<byte> data) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.DetachChild(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, byte port) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.Endpoints.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint!>!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.FindEndpoint(Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType type, bool isIn) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint?
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.GetDescriptor(Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType type, byte index, System.Span<byte> buffer) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.HubDepth.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.InterfaceClass.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.InterfaceNumber.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.InterfaceProtocol.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.InterfaceSubclass.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.IsDisconnected.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.MaxPacketSize0.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.OpenBulkPipe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint! endpoint, out Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe? pipe) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.OpenInterruptPipe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint! endpoint, Cosmos.Kernel.HAL.DriverKit.Usb.UsbReportHandler! handler, out Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe? pipe) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.PortPath.get -> string!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.Speed.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus.Attach(byte port, Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed speed) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus.Binding.get -> Cosmos.Kernel.HAL.DriverKit.DeviceBinding!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus.Detach(byte port) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus.DeviceCount.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus.Host.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbHostController!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus.Ordinal.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus.ReleaseAll(bool hostPresent) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus.UsbBus(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.Usb.UsbHostController! host) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbClassCode
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType.Configuration = 2 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType.Device = 1 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType.Endpoint = 5 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType.Hub = 41 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType.Interface = 4 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType.SuperSpeedEndpointCompanion = 48 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType.SuperSpeedHub = 42 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDescriptorType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.ConfigurationValue.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.DeviceClass.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.DeviceProtocol.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.DeviceSubclass.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.Host.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbHostController!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.HubDepth.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.IsDisconnected.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.MarkDisconnected() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.MaxPacketSize0.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.MaxPacketSize0.set -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.Parent.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice?
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.PortNumber.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.ProductId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.RootPortNumber.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.Speed.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.UsbDevice(Cosmos.Kernel.HAL.DriverKit.Usb.UsbHostController! host, Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice? parent, byte portNumber, Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed speed) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.VendorId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint.AdditionalTransactions.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint.Address.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint.Interval.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint.IsIn.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint.MaxBurst.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint.MaxPacketSize.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint.Number.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint.Type.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType.Bulk = 2 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType.Control = 0 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType.Interrupt = 3 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType.Isochronous = 1 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpointType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbHostController
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbHostController.UsbHostController() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.ConfigurationValue.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.DeviceClass.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.DeviceProtocol.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.DeviceSubclass.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.InterfaceClass.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.InterfaceNumber.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.InterfaceProtocol.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.InterfaceSubclass.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.PortPath.get -> string!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.ProductId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.Speed.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.VendorId.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbMatch
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbMatch.UsbMatch(ushort? vendorId = null, ushort? productId = null, byte? deviceClass = null, byte? deviceSubclass = null, byte? deviceProtocol = null, byte? interfaceClass = null, byte? interfaceSubclass = null, byte? interfaceProtocol = null) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe.Endpoint.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe.IsClosed.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe.IsClosed.set -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe.UsbPipe(Cosmos.Kernel.HAL.DriverKit.Usb.UsbEndpoint! endpoint) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbReportHandler
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Class = 32 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Device = 0 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.DeviceToHost = 128 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Endpoint = 2 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.HostToDevice = 0 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Interface = 1 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Other = Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Interface | Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Endpoint -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Standard = 0 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType.Vendor = 64 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket.Index.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket.IsDeviceToHost.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket.Length.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket.Pack() -> ulong
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket.Request.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket.RequestType.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket.UsbSetupPacket() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket.UsbSetupPacket(Cosmos.Kernel.HAL.DriverKit.Usb.UsbRequestType requestType, byte request, ushort value, ushort index, ushort length) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSetupPacket.Value.get -> ushort
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed.Full = 1 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed.High = 3 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed.Low = 2 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed.Super = 4 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed.SuperPlus = 5 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed.Unknown = 0 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbSpeed
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest.ClearFeature = 1 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest.GetDescriptor = 6 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest.GetStatus = 0 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest.SetConfiguration = 9 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest.SetFeature = 3 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbStandardRequest
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus.Disconnected = 4 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus.Error = 3 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus.Stall = 1 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus.Success = 0 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus.Timeout = 2 -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioAccess
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioAccess.ConfigInterrupt.get -> Cosmos.Kernel.HAL.DriverKit.InterruptSource!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioAccess.DeviceType.get -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioDeviceType
@@ -523,6 +708,11 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticIdentity.Describe() -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticMatch.Matches(Cosmos.Kernel.HAL.DriverKit.DeviceIdentity! identity) -> bool
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticMatch.Specificity.get -> int
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.Address.get -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.BusName.get -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Usb.UsbIdentity.Describe() -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Usb.UsbMatch.Matches(Cosmos.Kernel.HAL.DriverKit.DeviceIdentity! identity) -> bool
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Usb.UsbMatch.Specificity.get -> int
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioIdentity.Address.get -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioIdentity.BusName.get -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioIdentity.Describe() -> string!
@@ -549,8 +739,12 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticBus.WaitForQueuedJobs() -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticMatch.Any() -> Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticMatch!
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticMatch.Key(string! key) -> Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticMatch!
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.HighSpeedChangeFeatures.get -> System.ReadOnlySpan<byte>
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.HubChangeFeatures.get -> System.ReadOnlySpan<byte>
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Usb.UsbHubProtocol.SuperSpeedChangeFeatures.get -> System.ReadOnlySpan<byte>
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioMatch.Any() -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioMatch!
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioMatch.DeviceType(Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioDeviceType type) -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioMatch!
 [COSMOS0003]virtual Cosmos.Kernel.HAL.DriverKit.Driver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 [COSMOS0003]virtual Cosmos.Kernel.HAL.DriverKit.Driver.Priority.get -> int
 [COSMOS0003]virtual Cosmos.Kernel.HAL.DriverKit.InterruptHandler.Invoke(Cosmos.Kernel.HAL.DriverKit.InterruptContext! context) -> void
+[COSMOS0003]virtual Cosmos.Kernel.HAL.DriverKit.Usb.UsbReportHandler.Invoke(System.ReadOnlySpan<byte> report) -> void
