@@ -28,6 +28,13 @@ internal static unsafe partial class ExceptionHelper
     // Guard against recursive exception handling.
     private static bool s_isHandlingException = false;
 
+    // Whether every throw is told on the serial port (its message and where it was thrown), and
+    // the handler found for it: for debugging the dispatcher, whose crash would otherwise lose
+    // the exception. Off, only an exception nothing catches is told: a line costs ~90 µs per
+    // character over a 115200-baud UART, and code that catches what it throws (a script engine
+    // running a page) throws dozens of times a second.
+    internal static bool TraceThrows;
+
     // The catch clauses whose funclets are running, recorded just before control transfers to
     // each funclet, with the ExInfo of the exception that entered them. A funclet runs on top of
     // the dispatcher, itself on top of the frames of the throw, so an exception thrown while it
@@ -169,9 +176,31 @@ internal static unsafe partial class ExceptionHelper
 
         PruneFinishedCatches(pExInfo);
 
+        // Before the stack walk, in case the walk crashes.
+        if (TraceThrows)
+        {
+            WriteThrow(ex, throwAddress, throwRbp, throwRsp);
+        }
+
+        DispatchExceptionWithContext(ex, throwAddress, throwRbp, throwRsp, pExInfo);
+
+        // DispatchExceptionWithContext transfers to the handler on success; it only returns here
+        // when no handler covered the throw.
+        if (!TraceThrows)
+        {
+            WriteThrow(ex, throwAddress, throwRbp, throwRsp);
+        }
+
+        Serial.WriteString("\n*** UNHANDLED EXCEPTION ***\n");
+        Serial.WriteString("No catch handler found. System halting...\n");
+        FailFast("Unhandled exception", ex);
+    }
+
+    /// <summary>Tells the serial port what was thrown, and where.</summary>
+    private static void WriteThrow(Exception ex, nuint throwAddress, nuint throwRbp, nuint throwRsp)
+    {
         Serial.WriteString("\n=== DOTNET EXCEPTION THROWN ===\n");
-        // Print the message before the stack walk, in case the walk crashes. Avoid GetType().Name —
-        // it allocates.
+        // Avoid GetType().Name — it allocates.
         string? msg = ex.Message;
         if (msg is not null)
         {
@@ -188,14 +217,6 @@ internal static unsafe partial class ExceptionHelper
         Serial.WriteString("RSP: 0x");
         Serial.WriteNumber(throwRsp);
         Serial.WriteString("\n");
-
-        DispatchExceptionWithContext(ex, throwAddress, throwRbp, throwRsp, pExInfo);
-
-        // DispatchExceptionWithContext transfers to the handler on success; it only returns here
-        // when no handler covered the throw.
-        Serial.WriteString("\n*** UNHANDLED EXCEPTION ***\n");
-        Serial.WriteString("No catch handler found. System halting...\n");
-        FailFast("Unhandled exception", ex);
     }
 
     /// <summary>
@@ -262,9 +283,12 @@ internal static unsafe partial class ExceptionHelper
             if (!IsUnwoundFrame(frame.FramePointer)
                 && TryFindHandler(ex, frame.ReturnAddress - 1, frame.FramePointer, out EHClause clause, pRegDisplay))
             {
-                Serial.WriteString("[EH] Handler found at 0x");
-                Serial.WriteHex((nuint)clause.HandlerAddress);
-                Serial.WriteString("\n");
+                if (TraceThrows)
+                {
+                    Serial.WriteString("[EH] Handler found at 0x");
+                    Serial.WriteHex((nuint)clause.HandlerAddress);
+                    Serial.WriteString("\n");
+                }
 
                 catchFrame = frame;
                 catchClause = clause;
