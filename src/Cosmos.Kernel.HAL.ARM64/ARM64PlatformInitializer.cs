@@ -11,7 +11,6 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Power;
 using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
 using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
-using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Platform;
@@ -261,11 +260,9 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        // USB keyboards only: virtio input is a kit driver now, published
-        // to the keyboard consumer. Behind USB's own switch so a kernel
-        // without USB never references the USB keyboard driver and ILC
-        // trims it.
-        return CosmosFeatures.UsbEnabled ? UsbKeyboardDriver.GetKeyboards() : [];
+        // The platform has no keyboard of its own: USB and virtio keyboards
+        // are kit drivers now, published to the keyboard consumer.
+        return [];
     }
 
     public IMouseDevice[] GetMouseDevices()

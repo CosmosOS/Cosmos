@@ -246,9 +246,7 @@ public sealed class PciHostAccess
     /// <remarks>
     /// Sizing writes all ones to each register and reads the mask back, so
     /// for its duration the function decodes neither memory nor I/O while
-    /// bus mastering stays as it was (the function the HAL's USB host
-    /// controller driver operates keeps its DMA and its MSI-X). Interrupts
-    /// are disabled around the
+    /// bus mastering stays as it was. Interrupts are disabled around the
     /// write pairs and the early framebuffer console is paused: the serial
     /// log mirrors every byte into the framebuffer, whose BAR may be the
     /// one being sized, so nothing in that scope writes to the log.

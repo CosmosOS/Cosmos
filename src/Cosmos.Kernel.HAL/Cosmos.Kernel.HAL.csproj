@@ -8,7 +8,7 @@
     <Description>Hardware abstraction layer base for multi-architecture kernel development.</Description>
     <PackageTags>cosmos;kernel;hal;abstraction;architecture;hardware</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
-    <!-- The driver kit's worker thread, its waits and delays and the USB hot-plug thread go through the experimental scheduler seam (COSMOS0001). -->
+    <!-- The driver kit's worker thread and its waits and delays go through the experimental scheduler seam (COSMOS0001). -->
     <!-- COSMOS0003: this assembly declares the experimental driver kit seam and consumes it itself. -->
     <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
@@ -52,8 +52,8 @@
 
   <ItemGroup>
     <!-- System's managers sit directly on the HAL drivers (PS/2 mouse, PCI
-         discovery, USB mass storage) and install their kit consumers through
-         the internal DeviceRegistry (keyboard, mouse, network, display, block). -->
+         discovery) and install their kit consumers through the internal
+         DeviceRegistry (keyboard, mouse, network, display, block). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
     <!-- The aggregator initializes PlatformHAL from its library initializer. -->
     <InternalsVisibleTo Include="Cosmos.Kernel" />
@@ -62,10 +62,10 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box suites over HAL internals: MSI-X tables (Interrupts),
          PCI discovery and the nodes' PciAccess (Pci), platform power ops
-         (Power), the block device base class and the USB mass storage driver
-         (Storage), the TimerDevice base and its
-         software timers (Timer), the tree and the bindings' driver state
-         (Virtio). -->
+         (Power), the block device base class behind the in-memory probe
+         hosts and the legacy PCI manager behind the BAR relocation probes
+         (Storage), the TimerDevice base and its software timers (Timer),
+         the tree and the bindings' driver state (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />

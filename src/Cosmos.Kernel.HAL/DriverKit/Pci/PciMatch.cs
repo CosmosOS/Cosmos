@@ -8,8 +8,8 @@ namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 /// A match over PCI identities: every field given must equal the
 /// function's, every field left null is not looked at, and the specificity
 /// is the number of fields given. A match that constrains nothing is
-/// refused: until the HAL's USB host controller driver moves into the
-/// kit, a catch-all driver would quiesce the function it operates.
+/// refused: a catch-all driver would be offered every function on the
+/// bus, the ones other drivers want included.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class PciMatch : DeviceMatch

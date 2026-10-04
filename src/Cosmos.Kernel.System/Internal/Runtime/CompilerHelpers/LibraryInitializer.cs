@@ -5,7 +5,6 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Graphics;
@@ -50,15 +49,6 @@ internal class LibraryInitializer
                     {
                         KeyboardManager.RegisterKeyboard(keyboard);
                     }
-
-                    // USB keyboards plugged in or pulled out from now on. Nested
-                    // under USB's own switch so a kernel without USB never
-                    // references the USB keyboard driver and ILC trims it.
-                    if (CosmosFeatures.UsbEnabled)
-                    {
-                        UsbKeyboardDriver.KeyboardAttached = KeyboardManager.RegisterKeyboard;
-                        UsbKeyboardDriver.KeyboardDetached = KeyboardManager.UnregisterKeyboard;
-                    }
                 }
 
                 // Initialize Mouse Manager and register mouse
@@ -96,24 +86,6 @@ internal class LibraryInitializer
                     Serial.WriteString("[KERNEL]   - Initializing storage manager...\n");
                     StorageManager.Initialize();
                 }
-            }
-
-            // Storage device registration runs OUTSIDE the
-            // DisableInterruptsScope: ScanPartitions issues real I/O
-            // (LBA 0 read for MBR/GPT detection), and interrupt-driven
-            // drivers like the xHCI host under a USB disk need IF=1 /
-            // DAIF.I=0 to receive completion IRQs. Disposing the scope only RESTORES the
-            // prior state: on ARM64 IRQs were still masked from boot
-            // at this point, so explicitly unmask before doing I/O.
-            // The kernel re-enables IRQs again in Kernel.Start; this
-            // call is idempotent.
-            if (StorageManager.IsEnabled)
-            {
-                if (InterruptManager.IsEnabled)
-                {
-                    InternalCpu.EnableInterrupts();
-                }
-                StorageManager.RegisterHalDevices();
             }
         }
     }

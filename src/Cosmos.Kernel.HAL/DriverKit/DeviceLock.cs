@@ -28,8 +28,12 @@ public sealed class DeviceLock
     /// Takes the lock. Any context; the holder runs with interrupts disabled
     /// until the scope is disposed, so the lock is never held across
     /// <see cref="DeviceBinding.Sleep"/>, <see cref="DeviceBinding.Wait"/>,
-    /// <see cref="DeviceBinding.Delay"/>, a sink call or a publish. Not
-    /// reentrant: a holder that acquires again spins forever.
+    /// <see cref="DeviceBinding.Delay"/>, a sink call or a publish. A bus
+    /// driver that drains its event ring under the lock may call a report
+    /// handler there; such a handler is bound by the
+    /// <see cref="Usb.UsbReportHandler"/> contract (allocation-free, sinks
+    /// and Interlocked only), which is the one sanctioned sink call under a
+    /// lock. Not reentrant: a holder that acquires again spins forever.
     /// </summary>
     /// <returns>The held state; a <c>using</c> binds to it and releases the lock.</returns>
     public DeviceLockScope Acquire() => new(_lock.AcquireIrqSafe());

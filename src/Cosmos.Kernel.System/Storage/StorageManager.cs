@@ -2,7 +2,6 @@
 
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Filesystems.Fat;
@@ -14,27 +13,26 @@ namespace Cosmos.Kernel.System.Storage;
 /// <summary>
 /// Manages block storage devices. A disk reaches the manager one of two
 /// ways: a driver kit driver publishes it and the manager's
-/// <see cref="KitBlockConsumer"/> registers it during the driver stage, or
-/// it is handed to <see cref="RegisterDevice"/> directly (the USB mass
-/// storage units the HAL's USB stack finds at boot and on hot-plug, and
-/// whatever a kernel registers by hand). Every registration scans the disk
-/// for partitions. The tables change after boot too, when a USB disk is
-/// plugged in or pulled out, from the USB hot-plug thread, and when a kit
-/// disk is published or withdrawn, from the kit worker: each is replaced
-/// whole on every change, so a list read from <see cref="Devices"/>,
+/// <see cref="KitBlockConsumer"/> registers it (the AHCI, NVMe and USB mass
+/// storage drivers), or it is handed to <see cref="RegisterDevice"/>
+/// directly by the kernel. Every registration scans the disk for
+/// partitions. The tables change after boot too, when a USB disk is plugged
+/// in or pulled out, from the kit worker in a probe or a teardown: each is
+/// replaced whole on every change, so a list read from <see cref="Devices"/>,
 /// <see cref="Partitions"/> or <see cref="GetPartitions"/> never changes
 /// under its reader. Read it once and index that copy: a second read may be
 /// a newer table.
 /// <para>
 /// The tables are kept in one order, which decides the primary device: a
 /// kit disk before a hand-registered one; among kit disks the smaller node
-/// path by ordinal comparison, and among equal paths (the ports of one
-/// controller) the earlier registered; among hand-registered disks the
-/// earlier registered. So an internal disk comes before a USB stick present
-/// at boot whichever registered first, and a kit disk arriving after a USB
-/// stick moves ahead of it and renumbers <see cref="Partitions"/>, which is
-/// why a mount by <see cref="Partition"/> keeps its partition where a mount
-/// by index string keeps its index.
+/// path by ordinal comparison (<c>pci:</c> before <c>usb:</c> before
+/// <c>virtio:</c>), and among equal paths the earlier registered; among
+/// hand-registered disks the earlier registered. So an internal disk on a
+/// PCI controller comes before a USB stick present at boot whichever
+/// registered first, and a kit disk arriving after a USB stick moves ahead
+/// of it and renumbers <see cref="Partitions"/>, which is why a mount by
+/// <see cref="Partition"/> keeps its partition where a mount by index
+/// string keeps its index.
 /// </para>
 /// </summary>
 public static class StorageManager
@@ -196,47 +194,12 @@ public static class StorageManager
     }
 
     /// <summary>
-    /// Registers the USB mass storage units the HAL's USB stack found at
-    /// boot and follows the USB disks plugged in or pulled out from then
-    /// on. The AHCI and NVMe disks do not pass through here: the driver
-    /// kit's storage drivers publish them during the driver stage and the
-    /// manager's block consumer registers them as they arrive. Called once
-    /// during boot after the HAL has initialized the USB stack.
-    /// </summary>
-    internal static void RegisterHalDevices()
-    {
-        if (!IsEnabled)
-        {
-            return;
-        }
-
-        // Before the boot disks are read, so none can slip between the two;
-        // one reported twice is registered once. Both USB blocks sit behind
-        // USB's own switch so a kernel without USB never references the USB
-        // mass storage driver and ILC trims it.
-        if (CosmosFeatures.UsbEnabled)
-        {
-            UsbMassStorageDriver.DiskAttached = RegisterDevice;
-            UsbMassStorageDriver.DiskDetached = UnregisterDevice;
-        }
-
-        if (CosmosFeatures.UsbEnabled)
-        {
-            IReadOnlyList<UsbMassStorage> usbDisks = UsbMassStorageDriver.Disks;
-            for (int i = 0; i < usbDisks.Count; i++)
-            {
-                RegisterDevice(usbDisks[i]);
-            }
-        }
-    }
-
-    /// <summary>
     /// Registers a block device with the manager and scans it for a GPT or
     /// MBR partition table. Discovered partitions are appended to
     /// <see cref="Partitions"/>. A device already registered, or one more
-    /// than the manager holds, is silently ignored. Thread context: the USB
-    /// hot-plug thread, the boot thread, or a kernel's own thread; the scan
-    /// reads the disk before the lock.
+    /// than the manager holds, is silently ignored. Thread context: the boot
+    /// thread or a kernel's own thread; the scan reads the disk before the
+    /// lock.
     /// </summary>
     /// <param name="device">The block device to register.</param>
     /// <exception cref="InvalidOperationException">Storage support is disabled.</exception>
@@ -253,8 +216,8 @@ public static class StorageManager
     /// under it. A kit device (a non-null <paramref name="driverName"/>)
     /// gets its registered line written here, with the primary suffix when
     /// the order rule put it first at that moment; a hand-registered device
-    /// logs nothing. Thread context: the kit worker inside the publishing
-    /// probe, the USB hot-plug thread, or the boot thread.
+    /// logs nothing. Thread context: the publishing probe on the kit worker,
+    /// or the boot thread.
     /// </summary>
     /// <param name="device">The block device to register.</param>
     /// <param name="nodePath">The path of the kit node whose driver published it, or null when hand-registered.</param>
@@ -274,8 +237,8 @@ public static class StorageManager
         }
 
         // Re-registering a known device is a no-op: RegisterDevice is
-        // public, so a second RegisterHalDevices call would otherwise
-        // double-count the device and duplicate every partition under
+        // public, so a kernel handing the same device over twice would
+        // otherwise double-count it and duplicate every partition under
         // identical names. Checked before the scan, which reads the disk,
         // and again under the lock.
         if (IsRegistered(device))
@@ -317,10 +280,10 @@ public static class StorageManager
             s_mutationLock.Release();
         }
 
-        // String fragments only: RegisterDevice still runs in the phase 3
-        // window for the boot-time USB units, where number formatting is
-        // not available. The suffix says the rule chose the device at that
-        // moment; a later line carrying it supersedes this one.
+        // String fragments only: a kernel may register a device before
+        // CoreLib number formatting is safe. The suffix says the rule chose
+        // the device at that moment; a later line carrying it supersedes
+        // this one.
         if (driverName is not null)
         {
             Serial.WriteString("[StorageManager] ");
@@ -345,7 +308,7 @@ public static class StorageManager
     /// detached from the VFS without a flush, since the device can take no
     /// more writes. When it was the primary device, the first one left
     /// takes its place: the order of the rest does not change. Thread
-    /// context: the USB hot-plug thread or the kit worker in a teardown.
+    /// context: the kit worker in a teardown.
     /// </summary>
     /// <param name="device">The device that is gone.</param>
     internal static void UnregisterDevice(IBlockDevice device)

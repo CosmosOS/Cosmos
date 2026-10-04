@@ -8,7 +8,6 @@ using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Firmware;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Pci;
@@ -77,19 +76,6 @@ internal class LibraryInitializer
                 Serial.WriteString("[KERNEL]   - Platform nodes not published: ");
                 Serial.WriteString(exception.Message);
                 Serial.WriteString("\n");
-            }
-
-            // Bring up USB host controllers and enumerate the devices behind
-            // them. Must run after InitializeHardware: MSI-X routing needs
-            // the platform MSI binder (LAPIC on x64, GICv3 ITS on ARM64). USB's own switch
-            // alone, not PCI && (Keyboard || Storage): Sdk.targets already
-            // turns it off with PCI and derives its default from Keyboard and
-            // Storage, and a compound guard does not fold in Debug IL, so ILC
-            // would keep the whole USB stack in a kernel that turned it off.
-            if (CosmosFeatures.UsbEnabled)
-            {
-                Serial.WriteString("[KERNEL]   - Initializing USB...\n");
-                UsbManager.Initialize();
             }
         }
 

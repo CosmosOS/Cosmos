@@ -9,7 +9,6 @@ using Cosmos.Kernel.Core.X64;
 using Cosmos.Kernel.Core.X64.Cpu;
 using Cosmos.Kernel.Core.X64.IO;
 using Cosmos.Kernel.Core.X64.Power;
-using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Platform;
@@ -170,13 +169,9 @@ internal class X64PlatformInitializer : IPlatformInitializer
             return [];
         }
 
-        // PS/2 and USB keyboards: virtio input is a kit driver now,
+        // PS/2 only: USB and virtio keyboards are kit drivers now,
         // published to the keyboard consumer.
-        IKeyboardDevice[] ps2 = _ps2Controller is not null ? PS2Controller.GetKeyboardDevices() : [];
-        // Behind USB's own switch so a kernel without USB never references
-        // the USB keyboard driver and ILC trims it.
-        IKeyboardDevice[] usb = CosmosFeatures.UsbEnabled ? UsbKeyboardDriver.GetKeyboards() : [];
-        return [.. ps2, .. usb];
+        return _ps2Controller is not null ? PS2Controller.GetKeyboardDevices() : [];
     }
 
     public IMouseDevice[] GetMouseDevices()

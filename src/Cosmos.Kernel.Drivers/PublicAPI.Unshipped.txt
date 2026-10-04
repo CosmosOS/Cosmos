@@ -58,6 +58,44 @@ Cosmos.Kernel.Drivers.NvmeState.NamespaceCount.get -> int
 Cosmos.Kernel.Drivers.NvmeState.Timeouts.get -> int
 Cosmos.Kernel.Drivers.PciHostDriver
 Cosmos.Kernel.Drivers.PciHostDriver.PciHostDriver() -> void
+Cosmos.Kernel.Drivers.UsbHubDriver
+Cosmos.Kernel.Drivers.UsbHubDriver.UsbHubDriver() -> void
+Cosmos.Kernel.Drivers.UsbHubState
+Cosmos.Kernel.Drivers.UsbHubState.ChildrenAttached.get -> int
+Cosmos.Kernel.Drivers.UsbHubState.ChildrenDetached.get -> int
+Cosmos.Kernel.Drivers.UsbHubState.HotPlugRunning.get -> bool
+Cosmos.Kernel.Drivers.UsbHubState.IsSuperSpeed.get -> bool
+Cosmos.Kernel.Drivers.UsbHubState.PortCount.get -> byte
+Cosmos.Kernel.Drivers.UsbKeyboardDriver
+Cosmos.Kernel.Drivers.UsbKeyboardDriver.UsbKeyboardDriver() -> void
+Cosmos.Kernel.Drivers.UsbKeyboardState
+Cosmos.Kernel.Drivers.UsbKeyboardState.KeyEvents.get -> int
+Cosmos.Kernel.Drivers.UsbKeyboardState.LastLedReport.get -> byte
+Cosmos.Kernel.Drivers.UsbKeyboardState.LastLedStatus.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+Cosmos.Kernel.Drivers.UsbKeyboardState.LedWrites.get -> int
+Cosmos.Kernel.Drivers.UsbKeyboardState.Name.get -> string!
+Cosmos.Kernel.Drivers.UsbKeyboardState.ReportCount.get -> int
+Cosmos.Kernel.Drivers.UsbKeyboardState.SetLeds(Cosmos.Kernel.HAL.DriverKit.Devices.KeyboardLeds leds) -> void
+Cosmos.Kernel.Drivers.UsbKeyboardState.Sink.get -> Cosmos.Kernel.HAL.DriverKit.Devices.KeyboardSink?
+Cosmos.Kernel.Drivers.UsbMassStorageDriver
+Cosmos.Kernel.Drivers.UsbMassStorageDriver.UsbMassStorageDriver() -> void
+Cosmos.Kernel.Drivers.UsbMassStorageState
+Cosmos.Kernel.Drivers.UsbMassStorageState.Detached.get -> bool
+Cosmos.Kernel.Drivers.UsbMassStorageState.MaxLun.get -> byte
+Cosmos.Kernel.Drivers.UsbMassStorageState.UnitCount.get -> int
+Cosmos.Kernel.Drivers.UsbMassStorageState.Units.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.Drivers.UsbMassStorageUnit!>!
+Cosmos.Kernel.Drivers.UsbMassStorageUnit
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.BlockCount.get -> ulong
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.BlockSize.get -> ulong
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.Flush() -> void
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.Index.get -> uint
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.IsDisconnected.get -> bool
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.Lun.get -> byte
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.Name.get -> string!
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.Product.get -> string!
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.Vendor.get -> string!
+Cosmos.Kernel.Drivers.UsbMassStorageUnit.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
 Cosmos.Kernel.Drivers.VirtioGpuDriver
 Cosmos.Kernel.Drivers.VirtioGpuDriver.VirtioGpuDriver() -> void
 Cosmos.Kernel.Drivers.VirtioGpuState
@@ -130,6 +168,27 @@ Cosmos.Kernel.Drivers.VmwareSvgaState.SetEnabled(bool enabled) -> void
 Cosmos.Kernel.Drivers.VmwareSvgaState.Svga3DVersion.get -> uint
 Cosmos.Kernel.Drivers.VmwareSvgaState.TryDefine(int hotspotX, int hotspotY, int width, int height, System.ReadOnlySpan<uint> pixels) -> bool
 Cosmos.Kernel.Drivers.VmwareSvgaState.TrySetMode(int width, int height, int bitsPerPixel) -> bool
+Cosmos.Kernel.Drivers.XhciDriver
+Cosmos.Kernel.Drivers.XhciDriver.XhciDriver() -> void
+Cosmos.Kernel.Drivers.XhciState
+Cosmos.Kernel.Drivers.XhciState.Bus.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus!
+Cosmos.Kernel.Drivers.XhciState.CommandsIssued.get -> int
+Cosmos.Kernel.Drivers.XhciState.ContextSize.get -> int
+Cosmos.Kernel.Drivers.XhciState.DevicesAddressed.get -> int
+Cosmos.Kernel.Drivers.XhciState.HasInterrupt.get -> bool
+Cosmos.Kernel.Drivers.XhciState.HostControllerEvents.get -> int
+Cosmos.Kernel.Drivers.XhciState.HotPlugRunning.get -> bool
+Cosmos.Kernel.Drivers.XhciState.Index.get -> int
+Cosmos.Kernel.Drivers.XhciState.InterruptCount.get -> int
+Cosmos.Kernel.Drivers.XhciState.IsPolling.get -> bool
+Cosmos.Kernel.Drivers.XhciState.LastHostControllerEventCode.get -> byte
+Cosmos.Kernel.Drivers.XhciState.MaxPorts.get -> byte
+Cosmos.Kernel.Drivers.XhciState.MaxSlots.get -> byte
+Cosmos.Kernel.Drivers.XhciState.PipeRecoveries.get -> int
+Cosmos.Kernel.Drivers.XhciState.PipesClosed.get -> int
+Cosmos.Kernel.Drivers.XhciState.ScratchpadBuffers.get -> int
+Cosmos.Kernel.Drivers.XhciState.Timeouts.get -> int
+Cosmos.Kernel.Drivers.XhciState.Version.get -> ushort
 [COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter
 [COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.Capabilities.get -> uint
 [COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Canvas3D!
@@ -157,6 +216,16 @@ override Cosmos.Kernel.Drivers.NvmeDriver.Probe(Cosmos.Kernel.HAL.DriverKit.Devi
 override Cosmos.Kernel.Drivers.PciHostDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.PciHostDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.PciHostDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.UsbHubDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.UsbHubDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.UsbHubDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.UsbKeyboardDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.UsbKeyboardDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.UsbKeyboardDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.UsbMassStorageDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.UsbMassStorageDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.UsbMassStorageDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.UsbMassStorageDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.VirtioGpuDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.VirtioGpuDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.VirtioGpuDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
@@ -218,3 +287,8 @@ override Cosmos.Kernel.Drivers.VmwareSvgaDriver.Matches.get -> System.ReadOnlySp
 override Cosmos.Kernel.Drivers.VmwareSvgaDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.VmwareSvgaDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.VmwareSvgaDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.XhciDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.XhciDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.XhciDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.XhciDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.XhciState.Name.get -> string!

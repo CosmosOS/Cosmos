@@ -1,7 +1,6 @@
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Cpu;
-using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.System;
@@ -55,15 +54,6 @@ public abstract partial class Kernel
         // every one of them has been offered.
         Serial.WriteString("[Kernel] Starting drivers...\n");
         DriverEngine.Start();
-
-        // USB hot-plug runs on a thread of its own, which only a scheduler
-        // tick can start, so it waits for interrupts. Same switches as the
-        // USB bring-up, so a kernel without USB trims it all.
-        if (Core.CosmosFeatures.SchedulerEnabled && Core.CosmosFeatures.PCIEnabled
-            && (Core.CosmosFeatures.KeyboardEnabled || Core.CosmosFeatures.StorageEnabled))
-        {
-            UsbManager.StartHotPlug();
-        }
 
         Serial.WriteString("[Kernel] Calling OnBoot()...\n");
         OnBoot();

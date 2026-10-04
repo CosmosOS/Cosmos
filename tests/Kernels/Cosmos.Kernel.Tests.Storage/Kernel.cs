@@ -5,7 +5,6 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Drivers;
 using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Devices.Storage;
-using Cosmos.Kernel.HAL.Devices.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;
@@ -374,7 +373,7 @@ public class Kernel : Sys.Kernel
     private const string HotPlugFilePath = $"{HotPlugMountPoint}/{HotPlugFileName}";
 
     /// <summary>The stick as it was before the unplug, for the cells that check what it left behind.</summary>
-    private static UsbMassStorage? s_unpluggedDisk;
+    private static UsbMassStorageUnit? s_unpluggedDisk;
 
     protected override void BeforeRun()
     {
@@ -417,19 +416,10 @@ public class Kernel : Sys.Kernel
         // regression pass before.
         TR.RunIf(hasDevice, "Profile_DeviceKindMatches", TestProfile_DeviceKindMatches, SkipNoDevice);
 
-        // The kit's view of the same device: the AHCI and NVMe disks are
+        // The kit's view of the same device: every disk of these cells is
         // published by a kit driver and consumed by the manager, so DriverInfo
-        // lists them under the driver the cell names; the USB disk is handed
-        // to the manager by the HAL and has no kit entry.
-        if (!hasDevice)
-        {
-            TR.Skip("Manager_DeviceListedInDriverInfo", SkipNoDevice);
-        }
-        else
-        {
-            TR.RunIf(!TR.ProfileHasPrefix("usb"), "Manager_DeviceListedInDriverInfo", TestManager_DeviceListedInDriverInfo,
-                "the USB disk is registered by the HAL, not published through the kit");
-        }
+        // lists it under the driver the cell names.
+        TR.RunIf(hasDevice, "Manager_DeviceListedInDriverInfo", TestManager_DeviceListedInDriverInfo, SkipNoDevice);
 
         if (!TR.ProfileHasPrefix("nvme"))
         {
@@ -625,8 +615,8 @@ public class Kernel : Sys.Kernel
     }
 
     // Re-registering an already-known device must be a no-op: RegisterDevice
-    // is public and unguarded (unlike Initialize), so a second
-    // RegisterHalDevices call would otherwise double-count the device and
+    // is public and unguarded (unlike Initialize), so a kernel handing the
+    // same device over twice would otherwise double-count the device and
     // duplicate every partition under identical names.
     private static void TestManager_DuplicateRegistrationIgnored()
     {
@@ -769,7 +759,7 @@ public class Kernel : Sys.Kernel
     // manager's boot-time walk over the HAL controllers.
     private static void TestManager_DeviceListedInDriverInfo()
     {
-        string expectedDriver = TR.ProfileHasPrefix("ahci") ? nameof(AhciDriver) : nameof(NvmeDriver);
+        string expectedDriver = TR.ProfileHasPrefix("ahci") ? nameof(AhciDriver) : TR.ProfileHasPrefix("usb") ? nameof(UsbMassStorageDriver) : nameof(NvmeDriver);
         bool found = false;
         for (int i = 0; i < DriverInfo.DeviceCount; i++)
         {
@@ -1252,8 +1242,8 @@ public class Kernel : Sys.Kernel
     // ==================== USB hot-plug ====================
 
     // Empty when the cell can pull its stick out: a USB cell whose stick
-    // bound, with the hot-plug thread running. It cannot run on x64 with
-    // ACPI off, where the scheduler's timer never starts.
+    // bound, with the kit's worker running the hot-plug thread. Without a
+    // worker (no scheduler) nothing follows a port change.
     private static string HotPlugSkipReason()
     {
         if (!TR.ProfileHasPrefix("usb"))
@@ -1261,31 +1251,44 @@ public class Kernel : Sys.Kernel
             return "not a USB profile";
         }
 
-        if (s_dev is not UsbMassStorage)
+        if (s_dev is not UsbMassStorageUnit)
         {
             return SkipNoDevice;
         }
 
-        return UsbManager.IsHotPlugRunning ? string.Empty : "USB hot-plug thread not running (scheduler timer not ticking)";
+        return DriverInfo.HasWorker ? string.Empty : "the driver kit has no worker (no scheduler)";
     }
 
     // Pulling the stick out must take it out of the storage manager and the
-    // USB storage driver, and mark the object they handed out removed. The
-    // sector stamped first is read back once the stick is plugged in again.
+    // kit's published devices, retract its interface node, and mark the
+    // object they handed out disconnected. The sector stamped first is read
+    // back once the stick is plugged in again.
     private static void TestUsbHotPlug_UnplugUnregistersDisk()
     {
-        UsbMassStorage disk = (UsbMassStorage)s_dev!;
+        UsbMassStorageUnit disk = (UsbMassStorageUnit)s_dev!;
         disk.WriteBlock(HotPlugMarkerLba, 1, HotPlugMarker((int)disk.BlockSize));
         disk.Flush();
+
+        string? nodePath = FindBlockNodePath(disk.Name);
+        Assert.NotNull(nodePath, "the stick must be a kit device");
+        if (nodePath is null)
+        {
+            return;
+        }
+
+        int nodesBefore = DriverInfo.NodeCount;
 
         s_unpluggedDisk = disk;
         TR.RequestHost(UsbUnplugRequest);
         bool gone = WaitForDeviceCount(0);
+        bool nodeGone = WaitForNodeGone(nodePath);
         s_dev = null;
 
         Assert.True(gone, "the stick is still registered after being unplugged");
-        Assert.Equal(0, UsbMassStorageDriver.Disks.Count, "the USB storage driver still lists the stick");
-        Assert.True(disk.IsRemoved, "the unplugged stick is not marked removed");
+        Assert.True(FindBlockDeviceIndexByName(disk.Name) < 0, "the USB disk should have left the kit's published devices");
+        Assert.True(nodeGone, "the stick's node should have left the tree");
+        Assert.Equal(nodesBefore - 1, DriverInfo.NodeCount, "the node count should drop by one");
+        Assert.True(disk.IsDisconnected, "the unplugged stick is not marked disconnected");
     }
 
     // I/O on a stick that is gone must fail as an IOException, not wait for
@@ -1322,13 +1325,15 @@ public class Kernel : Sys.Kernel
         }
 
         s_dev = StorageManager.GetDevice(0);
-        Assert.True(s_dev is UsbMassStorage, "the device that came back is not a USB stick");
+        Assert.True(s_dev is UsbMassStorageUnit, "the device that came back is not a USB stick");
         Assert.False(ReferenceEquals(s_dev, s_unpluggedDisk), "the removed device object came back");
         if (s_unpluggedDisk is not null)
         {
             Assert.Equal(s_unpluggedDisk.Name, s_dev!.Name, "a stick plugged back in gets its name back");
             Assert.Equal<ulong>(s_unpluggedDisk.BlockCount, s_dev.BlockCount, "block count of the stick plugged back in");
         }
+
+        Assert.True(FindBlockDeviceIndexByName(s_dev!.Name) >= 0, "the replugged stick should be a kit device again");
     }
 
     private static void TestUsbHotPlug_ReplugKeepsData()
@@ -1441,11 +1446,30 @@ public class Kernel : Sys.Kernel
         return false;
     }
 
-    // Waits for the hot-plug thread to bring the storage manager to
-    // `count` devices, sleeping so that thread gets to run.
+    // Waits for the kit's worker to bring the storage manager to `count`
+    // devices, sleeping so that thread gets to run.
     private static bool WaitForDeviceCount(int count)
     {
         for (int waitedMs = 0; StorageManager.DeviceCount != count; waitedMs += HotPlugPollMs)
+        {
+            if (waitedMs >= HotPlugTimeoutMs)
+            {
+                return false;
+            }
+
+            SysThread.Sleep(HotPlugPollMs);
+        }
+
+        return true;
+    }
+
+    // Waits for the node at `path` to leave the kit's tree. The manager's
+    // count drops in the teardown's second step while the node leaves the
+    // tree only once the teardown has run through, so a poll that saw the
+    // count drop can wake between the two.
+    private static bool WaitForNodeGone(string path)
+    {
+        for (int waitedMs = 0; TryFindNode(path, out _); waitedMs += HotPlugPollMs)
         {
             if (waitedMs >= HotPlugTimeoutMs)
             {
@@ -2910,5 +2934,56 @@ public class Kernel : Sys.Kernel
         public override void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
         {
         }
+    }
+
+    // ==================== Kit lookups ====================
+
+    // The index of the kit node at `path` in DriverInfo, or -1.
+    private static int FindNodeIndex(string path)
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info) && info.Path == path)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static bool TryFindNode(string path, out DeviceNodeInfo info) => DriverInfo.TryGetNode(FindNodeIndex(path), out info);
+
+    // The node path of the published block device named `name`, or null
+    // when no kit driver published a block device of that name.
+    private static string? FindBlockNodePath(string name)
+    {
+        int count = DriverInfo.DeviceCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.Name == name)
+            {
+                return info.NodePath;
+            }
+        }
+
+        return null;
+    }
+
+    // The index of the published block device named `name` in DriverInfo,
+    // or -1.
+    private static int FindBlockDeviceIndexByName(string name)
+    {
+        int count = DriverInfo.DeviceCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.Name == name)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
