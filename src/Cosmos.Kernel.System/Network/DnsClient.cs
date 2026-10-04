@@ -86,11 +86,13 @@ public sealed class DnsClient : UdpClient
     /// <see cref="Receive"/> for what the null covers.</returns>
     public List<Address>? ReceiveAll(int timeout = 5000)
     {
+        // Checked every 10 ms, the timer's tick, as UdpClient.Receive does: a reply comes in a
+        // few milliseconds, and checking every 100 ms made each lookup last 100 ms at least.
         int waited = 0;
         while (_rxBuffer.Count < 1 && waited < timeout)
         {
-            TimerManager.Wait(100);
-            waited += 100;
+            TimerManager.Wait(10);
+            waited += 10;
         }
 
         if (_rxBuffer.Count < 1)
