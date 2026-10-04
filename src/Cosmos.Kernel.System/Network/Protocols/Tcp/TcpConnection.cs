@@ -24,9 +24,13 @@ namespace Cosmos.Kernel.System.Network.Protocols.Tcp;
 internal class TcpConnection : IDisposable
 {
     /// <summary>
-    /// The TCP window size.
+    /// The TCP window size: how much the peer may send before it waits for an
+    /// acknowledgment. 32 KiB (23 full segments) fits the 32 receive
+    /// descriptors of an e1000 between two drains, where the controller's
+    /// interrupt does not reach the kernel and a timer drains it; at 8 KiB a
+    /// download ran at 8 KiB per round trip.
     /// </summary>
-    public const ushort TcpWindowSize = 8192;
+    public const ushort TcpWindowSize = 32768;
 
     /// <summary>
     /// The first port of the dynamic range <see cref="GetDynamicPort"/> hands out.

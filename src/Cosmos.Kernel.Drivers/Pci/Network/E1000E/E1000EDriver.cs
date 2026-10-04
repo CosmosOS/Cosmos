@@ -89,8 +89,15 @@ public sealed class E1000EDriver : Driver
     /// <summary>The interrupt source index of the function's legacy line.</summary>
     private const int LineInterruptIndex = 0;
 
-    /// <summary>Period of the drain the kit runs whether or not the line connected.</summary>
-    private const uint DrainPeriodMilliseconds = 50;
+    /// <summary>
+    /// Period of the drain the kit runs whether or not the line connected: the
+    /// platform timer's tick. Where the line register does not name the
+    /// interrupt the function raises (VMware routes PCI lines to I/O APIC
+    /// inputs above 15, as real chipsets do), this drain is all the controller
+    /// gets: every TCP round trip waits for it, and a receive window's worth
+    /// of data arrives per period at most.
+    /// </summary>
+    private const uint DrainPeriodMilliseconds = 10;
 
     /// <summary>How long the detach hook waits after disabling the receiver, so a frame in flight lands before the buffers are freed.</summary>
     private const uint QuiesceMicroseconds = 100;
