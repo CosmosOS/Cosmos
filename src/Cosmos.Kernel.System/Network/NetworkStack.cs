@@ -175,10 +175,8 @@ public static class NetworkStack
     [Experimental(Experimentals.PacketSeamDiagId)]
     public static void HandlePacket(byte[] packetData, int length)
     {
-        Serial.WriteString("[NetworkStack] HandlePacket called, len=");
-        Serial.WriteNumber((ulong)length);
-        Serial.WriteString("\n");
-
+        // No trace for a frame that is handled: the serial port takes about 90 µs a character,
+        // and a line for every frame made it the bottleneck of every download.
         if (length < 14)
         {
             Serial.WriteString("[NetworkStack] Error: Invalid packet data\n");
@@ -186,22 +184,16 @@ public static class NetworkStack
         }
 
         ushort etherType = (ushort)((packetData[12] << 8) | packetData[13]);
-        Serial.WriteString("[NetworkStack] EtherType: 0x");
-        Serial.WriteHex(etherType);
-        Serial.WriteString("\n");
 
         switch (etherType)
         {
             case 0x0806: // ARP
-                Serial.WriteString("[NetworkStack] -> ARP\n");
                 ArpPacket.ARPHandler(packetData);
                 break;
             case 0x0800: // IPv4
-                Serial.WriteString("[NetworkStack] -> IPv4\n");
                 IPPacket.IPv4Handler(packetData);
                 break;
             case 0x86DD: // IPv6
-                Serial.WriteString("[NetworkStack] -> IPv6\n");
                 IPv6Packet.IPv6Handler(packetData);
                 break;
             default:

@@ -447,7 +447,6 @@ public static class SocketPlug
 
     public static int SendTcp(Socket aThis, byte[] buffer, int offset, int size)
     {
-        Log.WriteString("[SocketPlug] SendTcp: entering\n");
         int id = GetId(aThis);
         if (!s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
         {
@@ -495,21 +494,17 @@ public static class SocketPlug
         }
         else
         {
-            Log.WriteString("[SocketPlug] SendTcp: preparing packet\n");
             byte[] data = new byte[size];
             buffer.AsSpan(offset, size).CopyTo(data);
 
             TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), (ushort)sm.TCB.RcvWnd, 0, data);
-            Log.WriteString("[SocketPlug] SendTcp: adding to outgoing buffer\n");
             packet.Network.Enqueue();
 
             // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
             sm.TCB.SndNxt += (uint)size;
             bytesSent = size;
 
-            Log.WriteString("[SocketPlug] SendTcp: calling NetworkStack.Update\n");
             NetworkStack.Update();
-            Log.WriteString("[SocketPlug] SendTcp: NetworkStack.Update returned\n");
 
             // Check if connection was closed during Update (e.g., by FIN from server)
             if (sm.Status == Status.CLOSED || sm.Status == Status.TIME_WAIT)
@@ -518,16 +513,9 @@ public static class SocketPlug
                 return bytesSent;
             }
 
-            Log.WriteString("[SocketPlug] SendTcp: calling WaitAck\n");
             WaitAck(sm);
-            Log.WriteString("[SocketPlug] SendTcp: WaitAck returned, status=");
-            Log.WriteNumber((ulong)sm.Status);
-            Log.WriteString("\n");
         }
 
-        Log.WriteString("[SocketPlug] SendTcp: returning bytesSent=");
-        Log.WriteNumber((ulong)bytesSent);
-        Log.WriteString("\n");
         return bytesSent;
     }
 

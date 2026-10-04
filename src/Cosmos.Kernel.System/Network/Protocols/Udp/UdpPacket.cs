@@ -239,16 +239,6 @@ public class UdpPacket
     {
         UdpPacket udpPacket = new(network);
 
-        Serial.WriteString("[UDP] Received from ");
-        Serial.WriteString(udpPacket.SourceIP.ToString());
-        Serial.WriteString(":");
-        Serial.WriteNumber((ulong)udpPacket.SourcePort);
-        Serial.WriteString(" -> ");
-        Serial.WriteNumber((ulong)udpPacket.DestinationPort);
-        Serial.WriteString(" len=");
-        Serial.WriteNumber((ulong)udpPacket.UdpDataLength);
-        Serial.WriteString("\n");
-
         if (!udpPacket.VerifyChecksum())
         {
             Serial.WriteString("[UDP] Bad checksum, dropping\n");

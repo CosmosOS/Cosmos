@@ -310,8 +310,6 @@ internal class TcpConnection : IDisposable
 
     private void ReceiveDataInternal(TcpPacket packet)
     {
-        Serial.WriteString($"[{Table[(int)Status]}] {packet}\n");
-
         if (Status == Status.LISTEN)
         {
             ProcessListen(packet);

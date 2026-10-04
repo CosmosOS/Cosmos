@@ -142,7 +142,6 @@ internal static class IPv4OutgoingBuffer
                     {
                         entry.Packet.DestinationMac = cachedMac;
                         entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
-                        Serial.WriteString("[IPv4OutgoingBuffer] Sent via ARP cache\n");
                         s_queue.RemoveAt(e);
                     }
                     else
