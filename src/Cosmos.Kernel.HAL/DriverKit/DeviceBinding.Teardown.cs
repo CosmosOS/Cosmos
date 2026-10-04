@@ -129,7 +129,9 @@ public sealed partial class DeviceBinding
         }
 
         // 3b. Pipes: stopped and dropped on the controller while the ring they
-        //     point at is still allocated; a waiter on one wakes with Stopped.
+        //     point at is still allocated. A transfer still running on one is
+        //     waited out, up to the bulk budget; a transfer to a device that was
+        //     pulled out was woken with Disconnected when the detach marked it.
         for (int i = 0; i < pipes.Length; i++)
         {
             try

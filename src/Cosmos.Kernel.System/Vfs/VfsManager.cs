@@ -92,9 +92,9 @@ public static partial class VfsManager
 
     /// <summary>
     /// The mount table. Replaced on every change, never changed in place:
-    /// the USB hot-plug thread detaches the mounts of a disk that was pulled
-    /// out while another thread may be resolving a path, and that thread
-    /// keeps walking the whole table it read.
+    /// the kit worker, tearing down the node of a USB disk that was pulled
+    /// out, detaches its mounts while another thread may be resolving a
+    /// path, and that thread keeps walking the whole table it read.
     /// </summary>
     private static VfsMount[] s_mounts = [];
 
@@ -393,7 +393,7 @@ public static partial class VfsManager
     }
 
     /// <summary>
-    /// True when a live mount matches the driver name and source —
+    /// True when a live mount matches the driver name and source:
     /// formatting or destroying it would rewrite the volume underneath a
     /// superblock that still holds the old geometry and caches.
     /// </summary>
@@ -696,8 +696,8 @@ public static partial class VfsManager
 
     /// <summary>
     /// True when <paramref name="mountPoint"/> (normalized: leading /, no
-    /// trailing /) covers <paramref name="path"/> on a path-segment boundary
-    /// — "/mnt" covers "/mnt" and "/mnt/x" but not "/mntx".
+    /// trailing /) covers <paramref name="path"/> on a path-segment boundary:
+    /// "/mnt" covers "/mnt" and "/mnt/x" but not "/mntx".
     /// </summary>
     internal static bool MountCovers(string mountPoint, string path)
     {

@@ -62,11 +62,11 @@ Kernel features are toggled via MSBuild properties in kernel `.csproj` files (al
 - `src/Cosmos.Kernel.Core/Runtime/` - Runtime stubs (RhpThrowEx, exception handling, etc.)
 - `src/Cosmos.Kernel.Core/Memory/` - Memory allocation
 - `src/Cosmos.Kernel.System/` - Higher-level services (Graphics with `DisplayManager` and the canvas over the kit's display kind, Network, Input, Timer, IO, Storage with `StorageManager` and its consumer of the kit's block kind)
-- `src/Cosmos.Kernel.HAL/DriverKit/` - The driver kit (bindings, bus kinds: synthetic, platform, PCI, virtio; device kinds under `Devices/`: keyboard, pointer, network, block, display with the `IDisplayModes` and `IHardwareCursor` facets)
+- `src/Cosmos.Kernel.HAL/DriverKit/` - The driver kit (bindings, bus kinds: synthetic, platform, PCI, virtio, USB; device kinds under `Devices/`: keyboard, pointer, network, block, display with the `IDisplayModes` and `IHardwareCursor` facets)
 - `src/Cosmos.Kernel.HAL/Firmware/` - The firmware framebuffer the kit publishes as the firmware display
-- `src/Cosmos.Kernel.Drivers/` - Shipped drivers over the kit (PCI host, E1000E, the virtio PCI and MMIO transports, virtio-net, virtio-input, the display drivers virtio-gpu and VMware SVGA II with its SVGA3D layer, and the storage drivers AHCI and NVMe, whose disks `StorageManager` consumes); a User-layer driver assembly, one RID-less package
+- `src/Cosmos.Kernel.Drivers/` - Shipped drivers over the kit (PCI host, E1000E, the virtio PCI and MMIO transports, virtio-net, virtio-input, the display drivers virtio-gpu and VMware SVGA II with its SVGA3D layer, the storage drivers AHCI and NVMe, whose disks `StorageManager` consumes, and the xHCI host controller with the USB hub, HID boot keyboard and mass storage class drivers); a User-layer driver assembly, one RID-less package
 - `examples/DevKernel/` - Development kernel (use for testing changes)
-- `tests/Kernels/` - 8 kernel test suites
+- `tests/Kernels/` - 18 kernel test suites and the Drivers suite's driver library
 - `dotnet/runtime/` - .NET runtime submodule (release/10.0 branch)
 - `artifacts/` - Build outputs, NuGet packages, Limine bootloader
 

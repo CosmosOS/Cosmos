@@ -72,8 +72,10 @@ public static class KernelFeatures
     public static bool Fat => CosmosFeatures.FatEnabled;
 
     /// <summary>
-    /// Whether the USB stack is enabled (<c>CosmosEnableUsb</c>).
-    /// Requires PCI. When the property is not set, it is on only if
+    /// Whether USB is enabled (<c>CosmosEnableUsb</c>): the kit's xHCI host
+    /// controller driver, the hub driver and the USB keyboard and mass
+    /// storage class drivers, which the driver manifest registers under this
+    /// switch. Requires PCI. When the property is not set, it is on only if
     /// Keyboard or Storage is on.
     /// </summary>
     public static bool Usb => CosmosFeatures.UsbEnabled;

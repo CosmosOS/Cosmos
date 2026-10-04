@@ -26,10 +26,10 @@ public static class KeyboardManager
 
     /// <summary>
     /// The registered keyboards. Replaced on every change, never changed in
-    /// place: a USB keyboard can come or go on the hot-plug thread, and a
-    /// kit keyboard on the kit worker, while a key press walks the list in
-    /// interrupt context. Changed by the boot path, then by those threads
-    /// only.
+    /// place: a kit keyboard (a virtio or USB one) can come or go on the kit
+    /// worker, in the probe that published it or the teardown that withdrew
+    /// it, while a key press walks the list in interrupt context. Changed by
+    /// the boot path, then by the kit worker only.
     /// </summary>
     private static IKeyboardDevice[]? s_keyboards;
     private static Queue<KeyEvent>? s_queuedKeys;
@@ -116,9 +116,8 @@ public static class KeyboardManager
 
     /// <summary>
     /// Registers a keyboard device with the manager. Thread context, from
-    /// the boot path, from the USB hot-plug thread or from the kit worker
-    /// when a published keyboard is consumed; the list is replaced, never
-    /// changed in place.
+    /// the boot path or from the kit worker when a published keyboard is
+    /// consumed; the list is replaced, never changed in place.
     /// </summary>
     /// <param name="keyboard">The keyboard to register; nothing when it is null or the manager is not initialized.</param>
     internal static void RegisterKeyboard(IKeyboardDevice keyboard)
@@ -140,11 +139,11 @@ public static class KeyboardManager
     }
 
     /// <summary>
-    /// Forgets a keyboard that is gone (a USB keyboard pulled out, a kit
-    /// keyboard withdrawn). Its keys stop arriving; a modifier it held down
-    /// stays down until pressed on another keyboard. Thread context, from
-    /// the USB hot-plug thread or from the kit worker; the list is replaced,
-    /// never changed in place.
+    /// Forgets a keyboard that is gone (a kit keyboard withdrawn, a USB
+    /// keyboard pulled out among them). Its keys stop arriving; a modifier
+    /// it held down stays down until pressed on another keyboard. Thread
+    /// context, the kit worker in a teardown; the list is replaced, never
+    /// changed in place.
     /// </summary>
     /// <param name="keyboard">The keyboard to remove; nothing when it is not registered.</param>
     internal static void UnregisterKeyboard(IKeyboardDevice keyboard)

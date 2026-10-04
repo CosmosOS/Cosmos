@@ -52,9 +52,14 @@
     },
     {
       // A USB stick: usb-storage (SCSI over the Bulk-Only Transport) on a
-      // qemu-xhci controller, which attaches it at SuperSpeed. Covers the
-      // xHCI bulk endpoints and the mass storage class driver under the same
-      // block-device assertions as the ahci and nvme cells.
+      // qemu-xhci controller, which attaches it at SuperSpeed. The kit's
+      // XhciDriver binds the controller, its bus publishes the stick's mass
+      // storage interface as usb:1-1:0, UsbMassStorageDriver binds it and
+      // publishes the disk as usb0, and the storage manager registers and
+      // scans it inside the probe. Covers the xHCI bulk endpoints, the mass
+      // storage class driver and USB hot-plug (the UsbHotPlug_* tests pull
+      // the stick out and back in) under the same block-device assertions
+      // as the ahci and nvme cells.
       "name": "usb",
       "disks": [
         { "type": "usb" }
