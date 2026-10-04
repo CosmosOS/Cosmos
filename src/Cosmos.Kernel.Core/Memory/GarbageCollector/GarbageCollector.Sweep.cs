@@ -286,6 +286,17 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
+    /// Whether an object survives the collection under way: marked, or outside the GC heap (a
+    /// frozen object, never collected and never marked).
+    /// </summary>
+    /// <param name="obj">The object, not null.</param>
+    /// <returns><c>true</c> if <paramref name="obj"/> is marked or not in a GC or pinned heap segment.</returns>
+    internal static bool IsLive(GCObject* obj)
+    {
+        return obj->IsMarked || !IsInGCHeap((nint)obj);
+    }
+
+    /// <summary>
     /// Finds the segment, regular or pinned, whose object area contains a pointer.
     /// </summary>
     /// <remarks>

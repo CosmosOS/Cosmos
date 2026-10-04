@@ -43,7 +43,7 @@ internal static unsafe partial class GarbageCollector
         ScanGCHandles(GCHandleType.Pinned);
 
         // Pass 2: Dependent handle convergence loop
-        // If primary is marked, mark secondary. Repeat until no new marks (handles transitive chains).
+        // If primary is live, mark secondary. Repeat until no new marks (handles transitive chains).
         bool markedNew = true;
         while (markedNew)
         {
@@ -57,10 +57,14 @@ internal static unsafe partial class GarbageCollector
                 // nor through a null primary, which a collection leaves when the primary dies.
                 GCObject* primary = storeEnum.Current->Object;
                 GCObject* secondary = (GCObject*)storeEnum.Current->ExtraInfo;
-                if (secondary != null && primary != null && primary->IsMarked && !secondary->IsMarked)
+                if (secondary != null && primary != null && IsLive(primary) && !secondary->IsMarked)
                 {
                     TryMarkRoot((nint)secondary);
-                    markedNew = true;
+
+                    // Another pass only for a secondary marked now: one TryMarkRoot leaves unmarked
+                    // (a frozen object, outside the GC heap) stays so, and counting it looped here
+                    // for ever with interrupts masked, the whole machine stopped.
+                    markedNew |= secondary->IsMarked;
                 }
             }
         }

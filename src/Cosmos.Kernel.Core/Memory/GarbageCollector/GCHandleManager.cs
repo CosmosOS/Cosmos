@@ -228,7 +228,9 @@ internal unsafe struct GCHandleManager()
             while (handleEnum.MoveNext())
             {
                 GCHandle* handle = handleEnum.Current;
-                if (handle->Object != null && !handle->Object->IsMarked)
+
+                // A frozen target is never marked, and never dies.
+                if (handle->Object != null && !GarbageCollector.IsLive(handle->Object))
                 {
                     handle->Object = null;
                     if (dependent)
