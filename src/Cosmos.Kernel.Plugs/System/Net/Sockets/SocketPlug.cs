@@ -834,6 +834,21 @@ public static class SocketPlug
 
             s_tcpStateMachines.Remove(id);
         }
+        else if (sm.Status is Status.SYN_SENT or Status.SYN_RECEIVED)
+        {
+            // A connect that did not complete: there is nothing to close with the peer.
+            TcpConnection.RemoveConnection(sm);
+            s_tcpStateMachines.Remove(id);
+        }
+        else
+        {
+            // Our FIN is out already: LAST_ACK, where the peer's FIN came with its last data (as
+            // an HTTP server answering Connection: close sends it), FIN_WAIT1, FIN_WAIT2 or
+            // TIME_WAIT. The connection finishes on its own and TcpConnection reaps it once CLOSED; it was
+            // left in the table before, with its receive buffer, once for every such response.
+            RemoveOrDetach(sm);
+            s_tcpStateMachines.Remove(id);
+        }
 
         _endpoints.Remove(id);
         _localEndPoints.Remove(id);
