@@ -35,8 +35,8 @@ User Kernel (DevKernel, test kernels)
 Cosmos.Kernel.Drivers (the shipped drivers, a driver assembly held to the User layer)
     └── Cosmos.Kernel.System        ← high-level OS APIs (Console, Graphics, Network)
          └── Cosmos.Kernel.HAL      ← hardware abstraction (shared logic)
-              ├── Cosmos.Kernel.HAL.X64        ← x64-specific HAL implementations
-              ├── Cosmos.Kernel.HAL.ARM64      ← ARM64-specific HAL implementations
+              ├── Cosmos.Kernel.HAL.X64        ← x64 platform code (machine description, line routing, PIT, RTC)
+              ├── Cosmos.Kernel.HAL.ARM64      ← ARM64 platform code (machine description, line routing, generic timer, RTC)
               └── Cosmos.Kernel.HAL.Interfaces ← pure interfaces, no implementations
                    └── Cosmos.Kernel.Core   ← low-level runtime (memory, scheduler, serial)
                         ├── Cosmos.Kernel.Native.X64       ← x64 assembly (.s)
@@ -48,8 +48,7 @@ For the full dependency graph, project descriptions, and rules, see [Kernel Proj
 
 ### When to Create a New Project
 
-- A driver for a device the driver kit's buses reach (a PCI function today) → a `[Driver]` class in `Cosmos.Kernel.Drivers`, written over the public seam ([Writing a Driver](../user/drivers.md)); the aggregator carries the package, so every kernel gets it.
-- New hardware device category the kit does not cover yet → new interface in `Cosmos.Kernel.HAL.Interfaces`, implementations in `Cosmos.Kernel.HAL.X64`/`Cosmos.Kernel.HAL.ARM64`. Cross-platform HAL devices go to `Cosmos.Kernel.HAL`.
+- New hardware the kit's buses reach (a PCI function, a virtio device, a USB interface, a PS/2 port, a platform node) → a `[Driver]` class in `Cosmos.Kernel.Drivers`, written over the public seam ([Writing a Driver](../user/drivers.md)); the aggregator carries the package, so every kernel gets it. A new bus kind → an identity, a match, an access object and a path in the kit. Cross-platform HAL code goes to `Cosmos.Kernel.HAL`, platform code to `Cosmos.Kernel.HAL.X64`/`Cosmos.Kernel.HAL.ARM64`.
 - New OS-level feature, user API exposed → in `Cosmos.Kernel.System`.
 - New low-level runtime concern → in `Cosmos.Kernel.Core`.
 
@@ -322,7 +321,7 @@ public class Kernel : Cosmos.Kernel.System.Kernel
 
 ### Interface-Driven HAL
 
-All hardware interaction goes through interfaces. Implementations are registered at boot:
+Platform services go through interfaces. Implementations are registered at boot:
 
 ```csharp
 // Interface (Cosmos.Kernel.Core, internal: no kernel registers or obtains one)
@@ -343,7 +342,7 @@ public class X64CpuOps : ICpuOps
 
 ### Platform Initializer Pattern
 
-Each architecture provides a factory that creates all platform-specific components. The factory, the contract and everything it returns are internal to the HAL: a kernel never installs one.
+Each architecture provides a factory that creates all platform-specific components. The factory, the contract and everything it returns are internal to the HAL: a kernel never installs one. The initializer is also the machine description: it publishes the root platform nodes a bus driver binds, and it holds no device driver.
 
 ```csharp
 internal class X64PlatformInitializer : IPlatformInitializer
@@ -354,9 +353,8 @@ internal class X64PlatformInitializer : IPlatformInitializer
     public IPortIO CreatePortIO() => new X64PortIO();
     public ICpuOps CreateCpuOps() => new X64CpuOps();
     public IInterruptController CreateInterruptController() => new X64InterruptController();
-    public ITimerDevice CreateTimer() => new X64Timer();
-    public IKeyboardDevice[] GetKeyboardDevices() => [new PS2Keyboard()];
-    public IMouseDevice[] GetMouseDevices() => [new PS2Mouse()];
+    public ITimerDevice CreateTimer() => new PIT();
+    public void PublishPlatformNodes() { /* the 8042 and the PCI host, with their port ranges and lines */ }
     public uint GetCpuCount() => /* ACPI/MADT */ 1;
 
     public void InitializeHardware()
@@ -373,12 +371,13 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
 ### Adding a New Device
 
-For a device the driver kit reaches (a PCI function today), write a `[Driver]` class in `Cosmos.Kernel.Drivers` over the kit and publish the device through its binding; the steps below are for a device the kit does not cover yet.
+Write a `[Driver]` class in `Cosmos.Kernel.Drivers` over the kit and publish the device through its binding ([Writing a Driver](../user/drivers.md)). When the device sits on a bus the kit does not know:
 
-1. Define the interface in `Cosmos.Kernel.HAL.Interfaces/Devices/`.
-2. Implement in `Cosmos.Kernel.HAL.X64/` and `Cosmos.Kernel.HAL.ARM64/`.
-3. Add factory method to `IPlatformInitializer`.
-4. Register during `InitializeHardware()` or via the platform initializer.
+1. Add the bus kind to the kit: an identity, a match, an access object and a path format under `DriverKit/`.
+2. Publish its nodes from the machine description (`PublishPlatformNodes`) or from a bus driver (`PublishChild`).
+3. Write the leaf driver over the access object.
+
+Nothing goes into `Cosmos.Kernel.HAL.X64` or `Cosmos.Kernel.HAL.ARM64` but platform code.
 
 ### HAL Registration
 
@@ -760,7 +759,7 @@ if (device?.BlockSize is not > 0)
 Address ip = config?.Address ?? defaultAddress;
 
 // Collection expressions
-public IKeyboardDevice[] GetKeyboardDevices() => [new PS2Keyboard()];
+DeviceResource[] resources = [DeviceResource.PortRange(0x60, 1), DeviceResource.PortRange(0x64, 1)];
 
 // Target-typed new
 Thread thread = new();

@@ -95,9 +95,10 @@ internal interface IPlatformInitializer
 
     /// <summary>
     /// Publishes the root platform nodes of this machine into the driver
-    /// kit: the PCI host on both architectures, and on ARM64 one node per
-    /// occupied slot of the virt machine's virtio-mmio window, whatever the
-    /// feature switches and whether or not ACPI described anything. Called
+    /// kit: on x64 the 8042 keyboard controller and the PCI host, on ARM64
+    /// the ECAM host and one node per occupied slot of the virt machine's
+    /// virtio-mmio window, whatever the feature switches and whether or not
+    /// ACPI described anything. Called
     /// once from the HAL library initializer after
     /// <see cref="InitializeHardware"/>, with interrupts disabled; the nodes
     /// are offered when the driver stage runs, and a node's lines are only

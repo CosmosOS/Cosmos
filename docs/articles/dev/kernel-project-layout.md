@@ -31,11 +31,11 @@ flowchart LR;
 | Project | Purpose |
 |---------|---------|
 | **Cosmos.Kernel.System** | High-level OS APIs: Console, Graphics, Network, Timer, Mouse. The layer user kernels interact with. |
-| **Cosmos.Kernel.Drivers** | The fourteen drivers Cosmos ships over the driver kit: the PCI host driver, the Intel E1000E driver, the virtio PCI and MMIO transport drivers, the virtio-net and virtio-input drivers, the two display drivers, `VirtioGpuDriver` and `VmwareSvgaDriver` (with its SVGA3D command layer and `Canvas3D`), the two storage drivers, `AhciDriver` and `NvmeDriver`, whose disks the storage manager consumes, and the USB drivers: `XhciDriver` with the hub, HID boot keyboard and mass storage class drivers. A User-layer driver assembly (`CosmosDriverAssembly`), held by the layer analyzer to what a kernel author can name, with no `InternalsVisibleTo` grant from any project; one RID-less `lib/net10.0` package, since it holds no architecture-specific code. Referenced by Cosmos.Kernel, so every kernel carries its drivers in the manifest. |
-| **Cosmos.Kernel.HAL** | Hardware Abstraction Layer: shared logic, platform registration (`PlatformHAL`), device managers, the driver kit (`DriverKit/`, with its five bus kinds, synthetic, platform, PCI, virtio and USB, and the display kind and its facets under `DriverKit/Devices/`), and the record of the firmware framebuffer (`Firmware/`) the kit publishes as the firmware display. |
-| **Cosmos.Kernel.HAL.Interfaces** | Pure interfaces, no implementations. Public: `IBlockDevice`, which kernels implement and drive directly, `MACAddress`, and `SoftwareTimer` as a read-only handle. Internal: the boot contract `IPlatformInitializer`, the input, timer and network devices, and `SoftwareTimer`'s construction and tick members. |
-| **Cosmos.Kernel.HAL.X64** | x86-64 HAL implementations (PCI, APIC, PS/2, ACPI, etc.). |
-| **Cosmos.Kernel.HAL.ARM64** | ARM64 HAL implementations (GIC, PL011, generic timer, etc.). |
+| **Cosmos.Kernel.Drivers** | The seventeen drivers Cosmos ships over the driver kit: the PCI host driver, the Intel E1000E driver, the virtio PCI and MMIO transport drivers, the virtio-net and virtio-input drivers, the two display drivers, `VirtioGpuDriver` and `VmwareSvgaDriver` (with its SVGA3D command layer and `Canvas3D`), the two storage drivers, `AhciDriver` and `NvmeDriver`, whose disks the storage manager consumes, the USB drivers: `XhciDriver` with the hub, HID boot keyboard and mass storage class drivers, and the PS/2 drivers: `I8042Driver` with `Ps2KeyboardDriver` and `Ps2MouseDriver`. A User-layer driver assembly (`CosmosDriverAssembly`), held by the layer analyzer to what a kernel author can name, with no `InternalsVisibleTo` grant from any project; one RID-less `lib/net10.0` package, since it holds no architecture-specific code. Referenced by Cosmos.Kernel, so every kernel carries its drivers in the manifest. |
+| **Cosmos.Kernel.HAL** | Hardware Abstraction Layer: shared logic, platform registration (`PlatformHAL`), device managers, the driver kit (`DriverKit/`, with its six bus kinds, synthetic, platform, PCI, virtio, USB and PS/2, and the display kind and its facets under `DriverKit/Devices/`), and the record of the firmware framebuffer (`Firmware/`) the kit publishes as the firmware display. |
+| **Cosmos.Kernel.HAL.Interfaces** | Pure interfaces, no implementations. Public: `IBlockDevice`, which kernels implement and drive directly, `MACAddress`, and `SoftwareTimer` as a read-only handle. Internal: the boot contract `IPlatformInitializer`, the timer and network devices, and `SoftwareTimer`'s construction and tick members. |
+| **Cosmos.Kernel.HAL.X64** | x86-64 platform code: the machine description (the 8042 and PCI host nodes), the I/O APIC line routing, the PIT and the CMOS RTC. No device driver. |
+| **Cosmos.Kernel.HAL.ARM64** | ARM64 platform code: the machine description (the ECAM host and the virtio-mmio slots), the GIC line routing, the generic timer and the PL031 RTC. No device driver. |
 | **Cosmos.Kernel.Core** | Low-level runtime: memory management, GC, scheduler, serial I/O, panic handler. |
 | **Cosmos.Kernel.Native.X64** | x86-64 assembly files (`.s`, GAS syntax): interrupt stubs, context switching, SIMD. |
 | **Cosmos.Kernel.Native.ARM64** | ARM64 assembly files (`.s`, GAS syntax): exception vectors, context switching. |
@@ -61,9 +61,9 @@ flowchart LR;
 - **Never** reference upward (Core must not reference HAL or System)
 - **Never** reference a platform-specific HAL project from Core
 - Cross-cutting concerns (memory, scheduler, serial) go in **Core**
-- Platform-specific implementations go in **HAL.X64** / **HAL.ARM64**
+- Platform code (machine descriptions, interrupt line routing, tick sources, firmware clocks) goes in **HAL.X64** / **HAL.ARM64**; device drivers go in **Cosmos.Kernel.Drivers** over the kit
 - User-facing APIs go in **System**
-- All hardware interfaces are defined in **HAL.Interfaces**
+- The hardware contracts the ring still shares are defined in **HAL.Interfaces**; device kinds live in the kit
 - A driver written over the driver kit for a device the kit's buses reach goes in **Drivers**, which references only System and HAL and never the arch assemblies
 
 For coding style and implementation patterns, see [Coding Guidelines](coding-guidelines.md).

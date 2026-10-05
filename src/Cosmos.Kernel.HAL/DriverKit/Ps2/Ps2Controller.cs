@@ -48,10 +48,11 @@ public abstract class Ps2Controller
     protected abstract bool TrySendCore(Ps2Port port, byte value);
 
     /// <summary>
-    /// Reads the status register once and, while the output buffer is full,
-    /// hands each byte to the <see cref="Ps2Access.Deliver"/> of the port
-    /// the status attributes it to. Thread context, from an exchange that
-    /// waits on a controller that does not deliver on its own.
+    /// Reads the status register and, while the output buffer is full, up
+    /// to the controller driver's bound of bytes per call, hands each byte to
+    /// the <see cref="Ps2Access.Deliver"/> of the port the status attributes
+    /// it to. Thread context, from an exchange that waits on a controller
+    /// that does not deliver on its own.
     /// </summary>
     protected abstract void PollCore();
 

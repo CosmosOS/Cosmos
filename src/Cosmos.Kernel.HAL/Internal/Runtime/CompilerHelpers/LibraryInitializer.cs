@@ -61,8 +61,9 @@ internal class LibraryInitializer
             initializer.InitializeHardware();
 
             // Seed the driver kit's platform bus with this machine's root
-            // nodes: the PCI host, and on ARM64 the occupied slots of the
-            // virt machine's virtio-mmio window. Interrupts are still
+            // nodes: on x64 the 8042 keyboard controller and the PCI host, on
+            // ARM64 the ECAM host and one node per occupied slot of the virt
+            // machine's virtio-mmio window. Interrupts are still
             // disabled and the nodes wait in the engine's queue until
             // Kernel.Start runs the driver stage. A machine description
             // that throws costs the kit its nodes, not the boot.

@@ -17,8 +17,8 @@
 | Cosmos Graphic Subsystem | ✅ | ✅ | The firmware framebuffer via Limine, plus the virtio-gpu and VMware SVGA II display drivers over the driver kit (SVGA3D on the latter). |
 | Network interface | ✅ | ✅ | |
 | Timer / Clock | ✅ | ✅ | |
-| Keyboard Input | ✅ | ✅ | |
-| Mouse Input | ✅ | ✅ | |
+| Keyboard Input | ✅ | ✅ | PS/2 (x64), virtio and USB keyboards, all as driver kit drivers |
+| Mouse Input | ✅ | ✅ | PS/2 (x64) and virtio mice, both as driver kit drivers |
 | Audio interface | 🟡 | ❌ | No audio, sound, or speaker support. |
 
 ## Additional Gen3 Features
