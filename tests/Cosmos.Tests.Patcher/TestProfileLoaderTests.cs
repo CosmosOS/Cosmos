@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Cosmos.TestRunner.Engine;
+using Cosmos.Tools.Launcher;
 
 namespace Cosmos.Tests.Patcher;
 
@@ -107,9 +108,38 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Equal("virtio-gpu-pci", profile.GpuDevice);
     }
 
+    // The two virtio-blk kinds a profile names reach the launcher as their
+    // DiskKind, in the order the profile lists them.
+    [Fact]
+    public void LoadFor_ReadsTheVirtioBlkDiskKinds()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            {
+              "name": "vb",
+              "architectures": ["arm64"],
+              "disks": [
+                { "type": "virtio-blk" },
+                { "type": "virtio-blk-mmio" }
+              ]
+            }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "vb");
+
+        TestProfile profile = Assert.Single(TestProfileLoader.LoadFor(_suiteDir, "arm64"));
+
+        Assert.Equal("vb", profile.Name);
+        Assert.Collection(profile.Disks,
+            disk => Assert.Equal(DiskKind.VirtioBlk, disk.Kind),
+            disk => Assert.Equal(DiskKind.VirtioBlkMmio, disk.Kind));
+    }
+
     // One suite, two architectures, one csproj: each arch keeps only the
     // profile describing hardware it can actually present. Uses the two
-    // arch-pinned profiles — virtio-pci deliberately spans both, so it would
+    // arch-pinned profiles: virtio-pci deliberately spans both, so it would
     // not exercise the filter.
     [Theory]
     [InlineData("x64", "e1000e", "e1000e")]

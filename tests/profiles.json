@@ -69,6 +69,33 @@
       ]
     },
     {
+      // A virtio-blk disk: a transitional virtio-blk-pci function
+      // (1af4:1001) on the root bus, which the kit's PCI transport binds;
+      // VirtioBlkDriver binds the virtio node beneath and publishes the
+      // disk as vblk0, and the storage manager registers and scans it
+      // inside the probe. The Drivers suite's virtio-blk group runs on it,
+      // over the driver that suite's library writes on the public seam. No
+      // machineOptions: the GIC version is the modifiers' business, and
+      // the Drivers suite's arm64 cell runs the default GICv2 without an
+      // ITS, so the driver polls there.
+      "name": "virtio-blk-pci",
+      "architectures": ["x64", "arm64"],
+      "disks": [
+        { "type": "virtio-blk" }
+      ]
+    },
+    {
+      // The same disk as a virtio-blk-device in the virt machine's
+      // virtio-mmio window, bound through the MMIO transport on the GIC
+      // line the machine description routes: the legacy virtio interface
+      // and the one block cell that needs no PCI at all.
+      "name": "virtio-blk-mmio",
+      "architectures": ["arm64"],
+      "disks": [
+        { "type": "virtio-blk-mmio" }
+      ]
+    },
+    {
       // A USB keyboard (usb-kbd) on a qemu-xhci controller, plugged in at
       // boot. The kit's XhciDriver binds the controller and publishes the
       // keyboard's HID interface as a usb: node, which UsbKeyboardDriver

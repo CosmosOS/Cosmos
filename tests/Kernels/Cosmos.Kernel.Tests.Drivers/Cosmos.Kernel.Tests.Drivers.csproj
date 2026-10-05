@@ -14,17 +14,21 @@
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
-  <!-- Two cells per architecture: bare, where the synthetic groups need no
-       hardware and the hardware group reads what the machine carries by
-       default (the PCI host on both arches; q35's default e1000e on x64, while
-       virt's default NIC is a virtio-net-pci function that the kit's
-       VirtioNetDriver binds, so the E1000E tests skip there), and usb-kbd,
-       which adds a qemu-xhci controller with a usb-kbd plugged in at boot for
-       the USB keyboard group; that group skips on bare. Definitions live in
-       tests/profiles.json. -->
+  <!-- Three cells on x64 and four on arm64: bare, where the synthetic groups
+       need no hardware and the hardware group reads what the machine carries
+       by default (the PCI host on both arches; q35's default e1000e on x64,
+       while virt's default NIC is a virtio-net-pci function that the kit's
+       VirtioNetDriver binds, so the E1000E tests skip there); usb-kbd, which
+       adds a qemu-xhci controller with a usb-kbd plugged in at boot for the
+       USB keyboard group, which skips elsewhere; virtio-blk-pci, a virtio-blk
+       disk on the PCI bus for the virtio-blk group; and, on arm64 alone,
+       virtio-blk-mmio, the same disk in the virt machine's window.
+       Definitions live in tests/profiles.json. -->
   <ItemGroup>
     <CosmosTestProfile Include="bare" />
     <CosmosTestProfile Include="usb-kbd" />
+    <CosmosTestProfile Include="virtio-blk-pci" />
+    <CosmosTestProfile Include="virtio-blk-mmio" />
   </ItemGroup>
 
   <!-- Manifest policy under test: a default driver dropped by name, and an

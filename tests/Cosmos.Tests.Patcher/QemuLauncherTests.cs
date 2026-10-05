@@ -49,6 +49,77 @@ public class QemuLauncherTests
         Assert.Contains("-device usb-storage,drive=usbdisk1,bus=usbxhci0.0,id=usbstick1", text);
     }
 
+    [Fact]
+    public void AppendStorageArgs_EmitsAVirtioBlkPciFunctionOnTheRootBus()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, OptionsWithDisk("/tmp/a.img", DiskKind.VirtioBlk));
+
+        string text = args.ToString();
+        Assert.Contains(" -drive file=\"/tmp/a.img\",if=none,id=vblkdisk0,format=raw -device virtio-blk-pci,drive=vblkdisk0,id=vblk0", text);
+        Assert.DoesNotContain("pcie-root-port", text);
+    }
+
+    [Fact]
+    public void AppendStorageArgs_EmitsAVirtioBlkDeviceOnArm64()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "arm64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlkMmio }]
+        });
+
+        Assert.Contains(" -device virtio-blk-device,drive=vblkdisk0,id=vblk0", args.ToString());
+    }
+
+    // q35 has no virtio-mmio window, so the launcher refuses the kind before
+    // QEMU would fail on a device with no bus to sit on.
+    [Fact]
+    public void AppendStorageArgs_RefusesVirtioBlkMmioOnX64()
+    {
+        StringBuilder args = new();
+
+        ArgumentException ex = Assert.Throws<ArgumentException>(() =>
+            QemuLauncher.AppendStorageArgs(args, OptionsWithDisk("/tmp/a.img", DiskKind.VirtioBlkMmio)));
+        Assert.Contains("virt machine", ex.Message);
+    }
+
+    [Fact]
+    public void AppendStorageArgs_NumbersBothVirtioBlkKindsTogether()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "arm64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks =
+            [
+                new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlk },
+                new DiskAttachment { Path = "/tmp/b.img", Kind = DiskKind.VirtioBlkMmio }
+            ]
+        });
+
+        string text = args.ToString();
+        Assert.Contains(" -device virtio-blk-pci,drive=vblkdisk0,id=vblk0", text);
+        Assert.Contains(" -device virtio-blk-device,drive=vblkdisk1,id=vblk1", text);
+    }
+
+    // The virt machine turns -cdrom into a virtio-blk-pci function a
+    // virtio-blk driver would bind; virtio-scsi keeps the ISO off the block
+    // layer (stage9-experiments.md E5).
+    [Fact]
+    public void AppendArm64Args_AttachesTheIsoThroughVirtioScsi()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendArm64Args(args, new QemuLaunchOptions { Architecture = "arm64", IsoPath = "/tmp/kernel.iso" });
+
+        string text = args.ToString();
+        Assert.Contains(" -device virtio-scsi-pci,id=scsi0 -drive file=\"/tmp/kernel.iso\",if=none,id=cosmoscd,format=raw,readonly=on,media=cdrom -device scsi-cd,drive=cosmoscd,bus=scsi0.0,bootindex=0", text);
+        Assert.DoesNotContain("-cdrom", text);
+    }
+
     // The keyboard rides the xHCI controller the USB disks share, under the
     // id the engine unplugs; a run with no USB disk gets the controller from
     // the keyboard itself, and never twice.

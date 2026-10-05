@@ -118,11 +118,23 @@ public sealed class QemuLaunchOptions
     public IReadOnlyList<string> ExtraArgs { get; init; } = Array.Empty<string>();
 }
 
+/// <summary>The controller or transport a <see cref="DiskAttachment"/> reaches the guest through.</summary>
 public enum DiskKind
 {
+    /// <summary>A SATA disk on the shared <c>ich9-ahci</c> controller.</summary>
     Ahci,
+
+    /// <summary>A namespace on a dedicated <c>nvme</c> controller.</summary>
     Nvme,
-    Usb
+
+    /// <summary>A <c>usb-storage</c> stick on the shared <c>qemu-xhci</c> controller.</summary>
+    Usb,
+
+    /// <summary>A virtio-blk-pci function on the root bus.</summary>
+    VirtioBlk,
+
+    /// <summary>A virtio-blk-device in the arm64 virt machine's virtio-mmio window; refused on x64.</summary>
+    VirtioBlkMmio
 }
 
 /// <summary>
@@ -175,6 +187,18 @@ public static class QemuLauncher
 
     /// <summary>QEMU id of the <paramref name="index"/>th USB disk's usb-storage device, the one to unplug.</summary>
     public static string UsbDeviceId(int index) => $"usbstick{index}";
+
+    /// <summary>QEMU id of the drive behind the <paramref name="index"/>th virtio-blk disk, both kinds counted together.</summary>
+    public static string VirtioBlkDriveId(int index) => $"vblkdisk{index}";
+
+    /// <summary>QEMU id of the <paramref name="index"/>th virtio-blk device, the one a hot-plug request deletes.</summary>
+    public static string VirtioBlkDeviceId(int index) => $"vblk{index}";
+
+    /// <summary>QEMU's driver name for a virtio-blk disk behind a PCI function.</summary>
+    public const string VirtioBlkPciModel = "virtio-blk-pci";
+
+    /// <summary>QEMU's driver name for a virtio-blk disk in the virt machine's virtio-mmio window.</summary>
+    public const string VirtioBlkMmioModel = "virtio-blk-device";
 
     public static async Task<QemuLaunchPlan> BuildAsync(QemuLaunchOptions options)
     {
@@ -326,7 +350,12 @@ public static class QemuLauncher
         AppendUsbKeyboardArgs(args, options, AppendStorageArgs(args, options));
     }
 
-    private static void AppendArm64Args(StringBuilder args, QemuLaunchOptions options)
+    /// <summary>
+    /// Emits the arm64 virt machine, its CPU, memory and EDK2 firmware, the
+    /// ISO behind a virtio-scsi controller, <c>ramfb</c>, the disks and the
+    /// USB keyboard.
+    /// </summary>
+    internal static void AppendArm64Args(StringBuilder args, QemuLaunchOptions options)
     {
         // -bios takes a bare filename when not absolute: QEMU resolves it
         // through its data dir search, which our `-L "<exe>/../share/qemu"`
@@ -340,10 +369,16 @@ public static class QemuLauncher
         ValidateOptionToken(cpu, "cpu model");
         args.Append($" -cpu {cpu} -m {options.MemoryMb}M");
         args.Append(" -bios edk2-aarch64-code.fd");
-        // -cdrom takes its filename verbatim (no option parsing), so commas
-        // must NOT be doubled here: only the quote rejection in BuildAsync
-        // applies.
-        args.Append($" -cdrom \"{options.IsoPath}\"");
+        // The ISO goes through a virtio-scsi controller, not -cdrom: the virt
+        // machine attaches -cdrom as a virtio-blk-pci function, which the
+        // shipped virtio-blk driver would bind and publish as a read-only disk
+        // on every cell; virtio-scsi has no driver, so the boot medium stays
+        // invisible to the block layer, as q35's ATAPI drive does on x64. EDK2
+        // and Limine boot it the same (stage9-experiments.md E5). A -drive file
+        // value doubles its commas, unlike -cdrom.
+        args.Append(" -device virtio-scsi-pci,id=scsi0");
+        args.Append($" -drive file=\"{EscapeDriveFileValue(options.IsoPath)}\",if=none,id=cosmoscd,format=raw,readonly=on,media=cdrom");
+        args.Append(" -device scsi-cd,drive=cosmoscd,bus=scsi0.0,bootindex=0");
         args.Append(" -boot d -no-reboot");
         // ramfb is required for Limine framebuffer support even when headless.
         args.Append(" -device ramfb");
@@ -391,11 +426,14 @@ public static class QemuLauncher
     }
 
     /// <summary>
-    /// Attach AHCI/SATA, NVMe and USB disks. AHCI disks share one <c>ich9-ahci</c>
+    /// Attach AHCI/SATA, NVMe, USB and virtio-blk disks. AHCI disks share one <c>ich9-ahci</c>
     /// controller and consume successive ports; NVMe disks each get a
     /// dedicated <c>nvme</c> controller so the guest exercises multi-controller
     /// binding; USB disks are <c>usb-storage</c> sticks on one shared
-    /// <c>qemu-xhci</c> controller. Per-disk <see cref="DiskAttachment.ExtraDeviceOptions"/> is
+    /// <c>qemu-xhci</c> controller; <see cref="DiskKind.VirtioBlk"/> disks are
+    /// one <c>virtio-blk-pci</c> function each and <see cref="DiskKind.VirtioBlkMmio"/>
+    /// disks one <c>virtio-blk-device</c> slot each (arm64 only), both kinds
+    /// numbered together. Per-disk <see cref="DiskAttachment.ExtraDeviceOptions"/> is
     /// appended after the standard device properties so profiles can flip
     /// things like <c>msix=off</c>.
     /// </summary>
@@ -405,6 +443,7 @@ public static class QemuLauncher
         int ahciIndex = 0;
         int nvmeIndex = 0;
         int usbIndex = 0;
+        int virtioBlkIndex = 0;
         bool ahciControllerEmitted = false;
         bool usbControllerEmitted = false;
 
@@ -441,6 +480,24 @@ public static class QemuLauncher
                     args.Append($" -device usb-storage,drive={UsbDriveId(usbIndex)},bus={UsbControllerId}.0,id={UsbDeviceId(usbIndex)}");
                     AppendDeviceOptions(args, disk.ExtraDeviceOptions);
                     usbIndex++;
+                    break;
+
+                case DiskKind.VirtioBlk:
+                    args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={VirtioBlkDriveId(virtioBlkIndex)},format=raw");
+                    args.Append($" -device {VirtioBlkPciModel},drive={VirtioBlkDriveId(virtioBlkIndex)},id={VirtioBlkDeviceId(virtioBlkIndex)}");
+                    AppendDeviceOptions(args, disk.ExtraDeviceOptions);
+                    virtioBlkIndex++;
+                    break;
+
+                case DiskKind.VirtioBlkMmio:
+                    if (!options.Architecture.Equals("arm64", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new ArgumentException("A virtio-blk disk over MMIO needs the arm64 virt machine: q35 has no virtio-mmio window.");
+                    }
+                    args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={VirtioBlkDriveId(virtioBlkIndex)},format=raw");
+                    args.Append($" -device {VirtioBlkMmioModel},drive={VirtioBlkDriveId(virtioBlkIndex)},id={VirtioBlkDeviceId(virtioBlkIndex)}");
+                    AppendDeviceOptions(args, disk.ExtraDeviceOptions);
+                    virtioBlkIndex++;
                     break;
             }
         }

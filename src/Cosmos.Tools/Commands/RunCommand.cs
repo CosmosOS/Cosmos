@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Tools.Launcher;
 using Cosmos.Tools.Platform;
 using Cosmos.Tools.Update;
@@ -41,7 +42,8 @@ public class RunSettings : CommandSettings
     public bool Debug { get; set; }
 
     [CommandOption("--disk <SPEC>")]
-    [Description("Attach a disk image the kernel can use at boot. Format: 'path' or 'path,kind' where kind is ahci (default), nvme or usb. Repeatable.")]
+    [Description("Attach a disk image the kernel can use at boot. Format: 'path' or 'path,kind' where kind is ahci (default), nvme, usb, virtio-blk or virtio-blk-mmio (arm64 only). Repeatable.")]
+    [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Spectre.Console.Cli binds a repeatable option to an array.")]
     public string[] Disks { get; set; } = Array.Empty<string>();
 
     [CommandOption("--nic <MODEL>")]
@@ -110,7 +112,7 @@ public class RunCommand : AsyncCommand<RunSettings>
             return 1;
         }
 
-        // Notify before QEMU starts — stdio is handed to the guest serial console after this.
+        // Notify before QEMU starts: stdio is handed to the guest serial console after this.
         await UpdateNotifier.MaybeNotifyAsync();
 
         AnsiConsole.MarkupLine($"  Running [blue]{Path.GetFileName(isoPath)}[/] ([blue]{settings.Arch}[/]) via QEMU [dim]({plan.Source.ToString().ToLowerInvariant()}: {plan.BinaryPath})[/]");
@@ -162,7 +164,7 @@ public class RunCommand : AsyncCommand<RunSettings>
     /// Turns <c>--disk</c> specs (<c>path[,kind]</c>) into <see cref="DiskAttachment"/>s.
     /// The kind suffix is optional and defaults to AHCI; the split is on the last
     /// comma so a bare path (the common case) is never mistaken for a kind. The
-    /// image must already exist — the launcher would otherwise fail deep inside
+    /// image must already exist: the launcher would otherwise fail deep inside
     /// QEMU with a less obvious message.
     /// </summary>
     internal static List<DiskAttachment> ParseDisks(string[] specs)
@@ -190,6 +192,16 @@ public class RunCommand : AsyncCommand<RunSettings>
                 else if (suffix.Equals("usb", StringComparison.OrdinalIgnoreCase))
                 {
                     kind = DiskKind.Usb;
+                    path = spec[..comma];
+                }
+                else if (suffix.Equals("virtio-blk", StringComparison.OrdinalIgnoreCase))
+                {
+                    kind = DiskKind.VirtioBlk;
+                    path = spec[..comma];
+                }
+                else if (suffix.Equals("virtio-blk-mmio", StringComparison.OrdinalIgnoreCase))
+                {
+                    kind = DiskKind.VirtioBlkMmio;
                     path = spec[..comma];
                 }
                 // Any other suffix is treated as part of the path (a filename that

@@ -48,7 +48,11 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// 8042 carries a keyboard and a mouse on both x64 cells: the PS/2 group
 /// proves the kit's Ps2 bus kind over it, with the key and the pointer
 /// events the engine injects over QMP when a test asks; virt has no 8042
-/// and the group skips on arm64.
+/// and the group skips on arm64. The virtio-blk-pci cell (both arches) and
+/// the virtio-blk-mmio cell (arm64) attach one virtio-blk disk: the
+/// virtio-blk group proves the library's <see cref="VirtioBlkDriver"/>
+/// over the kit's Virtio bus kind under either transport, publishing the
+/// disk to the ring's storage manager; the group skips on the other cells.
 /// </para>
 /// <para>
 /// The suite is two projects. This kernel is the harness: it holds an
@@ -63,8 +67,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 7 PS/2.</summary>
-    private const int ExpectedTestCount = 47;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 7 PS/2, 6 virtio-blk.</summary>
+    private const int ExpectedTestCount = 53;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -253,6 +257,42 @@ public class Kernel : Sys.Kernel
     /// <summary>Skip reason of the key injection test on a cell with a USB keyboard, which QEMU hands the key to.</summary>
     private const string SkipUsbKeyboardTakesKeys = "a usb-kbd on this cell takes the host's keys";
 
+    /// <summary>Bus name of the device nodes the virtio transport drivers publish.</summary>
+    private const string VirtioBusName = "virtio";
+
+    /// <summary>The start of a virtio node's description for a block device; the trailing space keeps type 2x out.</summary>
+    private const string VirtioBlkDescriptionPrefix = "type 2 ";
+
+    /// <summary>Start of a function node's description for a transitional virtio-blk-pci function (vendor 1af4, device 1001), on a root bus.</summary>
+    private const string TransitionalBlkFunctionPrefix = "1af4:1001";
+
+    /// <summary>Start of a function node's description for a modern-only virtio-blk-pci function (vendor 1af4, device 1042), behind a PCI Express port.</summary>
+    private const string ModernBlkFunctionPrefix = "1af4:1042";
+
+    /// <summary>The start of every name the virtio-blk driver publishes a disk under.</summary>
+    private const string VirtioBlkNamePrefix = "vblk";
+
+    /// <summary>The engine's 256 MiB sparse image.</summary>
+    private const long VirtioBlkImageBytes = 268435456L;
+
+    /// <summary>Bytes per sector of the engine's image, the device's block size.</summary>
+    private const int VirtioBlkSectorBytes = 512;
+
+    /// <summary>The block the round trip test saves, overwrites and restores: well past any partition table and inside the image.</summary>
+    private const ulong VirtioBlkProbeLba = 200000UL;
+
+    /// <summary>More than the driver moves in one request: 130 blocks of 512 bytes is 66560, above the 65536-byte bounce block.</summary>
+    private const int VirtioBlkSpanBlocks = 130;
+
+    /// <summary>Skip reason of the virtio-blk tests on a cell that attaches no virtio-blk disk.</summary>
+    private const string SkipNoVirtioBlk = "no virtio-blk device on this cell";
+
+    /// <summary>The start of a virtio node's path under the PCI transport.</summary>
+    private const string VirtioPciPathPrefix = "virtio:pci:";
+
+    /// <summary>The start of a virtio node's path under the MMIO transport.</summary>
+    private const string VirtioMmioPathPrefix = "virtio:mmio:";
+
     private readonly TestKeyboardConsumer _keyboardConsumer = new();
     private readonly TestPointerConsumer _pointerConsumer = new();
     private readonly DeviceNode _bootNode;
@@ -266,6 +306,7 @@ public class Kernel : Sys.Kernel
     private string? _usbKeyboardPath;
     private DeviceNode? _usbKeyboardNode;
     private string? _i8042Path;
+    private string? _virtioBlkPath;
 
     /// <summary>
     /// Publishes the boot node. The constructor runs before
@@ -379,6 +420,20 @@ public class Kernel : Sys.Kernel
         TR.RunIf(has8042, "Ps2_Mouse_Bound", TestPs2MouseBound, SkipNo8042);
         TR.RunIf(has8042, "Ps2_Mouse_MovementInjected", TestPs2MouseMovementInjected, SkipNo8042);
         TR.RunIf(has8042, "Ps2_Mouse_ButtonInjected", TestPs2MouseButtonInjected, SkipNo8042);
+
+        // ==================== virtio-blk ====================
+        // The virtio-blk-pci and virtio-blk-mmio cells attach one virtio-blk disk;
+        // bare and usb-kbd attach none and the group skips. The driver under test
+        // is the library's own in this commit and the shipped one after the
+        // promotion, over the same six assertions.
+        _virtioBlkPath = FindVirtioBlkPath();
+        bool hasVirtioBlk = _virtioBlkPath is not null;
+        TR.RunIf(hasVirtioBlk, "VirtioBlk_Bound", TestVirtioBlkBound, SkipNoVirtioBlk);
+        TR.RunIf(hasVirtioBlk, "VirtioBlk_TransportMatchesCell", TestVirtioBlkTransportMatchesCell, SkipNoVirtioBlk);
+        TR.RunIf(hasVirtioBlk, "VirtioBlk_CapacityMatchesImage", TestVirtioBlkCapacityMatchesImage, SkipNoVirtioBlk);
+        TR.RunIf(hasVirtioBlk, "VirtioBlk_ReadWriteRoundTrip", TestVirtioBlkReadWriteRoundTrip, SkipNoVirtioBlk);
+        TR.RunIf(hasVirtioBlk, "VirtioBlk_FlushCompletes", TestVirtioBlkFlushCompletes, SkipNoVirtioBlk);
+        TR.RunIf(hasVirtioBlk, "VirtioBlk_InterruptOrPolled", TestVirtioBlkInterruptOrPolled, SkipNoVirtioBlk);
 
         TR.Finish();
 
@@ -1591,6 +1646,214 @@ public class Kernel : Sys.Kernel
         Assert.True(WaitUntil(() => _pointerConsumer.RelativeCount > reportsBefore && _pointerConsumer.LastButtons == PointerButtons.None), "the button release should reach the pointer consumer");
     }
 
+    // ==================== virtio-blk ====================
+    //
+    // The kit's Virtio bus kind over the cell's virtio-blk disk, under the
+    // PCI transport or the virt machine's MMIO window: the library's driver
+    // bound and its disk consumed by the ring's storage manager, the
+    // geometry of the engine's image, a round trip that crosses the
+    // per-request bound, a flush, and the completion mode the transport
+    // gave the queue. The state is read through the node's binding.
+
+    private void TestVirtioBlkBound()
+    {
+        if (!TryGetVirtioBlk(out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        VirtioBlkState? state = FindDriverState<VirtioBlkState>(path);
+        Assert.NotNull(state, "the virtio-blk node should be bound by VirtioBlkDriver");
+        if (state is null)
+        {
+            return;
+        }
+
+        Assert.True(info.State == DeviceNodeState.Bound, "the virtio-blk node should be bound");
+        Assert.True(info.DriverName == nameof(VirtioBlkDriver), "VirtioBlkDriver should hold the virtio-blk node");
+        Assert.Equal(1, info.PublishedDeviceCount, "the binding should hold one published disk");
+        Assert.True(info.BusName == VirtioBusName, "the node should be on the virtio bus");
+
+        int index = FindBlockDeviceIndex(path);
+        Assert.True(index >= 0, "the disk should be in the published list under its node");
+        if (DriverInfo.TryGetDevice(index, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.IsConsumed, "the storage manager should have consumed the disk");
+            Assert.False(device.IsWithdrawn, "a published disk is not withdrawn");
+            Assert.True(device.DriverName == nameof(VirtioBlkDriver), "the published device should name its driver");
+            Assert.True(device.Name == state.Name, "the published device should carry the disk's name");
+        }
+
+        Assert.True(state.Name.StartsWith(VirtioBlkNamePrefix, StringComparison.Ordinal), "the disk should be named vblk<n>");
+        Assert.True(HoldsDevice(StorageManager.Devices, state), "the storage manager should list the disk");
+        Assert.Equal(0u, state.Index, "the cell's one disk takes index 0");
+    }
+
+    private void TestVirtioBlkTransportMatchesCell()
+    {
+        if (!TryGetVirtioBlk(out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        VirtioBlkState? state = FindDriverState<VirtioBlkState>(path);
+        Assert.NotNull(state, "the virtio-blk node should be bound by VirtioBlkDriver");
+        if (state is null)
+        {
+            return;
+        }
+
+        bool pci = FindNodePathOnBus(PciBusName, TransitionalBlkFunctionPrefix) is not null || FindNodePathOnBus(PciBusName, ModernBlkFunctionPrefix) is not null;
+        string expectedPrefix = pci ? VirtioPciPathPrefix : VirtioMmioPathPrefix;
+        string expectedTransport = pci ? nameof(VirtioPciTransportDriver) : nameof(VirtioMmioTransportDriver);
+        Assert.True(path.StartsWith(expectedPrefix, StringComparison.Ordinal), "the node's path should name the transport the cell attaches the disk on");
+
+        string? parentPath = info.ParentPath;
+        Assert.NotNull(parentPath, "the virtio node should have its transport's node as parent");
+        if (parentPath is null)
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(parentPath, out DeviceNodeInfo parent), "the transport's node should be in the tree");
+        Assert.True(parent.State == DeviceNodeState.Bound, "the transport's node should be bound");
+        Assert.True(parent.DriverName == expectedTransport, "the transport driver should match the cell's bus");
+        Assert.Equal(1, parent.ChildCount, "the transport publishes one virtio node");
+    }
+
+    private void TestVirtioBlkCapacityMatchesImage()
+    {
+        if (!TryGetVirtioBlk(out string? path, out _))
+        {
+            return;
+        }
+
+        VirtioBlkState? state = FindDriverState<VirtioBlkState>(path);
+        Assert.NotNull(state, "the virtio-blk node should be bound by VirtioBlkDriver");
+        if (state is null)
+        {
+            return;
+        }
+
+        Assert.Equal<ulong>(VirtioBlkSectorBytes, state.BlockSize, "the engine's image has 512-byte blocks");
+        Assert.Equal<ulong>((ulong)VirtioBlkImageBytes / VirtioBlkSectorBytes, state.BlockCount, "the capacity should be the engine's 256 MiB image");
+        Assert.False(state.IsReadOnly, "the engine's image is writable");
+        Assert.True(state.MaxTransferBytes >= (int)state.BlockSize, "one request should move at least one block");
+    }
+
+    // The span crosses the per-request bound, so the chunking runs; both
+    // ranges are put back as they were.
+    private void TestVirtioBlkReadWriteRoundTrip()
+    {
+        if (!TryGetVirtioBlk(out string? path, out _))
+        {
+            return;
+        }
+
+        VirtioBlkState? state = FindDriverState<VirtioBlkState>(path);
+        Assert.NotNull(state, "the virtio-blk node should be bound by VirtioBlkDriver");
+        if (state is null)
+        {
+            return;
+        }
+
+        int blockBytes = (int)state.BlockSize;
+        int spanBytes = VirtioBlkSpanBlocks * blockBytes;
+        ulong spanLba = VirtioBlkProbeLba + 1;
+        byte[] savedBlock = new byte[blockBytes];
+        byte[] savedSpan = new byte[spanBytes];
+        byte[] block = new byte[blockBytes];
+        byte[] span = new byte[spanBytes];
+        byte[] readBlock = new byte[blockBytes];
+        byte[] readSpan = new byte[spanBytes];
+        for (int i = 0; i < blockBytes; i++)
+        {
+            block[i] = (byte)(i * 7 + 3);
+        }
+
+        for (int i = 0; i < spanBytes; i++)
+        {
+            span[i] = (byte)(i * 13 + 5);
+        }
+
+        try
+        {
+            state.ReadBlock(VirtioBlkProbeLba, 1, savedBlock);
+            state.ReadBlock(spanLba, VirtioBlkSpanBlocks, savedSpan);
+
+            state.WriteBlock(VirtioBlkProbeLba, 1, block);
+            state.WriteBlock(spanLba, VirtioBlkSpanBlocks, span);
+            state.ReadBlock(VirtioBlkProbeLba, 1, readBlock);
+            state.ReadBlock(spanLba, VirtioBlkSpanBlocks, readSpan);
+            Assert.Equal(block, readBlock, "the single block should read back as written");
+            Assert.Equal(span, readSpan, "the span should read back as written across the per-request bound");
+
+            state.WriteBlock(VirtioBlkProbeLba, 1, savedBlock);
+            state.WriteBlock(spanLba, VirtioBlkSpanBlocks, savedSpan);
+            state.ReadBlock(VirtioBlkProbeLba, 1, readBlock);
+            state.ReadBlock(spanLba, VirtioBlkSpanBlocks, readSpan);
+            Assert.Equal(savedBlock, readBlock, "the single block should read back as restored");
+            Assert.Equal(savedSpan, readSpan, "the span should read back as restored");
+        }
+        catch (Exception exception)
+        {
+            Assert.Fail("the round trip threw: " + exception.Message);
+        }
+    }
+
+    private void TestVirtioBlkFlushCompletes()
+    {
+        if (!TryGetVirtioBlk(out string? path, out _))
+        {
+            return;
+        }
+
+        VirtioBlkState? state = FindDriverState<VirtioBlkState>(path);
+        Assert.NotNull(state, "the virtio-blk node should be bound by VirtioBlkDriver");
+        if (state is null)
+        {
+            return;
+        }
+
+        int before = state.RequestsCompleted;
+        try
+        {
+            state.Flush();
+        }
+        catch (Exception exception)
+        {
+            Assert.Fail("the flush threw: " + exception.Message);
+            return;
+        }
+
+        Assert.Equal(before + (state.FlushNegotiated ? 1 : 0), state.RequestsCompleted, "a negotiated flush is one request, an unnegotiated one none");
+        Log.WriteString(state.FlushNegotiated ? "[DriversTests] virtio-blk flush negotiated\n" : "[DriversTests] virtio-blk flush not negotiated\n");
+    }
+
+    // The group's cells carry no GIC modifier, so the mode is not pinned.
+    private void TestVirtioBlkInterruptOrPolled()
+    {
+        if (!TryGetVirtioBlk(out string? path, out _))
+        {
+            return;
+        }
+
+        VirtioBlkState? state = FindDriverState<VirtioBlkState>(path);
+        Assert.NotNull(state, "the virtio-blk node should be bound by VirtioBlkDriver");
+        if (state is null)
+        {
+            return;
+        }
+
+        Assert.True(state.HasInterrupt != state.IsPolling, "the driver takes its completions from the queue interrupt or polls, never both or neither");
+        if (state.HasInterrupt)
+        {
+            Assert.True(state.InterruptCount >= 1, "the round trip should have raised the queue interrupt");
+        }
+
+        Log.WriteString(state.HasInterrupt ? "[DriversTests] virtio-blk interrupt\n" : "[DriversTests] virtio-blk polling\n");
+    }
+
     // ==================== Helpers ====================
 
     /// <summary>
@@ -1742,6 +2005,52 @@ public class Kernel : Sys.Kernel
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Finds the path of the first virtio node describing a block device,
+    /// whatever its state: the virtio-blk tests decide from the hardware's
+    /// presence, as the E1000E tests do, so a probe that failed shows up as
+    /// a failed test rather than a skip.
+    /// </summary>
+    /// <returns>The node's path, or null when no virtio-blk device is in the tree.</returns>
+    private static string? FindVirtioBlkPath() => FindNodePathOnBus(VirtioBusName, VirtioBlkDescriptionPrefix);
+
+    /// <summary>Finds the path of the first node on <paramref name="busName"/> whose description starts with <paramref name="descriptionPrefix"/>, compared ordinally, whatever its state.</summary>
+    /// <param name="busName">The bus the node is on.</param>
+    /// <param name="descriptionPrefix">The start of the node's description.</param>
+    /// <returns>The node's path, or null when no such node is in the tree.</returns>
+    private static string? FindNodePathOnBus(string busName, string descriptionPrefix)
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+                && info.BusName == busName
+                && info.Description.StartsWith(descriptionPrefix, StringComparison.Ordinal))
+            {
+                return info.Path;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>Hands back the virtio-blk node's path and a fresh snapshot of it, or fails the test when BeforeRun found none.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private bool TryGetVirtioBlk([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    {
+        path = _virtioBlkPath;
+        if (path is null || !TryFindNode(path, out info))
+        {
+            Assert.Fail("the virtio-blk node was not found by BeforeRun");
+            info = default;
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>Hands back the 8042 node's path and a fresh snapshot of it, or fails the test when BeforeRun found none.</summary>
