@@ -1,17 +1,16 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
-using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.System.Mouse;
 
 /// <summary>
-/// Manages mouse input from physical mouse devices: the platform's mice,
-/// registered at boot, and every pointer a driver kit driver publishes,
-/// which the manager's <see cref="KitPointerConsumer"/> registers from the
-/// kit worker and unregisters when it is withdrawn.
+/// Manages mouse input from every pointer a driver kit driver publishes (the
+/// PS/2 mouse on x64, virtio mice), which the manager's
+/// <see cref="KitPointerConsumer"/> registers from the kit worker when it is
+/// published and unregisters when it is withdrawn.
 /// </summary>
 public static class MouseManager
 {
@@ -21,12 +20,11 @@ public static class MouseManager
     public static bool IsEnabled => CosmosFeatures.MouseEnabled;
 
     /// <summary>
-    /// The registered mice. Replaced on every change, never changed in
-    /// place: a kit pointer can come or go on the kit worker while
-    /// <see cref="Poll"/> walks the list on the ring's thread. Changed by the
-    /// boot path, then by the worker only.
+    /// The published pointers, kept for the registration log and the count.
+    /// Replaced on every change, never changed in place; changed by the kit
+    /// worker only.
     /// </summary>
-    private static IMouseDevice[]? s_mice;
+    private static PublishedDevice[]? s_mice;
 
     /// <summary>
     /// Current X position (screen coordinates).
@@ -117,9 +115,8 @@ public static class MouseManager
 
     /// <summary>
     /// Initializes the mouse manager. Called once during boot, before the
-    /// platform mice are registered and before the driver stage runs, so
-    /// the pointer consumer it installs sees every pointer a kit driver
-    /// publishes.
+    /// driver stage runs, so the pointer consumer it installs sees every
+    /// pointer a kit driver publishes.
     /// </summary>
     internal static void Initialize()
     {
@@ -137,28 +134,19 @@ public static class MouseManager
     }
 
     /// <summary>
-    /// Registers a mouse device with the manager. Thread context, from the
-    /// boot path or from the kit worker when a published pointer is
-    /// consumed; the list is replaced, never changed in place.
+    /// Registers a published pointer with the manager. Thread context, the
+    /// kit worker when a published pointer is consumed; the list is replaced,
+    /// never changed in place.
     /// </summary>
-    /// <param name="mouse">The mouse to register; nothing when it is null or the manager is not initialized.</param>
-    internal static void RegisterMouse(IMouseDevice mouse)
+    /// <param name="mouse">The pointer to register; nothing when the manager is not initialized.</param>
+    internal static void RegisterMouse(PublishedDevice mouse)
     {
-        if (s_mice is null || mouse is null)
+        if (s_mice is null)
         {
             return;
         }
 
-        // Set up event handler for mouse devices that use MouseDevice base class
-        if (mouse is MouseDevice mouseDevice)
-        {
-            mouseDevice.OnMouseEvent = HandleMouseEvent;
-        }
-
         s_mice = [.. s_mice, mouse];
-
-        // Enable mouse after callback is set
-        mouse.Enable();
 
         Core.IO.Serial.Write("[MouseManager] Registered mouse, total: ");
         Core.IO.Serial.WriteNumber((uint)s_mice.Length);
@@ -166,21 +154,21 @@ public static class MouseManager
     }
 
     /// <summary>
-    /// Forgets a mouse that is gone (a kit pointer withdrawn). Its reports
-    /// stop arriving; the cursor and the button flags keep their last
-    /// values. Thread context, from the kit worker; the list is replaced,
-    /// never changed in place.
+    /// Forgets a pointer that is gone (withdrawn by its driver's teardown).
+    /// Its reports stop arriving; the cursor and the button flags keep their
+    /// last values. Thread context, the kit worker in a teardown; the list is
+    /// replaced, never changed in place.
     /// </summary>
-    /// <param name="mouse">The mouse to remove; nothing when it is not registered.</param>
-    internal static void UnregisterMouse(IMouseDevice mouse)
+    /// <param name="mouse">The pointer to remove; nothing when it is not registered.</param>
+    internal static void UnregisterMouse(PublishedDevice mouse)
     {
         if (s_mice is null)
         {
             return;
         }
 
-        List<IMouseDevice> kept = new(s_mice.Length);
-        foreach (IMouseDevice other in s_mice)
+        List<PublishedDevice> kept = new(s_mice.Length);
+        foreach (PublishedDevice other in s_mice)
         {
             if (!ReferenceEquals(other, mouse))
             {
@@ -189,10 +177,6 @@ public static class MouseManager
         }
 
         s_mice = kept.ToArray();
-        if (mouse is MouseDevice mouseDevice)
-        {
-            mouseDevice.OnMouseEvent = null;
-        }
 
         Core.IO.Serial.Write("[MouseManager] Unregistered mouse, total: ");
         Core.IO.Serial.WriteNumber((uint)s_mice.Length);
@@ -200,9 +184,15 @@ public static class MouseManager
     }
 
     /// <summary>
-    /// Handles mouse events from devices.
+    /// A relative movement report: applies the sensitivity, moves the cursor,
+    /// clamps it to the screen, accumulates the wheel and sets the buttons.
+    /// Sink caller's context, an interrupt included; allocation-free.
     /// </summary>
-    private static void HandleMouseEvent(int deltaX, int deltaY, int deltaZ, bool leftButton, bool rightButton, bool middleButton)
+    /// <param name="deltaX">Horizontal movement since the last report.</param>
+    /// <param name="deltaY">Vertical movement since the last report.</param>
+    /// <param name="buttons">Buttons held down.</param>
+    /// <param name="wheel">Wheel movement since the last report: negative scrolls up, positive scrolls down.</param>
+    internal static void HandleRelative(int deltaX, int deltaY, PointerButtons buttons, int wheel)
     {
         // Apply sensitivity
         int adjustedDeltaX = (int)(deltaX * Sensitivity);
@@ -211,7 +201,7 @@ public static class MouseManager
         // Update position with boundary checking
         X += adjustedDeltaX;
         Y += adjustedDeltaY;
-        ScrollDelta += deltaZ;
+        ScrollDelta += wheel;
 
         // Clamp to screen bounds
         if (X < 0)
@@ -235,28 +225,28 @@ public static class MouseManager
         }
 
         // Update button states
-        LeftButton = leftButton;
-        RightButton = rightButton;
-        MiddleButton = middleButton;
+        LeftButton = (buttons & PointerButtons.Left) != 0;
+        RightButton = (buttons & PointerButtons.Right) != 0;
+        MiddleButton = (buttons & PointerButtons.Middle) != 0;
     }
 
     /// <summary>
-    /// Polls all registered mice for events. Thread context; walks the
-    /// list as it was when the walk began, since a registration from the
-    /// worker replaces the array rather than changing it.
+    /// An absolute position report: sets the three buttons and nothing else,
+    /// the migration-period mapping of an absolute device onto a manager that
+    /// only knows movement: the buttons are learned and the cursor stays
+    /// where it was (the scaling of an absolute device to the screen is an
+    /// open item). Sink caller's context, an interrupt included;
+    /// allocation-free.
     /// </summary>
-    internal static void Poll()
+    /// <param name="x">Horizontal position in the device's own range; not applied.</param>
+    /// <param name="y">Vertical position in the device's own range; not applied.</param>
+    /// <param name="buttons">Buttons held down.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "The method has the absolute report's shape; the position is not applied until the manager scales an absolute device to the screen.")]
+    internal static void HandleAbsolute(int x, int y, PointerButtons buttons)
     {
-        IMouseDevice[]? mice = s_mice;
-        if (mice is null)
-        {
-            return;
-        }
-
-        foreach (IMouseDevice mouse in mice)
-        {
-            mouse.Poll();
-        }
+        LeftButton = (buttons & PointerButtons.Left) != 0;
+        RightButton = (buttons & PointerButtons.Right) != 0;
+        MiddleButton = (buttons & PointerButtons.Middle) != 0;
     }
 
     /// <summary>

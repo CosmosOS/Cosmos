@@ -4,7 +4,6 @@ using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.X64.Cpu;
-using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.Devices.Clock;
 
 namespace Cosmos.Kernel.HAL.X64.Devices.Clock;
@@ -13,7 +12,7 @@ namespace Cosmos.Kernel.HAL.X64.Devices.Clock;
 /// CMOS Real-Time Clock (RTC) device for x64.
 /// Reads date/time from the hardware RTC.
 /// </summary>
-internal class RTC : Device
+internal class RTC
 {
     /// <summary>
     /// Singleton instance of the RTC.

@@ -1,8 +1,6 @@
 ﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 // Ported from Cosmos.System2/Keyboard/ScanMapBase.cs
 
-using Cosmos.Kernel.HAL.Interfaces.Devices;
-
 namespace Cosmos.Kernel.System.Keyboard;
 
 /// <summary>
@@ -17,9 +15,11 @@ public abstract class ScanMapBase
     /// Scan code the keyboard devices report for the right Alt key. A layout
     /// maps it to <see cref="ConsoleKeyEx.AltGr"/> when the key selects its
     /// third level, and to <see cref="ConsoleKeyEx.RAlt"/> when it is a second
-    /// Alt.
+    /// Alt. On the wire it is the extended form of the left Alt (E0 38),
+    /// which every keyboard driver folds to this value, one set 1 assigns to
+    /// no key.
     /// </summary>
-    internal const byte RightAltScanCode = IKeyboardDevice.RightAltScanCode;
+    internal const byte RightAltScanCode = 0x60;
 
     private bool _keysInitialized;
 
@@ -63,13 +63,12 @@ public abstract class ScanMapBase
     /// <param name="alt">Whether the Alt key is pressed.</param>
     /// <param name="numLock">Whether num-lock is active.</param>
     /// <param name="capsLock">Whether caps-lock is active.</param>
-    /// <param name="scrollLock">Whether scroll-lock is active.</param>
     /// <returns>The translated <see cref="KeyEvent"/>.</returns>
-    internal KeyEvent? ConvertScanCode(byte scanKey, bool ctrl, bool shift, bool alt, bool numLock, bool capsLock, bool scrollLock)
+    internal KeyEvent? ConvertScanCode(byte scanKey, bool ctrl, bool shift, bool alt, bool numLock, bool capsLock)
     {
         EnsureKeysInitialized();
 
-        var keyEvent = new KeyEvent();
+        KeyEvent keyEvent = new();
         bool found = false;
 
         if (scanKey == 0)

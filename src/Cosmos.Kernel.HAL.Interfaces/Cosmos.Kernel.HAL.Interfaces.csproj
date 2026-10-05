@@ -20,11 +20,11 @@
     <ItemGroup>
         <!-- The rest are internal because no kernel can obtain or meaningfully
              supply one: the boot contract (IPlatformInitializer) and the
-             input, timer and network devices, whose only registration
-             callers are System's own LibraryInitializer wiring up HAL
-             enumeration. A kernel reads NetworkManager.Name/MacAddress/
-             LinkUp/Ready, never the device, exactly as it reads
-             KeyboardManager.ReadKey. -->
+             timer and network devices, whose only registration callers are
+             System's own LibraryInitializer and its network consumer. A
+             kernel reads NetworkManager.Name/MacAddress/LinkUp/Ready, never
+             the device, exactly as it reads KeyboardManager.ReadKey; the
+             input kinds are the driver kit's IKeyboard and IPointer. -->
         <InternalsVisibleTo Include="Cosmos.Kernel.HAL" />
         <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
         <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
@@ -33,10 +33,8 @@
         <InternalsVisibleTo Include="Cosmos.Kernel" />
         <InternalsVisibleTo Include="Cosmos.Kernel.System" />
         <!-- The white-box storage suite maps a high BAR through
-             PlatformHAL.Initializer.EnsureMmioMapped, and the virtio suite
-             holds the enumerated input devices it exercises. -->
+             PlatformHAL.Initializer.EnsureMmioMapped. -->
         <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
-        <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Virtio" />
         <!-- The white-box network suite checks that the stack attached its
              packet handler to the device, which the ring does not report. -->
         <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Network" />

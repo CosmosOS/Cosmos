@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.HAL.Devices.Storage;
 /// <summary>
 /// Abstract base class for all block storage devices.
 /// </summary>
-internal abstract class BlockDevice : Device, IBlockDevice
+internal abstract class BlockDevice : IBlockDevice
 {
     /// <inheritdoc />
     public ulong BlockCount { get; protected set; }

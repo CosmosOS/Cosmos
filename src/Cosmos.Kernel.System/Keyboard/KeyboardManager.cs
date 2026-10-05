@@ -4,18 +4,18 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
+using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.System.Keyboard.ScanMaps;
 
 namespace Cosmos.Kernel.System.Keyboard;
 
 /// <summary>
-/// Manages keyboard input from physical keyboards: the platform's keyboards,
-/// registered at boot, USB keyboards as they come and go, and every keyboard
-/// a driver kit driver publishes, which the manager's
-/// <see cref="KitKeyboardConsumer"/> registers from the kit worker and
-/// unregisters when it is withdrawn.
+/// Manages keyboard input from every keyboard a driver kit driver publishes
+/// (the PS/2 keyboard on x64, virtio and USB keyboards), which the manager's
+/// <see cref="KitKeyboardConsumer"/> registers from the kit worker when it is
+/// published and unregisters when it is withdrawn.
 /// </summary>
 public static class KeyboardManager
 {
@@ -25,13 +25,25 @@ public static class KeyboardManager
     public static bool IsEnabled => CosmosFeatures.KeyboardEnabled;
 
     /// <summary>
-    /// The registered keyboards. Replaced on every change, never changed in
-    /// place: a kit keyboard (a virtio or USB one) can come or go on the kit
-    /// worker, in the probe that published it or the teardown that withdrew
-    /// it, while a key press walks the list in interrupt context. Changed by
-    /// the boot path, then by the kit worker only.
+    /// The published keyboards. Replaced on every change, never changed in
+    /// place: a keyboard comes or goes on the kit worker, in the probe that
+    /// published it or the teardown that withdrew it, while a key report
+    /// walks nothing (the consumer hands the scan code straight to the
+    /// handler) and the indicator item walks the list on the worker. Changed
+    /// by the kit worker only.
     /// </summary>
-    private static IKeyboardDevice[]? s_keyboards;
+    private static PublishedDevice[]? s_keyboards;
+
+    /// <summary>
+    /// The one kit-owned work item that lights the indicators on every
+    /// keyboard; created by <see cref="Initialize"/>, scheduled by the toggle
+    /// of a lock key.
+    /// </summary>
+    private static WorkItem? s_ledsWork;
+
+    /// <summary>Whether the refused indicator schedule of a kernel with no kit worker has been logged.</summary>
+    private static bool s_ledsRefusedLogged;
+
     private static Queue<KeyEvent>? s_queuedKeys;
     private static ScanMapBase? s_scanMap;
 
@@ -95,9 +107,8 @@ public static class KeyboardManager
 
     /// <summary>
     /// Initializes the keyboard manager. Called once during boot, before the
-    /// platform keyboards are registered and before the driver stage runs,
-    /// so the keyboard consumer it installs sees every keyboard a kit driver
-    /// publishes.
+    /// driver stage runs, so the keyboard consumer it installs sees every
+    /// keyboard a kit driver publishes.
     /// </summary>
     internal static void Initialize()
     {
@@ -111,27 +122,24 @@ public static class KeyboardManager
         s_queuedKeys = new Queue<KeyEvent>();
         s_scanMap = new USStandardLayout();
         s_keyboards = [];
+        s_ledsWork = new WorkItem(ApplyLeds, binding: null);
         DeviceRegistry.SetConsumer(DeviceKind.Keyboard, new KitKeyboardConsumer());
     }
 
     /// <summary>
-    /// Registers a keyboard device with the manager. Thread context, from
-    /// the boot path or from the kit worker when a published keyboard is
-    /// consumed; the list is replaced, never changed in place.
+    /// Registers a published keyboard with the manager. Thread context, the
+    /// kit worker when a published keyboard is consumed; the list is
+    /// replaced, never changed in place.
     /// </summary>
-    /// <param name="keyboard">The keyboard to register; nothing when it is null or the manager is not initialized.</param>
-    internal static void RegisterKeyboard(IKeyboardDevice keyboard)
+    /// <param name="keyboard">The keyboard to register; nothing when the manager is not initialized.</param>
+    internal static void RegisterKeyboard(PublishedDevice keyboard)
     {
-        if (s_keyboards is null || keyboard is null)
+        if (s_keyboards is null)
         {
             return;
         }
 
-        keyboard.OnKeyPressed = HandleScanCode;
         s_keyboards = [.. s_keyboards, keyboard];
-
-        // Enable keyboard after callback is set (this registers IRQ handler)
-        keyboard.Enable();
 
         Core.IO.Serial.Write("[KeyboardManager] Registered keyboard, total: ");
         Core.IO.Serial.WriteNumber((uint)s_keyboards.Length);
@@ -139,22 +147,22 @@ public static class KeyboardManager
     }
 
     /// <summary>
-    /// Forgets a keyboard that is gone (a kit keyboard withdrawn, a USB
-    /// keyboard pulled out among them). Its keys stop arriving; a modifier
-    /// it held down stays down until pressed on another keyboard. Thread
-    /// context, the kit worker in a teardown; the list is replaced, never
-    /// changed in place.
+    /// Forgets a keyboard that is gone (withdrawn by its driver's teardown, a
+    /// USB keyboard pulled out among them). Its keys stop arriving; a
+    /// modifier it held down stays down until pressed on another keyboard.
+    /// Thread context, the kit worker in a teardown; the list is replaced,
+    /// never changed in place.
     /// </summary>
     /// <param name="keyboard">The keyboard to remove; nothing when it is not registered.</param>
-    internal static void UnregisterKeyboard(IKeyboardDevice keyboard)
+    internal static void UnregisterKeyboard(PublishedDevice keyboard)
     {
         if (s_keyboards is null)
         {
             return;
         }
 
-        List<IKeyboardDevice> kept = new(s_keyboards.Length);
-        foreach (IKeyboardDevice other in s_keyboards)
+        List<PublishedDevice> kept = new(s_keyboards.Length);
+        foreach (PublishedDevice other in s_keyboards)
         {
             if (!ReferenceEquals(other, keyboard))
             {
@@ -163,7 +171,6 @@ public static class KeyboardManager
         }
 
         s_keyboards = kept.ToArray();
-        keyboard.OnKeyPressed = null;
 
         Core.IO.Serial.Write("[KeyboardManager] Unregistered keyboard, total: ");
         Core.IO.Serial.WriteNumber((uint)s_keyboards.Length);
@@ -172,12 +179,11 @@ public static class KeyboardManager
 
     /// <summary>
     /// Enqueues the given key-press event to the internal keyboard buffer.
-    /// Runs in interrupt context on the IRQ path and in thread context from
-    /// <see cref="PollKeyboards"/>, against readers that are always in thread
-    /// context, so every touch of the queue masks interrupts for its
-    /// duration. <see cref="Queue{T}"/> is not reentrant: an enqueue that
-    /// grows the queue reallocates the backing array and rehomes its head
-    /// while a reader may be indexing the old one.
+    /// Runs in the sink caller's context, an interrupt included, against
+    /// readers that are always in thread context, so every touch of the
+    /// queue masks interrupts for its duration. <see cref="Queue{T}"/> is not
+    /// reentrant: an enqueue that grows the queue reallocates the backing
+    /// array and rehomes its head while a reader may be indexing the old one.
     /// </summary>
     private static void Enqueue(KeyEvent keyEvent)
     {
@@ -188,9 +194,14 @@ public static class KeyboardManager
     }
 
     /// <summary>
-    /// Handles a key-press by its physical key scan-code.
+    /// Handles one key report by its set 1 scan code: toggles the lock keys
+    /// and lights the indicators, tracks the modifiers, converts a make
+    /// through the active layout and queues the event. Sink caller's context,
+    /// an interrupt included; called by <see cref="KitKeyboardConsumer.OnKey"/>.
     /// </summary>
-    private static void HandleScanCode(byte scanCode, bool released)
+    /// <param name="scanCode">The set 1 scan code, the right Alt as <see cref="ScanMapBase.RightAltScanCode"/>.</param>
+    /// <param name="released">True for a key release.</param>
+    internal static void HandleScanCode(byte scanCode, bool released)
     {
         if (s_scanMap is null)
         {
@@ -234,27 +245,79 @@ public static class KeyboardManager
         {
             if (!released)
             {
-                if (GetKey(key, out var keyInfo))
+                if (GetKey(key, out KeyEvent? keyInfo))
                 {
-                    Enqueue(keyInfo!);
+                    Enqueue(keyInfo);
                 }
             }
         }
     }
 
     /// <summary>
-    /// Updates the keyboard LEDs.
+    /// Schedules the indicator item. Any context, an interrupt included;
+    /// allocation-free. A schedule refused because the item is already
+    /// queued is the coalescing the indicator item relies on and is ignored;
+    /// a kernel with no kit worker is logged once and otherwise ignored.
     /// </summary>
     private static void UpdateLeds()
     {
-        if (s_keyboards is null)
+        WorkItem? work = s_ledsWork;
+        if (work is null)
         {
             return;
         }
 
-        foreach (IKeyboardDevice keyboard in s_keyboards)
+        if (work.Schedule() || DriverEngine.HasWorker)
         {
-            keyboard.UpdateLeds();
+            return;
+        }
+
+        if (!s_ledsRefusedLogged)
+        {
+            s_ledsRefusedLogged = true;
+            Core.IO.Serial.Write("[KeyboardManager] No kit worker: the indicators stay as they are\n");
+        }
+    }
+
+    /// <summary>
+    /// The indicator work item. Thread context on the kit worker. Reads the
+    /// lock states the manager holds now, so coalesced schedules apply the
+    /// latest, and skips a keyboard withdrawn meanwhile, since its contract
+    /// object must not be used after that.
+    /// </summary>
+    private static void ApplyLeds()
+    {
+        KeyboardLeds leds = KeyboardLeds.None;
+        if (NumLock)
+        {
+            leds |= KeyboardLeds.NumLock;
+        }
+
+        if (CapsLock)
+        {
+            leds |= KeyboardLeds.CapsLock;
+        }
+
+        if (ScrollLock)
+        {
+            leds |= KeyboardLeds.ScrollLock;
+        }
+
+        PublishedDevice[]? keyboards = s_keyboards;
+        if (keyboards is null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < keyboards.Length; i++)
+        {
+            PublishedDevice device = keyboards[i];
+            if (device.IsWithdrawn)
+            {
+                continue;
+            }
+
+            ((IKeyboard)device.Device).SetLeds(leds);
         }
     }
 
@@ -281,7 +344,7 @@ public static class KeyboardManager
     /// <summary>
     /// Attempts to convert the given physical key scan-code to a KeyEvent.
     /// </summary>
-    private static bool GetKey(byte scanCode, out KeyEvent? keyInfo)
+    private static bool GetKey(byte scanCode, [NotNullWhen(true)] out KeyEvent? keyInfo)
     {
         if (s_scanMap is null)
         {
@@ -294,8 +357,7 @@ public static class KeyboardManager
             ShiftPressed,
             AltPressed || s_altGrPressed,
             NumLock,
-            CapsLock,
-            ScrollLock);
+            CapsLock);
         return keyInfo is not null;
     }
 
@@ -345,8 +407,8 @@ public static class KeyboardManager
 
         while (true)
         {
-            // The mask covers the take and nothing else: polling allocates and
-            // the halt below waits for the very interrupt this scope masks.
+            // The mask covers the take and nothing else: the halt below waits
+            // for the very interrupt this scope masks.
             using (InternalCpu.DisableInterruptsScope())
             {
                 if (s_queuedKeys.TryDequeue(out KeyEvent? key))
@@ -355,36 +417,18 @@ public static class KeyboardManager
                 }
             }
 
-            // Poll all keyboards for events (in case interrupts aren't working)
-            PollKeyboards();
-
-            // Halt CPU until interrupt (key press)
+            // The halt waits for the interrupt, or the worker's tick, that
+            // fills the queue.
             HAL.PlatformHAL.CpuOps?.Halt();
-        }
-    }
-
-    /// <summary>
-    /// Polls all registered keyboards for events.
-    /// </summary>
-    private static void PollKeyboards()
-    {
-        if (s_keyboards is null)
-        {
-            return;
-        }
-
-        foreach (var keyboard in s_keyboards)
-        {
-            keyboard.Poll();
         }
     }
 
     /// <summary>
     /// Gets the scan map that turns scan codes into characters.
     /// </summary>
-    /// <returns>The active layout, or <see langword="null"/> before a keyboard
-    /// has been registered and when keyboard support is compiled out;
-    /// registration installs <see cref="ScanMaps.USStandardLayout"/>.</returns>
+    /// <returns>The active layout, or <see langword="null"/> before the
+    /// manager was initialized and when keyboard support is compiled out;
+    /// initialization installs <see cref="ScanMaps.USStandardLayout"/>.</returns>
     public static ScanMapBase? GetKeyLayout() => s_scanMap;
 
     /// <summary>
@@ -408,5 +452,4 @@ public static class KeyboardManager
 
         s_scanMap = scanMap;
     }
-
 }

@@ -27,9 +27,8 @@ public class TRStandardLayoutTest
     // AltGr reaches a layout as Control and Alt held together.
     private KeyEvent Convert(byte scanCode, bool ctrl = false, bool shift = false, bool alt = false)
     {
-        KeyEvent? keyEvent = _target.ConvertScanCode(scanCode, ctrl, shift, alt, numLock: false, capsLock: false, scrollLock: false);
-        Assert.That(keyEvent, Is.Not.Null);
-        return keyEvent;
+        KeyEvent? keyEvent = _target.ConvertScanCode(scanCode, ctrl, shift, alt, numLock: false, capsLock: false);
+        return keyEvent ?? throw new AssertionException($"Scan code 0x{scanCode:X2} did not convert");
     }
 
     [TestFixture]

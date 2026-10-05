@@ -5,7 +5,6 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.ARM64.Cpu;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
-using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.Devices.Clock;
 
 namespace Cosmos.Kernel.HAL.ARM64.Devices.Clock;
@@ -18,7 +17,7 @@ namespace Cosmos.Kernel.HAL.ARM64.Devices.Clock;
 /// PL031 RTCDR register provides Unix time (seconds since 1970-01-01 UTC).
 /// QEMU virt machine maps PL031 at physical address 0x09010000.
 /// </summary>
-internal class RTC : Device
+internal class RTC
 {
     /// <summary>Singleton instance of the RTC.</summary>
     public static RTC? Instance { get; private set; }
@@ -149,7 +148,7 @@ internal class RTC : Device
             Serial.Write("[RTC] Limine BootTime response is null (feature unsupported by bootloader)\n");
         }
 
-        // Priority 3: PL031 MMIO RTC (QEMU virt only — skip on real hardware)
+        // Priority 3: PL031 MMIO RTC (QEMU virt only, skipped on real hardware)
         if (GICv3.IsMmioAvailable)
         {
             ulong hhdmOffset = Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : 0;

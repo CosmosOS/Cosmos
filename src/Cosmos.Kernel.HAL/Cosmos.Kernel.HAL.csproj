@@ -51,13 +51,15 @@
   </Target>
 
   <ItemGroup>
-    <!-- System's managers sit directly on the HAL drivers (PS/2 mouse, PCI
-         discovery) and install their kit consumers through the internal
-         DeviceRegistry (keyboard, mouse, network, display, block). -->
+    <!-- System's managers install their kit consumers through the internal
+         DeviceRegistry (keyboard, mouse, network, display, block) and build
+         the keyboard manager's indicator work item. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
     <!-- The aggregator initializes PlatformHAL from its library initializer. -->
     <InternalsVisibleTo Include="Cosmos.Kernel" />
-    <!-- Arch HALs implement the driver base classes and register devices. -->
+    <!-- Arch HALs are the machine descriptions: they publish platform nodes
+         and line sources through the internal PlatformBus and
+         PlatformLineRouting, and their tick sources derive from TimerDevice. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box suites over HAL internals: MSI-X tables (Interrupts),

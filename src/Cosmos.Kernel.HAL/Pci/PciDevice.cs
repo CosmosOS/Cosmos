@@ -1,12 +1,11 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.Pci.Enums;
 
 namespace Cosmos.Kernel.HAL.Pci;
 
-internal class PciDevice : Device
+internal class PciDevice
 {
     public readonly uint Bus;
     public readonly uint Slot;
@@ -38,7 +37,7 @@ internal class PciDevice : Device
     private const byte CapabilityPointerMask = 0xFC;
     /// <summary>Upper bound on capability-list entries (the cap area spans 0x40..0xFF, 4-byte aligned).</summary>
     private const int MaxCapabilityEntries = 48;
-    /// <summary>Status register bit 4 — Capabilities List present.</summary>
+    /// <summary>Status register bit 4: Capabilities List present.</summary>
     private const ushort StatusCapabilitiesListMask = 0x0010;
     /// <summary>Header type bits 6:0, the layout; bit 7 only flags a multi-function device.</summary>
     private const byte HeaderLayoutMask = 0x7F;
@@ -51,7 +50,7 @@ internal class PciDevice : Device
 
     // BAR bit-field layout (PCI 3.0 §6.2.5.1). PciDevice owns BAR decoding;
     // these are public so BAR-manipulating consumers share one definition.
-    /// <summary>BAR bit 0 — set when the BAR maps I/O space instead of memory space.</summary>
+    /// <summary>BAR bit 0: set when the BAR maps I/O space instead of memory space.</summary>
     public const uint BarIoSpaceMask = 0x1;
     /// <summary>Mask selecting the address bits of a memory BAR (low 4 bits are flags).</summary>
     public const uint BarMemoryAddressMask = 0xFFFFFFF0;
@@ -148,7 +147,7 @@ internal class PciDevice : Device
     /// lower BAR with the immediately-following upper BAR; for 32-bit
     /// BARs it returns just the lower 32 bits. I/O BARs, out-of-range
     /// indices, and a 64-bit claim with no following BAR return 0.
-    /// Both halves are read live from config space — the ctor-cached
+    /// Both halves are read live from config space; the ctor-cached
     /// <see cref="BaseAddressBar"/> copy is an enumeration-time snapshot,
     /// and splicing it with a live upper half would combine two different
     /// addresses once a BAR is reprogrammed.
@@ -170,7 +169,7 @@ internal class PciDevice : Device
         if (((lower >> BarTypeShift) & BarTypeMask) == BarType64Bit)
         {
             // 64-bit BAR: the next BAR slot holds the upper half. A 64-bit
-            // claim on the last slot is malformed — report 0 rather than a
+            // claim on the last slot is malformed: report 0 rather than a
             // lower-half-only address.
             if (barIndex + 1 >= BaseAddressBar.Length)
             {

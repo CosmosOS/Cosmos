@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.HAL.Devices.Timer;
 /// Abstract base class for all timer devices. Maintains the software timer
 /// registry that is advanced on each hardware tick of the device.
 /// </summary>
-internal abstract class TimerDevice : Device, ITimerDevice
+internal abstract class TimerDevice : ITimerDevice
 {
     /// <summary>Nanoseconds in one millisecond.</summary>
     protected const ulong NanosecondsPerMillisecond = 1_000_000;
