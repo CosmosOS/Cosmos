@@ -201,9 +201,9 @@ internal static class InterruptManager
     /// <summary>
     /// True when a handler is registered for a hardware IRQ, under
     /// <see cref="SetIrqHandler"/>'s x64 vector semantics (the slot at
-    /// 0x20 + <paramref name="irqNo"/>): the PIT, the PS/2 ports or another
-    /// device own the line. ARM64 dispatches by INTID and does not use this
-    /// member. Any context.
+    /// 0x20 + <paramref name="irqNo"/>): the PIT, a platform line the kit
+    /// routed (the 8042's two lines) or another device own the line. ARM64
+    /// dispatches by INTID and does not use this member. Any context.
     /// </summary>
     /// <param name="irqNo">IRQ index (0-15 for ISA IRQs).</param>
     public static bool HasIrqHandler(byte irqNo) =>

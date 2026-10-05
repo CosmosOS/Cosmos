@@ -40,6 +40,27 @@ internal class X64PlatformInitializer : IPlatformInitializer
     /// <summary>The last bus the legacy mechanism decodes: the bus field of CONFIG_ADDRESS is eight bits.</summary>
     private const byte LegacyLastBus = 255;
 
+    /// <summary>The 8042 node's address: the controller's data port, in the device tree's name@hex form.</summary>
+    private const string I8042Address = "i8042@60";
+
+    /// <summary>The 8042 node's compatible string, the PNP id of the PC keyboard controller.</summary>
+    private const string I8042Compatible = "pnp0303";
+
+    /// <summary>The 8042's data port.</summary>
+    private const ushort I8042DataPort = 0x60;
+
+    /// <summary>The 8042's status port on read, command port on write.</summary>
+    private const ushort I8042ControlPort = 0x64;
+
+    /// <summary>Ports each of the 8042's two resources occupies.</summary>
+    private const ushort I8042PortCount = 1;
+
+    /// <summary>The ISA line the 8042 raises for a byte from its first port.</summary>
+    private const uint I8042KeyboardLine = 1;
+
+    /// <summary>The ISA line the 8042 raises for a byte from its second port.</summary>
+    private const uint I8042AuxiliaryLine = 12;
+
     private PIT? _pit;
     private RTC? _rtc;
     private PS2Controller? _ps2Controller;
@@ -126,15 +147,22 @@ internal class X64PlatformInitializer : IPlatformInitializer
     }
 
     /// <summary>
-    /// The q35 machine description: one PCI host node over the legacy port
-    /// mechanism, buses 0 to 255 of segment 0, which the PCI host driver
-    /// enumerates. q35's MCFG is not used on x64 because sub-4 GiB MMIO
-    /// carries Limine's cacheable attributes there, and the ports need no
-    /// mapping at all. Thread context, interrupts disabled, from the HAL
-    /// library initializer; nothing when PCI is compiled out.
+    /// The q35 machine description: the 8042 keyboard controller node, then
+    /// one PCI host node over the legacy port mechanism, buses 0 to 255 of
+    /// segment 0, which the PCI host driver enumerates. q35's MCFG is not
+    /// used on x64 because sub-4 GiB MMIO carries Limine's cacheable
+    /// attributes there, and the ports need no mapping at all. The 8042
+    /// node is published first, so its driver binds first and holds lines 1
+    /// and 12 before any PCI function is offered (the PCI line source then
+    /// refuses line 12 as held). Always: every PC has the controller; its
+    /// lines are only described here and connected by the driver that binds
+    /// it. Thread context, interrupts disabled, from the HAL library
+    /// initializer; the PCI host node only when PCI is compiled in.
     /// </summary>
     public void PublishPlatformNodes()
     {
+        PublishI8042Node();
+
         if (!CosmosFeatures.PCIEnabled)
         {
             return;
@@ -145,6 +173,23 @@ internal class X64PlatformInitializer : IPlatformInitializer
         DeviceResource[] resources = [DeviceResource.PortRange(LegacyConfigAddressPort, LegacyConfigPortCount)];
         PciHostAccess host = PciHostAccess.ForPorts(LegacyPciSegment, LegacyFirstBus, LegacyLastBus);
         PlatformBus.Publish(identity, resources, [], host);
+    }
+
+    /// <summary>
+    /// Publishes the 8042 node, <c>platform:i8042@60</c>, compatible
+    /// <c>pnp0303</c>: resource 0 the data port, resource 1 the status and
+    /// command port; interrupt 0 line 1, interrupt 1 line 12, both over
+    /// <see cref="IoApicLineRouting"/>. A port range grants no exclusivity:
+    /// the power operations write the reset command to port 0x64 behind the
+    /// driver. Thread context, interrupts disabled.
+    /// </summary>
+    private static void PublishI8042Node()
+    {
+        Serial.WriteString("[X64HAL] Publishing the 8042 node...\n");
+        PlatformIdentity identity = new(I8042Address, [I8042Compatible]);
+        DeviceResource[] resources = [DeviceResource.PortRange(I8042DataPort, I8042PortCount), DeviceResource.PortRange(I8042ControlPort, I8042PortCount)];
+        InterruptSource[] interrupts = [new PlatformLineInterruptSource(I8042KeyboardLine, IoApicLineRouting.Instance), new PlatformLineInterruptSource(I8042AuxiliaryLine, IoApicLineRouting.Instance)];
+        PlatformBus.Publish(identity, resources, interrupts, null);
     }
 
     public ITimerDevice CreateTimer()

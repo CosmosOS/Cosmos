@@ -127,6 +127,10 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.InterruptSource.MaskCore() -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.InterruptSource.TryConnectCore(Cosmos.Kernel.HAL.DriverKit.InterruptTrampoline! trampoline) -> bool
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.InterruptSource.UnmaskCore() -> void
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Controller.InterruptDriven.get -> bool
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Controller.PollCore() -> void
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Controller.PolledPeriodically.get -> bool
+[COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Controller.TrySendCore(Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port port, byte value) -> bool
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.BulkInCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe, System.Span<byte> data, out int transferred) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.BulkOutCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe, System.ReadOnlySpan<byte> data, out int transferred) -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Usb.UsbDevice.ClosePipeCore(Cosmos.Kernel.HAL.DriverKit.Usb.UsbPipe! pipe) -> void
@@ -158,6 +162,12 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioTransport.WriteConfig8(uint offset, byte value) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioTransport.WriteDriverFeatures(ulong features) -> void
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioTransport.WriteStatus(byte status) -> void
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.Acknowledge = 250 -> byte
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.MaxReplyBytes = 8 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.MaxResends = 3 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.ReceiveRingBytes = 16 -> int
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.ReplyGapMilliseconds = 20 -> uint
+[COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.Resend = 254 -> byte
 [COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbAccess.MaxControlTransferLength = 4096 -> int
 [COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbClassCode.Hid = 3 -> byte
 [COSMOS0003]const Cosmos.Kernel.HAL.DriverKit.Usb.UsbClassCode.Hub = 9 -> byte
@@ -459,6 +469,24 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.ProbeResult.Outcome.get -> Cosmos.Kernel.HAL.DriverKit.ProbeOutcome
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.ProbeResult.ProbeResult() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.ProbeResult.Reason.get -> string?
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.Deliver(byte value) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.DeliversUnattended.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.InterruptsForPublish() -> Cosmos.Kernel.HAL.DriverKit.InterruptSource![]!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.OverrunCount.get -> int
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.Port.get -> Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.Ps2Access(Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port port, Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Controller! controller) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.TryCommand(byte command, System.ReadOnlySpan<byte> arguments, System.Span<byte> reply, out int replyLength, uint timeoutMilliseconds) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Access.TryReceive(out byte value) -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Controller
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Controller.Ps2Controller() -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Identity
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Identity.Port.get -> Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Identity.Ps2Identity(Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port port) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Match
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port.Auxiliary = 2 -> Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port.Keyboard = 1 -> Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.RegionCaching
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.RegionCaching.Device = 0 -> Cosmos.Kernel.HAL.DriverKit.RegionCaching
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.RegionCaching.Normal = 2 -> Cosmos.Kernel.HAL.DriverKit.RegionCaching
@@ -703,6 +731,11 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Platform.PlatformIdentity.Describe() -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Platform.PlatformMatch.Matches(Cosmos.Kernel.HAL.DriverKit.DeviceIdentity! identity) -> bool
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Platform.PlatformMatch.Specificity.get -> int
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Identity.Address.get -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Identity.BusName.get -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Identity.Describe() -> string!
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Match.Matches(Cosmos.Kernel.HAL.DriverKit.DeviceIdentity! identity) -> bool
+[COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Match.Specificity.get -> int
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticIdentity.Address.get -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticIdentity.BusName.get -> string!
 [COSMOS0003]override Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticIdentity.Describe() -> string!
@@ -733,6 +766,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.ProbeResult.Bound.get -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.ProbeResult.Declined(string! reason) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.ProbeResult.Failed(string! reason) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+[COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Match.Port(Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Port port) -> Cosmos.Kernel.HAL.DriverKit.Ps2.Ps2Match!
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticBus.Publish(string! key, byte[]! data, int interruptCount = 0, int windowBytes = 0) -> Cosmos.Kernel.HAL.DriverKit.DeviceNode!
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticBus.RaiseInterrupt(Cosmos.Kernel.HAL.DriverKit.DeviceNode! node, int index) -> bool
 [COSMOS0003]static Cosmos.Kernel.HAL.DriverKit.Synthetic.SyntheticBus.Retract(Cosmos.Kernel.HAL.DriverKit.DeviceNode! node, bool hardwarePresent = false) -> void

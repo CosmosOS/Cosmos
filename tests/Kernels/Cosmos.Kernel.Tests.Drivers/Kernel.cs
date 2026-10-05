@@ -58,8 +58,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard.</summary>
-    private const int ExpectedTestCount = 40;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 1 PS/2.</summary>
+    private const int ExpectedTestCount = 41;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -191,6 +191,18 @@ public class Kernel : Sys.Kernel
     /// <summary>Specificity of a USB match on the interface class, subclass and protocol: the shipped keyboard driver's and the declining driver's.</summary>
     private const int UsbKeyboardMatchSpecificity = 3;
 
+    /// <summary>The 8042 node's compatible string, which the x64 machine description publishes it under.</summary>
+    private const string I8042Compatible = "pnp0303";
+
+    /// <summary>The 8042 node's description: its one compatible string.</summary>
+    private const string I8042Description = "compatible pnp0303";
+
+    /// <summary>The 8042 node's path, asserted: the machine description names it.</summary>
+    private const string I8042Path = "platform:i8042@60";
+
+    /// <summary>Skip reason of the PS/2 tests on a cell whose machine has no 8042.</summary>
+    private const string SkipNo8042 = "no 8042 on this cell";
+
     private readonly TestKeyboardConsumer _keyboardConsumer = new();
     private readonly DeviceNode _bootNode;
     private DeviceNode? _keyboardNode;
@@ -202,6 +214,7 @@ public class Kernel : Sys.Kernel
     private string? _xhciPath;
     private string? _usbKeyboardPath;
     private DeviceNode? _usbKeyboardNode;
+    private string? _i8042Path;
 
     /// <summary>
     /// Publishes the boot node. The constructor runs before
@@ -297,6 +310,14 @@ public class Kernel : Sys.Kernel
         TR.RunIf(hasXhci, "Usb_Keyboard_Unplug_RetractsNode", TestUsbKeyboardUnplugRetractsNode, SkipNoXhci);
         TR.RunIf(hasXhci, "Usb_Keyboard_Replug_PublishesAgain", TestUsbKeyboardReplugPublishesAgain, SkipNoXhci);
         TR.RunIf(hasXhci, "Usb_Keyboard_Replug_SetLeds", TestUsbKeyboardReplugSetLeds, SkipNoXhci);
+
+        // ==================== PS/2 ====================
+        // q35 has an 8042 with a keyboard and a mouse built in, on both x64
+        // cells; virt has none and the group skips. No driver binds the
+        // node yet: the test proves the machine description publishes it.
+        _i8042Path = FindI8042Path();
+        bool has8042 = _i8042Path is not null;
+        TR.RunIf(has8042, "Ps2_ControllerNode_Published", TestPs2ControllerNodePublished, SkipNo8042);
 
         TR.Finish();
 
@@ -1297,6 +1318,26 @@ public class Kernel : Sys.Kernel
         Assert.Equal(1, state.LedWrites, "a fresh state should count this write alone");
     }
 
+    // ==================== PS/2 ====================
+    //
+    // The 8042 node the x64 machine description publishes, read through
+    // DriverInfo like every other node.
+
+    private void TestPs2ControllerNodePublished()
+    {
+        if (!TryGetI8042(out _, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        Assert.True(info.Path == I8042Path, "the machine description names the controller platform:i8042@60");
+        Assert.True(info.Description == I8042Description, "the node's one compatible string is pnp0303");
+        Assert.Equal(2, info.ResourceCount, "the data port and the status and command port");
+        Assert.Equal(2, info.InterruptCount, "lines 1 and 12");
+        Assert.True(info.State == DeviceNodeState.Unbound, "no driver binds the controller yet");
+        Assert.Equal(0, info.OfferCount, "no driver matches pnp0303 yet");
+    }
+
     // ==================== Helpers ====================
 
     /// <summary>
@@ -1421,6 +1462,45 @@ public class Kernel : Sys.Kernel
         if (path is null || !TryFindNode(path, out info))
         {
             Assert.Fail("the xHCI controller's node was not found by BeforeRun");
+            info = default;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Finds the path of the 8042's platform node: the node on the platform
+    /// bus whose description (the identity's compatible strings) names
+    /// pnp0303, compared ordinally, whatever its state.
+    /// </summary>
+    /// <returns>The node's path, or null when the machine description published none.</returns>
+    private static string? FindI8042Path()
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+                && info.BusName == PlatformBusName
+                && info.Description.Contains(I8042Compatible, StringComparison.Ordinal))
+            {
+                return info.Path;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>Hands back the 8042 node's path and a fresh snapshot of it, or fails the test when BeforeRun found none.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private bool TryGetI8042([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    {
+        path = _i8042Path;
+        if (path is null || !TryFindNode(path, out info))
+        {
+            Assert.Fail("the 8042 node was not found by BeforeRun");
             info = default;
             return false;
         }

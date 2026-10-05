@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 /// QEMU delivers and a real chipset may not (there the register is not the
 /// GSI and INTx is level-triggered). Only lines 3 to 15 are routable: the
 /// platform's ISA routing is defined for lines 0 to 15, the lowest three
-/// are its own (timer, keyboard, cascade), and a register above 15 would
+/// are its own (the timer, the 8042's keyboard line, the cascade), and a register above 15 would
 /// land on a vector with another owner (the dynamic message vectors, the
 /// CPU exceptions) while the I/O APIC silently ignores it. One function
 /// per line: a line another handler holds is refused rather than shared.
@@ -28,7 +28,7 @@ internal sealed class PciLineInterruptSource : InterruptSource
     private const byte NoLine = 0;
     /// <summary>A line register of 0xFF: firmware routed nothing.</summary>
     private const byte UnroutedLine = 0xFF;
-    /// <summary>Lines below this are ISA lines the platform owns (timer, keyboard, cascade).</summary>
+    /// <summary>Lines below this are ISA lines the platform owns (the timer, the 8042's keyboard line, the cascade).</summary>
     private const byte FirstPciLine = 3;
     /// <summary>The last ISA line: the platform's line primitives are defined for 0 to 15, and a higher register names no routable input.</summary>
     private const byte LastIsaLine = 15;
