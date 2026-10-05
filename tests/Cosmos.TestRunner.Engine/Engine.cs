@@ -355,7 +355,8 @@ public partial class Engine
             {
                 Path = path,
                 Kind = disk.Kind,
-                ExtraDeviceOptions = disk.FormatOptions()
+                ExtraDeviceOptions = disk.FormatOptions(),
+                HotPlug = disk.HotPlug
             });
         }
         return attachments;

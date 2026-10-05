@@ -83,6 +83,13 @@ public sealed record TestProfileDisk
     public required DiskKind Kind { get; init; }
     public IReadOnlyDictionary<string, string> Options { get; init; } = new Dictionary<string, string>();
 
+    /// <summary>
+    /// The disk sits behind a PCI Express root port of its own and may be
+    /// pulled and replugged by the pci-unplug and pci-plug requests;
+    /// virtio-blk only.
+    /// </summary>
+    public bool HotPlug { get; init; }
+
     public string FormatOptions()
     {
         if (Options.Count == 0)
@@ -473,10 +480,18 @@ public static class TestProfileLoader
                 foreach (DiskEntry disk in entry.Disks)
                 {
                     DiskKind kind = ParseDiskKind(path, $"profile '{entry.Name}'", disk.Type);
+                    bool hotPlug = disk.HotPlug ?? false;
+                    if (hotPlug && kind != DiskKind.VirtioBlk)
+                    {
+                        throw new InvalidOperationException(
+                            $"{path}: profile '{entry.Name}' sets hotplug on a '{disk.Type}' disk; only a 'virtio-blk' disk can sit behind a PCI Express root port.");
+                    }
+
                     disks.Add(new TestProfileDisk
                     {
                         Kind = kind,
-                        Options = disk.Options ?? new Dictionary<string, string>()
+                        Options = disk.Options ?? new Dictionary<string, string>(),
+                        HotPlug = hotPlug
                     });
                 }
             }
@@ -608,7 +623,7 @@ public static class TestProfileLoader
         // already scoped by its own "architectures" list, while a profile
         // describes one hardware shape that may span several.
         Dictionary<string, Dictionary<string, string>>? MachineOptions);
-    private sealed record DiskEntry(string? Type, Dictionary<string, string>? Options);
+    private sealed record DiskEntry(string? Type, Dictionary<string, string>? Options, bool? HotPlug);
     private sealed record ModifierEntry(
         string? Name,
         List<string>? Architectures,

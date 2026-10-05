@@ -130,7 +130,10 @@ public enum DiskKind
     /// <summary>A <c>usb-storage</c> stick on the shared <c>qemu-xhci</c> controller.</summary>
     Usb,
 
-    /// <summary>A virtio-blk-pci function on the root bus.</summary>
+    /// <summary>
+    /// A virtio-blk-pci function on the root bus, or behind a PCI Express
+    /// root port of its own when the attachment is hot-pluggable.
+    /// </summary>
     VirtioBlk,
 
     /// <summary>A virtio-blk-device in the arm64 virt machine's virtio-mmio window; refused on x64.</summary>
@@ -149,6 +152,12 @@ public sealed record DiskAttachment
     public required string Path { get; init; }
     public required DiskKind Kind { get; init; }
     public string ExtraDeviceOptions { get; init; } = string.Empty;
+
+    /// <summary>
+    /// The disk sits behind a PCI Express root port of its own, so the test
+    /// engine can pull it out and plug it back in; <see cref="DiskKind.VirtioBlk"/> only.
+    /// </summary>
+    public bool HotPlug { get; init; }
 }
 
 public sealed record QemuLaunchPlan(string BinaryPath, string Arguments, ToolSource Source);
@@ -199,6 +208,20 @@ public static class QemuLauncher
 
     /// <summary>QEMU's driver name for a virtio-blk disk in the virt machine's virtio-mmio window.</summary>
     public const string VirtioBlkMmioModel = "virtio-blk-device";
+
+    /// <summary>QEMU id of the root port the <paramref name="index"/>th virtio-blk disk sits behind, also its <c>bus=</c> name.</summary>
+    public static string RootPortId(int index) => $"rp{index}";
+
+    /// <summary>QEMU's driver name for a PCI Express root port.</summary>
+    public const string RootPortModel = "pcie-root-port";
+
+    /// <summary>
+    /// The global that turns q35's root ports to native PCI Express hot-plug;
+    /// without it QEMU 8.2 routes a root port hot-plug through ACPI, which the
+    /// kernel does not interpret; stage9-experiments.md E3. The virt machine's
+    /// ports are native always and the global is not emitted there.
+    /// </summary>
+    public const string Ich9NativeHotPlugGlobal = "ICH9-LPC.acpi-pci-hotplug-with-bridge-support=off";
 
     public static async Task<QemuLaunchPlan> BuildAsync(QemuLaunchOptions options)
     {
@@ -431,7 +454,9 @@ public static class QemuLauncher
     /// dedicated <c>nvme</c> controller so the guest exercises multi-controller
     /// binding; USB disks are <c>usb-storage</c> sticks on one shared
     /// <c>qemu-xhci</c> controller; <see cref="DiskKind.VirtioBlk"/> disks are
-    /// one <c>virtio-blk-pci</c> function each and <see cref="DiskKind.VirtioBlkMmio"/>
+    /// one <c>virtio-blk-pci</c> function each, a hot-pluggable one behind a
+    /// <c>pcie-root-port</c> of its own (on x64 with the ICH9 global that turns
+    /// the ports to native hot-plug, emitted once), and <see cref="DiskKind.VirtioBlkMmio"/>
     /// disks one <c>virtio-blk-device</c> slot each (arm64 only), both kinds
     /// numbered together. Per-disk <see cref="DiskAttachment.ExtraDeviceOptions"/> is
     /// appended after the standard device properties so profiles can flip
@@ -446,6 +471,7 @@ public static class QemuLauncher
         int virtioBlkIndex = 0;
         bool ahciControllerEmitted = false;
         bool usbControllerEmitted = false;
+        bool ich9GlobalEmitted = false;
 
         foreach (DiskAttachment disk in options.Disks)
         {
@@ -483,8 +509,25 @@ public static class QemuLauncher
                     break;
 
                 case DiskKind.VirtioBlk:
-                    args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={VirtioBlkDriveId(virtioBlkIndex)},format=raw");
-                    args.Append($" -device {VirtioBlkPciModel},drive={VirtioBlkDriveId(virtioBlkIndex)},id={VirtioBlkDeviceId(virtioBlkIndex)}");
+                    if (disk.HotPlug)
+                    {
+                        if (!ich9GlobalEmitted && options.Architecture.Equals("x64", StringComparison.OrdinalIgnoreCase))
+                        {
+                            args.Append($" -global {Ich9NativeHotPlugGlobal}");
+                            ich9GlobalEmitted = true;
+                        }
+                        // QEMU resolves bus= against the devices already on the
+                        // command line, so the port precedes the disk; the
+                        // chassis and slot pair must be unique per port.
+                        args.Append($" -device {RootPortModel},id={RootPortId(virtioBlkIndex)},bus=pcie.0,chassis={virtioBlkIndex + 1},slot={virtioBlkIndex + 1}");
+                        args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={VirtioBlkDriveId(virtioBlkIndex)},format=raw");
+                        args.Append($" -device {VirtioBlkPciModel},drive={VirtioBlkDriveId(virtioBlkIndex)},bus={RootPortId(virtioBlkIndex)},id={VirtioBlkDeviceId(virtioBlkIndex)}");
+                    }
+                    else
+                    {
+                        args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={VirtioBlkDriveId(virtioBlkIndex)},format=raw");
+                        args.Append($" -device {VirtioBlkPciModel},drive={VirtioBlkDriveId(virtioBlkIndex)},id={VirtioBlkDeviceId(virtioBlkIndex)}");
+                    }
                     AppendDeviceOptions(args, disk.ExtraDeviceOptions);
                     virtioBlkIndex++;
                     break;
@@ -493,6 +536,10 @@ public static class QemuLauncher
                     if (!options.Architecture.Equals("arm64", StringComparison.OrdinalIgnoreCase))
                     {
                         throw new ArgumentException("A virtio-blk disk over MMIO needs the arm64 virt machine: q35 has no virtio-mmio window.");
+                    }
+                    if (disk.HotPlug)
+                    {
+                        throw new ArgumentException("A virtio-blk disk over MMIO cannot be hot-pluggable: only a virtio-blk-pci function sits behind a root port.");
                     }
                     args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={VirtioBlkDriveId(virtioBlkIndex)},format=raw");
                     args.Append($" -device {VirtioBlkMmioModel},drive={VirtioBlkDriveId(virtioBlkIndex)},id={VirtioBlkDeviceId(virtioBlkIndex)}");

@@ -69,21 +69,27 @@
       ]
     },
     {
-      // A virtio-blk disk: a transitional virtio-blk-pci function
-      // (1af4:1001) on the root bus, which the kit's PCI transport binds;
+      // A virtio-blk disk: a virtio-blk-pci function the kit's PCI
+      // transport binds (transitional 1af4:1001 on the root bus,
+      // modern-only 1af4:1042 behind a PCI Express root port);
       // VirtioBlkDriver binds the virtio node beneath and publishes the
       // disk as vblk0, and the storage manager registers and scans it
-      // inside the probe. The driver was written in the Drivers suite's
-      // library over the public seam and promoted unchanged, so this cell is
-      // the standing proof that a third party's block driver runs the same
-      // block-device, partition and reboot assertions as the shipped ones.
-      // No machineOptions: the GIC version is the modifiers' business, so
-      // the arm64 cells cover the polled path (default GICv2, no ITS) and
-      // the message interrupt path (gicv3) both.
+      // inside the probe. The disk sits behind a PCI Express root port of
+      // its own (rp0): cold-plugged at boot behind the port, pulled and
+      // replugged by the Storage and Drivers suites' PciHotPlug and
+      // Pci_HotPlug tests through the engine's pci-unplug and pci-plug
+      // requests; on q35 the launcher turns the port to native hot-plug
+      // with the ICH9-LPC global. The driver was written in the Drivers
+      // suite's library over the public seam and promoted unchanged, so
+      // this cell is the standing proof that a third party's block driver
+      // runs the same block-device, partition and reboot assertions as the
+      // shipped ones. No machineOptions: the GIC version is the modifiers'
+      // business, so the arm64 cells cover the polled path (default GICv2,
+      // no ITS) and the message interrupt path (gicv3) both.
       "name": "virtio-blk-pci",
       "architectures": ["x64", "arm64"],
       "disks": [
-        { "type": "virtio-blk" }
+        { "type": "virtio-blk", "hotplug": true }
       ]
     },
     {

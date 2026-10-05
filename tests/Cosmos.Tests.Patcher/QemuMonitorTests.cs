@@ -69,6 +69,20 @@ public class QemuMonitorTests
         Assert.Equal("the mouse button takes a button name and down or up", ex.Message);
     }
 
+    [Fact]
+    public void PciPlugArguments_BuildsADeviceAddBehindThePort()
+    {
+        Assert.Equal(
+            "{\"driver\":\"virtio-blk-pci\",\"drive\":\"vblkdisk0p1\",\"bus\":\"rp0\",\"id\":\"vblk0p1\"}",
+            QemuMonitor.PciPlugArguments("vblkdisk0p1", "rp0", "vblk0p1").ToJsonString());
+    }
+
+    [Fact]
+    public void PciUnplugArguments_BuildsADeviceDel()
+    {
+        Assert.Equal("{\"id\":\"vblk0\"}", QemuMonitor.PciUnplugArguments("vblk0").ToJsonString());
+    }
+
     // The input requests need a monitor on a cell with no USB device, so a
     // run attaching nothing gets one too, listening before QEMU is launched.
     [Fact]

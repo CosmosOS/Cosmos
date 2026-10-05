@@ -197,6 +197,8 @@ namespace Cosmos.TestRunner.Framework
         /// guest: <c>usb-unplug [n]</c> and <c>usb-plug [n]</c> pull the
         /// profile's USB stick out and put it back, <c>usb-kbd-unplug</c>
         /// and <c>usb-kbd-plug</c> do the same for its USB keyboard,
+        /// <c>pci-unplug [n]</c> and <c>pci-plug [n]</c> pull its
+        /// hot-pluggable PCI disk out of its root port and plug it back in,
         /// <c>key-press &lt;qcode&gt;</c> presses and releases a key,
         /// <c>mouse-move &lt;dx&gt; &lt;dy&gt;</c> moves the pointer and
         /// <c>mouse-button &lt;name&gt; &lt;down|up&gt;</c> presses or

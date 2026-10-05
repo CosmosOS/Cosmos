@@ -17,9 +17,9 @@ using Cosmos.Tools.Launcher;
 namespace Cosmos.TestRunner.Engine.Hosts;
 
 /// <summary>
-/// QEMU's QMP monitor for one run: plugs the profile's USB sticks and USB
-/// keyboard in and out and injects keys and pointer events into the running
-/// guest when one of its tests asks (<see cref="Ds2Vs.HostRequest"/>). QEMU
+/// QEMU's QMP monitor for one run: plugs the profile's USB sticks, USB
+/// keyboard and hot-pluggable PCI disks in and out and injects keys and
+/// pointer events into the running guest when one of its tests asks (<see cref="Ds2Vs.HostRequest"/>). QEMU
 /// connects the monitor to <see cref="Port"/> at startup, so an instance
 /// exists, and listens, before QEMU is launched; every run has one.
 /// </summary>
@@ -53,6 +53,16 @@ public sealed class QemuMonitor : IAsyncDisposable
     /// <summary>Presses or releases a pointer button: <c>mouse-button &lt;left|middle|right&gt; &lt;down|up&gt;</c>.</summary>
     public const string MouseButtonRequest = "mouse-button";
 
+    /// <summary>
+    /// Pulls the index-th hot-pluggable PCI disk (0 when omitted) out of its
+    /// root port: QEMU raises the slot's attention button and finishes the
+    /// removal when the guest powers the slot off.
+    /// </summary>
+    public const string PciUnplugRequest = "pci-unplug";
+
+    /// <summary>Plugs it back in behind the same port, on the same image.</summary>
+    public const string PciPlugRequest = "pci-plug";
+
     private readonly TcpListener _listener;
     private readonly IReadOnlyList<DiskAttachment> _sticks;
 
@@ -64,6 +74,12 @@ public sealed class QemuMonitor : IAsyncDisposable
 
     /// <summary>QEMU id of the keyboard's device, null while it is unplugged.</summary>
     private string? _keyboardId;
+
+    /// <summary>The hot-pluggable PCI disks, in the order the profile attaches them.</summary>
+    private readonly IReadOnlyList<PciDisk> _pciDisks;
+
+    /// <summary>QEMU id of each hot-pluggable PCI disk's device, null while it is unplugged.</summary>
+    private readonly string?[] _pciDeviceIds;
 
     /// <summary>Numbers the devices and drives of each plug, whose ids QEMU may not have released yet.</summary>
     private int _plugCount;
@@ -79,7 +95,7 @@ public sealed class QemuMonitor : IAsyncDisposable
     /// <summary>Port QEMU connects its monitor to (<see cref="QemuLaunchOptions.MonitorPort"/>).</summary>
     public int Port { get; }
 
-    private QemuMonitor(IReadOnlyList<DiskAttachment> sticks, bool keyboard)
+    private QemuMonitor(IReadOnlyList<DiskAttachment> sticks, bool keyboard, IReadOnlyList<PciDisk> pciDisks)
     {
         _sticks = sticks;
         _keyboard = keyboard;
@@ -90,6 +106,13 @@ public sealed class QemuMonitor : IAsyncDisposable
             _deviceIds[i] = QemuLauncher.UsbDeviceId(i);
         }
 
+        _pciDisks = pciDisks;
+        _pciDeviceIds = new string?[pciDisks.Count];
+        for (int i = 0; i < pciDisks.Count; i++)
+        {
+            _pciDeviceIds[i] = QemuLauncher.VirtioBlkDeviceId(pciDisks[i].LauncherIndex);
+        }
+
         _listener = new TcpListener(IPAddress.Loopback, 0);
         _listener.Start();
         Port = ((IPEndPoint)_listener.LocalEndpoint).Port;
@@ -97,16 +120,37 @@ public sealed class QemuMonitor : IAsyncDisposable
 
     /// <summary>
     /// An instance for a run attaching <paramref name="disks"/> and the
-    /// keyboard model <paramref name="keyboardDevice"/>. The USB sticks among
-    /// the disks and a <see cref="QemuLauncher.UsbKeyboardModel"/> keyboard are
-    /// what the hot-plug requests act on; the input requests need no device,
-    /// so a run with neither gets a monitor too.
+    /// keyboard model <paramref name="keyboardDevice"/>. The USB sticks and the
+    /// hot-pluggable virtio-blk disks among the disks and a
+    /// <see cref="QemuLauncher.UsbKeyboardModel"/> keyboard are what the
+    /// hot-plug requests act on; the input requests need no device, so a run
+    /// with none of them gets a monitor too.
     /// </summary>
     public static QemuMonitor For(IReadOnlyList<DiskAttachment> disks, string? keyboardDevice)
     {
         List<DiskAttachment> sticks = disks.Where(d => d.Kind == DiskKind.Usb).ToList();
         bool keyboard = string.Equals(keyboardDevice, QemuLauncher.UsbKeyboardModel, StringComparison.OrdinalIgnoreCase);
-        return new QemuMonitor(sticks, keyboard);
+
+        // The launcher numbers both virtio-blk kinds together, so the ids of
+        // a hot-pluggable disk follow that running index.
+        List<PciDisk> pciDisks = new();
+        int virtioBlkIndex = 0;
+        foreach (DiskAttachment disk in disks)
+        {
+            if (disk.Kind != DiskKind.VirtioBlk && disk.Kind != DiskKind.VirtioBlkMmio)
+            {
+                continue;
+            }
+
+            if (disk.Kind == DiskKind.VirtioBlk && disk.HotPlug)
+            {
+                pciDisks.Add(new PciDisk(virtioBlkIndex, disk));
+            }
+
+            virtioBlkIndex++;
+        }
+
+        return new QemuMonitor(sticks, keyboard, pciDisks);
     }
 
     /// <summary>Takes QEMU's monitor connection. Called once QEMU was started.</summary>
@@ -201,6 +245,30 @@ public sealed class QemuMonitor : IAsyncDisposable
         };
     }
 
+    /// <summary>
+    /// The <c>device_del</c> arguments of a <see cref="PciUnplugRequest"/>:
+    /// <c>{"id":"vblk0"}</c>.
+    /// </summary>
+    /// <param name="deviceId">QEMU id of the disk's device.</param>
+    public static JsonObject PciUnplugArguments(string deviceId) => new() { ["id"] = deviceId };
+
+    /// <summary>
+    /// The <c>device_add</c> arguments of a <see cref="PciPlugRequest"/>: a
+    /// virtio-blk-pci function on <paramref name="driveId"/> behind the root
+    /// port <paramref name="bus"/>,
+    /// <c>{"driver":"virtio-blk-pci","drive":"vblkdisk0p1","bus":"rp0","id":"vblk0p1"}</c>.
+    /// </summary>
+    /// <param name="driveId">QEMU id of the drive the function serves.</param>
+    /// <param name="bus">QEMU id of the root port.</param>
+    /// <param name="deviceId">QEMU id of the new device.</param>
+    public static JsonObject PciPlugArguments(string driveId, string bus, string deviceId) => new()
+    {
+        ["driver"] = QemuLauncher.VirtioBlkPciModel,
+        ["drive"] = driveId,
+        ["bus"] = bus,
+        ["id"] = deviceId
+    };
+
     /// <summary>One relative pointer event on <paramref name="axis"/> by <paramref name="value"/> units.</summary>
     private static JsonObject RelativeEvent(string axis, int value)
     {
@@ -271,6 +339,12 @@ public sealed class QemuMonitor : IAsyncDisposable
             case MouseButtonRequest:
                 await ExecuteAsync("input-send-event", MouseButtonArguments(words), cancellationToken);
                 break;
+            case PciUnplugRequest:
+                await UnplugPciAsync(PciDiskIndex(words), cancellationToken);
+                break;
+            case PciPlugRequest:
+                await PlugPciAsync(PciDiskIndex(words), cancellationToken);
+                break;
             default:
                 throw new InvalidOperationException("unknown request");
         }
@@ -283,6 +357,18 @@ public sealed class QemuMonitor : IAsyncDisposable
         if (words.Length > 2 || (words.Length == 2 && !int.TryParse(words[1], out index)) || index < 0 || index >= _sticks.Count)
         {
             throw new InvalidOperationException($"no such USB stick (the profile attaches {_sticks.Count})");
+        }
+
+        return index;
+    }
+
+    /// <summary>The hot-pluggable PCI disk a request names: its second word, 0 when omitted, below the number of such disks.</summary>
+    private int PciDiskIndex(string[] words)
+    {
+        int index = 0;
+        if (words.Length > 2 || (words.Length == 2 && !int.TryParse(words[1], out index)) || index < 0 || index >= _pciDisks.Count)
+        {
+            throw new InvalidOperationException($"no such hot-pluggable PCI disk (the profile attaches {_pciDisks.Count})");
         }
 
         return index;
@@ -348,6 +434,48 @@ public sealed class QemuMonitor : IAsyncDisposable
             },
             cancellationToken);
         _deviceIds[index] = deviceId;
+    }
+
+    private async Task UnplugPciAsync(int index, CancellationToken cancellationToken)
+    {
+        string deviceId = _pciDeviceIds[index] ?? throw new InvalidOperationException($"PCI disk {index} is already unplugged");
+
+        // QEMU answers at once and finishes the removal when the guest powers
+        // the slot off. No wait for DEVICE_DELETED: the engine awaits every
+        // request inside its UART scan loop, so a wait here would hold the
+        // stall clock and the end-marker scan; the kernel's test waits for
+        // the node to leave the tree instead.
+        await ExecuteAsync("device_del", PciUnplugArguments(deviceId), cancellationToken);
+        _pciDeviceIds[index] = null;
+    }
+
+    private async Task PlugPciAsync(int index, CancellationToken cancellationToken)
+    {
+        if (_pciDeviceIds[index] is not null)
+        {
+            throw new InvalidOperationException($"PCI disk {index} is already plugged in");
+        }
+
+        int launcherIndex = _pciDisks[index].LauncherIndex;
+        _plugCount++;
+        string driveId = $"{QemuLauncher.VirtioBlkDriveId(launcherIndex)}p{_plugCount}";
+        string deviceId = $"{QemuLauncher.VirtioBlkDeviceId(launcherIndex)}p{_plugCount}";
+
+        // drive_add rather than blockdev-add for the reason PlugAsync gives:
+        // the image must close with the device.
+        string path = _pciDisks[index].Disk.Path.Replace(",", ",,");
+        JsonNode? added = await ExecuteAsync(
+            "human-monitor-command",
+            new JsonObject { ["command-line"] = $"drive_add 0 if=none,id={driveId},file={path},format=raw" },
+            cancellationToken);
+        string output = added?.GetValue<string>().Trim() ?? string.Empty;
+        if (output != "OK")
+        {
+            throw new InvalidOperationException($"drive_add: {output}");
+        }
+
+        await ExecuteAsync("device_add", PciPlugArguments(driveId, QemuLauncher.RootPortId(launcherIndex), deviceId), cancellationToken);
+        _pciDeviceIds[index] = deviceId;
     }
 
     private async Task UnplugKeyboardAsync(CancellationToken cancellationToken)
@@ -431,4 +559,9 @@ public sealed class QemuMonitor : IAsyncDisposable
             // Anything else is an event (DEVICE_DELETED, ...), which nothing waits for.
         }
     }
+
+    /// <summary>A hot-pluggable virtio-blk disk and its index among the launcher's virtio-blk disks, which names its QEMU ids.</summary>
+    /// <param name="LauncherIndex">The disk's running index over both virtio-blk kinds, as the launcher counts.</param>
+    /// <param name="Disk">The attachment, for its image path.</param>
+    private sealed record PciDisk(int LauncherIndex, DiskAttachment Disk);
 }

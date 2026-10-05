@@ -106,6 +106,70 @@ public class QemuLauncherTests
         Assert.Contains(" -device virtio-blk-device,drive=vblkdisk1,id=vblk1", text);
     }
 
+    // A hot-pluggable disk gets a root port of its own ahead of it, since
+    // QEMU resolves bus= against devices already on the command line; on q35
+    // the ICH9 global turns the port to native hot-plug (stage9-experiments.md E3).
+    [Fact]
+    public void AppendStorageArgs_PutsAHotPluggableVirtioBlkBehindARootPort()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlk, HotPlug = true }]
+        });
+
+        Assert.Equal(
+            " -global ICH9-LPC.acpi-pci-hotplug-with-bridge-support=off -device pcie-root-port,id=rp0,bus=pcie.0,chassis=1,slot=1 -drive file=\"/tmp/a.img\",if=none,id=vblkdisk0,format=raw -device virtio-blk-pci,drive=vblkdisk0,bus=rp0,id=vblk0",
+            args.ToString());
+    }
+
+    // The virt machine's root ports are native always, and the virt machine
+    // has no ICH9-LPC device for the global to name.
+    [Fact]
+    public void AppendStorageArgs_EmitsNoIch9GlobalOnArm64()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "arm64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlk, HotPlug = true }]
+        });
+
+        string text = args.ToString();
+        Assert.Contains(" -device pcie-root-port,id=rp0,bus=pcie.0,chassis=1,slot=1", text);
+        Assert.Contains(" -device virtio-blk-pci,drive=vblkdisk0,bus=rp0,id=vblk0", text);
+        Assert.DoesNotContain("-global", text);
+    }
+
+    // QEMU refuses a duplicate chassis and slot pair, so each port numbers
+    // its own; the global is machine-wide and appears once.
+    [Fact]
+    public void AppendStorageArgs_EmitsTheIch9GlobalOnceForTwoPorts()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks =
+            [
+                new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlk, HotPlug = true },
+                new DiskAttachment { Path = "/tmp/b.img", Kind = DiskKind.VirtioBlk, HotPlug = true }
+            ]
+        });
+
+        string text = args.ToString();
+        Assert.Contains(" -global ICH9-LPC.acpi-pci-hotplug-with-bridge-support=off", text);
+        Assert.Equal(text.IndexOf("-global", StringComparison.Ordinal), text.LastIndexOf("-global", StringComparison.Ordinal));
+        Assert.Contains(" -device pcie-root-port,id=rp0,bus=pcie.0,chassis=1,slot=1", text);
+        Assert.Contains(" -device pcie-root-port,id=rp1,bus=pcie.0,chassis=2,slot=2", text);
+        Assert.Contains(" -device virtio-blk-pci,drive=vblkdisk0,bus=rp0,id=vblk0", text);
+        Assert.Contains(" -device virtio-blk-pci,drive=vblkdisk1,bus=rp1,id=vblk1", text);
+    }
+
     // The virt machine turns -cdrom into a virtio-blk-pci function a
     // virtio-blk driver would bind; virtio-scsi keeps the ISO off the block
     // layer (stage9-experiments.md E5).
