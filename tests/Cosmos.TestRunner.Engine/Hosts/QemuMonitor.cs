@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,13 +17,13 @@ using Cosmos.Tools.Launcher;
 namespace Cosmos.TestRunner.Engine.Hosts;
 
 /// <summary>
-/// Plugs the profile's USB sticks and the USB keyboard in and out of the
-/// running guest when one of its tests asks (<see cref="Ds2Vs.HostRequest"/>),
-/// through QEMU's QMP monitor. QEMU connects the monitor to <see cref="Port"/>
-/// at startup, so an instance exists, and listens, before QEMU is launched.
-/// One instance serves one QEMU run.
+/// QEMU's QMP monitor for one run: plugs the profile's USB sticks and USB
+/// keyboard in and out and injects keys and pointer events into the running
+/// guest when one of its tests asks (<see cref="Ds2Vs.HostRequest"/>). QEMU
+/// connects the monitor to <see cref="Port"/> at startup, so an instance
+/// exists, and listens, before QEMU is launched; every run has one.
 /// </summary>
-public sealed class QemuHotPlug : IAsyncDisposable
+public sealed class QemuMonitor : IAsyncDisposable
 {
     /// <summary>Pulls stick n (0 when omitted) off the xHCI controller.</summary>
     public const string UsbUnplugRequest = "usb-unplug";
@@ -35,6 +36,22 @@ public sealed class QemuHotPlug : IAsyncDisposable
 
     /// <summary>Plugs it back in.</summary>
     public const string UsbKeyboardPlugRequest = "usb-kbd-plug";
+
+    /// <summary>
+    /// Presses and releases one key: <c>key-press &lt;qcode&gt;</c> with a QEMU
+    /// QKeyCode name such as <c>a</c>, <c>ret</c>, <c>spc</c>; QEMU releases
+    /// after its default hold time of 100 ms.
+    /// </summary>
+    public const string KeyPressRequest = "key-press";
+
+    /// <summary>
+    /// Moves the pointer: <c>mouse-move &lt;dx&gt; &lt;dy&gt;</c> in device
+    /// units, one <c>input-send-event</c> with two relative events and one sync.
+    /// </summary>
+    public const string MouseMoveRequest = "mouse-move";
+
+    /// <summary>Presses or releases a pointer button: <c>mouse-button &lt;left|middle|right&gt; &lt;down|up&gt;</c>.</summary>
+    public const string MouseButtonRequest = "mouse-button";
 
     private readonly TcpListener _listener;
     private readonly IReadOnlyList<DiskAttachment> _sticks;
@@ -62,7 +79,7 @@ public sealed class QemuHotPlug : IAsyncDisposable
     /// <summary>Port QEMU connects its monitor to (<see cref="QemuLaunchOptions.MonitorPort"/>).</summary>
     public int Port { get; }
 
-    private QemuHotPlug(IReadOnlyList<DiskAttachment> sticks, bool keyboard)
+    private QemuMonitor(IReadOnlyList<DiskAttachment> sticks, bool keyboard)
     {
         _sticks = sticks;
         _keyboard = keyboard;
@@ -80,15 +97,16 @@ public sealed class QemuHotPlug : IAsyncDisposable
 
     /// <summary>
     /// An instance for a run attaching <paramref name="disks"/> and the
-    /// keyboard model <paramref name="keyboardDevice"/>, or null when none of
-    /// the disks is a USB stick and the keyboard is not
-    /// <see cref="QemuLauncher.UsbKeyboardModel"/>, so nothing can be plugged.
+    /// keyboard model <paramref name="keyboardDevice"/>. The USB sticks among
+    /// the disks and a <see cref="QemuLauncher.UsbKeyboardModel"/> keyboard are
+    /// what the hot-plug requests act on; the input requests need no device,
+    /// so a run with neither gets a monitor too.
     /// </summary>
-    public static QemuHotPlug? For(IReadOnlyList<DiskAttachment> disks, string? keyboardDevice)
+    public static QemuMonitor For(IReadOnlyList<DiskAttachment> disks, string? keyboardDevice)
     {
         List<DiskAttachment> sticks = disks.Where(d => d.Kind == DiskKind.Usb).ToList();
         bool keyboard = string.Equals(keyboardDevice, QemuLauncher.UsbKeyboardModel, StringComparison.OrdinalIgnoreCase);
-        return sticks.Count == 0 && !keyboard ? null : new QemuHotPlug(sticks, keyboard);
+        return new QemuMonitor(sticks, keyboard);
     }
 
     /// <summary>Takes QEMU's monitor connection. Called once QEMU was started.</summary>
@@ -99,23 +117,98 @@ public sealed class QemuHotPlug : IAsyncDisposable
     /// reported and dropped: the guest's test then times out waiting for
     /// the change, and fails with that.
     /// </summary>
-    public static async Task DispatchAsync(QemuHotPlug? hotPlug, string request, CancellationToken cancellationToken)
+    public static async Task DispatchAsync(QemuMonitor? monitor, string request, CancellationToken cancellationToken)
     {
-        if (hotPlug is null)
+        if (monitor is null)
         {
-            Console.WriteLine($"[HotPlug] Ignored '{request}': the profile attaches no USB device");
+            Console.WriteLine($"[Monitor] Ignored '{request}': the run has no monitor");
             return;
         }
 
         try
         {
-            await hotPlug.RunAsync(request, cancellationToken);
-            Console.WriteLine($"[HotPlug] {request}: done");
+            await monitor.RunAsync(request, cancellationToken);
+            Console.WriteLine($"[Monitor] {request}: done");
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            Console.WriteLine($"[HotPlug] {request} failed: {ex.Message}");
+            Console.WriteLine($"[Monitor] {request} failed: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// The <c>send-key</c> arguments of a <see cref="KeyPressRequest"/>:
+    /// one QKeyCode key, <c>{"keys":[{"type":"qcode","data":"a"}]}</c>.
+    /// </summary>
+    /// <param name="words">The request split on spaces: the request name and the key name.</param>
+    public static JsonObject KeyPressArguments(string[] words)
+    {
+        if (words.Length != 2)
+        {
+            throw new InvalidOperationException("the key request takes one key name");
+        }
+
+        return new JsonObject
+        {
+            ["keys"] = new JsonArray(new JsonObject { ["type"] = "qcode", ["data"] = words[1] })
+        };
+    }
+
+    /// <summary>
+    /// The <c>input-send-event</c> arguments of a <see cref="MouseMoveRequest"/>:
+    /// a relative x event and a relative y event,
+    /// <c>{"events":[{"type":"rel","data":{"axis":"x","value":10}},{"type":"rel","data":{"axis":"y","value":0}}]}</c>.
+    /// </summary>
+    /// <param name="words">The request split on spaces: the request name, dx and dy as integers.</param>
+    public static JsonObject MouseMoveArguments(string[] words)
+    {
+        if (words.Length != 3
+            || !int.TryParse(words[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int dx)
+            || !int.TryParse(words[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int dy))
+        {
+            throw new InvalidOperationException("the mouse move takes two integers");
+        }
+
+        return new JsonObject
+        {
+            ["events"] = new JsonArray(RelativeEvent("x", dx), RelativeEvent("y", dy))
+        };
+    }
+
+    /// <summary>
+    /// The <c>input-send-event</c> arguments of a <see cref="MouseButtonRequest"/>:
+    /// one button event, <c>{"events":[{"type":"btn","data":{"down":true,"button":"left"}}]}</c>.
+    /// The button name passes through; QEMU rejects one it does not know
+    /// (its names are <c>left</c>, <c>middle</c>, <c>right</c>, <c>wheel-up</c>,
+    /// <c>wheel-down</c>, <c>side</c>, <c>extra</c>).
+    /// </summary>
+    /// <param name="words">The request split on spaces: the request name, the button name and <c>down</c> or <c>up</c>.</param>
+    public static JsonObject MouseButtonArguments(string[] words)
+    {
+        if (words.Length != 3 || (words[2] != "down" && words[2] != "up"))
+        {
+            throw new InvalidOperationException("the mouse button takes a button name and down or up");
+        }
+
+        return new JsonObject
+        {
+            ["events"] = new JsonArray(
+                new JsonObject
+                {
+                    ["type"] = "btn",
+                    ["data"] = new JsonObject { ["down"] = words[2] == "down", ["button"] = words[1] }
+                })
+        };
+    }
+
+    /// <summary>One relative pointer event on <paramref name="axis"/> by <paramref name="value"/> units.</summary>
+    private static JsonObject RelativeEvent(string axis, int value)
+    {
+        return new JsonObject
+        {
+            ["type"] = "rel",
+            ["data"] = new JsonObject { ["axis"] = axis, ["value"] = value }
+        };
     }
 
     /// <summary>
@@ -168,6 +261,15 @@ public sealed class QemuHotPlug : IAsyncDisposable
             case UsbKeyboardPlugRequest:
                 RequireKeyboard(words);
                 await PlugKeyboardAsync(cancellationToken);
+                break;
+            case KeyPressRequest:
+                await ExecuteAsync("send-key", KeyPressArguments(words), cancellationToken);
+                break;
+            case MouseMoveRequest:
+                await ExecuteAsync("input-send-event", MouseMoveArguments(words), cancellationToken);
+                break;
+            case MouseButtonRequest:
+                await ExecuteAsync("input-send-event", MouseButtonArguments(words), cancellationToken);
                 break;
             default:
                 throw new InvalidOperationException("unknown request");

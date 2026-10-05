@@ -246,12 +246,13 @@ public partial class Engine
                 }
 
                 // Every boot starts with the sticks and the keyboard plugged
-                // in, and a QEMU of its own to connect a monitor.
-                await using QemuHotPlug? hotPlug = QemuHotPlug.For(disks, profile.KeyboardDevice);
+                // in, and a QEMU of its own with a monitor for the hot-plug
+                // and input requests.
+                await using QemuMonitor monitor = QemuMonitor.For(disks, profile.KeyboardDevice);
                 QemuRunResult result = await _qemuHost.RunKernelAsync(
                     bootIsoPath, bootLogPath, _config.TimeoutSeconds, _config.ShouldShowDisplay, enableNetworkTesting, disks, profile.MachineOptions,
                     new ProfileDevices(profile.NetworkCard, profile.KeyboardDevice, profile.MouseDevice, profile.VgaAdapter, profile.GpuDevice),
-                    hotPlug);
+                    monitor);
 
                 combinedLog.Append(result.UartLog);
                 lastResult = result;

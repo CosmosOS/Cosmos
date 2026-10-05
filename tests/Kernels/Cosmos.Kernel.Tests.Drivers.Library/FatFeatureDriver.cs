@@ -6,19 +6,19 @@ using Cosmos.Kernel.HAL.DriverKit.Synthetic;
 namespace Cosmos.Kernel.Tests.Drivers.Library;
 
 /// <summary>
-/// Tied to the mouse feature. The suite builds with <c>CosmosEnableMouse</c>
+/// Tied to the FAT feature. The suite builds with <c>CosmosEnableFat</c>
 /// off, so the manifest must leave this driver out.
 /// </summary>
-[Driver(Feature = DriverFeature.Mouse)]
-public sealed class MouseFeatureDriver : RecordingDriver
+[Driver(Feature = DriverFeature.Fat)]
+public sealed class FatFeatureDriver : RecordingDriver
 {
     /// <summary>The synthetic key this driver matches.</summary>
-    public const string Key = "mouse";
+    public const string Key = "fat";
 
     private readonly DeviceMatch[] _matches = [SyntheticMatch.Key(Key)];
 
     /// <inheritdoc/>
-    public override string Name => nameof(MouseFeatureDriver);
+    public override string Name => nameof(FatFeatureDriver);
 
     /// <inheritdoc/>
     public override ReadOnlySpan<DeviceMatch> Matches => _matches;

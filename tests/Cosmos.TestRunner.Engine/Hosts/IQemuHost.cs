@@ -14,8 +14,8 @@ namespace Cosmos.TestRunner.Engine;
 /// <param name="NetworkCard">NIC model, e.g. <c>e1000e</c> or <c>virtio-net-pci</c>.</param>
 /// <param name="KeyboardDevice">Keyboard model, e.g. <c>virtio-keyboard-pci</c>.</param>
 /// <param name="MouseDevice">Mouse model, e.g. <c>virtio-mouse-pci</c>.</param>
-/// <param name="VgaAdapter">VGA adapter as a <c>-vga</c> backend name, e.g. <c>vmware</c> — replaces the default adapter rather than adding a second one.</param>
-/// <param name="GpuDevice">Display adapter attached as a <c>-device</c> line, e.g. <c>virtio-gpu-pci</c> — added alongside the default adapter rather than replacing it.</param>
+/// <param name="VgaAdapter">VGA adapter as a <c>-vga</c> backend name, e.g. <c>vmware</c>; replaces the default adapter rather than adding a second one.</param>
+/// <param name="GpuDevice">Display adapter attached as a <c>-device</c> line, e.g. <c>virtio-gpu-pci</c>; added alongside the default adapter rather than replacing it.</param>
 public sealed record ProfileDevices(
     string? NetworkCard,
     string? KeyboardDevice,
@@ -44,9 +44,9 @@ public interface IQemuHost
     /// <param name="disks">Per-profile disk attachments. AHCI entries share one <c>ich9-ahci</c> controller; NVMe entries each get their own <c>nvme</c> controller; USB entries share one <c>qemu-xhci</c> controller. Per-disk extra device options (e.g. <c>msix=off</c>) flow through.</param>
     /// <param name="machineOptions">Extra <c>-M</c> properties (e.g. <c>{"gic-version", "2"}</c> on ARM64). Caller is responsible for passing arch-appropriate keys.</param>
     /// <param name="devices">Per-profile NIC and input device models; null leaves the architecture defaults in place.</param>
-    /// <param name="hotPlug">Carries out the guest's requests to plug its USB sticks in and out, through the QMP monitor QEMU is launched with; null when the run attaches none.</param>
+    /// <param name="monitor">Carries out the guest's requests (USB hot-plug, key and pointer injection) through the QMP monitor QEMU is launched with; null when the caller opened none.</param>
     /// <returns>Exit code and UART log content</returns>
-    Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuHotPlug? hotPlug = null);
+    Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuMonitor? monitor = null);
 }
 
 /// <summary>
@@ -58,7 +58,7 @@ public enum UartMonitorOutcome
     NotFinished,
     /// <summary>Kernel emitted the suite-end marker (0xDEADBEEFCAFEBABE).</summary>
     EndMarkerSeen,
-    /// <summary>UART went quiet after a TestPass — the kernel is hung after reaching a test.</summary>
+    /// <summary>UART went quiet after a TestPass: the kernel is hung after reaching a test.</summary>
     Stalled
 }
 
@@ -75,7 +75,7 @@ public record QemuRunResult
     /// <summary>
     /// True if the kernel emitted the suite-end marker (0xDEADBEEFCAFEBABE)
     /// before QEMU exited. False means QEMU exited on its own (e.g. guest
-    /// rebooted or shut down) — which the multi-boot loop treats as a cue
+    /// rebooted or shut down), which the multi-boot loop treats as a cue
     /// to re-launch with the next <c>skip=N</c>.
     /// </summary>
     public bool SuiteMarkerSeen { get; init; }

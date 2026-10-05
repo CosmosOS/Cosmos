@@ -20,8 +20,11 @@
   // [profile+modifier].
   "profiles": [
     {
-      // No devices attached. A base for non-storage suites (e.g. Interrupts)
-      // that only want machine modifiers like gic-version composed onto them.
+      // No devices attached beyond the machine's own: on x64 q35's 8042
+      // with its PS/2 keyboard and mouse, which the Drivers suite's PS/2
+      // group drives through the engine's key-press and mouse requests. A
+      // base for non-storage suites (e.g. Interrupts) that only want machine
+      // modifiers like gic-version composed onto them.
       "name": "bare"
     },
     {

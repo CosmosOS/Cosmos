@@ -17,6 +17,7 @@ internal sealed class TestKeyboardConsumer : KeyboardConsumer
     private volatile int _withdrawnCount;
     private volatile int _keyCount;
     private volatile byte _lastScanCode;
+    private volatile byte _lastPressedScanCode;
     private volatile bool _lastReleased;
 
     /// <summary>How many keyboards the kit published to this consumer.</summary>
@@ -31,6 +32,9 @@ internal sealed class TestKeyboardConsumer : KeyboardConsumer
     /// <summary>The scan code of the last key report.</summary>
     public byte LastScanCode => _lastScanCode;
 
+    /// <summary>The scan code of the last report that was a press.</summary>
+    public byte LastPressedScanCode => _lastPressedScanCode;
+
     /// <summary>Whether the last key report was a release.</summary>
     public bool LastReleased => _lastReleased;
 
@@ -39,6 +43,9 @@ internal sealed class TestKeyboardConsumer : KeyboardConsumer
 
     /// <summary>The keyboard withdrawn most recently.</summary>
     public PublishedDevice? LastWithdrawn { get; private set; }
+
+    /// <summary>The keyboard that made the last report.</summary>
+    public PublishedDevice? LastKeyDevice { get; private set; }
 
     /// <inheritdoc/>
     public override void OnPublished(PublishedDevice device)
@@ -64,6 +71,12 @@ internal sealed class TestKeyboardConsumer : KeyboardConsumer
     {
         _lastScanCode = scanCode;
         _lastReleased = released;
+        if (!released)
+        {
+            _lastPressedScanCode = scanCode;
+        }
+
+        LastKeyDevice = device;
         _keyCount++;
     }
 }

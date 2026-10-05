@@ -125,7 +125,7 @@ namespace Cosmos.TestRunner.Framework
         /// true; otherwise emit a <see cref="Skip(string, string)"/> with
         /// <paramref name="skipReason"/>. Use to gate a test on a feature that may or
         /// may not be present in the current QEMU profile (specific device kind, MSI-X
-        /// capability, GIC version) — keeps the test in the report as Skipped instead
+        /// capability, GIC version): keeps the test in the report as Skipped instead
         /// of either silently disappearing or failing for a reason that's not a code
         /// regression.
         /// </summary>
@@ -143,9 +143,9 @@ namespace Cosmos.TestRunner.Framework
 
         /// <summary>
         /// Run a test that adapts to a capability instead of skipping. The
-        /// <paramref name="condition"/> is passed into <paramref name="test"/>
+        /// <paramref name="expectation"/> is passed into <paramref name="test"/>
         /// so the body can assert the capable path when true and the fallback
-        /// path when false — both branches stay in the report as a real run.
+        /// path when false; both branches stay in the report as a real run.
         /// Use this when the cell always has something to assert but the
         /// expected outcome differs by profile (e.g. NVMe MSI-X vs polled),
         /// as opposed to <see cref="RunIf(bool, string, Action, string)"/>
@@ -185,7 +185,7 @@ namespace Cosmos.TestRunner.Framework
 
             testAction();
 
-            // Action returned — destructive op didn't fire. Demote to fail
+            // Action returned: destructive op didn't fire. Demote to fail
             // (last write wins in the parser).
             s_passedCount--;
             s_failedCount++;
@@ -194,10 +194,14 @@ namespace Cosmos.TestRunner.Framework
 
         /// <summary>
         /// Asks the test engine to change the machine under the running
-        /// guest: <c>usb-unplug</c> pulls the profile's USB stick out and
-        /// <c>usb-plug</c> puts it back (both take an optional stick index,
-        /// 0 by default). Returns at once, since nothing replies: the test
-        /// waits for the change to show up, and must see it within the
+        /// guest: <c>usb-unplug [n]</c> and <c>usb-plug [n]</c> pull the
+        /// profile's USB stick out and put it back, <c>usb-kbd-unplug</c>
+        /// and <c>usb-kbd-plug</c> do the same for its USB keyboard,
+        /// <c>key-press &lt;qcode&gt;</c> presses and releases a key,
+        /// <c>mouse-move &lt;dx&gt; &lt;dy&gt;</c> moves the pointer and
+        /// <c>mouse-button &lt;name&gt; &lt;down|up&gt;</c> presses or
+        /// releases a button. Returns at once, since nothing replies: the
+        /// test waits for the change to show up, and must see it within the
         /// engine's stall window (10 s without a protocol message).
         /// </summary>
         public static void RequestHost(string request) => SendMessage(HostRequest, EncodeString(request));

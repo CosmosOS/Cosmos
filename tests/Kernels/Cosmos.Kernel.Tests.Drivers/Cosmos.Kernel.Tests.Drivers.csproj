@@ -5,9 +5,10 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <!-- Off on purpose: MouseFeatureDriver is tied to the mouse feature and the
-         suite asserts the manifest leaves it out. -->
-    <CosmosEnableMouse>false</CosmosEnableMouse>
+    <!-- Off on purpose: FatFeatureDriver is tied to the FAT feature and the suite
+         asserts the manifest leaves it out; the suite mounts nothing. The mouse
+         stays on for the PS/2 mouse of the x64 cells. -->
+    <CosmosEnableFat>false</CosmosEnableFat>
     <!-- The harness reads the experimental driver kit seam (COSMOS0003); the
          drivers themselves live in Cosmos.Kernel.Tests.Drivers.Library. -->
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
@@ -36,7 +37,8 @@
 
   <!-- The suite's drivers: a driver assembly with no InternalsVisibleTo grant,
        written over the public seam only. This kernel keeps its own HAL grant for
-       the harness (TestKeyboardConsumer through DeviceRegistry.SetConsumer). -->
+       the harness (TestKeyboardConsumer and TestPointerConsumer through
+       DeviceRegistry.SetConsumer). -->
   <ItemGroup>
     <ProjectReference Include="../Cosmos.Kernel.Tests.Drivers.Library/Cosmos.Kernel.Tests.Drivers.Library.csproj" />
   </ItemGroup>

@@ -23,7 +23,7 @@ public class QemuARM64Host : IQemuHost
 
     // Test runner protocol needle: 0x19740807 magic little-endian + command
     // byte (Ds2Vs.TestPass). Used to detect "kernel reached at least one test"
-    // so we can declare a stall when UART goes silent — handles destructive
+    // so we can declare a stall when UART goes silent: handles destructive
     // ops (e.g. Power.Shutdown's LAI panic) that hang instead of cleanly
     // exiting QEMU.
     private static readonly byte[] TestPassMarker =
@@ -47,10 +47,11 @@ public class QemuARM64Host : IQemuHost
     {
         _qemuBinaryOverride = qemuBinary;
         _memoryMb = memoryMb;
-        // uefiFirmwarePath ignored — QemuLauncher.ResolveArm64Firmware() handles it.
+        // The firmware path is not used: QemuLauncher.ResolveArm64Firmware() finds it.
+        _ = uefiFirmwarePath;
     }
 
-    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuHotPlug? hotPlug = null)
+    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuMonitor? monitor = null)
     {
         if (!File.Exists(isoPath))
         {
@@ -90,7 +91,7 @@ public class QemuARM64Host : IQemuHost
                 MouseDevice = devices?.MouseDevice,
                 VgaAdapter = devices?.VgaAdapter,
                 GpuDevice = devices?.GpuDevice,
-                MonitorPort = hotPlug?.Port,
+                MonitorPort = monitor?.Port,
                 AllowGuestShutdown = true
             });
         }
@@ -129,14 +130,14 @@ public class QemuARM64Host : IQemuHost
             icmpServer?.Start();
 
             process.Start();
-            hotPlug?.Attach(cts.Token);
+            monitor?.Attach(cts.Token);
 
             // Capture stderr asynchronously for diagnostics
             Task<string> stderrTask = process.StandardError.ReadToEndAsync();
 
             // Monitor UART log for the suite-end marker or a stall after a test
             // was reached, while waiting for QEMU to exit on its own.
-            Task<UartMonitorOutcome> monitorTask = MonitorUartLogAsync(uartLogPath, hotPlug, cts.Token);
+            Task<UartMonitorOutcome> monitorTask = MonitorUartLogAsync(uartLogPath, monitor, cts.Token);
             Task processTask = process.WaitForExitAsync(cts.Token);
 
             Task completedTask = await Task.WhenAny(monitorTask, processTask);
@@ -154,7 +155,7 @@ public class QemuARM64Host : IQemuHost
             }
             else if (!process.HasExited)
             {
-                // Process task completed (process exited on its own — guest reboot/shutdown)
+                // Process task completed (process exited on its own: guest reboot/shutdown)
                 await processTask;
             }
 
@@ -268,14 +269,14 @@ public class QemuARM64Host : IQemuHost
     /// Monitor UART log for the suite-end marker or a stall after a test was
     /// reached. See <see cref="QemuX64Host"/> for the full rationale.
     /// </summary>
-    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, QemuHotPlug? hotPlug, CancellationToken cancellationToken)
+    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, QemuMonitor? monitor, CancellationToken cancellationToken)
     {
         long lastPosition = 0;
         int endMarkerIndex = 0;
         int testPassMarkerIndex = 0;
         bool sawTestPass = false;
         // See QemuX64Host for the rationale: track the last protocol-frame
-        // magic, not raw UART bytes — a hung kernel keeps spamming scheduler
+        // magic, not raw UART bytes: a hung kernel keeps spamming scheduler
         // text but stops emitting protocol frames.
         DateTime lastMagicAt = DateTime.UtcNow;
         HostRequestScanner hostRequests = new();
@@ -302,7 +303,7 @@ public class QemuARM64Host : IQemuHost
                             // done now rather than after the run.
                             if (hostRequests.Feed(b) is string request)
                             {
-                                await QemuHotPlug.DispatchAsync(hotPlug, request, cancellationToken);
+                                await QemuMonitor.DispatchAsync(monitor, request, cancellationToken);
                                 lastMagicAt = DateTime.UtcNow;
                             }
 

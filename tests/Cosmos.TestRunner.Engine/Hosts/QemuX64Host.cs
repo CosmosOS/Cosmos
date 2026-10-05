@@ -23,7 +23,7 @@ public class QemuX64Host : IQemuHost
 
     // Test runner protocol needle: 0x19740807 magic little-endian + command
     // byte (Ds2Vs.TestPass). Used to detect "kernel reached at least one test"
-    // so we can declare a stall when UART goes silent — handles destructive
+    // so we can declare a stall when UART goes silent: handles destructive
     // ops (e.g. Power.Shutdown's LAI panic) that hang instead of cleanly
     // exiting QEMU.
     private static readonly byte[] TestPassMarker =
@@ -46,7 +46,7 @@ public class QemuX64Host : IQemuHost
         _memoryMb = memoryMb;
     }
 
-    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuHotPlug? hotPlug = null)
+    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuMonitor? monitor = null)
     {
         if (!File.Exists(isoPath))
         {
@@ -84,7 +84,7 @@ public class QemuX64Host : IQemuHost
             MouseDevice = devices?.MouseDevice,
             VgaAdapter = devices?.VgaAdapter,
             GpuDevice = devices?.GpuDevice,
-            MonitorPort = hotPlug?.Port
+            MonitorPort = monitor?.Port
         });
         ProcessStartInfo startInfo = QemuLauncher.ToProcessStartInfo(plan);
         if (_qemuBinaryOverride is not null)
@@ -117,14 +117,14 @@ public class QemuX64Host : IQemuHost
             icmpServer?.Start();
 
             process.Start();
-            hotPlug?.Attach(cts.Token);
+            monitor?.Attach(cts.Token);
 
             // Capture stderr asynchronously for diagnostics
             Task<string> stderrTask = process.StandardError.ReadToEndAsync();
 
             // Monitor UART log for the suite-end marker or a stall after a test
             // was reached, while waiting for QEMU to exit on its own.
-            Task<UartMonitorOutcome> monitorTask = MonitorUartLogAsync(uartLogPath, hotPlug, cts.Token);
+            Task<UartMonitorOutcome> monitorTask = MonitorUartLogAsync(uartLogPath, monitor, cts.Token);
             Task processTask = process.WaitForExitAsync(cts.Token);
 
             Task completedTask = await Task.WhenAny(monitorTask, processTask);
@@ -133,7 +133,7 @@ public class QemuX64Host : IQemuHost
             {
                 UartMonitorOutcome outcome = await monitorTask;
                 testSuiteCompleted = outcome == UartMonitorOutcome.EndMarkerSeen;
-                // Either EndMarkerSeen or Stalled — kill QEMU now. Stalled means
+                // Either EndMarkerSeen or Stalled: kill QEMU now. Stalled means
                 // a destructive op (e.g. Power.Shutdown) hung after pre-emitting
                 // its Pass marker; the engine will see the markers in the UART
                 // log and roll on to the next boot.
@@ -146,7 +146,7 @@ public class QemuX64Host : IQemuHost
             }
             else if (!process.HasExited)
             {
-                // Process task completed (process exited on its own — guest reboot/shutdown)
+                // Process task completed (process exited on its own: guest reboot/shutdown)
                 await processTask;
             }
 
@@ -265,13 +265,13 @@ public class QemuX64Host : IQemuHost
     /// op fired but didn't exit QEMU"). Returns <see cref="UartMonitorOutcome.NotFinished"/>
     /// only on cancellation.
     /// </summary>
-    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, QemuHotPlug? hotPlug, CancellationToken cancellationToken)
+    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, QemuMonitor? monitor, CancellationToken cancellationToken)
     {
         long lastPosition = 0;
         int endMarkerIndex = 0;
         int testPassMarkerIndex = 0;
         bool sawTestPass = false;
-        // Track time of the last protocol-frame magic — not just any UART byte.
+        // Track time of the last protocol-frame magic, not just any UART byte.
         // After Power.Shutdown's LAI panic the scheduler keeps writing text to
         // UART, so a "no growth" check would never fire; "no protocol magic"
         // does, since the test framework emits no more frames once hung.
@@ -300,7 +300,7 @@ public class QemuX64Host : IQemuHost
                             // done now rather than after the run.
                             if (hostRequests.Feed(b) is string request)
                             {
-                                await QemuHotPlug.DispatchAsync(hotPlug, request, cancellationToken);
+                                await QemuMonitor.DispatchAsync(monitor, request, cancellationToken);
                                 lastMagicAt = DateTime.UtcNow;
                             }
 
@@ -317,7 +317,7 @@ public class QemuX64Host : IQemuHost
                                 endMarkerIndex = (b == TestEndMarker[0]) ? 1 : 0;
                             }
 
-                            // TestPass marker scan also reuses the magic prefix —
+                            // TestPass marker scan also reuses the magic prefix:
                             // when its 4-byte magic+cmd are matched, both flags
                             // get bumped: lastMagicAt and (once) sawTestPass.
                             if (b == TestPassMarker[testPassMarkerIndex])
@@ -325,7 +325,7 @@ public class QemuX64Host : IQemuHost
                                 testPassMarkerIndex++;
                                 if (testPassMarkerIndex == Consts.SerialSignatureLengthBytes)
                                 {
-                                    // Full magic 0x19740807 hit — kernel emitted a frame.
+                                    // Full magic 0x19740807 hit: kernel emitted a frame.
                                     lastMagicAt = DateTime.UtcNow;
                                 }
                                 if (testPassMarkerIndex == TestPassMarker.Length)

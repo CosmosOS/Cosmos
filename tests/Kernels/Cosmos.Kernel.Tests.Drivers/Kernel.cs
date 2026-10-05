@@ -44,13 +44,18 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// proves the kit's Usb bus kind over it, the decline-after-open
 /// fall-through to the shipped <see cref="UsbKeyboardDriver"/>, and the
 /// unplug and replug the engine performs over QMP when a test asks; the
-/// group skips on the bare cell, which has no controller.
+/// group skips on the bare cell, which has no controller. q35's built-in
+/// 8042 carries a keyboard and a mouse on both x64 cells: the PS/2 group
+/// proves the kit's Ps2 bus kind over it, with the key and the pointer
+/// events the engine injects over QMP when a test asks; virt has no 8042
+/// and the group skips on arm64.
 /// </para>
 /// <para>
 /// The suite is two projects. This kernel is the harness: it holds an
 /// <c>InternalsVisibleTo</c> grant from <c>Cosmos.Kernel.HAL</c> for one
-/// purpose, installing <see cref="TestKeyboardConsumer"/> through the
-/// internal <see cref="DeviceRegistry"/>. The drivers it drives live in
+/// purpose, installing <see cref="TestKeyboardConsumer"/> and
+/// <see cref="TestPointerConsumer"/> through the internal
+/// <see cref="DeviceRegistry"/>. The drivers it drives live in
 /// <c>Cosmos.Kernel.Tests.Drivers.Library</c>, a driver assembly with no
 /// grant at all, written over the public seam only, so their compiling is
 /// the proof that a third party can write every one of them.
@@ -58,8 +63,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 1 PS/2.</summary>
-    private const int ExpectedTestCount = 41;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 7 PS/2.</summary>
+    private const int ExpectedTestCount = 47;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -191,6 +196,9 @@ public class Kernel : Sys.Kernel
     /// <summary>Specificity of a USB match on the interface class, subclass and protocol: the shipped keyboard driver's and the declining driver's.</summary>
     private const int UsbKeyboardMatchSpecificity = 3;
 
+    /// <summary>Bus name of the port nodes the shipped 8042 driver publishes.</summary>
+    private const string Ps2BusName = "ps2";
+
     /// <summary>The 8042 node's compatible string, which the x64 machine description publishes it under.</summary>
     private const string I8042Compatible = "pnp0303";
 
@@ -200,13 +208,53 @@ public class Kernel : Sys.Kernel
     /// <summary>The 8042 node's path, asserted: the machine description names it.</summary>
     private const string I8042Path = "platform:i8042@60";
 
+    /// <summary>The keyboard port's node path.</summary>
+    private const string Ps2KeyboardPath = "ps2:kbd";
+
+    /// <summary>The auxiliary port's node path.</summary>
+    private const string Ps2MousePath = "ps2:aux";
+
+    /// <summary>The keyboard port's node description.</summary>
+    private const string Ps2KeyboardDescription = "port kbd";
+
+    /// <summary>The auxiliary port's node description.</summary>
+    private const string Ps2MouseDescription = "port aux";
+
+    /// <summary>The name the shipped driver publishes the PS/2 keyboard under.</summary>
+    private const string Ps2KeyboardName = "ps2-keyboard";
+
+    /// <summary>The name the shipped driver publishes the PS/2 mouse under.</summary>
+    private const string Ps2MouseName = "ps2-mouse";
+
+    /// <summary>Asks the engine to press and release a key (see TR.RequestHost): QEMU's qcode a, which the controller's translation delivers as set 1 make 0x1E and break 0x9E.</summary>
+    private const string Ps2KeyRequest = "key-press a";
+
+    /// <summary>Asks the engine to move the mouse 10 units right and none down.</summary>
+    private const string Ps2MouseMoveRequest = "mouse-move 10 0";
+
+    /// <summary>Asks the engine to press the left mouse button.</summary>
+    private const string Ps2MouseButtonDownRequest = "mouse-button left down";
+
+    /// <summary>Asks the engine to release it.</summary>
+    private const string Ps2MouseButtonUpRequest = "mouse-button left up";
+
+    /// <summary>The horizontal movement the move request asks for.</summary>
+    private const int Ps2MoveDeltaX = 10;
+
+    /// <summary>0xED's byte: num lock bit 1, caps lock bit 2.</summary>
+    private const byte NumLockCapsLockLedByte = 0x06;
+
     /// <summary>Resources the 8042's binding holds when both lines are routed: two port windows and two line handles; the lock is not counted.</summary>
     private const int I8042InterruptDrivenHeldResources = 4;
 
     /// <summary>Skip reason of the PS/2 tests on a cell whose machine has no 8042.</summary>
     private const string SkipNo8042 = "no 8042 on this cell";
 
+    /// <summary>Skip reason of the key injection test on a cell with a USB keyboard, which QEMU hands the key to.</summary>
+    private const string SkipUsbKeyboardTakesKeys = "a usb-kbd on this cell takes the host's keys";
+
     private readonly TestKeyboardConsumer _keyboardConsumer = new();
+    private readonly TestPointerConsumer _pointerConsumer = new();
     private readonly DeviceNode _bootNode;
     private DeviceNode? _keyboardNode;
     private KeyboardState? _keyboardState;
@@ -238,11 +286,14 @@ public class Kernel : Sys.Kernel
         // before any keyboard is published, as a manager would be.
         DeviceRegistry.SetConsumer(DeviceKind.Keyboard, _keyboardConsumer);
 
+        // ... and for the ring's mouse manager, so the PS/2 mouse's reports land here.
+        DeviceRegistry.SetConsumer(DeviceKind.Pointer, _pointerConsumer);
+
         TR.Start("Driver Kit Tests", expectedTests: ExpectedTestCount);
 
         // ==================== Manifest ====================
         TR.Run("Manifest_HighPriorityDriver_Present", TestManifestHighPriorityDriverPresent);
-        TR.Run("Manifest_MouseFeatureDriver_Absent", TestManifestMouseFeatureDriverAbsent);
+        TR.Run("Manifest_FatFeatureDriver_Absent", TestManifestFatFeatureDriverAbsent);
         TR.Run("Manifest_ExcludedDriver_Absent", TestManifestExcludedDriverAbsent);
         TR.Run("Manifest_OptInDriver_Present", TestManifestOptInDriverPresent);
         TR.Run("Manifest_OptOutDriver_Absent", TestManifestOptOutDriverAbsent);
@@ -316,12 +367,18 @@ public class Kernel : Sys.Kernel
 
         // ==================== PS/2 ====================
         // q35 has an 8042 with a keyboard and a mouse built in, on both x64
-        // cells; virt has none and the group skips. The shipped 8042 driver
-        // binds the node at the driver stage and publishes a Ps2 node per
-        // port whose test passed.
+        // cells; virt has none and the group skips. The host injects a key and
+        // pointer events over QMP when asked; with a usb-kbd present QEMU hands
+        // the key to it, so the key test runs on the bare cell only.
         _i8042Path = FindI8042Path();
         bool has8042 = _i8042Path is not null;
         TR.RunIf(has8042, "Ps2_Controller_Bound", TestPs2ControllerBound, SkipNo8042);
+        TR.RunIf(has8042, "Ps2_Keyboard_Bound", TestPs2KeyboardBound, SkipNo8042);
+        TR.RunIf(has8042 && !hasXhci, "Ps2_Keyboard_KeyInjected", TestPs2KeyboardKeyInjected, has8042 ? SkipUsbKeyboardTakesKeys : SkipNo8042);
+        TR.RunIf(has8042, "Ps2_Keyboard_SetLedsRoundTrip", TestPs2KeyboardSetLedsRoundTrip, SkipNo8042);
+        TR.RunIf(has8042, "Ps2_Mouse_Bound", TestPs2MouseBound, SkipNo8042);
+        TR.RunIf(has8042, "Ps2_Mouse_MovementInjected", TestPs2MouseMovementInjected, SkipNo8042);
+        TR.RunIf(has8042, "Ps2_Mouse_ButtonInjected", TestPs2MouseButtonInjected, SkipNo8042);
 
         TR.Finish();
 
@@ -352,13 +409,13 @@ public class Kernel : Sys.Kernel
         Assert.NotNull(RecordingDriver.Find<HighPriorityDriver>());
     }
 
-    // The driver is tied to the mouse feature and the project turns the
+    // The driver is tied to the FAT feature and the project turns the
     // feature off, so the generated manifest guards its registration behind
-    // KernelFeatures.Mouse and the guard folds to nothing.
-    private static void TestManifestMouseFeatureDriverAbsent()
+    // KernelFeatures.Fat and the guard folds to nothing.
+    private static void TestManifestFatFeatureDriverAbsent()
     {
-        Assert.True(FindDriverIndex(nameof(MouseFeatureDriver)) < 0, "a driver tied to a feature that is off should not be in the manifest");
-        Assert.Null(RecordingDriver.Find<MouseFeatureDriver>(), "the registry should hold no MouseFeatureDriver");
+        Assert.True(FindDriverIndex(nameof(FatFeatureDriver)) < 0, "a driver tied to a feature that is off should not be in the manifest");
+        Assert.Null(RecordingDriver.Find<FatFeatureDriver>(), "the registry should hold no FatFeatureDriver");
     }
 
     private static void TestManifestExcludedDriverAbsent()
@@ -1324,10 +1381,14 @@ public class Kernel : Sys.Kernel
 
     // ==================== PS/2 ====================
     //
-    // The 8042 node the x64 machine description publishes, bound by the
-    // shipped I8042Driver at the driver stage and read through DriverInfo
-    // like every other node. The leaf nodes under it are the keyboard and
-    // mouse drivers' business; the suite reads the controller's own state.
+    // The kit's Ps2 bus kind over q35's built-in 8042: the controller node
+    // the x64 machine description publishes, bound by the shipped
+    // I8042Driver at the driver stage, the two port nodes it published,
+    // bound by the shipped keyboard and mouse drivers, an LED write through
+    // the keyboard's state object, then a key press and pointer events the
+    // engine injects over QMP. The shipped drivers are no RecordingDriver,
+    // so their work shows through the nodes, the states' counters and the
+    // suite's two consumers.
 
     private void TestPs2ControllerBound()
     {
@@ -1357,6 +1418,177 @@ public class Kernel : Sys.Kernel
         Assert.False(state.PolledPeriodically, "a controller with both lines routed needs no periodic drain");
         Assert.Equal(I8042InterruptDrivenHeldResources, info.HeldResourceCount, "two port windows and two line handles");
         Assert.Equal(0, state.StrayBytes, "no byte should have arrived while the ports were between probes");
+    }
+
+    // The keyboard published at the driver stage went to the ring's
+    // consumer, so the keyboard manager holds it; the suite's consumer,
+    // installed afterwards, never saw it and its published count is not
+    // read here.
+    private void TestPs2KeyboardBound()
+    {
+        if (!TryGetI8042(out string? path, out _))
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(Ps2KeyboardPath, out DeviceNodeInfo info), "the keyboard port's node should be in the tree");
+        Assert.True(info.State == DeviceNodeState.Bound, "the keyboard port should be bound");
+        Assert.True(info.DriverName == nameof(Ps2KeyboardDriver), "Ps2KeyboardDriver should hold the keyboard port");
+        Assert.True(info.BusName == Ps2BusName, "the port node sits on the ps2 bus");
+        Assert.True(info.Description == Ps2KeyboardDescription, "the port node describes itself as port kbd");
+        Assert.True(info.ParentPath == path, "the port node should sit under the controller's node");
+        Assert.Equal(0, info.ResourceCount, "a port node carries no resources");
+        Assert.Equal(1, info.InterruptCount, "a port node carries the port's interrupt source");
+        Assert.Equal(1, info.OfferCount, "the shipped driver should have bound on the first offer");
+        Assert.Equal(1, info.PublishedDeviceCount, "the binding should publish one keyboard");
+        Assert.Equal(1, info.HeldResourceCount, "the port's interrupt handle");
+
+        int deviceIndex = FindDeviceIndex(Ps2KeyboardName);
+        Assert.True(deviceIndex >= 0, "the keyboard should be in the published list");
+        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.Kind == PublishedDeviceKind.Keyboard, "the published device should be a keyboard");
+            Assert.True(device.IsConsumed, "the keyboard consumer should have taken the keyboard");
+            Assert.False(device.IsWithdrawn, "the keyboard should still be published");
+            Assert.True(device.DriverName == nameof(Ps2KeyboardDriver), "the published device should name its driver");
+            Assert.True(device.NodePath == Ps2KeyboardPath, "the published device should name the port node");
+        }
+
+        if (!TryGetPs2KeyboardState(out Ps2KeyboardState? state))
+        {
+            return;
+        }
+
+        Assert.False(state.IsAtKeyboard, "QEMU's keyboard answers identify with AB 41");
+    }
+
+    // QMP send-key releases the key after its default 100 ms hold time, so
+    // the test waits for the make and the break.
+    private void TestPs2KeyboardKeyInjected()
+    {
+        if (!TryGetPs2KeyboardState(out Ps2KeyboardState? state))
+        {
+            return;
+        }
+
+        int keysBefore = _keyboardConsumer.KeyCount;
+        int eventsBefore = state.KeyEvents;
+
+        TR.RequestHost(Ps2KeyRequest);
+
+        Assert.True(WaitUntil(() => _keyboardConsumer.KeyCount >= keysBefore + 2), "the make and the break of the injected key should reach the consumer");
+        Assert.Equal(TestScanCode, _keyboardConsumer.LastPressedScanCode, "qcode a is set 1 make code 0x1E");
+        Assert.True(_keyboardConsumer.LastScanCode == TestScanCode && _keyboardConsumer.LastReleased, "the last report is the release, 0x9E on the wire");
+        Assert.True(_keyboardConsumer.LastKeyDevice is { Device: IKeyboard keyboard } && keyboard.Name == Ps2KeyboardName, "the key came from the PS/2 keyboard");
+        Assert.True(state.KeyEvents >= eventsBefore + 2, "the driver should have decoded the make and the break");
+    }
+
+    // Runs on the boot thread after the driver stage returned, when no
+    // worker job sends to either port; the exchange's event polls its latch
+    // with interrupts enabled and the acknowledgements arrive on IRQ 1.
+    private void TestPs2KeyboardSetLedsRoundTrip()
+    {
+        if (!TryGetPs2KeyboardState(out Ps2KeyboardState? state))
+        {
+            return;
+        }
+
+        int writes = state.LedWrites;
+        state.SetLeds(KeyboardLeds.NumLock | KeyboardLeds.CapsLock);
+
+        Assert.Equal(writes + 1, state.LedWrites, "SetLeds should run one indicator exchange");
+        Assert.Equal(NumLockCapsLockLedByte, state.LastLedByte, "the byte should carry the num lock and caps lock bits");
+        Assert.True(state.LastLedAcknowledged, "QEMU's keyboard acknowledges 0xED and its byte");
+    }
+
+    // The mouse published at the driver stage went to the ring's consumer,
+    // as the keyboard did; the suite's pointer consumer never saw it.
+    private void TestPs2MouseBound()
+    {
+        if (!TryGetI8042(out string? path, out _))
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(Ps2MousePath, out DeviceNodeInfo info), "the auxiliary port's node should be in the tree");
+        Assert.True(info.State == DeviceNodeState.Bound, "the auxiliary port should be bound");
+        Assert.True(info.DriverName == nameof(Ps2MouseDriver), "Ps2MouseDriver should hold the auxiliary port");
+        Assert.True(info.BusName == Ps2BusName, "the port node sits on the ps2 bus");
+        Assert.True(info.Description == Ps2MouseDescription, "the port node describes itself as port aux");
+        Assert.True(info.ParentPath == path, "the port node should sit under the controller's node");
+        Assert.Equal(0, info.ResourceCount, "a port node carries no resources");
+        Assert.Equal(1, info.InterruptCount, "a port node carries the port's interrupt source");
+        Assert.Equal(1, info.OfferCount, "the shipped driver should have bound on the first offer");
+        Assert.Equal(1, info.PublishedDeviceCount, "the binding should publish one pointer");
+        Assert.Equal(1, info.HeldResourceCount, "the port's interrupt handle");
+
+        int deviceIndex = FindDeviceIndex(Ps2MouseName);
+        Assert.True(deviceIndex >= 0, "the mouse should be in the published list");
+        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.Kind == PublishedDeviceKind.Pointer, "the published device should be a pointer");
+            Assert.True(device.IsConsumed, "the pointer consumer should have taken the mouse");
+            Assert.False(device.IsWithdrawn, "the mouse should still be published");
+            Assert.True(device.DriverName == nameof(Ps2MouseDriver), "the published device should name its driver");
+            Assert.True(device.NodePath == Ps2MousePath, "the published device should name the port node");
+        }
+
+        if (!TryGetPs2MouseState(out Ps2MouseState? state))
+        {
+            return;
+        }
+
+        Assert.True(state.HasWheel, "QEMU's mouse answers 3 after the 200, 100, 80 knock");
+        Assert.Equal(4, state.PacketBytes, "a wheel mouse sends four byte packets");
+    }
+
+    // The engine sends the move as one input-send-event with one sync, and
+    // QEMU's PS/2 mouse splits a delta over several packets only beyond 127
+    // units, so a 10 unit move is one packet and one report. The totals are
+    // what the test reads.
+    private void TestPs2MouseMovementInjected()
+    {
+        if (!TryGetPs2MouseState(out Ps2MouseState? state))
+        {
+            return;
+        }
+
+        int reportsBefore = _pointerConsumer.RelativeCount;
+        int totalXBefore = _pointerConsumer.TotalDeltaX;
+        int totalYBefore = _pointerConsumer.TotalDeltaY;
+        int packetsBefore = state.PacketsReported;
+
+        TR.RequestHost(Ps2MouseMoveRequest);
+
+        Assert.True(WaitUntil(() => _pointerConsumer.RelativeCount >= reportsBefore + 1), "the movement should reach the pointer consumer");
+        Assert.Equal(totalXBefore + Ps2MoveDeltaX, _pointerConsumer.TotalDeltaX, "the packets of a 10 unit move sum to 10");
+        Assert.Equal(totalYBefore, _pointerConsumer.TotalDeltaY, "a horizontal move has no vertical part");
+        Assert.True(_pointerConsumer.LastButtons == PointerButtons.None, "no button is down during the move");
+        Assert.Equal(0, _pointerConsumer.LastWheel, "the wheel did not turn");
+        Assert.True(_pointerConsumer.LastDevice is { Device: IPointer pointer } && pointer.Name == Ps2MouseName, "the movement came from the PS/2 mouse");
+        Assert.True(state.PacketsReported >= packetsBefore + 1, "the driver should have reported at least one packet");
+        Assert.Equal(0, state.ResyncDrops, "every byte should have landed in a packet");
+    }
+
+    private void TestPs2MouseButtonInjected()
+    {
+        if (!TryGetPs2MouseState(out _))
+        {
+            return;
+        }
+
+        int reportsBefore = _pointerConsumer.RelativeCount;
+
+        TR.RequestHost(Ps2MouseButtonDownRequest);
+
+        Assert.True(WaitUntil(() => _pointerConsumer.RelativeCount > reportsBefore && (_pointerConsumer.LastButtons & PointerButtons.Left) != 0), "the button press should reach the pointer consumer");
+        Assert.True(_pointerConsumer.LastButtons == PointerButtons.Left, "only the left button is down");
+
+        reportsBefore = _pointerConsumer.RelativeCount;
+
+        TR.RequestHost(Ps2MouseButtonUpRequest);
+
+        Assert.True(WaitUntil(() => _pointerConsumer.RelativeCount > reportsBefore && _pointerConsumer.LastButtons == PointerButtons.None), "the button release should reach the pointer consumer");
     }
 
     // ==================== Helpers ====================
@@ -1527,6 +1759,26 @@ public class Kernel : Sys.Kernel
         }
 
         return true;
+    }
+
+    /// <summary>Hands back the shipped keyboard driver's state on the keyboard port, or fails the test.</summary>
+    /// <param name="state">The driver state when found.</param>
+    /// <returns>True when the port is bound by the shipped driver.</returns>
+    private static bool TryGetPs2KeyboardState([NotNullWhen(true)] out Ps2KeyboardState? state)
+    {
+        state = FindDriverState<Ps2KeyboardState>(Ps2KeyboardPath);
+        Assert.NotNull(state, "the keyboard port should be bound by Ps2KeyboardDriver");
+        return state is not null;
+    }
+
+    /// <summary>Hands back the shipped mouse driver's state on the auxiliary port, or fails the test.</summary>
+    /// <param name="state">The driver state when found.</param>
+    /// <returns>True when the port is bound by the shipped driver.</returns>
+    private static bool TryGetPs2MouseState([NotNullWhen(true)] out Ps2MouseState? state)
+    {
+        state = FindDriverState<Ps2MouseState>(Ps2MousePath);
+        Assert.NotNull(state, "the auxiliary port should be bound by Ps2MouseDriver");
+        return state is not null;
     }
 
     /// <summary>Hands back the keyboard interface's path and node as the bound test recorded them, or fails the test when it did not.</summary>
