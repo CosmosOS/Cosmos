@@ -40,6 +40,13 @@ internal class LibraryInitializer
         Serial.WriteString("[KERNEL]   - Initializing HAL...\n");
         PlatformHAL.Initialize(initializer);
 
+        // Record the device tree the bootloader handed over, if any, before the
+        // interrupt controller and the machine description run: both may read it.
+        // The heap is up (Core's initializer ran first), the blob is RAM in the
+        // higher-half map and stays mapped for the kernel's lifetime.
+        Serial.WriteString("[KERNEL]   - Recording the firmware device tree...\n");
+        BootFirmware.DiscoverDeviceTree();
+
         // Initialize interrupts (skipped if CosmosEnableInterrupts=false)
         if (InterruptManager.IsEnabled)
         {
@@ -62,11 +69,12 @@ internal class LibraryInitializer
 
             // Seed the driver kit's platform bus with this machine's root
             // nodes: on x64 the 8042 keyboard controller and the PCI host, on
-            // ARM64 the ECAM host and one node per occupied slot of the virt
-            // machine's virtio-mmio window. Interrupts are still
-            // disabled and the nodes wait in the engine's queue until
-            // Kernel.Start runs the driver stage. A machine description
-            // that throws costs the kit its nodes, not the boot.
+            // ARM64 the ECAM host from ACPI's MCFG or from the device tree and
+            // one node per occupied virtio-mmio slot, from the device tree or
+            // the virt machine's table. Interrupts are still disabled and the
+            // nodes wait in the engine's queue until Kernel.Start runs the
+            // driver stage. A machine description that throws costs the kit
+            // its nodes, not the boot.
             Serial.WriteString("[KERNEL]   - Publishing platform nodes...\n");
             try
             {

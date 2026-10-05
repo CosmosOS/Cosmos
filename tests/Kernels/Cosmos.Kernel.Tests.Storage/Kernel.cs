@@ -29,9 +29,10 @@ public class Kernel : Sys.Kernel
     private static IBlockDevice? s_dev;
 
     // Reason surfaced through TR.RunIf when a test depends on a device
-    // having actually bound. A profile whose driver did not enumerate
-    // (e.g. nvme+acpi-off on arm64, where no-ACPI removes PCIe discovery)
-    // lands here and the device tests skip.
+    // having actually bound. Every cell of this suite attaches one disk and
+    // the machine description finds the PCI host on both architectures with
+    // or without ACPI (on arm64 from the device tree when ACPI is off), so a
+    // cell landing here has Manager_ExactlyOneDevice failing above it.
     private const string SkipNoDevice = "no block device bound for this profile";
 
     // Same gating reason for the partition-table tests, which also need
@@ -390,15 +391,12 @@ public class Kernel : Sys.Kernel
 
         // ==================== Manager ====================
         TR.Run("Manager_StorageInitialized", TestManager_StorageInitialized);
-        // A cell that attached a disk must SEE a disk: on x64 PCI enumerates
-        // with or without ACPI, so zero devices is always a bind regression
-        // and must fail, not skip; on arm64, acpi-off removes PCIe discovery,
-        // so only those cells may legitimately come up empty.
-#if ARCH_X64
+        // A cell that attached a disk must SEE a disk on both architectures:
+        // on x64 PCI enumerates with or without ACPI, and on arm64 the machine
+        // description takes the ECAM host from the device tree when ACPI is
+        // off (the acpi-off cells), so zero devices is always a bind
+        // regression and must fail, not skip.
         bool deviceExpected = true;
-#else
-        bool deviceExpected = !TR.ProfileContains("acpi-off");
-#endif
         TR.RunIf(deviceExpected, "Manager_ExactlyOneDevice", TestManager_ExactlyOneDevice, SkipNoDevice);
         TR.RunIf(hasDevice, "Manager_DuplicateRegistrationIgnored", TestManager_DuplicateRegistrationIgnored, SkipNoDevice);
 
@@ -429,6 +427,20 @@ public class Kernel : Sys.Kernel
         {
             TR.Skip("Profile_NvmeInterruptModeMatches", SkipNoDevice);
         }
+        else if (TR.ProfileContains("acpi-off"))
+        {
+#if ARCH_X64
+            // acpi-off x64: QEMU leaves the MADT in place and the LAPIC MSI binder
+            // comes up, but the cell exists to prove the ACPI-less discovery
+            // paths, not the interrupt mode, which is pinned on the plain cell.
+            TR.Skip("Profile_NvmeInterruptModeMatches", "acpi-off has no MSI routing to pin");
+#else
+            // acpi-off arm64: the GIC comes up on the virt defaults and the ITS
+            // is not discovered without ACPI, so MSI-X cannot route on any GIC
+            // version and the driver must poll. expect-interrupt = false.
+            TR.RunWithExpectation(false, "Profile_NvmeInterruptModeMatches", TestProfile_NvmeInterruptMode);
+#endif
+        }
         else if (TR.ProfileContains("gicv2") || TR.ProfileContains("gicv3"))
         {
             // Only the GIC-version cells pin a determinate NVMe interrupt path:
@@ -440,21 +452,13 @@ public class Kernel : Sys.Kernel
         else
         {
 #if ARCH_X64
-            if (!TR.ProfileContains("acpi-off"))
-            {
-                // Plain x64 nvme: ACPI is on and the LAPIC MSI binder is
-                // always registered (the Interrupts suite asserts
-                // MsiRouting.IsAvailable unconditionally on x64), so the
-                // driver landing in interrupt mode IS determinate: a silent
-                // interrupt-to-polling regression here is exactly the failure
-                // this cell exists to catch. expect-interrupt = true.
-                TR.RunWithExpectation(true, "Profile_NvmeInterruptModeMatches", TestProfile_NvmeInterruptMode);
-            }
-            else
-            {
-                // acpi-off x64: no MADT → no LAPIC MSI routing to pin.
-                TR.Skip("Profile_NvmeInterruptModeMatches", "acpi-off has no MSI routing to pin");
-            }
+            // Plain x64 nvme: ACPI is on and the LAPIC MSI binder is
+            // always registered (the Interrupts suite asserts
+            // MsiRouting.IsAvailable unconditionally on x64), so the
+            // driver landing in interrupt mode IS determinate: a silent
+            // interrupt-to-polling regression here is exactly the failure
+            // this cell exists to catch. expect-interrupt = true.
+            TR.RunWithExpectation(true, "Profile_NvmeInterruptModeMatches", TestProfile_NvmeInterruptMode);
 #else
             // arm64 bare nvme: the interrupt mode depends on the machine's
             // default gic-version, so it is not pinned here, the

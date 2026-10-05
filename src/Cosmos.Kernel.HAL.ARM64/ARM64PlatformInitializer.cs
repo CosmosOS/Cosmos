@@ -14,6 +14,7 @@ using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Platform;
+using Cosmos.Kernel.HAL.Firmware;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
@@ -47,6 +48,8 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
 
     /// <summary>Shift of the bus number in an ECAM address: 1 MiB of configuration space per bus.</summary>
     private const int EcamBusShift = 20;
+    /// <summary>Bytes of ECAM per bus, the smallest window that describes one bus.</summary>
+    private const ulong EcamBusSize = 1UL << EcamBusShift;
 
     private GenericTimer? _timer;
 
@@ -131,16 +134,18 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     }
 
     /// <summary>
-    /// The virt machine description. One PCI host node over the ECAM
-    /// window ACPI's MCFG reports, which the PCI host driver enumerates,
-    /// when PCI is compiled in and an MCFG entry exists (without one, ACPI
-    /// off and no DTB parsing yet, no host is published and the legacy
-    /// scan stays the only PCI path). Then one platform node per occupied
-    /// slot of the virtio-mmio window, always: the window is the virt
-    /// machine's hardcoded table, not an ACPI node, so an acpi-off boot and
-    /// a PCI-off kernel keep their MMIO devices. Thread context, interrupts
-    /// disabled, from the HAL library initializer; the lines are only
-    /// described here, the transport driver connects them at bind time.
+    /// The virt machine description, over the design's three sources in
+    /// order of preference. One PCI host node over the ECAM window, from
+    /// ACPI's MCFG when an entry exists, else from the device tree's
+    /// <c>pci-host-ecam-generic</c> node when the bootloader handed a tree
+    /// over, else none (the legacy scan stays the only PCI path), when PCI
+    /// is compiled in. Then one platform node per occupied virtio-mmio
+    /// slot, always: from the device tree's <c>virtio,mmio</c> nodes when
+    /// there is a tree, else from the virt machine's hardcoded window; a
+    /// slot is occupied when its magic and device id registers say so,
+    /// whichever source named it. Thread context, interrupts disabled,
+    /// from the HAL library initializer; the lines are only described
+    /// here, the transport driver connects them at bind time.
     /// </summary>
     public void PublishPlatformNodes()
     {
@@ -149,8 +154,9 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     }
 
     /// <summary>
-    /// Publishes the ECAM PCI host node; nothing when PCI is compiled out
-    /// or the MCFG entry is missing. Thread context, interrupts disabled.
+    /// Publishes the ECAM PCI host node from ACPI's MCFG, else from the
+    /// device tree; nothing when PCI is compiled out or neither source
+    /// names a host. Thread context, interrupts disabled.
     /// </summary>
     private static void PublishPciHostNode()
     {
@@ -159,33 +165,214 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
             return;
         }
 
-        if (!AcpiMcfg.TryGetInfo(out AcpiMcfg.McfgInfo mcfg))
+        if (AcpiMcfg.TryGetInfo(out AcpiMcfg.McfgInfo mcfg))
         {
-            Serial.WriteString("[ARM64HAL] No MCFG entry: no PCI host node published\n");
+            Serial.WriteString("[ARM64HAL] Publishing the ECAM PCI host node...\n");
+            PciHostAccess host = PciHostAccess.ForEcam(mcfg.BaseAddress, mcfg.Segment, mcfg.StartBus, mcfg.EndBus);
+
+            // The window the node reports is the host's range, not the table's:
+            // the access ends its range at the last bus it could map.
+            ulong windowLength = (ulong)(host.EndBus - host.StartBus + 1) << EcamBusShift;
+            PlatformIdentity identity = new($"pci@{mcfg.BaseAddress:x}", ["pci-host-ecam-generic"]);
+            DeviceResource[] resources = [DeviceResource.MemoryWindow(mcfg.BaseAddress, windowLength)];
+            PlatformBus.Publish(identity, resources, [], host);
             return;
         }
 
-        Serial.WriteString("[ARM64HAL] Publishing the ECAM PCI host node...\n");
-        PciHostAccess host = PciHostAccess.ForEcam(mcfg.BaseAddress, mcfg.Segment, mcfg.StartBus, mcfg.EndBus);
+        DeviceTree? tree = BootFirmware.DeviceTree;
+        if (tree is not null && TryFindDeviceTreePciHost(tree, out ulong ecamBase, out ulong ecamLength, out byte firstBus, out byte lastBus))
+        {
+            Serial.WriteString("[ARM64HAL] Publishing the ECAM PCI host node from the device tree...\n");
 
-        // The window the node reports is the host's range, not the table's:
-        // the access ends its range at the last bus it could map.
-        ulong windowLength = (ulong)(host.EndBus - host.StartBus + 1) << EcamBusShift;
-        PlatformIdentity identity = new($"pci@{mcfg.BaseAddress:x}", ["pci-host-ecam-generic"]);
-        DeviceResource[] resources = [DeviceResource.MemoryWindow(mcfg.BaseAddress, windowLength)];
-        PlatformBus.Publish(identity, resources, [], host);
+            // Segment 0: the tree names none and linux,pci-domain is 0. The
+            // bus range is the smaller of bus-range and the buses the reg
+            // window holds, so the host's range differs from it only when
+            // ForEcam clamped it at a megabyte it could not map; the window
+            // compared is the one those buses span, not the reg length,
+            // which a narrower bus-range leaves partly unused.
+            PciHostAccess host = PciHostAccess.ForEcam(ecamBase, 0, firstBus, lastBus);
+            ulong requestedLength = (ulong)(lastBus - firstBus + 1) << EcamBusShift;
+            ulong windowLength = (ulong)(host.EndBus - host.StartBus + 1) << EcamBusShift;
+            if (windowLength != requestedLength)
+            {
+                Serial.WriteString($"[ARM64HAL] device tree ECAM window is 0x{requestedLength:X} bytes, the host maps 0x{windowLength:X}\n");
+            }
+
+            PlatformIdentity identity = new($"pci@{ecamBase:x}", ["pci-host-ecam-generic"]);
+            DeviceResource[] resources = [DeviceResource.MemoryWindow(ecamBase, windowLength)];
+            PlatformBus.Publish(identity, resources, [], host);
+            return;
+        }
+
+        Serial.WriteString("[ARM64HAL] No MCFG entry and no device tree PCI host: no PCI host node published\n");
+    }
+
+    /// <summary>
+    /// Finds the first enabled <c>pci-host-ecam-generic</c> child of the
+    /// tree's root with a reg window of at least one bus: its ECAM base
+    /// and length, and its bus range from <c>bus-range</c> (0 to 255
+    /// without the property), the last bus bounded by the buses the
+    /// window holds. Thread context; allocation-free (the skip lines are
+    /// written piece by piece).
+    /// </summary>
+    /// <param name="tree">The device tree.</param>
+    /// <param name="ecamBase">The ECAM window's physical base.</param>
+    /// <param name="ecamLength">The ECAM window's length in bytes.</param>
+    /// <param name="firstBus">The first bus the host decodes.</param>
+    /// <param name="lastBus">The last bus the host decodes.</param>
+    private static bool TryFindDeviceTreePciHost(DeviceTree tree, out ulong ecamBase, out ulong ecamLength, out byte firstBus, out byte lastBus)
+    {
+        ecamBase = 0;
+        ecamLength = 0;
+        firstBus = 0;
+        lastBus = 0;
+        bool more = tree.Root.TryGetFirstChild(out DeviceTreeNode node);
+        while (more)
+        {
+            if (node.IsCompatible("pci-host-ecam-generic") && !node.IsDisabled)
+            {
+                if (!node.TryReadReg(0, out ulong address, out ulong length))
+                {
+                    Serial.WriteString("[ARM64HAL] device tree PCI host without reg: skipped\n");
+                }
+                else if (length < EcamBusSize)
+                {
+                    Serial.WriteString("[ARM64HAL] device tree PCI host with a ");
+                    Serial.WriteNumber(length);
+                    Serial.WriteString(" byte window: skipped\n");
+                }
+                else
+                {
+                    if (!node.TryReadBusRange(out firstBus, out lastBus))
+                    {
+                        firstBus = 0;
+                        lastBus = byte.MaxValue;
+                    }
+
+                    // The reg length is the binding's own bound on the buses:
+                    // ForEcam clamps only when a megabyte cannot be mapped, and
+                    // past the window lies RAM the HHDM already maps.
+                    ulong windowBuses = length >> EcamBusShift;
+                    ulong windowLastBus = firstBus + windowBuses - 1;
+                    if (windowLastBus < lastBus)
+                    {
+                        lastBus = (byte)windowLastBus;
+                    }
+
+                    ecamBase = address;
+                    ecamLength = length;
+                    return true;
+                }
+            }
+
+            more = node.TryGetNextSibling(out DeviceTreeNode next);
+            node = next;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Publishes one "virtio,mmio" platform node per occupied virtio-mmio
+    /// slot, whatever the feature switches and whether or not ACPI
+    /// described anything: from the device tree's nodes when the
+    /// bootloader handed a tree over, else from the virt machine's
+    /// hardcoded window. A slot whose magic does not match or whose device
+    /// id reads 0 is empty and gets no node, whichever source named it;
+    /// the transport driver validates the slot again at bind time. Thread
+    /// context, interrupts disabled.
+    /// </summary>
+    private static void PublishVirtioMmioNodes()
+    {
+        DeviceTree? tree = BootFirmware.DeviceTree;
+        if (tree is null)
+        {
+            PublishVirtioMmioNodesFromTable();
+            return;
+        }
+
+        Serial.WriteString("[ARM64HAL] Publishing the virtio-mmio nodes from the device tree...\n");
+        bool more = tree.Root.TryGetFirstChild(out DeviceTreeNode node);
+        while (more)
+        {
+            if (node.IsCompatible("virtio,mmio") && !node.IsDisabled)
+            {
+                PublishVirtioMmioNodeFromTree(node);
+            }
+
+            more = node.TryGetNextSibling(out DeviceTreeNode next);
+            node = next;
+        }
+    }
+
+    /// <summary>
+    /// Publishes one <c>virtio,mmio</c> node of the device tree when its
+    /// slot is occupied: the window is Device-mapped before its registers
+    /// are read (a mapping already installed is a no-op, so the 32 slots
+    /// cost one), the magic and device id probed as the table path does,
+    /// and the GIC line taken from the first <c>interrupts</c> entry when
+    /// it is a routable SPI; the flags cell is read and ignored, every
+    /// routed line is programmed level-triggered. Thread context.
+    /// </summary>
+    /// <param name="node">The tree node.</param>
+    private static void PublishVirtioMmioNodeFromTree(DeviceTreeNode node)
+    {
+        if (!node.TryReadReg(0, out ulong address, out ulong size))
+        {
+            return;
+        }
+
+        if (!DeviceMapper.EnsureMapped(address))
+        {
+            Serial.WriteString($"[ARM64HAL] virtio_mmio@{address:x} not mapped: skipped\n");
+            return;
+        }
+
+        if (Native.MMIO.Read32(PhysToVirt(address + VirtioMmioMagicRegister)) != VirtioMmioMagic)
+        {
+            return;
+        }
+
+        if (Native.MMIO.Read32(PhysToVirt(address + VirtioMmioDeviceIdRegister)) == 0)
+        {
+            return;
+        }
+
+        InterruptSource[] interrupts;
+        if (node.TryReadInterrupt(0, out uint type, out uint number, out uint flags))
+        {
+            // The number is bounded before GicSpiBase is added, so a huge
+            // number cannot wrap into an SGI or PPI INTID.
+            if (type == DeviceTreeFormat.GicSpiType && number <= GicLineRouting.LastTableLine - DeviceTreeFormat.GicSpiBase)
+            {
+                interrupts = [new PlatformLineInterruptSource(DeviceTreeFormat.GicSpiBase + number, GicLineRouting.Instance)];
+            }
+            else
+            {
+                interrupts = [];
+                Serial.WriteString($"[ARM64HAL] virtio_mmio@{address:x}: interrupt type {type} number {number} flags {flags} is not a routable SPI, published without a line\n");
+            }
+        }
+        else
+        {
+            interrupts = [];
+            Serial.WriteString($"[ARM64HAL] virtio_mmio@{address:x}: no interrupts property, published without a line\n");
+        }
+
+        PlatformIdentity identity = new($"virtio_mmio@{address:x}", ["virtio,mmio"]);
+        DeviceResource[] resources = [DeviceResource.MemoryWindow(address, size)];
+        PlatformBus.Publish(identity, resources, interrupts, null);
     }
 
     /// <summary>
     /// Publishes one "virtio,mmio" platform node per occupied slot of the
-    /// virt machine's virtio-mmio window, whatever the feature switches and
-    /// whether or not ACPI described anything: the slot's register window
-    /// and its GIC line, routed through <see cref="GicLineRouting"/>. A
-    /// slot whose magic does not match or whose device id reads 0 is empty
-    /// and gets no node; the transport driver validates the slot again at
-    /// bind time. Thread context, interrupts disabled.
+    /// virt machine's virtio-mmio window, the hardcoded table used when no
+    /// device tree was handed over: the slot's register window and its GIC
+    /// line, routed through <see cref="GicLineRouting"/>. A slot whose
+    /// magic does not match or whose device id reads 0 is empty and gets
+    /// no node. Thread context, interrupts disabled.
     /// </summary>
-    private static void PublishVirtioMmioNodes()
+    private static void PublishVirtioMmioNodesFromTable()
     {
         // The window is Device-mapped before its registers are read (the
         // HHDM alias of an unmapped device address faults); this is the one

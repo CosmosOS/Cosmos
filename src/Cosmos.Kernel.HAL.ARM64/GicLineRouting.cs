@@ -17,7 +17,7 @@ namespace Cosmos.Kernel.HAL.ARM64;
 internal sealed class GicLineRouting : PlatformLineRouting
 {
     /// <summary>The highest line the dense handler table holds: 256 slots, indexed by the INTID itself on ARM64.</summary>
-    private const uint LastTableLine = 255;
+    internal const uint LastTableLine = 255;
 
     /// <summary>The GIC priority every routed line gets: the middle of the range, the same the virtio lines had.</summary>
     private const byte MediumPriority = 0x80;

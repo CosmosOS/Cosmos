@@ -17,10 +17,18 @@
        and input binding are covered on each transport.
 
        The arm64 PCI cell is the one that earns its keep: it is the only place
-       the PCI transport meets a non-LAPIC MSI backend (GICv3 ITS). -->
+       the PCI transport meets a non-LAPIC MSI backend (GICv3 ITS).
+
+       Each profile is also run with the acpi-off modifier: on arm64 that is
+       the one boot on which the bootloader hands over a device tree, so the
+       ECAM host and the virtio-mmio slots the machine description publishes
+       from it are proven here, with the transports' polled mode for the PCI
+       cell (no ITS without ACPI); on x64 acpi=off leaves the MADT in place
+       and the cell differs from the plain one by the discovery tables alone. -->
   <ItemGroup>
     <CosmosTestProfile Include="virtio-pci" />
     <CosmosTestProfile Include="virtio-mmio" />
+    <CosmosTestModifier Include="acpi-off" />
   </ItemGroup>
 
   <!-- Core kernel packages (using project references for development) -->

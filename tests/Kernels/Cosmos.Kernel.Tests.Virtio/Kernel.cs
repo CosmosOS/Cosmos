@@ -1,7 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Build.API.Enum;
 using Cosmos.Kernel.Drivers;
+using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
@@ -35,9 +37,11 @@ namespace Cosmos.Kernel.Tests.Virtio;
 /// </para>
 /// <para>
 /// The kernel holds an <c>InternalsVisibleTo</c> grant from
-/// <c>Cosmos.Kernel.HAL</c> for one purpose: reaching a node's binding state
+/// <c>Cosmos.Kernel.HAL</c> for two purposes: reaching a node's binding state
 /// through <see cref="DriverEngine.Nodes"/>, for the flags
-/// <see cref="VirtioNetState"/> records and no diagnostic snapshot carries.
+/// <see cref="VirtioNetState"/> records and no diagnostic snapshot carries,
+/// and reading <see cref="PlatformHAL.Architecture"/> for the one cell whose
+/// interrupt mode depends on it.
 /// </para>
 /// </summary>
 public class Kernel : Sys.Kernel
@@ -118,7 +122,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Net_DeviceReady", TestNet_DeviceReady);
         TR.Run("Net_LinkUp", TestNet_LinkUp);
         TR.Run("Net_MacAddressProgrammed", TestNet_MacAddressProgrammed);
-        TR.Run("Net_InterruptConnected", TestNet_InterruptConnected);
+        TR.Run("Net_InterruptModeMatchesCell", TestNet_InterruptModeMatchesCell);
 
         // ==================== Input ====================
         TR.Run("Input_KeyboardBound", TestInput_KeyboardBound);
@@ -234,21 +238,35 @@ public class Kernel : Sys.Kernel
         Assert.False(mac.Equals(MACAddress.None), "MAC address read from device config should not be all zeros");
     }
 
-    // Every cell routes one wake for the receive queue: MSI-X over PCI (the
-    // LAPIC on x64, the GICv3 ITS on arm64, which is why the PCI cells set
-    // gic-version=3) and the GIC line over MMIO. A driver that fell back to
-    // the periodic drain would still pass every other test here, so the
-    // flags are read off the binding's state.
-    private static void TestNet_InterruptConnected()
+    // Every cell routes one wake for the receive queue but the arm64 PCI cell
+    // under acpi-off: there the GIC comes up on the virt defaults without an
+    // ITS, the transport publishes the device with no message entry, and the
+    // driver falls back to the periodic drain. Over MMIO the GIC line routes
+    // with or without ACPI; on x64 the LAPIC does too (acpi=off leaves the
+    // MADT in place). A driver on the wrong side of that line passes every
+    // other test here, so the flags are read off the binding's state.
+    private static void TestNet_InterruptModeMatchesCell()
     {
         if (!TryGetNetState(out VirtioNetState? state))
         {
             return;
         }
 
-        Assert.True(state.HasInterrupt, "the receive queue's source should be connected on every cell");
-        Assert.False(state.IsPolling, "a driver with an interrupt should not run the periodic drain");
+        if (ExpectsInterrupt())
+        {
+            Assert.True(state.HasInterrupt, "the receive queue's source should be connected on this cell");
+            Assert.False(state.IsPolling, "a driver with an interrupt should not run the periodic drain");
+        }
+        else
+        {
+            Assert.False(state.HasInterrupt, "the receive queue's source cannot be routed on this cell");
+            Assert.True(state.IsPolling, "a driver without an interrupt should run the periodic drain");
+        }
     }
+
+    /// <summary>True on every cell but the arm64 PCI cell under acpi-off.</summary>
+    private static bool ExpectsInterrupt() =>
+        PlatformHAL.Architecture != PlatformArchitecture.ARM64 || !s_isPciCell || !TR.ProfileContains("acpi-off");
 
     // ==================== Input ====================
     //
