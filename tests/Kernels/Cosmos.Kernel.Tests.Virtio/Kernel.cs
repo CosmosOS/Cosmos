@@ -9,6 +9,7 @@ using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
+using Cosmos.Kernel.System.Storage;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -17,12 +18,13 @@ namespace Cosmos.Kernel.Tests.Virtio;
 
 /// <summary>
 /// Covers virtio device binding through the driver kit over both
-/// transports. The suite's profiles attach a virtio NIC, keyboard and mouse
-/// on every cell, so the bind tests are unconditional: if a device is
+/// transports. The suite's profiles attach a virtio NIC, keyboard, mouse and
+/// disk on every cell, so the bind tests are unconditional: if a device is
 /// missing, that is the regression this suite exists to catch, not an
 /// environment condition. Every assertion reads <see cref="DriverInfo"/>,
-/// the ring's <see cref="NetworkManager"/> or the state a binding holds,
-/// never the serial log.
+/// the ring's <see cref="NetworkManager"/>, the ring's
+/// <see cref="StorageManager"/> or the state a binding holds, never the
+/// serial log.
 /// <para>
 /// Which transport a cell presents is a property of the QEMU profile, not of
 /// the architecture: x64 runs PCI only (q35 has no virtio-mmio window) while
@@ -32,8 +34,9 @@ namespace Cosmos.Kernel.Tests.Virtio;
 /// <see cref="VirtioPciTransportDriver"/>, on an MMIO cell the platform slot
 /// by <see cref="VirtioMmioTransportDriver"/>, and either publishes one
 /// virtio node per device whose path names the transport. The leaf drivers,
-/// <see cref="VirtioNetDriver"/> and <see cref="VirtioInputDriver"/>, bind
-/// that node the same way on both, which is what the shared tests prove.
+/// <see cref="VirtioNetDriver"/>, <see cref="VirtioInputDriver"/> and
+/// <see cref="VirtioBlkDriver"/>, bind that node the same way on both,
+/// which is what the shared tests prove.
 /// </para>
 /// <para>
 /// The kernel holds an <c>InternalsVisibleTo</c> grant from
@@ -46,8 +49,8 @@ namespace Cosmos.Kernel.Tests.Virtio;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 net, 2 input, 2 PCI transport, 2 MMIO transport.</summary>
-    private const int ExpectedTestCount = 12;
+    /// <summary>Total tests: 6 net, 2 input, 2 block, 2 PCI transport, 2 MMIO transport.</summary>
+    private const int ExpectedTestCount = 14;
 
     /// <summary>Reason surfaced for the PCI transport tests when the cell runs virtio over MMIO.</summary>
     private const string SkipNotPci = "this cell presents virtio over MMIO";
@@ -69,6 +72,18 @@ public class Kernel : Sys.Kernel
 
     /// <summary>Start of a virtio node's description for an input device (type 18).</summary>
     private const string InputDescriptionPrefix = "type 18 ";
+
+    /// <summary>Start of a virtio node's description for a block device (type 2); the trailing space keeps type 2x out.</summary>
+    private const string BlockDescriptionPrefix = "type 2 ";
+
+    /// <summary>Start of a function node's description for a modern virtio-blk function (vendor 1af4, device 0x1040 + 2).</summary>
+    private const string ModernBlockFunctionPrefix = "1af4:1042";
+
+    /// <summary>Start of a function node's description for a transitional virtio-blk function (vendor 1af4, legacy device id 0x1001).</summary>
+    private const string TransitionalBlockFunctionPrefix = "1af4:1001";
+
+    /// <summary>The name <see cref="VirtioBlkDriver"/> gives the first disk it publishes.</summary>
+    private const string BlockDeviceName = "vblk0";
 
     /// <summary>Start of a function node's description for a modern virtio-net function (vendor 1af4, device 0x1040 + 1).</summary>
     private const string ModernNetFunctionPrefix = "1af4:1041";
@@ -102,6 +117,7 @@ public class Kernel : Sys.Kernel
     // its node, and nothing here retracts a node between tests.
     private static string? s_netPath;
     private static string[] s_inputPaths = [];
+    private static string? s_blkPath;
     private static string? s_pciFunctionPath;
 
     /// <inheritdoc/>
@@ -113,6 +129,7 @@ public class Kernel : Sys.Kernel
 
         s_netPath = FindNodePath(VirtioBusName, NetDescriptionPrefix);
         s_inputPaths = FindInputPaths();
+        s_blkPath = FindNodePath(VirtioBusName, BlockDescriptionPrefix);
         s_pciFunctionPath = FindNodePath(PciBusName, ModernNetFunctionPrefix) ?? FindNodePath(PciBusName, TransitionalNetFunctionPrefix);
         s_isPciCell = s_pciFunctionPath is not null;
 
@@ -127,6 +144,10 @@ public class Kernel : Sys.Kernel
         // ==================== Input ====================
         TR.Run("Input_KeyboardBound", TestInput_KeyboardBound);
         TR.Run("Input_MouseBound", TestInput_MouseBound);
+
+        // ==================== Block ====================
+        TR.Run("Blk_DriverBound", TestBlk_DriverBound);
+        TR.Run("Blk_TransportMatchesCell", TestBlk_TransportMatchesCell);
 
         // ==================== PCI transport ====================
         TR.RunIf(s_isPciCell, "Pci_FunctionBoundByTransport", TestPci_FunctionBoundByTransport, SkipNotPci);
@@ -284,6 +305,70 @@ public class Kernel : Sys.Kernel
     private static void TestInput_MouseBound()
     {
         AssertInputBound(PublishedDeviceKind.Pointer, "pointer");
+    }
+
+    // ==================== Block ====================
+    //
+    // Both profiles attach one virtio-blk disk. The shipped
+    // VirtioBlkDriver binds the type 2 node under either transport and
+    // publishes the disk, which the ring's storage manager registers; the
+    // block-device assertions run in the Storage suite, these two pin the
+    // binding and the transport.
+
+    private static void TestBlk_DriverBound()
+    {
+        if (!TryGetBlkNode(out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        Log.WriteString("[Test] Blk node: ");
+        Log.WriteString(path);
+        Log.WriteString("\n");
+
+        Assert.True(info.State == DeviceNodeState.Bound, "the virtio-blk node should be bound");
+        Assert.True(info.DriverName == nameof(VirtioBlkDriver), "VirtioBlkDriver should hold the virtio-blk node");
+        Assert.Equal(1, info.PublishedDeviceCount, "the driver should publish one block device for the node");
+
+        int deviceIndex = FindDeviceIndex(PublishedDeviceKind.Block, path);
+        Assert.True(deviceIndex >= 0, "the virtio-blk disk should be in the published list as a block device");
+        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.Name == BlockDeviceName, "the first virtio-blk disk should be named " + BlockDeviceName + ": " + device.Name);
+            Assert.True(device.IsConsumed, "the ring's storage manager should have taken the disk");
+            Assert.False(device.IsWithdrawn, "the disk should not be withdrawn");
+        }
+
+        Assert.Equal(1, StorageManager.DeviceCount, "the storage manager should hold the virtio-blk disk and nothing else");
+    }
+
+    // The same cross-check as the NIC's, for the disk: its node names the
+    // transport the cell presents, and on the PCI cell the disk's function
+    // is held by the PCI transport with the one virtio node beneath.
+    private static void TestBlk_TransportMatchesCell()
+    {
+        if (!TryGetBlkNode(out string? path, out _))
+        {
+            return;
+        }
+
+        string expected = s_isPciCell ? PciPathPrefix : MmioPathPrefix;
+        Assert.True(path.StartsWith(expected, StringComparison.Ordinal), "the virtio-blk node's path should name the transport this cell presents: " + path);
+        if (!s_isPciCell)
+        {
+            return;
+        }
+
+        string? functionPath = FindNodePath(PciBusName, TransitionalBlockFunctionPrefix) ?? FindNodePath(PciBusName, ModernBlockFunctionPrefix);
+        if (functionPath is null || !TryFindNode(functionPath, out DeviceNodeInfo function))
+        {
+            Assert.Fail("a virtio-blk function should be on the PCI bus on this cell");
+            return;
+        }
+
+        Assert.True(function.State == DeviceNodeState.Bound, "the virtio-blk function should be bound");
+        Assert.True(function.DriverName == nameof(VirtioPciTransportDriver), "VirtioPciTransportDriver should hold the virtio-blk function");
+        Assert.Equal(TransportChildCount, function.ChildCount, "the transport should publish one virtio node for the function");
     }
 
     // ==================== PCI transport ====================
@@ -471,6 +556,23 @@ public class Kernel : Sys.Kernel
         if (path is null || !TryFindNode(path, out info))
         {
             Assert.Fail("no virtio-net node was found by BeforeRun");
+            info = default;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>Hands back the virtio-blk node's path and a fresh snapshot of it, or fails the test when BeforeRun found none.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private static bool TryGetBlkNode([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    {
+        path = s_blkPath;
+        if (path is null || !TryFindNode(path, out info))
+        {
+            Assert.Fail("no virtio-blk node was found by BeforeRun");
             info = default;
             return false;
         }

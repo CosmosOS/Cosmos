@@ -14,14 +14,16 @@
     the applicable modifiers, so each added modifier roughly doubles a
     profile's cells (mutually exclusive ones like gicv2/gicv3 don't
     combine, and arch-filtered ones drop out on the wrong arch). For this
-    suite that means: x64 = 3 profiles x {bare, acpi-off} = 6 cells;
-    arm64 = 3 profiles x {bare, gicv2, gicv3, acpi-off, gicv2+acpi-off,
-    gicv3+acpi-off} = 18 cells. Budget CI timeouts accordingly.
+    suite that means: x64 = 4 profiles x {bare, acpi-off} = 8 cells;
+    arm64 = 5 profiles x {bare, gicv2, gicv3, acpi-off, gicv2+acpi-off,
+    gicv3+acpi-off} = 30 cells. Budget CI timeouts accordingly.
   -->
   <ItemGroup>
     <CosmosTestProfile Include="ahci" />
     <CosmosTestProfile Include="nvme" />
     <CosmosTestProfile Include="usb" />
+    <CosmosTestProfile Include="virtio-blk-pci" />
+    <CosmosTestProfile Include="virtio-blk-mmio" />
     <CosmosTestModifier Include="gicv2" />
     <CosmosTestModifier Include="gicv3" />
     <CosmosTestModifier Include="acpi-off" />

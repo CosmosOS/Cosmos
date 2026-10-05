@@ -73,11 +73,13 @@
       // (1af4:1001) on the root bus, which the kit's PCI transport binds;
       // VirtioBlkDriver binds the virtio node beneath and publishes the
       // disk as vblk0, and the storage manager registers and scans it
-      // inside the probe. The Drivers suite's virtio-blk group runs on it,
-      // over the driver that suite's library writes on the public seam. No
-      // machineOptions: the GIC version is the modifiers' business, and
-      // the Drivers suite's arm64 cell runs the default GICv2 without an
-      // ITS, so the driver polls there.
+      // inside the probe. The driver was written in the Drivers suite's
+      // library over the public seam and promoted unchanged, so this cell is
+      // the standing proof that a third party's block driver runs the same
+      // block-device, partition and reboot assertions as the shipped ones.
+      // No machineOptions: the GIC version is the modifiers' business, so
+      // the arm64 cells cover the polled path (default GICv2, no ITS) and
+      // the message interrupt path (gicv3) both.
       "name": "virtio-blk-pci",
       "architectures": ["x64", "arm64"],
       "disks": [
@@ -173,8 +175,9 @@
     },
     {
       // Every virtio device kind the kernel has a driver for, over PCI.
-      // Exercises capability parsing, MSI-X setup and driver binding for both
-      // the network and input paths. Runs on both arches: q35 has no
+      // Exercises capability parsing, MSI-X setup and driver binding for the
+      // network and input paths, and the block path through VirtioBlkDriver's
+      // disk, vblk0. Runs on both arches: q35 has no
       // virtio-mmio window at all, and the arm64 virt machine has a PCIe host
       // bridge alongside its MMIO one, so this is the same hardware shape in
       // both columns.
@@ -188,7 +191,10 @@
       "machineOptions": { "arm64": { "gic-version": "3" } },
       "nic": "virtio-net-pci",
       "keyboard": "virtio-keyboard-pci",
-      "mouse": "virtio-mouse-pci"
+      "mouse": "virtio-mouse-pci",
+      "disks": [
+        { "type": "virtio-blk" }
+      ]
     },
     {
       // The same device set over the virt machine's virtio-mmio window, so
@@ -197,7 +203,10 @@
       "architectures": ["arm64"],
       "nic": "virtio-net-device",
       "keyboard": "virtio-keyboard-device",
-      "mouse": "virtio-mouse-device"
+      "mouse": "virtio-mouse-device",
+      "disks": [
+        { "type": "virtio-blk-mmio" }
+      ]
     }
   ],
   "modifiers": [

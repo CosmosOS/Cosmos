@@ -8,7 +8,7 @@ using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Virtio;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
-namespace Cosmos.Kernel.Tests.Drivers.Library;
+namespace Cosmos.Kernel.Drivers;
 
 /// <summary>
 /// The disk <see cref="VirtioBlkDriver"/> publishes: <c>vblk&lt;n&gt;</c>

@@ -2,7 +2,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Kernel.Tests.Drivers.Library;
+namespace Cosmos.Kernel.Drivers;
 
 /// <summary>
 /// The constants of the virtio block device (virtio 1.x section 5.2) as the

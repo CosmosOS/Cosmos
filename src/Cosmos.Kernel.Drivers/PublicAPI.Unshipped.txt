@@ -128,6 +128,28 @@ Cosmos.Kernel.Drivers.UsbMassStorageUnit.Product.get -> string!
 Cosmos.Kernel.Drivers.UsbMassStorageUnit.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
 Cosmos.Kernel.Drivers.UsbMassStorageUnit.Vendor.get -> string!
 Cosmos.Kernel.Drivers.UsbMassStorageUnit.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
+Cosmos.Kernel.Drivers.VirtioBlkDriver
+Cosmos.Kernel.Drivers.VirtioBlkDriver.VirtioBlkDriver() -> void
+Cosmos.Kernel.Drivers.VirtioBlkState
+Cosmos.Kernel.Drivers.VirtioBlkState.BlockCount.get -> ulong
+Cosmos.Kernel.Drivers.VirtioBlkState.BlockSize.get -> ulong
+Cosmos.Kernel.Drivers.VirtioBlkState.Flush() -> void
+Cosmos.Kernel.Drivers.VirtioBlkState.FlushNegotiated.get -> bool
+Cosmos.Kernel.Drivers.VirtioBlkState.HasInterrupt.get -> bool
+Cosmos.Kernel.Drivers.VirtioBlkState.Index.get -> uint
+Cosmos.Kernel.Drivers.VirtioBlkState.InterruptCount.get -> int
+Cosmos.Kernel.Drivers.VirtioBlkState.IsDetached.get -> bool
+Cosmos.Kernel.Drivers.VirtioBlkState.IsFaulted.get -> bool
+Cosmos.Kernel.Drivers.VirtioBlkState.IsPolling.get -> bool
+Cosmos.Kernel.Drivers.VirtioBlkState.IsReadOnly.get -> bool
+Cosmos.Kernel.Drivers.VirtioBlkState.MaxTransferBytes.get -> int
+Cosmos.Kernel.Drivers.VirtioBlkState.Name.get -> string!
+Cosmos.Kernel.Drivers.VirtioBlkState.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
+Cosmos.Kernel.Drivers.VirtioBlkState.RequestsCompleted.get -> int
+Cosmos.Kernel.Drivers.VirtioBlkState.RequestsSubmitted.get -> int
+Cosmos.Kernel.Drivers.VirtioBlkState.Timeouts.get -> int
+Cosmos.Kernel.Drivers.VirtioBlkState.Version1Negotiated.get -> bool
+Cosmos.Kernel.Drivers.VirtioBlkState.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
 Cosmos.Kernel.Drivers.VirtioGpuDriver
 Cosmos.Kernel.Drivers.VirtioGpuDriver.VirtioGpuDriver() -> void
 Cosmos.Kernel.Drivers.VirtioGpuState
@@ -273,6 +295,10 @@ override Cosmos.Kernel.Drivers.UsbMassStorageDriver.Matches.get -> System.ReadOn
 override Cosmos.Kernel.Drivers.UsbMassStorageDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.UsbMassStorageDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.UsbMassStorageDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.VirtioBlkDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.VirtioBlkDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.VirtioBlkDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.VirtioBlkDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.VirtioGpuDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.VirtioGpuDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.VirtioGpuDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void

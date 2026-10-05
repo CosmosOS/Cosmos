@@ -746,12 +746,13 @@ public class Kernel : Sys.Kernel
     // ==================== Profile ====================
 
     // The cell name encodes the controller it attached: ahci => sata*,
-    // nvme-* => nvme*, usb => usb*. Proves the driver that bound matches the
-    // cell's intent. Device names are unique per instance ("sata0",
-    // "nvme0n1", "usb0"), so only the driver prefix is pinned here.
+    // nvme-* => nvme*, usb => usb*, virtio-blk-* => vblk*. Proves the driver
+    // that bound matches the cell's intent. Device names are unique per
+    // instance ("sata0", "nvme0n1", "usb0", "vblk0"), so only the driver
+    // prefix is pinned here.
     private static void TestProfile_DeviceKindMatches()
     {
-        string expected = TR.ProfileHasPrefix("ahci") ? "sata" : TR.ProfileHasPrefix("usb") ? "usb" : "nvme";
+        string expected = TR.ProfileHasPrefix("ahci") ? "sata" : TR.ProfileHasPrefix("usb") ? "usb" : TR.ProfileHasPrefix("virtio-blk") ? "vblk" : "nvme";
         Assert.True(HasOrdinalPrefix(s_dev!.Name, expected),
             "device name does not match the cell's controller kind");
     }
@@ -763,7 +764,7 @@ public class Kernel : Sys.Kernel
     // manager's boot-time walk over the HAL controllers.
     private static void TestManager_DeviceListedInDriverInfo()
     {
-        string expectedDriver = TR.ProfileHasPrefix("ahci") ? nameof(AhciDriver) : TR.ProfileHasPrefix("usb") ? nameof(UsbMassStorageDriver) : nameof(NvmeDriver);
+        string expectedDriver = TR.ProfileHasPrefix("ahci") ? nameof(AhciDriver) : TR.ProfileHasPrefix("usb") ? nameof(UsbMassStorageDriver) : TR.ProfileHasPrefix("virtio-blk") ? nameof(VirtioBlkDriver) : nameof(NvmeDriver);
         bool found = false;
         for (int i = 0; i < DriverInfo.DeviceCount; i++)
         {

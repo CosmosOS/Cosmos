@@ -50,7 +50,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// events the engine injects over QMP when a test asks; virt has no 8042
 /// and the group skips on arm64. The virtio-blk-pci cell (both arches) and
 /// the virtio-blk-mmio cell (arm64) attach one virtio-blk disk: the
-/// virtio-blk group proves the library's <see cref="VirtioBlkDriver"/>
+/// virtio-blk group proves the shipped <see cref="VirtioBlkDriver"/>
 /// over the kit's Virtio bus kind under either transport, publishing the
 /// disk to the ring's storage manager; the group skips on the other cells.
 /// </para>
@@ -424,8 +424,8 @@ public class Kernel : Sys.Kernel
         // ==================== virtio-blk ====================
         // The virtio-blk-pci and virtio-blk-mmio cells attach one virtio-blk disk;
         // bare and usb-kbd attach none and the group skips. The driver under test
-        // is the library's own in this commit and the shipped one after the
-        // promotion, over the same six assertions.
+        // is the shipped VirtioBlkDriver, written in this suite's library over
+        // the public seam and promoted with its namespace as the only change.
         _virtioBlkPath = FindVirtioBlkPath();
         bool hasVirtioBlk = _virtioBlkPath is not null;
         TR.RunIf(hasVirtioBlk, "VirtioBlk_Bound", TestVirtioBlkBound, SkipNoVirtioBlk);
@@ -1649,7 +1649,7 @@ public class Kernel : Sys.Kernel
     // ==================== virtio-blk ====================
     //
     // The kit's Virtio bus kind over the cell's virtio-blk disk, under the
-    // PCI transport or the virt machine's MMIO window: the library's driver
+    // PCI transport or the virt machine's MMIO window: the shipped driver
     // bound and its disk consumed by the ring's storage manager, the
     // geometry of the engine's image, a round trip that crosses the
     // per-request bound, a flush, and the completion mode the transport

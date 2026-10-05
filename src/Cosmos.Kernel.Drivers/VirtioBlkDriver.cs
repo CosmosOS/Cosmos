@@ -4,7 +4,7 @@ using System;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Virtio;
 
-namespace Cosmos.Kernel.Tests.Drivers.Library;
+namespace Cosmos.Kernel.Drivers;
 
 /// <summary>
 /// The virtio block device over the driver kit: binds a virtio node of type
