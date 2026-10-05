@@ -24,8 +24,8 @@
     <!-- Package Metadata -->
     <PackageId>Cosmos.Kernel.Drivers</PackageId>
     <Title>Cosmos Kernel Drivers</Title>
-    <Description>The drivers Cosmos ships, written over the driver kit: the PCI host, E1000E, the virtio transports, virtio-net, virtio-input, the virtio-gpu and VMware SVGA II display drivers, the AHCI and NVMe storage drivers, and the xHCI host controller, USB hub, HID boot keyboard and USB mass storage drivers</Description>
-    <PackageTags>cosmos;kernel;drivers;pci;network;e1000e;virtio;virtio-gpu;vmware-svga;display;ahci;nvme;storage;usb;xhci;usb-hid;usb-storage</PackageTags>
+    <Description>The drivers Cosmos ships, written over the driver kit: the PCI host, E1000E, the virtio transports, virtio-net, virtio-input, the virtio-gpu and VMware SVGA II display drivers, the AHCI and NVMe storage drivers, the xHCI host controller, USB hub, HID boot keyboard and USB mass storage drivers, and the 8042 controller with the PS/2 keyboard and mouse drivers</Description>
+    <PackageTags>cosmos;kernel;drivers;pci;network;e1000e;virtio;virtio-gpu;vmware-svga;display;ahci;nvme;storage;usb;xhci;usb-hid;usb-storage;ps2;i8042;keyboard;mouse</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
 
     <!-- Held to the surface a third party gets: the layer analyzer treats it as a

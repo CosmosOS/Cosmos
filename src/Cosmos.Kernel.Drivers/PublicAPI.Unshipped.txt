@@ -36,6 +36,15 @@ Cosmos.Kernel.Drivers.E1000EState.LinkUp.get -> bool
 Cosmos.Kernel.Drivers.E1000EState.MacAddress.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
 Cosmos.Kernel.Drivers.E1000EState.Name.get -> string!
 Cosmos.Kernel.Drivers.E1000EState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
+Cosmos.Kernel.Drivers.I8042Driver
+Cosmos.Kernel.Drivers.I8042Driver.I8042Driver() -> void
+Cosmos.Kernel.Drivers.I8042State
+Cosmos.Kernel.Drivers.I8042State.AuxiliaryNode.get -> Cosmos.Kernel.HAL.DriverKit.DeviceNode?
+Cosmos.Kernel.Drivers.I8042State.BytesDelivered.get -> int
+Cosmos.Kernel.Drivers.I8042State.IsDualChannel.get -> bool
+Cosmos.Kernel.Drivers.I8042State.KeyboardNode.get -> Cosmos.Kernel.HAL.DriverKit.DeviceNode?
+Cosmos.Kernel.Drivers.I8042State.SpuriousInterrupts.get -> int
+Cosmos.Kernel.Drivers.I8042State.StrayBytes.get -> int
 Cosmos.Kernel.Drivers.NvmeDriver
 Cosmos.Kernel.Drivers.NvmeDriver.NvmeDriver() -> void
 Cosmos.Kernel.Drivers.NvmeNamespace
@@ -58,6 +67,29 @@ Cosmos.Kernel.Drivers.NvmeState.NamespaceCount.get -> int
 Cosmos.Kernel.Drivers.NvmeState.Timeouts.get -> int
 Cosmos.Kernel.Drivers.PciHostDriver
 Cosmos.Kernel.Drivers.PciHostDriver.PciHostDriver() -> void
+Cosmos.Kernel.Drivers.Ps2KeyboardDriver
+Cosmos.Kernel.Drivers.Ps2KeyboardDriver.Ps2KeyboardDriver() -> void
+Cosmos.Kernel.Drivers.Ps2KeyboardState
+Cosmos.Kernel.Drivers.Ps2KeyboardState.BytesReceived.get -> int
+Cosmos.Kernel.Drivers.Ps2KeyboardState.IdentityByte.get -> byte
+Cosmos.Kernel.Drivers.Ps2KeyboardState.IsAtKeyboard.get -> bool
+Cosmos.Kernel.Drivers.Ps2KeyboardState.KeyEvents.get -> int
+Cosmos.Kernel.Drivers.Ps2KeyboardState.LastLedAcknowledged.get -> bool
+Cosmos.Kernel.Drivers.Ps2KeyboardState.LastLedByte.get -> byte
+Cosmos.Kernel.Drivers.Ps2KeyboardState.LedWrites.get -> int
+Cosmos.Kernel.Drivers.Ps2KeyboardState.Name.get -> string!
+Cosmos.Kernel.Drivers.Ps2KeyboardState.SetLeds(Cosmos.Kernel.HAL.DriverKit.Devices.KeyboardLeds leds) -> void
+Cosmos.Kernel.Drivers.Ps2KeyboardState.Sink.get -> Cosmos.Kernel.HAL.DriverKit.Devices.KeyboardSink?
+Cosmos.Kernel.Drivers.Ps2MouseDriver
+Cosmos.Kernel.Drivers.Ps2MouseDriver.Ps2MouseDriver() -> void
+Cosmos.Kernel.Drivers.Ps2MouseState
+Cosmos.Kernel.Drivers.Ps2MouseState.BytesReceived.get -> int
+Cosmos.Kernel.Drivers.Ps2MouseState.HasWheel.get -> bool
+Cosmos.Kernel.Drivers.Ps2MouseState.Name.get -> string!
+Cosmos.Kernel.Drivers.Ps2MouseState.PacketBytes.get -> int
+Cosmos.Kernel.Drivers.Ps2MouseState.PacketsReported.get -> int
+Cosmos.Kernel.Drivers.Ps2MouseState.ResyncDrops.get -> int
+Cosmos.Kernel.Drivers.Ps2MouseState.Sink.get -> Cosmos.Kernel.HAL.DriverKit.Devices.PointerSink?
 Cosmos.Kernel.Drivers.UsbHubDriver
 Cosmos.Kernel.Drivers.UsbHubDriver.UsbHubDriver() -> void
 Cosmos.Kernel.Drivers.UsbHubState
@@ -201,6 +233,7 @@ Cosmos.Kernel.Drivers.XhciState.Version.get -> ushort
 [COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.ReadFifo(uint byteOffset) -> uint
 [COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.SetEnabled(bool enabled) -> void
 [COSMOS0003]Cosmos.Kernel.Drivers.ISvgaAdapter.Svga3DVersion.get -> uint
+const Cosmos.Kernel.Drivers.I8042Driver.CompatibleString = "pnp0303" -> string!
 override Cosmos.Kernel.Drivers.AhciDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.AhciDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.AhciDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
@@ -209,6 +242,12 @@ override Cosmos.Kernel.Drivers.E1000EDriver.Matches.get -> System.ReadOnlySpan<C
 override Cosmos.Kernel.Drivers.E1000EDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.E1000EDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.E1000EDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.I8042Driver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.I8042Driver.Name.get -> string!
+override Cosmos.Kernel.Drivers.I8042Driver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.I8042Driver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.I8042State.InterruptDriven.get -> bool
+override Cosmos.Kernel.Drivers.I8042State.PolledPeriodically.get -> bool
 override Cosmos.Kernel.Drivers.NvmeDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.NvmeDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.NvmeDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
@@ -216,6 +255,14 @@ override Cosmos.Kernel.Drivers.NvmeDriver.Probe(Cosmos.Kernel.HAL.DriverKit.Devi
 override Cosmos.Kernel.Drivers.PciHostDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.PciHostDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.PciHostDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.Ps2KeyboardDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.Ps2KeyboardDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.Ps2KeyboardDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.Ps2KeyboardDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.Ps2MouseDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.Ps2MouseDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.Ps2MouseDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.Ps2MouseDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.UsbHubDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.UsbHubDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.UsbHubDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult

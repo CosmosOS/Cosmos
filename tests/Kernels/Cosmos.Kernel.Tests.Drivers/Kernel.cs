@@ -200,6 +200,9 @@ public class Kernel : Sys.Kernel
     /// <summary>The 8042 node's path, asserted: the machine description names it.</summary>
     private const string I8042Path = "platform:i8042@60";
 
+    /// <summary>Resources the 8042's binding holds when both lines are routed: two port windows and two line handles; the lock is not counted.</summary>
+    private const int I8042InterruptDrivenHeldResources = 4;
+
     /// <summary>Skip reason of the PS/2 tests on a cell whose machine has no 8042.</summary>
     private const string SkipNo8042 = "no 8042 on this cell";
 
@@ -313,11 +316,12 @@ public class Kernel : Sys.Kernel
 
         // ==================== PS/2 ====================
         // q35 has an 8042 with a keyboard and a mouse built in, on both x64
-        // cells; virt has none and the group skips. No driver binds the
-        // node yet: the test proves the machine description publishes it.
+        // cells; virt has none and the group skips. The shipped 8042 driver
+        // binds the node at the driver stage and publishes a Ps2 node per
+        // port whose test passed.
         _i8042Path = FindI8042Path();
         bool has8042 = _i8042Path is not null;
-        TR.RunIf(has8042, "Ps2_ControllerNode_Published", TestPs2ControllerNodePublished, SkipNo8042);
+        TR.RunIf(has8042, "Ps2_Controller_Bound", TestPs2ControllerBound, SkipNo8042);
 
         TR.Finish();
 
@@ -1320,22 +1324,39 @@ public class Kernel : Sys.Kernel
 
     // ==================== PS/2 ====================
     //
-    // The 8042 node the x64 machine description publishes, read through
-    // DriverInfo like every other node.
+    // The 8042 node the x64 machine description publishes, bound by the
+    // shipped I8042Driver at the driver stage and read through DriverInfo
+    // like every other node. The leaf nodes under it are the keyboard and
+    // mouse drivers' business; the suite reads the controller's own state.
 
-    private void TestPs2ControllerNodePublished()
+    private void TestPs2ControllerBound()
     {
-        if (!TryGetI8042(out _, out DeviceNodeInfo info))
+        if (!TryGetI8042(out string? path, out DeviceNodeInfo info))
         {
             return;
         }
 
         Assert.True(info.Path == I8042Path, "the machine description names the controller platform:i8042@60");
+        Assert.True(info.State == DeviceNodeState.Bound, "the 8042 driver should hold the controller");
+        Assert.True(info.DriverName == nameof(I8042Driver), "I8042Driver should hold the controller");
         Assert.True(info.Description == I8042Description, "the node's one compatible string is pnp0303");
         Assert.Equal(2, info.ResourceCount, "the data port and the status and command port");
         Assert.Equal(2, info.InterruptCount, "lines 1 and 12");
-        Assert.True(info.State == DeviceNodeState.Unbound, "no driver binds the controller yet");
-        Assert.Equal(0, info.OfferCount, "no driver matches pnp0303 yet");
+        Assert.Equal(2, info.ChildCount, "q35's 8042 is dual channel and both ports pass");
+        Assert.Equal(0, info.PublishedDeviceCount, "the controller publishes nodes, not devices");
+
+        I8042State? state = FindDriverState<I8042State>(path);
+        Assert.NotNull(state);
+        if (state is null)
+        {
+            return;
+        }
+
+        Assert.True(state.IsDualChannel, "q35's 8042 has a second port");
+        Assert.True(state.InterruptDriven, "the I/O APIC routes lines 1 and 12 on q35");
+        Assert.False(state.PolledPeriodically, "a controller with both lines routed needs no periodic drain");
+        Assert.Equal(I8042InterruptDrivenHeldResources, info.HeldResourceCount, "two port windows and two line handles");
+        Assert.Equal(0, state.StrayBytes, "no byte should have arrived while the ports were between probes");
     }
 
     // ==================== Helpers ====================

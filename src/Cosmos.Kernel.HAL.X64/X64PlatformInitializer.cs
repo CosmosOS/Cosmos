@@ -15,7 +15,6 @@ using Cosmos.Kernel.HAL.DriverKit.Platform;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.X64.Devices.Clock;
-using Cosmos.Kernel.HAL.X64.Devices.Input;
 using Cosmos.Kernel.HAL.X64.Devices.Timer;
 
 namespace Cosmos.Kernel.HAL.X64;
@@ -63,7 +62,6 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
     private PIT? _pit;
     private RTC? _rtc;
-    private PS2Controller? _ps2Controller;
 
     public string PlatformName => "x86-64";
     public PlatformArchitecture Architecture => PlatformArchitecture.X64;
@@ -136,14 +134,6 @@ internal class X64PlatformInitializer : IPlatformInitializer
         _pit = new PIT();
         _pit.Initialize();
         _pit.RegisterIRQHandler();
-
-        // Initialize PS/2 Controller (if keyboard or mouse feature enabled)
-        if (CosmosFeatures.KeyboardEnabled || CosmosFeatures.MouseEnabled)
-        {
-            Serial.WriteString("[X64HAL] Initializing PS/2 controller...\n");
-            _ps2Controller = new PS2Controller();
-            _ps2Controller.Initialize();
-        }
     }
 
     /// <summary>
@@ -205,30 +195,6 @@ internal class X64PlatformInitializer : IPlatformInitializer
             _pit.Initialize();
         }
         return _pit;
-    }
-
-    public IKeyboardDevice[] GetKeyboardDevices()
-    {
-        if (!CosmosFeatures.KeyboardEnabled)
-        {
-            return [];
-        }
-
-        // PS/2 only: USB and virtio keyboards are kit drivers now,
-        // published to the keyboard consumer.
-        return _ps2Controller is not null ? PS2Controller.GetKeyboardDevices() : [];
-    }
-
-    public IMouseDevice[] GetMouseDevices()
-    {
-        if (!CosmosFeatures.MouseEnabled)
-        {
-            return [];
-        }
-
-        // PS/2 mice only: virtio input is a kit driver now, published to
-        // the pointer consumer.
-        return _ps2Controller is not null ? PS2Controller.GetMouseDevices() : [];
     }
 
     public unsafe uint GetCpuCount()

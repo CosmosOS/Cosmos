@@ -6,7 +6,6 @@ using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Interfaces;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Keyboard;
 using Cosmos.Kernel.System.Mouse;
@@ -39,28 +38,21 @@ internal class LibraryInitializer
             using (InternalCpu.DisableInterruptsScope())
             {
 
-                // Initialize Keyboard Manager and register platform keyboards
+                // Initialize Keyboard Manager; its consumer registers every
+                // keyboard a kit driver publishes (the PS/2, virtio and USB
+                // keyboards) once the driver stage runs.
                 if (KeyboardManager.IsEnabled)
                 {
                     Serial.WriteString("[KERNEL]   - Initializing keyboard manager...\n");
                     KeyboardManager.Initialize();
-                    IKeyboardDevice[] keyboards = initializer.GetKeyboardDevices();
-                    foreach (IKeyboardDevice keyboard in keyboards)
-                    {
-                        KeyboardManager.RegisterKeyboard(keyboard);
-                    }
                 }
 
-                // Initialize Mouse Manager and register mouse
+                // Initialize Mouse Manager; its consumer registers every
+                // pointer a kit driver publishes (the PS/2 and virtio mice).
                 if (MouseManager.IsEnabled)
                 {
                     Serial.WriteString("[KERNEL]   - Initializing mouse manager...\n");
                     MouseManager.Initialize();
-                    IMouseDevice[] mice = initializer.GetMouseDevices();
-                    foreach (IMouseDevice mouse in mice)
-                    {
-                        MouseManager.RegisterMouse(mouse);
-                    }
                 }
 
                 // Initialize Network Manager; its consumer registers every

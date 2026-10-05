@@ -253,25 +253,6 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         return _timer;
     }
 
-    public IKeyboardDevice[] GetKeyboardDevices()
-    {
-        if (!CosmosFeatures.KeyboardEnabled)
-        {
-            return [];
-        }
-
-        // The platform has no keyboard of its own: USB and virtio keyboards
-        // are kit drivers now, published to the keyboard consumer.
-        return [];
-    }
-
-    public IMouseDevice[] GetMouseDevices()
-    {
-        // The platform has no mouse of its own: virtio input is a kit
-        // driver now, published to the pointer consumer.
-        return [];
-    }
-
     public uint GetCpuCount()
     {
         // For now, single CPU on ARM64
