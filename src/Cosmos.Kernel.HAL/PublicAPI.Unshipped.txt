@@ -407,11 +407,15 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.FindCapability(byte capabilityId, byte after = 0) -> byte
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.InterruptLine.get -> byte
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.InterruptPin.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.IsHotPlugSlot.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.IsMsiXCapable.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.MessageInterruptCount.get -> int
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.ReadConfig16(ushort offset) -> ushort
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.ReadConfig32(ushort offset) -> uint
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.ReadConfig8(ushort offset) -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.SecondaryBus.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.SubordinateBus.get -> byte
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.TryDescribeChild(byte device, byte function, bool assignResources, out Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription description) -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.WriteConfig16(ushort offset, ushort value) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.WriteConfig32(ushort offset, uint value) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess.WriteConfig8(ushort offset, byte value) -> void
@@ -428,6 +432,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.Access.get -> Cosmos.Kernel.HAL.DriverKit.Pci.PciAccess!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.Identity.get -> Cosmos.Kernel.HAL.DriverKit.Pci.PciIdentity!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.Interrupts.get -> Cosmos.Kernel.HAL.DriverKit.InterruptSource![]!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.IsMultiFunction.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.PciFunctionDescription() -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciFunctionDescription.Resources.get -> Cosmos.Kernel.HAL.DriverKit.DeviceResource[]!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Pci.PciHostAccess

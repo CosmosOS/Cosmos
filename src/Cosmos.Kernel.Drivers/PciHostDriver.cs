@@ -12,7 +12,9 @@ namespace Cosmos.Kernel.Drivers;
 /// window from MCFG on ARM64) and publishes one child node per function it
 /// finds. The walk is the legacy scan's: the host's first bus, then every
 /// bus a PCI-to-PCI bridge leads to and, on the legacy host, every bus a
-/// host bridge function of device 00:00 roots, each bus once. The kit
+/// host bridge function of device 00:00 roots, each bus once. A PCI
+/// Express root port or downstream port with a hot-plug slot is published
+/// and its bus left to <c>PcieRootPortDriver</c>. The kit
 /// offers the children to the device drivers and retracts them with this
 /// node, so the driver keeps no per-device state and has no detach work.
 /// <see cref="Probe"/> runs in thread context on the kit worker.
@@ -151,6 +153,14 @@ public sealed class PciHostDriver : Driver
 
         if (identity.Subclass == PciToPciBridgeSubclass && identity.HeaderType == PciToPciBridgeHeaderType)
         {
+            if (description.Access.IsHotPlugSlot)
+            {
+                // The bus behind a hot-plug slot belongs to the slot's driver, which
+                // describes and publishes what sits there at boot and on every arrival
+                // and places the registers of a function firmware never saw.
+                return;
+            }
+
             byte secondary = host.ReadConfig8(identity.Bus, identity.Device, identity.Function, SecondaryBusOffset);
             QueueBus(host, visited, pending, ref pendingCount, secondary);
         }

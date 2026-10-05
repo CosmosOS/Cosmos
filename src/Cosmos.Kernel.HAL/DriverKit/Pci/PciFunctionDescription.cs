@@ -5,20 +5,23 @@ using System.Diagnostics.CodeAnalysis;
 namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 
 /// <summary>
-/// Everything a PCI host driver publishes for one function, as
-/// <see cref="PciHostAccess.TryDescribeFunction"/> read it: the arguments
-/// of <see cref="DeviceBinding.PublishChild"/>, in order. A default
-/// instance, which the describe returns with false, holds nothing.
+/// Everything a PCI host or bridge driver publishes for one function, as
+/// <see cref="PciHostAccess.TryDescribeFunction"/> or
+/// <see cref="PciAccess.TryDescribeChild"/> read it: the arguments of
+/// <see cref="DeviceBinding.PublishChild"/>, in order, and whether the
+/// device has functions beyond 0. A default instance, which the describe
+/// returns with false, holds nothing.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct PciFunctionDescription
 {
-    internal PciFunctionDescription(PciIdentity identity, DeviceResource[] resources, InterruptSource[] interrupts, PciAccess access)
+    internal PciFunctionDescription(PciIdentity identity, DeviceResource[] resources, InterruptSource[] interrupts, PciAccess access, bool isMultiFunction)
     {
         Identity = identity;
         Resources = resources;
         Interrupts = interrupts;
         Access = access;
+        IsMultiFunction = isMultiFunction;
     }
 
     /// <summary>The function's identity.</summary>
@@ -34,4 +37,7 @@ public readonly struct PciFunctionDescription
 
     /// <summary>The access object of the function's node.</summary>
     public PciAccess Access { get; }
+
+    /// <summary>True when the header type register's bit 7 was set at describe time: the device implements functions beyond 0, which a walk of its bus describes too. Any context; allocation-free.</summary>
+    public bool IsMultiFunction { get; }
 }

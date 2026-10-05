@@ -15,8 +15,12 @@ namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 /// and disabled), quiesced again after each probe that did not bind, before
 /// the probe's memory is freed, restored as firmware left it when nobody
 /// binds, and quiesced once more after a binding is torn down. A bound
-/// driver owns the state from its probe on and enables what it needs. Any
-/// context; allocation-free.
+/// driver owns the state from its probe on and enables what it needs. For
+/// a bridge it also carries the secondary and subordinate bus and, for a
+/// hot-plug slot, the describe of the functions behind it with the kit's
+/// one resource assignment. Any context and allocation-free except
+/// <see cref="TryDescribeChild"/>, which is thread context and allocates
+/// the description.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class PciAccess : INodeHooks
@@ -58,7 +62,34 @@ public sealed class PciAccess : INodeHooks
     /// <summary>Message Control bits 10:0: table size minus one.</summary>
     private const ushort MsiXTableSizeMask = 0x07FF;
 
+    /// <summary>Header layout of a PCI-to-PCI bridge.</summary>
+    private const byte BridgeHeaderType = 1;
+    /// <summary>Secondary bus number offset of a type 1 header.</summary>
+    private const ushort SecondaryBusOffset = 0x19;
+    /// <summary>Subordinate bus number offset of a type 1 header.</summary>
+    private const ushort SubordinateBusOffset = 0x1A;
+    /// <summary>The PCI Express capability id.</summary>
+    private const byte ExpressCapabilityId = 0x10;
+    /// <summary>Offset of PCI Express Capabilities within the capability.</summary>
+    private const ushort ExpressCapabilitiesOffset = 0x02;
+    /// <summary>Shift down to the Device/Port Type field (bits 7:4) of PCI Express Capabilities.</summary>
+    private const int ExpressPortTypeShift = 4;
+    /// <summary>Mask of the Device/Port Type field after shifting.</summary>
+    private const int ExpressPortTypeMask = 0xF;
+    /// <summary>Device/Port Type of a root port.</summary>
+    private const int ExpressRootPort = 4;
+    /// <summary>Device/Port Type of a switch's downstream port.</summary>
+    private const int ExpressDownstreamPort = 6;
+    /// <summary>PCI Express Capabilities bit 8: Slot Implemented.</summary>
+    private const ushort ExpressSlotImplemented = 0x0100;
+    /// <summary>Offset of Slot Capabilities within the capability.</summary>
+    private const ushort ExpressSlotCapabilitiesOffset = 0x14;
+    /// <summary>Slot Capabilities bit 6: Hot-Plug Capable.</summary>
+    private const uint ExpressSlotHotPlugCapable = 0x40;
+
     private readonly PciConfigSpace _configSpace;
+    private readonly ushort _segment;
+    private readonly byte _lastBus;
     private readonly byte _bus;
     private readonly byte _device;
     private readonly byte _function;
@@ -66,13 +97,17 @@ public sealed class PciAccess : INodeHooks
     private readonly PciBar[] _bars;
     private readonly byte _msiXCapability;
     private readonly int _messageInterruptCount;
+    private readonly bool _isHotPlugSlot;
+    private PciBridgeWindows? _childWindows;
     private ushort _savedCommand;
     private ushort _savedMessageControl;
     private bool _hasSnapshot;
 
-    internal PciAccess(PciConfigSpace configSpace, byte bus, byte device, byte function, byte headerType, PciBar[] bars, byte interruptLine, byte interruptPin)
+    internal PciAccess(PciConfigSpace configSpace, ushort segment, byte lastBus, byte bus, byte device, byte function, byte headerType, PciBar[] bars, byte interruptLine, byte interruptPin)
     {
         _configSpace = configSpace;
+        _segment = segment;
+        _lastBus = lastBus;
         _bus = bus;
         _device = device;
         _function = function;
@@ -87,9 +122,10 @@ public sealed class PciAccess : INodeHooks
         MessageTable = _msiXCapability == 0
             ? null
             : new PciMessageTable(this, _msiXCapability, _messageInterruptCount);
+        _isHotPlugSlot = headerType == BridgeHeaderType && ReadIsHotPlugSlot();
     }
 
-    /// <summary>The six base address registers as the host sized them; the resource at the same index is the mappable form.</summary>
+    /// <summary>The six base address registers as the kit sized them (and, behind a hot-plug slot, placed them); the resource at the same index is the mappable form.</summary>
     public ReadOnlySpan<PciBar> Bars => _bars;
 
     /// <summary>The interrupt line register at 0x3C as firmware wrote it, read at describe time.</summary>
@@ -103,6 +139,28 @@ public sealed class PciAccess : INodeHooks
 
     /// <summary>The MSI-X table size (Message Control's table size plus one), or 0 without the capability.</summary>
     public int MessageInterruptCount => _messageInterruptCount;
+
+    /// <summary>
+    /// The secondary bus number of a type 1 header (a PCI-to-PCI bridge, a
+    /// root port), read live; 0 for any other header type. Any context;
+    /// allocation-free.
+    /// </summary>
+    public byte SecondaryBus => _headerType == BridgeHeaderType ? ReadConfig8(SecondaryBusOffset) : (byte)0;
+
+    /// <summary>
+    /// The subordinate bus number of a type 1 header (a PCI-to-PCI bridge,
+    /// a root port): the highest bus behind it, read live; 0 for any other
+    /// header type. Any context; allocation-free.
+    /// </summary>
+    public byte SubordinateBus => _headerType == BridgeHeaderType ? ReadConfig8(SubordinateBusOffset) : (byte)0;
+
+    /// <summary>
+    /// True for a PCI Express root port or downstream port that implements
+    /// a hot-plug capable slot: the host driver does not walk its secondary
+    /// bus, the port driver does. Decided once at describe time. Any
+    /// context; allocation-free.
+    /// </summary>
+    public bool IsHotPlugSlot => _isHotPlugSlot;
 
     /// <summary>The MSI-X table the kit programs for the function's message interrupt sources; null without the capability.</summary>
     internal PciMessageTable? MessageTable { get; }
@@ -213,6 +271,58 @@ public sealed class PciAccess : INodeHooks
         return 0;
     }
 
+    /// <summary>
+    /// Reads a function on this bridge's secondary bus and builds what the
+    /// bridge's driver publishes for it, exactly as the host's
+    /// <see cref="PciHostAccess.TryDescribeFunction"/> does; with
+    /// <paramref name="assignResources"/>, every implemented base address
+    /// register firmware or the kit did not assign is placed inside the
+    /// bridge's windows, the registers written and the function's memory
+    /// (and I/O when a port range was placed) decoding enabled. Describing
+    /// function 0 starts a new placement pass over the bridge's windows,
+    /// above every register firmware assigned to the device's other
+    /// functions; functions 1 to 7 continue above it. Thread context;
+    /// allocates the description.
+    /// </summary>
+    /// <param name="device">The device on the secondary bus, 0 to 31.</param>
+    /// <param name="function">The function, 0 to 7.</param>
+    /// <param name="assignResources">True to place the function's unassigned registers inside the bridge's windows.</param>
+    /// <param name="description">What to publish; default when nothing was described.</param>
+    /// <returns>
+    /// False when this is not a type 1 header, when <see cref="SecondaryBus"/>
+    /// is 0, at most this function's own bus, or above the host's last bus,
+    /// or when the vendor id reads 0xFFFF or 0x0000 (an empty or powered-off
+    /// slot).
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">The device or function number is too large.</exception>
+    /// <exception cref="InvalidOperationException">The caller is an interrupt handler.</exception>
+    public bool TryDescribeChild(byte device, byte function, bool assignResources, out PciFunctionDescription description)
+    {
+        InterruptContextGuard.ThrowIfInHandler(nameof(TryDescribeChild));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(device, PciConfigSpace.MaxDevice);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(function, PciConfigSpace.MaxFunction);
+        byte bus = SecondaryBus;
+        if (_headerType != BridgeHeaderType || bus == 0 || bus <= _bus || bus > _lastBus)
+        {
+            description = default;
+            return false;
+        }
+
+        PciBridgeWindows? windows = null;
+        if (assignResources)
+        {
+            if (function == 0 || _childWindows is null)
+            {
+                _childWindows = PciBridgeWindows.Read(this);
+                PciFunctionDescriber.NoteOtherFunctions(_configSpace, bus, device, function, _childWindows);
+            }
+
+            windows = _childWindows;
+        }
+
+        return PciFunctionDescriber.TryDescribe(_configSpace, _segment, _lastBus, bus, device, function, windows, out description);
+    }
+
     /// <summary>Turns bus mastering on or off: a read-modify-write of Command under the mechanism's lock. Any context; allocation-free.</summary>
     /// <param name="enable">True to let the function initiate DMA.</param>
     public void EnableBusMastering(bool enable) => UpdateCommand(CommandBusMaster, enable);
@@ -301,6 +411,35 @@ public sealed class PciAccess : INodeHooks
         {
             Quiesce();
         }
+    }
+
+    /// <summary>
+    /// Decides whether this type 1 header is a PCI Express root port or
+    /// downstream port with an implemented, hot-plug capable slot. From the
+    /// constructor, once.
+    /// </summary>
+    private bool ReadIsHotPlugSlot()
+    {
+        byte express = FindCapability(ExpressCapabilityId);
+        if (express == 0)
+        {
+            return false;
+        }
+
+        ushort capabilities = ReadConfig16((ushort)(express + ExpressCapabilitiesOffset));
+        int portType = (capabilities >> ExpressPortTypeShift) & ExpressPortTypeMask;
+        if (portType != ExpressRootPort && portType != ExpressDownstreamPort)
+        {
+            return false;
+        }
+
+        if ((capabilities & ExpressSlotImplemented) == 0)
+        {
+            return false;
+        }
+
+        uint slotCapabilities = ReadConfig32((ushort)(express + ExpressSlotCapabilitiesOffset));
+        return (slotCapabilities & ExpressSlotHotPlugCapable) != 0;
     }
 
     private ushort MessageControlOffset() => (ushort)(_msiXCapability + MsiXMessageControlOffset);

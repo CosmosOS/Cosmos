@@ -40,7 +40,7 @@ public class Kernel : Sys.Kernel
     private const string SkipNoHost = "no block device bound for partition-table tests";
 
     /// <summary>Total tests this suite reports per profile; the breakdown is at the TR.Start call site.</summary>
-    private const ushort ExpectedTestCount = 78;
+    private const ushort ExpectedTestCount = 83;
 
     /// <summary>Block devices the engine attaches per QEMU profile; any other count is a bind or double-registration regression.</summary>
     private const int AttachedDisksPerProfile = 1;
@@ -345,6 +345,12 @@ public class Kernel : Sys.Kernel
     /// <summary>Asks the engine to plug the stick back in, on the same image.</summary>
     private const string UsbPlugRequest = "usb-plug";
 
+    /// <summary>Asks the engine to pull the profile's hot-pluggable PCI disk out of its root port (see TR.RequestHost).</summary>
+    private const string PciUnplugRequest = "pci-unplug";
+
+    /// <summary>Asks the engine to plug the PCI disk back into its root port, on the same image.</summary>
+    private const string PciPlugRequest = "pci-plug";
+
     /// <summary>
     /// Longest wait for the hot-plug thread to follow a plug or an unplug.
     /// Well inside the engine's stall window: 10 s without a protocol
@@ -376,6 +382,12 @@ public class Kernel : Sys.Kernel
     /// <summary>The stick as it was before the unplug, for the cells that check what it left behind.</summary>
     private static UsbMassStorageUnit? s_unpluggedDisk;
 
+    /// <summary>The virtio-blk disk as it was before the PCI unplug, for the cells that check what it left behind.</summary>
+    private static VirtioBlkState? s_unpluggedPciDisk;
+
+    /// <summary>The virtio node path of the PCI disk before the unplug, which the replugged disk must come back under.</summary>
+    private static string? s_unpluggedPciNodePath;
+
     protected override void BeforeRun()
     {
         Serial.WriteString("[Storage] BeforeRun() reached!\n");
@@ -383,7 +395,7 @@ public class Kernel : Sys.Kernel
         // 3 manager + 1 boot-scan + 2 profile + 1 driver-info + 12 device
         // + 7 partition + 42 partition-lifecycle (MBR mutation, EBR chain,
         // PartitionManager, superfloppy) + 2 bounds probes + 2 mmio/pci
-        // + 5 USB hot-plug + 1 boot-reboot = 78 tests per profile.
+        // + 5 USB hot-plug + 5 PCI hot-plug + 1 boot-reboot = 83 tests per profile.
         TR.Start("Storage Block Device Tests", expectedTests: ExpectedTestCount);
 
         bool hasDevice = StorageManager.DeviceCount > 0;
@@ -567,13 +579,26 @@ public class Kernel : Sys.Kernel
         // monitor. After the block I/O and partition cells, so a hot-plug
         // regression cannot take them down; before the reboot cell, which
         // writes to whatever stick is plugged in by then.
-        string hotPlugSkip = HotPlugSkipReason();
+        string hotPlugSkip = UsbHotPlugSkipReason();
         bool hotPlug = hotPlugSkip.Length == 0;
         TR.RunIf(hotPlug, "UsbHotPlug_UnplugUnregistersDisk", TestUsbHotPlug_UnplugUnregistersDisk, hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_RemovedDiskFailsIo",    TestUsbHotPlug_RemovedDiskFailsIo,    hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_ReplugRegistersDisk",   TestUsbHotPlug_ReplugRegistersDisk,   hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_ReplugKeepsData",       TestUsbHotPlug_ReplugKeepsData,       hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_UnplugDetachesMount",   TestUsbHotPlug_UnplugDetachesMount,   hotPlugSkip);
+
+        // ==================== PCI hot-plug (pulls the disk out of its root port and back in) ====================
+        // The virtio-blk-pci cells boot with the disk behind a PCI Express root
+        // port the engine adds; its port driver powers the slot off when the
+        // engine deletes the device and on again when it adds it back, placing
+        // the new function's registers inside the port's windows.
+        string pciHotPlugSkip = PciHotPlugSkipReason();
+        bool pciHotPlug = pciHotPlugSkip.Length == 0;
+        TR.RunIf(pciHotPlug, "PciHotPlug_UnplugUnregistersDisk", TestPciHotPlug_UnplugUnregistersDisk, pciHotPlugSkip);
+        TR.RunIf(pciHotPlug, "PciHotPlug_RemovedDiskFailsIo",    TestPciHotPlug_RemovedDiskFailsIo,    pciHotPlugSkip);
+        TR.RunIf(pciHotPlug, "PciHotPlug_ReplugRegistersDisk",   TestPciHotPlug_ReplugRegistersDisk,   pciHotPlugSkip);
+        TR.RunIf(pciHotPlug, "PciHotPlug_ReplugKeepsData",       TestPciHotPlug_ReplugKeepsData,       pciHotPlugSkip);
+        TR.RunIf(pciHotPlug, "PciHotPlug_UnplugDetachesMount",   TestPciHotPlug_UnplugDetachesMount,   pciHotPlugSkip);
         dev = s_dev is not null;
 
         // ==================== Boot persistence (destructive: reboots QEMU) ====================
@@ -1249,7 +1274,7 @@ public class Kernel : Sys.Kernel
     // Empty when the cell can pull its stick out: a USB cell whose stick
     // bound, with the kit's worker running the hot-plug thread. Without a
     // worker (no scheduler) nothing follows a port change.
-    private static string HotPlugSkipReason()
+    private static string UsbHotPlugSkipReason()
     {
         if (!TR.ProfileHasPrefix("usb"))
         {
@@ -1422,6 +1447,222 @@ public class Kernel : Sys.Kernel
         Assert.True(VfsManager.TryUnmount(HotPlugMountPoint));
     }
 
+    // ==================== PCI hot-plug ====================
+
+    // Empty when the cell can pull its disk out of the root port: a
+    // virtio-blk-pci cell whose disk bound, with the kit's worker running the
+    // offers the port's slot thread waits for. Without a worker (no
+    // scheduler) nothing follows a slot event.
+    private static string PciHotPlugSkipReason()
+    {
+        if (!TR.ProfileHasPrefix("virtio-blk-pci"))
+        {
+            return "no hot-pluggable PCI disk on this cell";
+        }
+
+        if (s_dev is not VirtioBlkState)
+        {
+            return SkipNoDevice;
+        }
+
+        return DriverInfo.HasWorker ? string.Empty : "the driver kit has no worker (no scheduler)";
+    }
+
+    // Pulling the disk out of its root port must take it out of the storage
+    // manager and the kit's published devices, retract the function node and
+    // the virtio node beneath it, leave the port bound with one child less,
+    // and mark the object they handed out detached. The sector stamped first
+    // is read back once the disk is plugged in again.
+    private static void TestPciHotPlug_UnplugUnregistersDisk()
+    {
+        VirtioBlkState disk = (VirtioBlkState)s_dev!;
+        disk.WriteBlock(HotPlugMarkerLba, 1, HotPlugMarker((int)disk.BlockSize));
+        disk.Flush();
+
+        string? nodePath = FindBlockNodePath(disk.Name);
+        Assert.NotNull(nodePath, "the disk must be a kit device");
+        if (nodePath is null)
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(nodePath, out DeviceNodeInfo virtioInfo), "the disk's virtio node should be in the tree");
+        string? functionPath = virtioInfo.ParentPath;
+        Assert.NotNull(functionPath, "the virtio node should sit under its PCI function");
+        if (functionPath is null)
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(functionPath, out DeviceNodeInfo functionInfo), "the disk's function node should be in the tree");
+        string? portPath = functionInfo.ParentPath;
+        Assert.NotNull(portPath, "the function should sit under its root port");
+        if (portPath is null || !TryFindNode(portPath, out DeviceNodeInfo portBefore))
+        {
+            Assert.Fail("the root port's node should be in the tree");
+            return;
+        }
+
+        int nodesBefore = DriverInfo.NodeCount;
+        int portChildrenBefore = portBefore.ChildCount;
+        PcieRootPortState? port = FindRootPortState();
+        int removalsBefore = port?.RemovalCount ?? 0;
+
+        s_unpluggedPciDisk = disk;
+        s_unpluggedPciNodePath = nodePath;
+        TR.RequestHost(PciUnplugRequest);
+        bool gone = WaitForDeviceCount(0);
+        bool nodeGone = WaitForNodeGone(nodePath);
+        bool functionGone = WaitForNodeGone(functionPath);
+        bool poweredOff = gone && functionGone && WaitForSlotPoweredOff(port, removalsBefore);
+        s_dev = null;
+
+        Assert.True(gone, "the disk is still registered after being unplugged");
+        Assert.True(FindBlockDeviceIndexByName(disk.Name) < 0, "the virtio-blk disk should have left the kit's published devices");
+        Assert.True(nodeGone, "the disk's virtio node should have left the tree");
+        Assert.True(functionGone, "the disk's function node should have left the tree");
+        Assert.Equal(nodesBefore - 2, DriverInfo.NodeCount, "the function node and the virtio node beneath it leave together");
+        Assert.True(TryFindNode(portPath, out DeviceNodeInfo portAfter), "the root port should stay in the tree");
+        Assert.True(portAfter.State == DeviceNodeState.Bound, "the root port should stay bound");
+        Assert.Equal(portChildrenBefore - 1, portAfter.ChildCount, "the root port should count one child less");
+        Assert.True(disk.IsDetached, "the unplugged disk is not marked detached");
+        Assert.True(poweredOff, "the root port should have powered the slot off after the unplug");
+    }
+
+    // I/O on a disk that is gone must fail as an IOException, not wait for
+    // a request that never completes or hand back stale bytes.
+    private static void TestPciHotPlug_RemovedDiskFailsIo()
+    {
+        Assert.NotNull(s_unpluggedPciDisk);
+        if (s_unpluggedPciDisk is null)
+        {
+            return;
+        }
+
+        Span<byte> buffer = new byte[s_unpluggedPciDisk.BlockSize];
+        try
+        {
+            s_unpluggedPciDisk.ReadBlock(HotPlugMarkerLba, 1, buffer);
+            Assert.Fail("reading the unplugged disk did not throw");
+        }
+        catch (IOException)
+        {
+            // Expected.
+        }
+    }
+
+    // Plugged back in, the disk must come back as a new device with its old
+    // name (the lowest vblkN free) and geometry, under the same node path:
+    // device 0 function 0 of the port's bus again.
+    private static void TestPciHotPlug_ReplugRegistersDisk()
+    {
+        TR.RequestHost(PciPlugRequest);
+        Assert.True(WaitForDeviceCount(1), "the disk did not come back after being plugged in");
+        if (StorageManager.DeviceCount != 1)
+        {
+            return;
+        }
+
+        s_dev = StorageManager.GetDevice(0);
+        Assert.True(s_dev is VirtioBlkState, "the device that came back is not a virtio-blk disk");
+        Assert.False(ReferenceEquals(s_dev, s_unpluggedPciDisk), "the removed device object came back");
+        if (s_unpluggedPciDisk is not null)
+        {
+            Assert.Equal(s_unpluggedPciDisk.Name, s_dev!.Name, "a disk plugged back in gets its name back");
+            Assert.Equal<ulong>(s_unpluggedPciDisk.BlockCount, s_dev.BlockCount, "block count of the disk plugged back in");
+        }
+
+        string? nodePath = FindBlockNodePath(s_dev!.Name);
+        Assert.True(nodePath is not null && nodePath == s_unpluggedPciNodePath, "the replugged disk should come back under the same virtio node path");
+        Assert.True(FindBlockDeviceIndexByName(s_dev.Name) >= 0, "the replugged disk should be a kit device again");
+    }
+
+    private static void TestPciHotPlug_ReplugKeepsData()
+    {
+        Assert.NotNull(s_dev);
+        if (s_dev is null)
+        {
+            return;
+        }
+
+        byte[] actual = new byte[s_dev.BlockSize];
+        s_dev.ReadBlock(HotPlugMarkerLba, 1, actual);
+        Assert.Equal(HotPlugMarker((int)s_dev.BlockSize), actual, "the sector written before the unplug");
+    }
+
+    // A filesystem mounted from the disk's partition must be detached when
+    // the disk leaves its root port, and the partition dropped with it.
+    // Plugged back in, the partition is found again and the file written
+    // before is there.
+    private static void TestPciHotPlug_UnplugDetachesMount()
+    {
+        Assert.NotNull(s_dev);
+        if (s_dev is null)
+        {
+            return;
+        }
+
+        // A superfloppy, as in the USB cell: one partition covering the
+        // whole disk.
+        Span<byte> zero = new byte[(int)s_dev.BlockSize];
+        for (ulong lba = 0; lba < SuperfloppyWipeHeadSectors; lba++)
+        {
+            s_dev.WriteBlock(lba, 1, zero);
+        }
+        Assert.True(new FatFilesystemType(s_dev).TryFormat(string.Empty, null), "FAT format of the disk must succeed");
+        StorageManager.RescanPartitions(s_dev);
+
+        _ = VfsManager.RegisterFilesystem(HotPlugDriverName, new FatFilesystemType());
+        if (!MountStickPartition())
+        {
+            return;
+        }
+
+        byte[] payload = HotPlugMarker(SuperfloppyPayloadBytes);
+        Assert.True(VfsManager.TryOpenDirectory(HotPlugMountPoint, out IVfsDirectoryHandle? root));
+        Assert.True(root!.TryCreateFile(HotPlugFileName, VfsMode.RegularFile, out _));
+        using (IVfsFileHandle? writer = OpenVfsFile(HotPlugFilePath))
+        {
+            Assert.NotNull(writer);
+            Assert.Equal<long>(payload.Length, writer!.Write(payload));
+            Assert.True(writer.TryFlush());
+        }
+
+        PcieRootPortState? port = FindRootPortState();
+        int removalsBefore = port?.RemovalCount ?? 0;
+        TR.RequestHost(PciUnplugRequest);
+        bool gone = WaitForDeviceCount(0);
+        Assert.True(gone, "the disk is still registered after being unplugged");
+        s_dev = null;
+        Assert.False(IsMounted(HotPlugMountPoint), "the mount outlived its disk");
+        Assert.Equal(0, StorageManager.Partitions.Count, "the disk's partition outlived it");
+        Assert.True(gone && WaitForSlotPoweredOff(port, removalsBefore), "the root port should have powered the slot off after the unplug");
+
+        TR.RequestHost(PciPlugRequest);
+        Assert.True(WaitForDeviceCount(1), "the disk did not come back after being plugged in");
+        if (StorageManager.DeviceCount != 1)
+        {
+            return;
+        }
+
+        s_dev = StorageManager.GetDevice(0);
+        if (!MountStickPartition())
+        {
+            return;
+        }
+
+        using (IVfsFileHandle? reader = OpenVfsFile(HotPlugFilePath))
+        {
+            Assert.NotNull(reader);
+            byte[] readBack = new byte[payload.Length];
+            Assert.Equal<long>(payload.Length, reader!.Read(readBack));
+            Assert.Equal(payload, readBack, "the file written before the unplug");
+        }
+
+        // The reboot cell rewrites the disk underneath.
+        Assert.True(VfsManager.TryUnmount(HotPlugMountPoint));
+    }
+
     // Mounts the stick's one partition at HotPlugMountPoint through the
     // partition overload, the kind of mount a removed disk takes along.
     private static bool MountStickPartition()
@@ -1472,6 +1713,48 @@ public class Kernel : Sys.Kernel
     // count drops in the teardown's second step while the node leaves the
     // tree only once the teardown has run through, so a poll that saw the
     // count drop can wake between the two.
+    // The root port's state, through the kit's tree (the HAL grant): the
+    // virtio-blk-pci cells carry one port.
+#pragma warning disable COSMOS0003
+    private static PcieRootPortState? FindRootPortState()
+    {
+        IReadOnlyList<Cosmos.Kernel.HAL.DriverKit.DeviceNode> nodes = Cosmos.Kernel.HAL.DriverKit.Engine.DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            if (nodes[i].Binding?.DriverState is PcieRootPortState state)
+            {
+                return state;
+            }
+        }
+
+        return null;
+    }
+#pragma warning restore COSMOS0003
+
+    // The port's slot thread powers the slot off only after the retraction
+    // it waited for returned, and QEMU finishes a device_del inside that
+    // write: a plug requested before it would find the old device still in
+    // the slot and its drive still holding the image.
+    private static bool WaitForSlotPoweredOff(PcieRootPortState? port, int removalsBefore)
+    {
+        if (port is null)
+        {
+            return false;
+        }
+
+        for (int waitedMs = 0; port.RemovalCount != removalsBefore + 1 || port.IsPoweredOn; waitedMs += HotPlugPollMs)
+        {
+            if (waitedMs >= HotPlugTimeoutMs)
+            {
+                return false;
+            }
+
+            SysThread.Sleep(HotPlugPollMs);
+        }
+
+        return true;
+    }
+
     private static bool WaitForNodeGone(string path)
     {
         for (int waitedMs = 0; TryFindNode(path, out _); waitedMs += HotPlugPollMs)

@@ -8,8 +8,11 @@ namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 /// One base address register of a PCI function as the host sized it at
 /// describe time: what the slot decodes, where, and how much. The six
 /// slots are always reported; the upper half of a 64-bit register and a
-/// register firmware left unprogrammed are unassigned, with length 0. The
-/// resource at the same index on the node is the mappable form.
+/// slot with no register behind it are unassigned with length 0; an
+/// implemented register nobody has assigned yet is unassigned with the
+/// length its mask decoded, which is what the kit's placement for a
+/// function arriving behind a hot-plug slot uses. The resource at the same
+/// index on the node is the mappable form.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct PciBar
@@ -43,6 +46,6 @@ public readonly struct PciBar
     /// <summary>Physical address of a memory window, or the first port of an I/O range.</summary>
     public ulong Base { get; }
 
-    /// <summary>Bytes of a memory window, or ports of an I/O range; 0 when unassigned.</summary>
+    /// <summary>Bytes of a memory window, or ports of an I/O range: the decoded size, 0 only for an empty slot or the upper half of a 64-bit register.</summary>
     public ulong Length { get; }
 }

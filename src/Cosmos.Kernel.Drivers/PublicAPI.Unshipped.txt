@@ -67,6 +67,21 @@ Cosmos.Kernel.Drivers.NvmeState.NamespaceCount.get -> int
 Cosmos.Kernel.Drivers.NvmeState.Timeouts.get -> int
 Cosmos.Kernel.Drivers.PciHostDriver
 Cosmos.Kernel.Drivers.PciHostDriver.PciHostDriver() -> void
+Cosmos.Kernel.Drivers.PcieRootPortDriver
+Cosmos.Kernel.Drivers.PcieRootPortDriver.PcieRootPortDriver() -> void
+Cosmos.Kernel.Drivers.PcieRootPortState
+Cosmos.Kernel.Drivers.PcieRootPortState.ArrivalCount.get -> int
+Cosmos.Kernel.Drivers.PcieRootPortState.ChildCount.get -> int
+Cosmos.Kernel.Drivers.PcieRootPortState.HasInterrupt.get -> bool
+Cosmos.Kernel.Drivers.PcieRootPortState.HasPowerController.get -> bool
+Cosmos.Kernel.Drivers.PcieRootPortState.HotPlugRunning.get -> bool
+Cosmos.Kernel.Drivers.PcieRootPortState.InterruptCount.get -> int
+Cosmos.Kernel.Drivers.PcieRootPortState.IsPolling.get -> bool
+Cosmos.Kernel.Drivers.PcieRootPortState.IsPoweredOn.get -> bool
+Cosmos.Kernel.Drivers.PcieRootPortState.IsPresent.get -> bool
+Cosmos.Kernel.Drivers.PcieRootPortState.RemovalCount.get -> int
+Cosmos.Kernel.Drivers.PcieRootPortState.SecondaryBus.get -> byte
+Cosmos.Kernel.Drivers.PcieRootPortState.SlotNumber.get -> uint
 Cosmos.Kernel.Drivers.Ps2KeyboardDriver
 Cosmos.Kernel.Drivers.Ps2KeyboardDriver.Ps2KeyboardDriver() -> void
 Cosmos.Kernel.Drivers.Ps2KeyboardState
@@ -277,6 +292,10 @@ override Cosmos.Kernel.Drivers.NvmeDriver.Probe(Cosmos.Kernel.HAL.DriverKit.Devi
 override Cosmos.Kernel.Drivers.PciHostDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.PciHostDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.PciHostDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.PcieRootPortDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.PcieRootPortDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.PcieRootPortDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.PcieRootPortDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.Ps2KeyboardDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Ps2KeyboardDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Ps2KeyboardDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void

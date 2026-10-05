@@ -6,6 +6,7 @@ using Cosmos.Kernel.Drivers;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Synthetic;
 using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
@@ -53,6 +54,11 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// virtio-blk group proves the shipped <see cref="VirtioBlkDriver"/>
 /// over the kit's Virtio bus kind under either transport, publishing the
 /// disk to the ring's storage manager; the group skips on the other cells.
+/// On the virtio-blk-pci cell the disk sits behind a PCI Express root port
+/// the engine adds: the root port group proves the shipped
+/// <see cref="PcieRootPortDriver"/> bound to it, and the unplug and replug
+/// the engine performs over QMP when a test asks, with the replugged
+/// function's registers placed inside the port's windows.
 /// </para>
 /// <para>
 /// The suite is two projects. This kernel is the harness: it holds an
@@ -67,8 +73,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 7 PS/2, 6 virtio-blk.</summary>
-    private const int ExpectedTestCount = 53;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 7 PS/2, 6 virtio-blk, 3 PCI Express root port.</summary>
+    private const int ExpectedTestCount = 56;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -293,6 +299,60 @@ public class Kernel : Sys.Kernel
     /// <summary>The start of a virtio node's path under the MMIO transport.</summary>
     private const string VirtioMmioPathPrefix = "virtio:mmio:";
 
+    /// <summary>Start of a function node's description for QEMU's generic PCI Express root port: Red Hat's vendor id and the device id <c>PCI_DEVICE_ID_REDHAT_PCIE_RP</c>.</summary>
+    private const string RootPortDescriptionPrefix = "1b36:000c";
+
+    /// <summary>Skip reason of the root port tests on a cell that carries no root port.</summary>
+    private const string SkipNoRootPort = "no PCI Express root port on this cell";
+
+    /// <summary>Asks the engine to pull the cell's hot-pluggable PCI disk out of its root port (see TR.RequestHost).</summary>
+    private const string PciUnplugRequest = "pci-unplug 0";
+
+    /// <summary>Asks the engine to plug it back in, on the same image.</summary>
+    private const string PciPlugRequest = "pci-plug 0";
+
+    /// <summary>Nodes one virtio-blk-pci disk puts in the tree: the function node and the virtio node beneath it.</summary>
+    private const int PciNodesPerDisk = 2;
+
+    /// <summary>Resources the kit gives every PCI function node: one per base address register slot of a type 0 header.</summary>
+    private const int PciFunctionResourceCount = 6;
+
+    /// <summary>Memory Base of a type 1 header (16 bits): bits 15:4 are address bits 31:20.</summary>
+    private const ushort BridgeMemoryBaseOffset = 0x20;
+
+    /// <summary>Memory Limit of a type 1 header (16 bits).</summary>
+    private const ushort BridgeMemoryLimitOffset = 0x22;
+
+    /// <summary>Prefetchable Memory Base of a type 1 header (16 bits): the Memory Base encoding, bit 0 set when 64-bit.</summary>
+    private const ushort BridgePrefetchableBaseOffset = 0x24;
+
+    /// <summary>Prefetchable Memory Limit of a type 1 header (16 bits).</summary>
+    private const ushort BridgePrefetchableLimitOffset = 0x26;
+
+    /// <summary>Prefetchable Base Upper 32 Bits of a type 1 header.</summary>
+    private const ushort BridgePrefetchableBaseUpperOffset = 0x28;
+
+    /// <summary>Prefetchable Limit Upper 32 Bits of a type 1 header.</summary>
+    private const ushort BridgePrefetchableLimitUpperOffset = 0x2C;
+
+    /// <summary>The address bits of a memory window register.</summary>
+    private const ushort BridgeWindowAddressMask = 0xFFF0;
+
+    /// <summary>Shift from a memory window register's address bits to the address.</summary>
+    private const int BridgeWindowAddressShift = 16;
+
+    /// <summary>The low bits a window limit covers: windows are 1 MiB granular.</summary>
+    private const ulong BridgeWindowGranuleMask = 0xFFFFF;
+
+    /// <summary>Bit 0 of a prefetchable window register: the window decodes 64-bit addresses.</summary>
+    private const ushort BridgeWindow64Bit = 0x0001;
+
+    /// <summary>Shift of an upper 32 bits register to its place in the address.</summary>
+    private const int UpperHalfShift = 32;
+
+    /// <summary>The name the replugged disk must come back under: the lowest free index.</summary>
+    private const string ReplugDiskName = "vblk0";
+
     private readonly TestKeyboardConsumer _keyboardConsumer = new();
     private readonly TestPointerConsumer _pointerConsumer = new();
     private readonly DeviceNode _bootNode;
@@ -307,6 +367,9 @@ public class Kernel : Sys.Kernel
     private DeviceNode? _usbKeyboardNode;
     private string? _i8042Path;
     private string? _virtioBlkPath;
+    private string? _rootPortPath;
+    private string? _pciFunctionPath;
+    private DeviceNode? _pciFunctionNode;
 
     /// <summary>
     /// Publishes the boot node. The constructor runs before
@@ -434,6 +497,17 @@ public class Kernel : Sys.Kernel
         TR.RunIf(hasVirtioBlk, "VirtioBlk_ReadWriteRoundTrip", TestVirtioBlkReadWriteRoundTrip, SkipNoVirtioBlk);
         TR.RunIf(hasVirtioBlk, "VirtioBlk_FlushCompletes", TestVirtioBlkFlushCompletes, SkipNoVirtioBlk);
         TR.RunIf(hasVirtioBlk, "VirtioBlk_InterruptOrPolled", TestVirtioBlkInterruptOrPolled, SkipNoVirtioBlk);
+
+        // ==================== PCI Express root port ====================
+        // The virtio-blk-pci cell boots with its disk behind a root port the
+        // engine adds (native hot-plug on q35 through the ICH9-LPC global); the
+        // other cells carry no port and the group skips. The engine pulls the
+        // disk out of the port and puts it back when asked.
+        _rootPortPath = FindRootPortPath();
+        bool hasRootPort = _rootPortPath is not null;
+        TR.RunIf(hasRootPort, "Pci_RootPort_Bound", TestPciRootPortBound, SkipNoRootPort);
+        TR.RunIf(hasRootPort, "Pci_HotPlug_Unplug_RetractsNode", TestPciHotPlugUnplugRetractsNode, SkipNoRootPort);
+        TR.RunIf(hasRootPort, "Pci_HotPlug_Replug_PublishesAgain", TestPciHotPlugReplugPublishesAgain, SkipNoRootPort);
 
         TR.Finish();
 
@@ -1854,6 +1928,195 @@ public class Kernel : Sys.Kernel
         Log.WriteString(state.HasInterrupt ? "[DriversTests] virtio-blk interrupt\n" : "[DriversTests] virtio-blk polling\n");
     }
 
+    // ==================== PCI Express root port ====================
+    //
+    // The shipped root port driver over the port the virtio-blk-pci cell's
+    // disk sits behind: the port bound with its slot followed and its one
+    // child bound by the PCI transport, then one unplug and one replug the
+    // engine performs over QMP. The state is read through the node's
+    // binding, the registers through the port's PciAccess (the HAL grant).
+
+    private void TestPciRootPortBound()
+    {
+        if (!TryGetRootPort(out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        PcieRootPortState? state = FindDriverState<PcieRootPortState>(path);
+        Assert.NotNull(state, "the root port should be bound by PcieRootPortDriver");
+        if (state is null)
+        {
+            return;
+        }
+
+        Assert.True(info.State == DeviceNodeState.Bound, "the root port should be bound");
+        Assert.True(info.DriverName == nameof(PcieRootPortDriver), "PcieRootPortDriver should hold the root port");
+        Assert.True(info.BusName == PciBusName, "the root port is a PCI function");
+        Assert.Equal(1, info.ChildCount, "the root port should have published the disk's function under it");
+        Assert.True(state.IsPresent, "the slot should hold the disk plugged in at boot");
+        Assert.True(state.IsPoweredOn, "a populated slot resets powered on");
+        Assert.True(state.HotPlugRunning, "TryStartThread needs the scheduler");
+        Assert.True(state.HasInterrupt != state.IsPolling, "the slot takes its events from a message interrupt or a poll, never both or neither");
+        Assert.Equal(1, state.ChildCount, "the port should list the one function it published");
+        Assert.True(state.SecondaryBus != 0, "the slot should have a secondary bus");
+
+        string? childPath = FindChildPath(path);
+        Assert.NotNull(childPath, "the disk's function node should sit under the root port");
+        if (childPath is null)
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(childPath, out DeviceNodeInfo child), "the disk's function node should be in the tree");
+        Assert.True(child.State == DeviceNodeState.Bound, "the disk's function should be bound");
+        Assert.True(child.DriverName == nameof(VirtioPciTransportDriver), "VirtioPciTransportDriver should hold the disk's function");
+        Assert.Equal(1, child.ChildCount, "the transport should have published the virtio node");
+
+        DeviceNode? portNode = FindNode(path);
+        DeviceNode? childNode = FindNode(childPath);
+        if (portNode is not null && childNode is not null && portNode.TryGetAccess(out PciAccess? port))
+        {
+            AssertInsideBridgeWindows(port, childNode.Resources);
+        }
+        else
+        {
+            Assert.Fail("the root port and its function should be reachable through the tree with PCI access");
+        }
+
+        // The kit sizes a type 1 header's two registers: the port's BAR0
+        // holds its MSI-X table, which firmware assigned; nothing else is
+        // decoded.
+        if (portNode is not null)
+        {
+            IReadOnlyList<DeviceResource> portResources = portNode.Resources;
+            Assert.Equal(PciFunctionResourceCount, portResources.Count, "the root port carries one resource per base address register slot");
+            if (portResources.Count == PciFunctionResourceCount)
+            {
+                Assert.True(portResources[0].Kind == DeviceResourceKind.MemoryWindow, "the root port's resource 0 should be its MSI-X table window");
+                for (int i = 1; i < portResources.Count; i++)
+                {
+                    Assert.True(portResources[i].Kind == DeviceResourceKind.None, "the root port's resources 1 to 5 should be empty");
+                }
+            }
+        }
+    }
+
+    // The node leaves the tree in the slot thread's retraction, before the
+    // thread powers the slot off and counts the removal in the same pass,
+    // so the wait holds every condition at once.
+    private void TestPciHotPlugUnplugRetractsNode()
+    {
+        if (!TryGetRootPort(out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        PcieRootPortState? state = FindDriverState<PcieRootPortState>(path);
+        Assert.NotNull(state, "the root port should be bound by PcieRootPortDriver");
+        if (state is null)
+        {
+            return;
+        }
+
+        string? functionPath = FindChildPath(path);
+        Assert.NotNull(functionPath, "the disk's function node should sit under the root port");
+        if (functionPath is null)
+        {
+            return;
+        }
+
+        DeviceNode? functionNode = FindNode(functionPath);
+        Assert.NotNull(functionNode, "the disk's function node should be in the tree");
+        if (functionNode is null)
+        {
+            return;
+        }
+
+        _pciFunctionPath = functionPath;
+        _pciFunctionNode = functionNode;
+        int nodesBefore = DriverInfo.NodeCount;
+        int devicesBefore = DriverInfo.DeviceCount;
+        int disksBefore = StorageManager.DeviceCount;
+        int childrenBefore = info.ChildCount;
+        int removalsBefore = state.RemovalCount;
+
+        TR.RequestHost(PciUnplugRequest);
+
+        Assert.True(WaitUntil(() => !TryFindNode(functionPath, out _) && state.ChildCount == 0 && state.RemovalCount == removalsBefore + 1 && !state.IsPresent && !state.IsPoweredOn), "the function node should leave the tree and the port should have handled the attention button, powered the slot off and seen it empty after the unplug");
+        Assert.True(functionNode.State == NodeState.Retracted, "the function node should be retracted");
+        Assert.Equal(nodesBefore - PciNodesPerDisk, DriverInfo.NodeCount, "the function node and the virtio node beneath it leave together");
+        Assert.Equal(devicesBefore - 1, DriverInfo.DeviceCount, "the published list should have shrunk by the disk");
+        Assert.Equal(disksBefore - 1, StorageManager.DeviceCount, "the storage manager should have dropped the disk");
+        Assert.True(TryFindNode(path, out DeviceNodeInfo portAfter), "the root port should stay in the tree");
+        Assert.True(portAfter.State == DeviceNodeState.Bound, "the root port should stay bound");
+        Assert.Equal(childrenBefore - 1, portAfter.ChildCount, "a retracted child leaves its parent's count");
+    }
+
+    // The port powers the slot on before the describe and counts the
+    // arrival once the child's offer ran, so the wait holds both. The
+    // virtio node's own offer runs after the transport's probe returned,
+    // and VirtioBlkDriver registers the disk inside its probe, before the
+    // node reads Bound, so the wait holds that state too.
+    private void TestPciHotPlugReplugPublishesAgain()
+    {
+        if (!TryGetRootPort(out string? path, out DeviceNodeInfo _))
+        {
+            return;
+        }
+
+        PcieRootPortState? state = FindDriverState<PcieRootPortState>(path);
+        Assert.NotNull(state, "the root port should be bound by PcieRootPortDriver");
+        if (state is null)
+        {
+            return;
+        }
+
+        int arrivalsBefore = state.ArrivalCount;
+        int nodesBefore = DriverInfo.NodeCount;
+        int disksBefore = StorageManager.DeviceCount;
+
+        TR.RequestHost(PciPlugRequest);
+
+        Assert.True(WaitUntil(() => FindChildPath(path) is { } found && TryFindNode(found, out DeviceNodeInfo foundInfo) && foundInfo.State == DeviceNodeState.Bound && foundInfo.ChildCount == 1 && FindChildPath(found) is { } virtioFound && TryFindNode(virtioFound, out DeviceNodeInfo virtioInfo) && virtioInfo.State == DeviceNodeState.Bound && StorageManager.DeviceCount == disksBefore + 1 && state.ArrivalCount == arrivalsBefore + 1 && state.IsPoweredOn), "the function should be bound again with its disk registered and the port should have counted the arrival after the replug");
+
+        string? functionPath = FindChildPath(path);
+        Assert.NotNull(functionPath, "the replugged function should sit under the root port");
+        if (functionPath is null)
+        {
+            return;
+        }
+
+        Assert.True(functionPath == _pciFunctionPath, "the replugged function should come back at device 0 function 0 of the port's bus");
+        DeviceNode? functionNode = FindNode(functionPath);
+        Assert.True(functionNode is not null && !ReferenceEquals(functionNode, _pciFunctionNode), "the replug should publish a new node");
+        Assert.True(TryFindNode(functionPath, out DeviceNodeInfo function), "the replugged function should be in the tree");
+        Assert.True(function.State == DeviceNodeState.Bound, "the replugged function should be bound");
+        Assert.True(function.DriverName == nameof(VirtioPciTransportDriver), "VirtioPciTransportDriver should hold the replugged function");
+
+        string? virtioPath = FindChildPath(functionPath);
+        Assert.True(virtioPath is not null && TryFindNode(virtioPath, out DeviceNodeInfo virtio) && virtio.State == DeviceNodeState.Bound && virtio.DriverName == nameof(VirtioBlkDriver), "VirtioBlkDriver should hold the virtio node beneath the replugged function");
+        Assert.Equal(nodesBefore + PciNodesPerDisk, DriverInfo.NodeCount, "the function node and the virtio node beneath it come back together");
+        Assert.True(state.IsPresent, "the slot should hold the replugged disk");
+
+        DeviceNode? portNode = FindNode(path);
+        if (portNode is not null && functionNode is not null && portNode.TryGetAccess(out PciAccess? port))
+        {
+            AssertInsideBridgeWindows(port, functionNode.Resources);
+        }
+        else
+        {
+            Assert.Fail("the kit placed the replugged function's registers inside the port's windows");
+        }
+
+        int deviceIndex = FindDeviceIndex(ReplugDiskName);
+        Assert.True(deviceIndex >= 0, "the replugged disk should be published as vblk0");
+        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.IsConsumed, "the storage manager should have consumed the replugged disk");
+        }
+    }
+
     // ==================== Helpers ====================
 
     /// <summary>
@@ -2034,6 +2297,96 @@ public class Kernel : Sys.Kernel
         }
 
         return null;
+    }
+
+    /// <summary>Finds the path of the first PCI node whose description names QEMU's generic PCI Express root port, whatever its state.</summary>
+    /// <returns>The node's path, or null when the cell carries no root port.</returns>
+    private static string? FindRootPortPath() => FindNodePathOnBus(PciBusName, RootPortDescriptionPrefix);
+
+    /// <summary>Finds the path of the first node whose parent has the given path.</summary>
+    /// <param name="parentPath">The parent's path.</param>
+    /// <returns>The child's path, or null when the parent has no child in the tree.</returns>
+    private static string? FindChildPath(string parentPath)
+    {
+        int count = DriverInfo.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info) && info.ParentPath == parentPath)
+            {
+                return info.Path;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>Hands back the root port's path and a fresh snapshot of it, or fails the test when BeforeRun found none.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private bool TryGetRootPort([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    {
+        path = _rootPortPath;
+        if (path is null || !TryFindNode(path, out info))
+        {
+            Assert.Fail("the root port's node was not found by BeforeRun");
+            info = default;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Asserts that every memory window among <paramref name="resources"/>
+    /// lies inside the port's memory window or its prefetchable window, as
+    /// the type 1 header decodes them, and that there is at least one: a
+    /// virtio-blk-pci function carries its MSI-X table and its modern
+    /// structures in memory windows.
+    /// </summary>
+    /// <param name="port">The root port's access, for its type 1 registers.</param>
+    /// <param name="resources">The function's resources.</param>
+    private static void AssertInsideBridgeWindows(PciAccess port, IReadOnlyList<DeviceResource> resources)
+    {
+        ushort memoryBase = port.ReadConfig16(BridgeMemoryBaseOffset);
+        ushort memoryLimit = port.ReadConfig16(BridgeMemoryLimitOffset);
+        ulong memoryStart = (ulong)(memoryBase & BridgeWindowAddressMask) << BridgeWindowAddressShift;
+        ulong memoryEnd = ((ulong)(memoryLimit & BridgeWindowAddressMask) << BridgeWindowAddressShift) | BridgeWindowGranuleMask;
+
+        ushort prefetchableBase = port.ReadConfig16(BridgePrefetchableBaseOffset);
+        ushort prefetchableLimit = port.ReadConfig16(BridgePrefetchableLimitOffset);
+        ulong prefetchableStart = (ulong)(prefetchableBase & BridgeWindowAddressMask) << BridgeWindowAddressShift;
+        ulong prefetchableEnd = ((ulong)(prefetchableLimit & BridgeWindowAddressMask) << BridgeWindowAddressShift) | BridgeWindowGranuleMask;
+        if ((prefetchableBase & BridgeWindow64Bit) != 0)
+        {
+            prefetchableStart |= (ulong)port.ReadConfig32(BridgePrefetchableBaseUpperOffset) << UpperHalfShift;
+        }
+
+        if ((prefetchableLimit & BridgeWindow64Bit) != 0)
+        {
+            prefetchableEnd |= (ulong)port.ReadConfig32(BridgePrefetchableLimitUpperOffset) << UpperHalfShift;
+        }
+
+        bool hasMemory = memoryStart <= memoryEnd;
+        bool hasPrefetchable = prefetchableStart <= prefetchableEnd;
+        int windows = 0;
+        for (int i = 0; i < resources.Count; i++)
+        {
+            DeviceResource resource = resources[i];
+            if (resource.Kind != DeviceResourceKind.MemoryWindow)
+            {
+                continue;
+            }
+
+            windows++;
+            ulong first = resource.PhysicalBase;
+            ulong last = resource.PhysicalBase + resource.Length - 1;
+            bool inMemory = hasMemory && first >= memoryStart && last <= memoryEnd;
+            bool inPrefetchable = hasPrefetchable && first >= prefetchableStart && last <= prefetchableEnd;
+            Assert.True(inMemory || inPrefetchable, "every memory window of the function should lie inside one of the port's windows");
+        }
+
+        Assert.True(windows >= 1, "a virtio-blk-pci function carries its MSI-X table and its modern structures in memory windows");
     }
 
     /// <summary>Hands back the virtio-blk node's path and a fresh snapshot of it, or fails the test when BeforeRun found none.</summary>
