@@ -25,10 +25,12 @@ namespace Cosmos.Kernel.System.Storage;
 /// hardware; the ring does not wrap the driver's object, so a later call
 /// through a <see cref="Partition"/> of a withdrawn kit disk gets the kit's
 /// <see cref="InvalidOperationException"/> (a window or DMA buffer torn
-/// down) or the driver's own detach exception, not an I/O exception. A PCI
-/// function is never retracted today, so that path is reached only through
-/// the synthetic bus. The two never run concurrently, which is what makes
-/// the copy-on-write array safe without a lock.
+/// down) or the driver's own detach exception (an I/O exception for the
+/// shipped NVMe, USB mass storage and virtio-blk drivers); the ring
+/// translates nothing. That path is reached when a USB stick or a PCI function behind a hot-plug slot
+/// is pulled out, and through the synthetic bus. The two never run
+/// concurrently, which is what makes the copy-on-write array safe without a
+/// lock.
 /// </para>
 /// </summary>
 internal sealed class KitBlockConsumer : BlockConsumer

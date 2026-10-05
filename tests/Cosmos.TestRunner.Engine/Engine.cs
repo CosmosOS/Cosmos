@@ -245,9 +245,9 @@ public partial class Engine
                     Console.WriteLine($"[Engine] Re-launching kernel for boot #{boot} (skip={boot})");
                 }
 
-                // Every boot starts with the sticks and the keyboard plugged
-                // in, and a QEMU of its own with a monitor for the hot-plug
-                // and input requests.
+                // Every boot starts with the sticks, the hot-pluggable PCI
+                // disks and the keyboard plugged in, and a QEMU of its own
+                // with a monitor for the hot-plug and input requests.
                 await using QemuMonitor monitor = QemuMonitor.For(disks, profile.KeyboardDevice);
                 QemuRunResult result = await _qemuHost.RunKernelAsync(
                     bootIsoPath, bootLogPath, _config.TimeoutSeconds, _config.ShouldShowDisplay, enableNetworkTesting, disks, profile.MachineOptions,

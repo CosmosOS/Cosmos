@@ -45,8 +45,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// proves the kit's Usb bus kind over it, the decline-after-open
 /// fall-through to the shipped <see cref="UsbKeyboardDriver"/>, and the
 /// unplug and replug the engine performs over QMP when a test asks; the
-/// group skips on the bare cell, which has no controller. q35's built-in
-/// 8042 carries a keyboard and a mouse on both x64 cells: the PS/2 group
+/// group skips on the other cells, which have no controller. q35's built-in
+/// 8042 carries a keyboard and a mouse on every x64 cell: the PS/2 group
 /// proves the kit's Ps2 bus kind over it, with the key and the pointer
 /// events the engine injects over QMP when a test asks; virt has no 8042
 /// and the group skips on arm64. The virtio-blk-pci cell (both arches) and

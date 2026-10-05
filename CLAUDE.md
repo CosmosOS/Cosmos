@@ -46,7 +46,7 @@ Dual-arch (x64/ARM64) with compile-time selection via `DefineConstants` and `Run
 - **Native x64**: `src/Cosmos.Kernel.Native.X64/` - YASM `.asm` files (Runtime, WriteBarriers, InterfaceDispatch, Interrupts, etc.)
 - **Native ARM64**: `src/Cosmos.Kernel.Native.ARM64/` - GAS `.s` files
 - **HAL x64**: `src/Cosmos.Kernel.HAL.X64/` (platform code only: the machine description, the line routing, the tick source, the firmware clock)
-- **HAL ARM64**: `src/Cosmos.Kernel.HAL.ARM64/` (platform code only: the machine description, the line routing, the tick source, the firmware clock)
+- **HAL ARM64**: `src/Cosmos.Kernel.HAL.ARM64/` (platform code only: the machine description over ACPI, the device tree and the virt table, the line routing, the tick source, the firmware clock)
 - Multi-arch packages bundle both architectures; NuGet selects by RID at build time
 
 ## Feature switches
@@ -62,9 +62,9 @@ Kernel features are toggled via MSBuild properties in kernel `.csproj` files (al
 - `src/Cosmos.Kernel.Core/Runtime/` - Runtime stubs (RhpThrowEx, exception handling, etc.)
 - `src/Cosmos.Kernel.Core/Memory/` - Memory allocation
 - `src/Cosmos.Kernel.System/` - Higher-level services (Graphics with `DisplayManager` and the canvas over the kit's display kind, Network, Input, Timer, IO, Storage with `StorageManager` and its consumer of the kit's block kind)
-- `src/Cosmos.Kernel.HAL/DriverKit/` - The driver kit (bindings, bus kinds: synthetic, platform, PCI, virtio, USB, PS/2; device kinds under `Devices/`: keyboard, pointer, network, block, display with the `IDisplayModes` and `IHardwareCursor` facets)
-- `src/Cosmos.Kernel.HAL/Firmware/` - The firmware framebuffer the kit publishes as the firmware display
-- `src/Cosmos.Kernel.Drivers/` - Shipped drivers over the kit (PCI host, E1000E, the virtio PCI and MMIO transports, virtio-net, virtio-input, the display drivers virtio-gpu and VMware SVGA II with its SVGA3D layer, the storage drivers AHCI and NVMe, whose disks `StorageManager` consumes, the xHCI host controller with the USB hub, HID boot keyboard and mass storage class drivers, and the 8042 controller with the PS/2 keyboard and mouse class drivers); a User-layer driver assembly, one RID-less package
+- `src/Cosmos.Kernel.HAL/DriverKit/` - The driver kit (bindings, bus kinds: synthetic, platform, PCI with the bridge describe and resource placement behind hot-plug slots, virtio, USB, PS/2; device kinds under `Devices/`: keyboard, pointer, network, block, display with the `IDisplayModes` and `IHardwareCursor` facets)
+- `src/Cosmos.Kernel.HAL/Firmware/` - The firmware framebuffer the kit publishes as the firmware display, and the device tree parser the ARM64 description reads
+- `src/Cosmos.Kernel.Drivers/` - Shipped drivers over the kit (PCI host and PCI Express root port (hot-plug), E1000E, the virtio PCI and MMIO transports, virtio-net, virtio-input, the display drivers virtio-gpu and VMware SVGA II with its SVGA3D layer, the storage drivers AHCI, NVMe and virtio-blk, whose disks `StorageManager` consumes, the xHCI host controller with the USB hub, HID boot keyboard and mass storage class drivers, and the 8042 controller with the PS/2 keyboard and mouse class drivers); a User-layer driver assembly, one RID-less package
 - `examples/DevKernel/` - Development kernel (use for testing changes)
 - `tests/Kernels/` - 18 kernel test suites and the Drivers suite's driver library
 - `dotnet/runtime/` - .NET runtime submodule (release/10.0 branch)

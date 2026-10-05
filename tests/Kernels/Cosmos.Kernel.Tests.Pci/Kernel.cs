@@ -21,8 +21,9 @@ public class Kernel : Sys.Kernel
 
     // Reason string surfaced through TR.RunIf when a test depends on at
     // least one PCI device having been enumerated. A profile that disables
-    // ACPI on arm64 (no MCFG, no FDT fallback for the ECAM base) lands
-    // here and the device tests skip cleanly.
+    // ACPI on arm64 (no MCFG; the legacy manager reads no device tree,
+    // unlike the kit's host node, which the ARM64 description takes from it)
+    // lands here and the device tests skip cleanly.
     private const string SkipNoDevice = "no PCI devices enumerated, host bridge / ECAM not discovered";
 
     /// <summary>Number of tests announced to the runner in TR.Start: 2 manager, 4 config space, 3 host.</summary>

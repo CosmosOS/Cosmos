@@ -21,8 +21,9 @@
        VirtioNetDriver binds, so the E1000E tests skip there); usb-kbd, which
        adds a qemu-xhci controller with a usb-kbd plugged in at boot for the
        USB keyboard group, which skips elsewhere; virtio-blk-pci, a virtio-blk
-       disk on the PCI bus for the virtio-blk group; and, on arm64 alone,
-       virtio-blk-mmio, the same disk in the virt machine's window.
+       disk behind a PCI Express root port for the virtio-blk and root port
+       groups; and, on arm64 alone, virtio-blk-mmio, the same disk in the virt
+       machine's window.
        Definitions live in tests/profiles.json. -->
   <ItemGroup>
     <CosmosTestProfile Include="bare" />

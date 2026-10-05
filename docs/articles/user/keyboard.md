@@ -187,7 +187,7 @@ Keys.Add(new KeyMapping(0x10, 'q', 'Q', 'q', 'Q', 'q', 'Q', '@', ConsoleKeyEx.Q)
 
 - Key releases are not queued: `KeyEvent.Type` has a `Break` value, but only presses reach the buffer. Releases of Shift, Ctrl and Alt update the modifier state and are otherwise dropped.
 - The German, Spanish and Turkish scan maps carry their AltGr characters; the French and British ones do not yet (`@`, `#`, `{` on AZERTY), so their right Alt stays a plain Alt. Dead keys are not composed: the Turkish `¨`, `~`, `´` and `` ` `` come out as those characters.
-- A PS/2 keyboard is published once, during the driver stage, when the keyboard driver bound the 8042 driver's keyboard port node and its reset was answered; a virtio keyboard once, when the stage offers its device. A USB keyboard is published when its node is bound and withdrawn when the node is retracted, so only USB keyboards can be plugged in and pulled out while the kernel runs; a modifier held on one pulled out stays down until pressed on another keyboard.
+- A PS/2 keyboard is published once, during the driver stage, when the keyboard driver bound the 8042 driver's keyboard port node and its reset was answered; a virtio keyboard present at boot once, when the stage offers its device. A USB keyboard is published when its node is bound and withdrawn when the node is retracted, and so is a virtio keyboard whose PCI function sits behind a PCI Express hot-plug slot, which the root port driver publishes and retracts, so those are the keyboards that can be plugged in and pulled out while the kernel runs; a modifier held on one pulled out stays down until pressed on another keyboard.
 
 ## How it works
 

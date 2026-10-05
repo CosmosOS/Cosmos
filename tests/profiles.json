@@ -190,8 +190,10 @@
       //
       // gic-version=3 is required on arm64, not cosmetic: MSI-X is routed by
       // the GICv3 ITS, and the virt machine defaults to GICv2, which has none:
-      // MsiRouting would never get a binder and the transport would refuse
-      // to bring the device up. q35 rejects the property, hence the scoping.
+      // MsiRouting would get no binder, the transport would publish the
+      // device with no message entry and the leaf drivers would poll, which
+      // is what the virtio-pci+acpi-off cell on arm64 shows (no ITS without
+      // ACPI). q35 rejects the property, hence the scoping.
       "name": "virtio-pci",
       "architectures": ["x64", "arm64"],
       "machineOptions": { "arm64": { "gic-version": "3" } },
@@ -234,10 +236,11 @@
     {
       // Disable ACPI on the machine. Default is acpi=on for both q35 and
       // virt; flipping it forces the kernel onto its non-ACPI discovery
-      // paths (no MADT/IORT/MCFG, fall back to FDT or hard-coded layout).
-      // Useful smoke for "ACPI tables absent" code; on x64 it typically
-      // disables PCIe enumeration and surfaces as missing devices in the
-      // dependent tests via the existing TR.RunIf gating.
+      // paths: on arm64 no MADT, IORT or MCFG, the GIC on the virt defaults
+      // (no ITS, so no MSI) and the platform bus seeded from the device tree
+      // EDK2 exposes only then; on x64 the MADT stays in place, PCI
+      // enumerates over the port mechanism and the LAPIC routes messages, so
+      // the cell differs from the plain one by the discovery tables alone.
       "name": "acpi-off",
       "machineOptions": { "acpi": "off" }
     }

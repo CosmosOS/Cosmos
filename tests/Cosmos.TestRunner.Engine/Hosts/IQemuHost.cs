@@ -44,7 +44,7 @@ public interface IQemuHost
     /// <param name="disks">Per-profile disk attachments. AHCI entries share one <c>ich9-ahci</c> controller; NVMe entries each get their own <c>nvme</c> controller; USB entries share one <c>qemu-xhci</c> controller; virtio-blk entries are one virtio-blk-pci function each (behind a root port when hot-pluggable); virtio-blk-mmio entries one virtio-blk-device slot each, arm64 only. Per-disk extra device options (e.g. <c>msix=off</c>) flow through.</param>
     /// <param name="machineOptions">Extra <c>-M</c> properties (e.g. <c>{"gic-version", "2"}</c> on ARM64). Caller is responsible for passing arch-appropriate keys.</param>
     /// <param name="devices">Per-profile NIC and input device models; null leaves the architecture defaults in place.</param>
-    /// <param name="monitor">Carries out the guest's requests (USB hot-plug, key and pointer injection) through the QMP monitor QEMU is launched with; null when the caller opened none.</param>
+    /// <param name="monitor">Carries out the guest's requests (USB and PCI hot-plug, key and pointer injection) through the QMP monitor QEMU is launched with; null when the caller opened none.</param>
     /// <returns>Exit code and UART log content</returns>
     Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuMonitor? monitor = null);
 }

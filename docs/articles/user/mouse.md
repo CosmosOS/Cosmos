@@ -152,7 +152,7 @@ Two more knobs on `MouseManager`:
 
 - Only relative pointing devices are supported. There is no absolute (tablet) input, so inside a VM window the guest pointer does not track the host cursor one to one.
 - Horizontal wheel tilt is ignored; only the vertical wheel reaches `ScrollDelta`.
-- A PS/2 mouse is published once, during the driver stage, when the mouse driver bound the 8042 driver's auxiliary port node and its reset was answered; a virtio mouse once, when the stage offers its device; there is no mouse hotplug.
+- A PS/2 mouse is published once, during the driver stage, when the mouse driver bound the 8042 driver's auxiliary port node and its reset was answered; a virtio mouse present at boot once, when the stage offers its device. The one mouse that can be plugged in and pulled out while the kernel runs is a virtio mouse whose PCI function sits behind a PCI Express hot-plug slot, which the root port driver publishes and retracts.
 
 ## How it works
 

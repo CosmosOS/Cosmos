@@ -13,11 +13,12 @@ namespace Cosmos.Kernel.System.Storage;
 /// <summary>
 /// Manages block storage devices. A disk reaches the manager one of two
 /// ways: a driver kit driver publishes it and the manager's
-/// <see cref="KitBlockConsumer"/> registers it (the AHCI, NVMe and USB mass
-/// storage drivers), or it is handed to <see cref="RegisterDevice"/>
-/// directly by the kernel. Every registration scans the disk for
-/// partitions. The tables change after boot too, when a USB disk is plugged
-/// in or pulled out, from the kit worker in a probe or a teardown: each is
+/// <see cref="KitBlockConsumer"/> registers it (the AHCI, NVMe, virtio-blk
+/// and USB mass storage drivers), or it is handed to
+/// <see cref="RegisterDevice"/> directly by the kernel. Every registration
+/// scans the disk for partitions. The tables change after boot too, when a
+/// USB disk, or a virtio-blk disk behind a PCI Express hot-plug slot, is
+/// plugged in or pulled out, from the kit worker in a probe or a teardown: each is
 /// replaced whole on every change, so a list read from <see cref="Devices"/>,
 /// <see cref="Partitions"/> or <see cref="GetPartitions"/> never changes
 /// under its reader. Read it once and index that copy: a second read may be

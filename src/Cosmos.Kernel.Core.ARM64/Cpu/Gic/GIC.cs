@@ -93,7 +93,7 @@ public static class GIC
     /// <summary>
     /// Brings the LPI/ITS path online if the platform reports an ITS, then
     /// registers the ARM64 MSI binder. Safe to call when no ITS is present
-    /// — it logs and returns, leaving MsiRouting unregistered so callers
+    /// as well: it logs and returns, leaving MsiRouting unregistered so callers
     /// fall back to whatever non-MSI path they support.
     /// </summary>
     private static unsafe void InitializeMsi(ulong itsBase)
@@ -118,7 +118,7 @@ public static class GIC
         DeviceMapper.EnsureMapped(itsBase + ItsTranslationFrameOffset);
 
         // MMIO dereferences must go through the Device-memory HHDM mapping
-        // EnsureMapped installed above — the TTBR0 identity map is Normal
+        // EnsureMapped installed above: the TTBR0 identity map is Normal
         // WB cacheable, and dereferencing raw physical only appears to work
         // because QEMU TCG ignores memory attributes. Addresses programmed
         // INTO the hardware (GITS_TRANSLATER MSI doorbell, MAPC RDbase)
@@ -165,7 +165,7 @@ public static class GIC
             {
                 // Default to sysreg-only (safe on hardware where GICD/GICR
                 // MMIO is inaccessible). When the firmware advertises an
-                // ITS, we MUST take the full MMIO path — LPI delivery
+                // ITS, we MUST take the full MMIO path: LPI delivery
                 // requires GICR_PROPBASER/PENDBASER writes against the
                 // redistributor, and the redistributor walk to populate
                 // CurrentCpuRdBase, neither of which run in sysreg-only.
@@ -196,7 +196,7 @@ public static class GIC
                     DeviceMapper.EnsureMapped(acpiGic->DistBase);
                     // The redistributor walk strides 128 KiB frames until
                     // GICR_TYPER.Last, spanning the whole MADT-advertised
-                    // region — one 2 MiB block only covers 16 frames, so
+                    // region, and one 2 MiB block only covers 16 frames, so
                     // with more CPUs the walk would dereference past the
                     // mapping and data-abort at boot. Map every 2 MiB block
                     // the region touches (aligned loop so an unaligned
@@ -246,7 +246,8 @@ public static class GIC
             return;
         }
 
-        // Priority 3: Default QEMU virt machine addresses (no DTB, no ACPI)
+        // Fallback: the QEMU virt machine's default addresses (no ACPI MADT;
+        // the GIC is not read from the device tree)
         Serial.Write("[GIC] No DTB/ACPI, using default QEMU addresses\n");
         s_distBase = PhysToVirt(QemuVirtGicdBase);
 
@@ -271,7 +272,7 @@ public static class GIC
 
         // No MADT means no authoritative ITS address. Probing QEMU's
         // default 0x08080000 blindly reads GITS_CTLR on whatever sits
-        // there — on `-M virt,its=off` (or any non-QEMU board reaching
+        // there: on `-M virt,its=off` (or any non-QEMU board reaching
         // this fallback) that's unbacked address space and the read
         // faults or hangs the bus at boot. Without a safe probe, leave
         // MSI off and let the drivers take their polled fallback.

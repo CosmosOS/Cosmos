@@ -342,7 +342,7 @@ public class X64CpuOps : ICpuOps
 
 ### Platform Initializer Pattern
 
-Each architecture provides a factory that creates all platform-specific components. The factory, the contract and everything it returns are internal to the HAL: a kernel never installs one. The initializer is also the machine description: it publishes the root platform nodes a bus driver binds, and it holds no device driver.
+Each architecture provides a factory that creates all platform-specific components. The factory, the contract and everything it returns are internal to the HAL: a kernel never installs one. The initializer is also the machine description: it publishes the root platform nodes a bus driver binds, from the sources the platform knows: ACPI's tables, the device tree the bootloader handed over, or a per-machine table; and it holds no device driver.
 
 ```csharp
 internal class X64PlatformInitializer : IPlatformInitializer
@@ -377,7 +377,7 @@ Write a `[Driver]` class in `Cosmos.Kernel.Drivers` over the kit and publish the
 2. Publish its nodes from the machine description (`PublishPlatformNodes`) or from a bus driver (`PublishChild`).
 3. Write the leaf driver over the access object.
 
-Nothing goes into `Cosmos.Kernel.HAL.X64` or `Cosmos.Kernel.HAL.ARM64` but platform code.
+Nothing goes into `Cosmos.Kernel.HAL.X64` or `Cosmos.Kernel.HAL.ARM64` but platform code. The device tree parser is cross-platform HAL code under `Cosmos.Kernel.HAL/Firmware`; the ARM64 description only reads it.
 
 ### HAL Registration
 

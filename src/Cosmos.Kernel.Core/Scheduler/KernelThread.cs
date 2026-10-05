@@ -10,13 +10,13 @@ using Cosmos.Kernel.Core.CPU;
 namespace Cosmos.Kernel.Core.Scheduler;
 
 /// <summary>
-/// Starts the kernel's own service threads (USB hot-plug) and bounds how
-/// long the caller waits for one to begin.
+/// Starts the kernel's own service threads (the USB and PCI Express
+/// hot-plug threads) and bounds how long the caller waits for one to begin.
 ///
 /// <para>CoreLib's <c>Thread.Start</c> does not return until the new thread
 /// has run, and only a scheduler switch runs it. A timer that never ticks
-/// (x64 with ACPI off, where nothing calibrates the LAPIC timer), or one
-/// that ticks without scheduling (a boot CPU whose APIC ID is not 0), keeps
+/// (a LAPIC timer nothing calibrated), or one that ticks without
+/// scheduling (a boot CPU whose APIC ID is not 0), keeps
 /// that call spinning forever. <see cref="TryStart(Action)"/> builds the thread on
 /// the scheduler directly, as <c>SystemNative_CreateThread</c> does for
 /// CoreLib, and gives it <see cref="StartTimeoutMs"/> of
