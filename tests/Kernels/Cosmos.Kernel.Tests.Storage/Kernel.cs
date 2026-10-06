@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort;
+using Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 using Cosmos.Kernel.Drivers.Pci.Storage.Ahci;
 using Cosmos.Kernel.Drivers.Pci.Storage.Nvme;
 using Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage;
@@ -356,11 +358,17 @@ public class Kernel : Sys.Kernel
     private const string PciPlugRequest = "pci-plug";
 
     /// <summary>
-    /// Longest wait for the hot-plug thread to follow a plug or an unplug.
-    /// Well inside the engine's stall window: 10 s without a protocol
-    /// message and it kills the guest.
+    /// Longest wait for the hot-plug thread to follow one host request, all
+    /// the waits after that request together: the request is the last
+    /// protocol message before them, and the engine's stall window (10 s of
+    /// host time without one) kills the guest. Measured on the
+    /// <see cref="Stopwatch"/>, whose counter runs on host time under
+    /// emulation as well, never by counting sleeps, which delayed ticks
+    /// stretch.
     /// </summary>
     private const int HotPlugTimeoutMs = 8000;
+
+    private const long MillisecondsPerSecond = 1000;
 
     /// <summary>How often a hot-plug wait looks at the storage manager again.</summary>
     private const int HotPlugPollMs = 50;
@@ -1301,6 +1309,10 @@ public class Kernel : Sys.Kernel
     // back once the stick is plugged in again.
     private static void TestUsbHotPlug_UnplugUnregistersDisk()
     {
+        // Only the controller's hot-plug thread follows a port change: one
+        // that did not start would leave every wait below to time out.
+        Assert.True(FindDriverState<XhciState>()?.HotPlugRunning == true, "the xHCI hot-plug thread is not running");
+
         UsbMassStorageUnit disk = (UsbMassStorageUnit)s_dev!;
         disk.WriteBlock(HotPlugMarkerLba, 1, HotPlugMarker((int)disk.BlockSize));
         disk.Flush();
@@ -1316,8 +1328,9 @@ public class Kernel : Sys.Kernel
 
         s_unpluggedDisk = disk;
         TR.RequestHost(UsbUnplugRequest);
-        bool gone = WaitForDeviceCount(0);
-        bool nodeGone = WaitForNodeGone(nodePath);
+        long deadline = HotPlugDeadline();
+        bool gone = WaitForDeviceCount(0, deadline);
+        bool nodeGone = WaitForNodeGone(nodePath, deadline);
         s_dev = null;
 
         Assert.True(gone, "the stick is still registered after being unplugged");
@@ -1354,7 +1367,7 @@ public class Kernel : Sys.Kernel
     private static void TestUsbHotPlug_ReplugRegistersDisk()
     {
         TR.RequestHost(UsbPlugRequest);
-        Assert.True(WaitForDeviceCount(1), "the stick did not come back after being plugged in");
+        Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the stick did not come back after being plugged in");
         if (StorageManager.DeviceCount != 1)
         {
             return;
@@ -1423,13 +1436,13 @@ public class Kernel : Sys.Kernel
         }
 
         TR.RequestHost(UsbUnplugRequest);
-        Assert.True(WaitForDeviceCount(0), "the stick is still registered after being unplugged");
+        Assert.True(WaitForDeviceCount(0, HotPlugDeadline()), "the stick is still registered after being unplugged");
         s_dev = null;
         Assert.False(IsMounted(HotPlugMountPoint), "the mount outlived its stick");
         Assert.Equal(0, StorageManager.Partitions.Count, "the stick's partition outlived it");
 
         TR.RequestHost(UsbPlugRequest);
-        Assert.True(WaitForDeviceCount(1), "the stick did not come back after being plugged in");
+        Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the stick did not come back after being plugged in");
         if (StorageManager.DeviceCount != 1)
         {
             return;
@@ -1511,16 +1524,21 @@ public class Kernel : Sys.Kernel
 
         int nodesBefore = DriverInfo.NodeCount;
         int portChildrenBefore = portBefore.ChildCount;
-        PcieRootPortState? port = FindRootPortState();
+        PcieRootPortState? port = FindDriverState<PcieRootPortState>();
         int removalsBefore = port?.RemovalCount ?? 0;
+
+        // Only the port's slot thread follows a slot event: one that did not
+        // start would leave every wait below to time out.
+        Assert.True(port?.HotPlugRunning == true, "the root port's slot thread is not running");
 
         s_unpluggedPciDisk = disk;
         s_unpluggedPciNodePath = nodePath;
         TR.RequestHost(PciUnplugRequest);
-        bool gone = WaitForDeviceCount(0);
-        bool nodeGone = WaitForNodeGone(nodePath);
-        bool functionGone = WaitForNodeGone(functionPath);
-        bool poweredOff = gone && functionGone && WaitForSlotPoweredOff(port, removalsBefore);
+        long deadline = HotPlugDeadline();
+        bool gone = WaitForDeviceCount(0, deadline);
+        bool nodeGone = WaitForNodeGone(nodePath, deadline);
+        bool functionGone = WaitForNodeGone(functionPath, deadline);
+        bool poweredOff = gone && functionGone && WaitForSlotPoweredOff(port, removalsBefore, deadline);
         s_dev = null;
 
         Assert.True(gone, "the disk is still registered after being unplugged");
@@ -1563,7 +1581,7 @@ public class Kernel : Sys.Kernel
     private static void TestPciHotPlug_ReplugRegistersDisk()
     {
         TR.RequestHost(PciPlugRequest);
-        Assert.True(WaitForDeviceCount(1), "the disk did not come back after being plugged in");
+        Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the disk did not come back after being plugged in");
         if (StorageManager.DeviceCount != 1)
         {
             return;
@@ -1634,18 +1652,19 @@ public class Kernel : Sys.Kernel
             Assert.True(writer.TryFlush());
         }
 
-        PcieRootPortState? port = FindRootPortState();
+        PcieRootPortState? port = FindDriverState<PcieRootPortState>();
         int removalsBefore = port?.RemovalCount ?? 0;
         TR.RequestHost(PciUnplugRequest);
-        bool gone = WaitForDeviceCount(0);
+        long deadline = HotPlugDeadline();
+        bool gone = WaitForDeviceCount(0, deadline);
         Assert.True(gone, "the disk is still registered after being unplugged");
         s_dev = null;
         Assert.False(IsMounted(HotPlugMountPoint), "the mount outlived its disk");
         Assert.Equal(0, StorageManager.Partitions.Count, "the disk's partition outlived it");
-        Assert.True(gone && WaitForSlotPoweredOff(port, removalsBefore), "the root port should have powered the slot off after the unplug");
+        Assert.True(gone && WaitForSlotPoweredOff(port, removalsBefore, deadline), "the root port should have powered the slot off after the unplug");
 
         TR.RequestHost(PciPlugRequest);
-        Assert.True(WaitForDeviceCount(1), "the disk did not come back after being plugged in");
+        Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the disk did not come back after being plugged in");
         if (StorageManager.DeviceCount != 1)
         {
             return;
@@ -1698,13 +1717,60 @@ public class Kernel : Sys.Kernel
         return false;
     }
 
+    // The deadline every wait after a host request shares; see HotPlugTimeoutMs.
+    private static long HotPlugDeadline() => Stopwatch.GetTimestamp() + (Stopwatch.Frequency * HotPlugTimeoutMs / MillisecondsPerSecond);
+
     // Waits for the kit's worker to bring the storage manager to `count`
     // devices, sleeping so that thread gets to run.
-    private static bool WaitForDeviceCount(int count)
+    private static bool WaitForDeviceCount(int count, long deadline)
     {
-        for (int waitedMs = 0; StorageManager.DeviceCount != count; waitedMs += HotPlugPollMs)
+        while (StorageManager.DeviceCount != count)
         {
-            if (waitedMs >= HotPlugTimeoutMs)
+            if (Stopwatch.GetTimestamp() >= deadline)
+            {
+                return false;
+            }
+
+            SysThread.Sleep(HotPlugPollMs);
+        }
+
+        return true;
+    }
+
+    // The driver state of the first node bound to a driver whose state is a
+    // T, through the kit's tree (the HAL grant): the usb cells carry one
+    // xHCI controller, the virtio-blk-pci cells one root port.
+#pragma warning disable COSMOS0003
+    private static T? FindDriverState<T>()
+        where T : class
+    {
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            if (nodes[i].Binding?.DriverState is T state)
+            {
+                return state;
+            }
+        }
+
+        return null;
+    }
+#pragma warning restore COSMOS0003
+
+    // The port's slot thread powers the slot off only after the retraction
+    // it waited for returned, and QEMU finishes a device_del inside that
+    // write: a plug requested before it would find the old device still in
+    // the slot and its drive still holding the image.
+    private static bool WaitForSlotPoweredOff(PcieRootPortState? port, int removalsBefore, long deadline)
+    {
+        if (port is null)
+        {
+            return false;
+        }
+
+        while (port.RemovalCount != removalsBefore + 1 || port.IsPoweredOn)
+        {
+            if (Stopwatch.GetTimestamp() >= deadline)
             {
                 return false;
             }
@@ -1719,53 +1785,11 @@ public class Kernel : Sys.Kernel
     // count drops in the teardown's second step while the node leaves the
     // tree only once the teardown has run through, so a poll that saw the
     // count drop can wake between the two.
-    // The root port's state, through the kit's tree (the HAL grant): the
-    // virtio-blk-pci cells carry one port.
-#pragma warning disable COSMOS0003
-    private static PcieRootPortState? FindRootPortState()
+    private static bool WaitForNodeGone(string path, long deadline)
     {
-        IReadOnlyList<Cosmos.Kernel.HAL.DriverKit.DeviceNode> nodes = Cosmos.Kernel.HAL.DriverKit.Engine.DriverEngine.Nodes;
-        for (int i = 0; i < nodes.Count; i++)
+        while (TryFindNode(path, out _))
         {
-            if (nodes[i].Binding?.DriverState is PcieRootPortState state)
-            {
-                return state;
-            }
-        }
-
-        return null;
-    }
-#pragma warning restore COSMOS0003
-
-    // The port's slot thread powers the slot off only after the retraction
-    // it waited for returned, and QEMU finishes a device_del inside that
-    // write: a plug requested before it would find the old device still in
-    // the slot and its drive still holding the image.
-    private static bool WaitForSlotPoweredOff(PcieRootPortState? port, int removalsBefore)
-    {
-        if (port is null)
-        {
-            return false;
-        }
-
-        for (int waitedMs = 0; port.RemovalCount != removalsBefore + 1 || port.IsPoweredOn; waitedMs += HotPlugPollMs)
-        {
-            if (waitedMs >= HotPlugTimeoutMs)
-            {
-                return false;
-            }
-
-            SysThread.Sleep(HotPlugPollMs);
-        }
-
-        return true;
-    }
-
-    private static bool WaitForNodeGone(string path)
-    {
-        for (int waitedMs = 0; TryFindNode(path, out _); waitedMs += HotPlugPollMs)
-        {
-            if (waitedMs >= HotPlugTimeoutMs)
+            if (Stopwatch.GetTimestamp() >= deadline)
             {
                 return false;
             }
