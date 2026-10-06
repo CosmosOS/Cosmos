@@ -134,11 +134,9 @@ The manifest order is deterministic (the kernel's own drivers first, then those 
 
 ## Identity and matches
 
-A bus knows a device before any driver looks at it, and it says so in a `DeviceIdentity`: `BusName` (the bus the device sits on), `Address` (its address in the bus's own notation) and `Describe()` (the identity in words, for the log). The node's `Path` is the two joined with a colon (`synthetic:kbd`, `platform:pci@cf8`, `pci:0000:00:03.0`), and it is how the log and the diagnostics view name the node.
+Every node has a `DeviceIdentity`, set by its bus: `BusName`, `Address`, and `Describe()` for the log. The node's `Path` joins the first two (`pci:0000:00:03.0`) and is how the log names the node.
 
-A driver's match table is a `ReadOnlySpan<DeviceMatch>`. Each `DeviceMatch` is a predicate over an identity, `Matches(DeviceIdentity)`, plus a `Specificity`: how many identity fields it constrains. Each bus kind brings its identity type and its match type as a pair, and a driver never sees a transport, only the identity.
-
-There are six pairs today. `SyntheticIdentity` carries a `Key` the test chose, and `SyntheticMatch` has two shapes:
+A driver's `Matches` is a list of `DeviceMatch`. Each one tests an identity and has a `Specificity`: the number of fields it checks. Every bus kind has its own pair of types (`PciIdentity` and `PciMatch`, `UsbIdentity` and `UsbMatch`, ...), described with their buses below. On the synthetic bus:
 
 ```csharp
 // This device and no other: specificity 1.
@@ -148,16 +146,14 @@ private readonly DeviceMatch[] _matches = [SyntheticMatch.Key("kbd")];
 private readonly DeviceMatch[] _matches = [SyntheticMatch.Any()];
 ```
 
-`PlatformIdentity` and `PlatformMatch` are the pair of the platform bus, `PciIdentity` and `PciMatch` the pair of PCI, `VirtioIdentity` and `VirtioMatch` the pair of virtio, `UsbIdentity` and `UsbMatch` the pair of USB, and `Ps2Identity` and `Ps2Match` the pair of PS/2; all five are described with their buses below, and a driver for any of them reads the same way: a table of matches and nothing about how the node was found.
-
-When a node appears, the kit collects every registered driver with a matching entry and orders them: by `Priority` (highest first), then by the specificity of the driver's best match (highest first), then by manifest position (earliest first). The log prints the order:
+When a node appears, the kit orders the matching drivers by `Priority`, then by specificity (highest first), then by manifest order, and offers the node to each until one returns `Bound`:
 
 ```
 [Drivers] synthetic:prio candidates: HighPriorityDriver(prio 10, spec 1) LowPriorityDriver(prio 0, spec 1)
 [Drivers] synthetic:prio offer HighPriorityDriver -> bound
 ```
 
-Each candidate is offered the node with a fresh binding, and the first to return `Bound` keeps it. A node no driver matched is logged `no driver` and stays in the tree as `Unbound`, so the diagnostics view can show it. Priority is how a kernel's own driver overrides a framework one for the same hardware: return more than `0`; specificity only breaks a tie in priority.
+To replace a shipped driver for the same hardware, give yours a `Priority` above `0`. A node no driver takes is logged `no driver` and stays `Unbound`.
 
 ## Probe and the binding
 
