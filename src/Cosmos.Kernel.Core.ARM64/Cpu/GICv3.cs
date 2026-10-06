@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.Core.ARM64.Cpu;
 /// GICv3 uses system registers (ICC_*) for the CPU interface instead of MMIO,
 /// and adds a Redistributor component (one per CPU).
 /// Base addresses are configurable to support both QEMU and real hardware.
-/// Native imports live in Cosmos.Kernel.Core.ARM64/Bridge/Import/Gic/GICv3Native.cs.
+/// Native imports live in Cosmos.Kernel.Core.ARM64/Bridge/Import/GICv3Native.cs.
 /// </summary>
 public static class GICv3
 {

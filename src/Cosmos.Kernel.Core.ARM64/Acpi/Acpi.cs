@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Core.ARM64;
 /// C# bridge to native ACPI GIC discovery (acpi_wrapper.c in MultiArch).
 /// The native code is called during early boot (kmain) and parses the MADT
 /// to extract GICD/GICR/GICC addresses. This class just retrieves the result.
-/// Native import lives in Cosmos.Kernel.Core.ARM64/Bridge/Import/Gic/AcpiGicNative.cs.
+/// Native import lives in Cosmos.Kernel.Core.ARM64/Bridge/Import/AcpiGicNative.cs.
 /// </summary>
 public static unsafe class AcpiGic
 {
