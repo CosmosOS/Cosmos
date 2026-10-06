@@ -3,13 +3,13 @@
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.Bridge;
 
-namespace Cosmos.Kernel.HAL;
+namespace Cosmos.Kernel.HAL.Firmware;
 
 /// <summary>
 /// C# bridge to native ACPI MCFG discovery (acpi_wrapper.c in MultiArch).
 /// The native code is called during early boot (kmain) and parses the MCFG
 /// table to extract the PCI ECAM base address. This class just retrieves the result.
-/// Native import lives in Cosmos.Kernel.Core/Bridge/Import/AcpiNative.cs.
+/// Native import lives in Cosmos.Kernel.Core/Bridge/Import/AcpiMcfgNative.cs.
 /// </summary>
 internal static unsafe class AcpiMcfg
 {

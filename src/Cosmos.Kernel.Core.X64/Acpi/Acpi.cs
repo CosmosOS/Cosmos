@@ -105,7 +105,7 @@ public unsafe struct MadtInfo
 
 /// <summary>
 /// ACPI subsystem interface.
-/// Native import lives in Cosmos.Kernel.Core.X64/Bridge/Import/AcpiNative.cs.
+/// Native import lives in Cosmos.Kernel.Core.X64/Bridge/Import/AcpiMadtNative.cs.
 /// </summary>
 public static unsafe class AcpiMadt
 {
