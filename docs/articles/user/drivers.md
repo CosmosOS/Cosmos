@@ -571,24 +571,21 @@ Resources are built with `DeviceResource.MemoryWindow`, `PortRange`, `RamWindow`
 
 ## Declining and failing
 
-`ProbeResult` is an outcome the caller must tell apart, so it is a value with a kind and a reason, not a bool and not an exception:
+`Probe` returns one of three results:
 
-| Result | Meaning | What the kit does |
-|--------|---------|-------------------|
-| `ProbeResult.Bound` | The driver took the device | Keeps the binding and everything acquired through it |
-| `ProbeResult.Declined(reason)` | The driver looked and does not want it | Unwinds the ledger, records the reason, offers the next candidate |
-| `ProbeResult.Failed(reason)` | The driver wanted it and could not bring it up | The same, recorded as failed |
-| An exception escaping `Probe` | Treated as `Failed` with the exception's message | The same |
+| Result | When to return it |
+|--------|-------------------|
+| `ProbeResult.Bound` | The driver took the device. |
+| `ProbeResult.Declined(reason)` | The device is not one the driver serves after all (an unknown revision, a missing feature). |
+| `ProbeResult.Failed(reason)` | The device is one the driver serves, but bringing it up did not work. An exception escaping `Probe` counts as a failure. |
 
-In every case but `Bound` the kit releases everything in the ledger in the same fixed order as a teardown (below), without the `OnDetach` hook, before offering the node to the next candidate. A work item the probe had scheduled is taken out of the queue; a handler it had connected is disconnected; a device it had published is withdrawn. The offer records how many kit resources the probe had acquired (`ReleasedResourceCount`), and the total the kit holds returns to what it was. The Drivers suite has one driver that acquires a window, a DMA buffer, an event and a work item and then declines, and one that throws, to assert both paths:
+On anything but `Bound`, the kit releases everything the probe acquired, then offers the node to the next candidate. The reason is printed in the log:
 
 ```
 [Drivers] synthetic:decline offer DecliningDriver -> declined: declined on purpose
 [Drivers] synthetic:decline offer AnyKeyDriver -> bound
 [Drivers] synthetic:throw offer ThrowingDriver -> failed: probe threw on purpose
 ```
-
-Decline when the device is not one the driver serves after all (a revision it does not know, a feature set it cannot negotiate); fail when it is and bring-up did not work. Both reasons are short strings for the log and the diagnostics view.
 
 ## Teardown and OnDetach
 
