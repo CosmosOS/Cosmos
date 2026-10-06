@@ -1,6 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.HAL.Interfaces.Devices;
+namespace Cosmos.Kernel.HAL.Platform;
 
 /// <summary>
 /// Delegate for handling timer tick events.

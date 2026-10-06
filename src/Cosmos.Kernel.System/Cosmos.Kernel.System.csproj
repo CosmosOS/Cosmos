@@ -78,7 +78,8 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Plugs</_Parameter1>
     </AssemblyAttribute>
-    <!-- White-box network tests observe the stack's ICMP echo counters. -->
+    <!-- White-box network tests observe the stack's ICMP echo counters and
+         the packet handler it attached to the internal INetworkDevice. -->
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.Network</_Parameter1>
     </AssemblyAttribute>

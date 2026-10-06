@@ -94,11 +94,10 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Runtime" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.ARM64" />
-    <!-- HAL's ACPI layer reads the MCFG table through AcpiMcfgNative. -->
-    <InternalsVisibleTo Include="Cosmos.Kernel.HAL" />
-    <!-- IPlatformInitializer's factory methods return the platform contracts
+    <!-- HAL's ACPI layer reads the MCFG table through AcpiMcfgNative, and
+         IPlatformInitializer's factory methods return the platform contracts
          (IPortIO, ICpuOps, IPowerOps, IInterruptController). -->
-    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.Interfaces" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL" />
     <!-- Plugs read feature knobs (KnobsNative) and module metadata (ManagedModule). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
     <!-- White-box GC tests drive the CFI unwinder through ExceptionHelper. -->

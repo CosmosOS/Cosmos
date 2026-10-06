@@ -1,4 +1,21 @@
 #nullable enable
+Cosmos.Kernel.HAL.Devices.IBlockDevice
+Cosmos.Kernel.HAL.Devices.IBlockDevice.BlockCount.get -> ulong
+Cosmos.Kernel.HAL.Devices.IBlockDevice.BlockSize.get -> ulong
+Cosmos.Kernel.HAL.Devices.IBlockDevice.Flush() -> void
+Cosmos.Kernel.HAL.Devices.IBlockDevice.Name.get -> string!
+Cosmos.Kernel.HAL.Devices.IBlockDevice.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
+Cosmos.Kernel.HAL.Devices.IBlockDevice.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
+Cosmos.Kernel.HAL.Devices.MACAddress
+Cosmos.Kernel.HAL.Devices.MACAddress.CompareTo(Cosmos.Kernel.HAL.Devices.MACAddress? other) -> int
+Cosmos.Kernel.HAL.Devices.MACAddress.Equals(Cosmos.Kernel.HAL.Devices.MACAddress? other) -> bool
+Cosmos.Kernel.HAL.Devices.MACAddress.MACAddress(byte[]! address) -> void
+Cosmos.Kernel.HAL.Devices.MACAddress.MACAddress(byte[]! buffer, int offset) -> void
+Cosmos.Kernel.HAL.Devices.MACAddress.MACAddress(Cosmos.Kernel.HAL.Devices.MACAddress! m) -> void
+Cosmos.Kernel.HAL.Platform.SoftwareTimer
+Cosmos.Kernel.HAL.Platform.SoftwareTimer.IsActive.get -> bool
+Cosmos.Kernel.HAL.Platform.SoftwareTimer.Recurring.get -> bool
+Cosmos.Kernel.HAL.Platform.SoftwareTimer.TimeoutNs.get -> ulong
 Cosmos.Kernel.HAL.Vfs.IFileOperations
 Cosmos.Kernel.HAL.Vfs.IFileOperations.Fsync(Cosmos.Kernel.HAL.Vfs.IVfsOpenFile! openFile) -> bool
 Cosmos.Kernel.HAL.Vfs.IFileOperations.Read(Cosmos.Kernel.HAL.Vfs.IVfsOpenFile! openFile, System.Span<byte> buffer) -> long
@@ -114,6 +131,11 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.TvNsec -> long
 Cosmos.Kernel.HAL.Vfs.VfsTimespec.TvSec -> long
 Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec() -> void
 Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
+override Cosmos.Kernel.HAL.Devices.MACAddress.Equals(object? obj) -> bool
+override Cosmos.Kernel.HAL.Devices.MACAddress.GetHashCode() -> int
+override Cosmos.Kernel.HAL.Devices.MACAddress.ToString() -> string!
+static Cosmos.Kernel.HAL.Devices.MACAddress.Broadcast.get -> Cosmos.Kernel.HAL.Devices.MACAddress!
+static Cosmos.Kernel.HAL.Devices.MACAddress.None.get -> Cosmos.Kernel.HAL.Devices.MACAddress!
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.DeviceIdentity.Address.get -> string!
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.DeviceIdentity.BusName.get -> string!
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.DeviceIdentity.Describe() -> string!
@@ -226,7 +248,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.MapRegion(int resourceIndex, Cosmos.Kernel.HAL.DriverKit.RegionCaching caching) -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.MapRegisters(int resourceIndex) -> Cosmos.Kernel.HAL.DriverKit.RegisterWindow!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.Node.get -> Cosmos.Kernel.HAL.DriverKit.DeviceNode!
-[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.PublishBlockDevice(Cosmos.Kernel.HAL.Interfaces.Devices.IBlockDevice! device) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.PublishBlockDevice(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.PublishChild(Cosmos.Kernel.HAL.DriverKit.DeviceIdentity! identity, Cosmos.Kernel.HAL.DriverKit.DeviceResource[]! resources, Cosmos.Kernel.HAL.DriverKit.InterruptSource![]! interrupts, object? access) -> Cosmos.Kernel.HAL.DriverKit.DeviceNode!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.PublishDisplay(Cosmos.Kernel.HAL.DriverKit.Devices.IDisplay! display) -> Cosmos.Kernel.HAL.DriverKit.Devices.DisplaySink!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DeviceBinding.PublishKeyboard(Cosmos.Kernel.HAL.DriverKit.Devices.IKeyboard! keyboard) -> Cosmos.Kernel.HAL.DriverKit.Devices.KeyboardSink!
@@ -322,7 +344,7 @@ Cosmos.Kernel.HAL.Vfs.VfsTimespec.VfsTimespec(long tvSec, long tvNsec) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IKeyboard.SetLeds(Cosmos.Kernel.HAL.DriverKit.Devices.KeyboardLeds leds) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.INetworkInterface
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.INetworkInterface.LinkUp.get -> bool
-[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.INetworkInterface.MacAddress.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.INetworkInterface.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MACAddress!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.INetworkInterface.Name.get -> string!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.INetworkInterface.Transmit(System.ReadOnlySpan<byte> frame) -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Devices.IPointer

@@ -1,4 +1,4 @@
-namespace Cosmos.Kernel.HAL.Interfaces.Devices;
+namespace Cosmos.Kernel.HAL.Devices;
 
 /// <summary>
 /// A 48-bit Ethernet MAC address.

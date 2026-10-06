@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Network.IPv4;
 using Cosmos.Kernel.System.Timer;
 

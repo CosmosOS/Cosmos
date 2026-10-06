@@ -2,8 +2,8 @@
 
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
+using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.System.Network;
 

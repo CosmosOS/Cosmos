@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices;
 
 namespace Cosmos.Kernel.System.Network.ARP;
 

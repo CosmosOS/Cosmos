@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.System.Network.IPv4;
 
 namespace Cosmos.Kernel.System.Network.ARP;

@@ -6,8 +6,7 @@ using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
-using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Interfaces;
+using Cosmos.Kernel.HAL.Platform;
 
 namespace Internal.Runtime.CompilerHelpers;
 

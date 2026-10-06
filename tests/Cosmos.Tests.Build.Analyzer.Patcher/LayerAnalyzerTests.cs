@@ -18,7 +18,6 @@ namespace Cosmos.Tests.Build.Analyzer.Patcher;
 public class LayerAnalyzerTests
 {
     private const string CoreName = "Cosmos.Kernel.Core";
-    private const string HalInterfacesName = "Cosmos.Kernel.HAL.Interfaces";
     private const string HalName = "Cosmos.Kernel.HAL";
     private const string HalX64Name = "Cosmos.Kernel.HAL.X64";
     private const string HalArm64Name = "Cosmos.Kernel.HAL.ARM64";
@@ -28,10 +27,9 @@ public class LayerAnalyzerTests
     private static readonly MetadataReference s_corlibReference =
         MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 
-    // Built the way the tree is: the HAL against Core and the interfaces, the ring against the HAL.
+    // Built the way the tree is: the HAL against Core, the ring against the HAL.
     private static readonly MetadataReference s_nativeX64Reference = FakeAssembly.EmitWithMarker(NativeX64Name);
     private static readonly MetadataReference s_coreReference = FakeAssembly.EmitWithMarker(CoreName, s_nativeX64Reference);
-    private static readonly MetadataReference s_halInterfacesReference = FakeAssembly.EmitWithMarker(HalInterfacesName, s_coreReference);
     private static readonly MetadataReference s_halReference = FakeAssembly.Emit(
         HalName,
         $$"""
@@ -45,7 +43,7 @@ public class LayerAnalyzerTests
             }
         }
         """,
-        s_coreReference, s_halInterfacesReference);
+        s_coreReference);
     private static readonly MetadataReference s_halX64Reference = FakeAssembly.EmitWithMarker(HalX64Name, s_coreReference, s_halReference);
     private static readonly MetadataReference s_halArm64Reference = FakeAssembly.EmitWithMarker(HalArm64Name, s_coreReference, s_halReference);
     private static readonly MetadataReference s_systemReference = FakeAssembly.EmitWithMarker(SystemName, s_coreReference, s_halReference);
@@ -53,7 +51,7 @@ public class LayerAnalyzerTests
     /// <summary>The full reference list a kernel or a driver library ends up with after restore.</summary>
     private static readonly MetadataReference[] s_everyReference =
     [
-        s_systemReference, s_halReference, s_halInterfacesReference, s_halX64Reference, s_halArm64Reference, s_coreReference, s_nativeX64Reference
+        s_systemReference, s_halReference, s_halX64Reference, s_halArm64Reference, s_coreReference, s_nativeX64Reference
     ];
 
     /// <summary>Doc comments are parsed and bound, as they are in the tree (GenerateDocumentationFile is on).</summary>
@@ -71,18 +69,6 @@ public class LayerAnalyzerTests
             s_everyReference,
             driverAssemblyValue,
             SystemName, HalName);
-
-        Assert.DoesNotContain(diagnostics, d => d.Id == DiagnosticMessages.LayerViolation.Id);
-    }
-
-    [Fact]
-    public async Task DriverAssembly_UsingTheDeviceContracts_NoLayerViolation()
-    {
-        ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(
-            "Cosmos.Kernel.Drivers",
-            s_everyReference,
-            "true",
-            HalName, HalInterfacesName);
 
         Assert.DoesNotContain(diagnostics, d => d.Id == DiagnosticMessages.LayerViolation.Id);
     }
@@ -108,7 +94,7 @@ public class LayerAnalyzerTests
         // The reference list carries Core (the HAL was built against it); the code never names it.
         ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(
             "Cosmos.Kernel.Drivers",
-            [s_halReference, s_halInterfacesReference, s_coreReference],
+            [s_halReference, s_coreReference],
             "true",
             HalName);
 
@@ -146,7 +132,6 @@ public class LayerAnalyzerTests
     [Theory]
     [InlineData(SystemName)]
     [InlineData(HalName)]
-    [InlineData(HalInterfacesName)]
     public async Task UserKernel_UsingTheRingOrTheSeam_NoLayerViolation(string usedName)
     {
         ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(
@@ -348,7 +333,7 @@ public class LayerAnalyzerTests
 
     [Theory]
     [InlineData(HalX64Name, CoreName)]
-    [InlineData(HalName, HalInterfacesName)]
+    [InlineData(HalX64Name, HalName)]
     [InlineData(CoreName, NativeX64Name)]
     public async Task LowerLayer_UsingTheLayerBelow_NoLayerViolation(string assemblyName, string usedName)
     {

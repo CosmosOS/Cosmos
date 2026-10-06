@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.HAL;
+using Cosmos.Kernel.HAL.Platform;
 
 namespace Cosmos.Kernel.System;
 

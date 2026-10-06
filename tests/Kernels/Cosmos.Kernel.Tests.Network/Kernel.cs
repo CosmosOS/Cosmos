@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Config;

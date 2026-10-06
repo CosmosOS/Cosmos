@@ -4,9 +4,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Virtio;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 

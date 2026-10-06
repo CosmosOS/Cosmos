@@ -18,7 +18,6 @@
         <Project Path="src/Cosmos.Kernel.SourceGenerators/Cosmos.Kernel.SourceGenerators.csproj" />
         <Project Path="src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
         <Project Path="src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
-        <Project Path="src\Cosmos.Kernel.HAL.Interfaces\Cosmos.Kernel.HAL.Interfaces.csproj" />
     </Folder>
     <Folder Name="/src/Build/">
         <Project Path="src/Cosmos.Build.Analyzer.Patcher.CodeFixes/Cosmos.Build.Analyzer.Patcher.CodeFixes.csproj" />

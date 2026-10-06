@@ -13,11 +13,8 @@ flowchart LR;
 	Cosmos.Kernel.Plugs-->Cosmos.Kernel.System;
     Cosmos.Kernel.Plugs-->Cosmos.Kernel.HAL;
     Cosmos.Kernel.Plugs-->Cosmos.Kernel.Core;
-    Cosmos.Kernel.HAL-->Cosmos.Kernel.HAL.Interfaces;
     Cosmos.Kernel.HAL.ARM64-->Cosmos.Kernel.HAL;
     Cosmos.Kernel.HAL.X64-->Cosmos.Kernel.HAL;
-	Cosmos.Kernel.HAL.ARM64-->Cosmos.Kernel.HAL.Interfaces;
-	Cosmos.Kernel.HAL.X64-->Cosmos.Kernel.HAL.Interfaces;
 	Cosmos.Kernel.HAL.ARM64-->Cosmos.Kernel.Core;
 	Cosmos.Kernel.HAL.X64-->Cosmos.Kernel.Core;
 	Cosmos.Kernel.HAL-->Cosmos.Kernel.Core;
@@ -32,8 +29,7 @@ flowchart LR;
 |---------|---------|
 | **Cosmos.Kernel.System** | High-level OS APIs: Console, Graphics, Network, Timer, Mouse. The layer user kernels interact with. |
 | **Cosmos.Kernel.Drivers** | The nineteen drivers Cosmos ships over the driver kit: the PCI host and PCI Express root port drivers, the Intel E1000E driver, the virtio PCI and MMIO transport drivers, the virtio-net and virtio-input drivers, the two display drivers, `VirtioGpuDriver` and `VmwareSvgaDriver` (with its SVGA3D command layer and `Canvas3D`), the three block drivers, `AhciDriver`, `NvmeDriver` and the virtio leaf `VirtioBlkDriver`, whose disks the storage manager consumes, the USB drivers: `XhciDriver` with the hub, HID boot keyboard and mass storage class drivers, and the PS/2 drivers: `I8042Driver` with `Ps2KeyboardDriver` and `Ps2MouseDriver`. Each driver sits in a bus kind / category / driver folder, and its namespace follows the folder ([Driver Folders](coding-guidelines.md#driver-folders)): `Pci/` (`Bus/PcieRootPort`, `Bus/VirtioPci`, `Bus/Xhci`, `Display/VmwareSvga`, `Network/E1000E`, `Storage/Ahci`, `Storage/Nvme`), `Platform/Bus/` (`I8042`, `PciHost`, `VirtioMmio`), `Ps2/Input/` (`Ps2Keyboard`, `Ps2Mouse`), `Usb/` (`Bus/UsbHub`, `Input/UsbKeyboard`, `Storage/UsbMassStorage`) and `Virtio/` (`Display/VirtioGpu`, `Input/VirtioInput`, `Network/VirtioNet`, `Storage/VirtioBlk`), so the xHCI driver is `Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver`. A User-layer driver assembly (`CosmosDriverAssembly`), held by the layer analyzer to what a kernel author can name, with no `InternalsVisibleTo` grant from any project; one RID-less `lib/net10.0` package, since it holds no architecture-specific code. Referenced by Cosmos.Kernel, so every kernel carries its drivers in the manifest. |
-| **Cosmos.Kernel.HAL** | Hardware Abstraction Layer: shared logic, platform registration (`PlatformHAL`), device managers, the driver kit (`DriverKit/`, with its six bus kinds, synthetic, platform, PCI, virtio, USB and PS/2, and the display kind and its facets under `DriverKit/Devices/`), and the Firmware facility (`Firmware/`: the boot framebuffer the kit publishes as the firmware display, the device tree parser the ARM64 description reads, the bridge to the ACPI MCFG table the native boot code parses, and the clock read through the UEFI runtime services). |
-| **Cosmos.Kernel.HAL.Interfaces** | Pure interfaces, no implementations. Public: `IBlockDevice`, which kernels implement and drive directly, `MACAddress`, and `SoftwareTimer` as a read-only handle. Internal: the boot contract `IPlatformInitializer`, the timer and network devices, and `SoftwareTimer`'s construction and tick members. |
+| **Cosmos.Kernel.HAL** | Hardware Abstraction Layer: shared logic, the platform contracts (`Platform/`: the internal boot contract `IPlatformInitializer`, platform registration `PlatformHAL`, the timer device base and `SoftwareTimer`, public as a read-only handle), the device contracts the ring hands out (`Devices/`: `IBlockDevice`, which kernels implement and drive directly, and `MACAddress`), the driver kit (`DriverKit/`, with its six bus kinds, synthetic, platform, PCI, virtio, USB and PS/2, and the display kind and its facets under `DriverKit/Devices/`), and the Firmware facility (`Firmware/`: the boot framebuffer the kit publishes as the firmware display, the device tree parser the ARM64 description reads, the bridge to the ACPI MCFG table the native boot code parses, and the clock read through the UEFI runtime services). |
 | **Cosmos.Kernel.HAL.X64** | x86-64 platform code: the machine description (the 8042 and PCI host nodes), the I/O APIC line routing, the PIT and the CMOS RTC. No device driver. |
 | **Cosmos.Kernel.HAL.ARM64** | ARM64 platform code: the machine description (the ECAM host and the virtio-mmio slots, from ACPI's MCFG, the device tree or the virt machine's table), the GIC line routing, the generic timer and the PL031 RTC. No device driver. |
 | **Cosmos.Kernel.Core** | Low-level runtime: memory management, GC, scheduler, serial I/O, panic handler. |
@@ -42,7 +38,7 @@ flowchart LR;
 | **Cosmos.Kernel.Native.MultiArch** | Cross-platform native C code (ACPI, libc stubs). |
 | **Cosmos.Kernel.Plugs** | IL-level method replacements for BCL types (`Console`, `Thread`, `Environment`, etc.). |
 | **Cosmos.Kernel.Boot.Limine** | Limine bootloader protocol integration. |
-| **Cosmos.Kernel** | The aggregator every kernel references. Pulls in Boot.Limine, Core, Drivers, HAL, HAL.Interfaces, Plugs and System, ships the `kmain` bootstrap C sources, and holds the library initializer that wires up the CPU exception handlers and the scheduler. No public types. |
+| **Cosmos.Kernel** | The aggregator every kernel references. Pulls in Boot.Limine, Core, Drivers, HAL, Plugs and System, ships the `kmain` bootstrap C sources, and holds the library initializer that wires up the CPU exception handlers and the scheduler. No public types. |
 
 ## Build System Projects
 
@@ -63,7 +59,7 @@ flowchart LR;
 - Cross-cutting concerns (memory, scheduler, serial) go in **Core**
 - Platform code (machine descriptions, interrupt line routing, tick sources, firmware clocks) goes in **HAL.X64** / **HAL.ARM64**; device drivers go in **Cosmos.Kernel.Drivers** over the kit
 - User-facing APIs go in **System**
-- The hardware contracts the ring still shares are defined in **HAL.Interfaces**; device kinds live in the kit
+- The hardware contracts the ring still shares (`IBlockDevice`, `MACAddress`, `SoftwareTimer`) are defined in **HAL**, outside the kit's experimental seam; device kinds live in the kit, and the network device the stack drives is internal to **System**
 - A driver written over the driver kit for a device the kit's buses reach goes in **Drivers**, which references only System and HAL and never the arch assemblies
 
 For coding style and implementation patterns, see [Coding Guidelines](coding-guidelines.md).

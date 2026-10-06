@@ -21,7 +21,7 @@ Run the script from the root of the repository:
    - Base libraries (`Cosmos.Build.API`, `Cosmos.Build.Common`)
    - Build tools (`Cosmos.Build.Asm`, `Cosmos.Build.CC`, `Cosmos.Build.Ilc`, `Cosmos.Build.Patcher`, `Cosmos.Patcher`, `Cosmos.Tools`)
    - Native runtime packages for x64 and ARM64 (`Cosmos.Kernel.Native.*`)
-   - Architecture-independent kernel packages (`Cosmos.Kernel.HAL.Interfaces`, `Cosmos.Kernel.Debug`, `Cosmos.Kernel.Boot.Limine`)
+   - Architecture-independent kernel packages (`Cosmos.Kernel.Drivers`, `Cosmos.Kernel.Debug`, `Cosmos.Kernel.Boot.Limine`, `Cosmos.Kernel.SourceGenerators`)
    - Architecture-specific HAL packages (`Cosmos.Kernel.HAL.X64`, `Cosmos.Kernel.HAL.ARM64`)
    - Multi-arch kernel packages built for both `linux-x64` and `linux-arm64` (`Cosmos.Kernel.Core`, `Cosmos.Kernel.HAL`, `Cosmos.Kernel.System`, `Cosmos.Kernel.Plugs`, `Cosmos.Kernel`)
    - SDK and templates (`Cosmos.Sdk`, `Cosmos.Build.Templates`)

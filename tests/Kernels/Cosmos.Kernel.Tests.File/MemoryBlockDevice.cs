@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.Tests.File;
 // global:: because a plain "System" binds to Cosmos.Kernel.System from
 // inside this namespace.
 using global::System;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices;
 
 /// <summary>
 /// RAM-backed <see cref="IBlockDevice"/> for the System.IO tests. No

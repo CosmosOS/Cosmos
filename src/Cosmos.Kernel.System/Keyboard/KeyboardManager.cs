@@ -7,6 +7,7 @@ using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.Platform;
 using Cosmos.Kernel.System.Keyboard.ScanMaps;
 
 namespace Cosmos.Kernel.System.Keyboard;
@@ -419,7 +420,7 @@ public static class KeyboardManager
 
             // The halt waits for the interrupt, or the worker's tick, that
             // fills the queue.
-            HAL.PlatformHAL.CpuOps?.Halt();
+            PlatformHAL.CpuOps?.Halt();
         }
     }
 

@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices;
 
 namespace Cosmos.Kernel.System.Network;
 

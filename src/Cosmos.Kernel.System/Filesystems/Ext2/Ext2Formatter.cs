@@ -1,6 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.Vfs;
 
 namespace Cosmos.Kernel.System.Filesystems.Ext2;

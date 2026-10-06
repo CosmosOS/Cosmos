@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.System.Storage;
 using DevKernel.Shell;
 using DevKernel.Storage;

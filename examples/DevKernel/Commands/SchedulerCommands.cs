@@ -1,5 +1,5 @@
 using System;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Platform;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Timer;
 using DevKernel.Diagnostics;

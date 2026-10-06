@@ -25,7 +25,7 @@ namespace Cosmos.Build.Analyzer.Patcher;
 /// <para>
 /// Allowed references (strict, no skipping layers):
 /// <list type="bullet">
-///   <item>User     -> System, and the two HAL assemblies the public surface names: Cosmos.Kernel.HAL (the driver kit's host) and Cosmos.Kernel.HAL.Interfaces (the device contracts)</item>
+///   <item>User     -> System, and the one HAL assembly the public surface names: Cosmos.Kernel.HAL (the driver kit's host and the device contracts)</item>
 ///   <item>System   -> HAL</item>
 ///   <item>HAL      -> HAL, Core</item>
 ///   <item>Core     -> Native</item>
@@ -37,17 +37,12 @@ namespace Cosmos.Build.Analyzer.Patcher;
 public class LayerAnalyzer : DiagnosticAnalyzer
 {
     /// <summary>
-    /// The HAL assembly that carries the driver kit seam: a User layer project may name
-    /// its types. The arch HAL assemblies are reached through it only.
+    /// The HAL assembly that carries the driver kit seam and the device contracts the ring
+    /// and the kit name in their public surface (<c>IBlockDevice</c>, <c>MACAddress</c>,
+    /// <c>SoftwareTimer</c>): a User layer project may name its types. The arch HAL
+    /// assemblies are reached through it only.
     /// </summary>
     private const string DriverKitHostAssemblyName = "Cosmos.Kernel.HAL";
-
-    /// <summary>
-    /// The HAL assembly that holds the device contracts the ring and the driver kit name
-    /// in their public surface (<c>IBlockDevice</c>, <c>MACAddress</c> and the rest): a
-    /// User layer project names one of them whenever it touches such a member.
-    /// </summary>
-    private const string DeviceContractsAssemblyName = "Cosmos.Kernel.HAL.Interfaces";
 
     /// <summary>
     /// The analyzer config key behind <c>&lt;CosmosDriverAssembly&gt;</c>, made visible by
@@ -202,7 +197,7 @@ public class LayerAnalyzer : DiagnosticAnalyzer
             return KernelLayer.Core;
         }
 
-        // HAL: Cosmos.Kernel.HAL, Cosmos.Kernel.HAL.X64, Cosmos.Kernel.HAL.ARM64, Cosmos.Kernel.HAL.Interfaces
+        // HAL: Cosmos.Kernel.HAL, Cosmos.Kernel.HAL.X64, Cosmos.Kernel.HAL.ARM64
         if (name.StartsWith("Cosmos.Kernel.HAL", System.StringComparison.Ordinal))
         {
             return KernelLayer.Hal;
@@ -224,8 +219,7 @@ public class LayerAnalyzer : DiagnosticAnalyzer
         return current switch
         {
             KernelLayer.User => referenced == KernelLayer.System
-                || referencedName == DriverKitHostAssemblyName
-                || referencedName == DeviceContractsAssemblyName,
+                || referencedName == DriverKitHostAssemblyName,
             KernelLayer.System => referenced == KernelLayer.Hal,
             KernelLayer.Hal => referenced == KernelLayer.Hal || referenced == KernelLayer.Core,
             KernelLayer.Core => referenced == KernelLayer.Native,

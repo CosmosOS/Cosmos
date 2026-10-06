@@ -2,6 +2,7 @@
 
 using Cosmos.Build.API.Enum;
 using Cosmos.Kernel.Core.CPU;
+using Cosmos.Kernel.HAL.Platform;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Pci;

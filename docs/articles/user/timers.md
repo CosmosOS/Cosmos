@@ -33,7 +33,7 @@ These are the `using`s the snippets below rely on:
 
 ```csharp
 using System;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Platform;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Timer;
 ```

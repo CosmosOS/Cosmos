@@ -1,6 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.Vfs;
 using Cosmos.Kernel.System.Storage;
 using global::System.Diagnostics.CodeAnalysis;

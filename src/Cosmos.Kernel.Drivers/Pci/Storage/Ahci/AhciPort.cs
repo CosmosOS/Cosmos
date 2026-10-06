@@ -2,8 +2,8 @@
 
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.Drivers.Pci.Storage.Ahci;
 

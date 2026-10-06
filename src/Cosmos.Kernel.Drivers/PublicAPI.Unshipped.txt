@@ -71,7 +71,7 @@ Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.InterruptCount.get -> int
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.IsPolling.get -> bool
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.LinkChanges.get -> int
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.LinkUp.get -> bool
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.MacAddress.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
+Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MACAddress!
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.Name.get -> string!
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
 Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciDriver
@@ -232,7 +232,7 @@ Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.InterruptEntryCoun
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.IsPolling.get -> bool
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.LinkChanges.get -> int
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.LinkUp.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.MacAddress.get -> Cosmos.Kernel.HAL.Interfaces.Devices.MACAddress!
+Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MACAddress!
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.Name.get -> string!
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.Version1Negotiated.get -> bool

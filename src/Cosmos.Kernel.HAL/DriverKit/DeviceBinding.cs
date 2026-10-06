@@ -6,8 +6,7 @@ using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Usb;
-using Cosmos.Kernel.HAL.Interfaces;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Platform;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.HAL.DriverKit;

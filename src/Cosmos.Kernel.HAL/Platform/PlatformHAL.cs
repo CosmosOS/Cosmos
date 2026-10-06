@@ -4,9 +4,8 @@ using Cosmos.Build.API.Enum;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Power;
-using Cosmos.Kernel.HAL.Interfaces;
 
-namespace Cosmos.Kernel.HAL;
+namespace Cosmos.Kernel.HAL.Platform;
 
 /// <summary>
 /// Platform HAL manager - provides access to platform-specific hardware.

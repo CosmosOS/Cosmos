@@ -4,7 +4,7 @@
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Platform;
 
 namespace Cosmos.Kernel.HAL.X64;
 

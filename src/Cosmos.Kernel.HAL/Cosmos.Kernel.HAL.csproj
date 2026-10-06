@@ -13,7 +13,17 @@
     <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
-         the VFS contract types and the driver kit seam (COSMOS0003). -->
+         the VFS contract types, the driver kit seam (COSMOS0003), and the
+         contracts the ring hands out: IBlockDevice, the one device contract
+         kernels really implement and drive (the Fat and File suites each
+         supply a RAM disk, DevKernel reads and writes blocks through it),
+         MACAddress, which the packet seam and NetworkManager both hand out,
+         and SoftwareTimer as the handle TimerManager.Schedule returns.
+         SoftwareTimer's construction and tick members stay internal: they
+         belong to the timer device, and a kernel calling them corrupts the
+         registry. The boot contract (IPlatformInitializer) and the timer
+         device are internal because no kernel can obtain or meaningfully
+         supply one. -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
   <ItemGroup>
@@ -21,7 +31,6 @@
     <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.Boot.Limine\Cosmos.Kernel.Boot.Limine.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" PrivateAssets="none" />
-    <ProjectReference Include="..\Cosmos.Kernel.HAL.Interfaces\Cosmos.Kernel.HAL.Interfaces.csproj" />
     <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
@@ -53,20 +62,24 @@
   <ItemGroup>
     <!-- System's managers install their kit consumers through the internal
          DeviceRegistry (keyboard, mouse, network, display, block) and build
-         the keyboard manager's indicator work item. -->
+         the keyboard manager's indicator work item; its library initializer
+         registers the platform timer, TimerManager constructs SoftwareTimer,
+         and the network stack reads MACAddress's internal bytes. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
-    <!-- The aggregator initializes PlatformHAL from its library initializer. -->
+    <!-- The aggregator reads PlatformHAL.Initializer from its library initializer. -->
     <InternalsVisibleTo Include="Cosmos.Kernel" />
-    <!-- Arch HALs are the machine descriptions: they publish platform nodes
-         and line sources through the internal PlatformBus and
-         PlatformLineRouting, and their tick sources derive from TimerDevice. -->
+    <!-- Arch HALs are the machine descriptions: they implement
+         IPlatformInitializer, publish platform nodes and line sources
+         through the internal PlatformBus and PlatformLineRouting, and their
+         tick sources derive from TimerDevice. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box suites over HAL internals: the kit's MSI-X table and the
          nodes' PciAccess (Interrupts), the PCI host's configuration
          mechanism and the nodes' PciAccess (Pci), the kit's tree behind
-         the BAR relocation probes (Storage), the TimerDevice base and its
-         software timers (Timer), the tree and the bindings' driver state
+         the BAR relocation probes and PlatformHAL.Initializer's
+         EnsureMmioMapped for a high BAR (Storage), the TimerDevice base and
+         its software timers (Timer), the tree and the bindings' driver state
          (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />

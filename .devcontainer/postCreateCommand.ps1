@@ -96,10 +96,8 @@ Get-ChildItem -Path "artifacts/package/release/Cosmos.Kernel.Native.*.nupkg" | F
 
 # Architecture-independent kernel packages (build first, then pack)
 Write-Host "Building and packing architecture-independent kernel packages..." -ForegroundColor Cyan
-dotnet build src/Cosmos.Kernel.HAL.Interfaces/Cosmos.Kernel.HAL.Interfaces.csproj -c Release -p:GeneratePackageOnBuild=false
-dotnet pack src/Cosmos.Kernel.HAL.Interfaces/Cosmos.Kernel.HAL.Interfaces.csproj -c Release --no-build -o artifacts/package/release
 # The shipped drivers hold no architecture-specific code: one RID-less build
-# (which builds HAL and System RID-less too, as HAL.Interfaces does for Core)
+# (which builds Core, HAL and System RID-less too)
 # and one lib/net10.0 package over the HAL and System public surfaces.
 dotnet build src/Cosmos.Kernel.Drivers/Cosmos.Kernel.Drivers.csproj -c Release -p:GeneratePackageOnBuild=false
 dotnet pack src/Cosmos.Kernel.Drivers/Cosmos.Kernel.Drivers.csproj -c Release --no-build -o artifacts/package/release
@@ -111,7 +109,6 @@ dotnet build src/Cosmos.Kernel.SourceGenerators/Cosmos.Kernel.SourceGenerators.c
 dotnet pack src/Cosmos.Kernel.SourceGenerators/Cosmos.Kernel.SourceGenerators.csproj -c Release --no-build -o artifacts/package/release
 
 Write-Host "Verifying arch-independent packages..." -ForegroundColor Yellow
-Get-ChildItem -Path "artifacts/package/release/Cosmos.Kernel.HAL.Interfaces.*.nupkg" | ForEach-Object { Write-Host $_.Name }
 Get-ChildItem -Path "artifacts/package/release/Cosmos.Kernel.Drivers.*.nupkg" | ForEach-Object { Write-Host $_.Name }
 Get-ChildItem -Path "artifacts/package/release/Cosmos.Kernel.Debug.*.nupkg" | ForEach-Object { Write-Host $_.Name }
 Get-ChildItem -Path "artifacts/package/release/Cosmos.Kernel.Boot.*.nupkg" | ForEach-Object { Write-Host $_.Name }

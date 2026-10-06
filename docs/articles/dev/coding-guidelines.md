@@ -28,20 +28,19 @@ This document establishes the coding style and architecture patterns for Cosmos 
 
 ### Layer Dependency Rules
 
-The project is split into strict layers. Dependencies flow **downward only**. These rules are **enforced at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which judges a project on the types and members its code names, not on the reference list restore builds, and reports each assembly used across a boundary once, at its first use. A user kernel, and a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, see [Public API Tracking](public-api.md)), may also name what `Cosmos.Kernel.HAL` offers for the driver kit seam and the device contracts in `Cosmos.Kernel.HAL.Interfaces`.
+The project is split into strict layers. Dependencies flow **downward only**. These rules are **enforced at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which judges a project on the types and members its code names, not on the reference list restore builds, and reports each assembly used across a boundary once, at its first use. A user kernel, and a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, see [Public API Tracking](public-api.md)), may also name what `Cosmos.Kernel.HAL` offers: the driver kit seam and the device contracts (`IBlockDevice`, `MACAddress`, `SoftwareTimer`).
 
 ```
 User Kernel (DevKernel, test kernels)
 Cosmos.Kernel.Drivers (the shipped drivers, a driver assembly held to the User layer)
     └── Cosmos.Kernel.System        ← high-level OS APIs (Console, Graphics, Network)
-         └── Cosmos.Kernel.HAL      ← hardware abstraction (shared logic)
+         └── Cosmos.Kernel.HAL      ← hardware abstraction (shared logic, boot and device contracts)
               ├── Cosmos.Kernel.HAL.X64        ← x64 platform code (machine description, line routing, PIT, RTC)
               ├── Cosmos.Kernel.HAL.ARM64      ← ARM64 platform code (machine description, line routing, generic timer, RTC)
-              └── Cosmos.Kernel.HAL.Interfaces ← pure interfaces, no implementations
-                   └── Cosmos.Kernel.Core   ← low-level runtime (memory, scheduler, serial)
-                        ├── Cosmos.Kernel.Native.X64       ← x64 assembly (.s)
-                        ├── Cosmos.Kernel.Native.ARM64     ← ARM64 assembly (.s)
-                        └── Cosmos.Kernel.Native.MultiArch ← cross-platform native C code (ACPI, libc stubs)
+              └── Cosmos.Kernel.Core   ← low-level runtime (memory, scheduler, serial)
+                   ├── Cosmos.Kernel.Native.X64       ← x64 assembly (.s)
+                   ├── Cosmos.Kernel.Native.ARM64     ← ARM64 assembly (.s)
+                   └── Cosmos.Kernel.Native.MultiArch ← cross-platform native C code (ACPI, libc stubs)
 ```
 
 For the full dependency graph, project descriptions, and rules, see [Kernel Project Layout](kernel-project-layout.md).
@@ -986,7 +985,7 @@ Logic that needs no hardware (`Tcp` receive-buffer arithmetic, address parsing) 
 
 Three rules decide what is `public` (the full policy and its mechanisms live in [Public API Tracking](public-api.md)):
 
-1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types its signatures expose (the `HAL.Interfaces` device interfaces, the `HAL.Vfs` contracts, Core's platform interfaces). Only that surface is tracked, documented, and covered by deprecation cycles.
+1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types its signatures expose (the HAL's device contracts `IBlockDevice`, `MACAddress` and `SoftwareTimer`, the `HAL.Vfs` contracts, Core's platform interfaces). Only that surface is tracked, documented, and covered by deprecation cycles.
 2. **Chosen experimental seams.** An extension point outside the ring is opened deliberately and marked `[Experimental("COSMOSxxxx")]`: usable now, no compatibility promise, promoted by removing the attribute. Never open a seam by just making something public.
 3. **Everything else is `internal`.** Visibility is not the extension mechanism. First-party assemblies and white-box test kernels use `InternalsVisibleTo`; external code uses `[UnsafeAccessor]` ([Accessing internals](accessing-internals.md)) at its own risk.
 

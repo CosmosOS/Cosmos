@@ -2,8 +2,8 @@
 
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Filesystems.Fat;
 using Cosmos.Kernel.System.Vfs;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
