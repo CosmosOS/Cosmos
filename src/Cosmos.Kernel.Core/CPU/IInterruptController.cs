@@ -41,7 +41,9 @@ internal interface IInterruptController
     void UnmaskIrq(byte irqNo);
 
     /// <summary>
-    /// Check if the interrupt controller is initialized.
+    /// True once the controller can route, mask and unmask a hardware line,
+    /// which is what <see cref="InterruptManager.IsControllerInitialized"/>
+    /// reports to line sources. Any context.
     /// </summary>
     bool IsInitialized { get; }
 

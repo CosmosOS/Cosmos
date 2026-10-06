@@ -13,12 +13,23 @@ public static class ApicManager
     private static bool s_initialized;
 
     /// <summary>
-    /// Gets whether the APIC system is initialized.
+    /// Gets whether the Local APIC is up: its timer is calibrated, an
+    /// interrupt it delivers takes an EOI, and MSI messages reach it.
     /// </summary>
     public static bool IsInitialized => s_initialized;
 
     /// <summary>
-    /// Initializes the APIC system using MADT information.
+    /// Gets whether a hardware line can be routed: the Local APIC is up and
+    /// the MADT described an I/O APIC to program. Any context.
+    /// </summary>
+    internal static bool CanRouteIrqs => s_initialized && IoApic.IsInitialized;
+
+    /// <summary>
+    /// Initializes the Local APIC from IA32_APIC_BASE and the I/O APIC from
+    /// the MADT. The Local APIC is architectural, so a machine without ACPI
+    /// still gets its timer, its EOIs and MSI delivery; only the I/O APIC
+    /// and the ISA overrides need the table, and without it no hardware line
+    /// is routed.
     /// </summary>
     public static unsafe void Initialize()
     {
@@ -27,38 +38,36 @@ public static class ApicManager
         // Disable the legacy 8259 PIC first
         LegacyPic.RemapAndDisable();
 
-        // Get MADT info
-        MadtInfo* madtPtr = AcpiMadt.GetMadtInfoPtr();
-        if (madtPtr == null)
+        if (!LocalApic.TryReadBaseAddress(out ulong localApicBase))
         {
-            Serial.Write("[ApicManager] ERROR: MADT not available!\n");
+            Serial.Write("[ApicManager] ERROR: no enabled Local APIC on this CPU!\n");
             return;
         }
 
-        MadtInfo madt = *madtPtr;
-
-        // Initialize Local APIC
         Serial.Write("[ApicManager] Initializing Local APIC...\n");
-        LocalApic.Initialize(madt.LocalApicAddress);
+        LocalApic.Initialize(localApicBase);
 
-        // Calibrate LAPIC timer
         Serial.Write("[ApicManager] Calibrating LAPIC timer...\n");
         LocalApic.CalibrateTimer();
 
-        // Initialize I/O APIC(s)
-        var ioApics = madt.IoApics;
-        if (ioApics.Length > 0)
+        s_initialized = true;
+
+        MadtInfo* madtPtr = AcpiMadt.GetMadtInfoPtr();
+        if (madtPtr == null)
+        {
+            Serial.Write("[ApicManager] WARNING: no MADT, so no I/O APIC: hardware lines will not be routed\n");
+        }
+        else if (madtPtr->IoApics.Length > 0)
         {
             Serial.Write("[ApicManager] Initializing I/O APIC...\n");
             // For now, just use the first I/O APIC
-            IoApic.Initialize(ioApics[0]);
+            IoApic.Initialize(madtPtr->IoApics[0]);
         }
         else
         {
             Serial.Write("[ApicManager] WARNING: No I/O APIC found in MADT!\n");
         }
 
-        s_initialized = true;
         Serial.Write("[ApicManager] APIC system initialized\n");
     }
 
@@ -73,9 +82,9 @@ public static class ApicManager
     /// <param name="startMasked">If true, the IRQ starts masked and must be explicitly unmasked.</param>
     public static void RouteIrq(byte irq, byte vector, bool startMasked = false)
     {
-        if (!s_initialized)
+        if (!CanRouteIrqs)
         {
-            Serial.Write("[ApicManager] ERROR: APIC not initialized!\n");
+            Serial.Write("[ApicManager] ERROR: no I/O APIC to route IRQ ", irq, " through!\n");
             return;
         }
 

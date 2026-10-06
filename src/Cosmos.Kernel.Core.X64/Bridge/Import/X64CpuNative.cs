@@ -15,4 +15,8 @@ internal static partial class X64CpuNative
     [LibraryImport("*", EntryPoint = "_native_cpu_invlpg")]
     [SuppressGCTransition]
     public static partial void InvalidatePage(ulong virtualAddress);
+
+    [LibraryImport("*", EntryPoint = "_native_cpu_rdmsr")]
+    [SuppressGCTransition]
+    public static partial ulong ReadMsr(uint index);
 }

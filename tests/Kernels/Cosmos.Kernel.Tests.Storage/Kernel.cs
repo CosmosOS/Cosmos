@@ -446,10 +446,12 @@ public class Kernel : Sys.Kernel
         else if (TR.ProfileContains("acpi-off"))
         {
 #if ARCH_X64
-            // acpi-off x64: QEMU leaves the MADT in place and the LAPIC MSI binder
-            // comes up, but the cell exists to prove the ACPI-less discovery
-            // paths, not the interrupt mode, which is pinned on the plain cell.
-            TR.Skip("Profile_NvmeInterruptModeMatches", "acpi-off has no MSI routing to pin");
+            // acpi-off x64: SeaBIOS builds no ACPI tables, so there is no MADT
+            // and no I/O APIC, but the Local APIC comes up from IA32_APIC_BASE
+            // and registers the MSI binder, so MSI-X routes as on the plain
+            // cell. A driver that fell back to polling here means the Local
+            // APIC waited on ACPI again. expect-interrupt = true.
+            TR.RunWithExpectation(true, "Profile_NvmeInterruptModeMatches", TestProfile_NvmeInterruptMode);
 #else
             // acpi-off arm64: the GIC comes up on the virt defaults and the ITS
             // is not discovered without ACPI, so MSI-X cannot route on any GIC

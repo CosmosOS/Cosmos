@@ -267,9 +267,10 @@ public class Kernel : Sys.Kernel
     // under acpi-off: there the GIC comes up on the virt defaults without an
     // ITS, the transport publishes the device with no message entry, and the
     // driver falls back to the periodic drain. Over MMIO the GIC line routes
-    // with or without ACPI; on x64 the LAPIC does too (acpi=off leaves the
-    // MADT in place). A driver on the wrong side of that line passes every
-    // other test here, so the flags are read off the binding's state.
+    // with or without ACPI; on x64 the Local APIC does too, since it comes up
+    // from IA32_APIC_BASE when acpi=off leaves no MADT. A driver on the wrong
+    // side of that line passes every other test here, so the flags are read
+    // off the binding's state.
     private static void TestNet_InterruptModeMatchesCell()
     {
         if (!TryGetNetState(out VirtioNetState? state))

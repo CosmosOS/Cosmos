@@ -238,9 +238,11 @@
       // virt; flipping it forces the kernel onto its non-ACPI discovery
       // paths: on arm64 no MADT, IORT or MCFG, the GIC on the virt defaults
       // (no ITS, so no MSI) and the platform bus seeded from the device tree
-      // EDK2 exposes only then; on x64 the MADT stays in place, PCI
-      // enumerates over the port mechanism and the LAPIC routes messages, so
-      // the cell differs from the plain one by the discovery tables alone.
+      // EDK2 exposes only then; on x64 SeaBIOS builds no ACPI tables at all,
+      // so there is no MADT and no I/O APIC: PCI enumerates over the port
+      // mechanism, the Local APIC comes up from IA32_APIC_BASE and routes
+      // MSI messages, and every line source is refused, so the 8042 and any
+      // INTx-only function poll.
       "name": "acpi-off",
       "machineOptions": { "acpi": "off" }
     }

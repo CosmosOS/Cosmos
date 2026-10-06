@@ -23,8 +23,10 @@
        the one boot on which the bootloader hands over a device tree, so the
        ECAM host and the virtio-mmio slots the machine description publishes
        from it are proven here, with the transports' polled mode for the PCI
-       cell (no ITS without ACPI); on x64 acpi=off leaves the MADT in place
-       and the cell differs from the plain one by the discovery tables alone. -->
+       cell (no ITS without ACPI); on x64 SeaBIOS builds no ACPI tables at
+       all, so the cell proves the Local APIC comes up from IA32_APIC_BASE
+       without a MADT and routes the transport's MSI-X messages, while the
+       lines that need the I/O APIC are refused and their drivers poll. -->
   <ItemGroup>
     <CosmosTestProfile Include="virtio-pci" />
     <CosmosTestProfile Include="virtio-mmio" />
