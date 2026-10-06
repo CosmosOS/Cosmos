@@ -19,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- DateTime/Stopwatch plugs read the RTC driver singleton. -->
+    <!-- The DateTime and Interop.Sys plugs read the PL031Rtc singleton. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
-    <!-- White-box timer suite exercises the generic timer and RTC directly. -->
+    <!-- White-box timer suite exercises PL031Rtc directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
   </ItemGroup>
 </Project>

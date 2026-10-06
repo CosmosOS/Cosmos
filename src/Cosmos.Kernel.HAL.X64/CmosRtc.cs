@@ -12,12 +12,12 @@ namespace Cosmos.Kernel.HAL.X64;
 /// CMOS Real-Time Clock (RTC) device for x64.
 /// Reads date/time from the hardware RTC.
 /// </summary>
-internal class RTC
+internal class CmosRtc
 {
     /// <summary>
     /// Singleton instance of the RTC.
     /// </summary>
-    public static RTC? Instance { get; private set; }
+    public static CmosRtc? Instance { get; private set; }
 
     /// <summary>
     /// CMOS address/index port.
@@ -56,7 +56,7 @@ internal class RTC
     /// </summary>
     public bool IsInitialized { get; private set; }
 
-    /// <summary>Mirrors the ARM64 RTC property name for cross-arch compatibility.</summary>
+    /// <summary>Mirrors the property name of the ARM64 <c>PL031Rtc</c> for cross-arch compatibility.</summary>
     public bool IsAvailable => IsInitialized;
 
     /// <summary>
@@ -102,7 +102,7 @@ internal class RTC
         }
 
         // Priority 3: CMOS RTC
-        var (year, month, day, hour, minute, second) = ReadTime();
+        (int year, int month, int day, int hour, int minute, int second) = ReadTime();
         BootTimeTicks = DateToTicks(year, month, day) + TimeToTicks(hour, minute, second);
         Serial.Write("[RTC] Boot time (CMOS): ");
         LogTime(BootTimeTicks);
@@ -113,7 +113,7 @@ internal class RTC
 
     private static void LogTime(long ticks)
     {
-        var dt = new System.DateTime(ticks, System.DateTimeKind.Utc);
+        DateTime dt = new(ticks, DateTimeKind.Utc);
         int year = dt.Year, month = dt.Month, day = dt.Day;
         int hour = dt.Hour, minute = dt.Minute, second = dt.Second;
         Serial.WriteNumber((ulong)year);
@@ -180,12 +180,15 @@ internal class RTC
         }
 
         // elapsedTicks = elapsedTsc * 10_000_000 / tscFrequency
-        // Use 128-bit math to avoid overflow
         ulong elapsedTicks = MultiplyDivide(elapsedTsc, TimeSpan.TicksPerSecond, (ulong)tscFrequency);
 
         return BootTimeTicks + (long)elapsedTicks;
     }
 
+    /// <summary>
+    /// Gets the time elapsed since <see cref="Initialize"/> captured the boot TSC value,
+    /// in DateTime ticks (100-ns intervals); 0 before initialization.
+    /// </summary>
     public long GetElapsedTicks()
     {
         if (!IsInitialized)
@@ -207,12 +210,10 @@ internal class RTC
         }
 
         // elapsedTicks = elapsedTsc * 10_000_000 / tscFrequency
-        // Use 128-bit math to avoid overflow
         ulong elapsedTicks = MultiplyDivide(elapsedTsc, TimeSpan.TicksPerSecond, (ulong)tscFrequency);
 
         return (long)elapsedTicks;
     }
-
 
     /// <summary>
     /// Reads a byte from a CMOS register.
@@ -300,10 +301,7 @@ internal class RTC
     /// <summary>
     /// Converts a BCD value to binary.
     /// </summary>
-    private static byte BcdToBinary(byte bcd)
-    {
-        return (byte)(((bcd >> 4) * 10) + (bcd & 0x0F));
-    }
+    private static byte BcdToBinary(byte bcd) => (byte)(((bcd >> 4) * 10) + (bcd & 0x0F));
 
     /// <summary>
     /// Converts date to DateTime ticks.
@@ -311,7 +309,7 @@ internal class RTC
     private static long DateToTicks(int year, int month, int day)
     {
         // Days in each month (non-leap year)
-        int[] daysInMonth = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        int[] daysInMonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
         // Calculate days from year 1
         int y = year - 1;
@@ -340,17 +338,13 @@ internal class RTC
     /// Converts time to DateTime ticks.
     /// </summary>
     private static long TimeToTicks(int hour, int minute, int second)
-    {
-        return hour * TimeSpan.TicksPerHour + minute * TimeSpan.TicksPerMinute + second * TimeSpan.TicksPerSecond;
-    }
+        => hour * TimeSpan.TicksPerHour + minute * TimeSpan.TicksPerMinute + second * TimeSpan.TicksPerSecond;
 
     /// <summary>
     /// Checks if a year is a leap year.
     /// </summary>
     private static bool IsLeapYear(int year)
-    {
-        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-    }
+        => (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
 
     /// <summary>
     /// Multiplies two 64-bit values and divides by a third, avoiding overflow.

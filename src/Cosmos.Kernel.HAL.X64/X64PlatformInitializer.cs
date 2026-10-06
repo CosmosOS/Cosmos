@@ -58,7 +58,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
     private const uint I8042AuxiliaryLine = 12;
 
     private PIT? _pit;
-    private RTC? _rtc;
+    private CmosRtc? _rtc;
 
     public string PlatformName => "x86-64";
     public PlatformArchitecture Architecture => PlatformArchitecture.X64;
@@ -98,29 +98,25 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
     private static readonly X64PortIO s_delayPort = new();
 
+    /// <inheritdoc />
     public void InitializeHardware()
     {
-        // Display ACPI MADT information
         Serial.WriteString("[X64HAL] Displaying ACPI MADT info...\n");
         AcpiMadt.DisplayMadtInfo();
 
-        // Initialize APIC
         Serial.WriteString("[X64HAL] Initializing APIC...\n");
         ApicManager.Initialize();
 
-        // Calibrate TSC frequency
         Serial.WriteString("[X64HAL] Calibrating TSC frequency...\n");
         X64CpuOps.CalibrateTsc();
         Serial.WriteString("[X64HAL] TSC frequency: ");
         Serial.WriteNumber((ulong)X64CpuOps.TscFrequency);
         Serial.WriteString(" Hz\n");
 
-        // Initialize RTC
         Serial.WriteString("[X64HAL] Initializing RTC...\n");
-        _rtc = new RTC();
+        _rtc = new CmosRtc();
         _rtc.Initialize();
 
-        // Initialize PIT
         Serial.WriteString("[X64HAL] Initializing PIT...\n");
         _pit = new PIT();
         _pit.Initialize();

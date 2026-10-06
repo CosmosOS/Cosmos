@@ -19,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- DateTime/Stopwatch plugs read the RTC driver singleton. -->
+    <!-- The DateTime and Interop.Sys plugs read the CmosRtc singleton. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
-    <!-- White-box timer suite exercises PIT and RTC directly. -->
+    <!-- White-box timer suite exercises PIT and CmosRtc directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
   </ItemGroup>
 </Project>

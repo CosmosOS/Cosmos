@@ -16,10 +16,10 @@ namespace Cosmos.Kernel.HAL.ARM64;
 /// PL031 RTCDR register provides Unix time (seconds since 1970-01-01 UTC).
 /// QEMU virt machine maps PL031 at physical address 0x09010000.
 /// </summary>
-internal class RTC
+internal class PL031Rtc
 {
     /// <summary>Singleton instance of the RTC.</summary>
-    public static RTC? Instance { get; private set; }
+    public static PL031Rtc? Instance { get; private set; }
 
     // PL031 RTC base address on QEMU virt machine (physical)
     private const ulong PL031_BASE_PHYS = 0x09010000;
@@ -62,7 +62,7 @@ internal class RTC
         Instance = this;
 
         // Capture GenericTimer reference point for elapsed time
-        if (GenericTimer.Instance != null)
+        if (GenericTimer.Instance is not null)
         {
             _bootCounter = GenericTimer.Instance.GetCurrentCounter();
             _timerFrequency = GenericTimer.Instance.TimerFrequency;
@@ -219,7 +219,7 @@ internal class RTC
     {
         ulong elapsed = 0;
 
-        if (_timerFrequency > 0 && GenericTimer.Instance != null)
+        if (_timerFrequency > 0 && GenericTimer.Instance is not null)
         {
             ulong current = GenericTimer.Instance.GetCurrentCounter();
             ulong counterElapsed = current - _bootCounter;
@@ -231,11 +231,15 @@ internal class RTC
         return BootTimeTicks + (long)elapsed;
     }
 
+    /// <summary>
+    /// Gets the time elapsed since <see cref="Initialize"/> captured the Generic Timer
+    /// counter, in DateTime ticks (100-ns intervals); 0 when the Generic Timer was not up.
+    /// </summary>
     public long GetElapsedTicks()
     {
         ulong elapsed = 0;
 
-        if (_timerFrequency > 0 && GenericTimer.Instance != null)
+        if (_timerFrequency > 0 && GenericTimer.Instance is not null)
         {
             ulong current = GenericTimer.Instance.GetCurrentCounter();
             ulong counterElapsed = current - _bootCounter;
@@ -330,7 +334,7 @@ internal class RTC
         }
 
         // Compute month
-        int[] daysPerMonth = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        int[] daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         if (IsLeapYear(year))
         {
             daysPerMonth[1] = 29;
