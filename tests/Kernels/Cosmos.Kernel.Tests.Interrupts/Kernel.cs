@@ -407,9 +407,9 @@ public class Kernel : Sys.Kernel
         Assert.True(boundAfterRelease == bound, "ReleaseDevice must return every vector / LPI the function still held");
     }
 
-    // The second driver's MsiX.Enable case: an owner prepares and binds the
-    // function, never releases it (no driver disables MSI-X today), and a
-    // second owner prepares it again, binds and releases. Each take-over
+    // The take-over case: an owner prepares and binds the function and
+    // never releases its context (a table whose last disconnect never ran),
+    // and a second owner prepares it again, binds and releases. Each take-over
     // must free what the first owner held: on ARM64 the DeviceID mapping and
     // its ITT, or every round orphans a page; on both arches the slot it
     // bound, or every round loses one (64 of x64's 175 vectors). The
@@ -608,12 +608,13 @@ public class Kernel : Sys.Kernel
 
     // A second owner can connect the same function after the last
     // disconnect disabled it: MSI-X on again with the Function Mask that
-    // disconnect left set cleared, and the entry programmed afresh. The
-    // routing context the first connect prepared is private to the table,
-    // so its release shows only in the slot count, which the two rounds
-    // must leave as they found it. Entry 0's message is cleared in between,
-    // so the address read back is the second connect's and not the first
-    // one's.
+    // disconnect left set cleared, and the entry programmed afresh. The slot
+    // count, which the two rounds must leave as they found it, shows that
+    // each disconnect gave back the vector / LPI its connect bound; the
+    // release of the routing context the first connect prepared is private
+    // to the table and is not observed here. Entry 0's message is cleared in
+    // between, so the address read back is the second connect's and not the
+    // first one's.
     private static void TestMsiXTableConnectAfterDisconnect()
     {
         if (s_idleMsiXFunction is not PciAccess pci || pci.MessageTable is not PciMessageTable table)

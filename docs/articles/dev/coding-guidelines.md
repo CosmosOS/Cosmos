@@ -393,7 +393,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
     public void InitializeHardware()
     {
-        // PCI, ACPI, APIC initialization
+        // ACPI, APIC, timers
     }
 
     public void StartSchedulerTimer(uint quantumMs)
