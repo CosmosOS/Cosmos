@@ -157,9 +157,9 @@ To replace a shipped driver for the same hardware, give yours a `Priority` above
 
 ## Probe and the binding
 
-`Probe` is the only required entry point, and `DeviceBinding` is the only door. Everything the driver acquires goes through the binding and is written to its **ledger**: windows, regions, DMA buffers, interrupt handles, events, work items, periodic work, threads, published devices, child nodes. The constructors of all of those types are internal; there is no other way to get one. The driver cannot forget cleanup because it never writes any.
+`Probe` is the only required entry point, and `DeviceBinding` is the driver's only way to reach the hardware and the kernel. Everything the driver acquires through it (register windows, DMA memory, interrupts, events, work items, threads, published devices, child nodes) is recorded on the binding and released by the kit, so a driver never writes cleanup code.
 
-A probe reads the node (`binding.Node.Resources`, `binding.Node.Interrupts`, `binding.Node.Access<T>()`), acquires what it needs, creates its per-device state, publishes what the device is, and returns. This is the shape of a full driver, modelled on the keyboard driver of the Drivers suite:
+A probe reads the node (`binding.Node.Resources`, `binding.Node.Interrupts`, `binding.Node.Access<T>()`), acquires what it needs, creates its per-device state, publishes the device and returns. A full driver, modelled on the keyboard driver of the Drivers suite:
 
 ```csharp
 using Cosmos.Kernel.HAL.DriverKit;
@@ -214,7 +214,7 @@ public sealed class SyntheticKeyboardDriver : Driver
 }
 ```
 
-The state object implements the device contract, owns the handler, and holds every kit object the probe acquired:
+The state object is a plain class, not a `Driver`: there is one per device, and it implements the device contract, owns the handler, and holds every kit object the probe acquired:
 
 ```csharp
 using Cosmos.Kernel.HAL.DriverKit;
@@ -274,81 +274,140 @@ public sealed class KeyboardState : IKeyboard
 }
 ```
 
-Note what the two classes never do: allocate a page, program an interrupt controller, register the keyboard with a manager, or free anything. The sections below take the binding's members one at a time.
+Neither class allocates pages, programs an interrupt controller, registers the keyboard with a manager or frees anything: the binding does all of it. The sections below cover its members; their samples are pieces of a driver's `Probe` or of its state object.
 
 ### Register windows
 
-`binding.MapRegisters(resourceIndex)` maps one entry of `Node.Resources` as registers and returns a `RegisterWindow`: `Read8` to `Read64`, `Write8` to `Write64`, each one access of that width at a byte offset, in program order, with the barriers the architecture needs inside the kit. A write is preceded by a DMA write barrier and a read is followed by a DMA read barrier, so a doorbell write lands after every earlier store to DMA memory and no later load runs ahead of a status register. Offsets are checked against the window's `Length` and the access width's alignment, in every build.
-
-The same driver code works over every resource kind. A `MemoryWindow` is mapped as device memory; a `RamWindow` (what a synthetic node carries) is reached through the kernel's own mapping; a `PortRange` on x64 becomes `in` and `out`, and has no 64-bit access. `MapRegisters` throws `PlatformNotSupportedException` for a port range on ARM64, `InvalidOperationException` for a window that overlaps the kernel heap or cannot be mapped, and `ArgumentOutOfRangeException` for an index the node does not have.
-
-The accessors neither allocate nor block, so an interrupt handler may use them. After teardown every access throws, so a driver still holding the window gets an exception instead of writing to a device that is no longer its own.
+`binding.MapRegisters(resourceIndex)` maps one of `Node.Resources` and returns a `RegisterWindow`, with `Read8` to `Read64` and `Write8` to `Write64` at a byte offset. Every access is bounds-checked and carries the barriers it needs, so a doorbell write always lands after the DMA stores before it. The same code works over a memory window, a synthetic node's RAM window and an x64 port range. The accessors are safe from an interrupt handler, and throw once the binding is torn down.
 
 ### Bulk regions
 
-`binding.MapRegion(resourceIndex, RegionCaching)` maps a resource as memory rather than registers and returns a `DeviceRegion`: a framebuffer, a command queue, a descriptor area. Where a register window checks and orders every access, a region is memory: `Span` fills it, `As<T>()` views it as a span of unmanaged structs, and `Pointer` reaches what a span cannot express (a region longer than `int.MaxValue`). `Length` and `Caching` say what was mapped.
+`binding.MapRegion(resourceIndex, RegionCaching)` maps a resource as plain memory, for a framebuffer or a command queue, and returns a `DeviceRegion`. Unlike a register window, its accesses are neither checked nor ordered:
 
 ```csharp
+// In Probe:
 DeviceRegion framebuffer = binding.MapRegion(1, RegionCaching.WriteCombining);
 framebuffer.Span.Fill(0);
 Span<uint> pixels = framebuffer.As<uint>();
 pixels[0] = 0x00FF0000;
 ```
 
-`RegionCaching` names what the driver wants: `Device` (uncached, every access reaches the device in order), `WriteCombining` (stores gathered into bursts, for framebuffers) or `Normal` (cacheable, for coherent RAM). Today a memory window is mapped as device memory whatever is asked, until a platform offers write-combining; the value asked for is recorded on the region. A port range cannot be mapped as a region (`ArgumentException`). A region orders nothing on its own: what needs ordering against a doorbell is ordered with the DMA barriers below.
+The second argument tells the CPU how to cache the region. Pick it by what the region holds:
+
+- `RegionCaching.Device` for commands the device reads, such as a command queue: every read and write goes straight to the device, in order.
+- `RegionCaching.WriteCombining` for a framebuffer: writes are grouped into bursts, which is much faster for drawing pixels.
+- `RegionCaching.Normal` for ordinary RAM shared with the device.
+
+Today every memory window is mapped as `Device`, whatever you ask. Pick the right value anyway: the kit records it and will apply it once the platform supports it.
 
 ### DMA memory
 
-`binding.AllocateDma(length, alignment)` returns a `DmaBuffer`: zeroed, physically contiguous pages the device can address, with `PhysicalAddress` for the device, `Span` for the CPU and `Length` as requested. An alignment below a page is raised to the page; a larger one is honoured. `TryAllocateDma(length, alignment, constraints, out buffer)` is the same for a device with addressing limits: `DmaConstraints.Addressable32Bit` asks for a buffer that ends below 4 GiB, and the method returns `false` rather than throwing when the allocator cannot meet it, so the driver can decline.
+`binding.AllocateDma(length, alignment)` returns a `DmaBuffer`: zeroed, physically contiguous memory, with `PhysicalAddress` for the device and `Span` for the CPU.
+
+DMA memory usually holds a **ring**: a fixed array of descriptors that the driver and the device use as a circular queue. Each descriptor points at a data buffer and says who owns it. The driver fills descriptors, hands them to the device and writes a register (the doorbell) to say new ones are ready; the device processes them in order, marks each one done, and wraps back to the first after the last. A network card, for example, has a receive ring the device fills with incoming frames and a transmit ring the driver fills with outgoing ones.
+
+For a device that only addresses 32 bits, `TryAllocateDma` takes a constraint and returns `false` instead of throwing:
 
 ```csharp
+// In Probe:
 if (!binding.TryAllocateDma(RingBytes, 4096, DmaConstraints.Addressable32Bit, out DmaBuffer? ring))
 {
     return ProbeResult.Declined("no DMA memory below 4 GiB");
 }
 ```
 
-DMA is coherent on the machines the kernel runs on, so only ordering is needed, and `DmaBuffer` carries the two barriers as static methods. `DmaBuffer.WriteBarrier()` goes between filling a descriptor and the store that hands it to the device; `DmaBuffer.ReadBarrier()` goes between reading a flag the device wrote and reading the data the flag guards. Both are no-ops on x64 and real fences on ARM64, and both are safe from a handler.
+DMA is coherent, so only ordering matters. Call `DmaBuffer.WriteBarrier()` between filling a descriptor and handing it to the device, and `DmaBuffer.ReadBarrier()` between reading a flag the device wrote and reading the data it guards. Register writes carry their own barrier:
 
 ```csharp
+// When sending, for example in Transmit:
 Span<byte> descriptors = ring.Span;
 descriptors[8] = 0x01;                   // fill the descriptor
 DmaBuffer.WriteBarrier();
 descriptors[0] = OwnedByDevice;          // then hand it over
 
-// A register write carries its own barrier, so a doorbell needs none:
-window.Write32(DoorbellOffset, 1);
+window.Write32(DoorbellOffset, 1);       // no barrier needed
 ```
 
-Managed arrays are not DMA memory: the pinned heap is collected when nothing references an array, and a device holds no reference. A buffer is freed by teardown, after which `Span` throws.
+Never hand a device a managed array: the garbage collector does not know the device holds it.
 
 ### Interrupts
 
-`binding.TryRequestInterrupt(source, handler, out handle)` connects an `InterruptHandler` to one of `Node.Interrupts`, routes it through whatever the platform has, and returns `false` when the platform cannot deliver it, so the driver declines or falls back to polling instead of silently never firing. The `source` must belong to the binding's own node (`ArgumentException` otherwise). Nothing is recorded on a `false`.
+`binding.TryRequestInterrupt(source, handler, out handle)` connects a handler to one of `Node.Interrupts`. It returns `false` when the platform cannot deliver that interrupt, so the driver can decline or poll instead. The handler is live as soon as the call returns `true`, which lets a probe send a command and wait for the interrupt; arm the device last if it must not interrupt earlier.
 
-The handler is live from the moment the call returns `true`, not from the moment `Probe` returns `Bound`. That is deliberate: `Probe` runs in thread context, so a driver can connect its handler, issue a command, and wait on an event the handler signals, which is how a real driver brings a device up. The two guarantees that matter: the handler is connected before the call returns, so an interrupt the device raises while `TryRequestInterrupt` is still returning is delivered rather than lost; and on decline, failure or removal the source is masked and disconnected right after the published devices are withdrawn, before events are cancelled, threads joined or memory released, so a handler never touches memory the teardown has freed. A driver that must not be interrupted until it is ready arms the device last, as the sample does.
+```csharp
+// In Probe:
+if (!binding.TryRequestInterrupt(binding.Node.Interrupts[0], state.OnInterrupt, out InterruptHandle? handle))
+{
+    return ProbeResult.Declined("the interrupt cannot be delivered");
+}
 
-The `InterruptHandle` masks and unmasks from any context (`Mask()`, `Unmask()`, `IsMasked`) and names its `Source`. From inside the handler, `context.Mask()` is the same mask, for a level-triggered device whose condition a thread will clear; the thread unmasks through the handle. A handler that throws leaves its source masked, with the fault recorded on the node; the driver may unmask it again once it has looked.
+state.Handle = handle;
+```
+
+The handler runs in interrupt context: it acknowledges the device and leaves the real work to a work item. With an `OnInterrupt` method on the state object:
+
+```csharp
+// In the state object, in interrupt context:
+public void OnInterrupt(InterruptContext context)
+{
+    uint cause = Window.Read32(InterruptCauseOffset);
+    Window.Write32(InterruptCauseOffset, cause);   // acknowledge
+    context.Schedule(ReceiveWork);
+}
+```
+
+The `InterruptHandle` masks and unmasks the source (`Mask()`, `Unmask()`) from any context. A handler that throws leaves its source masked.
 
 ### Events and waiting
 
-`binding.CreateEvent()` returns a `DeviceEvent`: a counted signal between a handler and a thread. A handler signals it, through `context.Signal(evt)` or `evt.Signal()`; a thread waits through `binding.Wait(evt, timeoutMilliseconds)`, which is the only way to wait, so a handler holding the event cannot block on it. `Wait` returns `true` when a signal was consumed, `false` on timeout, and `false` at once and forever once teardown began (`evt.IsCancelled`).
+`binding.CreateEvent()` returns a `DeviceEvent`. A handler signals it with `context.Signal(evt)`; a thread waits with `binding.Wait(evt, timeoutMilliseconds)`, which returns `true` on a signal, and `false` on timeout or once teardown has started.
 
-The binding also carries `DetachEvent`, cancelled first among the events once teardown reaches them (step 6 below), so a thread that waits on it, or on any event of the binding, wakes, finds `IsDetaching` true and returns.
+A probe can send a command and wait for the device to answer. The handler calls `context.Signal(CommandDone)`, and the probe waits on the same event:
 
-Two more thread-context waits live on the binding: `Delay(microseconds)` busy-waits on the platform's calibrated source, for a register that needs a moment, and `Sleep(milliseconds)` gives up the CPU (a scheduler sleep on a driver thread or the worker, a busy wait without a scheduler).
+```csharp
+// In Probe:
+state.CommandDone = binding.CreateEvent();
+// ... connect the interrupt, then send the command
+window.Write32(CommandOffset, ResetCommand);
+
+if (!binding.Wait(state.CommandDone, 100))
+{
+    return ProbeResult.Failed("the device did not answer the reset");
+}
+```
+
+For short waits in thread context, `binding.Delay(microseconds)` busy-waits and `binding.Sleep(milliseconds)` gives up the CPU:
+
+```csharp
+// In Probe or a work item:
+window.Write32(ControlOffset, ResetBit);
+binding.Delay(10);   // the device needs 10 µs before the next access
+```
 
 ### Work items
 
-`binding.CreateWorkItem(callback)` returns a `WorkItem` whose callback runs in thread context on the kit worker when scheduled. Scheduling it, from a handler through `context.Schedule(item)` or from anywhere through `item.Schedule()`, is allocation-free, because the item owns its queue entry; it is queued at most once at a time, and `Schedule` returns `false` when it is already queued, was cancelled by teardown, or no worker runs in this kernel. A work item that throws is logged (`work item threw`) and cancelled. Create work items in `Probe`, as the sample does in the state's constructor, and schedule them later.
+`binding.CreateWorkItem(callback)` returns a `WorkItem` whose callback runs on the kit worker when scheduled. `context.Schedule(item)` from a handler, or `item.Schedule()` from anywhere, queues it without allocating; it returns `false` when the item is already queued, cancelled by teardown, or the kernel has no worker. Create work items in `Probe` and schedule them later:
+
+```csharp
+// In Probe: create the work item once.
+state.ReceiveWork = binding.CreateWorkItem(state.DrainReceiveRing);
+
+// In the handler: queue it.
+context.Schedule(ReceiveWork);
+
+// On the kit worker, in thread context: may allocate, wait and report.
+public void DrainReceiveRing()
+{
+    // walk the receive ring and hand each frame to Sink.Receive
+}
+```
 
 ### Periodic work
 
-Polling is a driver's own fallback, and it is spelled as deferred work: `binding.TrySchedulePeriodic(intervalMilliseconds, item)` runs a work item of this binding at that interval, from the platform timer, until teardown. The interval is rounded to the timer's tick, which is tens of milliseconds on some platforms. It returns `false` when the kernel has no platform timer (`CosmosEnableTimer` off) or no worker (`CosmosEnableScheduler` off). The kit does not silently poll on a driver's behalf, because a driver that does not know it is being polled cannot size its rings for it.
-
-With an `OnPoll` method on the state object:
+`binding.TrySchedulePeriodic(intervalMilliseconds, item)` runs a work item at an interval until teardown, rounded to the timer's tick. It returns `false` when the kernel has no timer or no scheduler. The kit never polls on a driver's behalf. With an `OnPoll` method on the state object:
 
 ```csharp
+// In Probe:
 WorkItem poll = binding.CreateWorkItem(state.OnPoll);
 if (!binding.TrySchedulePeriodic(20, poll))
 {
@@ -358,11 +417,10 @@ if (!binding.TrySchedulePeriodic(20, poll))
 
 ### Driver threads
 
-`binding.TryStartThread(name, entry, out thread)` starts a thread of the driver's own, for work that must wait rather than run to completion on the worker. It returns `false` when the scheduler is not running or the thread did not start. The body's contract is fixed: loop on the binding's events, and return once `IsDetaching` is true. Teardown cancels every event, so a waiter wakes, and then joins the thread with a bounded wait of 500 ms; a thread that outlives it is logged, and the memory it may still touch is leaked on purpose rather than handed to someone else (`LeakedResourceCount` on the node says how much).
-
-With a `ThreadMain` method on the state object:
+`binding.TryStartThread(name, entry, out thread)` starts a thread for work that has to wait, and returns `false` when the scheduler is not running. The thread loops on the binding's events and returns once `IsDetaching` is true; teardown wakes every waiter, then joins the thread:
 
 ```csharp
+// In the state object, on the driver thread:
 public void ThreadMain()
 {
     while (!_binding.IsDetaching)
@@ -376,19 +434,22 @@ public void ThreadMain()
 ```
 
 ```csharp
-if (!binding.TryStartThread("kbd-thread", state.ThreadMain, out DriverThread? thread))
+// In Probe:
+DrainState state = new(binding);
+binding.DriverState = state;
+
+if (!binding.TryStartThread("drain", state.ThreadMain, out DriverThread? thread))
 {
     return ProbeResult.Failed("no scheduler to run the drain thread on");
 }
 ```
 
-A `DriverThread` exposes its `Name` and `HasExited`. A driver thread cannot retract its own node (the teardown would wait to join the thread that is waiting on the teardown); the kit refuses that with an exception.
-
 ### Device locks
 
-`binding.CreateLock()` returns a `DeviceLock`, for a device that is entered from more than one context at once: a `Transmit` the ring calls from its own thread while the driver's work item, delivering a frame, re-enters it through the stack's synchronous reply; a handler and a thread sharing a register sequence. It is created in thread context and recorded on the binding: it holds no resource, does not count in `HeldResourceCount` and needs no release. `Acquire()` returns a `DeviceLockScope`, a `ref struct` a `using` binds to; the holder runs with interrupts disabled until the scope is disposed, which restores the interrupt state the acquire found, so a handler can never spin on a thread that holds the lock and one scope nests inside another. It is not reentrant (a holder that acquires again spins forever), and it is never held across `Sleep`, `Wait`, `Delay`, a sink call or a publish. The one exception is a bus driver that drains its event ring under its lock and calls a report handler there: the handler is bound by the `UsbReportHandler` contract (allocation-free, sinks and `Interlocked` only), described under [The USB access object](#the-usb-access-object). The E1000E's `Transmit` runs under its lock, and its drain takes the lock only around its own ring index update, never across a `Receive`:
+`binding.CreateLock()` returns a `DeviceLock`, for a device entered from several contexts at once, such as a `Transmit` the network stack calls while the driver's work item drains the receive ring. `Acquire()` disables interrupts until the scope is disposed. The lock is not reentrant, and must never be held across `Sleep`, `Wait`, `Delay`, a sink call or a publish:
 
 ```csharp
+// In the state object, called by the network stack:
 public bool Transmit(ReadOnlySpan<byte> frame)
 {
     using (_lock.Acquire())
@@ -403,36 +464,50 @@ public bool Transmit(ReadOnlySpan<byte> frame)
 
 ### Publishing a device
 
-A device kind is the smallest interface the kernel needs, plus a kit-owned **sink** through which the driver pushes events. Lifecycle is not on the interface, because the binding owns lifecycle; publish and withdraw are enable and disable.
+A device kind is a small interface the driver implements, plus a **sink** the kit hands back for the driver to report events through:
 
-| Kind | The driver implements | `Publish...` returns | The driver reports through |
-|------|-----------------------|----------------------|----------------------------|
-| Keyboard | `IKeyboard { string Name; void SetLeds(KeyboardLeds); }` | `KeyboardSink` | `Report(scanCode, released)` |
-| Pointer | `IPointer { string Name; }` | `PointerSink` | `ReportRelative(deltaX, deltaY, buttons, wheel)`, `ReportAbsolute(x, y, buttons)` |
-| Network interface | `INetworkInterface { string Name; MACAddress MacAddress; bool LinkUp; bool Transmit(ReadOnlySpan<byte>); }` | `NetworkSink` | `Receive(frame)`, `LinkChanged(up)` |
-| Block device | `IBlockDevice`, the existing public contract; the storage manager registers it and scans its partitions on publish | nothing | nothing to report |
-| Display | `IDisplay { string Name; DisplayMode Mode; DeviceRegion? Framebuffer; void Flush(x, y, width, height); }` | `DisplaySink` | `ModeChanged()` |
+| Kind | The driver implements | Publish call | The driver reports through |
+|------|-----------------------|--------------|----------------------------|
+| Keyboard | `IKeyboard` (`Name`, `SetLeds`) | `PublishKeyboard` | `KeyboardSink.Report(scanCode, released)` |
+| Pointer | `IPointer` (`Name`) | `PublishPointer` | `PointerSink.ReportRelative(...)`, `ReportAbsolute(...)` |
+| Network | `INetworkInterface` (`Name`, `MacAddress`, `LinkUp`, `Transmit`) | `PublishNetwork` | `NetworkSink.Receive(frame)`, `LinkChanged(up)` |
+| Block | `IBlockDevice` | `PublishBlockDevice` | nothing |
+| Display | `IDisplay` (`Name`, `Mode`, `Framebuffer`, `Flush`) | `PublishDisplay` | `DisplaySink.ModeChanged()` |
 
-`binding.PublishKeyboard(keyboard)`, `PublishPointer`, `PublishNetwork`, `PublishBlockDevice` and `PublishDisplay` are the five calls. Every sink is allocation-free; it finds the kernel's consumer for its kind at call time and drops the report when the device was withdrawn or nobody listens. A kernel built without a kind therefore gets a sink that discards rather than a throw the driver could not anticipate. The published device is withdrawn by teardown ahead of everything else the driver holds, and the log records both ends:
+The kernel's manager for that kind picks the device up as soon as it is published, and teardown withdraws it before releasing anything else. Sinks never allocate, and drop reports once the device is withdrawn.
+
+With a `NicState` state object implementing `INetworkInterface`, the probe publishes it and keeps the sink it gets back:
+
+```csharp
+// In Probe:
+NicState state = new(binding);
+binding.DriverState = state;
+state.Sink = binding.PublishNetwork(state);
+
+// In the receive work item, for each frame the device received:
+Sink?.Receive(frame);
+```
+
+The log records both ends, here for the keyboard sample above:
 
 ```
 [Drivers] synthetic:kbd synthetic-keyboard published keyboard "synthetic-kbd" (consumed)
 [Drivers] synthetic:kbd synthetic-keyboard withdrew keyboard "synthetic-kbd"
 ```
 
-A display driver publishes its device under `IDisplay.Name` (`virtio-gpu`, `vmware-svga`; the firmware display is `framebuffer`) in whatever scanout state it found it and programs no mode of its own: `Mode` is the geometry the scanout is in, or `DisplayMode.IsEmpty` while nothing has programmed one, and `Framebuffer` is a `DeviceRegion` the driver mapped (a BAR window sliced to one frame, or a `DmaBuffer.Region` when the host scans out of DMA memory) or `null` for a display the CPU cannot draw into. Two optional facets are extra interfaces the same published object implements, found by a type test through `DisplayDevice.TryGetFacet<T>()`: `IDisplayModes` (`Modes`, the list the display accepts, and `TrySetMode(width, height, bitsPerPixel)`, which reports `ModeChanged()` on success and returns `false`, changing nothing, for a mode the display refuses) for a display that switches modes, and `IHardwareCursor` (`TryDefine(hotspotX, hotspotY, width, height, pixels)` for a premultiplied ARGB image, `Set(x, y, visible)`) for one that composes a cursor itself. A third facet is the ring's, not the kit's: a display that renders 3D implements `ICanvas3DFactory` from `Cosmos.Kernel.System.Graphics`, and `Canvas.GetFullScreen()` asks the primary display for it before building a canvas. A driver's own state type is a facet too, which is how the Graphic suite reads a driver's counters back.
+A few rules per kind:
 
-The framebuffer the bootloader handed over is a display like the others, the **firmware display**: the HAL records it at boot (`[KERNEL]   - Recording the firmware framebuffer...`, under `CosmosEnableGraphics` alone), and the engine publishes it right after the manifest line, before its worker exists and before any node is offered, with `DeviceProvenance.Firmware`, no binding and no node, logged `firmware published display "framebuffer" (consumed)`. It is withdrawn by the **retirement rule**: when a driver binds a PCI function, every firmware display whose physical address lies inside one of that function's assigned memory base address registers is withdrawn, logged `firmware display "framebuffer" retired: inside pci:0000:00:01.0 bar 1`, because the driver now owns the adapter the firmware framebuffer sits in. That is what happens on a VMware SVGA II adapter, whose VRAM window is BAR 1; a virtio-gpu added beside the machine's default adapter retires nothing, and both displays stay published.
+- **Network**: call `NetworkSink.Receive` from thread context, never from the handler; hand received frames to a work item.
+- **Block**: `PublishBlockDevice` registers the disk with `StorageManager` and scans its partitions before returning, so the device must be ready. If the manager refuses it, the probe fails.
+- **Display**: publish the display as you found it; `Mode` is empty until something sets one, and `Framebuffer` is `null` when the CPU cannot draw into it. The same object may also implement `IDisplayModes` to switch modes and `IHardwareCursor` for a hardware cursor. The bootloader's framebuffer is published as the firmware display at boot, and withdrawn when a driver binds the PCI function it lives in.
 
-`DisplayManager` in `Cosmos.Kernel.System.Graphics` is the display kind's manager: `Count`, `Primary` and `TryGet(index, out display)` over a list kept in primary order, each entry a `DisplayDevice` carrying the published `Name`, the `DriverName` (the driver's class name, or `firmware`), `NodePath` (null for the firmware display), `IsFirmware`, the mode read live from the driver (`Width`, `Height`, `BitsPerPixel`, `Pitch`, `RefreshRate`, 60 when the driver reports none, all 0 once withdrawn), `IsWithdrawn` and `TryGetFacet<T>`, which finds nothing once the display is withdrawn. The primary rule is stable and never arrival order: a driver display before the firmware one, among driver displays the smallest `NodePath` by ordinal comparison, among firmware displays the first published. The choice is logged whenever it changes, `[Display] primary: firmware "framebuffer" (the only display)` at boot, `[Display] primary: VirtioGpuDriver "virtio-gpu" (driver published, preferred over firmware)` once a driver display arrives, `[Display] primary: none` when the last one leaves. `Canvas.GetFullScreen()` draws on the primary display: when it implements `ICanvas3DFactory` the canvas is the factory's `Canvas3D`, otherwise the framework `Canvas` over the display, which asks for the default mode through `IDisplayModes` when the display reports none and copies its buffer into `Framebuffer` on every `Display()`, followed by `Flush`. A display that publishes no `Framebuffer` receives no pixels and no `Flush` from the framework canvas: the kind has no upload call, so such a device presents only through its own `Canvas3D` via `ICanvas3DFactory`, or is listed by the manager and drawn on by nobody. The [Graphics](graphics.md) article has the canvas side.
-
-Keyboard, pointer, network, display and block have consumers, each installed by its manager's `Initialize` through `DeviceRegistry.SetConsumer` before the driver stage runs, one consumer per kind. A published `IKeyboard` is in `KeyboardManager`'s list by the time `PublishKeyboard` returns, and its keys reach the manager through the consumer, whatever the driver: `KeyboardSink.Report(scanCode, released)` runs the manager's scan code handler in the caller's context, an interrupt included, allocating nothing of its own. A lock key toggled on any keyboard lights the indicators on every published keyboard through `IKeyboard.SetLeds`, from a work item on the kit worker, since `SetLeds` is thread context and the toggle may come from a PS/2 or USB interrupt. A published `IPointer` is in `MouseManager`'s list; `PointerSink.ReportRelative` moves the manager's cursor and sets its buttons as a PS/2 packet does, and `ReportAbsolute` sets the buttons and leaves the cursor where it was, the migration-period mapping of an absolute device onto a manager that only knows movement. A published `INetworkInterface` is an adapter in `NetworkManager`'s table under the interface's `Name` (`e1000e` and `virtio-net` for the shipped drivers, which is what `NetworkManager.Name` reports when that interface is the primary), and it leaves the table through `NetworkManager.UnregisterDevice` when teardown withdraws it. The first registered device is the primary: the first interface a kit driver publishes, in the order the driver stage binds them. Two rules come with the network kind. `NetworkSink.Receive` is called from thread context, the kit worker in practice, and never from an interrupt handler: the consumer copies the frame into an array and runs the stack's handler with interrupts disabled, which restores the atomicity the stack had while it ran inside the driver's interrupt handler, so a driver whose handler sees a frame hands it to a work item, as the E1000E's drain does. `LinkChanged` only writes a flag and may be reported from any context. Withdrawing a keyboard or a pointer takes it out of its manager's list at once; withdrawing an interface takes it out of the manager's table, but its IP configuration is not removed and `NetworkAdapter` handles stay positional, so a handle taken before the withdrawal may name the device that moved into its slot. A published `IDisplay` is in `DisplayManager`'s list by the time `PublishDisplay` returns, wrapped in a `DisplayDevice`, and the primary is recomputed; withdrawing it, by teardown or by the retirement rule, drops it from the list and recomputes the primary again, and a canvas still holding it copies nothing from then on. Publication and withdrawal run in thread context, on the boot thread for the firmware display and on the kit worker for a driver's, never concurrently. `DisplaySink.ModeChanged` runs in the caller's context, an interrupt included, and writes `[Display] mode changed: VmwareSvgaDriver "vmware-svga" now 1024x768x32` allocation-free; the canvas reads the new mode when it next draws. A published `IBlockDevice` is in `StorageManager`'s tables by the time `PublishBlockDevice` returns: the consumer registers it inside the publishing probe, on the kit worker, and the manager scans it for partitions there (GPT, then MBR with its EBR chain, then the FAT superfloppy probe), reading a device the driver has just made operational, so the scan's I/O lengthens the driver stage by its duration; the manager then writes `[StorageManager] sata0 registered by AhciDriver`, with ` (primary)` when its order rule put the disk first at that moment. That rule keeps `Devices`, `Partitions` and `PrimaryDevice` in one order whatever the arrival order: a kit disk before a hand-registered one (a disk a kernel registers itself), among kit disks the lowest node path by ordinal comparison (`pci:` before `usb:` before `virtio:`), then registration order; so an internal disk on a PCI controller is the primary over a USB stick present at boot, and a kit disk arriving after a USB stick moves ahead of it and renumbers `Partitions`, which is why a mount by `Partition` keeps its partition where a mount by index string keeps its index ([File System](filesystem.md)). A registration the manager refuses (its table of eight is full, the device is already registered, the manager is not initialized) is an `InvalidOperationException` from the consumer, so the device stays unconsumed and the publishing probe fails with that reason in its offer line, rather than binding a disk the ring never sees. Withdrawing a block device, from the binding's teardown before the driver's interrupts are disconnected and before `OnDetach`, unregisters it: it leaves `Devices` and `Partitions`, the mounts made on its partitions are detached without a flush, and the manager writes `[StorageManager] sata0 unregistered`, with ` (primary now nvme0n1)` or ` (no primary)` when it was the primary. The ring does not wrap the driver's object, so a later call through a `Partition` of a withdrawn kit disk gets the kit's `InvalidOperationException` (a window or DMA buffer torn down) or the driver's own detach exception, which for the shipped NVMe, USB mass storage and virtio-blk drivers is an `IOException` (`virtio-blk device detached`); the ring adds no exception of its own. A PCI function behind a hot-plug slot is retracted by the port driver when its device is pulled, and a USB node when its device is pulled out, which are the paths the Storage suite's virtio-blk-pci and usb cells and the Drivers suite's virtio-blk-pci and usb-kbd cells exercise; the synthetic bus reaches them with no hardware.
+See [Graphics](graphics.md) and [File System](filesystem.md) for the consuming side.
 
 ### Publishing child nodes
 
-A bus is a driver whose binding publishes child nodes. `binding.PublishChild(identity, resources, interrupts, access)` puts a device the driver found on its own bus into the tree beneath its node, to be offered to drivers like any other; `binding.RetractChild(child, hardwarePresent)` takes one out again, tearing down whatever binding it has. Children live and die with the parent: tearing down a bus driver retracts every node it published, which in turn tears down every binding on those nodes, leaf first, and each child's driver sees `DetachCause.ParentRetracted`.
+A bus driver publishes the devices it finds as child nodes: `binding.PublishChild(identity, resources, interrupts, access)` adds one beneath its node, to be offered to drivers like any other, and `binding.RetractChild(child, hardwarePresent)` removes it. Children go away with their parent, and their drivers see `DetachCause.ParentRetracted`.
 
-From the worker (a probe or a work item) the child's offer is queued behind the current job and runs once it returns; from a driver thread it completes before `PublishChild` returns. A bus driver brings its own identity and match pair, as the Drivers suite's bus driver does:
+A bus driver either uses a bus kind the kit defines (the virtio transports publish `VirtioIdentity` nodes) or brings its own identity and match pair:
 
 ```csharp
 using Cosmos.Kernel.HAL.DriverKit;
@@ -472,9 +547,15 @@ public sealed class ChildMatch : DeviceMatch
 ```
 
 ```csharp
+// In the bus driver:
 public override ProbeResult Probe(DeviceBinding binding)
 {
-    DeviceNode child = binding.PublishChild(new ChildIdentity("port0"), [], [], null);
+    DeviceResource[] resources =
+    [
+        DeviceResource.MemoryWindow(0xFEB00000, 0x1000),   // the child's registers, index 0
+    ];
+
+    DeviceNode child = binding.PublishChild(new ChildIdentity("port0"), resources, [], null);
     binding.DriverState = child;
     return ProbeResult.Bound;
 }
@@ -482,11 +563,11 @@ public override ProbeResult Probe(DeviceBinding binding)
 
 A bus driver may also publish a child of a bus kind the kit already defines: the shipped virtio transport drivers publish their device with the kit's `VirtioIdentity`, no resources, the nine interrupt sources of a `VirtioAccess` and that access as the access object ([Virtio devices](#virtio-devices)), and the kit's USB enumeration core publishes a device's interfaces beneath the xHCI or hub driver's node with a `UsbIdentity`, no resources, no interrupt sources and a `UsbAccess` ([USB devices](#usb-devices)).
 
-The `resources` array carries `DeviceResource.MemoryWindow(physicalBase, length)`, `DeviceResource.PortRange(basePort, count)`, `DeviceResource.RamWindow(virtualBase, physicalBase, length)` or `DeviceResource.None` entries (the last is a slot with nothing assigned, kept so the indices after it stay what the hardware numbers them; `MapRegisters` and `MapRegion` refuse it with `InvalidOperationException`); the `interrupts` array carries `InterruptSource` implementations the bus provides, each implementing `Describe()` and the four protected members (`TryConnectCore`, `MaskCore`, `UnmaskCore`, `DisconnectCore`) that the kit calls through its own internal forwarders, so a driver holding a source can neither connect nor mask it behind the kit's back.
+Resources are built with `DeviceResource.MemoryWindow`, `PortRange`, `RamWindow` or `None` (an unassigned slot that keeps the indices after it). Interrupts are `InterruptSource` subclasses the bus provides.
 
 ### Logging
 
-`binding.Log(message)` writes one line to the serial log in the kit's format, `[Drivers] synthetic:kbd synthetic-keyboard: message`, from thread context. The log is where a driver author looks first; the same facts reach a test through `DriverInfo` (below).
+`binding.Log(message)` writes one line to the serial log from thread context: `[Drivers] synthetic:kbd synthetic-keyboard: message`.
 
 ## Declining and failing
 
