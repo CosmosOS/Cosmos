@@ -77,60 +77,34 @@ Each driver class is instantiated once and offered every node it matches, so its
 
 ## Where a driver runs
 
-The driver stage runs from `Kernel.Start`, after the module initializers have brought up the heap, the interrupt controller, the scheduler and its tick, and after interrupts are enabled. The kit logs the manifest, starts its worker thread, offers every node published so far, and returns once every node has been offered, the children a bus driver published from its probe included. Only then do `OnBoot` and `BeforeRun` run, so a device a driver bound is usable from there on. The serial log of an x64 kernel with no drivers of its own, launched with `cosmos run --nic virtio-net-pci`, shows the stage between the two `[Kernel]` lines: the manifest holds the nineteen drivers Cosmos ships, in manifest order; the framebuffer the bootloader handed over is published as the firmware display, which the display manager takes as its primary, before the engine starts; the two nodes the platform bus seeded are offered first, the 8042 keyboard controller and then the PCI host; the two PS/2 port nodes the 8042 driver published from its probe are offered once the host node is bound, since a child's offer is queued behind the job that published it and the host node's offer was queued before them; the functions the host driver found are offered after the ports, each one bound by a driver or left `no driver` (the machine's standard VGA at `00:01.0` here, whose framebuffer the firmware display is; q35's built-in AHCI at `00:1f.2`, which carries the boot CD-ROM on its port 5 and no disk, is bound by the AHCI driver with no port published); and the virtio node the transport driver published beneath the NIC's function is offered once the functions are:
+The driver stage runs from `Kernel.Start`, once the heap, the interrupt controller and the scheduler are up and interrupts are enabled. The kit offers every node published so far, including the children a bus driver publishes from its probe, and returns when all of them have been offered. `OnBoot` and `BeforeRun` run after it, so every bound device is usable there.
+
+The serial log shows each node, its candidate drivers and the result of the offer. An excerpt from an x64 kernel launched with `cosmos run --nic virtio-net-pci`:
 
 ```
-[Kernel] Enabling interrupts...
 [Kernel] Starting drivers...
-[Drivers] manifest: PcieRootPortDriver(prio 0) VirtioPciTransportDriver(prio 0) XhciDriver(prio 0) VmwareSvgaDriver(prio 0) E1000EDriver(prio 0) AhciDriver(prio 0) NvmeDriver(prio 0) I8042Driver(prio 0) PciHostDriver(prio 0) VirtioMmioTransportDriver(prio 0) Ps2KeyboardDriver(prio 0) Ps2MouseDriver(prio 0) UsbHubDriver(prio 0) UsbKeyboardDriver(prio 0) UsbMassStorageDriver(prio 0) VirtioGpuDriver(prio 0) VirtioInputDriver(prio 0) VirtioNetDriver(prio 0) VirtioBlkDriver(prio 0)
-[Display] primary: firmware "framebuffer" (the only display)
-[Drivers] firmware published display "framebuffer" (consumed)
+[Drivers] manifest: PcieRootPortDriver(prio 0) VirtioPciTransportDriver(prio 0) ... VirtioBlkDriver(prio 0)
 [Drivers] engine started, worker thread
-[Drivers] platform:i8042@60 candidates: I8042Driver(prio 0, spec 1)
-[InterruptManager] Routing IRQ 1 -> vector 0x21
-[InterruptManager] Routing IRQ C -> vector 0x2C
-[Drivers] platform:i8042@60 I8042Driver: dual channel, translation on, lines 1 and 12
-[Drivers] platform:i8042@60 offer I8042Driver -> bound
+...
 [Drivers] platform:pci@cf8 candidates: PciHostDriver(prio 0, spec 1)
 [Drivers] platform:pci@cf8 PciHostDriver: 6 functions on 1 buses
 [Drivers] platform:pci@cf8 offer PciHostDriver -> bound
-[Drivers] ps2:kbd candidates: Ps2KeyboardDriver(prio 0, spec 1)
-[KeyboardManager] Registered keyboard, total: 1
-[Drivers] ps2:kbd Ps2KeyboardDriver published keyboard "ps2-keyboard" (consumed)
-[Drivers] ps2:kbd Ps2KeyboardDriver: MF2 keyboard (id ab 41), scanning
-[Drivers] ps2:kbd offer Ps2KeyboardDriver -> bound
-[Drivers] ps2:aux candidates: Ps2MouseDriver(prio 0, spec 1)
-[MouseManager] Registered mouse, total: 1
-[Drivers] ps2:aux Ps2MouseDriver published pointer "ps2-mouse" (consumed)
-[Drivers] ps2:aux Ps2MouseDriver: wheel mouse (id 03), 4-byte packets, reporting
-[Drivers] ps2:aux offer Ps2MouseDriver -> bound
-[Drivers] pci:0000:00:00.0 no driver
+...
 [Drivers] pci:0000:00:01.0 no driver
 [Drivers] pci:0000:00:02.0 candidates: VirtioPciTransportDriver(prio 0, spec 1)
-[Drivers] pci:0000:00:02.0 VirtioPciTransportDriver: virtio type 1, 4 message interrupts
 [Drivers] pci:0000:00:02.0 offer VirtioPciTransportDriver -> bound
-...
-[Drivers] pci:0000:00:1f.2 candidates: AhciDriver(prio 0, spec 3)
-[Drivers] pci:0000:00:1f.2 AhciDriver: port 0: no device (SSTS 0x0)
-...
-[Drivers] pci:0000:00:1f.2 AhciDriver: port 5: satapi not supported
-[Drivers] pci:0000:00:1f.2 AhciDriver: 0 sata ports of 6 implemented, version 1.0, 32 slots, 64-bit
-[Drivers] pci:0000:00:1f.2 offer AhciDriver -> bound
 ...
 [Drivers] virtio:pci:0000:00:02.0 candidates: VirtioNetDriver(prio 0, spec 1)
 [Drivers] virtio:pci:0000:00:02.0 VirtioNetDriver published network "virtio-net" (consumed)
-[Drivers] virtio:pci:0000:00:02.0 VirtioNetDriver: mac 52:54:00:12:34:56, link up, version 1, interrupts: 4 entries
 [Drivers] virtio:pci:0000:00:02.0 offer VirtioNetDriver -> bound
 [Kernel] Calling OnBoot()...
 ```
 
-A kernel built with `CosmosEnablePCI` off has no host node, no `PciHostDriver`, no `PcieRootPortDriver` and no `VirtioPciTransportDriver`; `E1000EDriver` and `VirtioNetDriver` are guarded by `CosmosEnableNetwork` instead, so they stay in the manifest while that switch is on and are offered nothing when no bus publishes their device. `VirtioGpuDriver` and `VmwareSvgaDriver` ride `CosmosEnableGraphics`, the switch that also decides whether the firmware framebuffer is recorded and published: with graphics off a kernel has no display at all, and with PCI off the SVGA driver is offered nothing while the virtio-gpu driver still binds a device behind the MMIO transport. `AhciDriver`, `NvmeDriver` and `VirtioBlkDriver` ride `CosmosEnableStorage`, the switch that also decides whether the storage manager exists to consume what they publish, and which the SDK turns off with `CosmosEnablePCI`, since the AHCI and NVMe controllers are PCI functions no other bus publishes (a virtio-blk disk in a virtio-mmio slot goes with it). `XhciDriver`, `UsbHubDriver`, `UsbKeyboardDriver` and `UsbMassStorageDriver` ride `CosmosEnableUsb`, which the SDK turns on whenever the keyboard or the storage switch is and off with `CosmosEnablePCI`, since the controller is a PCI function; the two class drivers check their own kind's switch in their probes (`keyboard support is compiled out`, `storage support is compiled out`), so a kernel with USB on and storage off binds a USB keyboard and leaves a stick's interface unbound. `VirtioMmioTransportDriver` and `VirtioInputDriver` ride no switch: the first is offered nothing on a machine without a virtio-mmio window, and the second checks the keyboard and mouse switches itself in its probe, because one device type is either. The manifest is `(empty)` only for a kernel that excludes every shipped driver and declares none of its own.
+A node published after boot, such as a USB device plugged in, takes the same path. See [Kernel Startup](startup.md) for the rest of the boot sequence.
 
-A node published after boot (a hot-plug, or a test publishing a synthetic node from `BeforeRun`) takes the same path: it is queued for the worker, offered there, and the publisher waits until the offer is done. A USB device plugged in is such a node: the xHCI driver's hot-plug thread publishes its interfaces and waits for the offer. A PCI function arriving behind a PCI Express hot-plug slot is another: the root port driver's slot thread powers the slot on, has the kit place the function's registers, and publishes it the same way. See [Kernel Startup](startup.md) for the rest of the boot sequence.
+Probes, teardowns and work items run one at a time on the kit's worker thread, so a driver never sees two of them overlap. Only driver threads run concurrently.
 
-Probes, teardowns and work items run one at a time on the kit worker, so a driver never sees two of them overlap; only driver threads run concurrently, with each other and with the worker.
-
-A kernel built with `CosmosEnableScheduler` off has no worker. The engine then runs inline: the thread that publishes or retracts a node drains the queue itself, and the log says `engine started, inline (no worker)`. Probing works the same, but nothing deferred does: `WorkItem.Schedule` returns `false`, `TrySchedulePeriodic` returns `false`, and `TryStartThread` returns `false`. A driver that must work in such a kernel checks those results.
+A kernel built with `CosmosEnableScheduler` off has no worker thread: probing still works, but `WorkItem.Schedule`, `TrySchedulePeriodic` and `TryStartThread` return `false`. A driver that must work in such a kernel checks those results. The engine then runs inline: the thread that publishes or retracts a node drains the queue itself, and the log says `engine started, inline (no worker)`.
 
 ## The two execution contexts and the guard
 
