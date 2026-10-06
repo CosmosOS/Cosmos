@@ -613,6 +613,15 @@ public static class SchedulerManager
         {
             PerCpuState state = s_cpuStates[cpuId];
 
+            // A wake for a thread that is already runnable does nothing: a
+            // Ready thread is queued and a Running one is on its CPU, and
+            // the run queue must never hold a thread twice (see
+            // ScheduleFromInterrupt for what a second entry does).
+            if (thread.State == SchedulerThreadState.Ready || thread.State == SchedulerThreadState.Running)
+            {
+                return;
+            }
+
             // Only set to Ready if not a new thread (Created).
             // New threads stay Created until they actually start running.
             // This allows ScheduleFromInterrupt to detect first-time execution.
@@ -729,7 +738,14 @@ public static class SchedulerManager
         {
             PerCpuState state = s_cpuStates[cpuId];
 
-            s_currentScheduler.OnThreadYield(state, thread);
+            // Queued from here on, so Ready: the switch that takes it off the
+            // CPU must not queue it a second time, and a pick that hands it
+            // straight back marks it Running again.
+            if (thread.State == SchedulerThreadState.Running)
+            {
+                thread.State = SchedulerThreadState.Ready;
+                s_currentScheduler.OnThreadYield(state, thread);
+            }
         }
     }
 
@@ -921,6 +937,8 @@ public static class SchedulerManager
 
     private static uint s_tickCount;
 
+    private static uint s_switchCount;
+
     private static ulong s_tickPeriodNs;
 
     /// <summary>
@@ -929,6 +947,13 @@ public static class SchedulerManager
     /// nothing still counts. Wraps: compare differences. Any context.
     /// </summary>
     internal static uint TickCount => Volatile.Read(ref s_tickCount);
+
+    /// <summary>
+    /// Context switches staged since boot, by <see cref="ScheduleFromInterrupt"/>,
+    /// the one path that switches threads. Wraps: compare differences. Any
+    /// context.
+    /// </summary>
+    internal static uint SwitchCount => Volatile.Read(ref s_switchCount);
 
     /// <summary>
     /// Interval between scheduler ticks in nanoseconds, as the timer last
@@ -1114,6 +1139,8 @@ public static class SchedulerManager
 
         if (next != prev)
         {
+            s_switchCount++;
+
             /*
             Serial.WriteString("[SCHED] Context switch: thread ");
             Serial.WriteNumber(prev?.Id ?? 0);
@@ -1124,18 +1151,19 @@ public static class SchedulerManager
             Serial.WriteString("\n");
             */
 
-            // Save current thread's stack pointer
+            // A prev that is already Ready is queued: it parked itself
+            // (blocked or slept) and a wake readied it before this switch
+            // took it off the CPU. Yielding it again would leave a second
+            // entry behind, whose pass keeps rising with the thread while its
+            // place in the queue does not move, so the queue stops being
+            // sorted and every thread queued behind that entry, a newly
+            // created one included, never reaches the head.
             if (prev is not null)
             {
                 prev.StackPointer = currentRsp;
                 if (prev.State == SchedulerThreadState.Running)
                 {
                     prev.State = SchedulerThreadState.Ready;
-                }
-
-                // Put previous thread back in run queue if still runnable
-                if (prev.State == SchedulerThreadState.Ready)
-                {
                     s_currentScheduler.OnThreadYield(state, prev);
                 }
             }
@@ -1152,6 +1180,12 @@ public static class SchedulerManager
             // Request context switch - set new thread flag and target RSP
             ContextSwitchNative.SetContextSwitchNewThread(isNewThread ? 1 : 0);
             ContextSwitchNative.SetContextSwitchSp(next.StackPointer);
+        }
+        else if (next.State == SchedulerThreadState.Ready)
+        {
+            // The policy handed back the current thread's own entry, queued
+            // by a wake that came before it left the CPU: it stays on.
+            next.State = SchedulerThreadState.Running;
         }
     }
 
