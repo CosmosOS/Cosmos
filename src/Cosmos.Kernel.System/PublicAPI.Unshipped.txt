@@ -5,8 +5,8 @@ abstract Cosmos.Kernel.System.Graphics.Canvas3D.CreateTexture(Cosmos.Kernel.Syst
 abstract Cosmos.Kernel.System.Graphics.Canvas3D.DestroyMesh(Cosmos.Kernel.System.Graphics.Mesh! mesh) -> void
 abstract Cosmos.Kernel.System.Graphics.Canvas3D.DestroyTexture(Cosmos.Kernel.System.Graphics.Texture! texture) -> void
 abstract Cosmos.Kernel.System.Graphics.Canvas3D.DrawMesh(Cosmos.Kernel.System.Graphics.Mesh! mesh, in System.Numerics.Matrix4x4 world) -> void
+abstract Cosmos.Kernel.System.Input.ScanMapBase.InitializeKeys() -> void
 abstract Cosmos.Kernel.System.Kernel.Run() -> void
-abstract Cosmos.Kernel.System.Keyboard.ScanMapBase.InitializeKeys() -> void
 abstract Cosmos.Kernel.System.Network.Address.IsBroadcastAddress.get -> bool
 abstract Cosmos.Kernel.System.Network.Address.IsLoopbackAddress.get -> bool
 abstract Cosmos.Kernel.System.Network.Address.IsZero.get -> bool
@@ -430,199 +430,199 @@ Cosmos.Kernel.System.Graphics.Texture.Height.get -> int
 Cosmos.Kernel.System.Graphics.Texture.IsDisposed.get -> bool
 Cosmos.Kernel.System.Graphics.Texture.Owner.get -> Cosmos.Kernel.System.Graphics.Canvas3D!
 Cosmos.Kernel.System.Graphics.Texture.Width.get -> int
+Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.A = 47 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.AltGr = 82 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Apostrophe = 58 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.B = 70 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Backquote = 17 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Backslash = 30 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Backspace = 31 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.BiggerThan = 60 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.C = 68 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.CapsLock = 46 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Colon = 57 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Comma = 73 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D = 49 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D0 = 27 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D1 = 18 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D2 = 19 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D3 = 20 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D4 = 21 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D5 = 22 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D6 = 23 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D7 = 24 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D8 = 25 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.D9 = 26 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Delete = 88 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.DownArrow = 92 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.E = 35 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.End = 89 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Enter = 45 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Equal = 29 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Escape = 1 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.ExclamationPoint = 61 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F = 50 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F1 = 2 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F10 = 11 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F11 = 12 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F12 = 13 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F2 = 3 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F3 = 4 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F4 = 5 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F5 = 6 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F6 = 7 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F7 = 8 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F8 = 9 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.F9 = 10 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.G = 51 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.H = 52 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Home = 86 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.I = 40 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Insert = 85 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.J = 53 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.K = 54 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.L = 55 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.LAlt = 79 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.LBracket = 43 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.LCtrl = 76 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.LeftArrow = 93 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.LowerThan = 59 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.LShift = 62 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.LWin = 78 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.M = 72 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Menu = 84 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Minus = 28 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.N = 71 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.NoName = 0 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num0 = 109 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num1 = 106 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num2 = 107 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num3 = 108 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num4 = 103 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num5 = 104 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num6 = 105 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num7 = 99 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num8 = 100 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Num9 = 101 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.NumDivide = 96 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.NumEnter = 111 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.NumLock = 95 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.NumMinus = 98 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.NumMultiply = 97 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.NumPeriod = 110 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.NumPlus = 102 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.O = 41 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.OEM102 = 64 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.OEM5 = 65 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.P = 42 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.PageDown = 90 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.PageUp = 87 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.PauseBreak = 16 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Period = 74 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Power = 112 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.PrintScreen = 14 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Q = 33 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.R = 36 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.RAlt = 80 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.RBracket = 44 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.RCtrl = 77 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.RightArrow = 94 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.RShift = 63 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.RWin = 83 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.S = 48 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.ScrollLock = 15 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Semicolon = 56 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Slash = 75 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Sleep = 113 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Spacebar = 81 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.T = 37 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Tab = 32 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.U = 39 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.UpArrow = 91 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.V = 69 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.W = 34 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Wake = 114 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.X = 67 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Y = 38 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.ConsoleKeyEx.Z = 66 -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.KeyboardManager
+Cosmos.Kernel.System.Input.KeyEvent
+Cosmos.Kernel.System.Input.KeyEvent.Key.get -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.KeyEvent.Key.set -> void
+Cosmos.Kernel.System.Input.KeyEvent.KeyChar.get -> char
+Cosmos.Kernel.System.Input.KeyEvent.KeyChar.set -> void
+Cosmos.Kernel.System.Input.KeyEvent.KeyEvent() -> void
+Cosmos.Kernel.System.Input.KeyEvent.KeyEvent(char keyChar, Cosmos.Kernel.System.Input.ConsoleKeyEx key, bool shift, bool alt, bool control, Cosmos.Kernel.System.Input.KeyEvent.KeyEventType type) -> void
+Cosmos.Kernel.System.Input.KeyEvent.KeyEventType
+Cosmos.Kernel.System.Input.KeyEvent.KeyEventType.Break = 1 -> Cosmos.Kernel.System.Input.KeyEvent.KeyEventType
+Cosmos.Kernel.System.Input.KeyEvent.KeyEventType.Make = 0 -> Cosmos.Kernel.System.Input.KeyEvent.KeyEventType
+Cosmos.Kernel.System.Input.KeyEvent.Modifiers.get -> System.ConsoleModifiers
+Cosmos.Kernel.System.Input.KeyEvent.Modifiers.set -> void
+Cosmos.Kernel.System.Input.KeyEvent.Type.get -> Cosmos.Kernel.System.Input.KeyEvent.KeyEventType
+Cosmos.Kernel.System.Input.KeyEvent.Type.set -> void
+Cosmos.Kernel.System.Input.KeyMapping
+Cosmos.Kernel.System.Input.KeyMapping.CapsLock.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.CapsLock.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.Control.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.Control.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.ControlAlt.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.ControlAlt.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.ControlAltShift.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.ControlAltShift.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.ControlShift.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.ControlShift.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.Key.get -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.KeyMapping.Key.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char n, Cosmos.Kernel.System.Input.ConsoleKeyEx key) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char num, char caps, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Cosmos.Kernel.System.Input.ConsoleKeyEx key, Cosmos.Kernel.System.Input.ConsoleKeyEx numKey) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char num, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Cosmos.Kernel.System.Input.ConsoleKeyEx key) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Cosmos.Kernel.System.Input.ConsoleKeyEx key) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Cosmos.Kernel.System.Input.ConsoleKeyEx key) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Cosmos.Kernel.System.Input.ConsoleKeyEx key, Cosmos.Kernel.System.Input.ConsoleKeyEx numKey) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Cosmos.Kernel.System.Input.ConsoleKeyEx key, Cosmos.Kernel.System.Input.ConsoleKeyEx numKey) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Cosmos.Kernel.System.Input.ConsoleKeyEx key) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Cosmos.Kernel.System.Input.ConsoleKeyEx key, Cosmos.Kernel.System.Input.ConsoleKeyEx numKey) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, char numLock, Cosmos.Kernel.System.Input.ConsoleKeyEx key, Cosmos.Kernel.System.Input.ConsoleKeyEx numKey) -> void
+Cosmos.Kernel.System.Input.KeyMapping.KeyMapping(byte scanCode, Cosmos.Kernel.System.Input.ConsoleKeyEx key) -> void
+Cosmos.Kernel.System.Input.KeyMapping.NumLock.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.NumLock.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.NumLockKey.get -> Cosmos.Kernel.System.Input.ConsoleKeyEx
+Cosmos.Kernel.System.Input.KeyMapping.NumLockKey.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.ScanCode.get -> byte
+Cosmos.Kernel.System.Input.KeyMapping.ScanCode.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.Shift.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.Shift.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.ShiftCapsLock.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.ShiftCapsLock.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.ShiftNumLock.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.ShiftNumLock.set -> void
+Cosmos.Kernel.System.Input.KeyMapping.Value.get -> char
+Cosmos.Kernel.System.Input.KeyMapping.Value.set -> void
+Cosmos.Kernel.System.Input.Layouts.DEStandardLayout
+Cosmos.Kernel.System.Input.Layouts.DEStandardLayout.DEStandardLayout() -> void
+Cosmos.Kernel.System.Input.Layouts.ESStandardLayout
+Cosmos.Kernel.System.Input.Layouts.ESStandardLayout.ESStandardLayout() -> void
+Cosmos.Kernel.System.Input.Layouts.FRStandardLayout
+Cosmos.Kernel.System.Input.Layouts.FRStandardLayout.FRStandardLayout() -> void
+Cosmos.Kernel.System.Input.Layouts.GBStandardLayout
+Cosmos.Kernel.System.Input.Layouts.GBStandardLayout.GBStandardLayout() -> void
+Cosmos.Kernel.System.Input.Layouts.TRStandardLayout
+Cosmos.Kernel.System.Input.Layouts.TRStandardLayout.TRStandardLayout() -> void
+Cosmos.Kernel.System.Input.Layouts.USDvorakLayout
+Cosmos.Kernel.System.Input.Layouts.USDvorakLayout.USDvorakLayout() -> void
+Cosmos.Kernel.System.Input.Layouts.USStandardLayout
+Cosmos.Kernel.System.Input.Layouts.USStandardLayout.USStandardLayout() -> void
+Cosmos.Kernel.System.Input.MouseManager
+Cosmos.Kernel.System.Input.ScanMapBase
+Cosmos.Kernel.System.Input.ScanMapBase.Keys.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Input.KeyMapping!>!
+Cosmos.Kernel.System.Input.ScanMapBase.ScanMapBase() -> void
 Cosmos.Kernel.System.Kernel
 Cosmos.Kernel.System.Kernel.Kernel() -> void
 Cosmos.Kernel.System.Kernel.Started.get -> bool
 Cosmos.Kernel.System.Kernel.Stop() -> void
 Cosmos.Kernel.System.Kernel.Stopped.get -> bool
 Cosmos.Kernel.System.KernelFeatures
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.A = 47 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.AltGr = 82 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Apostrophe = 58 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.B = 70 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Backquote = 17 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Backslash = 30 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Backspace = 31 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.BiggerThan = 60 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.C = 68 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.CapsLock = 46 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Colon = 57 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Comma = 73 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D = 49 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D0 = 27 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D1 = 18 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D2 = 19 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D3 = 20 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D4 = 21 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D5 = 22 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D6 = 23 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D7 = 24 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D8 = 25 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.D9 = 26 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Delete = 88 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.DownArrow = 92 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.E = 35 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.End = 89 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Enter = 45 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Equal = 29 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Escape = 1 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.ExclamationPoint = 61 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F = 50 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F1 = 2 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F10 = 11 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F11 = 12 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F12 = 13 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F2 = 3 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F3 = 4 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F4 = 5 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F5 = 6 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F6 = 7 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F7 = 8 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F8 = 9 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.F9 = 10 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.G = 51 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.H = 52 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Home = 86 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.I = 40 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Insert = 85 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.J = 53 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.K = 54 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.L = 55 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LAlt = 79 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LBracket = 43 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LCtrl = 76 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LeftArrow = 93 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LowerThan = 59 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LShift = 62 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.LWin = 78 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.M = 72 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Menu = 84 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Minus = 28 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.N = 71 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.NoName = 0 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num0 = 109 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num1 = 106 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num2 = 107 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num3 = 108 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num4 = 103 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num5 = 104 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num6 = 105 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num7 = 99 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num8 = 100 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Num9 = 101 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.NumDivide = 96 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.NumEnter = 111 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.NumLock = 95 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.NumMinus = 98 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.NumMultiply = 97 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.NumPeriod = 110 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.NumPlus = 102 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.O = 41 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.OEM102 = 64 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.OEM5 = 65 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.P = 42 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.PageDown = 90 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.PageUp = 87 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.PauseBreak = 16 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Period = 74 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Power = 112 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.PrintScreen = 14 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Q = 33 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.R = 36 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RAlt = 80 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RBracket = 44 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RCtrl = 77 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RightArrow = 94 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RShift = 63 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.RWin = 83 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.S = 48 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.ScrollLock = 15 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Semicolon = 56 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Slash = 75 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Sleep = 113 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Spacebar = 81 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.T = 37 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Tab = 32 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.U = 39 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.UpArrow = 91 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.V = 69 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.W = 34 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Wake = 114 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.X = 67 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Y = 38 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.ConsoleKeyEx.Z = 66 -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.KeyboardManager
-Cosmos.Kernel.System.Keyboard.KeyEvent
-Cosmos.Kernel.System.Keyboard.KeyEvent.Key.get -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.KeyEvent.Key.set -> void
-Cosmos.Kernel.System.Keyboard.KeyEvent.KeyChar.get -> char
-Cosmos.Kernel.System.Keyboard.KeyEvent.KeyChar.set -> void
-Cosmos.Kernel.System.Keyboard.KeyEvent.KeyEvent() -> void
-Cosmos.Kernel.System.Keyboard.KeyEvent.KeyEvent(char keyChar, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, bool shift, bool alt, bool control, Cosmos.Kernel.System.Keyboard.KeyEvent.KeyEventType type) -> void
-Cosmos.Kernel.System.Keyboard.KeyEvent.KeyEventType
-Cosmos.Kernel.System.Keyboard.KeyEvent.KeyEventType.Break = 1 -> Cosmos.Kernel.System.Keyboard.KeyEvent.KeyEventType
-Cosmos.Kernel.System.Keyboard.KeyEvent.KeyEventType.Make = 0 -> Cosmos.Kernel.System.Keyboard.KeyEvent.KeyEventType
-Cosmos.Kernel.System.Keyboard.KeyEvent.Modifiers.get -> System.ConsoleModifiers
-Cosmos.Kernel.System.Keyboard.KeyEvent.Modifiers.set -> void
-Cosmos.Kernel.System.Keyboard.KeyEvent.Type.get -> Cosmos.Kernel.System.Keyboard.KeyEvent.KeyEventType
-Cosmos.Kernel.System.Keyboard.KeyEvent.Type.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping
-Cosmos.Kernel.System.Keyboard.KeyMapping.CapsLock.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.CapsLock.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.Control.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.Control.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.ControlAlt.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.ControlAlt.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.ControlAltShift.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.ControlAltShift.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.ControlShift.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.ControlShift.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.Key.get -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.KeyMapping.Key.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char n, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char num, char caps, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char num, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, char numLock, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx numKey) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.KeyMapping(byte scanCode, Cosmos.Kernel.System.Keyboard.ConsoleKeyEx key) -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.NumLock.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.NumLock.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.NumLockKey.get -> Cosmos.Kernel.System.Keyboard.ConsoleKeyEx
-Cosmos.Kernel.System.Keyboard.KeyMapping.NumLockKey.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.ScanCode.get -> byte
-Cosmos.Kernel.System.Keyboard.KeyMapping.ScanCode.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.Shift.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.Shift.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.ShiftCapsLock.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.ShiftCapsLock.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.ShiftNumLock.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.ShiftNumLock.set -> void
-Cosmos.Kernel.System.Keyboard.KeyMapping.Value.get -> char
-Cosmos.Kernel.System.Keyboard.KeyMapping.Value.set -> void
-Cosmos.Kernel.System.Keyboard.ScanMapBase
-Cosmos.Kernel.System.Keyboard.ScanMapBase.Keys.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Keyboard.KeyMapping!>!
-Cosmos.Kernel.System.Keyboard.ScanMapBase.ScanMapBase() -> void
-Cosmos.Kernel.System.Keyboard.ScanMaps.DEStandardLayout
-Cosmos.Kernel.System.Keyboard.ScanMaps.DEStandardLayout.DEStandardLayout() -> void
-Cosmos.Kernel.System.Keyboard.ScanMaps.ESStandardLayout
-Cosmos.Kernel.System.Keyboard.ScanMaps.ESStandardLayout.ESStandardLayout() -> void
-Cosmos.Kernel.System.Keyboard.ScanMaps.FRStandardLayout
-Cosmos.Kernel.System.Keyboard.ScanMaps.FRStandardLayout.FRStandardLayout() -> void
-Cosmos.Kernel.System.Keyboard.ScanMaps.GBStandardLayout
-Cosmos.Kernel.System.Keyboard.ScanMaps.GBStandardLayout.GBStandardLayout() -> void
-Cosmos.Kernel.System.Keyboard.ScanMaps.TRStandardLayout
-Cosmos.Kernel.System.Keyboard.ScanMaps.TRStandardLayout.TRStandardLayout() -> void
-Cosmos.Kernel.System.Keyboard.ScanMaps.USDvorakLayout
-Cosmos.Kernel.System.Keyboard.ScanMaps.USDvorakLayout.USDvorakLayout() -> void
-Cosmos.Kernel.System.Keyboard.ScanMaps.USStandardLayout
-Cosmos.Kernel.System.Keyboard.ScanMaps.USStandardLayout.USStandardLayout() -> void
-Cosmos.Kernel.System.Mouse.MouseManager
 Cosmos.Kernel.System.Network.Address
 Cosmos.Kernel.System.Network.Address.Address() -> void
 Cosmos.Kernel.System.Network.Address.AddressFamily.get -> Cosmos.Kernel.System.Network.AddressFamily
@@ -899,6 +899,33 @@ static Cosmos.Kernel.System.Graphics.Mode.operator <=(Cosmos.Kernel.System.Graph
 static Cosmos.Kernel.System.Graphics.Mode.operator ==(Cosmos.Kernel.System.Graphics.Mode a, Cosmos.Kernel.System.Graphics.Mode b) -> bool
 static Cosmos.Kernel.System.Graphics.Mode.operator >(Cosmos.Kernel.System.Graphics.Mode a, Cosmos.Kernel.System.Graphics.Mode b) -> bool
 static Cosmos.Kernel.System.Graphics.Mode.operator >=(Cosmos.Kernel.System.Graphics.Mode a, Cosmos.Kernel.System.Graphics.Mode b) -> bool
+static Cosmos.Kernel.System.Input.KeyboardManager.AltPressed.get -> bool
+static Cosmos.Kernel.System.Input.KeyboardManager.CapsLock.get -> bool
+static Cosmos.Kernel.System.Input.KeyboardManager.ControlPressed.get -> bool
+static Cosmos.Kernel.System.Input.KeyboardManager.GetKeyLayout() -> Cosmos.Kernel.System.Input.ScanMapBase?
+static Cosmos.Kernel.System.Input.KeyboardManager.IsEnabled.get -> bool
+static Cosmos.Kernel.System.Input.KeyboardManager.KeyAvailable.get -> bool
+static Cosmos.Kernel.System.Input.KeyboardManager.NumLock.get -> bool
+static Cosmos.Kernel.System.Input.KeyboardManager.Peek() -> Cosmos.Kernel.System.Input.KeyEvent!
+static Cosmos.Kernel.System.Input.KeyboardManager.ReadKey() -> Cosmos.Kernel.System.Input.KeyEvent!
+static Cosmos.Kernel.System.Input.KeyboardManager.ScrollLock.get -> bool
+static Cosmos.Kernel.System.Input.KeyboardManager.SetKeyLayout(Cosmos.Kernel.System.Input.ScanMapBase! scanMap) -> void
+static Cosmos.Kernel.System.Input.KeyboardManager.ShiftPressed.get -> bool
+static Cosmos.Kernel.System.Input.KeyboardManager.TryReadKey(out Cosmos.Kernel.System.Input.KeyEvent? key) -> bool
+static Cosmos.Kernel.System.Input.MouseManager.IsEnabled.get -> bool
+static Cosmos.Kernel.System.Input.MouseManager.LeftButton.get -> bool
+static Cosmos.Kernel.System.Input.MouseManager.MiddleButton.get -> bool
+static Cosmos.Kernel.System.Input.MouseManager.ResetScrollDelta() -> void
+static Cosmos.Kernel.System.Input.MouseManager.RightButton.get -> bool
+static Cosmos.Kernel.System.Input.MouseManager.ScreenHeight.get -> int
+static Cosmos.Kernel.System.Input.MouseManager.ScreenWidth.get -> int
+static Cosmos.Kernel.System.Input.MouseManager.ScrollDelta.get -> int
+static Cosmos.Kernel.System.Input.MouseManager.Sensitivity.get -> float
+static Cosmos.Kernel.System.Input.MouseManager.Sensitivity.set -> void
+static Cosmos.Kernel.System.Input.MouseManager.SetPosition(int x, int y) -> void
+static Cosmos.Kernel.System.Input.MouseManager.SetScreenSize(int width, int height) -> void
+static Cosmos.Kernel.System.Input.MouseManager.X.get -> int
+static Cosmos.Kernel.System.Input.MouseManager.Y.get -> int
 static Cosmos.Kernel.System.KernelFeatures.Fat.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Graphics.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Interrupts.get -> bool
@@ -911,33 +938,6 @@ static Cosmos.Kernel.System.KernelFeatures.Storage.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Timer.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Uart.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Usb.get -> bool
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.AltPressed.get -> bool
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.CapsLock.get -> bool
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.ControlPressed.get -> bool
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.GetKeyLayout() -> Cosmos.Kernel.System.Keyboard.ScanMapBase?
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.IsEnabled.get -> bool
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.KeyAvailable.get -> bool
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.NumLock.get -> bool
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.Peek() -> Cosmos.Kernel.System.Keyboard.KeyEvent!
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.ReadKey() -> Cosmos.Kernel.System.Keyboard.KeyEvent!
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.ScrollLock.get -> bool
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.SetKeyLayout(Cosmos.Kernel.System.Keyboard.ScanMapBase! scanMap) -> void
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.ShiftPressed.get -> bool
-static Cosmos.Kernel.System.Keyboard.KeyboardManager.TryReadKey(out Cosmos.Kernel.System.Keyboard.KeyEvent? key) -> bool
-static Cosmos.Kernel.System.Mouse.MouseManager.IsEnabled.get -> bool
-static Cosmos.Kernel.System.Mouse.MouseManager.LeftButton.get -> bool
-static Cosmos.Kernel.System.Mouse.MouseManager.MiddleButton.get -> bool
-static Cosmos.Kernel.System.Mouse.MouseManager.ResetScrollDelta() -> void
-static Cosmos.Kernel.System.Mouse.MouseManager.RightButton.get -> bool
-static Cosmos.Kernel.System.Mouse.MouseManager.ScreenHeight.get -> int
-static Cosmos.Kernel.System.Mouse.MouseManager.ScreenWidth.get -> int
-static Cosmos.Kernel.System.Mouse.MouseManager.ScrollDelta.get -> int
-static Cosmos.Kernel.System.Mouse.MouseManager.Sensitivity.get -> float
-static Cosmos.Kernel.System.Mouse.MouseManager.Sensitivity.set -> void
-static Cosmos.Kernel.System.Mouse.MouseManager.SetPosition(int x, int y) -> void
-static Cosmos.Kernel.System.Mouse.MouseManager.SetScreenSize(int width, int height) -> void
-static Cosmos.Kernel.System.Mouse.MouseManager.X.get -> int
-static Cosmos.Kernel.System.Mouse.MouseManager.Y.get -> int
 static Cosmos.Kernel.System.Network.Address.operator !=(Cosmos.Kernel.System.Network.Address! a, Cosmos.Kernel.System.Network.Address! b) -> bool
 static Cosmos.Kernel.System.Network.Address.operator &(Cosmos.Kernel.System.Network.Address! a, Cosmos.Kernel.System.Network.Address! b) -> Cosmos.Kernel.System.Network.MaskedAddress
 static Cosmos.Kernel.System.Network.Address.operator ==(Cosmos.Kernel.System.Network.Address! a, Cosmos.Kernel.System.Network.Address! b) -> bool

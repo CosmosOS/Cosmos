@@ -2,7 +2,7 @@
 
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 
-namespace Cosmos.Kernel.System.Mouse;
+namespace Cosmos.Kernel.System.Input;
 
 /// <summary>
 /// The mouse manager's consumer of the driver kit: every pointer a kit driver

@@ -6,7 +6,7 @@ using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
 using DevKernel.Shell;
-using MouseManager = Cosmos.Kernel.System.Mouse.MouseManager;
+using MouseManager = Cosmos.Kernel.System.Input.MouseManager;
 using SysThread = System.Threading.Thread;
 
 namespace DevKernel.Graphics;

@@ -6,10 +6,10 @@ The main differences if you come from Gen2:
 
 | | Gen2 | Gen3 |
 |---|---|---|
-| Manager API | `Cosmos.System.KeyboardManager` | Same API, in `Cosmos.Kernel.System.Keyboard` |
+| Manager API | `Cosmos.System.KeyboardManager` | Same API, in `Cosmos.Kernel.System.Input` |
 | `Console.ReadLine` / `Console.ReadKey` | Plugged, backed by the manager | Plugged, backed by the manager |
 | Key events | `KeyEvent` (`KeyChar`, `Key`, `Modifiers`) | Same |
-| Layouts | US, FR, DE, ES, GB, TR, Dvorak scan maps | Same set, in `Cosmos.Kernel.System.Keyboard.ScanMaps` |
+| Layouts | US, FR, DE, ES, GB, TR, Dvorak scan maps | Same set, in `Cosmos.Kernel.System.Input.Layouts` |
 | Devices | PS/2 keyboard | PS/2 keyboard (x64), virtio-keyboard and USB keyboard, all over the driver kit (the 8042 on q35 and every PC; virtio over PCI on both architectures and MMIO on ARM64; USB on an xHCI controller on both) |
 
 If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
@@ -30,8 +30,8 @@ These are the `using`s the snippets below rely on:
 using System.Drawing;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
-using Cosmos.Kernel.System.Keyboard;
-using Cosmos.Kernel.System.Keyboard.ScanMaps;
+using Cosmos.Kernel.System.Input;
+using Cosmos.Kernel.System.Input.Layouts;
 ```
 
 There is nothing to initialize by hand: the PS/2 keyboard (x64), a virtio keyboard or a USB keyboard is bound by the driver kit's `Ps2KeyboardDriver`, `VirtioInputDriver` or `UsbKeyboardDriver` during the driver stage and published to the manager's consumer, which registers it ([PS/2 devices](drivers.md#ps2-devices), [Virtio devices](drivers.md#virtio-devices), [USB devices](drivers.md#usb-devices)).
@@ -155,7 +155,7 @@ Key presses come out of the hardware as layout-neutral scan codes; a scan map tu
 KeyboardManager.SetKeyLayout(new FRStandardLayout());
 ```
 
-Seven layouts ship in `Cosmos.Kernel.System.Keyboard.ScanMaps`:
+Seven layouts ship in `Cosmos.Kernel.System.Input.Layouts`:
 
 | Class | Layout |
 |---|---|

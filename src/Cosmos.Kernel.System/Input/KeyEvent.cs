@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 // Ported from Cosmos.System2/Keyboard/KeyEvent.cs
 
-namespace Cosmos.Kernel.System.Keyboard;
+namespace Cosmos.Kernel.System.Input;
 
 /// <summary>
 /// Represents a key-press event.
@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.System.Keyboard;
 public sealed class KeyEvent
 {
     /// <summary>
-    /// Represents the type of the a <see cref="KeyEvent"/>.
+    /// Represents the type of a <see cref="KeyEvent"/>.
     /// </summary>
     public enum KeyEventType
     {

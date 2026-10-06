@@ -3,7 +3,7 @@ using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.Plugs.System.IO;
 using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Graphics;
-using Cosmos.Kernel.System.Keyboard;
+using Cosmos.Kernel.System.Input;
 
 namespace Cosmos.Kernel.Plugs.System;
 

@@ -5,7 +5,7 @@ using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
 using DevKernel.Graphics;
-using MouseManager = Cosmos.Kernel.System.Mouse.MouseManager;
+using MouseManager = Cosmos.Kernel.System.Input.MouseManager;
 
 namespace DevKernel.Diagnostics;
 

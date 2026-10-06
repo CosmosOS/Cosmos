@@ -8,9 +8,9 @@ using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.Platform;
-using Cosmos.Kernel.System.Keyboard.ScanMaps;
+using Cosmos.Kernel.System.Input.Layouts;
 
-namespace Cosmos.Kernel.System.Keyboard;
+namespace Cosmos.Kernel.System.Input;
 
 /// <summary>
 /// Manages keyboard input from every keyboard a driver kit driver publishes
@@ -429,7 +429,7 @@ public static class KeyboardManager
     /// </summary>
     /// <returns>The active layout, or <see langword="null"/> before the
     /// manager was initialized and when keyboard support is compiled out;
-    /// initialization installs <see cref="ScanMaps.USStandardLayout"/>.</returns>
+    /// initialization installs <see cref="Layouts.USStandardLayout"/>.</returns>
     public static ScanMapBase? GetKeyLayout() => s_scanMap;
 
     /// <summary>

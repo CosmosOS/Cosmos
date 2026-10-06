@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 // Ported from Cosmos.System2/Keyboard/ScanMaps/USDvorakLayout.cs
 
-namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
+namespace Cosmos.Kernel.System.Input.Layouts;
 
 /// <summary>
 /// Represents the US Dvorak keyboard layout.
@@ -39,8 +39,6 @@ public sealed class USDvorakLayout : ScanMapBase
         /* -, =, Bksp, Tab */
         Keys.Add(new KeyMapping(0x0C, '[', '{', '[', '{', '[', '{', ConsoleKeyEx.LBracket));
         Keys.Add(new KeyMapping(0x0D, ']', '}', ']', '}', ']', '}', ConsoleKeyEx.RBracket));
-        //Keys.Add(new KeyMapping(0x0C, '-', '_', '-', '-', '_', '-', ConsoleKeyEx.Minus));
-        //Keys.Add(new KeyMapping(0x0D, '=', '+', '=', '=', '+', '=', ConsoleKeyEx.Equal));
         Keys.Add(new KeyMapping(0x0E, ConsoleKeyEx.Backspace));
         Keys.Add(new KeyMapping(0x0F, '\t', ConsoleKeyEx.Tab));
         Keys.Add(new KeyMapping(0x10, '\'', '"', '\'', '\'', '"', '"', ConsoleKeyEx.Apostrophe)); //'q', 'Q', 'q', 'Q', 'q', 'Q', ConsoleKeyEx.Q));

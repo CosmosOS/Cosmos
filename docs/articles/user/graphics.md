@@ -34,7 +34,7 @@ using System.IO;
 using System.Numerics;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
-using Cosmos.Kernel.System.Mouse;
+using Cosmos.Kernel.System.Input;
 ```
 
 ## Getting a canvas

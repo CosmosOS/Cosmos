@@ -1,9 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 // Ported from Cosmos.System2/Keyboard/KeyMapping.cs
 
-#pragma warning disable IDE0049 // Use framework type
-
-namespace Cosmos.Kernel.System.Keyboard;
+namespace Cosmos.Kernel.System.Input;
 
 /// <summary>
 /// Represents a physical to virtual key mapping.

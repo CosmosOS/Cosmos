@@ -1,5 +1,5 @@
-using Cosmos.Kernel.System.Keyboard;
-using Cosmos.Kernel.System.Keyboard.ScanMaps;
+using Cosmos.Kernel.System.Input;
+using Cosmos.Kernel.System.Input.Layouts;
 using DevKernel.Shell;
 
 namespace DevKernel.Commands;

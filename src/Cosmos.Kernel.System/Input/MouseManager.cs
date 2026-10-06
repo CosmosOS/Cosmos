@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 
-namespace Cosmos.Kernel.System.Mouse;
+namespace Cosmos.Kernel.System.Input;
 
 /// <summary>
 /// Manages mouse input from every pointer a driver kit driver publishes (the
@@ -194,16 +194,13 @@ public static class MouseManager
     /// <param name="wheel">Wheel movement since the last report: negative scrolls up, positive scrolls down.</param>
     internal static void HandleRelative(int deltaX, int deltaY, PointerButtons buttons, int wheel)
     {
-        // Apply sensitivity
         int adjustedDeltaX = (int)(deltaX * Sensitivity);
         int adjustedDeltaY = (int)(deltaY * Sensitivity);
 
-        // Update position with boundary checking
         X += adjustedDeltaX;
         Y += adjustedDeltaY;
         ScrollDelta += wheel;
 
-        // Clamp to screen bounds
         if (X < 0)
         {
             X = 0;
@@ -224,7 +221,6 @@ public static class MouseManager
             Y = ScreenHeight - 1;
         }
 
-        // Update button states
         LeftButton = (buttons & PointerButtons.Left) != 0;
         RightButton = (buttons & PointerButtons.Right) != 0;
         MiddleButton = (buttons & PointerButtons.Middle) != 0;
@@ -262,7 +258,6 @@ public static class MouseManager
         X = x;
         Y = y;
 
-        // Clamp to screen bounds
         if (X < 0)
         {
             X = 0;

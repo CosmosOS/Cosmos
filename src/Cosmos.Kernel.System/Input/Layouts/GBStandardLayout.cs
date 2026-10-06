@@ -1,42 +1,44 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
-// Ported from Cosmos.System2/Keyboard/ScanMaps/ESStandardLayout.cs
+// Ported from Cosmos.System2/Keyboard/ScanMaps/GBStandardLayout.cs
 
-namespace Cosmos.Kernel.System.Keyboard.ScanMaps;
+namespace Cosmos.Kernel.System.Input.Layouts;
 
 /// <summary>
-/// Represents the standard Spanish (ES) keyboard layout.
+/// Represents the standard English, Great Britain (GB) keyboard layout.
 /// </summary>
-public sealed class ESStandardLayout : ScanMapBase
+public sealed class GBStandardLayout : ScanMapBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ESStandardLayout"/> class.
+    /// Create new instance of the <see cref="GBStandardLayout"/> class.
     /// </summary>
-    public ESStandardLayout()
+    public GBStandardLayout()
     {
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Init key list.
+    /// </summary>
     protected override void InitializeKeys()
     {
         #region Keys
 
-        /*                       Scan Norm Shift Num Caps SCaps SNum AltGr ConsoleKeyEx */
+        /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKeyEx */
         Keys.Add(new KeyMapping(0x00, ConsoleKeyEx.NoName));
         Keys.Add(new KeyMapping(0x01, ConsoleKeyEx.Escape));
         /* 1 -> 9 */
-        Keys.Add(new KeyMapping(0x02, '1', '!', '1', '1', '!', '!', '|', ConsoleKeyEx.D1));
-        Keys.Add(new KeyMapping(0x03, '2', '"', '2', '2', '"', '"', '@', ConsoleKeyEx.D2));
-        Keys.Add(new KeyMapping(0x04, '3', '·', '3', '3', '·', '3', '#', ConsoleKeyEx.D3));
-        Keys.Add(new KeyMapping(0x05, '4', '$', '4', '4', '$', '4', '~', ConsoleKeyEx.D4));
-        Keys.Add(new KeyMapping(0x06, '5', '%', '5', '5', '%', '5', '€', ConsoleKeyEx.D5));
-        Keys.Add(new KeyMapping(0x07, '6', '&', '6', '6', '&', '6', '¬', ConsoleKeyEx.D6));
-        Keys.Add(new KeyMapping(0x08, '7', '/', '7', '7', '/', '7', ConsoleKeyEx.D7));
-        Keys.Add(new KeyMapping(0x09, '8', '(', '8', '8', '(', '8', ConsoleKeyEx.D8));
-        Keys.Add(new KeyMapping(0x0A, '9', ')', '9', '9', ')', '9', ConsoleKeyEx.D9));
-        Keys.Add(new KeyMapping(0x0B, '0', '=', '0', '0', '=', '0', ConsoleKeyEx.D0));
+        Keys.Add(new KeyMapping(0x02, '1', '!', '1', '1', '!', '1', ConsoleKeyEx.D1));
+        Keys.Add(new KeyMapping(0x03, '2', '"', '2', '2', '"', '2', ConsoleKeyEx.D2));
+        Keys.Add(new KeyMapping(0x04, '3', '£', '3', '3', '£', '3', ConsoleKeyEx.D3));
+        Keys.Add(new KeyMapping(0x05, '4', '$', '4', '4', '$', '4', ConsoleKeyEx.D4));
+        Keys.Add(new KeyMapping(0x06, '5', '%', '5', '5', '%', '5', ConsoleKeyEx.D5));
+        Keys.Add(new KeyMapping(0x07, '6', '^', '6', '6', '^', '6', ConsoleKeyEx.D6));
+        Keys.Add(new KeyMapping(0x08, '7', '&', '7', '7', '&', '7', ConsoleKeyEx.D7));
+        Keys.Add(new KeyMapping(0x09, '8', '*', '8', '8', '*', '8', ConsoleKeyEx.D8));
+        Keys.Add(new KeyMapping(0x0A, '9', '(', '9', '9', '(', '9', ConsoleKeyEx.D9));
+        Keys.Add(new KeyMapping(0x0B, '0', ')', '0', '0', ')', '0', ConsoleKeyEx.D0));
         /* -, =, Bksp, Tab */
-        Keys.Add(new KeyMapping(0x0C, '\'', '?', '\'', '-', '?', '?', ConsoleKeyEx.Minus));
-        Keys.Add(new KeyMapping(0x0D, '¡', '¿', '¡', '¡', '¿', '¿', ConsoleKeyEx.Equal));
+        Keys.Add(new KeyMapping(0x0C, '-', '_', '-', '-', '_', '-', ConsoleKeyEx.Minus));
+        Keys.Add(new KeyMapping(0x0D, '=', '+', '=', '=', '+', '=', ConsoleKeyEx.Equal));
         Keys.Add(new KeyMapping(0x0E, ConsoleKeyEx.Backspace));
         Keys.Add(new KeyMapping(0x0F, '\t', ConsoleKeyEx.Tab));
         /*      QWERTYUIOP[] */
@@ -50,8 +52,8 @@ public sealed class ESStandardLayout : ScanMapBase
         Keys.Add(new KeyMapping(0x17, 'i', 'I', 'i', 'I', 'i', 'I', ConsoleKeyEx.I));
         Keys.Add(new KeyMapping(0x18, 'o', 'O', 'o', 'O', 'o', 'O', ConsoleKeyEx.O));
         Keys.Add(new KeyMapping(0x19, 'p', 'P', 'p', 'P', 'p', 'P', ConsoleKeyEx.P));
-        Keys.Add(new KeyMapping(0x1A, '`', '^', '`', '`', '^', '^', '[', ConsoleKeyEx.LBracket));
-        Keys.Add(new KeyMapping(0x1B, '+', '*', '+', '+', '*', '*', ']', ConsoleKeyEx.RBracket));
+        Keys.Add(new KeyMapping(0x1A, '[', '{', '[', '{', '[', '{', ConsoleKeyEx.LBracket));
+        Keys.Add(new KeyMapping(0x1B, ']', '}', ']', '}', ']', '}', ConsoleKeyEx.RBracket));
         /* ENTER, CTRL */
         Keys.Add(new KeyMapping(0x1C, ConsoleKeyEx.Enter));
         Keys.Add(new KeyMapping(0x1D, ConsoleKeyEx.LCtrl));
@@ -65,13 +67,14 @@ public sealed class ESStandardLayout : ScanMapBase
         Keys.Add(new KeyMapping(0x24, 'j', 'J', 'j', 'J', 'j', 'J', ConsoleKeyEx.J));
         Keys.Add(new KeyMapping(0x25, 'k', 'K', 'k', 'K', 'k', 'K', ConsoleKeyEx.K));
         Keys.Add(new KeyMapping(0x26, 'l', 'L', 'l', 'L', 'l', 'L', ConsoleKeyEx.L));
-        Keys.Add(new KeyMapping(0x27, 'ñ', 'Ñ', 'ñ', 'Ñ', 'ñ', 'Ñ', ConsoleKeyEx.Semicolon));
-        Keys.Add(new KeyMapping(0x28, '´', '¨', '´', '´', '¨', '¨', '{', ConsoleKeyEx.Apostrophe));
-        Keys.Add(new KeyMapping(0x29, 'º', 'ª', 'º', 'º', 'ª', 'ª', '\\', ConsoleKeyEx.Backquote));
+        Keys.Add(new KeyMapping(0x27, ';', ':', ';', ';', ':', ':', ConsoleKeyEx.Semicolon));
+        Keys.Add(new KeyMapping(0x28, '\'', '@', '\'', '\'', '@', '@', ConsoleKeyEx.Apostrophe));
+        Keys.Add(new KeyMapping(0x29, '`', '¬', '`', '`', '¬', '¬', ConsoleKeyEx.Backquote));
         /* Left Shift*/
         Keys.Add(new KeyMapping(0x2A, ConsoleKeyEx.LShift));
         /* \ZXCVBNM,./ */
-        Keys.Add(new KeyMapping(0x2B, 'ç', 'Ç', 'ç', 'Ç', 'ç', 'Ç', '}', ConsoleKeyEx.Backslash));
+        Keys.Add(new KeyMapping(0x2B, '#', '~', '#', '#', '~', '~', ConsoleKeyEx.Backslash));
+        Keys.Add(new KeyMapping(0x56, '\\', '|', '\\', '\\', '|', '|', ConsoleKeyEx.OEM5));
         Keys.Add(new KeyMapping(0x2C, 'z', 'Z', 'z', 'Z', 'z', 'Z', ConsoleKeyEx.Z));
         Keys.Add(new KeyMapping(0x2D, 'x', 'X', 'x', 'X', 'x', 'X', ConsoleKeyEx.X));
         Keys.Add(new KeyMapping(0x2E, 'c', 'C', 'c', 'C', 'c', 'C', ConsoleKeyEx.C));
@@ -79,9 +82,9 @@ public sealed class ESStandardLayout : ScanMapBase
         Keys.Add(new KeyMapping(0x30, 'b', 'B', 'b', 'B', 'b', 'B', ConsoleKeyEx.B));
         Keys.Add(new KeyMapping(0x31, 'n', 'N', 'n', 'N', 'n', 'N', ConsoleKeyEx.N));
         Keys.Add(new KeyMapping(0x32, 'm', 'M', 'm', 'M', 'm', 'M', ConsoleKeyEx.M));
-        Keys.Add(new KeyMapping(0x33, ',', ';', ',', ',', ';', ';', ConsoleKeyEx.Comma));
-        Keys.Add(new KeyMapping(0x34, '.', ':', '.', '.', ':', ':', ConsoleKeyEx.Period));
-        Keys.Add(new KeyMapping(0x35, '-', '_', '-', '-', '_', '_', ConsoleKeyEx.Slash)); //
+        Keys.Add(new KeyMapping(0x33, ',', '<', ',', ',', '<', '<', ConsoleKeyEx.Comma));
+        Keys.Add(new KeyMapping(0x34, '.', '>', '.', '.', '>', '>', ConsoleKeyEx.Period));
+        Keys.Add(new KeyMapping(0x35, '/', '?', '/', '/', '?', '/', ConsoleKeyEx.Slash)); // also numpad divide
         /* Right Shift */
         Keys.Add(new KeyMapping(0x36, ConsoleKeyEx.RShift));
         /* Print Screen */
@@ -89,8 +92,8 @@ public sealed class ESStandardLayout : ScanMapBase
         // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, ConsoleKeyEx.LAlt));
-        /* Right Alt: the third-level modifier on this layout */
-        Keys.Add(new KeyMapping(RightAltScanCode, ConsoleKeyEx.AltGr));
+        /* Right Alt: a second Alt on this layout */
+        Keys.Add(new KeyMapping(RightAltScanCode, ConsoleKeyEx.RAlt));
         /* Space */
         Keys.Add(new KeyMapping(0x39, ' ', ConsoleKeyEx.Spacebar));
         /* Caps */

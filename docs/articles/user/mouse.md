@@ -6,7 +6,7 @@ The main differences if you come from Gen2:
 
 | | Gen2 | Gen3 |
 |---|---|---|
-| Manager API | `Cosmos.System.MouseManager` | Same model, in `Cosmos.Kernel.System.Mouse` |
+| Manager API | `Cosmos.System.MouseManager` | Same model, in `Cosmos.Kernel.System.Input` |
 | Button state | `MouseState` flags enum | `LeftButton`, `RightButton`, `MiddleButton` booleans |
 | Position | `X`, `Y` clamped to the screen size | Same |
 | Scroll wheel | `ScrollDelta` + `ResetScrollDelta()` | Same |
@@ -31,7 +31,7 @@ These are the `using`s the snippets below rely on; the drawing types come from t
 using System.Drawing;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
-using Cosmos.Kernel.System.Mouse;
+using Cosmos.Kernel.System.Input;
 ```
 
 Like the keyboard, the PS/2 mouse (x64) is bound by the driver kit's `Ps2MouseDriver` and a virtio mouse by `VirtioInputDriver` during the driver stage, each published to the manager's consumer, which registers it ([PS/2 devices](drivers.md#ps2-devices), [Virtio devices](drivers.md#virtio-devices)); `MouseManager` is ready as soon as your kernel runs.

@@ -1,10 +1,10 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.System.Keyboard;
-using Cosmos.Kernel.System.Keyboard.ScanMaps;
+using Cosmos.Kernel.System.Input;
+using Cosmos.Kernel.System.Input.Layouts;
 using NUnit.Framework;
 
-namespace Cosmos.Kernel.Tests.System.Keyboard;
+namespace Cosmos.Kernel.Tests.System.Input;
 
 public class ScanMapBaseTest
 {

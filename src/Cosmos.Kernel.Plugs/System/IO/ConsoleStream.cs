@@ -2,7 +2,7 @@
 
 using System.Text;
 using Cosmos.Kernel.System.Graphics;
-using Cosmos.Kernel.System.Keyboard;
+using Cosmos.Kernel.System.Input;
 
 namespace Cosmos.Kernel.Plugs.System.IO;
 

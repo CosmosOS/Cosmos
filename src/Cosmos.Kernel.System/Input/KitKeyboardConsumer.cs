@@ -2,7 +2,7 @@
 
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 
-namespace Cosmos.Kernel.System.Keyboard;
+namespace Cosmos.Kernel.System.Input;
 
 /// <summary>
 /// The keyboard manager's consumer of the driver kit: every keyboard a kit

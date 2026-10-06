@@ -1,7 +1,7 @@
 ﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 // Ported from Cosmos.System2/Keyboard/ScanMapBase.cs
 
-namespace Cosmos.Kernel.System.Keyboard;
+namespace Cosmos.Kernel.System.Input;
 
 /// <summary>
 /// Represents the base class for keyboard layout scan-maps.
