@@ -108,21 +108,18 @@ A kernel built with `CosmosEnableScheduler` off has no worker thread: probing st
 
 ## The two execution contexts and the guard
 
-The kit has exactly two execution contexts, and every entry point says which it is.
+Driver code runs in one of two contexts: thread or interrupt.
 
 | Entry point | Context | May block | May allocate |
 |-------------|---------|-----------|--------------|
-| `Driver.Probe`, `Driver.OnDetach` | thread (the kit worker) | yes | yes |
-| A work item created through the binding | thread (the kit worker) | yes | yes |
-| A driver thread started through the binding | thread (its own) | yes | yes |
-| An `InterruptHandler` passed to `TryRequestInterrupt` | interrupt (interrupts masked, on the interrupted stack) | **no** | **no** |
-| A device-kind method the kernel calls (`SetLeds`, `Transmit`, `Flush`) | thread (the caller's) | briefly | yes |
+| `Probe`, `OnDetach`, work items | thread (the kit worker) | yes | yes |
+| Driver threads | thread (their own) | yes | yes |
+| Device methods the kernel calls (`Transmit`, `Flush`, ...) | thread (the caller's) | briefly | yes |
+| Interrupt handlers | interrupt | **no** | **no** |
 
-An interrupt handler receives an `InterruptContext`, whose three members are the whole of what it may ask the kit for: `Mask()` its own source, `Signal(DeviceEvent)` a thread that is waiting, and `Schedule(WorkItem)` work that needs thread context. Besides those it may read and write its `RegisterWindow`, its `DmaBuffer.Span` and its `DeviceRegion`, report through a sink, and mask or unmask through its `InterruptHandle`; all of them are allocation-free. The context carries no binding, so a handler cannot map, allocate, publish, sleep or wait by type; one that reaches the binding through its state object hits the guard below. The pattern every driver follows is the same: the handler acknowledges the device, reports what it must, and hands the rest to a work item, which walks the completion rings in thread context.
+An interrupt handler should acknowledge the device and hand the rest to a work item. Its `InterruptContext` offers three calls: `Mask()` its own source, `Signal(DeviceEvent)` a waiting thread, and `Schedule(WorkItem)` work that needs thread context. It may also read and write its registers and DMA buffers and report through a sink, but it must not allocate (no `new` of a reference type, no string building, no capturing lambda) and must not block.
 
-Two rules the types cannot enforce, the handler has to keep itself: do not allocate (no `new` of a reference type, no string building, no lambda that captures) and do not block on anything outside the kit.
-
-The rule is also enforced at run time, in every build. Every method of `DeviceBinding` is thread context; called from a driver's interrupt handler, through a binding the driver kept in its state object, the method stops. In a synthetic dispatch (a test raising the source through `SyntheticBus.RaiseInterrupt`) that is an `InvalidOperationException` naming the member; the kit's trampoline catches it, records it as a fault on the node (`FaultCount`, `LastFault`), masks the source so a handler that throws once cannot throw on every delivery, and logs `interrupt handler threw` from thread context. In a real interrupt it is a panic naming the member, because building an exception there would allocate in the very place the guard forbids it. The Drivers suite has a driver whose handler sleeps on purpose, to assert that path.
+Calling a `DeviceBinding` method from a handler stops the kernel with a panic naming the member. Over the synthetic bus it throws instead: the kit records the fault on the node and masks the source, so a test can assert it.
 
 ## The attribute and the manifest
 
