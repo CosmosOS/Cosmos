@@ -1,22 +1,12 @@
 # Writing a Driver
 
-In this article, we will discuss how to write a device driver for Cosmos Gen3: what a driver is and where it runs, how the build finds it, how it takes a device and reaches its hardware through the driver kit, how it hands the kernel a device, and how it is tested with no hardware behind it.
-
-The main differences if you come from Gen2:
-
-| | Gen2 | Gen3 |
-|---|---|---|
-| Base class | `Cosmos.HAL.Device` | `Cosmos.Kernel.HAL.DriverKit.Driver` |
-| Registration | By hand, in `Cosmos.HAL.Global` or the kernel | A generated manifest registers every `[Driver]` class the kernel can see |
-| Hardware access | `IOPort`, `PCIDevice`, raw memory | A `DeviceBinding`: register windows, bulk regions, DMA memory, interrupts; a `PciAccess` for a PCI function's configuration space; a `VirtioAccess` for a virtio device's handshake, queues and configuration space; a `UsbAccess` for a USB interface's control transfers and pipes |
-| Device removal | None | The kit tears the binding down in a fixed order; the driver frees nothing itself. USB and PCI Express hot-plug slots report removal |
-| Testing | On the hardware | Over the synthetic bus, in a test kernel, identically on x64 and ARM64 |
+In this article, we will discuss how to write a device driver for Cosmos Gen3: how a driver is matched to a device, how it reaches the hardware, how it hands the kernel a device, and how it is tested without hardware.
 
 If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
 ## Experimental status
 
-Every type under `Cosmos.Kernel.HAL.DriverKit` (`Driver`, `DriverAttribute`, `DeviceBinding`, `DeviceNode`, the resource, interrupt and deferred-work types), `Cosmos.Kernel.HAL.DriverKit.Devices` (the device contracts, their facets and their sinks), `Cosmos.Kernel.HAL.DriverKit.Synthetic` (the test bus) and the bus kinds under `Cosmos.Kernel.HAL.DriverKit.Platform`, `Cosmos.Kernel.HAL.DriverKit.Ps2`, `Cosmos.Kernel.HAL.DriverKit.Pci`, `Cosmos.Kernel.HAL.DriverKit.Virtio` and `Cosmos.Kernel.HAL.DriverKit.Usb` carries `[Experimental("COSMOS0003")]`: they are usable today but make no compatibility promise, and they are promoted to the stable surface by removing the attribute once proven. The seam reaches outside the HAL in two places under the same id: `ICanvas3DFactory` in `Cosmos.Kernel.System.Graphics`, the ring-defined facet a display implements when it renders 3D, and `ISvgaAdapter` in `Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga`, the VMware SVGA II adapter's test seam. Referencing any of them is a build error until the project acknowledges that contract:
+The driver kit is experimental: every public type under `Cosmos.Kernel.HAL.DriverKit` carries `[Experimental("COSMOS0003")]`. You can use them today, but they may change until they are promoted to the stable API. Referencing one is a build error until your project acknowledges it:
 
 ```xml
 <PropertyGroup>
@@ -24,30 +14,37 @@ Every type under `Cosmos.Kernel.HAL.DriverKit` (`Driver`, `DriverAttribute`, `De
 </PropertyGroup>
 ```
 
-See [Public API Tracking](../dev/public-api.md) for how experimental seams fit the surface policy.
+See [Public API Tracking](../dev/public-api.md) for how experimental APIs are promoted.
 
-The kit is being built in stages. What exists today:
+What the kit supports today:
 
-- **Six bus kinds: the synthetic bus, the platform bus, PCI, virtio, USB and PS/2.** A test publishes synthetic nodes through `SyntheticBus.Publish`; the machine description in the arch HAL seeds the platform bus with the machine's root nodes at boot, on x64 the 8042 keyboard controller and the PCI host, on ARM64 the ECAM host, from ACPI's MCFG or the device tree the bootloader handed over, and one node per occupied virtio-mmio slot, from the device tree or the virt machine's table; the PCI host driver, bound to the host node, publishes one PCI node per function it finds, and the PCI Express root port driver, bound to a port with a hot-plug slot, the functions behind the slot; the two virtio transport drivers, bound to a virtio PCI function or a virtio-mmio slot, publish one virtio node each, which is how a driver for a virtio device is offered its device without knowing the transport; and the xHCI driver, bound to a USB host controller's function, publishes one USB node per interface of every device on its ports, through the kit's enumeration core, which a hub driver reaches for the ports of its hub; and the 8042 driver, bound to the x64 machine description's `platform:i8042@60` node, publishes its keyboard and auxiliary ports as `ps2:kbd` and `ps2:aux` ([Buses](#buses), [PCI devices](#pci-devices), [Virtio devices](#virtio-devices), [USB devices](#usb-devices), [PS/2 devices](#ps2-devices)). Every device driver the kernel ships is a kit driver, the PS/2 keyboard and mouse included; the arch HAL assemblies hold platform code only ([The storage drivers](#the-storage-drivers), [The USB class drivers](#the-usb-class-drivers), [The PS/2 class drivers](#the-ps2-class-drivers)). A PCI function no kit driver matches is sized like every other and otherwise left as firmware set it up, except one behind a hot-plug slot, at boot or arriving later, with a register firmware left unassigned, which the port driver has the kit place inside the port's windows.
-- **Five kernel managers consume a published device: the keyboard, mouse, network, display and storage managers.** `KeyboardManager`, `MouseManager`, `NetworkManager`, `DisplayManager` and `StorageManager` install their consumers before the driver stage, so a keyboard a driver publishes through `PublishKeyboard` joins the keyboard manager's list (a keyboard plugged in while the kernel runs reaches the manager the same way, and leaves it when its node is retracted), a pointer published through `PublishPointer` joins the mouse manager's, an interface published through `PublishNetwork` becomes an adapter the ring, the stack and the clients use, a display published through `PublishDisplay` joins the display manager's list, where `Canvas.GetFullScreen()` draws on the primary one, a block device published through `PublishBlockDevice` is registered with the storage manager and scanned for partitions before the call returns, and the log line says `(consumed)`. The framebuffer the bootloader handed over is a display too: the engine publishes it as the firmware display before it starts ([Publishing a device](#publishing-a-device)).
-- **The drivers Cosmos ships over the kit live in `Cosmos.Kernel.Drivers`**: `PciHostDriver` and the PCI Express root port driver `PcieRootPortDriver`, the Intel `E1000EDriver`, the two virtio transport drivers `VirtioPciTransportDriver` and `VirtioMmioTransportDriver`, the virtio leaf drivers `VirtioNetDriver`, `VirtioInputDriver`, `VirtioGpuDriver` and `VirtioBlkDriver`, the VMware SVGA II display driver `VmwareSvgaDriver`, the two storage drivers `AhciDriver` and `NvmeDriver`, the USB drivers, the host controller `XhciDriver` with the class drivers `UsbHubDriver`, `UsbKeyboardDriver` and `UsbMassStorageDriver`, and the PS/2 drivers, the controller `I8042Driver` with the class drivers `Ps2KeyboardDriver` and `Ps2MouseDriver`, written over the public seam as a third party would write them. Every kernel gets the package through `Cosmos.Kernel`, so all nineteen are in its manifest; [Project settings](#project-settings) says how to drop one.
-- **Everything else on this page is implemented and tested**: the manifest, arbitration, the binding and its ledger, both execution contexts and the guard, teardown, the diagnostics view, and the synthetic bus. The Drivers test suite exercises all of it on x64 and ARM64, and its drivers are the models for the samples below; the Virtio suite drives the virtio drivers over both transports, and the Storage suite every block driver, the promoted `VirtioBlkDriver` among them.
+- **Bus kinds**: platform, PCI, virtio, USB and PS/2 for real hardware, plus the synthetic bus for tests ([Testing a driver over the synthetic bus](#testing-a-driver-over-the-synthetic-bus)).
+- **Device kinds**: keyboard, pointer, network interface, block device and display. The kernel managers (`KeyboardManager`, `MouseManager`, `NetworkManager`, `StorageManager`, `DisplayManager`) pick up whatever a driver publishes.
+- **Shipped drivers**: every kernel gets the drivers below through `Cosmos.Kernel.Drivers`. They use the same public API as your drivers, so they are the best examples to read. [Excluding and opting in](#excluding-and-opting-in) shows how to drop one.
 
-The sources of `Cosmos.Kernel.Drivers` are filed by bus kind, then category, then driver, and each file's namespace follows its folder. The bus kind is the bus the driver matches on (`Pci`, `Platform`, `Ps2`, `Usb`, `Virtio`). The category is `Bus` for a bus driver, one whose binding publishes child nodes, and otherwise names what the driver publishes: `Display`, `Input` (a keyboard or pointer), `Network` or `Storage` (a block device). The driver folder holds the driver and the types that belong to it. So the PCI host driver is `Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver`, the xHCI driver `Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver` and the Intel driver `Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EDriver`. These full names are what an exclusion names ([Excluding and opting in](#excluding-and-opting-in)) and what the manifest sorts by, so the shipped drivers appear in it grouped by bus kind.
+| Bus | Drivers |
+|-----|---------|
+| Platform | `PciHostDriver`, `I8042Driver`, `VirtioMmioTransportDriver` |
+| PCI | `PcieRootPortDriver`, `VirtioPciTransportDriver`, `XhciDriver`, `E1000EDriver`, `AhciDriver`, `NvmeDriver`, `VmwareSvgaDriver` |
+| Virtio | `VirtioNetDriver`, `VirtioBlkDriver`, `VirtioGpuDriver`, `VirtioInputDriver` |
+| USB | `UsbHubDriver`, `UsbKeyboardDriver`, `UsbMassStorageDriver` |
+| PS/2 | `Ps2KeyboardDriver`, `Ps2MouseDriver` |
+
+Their sources are filed as `<bus>/<category>/<driver>/` (for example `Pci/Network/E1000E/`), and the namespace follows the folder.
 
 ## What a driver is
 
-The kit has five nouns and one verb.
+The kit is built on five concepts:
 
-| Noun | What it is | Who creates it |
-|------|------------|----------------|
-| **Node** (`DeviceNode`) | One piece of hardware the kernel can see: an identity on a bus, a list of resources (memory windows, port ranges, RAM windows) and interrupt sources, and a bus-specific access object | A bus (the synthetic bus for a test, the platform bus for the root nodes the machine description seeds), or a bus driver publishing a child (the PCI host driver, one per function; the PCI Express root port driver, one per function behind its slot; a virtio transport driver, one per device; the xHCI driver and the USB hub driver, one per interface of a USB device, through the kit's enumeration core; the 8042 driver, one per PS/2 port) |
-| **Bus kind** | The schema a node on that bus follows: what its identity looks like, how a driver matches it, what its access object can do | The kit; six kinds today: synthetic, platform, PCI, virtio, USB and PS/2 |
-| **Driver** (`Driver`) | A class declaring a name, a match table, a priority, and one entry point that receives a node and either takes it or does not | You, in the kernel project or in a driver library |
-| **Binding** (`DeviceBinding`) | The ownership record between one driver and one node: every resource the driver acquired, every device it published, every child node it created. The driver reaches hardware and the kernel *only* through it | The kit, once per offer |
-| **Device** | What a driver hands the kernel: an object implementing one of the kit's device kinds (`IKeyboard`, `IPointer`, `INetworkInterface`, `IBlockDevice`, `IDisplay`) | The driver, through its binding |
+| Concept | What it is |
+|---------|------------|
+| **Node** (`DeviceNode`) | A piece of hardware the kernel can see: its identity on a bus, its resources and its interrupts. Buses and bus drivers publish nodes. |
+| **Bus kind** | What a node looks like on a given bus (platform, PCI, virtio, USB, PS/2, synthetic) and how a driver matches it. |
+| **Driver** (`Driver`) | Your class: it says which nodes it wants, and takes or declines each one it is offered. |
+| **Binding** (`DeviceBinding`) | The link between one driver and one node. The driver reaches the hardware and the kernel only through it, and it remembers everything the driver acquired. |
+| **Device** | What the driver hands the kernel: an `IKeyboard`, `IPointer`, `INetworkInterface`, `IBlockDevice` or `IDisplay`. |
 
-The verb is **bind**: when a node appears, the kit lists the drivers whose match table covers it, orders them, and offers the node to each in turn until one returns `ProbeResult.Bound`. Everything a driver acquired while looking is released if it does not. When the node goes away, the kit tears the binding down in the reverse order, withdrawing devices first and freeing memory last, without the driver writing that code.
+When a node appears, the kit offers it to each matching driver in turn until one returns `ProbeResult.Bound`; whatever a declining driver acquired is released. When the node goes away, the kit tears the binding down for you: devices are withdrawn first, memory is freed last.
 
 The smallest driver that compiles and binds:
 
@@ -74,9 +71,9 @@ public sealed class SampleDriver : Driver
 }
 ```
 
-`Name` is what the log and the diagnostics view print. `Matches` is the table of identities the driver wants to be offered. `Priority` (virtual, `0` by default) decides who is offered a node first among the drivers that match it. `Probe` is the only required entry point; `OnDetach` is the optional other one.
+`Name` is shown in the log, `Matches` lists the nodes the driver wants, and `Priority` (`0` by default) decides which matching driver is offered a node first. `Probe` is required; `OnDetach` is optional.
 
-One instance per class: the manifest constructs each driver once, and that instance is offered every node it matches. Fields on the driver are therefore shared across devices. State that belongs to one device lives on an object the driver creates in `Probe` and hangs off `binding.DriverState`, which is the one slot the binding keeps for the driver and hands back in work items, threads and `OnDetach`.
+Each driver class is instantiated once and offered every node it matches, so its fields are shared across devices. Keep per-device state in an object created in `Probe` and stored in `binding.DriverState`.
 
 ## Where a driver runs
 
