@@ -14,7 +14,7 @@ abstract Cosmos.Kernel.System.Network.Address.OperatorBitwiseAnd(Cosmos.Kernel.S
 abstract Cosmos.Kernel.System.Network.Address.Parts.get -> Cosmos.Kernel.System.Network.MaskedAddress
 abstract Cosmos.Kernel.System.Network.Address.ToBytes() -> System.ReadOnlySpan<byte>
 const Cosmos.Kernel.System.Diagnostics.SchedulerInfo.NanosecondsPerMillisecond = 1000000 -> ulong
-const Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.BootSectorLba = 0 -> ulong
+const Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.BootSectorLba = 0 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.FirstUsableLba = 34 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.PrimaryHeaderLba = 1 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.ProtectiveMbrStartLba = 1 -> uint
@@ -98,66 +98,209 @@ Cosmos.Kernel.System.Diagnostics.ThreadKillResult.MarkedForExit = 2 -> Cosmos.Ke
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult.NotFound = 0 -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult.RefusedBlocked = 4 -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult.RefusedIdle = 3 -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.Ext2FilesystemType() -> void
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.Ext2FilesystemType(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.IVfsFormatOptions? options) -> bool
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FilesystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.MountFlags flags, out Cosmos.Kernel.HAL.Vfs.IVfsSuperblock? superblock) -> bool
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.BlockSize.get -> uint
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.BlockSize.set -> void
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.Ext2FormatOptions() -> void
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.VolumeLabel.get -> string!
-Cosmos.Kernel.System.Filesystems.Ext2.Ext2FormatOptions.VolumeLabel.set -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.BytesPerCluster.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.BytesPerSector.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.ClusterCount.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.ClusterToLba(uint cluster) -> ulong
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.DataStartLba.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.FatSectorCount.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.FatStartLba.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.NumberOfFats.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.ReservedSectorCount.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.RootCluster.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.RootEntryCount.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.RootSectorCount.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.RootStartLba.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.SectorsPerCluster.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.TotalSectorCount.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.Type.get -> Cosmos.Kernel.System.Filesystems.Fat.FatType
-Cosmos.Kernel.System.Filesystems.Fat.FatFilesystemType
-Cosmos.Kernel.System.Filesystems.Fat.FatFilesystemType.FatFilesystemType() -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFilesystemType.FatFilesystemType(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFilesystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
-Cosmos.Kernel.System.Filesystems.Fat.FatFilesystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.IVfsFormatOptions? options) -> bool
-Cosmos.Kernel.System.Filesystems.Fat.FatFilesystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.MountFlags flags, out Cosmos.Kernel.HAL.Vfs.IVfsSuperblock? superblock) -> bool
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.FatFormatOptions() -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.FatSectorCount.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.FatSectorCount.init -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.NumberOfFats.get -> byte
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.NumberOfFats.init -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.ReservedSectorCount.get -> ushort
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.ReservedSectorCount.init -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.RootCluster.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.RootCluster.init -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.RootEntryCount.get -> ushort
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.RootEntryCount.init -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.SectorsPerCluster.get -> byte
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.SectorsPerCluster.init -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.Type.get -> Cosmos.Kernel.System.Filesystems.Fat.FatType
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.Type.init -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.VolumeLabel.get -> string?
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.VolumeLabel.init -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.VolumeSerial.get -> uint
-Cosmos.Kernel.System.Filesystems.Fat.FatFormatOptions.VolumeSerial.init -> void
-Cosmos.Kernel.System.Filesystems.Fat.FatType
-Cosmos.Kernel.System.Filesystems.Fat.FatType.Fat12 = 1 -> Cosmos.Kernel.System.Filesystems.Fat.FatType
-Cosmos.Kernel.System.Filesystems.Fat.FatType.Fat16 = 2 -> Cosmos.Kernel.System.Filesystems.Fat.FatType
-Cosmos.Kernel.System.Filesystems.Fat.FatType.Fat32 = 3 -> Cosmos.Kernel.System.Filesystems.Fat.FatType
-Cosmos.Kernel.System.Filesystems.Fat.FatType.Unknown = 0 -> Cosmos.Kernel.System.Filesystems.Fat.FatType
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.Ext2FileSystemType() -> void
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.Ext2FileSystemType(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.IVfsFormatOptions? options) -> bool
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.MountFlags flags, out Cosmos.Kernel.System.FileSystem.IVfsSuperblock? superblock) -> bool
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FormatOptions
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FormatOptions.BlockSize.get -> uint
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FormatOptions.BlockSize.set -> void
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FormatOptions.Ext2FormatOptions() -> void
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FormatOptions.VolumeLabel.get -> string!
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FormatOptions.VolumeLabel.set -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.BytesPerCluster.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.BytesPerSector.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.ClusterCount.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.ClusterToLba(uint cluster) -> ulong
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.DataStartLba.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.FatSectorCount.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.FatStartLba.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.NumberOfFats.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.ReservedSectorCount.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.RootCluster.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.RootEntryCount.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.RootSectorCount.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.RootStartLba.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.SectorsPerCluster.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.TotalSectorCount.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.Type.get -> Cosmos.Kernel.System.FileSystem.Fat.FatType
+Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType
+Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.FatFileSystemType() -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.FatFileSystemType(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
+Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.IVfsFormatOptions? options) -> bool
+Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.MountFlags flags, out Cosmos.Kernel.System.FileSystem.IVfsSuperblock? superblock) -> bool
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.FatFormatOptions() -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.FatSectorCount.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.FatSectorCount.init -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.NumberOfFats.get -> byte
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.NumberOfFats.init -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.ReservedSectorCount.get -> ushort
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.ReservedSectorCount.init -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.RootCluster.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.RootCluster.init -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.RootEntryCount.get -> ushort
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.RootEntryCount.init -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.SectorsPerCluster.get -> byte
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.SectorsPerCluster.init -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.Type.get -> Cosmos.Kernel.System.FileSystem.Fat.FatType
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.Type.init -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.VolumeLabel.get -> string?
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.VolumeLabel.init -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.VolumeSerial.get -> uint
+Cosmos.Kernel.System.FileSystem.Fat.FatFormatOptions.VolumeSerial.init -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatType
+Cosmos.Kernel.System.FileSystem.Fat.FatType.Fat12 = 1 -> Cosmos.Kernel.System.FileSystem.Fat.FatType
+Cosmos.Kernel.System.FileSystem.Fat.FatType.Fat16 = 2 -> Cosmos.Kernel.System.FileSystem.Fat.FatType
+Cosmos.Kernel.System.FileSystem.Fat.FatType.Fat32 = 3 -> Cosmos.Kernel.System.FileSystem.Fat.FatType
+Cosmos.Kernel.System.FileSystem.Fat.FatType.Unknown = 0 -> Cosmos.Kernel.System.FileSystem.Fat.FatType
+Cosmos.Kernel.System.FileSystem.IFileOperations
+Cosmos.Kernel.System.FileSystem.IFileOperations.Fsync(Cosmos.Kernel.System.FileSystem.IVfsOpenFile! openFile) -> bool
+Cosmos.Kernel.System.FileSystem.IFileOperations.Read(Cosmos.Kernel.System.FileSystem.IVfsOpenFile! openFile, System.Span<byte> buffer) -> long
+Cosmos.Kernel.System.FileSystem.IFileOperations.Release(Cosmos.Kernel.System.FileSystem.IVfsOpenFile! openFile) -> void
+Cosmos.Kernel.System.FileSystem.IFileOperations.Seek(Cosmos.Kernel.System.FileSystem.IVfsOpenFile! openFile, long offset, Cosmos.Kernel.System.FileSystem.SeekWhence whence, out long newPosition) -> bool
+Cosmos.Kernel.System.FileSystem.IFileOperations.Write(Cosmos.Kernel.System.FileSystem.IVfsOpenFile! openFile, System.ReadOnlySpan<byte> buffer) -> long
+Cosmos.Kernel.System.FileSystem.IInodeOperations
+Cosmos.Kernel.System.FileSystem.IInodeOperations.Create(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name, Cosmos.Kernel.System.FileSystem.VfsMode mode, out Cosmos.Kernel.System.FileSystem.IVfsInode? inode) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.GetAttr(Cosmos.Kernel.System.FileSystem.IVfsInode! inode, out Cosmos.Kernel.System.FileSystem.VfsStat stat) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.Lookup(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name, out Cosmos.Kernel.System.FileSystem.IVfsInode? child) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.Mkdir(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name, Cosmos.Kernel.System.FileSystem.VfsMode mode, out Cosmos.Kernel.System.FileSystem.IVfsInode? inode) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.ReadDir(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, out System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.FileSystem.IVfsInode!>! entries) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.Rename(Cosmos.Kernel.System.FileSystem.IVfsInode! oldParent, System.ReadOnlySpan<char> oldName, Cosmos.Kernel.System.FileSystem.IVfsInode! newParent, System.ReadOnlySpan<char> newName) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.Rmdir(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.SetAttr(Cosmos.Kernel.System.FileSystem.IVfsInode! inode, Cosmos.Kernel.System.FileSystem.SetAttrFlags flags, in Cosmos.Kernel.System.FileSystem.VfsStat attributes) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.Symlink(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name, System.ReadOnlySpan<char> target, out Cosmos.Kernel.System.FileSystem.IVfsInode? inode) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.TryReadLink(Cosmos.Kernel.System.FileSystem.IVfsInode! symlink, out string? target) -> bool
+Cosmos.Kernel.System.FileSystem.IInodeOperations.Unlink(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name) -> bool
+Cosmos.Kernel.System.FileSystem.ISuperblockOperations
+Cosmos.Kernel.System.FileSystem.ISuperblockOperations.Drop(Cosmos.Kernel.System.FileSystem.IVfsSuperblock! superblock) -> void
+Cosmos.Kernel.System.FileSystem.ISuperblockOperations.StatFs(Cosmos.Kernel.System.FileSystem.IVfsSuperblock! superblock, out Cosmos.Kernel.System.FileSystem.VfsStatFs statFs) -> bool
+Cosmos.Kernel.System.FileSystem.ISuperblockOperations.Sync(Cosmos.Kernel.System.FileSystem.IVfsSuperblock! superblock) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle.TryCreateDirectory(System.ReadOnlySpan<char> name, Cosmos.Kernel.System.FileSystem.VfsMode mode, out Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle? child) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle.TryCreateFile(System.ReadOnlySpan<char> name, Cosmos.Kernel.System.FileSystem.VfsMode mode, out Cosmos.Kernel.System.FileSystem.IVfsNodeHandle? child) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle.TryLookup(System.ReadOnlySpan<char> name, out Cosmos.Kernel.System.FileSystem.IVfsNodeHandle? child) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle.TryReadDir(out System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.FileSystem.IVfsInode!>! entries) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle.TryRemoveDirectory(System.ReadOnlySpan<char> name) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle.TryRename(System.ReadOnlySpan<char> oldName, Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle! newParent, System.ReadOnlySpan<char> newName) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle.TrySetAttr(Cosmos.Kernel.System.FileSystem.SetAttrFlags flags, in Cosmos.Kernel.System.FileSystem.VfsStat attributes) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle.TrySymlink(System.ReadOnlySpan<char> name, System.ReadOnlySpan<char> target, out Cosmos.Kernel.System.FileSystem.IVfsNodeHandle? child) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle.TryUnlink(System.ReadOnlySpan<char> name) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsFileHandle
+Cosmos.Kernel.System.FileSystem.IVfsFileHandle.Position.get -> long
+Cosmos.Kernel.System.FileSystem.IVfsFileHandle.Read(System.Span<byte> buffer) -> long
+Cosmos.Kernel.System.FileSystem.IVfsFileHandle.TryFlush() -> bool
+Cosmos.Kernel.System.FileSystem.IVfsFileHandle.TrySeek(long offset, Cosmos.Kernel.System.FileSystem.SeekWhence whence) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsFileHandle.TrySetAttr(Cosmos.Kernel.System.FileSystem.SetAttrFlags flags, in Cosmos.Kernel.System.FileSystem.VfsStat attributes) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsFileHandle.Write(System.ReadOnlySpan<byte> buffer) -> long
+Cosmos.Kernel.System.FileSystem.IVfsFileSystemType
+Cosmos.Kernel.System.FileSystem.IVfsFileSystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsFileSystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.IVfsFormatOptions? options) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsFileSystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.MountFlags flags, out Cosmos.Kernel.System.FileSystem.IVfsSuperblock? superblock) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsFormatOptions
+Cosmos.Kernel.System.FileSystem.IVfsInode
+Cosmos.Kernel.System.FileSystem.IVfsInode.FileOperations.get -> Cosmos.Kernel.System.FileSystem.IFileOperations?
+Cosmos.Kernel.System.FileSystem.IVfsInode.InodeOperations.get -> Cosmos.Kernel.System.FileSystem.IInodeOperations!
+Cosmos.Kernel.System.FileSystem.IVfsInode.Name.get -> string!
+Cosmos.Kernel.System.FileSystem.IVfsNodeHandle
+Cosmos.Kernel.System.FileSystem.IVfsNodeHandle.Inode.get -> Cosmos.Kernel.System.FileSystem.IVfsInode!
+Cosmos.Kernel.System.FileSystem.IVfsNodeHandle.Name.get -> string!
+Cosmos.Kernel.System.FileSystem.IVfsNodeHandle.TryStat(out Cosmos.Kernel.System.FileSystem.VfsStat stat) -> bool
+Cosmos.Kernel.System.FileSystem.IVfsOpenFile
+Cosmos.Kernel.System.FileSystem.IVfsOpenFile.Inode.get -> Cosmos.Kernel.System.FileSystem.IVfsInode!
+Cosmos.Kernel.System.FileSystem.IVfsOpenFile.Operations.get -> Cosmos.Kernel.System.FileSystem.IFileOperations!
+Cosmos.Kernel.System.FileSystem.IVfsOpenFile.Position.get -> long
+Cosmos.Kernel.System.FileSystem.IVfsOpenFile.Position.set -> void
+Cosmos.Kernel.System.FileSystem.IVfsSuperblock
+Cosmos.Kernel.System.FileSystem.IVfsSuperblock.BlockSize.get -> long
+Cosmos.Kernel.System.FileSystem.IVfsSuperblock.MaxNameLength.get -> ulong
+Cosmos.Kernel.System.FileSystem.IVfsSuperblock.Root.get -> Cosmos.Kernel.System.FileSystem.IVfsInode!
+Cosmos.Kernel.System.FileSystem.IVfsSuperblock.SuperOperations.get -> Cosmos.Kernel.System.FileSystem.ISuperblockOperations!
+Cosmos.Kernel.System.FileSystem.MountFlags
+Cosmos.Kernel.System.FileSystem.MountFlags.NoDev = 4 -> Cosmos.Kernel.System.FileSystem.MountFlags
+Cosmos.Kernel.System.FileSystem.MountFlags.NoExec = 8 -> Cosmos.Kernel.System.FileSystem.MountFlags
+Cosmos.Kernel.System.FileSystem.MountFlags.None = 0 -> Cosmos.Kernel.System.FileSystem.MountFlags
+Cosmos.Kernel.System.FileSystem.MountFlags.NoSuid = 2 -> Cosmos.Kernel.System.FileSystem.MountFlags
+Cosmos.Kernel.System.FileSystem.MountFlags.ReadOnly = 1 -> Cosmos.Kernel.System.FileSystem.MountFlags
+Cosmos.Kernel.System.FileSystem.SeekWhence
+Cosmos.Kernel.System.FileSystem.SeekWhence.Cur = 1 -> Cosmos.Kernel.System.FileSystem.SeekWhence
+Cosmos.Kernel.System.FileSystem.SeekWhence.End = 2 -> Cosmos.Kernel.System.FileSystem.SeekWhence
+Cosmos.Kernel.System.FileSystem.SeekWhence.Set = 0 -> Cosmos.Kernel.System.FileSystem.SeekWhence
+Cosmos.Kernel.System.FileSystem.SetAttrFlags
+Cosmos.Kernel.System.FileSystem.SetAttrFlags.AccessTime = 16 -> Cosmos.Kernel.System.FileSystem.SetAttrFlags
+Cosmos.Kernel.System.FileSystem.SetAttrFlags.ChangeTime = 64 -> Cosmos.Kernel.System.FileSystem.SetAttrFlags
+Cosmos.Kernel.System.FileSystem.SetAttrFlags.Gid = 4 -> Cosmos.Kernel.System.FileSystem.SetAttrFlags
+Cosmos.Kernel.System.FileSystem.SetAttrFlags.Mode = 1 -> Cosmos.Kernel.System.FileSystem.SetAttrFlags
+Cosmos.Kernel.System.FileSystem.SetAttrFlags.ModificationTime = 32 -> Cosmos.Kernel.System.FileSystem.SetAttrFlags
+Cosmos.Kernel.System.FileSystem.SetAttrFlags.None = 0 -> Cosmos.Kernel.System.FileSystem.SetAttrFlags
+Cosmos.Kernel.System.FileSystem.SetAttrFlags.Size = 8 -> Cosmos.Kernel.System.FileSystem.SetAttrFlags
+Cosmos.Kernel.System.FileSystem.SetAttrFlags.Uid = 2 -> Cosmos.Kernel.System.FileSystem.SetAttrFlags
+Cosmos.Kernel.System.FileSystem.VfsManager
+Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.BlockDevice = Cosmos.Kernel.System.FileSystem.VfsMode.CharacterDevice | Cosmos.Kernel.System.FileSystem.VfsMode.Directory -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.CharacterDevice = 8192 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.Directory = 16384 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.FileTypeMask = Cosmos.Kernel.System.FileSystem.VfsMode.NamedPipe | Cosmos.Kernel.System.FileSystem.VfsMode.CharacterDevice | Cosmos.Kernel.System.FileSystem.VfsMode.Socket -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.GroupExecute = 8 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.GroupRead = 32 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.GroupWrite = 16 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.NamedPipe = 4096 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.OtherExecute = 1 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.OtherRead = 4 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.OtherWrite = 2 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.OwnerExecute = 64 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.OwnerRead = 256 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.OwnerWrite = 128 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.PermissionMask = Cosmos.Kernel.System.FileSystem.VfsMode.OtherExecute | Cosmos.Kernel.System.FileSystem.VfsMode.OtherWrite | Cosmos.Kernel.System.FileSystem.VfsMode.OtherRead | Cosmos.Kernel.System.FileSystem.VfsMode.GroupExecute | Cosmos.Kernel.System.FileSystem.VfsMode.GroupWrite | Cosmos.Kernel.System.FileSystem.VfsMode.GroupRead | Cosmos.Kernel.System.FileSystem.VfsMode.OwnerExecute | Cosmos.Kernel.System.FileSystem.VfsMode.OwnerWrite | Cosmos.Kernel.System.FileSystem.VfsMode.OwnerRead -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.RegularFile = 32768 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.SetGroupId = 1024 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.SetUserId = 2048 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.Socket = Cosmos.Kernel.System.FileSystem.VfsMode.Directory | Cosmos.Kernel.System.FileSystem.VfsMode.RegularFile -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.Sticky = 512 -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMode.SymbolicLink = Cosmos.Kernel.System.FileSystem.VfsMode.CharacterDevice | Cosmos.Kernel.System.FileSystem.VfsMode.RegularFile -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsMount
+Cosmos.Kernel.System.FileSystem.VfsMount.MountPoint.get -> string!
+Cosmos.Kernel.System.FileSystem.VfsMount.Name.get -> string!
+Cosmos.Kernel.System.FileSystem.VfsMount.Partition.get -> Cosmos.Kernel.System.Storage.Partition?
+Cosmos.Kernel.System.FileSystem.VfsMount.Source.get -> string!
+Cosmos.Kernel.System.FileSystem.VfsMount.Superblock.get -> Cosmos.Kernel.System.FileSystem.IVfsSuperblock!
+Cosmos.Kernel.System.FileSystem.VfsStat
+Cosmos.Kernel.System.FileSystem.VfsStat.AccessTime -> Cosmos.Kernel.System.FileSystem.VfsTimespec
+Cosmos.Kernel.System.FileSystem.VfsStat.Blocks -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStat.ChangeTime -> Cosmos.Kernel.System.FileSystem.VfsTimespec
+Cosmos.Kernel.System.FileSystem.VfsStat.DeviceId -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStat.Gid -> uint
+Cosmos.Kernel.System.FileSystem.VfsStat.InodeNumber -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStat.IsDirectory.get -> bool
+Cosmos.Kernel.System.FileSystem.VfsStat.IsRegularFile.get -> bool
+Cosmos.Kernel.System.FileSystem.VfsStat.IsSymbolicLink.get -> bool
+Cosmos.Kernel.System.FileSystem.VfsStat.LinkCount -> uint
+Cosmos.Kernel.System.FileSystem.VfsStat.Mode -> Cosmos.Kernel.System.FileSystem.VfsMode
+Cosmos.Kernel.System.FileSystem.VfsStat.ModificationTime -> Cosmos.Kernel.System.FileSystem.VfsTimespec
+Cosmos.Kernel.System.FileSystem.VfsStat.PreferredBlockSize -> long
+Cosmos.Kernel.System.FileSystem.VfsStat.Size -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStat.Uid -> uint
+Cosmos.Kernel.System.FileSystem.VfsStat.VfsStat() -> void
+Cosmos.Kernel.System.FileSystem.VfsStatFs
+Cosmos.Kernel.System.FileSystem.VfsStatFs.AvailableBlocks -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStatFs.Blocks -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStatFs.BlockSize -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStatFs.FragmentSize -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStatFs.FreeBlocks -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStatFs.FreeInodes -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStatFs.Inodes -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStatFs.MaxNameLength -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStatFs.Type -> ulong
+Cosmos.Kernel.System.FileSystem.VfsStatFs.VfsStatFs() -> void
+Cosmos.Kernel.System.FileSystem.VfsTimespec
+Cosmos.Kernel.System.FileSystem.VfsTimespec.Nanoseconds -> long
+Cosmos.Kernel.System.FileSystem.VfsTimespec.Seconds -> long
+Cosmos.Kernel.System.FileSystem.VfsTimespec.VfsTimespec() -> void
+Cosmos.Kernel.System.FileSystem.VfsTimespec.VfsTimespec(long seconds, long nanoseconds) -> void
 Cosmos.Kernel.System.Global
 Cosmos.Kernel.System.Graphics.Bitmap
 Cosmos.Kernel.System.Graphics.Bitmap.Bitmap(byte[]! imageData, Cosmos.Kernel.System.Graphics.ColorOrder colorOrder = Cosmos.Kernel.System.Graphics.ColorOrder.BGR) -> void
@@ -638,34 +781,6 @@ Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation.StartSector.get 
 Cosmos.Kernel.System.Storage.StorageManager
 Cosmos.Kernel.System.Timer.AlarmManager
 Cosmos.Kernel.System.Timer.TimerManager
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle.TryCreateDirectory(System.ReadOnlySpan<char> name, Cosmos.Kernel.HAL.Vfs.VfsMode mode, out Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle? child) -> bool
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle.TryCreateFile(System.ReadOnlySpan<char> name, Cosmos.Kernel.HAL.Vfs.VfsMode mode, out Cosmos.Kernel.System.Vfs.IVfsNodeHandle? child) -> bool
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle.TryLookup(System.ReadOnlySpan<char> name, out Cosmos.Kernel.System.Vfs.IVfsNodeHandle? child) -> bool
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle.TryReadDir(out System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Vfs.IVfsInode!>! entries) -> bool
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle.TryRemoveDirectory(System.ReadOnlySpan<char> name) -> bool
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle.TryRename(System.ReadOnlySpan<char> oldName, Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle! newParent, System.ReadOnlySpan<char> newName) -> bool
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle.TrySetAttr(Cosmos.Kernel.HAL.Vfs.SetAttrFlags flags, in Cosmos.Kernel.HAL.Vfs.VfsStat attributes) -> bool
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle.TrySymlink(System.ReadOnlySpan<char> name, System.ReadOnlySpan<char> target, out Cosmos.Kernel.System.Vfs.IVfsNodeHandle? child) -> bool
-Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle.TryUnlink(System.ReadOnlySpan<char> name) -> bool
-Cosmos.Kernel.System.Vfs.IVfsFileHandle
-Cosmos.Kernel.System.Vfs.IVfsFileHandle.Position.get -> long
-Cosmos.Kernel.System.Vfs.IVfsFileHandle.Read(System.Span<byte> buffer) -> long
-Cosmos.Kernel.System.Vfs.IVfsFileHandle.TryFlush() -> bool
-Cosmos.Kernel.System.Vfs.IVfsFileHandle.TrySeek(long offset, Cosmos.Kernel.HAL.Vfs.SeekWhence whence) -> bool
-Cosmos.Kernel.System.Vfs.IVfsFileHandle.TrySetAttr(Cosmos.Kernel.HAL.Vfs.SetAttrFlags flags, in Cosmos.Kernel.HAL.Vfs.VfsStat attributes) -> bool
-Cosmos.Kernel.System.Vfs.IVfsFileHandle.Write(System.ReadOnlySpan<byte> buffer) -> long
-Cosmos.Kernel.System.Vfs.IVfsNodeHandle
-Cosmos.Kernel.System.Vfs.IVfsNodeHandle.Inode.get -> Cosmos.Kernel.HAL.Vfs.IVfsInode!
-Cosmos.Kernel.System.Vfs.IVfsNodeHandle.Name.get -> string!
-Cosmos.Kernel.System.Vfs.IVfsNodeHandle.TryStat(out Cosmos.Kernel.HAL.Vfs.VfsStat stat) -> bool
-Cosmos.Kernel.System.Vfs.VfsManager
-Cosmos.Kernel.System.Vfs.VfsManager.VfsMount
-Cosmos.Kernel.System.Vfs.VfsManager.VfsMount.MountPoint.get -> string!
-Cosmos.Kernel.System.Vfs.VfsManager.VfsMount.Name.get -> string!
-Cosmos.Kernel.System.Vfs.VfsManager.VfsMount.Partition.get -> Cosmos.Kernel.System.Storage.Partition?
-Cosmos.Kernel.System.Vfs.VfsManager.VfsMount.Source.get -> string!
-Cosmos.Kernel.System.Vfs.VfsManager.VfsMount.Superblock.get -> Cosmos.Kernel.HAL.Vfs.IVfsSuperblock!
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetAdvance(char c) -> int
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetLineHeight() -> int
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetMaxAdvance() -> int
@@ -739,7 +854,25 @@ static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.TickPeriodNs.get -> ulong
 static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.TryGetCurrentThread(uint cpuId, out Cosmos.Kernel.System.Diagnostics.KernelThreadInfo info) -> bool
 static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.TryGetRunQueueThread(uint cpuId, int index, out Cosmos.Kernel.System.Diagnostics.KernelThreadInfo info) -> bool
 static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.TryGetThreadInSlot(int slot, out Cosmos.Kernel.System.Diagnostics.KernelThreadInfo info) -> bool
-static Cosmos.Kernel.System.Filesystems.Fat.FatBootSector.TryParse(System.ReadOnlySpan<byte> bpb, out Cosmos.Kernel.System.Filesystems.Fat.FatBootSector? bootSector) -> bool
+static Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.TryParse(System.ReadOnlySpan<byte> bpb, out Cosmos.Kernel.System.FileSystem.Fat.FatBootSector? bootSector) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.Mounts.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.FileSystem.VfsMount!>!
+static Cosmos.Kernel.System.FileSystem.VfsManager.RegisterFileSystem(string! name, Cosmos.Kernel.System.FileSystem.IVfsFileSystemType! fileSystemType) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryCreateDirectory(string! fullPath, Cosmos.Kernel.System.FileSystem.VfsMode permissions) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryCreateFile(string! fullPath, Cosmos.Kernel.System.FileSystem.VfsMode permissions) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryDestroy(string! name, System.ReadOnlySpan<char> source) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryFormat(string! name, Cosmos.Kernel.System.Storage.Partition! partition, Cosmos.Kernel.System.FileSystem.IVfsFormatOptions? options) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryFormat(string! name, System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.IVfsFormatOptions? options) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryGetMount(string! mountPoint, out Cosmos.Kernel.System.FileSystem.VfsMount? mount) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryMount(string! name, Cosmos.Kernel.System.Storage.Partition! partition, Cosmos.Kernel.System.FileSystem.MountFlags flags, string! mountPoint, out Cosmos.Kernel.System.FileSystem.VfsMount? mount) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryMount(string! name, System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.MountFlags flags, string! mountPoint, out Cosmos.Kernel.System.FileSystem.VfsMount? mount) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryOpenDirectory(string! path, out Cosmos.Kernel.System.FileSystem.IVfsDirectoryHandle? directory) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryOpenFile(string! path, out Cosmos.Kernel.System.FileSystem.IVfsFileHandle? file) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryRemoveDirectory(string! fullPath) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryRename(string! oldFullPath, string! newFullPath) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryStat(string! fullPath, out Cosmos.Kernel.System.FileSystem.VfsStat stat) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryStatFs(string! mountPoint, out Cosmos.Kernel.System.FileSystem.VfsStatFs stats) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryUnlink(string! fullPath) -> bool
+static Cosmos.Kernel.System.FileSystem.VfsManager.TryUnmount(string! mountPoint) -> bool
 static Cosmos.Kernel.System.Global.CurrentKernel.get -> Cosmos.Kernel.System.Kernel?
 static Cosmos.Kernel.System.Global.RegisterKernel(Cosmos.Kernel.System.Kernel! kernel) -> void
 static Cosmos.Kernel.System.Global.StartKernel() -> void
@@ -889,24 +1022,6 @@ static Cosmos.Kernel.System.Timer.TimerManager.IsInitialized.get -> bool
 static Cosmos.Kernel.System.Timer.TimerManager.Schedule(System.Action! callback, System.TimeSpan delay) -> Cosmos.Kernel.HAL.Platform.SoftwareTimer?
 static Cosmos.Kernel.System.Timer.TimerManager.ScheduleRecurring(System.Action! callback, System.TimeSpan period) -> Cosmos.Kernel.HAL.Platform.SoftwareTimer?
 static Cosmos.Kernel.System.Timer.TimerManager.Wait(uint ms) -> void
-static Cosmos.Kernel.System.Vfs.VfsManager.Mounts.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.Vfs.VfsManager.VfsMount!>!
-static Cosmos.Kernel.System.Vfs.VfsManager.RegisterFilesystem(string! name, Cosmos.Kernel.HAL.Vfs.IVfsFilesystemType! filesystemType) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryCreateDirectory(string! fullPath, Cosmos.Kernel.HAL.Vfs.VfsMode permissions) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryCreateFile(string! fullPath, Cosmos.Kernel.HAL.Vfs.VfsMode permissions) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryDestroy(string! name, System.ReadOnlySpan<char> source) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryFormat(string! name, Cosmos.Kernel.System.Storage.Partition! partition, Cosmos.Kernel.HAL.Vfs.IVfsFormatOptions? options) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryFormat(string! name, System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.IVfsFormatOptions? options) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryGetMount(string! mountPoint, out Cosmos.Kernel.System.Vfs.VfsManager.VfsMount? mount) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryMount(string! name, Cosmos.Kernel.System.Storage.Partition! partition, Cosmos.Kernel.HAL.Vfs.MountFlags flags, string! mountPoint, out Cosmos.Kernel.System.Vfs.VfsManager.VfsMount? mount) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryMount(string! name, System.ReadOnlySpan<char> source, Cosmos.Kernel.HAL.Vfs.MountFlags flags, string! mountPoint, out Cosmos.Kernel.System.Vfs.VfsManager.VfsMount? mount) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryOpenDirectory(string! path, out Cosmos.Kernel.System.Vfs.IVfsDirectoryHandle? directory) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryOpenFile(string! path, out Cosmos.Kernel.System.Vfs.IVfsFileHandle? file) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryRemoveDirectory(string! fullPath) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryRename(string! oldFullPath, string! newFullPath) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryStat(string! fullPath, out Cosmos.Kernel.HAL.Vfs.VfsStat stat) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryStatFs(string! mountPoint, out Cosmos.Kernel.HAL.Vfs.VfsStatFs stats) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryUnlink(string! fullPath) -> bool
-static Cosmos.Kernel.System.Vfs.VfsManager.TryUnmount(string! mountPoint) -> bool
 static readonly Cosmos.Kernel.System.Network.IPv4.Address4.Zero -> Cosmos.Kernel.System.Network.IPv4.Address4!
 static readonly Cosmos.Kernel.System.Network.IPv6.Address6.Loopback -> Cosmos.Kernel.System.Network.IPv6.Address6!
 static readonly Cosmos.Kernel.System.Network.IPv6.Address6.Zero -> Cosmos.Kernel.System.Network.IPv6.Address6!

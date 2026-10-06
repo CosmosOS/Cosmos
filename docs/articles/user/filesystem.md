@@ -8,7 +8,7 @@ The main differences if you come from Gen2:
 | | Gen2 | Gen3 |
 |---|---|---|
 | Paths | DOS drive letters (`0:\file.txt`) | Unix paths (`/mnt/file.txt`) |
-| Setup | `CosmosVFS` + `VFSManager.RegisterVFS` | `VfsManager.RegisterFilesystem` + `VfsManager.TryMount` |
+| Setup | `CosmosVFS` + `VFSManager.RegisterVFS` | `VfsManager.RegisterFileSystem` + `VfsManager.TryMount` |
 | API surface | Plugged subset of `System.IO` | Full `System.IO` (streams, enumeration patterns, `FileInfo`, …) |
 | `File.Move` | Not plugged (copy + delete) | Works, including onto-existing overwrite semantics |
 | Filesystems | FAT32 (FAT12/16 partial) | FAT12/16/32 |
@@ -56,23 +56,22 @@ These are the `using`s the snippets below rely on:
 
 ```csharp
 using System.IO;
-using Cosmos.Kernel.System.Storage;
-using Cosmos.Kernel.System.Vfs;
-using Cosmos.Kernel.System.Filesystems.Fat;
 using Cosmos.Kernel.HAL.Devices;
-using Cosmos.Kernel.HAL.Vfs;
+using Cosmos.Kernel.System.FileSystem;
+using Cosmos.Kernel.System.FileSystem.Fat;
+using Cosmos.Kernel.System.Storage;
 ```
 
-Two of those five are HAL namespaces, and that is deliberate. `Cosmos.Kernel.HAL.Vfs` holds the VFS vocabulary that drivers and callers share: the contracts a filesystem driver implements (`IVfsFilesystemType`, `IVfsSuperblock`, `IVfsInode`, `IVfsOpenFile` and their operations interfaces) and the flag, mode and metadata types every mount, create and stat call names (`MountFlags`, `VfsMode`, `VfsStat`, `VfsStatFs`, `SetAttrFlags`, `SeekWhence`, `VfsTimespec`). That is why `MountFlags.None` appears in a kernel's `BeforeRun()`. `Cosmos.Kernel.System.Vfs` holds the manager and the handles, `VfsManager` plus `IVfsNodeHandle`, `IVfsFileHandle` and `IVfsDirectoryHandle`, and the handles are typed in the shared vocabulary, so `IVfsNodeHandle.Inode` gives you a `Cosmos.Kernel.HAL.Vfs.IVfsInode`. The vocabulary sits in the lower assembly because the reference graph runs `Cosmos.Kernel.System` to `Cosmos.Kernel.HAL`, never the other way.
+`Cosmos.Kernel.System.FileSystem` holds the whole VFS in one namespace: the manager and what it hands out (`VfsManager`, `VfsMount`, `IVfsNodeHandle`, `IVfsFileHandle` and `IVfsDirectoryHandle`), the contracts a filesystem driver implements (`IVfsFileSystemType`, `IVfsSuperblock`, `IVfsInode`, `IVfsOpenFile` and their operations interfaces), and the flag, mode and metadata types every mount, create and stat call names (`MountFlags`, `VfsMode`, `VfsStat`, `VfsStatFs`, `SetAttrFlags`, `SeekWhence`, `VfsTimespec`). That is why `MountFlags.None` appears in a kernel's `BeforeRun()` under the same `using` as `VfsManager`, and why the `IVfsInode` that `IVfsNodeHandle.Inode` gives you needs no other `using`. Filesystem drivers sit one level down, a namespace each: the FAT driver's `FatFileSystemType` and `FatFormatOptions` are in `Cosmos.Kernel.System.FileSystem.Fat`.
 
-`Cosmos.Kernel.HAL.Devices` is needed only by the RAM-disk snippet further down, which implements `IBlockDevice`. Drop that and mounting a real partition takes four.
+`Cosmos.Kernel.HAL.Devices` is needed only by the RAM-disk snippet further down, which implements `IBlockDevice`. Drop that and mounting a real partition takes the three `Cosmos.Kernel.System` ones.
 
 First, register a FAT driver under a name of your choice, then mount a partition at a mount point. Add this to your kernel's `BeforeRun()`:
 
 ```csharp
-FatFilesystemType fat = new();
+FatFileSystemType fat = new();
 
-if (!VfsManager.RegisterFilesystem("fat", fat))
+if (!VfsManager.RegisterFileSystem("fat", fat))
 {
     Console.WriteLine("The name \"fat\" is already registered.");
     return;
@@ -84,13 +83,13 @@ if (StorageManager.Partitions.Count == 0)
     return;
 }
 
-if (VfsManager.TryMount("fat", StorageManager.Partitions[0], MountFlags.None, "/mnt", out VfsManager.VfsMount? mount))
+if (VfsManager.TryMount("fat", StorageManager.Partitions[0], MountFlags.None, "/mnt", out VfsMount? mount))
 {
     Console.WriteLine("Mounted " + mount.Name + " at " + mount.MountPoint);
 }
 ```
 
-`Partitions` is empty before storage is scanned, when no disk is attached, and when storage is compiled out, so index it only after checking `Count`. Every call above returns whether it worked: `RegisterFilesystem` refuses a name already in use, and `TryMount` refuses a source the driver does not recognize.
+`Partitions` is empty before storage is scanned, when no disk is attached, and when storage is compiled out, so index it only after checking `Count`. Every call above returns whether it worked: `RegisterFileSystem` refuses a name already in use, and `TryMount` refuses a source the driver does not recognize.
 
 `StorageManager.GetPartitions(device)` lists the partitions of one disk, numbered the way a user numbers them; `StorageManager.Partitions` is the flat list across every disk.
 
@@ -138,9 +137,9 @@ The FAT driver accepts an injected device directly. Register it as usual and lea
 
 ```csharp
 MemoryBlockDevice ramDisk = new("RAMDISK", 512, 65536);   // 32 MiB
-FatFilesystemType fat = new(ramDisk);
+FatFileSystemType fat = new(ramDisk);
 
-if (!VfsManager.RegisterFilesystem("ramfat", fat)
+if (!VfsManager.RegisterFileSystem("ramfat", fat)
     || !VfsManager.TryFormat("ramfat", "", new FatFormatOptions { Type = FatType.Fat16 })
     || !VfsManager.TryMount("ramfat", "", MountFlags.None, "/mnt", out _))
 {
@@ -248,7 +247,7 @@ Formatting is refused while the source is mounted: unmount first with `VfsManage
 `VfsManager.Mounts` is the mount table. Each entry tells you the driver name, the backing source and the mount point:
 
 ```csharp
-foreach (VfsManager.VfsMount m in VfsManager.Mounts)
+foreach (VfsMount m in VfsManager.Mounts)
 {
     Console.WriteLine(m.MountPoint + " -> " + m.Name + " (source " + m.Source + ")");
 }
@@ -266,7 +265,7 @@ foreach (VfsManager.VfsMount m in VfsManager.Mounts)
 ```csharp
 if (VfsManager.TryStatFs("/mnt", out VfsStatFs stats))
 {
-    ulong freeBytes = stats.Bavail * stats.BlockSize;
+    ulong freeBytes = stats.AvailableBlocks * stats.BlockSize;
     ulong totalBytes = stats.Blocks * stats.BlockSize;
     Console.WriteLine(freeBytes + " of " + totalBytes + " bytes free");
 }
@@ -488,7 +487,7 @@ With **nothing mounted at all**, `System.IO` still degrades gracefully: `Directo
 - Symbolic links and hard links are not supported (`ENOTSUP`/`EPERM` under the hood; the BCL surfaces `IOException`).
 - File timestamps are not persisted yet (`File.SetLastWriteTime` is accepted but a FAT timestamp lands later).
 - `DriveInfo` is not wired up yet; use `VfsManager.TryStatFs` for free-space queries.
-- FAT is the only filesystem driver today; the `IVfsFilesystemType` interface is what a new driver implements.
+- FAT is the only filesystem driver the kernel suites cover; an ext2 driver, `Ext2FileSystemType` in `Cosmos.Kernel.System.FileSystem.Ext2`, ships beside it and is tested on the host only. The `IVfsFileSystemType` interface is what a new driver implements.
 
 ## How it works
 
@@ -503,7 +502,7 @@ FileDescriptorTable                    (Cosmos.Kernel.Plugs: fds, dir streams, e
         │
 VfsManager                             (mounts, paths, CWD, open handles)
         │
-IVfsFilesystemType / IVfsSuperblock    (FAT driver)
+IVfsFileSystemType / IVfsSuperblock    (FAT driver)
         │
 IBlockDevice                           (the kit's AHCI, NVMe, virtio-blk and USB mass storage drivers, MemoryBlockDevice)
 ```

@@ -62,7 +62,7 @@ Kernel features are toggled via MSBuild properties in kernel `.csproj` files (al
 - `src/Cosmos.Patcher/` - IL patcher CLI tool (Mono.Cecil-based)
 - `src/Cosmos.Kernel.Core/Runtime/` - Runtime stubs (RhpThrowEx, exception handling, etc.)
 - `src/Cosmos.Kernel.Core/Memory/` - Memory allocation
-- `src/Cosmos.Kernel.System/` - Higher-level services (Graphics with `DisplayManager` and the canvas over the kit's display kind, Network, Input, Timer, Storage with `StorageManager` and its consumer of the kit's block kind)
+- `src/Cosmos.Kernel.System/` - Higher-level services (Graphics with `DisplayManager` and the canvas over the kit's display kind, Network, Input, Timer, Storage with `StorageManager` and its consumer of the kit's block kind, FileSystem with `VfsManager`, the VFS contracts and the Fat and Ext2 filesystems)
 - `src/Cosmos.Kernel.HAL/DriverKit/` - The driver kit (bindings, bus kinds: synthetic, platform, PCI with the bridge describe and resource placement behind hot-plug slots, virtio, USB, PS/2; device kinds under `Devices/`: keyboard, pointer, network, block, display with the `IDisplayModes` and `IHardwareCursor` facets)
 - `src/Cosmos.Kernel.HAL/Platform/` - The internal boot contract (`IPlatformInitializer`, `PlatformHAL`) and the timer device base, with `SoftwareTimer`, the handle `TimerManager.Schedule` returns
 - `src/Cosmos.Kernel.HAL/Devices/` - The device contracts the ring hands out: `IBlockDevice`, which kernels implement and drive, and `MACAddress`

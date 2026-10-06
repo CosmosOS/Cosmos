@@ -1,11 +1,11 @@
-using Cosmos.Kernel.HAL.Vfs;
-using Cosmos.Kernel.System.Filesystems.Fat;
+using Cosmos.Kernel.System.FileSystem;
+using Cosmos.Kernel.System.FileSystem.Fat;
 
 namespace Cosmos.Kernel.Tests.Fat;
 
 /// <summary>
 /// Builds clean FAT16 / FAT32 volumes on a <see cref="MemoryBlockDevice"/> by
-/// calling <see cref="FatFilesystemType.TryFormat(System.ReadOnlySpan{char}, IVfsFormatOptions?)"/>
+/// calling <see cref="FatFileSystemType.TryFormat(global::System.ReadOnlySpan{char}, IVfsFormatOptions?)"/>
 /// — the same path real kernel code would use to mkfs a partition. The
 /// volume sizes and explicit overrides are chosen so the resulting cluster
 /// counts land squarely in the FAT family the test asks for.
@@ -58,7 +58,7 @@ internal static class FatTestVolume
     /// <summary>Formats an existing device (sized <see cref="Fat16BlockCount"/>) with the FAT16 geometry above.</summary>
     public static MemoryBlockDevice FormatFat16(MemoryBlockDevice device)
     {
-        FatFilesystemType driver = new(device);
+        FatFileSystemType driver = new(device);
         FatFormatOptions options = new()
         {
             Type = FatType.Fat16,
@@ -84,7 +84,7 @@ internal static class FatTestVolume
     /// <summary>Formats an existing device (sized <see cref="Fat32BlockCount"/>) with the FAT32 geometry above.</summary>
     public static MemoryBlockDevice FormatFat32(MemoryBlockDevice device)
     {
-        FatFilesystemType driver = new(device);
+        FatFileSystemType driver = new(device);
         FatFormatOptions options = new()
         {
             Type = FatType.Fat32,

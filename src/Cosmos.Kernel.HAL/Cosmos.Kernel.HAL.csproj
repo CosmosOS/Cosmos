@@ -13,12 +13,12 @@
     <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
-         the VFS contract types, the driver kit seam (COSMOS0003), and the
-         contracts the ring hands out: IBlockDevice, the one device contract
-         kernels really implement and drive (the Fat and File suites each
-         supply a RAM disk, DevKernel reads and writes blocks through it),
-         MACAddress, which the packet seam and NetworkManager both hand out,
-         and SoftwareTimer as the handle TimerManager.Schedule returns.
+         the driver kit seam (COSMOS0003) and the contracts the ring hands
+         out: IBlockDevice, the one device contract kernels really implement
+         and drive (the Fat and File suites each supply a RAM disk, DevKernel
+         reads and writes blocks through it), MACAddress, which the packet
+         seam and NetworkManager both hand out, and SoftwareTimer as the
+         handle TimerManager.Schedule returns.
          SoftwareTimer's construction and tick members stay internal: they
          belong to the timer device, and a kernel calling them corrupts the
          registry. The boot contract (IPlatformInitializer) and the timer

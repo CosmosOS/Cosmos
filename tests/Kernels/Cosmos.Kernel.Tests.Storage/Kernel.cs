@@ -14,11 +14,10 @@ using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.Platform;
-using Cosmos.Kernel.HAL.Vfs;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Filesystems.Fat;
+using Cosmos.Kernel.System.FileSystem;
+using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.Kernel.System.Storage;
-using Cosmos.Kernel.System.Vfs;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using SysThread = System.Threading.Thread;
@@ -1213,7 +1212,7 @@ public class Kernel : Sys.Kernel
         {
             s_dev.WriteBlock(lba, 1, zero);
         }
-        FatFilesystemType rawDriver = new(s_dev);
+        FatFileSystemType rawDriver = new(s_dev);
         Assert.True(rawDriver.TryFormat(string.Empty, null), "FAT format of the raw device must succeed");
 
         StorageManager.RescanPartitions(s_dev);
@@ -1241,8 +1240,8 @@ public class Kernel : Sys.Kernel
         Assert.Equal<ulong>(s_dev.BlockCount, whole.BlockCount, "whole-disk partition must span the device");
 
         // The issue's exact call shape: mount by StorageManager partition index.
-        Assert.True(VfsManager.RegisterFilesystem(SuperfloppyDriverName, new FatFilesystemType()));
-        Assert.True(VfsManager.TryMount(SuperfloppyDriverName, index.ToString(), MountFlags.None, SuperfloppyMountPoint, out VfsManager.VfsMount? mount),
+        Assert.True(VfsManager.RegisterFileSystem(SuperfloppyDriverName, new FatFileSystemType()));
+        Assert.True(VfsManager.TryMount(SuperfloppyDriverName, index.ToString(), MountFlags.None, SuperfloppyMountPoint, out VfsMount? mount),
             "mount by partition index must succeed on a superfloppy volume");
         Assert.NotNull(mount);
         Assert.Equal<long>((long)SectorSizeBytes, mount!.Superblock.BlockSize);
@@ -1416,10 +1415,10 @@ public class Kernel : Sys.Kernel
         {
             s_dev.WriteBlock(lba, 1, zero);
         }
-        Assert.True(new FatFilesystemType(s_dev).TryFormat(string.Empty, null), "FAT format of the stick must succeed");
+        Assert.True(new FatFileSystemType(s_dev).TryFormat(string.Empty, null), "FAT format of the stick must succeed");
         StorageManager.RescanPartitions(s_dev);
 
-        _ = VfsManager.RegisterFilesystem(HotPlugDriverName, new FatFilesystemType());
+        _ = VfsManager.RegisterFileSystem(HotPlugDriverName, new FatFileSystemType());
         if (!MountStickPartition())
         {
             return;
@@ -1633,10 +1632,10 @@ public class Kernel : Sys.Kernel
         {
             s_dev.WriteBlock(lba, 1, zero);
         }
-        Assert.True(new FatFilesystemType(s_dev).TryFormat(string.Empty, null), "FAT format of the disk must succeed");
+        Assert.True(new FatFileSystemType(s_dev).TryFormat(string.Empty, null), "FAT format of the disk must succeed");
         StorageManager.RescanPartitions(s_dev);
 
-        _ = VfsManager.RegisterFilesystem(HotPlugDriverName, new FatFilesystemType());
+        _ = VfsManager.RegisterFileSystem(HotPlugDriverName, new FatFileSystemType());
         if (!MountStickPartition())
         {
             return;
@@ -1706,7 +1705,7 @@ public class Kernel : Sys.Kernel
 
     private static bool IsMounted(string mountPoint)
     {
-        foreach (VfsManager.VfsMount mount in VfsManager.Mounts)
+        foreach (VfsMount mount in VfsManager.Mounts)
         {
             if (mount.MountPoint == mountPoint)
             {

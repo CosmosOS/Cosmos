@@ -3,9 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Cosmos.Kernel.HAL.Vfs;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Vfs;
+using Cosmos.Kernel.System.FileSystem;
 using PalError = global::Interop.Error;
 using PalSys = global::Interop.Sys;
 
@@ -551,8 +550,8 @@ internal static unsafe class FileDescriptorTable
             return PalError.EINVAL;
         }
 
-        VfsManager.VfsMount? oldMount = FindMount(oldFull, out _);
-        VfsManager.VfsMount? newMount = FindMount(newFull, out _);
+        VfsMount? oldMount = FindMount(oldFull, out _);
+        VfsMount? newMount = FindMount(newFull, out _);
         if (newMount is null)
         {
             return PalError.ENOENT;
@@ -568,7 +567,7 @@ internal static unsafe class FileDescriptorTable
         // same-entry guard for FAT's case-insensitive lookups).
         if (VfsManager.TryStat(newFull, out VfsStat newStat))
         {
-            bool sameEntry = (oldStat.Ino != 0 && newStat.Ino == oldStat.Ino)
+            bool sameEntry = (oldStat.InodeNumber != 0 && newStat.InodeNumber == oldStat.InodeNumber)
                 || string.Equals(oldFull, newFull, StringComparison.OrdinalIgnoreCase);
 
             if (!sameEntry)
@@ -867,21 +866,21 @@ internal static unsafe class FileDescriptorTable
         status.Uid = stat.Uid;
         status.Gid = stat.Gid;
         status.Size = (long)stat.Size;
-        status.ATime = stat.Atime.TvSec;
-        status.ATimeNsec = stat.Atime.TvNsec;
-        status.MTime = stat.Mtime.TvSec;
-        status.MTimeNsec = stat.Mtime.TvNsec;
-        status.CTime = stat.Ctime.TvSec;
-        status.CTimeNsec = stat.Ctime.TvNsec;
+        status.ATime = stat.AccessTime.Seconds;
+        status.ATimeNsec = stat.AccessTime.Nanoseconds;
+        status.MTime = stat.ModificationTime.Seconds;
+        status.MTimeNsec = stat.ModificationTime.Nanoseconds;
+        status.CTime = stat.ChangeTime.Seconds;
+        status.CTimeNsec = stat.ChangeTime.Nanoseconds;
         status.BirthTime = 0;
         status.BirthTimeNsec = 0;
         FindMount(fullPath, out int mountOrdinal);
         status.Dev = mountOrdinal;
         status.RDev = 0;
-        // FAT reports Ino 0 for empty files and the fixed FAT12/16 root; the
+        // FAT reports InodeNumber 0 for empty files and the fixed FAT12/16 root; the
         // BCL compares Dev+Ino to detect "same file" (File.Move), so synthesize
         // distinct, stable inode numbers from the path for those.
-        status.Ino = stat.Ino != 0 ? (long)stat.Ino : SyntheticInode(fullPath);
+        status.Ino = stat.InodeNumber != 0 ? (long)stat.InodeNumber : SyntheticInode(fullPath);
         status.UserFlags = 0;
     }
 
@@ -900,15 +899,15 @@ internal static unsafe class FileDescriptorTable
 
     /// <summary>Longest-prefix mount lookup that also reports the mount's 1-based
     /// ordinal — the stable device number <c>FileStatus.Dev</c> carries.</summary>
-    private static VfsManager.VfsMount? FindMount(string fullPath, out int ordinal)
+    private static VfsMount? FindMount(string fullPath, out int ordinal)
     {
-        VfsManager.VfsMount? best = null;
+        VfsMount? best = null;
         ordinal = 0;
 
-        IReadOnlyList<VfsManager.VfsMount> mounts = VfsManager.Mounts;
+        IReadOnlyList<VfsMount> mounts = VfsManager.Mounts;
         for (int i = 0; i < mounts.Count; i++)
         {
-            VfsManager.VfsMount candidate = mounts[i];
+            VfsMount candidate = mounts[i];
             if (VfsManager.MountCovers(candidate.MountPoint, fullPath)
                 && (best is null || candidate.MountPoint.Length > best.MountPoint.Length))
             {

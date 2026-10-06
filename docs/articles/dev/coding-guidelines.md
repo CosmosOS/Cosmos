@@ -851,7 +851,7 @@ if (!s_clients.TryGetValue(port, out UdpClient? client))
 {
     return;
 }
-s_registeredTypes.TryAdd(name, filesystemType);
+s_registeredTypes.TryAdd(name, fileSystemType);
 cache[id] = mac;                        // upsert: no ContainsKey first
 
 // readonly on every field assigned only at its declaration or in a constructor
@@ -1008,7 +1008,7 @@ Logic that needs no hardware (`Tcp` receive-buffer arithmetic, address parsing) 
 
 Three rules decide what is `public` (the full policy and its mechanisms live in [Public API Tracking](public-api.md)):
 
-1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types its signatures expose (the HAL's device contracts `IBlockDevice`, `MACAddress` and `SoftwareTimer`, the `HAL.Vfs` contracts, Core's platform interfaces). Only that surface is tracked, documented, and covered by deprecation cycles.
+1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types its signatures expose (the HAL's device contracts `IBlockDevice`, `MACAddress` and `SoftwareTimer`, Core's platform interfaces). Only that surface is tracked, documented, and covered by deprecation cycles.
 2. **Chosen experimental seams.** An extension point outside the ring is opened deliberately and marked `[Experimental("COSMOSxxxx")]`: usable now, no compatibility promise, promoted by removing the attribute. Never open a seam by just making something public.
 3. **Everything else is `internal`.** Visibility is not the extension mechanism. First-party assemblies and white-box test kernels use `InternalsVisibleTo`; external code uses `[UnsafeAccessor]` ([Accessing internals](accessing-internals.md)) at its own risk.
 

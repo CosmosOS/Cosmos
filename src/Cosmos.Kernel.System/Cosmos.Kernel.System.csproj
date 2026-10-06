@@ -61,10 +61,6 @@
     </ItemGroup>
   </Target>
 
-  <ItemGroup>
-    <Folder Include="Vfs\" />
-  </ItemGroup>
-
   <!-- Multi-arch packaging support -->
   <Import Project="../Directory.MultiArch.targets" />
 

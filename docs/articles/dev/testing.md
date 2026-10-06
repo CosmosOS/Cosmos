@@ -447,7 +447,7 @@ tests/
         └── Bootloader/limine.conf
 ```
 
-`tests/Cosmos.Kernel.Tests.System/` holds the host-side tests of `Cosmos.Kernel.System`. It takes a project reference on the library and an `InternalsVisibleTo` grant from it, and its folders mirror the library's (`Network/`, `Keyboard/`, `Filesystems/Ext2/`).
+`tests/Cosmos.Kernel.Tests.System/` holds the host-side tests of `Cosmos.Kernel.System`. It takes a project reference on the library and an `InternalsVisibleTo` grant from it, and its folders mirror the library's (`Network/`, `Keyboard/`, `FileSystem/Ext2/`).
 
 ---
 
