@@ -1182,25 +1182,25 @@ Reach the driver's own state through `node.Binding.DriverState` to check what th
 
 ### A driver inside the kernel project
 
-A kernel project built with `Cosmos.Sdk` needs one line to write drivers, the acknowledgement of the experimental seam. The driver class may be `internal`:
+A kernel project built with `Cosmos.Sdk` only needs to acknowledge the experimental kit. The driver class may be `internal`:
 
 ```xml
+<!-- In the kernel's .csproj: -->
 <PropertyGroup>
-  <CosmosKernelClass>MyOS.Kernel</CosmosKernelClass>
   <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
 </PropertyGroup>
 ```
 
 ### A driver library
 
-A driver that ships on its own is a class library that references `Cosmos.Kernel.HAL` for the kit and `Cosmos.Kernel.System` for the kernel API, declares itself a driver assembly, and suppresses the seam's id. Its `[Driver]` classes are `public`, because the manifest generator in the consuming kernel sees a library's drivers through metadata:
+To ship drivers on their own, put them in a class library. It references `Cosmos.Kernel.HAL` for the kit and `Cosmos.Kernel.System` for the kernel API. Its `[Driver]` classes must be `public`, so the kernel's manifest generator can see them:
 
 ```xml
+<!-- The library's .csproj: -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <CosmosDriverAssembly>true</CosmosDriverAssembly>
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
@@ -1214,40 +1214,36 @@ A driver that ships on its own is a class library that references `Cosmos.Kernel
 </Project>
 ```
 
-The sample leaves package versions to central package management, as the kernel projects in the tree do; a library without a `Directory.Packages.props` gives each reference the `Version` its kernel uses.
+The versions are left to central package management. Without a `Directory.Packages.props`, give each reference the version your kernel uses.
 
-`CosmosDriverAssembly` is what makes the library's build the proof that it uses only what any kernel author can use. The analyzer package brings the `CompilerVisibleProperty` that lets its rules read the property; a kernel gets the package through the SDK, and a library references it itself, as the sample does, since without it the property is inert. The package enforces three things on such an assembly:
+`CosmosDriverAssembly`, with the analyzer package, checks at build time that the library only uses the public API:
 
-- It is a **User** layer assembly whatever its name, judged on the types and members its code names rather than on the reference list restore builds: it may name what `Cosmos.Kernel.System` offers and what `Cosmos.Kernel.HAL` offers, the kit and the device contracts its surface names (`IBlockDevice`, `MACAddress`) among them, and nothing lower. `Cosmos.Kernel.Core` sits on the reference list because the HAL and the ring were built against it, as do `Cosmos.Kernel.Boot.Limine` and the `Cosmos.Build.*` assemblies; naming a type or member from `Cosmos.Kernel.Core` is `NAOT0007`.
-- `NAOT0008`: no `[UnsafeAccessor]` or `[UnsafeAccessorType]` anywhere in it, which closes the one hatch that would reach internals without a grant.
-- `NAOT0009`: no `Cosmos.*` assembly it references grants it `InternalsVisibleTo`.
+- `NAOT0007`: it names nothing from `Cosmos.Kernel.Core`, only what `Cosmos.Kernel.HAL` and `Cosmos.Kernel.System` offer.
+- `NAOT0008`: it uses no `[UnsafeAccessor]` to reach internals.
+- `NAOT0009`: no Cosmos assembly grants it `InternalsVisibleTo`.
 
-In the tree, `CosmosDriverAssemblyNames` in `Directory.Build.props` lists every driver assembly: today that is `Cosmos.Kernel.Drivers`, the package the shipped drivers live in, and the Drivers suite's library, `Cosmos.Kernel.Tests.Drivers.Library`. Both are built under `CosmosDriverAssembly` with no grant from any project, so the compiler is the proof that the shipped drivers call only what a kernel author can call; a capability a driver there needs and a third party cannot reach is a build failure, and the fix is to add it to the kit for everyone. `Cosmos.Kernel.Drivers` is one RID-less `lib/net10.0` package, because an assembly written over the seam holds no architecture-specific code by construction, and `Cosmos.Kernel` references it, so a kernel gets it with the aggregator and needs no reference of its own. The kernel that consumes the library adds a `ProjectReference` or `PackageReference` to it and its own `<NoWarn>` line; the library's drivers then appear in the kernel's manifest after the kernel's own, ordered by assembly name and then full type name.
+The shipped drivers in `Cosmos.Kernel.Drivers` are built the same way, so they use nothing your own driver can't.
+
+The kernel references the library with a `ProjectReference` or `PackageReference` and adds its own `NoWarn` line. The library's drivers join the manifest after the kernel's own.
 
 ### Excluding and opting in
 
-Policy lives in the kernel's `.csproj`, not in code. Names are full type names, without `global::`:
+Which drivers a kernel carries is set in its `.csproj`, by full type name:
 
 ```xml
+<!-- In the kernel's .csproj: -->
 <ItemGroup>
-  <!-- Drop a driver the build would otherwise register. -->
-  <CosmosDriverExclude Include="Acme.Drivers.AcmeNicDriver" />
+  <!-- Drop a driver the build would otherwise register, here the shipped Intel network driver. -->
+  <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EDriver" />
   <!-- Register a driver declared [Driver(Default = false)]. -->
   <CosmosDriverInclude Include="Acme.Drivers.ExperimentalGpu" />
 </ItemGroup>
 ```
 
-The drivers Cosmos ships are dropped the same way, by full type name. A kernel that brings its own Ethernet driver, or wants the function left as firmware set it up, keeps the Intel driver out of its manifest:
-
-```xml
-<ItemGroup>
-  <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EDriver" />
-</ItemGroup>
-```
-
-A kernel that needs no network at all turns `CosmosEnableNetwork` off instead, which keeps every network driver out of the manifest, a future one included, without naming any: the Threading suite does that, to keep a NIC's periodic drain off the worker it measures. A kernel that wants to draw on the firmware framebuffer even on a VMware SVGA II adapter drops `Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver`: no driver binds the function then, so the firmware display is not retired and stays the primary. Excluding `Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver` goes further: no PCI node is published then, and every PCI driver in the manifest stays idle; excluding a transport driver leaves the devices behind it unpublished the same way.
-
-An excluded driver is dropped whatever its `Default`; a driver with `Default = false` is registered only when named. An item that matches no `[Driver]` class the kernel can see is reported as `COSMOSGEN002`, which is how a stale entry shows up. `[Driver(Feature = DriverFeature.X)]` is the third lever: the driver rides the kernel's feature switch and is trimmed with it. Reading the generated `DriverManifest.g.cs` under `obj/` is the quickest way to check what a kernel carries.
+- Excluding a bus driver also leaves the devices behind it unbound: without `PciHostDriver`, no PCI node is published, so no PCI driver binds.
+- To drop a whole kind of device, turn its feature switch off instead: `CosmosEnableNetwork` set to `false` keeps every network driver out.
+- A name that matches no driver is reported as `COSMOSGEN002`.
+- The generated `DriverManifest.g.cs` under `obj/` shows what the kernel carries.
 
 ## Checklist
 
