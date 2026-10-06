@@ -3283,20 +3283,18 @@ public class Kernel : Sys.Kernel
 
     // Contract-faithful degenerate device: one 512-byte block, throws on any
     // out-of-range access like real drivers do.
-    private sealed class TinyDevice : BlockDevice
+    private sealed class TinyDevice : IBlockDevice
     {
         /// <summary>Single-block capacity of the degenerate probe: too small for even the GPT header at LBA 1.</summary>
         private const ulong TinyBlockCount = 1;
 
-        public TinyDevice()
-        {
-            BlockSize = SectorSizeBytes;
-            BlockCount = TinyBlockCount;
-        }
+        public ulong BlockCount => TinyBlockCount;
 
-        public override string Name => "tiny-probe";
+        public ulong BlockSize => SectorSizeBytes;
 
-        public override void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
+        public string Name => "tiny-probe";
+
+        public void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
         {
             if (blockNo > BlockCount || blockCount > BlockCount - blockNo)
             {
@@ -3305,33 +3303,39 @@ public class Kernel : Sys.Kernel
             data.Clear();
         }
 
-        public override void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
+        public void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
         {
             if (blockNo > BlockCount || blockCount > BlockCount - blockNo)
             {
                 throw new ArgumentOutOfRangeException(nameof(blockNo));
             }
         }
+
+        public void Flush()
+        {
+        }
     }
 
-    private sealed class BoundsProbeDevice : BlockDevice
+    private sealed class BoundsProbeDevice : IBlockDevice
     {
         /// <summary>Backing block count of the in-memory probe device.</summary>
         private const ulong ProbeBlockCount = 1024;
 
-        public BoundsProbeDevice()
-        {
-            BlockSize = SectorSizeBytes;
-            BlockCount = ProbeBlockCount;
-        }
+        public ulong BlockCount => ProbeBlockCount;
 
-        public override string Name => "bounds-probe";
+        public ulong BlockSize => SectorSizeBytes;
 
-        public override void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
+        public string Name => "bounds-probe";
+
+        public void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
         {
         }
 
-        public override void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
+        public void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
+        {
+        }
+
+        public void Flush()
         {
         }
     }

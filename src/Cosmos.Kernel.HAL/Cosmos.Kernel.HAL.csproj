@@ -64,8 +64,7 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box suites over HAL internals: the kit's MSI-X table and the
          nodes' PciAccess (Interrupts), the PCI host's configuration
-         mechanism and the nodes' PciAccess (Pci), the block device base
-         class behind the in-memory probe hosts and the kit's tree behind
+         mechanism and the nodes' PciAccess (Pci), the kit's tree behind
          the BAR relocation probes (Storage), the TimerDevice base and its
          software timers (Timer), the tree and the bindings' driver state
          (Virtio). -->

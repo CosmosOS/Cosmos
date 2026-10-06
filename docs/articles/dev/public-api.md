@@ -34,7 +34,7 @@ The enforcement test is mechanical: `examples/DevKernel` must compile with no `I
 |----------|---------|
 | `Cosmos.Kernel.System` | The supported ring |
 | `Cosmos.Kernel.HAL.Interfaces` | `IBlockDevice`, `MACAddress` and `SoftwareTimer` as a read-only handle, tracked; the boot, timer and network contracts internal |
-| `Cosmos.Kernel.HAL` | The driver kit seam (`[Experimental]`) and the VFS contracts, tracked; the firmware clock and the timer and block device bases, ports internal |
+| `Cosmos.Kernel.HAL` | The driver kit seam (`[Experimental]`) and the VFS contracts, tracked; the firmware clock and the timer device base, ports internal |
 | `Cosmos.Kernel.Drivers` | The nineteen shipped driver classes, the two virtio transports, the E1000E, virtio-net, virtio-input, virtio-gpu, VMware SVGA II and virtio-blk state objects (the two display states with their kit facets, and the `VirtioBlkState` block device), the PCI Express root port state object, the AHCI and NVMe state objects with the `AhciPort` and `NvmeNamespace` block devices, the xHCI, hub, USB keyboard and mass storage state objects with the `UsbMassStorageUnit` block device, the 8042, PS/2 keyboard and PS/2 mouse state objects, and `ISvgaAdapter` (`[Experimental]`), tracked; a driver assembly held to the User layer |
 | `Cosmos.Kernel.Core` | The scheduler seam (`[Experimental]`) and nothing else, tracked |
 | Arch assemblies, Native, Plugs, Debug, Boot.Limine, `Cosmos.Kernel` | Internal, `InternalsVisibleTo` for first-party |

@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
 namespace Cosmos.Kernel.System.Storage;
@@ -30,9 +29,9 @@ public sealed class Partition : IBlockDevice
     public string Name => _name;
 
     /// <summary>
-    /// Index-based naming ctor: builds "&lt;host&gt;p&lt;index&gt;" digit by
-    /// digit so partition naming matches the device-naming convention and
-    /// stays safe if registration ever moves earlier in boot.
+    /// Index-based naming ctor: builds "&lt;host&gt;p&lt;index&gt;" with the
+    /// index formatted digit by digit, so naming stays safe if registration
+    /// ever moves earlier in boot.
     /// </summary>
     /// <param name="host">The disk this partition lives on.</param>
     /// <param name="startSector">Absolute LBA on the host where the partition begins.</param>
@@ -44,7 +43,7 @@ public sealed class Partition : IBlockDevice
     /// builds a partition view by hand names it instead.
     /// </remarks>
     internal Partition(IBlockDevice host, ulong startSector, ulong sectorCount, uint index)
-        : this(host, startSector, sectorCount, BlockDevice.BuildDeviceName(host.Name, "p", index))
+        : this(host, startSector, sectorCount, BuildName(host.Name, index))
     {
     }
 
@@ -102,5 +101,33 @@ public sealed class Partition : IBlockDevice
         {
             throw new ArgumentOutOfRangeException(nameof(blockNo), "Partition I/O extends beyond partition end.");
         }
+    }
+
+    /// <summary>Separator between the host name and the partition index ("sata0" + "p" + "1").</summary>
+    private const string PartitionInfix = "p";
+
+    /// <summary>Decimal digits in <see cref="uint.MaxValue"/> (4294967295), the longest index.</summary>
+    private const int MaxIndexDigits = 10;
+
+    /// <summary>Radix used when converting the index to its decimal digits.</summary>
+    private const uint DecimalBase = 10;
+
+    // Builds "<host>p<index>" without CoreLib int formatting (uint.ToString,
+    // "" + uint, $""), which reproducibly triple-faulted in device
+    // constructors that ran before the exception handlers and the late
+    // module initializers; the index is formatted by hand in case partition
+    // registration ever moves that early. The host name is copied whole.
+    private static string BuildName(string hostName, uint index)
+    {
+        Span<char> digits = stackalloc char[MaxIndexDigits];
+        int start = digits.Length;
+        do
+        {
+            digits[--start] = (char)('0' + index % DecimalBase);
+            index /= DecimalBase;
+        }
+        while (index != 0);
+
+        return string.Concat(hostName, PartitionInfix, new string(digits[start..]));
     }
 }
