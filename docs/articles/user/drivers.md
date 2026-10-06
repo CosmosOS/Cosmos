@@ -1135,47 +1135,48 @@ The snapshots are taken without locking, so a node that is being offered or torn
 
 ## Testing a driver over the synthetic bus
 
-The synthetic bus exists so that a driver's binding, arbitration, decline and removal behaviour can be tested with no hardware at all, in a test kernel, identically on both architectures. `SyntheticBus` has four members, all thread context:
+The synthetic bus lets you test a driver with no hardware. A test kernel publishes a fake node, the kit offers it to your driver as it would a real device, and the test plays the hardware's side. It behaves the same on x64 and ARM64.
+
+`SyntheticBus` has four members:
 
 | Member | What it does |
 |--------|--------------|
-| `Publish(key, data, interruptCount = 0, windowBytes = 0)` | Publishes a node at `synthetic:key`. `data` is a byte array the driver can read through the node's `SyntheticAccess`; `interruptCount` is how many sources the node has; `windowBytes` (up to one page) gives it a RAM-backed register window as resource 0. After the driver stage it returns once the node was offered; before it, it returns at once and the stage offers the node |
-| `Retract(node, hardwarePresent = false)` | Takes the node away; returns once its binding was torn down. `hardwarePresent` is what the driver's `DetachReason.HardwarePresent` says, false as for a hot-unplug by default |
-| `RaiseInterrupt(node, index)` | Runs the handler connected to that source in a synthetic dispatch, with interrupts masked and the guard on; returns `false` before the driver stage has run, when nothing is connected, or when the source is masked |
-| `WaitForQueuedJobs()` | Returns once every kit job queued before the call has run: a work item a handler scheduled, a teardown a driver queued. The hook for asserting after `RaiseInterrupt` |
+| `Publish(key, data, interruptCount, windowBytes)` | Publishes a node at `synthetic:key` with `interruptCount` interrupt sources and, when `windowBytes` is set, a RAM-backed register window of up to one page as resource 0. Returns once the node was offered |
+| `RaiseInterrupt(node, index)` | Runs the handler connected to that source, as a real interrupt would. Returns `false` when nothing is connected or the source is masked |
+| `WaitForQueuedJobs()` | Waits until every work item queued so far has run, so the test can check what it did |
+| `Retract(node, hardwarePresent)` | Removes the node and returns once the binding was torn down. `hardwarePresent` is what `OnDetach` sees; it defaults to `false`, a hot-unplug |
 
-The node's access object, `node.Access<SyntheticAccess>()`, is how the test sees the device from the other side: `Data` are the bytes it attached, `HasWindow` says whether resource 0 exists, and `Window` is the register window's memory as the test sees it, so a test can write what the driver's handler will read and read what the probe wrote. `Window` is empty once the node was retracted and the page released.
+The test sees the device through the node's `SyntheticAccess`: `Window` is the register window's memory, so the test writes what the driver will read and reads what the driver wrote.
 
-A test of the keyboard driver above, in a test kernel's `BeforeRun`:
+A test of the keyboard driver above:
 
 ```csharp
+// In the test kernel:
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Synthetic;
 using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.TestRunner.Framework;
 using MyOS.Drivers;
 
-// Publish: returns once the node was offered and bound.
+// In BeforeRun:
 DeviceNode node = SyntheticBus.Publish(SyntheticKeyboardDriver.Key, [], interruptCount: 1, windowBytes: 64);
-KeyboardState? state = node.Binding?.DriverState as KeyboardState;
 SyntheticAccess access = node.Access<SyntheticAccess>();
+Assert.Equal(KeyboardState.EnableBit, access.Window[KeyboardState.ControlOffset], "the probe should arm the device");
 
-// The probe armed the device through its window; the test sees the write.
-bool armed = access.Window[KeyboardState.ControlOffset] == KeyboardState.EnableBit;
-
-// Stage a key, raise the interrupt, wait for the work item it scheduled.
+// Play a key press: fill the registers, then raise the interrupt.
 access.Window[KeyboardState.ScanCodeOffset] = 0x1E;
 access.Window[KeyboardState.FlagsOffset] = 0;
-bool raised = SyntheticBus.RaiseInterrupt(node, 0);
-SyntheticBus.WaitForQueuedJobs();
+Assert.True(SyntheticBus.RaiseInterrupt(node, 0), "the handler should run");
+SyntheticBus.WaitForQueuedJobs();   // the work item the handler scheduled has run too
 
-// Retract: returns once the binding was torn down.
+// Unplug: the kit releases everything the probe acquired.
 int heldBefore = DriverInfo.GetTotalHeldResourceCount();
 SyntheticBus.Retract(node);
-bool released = DriverInfo.GetTotalHeldResourceCount() < heldBefore && access.Window.IsEmpty;
-bool stale = SyntheticBus.RaiseInterrupt(node, 0);   // false: nothing is connected any more
+Assert.True(DriverInfo.GetTotalHeldResourceCount() < heldBefore, "teardown should release the binding");
+Assert.False(SyntheticBus.RaiseInterrupt(node, 0), "nothing is connected any more");
 ```
 
-What such a test asserts, and where it reads it from, follows the Drivers suite: the node's state, driver and counts through `DriverInfo.TryGetNode`; the arbitration through `TryGetOffer`; what the handler and the work item did through the driver's own state object, reached through `node.Binding.DriverState`; and after a retraction, that the held total went back down, the window is empty, the driver saw `DetachCause.Retracted` in `OnDetach`, and a raise no longer runs the handler. A node published from the kernel's constructor, before the driver stage, covers the boot path; one published from a test, or a USB or PCI Express device plugged in, covers hot-plug. See [Testing](../dev/testing.md) for how a test kernel is built and run.
+Reach the driver's own state through `node.Binding.DriverState` to check what the handler did, and use `DriverInfo` (see [Observing drivers](#observing-drivers)) to check the node's state and offers. A node published in the kernel's constructor, before the driver stage, tests the boot path; one published in `BeforeRun` tests hot-plug. See [Testing](../dev/testing.md) for how to build and run a test kernel.
 
 ## Project settings
 
