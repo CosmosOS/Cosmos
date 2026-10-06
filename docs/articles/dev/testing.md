@@ -6,13 +6,13 @@ NativeAOT-Patcher has two complementary testing layers: **unit tests** that run 
 
 ## Unit Tests
 
-Unit tests live in the `tests/Cosmos.Tests.*` projects (xunit) and in `src/tests/Cosmos.Kernel.Tests.System` (NUnit), and are run with the standard .NET test runner. They do not require QEMU or any special infrastructure. CI runs each of them as its own job of the `.NET Tests` workflow (`.github/workflows/dotnet.yml`) on every push and pull request.
+Unit tests live in the `tests/Cosmos.Tests.*` projects (xunit) and in `tests/Cosmos.Kernel.Tests.System` (NUnit), and are run with the standard .NET test runner. They do not require QEMU or any special infrastructure. CI runs each of them as its own job of the `.NET Tests` workflow (`.github/workflows/dotnet.yml`) on every push and pull request.
 
 ### Running Unit Tests
 
 ```bash
 dotnet test tests/Cosmos.Tests.Patcher            # one toolchain project
-dotnet test src/tests/Cosmos.Kernel.Tests.System   # the kernel library tests
+dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
 ```
 
 ### Test Projects
@@ -430,6 +430,7 @@ tests/
 ├── Cosmos.TestRunner.Protocol/      # Shared protocol definitions
 │   ├── Consts.cs                    # Magic signature and constants
 │   └── Messages.cs                  # Typed message classes
+├── Cosmos.Kernel.Tests.System/      # Unit tests: Cosmos.Kernel.System (NUnit)
 ├── Cosmos.Tests.Build.Asm/          # Unit tests: Clang assembly build task
 ├── Cosmos.Tests.Build.Analyzer.Patcher/ # Unit tests: plug analyzer
 ├── Cosmos.Tests.Scanner/            # Unit tests: plug scanner
@@ -446,7 +447,7 @@ tests/
         └── Bootloader/limine.conf
 ```
 
-`src/tests/Cosmos.Kernel.Tests.System/` holds the host-side tests of `Cosmos.Kernel.System`. It sits under `src/` because it takes a project reference on the library and an `InternalsVisibleTo` grant from it.
+`tests/Cosmos.Kernel.Tests.System/` holds the host-side tests of `Cosmos.Kernel.System`. It takes a project reference on the library and an `InternalsVisibleTo` grant from it, and its folders mirror the library's (`Network/`, `Keyboard/`, `Filesystems/Ext2/`).
 
 ---
 

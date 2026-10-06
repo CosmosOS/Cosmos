@@ -6,7 +6,7 @@ using Cosmos.Kernel.System.Filesystems.Ext2;
 using Cosmos.Kernel.System.Vfs;
 using NUnit.Framework;
 
-namespace Cosmos.Kernel.Tests.System.Ext2;
+namespace Cosmos.Kernel.Tests.System.Filesystems.Ext2;
 
 internal sealed class MemoryBlockDevice : IBlockDevice
 {

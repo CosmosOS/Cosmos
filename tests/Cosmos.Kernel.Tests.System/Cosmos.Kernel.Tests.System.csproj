@@ -13,6 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Cosmos.Kernel.System\Cosmos.Kernel.System.csproj" />
+      <ProjectReference Include="..\..\src\Cosmos.Kernel.System\Cosmos.Kernel.System.csproj" />
     </ItemGroup>
 </Project>

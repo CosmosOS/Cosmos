@@ -976,7 +976,7 @@ Commented-out code is deleted; the history keeps it. A `TODO` names what is miss
 
 For the full testing guide (unit tests, kernel integration tests, UART protocol, CI, writing test kernels), see [Testing](testing.md).
 
-Logic that needs no hardware (`Tcp` receive-buffer arithmetic, address parsing) is unit-tested in the host process from `src/tests/Cosmos.Kernel.Tests.System` (NUnit): one nested fixture per member under test, named after it, test names of the form `WhenX_AndY_ResultZ`, and `[TestCase(..., ExpectedResult = ...)]` for value tables. The project holds an `InternalsVisibleTo` grant from `Cosmos.Kernel.System`.
+Logic that needs no hardware (`Tcp` receive-buffer arithmetic, address parsing) is unit-tested in the host process from `tests/Cosmos.Kernel.Tests.System` (NUnit): one nested fixture per member under test, named after it, test names of the form `WhenX_AndY_ResultZ`, and `[TestCase(..., ExpectedResult = ...)]` for value tables. The project holds an `InternalsVisibleTo` grant from `Cosmos.Kernel.System`.
 
 **Code coverage:** Add the `run-coverage` label to a PR to trigger the coverage CI. It runs the kernel test suites and outputs which code paths are covered by the integration tests.
 

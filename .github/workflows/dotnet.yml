@@ -201,20 +201,20 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: 🔄 Restore Dependencies
-        run: dotnet restore ./src/tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj
+        run: dotnet restore ./tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj
 
       - name: 🔨 Build Cosmos.Kernel.Tests.System
-        run: dotnet build ./src/tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj --configuration Debug --no-restore
+        run: dotnet build ./tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj --configuration Debug --no-restore
 
       - name: 🚀 Run Tests
-        run: dotnet test ./src/tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj --no-build --configuration Debug --logger "trx;LogFileName=Cosmos.Kernel.Tests.System.trx"
+        run: dotnet test ./tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj --no-build --configuration Debug --logger "trx;LogFileName=Cosmos.Kernel.Tests.System.trx"
 
       - name: 📤 Upload Test Results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Cosmos.Kernel.Tests.System-Results
-          path: ./src/tests/Cosmos.Kernel.Tests.System/TestResults/Cosmos.Kernel.Tests.System.trx
+          path: ./tests/Cosmos.Kernel.Tests.System/TestResults/Cosmos.Kernel.Tests.System.trx
 
   asm-tests:
     name: Run Cosmos.Build.Asm.Test
