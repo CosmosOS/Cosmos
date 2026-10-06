@@ -8,6 +8,7 @@
 using System.Buffers;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Network.Config;
+using Cosmos.Kernel.System.Timers;
 
 namespace Cosmos.Kernel.System.Network.TCP;
 
@@ -802,7 +803,7 @@ internal class Tcp : IDisposable
         int waited = 0;
         while (Status != status && waited < timeout)
         {
-            Timer.TimerManager.Wait(10);
+            TimerManager.Wait(10);
             waited += 10;
         }
         return Status == status;
@@ -815,7 +816,7 @@ internal class Tcp : IDisposable
     {
         while (Status != status)
         {
-            Timer.TimerManager.Wait(10);
+            TimerManager.Wait(10);
         }
         return true;
     }
@@ -828,7 +829,7 @@ internal class Tcp : IDisposable
         int waited = 0;
         while (Status == status && waited < timeout)
         {
-            Timer.TimerManager.Wait(10);
+            TimerManager.Wait(10);
             waited += 10;
         }
         return Status != status;

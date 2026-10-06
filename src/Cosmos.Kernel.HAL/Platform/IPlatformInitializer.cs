@@ -100,9 +100,10 @@ internal interface IPlatformInitializer
     void PublishPlatformNodes();
 
     /// <summary>
-    /// Creates and initializes the platform timer device.
+    /// Creates and initializes the platform timer device, or returns null when
+    /// timer support is compiled out (<c>CosmosEnableTimer</c>).
     /// </summary>
-    ITimerDevice CreateTimer();
+    TimerDevice? CreateTimer();
 
     /// <summary>
     /// Gets the number of CPUs detected on this platform.

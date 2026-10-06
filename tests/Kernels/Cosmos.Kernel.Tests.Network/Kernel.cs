@@ -12,7 +12,7 @@ using Cosmos.Kernel.System.Network.IPv4.DHCP;
 using Cosmos.Kernel.System.Network.IPv6;
 using Cosmos.Kernel.System.Network.TCP;
 using Cosmos.Kernel.System.Network.UDP;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using CosmosEndPoint = Cosmos.Kernel.System.Network.EndPoint;
 using CosmosUdpClient = Cosmos.Kernel.System.Network.UDP.UdpClient;

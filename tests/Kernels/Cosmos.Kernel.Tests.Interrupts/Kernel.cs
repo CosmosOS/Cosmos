@@ -8,7 +8,7 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Pci;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;

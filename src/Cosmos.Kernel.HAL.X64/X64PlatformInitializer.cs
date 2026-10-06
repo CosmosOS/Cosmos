@@ -173,14 +173,14 @@ internal class X64PlatformInitializer : IPlatformInitializer
         PlatformBus.Publish(identity, resources, interrupts, null);
     }
 
-    public ITimerDevice CreateTimer()
+    public TimerDevice? CreateTimer()
     {
         if (!CosmosFeatures.TimerEnabled)
         {
-            return null!;
+            return null;
         }
 
-        if (_pit == null)
+        if (_pit is null)
         {
             _pit = new PIT();
             _pit.Initialize();

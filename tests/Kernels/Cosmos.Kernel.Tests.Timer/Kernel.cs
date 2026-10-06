@@ -1,8 +1,7 @@
 using System;
 using System.Diagnostics;
-using Cosmos.Kernel.HAL.Platform;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using BclTimer = System.Threading.Timer;
 using Sys = Cosmos.Kernel.System;

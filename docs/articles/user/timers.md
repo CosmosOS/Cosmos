@@ -33,9 +33,8 @@ These are the `using`s the snippets below rely on:
 
 ```csharp
 using System;
-using Cosmos.Kernel.HAL.Platform;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 ```
 
 The timer device is found and registered at boot, so `TimerManager` is ready as soon as your kernel runs. `TimerManager.IsEnabled` answers the compile-time question and `TimerManager.IsInitialized` the runtime one.

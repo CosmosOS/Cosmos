@@ -3,7 +3,7 @@
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.HAL.Platform;
 
-namespace Cosmos.Kernel.System.Timer;
+namespace Cosmos.Kernel.System.Timers;
 
 /// <summary>
 /// Manages system timers.
@@ -13,7 +13,7 @@ public static class TimerManager
     /// <summary>Nanoseconds in one <see cref="TimeSpan"/> tick.</summary>
     private const ulong NanosecondsPerTick = 100;
 
-    private static ITimerDevice? s_timer;
+    private static TimerDevice? s_timer;
 
     /// <summary>
     /// Whether timer support is compiled into this kernel
@@ -31,7 +31,7 @@ public static class TimerManager
     /// <summary>
     /// Gets the registered timer device.
     /// </summary>
-    internal static ITimerDevice? Timer => s_timer;
+    internal static TimerDevice? Timer => s_timer;
 
     /// <summary>
     /// Throws when timer support is compiled out. Guards the two members that
@@ -54,7 +54,7 @@ public static class TimerManager
     /// <summary>
     /// Registers a timer device with the manager.
     /// </summary>
-    internal static void RegisterTimer(ITimerDevice timer)
+    internal static void RegisterTimer(TimerDevice? timer)
     {
         if (timer is null)
         {
@@ -171,7 +171,7 @@ public static class TimerManager
             return false;
         }
 
-        return s_timer.UnregisterTimer(timer);
+        return s_timer.UnregisterTimer(timer.Entry);
     }
 
     private static SoftwareTimer? ScheduleCore(Action callback, ulong timeoutNs, bool recurring)
@@ -181,13 +181,16 @@ public static class TimerManager
             return null;
         }
 
-        SoftwareTimer timer = new(callback, timeoutNs, recurring);
-        s_timer.RegisterTimer(timer);
+        // Both allocations come before the registration, so running out of
+        // memory cannot leave a registered entry with no handle to cancel it.
+        TimerEntry entry = new(callback, timeoutNs, recurring);
+        SoftwareTimer timer = new(entry);
+        s_timer.RegisterTimer(entry);
         return timer;
     }
 
     /// <summary>
-    /// Converts a duration to the nanoseconds a <see cref="SoftwareTimer"/>
+    /// Converts a duration to the nanoseconds a <see cref="TimerEntry"/>
     /// counts down. A non-positive duration becomes 0, which fires on the next
     /// device tick, and a duration too large to express in nanoseconds
     /// saturates rather than wrapping.

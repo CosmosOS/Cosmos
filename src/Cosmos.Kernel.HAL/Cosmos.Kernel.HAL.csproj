@@ -16,14 +16,14 @@
          the driver kit seam (COSMOS0003) and the contracts the ring hands
          out: IBlockDevice, the one device contract kernels really implement
          and drive (the Fat and File suites each supply a RAM disk, DevKernel
-         reads and writes blocks through it), MACAddress, which the packet
-         seam and NetworkManager both hand out, and SoftwareTimer as the
-         handle TimerManager.Schedule returns.
-         SoftwareTimer's construction and tick members stay internal: they
-         belong to the timer device, and a kernel calling them corrupts the
-         registry. The boot contract (IPlatformInitializer) and the timer
-         device are internal because no kernel can obtain or meaningfully
-         supply one. -->
+         reads and writes blocks through it), and MACAddress, which the
+         packet seam and NetworkManager both hand out.
+         The boot contract (IPlatformInitializer), the timer device and its
+         timer entries are internal because no kernel can obtain or
+         meaningfully supply one. The SoftwareTimer that TimerManager.Schedule
+         returns is the ring's own handle over an entry: TimerManager
+         constructs the entry, its tick members belong to the timer device,
+         and a kernel calling them corrupts the registry. -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
   <ItemGroup>
@@ -63,8 +63,9 @@
     <!-- System's managers install their kit consumers through the internal
          DeviceRegistry (keyboard, mouse, network, display, block) and build
          the keyboard manager's indicator work item; its library initializer
-         registers the platform timer, TimerManager constructs SoftwareTimer,
-         and the network stack reads MACAddress's internal bytes. -->
+         registers the platform timer, TimerManager constructs the TimerEntry
+         its SoftwareTimer handle wraps, and the network stack reads
+         MACAddress's internal bytes. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
     <!-- The aggregator reads PlatformHAL.Initializer from its library initializer. -->
     <InternalsVisibleTo Include="Cosmos.Kernel" />
@@ -78,9 +79,9 @@
          nodes' PciAccess (Interrupts), the PCI host's configuration
          mechanism and the nodes' PciAccess (Pci), the kit's tree behind
          the BAR relocation probes and PlatformHAL.Initializer's
-         EnsureMmioMapped for a high BAR (Storage), the TimerDevice base and
-         its software timers (Timer), the tree and the bindings' driver state
-         (Virtio). -->
+         EnsureMmioMapped for a high BAR (Storage), the TimerDevice base
+         behind PIT.Instance.Wait (Timer), the tree and the bindings' driver
+         state (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />

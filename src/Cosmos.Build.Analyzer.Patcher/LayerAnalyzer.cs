@@ -38,9 +38,9 @@ public class LayerAnalyzer : DiagnosticAnalyzer
 {
     /// <summary>
     /// The HAL assembly that carries the driver kit seam and the device contracts the ring
-    /// and the kit name in their public surface (<c>IBlockDevice</c>, <c>MACAddress</c>,
-    /// <c>SoftwareTimer</c>): a User layer project may name its types. The arch HAL
-    /// assemblies are reached through it only.
+    /// and the kit name in their public surface (<c>IBlockDevice</c>, <c>MACAddress</c>):
+    /// a User layer project may name its types. The arch HAL assemblies are reached
+    /// through it only.
     /// </summary>
     private const string DriverKitHostAssemblyName = "Cosmos.Kernel.HAL";
 

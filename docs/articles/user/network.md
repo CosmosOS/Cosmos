@@ -47,7 +47,7 @@ using Cosmos.Kernel.System.Network.Config;
 using Cosmos.Kernel.System.Network.DNS;
 using Cosmos.Kernel.System.Network.IPv4;
 using Cosmos.Kernel.System.Network.IPv4.DHCP;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 ```
 
 ## The network device

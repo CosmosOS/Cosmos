@@ -414,14 +414,14 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         return phys;
     }
 
-    public ITimerDevice CreateTimer()
+    public TimerDevice? CreateTimer()
     {
         if (!CosmosFeatures.TimerEnabled)
         {
-            return null!;
+            return null;
         }
 
-        if (_timer == null)
+        if (_timer is null)
         {
             _timer = new GenericTimer();
             _timer.Initialize();

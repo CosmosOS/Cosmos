@@ -7,7 +7,7 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 using Cosmos.Kernel.Core.Memory.Heap;
 using Cosmos.Kernel.Core.Runtime.GcInfo;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using CoreGC = Cosmos.Kernel.Core.Memory.GarbageCollector.GarbageCollector;
 using Sys = Cosmos.Kernel.System;

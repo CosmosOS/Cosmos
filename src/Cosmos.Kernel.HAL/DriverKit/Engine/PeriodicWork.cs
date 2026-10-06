@@ -14,22 +14,22 @@ internal sealed class PeriodicWork
 {
     private const ulong NanosecondsPerMillisecond = 1_000_000;
 
-    private readonly ITimerDevice _timer;
-    private readonly SoftwareTimer _softwareTimer;
+    private readonly TimerDevice _timer;
+    private readonly TimerEntry _entry;
     private readonly WorkItem _item;
 
-    internal PeriodicWork(ITimerDevice timer, WorkItem item, uint intervalMilliseconds)
+    internal PeriodicWork(TimerDevice timer, WorkItem item, uint intervalMilliseconds)
     {
         _timer = timer;
         _item = item;
-        _softwareTimer = new SoftwareTimer(Fire, intervalMilliseconds * NanosecondsPerMillisecond, recurring: true);
+        _entry = new TimerEntry(Fire, intervalMilliseconds * NanosecondsPerMillisecond, recurring: true);
     }
 
     /// <summary>Registers the timer; the first firing is one interval away.</summary>
-    internal void Start() => _timer.RegisterTimer(_softwareTimer);
+    internal void Start() => _timer.RegisterTimer(_entry);
 
     /// <summary>Unregisters the timer. Teardown only.</summary>
-    internal void Cancel() => _timer.UnregisterTimer(_softwareTimer);
+    internal void Cancel() => _timer.UnregisterTimer(_entry);
 
     private void Fire() => _item.Schedule();
 }

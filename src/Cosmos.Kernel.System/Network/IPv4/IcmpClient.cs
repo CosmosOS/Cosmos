@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 
 namespace Cosmos.Kernel.System.Network.IPv4;
 

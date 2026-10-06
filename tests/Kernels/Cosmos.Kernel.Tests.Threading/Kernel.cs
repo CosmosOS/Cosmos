@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using Monitor = System.Threading.Monitor;

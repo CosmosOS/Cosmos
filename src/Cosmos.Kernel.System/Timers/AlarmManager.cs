@@ -2,7 +2,7 @@
 
 using Cosmos.Kernel.Core.Scheduler;
 
-namespace Cosmos.Kernel.System.Timer;
+namespace Cosmos.Kernel.System.Timers;
 
 /// <summary>
 /// Runs callbacks after a delay on a dedicated kernel thread. Alarm callbacks

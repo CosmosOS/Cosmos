@@ -334,7 +334,7 @@ public sealed unsafe partial class DeviceBinding
             return false;
         }
 
-        ITimerDevice? timer = PlatformHAL.Initializer?.CreateTimer();
+        TimerDevice? timer = PlatformHAL.Initializer?.CreateTimer();
         if (timer is null)
         {
             return false;

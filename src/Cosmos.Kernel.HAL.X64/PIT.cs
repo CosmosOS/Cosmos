@@ -186,7 +186,7 @@ internal class PIT : TimerDevice
     /// Registers a software timer and reprograms channel 0 to ensure the tick is running.
     /// </summary>
     /// <param name="timer">Timer to register.</param>
-    public override void RegisterTimer(SoftwareTimer timer)
+    public override void RegisterTimer(TimerEntry timer)
     {
         base.RegisterTimer(timer);
         T0Countdown = _t0Countdown;

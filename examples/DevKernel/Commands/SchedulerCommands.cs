@@ -1,7 +1,6 @@
 using System;
-using Cosmos.Kernel.HAL.Platform;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using DevKernel.Diagnostics;
 using DevKernel.Shell;
 using SysThread = System.Threading.Thread;

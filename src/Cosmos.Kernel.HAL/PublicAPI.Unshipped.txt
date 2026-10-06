@@ -12,10 +12,6 @@ Cosmos.Kernel.HAL.Devices.MACAddress.Equals(Cosmos.Kernel.HAL.Devices.MACAddress
 Cosmos.Kernel.HAL.Devices.MACAddress.MACAddress(byte[]! address) -> void
 Cosmos.Kernel.HAL.Devices.MACAddress.MACAddress(byte[]! buffer, int offset) -> void
 Cosmos.Kernel.HAL.Devices.MACAddress.MACAddress(Cosmos.Kernel.HAL.Devices.MACAddress! m) -> void
-Cosmos.Kernel.HAL.Platform.SoftwareTimer
-Cosmos.Kernel.HAL.Platform.SoftwareTimer.IsActive.get -> bool
-Cosmos.Kernel.HAL.Platform.SoftwareTimer.Recurring.get -> bool
-Cosmos.Kernel.HAL.Platform.SoftwareTimer.TimeoutNs.get -> ulong
 override Cosmos.Kernel.HAL.Devices.MACAddress.Equals(object? obj) -> bool
 override Cosmos.Kernel.HAL.Devices.MACAddress.GetHashCode() -> int
 override Cosmos.Kernel.HAL.Devices.MACAddress.ToString() -> string!

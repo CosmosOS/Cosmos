@@ -8,12 +8,12 @@ namespace Cosmos.Kernel.HAL.Platform;
 /// Abstract base class for all timer devices. Maintains the software timer
 /// registry that is advanced on each hardware tick of the device.
 /// </summary>
-internal abstract class TimerDevice : ITimerDevice
+internal abstract class TimerDevice
 {
     /// <summary>Nanoseconds in one millisecond.</summary>
     protected const ulong NanosecondsPerMillisecond = 1_000_000;
 
-    private readonly List<SoftwareTimer> _timers = [];
+    private readonly List<TimerEntry> _timers = [];
 
     /// <summary>
     /// Timers found due by the current <see cref="HandleTick"/>, so their
@@ -22,7 +22,7 @@ internal abstract class TimerDevice : ITimerDevice
     /// one tick can find every registered timer due and the tick path must not
     /// allocate.
     /// </summary>
-    private SoftwareTimer?[] _dueTimers = new SoftwareTimer?[4];
+    private TimerEntry?[] _dueTimers = new TimerEntry?[4];
 
     /// <summary>
     /// Event handler for timer tick events.
@@ -40,7 +40,8 @@ internal abstract class TimerDevice : ITimerDevice
     public abstract uint Frequency { get; }
 
     /// <summary>
-    /// Sets the timer frequency in Hz.
+    /// Sets the timer frequency in Hz. Devices divide a fixed input clock, so
+    /// each has a range it can express and rejects the rest.
     /// </summary>
     /// <param name="frequency">Frequency in Hz.</param>
     /// <returns>
@@ -54,9 +55,9 @@ internal abstract class TimerDevice : ITimerDevice
     /// The timer's callback runs in interrupt context and must not block.
     /// </summary>
     /// <param name="timer">Timer to register.</param>
-    public virtual void RegisterTimer(SoftwareTimer timer)
+    public virtual void RegisterTimer(TimerEntry timer)
     {
-        if (timer is null || timer.IsActive)
+        if (timer.IsActive)
         {
             return;
         }
@@ -65,7 +66,7 @@ internal abstract class TimerDevice : ITimerDevice
         {
             if (_dueTimers.Length <= _timers.Count)
             {
-                _dueTimers = new SoftwareTimer?[(_timers.Count + 1) * 2];
+                _dueTimers = new TimerEntry?[(_timers.Count + 1) * 2];
             }
 
             timer.SetActive(true);
@@ -79,15 +80,10 @@ internal abstract class TimerDevice : ITimerDevice
     /// <param name="timer">Timer to unregister.</param>
     /// <returns>
     /// True when the timer was registered and has been removed; false when it
-    /// is null, had already fired, or was already unregistered.
+    /// had already fired or was already unregistered.
     /// </returns>
-    public virtual bool UnregisterTimer(SoftwareTimer timer)
+    public virtual bool UnregisterTimer(TimerEntry timer)
     {
-        if (timer is null)
-        {
-            return false;
-        }
-
         using (InternalCpu.DisableInterruptsScope())
         {
             // ReferenceEquals scan (not List.Remove) to match the kernel
@@ -121,7 +117,7 @@ internal abstract class TimerDevice : ITimerDevice
 
         for (int i = _timers.Count - 1; i >= 0 && dueCount < _dueTimers.Length; i--)
         {
-            SoftwareTimer timer = _timers[i];
+            TimerEntry timer = _timers[i];
 
             if (!timer.Tick(elapsedNs))
             {
@@ -139,7 +135,7 @@ internal abstract class TimerDevice : ITimerDevice
 
         for (int i = 0; i < dueCount; i++)
         {
-            SoftwareTimer? timer = _dueTimers[i];
+            TimerEntry? timer = _dueTimers[i];
             _dueTimers[i] = null;
 
             // A recurring timer that an earlier callback in this batch
@@ -163,7 +159,7 @@ internal abstract class TimerDevice : ITimerDevice
     /// <param name="ms">Milliseconds to wait.</param>
     public virtual void Wait(uint ms)
     {
-        SoftwareTimer timer = new(static () => { }, ms * NanosecondsPerMillisecond, recurring: false);
+        TimerEntry timer = new(static () => { }, ms * NanosecondsPerMillisecond, recurring: false);
         RegisterTimer(timer);
 
         while (timer.IsActive)

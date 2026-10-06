@@ -779,8 +779,12 @@ Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation.PartitionLocatio
 Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation.SectorCount.get -> ulong
 Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation.StartSector.get -> ulong
 Cosmos.Kernel.System.Storage.StorageManager
-Cosmos.Kernel.System.Timer.AlarmManager
-Cosmos.Kernel.System.Timer.TimerManager
+Cosmos.Kernel.System.Timers.AlarmManager
+Cosmos.Kernel.System.Timers.SoftwareTimer
+Cosmos.Kernel.System.Timers.SoftwareTimer.IsActive.get -> bool
+Cosmos.Kernel.System.Timers.SoftwareTimer.Recurring.get -> bool
+Cosmos.Kernel.System.Timers.SoftwareTimer.TimeoutNs.get -> ulong
+Cosmos.Kernel.System.Timers.TimerManager
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetAdvance(char c) -> int
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetLineHeight() -> int
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetMaxAdvance() -> int
@@ -1011,17 +1015,17 @@ static Cosmos.Kernel.System.Storage.StorageManager.Partitions.get -> System.Coll
 static Cosmos.Kernel.System.Storage.StorageManager.PrimaryDevice.get -> Cosmos.Kernel.HAL.Devices.IBlockDevice?
 static Cosmos.Kernel.System.Storage.StorageManager.RegisterDevice(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
 static Cosmos.Kernel.System.Storage.StorageManager.RescanPartitions(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
-static Cosmos.Kernel.System.Timer.AlarmManager.Cancel(ulong id) -> bool
-static Cosmos.Kernel.System.Timer.AlarmManager.Schedule(System.Action! callback, System.TimeSpan delay) -> ulong
-static Cosmos.Kernel.System.Timer.AlarmManager.ScheduleRecurring(System.Action! callback, System.TimeSpan period) -> ulong
-static Cosmos.Kernel.System.Timer.TimerManager.Cancel(Cosmos.Kernel.HAL.Platform.SoftwareTimer? timer) -> bool
-static Cosmos.Kernel.System.Timer.TimerManager.Frequency.get -> uint
-static Cosmos.Kernel.System.Timer.TimerManager.Frequency.set -> void
-static Cosmos.Kernel.System.Timer.TimerManager.IsEnabled.get -> bool
-static Cosmos.Kernel.System.Timer.TimerManager.IsInitialized.get -> bool
-static Cosmos.Kernel.System.Timer.TimerManager.Schedule(System.Action! callback, System.TimeSpan delay) -> Cosmos.Kernel.HAL.Platform.SoftwareTimer?
-static Cosmos.Kernel.System.Timer.TimerManager.ScheduleRecurring(System.Action! callback, System.TimeSpan period) -> Cosmos.Kernel.HAL.Platform.SoftwareTimer?
-static Cosmos.Kernel.System.Timer.TimerManager.Wait(uint ms) -> void
+static Cosmos.Kernel.System.Timers.AlarmManager.Cancel(ulong id) -> bool
+static Cosmos.Kernel.System.Timers.AlarmManager.Schedule(System.Action! callback, System.TimeSpan delay) -> ulong
+static Cosmos.Kernel.System.Timers.AlarmManager.ScheduleRecurring(System.Action! callback, System.TimeSpan period) -> ulong
+static Cosmos.Kernel.System.Timers.TimerManager.Cancel(Cosmos.Kernel.System.Timers.SoftwareTimer? timer) -> bool
+static Cosmos.Kernel.System.Timers.TimerManager.Frequency.get -> uint
+static Cosmos.Kernel.System.Timers.TimerManager.Frequency.set -> void
+static Cosmos.Kernel.System.Timers.TimerManager.IsEnabled.get -> bool
+static Cosmos.Kernel.System.Timers.TimerManager.IsInitialized.get -> bool
+static Cosmos.Kernel.System.Timers.TimerManager.Schedule(System.Action! callback, System.TimeSpan delay) -> Cosmos.Kernel.System.Timers.SoftwareTimer?
+static Cosmos.Kernel.System.Timers.TimerManager.ScheduleRecurring(System.Action! callback, System.TimeSpan period) -> Cosmos.Kernel.System.Timers.SoftwareTimer?
+static Cosmos.Kernel.System.Timers.TimerManager.Wait(uint ms) -> void
 static readonly Cosmos.Kernel.System.Network.IPv4.Address4.Zero -> Cosmos.Kernel.System.Network.IPv4.Address4!
 static readonly Cosmos.Kernel.System.Network.IPv6.Address6.Loopback -> Cosmos.Kernel.System.Network.IPv6.Address6!
 static readonly Cosmos.Kernel.System.Network.IPv6.Address6.Zero -> Cosmos.Kernel.System.Network.IPv6.Address6!

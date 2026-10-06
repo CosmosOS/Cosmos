@@ -9,7 +9,7 @@ using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Input;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Storage;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 
 namespace Internal.Runtime.CompilerHelpers;
 

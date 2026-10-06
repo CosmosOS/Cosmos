@@ -3,29 +3,33 @@
 namespace Cosmos.Kernel.HAL.Platform;
 
 /// <summary>
-/// A software timer that invokes a callback after a delay, driven by the
-/// periodic tick of the timer device it is registered with. Callbacks run
-/// in interrupt context: they must not block, and an exception escaping one
-/// halts the kernel, because the interrupt dispatch has no handler above it.
+/// An entry in a timer device's software timer registry: a countdown that
+/// invokes a callback after a delay, driven by the periodic tick of the timer
+/// device it is registered with. Callbacks run in interrupt context: they must
+/// not block, and an exception escaping one halts the kernel, because the
+/// interrupt dispatch has no handler above it.
 /// </summary>
 /// <remarks>
-/// A kernel obtains one from TimerManager.Schedule or ScheduleRecurring and
-/// passes it back to TimerManager.Cancel. Creating one and driving its tick
-/// state belongs to the timer device, so those members are internal.
+/// A kernel never sees an entry. TimerManager.Schedule and ScheduleRecurring
+/// create one and hand back the ring's SoftwareTimer handle in
+/// Cosmos.Kernel.System.Timers, which wraps it, and TimerManager.Cancel
+/// unregisters the entry behind that handle. <c>PeriodicWork</c> and
+/// <see cref="TimerDevice.Wait"/> create and register entries directly.
+/// Only the timer device drives its tick state (SetActive, Tick and Invoke).
 /// </remarks>
-public sealed class SoftwareTimer
+internal sealed class TimerEntry
 {
     private readonly Action _callback;
     private ulong _remainingNs;
     private volatile bool _active;
 
     /// <summary>
-    /// Initializes a new software timer with the specified callback and delay.
+    /// Initializes a new timer entry with the specified callback and delay.
     /// </summary>
     /// <param name="callback">The method to invoke when the timer fires.</param>
     /// <param name="timeoutNs">The delay before the timer fires, in nanoseconds. For recurring timers, the period between firings.</param>
     /// <param name="recurring">Whether the timer reloads after firing, or fires only once.</param>
-    internal SoftwareTimer(Action callback, ulong timeoutNs, bool recurring)
+    internal TimerEntry(Action callback, ulong timeoutNs, bool recurring)
     {
         _callback = callback;
         TimeoutNs = timeoutNs;

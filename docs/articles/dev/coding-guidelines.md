@@ -28,7 +28,7 @@ This document establishes the coding style and architecture patterns for Cosmos 
 
 ### Layer Dependency Rules
 
-The project is split into strict layers. Dependencies flow **downward only**. These rules are **enforced at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which judges a project on the types and members its code names, not on the reference list restore builds, and reports each assembly used across a boundary once, at its first use. A user kernel, and a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, see [Public API Tracking](public-api.md)), may also name what `Cosmos.Kernel.HAL` offers: the driver kit seam and the device contracts (`IBlockDevice`, `MACAddress`, `SoftwareTimer`).
+The project is split into strict layers. Dependencies flow **downward only**. These rules are **enforced at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which judges a project on the types and members its code names, not on the reference list restore builds, and reports each assembly used across a boundary once, at its first use. A user kernel, and a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, see [Public API Tracking](public-api.md)), may also name what `Cosmos.Kernel.HAL` offers: the driver kit seam and the device contracts (`IBlockDevice`, `MACAddress`).
 
 ```
 User Kernel (DevKernel, test kernels)
@@ -243,11 +243,11 @@ Use a `static class`. Managers coordinate subsystem state without requiring an i
 // Simple manager: no underlying instance to expose
 public static class TimerManager
 {
-    private static ITimerDevice? s_timer;
+    private static TimerDevice? s_timer;
 
     public static bool IsInitialized => s_timer is not null;
 
-    internal static void RegisterTimer(ITimerDevice timer) { ... }
+    internal static void RegisterTimer(TimerDevice timer) { ... }
     public static void Wait(uint ms) { ... }
 }
 
@@ -409,7 +409,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
     public IPortIO CreatePortIO() => new X64PortIO();
     public ICpuOps CreateCpuOps() => new X64CpuOps();
     public IInterruptController CreateInterruptController() => new X64InterruptController();
-    public ITimerDevice CreateTimer() => new PIT();
+    public TimerDevice CreateTimer() => new PIT();
     public void PublishPlatformNodes() { /* the 8042 and the PCI host, with their port ranges and lines */ }
     public uint GetCpuCount() => /* ACPI/MADT */ 1;
 
@@ -1008,7 +1008,7 @@ Logic that needs no hardware (`Tcp` receive-buffer arithmetic, address parsing) 
 
 Three rules decide what is `public` (the full policy and its mechanisms live in [Public API Tracking](public-api.md)):
 
-1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types its signatures expose (the HAL's device contracts `IBlockDevice`, `MACAddress` and `SoftwareTimer`, Core's platform interfaces). Only that surface is tracked, documented, and covered by deprecation cycles.
+1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types its signatures expose (the HAL's device contracts `IBlockDevice` and `MACAddress`, Core's platform interfaces). Only that surface is tracked, documented, and covered by deprecation cycles.
 2. **Chosen experimental seams.** An extension point outside the ring is opened deliberately and marked `[Experimental("COSMOSxxxx")]`: usable now, no compatibility promise, promoted by removing the attribute. Never open a seam by just making something public.
 3. **Everything else is `internal`.** Visibility is not the extension mechanism. First-party assemblies and white-box test kernels use `InternalsVisibleTo`; external code uses `[UnsafeAccessor]` ([Accessing internals](accessing-internals.md)) at its own risk.
 
