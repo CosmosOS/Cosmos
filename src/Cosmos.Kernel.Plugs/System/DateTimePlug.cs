@@ -1,9 +1,9 @@
 using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.System;
 #if ARCH_X64
-using Cosmos.Kernel.HAL.X64.Devices.Clock;
+using Cosmos.Kernel.HAL.X64;
 #elif ARCH_ARM64
-using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
+using Cosmos.Kernel.HAL.ARM64;
 #endif
 
 namespace Cosmos.Kernel.Plugs.System;

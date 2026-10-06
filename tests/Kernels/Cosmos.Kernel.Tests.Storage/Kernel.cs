@@ -8,7 +8,6 @@ using Cosmos.Kernel.Drivers.Pci.Storage.Nvme;
 using Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage;
 using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.HAL.Pci;
 using Cosmos.Kernel.HAL.Pci.Enums;

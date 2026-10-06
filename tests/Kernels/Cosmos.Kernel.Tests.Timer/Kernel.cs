@@ -9,10 +9,9 @@ using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
 #if ARCH_X64
 using Cosmos.Kernel.Core.X64.Cpu;
-using Cosmos.Kernel.HAL.X64.Devices.Clock;
-using Cosmos.Kernel.HAL.X64.Devices.Timer;
+using Cosmos.Kernel.HAL.X64;
 #else
-using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
+using Cosmos.Kernel.HAL.ARM64;
 #endif
 
 namespace Cosmos.Kernel.Tests.Timer;

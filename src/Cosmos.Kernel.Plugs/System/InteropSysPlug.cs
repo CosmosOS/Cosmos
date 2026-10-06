@@ -9,9 +9,9 @@ using Cosmos.Kernel.System.Diagnostics;
 using Monitor = Cosmos.Kernel.Core.Scheduler.Monitor;
 using System.Runtime.InteropServices;
 #if ARCH_X64
-using Cosmos.Kernel.HAL.X64.Devices.Clock;
+using Cosmos.Kernel.HAL.X64;
 #elif ARCH_ARM64
-using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
+using Cosmos.Kernel.HAL.ARM64;
 #endif
 
 

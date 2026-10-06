@@ -4,10 +4,9 @@ using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.ARM64.Cpu;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
-using Cosmos.Kernel.HAL.Devices.Clock;
+using Cosmos.Kernel.HAL.Firmware;
 
-namespace Cosmos.Kernel.HAL.ARM64.Devices.Clock;
+namespace Cosmos.Kernel.HAL.ARM64;
 
 /// <summary>
 /// ARM64 Real-Time Clock implementation.

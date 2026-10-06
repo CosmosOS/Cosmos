@@ -4,9 +4,9 @@ using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.X64.Cpu;
-using Cosmos.Kernel.HAL.Devices.Clock;
+using Cosmos.Kernel.HAL.Firmware;
 
-namespace Cosmos.Kernel.HAL.X64.Devices.Clock;
+namespace Cosmos.Kernel.HAL.X64;
 
 /// <summary>
 /// CMOS Real-Time Clock (RTC) device for x64.

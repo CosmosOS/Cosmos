@@ -2,7 +2,7 @@
 
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
-namespace Cosmos.Kernel.HAL.Devices.Storage;
+namespace Cosmos.Kernel.HAL;
 
 /// <summary>
 /// Abstract base class for all block storage devices.

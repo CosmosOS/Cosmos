@@ -14,8 +14,6 @@ using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Platform;
 using Cosmos.Kernel.HAL.Interfaces;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.HAL.X64.Devices.Clock;
-using Cosmos.Kernel.HAL.X64.Devices.Timer;
 
 namespace Cosmos.Kernel.HAL.X64;
 

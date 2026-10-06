@@ -3,7 +3,7 @@
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
 
-namespace Cosmos.Kernel.HAL.Devices.Timer;
+namespace Cosmos.Kernel.HAL;
 
 /// <summary>
 /// Abstract base class for all timer devices. Maintains the software timer

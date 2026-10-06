@@ -5,7 +5,7 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.IO;
 
-namespace Cosmos.Kernel.HAL.Devices.Clock;
+namespace Cosmos.Kernel.HAL.Firmware;
 
 /// <summary>
 /// Shared helper for reading wall-clock time via EFI Runtime Services GetTime().
