@@ -15,6 +15,6 @@ Local changes:
   against the PNG specification in `PngOpener.ReadImageHeader`.
 - All types are `internal`; the public API is the `Png` image class
   (namespace `Cosmos.Kernel.System.Graphics`) defined in
-  `src/Cosmos.Kernel.System/Graphics/Images/Png.cs`, one directory up.
+  `src/Cosmos.Kernel.System/Graphics/Png.cs`, two directories up.
 
 See `docs/credits.md` for the full third-party list.

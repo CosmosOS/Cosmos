@@ -59,7 +59,7 @@ Some core naming rules are enforced by `.editorconfig`; the table below document
 
 | Element | Convention | Example |
 |---------|-----------|---------|
-| Namespace | `Cosmos.Kernel.{Layer}.{Category}` | `Cosmos.Kernel.Core.Scheduler` |
+| Namespace | `Cosmos.Kernel.{Layer}.{Category}` (the project, then its folders) | `Cosmos.Kernel.Core.Scheduler` |
 | Public class/struct | PascalCase | `GarbageCollector`, `Thread` |
 | Interface | `I` + PascalCase | `IScheduler`, `IPlatformInitializer` |
 | Public method/property | PascalCase | `InitializeStack()`, `StackPointer` |
@@ -136,6 +136,26 @@ These are conditionally compiled via `.csproj`:
 ```
 
 This is only allowed now in `Cosmos.Kernel.Core` but this may change in the future.
+
+### Namespaces Follow Folders
+
+A file's namespace is its project's name followed by the folders between
+the project and the file: `Cosmos.Kernel.Core/Scheduler/SchedulerThread.cs`
+declares `Cosmos.Kernel.Core.Scheduler`. The build enforces it with IDE0130
+at error for every `src/Cosmos.Kernel*` project, the test kernels and
+`examples/DevKernel`, so `dotnet build` fails on a file that drifts (the
+format CI checks the projects in `nativeaot-patcher.slnx`, which leaves out
+the test kernels). Move the file or fix the namespace rather than adding an
+exemption. The exemptions, each with its reason, close `.editorconfig`:
+names ILC matches by full name (each `LibraryInitializer`,
+`EagerStaticClassConstructionAttribute`, `Core/Runtime/Stdllib.cs`), the
+source generators' `IsExternalInit` (the C# compiler's init-accessor
+marker, which must live in `System.Runtime.CompilerServices`), the
+`Bridge/Import` and `Bridge/Export` folders, whose files share the
+project's `Bridge` namespace, and vendored code. IDE0130 does not check a
+namespace holding a partial type split across files (every
+`[LibraryImport]` class) or a nested namespace; those follow the rule
+unchecked.
 
 ### Driver Folders
 

@@ -295,3 +295,50 @@ dotnet_diagnostic.RS0017.severity = none
 [**/KernelVersion.g.cs]
 dotnet_diagnostic.RS0016.severity = none
 dotnet_diagnostic.RS0017.severity = none
+
+# Namespaces follow folders (IDE0130): a file declares its project's name
+# (every RootNamespace is the project name) followed by the folders between
+# the project and the file. Error, so `dotnet build` fails on a file that
+# drifts, and so does the format CI for the projects nativeaot-patcher.slnx
+# lists (not the test kernels). IDE0130 does not see generated code (the
+# generated_code sections above), files linked from outside the project, a
+# namespace nested in or containing another, or a namespace holding a partial
+# type declared in more than one file, such as a [LibraryImport] class; it
+# compares ignoring case. The exemptions below must come after this section
+# (later sections win).
+[{src/Cosmos.Kernel*,tests/Kernels,examples}/**.cs]
+dotnet_style_namespace_match_folder = true
+dotnet_diagnostic.IDE0130.severity = error
+
+# ILC finds these by full name, so their namespaces cannot follow a folder:
+# each library's Internal.Runtime.CompilerHelpers.LibraryInitializer
+# (LibraryInitializers.cs), System.Runtime.CompilerServices.
+# EagerStaticClassConstructionAttribute (PreinitializationManager.cs), and
+# the System.Runtime attributes and IntrinsicAttribute in Stdllib.cs. The
+# source generators' IsExternalInit is the C# compiler's init-accessor marker.
+[src/Cosmos.Kernel*/Internal/Runtime/CompilerHelpers/LibraryInitializer.cs]
+dotnet_diagnostic.IDE0130.severity = none
+
+[src/Cosmos.Kernel.{HAL.X64,HAL.ARM64}/EagerStaticClassConstructionAttribute.cs]
+dotnet_diagnostic.IDE0130.severity = none
+
+[src/Cosmos.Kernel.Core/Runtime/Stdllib.cs]
+dotnet_diagnostic.IDE0130.severity = none
+
+[src/Cosmos.Kernel.SourceGenerators/IsExternalInit.cs]
+dotnet_diagnostic.IDE0130.severity = none
+
+# A bridge's direction is a folder, not a namespace: Bridge/Import (native
+# imports) and Bridge/Export (managed exports) share the project's Bridge
+# namespace. Bridge/Interop has a namespace of its own and stays checked.
+[src/Cosmos.Kernel.{Core,Core.X64,Core.ARM64}/Bridge/{Import,Export}/**.cs]
+dotnet_diagnostic.IDE0130.severity = none
+
+# Vendored code and the dotnet/runtime mirrors keep their upstream namespaces.
+# SharpZipLib, BigGustave and Runtime/Internal are already generated_code;
+# listing them here keeps them exempt if that ever changes.
+[src/Cosmos.Kernel.System/{IO/Compression/SharpZipLib,Graphics/Images/BigGustave,Graphics/Fonts/TrueType/LunarFonts}/**.cs]
+dotnet_diagnostic.IDE0130.severity = none
+
+[src/Cosmos.Kernel.Core/Runtime/Internal/**.cs]
+dotnet_diagnostic.IDE0130.severity = none
