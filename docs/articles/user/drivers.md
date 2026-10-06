@@ -46,6 +46,21 @@ The kit is built on five concepts:
 
 When a node appears, the kit offers it to each matching driver in turn until one returns `ProbeResult.Bound`; whatever a declining driver acquired is released. When the node goes away, the kit tears the binding down for you: devices are withdrawn first, memory is freed last.
 
+```mermaid
+flowchart TD
+    Bus["Bus or bus driver"] -->|"publishes"| Node["Node (DeviceNode)<br/>identity, resources, interrupts"]
+    Node -->|"matched against every driver's Matches"| Candidates["Candidate drivers<br/>ordered by Priority, then specificity"]
+    Candidates -->|"offers the node with a new binding"| Probe["Driver.Probe(binding)"]
+    Probe -->|"Declined or Failed"| Release["The kit releases what the probe acquired"]
+    Release -->|"next candidate"| Probe
+    Release -->|"no candidate left"| Unbound["Node stays unbound"]
+    Probe -->|"Bound"| Binding["Binding (DeviceBinding)<br/>registers, DMA, interrupts, work items, threads"]
+    Binding -->|"PublishKeyboard, PublishNetwork, ..."| Device["Device<br/>IKeyboard, INetworkInterface, ..."]
+    Device -->|"consumed by"| Manager["Kernel manager<br/>KeyboardManager, NetworkManager, ..."]
+    Binding -->|"PublishChild (bus drivers)"| Node
+    Binding -.->|"node removed"| Teardown["Teardown: withdraw devices, disconnect interrupts,<br/>OnDetach, free memory"]
+```
+
 The smallest driver that compiles and binds:
 
 ```csharp
@@ -748,202 +763,134 @@ A function behind a PCI Express hot-plug slot is published when a device is plug
 
 ## Virtio devices
 
-A virtio node is what a transport driver publishes for one virtio device, whichever transport carries it: an identity naming the transport and the device type, no resources, nine interrupt sources, and a `VirtioAccess` that runs the status handshake, the feature negotiation, the virtqueues and the device configuration space once, in the kit, over the transport's registers. A leaf driver such as the shipped `VirtioNetDriver` sees only the access and cannot tell PCI from MMIO; the transport drivers are described [below](#the-transport-drivers), and the snippets in this section are the net driver's steps.
+A virtio node is one virtio device, published by a transport driver over PCI or MMIO. It has no resources, nine interrupt sources and a `VirtioAccess` that speaks the virtio protocol, so a driver works the same over both transports. The shipped `VirtioNetDriver` is a good model, and the samples below are its steps.
 
 ### Virtio identity and match
 
-`VirtioIdentity(transport, transportAddress, deviceType)` is what a transport driver builds: `Transport` is `pci` or `mmio`, `TransportAddress` the transport's own address for the device (a function address, a slot base in hexadecimal) and `DeviceType` a `VirtioDeviceType`, the device ids of the virtio specification (`Network` 1, `Block` 2, `Console` 3, `Entropy` 4, `Balloon` 5, `Scsi` 8, `Gpu` 16, `Input` 18, `Socket` 19, `Crypto` 20, `Sound` 25, `FileSystem` 26; a value outside the list is a type the kit has no name for). `BusName` is `virtio` and `Address` is the transport and its address joined with a colon, so the path is `virtio:pci:0000:00:02.0` or `virtio:mmio:a003e00`: the transport is visible in the path and invisible to the driver. `Describe()` prints `type 1 (network)`, or `type 42 (unknown)` for a type without a name, which is what `DeviceNodeInfo.Description` shows for the node.
-
-`VirtioMatch` has two shapes: `VirtioMatch.DeviceType(type)` matches every virtio device of that type on any transport (specificity 1), and `VirtioMatch.Any()` matches every virtio device (specificity 0). The net driver's table:
+`VirtioIdentity` carries the `DeviceType` (`VirtioDeviceType.Network`, `Block`, `Gpu`, `Input`, ...) and the transport, which shows in the node path (`virtio:pci:0000:00:02.0`, `virtio:mmio:a003e00`) but never matters to the driver. A driver matches on the device type:
 
 ```csharp
+// In the driver:
 using Cosmos.Kernel.HAL.DriverKit.Virtio;
 
-private readonly DeviceMatch[] _matches =
-[
-    VirtioMatch.DeviceType(VirtioDeviceType.Network),
-];
+private readonly DeviceMatch[] _matches = [VirtioMatch.DeviceType(VirtioDeviceType.Network)];
 ```
 
 ### The virtio access object
 
-`binding.Node.Access<VirtioAccess>()` is the device. Its members, in the order a probe uses them:
+`binding.Node.Access<VirtioAccess>()` is the device. A probe uses it in this order:
 
-- `DeviceType`; `Version1Negotiated`, true once the negotiation took VIRTIO_F_VERSION_1, which the kit takes whenever the device offers it; and `InterruptEntryCount`, how many interrupt entries the transport delivers: the MSI-X messages it connected over PCI, one for the MMIO line, 0 when the leaf has to poll. Any context.
-- `NegotiateFeatures(requestedLow, out negotiatedLow)`, thread context. `requestedLow` is the whole low feature word the driver understands, reserved bits included (VIRTIO_F_ANY_LAYOUT, bit 27, is the leaf's request): the device's offer is masked with it, VERSION_1 is added when offered and nothing else, the result is written back and `negotiatedLow` is its low 32 bits. On a virtio 1.x transport (PCI, MMIO version 2) the kit then sets FEATURES_OK and reads it back, and returns `false` when the bit did not stick; legacy MMIO (version 1) has no such step and only a low feature word, so `Version1Negotiated` stays false there.
-- `TryCreateQueue(binding, index, preferredSize, out queue)`, thread context, described under [Queues](#queues); `ConfigInterrupt` and `QueueInterrupt(index)` (`ArgumentOutOfRangeException` at `MaxQueues`, 8, and above), the node's own sources, to pass to `binding.TryRequestInterrupt` ([Virtio interrupt sources](#virtio-interrupt-sources)).
-- `ReadConfig8`, `ReadConfig16`, `ReadConfig32` and `WriteConfig8` take an offset in the device-specific configuration space; any context, allocation-free. Over PCI a function without a device configuration structure reads 0 and drops the write.
-- `SetDriverOk()` sets DRIVER_OK and `SetFailed()` sets FAILED. `Reset()` writes status 0, waits up to `ResetTimeoutMilliseconds` (100) in steps of `ResetPollMicroseconds` (10) for the device to read it back as 0, then forgets the negotiated version and takes the entry away from every source. A device that never answers is logged `virtio type 1: status did not return to 0 within 100 ms after reset` and treated as reset; the handshake that follows fails visibly. Thread context.
-- `Dispatch(entry)` is the transport driver's, not the leaf's: interrupt context, it reads and acknowledges the interrupt status and raises the sources assigned to that entry.
+1. `NegotiateFeatures(requested, out negotiated)` with the feature bits the driver understands. It returns `false` when the device rejects them.
+2. `TryCreateQueue` for each queue ([Queues](#queues)).
+3. `ReadConfig8/16/32` and `WriteConfig8` for the device's own configuration, such as a network card's MAC address.
+4. `TryRequestInterrupt` on the queue and configuration sources ([Virtio interrupt sources](#virtio-interrupt-sources)).
+5. `SetDriverOk()`, after which the device is live.
 
-Behind the access object, for the kit only, the device is reset and brought to DRIVER state before the first probe and again after a probe that declined, failed or threw, so every candidate sees a freshly reset device with ACKNOWLEDGE and DRIVER set; a node nobody binds is left reset; and after a bound driver's teardown with the hardware present it is reset once more, after the driver's memory went back. A probe therefore starts at the negotiation:
+The kit resets the device before every probe, so a probe starts at the negotiation:
 
 ```csharp
+// In Probe:
 VirtioAccess dev = binding.Node.Access<VirtioAccess>();
-if (!dev.NegotiateFeatures(FeatureMac | FeatureStatus | FeatureAnyLayout, out uint features))
+if (!dev.NegotiateFeatures(FeatureMac | FeatureStatus, out uint features))
 {
     return ProbeResult.Failed("the device rejected the feature set");
 }
-
-int headerSize = dev.Version1Negotiated ? ModernHeaderBytes : LegacyHeaderBytes;
-bool anyLayout = (features & FeatureAnyLayout) != 0;
-if (!dev.Version1Negotiated && !anyLayout)
-{
-    return ProbeResult.Declined("legacy device without VIRTIO_F_ANY_LAYOUT");
-}
 ```
 
-The second result is declined, not failed: the device is healthy, its framing is one the driver does not implement (the net header and the frame share one descriptor, which is conformant with VERSION_1 or with any-layout and never used without one; the legacy split-header framing is not implemented), and the kit resets the device for the next candidate.
+`Reset()` stops the device; a driver calls it in `OnDetach`.
 
 ### Queues
 
-`dev.TryCreateQueue(binding, index, preferredSize, out Virtqueue? queue)` creates one split virtqueue in DMA memory on the leaf's own ledger (`ArgumentException` when the binding is bound to another node, `ArgumentOutOfRangeException` for a size of 0) and activates it on the device. The size is the smaller of the device's maximum and `preferredSize`; both are powers of two by the specification (QEMU offers 256 or 1024) and the kit does not round. The descriptor table sits at the start of a page-aligned block, the available ring right after it and the used ring on the next page boundary, the whole rounded up to pages and allocated through `binding.AllocateDma`, so it is freed by teardown with everything else. It returns `false` when the index is 8 or above, when the queue does not exist (its maximum reads 0), when it is already ready, or when the transport refused the layout; a refused layout leaves the memory on the ledger for the unwind. The net driver asks for two queues of 128:
+A virtqueue is a ring ([DMA memory](#dma-memory)) the driver and the device share. `dev.TryCreateQueue(binding, index, preferredSize, out Virtqueue? queue)` allocates one and activates it on the device. A `Virtqueue` offers:
+
+- `TryAllocateDescriptor(out index)` and `FreeDescriptor(index)`.
+- `SetDescriptor(index, physicalAddress, length, flags)`: `VirtqueueDescriptorFlags.Write` for a buffer the device fills, `Next` to chain descriptors.
+- `Submit(head)` hands a descriptor chain to the device, and `Notify()` rings the doorbell.
+- `TryTakeUsed(out id, out length)` takes back what the device finished.
+
+A queue is not thread-safe: guard it with a `DeviceLock` when `Transmit` and a work item share it. Buffers may be submitted before `SetDriverOk`, but `Notify` only after:
 
 ```csharp
-if (!dev.TryCreateQueue(binding, VirtioNetState.ReceiveQueue, QueueSize, out Virtqueue? receiveQueue))
+// In Probe:
+if (!dev.TryCreateQueue(binding, ReceiveQueue, 128, out Virtqueue? receiveQueue))
 {
     return ProbeResult.Failed("no receive queue");
 }
-```
 
-A `Virtqueue` is the ring as a driver drives it: `Index` and `Size`; `TryAllocateDescriptor(out index)` and `FreeDescriptor(index)` over a free list the kit keeps, with `FreeDescriptorCount`; `SetDescriptor(index, physicalAddress, length, flags, next = 0)`, whose `VirtqueueDescriptorFlags` are `Next` for a chain, `Write` for a buffer the device fills and `Indirect`; `Submit(head)`, which puts a chain in the available ring behind a write barrier; `HasUsed`, a barrier-free check for a work-item loop that returns (a driver that must wait waits on its interrupt or spins with `DmaBuffer.ReadBarrier()`), and `TryTakeUsed(out id, out length)`, which takes back what the device finished behind a read barrier, skipping an element whose id is out of range and counting it in `DroppedUsedElements` rather than throwing, since the kit cancels a work item that throws and the drain would never run again; and `Notify()`, the doorbell. Every member is allocation-free, so a handler may use them; none is thread-safe, so a driver serializes its use with a `DeviceLock`, as the net driver does between `Transmit` and its drain. Once the binding that created the queue is torn down every ring member throws `InvalidOperationException`, in every build, so a consumer that kept a reference across a withdrawal gets the exception and never a write into freed pages.
-
-One rule of the specification orders the probe: buffers may be submitted before DRIVER_OK, the doorbell may not be rung before it. The net driver posts every receive slot with `Submit` alone and rings once, after `SetDriverOk`, before it publishes:
-
-```csharp
+// One buffer per descriptor, for the device to write received frames into.
+DmaBuffer receiveBuffers = binding.AllocateDma(receiveQueue.Size * BufferBytes, 4096);
 for (int i = 0; i < receiveQueue.Size; i++)
 {
-    if (!receiveQueue.TryAllocateDescriptor(out ushort slot))
-    {
-        return ProbeResult.Failed("the receive queue ran out of descriptors while posting");
-    }
-
-    ulong physical = receiveBuffers.PhysicalAddress + (ulong)(slot * VirtioNetState.BufferBytes);
-    receiveQueue.SetDescriptor(slot, physical, VirtioNetState.BufferBytes, VirtqueueDescriptorFlags.Write);
+    receiveQueue.TryAllocateDescriptor(out ushort slot);
+    ulong physical = receiveBuffers.PhysicalAddress + (ulong)(slot * BufferBytes);
+    receiveQueue.SetDescriptor(slot, physical, BufferBytes, VirtqueueDescriptorFlags.Write);
     receiveQueue.Submit(slot);
 }
 
-// ... the station address, the state, the drain and the interrupts ...
+// ... connect the interrupts ...
 
 dev.SetDriverOk();
 receiveQueue.Notify();
 state.Sink = binding.PublishNetwork(state);
 ```
 
-Its `Transmit` runs under the lock: it reclaims the used transmit descriptors, takes one, copies a zeroed net header and the frame into that descriptor's slot, writes the descriptor, submits and notifies. Its drain, a work item on the kit worker, takes each used receive element under the lock, hands the frame behind the header to the sink outside the lock (the consumer copies it before returning, and the slot is re-posted only afterwards), and notifies once when anything was taken.
-
 ### Virtio interrupt sources
 
-`Node.Interrupts` of a virtio node is always nine sources, the access's own objects: index 0 the configuration change, which `Describe()` prints as `config`, and index 1 + n queue n, `queue 0` on. They are virtual: the transport delivers a few entries (the messages it connected, or the one MMIO line) and the access multiplexes the sources over them. The configuration source gets entry 0 when the handshake starts, if the transport has an entry and the device accepts it; queue n gets entry n + 1 when the transport has that many entries, otherwise entry 0 shared with the rest, otherwise none, assigned by a successful `TryCreateQueue`. A source with no entry refuses to connect, so `binding.TryRequestInterrupt(dev.QueueInterrupt(0), handler, out _)` returns `false` on a device the transport could not route and the driver falls back to polling, as it does with the PCI line:
+`dev.QueueInterrupt(n)` is the interrupt of queue `n`, and `dev.ConfigInterrupt` fires when the device's configuration changes. When the transport could not route them (ARM64 without a GICv3 ITS, for example), `TryRequestInterrupt` returns `false` and the driver polls instead:
 
 ```csharp
-bool receiveConnected = binding.TryRequestInterrupt(dev.QueueInterrupt(VirtioNetState.ReceiveQueue), state.OnInterrupt, out _);
-binding.TryRequestInterrupt(dev.QueueInterrupt(VirtioNetState.TransmitQueue), state.OnInterrupt, out _);
-binding.TryRequestInterrupt(dev.ConfigInterrupt, state.OnInterrupt, out _);
-state.HasInterrupt = receiveConnected;
-if (!receiveConnected && !binding.TrySchedulePeriodic(DrainPeriodMilliseconds, drain))
+// In Probe:
+WorkItem drain = binding.CreateWorkItem(state.Drain);
+bool hasInterrupt = binding.TryRequestInterrupt(dev.QueueInterrupt(ReceiveQueue), state.OnInterrupt, out _);
+if (!hasInterrupt && !binding.TrySchedulePeriodic(50, drain))
 {
     return ProbeResult.Declined("no interrupt and no timer to poll with");
 }
 ```
 
-A raise runs the leaf's handler inside the transport's own dispatch, in interrupt context, and the handler does what every handler does: it counts and schedules the drain. Because the entry is shared with the other sources of the node, `Mask` on a virtio handle drops deliveries at the kit, not at the controller. A reset takes the entry away from every source, so a leaf's `OnDetach` may call `dev.Reset()` to stop the device before the kit frees its rings; that is safe there because the binding's handles are already disconnected, and the net driver follows it with `binding.Delay(100)` so DMA in flight lands first:
+In `OnDetach`, reset the device so it stops writing into memory the kit is about to free, then give DMA in flight a moment to land:
 
 ```csharp
+// In the driver:
 public override void OnDetach(DeviceBinding binding, DetachReason reason)
 {
-    if (binding.DriverState is not VirtioNetState || !reason.HardwarePresent)
+    if (reason.HardwarePresent)
     {
-        return;
+        binding.Node.Access<VirtioAccess>().Reset();
+        binding.Delay(100);
     }
-
-    binding.Node.Access<VirtioAccess>().Reset();
-    binding.Delay(QuiesceMicroseconds);
 }
 ```
 
 ### The transport drivers
 
-`VirtioPciTransportDriver` is `[Driver(Feature = DriverFeature.Pci)]` and matches `new PciMatch(vendorId: 0x1AF4)`, every virtio function, so a leaf driver a kernel author writes for another virtio type needs no change here. Its probe derives the device type from the function's ids (a device id of `0x1040` or above is modern and the type is the id minus `0x1040`; `0x1000` to `0x103F` is transitional and the type is the subsystem id; anything else is declined `not a virtio function`), walks the vendor capabilities for the common, notify, ISR and device configuration structures (declined `no modern virtio capabilities (a legacy-only function)` without the first three, with the reason when a structure names a BAR past 5, an unassigned or I/O BAR, or one it does not fit, and `the notify structure or notify_off_multiplier is not 2-byte aligned` when either is odd), maps each BAR it needs once, turns on memory space and bus mastering, and requests the function's message sources for entry 0 on, at most nine (the configuration change and the eight queues), stopping at the first the platform cannot route. Then it publishes the child with the type, the function's address and the access's nine sources, and logs `virtio type 1, 4 message interrupts`. It has no legacy (I/O BAR) interface and no INTx fallback, so a function whose messages cannot be routed (ARM64 without an ITS, the virt machine's default GICv2) is published with no interrupt entry and its leaf polls or declines. `OnDetach` turns bus mastering off once the children are torn down.
-
-`VirtioMmioTransportDriver` is `[Driver]` with no feature and matches `PlatformMatch.Compatible("virtio,mmio")`, the nodes the ARM64 description publishes for the virt machine's slots. Its probe maps the slot's window (declined `no register window` without one, or `the register window spans 256 bytes, less than 512` when it is too short), checks the magic register (`no virtio device in the slot`), the device id (`empty slot`) and the version (`unknown virtio-mmio version 3`; version 1, the legacy interface, and version 2 are taken), requests the slot's line when the node has one, publishes the child with the type and the slot's base in hexadecimal, and logs `virtio type 1, version 1, line` or `no line`. It has no `OnDetach`: the child's hooks reset the device and the kit invalidates the window.
-
-Both are ordinary bus drivers written over the public seam: the transport class each builds (`VirtioPciTransport`, `VirtioMmioTransport`) derives from the kit's `VirtioTransport`, whose members the access calls, and the kit never sees a register itself.
+`VirtioPciTransportDriver` binds every virtio PCI function (vendor `0x1AF4`), using the modern interface and MSI-X messages only. `VirtioMmioTransportDriver` binds the `virtio,mmio` platform nodes on ARM64. A leaf driver never deals with either.
 
 ### The shipped leaf drivers
 
-`VirtioNetDriver` (`[Driver(Feature = DriverFeature.Network)]`, `VirtioMatch.DeviceType(VirtioDeviceType.Network)`) negotiates the MAC, status and any-layout features, declines a legacy device without any-layout as shown above, creates the receive and transmit queues, posts one 2048-byte buffer per receive descriptor, reads the station address (declined `no MAC address` when the feature is absent or the address is all zeros), connects the two queue sources and the configuration source or polls every 50 ms, sets DRIVER_OK, rings the receive queue and publishes an interface named `virtio-net`. Its log line reads `mac 52:54:00:12:34:56, link up, version 1, interrupts: 4 entries`, or `legacy any-layout` and `polling every 50 ms` on a legacy MMIO device whose line the platform did not route.
-
-`VirtioInputDriver` (`[Driver]`, `VirtioMatch.DeviceType(VirtioDeviceType.Input)`) carries no feature because the same device type is a keyboard or a mouse: its probe asks the configuration space which event types the device reports, declines `no key events` without keys, takes a device with relative axes for a mouse, and only then checks the kernel's switches (`mouse support is compiled out`, `keyboard support is compiled out`), each one alone. It creates the event queue, posts 32 eight-byte event buffers, connects the queue's source or polls every 20 ms, sets DRIVER_OK, rings the queue and publishes a keyboard named `virtio-keyboard` (Linux key codes converted to set 1 scan codes) or a pointer named `virtio-mouse` (axis and button events folded into one report per sync event); the log line is `keyboard, interrupt` or `pointer, polling every 20 ms`. It does not drive the status queue, so a virtio keyboard's indicators stay as they are. Both leaf drivers decline `no kit worker to run the drain on` in a kernel without a worker, and both reset the device in `OnDetach`.
-
-`VirtioBlkDriver` (`[Driver(Feature = DriverFeature.Storage)]`, `VirtioMatch.DeviceType(VirtioDeviceType.Block)`) binds a virtio-blk disk over either transport. Its probe requests the size max, seg max, read-only, block size, flush and any-layout features (failed `the device rejected the feature set`) and reads the geometry from the configuration space: `capacity` in 512-byte sectors as two 32-bit reads, since the kit has no 64-bit one, and `blk_size` when it was negotiated, 512 otherwise. It declines what it cannot drive: `zero capacity`, `unsupported block size 4097` (not a power of two from 512 to 64 KiB), `capacity below one block`, `size_max below one block` and `seg_max is 0`. It creates its one request queue, 16 entries at most (failed `no request queue`, or `the request queue is too small` below three descriptors), allocates one bounce block in DMA memory, a page holding the 16-byte request header and the status byte followed by a 64 KiB data area, creates its lock and its event, connects the queue's source or polls, sets DRIVER_OK and publishes the disk as `vblk<n>`, `n` the lowest index no live disk of the driver uses, so a disk plugged back in gets its name back; the storage manager registers and scans it inside the publish. The log line reads `524288 blocks of 512 bytes, flush, version 1, interrupt, 65536 bytes per request`, with `, read-only`, `no flush`, `legacy` and `polling` where they apply. A `VirtioBlkState` (`IBlockDevice`, with `Index`, `BlockSize`, `BlockCount`, `MaxTransferBytes`, `IsReadOnly`, `FlushNegotiated`, `Version1Negotiated`, `HasInterrupt`, `IsPolling`, `RequestsSubmitted`, `RequestsCompleted`, `Timeouts`, `InterruptCount`, `IsFaulted` and `IsDetached`) moves one request at a time through the bounce block, as a chain of three descriptors, the header, the data and the status (two for a flush, which carries no data), and splits a longer read or write into requests of 64 KiB, less when `size_max` is smaller; a caller that finds the block busy waits up to 5 s for it, then gets `IOException("virtio-blk request slot busy")`. A request completes on the queue interrupt, whose handler only counts and signals the event the caller waits on, or, without one, by the caller reading the used ring between `Delay` rounds of 10 microseconds; never through a work item, since the storage manager's partition scan reads the disk inside the publish, on the kit worker, where a work item of that worker would never run. A request the device failed is `IOException("virtio-blk I/O error")`, `virtio-blk request unsupported` or `virtio-blk status 0x..`; one unanswered for 5 s is `virtio-blk request timed out` and faults the disk (`virtio-blk device faulted` on every later call), a teardown during a request is `virtio-blk device detached`, which is what a file still open on a pulled disk gets, and a write to a read-only device is `the device is read-only`. `Flush` sends FLUSH when the device negotiated it and returns at once otherwise. `OnDetach` frees the name and, with the hardware present, resets the device and waits 100 microseconds for DMA in flight. The virtio-blk-pci cell of the Storage suite on x64 boots with the disk behind a PCI Express root port the engine adds, so the function is the port's child, offered after the host's functions, and the transport's line names the device type and its two message entries:
-
-```
-[Drivers] pci:0000:00:03.0 candidates: PcieRootPortDriver(prio 0, spec 2)
-[Drivers] pci:0000:00:03.0 PcieRootPortDriver: slot 1, bus 1, occupied, powered on, message interrupt
-[Drivers] pci:0000:00:03.0 offer PcieRootPortDriver -> bound
-...
-[Drivers] pci:0000:01:00.0 candidates: VirtioPciTransportDriver(prio 0, spec 1)
-[Drivers] pci:0000:01:00.0 VirtioPciTransportDriver: virtio type 2, 2 message interrupts
-[Drivers] pci:0000:01:00.0 offer VirtioPciTransportDriver -> bound
-[Drivers] virtio:pci:0000:01:00.0 candidates: VirtioBlkDriver(prio 0, spec 1)
-[StorageManager] vblk0 registered by VirtioBlkDriver (primary)
-[Drivers] virtio:pci:0000:01:00.0 VirtioBlkDriver published block "vblk0" (consumed)
-[Drivers] virtio:pci:0000:01:00.0 VirtioBlkDriver: 524288 blocks of 512 bytes, flush, version 1, interrupt, 65536 bytes per request
-[Drivers] virtio:pci:0000:01:00.0 offer VirtioBlkDriver -> bound
-```
-
-The driver was written in the Drivers suite's library, a driver assembly with no grant, and moved to `Cosmos.Kernel.Drivers` with `git mv`; the move's diff is the three namespace lines, which is the standing proof that a shipped driver has no ability a third party lacks.
+| Driver | Device type | Publishes |
+|--------|-------------|-----------|
+| `VirtioNetDriver` | `Network` | a network interface, `virtio-net` |
+| `VirtioInputDriver` | `Input` | a keyboard, `virtio-keyboard`, or a pointer, `virtio-mouse` |
+| `VirtioBlkDriver` | `Block` | a block device, `vblk<n>` |
+| `VirtioGpuDriver` | `Gpu` | a display, `virtio-gpu` (2D only) |
 
 ### The display drivers
 
-`VirtioGpuDriver` (`[Driver(Feature = DriverFeature.Graphics)]`, `VirtioMatch.DeviceType(VirtioDeviceType.Gpu)`) is a virtio leaf like the two above, so it binds a virtio-gpu over PCI on both architectures and over MMIO on ARM64 (`-device virtio-gpu-device`), 2D path only: the guest renders, the host composites. Its probe negotiates no feature beyond the VERSION_1 the kit takes (failed `the device rejected the feature set`), creates the control queue (failed `no control queue`) and the cursor queue when the device has one (logged `no cursor queue; the cursor is not driven` otherwise; the cursor queue is created but not driven), allocates one page of scratch DMA for the command, the memory entry and the response, connects the control queue's source or falls back to polling the used ring every 10 microseconds, sets DRIVER_OK before the first command, reads the scanout count from the configuration space (0 read as 1), asks GET_DISPLAY_INFO for the first scanout's rectangle (1024x768 when it is disabled or empty), allocates a page-aligned DMA framebuffer of that size, and creates the host resource with RESOURCE_CREATE_2D, backs it with RESOURCE_ATTACH_BACKING and binds it to scanout 0 with SET_SCANOUT, failing with the command's name when one is refused or, after 1000 ms, unanswered. Then it publishes a display named `virtio-gpu` whose `Framebuffer` is the DMA buffer's region and logs `1280x800, 1 scanouts, interrupt` (or `polling`). Every `Flush` is a TRANSFER_TO_HOST_2D of the clipped rectangle and a RESOURCE_FLUSH, both synchronous; one command is in flight at a time, the lock held only around the ring operations and never across a wait, so the ring's canvas may flush from any thread. A device that stops answering marks the state faulted, logs `the device stopped answering; flushes are dropped` once, and every later command is dropped. The display offers no facet beyond its own state type, `VirtioGpuState`, whose counters (`CommandsSent`, `FlushCount`, `InterruptCount`, `HasInterrupt`, `IsPolling`, `IsFaulted`, `ScanoutCount`) the Graphic suite reads through `DisplayManager.Primary.TryGetFacet`. `OnDetach` resets the device and waits 100 microseconds for DMA in flight, like virtio-net.
-
-`VmwareSvgaDriver` (`[Driver(Feature = DriverFeature.Graphics)]`, `new PciMatch(vendorId: 0x15AD, deviceId: 0x0405)`) is a PCI driver for the VMware SVGA II adapter, programmed through port I/O, so it declines `the adapter is programmed through port I/O, which this platform has not` on ARM64. Its probe turns I/O and memory decoding on first (QEMU answers the `FrameBufferStart` and `MemStart` registers only while it is), maps BAR 0 as the index and value ports and writes the version 2 protocol id (failed `the adapter did not accept the version 2 protocol` when it does not read back), maps BAR 1 as VRAM with write combining and BAR 2 as the command FIFO, checks that the two registers name the BARs (failed `register FrameBufferStart does not match BAR 1`), initialises the FIFO with the guest's 3D version declaration and the SVGA3D negotiation, and reads the scanout as the firmware left it. A scanout the firmware enabled is the display's mode; one it left off, which is what QEMU does, leaves the mode empty until the canvas programs one, since the width and height registers then echo the firmware's VGA surface. It publishes a display named `vmware-svga`, a `VmwareSvga3DState` implementing `ICanvas3DFactory` when the host negotiated 3D and a `VmwareSvgaState` otherwise, and logs `640x480x32 disabled, caps 0x3, svga3d none, vram 16 MiB, fifo 64 KiB`, where `svga3d` is `none` or the negotiated version as `major.minor`. The display's `Framebuffer` is one frame of VRAM sliced at the adapter's frame offset, recomputed on every mode set, and `Flush` is a FIFO UPDATE plus a sync, skipped while no mode is programmed or the scanout is off. It offers both kit facets: `IDisplayModes` with the classic VMware list from 320x200 to 3840x2400 at 32 bits per pixel, whose `TrySetMode` programs the registers, re-initialises the FIFO and reports the change, and `IHardwareCursor`, whose `TryDefine` needs the alpha cursor capability (absent on QEMU, so it returns `false` there) and whose `Set` writes the cursor registers. It also offers `ISvgaAdapter`, an experimental (`COSMOS0003`) test and tooling seam rather than a stability promise: the capabilities, the negotiation facts, the enable bit (`SetEnabled(false)` stops the host consuming the FIFO, so what is written afterwards can be inspected), the FIFO positions (`FifoMin`, `FifoMax`, `NextCommand`, `ReadFifo`) and a `CreateCanvas3D` that hands out the SVGA3D canvas whether or not 3D was negotiated, which is how the Graphic suite pins the 3D command layer's wire format on QEMU. The firmware framebuffer sits in the VRAM window, so binding this driver retires it; the log of the vmware-svga cell reads, in order:
-
-```
-[Display] primary: VmwareSvgaDriver "vmware-svga" (driver published, preferred over firmware)
-[Drivers] pci:0000:00:01.0 VmwareSvgaDriver published display "vmware-svga" (consumed)
-[Drivers] pci:0000:00:01.0 VmwareSvgaDriver: 640x480x32 disabled, caps 0x3, svga3d none, vram 16 MiB, fifo 64 KiB
-[Drivers] pci:0000:00:01.0 offer VmwareSvgaDriver -> bound
-[Drivers] firmware display "framebuffer" retired: inside pci:0000:00:01.0 bar 1
-[Display] mode changed: VmwareSvgaDriver "vmware-svga" now 1024x768x32
-```
-
-The primary line says `preferred over firmware` because the display is published during the probe, while the firmware display is still there, and the retirement runs after the bind; the retirement itself changes no primary, so it writes no second line. The last line is the console programming the default mode. `OnDetach` turns the scanout off so the host stops reading VRAM the ring may still hold a region over.
+| Driver | Hardware | Notes |
+|--------|----------|-------|
+| `VirtioGpuDriver` | virtio-gpu, over PCI or MMIO | 2D: the guest draws, the host composites |
+| `VmwareSvgaDriver` | VMware SVGA II, PCI, x64 only | Switches modes and draws a hardware cursor; replaces the firmware framebuffer, which lives in its VRAM |
 
 ### The storage drivers
 
-`AhciDriver` and `NvmeDriver` are the two PCI storage drivers; the third storage driver, `VirtioBlkDriver`, is a virtio leaf, described [above](#the-shipped-leaf-drivers), and a USB stick has its class driver under [The USB class drivers](#the-usb-class-drivers).
+| Driver | Hardware | Disk names |
+|--------|----------|------------|
+| `AhciDriver` | SATA controllers in AHCI mode (disks only, no CD-ROM) | `sata<n>` |
+| `NvmeDriver` | NVMe controllers | `nvme<controller>n<namespace>` |
+| `VirtioBlkDriver` | virtio-blk, over PCI or MMIO | `vblk<n>` |
 
-`AhciDriver` (`[Driver(Feature = DriverFeature.Storage)]`, `new PciMatch(classCode: 0x01, subclass: 0x06, progIf: 0x01)`: every SATA controller in AHCI mode; the legacy IDE-mode function has another programming interface and is never offered) is a PCI driver for an AHCI 1.3.1 host bus adapter. Its probe checks BAR5 as ABAR (declined `BAR5 is not a memory window` when it is unassigned, I/O, or shorter than the generic registers plus port 0's bank), maps it, turns on memory space and bus mastering, allocates one command region of 0x4A000 bytes in DMA memory holding the command list, the received FIS area and the 32 command tables of every port index, sets GHC.AE, and when firmware left the port map empty resets the HBA (failed `the HBA reset did not complete`) and derives the map from CAP.NP; a 32-bit HBA whose region landed above 4 GiB is declined `the controller addresses 32 bits and the command region lies above 4 GiB`. Then it walks each implemented port in ascending order: a port whose PHY reports no device gets one COMRESET, and one still without a device logs `port 1: no device (SSTS 0x0)` and is skipped; a port with a device has its engine stopped (or the port reset when the engine will not stop, and `port 1: engine still running, skipped` when neither works), is rebased onto the region with its interrupts masked, started (`port 1: engine did not start, skipped` after one reset and retry) and classified by its signature: a SATA disk becomes an `AhciPort`, whose constructor refuses an ATAPI device, allocates the port's bounce page (below 4 GiB on a 32-bit HBA) and issues IDENTIFY DEVICE, a failure being logged `port 1: bring-up failed: message`; a SATAPI, SEMB or port multiplier signature logs `port 5: satapi not supported` (`semb`, `port multiplier`), and an unknown one `port 1: unknown signature 0x..., skipped`. A rebased port that is not published is stopped again, so no engine keeps a FIS area inside memory the kit frees. The probe hangs an `AhciState` off `binding.DriverState` (`Index`, `PortCount`, `Version`, `CommandSlots`, `Supports64Bit`, `SupportsCommandListOverride`, `ImplementedPorts`, `CommandsIssued`, `Timeouts`), publishes each port through `PublishBlockDevice` as `sata{n}`, where `n` is global across controllers and consumed by every port whose bring-up was attempted, never reused, and logs `1 sata ports of 6 implemented, version 1.0, 32 slots, 64-bit`. A controller with no usable port still binds, which is what q35's built-in AHCI at `00:1f.2` does on every x64 machine: its port 5 holds the boot CD-ROM (`port 5: satapi not supported`) and it logs `0 sata ports of 6 implemented`. The driver stays strictly polled: no interrupt is requested, GHC.IE is never set and every PxIE stays 0. An `AhciPort` (`IBlockDevice`, with `Model`, `Serial`, `Firmware`, `PortNumber` and `Controller`) moves every transfer through its one bounce page, at most 8 sectors of 512 bytes per command, and keeps one command in flight per port: a caller claims the port's busy flag under the controller's `DeviceLock`, held only around the flag, so the chunks of two callers interleave but never overlap; a task file error is `IOException("SATA Fatal error: Command aborted")`, a stuck port or a command unanswered for 5 s an `InvalidOperationException` (`SATA: port stuck busy (TFD BSY/DRQ) before command issue.`, `SATA: command completion timeout.`). `OnDetach` stops the engine of every published port and turns bus mastering off.
-
-`NvmeDriver` (`[Driver(Feature = DriverFeature.Storage)]`, `new PciMatch(classCode: 0x01, subclass: 0x08, progIf: 0x02)`) is a PCI driver for an NVM Express controller. Its probe checks BAR0 (declined `BAR0 is not a memory window` when it is unassigned, I/O, or shorter than the registers plus the doorbell page), maps it, turns on memory space (before any message request, since the kit refuses a message while decoding is off) and bus mastering, reads CAP (failed `the controller's queue size is below the driver's queue depth` or `the doorbell stride does not fit BAR0`), disables the controller and waits for it (failed `the controller did not leave the ready state`), programs the admin queue pair in two DMA pages, enables it (failed `the controller did not become ready`), masks every vector, and identifies the controller, the active namespace list and each namespace through one scratch page, all on the admin queue, which is always polled: an admin command unanswered for 5 s fails the probe with `identify controller did not complete` and the like, a refused one with `identify controller failed` after a log line carrying the status; a namespace with no blocks is skipped silently, and one with metadata, a block below 512 bytes or a block above a page is logged `namespace 1 skipped (block size 8192, metadata 0)`. It allocates seven command slots (a bounce page and a `DeviceEvent` each) and the lock, then requests message 1 when the function's MSI-X table has two entries or more (message 0 carries the admin completions and must interrupt nobody), message 0 on a single-entry table, and polls when the function has no table or the platform cannot route the message (ARM64 with GICv2); the legacy line is never requested, and the handler is live from the request on but does nothing until the I/O queue exists. It creates the I/O completion queue, on that vector when one is connected, and the I/O submission queue (failed `create I/O completion queue failed` or `create I/O submission queue failed`), hangs an `NvmeState` off `binding.DriverState` (`Index`, `HasInterrupt`, `IsPolling`, `NamespaceCount`, `CommandsSent`, `InterruptCount`, `Timeouts`, `DoorbellStride`, which the Storage suite reads through a published namespace's `Controller`), publishes every namespace as `nvme{i}n{nsid}` (the controller number, then the namespace id) and logs `1 namespaces, interrupt, queue depth 8`, or `polling`. An `NvmeNamespace` (`IBlockDevice`, with `NamespaceId` and `Controller`) issues one command per logical block through a slot's bounce page, so callers on the same or another namespace of the controller run in parallel up to the seven slots; the submission runs under the lock and the wait outside it: with an interrupt the caller waits on the slot's event and the handler drains the completion queue in interrupt context, without the lock (a lock holder runs with interrupts disabled, so the two never overlap), signalling each completed slot through `context.Signal`; without one the caller drains under the lock between delays. A failed command is `IOException("NVMe Read error")`, `Write` or `Flush`; one unanswered for 5 s is `IOException("NVMe command timeout")` and a teardown mid-command `IOException("NVMe device detached")`, and either quarantines the slot (`quarantined I/O slot 3 (command may still be outstanding)`), never handed out again since a late completion would write into a recycled page; a caller that finds no free slot for 5 s gets `InvalidOperationException("NVMe I/O slots exhausted.")`. `OnDetach` disables the controller and turns bus mastering off.
-
-All three publish through `PublishBlockDevice`, so the storage manager registers and scans each disk inside the probe ([Publishing a device](#publishing-a-device)). The ahci cell of the Storage suite, whose disk hangs off an ich9-ahci added at `00:03.0`, logs in this order:
-
-```
-[Drivers] pci:0000:00:03.0 candidates: AhciDriver(prio 0, spec 3)
-[Drivers] pci:0000:00:03.0 AhciDriver: port 1: no device (SSTS 0x0)
-...
-[Drivers] pci:0000:00:03.0 AhciDriver: port 5: no device (SSTS 0x0)
-[StorageManager] sata0 registered by AhciDriver (primary)
-[Drivers] pci:0000:00:03.0 AhciDriver published block "sata0" (consumed)
-[Drivers] pci:0000:00:03.0 AhciDriver: 1 sata ports of 6 implemented, version 1.0, 32 slots, 64-bit
-[Drivers] pci:0000:00:03.0 offer AhciDriver -> bound
-```
-
-and the nvme cell:
-
-```
-[Drivers] pci:0000:00:03.0 candidates: NvmeDriver(prio 0, spec 3)
-[StorageManager] nvme0n1 registered by NvmeDriver (primary)
-[Drivers] pci:0000:00:03.0 NvmeDriver published block "nvme0n1" (consumed)
-[Drivers] pci:0000:00:03.0 NvmeDriver: 1 namespaces, interrupt, queue depth 8
-[Drivers] pci:0000:00:03.0 offer NvmeDriver -> bound
-```
-
-On a formatted disk the manager's scan line (`[StorageManager] GPT detected on sata0`) comes before the registered line, since the scan runs inside the registration. The suites read the drivers through the ring, never the log: `Manager_DeviceListedInDriverInfo` finds the cell's disk in `DriverInfo` as a consumed block device under `AhciDriver`, `NvmeDriver` or `VirtioBlkDriver`, and `Profile_NvmeInterruptModeMatches` reads `HasInterrupt` off the namespace's `Controller`.
+A USB stick is handled by `UsbMassStorageDriver` ([The USB class drivers](#the-usb-class-drivers)). Every disk is registered with `StorageManager` when it is published.
 
 ## USB devices
 
