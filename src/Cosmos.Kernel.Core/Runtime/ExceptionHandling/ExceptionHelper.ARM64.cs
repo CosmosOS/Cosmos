@@ -1,4 +1,4 @@
-namespace Cosmos.Kernel.Core.Runtime;
+namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 
 internal static unsafe partial class ExceptionHelper
 {

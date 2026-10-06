@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
+using Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 using Internal.Runtime;
 
 namespace Cosmos.Kernel.Core.Runtime;

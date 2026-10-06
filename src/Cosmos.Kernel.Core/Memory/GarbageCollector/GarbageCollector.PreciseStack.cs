@@ -3,7 +3,7 @@
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
-using Cosmos.Kernel.Core.Runtime;
+using Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 using Cosmos.Kernel.Core.Runtime.GcInfo;
 using Internal.Runtime;
 
