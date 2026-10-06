@@ -2,7 +2,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Build.API.Enum;
-using Cosmos.Kernel.Drivers;
+using Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci;
+using Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio;
+using Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput;
+using Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet;
+using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Engine;

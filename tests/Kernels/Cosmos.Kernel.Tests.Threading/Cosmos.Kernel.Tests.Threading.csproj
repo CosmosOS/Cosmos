@@ -25,8 +25,8 @@
        drain on the worker, the same wake the E1000E exclusion removes on
        x64, so it is left out too. -->
   <ItemGroup>
-    <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.E1000EDriver" />
-    <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.VirtioNetDriver" />
+    <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EDriver" />
+    <CosmosDriverExclude Include="Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetDriver" />
   </ItemGroup>
 
   <!-- Core kernel packages (using project references for development) -->

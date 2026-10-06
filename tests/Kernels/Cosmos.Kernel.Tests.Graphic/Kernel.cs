@@ -1,6 +1,6 @@
 using System;
 using System.Drawing;
-using Cosmos.Kernel.Drivers;
+using Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;

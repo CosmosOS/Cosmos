@@ -138,6 +138,40 @@ These are conditionally compiled via `.csproj`:
 
 This is only allowed now in `Cosmos.Kernel.Core` but this may change in the future.
 
+### Driver Folders
+
+`Cosmos.Kernel.Drivers` keeps each driver three folders deep, bus kind, then
+category, then driver, and each file's namespace follows its folder:
+
+```
+Cosmos.Kernel.Drivers/
+  Pci/                       ← the bus kind the driver matches on (PciMatch)
+    Bus/                     ← a bus driver: its binding publishes child nodes
+      Xhci/
+        XhciDriver.cs        ← Cosmos.Kernel.Drivers.Pci.Bus.Xhci
+    Storage/                 ← otherwise, what it publishes (a block device)
+      Nvme/
+        NvmeDriver.cs
+  Virtio/
+    Display/
+      VirtioGpu/
+        VirtioGpuDriver.cs   ← Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu
+```
+
+The bus kind is the one the driver matches on, named after its match type:
+`Pci`, `Platform`, `Ps2`, `Usb` or `Virtio`. The category is `Bus` for a bus
+driver and otherwise names what the driver publishes: `Display`, `Input` (a
+keyboard or pointer), `Network` or `Storage` (a block device). The driver
+folder is the class name without `Driver`, unless a type inside the folder
+already has that name, since a namespace must not share its name with one of
+its types: the transport drivers sit in `VirtioPci` and `VirtioMmio`, beside
+their `VirtioPciTransport` and `VirtioMmioTransport` classes. A driver's
+state, protocol and vocabulary types stay in its folder, in subfolders when
+there are many (`VmwareSvga/Enums`, `VmwareSvga/Structs`). The namespace is
+part of the full type name that `CosmosDriverExclude` names and that the
+manifest sorts by ([Driver Manifest](build/driver-manifest.md)), so moving a
+driver changes both.
+
 ### Member Order
 
 There is no separator convention to follow. Four garbage-collector files carry
@@ -158,8 +192,8 @@ one screen:
   static factory sits with the constructors it stands in for.
 
 If you want a model for the full separator form in a new file,
-`Cosmos.Kernel.Drivers/VirtioGpuDriver.cs` is the file that demonstrates it.
-Do not convert an existing file to it.
+`Cosmos.Kernel.Drivers/Virtio/Display/VirtioGpu/VirtioGpuDriver.cs` is the
+file that demonstrates it. Do not convert an existing file to it.
 
 ### Using Directives
 

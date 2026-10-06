@@ -2,7 +2,17 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.Drivers;
+using Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort;
+using Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci;
+using Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
+using Cosmos.Kernel.Drivers.Pci.Network.E1000E;
+using Cosmos.Kernel.Drivers.Platform.Bus.I8042;
+using Cosmos.Kernel.Drivers.Platform.Bus.PciHost;
+using Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio;
+using Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard;
+using Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse;
+using Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard;
+using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;

@@ -14,8 +14,9 @@ internal static class Experimentals
     /// <summary>
     /// The driver kit seam, the id the HAL's kit types and the ring's
     /// <c>ICanvas3DFactory</c> carry, shared so one suppression covers the
-    /// seam on every side: here it marks <see cref="ISvgaAdapter"/>, the
-    /// VMware SVGA II adapter's test and tooling facet.
+    /// seam on every side: here it marks
+    /// <see cref="Pci.Display.VmwareSvga.ISvgaAdapter"/>, the VMware SVGA II
+    /// adapter's test and tooling facet.
     /// </summary>
     internal const string DriverKitSeamDiagId = "COSMOS0003";
 }

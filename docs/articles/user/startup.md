@@ -200,7 +200,7 @@ Every phase above logs to the serial port (COM1), which `cosmos run` connects to
 [Global] Registering kernel
 [Kernel] Enabling interrupts...
 [Kernel] Starting drivers...
-[Drivers] manifest: AhciDriver(prio 0) E1000EDriver(prio 0) I8042Driver(prio 0) NvmeDriver(prio 0) PciHostDriver(prio 0) PcieRootPortDriver(prio 0) Ps2KeyboardDriver(prio 0) Ps2MouseDriver(prio 0) UsbHubDriver(prio 0) UsbKeyboardDriver(prio 0) UsbMassStorageDriver(prio 0) VirtioBlkDriver(prio 0) VirtioGpuDriver(prio 0) VirtioInputDriver(prio 0) VirtioMmioTransportDriver(prio 0) VirtioNetDriver(prio 0) VirtioPciTransportDriver(prio 0) VmwareSvgaDriver(prio 0) XhciDriver(prio 0)
+[Drivers] manifest: PcieRootPortDriver(prio 0) VirtioPciTransportDriver(prio 0) XhciDriver(prio 0) VmwareSvgaDriver(prio 0) E1000EDriver(prio 0) AhciDriver(prio 0) NvmeDriver(prio 0) I8042Driver(prio 0) PciHostDriver(prio 0) VirtioMmioTransportDriver(prio 0) Ps2KeyboardDriver(prio 0) Ps2MouseDriver(prio 0) UsbHubDriver(prio 0) UsbKeyboardDriver(prio 0) UsbMassStorageDriver(prio 0) VirtioGpuDriver(prio 0) VirtioInputDriver(prio 0) VirtioNetDriver(prio 0) VirtioBlkDriver(prio 0)
 [Display] primary: firmware "framebuffer" (the only display)
 [Drivers] firmware published display "framebuffer" (consumed)
 [Drivers] engine started, worker thread
