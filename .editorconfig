@@ -16,12 +16,9 @@ trim_trailing_whitespace = true
 [*{_AssemblyInfo.cs,.notsupported.cs,AsmOffsets.cs}]
 generated_code = true
 
-# Vendored and upstream-mirroring code: keep diffable with its origin, skip style analysis
-[src/Cosmos.Kernel.System/IO/Compression/SharpZipLib/**.cs]
-generated_code = true
-
-[src/Cosmos.Kernel.System/Graphics/Images/BigGustave/**.cs]
-generated_code = true
+# Vendored and upstream-mirroring code: keep diffable with its origin, skip
+# style analysis. The vendored trees under src/Cosmos.Kernel.System/ThirdParty
+# get one section at the end of this file, after the sections it overrides.
 
 # fdlibm port (via Cosmos Gen2)
 [src/Cosmos.Kernel.Core/Runtime/Math.cs]
@@ -275,20 +272,14 @@ dotnet_diagnostic.CS1591.severity = error
 # overloaded member picks an arbitrary overload, so the reader follows a link
 # to a signature nobody meant.
 #
-# The vendored trees below inherit these too. They are clean today, and a
-# vendor drop that is not has to be documented like the rest of the assembly.
+# The vendored trees under ThirdParty/ inherit these too. They are clean today,
+# and a vendor drop that is not has to be documented like the rest of the
+# assembly.
 dotnet_diagnostic.CS1572.severity = error
 dotnet_diagnostic.CS1573.severity = error
 dotnet_diagnostic.CS1574.severity = error
 dotnet_diagnostic.CS1734.severity = error
 dotnet_diagnostic.CS0419.severity = error
-
-# Vendored code stays out of the declared surface: the tracking files list the
-# repo's own API only, and these types go internal in the pre-release surface
-# cleanup. Must come after the [*.cs] section above (later sections win).
-[src/Cosmos.Kernel.System/{IO/Compression/SharpZipLib,Graphics/Images/BigGustave,Graphics/Fonts/TrueType}/**.cs]
-dotnet_diagnostic.RS0016.severity = none
-dotnet_diagnostic.RS0017.severity = none
 
 # Kernel.VersionString is generated from $(VersionPrefix) into the obj dir:
 # tracking a version-stamped constant would churn the file on every bump.
@@ -300,13 +291,14 @@ dotnet_diagnostic.RS0017.severity = none
 # (every RootNamespace is the project name) followed by the folders between
 # the project and the file. Error, so `dotnet build` fails on a file that
 # drifts, and so does the format CI for the projects nativeaot-patcher.slnx
-# lists (not the test kernels). IDE0130 does not see generated code (the
-# generated_code sections above), files linked from outside the project, a
-# namespace nested in or containing another, or a namespace holding a partial
-# type declared in more than one file, such as a [LibraryImport] class; it
-# compares ignoring case. The exemptions below must come after this section
-# (later sections win).
-[{src/Cosmos.Kernel*,tests/Kernels,examples}/**.cs]
+# lists (not the test kernels). The host-side unit tests in
+# tests/Cosmos.Kernel.Tests.System follow the same rule. IDE0130 does not see
+# generated code (the generated_code sections), files linked from outside the
+# project, a namespace nested in or containing another, or a namespace holding
+# a partial type declared in more than one file, such as a [LibraryImport]
+# class; it compares ignoring case. The exemptions below must come after this
+# section (later sections win).
+[{src/Cosmos.Kernel*,tests/Kernels,tests/Cosmos.Kernel.Tests.System,examples}/**.cs]
 dotnet_style_namespace_match_folder = true
 dotnet_diagnostic.IDE0130.severity = error
 
@@ -319,7 +311,7 @@ dotnet_diagnostic.IDE0130.severity = error
 [src/Cosmos.Kernel*/Internal/Runtime/CompilerHelpers/LibraryInitializer.cs]
 dotnet_diagnostic.IDE0130.severity = none
 
-[src/Cosmos.Kernel.{HAL.X64,HAL.ARM64}/EagerStaticClassConstructionAttribute.cs]
+[src/Cosmos.Kernel.Core/Runtime/EagerStaticClassConstructionAttribute.cs]
 dotnet_diagnostic.IDE0130.severity = none
 
 [src/Cosmos.Kernel.Core/Runtime/Stdllib.cs]
@@ -334,11 +326,22 @@ dotnet_diagnostic.IDE0130.severity = none
 [src/Cosmos.Kernel.{Core,Core.X64,Core.ARM64}/Bridge/{Import,Export}/**.cs]
 dotnet_diagnostic.IDE0130.severity = none
 
-# Vendored code and the dotnet/runtime mirrors keep their upstream namespaces.
-# SharpZipLib, BigGustave and Runtime/Internal are already generated_code;
-# listing them here keeps them exempt if that ever changes.
-[src/Cosmos.Kernel.System/{IO/Compression/SharpZipLib,Graphics/Images/BigGustave,Graphics/Fonts/TrueType/LunarFonts}/**.cs]
+# The dotnet/runtime mirrors keep their upstream namespaces. Runtime/Internal
+# is already generated_code; listing it here keeps it exempt if that ever
+# changes.
+[src/Cosmos.Kernel.Core/Runtime/Internal/**.cs]
 dotnet_diagnostic.IDE0130.severity = none
 
-[src/Cosmos.Kernel.Core/Runtime/Internal/**.cs]
+# Vendored code (BigGustave, LunarFonts, SharpZipLib, each with a README.md
+# recording its origin and local changes) keeps its upstream namespaces and
+# code shape (only whitespace follows the repository style) so it stays
+# diffable against upstream: generated_code skips the style analyzers and the
+# format CI, and IDE0130 is off. It also stays out of the declared surface,
+# since the PublicAPI files list the repo's own API only. Last in the file
+# because it overrides the [*.cs] RS0016/RS0017 section and the IDE0130
+# section above (later sections win).
+[src/Cosmos.Kernel.System/ThirdParty/**.cs]
+generated_code = true
+dotnet_diagnostic.RS0016.severity = none
+dotnet_diagnostic.RS0017.severity = none
 dotnet_diagnostic.IDE0130.severity = none

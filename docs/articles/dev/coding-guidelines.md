@@ -142,7 +142,8 @@ This is only allowed now in `Cosmos.Kernel.Core` but this may change in the futu
 A file's namespace is its project's name followed by the folders between
 the project and the file: `Cosmos.Kernel.Core/Scheduler/SchedulerThread.cs`
 declares `Cosmos.Kernel.Core.Scheduler`. The build enforces it with IDE0130
-at error for every `src/Cosmos.Kernel*` project, the test kernels and
+at error for every `src/Cosmos.Kernel*` project, the test kernels, the
+host-side unit tests in `tests/Cosmos.Kernel.Tests.System` and
 `examples/DevKernel`, so `dotnet build` fails on a file that drifts (the
 format CI checks the projects in `nativeaot-patcher.slnx`, which leaves out
 the test kernels). Move the file or fix the namespace rather than adding an
@@ -152,10 +153,11 @@ names ILC matches by full name (each `LibraryInitializer`,
 source generators' `IsExternalInit` (the C# compiler's init-accessor
 marker, which must live in `System.Runtime.CompilerServices`), the
 `Bridge/Import` and `Bridge/Export` folders, whose files share the
-project's `Bridge` namespace, and vendored code. IDE0130 does not check a
-namespace holding a partial type split across files (every
-`[LibraryImport]` class) or a nested namespace; those follow the rule
-unchecked.
+project's `Bridge` namespace, the vendored code under
+`Cosmos.Kernel.System/ThirdParty/` and the dotnet/runtime mirrors under
+`Cosmos.Kernel.Core/Runtime/Internal/`. IDE0130 does not check a namespace
+holding a partial type split across files (every `[LibraryImport]` class)
+or a nested namespace; those follow the rule unchecked.
 
 ### Driver Folders
 
@@ -219,10 +221,11 @@ file that demonstrates it. Do not convert an existing file to it.
 - Place `using` directives **outside** the namespace.
 - Sort `System` namespaces first.
 - Use file-scoped namespaces (eg. `namespace Cosmos.Kernel.Core.Scheduler;`).
-  The vendored trees (BigGustave, SharpZipLib, LunarFonts) and the
-  dotnet/runtime mirrors keep the block form so they stay diffable against
-  upstream, and `Core/Runtime/Stdllib.cs` cannot take the file-scoped form
-  at all: it declares four namespaces, one of them nested, which is CS8955.
+  The vendored trees under `ThirdParty/` (BigGustave, SharpZipLib,
+  LunarFonts) and the dotnet/runtime mirrors keep the block form so they
+  stay diffable against upstream, and `Core/Runtime/Stdllib.cs` cannot take
+  the file-scoped form at all: it declares four namespaces, one of them
+  nested, which is CS8955.
 
 ---
 

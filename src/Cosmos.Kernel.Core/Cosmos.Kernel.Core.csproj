@@ -108,7 +108,8 @@
     <!-- System's supported ring fronts Core internals (Serial log, memory
          stats, thread kill) so kernels never reference Core directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
-    <!-- Arch HALs feed timer ticks and IRQ plumbing into Core. -->
+    <!-- Arch HALs feed timer ticks and IRQ plumbing into Core, and mark their
+         EagerCtor with Core's EagerStaticClassConstructionAttribute. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box scheduler suite reads Stride bookkeeping and drives the

@@ -1,40 +1,29 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System.Text;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Keyboard;
 
-namespace Cosmos.Kernel.System.IO;
+namespace Cosmos.Kernel.Plugs.System.IO;
 
 internal sealed class KeyboardTextReader : TextReader
 {
-    public override int Read()
-    {
-        if (KeyboardManager.TryReadKey(out KeyEvent? result))
-        {
-            return result.KeyChar;
-        }
-        else
-        {
-            return -1;
-        }
-    }
+    public override int Read() => KeyboardManager.TryReadKey(out KeyEvent? result) ? result.KeyChar : -1;
 
-    public override int Peek()
-    {
-        return KeyboardManager.KeyAvailable ? KeyboardManager.Peek().KeyChar : -1;
-    }
+    public override int Peek() => KeyboardManager.KeyAvailable ? KeyboardManager.Peek().KeyChar : -1;
 
     public override string? ReadLine()
     {
         KernelConsole.ThrowIfKernelConsoleNotInitialized();
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
 
         // Track cursor position within input string
         int cursorPos = 0;
 
         while (true)
         {
-            var keyEvent = KeyboardManager.ReadKey();
+            KeyEvent keyEvent = KeyboardManager.ReadKey();
 
             switch (keyEvent.Key)
             {
@@ -45,17 +34,14 @@ internal sealed class KeyboardTextReader : TextReader
                 case ConsoleKeyEx.Backspace:
                     if (cursorPos > 0)
                     {
-                        // Remove character from string at cursor position
                         sb.Remove(cursorPos - 1, 1);
                         cursorPos--;
 
-                        // Move cursor back
                         KernelConsole.Default.MoveCursorLeft();
 
                         // If we're not at the end, shift remaining chars left
                         if (cursorPos < sb.Length)
                         {
-                            // Save current position
                             int savedX = KernelConsole.Default.CursorX;
                             int savedY = KernelConsole.Default.CursorY;
 
@@ -67,7 +53,6 @@ internal sealed class KeyboardTextReader : TextReader
                             // Clear the last position (now empty)
                             KernelConsole.Default.Write(' ');
 
-                            // Restore cursor position
                             KernelConsole.Default.SetCursorPosition(savedX, savedY);
                         }
                         else
@@ -83,10 +68,8 @@ internal sealed class KeyboardTextReader : TextReader
                 case ConsoleKeyEx.Delete:
                     if (cursorPos < sb.Length)
                     {
-                        // Remove character at cursor position
                         sb.Remove(cursorPos, 1);
 
-                        // Save current position
                         int savedX = KernelConsole.Default.CursorX;
                         int savedY = KernelConsole.Default.CursorY;
 
@@ -98,7 +81,6 @@ internal sealed class KeyboardTextReader : TextReader
                         // Clear the last position (now empty)
                         KernelConsole.Default.Write(' ');
 
-                        // Restore cursor position
                         KernelConsole.Default.SetCursorPosition(savedX, savedY);
 
                         KernelConsole.Default.Canvas.Display();
@@ -162,7 +144,6 @@ internal sealed class KeyboardTextReader : TextReader
                                 KernelConsole.Default.Write(sb[i]);
                             }
 
-                            // Move cursor to correct position
                             KernelConsole.Default.SetCursorPosition(afterTyping, savedY);
                         }
                         else

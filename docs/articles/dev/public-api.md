@@ -179,7 +179,7 @@ The effect is that any change to the public surface, deliberate or accidental, m
 
 Three categories stay out of the files, the first two through `.editorconfig` overrides that set `RS0016`/`RS0017` to `none` under their paths:
 
-- The vendored directories (`SharpZipLib`, the BigGustave PNG decoder, the TrueType fonts). The exemption is what let that cleanup happen without churning the declared surface; all three trees are `internal` throughout now, so it currently exempts nothing and stays as the standing rule for the next vendored tree.
+- The vendored directories under `Cosmos.Kernel.System/ThirdParty/` (`SharpZipLib`, the BigGustave PNG decoder, the LunarFonts TrueType rasterizer). The exemption is what let that cleanup happen without churning the declared surface; all three trees are `internal` throughout now, so it currently exempts nothing and stays as the standing rule for the next vendored tree.
 - The generated `KernelVersion.g.cs` that carries `Kernel.VersionString`: the declared-API format records constant values, and this one changes with every version stamp.
 - `internal` symbols, including everything exposed to the test kernels through `InternalsVisibleTo`.
 

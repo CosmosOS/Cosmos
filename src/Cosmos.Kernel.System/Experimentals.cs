@@ -1,8 +1,11 @@
-namespace Cosmos.Kernel.System.Network;
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
+namespace Cosmos.Kernel.System;
 
 /// <summary>
 /// Diagnostic IDs of the experimental API seams exposed by
-/// Cosmos.Kernel.System. An experimental API is usable today but carries no
+/// Cosmos.Kernel.System: the network packet seam and the ring's side of the
+/// driver kit seam. An experimental API is usable today but carries no
 /// compatibility promise; referencing one produces an error with the ID
 /// below until the caller suppresses it, which is the caller's
 /// acknowledgement of that contract.
@@ -12,8 +15,8 @@ internal static class Experimentals
     /// <summary>
     /// The packet seam: the protocol packet types (Ethernet, ARP, the
     /// version-neutral internet layer, IPv4, ICMP, UDP, DHCP, DNS, TCP), the
-    /// <see cref="NetworkStack"/> members that transmit and inject them, and
-    /// the client members that accept or return packet objects.
+    /// <see cref="Network.NetworkStack"/> members that transmit and inject
+    /// them, and the client members that accept or return packet objects.
     /// </summary>
     internal const string PacketSeamDiagId = "COSMOS0002";
 

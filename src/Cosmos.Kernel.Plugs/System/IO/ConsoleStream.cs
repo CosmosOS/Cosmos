@@ -1,13 +1,29 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System.Text;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Keyboard;
 
-namespace Cosmos.Kernel.System.IO;
+namespace Cosmos.Kernel.Plugs.System.IO;
 
 internal sealed class ConsoleStream : Stream
 {
     private readonly StringBuilder _readLineSB;
     private bool _canRead, _canWrite;
+
+    public sealed override bool CanRead => _canRead;
+
+    public sealed override bool CanWrite => _canWrite;
+
+    public sealed override bool CanSeek => false;
+
+    public sealed override long Length => throw new NotSupportedException();
+
+    public sealed override long Position
+    {
+        get => throw new NotSupportedException();
+        set => throw new NotSupportedException();
+    }
 
     public ConsoleStream(FileAccess access)
     {
@@ -18,17 +34,17 @@ internal sealed class ConsoleStream : Stream
 
     public override void Flush()
     {
-
     }
 
     public override void Write(ReadOnlySpan<byte> buffer)
     {
         KernelConsole.ThrowIfKernelConsoleNotInitialized();
 
-        var value = Console.OutputEncoding.GetString(buffer);
+        string value = Console.OutputEncoding.GetString(buffer);
         KernelConsole.Default.Write(value);
         KernelConsole.Default.Canvas.Display();
     }
+
     public override int Read(Span<byte> buffer)
     {
         if (buffer.IsEmpty)
@@ -38,7 +54,7 @@ internal sealed class ConsoleStream : Stream
 
         if (_readLineSB.Length == 0)
         {
-            var isEnter = ReadLineCore();
+            bool isEnter = ReadLineCore();
             if (isEnter)
             {
                 _readLineSB.Append(Environment.NewLine);
@@ -74,7 +90,7 @@ internal sealed class ConsoleStream : Stream
     {
         KernelConsole.ThrowIfKernelConsoleNotInitialized();
 
-        KernelConsole.Default?.Write((char)value);
+        KernelConsole.Default.Write((char)value);
     }
 
     public override int Read(byte[] buffer, int offset, int count)
@@ -96,20 +112,6 @@ internal sealed class ConsoleStream : Stream
         _canRead = false;
         _canWrite = false;
         base.Dispose(disposing);
-    }
-
-    public sealed override bool CanRead => _canRead;
-
-    public sealed override bool CanWrite => _canWrite;
-
-    public sealed override bool CanSeek => false;
-
-    public sealed override long Length => throw new NotSupportedException();
-
-    public sealed override long Position
-    {
-        get => throw new NotSupportedException();
-        set => throw new NotSupportedException();
     }
 
     public sealed override void SetLength(long value) => throw new NotSupportedException();
@@ -144,7 +146,7 @@ internal sealed class ConsoleStream : Stream
 
         while (true)
         {
-            var keyEvent = KeyboardManager.ReadKey();
+            KeyEvent keyEvent = KeyboardManager.ReadKey();
 
             switch (keyEvent.Key)
             {
@@ -156,17 +158,14 @@ internal sealed class ConsoleStream : Stream
                 case ConsoleKeyEx.Backspace:
                     if (cursorPos > 0)
                     {
-                        // Remove character from string at cursor position
                         _readLineSB.Remove(cursorPos - 1, 1);
                         cursorPos--;
 
-                        // Move cursor back
                         KernelConsole.Default.MoveCursorLeft();
 
                         // If we're not at the end, shift remaining chars left
                         if (cursorPos < _readLineSB.Length)
                         {
-                            // Save current position
                             int savedX = KernelConsole.Default.CursorX;
                             int savedY = KernelConsole.Default.CursorY;
 
@@ -178,7 +177,6 @@ internal sealed class ConsoleStream : Stream
                             // Clear the last position (now empty)
                             KernelConsole.Default.Write(' ');
 
-                            // Restore cursor position
                             KernelConsole.Default.SetCursorPosition(savedX, savedY);
                         }
                         else
@@ -194,10 +192,8 @@ internal sealed class ConsoleStream : Stream
                 case ConsoleKeyEx.Delete:
                     if (cursorPos < _readLineSB.Length)
                     {
-                        // Remove character at cursor position
                         _readLineSB.Remove(cursorPos, 1);
 
-                        // Save current position
                         int savedX = KernelConsole.Default.CursorX;
                         int savedY = KernelConsole.Default.CursorY;
 
@@ -209,7 +205,6 @@ internal sealed class ConsoleStream : Stream
                         // Clear the last position (now empty)
                         KernelConsole.Default.Write(' ');
 
-                        // Restore cursor position
                         KernelConsole.Default.SetCursorPosition(savedX, savedY);
 
                         KernelConsole.Default.Canvas.Display();
@@ -273,7 +268,6 @@ internal sealed class ConsoleStream : Stream
                                 KernelConsole.Default.Write(_readLineSB[i]);
                             }
 
-                            // Move cursor to correct position
                             KernelConsole.Default.SetCursorPosition(afterTyping, savedY);
                         }
                         else
