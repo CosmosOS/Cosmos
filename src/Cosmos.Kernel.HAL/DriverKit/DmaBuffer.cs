@@ -2,6 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Memory;
+using Cosmos.Kernel.HAL.DriverKit.Display;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
@@ -56,7 +57,7 @@ public sealed unsafe class DmaBuffer : IKitResource
     /// The buffer as a <see cref="DeviceRegion"/>, one instance for the
     /// buffer's lifetime, created with it. Throws once released, and the
     /// region itself throws from then on, so a driver that handed it out
-    /// (an <see cref="Devices.IDisplay.Framebuffer"/> over DMA memory) never
+    /// (an <see cref="IDisplay.Framebuffer"/> over DMA memory) never
     /// exposes freed pages. The region is not in the binding's ledger: the
     /// buffer's own release invalidates it. Any context; allocation-free.
     /// </summary>

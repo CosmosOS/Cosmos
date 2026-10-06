@@ -12,8 +12,8 @@ namespace Cosmos.Kernel.Tests.System.Network.Protocols.IPv6;
 [TestFixture]
 public class Icmpv6PacketTest
 {
-    private static readonly MACAddress s_guestMac = new([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
-    private static readonly MACAddress s_peerMac = new([0x52, 0x54, 0x00, 0x12, 0x34, 0x99]);
+    private static readonly MacAddress s_guestMac = new([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
+    private static readonly MacAddress s_peerMac = new([0x52, 0x54, 0x00, 0x12, 0x34, 0x99]);
     private static readonly Address6 s_guestLinkLocal = Address6.Parse("fe80::5054:ff:fe12:3456")!;
     private static readonly Address6 s_peerLinkLocal = Address6.Parse("fe80::2")!;
     private static readonly Address6 s_gateway = Address6.Parse("fec0::2")!;
@@ -128,7 +128,7 @@ public class Icmpv6PacketTest
                 Assert.That(solicitation.SourceIP, Is.EqualTo(s_guestLinkLocal));
                 Assert.That(solicitation.DestinationIP, Is.EqualTo(Address6.Parse("ff02::1:ff00:2")));
                 Assert.That(solicitation.SourceMac, Is.EqualTo(s_guestMac));
-                Assert.That(solicitation.DestinationMac, Is.EqualTo(new MACAddress([0x33, 0x33, 0xFF, 0x00, 0x00, 0x02])));
+                Assert.That(solicitation.DestinationMac, Is.EqualTo(new MacAddress([0x33, 0x33, 0xFF, 0x00, 0x00, 0x02])));
                 Assert.That(solicitation.HopLimit, Is.EqualTo(255));
                 Assert.That(solicitation.PayloadLength, Is.EqualTo(32));
                 Assert.That(solicitation.IcmpType, Is.EqualTo(135));
@@ -181,9 +181,9 @@ public class Icmpv6PacketTest
         [Test]
         public void GivenGroup_PrefixesThirtyThreeToItsLowFourBytes()
         {
-            MACAddress actual = IPv6Packet.MulticastMac(Address6.Parse("ff02::1:ff12:3456")!);
+            MacAddress actual = IPv6Packet.MulticastMac(Address6.Parse("ff02::1:ff12:3456")!);
 
-            Assert.That(actual, Is.EqualTo(new MACAddress([0x33, 0x33, 0xFF, 0x12, 0x34, 0x56])));
+            Assert.That(actual, Is.EqualTo(new MacAddress([0x33, 0x33, 0xFF, 0x12, 0x34, 0x56])));
         }
     }
 }

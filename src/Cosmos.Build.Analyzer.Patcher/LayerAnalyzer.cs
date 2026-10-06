@@ -38,7 +38,7 @@ public class LayerAnalyzer : DiagnosticAnalyzer
 {
     /// <summary>
     /// The HAL assembly that carries the driver kit seam and the device contracts the ring
-    /// and the kit name in their public surface (<c>IBlockDevice</c>, <c>MACAddress</c>):
+    /// and the kit name in their public surface (<c>IBlockDevice</c>, <c>MacAddress</c>):
     /// a User layer project may name its types. The arch HAL assemblies are reached
     /// through it only.
     /// </summary>

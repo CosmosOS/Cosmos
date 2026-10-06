@@ -129,7 +129,7 @@ internal static class IPv4OutgoingBuffer
                             continue;
                         }
 
-                        MACAddress? nextHopMac = ArpCache.Resolve(nextHop);
+                        MacAddress? nextHopMac = ArpCache.Resolve(nextHop);
                         if (nextHopMac is not null)
                         {
                             entry.Packet.DestinationMac = nextHopMac;
@@ -141,9 +141,9 @@ internal static class IPv4OutgoingBuffer
                             ArpRequestEthernet arpRequest = new(
                                 entry.NIC.MacAddress,
                                 entry.Packet.SourceIP,
-                                MACAddress.Broadcast,
+                                MacAddress.Broadcast,
                                 nextHop,
-                                MACAddress.None
+                                MacAddress.None
                             );
                             entry.NIC.Send(arpRequest.RawData, arpRequest.RawData.Length);
                             entry.Status = BufferEntry.EntryStatus.ROUTE_ARP_SENT;
@@ -151,7 +151,7 @@ internal static class IPv4OutgoingBuffer
                         continue;
                     }
 
-                    MACAddress? cachedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
+                    MacAddress? cachedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
                     if (cachedMac is not null)
                     {
                         entry.Packet.DestinationMac = cachedMac;
@@ -165,9 +165,9 @@ internal static class IPv4OutgoingBuffer
                         ArpRequestEthernet arpRequest = new(
                             entry.NIC.MacAddress,
                             entry.Packet.SourceIP,
-                            MACAddress.Broadcast,
+                            MacAddress.Broadcast,
                             entry.Packet.DestinationIP,
-                            MACAddress.None
+                            MacAddress.None
                         );
                         bool sent = entry.NIC.Send(arpRequest.RawData, arpRequest.RawData.Length);
                         Serial.WriteString("[IPv4OutgoingBuffer] ARP send result: ");
@@ -180,7 +180,7 @@ internal static class IPv4OutgoingBuffer
                 }
                 else if (entry.Status == BufferEntry.EntryStatus.ARP_SENT)
                 {
-                    MACAddress? repliedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
+                    MacAddress? repliedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
                     if (repliedMac is not null)
                     {
                         entry.Packet.DestinationMac = repliedMac;
@@ -190,7 +190,7 @@ internal static class IPv4OutgoingBuffer
                 }
                 else if (entry.Status == BufferEntry.EntryStatus.ROUTE_ARP_SENT)
                 {
-                    MACAddress? routedMac = entry.NextHop is null ? null : ArpCache.Resolve(entry.NextHop);
+                    MacAddress? routedMac = entry.NextHop is null ? null : ArpCache.Resolve(entry.NextHop);
                     if (routedMac is not null)
                     {
                         entry.Packet.DestinationMac = routedMac;

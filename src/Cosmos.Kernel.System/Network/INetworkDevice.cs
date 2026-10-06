@@ -26,7 +26,7 @@ internal interface INetworkDevice
     /// <summary>
     /// Gets the MAC address of the device.
     /// </summary>
-    MACAddress MacAddress { get; }
+    MacAddress MacAddress { get; }
 
     /// <summary>
     /// Gets whether the link is up.

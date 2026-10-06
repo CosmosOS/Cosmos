@@ -17,12 +17,12 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// <summary>
     /// The sender MAC address.
     /// </summary>
-    private protected MACAddress _senderMac = null!;
+    private protected MacAddress _senderMac = null!;
 
     /// <summary>
     /// The target MAC address.
     /// </summary>
-    private protected MACAddress _targetMac = null!;
+    private protected MacAddress _targetMac = null!;
 
     /// <summary>
     /// The sender IP address.
@@ -53,9 +53,9 @@ public abstract class ArpPacketEthernet : ArpPacket
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        _senderMac = new MACAddress(RawData, 22);
+        _senderMac = new MacAddress(RawData, 22);
         _senderIP = new Address4(RawData, 28);
-        _targetMac = new MACAddress(RawData, 32);
+        _targetMac = new MacAddress(RawData, 32);
         _targetIP = new Address4(RawData, 38);
     }
 
@@ -75,8 +75,8 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// <param name="packetSize">Total frame size in bytes.</param>
     /// <param name="arpTargetMac">Target hardware address (THA), the value written into the ARP
     /// body at offset 32; it can differ from the Ethernet destination, as in a broadcast request.</param>
-    private protected ArpPacketEthernet(ushort operation, MACAddress senderMac, Address senderIP,
-        MACAddress targetMac, Address targetIP, int packetSize, MACAddress arpTargetMac)
+    private protected ArpPacketEthernet(ushort operation, MacAddress senderMac, Address senderIP,
+        MacAddress targetMac, Address targetIP, int packetSize, MacAddress arpTargetMac)
         : base(targetMac, senderMac, 1, 0x0800, 6, 4, operation, packetSize)
     {
         for (int i = 0; i < 6; i++)
@@ -97,13 +97,13 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// Gets the sender hardware address (SHA). This is a snapshot parsed from
     /// <see cref="EthernetPacket.RawData"/> at construction.
     /// </summary>
-    public MACAddress SenderMac => _senderMac;
+    public MacAddress SenderMac => _senderMac;
 
     /// <summary>
     /// Gets the target hardware address (THA), read from the ARP body, not from the Ethernet
     /// header. This is a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction.
     /// </summary>
-    public MACAddress TargetMac => _targetMac;
+    public MacAddress TargetMac => _targetMac;
 
     /// <summary>
     /// Gets the sender protocol address (SPA). This is a snapshot parsed from
@@ -159,7 +159,7 @@ public class ArpReplyEthernet : ArpPacketEthernet
     /// <param name="targetMac">The requester's MAC address: the Ethernet destination and the ARP
     /// target hardware address (THA).</param>
     /// <param name="targetIP">The requester's IP address: the target protocol address (TPA).</param>
-    public ArpReplyEthernet(MACAddress ourMac, Address ourIP, MACAddress targetMac, Address targetIP)
+    public ArpReplyEthernet(MacAddress ourMac, Address ourIP, MacAddress targetMac, Address targetIP)
         : base(2, ourMac, ourIP, targetMac, targetIP, 42, targetMac)
     { }
 
@@ -196,19 +196,19 @@ public class ArpRequestEthernet : ArpPacketEthernet
 
     /// <summary>
     /// Initializes a new 42-byte ARP request for sending. Callers normally pass
-    /// <see cref="MACAddress.Broadcast"/> as <paramref name="targetMac"/> (the Ethernet
-    /// destination) and <see cref="MACAddress.None"/> as <paramref name="arpTargetMac"/>: the
+    /// <see cref="MacAddress.Broadcast"/> as <paramref name="targetMac"/> (the Ethernet
+    /// destination) and <see cref="MacAddress.None"/> as <paramref name="arpTargetMac"/>: the
     /// target hardware address field of a request is zero because it is the value being asked for.
     /// </summary>
     /// <param name="ourMac">Our MAC address: the sender hardware address (SHA) and the Ethernet
     /// source address.</param>
     /// <param name="ourIP">Our IP address: the sender protocol address (SPA).</param>
     /// <param name="targetMac">Destination MAC address of the Ethernet frame, normally
-    /// <see cref="MACAddress.Broadcast"/>.</param>
+    /// <see cref="MacAddress.Broadcast"/>.</param>
     /// <param name="targetIP">The IP address being resolved: the target protocol address (TPA).</param>
     /// <param name="arpTargetMac">Target hardware address (THA) written into the ARP body,
-    /// normally <see cref="MACAddress.None"/>.</param>
-    public ArpRequestEthernet(MACAddress ourMac, Address ourIP, MACAddress targetMac, Address targetIP, MACAddress arpTargetMac)
+    /// normally <see cref="MacAddress.None"/>.</param>
+    public ArpRequestEthernet(MacAddress ourMac, Address ourIP, MacAddress targetMac, Address targetIP, MacAddress arpTargetMac)
         : base(1, ourMac, ourIP, targetMac, targetIP, 42, arpTargetMac)
     { }
 

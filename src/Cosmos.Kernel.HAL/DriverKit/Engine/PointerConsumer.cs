@@ -1,6 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Input;
+
+namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 
 /// <summary>The ring's consumer of pointers: receives movement and button reports.</summary>
 internal abstract class PointerConsumer : DeviceConsumer

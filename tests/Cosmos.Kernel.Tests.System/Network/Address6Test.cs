@@ -256,7 +256,7 @@ public class Address6Test
         [Test]
         public void GivenUniversalMac_InvertsTheUniversalBitAndInsertsFffe()
         {
-            Address6 actual = Address6.LinkLocalFor(new MACAddress([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]));
+            Address6 actual = Address6.LinkLocalFor(new MacAddress([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]));
 
             Assert.That(actual, Is.EqualTo(Address6.Parse("fe80::5054:ff:fe12:3456")));
         }
@@ -264,7 +264,7 @@ public class Address6Test
         [Test]
         public void GivenLocallyAdministeredMac_ClearsTheUniversalBit()
         {
-            Address6 actual = Address6.LinkLocalFor(new MACAddress([0x02, 0x00, 0x00, 0x00, 0x00, 0x01]));
+            Address6 actual = Address6.LinkLocalFor(new MacAddress([0x02, 0x00, 0x00, 0x00, 0x00, 0x01]));
 
             Assert.That(actual, Is.EqualTo(Address6.Parse("fe80::ff:fe00:1")));
         }
@@ -272,7 +272,7 @@ public class Address6Test
         [Test]
         public void GivenLinkLocal_AddressTypeIsLinkLocal()
         {
-            Address6 actual = Address6.LinkLocalFor(new MACAddress([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]));
+            Address6 actual = Address6.LinkLocalFor(new MacAddress([0x52, 0x54, 0x00, 0x12, 0x34, 0x56]));
 
             Assert.That(actual.AddressType, Is.EqualTo(IPv6AddressType.LinkLocal));
         }

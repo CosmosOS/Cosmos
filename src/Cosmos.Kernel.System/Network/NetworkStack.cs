@@ -34,12 +34,11 @@ public static class NetworkStack
     /// <param name="ipAddress">The IP address to assign to the device.</param>
     internal static void ConfigIP(INetworkDevice device, Address ipAddress)
     {
-        MACAddress mac = device.MacAddress;
+        MacAddress mac = device.MacAddress;
 
-        if (MACMap.ContainsKey(mac.Hash))
+        if (MACMap.Remove(mac.Hash))
         {
             RemoveAddresses(device);
-            MACMap.Remove(mac.Hash);
         }
 
         // Add new config. The link-local IPv6 address needs nothing from the

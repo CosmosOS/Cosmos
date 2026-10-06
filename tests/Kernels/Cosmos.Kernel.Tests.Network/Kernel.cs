@@ -338,7 +338,7 @@ public class Kernel : Sys.Kernel
         }
 
         Address6? linkLocal = NetworkManager.Primary.LinkLocalAddress;
-        MACAddress? mac = NetworkManager.MacAddress;
+        MacAddress? mac = NetworkManager.MacAddress;
         if (linkLocal is null || mac is null)
         {
             Assert.True(false, "The primary adapter should carry a link-local address once configured");
@@ -493,7 +493,7 @@ public class Kernel : Sys.Kernel
         Assert.True(hostAck, "Host should confirm it received a valid ICMPv6 echo reply");
     }
 
-    // Parses "52:54:00:12:34:56" into six bytes; MACAddress keeps its bytes internal.
+    // Parses "52:54:00:12:34:56" into six bytes; MacAddress keeps its bytes internal.
     private static byte[] ParseMac(string mac)
     {
         byte[] bytes = new byte[6];

@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Devices;
+namespace Cosmos.Kernel.HAL.DriverKit.Input;
 
 /// <summary>What a keyboard driver implements and hands to <see cref="DeviceBinding.PublishKeyboard"/>. Called by the ring in thread context.</summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]

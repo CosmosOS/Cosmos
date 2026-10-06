@@ -124,7 +124,7 @@ public class IPPacket : InternetPacket
     /// <summary>
     /// Initializes a new instance of the <see cref="IPPacket"/> class. The
     /// source MAC is looked up from the configured devices by the source IP
-    /// (<see cref="MACAddress.None"/> when the address is not configured)
+    /// (<see cref="MacAddress.None"/> when the address is not configured)
     /// and the destination MAC is left unset for ARP resolution at send
     /// time.
     /// </summary>
@@ -134,7 +134,7 @@ public class IPPacket : InternetPacket
     /// <param name="dest">Destination address.</param>
     /// <param name="flags">Raw value of header byte 20: the 3 flag bits followed by the upper 5 bits of the fragment offset.</param>
     internal IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags)
-        : this(GetSourceMAC(source), MACAddress.None, dataLength, protocol, source, dest, flags)
+        : this(GetSourceMac(source), MacAddress.None, dataLength, protocol, source, dest, flags)
     { }
 
     /// <summary>
@@ -147,22 +147,22 @@ public class IPPacket : InternetPacket
     /// <param name="source">Source address.</param>
     /// <param name="dest">Destination address.</param>
     /// <param name="flags">Raw value of header byte 20: the 3 flag bits followed by the upper 5 bits of the fragment offset.</param>
-    /// <param name="destMAC">Destination MAC address.</param>
-    internal IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags, MACAddress destMAC)
-        : this(GetSourceMAC(source), destMAC, dataLength, protocol, source, dest, flags)
+    /// <param name="destMac">Destination MAC address.</param>
+    internal IPPacket(ushort dataLength, byte protocol, Address source, Address dest, byte flags, MacAddress destMac)
+        : this(GetSourceMac(source), destMac, dataLength, protocol, source, dest, flags)
     { }
 
     /// <summary>
     /// Gets the source MAC address from the NetworkStack based on source IP.
     /// </summary>
-    private static MACAddress GetSourceMAC(Address sourceIP)
+    private static MacAddress GetSourceMac(Address sourceIP)
     {
         if (NetworkStack.AddressMap.TryGetValue(sourceIP, out INetworkDevice? device))
         {
             return device.MacAddress;
         }
 
-        return MACAddress.None;
+        return MacAddress.None;
     }
 
     /// <summary>
@@ -170,16 +170,16 @@ public class IPPacket : InternetPacket
     /// writing the complete IPv4 header: TTL 0x80, a fragment ID drawn from
     /// a global counter, and the header checksum computed here.
     /// </summary>
-    /// <param name="srcMAC">Source MAC address.</param>
-    /// <param name="destMAC">Destination MAC address.</param>
+    /// <param name="srcMac">Source MAC address.</param>
+    /// <param name="destMac">Destination MAC address.</param>
     /// <param name="dataLength">Length of the IP payload, in bytes.</param>
     /// <param name="protocol">IP protocol number of the payload.</param>
     /// <param name="source">Source address.</param>
     /// <param name="dest">Destination address.</param>
     /// <param name="flags">Raw value of header byte 20: the 3 flag bits followed by the upper 5 bits of the fragment offset.</param>
-    public IPPacket(MACAddress srcMAC, MACAddress destMAC, ushort dataLength, byte protocol,
+    public IPPacket(MacAddress srcMac, MacAddress destMac, ushort dataLength, byte protocol,
         Address source, Address dest, byte flags)
-        : base(destMAC, srcMAC, EtherTypeIPv4, dataLength + 14 + 20)
+        : base(destMac, srcMac, EtherTypeIPv4, dataLength + 14 + 20)
     {
         RawData[14] = 0x45;
         RawData[15] = 0;

@@ -3,7 +3,7 @@
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.HAL.Devices;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.System.Network;
 
@@ -96,10 +96,10 @@ public static class NetworkManager
     /// <summary>
     /// The primary device's MAC address, or null when there is no device. A
     /// device that has not finished initializing reports
-    /// <see cref="MACAddress.None"/>, the all-zero address, rather than null;
+    /// <see cref="MacAddress.None"/>, the all-zero address, rather than null;
     /// see <see cref="Ready"/>.
     /// </summary>
-    public static MACAddress? MacAddress => PrimaryDevice?.MacAddress;
+    public static MacAddress? MacAddress => PrimaryDevice?.MacAddress;
 
     /// <summary>
     /// Whether the primary device finished initializing and can carry traffic.

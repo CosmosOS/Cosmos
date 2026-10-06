@@ -5,8 +5,8 @@ using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Input;
 using Cosmos.Kernel.HAL.Platform;
 using Cosmos.Kernel.System.Input.Layouts;
 

@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Input;
 using Cosmos.Kernel.HAL.DriverKit.Usb;
 
 namespace Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard;

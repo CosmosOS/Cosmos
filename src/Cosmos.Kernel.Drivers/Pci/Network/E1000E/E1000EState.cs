@@ -3,7 +3,7 @@
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Network;
 
 namespace Cosmos.Kernel.Drivers.Pci.Network.E1000E;
 
@@ -47,7 +47,7 @@ public sealed class E1000EState : INetworkInterface
 
     private readonly DeviceBinding _binding;
     private readonly RegisterWindow _registers;
-    private readonly MACAddress _macAddress;
+    private readonly MacAddress _macAddress;
     private readonly DmaBuffer _receiveRing;
     private readonly DmaBuffer _transmitRing;
     private readonly DmaBuffer _receiveBuffers;
@@ -71,7 +71,7 @@ public sealed class E1000EState : INetworkInterface
     /// tail starts on the last descriptor, the transmit tail on the first,
     /// as the registers were set. Thread context, from the probe.
     /// </summary>
-    internal E1000EState(DeviceBinding binding, RegisterWindow registers, MACAddress macAddress, DmaBuffer receiveRing, DmaBuffer transmitRing, DmaBuffer receiveBuffers, DmaBuffer transmitBuffers)
+    internal E1000EState(DeviceBinding binding, RegisterWindow registers, MacAddress macAddress, DmaBuffer receiveRing, DmaBuffer transmitRing, DmaBuffer receiveBuffers, DmaBuffer transmitBuffers)
     {
         _binding = binding;
         _registers = registers;
@@ -88,7 +88,7 @@ public sealed class E1000EState : INetworkInterface
     public string Name => "e1000e";
 
     /// <inheritdoc/>
-    public MACAddress MacAddress => _macAddress;
+    public MacAddress MacAddress => _macAddress;
 
     /// <summary>True while the link is up, as the probe read it and the drain keeps it. Any context.</summary>
     public bool LinkUp

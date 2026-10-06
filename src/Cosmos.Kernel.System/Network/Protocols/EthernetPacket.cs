@@ -18,10 +18,10 @@ namespace Cosmos.Kernel.System.Network.Protocols;
 public class EthernetPacket
 {
     /// <summary>Parsed source MAC address backing <see cref="SourceMac"/>.</summary>
-    private protected MACAddress _srcMAC = null!;
+    private protected MacAddress _srcMAC = null!;
 
     /// <summary>Parsed destination MAC address backing <see cref="DestinationMac"/>.</summary>
-    private protected MACAddress _destMAC = null!;
+    private protected MacAddress _destMAC = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EthernetPacket"/> class
@@ -44,8 +44,8 @@ public class EthernetPacket
     /// </summary>
     private protected virtual void InitializeFields()
     {
-        _destMAC = new MACAddress(RawData, 0);
-        _srcMAC = new MACAddress(RawData, 6);
+        _destMAC = new MacAddress(RawData, 0);
+        _srcMAC = new MacAddress(RawData, 6);
         EthernetType = (ushort)((RawData[12] << 8) | RawData[13]);
     }
 
@@ -55,7 +55,7 @@ public class EthernetPacket
     /// <param name="type">EtherType of the frame.</param>
     /// <param name="packetSize">Total frame size in bytes; the buffer is allocated here.</param>
     private protected EthernetPacket(ushort type, int packetSize)
-        : this(MACAddress.None, MACAddress.None, type, packetSize)
+        : this(MacAddress.None, MacAddress.None, type, packetSize)
     {
     }
 
@@ -66,7 +66,7 @@ public class EthernetPacket
     /// <param name="src">Source MAC address.</param>
     /// <param name="type">EtherType of the frame.</param>
     /// <param name="packetSize">Total frame size in bytes; the buffer is allocated here.</param>
-    private protected EthernetPacket(MACAddress dest, MACAddress src, ushort type, int packetSize)
+    private protected EthernetPacket(MacAddress dest, MacAddress src, ushort type, int packetSize)
     {
         RawData = new byte[packetSize];
         for (int i = 0; i < 6; i++)
@@ -93,7 +93,7 @@ public class EthernetPacket
     /// it stamps the sending device's address) rewrites the buffer and
     /// re-parses the whole packet.
     /// </summary>
-    public MACAddress SourceMac
+    public MacAddress SourceMac
     {
         get => _srcMAC;
         internal set
@@ -111,7 +111,7 @@ public class EthernetPacket
     /// once ARP resolution completes) rewrites the buffer and re-parses the
     /// whole packet.
     /// </summary>
-    public MACAddress DestinationMac
+    public MacAddress DestinationMac
     {
         get => _destMAC;
         internal set

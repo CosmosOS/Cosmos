@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Devices;
+namespace Cosmos.Kernel.HAL.DriverKit.Display;
 
 /// <summary>What a display driver implements and hands to <see cref="DeviceBinding.PublishDisplay"/>. Called by the ring in thread context.</summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]

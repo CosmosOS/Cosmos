@@ -1,7 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.HAL.Devices;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Network;
 
 namespace Cosmos.Kernel.System.Network;
 
@@ -37,7 +38,7 @@ internal sealed class KitNetworkDevice : INetworkDevice
     public string Name => _network.Name;
 
     /// <inheritdoc/>
-    public MACAddress MacAddress => _network.MacAddress;
+    public MacAddress MacAddress => _network.MacAddress;
 
     /// <summary>True while the link is up, as the driver last reported it through its sink; false once the device is withdrawn.</summary>
     public bool LinkUp

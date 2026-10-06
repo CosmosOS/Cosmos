@@ -731,7 +731,7 @@ Cosmos.Kernel.System.Network.NetworkAdapter.IPConfig.get -> Cosmos.Kernel.System
 Cosmos.Kernel.System.Network.NetworkAdapter.IsValid.get -> bool
 Cosmos.Kernel.System.Network.NetworkAdapter.LinkLocalAddress.get -> Cosmos.Kernel.System.Network.Address6?
 Cosmos.Kernel.System.Network.NetworkAdapter.LinkUp.get -> bool
-Cosmos.Kernel.System.Network.NetworkAdapter.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MACAddress?
+Cosmos.Kernel.System.Network.NetworkAdapter.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MacAddress?
 Cosmos.Kernel.System.Network.NetworkAdapter.Name.get -> string?
 Cosmos.Kernel.System.Network.NetworkAdapter.NetworkAdapter() -> void
 Cosmos.Kernel.System.Network.NetworkAdapter.Ready.get -> bool
@@ -949,7 +949,7 @@ static Cosmos.Kernel.System.Network.Address.Parse(System.ReadOnlySpan<char> addr
 static Cosmos.Kernel.System.Network.Address4.Broadcast.get -> Cosmos.Kernel.System.Network.Address4!
 static Cosmos.Kernel.System.Network.Address4.CIDRToAddress(int cidr) -> Cosmos.Kernel.System.Network.Address4?
 static Cosmos.Kernel.System.Network.Address4.Parse(System.ReadOnlySpan<char> addr, Cosmos.Kernel.System.Network.AddressNumericStyle style) -> Cosmos.Kernel.System.Network.Address4?
-static Cosmos.Kernel.System.Network.Address6.LinkLocalFor(Cosmos.Kernel.HAL.Devices.MACAddress! mac) -> Cosmos.Kernel.System.Network.Address6!
+static Cosmos.Kernel.System.Network.Address6.LinkLocalFor(Cosmos.Kernel.HAL.Devices.MacAddress! mac) -> Cosmos.Kernel.System.Network.Address6!
 static Cosmos.Kernel.System.Network.Address6.Parse(System.ReadOnlySpan<char> addr) -> Cosmos.Kernel.System.Network.Address6?
 static Cosmos.Kernel.System.Network.DnsConfig.Add(Cosmos.Kernel.System.Network.Address! nameserver) -> void
 static Cosmos.Kernel.System.Network.DnsConfig.HostName.get -> string!
@@ -967,7 +967,7 @@ static Cosmos.Kernel.System.Network.NetworkManager.GetAdapter(int index) -> Cosm
 static Cosmos.Kernel.System.Network.NetworkManager.IsEnabled.get -> bool
 static Cosmos.Kernel.System.Network.NetworkManager.IsInitialized.get -> bool
 static Cosmos.Kernel.System.Network.NetworkManager.LinkUp.get -> bool
-static Cosmos.Kernel.System.Network.NetworkManager.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MACAddress?
+static Cosmos.Kernel.System.Network.NetworkManager.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MacAddress?
 static Cosmos.Kernel.System.Network.NetworkManager.Name.get -> string?
 static Cosmos.Kernel.System.Network.NetworkManager.Primary.get -> Cosmos.Kernel.System.Network.NetworkAdapter
 static Cosmos.Kernel.System.Network.NetworkManager.Primary.set -> void
@@ -1095,15 +1095,15 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.ArpPacketEthernet(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.SenderIP.get -> Cosmos.Kernel.System.Network.Address!
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.SenderMac.get -> Cosmos.Kernel.HAL.Devices.MACAddress!
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.SenderMac.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.TargetIP.get -> Cosmos.Kernel.System.Network.Address!
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.TargetMac.get -> Cosmos.Kernel.HAL.Devices.MACAddress!
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.TargetMac.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpReplyEthernet
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpReplyEthernet.ArpReplyEthernet(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpReplyEthernet.ArpReplyEthernet(Cosmos.Kernel.HAL.Devices.MACAddress! ourMac, Cosmos.Kernel.System.Network.Address! ourIP, Cosmos.Kernel.HAL.Devices.MACAddress! targetMac, Cosmos.Kernel.System.Network.Address! targetIP) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpReplyEthernet.ArpReplyEthernet(Cosmos.Kernel.HAL.Devices.MacAddress! ourMac, Cosmos.Kernel.System.Network.Address! ourIP, Cosmos.Kernel.HAL.Devices.MacAddress! targetMac, Cosmos.Kernel.System.Network.Address! targetIP) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpRequestEthernet
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpRequestEthernet.ArpRequestEthernet(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpRequestEthernet.ArpRequestEthernet(Cosmos.Kernel.HAL.Devices.MACAddress! ourMac, Cosmos.Kernel.System.Network.Address! ourIP, Cosmos.Kernel.HAL.Devices.MACAddress! targetMac, Cosmos.Kernel.System.Network.Address! targetIP, Cosmos.Kernel.HAL.Devices.MACAddress! arpTargetMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpRequestEthernet.ArpRequestEthernet(Cosmos.Kernel.HAL.Devices.MacAddress! ourMac, Cosmos.Kernel.System.Network.Address! ourIP, Cosmos.Kernel.HAL.Devices.MacAddress! targetMac, Cosmos.Kernel.System.Network.Address! targetIP, Cosmos.Kernel.HAL.Devices.MacAddress! arpTargetMac) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsAnswer
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsAnswer.Address.get -> byte[]?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsAnswer.CanonicalName.get -> string?
@@ -1142,15 +1142,15 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.ReplyCode.Refused = 5 -> Cosmos.Kernel.System.Network.Protocols.Dns.ReplyCode
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.ReplyCode.ServerFailure = 2 -> Cosmos.Kernel.System.Network.Protocols.Dns.ReplyCode
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.DestinationMac.get -> Cosmos.Kernel.HAL.Devices.MACAddress!
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.DestinationMac.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.EthernetPacket(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.EthernetType.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.RawData.get -> byte[]!
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.SourceMac.get -> Cosmos.Kernel.HAL.Devices.MACAddress!
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.SourceMac.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.InternetPacket
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpDiscover
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpDiscover.DhcpDiscover(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpDiscover.DhcpDiscover(Cosmos.Kernel.HAL.Devices.MACAddress! sourceMAC) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpDiscover.DhcpDiscover(Cosmos.Kernel.HAL.Devices.MacAddress! sourceMac) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpOption
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpOption.Data.get -> byte[]!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpOption.Data.init -> void
@@ -1161,8 +1161,8 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.Client.get -> Cosmos.Kernel.System.Network.Address?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(Cosmos.Kernel.HAL.Devices.MACAddress! sourceMac, ushort dhcpDataSize) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Devices.MACAddress! sourceMAC, ushort dhcpDataSize) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(Cosmos.Kernel.HAL.Devices.MacAddress! sourceMac, ushort dhcpDataSize) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Devices.MacAddress! sourceMac, ushort dhcpDataSize) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DNS.get -> Cosmos.Kernel.System.Network.Address?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.Gateway.get -> Cosmos.Kernel.System.Network.Address?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.Operation.get -> byte
@@ -1170,10 +1170,10 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.Subnet.get -> Cosmos.Kernel.System.Network.Address?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRelease
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRelease.DhcpRelease(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRelease.DhcpRelease(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Devices.MACAddress! source) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRelease.DhcpRelease(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Devices.MacAddress! source) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRequest
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRequest.DhcpRequest(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRequest.DhcpRequest(Cosmos.Kernel.HAL.Devices.MACAddress! sourceMAC, Cosmos.Kernel.System.Network.Address! requestedAddress) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRequest.DhcpRequest(Cosmos.Kernel.HAL.Devices.MacAddress! sourceMac, Cosmos.Kernel.System.Network.Address! requestedAddress) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IcmpEchoReply
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IcmpEchoReply.IcmpEchoReply(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IcmpEchoReply.IcmpEchoReply(Cosmos.Kernel.System.Network.Protocols.IPv4.IcmpEchoRequest! request) -> void
@@ -1200,7 +1200,7 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPFlags.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPLength.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPPacket(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPPacket(Cosmos.Kernel.HAL.Devices.MACAddress! srcMAC, Cosmos.Kernel.HAL.Devices.MACAddress! destMAC, ushort dataLength, byte protocol, Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, byte flags) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPPacket(Cosmos.Kernel.HAL.Devices.MacAddress! srcMac, Cosmos.Kernel.HAL.Devices.MacAddress! destMac, ushort dataLength, byte protocol, Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, byte flags) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPVersion.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.Protocol.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.TTL.get -> byte
@@ -1251,9 +1251,9 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpLength.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data, Cosmos.Kernel.HAL.Devices.MACAddress! destMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data, Cosmos.Kernel.HAL.Devices.MacAddress! destMac) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength, Cosmos.Kernel.HAL.Devices.MACAddress! destMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength, Cosmos.Kernel.HAL.Devices.MacAddress! destMac) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.VerifyChecksum() -> bool
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.WriteChecksum() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.UdpClient.ReceivePacket(int timeoutMs = 5000) -> Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket?

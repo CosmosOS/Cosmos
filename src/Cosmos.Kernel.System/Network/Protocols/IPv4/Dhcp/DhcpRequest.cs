@@ -34,9 +34,9 @@ public class DhcpRequest : DhcpPacket
     /// options 1 (subnet mask), 3 (router), 15 (domain name) and 6 (domain name server), then
     /// the end mark.
     /// </summary>
-    /// <param name="sourceMAC">The MAC address of the sending network device.</param>
+    /// <param name="sourceMac">The MAC address of the sending network device.</param>
     /// <param name="requestedAddress">The IPv4 address to request, written to option 50.</param>
-    public DhcpRequest(MACAddress sourceMAC, Address requestedAddress) : base(sourceMAC, 16)
+    public DhcpRequest(MacAddress sourceMac, Address requestedAddress) : base(sourceMac, 16)
     {
         // Request
         RawData[282] = 53;

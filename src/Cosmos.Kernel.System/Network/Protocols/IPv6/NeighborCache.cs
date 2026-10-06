@@ -10,14 +10,14 @@ namespace Cosmos.Kernel.System.Network.Protocols.IPv6;
 /// </summary>
 internal static class NeighborCache
 {
-    private static readonly Dictionary<Address6, MACAddress> s_entries = [];
+    private static readonly Dictionary<Address6, MacAddress> s_entries = [];
 
     /// <summary>
     /// Records or refreshes the link-layer address of a neighbor.
     /// </summary>
     /// <param name="address">The neighbor's IPv6 address; the unspecified address is ignored.</param>
     /// <param name="macAddress">Its MAC address.</param>
-    internal static void Update(Address6 address, MACAddress macAddress)
+    internal static void Update(Address6 address, MacAddress macAddress)
     {
         if (address.IsZero)
         {
@@ -32,8 +32,8 @@ internal static class NeighborCache
     /// </summary>
     /// <param name="address">The neighbor's IPv6 address.</param>
     /// <returns>The MAC address, or null when the neighbor is unknown.</returns>
-    internal static MACAddress? Resolve(Address6 address)
+    internal static MacAddress? Resolve(Address6 address)
     {
-        return s_entries.TryGetValue(address, out MACAddress? macAddress) ? macAddress : null;
+        return s_entries.TryGetValue(address, out MacAddress? macAddress) ? macAddress : null;
     }
 }

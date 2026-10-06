@@ -1,6 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Display;
+
+namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 
 /// <summary>The ring's consumer of displays: learns when a display's mode changed.</summary>
 internal abstract class DisplayConsumer : DeviceConsumer

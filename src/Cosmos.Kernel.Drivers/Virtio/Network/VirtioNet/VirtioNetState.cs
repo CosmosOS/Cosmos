@@ -2,7 +2,7 @@
 
 using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Network;
 using Cosmos.Kernel.HAL.DriverKit.Virtio;
 
 namespace Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet;
@@ -46,7 +46,7 @@ public sealed class VirtioNetState : INetworkInterface
     private readonly DmaBuffer _receiveBuffers;
     private readonly DmaBuffer _transmitBuffers;
     private readonly int _headerSize;
-    private readonly MACAddress _macAddress;
+    private readonly MacAddress _macAddress;
     private readonly bool _anyLayoutNegotiated;
     private readonly bool _statusNegotiated;
     private DeviceLock? _lock;
@@ -74,7 +74,7 @@ public sealed class VirtioNetState : INetworkInterface
     /// <param name="macAddress">The station address.</param>
     /// <param name="anyLayoutNegotiated">Whether VIRTIO_F_ANY_LAYOUT was negotiated.</param>
     /// <param name="statusNegotiated">Whether VIRTIO_NET_F_STATUS was negotiated, so the drain reads the link.</param>
-    internal VirtioNetState(DeviceBinding binding, VirtioAccess access, Virtqueue receiveQueue, Virtqueue transmitQueue, DmaBuffer receiveBuffers, DmaBuffer transmitBuffers, int headerSize, MACAddress macAddress, bool anyLayoutNegotiated, bool statusNegotiated)
+    internal VirtioNetState(DeviceBinding binding, VirtioAccess access, Virtqueue receiveQueue, Virtqueue transmitQueue, DmaBuffer receiveBuffers, DmaBuffer transmitBuffers, int headerSize, MacAddress macAddress, bool anyLayoutNegotiated, bool statusNegotiated)
     {
         _binding = binding;
         _access = access;
@@ -92,7 +92,7 @@ public sealed class VirtioNetState : INetworkInterface
     public string Name => "virtio-net";
 
     /// <inheritdoc/>
-    public MACAddress MacAddress => _macAddress;
+    public MacAddress MacAddress => _macAddress;
 
     /// <summary>True while the link is up, as the probe read it and the drain keeps it. Any context.</summary>
     public bool LinkUp

@@ -33,8 +33,8 @@ public class DhcpDiscover : DhcpPacket
     /// request list asking for options 1 (subnet mask), 3 (router), 15 (domain name) and
     /// 6 (domain name server), then the end mark.
     /// </summary>
-    /// <param name="sourceMAC">The MAC address of the sending network device.</param>
-    public DhcpDiscover(MACAddress sourceMAC) : base(sourceMAC, 10) //discover packet size
+    /// <param name="sourceMac">The MAC address of the sending network device.</param>
+    public DhcpDiscover(MacAddress sourceMac) : base(sourceMac, 10) //discover packet size
     {
         //Discover
         RawData[282] = 0x35;

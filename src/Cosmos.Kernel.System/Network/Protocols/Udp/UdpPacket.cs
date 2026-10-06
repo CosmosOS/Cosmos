@@ -151,7 +151,7 @@ public class UdpPacket
     /// <param name="dataLength">The payload length in bytes.</param>
     /// <param name="destMac">The destination MAC address to write into the Ethernet header.</param>
     /// <exception cref="ArgumentException">The two addresses belong to different IP versions.</exception>
-    public UdpPacket(Address source, Address dest, ushort srcPort, ushort destPort, ushort dataLength, MACAddress destMac)
+    public UdpPacket(Address source, Address dest, ushort srcPort, ushort destPort, ushort dataLength, MacAddress destMac)
         : this(Build(source, dest, dataLength, destMac), srcPort, destPort, dataLength)
     {
     }
@@ -189,7 +189,7 @@ public class UdpPacket
     /// <param name="data">The payload bytes to copy into the packet.</param>
     /// <param name="destMac">The destination MAC address to write into the Ethernet header.</param>
     /// <exception cref="ArgumentException">The two addresses belong to different IP versions.</exception>
-    public UdpPacket(Address source, Address dest, ushort srcPort, ushort destPort, byte[] data, MACAddress destMac)
+    public UdpPacket(Address source, Address dest, ushort srcPort, ushort destPort, byte[] data, MacAddress destMac)
         : this(source, dest, srcPort, destPort, (ushort)data.Length, destMac)
     {
         WritePayload(data);
@@ -219,7 +219,7 @@ public class UdpPacket
     /// Builds the internet packet for a datagram of <paramref name="dataLength"/> payload bytes,
     /// with the destination MAC address already known.
     /// </summary>
-    private static InternetPacket Build(Address source, Address dest, ushort dataLength, MACAddress destMac)
+    private static InternetPacket Build(Address source, Address dest, ushort dataLength, MacAddress destMac)
     {
         return InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolUdp,
             (ushort)(dataLength + UdpHeaderLength), false, destMac);

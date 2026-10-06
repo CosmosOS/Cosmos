@@ -67,7 +67,7 @@ public abstract class InternetPacket : EthernetPacket
     /// <param name="sourceMac">Source MAC address.</param>
     /// <param name="etherType">EtherType of the frame.</param>
     /// <param name="packetSize">Total frame size in bytes.</param>
-    private protected InternetPacket(MACAddress destinationMac, MACAddress sourceMac, ushort etherType, int packetSize)
+    private protected InternetPacket(MacAddress destinationMac, MacAddress sourceMac, ushort etherType, int packetSize)
         : base(destinationMac, sourceMac, etherType, packetSize)
     {
     }
@@ -185,7 +185,7 @@ public abstract class InternetPacket : EthernetPacket
     /// <returns>The built packet, with the transport section left as zeroes.</returns>
     /// <exception cref="ArgumentException">The two addresses belong to different versions.</exception>
     internal static InternetPacket CreateForTransport(Address source, Address destination, byte protocol,
-        ushort payloadLength, bool dontFragment, MACAddress destinationMac)
+        ushort payloadLength, bool dontFragment, MacAddress destinationMac)
     {
         RequireSameFamily(source, destination);
 

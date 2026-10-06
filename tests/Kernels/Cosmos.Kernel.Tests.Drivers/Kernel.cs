@@ -15,8 +15,9 @@ using Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard;
 using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Display;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Input;
 using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Synthetic;
 using Cosmos.Kernel.HAL.DriverKit.Usb;
@@ -164,7 +165,7 @@ public class Kernel : Sys.Kernel
     /// <summary>Every byte of the broadcast address.</summary>
     private const byte BroadcastByte = 0xFF;
 
-    /// <summary>Characters of an address in the text form MACAddress exposes: six hex pairs and five colons.</summary>
+    /// <summary>Characters of an address in the text form MacAddress exposes: six hex pairs and five colons.</summary>
     private const int MacAddressTextLength = 17;
 
     /// <summary>Characters per address byte in that text form: the pair and its separator.</summary>
@@ -1260,9 +1261,9 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(NetworkManager.DeviceCount >= 1, "the network manager should hold at least the kit's interface");
-        MACAddress? macAddress = NetworkManager.MacAddress;
+        MacAddress? macAddress = NetworkManager.MacAddress;
         Assert.NotNull(macAddress);
-        Assert.True(macAddress is not null && !macAddress.Equals(MACAddress.None), "the primary device's address should not be all zero");
+        Assert.True(macAddress is not null && !macAddress.Equals(MacAddress.None), "the primary device's address should not be all zero");
         Assert.True(macAddress is not null && macAddress.Equals(state.MacAddress), "the primary device's address should be the 82574L's");
     }
 
@@ -2674,7 +2675,7 @@ public class Kernel : Sys.Kernel
     /// <param name="source">The address to send from.</param>
     /// <param name="frame">The buffer to fill, at least the header long.</param>
     /// <returns>True when the source address parsed and the frame is filled.</returns>
-    private static bool TryBuildBroadcastFrame(MACAddress source, Span<byte> frame)
+    private static bool TryBuildBroadcastFrame(MacAddress source, Span<byte> frame)
     {
         frame.Clear();
         frame.Slice(DestinationOffset, MacAddressBytes).Fill(BroadcastByte);
@@ -2690,10 +2691,10 @@ public class Kernel : Sys.Kernel
 
     /// <summary>
     /// Decodes the text form of an address, six hex pairs joined by
-    /// colons, into its bytes. MACAddress hands its bytes only to the HAL
+    /// colons, into its bytes. MacAddress hands its bytes only to the HAL
     /// and the ring; the text form is the public one.
     /// </summary>
-    /// <param name="text">The address as MACAddress prints it.</param>
+    /// <param name="text">The address as MacAddress prints it.</param>
     /// <param name="bytes">Where the six bytes go.</param>
     /// <returns>True when the text had the expected shape.</returns>
     private static bool TryParseMacAddress(string text, Span<byte> bytes)

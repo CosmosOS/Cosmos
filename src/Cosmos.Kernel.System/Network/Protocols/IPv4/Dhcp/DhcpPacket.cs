@@ -75,7 +75,7 @@ public class DhcpPacket : UdpPacket
     /// </summary>
     /// <param name="sourceMac">The MAC address of the sending network device.</param>
     /// <param name="dhcpDataSize">The size in bytes of the DHCP options that follow the fixed BOOTP header.</param>
-    public DhcpPacket(MACAddress sourceMac, ushort dhcpDataSize)
+    public DhcpPacket(MacAddress sourceMac, ushort dhcpDataSize)
         : this(Address4.Zero, Address4.Broadcast, sourceMac, dhcpDataSize)
     { }
 
@@ -88,10 +88,10 @@ public class DhcpPacket : UdpPacket
     /// </summary>
     /// <param name="client">The IPv4 source address, also written to the ciaddr field.</param>
     /// <param name="server">The IPv4 destination address.</param>
-    /// <param name="sourceMAC">The MAC address of the sending network device.</param>
+    /// <param name="sourceMac">The MAC address of the sending network device.</param>
     /// <param name="dhcpDataSize">The size in bytes of the DHCP options that follow the fixed BOOTP header.</param>
-    public DhcpPacket(Address client, Address server, MACAddress sourceMAC, ushort dhcpDataSize)
-        : base(client, server, 68, 67, (ushort)(dhcpDataSize + 240), MACAddress.Broadcast)
+    public DhcpPacket(Address client, Address server, MacAddress sourceMac, ushort dhcpDataSize)
+        : base(client, server, 68, 67, (ushort)(dhcpDataSize + 240), MacAddress.Broadcast)
     {
         RawData[42] = 0x01; // Request
         RawData[43] = 0x01; // ethernet
@@ -124,12 +124,12 @@ public class DhcpPacket : UdpPacket
         }
 
         // Source MAC
-        RawData[70] = sourceMAC._bytes[0];
-        RawData[71] = sourceMAC._bytes[1];
-        RawData[72] = sourceMAC._bytes[2];
-        RawData[73] = sourceMAC._bytes[3];
-        RawData[74] = sourceMAC._bytes[4];
-        RawData[75] = sourceMAC._bytes[5];
+        RawData[70] = sourceMac._bytes[0];
+        RawData[71] = sourceMac._bytes[1];
+        RawData[72] = sourceMac._bytes[2];
+        RawData[73] = sourceMac._bytes[3];
+        RawData[74] = sourceMac._bytes[4];
+        RawData[75] = sourceMac._bytes[5];
 
         // Fill w/ 0s
         for (int i = 0; i < 202; i++)

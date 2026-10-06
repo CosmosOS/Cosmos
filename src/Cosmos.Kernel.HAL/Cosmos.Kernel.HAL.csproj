@@ -16,7 +16,7 @@
          the driver kit seam (COSMOS0003) and the contracts the ring hands
          out: IBlockDevice, the one device contract kernels really implement
          and drive (the Fat and File suites each supply a RAM disk, DevKernel
-         reads and writes blocks through it), and MACAddress, which the
+         reads and writes blocks through it), and MacAddress, which the
          packet seam and NetworkManager both hand out.
          The boot contract (IPlatformInitializer), the timer device and its
          timer entries are internal because no kernel can obtain or
@@ -65,7 +65,7 @@
          the keyboard manager's indicator work item; its library initializer
          registers the platform timer, TimerManager constructs the TimerEntry
          its SoftwareTimer handle wraps, and the network stack reads
-         MACAddress's internal bytes. -->
+         MacAddress's internal bytes. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
     <!-- The aggregator reads PlatformHAL.Initializer from its library initializer. -->
     <InternalsVisibleTo Include="Cosmos.Kernel" />

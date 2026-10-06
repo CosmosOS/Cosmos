@@ -85,7 +85,7 @@ internal static class IPv6OutgoingBuffer
                     continue;
                 }
 
-                MACAddress? neighborMac = NeighborCache.Resolve(packet.DestinationIP);
+                MacAddress? neighborMac = NeighborCache.Resolve(packet.DestinationIP);
                 if (neighborMac is not null)
                 {
                     packet.DestinationMac = neighborMac;

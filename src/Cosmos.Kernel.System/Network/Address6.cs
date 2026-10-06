@@ -257,7 +257,7 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
     /// middle and its universal/local bit inverted.
     /// </summary>
     /// <param name="mac">The device's MAC address.</param>
-    public static Address6 LinkLocalFor(MACAddress mac)
+    public static Address6 LinkLocalFor(MacAddress mac)
     {
         ArgumentNullException.ThrowIfNull(mac);
 

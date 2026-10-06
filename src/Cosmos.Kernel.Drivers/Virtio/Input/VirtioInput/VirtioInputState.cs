@@ -2,7 +2,7 @@
 
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Input;
 using Cosmos.Kernel.HAL.DriverKit.Virtio;
 
 namespace Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput;

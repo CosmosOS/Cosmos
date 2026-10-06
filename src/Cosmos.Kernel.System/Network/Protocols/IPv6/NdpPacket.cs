@@ -80,8 +80,8 @@ internal abstract class NdpPacket : Icmpv6Packet
     /// <param name="target">The target address.</param>
     /// <param name="optionType">The link-layer option type.</param>
     /// <param name="linkLayer">The link-layer address the option carries.</param>
-    private protected NdpPacket(MACAddress sourceMac, MACAddress destinationMac, Address6 source, Address6 destination,
-        byte type, byte flags, Address6 target, byte optionType, MACAddress linkLayer)
+    private protected NdpPacket(MacAddress sourceMac, MacAddress destinationMac, Address6 source, Address6 destination,
+        byte type, byte flags, Address6 target, byte optionType, MacAddress linkLayer)
         : base(sourceMac, destinationMac, source, destination, NdpHopLimit, type, 0, MessageLength)
     {
         RawData[PayloadOffset + 4] = flags;
@@ -109,7 +109,7 @@ internal abstract class NdpPacket : Icmpv6Packet
     /// The link-layer address carried by the first option of
     /// <paramref name="optionType"/>, or null when the message has none.
     /// </summary>
-    private protected MACAddress? FindLinkLayerOption(byte optionType)
+    private protected MacAddress? FindLinkLayerOption(byte optionType)
     {
         int end = Math.Min(PayloadOffset + PayloadLength, RawData.Length);
         int offset = OptionsOffset;
@@ -123,7 +123,7 @@ internal abstract class NdpPacket : Icmpv6Packet
 
             if (RawData[offset] == optionType && length == LinkLayerOptionLength && offset + length <= end)
             {
-                return new MACAddress(RawData, offset + 2);
+                return new MacAddress(RawData, offset + 2);
             }
 
             offset += length;
@@ -144,7 +144,7 @@ internal abstract class NdpPacket : Icmpv6Packet
 /// </summary>
 internal sealed class NeighborSolicitation : NdpPacket
 {
-    private MACAddress? _sourceLinkLayerAddress;
+    private MacAddress? _sourceLinkLayerAddress;
 
     /// <summary>
     /// Initializes a new instance over existing frame bytes. The array is
@@ -165,12 +165,12 @@ internal sealed class NeighborSolicitation : NdpPacket
     /// <param name="source">Source address.</param>
     /// <param name="target">The address to resolve.</param>
     /// <param name="sourceMac">The sending device's MAC address.</param>
-    internal NeighborSolicitation(Address6 source, Address6 target, MACAddress sourceMac)
+    internal NeighborSolicitation(Address6 source, Address6 target, MacAddress sourceMac)
         : this(source, target, sourceMac, target.ToSolicitedNodeMulticast())
     {
     }
 
-    private NeighborSolicitation(Address6 source, Address6 target, MACAddress sourceMac, Address6 group)
+    private NeighborSolicitation(Address6 source, Address6 target, MacAddress sourceMac, Address6 group)
         : base(sourceMac, MulticastMac(group), source, group, TypeNeighborSolicitation, 0, target, OptionSourceLinkLayer, sourceMac)
     {
     }
@@ -203,7 +203,7 @@ internal sealed class NeighborSolicitation : NdpPacket
         Serial.WriteString(solicitation.SourceIP.ToString());
         Serial.WriteString("\n");
 
-        MACAddress requester = solicitation.SourceLinkLayerAddress ?? solicitation.SourceMac;
+        MacAddress requester = solicitation.SourceLinkLayerAddress ?? solicitation.SourceMac;
         NeighborCache.Update(solicitation.SourceIP, requester);
 
         NeighborAdvertisement advertisement = new(solicitation.Target, solicitation.SourceIP, nic.MacAddress, requester, solicitation.Target);
@@ -225,7 +225,7 @@ internal sealed class NeighborSolicitation : NdpPacket
     /// The sender's link-layer address from the source link-layer option, or
     /// null when the solicitation carries none.
     /// </summary>
-    public MACAddress? SourceLinkLayerAddress => _sourceLinkLayerAddress;
+    public MacAddress? SourceLinkLayerAddress => _sourceLinkLayerAddress;
 
     /// <inheritdoc/>
     public override string ToString()
@@ -243,7 +243,7 @@ internal sealed class NeighborAdvertisement : NdpPacket
     private const byte FlagSolicited = 0x40;
     private const byte FlagOverride = 0x20;
 
-    private MACAddress? _targetLinkLayerAddress;
+    private MacAddress? _targetLinkLayerAddress;
 
     /// <summary>
     /// Initializes a new instance over existing frame bytes. The array is
@@ -265,7 +265,7 @@ internal sealed class NeighborAdvertisement : NdpPacket
     /// <param name="sourceMac">The advertising device's MAC address.</param>
     /// <param name="destinationMac">The requester's MAC address.</param>
     /// <param name="target">The address being advertised.</param>
-    internal NeighborAdvertisement(Address6 source, Address6 destination, MACAddress sourceMac, MACAddress destinationMac, Address6 target)
+    internal NeighborAdvertisement(Address6 source, Address6 destination, MacAddress sourceMac, MacAddress destinationMac, Address6 target)
         : base(sourceMac, destinationMac, source, destination, TypeNeighborAdvertisement, FlagSolicited | FlagOverride, target, OptionTargetLinkLayer, sourceMac)
     {
     }
@@ -311,7 +311,7 @@ internal sealed class NeighborAdvertisement : NdpPacket
     /// The target's link-layer address from the target link-layer option, or
     /// null when the advertisement carries none.
     /// </summary>
-    public MACAddress? TargetLinkLayerAddress => _targetLinkLayerAddress;
+    public MacAddress? TargetLinkLayerAddress => _targetLinkLayerAddress;
 
     /// <inheritdoc/>
     public override string ToString()

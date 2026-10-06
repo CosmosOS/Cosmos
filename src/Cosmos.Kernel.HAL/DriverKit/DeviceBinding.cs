@@ -3,7 +3,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Scheduler;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Usb;
 using Cosmos.Kernel.HAL.Platform;

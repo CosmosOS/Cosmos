@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Display;
 using Cosmos.Kernel.System.Graphics.Fonts;
 
 namespace Cosmos.Kernel.System.Graphics;

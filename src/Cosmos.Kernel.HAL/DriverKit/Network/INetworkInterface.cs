@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Devices;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Devices;
+namespace Cosmos.Kernel.HAL.DriverKit.Network;
 
 /// <summary>What a network driver implements and hands to <see cref="DeviceBinding.PublishNetwork"/>. Called by the ring in thread context.</summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
@@ -13,7 +13,7 @@ public interface INetworkInterface
     string Name { get; }
 
     /// <summary>The hardware address.</summary>
-    MACAddress MacAddress { get; }
+    MacAddress MacAddress { get; }
 
     /// <summary>True while the link is up.</summary>
     bool LinkUp { get; }

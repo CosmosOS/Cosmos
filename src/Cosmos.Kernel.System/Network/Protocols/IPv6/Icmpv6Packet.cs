@@ -162,7 +162,7 @@ internal class Icmpv6Packet : IPv6Packet
     /// <param name="type">ICMPv6 type.</param>
     /// <param name="code">ICMPv6 code.</param>
     /// <param name="icmpLength">Length of the ICMPv6 header plus body: the whole IPv6 payload.</param>
-    private protected Icmpv6Packet(MACAddress sourceMac, MACAddress destinationMac, Address6 source, Address6 destination, byte hopLimit, byte type, byte code, ushort icmpLength)
+    private protected Icmpv6Packet(MacAddress sourceMac, MacAddress destinationMac, Address6 source, Address6 destination, byte hopLimit, byte type, byte code, ushort icmpLength)
         : base(sourceMac, destinationMac, icmpLength, ProtocolIcmpv6, hopLimit, source, destination)
     {
         WriteTypeAndCode(type, code);
@@ -353,7 +353,7 @@ internal sealed class Icmpv6EchoReply : Icmpv6Packet
     /// </summary>
     /// <param name="request">The echo request to answer.</param>
     /// <param name="sourceMac">The answering device's MAC address.</param>
-    internal Icmpv6EchoReply(Icmpv6EchoRequest request, MACAddress sourceMac)
+    internal Icmpv6EchoReply(Icmpv6EchoRequest request, MacAddress sourceMac)
         : base(sourceMac, request.SourceMac, request.DestinationIP, request.SourceIP, EchoHopLimit, TypeEchoReply, 0, request.PayloadLength)
     {
         request.RawData.AsSpan(PayloadOffset + 4, request.PayloadLength - 4).CopyTo(RawData.AsSpan(PayloadOffset + 4));

@@ -59,20 +59,20 @@ public class ArpPacket : EthernetPacket
                     return;
                 }
 
-                ArpCache.Update(arpRequest.SenderIP, arpRequest.SenderMac!);
+                ArpCache.Update(arpRequest.SenderIP, arpRequest.SenderMac);
 
-                if (NetworkStack.AddressMap.TryGetValue(arpRequest.TargetIP!, out INetworkDevice? nic))
+                if (NetworkStack.AddressMap.TryGetValue(arpRequest.TargetIP, out INetworkDevice? nic))
                 {
                     Serial.WriteString("[ARP] Request received from ");
                     Serial.WriteString(arpRequest.SenderIP.ToString());
                     Serial.WriteString("\n");
 
-                    MACAddress nicMac = new(nic.MacAddress);
+                    MacAddress nicMac = new(nic.MacAddress);
 
                     ArpReplyEthernet reply = new(
                         nicMac,
                         arpRequest.TargetIP,
-                        arpRequest.SenderMac!,
+                        arpRequest.SenderMac,
                         arpRequest.SenderIP
                     );
 
@@ -87,9 +87,9 @@ public class ArpPacket : EthernetPacket
             {
                 ArpReplyEthernet arpReply = new(packetData);
                 Serial.WriteString("[ARP] Reply received from ");
-                Serial.WriteString(arpReply.SenderIP!.ToString());
+                Serial.WriteString(arpReply.SenderIP.ToString());
                 Serial.WriteString("\n");
-                ArpCache.Update(arpReply.SenderIP, arpReply.SenderMac!);
+                ArpCache.Update(arpReply.SenderIP, arpReply.SenderMac);
             }
         }
     }
@@ -133,7 +133,7 @@ public class ArpPacket : EthernetPacket
     /// <param name="protoLen">Protocol address length in bytes (PLEN); 4 for IPv4.</param>
     /// <param name="operation">Operation code (OPER); 1 for a request, 2 for a reply.</param>
     /// <param name="packetSize">Total frame size in bytes.</param>
-    private protected ArpPacket(MACAddress dest, MACAddress src, ushort hwType, ushort protoType,
+    private protected ArpPacket(MacAddress dest, MacAddress src, ushort hwType, ushort protoType,
         byte hwLen, byte protoLen, ushort operation, int packetSize)
         : base(dest, src, 0x0806, packetSize)
     {

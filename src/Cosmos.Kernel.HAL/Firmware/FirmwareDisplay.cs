@@ -2,8 +2,7 @@
 
 using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
-using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Display;
 
 namespace Cosmos.Kernel.HAL.Firmware;
 

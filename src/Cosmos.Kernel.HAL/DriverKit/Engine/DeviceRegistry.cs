@@ -4,7 +4,7 @@ using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.Firmware;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Devices;
+namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 
 /// <summary>
 /// The published devices and, per kind, the one consumer the ring installed

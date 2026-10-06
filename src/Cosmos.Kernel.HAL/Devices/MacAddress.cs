@@ -1,26 +1,28 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 namespace Cosmos.Kernel.HAL.Devices;
 
 /// <summary>
 /// A 48-bit Ethernet MAC address.
 /// </summary>
-public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
+public sealed class MacAddress : IComparable<MacAddress>, IEquatable<MacAddress>
 {
     // Filled on first read, not by initializers: an initializer would give this type a
     // class constructor, and the type is reachable from any device bring-up path, before
     // the scheduler has a current thread for the class-constructor lock to use. No current
     // caller reads these before the scheduler exists; the lazy fill keeps it that way.
-    private static MACAddress? s_broadcast;
-    private static MACAddress? s_none;
+    private static MacAddress? s_broadcast;
+    private static MacAddress? s_none;
 
     /// <summary>
     /// The broadcast address (FF:FF:FF:FF:FF:FF).
     /// </summary>
-    public static MACAddress Broadcast => s_broadcast ??= new([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
+    public static MacAddress Broadcast => s_broadcast ??= new([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);
 
     /// <summary>
     /// The all-zero address (00:00:00:00:00:00), used when no address is assigned.
     /// </summary>
-    public static MACAddress None => s_none ??= new([0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+    public static MacAddress None => s_none ??= new([0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
 
     /// <summary>
     /// The six address bytes, most significant first. Internal because the
@@ -33,7 +35,7 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     /// Create a MAC address from a 6-byte array.
     /// </summary>
     /// <param name="address">The six address bytes, most significant first.</param>
-    public MACAddress(byte[] address)
+    public MacAddress(byte[] address)
     {
         ArgumentNullException.ThrowIfNull(address);
         ArgumentOutOfRangeException.ThrowIfNotEqual(address.Length, 6, nameof(address));
@@ -44,7 +46,6 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
         _bytes[3] = address[3];
         _bytes[4] = address[4];
         _bytes[5] = address[5];
-
     }
 
     /// <summary>
@@ -52,7 +53,7 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     /// </summary>
     /// <param name="buffer">byte buffer</param>
     /// <param name="offset">offset in buffer to start from</param>
-    public MACAddress(byte[] buffer, int offset)
+    public MacAddress(byte[] buffer, int offset)
     {
         ArgumentNullException.ThrowIfNull(buffer);
         ArgumentOutOfRangeException.ThrowIfLessThan(buffer.Length, offset + 6, nameof(buffer));
@@ -69,11 +70,10 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     /// Create a copy of an existing MAC address.
     /// </summary>
     /// <param name="m">MAC address to copy.</param>
-    public MACAddress(MACAddress m)
+    public MacAddress(MacAddress m)
         : this(m._bytes)
     {
     }
-
 
     /// <summary>
     /// Compare this address to another MAC address, byte by byte from the
@@ -81,7 +81,7 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     /// </summary>
     /// <param name="other">MAC address to compare against, or null.</param>
     /// <returns>Negative, zero, or positive following the ordering of the first differing byte. Null orders before any address.</returns>
-    public int CompareTo(MACAddress? other)
+    public int CompareTo(MacAddress? other)
     {
         if (other is null)
         {
@@ -105,7 +105,7 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     /// </summary>
     /// <param name="other">MAC address to compare against, or null.</param>
     /// <returns>True when <paramref name="other"/> holds the same six bytes, false otherwise and for null.</returns>
-    public bool Equals(MACAddress? other)
+    public bool Equals(MacAddress? other)
     {
         if (other is null)
         {
@@ -127,11 +127,8 @@ public sealed class MACAddress : IComparable<MACAddress>, IEquatable<MACAddress>
     /// Check whether another object is a MAC address holding the same six bytes.
     /// </summary>
     /// <param name="obj">Object to compare against.</param>
-    /// <returns>True when <paramref name="obj"/> is a <see cref="MACAddress"/> with the same six bytes, false for anything else including null.</returns>
-    public override bool Equals(object? obj)
-    {
-        return Equals(obj as MACAddress);
-    }
+    /// <returns>True when <paramref name="obj"/> is a <see cref="MacAddress"/> with the same six bytes, false for anything else including null.</returns>
+    public override bool Equals(object? obj) => Equals(obj as MacAddress);
 
     /// <summary>
     /// Get a hash code derived from the six address bytes, consistent with

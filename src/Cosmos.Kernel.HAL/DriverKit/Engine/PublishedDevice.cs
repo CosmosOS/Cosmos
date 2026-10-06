@@ -1,6 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Input;
+
+namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 
 /// <summary>
 /// A device a driver made available to the ring: its kind, its name, the

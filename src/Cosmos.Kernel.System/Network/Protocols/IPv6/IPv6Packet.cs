@@ -127,29 +127,29 @@ internal class IPv6Packet : InternetPacket
     /// followed by the low 32 bits of the group address (RFC 2464 section 7).
     /// </summary>
     /// <param name="group">The multicast group.</param>
-    internal static MACAddress MulticastMac(Address6 group)
+    internal static MacAddress MulticastMac(Address6 group)
     {
         uint low = group.Segment4;
-        return new MACAddress([0x33, 0x33, (byte)(low >> 24), (byte)(low >> 16), (byte)(low >> 8), (byte)low]);
+        return new MacAddress([0x33, 0x33, (byte)(low >> 24), (byte)(low >> 16), (byte)(low >> 8), (byte)low]);
     }
 
     /// <summary>
     /// The MAC of the device configured with <paramref name="source"/>, or
-    /// <see cref="MACAddress.None"/> when no device carries it.
+    /// <see cref="MacAddress.None"/> when no device carries it.
     /// </summary>
-    private static MACAddress GetSourceMac(Address6 source)
+    private static MacAddress GetSourceMac(Address6 source)
     {
-        return NetworkStack.AddressMap.TryGetValue(source, out INetworkDevice? device) ? device.MacAddress : MACAddress.None;
+        return NetworkStack.AddressMap.TryGetValue(source, out INetworkDevice? device) ? device.MacAddress : MacAddress.None;
     }
 
     /// <summary>
     /// The destination MAC a build constructor can settle at once: the mapped
-    /// address for a multicast group, <see cref="MACAddress.None"/> for a
+    /// address for a multicast group, <see cref="MacAddress.None"/> for a
     /// unicast destination that Neighbor Discovery resolves at send time.
     /// </summary>
-    private static MACAddress GetDestinationMac(Address6 destination)
+    private static MacAddress GetDestinationMac(Address6 destination)
     {
-        return destination.IsMulticast ? MulticastMac(destination) : MACAddress.None;
+        return destination.IsMulticast ? MulticastMac(destination) : MacAddress.None;
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ internal class IPv6Packet : InternetPacket
     /// <param name="source">Source address.</param>
     /// <param name="destination">Destination address.</param>
     /// <param name="destinationMac">Destination MAC address.</param>
-    internal IPv6Packet(ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination, MACAddress destinationMac)
+    internal IPv6Packet(ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination, MacAddress destinationMac)
         : this(GetSourceMac(source), destinationMac, payloadLength, nextHeader, hopLimit, source, destination)
     {
     }
@@ -204,7 +204,7 @@ internal class IPv6Packet : InternetPacket
     /// <param name="hopLimit">Hop limit.</param>
     /// <param name="source">Source address.</param>
     /// <param name="destination">Destination address.</param>
-    internal IPv6Packet(MACAddress sourceMac, MACAddress destinationMac, ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination)
+    internal IPv6Packet(MacAddress sourceMac, MacAddress destinationMac, ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination)
         : base(destinationMac, sourceMac, EtherTypeIPv6, PayloadOffset + payloadLength)
     {
         RawData[14] = 0x60;

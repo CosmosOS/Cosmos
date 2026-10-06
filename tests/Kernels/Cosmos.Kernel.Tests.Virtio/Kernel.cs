@@ -249,7 +249,7 @@ public class Kernel : Sys.Kernel
     // all-zero address means those reads landed nowhere.
     private static void TestNet_MacAddressProgrammed()
     {
-        MACAddress? mac = NetworkManager.MacAddress;
+        MacAddress? mac = NetworkManager.MacAddress;
         Assert.NotNull(mac);
         if (mac is null)
         {
@@ -260,7 +260,7 @@ public class Kernel : Sys.Kernel
         Log.WriteString(mac.ToString());
         Log.WriteString("\n");
 
-        Assert.False(mac.Equals(MACAddress.None), "MAC address read from device config should not be all zeros");
+        Assert.False(mac.Equals(MacAddress.None), "MAC address read from device config should not be all zeros");
     }
 
     // Every cell routes one wake for the receive queue but the arm64 PCI cell

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Display;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.TestRunner.Framework;
 

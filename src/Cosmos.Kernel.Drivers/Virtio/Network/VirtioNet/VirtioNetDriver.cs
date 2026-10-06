@@ -133,7 +133,7 @@ public sealed class VirtioNetDriver : Driver
             return ProbeResult.Declined("no MAC address");
         }
 
-        MACAddress macAddress = new(address);
+        MacAddress macAddress = new(address);
         bool statusNegotiated = (features & FeatureStatus) != 0;
         bool linkUp = !statusNegotiated || (dev.ReadConfig16(VirtioNetState.StatusConfigOffset) & VirtioNetState.LinkUpBit) != 0;
 

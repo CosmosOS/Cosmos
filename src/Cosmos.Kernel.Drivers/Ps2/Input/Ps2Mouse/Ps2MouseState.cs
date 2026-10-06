@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Input;
 using Cosmos.Kernel.HAL.DriverKit.Ps2;
 
 namespace Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse;

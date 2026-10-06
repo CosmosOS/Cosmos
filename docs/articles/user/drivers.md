@@ -233,7 +233,7 @@ The state object is a plain class, not a `Driver`: there is one per device, and 
 
 ```csharp
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Devices;
+using Cosmos.Kernel.HAL.DriverKit.Input;
 
 namespace MyOS.Drivers;
 
@@ -488,6 +488,8 @@ A device kind is a small interface the driver implements, plus a **sink** the ki
 | Network | `INetworkInterface` (`Name`, `MacAddress`, `LinkUp`, `Transmit`) | `PublishNetwork` | `NetworkSink.Receive(frame)`, `LinkChanged(up)` |
 | Block | `IBlockDevice` | `PublishBlockDevice` | nothing |
 | Display | `IDisplay` (`Name`, `Mode`, `Framebuffer`, `Flush`) | `PublishDisplay` | `DisplaySink.ModeChanged()` |
+
+The keyboard and pointer types are in `Cosmos.Kernel.HAL.DriverKit.Input`, the network ones in `Cosmos.Kernel.HAL.DriverKit.Network`, the display ones in `Cosmos.Kernel.HAL.DriverKit.Display`, and `IBlockDevice` in `Cosmos.Kernel.HAL.Devices`, beside `MacAddress`, the type `INetworkInterface.MacAddress` returns.
 
 The kernel's manager for that kind picks the device up as soon as it is published, and teardown withdraws it before releasing anything else. Sinks never allocate, and drop reports once the device is withdrawn.
 

@@ -28,7 +28,7 @@ This document establishes the coding style and architecture patterns for Cosmos 
 
 ### Layer Dependency Rules
 
-The project is split into strict layers. Dependencies flow **downward only**. These rules are **enforced at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which judges a project on the types and members its code names, not on the reference list restore builds, and reports each assembly used across a boundary once, at its first use. A user kernel, and a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, see [Public API Tracking](public-api.md)), may also name what `Cosmos.Kernel.HAL` offers: the driver kit seam and the device contracts (`IBlockDevice`, `MACAddress`).
+The project is split into strict layers. Dependencies flow **downward only**. These rules are **enforced at compile time** by the `LayerAnalyzer` Roslyn analyzer in `Cosmos.Build.Analyzer.Patcher`, which judges a project on the types and members its code names, not on the reference list restore builds, and reports each assembly used across a boundary once, at its first use. A user kernel, and a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, see [Public API Tracking](public-api.md)), may also name what `Cosmos.Kernel.HAL` offers: the driver kit seam and the device contracts (`IBlockDevice`, `MacAddress`).
 
 ```
 User Kernel (DevKernel, test kernels)
@@ -307,7 +307,7 @@ public enum ThreadFlags
 
 ### Types Compared by Value
 
-A type whose identity is its content (`Address`, `MACAddress`, `Mode`) is `sealed`, keeps its state in get-only members set by the constructor, and implements `IEquatable<T>` beside `Equals(object?)` and `GetHashCode()`. The three agree: two instances that are `Equals` hash alike, and `GetHashCode` never throws. Ordering, where it exists, is `IComparable<T>`, never the non-generic `IComparable`. A caller who needs the bytes gets a `ReadOnlySpan<byte>`; the backing array is never handed out, because a caller who can write it changes the identity behind every dictionary keyed on the value.
+A type whose identity is its content (`Address`, `MacAddress`, `Mode`) is `sealed`, keeps its state in get-only members set by the constructor, and implements `IEquatable<T>` beside `Equals(object?)` and `GetHashCode()`. The three agree: two instances that are `Equals` hash alike, and `GetHashCode` never throws. Ordering, where it exists, is `IComparable<T>`, never the non-generic `IComparable`. A caller who needs the bytes gets a `ReadOnlySpan<byte>`; the backing array is never handed out, because a caller who can write it changes the identity behind every dictionary keyed on the value.
 
 ```csharp
 public sealed class Address : IComparable<Address>, IEquatable<Address>
@@ -750,7 +750,7 @@ Use `?? throw` where a null result is a programming error:
 Address source = IPConfig.FindNetwork(destination)
     ?? throw new InvalidOperationException("No network route to destination");
 
-public MACAddress MacAddress => _macAddress
+public MacAddress MacAddress => _macAddress
     ?? throw new InvalidOperationException($"{nameof(_macAddress)} is null");
 ```
 
@@ -862,7 +862,7 @@ private static readonly ArrayPool<byte> s_arrayPool = ArrayPool<byte>.Shared;
 public static KernelConsole? Default { get; private set; }
 ```
 
-Three limits on the last two. `readonly` on a field of a mutable struct type (`SpinLock`) is wrong: every method call would act on a defensive copy, and the lock would never be taken. The analyzer behind `dotnet_style_readonly_field` does not know which struct methods mutate, so its suggestion is taken for reference types and for structs with no mutating members only. A field a plug reaches by name (`[FieldAccess]`) stays a field: an auto-property's backing field has a compiler-generated name. And a static initializer that allocates is a class constructor, which runs on first touch through a lock that needs a current thread: a type reachable from device bring-up (`MACAddress`, whose `None` and `Broadcast` any driver may read) keeps its lazily filled statics, with a comment saying why.
+Three limits on the last two. `readonly` on a field of a mutable struct type (`SpinLock`) is wrong: every method call would act on a defensive copy, and the lock would never be taken. The analyzer behind `dotnet_style_readonly_field` does not know which struct methods mutate, so its suggestion is taken for reference types and for structs with no mutating members only. A field a plug reaches by name (`[FieldAccess]`) stays a field: an auto-property's backing field has a compiler-generated name. And a static initializer that allocates is a class constructor, which runs on first touch through a lock that needs a current thread: a type reachable from device bring-up (`MacAddress`, whose `None` and `Broadcast` any driver may read) keeps its lazily filled statics, with a comment saying why.
 
 ### Avoid
 
@@ -1008,7 +1008,7 @@ Logic that needs no hardware (`TcpConnection` receive-buffer arithmetic, address
 
 Three rules decide what is `public` (the full policy and its mechanisms live in [Public API Tracking](public-api.md)):
 
-1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types its signatures expose (the HAL's device contracts `IBlockDevice` and `MACAddress`, Core's platform interfaces). Only that surface is tracked, documented, and covered by deprecation cycles.
+1. **One supported ring.** `Cosmos.Kernel.System` is the API kernels program against, plus the contract types its signatures expose (the HAL's device contracts `IBlockDevice` and `MacAddress`, Core's platform interfaces). Only that surface is tracked, documented, and covered by deprecation cycles.
 2. **Chosen experimental seams.** An extension point outside the ring is opened deliberately and marked `[Experimental("COSMOSxxxx")]`: usable now, no compatibility promise, promoted by removing the attribute. Never open a seam by just making something public.
 3. **Everything else is `internal`.** Visibility is not the extension mechanism. First-party assemblies and white-box test kernels use `InternalsVisibleTo`; external code uses `[UnsafeAccessor]` ([Accessing internals](accessing-internals.md)) at its own risk.
 

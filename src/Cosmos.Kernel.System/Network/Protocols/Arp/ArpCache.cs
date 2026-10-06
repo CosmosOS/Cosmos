@@ -13,7 +13,7 @@ internal static class ArpCache
     /// <summary>
     /// The cache map.
     /// </summary>
-    public static Dictionary<Address, MACAddress>? Cache;
+    public static Dictionary<Address, MacAddress>? Cache;
 
     /// <summary>
     /// Ensures the cache map exists.
@@ -32,7 +32,7 @@ internal static class ArpCache
     /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
     /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
     /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
-    internal static void Update(Address ipAddress, MACAddress macAddress)
+    internal static void Update(Address ipAddress, MacAddress macAddress)
     {
         EnsureCacheExists();
         if (Equals(ipAddress, Address4.Zero))
@@ -48,10 +48,10 @@ internal static class ArpCache
     /// </summary>
     /// <param name="ipAddress">IP address.</param>
     /// <returns>The resolved MAC address, or <see langword="null"/> if no cache entry for the given IP address exists.</returns>
-    internal static MACAddress? Resolve(Address ipAddress)
+    internal static MacAddress? Resolve(Address ipAddress)
     {
         EnsureCacheExists();
 
-        return Cache.TryGetValue(ipAddress, out MACAddress? resolve) ? resolve : null;
+        return Cache.TryGetValue(ipAddress, out MacAddress? resolve) ? resolve : null;
     }
 }

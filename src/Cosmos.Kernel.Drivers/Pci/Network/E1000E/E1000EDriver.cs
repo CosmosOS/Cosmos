@@ -172,7 +172,7 @@ public sealed class E1000EDriver : Driver
         addressHigh = address[4] | ((uint)address[5] << BitsPerByte) | E1000ERegisters.ReceiveAddressValid;
         registers.Write32(E1000ERegisters.ReceiveAddressLow0, addressLow);
         registers.Write32(E1000ERegisters.ReceiveAddressHigh0, addressHigh);
-        MACAddress macAddress = new(address);
+        MacAddress macAddress = new(address);
 
         // 5. The rings and their buffers, in DMA memory; each descriptor
         //    points at its own buffer.

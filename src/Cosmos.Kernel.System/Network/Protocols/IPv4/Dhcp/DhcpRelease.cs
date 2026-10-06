@@ -37,7 +37,7 @@ public class DhcpRelease : DhcpPacket
     /// <param name="client">The client's currently assigned IPv4 address, used as the source.</param>
     /// <param name="server">The DHCP server's IPv4 address, used as the destination and written to option 54.</param>
     /// <param name="source">The MAC address of the sending network device, written to option 61.</param>
-    public DhcpRelease(Address client, Address server, MACAddress source) : base(client, server, source, 19)
+    public DhcpRelease(Address client, Address server, MacAddress source) : base(client, server, source, 19)
     {
         //Release
         RawData[282] = 0x35;
