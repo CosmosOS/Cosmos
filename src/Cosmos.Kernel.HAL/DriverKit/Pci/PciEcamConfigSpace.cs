@@ -5,7 +5,7 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Scheduler;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
-namespace Cosmos.Kernel.HAL.Pci;
+namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 
 /// <summary>
 /// PCIe Enhanced Configuration Access Mechanism: a function's 4 KiB of

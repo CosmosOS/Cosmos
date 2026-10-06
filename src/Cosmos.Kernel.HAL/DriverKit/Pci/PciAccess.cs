@@ -2,7 +2,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
-using Cosmos.Kernel.HAL.Pci;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 

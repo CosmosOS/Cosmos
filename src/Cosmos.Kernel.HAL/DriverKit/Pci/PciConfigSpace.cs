@@ -3,18 +3,19 @@
 using Cosmos.Build.API.Enum;
 using Cosmos.Kernel.Core.Scheduler;
 
-namespace Cosmos.Kernel.HAL.Pci;
+namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 
 /// <summary>
 /// One way of reaching PCI configuration space: the x86 port mechanism
 /// (<see cref="PciPortConfigSpace"/>) or a PCIe ECAM window
 /// (<see cref="PciEcamConfigSpace"/>). Both are compiled on both
-/// architectures; which one the legacy <see cref="PciDevice"/> paths use is
-/// chosen at run time by <see cref="SelectLegacy"/>, and the driver kit's
-/// PCI host nodes carry the one their platform node describes. Every
-/// access is a single locked transaction; a read-modify-write sequence
-/// runs under <see cref="AcquireLock"/>, which is a second lock, since the
-/// spin lock is not reentrant. Any context; allocation-free.
+/// architectures; which one the legacy
+/// <see cref="Cosmos.Kernel.HAL.Pci.PciDevice"/> paths use is chosen at run
+/// time by <see cref="SelectLegacy"/>, and the driver kit's PCI host nodes
+/// carry the one their platform node describes. Every access is a single
+/// locked transaction; a read-modify-write sequence runs under
+/// <see cref="AcquireLock"/>, which is a second lock, since the spin lock
+/// is not reentrant. Any context; allocation-free.
 /// </summary>
 internal abstract class PciConfigSpace
 {
@@ -41,10 +42,10 @@ internal abstract class PciConfigSpace
     public static PciPortConfigSpace Ports => s_ports ??= new PciPortConfigSpace();
 
     /// <summary>
-    /// The mechanism the legacy <see cref="PciDevice"/> paths use, chosen
-    /// by <see cref="SelectLegacy"/>. Before the choice x64 answers with the
-    /// ports, which needed no setup before the mechanisms were split, so an
-    /// early caller keeps working there.
+    /// The mechanism the legacy <see cref="Cosmos.Kernel.HAL.Pci.PciDevice"/>
+    /// paths use, chosen by <see cref="SelectLegacy"/>. Before the choice x64
+    /// answers with the ports, which needed no setup before the mechanisms
+    /// were split, so an early caller keeps working there.
     /// </summary>
     /// <exception cref="InvalidOperationException">No mechanism was selected yet and the architecture has no port mechanism.</exception>
     public static PciConfigSpace Legacy => s_legacy

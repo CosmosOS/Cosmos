@@ -3,7 +3,7 @@
 using Cosmos.Kernel.Core.Scheduler;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
-namespace Cosmos.Kernel.HAL.Pci;
+namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 
 /// <summary>
 /// PCI Configuration Mechanism #1: CONFIG_ADDRESS at port 0xCF8 selects a
