@@ -123,13 +123,14 @@ Calling a `DeviceBinding` method from a handler stops the kernel with a panic na
 
 ## The attribute and the manifest
 
-`[Driver]` is what the build looks for. A source generator in the kernel project emits `DriverManifest.g.cs`, one `DriverRegistry.Register(new X())` call per driver, and the generated entry point runs it before the kernel starts; the registry is fixed once the engine has started. [Driver Manifest](../dev/build/driver-manifest.md) describes the generator, the diagnostics and the build plumbing; what a driver author needs is this:
+The build registers every class marked `[Driver]`: a source generator writes `DriverManifest.g.cs` into the kernel project, which constructs each driver once at boot ([Driver Manifest](../dev/build/driver-manifest.md) describes the generator). A driver class must derive from `Driver`, be concrete and non-generic, and have a parameterless constructor. It may be `internal` in the kernel project, but must be `public` in a driver library ([A driver library](#a-driver-library)).
 
-- A driver in the **kernel project** may be `internal`. A driver in a **class library** must be `public`, and the library must reference `Cosmos.Kernel.HAL`, because that is where the generator looks.
-- The class must be concrete, non-generic, derive from `Driver`, and have a parameterless constructor the kernel can call.
-- **Order is deterministic.** The kernel's own drivers come first (by file path, then position in the file), then referenced assemblies (by assembly name, then full type name). Position is the last arbitration key, and the log prints the manifest at boot.
-- `[Driver(Feature = DriverFeature.Keyboard)]` ties the registration to a feature switch: the `Register` call is wrapped in `if (KernelFeatures.Keyboard)`, so a kernel with `CosmosEnableKeyboard` off never constructs the driver and everything only it references is trimmed. The members of `DriverFeature` mirror the `KernelFeatures` properties by name (`Interrupts`, `Uart`, `Pci`, `Timer`, `Keyboard`, `Mouse`, `Network`, `Storage`, `Fat`, `Graphics`, `Scheduler`, `Usb`); `None`, the default, emits no guard.
-- `[Driver(Default = false)]` marks a driver a kernel must opt into by name with a `CosmosDriverInclude` item; any driver can be dropped with a `CosmosDriverExclude` item. Both are shown under [Project settings](#project-settings).
+The attribute takes two options:
+
+- `[Driver(Feature = DriverFeature.Keyboard)]` registers the driver only when the matching feature switch (`CosmosEnableKeyboard`) is on; otherwise it is trimmed from the kernel.
+- `[Driver(Default = false)]` registers the driver only when the kernel opts into it by name ([Excluding and opting in](#excluding-and-opting-in)).
+
+The manifest order is deterministic (the kernel's own drivers first, then those of referenced libraries) and is printed at boot.
 
 ## Identity and matches
 
