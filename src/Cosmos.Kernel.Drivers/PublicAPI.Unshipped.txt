@@ -44,7 +44,7 @@ Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.VmwareSvgaDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Capabilities.get -> uint
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Canvas3D!
+Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.FifoMax.get -> uint
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.FifoMin.get -> uint
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Flush(int x, int y, int width, int height) -> void
@@ -374,7 +374,7 @@ override Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkDriver.OnDetach
 override Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 [COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter
 [COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.Capabilities.get -> uint
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Canvas3D!
+[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!
 [COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.FifoMax.get -> uint
 [COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.FifoMin.get -> uint
 [COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.Is3DNegotiated.get -> bool

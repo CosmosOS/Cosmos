@@ -5,6 +5,7 @@ using System.Numerics;
 using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
+using Cosmos.Kernel.System.Graphics.Rendering3D;
 using DevKernel.Shell;
 using MouseManager = Cosmos.Kernel.System.Input.MouseManager;
 using SysThread = System.Threading.Thread;

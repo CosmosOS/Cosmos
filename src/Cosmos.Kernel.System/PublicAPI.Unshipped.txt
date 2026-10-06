@@ -1,10 +1,10 @@
 #nullable enable
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.ClearScene(System.Drawing.Color color, float depth = 1) -> void
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.CreateMeshCore(System.ReadOnlySpan<System.Numerics.Vector3> positions, System.ReadOnlySpan<uint> colors, System.ReadOnlySpan<System.Numerics.Vector2> uvs, Cosmos.Kernel.System.Graphics.Texture? texture, System.ReadOnlySpan<ushort> indices, Cosmos.Kernel.System.Graphics.MeshTopology topology) -> Cosmos.Kernel.System.Graphics.Mesh!
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.CreateTexture(Cosmos.Kernel.System.Graphics.Image! image) -> Cosmos.Kernel.System.Graphics.Texture!
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.DestroyMesh(Cosmos.Kernel.System.Graphics.Mesh! mesh) -> void
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.DestroyTexture(Cosmos.Kernel.System.Graphics.Texture! texture) -> void
-abstract Cosmos.Kernel.System.Graphics.Canvas3D.DrawMesh(Cosmos.Kernel.System.Graphics.Mesh! mesh, in System.Numerics.Matrix4x4 world) -> void
+abstract Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.ClearScene(System.Drawing.Color color, float depth = 1) -> void
+abstract Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateMeshCore(System.ReadOnlySpan<System.Numerics.Vector3> positions, System.ReadOnlySpan<uint> colors, System.ReadOnlySpan<System.Numerics.Vector2> uvs, Cosmos.Kernel.System.Graphics.Rendering3D.Texture? texture, System.ReadOnlySpan<ushort> indices, Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology topology) -> Cosmos.Kernel.System.Graphics.Rendering3D.Mesh!
+abstract Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateTexture(Cosmos.Kernel.System.Graphics.Image! image) -> Cosmos.Kernel.System.Graphics.Rendering3D.Texture!
+abstract Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DestroyMesh(Cosmos.Kernel.System.Graphics.Rendering3D.Mesh! mesh) -> void
+abstract Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DestroyTexture(Cosmos.Kernel.System.Graphics.Rendering3D.Texture! texture) -> void
+abstract Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DrawMesh(Cosmos.Kernel.System.Graphics.Rendering3D.Mesh! mesh, in System.Numerics.Matrix4x4 world) -> void
 abstract Cosmos.Kernel.System.Input.KeyboardLayout.InitializeKeys() -> void
 abstract Cosmos.Kernel.System.Kernel.Run() -> void
 abstract Cosmos.Kernel.System.Network.Address.IsBroadcastAddress.get -> bool
@@ -309,18 +309,6 @@ Cosmos.Kernel.System.Graphics.Bitmap.Bitmap(int width, int height, Cosmos.Kernel
 Cosmos.Kernel.System.Graphics.Bitmap.Bitmap(string! path, Cosmos.Kernel.System.Graphics.ColorOrder colorOrder = Cosmos.Kernel.System.Graphics.ColorOrder.BGR) -> void
 Cosmos.Kernel.System.Graphics.Bitmap.Save(string! path) -> void
 Cosmos.Kernel.System.Graphics.Bitmap.Save(System.IO.Stream! stream) -> void
-Cosmos.Kernel.System.Graphics.Camera3D
-Cosmos.Kernel.System.Graphics.Camera3D.Camera3D() -> void
-Cosmos.Kernel.System.Graphics.Camera3D.Camera3D(System.Numerics.Vector3 position, System.Numerics.Vector3 target) -> void
-Cosmos.Kernel.System.Graphics.Camera3D.Camera3D(System.Numerics.Vector3 position, System.Numerics.Vector3 target, System.Numerics.Vector3 up, float fovY) -> void
-Cosmos.Kernel.System.Graphics.Camera3D.FovY.get -> float
-Cosmos.Kernel.System.Graphics.Camera3D.FovY.init -> void
-Cosmos.Kernel.System.Graphics.Camera3D.Position.get -> System.Numerics.Vector3
-Cosmos.Kernel.System.Graphics.Camera3D.Position.init -> void
-Cosmos.Kernel.System.Graphics.Camera3D.Target.get -> System.Numerics.Vector3
-Cosmos.Kernel.System.Graphics.Camera3D.Target.init -> void
-Cosmos.Kernel.System.Graphics.Camera3D.Up.get -> System.Numerics.Vector3
-Cosmos.Kernel.System.Graphics.Camera3D.Up.init -> void
 Cosmos.Kernel.System.Graphics.Canvas
 Cosmos.Kernel.System.Graphics.Canvas.Canvas(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> void
 Cosmos.Kernel.System.Graphics.Canvas.Canvas(int width, int height, Cosmos.Kernel.System.Graphics.ColorDepth colorDepth = Cosmos.Kernel.System.Graphics.ColorDepth.ColorDepth32) -> void
@@ -332,18 +320,6 @@ Cosmos.Kernel.System.Graphics.Canvas.Height.get -> int
 Cosmos.Kernel.System.Graphics.Canvas.ThrowIfModeIsNotValid(Cosmos.Kernel.System.Graphics.Mode mode) -> void
 Cosmos.Kernel.System.Graphics.Canvas.TrimLine(ref int x1, ref int y1, ref int x2, ref int y2) -> void
 Cosmos.Kernel.System.Graphics.Canvas.Width.get -> int
-Cosmos.Kernel.System.Graphics.Canvas3D
-Cosmos.Kernel.System.Graphics.Canvas3D.Camera.get -> Cosmos.Kernel.System.Graphics.Camera3D
-Cosmos.Kernel.System.Graphics.Canvas3D.Camera.set -> void
-Cosmos.Kernel.System.Graphics.Canvas3D.Canvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> void
-Cosmos.Kernel.System.Graphics.Canvas3D.CreateMesh(System.ReadOnlySpan<System.Numerics.Vector3> positions, System.ReadOnlySpan<System.Numerics.Vector2> uvs, Cosmos.Kernel.System.Graphics.Texture! texture, System.ReadOnlySpan<ushort> indices) -> Cosmos.Kernel.System.Graphics.Mesh!
-Cosmos.Kernel.System.Graphics.Canvas3D.CreateMesh(System.ReadOnlySpan<System.Numerics.Vector3> positions, System.ReadOnlySpan<uint> colors, System.ReadOnlySpan<ushort> indices) -> Cosmos.Kernel.System.Graphics.Mesh!
-Cosmos.Kernel.System.Graphics.Canvas3D.CreateMeshHandle(int vertexCount, int indexCount, Cosmos.Kernel.System.Graphics.Texture? texture, Cosmos.Kernel.System.Graphics.MeshTopology topology, object? driverData) -> Cosmos.Kernel.System.Graphics.Mesh!
-Cosmos.Kernel.System.Graphics.Canvas3D.CreateTextureHandle(int width, int height, object? driverData) -> Cosmos.Kernel.System.Graphics.Texture!
-Cosmos.Kernel.System.Graphics.Canvas3D.DrawCube(System.Numerics.Vector3 position, System.Numerics.Vector3 size, System.Drawing.Color color) -> void
-Cosmos.Kernel.System.Graphics.Canvas3D.DrawGrid(int slices, float spacing, System.Drawing.Color color) -> void
-Cosmos.Kernel.System.Graphics.Canvas3D.DrawLine3D(System.Numerics.Vector3 start, System.Numerics.Vector3 end, System.Drawing.Color color) -> void
-Cosmos.Kernel.System.Graphics.Canvas3D.DrawMesh(Cosmos.Kernel.System.Graphics.Mesh! mesh) -> void
 Cosmos.Kernel.System.Graphics.ColorDepth
 Cosmos.Kernel.System.Graphics.ColorDepth.ColorDepth16 = 16 -> Cosmos.Kernel.System.Graphics.ColorDepth
 Cosmos.Kernel.System.Graphics.ColorDepth.ColorDepth24 = 24 -> Cosmos.Kernel.System.Graphics.ColorDepth
@@ -401,17 +377,6 @@ Cosmos.Kernel.System.Graphics.KernelConsole.Cols.get -> int
 Cosmos.Kernel.System.Graphics.KernelConsole.Font.get -> Cosmos.Kernel.System.Graphics.Fonts.Font!
 Cosmos.Kernel.System.Graphics.KernelConsole.Font.set -> void
 Cosmos.Kernel.System.Graphics.KernelConsole.Rows.get -> int
-Cosmos.Kernel.System.Graphics.Mesh
-Cosmos.Kernel.System.Graphics.Mesh.Dispose() -> void
-Cosmos.Kernel.System.Graphics.Mesh.IndexCount.get -> int
-Cosmos.Kernel.System.Graphics.Mesh.IsDisposed.get -> bool
-Cosmos.Kernel.System.Graphics.Mesh.Owner.get -> Cosmos.Kernel.System.Graphics.Canvas3D!
-Cosmos.Kernel.System.Graphics.Mesh.Texture.get -> Cosmos.Kernel.System.Graphics.Texture?
-Cosmos.Kernel.System.Graphics.Mesh.Topology.get -> Cosmos.Kernel.System.Graphics.MeshTopology
-Cosmos.Kernel.System.Graphics.Mesh.VertexCount.get -> int
-Cosmos.Kernel.System.Graphics.MeshTopology
-Cosmos.Kernel.System.Graphics.MeshTopology.Lines = 1 -> Cosmos.Kernel.System.Graphics.MeshTopology
-Cosmos.Kernel.System.Graphics.MeshTopology.Triangles = 0 -> Cosmos.Kernel.System.Graphics.MeshTopology
 Cosmos.Kernel.System.Graphics.Mode
 Cosmos.Kernel.System.Graphics.Mode.ColorDepth.get -> Cosmos.Kernel.System.Graphics.ColorDepth
 Cosmos.Kernel.System.Graphics.Mode.CompareTo(Cosmos.Kernel.System.Graphics.Mode other) -> int
@@ -424,12 +389,47 @@ Cosmos.Kernel.System.Graphics.Png
 Cosmos.Kernel.System.Graphics.Png.Png(byte[]! imageData) -> void
 Cosmos.Kernel.System.Graphics.Png.Png(string! path) -> void
 Cosmos.Kernel.System.Graphics.Png.Png(System.IO.Stream! stream) -> void
-Cosmos.Kernel.System.Graphics.Texture
-Cosmos.Kernel.System.Graphics.Texture.Dispose() -> void
-Cosmos.Kernel.System.Graphics.Texture.Height.get -> int
-Cosmos.Kernel.System.Graphics.Texture.IsDisposed.get -> bool
-Cosmos.Kernel.System.Graphics.Texture.Owner.get -> Cosmos.Kernel.System.Graphics.Canvas3D!
-Cosmos.Kernel.System.Graphics.Texture.Width.get -> int
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.Camera3D() -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.Camera3D(System.Numerics.Vector3 position, System.Numerics.Vector3 target) -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.Camera3D(System.Numerics.Vector3 position, System.Numerics.Vector3 target, System.Numerics.Vector3 up, float fovY) -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.FovY.get -> float
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.FovY.init -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.Position.get -> System.Numerics.Vector3
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.Position.init -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.Target.get -> System.Numerics.Vector3
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.Target.init -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.Up.get -> System.Numerics.Vector3
+Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D.Up.init -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.Camera.get -> Cosmos.Kernel.System.Graphics.Rendering3D.Camera3D
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.Camera.set -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.Canvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateMesh(System.ReadOnlySpan<System.Numerics.Vector3> positions, System.ReadOnlySpan<System.Numerics.Vector2> uvs, Cosmos.Kernel.System.Graphics.Rendering3D.Texture! texture, System.ReadOnlySpan<ushort> indices) -> Cosmos.Kernel.System.Graphics.Rendering3D.Mesh!
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateMesh(System.ReadOnlySpan<System.Numerics.Vector3> positions, System.ReadOnlySpan<uint> colors, System.ReadOnlySpan<ushort> indices) -> Cosmos.Kernel.System.Graphics.Rendering3D.Mesh!
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateMeshHandle(int vertexCount, int indexCount, Cosmos.Kernel.System.Graphics.Rendering3D.Texture? texture, Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology topology, object? driverData) -> Cosmos.Kernel.System.Graphics.Rendering3D.Mesh!
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateTextureHandle(int width, int height, object? driverData) -> Cosmos.Kernel.System.Graphics.Rendering3D.Texture!
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DrawCube(System.Numerics.Vector3 position, System.Numerics.Vector3 size, System.Drawing.Color color) -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DrawGrid(int slices, float spacing, System.Drawing.Color color) -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DrawLine3D(System.Numerics.Vector3 start, System.Numerics.Vector3 end, System.Drawing.Color color) -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DrawMesh(Cosmos.Kernel.System.Graphics.Rendering3D.Mesh! mesh) -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Mesh
+Cosmos.Kernel.System.Graphics.Rendering3D.Mesh.Dispose() -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Mesh.IndexCount.get -> int
+Cosmos.Kernel.System.Graphics.Rendering3D.Mesh.IsDisposed.get -> bool
+Cosmos.Kernel.System.Graphics.Rendering3D.Mesh.Owner.get -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!
+Cosmos.Kernel.System.Graphics.Rendering3D.Mesh.Texture.get -> Cosmos.Kernel.System.Graphics.Rendering3D.Texture?
+Cosmos.Kernel.System.Graphics.Rendering3D.Mesh.Topology.get -> Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology
+Cosmos.Kernel.System.Graphics.Rendering3D.Mesh.VertexCount.get -> int
+Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology
+Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology.Lines = 1 -> Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology
+Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology.Triangles = 0 -> Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology
+Cosmos.Kernel.System.Graphics.Rendering3D.Texture
+Cosmos.Kernel.System.Graphics.Rendering3D.Texture.Dispose() -> void
+Cosmos.Kernel.System.Graphics.Rendering3D.Texture.Height.get -> int
+Cosmos.Kernel.System.Graphics.Rendering3D.Texture.IsDisposed.get -> bool
+Cosmos.Kernel.System.Graphics.Rendering3D.Texture.Owner.get -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!
+Cosmos.Kernel.System.Graphics.Rendering3D.Texture.Width.get -> int
 Cosmos.Kernel.System.Input.Key
 Cosmos.Kernel.System.Input.Key.A = 47 -> Cosmos.Kernel.System.Input.Key
 Cosmos.Kernel.System.Input.Key.AltGr = 82 -> Cosmos.Kernel.System.Input.Key
@@ -884,10 +884,6 @@ static Cosmos.Kernel.System.Graphics.Canvas.AlphaBlend(System.Drawing.Color to, 
 static Cosmos.Kernel.System.Graphics.Canvas.DisableFullScreen() -> void
 static Cosmos.Kernel.System.Graphics.Canvas.GetFullScreen() -> Cosmos.Kernel.System.Graphics.Canvas!
 static Cosmos.Kernel.System.Graphics.Canvas.GetFullScreen(Cosmos.Kernel.System.Graphics.Mode mode) -> Cosmos.Kernel.System.Graphics.Canvas!
-static Cosmos.Kernel.System.Graphics.Canvas3D.DriverDataOf(Cosmos.Kernel.System.Graphics.Mesh! mesh) -> object?
-static Cosmos.Kernel.System.Graphics.Canvas3D.DriverDataOf(Cosmos.Kernel.System.Graphics.Texture! texture) -> object?
-static Cosmos.Kernel.System.Graphics.Canvas3D.SetDriverData(Cosmos.Kernel.System.Graphics.Mesh! mesh, object? data) -> void
-static Cosmos.Kernel.System.Graphics.Canvas3D.SetDriverData(Cosmos.Kernel.System.Graphics.Texture! texture, object? data) -> void
 static Cosmos.Kernel.System.Graphics.DisplayManager.Count.get -> int
 static Cosmos.Kernel.System.Graphics.DisplayManager.IsEnabled.get -> bool
 static Cosmos.Kernel.System.Graphics.DisplayManager.Primary.get -> Cosmos.Kernel.System.Graphics.DisplayDevice?
@@ -903,6 +899,10 @@ static Cosmos.Kernel.System.Graphics.Mode.operator <=(Cosmos.Kernel.System.Graph
 static Cosmos.Kernel.System.Graphics.Mode.operator ==(Cosmos.Kernel.System.Graphics.Mode a, Cosmos.Kernel.System.Graphics.Mode b) -> bool
 static Cosmos.Kernel.System.Graphics.Mode.operator >(Cosmos.Kernel.System.Graphics.Mode a, Cosmos.Kernel.System.Graphics.Mode b) -> bool
 static Cosmos.Kernel.System.Graphics.Mode.operator >=(Cosmos.Kernel.System.Graphics.Mode a, Cosmos.Kernel.System.Graphics.Mode b) -> bool
+static Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DriverDataOf(Cosmos.Kernel.System.Graphics.Rendering3D.Mesh! mesh) -> object?
+static Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DriverDataOf(Cosmos.Kernel.System.Graphics.Rendering3D.Texture! texture) -> object?
+static Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.SetDriverData(Cosmos.Kernel.System.Graphics.Rendering3D.Mesh! mesh, object? data) -> void
+static Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.SetDriverData(Cosmos.Kernel.System.Graphics.Rendering3D.Texture! texture, object? data) -> void
 static Cosmos.Kernel.System.Input.KeyboardManager.AltPressed.get -> bool
 static Cosmos.Kernel.System.Input.KeyboardManager.CapsLock.get -> bool
 static Cosmos.Kernel.System.Input.KeyboardManager.ControlPressed.get -> bool
@@ -1069,11 +1069,11 @@ virtual Cosmos.Kernel.System.Graphics.Canvas.MovePixel(int x, int y, int newX, i
 virtual Cosmos.Kernel.System.Graphics.Canvas.Name.get -> string!
 virtual Cosmos.Kernel.System.Graphics.Canvas.OnModeChanged() -> void
 virtual Cosmos.Kernel.System.Graphics.Canvas.RefreshRate.get -> int
-virtual Cosmos.Kernel.System.Graphics.Canvas3D.OnCameraChanged() -> void
 virtual Cosmos.Kernel.System.Graphics.Fonts.Font.GetAdvance(char c) -> int
 virtual Cosmos.Kernel.System.Graphics.Fonts.Font.GetLineHeight() -> int
 virtual Cosmos.Kernel.System.Graphics.Fonts.Font.GetMaxAdvance() -> int
 virtual Cosmos.Kernel.System.Graphics.Fonts.Font.MeasureString(string! text) -> int
+virtual Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.OnCameraChanged() -> void
 virtual Cosmos.Kernel.System.Kernel.AfterRun() -> void
 virtual Cosmos.Kernel.System.Kernel.BeforeRun() -> void
 virtual Cosmos.Kernel.System.Kernel.OnBoot() -> void
@@ -1276,5 +1276,5 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]override Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.ToString() -> string!
 [COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.HandlePacket(byte[]! packetData, int length) -> void
 [COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.Send(Cosmos.Kernel.System.Network.Protocols.InternetPacket! packet) -> bool
-[COSMOS0003]Cosmos.Kernel.System.Graphics.ICanvas3DFactory
-[COSMOS0003]Cosmos.Kernel.System.Graphics.ICanvas3DFactory.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Canvas3D!
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICanvas3DFactory
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICanvas3DFactory.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!

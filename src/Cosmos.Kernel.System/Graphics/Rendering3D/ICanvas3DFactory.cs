@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.System.Graphics;
+namespace Cosmos.Kernel.System.Graphics.Rendering3D;
 
 /// <summary>Ring-defined facet a display implements when it can render 3D: <see cref="Canvas.GetFullScreen()"/> asks the primary display for it.</summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]

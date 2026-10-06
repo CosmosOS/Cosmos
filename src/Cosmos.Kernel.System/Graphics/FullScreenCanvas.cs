@@ -1,4 +1,5 @@
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.System.Graphics.Rendering3D;
 
 namespace Cosmos.Kernel.System.Graphics;
 

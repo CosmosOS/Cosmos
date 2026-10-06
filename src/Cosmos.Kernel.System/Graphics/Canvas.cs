@@ -6,6 +6,7 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Display;
 using Cosmos.Kernel.System.Graphics.Fonts;
+using Cosmos.Kernel.System.Graphics.Rendering3D;
 
 namespace Cosmos.Kernel.System.Graphics;
 

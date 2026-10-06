@@ -24,8 +24,8 @@ internal static class Experimentals
     /// <summary>
     /// The driver kit seam, the id the HAL's kit types carry, shared so one
     /// suppression covers the seam on both sides: the ring's
-    /// <see cref="Graphics.ICanvas3DFactory"/>, which a display driver
-    /// implements beside the kit's facets.
+    /// <see cref="Graphics.Rendering3D.ICanvas3DFactory"/>, which a display
+    /// driver implements beside the kit's facets.
     /// </summary>
     internal const string DriverKitSeamDiagId = "COSMOS0003";
 }

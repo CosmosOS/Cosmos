@@ -1,6 +1,8 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System;
 
-namespace Cosmos.Kernel.System.Graphics;
+namespace Cosmos.Kernel.System.Graphics.Rendering3D;
 
 /// <summary>
 /// A set of 3D primitives uploaded to a 3D device. Created with one of the
@@ -10,8 +12,6 @@ namespace Cosmos.Kernel.System.Graphics;
 /// </summary>
 public sealed class Mesh : IDisposable
 {
-    private bool _disposed;
-
     /// <summary>
     /// The canvas that created this mesh; only it can draw the mesh.
     /// </summary>
@@ -66,7 +66,7 @@ public sealed class Mesh : IDisposable
     /// <summary>
     /// Whether <see cref="Dispose"/> ran: a disposed mesh can no longer be drawn.
     /// </summary>
-    public bool IsDisposed => _disposed;
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Releases the device memory held by this mesh. Any <see cref="Texture"/>
@@ -74,12 +74,12 @@ public sealed class Mesh : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (_disposed)
+        if (IsDisposed)
         {
             return;
         }
 
-        _disposed = true;
+        IsDisposed = true;
         Owner.DestroyMesh(this);
     }
 }

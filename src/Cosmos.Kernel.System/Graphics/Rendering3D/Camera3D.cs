@@ -1,6 +1,8 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System.Numerics;
 
-namespace Cosmos.Kernel.System.Graphics;
+namespace Cosmos.Kernel.System.Graphics.Rendering3D;
 
 /// <summary>
 /// Describes the point of view used for 3D drawing on a <see cref="Canvas3D"/>.

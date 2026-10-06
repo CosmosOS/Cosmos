@@ -6,6 +6,7 @@ using System.Numerics;
 using Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.Enums;
 using Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.Structs;
 using Cosmos.Kernel.System.Graphics;
+using Cosmos.Kernel.System.Graphics.Rendering3D;
 
 namespace Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga;
 

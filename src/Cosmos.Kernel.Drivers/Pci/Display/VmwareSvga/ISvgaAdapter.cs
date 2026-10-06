@@ -2,6 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.System.Graphics;
+using Cosmos.Kernel.System.Graphics.Rendering3D;
 
 namespace Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga;
 

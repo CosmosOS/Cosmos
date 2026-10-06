@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga;
 using Cosmos.Kernel.HAL.DriverKit.Display;
 using Cosmos.Kernel.System.Graphics;
+using Cosmos.Kernel.System.Graphics.Rendering3D;
 using Cosmos.TestRunner.Framework;
 
 namespace Cosmos.Kernel.Tests.Graphic;
