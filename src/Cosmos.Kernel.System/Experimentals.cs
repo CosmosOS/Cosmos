@@ -13,8 +13,9 @@ namespace Cosmos.Kernel.System;
 internal static class Experimentals
 {
     /// <summary>
-    /// The packet seam: the protocol packet types (Ethernet, ARP, the
-    /// version-neutral internet layer, IPv4, ICMP, UDP, DHCP, DNS, TCP), the
+    /// The packet seam: the protocol packet types, which make up the
+    /// <c>Cosmos.Kernel.System.Network.Protocols</c> subtree (Ethernet, ARP,
+    /// the version-neutral internet layer, IPv4, ICMP, UDP, DHCP, DNS, TCP), the
     /// <see cref="Network.NetworkStack"/> members that transmit and inject
     /// them, and the client members that accept or return packet objects.
     /// </summary>

@@ -55,7 +55,7 @@ public static class NetworkManager
     /// <summary>
     /// The adapter the ring uses when no other is named: the target of
     /// <see cref="Send"/>, of the primary shortcuts on this class, and of
-    /// <see cref="Config.IPConfig.Enable(Address, Address, Address)"/>.
+    /// <see cref="IPConfig.Enable(Address, Address, Address)"/>.
     /// It starts as the first device registered: the first interface a kit
     /// driver publishes, in the order the driver stage binds them.
     /// </summary>

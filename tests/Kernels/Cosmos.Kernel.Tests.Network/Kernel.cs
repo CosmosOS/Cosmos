@@ -5,17 +5,13 @@ using System.Text;
 using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
-using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Network.DNS;
-using Cosmos.Kernel.System.Network.IPv4;
-using Cosmos.Kernel.System.Network.IPv4.DHCP;
-using Cosmos.Kernel.System.Network.IPv6;
-using Cosmos.Kernel.System.Network.TCP;
-using Cosmos.Kernel.System.Network.UDP;
+using Cosmos.Kernel.System.Network.Protocols.IPv4;
+using Cosmos.Kernel.System.Network.Protocols.IPv6;
+using Cosmos.Kernel.System.Network.Protocols.Udp;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using CosmosEndPoint = Cosmos.Kernel.System.Network.EndPoint;
-using CosmosUdpClient = Cosmos.Kernel.System.Network.UDP.UdpClient;
+using CosmosUdpClient = Cosmos.Kernel.System.Network.UdpClient;
 using DotNetDns = System.Net.Dns;
 using DotNetTcpClient = System.Net.Sockets.TcpClient;
 using DotNetTcpListener = System.Net.Sockets.TcpListener;
@@ -1401,7 +1397,7 @@ public class Kernel : Sys.Kernel
     /// <summary>
     /// The plug on NameResolutionPal is what makes System.Net.Dns work, so
     /// these two cases go through the standard API with no Cosmos DnsClient in
-    /// sight, which is what the DotNetDns alias spells out. Nothing on the
+    /// sight, which is what the DotNetDns alias spells out. No type on the
     /// Cosmos side is named Dns, so the alias is for the reader rather than to
     /// break a tie. This case needs no network: it pins the name the plug
     /// reports.

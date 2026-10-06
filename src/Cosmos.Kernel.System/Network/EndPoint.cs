@@ -1,5 +1,3 @@
-using Cosmos.Kernel.System.Network.IPv4;
-
 namespace Cosmos.Kernel.System.Network;
 
 /// <summary>

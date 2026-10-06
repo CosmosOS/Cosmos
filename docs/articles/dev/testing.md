@@ -41,7 +41,7 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
   - `PatchType_ShouldReplaceAllMethodsCorrectly`
   - `PatchType_ShouldPlugAssembly`
   - `AddMethod_BehaviorBeforeAndAfterPlug`
-- **Cosmos.Kernel.Tests.System**: Exercises `Cosmos.Kernel.System` logic that needs no hardware, in the host process (`Tcp` receive buffer, `Address` identity and formatting). One nested fixture per member under test, holding an `InternalsVisibleTo` grant from the library.
+- **Cosmos.Kernel.Tests.System**: Exercises `Cosmos.Kernel.System` logic that needs no hardware, in the host process (`TcpConnection` receive buffer, `Address` identity and formatting). One nested fixture per member under test, holding an `InternalsVisibleTo` grant from the library.
   - `AppendToData.WhenBothData_AndOtherAreEmpty_DataIsEmpty`
   - `AppendToData.WhenDataIsNotEmpty_AndOtherIsEmpty_DataDoesNotChange`
   - `AppendToData.WhenDataIsNotEmpty_AndOtherIsNotEmpty_OtherIsAppendedToData`
@@ -447,7 +447,7 @@ tests/
         └── Bootloader/limine.conf
 ```
 
-`tests/Cosmos.Kernel.Tests.System/` holds the host-side tests of `Cosmos.Kernel.System`. It takes a project reference on the library and an `InternalsVisibleTo` grant from it, and its folders mirror the library's (`Network/`, `Input/`, `FileSystem/Ext2/`).
+`tests/Cosmos.Kernel.Tests.System/` holds the host-side tests of `Cosmos.Kernel.System`. It takes a project reference on the library and an `InternalsVisibleTo` grant from it, and its folders mirror the library's (`Network/`, `Network/Protocols/`, `Input/`, `FileSystem/Ext2/`).
 
 ---
 

@@ -3,9 +3,6 @@ using System.Net.Sockets;
 using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
-using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Network.DNS;
-using Cosmos.Kernel.System.Network.IPv4;
 using AddressFamily = System.Net.Sockets.AddressFamily;
 
 namespace Cosmos.Kernel.Plugs.System.Net;

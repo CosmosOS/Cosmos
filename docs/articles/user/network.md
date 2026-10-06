@@ -43,10 +43,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Cosmos.Kernel.System.Network;
-using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Network.DNS;
-using Cosmos.Kernel.System.Network.IPv4;
-using Cosmos.Kernel.System.Network.IPv4.DHCP;
 using Cosmos.Kernel.System.Timers;
 ```
 
@@ -166,7 +162,7 @@ Icmpv6Client ping = new();
 ping.Connect(new Address6(0xFEC0_0000, 0, 0, 2));               // QEMU user networking answers on fec0::2
 ping.SendEcho();
 
-EndPoint from = new(Address6.Zero, 0);
+Cosmos.Kernel.System.Network.EndPoint from = new(Address6.Zero, 0);
 int elapsedMs = ping.Receive(ref from, 5000);                  // -1 on timeout
 ping.Close();
 ```
@@ -183,12 +179,10 @@ What IPv6 does not cover yet: addresses beyond link-local (Router Advertisements
 
 ## UDP
 
-UDP uses the standard .NET `UdpClient`, no Cosmos-specific classes. Sends go out immediately; for receives, poll `Available` (a receive with nothing pending would block):
+UDP goes through the standard .NET `System.Net.Sockets.UdpClient`; no Cosmos-specific class is needed. `Cosmos.Kernel.System.Network` has a `UdpClient` of its own (the packet-level client), so with both namespaces imported, as above, name the .NET one in full. Sends go out immediately; for receives, poll `Available` (a receive with nothing pending would block):
 
 ```csharp
-using System.Net.Sockets;
-
-var udpClient = new UdpClient(4242);
+var udpClient = new System.Net.Sockets.UdpClient(4242);
 
 /* Send data: 10.0.2.2 is the host under QEMU user networking */
 byte[] message = Encoding.ASCII.GetBytes("Hello from CosmosOS!");
@@ -316,6 +310,8 @@ dnsClient.Close();
 DNS is one protocol at both IP versions, so `DnsClient` serves both. Two things vary independently: the server address passed to `Connect` decides which version carries the query, and the record type passed to `SendQuery` decides which address family the answer holds. An IPv4 query can ask for an IPv6 address, and the reverse:
 
 ```csharp
+using Cosmos.Kernel.System.Network.Protocols.Dns;   // DnsRecordType, part of the packet seam (COSMOS0002)
+
 /* Ask for the IPv6 address, over whichever version reaches the server */
 dnsClient.SendQuery("github.com", DnsRecordType.AAAA);
 
@@ -346,6 +342,8 @@ The seam has three parts:
 | Transmit and inject | `NetworkStack.Send(InternetPacket)` queues a built packet and resolves its neighbor address; `NetworkStack.HandlePacket` injects a raw frame into the receive path |
 | Packet-level client I/O | `UdpClient.Send(UdpPacket)` / `UdpClient.ReceivePacket(timeout)`, `IcmpClient.Send(IcmpPacket)` / `IcmpClient.ReceivePacket(timeout)` |
 
+The packet types make up the `Cosmos.Kernel.System.Network.Protocols` subtree: `EthernetPacket` and `InternetPacket` at its root, then one namespace per protocol (`Arp`, `Dns`, `IPv4` with `IPv4.Dhcp` under it, `Tcp`, `Udp`). The transmit, inject and client members stay on their stable types in `Cosmos.Kernel.System.Network`.
+
 The seam is for building and reading the packet types the stack already
 speaks, not for adding new ones: their wire fields, header checksum helpers
 and the `InitializeFields` parse hook are internal to the stack, so a kernel
@@ -358,6 +356,8 @@ by passing two addresses of the same version, and hand `packet.Network` to
 `NetworkStack.Send`:
 
 ```csharp
+using Cosmos.Kernel.System.Network.Protocols.Udp;
+
 UdpPacket datagram = new UdpPacket(localIp, remoteIp, 5000, 4242, payload);
 NetworkStack.Send(datagram.Network);
 ```
@@ -369,8 +369,7 @@ A crafted echo request, correlated with its reply by the identifier and sequence
 
 ```csharp
 using Cosmos.Kernel.System.Network;
-using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Network.IPv4;
+using Cosmos.Kernel.System.Network.Protocols.IPv4;
 
 IPConfig? config = NetworkManager.Primary.IPConfig;
 if (config is null)
@@ -432,7 +431,7 @@ TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
         │
 Socket plugs                                            (Cosmos.Kernel.Plugs)
         │
-Cosmos TCP state machine / UDP                          (Cosmos.Kernel.System.Network.IPv4)
+Cosmos TCP state machine / UDP                          (Cosmos.Kernel.System.Network)
         │                                    DhcpClient / DnsClient ride UDP directly
 IPv4 / ARP and IPv6 / Neighbor Discovery / Ethernet
         │

@@ -2,8 +2,6 @@
 
 using System.Collections.Immutable;
 using Cosmos.Kernel.System.Network;
-using Cosmos.Kernel.System.Network.IPv4;
-using Cosmos.Kernel.System.Network.IPv6;
 using NUnit.Framework;
 
 namespace Cosmos.Kernel.Tests.System.Network;

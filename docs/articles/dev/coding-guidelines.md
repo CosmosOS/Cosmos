@@ -326,7 +326,7 @@ public sealed class Address : IComparable<Address>, IEquatable<Address>
 
 ### Registered Instances
 
-When the subsystem must see every live instance (`Tcp.Connections`), the constructor is private and a static factory creates and registers the instance (`Tcp.CreateConnection`). The registry stays private, and removal disposes the instance so what it rented goes back to its pool.
+When the subsystem must see every live instance (`TcpConnection.Connections`), the constructor is private and a static factory creates and registers the instance (`TcpConnection.CreateConnection`). The registry stays private, and removal disposes the instance so what it rented goes back to its pool.
 
 ---
 
@@ -596,7 +596,7 @@ List<int> list = new();  // uses RhAllocateNewArray under the hood
 | Read-only input | A `ReadOnlySpan<T>` parameter, not `byte[]` |
 | Copying | `source.CopyTo(destination)` on spans, not `Buffer.BlockCopy` |
 
-A rented array is at least as long as requested, not exactly as long, so the owner tracks the length and offset it uses and exposes the live part as a `ReadOnlySpan<T>`, never the array. `Tcp` is the model: `_data`, `_dataOffset` and `_dataLength` behind `Data => _data.AsSpan().Slice(_dataOffset, _dataLength)`, with `AppendToData` writing in place while the rented array has room and `Dispose` returning it.
+A rented array is at least as long as requested, not exactly as long, so the owner tracks the length and offset it uses and exposes the live part as a `ReadOnlySpan<T>`, never the array. `TcpConnection` is the model: `_data`, `_dataOffset` and `_dataLength` behind `Data => _data.AsSpan().Slice(_dataOffset, _dataLength)`, with `AppendToData` writing in place while the rented array has room and `Dispose` returning it.
 
 ### Critical Sections
 
@@ -998,7 +998,7 @@ Commented-out code is deleted; the history keeps it. A `TODO` names what is miss
 
 For the full testing guide (unit tests, kernel integration tests, UART protocol, CI, writing test kernels), see [Testing](testing.md).
 
-Logic that needs no hardware (`Tcp` receive-buffer arithmetic, address parsing) is unit-tested in the host process from `tests/Cosmos.Kernel.Tests.System` (NUnit): one nested fixture per member under test, named after it, test names of the form `WhenX_AndY_ResultZ`, and `[TestCase(..., ExpectedResult = ...)]` for value tables. The project holds an `InternalsVisibleTo` grant from `Cosmos.Kernel.System`.
+Logic that needs no hardware (`TcpConnection` receive-buffer arithmetic, address parsing) is unit-tested in the host process from `tests/Cosmos.Kernel.Tests.System` (NUnit): one nested fixture per member under test, named after it, test names of the form `WhenX_AndY_ResultZ`, and `[TestCase(..., ExpectedResult = ...)]` for value tables. The project holds an `InternalsVisibleTo` grant from `Cosmos.Kernel.System`.
 
 **Code coverage:** Add the `run-coverage` label to a PR to trigger the coverage CI. It runs the kernel test suites and outputs which code paths are covered by the integration tests.
 
