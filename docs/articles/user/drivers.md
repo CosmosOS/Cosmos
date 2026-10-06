@@ -649,6 +649,7 @@ Platform nodes are the roots: devices nothing can enumerate, which the machine d
 On ARM64 they come from ACPI, the device tree, or the virt machine's fixed layout. A driver matches a platform node by one of its compatible strings:
 
 ```csharp
+// In the driver:
 private readonly DeviceMatch[] _matches = [PlatformMatch.Compatible("virtio,mmio")];
 ```
 
@@ -660,15 +661,16 @@ private readonly DeviceMatch[] _matches = [PlatformMatch.Compatible("virtio,mmio
 
 ## PCI devices
 
-A PCI node is what the host driver, or a root port driver behind a hot-plug slot, publishes for one function: an identity read from the header, six resources that are its base address registers, its interrupt sources, the legacy line first and then one per described message, one per entry of the function's MSI-X table up to 32 ([Message interrupts](#message-interrupts)), and a `PciAccess` for everything else. The shipped `E1000EDriver` is the model for a driver over one, and the snippets below are its steps.
+A PCI node is one function: its identity read from the configuration header, six resources (its base address registers), its interrupt sources (the legacy line, then its MSI-X messages) and a `PciAccess` for its configuration space. The shipped `E1000EDriver` is a good model, and the samples below are its steps.
 
 ### Identity and match
 
-`PciIdentity` is the header as the host read it, once: `Segment`, `Bus`, `Device`, `Function`; `VendorId`, `DeviceId`; `SubsystemVendorId` and `SubsystemId` (type 0 headers only, zero otherwise); `ClassCode`, `Subclass`, `ProgIf`, `Revision`; and `HeaderType`, 0 for a device, 1 for a PCI-to-PCI bridge, 2 for a CardBus bridge, with the multi-function bit stripped. `BusName` is `pci` and `Address` is `ssss:bb:dd.f`, all hexadecimal, so the path is `pci:0000:00:03.0`. `Describe()` prints `8086:10d3 class 02.00.00`: vendor and device id, then class, subclass and programming interface, which is what `DeviceNodeInfo.Description` shows for the node.
+`PciIdentity` holds the header fields a driver matches on: `VendorId`, `DeviceId`, `SubsystemVendorId`, `SubsystemId`, `ClassCode`, `Subclass`, `ProgIf` and `Revision`, plus the function's address. The node path is `pci:<segment>:<bus>:<device>.<function>`, for example `pci:0000:00:03.0`.
 
-`PciMatch` has one constructor with eight optional fields, `vendorId`, `deviceId`, `subsystemVendorId`, `subsystemId`, `classCode`, `subclass`, `progIf` and `revision`: every field given must equal the function's, every field left `null` is not looked at, and the specificity is the number of fields given.
+`PciMatch` takes any of those fields; every field given must be equal, and the specificity is the number of fields given:
 
 ```csharp
+// In the driver:
 using Cosmos.Kernel.HAL.DriverKit.Pci;
 
 private readonly DeviceMatch[] _matches =
@@ -678,27 +680,25 @@ private readonly DeviceMatch[] _matches =
 ];
 ```
 
-A match with no field set throws `ArgumentException` (`a PCI match constrains at least one field`). That is deliberate: the kit quiesces a function before the first driver looks at it (below), and a catch-all driver would be offered every function on the bus, the ones other drivers want included. Prefer the chips a driver was tested on to a class match for the same reason; the shipped E1000E matches six Intel device ids and nothing else. The one vendor-wide match in the tree is the virtio PCI transport's `new PciMatch(vendorId: 0x1AF4)`, because every virtio function shares the transport whatever the device behind it ([The transport drivers](#the-transport-drivers)).
+A match must set at least one field. Prefer the device ids you tested over a class match: the shipped E1000E matches six Intel device ids and nothing else.
 
 ### The access object
 
-`binding.Node.Access<PciAccess>()` is the function's configuration space and what the driver turns on in it. All of it is any context and allocation-free:
+`binding.Node.Access<PciAccess>()` reaches the function's configuration space:
 
-- `ReadConfig8`, `ReadConfig16`, `ReadConfig32` and `WriteConfig8/16/32` take a register offset in this function's space; an offset past the mechanism's size (256 bytes over the ports, 4096 over ECAM) or off the access width's alignment is `ArgumentOutOfRangeException`.
-- `FindCapability(capabilityId, after = 0)` walks the capability list, from its head or from the entry after `after`, bounded to 48 entries, and returns the capability's offset or 0.
-- `EnableBusMastering(bool)`, `EnableMemorySpace(bool)` and `EnableIoSpace(bool)` are read-modify-writes of the Command register under the mechanism's lock. A driver enables what it uses: decoding is what makes the windows answer, bus mastering is what lets the device write to DMA memory.
-- `InterruptLine` and `InterruptPin` are registers `0x3C` and `0x3D` as firmware wrote them, read at describe time.
-- `IsMsiXCapable` and `MessageInterruptCount` (the MSI-X table size, 0 without the capability) say what the function offers over message-signalled interrupts; the node carries the first `min(MessageInterruptCount, 32)` of them after its line, see [Message interrupts](#message-interrupts).
-- `Bars` is the six base address registers as the host sized them (next).
-- `SecondaryBus`, `SubordinateBus`, `IsHotPlugSlot` and `TryDescribeChild` are a bridge's, described under [Hot-plug slots](#hot-plug-slots); `TryDescribeChild` is thread context and allocates.
+- `ReadConfig8/16/32` and `WriteConfig8/16/32` read and write a register at an offset.
+- `FindCapability(id)` returns the offset of a capability, or 0.
+- `EnableMemorySpace`, `EnableIoSpace` and `EnableBusMastering` turn on what the driver uses: decoding makes the registers answer, bus mastering lets the device reach DMA memory.
+- `Bars` describes the six base address registers (next section).
 
-Behind the access object, for the kit only, the function is quiesced and restored around the offers. Before the first probe, when at least one driver is a candidate, the kit snapshots Command (and MSI-X Message Control) and turns bus mastering off, disables the legacy line and, when firmware left MSI-X enabled, disables it with the function mask set. After a probe that declined, failed or threw, the same quiescing runs again before the probe's memory is freed, so a ring the probe armed cannot write into pages the kit is about to release. When every candidate declined, the snapshot is written back, so a function no driver binds keeps the bus mastering and the MSI-X firmware gave it. After a bound driver's teardown with the hardware present, the function is quiesced once more. A bound driver owns the state from its probe on, and a node no driver matches is not touched at all. A hook that throws is logged `bus hook "quiesce" threw: message`, and when it is the first one the node is left `Unbound` with no offer (`not offered: message`), since a driver must not see a function the bus could not quiet.
+Before the first probe, the kit turns bus mastering and interrupts off on the function, so a probe turns on what it needs itself. If every driver declines, the kit restores what the firmware had set.
 
 ### BAR resources
 
-`Node.Resources` of a PCI node always has six entries, one per base address register, sized at describe time. Slot `i` is `DeviceResource.MemoryWindow(base, length)` for an assigned memory register, `DeviceResource.PortRange(base, count)` for an assigned I/O register inside the 16-bit port space (a range running past it is clipped), and `DeviceResource.None` for everything else: a register nobody assigned (firmware left it at zero, or the function arrived behind a hot-plug slot and the kit found no room for it in the port's windows or the register did not take the address), the upper half of a 64-bit register, an I/O register at port zero or above `0xFFFF`, and slots 2 to 5 of a type 1 header, whose two registers at `0x10` and `0x14` are sized like a type 0's (a root port's MSI-X table sits in its BAR0); a type 2 header is not sized. `Node.Resources.Count` counts every slot, and `MapRegisters` or `MapRegion` on a `None` slot throws `InvalidOperationException` (`resource i is not assigned`), so a driver checks first. `pci.Bars[i]` is the register's own view, a `PciBar`: `Index`, `IsAssigned`, `IsIo`, `Is64Bit`, `IsPrefetchable`, `Base` (a physical address, or the first port) and `Length` (bytes, or ports; 0 when unassigned). The E1000E's first step reads as:
+`Node.Resources` of a PCI node always has six entries, one per base address register: a `MemoryWindow`, a `PortRange`, or `None` for a register that is not assigned (or is the upper half of a 64-bit one). Mapping a `None` entry throws, so check `pci.Bars[i]` first:
 
 ```csharp
+// In Probe:
 PciAccess pci = binding.Node.Access<PciAccess>();
 PciBar bar0 = pci.Bars[0];
 if (!bar0.IsAssigned || bar0.IsIo || bar0.Length < 0x20000)
@@ -711,15 +711,12 @@ pci.EnableMemorySpace(true);
 pci.EnableBusMastering(true);
 ```
 
-Sizing writes all ones to each register and reads the mask back, so for its duration the function decodes neither memory nor I/O while bus mastering stays as it was; it runs with interrupts disabled and the early framebuffer console paused, because the serial log mirrors every byte into a framebuffer whose register may be the one being sized. A 64-bit register is sized with both halves together; a 64-bit register in the last slot is malformed and reported unassigned.
-
 ### The legacy line
 
-`Node.Interrupts[0]` of a PCI node is the function's legacy interrupt line, which `Describe()` prints as `line 11` or `line (none)`. `TryRequestInterrupt` on it returns `false` on ARM64, where the line register names nothing; when the register is 0 or `0xFF`; when the line is below 3 or above 15 (the lowest three are the platform's own, and a higher register names no routable input); when the interrupt controller is not initialized; when another handler already holds the line (the PIT, the 8042 driver's two lines or another function: a shared line is refused rather than shared); and when the source is already connected. On success the line is routed as the x64 platform routes an ISA IRQ, edge-triggered and active-high, the handler is installed, and only then is the function's INTx disable bit cleared, so a function whose interrupt is already pending asserts the line after the entry is open. `Mask` and `Unmask` go to the controller; disconnecting clears the handler and sets INTx disable again.
-
-That routing is validated on QEMU and nowhere else: on a real chipset the line register is not the GSI and INTx is level-triggered, so a line that connected may never fire there. A PCI driver therefore pairs the line with a periodic drain rather than trusting it, which is the pattern the E1000E follows:
+`Node.Interrupts[0]` is the function's legacy interrupt line. It is only routed on x64, and never shared with another device, so `TryRequestInterrupt` often returns `false`. Even when it connects, the routing has only been validated on QEMU, so pair it with a periodic drain that keeps the device working if the line never fires:
 
 ```csharp
+// In Probe:
 WorkItem drain = binding.CreateWorkItem(state.Drain);
 state.DrainWork = drain;
 
@@ -731,23 +728,23 @@ if (!hasLine && !polling)
 }
 ```
 
-The drain is idempotent, so the handler and the timer can both schedule it: the handler acknowledges the device and schedules the drain, the timer runs it every period whatever happened, an edge lost while the line was masked is recovered within a period, and a line that is routed but dead still yields a working device. The E1000E's handler reads the cause register (which clears it), counts the interrupt and schedules the drain when a frame arrived, the ring ran low or the link changed; its probe logs which of the two it got, `line 11` or `no line`, and `polling every 50 ms` or `no polling`.
+The handler acknowledges the device and schedules the same drain, which must therefore be safe to run at any time.
 
 ### Message interrupts
 
-When the function has an MSI-X capability, `Node.Interrupts[1]` on are its message sources, one per table entry for the first `min(MessageInterruptCount, 32)` entries, each of which `Describe()` prints as `message 0 of 4`. A function with a larger table (an NVMe controller advertises up to 2048 entries) is offered its first 32; a driver that needs more is a later extension of the description. `TryRequestInterrupt` on a message source returns `false` when the platform has no message binder (the LAPIC on x64, the GICv3 ITS on ARM64, so the virt machine's default GICv2 routes none); when memory space decoding is off in the function's Command register, because the table lives in a BAR and is not decoded until then, so a driver calls `pci.EnableMemorySpace(true)` before it requests a message, as the E1000E and the virtio transport do; when the BAR holding the table is unassigned or I/O, or cannot be mapped; when the binder cannot route the function or has no slot left; and when the source is already connected. The first connect on a function maps the table, masks every entry, enables the capability and sets the function's INTx disable bit, so the line and the messages are never both live; each connect then programs its entry with the address and data the binder hands out and unmasks it. `Mask` and `Unmask` are one write of the entry's vector control bit, from any context. Disconnecting masks the entry in the table when decoding is on and through the capability's function mask when a driver turned memory space off while still holding the handle, reads the write back, gives the routing slot back, and the last disconnect disables the capability.
+When the function supports MSI-X, `Node.Interrupts[1]` onwards are its messages, up to 32. They need memory decoding on, because the MSI-X table lives in a BAR, and they return `false` where the platform cannot route messages (ARM64 without a GICv3 ITS). Connecting a message turns the legacy line off, so the two are never live together:
 
-The virtio PCI transport is the first shipped driver over the messages: it requests entry 0 on for as many entries as the device and the platform give it, stops at the first refusal, and has no INTx fallback, so a virtio function whose messages cannot be routed is published with no interrupt entry and its leaf driver polls or declines ([Virtio devices](#virtio-devices)).
+```csharp
+// In Probe:
+pci.EnableMemorySpace(true);   // before requesting a message
+
+bool hasMessage = binding.Node.Interrupts.Count > 1
+    && binding.TryRequestInterrupt(binding.Node.Interrupts[1], state.OnInterrupt, out _);
+```
 
 ### Hot-plug slots
 
-A PCI Express root port, or a switch's downstream port, with a hot-plug capable slot is a bus of its own, and its `PciAccess` carries what a driver for it needs. `IsHotPlugSlot` is true for a type 1 header whose PCI Express capability names a root or downstream port with a slot implemented and hot-plug capable, decided once at describe time. `SecondaryBus` and `SubordinateBus` read the bridge's bus numbers live, 0 for any other header type. `TryDescribeChild(device, function, assignResources, out description)`, thread context, describes a function on the secondary bus exactly as the host's `TryDescribeFunction` does, and returns `false` for a secondary bus of 0, at most the bridge's own or past the host's last bus, and for a vendor id reading `0xFFFF` or `0x0000` (an empty or powered-off slot). With `assignResources`, every implemented base address register of a type 0 header that nobody assigned is placed inside the windows firmware gave the bridge: a memory register in the memory window; a prefetchable one in the prefetchable window when the bridge has one and the register fits there, in the memory window otherwise; an I/O register only when the bridge has an I/O window. Each is naturally aligned (its base a multiple of its size), above everything already assigned in its window, the registers of the device's other functions included, and a 32-bit memory register never ends above 4 GiB; a window whose base reads 0 counts as absent, since that is what a window firmware never programmed reads. Each address is written and read back, a register that did not take it gets its old contents back, and the window's cursor moves only past a register that took its address. Memory decoding is turned on afterwards when a memory register was placed, I/O decoding when a port range was; bus mastering is left as it was. A register that found no room stays `None`, and the driver offered the function declines on `Bars` as it would for a register firmware left unassigned. This is the one place the kit writes a base address register: every register firmware assigned keeps its address.
-
-`PcieRootPortDriver` (`[Driver(Feature = DriverFeature.Pci)]`, `new PciMatch(classCode: 0x06, subclass: 0x04)`) binds the port function the host published. Its probe declines `not a hot-plug slot` for any other PCI-to-PCI bridge and `no secondary bus assigned to the slot` when the secondary bus is 0, at most the port's own bus or past the host's last bus; reads the slot number, the power controller and No Command Completed Support from Slot Capabilities, and Data Link Layer Link Active Reporting from Link Capabilities; clears the slot's event enables and writes back the change bits firmware left set; turns the port's memory decoding and bus mastering on (without bus mastering a bridge forwards no DMA of the functions behind it); and takes the port's message interrupt, message 0 of its MSI-X table, or, where none routes, schedules a work item that signals the thread every 500 ms. The legacy line is never requested. A populated slot comes out of reset powered on, so the probe publishes the functions the slot holds at boot, device 0 and functions 1 to 7 when function 0's header says multi-function, offered once the probe returns; a PCI-to-PCI bridge among them that is no hot-plug slot has its bus walked too, with firmware's assignment. It then enables the presence detect, attention button and, when the link reports it, data link layer state changed events, and starts the `pcie-slot` thread; without a scheduler it logs `hot-plug off (no scheduler)` and the functions present at boot are all it publishes. Every Slot Control write is followed by a wait of up to 1 s for Command Completed, unless the port reports none. The probe logs `slot 1, bus 1, occupied, powered on, message interrupt`, with `polled every 500 ms` where no message routes, and hangs a `PcieRootPortState` off `binding.DriverState` (`SlotNumber`, `SecondaryBus`, `HasPowerController`, `IsPresent`, `IsPoweredOn`, `HasInterrupt`, `IsPolling`, `HotPlugRunning`, `ChildCount`, `ArrivalCount`, `RemovalCount`, `InterruptCount`).
-
-The handler and the poll only signal the thread's event. The thread, until `IsDetaching`, clears the change bits it read before acting, then decides from the slot's presence and its own children. Presence detected with no children is an arrival: the slot is powered on when it is off (power indicator on, then 100 ms for the device to settle), device 0 is described with `assignResources` and published, and the thread logs `slot 1: device arrived, 1 functions published`. An attention button press with children is a removal request: the children are retracted with the hardware present, so their drivers quiesce it, then the slot is powered off, logged `slot 1: attention button, 1 functions retracted, slot powered off`. Presence lost with children is a surprise removal, retracted with the hardware gone (`slot 1: device removed, 1 functions retracted`). An empty slot left powered on is powered off. A slot powered off on request with its card still in stays off until the button is pressed again or presence changes. Each pass runs inside a `try`/`catch` that logs the exception, and the thread waits on its event for up to a second between passes. Retracting a function retracts the virtio node beneath it and withdraws its disk, which the storage manager unregisters, the path a USB device's interfaces take. `OnDetach`, with the hardware present, clears the slot's event enables; the kit tore the children down, disconnected the interrupt, cancelled the poll and joined the thread before it runs.
-
-Three QEMU facts shape the flow. A device added to a powered-off slot answers only once the slot is powered on, and QEMU raises the attention button with the presence change for it, which is why a press on a slot with no children counts as an arrival. A `device_del` on a powered-on slot raises the attention button and completes only when the guest powers the slot off, so the removal is the thread's to finish. On q35 a `pcie-root-port` uses native PCI Express hot-plug only with the ICH9-LPC global `acpi-pci-hotplug-with-bridge-support=off`, which the test engine sets; the virt machine's ports are native already. The port's own BAR0 is sized like a type 0 register, so its message interrupt connects where the platform routes messages (x64, arm64 with an ITS) and the slot is polled every 500 ms elsewhere.
+A function behind a PCI Express hot-plug slot is published when a device is plugged in, and retracted when it is removed; `PcieRootPortDriver` handles the slot. If the firmware left the function's registers unassigned, the kit places them before the function is offered, so a driver needs nothing special: it checks `Bars` as usual, and leaves the registers alone in `OnDetach` when `reason.HardwarePresent` is `false`.
 
 ## Virtio devices
 
