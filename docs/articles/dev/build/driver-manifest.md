@@ -13,8 +13,7 @@ public static class CosmosEntryPoint
     public static void Main()
     {
         global::Cosmos.Kernel.System.Internal.DriverManifest.Register();
-        global::Cosmos.Kernel.System.Global.RegisterKernel(new global::MyOS.Kernel());
-        global::Cosmos.Kernel.System.Global.StartKernel();
+        global::Cosmos.Kernel.System.Internal.KernelEntry.Start(new global::MyOS.Kernel());
     }
 }
 ```

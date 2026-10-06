@@ -107,14 +107,13 @@ internal static class KitStubs
                 {
                 }
             }
+        }
 
-            public static class Global
+        namespace Cosmos.Kernel.System.Internal
+        {
+            public static class KernelEntry
             {
-                public static void RegisterKernel(Kernel kernel)
-                {
-                }
-
-                public static void StartKernel()
+                public static void Start(Kernel kernel)
                 {
                 }
             }

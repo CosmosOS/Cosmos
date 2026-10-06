@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
 /// One offer of a device node to a driver and how it ended, produced by
-/// <see cref="DriverInfo.TryGetOffer"/>. A node's offers are recorded in
+/// <see cref="DriverDiagnostics.TryGetOffer"/>. A node's offers are recorded in
 /// the order they were made, so walking them from index 0 replays the
 /// arbitration: which drivers were tried, in what order, and why each one
 /// passed. Offers are written once, when the node is offered, and never

@@ -438,9 +438,9 @@ public class Kernel : Sys.Kernel
         TR.RunIf(hasDevice, "Profile_DeviceKindMatches", TestProfile_DeviceKindMatches, SkipNoDevice);
 
         // The kit's view of the same device: every disk of these cells is
-        // published by a kit driver and consumed by the manager, so DriverInfo
-        // lists it under the driver the cell names.
-        TR.RunIf(hasDevice, "Manager_DeviceListedInDriverInfo", TestManager_DeviceListedInDriverInfo, SkipNoDevice);
+        // published by a kit driver and consumed by the manager, so
+        // DriverDiagnostics lists it under the driver the cell names.
+        TR.RunIf(hasDevice, "Manager_DeviceListedInDriverDiagnostics", TestManager_DeviceListedInDriverDiagnostics, SkipNoDevice);
 
         if (!TR.ProfileHasPrefix("nvme"))
         {
@@ -795,18 +795,18 @@ public class Kernel : Sys.Kernel
             "device name does not match the cell's controller kind");
     }
 
-    // The manager's device is the kit's device: DriverInfo lists a block
+    // The manager's device is the kit's device: DriverDiagnostics lists a block
     // device under the manager's name, published by the driver the cell
     // names, consumed (the manager's block consumer registered it) and not
     // withdrawn. Pins the publish-to-register path that replaced the
     // manager's boot-time walk over the HAL controllers.
-    private static void TestManager_DeviceListedInDriverInfo()
+    private static void TestManager_DeviceListedInDriverDiagnostics()
     {
         string expectedDriver = TR.ProfileHasPrefix("ahci") ? nameof(AhciDriver) : TR.ProfileHasPrefix("usb") ? nameof(UsbMassStorageDriver) : TR.ProfileHasPrefix("virtio-blk") ? nameof(VirtioBlkDriver) : nameof(NvmeDriver);
         bool found = false;
-        for (int i = 0; i < DriverInfo.DeviceCount; i++)
+        for (int i = 0; i < DriverDiagnostics.DeviceCount; i++)
         {
-            if (!DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info))
+            if (!DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info))
             {
                 break;
             }
@@ -1299,7 +1299,7 @@ public class Kernel : Sys.Kernel
             return SkipNoDevice;
         }
 
-        return DriverInfo.HasWorker ? string.Empty : "the driver kit has no worker (no scheduler)";
+        return DriverDiagnostics.HasWorker ? string.Empty : "the driver kit has no worker (no scheduler)";
     }
 
     // Pulling the stick out must take it out of the storage manager and the
@@ -1323,7 +1323,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        int nodesBefore = DriverInfo.NodeCount;
+        int nodesBefore = DriverDiagnostics.NodeCount;
 
         s_unpluggedDisk = disk;
         TR.RequestHost(UsbUnplugRequest);
@@ -1335,7 +1335,7 @@ public class Kernel : Sys.Kernel
         Assert.True(gone, "the stick is still registered after being unplugged");
         Assert.True(FindBlockDeviceIndexByName(disk.Name) < 0, "the USB disk should have left the kit's published devices");
         Assert.True(nodeGone, "the stick's node should have left the tree");
-        Assert.Equal(nodesBefore - 1, DriverInfo.NodeCount, "the node count should drop by one");
+        Assert.Equal(nodesBefore - 1, DriverDiagnostics.NodeCount, "the node count should drop by one");
         Assert.True(disk.IsDisconnected, "the unplugged stick is not marked disconnected");
     }
 
@@ -1483,7 +1483,7 @@ public class Kernel : Sys.Kernel
             return SkipNoDevice;
         }
 
-        return DriverInfo.HasWorker ? string.Empty : "the driver kit has no worker (no scheduler)";
+        return DriverDiagnostics.HasWorker ? string.Empty : "the driver kit has no worker (no scheduler)";
     }
 
     // Pulling the disk out of its root port must take it out of the storage
@@ -1521,7 +1521,7 @@ public class Kernel : Sys.Kernel
             return;
         }
 
-        int nodesBefore = DriverInfo.NodeCount;
+        int nodesBefore = DriverDiagnostics.NodeCount;
         int portChildrenBefore = portBefore.ChildCount;
         PcieRootPortState? port = FindDriverState<PcieRootPortState>();
         int removalsBefore = port?.RemovalCount ?? 0;
@@ -1544,7 +1544,7 @@ public class Kernel : Sys.Kernel
         Assert.True(FindBlockDeviceIndexByName(disk.Name) < 0, "the virtio-blk disk should have left the kit's published devices");
         Assert.True(nodeGone, "the disk's virtio node should have left the tree");
         Assert.True(functionGone, "the disk's function node should have left the tree");
-        Assert.Equal(nodesBefore - 2, DriverInfo.NodeCount, "the function node and the virtio node beneath it leave together");
+        Assert.Equal(nodesBefore - 2, DriverDiagnostics.NodeCount, "the function node and the virtio node beneath it leave together");
         Assert.True(TryFindNode(portPath, out DeviceNodeInfo portAfter), "the root port should stay in the tree");
         Assert.True(portAfter.State == DeviceNodeState.Bound, "the root port should stay bound");
         Assert.Equal(portChildrenBefore - 1, portAfter.ChildCount, "the root port should count one child less");
@@ -3367,13 +3367,13 @@ public class Kernel : Sys.Kernel
 
     // ==================== Kit lookups ====================
 
-    // The index of the kit node at `path` in DriverInfo, or -1.
+    // The index of the kit node at `path` in DriverDiagnostics, or -1.
     private static int FindNodeIndex(string path)
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info) && info.Path == path)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info) && info.Path == path)
             {
                 return i;
             }
@@ -3382,16 +3382,16 @@ public class Kernel : Sys.Kernel
         return -1;
     }
 
-    private static bool TryFindNode(string path, out DeviceNodeInfo info) => DriverInfo.TryGetNode(FindNodeIndex(path), out info);
+    private static bool TryFindNode(string path, out DeviceNodeInfo info) => DriverDiagnostics.TryGetNode(FindNodeIndex(path), out info);
 
     // The node path of the published block device named `name`, or null
     // when no kit driver published a block device of that name.
     private static string? FindBlockNodePath(string name)
     {
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.Name == name)
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.Name == name)
             {
                 return info.NodePath;
             }
@@ -3400,14 +3400,14 @@ public class Kernel : Sys.Kernel
         return null;
     }
 
-    // The index of the published block device named `name` in DriverInfo,
+    // The index of the published block device named `name` in DriverDiagnostics,
     // or -1.
     private static int FindBlockDeviceIndexByName(string name)
     {
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.Name == name)
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.Name == name)
             {
                 return i;
             }

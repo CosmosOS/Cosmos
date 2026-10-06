@@ -12,7 +12,7 @@ namespace DevKernel.Commands;
 /// <summary>
 /// Driver kit introspection: the engine, the manifest, the device tree with
 /// every offer made for each node, and the published devices, all read
-/// through <see cref="DriverInfo"/>; and the synthetic device that lets
+/// through <see cref="DriverDiagnostics"/>; and the synthetic device that lets
 /// <see cref="SampleDriver"/> bind and detach on demand.
 /// </summary>
 internal static class DriverCommands
@@ -106,13 +106,13 @@ internal static class DriverCommands
 
         Terminal.StatusLine(
             "Engine",
-            DriverInfo.IsStarted ? "STARTED" : "NOT STARTED",
-            DriverInfo.IsStarted ? ConsoleColor.Green : ConsoleColor.Red);
-        Terminal.InfoLine("Worker", DriverInfo.HasWorker ? "kit worker thread" : "inline, no worker");
-        Terminal.InfoLine("Drivers", DriverInfo.DriverCount.ToString());
-        Terminal.InfoLine("Nodes", DriverInfo.NodeCount.ToString());
-        Terminal.InfoLine("Devices", DriverInfo.DeviceCount.ToString());
-        Terminal.InfoLine("Held", DriverInfo.GetTotalHeldResourceCount() + " resources");
+            DriverDiagnostics.IsStarted ? "STARTED" : "NOT STARTED",
+            DriverDiagnostics.IsStarted ? ConsoleColor.Green : ConsoleColor.Red);
+        Terminal.InfoLine("Worker", DriverDiagnostics.HasWorker ? "kit worker thread" : "inline, no worker");
+        Terminal.InfoLine("Drivers", DriverDiagnostics.DriverCount.ToString());
+        Terminal.InfoLine("Nodes", DriverDiagnostics.NodeCount.ToString());
+        Terminal.InfoLine("Devices", DriverDiagnostics.DeviceCount.ToString());
+        Terminal.InfoLine("Held", $"{DriverDiagnostics.GetTotalHeldResourceCount()} resources");
         Console.WriteLine();
 
         PrintManifest();
@@ -126,7 +126,7 @@ internal static class DriverCommands
         Console.WriteLine("  Manifest:");
         Console.ResetColor();
 
-        int count = DriverInfo.DriverCount;
+        int count = DriverDiagnostics.DriverCount;
         if (count == 0)
         {
             Terminal.Muted(EntryIndent + "no drivers registered");
@@ -134,7 +134,7 @@ internal static class DriverCommands
 
         for (int i = 0; i < count; i++)
         {
-            if (!DriverInfo.TryGetDriver(i, out DriverEntryInfo driver))
+            if (!DriverDiagnostics.TryGetDriver(i, out DriverInfo driver))
             {
                 continue;
             }
@@ -159,7 +159,7 @@ internal static class DriverCommands
         Console.WriteLine("  Device tree:");
         Console.ResetColor();
 
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         if (count == 0)
         {
             Terminal.Muted(EntryIndent + "no nodes published");
@@ -167,7 +167,7 @@ internal static class DriverCommands
 
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo node))
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo node))
             {
                 PrintNode(i, node);
             }
@@ -228,7 +228,7 @@ internal static class DriverCommands
 
         for (int offerIndex = 0; offerIndex < node.OfferCount; offerIndex++)
         {
-            if (DriverInfo.TryGetOffer(index, offerIndex, out DeviceOfferInfo offer))
+            if (DriverDiagnostics.TryGetOffer(index, offerIndex, out DeviceOfferInfo offer))
             {
                 PrintOffer(offerIndex, offer);
             }
@@ -268,7 +268,7 @@ internal static class DriverCommands
         Console.WriteLine("  Published devices:");
         Console.ResetColor();
 
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         if (count == 0)
         {
             Terminal.Muted(EntryIndent + "no devices published");
@@ -276,7 +276,7 @@ internal static class DriverCommands
 
         for (int i = 0; i < count; i++)
         {
-            if (!DriverInfo.TryGetDevice(i, out PublishedDeviceInfo device))
+            if (!DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo device))
             {
                 continue;
             }

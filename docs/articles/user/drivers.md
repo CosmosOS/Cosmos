@@ -1084,7 +1084,7 @@ Both are published during the driver stage, so a kernel finds them in `OnBoot`. 
 
 ## Observing drivers
 
-The kit reports what it does in two places. The serial log has one line per event, prefixed `[Drivers]`, so you can follow a boot. The `DriverInfo` class in `Cosmos.Kernel.System.Diagnostics` gives code the same facts, for a test or a shell command.
+The kit reports what it does in two places. The serial log has one line per event, prefixed `[Drivers]`, so you can follow a boot. The `DriverDiagnostics` class in `Cosmos.Kernel.System.Diagnostics` gives code the same facts, for a test or a shell command.
 
 The lines you will see most, in the order a device's life produces them:
 
@@ -1103,7 +1103,7 @@ The lines you will see most, in the order a device's life produces them:
 
 Bus drivers add their own lines through `binding.Log`: the xHCI driver logs each USB device it finds, the root port driver each hot-plug event. The storage manager adds `[StorageManager]` lines when it registers or drops a disk.
 
-`DriverInfo` only reads, so it never changes the kit and never throws:
+`DriverDiagnostics` only reads, so it never changes the kit and never throws:
 
 - `DriverCount`, `NodeCount` and `DeviceCount`, with `TryGetDriver`, `TryGetNode` and `TryGetDevice` to read one entry by index.
 - `TryGetOffer(nodeIndex, offerIndex, out DeviceOfferInfo)` replays the offers a node received: the driver, its priority and specificity, the `Outcome` (`Bound`, `Declined`, `Failed`) and the `Reason`.
@@ -1115,9 +1115,9 @@ This prints every node with the driver that took it, and the offers that led the
 // In the kernel:
 using Cosmos.Kernel.System.Diagnostics;
 
-for (int i = 0; i < DriverInfo.NodeCount; i++)
+for (int i = 0; i < DriverDiagnostics.NodeCount; i++)
 {
-    if (!DriverInfo.TryGetNode(i, out DeviceNodeInfo node))
+    if (!DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo node))
     {
         continue;
     }
@@ -1125,7 +1125,7 @@ for (int i = 0; i < DriverInfo.NodeCount; i++)
     Console.WriteLine($"{node.Path}: {node.DriverName ?? "no driver"} ({node.State})");
     for (int j = 0; j < node.OfferCount; j++)
     {
-        if (DriverInfo.TryGetOffer(i, j, out DeviceOfferInfo offer))
+        if (DriverDiagnostics.TryGetOffer(i, j, out DeviceOfferInfo offer))
         {
             Console.WriteLine($"  {offer.DriverName} -> {offer.Outcome} {offer.Reason}");
         }
@@ -1172,13 +1172,13 @@ Assert.True(SyntheticBus.RaiseInterrupt(node, 0), "the handler should run");
 SyntheticBus.WaitForQueuedJobs();   // the work item the handler scheduled has run too
 
 // Unplug: the kit releases everything the probe acquired.
-int heldBefore = DriverInfo.GetTotalHeldResourceCount();
+int heldBefore = DriverDiagnostics.GetTotalHeldResourceCount();
 SyntheticBus.Retract(node);
-Assert.True(DriverInfo.GetTotalHeldResourceCount() < heldBefore, "teardown should release the binding");
+Assert.True(DriverDiagnostics.GetTotalHeldResourceCount() < heldBefore, "teardown should release the binding");
 Assert.False(SyntheticBus.RaiseInterrupt(node, 0), "nothing is connected any more");
 ```
 
-Reach the driver's own state through `node.Binding.DriverState` to check what the handler did, and use `DriverInfo` (see [Observing drivers](#observing-drivers)) to check the node's state and offers. A node published in the kernel's constructor, before the driver stage, tests the boot path; one published in `BeforeRun` tests hot-plug. See [Testing](../dev/testing.md) for how to build and run a test kernel.
+Reach the driver's own state through `node.Binding.DriverState` to check what the handler did, and use `DriverDiagnostics` (see [Observing drivers](#observing-drivers)) to check the node's state and offers. A node published in the kernel's constructor, before the driver stage, tests the boot path; one published in `BeforeRun` tests hot-plug. See [Testing](../dev/testing.md) for how to build and run a test kernel.
 
 ## Project settings
 
@@ -1261,5 +1261,5 @@ Which drivers a kernel carries is set in its `.csproj`, by full type name:
 10. For a PS/2 port, talk to the device through `Ps2Access` only: `TryCommand` for every command with its acknowledgement, `TryReceive` from the handler for the stream, and publish before you enable scanning or reporting.
 11. Write driver threads as a loop on `IsDetaching` around `binding.Wait`, and return promptly once it turns true.
 12. Put hardware quiescing in `OnDetach`, and only when `reason.HardwarePresent` is true.
-13. Write a test kernel over the synthetic bus: publish, raise, `WaitForQueuedJobs`, retract, and assert through `DriverInfo` and the driver's own state.
+13. Write a test kernel over the synthetic bus: publish, raise, `WaitForQueuedJobs`, retract, and assert through `DriverDiagnostics` and the driver's own state.
 14. Add `<NoWarn>$(NoWarn);COSMOS0003</NoWarn>` to the project, and `<CosmosDriverAssembly>true</CosmosDriverAssembly>` to a library, with its drivers `public`.

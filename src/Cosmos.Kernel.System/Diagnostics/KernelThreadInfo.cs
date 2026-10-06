@@ -2,7 +2,7 @@ namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
 /// Point-in-time snapshot of one kernel thread, produced by
-/// <see cref="SchedulerInfo"/>. The snapshot is taken without locking the
+/// <see cref="SchedulerDiagnostics"/>. The snapshot is taken without locking the
 /// scheduler, so fields of a thread that is being rescheduled concurrently
 /// may be one tick stale.
 /// <para>

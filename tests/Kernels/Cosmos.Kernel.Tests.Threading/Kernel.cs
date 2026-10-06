@@ -974,7 +974,7 @@ public class Kernel : Sys.Kernel
 
     private static void KillVictimWorker()
     {
-        if (SchedulerInfo.TryGetCurrentThread(SchedulerManager.GetCurrentCpuId(), out KernelThreadInfo info))
+        if (SchedulerDiagnostics.TryGetCurrentThread(SchedulerManager.GetCurrentCpuId(), out KernelThreadInfo info))
         {
             s_killVictimId = info.Id;
         }
@@ -1001,7 +1001,7 @@ public class Kernel : Sys.Kernel
         }
         Assert.True(s_killVictimStarted, "the victim must have started before it is killed");
 
-        ThreadKillResult result = SchedulerInfo.RequestKill(s_killVictimId);
+        ThreadKillResult result = SchedulerDiagnostics.RequestKill(s_killVictimId);
         Assert.Equal((int)ThreadKillResult.Killed, (int)result, "a preempted thread sits in the run queue and is killed outright");
 
         // The managed thread stops with the kernel one: joiners are released

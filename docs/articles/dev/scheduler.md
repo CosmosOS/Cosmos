@@ -347,8 +347,8 @@ The native side of switching is [`ContextSwitchNative`](https://github.com/Cosmo
 
 The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfaced as `CosmosFeatures.SchedulerEnabled` and checked at three levels:
 
-- `SchedulerManager.IsEnabled` (internal) mirrors the switch. The creation entry points (`Initialize`, `CreateThread`, `ReadyThread`) throw when it is off; with the switch off nothing else is reachable, since no thread ever exists. On the ring the same fact is `KernelFeatures.Scheduler` and `SchedulerInfo.IsSupported`.
-- `SchedulerManager.IsRunning` (internal) is the runtime arm switch, read on the ring as `SchedulerInfo.IsRunning`. `LibraryInitializer` flips it only after the manager, the policy, and the idle threads are fully wired, and the interrupt-side entries (`OnTimerInterrupt`, `ReschedulePendingFromIrq`) return early until it is set, so the first tick cannot race a half-built scheduler.
+- `SchedulerManager.IsEnabled` (internal) mirrors the switch. The creation entry points (`Initialize`, `CreateThread`, `ReadyThread`) throw when it is off; with the switch off nothing else is reachable, since no thread ever exists. On the ring the same fact is `KernelFeatures.Scheduler` and `SchedulerDiagnostics.IsSupported`.
+- `SchedulerManager.IsRunning` (internal) is the runtime arm switch, read on the ring as `SchedulerDiagnostics.IsRunning`. `LibraryInitializer` flips it only after the manager, the policy, and the idle threads are fully wired, and the interrupt-side entries (`OnTimerInterrupt`, `ReschedulePendingFromIrq`) return early until it is set, so the first tick cannot race a half-built scheduler.
 - `SchedulerManager.IsReady` (`IsEnabled` plus initialized state) is the guard for touching per-CPU state, and the one of the three the seam publishes. `Mutex` and `InterruptEvent` check it literally; `ConditionVariable` and the runtime exports reach the same effect through the feature check plus null propagation on the CPU state. When the scheduler is not ready they degrade: `Mutex` becomes a no-op, `InterruptEvent` polls instead of parking, the stack bounds fall back to the boot stack.
 
 ---

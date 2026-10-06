@@ -63,7 +63,7 @@ public static class SchedulerManager
     /// Whether scheduler support is compiled into this kernel
     /// (the <c>CosmosEnableScheduler</c> feature switch). Internal: the ring
     /// already publishes this fact as <c>KernelFeatures.Scheduler</c> and
-    /// <c>SchedulerInfo.IsSupported</c>, so a policy author reads it there.
+    /// <c>SchedulerDiagnostics.IsSupported</c>, so a policy author reads it there.
     /// </summary>
     internal static bool IsEnabled => CosmosFeatures.SchedulerEnabled;
 
@@ -220,7 +220,7 @@ public static class SchedulerManager
     /// </summary>
     /// <param name="cpuId">
     /// CPU to look up. The count is on the ring as
-    /// <c>SchedulerInfo.CpuCount</c>; a policy normally takes the state it
+    /// <c>SchedulerDiagnostics.CpuCount</c>; a policy normally takes the state it
     /// needs from its hook parameters instead.
     /// </param>
     /// <exception cref="IndexOutOfRangeException">
@@ -265,7 +265,7 @@ public static class SchedulerManager
     /// threads. The boot path arms it once the manager, the policy and the
     /// idle threads are all wired, so the first tick cannot race a
     /// half-built scheduler. Surfaced on the ring as
-    /// <c>SchedulerInfo.IsRunning</c>.
+    /// <c>SchedulerDiagnostics.IsRunning</c>.
     /// </summary>
     internal static bool IsRunning
     {
@@ -449,7 +449,7 @@ public static class SchedulerManager
     /// <see cref="ExitThread"/>'s own scope. An unmasked walk that read the exited
     /// total first and met that pair mid-scan would count the thread in neither
     /// term and report less than the previous call, which is the one thing
-    /// <c>SchedulerInfo.BusyCpuTimeNs</c> promises never happens.
+    /// <c>SchedulerDiagnostics.BusyCpuTimeNs</c> promises never happens.
     /// </summary>
     internal static ulong GetBusyCpuTimeNs()
     {
@@ -672,7 +672,7 @@ public static class SchedulerManager
         // callback does all three, but it takes no argument and reads
         // t_currentThread, so it can only clean the thread it runs on. A
         // thread exiting itself gets that callback; a thread reaped from
-        // someone else's context (SchedulerInfo.RequestKill on a queued
+        // someone else's context (SchedulerDiagnostics.RequestKill on a queued
         // thread) gets the same three steps addressed at it explicitly.
         if (ReferenceEquals(GetCpuState(cpuId)?.CurrentThread, thread))
         {
@@ -960,7 +960,7 @@ public static class SchedulerManager
     /// reported it, or 0 before the first tick. This is the real preemption
     /// granularity: whatever slice a policy believes it is handing out, it
     /// cannot preempt more finely than the timer fires. Surfaced on the ring
-    /// as <c>SchedulerInfo.TickPeriodNs</c>.
+    /// as <c>SchedulerDiagnostics.TickPeriodNs</c>.
     /// </summary>
     internal static ulong TickPeriodNs => s_tickPeriodNs;
 

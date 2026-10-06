@@ -2,7 +2,7 @@ namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
 /// Lifecycle state of a kernel thread as reported by
-/// <see cref="SchedulerInfo"/>.
+/// <see cref="SchedulerDiagnostics"/>.
 /// </summary>
 public enum KernelThreadState : byte
 {

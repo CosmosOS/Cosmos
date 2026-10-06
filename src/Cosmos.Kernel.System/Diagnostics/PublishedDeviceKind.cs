@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
 /// The kind of a device a driver published, as reported by
-/// <see cref="DriverInfo.TryGetDevice"/>. The set is closed: each kind is
+/// <see cref="DriverDiagnostics.TryGetDevice"/>. The set is closed: each kind is
 /// one contract a driver implements and one consumer slot the kernel's
 /// manager of that kind occupies.
 /// </summary>

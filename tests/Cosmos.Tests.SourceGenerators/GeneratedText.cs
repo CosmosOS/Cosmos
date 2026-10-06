@@ -29,8 +29,7 @@ internal static class GeneratedText
         + "    /// <summary>Called by the runtime startup code once the managed world is up.</summary>\n"
         + "    public static void Main()\n    {\n"
         + "        global::Cosmos.Kernel.System.Internal.DriverManifest.Register();\n"
-        + $"        global::Cosmos.Kernel.System.Global.RegisterKernel(new global::{kernelClass}());\n"
-        + "        global::Cosmos.Kernel.System.Global.StartKernel();\n"
+        + $"        global::Cosmos.Kernel.System.Internal.KernelEntry.Start(new global::{kernelClass}());\n"
         + "    }\n}\n";
 
     /// <summary>The whole of <c>DriverManifest.g.cs</c> whose <c>Register</c> body is <paramref name="statements"/>, in order.</summary>

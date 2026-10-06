@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
 /// How one offer of a device node to a driver ended, as reported by
-/// <see cref="DriverInfo.TryGetOffer"/>.
+/// <see cref="DriverDiagnostics.TryGetOffer"/>.
 /// </summary>
 public enum DeviceOfferOutcome : byte
 {

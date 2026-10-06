@@ -41,7 +41,7 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// periodic work, driver threads, teardown order and accounting, child
 /// nodes, a display published to the ring's display manager, and a block
 /// device published to the ring's storage manager. Every assertion reads
-/// <see cref="DriverInfo"/>, the display manager, the storage manager or
+/// <see cref="DriverDiagnostics"/>, the display manager, the storage manager or
 /// the suite's own drivers and consumer, never the serial log. One node is published from
 /// the constructor, before the driver stage, to cover the boot path; the
 /// rest are published from the tests, which is the hot-plug path.
@@ -451,7 +451,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Children_RetractedWithParent", TestChildrenRetractedWithParent);
 
         // ==================== Diagnostics ====================
-        TR.Run("DriverInfo_OutOfRange_ReturnsFalse", TestDriverInfoOutOfRangeReturnsFalse);
+        TR.Run("DriverDiagnostics_OutOfRange_ReturnsFalse", TestDriverDiagnosticsOutOfRangeReturnsFalse);
 
         // ==================== Hardware ====================
         // The host test is unconditional: the default cell on either arch
@@ -541,7 +541,7 @@ public class Kernel : Sys.Kernel
     {
         int index = FindDriverIndex(nameof(HighPriorityDriver));
         Assert.True(index >= 0, "HighPriorityDriver should be in the manifest");
-        if (DriverInfo.TryGetDriver(index, out DriverEntryInfo info))
+        if (DriverDiagnostics.TryGetDriver(index, out DriverInfo info))
         {
             Assert.Equal(HighPriorityDriver.ClaimedPriority, info.Priority, "the manifest entry should carry the driver's priority");
         }
@@ -595,8 +595,8 @@ public class Kernel : Sys.Kernel
 
     private static void TestEngineStartedWithWorker()
     {
-        Assert.True(DriverInfo.IsStarted, "the driver stage should have run before BeforeRun");
-        Assert.True(DriverInfo.HasWorker, "with the scheduler on, a worker thread should run the kit");
+        Assert.True(DriverDiagnostics.IsStarted, "the driver stage should have run before BeforeRun");
+        Assert.True(DriverDiagnostics.HasWorker, "with the scheduler on, a worker thread should run the kit");
     }
 
     private void TestBootPathNodeFromConstructorBound()
@@ -668,7 +668,7 @@ public class Kernel : Sys.Kernel
     private static void TestDeclineUnwindsResources()
     {
         DecliningDriver? declining = RecordingDriver.Find<DecliningDriver>();
-        int heldBefore = DriverInfo.GetTotalHeldResourceCount();
+        int heldBefore = DriverDiagnostics.GetTotalHeldResourceCount();
         DeviceNode node = SyntheticBus.Publish(DecliningDriver.Key, [], interruptCount: 0, windowBytes: DecliningDriver.WindowBytes);
 
         // Drains anything the declined probe left queued: a work item the
@@ -680,7 +680,7 @@ public class Kernel : Sys.Kernel
         Assert.True(offer.Outcome == DeviceOfferOutcome.Declined, "the offer should be recorded as declined");
         Assert.True(offer.Reason == DecliningDriver.Reason, "the offer should carry the driver's reason");
         Assert.Equal(DecliningDriver.AcquiredResourceCount, offer.ReleasedResourceCount, "the offer should count what the probe had acquired");
-        Assert.Equal(heldBefore, DriverInfo.GetTotalHeldResourceCount(), "a declined probe should leave the held total unchanged");
+        Assert.Equal(heldBefore, DriverDiagnostics.GetTotalHeldResourceCount(), "a declined probe should leave the held total unchanged");
 
         Assert.True(TryFindNode(node.Path, out DeviceNodeInfo info), "the decline node should be in the tree");
         Assert.Equal(2, info.OfferCount, "the catch-all should be offered after the decline");
@@ -708,7 +708,7 @@ public class Kernel : Sys.Kernel
 
     private void TestPublishReachesConsumer()
     {
-        int devicesBefore = DriverInfo.DeviceCount;
+        int devicesBefore = DriverDiagnostics.DeviceCount;
         DeviceNode node = SyntheticBus.Publish(KeyboardDriver.Key, [], interruptCount: 1, windowBytes: KeyboardState.WindowBytes);
         _keyboardNode = node;
         _keyboardAccess = node.Access<SyntheticAccess>();
@@ -730,11 +730,11 @@ public class Kernel : Sys.Kernel
 
         Assert.Equal(1, _keyboardConsumer.PublishedCount, "the consumer should have been handed the keyboard");
         Assert.True(_keyboardConsumer.LastPublished is { } published && published.Kind == DeviceKind.Keyboard && ReferenceEquals(published.Device, state), "the consumer should hold the driver's keyboard");
-        Assert.Equal(devicesBefore + 1, DriverInfo.DeviceCount, "the published list should have grown by one");
+        Assert.Equal(devicesBefore + 1, DriverDiagnostics.DeviceCount, "the published list should have grown by one");
 
         int deviceIndex = FindDeviceIndex(state.Name);
         Assert.True(deviceIndex >= 0, "the keyboard should be in the published list");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.Kind == PublishedDeviceKind.Keyboard, "the published device should be a keyboard");
             Assert.True(device.IsConsumed, "the published device should be consumed");
@@ -950,7 +950,7 @@ public class Kernel : Sys.Kernel
 
         int deviceIndex = FindDisplayDeviceIndex(node.Path);
         Assert.True(deviceIndex >= 0, "the display should be in the published list under its node");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.IsConsumed, "the display manager should have consumed the display");
             Assert.True(device.DriverName == nameof(DisplayDriver), "the published device should name its driver");
@@ -984,7 +984,7 @@ public class Kernel : Sys.Kernel
     private static void TestPublishBlockReachesStorageManager()
     {
         int disksBefore = StorageManager.DeviceCount;
-        int devicesBefore = DriverInfo.DeviceCount;
+        int devicesBefore = DriverDiagnostics.DeviceCount;
         IBlockDevice? primaryBefore = StorageManager.PrimaryDevice;
         BlockDriver? driver = RecordingDriver.Find<BlockDriver>();
         int probesBefore = driver?.ProbeCount ?? 0;
@@ -1015,10 +1015,10 @@ public class Kernel : Sys.Kernel
             Assert.True(ReferenceEquals(StorageManager.PrimaryDevice, state), "the only disk should be the primary device");
         }
 
-        Assert.Equal(devicesBefore + 1, DriverInfo.DeviceCount, "the published list should hold one more device");
+        Assert.Equal(devicesBefore + 1, DriverDiagnostics.DeviceCount, "the published list should hold one more device");
         int deviceIndex = FindBlockDeviceIndex(node.Path);
         Assert.True(deviceIndex >= 0, "the disk should be in the published list under its node");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.IsConsumed, "the storage manager should have consumed the disk");
             Assert.False(device.IsWithdrawn, "a published disk is not withdrawn");
@@ -1032,7 +1032,7 @@ public class Kernel : Sys.Kernel
         Assert.Equal(disksBefore, StorageManager.DeviceCount, "the storage manager should have dropped the disk");
         Assert.False(HoldsDevice(StorageManager.Devices, state), "the withdrawn disk should have left the manager's list");
         Assert.True(ReferenceEquals(StorageManager.PrimaryDevice, primaryBefore), "the primary device should be what it was before, or none");
-        Assert.Equal(devicesBefore, DriverInfo.DeviceCount, "the withdrawn disk should have left the published list");
+        Assert.Equal(devicesBefore, DriverDiagnostics.DeviceCount, "the withdrawn disk should have left the published list");
         Assert.True(FindBlockDeviceIndex(node.Path) < 0, "the withdrawn disk should have left the published list");
         Assert.True(driver is not null && driver.ProbeCount == probesBefore + 1, "the block driver should have been probed once");
         Assert.True(driver is not null && driver.DetachCount == detachesBefore + 1, "the block driver should have been detached once");
@@ -1052,11 +1052,11 @@ public class Kernel : Sys.Kernel
         }
 
         KeyboardDriver? driver = RecordingDriver.Find<KeyboardDriver>();
-        int devicesBefore = DriverInfo.DeviceCount;
+        int devicesBefore = DriverDiagnostics.DeviceCount;
         int withdrawnBefore = _keyboardConsumer.WithdrawnCount;
-        int heldBefore = DriverInfo.GetTotalHeldResourceCount();
+        int heldBefore = DriverDiagnostics.GetTotalHeldResourceCount();
         PublishedDevice? published = _keyboardConsumer.LastPublished;
-        int nodesBefore = DriverInfo.NodeCount;
+        int nodesBefore = DriverDiagnostics.NodeCount;
 
         SyntheticBus.Retract(node);
         SyntheticBus.WaitForQueuedJobs();
@@ -1068,14 +1068,14 @@ public class Kernel : Sys.Kernel
         Assert.Equal(withdrawnBefore + 1, _keyboardConsumer.WithdrawnCount, "the consumer should be told the keyboard is gone");
         Assert.Null(_keyboardConsumer.LastPublished, "the consumer should hold no keyboard any more");
         Assert.True(published is not null && ReferenceEquals(_keyboardConsumer.LastWithdrawn, published), "the consumer should be handed the same device it was given");
-        Assert.Equal(devicesBefore - 1, DriverInfo.DeviceCount, "the published list should have shrunk by one");
+        Assert.Equal(devicesBefore - 1, DriverDiagnostics.DeviceCount, "the published list should have shrunk by one");
         Assert.True(FindDeviceIndex(state.Name) < 0, "the withdrawn keyboard should have left the published list");
 
         Assert.False(TryFindNode(node.Path, out _), "a retracted node leaves the tree");
-        Assert.Equal(nodesBefore - 1, DriverInfo.NodeCount, "the node count should drop by one");
+        Assert.Equal(nodesBefore - 1, DriverDiagnostics.NodeCount, "the node count should drop by one");
         Assert.True(node.State == NodeState.Retracted, "the node should be retracted");
         Assert.True(node.Binding is { Driver.Name: nameof(KeyboardDriver) }, "the node still names the driver that held it last");
-        Assert.Equal(heldBefore - state.ExpectedHeldResourceCount, DriverInfo.GetTotalHeldResourceCount(), "the held total should drop by what the binding held");
+        Assert.Equal(heldBefore - state.ExpectedHeldResourceCount, DriverDiagnostics.GetTotalHeldResourceCount(), "the held total should drop by what the binding held");
         Assert.True(node.Binding is { IsDetaching: true }, "the binding should be flagged as detaching");
         Assert.True(access.Window.IsEmpty, "the RAM page should have gone back to the allocator");
     }
@@ -1175,7 +1175,7 @@ public class Kernel : Sys.Kernel
         ChildDriver? child = RecordingDriver.Find<ChildDriver>();
         BusDriver? busDriver = RecordingDriver.Find<BusDriver>();
         Assert.True(child is { DetachCount: 0 }, "the child driver should still hold its device");
-        int nodesBefore = DriverInfo.NodeCount;
+        int nodesBefore = DriverDiagnostics.NodeCount;
 
         SyntheticBus.Retract(bus);
         SyntheticBus.WaitForQueuedJobs();
@@ -1186,27 +1186,27 @@ public class Kernel : Sys.Kernel
         Assert.True(busDriver is not null && busDriver.DetachCount == 1 && busDriver.LastDetachReason.Cause == DetachCause.Retracted, "the bus driver should see its own retraction");
 
         Assert.False(TryFindNode(busState.Child.Path, out _) || TryFindNode(busState.Orphan.Path, out _) || TryFindNode(bus.Path, out _), "a retracted parent and its children leave the tree");
-        Assert.Equal(nodesBefore - 3, DriverInfo.NodeCount, "the three nodes should leave the count");
+        Assert.Equal(nodesBefore - 3, DriverDiagnostics.NodeCount, "the three nodes should leave the count");
         Assert.True(busState.Child.State == NodeState.Retracted && busState.Orphan.State == NodeState.Retracted && bus.State == NodeState.Retracted, "all three should be retracted");
         Assert.Equal(2, bus.Children.Count, "children retracted with their parent stay on the parent");
     }
 
     // ==================== Diagnostics ====================
 
-    private static void TestDriverInfoOutOfRangeReturnsFalse()
+    private static void TestDriverDiagnosticsOutOfRangeReturnsFalse()
     {
-        Assert.True(DriverInfo.NodeCount > 0, "the suite should have published nodes by now");
-        Assert.False(DriverInfo.TryGetNode(DriverInfo.NodeCount, out _), "an index equal to the count is out of range");
-        Assert.False(DriverInfo.TryGetNode(-1, out _), "a negative index is out of range");
-        Assert.False(DriverInfo.TryGetDriver(DriverInfo.DriverCount, out _), "an index equal to the driver count is out of range");
-        Assert.False(DriverInfo.TryGetDevice(DriverInfo.DeviceCount, out _), "an index equal to the device count is out of range");
-        Assert.False(DriverInfo.TryGetOffer(DriverInfo.NodeCount, 0, out _), "a node index out of range yields no offer");
-        Assert.False(DriverInfo.TryGetOffer(0, int.MaxValue, out _), "an offer index out of range yields no offer");
+        Assert.True(DriverDiagnostics.NodeCount > 0, "the suite should have published nodes by now");
+        Assert.False(DriverDiagnostics.TryGetNode(DriverDiagnostics.NodeCount, out _), "an index equal to the count is out of range");
+        Assert.False(DriverDiagnostics.TryGetNode(-1, out _), "a negative index is out of range");
+        Assert.False(DriverDiagnostics.TryGetDriver(DriverDiagnostics.DriverCount, out _), "an index equal to the driver count is out of range");
+        Assert.False(DriverDiagnostics.TryGetDevice(DriverDiagnostics.DeviceCount, out _), "an index equal to the device count is out of range");
+        Assert.False(DriverDiagnostics.TryGetOffer(DriverDiagnostics.NodeCount, 0, out _), "a node index out of range yields no offer");
+        Assert.False(DriverDiagnostics.TryGetOffer(0, int.MaxValue, out _), "an offer index out of range yields no offer");
     }
 
     // ==================== Hardware ====================
     //
-    // The kit over the machine's real buses, read through DriverInfo and
+    // The kit over the machine's real buses, read through DriverDiagnostics and
     // the ring like every other group; the transmit test alone reaches
     // into the tree through the HAL grant, for the driver's counters.
 
@@ -1249,7 +1249,7 @@ public class Kernel : Sys.Kernel
 
         int deviceIndex = FindNetworkDeviceIndex(path);
         Assert.True(deviceIndex >= 0, "the 82574L's interface should be in the published list as a network device");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.IsConsumed, "the ring's network manager should have taken the interface");
             Assert.True(device.DriverName == nameof(E1000EDriver), "the published device should name its driver");
@@ -1389,7 +1389,7 @@ public class Kernel : Sys.Kernel
 
         int deviceIndex = FindDeviceIndex(UsbKeyboardName);
         Assert.True(deviceIndex >= 0, "the keyboard should be in the published list");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.Kind == PublishedDeviceKind.Keyboard, "the published device should be a keyboard");
             Assert.True(device.IsConsumed, "the keyboard consumer should have taken the keyboard");
@@ -1432,8 +1432,8 @@ public class Kernel : Sys.Kernel
         }
 
         int childrenBefore = hostBefore.ChildCount;
-        int nodesBefore = DriverInfo.NodeCount;
-        int devicesBefore = DriverInfo.DeviceCount;
+        int nodesBefore = DriverDiagnostics.NodeCount;
+        int devicesBefore = DriverDiagnostics.DeviceCount;
         int withdrawnBefore = _keyboardConsumer.WithdrawnCount;
 
         TR.RequestHost(UsbKeyboardUnplugRequest);
@@ -1442,9 +1442,9 @@ public class Kernel : Sys.Kernel
         Assert.True(node.State == NodeState.Retracted, "the node should be retracted");
         Assert.True(node.Binding is { IsDetaching: true }, "the binding should be flagged as detaching");
         Assert.True(FindDeviceIndex(UsbKeyboardName) < 0, "the withdrawn keyboard should have left the published list");
-        Assert.Equal(devicesBefore - 1, DriverInfo.DeviceCount, "the published list should have shrunk by one");
+        Assert.Equal(devicesBefore - 1, DriverDiagnostics.DeviceCount, "the published list should have shrunk by one");
         Assert.Equal(withdrawnBefore + 1, _keyboardConsumer.WithdrawnCount, "the consumer should be told the keyboard is gone");
-        Assert.Equal(nodesBefore - 1, DriverInfo.NodeCount, "the node count should drop by one");
+        Assert.Equal(nodesBefore - 1, DriverDiagnostics.NodeCount, "the node count should drop by one");
         Assert.True(TryFindNode(xhciPath, out DeviceNodeInfo hostAfter), "the controller's node should still be in the tree");
         Assert.Equal(childrenBefore - 1, hostAfter.ChildCount, "a retracted child leaves its parent's count");
         Assert.Equal(0, state.Bus.DeviceCount, "the bus should carry no device once the keyboard is gone");
@@ -1468,7 +1468,7 @@ public class Kernel : Sys.Kernel
         }
 
         int publishedBefore = _keyboardConsumer.PublishedCount;
-        int nodesBefore = DriverInfo.NodeCount;
+        int nodesBefore = DriverDiagnostics.NodeCount;
         int childrenBefore = hostBefore.ChildCount;
 
         TR.RequestHost(UsbKeyboardPlugRequest);
@@ -1499,7 +1499,7 @@ public class Kernel : Sys.Kernel
 
         Assert.Equal(publishedBefore + 1, _keyboardConsumer.PublishedCount, "the suite's consumer should be handed the replugged keyboard");
         Assert.True(_keyboardConsumer.LastPublished is { Device: IKeyboard keyboard } && keyboard.Name == UsbKeyboardName, "the published device should be the shipped driver's keyboard");
-        Assert.Equal(nodesBefore + 1, DriverInfo.NodeCount, "the node count should grow by one");
+        Assert.Equal(nodesBefore + 1, DriverDiagnostics.NodeCount, "the node count should grow by one");
         Assert.True(TryFindNode(xhciPath, out DeviceNodeInfo hostAfter), "the controller's node should still be in the tree");
         Assert.Equal(childrenBefore + 1, hostAfter.ChildCount, "the controller should count its child again");
         Assert.True(FindDeviceIndex(UsbKeyboardName) >= 0, "the keyboard should be back in the published list");
@@ -1585,7 +1585,7 @@ public class Kernel : Sys.Kernel
 
         int deviceIndex = FindDeviceIndex(Ps2KeyboardName);
         Assert.True(deviceIndex >= 0, "the keyboard should be in the published list");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.Kind == PublishedDeviceKind.Keyboard, "the published device should be a keyboard");
             Assert.True(device.IsConsumed, "the keyboard consumer should have taken the keyboard");
@@ -1664,7 +1664,7 @@ public class Kernel : Sys.Kernel
 
         int deviceIndex = FindDeviceIndex(Ps2MouseName);
         Assert.True(deviceIndex >= 0, "the mouse should be in the published list");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.Kind == PublishedDeviceKind.Pointer, "the published device should be a pointer");
             Assert.True(device.IsConsumed, "the pointer consumer should have taken the mouse");
@@ -1761,7 +1761,7 @@ public class Kernel : Sys.Kernel
 
         int index = FindBlockDeviceIndex(path);
         Assert.True(index >= 0, "the disk should be in the published list under its node");
-        if (DriverInfo.TryGetDevice(index, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(index, out PublishedDeviceInfo device))
         {
             Assert.True(device.IsConsumed, "the storage manager should have consumed the disk");
             Assert.False(device.IsWithdrawn, "a published disk is not withdrawn");
@@ -2046,8 +2046,8 @@ public class Kernel : Sys.Kernel
 
         _pciFunctionPath = functionPath;
         _pciFunctionNode = functionNode;
-        int nodesBefore = DriverInfo.NodeCount;
-        int devicesBefore = DriverInfo.DeviceCount;
+        int nodesBefore = DriverDiagnostics.NodeCount;
+        int devicesBefore = DriverDiagnostics.DeviceCount;
         int disksBefore = StorageManager.DeviceCount;
         int childrenBefore = info.ChildCount;
         int removalsBefore = state.RemovalCount;
@@ -2056,8 +2056,8 @@ public class Kernel : Sys.Kernel
 
         Assert.True(WaitUntil(() => !TryFindNode(functionPath, out _) && state.ChildCount == 0 && state.RemovalCount == removalsBefore + 1 && !state.IsPresent && !state.IsPoweredOn), "the function node should leave the tree and the port should have handled the attention button, powered the slot off and seen it empty after the unplug");
         Assert.True(functionNode.State == NodeState.Retracted, "the function node should be retracted");
-        Assert.Equal(nodesBefore - PciNodesPerDisk, DriverInfo.NodeCount, "the function node and the virtio node beneath it leave together");
-        Assert.Equal(devicesBefore - 1, DriverInfo.DeviceCount, "the published list should have shrunk by the disk");
+        Assert.Equal(nodesBefore - PciNodesPerDisk, DriverDiagnostics.NodeCount, "the function node and the virtio node beneath it leave together");
+        Assert.Equal(devicesBefore - 1, DriverDiagnostics.DeviceCount, "the published list should have shrunk by the disk");
         Assert.Equal(disksBefore - 1, StorageManager.DeviceCount, "the storage manager should have dropped the disk");
         Assert.True(TryFindNode(path, out DeviceNodeInfo portAfter), "the root port should stay in the tree");
         Assert.True(portAfter.State == DeviceNodeState.Bound, "the root port should stay bound");
@@ -2084,7 +2084,7 @@ public class Kernel : Sys.Kernel
         }
 
         int arrivalsBefore = state.ArrivalCount;
-        int nodesBefore = DriverInfo.NodeCount;
+        int nodesBefore = DriverDiagnostics.NodeCount;
         int disksBefore = StorageManager.DeviceCount;
 
         TR.RequestHost(PciPlugRequest);
@@ -2107,7 +2107,7 @@ public class Kernel : Sys.Kernel
 
         string? virtioPath = FindChildPath(functionPath);
         Assert.True(virtioPath is not null && TryFindNode(virtioPath, out DeviceNodeInfo virtio) && virtio.State == DeviceNodeState.Bound && virtio.DriverName == nameof(VirtioBlkDriver), "VirtioBlkDriver should hold the virtio node beneath the replugged function");
-        Assert.Equal(nodesBefore + PciNodesPerDisk, DriverInfo.NodeCount, "the function node and the virtio node beneath it come back together");
+        Assert.Equal(nodesBefore + PciNodesPerDisk, DriverDiagnostics.NodeCount, "the function node and the virtio node beneath it come back together");
         Assert.True(state.IsPresent, "the slot should hold the replugged disk");
 
         DeviceNode? portNode = FindNode(path);
@@ -2122,7 +2122,7 @@ public class Kernel : Sys.Kernel
 
         int deviceIndex = FindDeviceIndex(ReplugDiskName);
         Assert.True(deviceIndex >= 0, "the replugged disk should be published as vblk0");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.IsConsumed, "the storage manager should have consumed the replugged disk");
         }
@@ -2140,10 +2140,10 @@ public class Kernel : Sys.Kernel
     /// <returns>True when the node is in the tree.</returns>
     private static bool TryFindHostNode(out DeviceNodeInfo host)
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == PlatformBusName
                 && info.Description.Contains(PciHostCompatiblePrefix, StringComparison.Ordinal))
             {
@@ -2165,10 +2165,10 @@ public class Kernel : Sys.Kernel
     /// <returns>The node's path, or null when no such function is on the bus.</returns>
     private static string? FindE1000EPath()
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == PciBusName
                 && info.Description.StartsWith(E1000EDescriptionPrefix, StringComparison.Ordinal))
             {
@@ -2205,10 +2205,10 @@ public class Kernel : Sys.Kernel
     /// <returns>The node's path, or null when no such function is on the bus.</returns>
     private static string? FindXhciPath()
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == PciBusName
                 && info.Description.Contains(XhciClassDescription, StringComparison.Ordinal))
             {
@@ -2227,10 +2227,10 @@ public class Kernel : Sys.Kernel
     /// <returns>The node's path, or null when no live keyboard interface is in the tree.</returns>
     private static string? FindUsbKeyboardPath()
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == UsbBusName
                 && info.Description.EndsWith(UsbKeyboardDescriptionSuffix, StringComparison.Ordinal)
                 && info.State != DeviceNodeState.Retracted)
@@ -2267,10 +2267,10 @@ public class Kernel : Sys.Kernel
     /// <returns>The node's path, or null when the machine description published none.</returns>
     private static string? FindI8042Path()
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == PlatformBusName
                 && info.Description.Contains(I8042Compatible, StringComparison.Ordinal))
             {
@@ -2296,10 +2296,10 @@ public class Kernel : Sys.Kernel
     /// <returns>The node's path, or null when no such node is in the tree.</returns>
     private static string? FindNodePathOnBus(string busName, string descriptionPrefix)
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == busName
                 && info.Description.StartsWith(descriptionPrefix, StringComparison.Ordinal))
             {
@@ -2319,10 +2319,10 @@ public class Kernel : Sys.Kernel
     /// <returns>The child's path, or null when the parent has no child in the tree.</returns>
     private static string? FindChildPath(string parentPath)
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info) && info.ParentPath == parentPath)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info) && info.ParentPath == parentPath)
             {
                 return info.Path;
             }
@@ -2542,10 +2542,10 @@ public class Kernel : Sys.Kernel
     /// <returns>Its position in the published list, or -1.</returns>
     private static int FindNetworkDeviceIndex(string nodePath)
     {
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Network && info.NodePath == nodePath)
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Network && info.NodePath == nodePath)
             {
                 return i;
             }
@@ -2576,10 +2576,10 @@ public class Kernel : Sys.Kernel
     /// <returns>Its position in the published list, or -1.</returns>
     private static int FindDisplayDeviceIndex(string nodePath)
     {
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Display && info.NodePath == nodePath)
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Display && info.NodePath == nodePath)
             {
                 return i;
             }
@@ -2593,10 +2593,10 @@ public class Kernel : Sys.Kernel
     /// <returns>Its position in the published list, or -1.</returns>
     private static int FindBlockDeviceIndex(string nodePath)
     {
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.NodePath == nodePath)
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.NodePath == nodePath)
             {
                 return i;
             }
@@ -2758,10 +2758,10 @@ public class Kernel : Sys.Kernel
 
     private static int FindDriverIndex(string name)
     {
-        int count = DriverInfo.DriverCount;
+        int count = DriverDiagnostics.DriverCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDriver(i, out DriverEntryInfo info) && info.Name == name)
+            if (DriverDiagnostics.TryGetDriver(i, out DriverInfo info) && info.Name == name)
             {
                 return i;
             }
@@ -2772,10 +2772,10 @@ public class Kernel : Sys.Kernel
 
     private static int FindNodeIndex(string path)
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info) && info.Path == path)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info) && info.Path == path)
             {
                 return i;
             }
@@ -2786,10 +2786,10 @@ public class Kernel : Sys.Kernel
 
     private static int FindDeviceIndex(string name)
     {
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Name == name)
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info) && info.Name == name)
             {
                 return i;
             }
@@ -2798,7 +2798,7 @@ public class Kernel : Sys.Kernel
         return -1;
     }
 
-    private static bool TryFindNode(string path, out DeviceNodeInfo info) => DriverInfo.TryGetNode(FindNodeIndex(path), out info);
+    private static bool TryFindNode(string path, out DeviceNodeInfo info) => DriverDiagnostics.TryGetNode(FindNodeIndex(path), out info);
 
-    private static bool TryFindOffer(string path, int offerIndex, out DeviceOfferInfo info) => DriverInfo.TryGetOffer(FindNodeIndex(path), offerIndex, out info);
+    private static bool TryFindOffer(string path, int offerIndex, out DeviceOfferInfo info) => DriverDiagnostics.TryGetOffer(FindNodeIndex(path), offerIndex, out info);
 }

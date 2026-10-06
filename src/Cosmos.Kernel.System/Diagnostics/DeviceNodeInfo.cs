@@ -4,14 +4,14 @@ namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
 /// Point-in-time snapshot of one device node in the driver kit's tree,
-/// produced by <see cref="DriverInfo.TryGetNode"/>. The snapshot is taken
+/// produced by <see cref="DriverDiagnostics.TryGetNode"/>. The snapshot is taken
 /// without locking the kit, so a node whose offer or teardown is running on
 /// the kit worker may read one job stale: its state and the counts that
 /// depend on its binding can lag the log by one line.
 /// <para>
 /// It carries what a monitor can render off an unlocked read: identity,
 /// state, the driver that holds it, and counts. The offers themselves are
-/// reached by index through <see cref="DriverInfo.TryGetOffer"/>, bounded by
+/// reached by index through <see cref="DriverDiagnostics.TryGetOffer"/>, bounded by
 /// <see cref="OfferCount"/>; <see cref="ResourceCount"/> and
 /// <see cref="InterruptCount"/> are counts only.
 /// </para>
@@ -85,7 +85,7 @@ public readonly struct DeviceNodeInfo
 
     /// <summary>
     /// Number of offers made for the node so far, and the bound for the offer
-    /// index of <see cref="DriverInfo.TryGetOffer"/>. Zero while the node is
+    /// index of <see cref="DriverDiagnostics.TryGetOffer"/>. Zero while the node is
     /// pending, and zero for an unbound node no driver matched.
     /// </summary>
     public int OfferCount { get; }

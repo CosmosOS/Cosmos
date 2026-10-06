@@ -13,7 +13,7 @@ abstract Cosmos.Kernel.System.Network.Address.IsZero.get -> bool
 abstract Cosmos.Kernel.System.Network.Address.OperatorBitwiseAnd(Cosmos.Kernel.System.Network.Address! other) -> Cosmos.Kernel.System.Network.MaskedAddress
 abstract Cosmos.Kernel.System.Network.Address.Parts.get -> Cosmos.Kernel.System.Network.MaskedAddress
 abstract Cosmos.Kernel.System.Network.Address.ToBytes() -> System.ReadOnlySpan<byte>
-const Cosmos.Kernel.System.Diagnostics.SchedulerInfo.NanosecondsPerMillisecond = 1000000 -> ulong
+const Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.NanosecondsPerMillisecond = 1000000 -> ulong
 const Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.BootSectorLba = 0 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.FirstUsableLba = 34 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.PrimaryHeaderLba = 1 -> ulong
@@ -52,11 +52,11 @@ Cosmos.Kernel.System.Diagnostics.DeviceOfferOutcome
 Cosmos.Kernel.System.Diagnostics.DeviceOfferOutcome.Bound = 0 -> Cosmos.Kernel.System.Diagnostics.DeviceOfferOutcome
 Cosmos.Kernel.System.Diagnostics.DeviceOfferOutcome.Declined = 1 -> Cosmos.Kernel.System.Diagnostics.DeviceOfferOutcome
 Cosmos.Kernel.System.Diagnostics.DeviceOfferOutcome.Failed = 2 -> Cosmos.Kernel.System.Diagnostics.DeviceOfferOutcome
-Cosmos.Kernel.System.Diagnostics.DriverEntryInfo
-Cosmos.Kernel.System.Diagnostics.DriverEntryInfo.DriverEntryInfo() -> void
-Cosmos.Kernel.System.Diagnostics.DriverEntryInfo.Name.get -> string!
-Cosmos.Kernel.System.Diagnostics.DriverEntryInfo.Priority.get -> int
+Cosmos.Kernel.System.Diagnostics.DriverDiagnostics
 Cosmos.Kernel.System.Diagnostics.DriverInfo
+Cosmos.Kernel.System.Diagnostics.DriverInfo.DriverInfo() -> void
+Cosmos.Kernel.System.Diagnostics.DriverInfo.Name.get -> string!
+Cosmos.Kernel.System.Diagnostics.DriverInfo.Priority.get -> int
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.CpuId.get -> uint
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.HasPriority.get -> bool
@@ -76,7 +76,7 @@ Cosmos.Kernel.System.Diagnostics.KernelThreadState.Ready = 1 -> Cosmos.Kernel.Sy
 Cosmos.Kernel.System.Diagnostics.KernelThreadState.Running = 2 -> Cosmos.Kernel.System.Diagnostics.KernelThreadState
 Cosmos.Kernel.System.Diagnostics.KernelThreadState.Sleeping = 4 -> Cosmos.Kernel.System.Diagnostics.KernelThreadState
 Cosmos.Kernel.System.Diagnostics.Log
-Cosmos.Kernel.System.Diagnostics.MemoryInfo
+Cosmos.Kernel.System.Diagnostics.MemoryDiagnostics
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo.DriverName.get -> string?
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo.IsConsumed.get -> bool
@@ -91,7 +91,7 @@ Cosmos.Kernel.System.Diagnostics.PublishedDeviceKind.Display = 4 -> Cosmos.Kerne
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceKind.Keyboard = 0 -> Cosmos.Kernel.System.Diagnostics.PublishedDeviceKind
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceKind.Network = 2 -> Cosmos.Kernel.System.Diagnostics.PublishedDeviceKind
 Cosmos.Kernel.System.Diagnostics.PublishedDeviceKind.Pointer = 1 -> Cosmos.Kernel.System.Diagnostics.PublishedDeviceKind
-Cosmos.Kernel.System.Diagnostics.SchedulerInfo
+Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult.Killed = 1 -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult.MarkedForExit = 2 -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
@@ -301,7 +301,6 @@ Cosmos.Kernel.System.FileSystem.VfsTimespec.Nanoseconds -> long
 Cosmos.Kernel.System.FileSystem.VfsTimespec.Seconds -> long
 Cosmos.Kernel.System.FileSystem.VfsTimespec.VfsTimespec() -> void
 Cosmos.Kernel.System.FileSystem.VfsTimespec.VfsTimespec(long seconds, long nanoseconds) -> void
-Cosmos.Kernel.System.Global
 Cosmos.Kernel.System.Graphics.Bitmap
 Cosmos.Kernel.System.Graphics.Bitmap.Bitmap(byte[]! imageData, Cosmos.Kernel.System.Graphics.ColorOrder colorOrder = Cosmos.Kernel.System.Graphics.ColorOrder.BGR) -> void
 Cosmos.Kernel.System.Graphics.Bitmap.Bitmap(int width, int height, byte[]! pixelData, Cosmos.Kernel.System.Graphics.ColorDepth colorDepth) -> void
@@ -617,6 +616,7 @@ Cosmos.Kernel.System.Input.Layouts.USDvorakLayout.USDvorakLayout() -> void
 Cosmos.Kernel.System.Input.Layouts.USStandardLayout
 Cosmos.Kernel.System.Input.Layouts.USStandardLayout.USStandardLayout() -> void
 Cosmos.Kernel.System.Input.MouseManager
+Cosmos.Kernel.System.Internal.KernelEntry
 Cosmos.Kernel.System.Kernel
 Cosmos.Kernel.System.Kernel.Kernel() -> void
 Cosmos.Kernel.System.Kernel.Started.get -> bool
@@ -815,16 +815,16 @@ override Cosmos.Kernel.System.Network.EndPoint.ToString() -> string!
 override Cosmos.Kernel.System.Network.MaskedAddress.Equals(object! obj) -> bool
 override Cosmos.Kernel.System.Network.NetworkAdapter.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.NetworkAdapter.GetHashCode() -> int
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.DeviceCount.get -> int
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.DriverCount.get -> int
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.GetTotalHeldResourceCount() -> int
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.HasWorker.get -> bool
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.IsStarted.get -> bool
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.NodeCount.get -> int
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.TryGetDevice(int index, out Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo info) -> bool
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.TryGetDriver(int index, out Cosmos.Kernel.System.Diagnostics.DriverEntryInfo info) -> bool
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.TryGetNode(int index, out Cosmos.Kernel.System.Diagnostics.DeviceNodeInfo info) -> bool
-static Cosmos.Kernel.System.Diagnostics.DriverInfo.TryGetOffer(int nodeIndex, int offerIndex, out Cosmos.Kernel.System.Diagnostics.DeviceOfferInfo info) -> bool
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.DeviceCount.get -> int
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.DriverCount.get -> int
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.GetTotalHeldResourceCount() -> int
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.HasWorker.get -> bool
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.IsStarted.get -> bool
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.NodeCount.get -> int
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.TryGetDevice(int index, out Cosmos.Kernel.System.Diagnostics.PublishedDeviceInfo info) -> bool
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.TryGetDriver(int index, out Cosmos.Kernel.System.Diagnostics.DriverInfo info) -> bool
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.TryGetNode(int index, out Cosmos.Kernel.System.Diagnostics.DeviceNodeInfo info) -> bool
+static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.TryGetOffer(int nodeIndex, int offerIndex, out Cosmos.Kernel.System.Diagnostics.DeviceOfferInfo info) -> bool
 static Cosmos.Kernel.System.Diagnostics.Log.Write(params System.ReadOnlySpan<object?> args) -> void
 static Cosmos.Kernel.System.Diagnostics.Log.WriteBytes(System.ReadOnlySpan<byte> bytes) -> void
 static Cosmos.Kernel.System.Diagnostics.Log.WriteHex(uint number) -> void
@@ -836,28 +836,28 @@ static Cosmos.Kernel.System.Diagnostics.Log.WriteNumber(long number) -> void
 static Cosmos.Kernel.System.Diagnostics.Log.WriteNumber(uint number) -> void
 static Cosmos.Kernel.System.Diagnostics.Log.WriteNumber(ulong number) -> void
 static Cosmos.Kernel.System.Diagnostics.Log.WriteString(string! text) -> void
-static Cosmos.Kernel.System.Diagnostics.MemoryInfo.Collect() -> int
-static Cosmos.Kernel.System.Diagnostics.MemoryInfo.FreePages.get -> ulong
-static Cosmos.Kernel.System.Diagnostics.MemoryInfo.GcTimePercent.get -> int
-static Cosmos.Kernel.System.Diagnostics.MemoryInfo.PageSizeBytes.get -> ulong
-static Cosmos.Kernel.System.Diagnostics.MemoryInfo.RamSizeBytes.get -> ulong
-static Cosmos.Kernel.System.Diagnostics.MemoryInfo.TotalCollections.get -> int
-static Cosmos.Kernel.System.Diagnostics.MemoryInfo.TotalObjectsFreed.get -> int
-static Cosmos.Kernel.System.Diagnostics.MemoryInfo.TotalPages.get -> ulong
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.BusyCpuTimeNs.get -> ulong
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.CpuCount.get -> uint
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.GetRunQueueCount(uint cpuId) -> int
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.IsInitialized.get -> bool
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.IsRunning.get -> bool
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.IsSupported.get -> bool
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.RequestKill(uint threadId) -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.SchedulerName.get -> string?
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.ThreadCount.get -> int
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.ThreadSlotCount.get -> int
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.TickPeriodNs.get -> ulong
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.TryGetCurrentThread(uint cpuId, out Cosmos.Kernel.System.Diagnostics.KernelThreadInfo info) -> bool
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.TryGetRunQueueThread(uint cpuId, int index, out Cosmos.Kernel.System.Diagnostics.KernelThreadInfo info) -> bool
-static Cosmos.Kernel.System.Diagnostics.SchedulerInfo.TryGetThreadInSlot(int slot, out Cosmos.Kernel.System.Diagnostics.KernelThreadInfo info) -> bool
+static Cosmos.Kernel.System.Diagnostics.MemoryDiagnostics.Collect() -> int
+static Cosmos.Kernel.System.Diagnostics.MemoryDiagnostics.FreePages.get -> ulong
+static Cosmos.Kernel.System.Diagnostics.MemoryDiagnostics.GcTimePercent.get -> int
+static Cosmos.Kernel.System.Diagnostics.MemoryDiagnostics.PageSizeBytes.get -> ulong
+static Cosmos.Kernel.System.Diagnostics.MemoryDiagnostics.RamSizeBytes.get -> ulong
+static Cosmos.Kernel.System.Diagnostics.MemoryDiagnostics.TotalCollections.get -> int
+static Cosmos.Kernel.System.Diagnostics.MemoryDiagnostics.TotalObjectsFreed.get -> int
+static Cosmos.Kernel.System.Diagnostics.MemoryDiagnostics.TotalPages.get -> ulong
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.BusyCpuTimeNs.get -> ulong
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.CpuCount.get -> uint
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.GetRunQueueCount(uint cpuId) -> int
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.IsInitialized.get -> bool
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.IsRunning.get -> bool
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.IsSupported.get -> bool
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.RequestKill(uint threadId) -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.SchedulerName.get -> string?
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.ThreadCount.get -> int
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.ThreadSlotCount.get -> int
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.TickPeriodNs.get -> ulong
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.TryGetCurrentThread(uint cpuId, out Cosmos.Kernel.System.Diagnostics.KernelThreadInfo info) -> bool
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.TryGetRunQueueThread(uint cpuId, int index, out Cosmos.Kernel.System.Diagnostics.KernelThreadInfo info) -> bool
+static Cosmos.Kernel.System.Diagnostics.SchedulerDiagnostics.TryGetThreadInSlot(int slot, out Cosmos.Kernel.System.Diagnostics.KernelThreadInfo info) -> bool
 static Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.TryParse(System.ReadOnlySpan<byte> bpb, out Cosmos.Kernel.System.FileSystem.Fat.FatBootSector? bootSector) -> bool
 static Cosmos.Kernel.System.FileSystem.VfsManager.Mounts.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.FileSystem.VfsMount!>!
 static Cosmos.Kernel.System.FileSystem.VfsManager.RegisterFileSystem(string! name, Cosmos.Kernel.System.FileSystem.IVfsFileSystemType! fileSystemType) -> bool
@@ -877,9 +877,6 @@ static Cosmos.Kernel.System.FileSystem.VfsManager.TryStat(string! fullPath, out 
 static Cosmos.Kernel.System.FileSystem.VfsManager.TryStatFs(string! mountPoint, out Cosmos.Kernel.System.FileSystem.VfsStatFs stats) -> bool
 static Cosmos.Kernel.System.FileSystem.VfsManager.TryUnlink(string! fullPath) -> bool
 static Cosmos.Kernel.System.FileSystem.VfsManager.TryUnmount(string! mountPoint) -> bool
-static Cosmos.Kernel.System.Global.CurrentKernel.get -> Cosmos.Kernel.System.Kernel?
-static Cosmos.Kernel.System.Global.RegisterKernel(Cosmos.Kernel.System.Kernel! kernel) -> void
-static Cosmos.Kernel.System.Global.StartKernel() -> void
 static Cosmos.Kernel.System.Graphics.Canvas.AlphaBlend(System.Drawing.Color to, System.Drawing.Color from, byte alpha) -> System.Drawing.Color
 static Cosmos.Kernel.System.Graphics.Canvas.DisableFullScreen() -> void
 static Cosmos.Kernel.System.Graphics.Canvas.GetFullScreen() -> Cosmos.Kernel.System.Graphics.Canvas!
@@ -930,6 +927,8 @@ static Cosmos.Kernel.System.Input.MouseManager.SetPosition(int x, int y) -> void
 static Cosmos.Kernel.System.Input.MouseManager.SetScreenSize(int width, int height) -> void
 static Cosmos.Kernel.System.Input.MouseManager.X.get -> int
 static Cosmos.Kernel.System.Input.MouseManager.Y.get -> int
+static Cosmos.Kernel.System.Internal.KernelEntry.Start(Cosmos.Kernel.System.Kernel! kernel) -> void
+static Cosmos.Kernel.System.Kernel.Current.get -> Cosmos.Kernel.System.Kernel?
 static Cosmos.Kernel.System.KernelFeatures.Fat.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Graphics.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Interrupts.get -> bool

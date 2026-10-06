@@ -1,7 +1,7 @@
 namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
-/// Outcome of <see cref="SchedulerInfo.RequestKill"/>.
+/// Outcome of <see cref="SchedulerDiagnostics.RequestKill"/>.
 /// </summary>
 public enum ThreadKillResult : byte
 {

@@ -25,7 +25,7 @@ namespace Cosmos.Kernel.Tests.Virtio;
 /// transports. The suite's profiles attach a virtio NIC, keyboard, mouse and
 /// disk on every cell, so the bind tests are unconditional: if a device is
 /// missing, that is the regression this suite exists to catch, not an
-/// environment condition. Every assertion reads <see cref="DriverInfo"/>,
+/// environment condition. Every assertion reads <see cref="DriverDiagnostics"/>,
 /// the ring's <see cref="NetworkManager"/>, the ring's
 /// <see cref="StorageManager"/> or the state a binding holds, never the
 /// serial log.
@@ -226,7 +226,7 @@ public class Kernel : Sys.Kernel
 
         int deviceIndex = FindDeviceIndex(PublishedDeviceKind.Network, path);
         Assert.True(deviceIndex >= 0, "the virtio-net interface should be in the published list as a network device");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.IsConsumed, "the ring's network manager should have taken the interface");
         }
@@ -337,7 +337,7 @@ public class Kernel : Sys.Kernel
 
         int deviceIndex = FindDeviceIndex(PublishedDeviceKind.Block, path);
         Assert.True(deviceIndex >= 0, "the virtio-blk disk should be in the published list as a block device");
-        if (DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
         {
             Assert.True(device.Name == BlockDeviceName, "the first virtio-blk disk should be named " + BlockDeviceName + ": " + device.Name);
             Assert.True(device.IsConsumed, "the ring's storage manager should have taken the disk");
@@ -416,11 +416,11 @@ public class Kernel : Sys.Kernel
     // tree there is nothing for the net tests to fail on but the absence.
     private static void TestMmio_SlotBoundByTransport()
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         int slots = 0;
         for (int i = 0; i < count; i++)
         {
-            if (!DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (!DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 || info.BusName != PlatformBusName
                 || !info.Description.Contains(MmioCompatible, StringComparison.Ordinal))
             {
@@ -477,7 +477,7 @@ public class Kernel : Sys.Kernel
 
             int deviceIndex = FindDeviceIndex(kind, path);
             if (deviceIndex >= 0
-                && DriverInfo.TryGetDevice(deviceIndex, out PublishedDeviceInfo device)
+                && DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device)
                 && device.IsConsumed)
             {
                 found = true;
@@ -498,10 +498,10 @@ public class Kernel : Sys.Kernel
     /// <returns>The node's path, or null when no such node is in the tree.</returns>
     private static string? FindNodePath(string busName, string descriptionPrefix)
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == busName
                 && info.Description.StartsWith(descriptionPrefix, StringComparison.Ordinal))
             {
@@ -519,7 +519,7 @@ public class Kernel : Sys.Kernel
     /// <returns>The paths; empty when no input device is in the tree.</returns>
     private static string[] FindInputPaths()
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         int matches = 0;
         for (int i = 0; i < count; i++)
         {
@@ -533,7 +533,7 @@ public class Kernel : Sys.Kernel
         int next = 0;
         for (int i = 0; i < count && next < matches; i++)
         {
-            if (IsInputNode(i) && DriverInfo.TryGetNode(i, out DeviceNodeInfo info))
+            if (IsInputNode(i) && DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info))
             {
                 paths[next] = info.Path;
                 next++;
@@ -547,7 +547,7 @@ public class Kernel : Sys.Kernel
     /// <param name="index">Publication position of the node.</param>
     /// <returns>True for a virtio node of type 18.</returns>
     private static bool IsInputNode(int index) =>
-        DriverInfo.TryGetNode(index, out DeviceNodeInfo info)
+        DriverDiagnostics.TryGetNode(index, out DeviceNodeInfo info)
         && info.BusName == VirtioBusName
         && info.Description.StartsWith(InputDescriptionPrefix, StringComparison.Ordinal);
 
@@ -639,10 +639,10 @@ public class Kernel : Sys.Kernel
     /// <returns>Its position in the published list, or -1.</returns>
     private static int FindDeviceIndex(PublishedDeviceKind kind, string nodePath)
     {
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == kind && info.NodePath == nodePath)
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == kind && info.NodePath == nodePath)
             {
                 return i;
             }
@@ -653,10 +653,10 @@ public class Kernel : Sys.Kernel
 
     private static int FindNodeIndex(string path)
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info) && info.Path == path)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info) && info.Path == path)
             {
                 return i;
             }
@@ -665,5 +665,5 @@ public class Kernel : Sys.Kernel
         return -1;
     }
 
-    private static bool TryFindNode(string path, out DeviceNodeInfo info) => DriverInfo.TryGetNode(FindNodeIndex(path), out info);
+    private static bool TryFindNode(string path, out DeviceNodeInfo info) => DriverDiagnostics.TryGetNode(FindNodeIndex(path), out info);
 }

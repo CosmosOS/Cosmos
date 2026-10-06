@@ -26,7 +26,7 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// scheduler is compiled out.
 /// </para>
 /// </summary>
-public static class SchedulerInfo
+public static class SchedulerDiagnostics
 {
     /// <summary>
     /// Nanoseconds per millisecond, for converting the nanosecond figures

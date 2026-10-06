@@ -34,7 +34,7 @@
       // probe ("[StorageManager] sata0 registered by AhciDriver (primary)").
       // The cell proves the polled SATA command path, one page per command,
       // under the block-device, partition and reboot assertions, and that
-      // the disk shows in DriverInfo as a consumed block device.
+      // the disk shows in DriverDiagnostics as a consumed block device.
       "name": "ahci",
       "disks": [
         { "type": "ahci" }

@@ -73,7 +73,7 @@ internal static class CpuStat
             return new CpuUsageSampler
             {
                 _lastTimestamp = Stopwatch.GetTimestamp(),
-                _lastBusyNs = SchedulerInfo.BusyCpuTimeNs
+                _lastBusyNs = SchedulerDiagnostics.BusyCpuTimeNs
             };
         }
 
@@ -84,10 +84,10 @@ internal static class CpuStat
         public double Sample()
         {
             long timestamp = Stopwatch.GetTimestamp();
-            ulong busyNs = SchedulerInfo.BusyCpuTimeNs;
+            ulong busyNs = SchedulerDiagnostics.BusyCpuTimeNs;
 
             long elapsedTicks = timestamp - _lastTimestamp;
-            uint cpuCount = SchedulerInfo.CpuCount;
+            uint cpuCount = SchedulerDiagnostics.CpuCount;
 
             if (elapsedTicks > 0 && cpuCount > 0)
             {
@@ -143,7 +143,7 @@ internal static class CpuStat
 
     public static void Run()
     {
-        if (!SchedulerInfo.IsSupported)
+        if (!SchedulerDiagnostics.IsSupported)
         {
             Console.WriteLine("cpustat: scheduler disabled (set CosmosEnableScheduler=true).");
             return;
@@ -307,7 +307,7 @@ internal static class CpuStat
         int maxHeight)
     {
         int lineHeight = OverlayLayout.LineHeight(font);
-        int threadCount = SchedulerInfo.ThreadCount;
+        int threadCount = SchedulerDiagnostics.ThreadCount;
 
         if (threadCount <= 0 || maxHeight < lineHeight * 2)
         {
@@ -336,9 +336,9 @@ internal static class CpuStat
         int capacity = columns * rows;
 
         int drawn = 0;
-        for (int slot = 0; slot < SchedulerInfo.ThreadSlotCount && drawn < capacity; slot++)
+        for (int slot = 0; slot < SchedulerDiagnostics.ThreadSlotCount && drawn < capacity; slot++)
         {
-            if (!SchedulerInfo.TryGetThreadInSlot(slot, out KernelThreadInfo thread))
+            if (!SchedulerDiagnostics.TryGetThreadInSlot(slot, out KernelThreadInfo thread))
             {
                 continue;
             }

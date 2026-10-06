@@ -1,6 +1,7 @@
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.System.Graphics;
 
 namespace Cosmos.Kernel.System;
 
@@ -10,6 +11,18 @@ namespace Cosmos.Kernel.System;
 /// </summary>
 public abstract partial class Kernel
 {
+    /// <summary>
+    /// The running kernel: the instance the generated entry point registered
+    /// before calling its <see cref="Start"/>, or <see langword="null"/>
+    /// before then. Code that runs from <see cref="Start"/> onwards,
+    /// <see cref="OnBoot"/>, <see cref="BeforeRun"/> and <see cref="Run"/>
+    /// included, always sees one, so static code with no instance at hand
+    /// reaches the kernel here, for example to call <see cref="Stop"/>. The
+    /// kernel's own constructor runs before the registration and sees
+    /// <see langword="null"/>.
+    /// </summary>
+    public static Kernel? Current { get; internal set; }
+
     /// <summary>
     /// True once BeforeRun has completed and the Run loop is active.
     /// </summary>
@@ -86,12 +99,36 @@ public abstract partial class Kernel
 
     /// <summary>
     /// Called once during boot, before BeforeRun(), with interrupts enabled
-    /// and the driver stage complete. Override to customize system
-    /// initialization.
+    /// and the driver stage complete. The default brings up the graphical
+    /// <see cref="KernelConsole"/>, which is what makes <c>Console.WriteLine</c>
+    /// draw to the screen; every other subsystem is already up by this point,
+    /// since the library initializer wires the managers to the HAL before any
+    /// managed code runs. Override to customize system initialization.
     /// </summary>
     protected virtual void OnBoot()
     {
-        Global.Initialize();
+        Serial.WriteString("[Kernel] OnBoot() called\n");
+
+        if (Core.CosmosFeatures.GraphicsEnabled)
+        {
+            Serial.WriteString("[Kernel] Initializing KernelConsole...\n");
+            if (KernelConsole.Initialize())
+            {
+                Serial.WriteString("[Kernel] KernelConsole initialized: ");
+                Serial.WriteNumber((ulong)KernelConsole.Default.Cols);
+                Serial.WriteString("x");
+                Serial.WriteNumber((ulong)KernelConsole.Default.Rows);
+                Serial.WriteString(" chars\n");
+            }
+            else
+            {
+                Serial.WriteString("[Kernel] WARNING: KernelConsole initialization failed!\n");
+            }
+        }
+        else
+        {
+            Serial.WriteString("[Kernel] Graphics disabled via feature switch.\n");
+        }
     }
 
     /// <summary>

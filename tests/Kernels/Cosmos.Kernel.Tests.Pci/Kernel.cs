@@ -68,7 +68,7 @@ public class Kernel : Sys.Kernel
     /// <summary>Bus name of the function nodes the PCI host driver publishes.</summary>
     private const string PciBusName = "pci";
 
-    /// <summary>Name of the driver kit's PCI host driver, as DriverInfo reports it.</summary>
+    /// <summary>Name of the driver kit's PCI host driver, as DriverDiagnostics reports it.</summary>
     private const string PciHostDriverName = "PciHostDriver";
 
     /// <summary>Prefix shared by the host's compatible strings (pci-host-legacy on x64, pci-host-ecam-generic on arm64), which the platform node's description lists.</summary>
@@ -149,7 +149,7 @@ public class Kernel : Sys.Kernel
 
     // ==================== Host ====================
     //
-    // The driver kit's view of the bus, enumerated through DriverInfo: the
+    // The driver kit's view of the bus, enumerated through DriverDiagnostics: the
     // platform node the machine description publishes for the PCI host,
     // the PciHostDriver that binds it, and the function nodes the driver
     // publishes beneath it. The configuration mechanism, the per-function
@@ -230,10 +230,10 @@ public class Kernel : Sys.Kernel
         }
 
         int published = 0;
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (!DriverInfo.TryGetNode(i, out DeviceNodeInfo info) || info.BusName != PciBusName || info.ParentPath != host.Path)
+            if (!DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info) || info.BusName != PciBusName || info.ParentPath != host.Path)
             {
                 continue;
             }
@@ -379,10 +379,10 @@ public class Kernel : Sys.Kernel
     /// <returns>True when the node is in the tree.</returns>
     private static bool TryFindHostNode(out DeviceNodeInfo host)
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == PlatformBusName
                 && info.Description.Contains(PciHostCompatiblePrefix, StringComparison.Ordinal))
             {
@@ -430,7 +430,7 @@ public class Kernel : Sys.Kernel
     /// the host test reads are on the node, which no diagnostic snapshot
     /// carries. Paths are compared ordinally.
     /// </summary>
-    /// <param name="path">The node's path, as DriverInfo reports it.</param>
+    /// <param name="path">The node's path, as DriverDiagnostics reports it.</param>
     /// <param name="node">The node when found.</param>
     /// <returns>True when a node with that path is in the tree.</returns>
     private static bool TryFindKitNode(string path, [NotNullWhen(true)] out DeviceNode? node)

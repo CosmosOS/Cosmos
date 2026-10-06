@@ -83,8 +83,7 @@ public sealed class CosmosEntryPointGenerator : IIncrementalGenerator
         builder.Append("    /// <summary>Called by the runtime startup code once the managed world is up.</summary>\n");
         builder.Append("    public static void Main()\n    {\n");
         builder.Append("        global::Cosmos.Kernel.System.Internal.DriverManifest.Register();\n");
-        builder.Append("        global::Cosmos.Kernel.System.Global.RegisterKernel(new global::").Append(kernelClass).Append("());\n");
-        builder.Append("        global::Cosmos.Kernel.System.Global.StartKernel();\n");
+        builder.Append("        global::Cosmos.Kernel.System.Internal.KernelEntry.Start(new global::").Append(kernelClass).Append("());\n");
         builder.Append("    }\n}\n");
         return builder.ToString();
     }

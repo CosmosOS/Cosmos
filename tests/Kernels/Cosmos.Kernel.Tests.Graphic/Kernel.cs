@@ -109,7 +109,7 @@ public class Kernel : Sys.Kernel
         // and the cell's display is what the device tree says it is.
         TR.Run("Display_PrimaryPresent", TestDisplayPrimaryPresent);
         TR.Run("Display_PrimaryMatchesCell", TestDisplayPrimaryMatchesCell);
-        TR.Run("Display_ListedInDriverInfo", TestDisplayListedInDriverInfo);
+        TR.Run("Display_ListedInDriverDiagnostics", TestDisplayListedInDriverDiagnostics);
 
         // ==================== virtio-gpu ====================
         // The driver's state through the facet the primary display carries.
@@ -228,7 +228,7 @@ public class Kernel : Sys.Kernel
     // Every display the manager lists is a published device of the display
     // kind that the manager consumed, on a node exactly when it is not the
     // firmware one.
-    private static void TestDisplayListedInDriverInfo()
+    private static void TestDisplayListedInDriverDiagnostics()
     {
         int count = DisplayManager.Count;
         Assert.True(count >= 1, "the manager should list at least one display");
@@ -242,7 +242,7 @@ public class Kernel : Sys.Kernel
 
             int index = FindDisplayDeviceIndex(display.Name, display.NodePath);
             Assert.True(index >= 0, "the kit should list display \"" + display.Name + "\" as a published device");
-            if (!DriverInfo.TryGetDevice(index, out PublishedDeviceInfo device))
+            if (!DriverDiagnostics.TryGetDevice(index, out PublishedDeviceInfo device))
             {
                 continue;
             }
@@ -347,10 +347,10 @@ public class Kernel : Sys.Kernel
     /// <returns>The node's path, or null when no such node is in the tree.</returns>
     private static string? FindNodePath(string busName, string descriptionPrefix)
     {
-        int count = DriverInfo.NodeCount;
+        int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetNode(i, out DeviceNodeInfo info)
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == busName
                 && info.Description.StartsWith(descriptionPrefix, StringComparison.Ordinal))
             {
@@ -365,10 +365,10 @@ public class Kernel : Sys.Kernel
     /// <returns>Its position in the published list, or -1 when the kit lists none.</returns>
     private static int FindFirmwareDisplayDeviceIndex()
     {
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info)
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info)
                 && info.Kind == PublishedDeviceKind.Display
                 && info.NodePath is null)
             {
@@ -385,10 +385,10 @@ public class Kernel : Sys.Kernel
     /// <returns>Its position in the published list, or -1.</returns>
     private static int FindDisplayDeviceIndex(string name, string? nodePath)
     {
-        int count = DriverInfo.DeviceCount;
+        int count = DriverDiagnostics.DeviceCount;
         for (int i = 0; i < count; i++)
         {
-            if (DriverInfo.TryGetDevice(i, out PublishedDeviceInfo info)
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info)
                 && info.Kind == PublishedDeviceKind.Display
                 && info.Name == name
                 && info.NodePath == nodePath)
@@ -657,7 +657,7 @@ public class Kernel : Sys.Kernel
         Canvas.DisableFullScreen();
 
         Console.WriteLine("Back in text mode");
-        Console.WriteLine("Freed: " + MemoryInfo.Collect());
+        Console.WriteLine("Freed: " + MemoryDiagnostics.Collect());
 
         Log.Write("Test of Canvas with mode " + canvas.Mode + " executed successfully");
     }

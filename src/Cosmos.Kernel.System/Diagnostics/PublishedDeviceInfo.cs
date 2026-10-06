@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
 /// Point-in-time snapshot of one device a driver published, produced by
-/// <see cref="DriverInfo.TryGetDevice"/>. A withdrawn device leaves the
+/// <see cref="DriverDiagnostics.TryGetDevice"/>. A withdrawn device leaves the
 /// list, but the snapshot is taken without locking the kit, so a device being
 /// withdrawn concurrently may still be listed for one job; <see cref="IsWithdrawn"/>
 /// tells that case apart.

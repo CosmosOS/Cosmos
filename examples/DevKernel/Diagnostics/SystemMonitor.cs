@@ -73,7 +73,7 @@ internal static class SystemMonitor
 
             if (frames % GcCollectFrameInterval == 0)
             {
-                MemoryInfo.Collect();
+                MemoryDiagnostics.Collect();
             }
 
             canvas.Display();
@@ -85,10 +85,10 @@ internal static class SystemMonitor
     /// <summary>Draws the memory counters; returns the next free row.</summary>
     private static int DrawMemorySection(Canvas canvas, PCScreenFont font, int x, int rowY, int lineHeight)
     {
-        ulong totalPages = MemoryInfo.TotalPages;
-        ulong freePages = MemoryInfo.FreePages;
+        ulong totalPages = MemoryDiagnostics.TotalPages;
+        ulong freePages = MemoryDiagnostics.FreePages;
         ulong usedPages = totalPages - freePages;
-        ulong pageSize = MemoryInfo.PageSizeBytes;
+        ulong pageSize = MemoryDiagnostics.PageSizeBytes;
 
         canvas.DrawString("Meminfo", font, Color.Cyan, x, rowY);
         rowY += lineHeight;
@@ -107,9 +107,9 @@ internal static class SystemMonitor
     {
         canvas.DrawString("GCinfo", font, Color.Cyan, x, rowY);
         rowY += lineHeight;
-        canvas.DrawString("Collections: " + MemoryInfo.TotalCollections, font, Color.White, x, rowY);
+        canvas.DrawString($"Collections: {MemoryDiagnostics.TotalCollections}", font, Color.White, x, rowY);
         rowY += lineHeight;
-        canvas.DrawString("Objects Freed: " + MemoryInfo.TotalObjectsFreed, font, Color.White, x, rowY);
+        canvas.DrawString($"Objects Freed: {MemoryDiagnostics.TotalObjectsFreed}", font, Color.White, x, rowY);
         return rowY + lineHeight * OverlayLayout.SectionBreakRowCount;
     }
 

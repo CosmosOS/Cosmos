@@ -207,7 +207,7 @@ public sealed class RoundRobinScheduler : IScheduler
 
     public int GetRunQueueCount(PerCpuState cpuState)
     {
-        // The SchedulerInfo facade calls the diagnostics hooks from thread
+        // The SchedulerDiagnostics facade calls the diagnostics hooks from thread
         // context; guard them against the tick ourselves, per the plugging guide.
         using (SchedulerManager.MaskInterrupts())
         {

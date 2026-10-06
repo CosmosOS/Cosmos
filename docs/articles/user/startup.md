@@ -58,8 +58,7 @@ public static class CosmosEntryPoint
     public static void Main()
     {
         global::Cosmos.Kernel.System.Internal.DriverManifest.Register();
-        global::Cosmos.Kernel.System.Global.RegisterKernel(new global::MyOS.Kernel());
-        global::Cosmos.Kernel.System.Global.StartKernel();
+        global::Cosmos.Kernel.System.Internal.KernelEntry.Start(new global::MyOS.Kernel());
     }
 }
 ```
@@ -74,7 +73,7 @@ public static class CosmosEntryPoint
 </PropertyGroup>
 ```
 
-`Global.StartKernel()` then calls `Start()` on the registered instance.
+`KernelEntry.Start` then registers that instance as `Kernel.Current` and calls its `Start()`. `KernelEntry` is boot plumbing for this generated code only, public because the code compiles into your kernel's assembly; your own code never calls it.
 
 ## Sys.Kernel.Start()
 
@@ -107,10 +106,12 @@ Power.Shutdown();  // power off; does not return
 
 To end the main loop without ending the machine, call `Stop()` on your kernel. `Run()` stops being called, `AfterRun()` runs once, and the CPU halts.
 
-Static code that has no `this` to call it on reaches the running instance through `Global.CurrentKernel`, which the generated entry point sets before your kernel starts:
+Static code that has no `this` to call it on reaches the running instance through `Kernel.Current`, which the generated entry point sets before your kernel starts (it is `null` until then, in your kernel's constructor included):
 
 ```csharp
-Global.CurrentKernel?.Stop();
+using Cosmos.Kernel.System;
+
+Kernel.Current?.Stop();
 ```
 
 ## A minimal kernel
@@ -198,7 +199,7 @@ Every phase above logs to the serial port (COM1), which `cosmos run` connects to
 [KERNEL]   - Recording the firmware framebuffer...
 [KERNEL]   - Initializing scheduler...
 [KMAIN] Phase 4: User kernel
-[Global] Registering kernel
+[KernelEntry] Registering kernel
 [Kernel] Enabling interrupts...
 [Kernel] Starting drivers...
 [Drivers] manifest: PcieRootPortDriver(prio 0) VirtioPciTransportDriver(prio 0) XhciDriver(prio 0) VmwareSvgaDriver(prio 0) E1000EDriver(prio 0) AhciDriver(prio 0) NvmeDriver(prio 0) I8042Driver(prio 0) PciHostDriver(prio 0) VirtioMmioTransportDriver(prio 0) Ps2KeyboardDriver(prio 0) Ps2MouseDriver(prio 0) UsbHubDriver(prio 0) UsbKeyboardDriver(prio 0) UsbMassStorageDriver(prio 0) VirtioGpuDriver(prio 0) VirtioInputDriver(prio 0) VirtioNetDriver(prio 0) VirtioBlkDriver(prio 0)

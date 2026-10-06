@@ -88,7 +88,7 @@ Anything the paragraph above forbids belongs on an alarm. `AlarmManager` keeps i
 
 ```csharp
 ulong id = AlarmManager.ScheduleRecurring(
-    () => Console.WriteLine("free pages: " + MemoryInfo.FreePages),
+    () => Console.WriteLine("free pages: " + MemoryDiagnostics.FreePages),
     TimeSpan.FromSeconds(5));
 
 /* ... later ... */

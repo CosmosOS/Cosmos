@@ -72,6 +72,8 @@ Some core naming rules are enforced by `.editorconfig`; the table below document
 | Type parameter | `T` + PascalCase | `TValue`, `TKey` |
 | Enum member | PascalCase | `ThreadState.Running` |
 
+In `Cosmos.Kernel.System.Diagnostics` a suffix says what a type is: a `*Diagnostics` type is the static diagnostic view of one subsystem (`DriverDiagnostics`, `SchedulerDiagnostics`, `MemoryDiagnostics`), which mostly reads but may act (`SchedulerDiagnostics.RequestKill`, `MemoryDiagnostics.Collect`), and an `*Info` type is a readonly snapshot struct such a view hands out (`DriverInfo`, `DeviceNodeInfo`, `KernelThreadInfo`). See [Public API Tracking](public-api.md#naming).
+
 ### Avoid
 
 - Hungarian notation (`m_`, `p_`, `g_`), use `_` prefix for private fields only.
@@ -1016,7 +1018,7 @@ Practical rules that follow:
 
 ```csharp
 // Good: new user-facing capability lands as a Cosmos.Kernel.System facade
-public static class MemoryInfo { public static ulong FreePages => PageAllocator.FreePageCount; }
+public static class MemoryDiagnostics { public static ulong FreePages => PageAllocator.FreePageCount; }
 
 // Bad: making the Core type public so a kernel can reach it
 public static class PageAllocator { ... }

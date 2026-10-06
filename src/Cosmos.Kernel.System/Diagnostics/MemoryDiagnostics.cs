@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// Managed-heap figures beyond these counters come from the BCL
 /// (<see cref="global::System.GC.GetGCMemoryInfo()"/>).
 /// </summary>
-public static class MemoryInfo
+public static class MemoryDiagnostics
 {
     /// <summary>
     /// Size of a physical page in bytes.
