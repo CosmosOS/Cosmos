@@ -1082,56 +1082,56 @@ Both are published during the driver stage, so a kernel finds them in `OnBoot`. 
 
 ## Observing drivers
 
-Everything the kit does is one line in the serial log, prefixed `[Drivers]`, with the two `[StorageManager]` lines a block device adds, and the same fact in the `DriverInfo` facade of `Cosmos.Kernel.System.Diagnostics`, so a test asserts on the facade and a human reads the log, and the two cannot drift.
+The kit reports what it does in two places. The serial log has one line per event, prefixed `[Drivers]`, so you can follow a boot. The `DriverInfo` class in `Cosmos.Kernel.System.Diagnostics` gives code the same facts, for a test or a shell command.
 
-The log lines, in the order a device's life produces them:
+The lines you will see most, in the order a device's life produces them:
 
-| Line | When |
-|------|------|
-| `manifest: A(prio 0) B(prio 10)` | Once, at the start of the driver stage; `(empty)` with no drivers |
-| `firmware published display "framebuffer" (consumed)` / `(no consumer)` | Once, between the manifest and the engine lines, when the bootloader handed over a framebuffer and graphics are on |
-| `engine started, worker thread` / `engine started, inline (no worker)` | Once, right after |
-| `synthetic:k candidates: A(prio 10, spec 1) B(prio 0, spec 1)` | A node is offered |
-| `synthetic:k offer A -> bound` / `-> declined: reason` / `-> failed: message` | Each offer |
-| `synthetic:k no driver` | No registered driver matched |
-| `pci:0000:00:03.0 XhciDriver: usb 1-1: 46f4:0001 SuperSpeed, 1 interface(s)` | The xHCI driver's bus enumerated a device; its interface nodes follow, offered after the probe that found it, or at once from the hot-plug thread |
-| `pci:0000:00:03.0 PcieRootPortDriver: slot 1, bus 1, occupied, powered on, message interrupt` | The root port driver bound a hot-plug slot; the functions behind it follow, offered after the probe |
-| `platform:i8042@60 I8042Driver: dual channel, translation on, lines 1 and 12` | The 8042 driver brought the controller up; its two port nodes follow, offered after the probe that published them |
-| `[StorageManager] sata0 registered by AhciDriver (primary)` | The storage manager consumed a published block device and scanned it, inside the publish, so it precedes the `published block` line; the suffix says the manager's order rule made the disk the primary at that moment, and a later line carrying it supersedes this one |
-| `[StorageManager] usb0 registered by UsbMassStorageDriver (primary)` | The same for a USB stick, at boot or plugged in later; its node path sorts after `pci:`, so it is the primary only while no internal kit disk is registered |
-| `[StorageManager] vblk0 registered by VirtioBlkDriver (primary)` | The same for a virtio-blk disk, at boot or plugged in behind a root port later; its node path (`virtio:`) sorts after `pci:` and `usb:`, so it is the primary only while no other kit disk is registered |
-| `synthetic:k A published keyboard "name" (consumed)` / `(no consumer)` | A device was published |
-| `firmware display "framebuffer" retired: inside pci:0000:00:01.0 bar 1` | A driver bound the function whose memory window holds the firmware framebuffer; the firmware display is withdrawn |
-| `synthetic:k A: message` | `binding.Log` |
-| `synthetic:k A interrupt handler threw: message` | A handler threw; its source is masked |
+| Line | Meaning |
+|------|---------|
+| `manifest: A(prio 0) B(prio 10)` | The registered drivers, once at the start of the driver stage |
+| `synthetic:k candidates: A(prio 10, spec 1) B(prio 0, spec 1)` | A node is offered to these drivers, in this order |
+| `synthetic:k offer A -> bound` / `-> declined: reason` / `-> failed: message` | What each probe returned |
+| `synthetic:k no driver` | No driver matched the node |
+| `synthetic:k A published keyboard "name" (consumed)` / `(no consumer)` | A device was published, and whether a kernel manager took it |
+| `synthetic:k A: message` | The driver called `binding.Log` |
+| `synthetic:k A interrupt handler threw: message` | A handler threw; its interrupt is masked |
 | `synthetic:k A work item threw: message` | A work item threw; it is cancelled |
-| `[StorageManager] sata0 unregistered (primary now nvme0n1)` / `(no primary)` | Teardown withdrew a block device and the storage manager dropped it, inside the withdrawal, so it precedes the `withdrew block` line; the suffix appears only when it was the primary |
 | `synthetic:k A withdrew keyboard "name"` | Teardown withdrew a device |
-| `synthetic:k A thread "name" did not stop in 500 ms; 3 resources leaked` | Teardown could not join a thread |
-| `synthetic:k A OnDetach threw: message` | The detach hook threw |
-| `synthetic:k retracted` | The node left the tree and its parent's child list |
-| `pci:0000:00:03.0 XhciDriver: usb 1-1: disconnected` | The device was pulled out and its nodes retracted; the host freed its slot |
-| `pci:0000:00:03.0 PcieRootPortDriver: slot 1: attention button, 1 functions retracted, slot powered off` | A removal was requested at the slot: its functions were retracted with the hardware present, then the slot was powered off |
-| `pci:0000:00:03.0 PcieRootPortDriver: slot 1: device arrived, 1 functions published` | A device was plugged into the slot: the slot was powered on, its registers placed and its functions published and offered |
-| `pci:0000:00:03.0 bus hook "quiesce" threw: message` | A bus hook threw (`quiesce`, `quiet`, `restore` or `after teardown`); after `quiesce` the node is `not offered: message` |
-| `pci host at 0x...: buses xx to yy not mapped, enumeration ends at bus zz` | An ECAM window could not be mapped whole; the host serves the buses before it |
-| `virtio type 1: status did not return to 0 within 100 ms after reset` | A virtio device did not acknowledge a reset in time; the kit went on as if it had |
+| `synthetic:k retracted` | The node was removed |
 
-`DriverInfo` is read-only, allocation-free and safe to poll: `IsStarted`, `HasWorker`, `DriverCount`, `NodeCount`, `DeviceCount`, `GetTotalHeldResourceCount()`, and four `Try` reads that snapshot one entry by index. `TryGetDriver(index, out DriverEntryInfo)` walks the manifest (`Name`, `Priority`). `TryGetNode(index, out DeviceNodeInfo)` walks the nodes in the tree: a retracted node leaves it, and its parent's `ChildCount`, so the positions after it shift down by one, as a withdrawn device does in `DeviceCount`, and a node retracted with its parent leaves with it; what a snapshot holds is `Path`, `BusName`, `Description`, `DriverName`, `State` (`Pending`, `Bound`, `Unbound`, `Retracted`), `ParentPath`, the resource, interrupt, offer and child counts, `HeldResourceCount`, `PublishedDeviceCount`, `LeakedResourceCount`, `FaultCount` and `LastFault`. `TryGetOffer(nodeIndex, offerIndex, out DeviceOfferInfo)` replays a node's arbitration (`DriverName`, `Priority`, `Specificity`, `Outcome`, `Reason`, `ReleasedResourceCount`). `TryGetDevice(index, out PublishedDeviceInfo)` lists what is published (`Kind`, `Name`, `NodePath`, `DriverName`, `IsConsumed`, `IsWithdrawn`).
+Bus drivers add their own lines through `binding.Log`: the xHCI driver logs each USB device it finds, the root port driver each hot-plug event. The storage manager adds `[StorageManager]` lines when it registers or drops a disk.
+
+`DriverInfo` only reads, so it never changes the kit and never throws:
+
+- `DriverCount`, `NodeCount` and `DeviceCount`, with `TryGetDriver`, `TryGetNode` and `TryGetDevice` to read one entry by index.
+- `TryGetOffer(nodeIndex, offerIndex, out DeviceOfferInfo)` replays the offers a node received: the driver, its priority and specificity, the `Outcome` (`Bound`, `Declined`, `Failed`) and the `Reason`.
+- A node (`DeviceNodeInfo`) gives its `Path`, `DriverName`, `State` (`Pending`, `Bound`, `Unbound`, `Retracted`) and counters such as `HeldResourceCount`, `FaultCount` and `LastFault`.
+
+This prints every node with the driver that took it, and the offers that led there:
 
 ```csharp
+// In the kernel:
 using Cosmos.Kernel.System.Diagnostics;
 
 for (int i = 0; i < DriverInfo.NodeCount; i++)
 {
-    if (DriverInfo.TryGetNode(i, out DeviceNodeInfo node))
+    if (!DriverInfo.TryGetNode(i, out DeviceNodeInfo node))
     {
-        Console.WriteLine($"{node.Path} {node.DriverName ?? "no driver"} held {node.HeldResourceCount}");
+        continue;
+    }
+
+    Console.WriteLine($"{node.Path}: {node.DriverName ?? "no driver"} ({node.State})");
+    for (int j = 0; j < node.OfferCount; j++)
+    {
+        if (DriverInfo.TryGetOffer(i, j, out DeviceOfferInfo offer))
+        {
+            Console.WriteLine($"  {offer.DriverName} -> {offer.Outcome} {offer.Reason}");
+        }
     }
 }
 ```
 
-A snapshot is taken without locking the kit, so a node whose offer or teardown is running on the worker may read one job stale. Nothing in `DriverInfo` acts on the kit, so nothing there throws.
+The snapshots are taken without locking, so a node that is being offered or torn down at that moment may read one step behind.
 
 ## Testing a driver over the synthetic bus
 
