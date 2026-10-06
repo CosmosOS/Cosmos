@@ -5,8 +5,8 @@ namespace Cosmos.Kernel.Core.CPU;
 /// <summary>
 /// Architecture-neutral PCI MSI / MSI-X binding. Both x64 (LAPIC Fixed-mode
 /// messages) and ARM64 (GICv3 ITS GITS_TRANSLATER writes) ultimately program
-/// the same shape into a device's MSI-X table — a 64-bit address plus a
-/// 32-bit data dword — but the routing model differs:
+/// the same shape into a device's MSI-X table (a 64-bit address plus a
+/// 32-bit data dword), but the routing model differs:
 ///
 /// <list type="bullet">
 /// <item>x64: data = IDT vector chosen by the kernel; address encodes the
@@ -18,16 +18,15 @@ namespace Cosmos.Kernel.Core.CPU;
 /// </list>
 ///
 /// This file abstracts both behind <see cref="IMsiBinder"/>: each platform
-/// initializer registers a binder, then HAL-level PCI MSI-X code calls
+/// initializer registers a binder, then the driver kit's PCI MSI-X table calls
 /// <see cref="PrepareDevice"/> once per device and <see cref="BindEntry"/>
 /// per MSI-X table entry, and on teardown <see cref="UnbindEntry"/> per
 /// entry and <see cref="ReleaseDevice"/> once. The binder owns vector / LPI
 /// allocation and any device-specific bookkeeping (ITT allocation, MAPD,
 /// MAPTI, DISCARD on ARM64).
 ///
-/// PCI device identity is passed in raw (bus, slot, function) form to keep
-/// this file free of <c>HAL/Pci</c> dependencies — Core can't reference
-/// HAL upstream.
+/// PCI device identity is passed in raw (bus, slot, function) form: Core
+/// sits below the HAL and cannot reference its PCI types.
 /// </summary>
 internal static class MsiRouting
 {
@@ -47,8 +46,10 @@ internal static class MsiRouting
     }
 
     /// <summary>
-    /// Per-device prep called once by <c>MsiX.Enable</c> after the cap is
-    /// located. Returns an opaque context the platform can pass back into
+    /// Per-device prep, called by the driver kit's PCI MSI-X table when an
+    /// entry connects while the function holds no context (its first
+    /// connect, or the first after the last disconnect released it).
+    /// Returns an opaque context the platform can pass back into
     /// <see cref="BindEntry"/>, <see cref="UnbindEntry"/> and
     /// <see cref="ReleaseDevice"/>. Thread context only.
     /// </summary>

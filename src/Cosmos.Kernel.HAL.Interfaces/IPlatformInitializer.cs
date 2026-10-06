@@ -46,13 +46,6 @@ internal interface IPlatformInitializer
     IInterruptController CreateInterruptController();
 
     /// <summary>
-    /// Maps PCI configuration space memory before device enumeration.
-    /// ARM64 maps ECAM as device memory; x64 uses port I/O (no mapping needed).
-    /// </summary>
-    /// <param name="ecamBase">Physical ECAM base address from ACPI MCFG.</param>
-    void PreparePciMapping(ulong ecamBase);
-
-    /// <summary>
     /// Maps the 2 MiB block containing a physical MMIO address so its
     /// HHDM-virtual alias is accessible with Device-memory attributes.
     /// Called by the driver kit's register mapper and by its MSI-X table
@@ -88,7 +81,7 @@ internal interface IPlatformInitializer
     void DelayMicroseconds(uint microseconds);
 
     /// <summary>
-    /// Initializes platform-specific hardware (PCI, ACPI, APIC, GIC, etc.).
+    /// Initializes platform-specific hardware (ACPI, APIC, GIC, timers, etc.).
     /// Called after HAL and interrupt manager are initialized.
     /// </summary>
     void InitializeHardware();

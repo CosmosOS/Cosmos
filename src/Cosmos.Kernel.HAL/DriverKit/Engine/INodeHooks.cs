@@ -31,16 +31,16 @@ internal interface INodeHooks
 
     /// <summary>
     /// Runs after every candidate declined or failed: the hardware goes back
-    /// to what firmware left, so a function a legacy driver still operates
-    /// keeps its bus mastering and its message interrupts.
+    /// to what firmware left, so a function no driver binds keeps the bus
+    /// mastering and the message interrupts firmware gave it.
     /// </summary>
     void AfterUnbound();
 
     /// <summary>
     /// Runs after a binding's teardown, before the bus's own allocation is
     /// released, whether or not resources leaked; a node nobody bound is
-    /// not quieted when it is retracted, since a legacy driver may operate
-    /// its function. With <paramref name="hardwarePresent"/> false the
+    /// not quieted when it is retracted: its function stays as firmware
+    /// left it. With <paramref name="hardwarePresent"/> false the
     /// hardware is gone and nothing is written.
     /// </summary>
     /// <param name="hardwarePresent">Whether the hardware is still there to be quiesced.</param>

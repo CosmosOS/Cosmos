@@ -62,12 +62,13 @@
          PlatformLineRouting, and their tick sources derive from TimerDevice. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
-    <!-- White-box suites over HAL internals: MSI-X tables (Interrupts),
-         PCI discovery and the nodes' PciAccess (Pci), platform power ops
-         (Power), the block device base class behind the in-memory probe
-         hosts and the legacy PCI manager behind the BAR relocation probes
-         (Storage), the TimerDevice base and its software timers (Timer),
-         the tree and the bindings' driver state (Virtio). -->
+    <!-- White-box suites over HAL internals: the kit's MSI-X table and the
+         nodes' PciAccess (Interrupts), the PCI host's configuration
+         mechanism and the nodes' PciAccess (Pci), the block device base
+         class behind the in-memory probe hosts and the kit's tree behind
+         the BAR relocation probes (Storage), the TimerDevice base and its
+         software timers (Timer), the tree and the bindings' driver state
+         (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />

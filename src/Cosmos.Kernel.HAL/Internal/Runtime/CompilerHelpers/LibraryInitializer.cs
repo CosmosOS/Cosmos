@@ -10,7 +10,6 @@ using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL;
 using Cosmos.Kernel.HAL.Firmware;
 using Cosmos.Kernel.HAL.Interfaces;
-using Cosmos.Kernel.HAL.Pci;
 
 namespace Internal.Runtime.CompilerHelpers;
 
@@ -20,7 +19,7 @@ namespace Internal.Runtime.CompilerHelpers;
 internal class LibraryInitializer
 {
     /// <summary>
-    /// Initialize HAL, interrupts, PCI, and platform-specific hardware. This method is called by the runtime before any managed code is executed.
+    /// Initialize the HAL, the interrupt controller, the platform hardware and the driver kit's platform nodes. This method is called by the runtime before any managed code is executed.
     /// </summary>
     public static void InitializeLibrary()
     {
@@ -52,16 +51,6 @@ internal class LibraryInitializer
         {
             Serial.WriteString("[KERNEL]   - Initializing interrupts...\n");
             InterruptManager.Initialize(initializer.CreateInterruptController());
-
-            if (CosmosFeatures.PCIEnabled)
-            {
-                // Initialize PCI (requires interrupts for MSI/MSI-X)
-                Serial.WriteString("[KERNEL]   - Initializing PCI...\n");
-                ulong ecamBase = AcpiMcfg.GetEcamBase();
-                initializer.PreparePciMapping(ecamBase);
-                PciDevice.SetEcamBase(ecamBase);
-                PciManager.Setup();
-            }
 
             // Initialize platform-specific hardware (ACPI, APIC, GIC, timers, etc.)
             Serial.WriteString("[KERNEL]   - Initializing platform hardware...\n");

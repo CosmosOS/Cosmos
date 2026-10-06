@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.HAL.Firmware;
 /// <summary>
 /// C# bridge to native ACPI MCFG discovery (acpi_wrapper.c in MultiArch).
 /// The native code is called during early boot (kmain) and parses the MCFG
-/// table to extract the PCI ECAM base address. This class just retrieves the result.
+/// table to extract the PCI ECAM window. This class just retrieves the result.
 /// Native import lives in Cosmos.Kernel.Core/Bridge/Import/AcpiMcfgNative.cs.
 /// </summary>
 internal static unsafe class AcpiMcfg
@@ -30,15 +30,6 @@ internal static unsafe class AcpiMcfg
     }
 
     /// <summary>
-    /// Gets MCFG information discovered from ACPI during early boot.
-    /// Returns null if ACPI was not available or MCFG table wasn't found.
-    /// </summary>
-    public static McfgInfo* GetMcfgInfo()
-    {
-        return (McfgInfo*)AcpiMcfgNative.GetMcfgInfo();
-    }
-
-    /// <summary>
     /// Copies the MCFG entry ACPI reported (base address, segment, first and
     /// last bus), for the machine description that publishes the PCI host
     /// node. Thread context; allocation-free.
@@ -56,20 +47,5 @@ internal static unsafe class AcpiMcfg
 
         info = default;
         return false;
-    }
-
-    /// <summary>
-    /// Gets the PCI ECAM physical base address from ACPI MCFG.
-    /// Returns 0 if MCFG table was not found.
-    /// </summary>
-    public static ulong GetEcamBase()
-    {
-        McfgInfo* mcfg = (McfgInfo*)AcpiMcfgNative.GetMcfgInfo();
-        if (mcfg != null && mcfg->Found != 0)
-        {
-            return mcfg->BaseAddress;
-        }
-
-        return 0;
     }
 }

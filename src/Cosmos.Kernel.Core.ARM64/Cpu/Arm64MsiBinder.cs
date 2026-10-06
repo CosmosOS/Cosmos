@@ -74,19 +74,20 @@ internal sealed class Arm64MsiBinder : IMsiBinder
         // Resolve PCI requester ID -> ITS DeviceID via IORT. Fall back to
         // identity (DeviceID == BDF) if no IORT is present.
         //
-        // Segment is hardcoded to 0: Cosmos's PCI scan today uses a single
-        // ECAM region (one segment). When multi-segment support lands on
-        // PciDevice, plumb the device's segment through MsiRouting.PrepareDevice
+        // Segment is hardcoded to 0: the driver kit's PCI MSI-X table
+        // passes bus, device and function only, and the one ECAM host the
+        // virt machine describes serves segment 0. When a host on another
+        // segment appears, plumb its segment through MsiRouting.PrepareDevice
         // instead of assuming 0 here.
         if (AcpiIortNative.ResolveDeviceId(0, bdf, out uint devId) != 0)
         {
             devId = bdf;
         }
 
-        // An earlier MsiX.Enable on this function that was never disabled
-        // still owns the DeviceID. MsiX.Enable has already masked every
-        // entry of the table, so its owner receives nothing from here on:
-        // unmap it the way ReleaseDevice would before mapping afresh.
+        // An earlier owner of this function that never released its
+        // context still owns the DeviceID: unmap it the way ReleaseDevice
+        // would before mapping afresh, so that owner receives nothing from
+        // here on.
         Arm64DevCtx? previous = RetireMapped(devId);
         if (previous is not null)
         {

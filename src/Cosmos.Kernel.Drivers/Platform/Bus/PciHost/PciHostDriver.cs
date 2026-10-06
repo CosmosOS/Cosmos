@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Drivers.Platform.Bus.PciHost;
 /// The PCI host driver: binds a platform node whose access object is a
 /// <see cref="PciHostAccess"/> (the legacy port mechanism on x64, an ECAM
 /// window from MCFG on ARM64) and publishes one child node per function it
-/// finds. The walk is the legacy scan's: the host's first bus, then every
+/// finds. The walk covers the host's first bus, then every
 /// bus a PCI-to-PCI bridge leads to and, on the legacy host, every bus a
 /// host bridge function of device 00:00 roots, each bus once. A PCI
 /// Express root port or downstream port with a hot-plug slot is published
@@ -166,8 +166,7 @@ public sealed class PciHostDriver : Driver
         }
         else if (legacyHost && identity.Subclass == HostBridgeSubclass && identity.Bus == 0 && identity.Device == 0)
         {
-            // The legacy scan's rule: function N of device 00:00 that is a
-            // host bridge roots bus N.
+            // Function N of device 00:00 that is a host bridge roots bus N.
             QueueBus(host, visited, pending, ref pendingCount, identity.Function);
         }
     }

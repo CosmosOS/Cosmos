@@ -233,7 +233,7 @@ internal sealed class PciMessageTable
 
     /// <summary>
     /// Undoes <see cref="TryConnect"/> for entry <paramref name="index"/>,
-    /// configuration space first, as <c>MsiX.Disable</c> does. With memory
+    /// configuration space first. With memory
     /// decoding on, the entry is masked through the table and its vector
     /// control read back, so the posted write has landed. With decoding
     /// off the table is not touched (an unclaimed posted write is dropped

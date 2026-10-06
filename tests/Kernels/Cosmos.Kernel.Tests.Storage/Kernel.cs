@@ -8,9 +8,10 @@ using Cosmos.Kernel.Drivers.Pci.Storage.Nvme;
 using Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage;
 using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 using Cosmos.Kernel.HAL;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.HAL.Pci;
-using Cosmos.Kernel.HAL.Pci.Enums;
 using Cosmos.Kernel.HAL.Vfs;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Filesystems.Fat;
@@ -570,11 +571,11 @@ public class Kernel : Sys.Kernel
 #if ARCH_X64
         TR.RunIf(dev && TR.ProfileHasPrefix("nvme"), "Mmio_HighBar_RemappedOnDemand", TestMmio_HighBarRemapped,
             "64-bit BAR relocation probe is nvme-profile only");
-        TR.RunIf(dev && TR.ProfileHasPrefix("nvme"), "Pci_GetBar64_ReadsLiveConfig", TestPciGetBar64ReadsLiveConfig,
+        TR.RunIf(dev && TR.ProfileHasPrefix("nvme"), "Pci_DescribeBar64_ReadsLiveConfig", TestPciDescribeBar64ReadsLiveConfig,
             "64-bit BAR relocation probe is nvme-profile only");
 #else
         TR.Skip("Mmio_HighBar_RemappedOnDemand", "x64 mapper cell; arm64 installs Device mappings via DeviceMapper");
-        TR.Skip("Pci_GetBar64_ReadsLiveConfig", "BAR relocation probe is x64-only (same harness as the mapper cell)");
+        TR.Skip("Pci_DescribeBar64_ReadsLiveConfig", "BAR relocation probe is x64-only (same harness as the mapper cell)");
 #endif
 
         // ==================== USB hot-plug (pulls the stick out and back in) ====================
@@ -3062,23 +3063,63 @@ public class Kernel : Sys.Kernel
     }
 
 #if ARCH_X64
+#pragma warning disable COSMOS0003
     // Physical address for the relocation probe: above 4 GiB, where Limine's
     // base-revision-0 blanket map (identity + HHDM of the low 4 GiB plus
     // memory-map regions) no longer covers anything, and clear of RAM and of
     // every fixed q35 window (ECAM, LAPIC, IO-APIC all sit below 4 GiB).
     private const ulong HighBarPhys = 0x1_1000_0000;
 
+    /// <summary>Base class code of a mass storage controller, the class the BAR probes find the NVMe function by.</summary>
+    private const byte PciMassStorageClass = 0x01;
+
+    /// <summary>Mass storage subclass of a non-volatile memory controller; with <see cref="PciMassStorageClass"/>, the NVMe function the BAR probes relocate.</summary>
+    private const byte PciNvmSubclass = 0x08;
+
     /// <summary>Index of the NVMe controller's 64-bit register BAR (BAR0).</summary>
     private const int NvmeRegisterBarIndex = 0;
 
-    /// <summary>Mask of the type bits in a memory BAR's lower dword (bits 0-2), composed from the PciDevice BAR field layout.</summary>
-    private const uint PciBarTypeMask = (PciDevice.BarTypeMask << PciDevice.BarTypeShift) | PciDevice.BarIoSpaceMask;
+    /// <summary>Configuration offset of the Command register (PCI 3.0 6.2.2).</summary>
+    private const ushort PciCommandOffset = 0x04;
+
+    /// <summary>Configuration offset of the first base address register (PCI 3.0 6.2.5.1).</summary>
+    private const ushort PciBarBaseOffset = 0x10;
+
+    /// <summary>Bytes of one base address register slot in configuration space.</summary>
+    private const int PciBarSlotBytes = 4;
+
+    /// <summary>Configuration offset of the lower dword of the NVMe register BAR.</summary>
+    private const ushort NvmeBarLowOffset = PciBarBaseOffset + (NvmeRegisterBarIndex * PciBarSlotBytes);
+
+    /// <summary>Configuration offset of the upper dword of the NVMe register BAR: the next slot, as for every 64-bit BAR.</summary>
+    private const ushort NvmeBarHighOffset = NvmeBarLowOffset + PciBarSlotBytes;
+
+    /// <summary>BAR bit 0: set when the register maps I/O space instead of memory space.</summary>
+    private const uint PciBarIoSpaceBit = 0x1;
+
+    /// <summary>Shift down to the memory BAR type field (bits 2:1).</summary>
+    private const int PciBarTypeShift = 1;
+
+    /// <summary>Mask of the memory BAR type field after shifting.</summary>
+    private const uint PciBarTypeFieldMask = 0x3;
+
+    /// <summary>Memory BAR type field value of a 64-bit register.</summary>
+    private const uint PciBarType64Bit = 0x2;
+
+    /// <summary>Mask selecting the address bits of a memory BAR's lower dword (the low 4 bits are flags).</summary>
+    private const uint PciBarMemoryAddressMask = 0xFFFF_FFF0;
+
+    /// <summary>Shift placing a 64-bit BAR's upper dword into bits 63:32 of the address.</summary>
+    private const int PciBarUpperHalfShift = 32;
+
+    /// <summary>Mask of the type bits in a memory BAR's lower dword (bits 0-2), composed from the BAR field layout above.</summary>
+    private const uint PciBarTypeMask = (PciBarTypeFieldMask << PciBarTypeShift) | PciBarIoSpaceBit;
 
     /// <summary>Type-bit value marking a 64-bit memory BAR.</summary>
-    private const uint PciBar64BitMemoryType = PciDevice.BarType64Bit << PciDevice.BarTypeShift;
+    private const uint PciBar64BitMemoryType = PciBarType64Bit << PciBarTypeShift;
 
     /// <summary>Mask selecting the flag bits of a memory BAR's lower dword.</summary>
-    private const uint PciBarFlagsMask = ~PciDevice.BarMemoryAddressMask;
+    private const uint PciBarFlagsMask = ~PciBarMemoryAddressMask;
 
     /// <summary>All-ones 32-bit MMIO read value, meaning nothing decodes the address.</summary>
     private const uint MmioAllOnesValue = 0xFFFF_FFFF;
@@ -3089,23 +3130,29 @@ public class Kernel : Sys.Kernel
     // Proves 64-bit BAR MMIO stays reachable when the BAR sits above 4 GiB,
     // where firmware on real hardware may place it: the HHDM alias of such a
     // BAR is unmapped until EnsureMmioMapped installs a page-table entry for
-    // it. The cell relocates the NVMe controller's own BAR0 up there, mirrors
-    // the driver-init access pattern (EnsureMmioMapped + phys-plus-HHDM
-    // arithmetic) against the new address, and asserts the VS register reads
-    // back identical, then restores the original BAR before returning. With
-    // a no-op x64 EnsureMmioMapped this cell dies on an unhandled page fault.
+    // it. The cell relocates the NVMe controller's own BAR0 up there through
+    // its node's PciAccess, mirrors the driver-init access pattern
+    // (EnsureMmioMapped + phys-plus-HHDM arithmetic) against the new
+    // address, and asserts the VS register reads back identical, then
+    // restores the original BAR before returning. With a no-op x64
+    // EnsureMmioMapped this cell dies on an unhandled page fault.
     private static void TestMmio_HighBarRemapped()
     {
         // NVMe controller registers: VS (version) sits at byte offset 8.
         const ulong NvmeVersionOffset = 0x08;
-        PciDevice? nvmePci = PciManager.GetDeviceClass(ClassId.MassStorageController, SubclassId.NvmController);
-        Assert.True(nvmePci != null, "an NVMe PCI function must exist on an nvme profile");
+        DeviceNode? nvmeNode = FindNvmeFunctionNode();
+        if (nvmeNode is null)
+        {
+            Assert.Fail("an NVMe PCI function must exist on an nvme profile");
+            return;
+        }
 
-        uint barLow = nvmePci!.ReadRegister32((byte)Config.Bar0);
-        uint barHigh = nvmePci.ReadRegister32((byte)Config.Bar1);
+        PciAccess nvmePci = nvmeNode.Access<PciAccess>();
+        uint barLow = nvmePci.ReadConfig32(NvmeBarLowOffset);
+        uint barHigh = nvmePci.ReadConfig32(NvmeBarHighOffset);
         Assert.True((barLow & PciBarTypeMask) == PciBar64BitMemoryType, "NVMe BAR0 must be a 64-bit memory BAR");
 
-        ulong origPhys = ((ulong)barHigh << PciDevice.BarUpperHalfShift) | (barLow & PciDevice.BarMemoryAddressMask);
+        ulong origPhys = ((ulong)barHigh << PciBarUpperHalfShift) | (barLow & PciBarMemoryAddressMask);
         ulong hhdm = HhdmOffset();
         uint vsOrig = Native.MMIO.Read32(origPhys + hhdm + NvmeVersionOffset);
         Assert.True(vsOrig != 0 && vsOrig != MmioAllOnesValue, "NVMe VS must read sane at the original BAR");
@@ -3113,11 +3160,11 @@ public class Kernel : Sys.Kernel
         // Quiesce decode while the BAR moves, like firmware would. No block
         // I/O is in flight (every I/O cell ran earlier), so nothing touches
         // the controller through the stale driver mapping meanwhile.
-        ushort command = nvmePci.ReadRegister16((byte)Config.Command);
-        nvmePci.WriteRegister16((byte)Config.Command, (ushort)(command & ~(ushort)PciCommand.Memory));
-        nvmePci.WriteRegister32((byte)Config.Bar0, (uint)(HighBarPhys & PciDevice.BarMemoryAddressMask) | (barLow & PciBarFlagsMask));
-        nvmePci.WriteRegister32((byte)Config.Bar1, (uint)(HighBarPhys >> PciDevice.BarUpperHalfShift));
-        nvmePci.WriteRegister16((byte)Config.Command, command);
+        ushort command = nvmePci.ReadConfig16(PciCommandOffset);
+        nvmePci.EnableMemorySpace(false);
+        nvmePci.WriteConfig32(NvmeBarLowOffset, (uint)(HighBarPhys & PciBarMemoryAddressMask) | (barLow & PciBarFlagsMask));
+        nvmePci.WriteConfig32(NvmeBarHighOffset, (uint)(HighBarPhys >> PciBarUpperHalfShift));
+        nvmePci.WriteConfig16(PciCommandOffset, command);
 
         uint vsHigh;
         bool mapped;
@@ -3130,46 +3177,108 @@ public class Kernel : Sys.Kernel
         {
             // Put the BAR back exactly as found so the destructive reboot
             // cell (and boot 1's scan) still see a working controller.
-            nvmePci.WriteRegister16((byte)Config.Command, (ushort)(command & ~(ushort)PciCommand.Memory));
-            nvmePci.WriteRegister32((byte)Config.Bar0, barLow);
-            nvmePci.WriteRegister32((byte)Config.Bar1, barHigh);
-            nvmePci.WriteRegister16((byte)Config.Command, command);
+            nvmePci.EnableMemorySpace(false);
+            nvmePci.WriteConfig32(NvmeBarLowOffset, barLow);
+            nvmePci.WriteConfig32(NvmeBarHighOffset, barHigh);
+            nvmePci.WriteConfig16(PciCommandOffset, command);
         }
 
         Assert.True(mapped, "EnsureMmioMapped must report the high BAR's block as mapped");
         Assert.True(vsHigh == vsOrig, "VS read through the remapped high BAR must match the original");
     }
 
-    // GetBar64Address must read BOTH halves of a 64-bit BAR from live
-    // config space: mixing the enumeration-time cached lower half with a
-    // live upper half splices two different addresses together the moment
-    // a BAR is reprogrammed (exactly what the remap cell above, or any
-    // future PCI resource allocator, does). Decode stays disabled for the
-    // whole probe window: only config space is touched.
-    private static void TestPciGetBar64ReadsLiveConfig()
+    // The kit reads a 64-bit BAR in one place, the describe that builds a
+    // function's node (PciHostAccess.TryDescribeFunction, or a bridge's
+    // PciAccess.TryDescribeChild), and it must read BOTH halves from live
+    // config space: the published node's BAR0 has to match the raw
+    // registers, and a describe after a reprogram has to report the new
+    // address whole rather than splice a stale half with a live one, the
+    // moment a BAR is reprogrammed (exactly what the remap cell above, or
+    // the kit's own placement behind a hot-plug slot, does). Decode stays
+    // disabled for the whole probe window: only config space is touched,
+    // the describe puts every register it sizes back, and its description
+    // is dropped unpublished.
+    private static void TestPciDescribeBar64ReadsLiveConfig()
     {
-        PciDevice? nvmePci = PciManager.GetDeviceClass(ClassId.MassStorageController, SubclassId.NvmController);
-        Assert.True(nvmePci != null, "an NVMe PCI function must exist on an nvme profile");
+        DeviceNode? nvmeNode = FindNvmeFunctionNode();
+        if (nvmeNode is null)
+        {
+            Assert.Fail("an NVMe PCI function must exist on an nvme profile");
+            return;
+        }
 
-        uint barLow = nvmePci!.ReadRegister32((byte)Config.Bar0);
-        uint barHigh = nvmePci.ReadRegister32((byte)Config.Bar1);
-        ulong origPhys = ((ulong)barHigh << PciDevice.BarUpperHalfShift) | (barLow & PciDevice.BarMemoryAddressMask);
-        Assert.True(nvmePci.GetBar64Address(NvmeRegisterBarIndex) == origPhys, "baseline: GetBar64Address must match raw config space");
+        PciAccess nvmePci = nvmeNode.Access<PciAccess>();
+        uint barLow = nvmePci.ReadConfig32(NvmeBarLowOffset);
+        uint barHigh = nvmePci.ReadConfig32(NvmeBarHighOffset);
+        ulong origPhys = ((ulong)barHigh << PciBarUpperHalfShift) | (barLow & PciBarMemoryAddressMask);
+        PciBar published = nvmePci.Bars[NvmeRegisterBarIndex];
+        Assert.True(published.IsAssigned && published.Is64Bit && published.Base == origPhys, "baseline: the published node's BAR0 must match raw config space");
 
-        ushort command = nvmePci.ReadRegister16((byte)Config.Command);
-        nvmePci.WriteRegister16((byte)Config.Command, (ushort)(command & ~(ushort)PciCommand.Memory));
-        nvmePci.WriteRegister32((byte)Config.Bar0, (uint)(HighBarPhys & PciDevice.BarMemoryAddressMask) | (barLow & PciBarFlagsMask));
-        nvmePci.WriteRegister32((byte)Config.Bar1, (uint)(HighBarPhys >> PciDevice.BarUpperHalfShift));
+        ushort command = nvmePci.ReadConfig16(PciCommandOffset);
+        nvmePci.EnableMemorySpace(false);
+        nvmePci.WriteConfig32(NvmeBarLowOffset, (uint)(HighBarPhys & PciBarMemoryAddressMask) | (barLow & PciBarFlagsMask));
+        nvmePci.WriteConfig32(NvmeBarHighOffset, (uint)(HighBarPhys >> PciBarUpperHalfShift));
 
-        ulong reported = nvmePci.GetBar64Address(NvmeRegisterBarIndex);
+        bool described = TryDescribeAgain(nvmeNode, out PciFunctionDescription description);
+        PciBar reported = described ? description.Access.Bars[NvmeRegisterBarIndex] : default;
 
-        nvmePci.WriteRegister32((byte)Config.Bar0, barLow);
-        nvmePci.WriteRegister32((byte)Config.Bar1, barHigh);
-        nvmePci.WriteRegister16((byte)Config.Command, command);
+        nvmePci.WriteConfig32(NvmeBarLowOffset, barLow);
+        nvmePci.WriteConfig32(NvmeBarHighOffset, barHigh);
+        nvmePci.WriteConfig16(PciCommandOffset, command);
 
-        Assert.True(reported == HighBarPhys,
-            "GetBar64Address must read both halves live after a BAR reprogram, not splice cached low with live high");
+        Assert.True(described, "the NVMe function must describe again through its parent's access object");
+        Assert.True(reported.Is64Bit && reported.Base == HighBarPhys,
+            "a describe must read both halves of a 64-bit BAR live after a reprogram, not splice a stale half with a live one");
     }
+
+    // The NVMe function's node, through the kit's tree (the HAL grant): the
+    // first node whose identity is a PCI function of class 01 subclass 08,
+    // any programming interface, the pair the probes looked the function up
+    // by before the kit, with a PciAccess; null when there is none. Every
+    // nvme cell attaches one controller on the root bus, the one NvmeDriver
+    // bound.
+    private static DeviceNode? FindNvmeFunctionNode()
+    {
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            DeviceNode node = nodes[i];
+            if (node.Identity is PciIdentity identity
+                && identity.ClassCode == PciMassStorageClass
+                && identity.Subclass == PciNvmSubclass
+                && node.TryGetAccess(out PciAccess? _))
+            {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    // Describes a PCI function afresh through the access object of the node
+    // that published it: the PCI host's for a function its walk found, a
+    // bridge's (without placement) for one behind a hot-plug slot. Nothing
+    // is published.
+    private static bool TryDescribeAgain(DeviceNode node, out PciFunctionDescription description)
+    {
+        DeviceNode? parent = node.Parent;
+        if (node.Identity is PciIdentity identity && parent is not null)
+        {
+            if (parent.TryGetAccess(out PciHostAccess? host))
+            {
+                return host.TryDescribeFunction(identity.Bus, identity.Device, identity.Function, out description);
+            }
+
+            if (parent.TryGetAccess(out PciAccess? bridge))
+            {
+                return bridge.TryDescribeChild(identity.Device, identity.Function, assignResources: false, out description);
+            }
+        }
+
+        description = default;
+        return false;
+    }
+#pragma warning restore COSMOS0003
 #endif
 
     // Contract-faithful degenerate device: one 512-byte block, throws on any

@@ -14,9 +14,9 @@ namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 /// reached through its HHDM alias. Each access is one load or store, so
 /// no latch lock is needed; a read-modify-write sequence takes the
 /// instance's own IRQ-safe lock through <see cref="AcquireLock"/>. The
-/// window is mapped as device memory by whoever creates the instance
-/// (the platform initializer for the legacy paths, the kit's PCI host
-/// factory for a host node). Any context; allocation-free.
+/// window is mapped as device memory by whoever creates the instance:
+/// the kit's PCI host factory, <see cref="PciHostAccess.ForEcam"/>, maps
+/// it bus by bus first. Any context; allocation-free.
 /// </summary>
 internal sealed unsafe class PciEcamConfigSpace : PciConfigSpace
 {

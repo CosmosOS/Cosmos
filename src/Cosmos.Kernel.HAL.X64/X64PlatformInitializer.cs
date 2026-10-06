@@ -69,12 +69,6 @@ internal class X64PlatformInitializer : IPlatformInitializer
     public IPowerOps CreatePowerOps() => new X64PowerOps();
     public IInterruptController CreateInterruptController() => new X64InterruptController();
 
-    public void PreparePciMapping(ulong ecamBase)
-    {
-        // x64 uses legacy port I/O (0xCF8/0xCFC) for PCI config access,
-        // which bypasses the MMU, so no memory mapping is needed.
-    }
-
     public bool EnsureMmioMapped(ulong physBase)
     {
         // Limine's blanket map (base revision 0) only covers the low 4 GiB

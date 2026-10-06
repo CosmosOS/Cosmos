@@ -350,8 +350,8 @@ public static unsafe class GICv3Its
         // The flat device table is indexed by DeviceID value: a MAPD past
         // its end is either rejected (command error -> STALLED) or walks
         // memory beyond the table, and the device's MSIs silently vanish.
-        // Reject loudly instead; MsiX.Enable turns this into a clean
-        // polled-mode downgrade for the device.
+        // Reject loudly instead; the driver kit's PCI MSI-X table turns
+        // this into a refused connect, and the driver takes its polled path.
         if (deviceId > s_maxDeviceId)
         {
             Serial.WriteString("[GICv3-ITS] ERROR: DeviceID 0x");
@@ -380,8 +380,8 @@ public static unsafe class GICv3Its
         ulong ittVirt = (ulong)PageAllocator.AllocPages(PageType.Unmanaged, (uint)pages, zero: true);
         if (ittVirt == 0)
         {
-            // Same channel as the DeviceID bound: MsiX.Enable catches this
-            // and the device downgrades to polled.
+            // Same channel as the DeviceID bound: the driver kit's PCI MSI-X
+            // table catches this, and the driver takes its polled path.
             Serial.WriteString("[GICv3-ITS] ERROR: ITT alloc failed\n");
             throw new System.InvalidOperationException("GICv3-ITS: ITT allocation failed");
         }

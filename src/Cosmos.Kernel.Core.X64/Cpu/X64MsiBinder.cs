@@ -55,8 +55,8 @@ internal sealed class X64MsiBinder : IMsiBinder
 
     /// <summary>
     /// Every context not yet released, so a second PrepareDevice for the
-    /// same function can find the first and free its vectors: the owner
-    /// that walked away without <c>MsiX.Disable</c> never will, and each
+    /// same function can find the first and free its vectors: an owner
+    /// that walked away without releasing its context never will, and each
     /// vector stays allocated with its handler rooted and invokable, out of
     /// 175 dynamic slots. Same take-over as the ARM64 binder. A plain list:
     /// a handful of MSI-X functions exist, and only bring-up and teardown
@@ -77,11 +77,11 @@ internal sealed class X64MsiBinder : IMsiBinder
     {
         uint bdf = (bus << BdfBusShift) | (slot << BdfSlotShift) | function;
 
-        // An earlier MsiX.Enable on this function that was never disabled
-        // still holds its vectors. MsiX.Enable has already masked every
-        // entry of the table, so its owner receives nothing from here on:
-        // free them the way ReleaseDevice would. A message already on its
-        // way still gets its EOI from the dispatcher's no-handler path.
+        // An earlier owner of this function that never released its
+        // context still holds its vectors: free them the way ReleaseDevice
+        // would, so that owner receives nothing from here on. A message
+        // already on its way still gets its EOI from the dispatcher's
+        // no-handler path.
         X64DevCtx? previous = RetireLive(bdf);
         if (previous is not null)
         {

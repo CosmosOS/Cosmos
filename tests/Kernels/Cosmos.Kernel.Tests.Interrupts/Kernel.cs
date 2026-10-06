@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
-using Cosmos.Kernel.HAL.Pci;
-using Cosmos.Kernel.HAL.Pci.Enums;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.System.Timer;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -25,14 +27,16 @@ namespace Cosmos.Kernel.Tests.Interrupts;
 // and gicv3 QEMU profiles (tests/profiles.json) so BOTH interrupt-controller
 // paths are covered deterministically rather than depending on the machine
 // default. End-to-end MSI *delivery* (a device raising an MSI through the ITS)
-// stays covered by the Storage suite's NVMe assertions. The MSI-X teardown
-// cells program a scratch table through the real binder, and only borrow a
-// live function whose MSI-X nobody has enabled (x64: the default e1000e NIC,
-// whose driver uses INTx), restoring its registers afterwards.
+// stays covered by the Storage suite's NVMe assertions. The MSI-X table cells
+// go through the driver kit's PciMessageTable: the bounds cell over a scratch
+// table that never gets past its index guard, the connect and disconnect
+// cells over the table of a live function whose MSI-X nobody has enabled
+// (x64: the default e1000e NIC, whose driver takes its line), restoring its
+// registers afterwards.
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests per cell: 11 cross-arch + 6 arch-specific.</summary>
-    private const int ExpectedTestCount = 17;
+    /// <summary>Total tests per cell: 10 cross-arch + 6 arch-specific.</summary>
+    private const int ExpectedTestCount = 16;
 
     /// <summary>First vector of the dynamic MSI/MSI-X allocation window [0x40, 0xFE].</summary>
     private const byte DynamicVectorFirst = 0x40;
@@ -46,17 +50,15 @@ public class Kernel : Sys.Kernel
     /// <summary>Lower bound the measured sleep must reach to prove the timer IRQ actually elapsed it (ms).</summary>
     private const int MinMeasuredSleepMs = 100;
 
-    /// <summary>Entry count of the fake MSI-X table used for bounds probing (also the first out-of-range index).</summary>
+    /// <summary>Entry count of the scratch table the bounds cell probes (also its first out-of-range index), and the fewest entries a borrowed function needs for the live cells to connect two.</summary>
     private const int MsiXProbeEntryCount = 2;
-    /// <summary>In-range entry index the MSI-X mask/unmask accessors are exercised on.</summary>
+    /// <summary>Second entry the live table cells connect beside entry 0, so one disconnect leaves an entry bound.</summary>
     private const int MsiXProbeEntryIndex = 1;
-    /// <summary>Byte offset of probe entry 1 in the MSI-X table (index × 16-byte entry stride, PCI 3.0 §6.8.2).</summary>
-    private const int MsiXProbeEntryOffset = 16;
     /// <summary>Vector Control register offset within an MSI-X table entry (PCI 3.0 §6.8.2).</summary>
     private const int MsiXVectorControlOffset = 12;
     /// <summary>Mask bit (bit 0) of the MSI-X Vector Control register.</summary>
     private const uint MsiXVectorControlMaskBit = 1;
-    /// <summary>Out-of-range entry index used to probe UnmaskEntry rejection.</summary>
+    /// <summary>Out-of-range entry index the bounds cell probes Unmask and Disconnect with.</summary>
     private const int MsiXOutOfRangeIndex = 5;
     /// <summary>Byte stride between MSI-X table entries (PCI 3.0 §6.8.2).</summary>
     private const int MsiXEntryStride = 16;
@@ -74,6 +76,22 @@ public class Kernel : Sys.Kernel
     private const ushort MsiXFunctionMaskBit = 1 << 14;
     /// <summary>Largest MSI-X table a function can expose (Table Size is 11 bits, PCI 3.0 §6.8.2.3); more entries than either arch has vectors or LPIs, so binding them all drains the allocator.</summary>
     private const int MsiXMaxTableSize = 2048;
+    /// <summary>The MSI-X capability id (PCI 3.0 6.8.2).</summary>
+    private const byte MsiXCapabilityId = 0x11;
+    /// <summary>Offset of the Table Offset/Table BIR register within the MSI-X capability (PCI 3.0 6.8.2.4).</summary>
+    private const byte MsiXTableOffsetBirOffset = 4;
+    /// <summary>Bits 2:0 of the Table Offset/Table BIR register: the base address register holding the table.</summary>
+    private const uint MsiXTableBirMask = 0x7;
+    /// <summary>Bits 31:3 of the Table Offset/Table BIR register: the table's offset into that register's window.</summary>
+    private const uint MsiXTableOffsetMask = 0xFFFFFFF8;
+    /// <summary>Command register offset in configuration space (PCI 3.0 6.2.2).</summary>
+    private const ushort PciCommandOffset = 0x04;
+    /// <summary>Command bit 1: memory space decode, without which a function's MSI-X table is not decoded.</summary>
+    private const ushort PciCommandMemorySpace = 0x0002;
+    /// <summary>Command bit 10: INTx disabled, which the kit's first message connect sets.</summary>
+    private const ushort PciCommandInterruptDisable = 0x0400;
+    /// <summary>Capability offset of the bounds cell's scratch table: none, since none of its calls gets past the index guard.</summary>
+    private const byte ScratchTableCapability = 0;
 
     // A function no QEMU machine the suite runs populates (00:1f.7). The
     // binder only turns it into a routing key (ARM64: ITS DeviceID 0xFF, well
@@ -96,20 +114,26 @@ public class Kernel : Sys.Kernel
     /// </summary>
     private const ulong RemapLeakSlackPages = RemapRounds / 2;
 
-    /// <summary>A function with an MSI-X capability nobody enabled and memory decode on, or null when the cell has none.</summary>
-    private static PciDevice? s_idleMsiXFunction;
+    /// <summary>The access of a PCI function with no assigned base address register (a host bridge), which the bounds cell builds its scratch table over; null when the cell has none.</summary>
+    private static PciAccess? s_barlessPciFunction;
+
+    /// <summary>The access of a PCI function with an MSI-X capability nobody enabled, memory decoding on and at least two table entries, or null when the cell has none.</summary>
+    private static PciAccess? s_idleMsiXFunction;
 
     protected override void BeforeRun()
     {
         Serial.WriteString("[Interrupts] BeforeRun() reached!\n");
 
-        // 11 cross-arch + 6 arch-specific = 17 tests per cell.
+        // 10 cross-arch + 6 arch-specific = 16 tests per cell.
         TR.Start("Interrupt System Tests", expectedTests: ExpectedTestCount);
 
+        s_barlessPciFunction = FindBarlessPciFunction();
         s_idleMsiXFunction = FindIdleMsiXFunction();
         bool routing = MsiRouting.IsAvailable;
+        bool barlessFunction = s_barlessPciFunction is not null;
         bool liveFunction = routing && s_idleMsiXFunction is not null;
         const string NoRouting = "no MSI routing in this cell (GICv2 has no ITS)";
+        const string NoBarlessFunction = "no PCI function without an assigned base address register in this cell";
         const string NoIdleFunction = "needs MSI routing and an MSI-X function no driver has enabled (arm64: virtio-net owns the only one)";
 
         // ==================== Cross-arch ====================
@@ -117,12 +141,11 @@ public class Kernel : Sys.Kernel
         TR.Run("TimerSource_Registered", TestTimerSourceRegistered);
         TR.Run("VectorAllocator_ReturnsDistinctDynamicVectors", TestVectorAllocatorDistinct);
         TR.Run("VectorAllocator_ReusesFreedSlots", TestVectorAllocatorReusesFreedSlots);
-        TR.Run("MsiX_TableAccessors_BoundsChecked", TestMsiXTableAccessorsBoundsChecked);
-        TR.RunIf(routing, "MsiX_SetEntryMasked_LeavesEntryMasked", TestMsiXSetEntryMaskedLeavesEntryMasked, NoRouting);
+        TR.RunIf(barlessFunction, "MsiXTable_OutOfRangeEntry_Refused", TestMsiXTableOutOfRangeEntryRefused, NoBarlessFunction);
         TR.RunIf(routing, "MsiRouting_UnbindEntry_ReturnsSlot", TestMsiRoutingUnbindEntryReturnsSlot, NoRouting);
         TR.RunIf(routing, "MsiRouting_PrepareDevice_RemapDoesNotLeak", TestMsiRoutingRemapDoesNotLeak, NoRouting);
-        TR.RunIf(liveFunction, "MsiX_Disable_ClearsEnableAndMasksEntries", TestMsiXDisableClearsEnableAndMasks, NoIdleFunction);
-        TR.RunIf(liveFunction, "MsiX_EnableDisableEnable_SameFunction", TestMsiXEnableDisableEnable, NoIdleFunction);
+        TR.RunIf(liveFunction, "MsiXTable_LastDisconnect_DisablesAndMasks", TestMsiXTableLastDisconnectDisablesAndMasks, NoIdleFunction);
+        TR.RunIf(liveFunction, "MsiXTable_ConnectAfterDisconnect_SameFunction", TestMsiXTableConnectAfterDisconnect, NoIdleFunction);
         TR.Run("TimerInterrupt_WakesSleepingThread", TestTimerInterruptWakesSleepingThread);
 
 #if ARCH_X64
@@ -293,94 +316,68 @@ public class Kernel : Sys.Kernel
     {
     }
 
-    // MSI-X table accessors must bounds-check like SetEntry does: an
-    // out-of-range Mask/UnmaskEntry index is a stray 32-bit MMIO write past
-    // the device's table. Probed hardware-free against a fake context whose
-    // "table" is a private heap page, so a missing guard writes into this
-    // cell's own buffer instead of a live device — and is caught as a
-    // missing exception, not as corruption.
-    private static unsafe void TestMsiXTableAccessorsBoundsChecked()
+    // The kit's MSI-X table refuses an entry index outside the table rather
+    // than write past it: TryConnect answers false, and Mask, Unmask and
+    // Disconnect return without a write. Probed hardware-free on a scratch
+    // table over the access of a function with no assigned base address
+    // register: every call below stops at the index guard, before
+    // configuration space or the table is reached, and a TryConnect that got
+    // past a broken guard would still find no window to map. A missing range
+    // check shows as the IndexOutOfRangeException the per-entry bookkeeping
+    // throws, caught here as a failed assertion.
+    private static void TestMsiXTableOutOfRangeEntryRefused()
     {
-        void* table = PageAllocator.AllocPages(PageType.Unmanaged, 1, zero: true);
-        Assert.True(table != null, "probe table allocation must succeed");
+        if (s_barlessPciFunction is not PciAccess pci)
+        {
+            Assert.Fail("the gate found a function without an assigned base address register, so it must still be recorded");
+            return;
+        }
 
-        MsiXContext ctx = new MsiXContext((ulong)table, MsiXProbeEntryCount, null);
+        PciMessageTable table = new(pci, ScratchTableCapability, MsiXProbeEntryCount);
 
-        // In-range accessors keep programming VectorControl (offset 12).
-        MsiX.MaskEntry(ctx, MsiXProbeEntryIndex);
-        Assert.True(*(uint*)((byte*)table + MsiXProbeEntryOffset + MsiXVectorControlOffset) == MsiXVectorControlMaskBit, "in-range MaskEntry must set the mask bit");
-        MsiX.UnmaskEntry(ctx, MsiXProbeEntryIndex);
-        Assert.True(*(uint*)((byte*)table + MsiXProbeEntryOffset + MsiXVectorControlOffset) == 0, "in-range UnmaskEntry must clear the mask bit");
+        bool connectHigh = TableConnectRefused(table, MsiXProbeEntryCount);
+        bool connectNegative = TableConnectRefused(table, -1);
+        bool maskHigh = !Throws(() => table.Mask(MsiXProbeEntryCount));
+        bool maskNegative = !Throws(() => table.Mask(-1));
+        bool unmaskHigh = !Throws(() => table.Unmask(MsiXOutOfRangeIndex));
+        bool disconnectHigh = !Throws(() => table.Disconnect(MsiXOutOfRangeIndex));
 
-        bool maskHigh = MsiXMaskRejects(ctx, MsiXProbeEntryCount);
-        bool maskNegative = MsiXMaskRejects(ctx, -1);
-        bool unmaskHigh = MsiXUnmaskRejects(ctx, MsiXOutOfRangeIndex);
-        PageAllocator.Free(table);
+        Assert.True(connectHigh, "TryConnect must refuse index == EntryCount");
+        Assert.True(connectNegative, "TryConnect must refuse a negative index");
+        Assert.True(maskHigh, "Mask must ignore index == EntryCount");
+        Assert.True(maskNegative, "Mask must ignore a negative index");
+        Assert.True(unmaskHigh, "Unmask must ignore an out-of-range index");
+        Assert.True(disconnectHigh, "Disconnect must ignore an out-of-range index");
+    }
 
-        Assert.True(maskHigh, "MaskEntry must reject index == EntryCount");
-        Assert.True(maskNegative, "MaskEntry must reject negative indices");
-        Assert.True(unmaskHigh, "UnmaskEntry must reject an out-of-range index");
+    // Single try/catch per helper (arm64 EH inlining quirk, see
+    // TryAllocateVector). True when the table refused the entry without
+    // throwing.
+    private static bool TableConnectRefused(PciMessageTable table, int index)
+    {
+        try
+        {
+            return !table.TryConnect(index, NoopHandler);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     // Single try/catch per helper (arm64 EH inlining quirk, see
     // TryAllocateVector).
-    private static bool MsiXMaskRejects(MsiXContext ctx, int index)
+    private static bool Throws(Action action)
     {
         try
         {
-            MsiX.MaskEntry(ctx, index);
+            action();
             return false;
         }
-        catch (ArgumentOutOfRangeException)
+        catch (Exception)
         {
             return true;
         }
-    }
-
-    private static bool MsiXUnmaskRejects(MsiXContext ctx, int index)
-    {
-        try
-        {
-            MsiX.UnmaskEntry(ctx, index);
-            return false;
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            return true;
-        }
-    }
-
-    // SetEntryMasked must bind and write the message like SetEntry but leave
-    // the mask bit set, so a half-built driver never sees the vector. The
-    // scratch table starts zeroed (every entry unmasked), so an entry that
-    // stays unmasked reads back 0. SetEntry is probed on the other entry to
-    // pin that existing callers still get an unmasked entry.
-    private static unsafe void TestMsiXSetEntryMaskedLeavesEntryMasked()
-    {
-        void* table = PageAllocator.AllocPages(PageType.Unmanaged, 1, zero: true);
-        Assert.True(table != null, "probe table allocation must succeed");
-        if (table == null)
-        {
-            return;
-        }
-
-        object? device = MsiRouting.PrepareDevice(SyntheticBus, SyntheticSlot, SyntheticFunction, MsiXProbeEntryCount);
-        MsiXContext ctx = new MsiXContext((ulong)table, MsiXProbeEntryCount, device);
-        byte* entry = (byte*)table + MsiXProbeEntryOffset;
-
-        MsiX.SetEntryMasked(ctx, MsiXProbeEntryIndex, NoopHandler);
-        uint maskedControl = *(uint*)(entry + MsiXVectorControlOffset);
-        uint maskedAddress = *(uint*)(entry + MsiXMessageAddressOffset);
-
-        MsiX.SetEntry(ctx, 0, NoopHandler);
-        uint unmaskedControl = *(uint*)((byte*)table + MsiXVectorControlOffset);
-
-        MsiRouting.ReleaseDevice(device);
-        PageAllocator.Free(table);
-
-        Assert.True(maskedControl == MsiXVectorControlMaskBit, "SetEntryMasked must leave the entry's mask bit set");
-        Assert.True(maskedAddress != 0, "SetEntryMasked must still write the message address");
-        Assert.True(unmaskedControl == 0, "SetEntry must keep unmasking the entry it programs");
     }
 
     // Binds entries of one oversized synthetic function until the vector /
@@ -516,64 +513,90 @@ public class Kernel : Sys.Kernel
         }
     }
 
-    // On a live function: Enable turns MSI-X on, a masked program stays
-    // masked in the device's own table, and Disable clears Enable, leaves
-    // Function Mask set and masks every entry. Enable masks every entry
-    // itself, so they are unmasked before Disable for the last check to
-    // depend on it; Function Mask goes on first, through config space, so
-    // the live function cannot signal an unmasked entry meanwhile.
-    private static void TestMsiXDisableClearsEnableAndMasks()
+    // On a live function, through the kit's table: the first connect enables
+    // MSI-X with Function Mask clear and INTx disabled and masks every entry,
+    // then each connect programs its own entry and leaves it unmasked; a
+    // second connect of a bound entry is refused; Mask and Unmask flip the
+    // entry's vector control bit; a disconnect that leaves another entry
+    // bound masks its entry and keeps MSI-X on, and the last one clears
+    // Enable, leaves Function Mask set and every entry masked, and gives
+    // back every vector / LPI the connects bound. While both entries are
+    // unmasked the function may signal one: NoopHandler takes the message
+    // and the dispatcher acknowledges it.
+    private static void TestMsiXTableLastDisconnectDisablesAndMasks()
     {
-        if (s_idleMsiXFunction is not PciDevice device)
+        if (s_idleMsiXFunction is not PciAccess pci || pci.MessageTable is not PciMessageTable table)
         {
             Assert.Fail("the gate found an idle MSI-X function, so it must still be recorded");
             return;
         }
 
-        byte cap = device.FindCapability(MsiX.CapId);
-        byte msgCtrlRegister = (byte)(cap + MsiXMessageControlOffset);
-        ushort savedCommand = device.ReadRegister16((byte)Config.Command);
-        ushort savedMsgCtrl = device.ReadRegister16(msgCtrlRegister);
+        byte capability = pci.FindCapability(MsiXCapabilityId);
+        ushort messageControlRegister = (ushort)(capability + MsiXMessageControlOffset);
+        ushort savedCommand = pci.ReadConfig16(PciCommandOffset);
+        ushort savedMessageControl = pci.ReadConfig16(messageControlRegister);
+        int slotsBefore = CountFreeSlots();
 
-        MsiXContext? enabled = MsiX.Enable(device);
-        Assert.True(enabled is not null, "Enable must succeed on a function with MSI-X and a routing backend");
-        if (enabled is not MsiXContext ctx)
+        bool connectedFirst = table.TryConnect(0, NoopHandler);
+        bool connectedSecond = table.TryConnect(MsiXProbeEntryIndex, NoopHandler);
+        if (!connectedFirst || !connectedSecond)
         {
+            table.Disconnect(0);
+            table.Disconnect(MsiXProbeEntryIndex);
+            RestoreFunction(pci, messageControlRegister, savedMessageControl, savedCommand);
+            Assert.Fail("both connects must succeed on an idle function with MSI-X and a routing backend");
             return;
         }
 
-        ushort enabledMsgCtrl = device.ReadRegister16(msgCtrlRegister);
-        MsiX.SetEntryMasked(ctx, 0, NoopHandler);
-        uint programmedControl = Native.MMIO.Read32(ctx.TableVirt + MsiXVectorControlOffset);
+        bool reconnectRefused = !table.TryConnect(0, NoopHandler);
+        ushort enabledMessageControl = pci.ReadConfig16(messageControlRegister);
+        ushort enabledCommand = pci.ReadConfig16(PciCommandOffset);
+        ulong entry = MsiXTableAddress(pci, capability);
+        uint programmedAddress = Native.MMIO.Read32(entry + MsiXMessageAddressOffset);
+        int maskedBound = CountMaskedEntries(entry, 0, MsiXProbeEntryCount);
+        int maskedUnbound = CountMaskedEntries(entry, MsiXProbeEntryCount, table.EntryCount);
 
-        device.WriteRegister16(msgCtrlRegister, (ushort)(device.ReadRegister16(msgCtrlRegister) | MsiXFunctionMaskBit));
-        for (int i = 0; i < ctx.EntryCount; i++)
-        {
-            MsiX.UnmaskEntry(ctx, i);
-        }
+        table.Mask(0);
+        uint maskedControl = Native.MMIO.Read32(entry + MsiXVectorControlOffset);
+        table.Unmask(0);
+        uint unmaskedControl = Native.MMIO.Read32(entry + MsiXVectorControlOffset);
 
-        int maskedBeforeDisable = CountMaskedEntries(ctx);
+        table.Disconnect(0);
+        ushort partialMessageControl = pci.ReadConfig16(messageControlRegister);
+        uint disconnectedControl = Native.MMIO.Read32(entry + MsiXVectorControlOffset);
 
-        MsiX.Disable(ctx);
-        ushort disabledMsgCtrl = device.ReadRegister16(msgCtrlRegister);
-        int maskedAfterDisable = CountMaskedEntries(ctx);
+        table.Disconnect(MsiXProbeEntryIndex);
+        ushort disabledMessageControl = pci.ReadConfig16(messageControlRegister);
+        int maskedAfterDisable = CountMaskedEntries(entry, 0, table.EntryCount);
 
-        RestoreFunction(device, msgCtrlRegister, savedMsgCtrl, savedCommand);
+        RestoreFunction(pci, messageControlRegister, savedMessageControl, savedCommand);
+        int slotsAfter = CountFreeSlots();
 
-        Assert.True((enabledMsgCtrl & MsiXEnableBit) != 0, "Enable must set MSI-X Enable");
-        Assert.True((programmedControl & MsiXVectorControlMaskBit) != 0, "SetEntryMasked must leave the live entry masked");
-        Assert.True(maskedBeforeDisable == 0, "every entry must read back unmasked before Disable, or the mask check below proves nothing");
-        Assert.True((disabledMsgCtrl & MsiXEnableBit) == 0, "Disable must clear MSI-X Enable");
-        Assert.True((disabledMsgCtrl & MsiXFunctionMaskBit) != 0, "Disable must leave Function Mask set");
-        Assert.True(maskedAfterDisable == ctx.EntryCount, "Disable must mask every table entry");
+        Assert.True(reconnectRefused, "a connect of an entry already bound must be refused");
+        Assert.True((enabledMessageControl & MsiXEnableBit) != 0, "the first connect must set MSI-X Enable");
+        Assert.True((enabledMessageControl & MsiXFunctionMaskBit) == 0, "the first connect must clear Function Mask");
+        Assert.True((enabledCommand & PciCommandInterruptDisable) != 0, "the first connect must disable the function's INTx line");
+        Assert.True(programmedAddress != 0, "a connect must write the message address");
+        Assert.True(maskedBound == 0, "both connected entries must read unmasked, or the mask checks below prove nothing");
+        Assert.True(maskedUnbound == table.EntryCount - MsiXProbeEntryCount, "the first connect must mask every entry no connect programmed");
+        Assert.True((maskedControl & MsiXVectorControlMaskBit) != 0, "Mask must set the entry's mask bit");
+        Assert.True((unmaskedControl & MsiXVectorControlMaskBit) == 0, "Unmask must clear the entry's mask bit");
+        Assert.True((partialMessageControl & MsiXEnableBit) != 0, "a disconnect that leaves an entry bound must keep MSI-X enabled");
+        Assert.True((disconnectedControl & MsiXVectorControlMaskBit) != 0, "a disconnect must mask its entry");
+        Assert.True((disabledMessageControl & MsiXEnableBit) == 0, "the last disconnect must clear MSI-X Enable");
+        Assert.True((disabledMessageControl & MsiXFunctionMaskBit) != 0, "the last disconnect must leave Function Mask set");
+        Assert.True(maskedAfterDisable == table.EntryCount, "after the last disconnect every table entry must read masked");
+        Assert.True(slotsAfter == slotsBefore, "the disconnects must give back every vector / LPI the connects bound");
     }
 
-    private static int CountMaskedEntries(MsiXContext ctx)
+    // Entries first to end - 1 of the table at tableAddress whose vector
+    // control mask bit reads set.
+    private static int CountMaskedEntries(ulong tableAddress, int first, int end)
     {
         int masked = 0;
-        for (int i = 0; i < ctx.EntryCount; i++)
+        for (int i = first; i < end; i++)
         {
-            ulong control = ctx.TableVirt + (ulong)(i * MsiXEntryStride) + MsiXVectorControlOffset;
+            ulong control = tableAddress + (ulong)(i * MsiXEntryStride) + MsiXVectorControlOffset;
             if ((Native.MMIO.Read32(control) & MsiXVectorControlMaskBit) != 0)
             {
                 masked++;
@@ -583,105 +606,145 @@ public class Kernel : Sys.Kernel
         return masked;
     }
 
-    // A second owner must be able to enable the same function after the
-    // first disabled it: fresh routing context, MSI-X on again with Function
-    // Mask clear, and an entry that programs. Disable must have released the
-    // first routing context before the second Enable, which would otherwise
-    // retire it itself; entry 0's message is cleared in between, so the
-    // address read back is the second program's and not the first one's.
-    private static void TestMsiXEnableDisableEnable()
+    // A second owner can connect the same function after the last
+    // disconnect disabled it: MSI-X on again with the Function Mask that
+    // disconnect left set cleared, and the entry programmed afresh. The
+    // routing context the first connect prepared is private to the table,
+    // so its release shows only in the slot count, which the two rounds
+    // must leave as they found it. Entry 0's message is cleared in between,
+    // so the address read back is the second connect's and not the first
+    // one's.
+    private static void TestMsiXTableConnectAfterDisconnect()
     {
-        if (s_idleMsiXFunction is not PciDevice device)
+        if (s_idleMsiXFunction is not PciAccess pci || pci.MessageTable is not PciMessageTable table)
         {
             Assert.Fail("the gate found an idle MSI-X function, so it must still be recorded");
             return;
         }
 
-        byte cap = device.FindCapability(MsiX.CapId);
-        byte msgCtrlRegister = (byte)(cap + MsiXMessageControlOffset);
-        ushort savedCommand = device.ReadRegister16((byte)Config.Command);
-        ushort savedMsgCtrl = device.ReadRegister16(msgCtrlRegister);
+        byte capability = pci.FindCapability(MsiXCapabilityId);
+        ushort messageControlRegister = (ushort)(capability + MsiXMessageControlOffset);
+        ushort savedCommand = pci.ReadConfig16(PciCommandOffset);
+        ushort savedMessageControl = pci.ReadConfig16(messageControlRegister);
+        int slotsBefore = CountFreeSlots();
 
-        MsiXContext? first = MsiX.Enable(device);
-        Assert.True(first is not null, "the first Enable must succeed");
-        if (first is not MsiXContext firstCtx)
+        if (!table.TryConnect(0, NoopHandler))
         {
+            RestoreFunction(pci, messageControlRegister, savedMessageControl, savedCommand);
+            Assert.Fail("the first connect must succeed on an idle function with MSI-X and a routing backend");
             return;
         }
 
-        MsiX.SetEntryMasked(firstCtx, 0, NoopHandler);
-        MsiX.Disable(firstCtx);
-        bool firstContextReleased = !TryBindEntry(firstCtx.DeviceCtx, 0);
-        if (!firstContextReleased)
-        {
-            MsiRouting.ReleaseDevice(firstCtx.DeviceCtx);
-        }
+        ulong entry = MsiXTableAddress(pci, capability);
+        table.Disconnect(0);
+        ushort disabledMessageControl = pci.ReadConfig16(messageControlRegister);
 
         // MSI-X is off and every entry masked: clearing the message cannot
         // make the function signal anything.
-        ulong firstEntry = firstCtx.TableVirt;
-        Native.MMIO.Write32(firstEntry + MsiXMessageAddressOffset, 0);
-        Native.MMIO.Write32(firstEntry + MsiXMessageUpperAddressOffset, 0);
-        Native.MMIO.Write32(firstEntry + MsiXMessageDataOffset, 0);
+        Native.MMIO.Write32(entry + MsiXMessageAddressOffset, 0);
+        Native.MMIO.Write32(entry + MsiXMessageUpperAddressOffset, 0);
+        Native.MMIO.Write32(entry + MsiXMessageDataOffset, 0);
 
-        MsiXContext? second = MsiX.Enable(device);
-        Assert.True(second is not null, "Enable after Disable must succeed on the same function");
-        if (second is not MsiXContext secondCtx)
-        {
-            RestoreFunction(device, msgCtrlRegister, savedMsgCtrl, savedCommand);
-            return;
-        }
-
-        ushort reenabledMsgCtrl = device.ReadRegister16(msgCtrlRegister);
-        MsiX.SetEntryMasked(secondCtx, 0, NoopHandler);
-        ulong entry = secondCtx.TableVirt;
+        bool reconnected = table.TryConnect(0, NoopHandler);
+        ushort reconnectedMessageControl = pci.ReadConfig16(messageControlRegister);
         uint address = Native.MMIO.Read32(entry + MsiXMessageAddressOffset);
         uint control = Native.MMIO.Read32(entry + MsiXVectorControlOffset);
-        MsiX.Disable(secondCtx);
+        table.Disconnect(0);
 
-        RestoreFunction(device, msgCtrlRegister, savedMsgCtrl, savedCommand);
+        RestoreFunction(pci, messageControlRegister, savedMessageControl, savedCommand);
+        int slotsAfter = CountFreeSlots();
 
-        Assert.True(firstContextReleased, "Disable must release the routing context, so binding through it fails");
-        Assert.True((reenabledMsgCtrl & MsiXEnableBit) != 0, "the second Enable must set MSI-X Enable again");
-        Assert.True((reenabledMsgCtrl & MsiXFunctionMaskBit) == 0, "the second Enable must clear the Function Mask Disable left set");
-        Assert.True(address != 0, "an entry of the re-enabled function must program");
-        Assert.True((control & MsiXVectorControlMaskBit) != 0, "the re-programmed entry must stay masked");
+        Assert.True((disabledMessageControl & MsiXFunctionMaskBit) != 0, "the last disconnect must leave Function Mask set, or the clear checked below proves nothing");
+        Assert.True(reconnected, "a connect after the last disconnect must succeed on the same function");
+        Assert.True((reconnectedMessageControl & MsiXEnableBit) != 0, "the second connect must set MSI-X Enable again");
+        Assert.True((reconnectedMessageControl & MsiXFunctionMaskBit) == 0, "the second connect must clear the Function Mask the disconnect left set");
+        Assert.True(address != 0, "the entry of the reconnected function must program");
+        Assert.True((control & MsiXVectorControlMaskBit) == 0, "the reprogrammed entry must be unmasked");
+        Assert.True(slotsAfter == slotsBefore, "two connect and disconnect rounds must give back every vector / LPI they bound");
+    }
+
+    // The table's virtual address through the HHDM alias, decoded as the
+    // kit's table decodes it: Table Offset/Table BIR names the base address
+    // register and the offset into its window. Read only after a connect
+    // succeeded, which mapped the window.
+    private static ulong MsiXTableAddress(PciAccess pci, byte capability)
+    {
+        uint tableOffsetBir = pci.ReadConfig32((ushort)(capability + MsiXTableOffsetBirOffset));
+        PciBar bar = pci.Bars[(int)(tableOffsetBir & MsiXTableBirMask)];
+        return bar.Base + (tableOffsetBir & MsiXTableOffsetMask) + DeviceMemory.HhdmOffset();
     }
 
     // Puts back what the borrowed function's driver had: Message Control
-    // (MSI-X off) and the Command register, whose INTx Disable bit Enable
-    // set and Disable leaves for the owner to restore.
-    private static void RestoreFunction(PciDevice device, byte msgCtrlRegister, ushort savedMsgCtrl, ushort savedCommand)
+    // (MSI-X off) and Command's INTx disable bit, which the first connect
+    // sets and the last disconnect leaves for the owner to restore. Only
+    // that bit of Command is written, under the mechanism's lock, so the
+    // decode and bus master bits the driver owns are never replaced with a
+    // stale copy.
+    private static void RestoreFunction(PciAccess pci, ushort messageControlRegister, ushort savedMessageControl, ushort savedCommand)
     {
-        device.WriteRegister16(msgCtrlRegister, savedMsgCtrl);
-        device.WriteRegister16((byte)Config.Command, savedCommand);
+        pci.WriteConfig16(messageControlRegister, savedMessageControl);
+        pci.SetInterruptDisable((savedCommand & PciCommandInterruptDisable) != 0);
     }
 
-    // The first function with an MSI-X capability that is not enabled and
-    // whose memory decode is on, so its table is reachable. Only such a
-    // function can be borrowed without taking interrupts from a driver.
-    private static PciDevice? FindIdleMsiXFunction()
+    // The first PCI function the kit published with no assigned base
+    // address register (q35's and virt's host bridge at 00:00.0), for the
+    // scratch table the bounds cell builds over its access: a TryConnect
+    // that got past a broken index guard has no window to map there.
+    private static PciAccess? FindBarlessPciFunction()
     {
-        PciDevice[]? devices = PciManager.Devices;
-        if (devices is null)
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
         {
-            return null;
+            if (nodes[i].TryGetAccess(out PciAccess? pci) && !HasAssignedBar(pci))
+            {
+                return pci;
+            }
         }
 
-        for (int i = 0; i < PciManager.Count && i < devices.Length; i++)
+        return null;
+    }
+
+    // True when the kit sized any of the function's base address registers
+    // as decoding something.
+    private static bool HasAssignedBar(PciAccess pci)
+    {
+        ReadOnlySpan<PciBar> bars = pci.Bars;
+        for (int i = 0; i < bars.Length; i++)
         {
-            PciDevice device = devices[i];
-            byte cap = device.FindCapability(MsiX.CapId);
-            if (cap == 0)
+            if (bars[i].IsAssigned)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // The first PCI function the kit published whose MSI-X capability is
+    // not enabled, whose memory decoding is on, so its table is reachable,
+    // and whose table holds the two entries the live cells connect. The kit
+    // enables the capability at a driver's first message connect, so a
+    // clear Enable bit means no driver holds a message on the function:
+    // only such a function can be borrowed without taking interrupts from a
+    // driver.
+    private static PciAccess? FindIdleMsiXFunction()
+    {
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            if (!nodes[i].TryGetAccess(out PciAccess? pci)
+                || pci.MessageTable is not PciMessageTable table
+                || table.EntryCount < MsiXProbeEntryCount)
             {
                 continue;
             }
 
-            ushort msgCtrl = device.ReadRegister16((byte)(cap + MsiXMessageControlOffset));
-            ushort command = device.ReadRegister16((byte)Config.Command);
-            if ((msgCtrl & MsiXEnableBit) == 0 && (command & (ushort)PciCommand.Memory) != 0)
+            byte capability = pci.FindCapability(MsiXCapabilityId);
+            ushort messageControl = pci.ReadConfig16((ushort)(capability + MsiXMessageControlOffset));
+            ushort command = pci.ReadConfig16(PciCommandOffset);
+            if ((messageControl & MsiXEnableBit) == 0 && (command & PciCommandMemorySpace) != 0)
             {
-                return device;
+                return pci;
             }
         }
 

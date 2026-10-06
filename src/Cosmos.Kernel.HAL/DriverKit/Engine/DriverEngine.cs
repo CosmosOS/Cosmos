@@ -322,7 +322,7 @@ internal static class DriverEngine
 
             // Even when resources leaked: a function whose driver thread is
             // stuck still has its bus mastering turned off. A node nobody
-            // bound is left alone: a legacy driver may operate its function.
+            // bound is left alone: its function stays as firmware left it.
             if (node.Binding is not null && node.AccessObject is INodeHooks hooks)
             {
                 try

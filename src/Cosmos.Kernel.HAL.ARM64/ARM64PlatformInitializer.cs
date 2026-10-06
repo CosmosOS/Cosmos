@@ -59,14 +59,6 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     public IPowerOps CreatePowerOps() => new ARM64PowerOps();
     public IInterruptController CreateInterruptController() => new ARM64InterruptController();
 
-    public void PreparePciMapping(ulong ecamBase)
-    {
-        if (ecamBase != 0)
-        {
-            DeviceMapper.EnsureMapped(ecamBase);
-        }
-    }
-
     public bool EnsureMmioMapped(ulong physBase)
     {
         // Limine's HHDM on aarch64 only covers RAM with Normal-cacheable
@@ -136,7 +128,7 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     /// order of preference. One PCI host node over the ECAM window, from
     /// ACPI's MCFG when an entry exists, else from the device tree's
     /// <c>pci-host-ecam-generic</c> node when the bootloader handed a tree
-    /// over, else none (the legacy scan stays the only PCI path), when PCI
+    /// over, else none (the machine then has no PCI), when PCI
     /// is compiled in. Then one platform node per occupied virtio-mmio
     /// slot, always: from the device tree's <c>virtio,mmio</c> nodes when
     /// there is a tree, else from the virt machine's hardcoded window; a
