@@ -996,15 +996,14 @@ A USB stick present at boot, for example:
 
 ## PS/2 devices
 
-A PS/2 node is what the shipped 8042 driver publishes for one port of the keyboard controller, beneath the controller's platform node: `ps2:kbd` for the first port and `ps2:aux` for the second. It has an identity that is the port and nothing else, no resources, one interrupt source the kit owns, and a `Ps2Access` for everything a class driver does: the byte stream from the port and the command exchange with the device behind it. The device is identified by the class driver, which resets it anyway: the keyboard driver bound to `ps2:kbd` finds out whether a keyboard answers. A class driver such as the shipped `Ps2KeyboardDriver` sees only the access and never a port or a configuration byte; the controller side is the 8042 driver, described [below](#the-8042-driver), and the snippets in this section are the shipped drivers' steps. The bus exists on x64 only, where the machine description publishes the controller node; the virt machine has no 8042 and the ARM64 description publishes none ([Platform nodes](#platform-nodes)).
+A PS/2 node is one port of the 8042 controller, published by `I8042Driver`: `ps2:kbd` for the keyboard port and `ps2:aux` for the mouse port. It has no resources, one interrupt source and a `Ps2Access` to talk to the device. The class driver finds out what is plugged in. PS/2 exists on x64 only.
 
 ### PS/2 identity and match
 
-`Ps2Identity(port)` takes a `Ps2Port`, `Keyboard` (the first port: IRQ 1, the 8042 commands 0xAB, 0xAD and 0xAE, configuration bit 0) or `Auxiliary` (the second port: IRQ 12, the commands 0xA9, 0xA7 and 0xA8, the 0xD4 write prefix, configuration bit 1), and throws `ArgumentOutOfRangeException` for any other value. `BusName` is `ps2` and `Address` is `kbd` or `aux`, so the paths are `ps2:kbd` and `ps2:aux`; `Describe()` prints `port kbd` or `port aux`, which is what `DeviceNodeInfo.Description` shows for the node. The constructor is public, as `PlatformIdentity`'s is: the 8042 driver in `Cosmos.Kernel.Drivers` builds one, and so can a test.
-
-`Ps2Match.Port(port)` matches the node of that port at specificity 1, and it is the only shape: there is no match for any port, because the bus has two ports of different kinds and a driver matching both would be offered a mouse's port as a keyboard. Each shipped class driver matches one port:
+A driver matches one port, never both, since a keyboard and a mouse speak different protocols:
 
 ```csharp
+// In the driver:
 using Cosmos.Kernel.HAL.DriverKit.Ps2;
 
 private readonly DeviceMatch[] _matches = [Ps2Match.Port(Ps2Port.Keyboard)];
@@ -1012,55 +1011,74 @@ private readonly DeviceMatch[] _matches = [Ps2Match.Port(Ps2Port.Keyboard)];
 
 ### The PS/2 access object
 
-`binding.Node.Access<Ps2Access>()` is the interface. The access is one per port, constructed by the 8042 driver over its `Ps2Controller`; the kit holds the protocol (the exchange, the receive ring, the port's source) and nothing of the hardware, which the controller driver maps and connects. Its members, with their contexts:
+`binding.Node.Access<Ps2Access>()` is the port:
 
-- `Port` and `DeliversUnattended`, any context: the second is true when bytes reach the access after the probe returns, because the controller's lines are connected or its driver drains it periodically. A class driver declines a port that is neither (`no interrupt and no timer to poll with`): a keyboard bound on such a controller would never deliver a key after its probe.
-- `OverrunCount`, any context: how many stream bytes the full ring dropped. The ring holds `ReceiveRingBytes` (16) bytes and, when full, drops its oldest byte and counts the overrun.
-- `InterruptsForPublish()`, thread context: the node's one interrupt source, the port's, in a fresh array for the controller driver to hand to `PublishChild` exactly once.
-- `Deliver(value)`, any context (the controller driver's interrupt handler, its periodic drain, or a poll inside an exchange), allocation-free, under no kit lock but the access's own spin lock: a byte the status register attributed to this port. It completes the step of the exchange in flight (an acknowledgement, a resend request or a reply byte) and signals the exchange's waiter, or appends the byte to the receive ring and raises the port's source; a byte does one or the other, never both. The source is raised with interrupts disabled, so the class driver's handler gets the masked context every source promises even when the delivery came from a poll in thread context, and the handler runs under its own trampoline: an exception there is counted on the PS/2 node and masks that node's handle, never the 8042's line.
-- `TryReceive(out value)`, any context, allocation-free: takes the oldest byte off the receive ring, `false` when it is empty. The class driver's handler drains the ring with it.
-- `TryCommand(command, arguments, reply, out replyLength, timeoutMilliseconds)`, thread context (a probe, `OnDetach` or the ring's indicator work item on the kit worker; from an interrupt handler it stops the way a binding member does): sends `command` and then each of `arguments` to the device, each acknowledged by 0xFA (`Acknowledge`) within the remaining time, where 0xFE (`Resend`) makes the access send that byte again, up to `MaxResends` (3) times; then it collects up to `reply.Length` reply bytes, ending at `reply.Length`, at the first gap of `ReplyGapMilliseconds` (20) once one byte arrived, or at the deadline with what arrived, so an AT keyboard's empty answer to Identify is `replyLength` 0 and `true`. It returns `false` when a byte is not acknowledged within `timeoutMilliseconds` counted from the call, when the resends ran out, when the controller could not accept a byte, or when another exchange is in flight on this port. The access does not judge a reply: a Reset's failure code (0xFC or 0xFD) comes back as `reply[0]` and the driver reads it. A `reply` longer than `MaxReplyBytes` (8) is an `ArgumentOutOfRangeException`. One exchange runs at a time per port, and the exchanges of the two ports are serialized by their callers, all on the worker. The exchange waits on the access's own `DeviceEvent`, which `Deliver` signals for every step it completes, so on an interrupt driven controller every acknowledgement wakes the waiter at once; on a controller that is not interrupt driven each wait polls the controller first and then sleeps 1 ms.
+- `TryCommand(command, arguments, reply, out replyLength, timeoutMilliseconds)` sends a command and its arguments, waits for the device to acknowledge each byte, and collects the reply. Thread context.
+- `TryReceive(out value)` takes the next byte the device sent on its own, such as a scan code. Any context, so the handler uses it.
+- `DeliversUnattended` is `false` when the controller can neither interrupt nor be polled; decline the port then.
 
-A byte that arrives while no exchange is in flight is a stream byte; an exchange's acknowledgements and reply bytes are consumed by the exchange and never reach the ring, which is how the two 0xFA a keyboard answers to an indicator write are never parsed as scan codes.
+Bytes that answer a command go to `TryCommand`, never to `TryReceive`. A keyboard probe resets the device, publishes the keyboard, connects the port's interrupt, then starts scanning:
+
+```csharp
+// In Probe:
+Ps2Access ps2 = binding.Node.Access<Ps2Access>();
+if (!ps2.DeliversUnattended)
+{
+    return ProbeResult.Declined("no interrupt and no timer to poll with");
+}
+
+Span<byte> reply = stackalloc byte[1];
+if (!ps2.TryCommand(Reset, [], reply, out int count, 1000) || count == 0 || reply[0] != SelfTestPassed)
+{
+    return ProbeResult.Declined("no keyboard on the port");
+}
+
+state.Sink = binding.PublishKeyboard(state);   // before scanning starts
+if (!binding.TryRequestInterrupt(binding.Node.Interrupts[0], state.OnInterrupt, out _))
+{
+    return ProbeResult.Failed("the port's interrupt could not be connected");
+}
+
+if (!ps2.TryCommand(EnableScanning, [], [], out _, 100))
+{
+    return ProbeResult.Failed("enable scanning was not acknowledged");
+}
+
+// In the state object, in interrupt context:
+public void OnInterrupt(InterruptContext context)
+{
+    while (_ps2.TryReceive(out byte value))
+    {
+        // decode the scan code and hand it to Sink.Report
+    }
+}
+```
 
 ### The controller contract
 
-`Ps2Controller` is the abstract class the 8042 driver's state object implements, in the `UsbHostController` shape: two public state properties, two protected members the controller driver implements and the internal forwarders the access calls, so a class driver holding a reference can read the state but reach neither core. `InterruptDriven`, any context, is true once the controller's lines are connected, so a byte reaches `Deliver` from the controller driver's interrupt handler without anyone polling; `PolledPeriodically`, any context, is true when the controller driver drains the status register from a periodic work item on the kit worker because a line could not be routed; `TrySendCore(port, value)`, thread context, writes one byte to the port's device (the 0xD4 prefix for the auxiliary port, then the byte, each after the controller's input buffer emptied) and returns `false` when the input buffer did not empty within the controller driver's bound; `PollCore()`, thread context, reads the status register and, while the output buffer is full, up to 16 bytes per call, hands each byte to the `Deliver` of the port the status attributes it to. `DeliversUnattended` on the access is `InterruptDriven || PolledPeriodically`. The shipped `I8042State` is the one implementation.
+`Ps2Controller` is what a controller driver implements to send bytes to a port and hand back the bytes it reads. `I8042State` is the only implementation, and a class driver never uses it.
 
 ### The 8042 driver
 
-`I8042Driver` (`[Driver]` with no feature, since the controller serves two; `PlatformMatch.Compatible("pnp0303")`) is a bus driver over the x64 machine description's `platform:i8042@60` node, with everything for one controller on an `I8042State` hung off `binding.DriverState`. Its probe declines `keyboard and mouse support are off` when both switches are off, maps the two one-port windows (resource 0 the data port, resource 1 the status and command port), creates its lock and brings the controller up with controller commands, every status read paired with a data read or a command write under the lock and every wait bounded in time (10 ms for the input buffer to empty or a reply to land, the status read every 10 microseconds through `binding.Delay` outside the lock): both ports disabled (failed `the controller does not accept commands`), the output buffer flushed, the configuration byte read (failed `the controller did not answer the configuration read`) and written back with both interrupt enables clear and translation on, so the keyboard port delivers set 1 scan codes whatever firmware left; the self test (failed `self test failed` unless it answers 0x55), then the configuration written again, since some controllers reset it on 0xAA; the dual channel probe (the second port exists when its clock bit clears once the port is enabled); and the interface tests, 0xAB for the keyboard port and 0xA9 for the auxiliary one, logged `port kbd test failed: 0x..` or `port aux test failed: 0x..` when the reply is not 0x00 (failed `no port passed its interface test` when neither passed). It then flushes again, creates a `Ps2Access` per port that passed, and requests the node's two line sources, line 1 and line 12, with one handler for both: the status register's bit 5 picks the port, not the vector that fired. The controller is interrupt driven only when every line a passed port needs connected; otherwise a work item drains it every 20 ms through `TrySchedulePeriodic`, and a handle connected for one line while the other was refused stays connected and harmless. The configuration is written once more with the interrupt enables of the connected lines, the ports that passed are enabled, the buffer is drained once (a byte that landed before the enables produced no edge on an edge-triggered line), and the children are published, keyboard first, with `PublishChild(new Ps2Identity(port), [], access.InterruptsForPublish(), access)`; from the worker their offers queue behind the probe. The log line is `dual channel, translation on, lines 1 and 12` on q35, `single channel` for a controller without a second port, `line 1` or `line 12` when one port failed its interface test, `polled every 20 ms` when the lines could not be routed and `no interrupt and no timer` when the drain could not be scheduled either, which makes the class drivers decline. The handler drains up to 16 bytes per run and hands each to its port's access through `Deliver` (counted in `BytesDelivered`, or in `StrayBytes` for a port with no access), counting a run that found the buffer empty in `SpuriousInterrupts`; `Deliver` is always called outside the lock, since it reaches the class driver's handler and its sink. The state also carries `IsDualChannel`, `InterruptDriven`, `PolledPeriodically`, `KeyboardNode` and `AuxiliaryNode` for the Drivers suite. `OnDetach`, with the hardware present, disables both ports, flushes the output buffer and writes the configuration back with both interrupt enables clear; the kit tore the two children down and disconnected the two line handles before it runs, and the windows are still valid. The 8042 node is a root the machine description publishes and is never retracted: a PS/2 controller has no hot-plug slot. The driver is the only code that touches ports 0x60 and 0x64 while the kernel runs; `X64PowerOps.Reboot` writes 0xFE to 0x64 behind it on the way out, which no driver can claim against.
-
-Sends to the two ports are serialized by their callers, not by the controller: the 0xD4 prefix and its data byte are two writes with a wait between them that the lock cannot make atomic, and every `TryCommand` of the shipped drivers runs on the kit worker (a probe, an `OnDetach`, the ring's indicator item), one job at a time. A caller from another thread would need a controller-wide send flag taken under the lock around the pair; none exists today.
+`I8042Driver` binds `platform:i8042@60`. It tests the controller and its two ports, connects IRQ 1 and IRQ 12 (or polls every 20 ms when it cannot), and publishes one node per working port. It is the only code that touches ports `0x60` and `0x64`.
 
 ### The PS/2 class drivers
 
-`Ps2KeyboardDriver` (`[Driver(Feature = DriverFeature.Keyboard)]`, `Ps2Match.Port(Ps2Port.Keyboard)`) declines `no interrupt and no timer to poll with` on a port whose access does not deliver unattended, resets the device with a 1 s bound (declined `no keyboard on the port` when nothing acknowledges the reset; failed `the keyboard did not pass its self test` unless the completion byte is 0xAA, so 0xFC, 0xFD and a missing byte all fail), disables scanning (0xF5, unchecked: a key held during boot would otherwise put a scan code in the identify reply), identifies the device (0xF2, failed `identify was not acknowledged`; no reply is an AT keyboard, accepted; `ab 41`, `ab c1` or `ab 83` is an MF2 keyboard; anything else, a mouse's id among them, is declined `not a keyboard` and the port left unbound), turns the indicators off (0xED 0x00, unchecked), hangs a `Ps2KeyboardState` off `binding.DriverState`, empties the ring of whatever the exchanges did not consume, connects the port's source (failed `the port's interrupt source could not be connected`, which the kit's source refuses only when already connected), publishes the keyboard as `ps2-keyboard` before scanning is enabled, so a scan code never finds a null sink, enables scanning (0xF4, failed `enable scanning was not acknowledged`, and the unwind withdraws the keyboard) and logs `MF2 keyboard (id ab 41), scanning` or `AT keyboard (no identify reply), scanning`. The handler drains the ring and decodes each byte: 0x00 and 0xFF are ignored, the 0xE0 prefix is remembered for the code that follows, the release bit is folded out, and the extended Alt (E0 38) becomes the right Alt's code 0x60, which the ring's layouts expect and every keyboard driver reports; every other extended key keeps its bare code. `SetLeds`, thread context on the kit worker when a lock key toggles on any keyboard, sends 0xED and the indicator byte (scroll lock in bit 0, num lock in bit 1, caps lock in bit 2, `KeyboardLeds`' own order), which lights the PS/2 keyboard's indicators for the first time: the old driver never did. The state keeps `IsAtKeyboard`, `IdentityByte`, `BytesReceived`, `KeyEvents`, `LedWrites`, `LastLedByte` and `LastLedAcknowledged` for the Drivers suite. `OnDetach` disables scanning when the hardware is present; the handle is already disconnected, so the acknowledgement reaches the exchange and nothing is raised.
+| Driver | Port | Publishes |
+|--------|------|-----------|
+| `Ps2KeyboardDriver` | `ps2:kbd` | a keyboard, `ps2-keyboard` (AT and MF2 keyboards, with their indicators) |
+| `Ps2MouseDriver` | `ps2:aux` | a pointer, `ps2-mouse` (standard and wheel mice) |
 
-`Ps2MouseDriver` (`[Driver(Feature = DriverFeature.Mouse)]`, `Ps2Match.Port(Ps2Port.Auxiliary)`) declines the same way on a port that does not deliver unattended, resets the device with a 1 s bound (declined `no mouse on the port`; failed `the mouse did not pass its self test` unless the completion byte is 0xAA; declined `not a mouse` unless the id byte 0x00 follows it, since a keyboard answers 0xAA alone and would otherwise be bound as a mouse), sets the defaults (0xF6, failed `set defaults was not acknowledged`), knocks the IntelliMouse sequence (sample rates 200, 100 and 80 through 0xF3) and identifies: id 0x03 with every rate acknowledged is a wheel mouse, id 0x00 a standard one, and when the knock and the id do not agree (an identify not answered, another id, or the wheel id with a rate refused) the device is reset and its defaults set again, so it is back to 3-byte packets (failed `the reset after an unconfirmed knock was not answered`). It hangs a `Ps2MouseState` off `binding.DriverState`, empties the ring, connects the port's source, publishes the pointer as `ps2-mouse` before reporting is enabled, enables data reporting (0xF4, failed `enable data reporting was not acknowledged`) and logs `wheel mouse (id 03), 4-byte packets, reporting` or `standard mouse (id 00), 3-byte packets, reporting`. The handler assembles packets of 3 bytes, 4 with a wheel: a first byte whose bit 3 is clear is not a packet start and is dropped (`ResyncDrops`), so a lost or doubled byte costs one packet and not every packet after it; a whole packet is parsed into the buttons (bits 0 to 2 of the first byte), X and Y sign-extended from bits 4 and 5 with Y inverted, since PS/2 points it up, and the wheel from the signed fourth byte, the overflow bits ignored, and reported as one `ReportRelative`. The state keeps `HasWheel`, `PacketBytes`, `BytesReceived`, `PacketsReported` and `ResyncDrops`. `OnDetach` disables reporting when the hardware is present.
-
-Neither class driver touches a port or a configuration byte: the 8042 driver is the only one reaching 0x60 and 0x64. The bare x64 cell of the Drivers suite, on q35, logs the controller and its two ports in this order, with the PCI host node and the suite's own `synthetic:boot` node, both queued before the port nodes, offered between the two:
+Both are published during the driver stage, so a kernel finds them in `OnBoot`. PS/2 has no hot-plug.
 
 ```
-[Drivers] platform:i8042@60 candidates: I8042Driver(prio 0, spec 1)
-[InterruptManager] Routing IRQ 1 -> vector 0x21
-[InterruptManager] Routing IRQ C -> vector 0x2C
-[Drivers] platform:i8042@60 I8042Driver: dual channel, translation on, lines 1 and 12
-[Drivers] platform:i8042@60 offer I8042Driver -> bound
-...
-[Drivers] ps2:kbd candidates: Ps2KeyboardDriver(prio 0, spec 1)
-[KeyboardManager] Registered keyboard, total: 1
 [Drivers] ps2:kbd Ps2KeyboardDriver published keyboard "ps2-keyboard" (consumed)
 [Drivers] ps2:kbd Ps2KeyboardDriver: MF2 keyboard (id ab 41), scanning
 [Drivers] ps2:kbd offer Ps2KeyboardDriver -> bound
-[Drivers] ps2:aux candidates: Ps2MouseDriver(prio 0, spec 1)
-[MouseManager] Registered mouse, total: 1
 [Drivers] ps2:aux Ps2MouseDriver published pointer "ps2-mouse" (consumed)
 [Drivers] ps2:aux Ps2MouseDriver: wheel mouse (id 03), 4-byte packets, reporting
 [Drivers] ps2:aux offer Ps2MouseDriver -> bound
 ```
-
-The two `[InterruptManager]` lines are the line routing connecting IRQ 1 and IRQ 12 from the probe; the managers' lines come before the `published` lines because the kit notifies the consumer, which writes the manager's line, before it writes its own. The PS/2 keyboard and mouse are published once, during the driver stage, so a kernel reading `KeyboardManager` in `OnBoot` finds them, as it finds a USB keyboard present at boot; there is no PS/2 hot-plug, and the port nodes are never retracted. The Drivers suite reads the drivers through the ring and their state objects, never the log, and drives them with a key and pointer events the engine injects over QMP ([Testing](../dev/testing.md#drivers-tests)).
 
 ## Observing drivers
 
