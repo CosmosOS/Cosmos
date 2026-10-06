@@ -47,5 +47,4 @@ Features planned after first release:
 | **Code execution** | ❌ Not Started | Userland WASM VM |
 | **The GIC, the ITS and the clocks from the device tree** | ❌ Not Started | Today the ARM64 interrupt controller comes from ACPI or the virt defaults, so an acpi=off boot has no MSI; the platform bus already reads the tree. x64 never has one. |
 | **PCI hot-plug beyond native PCI Express slots** | ❌ Not Started | ACPI (GPE) hot-plug, which QEMU uses on q35's root ports without the ICH9-LPC global and on conventional PCI bridges; downstream switch ports are matched but untested. |
-| **Driver thread start under load** | ❌ Not Started | Core's 50 ms thread start handshake (`KernelThread.StartTimeoutMs`) can expire on a slow emulated machine early in the boot; the PCI Express root port driver retries its slot thread, the xHCI and hub drivers start theirs once. |
 

@@ -919,10 +919,16 @@ public static class SchedulerManager
 
     // ========== Timer Interrupt Handling ==========
 
-    // Debug counter to avoid flooding serial output
     private static uint s_tickCount;
 
     private static ulong s_tickPeriodNs;
+
+    /// <summary>
+    /// Timer interrupts handled since boot, counted before every early
+    /// return of <see cref="OnTimerInterrupt"/>, so a tick that schedules
+    /// nothing still counts. Wraps: compare differences. Any context.
+    /// </summary>
+    internal static uint TickCount => Volatile.Read(ref s_tickCount);
 
     /// <summary>
     /// Interval between scheduler ticks in nanoseconds, as the timer last

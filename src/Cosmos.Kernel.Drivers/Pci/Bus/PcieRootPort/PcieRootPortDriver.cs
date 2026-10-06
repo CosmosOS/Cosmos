@@ -40,15 +40,6 @@ public sealed class PcieRootPortDriver : Driver
     /// <summary>The slot thread's name, for the log.</summary>
     private const string ThreadName = "pcie-slot";
 
-    /// <summary>
-    /// How many times the probe asks for the slot thread. A start fails at
-    /// once without a scheduler, but also when the scheduler did not switch
-    /// to the new thread within the kit's start window, which a slow
-    /// emulated machine early in the boot occasionally misses; the later
-    /// attempts cover that.
-    /// </summary>
-    private const int ThreadStartAttempts = 3;
-
     // --- Private fields ---
 
     private readonly DeviceMatch[] _matches =
@@ -168,13 +159,7 @@ public sealed class PcieRootPortDriver : Driver
         state.WaitCommandCompleted(stopWhenDetaching: false);
 
         // 10. The thread; without a scheduler, the boot-time publish only.
-        bool started = false;
-        for (int attempt = 0; attempt < ThreadStartAttempts && !started; attempt++)
-        {
-            started = binding.TryStartThread(ThreadName, state.ThreadMain, out _);
-        }
-
-        state.HotPlugRunning = started;
+        state.HotPlugRunning = binding.TryStartThread(ThreadName, state.ThreadMain, out _);
         if (!state.HotPlugRunning)
         {
             binding.Log("hot-plug off (no scheduler)");

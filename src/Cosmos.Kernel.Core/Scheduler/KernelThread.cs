@@ -19,20 +19,31 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// scheduling (a boot CPU whose APIC ID is not 0), keeps
 /// that call spinning forever. <see cref="TryStart(Action)"/> builds the thread on
 /// the scheduler directly, as <c>SystemNative_CreateThread</c> does for
-/// CoreLib, and gives it <see cref="StartTimeoutMs"/> of
-/// <see cref="Stopwatch"/> time to report that it runs. The Stopwatch
-/// reads the TSC on x64 and the generic timer's counter on ARM64: both
-/// count with interrupts masked and no tick, so the wait ends whatever the
-/// scheduler does.</para>
+/// CoreLib, and waits for it in scheduler ticks: the threads queued ahead
+/// of it get a quantum each, then it does, so a scheduler that let
+/// <see cref="StartGraceTicks"/> more ticks pass without running it does
+/// not switch. Time is not the measure, since a switch only happens on a
+/// tick, and under emulation the counter the <see cref="Stopwatch"/> reads
+/// (the TSC on x64, the generic timer's on ARM64) runs on host time: a
+/// descheduled virtual CPU sees milliseconds pass while it takes no tick.
+/// The Stopwatch bounds only the stretch between two ticks,
+/// <see cref="NoTickTimeoutMs"/>, which ends only for a timer that stopped.</para>
 /// </summary>
 internal static unsafe partial class KernelThread
 {
     /// <summary>
-    /// Longest wait for a new thread to begin, in milliseconds: five of the
-    /// scheduler's 10 ms quanta, so a scheduler that switches at all has
-    /// started it well before.
+    /// Ticks a new thread may wait beyond one per thread queued with it
+    /// before the scheduler counts as not switching to it: the tick that
+    /// preempts the creator, and one of margin.
     /// </summary>
-    internal const uint StartTimeoutMs = 50;
+    internal const uint StartGraceTicks = 2;
+
+    /// <summary>
+    /// Longest stretch without a scheduler tick, in milliseconds, before the
+    /// timer counts as stopped and the wait ends: a hundred 10 ms quanta, so
+    /// only a timer that never ticks pays it, not one an emulator delays.
+    /// </summary>
+    internal const uint NoTickTimeoutMs = 1000;
 
     private const long MillisecondsPerSecond = 1000;
 
@@ -43,16 +54,18 @@ internal static unsafe partial class KernelThread
 #endif
 
     /// <summary>
-    /// Creates a thread that runs <paramref name="entry"/>, and waits at most
-    /// <see cref="StartTimeoutMs"/> for it to begin.
+    /// Creates a thread that runs <paramref name="entry"/>, and waits for it
+    /// to begin as long as the scheduler keeps ticking toward it.
     /// </summary>
     /// <param name="entry">The thread's body; the thread exits when it returns.</param>
     /// <returns>
     /// True once the thread began. False when the scheduler is not running,
-    /// or did not switch to the thread in time: that thread then never runs
-    /// <paramref name="entry"/>. One that never ran is taken off the run
-    /// queue at once; one that ran but was preempted before it looked at
-    /// the handshake returns as soon as it resumes.
+    /// its timer stopped, or it handled one tick per queued thread and
+    /// <see cref="StartGraceTicks"/> more without switching to the thread:
+    /// that thread then never runs <paramref name="entry"/>. One that never
+    /// ran is taken off the run queue at once; one that ran but was
+    /// preempted before it looked at the handshake returns as soon as it
+    /// resumes.
     /// </returns>
     internal static bool TryStart(Action entry) => TryStart(entry, out _);
 
@@ -92,17 +105,45 @@ internal static unsafe partial class KernelThread
         started.InitializeStack(entryPoint, (ushort)GetCurrentCodeSelector(), parameter);
 #endif
 
+        uint tickBudget;
+        uint readiedAtTick;
         using (InternalCpu.DisableInterruptsScope())
         {
             SchedulerManager.CreateThread(started.CpuId, started);
             SchedulerManager.ReadyThread(started.CpuId, started);
+
+            // The queue holds the new thread too: with one quantum each, a
+            // round-robin policy reaches it by the last of these ticks, and
+            // the stride policy sooner, since a new thread enters at the
+            // global pass.
+            PerCpuState? cpuState = SchedulerManager.CurrentCpuState;
+            int queued = cpuState is not null ? SchedulerManager.Current?.GetRunQueueCount(cpuState) ?? 0 : 0;
+            tickBudget = (uint)queued + StartGraceTicks;
+            readiedAtTick = SchedulerManager.TickCount;
         }
 
         // Spin rather than halt: when no interrupt comes, a halt never ends.
-        long timeoutTicks = Stopwatch.Frequency / MillisecondsPerSecond * StartTimeoutMs;
-        long startedAt = Stopwatch.GetTimestamp();
-        while (handshake.IsPending && Stopwatch.GetTimestamp() - startedAt < timeoutTicks)
+        long noTickTimeout = Stopwatch.Frequency / MillisecondsPerSecond * NoTickTimeoutMs;
+        uint lastTick = readiedAtTick;
+        long lastTickAt = Stopwatch.GetTimestamp();
+        while (handshake.IsPending)
         {
+            uint tick = SchedulerManager.TickCount;
+            long now = Stopwatch.GetTimestamp();
+            if (tick != lastTick)
+            {
+                if (tick - readiedAtTick >= tickBudget)
+                {
+                    break;
+                }
+
+                lastTick = tick;
+                lastTickAt = now;
+            }
+            else if (now - lastTickAt >= noTickTimeout)
+            {
+                break;
+            }
         }
 
         // Masked, so on this CPU, the only one that runs threads, the thread
