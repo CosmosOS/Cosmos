@@ -589,20 +589,29 @@ On anything but `Bound`, the kit releases everything the probe acquired, then of
 
 ## Teardown and OnDetach
 
-Removal, whether a bus retracting a node, a parent binding going away, or a test retracting a synthetic node, unwinds the ledger in this fixed order:
+When a node goes away (the device is unplugged, its parent is removed, or a test retracts it), the kit tears its binding down in a fixed order:
 
-1. The `IsDetaching` flag is set, so nothing new can be acquired: every acquiring member of the binding throws from here on.
-2. Child nodes are retracted, recursively; leaf bindings go first.
-3. Published devices are withdrawn: the consumer, when there is one, is told, and every sink goes quiet.
-4. Interrupt handles are masked at the controller and disconnected; no handler of this binding runs again.
-5. USB pipes are stopped on the controller and their endpoint contexts dropped, while the rings they point at are still allocated. The step waits for a transfer still running on the pipe, up to the bulk budget; a transfer to a device that was pulled out was already woken with `Disconnected` when the detach marked the device, before this teardown began.
-6. `DetachEvent` is cancelled, periodic work is unregistered, work items are cancelled and taken out of the queue, every other event is cancelled, and driver threads are joined with the 500 ms bound.
-7. `Driver.OnDetach(binding, reason)` runs.
-8. Memory is released in reverse order of acquisition: DMA buffers freed, regions and windows invalidated. When a thread did not stop, this step is skipped and the node's `LeakedResourceCount` says how much stays allocated.
+1. `IsDetaching` turns true, and the binding refuses any new acquisition.
+2. Child nodes are removed.
+3. Published devices are withdrawn, so the kernel stops using them.
+4. Interrupts are disconnected, and work items, periodic work and driver threads are stopped.
+5. `OnDetach` runs.
+6. Memory is freed: DMA buffers, register windows and regions.
 
-A step that throws is logged (`teardown step "withdraw" threw`) and the walk goes on, so a misbehaving consumer never leaves a handler connected or memory held.
+`OnDetach` is optional. It is the place to stop the hardware, because interrupts and threads are already stopped and the registers are still mapped. Check `reason.HardwarePresent` first: it is `false` when the device was unplugged, and the registers must not be touched then.
 
-`OnDetach` is the one place a driver may quiesce hardware on the way out, and it runs at the one moment that is safe: interrupts are disconnected and threads are stopped, and the windows are still valid. `DetachReason` says why (`Cause`: `DetachCause.Retracted` for the bus taking the node itself, `DetachCause.ParentRetracted` for a parent going away) and whether the hardware is still there (`HardwarePresent`). When `HardwarePresent` is `false`, as for a hot-unplug, register writes would fault or reach another device, so the driver must not touch them; the sample's `OnDetach` checks the flag before writing. Nothing runs for the driver afterwards, and `binding.DriverState` is where it finds its own objects.
+```csharp
+// In the driver:
+public override void OnDetach(DeviceBinding binding, DetachReason reason)
+{
+    if (reason.HardwarePresent && binding.DriverState is KeyboardState state)
+    {
+        state.Window.Write8(KeyboardState.ControlOffset, 0);   // disable the device
+    }
+}
+```
+
+`reason.Cause` says why: `DetachCause.Retracted` when the node itself was removed, `DetachCause.ParentRetracted` when its parent was.
 
 ```
 [Drivers] synthetic:kbd synthetic-keyboard withdrew keyboard "synthetic-kbd"
