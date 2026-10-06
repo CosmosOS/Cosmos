@@ -46,10 +46,10 @@ public static class KeyboardManager
     private static bool s_ledsRefusedLogged;
 
     private static Queue<KeyEvent>? s_queuedKeys;
-    private static ScanMapBase? s_scanMap;
+    private static KeyboardLayout? s_layout;
 
     /// <summary>
-    /// Whether the key the active layout maps to <see cref="ConsoleKeyEx.AltGr"/>
+    /// Whether the key the active layout maps to <see cref="Key.AltGr"/>
     /// is held. It converts as Control and Alt together, the way Windows
     /// reports it, so a layout's third level lives in its Control+Alt column.
     /// </summary>
@@ -121,7 +121,7 @@ public static class KeyboardManager
         }
 
         s_queuedKeys = new Queue<KeyEvent>();
-        s_scanMap = new USStandardLayout();
+        s_layout = new USStandardLayout();
         s_keyboards = [];
         s_ledsWork = new WorkItem(ApplyLeds, binding: null);
         DeviceRegistry.SetConsumer(DeviceKind.Keyboard, new KitKeyboardConsumer());
@@ -200,45 +200,45 @@ public static class KeyboardManager
     /// through the active layout and queues the event. Sink caller's context,
     /// an interrupt included; called by <see cref="KitKeyboardConsumer.OnKey"/>.
     /// </summary>
-    /// <param name="scanCode">The set 1 scan code, the right Alt as <see cref="ScanMapBase.RightAltScanCode"/>.</param>
+    /// <param name="scanCode">The set 1 scan code, the right Alt as <see cref="KeyboardLayout.RightAltScanCode"/>.</param>
     /// <param name="released">True for a key release.</param>
     internal static void HandleScanCode(byte scanCode, bool released)
     {
-        if (s_scanMap is null)
+        if (s_layout is null)
         {
             return;
         }
 
         byte key = scanCode;
 
-        if (s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !released)
+        if (s_layout.ScanCodeMatchesKey(key, Key.CapsLock) && !released)
         {
             CapsLock = !CapsLock;
             UpdateLeds();
         }
-        else if (s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !released)
+        else if (s_layout.ScanCodeMatchesKey(key, Key.NumLock) && !released)
         {
             NumLock = !NumLock;
             UpdateLeds();
         }
-        else if (s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !released)
+        else if (s_layout.ScanCodeMatchesKey(key, Key.ScrollLock) && !released)
         {
             ScrollLock = !ScrollLock;
             UpdateLeds();
         }
-        else if (s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl))
+        else if (s_layout.ScanCodeMatchesKey(key, Key.LCtrl) || s_layout.ScanCodeMatchesKey(key, Key.RCtrl))
         {
             ControlPressed = !released;
         }
-        else if (s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LShift) || s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RShift))
+        else if (s_layout.ScanCodeMatchesKey(key, Key.LShift) || s_layout.ScanCodeMatchesKey(key, Key.RShift))
         {
             ShiftPressed = !released;
         }
-        else if (s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LAlt) || s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RAlt))
+        else if (s_layout.ScanCodeMatchesKey(key, Key.LAlt) || s_layout.ScanCodeMatchesKey(key, Key.RAlt))
         {
             AltPressed = !released;
         }
-        else if (s_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.AltGr))
+        else if (s_layout.ScanCodeMatchesKey(key, Key.AltGr))
         {
             s_altGrPressed = !released;
         }
@@ -347,12 +347,12 @@ public static class KeyboardManager
     /// </summary>
     private static bool GetKey(byte scanCode, [NotNullWhen(true)] out KeyEvent? keyInfo)
     {
-        if (s_scanMap is null)
+        if (s_layout is null)
         {
             keyInfo = null;
             return false;
         }
-        keyInfo = s_scanMap.ConvertScanCode(
+        keyInfo = s_layout.ConvertScanCode(
             scanCode,
             ControlPressed || s_altGrPressed,
             ShiftPressed,
@@ -425,32 +425,32 @@ public static class KeyboardManager
     }
 
     /// <summary>
-    /// Gets the scan map that turns scan codes into characters.
+    /// Gets the layout that turns scan codes into characters.
     /// </summary>
     /// <returns>The active layout, or <see langword="null"/> before the
     /// manager was initialized and when keyboard support is compiled out;
     /// initialization installs <see cref="Layouts.USStandardLayout"/>.</returns>
-    public static ScanMapBase? GetKeyLayout() => s_scanMap;
+    public static KeyboardLayout? GetLayout() => s_layout;
 
     /// <summary>
-    /// Sets the scan map that turns scan codes into characters. This is a
+    /// Sets the layout that turns scan codes into characters. This is a
     /// method rather than a settable property beside
-    /// <see cref="GetKeyLayout"/> because the two halves cannot share a type:
+    /// <see cref="GetLayout"/> because the two halves cannot share a type:
     /// the read is honestly nullable, while a null layout would leave the
     /// interrupt path with nothing to decode with. Both forms refuse null at
     /// run time; only a non-nullable parameter also diagnoses it at compile
     /// time, which a nullable property cannot.
     /// </summary>
-    /// <param name="scanMap">The layout to use.</param>
+    /// <param name="layout">The layout to use.</param>
     /// <exception cref="InvalidOperationException">Keyboard support is disabled.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="scanMap"/> is null.</exception>
-    public static void SetKeyLayout(ScanMapBase scanMap)
+    /// <exception cref="ArgumentNullException"><paramref name="layout"/> is null.</exception>
+    public static void SetLayout(KeyboardLayout layout)
     {
         // The switch first, so a compiled-out keyboard names the switch to set
         // rather than reporting whatever else is wrong with the call.
         ThrowIfDisabled();
-        ArgumentNullException.ThrowIfNull(scanMap);
+        ArgumentNullException.ThrowIfNull(layout);
 
-        s_scanMap = scanMap;
+        s_layout = layout;
     }
 }

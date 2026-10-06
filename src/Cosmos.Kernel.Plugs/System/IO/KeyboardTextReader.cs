@@ -27,11 +27,11 @@ internal sealed class KeyboardTextReader : TextReader
 
             switch (keyEvent.Key)
             {
-                case ConsoleKeyEx.Enter:
+                case Key.Enter:
                     KernelConsole.Default.WriteLine();
                     return sb.ToString();
 
-                case ConsoleKeyEx.Backspace:
+                case Key.Backspace:
                     if (cursorPos > 0)
                     {
                         sb.Remove(cursorPos - 1, 1);
@@ -65,7 +65,7 @@ internal sealed class KeyboardTextReader : TextReader
                     }
                     break;
 
-                case ConsoleKeyEx.Delete:
+                case Key.Delete:
                     if (cursorPos < sb.Length)
                     {
                         sb.Remove(cursorPos, 1);
@@ -87,7 +87,7 @@ internal sealed class KeyboardTextReader : TextReader
                     }
                     break;
 
-                case ConsoleKeyEx.LeftArrow:
+                case Key.LeftArrow:
                     if (cursorPos > 0)
                     {
                         cursorPos--;
@@ -96,7 +96,7 @@ internal sealed class KeyboardTextReader : TextReader
                     }
                     break;
 
-                case ConsoleKeyEx.RightArrow:
+                case Key.RightArrow:
                     if (cursorPos < sb.Length)
                     {
                         cursorPos++;
@@ -105,7 +105,7 @@ internal sealed class KeyboardTextReader : TextReader
                     }
                     break;
 
-                case ConsoleKeyEx.Home:
+                case Key.Home:
                     // Move cursor to start of input
                     while (cursorPos > 0)
                     {
@@ -115,7 +115,7 @@ internal sealed class KeyboardTextReader : TextReader
                     }
                     break;
 
-                case ConsoleKeyEx.End:
+                case Key.End:
                     // Move cursor to end of input
                     while (cursorPos < sb.Length)
                     {

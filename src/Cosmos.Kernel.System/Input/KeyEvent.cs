@@ -29,7 +29,7 @@ public sealed class KeyEvent
     /// <summary>
     /// The virtual key of the key-press event.
     /// </summary>
-    public ConsoleKeyEx Key { get; set; }
+    public Key Key { get; set; }
 
     /// <summary>
     /// The modifiers of the key-press event.
@@ -47,7 +47,7 @@ public sealed class KeyEvent
     public KeyEvent()
     {
         KeyChar = '\0';
-        Key = ConsoleKeyEx.NoName;
+        Key = Key.NoName;
         Modifiers = 0;
         Type = KeyEventType.Make;
     }
@@ -61,7 +61,7 @@ public sealed class KeyEvent
     /// <param name="alt">Whether the Alt key was pressed.</param>
     /// <param name="control">Whether the Control (Ctrl) key was pressed.</param>
     /// <param name="type">The type of the <see cref="KeyEvent"/>.</param>
-    public KeyEvent(char keyChar, ConsoleKeyEx key, bool shift, bool alt, bool control, KeyEventType type)
+    public KeyEvent(char keyChar, Key key, bool shift, bool alt, bool control, KeyEventType type)
     {
         KeyChar = keyChar;
         Key = key;

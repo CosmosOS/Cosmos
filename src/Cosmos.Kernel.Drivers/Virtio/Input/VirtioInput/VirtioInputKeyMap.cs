@@ -12,7 +12,7 @@ internal static class VirtioInputKeyMap
 {
     /// <summary>
     /// The scan code every keyboard device reports for the right Alt key,
-    /// the value the ring's <c>ScanMapBase.RightAltScanCode</c> keeps and
+    /// the value the ring's <c>KeyboardLayout.RightAltScanCode</c> keeps and
     /// every keyboard driver reports, so the manager's AltGr handling applies
     /// to this keyboard as to the others.
     /// </summary>

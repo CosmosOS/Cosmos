@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.System.Input;
 /// Specifies the recognized virtual console keys, that are independent
 /// from physical keyboard scan-codes.
 /// </summary>
-public enum ConsoleKeyEx
+public enum Key
 {
     /// <summary>
     /// An unknown, undefined, or otherwise unrecognized key.

@@ -4,17 +4,17 @@
 namespace Cosmos.Kernel.System.Input;
 
 /// <summary>
-/// Represents the base class for keyboard layout scan-maps.
+/// Represents the base class for keyboard layouts.
 /// </summary>
-public abstract class ScanMapBase
+public abstract class KeyboardLayout
 {
     /// <summary>Mappings a layout is expected to declare, reserved up front.</summary>
     private const int InitialKeyCapacity = 105;
 
     /// <summary>
     /// Scan code the keyboard devices report for the right Alt key. A layout
-    /// maps it to <see cref="ConsoleKeyEx.AltGr"/> when the key selects its
-    /// third level, and to <see cref="ConsoleKeyEx.RAlt"/> when it is a second
+    /// maps it to <see cref="Key.AltGr"/> when the key selects its
+    /// third level, and to <see cref="Key.RAlt"/> when it is a second
     /// Alt. On the wire it is the extended form of the left Alt (E0 38),
     /// which every keyboard driver folds to this value, one set 1 assigns to
     /// no key.
@@ -154,7 +154,7 @@ public abstract class ScanMapBase
     /// </summary>
     /// <param name="scanCode">The physical keyboard scan-code.</param>
     /// <param name="key">The virtual mapping key.</param>
-    internal bool ScanCodeMatchesKey(byte scanCode, ConsoleKeyEx key)
+    internal bool ScanCodeMatchesKey(byte scanCode, Key key)
     {
         EnsureKeysInitialized();
 

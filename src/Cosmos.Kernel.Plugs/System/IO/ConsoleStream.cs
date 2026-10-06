@@ -150,12 +150,12 @@ internal sealed class ConsoleStream : Stream
 
             switch (keyEvent.Key)
             {
-                case ConsoleKeyEx.Enter:
+                case Key.Enter:
                     KernelConsole.Default.WriteLine();
                     KernelConsole.Default.Canvas.Display();
                     return true;
 
-                case ConsoleKeyEx.Backspace:
+                case Key.Backspace:
                     if (cursorPos > 0)
                     {
                         _readLineSB.Remove(cursorPos - 1, 1);
@@ -189,7 +189,7 @@ internal sealed class ConsoleStream : Stream
                     }
                     break;
 
-                case ConsoleKeyEx.Delete:
+                case Key.Delete:
                     if (cursorPos < _readLineSB.Length)
                     {
                         _readLineSB.Remove(cursorPos, 1);
@@ -211,7 +211,7 @@ internal sealed class ConsoleStream : Stream
                     }
                     break;
 
-                case ConsoleKeyEx.LeftArrow:
+                case Key.LeftArrow:
                     if (cursorPos > 0)
                     {
                         cursorPos--;
@@ -220,7 +220,7 @@ internal sealed class ConsoleStream : Stream
                     }
                     break;
 
-                case ConsoleKeyEx.RightArrow:
+                case Key.RightArrow:
                     if (cursorPos < _readLineSB.Length)
                     {
                         cursorPos++;
@@ -229,7 +229,7 @@ internal sealed class ConsoleStream : Stream
                     }
                     break;
 
-                case ConsoleKeyEx.Home:
+                case Key.Home:
                     // Move cursor to start of input
                     while (cursorPos > 0)
                     {
@@ -239,7 +239,7 @@ internal sealed class ConsoleStream : Stream
                     }
                     break;
 
-                case ConsoleKeyEx.End:
+                case Key.End:
                     // Move cursor to end of input
                     while (cursorPos < _readLineSB.Length)
                     {

@@ -6,10 +6,10 @@ using NUnit.Framework;
 
 namespace Cosmos.Kernel.Tests.System.Input;
 
-public class ScanMapBaseTest
+public class KeyboardLayoutTest
 {
     // Every shipped layout, so a new one cannot ship without saying what its right Alt is.
-    private static readonly ScanMapBase[] s_shippedLayouts =
+    private static readonly KeyboardLayout[] s_shippedLayouts =
     [
         new USStandardLayout(),
         new FRStandardLayout(),
@@ -21,13 +21,13 @@ public class ScanMapBaseTest
     ];
 
     [TestFixture]
-    public class ScanCodeMatchesKey : ScanMapBaseTest
+    public class ScanCodeMatchesKey : KeyboardLayoutTest
     {
         [TestCaseSource(nameof(s_shippedLayouts))]
-        public void WhenRightAlt_EveryShippedLayoutMapsItToAltGrOrRAlt(ScanMapBase layout)
+        public void WhenRightAlt_EveryShippedLayoutMapsItToAltGrOrRAlt(KeyboardLayout layout)
         {
-            bool altGr = layout.ScanCodeMatchesKey(ScanMapBase.RightAltScanCode, ConsoleKeyEx.AltGr);
-            bool rAlt = layout.ScanCodeMatchesKey(ScanMapBase.RightAltScanCode, ConsoleKeyEx.RAlt);
+            bool altGr = layout.ScanCodeMatchesKey(KeyboardLayout.RightAltScanCode, Key.AltGr);
+            bool rAlt = layout.ScanCodeMatchesKey(KeyboardLayout.RightAltScanCode, Key.RAlt);
 
             Assert.That(altGr ^ rAlt, Is.True, $"{layout.GetType().Name} maps the right Alt to {(altGr ? "AltGr" : "RAlt")} {(altGr == rAlt ? "and the other" : "")}");
         }
@@ -39,9 +39,9 @@ public class ScanMapBaseTest
         [TestCase(typeof(USDvorakLayout), ExpectedResult = false)]
         public bool WhenRightAlt_LayoutsWithAThirdLevelMapItToAltGr(Type layoutType)
         {
-            ScanMapBase layout = (ScanMapBase)Activator.CreateInstance(layoutType)!;
+            KeyboardLayout layout = (KeyboardLayout)Activator.CreateInstance(layoutType)!;
 
-            return layout.ScanCodeMatchesKey(ScanMapBase.RightAltScanCode, ConsoleKeyEx.AltGr);
+            return layout.ScanCodeMatchesKey(KeyboardLayout.RightAltScanCode, Key.AltGr);
         }
     }
 }

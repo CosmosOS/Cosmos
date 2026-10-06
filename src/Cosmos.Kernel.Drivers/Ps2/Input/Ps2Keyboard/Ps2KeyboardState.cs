@@ -28,7 +28,7 @@ public sealed class Ps2KeyboardState : IKeyboard
 
     /// <summary>
     /// The code the ring's layouts expect for the right Alt, the value
-    /// <c>ScanMapBase.RightAltScanCode</c> keeps and the USB and virtio key
+    /// <c>KeyboardLayout.RightAltScanCode</c> keeps and the USB and virtio key
     /// maps carry as the same private constant; no seam member exists for
     /// it. On the wire it is the extended form of the left Alt (E0 38),
     /// which every keyboard driver folds to this value, one set 1 assigns to

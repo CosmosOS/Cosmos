@@ -75,13 +75,13 @@ public sealed class KeyMapping
     /// <summary>
     /// The virtual key that the physical key-press maps to.
     /// </summary>
-    public ConsoleKeyEx Key { get; set; }
+    public Key Key { get; set; }
 
     /// <summary>
     /// The virtual key that the physical key-press maps to when
     /// the Num Lock modifier is active.
     /// </summary>
-    public ConsoleKeyEx NumLockKey { get; set; }
+    public Key NumLockKey { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="KeyMapping"/> class.
@@ -99,7 +99,7 @@ public sealed class KeyMapping
     /// <param name="shiftCtrl">The text character value of the key with the Shift and Control modifiers being active.</param>
     /// <param name="key">The virtual key that the physical key-press maps to.</param>
     /// <param name="numKey">The virtual key that the physical key-press maps to when the Num Lock modifier is active..</param>
-    public KeyMapping(byte scanCode, char normal, char shift, char num, char caps, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, ConsoleKeyEx key, ConsoleKeyEx numKey)
+    public KeyMapping(byte scanCode, char normal, char shift, char num, char caps, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Key key, Key numKey)
     {
         ScanCode = scanCode;
         Value = normal;
@@ -117,51 +117,51 @@ public sealed class KeyMapping
         NumLockKey = numKey;
     }
 
-    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, ConsoleKeyEx, ConsoleKeyEx)"/>
-    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, ConsoleKeyEx key, ConsoleKeyEx numKey)
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Key key, Key numKey)
         : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, ctrlAltShift, '\0', '\0', key, numKey)
     {
     }
 
-    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, ConsoleKeyEx, ConsoleKeyEx)"/>
-    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, ConsoleKeyEx key, ConsoleKeyEx numKey)
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Key key, Key numKey)
         : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, '\0', '\0', '\0', key, numKey)
     {
     }
 
-    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, ConsoleKeyEx, ConsoleKeyEx)"/>
-    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, ConsoleKeyEx key)
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Key key)
         : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, ctrlAltShift, ctrl, shiftCtrl, key, key)
     {
     }
 
-    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, ConsoleKeyEx, ConsoleKeyEx)"/>
-    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, ConsoleKeyEx key)
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Key key)
         : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, ctrlAltShift, '\0', '\0', key)
     {
     }
 
 
-    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, ConsoleKeyEx, ConsoleKeyEx)"/>
-    public KeyMapping(byte scanCode, char normal, char shift, char num, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, ConsoleKeyEx key)
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char num, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Key key)
         : this(scanCode, normal, shift, num, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, '\0', '\0', '\0', key)
     {
     }
 
-    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, ConsoleKeyEx, ConsoleKeyEx)"/>
-    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, ConsoleKeyEx key)
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Key key)
         : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, '\0', '\0', '\0', '\0', key)
     {
     }
 
-    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, ConsoleKeyEx, ConsoleKeyEx)"/>
-    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, ConsoleKeyEx key, ConsoleKeyEx numKey)
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Key key, Key numKey)
         : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, '\0', key, numKey)
     {
     }
 
-    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, ConsoleKeyEx, ConsoleKeyEx)"/>
-    public KeyMapping(byte scanCode, char numLock, ConsoleKeyEx key, ConsoleKeyEx numKey)
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char numLock, Key key, Key numKey)
         : this(scanCode, '\0', '\0', numLock, '\0', '\0', '\0', key, numKey)
     {
     }
@@ -172,13 +172,13 @@ public sealed class KeyMapping
     /// <param name="scanCode">The physical scan code of the key.</param>
     /// <param name="n">The character to use for all of the text character fields.</param>
     /// <param name="key">The virtual key that the physical key-press maps to.</param>
-    public KeyMapping(byte scanCode, char n, ConsoleKeyEx key)
+    public KeyMapping(byte scanCode, char n, Key key)
         : this(scanCode, n, n, n, n, n, n, key)
     {
     }
 
-    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, ConsoleKeyEx, ConsoleKeyEx)"/>
-    public KeyMapping(byte scanCode, ConsoleKeyEx key)
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, Key key)
         : this(scanCode, '\0', '\0', '\0', '\0', '\0', '\0', key)
     {
     }

@@ -62,7 +62,7 @@ public class TRStandardLayoutTest
             KeyEvent keyEvent = Convert(Q, ctrl: true, alt: true);
 
             Assert.That(keyEvent.Modifiers, Is.EqualTo(ConsoleModifiers.Control | ConsoleModifiers.Alt));
-            Assert.That(keyEvent.Key, Is.EqualTo(ConsoleKeyEx.Q));
+            Assert.That(keyEvent.Key, Is.EqualTo(Key.Q));
         }
 
         [TestCase(Q, false, ExpectedResult = 'q')]
