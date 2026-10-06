@@ -894,15 +894,16 @@ A USB stick is handled by `UsbMassStorageDriver` ([The USB class drivers](#the-u
 
 ## USB devices
 
-A USB node is what the kit's enumeration core publishes for one interface of a USB device, beneath the node of the driver that found it: the xHCI driver's PCI function for a device on a root port, a hub's interface node for a device behind the hub. It has an identity read once from the device's descriptors, no resources, no interrupt sources, and a `UsbAccess` for everything a class driver does: control transfers on the device's default pipe, the pipes it opens on its endpoints and the bulk transfers through them. A composite device is several nodes sharing one device. A class driver such as the shipped `UsbKeyboardDriver` sees only the access and never a controller register or a transfer ring; the host controller side is the xHCI driver, described [below](#the-xhci-driver), and the snippets in this section are the shipped class drivers' steps.
+A USB node is one interface of a USB device, published by the host controller driver for a device on a root port, or by the hub driver for a device behind a hub. It has no resources, no interrupt sources and a `UsbAccess` for everything a class driver does. A device with several interfaces gives several nodes. A class driver never sees the controller or the hubs above it; the shipped `UsbKeyboardDriver` and `UsbMassStorageDriver` are good models.
 
 ### USB identity and match
 
-`UsbIdentity` is one interface of one device: `PortPath`, the dotted port chain from the host controller down (`1-2` is root port 2 of controller 1, `1-2.1` port 1 of the hub on that root port), `InterfaceNumber`, `VendorId` and `ProductId`, the device's class triplet `DeviceClass`, `DeviceSubclass` and `DeviceProtocol`, the interface's `InterfaceClass`, `InterfaceSubclass` and `InterfaceProtocol`, the `Speed` the device was attached at and the `ConfigurationValue` the kit selected, the first configuration. `BusName` is `usb` and `Address` is the port path and the interface number joined with a colon, so a stick on root port 1 of the first controller is `usb:1-1:0` and a device on port 1 of a hub on root port 2 is `usb:1-2.1:0`. `Describe()` prints `46f4:0001 class 00.00.00 interface 0 class 08.06.50`: vendor and product, the device class triplet, the interface number and its class triplet, which is what `DeviceNodeInfo.Description` shows for the node.
+`UsbIdentity` holds the device's `VendorId`, `ProductId` and class, and the interface's class, subclass and protocol. The node path is the port chain and the interface number: `usb:1-1:0` is interface 0 of the device on root port 1 of the first controller, and `usb:1-2.1:0` a device on port 1 of a hub plugged into root port 2.
 
-`UsbMatch` has one constructor with eight optional fields, `vendorId`, `productId`, `deviceClass`, `deviceSubclass`, `deviceProtocol`, `interfaceClass`, `interfaceSubclass` and `interfaceProtocol`: every field given must equal the identity's, every field left `null` is not looked at, and the specificity is the number of fields given, so a vendor and product match (2) outranks a class-only match (1) and a full interface triplet (3) outranks both. The port path and the speed are identity, not match fields, and a match with no field set throws `ArgumentException` (`a USB match constrains at least one field`). The shipped hub driver matches `new UsbMatch(interfaceClass: UsbClassCode.Hub)`; the keyboard and mass storage drivers match their interface triplets:
+`UsbMatch` works like `PciMatch`: every field given must be equal, and the specificity is the number of fields given. A class driver usually matches the interface class, subclass and protocol:
 
 ```csharp
+// In the driver:
 using Cosmos.Kernel.HAL.DriverKit.Usb;
 
 private readonly DeviceMatch[] _matches =
@@ -911,32 +912,26 @@ private readonly DeviceMatch[] _matches =
 ];
 ```
 
-Two drivers matching one interface at the same specificity are ordered by priority, as everywhere: the Drivers suite's `UsbDeclineDriver` claims priority 1 over the shipped keyboard driver's 0 and is offered the keyboard first.
-
 ### The USB access object
 
-`binding.Node.Access<UsbAccess>()` is the interface. Every member is thread context (a probe, a work item, a driver thread or a ring caller) unless said otherwise, and one called from an interrupt handler stops the way a binding member does:
+`binding.Node.Access<UsbAccess>()` is the interface. Its members run in thread context:
 
-- The interface's identity: `InterfaceNumber`, `InterfaceClass`, `InterfaceSubclass` and `InterfaceProtocol`; `Endpoints`, those of alternate setting 0 in descriptor order, each a `UsbEndpoint` with `Address`, `Number`, `IsIn`, `Type`, `MaxPacketSize`, `AdditionalTransactions`, `Interval` and `MaxBurst`; `FindEndpoint(type, isIn)`, the first of that type and direction, or `null`; `Speed`, `MaxPacketSize0`, `HubDepth` and `PortPath`; `Configuration`, the whole configuration descriptor as read, for a class driver that parses more than the kit does; and `IsDisconnected`, any context, true once the device left the bus.
-- `ControlTransfer(setup, data)` runs a `UsbSetupPacket` on the device's default pipe and waits for it: `ArgumentOutOfRangeException` when `data` is shorter than the setup's `Length` or the length exceeds `MaxControlTransferLength` (4096, one host DMA page); `UsbTransferStatus.Disconnected` at once on a disconnected device; otherwise serialized with the device's other interfaces and run by the host. `ControlIn(requestType, request, value, index, data)`, `ControlOut(requestType, request, value, index)` with no data stage and `ControlOut(..., data)`, whose data is copied into a buffer the kit owns for the call (a probe may allocate), build the setup packet for the three shapes, and `GetDescriptor(type, index, buffer)` is GET_DESCRIPTOR of a standard descriptor. A `UsbTransferStatus` is `Success`, `Stall` (the device refused the request, or the endpoint is halted), `Timeout`, `Error` or `Disconnected`.
-- `OpenInterruptPipe(binding, endpoint, handler, out pipe)` configures an interrupt IN endpoint on the host, which keeps transfers queued on it and hands every completed one to the `UsbReportHandler` until the pipe is closed; `OpenBulkPipe(binding, endpoint, out pipe)` configures a bulk endpoint of either direction. Both take the driver's own binding (`ArgumentException` for one bound to another node, as `VirtioAccess.TryCreateQueue` does, and for an endpoint that is not one of this interface's or not of that kind), return `false` with `pipe` null when the device is disconnected or the host refused, and record the `UsbPipe` on the binding's ledger, where it counts in `HeldResourceCount`. A pipe opened once the binding is being torn down is closed again and the call throws the kit's `InvalidOperationException`.
-- `ClosePipe(binding, pipe)` closes a pipe before the unwind would: off the ledger, then stopped on the host (`ArgumentException` for a pipe this binding did not open; one the host already closed is only taken off the ledger). `BulkIn(pipe, data, out transferred)` and `BulkOut(pipe, data, out transferred)` move data through a bulk pipe and wait, ending early on a short packet: `Error` with 0 transferred on a closed pipe, `Disconnected` on a disconnected device, the host's status otherwise; one caller per pipe at a time is the driver's rule. `ClearHalt(pipe)` clears a halted endpoint on both sides, CLEAR_FEATURE(ENDPOINT_HALT) to the device and the host's reset of its half, so both data toggles agree again.
-- `ConfigureAsHub(portCount, thinkTime)`, `AttachChild(binding, port, speed)` and `DetachChild(binding, port)` are the hub driver's, described under [Hubs](#hubs).
+- `Endpoints` lists the interface's endpoints, and `FindEndpoint(type, isIn)` finds one.
+- `ControlIn`, `ControlOut` and `GetDescriptor` send control requests to the device. Each returns a `UsbTransferStatus`: `Success`, `Stall`, `Timeout`, `Error` or `Disconnected`.
+- `OpenInterruptPipe(binding, endpoint, handler, out pipe)` opens an interrupt IN endpoint and calls the handler with every report the device sends.
+- `OpenBulkPipe(binding, endpoint, out pipe)` opens a bulk endpoint, and `BulkIn` and `BulkOut` move data through it and wait for the transfer.
+- `IsDisconnected` turns true once the device is unplugged; every transfer then returns `Disconnected`, so check it rather than retrying.
 
-The pipe rule is the one this section rests on: anything a driver can open, the access object can close. A pipe is on the ledger of the binding that opened it and is closed before the binding's deferred work stops, so a probe that opens a pipe and declines hands a clean endpoint to the next candidate, and a driver torn down because its device was pulled out writes nothing to hardware that is gone. The mass storage driver opens two bulk pipes and, when the second does not open, fails and lets the unwind close the first:
+Pipes are recorded on the binding, so the kit closes them when the probe declines or the device goes away. The mass storage driver opens two bulk pipes; if the second fails, the kit still closes the first:
 
 ```csharp
+// In Probe:
 UsbAccess usb = binding.Node.Access<UsbAccess>();
 UsbEndpoint? bulkIn = usb.FindEndpoint(UsbEndpointType.Bulk, isIn: true);
-if (bulkIn is null)
-{
-    return ProbeResult.Declined("no bulk IN endpoint");
-}
-
 UsbEndpoint? bulkOut = usb.FindEndpoint(UsbEndpointType.Bulk, isIn: false);
-if (bulkOut is null)
+if (bulkIn is null || bulkOut is null)
 {
-    return ProbeResult.Declined("no bulk OUT endpoint");
+    return ProbeResult.Declined("no bulk endpoints");
 }
 
 if (!usb.OpenBulkPipe(binding, bulkIn, out UsbPipe? inPipe) || !usb.OpenBulkPipe(binding, bulkOut, out UsbPipe? outPipe))
@@ -945,82 +940,59 @@ if (!usb.OpenBulkPipe(binding, bulkIn, out UsbPipe? inPipe) || !usb.OpenBulkPipe
 }
 ```
 
-A `UsbReportHandler` receives one completed transfer of an interrupt IN pipe, `(ReadOnlySpan<byte> report)`, valid for the call only. Its context depends on the controller: interrupt context, under no lock, on a controller with a message interrupt; on a polled one, thread context on whichever thread drains the controller's events (its hot-plug thread, or any thread waiting on one of its commands or transfers), under the host's own `DeviceLock`. So the handler keeps an interrupt handler's rules whichever it is: it must not block, allocate, or call any `UsbAccess` or `DeviceBinding` member; it may call a sink, `DeviceEvent.Signal` and `Interlocked` on its own fields. The keyboard driver's handler diffs the report against the previous one and reports scan codes through its `KeyboardSink`; the hub driver's ORs the change bitmap into a field with `Interlocked.Or` and signals the event its thread waits on.
+A report handler may run in interrupt context, so it follows the rules of an interrupt handler: no blocking, no allocation, and no call to `UsbAccess` or `DeviceBinding`. It may call a sink, `DeviceEvent.Signal` and `Interlocked`. The keyboard driver publishes its keyboard first, so the handler always has a sink, then opens the report pipe:
+
+```csharp
+// In Probe:
+UsbEndpoint? reports = usb.FindEndpoint(UsbEndpointType.Interrupt, isIn: true);
+if (reports is null)
+{
+    return ProbeResult.Declined("no interrupt IN endpoint");
+}
+
+state.Sink = binding.PublishKeyboard(state);
+if (!usb.OpenInterruptPipe(binding, reports, state.OnReport, out UsbPipe? pipe))
+{
+    return ProbeResult.Failed("could not open the report pipe");
+}
+
+// In the state object, for every report:
+public void OnReport(ReadOnlySpan<byte> report)
+{
+    // compare with the previous report and hand each key change to Sink.Report
+}
+```
 
 ### The host controller contract
 
-A host controller driver is an ordinary kit driver that binds the controller's own node (a PCI function for xHCI) and owns every register, ring, context and DMA page; the kit never publishes a node for the controller itself. It implements two abstract classes and derives its pipes from a third, each with protected members the host implements and internal forwarders the kit calls, the `InterruptSource` pattern, so a class driver holding a reference reaches none of them:
-
-- `UsbHostController`: `Name`, a short name for logs (`xHCI`); `AddressDeviceCore(parentHub, port, speed)`, thread context, which gives the device on a port of a hub (null: a root port) its address and default control pipe, reads the 8-byte head of its device descriptor, sets `MaxPacketSize0` and returns the `UsbDevice`, or null when any step failed, the host having logged why and released what it allocated; and `ReleaseDeviceCore(device, hostPresent)`, thread context, which frees the host's state for a device the kit no longer tracks: with `hostPresent` the host first waits out any transfer still running on the device and tells the controller the slot is free; without it (the controller's own hardware is gone) nothing is written and the state is only dropped. The kit calls it only after every interface node of the device was torn down.
-- `UsbDevice`: the kit half of a device the host addressed: `Host`, `Parent`, `PortNumber`, `RootPortNumber`, `HubDepth`, `Speed`, `MaxPacketSize0`, the identity fields the enumeration core writes (`VendorId`, `ProductId`, the device class triplet, `ConfigurationValue`), `IsDisconnected`, and `MarkDisconnected()`, any context and allocation-free: every transfer to the device returns `Disconnected` from then on and one already waiting stops waiting, through the host's `OnDisconnectedCore` hook, which signals every waiter of the device, so a bulk transfer in flight when a stick is pulled does not hold its pipe for its whole 10 s budget. The host calls it from its port change handler when a root port loses its connection, the kit for a whole subtree at detach. The transfer primitives are the protected `*Core` members, all thread context: `ControlTransferCore`, `OpenInterruptPipeCore`, `OpenBulkPipeCore`, `ClosePipeCore` (stops the endpoint, drops its context and marks the pipe closed; on a disconnected device only the state is dropped), `BulkInCore`, `BulkOutCore`, `ResetEndpointCore` (the host half of CLEAR_FEATURE(ENDPOINT_HALT)) and `ConfigureAsHubCore`.
-- `UsbPipe`: `Endpoint` and `IsClosed`, which the host alone sets, once, and the kit only reads. A derived pipe is a new object per open, so a stale reference a driver kept looks closed forever and never names another driver's endpoint.
-
-`UsbBus` ties them together. The host's probe creates one with `new UsbBus(binding, host)`, which takes the next 1-based `Ordinal` (the first controller bound is 1, a second xHCI function 2, a controller unbound and rebound a new number), the first part of every port path below it. `Attach(port, speed)` and `Detach(port)` are the enumeration core's entry points for root ports, thread context on the host's probe or hot-plug thread; the hub driver reaches the same core for its ports through `AttachChild` and `DetachChild`. Attach addresses the device through the host, reads the device descriptor and the first configuration, parses alternate setting 0 of each interface, sends SET_CONFIGURATION, logs `usb 1-1: 46f4:0001 SuperSpeed, 1 interface(s)` through the owner's binding and publishes one node per interface with `PublishChild` beneath the owner's node (from a probe the offers are queued behind it, from a driver thread they complete before the publish returns); a failed step is logged (`usb 1-1: the host could not address the device`, `could not read the device descriptor`, `could not read the configuration descriptor`, `SET_CONFIGURATION failed`) and the device released. Detach marks the device and every device below it disconnected first, so a thread waiting on a transfer anywhere in the branch stops now, retracts every interface node with `RetractChild(node, hardwarePresent: false)`, the hub nodes' own children first inside their teardown, releases the devices through the host deepest first and logs `usb 1-1: disconnected`. `ReleaseAll(hostPresent)`, from the host's `OnDetach`, releases every device still on the bus without a retraction, the kit's child step having torn the nodes down before the hook ran. `DeviceCount`, any context, is the devices attached, hubs included; the Drivers suite reads it off `XhciState.Bus` to see the keyboard's device leave and come back.
+A host controller driver binds the controller's own node and implements `UsbHostController` and `UsbDevice`, with its pipes derived from `UsbPipe`. It creates a `UsbBus`, whose `Attach(port, speed)` and `Detach(port)` enumerate a device and publish or retract its interface nodes. `XhciDriver` is the reference implementation; a class driver never deals with any of this.
 
 ### Hubs
 
-`UsbHubDriver` (`[Driver(Feature = DriverFeature.Usb)]`, `new UsbMatch(interfaceClass: UsbClassCode.Hub)`) binds every hub interface, USB 2 and SuperSpeed alike, and runs the hub's half of the protocol over the access object with the numbers of `UsbHubProtocol` (the descriptor offsets, the port features, the status and change bits, the change feature tables, the timings). Its probe declines `no status change endpoint` without an interrupt IN endpoint, reads the hub descriptor (failed `could not read the hub descriptor`), hands the port count and the TT think time to the host through `usb.ConfigureAsHub` (failed `the host controller refused the hub configuration`), tells a SuperSpeed hub its depth (failed `SET_HUB_DEPTH failed`), hangs a `UsbHubState` off `binding.DriverState` (`PortCount`, `IsSuperSpeed`, `ChildrenAttached`, `ChildrenDetached`, `HotPlugRunning`) and logs `4 port(s)`, powers the ports and waits the descriptor's power-good time plus the connect debounce, then probes ports 1 to 15 at most: a connected port is reset (`port 1: port reset timed out` and `port 1: port did not enable after reset` skip it), its speed read and `usb.AttachChild(binding, port, speed)` called, the enumeration core with this hub's device as the parent and the hub's binding as the owner of the nodes, so a device behind the hub is `usb:1-2.1:0`, a child of the hub's node. Only then does it open the status change pipe (failed `could not open the status change pipe`), so the scan's own resets do not come back as reports, and starts the `usb-hub` thread (`hot-plug off (no scheduler)` without a scheduler: the boot-time scan only).
-
-The handler ORs the hub's change bitmap into a field with `Interlocked.Or` and signals the thread. The thread, until `IsDetaching`, takes the bitmap, clears the hub's own change bits (local power, over-current) when bit 0 is set, the hub being port 0 of its own status requests, so a failure there is logged `port 0: message`; clears each changed port's change bits with CLEAR_FEATURE, calls `usb.DetachChild(binding, port)` for a port whose connection changed or that the hub disabled on its own and, when a device is connected and still is after the 100 ms debounce, resets the port and attaches it again; every step of a port is inside a `try`/`catch` logging `port 1: message`, and the thread waits on its event for a second between passes. `DetachChild` returns once every interface node of the device and of its subtree was torn down and every device released, so a hub behind a hub unwinds leaf first. Children live and die with the hub node: tearing the hub's binding down retracts every node it published (the kit's child step), its pipe is closed by the ledger and its own device's slot is freed by the host, so `OnDetach` has nothing to do. A hub probe that attached its children and then failed leaves their nodes retracted by the unwind and their device states under the hub's until the next probe of the hub node attaches the same port and releases the stale state first (`usb 1-2.1: released a stale device`).
+`UsbHubDriver` binds every hub interface. It hands the devices on the hub's ports to the same enumeration through `ConfigureAsHub`, `AttachChild` and `DetachChild`, and watches the ports from a thread, so a device behind a hub is offered like any other, as `usb:1-2.1:0`.
 
 ### The xHCI driver
 
-`XhciDriver` (`[Driver(Feature = DriverFeature.Usb)]`, `new PciMatch(classCode: 0x0C, subclass: 0x03, progIf: 0x30)`: every xHCI function) is a PCI driver for an xHCI 1.2 host controller and the kit's host controller contract, both on an `XhciState` hung off `binding.DriverState`. Its probe checks BAR0 (declined `BAR0 is not a memory window` when it is unassigned, I/O or shorter than the capability registers), maps it, turns on memory space (before any message request, since the kit refuses a message while decoding is off) and bus mastering, reads the capability registers (failed `the register block runs past BAR0` or `the controller does not support 4 KiB pages`), allocates the command ring, the event ring, the device context base address array and the scratchpad pages in DMA memory (below 4 GiB on a controller without 64-bit addressing, failed `no DMA memory below 4 GiB for a 32-bit controller` when there is none), creates its lock and its events, takes the controller from the firmware (`firmware did not release the controller, taking it over` after a second), resets it (failed `the controller stayed not ready`, `the controller did not halt`, `the controller reset did not complete` or `the controller is not ready after reset`), programs the registers, requests message 0 when the function has an MSI-X table and polls when it has none or the platform cannot route it (ARM64 without an ITS, the virt machine's default GICv2); the legacy line is never requested. It starts the controller (failed `the controller did not start`), creates the `UsbBus`, and scans the root ports inside the probe: a connected port is reset, debounced and handed to `Bus.Attach`, so every boot-time device's interface nodes are published from the probe, queued behind it, and offered during the driver stage, which is how a USB stick is registered with the storage manager before `OnBoot`. Then it starts the `xhci-hotplug` thread (`hot-plug off (no scheduler)` without a scheduler: boot-time enumeration only, and on a polled controller interrupt pipes then never drain) and logs `version 0x100, 64 slots, 8 ports, 32-byte contexts, 0 scratchpad buffers, events via message interrupt, 1 device(s)`, or `events polled`. A controller with no device still binds. The root port scan waits up to 500 ms per port reset, 200 ms for the connect settle and up to 5 s per command, so the driver stage lengthens by that.
-
-The hot-plug thread, until `IsDetaching`, reads every root port's status, writes the change bits back, detaches whatever was on a port whose connection changed and, when a device is connected and still is after a 100 ms debounce, resets the port and attaches it; then it waits on the port change event for up to a second with a message interrupt, or sleeps 20 ms and drains the event ring under the lock without one, the periodic drain that delivers interrupt pipe reports and port events on a polled controller (a keyboard on such a controller reports within 20 ms). Every port step is inside a `try`/`catch` logging `root port 5: message`, and every wait is a 1 ms step that gives up when the binding detaches, so the thread leaves within one step of the teardown flag. The interrupt handler's share of hot-plug is small: it marks every device of a root port that lost its connection disconnected and signals the thread.
-
-Memory is pooled, objects are not: the four pages of an addressed device (its output and input contexts, its control ring and its control bounce page), the two pages of an interrupt pipe (its ring and its buffer) and the 64 KiB bounce plus ring page of a bulk pipe are allocated once on the host's binding and returned to free lists on release or close, never freed early, since the kit frees DMA memory only in the binding's teardown; the `UsbDevice` and `UsbPipe` objects over them are constructed per Address Device or per open and dropped when released or closed. The pools never shrink; their size is bounded by the most devices and pipes ever open at once on the controller. Commands, control transfers and bulk transfers are synchronous: one `DeviceLock` per controller guards the command ring, every transfer ring, the event ring consumer, the slot table and the pools, is held around ring and table work only and never across a wait, and the message interrupt handler takes no lock, since a lock holder runs with interrupts disabled; a waiter parks on a `DeviceEvent` with an interrupt and drains the event ring itself under the lock on a polled controller, which is where a report handler runs under the lock. A stick pulled out mid-transfer wakes its waiter at once through `MarkDisconnected`.
-
-`ClosePipeCore` is the controller command the old stack lacked: it stops the endpoint (Stop Endpoint, Reset Endpoint on a halted one, Set TR Dequeue Pointer), drops its context with a Configure Endpoint, marks the pipe closed, clears the slot's entry and returns the pipe's memory to its pool; the pipe object stays closed forever, so a driver still holding it gets `Error` from `BulkIn` and `BulkOut` and a no-op from `ClosePipe`. On a disconnected device, or a halted controller, only the state is dropped: the Disable Slot of the device's release ends every endpoint of the slot, and the pipe's memory is held until then. `OnDetach` releases every device the bus still holds through `Bus.ReleaseAll(reason.HardwarePresent)` (the slots disabled when the hardware is present; the commands complete through the polled wait, since the kit cancelled the binding's events and disconnected its interrupt before the hook), then, with the hardware present, stops the controller and turns bus mastering off; the kit frees every DMA page afterwards. The state carries the facts the suites read: `Index`, `Version`, `MaxSlots`, `MaxPorts`, `ContextSize`, `ScratchpadBuffers`, `HasInterrupt`, `IsPolling`, `HotPlugRunning`, `Bus`, and the counters `CommandsIssued`, `Timeouts`, `DevicesAddressed`, `PipesClosed`, `InterruptCount`, `PipeRecoveries`, `HostControllerEvents` and `LastHostControllerEventCode`. Not implemented: isochronous endpoints, interrupt OUT endpoints and streams.
+`XhciDriver` binds every xHCI controller. It enumerates the devices already plugged in during its probe, so a USB stick is ready before `OnBoot`, and handles hot-plug from a thread. It uses an MSI-X message where the platform routes one and polls every 20 ms otherwise. Isochronous endpoints, interrupt OUT endpoints and streams are not supported.
 
 ### The USB class drivers
 
-`UsbKeyboardDriver` (`[Driver(Feature = DriverFeature.Usb)]`, `new UsbMatch(interfaceClass: UsbClassCode.Hid, interfaceSubclass: 0x01, interfaceProtocol: 0x01)`: every HID interface declaring the boot keyboard protocol, which every PC keyboard does so firmware can use it) declines `keyboard support is compiled out` when `CosmosEnableKeyboard` is off, the `VirtioInputDriver` pattern, and `no interrupt IN endpoint` without a report endpoint, switches the interface to the boot protocol with SET_PROTOCOL (failed `SET_PROTOCOL(boot) failed`), asks for reports on change only with SET_IDLE (unchecked: a keyboard may stall it and still work), publishes a `UsbKeyboardState` named `usb-keyboard` before the pipe opens, so a report never finds a null sink, opens the report pipe (failed `could not open the report pipe`, and the unwind withdraws the keyboard) and logs `ready`. The handler diffs each 8-byte boot report against the previous one, modifiers first, then releases, then presses, into set 1 scan codes (the right Alt as `0x60`, as every driver reports it) and hands them to the `KeyboardSink`; a roll-over report is dropped. `SetLeds`, thread context on the kit worker when a lock key toggles on any keyboard, writes one SET_REPORT output report with the HID indicator bits through `ControlOut`, and the state keeps `LedWrites`, `LastLedReport` and `LastLedStatus` for the Drivers suite, beside `ReportCount` and `KeyEvents`. `OnDetach` has nothing to do: the pipe is closed by the ledger and the keyboard withdrawn by the kit, which takes it out of the keyboard manager's list.
+| Driver | Matches | Publishes |
+|--------|---------|-----------|
+| `UsbKeyboardDriver` | HID boot keyboards | a keyboard, `usb-keyboard` |
+| `UsbMassStorageDriver` | Mass storage over bulk-only transport (sticks, card readers, USB disks) | a block device per unit, `usb<n>` |
+| `UsbHubDriver` | Hubs | the devices behind the hub, as child nodes |
 
-`UsbMassStorageDriver` (`[Driver(Feature = DriverFeature.Usb)]`, `new UsbMatch(interfaceClass: UsbClassCode.MassStorage, interfaceSubclass: 0x06, interfaceProtocol: 0x50)`: SCSI commands over the Bulk-Only Transport, which USB sticks, card readers and USB disks all speak) declines `storage support is compiled out` when `CosmosEnableStorage` is off and `no bulk IN endpoint` or `no bulk OUT endpoint`, opens the two bulk pipes as shown above, asks the device for its highest LUN (a STALL means 0) and, for each LUN, builds a `UsbMassStorageUnit` (`IBlockDevice`, with `Index`, `Lun`, `Vendor`, `Product` and `IsDisconnected`) named `usb{N}`, where `N` is the lowest number no unit present uses, so a stick plugged back in gets its name back and two units never share one: INQUIRY (`usb0 (LUN 0): INQUIRY failed`, or `not a disk (peripheral 0x05), skipped` for anything but a disk), TEST UNIT READY up to 50 times 100 ms apart (`no medium`, `does not answer`, `never became ready`), READ CAPACITY, then the log line `usb0 (LUN 0): QEMU QEMU HARDDISK, 524288 blocks of 512 bytes` and `PublishBlockDevice`, inside which the storage manager registers and scans it; a registration the manager refuses throws out of the probe as `Failed` with the consumer's reason, and the unit never holds its name. It hangs a `UsbMassStorageState` off `binding.DriverState` (`UnitCount`, `MaxLun`, `Units`, `Detached`) and logs `1 unit(s), max LUN 0`, binding even with no unit ready, since the interface is this driver's. A unit moves every transfer through the transport one SCSI command at a time, 64 KiB at most each, under a `DeviceLock` held only around the busy flag, READ(10) and WRITE(10) below 2^32 blocks and the 16-byte forms above, three attempts on a transport error; a command that fails is `IOException("USB mass storage READ failed on usb0.")` and the like, and a unit whose device is gone throws `IOException("USB device detached")` from every read, write and flush, which is what a file still open on a pulled stick gets. `OnDetach` marks the state detached and frees the units' names, so the replugged stick's probe, which runs after this teardown completed, is `usb0` again.
-
-The usb cell of the Storage suite, whose stick hangs off a qemu-xhci added at `00:03.0`, logs in this order:
+A USB stick present at boot, for example:
 
 ```
-[Drivers] pci:0000:00:03.0 candidates: XhciDriver(prio 0, spec 3)
 [Drivers] pci:0000:00:03.0 XhciDriver: usb 1-1: 46f4:0001 SuperSpeed, 1 interface(s)
-[Drivers] pci:0000:00:03.0 XhciDriver: version 0x100, 64 slots, 8 ports, 32-byte contexts, 0 scratchpad buffers, events via message interrupt, 1 device(s)
 [Drivers] pci:0000:00:03.0 offer XhciDriver -> bound
 [Drivers] usb:1-1:0 candidates: UsbMassStorageDriver(prio 0, spec 3)
-[Drivers] usb:1-1:0 UsbMassStorageDriver: usb0 (LUN 0): QEMU QEMU HARDDISK, 524288 blocks of 512 bytes
 [StorageManager] usb0 registered by UsbMassStorageDriver (primary)
 [Drivers] usb:1-1:0 UsbMassStorageDriver published block "usb0" (consumed)
-[Drivers] usb:1-1:0 UsbMassStorageDriver: 1 unit(s), max LUN 0
 [Drivers] usb:1-1:0 offer UsbMassStorageDriver -> bound
 ```
-
-The device line comes before the controller line because the root port scan runs inside the probe, and the interface node is offered after the probe that published it. When the suite pulls the stick out and plugs it back in, the teardown and the new enumeration read:
-
-```
-[StorageManager] usb0 unregistered (no primary)
-[Drivers] usb:1-1:0 UsbMassStorageDriver withdrew block "usb0"
-[Drivers] usb:1-1:0 retracted
-[Drivers] pci:0000:00:03.0 XhciDriver: usb 1-1: disconnected
-[Drivers] pci:0000:00:03.0 XhciDriver: usb 1-2: 46f4:0001 SuperSpeed, 1 interface(s)
-[Drivers] usb:1-2:0 candidates: UsbMassStorageDriver(prio 0, spec 3)
-[Drivers] usb:1-2:0 UsbMassStorageDriver: usb0 (LUN 0): QEMU QEMU HARDDISK, 524288 blocks of 512 bytes
-[StorageManager] usb0 registered by UsbMassStorageDriver (primary)
-[Drivers] usb:1-2:0 UsbMassStorageDriver published block "usb0" (consumed)
-```
-
-QEMU plugs the stick back into its next free root port, so the node is new (`usb:1-2:0`, then `usb:1-3:0`) and the disk is `usb0` again. The usb-kbd cell of the Drivers suite shows the decline-after-open path on a keyboard, with the suite's `UsbDeclineDriver` offered first at priority 1 and the kit closing the pipe it opened before the shipped driver's probe opens the same endpoint:
-
-```
-[Drivers] pci:0000:00:03.0 XhciDriver: usb 1-5: 0627:0001 high-speed, 1 interface(s)
-[Drivers] usb:1-5:0 candidates: UsbDeclineDriver(prio 1, spec 3) UsbKeyboardDriver(prio 0, spec 3)
-[Drivers] usb:1-5:0 offer UsbDeclineDriver -> declined: declined after opening a pipe
-[KeyboardManager] Registered keyboard, total: 2
-[Drivers] usb:1-5:0 UsbKeyboardDriver published keyboard "usb-keyboard" (consumed)
-[Drivers] usb:1-5:0 UsbKeyboardDriver: ready
-[Drivers] usb:1-5:0 offer UsbKeyboardDriver -> bound
-```
-
-The suites read the drivers through the ring, never the log: `Manager_DeviceListedInDriverInfo` finds the stick in `DriverInfo` as a consumed block device under `UsbMassStorageDriver`, the hot-plug tests watch the node leave and rejoin the tree, and the Drivers suite reads the offers, the keyboard's state object and the host's counters.
 
 ## PS/2 devices
 
