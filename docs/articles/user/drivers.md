@@ -268,7 +268,10 @@ public sealed class KeyboardState : IKeyboard
 
     public InterruptHandle? Handle { get; set; }
 
-    public void SetLeds(KeyboardLeds leds) => _leds = leds;
+    public void SetLeds(KeyboardLeds leds)
+    {
+        _leds = leds;
+    }
 
     // Interrupt context: reads two registers, reports the key, wakes the
     // thread and hands the rest to the work item. Allocates nothing.
@@ -544,7 +547,10 @@ public sealed class ChildIdentity : DeviceIdentity
 
     public override string Address => Name;
 
-    public override string Describe() => string.Concat("child ", Name);
+    public override string Describe()
+    {
+        return string.Concat("child ", Name);
+    }
 }
 
 public sealed class ChildMatch : DeviceMatch
@@ -558,8 +564,10 @@ public sealed class ChildMatch : DeviceMatch
 
     public override int Specificity => 1;
 
-    public override bool Matches(DeviceIdentity identity) =>
-        identity is ChildIdentity child && string.Equals(_name, child.Name);
+    public override bool Matches(DeviceIdentity identity)
+    {
+        return identity is ChildIdentity child && string.Equals(_name, child.Name);
+    }
 }
 ```
 

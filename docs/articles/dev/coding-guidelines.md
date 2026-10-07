@@ -318,11 +318,30 @@ public sealed class Address : IComparable<Address>, IEquatable<Address>
 
     public Address(ReadOnlySpan<byte> buffer) { ... }
 
-    public ReadOnlySpan<byte> ToSpan() => Parts.AsSpan();
-    public bool Equals(Address? other) => other is not null && Parts.SequenceEqual(other.Parts);
-    public override bool Equals(object? obj) => Equals(obj as Address);
-    public override int GetHashCode() => HashCode.Combine(Id);
-    public int CompareTo(Address? other) => other is null ? 1 : Id.CompareTo(other.Id);
+    public ReadOnlySpan<byte> ToSpan()
+    {
+        return Parts.AsSpan();
+    }
+
+    public bool Equals(Address? other)
+    {
+        return other is not null && Parts.SequenceEqual(other.Parts);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as Address);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id);
+    }
+
+    public int CompareTo(Address? other)
+    {
+        return other is null ? 1 : Id.CompareTo(other.Id);
+    }
 }
 ```
 
@@ -393,7 +412,11 @@ internal interface ICpuOps
 // Implementation (Cosmos.Kernel.HAL.X64)
 public class X64CpuOps : ICpuOps
 {
-    public void Halt() => Native.Cpu.Halt();
+    public void Halt()
+    {
+        Native.Cpu.Halt();
+    }
+
     // ...
 }
 ```
@@ -408,12 +431,35 @@ internal class X64PlatformInitializer : IPlatformInitializer
     public string PlatformName => "x86-64";
     public PlatformArchitecture Architecture => PlatformArchitecture.X64;
 
-    public IPortIO CreatePortIO() => new X64PortIO();
-    public ICpuOps CreateCpuOps() => new X64CpuOps();
-    public IInterruptController CreateInterruptController() => new X64InterruptController();
-    public TimerDevice CreateTimer() => new PIT();
-    public void PublishPlatformNodes() { /* the 8042 and the PCI host, with their port ranges and lines */ }
-    public uint GetCpuCount() => /* ACPI/MADT */ 1;
+    public IPortIO CreatePortIO()
+    {
+        return new X64PortIO();
+    }
+
+    public ICpuOps CreateCpuOps()
+    {
+        return new X64CpuOps();
+    }
+
+    public IInterruptController CreateInterruptController()
+    {
+        return new X64InterruptController();
+    }
+
+    public TimerDevice CreateTimer()
+    {
+        return new PIT();
+    }
+
+    public void PublishPlatformNodes()
+    {
+        // the 8042 and the PCI host, with their port ranges and lines
+    }
+
+    public uint GetCpuCount()
+    {
+        return /* ACPI/MADT */ 1;
+    }
 
     public void InitializeHardware()
     {
@@ -566,7 +612,10 @@ public static unsafe void WriteString(string str)
 // Good: unsafe class for types that inherently work with pointers
 public unsafe class Thread : SchedulerExtensible
 {
-    public ThreadContext* GetContext() => (ThreadContext*)StackPointer;
+    public ThreadContext* GetContext()
+    {
+        return (ThreadContext*)StackPointer;
+    }
 }
 ```
 
@@ -707,7 +756,11 @@ A member that can return `null` is declared with `?`: never hide it behind `!` t
 ```csharp
 // Declare what can actually be null: callers are forced to handle it
 public static IScheduler? Current => _currentScheduler;
-public static PerCpuState? GetCpuState(uint cpuId) => _cpuStates?[cpuId];
+
+public static PerCpuState? GetCpuState(uint cpuId)
+{
+    return _cpuStates?[cpuId];
+}
 
 // Prefer a sentinel over a nullable field when null and empty mean the same thing
 private byte[] _window = [];                 // not: private byte[]? _window;
@@ -752,8 +805,13 @@ Use `?? throw` where a null result is a programming error:
 Address source = IPConfig.FindNetwork(destination)
     ?? throw new InvalidOperationException("No network route to destination");
 
-public MacAddress MacAddress => _macAddress
-    ?? throw new InvalidOperationException($"{nameof(_macAddress)} is null");
+public MacAddress MacAddress
+{
+    get
+    {
+        return _macAddress ?? throw new InvalidOperationException($"{nameof(_macAddress)} is null");
+    }
+}
 ```
 
 ### Constructors
@@ -789,9 +847,8 @@ The project targets `<LangVersion>latest</LangVersion>` and .NET 10. Use modern 
 // File-scoped namespaces
 namespace Cosmos.Kernel.Core.Scheduler;
 
-// Expression-bodied members for trivial implementations
+// Expression bodies for a property, indexer or accessor that fits on one line
 public string PlatformName => "x86-64";
-public void Halt() => Native.Cpu.Halt();
 
 // Pattern matching
 switch (args[i])
@@ -895,6 +952,26 @@ if (ptr == null)                  // Good
     return;
 }
 
+// Don't give a method, constructor, operator or local function an expression body
+public void Halt() => Native.Cpu.Halt();     // Bad
+
+public void Halt()                           // Good
+{
+    Native.Cpu.Halt();
+}
+
+// Don't wrap an expression body: past one line, a property takes a get block
+public bool IsFixedRoot =>                   // Bad
+    Parent is null && Superblock.Boot.Type != FatType.Fat32;
+
+public bool IsFixedRoot                      // Good
+{
+    get
+    {
+        return Parent is null && Superblock.Boot.Type != FatType.Fat32;
+    }
+}
+
 // Don't compare a bool to a literal
 if (applied == false)             // Bad
 if (!applied)                     // Good
@@ -908,6 +985,8 @@ if (map.ContainsKey(key))         // Bad: two lookups
 
 > Braces are enforced by `.editorconfig` (`csharp_prefer_braces = true:error`) and by CI (`dotnet format style --severity error`).
 
+Methods, constructors, operators and local functions take a block body, even for a single statement: a wrapped `=>` hides where the body starts. A property, indexer or accessor uses `=>` only when the whole member fits on one line, and a lambda keeps its `=>`. `.editorconfig` records this in the `csharp_style_expression_bodied_*` options at `silent`, so CI does not enforce it.
+
 ### Feature Switches
 
 Use `[FeatureSwitchDefinition]` for compile-time feature toggling (trimmed by NativeAOT linker). All feature flags live in `Cosmos.Kernel.Core.CosmosFeatures`:
@@ -915,9 +994,13 @@ Use `[FeatureSwitchDefinition]` for compile-time feature toggling (trimmed by Na
 ```csharp
 // In CosmosFeatures.cs: one property per feature
 [FeatureSwitchDefinition("Cosmos.Kernel.HAL.Interrupts.Enabled")]
-public static bool InterruptsEnabled =>
-    AppContext.TryGetSwitch("Cosmos.Kernel.HAL.Interrupts.Enabled", out bool enabled)
-        ? enabled : true;
+public static bool InterruptsEnabled
+{
+    get
+    {
+        return AppContext.TryGetSwitch("Cosmos.Kernel.HAL.Interrupts.Enabled", out bool enabled) ? enabled : true;
+    }
+}
 
 // The ILC linker trims the dead branch entirely
 if (CosmosFeatures.KeyboardEnabled)
