@@ -42,6 +42,20 @@ public abstract class Canvas3D : Canvas
     private uint _lineColor;
 
     /// <summary>
+    /// The camera every 3D draw call is seen through. The aspect ratio comes
+    /// from the canvas <see cref="Canvas.Mode"/>.
+    /// </summary>
+    public Camera3D Camera
+    {
+        get => _camera;
+        set
+        {
+            _camera = value;
+            OnCameraChanged();
+        }
+    }
+
+    /// <summary>
     /// Initializes a 3D canvas over a published display, in the display's
     /// current mode or its default mode when it reports none. The base has
     /// sized the buffer when the subclass constructor runs and calls no
@@ -54,20 +68,6 @@ public abstract class Canvas3D : Canvas
     protected Canvas3D(DisplayDevice display)
         : base(display)
     {
-    }
-
-    /// <summary>
-    /// The camera every 3D draw call is seen through. The aspect ratio comes
-    /// from the canvas <see cref="Canvas.Mode"/>.
-    /// </summary>
-    public Camera3D Camera
-    {
-        get => _camera;
-        set
-        {
-            _camera = value;
-            OnCameraChanged();
-        }
     }
 
     /// <summary>

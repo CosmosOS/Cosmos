@@ -20,7 +20,8 @@ public static class DisplayManager
     private static KitDisplayConsumer? s_consumer;
 
     /// <summary>
-    /// Whether graphics support is enabled. Uses centralized feature flag.
+    /// Whether graphics support is compiled into this kernel
+    /// (the <c>CosmosEnableGraphics</c> feature switch).
     /// </summary>
     public static bool IsEnabled => CosmosFeatures.GraphicsEnabled;
 

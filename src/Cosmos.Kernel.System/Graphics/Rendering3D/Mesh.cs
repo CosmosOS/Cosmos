@@ -30,24 +30,6 @@ public sealed class Mesh : IDisposable
     internal object? DriverData { get; set; }
 
     /// <summary>
-    /// Creates a mesh handle owned by <paramref name="owner"/>; the canvas
-    /// calls this through <see cref="Canvas3D.CreateMeshHandle"/>.
-    /// </summary>
-    /// <param name="owner">The canvas that uploaded the mesh.</param>
-    /// <param name="vertexCount">The number of vertices in the mesh.</param>
-    /// <param name="indexCount">The number of indices in the mesh.</param>
-    /// <param name="texture">The texture mapped onto the mesh, or null.</param>
-    /// <param name="topology">How the indices assemble into primitives.</param>
-    internal Mesh(Canvas3D owner, int vertexCount, int indexCount, Texture? texture, MeshTopology topology)
-    {
-        Owner = owner;
-        VertexCount = vertexCount;
-        IndexCount = indexCount;
-        Texture = texture;
-        Topology = topology;
-    }
-
-    /// <summary>
     /// The number of vertices in the mesh.
     /// </summary>
     public int VertexCount { get; }
@@ -69,6 +51,24 @@ public sealed class Mesh : IDisposable
     public bool IsDisposed { get; private set; }
 
     /// <summary>
+    /// Creates a mesh handle owned by <paramref name="owner"/>; the canvas
+    /// calls this through <see cref="Canvas3D.CreateMeshHandle"/>.
+    /// </summary>
+    /// <param name="owner">The canvas that uploaded the mesh.</param>
+    /// <param name="vertexCount">The number of vertices in the mesh.</param>
+    /// <param name="indexCount">The number of indices in the mesh.</param>
+    /// <param name="texture">The texture mapped onto the mesh, or null.</param>
+    /// <param name="topology">How the indices assemble into primitives.</param>
+    internal Mesh(Canvas3D owner, int vertexCount, int indexCount, Texture? texture, MeshTopology topology)
+    {
+        Owner = owner;
+        VertexCount = vertexCount;
+        IndexCount = indexCount;
+        Texture = texture;
+        Topology = topology;
+    }
+
+    /// <summary>
     /// Releases the device memory held by this mesh. Any <see cref="Texture"/>
     /// it references is not disposed with it.
     /// </summary>
@@ -82,16 +82,4 @@ public sealed class Mesh : IDisposable
         IsDisposed = true;
         Owner.DestroyMesh(this);
     }
-}
-
-/// <summary>
-/// How the indices of a mesh assemble into primitives.
-/// </summary>
-public enum MeshTopology
-{
-    /// <summary>Every three indices form a triangle.</summary>
-    Triangles,
-
-    /// <summary>Every two indices form a line segment.</summary>
-    Lines,
 }

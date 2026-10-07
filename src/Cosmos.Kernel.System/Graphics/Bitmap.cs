@@ -1,4 +1,5 @@
-﻿//#define COSMOSDEBUG
+﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System;
 using System.IO;
 using System.Security;
@@ -34,7 +35,7 @@ public sealed class Bitmap : Image
     /// <param name="height">The height of the bitmap.</param>
     /// <param name="pixelData">A byte array which includes the values for each pixel.</param>
     /// <param name="colorDepth">The format of the pixel data.</param>
-    /// <exception cref="NotImplementedException">Thrown if color depth is not 32.</exception>
+    /// <exception cref="NotImplementedException">Thrown if color depth is not 24 or 32.</exception>
     /// <exception cref="OverflowException">Thrown if bitmap size is bigger than Int32.MaxValue.</exception>
     /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
     /// <exception cref="ArgumentNullException">Thrown on memory error.</exception>
@@ -96,14 +97,14 @@ public sealed class Bitmap : Image
     /// <item>Total Image Size is smaller than pure image size.</item>
     /// </list>
     /// </exception>
-    /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
+    /// <exception cref="NotImplementedException">Thrown if the pixel size is other than 32 / 24 or the file is compressed.</exception>
     /// <exception cref="SecurityException">Thrown if the caller does not have permissions to read / write the file.</exception>
     /// <exception cref="FileNotFoundException">Thrown if the file cannot be found.</exception>
     /// <exception cref="DirectoryNotFoundException">Thrown if the specified path is invalid.</exception>
     /// <exception cref="PathTooLongException">Thrown if the specified path is exceed the system-defined max length.</exception>
     public Bitmap(string path, ColorOrder colorOrder = ColorOrder.BGR) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
     {
-        using var fs = new FileStream(path, FileMode.Open);
+        using FileStream fs = new(path, FileMode.Open);
         CreateBitmap(fs, colorOrder);
     }
 
@@ -126,13 +127,12 @@ public sealed class Bitmap : Image
     /// <item>Total Image Size is smaller than pure image size.</item>
     /// </list>
     /// </exception>
-    /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
+    /// <exception cref="NotImplementedException">Thrown if the pixel size is other than 32 / 24 or the file is compressed.</exception>
     public Bitmap(byte[] imageData, ColorOrder colorOrder = ColorOrder.BGR) : base(0, 0, ColorDepth.ColorDepth32) //Call the image constructor with wrong values
     {
-        using var ms = new MemoryStream(imageData);
+        using MemoryStream ms = new(imageData);
         CreateBitmap(ms, colorOrder);
     }
-
 
     // For more information about the format: https://docs.microsoft.com/en-us/previous-versions/ms969901(v=msdn.10)?redirectedfrom=MSDN
     /// <summary>
@@ -159,7 +159,7 @@ public sealed class Bitmap : Image
     /// <item>Total Image Size is smaller than pure image size.</item>
     /// </list>
     /// </exception>
-    /// <exception cref="NotImplementedException">Thrown if pixelsize is other then 32 / 24 or the file compressed.</exception>
+    /// <exception cref="NotImplementedException">Thrown if the pixel size is other than 32 / 24 or the file is compressed.</exception>
     private void CreateBitmap(Stream stream, ColorOrder colorOrder)
     {
         #region BMP Header
@@ -224,7 +224,6 @@ public sealed class Bitmap : Image
         // TODO: Be able to handle compressed files
         if (compression is not 0 and not 3) //3 is BI_BITFIELDS again ignore for now is for Adobe Images
         {
-            //Global.mDebugger.Send("Can only handle uncompressed files!");
             throw new NotImplementedException("Bitmap compression is not supported.");
         }
 
@@ -350,7 +349,7 @@ public sealed class Bitmap : Image
     public void Save(Stream stream)
     {
         //Calculate padding
-        int padding = 4 - ((int)Width * (int)ColorDepth % 32 / 8);
+        int padding = 4 - (Width * (int)ColorDepth % 32 / 8);
         if (padding == 4)
         {
             padding = 0;
@@ -365,7 +364,7 @@ public sealed class Bitmap : Image
         Array.Copy(data, 0, file, position, 2);
         position += 2;
 
-        // Write apporiximate file size
+        // Write approximate file size
         data = BitConverter.GetBytes(54 /*header*/ + (Width * Height * (uint)ColorDepth / 8) /*assume that it is full bytes */);
         Array.Copy(data, 0, file, position, 4);
         position += 4;

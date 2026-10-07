@@ -26,6 +26,21 @@ public sealed class Texture : IDisposable
     internal object? DriverData { get; set; }
 
     /// <summary>
+    /// The width of the texture in pixels.
+    /// </summary>
+    public int Width { get; }
+
+    /// <summary>
+    /// The height of the texture in pixels.
+    /// </summary>
+    public int Height { get; }
+
+    /// <summary>
+    /// Whether <see cref="Dispose"/> ran: a mesh mapping a disposed texture can no longer be drawn.
+    /// </summary>
+    public bool IsDisposed { get; private set; }
+
+    /// <summary>
     /// Creates a texture handle owned by <paramref name="owner"/>; the canvas
     /// calls this through <see cref="Canvas3D.CreateTextureHandle"/>.
     /// </summary>
@@ -40,21 +55,6 @@ public sealed class Texture : IDisposable
         Height = height;
         DriverData = driverData;
     }
-
-    /// <summary>
-    /// The width of the texture in pixels.
-    /// </summary>
-    public int Width { get; }
-
-    /// <summary>
-    /// The height of the texture in pixels.
-    /// </summary>
-    public int Height { get; }
-
-    /// <summary>
-    /// Whether <see cref="Dispose"/> ran: a mesh mapping a disposed texture can no longer be drawn.
-    /// </summary>
-    public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Releases the device memory held by this texture. A mesh that still

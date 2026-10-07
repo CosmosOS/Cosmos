@@ -23,22 +23,6 @@ public sealed class DisplayDevice
     /// <summary>The refresh rate reported when the driver does not know its own.</summary>
     private const int DefaultRefreshRate = 60;
 
-    private readonly PublishedDevice _published;
-    private readonly IDisplay _display;
-
-    /// <summary>Wraps a published display. Thread context, from the consumer's <see cref="KitDisplayConsumer.OnPublished"/>.</summary>
-    /// <param name="published">The published device, whose contract object is an <see cref="IDisplay"/>.</param>
-    internal DisplayDevice(PublishedDevice published)
-    {
-        _published = published;
-        _display = (IDisplay)published.Device;
-        Name = published.Name;
-        DeviceBinding? binding = published.Binding;
-        DriverName = binding is null ? "firmware" : binding.Driver.Name;
-        NodePath = binding?.Node.Path;
-        IsFirmware = published.Provenance == DeviceProvenance.Firmware;
-    }
-
     /// <summary>The driver's name for the display: <c>framebuffer</c>, <c>virtio-gpu</c>, <c>vmware-svga</c>.</summary>
     public string Name { get; }
 
@@ -52,44 +36,57 @@ public sealed class DisplayDevice
     public string? NodePath { get; }
 
     /// <summary>Width in pixels of the current mode; 0 once withdrawn.</summary>
-    public int Width => _published.IsWithdrawn ? 0 : _display.Mode.Width;
+    public int Width => Published.IsWithdrawn ? 0 : Display.Mode.Width;
 
     /// <summary>Height in pixels of the current mode; 0 once withdrawn.</summary>
-    public int Height => _published.IsWithdrawn ? 0 : _display.Mode.Height;
+    public int Height => Published.IsWithdrawn ? 0 : Display.Mode.Height;
 
     /// <summary>Bits per pixel of the current mode; 0 once withdrawn.</summary>
-    public int BitsPerPixel => _published.IsWithdrawn ? 0 : _display.Mode.BitsPerPixel;
+    public int BitsPerPixel => Published.IsWithdrawn ? 0 : Display.Mode.BitsPerPixel;
 
     /// <summary>Bytes per row of the framebuffer in the current mode; 0 once withdrawn.</summary>
-    public int Pitch => _published.IsWithdrawn ? 0 : _display.Mode.Pitch;
+    public int Pitch => Published.IsWithdrawn ? 0 : Display.Mode.Pitch;
 
     /// <summary>Refresh rate in Hz of the current mode; 60 when the driver reports none, 0 once withdrawn.</summary>
     public int RefreshRate
     {
         get
         {
-            if (_published.IsWithdrawn)
+            if (Published.IsWithdrawn)
             {
                 return 0;
             }
 
-            int refreshRate = _display.Mode.RefreshRate;
+            int refreshRate = Display.Mode.RefreshRate;
             return refreshRate == 0 ? DefaultRefreshRate : refreshRate;
         }
     }
 
     /// <summary>True once the kit withdrew the display: the driver unbound, or a driver retired the firmware framebuffer.</summary>
-    public bool IsWithdrawn => _published.IsWithdrawn;
+    public bool IsWithdrawn => Published.IsWithdrawn;
 
     /// <summary>
     /// The contract object the driver published, for the canvas that draws
     /// on it. Read only while <see cref="IsWithdrawn"/> is false, the kit's
     /// rule on contract objects. Any context.
     /// </summary>
-    internal IDisplay Display => _display;
+    internal IDisplay Display { get; }
 
     /// <summary>The kit's record of the publication: the withdrawal flag and the reference the consumer matches reports by. Any context.</summary>
-    internal PublishedDevice Published => _published;
+    internal PublishedDevice Published { get; }
+
+    /// <summary>Wraps a published display. Thread context, from the consumer's <see cref="KitDisplayConsumer.OnPublished"/>.</summary>
+    /// <param name="published">The published device, whose contract object is an <see cref="IDisplay"/>.</param>
+    internal DisplayDevice(PublishedDevice published)
+    {
+        Published = published;
+        Display = (IDisplay)published.Device;
+        Name = published.Name;
+        DeviceBinding? binding = published.Binding;
+        DriverName = binding is null ? "firmware" : binding.Driver.Name;
+        NodePath = binding?.Node.Path;
+        IsFirmware = published.Provenance == DeviceProvenance.Firmware;
+    }
 
     /// <summary>
     /// Finds a facet of the display: an extra interface the published
@@ -102,13 +99,13 @@ public sealed class DisplayDevice
     /// <returns>False when the display does not implement <typeparamref name="T"/>, and always once the display is withdrawn.</returns>
     public bool TryGetFacet<T>([NotNullWhen(true)] out T? facet) where T : class
     {
-        if (_published.IsWithdrawn)
+        if (Published.IsWithdrawn)
         {
             facet = null;
             return false;
         }
 
-        if (_display is T found)
+        if (Display is T found)
         {
             facet = found;
             return true;

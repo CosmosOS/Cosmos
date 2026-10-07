@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System.IO;
 
 namespace Cosmos.Kernel.System.Graphics;
@@ -35,10 +37,7 @@ public sealed class Png : Image
     /// Initializes a new instance of the <see cref="Png"/> class from a stream containing PNG data.
     /// </summary>
     /// <param name="stream">The stream containing PNG data.</param>
-    public Png(Stream stream) : base(0, 0, ColorDepth.ColorDepth32)
-    {
-        Create(stream);
-    }
+    public Png(Stream stream) : base(0, 0, ColorDepth.ColorDepth32) => Create(stream);
 
     private void Create(Stream stream)
     {

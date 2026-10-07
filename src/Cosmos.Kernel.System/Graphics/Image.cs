@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 namespace Cosmos.Kernel.System.Graphics;
 
@@ -39,7 +37,7 @@ public abstract class Image
     public ColorDepth ColorDepth { get; internal set; }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="Image"/> class.
+    /// Initializes a new instance of the <see cref="Image"/> class.
     /// </summary>
     /// <param name="width">The width of the image.</param>
     /// <param name="height">The height of the image.</param>

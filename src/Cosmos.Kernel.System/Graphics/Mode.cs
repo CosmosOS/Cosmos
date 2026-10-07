@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 namespace Cosmos.Kernel.System.Graphics;
 
@@ -42,10 +41,8 @@ public readonly struct Mode : IEquatable<Mode>
     /// <paramref name="other"/>.
     /// </summary>
     /// <param name="other">The mode to compare with.</param>
-    public bool Equals(Mode other)
-    {
-        return Width == other.Width && Height == other.Height && ColorDepth == other.ColorDepth;
-    }
+    public bool Equals(Mode other) =>
+        Width == other.Width && Height == other.Height && ColorDepth == other.ColorDepth;
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is Mode mode && Equals(mode);
@@ -81,7 +78,6 @@ public readonly struct Mode : IEquatable<Mode>
             return 1;
         }
 
-        // They are effectively Equals
         return 0;
     }
 
@@ -118,8 +114,5 @@ public readonly struct Mode : IEquatable<Mode>
     /// <summary>
     /// Formats the mode as <c>width x height @ depth</c>, e.g. <c>1024x768@32</c>.
     /// </summary>
-    public override string ToString()
-    {
-        return $"{Width}x{Height}@{(int)ColorDepth}";
-    }
+    public override string ToString() => $"{Width}x{Height}@{(int)ColorDepth}";
 }

@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.System.Graphics.Rendering3D;
 
@@ -13,13 +15,11 @@ namespace Cosmos.Kernel.System.Graphics;
 /// </remarks>
 internal static class FullScreenCanvas
 {
-    private static Canvas? s_videoDriver;
-
     /// <summary>
     /// The canvas currently driving the screen, or <see langword="null"/> when
     /// nothing has acquired it yet or the last one was disabled.
     /// </summary>
-    internal static Canvas? Current => s_videoDriver;
+    internal static Canvas? Current { get; private set; }
 
     /// <summary>
     /// Runs the cached canvas's <see cref="Canvas.Disable"/>, which releases
@@ -32,13 +32,13 @@ internal static class FullScreenCanvas
     /// </summary>
     internal static void Disable()
     {
-        if (s_videoDriver is null)
+        if (Current is null)
         {
             return;
         }
 
-        s_videoDriver.Disable();
-        s_videoDriver = null;
+        Current.Disable();
+        Current = null;
     }
 
     /// <summary>
@@ -54,8 +54,8 @@ internal static class FullScreenCanvas
         ThrowIfGraphicsDisabled();
         DropIfWithdrawn();
 
-        s_videoDriver ??= CreateVideoDriver(null);
-        return s_videoDriver;
+        Current ??= CreateVideoDriver(null);
+        return Current;
     }
 
     /// <summary>
@@ -72,16 +72,16 @@ internal static class FullScreenCanvas
         ThrowIfGraphicsDisabled();
         DropIfWithdrawn();
 
-        if (s_videoDriver is null)
+        if (Current is null)
         {
-            s_videoDriver = CreateVideoDriver(mode);
+            Current = CreateVideoDriver(mode);
         }
         else
         {
-            s_videoDriver.Mode = mode;
+            Current.Mode = mode;
         }
 
-        return s_videoDriver;
+        return Current;
     }
 
     /// <summary>
@@ -133,7 +133,7 @@ internal static class FullScreenCanvas
     /// </summary>
     private static void DropIfWithdrawn()
     {
-        if (s_videoDriver is { IsDisplayWithdrawn: true })
+        if (Current is { IsDisplayWithdrawn: true })
         {
             Disable();
         }

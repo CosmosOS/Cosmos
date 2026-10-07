@@ -1,4 +1,5 @@
-//#define COSMOSDEBUG
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -65,54 +66,6 @@ public class Canvas
 
     /// <summary>Set once <see cref="Display"/> logged that the display's depth is not supported.</summary>
     private bool _unsupportedDepthLogged;
-
-    /// <summary>
-    /// Creates an off-screen (buffer-backed) canvas of the given size.
-    /// </summary>
-    /// <param name="width">The width of the canvas in pixels.</param>
-    /// <param name="height">The height of the canvas in pixels.</param>
-    /// <param name="colorDepth">The color depth (default 32-bit).</param>
-    public Canvas(int width, int height, ColorDepth colorDepth = ColorDepth.ColorDepth32)
-    {
-        _mode = new Mode(width, height, colorDepth);
-        _buffer = new int[width * height];
-        _name = OffScreenName;
-    }
-
-    /// <summary>
-    /// Attaches a canvas to a published display, switching it to
-    /// <paramref name="requested"/> when the display can switch modes, or to
-    /// its default mode when it reports none. The constructor calls no
-    /// virtual member, so a subclass sees its own fields set before anything
-    /// virtual runs; when the display's mode is still empty afterwards the
-    /// canvas is zero-sized. Thread context.
-    /// </summary>
-    /// <param name="display">The display to draw on.</param>
-    /// <param name="requested">The mode to switch to, or null to keep or default the display's mode.</param>
-    /// <exception cref="ArgumentOutOfRangeException">The display can switch modes and refused <paramref name="requested"/>.</exception>
-    internal Canvas(DisplayDevice display, Mode? requested)
-    {
-        ArgumentNullException.ThrowIfNull(display);
-
-        _display = display;
-        _name = display.DriverName + " " + display.Name;
-        ApplyInitialMode(display, requested);
-        _mode = ReadMode(display);
-        _buffer = new int[_mode.Width * _mode.Height];
-    }
-
-    /// <summary>
-    /// Attaches a canvas to a published display in the display's current
-    /// mode, or its default mode when it reports none. For a
-    /// <see cref="Canvas3D"/> in a driver package: the base has sized the
-    /// buffer when the subclass constructor runs, and calls no virtual
-    /// member. Thread context.
-    /// </summary>
-    /// <param name="display">The display to draw on.</param>
-    protected Canvas(DisplayDevice display)
-        : this(display, null)
-    {
-    }
 
     /// <summary>
     /// The graphics modes this canvas accepts: the display's list when it
@@ -207,6 +160,61 @@ public class Canvas
     public virtual string Name => _name;
 
     /// <summary>
+    /// True when this canvas is attached to a display the kit has since
+    /// withdrawn: <see cref="Display"/> then copies nothing, and the
+    /// full-screen cache replaces the canvas on the next acquisition.
+    /// </summary>
+    internal bool IsDisplayWithdrawn => _display is not null && _display.IsWithdrawn;
+
+    /// <summary>
+    /// Creates an off-screen (buffer-backed) canvas of the given size.
+    /// </summary>
+    /// <param name="width">The width of the canvas in pixels.</param>
+    /// <param name="height">The height of the canvas in pixels.</param>
+    /// <param name="colorDepth">The color depth (default 32-bit).</param>
+    public Canvas(int width, int height, ColorDepth colorDepth = ColorDepth.ColorDepth32)
+    {
+        _mode = new Mode(width, height, colorDepth);
+        _buffer = new int[width * height];
+        _name = OffScreenName;
+    }
+
+    /// <summary>
+    /// Attaches a canvas to a published display, switching it to
+    /// <paramref name="requested"/> when the display can switch modes, or to
+    /// its default mode when it reports none. The constructor calls no
+    /// virtual member, so a subclass sees its own fields set before anything
+    /// virtual runs; when the display's mode is still empty afterwards the
+    /// canvas is zero-sized. Thread context.
+    /// </summary>
+    /// <param name="display">The display to draw on.</param>
+    /// <param name="requested">The mode to switch to, or null to keep or default the display's mode.</param>
+    /// <exception cref="ArgumentOutOfRangeException">The display can switch modes and refused <paramref name="requested"/>.</exception>
+    internal Canvas(DisplayDevice display, Mode? requested)
+    {
+        ArgumentNullException.ThrowIfNull(display);
+
+        _display = display;
+        _name = $"{display.DriverName} {display.Name}";
+        ApplyInitialMode(display, requested);
+        _mode = ReadMode(display);
+        _buffer = new int[_mode.Width * _mode.Height];
+    }
+
+    /// <summary>
+    /// Attaches a canvas to a published display in the display's current
+    /// mode, or its default mode when it reports none. For a
+    /// <see cref="Canvas3D"/> in a driver package: the base has sized the
+    /// buffer when the subclass constructor runs, and calls no virtual
+    /// member. Thread context.
+    /// </summary>
+    /// <param name="display">The display to draw on.</param>
+    protected Canvas(DisplayDevice display)
+        : this(display, null)
+    {
+    }
+
+    /// <summary>
     /// Gets the full-screen canvas on the primary display, in the display's
     /// current mode or its default mode when it reports none. The first call
     /// builds it; later calls hand back the same canvas without resetting the
@@ -225,10 +233,7 @@ public class Canvas
     /// is published: the kernel has no framebuffer from the bootloader and no
     /// display driver bound a device.
     /// </exception>
-    public static Canvas GetFullScreen()
-    {
-        return FullScreenCanvas.Get();
-    }
+    public static Canvas GetFullScreen() => FullScreenCanvas.Get();
 
     /// <summary>
     /// Gets the full-screen canvas on the primary display, switching the
@@ -242,10 +247,7 @@ public class Canvas
     /// </param>
     /// <exception cref="InvalidOperationException">Graphics support is compiled out with CosmosEnableGraphics=false, or no display is published.</exception>
     /// <exception cref="ArgumentOutOfRangeException">The display can switch modes and does not support <paramref name="mode"/>.</exception>
-    public static Canvas GetFullScreen(Mode mode)
-    {
-        return FullScreenCanvas.Get(mode);
-    }
+    public static Canvas GetFullScreen(Mode mode) => FullScreenCanvas.Get(mode);
 
     /// <summary>
     /// Drops the full-screen canvas, after its <see cref="Disable"/> released
@@ -254,36 +256,24 @@ public class Canvas
     /// display. Any canvas already acquired is dead after this call. The
     /// display itself stays in its mode: there is no text mode to return to.
     /// </summary>
-    public static void DisableFullScreen()
-    {
-        FullScreenCanvas.Disable();
-    }
+    public static void DisableFullScreen() => FullScreenCanvas.Disable();
 
     /// <summary>
     /// Clears the canvas with the default color.
     /// </summary>
-    public void Clear()
-    {
-        Clear(Color.Black);
-    }
+    public void Clear() => Clear(Color.Black);
 
     /// <summary>
     /// Clears the entire canvas with the specified color.
     /// </summary>
     /// <param name="color">The ARGB color to clear the screen with.</param>
-    public virtual void Clear(int color)
-    {
-        Array.Fill(_buffer, color);
-    }
+    public virtual void Clear(int color) => Array.Fill(_buffer, color);
 
     /// <summary>
     /// Clears the entire canvas with the specified color.
     /// </summary>
     /// <param name="color">The color to clear the screen with.</param>
-    public virtual void Clear(Color color)
-    {
-        Clear(color.ToArgb());
-    }
+    public virtual void Clear(Color color) => Clear(color.ToArgb());
 
     /// <summary>
     /// Releases what the canvas holds on its device; the canvas is dead
@@ -295,13 +285,6 @@ public class Canvas
     protected internal virtual void Disable()
     {
     }
-
-    /// <summary>
-    /// True when this canvas is attached to a display the kit has since
-    /// withdrawn: <see cref="Display"/> then copies nothing, and the
-    /// full-screen cache replaces the canvas on the next acquisition.
-    /// </summary>
-    internal bool IsDisplayWithdrawn => _display is not null && _display.IsWithdrawn;
 
     /// <summary>
     /// Called after <see cref="Mode"/> was assigned and the buffer resized,
@@ -513,9 +496,7 @@ public class Canvas
     /// <param name="width">The width of the drawn bitmap.</param>
     /// <param name="height">The height of the drawn bitmap.</param>
     public virtual void DrawArray(int[] colors, int x, int y, int width, int height)
-    {
-        CopyRows(colors, 0, width, x, y, width, height);
-    }
+        => CopyRows(colors, 0, width, x, y, width, height);
 
     /// <summary>
     /// Draws an array of raw ARGB pixels to the canvas, starting at the given
@@ -528,9 +509,7 @@ public class Canvas
     /// <param name="height">The height of the drawn bitmap.</param>
     /// <param name="startIndex">The index in <paramref name="colors"/> of the first pixel.</param>
     public virtual void DrawArray(int[] colors, int x, int y, int width, int height, int startIndex)
-    {
-        CopyRows(colors, startIndex, width, x, y, width, height);
-    }
+        => CopyRows(colors, startIndex, width, x, y, width, height);
 
     /// <summary>
     /// Draws another canvas onto this one at the specified position, as row
@@ -626,7 +605,7 @@ public class Canvas
     /// Draw a vertical line.
     /// </summary>
     /// <param name="color">The color to draw with.</param>
-    /// <param name="dy">The line of the line.</param>
+    /// <param name="dy">The length of the line.</param>
     /// <param name="x1">The starting point X coordinate.</param>
     /// <param name="y1">The starting point Y coordinate.</param>
     internal void DrawVerticalLine(Color color, int dy, int x1, int y1)
@@ -712,13 +691,12 @@ public class Canvas
     /// </remarks>
     public virtual void DrawLine(Color color, int x1, int y1, int x2, int y2)
     {
-        // Trim the given line to fit inside the canvas boundaries
         TrimLine(ref x1, ref y1, ref x2, ref y2);
 
-        int dx = x2 - x1; // The horizontal distance of the line
-        int dy = y2 - y1; // The vertical distance of the line
+        int dx = x2 - x1;
+        int dy = y2 - y1;
 
-        if (dy == 0) // The line is horizontal
+        if (dy == 0)
         {
             // Both endpoints are painted, so the run is the distance plus one.
             // DrawHorizontalLine only walks in the positive direction; start
@@ -727,14 +705,13 @@ public class Canvas
             return;
         }
 
-        if (dx == 0) // The line is vertical
+        if (dx == 0)
         {
             // Same as above: start from the topmost point.
             DrawVerticalLine(color, Math.Abs(dy) + 1, x1, Math.Min(y1, y2));
             return;
         }
 
-        // The line is neither horizontal neither vertical - it's diagonal.
         DrawDiagonalLine(color, dx, dy, x1, y1);
     }
 
@@ -795,7 +772,6 @@ public class Canvas
         {
             for (int i = x0 - x; i <= x0 + x; i++)
             {
-
                 DrawPoint(color, i, y0 + y);
                 DrawPoint(color, i, y0 - y);
             }
@@ -847,8 +823,17 @@ public class Canvas
             DrawPoint(color, xCenter - x, yCenter - y);
             DrawPoint(color, xCenter + x, yCenter - y);
             e2 = 2 * err;
-            if (e2 <= dy) { y++; err += dy += a; }
-            if (e2 >= dx || 2 * err > dy) { x--; err += dx += b1; }
+            if (e2 <= dy)
+            {
+                y++;
+                err += dy += a;
+            }
+
+            if (e2 >= dx || 2 * err > dy)
+            {
+                x--;
+                err += dx += b1;
+            }
         }
     }
 
@@ -894,9 +879,9 @@ public class Canvas
         for (double angle = startAngle; angle < endAngle; angle += 0.5)
         {
             double angleRadians = Math.PI * angle / 180;
-            int IX = (int)(xR * Math.Cos(angleRadians));
-            int IY = (int)(yR * Math.Sin(angleRadians));
-            DrawPoint(color, xCenter + IX, yCenter + IY);
+            int offsetX = (int)(xR * Math.Cos(angleRadians));
+            int offsetY = (int)(yR * Math.Sin(angleRadians));
+            DrawPoint(color, xCenter + offsetX, yCenter + offsetY);
         }
     }
 
@@ -1350,7 +1335,7 @@ public class Canvas
         {
             if (elem == mode)
             {
-                return true; // All OK mode does exists in availableModes
+                return true;
             }
         }
 
@@ -1398,7 +1383,7 @@ public class Canvas
         float x1Out = x1, y1Out = y1;
         float x2Out = x2, y2Out = y2;
 
-        // calculate the line slope, and the entercepted part of the y axis
+        // calculate the line slope, and the intercepted part of the y axis
         float m = (y2Out - y1Out) / (x2Out - x1Out);
         float c = y1Out - (m * x1Out);
 
@@ -1453,19 +1438,24 @@ public class Canvas
         // final check, to avoid lines that are totally outside bounds
         if (x1Out < 0 || x1Out >= Width || y1Out < 0 || y1Out >= Height)
         {
-            x1Out = 0; x2Out = 0;
-            y1Out = 0; y2Out = 0;
+            x1Out = 0;
+            x2Out = 0;
+            y1Out = 0;
+            y2Out = 0;
         }
 
         if (x2Out < 0 || x2Out >= Width || y2Out < 0 || y2Out >= Height)
         {
-            x1Out = 0; x2Out = 0;
-            y1Out = 0; y2Out = 0;
+            x1Out = 0;
+            x2Out = 0;
+            y1Out = 0;
+            y2Out = 0;
         }
 
-        // replace inputs with new values
-        x1 = (int)x1Out; y1 = (int)y1Out;
-        x2 = (int)x2Out; y2 = (int)y2Out;
+        x1 = (int)x1Out;
+        y1 = (int)y1Out;
+        x2 = (int)x2Out;
+        y2 = (int)y2Out;
     }
 
     /// <summary>
@@ -1478,10 +1468,10 @@ public class Canvas
     /// <param name="alpha">The opacity of <paramref name="to"/>, 0 to 255.</param>
     public static Color AlphaBlend(Color to, Color from, byte alpha)
     {
-        byte R = (byte)(((to.R * alpha) + (from.R * (255 - alpha))) >> 8);
-        byte G = (byte)(((to.G * alpha) + (from.G * (255 - alpha))) >> 8);
-        byte B = (byte)(((to.B * alpha) + (from.B * (255 - alpha))) >> 8);
-        return Color.FromArgb(R, G, B);
+        byte red = (byte)(((to.R * alpha) + (from.R * (255 - alpha))) >> 8);
+        byte green = (byte)(((to.G * alpha) + (from.G * (255 - alpha))) >> 8);
+        byte blue = (byte)(((to.B * alpha) + (from.B * (255 - alpha))) >> 8);
+        return Color.FromArgb(red, green, blue);
     }
 
     /// <summary>
