@@ -186,6 +186,7 @@ public sealed class HdAudioDriver : Driver
             registers.Write32(
                 HdAudioRegisters.InterruptControl,
                 HdAudioRegisters.InterruptControlGlobalEnable | (1u << streamIndex));
+            state.HasLine = true;
         }
 
         // 10. The output, and the sink it reports completions through.

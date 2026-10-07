@@ -21,7 +21,7 @@ make setup                          # Build all packages (.devcontainer/postCrea
 make build                          # Build DevKernel ISO
 make run                            # Build + run in QEMU (x64 uses KVM)
 make clean                          # Remove output-x64/, output-arm64/, artifacts/
-make test KERNEL=Memory             # Run a kernel test suite (HelloWorld, Memory, TypeCasting, Timer, Network, Runtime, Threading, Math, GarbageCollector, Graphic, Storage, Fat, File, ...)
+make test KERNEL=Memory             # Run a kernel test suite (HelloWorld, Memory, TypeCasting, Timer, Network, Runtime, Threading, Math, GarbageCollector, Graphic, Audio, Storage, Fat, File, ...)
 make test KERNEL=HelloWorld ARCH=arm64 TIMEOUT=90
 ```
 
@@ -71,7 +71,7 @@ Kernel features are toggled via MSBuild properties in kernel `.csproj` files (al
 - `src/Cosmos.Kernel.HAL/Timers/` - Internal only: the tick source base with its timer entries (`TimerEntry`); `SoftwareTimer`, the handle `TimerManager.Schedule` returns, is the ring's wrapper over one, in `System/Timers/`
 - `src/Cosmos.Kernel.Drivers/` - Shipped drivers over the kit (PCI host and PCI Express root port (hot-plug), E1000E, the virtio PCI and MMIO transports, virtio-net, virtio-input, the display drivers virtio-gpu and VMware SVGA II with its SVGA3D layer, the storage drivers AHCI, NVMe and virtio-blk, whose disks `StorageManager` consumes, the xHCI host controller with the USB hub, HID boot keyboard and mass storage class drivers, and the 8042 controller with the PS/2 keyboard and mouse class drivers), filed in bus kind / category / driver folders (`Pci/Bus/Xhci/`, `Virtio/Display/VirtioGpu/`) whose namespaces follow the folders; a User-layer driver assembly, one RID-less package
 - `examples/DevKernel/` - Development kernel (use for testing changes)
-- `tests/Kernels/` - 18 kernel test suites and the Drivers suite's driver library
+- `tests/Kernels/` - 19 kernel test suites and the Drivers suite's driver library
 - `dotnet/runtime/` - .NET runtime submodule (release/10.0 branch)
 - `artifacts/` - Build outputs, NuGet packages, Limine bootloader
 

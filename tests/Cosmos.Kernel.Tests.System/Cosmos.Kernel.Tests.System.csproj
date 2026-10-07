@@ -4,6 +4,9 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <!-- The audio tests build streams in AudioFormat and AudioBitDepth,
+             the driver kit's experimental audio vocabulary (COSMOS0003). -->
+        <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

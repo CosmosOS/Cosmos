@@ -91,6 +91,8 @@ public class QemuARM64Host : IQemuHost
                 MouseDevice = devices?.MouseDevice,
                 VgaAdapter = devices?.VgaAdapter,
                 GpuDevice = devices?.GpuDevice,
+                AudioDevice = devices?.AudioDevice,
+                AudioBackend = QemuHostDefaults.AudioBackend,
                 MonitorPort = monitor?.Port,
                 AllowGuestShutdown = true
             });

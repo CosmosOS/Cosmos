@@ -154,6 +154,14 @@ internal sealed class HdAudioState : IAudioOutput
     /// <summary>The codec address, converter and pin the frames travel through, for the log and the tests.</summary>
     internal HdAudioOutputPath Path => _path;
 
+    /// <summary>
+    /// True when the function's line reaches <see cref="OnInterrupt"/>, so a
+    /// finished period is reported through the sink. False when the platform
+    /// could not route the line or another handler holds it; the output
+    /// plays the same, since the writer reads the engine's position.
+    /// </summary>
+    internal bool HasLine { get; set; }
+
     // --- Public methods ---
 
     /// <inheritdoc/>

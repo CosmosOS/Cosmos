@@ -182,4 +182,24 @@ public class ProfileCatalogTests
             }
         }
     }
+
+    // The hda cell is the only run with an audio controller on the bus, and
+    // the Audio suite pairs it with bare, where the manager must list none.
+    // It drops the default NIC, which on q35 holds the controller's line.
+    [Fact]
+    public void AudioSuiteCoversHdAudioOnBothArchitectures()
+    {
+        string suiteDir = Path.Combine(FindRepoRoot(), "tests", "Kernels", "Cosmos.Kernel.Tests.Audio");
+
+        foreach (string architecture in Architectures)
+        {
+            IReadOnlyList<TestProfile> cells = TestProfileLoader.LoadFor(suiteDir, architecture);
+
+            TestProfile hda = Assert.Single(cells, c => c.Name == "hda");
+            Assert.Equal("intel-hda", hda.AudioDevice);
+            Assert.Equal("none", hda.NetworkCard);
+            TestProfile bare = Assert.Single(cells, c => c.Name == "bare");
+            Assert.Null(bare.AudioDevice);
+        }
+    }
 }
