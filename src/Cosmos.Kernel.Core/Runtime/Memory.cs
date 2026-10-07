@@ -25,10 +25,7 @@ internal static unsafe class Memory
     {
         uint size = pArrayEEType->BaseSize + numElements * pArrayEEType->ComponentSize;
 
-        GCObject* result = AllocObject(size, flags);
-
-        result->MethodTable = pArrayEEType;
-        result->Length = (int)numElements;
+        GCObject* result = AllocObject(size, pArrayEEType, (int)numElements, flags);
 
         pResult = result;
     }
@@ -43,10 +40,7 @@ internal static unsafe class Memory
 
         uint size = pMT->BaseSize + (uint)length * pMT->ComponentSize;
 
-        GCObject* result = AllocObject(size);
-
-        result->MethodTable = pMT;
-        result->Length = length;
+        GCObject* result = AllocObject(size, pMT, length);
 
         return result;
     }
@@ -61,10 +55,7 @@ internal static unsafe class Memory
 
         uint size = pMT->BaseSize + (uint)length * pMT->ComponentSize;
 
-        GCObject* result = AllocObject(size);
-
-        result->MethodTable = pMT;
-        result->Length = length;
+        GCObject* result = AllocObject(size, pMT, length);
 
         return result;
     }
@@ -78,9 +69,7 @@ internal static unsafe class Memory
 
         uint size = pMT->BaseSize + (uint)length * pMT->ComponentSize;
 
-        GCObject* result = AllocObject(size);
-        result->MethodTable = pMT;
-        result->Length = length;
+        GCObject* result = AllocObject(size, pMT, length);
 
         return result;
     }
@@ -94,8 +83,7 @@ internal static unsafe class Memory
     [RuntimeExport("RhAllocateNewObject")]
     internal static unsafe void RhAllocateNewObject(MethodTable* pEEType, GC_ALLOC_FLAGS flags, void* pResult)
     {
-        GCObject* result = AllocObject(pEEType->RawBaseSize, flags);
-        result->MethodTable = pEEType;
+        GCObject* result = AllocObject(pEEType->RawBaseSize, pEEType, 0, flags);
 
         *(void**)pResult = result;
         // as some point we should set flags   
@@ -113,8 +101,7 @@ internal static unsafe class Memory
     {
         // Use RawBaseSize instead of BaseSize because BaseSize only works for canonical/array types
         // For generic type definitions, BaseSize contains parameter count, not the actual size
-        GCObject* result = AllocObject(pMT->RawBaseSize);
-        result->MethodTable = pMT;
+        GCObject* result = AllocObject(pMT->RawBaseSize, pMT, 0);
         return (byte*)result;
     }
 
@@ -188,18 +175,34 @@ internal static unsafe class Memory
         return GarbageCollector.AllocateHandler(primary, (GCHandleType)6, (nint)secondary);
     }
 
+    /// <summary>
+    /// Allocates an object and stores its header: the MethodTable, and the Length of an array or
+    /// a string. With the GC enabled both are stored before interrupts can fire again (see
+    /// <see cref="GarbageCollector.AllocObject"/>), so no other thread ever collects while the new
+    /// object is still a headerless block.
+    /// </summary>
+    /// <param name="size">Object size in bytes.</param>
+    /// <param name="pMT">The object's MethodTable.</param>
+    /// <param name="length">Component count of an array or a string; ignored for any other type.</param>
+    /// <param name="flags">Runtime allocation flags.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe GCObject* AllocObject(uint size, GC_ALLOC_FLAGS flags = GC_ALLOC_FLAGS.GC_ALLOC_NO_FLAGS)
+    private static unsafe GCObject* AllocObject(uint size, MethodTable* pMT, int length, GC_ALLOC_FLAGS flags = GC_ALLOC_FLAGS.GC_ALLOC_NO_FLAGS)
     {
         if (GarbageCollector.IsEnabled)
         {
-            return GarbageCollector.AllocObject((nint)size, flags);
+            return GarbageCollector.AllocObject((nint)size, pMT, length, flags);
         }
         else
         {
-            var result = MemoryOp.Alloc(size);
+            GCObject* result = (GCObject*)MemoryOp.Alloc(size);
             MemoryOp.MemSet((byte*)result, 0, (int)size);
-            return (GCObject*)result;
+            result->MethodTable = pMT;
+            if (pMT->HasComponentSize)
+            {
+                result->Length = length;
+            }
+
+            return result;
         }
     }
 }

@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.IO;
 using Internal.Runtime;
 
@@ -90,29 +89,6 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Checks if a pointer falls within any pinned heap segment.
-    /// </summary>
-    /// <param name="ptr">The pointer to test.</param>
-    /// <returns><c>true</c> if <paramref name="ptr"/> is inside a pinned segment; otherwise, <c>false</c>.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool IsInPinnedHeap(nint ptr)
-    {
-        byte* p = (byte*)ptr;
-        GCSegment* segment = s_pinnedSegmentManager.Segments;
-        while (segment != null)
-        {
-            if (p >= segment->Start && p < segment->End)
-            {
-                return true;
-            }
-
-            segment = segment->Next;
-        }
-
-        return false;
-    }
-
-    /// <summary>
     /// Sweeps all pinned heap segments, collecting unmarked objects.
     /// </summary>
     /// <returns>The number of objects freed across all pinned segments.</returns>
@@ -144,13 +120,34 @@ internal static unsafe partial class GarbageCollector
         while (ptr < segment->Bump)
         {
             var obj = (GCObject*)ptr;
+            MethodTable* mt = obj->GetMethodTable();
+
+            // A free block from an earlier sweep, as in SweepSegment. Walked as an object, it
+            // was counted freed again at every collection, and the walk went on from its marker
+            // type's base size through the stale bytes the block covers.
+            if (mt == s_freeMethodTable)
+            {
+                uint blockSize = (uint)((FreeBlock*)ptr)->Size;
+                if (blockSize == 0 || blockSize > (uint)(segment->End - ptr))
+                {
+                    break;
+                }
+
+                if (freeRunStart == null)
+                {
+                    freeRunStart = ptr;
+                }
+
+                freeRunSize += blockSize;
+                ptr += blockSize;
+                continue;
+            }
 
             // Validate MethodTable. Anything that is not a plausible MethodTable —
             // null (zeroed gap), a value below kernel space (data, e.g. the runtime
             // object header written at objRef-4 of the following object), or a stale
             // pointer into the GC heap — is dead filler. Fold it into the free run so
             // the run stays contiguous and the trailing reset can reach Bump.
-            MethodTable* mt = obj->GetMethodTable();
             if (mt == null || (ulong)mt < AddressSpace.KernelSpaceStart || IsInGCHeap((nint)mt))
             {
                 if (freeRunStart == null)
@@ -323,7 +320,5 @@ internal static unsafe partial class GarbageCollector
         // from the list, so their objects are never found from a root again.
         s_pinnedSegmentManager.TailSegment = tail;
         s_currentPinnedSegment = semiHead != null ? semiHead : freeHead;
-
-        s_heapRangeDirty = true;
     }
 }

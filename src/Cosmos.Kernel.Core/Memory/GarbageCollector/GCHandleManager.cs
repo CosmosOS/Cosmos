@@ -120,8 +120,9 @@ internal unsafe struct GCHandleSegmentStore
                     {
                         if (ptr->Type != GCHandle.FreeHandleType)
                         {
-                            // Save Next Index;
-                            _count++;
+                            // Save Next Index: past this handle, not past the free slots before
+                            // it only, or the next call returns it again.
+                            _count = i + 1;
                             Current = ptr;
                             return true;
                         }
@@ -206,27 +207,37 @@ internal unsafe struct GCHandleManager()
     }
 
     /// <summary>
-    /// Clears weak handles whose target objects were not marked during the mark phase.
-    /// Called between mark and sweep to allow weak references to be collected.
+    /// Clears the weak handles whose target objects were not marked during the mark phase, and
+    /// the dependent handles whose primary was not. Called between mark and sweep to allow weak
+    /// references to be collected.
     /// </summary>
-    public readonly void FreeWeakHandles()
+    public readonly void ClearWeakHandles()
     {
-        var store = _gcHandleControllers[(int)GCHandleType.Weak];
-        var handleEnum = store.GetEnumerator();
-        while (handleEnum.MoveNext())
-        {
-            if (!handleEnum.Current->Object->IsMarked)
-            {
-                store.FreeHandle(handleEnum.Current);
-            }
-        }
+        // Both weak kinds: with no finalization, tracking resurrection changes nothing.
+        ClearDeadTargets(_gcHandleControllers[(int)GCHandleType.Weak], false);
+        ClearDeadTargets(_gcHandleControllers[(int)GCHandleType.WeakTrackResurrection], false);
+        ClearDeadTargets(DependentHandleStore, true);
 
-        handleEnum = DependentHandleStore.GetEnumerator();
-        while (handleEnum.MoveNext())
+        // The handle stays allocated: its owner still holds it, reads null from it, and frees it
+        // or sets a new target (RuntimeType does so for its RuntimeTypeInfo cache). Freeing it
+        // here put it back on the free list while still in use: a later handle shared its slot,
+        // and a target set in it was no longer cleared, so it dangled once collected.
+        static void ClearDeadTargets(GCHandleSegmentStore store, bool dependent)
         {
-            if (!handleEnum.Current->Object->IsMarked)
+            var handleEnum = store.GetEnumerator();
+            while (handleEnum.MoveNext())
             {
-                DependentHandleStore.FreeHandle(handleEnum.Current);
+                GCHandle* handle = handleEnum.Current;
+
+                // A frozen target is never marked, and never dies.
+                if (handle->Object != null && !GarbageCollector.IsLive(handle->Object))
+                {
+                    handle->Object = null;
+                    if (dependent)
+                    {
+                        handle->ExtraInfo = 0; // the secondary was alive only through the primary
+                    }
+                }
             }
         }
     }
