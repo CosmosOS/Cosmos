@@ -34,27 +34,83 @@ internal class Icmpv6Packet : IPv6Packet
     /// <summary>Hop limit of an echo request or reply.</summary>
     private protected const byte EchoHopLimit = 64;
 
-    private static int s_echoRequestsReplied;
-    private static byte[]? s_lastEchoRequestData;
-
-    /// <summary>Parsed ICMPv6 type backing <see cref="IcmpType"/>.</summary>
-    private protected byte _icmpType;
-
-    /// <summary>Parsed ICMPv6 code backing <see cref="IcmpCode"/>.</summary>
-    private protected byte _icmpCode;
-
-    /// <summary>Parsed or computed checksum backing <see cref="IcmpChecksum"/>.</summary>
-    private protected ushort _icmpChecksum;
-
     /// <summary>
     /// Number of echo requests answered with an echo reply.
     /// </summary>
-    internal static int EchoRequestsReplied => s_echoRequestsReplied;
+    internal static int EchoRequestsReplied { get; private set; }
 
     /// <summary>
     /// ICMPv6 payload of the most recently answered echo request.
     /// </summary>
-    internal static byte[]? LastEchoRequestData => s_lastEchoRequestData;
+    internal static byte[]? LastEchoRequestData { get; private set; }
+
+    /// <summary>
+    /// The ICMPv6 type, a snapshot parsed at construction time.
+    /// </summary>
+    public byte IcmpType { get; private set; }
+
+    /// <summary>
+    /// The ICMPv6 code, a snapshot parsed at construction time.
+    /// </summary>
+    public byte IcmpCode { get; private set; }
+
+    /// <summary>
+    /// The checksum stored in the section, a snapshot taken at construction time.
+    /// </summary>
+    public ushort IcmpChecksum { get; private set; }
+
+    /// <summary>
+    /// The length in bytes of the body after the 8-byte ICMPv6 header.
+    /// </summary>
+    public ushort IcmpDataLength => (ushort)(PayloadLength - Icmpv6HeaderLength);
+
+    /// <summary>
+    /// Initializes a new instance over existing frame bytes. The array is
+    /// aliased, not copied: the caller must not reuse the buffer while the
+    /// packet is alive.
+    /// </summary>
+    /// <param name="rawData">The raw data of the frame.</param>
+    public Icmpv6Packet(byte[] rawData)
+        : base(rawData)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance, resolving the MAC addresses as
+    /// <see cref="IPv6Packet"/> does, and writes the type and code. The
+    /// derived constructor writes the rest of the section and then calls
+    /// <see cref="WriteChecksum"/>.
+    /// </summary>
+    /// <param name="source">Source address.</param>
+    /// <param name="destination">Destination address.</param>
+    /// <param name="hopLimit">Hop limit.</param>
+    /// <param name="type">ICMPv6 type.</param>
+    /// <param name="code">ICMPv6 code.</param>
+    /// <param name="icmpLength">Length of the ICMPv6 header plus body: the whole IPv6 payload.</param>
+    private protected Icmpv6Packet(Address6 source, Address6 destination, byte hopLimit, byte type, byte code, ushort icmpLength)
+        : base(icmpLength, ProtocolIcmpv6, hopLimit, source, destination)
+    {
+        WriteTypeAndCode(type, code);
+    }
+
+    /// <summary>
+    /// Initializes a new instance with explicit MAC addresses and writes the
+    /// type and code. The derived constructor writes the rest of the section
+    /// and then calls <see cref="WriteChecksum"/>.
+    /// </summary>
+    /// <param name="sourceMac">Source MAC address.</param>
+    /// <param name="destinationMac">Destination MAC address.</param>
+    /// <param name="source">Source address.</param>
+    /// <param name="destination">Destination address.</param>
+    /// <param name="hopLimit">Hop limit.</param>
+    /// <param name="type">ICMPv6 type.</param>
+    /// <param name="code">ICMPv6 code.</param>
+    /// <param name="icmpLength">Length of the ICMPv6 header plus body: the whole IPv6 payload.</param>
+    private protected Icmpv6Packet(MacAddress sourceMac, MacAddress destinationMac, Address6 source, Address6 destination, byte hopLimit, byte type, byte code, ushort icmpLength)
+        : base(sourceMac, destinationMac, icmpLength, ProtocolIcmpv6, hopLimit, source, destination)
+    {
+        WriteTypeAndCode(type, code);
+    }
 
     /// <summary>
     /// Handles an ICMPv6 packet whose destination the stack owns. A packet
@@ -116,56 +172,8 @@ internal class Icmpv6Packet : IPv6Packet
 
         nic.Send(reply.RawData, reply.RawData.Length);
 
-        s_lastEchoRequestData = request.GetIcmpData();
-        s_echoRequestsReplied++;
-    }
-
-    /// <summary>
-    /// Initializes a new instance over existing frame bytes. The array is
-    /// aliased, not copied: the caller must not reuse the buffer while the
-    /// packet is alive.
-    /// </summary>
-    /// <param name="rawData">The raw data of the frame.</param>
-    public Icmpv6Packet(byte[] rawData)
-        : base(rawData)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance, resolving the MAC addresses as
-    /// <see cref="IPv6Packet"/> does, and writes the type and code. The
-    /// derived constructor writes the rest of the section and then calls
-    /// <see cref="WriteChecksum"/>.
-    /// </summary>
-    /// <param name="source">Source address.</param>
-    /// <param name="destination">Destination address.</param>
-    /// <param name="hopLimit">Hop limit.</param>
-    /// <param name="type">ICMPv6 type.</param>
-    /// <param name="code">ICMPv6 code.</param>
-    /// <param name="icmpLength">Length of the ICMPv6 header plus body: the whole IPv6 payload.</param>
-    private protected Icmpv6Packet(Address6 source, Address6 destination, byte hopLimit, byte type, byte code, ushort icmpLength)
-        : base(icmpLength, ProtocolIcmpv6, hopLimit, source, destination)
-    {
-        WriteTypeAndCode(type, code);
-    }
-
-    /// <summary>
-    /// Initializes a new instance with explicit MAC addresses and writes the
-    /// type and code. The derived constructor writes the rest of the section
-    /// and then calls <see cref="WriteChecksum"/>.
-    /// </summary>
-    /// <param name="sourceMac">Source MAC address.</param>
-    /// <param name="destinationMac">Destination MAC address.</param>
-    /// <param name="source">Source address.</param>
-    /// <param name="destination">Destination address.</param>
-    /// <param name="hopLimit">Hop limit.</param>
-    /// <param name="type">ICMPv6 type.</param>
-    /// <param name="code">ICMPv6 code.</param>
-    /// <param name="icmpLength">Length of the ICMPv6 header plus body: the whole IPv6 payload.</param>
-    private protected Icmpv6Packet(MacAddress sourceMac, MacAddress destinationMac, Address6 source, Address6 destination, byte hopLimit, byte type, byte code, ushort icmpLength)
-        : base(sourceMac, destinationMac, icmpLength, ProtocolIcmpv6, hopLimit, source, destination)
-    {
-        WriteTypeAndCode(type, code);
+        LastEchoRequestData = request.GetIcmpData();
+        EchoRequestsReplied++;
     }
 
     private void WriteTypeAndCode(byte type, byte code)
@@ -183,9 +191,9 @@ internal class Icmpv6Packet : IPv6Packet
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        _icmpType = RawData[PayloadOffset];
-        _icmpCode = RawData[PayloadOffset + 1];
-        _icmpChecksum = (ushort)((RawData[PayloadOffset + 2] << 8) | RawData[PayloadOffset + 3]);
+        IcmpType = RawData[PayloadOffset];
+        IcmpCode = RawData[PayloadOffset + 1];
+        IcmpChecksum = (ushort)((RawData[PayloadOffset + 2] << 8) | RawData[PayloadOffset + 3]);
     }
 
     /// <summary>
@@ -204,34 +212,11 @@ internal class Icmpv6Packet : IPv6Packet
     }
 
     /// <summary>
-    /// The ICMPv6 type, a snapshot parsed at construction time.
-    /// </summary>
-    public byte IcmpType => _icmpType;
-
-    /// <summary>
-    /// The ICMPv6 code, a snapshot parsed at construction time.
-    /// </summary>
-    public byte IcmpCode => _icmpCode;
-
-    /// <summary>
-    /// The checksum stored in the section, a snapshot taken at construction time.
-    /// </summary>
-    public ushort IcmpChecksum => _icmpChecksum;
-
-    /// <summary>
     /// Checks the stored checksum against the section and the pseudo-header,
     /// as a receiver does. Sums the whole section on every call.
     /// </summary>
     /// <returns>True when the section is intact.</returns>
-    public bool VerifyChecksum()
-    {
-        return CalcUpperLayerChecksum(PayloadLength) == 0;
-    }
-
-    /// <summary>
-    /// The length in bytes of the body after the 8-byte ICMPv6 header.
-    /// </summary>
-    public ushort IcmpDataLength => (ushort)(PayloadLength - Icmpv6HeaderLength);
+    public bool VerifyChecksum() => CalcUpperLayerChecksum(PayloadLength) == 0;
 
     /// <summary>
     /// Returns a fresh copy of the body after the 8-byte ICMPv6 header.
@@ -246,10 +231,8 @@ internal class Icmpv6Packet : IPv6Packet
     }
 
     /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $"ICMPv6 Packet Src={SourceIP}, Dest={DestinationIP}, Type={_icmpType}, Code={_icmpCode}";
-    }
+    public override string ToString() =>
+        $"ICMPv6 Packet Src={SourceIP}, Dest={DestinationIP}, Type={IcmpType}, Code={IcmpCode}";
 }
 
 /// <summary>
@@ -263,8 +246,15 @@ internal sealed class Icmpv6EchoRequest : Icmpv6Packet
     /// </summary>
     internal const int EchoDataLength = 32;
 
-    private ushort _icmpId;
-    private ushort _icmpSequence;
+    /// <summary>
+    /// The echo identifier, a snapshot parsed at construction time.
+    /// </summary>
+    public ushort IcmpId { get; private set; }
+
+    /// <summary>
+    /// The echo sequence number, a snapshot parsed at construction time.
+    /// </summary>
+    public ushort IcmpSequence { get; private set; }
 
     /// <summary>
     /// Initializes a new instance over existing frame bytes. The array is
@@ -291,9 +281,9 @@ internal sealed class Icmpv6EchoRequest : Icmpv6Packet
         RawData[PayloadOffset + 5] = (byte)id;
         RawData[PayloadOffset + 6] = (byte)(sequence >> 8);
         RawData[PayloadOffset + 7] = (byte)sequence;
-        for (int b = Icmpv6HeaderLength; b < Icmpv6HeaderLength + EchoDataLength; b++)
+        for (int offset = Icmpv6HeaderLength; offset < Icmpv6HeaderLength + EchoDataLength; offset++)
         {
-            RawData[PayloadOffset + b] = (byte)b;
+            RawData[PayloadOffset + offset] = (byte)offset;
         }
 
         WriteChecksum();
@@ -306,25 +296,13 @@ internal sealed class Icmpv6EchoRequest : Icmpv6Packet
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        _icmpId = (ushort)((RawData[PayloadOffset + 4] << 8) | RawData[PayloadOffset + 5]);
-        _icmpSequence = (ushort)((RawData[PayloadOffset + 6] << 8) | RawData[PayloadOffset + 7]);
+        IcmpId = (ushort)((RawData[PayloadOffset + 4] << 8) | RawData[PayloadOffset + 5]);
+        IcmpSequence = (ushort)((RawData[PayloadOffset + 6] << 8) | RawData[PayloadOffset + 7]);
     }
-
-    /// <summary>
-    /// The echo identifier, a snapshot parsed at construction time.
-    /// </summary>
-    public ushort IcmpId => _icmpId;
-
-    /// <summary>
-    /// The echo sequence number, a snapshot parsed at construction time.
-    /// </summary>
-    public ushort IcmpSequence => _icmpSequence;
 
     /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $"ICMPv6 Echo Request Src={SourceIP}, Dest={DestinationIP}, ID={_icmpId}, Sequence={_icmpSequence}";
-    }
+    public override string ToString() =>
+        $"ICMPv6 Echo Request Src={SourceIP}, Dest={DestinationIP}, ID={IcmpId}, Sequence={IcmpSequence}";
 }
 
 /// <summary>
@@ -333,8 +311,15 @@ internal sealed class Icmpv6EchoRequest : Icmpv6Packet
 /// </summary>
 internal sealed class Icmpv6EchoReply : Icmpv6Packet
 {
-    private ushort _icmpId;
-    private ushort _icmpSequence;
+    /// <summary>
+    /// The echo identifier, a snapshot parsed at construction time.
+    /// </summary>
+    public ushort IcmpId { get; private set; }
+
+    /// <summary>
+    /// The echo sequence number, a snapshot parsed at construction time.
+    /// </summary>
+    public ushort IcmpSequence { get; private set; }
 
     /// <summary>
     /// Initializes a new instance over existing frame bytes. The array is
@@ -367,23 +352,11 @@ internal sealed class Icmpv6EchoReply : Icmpv6Packet
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        _icmpId = (ushort)((RawData[PayloadOffset + 4] << 8) | RawData[PayloadOffset + 5]);
-        _icmpSequence = (ushort)((RawData[PayloadOffset + 6] << 8) | RawData[PayloadOffset + 7]);
+        IcmpId = (ushort)((RawData[PayloadOffset + 4] << 8) | RawData[PayloadOffset + 5]);
+        IcmpSequence = (ushort)((RawData[PayloadOffset + 6] << 8) | RawData[PayloadOffset + 7]);
     }
-
-    /// <summary>
-    /// The echo identifier, a snapshot parsed at construction time.
-    /// </summary>
-    public ushort IcmpId => _icmpId;
-
-    /// <summary>
-    /// The echo sequence number, a snapshot parsed at construction time.
-    /// </summary>
-    public ushort IcmpSequence => _icmpSequence;
 
     /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $"ICMPv6 Echo Reply Src={SourceIP}, Dest={DestinationIP}, ID={_icmpId}, Sequence={_icmpSequence}";
-    }
+    public override string ToString() =>
+        $"ICMPv6 Echo Reply Src={SourceIP}, Dest={DestinationIP}, ID={IcmpId}, Sequence={IcmpSequence}";
 }

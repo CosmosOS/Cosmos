@@ -44,6 +44,121 @@ internal class IPv6Packet : InternetPacket
     private Address6 _destinationIP = null!;
 
     /// <summary>
+    /// The length of the payload following the fixed header, in bytes.
+    /// </summary>
+    public ushort PayloadLength { get; private set; }
+
+    /// <summary>
+    /// The protocol of the payload (58 ICMPv6).
+    /// </summary>
+    public byte NextHeader { get; private set; }
+
+    /// <summary>
+    /// The hop limit. Neighbor Discovery messages carry 255.
+    /// </summary>
+    public byte HopLimit { get; private set; }
+
+    /// <summary>
+    /// The source address.
+    /// </summary>
+    public override Address6 SourceIP => _sourceIP;
+
+    /// <summary>
+    /// The destination address.
+    /// </summary>
+    public override Address6 DestinationIP => _destinationIP;
+
+    /// <summary>
+    /// The offset of the payload from the start of the frame. Extension
+    /// headers are not parsed, so this is always
+    /// <see cref="PayloadOffset"/>.
+    /// </summary>
+    public override ushort DataOffset => PayloadOffset;
+
+    /// <summary>
+    /// The length of the payload in bytes, the same as
+    /// <see cref="PayloadLength"/>. IPv6 states the payload length directly,
+    /// where IPv4 states a total length the header has to be subtracted from.
+    /// </summary>
+    public override ushort DataLength => PayloadLength;
+
+    /// <summary>
+    /// Whether a transport section must carry a checksum. True: IPv6 has no
+    /// header checksum of its own, so RFC 8200 section 8.1 makes the
+    /// upper-layer checksum mandatory, UDP included.
+    /// </summary>
+    internal override bool TransportChecksumRequired => true;
+
+    /// <summary>
+    /// Initializes a new instance over existing frame bytes. The array is
+    /// aliased, not copied, and the payload length is not validated.
+    /// </summary>
+    /// <param name="rawData">The raw data of the frame.</param>
+    public IPv6Packet(byte[] rawData)
+        : base(rawData)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance, resolving the source MAC from the device
+    /// configured with <paramref name="source"/> and settling the destination
+    /// MAC only for a multicast destination.
+    /// </summary>
+    /// <param name="payloadLength">Length of the payload following the fixed header, in bytes.</param>
+    /// <param name="nextHeader">Protocol of the payload.</param>
+    /// <param name="hopLimit">Hop limit.</param>
+    /// <param name="source">Source address.</param>
+    /// <param name="destination">Destination address.</param>
+    internal IPv6Packet(ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination)
+        : this(GetSourceMac(source), GetDestinationMac(destination), payloadLength, nextHeader, hopLimit, source, destination)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance with the destination MAC address already
+    /// known, which skips Neighbor Discovery, resolving the source MAC
+    /// address from the device configured with <paramref name="source"/>.
+    /// </summary>
+    /// <param name="payloadLength">Length of the payload following the fixed header, in bytes.</param>
+    /// <param name="nextHeader">Protocol of the payload.</param>
+    /// <param name="hopLimit">Hop limit.</param>
+    /// <param name="source">Source address.</param>
+    /// <param name="destination">Destination address.</param>
+    /// <param name="destinationMac">Destination MAC address.</param>
+    internal IPv6Packet(ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination, MacAddress destinationMac)
+        : this(GetSourceMac(source), destinationMac, payloadLength, nextHeader, hopLimit, source, destination)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance, writing the complete IPv6 header: version
+    /// 6, traffic class and flow label zero.
+    /// </summary>
+    /// <param name="sourceMac">Source MAC address.</param>
+    /// <param name="destinationMac">Destination MAC address.</param>
+    /// <param name="payloadLength">Length of the payload following the fixed header, in bytes.</param>
+    /// <param name="nextHeader">Protocol of the payload.</param>
+    /// <param name="hopLimit">Hop limit.</param>
+    /// <param name="source">Source address.</param>
+    /// <param name="destination">Destination address.</param>
+    internal IPv6Packet(MacAddress sourceMac, MacAddress destinationMac, ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination)
+        : base(destinationMac, sourceMac, EtherTypeIPv6, PayloadOffset + payloadLength)
+    {
+        RawData[14] = 0x60;
+        RawData[15] = 0;
+        RawData[16] = 0;
+        RawData[17] = 0;
+        RawData[18] = (byte)(payloadLength >> 8);
+        RawData[19] = (byte)payloadLength;
+        RawData[20] = nextHeader;
+        RawData[21] = hopLimit;
+        source.ToBytes().CopyTo(RawData.AsSpan(SourceOffset, 16));
+        destination.ToBytes().CopyTo(RawData.AsSpan(DestinationOffset, 16));
+
+        InitializeFields();
+    }
+
+    /// <summary>
     /// Handles a single IPv6 frame: ICMPv6, UDP and TCP are dispatched, and
     /// only when the destination is one of the stack's addresses or the
     /// solicited-node group of one; everything else is dropped. Extension
@@ -137,89 +252,16 @@ internal class IPv6Packet : InternetPacket
     /// The MAC of the device configured with <paramref name="source"/>, or
     /// <see cref="MacAddress.None"/> when no device carries it.
     /// </summary>
-    private static MacAddress GetSourceMac(Address6 source)
-    {
-        return NetworkStack.AddressMap.TryGetValue(source, out INetworkDevice? device) ? device.MacAddress : MacAddress.None;
-    }
+    private static MacAddress GetSourceMac(Address6 source) =>
+        NetworkStack.AddressMap.TryGetValue(source, out INetworkDevice? device) ? device.MacAddress : MacAddress.None;
 
     /// <summary>
     /// The destination MAC a build constructor can settle at once: the mapped
     /// address for a multicast group, <see cref="MacAddress.None"/> for a
     /// unicast destination that Neighbor Discovery resolves at send time.
     /// </summary>
-    private static MacAddress GetDestinationMac(Address6 destination)
-    {
-        return destination.IsMulticast ? MulticastMac(destination) : MacAddress.None;
-    }
-
-    /// <summary>
-    /// Initializes a new instance over existing frame bytes. The array is
-    /// aliased, not copied, and the payload length is not validated.
-    /// </summary>
-    /// <param name="rawData">The raw data of the frame.</param>
-    public IPv6Packet(byte[] rawData)
-        : base(rawData)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance, resolving the source MAC from the device
-    /// configured with <paramref name="source"/> and settling the destination
-    /// MAC only for a multicast destination.
-    /// </summary>
-    /// <param name="payloadLength">Length of the payload following the fixed header, in bytes.</param>
-    /// <param name="nextHeader">Protocol of the payload.</param>
-    /// <param name="hopLimit">Hop limit.</param>
-    /// <param name="source">Source address.</param>
-    /// <param name="destination">Destination address.</param>
-    internal IPv6Packet(ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination)
-        : this(GetSourceMac(source), GetDestinationMac(destination), payloadLength, nextHeader, hopLimit, source, destination)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance with the destination MAC address already
-    /// known, which skips Neighbor Discovery, resolving the source MAC
-    /// address from the device configured with <paramref name="source"/>.
-    /// </summary>
-    /// <param name="payloadLength">Length of the payload following the fixed header, in bytes.</param>
-    /// <param name="nextHeader">Protocol of the payload.</param>
-    /// <param name="hopLimit">Hop limit.</param>
-    /// <param name="source">Source address.</param>
-    /// <param name="destination">Destination address.</param>
-    /// <param name="destinationMac">Destination MAC address.</param>
-    internal IPv6Packet(ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination, MacAddress destinationMac)
-        : this(GetSourceMac(source), destinationMac, payloadLength, nextHeader, hopLimit, source, destination)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance, writing the complete IPv6 header: version
-    /// 6, traffic class and flow label zero.
-    /// </summary>
-    /// <param name="sourceMac">Source MAC address.</param>
-    /// <param name="destinationMac">Destination MAC address.</param>
-    /// <param name="payloadLength">Length of the payload following the fixed header, in bytes.</param>
-    /// <param name="nextHeader">Protocol of the payload.</param>
-    /// <param name="hopLimit">Hop limit.</param>
-    /// <param name="source">Source address.</param>
-    /// <param name="destination">Destination address.</param>
-    internal IPv6Packet(MacAddress sourceMac, MacAddress destinationMac, ushort payloadLength, byte nextHeader, byte hopLimit, Address6 source, Address6 destination)
-        : base(destinationMac, sourceMac, EtherTypeIPv6, PayloadOffset + payloadLength)
-    {
-        RawData[14] = 0x60;
-        RawData[15] = 0;
-        RawData[16] = 0;
-        RawData[17] = 0;
-        RawData[18] = (byte)(payloadLength >> 8);
-        RawData[19] = (byte)payloadLength;
-        RawData[20] = nextHeader;
-        RawData[21] = hopLimit;
-        source.ToBytes().CopyTo(RawData.AsSpan(SourceOffset, 16));
-        destination.ToBytes().CopyTo(RawData.AsSpan(DestinationOffset, 16));
-
-        InitializeFields();
-    }
+    private static MacAddress GetDestinationMac(Address6 destination) =>
+        destination.IsMulticast ? MulticastMac(destination) : MacAddress.None;
 
     /// <summary>
     /// Parses the header fields from <see cref="EthernetPacket.RawData"/>, in
@@ -247,13 +289,6 @@ internal class IPv6Packet : InternetPacket
     private protected ushort CalcUpperLayerChecksum(ushort length) => ComputeTransportChecksum(NextHeader, length);
 
     /// <summary>
-    /// Whether a transport section must carry a checksum. True: IPv6 has no
-    /// header checksum of its own, so RFC 8200 section 8.1 makes the
-    /// upper-layer checksum mandatory, UDP included.
-    /// </summary>
-    internal override bool TransportChecksumRequired => true;
-
-    /// <summary>
     /// Computes a transport checksum with the IPv6 pseudo-header of RFC 8200
     /// section 8.1: the source and destination addresses, the upper-layer
     /// length as 32 bits, three zero bytes and the next-header value.
@@ -276,48 +311,7 @@ internal class IPv6Packet : InternetPacket
     /// <inheritdoc/>
     internal override bool Enqueue() => IPv6OutgoingBuffer.AddPacket(this);
 
-    /// <summary>
-    /// The length of the payload following the fixed header, in bytes.
-    /// </summary>
-    public ushort PayloadLength { get; private set; }
-
-    /// <summary>
-    /// The protocol of the payload (58 ICMPv6).
-    /// </summary>
-    public byte NextHeader { get; private set; }
-
-    /// <summary>
-    /// The hop limit. Neighbor Discovery messages carry 255.
-    /// </summary>
-    public byte HopLimit { get; private set; }
-
-    /// <summary>
-    /// The source address.
-    /// </summary>
-    public override Address6 SourceIP => _sourceIP;
-
-    /// <summary>
-    /// The destination address.
-    /// </summary>
-    public override Address6 DestinationIP => _destinationIP;
-
-    /// <summary>
-    /// The offset of the payload from the start of the frame. Extension
-    /// headers are not parsed, so this is always
-    /// <see cref="PayloadOffset"/>.
-    /// </summary>
-    public override ushort DataOffset => PayloadOffset;
-
-    /// <summary>
-    /// The length of the payload in bytes, the same as
-    /// <see cref="PayloadLength"/>. IPv6 states the payload length directly,
-    /// where IPv4 states a total length the header has to be subtracted from.
-    /// </summary>
-    public override ushort DataLength => PayloadLength;
-
     /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $"IPv6 Packet Src={SourceIP}, Dest={DestinationIP}, NextHeader={NextHeader}, HopLimit={HopLimit}, PayloadLen={PayloadLength}";
-    }
+    public override string ToString() =>
+        $"IPv6 Packet Src={SourceIP}, Dest={DestinationIP}, NextHeader={NextHeader}, HopLimit={HopLimit}, PayloadLen={PayloadLength}";
 }

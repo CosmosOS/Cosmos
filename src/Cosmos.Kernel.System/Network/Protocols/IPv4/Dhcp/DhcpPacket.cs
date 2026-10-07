@@ -45,19 +45,44 @@ public class DhcpOption
 [Experimental(Experimentals.PacketSeamDiagId)]
 public class DhcpPacket : UdpPacket
 {
-    // Simple transaction ID generator
-    private static int s_idCounter = 1;
+    private static int s_nextTransactionId = 1;
 
     /// <summary>
-    /// Handles a single DHCP packet.
+    /// Gets the BOOTP op field at offset 42 of the frame: 1 for a request, 2 for a reply.
+    /// This is not the DHCP message type (option 53), which lives in the options section.
+    /// A snapshot parsed at construction.
     /// </summary>
-    internal static void DHCPHandler(byte[] packetData)
-    {
-        DhcpPacket dhcpPacket = new(packetData);
+    public byte Operation { get; private set; }
 
-        UdpClient? receiver = UdpClient.GetClient(dhcpPacket.DestinationPort);
-        receiver?.ReceiveData(dhcpPacket);
-    }
+    /// <summary>
+    /// Gets the client IPv4 address parsed from the BOOTP yiaddr field, or null when the first
+    /// byte of yiaddr is zero. A snapshot parsed at construction.
+    /// </summary>
+    public Address? Client { get; private set; }
+
+    /// <summary>
+    /// Gets the DHCP options parsed from the options section, or null when the section is empty.
+    /// A snapshot parsed at construction.
+    /// </summary>
+    public List<DhcpOption>? Options { get; private set; }
+
+    /// <summary>
+    /// Gets the subnet mask parsed from DHCP option 1, or null when the option is absent.
+    /// A snapshot parsed at construction.
+    /// </summary>
+    public Address? Subnet { get; private set; }
+
+    /// <summary>
+    /// Gets the first domain name server parsed from DHCP option 6, or null when the option is
+    /// absent; any additional servers in the option are discarded. A snapshot parsed at construction.
+    /// </summary>
+    public Address? DNS { get; private set; }
+
+    /// <summary>
+    /// Gets the gateway address parsed from DHCP option 3 (Router), or null when the option is
+    /// absent. A snapshot parsed at construction.
+    /// </summary>
+    public Address? Gateway { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DhcpPacket"/> class from received data.
@@ -98,7 +123,7 @@ public class DhcpPacket : UdpPacket
         RawData[44] = 0x06; // Length mac
         RawData[45] = 0x00; // hops
 
-        int id = s_idCounter++;
+        int id = s_nextTransactionId++;
         RawData[46] = (byte)((id >> 24) & 0xFF);
         RawData[47] = (byte)((id >> 16) & 0xFF);
         RawData[48] = (byte)((id >> 8) & 0xFF);
@@ -108,7 +133,7 @@ public class DhcpPacket : UdpPacket
         RawData[50] = 0x00;
         RawData[51] = 0x00;
 
-        // option bootp
+        // flags
         RawData[52] = 0x00;
         RawData[53] = 0x00;
 
@@ -144,6 +169,17 @@ public class DhcpPacket : UdpPacket
         RawData[281] = 0x63;
 
         InitializeFields();
+    }
+
+    /// <summary>
+    /// Handles a single DHCP packet.
+    /// </summary>
+    internal static void DHCPHandler(byte[] packetData)
+    {
+        DhcpPacket dhcpPacket = new(packetData);
+
+        UdpClient? receiver = UdpClient.GetClient(dhcpPacket.DestinationPort);
+        receiver?.ReceiveData(dhcpPacket);
     }
 
     /// <summary>
@@ -198,41 +234,4 @@ public class DhcpPacket : UdpPacket
             }
         }
     }
-
-    /// <summary>
-    /// Gets the BOOTP op field at offset 42 of the frame: 1 for a request, 2 for a reply.
-    /// This is not the DHCP message type (option 53), which lives in the options section.
-    /// A snapshot parsed at construction.
-    /// </summary>
-    public byte Operation { get; private set; }
-
-    /// <summary>
-    /// Gets the client IPv4 address parsed from the BOOTP yiaddr field, or null when the first
-    /// byte of yiaddr is zero. A snapshot parsed at construction.
-    /// </summary>
-    public Address? Client { get; private set; }
-
-    /// <summary>
-    /// Gets the DHCP options parsed from the options section, or null when the section is empty.
-    /// A snapshot parsed at construction.
-    /// </summary>
-    public List<DhcpOption>? Options { get; private set; }
-
-    /// <summary>
-    /// Gets the subnet mask parsed from DHCP option 1, or null when the option is absent.
-    /// A snapshot parsed at construction.
-    /// </summary>
-    public Address? Subnet { get; private set; }
-
-    /// <summary>
-    /// Gets the first domain name server parsed from DHCP option 6, or null when the option is
-    /// absent; any additional servers in the option are discarded. A snapshot parsed at construction.
-    /// </summary>
-    public Address? DNS { get; private set; }
-
-    /// <summary>
-    /// Gets the gateway address parsed from DHCP option 3 (Router), or null when the option is
-    /// absent. A snapshot parsed at construction.
-    /// </summary>
-    public Address? Gateway { get; private set; }
 }

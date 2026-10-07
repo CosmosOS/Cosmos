@@ -32,8 +32,6 @@ internal static class NeighborCache
     /// </summary>
     /// <param name="address">The neighbor's IPv6 address.</param>
     /// <returns>The MAC address, or null when the neighbor is unknown.</returns>
-    internal static MacAddress? Resolve(Address6 address)
-    {
-        return s_entries.TryGetValue(address, out MacAddress? macAddress) ? macAddress : null;
-    }
+    internal static MacAddress? Resolve(Address6 address) =>
+        s_entries.TryGetValue(address, out MacAddress? macAddress) ? macAddress : null;
 }

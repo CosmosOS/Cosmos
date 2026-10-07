@@ -14,72 +14,14 @@ public class UdpClient : IDisposable
 {
     private const ushort DynamicPortStart = 49152;
 
-    private static ushort s_nextPort = 49152;
-
-    /// <summary>
-    /// Gets a dynamic port (simple incrementing approach for AOT compatibility).
-    /// </summary>
-    /// <param name="tries">How many consecutive ports to try before giving up.</param>
-    /// <returns>A port no live client is bound to, or 0 when
-    /// <paramref name="tries"/> consecutive candidates were all taken. Zero is
-    /// not a usable port, but it is also what an unbound client reports, so a
-    /// caller that keeps the value must not later read it back as a binding.</returns>
-    public static ushort GetDynamicPort(int tries = 10)
-    {
-        for (int i = 0; i < tries; i++)
-        {
-            ushort port = s_nextPort++;
-            if (s_nextPort >= 65535)
-            {
-                s_nextPort = DynamicPortStart;
-            }
-            if (!s_clients.ContainsKey(port))
-            {
-                return port;
-            }
-        }
-
-        return 0;
-    }
-
+    private static ushort s_nextPort = DynamicPortStart;
     private static readonly Dictionary<uint, UdpClient> s_clients = [];
+
     private readonly int _localPort;
     private int _destinationPort;
-
-    /// <summary>
-    /// Destination address.
-    /// </summary>
     internal Address? _destination;
-
-    /// <summary>
-    /// The RX buffer queue.
-    /// </summary>
-    internal Queue<UdpPacket> _rxBuffer;
+    internal readonly Queue<UdpPacket> _rxBuffer;
     private bool _disposed;
-
-    /// <summary>
-    /// Throws once <see cref="Dispose"/> has run. <see cref="Close"/> does not
-    /// arm this: closing only stops delivery to this client, and the DHCP flow
-    /// closes itself mid-exchange and keeps going.
-    /// </summary>
-    private void ThrowIfDisposed()
-    {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-    }
-
-    /// <summary>
-    /// Gets a UDP client running on the given port.
-    /// </summary>
-    /// <param name="destPort">Destination port.</param>
-    /// <returns>If a client is running on the given port, the <see cref="UdpClient"/>; otherwise, <see langword="null"/>.</returns>
-    internal static UdpClient? GetClient(ushort destPort)
-    {
-        if (s_clients.TryGetValue(destPort, out var client))
-        {
-            return client;
-        }
-        return null;
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UdpClient"/> class.
@@ -116,10 +58,52 @@ public class UdpClient : IDisposable
     }
 
     /// <summary>
+    /// Gets a dynamic port (simple incrementing approach for AOT compatibility).
+    /// </summary>
+    /// <param name="tries">How many consecutive ports to try before giving up.</param>
+    /// <returns>A port no live client is bound to, or 0 when
+    /// <paramref name="tries"/> consecutive candidates were all taken. Zero is
+    /// not a usable port, but it is also what an unbound client reports, so a
+    /// caller that keeps the value must not later read it back as a binding.</returns>
+    public static ushort GetDynamicPort(int tries = 10)
+    {
+        for (int i = 0; i < tries; i++)
+        {
+            ushort port = s_nextPort++;
+            if (s_nextPort >= 65535)
+            {
+                s_nextPort = DynamicPortStart;
+            }
+            if (!s_clients.ContainsKey(port))
+            {
+                return port;
+            }
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Throws once <see cref="Dispose"/> has run. <see cref="Close"/> does not
+    /// arm this: closing only stops delivery to this client, and the DHCP flow
+    /// closes itself mid-exchange and keeps going.
+    /// </summary>
+    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
+
+    /// <summary>
+    /// Gets a UDP client running on the given port.
+    /// </summary>
+    /// <param name="destPort">Destination port.</param>
+    /// <returns>If a client is running on the given port, the <see cref="UdpClient"/>; otherwise, <see langword="null"/>.</returns>
+    internal static UdpClient? GetClient(ushort destPort) =>
+        s_clients.TryGetValue(destPort, out UdpClient? client) ? client : null;
+
+    /// <summary>
     /// Connects to the given client.
     /// </summary>
     /// <param name="dest">Destination address.</param>
     /// <param name="destPort">Destination port.</param>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
     public void Connect(Address dest, int destPort)
     {
         ThrowIfDisposed();
@@ -131,10 +115,7 @@ public class UdpClient : IDisposable
     /// <summary>
     /// Closes the active connection.
     /// </summary>
-    public void Close()
-    {
-        s_clients.Remove((uint)_localPort);
-    }
+    public void Close() => s_clients.Remove((uint)_localPort);
 
     /// <summary>
     /// Sends data to the client.
@@ -202,6 +183,7 @@ public class UdpClient : IDisposable
     /// <returns><see langword="true"/> when the packet was queued for transmission;
     /// <see langword="false"/> when no configured network interface matches the packet's
     /// source address.</returns>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
     [Experimental(Experimentals.PacketSeamDiagId)]
     public bool Send(UdpPacket packet)
     {
@@ -217,6 +199,7 @@ public class UdpClient : IDisposable
     /// <param name="source">Carries the sender's end point back when a datagram arrives.</param>
     /// <param name="timeoutMs">How long to wait, in milliseconds; 0 polls and returns at once.</param>
     /// <returns>The datagram payload, or <see langword="null"/> when none arrived in time.</returns>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
     public byte[]? Receive(ref EndPoint source, int timeoutMs = 5000)
     {
         ThrowIfDisposed();
@@ -251,6 +234,7 @@ public class UdpClient : IDisposable
     /// checks the receive buffer once without waiting.</param>
     /// <returns>The dequeued packet, or <see langword="null"/> when the timeout elapses with
     /// no datagram queued.</returns>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
     [Experimental(Experimentals.PacketSeamDiagId)]
     public UdpPacket? ReceivePacket(int timeoutMs = 5000)
     {
@@ -275,10 +259,7 @@ public class UdpClient : IDisposable
     /// Receives data from the given packet.
     /// </summary>
     /// <param name="packet">Packet to receive.</param>
-    internal void ReceiveData(UdpPacket packet)
-    {
-        _rxBuffer.Enqueue(packet);
-    }
+    internal void ReceiveData(UdpPacket packet) => _rxBuffer.Enqueue(packet);
 
     /// <summary>
     /// Closes the client and retires it. Unlike <see cref="Close"/>, which a

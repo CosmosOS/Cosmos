@@ -83,15 +83,6 @@ public static class DnsRecordType
 public class DnsQuery
 {
     /// <summary>
-    /// Parse products are produced by <see cref="DnsPacketAnswer"/>; every
-    /// setter on this type is internal, so a caller-built instance could never
-    /// be filled in.
-    /// </summary>
-    internal DnsQuery()
-    {
-    }
-
-    /// <summary>
     /// The queried domain name, read label by label from the question section without following
     /// compression pointers, or <see langword="null"/> on a query this packet built rather than
     /// parsed: only the parse path fills it in.
@@ -107,6 +98,15 @@ public class DnsQuery
     /// The 16-bit question class (QCLASS), 1 for the Internet class.
     /// </summary>
     public ushort Class { get; internal set; }
+
+    /// <summary>
+    /// Parse products are produced by <see cref="DnsPacketAnswer"/>; every
+    /// setter on this type is internal, so a caller-built instance could never
+    /// be filled in.
+    /// </summary>
+    internal DnsQuery()
+    {
+    }
 }
 
 /// <summary>
@@ -116,15 +116,6 @@ public class DnsQuery
 [Experimental(Experimentals.PacketSeamDiagId)]
 public class DnsAnswer
 {
-    /// <summary>
-    /// Parse products are produced by <see cref="DnsPacketAnswer"/>; every
-    /// setter on this type is internal, so a caller-built instance could never
-    /// be filled in.
-    /// </summary>
-    internal DnsAnswer()
-    {
-    }
-
     /// <summary>
     /// The raw 16-bit NAME field exactly as read from the record, usually a compression pointer
     /// (top two bits set) rather than a name.
@@ -168,6 +159,15 @@ public class DnsAnswer
     /// The decompressed CNAME target, set only for CNAME records; null for every other record type.
     /// </summary>
     public string? CanonicalName { get; internal set; }
+
+    /// <summary>
+    /// Parse products are produced by <see cref="DnsPacketAnswer"/>; every
+    /// setter on this type is internal, so a caller-built instance could never
+    /// be filled in.
+    /// </summary>
+    internal DnsAnswer()
+    {
+    }
 }
 
 /// <summary>
@@ -178,169 +178,14 @@ public class DnsAnswer
 [Experimental(Experimentals.PacketSeamDiagId)]
 public class DnsPacket : UdpPacket
 {
-    // Simple transaction ID generator
+    /// <summary>
+    /// The most compression pointers one name may follow, so a pointer loop in a malformed
+    /// message ends instead of spinning.
+    /// </summary>
+    private const int MaxPointerJumps = 16;
+
+    // A byte, so a built query only ever populates the low byte of the 16-bit transaction ID.
     private static byte s_transactionCounter = 1;
-
-    /// <summary>
-    /// Parses a DNS packet from a received frame. The buffer is aliased without copying, so later
-    /// changes to <paramref name="rawData"/> are visible through the packet.
-    /// </summary>
-    /// <param name="rawData">The complete Ethernet frame containing the DNS message.</param>
-    public DnsPacket(byte[] rawData)
-        : base(rawData)
-    { }
-
-    /// <summary>
-    /// Composes the UDP and DNS headers of a query between ports 53: a transaction ID taken from a
-    /// static 8-bit counter (only the low byte is ever populated), flags 0x0100 (recursion desired),
-    /// <paramref name="urlnb"/> questions and zero answer, authority and additional records. The
-    /// question section itself is written by subclasses. Lengths and checksums are computed by the
-    /// base constructors at construction and never recomputed.
-    /// </summary>
-    /// <param name="source">The source address.</param>
-    /// <param name="dest">The destination address (the DNS server).</param>
-    /// <param name="urlnb">The number of questions announced in the header.</param>
-    /// <param name="len">The length in bytes of the DNS payload following the 12-byte DNS header.</param>
-    public DnsPacket(Address source, Address dest, ushort urlnb, ushort len)
-        : base(source, dest, 53, 53, (ushort)(len + 12))
-    {
-        byte transactionID = s_transactionCounter++;
-        RawData[this.DataOffset + 8] = (byte)((transactionID >> 8) & 0xFF);
-        RawData[this.DataOffset + 9] = (byte)((transactionID >> 0) & 0xFF);
-
-        RawData[this.DataOffset + 10] = (byte)((0x0100 >> 8) & 0xFF);
-        RawData[this.DataOffset + 11] = (byte)((0x0100 >> 0) & 0xFF);
-
-        RawData[this.DataOffset + 12] = (byte)((urlnb >> 8) & 0xFF);
-        RawData[this.DataOffset + 13] = (byte)((urlnb >> 0) & 0xFF);
-
-        RawData[this.DataOffset + 14] = (byte)((0 >> 8) & 0xFF);
-        RawData[this.DataOffset + 15] = (byte)((0 >> 0) & 0xFF);
-
-        RawData[this.DataOffset + 16] = (byte)((0 >> 8) & 0xFF);
-        RawData[this.DataOffset + 17] = (byte)((0 >> 0) & 0xFF);
-
-        RawData[this.DataOffset + 18] = (byte)((0 >> 8) & 0xFF);
-        RawData[this.DataOffset + 19] = (byte)((0 >> 0) & 0xFF);
-
-        InitializeFields();
-    }
-
-    /// <summary>
-    /// Parses the UDP fields, then captures the DNS header snapshot: transaction ID, flags and the
-    /// question, answer, authority and additional record counts.
-    /// </summary>
-    private protected override void InitializeFields()
-    {
-        base.InitializeFields();
-        TransactionID = (ushort)((RawData[this.DataOffset + 8] << 8) | RawData[this.DataOffset + 9]);
-        DnsFlags = (ushort)((RawData[this.DataOffset + 10] << 8) | RawData[this.DataOffset + 11]);
-        Questions = (ushort)((RawData[this.DataOffset + 12] << 8) | RawData[this.DataOffset + 13]);
-        AnswerRRs = (ushort)((RawData[this.DataOffset + 14] << 8) | RawData[this.DataOffset + 15]);
-        AuthorityRRs = (ushort)((RawData[this.DataOffset + 16] << 8) | RawData[this.DataOffset + 17]);
-        AdditionalRRs = (ushort)((RawData[this.DataOffset + 18] << 8) | RawData[this.DataOffset + 19]);
-    }
-
-    /// <summary>
-    /// Gets the domain name at the given offset. Does not follow compression
-    /// pointers - use <see cref="ParseNameAt"/> for those.
-    /// </summary>
-    internal string ParseName(byte[] rawData, ref int index)
-    {
-        StringBuilder url = new();
-
-        while (rawData[index] != 0x00 && index < rawData.Length)
-        {
-            byte wordlength = rawData[index];
-            index++;
-            for (int j = 0; j < wordlength; j++)
-            {
-                url.Append((char)rawData[index]);
-                index++;
-            }
-            url.Append('.');
-        }
-
-        index++; //End 0x00
-        if (url.Length > 0)
-        {
-            return url.ToString().Substring(0, url.Length - 1);
-        }
-        return url.ToString();
-    }
-
-    /// <summary>
-    /// Reads a domain name starting at <paramref name="startIndex"/>, following RFC 1035 compression
-    /// pointers relative to <paramref name="messageBase"/>. Pointer chains are capped at 16 jumps to
-    /// avoid loops.
-    /// </summary>
-    /// <param name="rawData">The buffer containing the DNS message.</param>
-    /// <param name="startIndex">The index of the first name byte.</param>
-    /// <param name="messageBase">The index of the first byte of the DNS header, used to resolve pointer offsets.</param>
-    /// <returns>The dotted domain name without a trailing dot, or an empty string when no labels are present.</returns>
-    private protected static string ParseNameAt(byte[] rawData, int startIndex, int messageBase)
-    {
-        StringBuilder sb = new();
-        int pos = startIndex;
-        int jumps = 0;
-        // Avoid infinite pointer loops.
-        const int maxJumps = 16;
-
-        while (pos >= 0 && pos < rawData.Length)
-        {
-            byte b = rawData[pos];
-
-            if (b == 0x00)
-            {
-                break;
-            }
-
-            if ((b & 0xC0) == 0xC0)
-            {
-                if (pos + 1 >= rawData.Length || jumps++ >= maxJumps)
-                {
-                    break;
-                }
-
-                int pointer = ((b & 0x3F) << 8) | rawData[pos + 1];
-                pos = messageBase + pointer;
-                continue;
-            }
-
-            pos++;
-            for (int j = 0; j < b && pos < rawData.Length; j++, pos++)
-            {
-                sb.Append((char)rawData[pos]);
-            }
-            sb.Append('.');
-        }
-
-        if (sb.Length > 0)
-        {
-            // Trim trailing dot.
-            sb.Length--;
-        }
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Resolves a resource record's NAME field when it is a compression pointer.
-    /// </summary>
-    /// <param name="nameField">The raw 16-bit NAME field of the record.</param>
-    /// <param name="rawData">The buffer containing the DNS message.</param>
-    /// <param name="messageBase">The index of the first byte of the DNS header.</param>
-    /// <returns>The decompressed name, or null when the field is not a compression pointer (inline names are not handled).</returns>
-    private protected static string? ResolveRRName(ushort nameField, byte[] rawData, int messageBase)
-    {
-        if ((nameField & 0xC000) != 0xC000)
-        {
-            // Inline (non-compressed) RR names aren't handled.
-            return null;
-        }
-
-        int offset = nameField & 0x3FFF;
-        return ParseNameAt(rawData, messageBase + offset, messageBase);
-    }
 
     /// <summary>
     /// The number of answer resource records announced in the header, parsed at construction.
@@ -386,11 +231,171 @@ public class DnsPacket : UdpPacket
     /// </summary>
     public List<DnsAnswer>? Answers { get; internal set; }
 
-    /// <inheritdoc/>
-    public override string ToString()
+    /// <summary>
+    /// Parses a DNS packet from a received frame. The buffer is aliased without copying, so later
+    /// changes to <paramref name="rawData"/> are visible through the packet.
+    /// </summary>
+    /// <param name="rawData">The complete Ethernet frame containing the DNS message.</param>
+    public DnsPacket(byte[] rawData)
+        : base(rawData)
     {
-        return $"DNS Packet Src={SourceIP}:{SourcePort}, Dest={DestinationIP}:{DestinationPort}";
     }
+
+    /// <summary>
+    /// Composes the UDP and DNS headers of a query between ports 53: a transaction ID taken from a
+    /// static 8-bit counter (only the low byte is ever populated), flags 0x0100 (recursion desired),
+    /// <paramref name="urlnb"/> questions and zero answer, authority and additional records. The
+    /// question section itself is written by subclasses. Lengths and checksums are computed by the
+    /// base constructors at construction and never recomputed.
+    /// </summary>
+    /// <param name="source">The source address.</param>
+    /// <param name="dest">The destination address (the DNS server).</param>
+    /// <param name="urlnb">The number of questions announced in the header.</param>
+    /// <param name="len">The length in bytes of the DNS payload following the 12-byte DNS header.</param>
+    public DnsPacket(Address source, Address dest, ushort urlnb, ushort len)
+        : base(source, dest, 53, 53, (ushort)(len + 12))
+    {
+        byte transactionID = s_transactionCounter++;
+        RawData[DataOffset + 8] = (byte)((transactionID >> 8) & 0xFF);
+        RawData[DataOffset + 9] = (byte)((transactionID >> 0) & 0xFF);
+
+        RawData[DataOffset + 10] = (byte)((0x0100 >> 8) & 0xFF);
+        RawData[DataOffset + 11] = (byte)((0x0100 >> 0) & 0xFF);
+
+        RawData[DataOffset + 12] = (byte)((urlnb >> 8) & 0xFF);
+        RawData[DataOffset + 13] = (byte)((urlnb >> 0) & 0xFF);
+
+        RawData[DataOffset + 14] = (byte)((0 >> 8) & 0xFF);
+        RawData[DataOffset + 15] = (byte)((0 >> 0) & 0xFF);
+
+        RawData[DataOffset + 16] = (byte)((0 >> 8) & 0xFF);
+        RawData[DataOffset + 17] = (byte)((0 >> 0) & 0xFF);
+
+        RawData[DataOffset + 18] = (byte)((0 >> 8) & 0xFF);
+        RawData[DataOffset + 19] = (byte)((0 >> 0) & 0xFF);
+
+        InitializeFields();
+    }
+
+    /// <summary>
+    /// Parses the UDP fields, then captures the DNS header snapshot: transaction ID, flags and the
+    /// question, answer, authority and additional record counts.
+    /// </summary>
+    private protected override void InitializeFields()
+    {
+        base.InitializeFields();
+        TransactionID = (ushort)((RawData[DataOffset + 8] << 8) | RawData[DataOffset + 9]);
+        DnsFlags = (ushort)((RawData[DataOffset + 10] << 8) | RawData[DataOffset + 11]);
+        Questions = (ushort)((RawData[DataOffset + 12] << 8) | RawData[DataOffset + 13]);
+        AnswerRRs = (ushort)((RawData[DataOffset + 14] << 8) | RawData[DataOffset + 15]);
+        AuthorityRRs = (ushort)((RawData[DataOffset + 16] << 8) | RawData[DataOffset + 17]);
+        AdditionalRRs = (ushort)((RawData[DataOffset + 18] << 8) | RawData[DataOffset + 19]);
+    }
+
+    /// <summary>
+    /// Gets the domain name at the given offset. Does not follow compression
+    /// pointers - use <see cref="ParseNameAt"/> for those.
+    /// </summary>
+    internal string ParseName(byte[] rawData, ref int index)
+    {
+        StringBuilder name = new();
+
+        while (rawData[index] != 0x00 && index < rawData.Length)
+        {
+            byte labelLength = rawData[index];
+            index++;
+            for (int j = 0; j < labelLength; j++)
+            {
+                name.Append((char)rawData[index]);
+                index++;
+            }
+            name.Append('.');
+        }
+
+        // Step over the zero-length label that ends the name.
+        index++;
+        if (name.Length > 0)
+        {
+            // Trim trailing dot.
+            name.Length--;
+        }
+        return name.ToString();
+    }
+
+    /// <summary>
+    /// Reads a domain name starting at <paramref name="startIndex"/>, following RFC 1035 compression
+    /// pointers relative to <paramref name="messageBase"/>. Pointer chains are capped at 16 jumps to
+    /// avoid loops.
+    /// </summary>
+    /// <param name="rawData">The buffer containing the DNS message.</param>
+    /// <param name="startIndex">The index of the first name byte.</param>
+    /// <param name="messageBase">The index of the first byte of the DNS header, used to resolve pointer offsets.</param>
+    /// <returns>The dotted domain name without a trailing dot, or an empty string when no labels are present.</returns>
+    private protected static string ParseNameAt(byte[] rawData, int startIndex, int messageBase)
+    {
+        StringBuilder name = new();
+        int pos = startIndex;
+        int jumps = 0;
+
+        while (pos >= 0 && pos < rawData.Length)
+        {
+            byte lengthOrPointer = rawData[pos];
+
+            if (lengthOrPointer == 0x00)
+            {
+                break;
+            }
+
+            if ((lengthOrPointer & 0xC0) == 0xC0)
+            {
+                if (pos + 1 >= rawData.Length || jumps++ >= MaxPointerJumps)
+                {
+                    break;
+                }
+
+                int pointer = ((lengthOrPointer & 0x3F) << 8) | rawData[pos + 1];
+                pos = messageBase + pointer;
+                continue;
+            }
+
+            pos++;
+            for (int j = 0; j < lengthOrPointer && pos < rawData.Length; j++, pos++)
+            {
+                name.Append((char)rawData[pos]);
+            }
+            name.Append('.');
+        }
+
+        if (name.Length > 0)
+        {
+            // Trim trailing dot.
+            name.Length--;
+        }
+        return name.ToString();
+    }
+
+    /// <summary>
+    /// Resolves a resource record's NAME field when it is a compression pointer.
+    /// </summary>
+    /// <param name="nameField">The raw 16-bit NAME field of the record.</param>
+    /// <param name="rawData">The buffer containing the DNS message.</param>
+    /// <param name="messageBase">The index of the first byte of the DNS header.</param>
+    /// <returns>The decompressed name, or null when the field is not a compression pointer (inline names are not handled).</returns>
+    private protected static string? ResolveRRName(ushort nameField, byte[] rawData, int messageBase)
+    {
+        if ((nameField & 0xC000) != 0xC000)
+        {
+            // Inline (non-compressed) RR names aren't handled.
+            return null;
+        }
+
+        int offset = nameField & 0x3FFF;
+        return ParseNameAt(rawData, messageBase + offset, messageBase);
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() =>
+        $"DNS Packet Src={SourceIP}:{SourcePort}, Dest={DestinationIP}:{DestinationPort}";
 }
 
 /// <summary>
@@ -405,7 +410,8 @@ public class DnsPacketQuery : DnsPacket
     /// <param name="rawData">The complete Ethernet frame containing the DNS message.</param>
     public DnsPacketQuery(byte[] rawData)
         : base(rawData)
-    { }
+    {
+    }
 
     /// <summary>
     /// Composes a query with a single IN-class question for <paramref name="url"/>: the name is
@@ -422,30 +428,30 @@ public class DnsPacketQuery : DnsPacket
     public DnsPacketQuery(Address source, Address dest, string url, ushort recordType = DnsRecordType.A)
         : base(source, dest, 1, (ushort)(url.Length + url.Split('.').Length + 1 + 4))
     {
-        int b = 0;
+        int offset = 0;
 
-        foreach (string item in url.Split('.'))
+        foreach (string label in url.Split('.'))
         {
-            byte[] word = Encoding.ASCII.GetBytes(item);
+            byte[] labelBytes = Encoding.ASCII.GetBytes(label);
 
-            RawData[this.DataOffset + 20 + b] = (byte)word.Length; //set word length
+            RawData[DataOffset + 20 + offset] = (byte)labelBytes.Length;
 
-            b++;
+            offset++;
 
-            foreach (byte letter in word)
+            foreach (byte letter in labelBytes)
             {
-                RawData[this.DataOffset + 20 + b] = letter;
-                b++;
+                RawData[DataOffset + 20 + offset] = letter;
+                offset++;
             }
         }
 
-        RawData[this.DataOffset + 20 + b] = 0x00;
+        RawData[DataOffset + 20 + offset] = 0x00;
 
-        RawData[this.DataOffset + 20 + b + 1] = (byte)((recordType >> 8) & 0xFF);
-        RawData[this.DataOffset + 20 + b + 2] = (byte)((recordType >> 0) & 0xFF);
+        RawData[DataOffset + 20 + offset + 1] = (byte)((recordType >> 8) & 0xFF);
+        RawData[DataOffset + 20 + offset + 2] = (byte)((recordType >> 0) & 0xFF);
 
-        RawData[this.DataOffset + 20 + b + 3] = 0x00;
-        RawData[this.DataOffset + 20 + b + 4] = 0x01;
+        RawData[DataOffset + 20 + offset + 3] = 0x00;
+        RawData[DataOffset + 20 + offset + 4] = 0x01;
 
         // The question section is only complete now, and the length-taking UDP
         // constructor leaves the checksum at zero. A zero is legal over IPv4,
@@ -472,7 +478,8 @@ public class DnsPacketAnswer : DnsPacket
     /// <param name="rawData">The complete Ethernet frame containing the DNS message.</param>
     public DnsPacketAnswer(byte[] rawData)
         : base(rawData)
-    { }
+    {
+    }
 
     /// <summary>
     /// Parses the DNS header, then the question and answer sections, resolving compressed names.
@@ -505,21 +512,23 @@ public class DnsPacketAnswer : DnsPacket
                 index += 4;
             }
         }
+
         if (AnswerRRs > 0)
         {
             Answers = [];
 
             for (int i = 0; i < AnswerRRs; i++)
             {
+                ushort nameField = (ushort)((RawData[index + 0] << 8) | RawData[index + 1]);
                 DnsAnswer answer = new()
                 {
-                    NameField = (ushort)((RawData[index + 0] << 8) | RawData[index + 1])
+                    NameField = nameField,
+                    ResolvedName = ResolveRRName(nameField, RawData, DataOffset + 8),
+                    Type = (ushort)((RawData[index + 2] << 8) | RawData[index + 3]),
+                    Class = (ushort)((RawData[index + 4] << 8) | RawData[index + 5]),
+                    TimeToLive = (RawData[index + 6] << 24) | (RawData[index + 7] << 16) | (RawData[index + 8] << 8) | RawData[index + 9],
+                    DataLength = (ushort)((RawData[index + 10] << 8) | RawData[index + 11])
                 };
-                answer.ResolvedName = ResolveRRName(answer.NameField, RawData, DataOffset + 8);
-                answer.Type = (ushort)((RawData[index + 2] << 8) | RawData[index + 3]);
-                answer.Class = (ushort)((RawData[index + 4] << 8) | RawData[index + 5]);
-                answer.TimeToLive = (RawData[index + 6] << 24) | (RawData[index + 7] << 16) | (RawData[index + 8] << 8) | RawData[index + 9];
-                answer.DataLength = (ushort)((RawData[index + 10] << 8) | RawData[index + 11]);
                 index += 12;
 
                 int rdataStart = index;

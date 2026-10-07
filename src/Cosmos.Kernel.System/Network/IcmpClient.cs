@@ -13,40 +13,9 @@ public sealed class IcmpClient : IDisposable
 {
     private static readonly Dictionary<Address, IcmpClient> s_clients = [];
 
-    /// <summary>
-    /// Destination address.
-    /// </summary>
-    internal Address? _destination;
-
-    /// <summary>
-    /// The RX buffer queue.
-    /// </summary>
-    internal Queue<IcmpPacket> _rxBuffer;
+    private Address? _destination;
+    private readonly Queue<IcmpPacket> _rxBuffer;
     private bool _disposed;
-
-    /// <summary>
-    /// Throws once <see cref="Dispose"/> has run. <see cref="Close"/> does not
-    /// arm this: closing only stops delivery to this client, and
-    /// <see cref="Connect"/> reopens it.
-    /// </summary>
-    private void ThrowIfDisposed()
-    {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-    }
-
-    /// <summary>
-    /// Gets the client connected to a destination address.
-    /// </summary>
-    /// <param name="address">The destination address.</param>
-    /// <returns>If a client is connected to the given address, the <see cref="IcmpClient"/>; otherwise, <see langword="null"/>.</returns>
-    internal static IcmpClient? GetClient(Address address)
-    {
-        if (s_clients.TryGetValue(address, out IcmpClient? client))
-        {
-            return client;
-        }
-        return null;
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IcmpClient"/> class.
@@ -57,9 +26,25 @@ public sealed class IcmpClient : IDisposable
     }
 
     /// <summary>
+    /// Throws once <see cref="Dispose"/> has run. <see cref="Close"/> does not
+    /// arm this: closing only stops delivery to this client, and
+    /// <see cref="Connect"/> reopens it.
+    /// </summary>
+    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
+
+    /// <summary>
+    /// Gets the client connected to a destination address.
+    /// </summary>
+    /// <param name="address">The destination address.</param>
+    /// <returns>If a client is connected to the given address, the <see cref="IcmpClient"/>; otherwise, <see langword="null"/>.</returns>
+    internal static IcmpClient? GetClient(Address address) =>
+        s_clients.TryGetValue(address, out IcmpClient? client) ? client : null;
+
+    /// <summary>
     /// Connects to the given client.
     /// </summary>
     /// <param name="dest">Destination address.</param>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
     public void Connect(Address dest)
     {
         ThrowIfDisposed();
@@ -113,12 +98,13 @@ public sealed class IcmpClient : IDisposable
     /// </summary>
     /// <param name="packet">The packet to transmit; its headers and checksum must already be final.</param>
     /// <returns><see langword="false"/> when no configured interface matches the packet's source address; otherwise, <see langword="true"/>.</returns>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
     [Experimental(Experimentals.PacketSeamDiagId)]
     public bool Send(IcmpPacket packet)
     {
         ThrowIfDisposed();
 
-        return Cosmos.Kernel.System.Network.NetworkStack.Send(packet);
+        return NetworkStack.Send(packet);
     }
 
     /// <summary>
@@ -128,6 +114,7 @@ public sealed class IcmpClient : IDisposable
     /// </summary>
     /// <param name="timeoutMs">The timeout in milliseconds; a non-positive value checks the queue once without waiting.</param>
     /// <returns>The dequeued <see cref="IcmpPacket"/>, or <see langword="null"/> if none arrived before the timeout.</returns>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
     [Experimental(Experimentals.PacketSeamDiagId)]
     public IcmpPacket? ReceivePacket(int timeoutMs = 5000)
     {
@@ -154,6 +141,7 @@ public sealed class IcmpClient : IDisposable
     /// <param name="source">The source end point.</param>
     /// <param name="timeout">The timeout value in milliseconds; by default, 5000ms.</param>
     /// <returns>The elapsed time in milliseconds, or -1 if a timeout has been reached.</returns>
+    /// <exception cref="ObjectDisposedException">The client has been disposed.</exception>
     public int Receive(ref EndPoint source, int timeout = 5000)
     {
         ThrowIfDisposed();
@@ -180,10 +168,7 @@ public sealed class IcmpClient : IDisposable
     /// Receives data from the given packet.
     /// </summary>
     /// <param name="packet">The packet to receive.</param>
-    internal void ReceiveData(IcmpPacket packet)
-    {
-        _rxBuffer.Enqueue(packet);
-    }
+    internal void ReceiveData(IcmpPacket packet) => _rxBuffer.Enqueue(packet);
 
     /// <summary>
     /// Closes the client and retires it. Unlike <see cref="Close"/>, which a

@@ -27,13 +27,10 @@ public sealed class DnsClient : UdpClient
     }
 
     /// <summary>
-    /// Connects to a client.
+    /// Connects to a DNS server on port 53.
     /// </summary>
-    /// <param name="address">Destination address.</param>
-    public void Connect(Address address)
-    {
-        Connect(address, 53);
-    }
+    /// <param name="address">The DNS server address.</param>
+    public void Connect(Address address) => Connect(address, 53);
 
     /// <summary>
     /// Sends a DNS query for the given domain name string.
@@ -55,9 +52,9 @@ public sealed class DnsClient : UdpClient
         Address source = IPConfig.FindNetwork(_destination)
             ?? throw new InvalidOperationException("No network route to DNS server. Run 'netconfig' or 'dhcp' first.");
         _queryUrl = url;
-        DnsPacketQuery askpacket = new(source, _destination!, url, recordType);
+        DnsPacketQuery askPacket = new(source, _destination, url, recordType);
 
-        askpacket.Network.Enqueue();
+        askPacket.Network.Enqueue();
         NetworkStack.Update();
     }
 
@@ -86,7 +83,6 @@ public sealed class DnsClient : UdpClient
     /// <see cref="Receive"/> for what the null covers.</returns>
     public List<Address>? ReceiveAll(int timeout = 5000)
     {
-        // Wait in 100ms intervals, checking for data each time
         int waited = 0;
         while (_rxBuffer.Count < 1 && waited < timeout)
         {
@@ -107,7 +103,7 @@ public sealed class DnsClient : UdpClient
         }
 
         // Reject mismatched or unsolicited replies (e.g. spoofed/stray packets).
-        if (packet.Queries is null || packet.Queries.Count == 0 ||
+        if (_queryUrl is null || packet.Queries is null || packet.Queries.Count == 0 ||
             !string.Equals(packet.Queries[0].Name, _queryUrl, StringComparison.OrdinalIgnoreCase))
         {
             return null;
@@ -118,7 +114,6 @@ public sealed class DnsClient : UdpClient
             return null;
         }
 
-        ArgumentNullException.ThrowIfNull(_queryUrl);
         return ResolveAddresses(packet.Answers, _queryUrl);
     }
 
@@ -147,7 +142,6 @@ public sealed class DnsClient : UdpClient
 
             if (!visited.Add(current))
             {
-                // CNAME loop detected.
                 return null;
             }
 

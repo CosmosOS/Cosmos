@@ -11,13 +11,10 @@ namespace Cosmos.Kernel.System.Network.Protocols.Arp;
 internal static class ArpCache
 {
     /// <summary>
-    /// The cache map.
+    /// The MAC address last seen for each IP address; <see langword="null"/> until the first update or lookup.
     /// </summary>
     public static Dictionary<Address, MacAddress>? Cache;
 
-    /// <summary>
-    /// Ensures the cache map exists.
-    /// </summary>
     [MemberNotNull(nameof(Cache))]
     private static void EnsureCacheExists()
     {
@@ -29,12 +26,11 @@ internal static class ArpCache
     /// </summary>
     /// <param name="ipAddress">The IP address.</param>
     /// <param name="macAddress">The MAC address.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown on fatal error.</exception>
-    /// <exception cref="global::System.IO.IOException">Thrown on IO error.</exception>
-    /// <exception cref="ArgumentException">Thrown on fatal error.</exception>
     internal static void Update(Address ipAddress, MacAddress macAddress)
     {
         EnsureCacheExists();
+
+        // 0.0.0.0 is the sender of an ARP probe or of a DHCP client with no lease yet: no address to cache.
         if (Equals(ipAddress, Address4.Zero))
         {
             return;

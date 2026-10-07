@@ -17,22 +17,11 @@ namespace Cosmos.Kernel.System.Network;
 /// </summary>
 internal sealed class KitNetworkDevice : INetworkDevice
 {
-    private readonly PublishedDevice _published;
     private readonly INetworkInterface _network;
     private volatile bool _linkUp;
 
-    /// <summary>Wraps a published interface; the link state starts as the interface reports it. Kit worker, thread context.</summary>
-    /// <param name="published">The published device the interface came with.</param>
-    /// <param name="network">The driver's interface contract.</param>
-    internal KitNetworkDevice(PublishedDevice published, INetworkInterface network)
-    {
-        _published = published;
-        _network = network;
-        _linkUp = network.LinkUp;
-    }
-
     /// <summary>The published device this adapter stands for, the key the consumer finds it by.</summary>
-    public PublishedDevice Published => _published;
+    public PublishedDevice Published { get; }
 
     /// <inheritdoc/>
     public string Name => _network.Name;
@@ -43,7 +32,7 @@ internal sealed class KitNetworkDevice : INetworkDevice
     /// <summary>True while the link is up, as the driver last reported it through its sink; false once the device is withdrawn.</summary>
     public bool LinkUp
     {
-        get => _linkUp && !_published.IsWithdrawn;
+        get => _linkUp && !Published.IsWithdrawn;
         internal set => _linkUp = value;
     }
 
@@ -52,6 +41,16 @@ internal sealed class KitNetworkDevice : INetworkDevice
 
     /// <inheritdoc/>
     public PacketReceivedHandler? OnPacketReceived { get; set; }
+
+    /// <summary>Wraps a published interface; the link state starts as the interface reports it. Kit worker, thread context.</summary>
+    /// <param name="published">The published device the interface came with.</param>
+    /// <param name="network">The driver's interface contract.</param>
+    internal KitNetworkDevice(PublishedDevice published, INetworkInterface network)
+    {
+        Published = published;
+        _network = network;
+        _linkUp = network.LinkUp;
+    }
 
     /// <summary>Nothing to do: the kit driver brought the device up in its probe, before publishing it.</summary>
     public void Initialize()
@@ -79,5 +78,5 @@ internal sealed class KitNetworkDevice : INetworkDevice
     /// <param name="length">How many bytes of it to send.</param>
     /// <returns>False when the device is withdrawn, the arguments are unusable or the interface did not take the frame.</returns>
     public bool Send(byte[] data, int length) =>
-        !_published.IsWithdrawn && data is not null && length > 0 && length <= data.Length && _network.Transmit(data.AsSpan(0, length));
+        !Published.IsWithdrawn && data is not null && length > 0 && length <= data.Length && _network.Transmit(data.AsSpan(0, length));
 }

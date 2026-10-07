@@ -8,11 +8,6 @@ using Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp;
 namespace Cosmos.Kernel.System.Network.Protocols.Udp;
 
 /// <summary>
-/// Delegate for UDP data received events.
-/// </summary>
-internal delegate void UdpDataReceivedHandler(UdpPacket packet);
-
-/// <summary>
 /// A UDP datagram, over IPv4 or over IPv6. The wire header is the same on
 /// both, so one class serves both: the datagram composes the
 /// <see cref="InternetPacket"/> that carries it rather than deriving from a
@@ -43,51 +38,59 @@ public class UdpPacket
     internal static UdpDataReceivedHandler? OnUDPDataReceived { get; set; }
 
     /// <summary>
-    /// Handles a received UDP datagram, of either version: a datagram whose
-    /// checksum does not verify is dropped, a datagram addressed to the DHCP
-    /// client port goes to the DHCP handler, and everything else goes to the
-    /// client bound to its destination port.
+    /// The internet packet carrying this datagram: the frame buffer, the
+    /// addresses, and the version-specific half of the checksum. Pass it to
+    /// <see cref="NetworkStack.Send"/> to transmit the datagram.
     /// </summary>
-    /// <param name="network">The parsed internet packet carrying the datagram.</param>
-    internal static void UDPHandler(InternetPacket network)
-    {
-        UdpPacket udpPacket = new(network);
+    public InternetPacket Network { get; }
 
-        Serial.WriteString("[UDP] Received from ");
-        Serial.WriteString(udpPacket.SourceIP.ToString());
-        Serial.WriteString(":");
-        Serial.WriteNumber((ulong)udpPacket.SourcePort);
-        Serial.WriteString(" -> ");
-        Serial.WriteNumber((ulong)udpPacket.DestinationPort);
-        Serial.WriteString(" len=");
-        Serial.WriteNumber((ulong)udpPacket.UdpDataLength);
-        Serial.WriteString("\n");
+    /// <summary>
+    /// The complete wire image of the frame, Ethernet header included.
+    /// </summary>
+    public byte[] RawData => Network.RawData;
 
-        if (!udpPacket.VerifyChecksum())
-        {
-            Serial.WriteString("[UDP] Bad checksum, dropping\n");
-            return;
-        }
+    /// <summary>
+    /// The source address of the carrying internet packet.
+    /// </summary>
+    public Address SourceIP => Network.SourceIP;
 
-        // Route to specific protocol handlers based on port
-        if (udpPacket.DestinationPort == DhcpClientPort)
-        {
-            DhcpPacket.DHCPHandler(udpPacket.RawData);
-        }
-        else
-        {
-            // Route to UdpClient if available. DNS used to be routed here a
-            // second time as well, which enqueued every reply twice into the
-            // one client bound to port 53: the client dequeued one and the
-            // stale copy then satisfied the next query's wait, so every second
-            // lookup on a DnsClient failed its own query-name check.
-            UdpClient? client = UdpClient.GetClient(udpPacket.DestinationPort);
-            client?.ReceiveData(udpPacket);
-        }
+    /// <summary>
+    /// The destination address of the carrying internet packet.
+    /// </summary>
+    public Address DestinationIP => Network.DestinationIP;
 
-        // Call the registered callback if any
-        OnUDPDataReceived?.Invoke(udpPacket);
-    }
+    /// <summary>
+    /// The offset of the UDP header from the start of the frame.
+    /// </summary>
+    private protected ushort DataOffset => Network.DataOffset;
+
+    /// <summary>
+    /// Gets the destination port, a snapshot parsed from the UDP header at construction.
+    /// </summary>
+    public ushort DestinationPort { get; private set; }
+
+    /// <summary>
+    /// Gets the source port, a snapshot parsed from the UDP header at construction.
+    /// </summary>
+    public ushort SourcePort { get; private set; }
+
+    /// <summary>
+    /// Gets the value of the UDP length field: the 8-byte UDP header plus the payload. It is
+    /// a snapshot parsed from the header at construction and is never recomputed.
+    /// </summary>
+    public ushort UdpLength { get; private set; }
+
+    /// <summary>
+    /// Gets the checksum field as parsed from the header, a snapshot taken at
+    /// construction. Reads zero on a datagram whose payload the caller still
+    /// has to fill in and checksum.
+    /// </summary>
+    public ushort Checksum { get; private set; }
+
+    /// <summary>
+    /// Gets the payload length in bytes: <see cref="UdpLength"/> minus the 8-byte UDP header.
+    /// </summary>
+    public ushort UdpDataLength => (ushort)(UdpLength - UdpHeaderLength);
 
     /// <summary>
     /// Parses a UDP datagram from a raw Ethernet frame, picking the internet
@@ -209,76 +212,62 @@ public class UdpPacket
     /// <summary>
     /// Builds the internet packet for a datagram of <paramref name="dataLength"/> payload bytes.
     /// </summary>
-    private static InternetPacket Build(Address source, Address dest, ushort dataLength)
-    {
-        return InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolUdp,
+    private static InternetPacket Build(Address source, Address dest, ushort dataLength) =>
+        InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolUdp,
             (ushort)(dataLength + UdpHeaderLength), false);
-    }
 
     /// <summary>
     /// Builds the internet packet for a datagram of <paramref name="dataLength"/> payload bytes,
     /// with the destination MAC address already known.
     /// </summary>
-    private static InternetPacket Build(Address source, Address dest, ushort dataLength, MacAddress destMac)
-    {
-        return InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolUdp,
+    private static InternetPacket Build(Address source, Address dest, ushort dataLength, MacAddress destMac) =>
+        InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolUdp,
             (ushort)(dataLength + UdpHeaderLength), false, destMac);
+
+    /// <summary>
+    /// Handles a received UDP datagram, of either version: a datagram whose
+    /// checksum does not verify is dropped, a datagram addressed to the DHCP
+    /// client port goes to the DHCP handler, and everything else goes to the
+    /// client bound to its destination port.
+    /// </summary>
+    /// <param name="network">The parsed internet packet carrying the datagram.</param>
+    internal static void UDPHandler(InternetPacket network)
+    {
+        UdpPacket udpPacket = new(network);
+
+        Serial.WriteString("[UDP] Received from ");
+        Serial.WriteString(udpPacket.SourceIP.ToString());
+        Serial.WriteString(":");
+        Serial.WriteNumber((ulong)udpPacket.SourcePort);
+        Serial.WriteString(" -> ");
+        Serial.WriteNumber((ulong)udpPacket.DestinationPort);
+        Serial.WriteString(" len=");
+        Serial.WriteNumber((ulong)udpPacket.UdpDataLength);
+        Serial.WriteString("\n");
+
+        if (!udpPacket.VerifyChecksum())
+        {
+            Serial.WriteString("[UDP] Bad checksum, dropping\n");
+            return;
+        }
+
+        if (udpPacket.DestinationPort == DhcpClientPort)
+        {
+            DhcpPacket.DHCPHandler(udpPacket.RawData);
+        }
+        else
+        {
+            // DNS replies reach their client through this path only. Routing
+            // them here a second time enqueued every reply twice into the one
+            // client bound to port 53: the client dequeued one and the stale
+            // copy then satisfied the next query's wait, so every second
+            // lookup on a DnsClient failed its own query-name check.
+            UdpClient? client = UdpClient.GetClient(udpPacket.DestinationPort);
+            client?.ReceiveData(udpPacket);
+        }
+
+        OnUDPDataReceived?.Invoke(udpPacket);
     }
-
-    /// <summary>
-    /// The internet packet carrying this datagram: the frame buffer, the
-    /// addresses, and the version-specific half of the checksum. Pass it to
-    /// <see cref="NetworkStack.Send"/> to transmit the datagram.
-    /// </summary>
-    public InternetPacket Network { get; }
-
-    /// <summary>
-    /// The complete wire image of the frame, Ethernet header included.
-    /// </summary>
-    public byte[] RawData => Network.RawData;
-
-    /// <summary>
-    /// The source address of the carrying internet packet.
-    /// </summary>
-    public Address SourceIP => Network.SourceIP;
-
-    /// <summary>
-    /// The destination address of the carrying internet packet.
-    /// </summary>
-    public Address DestinationIP => Network.DestinationIP;
-
-    /// <summary>
-    /// The offset of the UDP header from the start of the frame.
-    /// </summary>
-    private protected ushort DataOffset => Network.DataOffset;
-
-    /// <summary>
-    /// Gets the destination port, a snapshot parsed from the UDP header at construction.
-    /// </summary>
-    public ushort DestinationPort { get; private set; }
-
-    /// <summary>
-    /// Gets the source port, a snapshot parsed from the UDP header at construction.
-    /// </summary>
-    public ushort SourcePort { get; private set; }
-
-    /// <summary>
-    /// Gets the value of the UDP length field: the 8-byte UDP header plus the payload. It is
-    /// a snapshot parsed from the header at construction and is never recomputed.
-    /// </summary>
-    public ushort UdpLength { get; private set; }
-
-    /// <summary>
-    /// Gets the checksum field as parsed from the header, a snapshot taken at
-    /// construction. Reads zero on a datagram whose payload the caller still
-    /// has to fill in and checksum.
-    /// </summary>
-    public ushort Checksum { get; private set; }
-
-    /// <summary>
-    /// Gets the payload length in bytes: <see cref="UdpLength"/> minus the 8-byte UDP header.
-    /// </summary>
-    public ushort UdpDataLength => (ushort)(UdpLength - UdpHeaderLength);
 
     /// <summary>
     /// Writes the UDP header. The length field counts the header, and the
@@ -303,7 +292,7 @@ public class UdpPacket
     /// Copies the payload in after the header and settles the checksum over
     /// the finished datagram.
     /// </summary>
-    private void WritePayload(byte[] data)
+    private void WritePayload(ReadOnlySpan<byte> data)
     {
         data.CopyTo(RawData.AsSpan(DataOffset + UdpHeaderLength, data.Length));
         WriteChecksum();
@@ -388,8 +377,6 @@ public class UdpPacket
     /// Returns a string with the source and destination endpoints and the payload length.
     /// </summary>
     /// <returns>A human-readable summary of the packet.</returns>
-    public override string ToString()
-    {
-        return $"UDP Packet Src={SourceIP}:{SourcePort},Dest={DestinationIP}:{DestinationPort}, DataLen={UdpDataLength}";
-    }
+    public override string ToString() =>
+        $"UDP Packet Src={SourceIP}:{SourcePort},Dest={DestinationIP}:{DestinationPort}, DataLen={UdpDataLength}";
 }

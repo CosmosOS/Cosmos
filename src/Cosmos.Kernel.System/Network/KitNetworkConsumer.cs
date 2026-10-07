@@ -44,11 +44,7 @@ internal sealed class KitNetworkConsumer : NetworkConsumer
             throw new InvalidOperationException("the network manager's device table is full");
         }
 
-        KitNetworkDevice[] current = _adapters;
-        KitNetworkDevice[] adapters = new KitNetworkDevice[current.Length + 1];
-        Array.Copy(current, adapters, current.Length);
-        adapters[current.Length] = adapter;
-        _adapters = adapters;
+        _adapters = [.. _adapters, adapter];
     }
 
     /// <inheritdoc/>

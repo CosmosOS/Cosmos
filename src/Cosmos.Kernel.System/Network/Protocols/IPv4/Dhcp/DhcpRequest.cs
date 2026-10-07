@@ -36,14 +36,14 @@ public class DhcpRequest : DhcpPacket
     /// </summary>
     /// <param name="sourceMac">The MAC address of the sending network device.</param>
     /// <param name="requestedAddress">The IPv4 address to request, written to option 50.</param>
-    public DhcpRequest(MacAddress sourceMac, Address requestedAddress) : base(sourceMac, 16)
+    public DhcpRequest(MacAddress sourceMac, Address requestedAddress) : base(sourceMac, 16) // 3 (message type) + 6 (requested address) + 6 (parameter list) + 1 (end mark) option bytes
     {
-        // Request
+        // Option 53, message type: DHCPREQUEST
         RawData[282] = 53;
         RawData[283] = 1;
         RawData[284] = 3;
 
-        // Requested Address
+        // Option 50, requested IP address
         RawData[285] = 50;
         RawData[286] = 4;
 
@@ -52,16 +52,16 @@ public class DhcpRequest : DhcpPacket
         RawData[289] = requestedAddress.Parts[2];
         RawData[290] = requestedAddress.Parts[3];
 
-        // Parameters start here
+        // Option 55, parameter request list
         RawData[291] = 0x37;
         RawData[292] = 4;
 
-        // Parameters
+        // Requested: subnet mask, router, domain name, domain name server
         RawData[293] = 0x01;
         RawData[294] = 0x03;
         RawData[295] = 0x0f;
         RawData[296] = 0x06;
 
-        RawData[297] = 0xff; // ENDMARK
+        RawData[297] = 0xff; // End mark
     }
 }

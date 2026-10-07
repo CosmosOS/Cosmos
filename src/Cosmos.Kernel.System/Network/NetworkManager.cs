@@ -17,7 +17,6 @@ namespace Cosmos.Kernel.System.Network;
 public static class NetworkManager
 {
     private static INetworkDevice?[]? s_devices;
-    private static int s_deviceCount;
     private static int s_primaryIndex = -1;
 
     /// <summary>
@@ -44,6 +43,11 @@ public static class NetworkManager
     /// the device table exist.
     /// </summary>
     public static bool IsInitialized => s_devices is not null;
+
+    /// <summary>
+    /// Gets the number of registered network devices.
+    /// </summary>
+    public static int DeviceCount { get; private set; }
 
     /// <summary>
     /// Gets the primary network device. Internal: a kernel names a device with
@@ -83,10 +87,8 @@ public static class NetworkManager
     /// </summary>
     /// <param name="index">Registration index, from 0 to <see cref="DeviceCount"/> - 1.</param>
     /// <returns>A handle to that device, or one whose <see cref="NetworkAdapter.IsValid"/> is false when there is none.</returns>
-    public static NetworkAdapter GetAdapter(int index)
-    {
-        return index >= 0 && index < s_deviceCount ? new NetworkAdapter(index) : default;
-    }
+    public static NetworkAdapter GetAdapter(int index) =>
+        index >= 0 && index < DeviceCount ? new NetworkAdapter(index) : default;
 
     /// <summary>
     /// The primary device's name, or null when there is no device.
@@ -112,15 +114,10 @@ public static class NetworkManager
     public static bool LinkUp => PrimaryDevice?.LinkUp ?? false;
 
     /// <summary>
-    /// Gets the number of registered network devices.
-    /// </summary>
-    public static int DeviceCount => s_deviceCount;
-
-    /// <summary>
     /// Initializes the network manager. Called once during boot, before the
-    /// platform network device is registered and before the driver stage
-    /// runs: the table exists from here on, and the kit's network consumer
-    /// is installed so every interface a driver publishes lands in it.
+    /// driver stage runs: the table exists from here on, and the kit's
+    /// network consumer is installed so every interface a driver publishes
+    /// lands in it.
     /// </summary>
     internal static void Initialize()
     {
@@ -131,9 +128,9 @@ public static class NetworkManager
             return;
         }
 
-        s_deviceCount = 0;
+        DeviceCount = 0;
         s_primaryIndex = -1;
-        s_devices = new INetworkDevice[8];
+        s_devices = new INetworkDevice?[8];
         DeviceRegistry.SetConsumer(DeviceKind.Network, new KitNetworkConsumer());
     }
 
@@ -144,22 +141,21 @@ public static class NetworkManager
     /// disabled.
     /// </summary>
     /// <param name="device">The network device to register.</param>
-    /// <returns>False when the device is null, the manager is not initialized or the table's eight slots are taken; the device is not registered then.</returns>
+    /// <returns>False when the manager is not initialized or the table's eight slots are taken; the device is not registered then.</returns>
     internal static bool RegisterDevice(INetworkDevice device)
     {
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (device is null || s_devices is null || s_deviceCount >= s_devices.Length)
+            if (s_devices is null || DeviceCount >= s_devices.Length)
             {
                 return false;
             }
 
-            s_devices[s_deviceCount++] = device;
+            s_devices[DeviceCount++] = device;
 
-            // First device becomes primary
             if (s_primaryIndex < 0)
             {
-                s_primaryIndex = s_deviceCount - 1;
+                s_primaryIndex = DeviceCount - 1;
             }
 
             return true;
@@ -187,7 +183,7 @@ public static class NetworkManager
             }
 
             int index = -1;
-            for (int i = 0; i < s_deviceCount; i++)
+            for (int i = 0; i < DeviceCount; i++)
             {
                 if (ReferenceEquals(s_devices[i], device))
                 {
@@ -201,17 +197,17 @@ public static class NetworkManager
                 return;
             }
 
-            for (int i = index; i < s_deviceCount - 1; i++)
+            for (int i = index; i < DeviceCount - 1; i++)
             {
                 s_devices[i] = s_devices[i + 1];
             }
 
-            s_deviceCount--;
-            s_devices[s_deviceCount] = null;
+            DeviceCount--;
+            s_devices[DeviceCount] = null;
 
             if (s_primaryIndex == index)
             {
-                s_primaryIndex = s_deviceCount > 0 ? 0 : -1;
+                s_primaryIndex = DeviceCount > 0 ? 0 : -1;
             }
             else if (s_primaryIndex > index)
             {
@@ -227,7 +223,7 @@ public static class NetworkManager
     /// <returns>The network device, or null if not found.</returns>
     internal static INetworkDevice? GetDevice(int index)
     {
-        if (s_devices is null || index < 0 || index >= s_deviceCount)
+        if (s_devices is null || index < 0 || index >= DeviceCount)
         {
             return null;
         }

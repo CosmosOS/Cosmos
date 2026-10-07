@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 namespace Cosmos.Kernel.System.Network;
 
 /// <summary>
@@ -40,10 +42,7 @@ public sealed class EndPoint : IComparable<EndPoint>, IEquatable<EndPoint>
     /// <summary>
     /// Formats the end point as <c>address:port</c>.
     /// </summary>
-    public override string ToString()
-    {
-        return $"{Address}:{Port}";
-    }
+    public override string ToString() => $"{Address}:{Port}";
 
     /// <summary>
     /// Orders end points by <see cref="Address"/> first, then by <see cref="Port"/>.
@@ -72,20 +71,11 @@ public sealed class EndPoint : IComparable<EndPoint>, IEquatable<EndPoint>
     /// </summary>
     /// <param name="other">The end point to compare with.</param>
     /// <returns>True when both the address and the port match.</returns>
-    public bool Equals(EndPoint? other)
-    {
-        return other is not null && Port == other.Port && Address.Equals(other.Address);
-    }
+    public bool Equals(EndPoint? other) => other is not null && Port == other.Port && Address.Equals(other.Address);
 
     /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        return Equals(obj as EndPoint);
-    }
+    public override bool Equals(object? obj) => Equals(obj as EndPoint);
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Address, Port);
-    }
+    public override int GetHashCode() => HashCode.Combine(Address, Port);
 }

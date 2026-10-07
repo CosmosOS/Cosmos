@@ -14,21 +14,21 @@ internal static class IPv6OutgoingBuffer
 {
     private sealed class Entry
     {
-        internal Entry(INetworkDevice nic, IPv6Packet packet)
-        {
-            Nic = nic;
-            Packet = packet;
-        }
-
         internal INetworkDevice Nic { get; }
 
         internal IPv6Packet Packet { get; }
 
         internal bool SolicitationSent { get; set; }
+
+        internal Entry(INetworkDevice nic, IPv6Packet packet)
+        {
+            Nic = nic;
+            Packet = packet;
+        }
     }
 
     /// <summary>Spins of the send loop before the queue is abandoned.</summary>
-    private const int MaxIterations = 10000;
+    private const int MaxIterations = 10_000;
 
     /// <summary>
     /// The queue. Initialized eagerly, as the IPv4 queue is, so no class
@@ -109,7 +109,7 @@ internal static class IPv6OutgoingBuffer
             // Spin to allow interrupt processing (neighbor advertisements)
             if (s_queue.Count > 0)
             {
-                Thread.SpinWait(10000);
+                Thread.SpinWait(10_000);
             }
         }
     }

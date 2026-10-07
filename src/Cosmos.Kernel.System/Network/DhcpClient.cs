@@ -19,18 +19,18 @@ namespace Cosmos.Kernel.System.Network;
 /// </summary>
 public sealed class DhcpClient : UdpClient
 {
-    /// <summary>
-    /// Is DHCP asked check variable
-    /// </summary>
-    private bool _applied = false;
+    private const byte BootReplyOperation = 2;
 
-    /// <summary>
-    /// Gets the IP address of the DHCP server.
-    /// </summary>
-    internal static Address? DHCPServerAddress(INetworkDevice networkDevice)
-    {
-        return IPConfig.Get(networkDevice)?.DefaultGateway;
-    }
+    // The message type (option 53) is read at a fixed frame offset, on the
+    // assumption that the server sends it as the first option.
+    private const int MessageTypeOffset = 284;
+
+    private const byte OfferMessageType = 0x02;
+    private const byte AckMessageType = 0x05;
+    private const byte NakMessageType = 0x06;
+
+    // Set once an ACK's configuration is in force; SendDiscoverPacket clears it.
+    private bool _applied;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DhcpClient"/> class.
@@ -40,10 +40,17 @@ public sealed class DhcpClient : UdpClient
     }
 
     /// <summary>
-    /// Receive data
+    /// Gets the address of the DHCP server for a device, taken to be its default
+    /// gateway, or null when the device has no IP configuration.
     /// </summary>
-    /// <param name="timeout">timeout value, default 5000ms</param>
-    /// <returns>time value (-1 = timeout)</returns>
+    internal static Address? DHCPServerAddress(INetworkDevice networkDevice) => IPConfig.Get(networkDevice)?.DefaultGateway;
+
+    /// <summary>
+    /// Waits for the server's reply and acts on it: an offer is answered with a
+    /// request, whose reply is awaited in turn, and an ACK or a NAK is applied.
+    /// </summary>
+    /// <param name="timeout">How long to wait, in milliseconds.</param>
+    /// <returns>The milliseconds waited for the last reply, or -1 when none arrived in time.</returns>
     private int Receive(int timeout = 5000)
     {
         int waited = 0;
@@ -61,18 +68,19 @@ public sealed class DhcpClient : UdpClient
 
         DhcpPacket packet = new(_rxBuffer.Dequeue().RawData);
 
-        if (packet.Operation == 2) //Boot Reply
+        if (packet.Operation == BootReplyOperation)
         {
-            if (packet.RawData[284] == 0x02) //Offer packet received
+            byte messageType = packet.RawData[MessageTypeOffset];
+            if (messageType == OfferMessageType)
             {
                 Serial.WriteString("[DHCP] Offer received.\n");
                 return SendRequestPacket(packet.Client ?? throw new Exception($"{nameof(packet.Client)} can not be null"));
             }
-            else if (packet.RawData[284] == 0x05 || packet.RawData[284] == 0x06) //ACK or NAK DHCP packet received
+            else if (messageType == AckMessageType || messageType == NakMessageType)
             {
                 if (!_applied)
                 {
-                    Apply(packet, true);
+                    Apply(packet);
 
                     Close();
                 }
@@ -85,19 +93,22 @@ public sealed class DhcpClient : UdpClient
     /// <summary>
     /// Sends a packet to the DHCP server in order to make the address available again.
     /// </summary>
+    /// <exception cref="Exception">A registered device has no IP
+    /// configuration to take the server address from, or no configured interface
+    /// can reach that address.</exception>
     public void SendReleasePacket()
     {
         for (int i = 0; i < NetworkManager.DeviceCount; i++)
         {
-            var networkDevice = NetworkManager.GetDevice(i);
+            INetworkDevice? networkDevice = NetworkManager.GetDevice(i);
             if (networkDevice is null)
             {
                 continue;
             }
 
-            var destIp = DHCPServerAddress(networkDevice) ?? throw new Exception($"IP can not be null");
+            Address destIp = DHCPServerAddress(networkDevice) ?? throw new Exception("IP can not be null");
             Address source = IPConfig.FindNetwork(destIp)
-                ?? throw new Exception($"Address can not be null");
+                ?? throw new Exception("Address can not be null");
             DhcpRelease dhcpRelease = new(source, destIp, networkDevice.MacAddress);
 
             dhcpRelease.Network.Enqueue();
@@ -116,13 +127,15 @@ public sealed class DhcpClient : UdpClient
     /// are requesting a new IP address.
     /// </summary>
     /// <returns>The amount of time elapsed, or -1 if a timeout has been reached.</returns>
+    /// <exception cref="Exception">The server answered with an offer,
+    /// an ACK or a NAK that carries no client address.</exception>
     public int SendDiscoverPacket()
     {
         NetworkStack.RemoveAllConfigIP();
 
         for (int i = 0; i < NetworkManager.DeviceCount; i++)
         {
-            var networkDevice = NetworkManager.GetDevice(i);
+            INetworkDevice? networkDevice = NetworkManager.GetDevice(i);
             if (networkDevice is null)
             {
                 continue;
@@ -148,7 +161,7 @@ public sealed class DhcpClient : UdpClient
     {
         for (int i = 0; i < NetworkManager.DeviceCount; i++)
         {
-            var networkDevice = NetworkManager.GetDevice(i);
+            INetworkDevice? networkDevice = NetworkManager.GetDevice(i);
             if (networkDevice is null)
             {
                 continue;
@@ -165,8 +178,7 @@ public sealed class DhcpClient : UdpClient
     /// Applies the newly received IP configuration.
     /// </summary>
     /// <param name="packet">The DHCP ACK packet.</param>
-    /// <param name="message">Enable/Disable the displaying of messages about DHCP applying and conf.</param>
-    private void Apply(DhcpPacket packet, bool message = false)
+    private void Apply(DhcpPacket packet)
     {
         if (!_applied)
         {
@@ -174,7 +186,7 @@ public sealed class DhcpClient : UdpClient
 
             for (int i = 0; i < NetworkManager.DeviceCount; i++)
             {
-                var networkDevice = NetworkManager.GetDevice(i);
+                INetworkDevice? networkDevice = NetworkManager.GetDevice(i);
                 if (networkDevice is null)
                 {
                     continue;

@@ -37,25 +37,21 @@ internal abstract class NdpPacket : Icmpv6Packet
     /// <summary>Payload of a message built here: the header, the target and one link-layer option.</summary>
     private const ushort MessageLength = MinimumLength + LinkLayerOptionLength;
 
-    /// <summary>Number of solicitations for one of the stack's addresses answered with an advertisement.</summary>
-    private protected static int s_solicitationsAnswered;
-
-    /// <summary>Number of advertisements recorded in the neighbor cache.</summary>
-    private protected static int s_advertisementsReceived;
-
-    /// <summary>Parsed target address backing <see cref="Target"/>.</summary>
-    private protected Address6 _target = null!;
-
     /// <summary>
     /// Number of solicitations for one of the stack's addresses answered
     /// with an advertisement.
     /// </summary>
-    internal static int SolicitationsAnswered => s_solicitationsAnswered;
+    internal static int SolicitationsAnswered { get; private protected set; }
 
     /// <summary>
     /// Number of advertisements recorded in the neighbor cache.
     /// </summary>
-    internal static int AdvertisementsReceived => s_advertisementsReceived;
+    internal static int AdvertisementsReceived { get; private protected set; }
+
+    /// <summary>
+    /// The target address, a snapshot parsed at construction time.
+    /// </summary>
+    public Address6 Target { get; private set; } = null!;
 
     /// <summary>
     /// Initializes a new instance over existing frame bytes. The array is
@@ -102,7 +98,7 @@ internal abstract class NdpPacket : Icmpv6Packet
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        _target = new Address6(RawData, TargetOffset);
+        Target = new Address6(RawData, TargetOffset);
     }
 
     /// <summary>
@@ -131,11 +127,6 @@ internal abstract class NdpPacket : Icmpv6Packet
 
         return null;
     }
-
-    /// <summary>
-    /// The target address, a snapshot parsed at construction time.
-    /// </summary>
-    public Address6 Target => _target;
 }
 
 /// <summary>
@@ -144,7 +135,11 @@ internal abstract class NdpPacket : Icmpv6Packet
 /// </summary>
 internal sealed class NeighborSolicitation : NdpPacket
 {
-    private MacAddress? _sourceLinkLayerAddress;
+    /// <summary>
+    /// The sender's link-layer address from the source link-layer option, or
+    /// null when the solicitation carries none.
+    /// </summary>
+    public MacAddress? SourceLinkLayerAddress { get; private set; }
 
     /// <summary>
     /// Initializes a new instance over existing frame bytes. The array is
@@ -208,7 +203,7 @@ internal sealed class NeighborSolicitation : NdpPacket
 
         NeighborAdvertisement advertisement = new(solicitation.Target, solicitation.SourceIP, nic.MacAddress, requester, solicitation.Target);
         nic.Send(advertisement.RawData, advertisement.RawData.Length);
-        s_solicitationsAnswered++;
+        SolicitationsAnswered++;
     }
 
     /// <summary>
@@ -218,20 +213,11 @@ internal sealed class NeighborSolicitation : NdpPacket
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        _sourceLinkLayerAddress = FindLinkLayerOption(OptionSourceLinkLayer);
+        SourceLinkLayerAddress = FindLinkLayerOption(OptionSourceLinkLayer);
     }
-
-    /// <summary>
-    /// The sender's link-layer address from the source link-layer option, or
-    /// null when the solicitation carries none.
-    /// </summary>
-    public MacAddress? SourceLinkLayerAddress => _sourceLinkLayerAddress;
 
     /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $"Neighbor Solicitation Src={SourceIP}, Dest={DestinationIP}, Target={_target}";
-    }
+    public override string ToString() => $"Neighbor Solicitation Src={SourceIP}, Dest={DestinationIP}, Target={Target}";
 }
 
 /// <summary>
@@ -243,7 +229,16 @@ internal sealed class NeighborAdvertisement : NdpPacket
     private const byte FlagSolicited = 0x40;
     private const byte FlagOverride = 0x20;
 
-    private MacAddress? _targetLinkLayerAddress;
+    /// <summary>
+    /// Whether the advertisement answers a solicitation (the S flag).
+    /// </summary>
+    public bool IsSolicited => (RawData[PayloadOffset + 4] & FlagSolicited) != 0;
+
+    /// <summary>
+    /// The target's link-layer address from the target link-layer option, or
+    /// null when the advertisement carries none.
+    /// </summary>
+    public MacAddress? TargetLinkLayerAddress { get; private set; }
 
     /// <summary>
     /// Initializes a new instance over existing frame bytes. The array is
@@ -289,7 +284,7 @@ internal sealed class NeighborAdvertisement : NdpPacket
         Serial.WriteString("\n");
 
         NeighborCache.Update(advertisement.Target, advertisement.TargetLinkLayerAddress ?? advertisement.SourceMac);
-        s_advertisementsReceived++;
+        AdvertisementsReceived++;
     }
 
     /// <summary>
@@ -299,23 +294,9 @@ internal sealed class NeighborAdvertisement : NdpPacket
     private protected override void InitializeFields()
     {
         base.InitializeFields();
-        _targetLinkLayerAddress = FindLinkLayerOption(OptionTargetLinkLayer);
+        TargetLinkLayerAddress = FindLinkLayerOption(OptionTargetLinkLayer);
     }
-
-    /// <summary>
-    /// Whether the advertisement answers a solicitation (the S flag).
-    /// </summary>
-    public bool IsSolicited => (RawData[PayloadOffset + 4] & FlagSolicited) != 0;
-
-    /// <summary>
-    /// The target's link-layer address from the target link-layer option, or
-    /// null when the advertisement carries none.
-    /// </summary>
-    public MacAddress? TargetLinkLayerAddress => _targetLinkLayerAddress;
 
     /// <inheritdoc/>
-    public override string ToString()
-    {
-        return $"Neighbor Advertisement Src={SourceIP}, Dest={DestinationIP}, Target={_target}";
-    }
+    public override string ToString() => $"Neighbor Advertisement Src={SourceIP}, Dest={DestinationIP}, Target={Target}";
 }

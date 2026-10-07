@@ -31,39 +31,37 @@ public static class DnsConfig
     public static string HostName { get; set; } = "cosmos";
 
     /// <summary>
-    /// Registers a given DNS server.
+    /// Registers a given DNS server. An address already registered is not
+    /// added a second time.
     /// </summary>
     /// <param name="nameserver">The IP address of the target DNS server.</param>
     public static void Add(Address nameserver)
     {
-        for (int i = 0; i < Nameservers.Count; i++)
+        for (int i = 0; i < s_nameservers.Count; i++)
         {
-            if (Equals(Nameservers[i], nameserver))
+            if (Equals(s_nameservers[i], nameserver))
             {
                 return;
             }
         }
+
         s_nameservers.Add(nameserver);
     }
 
     /// <summary>
     /// Removes the given DNS server from the list of registered nameservers.
+    /// Does nothing when the address is not registered.
     /// </summary>
     /// <param name="nameserver">The IP address of the target DNS server.</param>
     public static void Remove(Address nameserver)
     {
-        Address? toRemove = null;
-        for (int i = 0; i < Nameservers.Count; i++)
+        for (int i = 0; i < s_nameservers.Count; i++)
         {
-            if (Equals(Nameservers[i], nameserver))
+            if (Equals(s_nameservers[i], nameserver))
             {
-                toRemove = Nameservers[i];
-                break;
+                s_nameservers.RemoveAt(i);
+                return;
             }
-        }
-        if (toRemove is not null)
-        {
-            s_nameservers.Remove(toRemove);
         }
     }
 }

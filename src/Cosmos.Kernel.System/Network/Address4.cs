@@ -1,22 +1,15 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Cosmos.Kernel.System.Network;
 
 /// <summary>
-/// Represents a IPv4 address.
+/// Represents an IPv4 address.
 /// </summary>
 public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Address4>
 {
-    /// <summary>
-    /// The four octets packed into one number, the first octet in the most
-    /// significant byte.
-    /// </summary>
-    public uint Segment1 { get; }
-
     /// <summary>
     /// The <c>0.0.0.0</c> IP address.
     /// </summary>
@@ -28,12 +21,62 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     public static Address4 Broadcast { get; } = new(0xFFFFFFFF);
 
     /// <summary>
-    /// Create new instance of the <see cref="Address4"/> class, with specified IP address.
+    /// The four octets packed into one number, the first octet in the most
+    /// significant byte.
     /// </summary>
-    /// <param name="address">Address</param>
-    public Address4(uint address)
+    public uint Segment1 { get; }
+
+    /// <inheritdoc />
+    public override MaskedAddress Parts => new(Segment1);
+
+    /// <inheritdoc />
+    public override bool IsZero => Equals(Zero);
+
+    /// <summary>
+    /// Whether this is the limited broadcast address <c>255.255.255.255</c>.
+    /// </summary>
+    public override bool IsBroadcastAddress => Equals(Broadcast);
+
+    /// <summary>
+    /// Whether this is a loopback address, one in <c>127.0.0.0/8</c>.
+    /// </summary>
+    public override bool IsLoopbackAddress => (Segment1 >> 24) == 127;
+
+    /// <summary>
+    /// Creates a new <see cref="Address4"/> instance from the packed address.
+    /// </summary>
+    /// <param name="address">The four octets packed into one number, the first octet in the most significant byte.</param>
+    public Address4(uint address) => Segment1 = address;
+
+    /// <summary>
+    /// Creates a new <see cref="Address4"/> instance from its four octets.
+    /// </summary>
+    /// <param name="first">First block of the address.</param>
+    /// <param name="second">Second block of the address.</param>
+    /// <param name="third">Third block of the address.</param>
+    /// <param name="fourth">Fourth block of the address.</param>
+    public Address4(byte first, byte second, byte third, byte fourth) => Segment1 = ToUint32(first, second, third, fourth);
+
+    /// <summary>
+    /// Creates a new <see cref="Address4"/> instance from four bytes of <paramref name="buffer"/>.
+    /// </summary>
+    /// <param name="buffer">The array holding the address, most significant byte first.</param>
+    /// <param name="offset">The index of the address's first byte in <paramref name="buffer"/>.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> is negative or leaves fewer than four bytes after it.</exception>
+    public Address4(byte[] buffer, int offset) : this(new ReadOnlySpan<byte>(buffer, offset, 4))
     {
-        Segment1 = address;
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="Address4"/> instance, with the specified byte span.
+    /// </summary>
+    /// <param name="buffer">The four address bytes, most significant first.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="buffer"/> is not exactly four bytes long.</exception>
+    public Address4(ReadOnlySpan<byte> buffer)
+    {
+        ArgumentOutOfRangeException.ThrowIfNotEqual(buffer.Length, 4, nameof(buffer));
+
+        Segment1 = ToUint32(buffer);
     }
 
     /// <summary>
@@ -44,15 +87,14 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     /// <returns>The parsed address, or <see langword="null"/> when the text is not four octets in that base.</returns>
     public static Address4? Parse(ReadOnlySpan<char> addr, AddressNumericStyle style)
     {
-        var fragments = addr.Split('.');
         Span<byte> addressBytes = stackalloc byte[4];
 
         int index = 0;
         bool isGood = false;
-        var numberStyles = style == AddressNumericStyle.Dec ? NumberStyles.Number : NumberStyles.HexNumber;
-        foreach (var fragment in fragments)
+        NumberStyles numberStyles = style == AddressNumericStyle.Dec ? NumberStyles.Number : NumberStyles.HexNumber;
+        foreach (Range fragment in addr.Split('.'))
         {
-            // too many fragments?
+            // A fifth fragment means more than four octets: not an IPv4 address.
             if (index > 3)
             {
                 return null;
@@ -70,39 +112,6 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
         }
 
         return isGood ? new Address4(addressBytes) : null;
-    }
-
-    /// <summary>
-    /// Create new instance of the <see cref="Address4"/> class, with specified IP address.
-    /// </summary>
-    /// <param name="first">First block of the address.</param>
-    /// <param name="second">Second block of the address.</param>
-    /// <param name="third">Third block of the address.</param>
-    /// <param name="fourth">Fourth block of the address.</param>
-    public Address4(byte first, byte second, byte third, byte fourth)
-    {
-        Segment1 = (uint)((first << 24) | (second << 16) | (third << 8) | fourth);
-    }
-
-    /// <summary>
-    /// Create new instance of the <see cref="Address4"/> class, with specified buffer and offset.
-    /// </summary>
-    /// <param name="buffer">Buffer.</param>
-    /// <param name="offset">Offset.</param>
-    public Address4(byte[] buffer, int offset) : this(new ReadOnlySpan<byte>(buffer, offset, 4))
-    {
-    }
-
-    /// <summary>
-    /// Creates a new <see cref="Address4"/> instance, with the specified byte span.
-    /// </summary>
-    /// <param name="buffer">The four address bytes, most significant first.</param>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="buffer"/> is not exactly four bytes long.</exception>
-    public Address4(ReadOnlySpan<byte> buffer)
-    {
-        ArgumentOutOfRangeException.ThrowIfNotEqual(buffer.Length, 4, nameof(buffer));
-
-        Segment1 = ToUint32(buffer);
     }
 
     /// <summary>
@@ -125,12 +134,6 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     }
 
     /// <inheritdoc />
-    public override MaskedAddress Parts => new(Segment1);
-
-    /// <inheritdoc />
-    public override bool IsZero => Equals(Zero);
-
-    /// <inheritdoc />
     public override ReadOnlySpan<byte> ToBytes()
     {
         Span<byte> data = new byte[4];
@@ -139,58 +142,28 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     }
 
     /// <summary>
-    /// Check if this address is a broadcast address.
-    /// </summary>
-    public override bool IsBroadcastAddress => Equals(Broadcast);
-
-    /// <summary>
-    /// Check if this address is an APIPA address.
+    /// Whether this is an APIPA (link-local) address, one in <c>169.254.0.0/16</c>.
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    public bool IsAPIPA()
-    {
-        return (Segment1 >> 16) == 0xA9_FE; // 169, 254
-    }
+    public bool IsAPIPA() => (Segment1 >> 16) == 0xA9_FE; // 169, 254
 
     /// <summary>
     /// Formats the address in dotted-decimal notation (e.g. <c>192.168.1.1</c>).
     /// </summary>
-    public override string ToString()
-    {
-        return ToString(AddressNumericStyle.Dec);
-    }
+    public override string ToString() => ToString(AddressNumericStyle.Dec);
 
     /// <summary>
     /// Orders addresses by their numeric value (<see cref="Segment1"/>); a
     /// <see langword="null"/> address sorts first.
     /// </summary>
     /// <param name="other">The address to compare with.</param>
-    public int CompareTo(Address4? other)
-    {
-        if (other is null)
-        {
-            return 1;
-        }
-
-        return Segment1.CompareTo(other.Segment1);
-    }
-
-    /// <summary>
-    /// Whether this is a loopback address, one in <c>127.0.0.0/8</c>.
-    /// </summary>
-    public override bool IsLoopbackAddress => (Segment1 >> 24) == 127;
+    public int CompareTo(Address4? other) => other is null ? 1 : Segment1.CompareTo(other.Segment1);
 
     /// <inheritdoc />
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        return ReferenceEquals(this, obj) || obj is Address4 other && Equals(other);
-    }
+    public override bool Equals([NotNullWhen(true)] object? obj) => ReferenceEquals(this, obj) || obj is Address4 other && Equals(other);
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Segment1);
-    }
+    public override int GetHashCode() => HashCode.Combine(Segment1);
 
     /// <inheritdoc />
     protected override MaskedAddress OperatorBitwiseAnd(Address other)
@@ -209,20 +182,7 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     /// </summary>
     /// <param name="other">The address to compare with, or <see langword="null"/>.</param>
     /// <returns><see langword="true"/> for the same four bytes; <see langword="false"/> otherwise and for <see langword="null"/>.</returns>
-    public bool Equals([NotNullWhen(true)] Address4? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return Segment1 == other.Segment1;
-    }
+    public bool Equals([NotNullWhen(true)] Address4? other) => other is not null && Segment1 == other.Segment1;
 
     /// <summary>
     /// Formats the address as four dotted octets in the given number base.
@@ -238,7 +198,8 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
             AddressNumericStyle.Dec => leadingZeros ? "000" : "",
             _ => throw new ArgumentOutOfRangeException(nameof(numericStyle), numericStyle, null)
         };
-        var data = ToBytes();
+        Span<byte> data = stackalloc byte[4];
+        SegmentToSpan(Segment1, data);
         return
             $"{data[0].ToString(format, CultureInfo.InvariantCulture)}.{data[1].ToString(format, CultureInfo.InvariantCulture)}.{data[2].ToString(format, CultureInfo.InvariantCulture)}.{data[3].ToString(format, CultureInfo.InvariantCulture)}";
     }

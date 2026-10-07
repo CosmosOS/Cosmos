@@ -37,14 +37,15 @@ public class DhcpRelease : DhcpPacket
     /// <param name="client">The client's currently assigned IPv4 address, used as the source.</param>
     /// <param name="server">The DHCP server's IPv4 address, used as the destination and written to option 54.</param>
     /// <param name="source">The MAC address of the sending network device, written to option 61.</param>
+    // 19 option bytes: message type (3), server identifier (6), client identifier (9), end mark (1).
     public DhcpRelease(Address client, Address server, MacAddress source) : base(client, server, source, 19)
     {
-        //Release
+        // Option 53, message type: DHCPRELEASE
         RawData[282] = 0x35;
         RawData[283] = 0x01;
         RawData[284] = 0x07;
 
-        //DHCP Server ID
+        // Option 54, server identifier
         RawData[285] = 0x36;
         RawData[286] = 0x04;
 
@@ -53,7 +54,7 @@ public class DhcpRelease : DhcpPacket
         RawData[289] = server.Parts[2];
         RawData[290] = server.Parts[3];
 
-        //Client ID
+        // Option 61, client identifier: hardware type 1 (Ethernet), then the MAC
         RawData[291] = 0x3d;
         RawData[292] = 7;
         RawData[293] = 1;
@@ -65,6 +66,6 @@ public class DhcpRelease : DhcpPacket
         RawData[298] = source._bytes[4];
         RawData[299] = source._bytes[5];
 
-        RawData[300] = 0xff; //ENDMARK
+        RawData[300] = 0xff; // End mark
     }
 }

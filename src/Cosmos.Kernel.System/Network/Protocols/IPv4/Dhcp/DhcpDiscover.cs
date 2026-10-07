@@ -34,23 +34,23 @@ public class DhcpDiscover : DhcpPacket
     /// 6 (domain name server), then the end mark.
     /// </summary>
     /// <param name="sourceMac">The MAC address of the sending network device.</param>
-    public DhcpDiscover(MacAddress sourceMac) : base(sourceMac, 10) //discover packet size
+    public DhcpDiscover(MacAddress sourceMac) : base(sourceMac, 10) // 3 (message type) + 6 (parameter list) + 1 (end mark) option bytes
     {
-        //Discover
+        // Option 53, message type: DHCPDISCOVER
         RawData[282] = 0x35;
         RawData[283] = 0x01;
         RawData[284] = 0x01;
 
-        //Parameters start here
+        // Option 55, parameter request list
         RawData[285] = 0x37;
         RawData[286] = 4;
 
-        //Parameters*
+        // Requested: subnet mask, router, domain name, domain name server
         RawData[287] = 0x01;
         RawData[288] = 0x03;
         RawData[289] = 0x0f;
         RawData[290] = 0x06;
 
-        RawData[291] = 0xff; //ENDMARK
+        RawData[291] = 0xff; // End mark
     }
 }

@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices;
@@ -14,7 +16,7 @@ namespace Cosmos.Kernel.System.Network;
 public static class NetworkStack
 {
     /// <summary>Reentrancy guard for <see cref="Update"/>.</summary>
-    private static bool s_updating = false;
+    private static bool s_updating;
 
     /// <summary>
     /// Maps IP (Internet Protocol) addresses to network devices.
@@ -41,9 +43,8 @@ public static class NetworkStack
             RemoveAddresses(device);
         }
 
-        // Add new config. The link-local IPv6 address needs nothing from the
-        // caller: it is derived from the MAC, so it comes up with the first
-        // configuration.
+        // The link-local IPv6 address needs nothing from the caller: it is
+        // derived from the MAC, so it comes up with the first configuration.
         AddressMap.Add(ipAddress, device);
         AddressMap[Address6.LinkLocalFor(mac)] = device;
         MACMap.Add(mac.Hash, device);
@@ -130,7 +131,6 @@ public static class NetworkStack
     /// </summary>
     internal static void Update()
     {
-        // Prevent recursive calls
         if (s_updating)
         {
             return;

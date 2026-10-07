@@ -13,28 +13,23 @@ namespace Cosmos.Kernel.System.Network.Protocols.IPv4;
 /// </summary>
 internal static class IPv4OutgoingBuffer
 {
-    private class BufferEntry
+    private sealed class BufferEntry
     {
         internal enum EntryStatus
         {
-            ADDED,
-            ARP_SENT,
-            ROUTE_ARP_SENT,
-            JUST_SEND,
-            DONE,
-            DHCP_REQUEST
-        };
+            Added,
+            ArpSent,
+            RouteArpSent,
+            JustSend,
+            Done,
+            DhcpRequest
+        }
 
         public INetworkDevice NIC { get; }
         public IPPacket Packet { get; }
         public EntryStatus Status { get; set; }
         public Address? NextHop { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BufferEntry"/> class.
-        /// </summary>
-        /// <param name="nic">The network device.</param>
-        /// <param name="packet">The IP packet.</param>
         public BufferEntry(INetworkDevice nic, IPPacket packet)
         {
             NIC = nic;
@@ -42,28 +37,22 @@ internal static class IPv4OutgoingBuffer
 
             if (Packet.DestinationIP.IsBroadcastAddress)
             {
-                Status = EntryStatus.DHCP_REQUEST;
+                Status = EntryStatus.DhcpRequest;
             }
             else
             {
-                Status = EntryStatus.ADDED;
+                Status = EntryStatus.Added;
             }
         }
     }
 
-    /// <summary>
-    /// The buffer s_queue. Initialized eagerly to avoid issues with interrupt context.
-    /// </summary>
-    private static List<BufferEntry> s_queue = [];
+    /// <summary>Spins of the send loop before the queue is abandoned.</summary>
+    private const int MaxIterations = 10_000;
 
     /// <summary>
-    /// Ensures the s_queue exists and is initialized.
+    /// The queue. Initialized eagerly to avoid issues with interrupt context.
     /// </summary>
-    private static void EnsureQueueExists()
-    {
-        // Queue is now initialized at class load time, but keep this for safety
-        s_queue ??= [];
-    }
+    private static readonly List<BufferEntry> s_queue = [];
 
     /// <summary>
     /// Adds a packet to the buffer, resolving the sending device from the
@@ -73,7 +62,7 @@ internal static class IPv4OutgoingBuffer
     /// <returns>False when no configured interface matches the packet's source address.</returns>
     public static bool AddPacket(IPPacket packet)
     {
-        var device = IPConfig.FindInterface(packet.SourceIP);
+        INetworkDevice? device = IPConfig.FindInterface(packet.SourceIP);
         if (device is null)
         {
             return false;
@@ -90,7 +79,6 @@ internal static class IPv4OutgoingBuffer
     /// <param name="device">The Network Interface Controller.</param>
     public static void AddPacket(IPPacket packet, INetworkDevice device)
     {
-        EnsureQueueExists();
         packet.SourceMac = device.MacAddress;
         s_queue.Add(new BufferEntry(device, packet));
     }
@@ -100,14 +88,12 @@ internal static class IPv4OutgoingBuffer
     /// </summary>
     internal static void Send()
     {
-        EnsureQueueExists();
         int iterations = 0;
-        int maxIterations = 10000; // Spin-based timeout
 
         while (s_queue.Count > 0)
         {
             iterations++;
-            if (iterations >= maxIterations)
+            if (iterations >= MaxIterations)
             {
                 Serial.WriteString("[IPv4OutgoingBuffer] ARP timeout\n");
                 s_queue.Clear();
@@ -117,7 +103,7 @@ internal static class IPv4OutgoingBuffer
             for (int e = s_queue.Count - 1; e >= 0; e--)
             {
                 BufferEntry entry = s_queue[e];
-                if (entry.Status == BufferEntry.EntryStatus.ADDED)
+                if (entry.Status == BufferEntry.EntryStatus.Added)
                 {
                     if (!IPConfig.IsLocalAddress(entry.Packet.DestinationIP))
                     {
@@ -146,7 +132,7 @@ internal static class IPv4OutgoingBuffer
                                 MacAddress.None
                             );
                             entry.NIC.Send(arpRequest.RawData, arpRequest.RawData.Length);
-                            entry.Status = BufferEntry.EntryStatus.ROUTE_ARP_SENT;
+                            entry.Status = BufferEntry.EntryStatus.RouteArpSent;
                         }
                         continue;
                     }
@@ -175,10 +161,10 @@ internal static class IPv4OutgoingBuffer
                         Serial.WriteString(" len=");
                         Serial.WriteNumber((ulong)arpRequest.RawData.Length);
                         Serial.WriteString("\n");
-                        entry.Status = BufferEntry.EntryStatus.ARP_SENT;
+                        entry.Status = BufferEntry.EntryStatus.ArpSent;
                     }
                 }
-                else if (entry.Status == BufferEntry.EntryStatus.ARP_SENT)
+                else if (entry.Status == BufferEntry.EntryStatus.ArpSent)
                 {
                     MacAddress? repliedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
                     if (repliedMac is not null)
@@ -188,7 +174,7 @@ internal static class IPv4OutgoingBuffer
                         s_queue.RemoveAt(e);
                     }
                 }
-                else if (entry.Status == BufferEntry.EntryStatus.ROUTE_ARP_SENT)
+                else if (entry.Status == BufferEntry.EntryStatus.RouteArpSent)
                 {
                     MacAddress? routedMac = entry.NextHop is null ? null : ArpCache.Resolve(entry.NextHop);
                     if (routedMac is not null)
@@ -198,12 +184,12 @@ internal static class IPv4OutgoingBuffer
                         s_queue.RemoveAt(e);
                     }
                 }
-                else if (entry.Status == BufferEntry.EntryStatus.DHCP_REQUEST)
+                else if (entry.Status == BufferEntry.EntryStatus.DhcpRequest)
                 {
                     entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
                     s_queue.RemoveAt(e);
                 }
-                else if (entry.Status == BufferEntry.EntryStatus.JUST_SEND)
+                else if (entry.Status == BufferEntry.EntryStatus.JustSend)
                 {
                     entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
                     s_queue.RemoveAt(e);
@@ -213,35 +199,36 @@ internal static class IPv4OutgoingBuffer
             // Spin to allow interrupt processing (ARP replies)
             if (s_queue.Count > 0)
             {
-                Thread.SpinWait(10000);
+                Thread.SpinWait(10_000);
             }
         }
     }
 
     /// <summary>
-    /// Updates the ARP cache with the given ARP reply.
+    /// Hands an ARP reply to the queued entries waiting on it: each one whose
+    /// destination, or next hop, is the reply's sender takes the sender's MAC
+    /// address and leaves on the next pass of <see cref="Send"/>.
     /// </summary>
     /// <param name="arpReply">The ARP reply.</param>
     internal static void UpdateARPCache(ArpReplyEthernet arpReply)
     {
-        EnsureQueueExists();
         for (int e = 0; e < s_queue.Count; e++)
         {
             BufferEntry entry = s_queue[e];
-            if (entry.Status == BufferEntry.EntryStatus.ARP_SENT)
+            if (entry.Status == BufferEntry.EntryStatus.ArpSent)
             {
                 if (entry.Packet.DestinationIP.CompareTo(arpReply.SenderIP) == 0)
                 {
                     entry.Packet.DestinationMac = arpReply.SenderMac;
-                    entry.Status = BufferEntry.EntryStatus.JUST_SEND;
+                    entry.Status = BufferEntry.EntryStatus.JustSend;
                 }
             }
-            else if (entry.Status == BufferEntry.EntryStatus.ROUTE_ARP_SENT)
+            else if (entry.Status == BufferEntry.EntryStatus.RouteArpSent)
             {
                 if (entry.NextHop?.CompareTo(arpReply.SenderIP) == 0)
                 {
                     entry.Packet.DestinationMac = arpReply.SenderMac;
-                    entry.Status = BufferEntry.EntryStatus.JUST_SEND;
+                    entry.Status = BufferEntry.EntryStatus.JustSend;
                 }
             }
         }

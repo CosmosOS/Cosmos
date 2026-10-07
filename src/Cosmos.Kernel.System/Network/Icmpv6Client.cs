@@ -23,10 +23,7 @@ public sealed class Icmpv6Client : IDisposable
     /// arm this: closing only stops delivery to this client, and
     /// <see cref="Connect"/> reopens it.
     /// </summary>
-    private void ThrowIfDisposed()
-    {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-    }
+    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 
     /// <summary>
     /// Gets the client connected to a destination address.
@@ -34,9 +31,7 @@ public sealed class Icmpv6Client : IDisposable
     /// <param name="address">The destination address.</param>
     /// <returns>The client connected to that address, or null when there is none.</returns>
     internal static Icmpv6Client? GetClient(Address6 address)
-    {
-        return s_clients.TryGetValue(address, out Icmpv6Client? client) ? client : null;
-    }
+        => s_clients.TryGetValue(address, out Icmpv6Client? client) ? client : null;
 
     /// <summary>
     /// Connects to the given destination. Replies from it are delivered to
@@ -128,10 +123,7 @@ public sealed class Icmpv6Client : IDisposable
     /// Queues a reply for <see cref="Receive"/>.
     /// </summary>
     /// <param name="packet">The reply.</param>
-    internal void ReceiveData(Icmpv6EchoReply packet)
-    {
-        _rxBuffer.Enqueue(packet);
-    }
+    internal void ReceiveData(Icmpv6EchoReply packet) => _rxBuffer.Enqueue(packet);
 
     /// <summary>
     /// Closes the client and retires it. Unlike <see cref="Close"/>, which a

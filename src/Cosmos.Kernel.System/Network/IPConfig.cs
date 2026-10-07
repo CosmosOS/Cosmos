@@ -14,15 +14,15 @@ public class IPConfig
     /// </summary>
     private sealed class Entry
     {
+        internal INetworkDevice Device { get; }
+
+        internal IPConfig Config { get; }
+
         internal Entry(INetworkDevice device, IPConfig config)
         {
             Device = device;
             Config = config;
         }
-
-        internal INetworkDevice Device { get; }
-
-        internal IPConfig Config { get; }
     }
 
     /// <summary>
@@ -30,7 +30,38 @@ public class IPConfig
     /// per-device lookups read the same list, so neither can drift from the
     /// other.
     /// </summary>
-    private static readonly List<Entry> s_configs = new();
+    private static readonly List<Entry> s_configs = [];
+
+    /// <summary>
+    /// The IPv4 address assigned to the device this configuration belongs to.
+    /// </summary>
+    public Address Address { get; }
+
+    /// <summary>
+    /// The subnet mask.
+    /// </summary>
+    public Address SubnetMask { get; }
+
+    /// <summary>
+    /// The default gateway address.
+    /// </summary>
+    public Address DefaultGateway { get; }
+
+    /// <summary>
+    /// Creates a IPv4 Configuration. Internal: a kernel reads a configuration
+    /// back from <see cref="NetworkAdapter.IPConfig"/> and applies one with
+    /// <see cref="Enable(Address, Address, Address)"/>; it never supplies the
+    /// object itself, and the only caller is this class's own Enable.
+    /// </summary>
+    /// <param name="address">The IPv4 address to assign.</param>
+    /// <param name="subnetMask">The subnet mask.</param>
+    /// <param name="defaultGateway">The default gateway.</param>
+    internal IPConfig(Address address, Address subnetMask, Address defaultGateway)
+    {
+        Address = address;
+        SubnetMask = subnetMask;
+        DefaultGateway = defaultGateway;
+    }
 
     /// <summary>
     /// Record the configuration now in force on a device, replacing any
@@ -58,10 +89,7 @@ public class IPConfig
     /// <see cref="NetworkStack.RemoveAllConfigIP"/> is the complete reset and
     /// the only caller.
     /// </summary>
-    internal static void RemoveAll()
-    {
-        s_configs.Clear();
-    }
+    internal static void RemoveAll() => s_configs.Clear();
 
     /// <summary>
     /// The configuration in force on a device, or null when it has none.
@@ -94,7 +122,7 @@ public class IPConfig
             return FindNetwork6();
         }
 
-        Address? defaultGw = null;
+        Address? defaultRouteSource = null;
 
         foreach (Entry entry in s_configs)
         {
@@ -105,9 +133,10 @@ public class IPConfig
             {
                 return ipConfig.Address;
             }
-            if (defaultGw is null && !ipConfig.DefaultGateway.IsZero)
+
+            if (defaultRouteSource is null && !ipConfig.DefaultGateway.IsZero)
             {
-                defaultGw = ipConfig.Address;
+                defaultRouteSource = ipConfig.Address;
             }
 
             if (!IsLocalAddress(destination))
@@ -116,7 +145,7 @@ public class IPConfig
             }
         }
 
-        return defaultGw;
+        return defaultRouteSource;
     }
 
     /// <summary>
@@ -139,17 +168,11 @@ public class IPConfig
     /// <param name="address">The IP address to assign to the device.</param>
     /// <param name="subnetMask">The subnet mask to use for the device.</param>
     /// <param name="defaultGateway">The default gateway address to use for the device.</param>
-    /// <returns><see langword="true"/> if the device was successfully enabled, <see langword="false"/> otherwise.</returns>
-    internal static bool Enable(INetworkDevice device, Address address, Address subnetMask, Address defaultGateway)
+    internal static void Enable(INetworkDevice device, Address address, Address subnetMask, Address defaultGateway)
     {
-        if (device is not null)
-        {
-            IPConfig config = new(address, subnetMask, defaultGateway);
-            NetworkStack.ConfigIP(device, config);
-            Serial.WriteString("[IPConfig] Config OK.\n");
-            return true;
-        }
-        return false;
+        IPConfig config = new(address, subnetMask, defaultGateway);
+        NetworkStack.ConfigIP(device, config);
+        Serial.WriteString("[IPConfig] Config OK.\n");
     }
 
     /// <summary>
@@ -167,7 +190,8 @@ public class IPConfig
             return false;
         }
 
-        return Enable(device, address, subnetMask, defaultGateway);
+        Enable(device, address, subnetMask, defaultGateway);
+        return true;
     }
 
     /// <summary>
@@ -186,7 +210,8 @@ public class IPConfig
             return false;
         }
 
-        return Enable(device, address, subnetMask, defaultGateway);
+        Enable(device, address, subnetMask, defaultGateway);
+        return true;
     }
 
     /// <summary>
@@ -213,51 +238,18 @@ public class IPConfig
     /// Find the interface by the given IP address.
     /// </summary>
     /// <param name="sourceIP">Source IP.</param>
-    internal static INetworkDevice? FindInterface(Address sourceIP)
-    {
-        return NetworkStack.AddressMap.TryGetValue(sourceIP, out INetworkDevice? device) ? device : null;
-    }
+    internal static INetworkDevice? FindInterface(Address sourceIP) =>
+        NetworkStack.AddressMap.TryGetValue(sourceIP, out INetworkDevice? device) ? device : null;
 
     /// <summary>
     /// Find route to address.
     /// </summary>
     /// <param name="destIP">Destination IP.</param>
-    /// <returns>Address value.</returns>
+    /// <returns>The first configured interface's default gateway, or null when no interface is configured.</returns>
     internal static Address? FindRoute(Address destIP)
     {
         // There is no routing table: every non-local destination leaves
         // through the first configured interface's default gateway.
         return s_configs.Count > 0 ? s_configs[0].Config.DefaultGateway : null;
     }
-
-    /// <summary>
-    /// Creates a IPv4 Configuration. Internal: a kernel reads a configuration
-    /// back from <see cref="NetworkAdapter.IPConfig"/> and applies one with
-    /// <see cref="Enable(Address, Address, Address)"/>; it never supplies the
-    /// object itself, and the only caller is this class's own Enable.
-    /// </summary>
-    /// <param name="address">The IPv4 address to assign.</param>
-    /// <param name="subnetMask">The subnet mask.</param>
-    /// <param name="defaultGateway">The default gateway.</param>
-    internal IPConfig(Address address, Address subnetMask, Address defaultGateway)
-    {
-        Address = address;
-        SubnetMask = subnetMask;
-        DefaultGateway = defaultGateway;
-    }
-
-    /// <summary>
-    /// The IPv4 address assigned to the device this configuration belongs to.
-    /// </summary>
-    public Address Address { get; }
-
-    /// <summary>
-    /// The subnet mask.
-    /// </summary>
-    public Address SubnetMask { get; }
-
-    /// <summary>
-    /// The default gateway address.
-    /// </summary>
-    public Address DefaultGateway { get; }
 }

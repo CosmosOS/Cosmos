@@ -50,29 +50,6 @@ public abstract class InternetPacket : EthernetPacket
     private const byte TransportHopLimit = 64;
 
     /// <summary>
-    /// Initializes a new instance over existing frame bytes. The array is
-    /// aliased, not copied.
-    /// </summary>
-    /// <param name="rawData">The raw frame bytes, starting at the Ethernet header.</param>
-    private protected InternetPacket(byte[] rawData)
-        : base(rawData)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance, allocating the frame buffer and writing
-    /// the Ethernet header.
-    /// </summary>
-    /// <param name="destinationMac">Destination MAC address.</param>
-    /// <param name="sourceMac">Source MAC address.</param>
-    /// <param name="etherType">EtherType of the frame.</param>
-    /// <param name="packetSize">Total frame size in bytes.</param>
-    private protected InternetPacket(MacAddress destinationMac, MacAddress sourceMac, ushort etherType, int packetSize)
-        : base(destinationMac, sourceMac, etherType, packetSize)
-    {
-    }
-
-    /// <summary>
     /// The source address.
     /// </summary>
     public abstract Address SourceIP { get; }
@@ -99,6 +76,29 @@ public abstract class InternetPacket : EthernetPacket
     /// zero checksum field is a corrupt datagram rather than an absent one.
     /// </summary>
     internal abstract bool TransportChecksumRequired { get; }
+
+    /// <summary>
+    /// Initializes a new instance over existing frame bytes. The array is
+    /// aliased, not copied.
+    /// </summary>
+    /// <param name="rawData">The raw frame bytes, starting at the Ethernet header.</param>
+    private protected InternetPacket(byte[] rawData)
+        : base(rawData)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance, allocating the frame buffer and writing
+    /// the Ethernet header.
+    /// </summary>
+    /// <param name="destinationMac">Destination MAC address.</param>
+    /// <param name="sourceMac">Source MAC address.</param>
+    /// <param name="etherType">EtherType of the frame.</param>
+    /// <param name="packetSize">Total frame size in bytes.</param>
+    private protected InternetPacket(MacAddress destinationMac, MacAddress sourceMac, ushort etherType, int packetSize)
+        : base(destinationMac, sourceMac, etherType, packetSize)
+    {
+    }
 
     /// <summary>
     /// Computes a transport checksum over the section at
@@ -221,7 +221,7 @@ public abstract class InternetPacket : EthernetPacket
     /// <param name="buffer">The buffer to read.</param>
     /// <param name="offset">The offset to start at, in bytes.</param>
     /// <param name="length">The number of bytes to sum.</param>
-    internal static uint SumWords(byte[] buffer, int offset, int length)
+    internal static uint SumWords(ReadOnlySpan<byte> buffer, int offset, int length)
     {
         uint sum = 0;
         int end = offset + (length & ~1);
@@ -260,8 +260,6 @@ public abstract class InternetPacket : EthernetPacket
     /// <param name="buffer">The buffer to read.</param>
     /// <param name="offset">The offset to start at, in bytes.</param>
     /// <param name="length">The number of bytes to sum.</param>
-    internal static ushort CalcOcCrc(byte[] buffer, int offset, int length)
-    {
-        return (ushort)~Fold(SumWords(buffer, offset, length));
-    }
+    internal static ushort CalcOcCrc(ReadOnlySpan<byte> buffer, int offset, int length)
+        => (ushort)~Fold(SumWords(buffer, offset, length));
 }

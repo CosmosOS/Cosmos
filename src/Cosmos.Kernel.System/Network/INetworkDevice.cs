@@ -5,15 +5,8 @@ using Cosmos.Kernel.HAL.Devices;
 namespace Cosmos.Kernel.System.Network;
 
 /// <summary>
-/// Delegate for handling packet received events.
-/// </summary>
-/// <param name="data">The received packet data.</param>
-/// <param name="length">The length of the packet.</param>
-internal delegate void PacketReceivedHandler(byte[] data, int length);
-
-/// <summary>
 /// Interface for network devices. Internal: a kernel neither obtains one nor
-/// supplies one, it goes through <c>NetworkManager</c> like every other
+/// supplies one, it goes through <see cref="NetworkManager"/> like every other
 /// device manager in the ring.
 /// </summary>
 internal interface INetworkDevice

@@ -14,25 +14,36 @@ namespace Cosmos.Kernel.System.Network.Protocols.Arp;
 [Experimental(Experimentals.PacketSeamDiagId)]
 public abstract class ArpPacketEthernet : ArpPacket
 {
-    /// <summary>
-    /// The sender MAC address.
-    /// </summary>
+    // Assigned by InitializeFields, which the base constructor calls before this type's
+    // constructor body runs; flow analysis cannot follow that virtual call.
     private protected MacAddress _senderMac = null!;
-
-    /// <summary>
-    /// The target MAC address.
-    /// </summary>
     private protected MacAddress _targetMac = null!;
-
-    /// <summary>
-    /// The sender IP address.
-    /// </summary>
     private protected Address _senderIP = null!;
+    private protected Address _targetIP = null!;
 
     /// <summary>
-    /// The target IP address.
+    /// Gets the sender hardware address (SHA). This is a snapshot parsed from
+    /// <see cref="EthernetPacket.RawData"/> at construction.
     /// </summary>
-    private protected Address _targetIP = null!;
+    public MacAddress SenderMac => _senderMac;
+
+    /// <summary>
+    /// Gets the target hardware address (THA), read from the ARP body, not from the Ethernet
+    /// header. This is a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction.
+    /// </summary>
+    public MacAddress TargetMac => _targetMac;
+
+    /// <summary>
+    /// Gets the sender protocol address (SPA). This is a snapshot parsed from
+    /// <see cref="EthernetPacket.RawData"/> at construction.
+    /// </summary>
+    public Address SenderIP => _senderIP;
+
+    /// <summary>
+    /// Gets the target protocol address (TPA). This is a snapshot parsed from
+    /// <see cref="EthernetPacket.RawData"/> at construction.
+    /// </summary>
+    public Address TargetIP => _targetIP;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArpPacketEthernet"/> class from a received
@@ -43,20 +54,7 @@ public abstract class ArpPacketEthernet : ArpPacket
     /// <param name="rawData">The raw Ethernet frame, starting at the destination MAC address.</param>
     public ArpPacketEthernet(byte[] rawData)
         : base(rawData)
-    { }
-
-    /// <summary>
-    /// Parses the sender and target hardware and protocol addresses (SHA, SPA, THA, TPA) from
-    /// <see cref="EthernetPacket.RawData"/> into the protected fields. Called once during
-    /// construction; the parsed values are never refreshed afterwards.
-    /// </summary>
-    private protected override void InitializeFields()
     {
-        base.InitializeFields();
-        _senderMac = new MacAddress(RawData, 22);
-        _senderIP = new Address4(RawData, 28);
-        _targetMac = new MacAddress(RawData, 32);
-        _targetIP = new Address4(RawData, 38);
     }
 
     /// <summary>
@@ -94,46 +92,32 @@ public abstract class ArpPacketEthernet : ArpPacket
     }
 
     /// <summary>
-    /// Gets the sender hardware address (SHA). This is a snapshot parsed from
-    /// <see cref="EthernetPacket.RawData"/> at construction.
+    /// Parses the sender and target hardware and protocol addresses (SHA, SPA, THA, TPA) from
+    /// <see cref="EthernetPacket.RawData"/> into the protected fields. The base constructors
+    /// call it before the sending constructor has written the address fields, so that
+    /// constructor calls it again once they are in place.
     /// </summary>
-    public MacAddress SenderMac => _senderMac;
-
-    /// <summary>
-    /// Gets the target hardware address (THA), read from the ARP body, not from the Ethernet
-    /// header. This is a snapshot parsed from <see cref="EthernetPacket.RawData"/> at construction.
-    /// </summary>
-    public MacAddress TargetMac => _targetMac;
-
-    /// <summary>
-    /// Gets the sender protocol address (SPA). This is a snapshot parsed from
-    /// <see cref="EthernetPacket.RawData"/> at construction.
-    /// </summary>
-    public Address SenderIP => _senderIP;
-
-    /// <summary>
-    /// Gets the target protocol address (TPA). This is a snapshot parsed from
-    /// <see cref="EthernetPacket.RawData"/> at construction.
-    /// </summary>
-    public Address TargetIP => _targetIP;
+    private protected override void InitializeFields()
+    {
+        base.InitializeFields();
+        _senderMac = new MacAddress(RawData, 22);
+        _senderIP = new Address4(RawData, 28);
+        _targetMac = new MacAddress(RawData, 32);
+        _targetIP = new Address4(RawData, 38);
+    }
 
     /// <summary>
     /// Returns a string listing the sender and target MAC addresses, sender and target IP
     /// addresses, and the operation code.
     /// </summary>
     /// <returns>A string representation of the packet.</returns>
-    public override string ToString()
-    {
-        return $"IPv4 Ethernet ARP Packet SenderMac={_senderMac}, TargetMac={_targetMac}, SenderIP={_senderIP}, TargetIP={_targetIP}, Operation={_opCode}";
-    }
+    public override string ToString() =>
+        $"IPv4 Ethernet ARP Packet SenderMac={_senderMac}, TargetMac={_targetMac}, SenderIP={_senderIP}, TargetIP={_targetIP}, Operation={_opCode}";
 }
 
 /// <summary>
 /// Represents an ARP reply packet (operation code 2) for IPv4 over Ethernet.
 /// </summary>
-/// <remarks>
-/// See also: <seealso cref="ArpPacketEthernet"/>.
-/// </remarks>
 [Experimental(Experimentals.PacketSeamDiagId)]
 public class ArpReplyEthernet : ArpPacketEthernet
 {
@@ -145,7 +129,8 @@ public class ArpReplyEthernet : ArpPacketEthernet
     /// <param name="rawData">The raw Ethernet frame, starting at the destination MAC address.</param>
     public ArpReplyEthernet(byte[] rawData)
         : base(rawData)
-    { }
+    {
+    }
 
     /// <summary>
     /// Initializes a new 42-byte ARP reply for sending. The frame is sent unicast to
@@ -161,25 +146,21 @@ public class ArpReplyEthernet : ArpPacketEthernet
     /// <param name="targetIP">The requester's IP address: the target protocol address (TPA).</param>
     public ArpReplyEthernet(MacAddress ourMac, Address ourIP, MacAddress targetMac, Address targetIP)
         : base(2, ourMac, ourIP, targetMac, targetIP, 42, targetMac)
-    { }
+    {
+    }
 
     /// <summary>
     /// Returns a string listing the source and destination MAC addresses and the sender and
     /// target IP addresses.
     /// </summary>
     /// <returns>A string representation of the packet.</returns>
-    public override string ToString()
-    {
-        return $"ARP Reply Src={_srcMAC}, Dest={_destMAC}, Sender={_senderIP}, Target={_targetIP}";
-    }
+    public override string ToString() =>
+        $"ARP Reply Src={_srcMAC}, Dest={_destMAC}, Sender={_senderIP}, Target={_targetIP}";
 }
 
 /// <summary>
 /// Represents an ARP request packet (operation code 1) for IPv4 over Ethernet.
 /// </summary>
-/// <remarks>
-/// See also: <seealso cref="ArpPacketEthernet"/>.
-/// </remarks>
 [Experimental(Experimentals.PacketSeamDiagId)]
 public class ArpRequestEthernet : ArpPacketEthernet
 {
@@ -210,15 +191,14 @@ public class ArpRequestEthernet : ArpPacketEthernet
     /// normally <see cref="MacAddress.None"/>.</param>
     public ArpRequestEthernet(MacAddress ourMac, Address ourIP, MacAddress targetMac, Address targetIP, MacAddress arpTargetMac)
         : base(1, ourMac, ourIP, targetMac, targetIP, 42, arpTargetMac)
-    { }
+    {
+    }
 
     /// <summary>
     /// Returns a string listing the source and destination MAC addresses and the sender and
     /// target IP addresses.
     /// </summary>
     /// <returns>A string representation of the packet.</returns>
-    public override string ToString()
-    {
-        return $"ARP Request Src={_srcMAC}, Dest={_destMAC}, Sender={_senderIP}, Target={_targetIP}";
-    }
+    public override string ToString() =>
+        $"ARP Request Src={_srcMAC}, Dest={_destMAC}, Sender={_senderIP}, Target={_targetIP}";
 }

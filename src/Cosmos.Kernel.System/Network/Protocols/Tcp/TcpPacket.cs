@@ -120,24 +120,99 @@ public class TcpPacket
     internal bool _urg;
 
     /// <summary>
-    /// Handles a received TCP segment, of either version. A segment whose
-    /// checksum does not verify is dropped; the rest go to the connection
-    /// their four-tuple names.
+    /// The internet packet carrying this segment: the frame buffer, the
+    /// addresses, and the version-specific half of the checksum. Pass it to
+    /// <see cref="NetworkStack.Send"/> to transmit the segment.
     /// </summary>
-    /// <param name="network">The parsed internet packet carrying the segment.</param>
-    internal static void TCPHandler(InternetPacket network)
+    public InternetPacket Network { get; }
+
+    /// <summary>
+    /// The complete wire image of the frame, Ethernet header included.
+    /// </summary>
+    public byte[] RawData => Network.RawData;
+
+    /// <summary>
+    /// The source address of the carrying internet packet.
+    /// </summary>
+    public Address SourceIP => Network.SourceIP;
+
+    /// <summary>
+    /// The destination address of the carrying internet packet.
+    /// </summary>
+    public Address DestinationIP => Network.DestinationIP;
+
+    /// <summary>
+    /// The offset of the TCP header from the start of the frame.
+    /// </summary>
+    private protected ushort DataOffset => Network.DataOffset;
+
+    /// <summary>
+    /// Gets the TCP options parsed from a received segment's header, or null when the header is 20 bytes and carries none.
+    /// Options are parse products only: they are never serialized into packets this stack builds.
+    /// </summary>
+    public List<TcpOption>? Options { get; internal set; }
+
+    /// <summary>
+    /// Gets the destination port, a snapshot parsed from the header at construction.
+    /// </summary>
+    public ushort DestinationPort { get; private set; }
+
+    /// <summary>
+    /// Gets the source port, a snapshot parsed from the header at construction.
+    /// </summary>
+    public ushort SourcePort { get; private set; }
+
+    /// <summary>
+    /// Gets the acknowledgment number, a snapshot parsed from the header at construction.
+    /// </summary>
+    public uint AckNumber { get; private set; }
+
+    /// <summary>
+    /// Gets the sequence number, a snapshot parsed from the header at construction.
+    /// </summary>
+    public uint SequenceNumber { get; private set; }
+
+    /// <summary>
+    /// Gets the TCP header length in bytes, decoded from the data offset field at construction.
+    /// </summary>
+    public byte TcpHeaderLength { get; private set; }
+
+    /// <summary>
+    /// Gets the raw flag byte from the header, a snapshot taken at construction; see <see cref="TcpFlags"/> for the bit values.
+    /// </summary>
+    public byte FlagBits { get; private set; }
+
+    /// <summary>
+    /// Gets the advertised window size, a snapshot parsed from the header at construction.
+    /// </summary>
+    public ushort WindowSize { get; private set; }
+
+    /// <summary>
+    /// Gets the checksum field as parsed from the header, a snapshot taken at construction.
+    /// On a locally built segment it holds the value computed in the constructor.
+    /// </summary>
+    public ushort Checksum { get; private set; }
+
+    /// <summary>
+    /// Gets the urgent pointer, a snapshot parsed from the header at construction.
+    /// </summary>
+    public ushort UrgentPointer { get; private set; }
+
+    /// <summary>
+    /// Gets the payload length in bytes: the length of the internet payload minus the TCP header length.
+    /// </summary>
+    public ushort TcpDataLength => (ushort)(Network.DataLength - TcpHeaderLength);
+
+    /// <summary>
+    /// Gets a copy of the segment payload; every read allocates a new array.
+    /// </summary>
+    internal byte[] TcpData
     {
-        TcpPacket packet = new(network);
-
-        if (packet.VerifyChecksum())
+        get
         {
-            TcpConnection? connection = TcpConnection.GetConnection(packet.DestinationPort, packet.SourcePort, packet.DestinationIP, packet.SourceIP);
-
-            connection?.ReceiveData(packet);
-        }
-        else
-        {
-            Serial.WriteString("[TCP] Checksum incorrect, segment dropped.\n");
+            byte[] data = new byte[TcpDataLength];
+            RawData.AsSpan(DataOffset + TcpHeaderLength, data.Length).CopyTo(data);
+            return data;
         }
     }
 
@@ -234,40 +309,34 @@ public class TcpPacket
     /// Builds the internet packet for a segment of <paramref name="segmentLength"/>
     /// bytes. TCP sets Don't Fragment on IPv4, which IPv6 has no equivalent of.
     /// </summary>
-    private static InternetPacket Build(Address source, Address dest, ushort segmentLength)
+    private static InternetPacket Build(Address source, Address dest, ushort segmentLength) =>
+        InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolTcp, segmentLength, true);
+
+    /// <summary>
+    /// Handles a received TCP segment, of either version. A segment whose
+    /// checksum does not verify is dropped; the rest go to the connection
+    /// their four-tuple names.
+    /// </summary>
+    /// <param name="network">The parsed internet packet carrying the segment.</param>
+    internal static void TCPHandler(InternetPacket network)
     {
-        return InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolTcp, segmentLength, true);
+        TcpPacket packet = new(network);
+
+        if (packet.VerifyChecksum())
+        {
+            TcpConnection? connection = TcpConnection.GetConnection(packet.DestinationPort, packet.SourcePort, packet.DestinationIP, packet.SourceIP);
+
+            connection?.ReceiveData(packet);
+        }
+        else
+        {
+            Serial.WriteString("[TCP] Checksum incorrect, segment dropped.\n");
+        }
     }
 
     /// <summary>
-    /// The internet packet carrying this segment: the frame buffer, the
-    /// addresses, and the version-specific half of the checksum. Pass it to
-    /// <see cref="NetworkStack.Send"/> to transmit the segment.
-    /// </summary>
-    public InternetPacket Network { get; }
-
-    /// <summary>
-    /// The complete wire image of the frame, Ethernet header included.
-    /// </summary>
-    public byte[] RawData => Network.RawData;
-
-    /// <summary>
-    /// The source address of the carrying internet packet.
-    /// </summary>
-    public Address SourceIP => Network.SourceIP;
-
-    /// <summary>
-    /// The destination address of the carrying internet packet.
-    /// </summary>
-    public Address DestinationIP => Network.DestinationIP;
-
-    /// <summary>
-    /// The offset of the TCP header from the start of the frame.
-    /// </summary>
-    private protected ushort DataOffset => Network.DataOffset;
-
-    /// <summary>
-    /// Make TCP Packet.
+    /// Writes the TCP header at <see cref="DataOffset"/>, then computes and
+    /// stores the checksum over it and the payload already in place.
     /// </summary>
     private void MakePacket(ushort srcPort, ushort destPort,
         uint sequenceNumber, uint ackNumber, ushort headerLength, byte flags,
@@ -275,40 +344,35 @@ public class TcpPacket
     {
         ushort offset = DataOffset;
 
-        //ports
         RawData[offset + 0] = (byte)((srcPort >> 8) & 0xFF);
         RawData[offset + 1] = (byte)((srcPort >> 0) & 0xFF);
 
         RawData[offset + 2] = (byte)((destPort >> 8) & 0xFF);
         RawData[offset + 3] = (byte)((destPort >> 0) & 0xFF);
 
-        //sequence number
         RawData[offset + 4] = (byte)((sequenceNumber >> 24) & 0xFF);
         RawData[offset + 5] = (byte)((sequenceNumber >> 16) & 0xFF);
         RawData[offset + 6] = (byte)((sequenceNumber >> 8) & 0xFF);
         RawData[offset + 7] = (byte)((sequenceNumber >> 0) & 0xFF);
 
-        //Acknowledgment number
         RawData[offset + 8] = (byte)((ackNumber >> 24) & 0xFF);
         RawData[offset + 9] = (byte)((ackNumber >> 16) & 0xFF);
         RawData[offset + 10] = (byte)((ackNumber >> 8) & 0xFF);
         RawData[offset + 11] = (byte)((ackNumber >> 0) & 0xFF);
 
-        //Header length
+        // The data offset field is the header length in 32-bit words, in the
+        // upper nibble: (headerLength / 4) << 4, which is headerLength * 4.
         RawData[offset + 12] = (byte)(((headerLength >> 0) & 0xFF) * 4);
 
-        //Flags
         RawData[offset + 13] = (byte)((flags >> 0) & 0xFF);
 
-        //Window size value
         RawData[offset + 14] = (byte)((windowSize >> 8) & 0xFF);
         RawData[offset + 15] = (byte)((windowSize >> 0) & 0xFF);
 
-        //Checksum
+        // Checksum, filled in by WriteChecksum once the header is complete.
         RawData[offset + 16] = 0;
         RawData[offset + 17] = 0;
 
-        //Urgent Pointer
         RawData[offset + 18] = (byte)((urgentPointer >> 8) & 0xFF);
         RawData[offset + 19] = (byte)((urgentPointer >> 0) & 0xFF);
 
@@ -334,9 +398,9 @@ public class TcpPacket
         Checksum = (ushort)((RawData[offset + 16] << 8) | RawData[offset + 17]);
         UrgentPointer = (ushort)((RawData[offset + 18] << 8) | RawData[offset + 19]);
 
-        // Read the flag bits back from the field just parsed. They used to be
-        // read from a hardcoded frame offset, which is the flags byte only
-        // when the IPv4 header carries no options and never for IPv6.
+        // Read the flag bits from the field just parsed, not from a fixed
+        // frame offset: that is the flags byte only when the IPv4 header
+        // carries no options, and never for IPv6.
         _syn = (FlagBits & (byte)TcpFlags.SYN) != 0;
         _ack = (FlagBits & (byte)TcpFlags.ACK) != 0;
         _fin = (FlagBits & (byte)TcpFlags.FIN) != 0;
@@ -344,7 +408,7 @@ public class TcpPacket
         _rst = (FlagBits & (byte)TcpFlags.RST) != 0;
         _urg = (FlagBits & (byte)TcpFlags.URG) != 0;
 
-        if (TcpHeaderLength > TcpHeaderMinimumLength) //options
+        if (TcpHeaderLength > TcpHeaderMinimumLength)
         {
             Options = [];
 
@@ -355,7 +419,8 @@ public class TcpPacket
                     Kind = RawData[offset + 20 + i]
                 };
 
-                if (option.Kind != 1) //NOP
+                // Kind 1 (No-Operation) is a single byte with no length field.
+                if (option.Kind != 1)
                 {
                     option.Length = RawData[offset + 20 + i + 1];
 
@@ -377,12 +442,10 @@ public class TcpPacket
     }
 
     /// <summary>
-    /// Add raw data to TCP Packet.
+    /// Copies <paramref name="raw"/> into the payload area, after the 20 byte header.
     /// </summary>
-    internal void AddRawData(byte[] raw)
-    {
+    internal void AddRawData(byte[] raw) =>
         raw.CopyTo(RawData.AsSpan(DataOffset + TcpHeaderMinimumLength, raw.Length));
-    }
 
     /// <summary>
     /// Computes the checksum over the segment as it stands, stores it, and
@@ -417,68 +480,6 @@ public class TcpPacket
         }
 
         return Network.ComputeTransportChecksum(InternetPacket.ProtocolTcp, Network.DataLength) == 0;
-    }
-
-    /// <summary>
-    /// Gets the TCP options parsed from a received segment's header, or null when the header is 20 bytes and carries none.
-    /// Options are parse products only: they are never serialized into packets this stack builds.
-    /// </summary>
-    public List<TcpOption>? Options { get; internal set; }
-
-    /// <summary>
-    /// Gets the destination port, a snapshot parsed from the header at construction.
-    /// </summary>
-    public ushort DestinationPort { get; private set; }
-    /// <summary>
-    /// Gets the source port, a snapshot parsed from the header at construction.
-    /// </summary>
-    public ushort SourcePort { get; private set; }
-    /// <summary>
-    /// Gets the acknowledgment number, a snapshot parsed from the header at construction.
-    /// </summary>
-    public uint AckNumber { get; private set; }
-    /// <summary>
-    /// Gets the sequence number, a snapshot parsed from the header at construction.
-    /// </summary>
-    public uint SequenceNumber { get; private set; }
-    /// <summary>
-    /// Gets the TCP header length in bytes, decoded from the data offset field at construction.
-    /// </summary>
-    public byte TcpHeaderLength { get; private set; }
-    /// <summary>
-    /// Gets the raw flag byte from the header, a snapshot taken at construction; see <see cref="TcpFlags"/> for the bit values.
-    /// </summary>
-    public byte FlagBits { get; private set; }
-    /// <summary>
-    /// Gets the advertised window size, a snapshot parsed from the header at construction.
-    /// </summary>
-    public ushort WindowSize { get; private set; }
-    /// <summary>
-    /// Gets the checksum field as parsed from the header, a snapshot taken at construction.
-    /// On a locally built segment it holds the value computed in the constructor.
-    /// </summary>
-    public ushort Checksum { get; private set; }
-    /// <summary>
-    /// Gets the urgent pointer, a snapshot parsed from the header at construction.
-    /// </summary>
-    public ushort UrgentPointer { get; private set; }
-
-    /// <summary>
-    /// Gets the payload length in bytes: the length of the internet payload minus the TCP header length.
-    /// </summary>
-    public ushort TcpDataLength => (ushort)(Network.DataLength - TcpHeaderLength);
-
-    /// <summary>
-    /// Get TCP data.
-    /// </summary>
-    internal byte[] TcpData
-    {
-        get
-        {
-            byte[] data = new byte[TcpDataLength];
-            RawData.AsSpan(DataOffset + TcpHeaderLength, data.Length).CopyTo(data);
-            return data;
-        }
     }
 
     /// <summary>
@@ -530,8 +531,6 @@ public class TcpPacket
     /// Returns a string describing the segment: source and destination endpoints, flags, sequence number and acknowledgment number.
     /// </summary>
     /// <returns>A human readable summary of the segment.</returns>
-    public override string ToString()
-    {
-        return $"TCP Packet {SourceIP}:{SourcePort} -> {DestinationIP}:{DestinationPort} (flags={GetFlags()}, seq={SequenceNumber}, ack={AckNumber})";
-    }
+    public override string ToString() =>
+        $"TCP Packet {SourceIP}:{SourcePort} -> {DestinationIP}:{DestinationPort} (flags={GetFlags()}, seq={SequenceNumber}, ack={AckNumber})";
 }
