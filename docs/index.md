@@ -21,7 +21,9 @@ Everything you need to create, build and run your own Cosmos kernel:
  - [Network](articles/user/network.md): DHCP, UDP and TCP through the standard .NET `System.Net.Sockets` API, plus DNS.
  - [Timers and Alarms](articles/user/timers.md): block for a while, or run a callback later from the timer interrupt (`TimerManager`) or a kernel thread (`AlarmManager`).
  - [Graphics](articles/user/graphics.md): draw shapes, text and images on the screen with the Canvas API.
+ - [Audio](articles/user/audio.md): play tones, WAV files and sound you generate through the HD Audio output with `AudioManager` and `Console.Beep`.
  - [Keyboard](articles/user/keyboard.md): read lines, key events and layouts through `Console` and `KeyboardManager`.
+ - [Console Sessions and Telnet](articles/user/sessions.md): run several shells side by side on virtual consoles, and serve them to remote terminals over Telnet.
  - [Mouse](articles/user/mouse.md): pointer position, buttons and scroll wheel through `MouseManager`.
  - [Writing a Driver](articles/user/drivers.md): match a driver to a device, reach the hardware, hand the kernel a device, and test it without hardware.
  - [Writing a Scheduler](articles/user/scheduler-plugging.md): how to implement and install a scheduling policy.
