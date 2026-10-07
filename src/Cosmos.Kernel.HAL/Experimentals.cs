@@ -12,13 +12,13 @@ namespace Cosmos.Kernel.HAL;
 internal static class Experimentals
 {
     /// <summary>
-    /// The driver kit seam: every public type under
-    /// <c>Cosmos.Kernel.HAL.DriverKit</c> and its <c>Display</c>, <c>Input</c>,
-    /// <c>Network</c>, <c>Synthetic</c>, <c>Platform</c>, <c>Ps2</c>, <c>Pci</c>, <c>Usb</c> and
-    /// <c>Virtio</c> namespaces (<c>Engine</c>, the kit's plumbing, is internal). A build
-    /// target in the HAL project fails the build if a type under those
-    /// namespaces loses the attribute, so promoting the kit out of the seam
-    /// is a deliberate change of that target rather than of one type.
+    /// The driver kit seam: every public type in Cosmos.Kernel.HAL, the kit
+    /// under <c>Cosmos.Kernel.HAL.DriverKit</c> and the device categories
+    /// under <c>Cosmos.Kernel.HAL.Devices</c>, except the two stable device
+    /// contracts, <c>IBlockDevice</c> and <c>MacAddress</c>. A build target in
+    /// the HAL project fails the build if any other public type loses the
+    /// attribute, so promoting a type out of the seam is a deliberate change
+    /// of that target's list rather than of one type.
     /// </summary>
     internal const string DriverKitSeamDiagId = "COSMOS0003";
 }

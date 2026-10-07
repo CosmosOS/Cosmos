@@ -1,8 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.HAL.DriverKit;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Input;
+namespace Cosmos.Kernel.HAL.Devices.Input;
 
 /// <summary>What a keyboard driver implements and hands to <see cref="DeviceBinding.PublishKeyboard"/>. Called by the ring in thread context.</summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]

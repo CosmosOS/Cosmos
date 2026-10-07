@@ -1,8 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Input;
 using Cosmos.Kernel.HAL.DriverKit.Ps2;
 
 namespace Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard;

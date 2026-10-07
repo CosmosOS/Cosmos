@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Devices;
+using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.System.Storage;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 

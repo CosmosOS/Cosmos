@@ -56,7 +56,7 @@ These are the `using`s the snippets below rely on:
 
 ```csharp
 using System.IO;
-using Cosmos.Kernel.HAL.Devices;
+using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.System.FileSystem;
 using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.Kernel.System.Storage;
@@ -64,7 +64,7 @@ using Cosmos.Kernel.System.Storage;
 
 `Cosmos.Kernel.System.FileSystem` holds the whole VFS in one namespace: the manager and what it hands out (`VfsManager`, `VfsMount`, `IVfsNodeHandle`, `IVfsFileHandle` and `IVfsDirectoryHandle`), the contracts a filesystem driver implements (`IVfsFileSystemType`, `IVfsSuperblock`, `IVfsInode`, `IVfsOpenFile` and their operations interfaces), and the flag, mode and metadata types every mount, create and stat call names (`MountFlags`, `VfsMode`, `VfsStat`, `VfsStatFs`, `SetAttrFlags`, `SeekWhence`, `VfsTimespec`). That is why `MountFlags.None` appears in a kernel's `BeforeRun()` under the same `using` as `VfsManager`, and why the `IVfsInode` that `IVfsNodeHandle.Inode` gives you needs no other `using`. Filesystem drivers sit one level down, a namespace each: the FAT driver's `FatFileSystemType` and `FatFormatOptions` are in `Cosmos.Kernel.System.FileSystem.Fat`.
 
-`Cosmos.Kernel.HAL.Devices` is needed only by the RAM-disk snippet further down, which implements `IBlockDevice`. Drop that and mounting a real partition takes the three `Cosmos.Kernel.System` ones.
+`Cosmos.Kernel.HAL.Devices.Storage` is needed only by the RAM-disk snippet further down, which implements `IBlockDevice`. Drop that and mounting a real partition takes the three `Cosmos.Kernel.System` ones.
 
 First, register a FAT driver under a name of your choice, then mount a partition at a mount point. Add this to your kernel's `BeforeRun()`:
 
@@ -104,7 +104,7 @@ From this point on, everything under `/mnt` is served by the FAT driver, and eve
 
 ### Alternative: a RAM disk
 
-For quick experiments you don't need a disk image at all. A block device is just an `IBlockDevice` (from `Cosmos.Kernel.HAL.Devices`), and a RAM-backed one fits in a few lines; this is exactly what the kernel test suites use:
+For quick experiments you don't need a disk image at all. A block device is just an `IBlockDevice` (from `Cosmos.Kernel.HAL.Devices.Storage`), and a RAM-backed one fits in a few lines; this is exactly what the kernel test suites use:
 
 ```csharp
 internal sealed class MemoryBlockDevice : IBlockDevice

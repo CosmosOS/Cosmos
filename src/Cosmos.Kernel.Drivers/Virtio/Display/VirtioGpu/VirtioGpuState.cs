@@ -3,8 +3,8 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Display;
 using Cosmos.Kernel.HAL.DriverKit.Virtio;
 
 namespace Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu;

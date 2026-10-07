@@ -1,8 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Display;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.System.Graphics.Rendering3D;
 

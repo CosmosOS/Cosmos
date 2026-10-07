@@ -13,11 +13,13 @@
     <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
-         the driver kit seam (COSMOS0003) and the contracts the ring hands
-         out: IBlockDevice, the one device contract kernels really implement
+         the driver kit seam (COSMOS0003), which covers the kit under DriverKit/
+         and the device categories under Devices/ apart from the two contracts
+         the ring hands out, which are tracked as stable: IBlockDevice
+         (Devices/Storage/), the one device contract kernels really implement
          and drive (the Fat and File suites each supply a RAM disk, DevKernel
-         reads and writes blocks through it), and MacAddress, which the
-         packet seam and NetworkManager both hand out.
+         reads and writes blocks through it), and MacAddress (Devices/Network/),
+         which the packet seam and NetworkManager both hand out.
          The boot contract (IPlatformInitializer), the timer device and its
          timer entries are internal because no kernel can obtain or
          meaningfully supply one. The SoftwareTimer that TimerManager.Schedule
@@ -37,14 +39,19 @@
   <!-- Multi-arch packaging support -->
   <Import Project="../Directory.MultiArch.targets" />
 
-  <!-- The driver kit is an experimental seam: every public symbol under
-       Cosmos.Kernel.HAL.DriverKit carries [Experimental("COSMOS0003")], which
-       the public API analyzer records as a [COSMOS0003] prefix on the symbol's
-       line. A kit line without the prefix means a type lost the attribute,
-       which is how a promotion to the stable surface happens by accident, so
-       the build fails on it. Promoting the kit for real is a deliberate change
-       of this target. -->
-  <Target Name="CosmosGuardDriverKitPromotion" AfterTargets="Build">
+  <!-- Every public HAL symbol is on the experimental driver kit seam except
+       the stable device contracts listed in _CosmosStableHalTypes. A seam
+       symbol carries [Experimental("COSMOS0003")], which the public API
+       analyzer records as a [COSMOS0003] prefix on the symbol's line. Any other
+       line without the prefix means a type lost the attribute, which is how a
+       promotion to the stable surface happens by accident, so the build fails
+       on it. Promoting a type for real is a deliberate change of that list. -->
+  <Target Name="CosmosGuardHalPromotion" AfterTargets="Build">
+    <PropertyGroup>
+      <_CosmosStableHalTypes>Cosmos\.Kernel\.HAL\.Devices\.Storage\.IBlockDevice|Cosmos\.Kernel\.HAL\.Devices\.Network\.MacAddress</_CosmosStableHalTypes>
+      <!-- A stable line: optional modifiers (static, override), one of those types, then the end of the line or one of its members. -->
+      <_CosmosStableHalLine>^(?:[a-z]+ )*(?:$(_CosmosStableHalTypes))(?:[.( ]|$)</_CosmosStableHalLine>
+    </PropertyGroup>
     <ReadLinesFromFile File="$(MSBuildProjectDirectory)/PublicAPI.Shipped.txt">
       <Output TaskParameter="Lines" ItemName="_CosmosPublicApiLine" />
     </ReadLinesFromFile>
@@ -52,11 +59,11 @@
       <Output TaskParameter="Lines" ItemName="_CosmosPublicApiLine" />
     </ReadLinesFromFile>
     <ItemGroup>
-      <_CosmosPromotedKitLine Include="@(_CosmosPublicApiLine)"
-                              Condition="$([System.String]::Copy('%(Identity)').Contains('Cosmos.Kernel.HAL.DriverKit')) And !$([System.String]::Copy('%(Identity)').StartsWith('[COSMOS0003]')) And !$([System.String]::Copy('%(Identity)').StartsWith('*REMOVED*'))" />
+      <_CosmosPromotedHalLine Include="@(_CosmosPublicApiLine)"
+                              Condition="!$([System.String]::Copy('%(Identity)').StartsWith('#')) And !$([System.String]::Copy('%(Identity)').StartsWith('[COSMOS0003]')) And !$([System.String]::Copy('%(Identity)').StartsWith('*REMOVED*')) And !$([System.Text.RegularExpressions.Regex]::IsMatch('%(Identity)', '$(_CosmosStableHalLine)'))" />
     </ItemGroup>
-    <Error Condition="'@(_CosmosPromotedKitLine)' != ''"
-           Text="A driver kit symbol is public without the [COSMOS0003] prefix in PublicAPI.*.txt: '%(_CosmosPromotedKitLine.Identity)'. Every type under Cosmos.Kernel.HAL.DriverKit carries [Experimental(Experimentals.DriverKitSeamDiagId)]; promoting the kit out of the seam is a deliberate change of the CosmosGuardDriverKitPromotion target." />
+    <Error Condition="'@(_CosmosPromotedHalLine)' != ''"
+           Text="A HAL symbol is public without the [COSMOS0003] prefix in PublicAPI.*.txt: '%(_CosmosPromotedHalLine.Identity)'. Every public HAL type other than the stable device contracts (IBlockDevice, MacAddress) carries [Experimental(Experimentals.DriverKitSeamDiagId)]; promoting one out of the seam is a deliberate change of the _CosmosStableHalTypes list in the CosmosGuardHalPromotion target." />
   </Target>
 
   <ItemGroup>
@@ -87,7 +94,7 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Virtio" />
-    <!-- Drivers: installs its keyboard consumer through DeviceRegistry.SetConsumer; its
+    <!-- Drivers: installs its keyboard and pointer consumers through DeviceRegistry.SetConsumer; its
          [Driver] classes live in Cosmos.Kernel.Tests.Drivers.Library, which holds no grant. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Drivers" />
   </ItemGroup>

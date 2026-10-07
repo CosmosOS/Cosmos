@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Devices;
+using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.System.Network.Protocols;
 using Cosmos.Kernel.System.Network.Protocols.Arp;
 using Cosmos.Kernel.System.Network.Protocols.IPv4;

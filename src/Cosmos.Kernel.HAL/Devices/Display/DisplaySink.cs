@@ -1,10 +1,11 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.HAL.Devices.Input;
+using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
-using Cosmos.Kernel.HAL.DriverKit.Input;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Display;
+namespace Cosmos.Kernel.HAL.Devices.Display;
 
 /// <summary>
 /// Where a display driver reports a mode change, returned by

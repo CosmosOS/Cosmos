@@ -9,7 +9,7 @@
 */
 
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.HAL.Devices;
+using Cosmos.Kernel.HAL.Devices.Network;
 
 namespace Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp;
 

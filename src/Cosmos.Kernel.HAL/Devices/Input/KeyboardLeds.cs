@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Input;
+namespace Cosmos.Kernel.HAL.Devices.Input;
 
 /// <summary>Keyboard indicator lights.</summary>
 [Flags]

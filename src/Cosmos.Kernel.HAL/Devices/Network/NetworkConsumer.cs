@@ -1,6 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
+
+namespace Cosmos.Kernel.HAL.Devices.Network;
 
 /// <summary>The ring's consumer of network interfaces: receives frames and link changes.</summary>
 internal abstract class NetworkConsumer : DeviceConsumer

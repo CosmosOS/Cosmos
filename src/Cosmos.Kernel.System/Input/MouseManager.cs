@@ -2,8 +2,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
-using Cosmos.Kernel.HAL.DriverKit.Input;
 
 namespace Cosmos.Kernel.System.Input;
 

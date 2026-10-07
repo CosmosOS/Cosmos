@@ -1,9 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.HAL.Devices;
+using Cosmos.Kernel.HAL.DriverKit;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Network;
+namespace Cosmos.Kernel.HAL.Devices.Network;
 
 /// <summary>What a network driver implements and hands to <see cref="DeviceBinding.PublishNetwork"/>. Called by the ring in thread context.</summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]

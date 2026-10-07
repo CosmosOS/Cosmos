@@ -10,7 +10,7 @@ using Cosmos.Kernel.Drivers.Pci.Storage.Nvme;
 using Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage;
 using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 using Cosmos.Kernel.HAL.Boot;
-using Cosmos.Kernel.HAL.Devices;
+using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Pci;

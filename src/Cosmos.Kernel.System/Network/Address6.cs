@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
-using Cosmos.Kernel.HAL.Devices;
+using Cosmos.Kernel.HAL.Devices.Network;
 
 namespace Cosmos.Kernel.System.Network;
 

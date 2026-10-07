@@ -8,7 +8,7 @@ using Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput;
 using Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet;
 using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 using Cosmos.Kernel.HAL.Boot;
-using Cosmos.Kernel.HAL.Devices;
+using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.System.Diagnostics;

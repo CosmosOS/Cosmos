@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Display;
+namespace Cosmos.Kernel.HAL.Devices.Display;
 
 /// <summary>A display that composes a cursor itself. Optional facet on an <see cref="IDisplay"/>, found by a type test on the published object. Thread context.</summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]

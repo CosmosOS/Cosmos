@@ -1,8 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.HAL.DriverKit.Display;
-using Cosmos.Kernel.HAL.DriverKit.Input;
-using Cosmos.Kernel.HAL.DriverKit.Network;
+using Cosmos.Kernel.HAL.Devices.Display;
+using Cosmos.Kernel.HAL.Devices.Input;
+using Cosmos.Kernel.HAL.Devices.Network;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 

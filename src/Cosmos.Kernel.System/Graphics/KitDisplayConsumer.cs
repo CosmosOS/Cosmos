@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.DriverKit.Display;
+using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.System.Graphics;

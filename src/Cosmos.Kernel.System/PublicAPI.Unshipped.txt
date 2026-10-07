@@ -100,7 +100,7 @@ Cosmos.Kernel.System.Diagnostics.ThreadKillResult.RefusedBlocked = 4 -> Cosmos.K
 Cosmos.Kernel.System.Diagnostics.ThreadKillResult.RefusedIdle = 3 -> Cosmos.Kernel.System.Diagnostics.ThreadKillResult
 Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType
 Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.Ext2FileSystemType() -> void
-Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.Ext2FileSystemType(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
+Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.Ext2FileSystemType(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
 Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
 Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.IVfsFormatOptions? options) -> bool
 Cosmos.Kernel.System.FileSystem.Ext2.Ext2FileSystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.MountFlags flags, out Cosmos.Kernel.System.FileSystem.IVfsSuperblock? superblock) -> bool
@@ -129,7 +129,7 @@ Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.TotalSectorCount.get -> uint
 Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.Type.get -> Cosmos.Kernel.System.FileSystem.Fat.FatType
 Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType
 Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.FatFileSystemType() -> void
-Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.FatFileSystemType(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
+Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.FatFileSystemType(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
 Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
 Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.IVfsFormatOptions? options) -> bool
 Cosmos.Kernel.System.FileSystem.Fat.FatFileSystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.MountFlags flags, out Cosmos.Kernel.System.FileSystem.IVfsSuperblock? superblock) -> bool
@@ -731,7 +731,7 @@ Cosmos.Kernel.System.Network.NetworkAdapter.IPConfig.get -> Cosmos.Kernel.System
 Cosmos.Kernel.System.Network.NetworkAdapter.IsValid.get -> bool
 Cosmos.Kernel.System.Network.NetworkAdapter.LinkLocalAddress.get -> Cosmos.Kernel.System.Network.Address6?
 Cosmos.Kernel.System.Network.NetworkAdapter.LinkUp.get -> bool
-Cosmos.Kernel.System.Network.NetworkAdapter.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MacAddress?
+Cosmos.Kernel.System.Network.NetworkAdapter.MacAddress.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress?
 Cosmos.Kernel.System.Network.NetworkAdapter.Name.get -> string?
 Cosmos.Kernel.System.Network.NetworkAdapter.NetworkAdapter() -> void
 Cosmos.Kernel.System.Network.NetworkAdapter.Ready.get -> bool
@@ -766,9 +766,9 @@ Cosmos.Kernel.System.Storage.Partition
 Cosmos.Kernel.System.Storage.Partition.BlockCount.get -> ulong
 Cosmos.Kernel.System.Storage.Partition.BlockSize.get -> ulong
 Cosmos.Kernel.System.Storage.Partition.Flush() -> void
-Cosmos.Kernel.System.Storage.Partition.Host.get -> Cosmos.Kernel.HAL.Devices.IBlockDevice!
+Cosmos.Kernel.System.Storage.Partition.Host.get -> Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice!
 Cosmos.Kernel.System.Storage.Partition.Name.get -> string!
-Cosmos.Kernel.System.Storage.Partition.Partition(Cosmos.Kernel.HAL.Devices.IBlockDevice! host, ulong startSector, ulong sectorCount, string! name) -> void
+Cosmos.Kernel.System.Storage.Partition.Partition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! host, ulong startSector, ulong sectorCount, string! name) -> void
 Cosmos.Kernel.System.Storage.Partition.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
 Cosmos.Kernel.System.Storage.Partition.StartSector.get -> ulong
 Cosmos.Kernel.System.Storage.Partition.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
@@ -948,7 +948,7 @@ static Cosmos.Kernel.System.Network.Address.Parse(System.ReadOnlySpan<char> addr
 static Cosmos.Kernel.System.Network.Address4.Broadcast.get -> Cosmos.Kernel.System.Network.Address4!
 static Cosmos.Kernel.System.Network.Address4.CIDRToAddress(int cidr) -> Cosmos.Kernel.System.Network.Address4?
 static Cosmos.Kernel.System.Network.Address4.Parse(System.ReadOnlySpan<char> addr, Cosmos.Kernel.System.Network.AddressNumericStyle style) -> Cosmos.Kernel.System.Network.Address4?
-static Cosmos.Kernel.System.Network.Address6.LinkLocalFor(Cosmos.Kernel.HAL.Devices.MacAddress! mac) -> Cosmos.Kernel.System.Network.Address6!
+static Cosmos.Kernel.System.Network.Address6.LinkLocalFor(Cosmos.Kernel.HAL.Devices.Network.MacAddress! mac) -> Cosmos.Kernel.System.Network.Address6!
 static Cosmos.Kernel.System.Network.Address6.Parse(System.ReadOnlySpan<char> addr) -> Cosmos.Kernel.System.Network.Address6?
 static Cosmos.Kernel.System.Network.DnsConfig.Add(Cosmos.Kernel.System.Network.Address! nameserver) -> void
 static Cosmos.Kernel.System.Network.DnsConfig.HostName.get -> string!
@@ -966,7 +966,7 @@ static Cosmos.Kernel.System.Network.NetworkManager.GetAdapter(int index) -> Cosm
 static Cosmos.Kernel.System.Network.NetworkManager.IsEnabled.get -> bool
 static Cosmos.Kernel.System.Network.NetworkManager.IsInitialized.get -> bool
 static Cosmos.Kernel.System.Network.NetworkManager.LinkUp.get -> bool
-static Cosmos.Kernel.System.Network.NetworkManager.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MacAddress?
+static Cosmos.Kernel.System.Network.NetworkManager.MacAddress.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress?
 static Cosmos.Kernel.System.Network.NetworkManager.Name.get -> string?
 static Cosmos.Kernel.System.Network.NetworkManager.Primary.get -> Cosmos.Kernel.System.Network.NetworkAdapter
 static Cosmos.Kernel.System.Network.NetworkManager.Primary.set -> void
@@ -978,42 +978,42 @@ static Cosmos.Kernel.System.Power.Halt() -> void
 static Cosmos.Kernel.System.Power.IsSupported.get -> bool
 static Cosmos.Kernel.System.Power.Reboot() -> void
 static Cosmos.Kernel.System.Power.Shutdown() -> void
-static Cosmos.Kernel.System.Storage.Ebr.MoveLogical(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, ulong extendedStartSector, int logicalIndex, ulong newStartSector) -> bool
-static Cosmos.Kernel.System.Storage.Ebr.Parse(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, ulong extendedStartSector) -> System.Collections.Generic.List<Cosmos.Kernel.System.Storage.MbrPartitionEntry!>!
-static Cosmos.Kernel.System.Storage.Ebr.RemoveLogical(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, ulong extendedStartSector, int logicalIndex) -> bool
-static Cosmos.Kernel.System.Storage.Ebr.ResizeLogical(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, ulong extendedStartSector, int logicalIndex, ulong newSectorCount) -> bool
-static Cosmos.Kernel.System.Storage.Ebr.TryAddLogical(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, ulong extendedStartSector, ulong extendedSectorCount, byte systemId, ulong sectorCount, out ulong startSector) -> bool
-static Cosmos.Kernel.System.Storage.Gpt.AddPartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, ulong startSector, ulong sectorCount, System.Guid partitionType) -> bool
-static Cosmos.Kernel.System.Storage.Gpt.Create(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
-static Cosmos.Kernel.System.Storage.Gpt.IsGpt(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> bool
-static Cosmos.Kernel.System.Storage.Gpt.MovePartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, int index, ulong newStartSector) -> bool
-static Cosmos.Kernel.System.Storage.Gpt.Parse(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> System.Collections.Generic.List<Cosmos.Kernel.System.Storage.GptPartitionEntry!>!
-static Cosmos.Kernel.System.Storage.Gpt.RemovePartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, int index) -> bool
-static Cosmos.Kernel.System.Storage.Gpt.ResizePartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, int index, ulong newSectorCount) -> bool
-static Cosmos.Kernel.System.Storage.Mbr.AddPartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, int index, byte systemId, ulong startSector, ulong sectorCount) -> bool
-static Cosmos.Kernel.System.Storage.Mbr.Create(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
-static Cosmos.Kernel.System.Storage.Mbr.IsMbr(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> bool
-static Cosmos.Kernel.System.Storage.Mbr.MovePartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, int index, ulong newStartSector) -> bool
-static Cosmos.Kernel.System.Storage.Mbr.Parse(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> System.Collections.Generic.List<Cosmos.Kernel.System.Storage.MbrPartitionEntry!>!
-static Cosmos.Kernel.System.Storage.Mbr.RemovePartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, int index) -> void
-static Cosmos.Kernel.System.Storage.Mbr.ResizePartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, int index, ulong newSectorCount) -> bool
-static Cosmos.Kernel.System.Storage.Mbr.TryGetExtendedPartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, out ulong startSector) -> bool
-static Cosmos.Kernel.System.Storage.Mbr.TryGetExtendedPartition(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, out ulong startSector, out ulong sectorCount) -> bool
-static Cosmos.Kernel.System.Storage.PartitionManager.Create(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, ulong startSector, ulong sectorCount, byte mbrSystemId, System.Guid gptType) -> bool
-static Cosmos.Kernel.System.Storage.PartitionManager.Delete(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation location) -> bool
-static Cosmos.Kernel.System.Storage.PartitionManager.MoveWithData(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation location, ulong newStartSector) -> bool
-static Cosmos.Kernel.System.Storage.PartitionManager.Resize(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation location, ulong newSectorCount) -> bool
-static Cosmos.Kernel.System.Storage.PartitionManager.TryCreateLogical(Cosmos.Kernel.HAL.Devices.IBlockDevice! device, byte systemId, ulong sectorCount, out ulong startSector) -> bool
+static Cosmos.Kernel.System.Storage.Ebr.MoveLogical(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, ulong extendedStartSector, int logicalIndex, ulong newStartSector) -> bool
+static Cosmos.Kernel.System.Storage.Ebr.Parse(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, ulong extendedStartSector) -> System.Collections.Generic.List<Cosmos.Kernel.System.Storage.MbrPartitionEntry!>!
+static Cosmos.Kernel.System.Storage.Ebr.RemoveLogical(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, ulong extendedStartSector, int logicalIndex) -> bool
+static Cosmos.Kernel.System.Storage.Ebr.ResizeLogical(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, ulong extendedStartSector, int logicalIndex, ulong newSectorCount) -> bool
+static Cosmos.Kernel.System.Storage.Ebr.TryAddLogical(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, ulong extendedStartSector, ulong extendedSectorCount, byte systemId, ulong sectorCount, out ulong startSector) -> bool
+static Cosmos.Kernel.System.Storage.Gpt.AddPartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, ulong startSector, ulong sectorCount, System.Guid partitionType) -> bool
+static Cosmos.Kernel.System.Storage.Gpt.Create(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
+static Cosmos.Kernel.System.Storage.Gpt.IsGpt(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> bool
+static Cosmos.Kernel.System.Storage.Gpt.MovePartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, int index, ulong newStartSector) -> bool
+static Cosmos.Kernel.System.Storage.Gpt.Parse(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> System.Collections.Generic.List<Cosmos.Kernel.System.Storage.GptPartitionEntry!>!
+static Cosmos.Kernel.System.Storage.Gpt.RemovePartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, int index) -> bool
+static Cosmos.Kernel.System.Storage.Gpt.ResizePartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, int index, ulong newSectorCount) -> bool
+static Cosmos.Kernel.System.Storage.Mbr.AddPartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, int index, byte systemId, ulong startSector, ulong sectorCount) -> bool
+static Cosmos.Kernel.System.Storage.Mbr.Create(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
+static Cosmos.Kernel.System.Storage.Mbr.IsMbr(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> bool
+static Cosmos.Kernel.System.Storage.Mbr.MovePartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, int index, ulong newStartSector) -> bool
+static Cosmos.Kernel.System.Storage.Mbr.Parse(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> System.Collections.Generic.List<Cosmos.Kernel.System.Storage.MbrPartitionEntry!>!
+static Cosmos.Kernel.System.Storage.Mbr.RemovePartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, int index) -> void
+static Cosmos.Kernel.System.Storage.Mbr.ResizePartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, int index, ulong newSectorCount) -> bool
+static Cosmos.Kernel.System.Storage.Mbr.TryGetExtendedPartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, out ulong startSector) -> bool
+static Cosmos.Kernel.System.Storage.Mbr.TryGetExtendedPartition(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, out ulong startSector, out ulong sectorCount) -> bool
+static Cosmos.Kernel.System.Storage.PartitionManager.Create(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, ulong startSector, ulong sectorCount, byte mbrSystemId, System.Guid gptType) -> bool
+static Cosmos.Kernel.System.Storage.PartitionManager.Delete(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation location) -> bool
+static Cosmos.Kernel.System.Storage.PartitionManager.MoveWithData(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation location, ulong newStartSector) -> bool
+static Cosmos.Kernel.System.Storage.PartitionManager.Resize(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation location, ulong newSectorCount) -> bool
+static Cosmos.Kernel.System.Storage.PartitionManager.TryCreateLogical(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device, byte systemId, ulong sectorCount, out ulong startSector) -> bool
 static Cosmos.Kernel.System.Storage.StorageManager.DeviceCount.get -> int
-static Cosmos.Kernel.System.Storage.StorageManager.Devices.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Devices.IBlockDevice!>!
-static Cosmos.Kernel.System.Storage.StorageManager.GetDevice(int index) -> Cosmos.Kernel.HAL.Devices.IBlockDevice?
-static Cosmos.Kernel.System.Storage.StorageManager.GetPartitions(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.Storage.Partition!>!
+static Cosmos.Kernel.System.Storage.StorageManager.Devices.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice!>!
+static Cosmos.Kernel.System.Storage.StorageManager.GetDevice(int index) -> Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice?
+static Cosmos.Kernel.System.Storage.StorageManager.GetPartitions(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.Storage.Partition!>!
 static Cosmos.Kernel.System.Storage.StorageManager.IsEnabled.get -> bool
 static Cosmos.Kernel.System.Storage.StorageManager.IsInitialized.get -> bool
 static Cosmos.Kernel.System.Storage.StorageManager.Partitions.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.System.Storage.Partition!>!
-static Cosmos.Kernel.System.Storage.StorageManager.PrimaryDevice.get -> Cosmos.Kernel.HAL.Devices.IBlockDevice?
-static Cosmos.Kernel.System.Storage.StorageManager.RegisterDevice(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
-static Cosmos.Kernel.System.Storage.StorageManager.RescanPartitions(Cosmos.Kernel.HAL.Devices.IBlockDevice! device) -> void
+static Cosmos.Kernel.System.Storage.StorageManager.PrimaryDevice.get -> Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice?
+static Cosmos.Kernel.System.Storage.StorageManager.RegisterDevice(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
+static Cosmos.Kernel.System.Storage.StorageManager.RescanPartitions(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
 static Cosmos.Kernel.System.Timers.AlarmManager.Cancel(ulong id) -> bool
 static Cosmos.Kernel.System.Timers.AlarmManager.Schedule(System.Action! callback, System.TimeSpan delay) -> ulong
 static Cosmos.Kernel.System.Timers.AlarmManager.ScheduleRecurring(System.Action! callback, System.TimeSpan period) -> ulong
@@ -1094,15 +1094,15 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.ArpPacketEthernet(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.SenderIP.get -> Cosmos.Kernel.System.Network.Address!
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.SenderMac.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.SenderMac.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.TargetIP.get -> Cosmos.Kernel.System.Network.Address!
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.TargetMac.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpPacketEthernet.TargetMac.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpReplyEthernet
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpReplyEthernet.ArpReplyEthernet(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpReplyEthernet.ArpReplyEthernet(Cosmos.Kernel.HAL.Devices.MacAddress! ourMac, Cosmos.Kernel.System.Network.Address! ourIP, Cosmos.Kernel.HAL.Devices.MacAddress! targetMac, Cosmos.Kernel.System.Network.Address! targetIP) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpReplyEthernet.ArpReplyEthernet(Cosmos.Kernel.HAL.Devices.Network.MacAddress! ourMac, Cosmos.Kernel.System.Network.Address! ourIP, Cosmos.Kernel.HAL.Devices.Network.MacAddress! targetMac, Cosmos.Kernel.System.Network.Address! targetIP) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpRequestEthernet
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpRequestEthernet.ArpRequestEthernet(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpRequestEthernet.ArpRequestEthernet(Cosmos.Kernel.HAL.Devices.MacAddress! ourMac, Cosmos.Kernel.System.Network.Address! ourIP, Cosmos.Kernel.HAL.Devices.MacAddress! targetMac, Cosmos.Kernel.System.Network.Address! targetIP, Cosmos.Kernel.HAL.Devices.MacAddress! arpTargetMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Arp.ArpRequestEthernet.ArpRequestEthernet(Cosmos.Kernel.HAL.Devices.Network.MacAddress! ourMac, Cosmos.Kernel.System.Network.Address! ourIP, Cosmos.Kernel.HAL.Devices.Network.MacAddress! targetMac, Cosmos.Kernel.System.Network.Address! targetIP, Cosmos.Kernel.HAL.Devices.Network.MacAddress! arpTargetMac) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsAnswer
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsAnswer.Address.get -> byte[]?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsAnswer.CanonicalName.get -> string?
@@ -1141,15 +1141,15 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.ReplyCode.Refused = 5 -> Cosmos.Kernel.System.Network.Protocols.Dns.ReplyCode
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.ReplyCode.ServerFailure = 2 -> Cosmos.Kernel.System.Network.Protocols.Dns.ReplyCode
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.DestinationMac.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.DestinationMac.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.EthernetPacket(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.EthernetType.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.RawData.get -> byte[]!
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.SourceMac.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.EthernetPacket.SourceMac.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.InternetPacket
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpDiscover
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpDiscover.DhcpDiscover(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpDiscover.DhcpDiscover(Cosmos.Kernel.HAL.Devices.MacAddress! sourceMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpDiscover.DhcpDiscover(Cosmos.Kernel.HAL.Devices.Network.MacAddress! sourceMac) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpOption
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpOption.Data.get -> byte[]!
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpOption.Data.init -> void
@@ -1160,8 +1160,8 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.Client.get -> Cosmos.Kernel.System.Network.Address?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(Cosmos.Kernel.HAL.Devices.MacAddress! sourceMac, ushort dhcpDataSize) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Devices.MacAddress! sourceMac, ushort dhcpDataSize) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(Cosmos.Kernel.HAL.Devices.Network.MacAddress! sourceMac, ushort dhcpDataSize) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DhcpPacket(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Devices.Network.MacAddress! sourceMac, ushort dhcpDataSize) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.DNS.get -> Cosmos.Kernel.System.Network.Address?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.Gateway.get -> Cosmos.Kernel.System.Network.Address?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.Operation.get -> byte
@@ -1169,10 +1169,10 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpPacket.Subnet.get -> Cosmos.Kernel.System.Network.Address?
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRelease
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRelease.DhcpRelease(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRelease.DhcpRelease(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Devices.MacAddress! source) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRelease.DhcpRelease(Cosmos.Kernel.System.Network.Address! client, Cosmos.Kernel.System.Network.Address! server, Cosmos.Kernel.HAL.Devices.Network.MacAddress! source) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRequest
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRequest.DhcpRequest(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRequest.DhcpRequest(Cosmos.Kernel.HAL.Devices.MacAddress! sourceMac, Cosmos.Kernel.System.Network.Address! requestedAddress) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp.DhcpRequest.DhcpRequest(Cosmos.Kernel.HAL.Devices.Network.MacAddress! sourceMac, Cosmos.Kernel.System.Network.Address! requestedAddress) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IcmpEchoReply
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IcmpEchoReply.IcmpEchoReply(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IcmpEchoReply.IcmpEchoReply(Cosmos.Kernel.System.Network.Protocols.IPv4.IcmpEchoRequest! request) -> void
@@ -1199,7 +1199,7 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPFlags.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPLength.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPPacket(byte[]! rawData) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPPacket(Cosmos.Kernel.HAL.Devices.MacAddress! srcMac, Cosmos.Kernel.HAL.Devices.MacAddress! destMac, ushort dataLength, byte protocol, Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, byte flags) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPPacket(Cosmos.Kernel.HAL.Devices.Network.MacAddress! srcMac, Cosmos.Kernel.HAL.Devices.Network.MacAddress! destMac, ushort dataLength, byte protocol, Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, byte flags) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.IPVersion.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.Protocol.get -> byte
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.IPv4.IPPacket.TTL.get -> byte
@@ -1250,9 +1250,9 @@ virtual Cosmos.Kernel.System.Kernel.Start() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpLength.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data, Cosmos.Kernel.HAL.Devices.MacAddress! destMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, byte[]! data, Cosmos.Kernel.HAL.Devices.Network.MacAddress! destMac) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength) -> void
-[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength, Cosmos.Kernel.HAL.Devices.MacAddress! destMac) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.UdpPacket(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, ushort srcPort, ushort destPort, ushort dataLength, Cosmos.Kernel.HAL.Devices.Network.MacAddress! destMac) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.VerifyChecksum() -> bool
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket.WriteChecksum() -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.UdpClient.ReceivePacket(int timeoutMs = 5000) -> Cosmos.Kernel.System.Network.Protocols.Udp.UdpPacket?

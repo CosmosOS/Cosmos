@@ -51,8 +51,8 @@ Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Flush(int x, int y,
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion?
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Is3DNegotiated.get -> bool
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.IsEnabled.get -> bool
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Mode.get -> Cosmos.Kernel.HAL.DriverKit.Display.DisplayMode
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Modes.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.Display.DisplayMode>
+Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Mode.get -> Cosmos.Kernel.HAL.Devices.Display.DisplayMode
+Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Modes.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.Devices.Display.DisplayMode>
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Name.get -> string!
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.NextCommand.get -> uint
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.NextCommand.set -> void
@@ -72,7 +72,7 @@ Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.InterruptCount.get -> int
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.IsPolling.get -> bool
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.LinkChanges.get -> int
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.LinkUp.get -> bool
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
+Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.MacAddress.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.Name.get -> string!
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
 Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciDriver
@@ -144,8 +144,8 @@ Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.LastLedAcknowledged
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.LastLedByte.get -> byte
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.LedWrites.get -> int
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.Name.get -> string!
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.SetLeds(Cosmos.Kernel.HAL.DriverKit.Input.KeyboardLeds leds) -> void
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.Sink.get -> Cosmos.Kernel.HAL.DriverKit.Input.KeyboardSink?
+Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.SetLeds(Cosmos.Kernel.HAL.Devices.Input.KeyboardLeds leds) -> void
+Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.Sink.get -> Cosmos.Kernel.HAL.Devices.Input.KeyboardSink?
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseDriver
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseDriver.Ps2MouseDriver() -> void
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState
@@ -155,7 +155,7 @@ Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.Name.get -> string!
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.PacketBytes.get -> int
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.PacketsReported.get -> int
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.ResyncDrops.get -> int
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.Sink.get -> Cosmos.Kernel.HAL.DriverKit.Input.PointerSink?
+Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.Sink.get -> Cosmos.Kernel.HAL.Devices.Input.PointerSink?
 Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver
 Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver.UsbHubDriver() -> void
 Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubState
@@ -173,8 +173,8 @@ Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.LastLedStatus.get -
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.LedWrites.get -> int
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.Name.get -> string!
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.ReportCount.get -> int
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.SetLeds(Cosmos.Kernel.HAL.DriverKit.Input.KeyboardLeds leds) -> void
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.Sink.get -> Cosmos.Kernel.HAL.DriverKit.Input.KeyboardSink?
+Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.SetLeds(Cosmos.Kernel.HAL.Devices.Input.KeyboardLeds leds) -> void
+Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.Sink.get -> Cosmos.Kernel.HAL.Devices.Input.KeyboardSink?
 Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver
 Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.UsbMassStorageDriver() -> void
 Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageState
@@ -206,7 +206,7 @@ Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Height.get -> int
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.InterruptCount.get -> int
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.IsFaulted.get -> bool
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.IsPolling.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Mode.get -> Cosmos.Kernel.HAL.DriverKit.Display.DisplayMode
+Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Mode.get -> Cosmos.Kernel.HAL.Devices.Display.DisplayMode
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Name.get -> string!
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.ScanoutCount.get -> int
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Version1Negotiated.get -> bool
@@ -220,7 +220,7 @@ Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.InterruptCount.g
 Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.IsMouse.get -> bool
 Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.IsPolling.get -> bool
 Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.Name.get -> string!
-Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.SetLeds(Cosmos.Kernel.HAL.DriverKit.Input.KeyboardLeds leds) -> void
+Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.SetLeds(Cosmos.Kernel.HAL.Devices.Input.KeyboardLeds leds) -> void
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetDriver
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetDriver.VirtioNetDriver() -> void
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState
@@ -233,7 +233,7 @@ Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.InterruptEntryCoun
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.IsPolling.get -> bool
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.LinkChanges.get -> int
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.LinkUp.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.MacAddress.get -> Cosmos.Kernel.HAL.Devices.MacAddress!
+Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.MacAddress.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.Name.get -> string!
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.Version1Negotiated.get -> bool

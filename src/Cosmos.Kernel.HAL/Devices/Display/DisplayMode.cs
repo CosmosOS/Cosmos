@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.HAL.DriverKit.Display;
+namespace Cosmos.Kernel.HAL.Devices.Display;
 
 /// <summary>A display's geometry, pixel format and refresh rate. A mode is not the display's identity: it changes when the canvas switches it.</summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]

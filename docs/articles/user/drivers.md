@@ -6,7 +6,7 @@ If you find bugs or something abnormal, please [submit an issue](https://github.
 
 ## Experimental status
 
-The driver kit is experimental: every public type under `Cosmos.Kernel.HAL.DriverKit` carries `[Experimental("COSMOS0003")]`. You can use them today, but they may change until they are promoted to the stable API. Referencing one is a build error until your project acknowledges it:
+The driver kit is experimental: every public type under `Cosmos.Kernel.HAL.DriverKit` and `Cosmos.Kernel.HAL.Devices`, but the stable `IBlockDevice` and `MacAddress`, carries `[Experimental("COSMOS0003")]`. You can use them today, but they may change until they are promoted to the stable API. Referencing one is a build error until your project acknowledges it:
 
 ```xml
 <PropertyGroup>
@@ -232,8 +232,8 @@ public sealed class SyntheticKeyboardDriver : Driver
 The state object is a plain class, not a `Driver`: there is one per device, and it implements the device contract, owns the handler, and holds every kit object the probe acquired:
 
 ```csharp
+using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Input;
 
 namespace MyOS.Drivers;
 
@@ -492,7 +492,7 @@ A device kind is a small interface the driver implements, plus a **sink** the ki
 | Block | `IBlockDevice` | `PublishBlockDevice` | nothing |
 | Display | `IDisplay` (`Name`, `Mode`, `Framebuffer`, `Flush`) | `PublishDisplay` | `DisplaySink.ModeChanged()` |
 
-The keyboard and pointer types are in `Cosmos.Kernel.HAL.DriverKit.Input`, the network ones in `Cosmos.Kernel.HAL.DriverKit.Network`, the display ones in `Cosmos.Kernel.HAL.DriverKit.Display`, and `IBlockDevice` in `Cosmos.Kernel.HAL.Devices`, beside `MacAddress`, the type `INetworkInterface.MacAddress` returns.
+Each kind's types are in its category's namespace under `Cosmos.Kernel.HAL.Devices`, the same categories as the drivers' folders: the keyboard and pointer types in `Cosmos.Kernel.HAL.Devices.Input`; the network ones in `Cosmos.Kernel.HAL.Devices.Network`, beside `MacAddress`, the type `INetworkInterface.MacAddress` returns; the display ones in `Cosmos.Kernel.HAL.Devices.Display`; and `IBlockDevice` in `Cosmos.Kernel.HAL.Devices.Storage`.
 
 The kernel's manager for that kind picks the device up as soon as it is published, and teardown withdraws it before releasing anything else. Sinks never allocate, and drop reports once the device is withdrawn.
 
