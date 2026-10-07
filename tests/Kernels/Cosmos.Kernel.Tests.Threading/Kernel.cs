@@ -58,8 +58,8 @@ public class Kernel : Sys.Kernel
 
     /// <summary>Turns each side of the Thread.Yield ping-pong takes.</summary>
     private const int PingPongRounds = 20;
-    /// <summary>Yields one side of the ping-pong spends waiting for its turn before it calls the exchange stalled; each lasts until the next interrupt.</summary>
-    private const int YieldRetries = 1000;
+    /// <summary>Scheduler ticks one side of the ping-pong waits for its turn before it calls the exchange stalled.</summary>
+    private const uint PingPongTurnTicks = 100;
 
     /// <summary>Polling interval (ms) while waiting on scheduler-test flags (worker holding, parked, woke, ...).</summary>
     private const int FlagPollIntervalMs = 50;
@@ -883,18 +883,12 @@ public class Kernel : Sys.Kernel
         SysThread worker = new(PingPongWorker);
         worker.Start();
 
-        bool anotherRan = false;
         int rounds = 0;
         for (; rounds < PingPongRounds; rounds++)
         {
             int handedTurn = (2 * rounds) + 1;
             s_pingPongTurn = handedTurn;
-            for (int i = 0; i < YieldRetries && s_pingPongTurn == handedTurn; i++)
-            {
-                anotherRan |= SysThread.Yield();
-            }
-
-            if (s_pingPongTurn == handedTurn)
+            if (!YieldUntilTurn(handedTurn + 1))
             {
                 break;
             }
@@ -904,19 +898,13 @@ public class Kernel : Sys.Kernel
         TimerManager.Wait(ExitGraceWaitMs);
 
         Assert.Equal(PingPongRounds, rounds, "two threads waiting on each other through Thread.Yield must finish every round");
-        Assert.True(anotherRan, "Thread.Yield must report that the worker ran");
     }
 
     private static void PingPongWorker()
     {
         for (int turn = 1; turn < 2 * PingPongRounds; turn += 2)
         {
-            for (int i = 0; i < YieldRetries && s_pingPongTurn != turn && !s_pingPongStop; i++)
-            {
-                SysThread.Yield();
-            }
-
-            if (s_pingPongTurn != turn)
+            if (!YieldUntilTurn(turn))
             {
                 return;
             }
@@ -926,9 +914,26 @@ public class Kernel : Sys.Kernel
     }
 
     /// <summary>
-    /// With interrupts masked no interrupt exit can run the switch a yield
-    /// asks for, so Thread.Yield must return at once, reporting no switch,
-    /// rather than halt a CPU that takes no interrupt.
+    /// Yields until the ping-pong turn reads <paramref name="turn"/>, for at
+    /// most <see cref="PingPongTurnTicks"/> scheduler ticks: a yield returns
+    /// before the switch it asks for, so only the tick count measures how
+    /// long the other side had.
+    /// </summary>
+    private static bool YieldUntilTurn(int turn)
+    {
+        uint since = SchedulerManager.TickCount;
+        while (s_pingPongTurn != turn && !s_pingPongStop && SchedulerManager.TickCount - since < PingPongTurnTicks)
+        {
+            SysThread.Yield();
+        }
+
+        return s_pingPongTurn == turn;
+    }
+
+    /// <summary>
+    /// A yield asks for a switch and returns before it, so with interrupts
+    /// masked, where no interrupt exit comes to switch, it must still return,
+    /// reporting that no other thread ran.
     /// </summary>
     private static void TestThreadYieldInterruptsMasked()
     {

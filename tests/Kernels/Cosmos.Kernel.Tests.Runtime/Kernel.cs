@@ -142,7 +142,7 @@
 // │ RhpStackProbe                                     │ Std │  0 │   0 │ stub │   1   │  —   │  50  │
 // │ RhSetThreadExitCallback                           │ Std │  1 │   0 │ real │   1   │  33  │  50  │
 // │ RhSpinWait                                        │ Std │  1 │   0 │ real │   1   │  33  │  50  │
-// │ RhYield                                           │ Std │  0 │   1 │ real │   1   │  —   │  50  │
+// │ RhYield                                           │ Std │  0 │   1 │ real │   1   │  —   │ 100  │
 // │ NativeRuntimeEventSource_LogContentionLockCreated │ Std │  4 │   0 │ stub │   *   │  33  │  50  │
 // │ NativeRuntimeEventSource_LogContentionStart       │ Std │  5 │   0 │ stub │   *   │  33  │  50  │
 // │ NativeRuntimeEventSource_LogContentionStop        │ Std │  5 │   0 │ stub │   *   │  33  │  50  │
@@ -1429,8 +1429,8 @@ public unsafe class Kernel : Sys.Kernel
     // -- RhYield --
     private static void Test_RhYield_InterruptsMasked_ReturnsZero()
     {
-        // No interrupt exit can run the switch a yield asks for while
-        // interrupts are masked, so RhYield must return at once, not halt.
+        // RhYield returns before the switch it asks for, so it must return
+        // even with interrupts masked, where no interrupt exit comes.
         int result;
         using (InternalCpu.DisableInterruptsScope())
         {

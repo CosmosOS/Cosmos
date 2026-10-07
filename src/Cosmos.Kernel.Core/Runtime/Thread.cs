@@ -89,20 +89,16 @@ internal class Thread
     }
 
     /// <summary>
-    /// Backs <c>Thread.Yield</c>, and through it CoreLib's spin waits: gives
-    /// up the CPU until the next interrupt exit has switched.
+    /// Backs <c>Thread.Yield</c>, and through it CoreLib's spin waits: asks
+    /// the next interrupt exit to switch, and returns before it does.
     /// </summary>
-    /// <returns>Nonzero when another thread ran meanwhile, as upstream's.</returns>
+    /// <returns>0: no other thread has run yet when it returns.</returns>
     [RuntimeExport("RhYield")]
     internal static int RhYield()
     {
-        if (CosmosFeatures.SchedulerEnabled)
+        if (CosmosFeatures.SchedulerEnabled && SchedulerManager.CurrentCpuState is not null)
         {
-            SchedulerThread? thread = SchedulerManager.CurrentCpuState?.CurrentThread;
-            if (thread is not null && SchedulerManager.YieldThread(SchedulerManager.GetCurrentCpuId(), thread))
-            {
-                return 1;
-            }
+            SchedulerManager.YieldThread(SchedulerManager.GetCurrentCpuId());
         }
 
         return 0;

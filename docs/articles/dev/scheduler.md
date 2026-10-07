@@ -107,13 +107,13 @@ stateDiagram-v2
 | `BlockThread` | `Blocked` | `OnThreadBlocked` | sets `_needReschedule` |
 | `MarkSleeping` | `Sleeping`, after computing `WakeupTime` | `OnThreadBlocked` | no halt; the caller parks itself (see [the park protocol](#the-park-protocol)) |
 | `Sleep` | via `MarkSleeping` | | then halts once, only if still `Sleeping` |
-| `YieldThread` | none | none; the switch it asks for calls `OnThreadYield` | sets `_needReschedule` and halts until an interrupt exit ran it; does nothing while the scheduler is not running, before its first tick, or with interrupts masked |
+| `YieldThread` | none | none; the switch it asks for calls `OnThreadYield` | sets `_needReschedule` and returns before the switch |
 | `ExitThread` | `Dead` | `OnThreadExit` | runs the exit callback, returns the TLAB to the GC, clears the registry slot |
 
 Three details are deliberate:
 
 - A `Created` thread keeps that state even after `ReadyThread` queues it. `ScheduleFromInterrupt` uses `State == Created` to detect a first run, which needs the special exit path described below.
-- `ReadyThread`, `BlockThread` and `YieldThread` set `_needReschedule` so the next interrupt exit reschedules immediately. Without it, a thread woken by a device interrupt would sit in the run queue for up to a full quantum, a thread that just blocked would spin in its halt loop for the rest of its quantum, and a yield would switch only once the quantum ran out.
+- `ReadyThread`, `BlockThread` and `YieldThread` set `_needReschedule` so the next interrupt exit reschedules immediately. Without it, a thread woken by a device interrupt would sit in the run queue for up to a full quantum, a thread that just blocked would spin in its halt loop for the rest of its quantum, and a yielding thread would keep the CPU until its quantum ran out.
 - `WakeupTime` is stored in `Stopwatch` ticks, not nanoseconds. The tick check compares against `Stopwatch.GetTimestamp()`, and converting through nanoseconds distorted timeouts by 16x on ARM64's 62.5 MHz timer.
 
 ### Creation and first run
@@ -191,7 +191,7 @@ Device interrupt handlers wake threads too: the NVMe driver's message interrupt 
 
 ### What there is not: a voluntary switch
 
-`SchedulerManager.Schedule` and `ContextSwitch.Switch` exist in the tree but have no callers, and neither can complete a synchronous switch: they only *stage* a target stack pointer, the staged switch is consumed on an interrupt exit, and a voluntary caller has no interrupt-saved register frame for that exit to restore (`Schedule`'s helper does not even save the outgoing stack pointer). The one voluntary-yield entry that works, the runtime's `RhYield` behind `Thread.Yield`, borrows the interrupt path instead: `YieldThread` sets `_needReschedule` and halts until a hardware interrupt exit has run it, so the switch happens on the next interrupt, at most a tick away. That switch picks the replacement first and re-queues the yielding thread through `OnThreadYield` afterwards, exactly as a preemption does, so the thread is never queued while it still runs, and any other queued thread runs before it gets the CPU back. While the scheduler is not running, before its first tick, or with interrupts masked, no exit may ever run the request, so `YieldThread` returns at once and `Thread.Yield` reports that nothing else ran. A true synchronous switch would need its own save path (the equivalent of the IRQ stub's, entered from a call instead of an interrupt), which does not exist yet.
+`SchedulerManager.Schedule` and `ContextSwitch.Switch` exist in the tree but have no callers, and neither can complete a synchronous switch: they only *stage* a target stack pointer, the staged switch is consumed on an interrupt exit, and a voluntary caller has no interrupt-saved register frame for that exit to restore (`Schedule`'s helper does not even save the outgoing stack pointer). The one voluntary-yield entry that works, the runtime's `RhYield` behind `Thread.Yield`, borrows the interrupt path instead: `YieldThread` sets `_needReschedule`, so the next hardware interrupt exit switches even when the quantum has not run out, and returns at once. That switch picks the replacement first and re-queues the yielding thread through `OnThreadYield` afterwards, exactly as a preemption does, so the thread is never queued while it still runs. The caller does not wait for the switch, and `Thread.Yield` always reports that no other thread ran: waiting would cost every call up to a tick, while CoreLib calls `Thread.Yield` once per spin of its spin-then-block loops (on one CPU, an idle thread pool worker spins 70 times before it parks, and `Thread.Start` spins until the new thread reports started). Halting until the switch made those loops last 70 ticks. A true synchronous switch would need its own save path (the equivalent of the IRQ stub's, entered from a call instead of an interrupt), which does not exist yet.
 
 ---
 
@@ -335,7 +335,7 @@ The runtime and CoreLib see the scheduler through exports in [`Runtime/Thread.cs
 | `RhGetThreadStaticStorage` | Ref to the current thread's `[ThreadStatic]` backing store (a static spine when the switch is off) |
 | `RhGetDefaultStackSize` | `SchedulerThread.DefaultStackSize`, 256 KiB |
 | `RhSetThreadExitCallback` | Stores the callback `ExitThread` invokes; CoreLib uses it for managed thread cleanup |
-| `RhYield` | Backs `Thread.Yield`: gives up the CPU through `YieldThread` and returns nonzero when another thread ran meanwhile; see [What there is not](#what-there-is-not-a-voluntary-switch) |
+| `RhYield` | Backs `Thread.Yield`: asks for a switch at the next interrupt exit through `YieldThread` and returns 0 before it; see [What there is not](#what-there-is-not-a-voluntary-switch) |
 | `RhSpinWait` | A counted empty loop |
 | `RhGetThreadEntryPointAddress`, `RhSetCurrentThreadName` | Stubs: zero, and a serial log |
 

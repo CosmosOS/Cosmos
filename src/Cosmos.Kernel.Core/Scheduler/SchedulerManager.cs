@@ -730,41 +730,21 @@ public static class SchedulerManager
     }
 
     /// <summary>
-    /// Gives up the CPU: asks the next interrupt exit to switch, the request
-    /// <see cref="BlockThread"/> makes, and halts until that exit ran it. The
-    /// switch re-queues the thread through <see cref="IScheduler.OnThreadYield"/>
-    /// after the policy picked another, as a preemption does, so the thread
-    /// is never queued while it still runs. Nothing switches outside an
-    /// interrupt exit, so the thread waits for the next interrupt, at most a
-    /// tick. Does nothing while the scheduler is not running, before its
-    /// first tick, or with interrupts masked: no exit may ever run the
-    /// request then.
+    /// Gives up the CPU at the next interrupt exit: sets the request
+    /// <see cref="BlockThread"/> makes, so that exit switches even when the
+    /// quantum has not run out. The switch re-queues the thread through
+    /// <see cref="IScheduler.OnThreadYield"/> after the policy picked another,
+    /// as a preemption does. Returns at once: nothing switches outside an
+    /// interrupt exit, and waiting for one would cost every call up to a
+    /// tick, while CoreLib's spin-then-block loops call Thread.Yield once per
+    /// spin (70 times before an idle thread pool worker parks on one CPU).
     /// </summary>
-    /// <param name="cpuId">CPU ID of the thread.</param>
-    /// <param name="thread">The thread running on that CPU.</param>
-    /// <returns>True when another thread ran before this one got the CPU back.</returns>
-    internal static bool YieldThread(uint cpuId, SchedulerThread thread)
+    /// <param name="cpuId">CPU ID of the calling thread.</param>
+    internal static void YieldThread(uint cpuId)
     {
         ThrowIfCpuStateNotInitialized();
 
-        if (!s_enabled || s_tickPeriodNs == 0 || !InternalCpu.AreInterruptsEnabled())
-        {
-            return false;
-        }
-
-        PerCpuState state = s_cpuStates[cpuId];
-        ulong scheduledAt = thread.LastScheduledAt;
-        Volatile.Write(ref state._needReschedule, true);
-
-        // Every hardware interrupt exit clears the request and runs it, and a
-        // thread switched away resumes only through such an exit, so the
-        // request still set means no interrupt came yet.
-        while (Volatile.Read(ref state._needReschedule))
-        {
-            InternalCpu.Halt();
-        }
-
-        return thread.LastScheduledAt != scheduledAt;
+        Volatile.Write(ref s_cpuStates[cpuId]._needReschedule, true);
     }
 
     /// <summary>
