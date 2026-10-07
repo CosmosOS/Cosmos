@@ -8,6 +8,8 @@
   href: network.md
 - name: Timers and Alarms
   href: timers.md
+- name: Random Numbers
+  href: random.md
 - name: Graphics
   href: graphics.md
 - name: Keyboard
