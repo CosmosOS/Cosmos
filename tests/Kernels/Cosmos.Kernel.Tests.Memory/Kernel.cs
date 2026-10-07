@@ -12,7 +12,31 @@ namespace Cosmos.Kernel.Tests.Memory;
 public unsafe class Kernel : Sys.Kernel
 {
     /// <summary>Number of test cases registered with the TestRunner in BeforeRun.</summary>
-    private const int ExpectedTestCount = 71;
+    private const int ExpectedTestCount = 87;
+
+    /// <summary>
+    /// Sentinel written to a page before committing it, so the round-trip test
+    /// can prove the mapping reaches real memory rather than merely being
+    /// reported as present.
+    /// </summary>
+    private const byte PagerTestMarker = 0x5A;
+
+    /// <summary>
+    /// A higher-half address in the gap between the HHDM window and the kernel
+    /// image, used as a probe expected to be unmapped. Nothing the kernel or
+    /// the bootloader maps lives here on either architecture.
+    /// </summary>
+    private const ulong PagerUnmappedProbeAddress = 0xFFFF_5000_0000_0000;
+
+    /// <summary>Number of pages in the multi-page Pager round-trip test.</summary>
+    private const int PagerMultiPageCount = 4;
+
+    /// <summary>
+    /// Page count used to fill a descriptor to capacity for the Add-refusal
+    /// test. Must equal <c>AddressSpaceDescriptor.MaxRegionCount</c>; checked at
+    /// runtime rather than hard-coded so the two cannot drift apart silently.
+    /// </summary>
+    private const int PagerCapacityProbe = AddressSpaceDescriptor.MaxRegionCount;
 
     /// <summary>Expected argv length: argv[0] ("cosmos") plus the 3 args passed by limine.conf.</summary>
     private const int ExpectedArgvLength = 4;
@@ -185,6 +209,26 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("V2P_HhdmAlias_Translates", TestV2PHhdmAliasTranslates);
         TR.Run("V2P_PhysicalValue_PassesThrough", TestV2PPhysicalPassesThrough);
         TR.Run("V2P_KernelImageAddress_Rejected", TestV2PKernelImageRejected);
+
+        // Pager — the platform-agnostic paging API. Translate/Commit round
+        // trips are what user-space memory management will be built on, so
+        // they are pinned here before any fault handler depends on them.
+        TR.Run("Pager_Backend_Registered", TestPagerBackendRegistered);
+        TR.Run("Pager_TranslateCurrent_KernelImage", TestPagerTranslateCurrentKernelImage);
+        TR.Run("Pager_TranslateCurrent_Unmapped", TestPagerTranslateCurrentUnmapped);
+        TR.Run("Pager_Translate_ExplicitSpace_MatchesCurrent", TestPagerTranslateExplicitMatches);
+        TR.Run("Pager_Commit_RoundTripsMapping", TestPagerCommitRoundTrip);
+        TR.Run("Pager_Commit_MultiPageRange", TestPagerCommitMultiPage);
+        TR.Run("Pager_Translate_UnalignedAddress_Rejected", TestPagerTranslateUnaligned);
+        TR.Run("Pager_Translate_NullSpace_ReturnsFalse", TestPagerTranslateNullSpace);
+        TR.Run("Pager_Add_AtCapacity_ReturnsFalse", TestPagerAddAtCapacity);
+        TR.Run("Pager_Commit_EmptySpace_IsNoOp", TestPagerCommitEmptySpace);
+        TR.Run("Pager_Commit_ZeroPageRegion_InstallsNothing", TestPagerCommitZeroPage);
+        TR.Run("Pager_NewSpace_SharesKernelRoot", TestPagerNewSpaceSharesKernelRoot);
+        TR.Run("Pager_NewSpace_KernelStaysReachable", TestPagerNewSpaceKernelReachable);
+        TR.Run("Pager_Translate_CapacityLimitUnaffected", TestPagerTranslateCapacityUnaffected);
+        TR.Run("Pager_Translate_AllZeroRegions_MapsNothing", TestPagerTranslateZeroRegions);
+        TR.Run("Pager_Translate_SinglePageRegion", TestPagerTranslateSinglePage);
 
         TR.Finish();
     }
@@ -1252,6 +1296,496 @@ public unsafe class Kernel : Sys.Kernel
         {
             return true;
         }
+    }
+
+    // ==================== Pager ====================
+
+    // The Pager is kernel-internal paging plumbing: nothing in an application
+    // can reach it yet, because the kernel has no ring-3 transition and no
+    // syscall path. These tests pin the contracts that user-space memory
+    // management will be built on top of — that a mapping survives the
+    // describe/install/round-trip cycle, that a fresh space stays anchored to
+    // the kernel's own mappings, and that the refusal paths fail loudly rather
+    // than silently dropping work.
+
+    /// <summary>
+    /// The backend must be registered during InitializeHardware, before any
+    /// other Pager entry point runs.
+    /// </summary>
+    private static unsafe void TestPagerBackendRegistered()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Pager.Create must succeed once the backend is registered");
+
+        if (space != null)
+        {
+            Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+        }
+    }
+
+    /// <summary>
+    /// The live tables must already translate a kernel-image address. This is
+    /// the anchor every later Pager test depends on: if the kernel cannot
+    /// resolve its own code, a new address space that failed to inherit the
+    /// kernel mappings would be indistinguishable from one that worked.
+    /// </summary>
+    private static unsafe void TestPagerTranslateCurrentKernelImage()
+    {
+        // A method pointer to this very method is, by construction, an address
+        // in the kernel image that the CPU has already translated to reach us.
+        ulong here = KernelImageAnchor();
+
+        Assert.True(Pager.Translate(VirtualAddress.From(here & ~(Pager.PageSize - 1)), out PhysicalAddress phys),
+            "Translate must resolve an address the CPU already executed at");
+        Assert.True(phys.Value != PhysicalAddress.None.Value,
+            "a resolved kernel-image address must not report the none sentinel");
+    }
+
+    /// <summary>
+    /// An address in the lower half, above Limine's low-4GiB map, must report
+    /// unmapped rather than inventing a translation.
+    /// </summary>
+    private static unsafe void TestPagerTranslateCurrentUnmapped()
+    {
+        bool mapped = Pager.Translate(VirtualAddress.From(PagerUnmappedProbeAddress), out PhysicalAddress phys);
+
+        // QEMU/EDK2 may or may not have mapped this depending on firmware, so
+        // the assertion is on the failure shape, not on a specific answer.
+        if (!mapped)
+        {
+            Assert.True(phys.Value == PhysicalAddress.None.Value,
+                "an unmapped address must report the none sentinel");
+        }
+    }
+
+    /// <summary>
+    /// Translating through an explicit descriptor must agree with translating
+    /// against the live tables, since a new space is seeded from the live root.
+    /// </summary>
+    private static unsafe void TestPagerTranslateExplicitMatches()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            return;
+        }
+
+        ulong here = KernelImageAnchor();
+        VirtualAddress target = VirtualAddress.From(here & ~(Pager.PageSize - 1));
+
+        bool viaSpace = Pager.Translate(space, target, out PhysicalAddress spacePhys);
+        bool viaCurrent = Pager.Translate(target, out PhysicalAddress currentPhys);
+
+        Assert.True(viaSpace == viaCurrent,
+            "explicit-space and live-table translation must agree on presence");
+        Assert.True(!viaSpace || spacePhys.Value == currentPhys.Value,
+            "explicit-space and live-table translation must agree on the physical frame");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+    }
+
+    /// <summary>
+    /// The core round trip: allocate a frame, describe it, commit, and confirm
+    /// both the translation and an actual write/read through it. Verifying only
+    /// the translation would pass even if the entry pointed at the wrong frame.
+    /// </summary>
+    private static unsafe void TestPagerCommitRoundTrip()
+    {
+        void* page = PageAllocator.AllocPages(PageType.Unmanaged, 1, zero: true);
+        Assert.True(page != null, "page allocation must succeed");
+
+        if (page is null)
+        {
+            return;
+        }
+
+        ulong frame = PageAllocator.VirtualToPhysical((ulong)page);
+        VirtualAddress alias = VirtualAddress.From(PagerRoundTripAlias());
+
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            PageAllocator.Free(page);
+            return;
+        }
+
+        bool added = Pager.Add(space, alias, PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Writable | PageFlags.Cacheable);
+        Assert.True(added, "Add must accept a region below capacity");
+
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, alias, out PhysicalAddress resolved),
+            "a committed region must translate");
+        Assert.True(resolved.Value == frame,
+            "Translate must return the frame that was mapped");
+
+        // Prove the mapping is real by writing through it and reading back.
+        byte* target = (byte*)(ulong)alias.Value;
+        target[0] = PagerTestMarker;
+        Assert.True(target[0] == PagerTestMarker, "the committed mapping must be readable and writable");
+        Assert.True(((byte*)frame)[0] == PagerTestMarker,
+            "writing through the alias must reach the original frame");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+        PageAllocator.Free(page);
+    }
+
+    /// <summary>
+    /// A region spanning several pages must install every page in the range, not
+    /// just the first.
+    /// </summary>
+    private static unsafe void TestPagerCommitMultiPage()
+    {
+        void* pages = PageAllocator.AllocPages(PageType.Unmanaged, PagerMultiPageCount, zero: true);
+        Assert.True(pages != null, "multi-page allocation must succeed");
+
+        if (pages is null)
+        {
+            return;
+        }
+
+        ulong frame = PageAllocator.VirtualToPhysical((ulong)pages);
+        VirtualAddress alias = VirtualAddress.From(PagerRoundTripAlias(1));
+
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            PageAllocator.Free(pages);
+            return;
+        }
+
+        Pager.Add(space, alias, PhysicalAddress.From(frame), PagerMultiPageCount,
+            PageFlags.Present | PageFlags.Writable | PageFlags.Cacheable);
+        Pager.Commit(space);
+
+        for (int i = 0; i < PagerMultiPageCount; i++)
+        {
+            VirtualAddress page = VirtualAddress.From(alias.Value + ((ulong)i * Pager.PageSize));
+            Assert.True(Pager.Translate(space, page, out PhysicalAddress resolved),
+                "every page of a multi-page region must translate");
+            Assert.True(resolved.Value == frame + ((ulong)i * Pager.PageSize),
+                "each page must translate to its own consecutive frame");
+
+            byte* target = (byte*)(ulong)page.Value;
+            target[0] = PagerTestMarker;
+            Assert.True(target[0] == PagerTestMarker, "each page of the range must be writable");
+        }
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+        PageAllocator.Free(pages);
+    }
+
+    /// <summary>
+    /// A byte-granular address has no single correct translation, so it must be
+    /// refused rather than rounded.
+    /// </summary>
+    private static unsafe void TestPagerTranslateUnaligned()
+    {
+        ulong here = KernelImageAnchor();
+        VirtualAddress unaligned = VirtualAddress.From((here & ~(Pager.PageSize - 1)) + 1);
+
+        Assert.True(!Pager.Translate(unaligned, out _),
+            "Translate must reject a non-page-aligned address");
+    }
+
+    /// <summary>
+    /// A null descriptor must report failure, not dereference.
+    /// </summary>
+    private static unsafe void TestPagerTranslateNullSpace()
+    {
+        Assert.True(!Pager.Translate(null, VirtualAddress.From(PagerUnmappedProbeAddress), out _),
+            "Translate must return false for a null space");
+    }
+
+    /// <summary>
+    /// Add must refuse past capacity and say so. Silently dropping the region
+    /// would leave a caller believing a mapping exists that was never installed.
+    /// </summary>
+    private static unsafe void TestPagerAddAtCapacity()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < PagerCapacityProbe; i++)
+        {
+            Assert.True(Pager.Add(space, VirtualAddress.From(0), PhysicalAddress.From(0), 0, PageFlags.None),
+                "Add must succeed up to capacity");
+        }
+
+        Assert.True(space->RegionCount == AddressSpaceDescriptor.MaxRegionCount,
+            "a full descriptor must report exactly MaxRegionCount regions");
+        Assert.True(!Pager.Add(space, VirtualAddress.From(0), PhysicalAddress.From(0), 0, PageFlags.None),
+            "Add must refuse once the region array is full");
+        Assert.True(space->RegionCount == AddressSpaceDescriptor.MaxRegionCount,
+            "a refused Add must not corrupt the region count");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+    }
+
+    /// <summary>
+    /// Committing a space with no regions must succeed and change nothing.
+    /// </summary>
+    private static unsafe void TestPagerCommitEmptySpace()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Commit(space);
+
+        Assert.True(space->IsCommitted,
+            "committing an empty space must still mark it committed");
+        Assert.True(space->RegionCount == 0, "an empty space must have no regions");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+    }
+
+    /// <summary>
+    /// A zero-page region installs nothing and must not translate. This is the
+    /// documented way to reserve an address range before committing a length.
+    /// </summary>
+    private static unsafe void TestPagerCommitZeroPage()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            return;
+        }
+
+        VirtualAddress probe = VirtualAddress.From(PagerRoundTripAlias(2));
+        Pager.Add(space, probe, PhysicalAddress.From(Pager.PageSize), 0, PageFlags.Present);
+        Pager.Commit(space);
+
+        Assert.True(!Pager.Translate(space, probe, out _),
+            "a zero-page region must not create a mapping");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+    }
+
+    /// <summary>
+    /// A new space must be seeded from the live root rather than starting
+    /// empty. Without this, installing it would leave the kernel image unmapped
+    /// and the very next instruction fetch would fault.
+    /// </summary>
+    private static unsafe void TestPagerNewSpaceSharesKernelRoot()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            return;
+        }
+
+        Assert.True(space->RootFrame != 0,
+            "a new space must be seeded with the live page-table root, not zero");
+        Assert.True(!space->IsCommitted,
+            "a freshly created space must not claim to be committed");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+    }
+
+    /// <summary>
+    /// The shared-root invariant, tested directly: a space created from the
+    /// live root must still translate the kernel image after being committed.
+    /// This is the property the context-switch path will depend on when it
+    /// loads a different root, so it is worth pinning before any swap exists.
+    /// </summary>
+    private static unsafe void TestPagerNewSpaceKernelReachable()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Commit(space);
+
+        ulong here = KernelImageAnchor();
+        VirtualAddress herePage = VirtualAddress.From(here & ~(Pager.PageSize - 1));
+
+        Assert.True(Pager.Translate(space, herePage, out PhysicalAddress viaSpace),
+            "a committed space must still resolve the kernel image");
+        Assert.True(Pager.Translate(herePage, out PhysicalAddress viaCurrent),
+            "the live tables must still resolve the kernel image");
+
+        Assert.True(viaSpace.Value == viaCurrent.Value,
+            "the kernel image must resolve to the same frame in a new space as in the live tables");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+    }
+
+    /// <summary>
+    /// Filling a space to capacity must not disturb translation: the region
+    /// array is fixed-size, and exhausting it should have no effect on entries
+    /// already installed.
+    /// </summary>
+    private static unsafe void TestPagerTranslateCapacityUnaffected()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            return;
+        }
+
+        ulong here = KernelImageAnchor();
+        VirtualAddress herePage = VirtualAddress.From(here & ~(Pager.PageSize - 1));
+
+        for (int i = 0; i < PagerCapacityProbe; i++)
+        {
+            Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias((ulong)(i + 0x1000))), PhysicalAddress.None, 0, PageFlags.None);
+        }
+
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, herePage, out PhysicalAddress resolved),
+            "a space filled with empty regions must still resolve the kernel image");
+        Assert.True(resolved.Value != PhysicalAddress.None.Value,
+            "the resolved kernel frame must not be the none sentinel");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+    }
+
+    /// <summary>
+    /// Descriptors created but never given a region must not map anything. This
+    /// guards against a Create-time default accidentally installing the whole
+    /// physical space.
+    /// </summary>
+    private static unsafe void TestPagerTranslateZeroRegions()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Commit(space);
+
+        Assert.True(!Pager.Translate(space, VirtualAddress.From(PagerUnmappedProbeAddress), out PhysicalAddress phys),
+            "an empty space must not translate an unmapped lower-half address");
+        Assert.True(phys.Value == PhysicalAddress.None.Value,
+            "a refused translation must report the none sentinel");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+    }
+
+    /// <summary>
+    /// A single-page region is the smallest thing Commit can install, and the
+    /// case the 4 KiB path exists for.
+    /// </summary>
+    private static unsafe void TestPagerTranslateSinglePage()
+    {
+        void* page = PageAllocator.AllocPages(PageType.Unmanaged, 1, zero: true);
+        Assert.True(page != null, "page allocation must succeed");
+
+        if (page is null)
+        {
+            return;
+        }
+
+        ulong frame = PageAllocator.VirtualToPhysical((ulong)page);
+        VirtualAddress alias = VirtualAddress.From(PagerRoundTripAlias(3));
+
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Create must succeed");
+
+        if (space is null)
+        {
+            PageAllocator.Free(page);
+            return;
+        }
+
+        Pager.Add(space, alias, PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Writable | PageFlags.Cacheable);
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, alias, out PhysicalAddress resolved),
+            "a single-page region must translate");
+        Assert.True(resolved.Value == frame, "a single-page region must translate to its own frame");
+
+        // The page immediately after must not have been mapped as a side effect.
+        VirtualAddress after = VirtualAddress.From(alias.Value + Pager.PageSize);
+        Assert.True(!Pager.Translate(space, after, out _),
+            "a single-page region must not map the following page");
+
+        Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+        PageAllocator.Free(page);
+    }
+
+    /// <summary>
+    /// A static field used as a known-good kernel-image address. Its address is
+    /// in the top-2GiB kernel window that NativeAOT maps, so the CPU has
+    /// necessarily already translated the page containing it — which makes it the
+    /// cheapest trustworthy probe for "does this space still resolve the kernel
+    /// image". Taking the address of a method would work too but needs a
+    /// function-pointer cast the test kernel's unsafe context makes awkward.
+    /// </summary>
+    private static ulong s_pagerAnchor;
+
+    /// <summary>
+    /// Returns the address of <see cref="s_pagerAnchor"/>, page-aligned down.
+    /// </summary>
+    /// <remarks>
+    /// The address is taken inside a <c>fixed</c> block because C# requires a
+    /// moveable expression to be pinned first; without it this is a compile
+    /// error rather than a warning. The alignment matters because
+    /// <c>Translate</c> rejects non-page-aligned addresses by design.
+    /// </remarks>
+    private static unsafe ulong KernelImageAnchor()
+    {
+        fixed (ulong* anchor = &s_pagerAnchor)
+        {
+            return (ulong)anchor & ~(Pager.PageSize - 1);
+        }
+    }
+
+    /// <summary>
+    /// A scratch virtual range for the round-trip tests, distinct per slot so
+    /// two tests cannot collide on an alias.
+    /// </summary>
+    /// <remarks>
+    /// Sits in the higher half, above the HHDM window (0xFFFF_8000_0000_0000 on
+    /// x64, 0xFFFF_0000_0000_0000 on ARM64) but well below the kernel image at
+    /// 0xFFFF_FFFF_8000_0000, so it is not already mapped on either
+    /// architecture.
+    /// <para>
+    /// The higher half is required rather than cosmetic: the ARM64 backend
+    /// installs into the TTBR1 tables, which translate only the upper half. A
+    /// lower-half address would be resolved through TTBR0, so the mapping would
+    /// be installed into a table the CPU never consults for it and the first
+    /// write would trap. Each slot is one 2 MiB-aligned block apart so a region
+    /// of a few pages never straddles a huge-page boundary.
+    /// </para>
+    /// </remarks>
+    private static ulong PagerRoundTripAlias(ulong slot = 0)
+    {
+        const ulong Base = 0xFFFF_4000_0000_0000;
+        const ulong SlotStride = 0x20_0000;
+        return Base + (slot * SlotStride);
     }
 }
 

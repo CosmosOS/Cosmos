@@ -4,9 +4,11 @@ using Cosmos.Build.API.Enum;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.ARM64.Cpu;
 using Cosmos.Kernel.Core.ARM64.IO;
+using Cosmos.Kernel.Core.ARM64.Memory;
 using Cosmos.Kernel.Core.ARM64.Power;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Power;
 using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
 using Cosmos.Kernel.HAL.ARM64.Devices.Timer;
@@ -101,6 +103,14 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
 
     public void InitializeHardware()
     {
+        // Register the paging backend before any driver asks for a mapping:
+        // Pager.Create seeds a descriptor from the live TTBR1, so it has to be
+        // available from the first use rather than lazily. This also
+        // replaces the DeviceMapper call below as the mapping path, but
+        // DeviceMapper stays for the existing EnsureMapped callers.
+        Serial.WriteString("[ARM64HAL] Registering pager backend...\n");
+        Pager.RegisterBackend(new Arm64PagerBackend());
+
         // Initialize Generic Timer
         Serial.WriteString("[ARM64HAL] Initializing Generic Timer...\n");
         _timer = new GenericTimer();
