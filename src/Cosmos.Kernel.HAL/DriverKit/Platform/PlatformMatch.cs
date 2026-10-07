@@ -13,13 +13,13 @@ public sealed class PlatformMatch : DeviceMatch
 {
     private readonly string? _compatible;
 
+    /// <inheritdoc/>
+    public override int Specificity => _compatible is null ? 0 : 1;
+
     private PlatformMatch(string? compatible)
     {
         _compatible = compatible;
     }
-
-    /// <inheritdoc/>
-    public override int Specificity => _compatible is null ? 0 : 1;
 
     /// <summary>Matches every platform device whose <see cref="PlatformIdentity.Compatible"/> contains <paramref name="value"/>, compared ordinally.</summary>
     /// <param name="value">The compatible string.</param>
@@ -31,9 +31,14 @@ public sealed class PlatformMatch : DeviceMatch
     }
 
     /// <summary>Matches every platform device.</summary>
-    public static PlatformMatch Any() => new(null);
+    public static PlatformMatch Any()
+    {
+        return new(null);
+    }
 
     /// <inheritdoc/>
-    public override bool Matches(DeviceIdentity identity) =>
-        identity is PlatformIdentity platform && (_compatible is null || platform.IsCompatible(_compatible));
+    public override bool Matches(DeviceIdentity identity)
+    {
+        return identity is PlatformIdentity platform && (_compatible is null || platform.IsCompatible(_compatible));
+    }
 }

@@ -17,6 +17,15 @@ public sealed class PlatformIdentity : DeviceIdentity
 {
     private readonly string[] _compatible;
 
+    /// <summary>The strings drivers match on, most specific first; compared ordinally.</summary>
+    public IReadOnlyList<string> Compatible => _compatible;
+
+    /// <inheritdoc/>
+    public override string BusName => "platform";
+
+    /// <inheritdoc/>
+    public override string Address { get; }
+
     /// <summary>Creates the identity; the strings are copied.</summary>
     /// <param name="address">The node's "name@hex" address, such as <c>pci@cf8</c>.</param>
     /// <param name="compatible">The compatible strings, at least one, most specific first.</param>
@@ -46,15 +55,6 @@ public sealed class PlatformIdentity : DeviceIdentity
         _compatible = copy;
     }
 
-    /// <summary>The strings drivers match on, most specific first; compared ordinally.</summary>
-    public IReadOnlyList<string> Compatible => _compatible;
-
-    /// <inheritdoc/>
-    public override string BusName => "platform";
-
-    /// <inheritdoc/>
-    public override string Address { get; }
-
     /// <summary>True when <paramref name="value"/> is one of the compatible strings, compared ordinally; for <see cref="PlatformMatch"/>.</summary>
     /// <param name="value">The string to look for.</param>
     internal bool IsCompatible(string value)
@@ -71,5 +71,8 @@ public sealed class PlatformIdentity : DeviceIdentity
     }
 
     /// <inheritdoc/>
-    public override string Describe() => $"compatible {string.Join(", ", _compatible)}";
+    public override string Describe()
+    {
+        return $"compatible {string.Join(", ", _compatible)}";
+    }
 }

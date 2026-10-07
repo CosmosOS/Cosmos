@@ -37,7 +37,10 @@ internal sealed class PlatformLineInterruptSource : InterruptSource
     }
 
     /// <inheritdoc/>
-    public override string Describe() => $"line {_line}";
+    public override string Describe()
+    {
+        return $"line {_line}";
+    }
 
     /// <inheritdoc/>
     protected override bool TryConnectCore(InterruptTrampoline trampoline)
