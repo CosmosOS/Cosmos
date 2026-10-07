@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
@@ -7,7 +9,7 @@ namespace Cosmos.Kernel.System;
 
 /// <summary>
 /// Base class for all Cosmos user kernels.
-/// Provides the BeforeRun/Run/AfterRun lifecycle pattern.
+/// Provides the <see cref="BeforeRun"/>/<see cref="Run"/>/<see cref="AfterRun"/> lifecycle pattern.
 /// </summary>
 public abstract partial class Kernel
 {
@@ -24,7 +26,7 @@ public abstract partial class Kernel
     public static Kernel? Current { get; internal set; }
 
     /// <summary>
-    /// True once BeforeRun has completed and the Run loop is active.
+    /// True once <see cref="BeforeRun"/> has completed and the <see cref="Run"/> loop is active.
     /// </summary>
     protected bool Started { get; private set; }
 
@@ -98,7 +100,7 @@ public abstract partial class Kernel
     }
 
     /// <summary>
-    /// Called once during boot, before BeforeRun(), with interrupts enabled
+    /// Called once during boot, before <see cref="BeforeRun"/>, with interrupts enabled
     /// and the driver stage complete. The default brings up the graphical
     /// <see cref="KernelConsole"/>, which is what makes <c>Console.WriteLine</c>
     /// draw to the screen; every other subsystem is already up by this point,
@@ -156,8 +158,5 @@ public abstract partial class Kernel
     /// <summary>
     /// Signals the kernel to stop the main loop.
     /// </summary>
-    public void Stop()
-    {
-        Stopped = true;
-    }
+    public void Stop() => Stopped = true;
 }
