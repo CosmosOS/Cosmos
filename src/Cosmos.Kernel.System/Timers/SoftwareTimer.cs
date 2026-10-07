@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.System.Timers;
 
 /// <summary>
 /// A software timer that invokes a callback after a delay, driven by the
-/// periodic tick of the platform timer device. Callbacks run in interrupt
+/// periodic tick of the platform tick source. Callbacks run in interrupt
 /// context: they must not block, and an exception escaping one halts the
 /// kernel, because the interrupt dispatch has no handler above it.
 /// </summary>
@@ -14,13 +14,13 @@ namespace Cosmos.Kernel.System.Timers;
 /// A kernel obtains one from <see cref="TimerManager.Schedule"/> or
 /// <see cref="TimerManager.ScheduleRecurring"/> and passes it back to
 /// <see cref="TimerManager.Cancel"/>. It is a read-only handle:
-/// <see cref="TimerManager"/> creates it over an entry in the timer device's
-/// registry, and only the device drives that entry's countdown.
+/// <see cref="TimerManager"/> creates it over an entry in the tick source's
+/// registry, and only the tick source drives that entry's countdown.
 /// </remarks>
 public sealed class SoftwareTimer
 {
     /// <summary>
-    /// The timer device's registry entry this handle wraps.
+    /// The tick source's registry entry this handle wraps.
     /// </summary>
     internal TimerEntry Entry { get; }
 
@@ -35,7 +35,7 @@ public sealed class SoftwareTimer
     public bool Recurring => Entry.Recurring;
 
     /// <summary>
-    /// Whether the timer is registered with a device and pending. One-shot
+    /// Whether the timer is registered with a tick source and pending. One-shot
     /// timers become inactive after firing; cancelling also deactivates.
     /// </summary>
     public bool IsActive => Entry.IsActive;
@@ -43,7 +43,7 @@ public sealed class SoftwareTimer
     /// <summary>
     /// Wraps a registry entry in the handle the ring hands out.
     /// </summary>
-    /// <param name="entry">The entry the timer device counts down.</param>
+    /// <param name="entry">The entry the tick source counts down.</param>
     internal SoftwareTimer(TimerEntry entry)
     {
         Entry = entry;

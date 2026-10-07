@@ -29,7 +29,7 @@ internal static class LibraryInitializer
             if (CosmosFeatures.TimerEnabled)
             {
                 Serial.WriteString("[KERNEL]   - Initializing timer manager...\n");
-                TimerManager.RegisterTimer(initializer.CreateTimer());
+                TimerManager.RegisterTickSource(initializer.CreateTickSource());
             }
 
             using (InternalCpu.DisableInterruptsScope())

@@ -3,9 +3,9 @@
 namespace Cosmos.Kernel.HAL.Timers;
 
 /// <summary>
-/// An entry in a timer device's software timer registry: a countdown that
-/// invokes a callback after a delay, driven by the periodic tick of the timer
-/// device it is registered with. Callbacks run in interrupt context: they must
+/// An entry in a tick source's software timer registry: a countdown that
+/// invokes a callback after a delay, driven by the periodic tick of the
+/// source it is registered with. Callbacks run in interrupt context: they must
 /// not block, and an exception escaping one halts the kernel, because the
 /// interrupt dispatch has no handler above it.
 /// </summary>
@@ -14,8 +14,8 @@ namespace Cosmos.Kernel.HAL.Timers;
 /// create one and hand back the ring's SoftwareTimer handle in
 /// Cosmos.Kernel.System.Timers, which wraps it, and TimerManager.Cancel
 /// unregisters the entry behind that handle. <c>PeriodicWork</c> and
-/// <see cref="TimerDevice.Wait"/> create and register entries directly.
-/// Only the timer device drives its tick state (SetActive, Tick and Invoke).
+/// <see cref="TickSource.Wait"/> create and register entries directly.
+/// Only the tick source drives its tick state (SetActive, Tick and Invoke).
 /// </remarks>
 internal sealed class TimerEntry
 {
@@ -34,7 +34,7 @@ internal sealed class TimerEntry
     public bool Recurring { get; }
 
     /// <summary>
-    /// Whether the timer is registered with a device and pending. One-shot
+    /// Whether the timer is registered with a tick source and pending. One-shot
     /// timers become inactive after firing; unregistering also deactivates.
     /// </summary>
     public bool IsActive => _active;
@@ -54,7 +54,7 @@ internal sealed class TimerEntry
     }
 
     /// <summary>
-    /// Marks the timer active or inactive. Called by the timer device on
+    /// Marks the timer active or inactive. Called by the tick source on
     /// registration and unregistration; activating reloads the full timeout.
     /// </summary>
     internal void SetActive(bool active)
@@ -68,8 +68,8 @@ internal sealed class TimerEntry
     }
 
     /// <summary>
-    /// Advances the timer by the elapsed tick duration. Called by the timer
-    /// device on each hardware tick.
+    /// Advances the timer by the elapsed tick duration. Called by the tick
+    /// source on each hardware tick.
     /// </summary>
     /// <param name="elapsedNs">Nanoseconds elapsed since the previous tick.</param>
     /// <returns>True when the timer is due; recurring timers reload automatically.</returns>
@@ -86,7 +86,7 @@ internal sealed class TimerEntry
     }
 
     /// <summary>
-    /// Invokes the timer callback. Called by the timer device when the timer is due.
+    /// Invokes the timer callback. Called by the tick source when the timer is due.
     /// </summary>
     internal void Invoke()
     {

@@ -413,7 +413,7 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         return phys;
     }
 
-    public TimerDevice? CreateTimer()
+    public TickSource? CreateTickSource()
     {
         if (!CosmosFeatures.TimerEnabled)
         {

@@ -339,13 +339,13 @@ public sealed unsafe partial class DeviceBinding
             return false;
         }
 
-        TimerDevice? timer = PlatformHAL.Initializer?.CreateTimer();
-        if (timer is null)
+        TickSource? tickSource = PlatformHAL.Initializer?.CreateTickSource();
+        if (tickSource is null)
         {
             return false;
         }
 
-        PeriodicWork periodic = new(timer, item, intervalMilliseconds);
+        PeriodicWork periodic = new(tickSource, item, intervalMilliseconds);
         Record(_periodic, periodic, nameof(TrySchedulePeriodic));
         periodic.Start();
         return true;

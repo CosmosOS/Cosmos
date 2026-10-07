@@ -208,13 +208,13 @@ public class Kernel : Sys.Kernel
         Assert.True(InterruptManager.IsEnabled, "InterruptManager should report enabled");
     }
 
-    // A registered timer device is the periodic interrupt source that drives
+    // A registered tick source raises the periodic interrupt that drives
     // the scheduler; without one nothing would generate IRQs to dispatch.
     private static void TestTimerSourceRegistered()
     {
-        // IsInitialized is exactly "a timer device is registered": the ring
-        // publishes the fact, so the suite does not read the device itself.
-        Assert.True(TimerManager.IsInitialized, "A timer device should be registered");
+        // IsInitialized is exactly "a tick source is registered": the ring
+        // publishes the fact, so the suite does not read the tick source.
+        Assert.True(TimerManager.IsInitialized, "A tick source should be registered");
     }
 
     // Exercises the dynamic-vector allocator MSI/MSI-X programmers depend on:

@@ -170,7 +170,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
         PlatformBus.Publish(identity, resources, interrupts, null);
     }
 
-    public TimerDevice? CreateTimer()
+    public TickSource? CreateTickSource()
     {
         if (!CosmosFeatures.TimerEnabled)
         {

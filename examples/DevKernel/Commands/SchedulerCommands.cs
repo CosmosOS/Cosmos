@@ -189,7 +189,7 @@ internal static class SchedulerCommands
         SoftwareTimer? timer = TimerManager.Schedule(static () => s_timerFireCount++, TimeSpan.FromMilliseconds(TimerDelayMs));
         if (timer is null)
         {
-            Terminal.Error("No timer device registered");
+            Terminal.Error("No tick source registered");
             return;
         }
 

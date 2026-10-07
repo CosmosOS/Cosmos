@@ -209,9 +209,9 @@ public class Kernel : Sys.Kernel
 
     private static void TestTimerManagerInitialized()
     {
-        // IsInitialized is exactly "a timer device is registered": the ring
-        // publishes the fact, so the suite does not read the device itself.
-        Assert.True(TimerManager.IsInitialized, "TimerManager: a timer device should be registered");
+        // IsInitialized is exactly "a tick source is registered": the ring
+        // publishes the fact, so the suite does not read the tick source.
+        Assert.True(TimerManager.IsInitialized, "TimerManager: a tick source should be registered");
     }
 
     private static void TestTimerManagerWait500ms()

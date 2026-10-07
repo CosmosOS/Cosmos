@@ -20,11 +20,11 @@
          and drive (the Fat and File suites each supply a RAM disk, DevKernel
          reads and writes blocks through it), and MacAddress (Devices/Network/),
          which the packet seam and NetworkManager both hand out.
-         The boot contract (IPlatformInitializer), the timer device and its
+         The boot contract (IPlatformInitializer), the tick source and its
          timer entries are internal because no kernel can obtain or
          meaningfully supply one. The SoftwareTimer that TimerManager.Schedule
          returns is the ring's own handle over an entry: TimerManager
-         constructs the entry, its tick members belong to the timer device,
+         constructs the entry, its tick members belong to the tick source,
          and a kernel calling them corrupts the registry. -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
@@ -79,14 +79,14 @@
     <!-- Arch HALs are the machine descriptions: they implement
          IPlatformInitializer, publish platform nodes and line sources
          through the internal PlatformBus and PlatformLineRouting, and their
-         tick sources derive from TimerDevice. -->
+         tick sources derive from TickSource. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box suites over HAL internals: the kit's MSI-X table and the
          nodes' PciAccess (Interrupts), the PCI host's configuration
          mechanism and the nodes' PciAccess (Pci), the kit's tree behind
          the BAR relocation probes and PlatformHAL.Initializer's
-         EnsureMmioMapped for a high BAR (Storage), the TimerDevice base
+         EnsureMmioMapped for a high BAR (Storage), the TickSource base
          behind PIT.Instance.Wait (Timer), the tree and the bindings' driver
          state (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />

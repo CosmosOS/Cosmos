@@ -6,10 +6,13 @@ using Cosmos.Kernel.HAL.Boot;
 namespace Cosmos.Kernel.HAL.Timers;
 
 /// <summary>
-/// Abstract base class for all timer devices. Maintains the software timer
-/// registry that is advanced on each hardware tick of the device.
+/// The platform's tick source: the hardware timer whose periodic interrupt
+/// advances the software timer registry it keeps (the PIT on x64, the
+/// generic timer on ARM64). The machine description creates the one
+/// instance at boot, before the driver kit runs, which is why it is
+/// platform code rather than a device the kit publishes.
 /// </summary>
-internal abstract class TimerDevice
+internal abstract class TickSource
 {
     /// <summary>Nanoseconds in one millisecond.</summary>
     protected const ulong NanosecondsPerMillisecond = 1_000_000;
@@ -31,7 +34,7 @@ internal abstract class TimerDevice
     public TimerTickHandler? OnTick { get; set; }
 
     /// <summary>
-    /// Initialize the timer device.
+    /// Initialize the tick source.
     /// </summary>
     public abstract void Initialize();
 
@@ -41,18 +44,18 @@ internal abstract class TimerDevice
     public abstract uint Frequency { get; }
 
     /// <summary>
-    /// Sets the timer frequency in Hz. Devices divide a fixed input clock, so
-    /// each has a range it can express and rejects the rest.
+    /// Sets the timer frequency in Hz. Tick sources divide a fixed input clock,
+    /// so each has a range it can express and rejects the rest.
     /// </summary>
     /// <param name="frequency">Frequency in Hz.</param>
     /// <returns>
-    /// True when the device accepted the frequency; false when it is outside
-    /// what the device can divide to, in which case the tick is unchanged.
+    /// True when the hardware accepted the frequency; false when it is outside
+    /// what the hardware can divide to, in which case the tick is unchanged.
     /// </returns>
     public abstract bool SetFrequency(uint frequency);
 
     /// <summary>
-    /// Registers a software timer driven by this device's periodic tick.
+    /// Registers a software timer driven by this source's periodic tick.
     /// The timer's callback runs in interrupt context and must not block.
     /// </summary>
     /// <param name="timer">Timer to register.</param>
@@ -105,7 +108,7 @@ internal abstract class TimerDevice
 
     /// <summary>
     /// Advances all registered software timers and raises <see cref="OnTick"/>.
-    /// Called by the driver's tick interrupt handler with the elapsed tick duration.
+    /// Called by the subclass's interrupt handler with the elapsed tick duration.
     /// </summary>
     /// <param name="elapsedNs">Nanoseconds elapsed since the previous tick.</param>
     protected void HandleTick(ulong elapsedNs)
@@ -155,7 +158,7 @@ internal abstract class TimerDevice
 
     /// <summary>
     /// Blocks for the specified number of milliseconds by waiting for a
-    /// one-shot software timer to fire. Requires the device tick to be running.
+    /// one-shot software timer to fire. Requires the tick to be running.
     /// </summary>
     /// <param name="ms">Milliseconds to wait.</param>
     public virtual void Wait(uint ms)

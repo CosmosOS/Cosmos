@@ -14,13 +14,13 @@ internal sealed class PeriodicWork
 {
     private const ulong NanosecondsPerMillisecond = 1_000_000;
 
-    private readonly TimerDevice _timer;
+    private readonly TickSource _tickSource;
     private readonly TimerEntry _entry;
     private readonly WorkItem _item;
 
-    internal PeriodicWork(TimerDevice timer, WorkItem item, uint intervalMilliseconds)
+    internal PeriodicWork(TickSource tickSource, WorkItem item, uint intervalMilliseconds)
     {
-        _timer = timer;
+        _tickSource = tickSource;
         _item = item;
         _entry = new TimerEntry(Fire, intervalMilliseconds * NanosecondsPerMillisecond, recurring: true);
     }
@@ -28,13 +28,13 @@ internal sealed class PeriodicWork
     /// <summary>Registers the timer; the first firing is one interval away.</summary>
     internal void Start()
     {
-        _timer.RegisterTimer(_entry);
+        _tickSource.RegisterTimer(_entry);
     }
 
     /// <summary>Unregisters the timer. Teardown only.</summary>
     internal void Cancel()
     {
-        _timer.UnregisterTimer(_entry);
+        _tickSource.UnregisterTimer(_entry);
     }
 
     private void Fire()

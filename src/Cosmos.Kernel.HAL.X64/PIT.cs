@@ -10,9 +10,9 @@ namespace Cosmos.Kernel.HAL.X64;
 
 /// <summary>
 /// Handles the Programmable Interval Timer (PIT). Software timers registered
-/// via <see cref="TimerDevice.RegisterTimer"/> are driven by the channel 0 IRQ.
+/// via <see cref="TickSource.RegisterTimer"/> are driven by the channel 0 IRQ.
 /// </summary>
-internal class PIT : TimerDevice
+internal class PIT : TickSource
 {
     /// <summary>
     /// Singleton instance of the PIT.

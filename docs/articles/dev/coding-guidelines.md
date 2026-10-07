@@ -204,7 +204,7 @@ name appears twice in the tree:
 Cosmos.Kernel.HAL/
   Experimentals.cs           ← the seam's diagnostic ID (COSMOS0003)
   Boot/                      ← internal: IPlatformInitializer, PlatformHAL
-  Timers/                    ← internal: TimerDevice, TimerEntry
+  Timers/                    ← internal: TickSource, TimerEntry
   Firmware/                  ← internal: framebuffer, device tree, MCFG, EFI clock
   Internal/                  ← the LibraryInitializer ILC finds by full name
   Devices/                   ← what a device is, a folder per category
@@ -298,11 +298,11 @@ Use a `static class`. Managers coordinate subsystem state without requiring an i
 // Simple manager: no underlying instance to expose
 public static class TimerManager
 {
-    private static TimerDevice? s_timer;
+    private static TickSource? s_tickSource;
 
-    public static bool IsInitialized => s_timer is not null;
+    public static bool IsInitialized => s_tickSource is not null;
 
-    internal static void RegisterTimer(TimerDevice timer) { ... }
+    internal static void RegisterTickSource(TickSource tickSource) { ... }
     public static void Wait(uint ms) { ... }
 }
 
@@ -499,7 +499,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
         return new X64InterruptController();
     }
 
-    public TimerDevice CreateTimer()
+    public TickSource CreateTickSource()
     {
         return new PIT();
     }

@@ -14,9 +14,9 @@ public static class TimerManager
     private const ulong NanosecondsPerTick = 100;
 
     /// <summary>
-    /// Gets the registered timer device.
+    /// Gets the registered tick source.
     /// </summary>
-    internal static TimerDevice? Timer { get; private set; }
+    internal static TickSource? TickSource { get; private set; }
 
     /// <summary>
     /// Whether timer support is compiled into this kernel
@@ -25,11 +25,11 @@ public static class TimerManager
     public static bool IsEnabled => CosmosFeatures.TimerEnabled;
 
     /// <summary>
-    /// Gets whether a timer device is registered. False when the timer is
+    /// Gets whether a tick source is registered. False when the timer is
     /// compiled out with CosmosEnableTimer=false, since every member of this
-    /// class answers off that device.
+    /// class answers off that tick source.
     /// </summary>
-    public static bool IsInitialized => Timer is not null;
+    public static bool IsInitialized => TickSource is not null;
 
     /// <summary>
     /// Throws when timer support is compiled out. Guards the two members that
@@ -50,49 +50,49 @@ public static class TimerManager
     }
 
     /// <summary>
-    /// Registers a timer device with the manager.
+    /// Registers a tick source with the manager.
     /// </summary>
-    internal static void RegisterTimer(TimerDevice? timer)
+    internal static void RegisterTickSource(TickSource? tickSource)
     {
-        if (timer is null)
+        if (tickSource is null)
         {
             return;
         }
 
-        Timer = timer;
+        TickSource = tickSource;
     }
 
     /// <summary>
-    /// Tick frequency of the timer device in Hz, or 0 when no device is
-    /// registered, which <see cref="IsInitialized"/> reports and an
-    /// assignment made in that state does nothing. Assigning reprograms the
-    /// device, which divides a fixed input clock, so the value read back is
-    /// the nearest tick the divisor can express rather than the value
-    /// assigned. A frequency the device cannot divide to at all is refused
-    /// rather than silently dropped.
+    /// Frequency of the tick source in Hz, or 0 when none is registered,
+    /// which <see cref="IsInitialized"/> reports and an assignment made in
+    /// that state does nothing. Assigning reprograms the tick source, which
+    /// divides a fixed input clock, so the value read back is the nearest tick
+    /// the divisor can express rather than the value assigned. A frequency the
+    /// tick source cannot divide to at all is refused rather than silently
+    /// dropped.
     /// </summary>
     /// <exception cref="InvalidOperationException">Timer support is disabled.</exception>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// The timer device cannot run at this frequency. Each device divides a
+    /// The tick source cannot run at this frequency. Each one divides a
     /// fixed counter, so each accepts from that counter divided by its widest
     /// divisor up to the counter itself: 19 Hz to 1193180 Hz on the x64 PIT,
     /// and 1 Hz up to CNTFRQ_EL0 on the ARM64 generic timer.
     /// </exception>
     public static uint Frequency
     {
-        get => Timer?.Frequency ?? 0;
+        get => TickSource?.Frequency ?? 0;
         set
         {
             ThrowIfDisabled();
 
-            if (Timer is null)
+            if (TickSource is null)
             {
                 return;
             }
 
-            if (!Timer.SetFrequency(value))
+            if (!TickSource.SetFrequency(value))
             {
-                throw new ArgumentOutOfRangeException(nameof(value), value, "The timer device cannot run at this frequency.");
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The tick source cannot run at this frequency.");
             }
         }
     }
@@ -106,7 +106,7 @@ public static class TimerManager
     {
         ThrowIfDisabled();
 
-        Timer?.Wait(ms);
+        TickSource?.Wait(ms);
     }
 
     /// <summary>
@@ -118,11 +118,11 @@ public static class TimerManager
     /// </summary>
     /// <param name="callback">Method to invoke when the delay expires.</param>
     /// <param name="delay">
-    /// Delay before the timer fires. The timer device's tick is the resolution,
-    /// so a delay shorter than one tick, and a zero or negative delay, fire on
-    /// the next tick.
+    /// Delay before the timer fires. The tick source's period is the
+    /// resolution, so a delay shorter than one tick, and a zero or negative
+    /// delay, fire on the next tick.
     /// </param>
-    /// <returns>The scheduled timer, or null if no timer device is registered.</returns>
+    /// <returns>The scheduled timer, or null if no tick source is registered.</returns>
     public static SoftwareTimer? Schedule(Action callback, TimeSpan delay)
     {
         return ScheduleCore(callback, ToNanoseconds(delay), recurring: false);
@@ -136,11 +136,12 @@ public static class TimerManager
     /// </summary>
     /// <param name="callback">Method to invoke each period.</param>
     /// <param name="period">
-    /// Period between firings; must be positive. The timer device's tick is the
-    /// resolution, so a period shorter than one tick fires on every tick.
+    /// Period between firings; must be positive. One tick of the tick source
+    /// is the resolution, so a period shorter than one tick fires on every
+    /// tick.
     /// </param>
     /// <returns>
-    /// The scheduled timer, or null if no timer device is registered or the
+    /// The scheduled timer, or null if no tick source is registered or the
     /// period is not positive.
     /// </returns>
     public static SoftwareTimer? ScheduleRecurring(Action callback, TimeSpan period)
@@ -159,22 +160,22 @@ public static class TimerManager
     /// <param name="timer">Timer to cancel.</param>
     /// <returns>
     /// True when the timer was pending and has been cancelled; false when it is
-    /// null, had already fired, was already cancelled, or no timer device is
+    /// null, had already fired, was already cancelled, or no tick source is
     /// registered.
     /// </returns>
     public static bool Cancel(SoftwareTimer? timer)
     {
-        if (timer is null || Timer is null)
+        if (timer is null || TickSource is null)
         {
             return false;
         }
 
-        return Timer.UnregisterTimer(timer.Entry);
+        return TickSource.UnregisterTimer(timer.Entry);
     }
 
     private static SoftwareTimer? ScheduleCore(Action callback, ulong timeoutNs, bool recurring)
     {
-        if (Timer is null || callback is null)
+        if (TickSource is null || callback is null)
         {
             return null;
         }
@@ -183,15 +184,15 @@ public static class TimerManager
         // memory cannot leave a registered entry with no handle to cancel it.
         TimerEntry entry = new(callback, timeoutNs, recurring);
         SoftwareTimer timer = new(entry);
-        Timer.RegisterTimer(entry);
+        TickSource.RegisterTimer(entry);
         return timer;
     }
 
     /// <summary>
     /// Converts a duration to the nanoseconds a <see cref="TimerEntry"/>
     /// counts down. A non-positive duration becomes 0, which fires on the next
-    /// device tick, and a duration too large to express in nanoseconds
-    /// saturates rather than wrapping.
+    /// tick, and a duration too large to express in nanoseconds saturates
+    /// rather than wrapping.
     /// </summary>
     private static ulong ToNanoseconds(TimeSpan value)
     {

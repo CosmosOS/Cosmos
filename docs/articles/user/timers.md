@@ -10,7 +10,7 @@ The two managers are the thing to read first. `TimerManager` runs a callback fro
 | The callback may block, allocate or take a lock | No | Yes |
 | Scheduling calls may be made from | Anywhere, interrupt handlers included | Thread context only |
 | Needs the scheduler | No | Yes |
-| Resolution | The timer device tick | The scheduler tick |
+| Resolution | The tick source's period | The scheduler tick |
 | `Schedule` hands back | A `SoftwareTimer` handle, or null | An alarm id, or 0 |
 | Feature switch | `CosmosEnableTimer` | `CosmosEnableScheduler` |
 
@@ -37,7 +37,7 @@ using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Timers;
 ```
 
-The timer device is found and registered at boot, so `TimerManager` is ready as soon as your kernel runs. `TimerManager.IsEnabled` answers the compile-time question and `TimerManager.IsInitialized` the runtime one.
+The tick source is found and registered at boot, so `TimerManager` is ready as soon as your kernel runs. `TimerManager.IsEnabled` answers the compile-time question and `TimerManager.IsInitialized` the runtime one.
 
 ---
 
@@ -78,7 +78,7 @@ The handle is read-only: `TimeoutNs`, `Recurring` and `IsActive` are what a call
 
 **The callback runs in interrupt context.** It must not block, must not allocate, and must not take a lock, because the thread it interrupted may be holding one. It must also not let an exception escape: nothing above the interrupt dispatch catches one, and the kernel halts.
 
-`Schedule` and `ScheduleRecurring` return `null` when the timer is compiled out or no device registered, which is why the handle is nullable. `Cancel` accepts null and answers `false`.
+`Schedule` and `ScheduleRecurring` return `null` when the timer is compiled out or no tick source is registered, which is why the handle is nullable. `Cancel` accepts null and answers `false`.
 
 ---
 
@@ -95,7 +95,7 @@ ulong id = AlarmManager.ScheduleRecurring(
 AlarmManager.Cancel(id);
 ```
 
-The shape is deliberately the same as `TimerManager`'s so that switching between them is one word. What differs is what you get back: an alarm belongs to the alarm system rather than to a device registry, so it is identified by a `ulong` id. Zero means the alarm was not scheduled, which happens when the scheduler is not running or the period is not positive.
+The shape is deliberately the same as `TimerManager`'s so that switching between them is one word. What differs is what you get back: an alarm belongs to the alarm system rather than to a tick source's registry, so it is identified by a `ulong` id. Zero means the alarm was not scheduled, which happens when the scheduler is not running or the period is not positive.
 
 **The scheduling calls themselves are thread-context only.** Every `AlarmManager` member takes the alarm list's mutex and parks if it is held. Calling one from an interrupt handler parks inside the handler and hangs, and a `TimerManager` callback is an interrupt handler. The `TimerManager` members mask interrupts instead of parking and carry no such restriction, so a timer callback that needs to do real work should signal a thread rather than schedule an alarm.
 
@@ -105,7 +105,7 @@ A recurring alarm's period restarts when the callback fires, not when it returns
 
 ## Changing the tick rate
 
-`TimerManager.Frequency` reads and writes the timer device's tick rate in hertz. Each device divides a fixed counter, so each accepts a bounded range: 19 Hz to 1193180 Hz on the x64 PIT, and 1 Hz up to `CNTFRQ_EL0` on the ARM64 generic timer. A value outside its device's range throws `ArgumentOutOfRangeException` rather than being quietly ignored:
+`TimerManager.Frequency` reads and writes the tick source's rate in hertz. Each tick source divides a fixed counter, so each accepts a bounded range: 19 Hz to 1193180 Hz on the x64 PIT, and 1 Hz up to `CNTFRQ_EL0` on the ARM64 generic timer. A value outside its range throws `ArgumentOutOfRangeException` rather than being quietly ignored:
 
 ```csharp
 Console.WriteLine("timer runs at " + TimerManager.Frequency + " Hz");
