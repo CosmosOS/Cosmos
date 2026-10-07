@@ -31,14 +31,19 @@ public class DnsPacketTest
     private const int QuestionOffset = 20;
 
     // "example.com" as length-prefixed labels, then QTYPE and QCLASS 1 (IN).
-    private static byte[] ExpectedQuestion(ushort recordType) =>
-    [
-        0x07, .. "example"u8, 0x03, .. "com"u8, 0x00,
-        (byte)(recordType >> 8), (byte)recordType, 0x00, 0x01
-    ];
+    private static byte[] ExpectedQuestion(ushort recordType)
+    {
+        return
+        [
+            0x07, .. "example"u8, 0x03, .. "com"u8, 0x00,
+            (byte)(recordType >> 8), (byte)recordType, 0x00, 0x01
+        ];
+    }
 
-    private static byte[] QuestionOf(DnsPacketQuery packet, int length) =>
-        packet.RawData.AsSpan(packet.Network.DataOffset + QuestionOffset, length).ToArray();
+    private static byte[] QuestionOf(DnsPacketQuery packet, int length)
+    {
+        return packet.RawData.AsSpan(packet.Network.DataOffset + QuestionOffset, length).ToArray();
+    }
 
     public class OverIPv4 : DnsPacketTest
     {

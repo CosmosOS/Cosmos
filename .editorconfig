@@ -334,7 +334,8 @@ dotnet_diagnostic.IDE0130.severity = none
 
 # Vendored code (BigGustave, LunarFonts, SharpZipLib, each with a README.md
 # recording its origin and local changes) keeps its upstream namespaces and
-# code shape (only whitespace follows the repository style) so it stays
+# code shape (only whitespace and the expression-body rule follow the
+# repository style, each README listing the members that changed) so it stays
 # diffable against upstream: generated_code skips the style analyzers and the
 # format CI, and IDE0130 is off. It also stays out of the declared surface,
 # since the PublicAPI files list the repo's own API only. Last in the file

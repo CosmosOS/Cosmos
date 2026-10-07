@@ -28,7 +28,10 @@ public class TcpPacketTest
     private const ushort LocalPort = 49152;
     private const ushort PeerPort = 5557;
 
-    private static byte[] Payload() => Encoding.ASCII.GetBytes("HELLO");
+    private static byte[] Payload()
+    {
+        return Encoding.ASCII.GetBytes("HELLO");
+    }
 
     public class OverIPv4 : TcpPacketTest
     {

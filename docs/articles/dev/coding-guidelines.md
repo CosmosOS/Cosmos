@@ -985,7 +985,7 @@ if (map.ContainsKey(key))         // Bad: two lookups
 
 > Braces are enforced by `.editorconfig` (`csharp_prefer_braces = true:error`) and by CI (`dotnet format style --severity error`).
 
-Methods, constructors, operators and local functions take a block body, even for a single statement: a wrapped `=>` hides where the body starts. A property, indexer or accessor uses `=>` only when the whole member fits on one line, and a lambda keeps its `=>`. `.editorconfig` records this in the `csharp_style_expression_bodied_*` options at `silent`, so CI does not enforce it.
+Methods, constructors, operators and local functions take a block body, even for a single statement: a wrapped `=>` hides where the body starts. A property, indexer or accessor uses `=>` only when the whole member fits on one line, and a lambda keeps its `=>`. The vendored trees under `ThirdParty/` follow this rule too, and each one's README lists the members it changed. `.editorconfig` records this in the `csharp_style_expression_bodied_*` options at `silent`, so CI does not enforce it.
 
 ### Feature Switches
 

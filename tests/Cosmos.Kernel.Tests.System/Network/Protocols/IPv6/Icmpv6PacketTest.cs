@@ -26,7 +26,10 @@ public class Icmpv6PacketTest
         "fe800000000000000000000000000002" +
         "80007b261234000108090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f2021222324252627";
 
-    private static byte[] ExpectedBody() => Enumerable.Range(8, 32).Select(b => (byte)b).ToArray();
+    private static byte[] ExpectedBody()
+    {
+        return Enumerable.Range(8, 32).Select(b => (byte)b).ToArray();
+    }
 
     public class EchoRequest : Icmpv6PacketTest
     {

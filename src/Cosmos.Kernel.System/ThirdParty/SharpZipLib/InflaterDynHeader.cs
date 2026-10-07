@@ -30,7 +30,9 @@ namespace ICSharpCode.SharpZipLib.Zip.Compression
         /// </summary>
         /// <returns>Returns whether decoding could be completed</returns>
         public bool AttemptRead()
-            => !state.MoveNext() || state.Current;
+        {
+            return !state.MoveNext() || state.Current;
+        }
 
         public InflaterDynHeader(StreamManipulator input)
         {
@@ -124,14 +126,24 @@ namespace ICSharpCode.SharpZipLib.Zip.Compression
         /// </summary>
         /// <exception cref="StreamDecodingException">If hader has not been successfully read by the state machine</exception>
         public InflaterHuffmanTree LiteralLengthTree
-            => litLenTree ?? throw new StreamDecodingException("Header properties were accessed before header had been successfully read");
+        {
+            get
+            {
+                return litLenTree ?? throw new StreamDecodingException("Header properties were accessed before header had been successfully read");
+            }
+        }
 
         /// <summary>
         /// Get distance huffman tree, must not be used before <see cref="AttemptRead"/> has returned true
         /// </summary>
         /// <exception cref="StreamDecodingException">If hader has not been successfully read by the state machine</exception>
         public InflaterHuffmanTree DistanceTree
-            => distTree ?? throw new StreamDecodingException("Header properties were accessed before header had been successfully read");
+        {
+            get
+            {
+                return distTree ?? throw new StreamDecodingException("Header properties were accessed before header had been successfully read");
+            }
+        }
 
         #region Instance Fields
 

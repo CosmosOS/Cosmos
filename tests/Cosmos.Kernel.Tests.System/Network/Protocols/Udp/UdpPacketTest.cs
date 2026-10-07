@@ -28,7 +28,10 @@ public class UdpPacketTest
     private const ushort SourcePort = 5559;
     private const ushort DestinationPort = 5556;
 
-    private static byte[] Payload() => Encoding.ASCII.GetBytes("COSMOS_SEAM_TEST");
+    private static byte[] Payload()
+    {
+        return Encoding.ASCII.GetBytes("COSMOS_SEAM_TEST");
+    }
 
     public class OverIPv4 : UdpPacketTest
     {

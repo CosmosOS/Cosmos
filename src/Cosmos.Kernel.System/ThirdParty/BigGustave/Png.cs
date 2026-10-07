@@ -48,7 +48,10 @@
         /// <param name="x">The x coordinate (column).</param>
         /// <param name="y">The y coordinate (row).</param>
         /// <returns>The pixel at the coordinate.</returns>
-        public Pixel GetPixel(int x, int y) => data.GetPixel(x, y);
+        public Pixel GetPixel(int x, int y)
+        {
+            return data.GetPixel(x, y);
+        }
 
         /// <summary>
         /// Read the PNG image from the stream.
@@ -57,7 +60,9 @@
         /// <param name="chunkVisitor">Optional: A visitor which is called whenever a chunk is read by the library.</param>
         /// <returns>The <see cref="Png"/> data from the stream.</returns>
         public static Png Open(Stream stream, IChunkVisitor? chunkVisitor = null)
-            => PngOpener.Open(stream, chunkVisitor);
+        {
+            return PngOpener.Open(stream, chunkVisitor);
+        }
 
         /// <summary>
         /// Read the PNG image from the stream.
@@ -66,7 +71,9 @@
         /// <param name="settings">Settings to apply when opening the PNG.</param>
         /// <returns>The <see cref="Png"/> data from the stream.</returns>
         public static Png Open(Stream stream, PngOpenerSettings settings)
-            => PngOpener.Open(stream, settings);
+        {
+            return PngOpener.Open(stream, settings);
+        }
 
         /// <summary>
         /// Read the PNG image from the bytes.

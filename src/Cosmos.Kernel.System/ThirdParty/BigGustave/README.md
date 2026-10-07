@@ -16,5 +16,9 @@ Local changes:
 - All types are `internal`; the public API is the `Png` image class
   (namespace `Cosmos.Kernel.System.Graphics`) defined in
   `src/Cosmos.Kernel.System/Graphics/Png.cs`.
+- `Png.GetPixel`, `Png.Open(Stream, IChunkVisitor?)`,
+  `Png.Open(Stream, PngOpenerSettings)` and
+  `PngOpener.Open(Stream, IChunkVisitor?)` take block bodies instead of
+  `=>`, following the repository's expression-body rule.
 
 See `docs/credits.md` for the full third-party list.
