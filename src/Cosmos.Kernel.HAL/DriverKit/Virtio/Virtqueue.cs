@@ -55,9 +55,35 @@ public sealed unsafe class Virtqueue
     private readonly UsedElement* _usedRing;
     private readonly ushort[] _freeList;
     private ushort _freeHead;
-    private int _freeCount;
     private ushort _lastUsed;
-    private int _droppedUsedElements;
+
+    /// <summary>The queue's index on its device.</summary>
+    public ushort Index { get; }
+
+    /// <summary>How many descriptors the queue has; also the length of each ring.</summary>
+    public ushort Size { get; }
+
+    /// <summary>How many descriptors are not allocated. Any context.</summary>
+    public int FreeDescriptorCount { get; private set; }
+
+    /// <summary>Used elements whose id was at or above <see cref="Size"/>, dropped by <see cref="TryTakeUsed"/> rather than indexed. Any context.</summary>
+    public int DroppedUsedElements { get; private set; }
+
+    /// <summary>
+    /// True when the device has returned a buffer the driver has not taken.
+    /// No barrier: for a work item loop that returns, not a spin; a leaf
+    /// that must wait waits on its interrupt or spins with
+    /// <see cref="DmaBuffer.ReadBarrier"/>. Interrupt context; allocation-free.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The binding that created the queue was torn down.</exception>
+    public bool HasUsed
+    {
+        get
+        {
+            ThrowIfReleased();
+            return _lastUsed != _used->Index;
+        }
+    }
 
     /// <summary>
     /// Captures the ring pointers from <paramref name="memory"/> and builds
@@ -91,35 +117,7 @@ public sealed unsafe class Virtqueue
 
         _freeList[size - 1] = EndOfFreeList;
         _freeHead = 0;
-        _freeCount = size;
-    }
-
-    /// <summary>The queue's index on its device.</summary>
-    public ushort Index { get; }
-
-    /// <summary>How many descriptors the queue has; also the length of each ring.</summary>
-    public ushort Size { get; }
-
-    /// <summary>How many descriptors are not allocated. Any context.</summary>
-    public int FreeDescriptorCount => _freeCount;
-
-    /// <summary>Used elements whose id was at or above <see cref="Size"/>, dropped by <see cref="TryTakeUsed"/> rather than indexed. Any context.</summary>
-    public int DroppedUsedElements => _droppedUsedElements;
-
-    /// <summary>
-    /// True when the device has returned a buffer the driver has not taken.
-    /// No barrier: for a work item loop that returns, not a spin; a leaf
-    /// that must wait waits on its interrupt or spins with
-    /// <see cref="DmaBuffer.ReadBarrier"/>. Interrupt context; allocation-free.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">The binding that created the queue was torn down.</exception>
-    public bool HasUsed
-    {
-        get
-        {
-            ThrowIfReleased();
-            return _lastUsed != _used->Index;
-        }
+        FreeDescriptorCount = size;
     }
 
     /// <summary>Takes a descriptor off the free list. Managed state only; any context; allocation-free.</summary>
@@ -127,7 +125,7 @@ public sealed unsafe class Virtqueue
     /// <returns>False when every descriptor is allocated.</returns>
     public bool TryAllocateDescriptor(out ushort index)
     {
-        if (_freeCount == 0)
+        if (FreeDescriptorCount == 0)
         {
             index = 0;
             return false;
@@ -135,7 +133,7 @@ public sealed unsafe class Virtqueue
 
         index = _freeHead;
         _freeHead = _freeList[_freeHead];
-        _freeCount--;
+        FreeDescriptorCount--;
         return true;
     }
 
@@ -147,7 +145,7 @@ public sealed unsafe class Virtqueue
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, Size);
         _freeList[index] = _freeHead;
         _freeHead = index;
-        _freeCount++;
+        FreeDescriptorCount++;
     }
 
     /// <summary>Fills one descriptor. Interrupt context; allocation-free.</summary>
@@ -213,7 +211,7 @@ public sealed unsafe class Virtqueue
             _lastUsed++;
             if (elementId >= Size)
             {
-                _droppedUsedElements++;
+                DroppedUsedElements++;
                 continue;
             }
 

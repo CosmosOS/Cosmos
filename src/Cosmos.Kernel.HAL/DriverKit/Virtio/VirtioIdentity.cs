@@ -16,21 +16,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Virtio;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class VirtioIdentity : DeviceIdentity
 {
-    /// <summary>Describes a virtio device.</summary>
-    /// <param name="transport">The transport's name: "pci" or "mmio".</param>
-    /// <param name="transportAddress">The transport's address for the device: a PCI function address, an MMIO slot base in hexadecimal.</param>
-    /// <param name="deviceType">The device type the transport read.</param>
-    /// <exception cref="ArgumentException"><paramref name="transport"/> or <paramref name="transportAddress"/> is null or empty.</exception>
-    public VirtioIdentity(string transport, string transportAddress, VirtioDeviceType deviceType)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(transport);
-        ArgumentException.ThrowIfNullOrEmpty(transportAddress);
-        Transport = transport;
-        TransportAddress = transportAddress;
-        DeviceType = deviceType;
-        Address = $"{transport}:{transportAddress}";
-    }
-
     /// <summary>The transport's name: "pci" or "mmio".</summary>
     public string Transport { get; }
 
@@ -46,24 +31,45 @@ public sealed class VirtioIdentity : DeviceIdentity
     /// <inheritdoc/>
     public override string Address { get; }
 
+    /// <summary>Describes a virtio device.</summary>
+    /// <param name="transport">The transport's name: "pci" or "mmio".</param>
+    /// <param name="transportAddress">The transport's address for the device: a PCI function address, an MMIO slot base in hexadecimal.</param>
+    /// <param name="deviceType">The device type the transport read.</param>
+    /// <exception cref="ArgumentException"><paramref name="transport"/> or <paramref name="transportAddress"/> is null or empty.</exception>
+    public VirtioIdentity(string transport, string transportAddress, VirtioDeviceType deviceType)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(transport);
+        ArgumentException.ThrowIfNullOrEmpty(transportAddress);
+        Transport = transport;
+        TransportAddress = transportAddress;
+        DeviceType = deviceType;
+        Address = $"{transport}:{transportAddress}";
+    }
+
     /// <inheritdoc/>
-    public override string Describe() => $"type {(uint)DeviceType} ({TypeName(DeviceType)})";
+    public override string Describe()
+    {
+        return $"type {(uint)DeviceType} ({TypeName(DeviceType)})";
+    }
 
     /// <summary>The type in words, or "unknown" for a type the kit has no name for.</summary>
-    private static string TypeName(VirtioDeviceType type) => type switch
+    private static string TypeName(VirtioDeviceType type)
     {
-        VirtioDeviceType.Network => "network",
-        VirtioDeviceType.Block => "block",
-        VirtioDeviceType.Console => "console",
-        VirtioDeviceType.Entropy => "entropy",
-        VirtioDeviceType.Balloon => "balloon",
-        VirtioDeviceType.Scsi => "scsi",
-        VirtioDeviceType.Gpu => "gpu",
-        VirtioDeviceType.Input => "input",
-        VirtioDeviceType.Socket => "socket",
-        VirtioDeviceType.Crypto => "crypto",
-        VirtioDeviceType.Sound => "sound",
-        VirtioDeviceType.FileSystem => "filesystem",
-        _ => "unknown",
-    };
+        return type switch
+        {
+            VirtioDeviceType.Network => "network",
+            VirtioDeviceType.Block => "block",
+            VirtioDeviceType.Console => "console",
+            VirtioDeviceType.Entropy => "entropy",
+            VirtioDeviceType.Balloon => "balloon",
+            VirtioDeviceType.Scsi => "scsi",
+            VirtioDeviceType.Gpu => "gpu",
+            VirtioDeviceType.Input => "input",
+            VirtioDeviceType.Socket => "socket",
+            VirtioDeviceType.Crypto => "crypto",
+            VirtioDeviceType.Sound => "sound",
+            VirtioDeviceType.FileSystem => "filesystem",
+            _ => "unknown",
+        };
+    }
 }

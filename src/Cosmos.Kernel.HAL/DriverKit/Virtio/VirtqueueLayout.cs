@@ -14,23 +14,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Virtio;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct VirtqueueLayout
 {
-    /// <summary>Records where the rings are.</summary>
-    /// <param name="size">The queue size, a power of two.</param>
-    /// <param name="descriptorTable">Physical address of the descriptor table.</param>
-    /// <param name="availableRing">Physical address of the available ring.</param>
-    /// <param name="usedRing">Physical address of the used ring.</param>
-    /// <param name="baseAddress">Physical address of the page-aligned block holding the three.</param>
-    /// <param name="alignment">The boundary the used ring was placed on.</param>
-    public VirtqueueLayout(ushort size, ulong descriptorTable, ulong availableRing, ulong usedRing, ulong baseAddress, uint alignment)
-    {
-        Size = size;
-        DescriptorTable = descriptorTable;
-        AvailableRing = availableRing;
-        UsedRing = usedRing;
-        Base = baseAddress;
-        Alignment = alignment;
-    }
-
     /// <summary>The queue size: how many descriptors the table holds and how many entries each ring has.</summary>
     public ushort Size { get; }
 
@@ -52,4 +35,21 @@ public readonly struct VirtqueueLayout
     /// own guest page size.
     /// </summary>
     public uint Alignment { get; }
+
+    /// <summary>Records where the rings are.</summary>
+    /// <param name="size">The queue size, a power of two.</param>
+    /// <param name="descriptorTable">Physical address of the descriptor table.</param>
+    /// <param name="availableRing">Physical address of the available ring.</param>
+    /// <param name="usedRing">Physical address of the used ring.</param>
+    /// <param name="baseAddress">Physical address of the page-aligned block holding the three.</param>
+    /// <param name="alignment">The boundary the used ring was placed on.</param>
+    public VirtqueueLayout(ushort size, ulong descriptorTable, ulong availableRing, ulong usedRing, ulong baseAddress, uint alignment)
+    {
+        Size = size;
+        DescriptorTable = descriptorTable;
+        AvailableRing = availableRing;
+        UsedRing = usedRing;
+        Base = baseAddress;
+        Alignment = alignment;
+    }
 }

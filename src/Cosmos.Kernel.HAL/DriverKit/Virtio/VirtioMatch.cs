@@ -14,24 +14,30 @@ public sealed class VirtioMatch : DeviceMatch
 {
     private readonly VirtioDeviceType? _deviceType;
 
-    /// <summary>A match on <paramref name="deviceType"/>, or on any virtio device when null.</summary>
-    /// <param name="deviceType">The device type, or null for any.</param>
+    /// <inheritdoc/>
+    public override int Specificity => _deviceType is null ? 0 : 1;
+
     private VirtioMatch(VirtioDeviceType? deviceType)
     {
         _deviceType = deviceType;
     }
 
-    /// <inheritdoc/>
-    public override int Specificity => _deviceType is null ? 0 : 1;
-
     /// <summary>Matches every virtio device of <paramref name="type"/>, whatever its transport.</summary>
     /// <param name="type">The device type.</param>
-    public static VirtioMatch DeviceType(VirtioDeviceType type) => new(type);
+    public static VirtioMatch DeviceType(VirtioDeviceType type)
+    {
+        return new(type);
+    }
 
     /// <summary>Matches every virtio device.</summary>
-    public static VirtioMatch Any() => new(null);
+    public static VirtioMatch Any()
+    {
+        return new(null);
+    }
 
     /// <inheritdoc/>
-    public override bool Matches(DeviceIdentity identity) =>
-        identity is VirtioIdentity virtio && (_deviceType is null || _deviceType.Value == virtio.DeviceType);
+    public override bool Matches(DeviceIdentity identity)
+    {
+        return identity is VirtioIdentity virtio && (_deviceType is null || _deviceType.Value == virtio.DeviceType);
+    }
 }

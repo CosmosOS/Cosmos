@@ -16,11 +16,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Virtio;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public abstract class VirtioTransport
 {
-    /// <summary>For the derived transport.</summary>
-    protected VirtioTransport()
-    {
-    }
-
     /// <summary>The device type the transport read from the function or the slot. Any context.</summary>
     public abstract VirtioDeviceType DeviceType { get; }
 
@@ -40,6 +35,11 @@ public abstract class VirtioTransport
     /// the node. Any context.
     /// </summary>
     public abstract int InterruptEntryCount { get; }
+
+    /// <summary>For the derived transport.</summary>
+    protected VirtioTransport()
+    {
+    }
 
     /// <summary>Reads the device status register. Thread context.</summary>
     public abstract byte ReadStatus();

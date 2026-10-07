@@ -30,28 +30,40 @@ internal sealed class VirtioInterruptSource : InterruptSource
     private InterruptTrampoline? _trampoline;
     private bool _masked;
 
+    /// <summary>The transport entry this source is raised on, or <see cref="NoEntry"/>. Any context.</summary>
+    internal int Entry => _entry;
+
     /// <summary>A source of the given kind: <see cref="ConfigKind"/> or a queue index.</summary>
     private VirtioInterruptSource(int kind)
     {
         _kind = kind;
     }
 
-    /// <summary>The transport entry this source is raised on, or <see cref="NoEntry"/>. Any context.</summary>
-    internal int Entry => _entry;
-
     /// <summary>The configuration change source of a node.</summary>
-    internal static VirtioInterruptSource ForConfig() => new(ConfigKind);
+    internal static VirtioInterruptSource ForConfig()
+    {
+        return new(ConfigKind);
+    }
 
     /// <summary>The source of queue <paramref name="index"/>.</summary>
     /// <param name="index">The queue index.</param>
-    internal static VirtioInterruptSource ForQueue(int index) => new(index);
+    internal static VirtioInterruptSource ForQueue(int index)
+    {
+        return new(index);
+    }
 
     /// <inheritdoc/>
-    public override string Describe() => _kind == ConfigKind ? "config" : $"queue {_kind}";
+    public override string Describe()
+    {
+        return _kind == ConfigKind ? "config" : $"queue {_kind}";
+    }
 
     /// <summary>Gives the source an entry, or takes it away with <see cref="NoEntry"/>. Thread context.</summary>
     /// <param name="entry">The transport entry, or <see cref="NoEntry"/>.</param>
-    internal void AssignEntry(int entry) => _entry = entry;
+    internal void AssignEntry(int entry)
+    {
+        _entry = entry;
+    }
 
     /// <summary>
     /// The access's guard for a trampoline a declined probe left behind:

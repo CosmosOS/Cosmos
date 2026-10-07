@@ -44,20 +44,6 @@ public sealed class VirtioAccess : INodeHooks
     private readonly VirtioInterruptSource _configSource;
     private readonly VirtioInterruptSource[] _queueSources;
 
-    /// <summary>Wraps a transport.</summary>
-    /// <param name="transport">The transport driver's registers.</param>
-    public VirtioAccess(VirtioTransport transport)
-    {
-        ArgumentNullException.ThrowIfNull(transport);
-        _transport = transport;
-        _configSource = VirtioInterruptSource.ForConfig();
-        _queueSources = new VirtioInterruptSource[MaxQueues];
-        for (int i = 0; i < MaxQueues; i++)
-        {
-            _queueSources[i] = VirtioInterruptSource.ForQueue(i);
-        }
-    }
-
     /// <summary>The device type the transport read. Any context.</summary>
     public VirtioDeviceType DeviceType => _transport.DeviceType;
 
@@ -74,6 +60,20 @@ public sealed class VirtioAccess : INodeHooks
     /// request returns false and the leaf polls. Any context.
     /// </summary>
     public InterruptSource ConfigInterrupt => _configSource;
+
+    /// <summary>Wraps a transport.</summary>
+    /// <param name="transport">The transport driver's registers.</param>
+    public VirtioAccess(VirtioTransport transport)
+    {
+        ArgumentNullException.ThrowIfNull(transport);
+        _transport = transport;
+        _configSource = VirtioInterruptSource.ForConfig();
+        _queueSources = new VirtioInterruptSource[MaxQueues];
+        for (int i = 0; i < MaxQueues; i++)
+        {
+            _queueSources[i] = VirtioInterruptSource.ForQueue(i);
+        }
+    }
 
     /// <summary>
     /// The source of queue <paramref name="index"/>, for a leaf to pass to
@@ -225,10 +225,16 @@ public sealed class VirtioAccess : INodeHooks
     /// 3.1.1: no available buffer notification before DRIVER_OK);
     /// submitting descriptors before it is fine. Thread context.
     /// </summary>
-    public void SetDriverOk() => SetStatusBit(VirtioStatus.DriverOk);
+    public void SetDriverOk()
+    {
+        SetStatusBit(VirtioStatus.DriverOk);
+    }
 
     /// <summary>Sets FAILED: the driver gave up on the device. Thread context.</summary>
-    public void SetFailed() => SetStatusBit(VirtioStatus.Failed);
+    public void SetFailed()
+    {
+        SetStatusBit(VirtioStatus.Failed);
+    }
 
     /// <summary>
     /// Resets the device: writes status 0, waits up to
@@ -271,20 +277,32 @@ public sealed class VirtioAccess : INodeHooks
 
     /// <summary>Reads one byte of the device-specific configuration space. Any context; allocation-free.</summary>
     /// <param name="offset">The offset within the configuration space.</param>
-    public byte ReadConfig8(uint offset) => _transport.ReadConfig8(offset);
+    public byte ReadConfig8(uint offset)
+    {
+        return _transport.ReadConfig8(offset);
+    }
 
     /// <summary>Reads one word of the device-specific configuration space. Any context; allocation-free.</summary>
     /// <param name="offset">The offset within the configuration space.</param>
-    public ushort ReadConfig16(uint offset) => _transport.ReadConfig16(offset);
+    public ushort ReadConfig16(uint offset)
+    {
+        return _transport.ReadConfig16(offset);
+    }
 
     /// <summary>Reads one dword of the device-specific configuration space. Any context; allocation-free.</summary>
     /// <param name="offset">The offset within the configuration space.</param>
-    public uint ReadConfig32(uint offset) => _transport.ReadConfig32(offset);
+    public uint ReadConfig32(uint offset)
+    {
+        return _transport.ReadConfig32(offset);
+    }
 
     /// <summary>Writes one byte of the device-specific configuration space. Any context; allocation-free.</summary>
     /// <param name="offset">The offset within the configuration space.</param>
     /// <param name="value">The value.</param>
-    public void WriteConfig8(uint offset, byte value) => _transport.WriteConfig8(offset, value);
+    public void WriteConfig8(uint offset, byte value)
+    {
+        _transport.WriteConfig8(offset, value);
+    }
 
     /// <summary>
     /// Delivers one interrupt of the transport's entry
@@ -327,7 +345,10 @@ public sealed class VirtioAccess : INodeHooks
     }
 
     /// <inheritdoc/>
-    void INodeHooks.BeforeFirstOffer() => Begin();
+    void INodeHooks.BeforeFirstOffer()
+    {
+        Begin();
+    }
 
     /// <inheritdoc/>
     void INodeHooks.AfterOfferDeclined()
@@ -342,7 +363,10 @@ public sealed class VirtioAccess : INodeHooks
     }
 
     /// <inheritdoc/>
-    void INodeHooks.AfterUnbound() => Reset();
+    void INodeHooks.AfterUnbound()
+    {
+        Reset();
+    }
 
     /// <inheritdoc/>
     void INodeHooks.AfterTeardown(bool hardwarePresent)
@@ -377,7 +401,10 @@ public sealed class VirtioAccess : INodeHooks
     }
 
     /// <summary>Ors <paramref name="bit"/> into the status register.</summary>
-    private void SetStatusBit(byte bit) => _transport.WriteStatus((byte)(_transport.ReadStatus() | bit));
+    private void SetStatusBit(byte bit)
+    {
+        _transport.WriteStatus((byte)(_transport.ReadStatus() | bit));
+    }
 
     /// <summary>The entry queue <paramref name="index"/> gets: index + 1 when the transport has that many, else 0 when it has any, else none.</summary>
     private int ChooseQueueEntry(ushort index)
@@ -392,7 +419,10 @@ public sealed class VirtioAccess : INodeHooks
     }
 
     /// <summary>Rounds <paramref name="value"/> up to the next multiple of <paramref name="boundary"/>. Any context.</summary>
-    private static ulong RoundUp(ulong value, ulong boundary) => (value + boundary - 1) / boundary * boundary;
+    private static ulong RoundUp(ulong value, ulong boundary)
+    {
+        return (value + boundary - 1) / boundary * boundary;
+    }
 
     /// <summary>Refuses a queue index at or above <see cref="MaxQueues"/>. Any context.</summary>
     private static void ThrowIfNotAQueue(ushort index)
