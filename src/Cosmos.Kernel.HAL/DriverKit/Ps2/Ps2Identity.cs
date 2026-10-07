@@ -13,6 +13,15 @@ namespace Cosmos.Kernel.HAL.DriverKit.Ps2;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class Ps2Identity : DeviceIdentity
 {
+    /// <summary>The port of the 8042 this node hangs off. Any context.</summary>
+    public Ps2Port Port { get; }
+
+    /// <inheritdoc/>
+    public override string BusName => "ps2";
+
+    /// <inheritdoc/>
+    public override string Address => Port == Ps2Port.Keyboard ? "kbd" : "aux";
+
     /// <summary>Creates the identity of one port.</summary>
     /// <param name="port">The port.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="port"/> is neither <see cref="Ps2Port.Keyboard"/> nor <see cref="Ps2Port.Auxiliary"/>.</exception>
@@ -26,15 +35,9 @@ public sealed class Ps2Identity : DeviceIdentity
         Port = port;
     }
 
-    /// <summary>The port of the 8042 this node hangs off. Any context.</summary>
-    public Ps2Port Port { get; }
-
     /// <inheritdoc/>
-    public override string BusName => "ps2";
-
-    /// <inheritdoc/>
-    public override string Address => Port == Ps2Port.Keyboard ? "kbd" : "aux";
-
-    /// <inheritdoc/>
-    public override string Describe() => Port == Ps2Port.Keyboard ? "port kbd" : "port aux";
+    public override string Describe()
+    {
+        return Port == Ps2Port.Keyboard ? "port kbd" : "port aux";
+    }
 }

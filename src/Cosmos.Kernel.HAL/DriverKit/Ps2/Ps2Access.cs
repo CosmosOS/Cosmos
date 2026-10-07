@@ -88,6 +88,20 @@ public sealed class Ps2Access
     private int _replyCapacity;
     private long _lastReplyTimestamp;
 
+    /// <summary>The port this access serves. Any context.</summary>
+    public Ps2Port Port { get; }
+
+    /// <summary>
+    /// True when bytes reach this access after the probe returns: the
+    /// controller's lines are connected or its driver drains it
+    /// periodically. A leaf declines a port that is neither
+    /// (<c>no interrupt and no timer to poll with</c>). Any context.
+    /// </summary>
+    public bool DeliversUnattended => _controller.InterruptDriven || _controller.PolledPeriodically;
+
+    /// <summary>How many stream bytes a full ring dropped so far. Any context.</summary>
+    public int OverrunCount => _overruns;
+
     /// <summary>
     /// Creates the access of one port: the receive ring, the port's source
     /// and the exchange's event are allocated here. Thread context, the
@@ -110,20 +124,6 @@ public sealed class Ps2Access
         _source = new Ps2InterruptSource(port);
         _gapTicks = Stopwatch.Frequency / MillisecondsPerSecond * ReplyGapMilliseconds;
     }
-
-    /// <summary>The port this access serves. Any context.</summary>
-    public Ps2Port Port { get; }
-
-    /// <summary>
-    /// True when bytes reach this access after the probe returns: the
-    /// controller's lines are connected or its driver drains it
-    /// periodically. A leaf declines a port that is neither
-    /// (<c>no interrupt and no timer to poll with</c>). Any context.
-    /// </summary>
-    public bool DeliversUnattended => _controller.InterruptDriven || _controller.PolledPeriodically;
-
-    /// <summary>How many stream bytes a full ring dropped so far. Any context.</summary>
-    public int OverrunCount => _overruns;
 
     /// <summary>
     /// The node's one interrupt source, the port's, in a fresh array for

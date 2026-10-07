@@ -31,7 +31,10 @@ internal sealed class Ps2InterruptSource : InterruptSource
     }
 
     /// <inheritdoc/>
-    public override string Describe() => _port == Ps2Port.Keyboard ? "port kbd" : "port aux";
+    public override string Describe()
+    {
+        return _port == Ps2Port.Keyboard ? "port kbd" : "port aux";
+    }
 
     /// <summary>
     /// Delivers one interrupt to the connected handler: nothing while

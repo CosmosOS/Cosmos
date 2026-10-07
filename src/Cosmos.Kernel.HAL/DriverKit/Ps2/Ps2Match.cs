@@ -14,13 +14,13 @@ public sealed class Ps2Match : DeviceMatch
 {
     private readonly Ps2Port _port;
 
+    /// <inheritdoc/>
+    public override int Specificity => 1;
+
     private Ps2Match(Ps2Port port)
     {
         _port = port;
     }
-
-    /// <inheritdoc/>
-    public override int Specificity => 1;
 
     /// <summary>Matches the Ps2 node of <paramref name="port"/>.</summary>
     /// <param name="port">The port.</param>
@@ -36,5 +36,8 @@ public sealed class Ps2Match : DeviceMatch
     }
 
     /// <inheritdoc/>
-    public override bool Matches(DeviceIdentity identity) => identity is Ps2Identity ps2 && ps2.Port == _port;
+    public override bool Matches(DeviceIdentity identity)
+    {
+        return identity is Ps2Identity ps2 && ps2.Port == _port;
+    }
 }

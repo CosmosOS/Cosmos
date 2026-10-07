@@ -18,11 +18,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Ps2;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public abstract class Ps2Controller
 {
-    /// <summary>Creates the contract half of a controller.</summary>
-    protected Ps2Controller()
-    {
-    }
-
     /// <summary>
     /// True once the controller's lines are connected, so a byte reaches
     /// <see cref="Ps2Access.Deliver"/> from the controller driver's
@@ -36,6 +31,11 @@ public abstract class Ps2Controller
     /// routed. Any context.
     /// </summary>
     public abstract bool PolledPeriodically { get; }
+
+    /// <summary>Creates the contract half of a controller.</summary>
+    protected Ps2Controller()
+    {
+    }
 
     /// <summary>
     /// Writes one byte to the port's device: the 0xD4 prefix for the
@@ -60,8 +60,14 @@ public abstract class Ps2Controller
     /// <param name="port">The port whose device receives the byte.</param>
     /// <param name="value">The byte.</param>
     /// <returns>False when the input buffer did not empty within the controller driver's bound.</returns>
-    internal bool TrySend(Ps2Port port, byte value) => TrySendCore(port, value);
+    internal bool TrySend(Ps2Port port, byte value)
+    {
+        return TrySendCore(port, value);
+    }
 
     /// <summary>Kit side of <see cref="PollCore"/>; called by the access's exchange, never by a leaf driver. Thread context.</summary>
-    internal void Poll() => PollCore();
+    internal void Poll()
+    {
+        PollCore();
+    }
 }
