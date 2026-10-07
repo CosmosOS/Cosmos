@@ -36,7 +36,7 @@ Most hooks receive the `PerCpuState` they operate on, and run either under the m
 | `OnThreadCreate(state, thread)` | `CreateThread` | Allocate the per-thread bookkeeping into `thread.SchedulerData`; do not queue the thread yet |
 | `OnThreadReady(state, thread)` | `ReadyThread` (wakes, first start, sleep expiry) | Make the thread runnable: place it and insert it into the run structure |
 | `OnThreadBlocked(state, thread)` | `BlockThread` and `MarkSleeping` | Remove the thread from the run structure; save whatever must survive the park |
-| `OnThreadYield(state, thread)` | `ScheduleFromInterrupt` (the preempted thread, if it stayed `Ready`) and `YieldThread` | Re-insert a thread that gave up the CPU |
+| `OnThreadYield(state, thread)` | `ScheduleFromInterrupt` (the thread it switches out, preempted or yielding, if it was still `Running`) | Re-insert a thread that gave up the CPU |
 | `OnThreadExit(state, thread)` | `ExitThread` | Remove it everywhere and drop its bookkeeping |
 | `OnTick(state, current, elapsedNs)` | the timer interrupt | Account the elapsed time; return `true` to request a reschedule. `elapsedNs` is the configured tick interval, not a measurement |
 | `PickNext(state)` | `ScheduleFromInterrupt` | Return the next thread to run, or `null` to run the idle thread |

@@ -328,7 +328,7 @@ public static class SchedulerManager
     /// Entry body for newly scheduled threads. Called from
     /// <see cref="Cosmos.Kernel.Core.Bridge.ThreadNative.EntryPointStub"/>,
     /// whose address is passed as the initial RIP / PC to the context-switch
-    /// assembly by whoever creates the thread (e.g. ThreadPlug).
+    /// assembly by whoever creates the thread (e.g. SystemNative_CreateThread).
     /// </para>
     ///
     /// This method handles exceptions, marks the thread as exited, and halts. The scheduler will
@@ -729,24 +729,42 @@ public static class SchedulerManager
         }
     }
 
-    internal static void YieldThread(uint cpuId, SchedulerThread thread)
+    /// <summary>
+    /// Gives up the CPU: asks the next interrupt exit to switch, the request
+    /// <see cref="BlockThread"/> makes, and halts until that exit ran it. The
+    /// switch re-queues the thread through <see cref="IScheduler.OnThreadYield"/>
+    /// after the policy picked another, as a preemption does, so the thread
+    /// is never queued while it still runs. Nothing switches outside an
+    /// interrupt exit, so the thread waits for the next interrupt, at most a
+    /// tick. Does nothing while the scheduler is not running, before its
+    /// first tick, or with interrupts masked: no exit may ever run the
+    /// request then.
+    /// </summary>
+    /// <param name="cpuId">CPU ID of the thread.</param>
+    /// <param name="thread">The thread running on that CPU.</param>
+    /// <returns>True when another thread ran before this one got the CPU back.</returns>
+    internal static bool YieldThread(uint cpuId, SchedulerThread thread)
     {
         ThrowIfCpuStateNotInitialized();
-        ThrowIfSchedulerNotSet();
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        if (!s_enabled || s_tickPeriodNs == 0 || !InternalCpu.AreInterruptsEnabled())
         {
-            PerCpuState state = s_cpuStates[cpuId];
-
-            // Queued from here on, so Ready: the switch that takes it off the
-            // CPU must not queue it a second time, and a pick that hands it
-            // straight back marks it Running again.
-            if (thread.State == SchedulerThreadState.Running)
-            {
-                thread.State = SchedulerThreadState.Ready;
-                s_currentScheduler.OnThreadYield(state, thread);
-            }
+            return false;
         }
+
+        PerCpuState state = s_cpuStates[cpuId];
+        ulong scheduledAt = thread.LastScheduledAt;
+        Volatile.Write(ref state._needReschedule, true);
+
+        // Every hardware interrupt exit clears the request and runs it, and a
+        // thread switched away resumes only through such an exit, so the
+        // request still set means no interrupt came yet.
+        while (Volatile.Read(ref state._needReschedule))
+        {
+            InternalCpu.Halt();
+        }
+
+        return thread.LastScheduledAt != scheduledAt;
     }
 
     /// <summary>

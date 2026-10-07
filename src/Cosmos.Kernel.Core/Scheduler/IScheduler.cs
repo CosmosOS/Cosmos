@@ -123,12 +123,11 @@ public interface IScheduler
     void OnThreadExit(PerCpuState cpuState, SchedulerThread thread);
 
     /// <summary>
-    /// Re-insert a thread that gave up the CPU while still runnable. Called
-    /// from an explicit yield in thread context with interrupts masked, and
-    /// from the preemption path in interrupt context, where it runs
-    /// <em>after</em> <see cref="PickNext"/> has already chosen the
-    /// replacement: the outgoing thread is not a candidate for the switch it
-    /// is being preempted by.
+    /// Re-insert a thread that gave up the CPU while still runnable, whether
+    /// preempted or yielding. Called in interrupt context by the switch that
+    /// takes the thread off the CPU, <em>after</em> <see cref="PickNext"/>
+    /// has already chosen the replacement: the outgoing thread is not a
+    /// candidate for the switch it is leaving by.
     /// </summary>
     /// <param name="cpuState">CPU the thread is queued on.</param>
     /// <param name="thread">Thread giving up the CPU.</param>

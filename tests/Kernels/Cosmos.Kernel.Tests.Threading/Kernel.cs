@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.System.Diagnostics;
@@ -17,7 +18,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 74;
+    private const int ExpectedTestCount = 78;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -54,6 +55,11 @@ public class Kernel : Sys.Kernel
 
     /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
     private const uint UnregisteredCpuId = 4096;
+
+    /// <summary>Turns each side of the Thread.Yield ping-pong takes.</summary>
+    private const int PingPongRounds = 20;
+    /// <summary>Yields one side of the ping-pong spends waiting for its turn before it calls the exchange stalled; each lasts until the next interrupt.</summary>
+    private const int YieldRetries = 1000;
 
     /// <summary>Polling interval (ms) while waiting on scheduler-test flags (worker holding, parked, woke, ...).</summary>
     private const int FlagPollIntervalMs = 50;
@@ -166,6 +172,8 @@ public class Kernel : Sys.Kernel
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
         TR.Run("Mutex_ThreeContenders_AllAcquire", TestMutexThreeContenders);
         TR.Run("Mutex_ReleaseHandsOffToParkedWaiter", TestMutexReleaseHandsOff);
+        TR.Run("Thread_Yield_PingPong_BothWaitersFinish", TestThreadYieldPingPong);
+        TR.Run("Thread_Yield_InterruptsMasked_ReturnsFalse", TestThreadYieldInterruptsMasked);
 
         // ThreadPool / Task / async-await tests (validate fix for #245, #246)
         TR.Run("ThreadPool_QueueUserWorkItem_ExecutesCallback", TestThreadPoolQueueUserWorkItem);
@@ -857,6 +865,80 @@ public class Kernel : Sys.Kernel
         s_handoffMutex!.Acquire();
         s_handoffContenderAcquired = true;
         s_handoffMutex.Release();
+    }
+
+    // ===== Thread.Yield =====
+    // Thread.Yield reaches RhYield unplugged. Each of two threads waits for
+    // the other on Thread.Yield alone, so a yield that never lets the other
+    // run, or a run queue that strands it behind a stale entry, stalls the
+    // exchange instead of finishing it.
+    private static volatile int s_pingPongTurn;
+    private static volatile bool s_pingPongStop;
+
+    private static void TestThreadYieldPingPong()
+    {
+        s_pingPongTurn = 0;
+        s_pingPongStop = false;
+
+        SysThread worker = new(PingPongWorker);
+        worker.Start();
+
+        bool anotherRan = false;
+        int rounds = 0;
+        for (; rounds < PingPongRounds; rounds++)
+        {
+            int handedTurn = (2 * rounds) + 1;
+            s_pingPongTurn = handedTurn;
+            for (int i = 0; i < YieldRetries && s_pingPongTurn == handedTurn; i++)
+            {
+                anotherRan |= SysThread.Yield();
+            }
+
+            if (s_pingPongTurn == handedTurn)
+            {
+                break;
+            }
+        }
+
+        s_pingPongStop = true;
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        Assert.Equal(PingPongRounds, rounds, "two threads waiting on each other through Thread.Yield must finish every round");
+        Assert.True(anotherRan, "Thread.Yield must report that the worker ran");
+    }
+
+    private static void PingPongWorker()
+    {
+        for (int turn = 1; turn < 2 * PingPongRounds; turn += 2)
+        {
+            for (int i = 0; i < YieldRetries && s_pingPongTurn != turn && !s_pingPongStop; i++)
+            {
+                SysThread.Yield();
+            }
+
+            if (s_pingPongTurn != turn)
+            {
+                return;
+            }
+
+            s_pingPongTurn = turn + 1;
+        }
+    }
+
+    /// <summary>
+    /// With interrupts masked no interrupt exit can run the switch a yield
+    /// asks for, so Thread.Yield must return at once, reporting no switch,
+    /// rather than halt a CPU that takes no interrupt.
+    /// </summary>
+    private static void TestThreadYieldInterruptsMasked()
+    {
+        bool switched;
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            switched = SysThread.Yield();
+        }
+
+        Assert.False(switched, "Thread.Yield with interrupts masked must return without switching");
     }
 
     private static void TestMultipleThreads()

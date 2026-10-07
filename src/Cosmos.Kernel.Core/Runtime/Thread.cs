@@ -1,7 +1,6 @@
 using System.Runtime;
 using System.Runtime.InteropServices.Marshalling;
 using Cosmos.Kernel.Core.Bridge;
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 
@@ -89,20 +88,20 @@ internal class Thread
         }
     }
 
+    /// <summary>
+    /// Backs <c>Thread.Yield</c>, and through it CoreLib's spin waits: gives
+    /// up the CPU until the next interrupt exit has switched.
+    /// </summary>
+    /// <returns>Nonzero when another thread ran meanwhile, as upstream's.</returns>
     [RuntimeExport("RhYield")]
     internal static int RhYield()
     {
-        Serial.WriteString("RhYield Called\n");
         if (CosmosFeatures.SchedulerEnabled)
         {
             SchedulerThread? thread = SchedulerManager.CurrentCpuState?.CurrentThread;
-            if (thread is not null)
+            if (thread is not null && SchedulerManager.YieldThread(SchedulerManager.GetCurrentCpuId(), thread))
             {
-                //TODO: Switch Threads (if possible)
-                SchedulerManager.YieldThread(SchedulerManager.GetCurrentCpuId(), thread);
-                InternalCpu.Halt();
-
-                return 0;
+                return 1;
             }
         }
 

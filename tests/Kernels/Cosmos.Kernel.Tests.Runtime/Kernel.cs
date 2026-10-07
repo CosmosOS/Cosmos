@@ -142,7 +142,7 @@
 // │ RhpStackProbe                                     │ Std │  0 │   0 │ stub │   1   │  —   │  50  │
 // │ RhSetThreadExitCallback                           │ Std │  1 │   0 │ real │   1   │  33  │  50  │
 // │ RhSpinWait                                        │ Std │  1 │   0 │ real │   1   │  33  │  50  │
-// │ RhYield                                           │ Std │  0 │   1 │ stub │   1   │  —   │ 100  │
+// │ RhYield                                           │ Std │  0 │   1 │ real │   1   │  —   │  50  │
 // │ NativeRuntimeEventSource_LogContentionLockCreated │ Std │  4 │   0 │ stub │   *   │  33  │  50  │
 // │ NativeRuntimeEventSource_LogContentionStart       │ Std │  5 │   0 │ stub │   *   │  33  │  50  │
 // │ NativeRuntimeEventSource_LogContentionStop        │ Std │  5 │   0 │ stub │   *   │  33  │  50  │
@@ -260,6 +260,7 @@
 //   (+ 3 already listed above)
 
 using System.Runtime.CompilerServices;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime;
@@ -469,7 +470,7 @@ public unsafe class Kernel : Sys.Kernel
         // -- RhSpinWait --
         TR.Run("RhSpinWait_Zero_NoOp", Test_RhSpinWait_Zero_NoOp);
         // -- RhYield --
-        TR.Run("RhYield_ReturnsZero", Test_RhYield_ReturnsZero);
+        TR.Run("RhYield_InterruptsMasked_ReturnsZero", Test_RhYield_InterruptsMasked_ReturnsZero);
         // -- NativeRuntimeEventSource_Log* --
         TR.Run("NativeRuntimeEventSource_LogAll_Smoke", Test_NativeRuntimeEventSource_LogAll_Smoke);
 
@@ -1426,10 +1427,17 @@ public unsafe class Kernel : Sys.Kernel
     }
 
     // -- RhYield --
-    private static void Test_RhYield_ReturnsZero()
+    private static void Test_RhYield_InterruptsMasked_ReturnsZero()
     {
-        int result = Core.Runtime.Thread.RhYield();
-        Assert.Equal(0, result, "RhYield stub returns 0");
+        // No interrupt exit can run the switch a yield asks for while
+        // interrupts are masked, so RhYield must return at once, not halt.
+        int result;
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            result = Core.Runtime.Thread.RhYield();
+        }
+
+        Assert.Equal(0, result, "RhYield with interrupts masked returns 0 without switching");
     }
 
     // -- NativeRuntimeEventSource_Log* (6 no-op stubs, batched) --
