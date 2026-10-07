@@ -14,11 +14,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 /// </summary>
 internal sealed class EngineJob
 {
-    internal EngineJob(EngineJobKind kind)
-    {
-        Kind = kind;
-    }
-
     /// <summary>What to do.</summary>
     public EngineJobKind Kind { get; }
 
@@ -39,4 +34,9 @@ internal sealed class EngineJob
 
     /// <summary>True while linked in the queue. Engine lock.</summary>
     internal bool IsQueued { get; set; }
+
+    internal EngineJob(EngineJobKind kind)
+    {
+        Kind = kind;
+    }
 }

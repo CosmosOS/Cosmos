@@ -26,10 +26,19 @@ internal sealed class PeriodicWork
     }
 
     /// <summary>Registers the timer; the first firing is one interval away.</summary>
-    internal void Start() => _timer.RegisterTimer(_entry);
+    internal void Start()
+    {
+        _timer.RegisterTimer(_entry);
+    }
 
     /// <summary>Unregisters the timer. Teardown only.</summary>
-    internal void Cancel() => _timer.UnregisterTimer(_entry);
+    internal void Cancel()
+    {
+        _timer.UnregisterTimer(_entry);
+    }
 
-    private void Fire() => _item.Schedule();
+    private void Fire()
+    {
+        _item.Schedule();
+    }
 }

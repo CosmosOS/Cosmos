@@ -35,12 +35,17 @@ internal static class DeviceRegistry
     /// </summary>
     /// <param name="kind">The kind of device the consumer wants.</param>
     /// <param name="consumer">The consumer, or null to remove the current one.</param>
-    public static void SetConsumer(DeviceKind kind, DeviceConsumer? consumer) =>
+    public static void SetConsumer(DeviceKind kind, DeviceConsumer? consumer)
+    {
         Volatile.Write(ref s_consumers[(int)kind], consumer);
+    }
 
     /// <summary>The consumer installed for <paramref name="kind"/>, read at call time. Allocation-free; any context.</summary>
     /// <param name="kind">The kind.</param>
-    internal static DeviceConsumer? ConsumerOf(DeviceKind kind) => Volatile.Read(ref s_consumers[(int)kind]);
+    internal static DeviceConsumer? ConsumerOf(DeviceKind kind)
+    {
+        return Volatile.Read(ref s_consumers[(int)kind]);
+    }
 
     /// <summary>
     /// Lists a device as published, without telling anyone yet. Worker only,

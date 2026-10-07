@@ -24,8 +24,10 @@ internal static class DeviceMemory
     /// window is reached. 0 without a bootloader response. Any context;
     /// allocation-free.
     /// </summary>
-    internal static unsafe ulong HhdmOffset() =>
-        Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : 0;
+    internal static unsafe ulong HhdmOffset()
+    {
+        return Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : 0;
+    }
 
     /// <summary>
     /// Asks the platform to map every block of the window that starts at

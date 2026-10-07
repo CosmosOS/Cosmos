@@ -202,18 +202,18 @@ internal static class Arbitration
 
     private readonly struct Candidate
     {
+        internal Driver Driver { get; }
+
+        internal int Position { get; }
+
+        internal int Specificity { get; }
+
         internal Candidate(Driver driver, int position, int specificity)
         {
             Driver = driver;
             Position = position;
             Specificity = specificity;
         }
-
-        internal Driver Driver { get; }
-
-        internal int Position { get; }
-
-        internal int Specificity { get; }
 
         internal bool Precedes(Candidate other)
         {

@@ -33,7 +33,10 @@ internal static class InterruptContextGuard
     }
 
     /// <summary>Marks the end of a handler dispatch.</summary>
-    internal static void Exit() => s_depth--;
+    internal static void Exit()
+    {
+        s_depth--;
+    }
 
     /// <summary>Stops a thread-context member called from a driver interrupt handler.</summary>
     /// <param name="member">The member the caller is in, for the message.</param>

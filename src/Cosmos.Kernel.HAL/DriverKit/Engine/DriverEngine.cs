@@ -363,7 +363,10 @@ internal static class DriverEngine
         }
     }
 
-    private static InterruptEvent? NewCompletion() => IsStarted && HasWorker && !IsOnWorker ? new InterruptEvent() : null;
+    private static InterruptEvent? NewCompletion()
+    {
+        return IsStarted && HasWorker && !IsOnWorker ? new InterruptEvent() : null;
+    }
 
     /// <summary>Queues a job and, when it carries a completion, waits for it.</summary>
     /// <param name="job">The job.</param>

@@ -19,9 +19,15 @@ internal static class KitTime
     private const long MicrosecondsPerSecond = 1_000_000;
 
     /// <summary>The scheduler thread running this code, or null without a scheduler.</summary>
-    public static SchedulerThread? CurrentThread => SchedulerManager.IsReady
-        ? SchedulerManager.CurrentCpuState?.CurrentThread
-        : null;
+    public static SchedulerThread? CurrentThread
+    {
+        get
+        {
+            return SchedulerManager.IsReady
+                ? SchedulerManager.CurrentCpuState?.CurrentThread
+                : null;
+        }
+    }
 
     /// <summary>True when the caller is a thread the scheduler may put to sleep.</summary>
     public static bool CanSleep
@@ -35,12 +41,17 @@ internal static class KitTime
 
     /// <summary>A timestamp <paramref name="milliseconds"/> from now, in <see cref="Stopwatch"/> ticks.</summary>
     /// <param name="milliseconds">How far ahead.</param>
-    public static long DeadlineAfter(uint milliseconds) =>
-        Stopwatch.GetTimestamp() + Stopwatch.Frequency / MillisecondsPerSecond * milliseconds;
+    public static long DeadlineAfter(uint milliseconds)
+    {
+        return Stopwatch.GetTimestamp() + Stopwatch.Frequency / MillisecondsPerSecond * milliseconds;
+    }
 
     /// <summary>True once <paramref name="deadline"/> is in the past.</summary>
     /// <param name="deadline">A value from <see cref="DeadlineAfter"/>.</param>
-    public static bool HasPassed(long deadline) => Stopwatch.GetTimestamp() >= deadline;
+    public static bool HasPassed(long deadline)
+    {
+        return Stopwatch.GetTimestamp() >= deadline;
+    }
 
     /// <summary>Busy-waits for <paramref name="microseconds"/> on the timestamp counter, for a caller with no platform delay.</summary>
     /// <param name="microseconds">How long.</param>
