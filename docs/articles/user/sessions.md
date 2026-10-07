@@ -122,6 +122,7 @@ The DevKernel opens `tty2` to `tty4` at boot, each with a shell of its own, and 
 | `tty` | Shows which session the shell runs on |
 | `chvt <n>` | Shows session `n` on the display |
 | `openvt` | Opens another virtual console with a shell |
+| `telnetd [port\|stop]` | Starts the Telnet server, on port 23 by default, or stops it |
 | `exit` (`logout`) | Closes the session the shell runs on; the primary console stays |
 
 ## Current limitations
