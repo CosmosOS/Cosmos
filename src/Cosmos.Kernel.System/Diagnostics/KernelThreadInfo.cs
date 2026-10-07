@@ -1,8 +1,10 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
 /// Point-in-time snapshot of one kernel thread, produced by
-/// <see cref="SchedulerInfo"/>. The snapshot is taken without locking the
+/// <see cref="SchedulerDiagnostics"/>. The snapshot is taken without locking the
 /// scheduler, so fields of a thread that is being rescheduled concurrently
 /// may be one tick stale.
 /// <para>
@@ -20,28 +22,6 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// </summary>
 public readonly struct KernelThreadInfo
 {
-    internal KernelThreadInfo(
-        uint id,
-        uint cpuId,
-        KernelThreadState state,
-        bool isIdle,
-        bool isManaged,
-        ulong totalRuntimeNs,
-        ulong stackSizeBytes,
-        long priority,
-        bool hasPriority)
-    {
-        Id = id;
-        CpuId = cpuId;
-        State = state;
-        IsIdle = isIdle;
-        IsManaged = isManaged;
-        TotalRuntimeNs = totalRuntimeNs;
-        StackSizeBytes = stackSizeBytes;
-        Priority = priority;
-        HasPriority = hasPriority;
-    }
-
     /// <summary>Unique thread identifier. The idle thread has ID 0.</summary>
     public uint Id { get; }
 
@@ -79,4 +59,26 @@ public readonly struct KernelThreadInfo
     /// priority for it.
     /// </summary>
     public bool HasPriority { get; }
+
+    internal KernelThreadInfo(
+        uint id,
+        uint cpuId,
+        KernelThreadState state,
+        bool isIdle,
+        bool isManaged,
+        ulong totalRuntimeNs,
+        ulong stackSizeBytes,
+        long priority,
+        bool hasPriority)
+    {
+        Id = id;
+        CpuId = cpuId;
+        State = state;
+        IsIdle = isIdle;
+        IsManaged = isManaged;
+        TotalRuntimeNs = totalRuntimeNs;
+        StackSizeBytes = stackSizeBytes;
+        Priority = priority;
+        HasPriority = hasPriority;
+    }
 }

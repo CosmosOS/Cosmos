@@ -26,7 +26,13 @@ internal class X64InterruptController : IInterruptController
     /// <summary>Size in bytes of the XMM save area the asm stub pushes below the IRQContext. Internal: shared with the LAPIC timer handler's RSP derivation.</summary>
     internal const int XmmSaveAreaSizeBytes = 256;
 
-    public bool IsInitialized => ApicManager.IsInitialized;
+    /// <summary>
+    /// True once a hardware line can be routed, which on x64 takes the I/O
+    /// APIC the MADT describes. The Local APIC alone, which a machine without
+    /// ACPI still has, delivers the timer and MSI messages but no line, so
+    /// line sources refuse to connect and their drivers poll.
+    /// </summary>
+    public bool IsInitialized => ApicManager.CanRouteIrqs;
 
     public void Initialize()
     {
@@ -37,9 +43,27 @@ internal class X64InterruptController : IInterruptController
 
     public void RouteIrq(byte irqNo, byte vector, bool startMasked)
     {
-        if (ApicManager.IsInitialized)
+        if (ApicManager.CanRouteIrqs)
         {
             ApicManager.RouteIrq(irqNo, vector, startMasked);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void MaskIrq(byte irqNo)
+    {
+        if (ApicManager.CanRouteIrqs)
+        {
+            ApicManager.MaskIrq(irqNo);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void UnmaskIrq(byte irqNo)
+    {
+        if (ApicManager.CanRouteIrqs)
+        {
+            ApicManager.UnmaskIrq(irqNo);
         }
     }
 
@@ -57,7 +81,7 @@ internal class X64InterruptController : IInterruptController
                 // the APIC spurious vector: a spurious delivery sets no ISR
                 // bit, so an EOI here would retire whichever real interrupt
                 // is currently in service (SDM 3A §11.9).
-                if (ctx.interrupt >= FirstHardwareIrqVector && ctx.interrupt != LocalApic.SPURIOUS_VECTOR && IsInitialized)
+                if (ctx.interrupt >= FirstHardwareIrqVector && ctx.interrupt != LocalApic.SPURIOUS_VECTOR && ApicManager.IsInitialized)
                 {
                     SendEOI();
 
@@ -89,7 +113,7 @@ internal class X64InterruptController : IInterruptController
         // The spurious vector is the exception (see above): it arrives here
         // because nothing registers a handler for it, and it must be
         // dismissed without EOI.
-        if (ctx.interrupt >= FirstHardwareIrqVector && ctx.interrupt != LocalApic.SPURIOUS_VECTOR && IsInitialized)
+        if (ctx.interrupt >= FirstHardwareIrqVector && ctx.interrupt != LocalApic.SPURIOUS_VECTOR && ApicManager.IsInitialized)
         {
             SendEOI();
         }

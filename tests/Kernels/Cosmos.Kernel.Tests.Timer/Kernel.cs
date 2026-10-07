@@ -1,18 +1,17 @@
 using System;
 using System.Diagnostics;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using BclTimer = System.Threading.Timer;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
 #if ARCH_X64
 using Cosmos.Kernel.Core.X64.Cpu;
-using Cosmos.Kernel.HAL.X64.Devices.Clock;
-using Cosmos.Kernel.HAL.X64.Devices.Timer;
+using Cosmos.Kernel.HAL.X64;
+using Rtc = Cosmos.Kernel.HAL.X64.CmosRtc;
 #else
-using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
+using Rtc = Cosmos.Kernel.HAL.ARM64.PL031Rtc;
 #endif
 
 namespace Cosmos.Kernel.Tests.Timer;
@@ -95,11 +94,11 @@ public class Kernel : Sys.Kernel
     // ==================== DateTime/RTC Tests ====================
     private static void TestRTCInitialized()
     {
-        Assert.True(RTC.Instance != null, "RTC: Instance should be initialized");
-        Assert.True(RTC.Instance!.IsAvailable, "RTC: Should be initialized");
+        Assert.True(Rtc.Instance is not null, "RTC: Instance should be initialized");
+        Assert.True(Rtc.Instance!.IsAvailable, "RTC: Should be initialized");
 
         Log.WriteString("[Timer Tests] RTC boot time ticks: ");
-        Log.WriteNumber((ulong)RTC.Instance.BootTimeTicks);
+        Log.WriteNumber((ulong)Rtc.Instance.BootTimeTicks);
         Log.WriteString("\n");
     }
 
@@ -210,9 +209,9 @@ public class Kernel : Sys.Kernel
 
     private static void TestTimerManagerInitialized()
     {
-        // IsInitialized is exactly "a timer device is registered": the ring
-        // publishes the fact, so the suite does not read the device itself.
-        Assert.True(TimerManager.IsInitialized, "TimerManager: a timer device should be registered");
+        // IsInitialized is exactly "a tick source is registered": the ring
+        // publishes the fact, so the suite does not read the tick source.
+        Assert.True(TimerManager.IsInitialized, "TimerManager: a tick source should be registered");
     }
 
     private static void TestTimerManagerWait500ms()

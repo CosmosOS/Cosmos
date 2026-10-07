@@ -4,7 +4,7 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Runtime.GcInfo;
 using Unsafe = System.Runtime.CompilerServices.Unsafe;
 
-namespace Cosmos.Kernel.Core.Runtime;
+namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 
 /// <summary>
 /// Core exception handling implementation.

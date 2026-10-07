@@ -1,0 +1,183 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+// Ported from Cosmos.System2/Keyboard/KeyMapping.cs
+
+namespace Cosmos.Kernel.System.Input;
+
+/// <summary>
+/// Represents a physical to virtual key mapping.
+/// </summary>
+public sealed class KeyMapping
+{
+    /// <summary>
+    /// The physical scan-code that the mapping refers to.
+    /// </summary>
+    public byte ScanCode { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with no modifiers active.
+    /// </summary>
+    public char Value { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with the Control
+    /// (Ctrl) key modifier being active.
+    /// </summary>
+    public char Control { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with the Shift
+    /// key modifier being active.
+    /// </summary>
+    public char Shift { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with the Num Lock
+    /// key modifier being active.
+    /// </summary>
+    public char NumLock { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with the Caps Lock
+    /// key modifier being active.
+    /// </summary>
+    public char CapsLock { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with both the Caps Lock
+    /// and Num Lock key modifiers being active.
+    /// </summary>
+    public char ShiftCapsLock { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with both the Shift
+    /// and Num Lock key modifiers being active.
+    /// </summary>
+    public char ShiftNumLock { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with both the Control
+    /// and Alt key modifiers being active.
+    /// </summary>
+    public char ControlAlt { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with both the Control
+    /// and Shift key modifiers being active.
+    /// </summary>
+    public char ControlShift { get; set; }
+
+    /// <summary>
+    /// The text character value of the key with both the Control,
+    /// Alt, and Shift key modifiers being active.
+    /// </summary>
+    public char ControlAltShift { get; set; }
+
+    /// <summary>
+    /// The virtual key that the physical key-press maps to.
+    /// </summary>
+    public Key Key { get; set; }
+
+    /// <summary>
+    /// The virtual key that the physical key-press maps to when
+    /// the Num Lock modifier is active.
+    /// </summary>
+    public Key NumLockKey { get; set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KeyMapping"/> class.
+    /// </summary>
+    /// <param name="scanCode">The physical scan code of the key.</param>
+    /// <param name="normal">The text character value of the key with no modifiers being active.</param>
+    /// <param name="shift">The text character value of the key with the Shift modifier being active.</param>
+    /// <param name="num">The text character value of the key with the Num Lock modifier being active.</param>
+    /// <param name="caps">The text character value of the key with the Caps Lock modifier being active.</param>
+    /// <param name="shiftCapsLock">The text character value of the key with the Shift and Caps Lock modifiers being active.</param>
+    /// <param name="shiftNumLock">The text character value of the key with the Shift and Num Lock modifiers being active.</param>
+    /// <param name="ctrlAlt">The text character value of the key with the Control and Alt modifiers being active.</param>
+    /// <param name="ctrlAltShift">The text character value of the key with the Control, Alt, and Shift modifiers being active.</param>
+    /// <param name="ctrl">The text character value of the key with the Control modifier being active.</param>
+    /// <param name="shiftCtrl">The text character value of the key with the Shift and Control modifiers being active.</param>
+    /// <param name="key">The virtual key that the physical key-press maps to.</param>
+    /// <param name="numKey">The virtual key that the physical key-press maps to when the Num Lock modifier is active.</param>
+    public KeyMapping(byte scanCode, char normal, char shift, char num, char caps, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Key key, Key numKey)
+    {
+        ScanCode = scanCode;
+        Value = normal;
+        Shift = shift;
+        NumLock = num;
+        CapsLock = caps;
+        ShiftCapsLock = shiftCapsLock;
+        ShiftNumLock = shiftNumLock;
+        Key = key;
+        ControlAlt = ctrlAlt;
+        Control = ctrl;
+        ControlAltShift = ctrlAltShift;
+        ControlShift = shiftCtrl;
+        NumLockKey = numKey;
+    }
+
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Key key, Key numKey)
+        : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, ctrlAltShift, '\0', '\0', key, numKey)
+    {
+    }
+
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Key key, Key numKey)
+        : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, '\0', '\0', '\0', key, numKey)
+    {
+    }
+
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Key key)
+        : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, ctrlAltShift, ctrl, shiftCtrl, key, key)
+    {
+    }
+
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, Key key)
+        : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, ctrlAltShift, '\0', '\0', key)
+    {
+    }
+
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char num, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Key key)
+        : this(scanCode, normal, shift, num, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, '\0', '\0', '\0', key)
+    {
+    }
+
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Key key)
+        : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, '\0', '\0', '\0', '\0', key)
+    {
+    }
+
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char normal, char shift, char numLock, char capsLock, char shiftCapsLock, char shiftNumLock, Key key, Key numKey)
+        : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, '\0', key, numKey)
+    {
+    }
+
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, char numLock, Key key, Key numKey)
+        : this(scanCode, '\0', '\0', numLock, '\0', '\0', '\0', key, numKey)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KeyMapping"/> class.
+    /// </summary>
+    /// <param name="scanCode">The physical scan code of the key.</param>
+    /// <param name="n">The character to use for all of the text character fields.</param>
+    /// <param name="key">The virtual key that the physical key-press maps to.</param>
+    public KeyMapping(byte scanCode, char n, Key key)
+        : this(scanCode, n, n, n, n, n, n, key)
+    {
+    }
+
+    /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
+    public KeyMapping(byte scanCode, Key key)
+        : this(scanCode, '\0', '\0', '\0', '\0', '\0', '\0', key)
+    {
+    }
+}

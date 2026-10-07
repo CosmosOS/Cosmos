@@ -50,6 +50,182 @@ public class QemuLauncherTests
     }
 
     [Fact]
+    public void AppendStorageArgs_EmitsAVirtioBlkPciFunctionOnTheRootBus()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, OptionsWithDisk("/tmp/a.img", DiskKind.VirtioBlk));
+
+        string text = args.ToString();
+        Assert.Contains(" -drive file=\"/tmp/a.img\",if=none,id=vblkdisk0,format=raw -device virtio-blk-pci,drive=vblkdisk0,id=vblk0", text);
+        Assert.DoesNotContain("pcie-root-port", text);
+    }
+
+    [Fact]
+    public void AppendStorageArgs_EmitsAVirtioBlkDeviceOnArm64()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "arm64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlkMmio }]
+        });
+
+        Assert.Contains(" -device virtio-blk-device,drive=vblkdisk0,id=vblk0", args.ToString());
+    }
+
+    // q35 has no virtio-mmio window, so the launcher refuses the kind before
+    // QEMU would fail on a device with no bus to sit on.
+    [Fact]
+    public void AppendStorageArgs_RefusesVirtioBlkMmioOnX64()
+    {
+        StringBuilder args = new();
+
+        ArgumentException ex = Assert.Throws<ArgumentException>(() =>
+            QemuLauncher.AppendStorageArgs(args, OptionsWithDisk("/tmp/a.img", DiskKind.VirtioBlkMmio)));
+        Assert.Contains("virt machine", ex.Message);
+    }
+
+    [Fact]
+    public void AppendStorageArgs_NumbersBothVirtioBlkKindsTogether()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "arm64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks =
+            [
+                new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlk },
+                new DiskAttachment { Path = "/tmp/b.img", Kind = DiskKind.VirtioBlkMmio }
+            ]
+        });
+
+        string text = args.ToString();
+        Assert.Contains(" -device virtio-blk-pci,drive=vblkdisk0,id=vblk0", text);
+        Assert.Contains(" -device virtio-blk-device,drive=vblkdisk1,id=vblk1", text);
+    }
+
+    // A hot-pluggable disk gets a root port of its own ahead of it, since
+    // QEMU resolves bus= against devices already on the command line; on q35
+    // the ICH9 global turns the port to native hot-plug (stage9-experiments.md E3).
+    [Fact]
+    public void AppendStorageArgs_PutsAHotPluggableVirtioBlkBehindARootPort()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlk, HotPlug = true }]
+        });
+
+        Assert.Equal(
+            " -global ICH9-LPC.acpi-pci-hotplug-with-bridge-support=off -device pcie-root-port,id=rp0,bus=pcie.0,chassis=1,slot=1 -drive file=\"/tmp/a.img\",if=none,id=vblkdisk0,format=raw -device virtio-blk-pci,drive=vblkdisk0,bus=rp0,id=vblk0",
+            args.ToString());
+    }
+
+    // The virt machine's root ports are native always, and the virt machine
+    // has no ICH9-LPC device for the global to name.
+    [Fact]
+    public void AppendStorageArgs_EmitsNoIch9GlobalOnArm64()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "arm64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlk, HotPlug = true }]
+        });
+
+        string text = args.ToString();
+        Assert.Contains(" -device pcie-root-port,id=rp0,bus=pcie.0,chassis=1,slot=1", text);
+        Assert.Contains(" -device virtio-blk-pci,drive=vblkdisk0,bus=rp0,id=vblk0", text);
+        Assert.DoesNotContain("-global", text);
+    }
+
+    // QEMU refuses a duplicate chassis and slot pair, so each port numbers
+    // its own; the global is machine-wide and appears once.
+    [Fact]
+    public void AppendStorageArgs_EmitsTheIch9GlobalOnceForTwoPorts()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendStorageArgs(args, new QemuLaunchOptions
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            Disks =
+            [
+                new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.VirtioBlk, HotPlug = true },
+                new DiskAttachment { Path = "/tmp/b.img", Kind = DiskKind.VirtioBlk, HotPlug = true }
+            ]
+        });
+
+        string text = args.ToString();
+        Assert.Contains(" -global ICH9-LPC.acpi-pci-hotplug-with-bridge-support=off", text);
+        Assert.Equal(text.IndexOf("-global", StringComparison.Ordinal), text.LastIndexOf("-global", StringComparison.Ordinal));
+        Assert.Contains(" -device pcie-root-port,id=rp0,bus=pcie.0,chassis=1,slot=1", text);
+        Assert.Contains(" -device pcie-root-port,id=rp1,bus=pcie.0,chassis=2,slot=2", text);
+        Assert.Contains(" -device virtio-blk-pci,drive=vblkdisk0,bus=rp0,id=vblk0", text);
+        Assert.Contains(" -device virtio-blk-pci,drive=vblkdisk1,bus=rp1,id=vblk1", text);
+    }
+
+    // The virt machine turns -cdrom into a virtio-blk-pci function a
+    // virtio-blk driver would bind; virtio-scsi keeps the ISO off the block
+    // layer (stage9-experiments.md E5).
+    [Fact]
+    public void AppendArm64Args_AttachesTheIsoThroughVirtioScsi()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendArm64Args(args, new QemuLaunchOptions { Architecture = "arm64", IsoPath = "/tmp/kernel.iso" });
+
+        string text = args.ToString();
+        Assert.Contains(" -device virtio-scsi-pci,id=scsi0 -drive file=\"/tmp/kernel.iso\",if=none,id=cosmoscd,format=raw,readonly=on,media=cdrom -device scsi-cd,drive=cosmoscd,bus=scsi0.0,bootindex=0", text);
+        Assert.DoesNotContain("-cdrom", text);
+    }
+
+    // The keyboard rides the xHCI controller the USB disks share, under the
+    // id the engine unplugs; a run with no USB disk gets the controller from
+    // the keyboard itself, and never twice.
+    [Fact]
+    public void AppendUsbKeyboardArgs_PutsTheKeyboardOnOneXhciController()
+    {
+        QemuLaunchOptions keyboardOnly = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            KeyboardDevice = "usb-kbd"
+        };
+        StringBuilder args = new();
+        QemuLauncher.AppendUsbKeyboardArgs(args, keyboardOnly, QemuLauncher.AppendStorageArgs(args, keyboardOnly));
+
+        string text = args.ToString();
+        Assert.Contains("-device qemu-xhci,id=usbxhci0", text);
+        Assert.Equal(text.IndexOf("qemu-xhci", StringComparison.Ordinal), text.LastIndexOf("qemu-xhci", StringComparison.Ordinal));
+        Assert.Contains(" -device usb-kbd,bus=usbxhci0.0,id=usbkbd0", text);
+
+        // The shared input path adds nothing for it, so the keyboard is emitted once.
+        args.Clear();
+        QemuLauncher.AppendInputDevice(args, "usb-kbd");
+        Assert.Equal(string.Empty, args.ToString());
+
+        QemuLaunchOptions withDisk = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            KeyboardDevice = "usb-kbd",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.Usb }]
+        };
+        args.Clear();
+        QemuLauncher.AppendUsbKeyboardArgs(args, withDisk, QemuLauncher.AppendStorageArgs(args, withDisk));
+
+        text = args.ToString();
+        Assert.Equal(text.IndexOf("qemu-xhci", StringComparison.Ordinal), text.LastIndexOf("qemu-xhci", StringComparison.Ordinal));
+        Assert.Contains("-device usb-storage,drive=usbdisk0,bus=usbxhci0.0,id=usbstick0", text);
+        Assert.Contains(" -device usb-kbd,bus=usbxhci0.0,id=usbkbd0", text);
+    }
+
+    [Fact]
     public void AppendStorageArgs_RejectsQuotesInDrivePaths()
     {
         StringBuilder args = new();
@@ -145,7 +321,7 @@ public class QemuLauncherTests
         Assert.Throws<ArgumentException>(() => QemuLauncher.AppendInputDevice(args, "virtio-keyboard-device -device rm"));
     }
 
-    // "none" passes through deliberately — it is QEMU's own spelling for "no
+    // "none" passes through deliberately: it is QEMU's own spelling for "no
     // VGA adapter", not a sentinel of ours like the input devices' "ps2".
     [Theory]
     [InlineData("vmware")]

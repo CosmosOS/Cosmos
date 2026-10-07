@@ -1,7 +1,9 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
-/// Outcome of <see cref="SchedulerInfo.RequestKill"/>.
+/// Outcome of <see cref="SchedulerDiagnostics.RequestKill"/>.
 /// </summary>
 public enum ThreadKillResult : byte
 {

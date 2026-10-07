@@ -1,7 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.System.Network.IPv6;
+using Cosmos.Kernel.HAL.Devices.Network;
 
 namespace Cosmos.Kernel.System.Network;
 
@@ -10,7 +9,7 @@ namespace Cosmos.Kernel.System.Network;
 /// from <see cref="NetworkManager.GetAdapter(int)"/> or
 /// <see cref="NetworkManager.Primary"/>, and handed back to the ring to inspect
 /// that device or to configure it with
-/// <see cref="Config.IPConfig.Enable(NetworkAdapter, Address, Address, Address)"/>.
+/// <see cref="IPConfig.Enable(NetworkAdapter, Address, Address, Address)"/>.
 /// </summary>
 /// <remarks>
 /// The handle carries the device's registration index biased by one, so a
@@ -22,11 +21,6 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
     // One past the registration index. Slot 0 is the default-constructed
     // handle and belongs to no device.
     private readonly int _slot;
-
-    internal NetworkAdapter(int index)
-    {
-        _slot = index + 1;
-    }
 
     /// <summary>
     /// The device's registration index, or -1 for a handle that names none.
@@ -49,11 +43,11 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
     /// <summary>
     /// The device's MAC address, or null when the handle names no device. A
     /// device that has not finished initializing reports
-    /// <see cref="MACAddress.None"/>, the all-zero address, rather than null:
+    /// <see cref="MacAddress.None"/>, the all-zero address, rather than null:
     /// the two sentinels are different questions, and <see cref="Ready"/>
     /// answers the second one.
     /// </summary>
-    public MACAddress? MacAddress => Device?.MacAddress;
+    public MacAddress? MacAddress => Device?.MacAddress;
 
     /// <summary>
     /// Whether the device reports its link up.
@@ -68,14 +62,14 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
     /// <summary>
     /// The IPv4 configuration in force on this device, or null when the device
     /// is unconfigured or the handle names none. Assign one with
-    /// <see cref="Config.IPConfig.Enable(NetworkAdapter, Address, Address, Address)"/>.
+    /// <see cref="IPConfig.Enable(NetworkAdapter, Address, Address, Address)"/>.
     /// </summary>
-    public Config.IPConfig? IPConfig
+    public IPConfig? IPConfig
     {
         get
         {
             INetworkDevice? device = Device;
-            return device is null ? null : Config.IPConfig.Get(device);
+            return device is null ? null : IPConfig.Get(device);
         }
     }
 
@@ -92,6 +86,11 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
             INetworkDevice? device = Device;
             return device is null ? null : NetworkStack.LinkLocalOf(device);
         }
+    }
+
+    internal NetworkAdapter(int index)
+    {
+        _slot = index + 1;
     }
 
     /// <summary>

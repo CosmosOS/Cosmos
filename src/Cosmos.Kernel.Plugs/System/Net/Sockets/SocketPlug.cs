@@ -4,12 +4,10 @@ using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
-using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Network.IPv4;
-using Cosmos.Kernel.System.Network.TCP;
+using Cosmos.Kernel.System.Network.Protocols.Tcp;
 using AddressFamily = System.Net.Sockets.AddressFamily;
 using KernelEndPoint = Cosmos.Kernel.System.Network.EndPoint;
-using KernelUdpClient = Cosmos.Kernel.System.Network.UDP.UdpClient;
+using KernelUdpClient = Cosmos.Kernel.System.Network.UdpClient;
 
 namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 
@@ -28,7 +26,7 @@ public static class SocketPlug
     // Store protocol type per socket (public for cross-assembly access when patched)
     public static readonly Dictionary<int, ProtocolType> _protocolTypes = [];
     // Store TCP state machine per socket instance
-    internal static readonly Dictionary<int, Tcp> s_tcpStateMachines = [];
+    internal static readonly Dictionary<int, TcpConnection> s_tcpStateMachines = [];
     // Store UDP client per socket instance
     public static readonly Dictionary<int, KernelUdpClient> _udpClients = [];
     // Store bound endpoint per socket instance
@@ -92,11 +90,11 @@ public static class SocketPlug
     public static bool get_Connected(Socket aThis)
     {
         int id = GetId(aThis);
-        if (_protocolTypes.TryGetValue(id, out var proto))
+        if (_protocolTypes.TryGetValue(id, out ProtocolType proto))
         {
             if (proto == ProtocolType.Tcp)
             {
-                if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
+                if (s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
                 {
                     return sm.Status == Status.ESTABLISHED;
                 }
@@ -114,21 +112,21 @@ public static class SocketPlug
     public static int get_Available(Socket aThis)
     {
         int id = GetId(aThis);
-        if (!_protocolTypes.TryGetValue(id, out var proto))
+        if (!_protocolTypes.TryGetValue(id, out ProtocolType proto))
         {
             return 0;
         }
 
         if (proto == ProtocolType.Tcp)
         {
-            if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
+            if (s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
             {
                 return sm.Data.Length;
             }
         }
         else if (proto == ProtocolType.Udp)
         {
-            if (_udpClients.TryGetValue(id, out var client))
+            if (_udpClients.TryGetValue(id, out KernelUdpClient? client))
             {
                 // Return approximate bytes available (count of packets in buffer)
                 return client._rxBuffer.Count > 0 ? client._rxBuffer.Count : 0;
@@ -166,18 +164,18 @@ public static class SocketPlug
     public static bool Poll(Socket aThis, int microSeconds, SelectMode mode)
     {
         int id = GetId(aThis);
-        if (_protocolTypes.TryGetValue(id, out var proto))
+        if (_protocolTypes.TryGetValue(id, out ProtocolType proto))
         {
             if (proto == ProtocolType.Tcp)
             {
-                if (s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
+                if (s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
                 {
                     return sm.Status == Status.ESTABLISHED;
                 }
             }
             else if (proto == ProtocolType.Udp)
             {
-                if (_udpClients.TryGetValue(id, out var client))
+                if (_udpClients.TryGetValue(id, out KernelUdpClient? client))
                 {
                     return client._rxBuffer.Count > 0;
                 }
@@ -218,13 +216,13 @@ public static class SocketPlug
     public static void StartTcp(Socket aThis)
     {
         int id = GetId(aThis);
-        if (!_endpoints.TryGetValue(id, out var ep))
+        if (!_endpoints.TryGetValue(id, out IPEndPoint? ep))
         {
             Log.WriteString("[SocketPlug] Socket not bound\n");
             throw new InvalidOperationException("Socket not bound");
         }
 
-        var sm = Tcp.CreateConnection((ushort)ep.Port, 0, Address4.Zero, Address4.Zero);
+        TcpConnection sm = TcpConnection.CreateConnection((ushort)ep.Port, 0, Address4.Zero, Address4.Zero);
         sm.LocalEndPoint.Port = (ushort)ep.Port;
         sm.Status = Status.LISTEN;
 
@@ -236,7 +234,7 @@ public static class SocketPlug
     {
         int id = GetId(aThis);
 
-        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
         {
             Log.WriteString("[SocketPlug] TcpListener not started, starting...\n");
             StartTcp(aThis);
@@ -245,7 +243,7 @@ public static class SocketPlug
 
         if (sm.Status == Status.CLOSED)
         {
-            Tcp.RemoveConnection(sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address);
+            TcpConnection.RemoveConnection(sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address);
             StartTcp(aThis);
             sm = s_tcpStateMachines[id];
         }
@@ -314,7 +312,7 @@ public static class SocketPlug
         _endpoints.TryAdd(id, new IPEndPoint(address, port));
 
         StartTcp(aThis);
-        Tcp sm = s_tcpStateMachines[id];
+        TcpConnection sm = s_tcpStateMachines[id];
 
         if (sm.Status == Status.ESTABLISHED)
         {
@@ -328,7 +326,7 @@ public static class SocketPlug
         sm.RemoteEndPoint.Port = (ushort)port;
         sm.LocalEndPoint.Address = NetworkManager.Primary.IPConfig?.Address
             ?? throw new InvalidOperationException("No IPv4 configuration on the primary network device");
-        sm.LocalEndPoint.Port = Tcp.GetDynamicPort();
+        sm.LocalEndPoint.Port = TcpConnection.GetDynamicPort();
 
         _remoteEndPoints[id] = new IPEndPoint(address, sm.RemoteEndPoint.Port);
         _localEndPoints[id] = new IPEndPoint(new IPAddress(sm.LocalEndPoint.Address.ToBytes()), sm.LocalEndPoint.Port);
@@ -339,14 +337,14 @@ public static class SocketPlug
         // Fill TCB
         sm.TCB.SndUna = sequenceNumber;
         sm.TCB.SndNxt = sequenceNumber;
-        sm.TCB.SndWnd = Tcp.TcpWindowSize;
+        sm.TCB.SndWnd = TcpConnection.TcpWindowSize;
         sm.TCB.SndUp = 0;
         sm.TCB.SndWl1 = 0;
         sm.TCB.SndWl2 = 0;
         sm.TCB.ISS = sequenceNumber;
 
         sm.TCB.RcvNxt = 0;
-        sm.TCB.RcvWnd = Tcp.TcpWindowSize;
+        sm.TCB.RcvWnd = TcpConnection.TcpWindowSize;
         sm.TCB.RcvUp = 0;
         sm.TCB.IRS = 0;
 
@@ -420,7 +418,7 @@ public static class SocketPlug
     {
         Log.WriteString("[SocketPlug] SendTcp: entering\n");
         int id = GetId(aThis);
-        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
         {
             Log.WriteString("[SocketPlug] Must establish a connection before sending data.\n");
             throw new InvalidOperationException("Must establish a connection before sending data.");
@@ -444,7 +442,7 @@ public static class SocketPlug
         if (size > 536)
         {
             byte[] data = new byte[size];
-            Buffer.BlockCopy(buffer, offset, data, 0, size);
+            buffer.AsSpan(offset, size).CopyTo(data);
 
             byte[][] chunks = ArraySplit(data, 536);
 
@@ -468,7 +466,7 @@ public static class SocketPlug
         {
             Log.WriteString("[SocketPlug] SendTcp: preparing packet\n");
             byte[] data = new byte[size];
-            Buffer.BlockCopy(buffer, offset, data, 0, size);
+            buffer.AsSpan(offset, size).CopyTo(data);
 
             TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), sm.TCB.SndWnd, 0, data);
             Log.WriteString("[SocketPlug] SendTcp: adding to outgoing buffer\n");
@@ -502,13 +500,13 @@ public static class SocketPlug
         return bytesSent;
     }
 
-    internal static void WaitAck(Tcp sm)
+    internal static void WaitAck(TcpConnection sm)
     {
         bool ackReceived = false;
         uint expectedAckNumber = sm.TCB.SndNxt;
         int timeout = 0;
 
-        while (!ackReceived && timeout < 100000)
+        while (!ackReceived && timeout < 100_000)
         {
             if (sm.TCB.SndUna >= expectedAckNumber)
             {
@@ -616,7 +614,7 @@ public static class SocketPlug
     public static int ReceiveTcp(Socket aThis, byte[] buffer, int offset, int size)
     {
         int id = GetId(aThis);
-        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
         {
             Log.WriteString("[SocketPlug] Must establish a connection before receiving data.\n");
             throw new InvalidOperationException("Must establish a connection before receiving data.");
@@ -628,7 +626,7 @@ public static class SocketPlug
         if (sm.Data.Length > 0)
         {
             int bytesToCopy = Math.Min(sm.Data.Length, size);
-            var target = buffer.AsSpan(offset, bytesToCopy);
+            Span<byte> target = buffer.AsSpan(offset, bytesToCopy);
             sm.Data.Slice(0, bytesToCopy).CopyTo(target);
 
             sm.AdvanceDataOffset(bytesToCopy);
@@ -638,7 +636,7 @@ public static class SocketPlug
 
         // Wait for data only if connection is still active
         int timeout = 0;
-        while (sm.Data.Length == 0 && timeout < 100000)
+        while (sm.Data.Length == 0 && timeout < 100_000)
         {
             // Allow reading data in ESTABLISHED, CLOSE_WAIT, or FIN_WAIT states
             if (sm.Status != Status.ESTABLISHED &&
@@ -657,7 +655,7 @@ public static class SocketPlug
         }
 
         int bytes = Math.Min(sm.Data.Length, size);
-        var finalTarget = buffer.AsSpan(offset, bytes);
+        Span<byte> finalTarget = buffer.AsSpan(offset, bytes);
         sm.Data.Slice(0, bytes).CopyTo(finalTarget);
 
         sm.AdvanceDataOffset(bytes);
@@ -740,7 +738,7 @@ public static class SocketPlug
     {
         Log.WriteString("[SocketPlug] CloseTcp: entering\n");
         int id = GetId(aThis);
-        if (!s_tcpStateMachines.TryGetValue(id, out Tcp? sm))
+        if (!s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
         {
             Log.WriteString("[SocketPlug] CloseTcp: no state machine found, returning\n");
             return;
@@ -753,7 +751,7 @@ public static class SocketPlug
         if (sm.Status == Status.CLOSED)
         {
             Log.WriteString("[SocketPlug] CloseTcp: already closed, cleaning up\n");
-            Tcp.RemoveConnection(sm);
+            TcpConnection.RemoveConnection(sm);
             s_tcpStateMachines.Remove(id);
             _endpoints.Remove(id);
             _localEndPoints.Remove(id);
@@ -765,12 +763,12 @@ public static class SocketPlug
         {
             if (sm.WaitStatus(Status.CLOSED, timeout))
             {
-                Tcp.RemoveConnection(sm);
+                TcpConnection.RemoveConnection(sm);
             }
             else
             {
                 // The final ACK never arrived — detach instead of blocking
-                // forever; Tcp reaps the connection once it reaches CLOSED.
+                // forever; TcpConnection reaps the connection once it reaches CLOSED.
                 Log.WriteString("[SocketPlug] CloseTcp: passive close pending, detaching connection\n");
                 sm.Detached = true;
             }
@@ -784,7 +782,7 @@ public static class SocketPlug
 
         if (sm.Status == Status.LISTEN)
         {
-            Tcp.RemoveConnection(sm);
+            TcpConnection.RemoveConnection(sm);
             s_tcpStateMachines.Remove(id);
         }
         else if (sm.Status == Status.ESTABLISHED)
@@ -806,12 +804,12 @@ public static class SocketPlug
 
             if (sm.Status == Status.CLOSED)
             {
-                Tcp.RemoveConnection(sm);
+                TcpConnection.RemoveConnection(sm);
             }
             else
             {
                 // Half-close: detach the state machine so it finishes the
-                // handshake in the background; Tcp reaps it on CLOSED.
+                // handshake in the background; TcpConnection reaps it on CLOSED.
                 Log.WriteString("[SocketPlug] CloseTcp: peer FIN pending, detaching connection\n");
                 sm.Detached = true;
             }

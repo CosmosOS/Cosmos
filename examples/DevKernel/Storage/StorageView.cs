@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.System.Filesystems.Fat;
+using Cosmos.Kernel.HAL.Devices.Storage;
+using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.Kernel.System.Storage;
 using DevKernel.Shell;
 

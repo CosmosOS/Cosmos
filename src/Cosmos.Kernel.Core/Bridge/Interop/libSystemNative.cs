@@ -98,7 +98,9 @@ internal static unsafe partial class libSystemNative
     /// constructor's <c>maxStackSize</c>, or <c>RhGetDefaultStackSize</c> when
     /// unset — and passes it here, so honoring
     /// <c>new Thread(start, maxStackSize)</c> needs no access to Thread's
-    /// private StartHelper.
+    /// private StartHelper. A plug of <c>Thread.CreateThread</c> could not
+    /// reach that field: an <c>UnsafeAccessor</c> rejects a byref return of a
+    /// field whose type is inaccessible, so the seam runs here, below it.
     /// </summary>
     [UnmanagedCallersOnly(EntryPoint = "SystemNative_CreateThread")]
     internal static int SystemNative_CreateThread(IntPtr stackSize, delegate* unmanaged<IntPtr, IntPtr> startAddress, IntPtr parameter)

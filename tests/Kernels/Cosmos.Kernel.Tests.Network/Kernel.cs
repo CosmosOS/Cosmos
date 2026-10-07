@@ -3,20 +3,15 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Cosmos.Kernel.HAL.Devices.Network;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
-using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Network.DNS;
-using Cosmos.Kernel.System.Network.IPv4;
-using Cosmos.Kernel.System.Network.IPv4.DHCP;
-using Cosmos.Kernel.System.Network.IPv6;
-using Cosmos.Kernel.System.Network.TCP;
-using Cosmos.Kernel.System.Network.UDP;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Network.Protocols.IPv4;
+using Cosmos.Kernel.System.Network.Protocols.IPv6;
+using Cosmos.Kernel.System.Network.Protocols.Udp;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using CosmosEndPoint = Cosmos.Kernel.System.Network.EndPoint;
-using CosmosUdpClient = Cosmos.Kernel.System.Network.UDP.UdpClient;
+using CosmosUdpClient = Cosmos.Kernel.System.Network.UdpClient;
 using DotNetDns = System.Net.Dns;
 using DotNetTcpClient = System.Net.Sockets.TcpClient;
 using DotNetTcpListener = System.Net.Sockets.TcpListener;
@@ -51,7 +46,13 @@ public class Kernel : Sys.Kernel
     {
         Log.WriteString("[Network Tests] Starting test suite\n");
 
-        // x64 has E1000E network driver
+        // The NIC is a profile axis (tests/profiles.json). On x64 the e1000e cell's
+        // controller, the same 82574L that q35 adds by default, attached here by the
+        // profile's nic axis, is bound by the driver kit's E1000EDriver
+        // (Cosmos.Kernel.Drivers); the virtio-net cells are bound by the kit's
+        // VirtioNetDriver over either transport, PCI on both arches and MMIO on
+        // arm64, through the VirtioPciTransportDriver or VirtioMmioTransportDriver
+        // node above it.
         TR.Start("Network Tests", expectedTests: 24);
 
         // Network initialization tests
@@ -292,7 +293,7 @@ public class Kernel : Sys.Kernel
         Assert.True(true, "Host echo request received and answered");
 
         // Phase 2: the host validates our echo reply (checksum + payload) and
-        // only then switches its request payload from COSMOS_PING to HOST_OK —
+        // only then switches its request payload from COSMOS_PING to HOST_OK:
         // seeing it proves the full host->guest->host round trip.
         Log.WriteString("[Test] Waiting for HOST_OK acknowledgment payload...\n");
 
@@ -337,7 +338,7 @@ public class Kernel : Sys.Kernel
         }
 
         Address6? linkLocal = NetworkManager.Primary.LinkLocalAddress;
-        MACAddress? mac = NetworkManager.MacAddress;
+        MacAddress? mac = NetworkManager.MacAddress;
         if (linkLocal is null || mac is null)
         {
             Assert.True(false, "The primary adapter should carry a link-local address once configured");
@@ -492,7 +493,7 @@ public class Kernel : Sys.Kernel
         Assert.True(hostAck, "Host should confirm it received a valid ICMPv6 echo reply");
     }
 
-    // Parses "52:54:00:12:34:56" into six bytes; MACAddress keeps its bytes internal.
+    // Parses "52:54:00:12:34:56" into six bytes; MacAddress keeps its bytes internal.
     private static byte[] ParseMac(string mac)
     {
         byte[] bytes = new byte[6];
@@ -1396,7 +1397,7 @@ public class Kernel : Sys.Kernel
     /// <summary>
     /// The plug on NameResolutionPal is what makes System.Net.Dns work, so
     /// these two cases go through the standard API with no Cosmos DnsClient in
-    /// sight, which is what the DotNetDns alias spells out. Nothing on the
+    /// sight, which is what the DotNetDns alias spells out. No type on the
     /// Cosmos side is named Dns, so the alias is for the reader rather than to
     /// break a tie. This case needs no network: it pins the name the plug
     /// reports.

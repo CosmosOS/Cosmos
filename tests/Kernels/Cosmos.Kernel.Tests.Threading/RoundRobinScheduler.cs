@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 /// entirely over the public scheduler seam (<see cref="IScheduler"/>,
 /// <see cref="SchedulerManager"/>, the <see cref="SchedulerExtensible.SchedulerData"/>
 /// slots), with no access to Cosmos.Kernel.Core internals. It follows the
-/// Round-Robin sketch in docs/articles/dev/scheduler-plugging.md: a FIFO run
+/// Round-Robin sketch in docs/articles/user/scheduler-plugging.md: a FIFO run
 /// queue per CPU, a remaining-quantum counter per thread, fixed-quantum
 /// preemption in <see cref="OnTick"/>, and <see cref="PickNext"/> dequeuing
 /// the head.
@@ -207,7 +207,7 @@ public sealed class RoundRobinScheduler : IScheduler
 
     public int GetRunQueueCount(PerCpuState cpuState)
     {
-        // The SchedulerInfo facade calls the diagnostics hooks from thread
+        // The SchedulerDiagnostics facade calls the diagnostics hooks from thread
         // context; guard them against the tick ourselves, per the plugging guide.
         using (SchedulerManager.MaskInterrupts())
         {

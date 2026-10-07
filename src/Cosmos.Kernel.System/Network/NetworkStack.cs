@@ -1,9 +1,12 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.System.Network.ARP;
-using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Network.IPv4;
+using Cosmos.Kernel.HAL.Devices.Network;
+using Cosmos.Kernel.System.Network.Protocols;
+using Cosmos.Kernel.System.Network.Protocols.Arp;
+using Cosmos.Kernel.System.Network.Protocols.IPv4;
+using Cosmos.Kernel.System.Network.Protocols.IPv6;
 
 namespace Cosmos.Kernel.System.Network;
 
@@ -13,7 +16,7 @@ namespace Cosmos.Kernel.System.Network;
 public static class NetworkStack
 {
     /// <summary>Reentrancy guard for <see cref="Update"/>.</summary>
-    private static bool s_updating = false;
+    private static bool s_updating;
 
     /// <summary>
     /// Maps IP (Internet Protocol) addresses to network devices.
@@ -33,23 +36,19 @@ public static class NetworkStack
     /// <param name="ipAddress">The IP address to assign to the device.</param>
     internal static void ConfigIP(INetworkDevice device, Address ipAddress)
     {
-        var mac = device.MacAddress;
+        MacAddress mac = device.MacAddress;
 
-        // Remove old config if exists
-        if (MACMap.ContainsKey(mac.Hash))
+        if (MACMap.Remove(mac.Hash))
         {
             RemoveAddresses(device);
-            MACMap.Remove(mac.Hash);
         }
 
-        // Add new config. The link-local IPv6 address needs nothing from the
-        // caller: it is derived from the MAC, so it comes up with the first
-        // configuration.
+        // The link-local IPv6 address needs nothing from the caller: it is
+        // derived from the MAC, so it comes up with the first configuration.
         AddressMap.Add(ipAddress, device);
-        AddressMap[IPv6.Address6.LinkLocalFor(mac)] = device;
+        AddressMap[Address6.LinkLocalFor(mac)] = device;
         MACMap.Add(mac.Hash, device);
 
-        // Register packet handler
         device.OnPacketReceived = HandlePacket;
 
         Serial.WriteString("[NetworkStack] Configured IP ");
@@ -66,7 +65,7 @@ public static class NetworkStack
     /// <param name="config">The IP configuration to apply.</param>
     /// <remarks>
     /// Internal: a kernel configures the primary device through
-    /// <see cref="Config.IPConfig.Enable(Address, Address, Address)"/>,
+    /// <see cref="IPConfig.Enable(Address, Address, Address)"/>,
     /// which is the public form of this and always was.
     /// </remarks>
     internal static void ConfigIP(INetworkDevice device, IPConfig config)
@@ -101,11 +100,11 @@ public static class NetworkStack
     /// device is unconfigured.
     /// </summary>
     /// <param name="device">The device to look up.</param>
-    internal static IPv6.Address6? LinkLocalOf(INetworkDevice device)
+    internal static Address6? LinkLocalOf(INetworkDevice device)
     {
         foreach (KeyValuePair<Address, INetworkDevice> pair in AddressMap)
         {
-            if (pair.Value == device && pair.Key is IPv6.Address6 address6)
+            if (pair.Value == device && pair.Key is Address6 address6)
             {
                 return address6;
             }
@@ -116,7 +115,7 @@ public static class NetworkStack
 
     /// <summary>
     /// Removes all IP configurations, clearing the stack's address and MAC
-    /// maps with them. The counterpart of <see cref="Config.IPConfig.Enable(Address, Address, Address)"/>.
+    /// maps with them. The counterpart of <see cref="IPConfig.Enable(Address, Address, Address)"/>.
     /// </summary>
     public static void RemoveAllConfigIP()
     {
@@ -126,24 +125,20 @@ public static class NetworkStack
     }
 
     /// <summary>
-    /// Flag to prevent recursive Update calls.
-    /// </summary>
-    /// <summary>
     /// Updates the network stack (sends pending packets). Internal: every
     /// path that queues a packet pumps the queue itself, including
     /// <see cref="Send"/> and each protocol client.
     /// </summary>
     internal static void Update()
     {
-        // Prevent recursive calls
         if (s_updating)
         {
             return;
         }
 
         s_updating = true;
-        OutgoingBuffer.Send();
-        IPv6.OutgoingBuffer.Send();
+        IPv4OutgoingBuffer.Send();
+        IPv6OutgoingBuffer.Send();
         s_updating = false;
     }
 
@@ -207,7 +202,7 @@ public static class NetworkStack
                 break;
             case 0x86DD: // IPv6
                 Serial.WriteString("[NetworkStack] -> IPv6\n");
-                IPv6.IPv6Packet.IPv6Handler(packetData);
+                IPv6Packet.IPv6Handler(packetData);
                 break;
             default:
                 Serial.WriteString("[NetworkStack] Unknown EtherType, ignoring\n");

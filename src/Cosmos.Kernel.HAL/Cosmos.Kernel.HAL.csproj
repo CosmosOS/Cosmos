@@ -2,51 +2,101 @@
   <PropertyGroup>
     <!-- Multi-arch package: contains both x64 and arm64 builds -->
     <IsMultiArchPackage>true</IsMultiArchPackage>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Unsafe code is contained in Cosmos.Kernel.Core: this layer reaches memory through its address-based entry points. -->
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <PackageId>Cosmos.Kernel.HAL</PackageId>
     <Title>Cosmos Kernel HAL</Title>
     <Description>Hardware abstraction layer base for multi-architecture kernel development.</Description>
     <PackageTags>cosmos;kernel;hal;abstraction;architecture;hardware</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
-    <!-- NVMe I/O waits block and wake threads through the experimental scheduler seam (COSMOS0001). -->
-    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
+    <!-- The driver kit's worker thread and its waits and delays go through the experimental scheduler seam (COSMOS0001). -->
+    <!-- COSMOS0003: this assembly declares the experimental driver kit seam and consumes it itself. -->
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
-         the VFS contract types only. -->
+         the driver kit seam (COSMOS0003), which covers the kit under DriverKit/
+         and the device categories under Devices/ apart from the two contracts
+         the ring hands out, which are tracked as stable: IBlockDevice
+         (Devices/Storage/), the one device contract kernels really implement
+         and drive (the Fat and File suites each supply a RAM disk, DevKernel
+         reads and writes blocks through it), and MacAddress (Devices/Network/),
+         which the packet seam and NetworkManager both hand out.
+         The boot contract (IPlatformInitializer), the tick source and its
+         timer entries are internal because no kernel can obtain or
+         meaningfully supply one. The SoftwareTimer that TimerManager.Schedule
+         returns is the ring's own handle over an entry: TimerManager
+         constructs the entry, its tick members belong to the tick source,
+         and a kernel calling them corrupts the registry. -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Build.API\Cosmos.Build.API.csproj" />
     <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-    <ProjectReference Include="..\Cosmos.Kernel.Boot.Limine\Cosmos.Kernel.Boot.Limine.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" PrivateAssets="none" />
-    <ProjectReference Include="..\Cosmos.Kernel.HAL.Interfaces\Cosmos.Kernel.HAL.Interfaces.csproj" />
     <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <!-- Multi-arch packaging support -->
   <Import Project="../Directory.MultiArch.targets" />
 
+  <!-- Every public HAL symbol is on the experimental driver kit seam except
+       the stable device contracts listed in _CosmosStableHalTypes. A seam
+       symbol carries [Experimental("COSMOS0003")], which the public API
+       analyzer records as a [COSMOS0003] prefix on the symbol's line. Any other
+       line without the prefix means a type lost the attribute, which is how a
+       promotion to the stable surface happens by accident, so the build fails
+       on it. Promoting a type for real is a deliberate change of that list. -->
+  <Target Name="CosmosGuardHalPromotion" AfterTargets="Build">
+    <PropertyGroup>
+      <_CosmosStableHalTypes>Cosmos\.Kernel\.HAL\.Devices\.Storage\.IBlockDevice|Cosmos\.Kernel\.HAL\.Devices\.Network\.MacAddress</_CosmosStableHalTypes>
+      <!-- A stable line: optional modifiers (static, override), one of those types, then the end of the line or one of its members. -->
+      <_CosmosStableHalLine>^(?:[a-z]+ )*(?:$(_CosmosStableHalTypes))(?:[.( ]|$)</_CosmosStableHalLine>
+    </PropertyGroup>
+    <ReadLinesFromFile File="$(MSBuildProjectDirectory)/PublicAPI.Shipped.txt">
+      <Output TaskParameter="Lines" ItemName="_CosmosPublicApiLine" />
+    </ReadLinesFromFile>
+    <ReadLinesFromFile File="$(MSBuildProjectDirectory)/PublicAPI.Unshipped.txt">
+      <Output TaskParameter="Lines" ItemName="_CosmosPublicApiLine" />
+    </ReadLinesFromFile>
+    <ItemGroup>
+      <_CosmosPromotedHalLine Include="@(_CosmosPublicApiLine)"
+                              Condition="!$([System.String]::Copy('%(Identity)').StartsWith('#')) And !$([System.String]::Copy('%(Identity)').StartsWith('[COSMOS0003]')) And !$([System.String]::Copy('%(Identity)').StartsWith('*REMOVED*')) And !$([System.Text.RegularExpressions.Regex]::IsMatch('%(Identity)', '$(_CosmosStableHalLine)'))" />
+    </ItemGroup>
+    <Error Condition="'@(_CosmosPromotedHalLine)' != ''"
+           Text="A HAL symbol is public without the [COSMOS0003] prefix in PublicAPI.*.txt: '%(_CosmosPromotedHalLine.Identity)'. Every public HAL type other than the stable device contracts (IBlockDevice, MacAddress) carries [Experimental(Experimentals.DriverKitSeamDiagId)]; promoting one out of the seam is a deliberate change of the _CosmosStableHalTypes list in the CosmosGuardHalPromotion target." />
+  </Target>
+
   <ItemGroup>
-    <!-- System's internal canvases and managers sit directly on the HAL
-         drivers (GOP/SVGAII, AHCI/NVMe, PS/2 mouse, PCI discovery). -->
+    <!-- System's managers install their kit consumers through the internal
+         DeviceRegistry (keyboard, mouse, network, display, block) and build
+         the keyboard manager's indicator work item; its library initializer
+         registers the platform timer, TimerManager constructs the TimerEntry
+         its SoftwareTimer handle wraps, and the network stack reads
+         MacAddress's internal bytes. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
-    <!-- The aggregator initializes PlatformHAL from its library initializer. -->
+    <!-- The aggregator reads PlatformHAL.Initializer from its library initializer. -->
     <InternalsVisibleTo Include="Cosmos.Kernel" />
-    <!-- Arch HALs implement the driver base classes and register devices. -->
+    <!-- Arch HALs are the machine descriptions: they implement
+         IPlatformInitializer, publish platform nodes and line sources
+         through the internal PlatformBus and PlatformLineRouting, and their
+         tick sources derive from TickSource. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
-    <!-- White-box suites over HAL internals: SVGAII FIFO wire format
-         (Graphic), MSI-X tables (Interrupts), PCI discovery (Pci),
-         platform power ops (Power), AHCI/NVMe registers (Storage),
-         the TimerDevice base and its software timers (Timer), virtio
-         transports (Virtio). -->
-    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Graphic" />
+    <!-- White-box suites over HAL internals: the kit's MSI-X table and the
+         nodes' PciAccess (Interrupts), the PCI host's configuration
+         mechanism and the nodes' PciAccess (Pci), the kit's tree behind
+         the BAR relocation probes and PlatformHAL.Initializer's
+         EnsureMmioMapped for a high BAR (Storage), the TickSource base
+         behind PIT.Instance.Wait (Timer), the tree and the bindings' driver
+         state (Virtio). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Virtio" />
+    <!-- Drivers: installs its keyboard and pointer consumers through DeviceRegistry.SetConsumer; its
+         [Driver] classes live in Cosmos.Kernel.Tests.Drivers.Library, which holds no grant. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Drivers" />
   </ItemGroup>
 </Project>
 

@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 
@@ -17,63 +19,90 @@ public static class Log
     /// Writes a string to the log without appending a line terminator.
     /// </summary>
     /// <param name="text">Text to write.</param>
-    public static void WriteString(string text) => Serial.WriteString(text);
+    public static void WriteString(string text)
+    {
+        Serial.WriteString(text);
+    }
 
     /// <summary>
     /// Writes an unsigned 64-bit number in decimal. Use
     /// <see cref="WriteHex(ulong)"/> for base-16 digits.
     /// </summary>
     /// <param name="number">Value to write.</param>
-    public static void WriteNumber(ulong number) => Serial.WriteNumber(number);
+    public static void WriteNumber(ulong number)
+    {
+        Serial.WriteNumber(number);
+    }
 
     /// <summary>
     /// Writes an unsigned 32-bit number in decimal. Use
     /// <see cref="WriteHex(uint)"/> for base-16 digits.
     /// </summary>
     /// <param name="number">Value to write.</param>
-    public static void WriteNumber(uint number) => Serial.WriteNumber(number);
+    public static void WriteNumber(uint number)
+    {
+        Serial.WriteNumber(number);
+    }
 
     /// <summary>
     /// Writes a signed 32-bit number in decimal. Negative values are
     /// prefixed with <c>-</c>.
     /// </summary>
     /// <param name="number">Value to write.</param>
-    public static void WriteNumber(int number) => Serial.WriteNumber(number);
+    public static void WriteNumber(int number)
+    {
+        Serial.WriteNumber(number);
+    }
 
     /// <summary>
     /// Writes a signed 64-bit number in decimal. Negative values are
     /// prefixed with <c>-</c>.
     /// </summary>
     /// <param name="number">Value to write.</param>
-    public static void WriteNumber(long number) => Serial.WriteNumber(number);
+    public static void WriteNumber(long number)
+    {
+        Serial.WriteNumber(number);
+    }
 
     /// <summary>
     /// Writes an unsigned 64-bit number as hexadecimal digits without a
     /// <c>0x</c> prefix.
     /// </summary>
     /// <param name="number">Value to write.</param>
-    public static void WriteHex(ulong number) => Serial.WriteHex(number);
+    public static void WriteHex(ulong number)
+    {
+        Serial.WriteHex(number);
+    }
 
     /// <summary>
     /// Writes an unsigned 32-bit number as hexadecimal digits without a
     /// <c>0x</c> prefix.
     /// </summary>
     /// <param name="number">Value to write.</param>
-    public static void WriteHex(uint number) => Serial.WriteHex(number);
+    public static void WriteHex(uint number)
+    {
+        Serial.WriteHex(number);
+    }
 
     /// <summary>
     /// Writes an unsigned 64-bit number as hexadecimal digits with a
     /// <c>0x</c> prefix.
     /// </summary>
     /// <param name="number">Value to write.</param>
-    public static void WriteHexWithPrefix(ulong number) => Serial.WriteHexWithPrefix(number);
+    public static void WriteHexWithPrefix(ulong number)
+    {
+        Serial.WriteHexWithPrefix(number);
+    }
 
     /// <summary>
     /// Writes an unsigned 32-bit number as hexadecimal digits with a
     /// <c>0x</c> prefix.
     /// </summary>
     /// <param name="number">Value to write.</param>
-    public static void WriteHexWithPrefix(uint number) => Serial.WriteHexWithPrefix(number);
+    public static void WriteHexWithPrefix(uint number)
+    {
+        Serial.WriteHexWithPrefix(number);
+    }
 
     /// <summary>
     /// Writes each value in order: strings and characters as text, integers
@@ -86,7 +115,10 @@ public static class Log
     /// allocation-sensitive paths.
     /// </summary>
     /// <param name="args">Values to write.</param>
-    public static void Write(params ReadOnlySpan<object?> args) => Serial.Write(args);
+    public static void Write(params ReadOnlySpan<object?> args)
+    {
+        Serial.Write(args);
+    }
 
     /// <summary>
     /// Writes raw bytes to the log stream as one uninterrupted sequence.

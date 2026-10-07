@@ -55,7 +55,8 @@ Work file by file. Check each file against the whole guidelines document. The po
 - `is null` / `is not null` on references. Pointers keep `== null`.
 - Fields and constants before the members that read them. Constructors after fields and properties, before methods.
 - `readonly` on fields assigned only at declaration or in a constructor, but not on mutable structs such as `SpinLock`, and not on fields a plug reaches through `[FieldAccess]`.
-- Collection expressions, expression-bodied trivial members, interpolation over concatenation, numeric separators on long literals.
+- Collection expressions, interpolation over concatenation, numeric separators on long literals.
+- Block bodies for methods, constructors, operators and local functions, even for one statement. `=>` only for a property, indexer or accessor that fits on one line; past one line it takes a `get` block.
 - One dictionary call per lookup (`TryGetValue`, `TryAdd`, indexer upsert), not `ContainsKey` followed by an index.
 
 **Errors and nullability**

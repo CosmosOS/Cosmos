@@ -1,4 +1,4 @@
-namespace Cosmos.Kernel.Core.Runtime;
+namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 
 /// <summary>
 /// DWARF register numbers for x86-64.

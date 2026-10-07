@@ -1,7 +1,6 @@
 using System;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using DevKernel.Diagnostics;
 using DevKernel.Shell;
 using SysThread = System.Threading.Thread;
@@ -90,7 +89,7 @@ internal static class SchedulerCommands
     {
         Terminal.Header("Scheduler Information:");
 
-        if (!SchedulerInfo.IsInitialized)
+        if (!SchedulerDiagnostics.IsInitialized)
         {
             Terminal.InfoLine("Status", "Not initialized");
             return;
@@ -98,33 +97,33 @@ internal static class SchedulerCommands
 
         Terminal.StatusLine(
             "Status",
-            SchedulerInfo.IsRunning ? "ENABLED" : "DISABLED",
-            SchedulerInfo.IsRunning ? ConsoleColor.Green : ConsoleColor.Red);
+            SchedulerDiagnostics.IsRunning ? "ENABLED" : "DISABLED",
+            SchedulerDiagnostics.IsRunning ? ConsoleColor.Green : ConsoleColor.Red);
 
-        Terminal.InfoLine("Scheduler", SchedulerInfo.SchedulerName!);
-        Terminal.InfoLine("CPU Count", SchedulerInfo.CpuCount.ToString());
+        Terminal.InfoLine("Scheduler", SchedulerDiagnostics.SchedulerName!);
+        Terminal.InfoLine("CPU Count", SchedulerDiagnostics.CpuCount.ToString());
         Terminal.InfoLine(
             "Tick period",
-            SchedulerInfo.TickPeriodNs == 0
+            SchedulerDiagnostics.TickPeriodNs == 0
                 ? "no tick yet"
-                : (SchedulerInfo.TickPeriodNs / Units.NsPerMs).ToString() + " ms");
+                : $"{SchedulerDiagnostics.TickPeriodNs / Units.NsPerMs} ms");
         Console.WriteLine();
 
-        for (uint cpuId = 0; cpuId < SchedulerInfo.CpuCount; cpuId++)
+        for (uint cpuId = 0; cpuId < SchedulerDiagnostics.CpuCount; cpuId++)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("  CPU " + cpuId + ":");
             Console.ResetColor();
 
-            if (SchedulerInfo.TryGetCurrentThread(cpuId, out KernelThreadInfo currentThread))
+            if (SchedulerDiagnostics.TryGetCurrentThread(cpuId, out KernelThreadInfo currentThread))
             {
                 PrintThreadInfo(currentThread);
             }
 
-            int runQueueCount = SchedulerInfo.GetRunQueueCount(cpuId);
+            int runQueueCount = SchedulerDiagnostics.GetRunQueueCount(cpuId);
             for (int i = 0; i < runQueueCount; i++)
             {
-                if (SchedulerInfo.TryGetRunQueueThread(cpuId, i, out KernelThreadInfo thread))
+                if (SchedulerDiagnostics.TryGetRunQueueThread(cpuId, i, out KernelThreadInfo thread))
                 {
                     PrintThreadInfo(thread);
                 }
@@ -190,7 +189,7 @@ internal static class SchedulerCommands
         SoftwareTimer? timer = TimerManager.Schedule(static () => s_timerFireCount++, TimeSpan.FromMilliseconds(TimerDelayMs));
         if (timer is null)
         {
-            Terminal.Error("No timer device registered");
+            Terminal.Error("No tick source registered");
             return;
         }
 
@@ -236,13 +235,13 @@ internal static class SchedulerCommands
 
     private static void KillThread(uint threadId)
     {
-        if (!SchedulerInfo.IsInitialized)
+        if (!SchedulerDiagnostics.IsInitialized)
         {
             Terminal.Error("Scheduler not initialized");
             return;
         }
 
-        switch (SchedulerInfo.RequestKill(threadId))
+        switch (SchedulerDiagnostics.RequestKill(threadId))
         {
             case ThreadKillResult.Killed:
                 Terminal.Success("Thread " + threadId + " killed");

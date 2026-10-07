@@ -2,14 +2,15 @@
   <PropertyGroup>
     <!-- Multi-arch package: built for both x64 and arm64 -->
     <IsMultiArchPackage>true</IsMultiArchPackage>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Unsafe code is contained in Cosmos.Kernel.Core. -->
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props) -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
 
-    <!-- SchedulerInfo fronts the experimental scheduler seam (COSMOS0001). -->
+    <!-- SchedulerDiagnostics fronts the experimental scheduler seam (COSMOS0001). -->
     <!-- COSMOS0002: this assembly declares the experimental packet seam and consumes it itself. -->
-    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0002</NoWarn>
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0002;COSMOS0003</NoWarn>
 
     <!-- Package Metadata -->
     <PackageId>Cosmos.Kernel.System</PackageId>
@@ -61,10 +62,6 @@
     </ItemGroup>
   </Target>
 
-  <ItemGroup>
-    <Folder Include="Vfs\" />
-  </ItemGroup>
-
   <!-- Multi-arch packaging support -->
   <Import Project="../Directory.MultiArch.targets" />
 
@@ -78,18 +75,14 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Plugs</_Parameter1>
     </AssemblyAttribute>
-    <!-- White-box network tests observe the stack's ICMP echo counters. -->
+    <!-- White-box network tests observe the stack's ICMP echo counters and
+         the packet handler it attached to the internal INetworkDevice. -->
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.Network</_Parameter1>
     </AssemblyAttribute>
     <!-- White-box FAT layout tests forge and corrupt raw directory bytes. -->
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.Fat</_Parameter1>
-    </AssemblyAttribute>
-    <!-- White-box 3D wire tests drive the internal SVGA canvas with the
-         device disabled and inspect the commands it places in the FIFO. -->
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Cosmos.Kernel.Tests.Graphic</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 </Project>

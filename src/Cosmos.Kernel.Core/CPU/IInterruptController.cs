@@ -25,7 +25,25 @@ internal interface IInterruptController
     void RouteIrq(byte irqNo, byte vector, bool startMasked);
 
     /// <summary>
-    /// Check if the interrupt controller is initialized.
+    /// Stops deliveries of a hardware IRQ at the controller until
+    /// <see cref="UnmaskIrq"/>. The line is named as <see cref="RouteIrq"/>
+    /// names it: an ISA IRQ number on x64, the MADT override applied, a GIC
+    /// INTID on ARM64. Allocation-free; any context.
+    /// </summary>
+    /// <param name="irqNo">The line.</param>
+    void MaskIrq(byte irqNo);
+
+    /// <summary>
+    /// Lets deliveries of a hardware IRQ through again after
+    /// <see cref="MaskIrq"/>. Allocation-free; any context.
+    /// </summary>
+    /// <param name="irqNo">The line, as for <see cref="MaskIrq"/>.</param>
+    void UnmaskIrq(byte irqNo);
+
+    /// <summary>
+    /// True once the controller can route, mask and unmask a hardware line,
+    /// which is what <see cref="InterruptManager.IsControllerInitialized"/>
+    /// reports to line sources. Any context.
     /// </summary>
     bool IsInitialized { get; }
 

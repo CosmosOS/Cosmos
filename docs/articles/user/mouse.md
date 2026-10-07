@@ -6,12 +6,12 @@ The main differences if you come from Gen2:
 
 | | Gen2 | Gen3 |
 |---|---|---|
-| Manager API | `Cosmos.System.MouseManager` | Same model, in `Cosmos.Kernel.System.Mouse` |
+| Manager API | `Cosmos.System.MouseManager` | Same model, in `Cosmos.Kernel.System.Input` |
 | Button state | `MouseState` flags enum | `LeftButton`, `RightButton`, `MiddleButton` booleans |
 | Position | `X`, `Y` clamped to the screen size | Same |
 | Scroll wheel | `ScrollDelta` + `ResetScrollDelta()` | Same |
 | Cursor | Drawn by your code | Drawn by your code |
-| Devices | PS/2 mouse | PS/2 mouse with scroll wheel (x64), virtio-mouse (x64 PCI and ARM64 MMIO) |
+| Devices | PS/2 mouse | PS/2 mouse with scroll wheel (x64) and virtio-mouse, both over the driver kit (the 8042 on q35 and every PC; virtio over PCI on both architectures, MMIO on ARM64) |
 
 If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
@@ -31,10 +31,10 @@ These are the `using`s the snippets below rely on; the drawing types come from t
 using System.Drawing;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
-using Cosmos.Kernel.System.Mouse;
+using Cosmos.Kernel.System.Input;
 ```
 
-Like the keyboard, the mouse is detected and registered at boot; `MouseManager` is ready as soon as your kernel runs.
+Like the keyboard, the PS/2 mouse (x64) is bound by the driver kit's `Ps2MouseDriver` and a virtio mouse by `VirtioInputDriver` during the driver stage, each published to the manager's consumer, which registers it ([PS/2 devices](drivers.md#ps2-devices), [Virtio devices](drivers.md#virtio-devices)); `MouseManager` is ready as soon as your kernel runs.
 
 ## Position and buttons
 
@@ -152,16 +152,16 @@ Two more knobs on `MouseManager`:
 
 - Only relative pointing devices are supported. There is no absolute (tablet) input, so inside a VM window the guest pointer does not track the host cursor one to one.
 - Horizontal wheel tilt is ignored; only the vertical wheel reaches `ScrollDelta`.
-- Devices are detected once at boot; there is no mouse hotplug.
+- A PS/2 mouse is published once, during the driver stage, when the mouse driver bound the 8042 driver's auxiliary port node and its reset was answered; a virtio mouse present at boot once, when the stage offers its device. The one mouse that can be plugged in and pulled out while the kernel runs is a virtio mouse whose PCI function sits behind a PCI Express hot-plug slot, which the root port driver publishes and retracts.
 
 ## How it works
 
-On x64 the PS/2 mouse raises IRQ12 for every byte of a movement packet: 3 bytes of buttons and X/Y deltas, extended to 4 by the scroll wheel byte once the driver has enabled the IntelliMouse protocol (the magic sample-rate sequence 200, 100, 80 at boot). On ARM64 (and over PCI on x64) the virtio-input device delivers the same information as event records. Either way the driver hands the deltas to `MouseManager`, which applies `Sensitivity`, adds them to `X` and `Y`, clamps to the screen size and updates the button booleans; wheel deltas accumulate in `ScrollDelta` until a poller consumes them. Your render loop only ever reads state, which is why no locking is needed.
+On x64 the PS/2 mouse raises IRQ 12 for every byte of a movement packet, which the 8042 driver reads and hands to the auxiliary port's `Ps2Access`; the mouse driver's handler assembles the 3 bytes of buttons and X/Y deltas, extended to 4 by the scroll wheel byte once its probe has enabled the IntelliMouse protocol (the sample-rate sequence 200, 100, 80), drops a byte that cannot start a packet, and hands one report per packet through the pointer sink to the manager's consumer. A virtio mouse delivers the same information as event records on its queue, over PCI or MMIO: the driver kit's `VirtioInputDriver` drains them on the kit's worker (woken by the queue's interrupt, or every 20 ms when none could be routed), folds the axis and button events into one report per sync event, and hands it through the pointer sink to the manager's consumer. Either way the deltas reach `MouseManager`, which applies `Sensitivity`, adds them to `X` and `Y`, clamps to the screen size and updates the button booleans; wheel deltas accumulate in `ScrollDelta` until a poller consumes them. Your render loop only ever reads state, which is why no locking is needed.
 
 ```
 Render loop (reads X/Y, buttons, ScrollDelta)
         │
 MouseManager ── Sensitivity, screen clamping, ScrollDelta accumulation
         │
-PS/2 mouse, IRQ12 (x64)  /  virtio-mouse (x64 PCI, ARM64 MMIO)
+PS/2 mouse over the driver kit (the 8042, IRQ 12, x64)  /  virtio-mouse over the driver kit (PCI, MMIO)
 ```

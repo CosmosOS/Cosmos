@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cosmos.TestRunner.Engine;
+using Cosmos.Tools.Launcher;
 
 namespace Cosmos.Tests.Patcher;
 
@@ -13,7 +14,7 @@ namespace Cosmos.Tests.Patcher;
 ///
 /// A suite naming a profile that does not exist, or whose profiles are all
 /// pinned to the other architecture, only surfaces today once CI has built a
-/// kernel and booted QEMU — minutes in, for what is a typo. These run in
+/// kernel and booted QEMU: minutes in, for what is a typo. These run in
 /// milliseconds and need no kernel build.
 /// </summary>
 [Collection("PatcherTests")]
@@ -93,7 +94,7 @@ public class ProfileCatalogTests
             Assert.Equal("virtio-net-pci", cell.NetworkCard);
 
             // MSI-X on arm64 is routed by the GICv3 ITS, and the virt machine
-            // defaults to GICv2, which has none — losing this would not fail
+            // defaults to GICv2, which has none: losing this would not fail
             // loudly, the device would simply never take an interrupt. q35
             // rejects the property outright, so x64 must not carry it.
             if (architecture == "arm64")
@@ -107,8 +108,29 @@ public class ProfileCatalogTests
         }
     }
 
+    // virtio-blk-pci is one hardware shape on both arches; virtio-blk-mmio
+    // needs the virt machine's virtio-mmio window, so it stays off x64, where
+    // the launcher would refuse it. The Drivers suite lists both for its
+    // virtio-blk group.
+    [Fact]
+    public void VirtioBlkProfilesResolveOnBothArchitectures()
+    {
+        string suiteDir = Path.Combine(FindRepoRoot(), "tests", "Kernels", "Cosmos.Kernel.Tests.Drivers");
+
+        IReadOnlyList<TestProfile> x64Cells = TestProfileLoader.LoadFor(suiteDir, "x64");
+        TestProfile x64Pci = Assert.Single(x64Cells, c => c.Name == "virtio-blk-pci");
+        Assert.Equal(DiskKind.VirtioBlk, Assert.Single(x64Pci.Disks).Kind);
+        Assert.DoesNotContain(x64Cells, c => c.Name == "virtio-blk-mmio");
+
+        IReadOnlyList<TestProfile> arm64Cells = TestProfileLoader.LoadFor(suiteDir, "arm64");
+        TestProfile arm64Pci = Assert.Single(arm64Cells, c => c.Name == "virtio-blk-pci");
+        Assert.Equal(DiskKind.VirtioBlk, Assert.Single(arm64Pci.Disks).Kind);
+        TestProfile arm64Mmio = Assert.Single(arm64Cells, c => c.Name == "virtio-blk-mmio");
+        Assert.Equal(DiskKind.VirtioBlkMmio, Assert.Single(arm64Mmio.Disks).Kind);
+    }
+
     // The vmware-svga cell is the only run where the VMware SVGA II adapter
-    // is present at all — losing it would fail nothing, the suite would just
+    // is present at all: losing it would fail nothing, the suite would just
     // never see that hardware again (and the future SVGAII driver would run
     // untested). The bare cell keeps the default-adapter path covered.
     [Fact]

@@ -35,9 +35,11 @@ Build pipeline: Source -> Patcher (IL method replacement via Mono.Cecil) -> ILC 
 - `[RuntimeExport("name")]` only for NativeAOT/runtime-required exports in Core (`Rh*`, `memmove`, `sqrt`, etc.)
 - `[LibraryImport("*")]` for native imports
 - Architecture-specific code: `#if ARCH_X64` / `#if ARCH_ARM64` to avoid + only tolerated in Cosmos.Kernel.Core or Cosmos.Kernel.Plugs.
+- Unsafe code only in Cosmos.Kernel.Core (and its arch projects): HAL, HAL.X64, HAL.ARM64, System and Drivers compile with `AllowUnsafeBlocks=false` and reach memory through Core's address-based entry points (`MemoryBlock` with `PageAllocator.AllocBlock`, `AddressSpace.HhdmOffset`)
 - Private fields: `_camelCase`, static fields: `s_camelCase`, constants: `PascalCase`
 - Braces required (`csharp_prefer_braces = true:error`)
 - Avoid `var` - use explicit types
+- Namespace follows folder: the project name plus the folder path (IDE0130 at error for `src/Cosmos.Kernel*`, `tests/Kernels`, `tests/Cosmos.Kernel.Tests.System`, `examples`; the exemptions close `.editorconfig`)
 
 ## Architecture
 
@@ -45,25 +47,31 @@ Dual-arch (x64/ARM64) with compile-time selection via `DefineConstants` and `Run
 
 - **Native x64**: `src/Cosmos.Kernel.Native.X64/` - YASM `.asm` files (Runtime, WriteBarriers, InterfaceDispatch, Interrupts, etc.)
 - **Native ARM64**: `src/Cosmos.Kernel.Native.ARM64/` - GAS `.s` files
-- **HAL x64**: `src/Cosmos.Kernel.HAL.X64/`
-- **HAL ARM64**: `src/Cosmos.Kernel.HAL.ARM64/`
+- **HAL x64**: `src/Cosmos.Kernel.HAL.X64/` (platform code only: the machine description, the line routing, the tick source, the firmware clock)
+- **HAL ARM64**: `src/Cosmos.Kernel.HAL.ARM64/` (platform code only: the machine description over ACPI, the device tree and the virt table, the line routing, the tick source, the firmware clock)
 - Multi-arch packages bundle both architectures; NuGet selects by RID at build time
 
 ## Feature switches
 
 Kernel features are toggled via MSBuild properties in kernel `.csproj` files (all default to `true`):
 
-`CosmosEnableInterrupts`, `CosmosEnableUART`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`
+`CosmosEnableInterrupts`, `CosmosEnableUART`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, `CosmosEnableUsb`
 
 ## Key paths
 
 - `src/Cosmos.Sdk/Sdk/` - SDK props/targets consumed by kernel projects
 - `src/Cosmos.Patcher/` - IL patcher CLI tool (Mono.Cecil-based)
 - `src/Cosmos.Kernel.Core/Runtime/` - Runtime stubs (RhpThrowEx, exception handling, etc.)
-- `src/Cosmos.Kernel.Core/Memory/` - Memory allocation
-- `src/Cosmos.Kernel.System/` - Higher-level services (Graphics, Network, Input, Timer, IO)
+- `src/Cosmos.Kernel.Core/Memory/` - Memory allocation, and `MemoryBlock`, the view over memory at an address that the layers built without unsafe code read and write through (`PageAllocator.AllocBlock` hands out pages as one)
+- `src/Cosmos.Kernel.Core/Firmware/` - What the bootloader and the firmware hand over: the boot framebuffer (`BootFirmware`), the device tree parser the ARM64 description reads, the boot time, the bridge to the ACPI MCFG table the native boot code parses, and the clock read through the UEFI runtime services
+- `src/Cosmos.Kernel.System/` - Higher-level services (Graphics with `DisplayManager`, the canvas over the kit's display kind and the opt-in 3D types under `Graphics.Rendering3D`, Network with `NetworkManager` and the experimental packet seam under `Network.Protocols`, Input, Timers with `TimerManager`, `AlarmManager` and the `SoftwareTimer` handle, Storage with `StorageManager` and its consumer of the kit's block kind, FileSystem with `VfsManager`, the VFS contracts and the Fat and Ext2 filesystems)
+- `src/Cosmos.Kernel.HAL/Devices/` - What a device is, one folder per category (`Display/`, `Input/`, `Network/`, `Storage/`, the categories `Cosmos.Kernel.Drivers` uses beside `Bus/`): the kind's contract with its facets and vocabulary (`IDisplay` with `IDisplayModes` and `IHardwareCursor`, `IKeyboard`, `IPointer`, `INetworkInterface`, `IBlockDevice`), the sink a driver reports through (none for storage) and the ring's internal consumer; `IBlockDevice` (`Storage/`), which kernels implement and drive, and `MacAddress` (`Network/`) are stable, the rest is on the driver kit seam; `Display/` also holds `FirmwareDisplay`, the display the kit publishes over the boot framebuffer Core read
+- `src/Cosmos.Kernel.HAL/DriverKit/` - How a driver finds and binds a device: the driver and its binding at the root (`Driver`, `DeviceBinding`, `DeviceNode`, matching and probing), what a binding hands out under `Resources/` (registers, regions, DMA), `Interrupts/` and `Threading/` (locks, events, threads, deferred work), the bus kinds under `Buses/`, a folder each (synthetic, platform, PCI with the bridge describe and resource placement behind hot-plug slots, virtio, USB, PS/2), and the internal plumbing (the registry, the engine, arbitration, `DriverLog`) under `Engine/`
+- `src/Cosmos.Kernel.HAL/Boot/` - Internal only: the boot contract (`IPlatformInitializer`) and platform registration (`PlatformHAL`)
+- `src/Cosmos.Kernel.HAL/Timers/` - Internal only: the tick source base with its timer entries (`TimerEntry`); `SoftwareTimer`, the handle `TimerManager.Schedule` returns, is the ring's wrapper over one, in `System/Timers/`
+- `src/Cosmos.Kernel.Drivers/` - Shipped drivers over the kit (PCI host and PCI Express root port (hot-plug), E1000E, the virtio PCI and MMIO transports, virtio-net, virtio-input, the display drivers virtio-gpu and VMware SVGA II with its SVGA3D layer, the storage drivers AHCI, NVMe and virtio-blk, whose disks `StorageManager` consumes, the xHCI host controller with the USB hub, HID boot keyboard and mass storage class drivers, and the 8042 controller with the PS/2 keyboard and mouse class drivers), filed in bus kind / category / driver folders (`Pci/Bus/Xhci/`, `Virtio/Display/VirtioGpu/`) whose namespaces follow the folders; a User-layer driver assembly, one RID-less package
 - `examples/DevKernel/` - Development kernel (use for testing changes)
-- `tests/Kernels/` - 8 kernel test suites
+- `tests/Kernels/` - 18 kernel test suites and the Drivers suite's driver library
 - `dotnet/runtime/` - .NET runtime submodule (release/10.0 branch)
 - `artifacts/` - Build outputs, NuGet packages, Limine bootloader
 

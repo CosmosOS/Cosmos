@@ -1,4 +1,4 @@
-using Cosmos.Kernel.System.Network.IPv4;
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 namespace Cosmos.Kernel.System.Network;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 namespace Cosmos.Kernel.System.Graphics;
 
@@ -48,7 +47,10 @@ public readonly struct Mode : IEquatable<Mode>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object? obj) => obj is Mode mode && Equals(mode);
+    public override bool Equals(object? obj)
+    {
+        return obj is Mode mode && Equals(mode);
+    }
 
     /// <inheritdoc />
     public override int GetHashCode()
@@ -81,39 +83,56 @@ public readonly struct Mode : IEquatable<Mode>
             return 1;
         }
 
-        // They are effectively Equals
         return 0;
     }
 
     /// <summary>Checks whether the two modes are equal.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator ==(Mode a, Mode b) => a.Equals(b);
+    public static bool operator ==(Mode a, Mode b)
+    {
+        return a.Equals(b);
+    }
 
     /// <summary>Checks whether the two modes differ.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator !=(Mode a, Mode b) => !(a == b);
+    public static bool operator !=(Mode a, Mode b)
+    {
+        return !(a == b);
+    }
 
     /// <summary>Checks whether <paramref name="a"/> has a higher resolution than <paramref name="b"/>, per <see cref="CompareTo"/>.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator >(Mode a, Mode b) => a.CompareTo(b) > 0;
+    public static bool operator >(Mode a, Mode b)
+    {
+        return a.CompareTo(b) > 0;
+    }
 
     /// <summary>Checks whether <paramref name="a"/> has a lower resolution than <paramref name="b"/>, per <see cref="CompareTo"/>.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator <(Mode a, Mode b) => a.CompareTo(b) < 0;
+    public static bool operator <(Mode a, Mode b)
+    {
+        return a.CompareTo(b) < 0;
+    }
 
     /// <summary>Checks whether <paramref name="a"/> compares greater than or equal to <paramref name="b"/>, per <see cref="CompareTo"/>.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator >=(Mode a, Mode b) => a.CompareTo(b) >= 0;
+    public static bool operator >=(Mode a, Mode b)
+    {
+        return a.CompareTo(b) >= 0;
+    }
 
     /// <summary>Checks whether <paramref name="a"/> compares less than or equal to <paramref name="b"/>, per <see cref="CompareTo"/>.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator <=(Mode a, Mode b) => a.CompareTo(b) <= 0;
+    public static bool operator <=(Mode a, Mode b)
+    {
+        return a.CompareTo(b) <= 0;
+    }
 
     /// <summary>
     /// Formats the mode as <c>width x height @ depth</c>, e.g. <c>1024x768@32</c>.

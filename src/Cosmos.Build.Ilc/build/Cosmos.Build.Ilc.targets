@@ -132,14 +132,20 @@
     <WriteLinesToFile File="%(ManagedBinary.RspFile)" Lines="@(IlcArg)" Overwrite="true"/>
   </Target>
 
-  <!-- Content-hash based ILC caching: hash all input DLLs + ref DLLs, set _IlcCacheHit. -->
+  <!-- Content-hash based ILC caching: hash all input DLLs + ref DLLs + the
+       response file, set _IlcCacheHit. The response file is an input like the
+       assemblies: a feature switch changes only the runtimeknob arguments in
+       it, and a hash over the assemblies alone would keep the object built
+       for the old value while the switch says otherwise. WriteIlcRsp has
+       already written it when this target runs. -->
   <Target Name="CheckIlcCache">
     <PropertyGroup>
       <_IlcCacheFile>$(IlcIntermediateOutputPath).ilc-hash</_IlcCacheFile>
       <_IlcOutputFile>$([MSBuild]::NormalizePath('$(IlcIntermediateOutputPath)$(AssemblyName).o'))</_IlcOutputFile>
+      <_IlcRspFile>$([System.IO.Path]::GetFullPath('$(IlcIntermediateOutputPath)$(AssemblyName).ilc.rsp'))</_IlcRspFile>
     </PropertyGroup>
 
-    <ComputeInputsHashTask InputFiles="@(IlcCompileInput);@(IlcReferences)">
+    <ComputeInputsHashTask InputFiles="@(IlcCompileInput);@(IlcReferences);$(_IlcRspFile)">
       <Output TaskParameter="Hash" PropertyName="_CurrentIlcHash" />
     </ComputeInputsHashTask>
 

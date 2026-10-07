@@ -52,9 +52,9 @@ internal static class GcStat
         public static CollectorStats Read()
         {
             return new CollectorStats(
-                MemoryInfo.GcTimePercent,
-                MemoryInfo.TotalCollections,
-                MemoryInfo.TotalObjectsFreed);
+                MemoryDiagnostics.GcTimePercent,
+                MemoryDiagnostics.TotalCollections,
+                MemoryDiagnostics.TotalObjectsFreed);
         }
     }
 
@@ -110,7 +110,7 @@ internal static class GcStat
         {
             if (frames % CollectEveryFrames == 0)
             {
-                MemoryInfo.Collect();
+                MemoryDiagnostics.Collect();
             }
 
             GCMemoryInfo info = GC.GetGCMemoryInfo();
@@ -198,7 +198,7 @@ internal static class GcStat
 
         y = DrawRow(canvas, font, x, y, s_liveColor,
             "memory load", ByteFormat.Short(info.MemoryLoadBytes),
-            "installed", ByteFormat.Short((long)MemoryInfo.RamSizeBytes));
+            "installed", ByteFormat.Short((long)MemoryDiagnostics.RamSizeBytes));
 
         y = DrawRow(canvas, font, x, y, s_liveColor,
             "pinned", info.PinnedObjectsCount.ToString(),
