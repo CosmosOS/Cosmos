@@ -41,6 +41,20 @@
     <PackageReference Include="Cosmos.Executable.Lua" />
   </ItemGroup>
 
+  <!-- The Telnet server behind the telnetd command (CosmosOS/Cosmos.Network.Telnet).
+       A clone of that repository next to this one is built from source, so a
+       change to the server can be tried in the DevKernel before it is
+       published; otherwise the package comes from nuget.org. -->
+  <PropertyGroup>
+    <CosmosNetworkTelnetProject>$(MSBuildThisFileDirectory)../../../Cosmos.Network.Telnet/src/Cosmos.Network.Telnet/Cosmos.Network.Telnet.csproj</CosmosNetworkTelnetProject>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(CosmosNetworkTelnetProject)')">
+    <ProjectReference Include="$(CosmosNetworkTelnetProject)" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('$(CosmosNetworkTelnetProject)')">
+    <PackageReference Include="Cosmos.Network.Telnet" />
+  </ItemGroup>
+
   <!-- DevKernel-specific C files -->
   <ItemGroup>
     <GCCProject Include="./src/C/" />
