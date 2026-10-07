@@ -8,6 +8,24 @@ namespace Cosmos.Kernel.HAL.DriverKit.Display;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct DisplayMode
 {
+    /// <summary>Width in pixels.</summary>
+    public int Width { get; }
+
+    /// <summary>Height in pixels.</summary>
+    public int Height { get; }
+
+    /// <summary>Bytes per row of the framebuffer.</summary>
+    public int Pitch { get; }
+
+    /// <summary>Bits per pixel.</summary>
+    public int BitsPerPixel { get; }
+
+    /// <summary>Refresh rate in Hz; 0 when unknown.</summary>
+    public int RefreshRate { get; }
+
+    /// <summary>True for the unprogrammed case: an adapter whose scanout the driver has not programmed yet.</summary>
+    public bool IsEmpty => Width == 0 || Height == 0;
+
     /// <summary>Creates a mode.</summary>
     /// <param name="width">Width in pixels.</param>
     /// <param name="height">Height in pixels.</param>
@@ -32,22 +50,4 @@ public readonly struct DisplayMode
         BitsPerPixel = bitsPerPixel;
         RefreshRate = refreshRate;
     }
-
-    /// <summary>Width in pixels.</summary>
-    public int Width { get; }
-
-    /// <summary>Height in pixels.</summary>
-    public int Height { get; }
-
-    /// <summary>Bytes per row of the framebuffer.</summary>
-    public int Pitch { get; }
-
-    /// <summary>Bits per pixel.</summary>
-    public int BitsPerPixel { get; }
-
-    /// <summary>Refresh rate in Hz; 0 when unknown.</summary>
-    public int RefreshRate { get; }
-
-    /// <summary>True for the unprogrammed case: an adapter whose scanout the driver has not programmed yet.</summary>
-    public bool IsEmpty => Width == 0 || Height == 0;
 }
