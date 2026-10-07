@@ -11,12 +11,6 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// </summary>
 public readonly struct DriverInfo
 {
-    internal DriverInfo(string name, int priority)
-    {
-        Name = name;
-        Priority = priority;
-    }
-
     /// <summary>The driver's name, as it appears in the <c>[Drivers]</c> log.</summary>
     public string Name { get; }
 
@@ -25,4 +19,10 @@ public readonly struct DriverInfo
     /// offered first. Zero for a driver that does not override it.
     /// </summary>
     public int Priority { get; }
+
+    internal DriverInfo(string name, int priority)
+    {
+        Name = name;
+        Priority = priority;
+    }
 }

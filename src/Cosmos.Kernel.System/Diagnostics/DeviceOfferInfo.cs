@@ -12,16 +12,6 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// </summary>
 public readonly struct DeviceOfferInfo
 {
-    internal DeviceOfferInfo(string driverName, int priority, int specificity, DeviceOfferOutcome outcome, string? reason, int releasedResourceCount)
-    {
-        DriverName = driverName;
-        Priority = priority;
-        Specificity = specificity;
-        Outcome = outcome;
-        Reason = reason;
-        ReleasedResourceCount = releasedResourceCount;
-    }
-
     /// <summary>Name of the driver the node was offered to.</summary>
     public string DriverName { get; }
 
@@ -50,4 +40,14 @@ public readonly struct DeviceOfferInfo
     /// bound.
     /// </summary>
     public int ReleasedResourceCount { get; }
+
+    internal DeviceOfferInfo(string driverName, int priority, int specificity, DeviceOfferOutcome outcome, string? reason, int releasedResourceCount)
+    {
+        DriverName = driverName;
+        Priority = priority;
+        Specificity = specificity;
+        Outcome = outcome;
+        Reason = reason;
+        ReleasedResourceCount = releasedResourceCount;
+    }
 }

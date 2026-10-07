@@ -18,40 +18,6 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// </summary>
 public readonly struct DeviceNodeInfo
 {
-    internal DeviceNodeInfo(
-        string path,
-        string busName,
-        string description,
-        string? driverName,
-        DeviceNodeState state,
-        string? parentPath,
-        int resourceCount,
-        int interruptCount,
-        int offerCount,
-        int childCount,
-        int heldResourceCount,
-        int publishedDeviceCount,
-        int leakedResourceCount,
-        int faultCount,
-        string? lastFault)
-    {
-        Path = path;
-        BusName = busName;
-        Description = description;
-        DriverName = driverName;
-        State = state;
-        ParentPath = parentPath;
-        ResourceCount = resourceCount;
-        InterruptCount = interruptCount;
-        OfferCount = offerCount;
-        ChildCount = childCount;
-        HeldResourceCount = heldResourceCount;
-        PublishedDeviceCount = publishedDeviceCount;
-        LeakedResourceCount = leakedResourceCount;
-        FaultCount = faultCount;
-        LastFault = lastFault;
-    }
-
     /// <summary>The node's name in the <c>[Drivers]</c> log: bus name, colon, bus address.</summary>
     public string Path { get; }
 
@@ -122,4 +88,38 @@ public readonly struct DeviceNodeInfo
 
     /// <summary>The message of the most recent handler exception, or <see langword="null"/> when none has thrown.</summary>
     public string? LastFault { get; }
+
+    internal DeviceNodeInfo(
+        string path,
+        string busName,
+        string description,
+        string? driverName,
+        DeviceNodeState state,
+        string? parentPath,
+        int resourceCount,
+        int interruptCount,
+        int offerCount,
+        int childCount,
+        int heldResourceCount,
+        int publishedDeviceCount,
+        int leakedResourceCount,
+        int faultCount,
+        string? lastFault)
+    {
+        Path = path;
+        BusName = busName;
+        Description = description;
+        DriverName = driverName;
+        State = state;
+        ParentPath = parentPath;
+        ResourceCount = resourceCount;
+        InterruptCount = interruptCount;
+        OfferCount = offerCount;
+        ChildCount = childCount;
+        HeldResourceCount = heldResourceCount;
+        PublishedDeviceCount = publishedDeviceCount;
+        LeakedResourceCount = leakedResourceCount;
+        FaultCount = faultCount;
+        LastFault = lastFault;
+    }
 }

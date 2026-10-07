@@ -11,16 +11,6 @@ namespace Cosmos.Kernel.System.Diagnostics;
 /// </summary>
 public readonly struct PublishedDeviceInfo
 {
-    internal PublishedDeviceInfo(PublishedDeviceKind kind, string name, string? nodePath, string? driverName, bool isConsumed, bool isWithdrawn)
-    {
-        Kind = kind;
-        Name = name;
-        NodePath = nodePath;
-        DriverName = driverName;
-        IsConsumed = isConsumed;
-        IsWithdrawn = isWithdrawn;
-    }
-
     /// <summary>What kind of device this is.</summary>
     public PublishedDeviceKind Kind { get; }
 
@@ -52,4 +42,14 @@ public readonly struct PublishedDeviceInfo
     /// between its withdrawal and its removal from the list.
     /// </summary>
     public bool IsWithdrawn { get; }
+
+    internal PublishedDeviceInfo(PublishedDeviceKind kind, string name, string? nodePath, string? driverName, bool isConsumed, bool isWithdrawn)
+    {
+        Kind = kind;
+        Name = name;
+        NodePath = nodePath;
+        DriverName = driverName;
+        IsConsumed = isConsumed;
+        IsWithdrawn = isWithdrawn;
+    }
 }
