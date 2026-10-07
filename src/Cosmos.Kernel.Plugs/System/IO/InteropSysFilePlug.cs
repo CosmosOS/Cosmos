@@ -106,6 +106,23 @@ internal static unsafe class InteropSysFilePlug
         return error == PalError.SUCCESS ? bytesWritten : Fail(error);
     }
 
+    // Scatter/gather I/O: RandomAccess.Read/Write over several buffers, and the
+    // SafeFileHandle thread-pool source behind every async FileStream operation.
+
+    [PlugMember]
+    public static long PReadV(SafeHandle fd, PalSys.IOVector* vectors, int vectorCount, long fileOffset)
+    {
+        PalError error = FileDescriptorTable.PReadV(DescriptorOf(fd), vectors, vectorCount, fileOffset, out long bytesRead);
+        return error == PalError.SUCCESS ? bytesRead : Fail(error);
+    }
+
+    [PlugMember]
+    public static long PWriteV(SafeHandle fd, PalSys.IOVector* vectors, int vectorCount, long fileOffset)
+    {
+        PalError error = FileDescriptorTable.PWriteV(DescriptorOf(fd), vectors, vectorCount, fileOffset, out long bytesWritten);
+        return error == PalError.SUCCESS ? bytesWritten : Fail(error);
+    }
+
     [PlugMember]
     public static long LSeek(SafeFileHandle fd, long offset, PalSys.SeekWhence whence)
     {

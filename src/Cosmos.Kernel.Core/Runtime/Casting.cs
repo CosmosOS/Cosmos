@@ -109,6 +109,8 @@ internal static unsafe class Casting
 
     private static bool IsInstanceOfInterface(MethodTable* type, MethodTable* interfaceType)
     {
+        MethodTable* objectType = type;
+
         while (type != null)
         {
             for (int i = 0; i < type->NumInterfaces; i++)
@@ -131,7 +133,10 @@ internal static unsafe class Casting
             type = type->BaseType;
         }
 
-        return false;
+        // Not implemented as such, but a variant instantiation of it can be: an IEnumerable<Derived>
+        // is an IEnumerable<Base>, a string[] an IList<object>.
+        return objectType != null && interfaceType->HasGenericVariance
+            && TypeVariance.ImplementsInterface(objectType, interfaceType, null);
     }
 
     private static bool IsInstanceOfClass(MethodTable* type, MethodTable* classType)

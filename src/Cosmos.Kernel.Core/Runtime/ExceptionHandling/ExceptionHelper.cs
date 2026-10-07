@@ -11,8 +11,10 @@ namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 /// </summary>
 internal static unsafe partial class ExceptionHelper
 {
-    // Maximum stack frames to walk.
-    private const int MAX_STACK_FRAMES = 64;
+    // Maximum stack frames to walk: a guard against a corrupt frame chain, the walk ends at
+    // the bottom of the stack first. Deep enough for a throw a few hundred frames below its
+    // catch, as an interpreter's error raised from nested callbacks is.
+    private const int MAX_STACK_FRAMES = 4096;
 
     // Assembly funclet callers - use nint for object reference since P/Invoke doesn't support object.
     [LibraryImport("*", EntryPoint = "RhpCallCatchFunclet")]
@@ -26,19 +28,32 @@ internal static unsafe partial class ExceptionHelper
     // Guard against recursive exception handling.
     private static bool s_isHandlingException = false;
 
-    // The catch clauses the in-flight exception has already entered, recorded just before control
-    // transfers to each funclet. A `throw;` inside a funclet re-enters dispatch with the SAME
-    // exception object (RhpRethrow reads it back from the ExInfo); the new walk starts inside the
-    // funclet and runs back through the original throw context, so without these records it would
-    // find the very clauses that already ran and re-enter them forever. A chain (not a single
-    // record) because catch-and-rethrow can stack — each rethrow must skip every clause the
-    // object has visited. Records are only consulted for rethrow dispatches (same-object test),
-    // so entries left behind by a catch that completed normally are harmless.
-    private const int MaxActiveCatchDepth = 8;
+    // Whether every throw is told on the serial port (its message and where it was thrown), and
+    // the handler found for it: for debugging the dispatcher, whose crash would otherwise lose
+    // the exception. Off, only an exception nothing catches is told: a line costs ~90 µs per
+    // character over a 115200-baud UART, and code that catches what it throws (a script engine
+    // running a page) throws dozens of times a second.
+    internal static bool s_traceThrows;
+
+    // The catch clauses whose funclets are running, recorded just before control transfers to
+    // each funclet, with the ExInfo of the exception that entered them. A funclet runs on top of
+    // the dispatcher, itself on top of the frames of the throw, so an exception thrown while it
+    // runs — a `throw;`, or a new exception — walks back from the funclet through that throw's
+    // frames: they are unwound as far as the program goes, and must not catch it, nor must the
+    // clause that is running re-enter. A chain (not a single record) because funclets nest: a
+    // catch that throws from its handler runs the next catch on top of itself.
+    //
+    // A record lives as long as its funclet: RhpThrowEx links an ExInfo into a chain for every
+    // throw, and RhpCallCatchFunclet unlinks those of the frames it unwinds once the funclet
+    // returns, so the funclets still running are those whose ExInfo the chain still holds (see
+    // PruneFinishedCatches). Telling a rethrow by its exception object instead let a new
+    // exception thrown from a catch re-enter that catch, and a completed catch's object, thrown
+    // again later, skip it.
+    private const int MaxActiveCatchDepth = 64;
     private static readonly nuint[] s_activeCatchFramePointers = new nuint[MaxActiveCatchDepth];
     private static readonly nuint[] s_activeCatchHandlers = new nuint[MaxActiveCatchDepth];
+    private static readonly nuint[] s_activeCatchExInfos = new nuint[MaxActiveCatchDepth];
     private static int s_activeCatchCount;
-    private static Exception? s_activeCatchException;
 
     private static bool IsActiveCatchClause(nuint framePointer, nuint handlerAddress)
     {
@@ -51,6 +66,54 @@ internal static unsafe partial class ExceptionHelper
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Whether a frame belongs to a throw whose catch funclet is running: it lies between that
+    /// throw's ExInfo, on the stack of <c>RhpThrowEx</c>, and the frame that caught it.
+    /// </summary>
+    private static bool IsUnwoundFrame(nuint framePointer)
+    {
+        for (int i = 0; i < s_activeCatchCount; i++)
+        {
+            if (s_activeCatchExInfos[i] < framePointer && framePointer < s_activeCatchFramePointers[i])
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Drops the records of the catches whose funclets returned: those whose ExInfo the chain
+    /// behind <paramref name="pExInfo"/> (this throw's, linked first) no longer holds.
+    /// </summary>
+    private static void PruneFinishedCatches(void* pExInfo)
+    {
+        int kept = 0;
+        for (int i = 0; i < s_activeCatchCount; i++)
+        {
+            bool inFlight = false;
+            for (nuint* p = pExInfo == null ? null : *(nuint**)pExInfo; p != null; p = *(nuint**)p)
+            {
+                if ((nuint)p == s_activeCatchExInfos[i])
+                {
+                    inFlight = true;
+                    break;
+                }
+            }
+
+            if (inFlight)
+            {
+                s_activeCatchFramePointers[kept] = s_activeCatchFramePointers[i];
+                s_activeCatchHandlers[kept] = s_activeCatchHandlers[i];
+                s_activeCatchExInfos[kept] = s_activeCatchExInfos[i];
+                kept++;
+            }
+        }
+
+        s_activeCatchCount = kept;
     }
 
     // Arch-specific hooks — defined in ExceptionHelper.X64.cs / ExceptionHelper.ARM64.cs.
@@ -111,19 +174,33 @@ internal static unsafe partial class ExceptionHelper
         }
         s_isHandlingException = true;
 
-        // A rethrow re-dispatches the exception object the running catch funclet received; a
-        // fresh throw of a different object means the recorded catches completed normally, so
-        // their records are stale — drop them.
-        bool isRethrow = ReferenceEquals(ex, s_activeCatchException);
-        if (!isRethrow)
+        PruneFinishedCatches(pExInfo);
+
+        // Before the stack walk, in case the walk crashes.
+        if (s_traceThrows)
         {
-            s_activeCatchCount = 0;
-            s_activeCatchException = null;
+            WriteThrow(ex, throwAddress, throwRbp, throwRsp);
         }
 
+        DispatchExceptionWithContext(ex, throwAddress, throwRbp, throwRsp, pExInfo);
+
+        // DispatchExceptionWithContext transfers to the handler on success; it only returns here
+        // when no handler covered the throw.
+        if (!s_traceThrows)
+        {
+            WriteThrow(ex, throwAddress, throwRbp, throwRsp);
+        }
+
+        Serial.WriteString("\n*** UNHANDLED EXCEPTION ***\n");
+        Serial.WriteString("No catch handler found. System halting...\n");
+        FailFast("Unhandled exception", ex);
+    }
+
+    /// <summary>Tells the serial port what was thrown, and where.</summary>
+    private static void WriteThrow(Exception ex, nuint throwAddress, nuint throwRbp, nuint throwRsp)
+    {
         Serial.WriteString("\n=== DOTNET EXCEPTION THROWN ===\n");
-        // Print the message before the stack walk, in case the walk crashes. Avoid GetType().Name —
-        // it allocates.
+        // Avoid GetType().Name — it allocates.
         string? msg = ex.Message;
         if (msg is not null)
         {
@@ -140,14 +217,6 @@ internal static unsafe partial class ExceptionHelper
         Serial.WriteString("RSP: 0x");
         Serial.WriteNumber(throwRsp);
         Serial.WriteString("\n");
-
-        DispatchExceptionWithContext(ex, throwAddress, throwRbp, throwRsp, pExInfo, isRethrow);
-
-        // DispatchExceptionWithContext transfers to the handler on success; it only returns here
-        // when no handler covered the throw.
-        Serial.WriteString("\n*** UNHANDLED EXCEPTION ***\n");
-        Serial.WriteString("No catch handler found. System halting...\n");
-        FailFast("Unhandled exception", ex);
     }
 
     /// <summary>
@@ -156,7 +225,7 @@ internal static unsafe partial class ExceptionHelper
     /// the catch handler via <see cref="InvokeCatchHandler"/>, which does not return. Returns only
     /// when no handler was found (or the throw-site frame pointer was missing).
     /// </summary>
-    private static void DispatchExceptionWithContext(Exception ex, nuint throwAddress, nuint throwRbp, nuint throwRsp, void* pExInfo, bool isRethrow)
+    private static void DispatchExceptionWithContext(Exception ex, nuint throwAddress, nuint throwRbp, nuint throwRsp, void* pExInfo)
     {
         // No frame pointer from the throw-site context → can't walk the stack.
         if (throwRbp == 0)
@@ -204,18 +273,22 @@ internal static unsafe partial class ExceptionHelper
                 regDisplay.SP = frame.FramePointer;
             }
 
-            // Does this frame have a handler covering the call that threw? On a rethrow, the
-            // clauses this exception already entered must not catch it again.
+            // Does this frame have a handler covering the call that threw? Not if it is a frame
+            // of a throw whose catch is running, and not that catch's clause again.
             // Probe one byte back into the call: every ReturnAddress here — including frame 0's
             // throwAddress, captured as RhpThrowEx's return address — points at the instruction
             // AFTER the call, and clause try-ends are exclusive, so a call ending a try region
             // would otherwise miss its handler (#387). RyuJIT pads such calls with nop/int3
             // today, making this adjustment behavior-preserving on the current codegen.
-            if (TryFindHandler(ex, frame.ReturnAddress - 1, isRethrow, frame.FramePointer, out EHClause clause, pRegDisplay))
+            if (!IsUnwoundFrame(frame.FramePointer)
+                && TryFindHandler(ex, frame.ReturnAddress - 1, frame.FramePointer, out EHClause clause, pRegDisplay))
             {
-                Serial.WriteString("[EH] Handler found at 0x");
-                Serial.WriteHex((nuint)clause.HandlerAddress);
-                Serial.WriteString("\n");
+                if (s_traceThrows)
+                {
+                    Serial.WriteString("[EH] Handler found at 0x");
+                    Serial.WriteHex((nuint)clause.HandlerAddress);
+                    Serial.WriteString("\n");
+                }
 
                 catchFrame = frame;
                 catchClause = clause;
@@ -272,15 +345,19 @@ internal static unsafe partial class ExceptionHelper
             PinPass2RegDisplay(pRegDisplay, catchFrame.FramePointer);
         }
 
-        // Record the clause about to run so a `throw;` from inside its funclet is dispatched past
-        // it instead of re-entering it (see s_activeCatch* above).
+        // Record the clause about to run so an exception thrown from inside its funclet is
+        // dispatched past it instead of re-entering it (see s_activeCatch* above).
         if (s_activeCatchCount < MaxActiveCatchDepth)
         {
             s_activeCatchFramePointers[s_activeCatchCount] = catchFrame.FramePointer;
             s_activeCatchHandlers[s_activeCatchCount] = (nuint)catchClause.HandlerAddress;
+            s_activeCatchExInfos[s_activeCatchCount] = (nuint)pExInfo;
             s_activeCatchCount++;
         }
-        s_activeCatchException = ex;
+        else
+        {
+            Serial.WriteString("[EH] Too many nested catch funclets to track\n");
+        }
 
         // Pass 2: transfer to the catch handler.
         // TODO: execute finally handlers between the throw and the catch first.
@@ -328,7 +405,7 @@ internal static unsafe partial class ExceptionHelper
     /// method's LSDA. <paramref name="pRegDisplay"/> (if non-null) lets a <c>when</c>-filter clause
     /// be evaluated. Also appends the method name to the exception's stack trace.
     /// </summary>
-    private static bool TryFindHandler(Exception ex, nuint instructionPointer, bool skipActiveClauses, nuint framePointer, out EHClause clause, REGDISPLAY* pRegDisplay)
+    private static bool TryFindHandler(Exception ex, nuint instructionPointer, nuint framePointer, out EHClause clause, REGDISPLAY* pRegDisplay)
     {
         clause = default;
 
@@ -347,7 +424,7 @@ internal static unsafe partial class ExceptionHelper
         }
 
         uint codeOffset = (uint)(instructionPointer - methodStart);
-        return TryFindHandlerInLSDA(ex, pLSDA, methodStart, codeOffset, skipActiveClauses, framePointer, out clause, pRegDisplay);
+        return TryFindHandlerInLSDA(ex, pLSDA, methodStart, codeOffset, framePointer, out clause, pRegDisplay);
     }
 
     /// <summary>
@@ -411,7 +488,7 @@ internal static unsafe partial class ExceptionHelper
     /// (called via <see cref="RhpCallFilterFunclet"/>) returns non-zero. Fault clauses are
     /// recognised but not yet executed. Returns <c>false</c> if no clause matches.
     /// </summary>
-    private static bool TryFindHandlerInLSDA(Exception ex, byte* pLSDA, nuint methodStart, uint codeOffset, bool skipActiveClauses, nuint framePointer, out EHClause clause, REGDISPLAY* pRegDisplay)
+    private static bool TryFindHandlerInLSDA(Exception ex, byte* pLSDA, nuint methodStart, uint codeOffset, nuint framePointer, out EHClause clause, REGDISPLAY* pRegDisplay)
     {
         clause = default;
 
@@ -489,8 +566,16 @@ internal static unsafe partial class ExceptionHelper
                 continue;
             }
 
-            // Clauses this exception already entered must not re-catch their own rethrow.
-            if (skipActiveClauses && IsActiveCatchClause(framePointer, methodStart + handlerOffset))
+            // A clause whose funclet is running must not catch what that funclet throws.
+            if (IsActiveCatchClause(framePointer, methodStart + handlerOffset))
+            {
+                continue;
+            }
+
+            // A typed clause catches its type and the types derived from it, nothing else:
+            // `catch (A) {} catch (B) {}` must leave a B to the second clause.
+            if (kind == EHClauseKind.EH_CLAUSE_TYPED
+                && Casting.RhTypeCast_IsInstanceOfClass(ex, (Internal.Runtime.MethodTable*)targetType) is null)
             {
                 continue;
             }

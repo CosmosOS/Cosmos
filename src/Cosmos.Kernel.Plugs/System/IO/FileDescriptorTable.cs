@@ -276,6 +276,78 @@ internal static unsafe class FileDescriptorTable
         return error;
     }
 
+    /// <summary>preadv: <see cref="PRead"/> into each vector in turn, stopping at
+    /// the first short read (end of file). An error after some bytes were read
+    /// reports those bytes, as POSIX does.</summary>
+    internal static PalError PReadV(int fd, PalSys.IOVector* vectors, int vectorCount, long offset, out long bytesRead)
+    {
+        bytesRead = 0;
+
+        if (vectorCount < 0 || (vectorCount > 0 && vectors == null))
+        {
+            return PalError.EINVAL;
+        }
+
+        for (int i = 0; i < vectorCount; i++)
+        {
+            ulong length = (ulong)vectors[i].Count;
+            if (length > int.MaxValue)
+            {
+                return bytesRead > 0 ? PalError.SUCCESS : PalError.EINVAL;
+            }
+
+            PalError error = PRead(fd, vectors[i].Base, (int)length, offset + bytesRead, out int read);
+            if (error != PalError.SUCCESS)
+            {
+                return bytesRead > 0 ? PalError.SUCCESS : error;
+            }
+
+            bytesRead += read;
+            if ((ulong)read < length)
+            {
+                break;
+            }
+        }
+
+        return PalError.SUCCESS;
+    }
+
+    /// <summary>pwritev: <see cref="PWrite"/> from each vector in turn, stopping at
+    /// the first short write. An error after some bytes were written reports
+    /// those bytes, as POSIX does.</summary>
+    internal static PalError PWriteV(int fd, PalSys.IOVector* vectors, int vectorCount, long offset, out long bytesWritten)
+    {
+        bytesWritten = 0;
+
+        if (vectorCount < 0 || (vectorCount > 0 && vectors == null))
+        {
+            return PalError.EINVAL;
+        }
+
+        for (int i = 0; i < vectorCount; i++)
+        {
+            ulong length = (ulong)vectors[i].Count;
+            if (length > int.MaxValue)
+            {
+                return bytesWritten > 0 ? PalError.SUCCESS : PalError.EINVAL;
+            }
+
+            PalError error = PWrite(fd, vectors[i].Base, (int)length, offset + bytesWritten, out int written);
+            if (error != PalError.SUCCESS)
+            {
+                return bytesWritten > 0 ? PalError.SUCCESS : error;
+            }
+
+            bytesWritten += written;
+            if ((ulong)written < length)
+            {
+                break;
+            }
+        }
+
+        return PalError.SUCCESS;
+    }
+
     internal static PalError Seek(int fd, long offset, int whence, out long newPosition)
     {
         newPosition = -1;

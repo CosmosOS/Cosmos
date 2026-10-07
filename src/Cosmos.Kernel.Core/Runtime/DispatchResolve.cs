@@ -209,6 +209,11 @@ namespace Cosmos.Kernel.Core.Runtime
             System.Diagnostics.Debug.Assert(pTgtType->HasDispatchMap, "Missing dispatch map");
 #endif
 
+            MethodTable* pItfOpenGenericType = null;
+            MethodTableList itfInstantiation = default;
+            int itfArity = 0;
+            GenericVariance* pItfVarianceInfo = null;
+
             bool fCheckVariance = false;
             bool fArrayCovariance = false;
 
@@ -312,9 +317,46 @@ namespace Cosmos.Kernel.Core.Runtime
                     }
                     else if (fCheckVariance && ((fArrayCovariance && pCurEntryType->IsGeneric) || pCurEntryType->HasGenericVariance))
                     {
-                        // For simplicity in Cosmos, we skip full variance checking
-                        // This would require implementing TypeParametersAreCompatible which is complex
-                        continue;
+                        // Interface types don't match exactly but both the target interface and the current interface
+                        // in the map are marked as being generic with at least one co- or contra- variant type
+                        // parameter (an IEnumerator<Derived> called as an IEnumerator<Base>). So we might still have
+                        // a compatible match.
+
+                        // Retrieve the unified generic instance for the callsite interface if we haven't already (we
+                        // lazily get this then cache the result since the lookup isn't necessarily cheap).
+                        if (pItfOpenGenericType == null)
+                        {
+                            pItfOpenGenericType = pItfType->GenericDefinition;
+                            itfArity = (int)pItfType->GenericArity;
+                            itfInstantiation = pItfType->GenericArguments;
+                            pItfVarianceInfo = pItfType->GenericVariance;
+                        }
+
+                        // If the generic types aren't the same then the types aren't compatible.
+                        if (pItfOpenGenericType != pCurEntryType->GenericDefinition)
+                        {
+                            continue;
+                        }
+
+                        if (TypeVariance.TypeParametersAreCompatible(itfArity, pCurEntryType->GenericArguments, itfInstantiation,
+                                pItfVarianceInfo, fArrayCovariance, null))
+                        {
+                            *pImplSlotNumber = i->_usImplMethodSlot;
+
+                            // If this is a static method, the entry point is not usable without generic context.
+                            // (Instance methods acquire the generic context from their `this`.)
+                            // Same for IDynamicInterfaceCastable (that has a `this` but it's not useful)
+                            if (fStaticDispatch)
+                            {
+                                *ppGenericContext = GetGenericContextSource(pTgtType, i);
+                            }
+                            else if ((flags & ResolveFlags.IDynamicInterfaceCastable) != 0)
+                            {
+                                *ppGenericContext = pTgtType;
+                            }
+
+                            return true;
+                        }
                     }
                 }
             }
