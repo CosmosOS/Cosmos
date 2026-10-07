@@ -2,7 +2,7 @@
 
 using Cosmos.Kernel.Core.ARM64.Cpu;
 using Cosmos.Kernel.Core.CPU;
-using Cosmos.Kernel.HAL.DriverKit.Platform;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Platform;
 
 namespace Cosmos.Kernel.HAL.ARM64;
 

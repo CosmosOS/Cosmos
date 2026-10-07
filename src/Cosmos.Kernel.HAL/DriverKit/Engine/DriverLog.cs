@@ -2,7 +2,7 @@
 
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.DriverKit.Virtio;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Virtio;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 

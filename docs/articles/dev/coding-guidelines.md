@@ -477,7 +477,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
 Write a `[Driver]` class in `Cosmos.Kernel.Drivers` over the kit and publish the device through its binding ([Writing a Driver](../user/drivers.md)). When the device sits on a bus the kit does not know:
 
-1. Add the bus kind to the kit: an identity, a match, an access object and a path format under `DriverKit/`.
+1. Add the bus kind to the kit, in its own folder under `DriverKit/Buses/`: an identity, a match, an access object, an interrupt source when the bus delivers its own interrupts, and a path format.
 2. Publish its nodes from the machine description (`PublishPlatformNodes`) or from a bus driver (`PublishChild`).
 3. Write the leaf driver over the access object.
 

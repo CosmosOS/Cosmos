@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Cosmos.Kernel.HAL.DriverKit.Usb;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
 
 namespace Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 

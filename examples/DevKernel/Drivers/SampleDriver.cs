@@ -2,7 +2,7 @@
 
 using System;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Synthetic;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
 
 namespace DevKernel.Drivers;
 

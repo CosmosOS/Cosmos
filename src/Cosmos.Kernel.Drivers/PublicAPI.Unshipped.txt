@@ -21,7 +21,7 @@ Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver.VirtioPciTransp
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.XhciDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.Bus.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbBus!
+Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.Bus.get -> Cosmos.Kernel.HAL.DriverKit.Buses.Usb.UsbBus!
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.CommandsIssued.get -> int
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.ContextSize.get -> int
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.DevicesAddressed.get -> int
@@ -169,7 +169,7 @@ Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.UsbKeyboardDriver(
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.KeyEvents.get -> int
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.LastLedReport.get -> byte
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.LastLedStatus.get -> Cosmos.Kernel.HAL.DriverKit.Usb.UsbTransferStatus
+Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.LastLedStatus.get -> Cosmos.Kernel.HAL.DriverKit.Buses.Usb.UsbTransferStatus
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.LedWrites.get -> int
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.Name.get -> string!
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.ReportCount.get -> int
@@ -263,15 +263,15 @@ override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Matches.g
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ActivateQueue(ushort index, in Cosmos.Kernel.HAL.DriverKit.Virtio.VirtqueueLayout layout) -> bool
+override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ActivateQueue(ushort index, in Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtqueueLayout layout) -> bool
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.AfterReset() -> void
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.AssignConfigInterrupt(int entry) -> bool
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.AssignQueueInterrupt(ushort index, int entry) -> bool
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.DeviceType.get -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioDeviceType
+override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.DeviceType.get -> Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtioDeviceType
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.InterruptEntryCount.get -> int
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.IsQueueReady(ushort index) -> bool
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.NotifyQueue(ushort index) -> void
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadAndAcknowledgeInterrupt() -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioInterruptStatus
+override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadAndAcknowledgeInterrupt() -> Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtioInterruptStatus
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadConfig16(uint offset) -> ushort
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadConfig32(uint offset) -> uint
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadConfig8(uint offset) -> byte
@@ -316,15 +316,15 @@ override Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State.PolledPeriodically.
 override Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ActivateQueue(ushort index, in Cosmos.Kernel.HAL.DriverKit.Virtio.VirtqueueLayout layout) -> bool
+override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ActivateQueue(ushort index, in Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtqueueLayout layout) -> bool
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.AfterReset() -> void
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.AssignConfigInterrupt(int entry) -> bool
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.AssignQueueInterrupt(ushort index, int entry) -> bool
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.DeviceType.get -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioDeviceType
+override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.DeviceType.get -> Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtioDeviceType
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.InterruptEntryCount.get -> int
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.IsQueueReady(ushort index) -> bool
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.NotifyQueue(ushort index) -> void
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadAndAcknowledgeInterrupt() -> Cosmos.Kernel.HAL.DriverKit.Virtio.VirtioInterruptStatus
+override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadAndAcknowledgeInterrupt() -> Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtioInterruptStatus
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadConfig16(uint offset) -> ushort
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadConfig32(uint offset) -> uint
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadConfig8(uint offset) -> byte

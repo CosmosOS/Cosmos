@@ -2,7 +2,7 @@
 
 using System.Buffers.Binary;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Usb;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
 
 namespace Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage;
 

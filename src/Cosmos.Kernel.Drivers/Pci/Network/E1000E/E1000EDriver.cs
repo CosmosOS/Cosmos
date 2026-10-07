@@ -3,7 +3,7 @@
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
 
 namespace Cosmos.Kernel.Drivers.Pci.Network.E1000E;
 

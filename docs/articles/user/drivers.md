@@ -65,7 +65,7 @@ The smallest driver that compiles and binds:
 
 ```csharp
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Synthetic;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
 
 namespace MyOS.Drivers;
 
@@ -178,7 +178,7 @@ A probe reads the node (`binding.Node.Resources`, `binding.Node.Interrupts`, `bi
 
 ```csharp
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Synthetic;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
 
 namespace MyOS.Drivers;
 
@@ -696,7 +696,7 @@ A PCI node is one function: its identity read from the configuration header, six
 
 ```csharp
 // In the driver:
-using Cosmos.Kernel.HAL.DriverKit.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
 
 private readonly DeviceMatch[] _matches =
 [
@@ -781,7 +781,7 @@ A virtio node is one virtio device, published by a transport driver over PCI or 
 
 ```csharp
 // In the driver:
-using Cosmos.Kernel.HAL.DriverKit.Virtio;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Virtio;
 
 private readonly DeviceMatch[] _matches = [VirtioMatch.DeviceType(VirtioDeviceType.Network)];
 ```
@@ -914,7 +914,7 @@ A USB node is one interface of a USB device, published by the host controller dr
 
 ```csharp
 // In the driver:
-using Cosmos.Kernel.HAL.DriverKit.Usb;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
 
 private readonly DeviceMatch[] _matches =
 [
@@ -1014,7 +1014,7 @@ A driver matches one port, never both, since a keyboard and a mouse speak differ
 
 ```csharp
 // In the driver:
-using Cosmos.Kernel.HAL.DriverKit.Ps2;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Ps2;
 
 private readonly DeviceMatch[] _matches = [Ps2Match.Port(Ps2Port.Keyboard)];
 ```
@@ -1163,7 +1163,7 @@ A test of the keyboard driver above:
 ```csharp
 // In the test kernel:
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Synthetic;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.TestRunner.Framework;
 using MyOS.Drivers;

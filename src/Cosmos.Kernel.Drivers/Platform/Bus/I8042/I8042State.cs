@@ -3,7 +3,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Ps2;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Ps2;
 
 namespace Cosmos.Kernel.Drivers.Platform.Bus.I8042;
 

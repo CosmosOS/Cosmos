@@ -31,7 +31,7 @@ public sealed class DeviceLock
     /// <see cref="DeviceBinding.Delay"/>, a sink call or a publish. A bus
     /// driver that drains its event ring under the lock may call a report
     /// handler there; such a handler is bound by the
-    /// <see cref="Usb.UsbReportHandler"/> contract (allocation-free, sinks
+    /// <see cref="Buses.Usb.UsbReportHandler"/> contract (allocation-free, sinks
     /// and Interlocked only), which is the one sanctioned sink call under a
     /// lock. Not reentrant: a holder that acquires again spins forever.
     /// </summary>

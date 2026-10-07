@@ -2,8 +2,8 @@
 
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Pci;
-using Cosmos.Kernel.HAL.DriverKit.Usb;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
 
 namespace Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 

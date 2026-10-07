@@ -1,8 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Platform;
-using Cosmos.Kernel.HAL.DriverKit.Ps2;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Platform;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Ps2;
 using Cosmos.Kernel.System;
 
 namespace Cosmos.Kernel.Drivers.Platform.Bus.I8042;

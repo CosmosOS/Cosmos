@@ -2,7 +2,7 @@
 
 using System;
 using Cosmos.Kernel.HAL.DriverKit;
-using Cosmos.Kernel.HAL.DriverKit.Virtio;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Virtio;
 
 namespace Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 

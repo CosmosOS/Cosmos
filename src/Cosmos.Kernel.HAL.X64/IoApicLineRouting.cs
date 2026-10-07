@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core.CPU;
-using Cosmos.Kernel.HAL.DriverKit.Platform;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Platform;
 
 namespace Cosmos.Kernel.HAL.X64;
 
