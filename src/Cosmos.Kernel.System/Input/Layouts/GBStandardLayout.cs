@@ -8,21 +8,12 @@ namespace Cosmos.Kernel.System.Input.Layouts;
 /// </summary>
 public sealed class GBStandardLayout : KeyboardLayout
 {
-    /// <summary>
-    /// Create new instance of the <see cref="GBStandardLayout"/> class.
-    /// </summary>
-    public GBStandardLayout()
-    {
-    }
-
-    /// <summary>
-    /// Init key list.
-    /// </summary>
+    /// <inheritdoc />
     protected override void InitializeKeys()
     {
         #region Keys
 
-        /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum Key */
+        /*                       Scan  Norm Shift Num  Caps ShCaps ShNum Key */
         Keys.Add(new KeyMapping(0x00, Key.NoName));
         Keys.Add(new KeyMapping(0x01, Key.Escape));
         /* 1 -> 9 */
@@ -87,9 +78,8 @@ public sealed class GBStandardLayout : KeyboardLayout
         Keys.Add(new KeyMapping(0x35, '/', '?', '/', '/', '?', '/', Key.Slash)); // also numpad divide
         /* Right Shift */
         Keys.Add(new KeyMapping(0x36, Key.RShift));
-        /* Print Screen */
+        /* Print Screen, also numpad multiply */
         Keys.Add(new KeyMapping(0x37, '*', '*', '*', '*', '*', '*', Key.NumMultiply));
-        // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, Key.LAlt));
         /* Right Alt: a second Alt on this layout */
@@ -130,8 +120,8 @@ public sealed class GBStandardLayout : KeyboardLayout
         Keys.Add(new KeyMapping(0x53, '\0', '\0', '.', '\0', '\0', '\0', Key.Delete,
             Key.NumPeriod));
 
-        Keys.Add(new KeyMapping(0x5b, Key.LWin));
-        Keys.Add(new KeyMapping(0x5c, Key.RWin));
+        Keys.Add(new KeyMapping(0x5B, Key.LWin));
+        Keys.Add(new KeyMapping(0x5C, Key.RWin));
 
         #endregion
     }

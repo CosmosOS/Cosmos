@@ -8,21 +8,12 @@ namespace Cosmos.Kernel.System.Input.Layouts;
 /// </summary>
 public sealed class USDvorakLayout : KeyboardLayout
 {
-    /// <summary>
-    /// Create new instance of the <see cref="USDvorakLayout"/> class.
-    /// </summary>
-    public USDvorakLayout()
-    {
-    }
-
-    /// <summary>
-    /// Init key list.
-    /// </summary>
+    /// <inheritdoc />
     protected override void InitializeKeys()
     {
         #region Keys
 
-        /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum Key */
+        /*     Scan  Norm Shift Num  Caps ShCaps ShNum Key */
         Keys.Add(new KeyMapping(0x00, Key.NoName));
         Keys.Add(new KeyMapping(0x01, Key.Escape));
         /* 1 -> 9 */
@@ -41,48 +32,48 @@ public sealed class USDvorakLayout : KeyboardLayout
         Keys.Add(new KeyMapping(0x0D, ']', '}', ']', '}', ']', '}', Key.RBracket));
         Keys.Add(new KeyMapping(0x0E, Key.Backspace));
         Keys.Add(new KeyMapping(0x0F, '\t', Key.Tab));
-        Keys.Add(new KeyMapping(0x10, '\'', '"', '\'', '\'', '"', '"', Key.Apostrophe)); //'q', 'Q', 'q', 'Q', 'q', 'Q', Key.Q));
-        Keys.Add(new KeyMapping(0x11, ',', '<', ',', ',', '<', '<', Key.Comma)); //'w', 'W', 'w', 'W', 'w', 'W', Key.W));
-        Keys.Add(new KeyMapping(0x12, '.', '>', '.', '.', '>', '>', Key.Period)); //'e', 'E', 'e', 'E', 'e', 'E', Key.E));
-        Keys.Add(new KeyMapping(0x13, 'p', 'P', 'p', 'P', 'p', 'P', Key.P)); //'r', 'R', 'r', 'R', 'r', 'R', Key.R));
-        Keys.Add(new KeyMapping(0x14, 'y', 'Y', 'y', 'Y', 'y', 'Y', Key.Y)); //'t', 'T', 't', 'T', 't', 'T', Key.T));
-        Keys.Add(new KeyMapping(0x15, 'f', 'F', 'f', 'F', 'f', 'F', Key.F)); //'y', 'Y', 'y', 'Y', 'y', 'Y', Key.Y));
-        Keys.Add(new KeyMapping(0x16, 'g', 'G', 'g', 'G', 'g', 'G', Key.G)); //'u', 'U', 'u', 'U', 'u', 'U', Key.U));
-        Keys.Add(new KeyMapping(0x17, 'c', 'C', 'c', 'C', 'c', 'C', Key.C)); //'i', 'I', 'i', 'I', 'i', 'I', Key.I));
-        Keys.Add(new KeyMapping(0x18, 'r', 'R', 'r', 'R', 'r', 'R', Key.R)); //'o', 'O', 'o', 'O', 'o', 'O', Key.O));
-        Keys.Add(new KeyMapping(0x19, 'l', 'L', 'l', 'L', 'l', 'L', Key.L)); //'p', 'P', 'p', 'P', 'p', 'P', Key.P));
-        Keys.Add(new KeyMapping(0x1A, '/', '?', '/', '/', '?', '/', Key.Slash)); //'[', '{', '[', '{', '[', '{', Key.LBracket));
-        Keys.Add(new KeyMapping(0x1B, '=', '+', '=', '=', '+', '=', Key.Equal)); //']', '}', ']', '}', ']', '}', Key.RBracket));
+        Keys.Add(new KeyMapping(0x10, '\'', '"', '\'', '\'', '"', '"', Key.Apostrophe));
+        Keys.Add(new KeyMapping(0x11, ',', '<', ',', ',', '<', '<', Key.Comma));
+        Keys.Add(new KeyMapping(0x12, '.', '>', '.', '.', '>', '>', Key.Period));
+        Keys.Add(new KeyMapping(0x13, 'p', 'P', 'p', 'P', 'p', 'P', Key.P));
+        Keys.Add(new KeyMapping(0x14, 'y', 'Y', 'y', 'Y', 'y', 'Y', Key.Y));
+        Keys.Add(new KeyMapping(0x15, 'f', 'F', 'f', 'F', 'f', 'F', Key.F));
+        Keys.Add(new KeyMapping(0x16, 'g', 'G', 'g', 'G', 'g', 'G', Key.G));
+        Keys.Add(new KeyMapping(0x17, 'c', 'C', 'c', 'C', 'c', 'C', Key.C));
+        Keys.Add(new KeyMapping(0x18, 'r', 'R', 'r', 'R', 'r', 'R', Key.R));
+        Keys.Add(new KeyMapping(0x19, 'l', 'L', 'l', 'L', 'l', 'L', Key.L));
+        Keys.Add(new KeyMapping(0x1A, '/', '?', '/', '/', '?', '/', Key.Slash));
+        Keys.Add(new KeyMapping(0x1B, '=', '+', '=', '=', '+', '=', Key.Equal));
         /* ENTER, CTRL */
         Keys.Add(new KeyMapping(0x1C, Key.Enter));
         Keys.Add(new KeyMapping(0x1D, Key.LCtrl));
         /* ASDFGHJKL;'` */
         Keys.Add(new KeyMapping(0x1E, 'a', 'A', 'a', 'A', 'a', 'A', Key.A));
-        Keys.Add(new KeyMapping(0x1F, 'o', 'O', 'o', 'O', 'o', 'O', Key.O)); //'s', 'S', 's', 'S', 's', 'S', Key.S));
-        Keys.Add(new KeyMapping(0x20, 'e', 'E', 'e', 'E', 'e', 'E', Key.E)); //'d', 'D', 'd', 'D', 'd', 'D', Key.D));
-        Keys.Add(new KeyMapping(0x21, 'u', 'U', 'u', 'U', 'u', 'U', Key.U)); //'f', 'F', 'f', 'F', 'f', 'F', Key.F));
-        Keys.Add(new KeyMapping(0x22, 'i', 'I', 'i', 'I', 'i', 'I', Key.I)); //'g', 'G', 'g', 'G', 'g', 'G', Key.G));
-        Keys.Add(new KeyMapping(0x23, 'd', 'D', 'd', 'D', 'd', 'D', Key.D)); //'h', 'H', 'h', 'H', 'h', 'H', Key.H));
-        Keys.Add(new KeyMapping(0x24, 'h', 'H', 'h', 'H', 'h', 'H', Key.H)); //'j', 'J', 'j', 'J', 'j', 'J', Key.J));
-        Keys.Add(new KeyMapping(0x25, 't', 'T', 't', 'T', 't', 'T', Key.T)); //'k', 'K', 'k', 'K', 'k', 'K', Key.K));
-        Keys.Add(new KeyMapping(0x26, 'n', 'N', 'n', 'N', 'n', 'N', Key.N)); //'l', 'L', 'l', 'L', 'l', 'L', Key.L));
-        Keys.Add(new KeyMapping(0x27, 's', 'S', 's', 'S', 's', 'S', Key.S)); //';', ':', ';', ';', ':', ':', Key.Semicolon));
-        Keys.Add(new KeyMapping(0x28, '-', '_', '-', '-', '_', '-', Key.Minus)); //'\'', '"', '\'', '\'', '"', '"', Key.Apostrophe));
+        Keys.Add(new KeyMapping(0x1F, 'o', 'O', 'o', 'O', 'o', 'O', Key.O));
+        Keys.Add(new KeyMapping(0x20, 'e', 'E', 'e', 'E', 'e', 'E', Key.E));
+        Keys.Add(new KeyMapping(0x21, 'u', 'U', 'u', 'U', 'u', 'U', Key.U));
+        Keys.Add(new KeyMapping(0x22, 'i', 'I', 'i', 'I', 'i', 'I', Key.I));
+        Keys.Add(new KeyMapping(0x23, 'd', 'D', 'd', 'D', 'd', 'D', Key.D));
+        Keys.Add(new KeyMapping(0x24, 'h', 'H', 'h', 'H', 'h', 'H', Key.H));
+        Keys.Add(new KeyMapping(0x25, 't', 'T', 't', 'T', 't', 'T', Key.T));
+        Keys.Add(new KeyMapping(0x26, 'n', 'N', 'n', 'N', 'n', 'N', Key.N));
+        Keys.Add(new KeyMapping(0x27, 's', 'S', 's', 'S', 's', 'S', Key.S));
+        Keys.Add(new KeyMapping(0x28, '-', '_', '-', '-', '_', '-', Key.Minus));
         Keys.Add(new KeyMapping(0x29, '`', '~', '`', '`', '~', '~', Key.Backquote));
         /* Left Shift*/
         Keys.Add(new KeyMapping(0x2A, Key.LShift));
         /* \ZXCVBNM,./ */
         Keys.Add(new KeyMapping(0x2B, '\\', '|', '\\', '\\', '|', '|', Key.Backslash));
-        Keys.Add(new KeyMapping(0x2C, ';', ':', ';', ';', ':', ':', Key.Semicolon)); //'z', 'Z', 'z', 'Z', 'z', 'Z', Key.Z));
-        Keys.Add(new KeyMapping(0x2D, 'q', 'Q', 'q', 'Q', 'q', 'Q', Key.Q)); //'x', 'X', 'x', 'X', 'x', 'X', Key.X));
-        Keys.Add(new KeyMapping(0x2E, 'j', 'J', 'j', 'J', 'j', 'J', Key.J)); //'c', 'C', 'c', 'C', 'c', 'C', Key.C));
-        Keys.Add(new KeyMapping(0x2F, 'k', 'K', 'k', 'K', 'k', 'K', Key.K)); //'v', 'V', 'v', 'V', 'v', 'V', Key.V));
-        Keys.Add(new KeyMapping(0x30, 'x', 'X', 'x', 'X', 'x', 'X', Key.X)); //'b', 'B', 'b', 'B', 'b', 'B', Key.B));
-        Keys.Add(new KeyMapping(0x31, 'b', 'B', 'b', 'B', 'b', 'B', Key.B)); //'n', 'N', 'n', 'N', 'n', 'N', Key.N));
+        Keys.Add(new KeyMapping(0x2C, ';', ':', ';', ';', ':', ':', Key.Semicolon));
+        Keys.Add(new KeyMapping(0x2D, 'q', 'Q', 'q', 'Q', 'q', 'Q', Key.Q));
+        Keys.Add(new KeyMapping(0x2E, 'j', 'J', 'j', 'J', 'j', 'J', Key.J));
+        Keys.Add(new KeyMapping(0x2F, 'k', 'K', 'k', 'K', 'k', 'K', Key.K));
+        Keys.Add(new KeyMapping(0x30, 'x', 'X', 'x', 'X', 'x', 'X', Key.X));
+        Keys.Add(new KeyMapping(0x31, 'b', 'B', 'b', 'B', 'b', 'B', Key.B));
         Keys.Add(new KeyMapping(0x32, 'm', 'M', 'm', 'M', 'm', 'M', Key.M));
-        Keys.Add(new KeyMapping(0x33, 'w', 'W', 'w', 'W', 'w', 'W', Key.W)); //',', '<', ',', ',', '<', '<', Key.Comma));
-        Keys.Add(new KeyMapping(0x34, 'v', 'V', 'v', 'V', 'v', 'V', Key.V)); //'.', '>', '.', '.', '>', '>', Key.Period));
-        Keys.Add(new KeyMapping(0x35, 'z', 'Z', 'z', 'Z', 'z', 'Z', Key.Z)); //'/', '?', '/', '/', '?', '/', Key.Slash)); // also numpad divide
+        Keys.Add(new KeyMapping(0x33, 'w', 'W', 'w', 'W', 'w', 'W', Key.W));
+        Keys.Add(new KeyMapping(0x34, 'v', 'V', 'v', 'V', 'v', 'V', Key.V));
+        Keys.Add(new KeyMapping(0x35, 'z', 'Z', 'z', 'Z', 'z', 'Z', Key.Z));
         /* Right Shift */
         Keys.Add(new KeyMapping(0x36, Key.RShift));
         /* Print Screen */

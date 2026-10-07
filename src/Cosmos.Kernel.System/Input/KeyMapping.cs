@@ -92,13 +92,13 @@ public sealed class KeyMapping
     /// <param name="num">The text character value of the key with the Num Lock modifier being active.</param>
     /// <param name="caps">The text character value of the key with the Caps Lock modifier being active.</param>
     /// <param name="shiftCapsLock">The text character value of the key with the Shift and Caps Lock modifiers being active.</param>
-    /// <param name="shiftNumLock">The text character value of the key with the Shift and Num Lock modifiers being active</param>
+    /// <param name="shiftNumLock">The text character value of the key with the Shift and Num Lock modifiers being active.</param>
     /// <param name="ctrlAlt">The text character value of the key with the Control and Alt modifiers being active.</param>
-    /// <param name="ctrlAltShift">The text character value of the key with the Control, Alt, and Shift modifiers being active</param>
+    /// <param name="ctrlAltShift">The text character value of the key with the Control, Alt, and Shift modifiers being active.</param>
     /// <param name="ctrl">The text character value of the key with the Control modifier being active.</param>
     /// <param name="shiftCtrl">The text character value of the key with the Shift and Control modifiers being active.</param>
     /// <param name="key">The virtual key that the physical key-press maps to.</param>
-    /// <param name="numKey">The virtual key that the physical key-press maps to when the Num Lock modifier is active..</param>
+    /// <param name="numKey">The virtual key that the physical key-press maps to when the Num Lock modifier is active.</param>
     public KeyMapping(byte scanCode, char normal, char shift, char num, char caps, char shiftCapsLock, char shiftNumLock, char ctrlAlt, char ctrlAltShift, char ctrl, char shiftCtrl, Key key, Key numKey)
     {
         ScanCode = scanCode;
@@ -109,7 +109,6 @@ public sealed class KeyMapping
         ShiftCapsLock = shiftCapsLock;
         ShiftNumLock = shiftNumLock;
         Key = key;
-        NumLockKey = key;
         ControlAlt = ctrlAlt;
         Control = ctrl;
         ControlAltShift = ctrlAltShift;
@@ -140,7 +139,6 @@ public sealed class KeyMapping
         : this(scanCode, normal, shift, numLock, capsLock, shiftCapsLock, shiftNumLock, ctrlAlt, ctrlAltShift, '\0', '\0', key)
     {
     }
-
 
     /// <inheritdoc cref="KeyMapping(byte, char, char, char, char, char, char, char, char, char, char, Key, Key)"/>
     public KeyMapping(byte scanCode, char normal, char shift, char num, char capsLock, char shiftCapsLock, char shiftNumLock, char ctrlAlt, Key key)

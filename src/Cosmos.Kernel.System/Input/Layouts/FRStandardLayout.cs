@@ -26,12 +26,12 @@ public sealed class FRStandardLayout : KeyboardLayout
         Keys.Add(new KeyMapping(0x09, '_', '8', '_', '8', '_', '8', Key.D8));
         Keys.Add(new KeyMapping(0x0A, 'ç', '9', 'ç', '9', 'ç', '9', Key.D9));
         Keys.Add(new KeyMapping(0x0B, 'à', '0', 'à', '0', 'à', '0', Key.D0));
-        /* -, =, Bksp, Tab */
+        /* ), =, Bksp, Tab */
         Keys.Add(new KeyMapping(0x0C, ')', '°', ')', '°', ')', '°', Key.Minus));
         Keys.Add(new KeyMapping(0x0D, '=', '+', '=', '+', '=', '+', Key.Equal));
         Keys.Add(new KeyMapping(0x0E, Key.Backspace));
         Keys.Add(new KeyMapping(0x0F, '\t', Key.Tab));
-        /*      QWERTYUIOP[] */
+        /* AZERTYUIOP^$ */
         Keys.Add(new KeyMapping(0x10, 'a', 'A', 'a', 'A', 'a', 'A', Key.A));
         Keys.Add(new KeyMapping(0x11, 'z', 'Z', 'z', 'Z', 'z', 'Z', Key.Z));
         Keys.Add(new KeyMapping(0x12, 'e', 'E', 'e', 'E', 'e', 'E', Key.E));
@@ -47,7 +47,7 @@ public sealed class FRStandardLayout : KeyboardLayout
         /* ENTER, CTRL */
         Keys.Add(new KeyMapping(0x1C, Key.Enter));
         Keys.Add(new KeyMapping(0x1D, Key.LCtrl));
-        /* ASDFGHJKL;'` */
+        /* QSDFGHJKLMù² */
         Keys.Add(new KeyMapping(0x1E, 'q', 'Q', 'q', 'Q', 'q', 'Q', Key.Q));
         Keys.Add(new KeyMapping(0x1F, 's', 'S', 's', 'S', 's', 'S', Key.S));
         Keys.Add(new KeyMapping(0x20, 'd', 'D', 'd', 'D', 'd', 'D', Key.D));
@@ -62,7 +62,7 @@ public sealed class FRStandardLayout : KeyboardLayout
         Keys.Add(new KeyMapping(0x29, '²', '\0', '²', '²', '\0', '\0', Key.Backquote));
         /* Left Shift*/
         Keys.Add(new KeyMapping(0x2A, Key.LShift));
-        /* \ZXCVBNM,./ */
+        /* *WXCVBN,;:! */
         Keys.Add(new KeyMapping(0x2B, '*', 'µ', '*', 'µ', '*', 'µ', Key.Backslash));
         Keys.Add(new KeyMapping(0x2C, 'w', 'W', 'w', 'W', 'w', 'W', Key.W));
         Keys.Add(new KeyMapping(0x2D, 'x', 'X', 'x', 'X', 'x', 'X', Key.X));

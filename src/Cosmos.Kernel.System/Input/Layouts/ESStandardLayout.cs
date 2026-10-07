@@ -8,13 +8,6 @@ namespace Cosmos.Kernel.System.Input.Layouts;
 /// </summary>
 public sealed class ESStandardLayout : KeyboardLayout
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ESStandardLayout"/> class.
-    /// </summary>
-    public ESStandardLayout()
-    {
-    }
-
     /// <inheritdoc />
     protected override void InitializeKeys()
     {
@@ -84,9 +77,8 @@ public sealed class ESStandardLayout : KeyboardLayout
         Keys.Add(new KeyMapping(0x35, '-', '_', '-', '-', '_', '_', Key.Slash));
         /* Right Shift */
         Keys.Add(new KeyMapping(0x36, Key.RShift));
-        /* Print Screen */
+        /* Print Screen, also numpad multiply */
         Keys.Add(new KeyMapping(0x37, '*', '*', '*', '*', '*', '*', Key.NumMultiply));
-        // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, Key.LAlt));
         /* Right Alt: the third-level modifier on this layout */
@@ -127,8 +119,8 @@ public sealed class ESStandardLayout : KeyboardLayout
         Keys.Add(new KeyMapping(0x53, '\0', '\0', '.', '\0', '\0', '\0', Key.Delete,
             Key.NumPeriod));
 
-        Keys.Add(new KeyMapping(0x5b, Key.LWin));
-        Keys.Add(new KeyMapping(0x5c, Key.RWin));
+        Keys.Add(new KeyMapping(0x5B, Key.LWin));
+        Keys.Add(new KeyMapping(0x5C, Key.RWin));
 
         #endregion
     }

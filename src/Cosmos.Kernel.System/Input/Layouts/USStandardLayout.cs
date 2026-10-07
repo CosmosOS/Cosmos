@@ -8,19 +8,12 @@ namespace Cosmos.Kernel.System.Input.Layouts;
 /// </summary>
 public sealed class USStandardLayout : KeyboardLayout
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="USStandardLayout"/> class.
-    /// </summary>
-    public USStandardLayout()
-    {
-    }
-
     /// <inheritdoc />
     protected override void InitializeKeys()
     {
         #region Keys
 
-        /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum Key */
+        /*     Scan  Norm Shift Num  Caps ShCaps ShNum Key */
         Keys.Add(new KeyMapping(0x00, Key.NoName));
         Keys.Add(new KeyMapping(0x01, Key.Escape));
         /* 1 -> 9 */
@@ -85,8 +78,7 @@ public sealed class USStandardLayout : KeyboardLayout
         /* Right Shift */
         Keys.Add(new KeyMapping(0x36, Key.RShift));
         /* Print Screen */
-        Keys.Add(new KeyMapping(0x37, '*', '*', '*', '*', '*', '*', Key.NumMultiply));
-        // also numpad multiply
+        Keys.Add(new KeyMapping(0x37, '*', '*', '*', '*', '*', '*', Key.NumMultiply)); // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, Key.LAlt));
         /* Right Alt: a second Alt on this layout */

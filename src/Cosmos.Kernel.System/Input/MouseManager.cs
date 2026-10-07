@@ -83,22 +83,20 @@ public static class MouseManager
     /// </summary>
     public static int ScreenHeight { get; private set; } = 768;
 
-    private static float s_sensitivity = 1.0f;
-
     /// <summary>
     /// Mouse sensitivity multiplier (default 1.0).
     /// </summary>
     /// <exception cref="InvalidOperationException">Mouse support is disabled.</exception>
     public static float Sensitivity
     {
-        get => s_sensitivity;
+        get;
         set
         {
             ThrowIfDisabled();
 
-            s_sensitivity = value;
+            field = value;
         }
-    }
+    } = 1.0f;
 
     /// <summary>
     /// Throws when mouse support is compiled out. Guards actions, not reads:

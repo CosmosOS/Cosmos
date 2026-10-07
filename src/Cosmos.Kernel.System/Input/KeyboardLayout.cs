@@ -63,7 +63,8 @@ public abstract class KeyboardLayout
     /// <param name="alt">Whether the Alt key is pressed.</param>
     /// <param name="numLock">Whether num-lock is active.</param>
     /// <param name="capsLock">Whether caps-lock is active.</param>
-    /// <returns>The translated <see cref="KeyEvent"/>.</returns>
+    /// <returns>The translated <see cref="KeyEvent"/>, an empty one for scan code 0,
+    /// or <see langword="null"/> when no mapping matches the scan code.</returns>
     internal KeyEvent? ConvertScanCode(byte scanKey, bool ctrl, bool shift, bool alt, bool numLock, bool capsLock)
     {
         EnsureKeysInitialized();
@@ -102,16 +103,11 @@ public abstract class KeyboardLayout
 
         for (int index = 0; index < Keys.Count; index++)
         {
-            KeyMapping t = Keys[index];
+            KeyMapping map = Keys[index];
 
-            if (t is null)
-            {
-                continue;
-            }
-            else if (t.ScanCode == scan)
+            if (map.ScanCode == scan)
             {
                 found = true;
-                KeyMapping map = t;
                 char key;
 
                 if (ctrl)
@@ -141,7 +137,7 @@ public abstract class KeyboardLayout
                 }
 
                 keyEvent.KeyChar = key;
-                keyEvent.Key = numLock ? t.NumLockKey : t.Key;
+                keyEvent.Key = numLock ? map.NumLockKey : map.Key;
                 break;
             }
         }

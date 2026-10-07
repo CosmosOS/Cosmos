@@ -8,13 +8,6 @@ namespace Cosmos.Kernel.System.Input.Layouts;
 /// </summary>
 public sealed class TRStandardLayout : KeyboardLayout
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TRStandardLayout"/> class.
-    /// </summary>
-    public TRStandardLayout()
-    {
-    }
-
     /// <inheritdoc />
     protected override void InitializeKeys()
     {
@@ -98,8 +91,7 @@ public sealed class TRStandardLayout : KeyboardLayout
         Keys.Add(new KeyMapping(0x36, Key.RShift));
         Keys.Add(new KeyMapping(0x1D, Key.LCtrl));
         /* Print Screen */
-        Keys.Add(new KeyMapping(0x37, '*', '*', '*', '*', '*', '*', Key.NumMultiply));
-        // also numpad multiply
+        Keys.Add(new KeyMapping(0x37, '*', '*', '*', '*', '*', '*', Key.NumMultiply)); // also numpad multiply
         /* Alt  */
         Keys.Add(new KeyMapping(0x38, Key.LAlt));
         /* Right Alt: the third-level modifier on this layout */

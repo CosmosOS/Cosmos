@@ -107,6 +107,19 @@ public static class KeyboardManager
     }
 
     /// <summary>
+    /// Throws when <see cref="Initialize"/> has not run, and proves the key
+    /// queue non-null for the rest of the caller.
+    /// </summary>
+    [MemberNotNull(nameof(s_queuedKeys))]
+    private static void ThrowIfNotInitialized()
+    {
+        if (s_queuedKeys is null)
+        {
+            throw new InvalidOperationException("KeyboardManager not initialized!");
+        }
+    }
+
+    /// <summary>
     /// Initializes the keyboard manager. Called once during boot, before the
     /// driver stage runs, so the keyboard consumer it installs sees every
     /// keyboard a kit driver publishes.
@@ -330,11 +343,7 @@ public static class KeyboardManager
     public static KeyEvent Peek()
     {
         ThrowIfDisabled();
-
-        if (s_queuedKeys is null)
-        {
-            throw new InvalidOperationException("KeyboardManager not initialized!");
-        }
+        ThrowIfNotInitialized();
 
         using (InternalCpu.DisableInterruptsScope())
         {
@@ -400,11 +409,7 @@ public static class KeyboardManager
     public static KeyEvent ReadKey()
     {
         ThrowIfDisabled();
-
-        if (s_queuedKeys is null)
-        {
-            throw new InvalidOperationException("KeyboardManager not initialized!");
-        }
+        ThrowIfNotInitialized();
 
         while (true)
         {
