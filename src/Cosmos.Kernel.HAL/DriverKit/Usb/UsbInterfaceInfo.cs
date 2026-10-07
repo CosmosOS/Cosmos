@@ -10,14 +10,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Usb;
 /// </summary>
 internal sealed class UsbInterfaceInfo
 {
-    internal UsbInterfaceInfo(byte number, byte interfaceClass, byte subclass, byte protocol)
-    {
-        Number = number;
-        Class = interfaceClass;
-        Subclass = subclass;
-        Protocol = protocol;
-    }
-
     /// <summary>bInterfaceNumber.</summary>
     internal byte Number { get; }
 
@@ -32,4 +24,12 @@ internal sealed class UsbInterfaceInfo
 
     /// <summary>The endpoints of alternate setting 0, in descriptor order.</summary>
     internal List<UsbEndpoint> Endpoints { get; } = [];
+
+    internal UsbInterfaceInfo(byte number, byte interfaceClass, byte subclass, byte protocol)
+    {
+        Number = number;
+        Class = interfaceClass;
+        Subclass = subclass;
+        Protocol = protocol;
+    }
 }

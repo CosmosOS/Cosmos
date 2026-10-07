@@ -15,18 +15,18 @@ internal sealed class UsbPipeResource : IKitResource
     private readonly UsbDevice _device;
     private int _released;
 
+    /// <summary>The pipe, the lookup key of <see cref="DeviceBinding.FindPipe"/>.</summary>
+    internal UsbPipe Pipe { get; }
+
+    /// <summary>The binding that opened the pipe.</summary>
+    internal DeviceBinding Binding { get; }
+
     internal UsbPipeResource(UsbDevice device, UsbPipe pipe, DeviceBinding binding)
     {
         _device = device;
         Pipe = pipe;
         Binding = binding;
     }
-
-    /// <summary>The pipe, the lookup key of <see cref="DeviceBinding.FindPipe"/>.</summary>
-    internal UsbPipe Pipe { get; }
-
-    /// <summary>The binding that opened the pipe.</summary>
-    internal DeviceBinding Binding { get; }
 
     /// <summary>
     /// Closes the pipe on the device unless the host already closed it.

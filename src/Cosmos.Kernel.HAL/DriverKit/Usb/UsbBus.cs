@@ -27,6 +27,18 @@ public sealed class UsbBus
     private readonly List<UsbDeviceState> _roots = [];
     private int _deviceCount;
 
+    /// <summary>The controller's 1-based ordinal, the first part of every port path below it.</summary>
+    public int Ordinal { get; }
+
+    /// <summary>The host driver's binding: the owner of the nodes published for root ports.</summary>
+    public DeviceBinding Binding { get; }
+
+    /// <summary>The host controller.</summary>
+    public UsbHostController Host { get; }
+
+    /// <summary>Devices attached, hubs included. Any context.</summary>
+    public int DeviceCount => Volatile.Read(ref _deviceCount);
+
     /// <summary>
     /// Creates the bus of a host controller and takes the next ordinal: the
     /// first controller bound is 1, a second xHCI function 2; a controller
@@ -43,18 +55,6 @@ public sealed class UsbBus
         Host = host;
         Ordinal = Interlocked.Increment(ref s_nextOrdinal);
     }
-
-    /// <summary>The controller's 1-based ordinal, the first part of every port path below it.</summary>
-    public int Ordinal { get; }
-
-    /// <summary>The host driver's binding: the owner of the nodes published for root ports.</summary>
-    public DeviceBinding Binding { get; }
-
-    /// <summary>The host controller.</summary>
-    public UsbHostController Host { get; }
-
-    /// <summary>Devices attached, hubs included. Any context.</summary>
-    public int DeviceCount => Volatile.Read(ref _deviceCount);
 
     /// <summary>
     /// Attaches the device on root port <paramref name="port"/>: addresses

@@ -30,12 +30,6 @@ public sealed class UsbAccess
     private readonly UsbDeviceState _device;
     private readonly UsbInterfaceInfo _interface;
 
-    internal UsbAccess(UsbDeviceState device, UsbInterfaceInfo usbInterface)
-    {
-        _device = device;
-        _interface = usbInterface;
-    }
-
     /// <summary>bInterfaceNumber.</summary>
     public byte InterfaceNumber => _interface.Number;
 
@@ -68,6 +62,12 @@ public sealed class UsbAccess
 
     /// <summary>True once the device left the bus. Any context.</summary>
     public bool IsDisconnected => _device.Device.IsDisconnected;
+
+    internal UsbAccess(UsbDeviceState device, UsbInterfaceInfo usbInterface)
+    {
+        _device = device;
+        _interface = usbInterface;
+    }
 
     /// <summary>The first endpoint of that type and direction, or null.</summary>
     /// <param name="type">The transfer type.</param>
@@ -138,8 +138,10 @@ public sealed class UsbAccess
     /// <param name="value">wValue.</param>
     /// <param name="index">wIndex.</param>
     /// <exception cref="InvalidOperationException">The caller is an interrupt handler.</exception>
-    public UsbTransferStatus ControlOut(UsbRequestType requestType, byte request, ushort value, ushort index) =>
-        ControlTransfer(new UsbSetupPacket(requestType, request, value, index, 0), Span<byte>.Empty);
+    public UsbTransferStatus ControlOut(UsbRequestType requestType, byte request, ushort value, ushort index)
+    {
+        return ControlTransfer(new UsbSetupPacket(requestType, request, value, index, 0), Span<byte>.Empty);
+    }
 
     /// <summary>
     /// A host-to-device control request whose data stage is a copy of

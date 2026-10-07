@@ -16,6 +16,12 @@ namespace Cosmos.Kernel.HAL.DriverKit.Usb;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public abstract class UsbPipe
 {
+    /// <summary>The endpoint the pipe was opened on.</summary>
+    public UsbEndpoint Endpoint { get; }
+
+    /// <summary>True once the host closed the pipe; the host is the only writer, the kit only reads it.</summary>
+    public bool IsClosed { get; protected set; }
+
     /// <summary>Creates a pipe over an endpoint.</summary>
     /// <param name="endpoint">The endpoint the pipe was opened on.</param>
     protected UsbPipe(UsbEndpoint endpoint)
@@ -23,10 +29,4 @@ public abstract class UsbPipe
         ArgumentNullException.ThrowIfNull(endpoint);
         Endpoint = endpoint;
     }
-
-    /// <summary>The endpoint the pipe was opened on.</summary>
-    public UsbEndpoint Endpoint { get; }
-
-    /// <summary>True once the host closed the pipe; the host is the only writer, the kit only reads it.</summary>
-    public bool IsClosed { get; protected set; }
 }

@@ -19,22 +19,6 @@ public abstract class UsbDevice
     /// <summary>Written by the host's port change handler or the kit's detach, read by whichever thread waits on a transfer.</summary>
     private volatile bool _disconnected;
 
-    /// <summary>Creates the kit half of a device the host addressed.</summary>
-    /// <param name="host">The host controller that addressed it.</param>
-    /// <param name="parent">The hub it hangs off, or null for a device on a root port.</param>
-    /// <param name="portNumber">The 1-based port number on <paramref name="parent"/>, or the root port number.</param>
-    /// <param name="speed">The speed the port reported.</param>
-    protected UsbDevice(UsbHostController host, UsbDevice? parent, byte portNumber, UsbSpeed speed)
-    {
-        ArgumentNullException.ThrowIfNull(host);
-        Host = host;
-        Parent = parent;
-        PortNumber = portNumber;
-        Speed = speed;
-        RootPortNumber = parent?.RootPortNumber ?? portNumber;
-        HubDepth = parent is null ? 0 : parent.HubDepth + 1;
-    }
-
     /// <summary>The host controller that addressed the device.</summary>
     public UsbHostController Host { get; }
 
@@ -80,6 +64,22 @@ public abstract class UsbDevice
     /// and one already waiting stops waiting. Any context.
     /// </summary>
     public bool IsDisconnected => _disconnected;
+
+    /// <summary>Creates the kit half of a device the host addressed.</summary>
+    /// <param name="host">The host controller that addressed it.</param>
+    /// <param name="parent">The hub it hangs off, or null for a device on a root port.</param>
+    /// <param name="portNumber">The 1-based port number on <paramref name="parent"/>, or the root port number.</param>
+    /// <param name="speed">The speed the port reported.</param>
+    protected UsbDevice(UsbHostController host, UsbDevice? parent, byte portNumber, UsbSpeed speed)
+    {
+        ArgumentNullException.ThrowIfNull(host);
+        Host = host;
+        Parent = parent;
+        PortNumber = portNumber;
+        Speed = speed;
+        RootPortNumber = parent?.RootPortNumber ?? portNumber;
+        HubDepth = parent is null ? 0 : parent.HubDepth + 1;
+    }
 
     /// <summary>
     /// Any context, allocation-free: every transfer to the device returns
@@ -173,26 +173,50 @@ public abstract class UsbDevice
     protected abstract bool ConfigureAsHubCore(byte portCount, byte thinkTime);
 
     /// <summary>Kit side of <see cref="ControlTransferCore"/>; called by the enumeration core and the access object.</summary>
-    internal UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data) => ControlTransferCore(setup, data);
+    internal UsbTransferStatus ControlTransfer(UsbSetupPacket setup, Span<byte> data)
+    {
+        return ControlTransferCore(setup, data);
+    }
 
     /// <summary>Kit side of <see cref="OpenInterruptPipeCore"/>; called by the access object.</summary>
-    internal UsbPipe? OpenInterruptPipe(UsbEndpoint endpoint, UsbReportHandler handler) => OpenInterruptPipeCore(endpoint, handler);
+    internal UsbPipe? OpenInterruptPipe(UsbEndpoint endpoint, UsbReportHandler handler)
+    {
+        return OpenInterruptPipeCore(endpoint, handler);
+    }
 
     /// <summary>Kit side of <see cref="OpenBulkPipeCore"/>; called by the access object.</summary>
-    internal UsbPipe? OpenBulkPipe(UsbEndpoint endpoint) => OpenBulkPipeCore(endpoint);
+    internal UsbPipe? OpenBulkPipe(UsbEndpoint endpoint)
+    {
+        return OpenBulkPipeCore(endpoint);
+    }
 
     /// <summary>Kit side of <see cref="ClosePipeCore"/>; called by the pipe's ledger entry.</summary>
-    internal void ClosePipe(UsbPipe pipe) => ClosePipeCore(pipe);
+    internal void ClosePipe(UsbPipe pipe)
+    {
+        ClosePipeCore(pipe);
+    }
 
     /// <summary>Kit side of <see cref="BulkInCore"/>; called by the access object.</summary>
-    internal UsbTransferStatus BulkIn(UsbPipe pipe, Span<byte> data, out int transferred) => BulkInCore(pipe, data, out transferred);
+    internal UsbTransferStatus BulkIn(UsbPipe pipe, Span<byte> data, out int transferred)
+    {
+        return BulkInCore(pipe, data, out transferred);
+    }
 
     /// <summary>Kit side of <see cref="BulkOutCore"/>; called by the access object.</summary>
-    internal UsbTransferStatus BulkOut(UsbPipe pipe, ReadOnlySpan<byte> data, out int transferred) => BulkOutCore(pipe, data, out transferred);
+    internal UsbTransferStatus BulkOut(UsbPipe pipe, ReadOnlySpan<byte> data, out int transferred)
+    {
+        return BulkOutCore(pipe, data, out transferred);
+    }
 
     /// <summary>Kit side of <see cref="ResetEndpointCore"/>; called by the access object.</summary>
-    internal bool ResetEndpoint(UsbPipe pipe) => ResetEndpointCore(pipe);
+    internal bool ResetEndpoint(UsbPipe pipe)
+    {
+        return ResetEndpointCore(pipe);
+    }
 
     /// <summary>Kit side of <see cref="ConfigureAsHubCore"/>; called by the access object.</summary>
-    internal bool ConfigureAsHub(byte portCount, byte thinkTime) => ConfigureAsHubCore(portCount, thinkTime);
+    internal bool ConfigureAsHub(byte portCount, byte thinkTime)
+    {
+        return ConfigureAsHubCore(portCount, thinkTime);
+    }
 }

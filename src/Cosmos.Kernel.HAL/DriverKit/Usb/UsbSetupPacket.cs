@@ -11,21 +11,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Usb;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct UsbSetupPacket
 {
-    /// <summary>Builds a packet from its five fields.</summary>
-    /// <param name="requestType">bmRequestType: direction, type and recipient.</param>
-    /// <param name="request">bRequest.</param>
-    /// <param name="value">wValue.</param>
-    /// <param name="index">wIndex.</param>
-    /// <param name="length">wLength: bytes in the data stage, 0 when there is none.</param>
-    public UsbSetupPacket(UsbRequestType requestType, byte request, ushort value, ushort index, ushort length)
-    {
-        RequestType = requestType;
-        Request = request;
-        Value = value;
-        Index = index;
-        Length = length;
-    }
-
     /// <summary>bmRequestType: direction, type and recipient.</summary>
     public UsbRequestType RequestType { get; }
 
@@ -44,14 +29,31 @@ public readonly struct UsbSetupPacket
     /// <summary>True when the data stage comes from the device.</summary>
     public bool IsDeviceToHost => (RequestType & UsbRequestType.DeviceToHost) != 0;
 
+    /// <summary>Builds a packet from its five fields.</summary>
+    /// <param name="requestType">bmRequestType: direction, type and recipient.</param>
+    /// <param name="request">bRequest.</param>
+    /// <param name="value">wValue.</param>
+    /// <param name="index">wIndex.</param>
+    /// <param name="length">wLength: bytes in the data stage, 0 when there is none.</param>
+    public UsbSetupPacket(UsbRequestType requestType, byte request, ushort value, ushort index, ushort length)
+    {
+        RequestType = requestType;
+        Request = request;
+        Value = value;
+        Index = index;
+        Length = length;
+    }
+
     /// <summary>
     /// The packet in its little-endian wire layout, as one 64-bit value: the
     /// form an xHCI Setup Stage TRB carries as immediate data.
     /// </summary>
-    public ulong Pack() =>
-        (byte)RequestType
-        | ((ulong)Request << 8)
-        | ((ulong)Value << 16)
-        | ((ulong)Index << 32)
-        | ((ulong)Length << 48);
+    public ulong Pack()
+    {
+        return (byte)RequestType
+            | ((ulong)Request << 8)
+            | ((ulong)Value << 16)
+            | ((ulong)Index << 32)
+            | ((ulong)Length << 48);
+    }
 }

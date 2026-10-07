@@ -21,19 +21,6 @@ internal sealed class UsbDeviceState
     private SchedSpinLock _controlLock;
     private bool _controlBusy;
 
-    internal UsbDeviceState(UsbDevice device, UsbBus bus, UsbDeviceState? parent, byte port, string portPath,
-        byte[] configuration, UsbInterfaceInfo[] interfaces, DeviceBinding owner)
-    {
-        Device = device;
-        Bus = bus;
-        Parent = parent;
-        Port = port;
-        PortPath = portPath;
-        Configuration = configuration;
-        Interfaces = interfaces;
-        Owner = owner;
-    }
-
     /// <summary>The host's device object.</summary>
     internal UsbDevice Device { get; }
 
@@ -63,6 +50,19 @@ internal sealed class UsbDeviceState
 
     /// <summary>The host or hub binding that published <see cref="Nodes"/>.</summary>
     internal DeviceBinding Owner { get; }
+
+    internal UsbDeviceState(UsbDevice device, UsbBus bus, UsbDeviceState? parent, byte port, string portPath,
+        byte[] configuration, UsbInterfaceInfo[] interfaces, DeviceBinding owner)
+    {
+        Device = device;
+        Bus = bus;
+        Parent = parent;
+        Port = port;
+        PortPath = portPath;
+        Configuration = configuration;
+        Interfaces = interfaces;
+        Owner = owner;
+    }
 
     /// <summary>
     /// Runs one control transfer with the device's control pipe claimed:

@@ -17,13 +17,13 @@ namespace Cosmos.Kernel.HAL.DriverKit.Usb;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public abstract class UsbHostController
 {
+    /// <summary>A short name for logs, <c>"xHCI"</c>.</summary>
+    public abstract string Name { get; }
+
     /// <summary>Creates the contract half of a host controller.</summary>
     protected UsbHostController()
     {
     }
-
-    /// <summary>A short name for logs, <c>"xHCI"</c>.</summary>
-    public abstract string Name { get; }
 
     /// <summary>
     /// Gives the device on <paramref name="port"/> of <paramref name="parentHub"/>
@@ -53,8 +53,14 @@ public abstract class UsbHostController
     protected abstract void ReleaseDeviceCore(UsbDevice device, bool hostPresent);
 
     /// <summary>Kit side of <see cref="AddressDeviceCore"/>; called by the enumeration core, never by a driver.</summary>
-    internal UsbDevice? AddressDevice(UsbDevice? parentHub, byte port, UsbSpeed speed) => AddressDeviceCore(parentHub, port, speed);
+    internal UsbDevice? AddressDevice(UsbDevice? parentHub, byte port, UsbSpeed speed)
+    {
+        return AddressDeviceCore(parentHub, port, speed);
+    }
 
     /// <summary>Kit side of <see cref="ReleaseDeviceCore"/>; called by the enumeration core and the bus, never by a driver.</summary>
-    internal void ReleaseDevice(UsbDevice device, bool hostPresent) => ReleaseDeviceCore(device, hostPresent);
+    internal void ReleaseDevice(UsbDevice device, bool hostPresent)
+    {
+        ReleaseDeviceCore(device, hostPresent);
+    }
 }

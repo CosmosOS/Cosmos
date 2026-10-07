@@ -16,24 +16,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Usb;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class UsbIdentity : DeviceIdentity
 {
-    internal UsbIdentity(string portPath, byte interfaceNumber, ushort vendorId, ushort productId, byte deviceClass, byte deviceSubclass,
-        byte deviceProtocol, byte interfaceClass, byte interfaceSubclass, byte interfaceProtocol, UsbSpeed speed, byte configurationValue)
-    {
-        PortPath = portPath;
-        InterfaceNumber = interfaceNumber;
-        VendorId = vendorId;
-        ProductId = productId;
-        DeviceClass = deviceClass;
-        DeviceSubclass = deviceSubclass;
-        DeviceProtocol = deviceProtocol;
-        InterfaceClass = interfaceClass;
-        InterfaceSubclass = interfaceSubclass;
-        InterfaceProtocol = interfaceProtocol;
-        Speed = speed;
-        ConfigurationValue = configurationValue;
-        Address = $"{PortPath}:{InterfaceNumber}";
-    }
-
     /// <summary>The dotted port chain from the host controller down to the device: <c>1-2</c> is root port 2 of controller 1, <c>1-2.1</c> port 1 of the hub on it.</summary>
     public string PortPath { get; }
 
@@ -76,7 +58,27 @@ public sealed class UsbIdentity : DeviceIdentity
     /// <inheritdoc/>
     public override string Address { get; }
 
+    internal UsbIdentity(string portPath, byte interfaceNumber, ushort vendorId, ushort productId, byte deviceClass, byte deviceSubclass,
+        byte deviceProtocol, byte interfaceClass, byte interfaceSubclass, byte interfaceProtocol, UsbSpeed speed, byte configurationValue)
+    {
+        PortPath = portPath;
+        InterfaceNumber = interfaceNumber;
+        VendorId = vendorId;
+        ProductId = productId;
+        DeviceClass = deviceClass;
+        DeviceSubclass = deviceSubclass;
+        DeviceProtocol = deviceProtocol;
+        InterfaceClass = interfaceClass;
+        InterfaceSubclass = interfaceSubclass;
+        InterfaceProtocol = interfaceProtocol;
+        Speed = speed;
+        ConfigurationValue = configurationValue;
+        Address = $"{PortPath}:{InterfaceNumber}";
+    }
+
     /// <inheritdoc/>
-    public override string Describe() =>
-        $"{VendorId:x4}:{ProductId:x4} class {DeviceClass:x2}.{DeviceSubclass:x2}.{DeviceProtocol:x2} interface {InterfaceNumber} class {InterfaceClass:x2}.{InterfaceSubclass:x2}.{InterfaceProtocol:x2}";
+    public override string Describe()
+    {
+        return $"{VendorId:x4}:{ProductId:x4} class {DeviceClass:x2}.{DeviceSubclass:x2}.{DeviceProtocol:x2} interface {InterfaceNumber} class {InterfaceClass:x2}.{InterfaceSubclass:x2}.{InterfaceProtocol:x2}";
+    }
 }

@@ -358,16 +358,21 @@ internal static class UsbEnumeration
         return interfaces.ToArray();
     }
 
-    private static string SpeedName(UsbSpeed speed) => speed switch
+    private static string SpeedName(UsbSpeed speed)
     {
-        UsbSpeed.Low => "low-speed",
-        UsbSpeed.Full => "full-speed",
-        UsbSpeed.High => "high-speed",
-        UsbSpeed.Super => "SuperSpeed",
-        UsbSpeed.SuperPlus => "SuperSpeedPlus",
-        _ => "unknown speed",
-    };
+        return speed switch
+        {
+            UsbSpeed.Low => "low-speed",
+            UsbSpeed.Full => "full-speed",
+            UsbSpeed.High => "high-speed",
+            UsbSpeed.Super => "SuperSpeed",
+            UsbSpeed.SuperPlus => "SuperSpeedPlus",
+            _ => "unknown speed",
+        };
+    }
 
-    private static ushort ReadUInt16(ReadOnlySpan<byte> data, int offset) =>
-        (ushort)(data[offset] | (data[offset + 1] << 8));
+    private static ushort ReadUInt16(ReadOnlySpan<byte> data, int offset)
+    {
+        return (ushort)(data[offset] | (data[offset + 1] << 8));
+    }
 }

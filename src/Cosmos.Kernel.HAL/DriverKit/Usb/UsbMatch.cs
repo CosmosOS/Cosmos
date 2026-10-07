@@ -24,6 +24,9 @@ public sealed class UsbMatch : DeviceMatch
     private readonly byte? _interfaceSubclass;
     private readonly byte? _interfaceProtocol;
 
+    /// <inheritdoc/>
+    public override int Specificity { get; }
+
     /// <summary>Creates a match over the fields given; each null field is unconstrained.</summary>
     /// <param name="vendorId">The vendor id, or null.</param>
     /// <param name="productId">The product id, or null.</param>
@@ -64,17 +67,16 @@ public sealed class UsbMatch : DeviceMatch
     }
 
     /// <inheritdoc/>
-    public override int Specificity { get; }
-
-    /// <inheritdoc/>
-    public override bool Matches(DeviceIdentity identity) =>
-        identity is UsbIdentity usb
-        && (_vendorId is null || _vendorId.Value == usb.VendorId)
-        && (_productId is null || _productId.Value == usb.ProductId)
-        && (_deviceClass is null || _deviceClass.Value == usb.DeviceClass)
-        && (_deviceSubclass is null || _deviceSubclass.Value == usb.DeviceSubclass)
-        && (_deviceProtocol is null || _deviceProtocol.Value == usb.DeviceProtocol)
-        && (_interfaceClass is null || _interfaceClass.Value == usb.InterfaceClass)
-        && (_interfaceSubclass is null || _interfaceSubclass.Value == usb.InterfaceSubclass)
-        && (_interfaceProtocol is null || _interfaceProtocol.Value == usb.InterfaceProtocol);
+    public override bool Matches(DeviceIdentity identity)
+    {
+        return identity is UsbIdentity usb
+            && (_vendorId is null || _vendorId.Value == usb.VendorId)
+            && (_productId is null || _productId.Value == usb.ProductId)
+            && (_deviceClass is null || _deviceClass.Value == usb.DeviceClass)
+            && (_deviceSubclass is null || _deviceSubclass.Value == usb.DeviceSubclass)
+            && (_deviceProtocol is null || _deviceProtocol.Value == usb.DeviceProtocol)
+            && (_interfaceClass is null || _interfaceClass.Value == usb.InterfaceClass)
+            && (_interfaceSubclass is null || _interfaceSubclass.Value == usb.InterfaceSubclass)
+            && (_interfaceProtocol is null || _interfaceProtocol.Value == usb.InterfaceProtocol);
+    }
 }
