@@ -216,17 +216,7 @@ public class IPPacket : InternetPacket
     /// <param name="packetData">The raw data of the packet.</param>
     internal static void IPv4Handler(byte[] packetData)
     {
-        Serial.WriteString("[IP] IPv4Handler called\n");
-
         IPPacket ipPacket = new(packetData);
-
-        Serial.WriteString("[IP] From ");
-        Serial.WriteString(ipPacket.SourceIP.ToString());
-        Serial.WriteString(" to ");
-        Serial.WriteString(ipPacket.DestinationIP.ToString());
-        Serial.WriteString(" proto=");
-        Serial.WriteNumber((ulong)ipPacket.Protocol);
-        Serial.WriteString("\n");
 
         ArpCache.Update(ipPacket.SourceIP, ipPacket.SourceMac);
 

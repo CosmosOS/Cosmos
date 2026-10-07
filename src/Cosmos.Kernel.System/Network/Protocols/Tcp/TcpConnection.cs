@@ -8,6 +8,7 @@
 */
 
 using System.Buffers;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Timers;
 
@@ -23,9 +24,13 @@ namespace Cosmos.Kernel.System.Network.Protocols.Tcp;
 internal class TcpConnection : IDisposable
 {
     /// <summary>
-    /// The TCP window size.
+    /// The TCP window size: how much the peer may send before it waits for an
+    /// acknowledgment. 32 KiB (23 full segments) fits the 32 receive
+    /// descriptors of an e1000 between two drains, where the controller's
+    /// interrupt does not reach the kernel and a timer drains it; at 8 KiB a
+    /// download ran at 8 KiB per round trip.
     /// </summary>
-    public const ushort TcpWindowSize = 8192;
+    public const ushort TcpWindowSize = 32768;
 
     /// <summary>
     /// The first port of the dynamic range <see cref="GetDynamicPort"/> hands out.
@@ -33,11 +38,6 @@ internal class TcpConnection : IDisposable
     public const ushort DynamicPortStart = 49152;
 
     private static ushort s_nextPort = DynamicPortStart;
-
-    /// <summary>
-    /// Array pool used to rent buffers.
-    /// </summary>
-    private static readonly ArrayPool<byte> s_arrayPool = ArrayPool<byte>.Shared;
 
     // A plain counter, not the clock-driven initial sequence number generator RFC 793 describes.
     private static uint s_sequenceCounter = 1000;
@@ -99,20 +99,36 @@ internal class TcpConnection : IDisposable
     public bool Detached { get; set; }
 
     /// <summary>
-    /// The received data buffer.
+    /// The received data buffer. A plain array the connection owns, not one
+    /// from <see cref="ArrayPool{T}.Shared"/>: the receive path grows it on
+    /// the kit worker with interrupts masked, and the shared pool takes a
+    /// lock there that an app thread preempted inside it would never release,
+    /// hanging the machine.
     /// </summary>
     private byte[] _data = [];
     /// <summary>
-    /// Holds real data length as _data might be longer due to being rented.
+    /// Holds real data length as _data is usually longer.
     /// </summary>
     private int _dataLength;
 
     private int _dataOffset;
 
     /// <summary>
-    /// The received bytes not yet consumed through <see cref="AdvanceDataOffset"/>.
+    /// The received bytes not consumed yet, unsynchronized: the receive path
+    /// appends to them on the kit worker and may move them to a bigger array
+    /// at any moment. The hosted tests read it, as they cannot mask
+    /// interrupts; kernel code uses <see cref="DataLength"/> and
+    /// <see cref="ReadData"/>.
     /// </summary>
     public ReadOnlySpan<byte> Data => _data.AsSpan().Slice(_dataOffset, _dataLength);
+
+    /// <summary>
+    /// How many received bytes wait to be consumed. A single read of one
+    /// field, so any thread may take it without masking interrupts: it never
+    /// sees a half-updated buffer, only a count the receive path may raise
+    /// right after.
+    /// </summary>
+    public int DataLength => Volatile.Read(ref _dataLength);
 
     private TcpConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
     {
@@ -135,7 +151,10 @@ internal class TcpConnection : IDisposable
     }
 
     /// <summary>
-    /// Creates a TCP connection object.
+    /// Creates a connection and adds it to the table. Kernel callers mask
+    /// interrupts around it: the kit worker looks connections up in the same
+    /// table, and <see cref="List{T}.Add"/> counts the new slot before it
+    /// stores into it.
     /// </summary>
     /// <returns>The new <see cref="TcpConnection"/>, registered in the connection table.</returns>
     public static TcpConnection CreateConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
@@ -159,23 +178,37 @@ internal class TcpConnection : IDisposable
                 s_nextPort = DynamicPortStart;
             }
 
-            bool portInUse = false;
-            foreach (TcpConnection connection in Connections)
-            {
-                if (connection.LocalEndPoint.Port == port)
-                {
-                    portInUse = true;
-                    break;
-                }
-            }
-
-            if (!portInUse)
+            if (!IsLocalPortInUse(port))
             {
                 return port;
             }
         }
 
         return 0;
+    }
+
+    /// <summary>
+    /// Whether a connection in the table uses <paramref name="port"/> locally.
+    /// The scan runs with interrupts masked: the kit worker removes closed
+    /// connections from the table, which would skip an entry or break an
+    /// enumerator mid-scan. Nothing in it can throw, so the restore is an
+    /// explicit call.
+    /// </summary>
+    private static bool IsLocalPortInUse(ushort port)
+    {
+        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
+        bool inUse = false;
+        for (int i = 0; i < Connections.Count; i++)
+        {
+            if (Connections[i].LocalEndPoint.Port == port)
+            {
+                inUse = true;
+                break;
+            }
+        }
+
+        mask.Dispose();
+        return inUse;
     }
 
     /// <summary>
@@ -212,6 +245,10 @@ internal class TcpConnection : IDisposable
     /// <returns>True when a connection was removed, false when none matched.</returns>
     public static bool RemoveConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
     {
+        // Masked from the search to the removal, for the same reason as the
+        // overload below.
+        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
+        bool removed = false;
         for (int i = 0; i < Connections.Count; i++)
         {
             TcpConnection conn = Connections[i];
@@ -219,11 +256,13 @@ internal class TcpConnection : IDisposable
             {
                 conn.Dispose();
                 Connections.RemoveAt(i);
-                return true;
+                removed = true;
+                break;
             }
         }
 
-        return false;
+        mask.Dispose();
+        return removed;
     }
 
     /// <summary>
@@ -232,6 +271,13 @@ internal class TcpConnection : IDisposable
     /// <returns>True when the connection was removed, false when it was not registered.</returns>
     public static bool RemoveConnection(TcpConnection connection)
     {
+        // Masked from the search to the removal: the kit worker reaps closed
+        // connections from the same table, and an index found before it
+        // removed an earlier entry would take out the next connection
+        // instead. Nothing in between can throw, so the restore is an
+        // explicit call.
+        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
+        bool removed = false;
         for (int i = 0; i < Connections.Count; i++)
         {
             TcpConnection conn = Connections[i];
@@ -239,11 +285,13 @@ internal class TcpConnection : IDisposable
             {
                 conn.Dispose();
                 Connections.RemoveAt(i);
-                return true;
+                removed = true;
+                break;
             }
         }
 
-        return false;
+        mask.Dispose();
+        return removed;
     }
 
     #endregion
@@ -266,8 +314,6 @@ internal class TcpConnection : IDisposable
 
     private void ReceiveDataInternal(TcpPacket packet)
     {
-        Serial.WriteString($"[{Table[(int)Status]}] {packet}\n");
-
         if (Status == Status.LISTEN)
         {
             ProcessListen(packet);
@@ -499,24 +545,27 @@ internal class TcpConnection : IDisposable
                 return;
             }
 
-            if (packet._psh)
+            // Data is taken from every segment that carries it, PSH or not: a
+            // peer sets PSH on the last segment of a write only. Only the
+            // segment that continues the stream is taken, since one after a
+            // gap would be appended as if it came next. Every segment is
+            // acknowledged, which moves the peer's window on and, after a gap,
+            // has it resend from RcvNxt.
+            if (packet.TcpDataLength > 0)
             {
-                Serial.WriteString("[TCP] PSH received, data length: ");
-                Serial.WriteNumber((ulong)packet.TcpDataLength);
-                Serial.WriteString(", storing data\n");
+                if (packet.SequenceNumber != TCB.RcvNxt)
+                {
+                    SendEmptyPacket(TcpFlags.ACK);
+                    return;
+                }
 
                 TCB.RcvNxt += packet.TcpDataLength;
 
                 AppendToData(packet.TcpData);
 
-                Serial.WriteString("[TCP] Data buffer now has ");
-                Serial.WriteNumber((ulong)_data.Length);
-                Serial.WriteString(" bytes\n");
-
-                // Handle FIN flag within PSH handling if both are set
                 if (packet._fin)
                 {
-                    Serial.WriteString("[TCP] PSH+FIN received, closing\n");
+                    Serial.WriteString("[TCP] Data+FIN received, closing\n");
                     TCB.RcvNxt++;
 
                     SendEmptyPacket(TcpFlags.ACK);
@@ -545,13 +594,6 @@ internal class TcpConnection : IDisposable
                 WaitAndClose();
 
                 return;
-            }
-
-            if (packet.TcpDataLength > 0 && packet.SequenceNumber >= TCB.RcvNxt) // packet sequencing
-            {
-                TCB.RcvNxt += packet.TcpDataLength;
-
-                AppendToData(packet.TcpData);
             }
         }
         if (packet._rst)
@@ -724,7 +766,7 @@ internal class TcpConnection : IDisposable
     public void SendEmptyPacket(TcpFlags flag)
     {
         SendPacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
-            TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
+            TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, (ushort)TCB.RcvWnd, 0));
     }
 
     /// <summary>
@@ -733,7 +775,7 @@ internal class TcpConnection : IDisposable
     internal void SendEmptyPacket(TcpFlags flag, uint sequenceNumber)
     {
         SendPacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
-            sequenceNumber, TCB.RcvNxt, 20, (byte)flag, TCB.SndWnd, 0));
+            sequenceNumber, TCB.RcvNxt, 20, (byte)flag, (ushort)TCB.RcvWnd, 0));
     }
 
     /// <summary>
@@ -754,9 +796,39 @@ internal class TcpConnection : IDisposable
     }
 
     /// <summary>
-    /// Consumes the first <paramref name="offset"/> bytes of <see cref="Data"/>, returning the
-    /// rented buffer to the pool once none are left.
+    /// Copies up to <paramref name="destination"/>'s length of the received
+    /// bytes into it and consumes them, as one step with interrupts masked.
+    /// The receive path runs on the kit worker, which can preempt any other
+    /// thread: a copy and a consume made apart could read a buffer the worker
+    /// just moved, or race its append and lose acknowledged bytes. Any thread.
     /// </summary>
+    /// <param name="destination">Where the bytes go.</param>
+    /// <returns>How many bytes were copied; zero when none are waiting.</returns>
+    public int ReadData(Span<byte> destination)
+    {
+        // Nothing between the mask and its restore can throw: the count fits
+        // both the destination and the live bytes, and every writer of the
+        // buffer runs masked too. The restore is an explicit call, not a
+        // using: the kernel skips finally blocks while an exception unwinds,
+        // so the region is kept free of anything that could throw instead.
+        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
+        int count = Math.Min(_dataLength, destination.Length);
+        if (count > 0)
+        {
+            _data.AsSpan(_dataOffset, count).CopyTo(destination);
+            ConsumeData(count);
+        }
+
+        mask.Dispose();
+        return count;
+    }
+
+    /// <summary>
+    /// Consumes bytes a reader took from <see cref="Data"/>, unsynchronized
+    /// like it: for the hosted tests, while kernel code uses
+    /// <see cref="ReadData"/>.
+    /// </summary>
+    /// <param name="offset">How many bytes were taken.</param>
     public void AdvanceDataOffset(int offset)
     {
         if (offset == 0)
@@ -765,21 +837,28 @@ internal class TcpConnection : IDisposable
         }
         ArgumentOutOfRangeException.ThrowIfGreaterThan(offset, _dataLength);
 
-        if (offset == _dataLength && _dataLength != 0)
-        {
-            s_arrayPool.Return(_data);
-            _data = [];
-            _dataOffset = 0;
-            _dataLength = 0;
-            return;
-        }
-
-        _dataOffset += offset;
-        _dataLength -= offset;
+        ConsumeData(offset);
     }
 
     /// <summary>
-    /// Appends bytes to <see cref="_data"/>.
+    /// Drops the first <paramref name="count"/> received bytes, at most
+    /// <see cref="_dataLength"/>. Once all of them are gone the next append
+    /// starts again at the front of the same array. Never throws.
+    /// </summary>
+    private void ConsumeData(int count)
+    {
+        _dataOffset += count;
+        _dataLength -= count;
+        if (_dataLength == 0)
+        {
+            _dataOffset = 0;
+        }
+    }
+
+    /// <summary>
+    /// Appends bytes to <see cref="_data"/>. Called by the receive path, which
+    /// runs with interrupts masked, so a reader's <see cref="ReadData"/> never
+    /// sees it half-done.
     /// </summary>
     internal void AppendToData(ReadOnlySpan<byte> other)
     {
@@ -791,23 +870,26 @@ internal class TcpConnection : IDisposable
         Span<byte> target;
         // if new data fits into existing buffer, then no need to allocate a new one and write there
         // just append to existing buffer
-        if (_dataOffset + _dataLength + other.Length <= _dataLength)
+        if (_dataOffset + _dataLength + other.Length <= _data.Length)
         {
             target = _data.AsSpan(_dataOffset + _dataLength);
             other.CopyTo(target);
             _dataLength += other.Length;
             return;
         }
-        int realDataLength = _dataLength - _dataOffset;
-        int requiredLength = realDataLength + other.Length;
-        byte[] result = s_arrayPool.Rent(requiredLength);
-        _data.AsSpan(_dataOffset, realDataLength).CopyTo(result);
-        target = result.AsSpan(realDataLength);
+
+        // _dataLength already excludes the bytes a reader consumed, so the
+        // live data is _dataLength bytes from _dataOffset. When the array
+        // holds them plus the new bytes, they move to its front (CopyTo
+        // copies overlapping spans correctly); otherwise they move to an array
+        // twice as large, which keeps the copies linear in the bytes received.
+        int requiredLength = _dataLength + other.Length;
+        byte[] result = requiredLength <= _data.Length
+            ? _data
+            : new byte[Math.Max(requiredLength, _data.Length * 2)];
+        _data.AsSpan(_dataOffset, _dataLength).CopyTo(result);
+        target = result.AsSpan(_dataLength);
         other.CopyTo(target);
-        if (_data.Length > 0)
-        {
-            s_arrayPool.Return(_data);
-        }
 
         _data = result;
         _dataOffset = 0;
@@ -823,13 +905,17 @@ internal class TcpConnection : IDisposable
     #endregion
 
     /// <summary>
-    /// Returns the rented receive buffer to the pool.
+    /// Drops the receive buffer.
     /// </summary>
     public void Dispose()
     {
-        if (_data.Length > 0)
-        {
-            s_arrayPool.Return(_data);
-        }
+        // The buffer is dropped with interrupts masked: the kit worker can
+        // preempt this thread to append, and between the three stores it
+        // would find the empty array with the old offset and length.
+        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
+        _data = [];
+        _dataOffset = 0;
+        _dataLength = 0;
+        mask.Dispose();
     }
 }

@@ -5,8 +5,9 @@ namespace Cosmos.Kernel.Drivers.Pci.Network.E1000E;
 /// <summary>
 /// The register map of the Intel 82574 (E1000E) family as the driver and
 /// its state use it: byte offsets into the BAR0 window, the bits of the
-/// registers they program, and the descriptor command and status bits.
-/// Constants only, no execution context.
+/// registers they program, and the descriptor command and status bits. The
+/// 8254x controllers the driver also binds share every one of them except
+/// where a constant says otherwise. Constants only, no execution context.
 /// </summary>
 internal static class E1000ERegisters
 {
@@ -94,7 +95,7 @@ internal static class E1000ERegisters
     /// <summary>STATUS bit 1: Link Up.</summary>
     public const uint StatusLinkUp = 1u << 1;
 
-    /// <summary>EECD bit 9: the auto-read of the NVM after a reset is done.</summary>
+    /// <summary>EECD bit 9: the auto-read of the NVM after a reset is done. The 82540EM and 82545EM have no such bit.</summary>
     public const uint EepromControlAutoReadDone = 1u << 9;
 
     /// <summary>EERD bit 0: start a read.</summary>
@@ -105,6 +106,12 @@ internal static class E1000ERegisters
 
     /// <summary>EERD bits 15:2: the word address (82574 layout).</summary>
     public const int EepromReadAddressShift = 2;
+
+    /// <summary>EERD bit 4: the read is done (8254x layout).</summary>
+    public const uint EepromReadDone8254x = 1u << 4;
+
+    /// <summary>EERD bits 15:8: the word address (8254x layout).</summary>
+    public const int EepromReadAddressShift8254x = 8;
 
     /// <summary>EERD bits 31:16: the word read.</summary>
     public const int EepromReadDataShift = 16;

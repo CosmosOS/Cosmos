@@ -65,9 +65,6 @@ internal static unsafe class ModuleHelpers
     [RuntimeExport("RhFindBlob")]
     internal static unsafe bool RhFindBlob(TypeManagerHandle* typeManagerHandle, uint blobId, byte** ppbBlob, uint* pcbBlob)
     {
-        Serial.WriteString("[ModuleHelpers] - RhFindBlob called for Blob ID ");
-        Serial.WriteNumber(blobId);
-        Serial.WriteString("\n");
         ReadyToRunSectionType sectionId = (ReadyToRunSectionType)((uint)ReadyToRunSectionType.ReadonlyBlobRegionStart + blobId);
 
         TypeManager* pModule = typeManagerHandle->AsTypeManager();

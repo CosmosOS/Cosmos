@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using Cosmos.Build.API.Attributes;
@@ -24,6 +25,15 @@ public static class NameResolutionPalPlug
     /// </summary>
     private const int QueryTimeoutMs = 5000;
 
+    // How long an answer is kept, and how many: a web page asks for the same few hosts again and
+    // again (a connection for every file), and each lookup is a round trip to the nameserver.
+    private const int CacheMilliseconds = 60_000;
+    private const int CacheSize = 64;
+
+    // The names resolved lately, oldest first. Replaced whole, never changed: any thread reads it
+    // without a lock, and a lookup racing another one only loses an entry.
+    private static CachedName[] s_cache = [];
+
     [PlugMember]
     public static string GetHostName() => DnsConfig.HostName;
 
@@ -49,6 +59,12 @@ public static class NameResolutionPalPlug
             return SocketError.AddressFamilyNotSupported;
         }
 
+        if (TryGetCached(hostName, out IPAddress[] cached))
+        {
+            addresses = cached;
+            return SocketError.Success;
+        }
+
         if (DnsConfig.Nameservers.Count == 0)
         {
             Log.WriteString("[NameResolutionPalPlug] No nameserver configured. Run DHCP or add one to DnsConfig.\n");
@@ -72,7 +88,55 @@ public static class NameResolutionPalPlug
         }
 
         addresses = ToIPv4Addresses(resolved);
-        return addresses.Length == 0 ? SocketError.HostNotFound : SocketError.Success;
+        if (addresses.Length == 0)
+        {
+            return SocketError.HostNotFound;
+        }
+
+        Remember(hostName, addresses);
+        return SocketError.Success;
+    }
+
+    /// <summary>The addresses a name resolved to less than <see cref="CacheMilliseconds"/> ago, a copy the caller may change.</summary>
+    private static bool TryGetCached(string name, out IPAddress[] addresses)
+    {
+        CachedName[] cache = Volatile.Read(ref s_cache);
+        long now = Stopwatch.GetTimestamp();
+        for (int i = cache.Length - 1; i >= 0; i--)
+        {
+            CachedName entry = cache[i];
+            if (now < entry.Expires && string.Equals(entry.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                addresses = [.. entry.Addresses];
+                return true;
+            }
+        }
+
+        addresses = [];
+        return false;
+    }
+
+    /// <summary>Keeps a name's addresses for <see cref="CacheMilliseconds"/>, dropping its expired entries and the oldest past <see cref="CacheSize"/>.</summary>
+    private static void Remember(string name, IPAddress[] addresses)
+    {
+        CachedName[] cache = Volatile.Read(ref s_cache);
+        long now = Stopwatch.GetTimestamp();
+        List<CachedName> kept = new(cache.Length + 1);
+        foreach (CachedName entry in cache)
+        {
+            if (now < entry.Expires && !string.Equals(entry.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                kept.Add(entry);
+            }
+        }
+
+        if (kept.Count >= CacheSize)
+        {
+            kept.RemoveRange(0, kept.Count - CacheSize + 1);
+        }
+
+        kept.Add(new CachedName(name, [.. addresses], now + Stopwatch.Frequency * CacheMilliseconds / 1000));
+        Volatile.Write(ref s_cache, [.. kept]);
     }
 
     [PlugMember]
@@ -104,6 +168,14 @@ public static class NameResolutionPalPlug
         {
             client.Close();
         }
+    }
+
+    /// <summary>A name resolved, its addresses and when they go stale, as a <see cref="Stopwatch"/> timestamp.</summary>
+    private sealed class CachedName(string name, IPAddress[] addresses, long expires)
+    {
+        public readonly string Name = name;
+        public readonly IPAddress[] Addresses = addresses;
+        public readonly long Expires = expires;
     }
 
     /// <summary>

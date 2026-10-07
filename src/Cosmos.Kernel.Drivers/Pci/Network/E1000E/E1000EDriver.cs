@@ -10,17 +10,21 @@ using Cosmos.Kernel.HAL.DriverKit.Threading;
 namespace Cosmos.Kernel.Drivers.Pci.Network.E1000E;
 
 /// <summary>
-/// The driver of the Intel 82574 (E1000E) family over the driver kit: maps
-/// BAR0, resets the controller, reads its station address, programs the
-/// legacy descriptor rings in DMA memory, connects the function's line when
-/// the platform can route it and schedules a periodic drain in any case,
-/// then publishes the interface to the ring. Everything it holds for one
-/// controller lives on an <see cref="E1000EState"/> in
-/// <see cref="DeviceBinding.DriverState"/>. Frames reach the ring through a
-/// drain that runs only on the kit worker, so a kernel without one (the
-/// scheduler compiled out) is declined rather than left with a controller
-/// that transmits and never receives. <see cref="Probe"/> and
-/// <see cref="OnDetach"/> run in thread context on the kit worker.
+/// The driver of the Intel 82574 (E1000E) family over the driver kit, and of
+/// the two 8254x controllers that share its registers and legacy descriptors:
+/// the 82540EM QEMU and VirtualBox present as their e1000, and the 82545EM
+/// VMware presents. It maps BAR0, resets the controller, reads its station
+/// address, programs the legacy descriptor rings in DMA memory, connects the
+/// function's line when the platform can route it and schedules a periodic
+/// drain in any case, then publishes the interface to the ring. The two
+/// families differ only in the wait after the reset and in the EEPROM read
+/// register's layout. Everything it holds for one controller lives on an
+/// <see cref="E1000EState"/> in <see cref="DeviceBinding.DriverState"/>.
+/// Frames reach the ring through a drain that runs only on the kit worker,
+/// so a kernel without one (the scheduler compiled out) is declined rather
+/// than left with a controller that transmits and never receives.
+/// <see cref="Probe"/> and <see cref="OnDetach"/> run in thread context on
+/// the kit worker.
 /// </summary>
 [Driver(Feature = DriverFeature.Network)]
 public sealed class E1000EDriver : Driver
@@ -46,10 +50,16 @@ public sealed class E1000EDriver : Driver
     /// <summary>The 82578DM.</summary>
     private const ushort DeviceId82578Dm = 0x10EF;
 
+    /// <summary>The 82540EM, an 8254x: QEMU's and VirtualBox's e1000.</summary>
+    private const ushort DeviceId82540Em = 0x100E;
+
+    /// <summary>The 82545EM, copper, an 8254x: VMware's e1000.</summary>
+    private const ushort DeviceId82545Em = 0x100F;
+
     /// <summary>The base address register holding the controller's registers.</summary>
     private const int RegisterBar = 0;
 
-    /// <summary>Bytes the register window has to span: the 82574 decodes 128 KiB.</summary>
+    /// <summary>Bytes the register window has to span: both families decode 128 KiB.</summary>
     private const ulong RegisterWindowBytes = 0x20000;
 
     /// <summary>Polls of a reset or an auto-read: 100 of <see cref="ResetPollMicroseconds"/>, a 10 ms bound.</summary>
@@ -57,6 +67,9 @@ public sealed class E1000EDriver : Driver
 
     /// <summary>Delay between two polls of a reset or an auto-read.</summary>
     private const uint ResetPollMicroseconds = 100;
+
+    /// <summary>How long an 8254x is given to reload its EEPROM after a reset: it has no auto-read done bit to poll, and Linux's e1000 waits 5 ms.</summary>
+    private const uint EepromReloadMilliseconds = 5;
 
     /// <summary>Polls of one EEPROM word read.</summary>
     private const int EepromPollCount = 1000;
@@ -76,8 +89,15 @@ public sealed class E1000EDriver : Driver
     /// <summary>The interrupt source index of the function's legacy line.</summary>
     private const int LineInterruptIndex = 0;
 
-    /// <summary>Period of the drain the kit runs whether or not the line connected.</summary>
-    private const uint DrainPeriodMilliseconds = 50;
+    /// <summary>
+    /// Period of the drain the kit runs whether or not the line connected: the
+    /// platform timer's tick. Where the line register does not name the
+    /// interrupt the function raises (VMware routes PCI lines to I/O APIC
+    /// inputs above 15, as real chipsets do), this drain is all the controller
+    /// gets: every TCP round trip waits for it, and a receive window's worth
+    /// of data arrives per period at most.
+    /// </summary>
+    private const uint DrainPeriodMilliseconds = 10;
 
     /// <summary>How long the detach hook waits after disabling the receiver, so a frame in flight lands before the buffers are freed.</summary>
     private const uint QuiesceMicroseconds = 100;
@@ -90,6 +110,8 @@ public sealed class E1000EDriver : Driver
         new PciMatch(vendorId: IntelVendorId, deviceId: DeviceId82577Lm),
         new PciMatch(vendorId: IntelVendorId, deviceId: DeviceId82577Lc),
         new PciMatch(vendorId: IntelVendorId, deviceId: DeviceId82578Dm),
+        new PciMatch(vendorId: IntelVendorId, deviceId: DeviceId82540Em),
+        new PciMatch(vendorId: IntelVendorId, deviceId: DeviceId82545Em),
     ];
 
     /// <inheritdoc/>
@@ -107,8 +129,11 @@ public sealed class E1000EDriver : Driver
     /// <returns>Bound with the interface published; declined when the function is not one this driver can operate; failed when the controller did not come up.</returns>
     public override ProbeResult Probe(DeviceBinding binding)
     {
-        // 1. BAR0 is the register window.
+        // 1. BAR0 is the register window, and the device id says which
+        //    family's reset wait and EEPROM layout apply.
         PciAccess pci = binding.Node.Access<PciAccess>();
+        ushort deviceId = ((PciIdentity)binding.Node.Identity).DeviceId;
+        bool is8254x = deviceId is DeviceId82540Em or DeviceId82545Em;
         PciBar bar0 = pci.Bars[RegisterBar];
         if (!bar0.IsAssigned || bar0.IsIo || bar0.Length < RegisterWindowBytes)
         {
@@ -122,8 +147,9 @@ public sealed class E1000EDriver : Driver
         pci.EnableBusMastering(true);
 
         // 3. Reset, with every cause masked on both sides of it, then the
-        //    NVM auto-read the reset starts, before the address registers
-        //    are trusted.
+        //    NVM reload the reset starts, before the address registers are
+        //    trusted: the 8257x reports it done in EECD, the 8254x has no
+        //    such bit and is given a fixed wait.
         registers.Write32(E1000ERegisters.InterruptMaskClear, E1000ERegisters.AllInterrupts);
         registers.Write32(E1000ERegisters.Control, registers.Read32(E1000ERegisters.Control) | E1000ERegisters.ControlReset);
         if (!WaitForBit(binding, registers, E1000ERegisters.Control, E1000ERegisters.ControlReset, set: false))
@@ -132,7 +158,11 @@ public sealed class E1000EDriver : Driver
         }
 
         registers.Write32(E1000ERegisters.InterruptMaskClear, E1000ERegisters.AllInterrupts);
-        if (!WaitForBit(binding, registers, E1000ERegisters.EepromControl, E1000ERegisters.EepromControlAutoReadDone, set: true))
+        if (is8254x)
+        {
+            binding.Sleep(EepromReloadMilliseconds);
+        }
+        else if (!WaitForBit(binding, registers, E1000ERegisters.EepromControl, E1000ERegisters.EepromControlAutoReadDone, set: true))
         {
             return ProbeResult.Failed("the NVM auto-read did not complete");
         }
@@ -153,9 +183,11 @@ public sealed class E1000EDriver : Driver
         }
         else
         {
+            uint readDone = is8254x ? E1000ERegisters.EepromReadDone8254x : E1000ERegisters.EepromReadDone;
+            int addressShift = is8254x ? E1000ERegisters.EepromReadAddressShift8254x : E1000ERegisters.EepromReadAddressShift;
             for (int word = 0; word < EepromMacWords; word++)
             {
-                if (!TryReadEepromWord(binding, registers, (ushort)word, out ushort value))
+                if (!TryReadEepromWord(binding, registers, (ushort)word, readDone, addressShift, out ushort value))
                 {
                     return ProbeResult.Failed($"EEPROM word {word} did not read");
                 }
@@ -325,15 +357,15 @@ public sealed class E1000EDriver : Driver
         return false;
     }
 
-    /// <summary>Reads one EEPROM word through EERD, in the 82574 layout, polling until the done bit. Thread context.</summary>
-    private static bool TryReadEepromWord(DeviceBinding binding, RegisterWindow registers, ushort address, out ushort word)
+    /// <summary>Reads one EEPROM word through EERD, in the controller family's layout (<paramref name="readDone"/> and <paramref name="addressShift"/>), polling until the done bit. Thread context.</summary>
+    private static bool TryReadEepromWord(DeviceBinding binding, RegisterWindow registers, ushort address, uint readDone, int addressShift, out ushort word)
     {
-        registers.Write32(E1000ERegisters.EepromRead, ((uint)address << E1000ERegisters.EepromReadAddressShift) | E1000ERegisters.EepromReadStart);
+        registers.Write32(E1000ERegisters.EepromRead, ((uint)address << addressShift) | E1000ERegisters.EepromReadStart);
         for (int i = 0; i < EepromPollCount; i++)
         {
             binding.Delay(EepromPollMicroseconds);
             uint value = registers.Read32(E1000ERegisters.EepromRead);
-            if ((value & E1000ERegisters.EepromReadDone) != 0)
+            if ((value & readDone) != 0)
             {
                 word = (ushort)(value >> E1000ERegisters.EepromReadDataShift);
                 return true;
