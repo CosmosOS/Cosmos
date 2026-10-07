@@ -33,7 +33,7 @@ internal static unsafe partial class ExceptionHelper
     // the exception. Off, only an exception nothing catches is told: a line costs ~90 µs per
     // character over a 115200-baud UART, and code that catches what it throws (a script engine
     // running a page) throws dozens of times a second.
-    internal static bool TraceThrows;
+    internal static bool s_traceThrows;
 
     // The catch clauses whose funclets are running, recorded just before control transfers to
     // each funclet, with the ExInfo of the exception that entered them. A funclet runs on top of
@@ -177,7 +177,7 @@ internal static unsafe partial class ExceptionHelper
         PruneFinishedCatches(pExInfo);
 
         // Before the stack walk, in case the walk crashes.
-        if (TraceThrows)
+        if (s_traceThrows)
         {
             WriteThrow(ex, throwAddress, throwRbp, throwRsp);
         }
@@ -186,7 +186,7 @@ internal static unsafe partial class ExceptionHelper
 
         // DispatchExceptionWithContext transfers to the handler on success; it only returns here
         // when no handler covered the throw.
-        if (!TraceThrows)
+        if (!s_traceThrows)
         {
             WriteThrow(ex, throwAddress, throwRbp, throwRsp);
         }
@@ -283,7 +283,7 @@ internal static unsafe partial class ExceptionHelper
             if (!IsUnwoundFrame(frame.FramePointer)
                 && TryFindHandler(ex, frame.ReturnAddress - 1, frame.FramePointer, out EHClause clause, pRegDisplay))
             {
-                if (TraceThrows)
+                if (s_traceThrows)
                 {
                     Serial.WriteString("[EH] Handler found at 0x");
                     Serial.WriteHex((nuint)clause.HandlerAddress);
