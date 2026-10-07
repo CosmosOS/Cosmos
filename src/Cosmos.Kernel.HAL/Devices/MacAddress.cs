@@ -32,6 +32,23 @@ public sealed class MacAddress : IComparable<MacAddress>, IEquatable<MacAddress>
     internal readonly byte[] _bytes = new byte[6];
 
     /// <summary>
+    /// The address folded to 32 bits by <see cref="To32BitNumber"/>, kept after
+    /// the first read. Not unique: two addresses can fold to the same value.
+    /// </summary>
+    internal uint Hash
+    {
+        get
+        {
+            if (field == 0)
+            {
+                field = To32BitNumber();
+            }
+
+            return field;
+        }
+    }
+
+    /// <summary>
     /// Create a MAC address from a 6-byte array.
     /// </summary>
     /// <param name="address">The six address bytes, most significant first.</param>
@@ -49,10 +66,10 @@ public sealed class MacAddress : IComparable<MacAddress>, IEquatable<MacAddress>
     }
 
     /// <summary>
-    /// Create a MAC address from a byte buffer starting at the specified offset
+    /// Create a MAC address from a byte buffer starting at the specified offset.
     /// </summary>
-    /// <param name="buffer">byte buffer</param>
-    /// <param name="offset">offset in buffer to start from</param>
+    /// <param name="buffer">Byte buffer holding the six address bytes.</param>
+    /// <param name="offset">Offset in <paramref name="buffer"/> of the most significant byte.</param>
     public MacAddress(byte[] buffer, int offset)
     {
         ArgumentNullException.ThrowIfNull(buffer);
@@ -128,7 +145,10 @@ public sealed class MacAddress : IComparable<MacAddress>, IEquatable<MacAddress>
     /// </summary>
     /// <param name="obj">Object to compare against.</param>
     /// <returns>True when <paramref name="obj"/> is a <see cref="MacAddress"/> with the same six bytes, false for anything else including null.</returns>
-    public override bool Equals(object? obj) => Equals(obj as MacAddress);
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as MacAddress);
+    }
 
     /// <summary>
     /// Get a hash code derived from the six address bytes, consistent with
@@ -151,11 +171,11 @@ public sealed class MacAddress : IComparable<MacAddress>, IEquatable<MacAddress>
             ((ulong)_bytes[3] << 16) | ((ulong)_bytes[4] << 8) | _bytes[5];
     }
 
-    private static void PutByte(char[] aChars, int aIndex, byte aByte)
+    private static void PutByte(Span<char> chars, int index, byte value)
     {
-        string xChars = "0123456789ABCDEF";
-        aChars[aIndex + 0] = xChars[(aByte >> 4) & 0xF];
-        aChars[aIndex + 1] = xChars[aByte & 0xF];
+        string hexDigits = "0123456789ABCDEF";
+        chars[index] = hexDigits[(value >> 4) & 0xF];
+        chars[index + 1] = hexDigits[value & 0xF];
     }
 
     /// <summary>
@@ -171,41 +191,24 @@ public sealed class MacAddress : IComparable<MacAddress>, IEquatable<MacAddress>
     }
 
     /// <summary>
-    /// Hash value for this mac. Used to uniquely identify each mac
-    /// </summary>
-    internal uint Hash
-    {
-        get
-        {
-            if (field == 0)
-            {
-                field = To32BitNumber();
-            }
-
-            return field;
-        }
-    }
-
-    /// <summary>
     /// Format the address as six colon-separated hex byte pairs
     /// (e.g. "52:54:00:12:34:56").
     /// </summary>
     /// <returns>The address in colon-separated hex notation.</returns>
     public override string ToString()
     {
-        // mac address consists of 6 2chars pairs, delimited by :
-        char[] xChars = new char[17];
-        PutByte(xChars, 0, _bytes[0]);
-        xChars[2] = ':';
-        PutByte(xChars, 3, _bytes[1]);
-        xChars[5] = ':';
-        PutByte(xChars, 6, _bytes[2]);
-        xChars[8] = ':';
-        PutByte(xChars, 9, _bytes[3]);
-        xChars[11] = ':';
-        PutByte(xChars, 12, _bytes[4]);
-        xChars[14] = ':';
-        PutByte(xChars, 15, _bytes[5]);
-        return new string(xChars);
+        Span<char> chars = stackalloc char[17];
+        PutByte(chars, 0, _bytes[0]);
+        chars[2] = ':';
+        PutByte(chars, 3, _bytes[1]);
+        chars[5] = ':';
+        PutByte(chars, 6, _bytes[2]);
+        chars[8] = ':';
+        PutByte(chars, 9, _bytes[3]);
+        chars[11] = ':';
+        PutByte(chars, 12, _bytes[4]);
+        chars[14] = ':';
+        PutByte(chars, 15, _bytes[5]);
+        return new string(chars);
     }
 }
