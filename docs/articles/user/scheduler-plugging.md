@@ -1,12 +1,18 @@
+# Writing a Scheduler
+
+In this article, we will discuss how to write a scheduling policy for Cosmos Gen3: the interface a policy implements, where it keeps its state, the rules its hooks run under, and how to install it.
+
+For more details on the mechanism a policy plugs into (context switching, the thread lifecycle, the default Stride policy), see [Scheduler](../dev/scheduler.md) in the contributor docs.
+
 ## Overview
 
-This guide shows how to replace the kernel's scheduling policy. The mechanism side (context switching, the thread registry, the timer entry, the synchronization primitives, the GC bridge) never changes; everything an algorithm decides goes through one interface, [`IScheduler`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/IScheduler.cs). How the mechanism works, and how the default Stride policy uses this interface, is covered in [the scheduler article](scheduler.md); this page assumes it.
+This guide shows how to replace the kernel's scheduling policy. The mechanism side (context switching, the thread registry, the timer entry, the synchronization primitives, the GC bridge) never changes; everything an algorithm decides goes through one interface, [`IScheduler`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/IScheduler.cs).
 
 Replacing the policy takes three steps:
 
 1. Implement `IScheduler`, using the per-thread and per-CPU data slots for the algorithm's bookkeeping. The seam is public: a policy lives in your own kernel project, with no access to `Cosmos.Kernel.Core` internals.
 2. Respect the [kernel constraints](#kernel-constraints): the hooks run in interrupt context or under disabled interrupts, on live scheduler state.
-3. Install it with `SchedulerManager.SetScheduler(new MyScheduler())`. The manager calls `ShutdownCpu` on the outgoing policy and `InitializeCpu` on the incoming one for every CPU. Call it from your kernel entry point at a quiescent point, before starting your own threads: nothing migrates queued threads or their attached bookkeeping into the new policy. You cannot get in ahead of the default: the kernel installs Stride during its own startup, so by the time any of your code runs, the boot thread is already registered and carrying a `StrideThreadData`. [Reading the data slots](#attaching-state) covers what that means for your hooks.
+3. Install it with `SchedulerManager.SetScheduler(new MyScheduler())`. The manager calls `ShutdownCpu` on the outgoing policy and `InitializeCpu` on the incoming one for every CPU, and every live thread moves with the swap: the outgoing policy gets `OnThreadExit` for each one, the incoming one `OnThreadCreate`, then `OnThreadReady` for those waiting in a run queue. You cannot get in ahead of the default: the kernel installs Stride during its own startup, so your policy always receives at least the boot thread this way. [Attaching state](#attaching-state) covers what that means for your hooks.
 
 ---
 
@@ -20,11 +26,33 @@ The seam types (`IScheduler`, `SchedulerManager`, `SchedulerThread`, `PerCpuStat
 </PropertyGroup>
 ```
 
-See [Public API Tracking](public-api.md) for how experimental seams fit the surface policy.
+See [Public API Tracking](../dev/public-api.md) for how experimental seams fit the surface policy.
 
 ---
 
 ## The interface
+
+The manager calls the policy at fixed points in a thread's life; everything outside the hooks (the switch itself, the thread states, the idle fallback) stays with the manager:
+
+```mermaid
+flowchart TD
+    Install["SchedulerManager.SetScheduler(new MyScheduler())<br/>the outgoing policy gets OnThreadExit and ShutdownCpu"] -->|"every CPU"| InitCpu["InitializeCpu(state)<br/>your per-CPU record in state.SchedulerData"]
+    InitCpu -->|"every live thread"| Create
+    Start["A thread is created<br/>Thread.Start"] --> Create["OnThreadCreate(state, thread)<br/>your per-thread record in thread.SchedulerData"]
+    Create -->|"first start, or waiting at the swap"| Ready["OnThreadReady(state, thread)<br/>insert it into your run structure"]
+    Ready --> Queue[("Your run structure<br/>queue, sorted list, heap, ...")]
+    Queue --> Pick["PickNext(state)<br/>remove and return the next thread, or null for the idle thread"]
+    Pick -->|"switches to it"| Running["The current thread runs"]
+    Pick -->|"another thread was picked"| Requeue["OnThreadYield(state, previous)<br/>put the thread switched out back, if it was still running"]
+    Requeue --> Queue
+    Running -->|"timer interrupt"| Tick["OnTick(state, current, elapsedNs)<br/>charge the time, return true to preempt"]
+    Tick -->|"true"| Pick
+    Running -->|"Thread.Yield, or another thread woken:<br/>next interrupt exit"| Pick
+    Running -->|"blocks or sleeps"| Blocked["OnThreadBlocked(state, thread)<br/>take it out, keep what survives the park"]
+    Blocked -->|"next interrupt exit"| Pick
+    Blocked -.->|"woken"| Ready
+    Running -->|"returns or is killed"| Gone["OnThreadExit(state, thread)<br/>take it out everywhere, drop the record"]
+```
 
 Most hooks receive the `PerCpuState` they operate on, and run either under the manager's interrupt-masked lifecycle entries or in interrupt context itself; the exceptions are noted below. A policy that does not need a hook leaves it a no-op.
 

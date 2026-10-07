@@ -19,9 +19,12 @@ Everything you need to create, build and run your own Cosmos kernel:
  - [Kernel Startup](articles/user/startup.md): the boot chain and the `BeforeRun`/`Run`/`AfterRun` lifecycle.
  - [File System](articles/user/filesystem.md): mount a disk and use the standard .NET `System.IO` API (`File`, `Directory`, streams).
  - [Network](articles/user/network.md): DHCP, UDP and TCP through the standard .NET `System.Net.Sockets` API, plus DNS.
+ - [Timers and Alarms](articles/user/timers.md): block for a while, or run a callback later from the timer interrupt (`TimerManager`) or a kernel thread (`AlarmManager`).
  - [Graphics](articles/user/graphics.md): draw shapes, text and images on the screen with the Canvas API.
  - [Keyboard](articles/user/keyboard.md): read lines, key events and layouts through `Console` and `KeyboardManager`.
  - [Mouse](articles/user/mouse.md): pointer position, buttons and scroll wheel through `MouseManager`.
+ - [Writing a Driver](articles/user/drivers.md): match a driver to a device, reach the hardware, hand the kernel a device, and test it without hardware.
+ - [Writing a Scheduler](articles/user/scheduler-plugging.md): how to implement and install a scheduling policy.
  - [Debugging with VSCode and QEMU](articles/user/debugging.md): set breakpoints in your kernel with remote GDB.
 
 ## Contributor Docs
@@ -38,10 +41,10 @@ Architecture and internals, for contributors and the curious:
  - [Garbage Collector - Precise Stack Scan](articles/dev/garbage-collector-gcinfo.md): how GCInfo makes the triggering thread's stack scan exact.
  - [Garbage Collector - Glossary](articles/dev/garbage-collector-glossary.md): background notes on the GC concepts the articles build on.
  - [Scheduler](articles/dev/scheduler.md): the preemptive, pluggable scheduler.
- - [Scheduler - Writing a Scheduler](articles/dev/scheduler-plugging.md): how to implement and install a scheduling policy.
  - [Scheduler - Glossary](articles/dev/scheduler-glossary.md): background notes on the scheduling concepts the article builds on.
  - [Kernel Compilation Steps](articles/dev/build/kernel-compilation-steps.md): C# to bootable ISO, end to end.
  - [Cosmos.Build.Asm](articles/dev/build/asm-build.md), [Cosmos.Build.GCC](articles/dev/build/gcc-build.md), [Cosmos.Build.Patcher](articles/dev/build/patcher-build.md), [Cosmos.Build.Ilc](articles/dev/build/ilc-build.md): the build pipeline components.
+ - [Driver Manifest](articles/dev/build/driver-manifest.md): which `[Driver]` classes the build registers, in what order, and how a kernel keeps one out or opts one in.
 
 ## Cross-referencing
 

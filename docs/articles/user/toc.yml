@@ -16,5 +16,7 @@
   href: mouse.md
 - name: Writing a Driver
   href: drivers.md
+- name: Writing a Scheduler
+  href: scheduler-plugging.md
 - name: Debugging with VSCode and QEMU
   href: debugging.md

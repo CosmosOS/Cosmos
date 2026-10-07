@@ -1,6 +1,6 @@
 # Scheduler Glossary
 
-Short background notes on the general scheduling concepts the [Scheduler](scheduler.md) article builds on. Each page explains the concept on its own, then closes with one line on how the Cosmos scheduler applies it. Replacing the policy itself is not a concept but a how-to: see [Writing a scheduler](scheduler-plugging.md).
+Short background notes on the general scheduling concepts the [Scheduler](scheduler.md) article builds on. Each page explains the concept on its own, then closes with one line on how the Cosmos scheduler applies it. Replacing the policy itself is not a concept but a how-to: see [Writing a scheduler](../user/scheduler-plugging.md).
 
 | Concept | Summary |
 |---------|---------|
