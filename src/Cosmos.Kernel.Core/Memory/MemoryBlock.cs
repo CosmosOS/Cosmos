@@ -270,20 +270,6 @@ internal class MemoryBlock
     }
 
     /// <summary>
-    /// Copy ManagedMemoryBlock into MemoryBlock.
-    /// Non-temporal: a MemoryBlock is MMIO (e.g. the linear framebuffer) that is
-    /// written whole and never read back, so the copy must not go through the cache.
-    /// </summary>
-    /// <param name="block">ManagedMemoryBlock to copy.</param>
-    public unsafe void Copy(ManagedMemoryBlock block)
-    {
-        fixed (byte* src = block.Span)
-        {
-            MemoryOp.MemCopyNonTemporal((byte*)Base, src, (int)block.Size);
-        }
-    }
-
-    /// <summary>
     /// Copies data from the memory block to the specified array.
     /// </summary>
     /// <param name="aByteOffset">The byte offset in the memory block from which to start copying.</param>
