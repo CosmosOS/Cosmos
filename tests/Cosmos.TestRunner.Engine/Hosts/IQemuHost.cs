@@ -16,12 +16,14 @@ namespace Cosmos.TestRunner.Engine;
 /// <param name="MouseDevice">Mouse model, e.g. <c>virtio-mouse-pci</c>.</param>
 /// <param name="VgaAdapter">VGA adapter as a <c>-vga</c> backend name, e.g. <c>vmware</c>; replaces the default adapter rather than adding a second one.</param>
 /// <param name="GpuDevice">Display adapter attached as a <c>-device</c> line, e.g. <c>virtio-gpu-pci</c>; added alongside the default adapter rather than replacing it.</param>
+/// <param name="AudioDevice">HD Audio controller, e.g. <c>intel-hda</c>; the launcher adds its codec and the hosts play it into QEMU's <c>none</c> backend.</param>
 public sealed record ProfileDevices(
     string? NetworkCard,
     string? KeyboardDevice,
     string? MouseDevice,
     string? VgaAdapter,
-    string? GpuDevice = null);
+    string? GpuDevice = null,
+    string? AudioDevice = null);
 
 /// <summary>
 /// Interface for QEMU virtual machine hosts that can run test kernels

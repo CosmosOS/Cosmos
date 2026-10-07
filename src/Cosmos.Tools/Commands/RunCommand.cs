@@ -57,6 +57,10 @@ public class RunSettings : CommandSettings
     [CommandOption("--mouse <MODEL>")]
     [Description("Mouse device to attach. Default: virtio-mouse-device on arm64, none on x64 (PS/2 is built into the chipset). 'ps2'/'none' add nothing.")]
     public string? Mouse { get; set; }
+
+    [CommandOption("--audio <MODEL>")]
+    [Description("Audio controller to attach: a QEMU HD Audio model such as intel-hda or ich9-intel-hda. A codec is attached alongside it. Omit, or pass 'none', for no audio.")]
+    public string? Audio { get; set; }
 }
 
 public class RunCommand : AsyncCommand<RunSettings>
@@ -103,6 +107,7 @@ public class RunCommand : AsyncCommand<RunSettings>
                 NetworkCard = settings.Nic,
                 KeyboardDevice = ResolveInputDevice(settings.Arch, settings.Keyboard, "virtio-keyboard-device"),
                 MouseDevice = ResolveInputDevice(settings.Arch, settings.Mouse, "virtio-mouse-device"),
+                AudioDevice = settings.Audio,
                 ExtraArgs = context.Remaining.Raw.ToArray()
             });
         }

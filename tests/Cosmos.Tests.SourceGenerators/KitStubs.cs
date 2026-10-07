@@ -61,7 +61,7 @@ internal static class KitStubs
 
                 {{visibility}} enum DriverFeature
                 {
-                    None, Interrupts, Uart, Pci, Timer, Keyboard, Mouse, Network, Storage, Fat, Graphics, Scheduler, Usb{{extra}}
+                    None, Interrupts, Uart, Pci, Timer, Keyboard, Mouse, Network, Storage, Fat, Graphics, Scheduler, Usb, Audio{{extra}}
                 }
 
                 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
@@ -99,6 +99,7 @@ internal static class KitStubs
                 public static bool Graphics => true;
                 public static bool Scheduler => true;
                 public static bool Usb => true;
+                public static bool Audio => true;
             }
 
             public abstract class Kernel

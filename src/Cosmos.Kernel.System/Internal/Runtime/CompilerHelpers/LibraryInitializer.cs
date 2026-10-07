@@ -4,6 +4,7 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Boot;
+using Cosmos.Kernel.System.Audio;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Input;
 using Cosmos.Kernel.System.Network;
@@ -66,6 +67,14 @@ internal static class LibraryInitializer
                 {
                     Serial.WriteString("[KERNEL]   - Initializing display manager...\n");
                     DisplayManager.Initialize();
+                }
+
+                // The audio manager's consumer lists every audio output a kit
+                // driver publishes once the driver stage runs.
+                if (AudioManager.IsEnabled)
+                {
+                    Serial.WriteString("[KERNEL]   - Initializing audio manager...\n");
+                    AudioManager.Initialize();
                 }
 
                 // The storage manager's consumer registers every block device

@@ -48,6 +48,28 @@ public sealed class QemuLaunchOptions
     public string? MouseDevice { get; init; }
 
     /// <summary>
+    /// Audio controller attached to the guest as a <c>-device</c> line (e.g.
+    /// <c>intel-hda</c>), or <c>null</c>/<c>"none"</c> to add none. An HD Audio
+    /// controller is a bus rather than an endpoint, so a codec is attached
+    /// alongside it: the controller on its own enumerates on PCI with nothing
+    /// answering behind it, and a guest driver finds no converter to play
+    /// through. The host backend is <see cref="AudioBackend"/>, or QEMU's own
+    /// default when that is <c>null</c>.
+    /// </summary>
+    public string? AudioDevice { get; init; }
+
+    /// <summary>
+    /// Host backend the codec plays into, as a QEMU <c>-audiodev</c> driver
+    /// (e.g. <c>none</c>, <c>pa</c>, <c>wav</c>), or <c>null</c> to let QEMU
+    /// pick its default. A run with no audio server needs one named: QEMU's
+    /// default then fails to open the codec's output voice. <c>none</c> takes
+    /// the frames at the stream's rate and discards them, which is what the
+    /// test engine asks for. Ignored when <see cref="AudioDevice"/> adds
+    /// nothing.
+    /// </summary>
+    public string? AudioBackend { get; init; }
+
+    /// <summary>
     /// VGA adapter exposed to the guest, as a <c>-vga</c> backend name (e.g.
     /// <c>vmware</c>, <c>virtio</c>, <c>none</c>). <c>null</c> keeps the
     /// architecture default (stdvga on q35, nothing beyond ramfb on virt).
@@ -223,6 +245,9 @@ public static class QemuLauncher
     /// </summary>
     public const string Ich9NativeHotPlugGlobal = "ICH9-LPC.acpi-pci-hotplug-with-bridge-support=off";
 
+    /// <summary>The <c>-audiodev</c> id the codec is wired to when a backend is named.</summary>
+    public const string AudioBackendId = "cosmosaudio0";
+
     public static async Task<QemuLaunchPlan> BuildAsync(QemuLaunchOptions options)
     {
         CommandToolDefinition tool = options.Architecture switch
@@ -309,6 +334,7 @@ public static class QemuLauncher
 
         AppendInputDevice(args, options.KeyboardDevice);
         AppendInputDevice(args, options.MouseDevice);
+        AppendAudioDevice(args, options.AudioDevice, options.AudioBackend);
         AppendVgaAdapter(args, options.VgaAdapter);
         AppendGpuDevice(args, options.GpuDevice);
 
@@ -612,6 +638,34 @@ public static class QemuLauncher
 
         ValidateOptionToken(model, "input device model");
         args.Append($" -device {model}");
+    }
+
+    /// <summary>
+    /// Attaches the audio controller together with the codec that answers on
+    /// it. <c>null</c>/empty and <c>"none"</c> add nothing. The codec is not a
+    /// separate choice: every controller this accepts is an HD Audio one, and
+    /// <c>hda-duplex</c> is the codec that presents both a line-out and a
+    /// line-in on it. A named <paramref name="backend"/> becomes an
+    /// <c>-audiodev</c> the codec is wired to; <c>null</c>/empty leaves the
+    /// codec on QEMU's default backend.
+    /// </summary>
+    internal static void AppendAudioDevice(StringBuilder args, string? model, string? backend = null)
+    {
+        if (string.IsNullOrWhiteSpace(model)
+            || model.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        ValidateOptionToken(model, "audio device model");
+        if (string.IsNullOrWhiteSpace(backend))
+        {
+            args.Append($" -device {model} -device hda-duplex");
+            return;
+        }
+
+        ValidateOptionToken(backend, "audio backend");
+        args.Append($" -audiodev {backend},id={AudioBackendId} -device {model} -device hda-duplex,audiodev={AudioBackendId}");
     }
 
     /// <summary>

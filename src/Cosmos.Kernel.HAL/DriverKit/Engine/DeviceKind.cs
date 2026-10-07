@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.HAL.Devices.Audio;
 using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
@@ -27,4 +28,7 @@ internal enum DeviceKind
 
     /// <summary>A display: <see cref="IDisplay"/>, reported through a <see cref="DisplaySink"/>.</summary>
     Display,
+
+    /// <summary>An audio output: <see cref="IAudioOutput"/>, reported through an <see cref="AudioSink"/>.</summary>
+    Audio,
 }

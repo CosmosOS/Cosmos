@@ -84,5 +84,10 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.Fat</_Parameter1>
     </AssemblyAttribute>
+    <!-- White-box audio tests count the buffer completions the primary output
+         reported from its interrupt and read the formats its contract lists. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Cosmos.Kernel.Tests.Audio</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 </Project>

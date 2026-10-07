@@ -180,6 +180,28 @@
       "gpu": "virtio-gpu-pci"
     },
     {
+      // An Intel HD Audio controller (QEMU's ich6 intel-hda) with the
+      // hda-duplex codec the launcher always adds beside it: the controller
+      // is a bus, and on its own it enumerates with no converter behind it.
+      // The kit's HdAudioDriver binds it by PCI class 04.03.00, walks the
+      // codec to its line-out and publishes the output as "hda", which the
+      // audio manager lists as its primary. The engine plays it into QEMU's
+      // `none` backend: a runner has no audio server, and QEMU's default
+      // backend would then open no voice for the codec. `none` still takes
+      // the frames at the stream's rate, so the guest's stream engine runs
+      // and the Audio suite can watch its position move and its playback
+      // complete. The function is a plain PCI device on both machines.
+      //
+      // No NIC: the kit gives a legacy line to one handler and refuses a
+      // second, and on q35 the default e1000e at 00:02.0 takes the line the
+      // controller at 00:03.0 shares with it, which would leave the stream's
+      // completion interrupt unconnected on every cell.
+      "name": "hda",
+      "architectures": ["x64", "arm64"],
+      "nic": "none",
+      "audio": "intel-hda"
+    },
+    {
       // Every virtio device kind the kernel has a driver for, over PCI.
       // Exercises capability parsing, MSI-X setup and driver binding for the
       // network and input paths, and the block path through VirtioBlkDriver's

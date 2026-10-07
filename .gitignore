@@ -473,3 +473,6 @@ global.json
 
 .claude/*
 !.claude/agents/
+
+# The audio disk image `cosmos run --audio` builds for the DevKernel.
+disk-audio.img

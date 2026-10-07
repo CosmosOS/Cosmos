@@ -321,6 +321,62 @@ public class QemuLauncherTests
         Assert.Throws<ArgumentException>(() => QemuLauncher.AppendInputDevice(args, "virtio-keyboard-device -device rm"));
     }
 
+    [Theory]
+    [InlineData("intel-hda")]
+    [InlineData("ich9-intel-hda")]
+    public void AppendAudioDevice_EmitsControllerAndCodecForAModel(string model)
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendAudioDevice(args, model);
+        Assert.Equal($" -device {model} -device hda-duplex", args.ToString());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("none")]
+    [InlineData("NONE")]
+    public void AppendAudioDevice_AddsNothingWhenUnsetOrNone(string? model)
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendAudioDevice(args, model);
+        Assert.Equal(string.Empty, args.ToString());
+    }
+
+    [Fact]
+    public void AppendAudioDevice_RejectsCharactersOutsideOptionAlphabet()
+    {
+        StringBuilder args = new();
+        Assert.Throws<ArgumentException>(() => QemuLauncher.AppendAudioDevice(args, "intel-hda -device rm"));
+    }
+
+    // A headless run has no audio server, so QEMU's default backend opens no
+    // voice; a named backend is wired to the codec by id instead.
+    [Fact]
+    public void AppendAudioDevice_WiresTheCodecToANamedBackend()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendAudioDevice(args, "intel-hda", "none");
+        Assert.Equal(
+            $" -audiodev none,id={QemuLauncher.AudioBackendId} -device intel-hda -device hda-duplex,audiodev={QemuLauncher.AudioBackendId}",
+            args.ToString());
+    }
+
+    [Fact]
+    public void AppendAudioDevice_IgnoresTheBackendWithoutAController()
+    {
+        StringBuilder args = new();
+        QemuLauncher.AppendAudioDevice(args, "none", "none");
+        Assert.Equal(string.Empty, args.ToString());
+    }
+
+    [Fact]
+    public void AppendAudioDevice_RejectsABackendOutsideOptionAlphabet()
+    {
+        StringBuilder args = new();
+        Assert.Throws<ArgumentException>(() => QemuLauncher.AppendAudioDevice(args, "intel-hda", "none -device rm"));
+    }
+
     // "none" passes through deliberately: it is QEMU's own spelling for "no
     // VGA adapter", not a sentinel of ours like the input devices' "ps2".
     [Theory]

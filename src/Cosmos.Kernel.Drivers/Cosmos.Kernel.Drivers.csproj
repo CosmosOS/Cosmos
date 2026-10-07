@@ -48,6 +48,7 @@
        namespaces and units, the SVGA adapter facet). Granting from a driver
        assembly is allowed; it is a grant to one that the build forbids. -->
   <ItemGroup>
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Audio" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Drivers" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Graphic" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Network" />

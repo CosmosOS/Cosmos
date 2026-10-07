@@ -5,9 +5,19 @@
     "machineType": "q35",
     "cpuModel": "max",
     "serialMode": "stdio",
-    "disableGraphics": false,
+    "networkCard": "none",
+    "keyboard": "ps2",
+    "mouse": "ps2",
+    "audio": "intel-hda",
     "enableNetwork": false,
     "networkPorts": "5555",
-    "extraArgs": ""
+    "extraArgs": "",
+    "disks": [
+      {
+        "path": "disk-audio.img",
+        "type": "nvme",
+        "size": "256M"
+      }
+    ]
   }
 }

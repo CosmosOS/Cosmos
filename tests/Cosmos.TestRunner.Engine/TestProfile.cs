@@ -56,6 +56,13 @@ public sealed record TestProfile
     public string? GpuDevice { get; init; }
 
     /// <summary>
+    /// HD Audio controller to attach (e.g. <c>intel-hda</c>), with the codec
+    /// the launcher adds beside it, or null for none. The engine plays it
+    /// into QEMU's <c>none</c> backend: a CI runner has no audio server.
+    /// </summary>
+    public string? AudioDevice { get; init; }
+
+    /// <summary>
     /// Architectures this profile applies to; null means any. Mirrors the
     /// modifier filter, for hardware that only one architecture can present
     /// (PS/2 on x64, virtio-mmio on the ARM64 virt machine).
@@ -505,6 +512,7 @@ public static class TestProfileLoader
                 MouseDevice = NullIfBlank(entry.Mouse),
                 VgaAdapter = NullIfBlank(entry.Vga),
                 GpuDevice = NullIfBlank(entry.Gpu),
+                AudioDevice = NullIfBlank(entry.Audio),
                 Architectures = entry.Architectures
             };
 
@@ -618,6 +626,7 @@ public static class TestProfileLoader
         string? Mouse,
         string? Vga,
         string? Gpu,
+        string? Audio,
         List<string>? Architectures,
         // Keyed by architecture, unlike a modifier's flat map: a modifier is
         // already scoped by its own "architectures" list, while a profile

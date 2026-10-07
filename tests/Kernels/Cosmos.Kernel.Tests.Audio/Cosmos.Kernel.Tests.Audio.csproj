@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Cosmos.Sdk" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- The tests build streams in AudioFormat and AudioBitDepth, which are
+         the driver kit's experimental audio vocabulary (COSMOS0003), and call
+         Console.Beep(int, int), which .NET implements on Windows alone
+         (CA1416) and the kernel's Console plug implements here. -->
+    <NoWarn>$(NoWarn);COSMOS0003;CA1416</NoWarn>
+  </PropertyGroup>
+
+  <!-- Core kernel packages (using project references for development) -->
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
+    <ProjectReference Include="../../../src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
+    <ProjectReference Include="../../Cosmos.TestRunner.Framework/Cosmos.TestRunner.Framework.csproj" />
+  </ItemGroup>
+
+  <!-- Hardware matrix (tests/profiles.json). `hda` adds QEMU's intel-hda with
+       the hda-duplex codec, played into QEMU's `none` backend, and no NIC, on
+       both arches; HdAudioDriver binds it and the audio manager lists its
+       output. The line connects on x64 and not on arm64, and the interrupt
+       test asserts whichever path the driver took.
+       `bare` attaches nothing, and the manager must list no output and
+       refuse to play. Every cell registers the same 22 tests: the device
+       tests skip on bare, the refusal tests skip on hda, and the cell is
+       read from the device tree, so a driver that failed to bind fails the
+       suite instead of skipping it. -->
+  <ItemGroup>
+    <CosmosTestProfile Include="bare" />
+    <CosmosTestProfile Include="hda" />
+  </ItemGroup>
+
+  <!-- Architecture-specific HAL (using project references for development) -->
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_X64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_ARM64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
+  </ItemGroup>
+
+</Project>

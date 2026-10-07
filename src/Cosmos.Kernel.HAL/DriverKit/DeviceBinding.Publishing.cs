@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.HAL.Devices.Audio;
 using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
@@ -59,6 +60,15 @@ public sealed partial class DeviceBinding
     public DisplaySink PublishDisplay(IDisplay display)
     {
         return new(Publish(DeviceKind.Display, display.Name, display, nameof(PublishDisplay)));
+    }
+
+    /// <summary>Publishes an audio output under <see cref="IAudioOutput.Name"/>. The ring's audio manager, when present, receives it at once.</summary>
+    /// <param name="output">The driver's audio output contract.</param>
+    /// <returns>The sink the driver reports buffer completions and format changes to.</returns>
+    /// <exception cref="InvalidOperationException">The binding is being torn down, or the caller is an interrupt handler.</exception>
+    public AudioSink PublishAudio(IAudioOutput output)
+    {
+        return new(Publish(DeviceKind.Audio, output.Name, output, nameof(PublishAudio)));
     }
 
     /// <summary>

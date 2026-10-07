@@ -63,7 +63,8 @@ public class TestProfileLoaderTests : IDisposable
           "keyboard": "virtio-keyboard-pci",
           "mouse": "virtio-mouse-pci",
           "vga": "virtio",
-          "gpu": "virtio-gpu-pci"
+          "gpu": "virtio-gpu-pci",
+          "audio": "intel-hda"
         },
         {
           "name": "virtio-mmio",
@@ -72,7 +73,8 @@ public class TestProfileLoaderTests : IDisposable
           "keyboard": "virtio-keyboard-device",
           "mouse": "virtio-mouse-device",
           "vga": "virtio",
-          "gpu": "virtio-gpu-pci"
+          "gpu": "virtio-gpu-pci",
+          "audio": "ich9-intel-hda"
         },
         {
           "name": "plain"
@@ -106,6 +108,7 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Equal("virtio-mouse-pci", profile.MouseDevice);
         Assert.Equal("virtio", profile.VgaAdapter);
         Assert.Equal("virtio-gpu-pci", profile.GpuDevice);
+        Assert.Equal("intel-hda", profile.AudioDevice);
     }
 
     // The two virtio-blk kinds a profile names reach the launcher as their
@@ -218,6 +221,7 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Null(profile.MouseDevice);
         Assert.Null(profile.VgaAdapter);
         Assert.Null(profile.GpuDevice);
+        Assert.Null(profile.AudioDevice);
     }
 
     // A modifier overlays machine/device options; everything it does not touch
@@ -236,6 +240,7 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Equal("virtio-mouse-device", withModifier.MouseDevice);
         Assert.Equal("virtio", withModifier.VgaAdapter);
         Assert.Equal("virtio-gpu-pci", withModifier.GpuDevice);
+        Assert.Equal("ich9-intel-hda", withModifier.AudioDevice);
         Assert.Equal("3", withModifier.MachineOptions["gic-version"]);
     }
 

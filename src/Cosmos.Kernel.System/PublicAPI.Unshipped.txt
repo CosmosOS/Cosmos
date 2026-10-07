@@ -1,4 +1,11 @@
 #nullable enable
+abstract Cosmos.Kernel.System.Audio.AudioStream.Depleted.get -> bool
+abstract Cosmos.Kernel.System.Audio.AudioStream.Format.get -> Cosmos.Kernel.HAL.Devices.Audio.AudioFormat
+abstract Cosmos.Kernel.System.Audio.AudioStream.Read(System.Span<byte> destination) -> int
+abstract Cosmos.Kernel.System.Audio.AudioStream.SampleRate.get -> uint
+abstract Cosmos.Kernel.System.Audio.SeekableAudioStream.Length.get -> uint
+abstract Cosmos.Kernel.System.Audio.SeekableAudioStream.Position.get -> uint
+abstract Cosmos.Kernel.System.Audio.SeekableAudioStream.Position.set -> void
 abstract Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.ClearScene(System.Drawing.Color color, float depth = 1) -> void
 abstract Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateMeshCore(System.ReadOnlySpan<System.Numerics.Vector3> positions, System.ReadOnlySpan<uint> colors, System.ReadOnlySpan<System.Numerics.Vector2> uvs, Cosmos.Kernel.System.Graphics.Rendering3D.Texture? texture, System.ReadOnlySpan<ushort> indices, Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology topology) -> Cosmos.Kernel.System.Graphics.Rendering3D.Mesh!
 abstract Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateTexture(Cosmos.Kernel.System.Graphics.Image! image) -> Cosmos.Kernel.System.Graphics.Rendering3D.Texture!
@@ -18,6 +25,56 @@ const Cosmos.Kernel.System.FileSystem.Fat.FatBootSector.BootSectorLba = 0 -> ulo
 const Cosmos.Kernel.System.Storage.Gpt.FirstUsableLba = 34 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.PrimaryHeaderLba = 1 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.ProtectiveMbrStartLba = 1 -> uint
+Cosmos.Kernel.System.Audio.AudioDevice
+Cosmos.Kernel.System.Audio.AudioDevice.DriverName.get -> string!
+Cosmos.Kernel.System.Audio.AudioDevice.Format.get -> Cosmos.Kernel.HAL.Devices.Audio.AudioFormat
+Cosmos.Kernel.System.Audio.AudioDevice.IsRunning.get -> bool
+Cosmos.Kernel.System.Audio.AudioDevice.IsWithdrawn.get -> bool
+Cosmos.Kernel.System.Audio.AudioDevice.Name.get -> string!
+Cosmos.Kernel.System.Audio.AudioDevice.NodePath.get -> string?
+Cosmos.Kernel.System.Audio.AudioDevice.Player.get -> Cosmos.Kernel.System.Audio.AudioPlayer?
+Cosmos.Kernel.System.Audio.AudioDevice.SampleRate.get -> uint
+Cosmos.Kernel.System.Audio.AudioDevice.Start() -> void
+Cosmos.Kernel.System.Audio.AudioDevice.Stop() -> void
+Cosmos.Kernel.System.Audio.AudioDevice.TrySetFormat(Cosmos.Kernel.HAL.Devices.Audio.AudioFormat format, uint sampleRate) -> bool
+Cosmos.Kernel.System.Audio.AudioDevice.WritableBytes.get -> int
+Cosmos.Kernel.System.Audio.AudioDevice.Write(System.ReadOnlySpan<byte> frames) -> int
+Cosmos.Kernel.System.Audio.AudioManager
+Cosmos.Kernel.System.Audio.AudioPlayback
+Cosmos.Kernel.System.Audio.AudioPlayback.Device.get -> Cosmos.Kernel.System.Audio.AudioDevice!
+Cosmos.Kernel.System.Audio.AudioPlayback.IsPlaying.get -> bool
+Cosmos.Kernel.System.Audio.AudioPlayback.Player.get -> Cosmos.Kernel.System.Audio.AudioPlayer!
+Cosmos.Kernel.System.Audio.AudioPlayback.State.get -> Cosmos.Kernel.System.Audio.AudioPlaybackState
+Cosmos.Kernel.System.Audio.AudioPlayback.Stop() -> void
+Cosmos.Kernel.System.Audio.AudioPlayback.Stream.get -> Cosmos.Kernel.System.Audio.AudioStream!
+Cosmos.Kernel.System.Audio.AudioPlaybackState
+Cosmos.Kernel.System.Audio.AudioPlaybackState.Completed = 1 -> Cosmos.Kernel.System.Audio.AudioPlaybackState
+Cosmos.Kernel.System.Audio.AudioPlaybackState.Failed = 3 -> Cosmos.Kernel.System.Audio.AudioPlaybackState
+Cosmos.Kernel.System.Audio.AudioPlaybackState.Playing = 0 -> Cosmos.Kernel.System.Audio.AudioPlaybackState
+Cosmos.Kernel.System.Audio.AudioPlaybackState.Stopped = 2 -> Cosmos.Kernel.System.Audio.AudioPlaybackState
+Cosmos.Kernel.System.Audio.AudioPlayer
+Cosmos.Kernel.System.Audio.AudioPlayer.AudioPlayer(Cosmos.Kernel.System.Audio.AudioDevice! device) -> void
+Cosmos.Kernel.System.Audio.AudioPlayer.Device.get -> Cosmos.Kernel.System.Audio.AudioDevice!
+Cosmos.Kernel.System.Audio.AudioPlayer.Play(Cosmos.Kernel.System.Audio.AudioStream! stream) -> bool
+Cosmos.Kernel.System.Audio.AudioPlayer.RequestStop() -> void
+Cosmos.Kernel.System.Audio.AudioPlayer.StopRequested.get -> bool
+Cosmos.Kernel.System.Audio.AudioPlayer.Stream.get -> Cosmos.Kernel.System.Audio.AudioStream?
+Cosmos.Kernel.System.Audio.AudioStream
+Cosmos.Kernel.System.Audio.AudioStream.AudioStream() -> void
+Cosmos.Kernel.System.Audio.MemoryAudioStream
+Cosmos.Kernel.System.Audio.MemoryAudioStream.MemoryAudioStream(Cosmos.Kernel.HAL.Devices.Audio.AudioFormat format, uint sampleRate, byte[]! data) -> void
+Cosmos.Kernel.System.Audio.SeekableAudioStream
+Cosmos.Kernel.System.Audio.SeekableAudioStream.Rewind() -> void
+Cosmos.Kernel.System.Audio.SeekableAudioStream.SeekableAudioStream() -> void
+Cosmos.Kernel.System.Audio.WaveAudioStream
+Cosmos.Kernel.System.Audio.WaveAudioStream.Header.get -> Cosmos.Kernel.System.Audio.WaveHeader
+Cosmos.Kernel.System.Audio.WaveHeader
+Cosmos.Kernel.System.Audio.WaveHeader.DataLength.get -> long
+Cosmos.Kernel.System.Audio.WaveHeader.DataOffset.get -> long
+Cosmos.Kernel.System.Audio.WaveHeader.Format.get -> Cosmos.Kernel.HAL.Devices.Audio.AudioFormat
+Cosmos.Kernel.System.Audio.WaveHeader.FrameCount.get -> uint
+Cosmos.Kernel.System.Audio.WaveHeader.SampleRate.get -> uint
+Cosmos.Kernel.System.Audio.WaveHeader.WaveHeader() -> void
 Cosmos.Kernel.System.Diagnostics.DeviceNodeInfo
 Cosmos.Kernel.System.Diagnostics.DeviceNodeInfo.BusName.get -> string!
 Cosmos.Kernel.System.Diagnostics.DeviceNodeInfo.ChildCount.get -> int
@@ -785,6 +842,20 @@ Cosmos.Kernel.System.Timers.SoftwareTimer.IsActive.get -> bool
 Cosmos.Kernel.System.Timers.SoftwareTimer.Recurring.get -> bool
 Cosmos.Kernel.System.Timers.SoftwareTimer.TimeoutNs.get -> ulong
 Cosmos.Kernel.System.Timers.TimerManager
+override Cosmos.Kernel.System.Audio.MemoryAudioStream.Depleted.get -> bool
+override Cosmos.Kernel.System.Audio.MemoryAudioStream.Format.get -> Cosmos.Kernel.HAL.Devices.Audio.AudioFormat
+override Cosmos.Kernel.System.Audio.MemoryAudioStream.Length.get -> uint
+override Cosmos.Kernel.System.Audio.MemoryAudioStream.Position.get -> uint
+override Cosmos.Kernel.System.Audio.MemoryAudioStream.Position.set -> void
+override Cosmos.Kernel.System.Audio.MemoryAudioStream.Read(System.Span<byte> destination) -> int
+override Cosmos.Kernel.System.Audio.MemoryAudioStream.SampleRate.get -> uint
+override Cosmos.Kernel.System.Audio.WaveAudioStream.Depleted.get -> bool
+override Cosmos.Kernel.System.Audio.WaveAudioStream.Format.get -> Cosmos.Kernel.HAL.Devices.Audio.AudioFormat
+override Cosmos.Kernel.System.Audio.WaveAudioStream.Length.get -> uint
+override Cosmos.Kernel.System.Audio.WaveAudioStream.Position.get -> uint
+override Cosmos.Kernel.System.Audio.WaveAudioStream.Position.set -> void
+override Cosmos.Kernel.System.Audio.WaveAudioStream.Read(System.Span<byte> destination) -> int
+override Cosmos.Kernel.System.Audio.WaveAudioStream.SampleRate.get -> uint
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetAdvance(char c) -> int
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetLineHeight() -> int
 override Cosmos.Kernel.System.Graphics.Fonts.TrueTypeFont.GetMaxAdvance() -> int
@@ -815,6 +886,16 @@ override Cosmos.Kernel.System.Network.EndPoint.ToString() -> string!
 override Cosmos.Kernel.System.Network.MaskedAddress.Equals(object! obj) -> bool
 override Cosmos.Kernel.System.Network.NetworkAdapter.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.NetworkAdapter.GetHashCode() -> int
+static Cosmos.Kernel.System.Audio.AudioManager.Count.get -> int
+static Cosmos.Kernel.System.Audio.AudioManager.IsEnabled.get -> bool
+static Cosmos.Kernel.System.Audio.AudioManager.Play(Cosmos.Kernel.System.Audio.AudioStream! stream) -> bool
+static Cosmos.Kernel.System.Audio.AudioManager.Primary.get -> Cosmos.Kernel.System.Audio.AudioDevice?
+static Cosmos.Kernel.System.Audio.AudioManager.TryGet(int index, out Cosmos.Kernel.System.Audio.AudioDevice? device) -> bool
+static Cosmos.Kernel.System.Audio.AudioManager.TryStartPlayback(Cosmos.Kernel.System.Audio.AudioStream! stream, System.IDisposable? owned, out Cosmos.Kernel.System.Audio.AudioPlayback? playback) -> bool
+static Cosmos.Kernel.System.Audio.AudioPlayback.TryStart(Cosmos.Kernel.System.Audio.AudioDevice! device, Cosmos.Kernel.System.Audio.AudioStream! stream, System.IDisposable? owned, out Cosmos.Kernel.System.Audio.AudioPlayback? playback) -> bool
+static Cosmos.Kernel.System.Audio.MemoryAudioStream.FromWave(byte[]! file) -> Cosmos.Kernel.System.Audio.MemoryAudioStream!
+static Cosmos.Kernel.System.Audio.WaveAudioStream.TryOpen(Cosmos.Kernel.System.FileSystem.IVfsFileHandle! file, out Cosmos.Kernel.System.Audio.WaveAudioStream? stream) -> bool
+static Cosmos.Kernel.System.Audio.WaveHeader.TryParse(System.ReadOnlySpan<byte> file, out Cosmos.Kernel.System.Audio.WaveHeader header) -> bool
 static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.DeviceCount.get -> int
 static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.DriverCount.get -> int
 static Cosmos.Kernel.System.Diagnostics.DriverDiagnostics.GetTotalHeldResourceCount() -> int
@@ -929,6 +1010,7 @@ static Cosmos.Kernel.System.Input.MouseManager.X.get -> int
 static Cosmos.Kernel.System.Input.MouseManager.Y.get -> int
 static Cosmos.Kernel.System.Internal.KernelEntry.Start(Cosmos.Kernel.System.Kernel! kernel) -> void
 static Cosmos.Kernel.System.Kernel.Current.get -> Cosmos.Kernel.System.Kernel?
+static Cosmos.Kernel.System.KernelFeatures.Audio.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Fat.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Graphics.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Interrupts.get -> bool

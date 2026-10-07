@@ -20,7 +20,7 @@ namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 /// </summary>
 internal static class DeviceRegistry
 {
-    private const int KindCount = 5;
+    private const int KindCount = 6;
 
     private static readonly DeviceConsumer?[] s_consumers = new DeviceConsumer?[KindCount];
     private static PublishedDevice[] s_devices = [];
