@@ -1,7 +1,7 @@
 using System;
-using System.IO;
 using Cosmos.Kernel.System.Diagnostics;
 using DevKernel.Commands;
+using DevKernel.Network;
 using DevKernel.Shell;
 using DevKernel.Storage;
 using Sys = Cosmos.Kernel.System;
@@ -18,7 +18,10 @@ public class Kernel : Sys.Kernel
     /// <summary>Rule drawn above and below the boot banner.</summary>
     private const string BannerRule = "========================================";
 
-    private readonly ShellContext _shell = new(CommandRegistry.CreateDefault());
+    /// <summary>Virtual consoles opened at boot beside the primary one, as tty2 onwards.</summary>
+    private const int BootVirtualConsoles = 3;
+
+    private readonly ShellContext _shell = new(CommandRegistry.CreateDefault(), new NetworkSession());
 
     protected override void BeforeRun()
     {
@@ -49,42 +52,39 @@ public class Kernel : Sys.Kernel
         Console.WriteLine("Cosmos booted successfully!");
         Console.ResetColor();
         Console.WriteLine("Type 'help' for available commands.");
+
+        OpenVirtualConsoles();
         Console.WriteLine();
     }
 
     protected override void Run()
     {
-        Terminal.WritePrompt(_shell.Prompt, _shell.Cwd);
-
-        try
+        if (!ShellLoop.RunOnce(_shell))
         {
-            string? input = Console.ReadLine();
-            if (input is null)
-            {
-                // No console left to read from; end the main loop rather than
-                // spin on it forever.
-                Stop();
-                return;
-            }
-
-            if (input.Trim().Length == 0)
-            {
-                return;
-            }
-
-            _shell.Shell.Execute(_shell, input);
-        }
-        catch (IOException ex)
-        {
-            // A disk that fails, or is pulled out mid-command, fails that
-            // command only: USB disks come and go while the shell runs.
-            Terminal.Error($"I/O error: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Terminal.Error($"Exception: {ex.Message}");
             Stop();
         }
+    }
+
+    /// <summary>
+    /// Opens the virtual consoles beside the primary one, each with a shell
+    /// of its own, so Alt and a function key switches between them.
+    /// </summary>
+    private void OpenVirtualConsoles()
+    {
+        for (int i = 0; i < BootVirtualConsoles; i++)
+        {
+            try
+            {
+                SessionShells.OpenVirtualConsole(_shell);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Terminal.Warning($"No virtual consoles: {ex.Message}");
+                return;
+            }
+        }
+
+        Terminal.Hint($"Alt+F1..F{BootVirtualConsoles + 1} switches between the consoles.");
     }
 
     protected override void AfterRun()

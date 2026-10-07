@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Text;
-using Cosmos.Kernel.System.Graphics;
+using Cosmos.Kernel.System.Sessions;
 
 namespace Cosmos.Kernel.Plugs.System.IO;
 
@@ -11,10 +11,9 @@ internal sealed class ConsoleTextWriter : TextWriter
 
     public override void Write(char value)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.Write(value);
-        KernelConsole.Default.Canvas.Display();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.Write(value);
+        session.Flush();
     }
 
     public override void Write(string? value)
@@ -24,17 +23,15 @@ internal sealed class ConsoleTextWriter : TextWriter
             return;
         }
 
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.Write(value);
-        KernelConsole.Default.Canvas.Display();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.Write(value);
+        session.Flush();
     }
 
     public override void Write(ReadOnlySpan<char> buffer)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.Write(buffer);
-        KernelConsole.Default.Canvas.Display();
+        ConsoleSession session = SessionManager.RequireCurrent();
+        session.Write(buffer);
+        session.Flush();
     }
 }

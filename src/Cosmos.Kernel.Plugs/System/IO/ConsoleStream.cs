@@ -1,8 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Text;
-using Cosmos.Kernel.System.Graphics;
-using Cosmos.Kernel.System.Input;
+using Cosmos.Kernel.System.Sessions;
 
 namespace Cosmos.Kernel.Plugs.System.IO;
 
@@ -38,11 +37,11 @@ internal sealed class ConsoleStream : Stream
 
     public override void Write(ReadOnlySpan<byte> buffer)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
+        ConsoleSession session = SessionManager.RequireCurrent();
 
         string value = Console.OutputEncoding.GetString(buffer);
-        KernelConsole.Default.Write(value);
-        KernelConsole.Default.Canvas.Display();
+        session.Write(value);
+        session.Flush();
     }
 
     public override int Read(Span<byte> buffer)
@@ -54,11 +53,15 @@ internal sealed class ConsoleStream : Stream
 
         if (_readLineSB.Length == 0)
         {
-            bool isEnter = ReadLineCore();
-            if (isEnter)
+            ConsoleSession? session = SessionManager.CurrentInput;
+            string? line = session is null ? null : LineEditor.ReadLine(session);
+            if (line is null)
             {
-                _readLineSB.Append(Environment.NewLine);
+                return 0;
             }
+
+            _readLineSB.Append(line);
+            _readLineSB.Append(Environment.NewLine);
         }
 
         // Encode line into buffer.
@@ -88,9 +91,7 @@ internal sealed class ConsoleStream : Stream
 
     public override void WriteByte(byte value)
     {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        KernelConsole.Default.Write((char)value);
+        SessionManager.RequireCurrent().Write((char)value);
     }
 
     public override int Read(byte[] buffer, int offset, int count)
@@ -135,152 +136,6 @@ internal sealed class ConsoleStream : Stream
         if (!_canWrite)
         {
             throw new NotSupportedException();
-        }
-    }
-
-    private bool ReadLineCore()
-    {
-        KernelConsole.ThrowIfKernelConsoleNotInitialized();
-
-        int cursorPos = 0;
-
-        while (true)
-        {
-            KeyEvent keyEvent = KeyboardManager.ReadKey();
-
-            switch (keyEvent.Key)
-            {
-                case Key.Enter:
-                    KernelConsole.Default.WriteLine();
-                    KernelConsole.Default.Canvas.Display();
-                    return true;
-
-                case Key.Backspace:
-                    if (cursorPos > 0)
-                    {
-                        _readLineSB.Remove(cursorPos - 1, 1);
-                        cursorPos--;
-
-                        KernelConsole.Default.MoveCursorLeft();
-
-                        // If we're not at the end, shift remaining chars left
-                        if (cursorPos < _readLineSB.Length)
-                        {
-                            int savedX = KernelConsole.Default.CursorX;
-                            int savedY = KernelConsole.Default.CursorY;
-
-                            // Redraw remaining characters
-                            for (int i = cursorPos; i < _readLineSB.Length; i++)
-                            {
-                                KernelConsole.Default.Write(_readLineSB[i]);
-                            }
-                            // Clear the last position (now empty)
-                            KernelConsole.Default.Write(' ');
-
-                            KernelConsole.Default.SetCursorPosition(savedX, savedY);
-                        }
-                        else
-                        {
-                            // Simple case: at end of string
-                            KernelConsole.Default.Write(' ');
-                            KernelConsole.Default.MoveCursorLeft();
-                        }
-                        KernelConsole.Default.Canvas.Display();
-                    }
-                    break;
-
-                case Key.Delete:
-                    if (cursorPos < _readLineSB.Length)
-                    {
-                        _readLineSB.Remove(cursorPos, 1);
-
-                        int savedX = KernelConsole.Default.CursorX;
-                        int savedY = KernelConsole.Default.CursorY;
-
-                        // Redraw remaining characters
-                        for (int i = cursorPos; i < _readLineSB.Length; i++)
-                        {
-                            KernelConsole.Default.Write(_readLineSB[i]);
-                        }
-                        // Clear the last position (now empty)
-                        KernelConsole.Default.Write(' ');
-
-                        KernelConsole.Default.SetCursorPosition(savedX, savedY);
-
-                        KernelConsole.Default.Canvas.Display();
-                    }
-                    break;
-
-                case Key.LeftArrow:
-                    if (cursorPos > 0)
-                    {
-                        cursorPos--;
-                        KernelConsole.Default.MoveCursorLeft();
-                        KernelConsole.Default.Canvas.Display();
-                    }
-                    break;
-
-                case Key.RightArrow:
-                    if (cursorPos < _readLineSB.Length)
-                    {
-                        cursorPos++;
-                        KernelConsole.Default.MoveCursorRight();
-                        KernelConsole.Default.Canvas.Display();
-                    }
-                    break;
-
-                case Key.Home:
-                    // Move cursor to start of input
-                    while (cursorPos > 0)
-                    {
-                        cursorPos--;
-                        KernelConsole.Default.MoveCursorLeft();
-                        KernelConsole.Default.Canvas.Display();
-                    }
-                    break;
-
-                case Key.End:
-                    // Move cursor to end of input
-                    while (cursorPos < _readLineSB.Length)
-                    {
-                        cursorPos++;
-                        KernelConsole.Default.MoveCursorRight();
-                        KernelConsole.Default.Canvas.Display();
-                    }
-                    break;
-
-                default:
-                    if (keyEvent.KeyChar != '\0')
-                    {
-                        if (cursorPos < _readLineSB.Length)
-                        {
-                            // Insert character in the middle
-                            _readLineSB.Insert(cursorPos, keyEvent.KeyChar);
-                            cursorPos++;
-
-                            // Save current position after typing the new char
-                            int afterTyping = KernelConsole.Default.CursorX + 1;
-                            int savedY = KernelConsole.Default.CursorY;
-
-                            // Redraw from current position
-                            for (int i = cursorPos - 1; i < _readLineSB.Length; i++)
-                            {
-                                KernelConsole.Default.Write(_readLineSB[i]);
-                            }
-
-                            KernelConsole.Default.SetCursorPosition(afterTyping, savedY);
-                        }
-                        else
-                        {
-                            // Append character at end
-                            _readLineSB.Append(keyEvent.KeyChar);
-                            cursorPos++;
-                            KernelConsole.Default.Write(keyEvent.KeyChar);
-                        }
-                        KernelConsole.Default.Canvas.Display();
-                    }
-                    break;
-            }
         }
     }
 }

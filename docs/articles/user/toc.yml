@@ -14,6 +14,8 @@
   href: graphics.md
 - name: Keyboard
   href: keyboard.md
+- name: Console Sessions and Telnet
+  href: sessions.md
 - name: Mouse
   href: mouse.md
 - name: Writing a Driver
