@@ -17,6 +17,11 @@ namespace Cosmos.Kernel.HAL.Firmware;
 /// </summary>
 internal static class EfiRtc
 {
+    private const ulong EfiSuccess = 0;
+
+    // EFI_UNSPECIFIED_TIMEZONE: the firmware keeps local time with no known offset.
+    private const short EfiUnspecifiedTimeZone = 0x07FF;
+
     /// <summary>
     /// Attempts to read the current wall-clock time via EFI Runtime Services.
     /// Returns true and sets <paramref name="ticks"/> to DateTime ticks (UTC) on success.
@@ -45,7 +50,7 @@ internal static class EfiRtc
         Serial.WriteNumber(status);
         Serial.Write("\n");
 
-        if (status != 0) // EFI_SUCCESS = 0
+        if (status != EfiSuccess)
         {
             return false;
         }
@@ -87,7 +92,7 @@ internal static class EfiRtc
         }
 
         Serial.WriteNumber(time.Second);
-        if (time.TimeZone == unchecked((short)0x07FF))
+        if (time.TimeZone == EfiUnspecifiedTimeZone)
         {
             Serial.Write(" (TZ unspecified)\n");
         }
@@ -103,7 +108,7 @@ internal static class EfiRtc
                        + time.Nanosecond / 100;
 
         long tzOffset = 0;
-        if (time.TimeZone != unchecked((short)0x07FF))
+        if (time.TimeZone != EfiUnspecifiedTimeZone)
         {
             tzOffset = -(long)time.TimeZone * TimeSpan.TicksPerMinute;
         }
@@ -132,5 +137,7 @@ internal static class EfiRtc
     }
 
     private static bool IsLeapYear(int year)
-        => (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    }
 }

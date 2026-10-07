@@ -13,23 +13,6 @@ namespace Cosmos.Kernel.HAL.Firmware;
 /// </summary>
 internal readonly struct DeviceTreeNode
 {
-    /// <summary>Builds the cursor. Thread context; allocation-free.</summary>
-    /// <param name="tree">The tree.</param>
-    /// <param name="offset">The offset of the node's begin-node token.</param>
-    /// <param name="addressCells">The parent's address cells, which this node's reg uses.</param>
-    /// <param name="sizeCells">The parent's size cells, which this node's reg uses.</param>
-    /// <param name="parentInterruptCells">The interrupt cells the parent handed down.</param>
-    /// <param name="interruptCells">The interrupt cells this node's interrupts span, 0 when unresolved.</param>
-    internal DeviceTreeNode(DeviceTree tree, uint offset, uint addressCells, uint sizeCells, uint parentInterruptCells, uint interruptCells)
-    {
-        Tree = tree;
-        Offset = offset;
-        AddressCells = addressCells;
-        SizeCells = sizeCells;
-        ParentInterruptCells = parentInterruptCells;
-        InterruptCells = interruptCells;
-    }
-
     /// <summary>The tree, or null for a default instance. Any context.</summary>
     internal DeviceTree? Tree { get; }
 
@@ -51,8 +34,40 @@ internal readonly struct DeviceTreeNode
     /// <summary>Whether the cursor points into a tree. Any context.</summary>
     internal bool IsValid => Tree is not null;
 
+    /// <summary>Whether the node's status is "disabled"; an absent status is okay. Thread context; allocation-free.</summary>
+    internal bool IsDisabled
+    {
+        get
+        {
+            return TryGetProperty("status", out DeviceTreeProperty property) && property.ValueEquals("disabled");
+        }
+    }
+
+    /// <summary>This node's own #address-cells, the default when absent: what its children's reg uses. Thread context; allocation-free.</summary>
+    internal uint ChildAddressCells => ReadCellCount("#address-cells", DeviceTreeFormat.DefaultAddressCells);
+
+    /// <summary>This node's own #size-cells, the default when absent: what its children's reg uses. Thread context; allocation-free.</summary>
+    internal uint ChildSizeCells => ReadCellCount("#size-cells", DeviceTreeFormat.DefaultSizeCells);
+
     /// <summary>The first token after the node's padded name; the block's end when the name is unterminated.</summary>
     private uint BodyOffset => Tree!.SkipName(Offset + (uint)DeviceTreeFormat.TokenBytes);
+
+    /// <summary>Builds the cursor. Thread context; allocation-free.</summary>
+    /// <param name="tree">The tree.</param>
+    /// <param name="offset">The offset of the node's begin-node token.</param>
+    /// <param name="addressCells">The parent's address cells, which this node's reg uses.</param>
+    /// <param name="sizeCells">The parent's size cells, which this node's reg uses.</param>
+    /// <param name="parentInterruptCells">The interrupt cells the parent handed down.</param>
+    /// <param name="interruptCells">The interrupt cells this node's interrupts span, 0 when unresolved.</param>
+    internal DeviceTreeNode(DeviceTree tree, uint offset, uint addressCells, uint sizeCells, uint parentInterruptCells, uint interruptCells)
+    {
+        Tree = tree;
+        Offset = offset;
+        AddressCells = addressCells;
+        SizeCells = sizeCells;
+        ParentInterruptCells = parentInterruptCells;
+        InterruptCells = interruptCells;
+    }
 
     /// <summary>Whether the node's name equals <paramref name="name"/>. Thread context; allocation-free.</summary>
     /// <param name="name">The name to compare with.</param>
@@ -127,18 +142,10 @@ internal readonly struct DeviceTreeNode
 
     /// <summary>Whether the node's compatible list names <paramref name="compatible"/>. Thread context; allocation-free.</summary>
     /// <param name="compatible">The compatible string.</param>
-    internal bool IsCompatible(string compatible) =>
-        TryGetProperty("compatible", out DeviceTreeProperty property) && property.ContainsString(compatible);
-
-    /// <summary>Whether the node's status is "disabled"; an absent status is okay. Thread context; allocation-free.</summary>
-    internal bool IsDisabled =>
-        TryGetProperty("status", out DeviceTreeProperty property) && property.ValueEquals("disabled");
-
-    /// <summary>This node's own #address-cells, the default when absent: what its children's reg uses. Thread context; allocation-free.</summary>
-    internal uint ChildAddressCells => ReadCellCount("#address-cells", DeviceTreeFormat.DefaultAddressCells);
-
-    /// <summary>This node's own #size-cells, the default when absent: what its children's reg uses. Thread context; allocation-free.</summary>
-    internal uint ChildSizeCells => ReadCellCount("#size-cells", DeviceTreeFormat.DefaultSizeCells);
+    internal bool IsCompatible(string compatible)
+    {
+        return TryGetProperty("compatible", out DeviceTreeProperty property) && property.ContainsString(compatible);
+    }
 
     /// <summary>Moves to the node's first child. Thread context; allocation-free.</summary>
     /// <param name="child">The child cursor, or a default instance.</param>

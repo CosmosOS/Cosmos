@@ -25,21 +25,6 @@ internal sealed unsafe class FirmwareDisplay : IDisplay
     /// <summary>The region over the framebuffer, invalidated by <see cref="Retire"/>.</summary>
     private readonly DeviceRegion _framebuffer;
 
-    /// <summary>Builds the display from Limine's description of the framebuffer. Boot thread.</summary>
-    /// <param name="framebuffer">Limine's framebuffer entry.</param>
-    /// <param name="hhdmOffset">The higher-half direct map offset, or 0 without one.</param>
-    internal FirmwareDisplay(LimineFramebuffer* framebuffer, ulong hhdmOffset)
-    {
-        ulong address = (ulong)framebuffer->Address;
-        int width = (int)framebuffer->Width;
-        int height = (int)framebuffer->Height;
-        int pitch = (int)framebuffer->Pitch;
-        Mode = new DisplayMode(width, height, pitch, framebuffer->BitsPerPixel, ParseEdidRefreshRate(framebuffer));
-        Length = (ulong)height * (ulong)pitch;
-        PhysicalAddress = hhdmOffset != 0 && address >= hhdmOffset ? address - hhdmOffset : address;
-        _framebuffer = new DeviceRegion(address, Length, RegionCaching.WriteCombining);
-    }
-
     /// <inheritdoc/>
     public string Name => FramebufferName;
 
@@ -55,6 +40,21 @@ internal sealed unsafe class FirmwareDisplay : IDisplay
     /// <summary>The length of one frame in bytes: height times pitch. Any context; allocation-free.</summary>
     internal ulong Length { get; }
 
+    /// <summary>Builds the display from Limine's description of the framebuffer. Boot thread.</summary>
+    /// <param name="framebuffer">Limine's framebuffer entry.</param>
+    /// <param name="hhdmOffset">The higher-half direct map offset, or 0 without one.</param>
+    internal FirmwareDisplay(LimineFramebuffer* framebuffer, ulong hhdmOffset)
+    {
+        ulong address = (ulong)framebuffer->Address;
+        int width = (int)framebuffer->Width;
+        int height = (int)framebuffer->Height;
+        int pitch = (int)framebuffer->Pitch;
+        Mode = new DisplayMode(width, height, pitch, framebuffer->BitsPerPixel, ParseEdidRefreshRate(framebuffer));
+        Length = (ulong)height * (ulong)pitch;
+        PhysicalAddress = hhdmOffset != 0 && address >= hhdmOffset ? address - hhdmOffset : address;
+        _framebuffer = new DeviceRegion(address, Length, RegionCaching.WriteCombining);
+    }
+
     /// <summary>
     /// Invalidates the framebuffer region: the scanout now belongs to the
     /// driver that bound the function holding it, and a ring still drawing
@@ -62,7 +62,10 @@ internal sealed unsafe class FirmwareDisplay : IDisplay
     /// into the driver's memory. Called by the registry's retirement rule,
     /// from the offer that bound the node.
     /// </summary>
-    internal void Retire() => _framebuffer.Invalidate();
+    internal void Retire()
+    {
+        _framebuffer.Invalidate();
+    }
 
     /// <summary>A no-op: a linear framebuffer is scanned out as it is written.</summary>
     /// <param name="x">Left edge in pixels.</param>
@@ -116,7 +119,7 @@ internal sealed unsafe class FirmwareDisplay : IDisplay
             return DefaultRefreshRate;
         }
 
-        int hz = (int)((pixelClock * 10000) / (hTotal * vTotal));
+        int hz = (int)((pixelClock * 10_000) / (hTotal * vTotal));
         if (hz < 24 || hz > 360)
         {
             return DefaultRefreshRate;

@@ -19,9 +19,6 @@ internal sealed unsafe class DeviceTree
     /// <summary>The blob's first byte, a virtual address the bootloader handed over.</summary>
     private readonly byte* _blob;
 
-    /// <summary>Bytes of the whole blob, from the header.</summary>
-    private readonly uint _totalSize;
-
     /// <summary>Offset of the structure block.</summary>
     private readonly uint _structOffset;
 
@@ -49,14 +46,46 @@ internal sealed unsafe class DeviceTree
     /// <summary>The cells of the cached answer, 0 when <see cref="_cachedResolved"/> is false.</summary>
     private uint _cachedInterruptCells;
 
-    /// <summary>True once a walk met an unknown token.</summary>
-    private bool _walkStopped;
+    /// <summary>The blob's virtual address. Any context.</summary>
+    internal ulong Address => (ulong)_blob;
+
+    /// <summary>Bytes of the whole blob, from the header. Any context.</summary>
+    internal uint TotalSize { get; }
+
+    /// <summary>The format version the header names. Any context; allocation-free.</summary>
+    internal uint Version => ReadCellRaw(_blob, DeviceTreeFormat.VersionOffset);
+
+    /// <summary>True once a walk met an unknown token; the log line of <see cref="MarkWalkStopped"/> is written once. Any context.</summary>
+    internal bool WalkStopped { get; private set; }
+
+    /// <summary>
+    /// The root cursor, with the default cell counts the root's own reg
+    /// would use and the interrupt cells of its interrupt parent. Built on
+    /// each read; the phandle scan's answer is cached after the first.
+    /// Thread context; allocation-free.
+    /// </summary>
+    internal DeviceTreeNode Root
+    {
+        get
+        {
+            uint interruptCells = 0;
+            DeviceTreeNode probe = new(this, _structOffset, DeviceTreeFormat.DefaultAddressCells, DeviceTreeFormat.DefaultSizeCells, 0, 0);
+            if (probe.TryGetProperty("interrupt-parent", out DeviceTreeProperty parent)
+                && parent.TryReadCell(0, out uint phandle)
+                && TryResolveInterruptCells(phandle, out uint cells))
+            {
+                interruptCells = cells;
+            }
+
+            return new DeviceTreeNode(this, _structOffset, DeviceTreeFormat.DefaultAddressCells, DeviceTreeFormat.DefaultSizeCells, interruptCells, interruptCells);
+        }
+    }
 
     /// <summary>Builds the tree over header values <see cref="TryOpen"/> validated.</summary>
     private DeviceTree(byte* blob, uint totalSize, uint structOffset, uint structSize, uint stringsOffset, uint stringsSize)
     {
         _blob = blob;
-        _totalSize = totalSize;
+        TotalSize = totalSize;
         _structOffset = structOffset;
         _structSize = structSize;
         _stringsOffset = stringsOffset;
@@ -127,47 +156,12 @@ internal sealed unsafe class DeviceTree
         return true;
     }
 
-    /// <summary>The blob's virtual address. Any context.</summary>
-    internal ulong Address => (ulong)_blob;
-
-    /// <summary>Bytes of the whole blob, from the header. Any context.</summary>
-    internal uint TotalSize => _totalSize;
-
-    /// <summary>The format version the header names. Any context; allocation-free.</summary>
-    internal uint Version => ReadCellRaw(_blob, DeviceTreeFormat.VersionOffset);
-
-    /// <summary>True once a walk met an unknown token; the log line of <see cref="MarkWalkStopped"/> is written once. Any context.</summary>
-    internal bool WalkStopped => _walkStopped;
-
-    /// <summary>
-    /// The root cursor, with the default cell counts the root's own reg
-    /// would use and the interrupt cells of its interrupt parent. Built on
-    /// each read; the phandle scan's answer is cached after the first.
-    /// Thread context; allocation-free.
-    /// </summary>
-    internal DeviceTreeNode Root
-    {
-        get
-        {
-            uint interruptCells = 0;
-            DeviceTreeNode probe = new(this, _structOffset, DeviceTreeFormat.DefaultAddressCells, DeviceTreeFormat.DefaultSizeCells, 0, 0);
-            if (probe.TryGetProperty("interrupt-parent", out DeviceTreeProperty parent)
-                && parent.TryReadCell(0, out uint phandle)
-                && TryResolveInterruptCells(phandle, out uint cells))
-            {
-                interruptCells = cells;
-            }
-
-            return new DeviceTreeNode(this, _structOffset, DeviceTreeFormat.DefaultAddressCells, DeviceTreeFormat.DefaultSizeCells, interruptCells, interruptCells);
-        }
-    }
-
     /// <summary>Reads the big-endian cell at <paramref name="offset"/>. Any context; allocation-free.</summary>
     /// <param name="offset">The cell's offset in the blob.</param>
     /// <param name="value">The cell, or 0 when it runs past the blob.</param>
     internal bool TryReadCell(uint offset, out uint value)
     {
-        if ((ulong)offset + (uint)DeviceTreeFormat.CellBytes > _totalSize)
+        if ((ulong)offset + (uint)DeviceTreeFormat.CellBytes > TotalSize)
         {
             value = 0;
             return false;
@@ -182,7 +176,7 @@ internal sealed unsafe class DeviceTree
     /// <param name="value">The byte, or 0 when it lies past the blob.</param>
     internal bool TryReadByte(uint offset, out byte value)
     {
-        if (offset >= _totalSize)
+        if (offset >= TotalSize)
         {
             value = 0;
             return false;
@@ -268,7 +262,7 @@ internal sealed unsafe class DeviceTree
     /// <param name="value">The string to compare with.</param>
     internal bool BytesEqual(uint offset, uint length, string value)
     {
-        if (length != (uint)value.Length || (ulong)offset + length > _totalSize)
+        if (length != (uint)value.Length || (ulong)offset + length > TotalSize)
         {
             return false;
         }
@@ -456,12 +450,12 @@ internal sealed unsafe class DeviceTree
     /// <param name="offset">Where it was read.</param>
     internal void MarkWalkStopped(uint token, uint offset)
     {
-        if (_walkStopped)
+        if (WalkStopped)
         {
             return;
         }
 
-        _walkStopped = true;
+        WalkStopped = true;
         Serial.WriteString("[Firmware] Device tree walk stopped: unknown token 0x");
         Serial.WriteHex(token);
         Serial.WriteString(" at offset 0x");

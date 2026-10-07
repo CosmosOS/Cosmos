@@ -9,6 +9,15 @@ namespace Cosmos.Kernel.HAL.Firmware;
 /// </summary>
 internal readonly struct DeviceTreeProperty
 {
+    /// <summary>The tree the value lives in, or null for a default instance.</summary>
+    internal DeviceTree? Tree { get; }
+
+    /// <summary>The offset of the value's first byte in the blob.</summary>
+    internal uint ValueOffset { get; }
+
+    /// <summary>The value's length in bytes.</summary>
+    internal uint Length { get; }
+
     /// <summary>Builds the property over its value bytes.</summary>
     /// <param name="tree">The tree the value lives in.</param>
     /// <param name="valueOffset">The offset of the value's first byte in the blob.</param>
@@ -19,15 +28,6 @@ internal readonly struct DeviceTreeProperty
         ValueOffset = valueOffset;
         Length = length;
     }
-
-    /// <summary>The tree the value lives in, or null for a default instance.</summary>
-    internal DeviceTree? Tree { get; }
-
-    /// <summary>The offset of the value's first byte in the blob.</summary>
-    internal uint ValueOffset { get; }
-
-    /// <summary>The value's length in bytes.</summary>
-    internal uint Length { get; }
 
     /// <summary>Reads cell <paramref name="index"/> of the value, big-endian. Any context; allocation-free.</summary>
     /// <param name="index">The cell's index.</param>

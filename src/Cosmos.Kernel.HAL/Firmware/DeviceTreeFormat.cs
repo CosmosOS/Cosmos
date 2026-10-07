@@ -94,7 +94,10 @@ internal static class DeviceTreeFormat
 
     /// <summary>Rounds a byte offset or length up to the next cell boundary. Any context; allocation-free.</summary>
     /// <param name="value">The offset or length.</param>
-    internal static uint AlignUp(uint value) => (value + 3u) & ~3u;
+    internal static uint AlignUp(uint value)
+    {
+        return (value + 3u) & ~3u;
+    }
 
     /// <summary>
     /// Rounds a length read from the blob up to the next cell boundary in
@@ -103,5 +106,8 @@ internal static class DeviceTreeFormat
     /// context; allocation-free.
     /// </summary>
     /// <param name="value">The length.</param>
-    internal static ulong AlignUp(ulong value) => (value + 3UL) & ~3UL;
+    internal static ulong AlignUp(ulong value)
+    {
+        return (value + 3UL) & ~3UL;
+    }
 }
