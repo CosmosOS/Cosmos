@@ -9,11 +9,14 @@ using Microsoft.CodeAnalysis.Text;
 namespace Cosmos.Tests.SourceGenerators;
 
 /// <summary>
-/// One run of <see cref="CosmosEntryPointGenerator"/> over a kernel
-/// compilation: the ring and kit stubs, a kernel class, the test's own
-/// sources, and the build properties fed through a global analyzer config.
-/// The harness fails when a generated file, or a diagnostic, differs from
-/// what the test declared, or when the compilation does not build.
+/// One run of <see cref="CosmosEntryPointGenerator"/> and
+/// <see cref="DriverManifestGenerator"/> over a kernel compilation: the ring
+/// and kit stubs, a kernel class, the test's own sources, and the build
+/// properties fed through a global analyzer config. Both run together, as in
+/// a kernel build, since the entry point calls the manifest and neither
+/// compiles alone. The harness fails when a generated file, or a diagnostic,
+/// differs from what the test declared, or when the compilation does not
+/// build.
 /// </summary>
 internal sealed class ManifestTest : CSharpSourceGeneratorTest<CosmosEntryPointGenerator, DefaultVerifier>
 {
@@ -79,7 +82,7 @@ internal sealed class ManifestTest : CSharpSourceGeneratorTest<CosmosEntryPointG
     /// <param name="statements">Statements from <see cref="GeneratedText.Registration"/> and <see cref="GeneratedText.GuardedRegistration"/>.</param>
     public ManifestTest ExpectManifest(params string[] statements)
     {
-        TestState.GeneratedSources.Add((typeof(CosmosEntryPointGenerator), "DriverManifest.g.cs", SourceText.From(GeneratedText.Manifest(statements), Encoding.UTF8)));
+        TestState.GeneratedSources.Add((typeof(DriverManifestGenerator), "DriverManifest.g.cs", SourceText.From(GeneratedText.Manifest(statements), Encoding.UTF8)));
         return this;
     }
 
@@ -91,10 +94,16 @@ internal sealed class ManifestTest : CSharpSourceGeneratorTest<CosmosEntryPointG
         return this;
     }
 
-    /// <summary>Runs the generator and verifies everything declared.</summary>
+    /// <summary>Runs the generators and verifies everything declared.</summary>
     public Task RunAsync()
     {
         TestState.AnalyzerConfigFiles.Add((ConfigPath, _config.ToString()));
         return RunAsync(CancellationToken.None);
+    }
+
+    /// <summary>Both generators, in place of the base class's single type argument.</summary>
+    protected override IEnumerable<Type> GetSourceGenerators()
+    {
+        return [typeof(CosmosEntryPointGenerator), typeof(DriverManifestGenerator)];
     }
 }

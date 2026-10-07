@@ -9,7 +9,7 @@ namespace Cosmos.Tests.SourceGenerators;
 /// sources: what is emitted, in what order, under which guards, and what the
 /// policy lists and the diagnostics do.
 /// </summary>
-public sealed class CosmosEntryPointGeneratorTests
+public sealed class SourceDriverTests
 {
     private const string Prelude = "using Cosmos.Kernel.HAL.DriverKit;\n\n";
 

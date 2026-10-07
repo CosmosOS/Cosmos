@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Cosmos.Kernel.SourceGenerators;
 
 /// <summary>
-/// The build properties the generator reads, made visible to it by the
+/// The build properties the generators read, made visible to them by the
 /// <c>CompilerVisibleProperty</c> items in <c>build/Cosmos.Kernel.SourceGenerators.props</c>.
 /// </summary>
 /// <param name="KernelClass"><c>CosmosKernelClass</c>: the kernel type the entry point constructs; nothing is generated without it.</param>
