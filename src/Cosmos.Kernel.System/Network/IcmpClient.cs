@@ -30,15 +30,20 @@ public sealed class IcmpClient : IDisposable
     /// arm this: closing only stops delivery to this client, and
     /// <see cref="Connect"/> reopens it.
     /// </summary>
-    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
+    private void ThrowIfDisposed()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+    }
 
     /// <summary>
     /// Gets the client connected to a destination address.
     /// </summary>
     /// <param name="address">The destination address.</param>
     /// <returns>If a client is connected to the given address, the <see cref="IcmpClient"/>; otherwise, <see langword="null"/>.</returns>
-    internal static IcmpClient? GetClient(Address address) =>
-        s_clients.TryGetValue(address, out IcmpClient? client) ? client : null;
+    internal static IcmpClient? GetClient(Address address)
+    {
+        return s_clients.TryGetValue(address, out IcmpClient? client) ? client : null;
+    }
 
     /// <summary>
     /// Connects to the given client.
@@ -168,7 +173,10 @@ public sealed class IcmpClient : IDisposable
     /// Receives data from the given packet.
     /// </summary>
     /// <param name="packet">The packet to receive.</param>
-    internal void ReceiveData(IcmpPacket packet) => _rxBuffer.Enqueue(packet);
+    internal void ReceiveData(IcmpPacket packet)
+    {
+        _rxBuffer.Enqueue(packet);
+    }
 
     /// <summary>
     /// Closes the client and retires it. Unlike <see cref="Close"/>, which a

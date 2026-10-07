@@ -252,16 +252,20 @@ internal class IPv6Packet : InternetPacket
     /// The MAC of the device configured with <paramref name="source"/>, or
     /// <see cref="MacAddress.None"/> when no device carries it.
     /// </summary>
-    private static MacAddress GetSourceMac(Address6 source) =>
-        NetworkStack.AddressMap.TryGetValue(source, out INetworkDevice? device) ? device.MacAddress : MacAddress.None;
+    private static MacAddress GetSourceMac(Address6 source)
+    {
+        return NetworkStack.AddressMap.TryGetValue(source, out INetworkDevice? device) ? device.MacAddress : MacAddress.None;
+    }
 
     /// <summary>
     /// The destination MAC a build constructor can settle at once: the mapped
     /// address for a multicast group, <see cref="MacAddress.None"/> for a
     /// unicast destination that Neighbor Discovery resolves at send time.
     /// </summary>
-    private static MacAddress GetDestinationMac(Address6 destination) =>
-        destination.IsMulticast ? MulticastMac(destination) : MacAddress.None;
+    private static MacAddress GetDestinationMac(Address6 destination)
+    {
+        return destination.IsMulticast ? MulticastMac(destination) : MacAddress.None;
+    }
 
     /// <summary>
     /// Parses the header fields from <see cref="EthernetPacket.RawData"/>, in
@@ -286,7 +290,10 @@ internal class IPv6Packet : InternetPacket
     /// yields zero when that section is intact.
     /// </summary>
     /// <param name="length">The upper-layer length: the whole IPv6 payload.</param>
-    private protected ushort CalcUpperLayerChecksum(ushort length) => ComputeTransportChecksum(NextHeader, length);
+    private protected ushort CalcUpperLayerChecksum(ushort length)
+    {
+        return ComputeTransportChecksum(NextHeader, length);
+    }
 
     /// <summary>
     /// Computes a transport checksum with the IPv6 pseudo-header of RFC 8200
@@ -309,9 +316,14 @@ internal class IPv6Packet : InternetPacket
     }
 
     /// <inheritdoc/>
-    internal override bool Enqueue() => IPv6OutgoingBuffer.AddPacket(this);
+    internal override bool Enqueue()
+    {
+        return IPv6OutgoingBuffer.AddPacket(this);
+    }
 
     /// <inheritdoc/>
-    public override string ToString() =>
-        $"IPv6 Packet Src={SourceIP}, Dest={DestinationIP}, NextHeader={NextHeader}, HopLimit={HopLimit}, PayloadLen={PayloadLength}";
+    public override string ToString()
+    {
+        return $"IPv6 Packet Src={SourceIP}, Dest={DestinationIP}, NextHeader={NextHeader}, HopLimit={HopLimit}, PayloadLen={PayloadLength}";
+    }
 }

@@ -88,15 +88,20 @@ public class UdpClient : IDisposable
     /// arm this: closing only stops delivery to this client, and the DHCP flow
     /// closes itself mid-exchange and keeps going.
     /// </summary>
-    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
+    private void ThrowIfDisposed()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+    }
 
     /// <summary>
     /// Gets a UDP client running on the given port.
     /// </summary>
     /// <param name="destPort">Destination port.</param>
     /// <returns>If a client is running on the given port, the <see cref="UdpClient"/>; otherwise, <see langword="null"/>.</returns>
-    internal static UdpClient? GetClient(ushort destPort) =>
-        s_clients.TryGetValue(destPort, out UdpClient? client) ? client : null;
+    internal static UdpClient? GetClient(ushort destPort)
+    {
+        return s_clients.TryGetValue(destPort, out UdpClient? client) ? client : null;
+    }
 
     /// <summary>
     /// Connects to the given client.
@@ -115,7 +120,10 @@ public class UdpClient : IDisposable
     /// <summary>
     /// Closes the active connection.
     /// </summary>
-    public void Close() => s_clients.Remove((uint)_localPort);
+    public void Close()
+    {
+        s_clients.Remove((uint)_localPort);
+    }
 
     /// <summary>
     /// Sends data to the client.
@@ -259,7 +267,10 @@ public class UdpClient : IDisposable
     /// Receives data from the given packet.
     /// </summary>
     /// <param name="packet">Packet to receive.</param>
-    internal void ReceiveData(UdpPacket packet) => _rxBuffer.Enqueue(packet);
+    internal void ReceiveData(UdpPacket packet)
+    {
+        _rxBuffer.Enqueue(packet);
+    }
 
     /// <summary>
     /// Closes the client and retires it. Unlike <see cref="Close"/>, which a

@@ -77,6 +77,8 @@ internal sealed class KitNetworkDevice : INetworkDevice
     /// <param name="data">The frame.</param>
     /// <param name="length">How many bytes of it to send.</param>
     /// <returns>False when the device is withdrawn, the arguments are unusable or the interface did not take the frame.</returns>
-    public bool Send(byte[] data, int length) =>
-        !Published.IsWithdrawn && data is not null && length > 0 && length <= data.Length && _network.Transmit(data.AsSpan(0, length));
+    public bool Send(byte[] data, int length)
+    {
+        return !Published.IsWithdrawn && data is not null && length > 0 && length <= data.Length && _network.Transmit(data.AsSpan(0, length));
+    }
 }

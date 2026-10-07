@@ -30,7 +30,10 @@ public sealed class DnsClient : UdpClient
     /// Connects to a DNS server on port 53.
     /// </summary>
     /// <param name="address">The DNS server address.</param>
-    public void Connect(Address address) => Connect(address, 53);
+    public void Connect(Address address)
+    {
+        Connect(address, 53);
+    }
 
     /// <summary>
     /// Sends a DNS query for the given domain name string.

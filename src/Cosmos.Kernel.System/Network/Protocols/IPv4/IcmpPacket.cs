@@ -159,7 +159,10 @@ public class IcmpPacket : IPPacket
     /// </summary>
     /// <param name="length">The number of bytes to sum: the ICMP header plus payload.</param>
     /// <returns>The checksum value.</returns>
-    private protected ushort CalcIcmpCrc(ushort length) => CalcOcCrc(DataOffset, length);
+    private protected ushort CalcIcmpCrc(ushort length)
+    {
+        return CalcOcCrc(DataOffset, length);
+    }
 
     /// <summary>
     /// Returns a fresh copy of the ICMP payload (the bytes after the 8-byte
@@ -182,8 +185,10 @@ public class IcmpPacket : IPPacket
     /// Returns a string describing the packet's source, destination, type, and code.
     /// </summary>
     /// <returns>The description string.</returns>
-    public override string ToString() =>
-        $"ICMP Packet Src={SourceIP}, Dest={DestinationIP}, Type={_icmpType}, Code={_icmpCode}";
+    public override string ToString()
+    {
+        return $"ICMP Packet Src={SourceIP}, Dest={DestinationIP}, Type={_icmpType}, Code={_icmpCode}";
+    }
 }
 
 /// <summary>
@@ -265,8 +270,10 @@ public class IcmpEchoRequest : IcmpPacket
     /// Returns a string describing the request's source, destination, identifier, and sequence number.
     /// </summary>
     /// <returns>The description string.</returns>
-    public override string ToString() =>
-        $"ICMP Echo Request Src={SourceIP}, Dest={DestinationIP}, ID={_icmpId}, Sequence={_icmpSequence}";
+    public override string ToString()
+    {
+        return $"ICMP Echo Request Src={SourceIP}, Dest={DestinationIP}, ID={_icmpId}, Sequence={_icmpSequence}";
+    }
 }
 
 /// <summary>
@@ -346,6 +353,8 @@ public class IcmpEchoReply : IcmpPacket
     /// Returns a string describing the reply's source, destination, identifier, and sequence number.
     /// </summary>
     /// <returns>The description string.</returns>
-    public override string ToString() =>
-        $"ICMP Echo Reply Src={SourceIP}, Dest={DestinationIP}, ID={_icmpId}, Sequence={_icmpSequence}";
+    public override string ToString()
+    {
+        return $"ICMP Echo Reply Src={SourceIP}, Dest={DestinationIP}, ID={_icmpId}, Sequence={_icmpSequence}";
+    }
 }

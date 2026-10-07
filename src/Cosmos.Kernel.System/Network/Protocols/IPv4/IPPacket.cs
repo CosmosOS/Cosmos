@@ -257,8 +257,10 @@ public class IPPacket : InternetPacket
     /// <summary>
     /// Gets the source MAC address from the NetworkStack based on source IP.
     /// </summary>
-    private static MacAddress GetSourceMac(Address sourceIP) =>
-        NetworkStack.AddressMap.TryGetValue(sourceIP, out INetworkDevice? device) ? device.MacAddress : MacAddress.None;
+    private static MacAddress GetSourceMac(Address sourceIP)
+    {
+        return NetworkStack.AddressMap.TryGetValue(sourceIP, out INetworkDevice? device) ? device.MacAddress : MacAddress.None;
+    }
 
     /// <summary>
     /// Parses the IPv4 header fields from <see cref="EthernetPacket.RawData"/>,
@@ -289,14 +291,20 @@ public class IPPacket : InternetPacket
     /// </summary>
     /// <param name="offset">The offset, in bytes.</param>
     /// <param name="length">The length, in bytes.</param>
-    private protected ushort CalcOcCrc(ushort offset, ushort length) => CalcOcCrc(RawData, offset, length);
+    private protected ushort CalcOcCrc(ushort offset, ushort length)
+    {
+        return CalcOcCrc(RawData, offset, length);
+    }
 
     /// <summary>
     /// Computes the IPv4 header checksum over the first
     /// <paramref name="headerLength"/> bytes of the IP header.
     /// </summary>
     /// <param name="headerLength">The length of the header, in bytes.</param>
-    private protected ushort CalcIPCrc(ushort headerLength) => CalcOcCrc(14, headerLength);
+    private protected ushort CalcIPCrc(ushort headerLength)
+    {
+        return CalcOcCrc(14, headerLength);
+    }
 
     /// <summary>
     /// Computes a transport checksum with the IPv4 pseudo-header of RFC 793:
@@ -318,9 +326,14 @@ public class IPPacket : InternetPacket
     }
 
     /// <inheritdoc/>
-    internal override bool Enqueue() => IPv4OutgoingBuffer.AddPacket(this);
+    internal override bool Enqueue()
+    {
+        return IPv4OutgoingBuffer.AddPacket(this);
+    }
 
     /// <inheritdoc/>
-    public override string ToString() =>
-        $"IP Packet Src={SourceIP}, Dest={DestinationIP}, Protocol={Protocol}, TTL={TTL}, DataLen={DataLength}";
+    public override string ToString()
+    {
+        return $"IP Packet Src={SourceIP}, Dest={DestinationIP}, Protocol={Protocol}, TTL={TTL}, DataLen={DataLength}";
+    }
 }

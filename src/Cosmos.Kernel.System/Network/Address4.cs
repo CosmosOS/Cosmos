@@ -46,7 +46,10 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     /// Creates a new <see cref="Address4"/> instance from the packed address.
     /// </summary>
     /// <param name="address">The four octets packed into one number, the first octet in the most significant byte.</param>
-    public Address4(uint address) => Segment1 = address;
+    public Address4(uint address)
+    {
+        Segment1 = address;
+    }
 
     /// <summary>
     /// Creates a new <see cref="Address4"/> instance from its four octets.
@@ -55,7 +58,10 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     /// <param name="second">Second block of the address.</param>
     /// <param name="third">Third block of the address.</param>
     /// <param name="fourth">Fourth block of the address.</param>
-    public Address4(byte first, byte second, byte third, byte fourth) => Segment1 = ToUint32(first, second, third, fourth);
+    public Address4(byte first, byte second, byte third, byte fourth)
+    {
+        Segment1 = ToUint32(first, second, third, fourth);
+    }
 
     /// <summary>
     /// Creates a new <see cref="Address4"/> instance from four bytes of <paramref name="buffer"/>.
@@ -145,25 +151,40 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     /// Whether this is an APIPA (link-local) address, one in <c>169.254.0.0/16</c>.
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    public bool IsAPIPA() => (Segment1 >> 16) == 0xA9_FE; // 169, 254
+    public bool IsAPIPA()
+    {
+        return (Segment1 >> 16) == 0xA9_FE; // 169, 254
+    }
 
     /// <summary>
     /// Formats the address in dotted-decimal notation (e.g. <c>192.168.1.1</c>).
     /// </summary>
-    public override string ToString() => ToString(AddressNumericStyle.Dec);
+    public override string ToString()
+    {
+        return ToString(AddressNumericStyle.Dec);
+    }
 
     /// <summary>
     /// Orders addresses by their numeric value (<see cref="Segment1"/>); a
     /// <see langword="null"/> address sorts first.
     /// </summary>
     /// <param name="other">The address to compare with.</param>
-    public int CompareTo(Address4? other) => other is null ? 1 : Segment1.CompareTo(other.Segment1);
+    public int CompareTo(Address4? other)
+    {
+        return other is null ? 1 : Segment1.CompareTo(other.Segment1);
+    }
 
     /// <inheritdoc />
-    public override bool Equals([NotNullWhen(true)] object? obj) => ReferenceEquals(this, obj) || obj is Address4 other && Equals(other);
+    public override bool Equals([NotNullWhen(true)] object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is Address4 other && Equals(other);
+    }
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Segment1);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Segment1);
+    }
 
     /// <inheritdoc />
     protected override MaskedAddress OperatorBitwiseAnd(Address other)
@@ -182,7 +203,10 @@ public sealed class Address4 : Address, IComparable<Address4>, IEquatable<Addres
     /// </summary>
     /// <param name="other">The address to compare with, or <see langword="null"/>.</param>
     /// <returns><see langword="true"/> for the same four bytes; <see langword="false"/> otherwise and for <see langword="null"/>.</returns>
-    public bool Equals([NotNullWhen(true)] Address4? other) => other is not null && Segment1 == other.Segment1;
+    public bool Equals([NotNullWhen(true)] Address4? other)
+    {
+        return other is not null && Segment1 == other.Segment1;
+    }
 
     /// <summary>
     /// Formats the address as four dotted octets in the given number base.

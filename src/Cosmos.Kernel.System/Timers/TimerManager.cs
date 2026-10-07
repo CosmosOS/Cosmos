@@ -123,8 +123,10 @@ public static class TimerManager
     /// the next tick.
     /// </param>
     /// <returns>The scheduled timer, or null if no timer device is registered.</returns>
-    public static SoftwareTimer? Schedule(Action callback, TimeSpan delay) =>
-        ScheduleCore(callback, ToNanoseconds(delay), recurring: false);
+    public static SoftwareTimer? Schedule(Action callback, TimeSpan delay)
+    {
+        return ScheduleCore(callback, ToNanoseconds(delay), recurring: false);
+    }
 
     /// <summary>
     /// Schedules a callback to run repeatedly with the specified period. The

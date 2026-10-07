@@ -233,7 +233,10 @@ public class Canvas
     /// is published: the kernel has no framebuffer from the bootloader and no
     /// display driver bound a device.
     /// </exception>
-    public static Canvas GetFullScreen() => FullScreenCanvas.Get();
+    public static Canvas GetFullScreen()
+    {
+        return FullScreenCanvas.Get();
+    }
 
     /// <summary>
     /// Gets the full-screen canvas on the primary display, switching the
@@ -247,7 +250,10 @@ public class Canvas
     /// </param>
     /// <exception cref="InvalidOperationException">Graphics support is compiled out with CosmosEnableGraphics=false, or no display is published.</exception>
     /// <exception cref="ArgumentOutOfRangeException">The display can switch modes and does not support <paramref name="mode"/>.</exception>
-    public static Canvas GetFullScreen(Mode mode) => FullScreenCanvas.Get(mode);
+    public static Canvas GetFullScreen(Mode mode)
+    {
+        return FullScreenCanvas.Get(mode);
+    }
 
     /// <summary>
     /// Drops the full-screen canvas, after its <see cref="Disable"/> released
@@ -256,24 +262,36 @@ public class Canvas
     /// display. Any canvas already acquired is dead after this call. The
     /// display itself stays in its mode: there is no text mode to return to.
     /// </summary>
-    public static void DisableFullScreen() => FullScreenCanvas.Disable();
+    public static void DisableFullScreen()
+    {
+        FullScreenCanvas.Disable();
+    }
 
     /// <summary>
     /// Clears the canvas with the default color.
     /// </summary>
-    public void Clear() => Clear(Color.Black);
+    public void Clear()
+    {
+        Clear(Color.Black);
+    }
 
     /// <summary>
     /// Clears the entire canvas with the specified color.
     /// </summary>
     /// <param name="color">The ARGB color to clear the screen with.</param>
-    public virtual void Clear(int color) => Array.Fill(_buffer, color);
+    public virtual void Clear(int color)
+    {
+        Array.Fill(_buffer, color);
+    }
 
     /// <summary>
     /// Clears the entire canvas with the specified color.
     /// </summary>
     /// <param name="color">The color to clear the screen with.</param>
-    public virtual void Clear(Color color) => Clear(color.ToArgb());
+    public virtual void Clear(Color color)
+    {
+        Clear(color.ToArgb());
+    }
 
     /// <summary>
     /// Releases what the canvas holds on its device; the canvas is dead
@@ -457,7 +475,10 @@ public class Canvas
     /// display-backed canvas is buffered too. The return type stays nullable
     /// for callers written against the earlier contract.
     /// </summary>
-    public int[]? GetBuffer() => _buffer;
+    public int[]? GetBuffer()
+    {
+        return _buffer;
+    }
 
     /// <summary>
     /// Draws an array of pixels to the canvas, starting at the given
@@ -496,7 +517,9 @@ public class Canvas
     /// <param name="width">The width of the drawn bitmap.</param>
     /// <param name="height">The height of the drawn bitmap.</param>
     public virtual void DrawArray(int[] colors, int x, int y, int width, int height)
-        => CopyRows(colors, 0, width, x, y, width, height);
+    {
+        CopyRows(colors, 0, width, x, y, width, height);
+    }
 
     /// <summary>
     /// Draws an array of raw ARGB pixels to the canvas, starting at the given
@@ -509,7 +532,9 @@ public class Canvas
     /// <param name="height">The height of the drawn bitmap.</param>
     /// <param name="startIndex">The index in <paramref name="colors"/> of the first pixel.</param>
     public virtual void DrawArray(int[] colors, int x, int y, int width, int height, int startIndex)
-        => CopyRows(colors, startIndex, width, x, y, width, height);
+    {
+        CopyRows(colors, startIndex, width, x, y, width, height);
+    }
 
     /// <summary>
     /// Draws another canvas onto this one at the specified position, as row

@@ -231,8 +231,10 @@ public static class Mbr
     /// Locate the first extended partition (system ID 0x05, 0x0F, or 0x85)
     /// in the MBR's primary table and return its absolute start LBA.
     /// </summary>
-    public static bool TryGetExtendedPartition(IBlockDevice device, out ulong startSector) =>
-        TryGetExtendedPartition(device, out startSector, out _);
+    public static bool TryGetExtendedPartition(IBlockDevice device, out ulong startSector)
+    {
+        return TryGetExtendedPartition(device, out startSector, out _);
+    }
 
     /// <summary>
     /// As <see cref="TryGetExtendedPartition(IBlockDevice, out ulong)"/> but
@@ -388,8 +390,10 @@ public static class Mbr
     /// the entries this refuses, and <c>MoveWithData</c> must decline before
     /// it copies rather than after.
     /// </remarks>
-    internal static bool IsMutableSystemId(byte systemId) =>
-        systemId is not (SystemIdEmpty or SystemIdExtendedChs or SystemIdExtendedLba or SystemIdLinuxExtended or SystemIdGptProtective);
+    internal static bool IsMutableSystemId(byte systemId)
+    {
+        return systemId is not (SystemIdEmpty or SystemIdExtendedChs or SystemIdExtendedLba or SystemIdLinuxExtended or SystemIdGptProtective);
+    }
 
     /// <summary>
     /// Whether [<paramref name="startSector"/>, +<paramref name="sectorCount"/>)

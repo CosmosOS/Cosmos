@@ -307,8 +307,10 @@ public static class PartitionManager
     }
 
     /// <summary>Primary slot whose entry covers exactly <paramref name="location"/>, or -1.</summary>
-    private static int FindMbrSlot(IBlockDevice device, PartitionLocation location) =>
-        FindMbrSlot(device, location, out _);
+    private static int FindMbrSlot(IBlockDevice device, PartitionLocation location)
+    {
+        return FindMbrSlot(device, location, out _);
+    }
 
     /// <summary>
     /// As <see cref="FindMbrSlot(IBlockDevice, PartitionLocation)"/>, also

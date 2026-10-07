@@ -293,8 +293,10 @@ public static class Ebr
     /// <see cref="PartitionManager.MoveWithData"/> asks it before copying
     /// data so a refused move never touches the disk.
     /// </summary>
-    internal static bool CanMoveLogical(IBlockDevice device, ulong extendedStartSector, int logicalIndex, ulong newStartSector) =>
-        TryPlanMove(device, extendedStartSector, logicalIndex, newStartSector, out _, out _);
+    internal static bool CanMoveLogical(IBlockDevice device, ulong extendedStartSector, int logicalIndex, ulong newStartSector)
+    {
+        return TryPlanMove(device, extendedStartSector, logicalIndex, newStartSector, out _, out _);
+    }
 
     /// <summary>
     /// Resolve a logical move: walk the chain to the

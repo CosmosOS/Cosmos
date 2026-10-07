@@ -89,7 +89,10 @@ public class IPConfig
     /// <see cref="NetworkStack.RemoveAllConfigIP"/> is the complete reset and
     /// the only caller.
     /// </summary>
-    internal static void RemoveAll() => s_configs.Clear();
+    internal static void RemoveAll()
+    {
+        s_configs.Clear();
+    }
 
     /// <summary>
     /// The configuration in force on a device, or null when it has none.
@@ -238,8 +241,10 @@ public class IPConfig
     /// Find the interface by the given IP address.
     /// </summary>
     /// <param name="sourceIP">Source IP.</param>
-    internal static INetworkDevice? FindInterface(Address sourceIP) =>
-        NetworkStack.AddressMap.TryGetValue(sourceIP, out INetworkDevice? device) ? device : null;
+    internal static INetworkDevice? FindInterface(Address sourceIP)
+    {
+        return NetworkStack.AddressMap.TryGetValue(sourceIP, out INetworkDevice? device) ? device : null;
+    }
 
     /// <summary>
     /// Find route to address.

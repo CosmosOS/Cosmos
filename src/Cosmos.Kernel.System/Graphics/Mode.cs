@@ -41,11 +41,16 @@ public readonly struct Mode : IEquatable<Mode>
     /// <paramref name="other"/>.
     /// </summary>
     /// <param name="other">The mode to compare with.</param>
-    public bool Equals(Mode other) =>
-        Width == other.Width && Height == other.Height && ColorDepth == other.ColorDepth;
+    public bool Equals(Mode other)
+    {
+        return Width == other.Width && Height == other.Height && ColorDepth == other.ColorDepth;
+    }
 
     /// <inheritdoc />
-    public override bool Equals(object? obj) => obj is Mode mode && Equals(mode);
+    public override bool Equals(object? obj)
+    {
+        return obj is Mode mode && Equals(mode);
+    }
 
     /// <inheritdoc />
     public override int GetHashCode()
@@ -84,35 +89,56 @@ public readonly struct Mode : IEquatable<Mode>
     /// <summary>Checks whether the two modes are equal.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator ==(Mode a, Mode b) => a.Equals(b);
+    public static bool operator ==(Mode a, Mode b)
+    {
+        return a.Equals(b);
+    }
 
     /// <summary>Checks whether the two modes differ.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator !=(Mode a, Mode b) => !(a == b);
+    public static bool operator !=(Mode a, Mode b)
+    {
+        return !(a == b);
+    }
 
     /// <summary>Checks whether <paramref name="a"/> has a higher resolution than <paramref name="b"/>, per <see cref="CompareTo"/>.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator >(Mode a, Mode b) => a.CompareTo(b) > 0;
+    public static bool operator >(Mode a, Mode b)
+    {
+        return a.CompareTo(b) > 0;
+    }
 
     /// <summary>Checks whether <paramref name="a"/> has a lower resolution than <paramref name="b"/>, per <see cref="CompareTo"/>.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator <(Mode a, Mode b) => a.CompareTo(b) < 0;
+    public static bool operator <(Mode a, Mode b)
+    {
+        return a.CompareTo(b) < 0;
+    }
 
     /// <summary>Checks whether <paramref name="a"/> compares greater than or equal to <paramref name="b"/>, per <see cref="CompareTo"/>.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator >=(Mode a, Mode b) => a.CompareTo(b) >= 0;
+    public static bool operator >=(Mode a, Mode b)
+    {
+        return a.CompareTo(b) >= 0;
+    }
 
     /// <summary>Checks whether <paramref name="a"/> compares less than or equal to <paramref name="b"/>, per <see cref="CompareTo"/>.</summary>
     /// <param name="a">The first mode.</param>
     /// <param name="b">The second mode.</param>
-    public static bool operator <=(Mode a, Mode b) => a.CompareTo(b) <= 0;
+    public static bool operator <=(Mode a, Mode b)
+    {
+        return a.CompareTo(b) <= 0;
+    }
 
     /// <summary>
     /// Formats the mode as <c>width x height @ depth</c>, e.g. <c>1024x768@32</c>.
     /// </summary>
-    public override string ToString() => $"{Width}x{Height}@{(int)ColorDepth}";
+    public override string ToString()
+    {
+        return $"{Width}x{Height}@{(int)ColorDepth}";
+    }
 }

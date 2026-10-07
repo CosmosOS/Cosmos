@@ -29,7 +29,10 @@ public sealed class Ext2FileSystemType : IVfsFileSystemType
     /// empty (test seam).
     /// </summary>
     /// <param name="device">The block device holding the volume.</param>
-    public Ext2FileSystemType(IBlockDevice device) => _injectedDevice = device;
+    public Ext2FileSystemType(IBlockDevice device)
+    {
+        _injectedDevice = device;
+    }
 
     /// <inheritdoc />
     public bool TryMount(ReadOnlySpan<char> source, MountFlags flags, [NotNullWhen(true)] out IVfsSuperblock? superblock)

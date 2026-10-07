@@ -53,8 +53,13 @@ public static class NetworkManager
     /// Gets the primary network device. Internal: a kernel names a device with
     /// a <see cref="NetworkAdapter"/> rather than holding the contract.
     /// </summary>
-    internal static INetworkDevice? PrimaryDevice =>
-        s_primaryIndex >= 0 && s_devices is not null ? s_devices[s_primaryIndex] : null;
+    internal static INetworkDevice? PrimaryDevice
+    {
+        get
+        {
+            return s_primaryIndex >= 0 && s_devices is not null ? s_devices[s_primaryIndex] : null;
+        }
+    }
 
     /// <summary>
     /// The adapter the ring uses when no other is named: the target of
@@ -87,8 +92,10 @@ public static class NetworkManager
     /// </summary>
     /// <param name="index">Registration index, from 0 to <see cref="DeviceCount"/> - 1.</param>
     /// <returns>A handle to that device, or one whose <see cref="NetworkAdapter.IsValid"/> is false when there is none.</returns>
-    public static NetworkAdapter GetAdapter(int index) =>
-        index >= 0 && index < DeviceCount ? new NetworkAdapter(index) : default;
+    public static NetworkAdapter GetAdapter(int index)
+    {
+        return index >= 0 && index < DeviceCount ? new NetworkAdapter(index) : default;
+    }
 
     /// <summary>
     /// The primary device's name, or null when there is no device.

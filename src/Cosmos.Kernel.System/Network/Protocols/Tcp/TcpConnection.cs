@@ -815,8 +815,10 @@ internal class TcpConnection : IDisposable
     }
 
     internal bool Equals(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
-        => LocalEndPoint.Port.Equals(localPort) && RemoteEndPoint.Port.Equals(remotePort) &&
-           LocalEndPoint.Address.Equals(localIp) && RemoteEndPoint.Address.Equals(remoteIp);
+    {
+        return LocalEndPoint.Port.Equals(localPort) && RemoteEndPoint.Port.Equals(remotePort) &&
+               LocalEndPoint.Address.Equals(localIp) && RemoteEndPoint.Address.Equals(remoteIp);
+    }
 
     #endregion
 

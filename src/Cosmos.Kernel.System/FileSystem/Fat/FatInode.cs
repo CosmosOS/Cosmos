@@ -37,8 +37,13 @@ internal sealed class FatInode : IVfsInode
     /// True for the FAT12/16 root directory, which lives in the fixed root
     /// region after the FATs rather than in a cluster chain.
     /// </summary>
-    public bool IsFixedRoot =>
-        Parent is null && Superblock.Boot.Type != FatType.Fat32 && Superblock.Boot.RootSectorCount > 0;
+    public bool IsFixedRoot
+    {
+        get
+        {
+            return Parent is null && Superblock.Boot.Type != FatType.Fat32 && Superblock.Boot.RootSectorCount > 0;
+        }
+    }
 
     internal FatInode(
         FatSuperblock superblock,
@@ -72,5 +77,8 @@ internal sealed class FatInode : IVfsInode
         return chain;
     }
 
-    public void InvalidateChain() => CachedChain = null;
+    public void InvalidateChain()
+    {
+        CachedChain = null;
+    }
 }

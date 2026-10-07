@@ -38,10 +38,16 @@ internal sealed class FatSuperblock : IVfsSuperblock
         Root = root;
     }
 
-    public void Drop() => _inodeCache.Clear();
+    public void Drop()
+    {
+        _inodeCache.Clear();
+    }
 
     /// <summary>Flush the device's volatile write cache — the durability point for sync and unmount.</summary>
-    public void Flush() => _device.Flush();
+    public void Flush()
+    {
+        _device.Flush();
+    }
 
     public void ReadCluster(uint cluster, Span<byte> data)
     {

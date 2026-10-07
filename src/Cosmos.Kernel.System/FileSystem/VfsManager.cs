@@ -59,9 +59,11 @@ public static partial class VfsManager
     /// </summary>
     /// <returns><c>true</c> when registration succeeds; <c>false</c> if name is invalid, driver is null, or already registered.</returns>
     public static bool RegisterFileSystem(string name, IVfsFileSystemType fileSystemType)
-        => !string.IsNullOrWhiteSpace(name)
-            && fileSystemType is not null
-            && s_registeredTypes.TryAdd(name, fileSystemType);
+    {
+        return !string.IsNullOrWhiteSpace(name)
+               && fileSystemType is not null
+               && s_registeredTypes.TryAdd(name, fileSystemType);
+    }
 
     /// <summary>
     /// Resolves a registered driver by name. Guards the key the way
@@ -90,7 +92,9 @@ public static partial class VfsManager
     /// <param name="mount">Resulting mount data.</param>
     /// <returns><c>true</c> on success, <c>false</c> if driver is missing or mount fails.</returns>
     public static bool TryMount(string name, ReadOnlySpan<char> source, MountFlags flags, string mountPoint, [NotNullWhen(true)] out VfsMount? mount)
-        => TryMount(name, source, flags, mountPoint, null, out mount);
+    {
+        return TryMount(name, source, flags, mountPoint, null, out mount);
+    }
 
     /// <summary>
     /// Mount a registered filesystem driver on <paramref name="partition"/>.
@@ -626,7 +630,9 @@ public static partial class VfsManager
     }
 
     private static bool IsSymbolicLink(IVfsInode inode)
-        => inode.InodeOperations.GetAttr(inode, out VfsStat stat) && stat.IsSymbolicLink;
+    {
+        return inode.InodeOperations.GetAttr(inode, out VfsStat stat) && stat.IsSymbolicLink;
+    }
 
     /// <summary>
     /// True when <paramref name="mountPoint"/> (normalized: leading /, no

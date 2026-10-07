@@ -93,7 +93,10 @@ public sealed class Partition : IBlockDevice
     }
 
     /// <inheritdoc />
-    public void Flush() => Host.Flush();
+    public void Flush()
+    {
+        Host.Flush();
+    }
 
     private void CheckBounds(ulong blockNo, ulong blockCount)
     {

@@ -305,7 +305,10 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
     /// section 2.7.1): <c>ff02::1:ff00:0/104</c> followed by its low 24 bits.
     /// Neighbor Solicitations for the address are sent to this group.
     /// </summary>
-    public Address6 ToSolicitedNodeMulticast() => new Address6(0xFF02_0000, 0, 1, 0xFF00_0000 | (Segment4 & 0x00FF_FFFF));
+    public Address6 ToSolicitedNodeMulticast()
+    {
+        return new Address6(0xFF02_0000, 0, 1, 0xFF00_0000 | (Segment4 & 0x00FF_FFFF));
+    }
 
     /// <summary>
     /// Counts the colons in <paramref name="addr"/>.
@@ -599,10 +602,16 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
     }
 
     /// <inheritdoc />
-    public override bool Equals([NotNullWhen(true)] object? obj) => ReferenceEquals(this, obj) || obj is Address6 other && Equals(other);
+    public override bool Equals([NotNullWhen(true)] object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is Address6 other && Equals(other);
+    }
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Segment1, Segment2, Segment3, Segment4);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Segment1, Segment2, Segment3, Segment4);
+    }
 
     /// <summary>
     /// Checks whether <paramref name="other"/> holds the same sixteen bytes.
@@ -631,7 +640,10 @@ public class Address6 : Address, IComparable<Address6>, IEquatable<Address6>
     /// Formats the address in its shortest form: lowercase hexadecimal groups without leading
     /// zeros and the longest run of zero groups abbreviated to <c>::</c>.
     /// </summary>
-    public override string ToString() => ToString(leadingZeros: false);
+    public override string ToString()
+    {
+        return ToString(leadingZeros: false);
+    }
 
     /// <summary>
     /// Formats the address as eight colon-separated hexadecimal groups.

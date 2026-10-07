@@ -37,7 +37,10 @@ public sealed class Png : Image
     /// Initializes a new instance of the <see cref="Png"/> class from a stream containing PNG data.
     /// </summary>
     /// <param name="stream">The stream containing PNG data.</param>
-    public Png(Stream stream) : base(0, 0, ColorDepth.ColorDepth32) => Create(stream);
+    public Png(Stream stream) : base(0, 0, ColorDepth.ColorDepth32)
+    {
+        Create(stream);
+    }
 
     private void Create(Stream stream)
     {

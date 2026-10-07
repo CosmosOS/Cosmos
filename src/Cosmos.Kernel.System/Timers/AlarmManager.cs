@@ -28,7 +28,10 @@ public static class AlarmManager
     /// <param name="callback">Method to invoke when the delay expires.</param>
     /// <param name="delay">Delay before the alarm fires.</param>
     /// <returns>The alarm ID to pass to <see cref="Cancel"/>, or 0 when the alarm could not be scheduled because the scheduler is not running.</returns>
-    public static ulong Schedule(Action callback, TimeSpan delay) => AlarmSystem.Add(delay, callback);
+    public static ulong Schedule(Action callback, TimeSpan delay)
+    {
+        return AlarmSystem.Add(delay, callback);
+    }
 
     /// <summary>
     /// Schedules a callback to run repeatedly with the specified period, in
@@ -39,12 +42,18 @@ public static class AlarmManager
     /// <param name="callback">Method to invoke each period.</param>
     /// <param name="period">Period between firings; must be positive. Resolution is bounded by the scheduler tick.</param>
     /// <returns>The alarm ID to pass to <see cref="Cancel"/>, or 0 when the alarm could not be scheduled because the scheduler is not running or the period is not positive.</returns>
-    public static ulong ScheduleRecurring(Action callback, TimeSpan period) => AlarmSystem.AddRecurring(period, callback);
+    public static ulong ScheduleRecurring(Action callback, TimeSpan period)
+    {
+        return AlarmSystem.AddRecurring(period, callback);
+    }
 
     /// <summary>
     /// Cancels a pending alarm.
     /// </summary>
     /// <param name="id">ID returned by <see cref="Schedule"/> or <see cref="ScheduleRecurring"/>.</param>
     /// <returns>True when the alarm was pending and has been cancelled; false when it had already fired or the ID is unknown.</returns>
-    public static bool Cancel(ulong id) => AlarmSystem.Remove(id);
+    public static bool Cancel(ulong id)
+    {
+        return AlarmSystem.Remove(id);
+    }
 }

@@ -217,7 +217,10 @@ internal sealed class NeighborSolicitation : NdpPacket
     }
 
     /// <inheritdoc/>
-    public override string ToString() => $"Neighbor Solicitation Src={SourceIP}, Dest={DestinationIP}, Target={Target}";
+    public override string ToString()
+    {
+        return $"Neighbor Solicitation Src={SourceIP}, Dest={DestinationIP}, Target={Target}";
+    }
 }
 
 /// <summary>
@@ -298,5 +301,8 @@ internal sealed class NeighborAdvertisement : NdpPacket
     }
 
     /// <inheritdoc/>
-    public override string ToString() => $"Neighbor Advertisement Src={SourceIP}, Dest={DestinationIP}, Target={Target}";
+    public override string ToString()
+    {
+        return $"Neighbor Advertisement Src={SourceIP}, Dest={DestinationIP}, Target={Target}";
+    }
 }

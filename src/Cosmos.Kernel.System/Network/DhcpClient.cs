@@ -43,7 +43,10 @@ public sealed class DhcpClient : UdpClient
     /// Gets the address of the DHCP server for a device, taken to be its default
     /// gateway, or null when the device has no IP configuration.
     /// </summary>
-    internal static Address? DHCPServerAddress(INetworkDevice networkDevice) => IPConfig.Get(networkDevice)?.DefaultGateway;
+    internal static Address? DHCPServerAddress(INetworkDevice networkDevice)
+    {
+        return IPConfig.Get(networkDevice)?.DefaultGateway;
+    }
 
     /// <summary>
     /// Waits for the server's reply and acts on it: an offer is answered with a

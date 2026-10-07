@@ -399,19 +399,28 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// Group descriptor for a block group index.
     /// </summary>
     /// <param name="groupIndex">Zero-based block group.</param>
-    internal Ext2GroupDesc GetGroup(uint groupIndex) => _groups[groupIndex];
+    internal Ext2GroupDesc GetGroup(uint groupIndex)
+    {
+        return _groups[groupIndex];
+    }
 
     /// <summary>
     /// Block group holding an inode number.
     /// </summary>
     /// <param name="inodeNumber">One-based inode number.</param>
-    internal uint GroupOfInode(uint inodeNumber) => (inodeNumber - 1) / InodesPerGroup;
+    internal uint GroupOfInode(uint inodeNumber)
+    {
+        return (inodeNumber - 1) / InodesPerGroup;
+    }
 
     /// <summary>
     /// Index of an inode number within its block group.
     /// </summary>
     /// <param name="inodeNumber">One-based inode number.</param>
-    internal uint IndexInGroup(uint inodeNumber) => (inodeNumber - 1) % InodesPerGroup;
+    internal uint IndexInGroup(uint inodeNumber)
+    {
+        return (inodeNumber - 1) % InodesPerGroup;
+    }
 
     /// <summary>
     /// Read an inode from its table, consulting the live-inode cache first.
@@ -1070,7 +1079,10 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// Drops the indirect block cache. Called after any write that mutates
     /// indirect block contents outside <see cref="GetBlockPointer"/>.
     /// </summary>
-    private void InvalidateIndirCache() => _indirCacheBlk = uint.MaxValue;
+    private void InvalidateIndirCache()
+    {
+        _indirCacheBlk = uint.MaxValue;
+    }
 
     /// <summary>
     /// Clear a logical block pointer (used when truncating). Indirect slots

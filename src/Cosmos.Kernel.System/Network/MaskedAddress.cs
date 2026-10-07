@@ -67,9 +67,12 @@ public readonly ref struct MaskedAddress : IEquatable<MaskedAddress>
     /// Checks whether <paramref name="other"/> holds the same bytes and family.
     /// </summary>
     /// <param name="other">The masked address to compare with.</param>
-    public bool Equals(MaskedAddress other) => Segment1 == other.Segment1 && Segment2 == other.Segment2 &&
-                                               Segment3 == other.Segment3 && Segment4 == other.Segment4 &&
-                                               AddressFamily == other.AddressFamily;
+    public bool Equals(MaskedAddress other)
+    {
+        return Segment1 == other.Segment1 && Segment2 == other.Segment2 &&
+               Segment3 == other.Segment3 && Segment4 == other.Segment4 &&
+               AddressFamily == other.AddressFamily;
+    }
 
     /// <summary>
     /// Checks whether two masked addresses hold the same bytes and family.
@@ -77,7 +80,10 @@ public readonly ref struct MaskedAddress : IEquatable<MaskedAddress>
     /// <param name="a">The first masked address.</param>
     /// <param name="b">The second masked address.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(MaskedAddress a, MaskedAddress b) => a.Equals(b);
+    public static bool operator ==(MaskedAddress a, MaskedAddress b)
+    {
+        return a.Equals(b);
+    }
 
     /// <summary>
     /// Checks whether two masked addresses differ in bytes or family.
@@ -85,7 +91,10 @@ public readonly ref struct MaskedAddress : IEquatable<MaskedAddress>
     /// <param name="a">The first masked address.</param>
     /// <param name="b">The second masked address.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(MaskedAddress a, MaskedAddress b) => !(a == b);
+    public static bool operator !=(MaskedAddress a, MaskedAddress b)
+    {
+        return !(a == b);
+    }
 
     /// <summary>
     /// The byte at <paramref name="index"/>, counted from the most significant one.
@@ -120,5 +129,8 @@ public readonly ref struct MaskedAddress : IEquatable<MaskedAddress>
     /// </summary>
     /// <param name="obj">Ignored.</param>
     /// <exception cref="NotImplementedException">Always.</exception>
-    public override bool Equals(object obj) => throw new NotImplementedException();
+    public override bool Equals(object obj)
+    {
+        throw new NotImplementedException();
+    }
 }

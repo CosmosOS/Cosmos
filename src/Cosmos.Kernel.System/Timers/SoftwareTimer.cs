@@ -44,5 +44,8 @@ public sealed class SoftwareTimer
     /// Wraps a registry entry in the handle the ring hands out.
     /// </summary>
     /// <param name="entry">The entry the timer device counts down.</param>
-    internal SoftwareTimer(TimerEntry entry) => Entry = entry;
+    internal SoftwareTimer(TimerEntry entry)
+    {
+        Entry = entry;
+    }
 }

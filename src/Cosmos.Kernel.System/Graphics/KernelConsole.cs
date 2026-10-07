@@ -330,22 +330,34 @@ public class KernelConsole
     /// <summary>
     /// Sets the foreground color from ConsoleColor enum.
     /// </summary>
-    internal void SetForegroundColor(ConsoleColor color) => _foregroundColor = s_palette[(int)color];
+    internal void SetForegroundColor(ConsoleColor color)
+    {
+        _foregroundColor = s_palette[(int)color];
+    }
 
     /// <summary>
     /// Sets the background color from ConsoleColor enum.
     /// </summary>
-    internal void SetBackgroundColor(ConsoleColor color) => _backgroundColor = s_palette[(int)color];
+    internal void SetBackgroundColor(ConsoleColor color)
+    {
+        _backgroundColor = s_palette[(int)color];
+    }
 
     /// <summary>
     /// Converts ConsoleColor to uint color.
     /// </summary>
-    internal static uint ConsoleColorToUint(ConsoleColor color) => s_palette[(int)color];
+    internal static uint ConsoleColorToUint(ConsoleColor color)
+    {
+        return s_palette[(int)color];
+    }
 
     /// <summary>
     /// Gets the cell index for a given row and column.
     /// </summary>
-    private int GetIndex(int row, int col) => row * Cols + col;
+    private int GetIndex(int row, int col)
+    {
+        return row * Cols + col;
+    }
 
     /// <summary>
     /// Clears all cells to empty with current colors.
@@ -674,7 +686,10 @@ public class KernelConsole
     /// Performs a carriage return (move to column 0).
     /// Must be called with the lock held.
     /// </summary>
-    private void DoCarriageReturn() => _cursorX = 0;
+    private void DoCarriageReturn()
+    {
+        _cursorX = 0;
+    }
 
     /// <summary>
     /// Performs a backspace (move cursor back and clear character).
@@ -702,13 +717,19 @@ public class KernelConsole
     /// Moves the cursor left by one position. Thread-safe; a no-op in the
     /// first column.
     /// </summary>
-    internal void MoveCursorLeft() => MoveCursorBy(-1, 0);
+    internal void MoveCursorLeft()
+    {
+        MoveCursorBy(-1, 0);
+    }
 
     /// <summary>
     /// Moves the cursor right by one position. Thread-safe; a no-op in the
     /// last column.
     /// </summary>
-    internal void MoveCursorRight() => MoveCursorBy(1, 0);
+    internal void MoveCursorRight()
+    {
+        MoveCursorBy(1, 0);
+    }
 
     /// <summary>
     /// Scrolls the terminal up by one line.

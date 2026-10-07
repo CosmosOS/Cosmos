@@ -154,7 +154,10 @@ public abstract class Canvas3D : Canvas
     /// Draws a mesh at the world origin.
     /// </summary>
     /// <param name="mesh">The mesh to draw; must have been created by this canvas.</param>
-    public void DrawMesh(Mesh mesh) => DrawMesh(mesh, Matrix4x4.Identity);
+    public void DrawMesh(Mesh mesh)
+    {
+        DrawMesh(mesh, Matrix4x4.Identity);
+    }
 
     /// <summary>
     /// Draws a solid axis-aligned cube.
@@ -275,11 +278,13 @@ public abstract class Canvas3D : Canvas
     /// <param name="topology">How the indices assemble into primitives.</param>
     /// <param name="driverData">The backend's state for the mesh, read back with <see cref="DriverDataOf(Mesh)"/>.</param>
     /// <returns>The mesh handle.</returns>
-    protected Mesh CreateMeshHandle(int vertexCount, int indexCount, Texture? texture, MeshTopology topology, object? driverData) =>
-        new Mesh(this, vertexCount, indexCount, texture, topology)
+    protected Mesh CreateMeshHandle(int vertexCount, int indexCount, Texture? texture, MeshTopology topology, object? driverData)
+    {
+        return new Mesh(this, vertexCount, indexCount, texture, topology)
         {
             DriverData = driverData,
         };
+    }
 
     /// <summary>
     /// Creates the handle for a texture this canvas uploaded, owned by this
@@ -290,8 +295,10 @@ public abstract class Canvas3D : Canvas
     /// <param name="height">The height of the texture in pixels.</param>
     /// <param name="driverData">The backend's state for the texture, read back with <see cref="DriverDataOf(Texture)"/>.</param>
     /// <returns>The texture handle.</returns>
-    protected Texture CreateTextureHandle(int width, int height, object? driverData) =>
-        new Texture(this, width, height, driverData);
+    protected Texture CreateTextureHandle(int width, int height, object? driverData)
+    {
+        return new Texture(this, width, height, driverData);
+    }
 
     /// <summary>
     /// The backend's state attached to a mesh by <see cref="CreateMeshHandle"/>

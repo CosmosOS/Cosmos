@@ -36,5 +36,8 @@ internal struct Cell
     /// <summary>
     /// Creates an empty cell (a null character) in the given colors.
     /// </summary>
-    public static Cell Empty(uint foreground, uint background) => new('\0', foreground, background);
+    public static Cell Empty(uint foreground, uint background)
+    {
+        return new('\0', foreground, background);
+    }
 }

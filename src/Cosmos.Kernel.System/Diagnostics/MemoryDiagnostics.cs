@@ -61,5 +61,8 @@ public static class MemoryDiagnostics
     /// the count of freed objects is reported back to the caller.
     /// </summary>
     /// <returns>Number of objects freed by the collection.</returns>
-    public static int Collect() => KernelHeap.Collect();
+    public static int Collect()
+    {
+        return KernelHeap.Collect();
+    }
 }

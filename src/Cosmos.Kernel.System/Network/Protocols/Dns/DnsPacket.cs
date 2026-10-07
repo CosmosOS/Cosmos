@@ -394,8 +394,10 @@ public class DnsPacket : UdpPacket
     }
 
     /// <inheritdoc/>
-    public override string ToString() =>
-        $"DNS Packet Src={SourceIP}:{SourcePort}, Dest={DestinationIP}:{DestinationPort}";
+    public override string ToString()
+    {
+        return $"DNS Packet Src={SourceIP}:{SourcePort}, Dest={DestinationIP}:{DestinationPort}";
+    }
 }
 
 /// <summary>

@@ -198,7 +198,10 @@ public abstract class InternetPacket : EthernetPacket
     /// The raw value of IPv4 header byte 20: the 3 flag bits followed by the
     /// upper 5 bits of the fragment offset, which is always zero here.
     /// </summary>
-    private static byte FragmentFlags(bool dontFragment) => dontFragment ? (byte)0x40 : (byte)0x00;
+    private static byte FragmentFlags(bool dontFragment)
+    {
+        return dontFragment ? (byte)0x40 : (byte)0x00;
+    }
 
     /// <summary>
     /// Throws when the two addresses are not of the same IP version, which no
@@ -261,5 +264,7 @@ public abstract class InternetPacket : EthernetPacket
     /// <param name="offset">The offset to start at, in bytes.</param>
     /// <param name="length">The number of bytes to sum.</param>
     internal static ushort CalcOcCrc(ReadOnlySpan<byte> buffer, int offset, int length)
-        => (ushort)~Fold(SumWords(buffer, offset, length));
+    {
+        return (ushort)~Fold(SumWords(buffer, offset, length));
+    }
 }

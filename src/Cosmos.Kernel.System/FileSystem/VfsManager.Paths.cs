@@ -335,7 +335,10 @@ public static partial class VfsManager
 
     // ---------------- open-handle tracking ----------------
 
-    internal static void RegisterOpenFile(VfsFileHandle handle) => s_openFileHandles.Add(handle);
+    internal static void RegisterOpenFile(VfsFileHandle handle)
+    {
+        s_openFileHandles.Add(handle);
+    }
 
     /// <summary>Called from <see cref="VfsFileHandle.Dispose"/> on tracked handles;
     /// executes a deferred unlink once the last handle on the node closes.</summary>

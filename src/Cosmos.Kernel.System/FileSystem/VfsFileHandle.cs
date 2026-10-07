@@ -67,10 +67,15 @@ internal sealed class VfsFileHandle : IVfsFileHandle
         return true;
     }
 
-    public bool TryFlush() => !_disposed && _openFile.Operations.Fsync(_openFile);
+    public bool TryFlush()
+    {
+        return !_disposed && _openFile.Operations.Fsync(_openFile);
+    }
 
-    public bool TrySetAttr(SetAttrFlags flags, in VfsStat attributes) =>
-        !_disposed && Inode.InodeOperations.SetAttr(Inode, flags, attributes);
+    public bool TrySetAttr(SetAttrFlags flags, in VfsStat attributes)
+    {
+        return !_disposed && Inode.InodeOperations.SetAttr(Inode, flags, attributes);
+    }
 
     public bool TryStat(out VfsStat stat)
     {
@@ -100,5 +105,8 @@ internal sealed class VfsFileHandle : IVfsFileHandle
         }
     }
 
-    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
+    private void ThrowIfDisposed()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+    }
 }

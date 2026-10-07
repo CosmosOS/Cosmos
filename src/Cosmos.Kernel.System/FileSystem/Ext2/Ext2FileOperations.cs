@@ -24,7 +24,10 @@ internal sealed class Ext2FileOperations : IFileOperations
     /// Creates file operations bound to a mounted volume.
     /// </summary>
     /// <param name="superblock">The mounted volume.</param>
-    public Ext2FileOperations(Ext2Superblock superblock) => _superblock = superblock;
+    public Ext2FileOperations(Ext2Superblock superblock)
+    {
+        _superblock = superblock;
+    }
 
     /// <summary>
     /// Read bytes at the open file's position. Unallocated blocks (holes)
@@ -252,7 +255,10 @@ internal sealed class Ext2FileOperations : IFileOperations
     /// Release driver-side state when the open file is closed (flushes first).
     /// </summary>
     /// <param name="openFile">Open file being closed.</param>
-    public void Release(IVfsOpenFile openFile) => Fsync(openFile);
+    public void Release(IVfsOpenFile openFile)
+    {
+        Fsync(openFile);
+    }
 
     /// <summary>
     /// Read a symlink's target: inline from i_block for short targets, from

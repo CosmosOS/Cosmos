@@ -216,7 +216,10 @@ internal class Icmpv6Packet : IPv6Packet
     /// as a receiver does. Sums the whole section on every call.
     /// </summary>
     /// <returns>True when the section is intact.</returns>
-    public bool VerifyChecksum() => CalcUpperLayerChecksum(PayloadLength) == 0;
+    public bool VerifyChecksum()
+    {
+        return CalcUpperLayerChecksum(PayloadLength) == 0;
+    }
 
     /// <summary>
     /// Returns a fresh copy of the body after the 8-byte ICMPv6 header.
@@ -231,8 +234,10 @@ internal class Icmpv6Packet : IPv6Packet
     }
 
     /// <inheritdoc/>
-    public override string ToString() =>
-        $"ICMPv6 Packet Src={SourceIP}, Dest={DestinationIP}, Type={IcmpType}, Code={IcmpCode}";
+    public override string ToString()
+    {
+        return $"ICMPv6 Packet Src={SourceIP}, Dest={DestinationIP}, Type={IcmpType}, Code={IcmpCode}";
+    }
 }
 
 /// <summary>
@@ -301,8 +306,10 @@ internal sealed class Icmpv6EchoRequest : Icmpv6Packet
     }
 
     /// <inheritdoc/>
-    public override string ToString() =>
-        $"ICMPv6 Echo Request Src={SourceIP}, Dest={DestinationIP}, ID={IcmpId}, Sequence={IcmpSequence}";
+    public override string ToString()
+    {
+        return $"ICMPv6 Echo Request Src={SourceIP}, Dest={DestinationIP}, ID={IcmpId}, Sequence={IcmpSequence}";
+    }
 }
 
 /// <summary>
@@ -357,6 +364,8 @@ internal sealed class Icmpv6EchoReply : Icmpv6Packet
     }
 
     /// <inheritdoc/>
-    public override string ToString() =>
-        $"ICMPv6 Echo Reply Src={SourceIP}, Dest={DestinationIP}, ID={IcmpId}, Sequence={IcmpSequence}";
+    public override string ToString()
+    {
+        return $"ICMPv6 Echo Reply Src={SourceIP}, Dest={DestinationIP}, ID={IcmpId}, Sequence={IcmpSequence}";
+    }
 }

@@ -61,21 +61,28 @@ public abstract class Address : IComparable<Address>
     /// <param name="addr">The IP address as string.</param>
     /// <returns>The parsed address value or null when parsing fails.</returns>
     public static Address? Parse(ReadOnlySpan<char> addr)
-        => Address4.Parse(addr, AddressNumericStyle.Dec) ?? (Address?)Address6.Parse(addr);
+    {
+        return Address4.Parse(addr, AddressNumericStyle.Dec) ?? (Address?)Address6.Parse(addr);
+    }
 
     /// <summary>
     /// Packs the first four bytes of <paramref name="buffer"/> into one number, the first byte
     /// in the most significant position.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static uint ToUint32(ReadOnlySpan<byte> buffer) => ToUint32(buffer[0], buffer[1], buffer[2], buffer[3]);
+    internal static uint ToUint32(ReadOnlySpan<byte> buffer)
+    {
+        return ToUint32(buffer[0], buffer[1], buffer[2], buffer[3]);
+    }
 
     /// <summary>
     /// Packs four octets into one number, <paramref name="first"/> in the most significant byte.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static uint ToUint32(byte first, byte second, byte third, byte fourth)
-        => (uint)((first << 24) | (second << 16) | (third << 8) | fourth);
+    {
+        return (uint)((first << 24) | (second << 16) | (third << 8) | fourth);
+    }
 
     /// <summary>
     /// Writes the four bytes of <paramref name="segment"/> to <paramref name="destination"/>,
@@ -128,7 +135,10 @@ public abstract class Address : IComparable<Address>
     /// <param name="a">The address to mask.</param>
     /// <param name="b">The mask.</param>
     /// <exception cref="ArgumentException">The two addresses are not of the same family.</exception>
-    public static MaskedAddress operator &(Address a, Address b) => a.OperatorBitwiseAnd(b);
+    public static MaskedAddress operator &(Address a, Address b)
+    {
+        return a.OperatorBitwiseAnd(b);
+    }
 
     /// <summary>
     /// Masks this address with <paramref name="other"/> bit by bit.
@@ -164,5 +174,8 @@ public abstract class Address : IComparable<Address>
     /// </summary>
     /// <param name="a">The first address.</param>
     /// <param name="b">The second address.</param>
-    public static bool operator !=(Address a, Address b) => !(a == b);
+    public static bool operator !=(Address a, Address b)
+    {
+        return !(a == b);
+    }
 }

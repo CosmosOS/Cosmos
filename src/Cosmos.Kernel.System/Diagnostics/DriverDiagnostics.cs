@@ -233,27 +233,36 @@ public static class DriverDiagnostics
             node.LastFault);
     }
 
-    private static DeviceNodeState MapState(NodeState state) => state switch
+    private static DeviceNodeState MapState(NodeState state)
     {
-        NodeState.Pending => DeviceNodeState.Pending,
-        NodeState.Bound => DeviceNodeState.Bound,
-        NodeState.Unbound => DeviceNodeState.Unbound,
-        _ => DeviceNodeState.Retracted,
-    };
+        return state switch
+        {
+            NodeState.Pending => DeviceNodeState.Pending,
+            NodeState.Bound => DeviceNodeState.Bound,
+            NodeState.Unbound => DeviceNodeState.Unbound,
+            _ => DeviceNodeState.Retracted,
+        };
+    }
 
-    private static DeviceOfferOutcome MapOutcome(ProbeOutcome outcome) => outcome switch
+    private static DeviceOfferOutcome MapOutcome(ProbeOutcome outcome)
     {
-        ProbeOutcome.Bound => DeviceOfferOutcome.Bound,
-        ProbeOutcome.Declined => DeviceOfferOutcome.Declined,
-        _ => DeviceOfferOutcome.Failed,
-    };
+        return outcome switch
+        {
+            ProbeOutcome.Bound => DeviceOfferOutcome.Bound,
+            ProbeOutcome.Declined => DeviceOfferOutcome.Declined,
+            _ => DeviceOfferOutcome.Failed,
+        };
+    }
 
-    private static PublishedDeviceKind MapKind(DeviceKind kind) => kind switch
+    private static PublishedDeviceKind MapKind(DeviceKind kind)
     {
-        DeviceKind.Keyboard => PublishedDeviceKind.Keyboard,
-        DeviceKind.Pointer => PublishedDeviceKind.Pointer,
-        DeviceKind.Network => PublishedDeviceKind.Network,
-        DeviceKind.Block => PublishedDeviceKind.Block,
-        _ => PublishedDeviceKind.Display,
-    };
+        return kind switch
+        {
+            DeviceKind.Keyboard => PublishedDeviceKind.Keyboard,
+            DeviceKind.Pointer => PublishedDeviceKind.Pointer,
+            DeviceKind.Network => PublishedDeviceKind.Network,
+            DeviceKind.Block => PublishedDeviceKind.Block,
+            _ => PublishedDeviceKind.Display,
+        };
+    }
 }

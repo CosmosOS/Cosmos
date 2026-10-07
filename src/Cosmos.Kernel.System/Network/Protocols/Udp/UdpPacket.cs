@@ -212,17 +212,21 @@ public class UdpPacket
     /// <summary>
     /// Builds the internet packet for a datagram of <paramref name="dataLength"/> payload bytes.
     /// </summary>
-    private static InternetPacket Build(Address source, Address dest, ushort dataLength) =>
-        InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolUdp,
+    private static InternetPacket Build(Address source, Address dest, ushort dataLength)
+    {
+        return InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolUdp,
             (ushort)(dataLength + UdpHeaderLength), false);
+    }
 
     /// <summary>
     /// Builds the internet packet for a datagram of <paramref name="dataLength"/> payload bytes,
     /// with the destination MAC address already known.
     /// </summary>
-    private static InternetPacket Build(Address source, Address dest, ushort dataLength, MacAddress destMac) =>
-        InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolUdp,
+    private static InternetPacket Build(Address source, Address dest, ushort dataLength, MacAddress destMac)
+    {
+        return InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolUdp,
             (ushort)(dataLength + UdpHeaderLength), false, destMac);
+    }
 
     /// <summary>
     /// Handles a received UDP datagram, of either version: a datagram whose
@@ -377,6 +381,8 @@ public class UdpPacket
     /// Returns a string with the source and destination endpoints and the payload length.
     /// </summary>
     /// <returns>A human-readable summary of the packet.</returns>
-    public override string ToString() =>
-        $"UDP Packet Src={SourceIP}:{SourcePort},Dest={DestinationIP}:{DestinationPort}, DataLen={UdpDataLength}";
+    public override string ToString()
+    {
+        return $"UDP Packet Src={SourceIP}:{SourcePort},Dest={DestinationIP}:{DestinationPort}, DataLen={UdpDataLength}";
+    }
 }

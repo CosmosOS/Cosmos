@@ -106,7 +106,10 @@ internal sealed class KitNetworkConsumer : NetworkConsumer
     }
 
     /// <inheritdoc/>
-    public override void OnLinkChanged(PublishedDevice device, bool up) => Find(device)?.LinkUp = up;
+    public override void OnLinkChanged(PublishedDevice device, bool up)
+    {
+        Find(device)?.LinkUp = up;
+    }
 
     /// <summary>The adapter of a published device, by reference: a scan of a copy-on-write array, allocation-free. Any context.</summary>
     private KitNetworkDevice? Find(PublishedDevice device)

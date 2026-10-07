@@ -168,6 +168,8 @@ internal static class FatAttributes
         return days * SecondsPerDay + hour * SecondsPerHour + minute * SecondsPerMinute + second;
     }
 
-    private static bool IsLeap(int year) =>
-        (year % LeapYearInterval == 0 && year % LeapCenturyException != 0) || year % LeapQuadCenturyInterval == 0;
+    private static bool IsLeap(int year)
+    {
+        return (year % LeapYearInterval == 0 && year % LeapCenturyException != 0) || year % LeapQuadCenturyInterval == 0;
+    }
 }

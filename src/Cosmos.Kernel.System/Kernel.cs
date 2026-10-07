@@ -158,5 +158,8 @@ public abstract partial class Kernel
     /// <summary>
     /// Signals the kernel to stop the main loop.
     /// </summary>
-    public void Stop() => Stopped = true;
+    public void Stop()
+    {
+        Stopped = true;
+    }
 }

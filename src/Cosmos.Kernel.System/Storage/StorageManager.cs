@@ -75,7 +75,10 @@ public static class StorageManager
 
         /// <summary>The same entry with another partition list.</summary>
         /// <param name="partitions">The new partitions.</param>
-        public BlockDeviceEntry WithPartitions(Partition[] partitions) => new(Device, NodePath, DriverName, partitions);
+        public BlockDeviceEntry WithPartitions(Partition[] partitions)
+        {
+            return new(Device, NodePath, DriverName, partitions);
+        }
     }
 
     /// <summary>The device table, in the order of <see cref="Compare"/>; replaced whole on every change.</summary>

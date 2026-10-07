@@ -265,13 +265,16 @@ public static class SchedulerDiagnostics
             hasPriority);
     }
 
-    private static KernelThreadState MapState(SchedulerThreadState state) => state switch
+    private static KernelThreadState MapState(SchedulerThreadState state)
     {
-        SchedulerThreadState.Created => KernelThreadState.Created,
-        SchedulerThreadState.Ready => KernelThreadState.Ready,
-        SchedulerThreadState.Running => KernelThreadState.Running,
-        SchedulerThreadState.Blocked => KernelThreadState.Blocked,
-        SchedulerThreadState.Sleeping => KernelThreadState.Sleeping,
-        _ => KernelThreadState.Dead,
-    };
+        return state switch
+        {
+            SchedulerThreadState.Created => KernelThreadState.Created,
+            SchedulerThreadState.Ready => KernelThreadState.Ready,
+            SchedulerThreadState.Running => KernelThreadState.Running,
+            SchedulerThreadState.Blocked => KernelThreadState.Blocked,
+            SchedulerThreadState.Sleeping => KernelThreadState.Sleeping,
+            _ => KernelThreadState.Dead,
+        };
+    }
 }

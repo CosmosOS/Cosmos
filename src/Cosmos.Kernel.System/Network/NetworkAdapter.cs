@@ -88,27 +88,39 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
         }
     }
 
-    internal NetworkAdapter(int index) => _slot = index + 1;
+    internal NetworkAdapter(int index)
+    {
+        _slot = index + 1;
+    }
 
     /// <summary>
     /// Whether two handles name the same registered device.
     /// </summary>
     /// <param name="other">The handle to compare against.</param>
     /// <returns>True when both name the same device, or both name none.</returns>
-    public bool Equals(NetworkAdapter other) => _slot == other._slot;
+    public bool Equals(NetworkAdapter other)
+    {
+        return _slot == other._slot;
+    }
 
     /// <summary>
     /// Whether <paramref name="obj"/> is a handle naming the same device.
     /// </summary>
     /// <param name="obj">Object to compare against.</param>
     /// <returns>True when it is a <see cref="NetworkAdapter"/> naming the same device.</returns>
-    public override bool Equals(object? obj) => obj is NetworkAdapter other && Equals(other);
+    public override bool Equals(object? obj)
+    {
+        return obj is NetworkAdapter other && Equals(other);
+    }
 
     /// <summary>
     /// Get a hash code derived from the registration index.
     /// </summary>
     /// <returns>Hash code for this handle.</returns>
-    public override int GetHashCode() => _slot;
+    public override int GetHashCode()
+    {
+        return _slot;
+    }
 
     /// <summary>
     /// Whether two handles name the same registered device.
@@ -116,7 +128,10 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
     /// <param name="left">First handle.</param>
     /// <param name="right">Second handle.</param>
     /// <returns>True when both name the same device.</returns>
-    public static bool operator ==(NetworkAdapter left, NetworkAdapter right) => left.Equals(right);
+    public static bool operator ==(NetworkAdapter left, NetworkAdapter right)
+    {
+        return left.Equals(right);
+    }
 
     /// <summary>
     /// Whether two handles name different devices.
@@ -124,5 +139,8 @@ public readonly struct NetworkAdapter : IEquatable<NetworkAdapter>
     /// <param name="left">First handle.</param>
     /// <param name="right">Second handle.</param>
     /// <returns>True when they name different devices.</returns>
-    public static bool operator !=(NetworkAdapter left, NetworkAdapter right) => !left.Equals(right);
+    public static bool operator !=(NetworkAdapter left, NetworkAdapter right)
+    {
+        return !left.Equals(right);
+    }
 }

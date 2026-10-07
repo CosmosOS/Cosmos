@@ -309,8 +309,10 @@ public class TcpPacket
     /// Builds the internet packet for a segment of <paramref name="segmentLength"/>
     /// bytes. TCP sets Don't Fragment on IPv4, which IPv6 has no equivalent of.
     /// </summary>
-    private static InternetPacket Build(Address source, Address dest, ushort segmentLength) =>
-        InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolTcp, segmentLength, true);
+    private static InternetPacket Build(Address source, Address dest, ushort segmentLength)
+    {
+        return InternetPacket.CreateForTransport(source, dest, InternetPacket.ProtocolTcp, segmentLength, true);
+    }
 
     /// <summary>
     /// Handles a received TCP segment, of either version. A segment whose
@@ -444,8 +446,10 @@ public class TcpPacket
     /// <summary>
     /// Copies <paramref name="raw"/> into the payload area, after the 20 byte header.
     /// </summary>
-    internal void AddRawData(byte[] raw) =>
+    internal void AddRawData(byte[] raw)
+    {
         raw.CopyTo(RawData.AsSpan(DataOffset + TcpHeaderMinimumLength, raw.Length));
+    }
 
     /// <summary>
     /// Computes the checksum over the segment as it stands, stores it, and
@@ -531,6 +535,8 @@ public class TcpPacket
     /// Returns a string describing the segment: source and destination endpoints, flags, sequence number and acknowledgment number.
     /// </summary>
     /// <returns>A human readable summary of the segment.</returns>
-    public override string ToString() =>
-        $"TCP Packet {SourceIP}:{SourcePort} -> {DestinationIP}:{DestinationPort} (flags={GetFlags()}, seq={SequenceNumber}, ack={AckNumber})";
+    public override string ToString()
+    {
+        return $"TCP Packet {SourceIP}:{SourcePort} -> {DestinationIP}:{DestinationPort} (flags={GetFlags()}, seq={SequenceNumber}, ack={AckNumber})";
+    }
 }

@@ -524,9 +524,11 @@ public static class Gpt
     /// header has no entries to overlap. The range must already be bounded
     /// against the device.
     /// </summary>
-    internal static bool OverlapsOtherEntry(IBlockDevice device, int excludeIndex, ulong startSector, ulong sectorCount) =>
-        TryReadEntryArrayLayout(device, out EntryArrayLayout layout)
-        && OverlapsOtherEntry(device, layout, excludeIndex, startSector, sectorCount);
+    internal static bool OverlapsOtherEntry(IBlockDevice device, int excludeIndex, ulong startSector, ulong sectorCount)
+    {
+        return TryReadEntryArrayLayout(device, out EntryArrayLayout layout)
+               && OverlapsOtherEntry(device, layout, excludeIndex, startSector, sectorCount);
+    }
 
     /// <summary>
     /// The array walk behind <see cref="OverlapsOtherEntry(IBlockDevice, int, ulong, ulong)"/>,
@@ -645,7 +647,10 @@ public static class Gpt
         return false;
     }
 
-    private static Guid ReadGuid(ReadOnlySpan<byte> source) => new(source.Slice(0, GuidFieldSize));
+    private static Guid ReadGuid(ReadOnlySpan<byte> source)
+    {
+        return new(source.Slice(0, GuidFieldSize));
+    }
 
     private static void WriteGuid(Span<byte> destination, Guid value)
     {

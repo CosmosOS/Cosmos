@@ -18,16 +18,26 @@ namespace Cosmos.Kernel.System.Input;
 internal sealed class KitPointerConsumer : PointerConsumer
 {
     /// <inheritdoc/>
-    public override void OnPublished(PublishedDevice device) => MouseManager.RegisterMouse(device);
+    public override void OnPublished(PublishedDevice device)
+    {
+        MouseManager.RegisterMouse(device);
+    }
 
     /// <inheritdoc/>
-    public override void OnWithdrawn(PublishedDevice device) => MouseManager.UnregisterMouse(device);
+    public override void OnWithdrawn(PublishedDevice device)
+    {
+        MouseManager.UnregisterMouse(device);
+    }
 
     /// <inheritdoc/>
-    public override void OnRelative(PublishedDevice device, int deltaX, int deltaY, PointerButtons buttons, int wheel) =>
+    public override void OnRelative(PublishedDevice device, int deltaX, int deltaY, PointerButtons buttons, int wheel)
+    {
         MouseManager.HandleRelative(deltaX, deltaY, buttons, wheel);
+    }
 
     /// <inheritdoc/>
-    public override void OnAbsolute(PublishedDevice device, int x, int y, PointerButtons buttons) =>
+    public override void OnAbsolute(PublishedDevice device, int x, int y, PointerButtons buttons)
+    {
         MouseManager.HandleAbsolute(x, y, buttons);
+    }
 }

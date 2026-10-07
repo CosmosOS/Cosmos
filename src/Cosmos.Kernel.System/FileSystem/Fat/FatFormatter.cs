@@ -235,9 +235,15 @@ internal static class FatFormatter
 
         public uint RootDirSectors => (uint)(RootEntryCount * (uint)FatDirectory.EntrySize + (BytesPerSector - 1)) / BytesPerSector;
         public uint FatRegion => NumberOfFats * FatSectorCount;
-        public uint DataStart => Type == FatType.Fat32
-            ? ReservedSectorCount + FatRegion
-            : ReservedSectorCount + FatRegion + RootDirSectors;
+        public uint DataStart
+        {
+            get
+            {
+                return Type == FatType.Fat32
+                    ? ReservedSectorCount + FatRegion
+                    : ReservedSectorCount + FatRegion + RootDirSectors;
+            }
+        }
 
         public FormatGeometry(
             FatType type,
@@ -479,13 +485,16 @@ internal static class FatFormatter
         return fatSize;
     }
 
-    private static bool ValidateBand(FatType type, uint clusterCount) => type switch
+    private static bool ValidateBand(FatType type, uint clusterCount)
     {
-        FatType.Fat12 => clusterCount > 0 && clusterCount <= FatBootSector.Fat12MaxClusters,
-        FatType.Fat16 => clusterCount > FatBootSector.Fat12MaxClusters && clusterCount <= FatBootSector.Fat16MaxClusters,
-        FatType.Fat32 => clusterCount > FatBootSector.Fat16MaxClusters,
-        _ => false,
-    };
+        return type switch
+        {
+            FatType.Fat12 => clusterCount > 0 && clusterCount <= FatBootSector.Fat12MaxClusters,
+            FatType.Fat16 => clusterCount > FatBootSector.Fat12MaxClusters && clusterCount <= FatBootSector.Fat16MaxClusters,
+            FatType.Fat32 => clusterCount > FatBootSector.Fat16MaxClusters,
+            _ => false,
+        };
+    }
 
     private static string PadLabel(string label)
     {

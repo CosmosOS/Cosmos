@@ -169,6 +169,8 @@ public class ArpPacket : EthernetPacket
     /// protocol type, and operation code.
     /// </summary>
     /// <returns>A string representation of the packet.</returns>
-    public override string ToString() =>
-        $"ARP Packet Src={_srcMAC}, Dest={_destMAC}, HWType={_hardwareType}, Protocol={_protocolType}, Operation={Operation}";
+    public override string ToString()
+    {
+        return $"ARP Packet Src={_srcMAC}, Dest={_destMAC}, HWType={_hardwareType}, Protocol={_protocolType}, Operation={Operation}";
+    }
 }

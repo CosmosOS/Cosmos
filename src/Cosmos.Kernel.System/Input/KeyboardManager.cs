@@ -435,7 +435,10 @@ public static class KeyboardManager
     /// <returns>The active layout, or <see langword="null"/> before the
     /// manager was initialized and when keyboard support is compiled out;
     /// initialization installs <see cref="Layouts.USStandardLayout"/>.</returns>
-    public static KeyboardLayout? GetLayout() => s_layout;
+    public static KeyboardLayout? GetLayout()
+    {
+        return s_layout;
+    }
 
     /// <summary>
     /// Sets the layout that turns scan codes into characters. This is a

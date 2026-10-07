@@ -16,11 +16,20 @@ namespace Cosmos.Kernel.System.Input;
 internal sealed class KitKeyboardConsumer : KeyboardConsumer
 {
     /// <inheritdoc/>
-    public override void OnPublished(PublishedDevice device) => KeyboardManager.RegisterKeyboard(device);
+    public override void OnPublished(PublishedDevice device)
+    {
+        KeyboardManager.RegisterKeyboard(device);
+    }
 
     /// <inheritdoc/>
-    public override void OnWithdrawn(PublishedDevice device) => KeyboardManager.UnregisterKeyboard(device);
+    public override void OnWithdrawn(PublishedDevice device)
+    {
+        KeyboardManager.UnregisterKeyboard(device);
+    }
 
     /// <inheritdoc/>
-    public override void OnKey(PublishedDevice device, byte scanCode, bool released) => KeyboardManager.HandleScanCode(scanCode, released);
+    public override void OnKey(PublishedDevice device, byte scanCode, bool released)
+    {
+        KeyboardManager.HandleScanCode(scanCode, released);
+    }
 }

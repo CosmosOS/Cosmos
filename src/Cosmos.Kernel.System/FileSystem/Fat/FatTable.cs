@@ -130,7 +130,10 @@ internal sealed class FatTable
     }
 
     /// <summary>True when <paramref name="cluster"/> addresses a data cluster this volume (and its FAT) actually has.</summary>
-    public bool IsDataCluster(uint cluster) => cluster >= FirstDataCluster && cluster < _clusterLimit;
+    public bool IsDataCluster(uint cluster)
+    {
+        return cluster >= FirstDataCluster && cluster < _clusterLimit;
+    }
 
     /// <summary>Reads the FAT entry of <paramref name="cluster"/>; a number outside the data clusters reads as end-of-chain.</summary>
     public uint Get(uint cluster)
@@ -182,31 +185,40 @@ internal sealed class FatTable
     }
 
     /// <summary>True when <paramref name="entry"/> falls in the end-of-chain band of this volume's FAT type.</summary>
-    public bool IsEndOfChain(uint entry) => _boot.Type switch
+    public bool IsEndOfChain(uint entry)
     {
-        FatType.Fat32 => entry >= Fat32EndOfChain,
-        FatType.Fat16 => entry >= Fat16EndOfChain,
-        FatType.Fat12 => entry >= Fat12EndOfChain,
-        _ => true,
-    };
+        return _boot.Type switch
+        {
+            FatType.Fat32 => entry >= Fat32EndOfChain,
+            FatType.Fat16 => entry >= Fat16EndOfChain,
+            FatType.Fat12 => entry >= Fat12EndOfChain,
+            _ => true,
+        };
+    }
 
     /// <summary>True when <paramref name="entry"/> is the bad-cluster marker of this volume's FAT type.</summary>
-    public bool IsBadCluster(uint entry) => _boot.Type switch
+    public bool IsBadCluster(uint entry)
     {
-        FatType.Fat32 => entry == Fat32BadCluster,
-        FatType.Fat16 => entry == Fat16BadCluster,
-        FatType.Fat12 => entry == Fat12BadCluster,
-        _ => false,
-    };
+        return _boot.Type switch
+        {
+            FatType.Fat32 => entry == Fat32BadCluster,
+            FatType.Fat16 => entry == Fat16BadCluster,
+            FatType.Fat12 => entry == Fat12BadCluster,
+            _ => false,
+        };
+    }
 
     /// <summary>The canonical end-of-chain value this driver writes for the volume's FAT type.</summary>
-    public uint EndOfChainMarker() => _boot.Type switch
+    public uint EndOfChainMarker()
     {
-        FatType.Fat32 => Fat32EndOfChainValue,
-        FatType.Fat16 => Fat16EndOfChainValue,
-        FatType.Fat12 => Fat12EndOfChainValue,
-        _ => 0,
-    };
+        return _boot.Type switch
+        {
+            FatType.Fat32 => Fat32EndOfChainValue,
+            FatType.Fat16 => Fat16EndOfChainValue,
+            FatType.Fat12 => Fat12EndOfChainValue,
+            _ => 0,
+        };
+    }
 
     /// <summary>
     /// Walk the chain starting at <paramref name="firstCluster"/>. Stops on
