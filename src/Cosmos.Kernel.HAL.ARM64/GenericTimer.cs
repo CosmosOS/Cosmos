@@ -6,7 +6,7 @@ using Cosmos.Kernel.Core.ARM64.Cpu;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
-using Cosmos.Kernel.HAL.Platform;
+using Cosmos.Kernel.HAL.Timers;
 
 namespace Cosmos.Kernel.HAL.ARM64;
 

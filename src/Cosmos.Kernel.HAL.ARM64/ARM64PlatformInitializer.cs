@@ -9,11 +9,12 @@ using Cosmos.Kernel.Core.ARM64.Power;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Power;
+using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Platform;
 using Cosmos.Kernel.HAL.Firmware;
-using Cosmos.Kernel.HAL.Platform;
+using Cosmos.Kernel.HAL.Timers;
 
 namespace Cosmos.Kernel.HAL.ARM64;
 

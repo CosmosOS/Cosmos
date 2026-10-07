@@ -1,8 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core.CPU;
+using Cosmos.Kernel.HAL.Boot;
 
-namespace Cosmos.Kernel.HAL.Platform;
+namespace Cosmos.Kernel.HAL.Timers;
 
 /// <summary>
 /// Abstract base class for all timer devices. Maintains the software timer

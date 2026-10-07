@@ -3,7 +3,7 @@
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Platform;
+using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Input;
 using Cosmos.Kernel.System.Network;

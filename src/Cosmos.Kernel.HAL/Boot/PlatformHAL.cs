@@ -5,7 +5,7 @@ using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Power;
 
-namespace Cosmos.Kernel.HAL.Platform;
+namespace Cosmos.Kernel.HAL.Boot;
 
 /// <summary>
 /// Platform HAL manager - provides access to platform-specific hardware.

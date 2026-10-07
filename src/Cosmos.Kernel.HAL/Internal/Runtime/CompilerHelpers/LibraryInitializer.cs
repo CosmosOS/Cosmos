@@ -3,8 +3,8 @@
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.Firmware;
-using Cosmos.Kernel.HAL.Platform;
 
 namespace Internal.Runtime.CompilerHelpers;
 

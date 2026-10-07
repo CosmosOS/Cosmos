@@ -3,9 +3,10 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Usb;
-using Cosmos.Kernel.HAL.Platform;
+using Cosmos.Kernel.HAL.Timers;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
