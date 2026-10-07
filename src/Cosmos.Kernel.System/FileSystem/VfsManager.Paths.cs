@@ -2,6 +2,11 @@
 
 namespace Cosmos.Kernel.System.FileSystem;
 
+// TODO: a RAM filesystem for /tmp, and the /dev/null and /dev/full devices. Path.GetTempPath names
+// /tmp/ (with no environment, there is no TMPDIR: see EnvironmentPlug), and nothing can be created
+// there under the virtual root: Lua's os.tmpname fails, and with it verybig.lua and files.lua of
+// the Lua 5.5 test suite, which also writes to both devices.
+
 /// <summary>
 /// Path-level VFS operations: the kernel current directory, the virtual root
 /// (the synthesized "/" that exists while nothing is mounted over it), and

@@ -275,6 +275,20 @@ For an interactive shell over the network, the [Cosmos.Network.Telnet](https://g
 <!-- screenshot: console showing "Listening on port 4444...", "Client connected!" and the received message -->
 ![TCP Server](images/network-tcp-server.png)
 
+## FTP server
+
+The [Cosmos.Network.Ftp](https://github.com/CosmosOS/Cosmos.Network.Ftp) package serves a directory of the VFS over FTP. Version 2 is the Gen3 one; 1.x is for Gen2. Add `<PackageReference Include="Cosmos.Network.Ftp" Version="2.0.0" />` to your kernel and start the server once the network is configured and a filesystem is mounted:
+
+```csharp
+using System.Threading;
+using Cosmos.Network.Ftp;
+
+FtpServer server = new("/mnt");
+new Thread(server.Listen).Start(); // Listen() serves every client until server.Close()
+```
+
+Clients see `/mnt` as `/` and cannot leave it. Leaving `Authenticate` unset lets any user name in with any password; set it to check credentials. Transfers are passive, on ports 50000 to 50009 by default (`PassivePortMin` and `PassivePortMax`), so under QEMU user networking forward those as well as the control port: `cosmos run --hostfwd tcp::2121-:21 --hostfwd tcp::50000-:50000 ...`, then `curl ftp://localhost:2121/`. A `PASV` reply names the guest's own address, 10.0.2.15, which the host cannot reach: curl ignores it, but FileZilla connects to it, so set `PassiveAddress = IPAddress.Loopback` for `PASV` to name 127.0.0.1 instead. The DevKernel serves its working directory with `ftpd [dir] [port] [pasv-ip]`, `ftpd /mnt 21 127.0.0.1` under QEMU, and stops with `ftpd stop`.
+
 ## DNS
 
 Two APIs resolve a name: the standard `System.Net.Dns`, and the Cosmos `DnsClient`. Register a nameserver with either one, because there is no `resolv.conf` to read one from and DHCP is what normally supplies it:
