@@ -6,8 +6,8 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.Devices.Input;
-using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 using Cosmos.Kernel.System.Input.Layouts;
 
 namespace Cosmos.Kernel.System.Input;

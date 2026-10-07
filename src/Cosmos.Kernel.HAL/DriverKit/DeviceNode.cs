@@ -2,6 +2,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
 

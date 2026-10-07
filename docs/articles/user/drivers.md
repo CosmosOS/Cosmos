@@ -61,6 +61,8 @@ flowchart TD
     Binding -.->|"node removed"| Teardown["Teardown: withdraw devices, disconnect interrupts,<br/>OnDetach, free memory"]
 ```
 
+The driver, the binding and the node tree are in `Cosmos.Kernel.HAL.DriverKit`. What a binding hands out sits one namespace down, by concern: `Cosmos.Kernel.HAL.DriverKit.Resources` (register windows, mapped regions, DMA buffers), `.Interrupts` (interrupt handles, the handler contract) and `.Threading` (locks, events, threads, work items). Each bus kind has its own namespace under `.Buses`, and each device kind its category's under `Cosmos.Kernel.HAL.Devices`.
+
 The smallest driver that compiles and binds:
 
 ```csharp
@@ -179,6 +181,9 @@ A probe reads the node (`binding.Node.Resources`, `binding.Node.Interrupts`, `bi
 ```csharp
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
 namespace MyOS.Drivers;
 
@@ -234,6 +239,9 @@ The state object is a plain class, not a `Driver`: there is one per device, and 
 ```csharp
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
 namespace MyOS.Drivers;
 

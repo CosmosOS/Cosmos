@@ -5,7 +5,7 @@ using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Resources;
 
 /// <summary>
 /// A window of device registers, mapped through <see cref="DeviceBinding.MapRegisters"/>.

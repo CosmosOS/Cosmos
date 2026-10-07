@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Resources;
 
 /// <summary>
 /// A bulk device region mapped through <see cref="DeviceBinding.MapRegion"/>:

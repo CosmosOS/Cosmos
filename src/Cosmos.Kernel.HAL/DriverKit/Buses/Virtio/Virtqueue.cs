@@ -2,6 +2,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Buses.Virtio;
 

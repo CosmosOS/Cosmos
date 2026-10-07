@@ -3,6 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Virtio;
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
 
 namespace Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio;
 

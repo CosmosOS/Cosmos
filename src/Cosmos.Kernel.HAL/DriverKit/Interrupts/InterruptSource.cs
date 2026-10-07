@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Interrupts;
 
 /// <summary>
 /// One interrupt a <see cref="DeviceNode"/> can deliver: a legacy line, one

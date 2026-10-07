@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Scheduler;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Threading;
 
 /// <summary>
 /// The held state of a <see cref="DeviceLock"/>, returned by

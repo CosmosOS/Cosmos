@@ -1,6 +1,8 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
 

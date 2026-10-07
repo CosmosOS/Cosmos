@@ -3,6 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
 

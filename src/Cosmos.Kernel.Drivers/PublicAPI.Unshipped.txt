@@ -48,7 +48,7 @@ Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.CreateCanvas3D(Cosm
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.FifoMax.get -> uint
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.FifoMin.get -> uint
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Flush(int x, int y, int width, int height) -> void
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion?
+Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion?
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Is3DNegotiated.get -> bool
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.IsEnabled.get -> bool
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Mode.get -> Cosmos.Kernel.HAL.Devices.Display.DisplayMode
@@ -200,7 +200,7 @@ Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.CommandsSent.get -> int
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Flush(int x, int y, int width, int height) -> void
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.FlushCount.get -> int
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.DeviceRegion?
+Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion?
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.HasInterrupt.get -> bool
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Height.get -> int
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.InterruptCount.get -> int

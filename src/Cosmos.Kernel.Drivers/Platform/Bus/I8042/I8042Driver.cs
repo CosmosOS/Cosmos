@@ -3,6 +3,9 @@
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Platform;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Ps2;
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 using Cosmos.Kernel.System;
 
 namespace Cosmos.Kernel.Drivers.Platform.Bus.I8042;

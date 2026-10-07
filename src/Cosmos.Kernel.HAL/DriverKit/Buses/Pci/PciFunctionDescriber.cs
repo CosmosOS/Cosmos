@@ -2,6 +2,8 @@
 
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
 

@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Scheduler;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Threading;
 
 /// <summary>
 /// A counted signal between a handler and a thread, created through

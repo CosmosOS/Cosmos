@@ -3,6 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 using Cosmos.Kernel.HAL.Firmware;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 

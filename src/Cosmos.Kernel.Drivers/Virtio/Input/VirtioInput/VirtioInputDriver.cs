@@ -2,6 +2,8 @@
 
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Virtio;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 using Cosmos.Kernel.System;
 
 namespace Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput;

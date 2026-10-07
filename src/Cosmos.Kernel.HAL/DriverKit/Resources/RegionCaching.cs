@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Resources;
 
 /// <summary>
 /// How the CPU caches a bulk device region: the attribute the architecture applies

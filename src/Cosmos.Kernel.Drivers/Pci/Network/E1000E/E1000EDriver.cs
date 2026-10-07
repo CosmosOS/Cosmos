@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
 namespace Cosmos.Kernel.Drivers.Pci.Network.E1000E;
 

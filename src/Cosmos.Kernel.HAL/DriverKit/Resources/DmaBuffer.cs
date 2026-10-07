@@ -5,7 +5,7 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Resources;
 
 /// <summary>
 /// Physically contiguous, zeroed memory a device reads and writes directly,

@@ -2,8 +2,9 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Interrupts;
 
 /// <summary>
 /// The kit's dispatcher between an <see cref="InterruptSource"/> and a

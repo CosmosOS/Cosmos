@@ -2,6 +2,7 @@
 
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
 namespace Cosmos.Kernel.Tests.Drivers.Library;
 

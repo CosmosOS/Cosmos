@@ -111,7 +111,7 @@ Two details of that target are worth knowing when touching it. The items are joi
 
 ## Visibility
 
-The kit is public, under the experimental seam `COSMOS0003`: `Driver`, `DriverAttribute`, `DriverRegistry` and every other type in `Cosmos.Kernel.HAL.DriverKit` carry `[Experimental("COSMOS0003")]`, so a kernel or a library that declares a `[Driver]` class suppresses that id in its `.csproj`, and a driver library also declares itself a driver assembly:
+The kit is public, under the experimental seam `COSMOS0003`: `Driver`, `DriverAttribute`, `DriverRegistry` and every other type under `Cosmos.Kernel.HAL.DriverKit` carry `[Experimental("COSMOS0003")]`, so a kernel or a library that declares a `[Driver]` class suppresses that id in its `.csproj`, and a driver library also declares itself a driver assembly:
 
 ```xml
 <PropertyGroup>

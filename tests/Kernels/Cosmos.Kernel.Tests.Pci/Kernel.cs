@@ -5,6 +5,7 @@ using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Platform;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;

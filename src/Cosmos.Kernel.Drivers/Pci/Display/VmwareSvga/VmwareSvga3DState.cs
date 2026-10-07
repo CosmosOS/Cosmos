@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Rendering3D;
 

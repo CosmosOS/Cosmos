@@ -1,8 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Interrupts;
 
 /// <summary>
 /// The whole of what an <see cref="InterruptHandler"/> may do besides

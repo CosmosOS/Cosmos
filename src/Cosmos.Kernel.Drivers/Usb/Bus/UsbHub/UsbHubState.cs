@@ -2,6 +2,7 @@
 
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
 namespace Cosmos.Kernel.Drivers.Usb.Bus.UsbHub;
 

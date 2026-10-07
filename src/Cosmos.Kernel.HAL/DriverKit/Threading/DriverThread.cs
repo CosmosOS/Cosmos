@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Threading;
 
 /// <summary>
 /// A thread a driver started through <see cref="DeviceBinding.TryStartThread"/>.

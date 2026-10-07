@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Resources;
 
 /// <summary>
 /// One resource of a <see cref="DeviceNode"/>: a memory window, a port range

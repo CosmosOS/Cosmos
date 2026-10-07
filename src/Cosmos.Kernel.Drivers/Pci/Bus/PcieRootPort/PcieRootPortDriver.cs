@@ -3,6 +3,7 @@
 using System;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
 namespace Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort;
 

@@ -213,8 +213,11 @@ Cosmos.Kernel.HAL/
     Network/                 ← INetworkInterface, NetworkSink, NetworkConsumer, MacAddress
     Storage/                 ← IBlockDevice, BlockConsumer
   DriverKit/                 ← how a driver finds and binds a device
-    Driver.cs                ← the driver API, flat: one using for all of it
+    Driver.cs                ← the driver and its binding: matching, probing, the node tree
     DeviceBinding.cs
+    Resources/               ← what a binding hands out: RegisterWindow, DeviceRegion, DmaBuffer
+    Interrupts/              ← InterruptSource, InterruptHandle, InterruptHandler, InterruptContext
+    Threading/               ← DeviceLock, DeviceEvent, DriverThread, WorkItem
     Buses/
       Pci/                   ← PciIdentity, PciMatch, PciAccess, PciLineInterruptSource, …
       Usb/
@@ -227,6 +230,15 @@ driver reports through (the block kind has none) and the ring's internal
 consumer, which learns of each device's arrival and departure and receives
 its reports. The categories are the ones `Cosmos.Kernel.Drivers` files its
 drivers under ([Driver Folders](#driver-folders)), less `Bus`.
+
+The `DriverKit/` root holds the driver and its binding: `Driver` and its
+attribute, the registry, `DeviceBinding`, the node tree with its identity
+and match bases, and the probe and detach vocabulary. What a binding hands
+a driver sits one folder down, by concern: `Resources/` for the ways to
+reach the hardware (resources, register windows, mapped regions, DMA
+buffers), `Interrupts/` for the sources and the handler contract, and
+`Threading/` for the locks, events, threads and work items a driver
+synchronizes with. A driver names the root and then the folders it uses.
 
 A bus kind under `DriverKit/Buses/` gives each role the same name in every
 folder: `<Bus>Identity`, `<Bus>Match`, `<Bus>Access` when a driver reaches

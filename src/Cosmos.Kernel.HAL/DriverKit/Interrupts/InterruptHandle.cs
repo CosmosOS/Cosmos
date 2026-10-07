@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Interrupts;
 
 /// <summary>
 /// A connected interrupt, returned by <see cref="DeviceBinding.TryRequestInterrupt"/>.

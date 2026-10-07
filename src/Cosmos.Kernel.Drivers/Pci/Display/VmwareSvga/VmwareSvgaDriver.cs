@@ -4,6 +4,7 @@ using System;
 using Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.Enums;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
 
 namespace Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga;
 

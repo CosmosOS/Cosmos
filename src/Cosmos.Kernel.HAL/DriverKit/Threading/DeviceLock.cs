@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
-namespace Cosmos.Kernel.HAL.DriverKit;
+namespace Cosmos.Kernel.HAL.DriverKit.Threading;
 
 /// <summary>
 /// A lock the kit sanctions for a driver whose device is entered from more

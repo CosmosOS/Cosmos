@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.Enums;
 using Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.Structs;
 using Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.Structs.Commands;
-using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
 
 namespace Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga;
 

@@ -2,6 +2,8 @@
 
 using Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
+using Cosmos.Kernel.HAL.DriverKit.Threading;
 
 namespace Cosmos.Kernel.HAL.DriverKit;
 

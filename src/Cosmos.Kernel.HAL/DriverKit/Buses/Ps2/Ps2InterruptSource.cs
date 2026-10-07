@@ -2,6 +2,8 @@
 
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
+
 namespace Cosmos.Kernel.HAL.DriverKit.Buses.Ps2;
 
 /// <summary>

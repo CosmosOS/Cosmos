@@ -22,6 +22,8 @@ using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.HAL.DriverKit.Interrupts;
+using Cosmos.Kernel.HAL.DriverKit.Resources;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Network;
