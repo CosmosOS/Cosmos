@@ -38,16 +38,10 @@ internal sealed class FatSuperblock : IVfsSuperblock
         Root = root;
     }
 
-    public void Drop()
-    {
-        _inodeCache.Clear();
-    }
+    public void Drop() => _inodeCache.Clear();
 
     /// <summary>Flush the device's volatile write cache — the durability point for sync and unmount.</summary>
-    public void Flush()
-    {
-        _device.Flush();
-    }
+    public void Flush() => _device.Flush();
 
     public void ReadCluster(uint cluster, Span<byte> data)
     {
@@ -456,8 +450,7 @@ internal sealed class FatSuperblock : IVfsSuperblock
         }
 
         byte[] grown = new byte[currentData.Length + newClusters.Count * (int)Boot.BytesPerCluster];
-        Buffer.BlockCopy(currentData, 0, grown, 0, currentData.Length);
+        currentData.AsSpan().CopyTo(grown);
         return grown;
     }
-
 }

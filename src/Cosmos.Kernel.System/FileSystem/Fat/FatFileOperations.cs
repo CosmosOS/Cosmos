@@ -198,10 +198,7 @@ internal sealed class FatFileOperations : IFileOperations
         return true;
     }
 
-    public void Release(IVfsOpenFile openFile)
-    {
-        Fsync(openFile);
-    }
+    public void Release(IVfsOpenFile openFile) => Fsync(openFile);
 
     private bool EnsureChainLength(FatInode inode, long targetCount)
     {

@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.System.FileSystem.Fat;
 
 /// <summary>
 /// FAT12 / FAT16 / FAT32 driver entry point. Pluggable into the VFS via
-/// <c>VfsManager.RegisterFileSystem</c>. Source strings:
+/// <see cref="VfsManager.RegisterFileSystem"/>. Source strings:
 /// <list type="bullet">
 ///   <item><description>Empty: use the injected device passed to the constructor (test seam).</description></item>
 ///   <item><description><c>"&lt;index&gt;"</c>: partition index in <see cref="StorageManager.Partitions"/>.</description></item>

@@ -60,21 +60,10 @@ internal sealed class Ext2Inode : IVfsInode
     /// <summary>15 block pointers: 12 direct, then single, double and triple indirect.</summary>
     public uint[] Block { get; internal set; } = new uint[Ext2InodeLayout.BlockCount];
 
-    /// <summary>
-    /// Creates an inode handle.
-    /// </summary>
-    /// <param name="superblock">The mounted volume owning the inode.</param>
-    /// <param name="inodeNumber">One-based inode number.</param>
-    /// <param name="name">Leaf name within the parent directory.</param>
-    public Ext2Inode(Ext2Superblock superblock, uint inodeNumber, string name)
-    {
-        Superblock = superblock;
-        InodeNumber = inodeNumber;
-        Name = name;
-    }
-
+    /// <inheritdoc/>
     public IInodeOperations InodeOperations => Superblock.InodeOps;
 
+    /// <inheritdoc/>
     public IFileOperations? FileOperations
     {
         get
@@ -87,7 +76,7 @@ internal sealed class Ext2Inode : IVfsInode
             }
 
             // Regular files and symlinks (for reading the target) are readable.
-            if (type == Ext2InodeLayout.IFREG || type == Ext2InodeLayout.IFLNK)
+            if (type is Ext2InodeLayout.IFREG or Ext2InodeLayout.IFLNK)
             {
                 return Superblock.FileOps;
             }
@@ -104,4 +93,17 @@ internal sealed class Ext2Inode : IVfsInode
 
     /// <summary>True when the mode encodes a regular file.</summary>
     public bool IsRegularFile => (Mode & Ext2InodeLayout.IFMT) == Ext2InodeLayout.IFREG;
+
+    /// <summary>
+    /// Creates an inode handle.
+    /// </summary>
+    /// <param name="superblock">The mounted volume owning the inode.</param>
+    /// <param name="inodeNumber">One-based inode number.</param>
+    /// <param name="name">Leaf name within the parent directory.</param>
+    public Ext2Inode(Ext2Superblock superblock, uint inodeNumber, string name)
+    {
+        Superblock = superblock;
+        InodeNumber = inodeNumber;
+        Name = name;
+    }
 }

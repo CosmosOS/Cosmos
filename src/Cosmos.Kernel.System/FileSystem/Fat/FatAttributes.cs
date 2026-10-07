@@ -22,35 +22,6 @@ internal static class FatAttributes
     private const VfsMode WriteMask =
         VfsMode.OwnerWrite | VfsMode.GroupWrite | VfsMode.OtherWrite;
 
-    public static VfsMode ToMode(FatAttr attributes)
-    {
-        bool isDir = (attributes & FatAttr.Directory) != 0;
-        VfsMode mode = isDir
-            ? VfsMode.Directory | DirPermissions
-            : VfsMode.RegularFile | FilePermissions;
-
-        if ((attributes & FatAttr.ReadOnly) != 0)
-        {
-            mode &= ~WriteMask;
-        }
-
-        return mode;
-    }
-
-    public static FatAttr ToFatAttr(VfsMode mode)
-    {
-        FatAttr attr = (mode & VfsMode.FileTypeMask) == VfsMode.Directory
-            ? FatAttr.Directory
-            : FatAttr.None;
-
-        if ((mode & VfsMode.OwnerWrite) == 0 && (mode & VfsMode.FileTypeMask) != VfsMode.Directory)
-        {
-            attr |= FatAttr.ReadOnly;
-        }
-
-        return attr;
-    }
-
     /// <summary>FAT dates count years from 1980 (bits 15-9 of the date word).</summary>
     private const int FatEpochYear = 1980;
 
@@ -90,10 +61,8 @@ internal static class FatAttributes
     /// <summary>The tenths byte counts hundredths 0..199; 100+ rolls into the next second.</summary>
     private const int TenthsPerSecond = 100;
 
-    /// <summary>Nanoseconds per hundredth of a second.</summary>
     private const long NanosecondsPerHundredth = 10_000_000L;
 
-    /// <summary>Seconds per day / hour / minute for the epoch math.</summary>
     private const long SecondsPerDay = 86_400L;
     private const long SecondsPerHour = 3600L;
     private const long SecondsPerMinute = 60L;
@@ -107,10 +76,8 @@ internal static class FatAttributes
     /// <summary>Longest month length in days; upper bound of the FAT day field.</summary>
     private const int MaxDaysInMonth = 31;
 
-    /// <summary>Days in a Gregorian leap year.</summary>
     private const int DaysPerLeapYear = 366;
 
-    /// <summary>Days in a Gregorian common (non-leap) year.</summary>
     private const int DaysPerCommonYear = 365;
 
     /// <summary>Month number of February, the month that gains the leap day.</summary>
@@ -127,6 +94,35 @@ internal static class FatAttributes
 
     /// <summary>Days per month (non-leap); compiler-emitted static data, no per-call allocation.</summary>
     private static ReadOnlySpan<byte> DaysInMonth => [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    public static VfsMode ToMode(FatAttr attributes)
+    {
+        bool isDir = (attributes & FatAttr.Directory) != 0;
+        VfsMode mode = isDir
+            ? VfsMode.Directory | DirPermissions
+            : VfsMode.RegularFile | FilePermissions;
+
+        if ((attributes & FatAttr.ReadOnly) != 0)
+        {
+            mode &= ~WriteMask;
+        }
+
+        return mode;
+    }
+
+    public static FatAttr ToFatAttr(VfsMode mode)
+    {
+        FatAttr attr = (mode & VfsMode.FileTypeMask) == VfsMode.Directory
+            ? FatAttr.Directory
+            : FatAttr.None;
+
+        if ((mode & VfsMode.OwnerWrite) == 0 && (mode & VfsMode.FileTypeMask) != VfsMode.Directory)
+        {
+            attr |= FatAttr.ReadOnly;
+        }
+
+        return attr;
+    }
 
     public static VfsTimespec UnpackDateTime(ushort fatDate, ushort fatTime, byte tenths)
     {
@@ -172,8 +168,6 @@ internal static class FatAttributes
         return days * SecondsPerDay + hour * SecondsPerHour + minute * SecondsPerMinute + second;
     }
 
-    private static bool IsLeap(int year)
-    {
-        return (year % LeapYearInterval == 0 && year % LeapCenturyException != 0) || year % LeapQuadCenturyInterval == 0;
-    }
+    private static bool IsLeap(int year) =>
+        (year % LeapYearInterval == 0 && year % LeapCenturyException != 0) || year % LeapQuadCenturyInterval == 0;
 }

@@ -14,19 +14,19 @@ namespace Cosmos.Kernel.System.FileSystem.Fat;
 internal sealed class FatTable
 {
     /// <summary>Entry value marking a free cluster.</summary>
-    public const uint FreeCluster = 0x00000000;
+    public const uint FreeCluster = 0x0000_0000;
 
     /// <summary>First data-cluster number; clusters 0 and 1 are reserved.</summary>
     public const uint FirstDataCluster = 2;
 
     /// <summary>Lowest FAT32 entry value of the end-of-chain band.</summary>
-    public const uint Fat32EndOfChain = 0x0FFFFFF8;
+    public const uint Fat32EndOfChain = 0x0FFF_FFF8;
 
     /// <summary>FAT32 bad-cluster marker.</summary>
-    public const uint Fat32BadCluster = 0x0FFFFFF7;
+    public const uint Fat32BadCluster = 0x0FFF_FFF7;
 
     /// <summary>Canonical FAT32 end-of-chain value written by this driver; also stamped by the formatter into FAT[1] and the root cluster's FAT entry (fatgen103 §4).</summary>
-    internal const uint Fat32EndOfChainValue = 0x0FFFFFFF;
+    internal const uint Fat32EndOfChainValue = 0x0FFF_FFFF;
 
     /// <summary>Lowest FAT16 entry value of the end-of-chain band.</summary>
     private const uint Fat16EndOfChain = 0xFFF8;
@@ -47,10 +47,10 @@ internal sealed class FatTable
     private const uint Fat12EndOfChainValue = 0x0FFF;
 
     /// <summary>FAT32 entries use only the low 28 bits.</summary>
-    private const uint Fat32EntryMask = 0x0FFFFFFF;
+    private const uint Fat32EntryMask = 0x0FFF_FFFF;
 
     /// <summary>FAT32 reserved high bits, preserved on write per fatgen103.</summary>
-    private const uint Fat32ReservedMask = 0xF0000000;
+    private const uint Fat32ReservedMask = 0xF000_0000;
 
     /// <summary>FAT12 entries are 12 bits.</summary>
     private const uint Fat12EntryMask = 0x0FFF;
@@ -130,11 +130,9 @@ internal sealed class FatTable
     }
 
     /// <summary>True when <paramref name="cluster"/> addresses a data cluster this volume (and its FAT) actually has.</summary>
-    public bool IsDataCluster(uint cluster)
-    {
-        return cluster >= FirstDataCluster && cluster < _clusterLimit;
-    }
+    public bool IsDataCluster(uint cluster) => cluster >= FirstDataCluster && cluster < _clusterLimit;
 
+    /// <summary>Reads the FAT entry of <paramref name="cluster"/>; a number outside the data clusters reads as end-of-chain.</summary>
     public uint Get(uint cluster)
     {
         // Out-of-range numbers come from corrupt on-disk metadata; treat
@@ -154,6 +152,7 @@ internal sealed class FatTable
         };
     }
 
+    /// <summary>Writes <paramref name="value"/> into the entry of <paramref name="cluster"/> in every FAT copy; a number outside the data clusters is ignored.</summary>
     public void Set(uint cluster, uint value)
     {
         // Never let a corrupt cluster number drive a read-modify-write
@@ -182,38 +181,32 @@ internal sealed class FatTable
         }
     }
 
-    public bool IsEndOfChain(uint entry)
+    /// <summary>True when <paramref name="entry"/> falls in the end-of-chain band of this volume's FAT type.</summary>
+    public bool IsEndOfChain(uint entry) => _boot.Type switch
     {
-        return _boot.Type switch
-        {
-            FatType.Fat32 => entry >= Fat32EndOfChain,
-            FatType.Fat16 => entry >= Fat16EndOfChain,
-            FatType.Fat12 => entry >= Fat12EndOfChain,
-            _ => true,
-        };
-    }
+        FatType.Fat32 => entry >= Fat32EndOfChain,
+        FatType.Fat16 => entry >= Fat16EndOfChain,
+        FatType.Fat12 => entry >= Fat12EndOfChain,
+        _ => true,
+    };
 
-    public bool IsBadCluster(uint entry)
+    /// <summary>True when <paramref name="entry"/> is the bad-cluster marker of this volume's FAT type.</summary>
+    public bool IsBadCluster(uint entry) => _boot.Type switch
     {
-        return _boot.Type switch
-        {
-            FatType.Fat32 => entry == Fat32BadCluster,
-            FatType.Fat16 => entry == Fat16BadCluster,
-            FatType.Fat12 => entry == Fat12BadCluster,
-            _ => false,
-        };
-    }
+        FatType.Fat32 => entry == Fat32BadCluster,
+        FatType.Fat16 => entry == Fat16BadCluster,
+        FatType.Fat12 => entry == Fat12BadCluster,
+        _ => false,
+    };
 
-    public uint EndOfChainMarker()
+    /// <summary>The canonical end-of-chain value this driver writes for the volume's FAT type.</summary>
+    public uint EndOfChainMarker() => _boot.Type switch
     {
-        return _boot.Type switch
-        {
-            FatType.Fat32 => Fat32EndOfChainValue,
-            FatType.Fat16 => Fat16EndOfChainValue,
-            FatType.Fat12 => Fat12EndOfChainValue,
-            _ => 0,
-        };
-    }
+        FatType.Fat32 => Fat32EndOfChainValue,
+        FatType.Fat16 => Fat16EndOfChainValue,
+        FatType.Fat12 => Fat12EndOfChainValue,
+        _ => 0,
+    };
 
     /// <summary>
     /// Walk the chain starting at <paramref name="firstCluster"/>. Stops on
@@ -315,6 +308,7 @@ internal sealed class FatTable
         }
     }
 
+    /// <summary>Finds a free data cluster, searching from the allocation hint and wrapping once; returns 0 when none is free.</summary>
     public uint FindFree()
     {
         uint upper = _clusterLimit;
@@ -342,6 +336,7 @@ internal sealed class FatTable
         return 0;
     }
 
+    /// <summary>Counts the free data clusters recorded in the first FAT copy.</summary>
     public uint CountFree()
     {
         // Per-entry reads through Get() cost one cached-sector lookup per
@@ -366,12 +361,12 @@ internal sealed class FatTable
         uint freeCount = 0;
         Span<byte> buffer = _fatSpill;
 
-        for (uint sectorIdx = 0; sectorIdx < _boot.FatSectorCount; sectorIdx++)
+        for (uint sectorIndex = 0; sectorIndex < _boot.FatSectorCount; sectorIndex++)
         {
-            _device.ReadBlock(_boot.FatStartLba + sectorIdx, 1, buffer);
+            _device.ReadBlock(_boot.FatStartLba + sectorIndex, 1, buffer);
             for (uint j = 0; j < entriesPerSector; j++)
             {
-                uint cluster = sectorIdx * entriesPerSector + j;
+                uint cluster = sectorIndex * entriesPerSector + j;
                 if (!IsDataCluster(cluster))
                 {
                     continue;

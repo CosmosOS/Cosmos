@@ -1,8 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System;
-using System.Collections.Generic;
-
 namespace Cosmos.Kernel.System.FileSystem;
 
 /// <summary>
@@ -23,8 +20,6 @@ public static partial class VfsManager
     /// an open file can defer to the last close.</summary>
     private static readonly List<VfsFileHandle> s_openFileHandles = [];
 
-    private static string s_currentDirectory = "/";
-
     /// <summary>Kernel-wide current directory; always a normalized absolute path.</summary>
     /// <remarks>
     /// Internal with the path helpers below it: their only callers are the PAL
@@ -33,7 +28,7 @@ public static partial class VfsManager
     /// adapter is plugged under. A second public anchor would just disagree
     /// with whatever cwd the kernel's own shell keeps.
     /// </remarks>
-    internal static string CurrentDirectory => s_currentDirectory;
+    internal static string CurrentDirectory { get; private set; } = "/";
 
     /// <summary>Sets <see cref="CurrentDirectory"/>; the target must exist and be a directory.</summary>
     internal static bool TrySetCurrentDirectory(string path)
@@ -49,7 +44,7 @@ public static partial class VfsManager
             return false;
         }
 
-        s_currentDirectory = fullPath;
+        CurrentDirectory = fullPath;
         return true;
     }
 
@@ -65,9 +60,9 @@ public static partial class VfsManager
 
         string result = path[0] == Path.DirectorySeparatorChar
             ? path
-            : (s_currentDirectory == s_directorySeparatorString
+            : (CurrentDirectory == s_directorySeparatorString
                 ? Path.Combine(s_directorySeparatorString, path)
-                : Path.Combine(s_currentDirectory, path));
+                : Path.Combine(CurrentDirectory, path));
 
         int end = result.Length;
         while (end > 1 && result[end - 1] == Path.DirectorySeparatorChar)

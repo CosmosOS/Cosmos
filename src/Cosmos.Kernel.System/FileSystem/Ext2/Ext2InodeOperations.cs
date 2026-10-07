@@ -11,6 +11,15 @@ namespace Cosmos.Kernel.System.FileSystem.Ext2;
 /// </summary>
 internal sealed class Ext2InodeOperations : IInodeOperations
 {
+    /// <summary>Longest entry name: a directory entry stores the name length in one byte.</summary>
+    private const int MaxNameLength = 255;
+
+    /// <summary>Unit of i_blocks: 512-byte sectors, whatever the block size.</summary>
+    private const uint SectorSize = 512;
+
+    /// <summary>Low 12 bits of i_mode: the permission bits plus setuid, setgid and sticky.</summary>
+    private const ushort ModeLowBits = 0x0FFF;
+
     private readonly Ext2Superblock _superblock;
 
     /// <summary>
@@ -60,9 +69,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             {
                 if (entries[i].Name == "..")
                 {
-                    uint ino = entries[i].Inode;
-                    Ext2Inode found = _superblock.ReadInode(ino, "..");
-                    child = found;
+                    child = _superblock.ReadInode(entries[i].Inode, "..");
                     return true;
                 }
             }
@@ -78,8 +85,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             return false;
         }
 
-        Ext2Inode node = _superblock.ReadInode(entry.Inode, target);
-        child = node;
+        child = _superblock.ReadInode(entry.Inode, target);
         return true;
     }
 
@@ -91,23 +97,23 @@ internal sealed class Ext2InodeOperations : IInodeOperations
     /// <returns>true on success.</returns>
     public bool ReadDir(IVfsInode dir, out IReadOnlyList<IVfsInode> entries)
     {
-        entries = Array.Empty<IVfsInode>();
+        entries = [];
         if (dir is not Ext2Inode parent || !parent.IsDirectory)
         {
             return false;
         }
 
-        List<Ext2DirEntry> raw = Ext2DirectoryHelper.ParseDirectory(_superblock, parent);
-        List<IVfsInode> result = new(raw.Count);
-        for (int i = 0; i < raw.Count; i++)
+        List<Ext2DirEntry> rawEntries = Ext2DirectoryHelper.ParseDirectory(_superblock, parent);
+        List<IVfsInode> result = new(rawEntries.Count);
+        for (int i = 0; i < rawEntries.Count; i++)
         {
-            Ext2DirEntry e = raw[i];
-            if (e.Name == "." || e.Name == "..")
+            Ext2DirEntry entry = rawEntries[i];
+            if (entry.Name == "." || entry.Name == "..")
             {
                 continue;
             }
 
-            Ext2Inode node = _superblock.ReadInode(e.Inode, e.Name);
+            Ext2Inode node = _superblock.ReadInode(entry.Inode, entry.Name);
             result.Add(node);
         }
 
@@ -138,8 +144,8 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             return false;
         }
 
-        string strName = name.ToString();
-        if (strName.Length == 0 || strName.Length > 255)
+        string childName = name.ToString();
+        if (childName.Length == 0 || childName.Length > MaxNameLength)
         {
             return false;
         }
@@ -151,7 +157,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
 
         ushort ext2Mode = ToExt2Mode((mode & VfsMode.PermissionMask) | VfsMode.RegularFile);
         uint now = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        Ext2Inode newNode = new(_superblock, newIno, strName)
+        Ext2Inode newNode = new(_superblock, newIno, childName)
         {
             Mode = ext2Mode,
             Uid = 0,
@@ -167,8 +173,8 @@ internal sealed class Ext2InodeOperations : IInodeOperations
 
         _superblock.WriteInode(newNode);
 
-        byte ft = Ext2DirectoryHelper.FileTypeFromMode(ext2Mode);
-        if (!Ext2DirectoryHelper.AddEntry(_superblock, parent, strName, newIno, ft))
+        byte fileType = Ext2DirectoryHelper.FileTypeFromMode(ext2Mode);
+        if (!Ext2DirectoryHelper.AddEntry(_superblock, parent, childName, newIno, fileType))
         {
             _superblock.FreeInode(newIno);
             return false;
@@ -199,7 +205,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             return false;
         }
 
-        string strName = name.ToString();
+        string childName = name.ToString();
         if (!_superblock.TryAllocateInode(_superblock.GroupOfInode(parent.InodeNumber), out uint newIno))
         {
             return false;
@@ -213,7 +219,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
 
         ushort ext2Mode = ToExt2Mode((mode & VfsMode.PermissionMask) | VfsMode.Directory);
         uint now = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        Ext2Inode newNode = new(_superblock, newIno, strName)
+        Ext2Inode newNode = new(_superblock, newIno, childName)
         {
             Mode = ext2Mode,
             Uid = 0,
@@ -222,8 +228,8 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             Ctime = now,
             Mtime = now,
             LinksCount = 2,
-            Blocks = _superblock.BlockSize / 512,
-            Block = new uint[15],
+            Blocks = _superblock.BlockSize / SectorSize,
+            Block = new uint[Ext2InodeLayout.BlockCount],
         };
         newNode.Block[0] = block;
 
@@ -249,9 +255,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
         _superblock.WriteBlocks(block, 1, dirBlock);
         _superblock.WriteInode(newNode);
 
-        // Add entry to parent.
-        byte ft = Ext2InodeLayout.FileTypeDir;
-        if (!Ext2DirectoryHelper.AddEntry(_superblock, parent, strName, newIno, ft))
+        if (!Ext2DirectoryHelper.AddEntry(_superblock, parent, childName, newIno, Ext2InodeLayout.FileTypeDir))
         {
             _superblock.FreeBlock(block);
             _superblock.FreeInode(newIno);
@@ -262,22 +266,10 @@ internal sealed class Ext2InodeOperations : IInodeOperations
         parent.LinksCount++;
         _superblock.WriteInode(parent);
 
-        // The allocator tracks free counts only; persist the directory count
-        // with the same group-descriptor write the superblock uses.
         uint group = _superblock.GroupOfInode(newIno);
         _superblock.GetGroup(group).UsedDirsCount++;
         _superblock.UpdateSuperblock();
-        {
-            uint gdStartBlock = _superblock.BlockSize == 1024 ? 2u : 1u;
-            uint groups = _superblock.GroupsCount;
-            uint gdBytes = groups * (uint)Ext2SuperblockLayout.GroupDescSize;
-            uint gdBlocks = (gdBytes + _superblock.BlockSize - 1) / _superblock.BlockSize;
-            byte[] gdBuf = new byte[gdBlocks * _superblock.BlockSize];
-            _superblock.ReadBlocks(gdStartBlock, gdBlocks, gdBuf);
-            int off = (int)group * Ext2SuperblockLayout.GroupDescSize;
-            BitConverter.TryWriteBytes(gdBuf.AsSpan(off + Ext2SuperblockLayout.GroupDescUsedDirsCountOffset, 2), _superblock.GetGroup(group).UsedDirsCount);
-            _superblock.WriteBlocks(gdStartBlock, gdBlocks, gdBuf);
-        }
+        WriteUsedDirsCount(group);
 
         inode = newNode;
         return true;
@@ -305,9 +297,9 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             return false;
         }
 
-        string strName = name.ToString();
-        string strTarget = target.ToString();
-        byte[] targetBytes = global::System.Text.Encoding.UTF8.GetBytes(strTarget);
+        string childName = name.ToString();
+        string targetPath = target.ToString();
+        byte[] targetBytes = global::System.Text.Encoding.UTF8.GetBytes(targetPath);
         const int MaxSymlinkBlocks = 16;
         if (targetBytes.Length > _superblock.BlockSize * MaxSymlinkBlocks)
         {
@@ -321,7 +313,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
 
         ushort ext2Mode = ToExt2Mode(VfsMode.SymbolicLink | VfsMode.OwnerRead | VfsMode.OwnerWrite | VfsMode.OwnerExecute | VfsMode.GroupRead | VfsMode.GroupExecute | VfsMode.OtherRead | VfsMode.OtherExecute);
         uint now = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        Ext2Inode newNode = new(_superblock, newIno, strName)
+        Ext2Inode newNode = new(_superblock, newIno, childName)
         {
             Mode = ext2Mode,
             Uid = 0,
@@ -331,27 +323,26 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             Mtime = now,
             LinksCount = 1,
             Blocks = 0,
-            Block = new uint[15],
+            Block = new uint[Ext2InodeLayout.BlockCount],
         };
 
         if (targetBytes.Length <= Ext2InodeLayout.InlineSymlinkMax)
         {
-            Ext2FileOperations.WriteInlineSymlink(newNode, strTarget);
+            Ext2FileOperations.WriteInlineSymlink(newNode, targetPath);
         }
         else
         {
             uint blocksNeeded = (uint)((targetBytes.Length + _superblock.BlockSize - 1) / _superblock.BlockSize);
             for (uint i = 0; i < blocksNeeded; i++)
             {
-                if (!_superblock.TryAllocateBlock(_superblock.GroupOfInode(newIno), out uint blk))
+                if (!_superblock.TryAllocateBlock(_superblock.GroupOfInode(newIno), out uint block))
                 {
-                    // Cleanup prior blocks.
                     for (uint j = 0; j < i; j++)
                     {
-                        uint b = newNode.Block[j];
-                        if (b != 0)
+                        uint allocated = newNode.Block[j];
+                        if (allocated != 0)
                         {
-                            _superblock.FreeBlock(b);
+                            _superblock.FreeBlock(allocated);
                         }
                     }
 
@@ -359,13 +350,13 @@ internal sealed class Ext2InodeOperations : IInodeOperations
                     return false;
                 }
 
-                newNode.Block[i] = blk;
-                newNode.Blocks += _superblock.BlockSize / 512;
-                byte[] blkData = new byte[_superblock.BlockSize];
-                int off = (int)i * (int)_superblock.BlockSize;
-                int toCopy = Math.Min((int)_superblock.BlockSize, targetBytes.Length - off);
-                targetBytes.AsSpan(off, toCopy).CopyTo(blkData.AsSpan(0, toCopy));
-                _superblock.WriteBlocks(blk, 1, blkData);
+                newNode.Block[i] = block;
+                newNode.Blocks += _superblock.BlockSize / SectorSize;
+                byte[] blockData = new byte[_superblock.BlockSize];
+                int offset = (int)i * (int)_superblock.BlockSize;
+                int toCopy = Math.Min((int)_superblock.BlockSize, targetBytes.Length - offset);
+                targetBytes.AsSpan(offset, toCopy).CopyTo(blockData.AsSpan(0, toCopy));
+                _superblock.WriteBlocks(block, 1, blockData);
             }
 
             newNode.Size = (uint)targetBytes.Length;
@@ -374,12 +365,13 @@ internal sealed class Ext2InodeOperations : IInodeOperations
 
         _superblock.WriteInode(newNode);
 
-        byte ft = Ext2InodeLayout.FileTypeSymlink;
-        if (!Ext2DirectoryHelper.AddEntry(_superblock, parent, strName, newIno, ft))
+        if (!Ext2DirectoryHelper.AddEntry(_superblock, parent, childName, newIno, Ext2InodeLayout.FileTypeSymlink))
         {
+            // An inline target fills i_block with the path bytes, not block
+            // numbers; only a link with data blocks has any to free.
             if (newNode.Blocks > 0)
             {
-                for (int i = 0; i < 15; i++)
+                for (int i = 0; i < Ext2InodeLayout.BlockCount; i++)
                 {
                     if (newNode.Block[i] != 0)
                     {
@@ -410,19 +402,19 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             return false;
         }
 
-        string strName = name.ToString();
+        string childName = name.ToString();
         if (!Ext2DirectoryHelper.TryFind(_superblock, parent, name, out Ext2DirEntry entry))
         {
             return false;
         }
 
-        Ext2Inode target = _superblock.ReadInode(entry.Inode, strName);
+        Ext2Inode target = _superblock.ReadInode(entry.Inode, childName);
         if (target.IsDirectory)
         {
             return false;
         }
 
-        if (!Ext2DirectoryHelper.RemoveEntry(_superblock, parent, strName))
+        if (!Ext2DirectoryHelper.RemoveEntry(_superblock, parent, childName))
         {
             return false;
         }
@@ -454,13 +446,13 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             return false;
         }
 
-        string strName = name.ToString();
+        string childName = name.ToString();
         if (!Ext2DirectoryHelper.TryFind(_superblock, parent, name, out Ext2DirEntry entry))
         {
             return false;
         }
 
-        Ext2Inode target = _superblock.ReadInode(entry.Inode, strName);
+        Ext2Inode target = _superblock.ReadInode(entry.Inode, childName);
         if (!target.IsDirectory)
         {
             return false;
@@ -470,22 +462,22 @@ internal sealed class Ext2InodeOperations : IInodeOperations
         List<Ext2DirEntry> entries = Ext2DirectoryHelper.ParseDirectory(_superblock, target);
         for (int i = 0; i < entries.Count; i++)
         {
-            string n = entries[i].Name;
-            if (n != "." && n != "..")
+            string entryName = entries[i].Name;
+            if (entryName != "." && entryName != "..")
             {
                 return false;
             }
         }
 
-        if (!Ext2DirectoryHelper.RemoveEntry(_superblock, parent, strName))
+        if (!Ext2DirectoryHelper.RemoveEntry(_superblock, parent, childName))
         {
             return false;
         }
 
-        uint blk = target.Block[0];
-        if (blk != 0)
+        uint block = target.Block[0];
+        if (block != 0)
         {
-            _superblock.FreeBlock(blk);
+            _superblock.FreeBlock(block);
         }
 
         target.LinksCount = 0;
@@ -496,24 +488,13 @@ internal sealed class Ext2InodeOperations : IInodeOperations
         _superblock.WriteInode(parent);
 
         uint group = _superblock.GroupOfInode(target.InodeNumber);
-        Ext2GroupDesc gd = _superblock.GetGroup(group);
-        if (gd.UsedDirsCount > 0)
+        Ext2GroupDesc descriptor = _superblock.GetGroup(group);
+        if (descriptor.UsedDirsCount > 0)
         {
-            gd.UsedDirsCount--;
+            descriptor.UsedDirsCount--;
         }
 
-        {
-            uint gdStartBlock = _superblock.BlockSize == 1024 ? 2u : 1u;
-            uint groups = _superblock.GroupsCount;
-            uint gdBytes = groups * (uint)Ext2SuperblockLayout.GroupDescSize;
-            uint gdBlocks = (gdBytes + _superblock.BlockSize - 1) / _superblock.BlockSize;
-            byte[] gdBuf = new byte[gdBlocks * _superblock.BlockSize];
-            _superblock.ReadBlocks(gdStartBlock, gdBlocks, gdBuf);
-            int off = (int)group * Ext2SuperblockLayout.GroupDescSize;
-            BitConverter.TryWriteBytes(gdBuf.AsSpan(off + Ext2SuperblockLayout.GroupDescUsedDirsCountOffset, 2), gd.UsedDirsCount);
-            _superblock.WriteBlocks(gdStartBlock, gdBlocks, gdBuf);
-        }
-
+        WriteUsedDirsCount(group);
         return true;
     }
 
@@ -528,57 +509,60 @@ internal sealed class Ext2InodeOperations : IInodeOperations
     /// <returns>true when the entry was moved.</returns>
     public bool Rename(IVfsInode oldParent, ReadOnlySpan<char> oldName, IVfsInode newParent, ReadOnlySpan<char> newName)
     {
-        if (oldParent is not Ext2Inode op || newParent is not Ext2Inode np)
+        if (oldParent is not Ext2Inode oldDir || newParent is not Ext2Inode newDir)
         {
             return false;
         }
 
-        string sOld = oldName.ToString();
-        string sNew = newName.ToString();
+        string oldChildName = oldName.ToString();
+        string newChildName = newName.ToString();
 
-        if (!Ext2DirectoryHelper.TryFind(_superblock, op, oldName, out Ext2DirEntry oldEntry))
+        if (!Ext2DirectoryHelper.TryFind(_superblock, oldDir, oldName, out Ext2DirEntry oldEntry))
         {
             return false;
         }
 
-        if (Ext2DirectoryHelper.TryFind(_superblock, np, newName, out Ext2DirEntry existing))
+        if (Ext2DirectoryHelper.TryFind(_superblock, newDir, newName, out _))
         {
             // Replace semantics are not implemented: refuse an existing
             // destination instead of writing a duplicate name.
             return false;
         }
 
-        byte ft = oldEntry.FileType;
-        if (ft == 0)
+        byte fileType = oldEntry.FileType;
+        if (fileType == Ext2InodeLayout.FileTypeUnknown)
         {
-            Ext2Inode node = _superblock.ReadInode(oldEntry.Inode, sOld);
-            ft = Ext2DirectoryHelper.FileTypeFromMode(node.Mode);
+            Ext2Inode node = _superblock.ReadInode(oldEntry.Inode, oldChildName);
+            fileType = Ext2DirectoryHelper.FileTypeFromMode(node.Mode);
         }
 
-        if (!Ext2DirectoryHelper.AddEntry(_superblock, np, sNew, oldEntry.Inode, ft))
+        if (!Ext2DirectoryHelper.AddEntry(_superblock, newDir, newChildName, oldEntry.Inode, fileType))
         {
             return false;
         }
 
-        if (!Ext2DirectoryHelper.RemoveEntry(_superblock, op, sOld))
+        if (!Ext2DirectoryHelper.RemoveEntry(_superblock, oldDir, oldChildName))
         {
-            Ext2DirectoryHelper.RemoveEntry(_superblock, np, sNew);
+            Ext2DirectoryHelper.RemoveEntry(_superblock, newDir, newChildName);
             return false;
         }
 
         // A directory moved across parents keeps a ".." pointing at the
         // old parent; rewrite it.
-        if (ft == Ext2InodeLayout.FileTypeDir && !ReferenceEquals(op, np))
+        if (fileType == Ext2InodeLayout.FileTypeDir && !ReferenceEquals(oldDir, newDir))
         {
-            Ext2Inode moved = _superblock.ReadInode(oldEntry.Inode, sNew);
-            uint blk = moved.Block[0];
-            if (blk != 0)
+            Ext2Inode moved = _superblock.ReadInode(oldEntry.Inode, newChildName);
+            uint block = moved.Block[0];
+            if (block != 0)
             {
                 byte[] dirBlock = new byte[_superblock.BlockSize];
-                _superblock.ReadBlocks(blk, 1, dirBlock);
+                _superblock.ReadBlocks(block, 1, dirBlock);
+
+                // ".." follows ".", whose record is the header plus one name
+                // byte, padded to a 4-byte boundary.
                 int dotDotPos = (Ext2InodeLayout.DirEntryNameOffset + 1 + 3) & ~3;
-                BitConverter.TryWriteBytes(dirBlock.AsSpan(dotDotPos + Ext2InodeLayout.DirEntryInodeOffset, 4), np.InodeNumber);
-                _superblock.WriteBlocks(blk, 1, dirBlock);
+                BitConverter.TryWriteBytes(dirBlock.AsSpan(dotDotPos + Ext2InodeLayout.DirEntryInodeOffset, 4), newDir.InodeNumber);
+                _superblock.WriteBlocks(block, 1, dirBlock);
             }
         }
 
@@ -646,7 +630,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             {
                 // Growing records the size; the blocks materialize on the
                 // next write, and the gap reads as zeros until then.
-                node.Size = (uint)(newSize & 0xFFFFFFFF);
+                node.Size = (uint)(newSize & 0xFFFF_FFFF);
                 node.SizeHigh = (uint)(newSize >> 32);
                 _superblock.WriteInode(node);
             }
@@ -656,7 +640,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
         {
             // The file type is immutable; only permission bits change.
             ushort curType = (ushort)(node.Mode & Ext2InodeLayout.IFMT);
-            ushort newPerms = (ushort)(ToExt2Mode(attributes.Mode) & 0x0FFF);
+            ushort newPerms = (ushort)(ToExt2Mode(attributes.Mode) & ModeLowBits);
             node.Mode = (ushort)(curType | newPerms);
         }
 
@@ -695,7 +679,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
     /// <param name="symlink">Inode of the symbolic link.</param>
     /// <param name="target">Link target on success.</param>
     /// <returns>true when <paramref name="symlink"/> is a symbolic link and the target was read.</returns>
-    public bool TryReadLink(IVfsInode symlink, out string? target)
+    public bool TryReadLink(IVfsInode symlink, [NotNullWhen(true)] out string? target)
     {
         target = null;
         if (symlink is not Ext2Inode node || !node.IsSymlink)
@@ -708,14 +692,32 @@ internal sealed class Ext2InodeOperations : IInodeOperations
     }
 
     /// <summary>
+    /// Persist one group's used-directory count to its on-disk descriptor.
+    /// The allocator writes the free counts only, so creating or removing a
+    /// directory writes this field itself.
+    /// </summary>
+    /// <param name="group">Zero-based block group.</param>
+    private void WriteUsedDirsCount(uint group)
+    {
+        // The descriptor table follows the superblock: block 2 with 1 KiB
+        // blocks, block 1 otherwise.
+        uint tableStart = _superblock.BlockSize == 1024 ? 2u : 1u;
+        uint tableBytes = _superblock.GroupsCount * (uint)Ext2SuperblockLayout.GroupDescSize;
+        uint tableBlocks = (tableBytes + _superblock.BlockSize - 1) / _superblock.BlockSize;
+        byte[] table = new byte[tableBlocks * _superblock.BlockSize];
+        _superblock.ReadBlocks(tableStart, tableBlocks, table);
+        int offset = (int)group * Ext2SuperblockLayout.GroupDescSize;
+        BitConverter.TryWriteBytes(table.AsSpan(offset + Ext2SuperblockLayout.GroupDescUsedDirsCountOffset, 2), _superblock.GetGroup(group).UsedDirsCount);
+        _superblock.WriteBlocks(tableStart, tableBlocks, table);
+    }
+
+    /// <summary>
     /// Convert a VFS mode to raw i_mode bits (file type plus the low 12 permission bits).
     /// </summary>
     /// <param name="mode">VFS mode.</param>
     private static ushort ToExt2Mode(VfsMode mode)
     {
-        ushort m = 0;
-        VfsMode type = mode & VfsMode.FileTypeMask;
-        m |= type switch
+        ushort type = (mode & VfsMode.FileTypeMask) switch
         {
             VfsMode.RegularFile => Ext2InodeLayout.IFREG,
             VfsMode.Directory => Ext2InodeLayout.IFDIR,
@@ -728,8 +730,7 @@ internal sealed class Ext2InodeOperations : IInodeOperations
         };
 
         // Permission bits occupy the same low 12 bits in both encodings.
-        m |= (ushort)((uint)mode & 0x0FFF);
-        return m;
+        return (ushort)(type | ((uint)mode & ModeLowBits));
     }
 
     /// <summary>
@@ -738,9 +739,8 @@ internal sealed class Ext2InodeOperations : IInodeOperations
     /// <param name="ext2Mode">Raw i_mode value.</param>
     private static VfsMode ToVfsMode(ushort ext2Mode)
     {
-        VfsMode m = 0;
         ushort type = (ushort)(ext2Mode & Ext2InodeLayout.IFMT);
-        m |= type switch
+        VfsMode fileType = type switch
         {
             Ext2InodeLayout.IFREG => VfsMode.RegularFile,
             Ext2InodeLayout.IFDIR => VfsMode.Directory,
@@ -752,7 +752,6 @@ internal sealed class Ext2InodeOperations : IInodeOperations
             _ => 0,
         };
 
-        m |= (VfsMode)(ext2Mode & 0x0FFF);
-        return m;
+        return fileType | (VfsMode)(ext2Mode & ModeLowBits);
     }
 }

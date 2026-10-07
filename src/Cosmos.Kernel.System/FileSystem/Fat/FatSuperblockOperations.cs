@@ -2,9 +2,13 @@
 
 namespace Cosmos.Kernel.System.FileSystem.Fat;
 
+/// <summary>
+/// Superblock callbacks for a FAT mount: sync, statistics and teardown.
+/// </summary>
 internal sealed class FatSuperblockOperations : ISuperblockOperations
 {
-    public const ulong Magic = 0x4D7341544146u;
+    /// <summary>Filesystem magic reported by statfs.</summary>
+    public const ulong Magic = 0x4D73_4154_4146u;
 
     public bool Sync(IVfsSuperblock superblock)
     {

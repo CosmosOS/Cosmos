@@ -3,50 +3,6 @@
 namespace Cosmos.Kernel.System.FileSystem.Ext2;
 
 /// <summary>
-/// Parsed ext2 directory entry. <see cref="Offset"/> is the byte position of
-/// the entry within the buffer that produced it.
-/// </summary>
-internal sealed class Ext2DirEntry
-{
-    /// <summary>Inode number of the entry; 0 marks a free slot.</summary>
-    public uint Inode { get; }
-
-    /// <summary>Record length: bytes from this entry to the next one.</summary>
-    public ushort RecLen { get; set; }
-
-    /// <summary>Name length in bytes.</summary>
-    public byte NameLen { get; }
-
-    /// <summary>File type (one of the <c>FileType*</c> values).</summary>
-    public byte FileType { get; }
-
-    /// <summary>Decoded entry name.</summary>
-    public string Name { get; }
-
-    /// <summary>Byte offset of the entry within the parsed directory data.</summary>
-    public int Offset { get; }
-
-    /// <summary>
-    /// Creates a parsed directory entry.
-    /// </summary>
-    /// <param name="inode">Inode number of the entry.</param>
-    /// <param name="recLen">Record length in bytes.</param>
-    /// <param name="nameLen">Name length in bytes.</param>
-    /// <param name="fileType">File type value.</param>
-    /// <param name="name">Decoded entry name.</param>
-    /// <param name="offset">Byte offset within the parsed directory data.</param>
-    public Ext2DirEntry(uint inode, ushort recLen, byte nameLen, byte fileType, string name, int offset)
-    {
-        Inode = inode;
-        RecLen = recLen;
-        NameLen = nameLen;
-        FileType = fileType;
-        Name = name;
-        Offset = offset;
-    }
-}
-
-/// <summary>
 /// Parser and mutator for ext2 directory blocks. Operates over raw byte
 /// spans read through the superblock; no I/O is performed here beyond the
 /// block reads the superblock exposes.
@@ -241,34 +197,27 @@ internal static class Ext2DirectoryHelper
             int idealLen = 0;
             if (inode != 0)
             {
-                byte nl = data[pos + Ext2InodeLayout.DirEntryNameLenOffset];
-                idealLen = (Ext2InodeLayout.DirEntryNameOffset + nl + 3) & ~3;
-            }
-            else
-            {
-                idealLen = 0;
+                byte entryNameLen = data[pos + Ext2InodeLayout.DirEntryNameLenOffset];
+                idealLen = (Ext2InodeLayout.DirEntryNameOffset + entryNameLen + 3) & ~3;
             }
 
             int remaining = recLen - idealLen;
             if (inode != 0 && remaining >= needed)
             {
-                // Split.
+                // Shrink the live entry to its ideal length; the new entry takes the slack behind it.
                 ushort newRecLen = (ushort)idealLen;
                 BitConverter.TryWriteBytes(data.AsSpan(pos + Ext2InodeLayout.DirEntryRecLenOffset, 2), newRecLen);
                 int newPos = pos + idealLen;
-                // Write new entry.
                 BitConverter.TryWriteBytes(data.AsSpan(newPos + Ext2InodeLayout.DirEntryInodeOffset, 4), inodeNumber);
                 BitConverter.TryWriteBytes(data.AsSpan(newPos + Ext2InodeLayout.DirEntryRecLenOffset, 2), (ushort)(recLen - idealLen));
                 data[newPos + Ext2InodeLayout.DirEntryNameLenOffset] = (byte)nameBytes.Length;
                 data[newPos + Ext2InodeLayout.DirEntryFileTypeOffset] = fileType;
                 nameBytes.CopyTo(data.AsSpan(newPos + Ext2InodeLayout.DirEntryNameOffset, nameBytes.Length));
-                // Zero pad?
                 for (int z = nameBytes.Length; z < (recLen - idealLen) - Ext2InodeLayout.DirEntryNameOffset; z++)
                 {
                     data[newPos + Ext2InodeLayout.DirEntryNameOffset + z] = 0;
                 }
 
-                // Write back.
                 for (uint i = 0; i < blocks; i++)
                 {
                     uint blk = sb.GetBlockPointer(dir, i, false, out _);
@@ -280,9 +229,8 @@ internal static class Ext2DirectoryHelper
 
             if (inode == 0 && recLen >= needed)
             {
-                // Reuse empty entry (may need to keep recLen as is if at end).
+                // Reuse the free slot in place: its rec_len stays, so the chain is unchanged.
                 BitConverter.TryWriteBytes(data.AsSpan(pos + Ext2InodeLayout.DirEntryInodeOffset, 4), inodeNumber);
-                // Keep recLen
                 data[pos + Ext2InodeLayout.DirEntryNameLenOffset] = (byte)nameBytes.Length;
                 data[pos + Ext2InodeLayout.DirEntryFileTypeOffset] = fileType;
                 nameBytes.CopyTo(data.AsSpan(pos + Ext2InodeLayout.DirEntryNameOffset, nameBytes.Length));
@@ -303,23 +251,21 @@ internal static class Ext2DirectoryHelper
             pos += recLen;
         }
 
-        // No space, need new block.
+        // No slot has room: append a block whose single entry spans all of it.
         if (!AllocateDirBlock(sb, dir))
         {
             return false;
         }
 
-        // Retry by adding at new block's start.
-        uint newBlockIdx = blocks; // 0-based
+        uint newBlockIdx = blocks;
         byte[] blockData = new byte[sb.BlockSize];
         BitConverter.TryWriteBytes(blockData.AsSpan(Ext2InodeLayout.DirEntryInodeOffset, 4), inodeNumber);
         BitConverter.TryWriteBytes(blockData.AsSpan(Ext2InodeLayout.DirEntryRecLenOffset, 2), (ushort)sb.BlockSize);
         blockData[Ext2InodeLayout.DirEntryNameLenOffset] = (byte)nameBytes.Length;
         blockData[Ext2InodeLayout.DirEntryFileTypeOffset] = fileType;
         nameBytes.CopyTo(blockData.AsSpan(Ext2InodeLayout.DirEntryNameOffset, nameBytes.Length));
-        uint nb = sb.GetBlockPointer(dir, newBlockIdx, false, out _);
-        sb.WriteBlocks(nb, 1, blockData);
-        // Update dir size.
+        uint newBlock = sb.GetBlockPointer(dir, newBlockIdx, false, out _);
+        sb.WriteBlocks(newBlock, 1, blockData);
         dir.Size = (uint)((newBlockIdx + 1) * sb.BlockSize);
         sb.WriteInode(dir);
         return true;
@@ -342,14 +288,6 @@ internal static class Ext2DirectoryHelper
 
         dir.Size = (uint)((idx + 1) * sb.BlockSize);
         sb.WriteInode(dir);
-        // Initialize new block with empty dir? Actually should be zeroed, then first entry will be written by caller.
-        // Ensure previous block's last entry extends to block boundary.
-        // We do that by adjusting last entry's rec_len to remaining space.
-        if (idx > 0)
-        {
-            // Reload previous block to adjust? The AddEntry path that allocated will handle new block itself.
-        }
-
         return true;
     }
 
@@ -396,36 +334,26 @@ internal static class Ext2DirectoryHelper
             byte nameLen = data[pos + Ext2InodeLayout.DirEntryNameLenOffset];
             if (inode != 0)
             {
-                int cl = Math.Min(nameLen, recLen - Ext2InodeLayout.DirEntryNameOffset);
-                string n = global::System.Text.Encoding.UTF8.GetString(data, pos + Ext2InodeLayout.DirEntryNameOffset, cl);
-                if (n == name)
+                int nameLenClamped = Math.Min(nameLen, recLen - Ext2InodeLayout.DirEntryNameOffset);
+                string entryName = global::System.Text.Encoding.UTF8.GetString(data, pos + Ext2InodeLayout.DirEntryNameOffset, nameLenClamped);
+                if (entryName == name)
                 {
-                    // Found. Mark inode 0 and coalesce with previous.
                     if (prevPos >= 0)
                     {
-                        // Extend previous rec_len
+                        // The previous record absorbs this one; its stale bytes stay behind the extended rec_len.
                         ushort newLen = (ushort)(prevRecLen + recLen);
                         BitConverter.TryWriteBytes(data.AsSpan(prevPos + Ext2InodeLayout.DirEntryRecLenOffset, 2), newLen);
                     }
                     else
                     {
-                        // First entry: just zero inode
-                        BitConverter.TryWriteBytes(data.AsSpan(pos + Ext2InodeLayout.DirEntryInodeOffset, 4), (uint)0);
+                        // No previous record to merge into: a zero inode frees the slot and keeps its rec_len for reuse.
+                        BitConverter.TryWriteBytes(data.AsSpan(pos + Ext2InodeLayout.DirEntryInodeOffset, 4), 0u);
                     }
 
-                    // If we coalesced, we need to write back all.
-                    // If prevPos >=0, we effectively removed entry by merging; otherwise zeroed inode keeps rec_len.
                     for (uint i = 0; i < blocks; i++)
                     {
                         uint blk = sb.GetBlockPointer(dir, i, false, out _);
                         sb.WriteBlocks(blk, 1, data.AsSpan((int)i * (int)sb.BlockSize, (int)sb.BlockSize));
-                    }
-
-                    // If entry was coalesced, the hole is merged; if first, inode 0 stays with same rec_len and will be reused.
-                    // For simplicity, when coalesced we already extended prev; need to handle case where first entry and there are more? Zeroing is fine.
-                    if (prevPos >= 0)
-                    {
-                        // We already extended prev, but current entry's bytes remain; need to zero? Not needed, rec_len covers.
                     }
 
                     return true;

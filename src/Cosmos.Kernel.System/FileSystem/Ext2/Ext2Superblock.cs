@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Devices;
-using global::System.Diagnostics.CodeAnalysis;
 
 namespace Cosmos.Kernel.System.FileSystem.Ext2;
 
@@ -13,7 +13,8 @@ namespace Cosmos.Kernel.System.FileSystem.Ext2;
 /// </summary>
 internal sealed class Ext2Superblock : IVfsSuperblock
 {
-    private readonly IBlockDevice _device;
+    /// <summary>Group descriptor table (flat array).</summary>
+    private readonly Ext2GroupDesc[] _groups;
 
     /// <summary>Live inodes by number; keeps open handles coherent with metadata writes.</summary>
     private readonly Dictionary<uint, Ext2Inode> _inodeCache = [];
@@ -93,9 +94,6 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// <summary>Reserved; mirrors the on-disk blocks-per-group geometry.</summary>
     public uint BlocksPerGroupActual { get; }
 
-    /// <summary>Group descriptor table (flat array).</summary>
-    private readonly Ext2GroupDesc[] _groups;
-
     /// <summary>Directory and metadata operations for this volume.</summary>
     public Ext2InodeOperations InodeOps { get; }
 
@@ -108,13 +106,16 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// <summary>Root directory inode of this mount.</summary>
     public IVfsInode Root { get; }
 
+    /// <inheritdoc />
     public ISuperblockOperations SuperOperations => SuperOps;
 
     long IVfsSuperblock.BlockSize => BlockSize;
+
+    /// <inheritdoc />
     public ulong MaxNameLength => 255;
 
     /// <summary>The block device holding the volume.</summary>
-    public IBlockDevice Device => _device;
+    public IBlockDevice Device { get; }
 
     private Ext2Superblock(
         IBlockDevice device,
@@ -136,7 +137,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
         uint featureRoCompat,
         Ext2GroupDesc[] groups)
     {
-        _device = device;
+        Device = device;
         InodesCount = inodesCount;
         BlocksCount = blocksCount;
         FreeBlocksCount = freeBlocksCount;
@@ -170,8 +171,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
         FileOps = new Ext2FileOperations(this);
         SuperOps = new Ext2SuperblockOperations();
 
-        Ext2Inode root = ReadInode(Ext2SuperblockLayout.RootInodeNumber, "/");
-        Root = root;
+        Root = ReadInode(Ext2SuperblockLayout.RootInodeNumber, "/");
     }
 
     /// <summary>
@@ -314,7 +314,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// <param name="dest">Destination buffer.</param>
     internal static void ReadBlocks(IBlockDevice device, uint ext2Block, uint count, uint ext2BlockSize, ulong devBlockSize, Span<byte> dest)
     {
-        if (device is null || dest.Length == 0)
+        if (dest.Length == 0)
         {
             return;
         }
@@ -351,9 +351,8 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// <param name="dest">Destination buffer.</param>
     internal void ReadBlocks(uint ext2Block, uint count, Span<byte> dest)
     {
-        if (_device is null || dest.Length == 0)
+        if (dest.Length == 0)
         {
-            dest.Clear();
             return;
         }
 
@@ -363,7 +362,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
             return;
         }
 
-        ReadBlocks(_device, ext2Block, count, BlockSize, _device.BlockSize, dest);
+        ReadBlocks(Device, ext2Block, count, BlockSize, Device.BlockSize, dest);
     }
 
     /// <summary>
@@ -375,7 +374,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// <param name="data">Source bytes.</param>
     internal void WriteBlocks(uint ext2Block, uint count, ReadOnlySpan<byte> data)
     {
-        if (_device is null || data.Length == 0)
+        if (data.Length == 0)
         {
             return;
         }
@@ -386,14 +385,14 @@ internal sealed class Ext2Superblock : IVfsSuperblock
         }
 
         ulong byteOffset = (ulong)ext2Block * BlockSize;
-        ulong lba = byteOffset / _device.BlockSize;
-        ulong devBlocks = (ulong)count * BlockSize / _device.BlockSize;
-        if (lba + devBlocks > _device.BlockCount)
+        ulong lba = byteOffset / Device.BlockSize;
+        ulong devBlocks = (ulong)count * BlockSize / Device.BlockSize;
+        if (lba + devBlocks > Device.BlockCount)
         {
             return;
         }
 
-        _device.WriteBlock(lba, devBlocks, data);
+        Device.WriteBlock(lba, devBlocks, data);
     }
 
     /// <summary>
@@ -474,7 +473,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
         uint blocks = BitConverter.ToUInt32(raw.Slice(Ext2InodeLayout.BlocksOffset, 4));
         uint flags = BitConverter.ToUInt32(raw.Slice(Ext2InodeLayout.FlagsOffset, 4));
         uint sizeHigh = 0;
-        if (InodeSize >= 108 + 4)
+        if (InodeSize >= Ext2InodeLayout.DirAclOrSizeHighOffset + 4)
         {
             sizeHigh = BitConverter.ToUInt32(raw.Slice(Ext2InodeLayout.DirAclOrSizeHighOffset, 4));
         }
@@ -539,7 +538,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
         BitConverter.TryWriteBytes(raw.Slice(Ext2InodeLayout.LinksCountOffset, 2), inode.LinksCount);
         BitConverter.TryWriteBytes(raw.Slice(Ext2InodeLayout.BlocksOffset, 4), inode.Blocks);
         BitConverter.TryWriteBytes(raw.Slice(Ext2InodeLayout.FlagsOffset, 4), inode.Flags);
-        if (InodeSize >= 108 + 4)
+        if (InodeSize >= Ext2InodeLayout.DirAclOrSizeHighOffset + 4)
         {
             BitConverter.TryWriteBytes(raw.Slice(Ext2InodeLayout.DirAclOrSizeHighOffset, 4), inode.SizeHigh);
         }
@@ -729,18 +728,18 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// </summary>
     internal void UpdateSuperblock()
     {
-        ulong devBlockSize = _device.BlockSize;
+        ulong devBlockSize = Device.BlockSize;
         ulong sbByteOffset = Ext2SuperblockLayout.SuperblockOffset;
         ulong sbLba = sbByteOffset / devBlockSize;
         ulong blocksToRead = (Ext2SuperblockLayout.SuperblockSize + devBlockSize - 1) / devBlockSize;
         ulong totalBytes = blocksToRead * devBlockSize;
         byte[] buf = new byte[totalBytes];
-        _device.ReadBlock(sbLba, blocksToRead, buf);
+        Device.ReadBlock(sbLba, blocksToRead, buf);
         int off = (int)(sbByteOffset % devBlockSize);
         Span<byte> sb = buf.AsSpan(off, Ext2SuperblockLayout.SuperblockSize);
         BitConverter.TryWriteBytes(sb.Slice(Ext2SuperblockLayout.FreeBlocksCountOffset, 4), FreeBlocksCount);
         BitConverter.TryWriteBytes(sb.Slice(Ext2SuperblockLayout.FreeInodesCountOffset, 4), FreeInodesCount);
-        _device.WriteBlock(sbLba, blocksToRead, buf);
+        Device.WriteBlock(sbLba, blocksToRead, buf);
     }
 
     /// <summary>
@@ -758,7 +757,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// </summary>
     public void Flush()
     {
-        _device.Flush();
+        Device.Flush();
         UpdateSuperblock();
     }
 
@@ -776,11 +775,6 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     internal uint GetBlockPointer(Ext2Inode inode, uint logicalBlock, bool allocate, out bool isNew)
     {
         isNew = false;
-        if (inode is null || inode.Block is null)
-        {
-            return 0;
-        }
-
         if (BlockSize == 0)
         {
             return 0;
@@ -854,7 +848,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
             byte[] blockBuf = _indirBuf1;
             if (_indirCacheData is not null && _indirCacheBlk == indir)
             {
-                Buffer.BlockCopy(_indirCacheData, 0, blockBuf, 0, (int)BlockSize);
+                _indirCacheData.AsSpan(0, (int)BlockSize).CopyTo(blockBuf);
             }
             else
             {
@@ -864,7 +858,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
                     _indirCacheData = new byte[BlockSize];
                 }
 
-                Buffer.BlockCopy(blockBuf, 0, _indirCacheData, 0, (int)BlockSize);
+                blockBuf.AsSpan(0, (int)BlockSize).CopyTo(_indirCacheData);
                 _indirCacheBlk = indir;
             }
 
@@ -883,7 +877,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
 
                 BitConverter.TryWriteBytes(blockBuf.AsSpan((int)logicalBlock * 4, 4), nb);
                 WriteBlocks(indir, 1, blockBuf);
-                Buffer.BlockCopy(blockBuf, 0, _indirCacheData, 0, (int)BlockSize);
+                blockBuf.AsSpan(0, (int)BlockSize).CopyTo(_indirCacheData);
                 _indirCacheBlk = indir;
                 inode.Blocks += BlockSize / 512;
                 byte[] zero = new byte[BlockSize];
@@ -935,7 +929,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
             byte[] firstBuf = _indirBuf1;
             if (_indirCacheData is not null && _indirCacheBlk == dindir)
             {
-                Buffer.BlockCopy(_indirCacheData, 0, firstBuf, 0, (int)BlockSize);
+                _indirCacheData.AsSpan(0, (int)BlockSize).CopyTo(firstBuf);
             }
             else
             {
@@ -945,7 +939,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
                     _indirCacheData = new byte[BlockSize];
                 }
 
-                Buffer.BlockCopy(firstBuf, 0, _indirCacheData, 0, (int)BlockSize);
+                firstBuf.AsSpan(0, (int)BlockSize).CopyTo(_indirCacheData);
                 _indirCacheBlk = dindir;
             }
 
@@ -965,7 +959,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
                 firstBlk = nb;
                 BitConverter.TryWriteBytes(firstBuf.AsSpan((int)firstIdx * 4, 4), nb);
                 WriteBlocks(dindir, 1, firstBuf);
-                Buffer.BlockCopy(firstBuf, 0, _indirCacheData, 0, (int)BlockSize);
+                firstBuf.AsSpan(0, (int)BlockSize).CopyTo(_indirCacheData);
                 _indirCacheBlk = dindir;
                 inode.Blocks += BlockSize / 512;
                 byte[] zero = new byte[BlockSize];
@@ -1022,7 +1016,6 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     {
         List<uint> result = [];
         uint blocksNeeded = (uint)((inode.FullSize + BlockSize - 1) / BlockSize);
-        uint perBlock = BlockSize / 4;
         for (uint i = 0; i < blocksNeeded; i++)
         {
             uint blk = GetBlockPointer(inode, i, false, out _);
@@ -1067,7 +1060,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
             }
         }
 
-        inode.Size = (uint)(newSize & 0xFFFFFFFF);
+        inode.Size = (uint)(newSize & 0xFFFF_FFFF);
         inode.SizeHigh = (uint)(newSize >> 32);
         WriteInode(inode);
         InvalidateIndirCache();
@@ -1077,10 +1070,7 @@ internal sealed class Ext2Superblock : IVfsSuperblock
     /// Drops the indirect block cache. Called after any write that mutates
     /// indirect block contents outside <see cref="GetBlockPointer"/>.
     /// </summary>
-    private void InvalidateIndirCache()
-    {
-        _indirCacheBlk = uint.MaxValue;
-    }
+    private void InvalidateIndirCache() => _indirCacheBlk = uint.MaxValue;
 
     /// <summary>
     /// Clear a logical block pointer (used when truncating). Indirect slots

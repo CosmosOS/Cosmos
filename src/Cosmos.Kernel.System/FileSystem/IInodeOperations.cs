@@ -19,11 +19,15 @@ public interface IInodeOperations
     bool Lookup(IVfsInode dir, ReadOnlySpan<char> name, [NotNullWhen(true)] out IVfsInode? child);
 
     /// <summary>
-    /// List the directory's children. <paramref name="entries"/> is
-    /// intentionally non-nullable (empty on failure) and read-only:
-    /// implementations return fixed or immutable collections; callers
-    /// that need to mutate must copy.
+    /// List the directory's children.
     /// </summary>
+    /// <param name="dir">Directory to list.</param>
+    /// <param name="entries">
+    /// Child inodes on success. Intentionally non-nullable (empty on failure)
+    /// and read-only: implementations return fixed or immutable collections;
+    /// callers that need to mutate must copy.
+    /// </param>
+    /// <returns>true on success.</returns>
     bool ReadDir(IVfsInode dir, out IReadOnlyList<IVfsInode> entries);
 
     /// <summary>

@@ -9,15 +9,15 @@ namespace Cosmos.Kernel.System.FileSystem;
 /// </summary>
 internal sealed class VfsDirectoryHandle : IVfsDirectoryHandle
 {
+    public string Name { get; }
+
+    public IVfsInode Inode { get; }
+
     public VfsDirectoryHandle(string name, IVfsInode inode)
     {
         Name = name;
         Inode = inode;
     }
-
-    public string Name { get; }
-
-    public IVfsInode Inode { get; }
 
     public void Dispose()
     {
@@ -25,10 +25,8 @@ internal sealed class VfsDirectoryHandle : IVfsDirectoryHandle
         // the only thing a handle owns, and a directory does not open.
     }
 
-    public bool TryReadDir(out IReadOnlyList<IVfsInode> entries)
-    {
-        return Inode.InodeOperations.ReadDir(Inode, out entries);
-    }
+    public bool TryReadDir(out IReadOnlyList<IVfsInode> entries) =>
+        Inode.InodeOperations.ReadDir(Inode, out entries);
 
     public bool TryLookup(ReadOnlySpan<char> name, [NotNullWhen(true)] out IVfsNodeHandle? child)
     {
@@ -68,7 +66,6 @@ internal sealed class VfsDirectoryHandle : IVfsDirectoryHandle
 
     public bool TrySymlink(ReadOnlySpan<char> name, ReadOnlySpan<char> target, [NotNullWhen(true)] out IVfsNodeHandle? child)
     {
-
         if (!Inode.InodeOperations.Symlink(Inode, name, target, out IVfsInode? created))
         {
             child = null;
@@ -79,28 +76,15 @@ internal sealed class VfsDirectoryHandle : IVfsDirectoryHandle
         return child is not null;
     }
 
-    public bool TryUnlink(ReadOnlySpan<char> name)
-    {
-        return Inode.InodeOperations.Unlink(Inode, name);
-    }
+    public bool TryUnlink(ReadOnlySpan<char> name) => Inode.InodeOperations.Unlink(Inode, name);
 
-    public bool TryRemoveDirectory(ReadOnlySpan<char> name)
-    {
-        return Inode.InodeOperations.Rmdir(Inode, name);
-    }
+    public bool TryRemoveDirectory(ReadOnlySpan<char> name) => Inode.InodeOperations.Rmdir(Inode, name);
 
-    public bool TryRename(ReadOnlySpan<char> oldName, IVfsDirectoryHandle newParent, ReadOnlySpan<char> newName)
-    {
-        return Inode.InodeOperations.Rename(Inode, oldName, newParent.Inode, newName);
-    }
+    public bool TryRename(ReadOnlySpan<char> oldName, IVfsDirectoryHandle newParent, ReadOnlySpan<char> newName) =>
+        Inode.InodeOperations.Rename(Inode, oldName, newParent.Inode, newName);
 
-    public bool TrySetAttr(SetAttrFlags flags, in VfsStat attributes)
-    {
-        return Inode.InodeOperations.SetAttr(Inode, flags, attributes);
-    }
+    public bool TrySetAttr(SetAttrFlags flags, in VfsStat attributes) =>
+        Inode.InodeOperations.SetAttr(Inode, flags, attributes);
 
-    public bool TryStat(out VfsStat stat)
-    {
-        return Inode.InodeOperations.GetAttr(Inode, out stat);
-    }
+    public bool TryStat(out VfsStat stat) => Inode.InodeOperations.GetAttr(Inode, out stat);
 }

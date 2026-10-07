@@ -27,6 +27,19 @@ internal sealed class FatInode : IVfsInode
 
     public List<uint>? CachedChain { get; internal set; }
 
+    public IInodeOperations InodeOperations => Superblock.InodeOps;
+
+    public IFileOperations? FileOperations => IsDirectory ? null : Superblock.FileOps;
+
+    public bool IsDirectory => (Attributes & FatAttr.Directory) != 0;
+
+    /// <summary>
+    /// True for the FAT12/16 root directory, which lives in the fixed root
+    /// region after the FATs rather than in a cluster chain.
+    /// </summary>
+    public bool IsFixedRoot =>
+        Parent is null && Superblock.Boot.Type != FatType.Fat32 && Superblock.Boot.RootSectorCount > 0;
+
     internal FatInode(
         FatSuperblock superblock,
         string name,
@@ -47,15 +60,6 @@ internal sealed class FatInode : IVfsInode
         DirEntrySlotCount = dirEntrySlotCount;
     }
 
-    public IInodeOperations InodeOperations => Superblock.InodeOps;
-
-    public IFileOperations? FileOperations => IsDirectory ? null : Superblock.FileOps;
-
-    public bool IsDirectory => (Attributes & FatAttr.Directory) != 0;
-
-    public bool IsFixedRoot =>
-        Parent is null && Superblock.Boot.Type != FatType.Fat32 && Superblock.Boot.RootSectorCount > 0;
-
     public List<uint> ResolveChain()
     {
         if (CachedChain is not null)
@@ -68,8 +72,5 @@ internal sealed class FatInode : IVfsInode
         return chain;
     }
 
-    public void InvalidateChain()
-    {
-        CachedChain = null;
-    }
+    public void InvalidateChain() => CachedChain = null;
 }

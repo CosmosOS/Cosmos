@@ -2,20 +2,6 @@
 
 namespace Cosmos.Kernel.System.FileSystem.Fat;
 
-/// <summary>FAT directory-entry attribute bits (FAT spec).</summary>
-[Flags]
-internal enum FatAttr : byte
-{
-    None = 0,
-    ReadOnly = 0x01,
-    Hidden = 0x02,
-    System = 0x04,
-    VolumeId = 0x08,
-    Directory = 0x10,
-    Archive = 0x20,
-    Lfn = ReadOnly | Hidden | System | VolumeId,
-}
-
 /// <summary>Parsed FAT directory entry. <see cref="ByteOffset"/> is the byte position of the 8.3 record within the buffer that produced it; LFN entries that contributed to <see cref="Name"/> precede it.</summary>
 internal sealed class FatDirEntry
 {
@@ -26,6 +12,8 @@ internal sealed class FatDirEntry
     public uint Size { get; }
     public int ByteOffset { get; }
     public int LfnEntryCount { get; }
+    public bool IsDirectory => (Attributes & FatAttr.Directory) != 0;
+    public bool IsVolumeId => (Attributes & FatAttr.VolumeId) != 0;
 
     public FatDirEntry(
         string name,
@@ -44,9 +32,6 @@ internal sealed class FatDirEntry
         ByteOffset = byteOffset;
         LfnEntryCount = lfnEntryCount;
     }
-
-    public bool IsDirectory => (Attributes & FatAttr.Directory) != 0;
-    public bool IsVolumeId => (Attributes & FatAttr.VolumeId) != 0;
 }
 
 /// <summary>
@@ -226,17 +211,17 @@ internal static class FatDirectory
                 continue;
             }
 
-            FatAttr attr = (FatAttr)buffer[offset + AttributesOffset];
+            FatAttr attributes = (FatAttr)buffer[offset + AttributesOffset];
 
-            if (attr == FatAttr.Lfn)
+            if (attributes == FatAttr.Lfn)
             {
                 // LFN metadata is untrusted: validate the 6-bit ordinal
                 // and require one checksum across the chain, or a stale
                 // accumulator splices two names together.
                 byte sequence = buffer[offset];
-                int seqIndex = (sequence & LfnOrdinalMask) - LfnFirstOrdinal;
+                int sequenceIndex = (sequence & LfnOrdinalMask) - LfnFirstOrdinal;
                 byte checksum = buffer[offset + LfnChecksumOffset];
-                if (seqIndex < 0 || seqIndex >= MaxLfnEntries
+                if (sequenceIndex < 0 || sequenceIndex >= MaxLfnEntries
                     || (lfnEntryCount > 0 && checksum != lfnChecksum))
                 {
                     lfnAccum.Clear();
@@ -246,7 +231,7 @@ internal static class FatDirectory
                 }
 
                 lfnChecksum = checksum;
-                int destBase = seqIndex * LfnCharsPerEntry;
+                int destBase = sequenceIndex * LfnCharsPerEntry;
                 ReadLfnChars(buffer.Slice(offset, EntrySize), lfnAccum.Slice(destBase, LfnCharsPerEntry));
 
                 int candidateLength = destBase + LfnCharsPerEntry;
@@ -282,7 +267,7 @@ internal static class FatDirectory
             result.Add(new FatDirEntry(
                 longName,
                 shortName,
-                attr,
+                attributes,
                 firstCluster,
                 size,
                 offset,
@@ -401,11 +386,11 @@ internal static class FatDirectory
         {
             char ac = a[i];
             char bc = b[i];
-            if (ac >= 'a' && ac <= 'z')
+            if (ac is >= 'a' and <= 'z')
             {
                 ac = (char)(ac - CaseDistance);
             }
-            if (bc >= 'a' && bc <= 'z')
+            if (bc is >= 'a' and <= 'z')
             {
                 bc = (char)(bc - CaseDistance);
             }
@@ -438,16 +423,16 @@ internal static class FatDirectory
         Span<char> chunk = stackalloc char[LfnCharsPerEntry];
         for (int i = 0; i < entries; i++)
         {
-            int seq = entries - i;
-            int sourceStart = (seq - LfnFirstOrdinal) * LfnCharsPerEntry;
+            int ordinal = entries - i;
+            int sourceStart = (ordinal - LfnFirstOrdinal) * LfnCharsPerEntry;
             for (int c = 0; c < LfnCharsPerEntry; c++)
             {
-                int srcIdx = sourceStart + c;
-                if (srcIdx < longName.Length)
+                int sourceIndex = sourceStart + c;
+                if (sourceIndex < longName.Length)
                 {
-                    chunk[c] = longName[srcIdx];
+                    chunk[c] = longName[sourceIndex];
                 }
-                else if (srcIdx == longName.Length)
+                else if (sourceIndex == longName.Length)
                 {
                     chunk[c] = '\0';
                 }
@@ -457,7 +442,7 @@ internal static class FatDirectory
                 }
             }
 
-            byte sequence = (byte)seq;
+            byte sequence = (byte)ordinal;
             if (i == 0)
             {
                 sequence |= LfnLastBit;
@@ -513,21 +498,21 @@ internal static class FatDirectory
             dest11[i] = ' ';
         }
 
-        if (string.IsNullOrEmpty(longName))
+        if (longName.Length == 0)
         {
             return;
         }
 
         int dot = longName.LastIndexOf('.');
         ReadOnlySpan<char> baseName = dot >= 0 ? longName.AsSpan(0, dot) : longName.AsSpan();
-        ReadOnlySpan<char> ext = dot >= 0 && dot + 1 < longName.Length
+        ReadOnlySpan<char> extension = dot >= 0 && dot + 1 < longName.Length
             ? longName.AsSpan(dot + 1)
             : [];
 
         int e = 0;
-        for (int i = 0; i < ext.Length && e < ShortExtLength; i++)
+        for (int i = 0; i < extension.Length && e < ShortExtLength; i++)
         {
-            char c = NormalizeShort(ext[i]);
+            char c = NormalizeShort(extension[i]);
             if (c != '\0')
             {
                 dest11[ShortBaseLength + e++] = c;
@@ -551,14 +536,14 @@ internal static class FatDirectory
         // Collect the normalized base once, then probe ~1, ~2, ...
         // (shrinking the kept base as the tail widens) until the result
         // is unique within the directory.
-        Span<char> normBase = stackalloc char[ShortBaseLength];
-        int normLen = 0;
-        for (int i = 0; i < baseName.Length && normLen < ShortBaseLength; i++)
+        Span<char> normalizedBase = stackalloc char[ShortBaseLength];
+        int normalizedLength = 0;
+        for (int i = 0; i < baseName.Length && normalizedLength < ShortBaseLength; i++)
         {
             char c = NormalizeShort(baseName[i]);
             if (c != '\0')
             {
-                normBase[normLen++] = c;
+                normalizedBase[normalizedLength++] = c;
             }
         }
 
@@ -566,9 +551,9 @@ internal static class FatDirectory
         {
             int digits = CountDigits(tail);
             int keep = ShortBaseLength - NumericTailTildeChars - digits;
-            if (keep > normLen)
+            if (keep > normalizedLength)
             {
-                keep = normLen;
+                keep = normalizedLength;
             }
             if (keep < 0)
             {
@@ -578,7 +563,7 @@ internal static class FatDirectory
             int b = 0;
             for (; b < keep; b++)
             {
-                dest11[b] = normBase[b];
+                dest11[b] = normalizedBase[b];
             }
             dest11[b++] = '~';
             uint value = tail;
@@ -608,9 +593,9 @@ internal static class FatDirectory
         }
 
         int dot = name.LastIndexOf('.');
-        int baseLen = dot >= 0 ? dot : name.Length;
-        int extLen = dot >= 0 ? name.Length - dot - 1 : 0;
-        if (baseLen == 0 || baseLen > ShortBaseLength || extLen > ShortExtLength)
+        int baseLength = dot >= 0 ? dot : name.Length;
+        int extensionLength = dot >= 0 ? name.Length - dot - 1 : 0;
+        if (baseLength == 0 || baseLength > ShortBaseLength || extensionLength > ShortExtLength)
         {
             return false;
         }
@@ -709,12 +694,12 @@ internal static class FatDirectory
         }
     }
 
-    private static string TrimLfn(Span<char> chars)
+    private static string TrimLfn(ReadOnlySpan<char> chars)
     {
         int end = chars.Length;
         for (int i = 0; i < chars.Length; i++)
         {
-            if (chars[i] == '\0' || chars[i] == LfnPadChar)
+            if (chars[i] is '\0' or LfnPadChar)
             {
                 end = i;
                 break;
@@ -726,10 +711,10 @@ internal static class FatDirectory
     private static string DecodeShortName(ReadOnlySpan<byte> raw11, byte firstByte)
     {
         Span<char> chars = stackalloc char[MaxShortNameChars];
-        int len = 0;
+        int length = 0;
 
         byte effectiveFirst = firstByte == KanjiLeadSubstitute ? DeletedMarker : firstByte;
-        chars[len++] = (char)effectiveFirst;
+        chars[length++] = (char)effectiveFirst;
 
         for (int i = 1; i < ShortBaseLength; i++)
         {
@@ -737,33 +722,33 @@ internal static class FatDirectory
             {
                 break;
             }
-            chars[len++] = (char)raw11[i];
+            chars[length++] = (char)raw11[i];
         }
 
-        bool hasExt = false;
+        bool hasExtension = false;
         for (int i = ShortBaseLength; i < ShortNameLength; i++)
         {
             if (raw11[i] != PadByte)
             {
-                hasExt = true;
+                hasExtension = true;
                 break;
             }
         }
 
-        if (hasExt)
+        if (hasExtension)
         {
-            chars[len++] = '.';
+            chars[length++] = '.';
             for (int i = ShortBaseLength; i < ShortNameLength; i++)
             {
                 if (raw11[i] == PadByte)
                 {
                     break;
                 }
-                chars[len++] = (char)raw11[i];
+                chars[length++] = (char)raw11[i];
             }
         }
 
-        return new string(chars.Slice(0, len));
+        return new string(chars.Slice(0, length));
     }
 
     private static char NormalizeShort(char c)
@@ -772,17 +757,17 @@ internal static class FatDirectory
         {
             return '\0';
         }
-        if (c >= 'a' && c <= 'z')
+        if (c is >= 'a' and <= 'z')
         {
             return (char)(c - CaseDistance);
         }
-        if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+        if (c is (>= 'A' and <= 'Z') or (>= '0' and <= '9'))
         {
             return c;
         }
-        if (c == '$' || c == '%' || c == '\'' || c == '-' || c == '_'
-            || c == '@' || c == '~' || c == '`' || c == '!' || c == '('
-            || c == ')' || c == '{' || c == '}' || c == '^' || c == '#' || c == '&')
+        if (c is '$' or '%' or '\'' or '-' or '_'
+            or '@' or '~' or '`' or '!' or '('
+            or ')' or '{' or '}' or '^' or '#' or '&')
         {
             return c;
         }

@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.System.FileSystem;
 
 /// <summary>
 /// Marker for filesystem-specific format parameters. Each driver casts to
-/// its own concrete type (e.g. <c>FatFormatOptions</c>); a null value means
+/// its own concrete type (e.g. <see cref="Fat.FatFormatOptions"/>); a null value means
 /// "use driver defaults."
 /// </summary>
 public interface IVfsFormatOptions

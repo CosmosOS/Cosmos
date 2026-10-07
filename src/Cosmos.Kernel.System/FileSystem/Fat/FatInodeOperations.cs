@@ -70,8 +70,7 @@ internal sealed class FatInodeOperations : IInodeOperations
 
             if (FatDirectory.NameEqualsIgnoreCase(entry.Name, targetName) || FatDirectory.NameEqualsIgnoreCase(entry.ShortName, targetName))
             {
-                FatInode found = _superblock.GetOrCreateInode(parent, entry);
-                child = found;
+                child = _superblock.GetOrCreateInode(parent, entry);
                 return true;
             }
         }
@@ -81,7 +80,7 @@ internal sealed class FatInodeOperations : IInodeOperations
 
     public bool ReadDir(IVfsInode dir, out IReadOnlyList<IVfsInode> entries)
     {
-        entries = Array.Empty<IVfsInode>();
+        entries = [];
         if (dir is not FatInode parent || !parent.IsDirectory)
         {
             return false;
@@ -241,19 +240,19 @@ internal sealed class FatInodeOperations : IInodeOperations
 
     public bool Rename(IVfsInode oldParent, ReadOnlySpan<char> oldName, IVfsInode newParent, ReadOnlySpan<char> newName)
     {
-        if (oldParent is not FatInode op || newParent is not FatInode np)
+        if (oldParent is not FatInode oldDir || newParent is not FatInode newDir)
         {
             return false;
         }
 
-        if (!_superblock.FindChildEntry(op, oldName, out FatDirEntry? match))
+        if (!_superblock.FindChildEntry(oldDir, oldName, out FatDirEntry? match))
         {
             return false;
         }
 
         // Replace semantics are not implemented: refuse an existing
         // destination instead of writing a duplicate name.
-        if (_superblock.FindChildEntry(np, newName, out _))
+        if (_superblock.FindChildEntry(newDir, newName, out _))
         {
             return false;
         }
@@ -266,20 +265,20 @@ internal sealed class FatInodeOperations : IInodeOperations
         // filesystem unchanged (the allocator only fills free slots, so
         // the source entry stays valid until removed). Crash-safe too —
         // worst case is a transiently duplicated name, not a lost file.
-        if (!_superblock.AllocateDirectoryEntry(np, newName, attr, firstCluster, size, out _))
+        if (!_superblock.AllocateDirectoryEntry(newDir, newName, attr, firstCluster, size, out _))
         {
             return false;
         }
 
-        _superblock.RemoveDirectoryEntry(op, match);
+        _superblock.RemoveDirectoryEntry(oldDir, match);
         _superblock.ForgetInode(match.FirstCluster);
 
         // A directory moved across parents keeps a '..' pointing at the
         // old parent; rewrite it (0 when the new parent is the root).
-        if ((attr & FatAttr.Directory) != 0 && !ReferenceEquals(op, np)
+        if ((attr & FatAttr.Directory) != 0 && !ReferenceEquals(oldDir, newDir)
             && firstCluster >= FatTable.FirstDataCluster)
         {
-            RewriteDotDot(firstCluster, np);
+            RewriteDotDot(firstCluster, newDir);
         }
 
         return true;
@@ -366,7 +365,6 @@ internal sealed class FatInodeOperations : IInodeOperations
         _superblock.UpdateInodeEntry(node);
         return true;
     }
-
 
     private static void WriteDotEntries(Span<byte> clusterBuffer, uint selfCluster, uint parentCluster)
     {

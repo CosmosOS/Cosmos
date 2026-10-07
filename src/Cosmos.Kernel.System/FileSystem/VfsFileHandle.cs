@@ -10,14 +10,6 @@ internal sealed class VfsFileHandle : IVfsFileHandle
     private readonly IVfsOpenFile _openFile;
     private bool _disposed;
 
-    public VfsFileHandle(string name, IVfsInode inode, IVfsOpenFile openFile)
-    {
-        Name = name;
-        Inode = inode;
-        _openFile = openFile;
-        _disposed = false;
-    }
-
     public string Name { get; }
 
     public IVfsInode Inode { get; }
@@ -35,6 +27,13 @@ internal sealed class VfsFileHandle : IVfsFileHandle
     internal bool Tracked { get; set; }
 
     public long Position => _openFile.Position;
+
+    public VfsFileHandle(string name, IVfsInode inode, IVfsOpenFile openFile)
+    {
+        Name = name;
+        Inode = inode;
+        _openFile = openFile;
+    }
 
     public long Read(Span<byte> buffer)
     {
@@ -68,15 +67,10 @@ internal sealed class VfsFileHandle : IVfsFileHandle
         return true;
     }
 
-    public bool TryFlush()
-    {
-        return !_disposed && _openFile.Operations.Fsync(_openFile);
-    }
+    public bool TryFlush() => !_disposed && _openFile.Operations.Fsync(_openFile);
 
-    public bool TrySetAttr(SetAttrFlags flags, in VfsStat attributes)
-    {
-        return !_disposed && Inode.InodeOperations.SetAttr(Inode, flags, attributes);
-    }
+    public bool TrySetAttr(SetAttrFlags flags, in VfsStat attributes) =>
+        !_disposed && Inode.InodeOperations.SetAttr(Inode, flags, attributes);
 
     public bool TryStat(out VfsStat stat)
     {
@@ -106,8 +100,5 @@ internal sealed class VfsFileHandle : IVfsFileHandle
         }
     }
 
-    private void ThrowIfDisposed()
-    {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-    }
+    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 }

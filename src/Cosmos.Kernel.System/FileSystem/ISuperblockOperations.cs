@@ -26,5 +26,6 @@ public interface ISuperblockOperations
     /// <summary>
     /// Tear down this mount (unmount); analogous to <c>kill_sb</c> / final put.
     /// </summary>
+    /// <param name="superblock">Mount to tear down.</param>
     void Drop(IVfsSuperblock superblock);
 }

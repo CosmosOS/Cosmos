@@ -1,14 +1,14 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.HAL.Devices;
 using Cosmos.Kernel.System.Storage;
-using global::System.Diagnostics.CodeAnalysis;
 
 namespace Cosmos.Kernel.System.FileSystem.Ext2;
 
 /// <summary>
-/// ext2 driver entry point. Pluggable into the VFS via <c>VfsManager.RegisterFileSystem</c>.
-/// Mirrors <c>FatFileSystemType</c> construction.
+/// ext2 driver entry point. Pluggable into the VFS via <see cref="VfsManager.RegisterFileSystem"/>.
+/// Mirrors <see cref="Fat.FatFileSystemType"/> construction.
 /// </summary>
 public sealed class Ext2FileSystemType : IVfsFileSystemType
 {
@@ -29,10 +29,7 @@ public sealed class Ext2FileSystemType : IVfsFileSystemType
     /// empty (test seam).
     /// </summary>
     /// <param name="device">The block device holding the volume.</param>
-    public Ext2FileSystemType(IBlockDevice device)
-    {
-        _injectedDevice = device;
-    }
+    public Ext2FileSystemType(IBlockDevice device) => _injectedDevice = device;
 
     /// <inheritdoc />
     public bool TryMount(ReadOnlySpan<char> source, MountFlags flags, [NotNullWhen(true)] out IVfsSuperblock? superblock)
@@ -62,13 +59,12 @@ public sealed class Ext2FileSystemType : IVfsFileSystemType
             return false;
         }
 
-        Ext2FormatOptions? ext2Options = options as Ext2FormatOptions;
-        if (options is not null && ext2Options is null)
+        return options switch
         {
-            return false;
-        }
-
-        return Ext2Formatter.Format(device, ext2Options);
+            null => Ext2Formatter.Format(device, null),
+            Ext2FormatOptions ext2Options => Ext2Formatter.Format(device, ext2Options),
+            _ => false,
+        };
     }
 
     /// <inheritdoc />

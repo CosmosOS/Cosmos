@@ -17,14 +17,6 @@ public static partial class VfsManager
 {
     private sealed class VfsOpenFile : IVfsOpenFile
     {
-        public VfsOpenFile(string name, IVfsInode inode, IFileOperations operations)
-        {
-            Name = name;
-            Inode = inode;
-            Operations = operations;
-            Position = 0;
-        }
-
         public string Name { get; }
 
         public IVfsInode Inode { get; }
@@ -32,6 +24,14 @@ public static partial class VfsManager
         public IFileOperations Operations { get; }
 
         public long Position { get; set; }
+
+        public VfsOpenFile(string name, IVfsInode inode, IFileOperations operations)
+        {
+            Name = name;
+            Inode = inode;
+            Operations = operations;
+            Position = 0;
+        }
     }
 
     private static readonly Dictionary<string, IVfsFileSystemType> s_registeredTypes = new(StringComparer.Ordinal);
@@ -59,11 +59,9 @@ public static partial class VfsManager
     /// </summary>
     /// <returns><c>true</c> when registration succeeds; <c>false</c> if name is invalid, driver is null, or already registered.</returns>
     public static bool RegisterFileSystem(string name, IVfsFileSystemType fileSystemType)
-    {
-        return !string.IsNullOrWhiteSpace(name)
+        => !string.IsNullOrWhiteSpace(name)
             && fileSystemType is not null
             && s_registeredTypes.TryAdd(name, fileSystemType);
-    }
 
     /// <summary>
     /// Resolves a registered driver by name. Guards the key the way
@@ -92,9 +90,7 @@ public static partial class VfsManager
     /// <param name="mount">Resulting mount data.</param>
     /// <returns><c>true</c> on success, <c>false</c> if driver is missing or mount fails.</returns>
     public static bool TryMount(string name, ReadOnlySpan<char> source, MountFlags flags, string mountPoint, [NotNullWhen(true)] out VfsMount? mount)
-    {
-        return TryMount(name, source, flags, mountPoint, null, out mount);
-    }
+        => TryMount(name, source, flags, mountPoint, null, out mount);
 
     /// <summary>
     /// Mount a registered filesystem driver on <paramref name="partition"/>.
@@ -273,7 +269,7 @@ public static partial class VfsManager
 
             if (removed is not null)
             {
-                s_mounts = kept.ToArray();
+                s_mounts = [.. kept];
             }
         }
         finally
@@ -312,7 +308,7 @@ public static partial class VfsManager
                 }
             }
 
-            s_mounts = kept.ToArray();
+            s_mounts = [.. kept];
         }
         finally
         {
@@ -470,13 +466,9 @@ public static partial class VfsManager
     /// </summary>
     internal static IVfsNodeHandle? WrapNode(string name, IVfsInode inode)
     {
-        VfsStat stat;
-        if (inode.InodeOperations.GetAttr(inode, out stat))
+        if (inode.InodeOperations.GetAttr(inode, out VfsStat stat) && stat.IsDirectory)
         {
-            if (stat.IsDirectory)
-            {
-                return new VfsDirectoryHandle(name, inode);
-            }
+            return new VfsDirectoryHandle(name, inode);
         }
 
         IFileOperations? fileOperations = inode.FileOperations;
@@ -582,12 +574,12 @@ public static partial class VfsManager
                     string newTarget = target.Length > 0 && target[0] == Path.DirectorySeparatorChar
                         ? target
                         : parentPath.Length == 1
-                            ? s_directorySeparatorString + target
-                            : parentPath + s_directorySeparatorString + target;
+                            ? $"{s_directorySeparatorString}{target}"
+                            : $"{parentPath}{s_directorySeparatorString}{target}";
 
                     if (!string.IsNullOrEmpty(remaining))
                     {
-                        newTarget = newTarget.TrimEnd(Path.DirectorySeparatorChar) + s_directorySeparatorString + remaining;
+                        newTarget = $"{newTarget.TrimEnd(Path.DirectorySeparatorChar)}{s_directorySeparatorString}{remaining}";
                     }
 
                     currentPath = newTarget;
@@ -626,22 +618,15 @@ public static partial class VfsManager
             }
 
             parent = parent == s_directorySeparatorString
-                ? s_directorySeparatorString + segment
-                : parent + s_directorySeparatorString + segment;
+                ? $"{s_directorySeparatorString}{segment}"
+                : $"{parent}{s_directorySeparatorString}{segment}";
         }
 
         return parent;
     }
 
     private static bool IsSymbolicLink(IVfsInode inode)
-    {
-        if (inode.InodeOperations.GetAttr(inode, out VfsStat stat))
-        {
-            return stat.IsSymbolicLink;
-        }
-
-        return false;
-    }
+        => inode.InodeOperations.GetAttr(inode, out VfsStat stat) && stat.IsSymbolicLink;
 
     /// <summary>
     /// True when <paramref name="mountPoint"/> (normalized: leading /, no
