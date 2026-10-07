@@ -17,11 +17,11 @@ internal struct HdAudioBufferDescriptor
     internal const uint InterruptOnCompletion = 1u << 0;
 
     /// <summary>Physical address of the entry's first byte.</summary>
-    internal ulong Address;
+    public ulong Address;
 
     /// <summary>Length of the entry in bytes.</summary>
-    internal uint Length;
+    public uint Length;
 
     /// <summary>Entry flags; only <see cref="InterruptOnCompletion"/> is defined.</summary>
-    internal uint Flags;
+    public uint Flags;
 }
