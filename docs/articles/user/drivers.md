@@ -660,6 +660,8 @@ platform:pci@cf8                     PciHostDriver
 
 A driver only sees its own node: a virtio driver never learns which transport carries its device, and a USB driver never sees the controller or the hubs above it.
 
+Each bus kind has its own namespace, `Cosmos.Kernel.HAL.DriverKit.Buses.<Bus>` (`Platform`, `Pci`, `Virtio`, `Usb`, `Ps2`, and `Synthetic` for tests), and names its types the same way: `<Bus>Identity` for what a node is, `<Bus>Match` for what a driver binds, and `<Bus>Access` for how the driver reaches the device, on every bus but the platform one, whose drivers map the node's resources (the PCI host node alone carries an access object, `PciHostAccess`).
+
 ### Platform nodes
 
 Platform nodes are the roots: devices nothing can enumerate, which the machine description publishes at boot. A kernel cannot publish its own.

@@ -195,6 +195,59 @@ part of the full type name that `CosmosDriverExclude` names and that the
 manifest sorts by ([Driver Manifest](build/driver-manifest.md)), so moving a
 driver changes both.
 
+### HAL Folders
+
+`Cosmos.Kernel.HAL` gives each concept one top-level folder, and no folder
+name appears twice in the tree:
+
+```
+Cosmos.Kernel.HAL/
+  Experimentals.cs           ← the seam's diagnostic ID (COSMOS0003)
+  Boot/                      ← internal: IPlatformInitializer, PlatformHAL
+  Timers/                    ← internal: TimerDevice, TimerEntry
+  Firmware/                  ← internal: framebuffer, device tree, MCFG, EFI clock
+  Internal/                  ← the LibraryInitializer ILC finds by full name
+  Devices/                   ← what a device is, a folder per category
+    Display/                 ← IDisplay, its facets, DisplayMode, DisplaySink, DisplayConsumer
+    Input/
+    Network/                 ← INetworkInterface, NetworkSink, NetworkConsumer, MacAddress
+    Storage/                 ← IBlockDevice, BlockConsumer
+  DriverKit/                 ← how a driver finds and binds a device
+    Driver.cs                ← the driver API, flat: one using for all of it
+    DeviceBinding.cs
+    Buses/
+      Pci/                   ← PciIdentity, PciMatch, PciAccess, PciLineInterruptSource, …
+      Usb/
+    Engine/                  ← internal: DeviceRegistry, DriverEngine, Arbitration, DriverLog
+```
+
+A device category under `Devices/` holds everything about its kind: the
+contract a driver implements, its facets and vocabulary, the sink the
+driver reports through (the block kind has none) and the ring's internal
+consumer, which learns of each device's arrival and departure and receives
+its reports. The categories are the ones `Cosmos.Kernel.Drivers` files its
+drivers under ([Driver Folders](#driver-folders)), less `Bus`.
+
+A bus kind under `DriverKit/Buses/` gives each role the same name in every
+folder: `<Bus>Identity`, `<Bus>Match`, `<Bus>Access` when a driver reaches
+the device through the bus (the platform bus has none: a platform driver
+maps its node's resources, and only the PCI host node carries an access
+object, the PCI folder's `PciHostAccess`), `<Bus>InterruptSource` when the
+bus delivers its own interrupts (on PCI and the platform bus the name also
+says how: `PciLineInterruptSource`, `PciMessageInterruptSource`,
+`PlatformLineInterruptSource`), and the bus's own vocabulary beside them.
+The base class a bus's host implements for the kit keeps the name its
+specification uses (`Ps2Controller`, `UsbHostController`,
+`VirtioTransport`) rather than a suffix shared across buses; the platform
+bus's is `PlatformLineRouting`, which the machine description implements.
+
+Stability is marked on each type, not by folder. Every public HAL type
+carries `[Experimental(Experimentals.DriverKitSeamDiagId)]` except the two
+stable contracts, `IBlockDevice` and `MacAddress`, and the
+`CosmosGuardHalPromotion` target in the HAL project fails the build when any
+other public type loses the attribute
+([Public API Tracking](public-api.md#the-policy)).
+
 ### Member Order
 
 There is no separator convention to follow. Four garbage-collector files carry
@@ -477,7 +530,7 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
 Write a `[Driver]` class in `Cosmos.Kernel.Drivers` over the kit and publish the device through its binding ([Writing a Driver](../user/drivers.md)). When the device sits on a bus the kit does not know:
 
-1. Add the bus kind to the kit, in its own folder under `DriverKit/Buses/`: an identity, a match, an access object, an interrupt source when the bus delivers its own interrupts, and a path format.
+1. Add the bus kind to the kit, in its own folder under `DriverKit/Buses/`: an identity, a match, an access object when a driver reaches the device through the bus, an interrupt source when the bus delivers its own interrupts, and a path format ([HAL Folders](#hal-folders)).
 2. Publish its nodes from the machine description (`PublishPlatformNodes`) or from a bus driver (`PublishChild`).
 3. Write the leaf driver over the access object.
 
