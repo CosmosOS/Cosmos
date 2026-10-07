@@ -1,20 +1,20 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Build.API.Enum;
-using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.ARM64.Cpu;
 using Cosmos.Kernel.Core.ARM64.IO;
 using Cosmos.Kernel.Core.ARM64.Power;
 using Cosmos.Kernel.Core.CPU;
+using Cosmos.Kernel.Core.Firmware;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Power;
 using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Platform;
 using Cosmos.Kernel.HAL.DriverKit.Interrupts;
 using Cosmos.Kernel.HAL.DriverKit.Resources;
-using Cosmos.Kernel.HAL.Firmware;
 using Cosmos.Kernel.HAL.Timers;
 
 namespace Cosmos.Kernel.HAL.ARM64;
@@ -399,14 +399,14 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
     /// The HHDM alias of a physical device address: the Device-memory
     /// mapping <see cref="DeviceMapper"/> installs lives under Limine's
     /// higher-half offset, and the raw physical address would hit the
-    /// cacheable identity mapping. The address itself without an HHDM
-    /// response. Any context.
+    /// cacheable identity mapping. An address already at or above the
+    /// offset is returned as given. Any context.
     /// </summary>
     /// <param name="phys">The physical address.</param>
-    private static unsafe ulong PhysToVirt(ulong phys)
+    private static ulong PhysToVirt(ulong phys)
     {
-        ulong hhdmOffset = Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : 0;
-        if (hhdmOffset != 0 && phys < hhdmOffset)
+        ulong hhdmOffset = AddressSpace.HhdmOffset;
+        if (phys < hhdmOffset)
         {
             return phys + hhdmOffset;
         }

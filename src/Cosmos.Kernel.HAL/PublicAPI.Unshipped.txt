@@ -578,7 +578,6 @@ static Cosmos.Kernel.HAL.Devices.Network.MacAddress.None.get -> Cosmos.Kernel.HA
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion.As<T>() -> System.Span<T>
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion.Caching.get -> Cosmos.Kernel.HAL.DriverKit.Resources.RegionCaching
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion.Length.get -> ulong
-[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion.Pointer.get -> byte*
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion.Slice(ulong offset, ulong length) -> Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion!
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion.Span.get -> System.Span<byte>
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Resources.DeviceResource

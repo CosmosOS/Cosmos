@@ -40,8 +40,8 @@ internal class ARM64InterruptController : IInterruptController
     /// <summary>GIC priority for the timer PPI (lower value = higher priority; 0x80 = medium).</summary>
     private const byte TimerPriorityMedium = 0x80;
 
-    /// <summary>Size in bytes of the NEON save area the vector stub pushes below the IRQContext (public: GenericTimer derives the saved-context SP from it).</summary>
-    public const int NeonSaveAreaBytes = 512;
+    /// <summary>Size in bytes of the NEON save area the vector stub pushes below the IRQContext.</summary>
+    private const int NeonSaveAreaBytes = 512;
 
     /// <summary>Bit position of the EC (Exception Class) field in ESR_EL1 (bits [31:26]).</summary>
     private const int EsrEcShift = 26;
@@ -269,9 +269,21 @@ internal class ARM64InterruptController : IInterruptController
         HandleFatalException(ctx.interrupt, ctx.cpu_flags, ctx.fault_address);
     }
 
-    private static unsafe void RunPendingReschedule(ref IRQContext ctx)
+    /// <summary>
+    /// The stack pointer of the context the vector stub saved for an
+    /// interrupt: the start of the NEON save area it pushed below
+    /// <paramref name="ctx"/>, which is what the scheduler switches from.
+    /// Interrupt context.
+    /// </summary>
+    /// <param name="ctx">The interrupt's context, as the vector stub passed it.</param>
+    public static unsafe nuint SavedContextStackPointer(ref IRQContext ctx)
     {
-        SchedulerManager.ReschedulePendingFromIrq(0, (nuint)Unsafe.AsPointer(ref ctx) - NeonSaveAreaBytes);
+        return (nuint)Unsafe.AsPointer(ref ctx) - NeonSaveAreaBytes;
+    }
+
+    private static void RunPendingReschedule(ref IRQContext ctx)
+    {
+        SchedulerManager.ReschedulePendingFromIrq(0, SavedContextStackPointer(ref ctx));
     }
 
     private void SendEOI()

@@ -1,7 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Scheduler;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
 /// the kit's PCI host factory, <see cref="PciHostAccess.ForEcam"/>, maps
 /// it bus by bus first. Any context; allocation-free.
 /// </summary>
-internal sealed unsafe class PciEcamConfigSpace : PciConfigSpace
+internal sealed class PciEcamConfigSpace : PciConfigSpace
 {
     /// <summary>Shift placing the bus number into ECAM address bits 27:20.</summary>
     private const int EcamBusShift = 20;
@@ -39,8 +39,7 @@ internal sealed unsafe class PciEcamConfigSpace : PciConfigSpace
     /// <param name="startBus">The first bus the window covers: the MCFG entry's start bus.</param>
     internal PciEcamConfigSpace(ulong physicalBase, byte startBus)
     {
-        ulong hhdmOffset = Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : 0;
-        _virtualBase = physicalBase + hhdmOffset;
+        _virtualBase = physicalBase + AddressSpace.HhdmOffset;
         _startBus = startBus;
     }
 

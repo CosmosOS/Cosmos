@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.IO;
 
-namespace Cosmos.Kernel.HAL.Firmware;
+namespace Cosmos.Kernel.Core.Firmware;
 
 /// <summary>
 /// A flattened device tree blob read in place: the header validated once

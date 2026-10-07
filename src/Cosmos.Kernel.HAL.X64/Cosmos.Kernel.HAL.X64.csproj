@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Unsafe code is contained in Cosmos.Kernel.Core: this layer reaches memory through its address-based entry points. -->
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <PackageId>Cosmos.Kernel.HAL.X64</PackageId>
     <Title>Cosmos Kernel HAL X64</Title>
     <Description>Hardware abstraction layer X64 implementation for Cosmos kernel.</Description>
@@ -11,7 +12,6 @@
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Kernel.Boot.Limine\Cosmos.Kernel.Boot.Limine.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.Core.X64\Cosmos.Kernel.Core.X64.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.HAL\Cosmos.Kernel.HAL.csproj" />

@@ -32,7 +32,7 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 /// </para>
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
-public sealed unsafe partial class DeviceBinding
+public sealed partial class DeviceBinding
 {
     /// <summary>How long teardown waits for each driver thread to exit.</summary>
     internal const uint JoinTimeoutMilliseconds = 500;
@@ -467,8 +467,7 @@ public sealed unsafe partial class DeviceBinding
     /// </summary>
     private static ulong MapDeviceMemory(DeviceResource resource)
     {
-        ulong heapPhysical = PageAllocator.VirtualToPhysical((ulong)PageAllocator.RamStart);
-        if (resource.PhysicalBase < heapPhysical + PageAllocator.RamSize && resource.PhysicalBase + resource.Length > heapPhysical)
+        if (PageAllocator.OverlapsHeap(resource.PhysicalBase, resource.Length))
         {
             throw new InvalidOperationException("The window overlaps the kernel heap.");
         }
@@ -478,7 +477,7 @@ public sealed unsafe partial class DeviceBinding
             throw new InvalidOperationException("The window cannot be mapped.");
         }
 
-        return resource.PhysicalBase + DeviceMemory.HhdmOffset();
+        return resource.PhysicalBase + AddressSpace.HhdmOffset;
     }
 
     private static DmaBuffer? AllocateDmaCore(int length, int alignment)
@@ -500,16 +499,16 @@ public sealed unsafe partial class DeviceBinding
         }
 
         ulong pageCount = (wanted + pageSize - 1) / pageSize;
-        void* pages = PageAllocator.AllocPages(PageType.Unmanaged, pageCount, zero: true);
-        if (pages == null)
+        MemoryBlock? pages = PageAllocator.AllocBlock(PageType.Unmanaged, pageCount, zero: true);
+        if (pages is null)
         {
             return null;
         }
 
         ulong mask = (ulong)alignment - 1;
-        ulong address = ((ulong)pages + mask) & ~mask;
+        ulong address = (pages.Base + mask) & ~mask;
         ulong physical = PageAllocator.VirtualToPhysical(address);
-        return new DmaBuffer(address, physical, length, (ulong)pages);
+        return new DmaBuffer(address, physical, length, pages);
     }
 
     /// <summary>Puts a USB pipe on the ledger; a pipe opened after teardown began is closed again and the member refused.</summary>

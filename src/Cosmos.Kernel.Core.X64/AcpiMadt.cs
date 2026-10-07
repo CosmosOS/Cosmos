@@ -120,6 +120,18 @@ public static unsafe class AcpiMadt
     }
 
     /// <summary>
+    /// The number of processors the MADT lists, or 1 when ACPI found no MADT.
+    /// </summary>
+    internal static uint CpuCount
+    {
+        get
+        {
+            MadtInfo* info = GetMadtInfoPtr();
+            return info != null ? info->CpuCount : 1;
+        }
+    }
+
+    /// <summary>
     /// Get and display MADT information
     /// </summary>
     /// <returns>True if MADT was found and parsed successfully during early boot</returns>

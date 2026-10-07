@@ -672,7 +672,7 @@ public class Kernel : Sys.Kernel
     {
         uint tableOffsetBir = pci.ReadConfig32((ushort)(capability + MsiXTableOffsetBirOffset));
         PciBar bar = pci.Bars[(int)(tableOffsetBir & MsiXTableBirMask)];
-        return bar.Base + (tableOffsetBir & MsiXTableOffsetMask) + DeviceMemory.HhdmOffset();
+        return bar.Base + (tableOffsetBir & MsiXTableOffsetMask) + AddressSpace.HhdmOffset;
     }
 
     // Puts back what the borrowed function's driver had: Message Control

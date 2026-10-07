@@ -1,10 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
+using Cosmos.Kernel.Core.Firmware;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.X64.Cpu;
-using Cosmos.Kernel.HAL.Firmware;
 
 namespace Cosmos.Kernel.HAL.X64;
 
@@ -63,7 +62,7 @@ internal class CmosRtc
     /// Initialize the RTC and capture boot time.
     /// Should be called after TSC calibration.
     /// </summary>
-    public unsafe void Initialize()
+    public void Initialize()
     {
         if (IsInitialized)
         {
@@ -87,9 +86,8 @@ internal class CmosRtc
         }
 
         // Priority 2: Limine boot time
-        if (Limine.BootTime.Response != null)
+        if (BootFirmware.TryGetBootTime(out long unixSecs))
         {
-            long unixSecs = Limine.BootTime.Response->BootTime;
             if (unixSecs > 0)
             {
                 BootTimeTicks = DateTime.UnixEpoch.Ticks + unixSecs * TimeSpan.TicksPerSecond;

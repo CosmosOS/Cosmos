@@ -1,11 +1,10 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Boot.Limine;
-using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.IO;
 
-namespace Cosmos.Kernel.HAL.Firmware;
+namespace Cosmos.Kernel.Core.Firmware;
 
 /// <summary>
 /// Shared helper for reading wall-clock time via EFI Runtime Services GetTime().

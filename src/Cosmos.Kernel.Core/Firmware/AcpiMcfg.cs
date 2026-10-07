@@ -3,7 +3,7 @@
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.Bridge;
 
-namespace Cosmos.Kernel.HAL.Firmware;
+namespace Cosmos.Kernel.Core.Firmware;
 
 /// <summary>
 /// C# bridge to native ACPI MCFG discovery (acpi_wrapper.c in MultiArch).

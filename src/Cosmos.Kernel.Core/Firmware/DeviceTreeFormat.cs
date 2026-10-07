@@ -1,6 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-namespace Cosmos.Kernel.HAL.Firmware;
+namespace Cosmos.Kernel.Core.Firmware;
 
 /// <summary>
 /// The constants of the flattened device tree format (the devicetree

@@ -2,7 +2,8 @@
   <PropertyGroup>
     <!-- Multi-arch package: built for both x64 and arm64 -->
     <IsMultiArchPackage>true</IsMultiArchPackage>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Unsafe code is contained in Cosmos.Kernel.Core. -->
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props) -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>

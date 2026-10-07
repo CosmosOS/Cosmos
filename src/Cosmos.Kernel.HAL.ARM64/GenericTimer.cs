@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.ARM64.Bridge;
 using Cosmos.Kernel.Core.ARM64.Cpu;
 using Cosmos.Kernel.Core.CPU;
@@ -179,9 +178,9 @@ internal class GenericTimer : TickSource
     /// <summary>
     /// Handles the timer interrupt.
     /// </summary>
-    private static unsafe void HandleIRQ(ref IRQContext ctx)
+    private static void HandleIRQ(ref IRQContext ctx)
     {
-        if (Instance == null)
+        if (Instance is null)
         {
             return;
         }
@@ -204,10 +203,8 @@ internal class GenericTimer : TickSource
         // Get current CPU ID (for now, always 0 on single CPU ARM64)
         uint cpuId = 0;
 
-        // Calculate SP pointing to saved context for context switching
-        // On ARM64, ctx sits one NEON save area above the start of the saved context
-        nuint contextPtr = (nuint)Unsafe.AsPointer(ref ctx);
-        nuint currentSp = contextPtr - ARM64InterruptController.NeonSaveAreaBytes;  // SP points to start of NEON save area
+        // The saved context's SP, which the scheduler switches from.
+        nuint currentSp = ARM64InterruptController.SavedContextStackPointer(ref ctx);
 
         // Log first few ticks and then periodically
         if (s_timerTickCount <= 5 || s_timerTickCount % 100 == 0)

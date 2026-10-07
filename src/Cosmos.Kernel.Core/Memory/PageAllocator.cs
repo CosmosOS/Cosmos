@@ -105,15 +105,25 @@ internal static unsafe class PageAllocator
                 "Kernel-image addresses have no HHDM alias; copy to a heap buffer for DMA.");
         }
 
-        ulong hhdmOffset = Limine.HHDM.Response != null
-            ? Limine.HHDM.Response->Offset
-            : DefaultHhdmOffset;
-
+        ulong hhdmOffset = AddressSpace.HhdmOffset;
         if (virtualAddress >= hhdmOffset)
         {
             return virtualAddress - hhdmOffset;
         }
         return virtualAddress;
+    }
+
+    /// <summary>
+    /// Whether the physical range that starts at <paramref name="physicalBase"/>
+    /// and spans <paramref name="length"/> bytes overlaps the heap's pages, for
+    /// the driver kit to refuse a device window over kernel memory.
+    /// </summary>
+    /// <param name="physicalBase">Physical address of the first byte.</param>
+    /// <param name="length">Length in bytes.</param>
+    public static bool OverlapsHeap(ulong physicalBase, ulong length)
+    {
+        ulong heapPhysical = VirtualToPhysical((ulong)RamStart);
+        return physicalBase < heapPhysical + RamSize && physicalBase + length > heapPhysical;
     }
 
     /// <summary>
@@ -702,6 +712,33 @@ internal static unsafe class PageAllocator
     /// allocates and would re-enter <see cref="AllocPages"/> under the lock.
     /// </remarks>
     public static void Free(void* aPtr) => Free(GetFirstPageAllocatorIndex(aPtr));
+
+    /// <summary>
+    /// Alloc a given number of pages, all of the same type, as a
+    /// <see cref="MemoryBlock"/>: how the layers above Core, which compile
+    /// without unsafe code, take pages. <see cref="Free(MemoryBlock)"/> gives
+    /// them back.
+    /// </summary>
+    /// <param name="aType">A type of pages to alloc.</param>
+    /// <param name="aPageCount">Number of pages to alloc, at most the 4 GiB a block describes.</param>
+    /// <param name="zero">When true, the pages are cleared before they are returned.</param>
+    /// <returns>The block over the pages on success, null on failure.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="aPageCount"/> spans more than a block describes.</exception>
+    public static MemoryBlock? AllocBlock(PageType aType, ulong aPageCount, bool zero = false)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(aPageCount, uint.MaxValue / PageSize);
+        void* pages = AllocPages(aType, aPageCount, zero);
+        return pages == null ? null : new MemoryBlock((ulong)pages, (uint)(aPageCount * PageSize));
+    }
+
+    /// <summary>
+    /// Free the pages of a block <see cref="AllocBlock"/> returned.
+    /// </summary>
+    /// <param name="aBlock">The block.</param>
+    public static void Free(MemoryBlock aBlock)
+    {
+        Free((void*)aBlock.Base);
+    }
 
     /// <summary>
     /// Fills out per-PageType counts by scanning the RAT. Returns zeros when

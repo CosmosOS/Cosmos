@@ -1,10 +1,10 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.ARM64.Cpu;
+using Cosmos.Kernel.Core.Firmware;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Firmware;
+using Cosmos.Kernel.Core.Memory;
 
 namespace Cosmos.Kernel.HAL.ARM64;
 
@@ -55,7 +55,7 @@ internal class PL031Rtc
     /// otherwise uses a fixed fallback epoch. Captures the GenericTimer counter for
     /// elapsed-time tracking.
     /// </summary>
-    public unsafe void Initialize()
+    public void Initialize()
     {
         Serial.Write("[RTC] Initializing...\n");
 
@@ -82,9 +82,8 @@ internal class PL031Rtc
         }
 
         // Priority 2: Limine boot time
-        if (Limine.BootTime.Response != null)
+        if (BootFirmware.TryGetBootTime(out long unixSecs))
         {
-            long unixSecs = Limine.BootTime.Response->BootTime;
             Serial.Write("[RTC] Limine BootTime response: ");
             Serial.WriteNumber((ulong)unixSecs);
             Serial.Write("\n");
@@ -150,8 +149,7 @@ internal class PL031Rtc
         // Priority 3: PL031 MMIO RTC (QEMU virt only, skipped on real hardware)
         if (GICv3.IsMmioAvailable)
         {
-            ulong hhdmOffset = Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : 0;
-            ulong pl031Virt = PL031_BASE_PHYS + hhdmOffset;
+            ulong pl031Virt = PL031_BASE_PHYS + AddressSpace.HhdmOffset;
 
             if (TryReadPL031(pl031Virt, out uint unixSeconds))
             {
@@ -255,7 +253,7 @@ internal class PL031Rtc
     /// Attempts to read the current Unix timestamp from a PL031 RTC at the given virtual address.
     /// Returns false if no valid PL031 is detected at that address.
     /// </summary>
-    private static unsafe bool TryReadPL031(ulong baseVirt, out uint unixSeconds)
+    private static bool TryReadPL031(ulong baseVirt, out uint unixSeconds)
     {
         unixSeconds = 0;
 

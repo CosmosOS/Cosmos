@@ -2,6 +2,7 @@
 
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
+using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
@@ -304,7 +305,7 @@ internal sealed class PciMessageTable
             return false;
         }
 
-        _tableVirtual = tablePhysical + DeviceMemory.HhdmOffset();
+        _tableVirtual = tablePhysical + AddressSpace.HhdmOffset;
         return true;
     }
 

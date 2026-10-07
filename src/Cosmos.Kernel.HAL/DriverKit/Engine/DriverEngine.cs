@@ -3,8 +3,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.DriverKit.Threading;
-using Cosmos.Kernel.HAL.Firmware;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Engine;
@@ -82,7 +82,7 @@ internal static class DriverEngine
         // no firmware display type at all.
         if (CosmosFeatures.GraphicsEnabled)
         {
-            if (BootFirmware.BootDisplay is { } display)
+            if (FirmwareDisplay.Boot is { } display)
             {
                 try
                 {

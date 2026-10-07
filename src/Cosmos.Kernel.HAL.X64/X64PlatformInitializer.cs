@@ -186,10 +186,9 @@ internal class X64PlatformInitializer : IPlatformInitializer
         return _pit;
     }
 
-    public unsafe uint GetCpuCount()
+    public uint GetCpuCount()
     {
-        var madtInfo = AcpiMadt.GetMadtInfoPtr();
-        return madtInfo != null ? madtInfo->CpuCount : 1;
+        return AcpiMadt.CpuCount;
     }
 
     public void StartSchedulerTimer(uint quantumMs)

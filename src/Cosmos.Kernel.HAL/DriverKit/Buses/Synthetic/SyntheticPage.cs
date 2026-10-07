@@ -10,12 +10,15 @@ namespace Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
 /// bus's own allocation for the node, released by the kit after the node's
 /// teardown unless a driver thread may still touch it.
 /// </summary>
-internal sealed unsafe class SyntheticPage : IKitResource
+internal sealed class SyntheticPage : IKitResource
 {
     private volatile bool _released;
 
+    /// <summary>The page.</summary>
+    public MemoryBlock Block { get; }
+
     /// <summary>The kernel's virtual address of the page.</summary>
-    public ulong Address { get; }
+    public ulong Address => Block.Base;
 
     /// <summary>The page's physical address.</summary>
     public ulong PhysicalAddress { get; }
@@ -23,9 +26,9 @@ internal sealed unsafe class SyntheticPage : IKitResource
     /// <summary>True once the page went back to the allocator.</summary>
     public bool IsReleased => _released;
 
-    private SyntheticPage(ulong address, ulong physicalAddress)
+    private SyntheticPage(MemoryBlock block, ulong physicalAddress)
     {
-        Address = address;
+        Block = block;
         PhysicalAddress = physicalAddress;
     }
 
@@ -33,13 +36,9 @@ internal sealed unsafe class SyntheticPage : IKitResource
     /// <exception cref="InvalidOperationException">No page left.</exception>
     internal static SyntheticPage Allocate()
     {
-        void* page = PageAllocator.AllocPages(PageType.Unmanaged, 1, zero: true);
-        if (page == null)
-        {
-            throw new InvalidOperationException("No page left for a synthetic device window.");
-        }
-
-        return new SyntheticPage((ulong)page, PageAllocator.VirtualToPhysical((ulong)page));
+        MemoryBlock page = PageAllocator.AllocBlock(PageType.Unmanaged, 1, zero: true)
+            ?? throw new InvalidOperationException("No page left for a synthetic device window.");
+        return new SyntheticPage(page, PageAllocator.VirtualToPhysical(page.Base));
     }
 
     /// <inheritdoc/>
@@ -51,6 +50,6 @@ internal sealed unsafe class SyntheticPage : IKitResource
         }
 
         _released = true;
-        PageAllocator.Free((void*)Address);
+        PageAllocator.Free(Block);
     }
 }

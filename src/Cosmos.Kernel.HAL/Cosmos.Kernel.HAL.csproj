@@ -2,7 +2,8 @@
   <PropertyGroup>
     <!-- Multi-arch package: contains both x64 and arm64 builds -->
     <IsMultiArchPackage>true</IsMultiArchPackage>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Unsafe code is contained in Cosmos.Kernel.Core: this layer reaches memory through its address-based entry points. -->
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <PackageId>Cosmos.Kernel.HAL</PackageId>
     <Title>Cosmos Kernel HAL</Title>
     <Description>Hardware abstraction layer base for multi-architecture kernel development.</Description>
@@ -31,7 +32,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Build.API\Cosmos.Build.API.csproj" />
     <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-    <ProjectReference Include="..\Cosmos.Kernel.Boot.Limine\Cosmos.Kernel.Boot.Limine.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" PrivateAssets="none" />
     <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>

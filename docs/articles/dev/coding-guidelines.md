@@ -205,10 +205,9 @@ Cosmos.Kernel.HAL/
   Experimentals.cs           ← the seam's diagnostic ID (COSMOS0003)
   Boot/                      ← internal: IPlatformInitializer, PlatformHAL
   Timers/                    ← internal: TickSource, TimerEntry
-  Firmware/                  ← internal: framebuffer, device tree, MCFG, EFI clock
   Internal/                  ← the LibraryInitializer ILC finds by full name
   Devices/                   ← what a device is, a folder per category
-    Display/                 ← IDisplay, its facets, DisplayMode, DisplaySink, DisplayConsumer
+    Display/                 ← IDisplay, its facets, DisplayMode, DisplaySink, DisplayConsumer, FirmwareDisplay
     Input/
     Network/                 ← INetworkInterface, NetworkSink, NetworkConsumer, MacAddress
     Storage/                 ← IBlockDevice, BlockConsumer
@@ -229,7 +228,11 @@ contract a driver implements, its facets and vocabulary, the sink the
 driver reports through (the block kind has none) and the ring's internal
 consumer, which learns of each device's arrival and departure and receives
 its reports. The categories are the ones `Cosmos.Kernel.Drivers` files its
-drivers under ([Driver Folders](#driver-folders)), less `Bus`.
+drivers under ([Driver Folders](#driver-folders)), less `Bus`. `Display/`
+also holds `FirmwareDisplay`, the display the engine publishes over the boot
+framebuffer that Core's `BootFirmware` read. HAL has no firmware folder:
+reading what the bootloader and the firmware hand over takes pointers, so it
+is Core's ([Unsafe Code](#unsafe-code)).
 
 The `DriverKit/` root holds the driver and its binding: `Driver` and its
 attribute, the registry, `DeviceBinding`, the node tree with its identity
@@ -546,7 +549,7 @@ Write a `[Driver]` class in `Cosmos.Kernel.Drivers` over the kit and publish the
 2. Publish its nodes from the machine description (`PublishPlatformNodes`) or from a bus driver (`PublishChild`).
 3. Write the leaf driver over the access object.
 
-Nothing goes into `Cosmos.Kernel.HAL.X64` or `Cosmos.Kernel.HAL.ARM64` but platform code. The device tree parser is cross-platform HAL code under `Cosmos.Kernel.HAL/Firmware`; the ARM64 description only reads it.
+Nothing goes into `Cosmos.Kernel.HAL.X64` or `Cosmos.Kernel.HAL.ARM64` but platform code. The device tree parser is Core code under `Cosmos.Kernel.Core/Firmware`, beside the other readers of what the firmware hands over; the ARM64 description only reads it.
 
 ### HAL Registration
 
@@ -659,7 +662,32 @@ public static void ComWrite(byte value)
 
 ### Unsafe Code
 
-Unsafe code is allowed (`<AllowUnsafeBlocks>true</AllowUnsafeBlocks>`) but should be contained in `Cosmos.Kernel.Core`:
+Unsafe code lives in `Cosmos.Kernel.Core` and its architecture projects
+(`Cosmos.Kernel.Core.X64`, `Cosmos.Kernel.Core.ARM64`), and in the pieces
+outside the layers (`Cosmos.Kernel.Boot.Limine`, `Cosmos.Kernel.Plugs`,
+`Cosmos.Kernel.Debug` and the `Cosmos.Kernel` aggregator).
+`Cosmos.Kernel.HAL`, its platform projects, `Cosmos.Kernel.System` and
+`Cosmos.Kernel.Drivers` compile with
+`<AllowUnsafeBlocks>false</AllowUnsafeBlocks>`, so the compiler refuses a
+pointer there. What those layers need from memory, Core hands out by
+address:
+
+- `MemoryBlock` (`Core/Memory/`, the gen2 type) is a view over memory at an
+  address: `Span` and `AsSpan<T>` read and write it.
+  `PageAllocator.AllocBlock` hands out pages as a block and
+  `PageAllocator.Free(MemoryBlock)` takes them back. A kit resource
+  (`DeviceRegion`, `DmaBuffer`) holds a block and refuses its span once its
+  binding is torn down.
+- `AddressSpace.HhdmOffset` is Limine's higher-half offset, read in one place.
+- `Core/Firmware/` reads what the bootloader and the firmware hand over: the
+  framebuffer, the device tree, the boot time, the ACPI MCFG entry and the
+  EFI clock (`BootFirmware`, `DeviceTree`, `AcpiMcfg`, `EfiRtc`).
+
+A structure the device reads in place, such as a virtqueue ring, is reached
+through `MemoryMarshal.Cast` and `MemoryMarshal.AsRef` over such a span, with
+`Volatile.Read` for a field the device writes. When a layer above Core needs
+what only a pointer gives, the fix is a Core entry point, not an `unsafe`
+block. Inside Core, keep `unsafe` to where it is needed:
 
 ```csharp
 // Good: unsafe scoped to where needed

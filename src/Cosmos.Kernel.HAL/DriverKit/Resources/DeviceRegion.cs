@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 
 namespace Cosmos.Kernel.HAL.DriverKit.Resources;
@@ -16,9 +17,10 @@ namespace Cosmos.Kernel.HAL.DriverKit.Resources;
 /// The accessors neither allocate nor block.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
-public sealed unsafe class DeviceRegion : IKitResource
+public sealed class DeviceRegion : IKitResource
 {
-    private readonly ulong _address;
+    /// <summary>The memory behind the region, its first 4 GiB when it is longer: the most a block describes, and more than a span reaches.</summary>
+    private readonly MemoryBlock _block;
 
     /// <summary>The region this one was sliced from; null for a region the kit mapped itself.</summary>
     private readonly DeviceRegion? _parent;
@@ -34,7 +36,8 @@ public sealed unsafe class DeviceRegion : IKitResource
 
     /// <summary>
     /// The region as bytes. A span is at most <see cref="int.MaxValue"/>
-    /// bytes long; a longer region is reached through <see cref="Pointer"/>.
+    /// bytes long; a longer region is reached a slice at a time through
+    /// <see cref="Slice"/>.
     /// </summary>
     /// <exception cref="InvalidOperationException">The binding that mapped the region was torn down.</exception>
     public Span<byte> Span
@@ -42,24 +45,13 @@ public sealed unsafe class DeviceRegion : IKitResource
         get
         {
             ThrowIfInvalidated();
-            return new Span<byte>((void*)_address, (int)Math.Min(Length, int.MaxValue));
-        }
-    }
-
-    /// <summary>The region's first byte. For accesses a span cannot express.</summary>
-    /// <exception cref="InvalidOperationException">The binding that mapped the region was torn down.</exception>
-    public byte* Pointer
-    {
-        get
-        {
-            ThrowIfInvalidated();
-            return (byte*)_address;
+            return _block.Span;
         }
     }
 
     internal DeviceRegion(ulong address, ulong length, RegionCaching caching)
     {
-        _address = address;
+        _block = new MemoryBlock(address, (uint)Math.Min(length, uint.MaxValue));
         Length = length;
         Caching = caching;
     }
@@ -67,21 +59,22 @@ public sealed unsafe class DeviceRegion : IKitResource
     private DeviceRegion(DeviceRegion parent, ulong address, ulong length)
     {
         _parent = parent;
-        _address = address;
+        _block = new MemoryBlock(address, (uint)Math.Min(length, uint.MaxValue));
         Length = length;
         Caching = parent.Caching;
     }
 
     /// <summary>
-    /// The region as a span of <typeparamref name="T"/> values, as many as fit.
+    /// The region as a span of <typeparamref name="T"/> values, as many as fit
+    /// in its first 4 GiB; a longer region is reached a slice at a time
+    /// through <see cref="Slice"/>.
     /// </summary>
     /// <typeparam name="T">The element type, an unmanaged struct such as a descriptor.</typeparam>
     /// <exception cref="InvalidOperationException">The binding that mapped the region was torn down.</exception>
     public Span<T> As<T>() where T : unmanaged
     {
         ThrowIfInvalidated();
-        ulong count = Length / (ulong)sizeof(T);
-        return new Span<T>((void*)_address, (int)Math.Min(count, int.MaxValue));
+        return _block.AsSpan<T>();
     }
 
     /// <summary>
@@ -112,7 +105,7 @@ public sealed unsafe class DeviceRegion : IKitResource
             throw new ArgumentOutOfRangeException(nameof(length), length, "The slice runs past the end of the region.");
         }
 
-        return new DeviceRegion(this, _address + offset, length);
+        return new DeviceRegion(this, _block.Base + offset, length);
     }
 
     /// <summary>

@@ -22,7 +22,7 @@ namespace Cosmos.Kernel.HAL.DriverKit.Buses.Virtio;
 /// by the specification, and QEMU offers 256 or 1024.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
-public sealed unsafe class Virtqueue
+public sealed class Virtqueue
 {
     /// <summary>Bytes of one descriptor: address, length, flags, next.</summary>
     internal const int DescriptorBytes = 16;
@@ -50,11 +50,8 @@ public sealed unsafe class Virtqueue
 
     private readonly VirtioTransport _transport;
     private readonly DmaBuffer _memory;
-    private readonly Descriptor* _descriptors;
-    private readonly RingHeader* _available;
-    private readonly ushort* _availableRing;
-    private readonly RingHeader* _used;
-    private readonly UsedElement* _usedRing;
+    private readonly int _availableOffset;
+    private readonly int _usedOffset;
     private readonly ushort[] _freeList;
     private ushort _freeHead;
     private ushort _lastUsed;
@@ -73,7 +70,7 @@ public sealed unsafe class Virtqueue
 
     /// <summary>
     /// True when the device has returned a buffer the driver has not taken.
-    /// No barrier: for a work item loop that returns, not a spin; a leaf
+    /// No DMA read barrier: for a work item loop that returns, not a spin; a leaf
     /// that must wait waits on its interrupt or spins with
     /// <see cref="DmaBuffer.ReadBarrier"/>. Interrupt context; allocation-free.
     /// </summary>
@@ -83,12 +80,27 @@ public sealed unsafe class Virtqueue
         get
         {
             ThrowIfReleased();
-            return _lastUsed != _used->Index;
+            return _lastUsed != Volatile.Read(ref Used.Index);
         }
     }
 
+    /// <summary>The descriptor table, at the start of the block. Throws once the block was freed.</summary>
+    private Span<Descriptor> Descriptors => MemoryMarshal.Cast<byte, Descriptor>(_memory.Span.Slice(0, Size * DescriptorBytes));
+
+    /// <summary>The available ring's flags and index. Throws once the block was freed.</summary>
+    private ref RingHeader Available => ref MemoryMarshal.AsRef<RingHeader>(_memory.Span.Slice(_availableOffset, AvailableRingHeaderBytes));
+
+    /// <summary>The available ring's entries, after its header. Throws once the block was freed.</summary>
+    private Span<ushort> AvailableRing => MemoryMarshal.Cast<byte, ushort>(_memory.Span.Slice(_availableOffset + AvailableRingHeaderBytes, Size * AvailableRingEntryBytes));
+
+    /// <summary>The used ring's flags and index, which the device advances. Throws once the block was freed.</summary>
+    private ref RingHeader Used => ref MemoryMarshal.AsRef<RingHeader>(_memory.Span.Slice(_usedOffset, UsedRingHeaderBytes));
+
+    /// <summary>The used ring's elements, after its header. Throws once the block was freed.</summary>
+    private Span<UsedElement> UsedRing => MemoryMarshal.Cast<byte, UsedElement>(_memory.Span.Slice(_usedOffset + UsedRingHeaderBytes, Size * UsedRingElementBytes));
+
     /// <summary>
-    /// Captures the ring pointers from <paramref name="memory"/> and builds
+    /// Records where the rings sit in <paramref name="memory"/> and builds
     /// the free list. Thread context: the free list is a managed array.
     /// </summary>
     /// <param name="transport">The transport, for the doorbell.</param>
@@ -104,12 +116,8 @@ public sealed unsafe class Virtqueue
         Index = index;
         Size = size;
 
-        ulong baseAddress = memory.Address;
-        _descriptors = (Descriptor*)baseAddress;
-        _available = (RingHeader*)(baseAddress + availableOffset);
-        _availableRing = (ushort*)(_available + 1);
-        _used = (RingHeader*)(baseAddress + usedOffset);
-        _usedRing = (UsedElement*)(_used + 1);
+        _availableOffset = (int)availableOffset;
+        _usedOffset = (int)usedOffset;
 
         _freeList = new ushort[size];
         for (int i = 0; i < size - 1; i++)
@@ -162,11 +170,11 @@ public sealed unsafe class Virtqueue
     {
         ThrowIfReleased();
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, Size);
-        Descriptor* descriptor = _descriptors + index;
-        descriptor->Address = physicalAddress;
-        descriptor->Length = length;
-        descriptor->Flags = (ushort)flags;
-        descriptor->Next = next;
+        ref Descriptor descriptor = ref Descriptors[index];
+        descriptor.Address = physicalAddress;
+        descriptor.Length = length;
+        descriptor.Flags = (ushort)flags;
+        descriptor.Next = next;
     }
 
     /// <summary>
@@ -183,10 +191,11 @@ public sealed unsafe class Virtqueue
     {
         ThrowIfReleased();
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(head, Size);
-        ushort index = _available->Index;
-        _availableRing[index % Size] = head;
+        ref RingHeader available = ref Available;
+        ushort index = available.Index;
+        AvailableRing[index % Size] = head;
         DmaBuffer.WriteBarrier();
-        _available->Index = (ushort)(index + 1);
+        available.Index = (ushort)(index + 1);
     }
 
     /// <summary>
@@ -204,12 +213,12 @@ public sealed unsafe class Virtqueue
     public bool TryTakeUsed(out ushort id, out uint length)
     {
         ThrowIfReleased();
-        while (_lastUsed != _used->Index)
+        while (_lastUsed != Volatile.Read(ref Used.Index))
         {
             DmaBuffer.ReadBarrier();
-            UsedElement* element = _usedRing + (_lastUsed % Size);
-            uint elementId = element->Id;
-            uint elementLength = element->Length;
+            ref UsedElement element = ref UsedRing[_lastUsed % Size];
+            uint elementId = element.Id;
+            uint elementLength = element.Length;
             _lastUsed++;
             if (elementId >= Size)
             {

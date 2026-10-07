@@ -94,9 +94,11 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Runtime" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.ARM64" />
-    <!-- HAL's ACPI layer reads the MCFG table through AcpiMcfgNative, and
-         IPlatformInitializer's factory methods return the platform contracts
-         (IPortIO, ICpuOps, IPowerOps, IInterruptController). -->
+    <!-- HAL builds without unsafe code, so it takes memory and firmware data
+         through Core (MemoryBlock with PageAllocator.AllocBlock,
+         AddressSpace.HhdmOffset, BootFirmware), and IPlatformInitializer's
+         factory methods return the platform contracts (IPortIO, ICpuOps,
+         IPowerOps, IInterruptController). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL" />
     <!-- Plugs read feature knobs (KnobsNative) and module metadata (ManagedModule). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
@@ -108,8 +110,10 @@
     <!-- System's supported ring fronts Core internals (Serial log, memory
          stats, thread kill) so kernels never reference Core directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.System" />
-    <!-- Arch HALs feed timer ticks and IRQ plumbing into Core, and mark their
-         EagerCtor with Core's EagerStaticClassConstructionAttribute. -->
+    <!-- Arch HALs feed timer ticks and IRQ plumbing into Core, read what the
+         firmware handed over (BootFirmware, the device tree, AcpiMcfg,
+         EfiRtc) and the HHDM offset from it, and mark their EagerCtor with
+         Core's EagerStaticClassConstructionAttribute. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- White-box scheduler suite reads Stride bookkeeping and drives the

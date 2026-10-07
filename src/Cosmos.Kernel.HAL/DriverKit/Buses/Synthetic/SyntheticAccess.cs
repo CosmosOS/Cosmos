@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.HAL.DriverKit.Buses.Synthetic;
 /// <see cref="RegisterWindow"/> and write what the driver will read.
 /// </summary>
 [Experimental(Experimentals.DriverKitSeamDiagId)]
-public sealed unsafe class SyntheticAccess
+public sealed class SyntheticAccess
 {
     private readonly SyntheticPage? _page;
     private readonly int _windowBytes;
@@ -33,7 +33,7 @@ public sealed unsafe class SyntheticAccess
         {
             return _page is null || _page.IsReleased
                 ? Span<byte>.Empty
-                : new Span<byte>((void*)_page.Address, _windowBytes);
+                : _page.Block.Span.Slice(0, _windowBytes);
         }
     }
 
