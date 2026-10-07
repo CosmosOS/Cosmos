@@ -36,5 +36,8 @@ public sealed class DeviceLock
     /// lock. Not reentrant: a holder that acquires again spins forever.
     /// </summary>
     /// <returns>The held state; a <c>using</c> binds to it and releases the lock.</returns>
-    public DeviceLockScope Acquire() => new(_lock.AcquireIrqSafe());
+    public DeviceLockScope Acquire()
+    {
+        return new(_lock.AcquireIrqSafe());
+    }
 }

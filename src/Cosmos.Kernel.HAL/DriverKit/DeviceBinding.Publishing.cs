@@ -19,35 +19,45 @@ public sealed partial class DeviceBinding
     /// <param name="keyboard">The driver's keyboard contract.</param>
     /// <returns>The sink the driver reports keys to.</returns>
     /// <exception cref="InvalidOperationException">The binding is being torn down, or the caller is an interrupt handler.</exception>
-    public KeyboardSink PublishKeyboard(IKeyboard keyboard) =>
-        new(Publish(DeviceKind.Keyboard, keyboard.Name, keyboard, nameof(PublishKeyboard)));
+    public KeyboardSink PublishKeyboard(IKeyboard keyboard)
+    {
+        return new(Publish(DeviceKind.Keyboard, keyboard.Name, keyboard, nameof(PublishKeyboard)));
+    }
 
     /// <summary>Publishes a pointer.</summary>
     /// <param name="pointer">The driver's pointer contract.</param>
     /// <returns>The sink the driver reports movement to.</returns>
     /// <exception cref="InvalidOperationException">The binding is being torn down, or the caller is an interrupt handler.</exception>
-    public PointerSink PublishPointer(IPointer pointer) =>
-        new(Publish(DeviceKind.Pointer, pointer.Name, pointer, nameof(PublishPointer)));
+    public PointerSink PublishPointer(IPointer pointer)
+    {
+        return new(Publish(DeviceKind.Pointer, pointer.Name, pointer, nameof(PublishPointer)));
+    }
 
     /// <summary>Publishes a network interface.</summary>
     /// <param name="network">The driver's interface contract.</param>
     /// <returns>The sink the driver reports frames and link changes to.</returns>
     /// <exception cref="InvalidOperationException">The binding is being torn down, or the caller is an interrupt handler.</exception>
-    public NetworkSink PublishNetwork(INetworkInterface network) =>
-        new(Publish(DeviceKind.Network, network.Name, network, nameof(PublishNetwork)));
+    public NetworkSink PublishNetwork(INetworkInterface network)
+    {
+        return new(Publish(DeviceKind.Network, network.Name, network, nameof(PublishNetwork)));
+    }
 
     /// <summary>Publishes a block device. Block devices report nothing, so there is no sink.</summary>
     /// <param name="device">The driver's block device.</param>
     /// <exception cref="InvalidOperationException">The binding is being torn down, or the caller is an interrupt handler.</exception>
-    public void PublishBlockDevice(IBlockDevice device) =>
+    public void PublishBlockDevice(IBlockDevice device)
+    {
         Publish(DeviceKind.Block, device.Name, device, nameof(PublishBlockDevice));
+    }
 
     /// <summary>Publishes a display under <see cref="IDisplay.Name"/>. The ring's display manager, when present, receives it at once.</summary>
     /// <param name="display">The driver's display contract.</param>
     /// <returns>The sink the driver reports mode changes to.</returns>
     /// <exception cref="InvalidOperationException">The binding is being torn down, or the caller is an interrupt handler.</exception>
-    public DisplaySink PublishDisplay(IDisplay display) =>
-        new(Publish(DeviceKind.Display, display.Name, display, nameof(PublishDisplay)));
+    public DisplaySink PublishDisplay(IDisplay display)
+    {
+        return new(Publish(DeviceKind.Display, display.Name, display, nameof(PublishDisplay)));
+    }
 
     /// <summary>
     /// Puts a device the driver found on its bus into the tree beneath this

@@ -55,13 +55,6 @@ public sealed unsafe partial class DeviceBinding
     private readonly List<DeviceLock> _locks = new();
     private readonly List<UsbPipeResource> _pipes = new();
 
-    internal DeviceBinding(DeviceNode node, Driver driver)
-    {
-        Node = node;
-        Driver = driver;
-        DetachEvent = new DeviceEvent();
-    }
-
     /// <summary>The device.</summary>
     public DeviceNode Node { get; }
 
@@ -89,8 +82,13 @@ public sealed unsafe partial class DeviceBinding
     public DeviceEvent DetachEvent { get; }
 
     /// <summary>Kit resources the binding holds: windows, regions, DMA buffers, interrupts, work items, periodic work, events, threads and USB pipes.</summary>
-    internal int HeldResourceCount =>
-        _memory.Count + _handles.Count + _workItems.Count + _periodic.Count + _events.Count + _threads.Count + _pipes.Count;
+    internal int HeldResourceCount
+    {
+        get
+        {
+            return _memory.Count + _handles.Count + _workItems.Count + _periodic.Count + _events.Count + _threads.Count + _pipes.Count;
+        }
+    }
 
     /// <summary>Devices the binding has published and not yet withdrawn.</summary>
     internal int PublishedDeviceCount => _devices.Count;
@@ -116,6 +114,13 @@ public sealed unsafe partial class DeviceBinding
 
             return false;
         }
+    }
+
+    internal DeviceBinding(DeviceNode node, Driver driver)
+    {
+        Node = node;
+        Driver = driver;
+        DetachEvent = new DeviceEvent();
     }
 
     /// <summary>
@@ -507,7 +512,10 @@ public sealed unsafe partial class DeviceBinding
     /// <param name="pipe">The pipe's ledger entry.</param>
     /// <param name="member">The access member recording it, for the exception.</param>
     /// <exception cref="InvalidOperationException">The binding is being torn down.</exception>
-    internal void RecordPipe(UsbPipeResource pipe, string member) => Record(_pipes, pipe, member);
+    internal void RecordPipe(UsbPipeResource pipe, string member)
+    {
+        Record(_pipes, pipe, member);
+    }
 
     /// <summary>Takes a USB pipe off the ledger, for an early close by the driver.</summary>
     /// <param name="pipe">The pipe's ledger entry.</param>
@@ -588,7 +596,10 @@ public sealed unsafe partial class DeviceBinding
         }
     }
 
-    private static void ThrowIfNotThreadContext(string member) => InterruptContextGuard.ThrowIfInHandler(member);
+    private static void ThrowIfNotThreadContext(string member)
+    {
+        InterruptContextGuard.ThrowIfInHandler(member);
+    }
 
     private void ThrowIfDetachingLocked(string member)
     {
@@ -599,6 +610,8 @@ public sealed unsafe partial class DeviceBinding
     }
 
     [DoesNotReturn]
-    private static void ThrowDetaching(string member) =>
+    private static void ThrowDetaching(string member)
+    {
         throw new InvalidOperationException($"{member} cannot be called once the binding is being torn down.");
+    }
 }

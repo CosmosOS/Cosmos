@@ -19,22 +19,9 @@ public sealed class DeviceNode
 {
     private readonly DeviceResource[] _resources;
     private readonly InterruptSource[] _interrupts;
-    private readonly object? _access;
     private DeviceOffer[] _offers = [];
     private DeviceNode[] _children = [];
     private volatile int _faultCount;
-    private string? _lastFault;
-
-    internal DeviceNode(DeviceIdentity identity, DeviceResource[] resources, InterruptSource[] interrupts, object? access, DeviceNode? parent)
-    {
-        Identity = identity;
-        _resources = resources;
-        _interrupts = interrupts;
-        _access = access;
-        Parent = parent;
-        Path = $"{identity.BusName}:{identity.Address}";
-        Description = identity.Describe();
-    }
 
     /// <summary>The node's name in the log and the diagnostics view: bus name, colon, bus address.</summary>
     public string Path { get; }
@@ -70,7 +57,7 @@ public sealed class DeviceNode
     public int FaultCount => _faultCount;
 
     /// <summary>The message of the most recent handler exception, or null.</summary>
-    public string? LastFault => _lastFault;
+    public string? LastFault { get; private set; }
 
     /// <summary>
     /// Resources a retraction could not take back because a driver thread
@@ -80,7 +67,7 @@ public sealed class DeviceNode
     public int LeakedResourceCount { get; internal set; }
 
     /// <summary>The bus's access object, whatever its type.</summary>
-    internal object? AccessObject => _access;
+    internal object? AccessObject { get; }
 
     /// <summary>
     /// The bus's own allocation for the node (a synthetic node's RAM page),
@@ -88,12 +75,23 @@ public sealed class DeviceNode
     /// </summary>
     internal IKitResource? BusResource { get; set; }
 
+    internal DeviceNode(DeviceIdentity identity, DeviceResource[] resources, InterruptSource[] interrupts, object? access, DeviceNode? parent)
+    {
+        Identity = identity;
+        _resources = resources;
+        _interrupts = interrupts;
+        AccessObject = access;
+        Parent = parent;
+        Path = $"{identity.BusName}:{identity.Address}";
+        Description = identity.Describe();
+    }
+
     /// <summary>The bus's access object as a <typeparamref name="T"/>.</summary>
     /// <typeparam name="T">The access type the bus documents.</typeparam>
     /// <exception cref="InvalidOperationException">The node has no access object of that type.</exception>
     public T Access<T>() where T : class
     {
-        if (_access is T access)
+        if (AccessObject is T access)
         {
             return access;
         }
@@ -106,7 +104,7 @@ public sealed class DeviceNode
     /// <param name="access">The access object, when the node has one of that type.</param>
     public bool TryGetAccess<T>([NotNullWhen(true)] out T? access) where T : class
     {
-        access = _access as T;
+        access = AccessObject as T;
         return access is not null;
     }
 
@@ -148,7 +146,7 @@ public sealed class DeviceNode
     /// <summary>Records a handler exception. Interrupt context: keeps the message reference, formats nothing.</summary>
     internal void RecordFault(string message)
     {
-        _lastFault = message;
+        LastFault = message;
         _faultCount++;
     }
 

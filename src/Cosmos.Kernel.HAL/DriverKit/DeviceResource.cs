@@ -18,14 +18,6 @@ public readonly struct DeviceResource
     /// <summary>Number of I/O ports an x64 machine decodes.</summary>
     private const uint PortSpaceSize = 0x10000;
 
-    private DeviceResource(DeviceResourceKind kind, ulong baseAddress, ulong physicalBase, ulong length)
-    {
-        Kind = kind;
-        Base = baseAddress;
-        PhysicalBase = physicalBase;
-        Length = length;
-    }
-
     /// <summary>What <see cref="Base"/> and <see cref="Length"/> mean.</summary>
     public DeviceResourceKind Kind { get; }
 
@@ -47,6 +39,14 @@ public readonly struct DeviceResource
     /// <summary>True for <see cref="None"/>: a slot nothing is assigned to.</summary>
     public bool IsNone => Kind == DeviceResourceKind.None;
 
+    private DeviceResource(DeviceResourceKind kind, ulong baseAddress, ulong physicalBase, ulong length)
+    {
+        Kind = kind;
+        Base = baseAddress;
+        PhysicalBase = physicalBase;
+        Length = length;
+    }
+
     /// <summary>
     /// An unassigned slot, kept so the indices of the slots after it stay
     /// stable; the binding refuses to map it.
@@ -56,8 +56,10 @@ public readonly struct DeviceResource
     /// <summary>A window of device registers or device memory at <paramref name="physicalBase"/>.</summary>
     /// <param name="physicalBase">Physical address of the first byte.</param>
     /// <param name="length">Length in bytes.</param>
-    public static DeviceResource MemoryWindow(ulong physicalBase, ulong length) =>
-        new(DeviceResourceKind.MemoryWindow, physicalBase, physicalBase, length);
+    public static DeviceResource MemoryWindow(ulong physicalBase, ulong length)
+    {
+        return new(DeviceResourceKind.MemoryWindow, physicalBase, physicalBase, length);
+    }
 
     /// <summary>
     /// A window backed by RAM the kernel already maps, reached through the
@@ -66,8 +68,10 @@ public readonly struct DeviceResource
     /// <param name="virtualBase">The allocator's virtual address of the first byte.</param>
     /// <param name="physicalBase">Physical address of the first byte.</param>
     /// <param name="length">Length in bytes.</param>
-    public static DeviceResource RamWindow(ulong virtualBase, ulong physicalBase, ulong length) =>
-        new(DeviceResourceKind.RamWindow, virtualBase, physicalBase, length);
+    public static DeviceResource RamWindow(ulong virtualBase, ulong physicalBase, ulong length)
+    {
+        return new(DeviceResourceKind.RamWindow, virtualBase, physicalBase, length);
+    }
 
     /// <summary>A range of I/O ports starting at <paramref name="basePort"/>.</summary>
     /// <param name="basePort">First port of the range.</param>

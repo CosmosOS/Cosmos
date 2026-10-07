@@ -40,14 +40,26 @@ public abstract class InterruptSource
     protected abstract void DisconnectCore();
 
     /// <summary>Kit side of <see cref="TryConnectCore"/>; called by the binding, never by a driver.</summary>
-    internal bool TryConnect(InterruptTrampoline trampoline) => TryConnectCore(trampoline);
+    internal bool TryConnect(InterruptTrampoline trampoline)
+    {
+        return TryConnectCore(trampoline);
+    }
 
     /// <summary>Kit side of <see cref="MaskCore"/>; called through the handle.</summary>
-    internal void Mask() => MaskCore();
+    internal void Mask()
+    {
+        MaskCore();
+    }
 
     /// <summary>Kit side of <see cref="UnmaskCore"/>; called through the handle.</summary>
-    internal void Unmask() => UnmaskCore();
+    internal void Unmask()
+    {
+        UnmaskCore();
+    }
 
     /// <summary>Kit side of <see cref="DisconnectCore"/>; called by teardown.</summary>
-    internal void Disconnect() => DisconnectCore();
+    internal void Disconnect()
+    {
+        DisconnectCore();
+    }
 }

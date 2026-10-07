@@ -18,15 +18,18 @@ public sealed class DeviceEvent
     private readonly InterruptEvent _event = new();
     private volatile bool _cancelled;
 
+    /// <summary>True once the binding that created the event is being torn down.</summary>
+    public bool IsCancelled => _cancelled;
+
     internal DeviceEvent()
     {
     }
 
-    /// <summary>True once the binding that created the event is being torn down.</summary>
-    public bool IsCancelled => _cancelled;
-
     /// <summary>Signals the event, waking one waiter or latching for the next. Allocation-free; any context.</summary>
-    public void Signal() => _event.Signal();
+    public void Signal()
+    {
+        _event.Signal();
+    }
 
     /// <summary>
     /// Waits for a signal, up to <paramref name="timeoutMilliseconds"/>.

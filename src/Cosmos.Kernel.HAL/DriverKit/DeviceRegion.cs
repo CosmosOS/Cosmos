@@ -32,21 +32,6 @@ public sealed unsafe class DeviceRegion : IKitResource
     /// <summary>The caching the region was mapped with.</summary>
     public RegionCaching Caching { get; }
 
-    internal DeviceRegion(ulong address, ulong length, RegionCaching caching)
-    {
-        _address = address;
-        Length = length;
-        Caching = caching;
-    }
-
-    private DeviceRegion(DeviceRegion parent, ulong address, ulong length)
-    {
-        _parent = parent;
-        _address = address;
-        Length = length;
-        Caching = parent.Caching;
-    }
-
     /// <summary>
     /// The region as bytes. A span is at most <see cref="int.MaxValue"/>
     /// bytes long; a longer region is reached through <see cref="Pointer"/>.
@@ -70,6 +55,21 @@ public sealed unsafe class DeviceRegion : IKitResource
             ThrowIfInvalidated();
             return (byte*)_address;
         }
+    }
+
+    internal DeviceRegion(ulong address, ulong length, RegionCaching caching)
+    {
+        _address = address;
+        Length = length;
+        Caching = caching;
+    }
+
+    private DeviceRegion(DeviceRegion parent, ulong address, ulong length)
+    {
+        _parent = parent;
+        _address = address;
+        Length = length;
+        Caching = parent.Caching;
     }
 
     /// <summary>
@@ -121,9 +121,15 @@ public sealed unsafe class DeviceRegion : IKitResource
     /// retirement, so a driver or a ring still holding the region gets an
     /// exception instead of writing to a device that is no longer its own.
     /// </summary>
-    internal void Invalidate() => _invalidated = true;
+    internal void Invalidate()
+    {
+        _invalidated = true;
+    }
 
-    void IKitResource.Release() => Invalidate();
+    void IKitResource.Release()
+    {
+        Invalidate();
+    }
 
     private void ThrowIfInvalidated()
     {

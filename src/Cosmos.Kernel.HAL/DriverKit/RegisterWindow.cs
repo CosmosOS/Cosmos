@@ -166,9 +166,15 @@ public sealed class RegisterWindow : IKitResource
     /// driver still holding the window gets an exception instead of writing
     /// to a device that is no longer its own.
     /// </summary>
-    internal void Invalidate() => _invalidated = true;
+    internal void Invalidate()
+    {
+        _invalidated = true;
+    }
 
-    void IKitResource.Release() => Invalidate();
+    void IKitResource.Release()
+    {
+        Invalidate();
+    }
 
     private void ThrowIfPortRange()
     {

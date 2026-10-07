@@ -16,24 +16,23 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 public sealed class WorkItem
 {
     private readonly Action _callback;
-    private readonly DeviceBinding? _binding;
     private volatile bool _cancelled;
-
-    internal WorkItem(Action callback, DeviceBinding? binding)
-    {
-        _callback = callback;
-        _binding = binding;
-        Job = new EngineJob(EngineJobKind.RunWorkItem) { Item = this };
-    }
 
     /// <summary>The item's queue entry.</summary>
     internal EngineJob Job { get; }
 
     /// <summary>The binding the item belongs to; null for the kit's own items.</summary>
-    internal DeviceBinding? Binding => _binding;
+    internal DeviceBinding? Binding { get; }
 
     /// <summary>True once cancelled by teardown.</summary>
     public bool IsCancelled => _cancelled;
+
+    internal WorkItem(Action callback, DeviceBinding? binding)
+    {
+        _callback = callback;
+        Binding = binding;
+        Job = new EngineJob(EngineJobKind.RunWorkItem) { Item = this };
+    }
 
     /// <summary>
     /// Queues the item to run on the worker. Allocation-free; any context.

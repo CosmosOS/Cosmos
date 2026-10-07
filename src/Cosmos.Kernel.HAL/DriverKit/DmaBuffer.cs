@@ -44,15 +44,6 @@ public sealed unsafe class DmaBuffer : IKitResource
     /// <summary>Length in bytes, as requested.</summary>
     public int Length { get; }
 
-    internal DmaBuffer(ulong address, ulong physicalAddress, int length, ulong pagesAddress)
-    {
-        _address = address;
-        _pagesAddress = pagesAddress;
-        PhysicalAddress = physicalAddress;
-        Length = length;
-        _region = new DeviceRegion(address, (ulong)length, RegionCaching.Normal);
-    }
-
     /// <summary>
     /// The buffer as a <see cref="DeviceRegion"/>, one instance for the
     /// buffer's lifetime, created with it. Throws once released, and the
@@ -114,19 +105,34 @@ public sealed unsafe class DmaBuffer : IKitResource
     /// <summary>True once the pages went back to the allocator: a volatile read, for the kit's ring code to refuse a ring access. Any context; allocation-free.</summary>
     internal bool IsReleased => _released;
 
+    internal DmaBuffer(ulong address, ulong physicalAddress, int length, ulong pagesAddress)
+    {
+        _address = address;
+        _pagesAddress = pagesAddress;
+        PhysicalAddress = physicalAddress;
+        Length = length;
+        _region = new DeviceRegion(address, (ulong)length, RegionCaching.Normal);
+    }
+
     /// <summary>
     /// Orders loads from DMA memory: every load before it completes before
     /// any load after it. Use after reading a flag the device wrote and
     /// before reading what the flag says is valid.
     /// </summary>
-    public static void ReadBarrier() => DmaOrdering.ReadBarrier();
+    public static void ReadBarrier()
+    {
+        DmaOrdering.ReadBarrier();
+    }
 
     /// <summary>
     /// Orders stores to DMA memory: every store before it is visible to the
     /// device before any store after it. Use between filling a descriptor and
     /// the store that hands it to the device.
     /// </summary>
-    public static void WriteBarrier() => DmaOrdering.WriteBarrier();
+    public static void WriteBarrier()
+    {
+        DmaOrdering.WriteBarrier();
+    }
 
     /// <summary>Frees the pages and makes every later <see cref="Span"/> and <see cref="Region"/> access throw. Teardown only.</summary>
     internal void Release()
@@ -141,5 +147,8 @@ public sealed unsafe class DmaBuffer : IKitResource
         PageAllocator.Free((void*)_pagesAddress);
     }
 
-    void IKitResource.Release() => Release();
+    void IKitResource.Release()
+    {
+        Release();
+    }
 }

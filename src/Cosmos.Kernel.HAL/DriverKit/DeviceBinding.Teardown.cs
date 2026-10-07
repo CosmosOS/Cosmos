@@ -25,7 +25,10 @@ public sealed partial class DeviceBinding
     /// consumer or source never leaves a handler connected or memory held.
     /// </summary>
     /// <param name="reason">Why, and whether the hardware is still there.</param>
-    internal void Teardown(DetachReason reason) => Release(reason, runOnDetach: true);
+    internal void Teardown(DetachReason reason)
+    {
+        Release(reason, runOnDetach: true);
+    }
 
     /// <summary>
     /// Releases everything a probe acquired before declining, failing or
@@ -33,7 +36,10 @@ public sealed partial class DeviceBinding
     /// Worker only.
     /// </summary>
     /// <returns>How many kit resources the probe had acquired.</returns>
-    internal int Unwind() => Release(new DetachReason(DetachCause.Retracted, hardwarePresent: true), runOnDetach: false);
+    internal int Unwind()
+    {
+        return Release(new DetachReason(DetachCause.Retracted, hardwarePresent: true), runOnDetach: false);
+    }
 
     private int Release(DetachReason reason, bool runOnDetach)
     {

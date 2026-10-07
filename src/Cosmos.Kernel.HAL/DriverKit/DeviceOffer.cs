@@ -12,16 +12,6 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct DeviceOffer
 {
-    internal DeviceOffer(string driverName, int priority, int specificity, ProbeOutcome outcome, string? reason, int releasedResourceCount)
-    {
-        DriverName = driverName;
-        Priority = priority;
-        Specificity = specificity;
-        Outcome = outcome;
-        Reason = reason;
-        ReleasedResourceCount = releasedResourceCount;
-    }
-
     /// <summary>Name of the driver offered the node.</summary>
     public string DriverName { get; }
 
@@ -42,4 +32,14 @@ public readonly struct DeviceOffer
     /// failed, all released by the kit before the next offer; zero when bound.
     /// </summary>
     public int ReleasedResourceCount { get; }
+
+    internal DeviceOffer(string driverName, int priority, int specificity, ProbeOutcome outcome, string? reason, int releasedResourceCount)
+    {
+        DriverName = driverName;
+        Priority = priority;
+        Specificity = specificity;
+        Outcome = outcome;
+        Reason = reason;
+        ReleasedResourceCount = releasedResourceCount;
+    }
 }

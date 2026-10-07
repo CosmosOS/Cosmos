@@ -18,12 +18,6 @@ public sealed class DriverThread
     private SchedulerThread? _thread;
     private volatile bool _exited;
 
-    internal DriverThread(string name, Action entry)
-    {
-        Name = name;
-        _entry = entry;
-    }
-
     /// <summary>The name the driver gave the thread, for the log.</summary>
     public string Name { get; }
 
@@ -32,6 +26,12 @@ public sealed class DriverThread
 
     /// <summary>True when the calling code runs on this thread.</summary>
     internal bool IsCurrent => _thread is not null && ReferenceEquals(KitTime.CurrentThread, _thread);
+
+    internal DriverThread(string name, Action entry)
+    {
+        Name = name;
+        _entry = entry;
+    }
 
     /// <summary>
     /// The thread's real entry: notes which scheduler thread it runs on

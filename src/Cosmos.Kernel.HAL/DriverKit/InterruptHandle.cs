@@ -13,42 +13,41 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class InterruptHandle
 {
-    private readonly InterruptSource _source;
     private volatile bool _masked;
 
-    internal InterruptHandle(InterruptSource source)
-    {
-        _source = source;
-    }
-
     /// <summary>The source this handle is connected to.</summary>
-    public InterruptSource Source => _source;
+    public InterruptSource Source { get; }
 
     /// <summary>True while deliveries are stopped at the controller.</summary>
     public bool IsMasked => _masked;
+
+    /// <summary>The dispatcher connected for this handle.</summary>
+    internal InterruptTrampoline? Trampoline { get; set; }
+
+    internal InterruptHandle(InterruptSource source)
+    {
+        Source = source;
+    }
 
     /// <summary>Stops deliveries at the controller. Allocation-free; any context.</summary>
     public void Mask()
     {
         _masked = true;
-        _source.Mask();
+        Source.Mask();
     }
 
     /// <summary>Lets deliveries through again. Allocation-free; any context.</summary>
     public void Unmask()
     {
         _masked = false;
-        _source.Unmask();
+        Source.Unmask();
     }
-
-    /// <summary>The dispatcher connected for this handle.</summary>
-    internal InterruptTrampoline? Trampoline { get; set; }
 
     /// <summary>Masks the source and disconnects the handler for good. Teardown only.</summary>
     internal void Disconnect()
     {
         _masked = true;
         Trampoline?.MarkDisconnected();
-        _source.Disconnect();
+        Source.Disconnect();
     }
 }

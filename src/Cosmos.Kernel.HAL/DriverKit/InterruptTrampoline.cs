@@ -21,21 +21,20 @@ public sealed class InterruptTrampoline
     private readonly InterruptHandler _handler;
     private readonly InterruptContext _context;
     private readonly InterruptHandle _handle;
-    private readonly DeviceNode _node;
     private readonly WorkItem _faultLog;
     private volatile bool _disconnected;
+
+    /// <summary>The node whose interrupt this dispatches, for the source's own log lines.</summary>
+    public DeviceNode Node { get; }
 
     internal InterruptTrampoline(InterruptHandler handler, InterruptContext context, InterruptHandle handle, DeviceNode node, WorkItem faultLog)
     {
         _handler = handler;
         _context = context;
         _handle = handle;
-        _node = node;
+        Node = node;
         _faultLog = faultLog;
     }
-
-    /// <summary>The node whose interrupt this dispatches, for the source's own log lines.</summary>
-    public DeviceNode Node => _node;
 
     /// <summary>
     /// Runs the handler once. Called by the source with interrupts masked;
@@ -59,7 +58,7 @@ public sealed class InterruptTrampoline
         }
         catch (Exception exception)
         {
-            _node.RecordFault(exception.Message);
+            Node.RecordFault(exception.Message);
             _handle.Mask();
             _faultLog.Schedule();
         }
@@ -72,5 +71,8 @@ public sealed class InterruptTrampoline
     }
 
     /// <summary>Makes every later <see cref="Invoke"/> return without running the handler.</summary>
-    internal void MarkDisconnected() => _disconnected = true;
+    internal void MarkDisconnected()
+    {
+        _disconnected = true;
+    }
 }

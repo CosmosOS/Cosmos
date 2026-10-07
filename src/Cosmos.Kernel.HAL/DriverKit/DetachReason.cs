@@ -11,12 +11,6 @@ namespace Cosmos.Kernel.HAL.DriverKit;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct DetachReason
 {
-    internal DetachReason(DetachCause cause, bool hardwarePresent)
-    {
-        Cause = cause;
-        HardwarePresent = hardwarePresent;
-    }
-
     /// <summary>Why the device is being detached.</summary>
     public DetachCause Cause { get; }
 
@@ -26,4 +20,10 @@ public readonly struct DetachReason
     /// touching its registers would fault or reach another device.
     /// </summary>
     public bool HardwarePresent { get; }
+
+    internal DetachReason(DetachCause cause, bool hardwarePresent)
+    {
+        Cause = cause;
+        HardwarePresent = hardwarePresent;
+    }
 }

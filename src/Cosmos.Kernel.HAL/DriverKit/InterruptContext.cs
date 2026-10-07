@@ -25,14 +25,23 @@ public sealed class InterruptContext
     /// whose condition a thread will clear; the thread unmasks through the
     /// <see cref="InterruptHandle"/>.
     /// </summary>
-    public void Mask() => _handle.Mask();
+    public void Mask()
+    {
+        _handle.Mask();
+    }
 
     /// <summary>Wakes a thread waiting on <paramref name="evt"/>.</summary>
     /// <param name="evt">An event the binding created.</param>
-    public void Signal(DeviceEvent evt) => evt.Signal();
+    public void Signal(DeviceEvent evt)
+    {
+        evt.Signal();
+    }
 
     /// <summary>Queues <paramref name="item"/> to run on the kit worker.</summary>
     /// <param name="item">A work item the binding created.</param>
     /// <returns>False when the item is already queued or was cancelled.</returns>
-    public bool Schedule(WorkItem item) => item.Schedule();
+    public bool Schedule(WorkItem item)
+    {
+        return item.Schedule();
+    }
 }
