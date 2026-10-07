@@ -1,40 +1,34 @@
-using Cosmos.Kernel;
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.Core.Memory;
-using Cosmos.Kernel.Core.Memory.GarbageCollector;
-using Cosmos.Kernel.Core.Runtime;
-using Cosmos.Kernel.Core.Scheduler;
-using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.HAL.Firmware;
 using Cosmos.Kernel.HAL.Platform;
 
 namespace Internal.Runtime.CompilerHelpers;
 
 /// <summary>
-/// This class is responsible for initializing the library and its dependencies. It is called by the runtime before any managed code is executed.
+/// Boot-time initializer of Cosmos.Kernel.HAL. ILC finds this type by name and calls <see cref="InitializeLibrary"/> before the kernel's entry point runs.
 /// </summary>
-internal class LibraryInitializer
+internal static class LibraryInitializer
 {
     /// <summary>
-    /// Initialize the HAL, the interrupt controller, the platform hardware and the driver kit's platform nodes. This method is called by the runtime before any managed code is executed.
+    /// Initialize the HAL, the interrupt controller, the platform hardware and the driver kit's platform nodes.
     /// </summary>
     public static void InitializeLibrary()
     {
-        // Get the platform initializer (registered by HAL.X64 or HAL.ARM64 module initializer)
+        // Registered by the HAL.X64 or HAL.ARM64 module initializer.
         IPlatformInitializer? initializer = PlatformHAL.Initializer;
         if (initializer is null)
         {
             Panic.Halt("No platform initializer registered. Reference Cosmos.Kernel.HAL.X64 or Cosmos.Kernel.HAL.ARM64.");
         }
 
-        // Display architecture
         Serial.WriteString("[KERNEL]   - Architecture: ");
         Serial.WriteString(initializer.PlatformName);
         Serial.WriteString("\n");
 
-        // Initialize platform-specific HAL
         Serial.WriteString("[KERNEL]   - Initializing HAL...\n");
         PlatformHAL.Initialize(initializer);
 
@@ -45,13 +39,13 @@ internal class LibraryInitializer
         Serial.WriteString("[KERNEL]   - Recording the firmware device tree...\n");
         BootFirmware.DiscoverDeviceTree();
 
-        // Initialize interrupts (skipped if CosmosEnableInterrupts=false)
+        // Skipped if CosmosEnableInterrupts=false.
         if (InterruptManager.IsEnabled)
         {
             Serial.WriteString("[KERNEL]   - Initializing interrupts...\n");
             InterruptManager.Initialize(initializer.CreateInterruptController());
 
-            // Initialize platform-specific hardware (ACPI, APIC, GIC, timers, etc.)
+            // ACPI, APIC, GIC, timers, etc.
             Serial.WriteString("[KERNEL]   - Initializing platform hardware...\n");
             initializer.InitializeHardware();
 
