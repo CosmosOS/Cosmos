@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.DriverKit.Resources;
@@ -25,6 +26,17 @@ namespace Cosmos.Kernel.System.Graphics;
 /// up to it, and nothing throws for a coordinate, so coordinates never need
 /// clamping before a call. A canvas whose display has no mode is zero-sized:
 /// every primitive clips everything, and nothing throws.
+/// <para>
+/// The image and canvas draws (<c>DrawImage</c>, <see cref="CroppedDrawImage"/>,
+/// <c>DrawCanvas</c>) lay each pixel over the canvas by its alpha times the
+/// draw's <c>opacity</c>, 255 by default: an opaque pixel at full opacity
+/// replaces what is there, a transparent one leaves it alone, and one in
+/// between is blended (source over, straight alpha). Over an opaque pixel
+/// the result stays opaque; over a translucent or transparent one, as on an
+/// off-screen canvas cleared to <see cref="Color.Transparent"/>, the alphas
+/// combine, so that canvas can be drawn as a layer later. <c>DrawArray</c>
+/// is the one draw that copies pixels raw, alpha included.
+/// </para>
 /// </remarks>
 public class Canvas
 {
@@ -233,10 +245,7 @@ public class Canvas
     /// is published: the kernel has no framebuffer from the bootloader and no
     /// display driver bound a device.
     /// </exception>
-    public static Canvas GetFullScreen()
-    {
-        return FullScreenCanvas.Get();
-    }
+    public static Canvas GetFullScreen() => FullScreenCanvas.Get();
 
     /// <summary>
     /// Gets the full-screen canvas on the primary display, switching the
@@ -250,10 +259,7 @@ public class Canvas
     /// </param>
     /// <exception cref="InvalidOperationException">Graphics support is compiled out with CosmosEnableGraphics=false, or no display is published.</exception>
     /// <exception cref="ArgumentOutOfRangeException">The display can switch modes and does not support <paramref name="mode"/>.</exception>
-    public static Canvas GetFullScreen(Mode mode)
-    {
-        return FullScreenCanvas.Get(mode);
-    }
+    public static Canvas GetFullScreen(Mode mode) => FullScreenCanvas.Get(mode);
 
     /// <summary>
     /// Drops the full-screen canvas, after its <see cref="Disable"/> released
@@ -262,36 +268,24 @@ public class Canvas
     /// display. Any canvas already acquired is dead after this call. The
     /// display itself stays in its mode: there is no text mode to return to.
     /// </summary>
-    public static void DisableFullScreen()
-    {
-        FullScreenCanvas.Disable();
-    }
+    public static void DisableFullScreen() => FullScreenCanvas.Disable();
 
     /// <summary>
     /// Clears the canvas with the default color.
     /// </summary>
-    public void Clear()
-    {
-        Clear(Color.Black);
-    }
+    public void Clear() => Clear(Color.Black);
 
     /// <summary>
     /// Clears the entire canvas with the specified color.
     /// </summary>
     /// <param name="color">The ARGB color to clear the screen with.</param>
-    public virtual void Clear(int color)
-    {
-        Array.Fill(_buffer, color);
-    }
+    public virtual void Clear(int color) => Array.Fill(_buffer, color);
 
     /// <summary>
     /// Clears the entire canvas with the specified color.
     /// </summary>
     /// <param name="color">The color to clear the screen with.</param>
-    public virtual void Clear(Color color)
-    {
-        Clear(color.ToArgb());
-    }
+    public virtual void Clear(Color color) => Clear(color.ToArgb());
 
     /// <summary>
     /// Releases what the canvas holds on its device; the canvas is dead
@@ -315,7 +309,8 @@ public class Canvas
 
     /// <summary>
     /// Sets the pixel at the given coordinates to the specified <paramref name="color"/>,
-    /// blending it over the existing pixel when it is translucent.
+    /// blending it over the existing pixel when it is translucent, as the
+    /// image and canvas draws do.
     /// </summary>
     /// <param name="color">The color to draw with.</param>
     /// <param name="x">The X coordinate.</param>
@@ -327,17 +322,18 @@ public class Canvas
             return;
         }
 
+        int index = y * Width + x;
         if (color.A < 255)
         {
-            if (color.A == 0)
+            if (color.A != 0)
             {
-                return;
+                _buffer[index] = AlphaBlend(color.ToArgb(), _buffer[index], color.A);
             }
 
-            color = AlphaBlend(color, GetPointColor(x, y), color.A);
+            return;
         }
 
-        _buffer[y * Width + x] = color.ToArgb();
+        _buffer[index] = color.ToArgb();
     }
 
     /// <summary>
@@ -357,7 +353,7 @@ public class Canvas
     }
 
     /// <summary>
-    /// Sets the pixel at the given coordinates to the specified <paramref name="color"/>. without ToArgb()
+    /// Sets the pixel at the given coordinates to the specified <paramref name="color"/>, without ToArgb().
     /// </summary>
     /// <param name="color">The color to draw with (raw argb).</param>
     /// <param name="x">The X coordinate.</param>
@@ -509,21 +505,20 @@ public class Canvas
 
     /// <summary>
     /// Draws an array of raw ARGB pixels to the canvas, starting at the given
-    /// coordinates, as row copies: no blending.
+    /// coordinates, as row copies: no blending, what it draws replaces what
+    /// was there, alpha included.
     /// </summary>
     /// <param name="colors">The pixels to draw, row-major.</param>
     /// <param name="x">The X coordinate.</param>
     /// <param name="y">The Y coordinate.</param>
     /// <param name="width">The width of the drawn bitmap.</param>
     /// <param name="height">The height of the drawn bitmap.</param>
-    public virtual void DrawArray(int[] colors, int x, int y, int width, int height)
-    {
-        CopyRows(colors, 0, width, x, y, width, height);
-    }
+    public virtual void DrawArray(int[] colors, int x, int y, int width, int height) => DrawArray(colors, x, y, width, height, 0);
 
     /// <summary>
     /// Draws an array of raw ARGB pixels to the canvas, starting at the given
-    /// coordinates, as row copies: no blending.
+    /// coordinates, as row copies: no blending, what it draws replaces what
+    /// was there, alpha included.
     /// </summary>
     /// <param name="colors">The pixels to draw, row-major.</param>
     /// <param name="x">The X coordinate.</param>
@@ -533,21 +528,69 @@ public class Canvas
     /// <param name="startIndex">The index in <paramref name="colors"/> of the first pixel.</param>
     public virtual void DrawArray(int[] colors, int x, int y, int width, int height, int startIndex)
     {
-        CopyRows(colors, startIndex, width, x, y, width, height);
+        ArgumentNullException.ThrowIfNull(colors);
+
+        if (!ClipRectangle(x, y, width, height, out int left, out int top, out int columns, out int rows))
+        {
+            return;
+        }
+
+        int sourceStart = startIndex + ((top - y) * width) + (left - x);
+        int targetStart = (top * Width) + left;
+        for (int row = 0; row < rows; row++)
+        {
+            Array.Copy(colors, sourceStart + (row * width), _buffer, targetStart + (row * Width), columns);
+        }
     }
 
     /// <summary>
-    /// Draws another canvas onto this one at the specified position, as row
-    /// copies of its buffer: no blending.
+    /// Draws another canvas onto this one at the specified position, each
+    /// pixel laid over this canvas by its alpha times <paramref name="opacity"/>
+    /// (see the remarks on <see cref="Canvas"/>).
     /// </summary>
     /// <param name="canvas">The source canvas to draw.</param>
     /// <param name="x">The X coordinate on this canvas.</param>
     /// <param name="y">The Y coordinate on this canvas.</param>
-    public virtual void DrawCanvas(Canvas canvas, int x, int y)
+    /// <param name="opacity">The opacity of the whole source, from 0 (nothing is drawn) to 255 (its pixels' own alpha).</param>
+    public virtual void DrawCanvas(Canvas canvas, int x, int y, byte opacity = 255)
     {
         ArgumentNullException.ThrowIfNull(canvas);
 
-        CopyRows(canvas._buffer, 0, canvas.Width, x, y, canvas.Width, canvas.Height);
+        DrawPixels(canvas._buffer, 0, canvas.Width, x, y, canvas.Width, canvas.Height, opacity);
+    }
+
+    /// <summary>
+    /// Draws another canvas onto this one stretched to
+    /// <paramref name="width"/> by <paramref name="height"/>, nearest
+    /// neighbour, each pixel laid over this canvas by its alpha times
+    /// <paramref name="opacity"/> (see the remarks on <see cref="Canvas"/>).
+    /// Allocates nothing, and a row that repeats an opaque row above it is
+    /// copied from that row, so presenting a smaller off-screen canvas on the
+    /// screen at 150% or 200% costs little more than a plain blit.
+    /// </summary>
+    /// <param name="canvas">The source canvas to draw; not this canvas.</param>
+    /// <param name="x">The X coordinate on this canvas.</param>
+    /// <param name="y">The Y coordinate on this canvas.</param>
+    /// <param name="width">The width the source is stretched to; nothing is drawn when it is not positive.</param>
+    /// <param name="height">The height the source is stretched to; nothing is drawn when it is not positive.</param>
+    /// <param name="opacity">The opacity of the whole source, from 0 (nothing is drawn) to 255 (its pixels' own alpha).</param>
+    /// <exception cref="ArgumentException"><paramref name="canvas"/> is this canvas.</exception>
+    public virtual void DrawCanvas(Canvas canvas, int x, int y, int width, int height, byte opacity = 255)
+    {
+        ArgumentNullException.ThrowIfNull(canvas);
+
+        if (ReferenceEquals(canvas, this))
+        {
+            throw new ArgumentException("A canvas cannot be stretched onto itself", nameof(canvas));
+        }
+
+        if (width == canvas.Width && height == canvas.Height)
+        {
+            DrawPixels(canvas._buffer, 0, canvas.Width, x, y, width, height, opacity);
+            return;
+        }
+
+        DrawPixelsScaled(canvas._buffer, canvas.Width, canvas.Height, new Rectangle(x, y, width, height), new Rectangle(0, 0, canvas.Width, canvas.Height), opacity);
     }
 
     /// <summary>
@@ -618,16 +661,14 @@ public class Canvas
     /// <param name="y1">The starting point Y coordinate.</param>
     internal void DrawHorizontalLine(Color color, int dx, int x1, int y1)
     {
-        int i;
-
-        for (i = 0; i < dx; i++)
+        for (int i = 0; i < dx; i++)
         {
             DrawPoint(color, x1 + i, y1);
         }
     }
 
     /// <summary>
-    /// Draw a vertical line.
+    /// Draws a vertical line.
     /// </summary>
     /// <param name="color">The color to draw with.</param>
     /// <param name="dy">The length of the line.</param>
@@ -635,9 +676,7 @@ public class Canvas
     /// <param name="y1">The starting point Y coordinate.</param>
     internal void DrawVerticalLine(Color color, int dy, int x1, int y1)
     {
-        int i;
-
-        for (i = 0; i < dy; i++)
+        for (int i = 0; i < dy; i++)
         {
             DrawPoint(color, x1, y1 + i);
         }
@@ -657,8 +696,6 @@ public class Canvas
     /// <param name="y1">The starting point Y coordinate.</param>
     internal void DrawDiagonalLine(Color color, int dx, int dy, int x1, int y1)
     {
-        int i;
-
         int dxabs = Math.Abs(dx);
         int dyabs = Math.Abs(dy);
         int sdx = Math.Sign(dx);
@@ -675,7 +712,7 @@ public class Canvas
 
         if (dxabs >= dyabs) // the line is more horizontal than vertical
         {
-            for (i = 0; i < dxabs; i++)
+            for (int i = 0; i < dxabs; i++)
             {
                 y += dyabs;
                 if (y >= dxabs)
@@ -689,7 +726,7 @@ public class Canvas
         }
         else // the line is more vertical than horizontal
         {
-            for (i = 0; i < dyabs; i++)
+            for (int i = 0; i < dyabs; i++)
             {
                 x += dxabs;
                 if (x >= dyabs)
@@ -1038,18 +1075,19 @@ public class Canvas
     }
 
     /// <summary>
-    /// Draws the given image at the specified coordinates, as row copies of
-    /// its pixels: no blending. <see cref="DrawImageAlpha"/> blends.
+    /// Draws the given image at the specified coordinates, each pixel laid
+    /// over the canvas by its alpha times <paramref name="opacity"/> (see the
+    /// remarks on <see cref="Canvas"/>).
     /// </summary>
     /// <param name="image">The image to draw.</param>
     /// <param name="x">The origin X coordinate.</param>
     /// <param name="y">The origin Y coordinate.</param>
-    /// <param name="preventOffBoundPixels">Kept for callers written against the earlier contract; the canvas always clips.</param>
-    public virtual void DrawImage(Image image, int x, int y, bool preventOffBoundPixels = true)
+    /// <param name="opacity">The opacity of the whole image, from 0 (nothing is drawn) to 255 (its pixels' own alpha).</param>
+    public virtual void DrawImage(Image image, int x, int y, byte opacity = 255)
     {
         ArgumentNullException.ThrowIfNull(image);
 
-        CopyRows(image.RawData, 0, image.Width, x, y, image.Width, image.Height);
+        DrawPixels(image.RawData, 0, image.Width, x, y, image.Width, image.Height, opacity);
     }
 
     /// <summary>
@@ -1079,131 +1117,63 @@ public class Canvas
     }
 
     /// <summary>
-    /// Scales an image to the specified new width and height.
-    /// </summary>
-    /// <param name="image">The image to be scaled.</param>
-    /// <param name="newWidth">The width of the scaled image.</param>
-    /// <param name="newHeight">The height of the scaled image.</param>
-    /// <returns>An array of integers representing the scaled image's pixel data. (Raw bitmap data)</returns>
-    private static int[] ScaleImage(Image image, int newWidth, int newHeight)
-    {
-        int[] pixels = image.RawData;
-        int w1 = image.Width;
-        int h1 = image.Height;
-        int[] temp = new int[newWidth * newHeight];
-        int xRatio = (int)((w1 << 16) / newWidth) + 1;
-        int yRatio = (int)((h1 << 16) / newHeight) + 1;
-        int x2, y2;
-        for (int i = 0; i < newHeight; i++)
-        {
-            for (int j = 0; j < newWidth; j++)
-            {
-                x2 = (j * xRatio) >> 16;
-                y2 = (i * yRatio) >> 16;
-                temp[(i * newWidth) + j] = pixels[(y2 * w1) + x2];
-            }
-        }
-        return temp;
-    }
-
-    /// <summary>
-    /// Draws a bitmap, applying scaling to the given image. The scaled pixels
-    /// are drawn through <see cref="DrawPoint(Color, int, int)"/>, so a
-    /// translucent pixel blends over what is there.
+    /// Draws an image stretched to <paramref name="width"/> by
+    /// <paramref name="height"/>, nearest neighbour, each pixel laid over the
+    /// canvas by its alpha times <paramref name="opacity"/> (see the remarks
+    /// on <see cref="Canvas"/>). Allocates nothing.
     /// </summary>
     /// <param name="image">The image to draw.</param>
     /// <param name="x">The X coordinate.</param>
     /// <param name="y">The Y coordinate.</param>
-    /// <param name="w">The desired width to scale the image to before drawing.</param>
-    /// <param name="h">The desired height to scale the image to before drawing</param>
-    /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
-    public virtual void DrawImage(Image image, int x, int y, int w, int h, bool preventOffBoundPixels = true)
+    /// <param name="width">The width the image is stretched to; nothing is drawn when it is not positive.</param>
+    /// <param name="height">The height the image is stretched to; nothing is drawn when it is not positive.</param>
+    /// <param name="opacity">The opacity of the whole image, from 0 (nothing is drawn) to 255 (its pixels' own alpha).</param>
+    public virtual void DrawImage(Image image, int x, int y, int width, int height, byte opacity = 255)
     {
-        Color color;
+        ArgumentNullException.ThrowIfNull(image);
 
-        int[] pixels = ScaleImage(image, w, h);
-        if (preventOffBoundPixels)
-        {
-            int maxWidth = Math.Min(w, Width - x);
-            int maxHeight = Math.Min(h, Height - y);
-            for (int xi = 0; xi < maxWidth; xi++)
-            {
-                for (int yi = 0; yi < maxHeight; yi++)
-                {
-                    color = Color.FromArgb(pixels[xi + (yi * w)]);
-                    DrawPoint(color, x + xi, y + yi);
-                }
-            }
-        }
-        else
-        {
-            for (int xi = 0; xi < w; xi++)
-            {
-                for (int yi = 0; yi < h; yi++)
-                {
-                    color = Color.FromArgb(pixels[xi + (yi * w)]);
-                    DrawPoint(color, x + xi, y + yi);
-                }
-            }
-        }
+        DrawPixelsScaled(image.RawData, image.Width, image.Height, new Rectangle(x, y, width, height), new Rectangle(0, 0, image.Width, image.Height), opacity);
     }
 
     /// <summary>
-    /// Draws the given image at the specified coordinates, cropping the image
-    /// to fit within the maximum width and height, as row copies of its
-    /// pixels: no blending.
+    /// Draws the <paramref name="source"/> region of an image stretched over
+    /// the <paramref name="destination"/> rectangle, nearest neighbour, each
+    /// pixel laid over the canvas by its alpha times <paramref name="opacity"/>
+    /// (see the remarks on <see cref="Canvas"/>): the draw a nine-slice frame
+    /// is made of. Allocates nothing. The part of <paramref name="source"/>
+    /// outside the image draws nothing, and the stretch keeps the proportions
+    /// of the whole of <paramref name="source"/>.
+    /// </summary>
+    /// <param name="image">The image to draw.</param>
+    /// <param name="destination">Where on the canvas the region lands, and the size it is stretched to; nothing is drawn when it is empty.</param>
+    /// <param name="source">The region of the image to draw, in image pixels; nothing is drawn when it is empty.</param>
+    /// <param name="opacity">The opacity of the whole region, from 0 (nothing is drawn) to 255 (its pixels' own alpha).</param>
+    public virtual void DrawImage(Image image, Rectangle destination, Rectangle source, byte opacity = 255)
+    {
+        ArgumentNullException.ThrowIfNull(image);
+
+        DrawPixelsScaled(image.RawData, image.Width, image.Height, destination, source, opacity);
+    }
+
+    /// <summary>
+    /// Draws the given image at the specified coordinates, cropped to
+    /// <paramref name="maxWidth"/> by <paramref name="maxHeight"/>, each pixel
+    /// laid over the canvas by its alpha times <paramref name="opacity"/>
+    /// (see the remarks on <see cref="Canvas"/>).
     /// </summary>
     /// <param name="image">The image to draw.</param>
     /// <param name="x">The X coordinate where the image will be drawn.</param>
     /// <param name="y">The Y coordinate where the image will be drawn.</param>
     /// <param name="maxWidth">The maximum width to display the image. If the image exceeds this width, it will be cropped.</param>
     /// <param name="maxHeight">The maximum height to display the image. If the image exceeds this height, it will be cropped.</param>
-    /// <param name="preventOffBoundPixels">Kept for callers written against the earlier contract; the canvas always clips.</param>
-    public virtual void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight, bool preventOffBoundPixels = true)
+    /// <param name="opacity">The opacity of the whole image, from 0 (nothing is drawn) to 255 (its pixels' own alpha).</param>
+    public virtual void CroppedDrawImage(Image image, int x, int y, int maxWidth, int maxHeight, byte opacity = 255)
     {
         ArgumentNullException.ThrowIfNull(image);
 
         int width = Math.Min(image.Width, maxWidth);
         int height = Math.Min(image.Height, maxHeight);
-        CopyRows(image.RawData, 0, image.Width, x, y, width, height);
-    }
-
-    /// <summary>
-    /// Draws an image with alpha blending: every pixel goes through
-    /// <see cref="DrawPoint(Color, int, int)"/>, so a translucent pixel
-    /// blends over what is there and a transparent one leaves it alone.
-    /// </summary>
-    /// <param name="image">The image to draw.</param>
-    /// <param name="x">The X coordinate.</param>
-    /// <param name="y">The Y coordinate.</param>
-    /// <param name="preventOffBoundPixels">Prevents drawing outside the bounds of the canvas.</param>
-    public void DrawImageAlpha(Image image, int x, int y, bool preventOffBoundPixels = true)
-    {
-        Color color;
-        if (preventOffBoundPixels)
-        {
-            int maxWidth = Math.Min(image.Width, Width - x);
-            int maxHeight = Math.Min(image.Height, Height - y);
-            for (int xi = 0; xi < maxWidth; xi++)
-            {
-                for (int yi = 0; yi < maxHeight; yi++)
-                {
-                    color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
-                    DrawPoint(color, x + xi, y + yi);
-                }
-            }
-        }
-        else
-        {
-            for (int xi = 0; xi < image.Width; xi++)
-            {
-                for (int yi = 0; yi < image.Height; yi++)
-                {
-                    color = Color.FromArgb(image.RawData[xi + (yi * image.Width)]);
-                    DrawPoint(color, x + xi, y + yi);
-                }
-            }
-        }
+        DrawPixels(image.RawData, 0, image.Width, x, y, width, height, opacity);
     }
 
     /// <summary>
@@ -1650,29 +1620,216 @@ public class Canvas
     }
 
     /// <summary>
-    /// Copies rows of raw ARGB pixels into the buffer at the given position,
-    /// clipped to the canvas: one <see cref="Array.Copy(Array, int, Array, int, int)"/>
-    /// per row, no blending.
+    /// Draws a block of raw ARGB pixels onto the canvas at the given
+    /// position, clipped to the canvas, row by row: each pixel is laid over
+    /// the canvas by its alpha times <paramref name="opacity"/>, see
+    /// <see cref="AlphaBlend(int, int, int)"/>. The body of the unscaled
+    /// <c>DrawImage</c> and <c>DrawCanvas</c> and of <see cref="CroppedDrawImage"/>.
     /// </summary>
-    /// <param name="source">The pixels, row-major.</param>
-    /// <param name="sourceIndex">The index in <paramref name="source"/> of the first pixel of the first row.</param>
-    /// <param name="sourceStride">The number of pixels from one row of <paramref name="source"/> to the next.</param>
+    /// <param name="pixels">The pixels, row-major: an image's <see cref="Image.RawData"/> or another canvas's buffer.</param>
+    /// <param name="startIndex">The index in <paramref name="pixels"/> of the first pixel of the first row.</param>
+    /// <param name="stride">The number of pixels from one row of <paramref name="pixels"/> to the next.</param>
     /// <param name="x">The X coordinate the first column lands on.</param>
     /// <param name="y">The Y coordinate the first row lands on.</param>
-    /// <param name="width">The number of pixels per row to copy.</param>
-    /// <param name="height">The number of rows to copy.</param>
-    private void CopyRows(int[] source, int sourceIndex, int sourceStride, int x, int y, int width, int height)
+    /// <param name="width">The number of pixels per row to draw.</param>
+    /// <param name="height">The number of rows to draw.</param>
+    /// <param name="opacity">The opacity of the whole block, 255 for the pixels' own alpha.</param>
+    private void DrawPixels(int[] pixels, int startIndex, int stride, int x, int y, int width, int height, byte opacity)
     {
-        if (!ClipRectangle(x, y, width, height, out int left, out int top, out int columns, out int rows))
+        if (opacity == 0 || !ClipRectangle(x, y, width, height, out int left, out int top, out int columns, out int rows))
         {
             return;
         }
 
-        int sourceStart = sourceIndex + ((top - y) * sourceStride) + (left - x);
+        int sourceStart = startIndex + ((top - y) * stride) + (left - x);
         int targetStart = (top * Width) + left;
         for (int row = 0; row < rows; row++)
         {
-            Array.Copy(source, sourceStart + (row * sourceStride), _buffer, targetStart + (row * Width), columns);
+            ReadOnlySpan<int> sourceRow = pixels.AsSpan(sourceStart + (row * stride), columns);
+            Span<int> targetRow = _buffer.AsSpan(targetStart + (row * Width), columns);
+            for (int column = 0; column < sourceRow.Length; column++)
+            {
+                targetRow[column] = DrawOver(sourceRow[column], targetRow[column], opacity);
+            }
         }
+    }
+
+    /// <summary>
+    /// Draws the <paramref name="source"/> rectangle of a block of raw ARGB
+    /// pixels stretched over <paramref name="destination"/>, clipped to the
+    /// canvas, nearest neighbour: each destination pixel takes the source
+    /// pixel under its centre and is laid over the canvas as
+    /// <see cref="DrawPixels"/> does. Sampled pixels outside the block draw
+    /// nothing, and nothing is allocated. The body of the stretched
+    /// <c>DrawImage</c> and <c>DrawCanvas</c> overloads.
+    /// </summary>
+    /// <param name="pixels">The pixels, row-major.</param>
+    /// <param name="pixelsWidth">The width of the block, which is also its stride.</param>
+    /// <param name="pixelsHeight">The height of the block.</param>
+    /// <param name="destination">Where on the canvas the source lands, and the size it is stretched to.</param>
+    /// <param name="source">The rectangle of the block to draw.</param>
+    /// <param name="opacity">The opacity of the whole block, 255 for the pixels' own alpha.</param>
+    private void DrawPixelsScaled(int[] pixels, int pixelsWidth, int pixelsHeight, Rectangle destination, Rectangle source, byte opacity)
+    {
+        if (opacity == 0 || source.Width <= 0 || source.Height <= 0
+            || !ClipRectangle(destination.X, destination.Y, destination.Width, destination.Height, out int left, out int top, out int columns, out int rows))
+        {
+            return;
+        }
+
+        // Source coordinates in 32.32 fixed point. Destination pixel i samples
+        // source pixel (i + 0.5) * source / destination: a step per pixel plus
+        // half a step for the centre, both rounded up so a centre landing
+        // exactly on a pixel edge is not lost to rounding.
+        long stepX = FixedPointRatio(source.Width, destination.Width);
+        long stepY = FixedPointRatio(source.Height, destination.Height);
+        long firstX = ((left - destination.X) * stepX) + FixedPointRatio(source.Width, 2 * destination.Width);
+        long positionY = ((top - destination.Y) * stepY) + FixedPointRatio(source.Height, 2 * destination.Height);
+
+        // Scaling up repeats source rows. A row drawn entirely from opaque
+        // pixels replaced what was under it, so a row that samples the same
+        // source row again is a copy of it.
+        int previousSourceY = -1;
+        bool previousRowOpaque = false;
+
+        for (int row = 0; row < rows; row++, positionY += stepY)
+        {
+            int sourceY = source.Y + (int)(positionY >> 32);
+            if ((uint)sourceY >= (uint)pixelsHeight)
+            {
+                previousSourceY = -1;
+                continue;
+            }
+
+            int targetIndex = ((top + row) * Width) + left;
+            if (previousRowOpaque && sourceY == previousSourceY)
+            {
+                Array.Copy(_buffer, targetIndex - Width, _buffer, targetIndex, columns);
+                continue;
+            }
+
+            int sourceRowIndex = sourceY * pixelsWidth;
+            bool rowOpaque = opacity == byte.MaxValue;
+            long positionX = firstX;
+            for (int column = 0; column < columns; column++, positionX += stepX)
+            {
+                int sourceX = source.X + (int)(positionX >> 32);
+                if ((uint)sourceX >= (uint)pixelsWidth)
+                {
+                    rowOpaque = false;
+                    continue;
+                }
+
+                int pixel = pixels[sourceRowIndex + sourceX];
+                if ((uint)pixel < 0xFF000000)
+                {
+                    rowOpaque = false;
+                }
+
+                _buffer[targetIndex + column] = DrawOver(pixel, _buffer[targetIndex + column], opacity);
+            }
+
+            previousSourceY = sourceY;
+            previousRowOpaque = rowOpaque;
+        }
+    }
+
+    /// <summary>
+    /// One pixel of an image or canvas draw: <paramref name="pixel"/> laid
+    /// over <paramref name="background"/> by its alpha times
+    /// <paramref name="opacity"/>. Opaque at full opacity it replaces the
+    /// background, transparent it leaves it, and in between the two blend
+    /// (see <see cref="AlphaBlend(int, int, int)"/>).
+    /// </summary>
+    /// <param name="pixel">The raw ARGB pixel drawn.</param>
+    /// <param name="background">The raw ARGB pixel already there.</param>
+    /// <param name="opacity">The opacity of the draw, 255 for the pixel's own alpha.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int DrawOver(int pixel, int background, byte opacity)
+    {
+        int alpha = (int)((uint)pixel >> 24);
+        if (opacity != byte.MaxValue)
+        {
+            alpha = ApplyOpacity(alpha, opacity);
+        }
+
+        if (alpha == byte.MaxValue)
+        {
+            return pixel;
+        }
+
+        return alpha == 0 ? background : AlphaBlend(pixel, background, alpha);
+    }
+
+    /// <summary>
+    /// <paramref name="numerator"/> / <paramref name="denominator"/> in 32.32
+    /// fixed point, rounded up.
+    /// </summary>
+    /// <param name="numerator">A length in pixels, not negative.</param>
+    /// <param name="denominator">A length in pixels, positive.</param>
+    private static long FixedPointRatio(int numerator, int denominator) => (((long)numerator << 32) + denominator - 1) / denominator;
+
+    /// <summary>
+    /// Lays a raw ARGB color over a raw ARGB background, source over with
+    /// straight alpha. Over an opaque background each channel is
+    /// <c>(color * alpha + background * (255 - alpha)) / 255</c>, rounded, and
+    /// the result stays opaque; over a transparent one the color is kept with
+    /// <paramref name="alpha"/>; over a translucent one the two alphas combine
+    /// and each color counts for what it covers. Unlike the
+    /// <see cref="AlphaBlend(Color, Color, byte)"/> overload, the result keeps
+    /// the alpha, so a layer drawn on a transparent canvas can be blended
+    /// again later.
+    /// </summary>
+    /// <param name="color">The color laid on; its own alpha is ignored.</param>
+    /// <param name="background">The pixel already there.</param>
+    /// <param name="alpha">The opacity of <paramref name="color"/>, 1 to 254 (0 and 255 are the caller's skip and copy).</param>
+    private static int AlphaBlend(int color, int background, int alpha)
+    {
+        uint s = (uint)color;
+        uint d = (uint)background;
+        uint sa = (uint)alpha;
+        uint da = d >> 24;
+
+        if (da == byte.MaxValue)
+        {
+            // Red and blue blended in one multiply, green in another, each
+            // divided by 255 exactly with rounding: (t + (t >> 8)) >> 8 over
+            // t = x + 128 is round(x / 255) for every x up to 255 * 255.
+            uint ia = 255 - sa;
+            uint rb = ((s & 0x00FF00FF) * sa) + ((d & 0x00FF00FF) * ia) + 0x00800080;
+            rb = ((rb + ((rb >> 8) & 0x00FF00FF)) >> 8) & 0x00FF00FF;
+            uint g = (((s >> 8) & 0xFF) * sa) + (((d >> 8) & 0xFF) * ia) + 0x80;
+            g = ((g + (g >> 8)) >> 8) & 0xFF;
+            return (int)(0xFF000000 | rb | (g << 8));
+        }
+
+        if (da == 0)
+        {
+            return (int)((sa << 24) | (s & 0x00FFFFFF));
+        }
+
+        // Both translucent: the result's alpha, times 255, is what the color
+        // covers plus what the background still shows through it.
+        uint colorWeight = sa * 255;
+        uint backgroundWeight = da * (255 - sa);
+        uint total = colorWeight + backgroundWeight;
+        uint half = total / 2;
+        uint r = ((((s >> 16) & 0xFF) * colorWeight) + (((d >> 16) & 0xFF) * backgroundWeight) + half) / total;
+        uint gr = ((((s >> 8) & 0xFF) * colorWeight) + (((d >> 8) & 0xFF) * backgroundWeight) + half) / total;
+        uint b = (((s & 0xFF) * colorWeight) + ((d & 0xFF) * backgroundWeight) + half) / total;
+        uint a = (total + 127) / 255;
+        return (int)((a << 24) | (r << 16) | (gr << 8) | b);
+    }
+
+    /// <summary>
+    /// Scales a pixel's alpha by an opacity: <c>round(alpha * opacity / 255)</c>,
+    /// without a division.
+    /// </summary>
+    /// <param name="alpha">The pixel's alpha, 0 to 255.</param>
+    /// <param name="opacity">The opacity, 0 to 255.</param>
+    private static int ApplyOpacity(int alpha, byte opacity)
+    {
+        int t = (alpha * opacity) + 128;
+        return (t + (t >> 8)) >> 8;
     }
 }

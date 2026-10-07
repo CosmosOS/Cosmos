@@ -202,7 +202,7 @@ canvas.DrawImage(bitmap, 100, 150, 128, 128);
 canvas.Display();
 ```
 
-Two rules decide what happens to a pixel's alpha. The unscaled draws, `DrawImage(image, x, y)`, `CroppedDrawImage`, `DrawArray` and `DrawCanvas`, copy pixels row by row into the canvas, alpha channel included, with no blending: they are the fast path, and what they draw replaces what was there. The scaled overload `DrawImage(image, x, y, width, height)` and `DrawImageAlpha` draw pixel by pixel and blend: a translucent pixel blends over the canvas and a transparent one leaves it alone.
+Every image and canvas draw (`DrawImage`, `CroppedDrawImage` and `DrawCanvas`, plain or stretched) lays each pixel over the canvas by its alpha: an opaque pixel replaces what is there, a transparent one leaves it alone, and one in between mixes the two colors, the result staying opaque over an opaque canvas. Each of them takes an optional last argument, `opacity`, from 0 (nothing is drawn) to the default 255 (the pixels' own alpha), that fades the whole draw. Over a pixel that is itself translucent or transparent the alphas combine, so an off-screen canvas cleared to `Color.Transparent` collects what is drawn on it with its transparency intact, ready to be drawn as a layer (see [Off-screen canvases](#off-screen-canvases)). A translucent `DrawPoint` blends the same way. `DrawArray` is the one draw that copies pixels raw, alpha included, replacing what was there. None of these draws allocate.
 
 More usefully, `Bitmap` can load an uncompressed 24-bit or 32-bit **BMP file** through standard `System.IO`, for example from a FAT disk mounted as shown in the [File System](filesystem.md) article:
 
@@ -220,7 +220,7 @@ canvas.Display();
 <!-- screenshot: the 2x2 bitmap raw and scaled, plus the logo loaded from disk centered on screen -->
 ![Drawing images](images/graphics-images.png)
 
-**PNG** files work the same way through the `Png` class, also an `Image`, so it goes wherever a `Bitmap` goes. The whole format is supported (grayscale, truecolor and palette, with or without alpha, interlaced or not), decoded by pure managed code (see the [Credits](../../credits.md) page). Drawn through the scaled overload, its transparent pixels blend with what is already on the canvas:
+**PNG** files work the same way through the `Png` class, also an `Image`, so it goes wherever a `Bitmap` goes. The whole format is supported (grayscale, truecolor and palette, with or without alpha, interlaced or not), decoded by pure managed code (see the [Credits](../../credits.md) page). Its transparent pixels blend with what is already on the canvas:
 
 ```csharp
 /* logo.png is a PNG with transparency on the FAT partition mounted at /mnt */
@@ -237,7 +237,7 @@ canvas.Display();
 <!-- screenshot: the Cosmos logo PNG decoded from disk, scaled and alpha-blended over the background -->
 ![Drawing a PNG](images/graphics-png.png)
 
-`DrawImageAlpha` draws unscaled with per-pixel alpha blending, and `canvas.GetImage(x, y, width, height)` does the reverse: it copies a region of the canvas back into a `Bitmap`.
+A 32-bit BMP whose fourth byte is 0 in every pixel, as many writers save one, has no alpha: it loads opaque. `DrawImage(image, destination, source)` stretches only the `source` region of the image over the `destination` rectangle, both `System.Drawing.Rectangle`s, which is what a window frame cut from one skin image into corners, edges and a middle (a nine-slice frame) is drawn with. `canvas.GetImage(x, y, width, height)` does the reverse of a draw: it copies a region of the canvas back into a `Bitmap`.
 
 ## Off-screen canvases
 
@@ -262,6 +262,32 @@ canvas.Display();
 
 <!-- screenshot: the composed 220x220 tile blitted in the middle of the screen -->
 ![Off-screen canvas](images/graphics-offscreen.png)
+
+The tile above is opaque, so it lands as a square. To compose layers instead, as a window manager does, clear the off-screen canvas to `Color.Transparent` and draw on it: `DrawCanvas` then lets its transparent pixels show what is under them, blends its translucent ones, and fades the whole layer by the optional `opacity`:
+
+```csharp
+/* A window with a translucent title bar, faded to 80% over the desktop */
+Canvas window = new Canvas(300, 200);
+window.Clear(Color.Transparent);
+window.DrawFilledRectangle(Color.FromArgb(160, 0, 0, 128), 0, 0, 300, 24);
+window.DrawFilledRectangle(Color.Silver, 0, 24, 300, 176);
+
+canvas.DrawCanvas(window, 100, 100, 204);
+```
+
+`DrawCanvas(canvas, x, y, width, height)` stretches the source to `width` by `height`, nearest neighbour, without allocating. Drawing a whole interface on a smaller off-screen canvas and stretching it onto the screen once per frame is how to scale it to 150% or 200%: a 1280x720 canvas stretched to 1920x1080 is 150%, and a row that repeats an opaque row above it is copied rather than sampled again:
+
+```csharp
+Canvas screen = Canvas.GetFullScreen();
+Canvas ui = new Canvas(screen.Width * 2 / 3, screen.Height * 2 / 3);
+
+/* ...draw the interface on ui at its own size... */
+
+screen.DrawCanvas(ui, 0, 0, screen.Width, screen.Height);
+screen.Display();
+```
+
+Pointer coordinates then need the same scale: `MouseManager.SetScreenSize(ui.Width, ui.Height)` makes the mouse report positions on `ui` rather than on the screen.
 
 ## Reading pixels back
 

@@ -272,6 +272,7 @@ public sealed class Bitmap : Image
         byte[] pixelData = new byte[pureImageSize];
         stream.ReadExactly(pixelData, 0, pureImageSize);
         byte[] pixel = new byte[4]; // All must have the same size
+        bool hasAlpha = false;
 
         for (int y = 0; y < imageHeight; y++)
         {
@@ -283,6 +284,7 @@ public sealed class Bitmap : Image
                     pixel[1] = pixelData[position++];
                     pixel[2] = pixelData[position++];
                     pixel[3] = pixelData[position++];
+                    hasAlpha |= pixel[3] != 0;
                 }
                 else
                 {
@@ -307,6 +309,17 @@ public sealed class Bitmap : Image
                 RawData[x + (imageHeight - (y + 1)) * imageWidth] = BitConverter.ToInt32(pixel, 0);
             }
             position += paddingPerRow;
+        }
+
+        // A 32-bit BMP whose fourth byte is 0 in every pixel leaves it unused
+        // (the BI_RGB layout writers produce): load it opaque, as the canvas
+        // draws an image by its alpha and would otherwise draw nothing.
+        if (pixelSize == 32 && !hasAlpha)
+        {
+            for (int i = 0; i < RawData.Length; i++)
+            {
+                RawData[i] |= unchecked((int)0xFF000000);
+            }
         }
 
         #endregion Pixel Table
