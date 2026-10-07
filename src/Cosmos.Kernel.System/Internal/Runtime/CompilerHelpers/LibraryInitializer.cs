@@ -1,9 +1,8 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.Core.Memory;
-using Cosmos.Kernel.Core.Memory.GarbageCollector;
-using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.HAL.Platform;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Input;
@@ -14,19 +13,19 @@ using Cosmos.Kernel.System.Timers;
 namespace Internal.Runtime.CompilerHelpers;
 
 /// <summary>
-/// This class is responsible for initializing the library and its dependencies. It is called by the runtime before any managed code is executed.
+/// Boot-time initializer of Cosmos.Kernel.System. ILC finds this type by name and calls <see cref="InitializeLibrary"/> before the kernel's entry point runs.
 /// </summary>
-internal class LibraryInitializer
+internal static class LibraryInitializer
 {
     /// <summary>
-    /// Initialize all enabled services provided by Cosmos.Kernel.System, such as TimerManager, KeyboardManager, and NetworkManager. This method is called by the runtime before any managed code is executed.
+    /// Initialize all enabled services provided by Cosmos.Kernel.System, such as TimerManager, KeyboardManager, and NetworkManager.
     /// </summary>
     public static void InitializeLibrary()
     {
         IPlatformInitializer? initializer = PlatformHAL.Initializer;
         if (initializer is not null)
         {
-            // Initialize Timer Manager (skipped if CosmosEnableTimer=false)
+            // Skipped if CosmosEnableTimer=false.
             if (CosmosFeatures.TimerEnabled)
             {
                 Serial.WriteString("[KERNEL]   - Initializing timer manager...\n");
@@ -35,42 +34,42 @@ internal class LibraryInitializer
 
             using (InternalCpu.DisableInterruptsScope())
             {
-
-                // Initialize Keyboard Manager; its consumer registers every
-                // keyboard a kit driver publishes (the PS/2, virtio and USB
-                // keyboards) once the driver stage runs.
+                // The keyboard manager's consumer registers every keyboard a
+                // kit driver publishes (the PS/2, virtio and USB keyboards)
+                // once the driver stage runs.
                 if (KeyboardManager.IsEnabled)
                 {
                     Serial.WriteString("[KERNEL]   - Initializing keyboard manager...\n");
                     KeyboardManager.Initialize();
                 }
 
-                // Initialize Mouse Manager; its consumer registers every
-                // pointer a kit driver publishes (the PS/2 and virtio mice).
+                // The mouse manager's consumer registers every pointer a kit
+                // driver publishes (the PS/2 and virtio mice).
                 if (MouseManager.IsEnabled)
                 {
                     Serial.WriteString("[KERNEL]   - Initializing mouse manager...\n");
                     MouseManager.Initialize();
                 }
 
-                // Initialize Network Manager; its consumer registers every
-                // interface a kit driver publishes once the driver stage runs.
+                // The network manager's consumer registers every interface a
+                // kit driver publishes once the driver stage runs.
                 if (NetworkManager.IsEnabled)
                 {
                     Serial.WriteString("[KERNEL]   - Initializing network manager...\n");
                     NetworkManager.Initialize();
                 }
 
-                // Initialize Display Manager; its consumer lists the firmware
-                // framebuffer the engine publishes at its start and every
-                // display a kit driver publishes once the driver stage runs.
+                // The display manager's consumer lists the firmware framebuffer
+                // the engine publishes at its start and every display a kit
+                // driver publishes once the driver stage runs.
                 if (DisplayManager.IsEnabled)
                 {
                     Serial.WriteString("[KERNEL]   - Initializing display manager...\n");
                     DisplayManager.Initialize();
                 }
 
-                // Initialize Storage Manager (manager-level state only)
+                // The storage manager's consumer registers every block device
+                // a kit driver publishes once the driver stage runs.
                 if (StorageManager.IsEnabled)
                 {
                     Serial.WriteString("[KERNEL]   - Initializing storage manager...\n");
