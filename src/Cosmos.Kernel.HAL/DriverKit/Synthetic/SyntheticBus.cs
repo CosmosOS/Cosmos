@@ -85,6 +85,7 @@ public static class SyntheticBus
     /// Thread context, not from a driver thread of a binding that is being
     /// torn down.
     /// </summary>
+    /// <exception cref="InvalidOperationException">The caller is an interrupt handler.</exception>
     public static void WaitForQueuedJobs()
     {
         InterruptContextGuard.ThrowIfInHandler(nameof(WaitForQueuedJobs));

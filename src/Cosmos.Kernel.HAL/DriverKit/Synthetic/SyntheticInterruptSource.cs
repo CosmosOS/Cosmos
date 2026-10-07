@@ -17,12 +17,6 @@ internal sealed class SyntheticInterruptSource : InterruptSource
 {
     private SchedSpinLock _lock;
     private InterruptTrampoline? _trampoline;
-    private bool _masked;
-
-    internal SyntheticInterruptSource(int index)
-    {
-        Index = index;
-    }
 
     /// <summary>The source's index on its node.</summary>
     public int Index { get; }
@@ -31,10 +25,18 @@ internal sealed class SyntheticInterruptSource : InterruptSource
     public bool IsConnected => _trampoline is not null;
 
     /// <summary>True while deliveries are stopped.</summary>
-    public bool IsMasked => _masked;
+    public bool IsMasked { get; private set; }
+
+    internal SyntheticInterruptSource(int index)
+    {
+        Index = index;
+    }
 
     /// <inheritdoc/>
-    public override string Describe() => $"synthetic {Index}";
+    public override string Describe()
+    {
+        return $"synthetic {Index}";
+    }
 
     /// <summary>
     /// Delivers one interrupt. Thread context.
@@ -47,7 +49,7 @@ internal sealed class SyntheticInterruptSource : InterruptSource
             InterruptTrampoline? trampoline;
             using (_lock.AcquireIrqSafe())
             {
-                if (_masked || _trampoline is null)
+                if (IsMasked || _trampoline is null)
                 {
                     return false;
                 }
@@ -70,7 +72,7 @@ internal sealed class SyntheticInterruptSource : InterruptSource
             }
 
             _trampoline = trampoline;
-            _masked = false;
+            IsMasked = false;
             return true;
         }
     }
@@ -80,7 +82,7 @@ internal sealed class SyntheticInterruptSource : InterruptSource
     {
         using (_lock.AcquireIrqSafe())
         {
-            _masked = true;
+            IsMasked = true;
         }
     }
 
@@ -89,7 +91,7 @@ internal sealed class SyntheticInterruptSource : InterruptSource
     {
         using (_lock.AcquireIrqSafe())
         {
-            _masked = false;
+            IsMasked = false;
         }
     }
 
@@ -98,7 +100,7 @@ internal sealed class SyntheticInterruptSource : InterruptSource
     {
         using (_lock.AcquireIrqSafe())
         {
-            _masked = true;
+            IsMasked = true;
             _trampoline = null;
         }
     }

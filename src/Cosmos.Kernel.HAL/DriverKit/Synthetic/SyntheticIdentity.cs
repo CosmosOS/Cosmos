@@ -8,11 +8,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Synthetic;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class SyntheticIdentity : DeviceIdentity
 {
-    internal SyntheticIdentity(string key)
-    {
-        Key = key;
-    }
-
     /// <summary>The key the test published the device under.</summary>
     public string Key { get; }
 
@@ -22,6 +17,14 @@ public sealed class SyntheticIdentity : DeviceIdentity
     /// <inheritdoc/>
     public override string Address => Key;
 
+    internal SyntheticIdentity(string key)
+    {
+        Key = key;
+    }
+
     /// <inheritdoc/>
-    public override string Describe() => $"key {Key}";
+    public override string Describe()
+    {
+        return $"key {Key}";
+    }
 }

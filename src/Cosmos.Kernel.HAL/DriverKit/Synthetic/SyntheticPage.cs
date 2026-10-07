@@ -14,12 +14,6 @@ internal sealed unsafe class SyntheticPage : IKitResource
 {
     private volatile bool _released;
 
-    private SyntheticPage(ulong address, ulong physicalAddress)
-    {
-        Address = address;
-        PhysicalAddress = physicalAddress;
-    }
-
     /// <summary>The kernel's virtual address of the page.</summary>
     public ulong Address { get; }
 
@@ -28,6 +22,12 @@ internal sealed unsafe class SyntheticPage : IKitResource
 
     /// <summary>True once the page went back to the allocator.</summary>
     public bool IsReleased => _released;
+
+    private SyntheticPage(ulong address, ulong physicalAddress)
+    {
+        Address = address;
+        PhysicalAddress = physicalAddress;
+    }
 
     /// <summary>Allocates a zeroed page.</summary>
     /// <exception cref="InvalidOperationException">No page left.</exception>

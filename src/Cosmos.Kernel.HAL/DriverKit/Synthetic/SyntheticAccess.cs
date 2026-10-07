@@ -16,13 +16,6 @@ public sealed unsafe class SyntheticAccess
     private readonly SyntheticPage? _page;
     private readonly int _windowBytes;
 
-    internal SyntheticAccess(byte[] data, SyntheticPage? page, int windowBytes)
-    {
-        Data = data;
-        _page = page;
-        _windowBytes = windowBytes;
-    }
-
     /// <summary>The bytes the test attached.</summary>
     public byte[] Data { get; }
 
@@ -33,7 +26,20 @@ public sealed unsafe class SyntheticAccess
     /// The register window's memory, as the test sees it. Empty without a
     /// window, or once the node was retracted and the page released.
     /// </summary>
-    public Span<byte> Window => _page is null || _page.IsReleased
-        ? Span<byte>.Empty
-        : new Span<byte>((void*)_page.Address, _windowBytes);
+    public Span<byte> Window
+    {
+        get
+        {
+            return _page is null || _page.IsReleased
+                ? Span<byte>.Empty
+                : new Span<byte>((void*)_page.Address, _windowBytes);
+        }
+    }
+
+    internal SyntheticAccess(byte[] data, SyntheticPage? page, int windowBytes)
+    {
+        Data = data;
+        _page = page;
+        _windowBytes = windowBytes;
+    }
 }
