@@ -121,7 +121,7 @@ public static class Mbr
             // the protective entry as a data partition (e.g. when the
             // primary GPT header is damaged) would let a write destroy the
             // remaining GPT structures.
-            if (systemId == SystemIdEmpty || systemId == SystemIdExtendedChs || systemId == SystemIdExtendedLba || systemId == SystemIdLinuxExtended || systemId == SystemIdGptProtective)
+            if (systemId is SystemIdEmpty or SystemIdExtendedChs or SystemIdExtendedLba or SystemIdLinuxExtended or SystemIdGptProtective)
             {
                 continue;
             }
@@ -231,10 +231,8 @@ public static class Mbr
     /// Locate the first extended partition (system ID 0x05, 0x0F, or 0x85)
     /// in the MBR's primary table and return its absolute start LBA.
     /// </summary>
-    public static bool TryGetExtendedPartition(IBlockDevice device, out ulong startSector)
-    {
-        return TryGetExtendedPartition(device, out startSector, out _);
-    }
+    public static bool TryGetExtendedPartition(IBlockDevice device, out ulong startSector) =>
+        TryGetExtendedPartition(device, out startSector, out _);
 
     /// <summary>
     /// As <see cref="TryGetExtendedPartition(IBlockDevice, out ulong)"/> but
@@ -251,7 +249,7 @@ public static class Mbr
         {
             int offset = PartitionTableOffset + i * PartitionEntrySize;
             byte systemId = mbr[offset + EntrySystemIdOffset];
-            if (systemId == SystemIdExtendedChs || systemId == SystemIdExtendedLba || systemId == SystemIdLinuxExtended)
+            if (systemId is SystemIdExtendedChs or SystemIdExtendedLba or SystemIdLinuxExtended)
             {
                 ulong start = BitConverter.ToUInt32(mbr.Slice(offset + EntryStartLbaOffset, LbaFieldSizeBytes));
                 ulong count = BitConverter.ToUInt32(mbr.Slice(offset + EntrySectorCountOffset, LbaFieldSizeBytes));
@@ -390,14 +388,8 @@ public static class Mbr
     /// the entries this refuses, and <c>MoveWithData</c> must decline before
     /// it copies rather than after.
     /// </remarks>
-    internal static bool IsMutableSystemId(byte systemId)
-    {
-        return systemId != SystemIdEmpty
-            && systemId != SystemIdExtendedChs
-            && systemId != SystemIdExtendedLba
-            && systemId != SystemIdLinuxExtended
-            && systemId != SystemIdGptProtective;
-    }
+    internal static bool IsMutableSystemId(byte systemId) =>
+        systemId is not (SystemIdEmpty or SystemIdExtendedChs or SystemIdExtendedLba or SystemIdLinuxExtended or SystemIdGptProtective);
 
     /// <summary>
     /// Whether [<paramref name="startSector"/>, +<paramref name="sectorCount"/>)
@@ -420,7 +412,7 @@ public static class Mbr
     /// intersects any occupied primary slot other than <paramref name="index"/>.
     /// Slots with geometry <see cref="Parse"/> would drop are skipped.
     /// </summary>
-    private static bool OverlapsOtherPrimary(Span<byte> mbr, int index, ulong startSector, ulong sectorCount)
+    private static bool OverlapsOtherPrimary(ReadOnlySpan<byte> mbr, int index, ulong startSector, ulong sectorCount)
     {
         for (int i = 0; i < MaxPartitions; i++)
         {

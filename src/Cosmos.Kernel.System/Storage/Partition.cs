@@ -10,11 +10,16 @@ namespace Cosmos.Kernel.System.Storage;
 /// </summary>
 public sealed class Partition : IBlockDevice
 {
-    private readonly IBlockDevice _host;
-    private readonly string _name;
+    /// <summary>Separator between the host name and the partition index ("sata0" + "p" + "1").</summary>
+    private const string PartitionInfix = "p";
+
+    /// <summary>Decimal digits in <see cref="uint.MaxValue"/> (4294967295), the longest index.</summary>
+    private const int MaxIndexDigits = 10;
+
+    private const uint DecimalBase = 10;
 
     /// <summary>The disk this partition lives on.</summary>
-    public IBlockDevice Host => _host;
+    public IBlockDevice Host { get; }
 
     /// <summary>Absolute LBA on the host where the partition begins.</summary>
     public ulong StartSector { get; }
@@ -26,7 +31,7 @@ public sealed class Partition : IBlockDevice
     public ulong BlockSize { get; }
 
     /// <inheritdoc />
-    public string Name => _name;
+    public string Name { get; }
 
     /// <summary>
     /// Index-based naming ctor: builds "&lt;host&gt;p&lt;index&gt;" with the
@@ -66,8 +71,8 @@ public sealed class Partition : IBlockDevice
             throw new ArgumentOutOfRangeException(nameof(sectorCount), "Partition extends beyond the end of its host device.");
         }
 
-        _host = host;
-        _name = name;
+        Host = host;
+        Name = name;
         StartSector = startSector;
         BlockCount = sectorCount;
         BlockSize = host.BlockSize;
@@ -77,21 +82,18 @@ public sealed class Partition : IBlockDevice
     public void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
     {
         CheckBounds(blockNo, blockCount);
-        _host.ReadBlock(StartSector + blockNo, blockCount, data);
+        Host.ReadBlock(StartSector + blockNo, blockCount, data);
     }
 
     /// <inheritdoc />
     public void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
     {
         CheckBounds(blockNo, blockCount);
-        _host.WriteBlock(StartSector + blockNo, blockCount, data);
+        Host.WriteBlock(StartSector + blockNo, blockCount, data);
     }
 
     /// <inheritdoc />
-    public void Flush()
-    {
-        _host.Flush();
-    }
+    public void Flush() => Host.Flush();
 
     private void CheckBounds(ulong blockNo, ulong blockCount)
     {
@@ -102,15 +104,6 @@ public sealed class Partition : IBlockDevice
             throw new ArgumentOutOfRangeException(nameof(blockNo), "Partition I/O extends beyond partition end.");
         }
     }
-
-    /// <summary>Separator between the host name and the partition index ("sata0" + "p" + "1").</summary>
-    private const string PartitionInfix = "p";
-
-    /// <summary>Decimal digits in <see cref="uint.MaxValue"/> (4294967295), the longest index.</summary>
-    private const int MaxIndexDigits = 10;
-
-    /// <summary>Radix used when converting the index to its decimal digits.</summary>
-    private const uint DecimalBase = 10;
 
     // Builds "<host>p<index>" without CoreLib int formatting (uint.ToString,
     // "" + uint, $""), which reproducibly triple-faulted in device

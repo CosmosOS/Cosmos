@@ -46,11 +46,6 @@ public static class Ebr
     public static List<MbrPartitionEntry> Parse(IBlockDevice device, ulong extendedStartSector)
     {
         List<MbrPartitionEntry> logicals = [];
-        if (device is null)
-        {
-            return logicals;
-        }
-
         List<ChainNode> chain = WalkChain(device, extendedStartSector);
         for (int i = 0; i < chain.Count; i++)
         {
@@ -156,6 +151,10 @@ public static class Ebr
     /// Remove the <paramref name="logicalIndex"/>-th logical partition from
     /// the chain (0-based, in chain order).
     /// </summary>
+    /// <returns>
+    /// <see langword="false"/>, writing nothing, when the chain holds no
+    /// logical partition at <paramref name="logicalIndex"/>.
+    /// </returns>
     public static bool RemoveLogical(IBlockDevice device, ulong extendedStartSector, int logicalIndex)
     {
         List<ChainNode> chain = WalkChain(device, extendedStartSector);
@@ -204,6 +203,13 @@ public static class Ebr
     }
 
     /// <summary>Rewrite the SectorCount of the <paramref name="logicalIndex"/>-th logical partition.</summary>
+    /// <returns>
+    /// <see langword="false"/>, writing nothing, when the chain holds no
+    /// logical partition at <paramref name="logicalIndex"/>,
+    /// <paramref name="newSectorCount"/> is zero or overflows the EBR's
+    /// 32-bit field, or the resized logical would end past the next
+    /// logical's EBR sector or the container's end.
+    /// </returns>
     public static bool ResizeLogical(
         IBlockDevice device,
         ulong extendedStartSector,
@@ -249,6 +255,14 @@ public static class Ebr
     /// at the new range is what's expected (use
     /// <see cref="PartitionManager.MoveWithData"/> for a data-copying move).
     /// </summary>
+    /// <returns>
+    /// <see langword="false"/>, writing nothing, when the chain holds no
+    /// logical partition at <paramref name="logicalIndex"/>, or
+    /// <paramref name="newStartSector"/> does not lie past the logical's own
+    /// EBR sector, does not fit the EBR's 32-bit relative field, or would
+    /// make the logical end past the next logical's EBR sector or the
+    /// container's end.
+    /// </returns>
     public static bool MoveLogical(
         IBlockDevice device,
         ulong extendedStartSector,

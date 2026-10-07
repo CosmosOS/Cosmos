@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.System.Storage;
 public static class Gpt
 {
     /// <summary>"EFI PART" little-endian.</summary>
-    private const ulong EfiPartSignature = 0x5452415020494645UL;
+    private const ulong EfiPartSignature = 0x5452_4150_2049_4645UL;
 
     /// <summary>
     /// Upper bound on the on-disk NumberOfPartitionEntries field this
@@ -64,7 +64,7 @@ public static class Gpt
     private const int HeaderEntryArrayCrcOffset = 88;
 
     /// <summary>GPT revision 1.0 as encoded in the header (0x00010000).</summary>
-    private const uint GptRevision = 0x00010000u;
+    private const uint GptRevision = 0x0001_0000u;
 
     /// <summary>Size in bytes of the GPT header structure (UEFI spec: 92).</summary>
     private const uint GptHeaderSizeBytes = 92u;
@@ -160,13 +160,13 @@ public static class Gpt
     private const int GuidDword3Offset = 12;
 
     /// <summary>XOR salt mixed into the second GUID dword so deterministic GUIDs differ per word.</summary>
-    private const ulong GuidMixSalt1 = 0x12345678UL;
+    private const ulong GuidMixSalt1 = 0x1234_5678UL;
 
     /// <summary>XOR salt mixed into the third GUID dword so deterministic GUIDs differ per word.</summary>
-    private const ulong GuidMixSalt2 = 0x87654321UL;
+    private const ulong GuidMixSalt2 = 0x8765_4321UL;
 
     /// <summary>XOR salt mixed into the fourth GUID dword so deterministic GUIDs differ per word.</summary>
-    private const ulong GuidMixSalt3 = 0xDEADBEEFUL;
+    private const ulong GuidMixSalt3 = 0xDEAD_BEEFUL;
 
     /// <summary>Microsoft Basic Data Partition GUID — used by FAT/NTFS/exFAT volumes.</summary>
     public static readonly Guid BasicDataPartitionType = new(
@@ -223,13 +223,13 @@ public static class Gpt
             for (uint j = 0; j < thisSector; j++)
             {
                 int offset = (int)(j * entrySize);
-                Guid partType = ReadGuid(sector.Slice(offset, GuidFieldSize));
-                if (partType == Guid.Empty)
+                Guid partitionType = ReadGuid(sector.Slice(offset, GuidFieldSize));
+                if (partitionType == Guid.Empty)
                 {
                     continue;
                 }
 
-                Guid partGuid = ReadGuid(sector.Slice(offset + EntryUniqueGuidOffset, GuidFieldSize));
+                Guid partitionGuid = ReadGuid(sector.Slice(offset + EntryUniqueGuidOffset, GuidFieldSize));
                 ulong startLba = BitConverter.ToUInt64(sector.Slice(offset + EntryFirstLbaOffset, UInt64FieldSize));
                 ulong endLba = BitConverter.ToUInt64(sector.Slice(offset + EntryLastLbaOffset, UInt64FieldSize));
                 // endLba is inclusive. Reject corrupt entries outright:
@@ -244,7 +244,7 @@ public static class Gpt
                 }
                 ulong count = endLba + 1 - startLba;
 
-                partitions.Add(new GptPartitionEntry(partType, partGuid, startLba, count));
+                partitions.Add(new GptPartitionEntry(partitionType, partitionGuid, startLba, count));
             }
         }
 
@@ -367,8 +367,8 @@ public static class Gpt
                 }
 
                 WriteGuid(sector.Slice(offset, GuidFieldSize), partitionType);
-                ulong slotIdx = s + j;
-                ulong guidMix = startSector ^ sectorCount ^ slotIdx;
+                ulong slotIndex = s + j;
+                ulong guidMix = startSector ^ sectorCount ^ slotIndex;
                 WriteDeterministicGuid(sector.Slice(offset + EntryUniqueGuidOffset, GuidFieldSize), guidMix);
                 BitConverter.TryWriteBytes(sector.Slice(offset + EntryFirstLbaOffset, UInt64FieldSize), startSector);
                 BitConverter.TryWriteBytes(sector.Slice(offset + EntryLastLbaOffset, UInt64FieldSize), startSector + sectorCount - 1);
@@ -454,10 +454,10 @@ public static class Gpt
     }
 
     /// <summary>
-    /// Rewrites one partition entry in place. Receives the entry's 0..55 byte
-    /// region and returns false, having written nothing, to abort the mutation.
+    /// Rewrites one partition entry in place. Receives the whole entry and
+    /// returns false, having written nothing, to abort the mutation.
     /// </summary>
-    /// <param name="entry">The entry's 0..55 byte region.</param>
+    /// <param name="entry">The whole entry, the header's SizeOfPartitionEntry bytes.</param>
     /// <param name="layout">The validated entry array geometry, for overlap checks against the other entries.</param>
     /// <returns>true when <paramref name="entry"/> was rewritten and should be committed.</returns>
     private delegate bool EntryMutator(Span<byte> entry, EntryArrayLayout layout);
@@ -645,28 +645,23 @@ public static class Gpt
         return false;
     }
 
-    private static Guid ReadGuid(Span<byte> source)
-    {
-        byte[] bytes = new byte[GuidFieldSize];
-        source.Slice(0, GuidFieldSize).CopyTo(bytes);
-        return new Guid(bytes);
-    }
+    private static Guid ReadGuid(ReadOnlySpan<byte> source) => new(source.Slice(0, GuidFieldSize));
 
-    private static void WriteGuid(Span<byte> dest, Guid value)
+    private static void WriteGuid(Span<byte> destination, Guid value)
     {
         byte[] bytes = value.ToByteArray();
-        bytes.AsSpan().CopyTo(dest);
+        bytes.AsSpan().CopyTo(destination);
     }
 
-    private static void WriteDeterministicGuid(Span<byte> dest, ulong mix)
+    private static void WriteDeterministicGuid(Span<byte> destination, ulong mix)
     {
-        BitConverter.TryWriteBytes(dest.Slice(GuidDword0Offset, UInt32FieldSize), (uint)mix);
-        BitConverter.TryWriteBytes(dest.Slice(GuidDword1Offset, UInt32FieldSize), (uint)(mix ^ GuidMixSalt1));
-        BitConverter.TryWriteBytes(dest.Slice(GuidDword2Offset, UInt32FieldSize), (uint)(mix ^ GuidMixSalt2));
-        BitConverter.TryWriteBytes(dest.Slice(GuidDword3Offset, UInt32FieldSize), (uint)(mix ^ GuidMixSalt3));
+        BitConverter.TryWriteBytes(destination.Slice(GuidDword0Offset, UInt32FieldSize), (uint)mix);
+        BitConverter.TryWriteBytes(destination.Slice(GuidDword1Offset, UInt32FieldSize), (uint)(mix ^ GuidMixSalt1));
+        BitConverter.TryWriteBytes(destination.Slice(GuidDword2Offset, UInt32FieldSize), (uint)(mix ^ GuidMixSalt2));
+        BitConverter.TryWriteBytes(destination.Slice(GuidDword3Offset, UInt32FieldSize), (uint)(mix ^ GuidMixSalt3));
     }
 
-    private static bool IsZero(Span<byte> data)
+    private static bool IsZero(ReadOnlySpan<byte> data)
     {
         for (int i = 0; i < data.Length; i++)
         {

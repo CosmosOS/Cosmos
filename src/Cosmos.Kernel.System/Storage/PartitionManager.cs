@@ -82,7 +82,7 @@ public static class PartitionManager
         }
 
         // AddPartition owns the 32-bit on-disk field bound and reports it the
-        // same way this does, so the facade no longer pre-checks it.
+        // same way this does, so the facade does not pre-check it.
         return Mbr.AddPartition(device, freeSlot, mbrSystemId, startSector, sectorCount);
     }
 
@@ -273,8 +273,7 @@ public static class PartitionManager
         // The mutability test belongs with the other pre-copy checks: this
         // walks the raw table, so it matches the extended container and the
         // GPT protective entry, which Mbr.MovePartition then refuses. Asking
-        // afterwards meant the sectors were already copied and the refusal
-        // arrived as an exception out of a bool-returning method.
+        // after the copy would report false with the sectors already copied.
         int slot = FindMbrSlot(device, location, out byte systemId);
         if (slot < 0 || !Mbr.IsMutableSystemId(systemId))
         {
@@ -308,10 +307,8 @@ public static class PartitionManager
     }
 
     /// <summary>Primary slot whose entry covers exactly <paramref name="location"/>, or -1.</summary>
-    private static int FindMbrSlot(IBlockDevice device, PartitionLocation location)
-    {
-        return FindMbrSlot(device, location, out _);
-    }
+    private static int FindMbrSlot(IBlockDevice device, PartitionLocation location) =>
+        FindMbrSlot(device, location, out _);
 
     /// <summary>
     /// As <see cref="FindMbrSlot(IBlockDevice, PartitionLocation)"/>, also

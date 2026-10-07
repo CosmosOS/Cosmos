@@ -48,6 +48,18 @@ public static class StorageManager
     /// </summary>
     private readonly struct BlockDeviceEntry
     {
+        /// <summary>The block device.</summary>
+        public IBlockDevice Device { get; }
+
+        /// <summary>The path of the kit node whose driver published the device; null for a hand-registered one.</summary>
+        public string? NodePath { get; }
+
+        /// <summary>The name of the kit driver that published the device; null for a hand-registered one.</summary>
+        public string? DriverName { get; }
+
+        /// <summary>The partitions found on the device, in on-disk order; replaced whole by a rescan.</summary>
+        public Partition[] Partitions { get; }
+
         /// <summary>Builds an entry.</summary>
         /// <param name="device">The block device.</param>
         /// <param name="nodePath">The path of the kit node whose driver published it, or null when hand-registered.</param>
@@ -60,18 +72,6 @@ public static class StorageManager
             DriverName = driverName;
             Partitions = partitions;
         }
-
-        /// <summary>The block device.</summary>
-        public IBlockDevice Device { get; }
-
-        /// <summary>The path of the kit node whose driver published the device; null for a hand-registered one.</summary>
-        public string? NodePath { get; }
-
-        /// <summary>The name of the kit driver that published the device; null for a hand-registered one.</summary>
-        public string? DriverName { get; }
-
-        /// <summary>The partitions found on the device, in on-disk order; replaced whole by a rescan.</summary>
-        public Partition[] Partitions { get; }
 
         /// <summary>The same entry with another partition list.</summary>
         /// <param name="partitions">The new partitions.</param>
@@ -141,7 +141,7 @@ public static class StorageManager
     /// node path, then hand-registered disks in registration order. Empty
     /// before initialization and when storage support is compiled out.
     /// </summary>
-    public static IReadOnlyList<IBlockDevice> Devices => (IReadOnlyList<IBlockDevice>?)s_devices ?? Array.Empty<IBlockDevice>();
+    public static IReadOnlyList<IBlockDevice> Devices => s_devices ?? [];
 
     /// <summary>
     /// Partitions discovered across every registered device, grouped by
@@ -150,7 +150,7 @@ public static class StorageManager
     /// filesystem drivers consume them without knowing whether the host disk
     /// is GPT-, MBR-, or unpartitioned.
     /// </summary>
-    public static IReadOnlyList<Partition> Partitions => (IReadOnlyList<Partition>?)s_partitions ?? Array.Empty<Partition>();
+    public static IReadOnlyList<Partition> Partitions => s_partitions ?? [];
 
     /// <summary>
     /// The partitions discovered on one device, in on-disk order, so a kernel
@@ -164,13 +164,13 @@ public static class StorageManager
     public static IReadOnlyList<Partition> GetPartitions(IBlockDevice device)
     {
         BlockDeviceEntry[]? entries = s_entries;
-        if (entries is null || device is null)
+        if (entries is null)
         {
-            return Array.Empty<Partition>();
+            return [];
         }
 
         int index = IndexOf(entries, device);
-        return index < 0 ? Array.Empty<Partition>() : entries[index].Partitions;
+        return index < 0 ? [] : entries[index].Partitions;
     }
 
     /// <summary>
