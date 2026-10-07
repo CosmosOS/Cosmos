@@ -12,6 +12,8 @@
   href: random.md
 - name: Graphics
   href: graphics.md
+- name: Audio
+  href: audio.md
 - name: Keyboard
   href: keyboard.md
 - name: Console Sessions and Telnet
