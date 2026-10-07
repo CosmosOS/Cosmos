@@ -24,7 +24,7 @@ namespace Cosmos.Kernel.Tests.Audio;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total of TR.Run and TR.Skip calls in <see cref="BeforeRun"/>.</summary>
-    private const ushort ExpectedTestCount = 17;
+    private const ushort ExpectedTestCount = 22;
 
     private const string PciBusName = "pci";
 
@@ -62,6 +62,21 @@ public class Kernel : Sys.Kernel
 
     /// <summary>Length of the stream the stop test ends early; long enough that it cannot end on its own first.</summary>
     private const int LongStreamMs = 3000;
+
+    /// <summary>Length of the tone the Console.Beep tests play.</summary>
+    private const int BeepMs = 300;
+
+    /// <summary>Length of <c>Console.Beep()</c>'s tone, the one Windows plays.</summary>
+    private const int DefaultBeepMs = 200;
+
+    /// <summary>
+    /// Bound on a beep that has nothing to play on: it returns at once, so
+    /// this is far below the tone it was asked for.
+    /// </summary>
+    private const long RefusedBeepBoundMs = 500;
+
+    /// <summary>Length of the tone asked for while there is nothing to play it on, longer than <see cref="RefusedBeepBoundMs"/>.</summary>
+    private const int RefusedBeepMs = 1000;
 
     /// <summary>Bytes written per call while the ring is filled.</summary>
     private const int FillChunkBytes = 4096;
@@ -111,6 +126,13 @@ public class Kernel : Sys.Kernel
         TR.RunIf(IsHdaCell, "Playback_CompletesOnThread", TestPlaybackCompletes, NoControllerReason);
         TR.RunIf(IsHdaCell, "Playback_StopEndsEarly", TestPlaybackStop, NoControllerReason);
         TR.RunIf(IsHdaCell, "Wave_FromMemoryPlays", TestWaveFromMemoryPlays, NoControllerReason);
+
+        // ==================== Console.Beep ====================
+        TR.Run("Beep_RejectsOutOfRange", TestBeepRejectsOutOfRange);
+        TR.RunIf(IsHdaCell, "Beep_PlaysForItsDuration", TestBeepPlaysForItsDuration, NoControllerReason);
+        TR.RunIf(IsHdaCell, "Beep_DefaultPlaysWindowsTone", TestBeepDefault, NoControllerReason);
+        TR.RunIf(IsHdaCell, "Beep_WhileOutputBusyReturnsAtOnce", TestBeepWhileBusy, NoControllerReason);
+        TR.RunIf(!IsHdaCell, "Beep_WithoutOutputReturnsAtOnce", TestBeepWithoutOutput, "an output is published on this cell");
 
         Log.WriteString("[Audio Tests] All tests completed\n");
         TR.Finish();
@@ -495,6 +517,119 @@ public class Kernel : Sys.Kernel
         Assert.True(stream.Depleted, "the file should be read to its end");
     }
 
+    // ==================== Console.Beep ====================
+
+    // The plug keeps the Windows contract: a pitch from 37 to 32767 Hz and a
+    // positive length, checked before anything is played.
+    private static void TestBeepRejectsOutOfRange()
+    {
+        Assert.True(BeepThrowsOutOfRange(36, BeepMs), "36 Hz should be refused");
+        Assert.True(BeepThrowsOutOfRange(32768, BeepMs), "32768 Hz should be refused");
+        Assert.True(BeepThrowsOutOfRange(ToneHz, 0), "a zero length should be refused");
+        Assert.True(BeepThrowsOutOfRange(ToneHz, -1), "a negative length should be refused");
+    }
+
+    // A beep holds the caller until its tone has played through the output,
+    // then gives the output back stopped.
+    private static void TestBeepPlaysForItsDuration()
+    {
+        if (RequirePrimary() is not AudioDevice device)
+        {
+            return;
+        }
+
+        long start = Stopwatch.GetTimestamp();
+        Console.Beep(ToneHz, BeepMs);
+        long elapsed = ElapsedMs(start);
+
+        Log.WriteString("[Audio Tests] Console.Beep(" + ToneHz + ", " + BeepMs + ") took " + elapsed + " ms\n");
+        Assert.True(elapsed >= BeepMs / 2, "the beep should hold the caller while it plays");
+        Assert.True(elapsed < WaitTimeoutMs, "the beep should return once played");
+        Assert.Null(device.Player, "the output should be released");
+        Assert.False(device.IsRunning, "the output should be stopped");
+    }
+
+    // The overload without arguments plays Windows' 800 Hz for 200 ms
+    // through the same output, instead of writing a bell to a terminal.
+    private static void TestBeepDefault()
+    {
+        if (RequirePrimary() is not AudioDevice device)
+        {
+            return;
+        }
+
+        long start = Stopwatch.GetTimestamp();
+        Console.Beep();
+        long elapsed = ElapsedMs(start);
+
+        Log.WriteString("[Audio Tests] Console.Beep() took " + elapsed + " ms\n");
+        Assert.True(elapsed >= DefaultBeepMs / 2, "the beep should hold the caller while it plays");
+        Assert.True(elapsed < WaitTimeoutMs, "the beep should return once played");
+        Assert.Null(device.Player, "the output should be released");
+    }
+
+    // A beep does not wait for, or cut into, a playback that holds the
+    // output: it returns at once and the playback carries on.
+    private static void TestBeepWhileBusy()
+    {
+        if (RequirePrimary() is not AudioDevice device)
+        {
+            return;
+        }
+
+        Assert.True(AudioManager.TryStartPlayback(Tone(LongStreamMs, DefaultSampleRate), null, out AudioPlayback? started), "the playback should start");
+        if (started is not AudioPlayback playback)
+        {
+            return;
+        }
+
+        try
+        {
+            Assert.True(WaitUntil(() => device.IsRunning), "the playback thread should start the output");
+
+            long start = Stopwatch.GetTimestamp();
+            Console.Beep(ToneHz, RefusedBeepMs);
+            long elapsed = ElapsedMs(start);
+
+            Assert.True(elapsed < RefusedBeepBoundMs, "a beep on a busy output should return at once");
+            Assert.True(playback.IsPlaying, "the playback should carry on");
+            Assert.True(ReferenceEquals(playback.Player, device.Player), "the playback should still hold the output");
+        }
+        finally
+        {
+            playback.Stop();
+        }
+
+        Assert.True(WaitUntil(() => device.Player is null), "the output should be released");
+    }
+
+    // With no output a beep plays nothing and returns at once, without
+    // throwing.
+    private static void TestBeepWithoutOutput()
+    {
+        long start = Stopwatch.GetTimestamp();
+        Console.Beep(ToneHz, RefusedBeepMs);
+        Console.Beep();
+        long elapsed = ElapsedMs(start);
+
+        Assert.True(elapsed < RefusedBeepBoundMs, "a beep with no output should return at once");
+    }
+
+    // One try/catch per method on purpose: true = the beep threw the
+    // contract's ArgumentOutOfRangeException.
+    private static bool BeepThrowsOutOfRange(int frequency, int duration)
+    {
+        try
+        {
+            Console.Beep(frequency, duration);
+            return false;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return true;
+        }
+    }
+
     // ==================== Helpers ====================
 
     /// <summary>The primary output, with a failed assertion when the manager lists none.</summary>
@@ -585,6 +720,12 @@ public class Kernel : Sys.Kernel
         }
 
         return true;
+    }
+
+    /// <summary>Milliseconds of host time since <paramref name="start"/>, a <see cref="Stopwatch"/> timestamp.</summary>
+    private static long ElapsedMs(long start)
+    {
+        return (Stopwatch.GetTimestamp() - start) * MillisecondsPerSecond / Stopwatch.Frequency;
     }
 
     /// <summary>A signed 16-bit stereo square wave of the given length, in memory.</summary>

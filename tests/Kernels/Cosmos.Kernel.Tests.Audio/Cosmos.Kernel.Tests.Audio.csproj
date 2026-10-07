@@ -6,8 +6,10 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <!-- The tests build streams in AudioFormat and AudioBitDepth, which are
-         the driver kit's experimental audio vocabulary (COSMOS0003). -->
-    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+         the driver kit's experimental audio vocabulary (COSMOS0003), and call
+         Console.Beep(int, int), which .NET implements on Windows alone
+         (CA1416) and the kernel's Console plug implements here. -->
+    <NoWarn>$(NoWarn);COSMOS0003;CA1416</NoWarn>
   </PropertyGroup>
 
   <!-- Core kernel packages (using project references for development) -->
@@ -23,8 +25,8 @@
        output. The line connects on x64 and not on arm64, and the interrupt
        test asserts whichever path the driver took.
        `bare` attaches nothing, and the manager must list no output and
-       refuse to play. Every cell registers the same 17 tests: the device
-       tests skip on bare, the refusal test skips on hda, and the cell is
+       refuse to play. Every cell registers the same 22 tests: the device
+       tests skip on bare, the refusal tests skip on hda, and the cell is
        read from the device tree, so a driver that failed to bind fails the
        suite instead of skipping it. -->
   <ItemGroup>

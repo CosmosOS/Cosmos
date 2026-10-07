@@ -9,11 +9,12 @@ using DevKernel.Shell;
 namespace DevKernel.Commands;
 
 /// <summary>
-/// The audio commands: what the driver kit published, and playing a
-/// <c>.wav</c> off a mounted volume through it. The file is streamed rather
-/// than loaded, so a file of any size plays in a fixed amount of memory, and
-/// playback runs on a thread of its own, so the shell stays usable while it
-/// plays: <c>audio</c> shows how far it has got and <c>stop</c> ends it.
+/// The audio commands: what the driver kit published, a tone through
+/// <c>Console.Beep</c>, and a <c>.wav</c> played off a mounted volume. The
+/// file is streamed rather than loaded, so a file of any size plays in a
+/// fixed amount of memory, and playback runs on a thread of its own, so the
+/// shell stays usable while it plays: <c>audio</c> shows how far it has got
+/// and <c>stop</c> ends it.
 /// </summary>
 internal static class AudioCommands
 {
@@ -23,17 +24,11 @@ internal static class AudioCommands
     /// <summary>Label column width of the device listing.</summary>
     private const int LabelWidth = 14;
 
-    /// <summary>Frequency (Hz) of the tone the beep command synthesises.</summary>
-    private const int ToneHz = 440;
+    /// <summary>Pitch (Hz) the beep command plays when none is given: what <c>Console.Beep()</c> plays.</summary>
+    private const int BeepHz = 800;
 
-    /// <summary>Length (ms) of the tone the beep command synthesises.</summary>
-    private const int ToneMs = 600;
-
-    /// <summary>Rate (Hz) the synthesised tone is generated at, which every codec accepts.</summary>
-    private const uint ToneSampleRate = 48000;
-
-    /// <summary>Amplitude of the synthesised square wave, a quarter of full scale so it is not harsh.</summary>
-    private const short ToneAmplitude = 8192;
+    /// <summary>Length (ms) the beep command plays when none is given: what <c>Console.Beep()</c> plays.</summary>
+    private const int BeepMs = 200;
 
     public static void Register(CommandShell shell)
     {
@@ -58,9 +53,22 @@ internal static class AudioCommands
             new ShellCommand
             {
                 Name = "beep",
-                Usage = "beep",
-                Description = "Play a synthesised 440 Hz tone (no file needed)",
-                Execute = static (context, args) => PlayTone(),
+                Usage = "beep [hz] [ms]",
+                Description = "Play a tone through Console.Beep (default 800 Hz for 200 ms, no file needed)",
+                MaxArgs = 2,
+                Execute = static (context, args) =>
+                {
+                    int frequency = BeepHz;
+                    int duration = BeepMs;
+                    if ((args.Count >= 1 && !args.TryGetInt(0, out frequency))
+                        || (args.Count >= 2 && !args.TryGetInt(1, out duration)))
+                    {
+                        args.PrintUsage();
+                        return;
+                    }
+
+                    Beep(frequency, duration);
+                },
             },
             new ShellCommand
             {
@@ -188,8 +196,14 @@ internal static class AudioCommands
         }
     }
 
-    /// <summary>Synthesises a square wave and plays it, so the driver can be proven with no volume mounted.</summary>
-    private static void PlayTone()
+    /// <summary>
+    /// Plays a tone through <c>Console.Beep</c>, which the kernel plugs onto
+    /// the primary output, so the driver can be proven with no volume mounted.
+    /// The call holds the shell until the tone has played.
+    /// </summary>
+    /// <param name="frequency">The pitch in Hz.</param>
+    /// <param name="duration">The length in milliseconds.</param>
+    private static void Beep(int frequency, int duration)
     {
         AudioDevice? device = RequireIdleDevice();
         if (device is null)
@@ -197,23 +211,22 @@ internal static class AudioCommands
             return;
         }
 
-        AudioFormat format = AudioFormat.Stereo16;
-        int frames = (int)(ToneSampleRate * ToneMs / 1000);
-        byte[] samples = new byte[frames * format.FrameSize];
-
-        // A square wave: half a period high, half low. No sine needed, and it
-        // is unmistakably audible when the codec is wired up correctly.
-        int halfPeriod = (int)ToneSampleRate / (ToneHz * 2);
-        for (int frame = 0; frame < frames; frame++)
+        Terminal.Info($"A {frequency} Hz tone for {duration} ms on \"{device.Name}\"...");
+        try
         {
-            short value = (frame / halfPeriod) % 2 == 0 ? ToneAmplitude : (short)-ToneAmplitude;
-            int offset = frame * format.FrameSize;
-            BitConverter.TryWriteBytes(samples.AsSpan(offset, 2), value);
-            BitConverter.TryWriteBytes(samples.AsSpan(offset + 2, 2), value);
+            // .NET implements this overload on Windows only (CA1416); the
+            // kernel's Console plug implements it here.
+#pragma warning disable CA1416
+            Console.Beep(frequency, duration);
+#pragma warning restore CA1416
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            Terminal.Error(ex.Message);
+            return;
         }
 
-        Terminal.Info($"A {ToneHz} Hz tone for {ToneMs} ms on \"{device.Name}\"...");
-        Start(device, new MemoryAudioStream(format, ToneSampleRate, samples), owned: null);
+        Terminal.Success("Done.");
     }
 
     /// <summary>Asks whatever is playing to stop, on every published output.</summary>

@@ -2,6 +2,7 @@ using System.Text;
 using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.Plugs.System.IO;
 using Cosmos.Kernel.System;
+using Cosmos.Kernel.System.Audio;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Input;
 
@@ -10,6 +11,18 @@ namespace Cosmos.Kernel.Plugs.System;
 [Plug(typeof(Console))]
 public class ConsolePlug
 {
+    /// <summary>Pitch in Hz of <see cref="Beep()"/>, the one Windows plays.</summary>
+    private const int DefaultBeepFrequency = 800;
+
+    /// <summary>Length in milliseconds of <see cref="Beep()"/>, the one Windows plays.</summary>
+    private const int DefaultBeepDuration = 200;
+
+    /// <summary>Lowest pitch in Hz <see cref="Beep(int, int)"/> accepts, as on Windows.</summary>
+    private const int MinBeepFrequency = 37;
+
+    /// <summary>Highest pitch in Hz <see cref="Beep(int, int)"/> accepts, as on Windows.</summary>
+    private const int MaxBeepFrequency = 32767;
+
     // Track the start position for current input line (for proper backspace/delete handling)
     private static int s_inputStartX;
     private static int s_inputStartY;
@@ -192,6 +205,38 @@ public class ConsolePlug
         KernelConsole.ThrowIfKernelConsoleNotInitialized();
 
         return KernelConsole.Default.Rows;
+    }
+
+    /// <summary>Plays the Windows default tone: 800 Hz for 200 ms.</summary>
+    [PlugMember]
+    public static void Beep()
+    {
+        Beep(DefaultBeepFrequency, DefaultBeepDuration);
+    }
+
+    /// <summary>
+    /// Plays a square wave through the primary audio output and returns once
+    /// it has played, as on Windows, the one platform .NET implements this
+    /// overload on. With nothing to play on (no output published, audio
+    /// compiled out, or another player holding the output) it returns at once
+    /// and plays nothing.
+    /// </summary>
+    /// <param name="frequency">The pitch in Hz, from 37 to 32767.</param>
+    /// <param name="duration">How long the tone lasts, in milliseconds.</param>
+    /// <exception cref="ArgumentOutOfRangeException">The pitch is out of range, or the duration is zero or negative.</exception>
+    [PlugMember]
+    public static void Beep(int frequency, int duration)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(frequency, MinBeepFrequency);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(frequency, MaxBeepFrequency);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(duration);
+
+        if (!KernelFeatures.Audio)
+        {
+            return;
+        }
+
+        AudioManager.Play(new ToneAudioStream(frequency, duration));
     }
 
     [PlugMember]
