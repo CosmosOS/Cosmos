@@ -447,10 +447,16 @@ internal static class PciFunctionDescriber
     }
 
     /// <summary>The configuration offset of the register at <paramref name="slot"/>.</summary>
-    private static ushort BarOffset(int slot) => (ushort)(BarBaseOffset + slot * BarSlotSize);
+    private static ushort BarOffset(int slot)
+    {
+        return (ushort)(BarBaseOffset + slot * BarSlotSize);
+    }
 
     /// <summary>A slot with no register behind it: unassigned, length 0.</summary>
-    private static PciBar Unassigned(int slot) => new(slot, isAssigned: false, isIo: false, is64Bit: false, isPrefetchable: false, 0, 0);
+    private static PciBar Unassigned(int slot)
+    {
+        return new(slot, isAssigned: false, isIo: false, is64Bit: false, isPrefetchable: false, 0, 0);
+    }
 
     /// <summary>
     /// The mappable form of a register: a memory window, a port range

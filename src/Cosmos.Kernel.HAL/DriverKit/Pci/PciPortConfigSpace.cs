@@ -24,7 +24,7 @@ internal sealed class PciPortConfigSpace : PciConfigSpace
     /// <summary>CONFIG_DATA I/O port of Configuration Mechanism #1 (32-bit window at 0xCFC..0xCFF).</summary>
     private const ushort ConfigDataPort = 0xCFC;
     /// <summary>Enable bit (bit 31) of the CONFIG_ADDRESS value.</summary>
-    private const uint ConfigEnableBit = 0x80000000;
+    private const uint ConfigEnableBit = 0x8000_0000;
     /// <summary>Shift placing the bus number into CONFIG_ADDRESS bits 23:16.</summary>
     private const int ConfigBusShift = 16;
     /// <summary>Shift placing the device number into CONFIG_ADDRESS bits 15:11.</summary>
@@ -46,12 +46,12 @@ internal sealed class PciPortConfigSpace : PciConfigSpace
     /// <summary>The read-modify-write lock of <see cref="AcquireLock"/>; static for the same reason.</summary>
     private static SchedSpinLock s_updateLock;
 
+    /// <inheritdoc/>
+    public override int Size => LegacySize;
+
     internal PciPortConfigSpace()
     {
     }
-
-    /// <inheritdoc/>
-    public override int Size => LegacySize;
 
     /// <inheritdoc/>
     public override byte Read8(byte bus, byte device, byte function, ushort offset)
@@ -120,7 +120,10 @@ internal sealed class PciPortConfigSpace : PciConfigSpace
     }
 
     /// <inheritdoc/>
-    public override IrqLockScope AcquireLock() => s_updateLock.AcquireIrqSafe();
+    public override IrqLockScope AcquireLock()
+    {
+        return s_updateLock.AcquireIrqSafe();
+    }
 
     /// <summary>
     /// Takes the latch lock and writes CONFIG_ADDRESS for the dword holding

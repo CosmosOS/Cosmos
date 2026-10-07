@@ -96,6 +96,8 @@ internal abstract class PciConfigSpace
     /// <summary>Refuses an offset the mechanism does not reach.</summary>
     /// <param name="offset">The register offset.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="offset"/> is at or past <see cref="Size"/>.</exception>
-    protected void ThrowIfOutOfRange(ushort offset) =>
+    protected void ThrowIfOutOfRange(ushort offset)
+    {
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((int)offset, Size, nameof(offset));
+    }
 }

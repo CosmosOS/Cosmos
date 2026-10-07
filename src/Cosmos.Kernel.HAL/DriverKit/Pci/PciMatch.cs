@@ -23,6 +23,9 @@ public sealed class PciMatch : DeviceMatch
     private readonly byte? _progIf;
     private readonly byte? _revision;
 
+    /// <inheritdoc/>
+    public override int Specificity { get; }
+
     /// <summary>Creates a match over the fields given; each null field is unconstrained.</summary>
     /// <param name="vendorId">The vendor id, or null.</param>
     /// <param name="deviceId">The device id, or null.</param>
@@ -63,17 +66,16 @@ public sealed class PciMatch : DeviceMatch
     }
 
     /// <inheritdoc/>
-    public override int Specificity { get; }
-
-    /// <inheritdoc/>
-    public override bool Matches(DeviceIdentity identity) =>
-        identity is PciIdentity pci
-        && (_vendorId is null || _vendorId.Value == pci.VendorId)
-        && (_deviceId is null || _deviceId.Value == pci.DeviceId)
-        && (_subsystemVendorId is null || _subsystemVendorId.Value == pci.SubsystemVendorId)
-        && (_subsystemId is null || _subsystemId.Value == pci.SubsystemId)
-        && (_classCode is null || _classCode.Value == pci.ClassCode)
-        && (_subclass is null || _subclass.Value == pci.Subclass)
-        && (_progIf is null || _progIf.Value == pci.ProgIf)
-        && (_revision is null || _revision.Value == pci.Revision);
+    public override bool Matches(DeviceIdentity identity)
+    {
+        return identity is PciIdentity pci
+            && (_vendorId is null || _vendorId.Value == pci.VendorId)
+            && (_deviceId is null || _deviceId.Value == pci.DeviceId)
+            && (_subsystemVendorId is null || _subsystemVendorId.Value == pci.SubsystemVendorId)
+            && (_subsystemId is null || _subsystemId.Value == pci.SubsystemId)
+            && (_classCode is null || _classCode.Value == pci.ClassCode)
+            && (_subclass is null || _subclass.Value == pci.Subclass)
+            && (_progIf is null || _progIf.Value == pci.ProgIf)
+            && (_revision is null || _revision.Value == pci.Revision);
+    }
 }

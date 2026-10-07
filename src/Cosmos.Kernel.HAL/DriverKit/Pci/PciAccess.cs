@@ -86,43 +86,15 @@ public sealed class PciAccess : INodeHooks
     /// <summary>Slot Capabilities bit 6: Hot-Plug Capable.</summary>
     private const uint ExpressSlotHotPlugCapable = 0x40;
 
-    private readonly PciConfigSpace _configSpace;
     private readonly ushort _segment;
     private readonly byte _lastBus;
-    private readonly byte _bus;
-    private readonly byte _device;
-    private readonly byte _function;
     private readonly byte _headerType;
     private readonly PciBar[] _bars;
     private readonly byte _msiXCapability;
-    private readonly int _messageInterruptCount;
-    private readonly bool _isHotPlugSlot;
     private PciBridgeWindows? _childWindows;
     private ushort _savedCommand;
     private ushort _savedMessageControl;
     private bool _hasSnapshot;
-
-    internal PciAccess(PciConfigSpace configSpace, ushort segment, byte lastBus, byte bus, byte device, byte function, byte headerType, PciBar[] bars, byte interruptLine, byte interruptPin)
-    {
-        _configSpace = configSpace;
-        _segment = segment;
-        _lastBus = lastBus;
-        _bus = bus;
-        _device = device;
-        _function = function;
-        _headerType = headerType;
-        _bars = bars;
-        InterruptLine = interruptLine;
-        InterruptPin = interruptPin;
-        _msiXCapability = FindCapability(MsiXCapabilityId);
-        _messageInterruptCount = _msiXCapability == 0
-            ? 0
-            : (ReadConfig16((ushort)(_msiXCapability + MsiXMessageControlOffset)) & MsiXTableSizeMask) + 1;
-        MessageTable = _msiXCapability == 0
-            ? null
-            : new PciMessageTable(this, _msiXCapability, _messageInterruptCount);
-        _isHotPlugSlot = headerType == BridgeHeaderType && ReadIsHotPlugSlot();
-    }
 
     /// <summary>The six base address registers as the kit sized them (and, behind a hot-plug slot, placed them); the resource at the same index is the mappable form.</summary>
     public ReadOnlySpan<PciBar> Bars => _bars;
@@ -137,7 +109,7 @@ public sealed class PciAccess : INodeHooks
     public bool IsMsiXCapable => _msiXCapability != 0;
 
     /// <summary>The MSI-X table size (Message Control's table size plus one), or 0 without the capability.</summary>
-    public int MessageInterruptCount => _messageInterruptCount;
+    public int MessageInterruptCount { get; }
 
     /// <summary>
     /// The secondary bus number of a type 1 header (a PCI-to-PCI bridge, a
@@ -159,22 +131,44 @@ public sealed class PciAccess : INodeHooks
     /// bus, the port driver does. Decided once at describe time. Any
     /// context; allocation-free.
     /// </summary>
-    public bool IsHotPlugSlot => _isHotPlugSlot;
+    public bool IsHotPlugSlot { get; }
 
     /// <summary>The MSI-X table the kit programs for the function's message interrupt sources; null without the capability.</summary>
     internal PciMessageTable? MessageTable { get; }
 
     /// <summary>The mechanism the function is reached through.</summary>
-    internal PciConfigSpace ConfigSpace => _configSpace;
+    internal PciConfigSpace ConfigSpace { get; }
 
     /// <summary>The bus number.</summary>
-    internal byte Bus => _bus;
+    internal byte Bus { get; }
 
     /// <summary>The device number.</summary>
-    internal byte Device => _device;
+    internal byte Device { get; }
 
     /// <summary>The function number.</summary>
-    internal byte Function => _function;
+    internal byte Function { get; }
+
+    internal PciAccess(PciConfigSpace configSpace, ushort segment, byte lastBus, byte bus, byte device, byte function, byte headerType, PciBar[] bars, byte interruptLine, byte interruptPin)
+    {
+        ConfigSpace = configSpace;
+        _segment = segment;
+        _lastBus = lastBus;
+        Bus = bus;
+        Device = device;
+        Function = function;
+        _headerType = headerType;
+        _bars = bars;
+        InterruptLine = interruptLine;
+        InterruptPin = interruptPin;
+        _msiXCapability = FindCapability(MsiXCapabilityId);
+        MessageInterruptCount = _msiXCapability == 0
+            ? 0
+            : (ReadConfig16((ushort)(_msiXCapability + MsiXMessageControlOffset)) & MsiXTableSizeMask) + 1;
+        MessageTable = _msiXCapability == 0
+            ? null
+            : new PciMessageTable(this, _msiXCapability, MessageInterruptCount);
+        IsHotPlugSlot = headerType == BridgeHeaderType && ReadIsHotPlugSlot();
+    }
 
     /// <summary>Reads one byte of this function's configuration space. Any context; allocation-free.</summary>
     /// <param name="offset">The register offset.</param>
@@ -182,7 +176,7 @@ public sealed class PciAccess : INodeHooks
     public byte ReadConfig8(ushort offset)
     {
         ThrowIfOutOfRange(offset, sizeof(byte));
-        return _configSpace.Read8(_bus, _device, _function, offset);
+        return ConfigSpace.Read8(Bus, Device, Function, offset);
     }
 
     /// <summary>Reads one word of this function's configuration space. Any context; allocation-free.</summary>
@@ -191,7 +185,7 @@ public sealed class PciAccess : INodeHooks
     public ushort ReadConfig16(ushort offset)
     {
         ThrowIfOutOfRange(offset, sizeof(ushort));
-        return _configSpace.Read16(_bus, _device, _function, offset);
+        return ConfigSpace.Read16(Bus, Device, Function, offset);
     }
 
     /// <summary>Reads one dword of this function's configuration space. Any context; allocation-free.</summary>
@@ -200,7 +194,7 @@ public sealed class PciAccess : INodeHooks
     public uint ReadConfig32(ushort offset)
     {
         ThrowIfOutOfRange(offset, sizeof(uint));
-        return _configSpace.Read32(_bus, _device, _function, offset);
+        return ConfigSpace.Read32(Bus, Device, Function, offset);
     }
 
     /// <summary>Writes one byte of this function's configuration space. Any context; allocation-free.</summary>
@@ -210,7 +204,7 @@ public sealed class PciAccess : INodeHooks
     public void WriteConfig8(ushort offset, byte value)
     {
         ThrowIfOutOfRange(offset, sizeof(byte));
-        _configSpace.Write8(_bus, _device, _function, offset, value);
+        ConfigSpace.Write8(Bus, Device, Function, offset, value);
     }
 
     /// <summary>Writes one word of this function's configuration space. Any context; allocation-free.</summary>
@@ -220,7 +214,7 @@ public sealed class PciAccess : INodeHooks
     public void WriteConfig16(ushort offset, ushort value)
     {
         ThrowIfOutOfRange(offset, sizeof(ushort));
-        _configSpace.Write16(_bus, _device, _function, offset, value);
+        ConfigSpace.Write16(Bus, Device, Function, offset, value);
     }
 
     /// <summary>Writes one dword of this function's configuration space. Any context; allocation-free.</summary>
@@ -230,7 +224,7 @@ public sealed class PciAccess : INodeHooks
     public void WriteConfig32(ushort offset, uint value)
     {
         ThrowIfOutOfRange(offset, sizeof(uint));
-        _configSpace.Write32(_bus, _device, _function, offset, value);
+        ConfigSpace.Write32(Bus, Device, Function, offset, value);
     }
 
     /// <summary>
@@ -301,7 +295,7 @@ public sealed class PciAccess : INodeHooks
         ArgumentOutOfRangeException.ThrowIfGreaterThan(device, PciConfigSpace.MaxDevice);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(function, PciConfigSpace.MaxFunction);
         byte bus = SecondaryBus;
-        if (_headerType != BridgeHeaderType || bus == 0 || bus <= _bus || bus > _lastBus)
+        if (_headerType != BridgeHeaderType || bus == 0 || bus <= Bus || bus > _lastBus)
         {
             description = default;
             return false;
@@ -313,30 +307,42 @@ public sealed class PciAccess : INodeHooks
             if (function == 0 || _childWindows is null)
             {
                 _childWindows = PciBridgeWindows.Read(this);
-                PciFunctionDescriber.NoteOtherFunctions(_configSpace, bus, device, function, _childWindows);
+                PciFunctionDescriber.NoteOtherFunctions(ConfigSpace, bus, device, function, _childWindows);
             }
 
             windows = _childWindows;
         }
 
-        return PciFunctionDescriber.TryDescribe(_configSpace, _segment, _lastBus, bus, device, function, windows, out description);
+        return PciFunctionDescriber.TryDescribe(ConfigSpace, _segment, _lastBus, bus, device, function, windows, out description);
     }
 
     /// <summary>Turns bus mastering on or off: a read-modify-write of Command under the mechanism's lock. Any context; allocation-free.</summary>
     /// <param name="enable">True to let the function initiate DMA.</param>
-    public void EnableBusMastering(bool enable) => UpdateCommand(CommandBusMaster, enable);
+    public void EnableBusMastering(bool enable)
+    {
+        UpdateCommand(CommandBusMaster, enable);
+    }
 
     /// <summary>Turns memory space decoding on or off: a read-modify-write of Command under the mechanism's lock. Any context; allocation-free.</summary>
     /// <param name="enable">True to let the function decode its memory windows.</param>
-    public void EnableMemorySpace(bool enable) => UpdateCommand(CommandMemorySpace, enable);
+    public void EnableMemorySpace(bool enable)
+    {
+        UpdateCommand(CommandMemorySpace, enable);
+    }
 
     /// <summary>Turns I/O space decoding on or off: a read-modify-write of Command under the mechanism's lock. Any context; allocation-free.</summary>
     /// <param name="enable">True to let the function decode its port ranges.</param>
-    public void EnableIoSpace(bool enable) => UpdateCommand(CommandIoSpace, enable);
+    public void EnableIoSpace(bool enable)
+    {
+        UpdateCommand(CommandIoSpace, enable);
+    }
 
     /// <summary>Sets or clears Command's INTx disable bit, for the line source. Any context; allocation-free.</summary>
     /// <param name="disable">True to keep the function off its legacy line.</param>
-    internal void SetInterruptDisable(bool disable) => UpdateCommand(CommandInterruptDisable, disable);
+    internal void SetInterruptDisable(bool disable)
+    {
+        UpdateCommand(CommandInterruptDisable, disable);
+    }
 
     /// <summary>
     /// Snapshots Command and, with the capability, MSI-X Message Control
@@ -348,13 +354,13 @@ public sealed class PciAccess : INodeHooks
     /// </summary>
     internal void Quiesce()
     {
-        using (_configSpace.AcquireLock())
+        using (ConfigSpace.AcquireLock())
         {
-            ushort command = _configSpace.Read16(_bus, _device, _function, CommandOffset);
+            ushort command = ConfigSpace.Read16(Bus, Device, Function, CommandOffset);
             ushort messageControl = 0;
             if (_msiXCapability != 0)
             {
-                messageControl = _configSpace.Read16(_bus, _device, _function, MessageControlOffset());
+                messageControl = ConfigSpace.Read16(Bus, Device, Function, MessageControlOffset());
             }
 
             if (!_hasSnapshot)
@@ -364,10 +370,10 @@ public sealed class PciAccess : INodeHooks
                 _hasSnapshot = true;
             }
 
-            _configSpace.Write16(_bus, _device, _function, CommandOffset, (ushort)((command & ~CommandBusMaster) | CommandInterruptDisable));
+            ConfigSpace.Write16(Bus, Device, Function, CommandOffset, (ushort)((command & ~CommandBusMaster) | CommandInterruptDisable));
             if (_msiXCapability != 0 && (messageControl & MsiXEnable) != 0)
             {
-                _configSpace.Write16(_bus, _device, _function, MessageControlOffset(), (ushort)((messageControl & ~MsiXEnable) | MsiXFunctionMask));
+                ConfigSpace.Write16(Bus, Device, Function, MessageControlOffset(), (ushort)((messageControl & ~MsiXEnable) | MsiXFunctionMask));
             }
         }
     }
@@ -379,29 +385,38 @@ public sealed class PciAccess : INodeHooks
     /// </summary>
     internal void Restore()
     {
-        using (_configSpace.AcquireLock())
+        using (ConfigSpace.AcquireLock())
         {
             if (!_hasSnapshot)
             {
                 return;
             }
 
-            _configSpace.Write16(_bus, _device, _function, CommandOffset, _savedCommand);
+            ConfigSpace.Write16(Bus, Device, Function, CommandOffset, _savedCommand);
             if (_msiXCapability != 0)
             {
-                _configSpace.Write16(_bus, _device, _function, MessageControlOffset(), _savedMessageControl);
+                ConfigSpace.Write16(Bus, Device, Function, MessageControlOffset(), _savedMessageControl);
             }
         }
     }
 
     /// <inheritdoc/>
-    void INodeHooks.BeforeFirstOffer() => Quiesce();
+    void INodeHooks.BeforeFirstOffer()
+    {
+        Quiesce();
+    }
 
     /// <inheritdoc/>
-    void INodeHooks.AfterOfferDeclined() => Quiesce();
+    void INodeHooks.AfterOfferDeclined()
+    {
+        Quiesce();
+    }
 
     /// <inheritdoc/>
-    void INodeHooks.AfterUnbound() => Restore();
+    void INodeHooks.AfterUnbound()
+    {
+        Restore();
+    }
 
     /// <inheritdoc/>
     void INodeHooks.AfterTeardown(bool hardwarePresent)
@@ -441,22 +456,25 @@ public sealed class PciAccess : INodeHooks
         return (slotCapabilities & ExpressSlotHotPlugCapable) != 0;
     }
 
-    private ushort MessageControlOffset() => (ushort)(_msiXCapability + MsiXMessageControlOffset);
+    private ushort MessageControlOffset()
+    {
+        return (ushort)(_msiXCapability + MsiXMessageControlOffset);
+    }
 
     private void UpdateCommand(ushort bits, bool set)
     {
-        using (_configSpace.AcquireLock())
+        using (ConfigSpace.AcquireLock())
         {
-            ushort command = _configSpace.Read16(_bus, _device, _function, CommandOffset);
+            ushort command = ConfigSpace.Read16(Bus, Device, Function, CommandOffset);
             command = set ? (ushort)(command | bits) : (ushort)(command & ~bits);
-            _configSpace.Write16(_bus, _device, _function, CommandOffset, command);
+            ConfigSpace.Write16(Bus, Device, Function, CommandOffset, command);
         }
     }
 
     /// <summary>Refuses an access the mechanism does not reach or the register does not align to.</summary>
     private void ThrowIfOutOfRange(ushort offset, int size)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(offset + size, _configSpace.Size, nameof(offset));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(offset + size, ConfigSpace.Size, nameof(offset));
         if ((offset & (size - 1)) != 0)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, "A configuration register is read at its natural alignment.");

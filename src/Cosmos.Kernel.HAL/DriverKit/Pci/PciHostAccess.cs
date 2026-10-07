@@ -31,16 +31,6 @@ public sealed class PciHostAccess
     /// </summary>
     internal const int MaxDescribedMessages = 32;
 
-    private readonly PciConfigSpace _configSpace;
-
-    internal PciHostAccess(PciConfigSpace configSpace, ushort segment, byte startBus, byte endBus)
-    {
-        _configSpace = configSpace;
-        Segment = segment;
-        StartBus = startBus;
-        EndBus = endBus;
-    }
-
     /// <summary>The PCI segment group the host serves.</summary>
     public ushort Segment { get; }
 
@@ -51,14 +41,24 @@ public sealed class PciHostAccess
     public byte EndBus { get; }
 
     /// <summary>The mechanism behind this host.</summary>
-    internal PciConfigSpace ConfigSpace => _configSpace;
+    internal PciConfigSpace ConfigSpace { get; }
+
+    internal PciHostAccess(PciConfigSpace configSpace, ushort segment, byte startBus, byte endBus)
+    {
+        ConfigSpace = configSpace;
+        Segment = segment;
+        StartBus = startBus;
+        EndBus = endBus;
+    }
 
     /// <summary>A host over the x86 port mechanism, sharing its one latch and lock. Thread context.</summary>
     /// <param name="segment">The segment group.</param>
     /// <param name="startBus">The first bus.</param>
     /// <param name="endBus">The last bus.</param>
-    internal static PciHostAccess ForPorts(ushort segment, byte startBus, byte endBus) =>
-        new(PciConfigSpace.Ports, segment, startBus, endBus);
+    internal static PciHostAccess ForPorts(ushort segment, byte startBus, byte endBus)
+    {
+        return new PciHostAccess(PciConfigSpace.Ports, segment, startBus, endBus);
+    }
 
     /// <summary>
     /// A host over an ECAM window, mapped here as device memory bus by bus,
@@ -108,7 +108,7 @@ public sealed class PciHostAccess
     public byte ReadConfig8(byte bus, byte device, byte function, ushort offset)
     {
         ThrowIfOutOfRange(bus, device, function, offset, sizeof(byte));
-        return _configSpace.Read8(bus, device, function, offset);
+        return ConfigSpace.Read8(bus, device, function, offset);
     }
 
     /// <summary>Reads one word of a function's configuration space. Any context; allocation-free.</summary>
@@ -120,7 +120,7 @@ public sealed class PciHostAccess
     public ushort ReadConfig16(byte bus, byte device, byte function, ushort offset)
     {
         ThrowIfOutOfRange(bus, device, function, offset, sizeof(ushort));
-        return _configSpace.Read16(bus, device, function, offset);
+        return ConfigSpace.Read16(bus, device, function, offset);
     }
 
     /// <summary>Reads one dword of a function's configuration space. Any context; allocation-free.</summary>
@@ -132,7 +132,7 @@ public sealed class PciHostAccess
     public uint ReadConfig32(byte bus, byte device, byte function, ushort offset)
     {
         ThrowIfOutOfRange(bus, device, function, offset, sizeof(uint));
-        return _configSpace.Read32(bus, device, function, offset);
+        return ConfigSpace.Read32(bus, device, function, offset);
     }
 
     /// <summary>Writes one byte of a function's configuration space. Any context; allocation-free.</summary>
@@ -145,7 +145,7 @@ public sealed class PciHostAccess
     public void WriteConfig8(byte bus, byte device, byte function, ushort offset, byte value)
     {
         ThrowIfOutOfRange(bus, device, function, offset, sizeof(byte));
-        _configSpace.Write8(bus, device, function, offset, value);
+        ConfigSpace.Write8(bus, device, function, offset, value);
     }
 
     /// <summary>Writes one word of a function's configuration space. Any context; allocation-free.</summary>
@@ -158,7 +158,7 @@ public sealed class PciHostAccess
     public void WriteConfig16(byte bus, byte device, byte function, ushort offset, ushort value)
     {
         ThrowIfOutOfRange(bus, device, function, offset, sizeof(ushort));
-        _configSpace.Write16(bus, device, function, offset, value);
+        ConfigSpace.Write16(bus, device, function, offset, value);
     }
 
     /// <summary>Writes one dword of a function's configuration space. Any context; allocation-free.</summary>
@@ -171,7 +171,7 @@ public sealed class PciHostAccess
     public void WriteConfig32(byte bus, byte device, byte function, ushort offset, uint value)
     {
         ThrowIfOutOfRange(bus, device, function, offset, sizeof(uint));
-        _configSpace.Write32(bus, device, function, offset, value);
+        ConfigSpace.Write32(bus, device, function, offset, value);
     }
 
     /// <summary>
@@ -202,7 +202,7 @@ public sealed class PciHostAccess
             return false;
         }
 
-        return PciFunctionDescriber.TryDescribe(_configSpace, Segment, EndBus, bus, device, function, null, out description);
+        return PciFunctionDescriber.TryDescribe(ConfigSpace, Segment, EndBus, bus, device, function, null, out description);
     }
 
     /// <summary>Refuses an access outside the host's buses, a bad device or function number, or a register the mechanism does not reach or the access does not align to.</summary>
@@ -212,7 +212,7 @@ public sealed class PciHostAccess
         ArgumentOutOfRangeException.ThrowIfGreaterThan(bus, EndBus);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(device, PciConfigSpace.MaxDevice);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(function, PciConfigSpace.MaxFunction);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(offset + size, _configSpace.Size, nameof(offset));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(offset + size, ConfigSpace.Size, nameof(offset));
         if ((offset & (size - 1)) != 0)
         {
             throw new ArgumentOutOfRangeException(nameof(offset), offset, "A configuration register is read at its natural alignment.");

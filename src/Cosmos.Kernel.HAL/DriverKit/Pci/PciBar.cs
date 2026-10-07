@@ -17,17 +17,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct PciBar
 {
-    internal PciBar(int index, bool isAssigned, bool isIo, bool is64Bit, bool isPrefetchable, ulong baseAddress, ulong length)
-    {
-        Index = index;
-        IsAssigned = isAssigned;
-        IsIo = isIo;
-        Is64Bit = is64Bit;
-        IsPrefetchable = isPrefetchable;
-        Base = baseAddress;
-        Length = length;
-    }
-
     /// <summary>The slot, 0 to 5: register offset 0x10 + 4 * Index.</summary>
     public int Index { get; }
 
@@ -48,4 +37,15 @@ public readonly struct PciBar
 
     /// <summary>Bytes of a memory window, or ports of an I/O range: the decoded size, 0 only for an empty slot or the upper half of a 64-bit register.</summary>
     public ulong Length { get; }
+
+    internal PciBar(int index, bool isAssigned, bool isIo, bool is64Bit, bool isPrefetchable, ulong baseAddress, ulong length)
+    {
+        Index = index;
+        IsAssigned = isAssigned;
+        IsIo = isIo;
+        Is64Bit = is64Bit;
+        IsPrefetchable = isPrefetchable;
+        Base = baseAddress;
+        Length = length;
+    }
 }

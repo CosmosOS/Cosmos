@@ -56,12 +56,14 @@ internal sealed class PciMessageTable
 
     private readonly PciAccess _access;
     private readonly byte _capability;
-    private readonly int _entryCount;
     private readonly bool[] _bound;
     private ulong _tableVirtual;
     private object? _deviceContext;
     private int _connectedCount;
     private bool _tableStale;
+
+    /// <summary>The number of entries the table holds.</summary>
+    internal int EntryCount { get; }
 
     /// <summary>The table of <paramref name="access"/>'s MSI-X capability at <paramref name="capability"/>, with <paramref name="entryCount"/> entries.</summary>
     /// <param name="access">The function's access object.</param>
@@ -71,12 +73,9 @@ internal sealed class PciMessageTable
     {
         _access = access;
         _capability = capability;
-        _entryCount = entryCount;
+        EntryCount = entryCount;
         _bound = new bool[entryCount];
     }
-
-    /// <summary>The number of entries the table holds.</summary>
-    internal int EntryCount => _entryCount;
 
     /// <summary>
     /// Routes entry <paramref name="index"/> to <paramref name="handler"/>.
@@ -98,7 +97,7 @@ internal sealed class PciMessageTable
     /// </returns>
     internal bool TryConnect(int index, InterruptManager.IrqDelegate handler)
     {
-        if (index < 0 || index >= _entryCount || _bound[index])
+        if (index < 0 || index >= EntryCount || _bound[index])
         {
             return false;
         }
@@ -125,7 +124,7 @@ internal sealed class PciMessageTable
             // the driver takes its polled path.
             try
             {
-                _deviceContext = MsiRouting.PrepareDevice(_access.Bus, _access.Device, _access.Function, _entryCount);
+                _deviceContext = MsiRouting.PrepareDevice(_access.Bus, _access.Device, _access.Function, EntryCount);
             }
             catch (InvalidOperationException)
             {
@@ -137,7 +136,7 @@ internal sealed class PciMessageTable
         {
             // Every entry is masked before the capability is enabled, so
             // no stale entry can fire; the table is decoded at this point.
-            for (int i = 0; i < _entryCount; i++)
+            for (int i = 0; i < EntryCount; i++)
             {
                 Native.MMIO.Write32(EntryAddress(i) + EntryVectorControl, VectorControlMask);
             }
@@ -154,7 +153,7 @@ internal sealed class PciMessageTable
             // function mask instead: with the table decoded again, the
             // unbound entries are masked in the table before the function
             // mask is lifted from the entries that stayed bound.
-            for (int i = 0; i < _entryCount; i++)
+            for (int i = 0; i < EntryCount; i++)
             {
                 if (!_bound[i])
                 {
@@ -207,7 +206,7 @@ internal sealed class PciMessageTable
     /// <param name="index">The entry.</param>
     internal void Mask(int index)
     {
-        if (index < 0 || index >= _entryCount || !_bound[index])
+        if (index < 0 || index >= EntryCount || !_bound[index])
         {
             return;
         }
@@ -223,7 +222,7 @@ internal sealed class PciMessageTable
     /// <param name="index">The entry.</param>
     internal void Unmask(int index)
     {
-        if (index < 0 || index >= _entryCount || !_bound[index])
+        if (index < 0 || index >= EntryCount || !_bound[index])
         {
             return;
         }
@@ -249,7 +248,7 @@ internal sealed class PciMessageTable
     /// <param name="index">The entry.</param>
     internal void Disconnect(int index)
     {
-        if (index < 0 || index >= _entryCount || !_bound[index])
+        if (index < 0 || index >= EntryCount || !_bound[index])
         {
             return;
         }
@@ -300,7 +299,7 @@ internal sealed class PciMessageTable
         }
 
         ulong tablePhysical = bar.Base + tableOffset;
-        if (!DeviceMemory.EnsureWindowMapped(tablePhysical, (ulong)_entryCount * EntryStride))
+        if (!DeviceMemory.EnsureWindowMapped(tablePhysical, (ulong)EntryCount * EntryStride))
         {
             return false;
         }
@@ -326,8 +325,14 @@ internal sealed class PciMessageTable
     }
 
     /// <summary>The configuration offset of Message Control.</summary>
-    private ushort MessageControlRegister() => (ushort)(_capability + MessageControlOffset);
+    private ushort MessageControlRegister()
+    {
+        return (ushort)(_capability + MessageControlOffset);
+    }
 
     /// <summary>The virtual address of entry <paramref name="index"/> through the HHDM alias.</summary>
-    private ulong EntryAddress(int index) => _tableVirtual + (ulong)index * EntryStride;
+    private ulong EntryAddress(int index)
+    {
+        return _tableVirtual + (ulong)index * EntryStride;
+    }
 }

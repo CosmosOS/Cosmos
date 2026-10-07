@@ -41,17 +41,20 @@ internal sealed class PciLineInterruptSource : InterruptSource
     private InterruptManager.IrqDelegate? _adapter;
     private volatile bool _connected;
 
+    /// <summary>True when the register names a line at all.</summary>
+    private bool HasLine => _line != NoLine && _line != UnroutedLine;
+
     internal PciLineInterruptSource(PciAccess access)
     {
         _access = access;
         _line = access.InterruptLine;
     }
 
-    /// <summary>True when the register names a line at all.</summary>
-    private bool HasLine => _line != NoLine && _line != UnroutedLine;
-
     /// <inheritdoc/>
-    public override string Describe() => HasLine ? $"line {_line}" : "line (none)";
+    public override string Describe()
+    {
+        return HasLine ? $"line {_line}" : "line (none)";
+    }
 
     /// <inheritdoc/>
     protected override bool TryConnectCore(InterruptTrampoline trampoline)

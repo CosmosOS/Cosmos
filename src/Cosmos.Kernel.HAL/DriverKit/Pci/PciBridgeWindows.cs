@@ -60,19 +60,6 @@ internal sealed class PciBridgeWindows
     private ulong _prefetchableNext;
     private ulong _ioNext;
 
-    private PciBridgeWindows(ulong memoryBase, ulong memoryLimit, ulong prefetchableBase, ulong prefetchableLimit, ulong ioBase, ulong ioLimit)
-    {
-        MemoryBase = memoryBase;
-        MemoryLimit = memoryLimit;
-        PrefetchableBase = prefetchableBase;
-        PrefetchableLimit = prefetchableLimit;
-        IoBase = ioBase;
-        IoLimit = ioLimit;
-        _memoryNext = memoryBase;
-        _prefetchableNext = prefetchableBase;
-        _ioNext = ioBase;
-    }
-
     /// <summary>The first address of the memory window. Any context; allocation-free.</summary>
     internal ulong MemoryBase { get; }
 
@@ -110,6 +97,19 @@ internal sealed class PciBridgeWindows
     /// window. Any context; allocation-free.
     /// </summary>
     internal bool HasIo => IoBase != 0 && IoBase <= IoLimit;
+
+    private PciBridgeWindows(ulong memoryBase, ulong memoryLimit, ulong prefetchableBase, ulong prefetchableLimit, ulong ioBase, ulong ioLimit)
+    {
+        MemoryBase = memoryBase;
+        MemoryLimit = memoryLimit;
+        PrefetchableBase = prefetchableBase;
+        PrefetchableLimit = prefetchableLimit;
+        IoBase = ioBase;
+        IoLimit = ioLimit;
+        _memoryNext = memoryBase;
+        _prefetchableNext = prefetchableBase;
+        _ioNext = ioBase;
+    }
 
     /// <summary>
     /// Decodes the memory, prefetchable and I/O windows of a type 1 header,
@@ -262,5 +262,8 @@ internal sealed class PciBridgeWindows
     }
 
     /// <summary>True when <paramref name="address"/> lies within <paramref name="windowBase"/> and <paramref name="windowLimit"/>.</summary>
-    private static bool Contains(ulong windowBase, ulong windowLimit, ulong address) => address >= windowBase && address <= windowLimit;
+    private static bool Contains(ulong windowBase, ulong windowLimit, ulong address)
+    {
+        return address >= windowBase && address <= windowLimit;
+    }
 }

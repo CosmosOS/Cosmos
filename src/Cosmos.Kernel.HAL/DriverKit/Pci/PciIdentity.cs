@@ -14,25 +14,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public sealed class PciIdentity : DeviceIdentity
 {
-    internal PciIdentity(ushort segment, byte bus, byte device, byte function, ushort vendorId, ushort deviceId,
-        ushort subsystemVendorId, ushort subsystemId, byte classCode, byte subclass, byte progIf, byte revision, byte headerType)
-    {
-        Segment = segment;
-        Bus = bus;
-        Device = device;
-        Function = function;
-        VendorId = vendorId;
-        DeviceId = deviceId;
-        SubsystemVendorId = subsystemVendorId;
-        SubsystemId = subsystemId;
-        ClassCode = classCode;
-        Subclass = subclass;
-        ProgIf = progIf;
-        Revision = revision;
-        HeaderType = headerType;
-        Address = $"{segment:x4}:{bus:x2}:{device:x2}.{function:x}";
-    }
-
     /// <summary>The PCI segment group the function's host serves.</summary>
     public ushort Segment { get; }
 
@@ -78,7 +59,28 @@ public sealed class PciIdentity : DeviceIdentity
     /// <inheritdoc/>
     public override string Address { get; }
 
+    internal PciIdentity(ushort segment, byte bus, byte device, byte function, ushort vendorId, ushort deviceId,
+        ushort subsystemVendorId, ushort subsystemId, byte classCode, byte subclass, byte progIf, byte revision, byte headerType)
+    {
+        Segment = segment;
+        Bus = bus;
+        Device = device;
+        Function = function;
+        VendorId = vendorId;
+        DeviceId = deviceId;
+        SubsystemVendorId = subsystemVendorId;
+        SubsystemId = subsystemId;
+        ClassCode = classCode;
+        Subclass = subclass;
+        ProgIf = progIf;
+        Revision = revision;
+        HeaderType = headerType;
+        Address = $"{segment:x4}:{bus:x2}:{device:x2}.{function:x}";
+    }
+
     /// <inheritdoc/>
-    public override string Describe() =>
-        $"{VendorId:x4}:{DeviceId:x4} class {ClassCode:x2}.{Subclass:x2}.{ProgIf:x2}";
+    public override string Describe()
+    {
+        return $"{VendorId:x4}:{DeviceId:x4} class {ClassCode:x2}.{Subclass:x2}.{ProgIf:x2}";
+    }
 }

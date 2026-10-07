@@ -15,15 +15,6 @@ namespace Cosmos.Kernel.HAL.DriverKit.Pci;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public readonly struct PciFunctionDescription
 {
-    internal PciFunctionDescription(PciIdentity identity, DeviceResource[] resources, InterruptSource[] interrupts, PciAccess access, bool isMultiFunction)
-    {
-        Identity = identity;
-        Resources = resources;
-        Interrupts = interrupts;
-        Access = access;
-        IsMultiFunction = isMultiFunction;
-    }
-
     /// <summary>The function's identity.</summary>
     public PciIdentity Identity { get; }
 
@@ -40,4 +31,13 @@ public readonly struct PciFunctionDescription
 
     /// <summary>True when the header type register's bit 7 was set at describe time: the device implements functions beyond 0, which a walk of its bus describes too. Any context; allocation-free.</summary>
     public bool IsMultiFunction { get; }
+
+    internal PciFunctionDescription(PciIdentity identity, DeviceResource[] resources, InterruptSource[] interrupts, PciAccess access, bool isMultiFunction)
+    {
+        Identity = identity;
+        Resources = resources;
+        Interrupts = interrupts;
+        Access = access;
+        IsMultiFunction = isMultiFunction;
+    }
 }

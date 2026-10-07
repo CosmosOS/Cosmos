@@ -34,7 +34,10 @@ internal sealed class PciMessageInterruptSource : InterruptSource
     }
 
     /// <inheritdoc/>
-    public override string Describe() => $"message {_index} of {_table.EntryCount}";
+    public override string Describe()
+    {
+        return $"message {_index} of {_table.EntryCount}";
+    }
 
     /// <inheritdoc/>
     protected override bool TryConnectCore(InterruptTrampoline trampoline)
