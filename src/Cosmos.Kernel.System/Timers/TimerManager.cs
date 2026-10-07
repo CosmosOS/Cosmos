@@ -13,7 +13,10 @@ public static class TimerManager
     /// <summary>Nanoseconds in one <see cref="TimeSpan"/> tick.</summary>
     private const ulong NanosecondsPerTick = 100;
 
-    private static TimerDevice? s_timer;
+    /// <summary>
+    /// Gets the registered timer device.
+    /// </summary>
+    internal static TimerDevice? Timer { get; private set; }
 
     /// <summary>
     /// Whether timer support is compiled into this kernel
@@ -26,12 +29,7 @@ public static class TimerManager
     /// compiled out with CosmosEnableTimer=false, since every member of this
     /// class answers off that device.
     /// </summary>
-    public static bool IsInitialized => s_timer is not null;
-
-    /// <summary>
-    /// Gets the registered timer device.
-    /// </summary>
-    internal static TimerDevice? Timer => s_timer;
+    public static bool IsInitialized => Timer is not null;
 
     /// <summary>
     /// Throws when timer support is compiled out. Guards the two members that
@@ -61,7 +59,7 @@ public static class TimerManager
             return;
         }
 
-        s_timer = timer;
+        Timer = timer;
     }
 
     /// <summary>
@@ -82,17 +80,17 @@ public static class TimerManager
     /// </exception>
     public static uint Frequency
     {
-        get => s_timer?.Frequency ?? 0;
+        get => Timer?.Frequency ?? 0;
         set
         {
             ThrowIfDisabled();
 
-            if (s_timer is null)
+            if (Timer is null)
             {
                 return;
             }
 
-            if (!s_timer.SetFrequency(value))
+            if (!Timer.SetFrequency(value))
             {
                 throw new ArgumentOutOfRangeException(nameof(value), value, "The timer device cannot run at this frequency.");
             }
@@ -108,7 +106,7 @@ public static class TimerManager
     {
         ThrowIfDisabled();
 
-        s_timer?.Wait(ms);
+        Timer?.Wait(ms);
     }
 
     /// <summary>
@@ -125,10 +123,8 @@ public static class TimerManager
     /// the next tick.
     /// </param>
     /// <returns>The scheduled timer, or null if no timer device is registered.</returns>
-    public static SoftwareTimer? Schedule(Action callback, TimeSpan delay)
-    {
-        return ScheduleCore(callback, ToNanoseconds(delay), recurring: false);
-    }
+    public static SoftwareTimer? Schedule(Action callback, TimeSpan delay) =>
+        ScheduleCore(callback, ToNanoseconds(delay), recurring: false);
 
     /// <summary>
     /// Schedules a callback to run repeatedly with the specified period. The
@@ -166,17 +162,17 @@ public static class TimerManager
     /// </returns>
     public static bool Cancel(SoftwareTimer? timer)
     {
-        if (timer is null || s_timer is null)
+        if (timer is null || Timer is null)
         {
             return false;
         }
 
-        return s_timer.UnregisterTimer(timer.Entry);
+        return Timer.UnregisterTimer(timer.Entry);
     }
 
     private static SoftwareTimer? ScheduleCore(Action callback, ulong timeoutNs, bool recurring)
     {
-        if (s_timer is null || callback is null)
+        if (Timer is null || callback is null)
         {
             return null;
         }
@@ -185,7 +181,7 @@ public static class TimerManager
         // memory cannot leave a registered entry with no handle to cancel it.
         TimerEntry entry = new(callback, timeoutNs, recurring);
         SoftwareTimer timer = new(entry);
-        s_timer.RegisterTimer(entry);
+        Timer.RegisterTimer(entry);
         return timer;
     }
 
