@@ -19,7 +19,7 @@
 | Timer / Clock | ✅ | ✅ | |
 | Keyboard Input | ✅ | ✅ | PS/2 (x64), virtio and USB keyboards, all as driver kit drivers |
 | Mouse Input | ✅ | ✅ | PS/2 (x64) and virtio mice, both as driver kit drivers |
-| Audio interface | 🟡 | ❌ | No audio, sound, or speaker support. |
+| Audio interface | 🟡 | ✅ | Intel HD Audio: WAV playback, generated streams and `Console.Beep`. Playback only, one stream per output. |
 
 ## Additional Gen3 Features
 

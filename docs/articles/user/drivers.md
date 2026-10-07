@@ -499,8 +499,9 @@ A device kind is a small interface the driver implements, plus a **sink** the ki
 | Network | `INetworkInterface` (`Name`, `MacAddress`, `LinkUp`, `Transmit`) | `PublishNetwork` | `NetworkSink.Receive(frame)`, `LinkChanged(up)` |
 | Block | `IBlockDevice` | `PublishBlockDevice` | nothing |
 | Display | `IDisplay` (`Name`, `Mode`, `Framebuffer`, `Flush`) | `PublishDisplay` | `DisplaySink.ModeChanged()` |
+| Audio | `IAudioOutput` (`Name`, `Format`, `SampleRate`, `TrySetFormat`, `Start`, `Stop`, `Write`) | `PublishAudio` | `AudioSink.BufferCompleted()`, `FormatChanged()` |
 
-Each kind's types are in its category's namespace under `Cosmos.Kernel.HAL.Devices`, the same categories as the drivers' folders: the keyboard and pointer types in `Cosmos.Kernel.HAL.Devices.Input`; the network ones in `Cosmos.Kernel.HAL.Devices.Network`, beside `MacAddress`, the type `INetworkInterface.MacAddress` returns; the display ones in `Cosmos.Kernel.HAL.Devices.Display`; and `IBlockDevice` in `Cosmos.Kernel.HAL.Devices.Storage`.
+Each kind's types are in its category's namespace under `Cosmos.Kernel.HAL.Devices`, the same categories as the drivers' folders: the keyboard and pointer types in `Cosmos.Kernel.HAL.Devices.Input`; the network ones in `Cosmos.Kernel.HAL.Devices.Network`, beside `MacAddress`, the type `INetworkInterface.MacAddress` returns; the display ones in `Cosmos.Kernel.HAL.Devices.Display`; the audio ones in `Cosmos.Kernel.HAL.Devices.Audio`, beside `AudioFormat`; and `IBlockDevice` in `Cosmos.Kernel.HAL.Devices.Storage`.
 
 The kernel's manager for that kind picks the device up as soon as it is published, and teardown withdraws it before releasing anything else. Sinks never allocate, and drop reports once the device is withdrawn.
 
@@ -528,8 +529,9 @@ A few rules per kind:
 - **Network**: call `NetworkSink.Receive` from thread context, never from the handler; hand received frames to a work item.
 - **Block**: `PublishBlockDevice` registers the disk with `StorageManager` and scans its partitions before returning, so the device must be ready. If the manager refuses it, the probe fails.
 - **Display**: publish the display as you found it; `Mode` is empty until something sets one, and `Framebuffer` is `null` when the CPU cannot draw into it. The same object may also implement `IDisplayModes` to switch modes and `IHardwareCursor` for a hardware cursor. The bootloader's framebuffer is published as the firmware display at boot, and withdrawn when a driver binds the PCI function it lives in.
+- **Audio**: `Write` copies whole frames into the device's buffer, as many as fit, and never blocks; a short write is how the device says it is full. `BufferCompleted` may be called from the interrupt handler.
 
-See [Graphics](graphics.md) and [File System](filesystem.md) for the consuming side.
+See [Graphics](graphics.md), [Audio](audio.md) and [File System](filesystem.md) for the consuming side.
 
 ### Publishing child nodes
 
