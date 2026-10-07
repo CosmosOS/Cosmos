@@ -29,7 +29,7 @@ public sealed class I8042Driver : Driver
     // --- Constants ---
 
     /// <summary>The compatible string of the 8042 node the machine description publishes.</summary>
-    public const string CompatibleString = "pnp0303";
+    internal const string CompatibleString = "pnp0303";
 
     // --- Private fields ---
 

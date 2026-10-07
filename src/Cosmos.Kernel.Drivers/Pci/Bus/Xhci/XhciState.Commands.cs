@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 /// Endpoint, Set TR Dequeue Pointer and drop-context Configure Endpoint of
 /// a pipe close, and the Disable Slot of a device release.
 /// </summary>
-public sealed partial class XhciState
+internal sealed partial class XhciState
 {
     /// <summary>The device descriptor's first 8 bytes carry bMaxPacketSize0, and any packet size moves them (USB 2.0 section 9.6.1).</summary>
     private const int DeviceDescriptorHeadLength = 8;

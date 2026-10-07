@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 /// by command completions. Nothing here logs: the fault report work item
 /// logs in thread context what the handler recorded.
 /// </summary>
-public sealed partial class XhciState
+internal sealed partial class XhciState
 {
     /// <summary>
     /// The message interrupt's handler: acknowledges USBSTS.EINT and

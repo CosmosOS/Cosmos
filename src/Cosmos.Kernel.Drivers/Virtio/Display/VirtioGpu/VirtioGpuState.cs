@@ -26,7 +26,7 @@ namespace Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu;
 /// signals the event. Every struct goes through the scratch span with
 /// <c>MemoryMarshal</c>, never a pointer.
 /// </summary>
-public sealed class VirtioGpuState : IDisplay
+internal sealed class VirtioGpuState : IDisplay
 {
     // --- Constants ---
 

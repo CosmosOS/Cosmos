@@ -25,7 +25,7 @@ namespace Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 /// across a wait, a delay, a copy or a log; <see cref="OnInterrupt"/> runs
 /// in interrupt context and only counts and signals the event.
 /// </summary>
-public sealed class VirtioBlkState : IBlockDevice
+internal sealed class VirtioBlkState : IBlockDevice
 {
     // --- Constants ---
 

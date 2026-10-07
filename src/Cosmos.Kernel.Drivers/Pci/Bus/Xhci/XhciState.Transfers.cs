@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 /// endpoint, and the hand-off of the control ring to an interrupt pipe
 /// recovery that waits for its CLEAR_FEATURE.
 /// </summary>
-public sealed partial class XhciState
+internal sealed partial class XhciState
 {
     /// <summary>A Setup Stage TRB carries the 8-byte SETUP packet as immediate data.</summary>
     private const uint SetupPacketLength = 8;

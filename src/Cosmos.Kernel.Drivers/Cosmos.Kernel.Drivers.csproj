@@ -35,14 +35,26 @@
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
-         the driver classes the manifest constructs, the state objects the
-         Drivers and Graphic suites read back (the display states among them,
-         with their kit facets), and the ISvgaAdapter test seam. The lines carry
-         no [COSMOS0003] prefix, since the drivers derive from the experimental
-         kit but are not themselves experimental, except ISvgaAdapter's, which
-         is experimental and carries it. -->
+         only the driver classes, with their parameterless constructors and
+         Driver overrides, because the manifest generated into each kernel
+         constructs them and a package cannot grant internals to a kernel it
+         does not know. Everything else is internal: kernels have no use for
+         it. The lines carry no [COSMOS0003] prefix, since the drivers derive
+         from the experimental kit but are not themselves experimental. -->
     <CosmosTrackPublicApi>true</CosmosTrackPublicApi>
   </PropertyGroup>
+
+  <!-- The suites that read driver state back (the state objects, the
+       namespaces and units, the SVGA adapter facet). Granting from a driver
+       assembly is allowed; it is a grant to one that the build forbids. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Drivers" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Graphic" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Network" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Pci" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Storage" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Virtio" />
+  </ItemGroup>
 
   <!-- The analyzer package's build props declare this item for a library that
        references the package; this one references the analyzer project, so it

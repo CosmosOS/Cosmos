@@ -21,7 +21,7 @@ namespace Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet;
 /// sink call; <see cref="OnInterrupt"/> runs in interrupt context and only
 /// counts and schedules the drain.
 /// </summary>
-public sealed class VirtioNetState : INetworkInterface
+internal sealed class VirtioNetState : INetworkInterface
 {
     /// <summary>The receive queue's index (receiveq1).</summary>
     internal const ushort ReceiveQueue = 0;

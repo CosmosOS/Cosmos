@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse;
 /// in interrupt context, raised by the 8042 driver's delivery, and is
 /// allocation-free: the packet buffer is allocated in the constructor.
 /// </summary>
-public sealed class Ps2MouseState : IPointer
+internal sealed class Ps2MouseState : IPointer
 {
     // --- Constants ---
 

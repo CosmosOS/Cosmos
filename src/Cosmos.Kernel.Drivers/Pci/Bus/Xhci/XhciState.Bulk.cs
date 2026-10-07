@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 /// the 64 KiB bounce one Normal TRB at a time, and the endpoint reset that
 /// returns the host side to DATA0.
 /// </summary>
-public sealed partial class XhciState
+internal sealed partial class XhciState
 {
     /// <summary>
     /// Adds a bulk endpoint to the slot: an already open DCI returns the

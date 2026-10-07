@@ -28,7 +28,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga;
 /// negotiated 3D. Thread context; one caller at a time, as the ring's
 /// canvas is.
 /// </summary>
-public class VmwareSvgaState : IDisplay, IDisplayModes, IHardwareCursor, ISvgaAdapter
+internal class VmwareSvgaState : IDisplay, IDisplayModes, IHardwareCursor, ISvgaAdapter
 {
     // --- Constants ---
 

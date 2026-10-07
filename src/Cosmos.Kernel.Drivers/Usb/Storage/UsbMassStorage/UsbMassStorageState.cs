@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage;
 /// the detached flag is written by the detach hook and read by the units
 /// from any thread.
 /// </summary>
-public sealed class UsbMassStorageState
+internal sealed class UsbMassStorageState
 {
     // --- Private fields ---
 

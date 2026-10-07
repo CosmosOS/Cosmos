@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga;
 /// <see cref="ISvgaAdapter.CreateCanvas3D"/>. Thread context; one caller
 /// at a time, as the ring's canvas is.
 /// </summary>
-public sealed class VmwareSvga3DState : VmwareSvgaState, ICanvas3DFactory
+internal sealed class VmwareSvga3DState : VmwareSvgaState, ICanvas3DFactory
 {
     /// <summary>
     /// Takes the registers, the FIFO and the VRAM the probe mapped, as the

@@ -21,7 +21,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Network.E1000E;
 /// a sink call; <see cref="OnInterrupt"/> runs in interrupt context and
 /// only reads the cause register and schedules the drain.
 /// </summary>
-public sealed class E1000EState : INetworkInterface
+internal sealed class E1000EState : INetworkInterface
 {
     /// <summary>Descriptors per ring; the controller wants a multiple of 8.</summary>
     internal const int DescriptorCount = 32;

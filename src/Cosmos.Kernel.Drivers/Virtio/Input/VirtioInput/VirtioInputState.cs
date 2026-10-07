@@ -20,7 +20,7 @@ namespace Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput;
 /// schedules the drain. Events are read through the DMA span, never a
 /// pointer.
 /// </summary>
-public sealed class VirtioInputState : IKeyboard, IPointer
+internal sealed class VirtioInputState : IKeyboard, IPointer
 {
     /// <summary>The event queue's index (eventq).</summary>
     internal const ushort EventQueue = 0;

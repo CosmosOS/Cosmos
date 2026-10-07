@@ -21,7 +21,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Storage.Ahci;
 /// accessors are used from any thread by <see cref="AhciPort"/>. The HBA
 /// stays strictly polled: no interrupt is connected to it.
 /// </summary>
-public sealed class AhciState
+internal sealed class AhciState
 {
     // --- Constants ---
 

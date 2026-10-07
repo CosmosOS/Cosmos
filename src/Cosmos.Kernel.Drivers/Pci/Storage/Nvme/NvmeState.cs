@@ -27,7 +27,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Storage.Nvme;
 /// the lock between delays. Every entry goes through the DMA spans with
 /// <c>MemoryMarshal</c>, never a pointer.
 /// </summary>
-public sealed class NvmeState
+internal sealed class NvmeState
 {
     // --- Constants ---
 

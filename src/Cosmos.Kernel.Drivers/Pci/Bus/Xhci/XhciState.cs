@@ -32,7 +32,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 /// commands, the control transfers, the bulk transfers, the events and the
 /// ports.
 /// </summary>
-public sealed partial class XhciState : UsbHostController
+internal sealed partial class XhciState : UsbHostController
 {
     // --- Constants ---
 

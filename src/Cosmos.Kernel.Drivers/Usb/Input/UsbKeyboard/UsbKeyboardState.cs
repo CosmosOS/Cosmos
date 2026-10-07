@@ -19,7 +19,7 @@ namespace Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard;
 /// contexts and is allocation-free; <see cref="SetLeds"/> is thread
 /// context, the ring's work item on the kit worker.
 /// </summary>
-public sealed class UsbKeyboardState : IKeyboard
+internal sealed class UsbKeyboardState : IKeyboard
 {
     // --- Constants ---
 

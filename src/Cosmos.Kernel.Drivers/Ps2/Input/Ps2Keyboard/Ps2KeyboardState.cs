@@ -17,7 +17,7 @@ namespace Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard;
 /// driver's delivery, and is allocation-free; <see cref="SetLeds"/> is
 /// thread context, the ring's indicator work item on the kit worker.
 /// </summary>
-public sealed class Ps2KeyboardState : IKeyboard
+internal sealed class Ps2KeyboardState : IKeyboard
 {
     // --- Constants ---
 

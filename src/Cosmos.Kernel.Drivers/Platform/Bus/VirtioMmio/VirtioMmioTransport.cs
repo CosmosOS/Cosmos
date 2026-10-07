@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio;
 /// <see cref="InterruptEntryCount"/> before it publishes the node. The
 /// execution context of each member is in its summary.
 /// </summary>
-public sealed class VirtioMmioTransport : VirtioTransport
+internal sealed class VirtioMmioTransport : VirtioTransport
 {
     /// <summary>MagicValue: reads "virt" in little endian on a virtio slot.</summary>
     internal const ulong MagicValue = 0x000;

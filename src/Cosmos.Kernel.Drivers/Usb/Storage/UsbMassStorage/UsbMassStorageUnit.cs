@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage;
 /// the probe or by the ring from any thread; a failed command surfaces as
 /// an <see cref="IOException"/>, as the contract asks.
 /// </summary>
-public sealed class UsbMassStorageUnit : IBlockDevice
+internal sealed class UsbMassStorageUnit : IBlockDevice
 {
     // --- Constants ---
 

@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 /// written as a deadline loop of 1 ms steps that leaves when the host
 /// binding begins detaching.
 /// </summary>
-public sealed partial class XhciState
+internal sealed partial class XhciState
 {
     /// <summary>
     /// Records which root ports are USB 2 and which USB 3 from the

@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Rendering3D;
 
@@ -17,8 +16,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga;
 /// enable bit and the negotiation facts. Thread context; one caller at a
 /// time, as the ring's canvas is.
 /// </summary>
-[Experimental(Experimentals.DriverKitSeamDiagId)]
-public interface ISvgaAdapter
+internal interface ISvgaAdapter
 {
     /// <summary>The adapter's Capabilities register: the SVGA_CAP_* bits.</summary>
     uint Capabilities { get; }

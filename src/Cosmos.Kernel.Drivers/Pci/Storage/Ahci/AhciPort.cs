@@ -23,7 +23,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Storage.Ahci;
 /// <see cref="IOException"/>, a stuck port or a timeout as an
 /// <see cref="InvalidOperationException"/>.
 /// </summary>
-public sealed class AhciPort : IBlockDevice
+internal sealed class AhciPort : IBlockDevice
 {
     // --- Constants ---
 

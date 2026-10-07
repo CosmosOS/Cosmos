@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci;
 /// bounds are checked in every build, so no write can leave a BAR. The
 /// execution context of each member is in its summary.
 /// </summary>
-public sealed class VirtioPciTransport : VirtioTransport
+internal sealed class VirtioPciTransport : VirtioTransport
 {
     /// <summary>device_feature_select: which 32-bit half <see cref="CommonDeviceFeature"/> shows.</summary>
     private const ulong CommonDeviceFeatureSelect = 0x00;

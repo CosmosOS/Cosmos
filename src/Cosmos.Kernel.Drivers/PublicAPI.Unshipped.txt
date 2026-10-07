@@ -1,287 +1,46 @@
 #nullable enable
-const Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042Driver.CompatibleString = "pnp0303" -> string!
 Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver
 Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.PcieRootPortDriver() -> void
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.ArrivalCount.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.ChildCount.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.HasInterrupt.get -> bool
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.HasPowerController.get -> bool
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.HotPlugRunning.get -> bool
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.InterruptCount.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.IsPolling.get -> bool
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.IsPoweredOn.get -> bool
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.IsPresent.get -> bool
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.RemovalCount.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.SecondaryBus.get -> byte
-Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortState.SlotNumber.get -> uint
-Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport
 Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver
 Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver.VirtioPciTransportDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.XhciDriver() -> void
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.Bus.get -> Cosmos.Kernel.HAL.DriverKit.Buses.Usb.UsbBus!
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.CommandsIssued.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.ContextSize.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.DevicesAddressed.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.HasInterrupt.get -> bool
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.HostControllerEvents.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.HotPlugRunning.get -> bool
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.Index.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.InterruptCount.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.IsPolling.get -> bool
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.LastHostControllerEventCode.get -> byte
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.MaxPorts.get -> byte
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.MaxSlots.get -> byte
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.PipeRecoveries.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.PipesClosed.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.ScratchpadBuffers.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.Timeouts.get -> int
-Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.Version.get -> ushort
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvga3DState
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.VmwareSvgaDriver() -> void
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Capabilities.get -> uint
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.FifoMax.get -> uint
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.FifoMin.get -> uint
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Flush(int x, int y, int width, int height) -> void
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion?
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Is3DNegotiated.get -> bool
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.IsEnabled.get -> bool
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Mode.get -> Cosmos.Kernel.HAL.Devices.Display.DisplayMode
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Modes.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.Devices.Display.DisplayMode>
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Name.get -> string!
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.NextCommand.get -> uint
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.NextCommand.set -> void
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.ReadFifo(uint byteOffset) -> uint
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Set(int x, int y, bool visible) -> void
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.SetEnabled(bool enabled) -> void
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.Svga3DVersion.get -> uint
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.TryDefine(int hotspotX, int hotspotY, int width, int height, System.ReadOnlySpan<uint> pixels) -> bool
-Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaState.TrySetMode(int width, int height, int bitsPerPixel) -> bool
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EDriver
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EDriver.E1000EDriver() -> void
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.FramesReceived.get -> int
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.FramesTransmitted.get -> int
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.HasLine.get -> bool
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.InterruptCount.get -> int
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.IsPolling.get -> bool
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.LinkChanges.get -> int
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.LinkUp.get -> bool
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.MacAddress.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.Name.get -> string!
-Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
 Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciDriver
 Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciDriver.AhciDriver() -> void
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.BlockCount.get -> ulong
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.BlockSize.get -> ulong
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.Controller.get -> Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState!
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.Firmware.get -> string!
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.Flush() -> void
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.Model.get -> string!
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.Name.get -> string!
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.PortNumber.get -> uint
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.Serial.get -> string!
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciPort.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState.CommandsIssued.get -> int
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState.CommandSlots.get -> int
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState.ImplementedPorts.get -> uint
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState.Index.get -> int
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState.PortCount.get -> int
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState.Supports64Bit.get -> bool
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState.SupportsCommandListOverride.get -> bool
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState.Timeouts.get -> int
-Cosmos.Kernel.Drivers.Pci.Storage.Ahci.AhciState.Version.get -> uint
 Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeDriver
 Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeDriver.NvmeDriver() -> void
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeNamespace
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeNamespace.BlockCount.get -> ulong
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeNamespace.BlockSize.get -> ulong
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeNamespace.Controller.get -> Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState!
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeNamespace.Flush() -> void
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeNamespace.Name.get -> string!
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeNamespace.NamespaceId.get -> uint
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeNamespace.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeNamespace.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState.CommandsSent.get -> int
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState.DoorbellStride.get -> uint
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState.HasInterrupt.get -> bool
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState.Index.get -> int
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState.InterruptCount.get -> int
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState.IsPolling.get -> bool
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState.NamespaceCount.get -> int
-Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeState.Timeouts.get -> int
 Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042Driver
 Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042Driver.I8042Driver() -> void
-Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State
-Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State.AuxiliaryNode.get -> Cosmos.Kernel.HAL.DriverKit.DeviceNode?
-Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State.BytesDelivered.get -> int
-Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State.IsDualChannel.get -> bool
-Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State.KeyboardNode.get -> Cosmos.Kernel.HAL.DriverKit.DeviceNode?
-Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State.SpuriousInterrupts.get -> int
-Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State.StrayBytes.get -> int
 Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver
 Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver.PciHostDriver() -> void
-Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport
 Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransportDriver
 Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransportDriver.VirtioMmioTransportDriver() -> void
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardDriver
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardDriver.Ps2KeyboardDriver() -> void
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.BytesReceived.get -> int
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.IdentityByte.get -> byte
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.IsAtKeyboard.get -> bool
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.KeyEvents.get -> int
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.LastLedAcknowledged.get -> bool
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.LastLedByte.get -> byte
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.LedWrites.get -> int
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.Name.get -> string!
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.SetLeds(Cosmos.Kernel.HAL.Devices.Input.KeyboardLeds leds) -> void
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard.Ps2KeyboardState.Sink.get -> Cosmos.Kernel.HAL.Devices.Input.KeyboardSink?
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseDriver
 Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseDriver.Ps2MouseDriver() -> void
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.BytesReceived.get -> int
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.HasWheel.get -> bool
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.Name.get -> string!
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.PacketBytes.get -> int
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.PacketsReported.get -> int
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.ResyncDrops.get -> int
-Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse.Ps2MouseState.Sink.get -> Cosmos.Kernel.HAL.Devices.Input.PointerSink?
 Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver
 Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver.UsbHubDriver() -> void
-Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubState
-Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubState.ChildrenAttached.get -> int
-Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubState.ChildrenDetached.get -> int
-Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubState.HotPlugRunning.get -> bool
-Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubState.IsSuperSpeed.get -> bool
-Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubState.PortCount.get -> byte
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.UsbKeyboardDriver() -> void
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.KeyEvents.get -> int
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.LastLedReport.get -> byte
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.LastLedStatus.get -> Cosmos.Kernel.HAL.DriverKit.Buses.Usb.UsbTransferStatus
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.LedWrites.get -> int
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.Name.get -> string!
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.ReportCount.get -> int
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.SetLeds(Cosmos.Kernel.HAL.Devices.Input.KeyboardLeds leds) -> void
-Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardState.Sink.get -> Cosmos.Kernel.HAL.Devices.Input.KeyboardSink?
 Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver
 Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.UsbMassStorageDriver() -> void
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageState
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageState.Detached.get -> bool
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageState.MaxLun.get -> byte
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageState.UnitCount.get -> int
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageState.Units.get -> System.Collections.Generic.IReadOnlyList<Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit!>!
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.BlockCount.get -> ulong
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.BlockSize.get -> ulong
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.Flush() -> void
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.Index.get -> uint
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.IsDisconnected.get -> bool
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.Lun.get -> byte
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.Name.get -> string!
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.Product.get -> string!
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.Vendor.get -> string!
-Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageUnit.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuDriver
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuDriver.VirtioGpuDriver() -> void
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.CommandsSent.get -> int
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Flush(int x, int y, int width, int height) -> void
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.FlushCount.get -> int
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Framebuffer.get -> Cosmos.Kernel.HAL.DriverKit.Resources.DeviceRegion?
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.HasInterrupt.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Height.get -> int
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.InterruptCount.get -> int
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.IsFaulted.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.IsPolling.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Mode.get -> Cosmos.Kernel.HAL.Devices.Display.DisplayMode
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Name.get -> string!
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.ScanoutCount.get -> int
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Version1Negotiated.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuState.Width.get -> int
 Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputDriver
 Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputDriver.VirtioInputDriver() -> void
-Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState
-Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.EventsProcessed.get -> int
-Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.HasInterrupt.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.InterruptCount.get -> int
-Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.IsMouse.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.IsPolling.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.Name.get -> string!
-Cosmos.Kernel.Drivers.Virtio.Input.VirtioInput.VirtioInputState.SetLeds(Cosmos.Kernel.HAL.Devices.Input.KeyboardLeds leds) -> void
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetDriver
 Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetDriver.VirtioNetDriver() -> void
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.AnyLayoutNegotiated.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.FramesReceived.get -> int
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.FramesTransmitted.get -> int
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.HasInterrupt.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.InterruptCount.get -> int
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.InterruptEntryCount.get -> int
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.IsPolling.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.LinkChanges.get -> int
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.LinkUp.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.MacAddress.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.Name.get -> string!
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.Transmit(System.ReadOnlySpan<byte> frame) -> bool
-Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet.VirtioNetState.Version1Negotiated.get -> bool
 Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkDriver
 Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkDriver.VirtioBlkDriver() -> void
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.BlockCount.get -> ulong
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.BlockSize.get -> ulong
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.Flush() -> void
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.FlushNegotiated.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.HasInterrupt.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.Index.get -> uint
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.InterruptCount.get -> int
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.IsDetached.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.IsFaulted.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.IsPolling.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.IsReadOnly.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.MaxTransferBytes.get -> int
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.Name.get -> string!
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.RequestsCompleted.get -> int
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.RequestsSubmitted.get -> int
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.Timeouts.get -> int
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.Version1Negotiated.get -> bool
-Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkState.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ActivateQueue(ushort index, in Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtqueueLayout layout) -> bool
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.AfterReset() -> void
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.AssignConfigInterrupt(int entry) -> bool
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.AssignQueueInterrupt(ushort index, int entry) -> bool
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.DeviceType.get -> Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtioDeviceType
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.InterruptEntryCount.get -> int
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.IsQueueReady(ushort index) -> bool
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.NotifyQueue(ushort index) -> void
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadAndAcknowledgeInterrupt() -> Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtioInterruptStatus
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadConfig16(uint offset) -> ushort
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadConfig32(uint offset) -> uint
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadConfig8(uint offset) -> byte
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadDeviceFeatures() -> ulong
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadQueueMaxSize(ushort index) -> ushort
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.ReadStatus() -> byte
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.SupportsFeaturesOk.get -> bool
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.WriteConfig8(uint offset, byte value) -> void
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.WriteDriverFeatures(ulong features) -> void
-override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransport.WriteStatus(byte status) -> void
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
@@ -290,7 +49,6 @@ override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.Matches.get -> System.Rea
 override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
-override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciState.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
@@ -311,30 +69,9 @@ override Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042Driver.Matches.get -> Sys
 override Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042Driver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042Driver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042Driver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
-override Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State.InterruptDriven.get -> bool
-override Cosmos.Kernel.Drivers.Platform.Bus.I8042.I8042State.PolledPeriodically.get -> bool
 override Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Platform.Bus.PciHost.PciHostDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ActivateQueue(ushort index, in Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtqueueLayout layout) -> bool
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.AfterReset() -> void
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.AssignConfigInterrupt(int entry) -> bool
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.AssignQueueInterrupt(ushort index, int entry) -> bool
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.DeviceType.get -> Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtioDeviceType
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.InterruptEntryCount.get -> int
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.IsQueueReady(ushort index) -> bool
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.NotifyQueue(ushort index) -> void
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadAndAcknowledgeInterrupt() -> Cosmos.Kernel.HAL.DriverKit.Buses.Virtio.VirtioInterruptStatus
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadConfig16(uint offset) -> ushort
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadConfig32(uint offset) -> uint
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadConfig8(uint offset) -> byte
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadDeviceFeatures() -> ulong
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadQueueMaxSize(ushort index) -> ushort
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.ReadStatus() -> byte
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.SupportsFeaturesOk.get -> bool
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.WriteConfig8(uint offset, byte value) -> void
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.WriteDriverFeatures(ulong features) -> void
-override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransport.WriteStatus(byte status) -> void
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransportDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransportDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio.VirtioMmioTransportDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
@@ -372,15 +109,3 @@ override Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkDriver.Matches.
 override Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk.VirtioBlkDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.Capabilities.get -> uint
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.FifoMax.get -> uint
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.FifoMin.get -> uint
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.Is3DNegotiated.get -> bool
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.IsEnabled.get -> bool
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.NextCommand.get -> uint
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.NextCommand.set -> void
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.ReadFifo(uint byteOffset) -> uint
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.SetEnabled(bool enabled) -> void
-[COSMOS0003]Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.ISvgaAdapter.Svga3DVersion.get -> uint

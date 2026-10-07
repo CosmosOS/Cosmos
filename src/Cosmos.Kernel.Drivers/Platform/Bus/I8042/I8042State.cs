@@ -28,7 +28,7 @@ namespace Cosmos.Kernel.Drivers.Platform.Bus.I8042;
 /// send flag taken under the lock around the pair. The execution context of
 /// each member is in its summary.
 /// </summary>
-public sealed class I8042State : Ps2Controller
+internal sealed class I8042State : Ps2Controller
 {
     // --- Constants ---
 

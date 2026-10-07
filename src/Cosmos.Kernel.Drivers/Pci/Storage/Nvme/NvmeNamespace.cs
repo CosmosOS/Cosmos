@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Storage.Nvme;
 /// method is thread context, entered by the ring from any thread; a failed
 /// command surfaces as an <see cref="IOException"/>, as the contract asks.
 /// </summary>
-public sealed class NvmeNamespace : IBlockDevice
+internal sealed class NvmeNamespace : IBlockDevice
 {
     // --- Private fields ---
 

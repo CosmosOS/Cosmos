@@ -17,7 +17,7 @@ namespace Cosmos.Kernel.Drivers.Usb.Bus.UsbHub;
 /// looked at from the hub's thread or the probe, by GET_STATUS on the
 /// default pipe through the kit's <see cref="UsbAccess"/>.
 /// </summary>
-public sealed class UsbHubState
+internal sealed class UsbHubState
 {
     // --- Constants ---
 

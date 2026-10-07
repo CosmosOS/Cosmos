@@ -21,7 +21,7 @@ namespace Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort;
 /// by two at once; the interrupt handler and the periodic poll only signal
 /// the event, so no lock is needed.
 /// </summary>
-public sealed class PcieRootPortState
+internal sealed class PcieRootPortState
 {
     // --- Constants ---
 
