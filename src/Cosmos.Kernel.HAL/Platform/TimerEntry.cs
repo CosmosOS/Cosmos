@@ -24,20 +24,6 @@ internal sealed class TimerEntry
     private volatile bool _active;
 
     /// <summary>
-    /// Initializes a new timer entry with the specified callback and delay.
-    /// </summary>
-    /// <param name="callback">The method to invoke when the timer fires.</param>
-    /// <param name="timeoutNs">The delay before the timer fires, in nanoseconds. For recurring timers, the period between firings.</param>
-    /// <param name="recurring">Whether the timer reloads after firing, or fires only once.</param>
-    internal TimerEntry(Action callback, ulong timeoutNs, bool recurring)
-    {
-        _callback = callback;
-        TimeoutNs = timeoutNs;
-        Recurring = recurring;
-        _remainingNs = timeoutNs;
-    }
-
-    /// <summary>
     /// The delay before the timer fires, in nanoseconds. For recurring timers, the period between firings.
     /// </summary>
     public ulong TimeoutNs { get; }
@@ -52,6 +38,20 @@ internal sealed class TimerEntry
     /// timers become inactive after firing; unregistering also deactivates.
     /// </summary>
     public bool IsActive => _active;
+
+    /// <summary>
+    /// Initializes a new timer entry with the specified callback and delay.
+    /// </summary>
+    /// <param name="callback">The method to invoke when the timer fires.</param>
+    /// <param name="timeoutNs">The delay before the timer fires, in nanoseconds. For recurring timers, the period between firings.</param>
+    /// <param name="recurring">Whether the timer reloads after firing, or fires only once.</param>
+    internal TimerEntry(Action callback, ulong timeoutNs, bool recurring)
+    {
+        _callback = callback;
+        TimeoutNs = timeoutNs;
+        Recurring = recurring;
+        _remainingNs = timeoutNs;
+    }
 
     /// <summary>
     /// Marks the timer active or inactive. Called by the timer device on
