@@ -4,7 +4,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
-using Cosmos.Kernel.Core.Runtime;
 using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
@@ -12,7 +11,6 @@ using Cosmos.Kernel.HAL.DriverKit.Threading;
 using Cosmos.Kernel.HAL.Structures;
 using Cosmos.Kernel.System.Input.Layouts;
 using Cosmos.Kernel.System.Sessions;
-using Thread = System.Threading.Thread;
 
 namespace Cosmos.Kernel.System.Input;
 
@@ -478,8 +476,10 @@ public static class KeyboardManager
                     return key;
                 }
             }
-            // Let something else happened while we wait for the input.
-            Thread.Yield();
+
+            // The halt waits for the interrupt, or the worker's tick, that
+            // fills the queue.
+            PlatformHAL.CpuOps?.Halt();
         }
     }
 
