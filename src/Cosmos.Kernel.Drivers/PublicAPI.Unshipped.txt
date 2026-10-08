@@ -29,6 +29,8 @@ Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver
 Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver.UsbHubDriver() -> void
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.UsbKeyboardDriver() -> void
+Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver
+Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver.UsbMouseDriver() -> void
 Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver
 Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.UsbMassStorageDriver() -> void
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuDriver
@@ -95,6 +97,9 @@ override Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver.Probe(Cosmos.Kernel.H
 override Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void

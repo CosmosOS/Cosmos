@@ -102,10 +102,10 @@ internal static class CosmosFeatures
 
     /// <summary>
     /// Controls USB: the kit's xHCI host controller driver, the hub driver and
-    /// the USB keyboard and mass storage class drivers, which the driver
+    /// the USB keyboard, mouse and mass storage class drivers, which the driver
     /// manifest registers under this switch. Requires PCI; the MSBuild
     /// cascade in Sdk.targets disables this when PCI is off. When the property
-    /// is not set, Sdk.targets enables it only if Keyboard or Storage is on.
+    /// is not set, Sdk.targets enables it only if Keyboard, Mouse or Storage is on.
     /// Set via CosmosEnableUsb property in csproj.
     /// </summary>
     [FeatureSwitchDefinition("Cosmos.Kernel.HAL.Usb.Enabled")]
