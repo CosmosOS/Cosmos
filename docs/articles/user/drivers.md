@@ -25,7 +25,7 @@ What the kit supports today:
 | Bus | Drivers |
 |-----|---------|
 | Platform | `PciHostDriver`, `I8042Driver`, `VirtioMmioTransportDriver` |
-| PCI | `PcieRootPortDriver`, `VirtioPciTransportDriver`, `XhciDriver`, `E1000EDriver`, `AhciDriver`, `NvmeDriver`, `VmwareSvgaDriver` |
+| PCI | `PcieRootPortDriver`, `VirtioPciTransportDriver`, `XhciDriver`, `E1000EDriver`, `AhciDriver`, `NvmeDriver`, `VmwareSvgaDriver`, `AmdDcnDriver` |
 | Virtio | `VirtioNetDriver`, `VirtioBlkDriver`, `VirtioGpuDriver`, `VirtioInputDriver` |
 | USB | `UsbHubDriver`, `UsbKeyboardDriver`, `UsbMassStorageDriver` |
 | PS/2 | `Ps2KeyboardDriver`, `Ps2MouseDriver` |
@@ -903,6 +903,7 @@ public override void OnDetach(DeviceBinding binding, DetachReason reason)
 |--------|----------|-------|
 | `VirtioGpuDriver` | virtio-gpu, over PCI or MMIO | 2D: the guest draws, the host composites |
 | `VmwareSvgaDriver` | VMware SVGA II, PCI, x64 only | Switches modes and draws a hardware cursor; replaces the firmware framebuffer, which lives in its VRAM |
+| `AmdDcnDriver` | AMD DCN 3.1.5, the integrated Radeon graphics of Ryzen 7000 (Raphael, Dragon Range) and Ryzen 9000 (Granite Ridge) processors, PCI | Keeps the mode the UEFI firmware set (no mode switching); flips between three frames in VRAM at the vertical update, so nothing tears, and draws a hardware cursor; replaces the firmware framebuffer, which lives in its VRAM. A legacy (CSM) boot, a laptop in discrete-GPU-only mode, or a surface it cannot draw into makes it decline, with the reason recorded on the offer, where `DriverDiagnostics` reports it |
 
 ### The storage drivers
 
