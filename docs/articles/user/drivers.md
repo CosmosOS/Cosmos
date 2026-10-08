@@ -27,7 +27,7 @@ What the kit supports today:
 | Platform | `PciHostDriver`, `I8042Driver`, `VirtioMmioTransportDriver` |
 | PCI | `PcieRootPortDriver`, `VirtioPciTransportDriver`, `XhciDriver`, `E1000EDriver`, `AhciDriver`, `NvmeDriver`, `VmwareSvgaDriver` |
 | Virtio | `VirtioNetDriver`, `VirtioBlkDriver`, `VirtioGpuDriver`, `VirtioInputDriver` |
-| USB | `UsbHubDriver`, `UsbKeyboardDriver`, `UsbMassStorageDriver` |
+| USB | `UsbHubDriver`, `UsbKeyboardDriver`, `UsbMouseDriver`, `UsbMassStorageDriver` |
 | PS/2 | `Ps2KeyboardDriver`, `Ps2MouseDriver` |
 
 Their sources are filed as `<bus>/<category>/<driver>/` (for example `Pci/Network/E1000E/`), and the namespace follows the folder.
@@ -916,7 +916,7 @@ A USB stick is handled by `UsbMassStorageDriver` ([The USB class drivers](#the-u
 
 ## USB devices
 
-A USB node is one interface of a USB device, published by the host controller driver for a device on a root port, or by the hub driver for a device behind a hub. It has no resources, no interrupt sources and a `UsbAccess` for everything a class driver does. A device with several interfaces gives several nodes. A class driver never sees the controller or the hubs above it; the shipped `UsbKeyboardDriver` and `UsbMassStorageDriver` are good models.
+A USB node is one interface of a USB device, published by the host controller driver for a device on a root port, or by the hub driver for a device behind a hub. It has no resources, no interrupt sources and a `UsbAccess` for everything a class driver does. A device with several interfaces gives several nodes. A class driver never sees the controller or the hubs above it; the shipped `UsbKeyboardDriver`, `UsbMouseDriver` and `UsbMassStorageDriver` are good models.
 
 ### USB identity and match
 
@@ -1002,6 +1002,7 @@ A host controller driver binds the controller's own node and implements `UsbHost
 | Driver | Matches | Publishes |
 |--------|---------|-----------|
 | `UsbKeyboardDriver` | HID boot keyboards | a keyboard, `usb-keyboard` |
+| `UsbMouseDriver` | HID boot mice | a pointer, `usb-mouse` |
 | `UsbMassStorageDriver` | Mass storage over bulk-only transport (sticks, card readers, USB disks) | a block device per unit, `usb<n>` |
 | `UsbHubDriver` | Hubs | the devices behind the hub, as child nodes |
 
