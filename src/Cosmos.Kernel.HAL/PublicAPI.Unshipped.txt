@@ -12,6 +12,14 @@ Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice.Flush() -> void
 Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice.Name.get -> string!
 Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
 Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Clear() -> void
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Count.get -> int
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.GetEnumerator() -> System.Collections.Generic.IEnumerator<T>!
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Pop(out T? item) -> bool
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Push(T item) -> void
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.RingBuffer(ulong capacity) -> void
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Peek(out T? item) -> bool
 override Cosmos.Kernel.HAL.Devices.Network.MacAddress.Equals(object? obj) -> bool
 override Cosmos.Kernel.HAL.Devices.Network.MacAddress.GetHashCode() -> int
 override Cosmos.Kernel.HAL.Devices.Network.MacAddress.ToString() -> string!
