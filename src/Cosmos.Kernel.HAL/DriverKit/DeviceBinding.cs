@@ -161,9 +161,11 @@ public sealed partial class DeviceBinding
 
     /// <summary>
     /// Maps a resource as bulk memory: a framebuffer, a queue, a descriptor
-    /// area. A memory window is mapped as device memory whatever
-    /// <paramref name="caching"/> asks for, until a platform offers
-    /// write-combining; a RAM window keeps the kernel's normal mapping.
+    /// area. A memory window asked for as
+    /// <see cref="RegionCaching.WriteCombining"/> is mapped write-combining
+    /// on x64, in the 2 MiB blocks it covers whole; every other memory
+    /// window, and ARM64's, is mapped as device memory. A RAM window keeps
+    /// the kernel's normal mapping.
     /// </summary>
     /// <param name="resourceIndex">Index into <see cref="DeviceNode.Resources"/>; not a port range.</param>
     /// <param name="caching">The caching the driver wants; recorded on the region.</param>
@@ -179,7 +181,9 @@ public sealed partial class DeviceBinding
             throw new ArgumentException("A port range cannot be mapped as memory.", nameof(resourceIndex));
         }
 
-        ulong address = resource.Kind == DeviceResourceKind.RamWindow ? resource.Base : MapDeviceMemory(resource);
+        ulong address = resource.Kind == DeviceResourceKind.RamWindow
+            ? resource.Base
+            : MapDeviceMemory(resource, caching == RegionCaching.WriteCombining);
         DeviceRegion region = new(address, resource.Length, caching);
         Record(_memory, region, nameof(MapRegion));
         return region;
@@ -461,18 +465,18 @@ public sealed partial class DeviceBinding
 
     /// <summary>
     /// The virtual address of a memory window: the HHDM alias, once the
-    /// platform has mapped every block of it. Refuses a window that overlaps
-    /// the kernel heap, which on ARM64 would turn heap pages into device
-    /// memory.
+    /// platform has mapped every block of it, write-combining where asked
+    /// and offered. Refuses a window that overlaps the kernel heap, which on
+    /// ARM64 would turn heap pages into device memory.
     /// </summary>
-    private static ulong MapDeviceMemory(DeviceResource resource)
+    private static ulong MapDeviceMemory(DeviceResource resource, bool writeCombining = false)
     {
         if (PageAllocator.OverlapsHeap(resource.PhysicalBase, resource.Length))
         {
             throw new InvalidOperationException("The window overlaps the kernel heap.");
         }
 
-        if (!DeviceMemory.EnsureWindowMapped(resource.PhysicalBase, resource.Length))
+        if (!DeviceMemory.EnsureWindowMapped(resource.PhysicalBase, resource.Length, writeCombining))
         {
             throw new InvalidOperationException("The window cannot be mapped.");
         }

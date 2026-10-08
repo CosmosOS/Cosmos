@@ -80,6 +80,14 @@ internal class X64PlatformInitializer : IPlatformInitializer
         return DeviceMapper.EnsureMapped(physBase);
     }
 
+    public bool EnsureWriteCombiningMapped(ulong physBase)
+    {
+        // Above 4 GiB as EnsureMmioMapped, and below it too: Limine's map
+        // of the low 4 GiB reaches MMIO through the MTRRs' uncacheable
+        // type, which turns every framebuffer store into a bus transaction.
+        return DeviceMapper.EnsureWriteCombining(physBase);
+    }
+
     public void DmaBarrier()
     {
         // x86-64's total store order already makes normal-memory stores

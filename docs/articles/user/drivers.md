@@ -324,7 +324,7 @@ The second argument tells the CPU how to cache the region. Pick it by what the r
 - `RegionCaching.WriteCombining` for a framebuffer: writes are grouped into bursts, which is much faster for drawing pixels.
 - `RegionCaching.Normal` for ordinary RAM shared with the device.
 
-Today every memory window is mapped as `Device`, whatever you ask. Pick the right value anyway: the kit records it and will apply it once the platform supports it.
+On x64, `WriteCombining` is applied to every 2 MiB block the region covers whole; a block it shares with something else stays `Device`. Every other choice, and every choice on ARM64, is mapped as `Device` today. Pick the right value anyway: the kit records it and will apply it once the platform supports it.
 
 ### DMA memory
 
