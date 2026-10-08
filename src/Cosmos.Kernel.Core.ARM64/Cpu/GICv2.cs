@@ -275,7 +275,7 @@ public static class GICv2
         unsafe
         {
             uint* ptr = (uint*)(s_gicDistBase + offset);
-            return System.Threading.Volatile.Read(ref *ptr);
+            return Volatile.Read(ref *ptr);
         }
     }
 
@@ -285,7 +285,7 @@ public static class GICv2
         unsafe
         {
             uint* ptr = (uint*)(s_gicDistBase + offset);
-            System.Threading.Volatile.Write(ref *ptr, value);
+            Volatile.Write(ref *ptr, value);
         }
     }
 
@@ -295,7 +295,7 @@ public static class GICv2
         unsafe
         {
             uint* ptr = (uint*)(s_gicCpuBase + offset);
-            return System.Threading.Volatile.Read(ref *ptr);
+            return Volatile.Read(ref *ptr);
         }
     }
 
@@ -305,7 +305,7 @@ public static class GICv2
         unsafe
         {
             uint* ptr = (uint*)(s_gicCpuBase + offset);
-            System.Threading.Volatile.Write(ref *ptr, value);
+            Volatile.Write(ref *ptr, value);
         }
     }
 }

@@ -104,9 +104,9 @@ public static class SchedulerManager
         s_allThreads = new SchedulerThread?[SchedulerThread.MaxThreadCount];
         s_allThreadCount = 0;
 
-        Cosmos.Kernel.Core.Runtime.DebugLiveSnapshot.Initialize();
-        Cosmos.Kernel.Core.Runtime.DebugLiveGCSnapshot.Initialize();
-        Cosmos.Kernel.Core.Runtime.DebugLiveMemorySnapshot.Initialize();
+        Runtime.DebugLiveSnapshot.Initialize();
+        Runtime.DebugLiveGCSnapshot.Initialize();
+        Runtime.DebugLiveMemorySnapshot.Initialize();
     }
 
     /// <summary>
@@ -453,7 +453,7 @@ public static class SchedulerManager
     /// </summary>
     internal static ulong GetBusyCpuTimeNs()
     {
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             SchedulerThread?[]? threads = s_allThreads;
             if (threads is null)
@@ -506,7 +506,7 @@ public static class SchedulerManager
             return;
         }
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             // Idempotent: SetScheduler hands every registry entry to the
             // incoming policy exactly once, so a thread must hold one slot.
@@ -595,7 +595,7 @@ public static class SchedulerManager
 
         Serial.WriteString("[SCHED] CreateThread: entering\n");
         RegisterThread(thread);
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             var state = s_cpuStates[cpuId];
             s_currentScheduler.OnThreadCreate(state, thread);
@@ -609,7 +609,7 @@ public static class SchedulerManager
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             PerCpuState state = s_cpuStates[cpuId];
 
@@ -646,7 +646,7 @@ public static class SchedulerManager
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             PerCpuState state = s_cpuStates[cpuId];
 
@@ -707,7 +707,7 @@ public static class SchedulerManager
         Serial.WriteNumber(thread.Id);
         Serial.WriteString("\n");
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             PerCpuState state = s_cpuStates[cpuId];
 
@@ -985,9 +985,9 @@ public static class SchedulerManager
         // pausing the kernel.
         if ((s_tickCount % SnapshotRefreshTickInterval) == 0)
         {
-            Cosmos.Kernel.Core.Runtime.DebugLiveSnapshot.Update();
-            Cosmos.Kernel.Core.Runtime.DebugLiveGCSnapshot.Update();
-            Cosmos.Kernel.Core.Runtime.DebugLiveMemorySnapshot.Update();
+            Runtime.DebugLiveSnapshot.Update();
+            Runtime.DebugLiveGCSnapshot.Update();
+            Runtime.DebugLiveMemorySnapshot.Update();
         }
 
         // Only the first ticks are logged, to show at boot that the tick is

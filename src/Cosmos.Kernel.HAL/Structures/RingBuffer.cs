@@ -94,7 +94,7 @@ public class RingBuffer<T> : IEnumerable<T>
     /// <returns>An enumerator over the buffered items, leaving the buffer empty.</returns>
     public IEnumerator<T> GetEnumerator()
     {
-        while(Pop(out T? item))
+        while (Pop(out T? item))
         {
             yield return item!;
         }
