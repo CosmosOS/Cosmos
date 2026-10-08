@@ -18,11 +18,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f8cd28f8-8db5-4f5c-b0cb-c82b7fbea921" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.devcontainer/devcontainer.json" beforeDir="false" afterPath="$PROJECT_DIR$/.devcontainer/devcontainer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.nativeaot-patcher/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.nativeaot-patcher/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Directory.Packages.props" beforeDir="false" afterPath="$PROJECT_DIR$/Directory.Packages.props" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/global.json" beforeDir="false" afterPath="$PROJECT_DIR$/global.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Cosmos.Kernel.Core.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Cosmos.Kernel.Core.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Kernels/Cosmos.Kernel.Tests.Memory/Kernel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Kernels/Cosmos.Kernel.Tests.Memory/Kernel.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,25 +43,16 @@
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/32518f7e8c2ba2c2d56edcbfa986c3d26b7f4765026ea92642a6b10efba5/Index.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/332e2a21449ad65f2368d672a116246eadf3842dfcb45f35a713d912c51731c5/String.Comparison.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/53b578ffaf4d15d31df9df84211006ddaf861a469ed9ffa7e33de13df8764/Buffer.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5c21b9149ef32e1f68396d6e6fc7311324c9829ed40328c33f6d5f859a757/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/8d231c208f71c9dca17771aabf431d173a8e4815bcf7143eaa35e7c91733de/Range.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/918e155e8b6314bf1ab45285187d2e7bd8553bc3fa2ac27c405a8cd0d6dc4aed/Ordinal.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b29ea313179d1a40fddc56a26f34dd223cf0cc5fa5caa2d547c3ef6e43e94ce/Assert.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b9ad967b527a6deee20b35429cf8fc2df1f5c134f122d3f63aeb87e65586/Int64.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c391bf2fc83e6f8fd9435b45de99252a7915b37faadc45be0abe3dfbc97/ArgumentOutOfRangeException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/examples/DevKernel/Commands/NetworkCommands.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/examples/DevKernel/Kernel.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/examples/DevKernel/NuGet.Config" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Extensions/ByteArray.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/Pager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Runtime/Casting.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.HAL/Cpu/Enums/EFlagsEnum.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.HAL/DebugInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.HAL/PlatformHAL.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.HAL/Vfs/ModeEnum.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/IPv4/Address4.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/IPv6/Address6.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Tools/Commands/BuildCommand.cs" root0="FORCE_HIGHLIGHTING" />
@@ -73,14 +61,7 @@
     <setting file="file://$PROJECT_DIR$/src/tests/Cosmos.Kernel.Tests.System/Network/IPv4/Address4Test.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/tests/Cosmos.Kernel.Tests.System/Network/IPv6/Address6Test.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/tests/Cosmos.Kernel.Tests.System/Network/MaskedAddressTest.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/examples/DevKernel/Commands/NetworkCommands.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Global.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Graphics/FullScreenCanvas.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/Address.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/IPv4/Address4.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/IPv4/TCP/Tcp.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/src/Cosmos.Kernel.System/Network/IPv6/Address6.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="gitIndexFs://792d5e5c:/home/miha/projects/github/nativeaot-patcher:/home/miha/projects/github/nativeaot-patcher/tests/Kernels/Cosmos.Kernel.Tests.Network/Kernel.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///mnt/data/projects/git/zarlo/Cosmos/tests/Kernels/Cosmos.Kernel.Tests.Memory/Kernel.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
     <commands />
@@ -89,23 +70,23 @@
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="false" />
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.999427235619055" />
-      <entry key="MS500" value="5.487238240134688" />
-      <entry key="S2" value="7.247043340870015" />
-      <entry key="S5" value="7.6872084450273475" />
-      <entry key="S10" value="7.865416448162721" />
-      <entry key="S30" value="9.102130829476803" />
-      <entry key="S60" value="12.955146591864104" />
-      <entry key="M2" value="21.619937815199798" />
-      <entry key="M5" value="37.5925969036005" />
-      <entry key="M10" value="52.40561071035238" />
-      <entry key="M15" value="62.517123279923375" />
-      <entry key="M30" value="80.52668856609078" />
-      <entry key="H1" value="99.40261573076627" />
-      <entry key="H2" value="127.99622404268732" />
-      <entry key="H4" value="167.95449176758123" />
-      <entry key="D1" value="242.59095125569073" />
-      <entry key="W1" value="262.41935337463315" />
+      <entry key="MS100" value="1.1733133123893418" />
+      <entry key="MS500" value="3.2645919116049007" />
+      <entry key="S2" value="6.5683069657842905" />
+      <entry key="S5" value="7.893517062195983" />
+      <entry key="S10" value="8.421331317081147" />
+      <entry key="S30" value="8.801132587194513" />
+      <entry key="S60" value="8.89979756778221" />
+      <entry key="M2" value="8.949704951153787" />
+      <entry key="M5" value="8.982879041028937" />
+      <entry key="M10" value="9.461466914709936" />
+      <entry key="M15" value="11.697873190532745" />
+      <entry key="M30" value="25.74575536716429" />
+      <entry key="H1" value="54.332302171076925" />
+      <entry key="H2" value="95.43825123249094" />
+      <entry key="H4" value="147.02152450179426" />
+      <entry key="D1" value="243.78331009076754" />
+      <entry key="W1" value="270.1958291455808" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -113,37 +94,37 @@
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
       <entry key="S10" value="0.0" />
-      <entry key="S30" value="7.08117939762102E-192" />
-      <entry key="S60" value="4.223778906024788E-96" />
-      <entry key="M2" value="3.466068706928826E-48" />
-      <entry key="M5" value="2.062767148722963E-19" />
-      <entry key="M10" value="1.065154326163955E-9" />
-      <entry key="M15" value="2.474381465880604E-6" />
-      <entry key="M30" value="0.008037654717436237" />
-      <entry key="H1" value="0.5204532147042743" />
-      <entry key="H2" value="4.2978571981917515" />
-      <entry key="H4" value="12.418395292216019" />
-      <entry key="D1" value="30.141795929587275" />
-      <entry key="W1" value="35.09790642024953" />
+      <entry key="S30" value="8.575029040056963E-233" />
+      <entry key="S60" value="1.4698268552741517E-116" />
+      <entry key="M2" value="2.0446532536955475E-58" />
+      <entry key="M5" value="1.6701797220218948E-23" />
+      <entry key="M10" value="9.584490598751112E-12" />
+      <entry key="M15" value="1.0704613403118958E-7" />
+      <entry key="M30" value="0.001671789189174921" />
+      <entry key="H1" value="0.23736013414809018" />
+      <entry key="H2" value="2.9024518453600323" />
+      <entry key="H4" value="10.205211286282468" />
+      <entry key="D1" value="29.17170940416441" />
+      <entry key="W1" value="34.93426457472085" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.867620013005406" />
-      <entry key="MS500" value="5.407974845583422" />
-      <entry key="S2" value="7.2211579548415505" />
-      <entry key="S5" value="7.676260046498776" />
-      <entry key="S10" value="7.859799020653472" />
-      <entry key="S30" value="9.099719195971417" />
-      <entry key="S60" value="12.953337955849193" />
-      <entry key="M2" value="21.618480524467003" />
-      <entry key="M5" value="37.591607302463615" />
-      <entry key="M10" value="52.40491134949907" />
-      <entry key="M15" value="62.516561717917895" />
-      <entry key="M30" value="80.53433347331465" />
-      <entry key="H1" value="99.92229227234105" />
-      <entry key="H2" value="132.2917829126154" />
-      <entry key="H4" value="180.36973875682375" />
-      <entry key="D1" value="272.7315056387967" />
-      <entry key="W1" value="297.51705397370233" />
+      <entry key="MS100" value="1.12441823067024" />
+      <entry key="MS500" value="3.2343577119959024" />
+      <entry key="S2" value="6.551475992892272" />
+      <entry key="S5" value="7.885184084975205" />
+      <entry key="S10" value="8.416839602435047" />
+      <entry key="S30" value="8.799556661059759" />
+      <entry key="S60" value="8.898999339504401" />
+      <entry key="M2" value="8.949303237400356" />
+      <entry key="M5" value="8.982717647181993" />
+      <entry key="M10" value="9.461379859783516" />
+      <entry key="M15" value="11.697795031705684" />
+      <entry key="M30" value="25.74731852295256" />
+      <entry key="H1" value="54.56929461739701" />
+      <entry key="H2" value="98.33914422035053" />
+      <entry key="H4" value="157.22414520069702" />
+      <entry key="D1" value="272.9538173449322" />
+      <entry key="W1" value="305.12988877852484" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -161,39 +142,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
-    "KEY_CHAT_IN_TOOLWINDOW": "false",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "cidr.known.project.marker": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
+    &quot;KEY_CHAT_IN_TOOLWINDOW&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "GitStage.ChangesTree.GroupingKeys": [
-      "directory",
-      "module",
-      "repository"
+  &quot;keyToStringList&quot;: {
+    &quot;GitStage.ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;,
+      &quot;module&quot;,
+      &quot;repository&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CidrAttachToUnstartedProcessDialog.programPattern">
       <recent name="C:\Program Files\dotnet\sdk\9.0.308\MSBuild.dll" />
@@ -375,7 +356,8 @@
     <MESSAGE value="upd: fix Cosmos.Tools" />
     <MESSAGE value="upd: fix Cosmos.Build.Common.targets" />
     <MESSAGE value="upd: patcher structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="upd: patcher structure" />
+    <MESSAGE value="Add ARM64 Pager backend and shared address space implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add ARM64 Pager backend and shared address space implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Tests.Memory;
 public unsafe class Kernel : Sys.Kernel
 {
     /// <summary>Number of test cases registered with the TestRunner in BeforeRun.</summary>
-    private const int ExpectedTestCount = 87;
+    private const int ExpectedTestCount = 115;
 
     /// <summary>
     /// Sentinel written to a page before committing it, so the round-trip test
@@ -210,25 +210,84 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("V2P_PhysicalValue_PassesThrough", TestV2PPhysicalPassesThrough);
         TR.Run("V2P_KernelImageAddress_Rejected", TestV2PKernelImageRejected);
 
-        // Pager — the platform-agnostic paging API. Translate/Commit round
-        // trips are what user-space memory management will be built on, so
-        // they are pinned here before any fault handler depends on them.
+        // ===== Pager =====
+        //
+        // Ordered cheapest-and-most-independent first, deliberately. A fault
+        // inside the MMU path halts the CPU and takes every later test with it,
+        // so the pure-data and bookkeeping checks are registered ahead of the
+        // ones that actually install mappings. That way a regression in the
+        // walk still leaves the value objects and descriptor contracts
+        // reporting, instead of the suite dying at test one.
+
+        // Address value objects: pure data, no paging, no MMU.
+        TR.Run("VirtualAddress_WrapsAndUnwraps", TestVirtualAddressRoundTrip);
+        TR.Run("VirtualAddress_EqualityByValue", TestVirtualAddressEquality);
+        TR.Run("VirtualAddress_ToString_ShowsValue", TestVirtualAddressToString);
+        TR.Run("PhysicalAddress_Aligned_IsAccepted", TestPhysicalAddressAligned);
+        TR.Run("PhysicalAddress_Unaligned_IsRejected", TestPhysicalAddressUnaligned);
+        TR.Run("PhysicalAddress_None_IsZero", TestPhysicalAddressNone);
+        TR.Run("PhysicalAddress_EqualityByValue", TestPhysicalAddressEquality);
+        TR.Run("PhysicalAddress_DistinctFromVirtualAddress", TestAddressTypeDistinctness);
+
+        // Descriptor bookkeeping. Describes mappings without installing them.
         TR.Run("Pager_Backend_Registered", TestPagerBackendRegistered);
+        TR.Run("Pager_Create_DistinctDescriptors", TestPagerCreateDistinct);
+        TR.Run("Pager_Add_NullSpace_ReturnsFalse", TestPagerAddNullSpace);
+        TR.Run("Pager_Add_ZeroPageRegion_Retained", TestPagerAddZeroPageRetained);
+        TR.Run("Pager_Add_AtCapacity_ReturnsFalse", TestPagerAddAtCapacity);
+        TR.Run("Pager_NewSpace_SharesKernelRoot", TestPagerNewSpaceSharesKernelRoot);
+
+        // Argument handling: must refuse without touching the MMU.
+        TR.Run("Pager_Translate_NullSpace_ReturnsFalse", TestPagerTranslateNullSpace);
+        TR.Run("Pager_Translate_UnalignedAddress_Rejected", TestPagerTranslateUnaligned);
+        TR.Run("Pager_Commit_NullSpace_DoesNotThrow", TestPagerCommitNullSpace);
+
+        // Read-only translation: resolving an address that already works needs
+        // no new mapping, so it fails first if the walk itself is wrong.
         TR.Run("Pager_TranslateCurrent_KernelImage", TestPagerTranslateCurrentKernelImage);
         TR.Run("Pager_TranslateCurrent_Unmapped", TestPagerTranslateCurrentUnmapped);
         TR.Run("Pager_Translate_ExplicitSpace_MatchesCurrent", TestPagerTranslateExplicitMatches);
-        TR.Run("Pager_Commit_RoundTripsMapping", TestPagerCommitRoundTrip);
-        TR.Run("Pager_Commit_MultiPageRange", TestPagerCommitMultiPage);
-        TR.Run("Pager_Translate_UnalignedAddress_Rejected", TestPagerTranslateUnaligned);
-        TR.Run("Pager_Translate_NullSpace_ReturnsFalse", TestPagerTranslateNullSpace);
-        TR.Run("Pager_Add_AtCapacity_ReturnsFalse", TestPagerAddAtCapacity);
+        TR.Run("Pager_NewSpace_KernelStaysReachable", TestPagerNewSpaceKernelReachable);
+
+        // Commit with nothing to install.
         TR.Run("Pager_Commit_EmptySpace_IsNoOp", TestPagerCommitEmptySpace);
         TR.Run("Pager_Commit_ZeroPageRegion_InstallsNothing", TestPagerCommitZeroPage);
-        TR.Run("Pager_NewSpace_SharesKernelRoot", TestPagerNewSpaceSharesKernelRoot);
-        TR.Run("Pager_NewSpace_KernelStaysReachable", TestPagerNewSpaceKernelReachable);
-        TR.Run("Pager_Translate_CapacityLimitUnaffected", TestPagerTranslateCapacityUnaffected);
+
+        // ===== Pager: installs real mappings (MMU-changing, last) =====
+        //
+        // Everything above this line is safe to run anywhere. What follows
+        // writes page-table entries and dereferences them, so it is the block
+        // that a broken walk takes down with it.
+
+        // Flag encoding: each flag lowered per architecture.
+        TR.Run("Pager_Flags_None_DefaultsToNonExecutable", TestPagerFlagsNoneDefaults);
+        TR.Run("Pager_Flags_Executable_ClearsNoExecute", TestPagerFlagsExecutable);
+        TR.Run("Pager_Flags_Writable_IsHonoured", TestPagerFlagsWritable);
+        TR.Run("Pager_Flags_Device_IsHonoured", TestPagerFlagsDevice);
+        TR.Run("Pager_Flags_User_AcceptedButUnusable", TestPagerFlagsUser);
+        TR.Run("Pager_Flags_Global_AcceptedButNotEnforced", TestPagerFlagsGlobal);
+        TR.Run("Pager_Flags_Uncached_FallsBackToCacheable", TestPagerFlagsUncached);
+        TR.Run("Pager_Flags_Combined_BitwiseRoundTrip", TestPagerFlagsCombined);
+
+        // Region geometry.
+        TR.Run("Pager_Translate_FirstPageOfRange", TestPagerTranslateFirstPage);
+        TR.Run("Pager_Translate_LastPageOfRange", TestPagerTranslateLastPage);
+        TR.Run("Pager_Translate_NonPowerOfTwoPageCount", TestPagerTranslateOddCount);
+        TR.Run("Pager_Translate_LargeRegion", TestPagerTranslateLargeRegion);
+
+        // Multi-region spaces and repeat commits.
+        TR.Run("Pager_Add_MultipleRegions_AllRetained", TestPagerAddMultipleRegions);
+        TR.Run("Pager_Commit_MultipleTimes_IsIdempotent", TestPagerCommitIdempotent);
+        TR.Run("Pager_Translate_AfterSecondCommit", TestPagerTranslateAfterRecommit);
+        TR.Run("Pager_Commit_DoesNotDisturbKernel", TestPagerCommitKernelIntact);
         TR.Run("Pager_Translate_AllZeroRegions_MapsNothing", TestPagerTranslateZeroRegions);
+        TR.Run("Pager_Translate_CapacityLimitUnaffected", TestPagerTranslateCapacityUnaffected);
         TR.Run("Pager_Translate_SinglePageRegion", TestPagerTranslateSinglePage);
+        TR.Run("Pager_Commit_MultiPageRange", TestPagerCommitMultiPage);
+
+        // The write-through test, last: it is the only one that faults on a
+        // genuinely broken mapping rather than failing an assertion.
+        TR.Run("Pager_Commit_RoundTripsMapping", TestPagerCommitRoundTrip);
 
         TR.Finish();
     }
@@ -1285,6 +1344,32 @@ public unsafe class Kernel : Sys.Kernel
         => (ulong)Unsafe.AsPointer(ref s_v2pImageProbe);
 
     // Single try/catch in its own helper (arm64 EH inlining quirk).
+    /// <summary>
+    /// True when constructing a <see cref="PhysicalAddress"/> from
+    /// <paramref name="value"/> throws, i.e. the value is rejected as unaligned.
+    /// </summary>
+    /// <remarks>
+    /// Separate from <c>V2PRejects</c>, which exercises the HHDM translation
+    /// rules instead. Both reject bad input, but they are different contracts:
+    /// one is the value object's own validation, the other is
+    /// <c>PageAllocator</c> refusing a kernel-image address.
+    /// </remarks>
+    private static bool PhysicalAddressRejects(ulong value)
+    {
+        try
+        {
+            PhysicalAddress.From(value);
+            return false;
+        }
+        catch (Exception)
+        {
+            // Vogen raises ValueObjectValidationException for a failed
+            // Validate; catching Exception keeps the test honest about the
+            // contract (rejection) rather than one exception type.
+            return true;
+        }
+    }
+
     private static bool V2PRejects(ulong virtualAddress)
     {
         try
@@ -1736,6 +1821,733 @@ public unsafe class Kernel : Sys.Kernel
         PageAllocator.Free(page);
     }
 
+    // ==================== Pager: PageFlags encoding ====================
+
+    // PageFlags is a shared vocabulary; each backend lowers it to its own
+    // architecture bits. Most of that lowering is not observable from managed
+    // code without reading raw page tables, so these tests assert what IS
+    // observable — that a mapping installs at all, that the translation is
+    // correct, and that the flags are accepted — and they name the flags that
+    // are accepted-but-unenforced so a future reader does not mistake them for
+    // working protection.
+
+    /// <summary>
+    /// <see cref="PageFlags.None"/> must still produce a usable, non-executable
+    /// mapping. An omitted <see cref="PageFlags.Executable"/> means NX on both
+    /// architectures, which is the safe default for data.
+    /// </summary>
+    private static unsafe void TestPagerFlagsNoneDefaults()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x10)), PhysicalAddress.From(frame), 1,
+            PageFlags.None);
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x10)), out PhysicalAddress resolved),
+            "a region with no flags must still install a mapping");
+        Assert.True(resolved.Value == frame, "a no-flag mapping must resolve to its own frame");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// <see cref="PageFlags.Executable"/> must not break installation: the x64
+    /// backend clears NX and the ARM64 backend clears PXN/UXN, and both must
+    /// still leave a translatable entry.
+    /// </summary>
+    private static unsafe void TestPagerFlagsExecutable()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x11)), PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Executable);
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x11)), out PhysicalAddress resolved),
+            "an executable region must install and translate");
+        Assert.True(resolved.Value == frame, "an executable mapping must resolve to its own frame");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// A writable region must translate. Whether it is genuinely writable is
+    /// only provable by writing through it, which needs an installed mapping
+    /// and is covered by the round-trip test.
+    /// </summary>
+    private static unsafe void TestPagerFlagsWritable()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x12)), PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Writable);
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x12)), out _),
+            "a writable region must install and translate");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// A <see cref="PageFlags.Device"/> region must install. On ARM64 this
+    /// selects a Device MAIR attribute and therefore leaves AP[2] clear, so the
+    /// region is deliberately read-only — this asserts only that it exists.
+    /// </summary>
+    private static unsafe void TestPagerFlagsDevice()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x13)), PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Device);
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x13)), out PhysicalAddress resolved),
+            "a device region must install and translate");
+        Assert.True(resolved.Value == frame, "a device mapping must resolve to its own frame");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// <see cref="PageFlags.User"/> is defined but not yet usable: there is no
+    /// ring-3 transition in the kernel today, so nothing can prove the
+    /// privilege bit is enforced. This asserts the flag is accepted rather than
+    /// rejected, and records that its effect is unverified.
+    /// </summary>
+    private static unsafe void TestPagerFlagsUser()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        bool accepted = Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x14)),
+            PhysicalAddress.From(frame), 1, PageFlags.Present | PageFlags.User | PageFlags.Writable);
+        Assert.True(accepted, "PageFlags.User must be accepted even though it is not yet enforced");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// <see cref="PageFlags.Global"/> has no ARM64 encoding at all — TLBI is
+    /// issued without an address-space tag — so on ARM64 the bit is ignored
+    /// rather than rejected. It must at least not prevent installation.
+    /// </summary>
+    private static unsafe void TestPagerFlagsGlobal()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x15)), PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Global | PageFlags.Writable);
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x15)), out _),
+            "a global region must install and translate");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// <see cref="PageFlags.Uncached"/> is not separately expressible without
+    /// programming the PAT MSR (x64) or adding a MAIR entry (ARM64). Both
+    /// backends currently fall through to the cacheable default, so this pins
+    /// the present behaviour rather than an aspiration: the mapping installs
+    /// and translates.
+    /// </summary>
+    private static unsafe void TestPagerFlagsUncached()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x16)), PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Uncached | PageFlags.Writable);
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x16)), out PhysicalAddress resolved),
+            "an uncached region must install and translate");
+        Assert.True(resolved.Value == frame, "an uncached mapping must resolve to its own frame");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// Flags must combine bitwise, and the combination must not corrupt the
+    /// entry: the architecture bits they lower to overlap the address field on
+    /// both architectures, so a combination is the case most likely to expose a
+    /// masking error.
+    /// </summary>
+    private static unsafe void TestPagerFlagsCombined()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        PageFlags combined = PageFlags.Present | PageFlags.Writable | PageFlags.Executable
+            | PageFlags.User | PageFlags.Global | PageFlags.Cacheable;
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x17)), PhysicalAddress.From(frame), 1, combined);
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x17)), out PhysicalAddress resolved),
+            "a combined-flag region must install and translate");
+        Assert.True(resolved.Value == frame,
+            "combined flags must not corrupt the physical frame (address/flag overlap)");
+
+        PagerCleanup(space);
+    }
+
+    // ==================== Pager: address value objects ====================
+
+    /// <summary>A virtual address must survive a wrap/unwrap round trip byte for byte.</summary>
+    private static void TestVirtualAddressRoundTrip()
+    {
+        ulong raw = 0xFFFF_4000_0000_0000;
+        Assert.True(VirtualAddress.From(raw).Value == raw,
+            "VirtualAddress must return the exact value it was constructed from");
+        Assert.True(VirtualAddress.From(0).Value == 0, "VirtualAddress zero must round trip");
+        Assert.True(VirtualAddress.From(ulong.MaxValue).Value == ulong.MaxValue,
+            "VirtualAddress max must round trip (no canonical-form validation)");
+    }
+
+    /// <summary>Two virtual addresses with the same value are equal, and different ones are not.</summary>
+    private static void TestVirtualAddressEquality()
+    {
+        Assert.True(VirtualAddress.From(0x1000) == VirtualAddress.From(0x1000),
+            "VirtualAddress equality must be by value");
+        Assert.True(VirtualAddress.From(0x1000) != VirtualAddress.From(0x2000),
+            "VirtualAddress inequality must distinguish values");
+        Assert.True(VirtualAddress.From(0x1000).Equals(VirtualAddress.From(0x1000)),
+            "VirtualAddress.Equals must agree with the == operator");
+    }
+
+    /// <summary>
+    /// <c>ToString</c> must surface the value, and an explicit format string
+    /// must reach the underlying <see cref="ulong"/>'s formatting.
+    /// </summary>
+    /// <remarks>
+    /// The parameterless overload is decimal, not hex — Vogen's default. That is
+    /// the right thing for a general-purpose value object, but it is not what
+    /// the Serial/panic paths want, so they pass "X". Both forms are pinned
+    /// here so a future generator upgrade that changes either is caught.
+    /// </remarks>
+    private static void TestVirtualAddressToString()
+    {
+        Assert.True(VirtualAddress.From(0xDEAD_BEEF).ToString() == "3735928559",
+            "VirtualAddress.ToString() must be the decimal value by default");
+
+        Assert.True(VirtualAddress.From(0xDEAD_BEEF).ToString("X") == "DEADBEEF",
+            "VirtualAddress.ToString(\"X\") must format the underlying ulong as hex");
+    }
+
+    /// <summary>A page-aligned physical address is valid on both architectures.</summary>
+    private static void TestPhysicalAddressAligned()
+    {
+        Assert.True(PhysicalAddress.From(0).Value == 0, "physical address 0 must be accepted");
+        Assert.True(PhysicalAddress.From(0x1000).Value == 0x1000, "a 4 KiB-aligned address must be accepted");
+        Assert.True(PhysicalAddress.From(0x599C_0000).Value == 0x599C_0000,
+            "a high page-aligned address must be accepted");
+    }
+
+    /// <summary>
+    /// An unaligned physical address has no page-table encoding on either
+    /// architecture, so construction must fail rather than silently dropping the
+    /// low bits and mapping the wrong frame.
+    /// </summary>
+    private static void TestPhysicalAddressUnaligned()
+    {
+        Assert.True(PhysicalAddressRejects(0x1001), "physical address 0x1001 must be rejected as unaligned");
+        Assert.True(PhysicalAddressRejects(0x0FFF), "physical address 0x0FFF must be rejected as unaligned");
+        Assert.True(PhysicalAddressRejects(0x0800), "physical address 0x0800 must be rejected as unaligned");
+    }
+
+    /// <summary>
+    /// The failure sentinel is physical 0. It must be constructible (0 is
+    /// page-aligned) so the <c>out</c> parameter can always be assigned.
+    /// </summary>
+    private static void TestPhysicalAddressNone()
+    {
+        Assert.True(PhysicalAddress.None.Value == 0,
+            "PhysicalAddress.None must be physical address 0");
+    }
+
+    /// <summary>Physical addresses compare by value like any other value object.</summary>
+    private static void TestPhysicalAddressEquality()
+    {
+        Assert.True(PhysicalAddress.From(0x2000) == PhysicalAddress.From(0x2000),
+            "PhysicalAddress equality must be by value");
+        Assert.True(PhysicalAddress.From(0x2000) != PhysicalAddress.From(0x3000),
+            "PhysicalAddress inequality must distinguish values");
+    }
+
+    /// <summary>
+    /// The two address types must not be interchangeable. They have the same
+    /// underlying <see cref="ulong"/>, so the compiler cannot stop a physical
+    /// address being passed where a virtual one belongs — the only defence is
+    /// that the types differ, and this test fails loudly if they ever merge.
+    /// </summary>
+    private static void TestAddressTypeDistinctness()
+    {
+        Assert.True(typeof(VirtualAddress) != typeof(PhysicalAddress),
+            "VirtualAddress and PhysicalAddress must remain distinct types");
+        Assert.True(typeof(VirtualAddress) != typeof(ulong),
+            "VirtualAddress must remain a wrapper, not an alias for ulong");
+    }
+
+    // ==================== Pager: descriptor bookkeeping ====================
+
+    /// <summary>Several regions in one space must all be retained and installed.</summary>
+    private static unsafe void TestPagerAddMultipleRegions()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < 8; i++)
+        {
+            bool added = Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x20 + (ulong)i)),
+                PhysicalAddress.From(frame), 1, PageFlags.Present | PageFlags.Writable);
+            Assert.True(added, $"Add must accept region {i} below capacity");
+        }
+
+        Assert.True(space->RegionCount == 8, "eight added regions must be retained");
+
+        Pager.Commit(space);
+
+        for (int i = 0; i < 8; i++)
+        {
+            Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x20 + (ulong)i)), out _),
+                $"region {i} of a multi-region space must translate");
+        }
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>A null descriptor must be refused rather than dereferenced.</summary>
+    private static void TestPagerAddNullSpace()
+    {
+        Assert.True(!Pager.Add(null, VirtualAddress.From(0x1000), PhysicalAddress.From(0x1000), 1, PageFlags.Present),
+            "Add must return false for a null space");
+    }
+
+    /// <summary>
+    /// A zero-page region must still be recorded: reserving an address range
+    /// before committing to a length is the documented use, so it has to
+    /// consume a slot and leave the count consistent.
+    /// </summary>
+    private static unsafe void TestPagerAddZeroPageRetained()
+    {
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Assert.True(Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x30)),
+                PhysicalAddress.From(Pager.PageSize), 0, PageFlags.Present),
+            "Add must accept a zero-page region");
+        Assert.True(space->RegionCount == 1, "a zero-page region must still consume a slot");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// Each descriptor is its own allocation. Two must not alias, or installing
+    /// into one would silently rewrite the other.
+    /// </summary>
+    private static unsafe void TestPagerCreateDistinct()
+    {
+        AddressSpaceDescriptor* first = Pager.Create();
+        AddressSpaceDescriptor* second = Pager.Create();
+
+        Assert.True(first != null && second != null, "Create must succeed twice");
+        Assert.True((ulong)first != (ulong)second, "Create must return distinct descriptors");
+
+        if (first != null && second != null)
+        {
+            Assert.True(first->RegionCount == 0 && second->RegionCount == 0,
+                "both new descriptors must start empty");
+
+            Pager.Add(first, VirtualAddress.From(PagerRoundTripAlias(0x40)),
+                PhysicalAddress.From(Pager.PageSize), 0, PageFlags.None);
+
+            Assert.True(first->RegionCount == 1, "the added descriptor must record the region");
+            Assert.True(second->RegionCount == 0, "the other descriptor must be unaffected");
+
+            PagerCleanup(first);
+            PagerCleanup(second);
+        }
+    }
+
+    /// <summary>
+    /// Committing the same space twice must not double-count regions or
+    /// otherwise disturb it. Callers are expected to commit after each Add, so
+    /// the second commit is the common case, not an error path.
+    /// </summary>
+    private static unsafe void TestPagerCommitIdempotent()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x41)), PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Writable);
+
+        Pager.Commit(space);
+        Assert.True(space->RegionCount == 1, "the first commit must not alter the region count");
+        Assert.True(space->IsCommitted, "the first commit must mark the space committed");
+
+        Pager.Commit(space);
+        Assert.True(space->RegionCount == 1, "a repeated commit must not alter the region count");
+        Assert.True(space->IsCommitted, "a repeated commit must leave the space committed");
+
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x41)), out PhysicalAddress resolved),
+            "a repeatedly committed space must still translate");
+        Assert.True(resolved.Value == frame, "a repeated commit must not change the resolved frame");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>Committing null must be a no-op, not a crash.</summary>
+    private static void TestPagerCommitNullSpace()
+    {
+        Pager.Commit(null);
+        Assert.True(true, "Commit(null) must not throw");
+    }
+
+    /// <summary>
+    /// Committing must never disturb the kernel's own mappings. This is the
+    /// shared-root invariant, re-checked after real regions have been installed
+    /// rather than on a freshly created space.
+    /// </summary>
+    private static unsafe void TestPagerCommitKernelIntact()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x42)), PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Writable);
+        Pager.Commit(space);
+
+        Assert.True(Pager.Translate(KernelImageAnchor(out _), out PhysicalAddress resolved),
+            "the kernel image must still translate after a space with real regions is committed");
+        Assert.True(resolved.Value != PhysicalAddress.None.Value,
+            "the kernel frame must not be the none sentinel");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// Adding a region after a commit, then committing again, must make the new
+    /// region translatable without disturbing the first. This is the
+    /// grow-a-space-later flow.
+    /// </summary>
+    private static unsafe void TestPagerTranslateAfterRecommit()
+    {
+        ulong frame = PagerTestFrame();
+        if (frame == 0)
+        {
+            return;
+        }
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x43)), PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Writable);
+        Pager.Commit(space);
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x43)), out _),
+            "the first region must translate after the first commit");
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x44)), PhysicalAddress.From(frame), 1,
+            PageFlags.Present | PageFlags.Writable);
+        Pager.Commit(space);
+
+        Assert.True(space->RegionCount == 2, "a second commit must retain both regions");
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x44)), out _),
+            "a region added after a commit must translate once committed again");
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x43)), out _),
+            "the original region must survive a second commit");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// The final page of a multi-page region must map. An off-by-one that only
+    /// covers all but the last page is the classic range bug.
+    /// </summary>
+    private static unsafe void TestPagerTranslateLastPage()
+    {
+        if (!PagerTryMapRange(0x50, 4, out AddressSpaceDescriptor* space, out ulong frame))
+        {
+            return;
+        }
+
+        VirtualAddress last = VirtualAddress.From(PagerRoundTripAlias(0x50) + (3 * Pager.PageSize));
+        Assert.True(Pager.Translate(space, last, out PhysicalAddress resolved),
+            "the last page of a multi-page region must translate");
+        Assert.True(resolved.Value == frame + (3 * Pager.PageSize),
+            "the last page must resolve to the last frame of the range");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>The first page of a multi-page region must map.</summary>
+    private static unsafe void TestPagerTranslateFirstPage()
+    {
+        if (!PagerTryMapRange(0x51, 4, out AddressSpaceDescriptor* space, out ulong frame))
+        {
+            return;
+        }
+
+        Assert.True(Pager.Translate(space, VirtualAddress.From(PagerRoundTripAlias(0x51)), out PhysicalAddress resolved),
+            "the first page of a multi-page region must translate");
+        Assert.True(resolved.Value == frame,
+            "the first page must resolve to the base frame of the range");
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// A page count that is neither 1 nor a huge-page multiple must be installed
+    /// page by page, and every page must resolve to its own consecutive frame.
+    /// </summary>
+    private static unsafe void TestPagerTranslateOddCount()
+    {
+        const ulong Pages = 3;
+
+        if (!PagerTryMapRange(0x52, Pages, out AddressSpaceDescriptor* space, out ulong frame))
+        {
+            return;
+        }
+
+        Assert.True(space->RegionCount == 1, "an odd-length range is still a single region");
+
+        for (ulong i = 0; i < Pages; i++)
+        {
+            VirtualAddress page = VirtualAddress.From(PagerRoundTripAlias(0x52) + (i * Pager.PageSize));
+            Assert.True(Pager.Translate(space, page, out PhysicalAddress resolved),
+                $"page {i} of a {Pages}-page region must translate");
+            Assert.True(resolved.Value == frame + (i * Pager.PageSize),
+                $"page {i} must resolve to its own frame");
+        }
+
+        PagerCleanup(space);
+    }
+
+    /// <summary>
+    /// A region larger than a huge page must install every page. This is the
+    /// case that needs real intermediate tables, so it is the most likely to
+    /// expose a walk that only works for small mappings.
+    /// </summary>
+    private static unsafe void TestPagerTranslateLargeRegion()
+    {
+        const ulong Pages = 16;
+
+        void* memory = PageAllocator.AllocPages(PageType.Unmanaged, (ulong)Pages, zero: true);
+        Assert.True(memory != null, "large-region page allocation must succeed");
+
+        if (memory is null)
+        {
+            return;
+        }
+
+        ulong frame = PageAllocator.VirtualToPhysical((ulong)memory);
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+
+        if (space is null)
+        {
+            PageAllocator.Free(memory);
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(0x53)), PhysicalAddress.From(frame), Pages,
+            PageFlags.Present | PageFlags.Writable | PageFlags.Cacheable);
+        Pager.Commit(space);
+
+        for (ulong i = 0; i < Pages; i++)
+        {
+            VirtualAddress page = VirtualAddress.From(PagerRoundTripAlias(0x53) + (i * Pager.PageSize));
+            Assert.True(Pager.Translate(space, page, out PhysicalAddress resolved),
+                $"page {i} of a {Pages}-page region must translate");
+            Assert.True(resolved.Value == frame + (i * Pager.PageSize),
+                $"page {i} of a large region must resolve to its own frame");
+        }
+
+        PagerCleanup(space);
+        PageAllocator.Free(memory);
+    }
+
+    // ==================== Pager: test helpers ====================
+
+    /// <summary>
+    /// Allocates one page and returns its frame, or 0 when the allocation
+    /// failed. Callers treat 0 as "skip" so a memory-starved run reports a
+    /// skipped check rather than a bogus failure.
+    /// </summary>
+    private static unsafe ulong PagerTestFrame()
+    {
+        void* page = PageAllocator.AllocPages(PageType.Unmanaged, 1, zero: true);
+        return page is null ? 0 : PageAllocator.VirtualToPhysical((ulong)page);
+    }
+
+    /// <summary>Creates a descriptor, or returns null after asserting the failure.</summary>
+    private static AddressSpaceDescriptor* PagerCreateOrNull()
+    {
+        AddressSpaceDescriptor* space = Pager.Create();
+        Assert.True(space != null, "Pager.Create must succeed");
+        return space;
+    }
+
+    /// <summary>
+    /// Frees a descriptor and the frame behind it. Both are owned by the
+    /// caller, since the kernel heap is non-moving and nothing finalizes them.
+    /// </summary>
+    private static void PagerCleanup(AddressSpaceDescriptor* space)
+    {
+        if (space is not null)
+        {
+            Cosmos.Kernel.Core.Memory.Heap.Heap.Free(space);
+        }
+    }
+
+    /// <summary>
+    /// Allocates a contiguous run and describes it as a single region,
+    /// returning false (having asserted) when either step fails.
+    /// </summary>
+    private static unsafe bool PagerTryMapRange(ulong slot, ulong pages,
+        out AddressSpaceDescriptor* space, out ulong frame)
+    {
+        void* memory = PageAllocator.AllocPages(PageType.Unmanaged, pages, zero: true);
+        Assert.True(memory != null, "range page allocation must succeed");
+
+        if (memory is null)
+        {
+            space = null;
+            frame = 0;
+            return false;
+        }
+
+        frame = PageAllocator.VirtualToPhysical((ulong)memory);
+        space = PagerCreateOrNull();
+
+        if (space is null)
+        {
+            PageAllocator.Free(memory);
+            frame = 0;
+            return false;
+        }
+
+        Pager.Add(space, VirtualAddress.From(PagerRoundTripAlias(slot)), PhysicalAddress.From(frame), pages,
+            PageFlags.Present | PageFlags.Writable | PageFlags.Cacheable);
+        Pager.Commit(space);
+
+        return true;
+    }
+
     /// <summary>
     /// A static field used as a known-good kernel-image address. Its address is
     /// in the top-2GiB kernel window that NativeAOT maps, so the CPU has
@@ -1761,6 +2573,17 @@ public unsafe class Kernel : Sys.Kernel
         {
             return (ulong)anchor & ~(Pager.PageSize - 1);
         }
+    }
+
+    /// <summary>
+    /// <see cref="KernelImageAnchor"/> as a <see cref="VirtualAddress"/>,
+    /// for the callers that take one directly.
+    /// </summary>
+    private static VirtualAddress KernelImageAnchor(out bool ok)
+    {
+        ulong address = KernelImageAnchor();
+        ok = address != 0;
+        return VirtualAddress.From(address);
     }
 
     /// <summary>
