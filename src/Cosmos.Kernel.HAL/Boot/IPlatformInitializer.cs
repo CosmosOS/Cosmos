@@ -63,6 +63,18 @@ internal interface IPlatformInitializer
     bool EnsureMmioMapped(ulong physBase);
 
     /// <summary>
+    /// Maps the 2 MiB block containing a physical address of a framebuffer
+    /// write-combining, so stores to it leave in bursts. The caller asks
+    /// only for a block its window covers whole, since the block's existing
+    /// mappings change too. x64 maps it through the PAT's write-combining
+    /// entry; ARM64 maps it as <see cref="EnsureMmioMapped"/> does, Device
+    /// memory.
+    /// </summary>
+    /// <param name="physBase">Physical address in the block.</param>
+    /// <returns>True when the block is mapped on return; false when it could not be mapped and its HHDM alias must not be dereferenced.</returns>
+    bool EnsureWriteCombiningMapped(ulong physBase);
+
+    /// <summary>
     /// Full data-synchronization barrier ordering prior normal-memory
     /// accesses against subsequent device MMIO accesses. DMA drivers call
     /// this between filling a descriptor/queue entry in RAM and ringing

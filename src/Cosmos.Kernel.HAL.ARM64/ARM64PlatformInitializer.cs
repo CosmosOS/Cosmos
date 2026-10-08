@@ -76,6 +76,14 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         return DeviceMapper.EnsureMapped(physBase);
     }
 
+    public bool EnsureWriteCombiningMapped(ulong physBase)
+    {
+        // The device mapper installs only MAIR's Device attribute, not a
+        // Normal non-cacheable one, so a framebuffer is Device memory like
+        // any other window.
+        return EnsureMmioMapped(physBase);
+    }
+
     public void DmaBarrier()
     {
         // dsb sy + isb: orders Normal-memory descriptor/queue writes against
