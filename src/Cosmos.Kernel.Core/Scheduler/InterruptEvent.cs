@@ -137,17 +137,10 @@ internal class InterruptEvent
                 SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
             }
 
-            // Only park the CPU while still Blocked: if a Signal (or an
-            // unrelated ReadyThread) raced in between the scope-dispose and
-            // this point, the thread is already Ready/Running and halting
-            // would sleep it until the next unrelated interrupt instead of
-            // retrying the latch immediately. A wake racing in after this
-            // check costs at most one timer tick — no worse than the
-            // unconditional halt it replaces.
-            if (currentThread.State == SchedulerThreadState.Blocked)
-            {
-                InternalCpu.Halt();
-            }
+            // Give the CPU to the next thread until a Signal (or an
+            // unrelated ReadyThread) readies this one; returns at once when
+            // one raced in between the scope-dispose and this point.
+            SchedulerManager.Park(currentThread);
             // On wake, retry: either a Signal targeted us (we were removed
             // from _waiters) or we got readied for another reason; in
             // either case re-check state under the lock.
@@ -249,13 +242,9 @@ internal class InterruptEvent
                 SchedulerManager.MarkSleeping(currentThread.CpuId, currentThread, (uint)Math.Max(1, remainingMilliseconds));
             }
 
-            // Only park while still Sleeping: a wake that landed between the
-            // scope-dispose and here has already readied the thread, and a
-            // halt would sleep it until the next unrelated interrupt.
-            if (currentThread.State == SchedulerThreadState.Sleeping)
-            {
-                InternalCpu.Halt();
-            }
+            // Give the CPU to the next thread until a Signal or the deadline
+            // readies this one; returns at once when a wake already landed.
+            SchedulerManager.Park(currentThread);
 
             // Back here means the scheduler switched to this thread again:
             // Signal dequeued and readied it, the tick readied it at the

@@ -28,6 +28,7 @@ public static class GICv2
     private const uint GICD_IPRIORITYR = 0x400;  // Interrupt Priority (base)
     private const uint GICD_ITARGETSR = 0x800;   // Interrupt Processor Targets (base)
     private const uint GICD_ICFGR = 0xC00;       // Interrupt Configuration (base)
+    private const uint GICD_SGIR = 0xF00;        // Software Generated Interrupt
 
     // CPU Interface registers (offsets from GICC_BASE)
     private const uint GICC_CTLR = 0x000;        // CPU Interface Control
@@ -47,6 +48,10 @@ public static class GICv2
     private const uint CtlrEnable = 1;
     /// <summary>CPU 0 target mask (0x01) replicated into each byte of a GICD_ITARGETSR word.</summary>
     private const uint TargetCpu0AllBytes = 0x01010101;
+    /// <summary>GICD_SGIR.TargetListFilter (bits [25:24]) set to 0b10: forward the SGI to the requesting CPU only.</summary>
+    private const uint SgirTargetSelf = 0b10u << 24;
+    /// <summary>GICD_SGIR.SGIINTID field mask (bits [3:0]).</summary>
+    private const uint SgirIntIdMask = 0xF;
 
     // Register layout strides (GICv2 Architecture Specification)
     /// <summary>Interrupts covered by one 32-bit enable/pending register (one bit per interrupt).</summary>
@@ -200,6 +205,16 @@ public static class GICv2
             byte* ptr = (byte*)(s_gicDistBase + regOffset);
             *ptr = priority;
         }
+    }
+
+    /// <summary>
+    /// Raises SGI <paramref name="sgiId"/> on the calling CPU through
+    /// GICD_SGIR, with the target list filter that names the requester.
+    /// </summary>
+    /// <param name="sgiId">SGI ID (0-15).</param>
+    public static void SendSgiToSelf(uint sgiId)
+    {
+        WriteDistributor(GICD_SGIR, SgirTargetSelf | (sgiId & SgirIntIdMask));
     }
 
     /// <summary>

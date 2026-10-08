@@ -40,6 +40,16 @@ internal class ARM64InterruptController : IInterruptController
     /// <summary>GIC priority for the timer PPI (lower value = higher priority; 0x80 = medium).</summary>
     private const byte TimerPriorityMedium = 0x80;
 
+    /// <summary>
+    /// The SGI of the scheduler's self-interrupt (<see cref="TryRaiseReschedule"/>).
+    /// Not 0 to 3: an IRQ's INTID indexes the same handler table where
+    /// ExceptionHandler puts the four exception types.
+    /// </summary>
+    private const uint RescheduleSgi = 8;
+
+    /// <summary>GIC priority of the reschedule SGI: the timer's, so neither preempts the other.</summary>
+    private const byte ReschedulePriority = 0x80;
+
     /// <summary>Size in bytes of the NEON save area the vector stub pushes below the IRQContext.</summary>
     private const int NeonSaveAreaBytes = 512;
 
@@ -93,9 +103,27 @@ internal class ARM64InterruptController : IInterruptController
         GIC.SetPriority(GIC.TIMER_NONSEC_PHYS, TimerPriorityMedium);  // Medium priority
         GIC.EnableInterrupt(GIC.TIMER_NONSEC_PHYS);
 
+        // A handler, though it does nothing, is what takes the SGI down
+        // Dispatch's IRQ path: the EOI, then the pending reschedule.
+        InterruptManager.SetHandler((byte)RescheduleSgi, HandleReschedule);
+        GIC.SetPriority(RescheduleSgi, ReschedulePriority);
+        GIC.EnableInterrupt(RescheduleSgi);
+
         Serial.Write("[ARM64InterruptController] ARM64 interrupt system ready\n");
 
         _initialized = true;
+    }
+
+    /// <inheritdoc/>
+    public bool TryRaiseReschedule()
+    {
+        if (!_initialized)
+        {
+            return false;
+        }
+
+        GIC.SendSgiToSelf(RescheduleSgi);
+        return true;
     }
 
     public void RouteIrq(byte irqNo, byte vector, bool startMasked)
@@ -279,6 +307,11 @@ internal class ARM64InterruptController : IInterruptController
     public static unsafe nuint SavedContextStackPointer(ref IRQContext ctx)
     {
         return (nuint)Unsafe.AsPointer(ref ctx) - NeonSaveAreaBytes;
+    }
+
+    /// <summary>The reschedule SGI's handler: nothing to do, Dispatch runs the reschedule on its exit.</summary>
+    private static void HandleReschedule(ref IRQContext ctx)
+    {
     }
 
     private static void RunPendingReschedule(ref IRQContext ctx)
