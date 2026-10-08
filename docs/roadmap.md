@@ -42,7 +42,6 @@ Features planned after first release:
 | Feature | Status | Notes |
 |---------|--------|-------|
 | **SMP (Symmetric Multiprocessing)** | ❌ Not Started | Multi-core AP boot, per-CPU scheduling, load balancer. |
-| **HTTPS** | ❌ Not Started | TLS/SSL implementation, certificate handling, secure sockets. |
 | **Generational GC** | ❌ Not Started | Replace current mark-and-sweep with generational collector (Gen0/Gen1/Gen2) for better performance. |
 | **Code execution** | ❌ Not Started | Userland WASM VM |
 | **The GIC, the ITS and the clocks from the device tree** | ❌ Not Started | Today the ARM64 interrupt controller comes from ACPI or the virt defaults, so an acpi=off boot has no MSI; the platform bus already reads the tree. x64 never has one. |
