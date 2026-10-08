@@ -7,6 +7,8 @@ Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver
 Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver.VirtioPciTransportDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.XhciDriver() -> void
+Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver
+Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.AmdDcnDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.VmwareSvgaDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EDriver
@@ -57,6 +59,10 @@ override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.Matches.get -> System.Rea
 override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void

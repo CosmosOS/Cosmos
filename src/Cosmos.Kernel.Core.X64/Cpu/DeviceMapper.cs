@@ -18,7 +18,12 @@ namespace Cosmos.Kernel.Core.X64.Cpu;
 /// (PCD|PWT) mappings so <c>phys + HHDM offset</c> dereferences work for
 /// any BAR placement. Already-present mappings are left untouched: the low
 /// 4 GiB keeps Limine's attributes (MTRRs make QEMU/PC MMIO correct there
-/// today, and rewriting live Limine entries is not worth the risk).
+/// today, and rewriting live Limine entries is not worth the risk). A block
+/// Limine mapped in 4 KiB pages may be mapped only in part: Limine maps the
+/// boot framebuffer to its last byte, so the block holding its end has a
+/// table with the framebuffer's pages and nothing after them. The pages
+/// such a table leaves out are mapped uncacheable too, and the ones it
+/// maps keep Limine's attributes.
 /// </summary>
 public static unsafe class DeviceMapper
 {
@@ -42,6 +47,10 @@ public static unsafe class DeviceMapper
     private const int PdShift = 21;
     /// <summary>Mask isolating a 9-bit page-table index (512 entries per table).</summary>
     private const ulong TableIndexMask = 0x1FF;
+    /// <summary>Entries in one page table.</summary>
+    private const int TableEntries = 512;
+    /// <summary>Bytes in one page a page table maps.</summary>
+    private const ulong SmallPageSize = 0x1000;
 
     /// <summary>
     /// Serializes page-table walks and edits. Without it, two threads
@@ -86,7 +95,8 @@ public static unsafe class DeviceMapper
 
     /// <summary>
     /// Walks CR3's tables to the PD slot covering <paramref name="virt"/>
-    /// and installs a 2 MiB UC mapping there when nothing maps it yet.
+    /// and installs a 2 MiB UC mapping there when nothing maps it yet, or
+    /// fills in the pages a 4 KiB table there leaves out.
     /// Caller holds <see cref="s_lock"/>.
     /// </summary>
     private static bool MapBlock(ulong alignedPhys, ulong virt, ulong hhdm)
@@ -118,9 +128,16 @@ public static unsafe class DeviceMapper
         }
 
         int pdIndex = (int)((virt >> PdShift) & TableIndexMask);
-        if ((pd[pdIndex] & FlagPresent) != 0)
+        ulong pdEntry = pd[pdIndex];
+        if ((pdEntry & FlagPresent) != 0)
         {
-            // A 2 MiB page or a 4 KiB table already maps this block.
+            // A 2 MiB page maps the whole block; a 4 KiB table may map only
+            // part of it.
+            if ((pdEntry & FlagPageSize) == 0)
+            {
+                FillTable((ulong*)((pdEntry & AddrMask) + hhdm), alignedPhys, virt);
+            }
+
             return true;
         }
 
@@ -137,6 +154,46 @@ public static unsafe class DeviceMapper
                     | FlagPageSize | FlagNoExecute;
         X64CpuNative.InvalidatePage(virt);
         return true;
+    }
+
+    /// <summary>
+    /// Maps the pages of the 4 KiB table <paramref name="table"/> that map
+    /// nothing yet, uncacheable and non-executable like a 2 MiB block, and
+    /// leaves the present ones alone. The table maps the 2 MiB block at
+    /// <paramref name="alignedPhys"/>, seen at <paramref name="virt"/>.
+    /// Silent when the table was full. Caller holds <see cref="s_lock"/>.
+    /// </summary>
+    private static void FillTable(ulong* table, ulong alignedPhys, ulong virt)
+    {
+        int filled = 0;
+        for (int i = 0; i < TableEntries; i++)
+        {
+            if ((table[i] & FlagPresent) != 0)
+            {
+                continue;
+            }
+
+            ulong offset = (ulong)i * SmallPageSize;
+            table[i] = (alignedPhys + offset) | FlagPresent | FlagWritable
+                     | FlagCacheDisable | FlagWriteThrough | FlagNoExecute;
+            X64CpuNative.InvalidatePage(virt + offset);
+            filled++;
+        }
+
+        if (filled == 0)
+        {
+            return;
+        }
+
+        Serial.WriteString("[DeviceMapper] Mapping MMIO phys 0x");
+        Serial.WriteHex(alignedPhys);
+        Serial.WriteString(" -> virt 0x");
+        Serial.WriteHex(virt);
+        Serial.WriteString(" (");
+        Serial.WriteNumber(filled);
+        Serial.WriteString(" of ");
+        Serial.WriteNumber(TableEntries);
+        Serial.WriteString(" 4KiB pages, UC)\n");
     }
 
     /// <summary>
