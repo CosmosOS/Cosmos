@@ -901,6 +901,7 @@ override Cosmos.Kernel.System.Network.EndPoint.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.EndPoint.GetHashCode() -> int
 override Cosmos.Kernel.System.Network.EndPoint.ToString() -> string!
 override Cosmos.Kernel.System.Network.MaskedAddress.Equals(object! obj) -> bool
+override Cosmos.Kernel.System.Network.MaskedAddress.GetHashCode() -> int
 override Cosmos.Kernel.System.Network.NetworkAdapter.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.NetworkAdapter.GetHashCode() -> int
 static Cosmos.Kernel.System.Audio.AudioManager.Count.get -> int

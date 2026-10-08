@@ -19,8 +19,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f8cd28f8-8db5-4f5c-b0cb-c82b7fbea921" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.nativeaot-patcher/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.nativeaot-patcher/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.HAL/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.HAL/PublicAPI.Unshipped.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.System/Input/KeyboardManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.System/Input/KeyboardManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.HAL/Cosmos.Kernel.HAL.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.HAL/Cosmos.Kernel.HAL.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/MaskedAddress.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/MaskedAddress.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.System/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.System/PublicAPI.Unshipped.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +56,9 @@
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Runtime/Casting.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Tools/Commands/BuildCommand.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Tools/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///mnt/data/projects/git/zarlo/CosmosMe/src/Cosmos.Kernel.Core/Runtime/GC.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///mnt/data/projects/git/zarlo/CosmosMe/src/Cosmos.Kernel.HAL/Structures/RingBuffer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///mnt/data/projects/git/zarlo/CosmosMe/src/Cosmos.Kernel.System/Network/MaskedAddress.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
     <commands />
@@ -63,61 +67,61 @@
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="false" />
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="3.6375922324299356E-24" />
-      <entry key="MS500" value="3.566011454316103E-5" />
-      <entry key="S2" value="0.13023499214957915" />
-      <entry key="S5" value="0.7353546214804512" />
-      <entry key="S10" value="1.5952950364592577" />
-      <entry key="S30" value="3.6270633577143347" />
-      <entry key="S60" value="5.601741644911724" />
-      <entry key="M2" value="8.536698282944398" />
-      <entry key="M5" value="13.511114615765772" />
-      <entry key="M10" value="21.44209035865315" />
-      <entry key="M15" value="30.19734456398008" />
-      <entry key="M30" value="50.595943355802724" />
-      <entry key="H1" value="77.86178641657578" />
-      <entry key="H2" value="114.73046685506925" />
-      <entry key="H4" value="151.61615928360123" />
-      <entry key="D1" value="201.81681609907696" />
-      <entry key="W1" value="213.03890701488055" />
+      <entry key="MS100" value="2.716076002191458" />
+      <entry key="MS500" value="6.424385225971068" />
+      <entry key="S2" value="8.229189075202303" />
+      <entry key="S5" value="8.679692288894712" />
+      <entry key="S10" value="8.837771282290248" />
+      <entry key="S30" value="8.971701962091" />
+      <entry key="S60" value="9.36950822685797" />
+      <entry key="M2" value="10.52964856243073" />
+      <entry key="M5" value="12.698411342226573" />
+      <entry key="M10" value="15.70139982428809" />
+      <entry key="M15" value="19.05139866505339" />
+      <entry key="M30" value="31.377716084397573" />
+      <entry key="H1" value="58.75311580964546" />
+      <entry key="H2" value="103.62056859948645" />
+      <entry key="H4" value="154.45328750838715" />
+      <entry key="D1" value="232.12312913902392" />
+      <entry key="W1" value="250.7087634434662" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0000008244869532" />
-      <entry key="MS500" value="1.0607067184713521" />
-      <entry key="S2" value="1.4964722120908218" />
-      <entry key="S5" value="1.7805743739012772" />
-      <entry key="S10" value="2.0271574952656466" />
-      <entry key="S30" value="2.565253180028104" />
-      <entry key="S60" value="3.3665061391975373" />
-      <entry key="M2" value="5.077079057924738" />
-      <entry key="M5" value="8.063875109946839" />
-      <entry key="M10" value="10.746476226316432" />
-      <entry key="M15" value="12.759433021032121" />
-      <entry key="M30" value="16.768397068446383" />
-      <entry key="H1" value="22.695423312219496" />
-      <entry key="H2" value="32.13026674111839" />
-      <entry key="H4" value="42.19442736875373" />
-      <entry key="D1" value="56.26640675159497" />
-      <entry key="W1" value="59.44388228384238" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="9.484925208E-313" />
+      <entry key="S10" value="1.4795320843664477E-156" />
+      <entry key="S30" value="2.3096306451852462E-52" />
+      <entry key="S60" value="3.19437251258163E-26" />
+      <entry key="M2" value="4.945577373172449E-13" />
+      <entry key="M5" value="5.034832452737345E-5" />
+      <entry key="M10" value="0.02685262192588749" />
+      <entry key="M15" value="0.23495162500608033" />
+      <entry key="M30" value="2.2754384248057447" />
+      <entry key="H1" value="8.360361501613399" />
+      <entry key="H2" value="19.501037417231505" />
+      <entry key="H4" value="32.87205005994485" />
+      <entry key="D1" value="53.973153919580355" />
+      <entry key="W1" value="59.091571392136714" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.6836223531605586E-6" />
-      <entry key="MS500" value="0.07041236497770666" />
-      <entry key="S2" value="0.7732373639829745" />
-      <entry key="S5" value="1.9426226204429455" />
-      <entry key="S10" value="3.22198785115544" />
-      <entry key="S30" value="5.9654071527473" />
-      <entry key="S60" value="8.805229311082218" />
-      <entry key="M2" value="13.49483379931356" />
-      <entry key="M5" value="21.503803368221764" />
-      <entry key="M10" value="32.14019418637977" />
-      <entry key="M15" value="42.91701546680724" />
-      <entry key="M30" value="67.33633021836212" />
-      <entry key="H1" value="100.53705707189172" />
-      <entry key="H2" value="146.84592001500312" />
-      <entry key="H4" value="193.8007104793588" />
-      <entry key="D1" value="258.08100954983934" />
-      <entry key="W1" value="272.482454938931" />
+      <entry key="MS100" value="2.47685222414776" />
+      <entry key="MS500" value="6.3035837383197695" />
+      <entry key="S2" value="8.18845683714052" />
+      <entry key="S5" value="8.662312015281978" />
+      <entry key="S10" value="8.828888976859632" />
+      <entry key="S30" value="8.968685112606718" />
+      <entry key="S60" value="9.36790726314481" />
+      <entry key="M2" value="10.528712088160448" />
+      <entry key="M5" value="12.697992729808647" />
+      <entry key="M10" value="15.72786135158699" />
+      <entry key="M15" value="19.285421536081433" />
+      <entry key="M30" value="33.64923930524947" />
+      <entry key="H1" value="67.10598900842716" />
+      <entry key="H2" value="123.11258008149706" />
+      <entry key="H4" value="187.31762507753172" />
+      <entry key="D1" value="286.09415677653647" />
+      <entry key="W1" value="309.8000019984929" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -138,6 +142,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
+    "KEY_CHAT_IN_TOOLWINDOW": "false",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -348,7 +353,10 @@
     <MESSAGE value="upd: fix Cosmos.Tools" />
     <MESSAGE value="upd: fix Cosmos.Build.Common.targets" />
     <MESSAGE value="upd: patcher structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="upd: patcher structure" />
+    <MESSAGE value="Introduce `RingBuffer` and replace `Queue` in `KeyboardManager`" />
+    <MESSAGE value="revert small change." />
+    <MESSAGE value="Run format." />
+    <option name="LAST_COMMIT_MESSAGE" value="Run format." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
