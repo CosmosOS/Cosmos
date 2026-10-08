@@ -758,7 +758,7 @@ public static class GICv3
         {
             // Step 1: Read PIDR2 at GICv2 offset (0xFE8) - always within 4KB, safe for both v2 and v3
             uint* ptr = (uint*)(distBase + Pidr2OffsetGicv2);
-            uint pidr2 = System.Threading.Volatile.Read(ref *ptr);
+            uint pidr2 = Volatile.Read(ref *ptr);
             uint archRev = (pidr2 >> Pidr2ArchRevShift) & Pidr2ArchRevMask;
 
             Serial.Write("[GIC] PIDR2@0xFE8=0x");
@@ -779,7 +779,7 @@ public static class GICv3
             // is mapped to at least 4KB, and a GICv3 maps 64KB.
             Serial.Write(" (zero, trying 0xFFE8)\n");
             ptr = (uint*)(distBase + Pidr2OffsetGicv3);
-            pidr2 = System.Threading.Volatile.Read(ref *ptr);
+            pidr2 = Volatile.Read(ref *ptr);
             archRev = (pidr2 >> Pidr2ArchRevShift) & Pidr2ArchRevMask;
 
             Serial.Write("[GIC] PIDR2@0xFFE8=0x");
@@ -813,7 +813,7 @@ public static class GICv3
         unsafe
         {
             uint* ptr = (uint*)(s_gicDistBase + offset);
-            return System.Threading.Volatile.Read(ref *ptr);
+            return Volatile.Read(ref *ptr);
         }
     }
 
@@ -823,7 +823,7 @@ public static class GICv3
         unsafe
         {
             uint* ptr = (uint*)(s_gicDistBase + offset);
-            System.Threading.Volatile.Write(ref *ptr, value);
+            Volatile.Write(ref *ptr, value);
         }
     }
 
@@ -833,7 +833,7 @@ public static class GICv3
         unsafe
         {
             ulong* ptr = (ulong*)(s_gicDistBase + offset);
-            System.Threading.Volatile.Write(ref *ptr, value);
+            Volatile.Write(ref *ptr, value);
         }
     }
 
@@ -844,7 +844,7 @@ public static class GICv3
         unsafe
         {
             uint* ptr = (uint*)(baseAddr + offset);
-            return System.Threading.Volatile.Read(ref *ptr);
+            return Volatile.Read(ref *ptr);
         }
     }
 
@@ -854,7 +854,7 @@ public static class GICv3
         unsafe
         {
             ulong* ptr = (ulong*)(baseAddr + offset);
-            return System.Threading.Volatile.Read(ref *ptr);
+            return Volatile.Read(ref *ptr);
         }
     }
 
@@ -864,7 +864,7 @@ public static class GICv3
         unsafe
         {
             uint* ptr = (uint*)(baseAddr + offset);
-            System.Threading.Volatile.Write(ref *ptr, value);
+            Volatile.Write(ref *ptr, value);
         }
     }
 }

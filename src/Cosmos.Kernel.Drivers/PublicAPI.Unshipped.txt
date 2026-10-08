@@ -7,6 +7,10 @@ Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver
 Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver.VirtioPciTransportDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver
 Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.XhciDriver() -> void
+Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver
+Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.AmdDcnDriver() -> void
+Cosmos.Kernel.Drivers.Pci.Display.IntelGraphics.IntelGraphicsDriver
+Cosmos.Kernel.Drivers.Pci.Display.IntelGraphics.IntelGraphicsDriver.IntelGraphicsDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver
 Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.VmwareSvgaDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Network.E1000E.E1000EDriver
@@ -29,6 +33,8 @@ Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver
 Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver.UsbHubDriver() -> void
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver
 Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.UsbKeyboardDriver() -> void
+Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver
+Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver.UsbMouseDriver() -> void
 Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver
 Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.UsbMassStorageDriver() -> void
 Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu.VirtioGpuDriver
@@ -55,6 +61,14 @@ override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.Matches.get -> System.Rea
 override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.Pci.Display.AmdDcn.AmdDcnDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.Pci.Display.IntelGraphics.IntelGraphicsDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.Pci.Display.IntelGraphics.IntelGraphicsDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.Pci.Display.IntelGraphics.IntelGraphicsDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.Pci.Display.IntelGraphics.IntelGraphicsDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Display.VmwareSvga.VmwareSvgaDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
@@ -95,6 +109,9 @@ override Cosmos.Kernel.Drivers.Usb.Bus.UsbHub.UsbHubDriver.Probe(Cosmos.Kernel.H
 override Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard.UsbKeyboardDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.Usb.Input.UsbMouse.UsbMouseDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage.UsbMassStorageDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void

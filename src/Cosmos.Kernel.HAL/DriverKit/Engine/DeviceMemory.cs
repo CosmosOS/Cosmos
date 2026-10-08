@@ -10,7 +10,9 @@ namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 /// uncacheable 2 MiB page above 4 GiB, ARM64 a 2 MiB Device block in
 /// TTBR1), so a window is mapped by asking for every block it touches:
 /// asking for its two ends alone leaves the middle of a window wider than
-/// two blocks unmapped. Thread context.
+/// two blocks unmapped. A write-combining window gets that attribute in the
+/// blocks it covers whole, since a block's attributes apply to all of it,
+/// and device memory in a block it shares. Thread context.
 /// </summary>
 internal static class DeviceMemory
 {
@@ -25,8 +27,9 @@ internal static class DeviceMemory
     /// </summary>
     /// <param name="physicalBase">Physical address of the first byte.</param>
     /// <param name="length">Length in bytes.</param>
+    /// <param name="writeCombining">Whether the blocks the window covers whole are mapped write-combining, for a framebuffer.</param>
     /// <returns>False when there is no platform initializer, the window wraps the address space, or a block cannot be mapped; nothing past the first refusal is asked for.</returns>
-    public static bool EnsureWindowMapped(ulong physicalBase, ulong length)
+    public static bool EnsureWindowMapped(ulong physicalBase, ulong length, bool writeCombining = false)
     {
         IPlatformInitializer? initializer = PlatformHAL.Initializer;
         if (initializer is null)
@@ -49,7 +52,11 @@ internal static class DeviceMemory
         ulong address = physicalBase;
         while (true)
         {
-            if (!initializer.EnsureMmioMapped(address))
+            bool whole = block >= physicalBase && last - block >= MappingBlockSize - 1;
+            bool mapped = writeCombining && whole
+                ? initializer.EnsureWriteCombiningMapped(address)
+                : initializer.EnsureMmioMapped(address);
+            if (!mapped)
             {
                 return false;
             }

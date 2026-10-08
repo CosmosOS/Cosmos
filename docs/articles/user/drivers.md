@@ -25,9 +25,9 @@ What the kit supports today:
 | Bus | Drivers |
 |-----|---------|
 | Platform | `PciHostDriver`, `I8042Driver`, `VirtioMmioTransportDriver` |
-| PCI | `PcieRootPortDriver`, `VirtioPciTransportDriver`, `XhciDriver`, `E1000EDriver`, `AhciDriver`, `NvmeDriver`, `VmwareSvgaDriver` |
+| PCI | `PcieRootPortDriver`, `VirtioPciTransportDriver`, `XhciDriver`, `E1000EDriver`, `AhciDriver`, `NvmeDriver`, `VmwareSvgaDriver`, `AmdDcnDriver`, `IntelGraphicsDriver` |
 | Virtio | `VirtioNetDriver`, `VirtioBlkDriver`, `VirtioGpuDriver`, `VirtioInputDriver` |
-| USB | `UsbHubDriver`, `UsbKeyboardDriver`, `UsbMassStorageDriver` |
+| USB | `UsbHubDriver`, `UsbKeyboardDriver`, `UsbMouseDriver`, `UsbMassStorageDriver` |
 | PS/2 | `Ps2KeyboardDriver`, `Ps2MouseDriver` |
 
 Their sources are filed as `<bus>/<category>/<driver>/` (for example `Pci/Network/E1000E/`), and the namespace follows the folder.
@@ -324,7 +324,7 @@ The second argument tells the CPU how to cache the region. Pick it by what the r
 - `RegionCaching.WriteCombining` for a framebuffer: writes are grouped into bursts, which is much faster for drawing pixels.
 - `RegionCaching.Normal` for ordinary RAM shared with the device.
 
-Today every memory window is mapped as `Device`, whatever you ask. Pick the right value anyway: the kit records it and will apply it once the platform supports it.
+On x64, `WriteCombining` is applied to every 2 MiB block the region covers whole; a block it shares with something else stays `Device`. Every other choice, and every choice on ARM64, is mapped as `Device` today. Pick the right value anyway: the kit records it and will apply it once the platform supports it.
 
 ### DMA memory
 
@@ -903,6 +903,8 @@ public override void OnDetach(DeviceBinding binding, DetachReason reason)
 |--------|----------|-------|
 | `VirtioGpuDriver` | virtio-gpu, over PCI or MMIO | 2D: the guest draws, the host composites |
 | `VmwareSvgaDriver` | VMware SVGA II, PCI, x64 only | Switches modes and draws a hardware cursor; replaces the firmware framebuffer, which lives in its VRAM |
+| `AmdDcnDriver` | AMD DCN 3.1.5, the integrated Radeon graphics of Ryzen 7000 (Raphael, Dragon Range) and Ryzen 9000 (Granite Ridge) processors, PCI | Keeps the mode the UEFI firmware set (no mode switching); flips between three frames in VRAM at the vertical update, so nothing tears, and draws a hardware cursor; replaces the firmware framebuffer, which lives in its VRAM. A legacy (CSM) boot, a laptop in discrete-GPU-only mode, or a surface it cannot draw into makes it decline, with the reason recorded on the offer, where `DriverDiagnostics` reports it |
+| `IntelGraphicsDriver` | The integrated graphics of Intel Core processors from the 2nd generation (Sandy Bridge, HD Graphics 2000 and 3000) to the 14th (Raptor Lake, UHD and Iris Xe Graphics), PCI | Keeps the mode the UEFI firmware set (no mode switching); flips between three frames in stolen memory at the vertical blank, so nothing tears, and draws a hardware cursor; replaces the firmware framebuffer, which it reaches through the GPU's aperture. A legacy (CSM) boot, a surface it cannot draw into, or a device id outside the table it shares with Linux's i915 makes it decline; too little stolen memory after the firmware's surface leaves it drawing without flipping or without a cursor, which the bind log says |
 
 ### The storage drivers
 
@@ -916,7 +918,7 @@ A USB stick is handled by `UsbMassStorageDriver` ([The USB class drivers](#the-u
 
 ## USB devices
 
-A USB node is one interface of a USB device, published by the host controller driver for a device on a root port, or by the hub driver for a device behind a hub. It has no resources, no interrupt sources and a `UsbAccess` for everything a class driver does. A device with several interfaces gives several nodes. A class driver never sees the controller or the hubs above it; the shipped `UsbKeyboardDriver` and `UsbMassStorageDriver` are good models.
+A USB node is one interface of a USB device, published by the host controller driver for a device on a root port, or by the hub driver for a device behind a hub. It has no resources, no interrupt sources and a `UsbAccess` for everything a class driver does. A device with several interfaces gives several nodes. A class driver never sees the controller or the hubs above it; the shipped `UsbKeyboardDriver`, `UsbMouseDriver` and `UsbMassStorageDriver` are good models.
 
 ### USB identity and match
 
@@ -1002,6 +1004,7 @@ A host controller driver binds the controller's own node and implements `UsbHost
 | Driver | Matches | Publishes |
 |--------|---------|-----------|
 | `UsbKeyboardDriver` | HID boot keyboards | a keyboard, `usb-keyboard` |
+| `UsbMouseDriver` | HID boot mice | a pointer, `usb-mouse` |
 | `UsbMassStorageDriver` | Mass storage over bulk-only transport (sticks, card readers, USB disks) | a block device per unit, `usb<n>` |
 | `UsbHubDriver` | Hubs | the devices behind the hub, as child nodes |
 

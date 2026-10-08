@@ -12,6 +12,7 @@ using Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio;
 using Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard;
 using Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse;
 using Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard;
+using Cosmos.Kernel.Drivers.Usb.Input.UsbMouse;
 using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.Devices.Input;
@@ -59,11 +60,15 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// proves the kit's Usb bus kind over it, the decline-after-open
 /// fall-through to the shipped <see cref="UsbKeyboardDriver"/>, and the
 /// unplug and replug the engine performs over QMP when a test asks; the
-/// group skips on the other cells, which have no controller. q35's built-in
-/// 8042 carries a keyboard and a mouse on every x64 cell: the PS/2 group
-/// proves the kit's Ps2 bus kind over it, with the key and the pointer
-/// events the engine injects over QMP when a test asks; virt has no 8042
-/// and the group skips on arm64. The virtio-blk-pci cell (both arches) and
+/// group skips on the other cells. The usb-mouse cell puts a usb-mouse on
+/// the same controller: the USB mouse group proves the shipped
+/// <see cref="UsbMouseDriver"/> with the pointer events the engine injects
+/// over QMP, which QEMU hands to the USB mouse once its driver polls it;
+/// the group skips on the other cells. q35's built-in 8042 carries a
+/// keyboard and a mouse on every x64 cell: the PS/2 group proves the kit's
+/// Ps2 bus kind over it, with the key and the pointer events the engine
+/// injects over QMP when a test asks; virt has no 8042 and the group skips
+/// on arm64. The virtio-blk-pci cell (both arches) and
 /// the virtio-blk-mmio cell (arm64) attach one virtio-blk disk: the
 /// virtio-blk group proves the shipped <see cref="VirtioBlkDriver"/>
 /// over the kit's Virtio bus kind under either transport, publishing the
@@ -87,8 +92,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 7 PS/2, 6 virtio-blk, 3 PCI Express root port.</summary>
-    private const int ExpectedTestCount = 56;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 4 USB mouse, 7 PS/2, 6 virtio-blk, 3 PCI Express root port.</summary>
+    private const int ExpectedTestCount = 60;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -198,6 +203,15 @@ public class Kernel : Sys.Kernel
     /// <summary>Asks the engine to plug it back in.</summary>
     private const string UsbKeyboardPlugRequest = "usb-kbd-plug";
 
+    /// <summary>The end of an interface node's description for a HID boot mouse: interface class 03, subclass 01, protocol 02.</summary>
+    private const string UsbMouseDescriptionSuffix = "class 03.01.02";
+
+    /// <summary>The name the shipped driver publishes its mouse under.</summary>
+    private const string UsbMouseName = "usb-mouse";
+
+    /// <summary>Bytes of a report from QEMU's usb-mouse: the buttons, X, Y and the wheel.</summary>
+    private const int UsbMouseReportLength = 4;
+
     /// <summary>
     /// Longest wait for the hot-plug thread and the kit worker to follow a
     /// plug or an unplug. Well inside the engine's stall window: 10 s
@@ -208,8 +222,14 @@ public class Kernel : Sys.Kernel
     /// <summary>How long a hot-plug wait sleeps between looks, so those threads get to run.</summary>
     private const int HotPlugPollMilliseconds = 50;
 
-    /// <summary>Skip reason of the USB keyboard tests on a cell whose bus carries no xHCI controller.</summary>
+    /// <summary>Skip reason of the USB tests on a cell whose bus carries no xHCI controller.</summary>
     private const string SkipNoXhci = "no xHCI controller on this cell";
+
+    /// <summary>Skip reason of the USB keyboard tests on a cell whose controller carries no keyboard.</summary>
+    private const string SkipNoUsbKeyboard = "no USB keyboard on this cell";
+
+    /// <summary>Skip reason of the USB mouse tests on a cell whose controller carries no mouse.</summary>
+    private const string SkipNoUsbMouse = "no USB mouse on this cell";
 
     /// <summary>The HID output report lighting Num Lock (bit 0) and Caps Lock (bit 1).</summary>
     private const byte NumLockCapsLockReport = 0x03;
@@ -253,17 +273,26 @@ public class Kernel : Sys.Kernel
     /// <summary>Asks the engine to press and release a key (see TR.RequestHost): QEMU's qcode a, which the controller's translation delivers as set 1 make 0x1E and break 0x9E.</summary>
     private const string Ps2KeyRequest = "key-press a";
 
-    /// <summary>Asks the engine to move the mouse 10 units right and none down.</summary>
-    private const string Ps2MouseMoveRequest = "mouse-move 10 0";
+    /// <summary>Asks the engine to move the mouse 10 units right and none down; QEMU hands it to the active mouse, the USB one when present.</summary>
+    private const string MouseMoveRequest = "mouse-move 10 0";
 
     /// <summary>Asks the engine to press the left mouse button.</summary>
-    private const string Ps2MouseButtonDownRequest = "mouse-button left down";
+    private const string MouseButtonDownRequest = "mouse-button left down";
 
     /// <summary>Asks the engine to release it.</summary>
-    private const string Ps2MouseButtonUpRequest = "mouse-button left up";
+    private const string MouseButtonUpRequest = "mouse-button left up";
+
+    /// <summary>Asks the engine to turn the wheel one notch toward the user: QEMU's wheel-down button, pressed.</summary>
+    private const string MouseWheelDownRequest = "mouse-button wheel-down down";
+
+    /// <summary>Asks the engine to release the wheel-down button, which turns nothing.</summary>
+    private const string MouseWheelDownReleaseRequest = "mouse-button wheel-down up";
 
     /// <summary>The horizontal movement the move request asks for.</summary>
-    private const int Ps2MoveDeltaX = 10;
+    private const int MoveDeltaX = 10;
+
+    /// <summary>The ring's wheel delta for one notch toward the user: positive scrolls down.</summary>
+    private const int WheelDownNotch = 1;
 
     /// <summary>0xED's byte: num lock bit 1, caps lock bit 2.</summary>
     private const byte NumLockCapsLockLedByte = 0x06;
@@ -276,6 +305,9 @@ public class Kernel : Sys.Kernel
 
     /// <summary>Skip reason of the key injection test on a cell with a USB keyboard, which QEMU hands the key to.</summary>
     private const string SkipUsbKeyboardTakesKeys = "a usb-kbd on this cell takes the host's keys";
+
+    /// <summary>Skip reason of the pointer injection tests on a cell with a USB mouse, which QEMU hands the events to.</summary>
+    private const string SkipUsbMouseTakesPointer = "a usb-mouse on this cell takes the host's pointer events";
 
     /// <summary>Bus name of the device nodes the virtio transport drivers publish.</summary>
     private const string VirtioBusName = "virtio";
@@ -379,6 +411,7 @@ public class Kernel : Sys.Kernel
     private string? _xhciPath;
     private string? _usbKeyboardPath;
     private DeviceNode? _usbKeyboardNode;
+    private string? _usbMousePath;
     private string? _i8042Path;
     private string? _virtioBlkPath;
     private string? _rootPortPath;
@@ -473,36 +506,55 @@ public class Kernel : Sys.Kernel
         // ==================== USB keyboard ====================
         // The usb-kbd cell carries a qemu-xhci controller with a usb-kbd plugged
         // in at boot; the engine unplugs and replugs it over QMP when asked. On
-        // the bare cell there is no controller and the group skips.
+        // the bare cell there is no controller and the group skips, and on the
+        // usb-mouse cell the controller carries no keyboard. The xHCI probe
+        // scans the root ports at the driver stage, so a device present at
+        // boot is in the tree by now.
         _xhciPath = FindXhciPath();
         bool hasXhci = _xhciPath is not null;
+        bool hasUsbKeyboard = hasXhci && FindUsbKeyboardPath() is not null;
+        string skipUsbKeyboard = hasXhci ? SkipNoUsbKeyboard : SkipNoXhci;
         TR.RunIf(hasXhci, "Usb_XhciHost_Bound", TestUsbXhciHostBound, SkipNoXhci);
-        TR.RunIf(hasXhci, "Usb_Keyboard_BoundAfterDecline", TestUsbKeyboardBoundAfterDecline, SkipNoXhci);
-        TR.RunIf(hasXhci, "Usb_Keyboard_SetLedsRoundTrip", TestUsbKeyboardSetLedsRoundTrip, SkipNoXhci);
-        TR.RunIf(hasXhci, "Usb_Keyboard_Unplug_RetractsNode", TestUsbKeyboardUnplugRetractsNode, SkipNoXhci);
-        TR.RunIf(hasXhci, "Usb_Keyboard_Replug_PublishesAgain", TestUsbKeyboardReplugPublishesAgain, SkipNoXhci);
-        TR.RunIf(hasXhci, "Usb_Keyboard_Replug_SetLeds", TestUsbKeyboardReplugSetLeds, SkipNoXhci);
+        TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_BoundAfterDecline", TestUsbKeyboardBoundAfterDecline, skipUsbKeyboard);
+        TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_SetLedsRoundTrip", TestUsbKeyboardSetLedsRoundTrip, skipUsbKeyboard);
+        TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_Unplug_RetractsNode", TestUsbKeyboardUnplugRetractsNode, skipUsbKeyboard);
+        TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_Replug_PublishesAgain", TestUsbKeyboardReplugPublishesAgain, skipUsbKeyboard);
+        TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_Replug_SetLeds", TestUsbKeyboardReplugSetLeds, skipUsbKeyboard);
+
+        // ==================== USB mouse ====================
+        // The usb-mouse cell carries a qemu-xhci controller with a usb-mouse
+        // plugged in at boot; the engine injects pointer events over QMP when
+        // asked, which QEMU hands to the USB mouse once its driver polls it.
+        _usbMousePath = hasXhci ? FindUsbMousePath() : null;
+        bool hasUsbMouse = _usbMousePath is not null;
+        string skipUsbMouse = hasXhci ? SkipNoUsbMouse : SkipNoXhci;
+        TR.RunIf(hasUsbMouse, "Usb_Mouse_Bound", TestUsbMouseBound, skipUsbMouse);
+        TR.RunIf(hasUsbMouse, "Usb_Mouse_MovementInjected", TestUsbMouseMovementInjected, skipUsbMouse);
+        TR.RunIf(hasUsbMouse, "Usb_Mouse_ButtonInjected", TestUsbMouseButtonInjected, skipUsbMouse);
+        TR.RunIf(hasUsbMouse, "Usb_Mouse_WheelInjected", TestUsbMouseWheelInjected, skipUsbMouse);
 
         // ==================== PS/2 ====================
-        // q35 has an 8042 with a keyboard and a mouse built in, on both x64
-        // cells; virt has none and the group skips. The host injects a key and
-        // pointer events over QMP when asked; with a usb-kbd present QEMU hands
-        // the key to it, so the key test runs on the bare cell only.
+        // q35 has an 8042 with a keyboard and a mouse built in, on every x64
+        // cell; virt has none and the group skips. The host injects a key and
+        // pointer events over QMP when asked; QEMU hands the key to a usb-kbd
+        // and the pointer events to a usb-mouse when one is present, so the
+        // key test skips on usb-kbd and the pointer tests on usb-mouse.
         _i8042Path = FindI8042Path();
         bool has8042 = _i8042Path is not null;
         TR.RunIf(has8042, "Ps2_Controller_Bound", TestPs2ControllerBound, SkipNo8042);
         TR.RunIf(has8042, "Ps2_Keyboard_Bound", TestPs2KeyboardBound, SkipNo8042);
-        TR.RunIf(has8042 && !hasXhci, "Ps2_Keyboard_KeyInjected", TestPs2KeyboardKeyInjected, has8042 ? SkipUsbKeyboardTakesKeys : SkipNo8042);
+        TR.RunIf(has8042 && !hasUsbKeyboard, "Ps2_Keyboard_KeyInjected", TestPs2KeyboardKeyInjected, has8042 ? SkipUsbKeyboardTakesKeys : SkipNo8042);
         TR.RunIf(has8042, "Ps2_Keyboard_SetLedsRoundTrip", TestPs2KeyboardSetLedsRoundTrip, SkipNo8042);
         TR.RunIf(has8042, "Ps2_Mouse_Bound", TestPs2MouseBound, SkipNo8042);
-        TR.RunIf(has8042, "Ps2_Mouse_MovementInjected", TestPs2MouseMovementInjected, SkipNo8042);
-        TR.RunIf(has8042, "Ps2_Mouse_ButtonInjected", TestPs2MouseButtonInjected, SkipNo8042);
+        TR.RunIf(has8042 && !hasUsbMouse, "Ps2_Mouse_MovementInjected", TestPs2MouseMovementInjected, has8042 ? SkipUsbMouseTakesPointer : SkipNo8042);
+        TR.RunIf(has8042 && !hasUsbMouse, "Ps2_Mouse_ButtonInjected", TestPs2MouseButtonInjected, has8042 ? SkipUsbMouseTakesPointer : SkipNo8042);
 
         // ==================== virtio-blk ====================
         // The virtio-blk-pci and virtio-blk-mmio cells attach one virtio-blk disk;
-        // bare and usb-kbd attach none and the group skips. The driver under test
-        // is the shipped VirtioBlkDriver, written in this suite's library over
-        // the public seam and promoted with its namespace as the only change.
+        // bare, usb-kbd and usb-mouse attach none and the group skips. The
+        // driver under test is the shipped VirtioBlkDriver, written in this
+        // suite's library over the public seam and promoted with its namespace
+        // as the only change.
         _virtioBlkPath = FindVirtioBlkPath();
         bool hasVirtioBlk = _virtioBlkPath is not null;
         TR.RunIf(hasVirtioBlk, "VirtioBlk_Bound", TestVirtioBlkBound, SkipNoVirtioBlk);
@@ -1333,7 +1385,7 @@ public class Kernel : Sys.Kernel
 
         Assert.True(info.State == DeviceNodeState.Bound, "the xHCI driver should hold the controller");
         Assert.True(info.DriverName == nameof(XhciDriver), "XhciDriver should hold the controller");
-        Assert.True(info.ChildCount >= 1, "the controller should have published the keyboard's interface node under it");
+        Assert.True(info.ChildCount >= 1, "the controller should have published the boot-time device's interface node under it");
         Assert.True(info.HeldResourceCount >= 1, "the binding should hold the controller's register window at least");
 
         XhciState? state = FindDriverState<XhciState>(path);
@@ -1345,7 +1397,7 @@ public class Kernel : Sys.Kernel
 
         Assert.True(state.HotPlugRunning, "TryStartThread needs the scheduler");
         Assert.True(state.HasInterrupt != state.IsPolling, "the controller takes its events from a message interrupt or polls, never both or neither");
-        Assert.True(state.Bus.DeviceCount >= 1, "the bus should carry the keyboard plugged in at boot");
+        Assert.True(state.Bus.DeviceCount >= 1, "the bus should carry the device plugged in at boot");
         Assert.Equal(1, state.Bus.Ordinal, "the cell's one controller is bus 1");
     }
 
@@ -1520,6 +1572,118 @@ public class Kernel : Sys.Kernel
         Assert.Equal(ScrollLockReport, state.LastLedReport, "the report should carry the HID Scroll Lock bit");
         Assert.True(state.LastLedStatus == UsbTransferStatus.Success, "the replugged keyboard should accept the output report");
         Assert.Equal(1, state.LedWrites, "a fresh state should count this write alone");
+    }
+
+    // ==================== USB mouse ====================
+    //
+    // The shipped HID boot mouse driver over the usb-mouse cell's qemu-xhci
+    // controller: the mouse interface bound on the first offer and its
+    // pointer consumed by the ring's mouse manager, then a movement, a button
+    // and a wheel notch the engine injects over QMP. QEMU routes those to the
+    // most recently activated mouse, and its usb-mouse activates on the first
+    // poll of its report endpoint, which the driver's pipe makes before the
+    // suite runs, so on x64 the events reach the USB mouse and not q35's
+    // PS/2 one. The shipped driver is no RecordingDriver, so its work shows
+    // through the node, the state's counters and the suite's pointer consumer.
+
+    // The mouse published at boot went to the ring's consumer, as the
+    // keyboards did; the suite's pointer consumer never saw it.
+    private void TestUsbMouseBound()
+    {
+        if (!TryGetUsbMousePath(out string? path))
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(path, out DeviceNodeInfo info), "the mouse node should be in the tree");
+        Assert.True(info.State == DeviceNodeState.Bound, "the mouse interface should be bound");
+        Assert.True(info.DriverName == nameof(UsbMouseDriver), "UsbMouseDriver should hold the mouse interface");
+        Assert.True(info.ParentPath == _xhciPath, "the interface node should sit under the controller's node");
+        Assert.True(info.BusName == UsbBusName, "the interface node sits on the usb bus");
+        Assert.Equal(0, info.ResourceCount, "a USB interface node carries no resources");
+        Assert.Equal(0, info.InterruptCount, "a USB interface node carries no interrupt sources");
+        Assert.Equal(1, info.OfferCount, "the shipped driver should have bound on the first offer");
+        Assert.Equal(1, info.PublishedDeviceCount, "the binding should publish one pointer");
+
+        int deviceIndex = FindDeviceIndex(UsbMouseName);
+        Assert.True(deviceIndex >= 0, "the mouse should be in the published list");
+        if (DriverDiagnostics.TryGetDevice(deviceIndex, out PublishedDeviceInfo device))
+        {
+            Assert.True(device.Kind == PublishedDeviceKind.Pointer, "the published device should be a pointer");
+            Assert.True(device.IsConsumed, "the pointer consumer should have taken the mouse");
+            Assert.False(device.IsWithdrawn, "the mouse should still be published");
+            Assert.True(device.DriverName == nameof(UsbMouseDriver), "the published device should name its driver");
+            Assert.True(device.NodePath == path, "the published device should name the interface node");
+        }
+    }
+
+    // QEMU's usb-mouse clamps a delta to 127 per report, so a 10 unit move
+    // is one report; the wait is on the total all the same.
+    private void TestUsbMouseMovementInjected()
+    {
+        if (!TryGetUsbMouseState(out UsbMouseState? state))
+        {
+            return;
+        }
+
+        int totalXBefore = _pointerConsumer.TotalDeltaX;
+        int totalYBefore = _pointerConsumer.TotalDeltaY;
+        int reportsBefore = state.ReportCount;
+
+        TR.RequestHost(MouseMoveRequest);
+
+        Assert.True(WaitUntil(() => _pointerConsumer.TotalDeltaX >= totalXBefore + MoveDeltaX), "the movement should reach the pointer consumer");
+        Assert.Equal(totalXBefore + MoveDeltaX, _pointerConsumer.TotalDeltaX, "the reports of a 10 unit move sum to 10");
+        Assert.Equal(totalYBefore, _pointerConsumer.TotalDeltaY, "a horizontal move has no vertical part");
+        Assert.True(_pointerConsumer.LastButtons == PointerButtons.None, "no button is down during the move");
+        Assert.Equal(0, _pointerConsumer.LastWheel, "the wheel did not turn");
+        Assert.True(_pointerConsumer.LastDevice is { Device: IPointer pointer } && pointer.Name == UsbMouseName, "the movement came from the USB mouse");
+        Assert.True(state.ReportCount >= reportsBefore + 1, "the driver should have forwarded at least one report");
+        Assert.Equal(0, state.ShortReportDrops, "every report should carry the boot part");
+        Assert.Equal(UsbMouseReportLength, state.LastReportLength, "QEMU's usb-mouse sends the wheel byte after the boot part");
+    }
+
+    private void TestUsbMouseButtonInjected()
+    {
+        if (!TryGetUsbMouseState(out _))
+        {
+            return;
+        }
+
+        int reportsBefore = _pointerConsumer.RelativeCount;
+
+        TR.RequestHost(MouseButtonDownRequest);
+
+        Assert.True(WaitUntil(() => _pointerConsumer.RelativeCount > reportsBefore && (_pointerConsumer.LastButtons & PointerButtons.Left) != 0), "the button press should reach the pointer consumer");
+        Assert.True(_pointerConsumer.LastButtons == PointerButtons.Left, "only the left button is down");
+        Assert.True(_pointerConsumer.LastDevice is { Device: IPointer pointer } && pointer.Name == UsbMouseName, "the press came from the USB mouse");
+
+        reportsBefore = _pointerConsumer.RelativeCount;
+
+        TR.RequestHost(MouseButtonUpRequest);
+
+        Assert.True(WaitUntil(() => _pointerConsumer.RelativeCount > reportsBefore && _pointerConsumer.LastButtons == PointerButtons.None), "the button release should reach the pointer consumer");
+    }
+
+    // HID turns the wheel positive away from the user and the ring positive
+    // toward, so one notch down must arrive as +1: the driver's negation is
+    // what this pins.
+    private void TestUsbMouseWheelInjected()
+    {
+        if (!TryGetUsbMouseState(out _))
+        {
+            return;
+        }
+
+        int wheelBefore = _pointerConsumer.TotalWheel;
+
+        TR.RequestHost(MouseWheelDownRequest);
+        TR.RequestHost(MouseWheelDownReleaseRequest);
+
+        Assert.True(WaitUntil(() => _pointerConsumer.TotalWheel != wheelBefore), "the wheel notch should reach the pointer consumer");
+        Assert.Equal(wheelBefore + WheelDownNotch, _pointerConsumer.TotalWheel, "one notch toward the user is +1, scrolling down");
+        Assert.True(_pointerConsumer.LastButtons == PointerButtons.None, "the wheel is no button");
+        Assert.True(_pointerConsumer.LastDevice is { Device: IPointer pointer } && pointer.Name == UsbMouseName, "the notch came from the USB mouse");
     }
 
     // ==================== PS/2 ====================
@@ -1701,10 +1865,10 @@ public class Kernel : Sys.Kernel
         int totalYBefore = _pointerConsumer.TotalDeltaY;
         int packetsBefore = state.PacketsReported;
 
-        TR.RequestHost(Ps2MouseMoveRequest);
+        TR.RequestHost(MouseMoveRequest);
 
         Assert.True(WaitUntil(() => _pointerConsumer.RelativeCount >= reportsBefore + 1), "the movement should reach the pointer consumer");
-        Assert.Equal(totalXBefore + Ps2MoveDeltaX, _pointerConsumer.TotalDeltaX, "the packets of a 10 unit move sum to 10");
+        Assert.Equal(totalXBefore + MoveDeltaX, _pointerConsumer.TotalDeltaX, "the packets of a 10 unit move sum to 10");
         Assert.Equal(totalYBefore, _pointerConsumer.TotalDeltaY, "a horizontal move has no vertical part");
         Assert.True(_pointerConsumer.LastButtons == PointerButtons.None, "no button is down during the move");
         Assert.Equal(0, _pointerConsumer.LastWheel, "the wheel did not turn");
@@ -1722,14 +1886,14 @@ public class Kernel : Sys.Kernel
 
         int reportsBefore = _pointerConsumer.RelativeCount;
 
-        TR.RequestHost(Ps2MouseButtonDownRequest);
+        TR.RequestHost(MouseButtonDownRequest);
 
         Assert.True(WaitUntil(() => _pointerConsumer.RelativeCount > reportsBefore && (_pointerConsumer.LastButtons & PointerButtons.Left) != 0), "the button press should reach the pointer consumer");
         Assert.True(_pointerConsumer.LastButtons == PointerButtons.Left, "only the left button is down");
 
         reportsBefore = _pointerConsumer.RelativeCount;
 
-        TR.RequestHost(Ps2MouseButtonUpRequest);
+        TR.RequestHost(MouseButtonUpRequest);
 
         Assert.True(WaitUntil(() => _pointerConsumer.RelativeCount > reportsBefore && _pointerConsumer.LastButtons == PointerButtons.None), "the button release should reach the pointer consumer");
     }
@@ -2245,6 +2409,28 @@ public class Kernel : Sys.Kernel
         return null;
     }
 
+    /// <summary>
+    /// Finds the path of the first usb node describing a HID boot mouse
+    /// interface that is not retracted, compared ordinally as the keyboard's is.
+    /// </summary>
+    /// <returns>The node's path, or null when no live mouse interface is in the tree.</returns>
+    private static string? FindUsbMousePath()
+    {
+        int count = DriverDiagnostics.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
+                && info.BusName == UsbBusName
+                && info.Description.EndsWith(UsbMouseDescriptionSuffix, StringComparison.Ordinal)
+                && info.State != DeviceNodeState.Retracted)
+            {
+                return info.Path;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>Hands back the controller's path and a fresh snapshot of its node, or fails the test when BeforeRun found none.</summary>
     /// <param name="path">The node's path.</param>
     /// <param name="info">The node's snapshot.</param>
@@ -2487,6 +2673,37 @@ public class Kernel : Sys.Kernel
 
         state = FindDriverState<UsbKeyboardState>(path);
         Assert.NotNull(state, "the keyboard interface should be bound by UsbKeyboardDriver");
+        return state is not null;
+    }
+
+    /// <summary>Hands back the mouse interface's path as BeforeRun found it, or fails the test when it found none.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <returns>True when BeforeRun found the mouse.</returns>
+    private bool TryGetUsbMousePath([NotNullWhen(true)] out string? path)
+    {
+        path = _usbMousePath;
+        if (path is null)
+        {
+            Assert.Fail("BeforeRun found no USB mouse interface");
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>Hands back the shipped mouse driver's state on the mouse interface, or fails the test.</summary>
+    /// <param name="state">The driver state when found.</param>
+    /// <returns>True when the interface is bound by the shipped driver.</returns>
+    private bool TryGetUsbMouseState([NotNullWhen(true)] out UsbMouseState? state)
+    {
+        state = null;
+        if (!TryGetUsbMousePath(out string? path))
+        {
+            return false;
+        }
+
+        state = FindDriverState<UsbMouseState>(path);
+        Assert.NotNull(state, "the mouse interface should be bound by UsbMouseDriver");
         return state is not null;
     }
 

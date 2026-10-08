@@ -20,6 +20,7 @@ internal sealed class TestPointerConsumer : PointerConsumer
     private volatile int _absoluteCount;
     private volatile int _totalDeltaX;
     private volatile int _totalDeltaY;
+    private volatile int _totalWheel;
     private volatile int _lastDeltaX;
     private volatile int _lastDeltaY;
     private volatile int _lastWheel;
@@ -42,6 +43,9 @@ internal sealed class TestPointerConsumer : PointerConsumer
 
     /// <summary>The sum of every vertical delta reported.</summary>
     public int TotalDeltaY => _totalDeltaY;
+
+    /// <summary>The sum of every wheel delta reported.</summary>
+    public int TotalWheel => _totalWheel;
 
     /// <summary>The horizontal delta of the last relative report.</summary>
     public int LastDeltaX => _lastDeltaX;
@@ -88,6 +92,7 @@ internal sealed class TestPointerConsumer : PointerConsumer
     {
         _totalDeltaX += deltaX;
         _totalDeltaY += deltaY;
+        _totalWheel += wheel;
         _lastDeltaX = deltaX;
         _lastDeltaY = deltaY;
         _lastWheel = wheel;

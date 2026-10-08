@@ -104,9 +104,9 @@ public static class SchedulerManager
         s_allThreads = new SchedulerThread?[SchedulerThread.MaxThreadCount];
         s_allThreadCount = 0;
 
-        Cosmos.Kernel.Core.Runtime.DebugLiveSnapshot.Initialize();
-        Cosmos.Kernel.Core.Runtime.DebugLiveGCSnapshot.Initialize();
-        Cosmos.Kernel.Core.Runtime.DebugLiveMemorySnapshot.Initialize();
+        Runtime.DebugLiveSnapshot.Initialize();
+        Runtime.DebugLiveGCSnapshot.Initialize();
+        Runtime.DebugLiveMemorySnapshot.Initialize();
     }
 
     /// <summary>
@@ -453,7 +453,7 @@ public static class SchedulerManager
     /// </summary>
     internal static ulong GetBusyCpuTimeNs()
     {
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             SchedulerThread?[]? threads = s_allThreads;
             if (threads is null)
@@ -506,7 +506,7 @@ public static class SchedulerManager
             return;
         }
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             // Idempotent: SetScheduler hands every registry entry to the
             // incoming policy exactly once, so a thread must hold one slot.
@@ -595,7 +595,7 @@ public static class SchedulerManager
 
         Serial.WriteString("[SCHED] CreateThread: entering\n");
         RegisterThread(thread);
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             var state = s_cpuStates[cpuId];
             s_currentScheduler.OnThreadCreate(state, thread);
@@ -609,7 +609,7 @@ public static class SchedulerManager
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             PerCpuState state = s_cpuStates[cpuId];
 
@@ -646,18 +646,18 @@ public static class SchedulerManager
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             PerCpuState state = s_cpuStates[cpuId];
 
             thread.State = SchedulerThreadState.Blocked;
             s_currentScheduler.OnThreadBlocked(state, thread);
 
-            // Ask the next IRQ exit to switch away (same as ReadyThread): a
-            // blocked current thread otherwise keeps re-entering its halt
-            // loop until the quantum tick preempts it — or forever when the
-            // periodic tick is not running. Not logged, for the same reason
-            // as ReadyThread: interrupts are masked here.
+            // Ask the next IRQ exit to switch away (same as ReadyThread);
+            // Park raises that interrupt at once. Without the flag, a
+            // blocked current thread would wait for the quantum tick, or
+            // forever when the periodic tick is not running. Not logged, for
+            // the same reason as ReadyThread: interrupts are masked here.
             state._needReschedule = true;
         }
     }
@@ -707,7 +707,7 @@ public static class SchedulerManager
         Serial.WriteNumber(thread.Id);
         Serial.WriteString("\n");
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             PerCpuState state = s_cpuStates[cpuId];
 
@@ -757,13 +757,64 @@ public static class SchedulerManager
     internal static void Sleep(uint cpuId, SchedulerThread thread, uint timeoutMs)
     {
         MarkSleeping(cpuId, thread, timeoutMs);
+        Park(thread);
+    }
 
-        // Only park the CPU while still Sleeping: if a wake already landed between
+    /// <summary>
+    /// Takes the CPU from <paramref name="thread"/>, the caller, once it has
+    /// marked itself Blocked (<see cref="BlockThread"/>) or Sleeping
+    /// (<see cref="MarkSleeping"/>) and left its IRQ-off section, and
+    /// returns once a wake has readied it and the scheduler has put it back
+    /// on the CPU. The switch happens now: the controller raises its
+    /// reschedule interrupt on this CPU and the exit of that interrupt runs
+    /// the next thread. A halt would leave the CPU idle until the next tick,
+    /// which every thread that blocks pays, up to a whole tick period each
+    /// time, out of the time of the threads that could run. Returns at once
+    /// when a wake already landed. The idle thread, and any thread before the
+    /// controller can raise the interrupt, halts instead. Thread context,
+    /// interrupts enabled.
+    /// </summary>
+    /// <param name="thread">The calling thread.</param>
+    internal static void Park(SchedulerThread thread)
+    {
+        if (!IsParked(thread))
+        {
+            return;
+        }
+
+        PerCpuState[]? states = s_cpuStates;
+        if (states is not null && thread.CpuId < s_cpuCount && (thread.Flags & SchedulerThreadFlags.IdleThread) == 0)
+        {
+            Volatile.Write(ref states[thread.CpuId]._needReschedule, true);
+            if (InterruptManager.TryRaiseReschedule())
+            {
+                // The interrupt lands within a few instructions and switches
+                // away; this thread is back here once it runs again.
+                while (IsParked(thread))
+                {
+                }
+
+                return;
+            }
+        }
+
+        // Only halt while still parked: if a wake already landed between
         // scope-dispose and this point, halting would sleep past it.
-        if (thread.State == SchedulerThreadState.Sleeping)
+        if (IsParked(thread))
         {
             InternalCpu.Halt();
         }
+    }
+
+    /// <summary>
+    /// Whether <paramref name="thread"/> is still Blocked or Sleeping. Not
+    /// inlined, so <see cref="Park"/>'s wait reads the state on every pass:
+    /// the interrupt that changes it is invisible to the compiler.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool IsParked(SchedulerThread thread)
+    {
+        return thread.State is SchedulerThreadState.Blocked or SchedulerThreadState.Sleeping;
     }
 
     /// <summary>
@@ -985,9 +1036,9 @@ public static class SchedulerManager
         // pausing the kernel.
         if ((s_tickCount % SnapshotRefreshTickInterval) == 0)
         {
-            Cosmos.Kernel.Core.Runtime.DebugLiveSnapshot.Update();
-            Cosmos.Kernel.Core.Runtime.DebugLiveGCSnapshot.Update();
-            Cosmos.Kernel.Core.Runtime.DebugLiveMemorySnapshot.Update();
+            Runtime.DebugLiveSnapshot.Update();
+            Runtime.DebugLiveGCSnapshot.Update();
+            Runtime.DebugLiveMemorySnapshot.Update();
         }
 
         // Only the first ticks are logged, to show at boot that the tick is

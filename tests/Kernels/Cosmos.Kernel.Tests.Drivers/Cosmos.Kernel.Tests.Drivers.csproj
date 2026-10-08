@@ -14,13 +14,14 @@
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
-  <!-- Three cells on x64 and four on arm64: bare, where the synthetic groups
+  <!-- Four cells on x64 and five on arm64: bare, where the synthetic groups
        need no hardware and the hardware group reads what the machine carries
        by default (the PCI host on both arches; q35's default e1000e on x64,
        while virt's default NIC is a virtio-net-pci function that the kit's
        VirtioNetDriver binds, so the E1000E tests skip there); usb-kbd, which
        adds a qemu-xhci controller with a usb-kbd plugged in at boot for the
-       USB keyboard group, which skips elsewhere; virtio-blk-pci, a virtio-blk
+       USB keyboard group, which skips elsewhere; usb-mouse, the same
+       controller with a usb-mouse for the USB mouse group; virtio-blk-pci, a virtio-blk
        disk behind a PCI Express root port for the virtio-blk and root port
        groups; and, on arm64 alone, virtio-blk-mmio, the same disk in the virt
        machine's window.
@@ -28,6 +29,7 @@
   <ItemGroup>
     <CosmosTestProfile Include="bare" />
     <CosmosTestProfile Include="usb-kbd" />
+    <CosmosTestProfile Include="usb-mouse" />
     <CosmosTestProfile Include="virtio-blk-pci" />
     <CosmosTestProfile Include="virtio-blk-mmio" />
   </ItemGroup>

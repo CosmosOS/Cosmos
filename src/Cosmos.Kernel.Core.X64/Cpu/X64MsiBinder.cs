@@ -124,8 +124,8 @@ internal sealed class X64MsiBinder : IMsiBinder
                 throw new System.InvalidOperationException("X64MsiBinder: the device context was released");
             }
 
-            System.ArgumentOutOfRangeException.ThrowIfNegative(entryIndex);
-            System.ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(entryIndex, device.Vectors.Length);
+            ArgumentOutOfRangeException.ThrowIfNegative(entryIndex);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(entryIndex, device.Vectors.Length);
             ReleaseVector(device, entryIndex);
         }
 
@@ -156,8 +156,8 @@ internal sealed class X64MsiBinder : IMsiBinder
             return;
         }
 
-        System.ArgumentOutOfRangeException.ThrowIfNegative(entryIndex);
-        System.ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(entryIndex, device.Vectors.Length);
+        ArgumentOutOfRangeException.ThrowIfNegative(entryIndex);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(entryIndex, device.Vectors.Length);
         ReleaseVector(device, entryIndex);
     }
 

@@ -106,7 +106,8 @@ stateDiagram-v2
 | `ReadyThread` | `Ready`, unless the thread is still `Created` | `OnThreadReady` | sets the per-CPU `_needReschedule` flag |
 | `BlockThread` | `Blocked` | `OnThreadBlocked` | sets `_needReschedule` |
 | `MarkSleeping` | `Sleeping`, after computing `WakeupTime` | `OnThreadBlocked` | no halt; the caller parks itself (see [the park protocol](#the-park-protocol)) |
-| `Sleep` | via `MarkSleeping` | | then halts once, only if still `Sleeping` |
+| `Sleep` | via `MarkSleeping` | | then `Park` |
+| `Park` | none | none | sets `_needReschedule` and raises the controller's reschedule interrupt; returns once the thread runs again (see [Parking](#parking)) |
 | `YieldThread` | none | none; the switch it asks for calls `OnThreadYield` | sets `_needReschedule` and returns before the switch |
 | `ExitThread` | `Dead` | `OnThreadExit` | runs the exit callback, returns the TLAB to the GC, clears the registry slot |
 
@@ -189,6 +190,17 @@ The staging itself is two writes into native globals: the new-thread flag first,
 
 Device interrupt handlers wake threads too: the NVMe driver's message interrupt handler signals a driver kit `DeviceEvent`, an [`InterruptEvent`](#interruptevent) underneath, whose waiter must run. The tick path alone would leave that thread queued for up to a full quantum, so wake-ups take a shortcut. `ReadyThread` (and `BlockThread` and `YieldThread`) set a per-CPU `_needReschedule` flag, and the interrupt dispatcher calls `ReschedulePendingFromIrq` when a handled hardware interrupt exits: if the flag is set and no switch is already staged for this interrupt, it runs `ScheduleFromInterrupt` right there, on the device interrupt's own exit path. The already-staged check matters: the timer handler may have staged a switch during the same interrupt, and a second `ScheduleFromInterrupt` would save this frame's stack pointer into a thread whose real context lives elsewhere.
 
+### Parking
+
+A thread that blocks or sleeps gives the CPU away through `SchedulerManager.Park`, called after its state flip, once its IRQ-off scope is disposed. `Park` sets `_needReschedule` and raises the controller's reschedule interrupt on the current CPU (`IInterruptController.TryRaiseReschedule`). Its handler does nothing: the interrupt only exists for its exit, which runs `ReschedulePendingFromIrq` and switches to the next thread.
+
+| Architecture | Reschedule interrupt |
+|--------------|----------------------|
+| x64 | Local APIC self-IPI, vector `0xF0` |
+| ARM64 | SGI 8, through `ICC_SGI1R_EL1` on GICv3 or `GICD_SGIR` on GICv2 |
+
+`Park` then waits until the state leaves `Blocked` or `Sleeping`, which happens once a wake readied the thread and the scheduler ran it again, or at once when the wake landed before the switch. Halting instead left the CPU idle for the rest of the tick every time a thread blocked. The idle thread, and any thread parking before the controller can raise the interrupt, still halt.
+
 ### What there is not: a voluntary switch
 
 `SchedulerManager.Schedule` and `ContextSwitch.Switch` exist in the tree but have no callers, and neither can complete a synchronous switch: they only *stage* a target stack pointer, the staged switch is consumed on an interrupt exit, and a voluntary caller has no interrupt-saved register frame for that exit to restore (`Schedule`'s helper does not even save the outgoing stack pointer). The one voluntary-yield entry that works, the runtime's `RhYield` behind `Thread.Yield`, borrows the interrupt path instead: `YieldThread` sets `_needReschedule`, so the next hardware interrupt exit switches even when the quantum has not run out, and returns at once. That switch picks the replacement first and re-queues the yielding thread through `OnThreadYield` afterwards, exactly as a preemption does, so the thread is never queued while it still runs. The caller does not wait for the switch, and `Thread.Yield` always reports that no other thread ran: waiting would cost every call up to a tick, while CoreLib calls `Thread.Yield` once per spin of its spin-then-block loops (on one CPU, an idle thread pool worker spins 70 times before it parks, and `Thread.Start` spins until the new thread reports started). Halting until the switch made those loops last 70 ticks. A true synchronous switch would need its own save path (the equivalent of the IRQ stub's, entered from a call instead of an interrupt), which does not exist yet.
@@ -254,15 +266,15 @@ flowchart TD
     C --> D["BlockThread / MarkSleeping (state flips while IRQs are still masked)"]
     D --> E["Dispose the scope (interrupts back on: a pending wake can land now)"]
     E --> F{"Still Blocked / Sleeping?"}
-    F -->|yes| G["Halt until an interrupt"]
+    F -->|yes| G["Park: raise the reschedule interrupt, run the next thread"]
     F -->|no| H["Already woken: continue"]
 ```
 
 1. **One atomic section.** Queue insertion, any covering release, and the state flip happen inside a single `AcquireIrqSafe` scope. A wake cannot interleave, because the signal side needs the same lock and interrupts are masked.
-2. **State-guarded halt.** The halt after the scope is conditional on the thread still being parked. A wake that lands in the window between scope exit and halt flips the state back to `Ready`, and the guard sees it; an unconditional halt would sleep through it.
+2. **State-guarded park.** `Park` after the scope acts only while the thread is still parked. A wake that lands in the window between scope exit and the switch flips the state back to `Ready`, and the guard sees it; an unconditional halt would sleep through it.
 3. **Membership-based results.** For timed waits, "was I signaled or did I time out" is answered by wait-queue membership, not by flags: a signal removes the thread from the queue, so after waking, still-in-queue means timeout (and the thread removes its own stale entry so a later signal cannot be spent on it).
 
-`MarkSleeping` exists as a separate entry precisely for rule 1: `Sleep` is `MarkSleeping` plus its own guarded halt, but `ConditionVariable.WaitTimeout` needs the state flip inside *its* lock scope, so it calls `MarkSleeping` there and halts itself afterwards.
+`MarkSleeping` exists as a separate entry precisely for rule 1: `Sleep` is `MarkSleeping` plus `Park`, but `ConditionVariable.WaitTimeout` needs the state flip inside *its* lock scope, so it calls `MarkSleeping` there and `Park` afterwards.
 
 ### Mutex
 

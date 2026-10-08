@@ -70,4 +70,37 @@ internal static class MouseCursor
             }
         }
     }
+
+    /// <summary>
+    /// The arrow as premultiplied ARGB pixels for a hardware cursor, each
+    /// pattern pixel drawn as a <paramref name="scale"/> by <paramref name="scale"/>
+    /// square. The hotspot is the top left corner, as for <see cref="Draw"/>.
+    /// </summary>
+    /// <param name="scale">Pixels per pattern pixel, 1 or more.</param>
+    /// <param name="width">Width of the image in pixels.</param>
+    /// <param name="height">Height of the image in pixels.</param>
+    /// <returns>The pixels, row-major, <paramref name="width"/> times <paramref name="height"/> of them.</returns>
+    public static uint[] ToArgb(int scale, out int width, out int height)
+    {
+        width = CursorWidth * scale;
+        height = CursorHeight * scale;
+        uint[] pixels = new uint[width * height];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int pixel = s_pattern[y / scale * CursorWidth + x / scale];
+                if (pixel == PatternBorder)
+                {
+                    pixels[y * width + x] = (uint)Color.Black.ToArgb();
+                }
+                else if (pixel == PatternFill)
+                {
+                    pixels[y * width + x] = (uint)Color.White.ToArgb();
+                }
+            }
+        }
+
+        return pixels;
+    }
 }

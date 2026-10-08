@@ -56,7 +56,9 @@ public sealed class QemuLaunchOptions
     /// <summary>
     /// Mouse device attached to the guest, or <c>null</c> to add none. Same
     /// <c>"ps2"</c>/<c>"none"</c> handling as <see cref="KeyboardDevice"/>;
-    /// <c>virtio-mouse-device</c> is the ARM64 <c>virt</c> option.
+    /// <c>virtio-mouse-device</c> is the ARM64 <c>virt</c> option, and
+    /// <see cref="QemuLauncher.UsbMouseModel"/> puts a USB mouse on the xHCI
+    /// controller on either architecture.
     /// </summary>
     public string? MouseDevice { get; init; }
 
@@ -217,7 +219,7 @@ public static class QemuLauncher
     /// </summary>
     private const int NetworkTestRawSocketPort = 5560;
 
-    /// <summary>QEMU id of the xHCI controller USB disks and the USB keyboard sit on; its root hub is the bus <c>usbxhci0.0</c>.</summary>
+    /// <summary>QEMU id of the xHCI controller USB disks, the USB keyboard and the USB mouse sit on; its root hub is the bus <c>usbxhci0.0</c>.</summary>
     public const string UsbControllerId = "usbxhci0";
 
     /// <summary>The keyboard model a profile names to get a USB keyboard on the xHCI controller, and QEMU's driver name for it.</summary>
@@ -225,6 +227,12 @@ public static class QemuLauncher
 
     /// <summary>QEMU id of the USB keyboard plugged in at boot, the one to unplug.</summary>
     public const string UsbKeyboardId = "usbkbd0";
+
+    /// <summary>The mouse model a profile names to get a USB mouse on the xHCI controller, and QEMU's driver name for it.</summary>
+    public const string UsbMouseModel = "usb-mouse";
+
+    /// <summary>QEMU id of the USB mouse plugged in at boot.</summary>
+    public const string UsbMouseId = "usbmouse0";
 
     /// <summary>QEMU id of the drive behind the <paramref name="index"/>th USB disk.</summary>
     public static string UsbDriveId(int index) => $"usbdisk{index}";
@@ -417,13 +425,13 @@ public static class QemuLauncher
         {
             args.Append(" -vga std");
         }
-        AppendUsbKeyboardArgs(args, options, AppendStorageArgs(args, options));
+        AppendUsbMouseArgs(args, options, AppendUsbKeyboardArgs(args, options, AppendStorageArgs(args, options)));
     }
 
     /// <summary>
     /// Emits the arm64 virt machine, its CPU, memory and EDK2 firmware, the
     /// ISO behind a virtio-scsi controller, <c>ramfb</c>, the disks and the
-    /// USB keyboard.
+    /// USB keyboard and mouse.
     /// </summary>
     internal static void AppendArm64Args(StringBuilder args, QemuLaunchOptions options)
     {
@@ -452,7 +460,7 @@ public static class QemuLauncher
         args.Append(" -boot d -no-reboot");
         // ramfb is required for Limine framebuffer support even when headless.
         args.Append(" -device ramfb");
-        AppendUsbKeyboardArgs(args, options, AppendStorageArgs(args, options));
+        AppendUsbMouseArgs(args, options, AppendUsbKeyboardArgs(args, options, AppendStorageArgs(args, options)));
     }
 
     /// <summary>
@@ -509,7 +517,7 @@ public static class QemuLauncher
     /// appended after the standard device properties so profiles can flip
     /// things like <c>msix=off</c>.
     /// </summary>
-    /// <returns>True when the xHCI controller was emitted, so the USB keyboard can share it.</returns>
+    /// <returns>True when the xHCI controller was emitted, so the USB keyboard and mouse can share it.</returns>
     internal static bool AppendStorageArgs(StringBuilder args, QemuLaunchOptions options)
     {
         int ahciIndex = 0;
@@ -606,19 +614,45 @@ public static class QemuLauncher
     /// the keyboard always sits on <c>usbxhci0.0</c> under the id the engine
     /// unplugs and replugs.
     /// </summary>
-    internal static void AppendUsbKeyboardArgs(StringBuilder args, QemuLaunchOptions options, bool controllerEmitted)
+    /// <returns>True when the controller is on the command line, emitted before or here.</returns>
+    internal static bool AppendUsbKeyboardArgs(StringBuilder args, QemuLaunchOptions options, bool controllerEmitted)
     {
         if (!string.Equals(options.KeyboardDevice, UsbKeyboardModel, StringComparison.OrdinalIgnoreCase))
         {
-            return;
+            return controllerEmitted;
         }
 
+        AppendUsbController(args, controllerEmitted);
+        args.Append($" -device {UsbKeyboardModel},bus={UsbControllerId}.0,id={UsbKeyboardId}");
+        return true;
+    }
+
+    /// <summary>
+    /// Attaches the USB mouse when <see cref="QemuLaunchOptions.MouseDevice"/>
+    /// is <see cref="UsbMouseModel"/>: on the xHCI controller the USB disks or
+    /// the USB keyboard emitted, or on one added here, so the mouse always
+    /// sits on <c>usbxhci0.0</c>.
+    /// </summary>
+    /// <returns>True when the controller is on the command line, emitted before or here.</returns>
+    internal static bool AppendUsbMouseArgs(StringBuilder args, QemuLaunchOptions options, bool controllerEmitted)
+    {
+        if (!string.Equals(options.MouseDevice, UsbMouseModel, StringComparison.OrdinalIgnoreCase))
+        {
+            return controllerEmitted;
+        }
+
+        AppendUsbController(args, controllerEmitted);
+        args.Append($" -device {UsbMouseModel},bus={UsbControllerId}.0,id={UsbMouseId}");
+        return true;
+    }
+
+    /// <summary>Emits the xHCI controller unless an earlier device already did.</summary>
+    private static void AppendUsbController(StringBuilder args, bool controllerEmitted)
+    {
         if (!controllerEmitted)
         {
             args.Append($" -device qemu-xhci,id={UsbControllerId}");
         }
-
-        args.Append($" -device {UsbKeyboardModel},bus={UsbControllerId}.0,id={UsbKeyboardId}");
     }
 
     /// <summary>
@@ -677,15 +711,17 @@ public static class QemuLauncher
     /// <c>null</c>/empty and the sentinels <c>"none"</c>/<c>"ps2"</c> add
     /// nothing (PS/2 is part of the x64 chipset, not a device you attach), so
     /// only real QEMU models (e.g. <c>virtio-keyboard-device</c>) are emitted.
-    /// <see cref="UsbKeyboardModel"/> adds nothing here either: that keyboard
-    /// goes on the xHCI controller through <see cref="AppendUsbKeyboardArgs"/>.
+    /// <see cref="UsbKeyboardModel"/> and <see cref="UsbMouseModel"/> add
+    /// nothing here either: they go on the xHCI controller through
+    /// <see cref="AppendUsbKeyboardArgs"/> and <see cref="AppendUsbMouseArgs"/>.
     /// </summary>
     internal static void AppendInputDevice(StringBuilder args, string? model)
     {
         if (string.IsNullOrWhiteSpace(model)
             || model.Equals("none", StringComparison.OrdinalIgnoreCase)
             || model.Equals("ps2", StringComparison.OrdinalIgnoreCase)
-            || model.Equals(UsbKeyboardModel, StringComparison.OrdinalIgnoreCase))
+            || model.Equals(UsbKeyboardModel, StringComparison.OrdinalIgnoreCase)
+            || model.Equals(UsbMouseModel, StringComparison.OrdinalIgnoreCase))
         {
             return;
         }

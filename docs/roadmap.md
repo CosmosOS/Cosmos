@@ -14,11 +14,11 @@
 | Test Framework | ✅ | ✅  |  |
 | Debugger| ✅ | 🟡 Partial | Source link + variables bugs in vscode |
 | CPU/FPU accelerated math | ✅ | ✅ | x64 only: x87 FPU (sin/cos/tan/exp/log/atan) |
-| Cosmos Graphic Subsystem | ✅ | ✅ | The firmware framebuffer via Limine, plus the virtio-gpu and VMware SVGA II display drivers over the driver kit (SVGA3D on the latter). |
+| Cosmos Graphic Subsystem | ✅ | ✅ | The firmware framebuffer via Limine, plus the virtio-gpu, VMware SVGA II, AMD DCN 3.1.5 and Intel integrated graphics display drivers over the driver kit (SVGA3D on the VMware one). |
 | Network interface | ✅ | ✅ | |
 | Timer / Clock | ✅ | ✅ | |
 | Keyboard Input | ✅ | ✅ | PS/2 (x64), virtio and USB keyboards, all as driver kit drivers |
-| Mouse Input | ✅ | ✅ | PS/2 (x64) and virtio mice, both as driver kit drivers |
+| Mouse Input | ✅ | ✅ | PS/2 (x64), virtio and USB mice, all as driver kit drivers |
 | Audio interface | 🟡 | ✅ | Intel HD Audio: WAV playback, generated streams and `Console.Beep`. Playback only, one stream per output. |
 
 ## Additional Gen3 Features
@@ -33,7 +33,7 @@ Beyond Gen2 parity, Gen3 brings new capabilities:
 | **Threading & Scheduler** | ✅ | Priority-based stride scheduler (x64 + ARM64). `lock` keyword supported. |
 | **Feature Flags** | ✅ |  |
 | **Cosmos Vs Code Extension** | ✅ |  |
-| **USB Support** | ✅ | xHCI host controller with hubs and hot-plug (x64 + ARM64) as driver kit drivers, with the HID boot keyboard and mass storage (Bulk-Only Transport) class drivers. No USB mouse or EHCI yet. |
+| **USB Support** | ✅ | xHCI host controller with hubs and hot-plug (x64 + ARM64) as driver kit drivers, with the HID boot keyboard, HID boot mouse and mass storage (Bulk-Only Transport) class drivers. No EHCI yet. |
 
 ## Future Releases
 

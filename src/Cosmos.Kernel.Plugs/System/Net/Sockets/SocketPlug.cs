@@ -6,6 +6,7 @@ using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Protocols.Tcp;
+using Cosmos.Kernel.System.Timers;
 using AddressFamily = System.Net.Sockets.AddressFamily;
 using KernelEndPoint = Cosmos.Kernel.System.Network.EndPoint;
 using KernelUdpClient = Cosmos.Kernel.System.Network.UdpClient;
@@ -15,14 +16,19 @@ namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 [Plug(typeof(Socket))]
 public static class SocketPlug
 {
-    // Receive timeout for the UDP socket paths. Zero because SO_RCVTIMEO is not
-    // plumbed through yet: these poll once and leave the waiting to the caller,
-    // which is what the counter spin they replaced effectively did, without
-    // burning the cycles.
+    // Receive timeout for the UDP socket paths. Zero: these poll once and leave
+    // the waiting to the caller, which is what the counter spin they replaced
+    // effectively did, without burning the cycles. ReceiveTimeout bounds the
+    // TCP receive only.
     private const int UdpPollTimeoutMs = 0;
 
     // Linger allowed for a TCP close that has to wait for the peer's FIN.
     private const int DefaultCloseTimeoutMs = 5000;
+
+    // How long a TCP receive or a Poll waits between two looks at the
+    // connection, the slice of the kernel's other network waits
+    // (TcpConnection.WaitStatus, UdpClient.Receive).
+    private const int WaitSliceMs = 10;
 
     // Store protocol type per socket (public for cross-assembly access when patched)
     public static readonly Dictionary<int, ProtocolType> _protocolTypes = [];
@@ -39,6 +45,10 @@ public static class SocketPlug
     // Sockets Listen() was called on: each holds a listening connection, which
     // a completed handshake turns into the connection Accept() hands out
     internal static readonly HashSet<int> s_listeningSockets = [];
+    // ReceiveTimeout and SendTimeout per socket, in milliseconds, 0 for none
+    // as in .NET; a socket without an entry has none
+    internal static readonly Dictionary<int, int> s_receiveTimeouts = [];
+    internal static readonly Dictionary<int, int> s_sendTimeouts = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(Socket aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
@@ -164,39 +174,111 @@ public static class SocketPlug
         return null;
     }
 
+    // The timeouts are .NET's SO_RCVTIMEO and SO_SNDTIMEO: 0 for none, and
+    // -1 is taken for 0. ReceiveTimeout bounds a TCP receive; SendTimeout is
+    // kept for reading back only, as a send waits for nothing longer than
+    // the acknowledgement of each segment.
+    [PlugMember("get_ReceiveTimeout")]
+    public static int get_ReceiveTimeout(Socket aThis)
+    {
+        return s_receiveTimeouts.TryGetValue(GetId(aThis), out int timeout) ? timeout : 0;
+    }
+
+    [PlugMember("set_ReceiveTimeout")]
+    public static void set_ReceiveTimeout(Socket aThis, int value)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(value, -1);
+        s_receiveTimeouts[GetId(aThis)] = value == -1 ? 0 : value;
+    }
+
+    [PlugMember("get_SendTimeout")]
+    public static int get_SendTimeout(Socket aThis)
+    {
+        return s_sendTimeouts.TryGetValue(GetId(aThis), out int timeout) ? timeout : 0;
+    }
+
+    [PlugMember("set_SendTimeout")]
+    public static void set_SendTimeout(Socket aThis, int value)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(value, -1);
+        s_sendTimeouts[GetId(aThis)] = value == -1 ? 0 : value;
+    }
+
     [PlugMember]
     public static bool Poll(Socket aThis, int microSeconds, SelectMode mode)
     {
-        int id = GetId(aThis);
-        if (_protocolTypes.TryGetValue(id, out ProtocolType proto))
+        // Waits for the socket to be ready, -1 for as long as it takes. In
+        // whole milliseconds, as .NET's on Unix, which hands them to poll(2):
+        // less than one is a look without waiting.
+        int timeoutMs = microSeconds == -1 ? -1 : microSeconds / 1000;
+        int waited = 0;
+        while (!IsReady(aThis, mode))
         {
-            if (proto == ProtocolType.Tcp)
+            if (timeoutMs >= 0 && waited >= timeoutMs)
             {
-                if (s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
-                {
-                    return mode switch
-                    {
-                        // A listener is readable once a connection waits to be
-                        // accepted, a connected socket once a read would not
-                        // block: data waits, or the peer closed its side and
-                        // the read returns 0.
-                        SelectMode.SelectRead => s_listeningSockets.Contains(id)
-                            ? HasPendingConnection(sm)
-                            : sm.DataLength > 0 || HasPeerClosed(sm),
-                        SelectMode.SelectWrite => sm.Status is Status.ESTABLISHED or Status.CLOSE_WAIT,
-                        _ => false,
-                    };
-                }
+                return false;
             }
-            else if (proto == ProtocolType.Udp)
+
+            int slice = timeoutMs < 0 ? WaitSliceMs : Math.Min(WaitSliceMs, timeoutMs - waited);
+            TimerManager.Wait((uint)slice);
+            waited += slice;
+        }
+
+        return true;
+    }
+
+    // Whether the socket is ready for mode. Throws once the socket is closed,
+    // as .NET's Poll does for a disposed socket: Close forgets the socket,
+    // which would never be ready again.
+    private static bool IsReady(Socket socket, SelectMode mode)
+    {
+        int id = GetId(socket);
+        if (!_protocolTypes.TryGetValue(id, out ProtocolType proto))
+        {
+            throw new ObjectDisposedException(nameof(Socket));
+        }
+
+        if (proto == ProtocolType.Tcp)
+        {
+            if (s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm))
             {
-                if (_udpClients.TryGetValue(id, out KernelUdpClient? client))
+                return mode switch
                 {
-                    return client._rxBuffer.Count > 0;
-                }
+                    // A listener is readable once a connection waits to be
+                    // accepted, a connected socket once a read would not
+                    // block: data waits, or the peer closed its side and
+                    // the read returns 0.
+                    SelectMode.SelectRead => s_listeningSockets.Contains(id)
+                        ? HasPendingConnection(sm)
+                        : sm.DataLength > 0 || HasPeerClosed(sm),
+                    SelectMode.SelectWrite => sm.Status is Status.ESTABLISHED or Status.CLOSE_WAIT,
+                    _ => false,
+                };
             }
         }
+        else if (proto == ProtocolType.Udp)
+        {
+            if (_udpClients.TryGetValue(id, out KernelUdpClient? client))
+            {
+                return client._rxBuffer.Count > 0;
+            }
+        }
+
         return false;
+    }
+
+    /// <summary>
+    /// Whether the socket holds a TCP connection that was established and
+    /// that it has not closed: what .NET's Connected says, which stays true
+    /// once the peer has closed its side, where <see cref="get_Connected"/>
+    /// turns false. What the peer sent before closing is still to be read.
+    /// </summary>
+    internal static bool HoldsConnection(Socket socket)
+    {
+        int id = GetId(socket);
+        return !s_listeningSockets.Contains(id)
+            && s_tcpStateMachines.TryGetValue(id, out TcpConnection? sm)
+            && sm.Status is not (Status.LISTEN or Status.SYN_SENT or Status.SYN_RECEIVED);
     }
 
     // Whether a listening connection completed a handshake, which Accept()
@@ -650,37 +732,50 @@ public static class SocketPlug
         // them in one step with interrupts masked: the kit worker appends to
         // the same buffer and can preempt this thread anywhere else.
         Span<byte> target = buffer.AsSpan(offset, size);
-
-        // If data is already available, return it immediately (even if connection closed).
-        // A zero here means another reader on this socket took the bytes
-        // first: this read then waits below, as returning 0 would read as
-        // the end of the stream.
-        if (sm.DataLength > 0)
+        if (size == 0)
         {
+            return 0;
+        }
+
+        // Blocks as .NET's Receive does, until bytes arrive or none can any
+        // more: every caller takes a zero read for the end of the stream, so
+        // it never stands for "nothing yet". ReceiveTimeout bounds the wait.
+        int timeout = s_receiveTimeouts.TryGetValue(id, out int receiveTimeout) ? receiveTimeout : 0;
+        int waited = 0;
+        while (true)
+        {
+            // The status is read before the bytes: the receive path appends a
+            // segment's bytes before it moves the status on for the FIN that
+            // came with them, so a status that says the peer closed its side
+            // comes with everything it sent. A zero read here means nothing
+            // arrived yet, or another reader on this socket took the bytes.
+            Status status = sm.Status;
             int read = sm.ReadData(target);
             if (read > 0)
             {
                 return read;
             }
-        }
 
-        // Wait for data only if connection is still active
-        int timeout = 0;
-        while (sm.DataLength == 0 && timeout < 100_000)
-        {
-            // Allow reading data in ESTABLISHED, CLOSE_WAIT, or FIN_WAIT states
-            if (sm.Status != Status.ESTABLISHED &&
-                sm.Status != Status.CLOSE_WAIT &&
-                sm.Status != Status.FIN_WAIT1 &&
-                sm.Status != Status.FIN_WAIT2)
+            if (status is Status.LISTEN or Status.SYN_SENT or Status.SYN_RECEIVED)
             {
-                break;
+                throw new SocketException((int)SocketError.NotConnected);
             }
-            timeout++;
-        }
 
-        // Zero when nothing arrived in the meantime.
-        return sm.ReadData(target);
+            if (status != Status.ESTABLISHED)
+            {
+                // The peer closed its side or reset the connection, or this
+                // socket was closed meanwhile: no more bytes will come.
+                return 0;
+            }
+
+            if (timeout > 0 && waited >= timeout)
+            {
+                throw new SocketException((int)SocketError.TimedOut);
+            }
+
+            TimerManager.Wait(WaitSliceMs);
+            waited += WaitSliceMs;
+        }
     }
 
     [PlugMember]
@@ -727,6 +822,13 @@ public static class SocketPlug
     {
         int id = GetId(aThis);
 
+        // -1 is .NET's default (Socket.DefaultCloseTimeout, which
+        // NetworkStream passes), which closes as Close() does.
+        if (timeout == -1)
+        {
+            timeout = DefaultCloseTimeoutMs;
+        }
+
         if (_protocolTypes.TryGetValue(id, out var proto))
         {
             if (proto == ProtocolType.Udp)
@@ -740,6 +842,9 @@ public static class SocketPlug
             }
             _protocolTypes.Remove(id);
         }
+
+        s_receiveTimeouts.Remove(id);
+        s_sendTimeouts.Remove(id);
     }
 
     public static void CloseUdp(Socket aThis)

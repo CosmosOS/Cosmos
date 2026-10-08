@@ -127,8 +127,8 @@ internal sealed class Arm64MsiBinder : IMsiBinder
             throw new System.InvalidOperationException("Arm64MsiBinder: the device context was released");
         }
 
-        System.ArgumentOutOfRangeException.ThrowIfNegative(entryIndex);
-        System.ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(entryIndex, ctx.EntryCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(entryIndex);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(entryIndex, ctx.EntryCount);
 
         // The ITT holds one translation per EventID: re-binding an entry
         // discards the old one first, which also frees its LPI instead of
@@ -158,8 +158,8 @@ internal sealed class Arm64MsiBinder : IMsiBinder
             return;
         }
 
-        System.ArgumentOutOfRangeException.ThrowIfNegative(entryIndex);
-        System.ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(entryIndex, ctx.EntryCount);
+        ArgumentOutOfRangeException.ThrowIfNegative(entryIndex);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(entryIndex, ctx.EntryCount);
         ReleaseEvent(ctx, entryIndex);
     }
 

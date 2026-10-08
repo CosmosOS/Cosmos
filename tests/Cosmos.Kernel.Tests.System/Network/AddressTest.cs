@@ -31,7 +31,7 @@ public class AddressTest
 
             var actual = address.AddressFamily;
 
-            Assert.That(actual, Is.EqualTo(Kernel.System.Network.AddressFamily.IPv4));
+            Assert.That(actual, Is.EqualTo(AddressFamily.IPv4));
         }
     }
 

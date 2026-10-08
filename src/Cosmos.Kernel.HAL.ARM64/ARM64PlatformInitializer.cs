@@ -76,13 +76,21 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         return DeviceMapper.EnsureMapped(physBase);
     }
 
+    public bool EnsureWriteCombiningMapped(ulong physBase)
+    {
+        // The device mapper installs only MAIR's Device attribute, not a
+        // Normal non-cacheable one, so a framebuffer is Device memory like
+        // any other window.
+        return EnsureMmioMapped(physBase);
+    }
+
     public void DmaBarrier()
     {
         // dsb sy + isb: orders Normal-memory descriptor/queue writes against
         // the Device-memory doorbell store that follows (and device-written
         // flags against the payload reads that follow them). ARM64 does not
         // order Normal vs Device accesses on its own.
-        Cosmos.Kernel.Core.ARM64.Bridge.DeviceMapperNative.DsbIsb();
+        Core.ARM64.Bridge.DeviceMapperNative.DsbIsb();
     }
 
     /// <inheritdoc />
@@ -92,18 +100,18 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
         // without any driver init, so this works during phase-3 device
         // bring-up. Falls back to a crude spin if firmware left CNTFRQ
         // unprogrammed (should not happen on QEMU virt or real EL2 boots).
-        ulong freq = Cosmos.Kernel.Core.ARM64.Bridge.GenericTimerNative.GetFrequency();
+        ulong freq = Core.ARM64.Bridge.GenericTimerNative.GetFrequency();
         if (freq == 0)
         {
             for (uint i = 0; i < microseconds * FallbackSpinLoopsPerMicrosecond; i++)
             {
-                Cosmos.Kernel.Core.ARM64.Bridge.DeviceMapperNative.DsbIsb();
+                Core.ARM64.Bridge.DeviceMapperNative.DsbIsb();
             }
             return;
         }
 
-        ulong target = Cosmos.Kernel.Core.ARM64.Bridge.GenericTimerNative.GetCounter() + (freq * microseconds + (MicrosecondsPerSecond - 1UL)) / MicrosecondsPerSecond;
-        while (Cosmos.Kernel.Core.ARM64.Bridge.GenericTimerNative.GetCounter() < target)
+        ulong target = Core.ARM64.Bridge.GenericTimerNative.GetCounter() + (freq * microseconds + (MicrosecondsPerSecond - 1UL)) / MicrosecondsPerSecond;
+        while (Core.ARM64.Bridge.GenericTimerNative.GetCounter() < target)
         {
         }
     }

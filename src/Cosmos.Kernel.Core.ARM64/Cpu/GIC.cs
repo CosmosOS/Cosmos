@@ -343,6 +343,24 @@ public static class GIC
     }
 
     /// <summary>
+    /// Raises SGI <paramref name="sgiId"/> on the calling CPU: ICC_SGI1R_EL1
+    /// with the boot CPU in its target list on GICv3, GICD_SGIR with the
+    /// requester filter on GICv2.
+    /// </summary>
+    /// <param name="sgiId">SGI ID (0-15).</param>
+    public static void SendSgiToSelf(uint sgiId)
+    {
+        if (s_isV3)
+        {
+            GICv3.SendSGI(sgiId, targetSelf: true);
+        }
+        else
+        {
+            GICv2.SendSgiToSelf(sgiId);
+        }
+    }
+
+    /// <summary>
     /// Acknowledges an interrupt and returns its ID.
     /// </summary>
     public static uint AcknowledgeInterrupt()

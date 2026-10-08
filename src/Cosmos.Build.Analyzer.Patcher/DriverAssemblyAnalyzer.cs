@@ -138,7 +138,7 @@ public sealed class DriverAssemblyAnalyzer : DiagnosticAnalyzer
 
         foreach (IAssemblySymbol referenced in compilation.SourceModule.ReferencedAssemblySymbols)
         {
-            if (!referenced.Name.StartsWith(CosmosAssemblyPrefix, System.StringComparison.Ordinal))
+            if (!referenced.Name.StartsWith(CosmosAssemblyPrefix, StringComparison.Ordinal))
             {
                 continue;
             }
