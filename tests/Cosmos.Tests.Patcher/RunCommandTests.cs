@@ -111,6 +111,7 @@ public class RunCommandTests
     [Theory]
     [InlineData("none")]
     [InlineData("usb-kbd")]
+    [InlineData("usb-mouse")]
     public void ResolveInputDevice_ExplicitValueWinsOnArm64(string requested)
     {
         Assert.Equal(requested,
