@@ -134,6 +134,11 @@ public readonly ref struct MaskedAddress : IEquatable<MaskedAddress>
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
     public override int GetHashCode()
     {
         throw new NotImplementedException();
