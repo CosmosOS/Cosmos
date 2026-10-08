@@ -363,22 +363,6 @@ The rules the device holds you to:
 - `Stop()` drops whatever the buffer still holds. To hear the tail of a sound, write a buffer's worth of silence after it first (`WritableBytes` right after `TrySetFormat` tells you how much that is), which is what the player does.
 - Writing directly claims nothing. Check `Player` is `null` before you start; a `Play` or `Console.Beep` arriving while you write is refused, because the running device refuses its format change.
 
-## Trying it in the DevKernel
-
-The DevKernel has four audio commands, written over the calls in this article ([AudioCommands.cs](https://github.com/CosmosOS/Cosmos/blob/gen3/examples/DevKernel/Commands/AudioCommands.cs)):
-
-| Command | What it does |
-|---|---|
-| `audio` | Lists every output with its driver, node, format and what it is playing (`12s of 180s`) |
-| `beep [hz] [ms]` | Plays a tone through `Console.Beep`, 800 Hz for 200 ms by default |
-| `play <path>` | Streams a `.wav` off a mounted volume in the background |
-| `stop` | Stops whatever is playing |
-
-Its `.cosmos/config.json` attaches an `intel-hda` controller and an NVMe disk and forwards the FTP ports, so a file uploaded with `ftpd` (see [FTP server](network.md#ftp-server)) plays with `play`.
-
-<!-- video: the DevKernel listing the hda output with "audio", playing a song with "play /mnt/song.wav" while "audio" shows its progress, then "stop" -->
-<video src="images/audio-play.mp4" controls playsinline style="max-width:100%"></video>
-
 ## Current limitations
 
 - Intel HD Audio is the only sound card driver: no AC97, Sound Blaster, virtio-sound or USB audio, and no PC speaker. Without an HD Audio controller, `Console.Beep` returns at once and plays nothing.
