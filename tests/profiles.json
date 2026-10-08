@@ -116,6 +116,17 @@
       "keyboard": "usb-kbd"
     },
     {
+      // A USB mouse (usb-mouse) on a qemu-xhci controller, plugged in at
+      // boot. The kit's XhciDriver binds the controller and publishes the
+      // mouse's HID interface as a usb: node, which UsbMouseDriver binds.
+      // QEMU hands the engine's mouse-move and mouse-button events to the
+      // USB mouse once its driver polls it, ahead of q35's PS/2 mouse, so
+      // the Drivers suite reads them from the USB mouse here. A USB 2
+      // device too, so the node is usb:1-5:0.
+      "name": "usb-mouse",
+      "mouse": "usb-mouse"
+    },
+    {
       // Intel E1000E NIC, the historical x64 default, kept as an explicit
       // cell so the driver keeps its coverage now that the NIC is a choice.
       "name": "e1000e",

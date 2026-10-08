@@ -459,8 +459,8 @@ jobs:
       head_ref: ${{ github.head_ref || github.ref_name }}
 
   # ── Drivers ───────────────────────────────────────────────────────────────────
-  # bare, usb-kbd and virtio-blk-pci on both arches, virtio-blk-mmio on arm64
-  # (four arm64 cells); the hardware half runs on q35's default NIC on x64.
+  # bare, usb-kbd, usb-mouse and virtio-blk-pci on both arches, virtio-blk-mmio
+  # on arm64 (five arm64 cells); the hardware half runs on q35's default NIC on x64.
   drivers-tests:
     needs: setup
     uses: ./.github/workflows/kernel-test-run.yml
