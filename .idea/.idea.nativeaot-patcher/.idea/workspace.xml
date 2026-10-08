@@ -19,6 +19,13 @@
   <component name="ChangeListManager">
     <list default="true" id="f8cd28f8-8db5-4f5c-b0cb-c82b7fbea921" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.nativeaot-patcher/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.nativeaot-patcher/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Core.ARM64/Bridge/Import/DeviceMapperNative.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Core.ARM64/Bridge/Import/DeviceMapperNative.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Core.ARM64/Memory/Arm64PagerBackend.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Core.ARM64/Memory/Arm64PagerBackend.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Core.X64/Memory/X64PagerBackend.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Core.X64/Memory/X64PagerBackend.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/AddressSpaceDescriptor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/AddressSpaceDescriptor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/IPagerBackend.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/IPagerBackend.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/Pager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/Pager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Native.ARM64/CPU/PageTable.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Native.ARM64/CPU/PageTable.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/Kernels/Cosmos.Kernel.Tests.Memory/Kernel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Kernels/Cosmos.Kernel.Tests.Memory/Kernel.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -61,6 +68,7 @@
     <setting file="file://$PROJECT_DIR$/src/tests/Cosmos.Kernel.Tests.System/Network/IPv4/Address4Test.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/tests/Cosmos.Kernel.Tests.System/Network/IPv6/Address6Test.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/tests/Cosmos.Kernel.Tests.System/Network/MaskedAddressTest.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///mnt/data/projects/git/zarlo/Cosmos/src/Cosmos.Kernel.Core.ARM64/Memory/Arm64PagerBackend.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///mnt/data/projects/git/zarlo/Cosmos/tests/Kernels/Cosmos.Kernel.Tests.Memory/Kernel.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
@@ -70,23 +78,23 @@
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="false" />
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.1733133123893418" />
-      <entry key="MS500" value="3.2645919116049007" />
-      <entry key="S2" value="6.5683069657842905" />
-      <entry key="S5" value="7.893517062195983" />
-      <entry key="S10" value="8.421331317081147" />
-      <entry key="S30" value="8.801132587194513" />
-      <entry key="S60" value="8.89979756778221" />
-      <entry key="M2" value="8.949704951153787" />
-      <entry key="M5" value="8.982879041028937" />
-      <entry key="M10" value="9.461466914709936" />
-      <entry key="M15" value="11.697873190532745" />
-      <entry key="M30" value="25.74575536716429" />
-      <entry key="H1" value="54.332302171076925" />
-      <entry key="H2" value="95.43825123249094" />
-      <entry key="H4" value="147.02152450179426" />
-      <entry key="D1" value="243.78331009076754" />
-      <entry key="W1" value="270.1958291455808" />
+      <entry key="MS100" value="1.5775093000932756" />
+      <entry key="MS500" value="3.162482087260189" />
+      <entry key="S2" value="4.383374517929358" />
+      <entry key="S5" value="4.736866852746949" />
+      <entry key="S10" value="4.865504831678836" />
+      <entry key="S30" value="4.9544996592735355" />
+      <entry key="S60" value="4.977165112370545" />
+      <entry key="M2" value="4.988561294195092" />
+      <entry key="M5" value="4.9964309585736135" />
+      <entry key="M10" value="5.065447400421477" />
+      <entry key="M15" value="5.278201357018573" />
+      <entry key="M30" value="6.170779647865072" />
+      <entry key="H1" value="7.415379197404278" />
+      <entry key="H2" value="9.047917955884358" />
+      <entry key="H4" value="20.592662475572034" />
+      <entry key="D1" value="169.1066107906084" />
+      <entry key="W1" value="264.22973209550446" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -94,37 +102,37 @@
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
       <entry key="S10" value="0.0" />
-      <entry key="S30" value="8.575029040056963E-233" />
-      <entry key="S60" value="1.4698268552741517E-116" />
-      <entry key="M2" value="2.0446532536955475E-58" />
-      <entry key="M5" value="1.6701797220218948E-23" />
-      <entry key="M10" value="9.584490598751112E-12" />
-      <entry key="M15" value="1.0704613403118958E-7" />
-      <entry key="M30" value="0.001671789189174921" />
-      <entry key="H1" value="0.23736013414809018" />
-      <entry key="H2" value="2.9024518453600323" />
-      <entry key="H4" value="10.205211286282468" />
-      <entry key="D1" value="29.17170940416441" />
-      <entry key="W1" value="34.93426457472085" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="1.5065266094408094E-191" />
+      <entry key="M5" value="9.32622872130463E-77" />
+      <entry key="M10" value="2.2648553159296744E-38" />
+      <entry key="M15" value="1.8991179526213898E-25" />
+      <entry key="M30" value="2.2267527042851756E-12" />
+      <entry key="H1" value="8.662694858129885E-6" />
+      <entry key="H2" value="0.017534268076048454" />
+      <entry key="H4" value="0.793201104309949" />
+      <entry key="D1" value="19.057039328655186" />
+      <entry key="W1" value="32.87277734259819" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.12441823067024" />
-      <entry key="MS500" value="3.2343577119959024" />
-      <entry key="S2" value="6.551475992892272" />
-      <entry key="S5" value="7.885184084975205" />
-      <entry key="S10" value="8.416839602435047" />
-      <entry key="S30" value="8.799556661059759" />
-      <entry key="S60" value="8.898999339504401" />
-      <entry key="M2" value="8.949303237400356" />
-      <entry key="M5" value="8.982717647181993" />
-      <entry key="M10" value="9.461379859783516" />
-      <entry key="M15" value="11.697795031705684" />
-      <entry key="M30" value="25.74731852295256" />
-      <entry key="H1" value="54.56929461739701" />
-      <entry key="H2" value="98.33914422035053" />
-      <entry key="H4" value="157.22414520069702" />
-      <entry key="D1" value="272.9538173449322" />
-      <entry key="W1" value="305.12988877852484" />
+      <entry key="MS100" value="1.5170798670621186" />
+      <entry key="MS500" value="3.138824908593872" />
+      <entry key="S2" value="4.375179750741244" />
+      <entry key="S5" value="4.733322618791047" />
+      <entry key="S10" value="4.863684156448589" />
+      <entry key="S30" value="4.953881559908133" />
+      <entry key="S60" value="4.97685463487545" />
+      <entry key="M2" value="4.98840569644884" />
+      <entry key="M5" value="4.99636860580283" />
+      <entry key="M10" value="5.0654152045287395" />
+      <entry key="M15" value="5.2781775786296645" />
+      <entry key="M30" value="6.170762460588161" />
+      <entry key="H1" value="7.415375315723307" />
+      <entry key="H2" value="9.065434801162048" />
+      <entry key="H4" value="21.385657641281288" />
+      <entry key="D1" value="188.16286392812955" />
+      <entry key="W1" value="297.10231646441" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -357,7 +365,8 @@
     <MESSAGE value="upd: fix Cosmos.Build.Common.targets" />
     <MESSAGE value="upd: patcher structure" />
     <MESSAGE value="Add ARM64 Pager backend and shared address space implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add ARM64 Pager backend and shared address space implementation" />
+    <MESSAGE value="Expand Pager unit tests: add detailed checks for value objects, descriptor correctness, and flag handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Expand Pager unit tests: add detailed checks for value objects, descriptor correctness, and flag handling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

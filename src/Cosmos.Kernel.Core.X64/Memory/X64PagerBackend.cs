@@ -64,6 +64,14 @@ internal sealed unsafe class X64PagerBackend : IPagerBackend
     public ulong CurrentRootFrame() => X64CpuNative.ReadCr3() & AddrMask;
 
     /// <inheritdoc />
+    /// <remarks>
+    /// x86-64 has a single 4-level CR3 spanning the whole 48-bit address space,
+    /// so both halves are served by the same root. Reporting 0 here tells
+    /// <see cref="Pager.Create"/> to reuse <see cref="CurrentRootFrame"/>.
+    /// </remarks>
+    public ulong CurrentLowRootFrame() => 0;
+
+    /// <inheritdoc />
     public void Commit(AddressSpaceDescriptor* space)
     {
         ulong rootFrame = space->RootFrame;
@@ -122,6 +130,15 @@ internal sealed unsafe class X64PagerBackend : IPagerBackend
             return false;
         }
 
+        // A resolved frame must be page-aligned. If it is not, the walk
+        // mis-decoded an entry; report failure rather than returning a bogus
+        // frame, and never throw — callers include fault handlers.
+        if ((frame & (PageAllocator.PageSize - 1)) != 0)
+        {
+            phys = PhysicalAddress.None;
+            return false;
+        }
+
         phys = PhysicalAddress.From(frame);
         return true;
     }
@@ -146,6 +163,15 @@ internal sealed unsafe class X64PagerBackend : IPagerBackend
         }
 
         if (!Walk((ulong*)(rootFrame + hhdm), address, hhdm, out ulong frame))
+        {
+            phys = PhysicalAddress.None;
+            return false;
+        }
+
+        // A resolved frame must be page-aligned. If it is not, the walk
+        // mis-decoded an entry; report failure rather than returning a bogus
+        // frame, and never throw — callers include fault handlers.
+        if ((frame & (PageAllocator.PageSize - 1)) != 0)
         {
             phys = PhysicalAddress.None;
             return false;

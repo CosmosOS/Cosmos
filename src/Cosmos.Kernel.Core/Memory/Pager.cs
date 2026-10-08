@@ -86,6 +86,14 @@ internal static unsafe class Pager
 
         // Seed from the live root so kernel mappings stay valid in this space.
         space->RootFrame = s_backend.CurrentRootFrame();
+
+        // Architectures with one root (x86-64) report 0 for the lower half,
+        // which means "same root". Keeping a distinct field rather than
+        // overloading RootFrame lets a space describe mappings in both halves,
+        // which ARM64 needs: its kernel heap is identity-mapped low.
+        ulong lowRoot = s_backend.CurrentLowRootFrame();
+        space->LowRootFrame = lowRoot != 0 ? lowRoot : space->RootFrame;
+
         space->RegionCount = 0;
         space->IsCommitted = false;
 

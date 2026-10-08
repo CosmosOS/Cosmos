@@ -51,7 +51,21 @@ internal unsafe struct AddressSpaceDescriptor
     /// Physical address of the root table, or zero when this descriptor has not
     /// been committed and therefore names no tables yet.
     /// </summary>
+    /// <remarks>
+    /// This is the root for whichever half the address being translated falls
+    /// in; <see cref="LowRootFrame"/> holds the other one. On x86-64 a single
+    /// 4-level CR3 covers the whole address space, so both fields are the same
+    /// value there. On ARM64 the two halves are separate tables (TTBR0_EL1 and
+    /// TTBR1_EL1) and a space needs both: the kernel heap is identity-mapped in
+    /// the lower half while the HHDM and the kernel image live in the upper.
+    /// </remarks>
     public ulong RootFrame;
+
+    /// <summary>
+    /// Root table for the lower half of the address space. Equal to
+    /// <see cref="RootFrame"/> when the architecture has a single root (x86-64).
+    /// </summary>
+    public ulong LowRootFrame;
 
     /// <summary>
     /// x86 PCID assigned to this space, used to invalidate its TLB entries

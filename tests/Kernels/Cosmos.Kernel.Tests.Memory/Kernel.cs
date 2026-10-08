@@ -1420,6 +1420,7 @@ public unsafe class Kernel : Sys.Kernel
         // in the kernel image that the CPU has already translated to reach us.
         ulong here = KernelImageAnchor();
 
+
         Assert.True(Pager.Translate(VirtualAddress.From(here & ~(Pager.PageSize - 1)), out PhysicalAddress phys),
             "Translate must resolve an address the CPU already executed at");
         Assert.True(phys.Value != PhysicalAddress.None.Value,

@@ -40,6 +40,19 @@ internal unsafe interface IPagerBackend
     ulong CurrentRootFrame();
 
     /// <summary>
+    /// Root table for the lower half of the address space, or 0 when the
+    /// architecture has a single root and it is already reported by
+    /// <see cref="CurrentRootFrame"/>.
+    /// </summary>
+    /// <remarks>
+    /// ARM64 splits the address space across two tables (TTBR0_EL1 and
+    /// TTBR1_EL1), so a space that describes mappings in both halves needs
+    /// both. x86-64 has one 4-level CR3 covering everything, and an
+    /// implementation there may return 0 to mean "same as above".
+    /// </remarks>
+    ulong CurrentLowRootFrame();
+
+    /// <summary>
     /// Installs every region of <paramref name="space"/> into the page tables
     /// rooted at <see cref="AddressSpaceDescriptor.RootFrame"/>.
     /// </summary>
