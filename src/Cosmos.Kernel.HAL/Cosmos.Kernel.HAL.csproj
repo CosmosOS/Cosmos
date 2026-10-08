@@ -15,12 +15,13 @@
 
     <!-- Public surface tracked in PublicAPI.Shipped/Unshipped.txt (see Directory.Build.props):
          the driver kit seam (COSMOS0003), which covers the kit under DriverKit/
-         and the device categories under Devices/ apart from the two contracts
-         the ring hands out, which are tracked as stable: IBlockDevice
-         (Devices/Storage/), the one device contract kernels really implement
-         and drive (the Fat and File suites each supply a RAM disk, DevKernel
-         reads and writes blocks through it), and MacAddress (Devices/Network/),
-         which the packet seam and NetworkManager both hand out.
+         and the device categories under Devices/ apart from the stable
+         contracts the ring hands out: IBlockDevice (Devices/Storage/), the
+         one device contract kernels really implement and drive (the Fat and
+         File suites each supply a RAM disk, DevKernel reads and writes blocks
+         through it), MacAddress (Devices/Network/), which the packet seam and
+         NetworkManager both hand out, and RingBuffer (Structures/), the general
+         fixed-capacity buffer kernels build their own collections on.
          The boot contract (IPlatformInitializer), the tick source and its
          timer entries are internal because no kernel can obtain or
          meaningfully supply one. The SoftwareTimer that TimerManager.Schedule
@@ -48,7 +49,7 @@
        on it. Promoting a type for real is a deliberate change of that list. -->
   <Target Name="CosmosGuardHalPromotion" AfterTargets="Build">
     <PropertyGroup>
-      <_CosmosStableHalTypes>Cosmos\.Kernel\.HAL\.Devices\.Storage\.IBlockDevice|Cosmos\.Kernel\.HAL\.Devices\.Network\.MacAddress</_CosmosStableHalTypes>
+      <_CosmosStableHalTypes>Cosmos\.Kernel\.HAL\.Devices\.Storage\.IBlockDevice|Cosmos\.Kernel\.HAL\.Devices\.Network\.MacAddress|Cosmos\.Kernel\.HAL\.Structures\.RingBuffer&lt;T&gt;</_CosmosStableHalTypes>
       <!-- A stable line: optional modifiers (static, override), one of those types, then the end of the line or one of its members. -->
       <_CosmosStableHalLine>^(?:[a-z]+ )*(?:$(_CosmosStableHalTypes))(?:[.( ]|$)</_CosmosStableHalLine>
     </PropertyGroup>
@@ -63,7 +64,7 @@
                               Condition="!$([System.String]::Copy('%(Identity)').StartsWith('#')) And !$([System.String]::Copy('%(Identity)').StartsWith('[COSMOS0003]')) And !$([System.String]::Copy('%(Identity)').StartsWith('*REMOVED*')) And !$([System.Text.RegularExpressions.Regex]::IsMatch('%(Identity)', '$(_CosmosStableHalLine)'))" />
     </ItemGroup>
     <Error Condition="'@(_CosmosPromotedHalLine)' != ''"
-           Text="A HAL symbol is public without the [COSMOS0003] prefix in PublicAPI.*.txt: '%(_CosmosPromotedHalLine.Identity)'. Every public HAL type other than the stable device contracts (IBlockDevice, MacAddress) carries [Experimental(Experimentals.DriverKitSeamDiagId)]; promoting one out of the seam is a deliberate change of the _CosmosStableHalTypes list in the CosmosGuardHalPromotion target." />
+           Text="A HAL symbol is public without the [COSMOS0003] prefix in PublicAPI.*.txt: '%(_CosmosPromotedHalLine.Identity)'. Every public HAL type other than the stable contracts (IBlockDevice, MacAddress, RingBuffer) carries [Experimental(Experimentals.DriverKitSeamDiagId)]; promoting one out of the seam is a deliberate change of the _CosmosStableHalTypes list in the CosmosGuardHalPromotion target." />
   </Target>
 
   <ItemGroup>

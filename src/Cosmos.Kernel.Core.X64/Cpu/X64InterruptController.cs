@@ -166,7 +166,7 @@ internal class X64InterruptController : IInterruptController
         if (HasErrorCode(interrupt))
         {
             Serial.Write("[INT] Error code: 0x");
-            Serial.WriteHex(Cosmos.Kernel.Core.X64.Bridge.IdtNative.GetLastErrorCode());
+            Serial.WriteHex(Bridge.IdtNative.GetLastErrorCode());
             Serial.Write("\n");
         }
 

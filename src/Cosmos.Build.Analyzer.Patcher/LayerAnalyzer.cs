@@ -75,8 +75,8 @@ public class LayerAnalyzer : DiagnosticAnalyzer
     /// and are exempt from layer checks by convention.
     /// </summary>
     private static bool IsPlugAssembly(string assemblyName)
-        => assemblyName.EndsWith(".Plugs", System.StringComparison.Ordinal)
-        || assemblyName.Equals("Plugs", System.StringComparison.Ordinal);
+        => assemblyName.EndsWith(".Plugs", StringComparison.Ordinal)
+        || assemblyName.Equals("Plugs", StringComparison.Ordinal);
 
     /// <summary>
     /// Returns true when the project declares <c>&lt;CosmosDriverAssembly&gt;true&lt;/CosmosDriverAssembly&gt;</c>.
@@ -84,7 +84,7 @@ public class LayerAnalyzer : DiagnosticAnalyzer
     internal static bool IsDriverAssembly(AnalyzerOptions options)
     {
         return options.AnalyzerConfigOptionsProvider.GlobalOptions.TryGetValue(DriverAssemblyPropertyKey, out string? value)
-            && string.Equals(value, "true", System.StringComparison.OrdinalIgnoreCase);
+            && string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
     }
 
     private static void AnalyzeCompilationStart(CompilationStartAnalysisContext context)
@@ -130,7 +130,7 @@ public class LayerAnalyzer : DiagnosticAnalyzer
         // Non-Cosmos assemblies that reference at least one Cosmos layer assembly are user kernels.
         // Cosmos.* assemblies that are not a recognised layer (aggregator, Plugs, Debug, Boot...) are skipped.
         bool isUserKernel =
-            !compilation.Assembly.Name.StartsWith("Cosmos.", System.StringComparison.Ordinal)
+            !compilation.Assembly.Name.StartsWith("Cosmos.", StringComparison.Ordinal)
             && compilation.ReferencedAssemblyNames.Any(r => GetLayerFromAssemblyName(r.Name) != null);
 
         return isUserKernel ? KernelLayer.User : null;
@@ -186,7 +186,7 @@ public class LayerAnalyzer : DiagnosticAnalyzer
     private static KernelLayer? GetLayerFromAssemblyName(string name)
     {
         // Native: Cosmos.Kernel.Native.*
-        if (name.StartsWith("Cosmos.Kernel.Native", System.StringComparison.Ordinal))
+        if (name.StartsWith("Cosmos.Kernel.Native", StringComparison.Ordinal))
         {
             return KernelLayer.Native;
         }
@@ -198,7 +198,7 @@ public class LayerAnalyzer : DiagnosticAnalyzer
         }
 
         // HAL: Cosmos.Kernel.HAL, Cosmos.Kernel.HAL.X64, Cosmos.Kernel.HAL.ARM64
-        if (name.StartsWith("Cosmos.Kernel.HAL", System.StringComparison.Ordinal))
+        if (name.StartsWith("Cosmos.Kernel.HAL", StringComparison.Ordinal))
         {
             return KernelLayer.Hal;
         }
@@ -236,7 +236,7 @@ public class LayerAnalyzer : DiagnosticAnalyzer
     {
         private readonly KernelLayer _currentLayer;
         private readonly ConcurrentDictionary<string, Location> _firstUseByAssembly =
-            new(System.StringComparer.Ordinal);
+            new(StringComparer.Ordinal);
 
         public LayerUses(KernelLayer currentLayer)
         {
@@ -273,7 +273,7 @@ public class LayerAnalyzer : DiagnosticAnalyzer
 
         public void Report(CompilationAnalysisContext context)
         {
-            foreach (KeyValuePair<string, Location> use in _firstUseByAssembly.OrderBy(p => p.Key, System.StringComparer.Ordinal))
+            foreach (KeyValuePair<string, Location> use in _firstUseByAssembly.OrderBy(p => p.Key, StringComparer.Ordinal))
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticMessages.LayerViolation,

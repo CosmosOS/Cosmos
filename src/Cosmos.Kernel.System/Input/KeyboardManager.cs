@@ -8,6 +8,7 @@ using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.HAL.DriverKit.Threading;
+using Cosmos.Kernel.HAL.Structures;
 using Cosmos.Kernel.System.Input.Layouts;
 using Cosmos.Kernel.System.Sessions;
 
@@ -46,7 +47,7 @@ public static class KeyboardManager
     /// <summary>Whether the refused indicator schedule of a kernel with no kit worker has been logged.</summary>
     private static bool s_ledsRefusedLogged;
 
-    private static Queue<KeyEvent>? s_queuedKeys;
+    private static RingBuffer<KeyEvent>? s_queuedKeys;
     private static KeyboardLayout? s_layout;
 
     /// <summary>
@@ -147,7 +148,7 @@ public static class KeyboardManager
             return;
         }
 
-        s_queuedKeys = new Queue<KeyEvent>();
+        s_queuedKeys = new RingBuffer<KeyEvent>(200);
         s_layout = new USStandardLayout();
         s_keyboards = [];
         s_ledsWork = new WorkItem(ApplyLeds, binding: null);
@@ -223,7 +224,7 @@ public static class KeyboardManager
 
         using (InternalCpu.DisableInterruptsScope())
         {
-            s_queuedKeys?.Enqueue(keyEvent);
+            s_queuedKeys?.Push(keyEvent);
         }
     }
 
@@ -375,7 +376,13 @@ public static class KeyboardManager
 
         using (InternalCpu.DisableInterruptsScope())
         {
-            return s_queuedKeys.Peek();
+            if (s_queuedKeys.Peek(out KeyEvent? o))
+            {
+                return o;
+            }
+
+            return new KeyEvent();
+
         }
     }
 
@@ -425,7 +432,7 @@ public static class KeyboardManager
         // what makes the read safe against the interrupt that fills the queue.
         using (InternalCpu.DisableInterruptsScope())
         {
-            if (s_queuedKeys is not null && s_queuedKeys.TryDequeue(out KeyEvent? pending))
+            if (s_queuedKeys is not null && s_queuedKeys.Pop(out KeyEvent? pending))
             {
                 key = pending;
                 return true;
@@ -464,7 +471,7 @@ public static class KeyboardManager
             // for the very interrupt this scope masks.
             using (InternalCpu.DisableInterruptsScope())
             {
-                if (s_queuedKeys.TryDequeue(out KeyEvent? key))
+                if (s_queuedKeys.Pop(out KeyEvent? key))
                 {
                     return key;
                 }
