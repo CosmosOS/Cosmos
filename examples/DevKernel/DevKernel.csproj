@@ -4,7 +4,7 @@
     <CosmosKernelClass>DevKernel.Kernel</CosmosKernelClass>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <!-- Drivers/SampleDriver.cs and the sampledev command are written over the experimental driver kit seam (COSMOS0003). -->
+    <!-- Drivers/SampleDriver.cs, the sampledev command and the commands that read device facets (display, audio, disks) are written over the experimental driver kit seam (COSMOS0003). -->
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
