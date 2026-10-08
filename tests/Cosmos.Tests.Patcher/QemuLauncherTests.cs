@@ -225,6 +225,59 @@ public class QemuLauncherTests
         Assert.Contains(" -device usb-kbd,bus=usbxhci0.0,id=usbkbd0", text);
     }
 
+    // The mouse rides the same xHCI controller as the USB disks and the
+    // keyboard; alone, it brings the controller itself, and never twice.
+    [Fact]
+    public void AppendUsbMouseArgs_PutsTheMouseOnOneXhciController()
+    {
+        QemuLaunchOptions mouseOnly = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            MouseDevice = "usb-mouse"
+        };
+        StringBuilder args = new();
+        Assert.True(QemuLauncher.AppendUsbMouseArgs(args, mouseOnly, QemuLauncher.AppendUsbKeyboardArgs(args, mouseOnly, QemuLauncher.AppendStorageArgs(args, mouseOnly))));
+
+        string text = args.ToString();
+        Assert.Contains("-device qemu-xhci,id=usbxhci0", text);
+        Assert.Equal(text.IndexOf("qemu-xhci", StringComparison.Ordinal), text.LastIndexOf("qemu-xhci", StringComparison.Ordinal));
+        Assert.Contains(" -device usb-mouse,bus=usbxhci0.0,id=usbmouse0", text);
+        Assert.DoesNotContain("usb-kbd", text);
+
+        // The shared input path adds nothing for it, so the mouse is emitted once.
+        args.Clear();
+        QemuLauncher.AppendInputDevice(args, "usb-mouse");
+        Assert.Equal(string.Empty, args.ToString());
+
+        QemuLaunchOptions withKeyboardAndDisk = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            KeyboardDevice = "usb-kbd",
+            MouseDevice = "usb-mouse",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.Usb }]
+        };
+        args.Clear();
+        QemuLauncher.AppendUsbMouseArgs(args, withKeyboardAndDisk, QemuLauncher.AppendUsbKeyboardArgs(args, withKeyboardAndDisk, QemuLauncher.AppendStorageArgs(args, withKeyboardAndDisk)));
+
+        text = args.ToString();
+        Assert.Equal(text.IndexOf("qemu-xhci", StringComparison.Ordinal), text.LastIndexOf("qemu-xhci", StringComparison.Ordinal));
+        Assert.Contains("-device usb-storage,drive=usbdisk0,bus=usbxhci0.0,id=usbstick0", text);
+        Assert.Contains(" -device usb-kbd,bus=usbxhci0.0,id=usbkbd0", text);
+        Assert.Contains(" -device usb-mouse,bus=usbxhci0.0,id=usbmouse0", text);
+
+        // Neither USB input device asked for: no controller from them.
+        QemuLaunchOptions none = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso"
+        };
+        args.Clear();
+        Assert.False(QemuLauncher.AppendUsbMouseArgs(args, none, QemuLauncher.AppendUsbKeyboardArgs(args, none, QemuLauncher.AppendStorageArgs(args, none))));
+        Assert.DoesNotContain("qemu-xhci", args.ToString());
+    }
+
     [Fact]
     public void AppendStorageArgs_RejectsQuotesInDrivePaths()
     {

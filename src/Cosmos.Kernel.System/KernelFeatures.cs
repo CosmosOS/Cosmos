@@ -75,10 +75,10 @@ public static class KernelFeatures
 
     /// <summary>
     /// Whether USB is enabled (<c>CosmosEnableUsb</c>): the kit's xHCI host
-    /// controller driver, the hub driver and the USB keyboard and mass
+    /// controller driver, the hub driver and the USB keyboard, mouse and mass
     /// storage class drivers, which the driver manifest registers under this
     /// switch. Requires PCI. When the property is not set, it is on only if
-    /// Keyboard or Storage is on.
+    /// Keyboard, Mouse or Storage is on.
     /// </summary>
     public static bool Usb => CosmosFeatures.UsbEnabled;
 
