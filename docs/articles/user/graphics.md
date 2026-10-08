@@ -339,7 +339,7 @@ A display driver can implement `Canvas3D`: its constructor takes the `DisplayDev
 
 ### A cube the mouse rolls
 
-The DevKernel `cube` command builds a whole scene from those calls: a mesh with one color per face, the ground grid, and a flat triangle that points where the mouse pushes. The pointer drives the roll, so the further it sits from the center of the screen, the faster the cube rolls that way.
+Those calls are enough for a whole scene: a mesh with one color per face over the ground grid. The pointer drives the roll, so the further it sits from the center of the screen, the faster the cube rolls that way.
 
 ```csharp
 if (Canvas.GetFullScreen() is not Canvas3D canvas3D)
@@ -431,8 +431,6 @@ while (true)
 
 <!-- video: the cube spinning above the grid, then rolling right, left, toward the camera and away as the mouse is pushed to each edge of the screen, the arrow on the ground showing the push direction -->
 <video src="images/graphics-3d-cube.mp4" controls autoplay muted loop playsinline style="max-width:100%"></video>
-
-The full demo, cube mesh and direction arrow included, is [SpinningCubeDemo.cs](https://github.com/CosmosOS/Cosmos/blob/gen3/examples/DevKernel/Graphics/SpinningCubeDemo.cs).
 
 ## Current limitations
 
