@@ -48,6 +48,16 @@ internal interface IInterruptController
     bool IsInitialized { get; }
 
     /// <summary>
+    /// Raises the controller's reschedule interrupt on the current CPU, the
+    /// way a device would raise one, so its exit runs the reschedule the
+    /// caller requested: a self-IPI through the Local APIC on x64, a
+    /// self-SGI through the GIC on ARM64. The interrupt arrives once the
+    /// caller has interrupts enabled. Thread context.
+    /// </summary>
+    /// <returns>False when the controller cannot deliver one yet; nothing was raised.</returns>
+    bool TryRaiseReschedule();
+
+    /// <summary>
     /// Dispatch an interrupt delivered by the arch's assembly stub. The
     /// implementation is responsible for acknowledging (where applicable),
     /// looking up and invoking the registered handler, signalling EOI, and

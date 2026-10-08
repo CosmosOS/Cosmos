@@ -27,6 +27,13 @@ internal class X64InterruptController : IInterruptController
     internal const int XmmSaveAreaSizeBytes = 256;
 
     /// <summary>
+    /// The vector of the scheduler's self-IPI (<see cref="TryRaiseReschedule"/>):
+    /// above the LAPIC timer's <see cref="LocalApic.TIMER_VECTOR"/>, outside
+    /// the ISA lines and the dynamic range devices allocate from.
+    /// </summary>
+    private const byte RescheduleVector = 0xF0;
+
+    /// <summary>
     /// True once a hardware line can be routed, which on x64 takes the I/O
     /// APIC the MADT describes. The Local APIC alone, which a machine without
     /// ACPI still has, delivers the timer and MSI messages but no line, so
@@ -39,6 +46,22 @@ internal class X64InterruptController : IInterruptController
         Serial.Write("[X64InterruptController] Starting IDT initialization...\n");
         Idt.RegisterAllInterrupts();
         Serial.Write("[X64InterruptController] IDT initialization complete\n");
+
+        // A handler, though it does nothing, is what takes the vector down
+        // Dispatch's hardware-IRQ path: the EOI, then the pending reschedule.
+        InterruptManager.SetHandler(RescheduleVector, HandleReschedule);
+    }
+
+    /// <inheritdoc/>
+    public bool TryRaiseReschedule()
+    {
+        if (!ApicManager.IsInitialized)
+        {
+            return false;
+        }
+
+        LocalApic.SendSelfIpi(RescheduleVector);
+        return true;
     }
 
     public void RouteIrq(byte irqNo, byte vector, bool startMasked)
@@ -117,6 +140,11 @@ internal class X64InterruptController : IInterruptController
         {
             SendEOI();
         }
+    }
+
+    /// <summary>The reschedule self-IPI's handler: nothing to do, Dispatch runs the reschedule on its exit.</summary>
+    private static void HandleReschedule(ref IRQContext ctx)
+    {
     }
 
     private static void SendEOI()

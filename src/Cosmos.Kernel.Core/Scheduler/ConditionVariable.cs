@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.Core.CPU;
 
 namespace Cosmos.Kernel.Core.Scheduler;
 
@@ -66,13 +65,9 @@ internal class ConditionVariable : IDisposable
             SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
         }
 
-        // Only park the CPU while still Blocked (same rationale as Mutex.Acquire): if a Signal
-        // already readied this thread between scope-dispose and this point, halting would sleep
-        // past the wake-up until an unrelated interrupt.
-        if (currentThread.State == SchedulerThreadState.Blocked)
-        {
-            InternalCpu.Halt();
-        }
+        // Give the CPU to the next thread until a Signal readies this one (same as Mutex.Acquire);
+        // returns at once when a Signal already landed between scope-dispose and this point.
+        SchedulerManager.Park(currentThread);
 
         // Reacquire the mutex before returning
         mutex.Acquire();
@@ -105,10 +100,7 @@ internal class ConditionVariable : IDisposable
             SchedulerManager.MarkSleeping(currentThread.CpuId, currentThread, timeoutMs);
         }
 
-        if (currentThread.State == SchedulerThreadState.Sleeping)
-        {
-            InternalCpu.Halt();
-        }
+        SchedulerManager.Park(currentThread);
 
         // Signaled iff Signal/SignalAll removed this thread from the wait list before the
         // timeout fired. On timeout the stale entry must be removed here, or a later Signal

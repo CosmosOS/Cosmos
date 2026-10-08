@@ -236,6 +236,17 @@ internal static class InterruptManager
     public static void UnmaskIrq(byte irqNo) => s_controller?.UnmaskIrq(irqNo);
 
     /// <summary>
+    /// Raises the platform's reschedule interrupt on the current CPU
+    /// (<see cref="IInterruptController.TryRaiseReschedule"/>); false before
+    /// the controller is registered or while it cannot deliver one. Thread
+    /// context.
+    /// </summary>
+    internal static bool TryRaiseReschedule()
+    {
+        return s_controller?.TryRaiseReschedule() ?? false;
+    }
+
+    /// <summary>
     /// Undoes <see cref="SetIrqHandler"/>: masks the line at the controller,
     /// then clears the slot at 0x20 + <paramref name="irqNo"/>, so a
     /// delivery already latched finds no handler and is dismissed with its
