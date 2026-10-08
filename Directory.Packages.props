@@ -26,6 +26,7 @@
     <PackageVersion Include="Cosmos.Executable.Lua" Version="4.0.0" />
     <PackageVersion Include="Cosmos.Network.Telnet" Version="1.0.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="DotWasm" Version="0.1.0" />
     <PackageVersion Include="log4net" Version="3.0.3" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.4.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.14.0" />
@@ -55,6 +56,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
     <PackageVersion Include="Spectre.Console.Cli" Version="0.51.1" />
+    <PackageVersion Include="WACS" Version="0.16.14" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
