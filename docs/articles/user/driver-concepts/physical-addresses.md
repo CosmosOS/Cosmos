@@ -1,0 +1,11 @@
+# Physical addresses
+
+Code running on a CPU with paging never names memory directly. Every pointer it holds is a virtual address, which the memory management unit translates through page tables into a physical address, the location the memory bus actually carries, in RAM or in a device's register space. Translation works page by page, usually 4 KiB at a time, and neighboring virtual pages need not map to neighboring physical ones.
+
+A device sits outside that translation. When it reads or writes memory by [DMA](dma.md), it puts an address on the bus with no page table to consult, so a driver gives it the physical address of a buffer, never the pointer its own code uses. An IOMMU can give devices a translation of their own; without one, the device address is the physical address. The split also runs the other way: a device's [registers](registers.md) sit at a physical address, which the kernel maps into the virtual address space before the CPU can reach them.
+
+Two constraints follow. A buffer contiguous in virtual memory may be scattered across physical pages, while a device told to transfer N bytes from an address reads N physically consecutive bytes, so a driver allocates physically contiguous memory or describes a scattered buffer as a list of fragments. Devices also impose alignment: a register that holds a base address often ignores its low bits, and some structures must not cross a page boundary.
+
+The trap is that both kinds of address are plain integers. Nothing stops a driver from handing a device a virtual address, and the device then reads or writes an unrelated physical location, with no fault to show where.
+
+In the driver kit, a `DmaBuffer` from `binding.AllocateDma(length, alignment)` hands out both views together: it is physically contiguous, starts at least on a 4 KiB boundary, and carries `Span` for the CPU and `PhysicalAddress` for the device. A node's memory windows (`DeviceResource.PhysicalBase`, and `PciBar.Base` for a memory BAR) are physical addresses that `MapRegisters` and `MapRegion` make reachable, and the kernel sets up no IOMMU, so a physical address is what a device uses. See [DMA memory](../drivers.md#dma-memory) and [BAR resources](../drivers.md#bar-resources).
