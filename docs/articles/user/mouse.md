@@ -6,14 +6,14 @@ The main differences if you come from Gen2:
 
 | | Gen2 | Gen3 |
 |---|---|---|
-| Manager API | `Cosmos.System.MouseManager` | Same model, in `Cosmos.Kernel.System.Mouse` |
+| Manager API | `Cosmos.System.MouseManager` | Same model, in `Cosmos.Kernel.System.Input` |
 | Button state | `MouseState` flags enum | `LeftButton`, `RightButton`, `MiddleButton` booleans |
 | Position | `X`, `Y` clamped to the screen size | Same |
 | Scroll wheel | `ScrollDelta` + `ResetScrollDelta()` | Same |
 | Cursor | Drawn by your code | Drawn by your code |
-| Devices | PS/2 mouse | PS/2 mouse with scroll wheel (x64), virtio-mouse (x64 PCI and ARM64 MMIO) |
+| Devices | PS/2 mouse | PS/2 mouse with scroll wheel (x64), virtio-mouse and USB mouse, all over the driver kit (the 8042 on q35 and every PC; virtio over PCI on both architectures, MMIO on ARM64; USB on an xHCI controller on both) |
 
-If you find bugs or something abnormal, please [submit an issue](https://github.com/valentinbreiz/nativeaot-patcher/issues/new) on our repository.
+If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
 ## Enable the mouse in your kernel
 
@@ -31,10 +31,14 @@ These are the `using`s the snippets below rely on; the drawing types come from t
 using System.Drawing;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Graphics.Fonts;
-using Cosmos.Kernel.System.Mouse;
+using Cosmos.Kernel.System.Input;
 ```
 
-Like the keyboard, the mouse is detected and registered at boot; `MouseManager` is ready as soon as your kernel runs.
+Like the keyboard, the PS/2 mouse (x64) is bound by the driver kit's `Ps2MouseDriver`, a virtio mouse by `VirtioInputDriver` and a USB mouse by `UsbMouseDriver` during the driver stage, each published to the manager's consumer, which registers it ([PS/2 devices](drivers.md#ps2-devices), [Virtio devices](drivers.md#virtio-devices), [USB devices](drivers.md#usb-devices)); `MouseManager` is ready as soon as your kernel runs.
+
+USB mice also need the USB drivers, `CosmosEnableUsb`. You do not have to set it: left unset, it is on whenever `CosmosEnableMouse` is. Setting it to `false` keeps PS/2 and virtio mice and drops the USB ones with the xHCI driver.
+
+To try a USB mouse in QEMU, pass `--mouse usb-mouse` to `cosmos run`: the launcher adds a `qemu-xhci` controller (or reuses the one USB disks or a `usb-kbd` keyboard already brought) and plugs the mouse into it, on either architecture.
 
 ## Position and buttons
 
@@ -71,7 +75,7 @@ while (true)
 <!-- video: the cursor dot following the mouse while the position readout updates and the L, M and R indicators light up as each button is pressed -->
 <video src="images/mouse-cursor.mp4" controls autoplay muted loop playsinline style="max-width:100%"></video>
 
-Call `SetScreenSize` once at startup: the manager clamps `X` and `Y` to those bounds (the default is 1024x768, which rarely matches the framebuffer). For a real arrow cursor, blit a small bitmap instead of the circle; the DevKernel has a ready-made one in [MouseCursor.cs](https://github.com/valentinbreiz/nativeaot-patcher/blob/main/examples/DevKernel/Graphics/MouseCursor.cs).
+Call `SetScreenSize` once at startup: the manager clamps `X` and `Y` to those bounds (the default is 1024x768, which rarely matches the framebuffer). For a real arrow cursor, blit a small bitmap instead of the circle.
 
 ## Painting with the mouse
 
@@ -152,16 +156,17 @@ Two more knobs on `MouseManager`:
 
 - Only relative pointing devices are supported. There is no absolute (tablet) input, so inside a VM window the guest pointer does not track the host cursor one to one.
 - Horizontal wheel tilt is ignored; only the vertical wheel reaches `ScrollDelta`.
-- Devices are detected once at boot; there is no mouse hotplug.
+- A PS/2 mouse is published once, during the driver stage, when the mouse driver bound the 8042 driver's auxiliary port node and its reset was answered; a virtio mouse present at boot once, when the stage offers its device. A USB mouse is published when its node is bound and withdrawn when the node is retracted, and so is a virtio mouse whose PCI function sits behind a PCI Express hot-plug slot, which the root port driver publishes and retracts, so those are the mice that can be plugged in and pulled out while the kernel runs.
+- A USB mouse is driven in the HID boot protocol, which every PC mouse supports: three buttons, 8-bit X and Y deltas and, on a wheel mouse, the wheel in the byte after them. Extra buttons, horizontal tilt and the finer resolution some mice report in their own report protocol are not read.
 
 ## How it works
 
-On x64 the PS/2 mouse raises IRQ12 for every byte of a movement packet: 3 bytes of buttons and X/Y deltas, extended to 4 by the scroll wheel byte once the driver has enabled the IntelliMouse protocol (the magic sample-rate sequence 200, 100, 80 at boot). On ARM64 (and over PCI on x64) the virtio-input device delivers the same information as event records. Either way the driver hands the deltas to `MouseManager`, which applies `Sensitivity`, adds them to `X` and `Y`, clamps to the screen size and updates the button booleans; wheel deltas accumulate in `ScrollDelta` until a poller consumes them. Your render loop only ever reads state, which is why no locking is needed.
+On x64 the PS/2 mouse raises IRQ 12 for every byte of a movement packet, which the 8042 driver reads and hands to the auxiliary port's `Ps2Access`; the mouse driver's handler assembles the 3 bytes of buttons and X/Y deltas, extended to 4 by the scroll wheel byte once its probe has enabled the IntelliMouse protocol (the sample-rate sequence 200, 100, 80), drops a byte that cannot start a packet, and hands one report per packet through the pointer sink to the manager's consumer. A virtio mouse delivers the same information as event records on its queue, over PCI or MMIO: the driver kit's `VirtioInputDriver` drains them on the kit's worker (woken by the queue's interrupt, or every 20 ms when none could be routed), folds the axis and button events into one report per sync event, and hands it through the pointer sink to the manager's consumer. A USB mouse's boot reports arrive on its interrupt IN pipe, delivered by the xHCI driver's message interrupt or, when none could be routed, by its 20 ms polled drain of the event ring; `UsbMouseDriver`'s handler turns each report into one relative movement (HID points Y down as the manager does, and its wheel is negated so that positive scrolls down, as on PS/2) and hands it through the same sink. Either way the deltas reach `MouseManager`, which applies `Sensitivity`, adds them to `X` and `Y`, clamps to the screen size and updates the button booleans; wheel deltas accumulate in `ScrollDelta` until a poller consumes them. Your render loop only ever reads state, which is why no locking is needed.
 
 ```
 Render loop (reads X/Y, buttons, ScrollDelta)
         │
 MouseManager ── Sensitivity, screen clamping, ScrollDelta accumulation
         │
-PS/2 mouse, IRQ12 (x64)  /  virtio-mouse (x64 PCI, ARM64 MMIO)
+PS/2 mouse over the driver kit (the 8042, IRQ 12, x64)  /  virtio-mouse over the driver kit (PCI, MMIO)  /  USB mouse over the driver kit (xHCI)
 ```

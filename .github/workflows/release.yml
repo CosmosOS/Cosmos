@@ -6,8 +6,14 @@ name: Release
 #   2. Publish them to NuGet.org
 #   3. Build the Windows installer
 #   4. Create a GitHub release
-#   5. Publish a frozen copy of the docs to gh-pages under vX.Y.Z/ (plus
-#      latest/ and versions.json, consumed by the version dropdown)
+#   5. Publish a frozen copy of the docs under vX.Y.Z/ (plus latest/ and
+#      versions.json, consumed by the version dropdown)
+#
+# The tag releases from both remotes: mirror-gen3.yml forwards `v*` to
+# CosmosOS/Cosmos, so each repository builds its own installer, GitHub release
+# and versioned docs. Step 2 is the exception: nuget.org grants the publish
+# credential to CosmosOS/Cosmos alone (see publish-nuget), so packages reach
+# nuget.org exactly once, under the CosmosOS profile.
 #
 # `workflow_dispatch` is available for manual reruns / testing; manual runs
 # only build artifacts and DO NOT publish to NuGet or create a GitHub release.
@@ -135,12 +141,22 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
 
-  # ── Publish to NuGet (tag pushes only) ───────────────────────────────────────
+  # ── Publish to NuGet (tag pushes on CosmosOS/Cosmos only) ────────────────────
+  # Authenticated by nuget.org Trusted Publishing, so no API key is stored
+  # anywhere: the job trades its GitHub OIDC token for a key that lives one
+  # hour and may only touch packages owned by the CosmosOS profile. The policy
+  # matches on repository owner, repository name, this workflow's file name and
+  # the `production` environment, so renaming this file, moving the job to
+  # another repository or dropping the environment all break publishing.
   publish-nuget:
     name: Publish to NuGet
     needs: build-packages
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.repository == 'CosmosOS/Cosmos' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -153,27 +169,40 @@ jobs:
           name: cosmos-packages
           path: packages
 
+      # Keep this immediately before the push: the key expires after an hour,
+      # and one OIDC token buys exactly one key.
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@v1
+        with:
+          # The user who CREATED the policy, not the CosmosOS profile that owns
+          # it. nuget.org looks the policy up by creator and answers a wrong
+          # guess with "No matching trust policy owned by user 'CosmosOS' was
+          # found" (HTTP 401). Public, so not a secret. If the policy is ever
+          # recreated by somebody else, this has to follow them.
+          user: valentinbreiz
+
       - name: Push to NuGet
         run: |
           for pkg in packages/*.nupkg; do
             dotnet nuget push "$pkg" \
-              --api-key "${{ secrets.NUGET_API_KEY }}" \
+              --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
               --source https://api.nuget.org/v3/index.json \
               --skip-duplicate
           done
 
   # ── Versioned docs ───────────────────────────────────────────────────────────
-  # Freezes the docs of a release under gh-pages/vX.Y.Z/, refreshes the
-  # latest/ alias, and rewrites versions.json (read by the version dropdown in
-  # docs/templates/custom). The dev site that build-docs.yml publishes at the
-  # branch root keeps these folders thanks to its keep_files: true.
+  # Freezes the docs of a release under vX.Y.Z/ on the Pages site, refreshes
+  # the latest/ alias, and rewrites versions.json (read by the version dropdown
+  # in docs/templates/custom). The dev site that build-docs.yml publishes at
+  # the site root keeps these folders thanks to its keep_files: true.
   #
   # Runs on v* tag pushes; dispatching with docs_tag backfills a tag released
   # before this job existed (docs built from the tag's source, current
   # templates/custom overlaid so the frozen pages carry the version dropdown).
   publish-docs:
     name: Publish Versioned Docs
-    if: github.repository == 'valentinbreiz/nativeaot-patcher' && (startsWith(github.ref, 'refs/tags/v') || inputs.docs_tag != '')
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.docs_tag != ''
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -183,10 +212,28 @@ jobs:
         with:
           ref: ${{ inputs.docs_tag || github.ref }}
 
+      # The one place the per-repository mapping is stated. nativeaot-patcher
+      # serves the site from its own gh-pages branch; CosmosOS/Cosmos serves it
+      # from CosmosOS/cosmosos.github.io, the target build-docs.yml already
+      # deploys the dev site to. source_branch is the branch holding the
+      # current templates, used by the backfill overlay below.
+      - name: Resolve docs target
+        id: target
+        run: |
+          if [[ "$GITHUB_REPOSITORY" == "CosmosOS/Cosmos" ]]; then
+            echo "pages_repository=CosmosOS/cosmosos.github.io" >> "$GITHUB_OUTPUT"
+            echo "pages_branch=master" >> "$GITHUB_OUTPUT"
+            echo "source_branch=gen3" >> "$GITHUB_OUTPUT"
+          else
+            echo "pages_repository=$GITHUB_REPOSITORY" >> "$GITHUB_OUTPUT"
+            echo "pages_branch=gh-pages" >> "$GITHUB_OUTPUT"
+            echo "source_branch=main" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Overlay current template (backfill only)
         if: inputs.docs_tag != ''
         run: |
-          git fetch origin main --depth=1
+          git fetch origin ${{ steps.target.outputs.source_branch }} --depth=1
           git checkout FETCH_HEAD -- docs/templates/custom
 
       - name: Setup .NET
@@ -213,16 +260,20 @@ jobs:
       # one, newest first. The dropdown adds the dev entry (site root) itself.
       - name: Compose versions.json
         id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           version="${{ inputs.docs_tag }}"
           if [[ -z "$version" ]]; then
             version="${GITHUB_REF#refs/tags/}"
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          git fetch origin gh-pages --depth=1 || true
           mkdir -p /tmp/pages-root
+          # Both Pages targets are public, so the job token can list either.
+          # An empty listing (branch not created yet) is a valid first release.
           {
-            git ls-tree --name-only FETCH_HEAD 2>/dev/null | grep -E '^v[0-9]' || true
+            gh api "repos/${{ steps.target.outputs.pages_repository }}/contents?ref=${{ steps.target.outputs.pages_branch }}" \
+              --jq '.[] | select(.type == "dir") | .name' 2>/dev/null | grep -E '^v[0-9]' || true
             echo "$version"
           } | sort -uVr > /tmp/versions.txt
           # A backfilled old tag must not steal the latest/ alias.
@@ -235,29 +286,45 @@ jobs:
           ' > /tmp/pages-root/versions.json
           cat /tmp/pages-root/versions.json
 
-      - name: Publish frozen copy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./docs/_site
-          destination_dir: ${{ steps.version.outputs.version }}
+      # Everything this release changes on the Pages site, assembled into one
+      # tree: the frozen vX.Y.Z copy, the latest/ alias when this really is the
+      # newest release, and versions.json. It ships in a single deploy because
+      # peaceiris/actions-gh-pages starts an ssh-agent on a fixed socket path,
+      # so a second deploy_key step in the same job dies on the socket the
+      # first one left behind.
+      - name: Assemble Pages payload
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          mkdir -p "/tmp/pages-out/$version"
+          cp -r docs/_site/. "/tmp/pages-out/$version/"
+          if [[ "${{ steps.version.outputs.is_latest }}" == "true" ]]; then
+            mkdir -p /tmp/pages-out/latest
+            cp -r docs/_site/. /tmp/pages-out/latest/
+          fi
+          cp /tmp/pages-root/versions.json /tmp/pages-out/versions.json
+          find /tmp/pages-out -maxdepth 1 -mindepth 1 -printf '%f\n' | sort
 
-      - name: Refresh latest alias
-        if: steps.version.outputs.is_latest == 'true'
+      # keep_files: the dev site build-docs.yml publishes at the root has to
+      # survive, and so do the frozen copies of earlier releases.
+      - name: Publish to gh-pages
+        if: github.repository != 'CosmosOS/Cosmos'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./docs/_site
-          destination_dir: latest
+          publish_branch: ${{ steps.target.outputs.pages_branch }}
+          publish_dir: /tmp/pages-out
+          keep_files: true
 
-      - name: Publish versions.json
+      # Separate repository, so the job token does not reach it: same write
+      # deploy key build-docs.yml uses for the dev site.
+      - name: Publish to the org site
+        if: github.repository == 'CosmosOS/Cosmos'
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: /tmp/pages-root
+          deploy_key: ${{ secrets.GH_PAGES_DEPLOY_KEY }}
+          external_repository: ${{ steps.target.outputs.pages_repository }}
+          publish_branch: ${{ steps.target.outputs.pages_branch }}
+          publish_dir: /tmp/pages-out
           keep_files: true
 
   # ── Windows Installer ────────────────────────────────────────────────────────
@@ -301,7 +368,15 @@ jobs:
   create-release:
     name: Create Release
     needs: [build-packages, publish-nuget, build-installer-windows]
-    if: startsWith(github.ref, 'refs/tags/v')
+    # publish-nuget is skipped on every repository but CosmosOS/Cosmos, and a
+    # skipped dependency would otherwise skip this job too. A NuGet failure
+    # still blocks the release.
+    if: >-
+      !cancelled()
+      && startsWith(github.ref, 'refs/tags/v')
+      && needs.build-packages.result == 'success'
+      && needs.build-installer-windows.result == 'success'
+      && needs.publish-nuget.result != 'failure'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -312,10 +387,103 @@ jobs:
           path: installers
           merge-multiple: false
 
+      - name: Compose release name and notes
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${{ needs.build-packages.outputs.version }}"
+
+          # CosmosOS/Cosmos keeps the naming its releases have carried since the
+          # Gen2 User Kits: the UTC build date the kits were stamped with, plus
+          # the build it ships, so "User Kit 20260915 (3.0.85)" beside the old
+          # "User Kit 20221121". The tag stays v3.0.85 on both remotes, because
+          # that is what triggers this run and what versions the packages.
+          if [[ "$GITHUB_REPOSITORY" == "CosmosOS/Cosmos" ]]; then
+            echo "name=User Kit $(date -u +%Y%m%d) ($version)" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=v$version" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Left alone, GitHub diffs against whatever release is newest, and on
+          # CosmosOS/Cosmos that is the rolling tools-latest, which shares no
+          # history with the source. Pin the base to the highest earlier Gen3
+          # release of this repository instead. The pattern has to be strict:
+          # CosmosOS/Cosmos also carries a v0.20150130 release from Gen2 that a
+          # looser `^v[0-9]` would happily pick.
+          previous=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 200 \
+            --json tagName \
+            --jq '.[] | select(.tagName | test("^v[0-9]+\\.[0-9]+\\.[0-9]+$")) | .tagName' \
+            | grep -vx "v$version" | sort -Vr | head -1)
+          if [[ -n "$previous" && "$GITHUB_REPOSITORY" == "valentinbreiz/nativeaot-patcher" ]]; then
+            echo "generate=true" >> "$GITHUB_OUTPUT"
+            echo "previous_tag=$previous" >> "$GITHUB_OUTPUT"
+            echo "extra=" >> "$GITHUB_OUTPUT"
+          elif [[ -n "$previous" ]]; then
+            # GitHub's generator only lists pull requests of the repository it
+            # runs in. On CosmosOS/Cosmos the commits arrive through the mirror
+            # and the pull requests that merged them live upstream, so it would
+            # print a bare compare link and nothing else. Walk the merge commits
+            # between the two tags and resolve each to its pull request instead:
+            # this repository first, so the list keeps working once pull
+            # requests merge here directly, then upstream, which carries the
+            # same SHAs. The lines follow GitHub's own format.
+            upstream=valentinbreiz/nativeaot-patcher
+            changes=""
+            seen=""
+            for sha in $(gh api "repos/$GITHUB_REPOSITORY/compare/$previous...$GITHUB_SHA" --paginate \
+                           --jq '.commits[] | select(.parents | length > 1) | .sha'); do
+              line=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/pulls" \
+                       --jq '.[0] | select(. != null) | "* \(.title) by @\(.user.login) in \(.html_url)"')
+              if [[ -z "$line" ]]; then
+                line=$(gh api "repos/$upstream/commits/$sha/pulls" \
+                         --jq '.[0] | select(. != null) | "* \(.title) by @\(.user.login) in \(.html_url)"')
+              fi
+              # One line per pull request. Every merge commit in the range
+              # resolves to the pull request that introduced it, so a branch
+              # that merged gen3 into itself, or a contributor's fork-side
+              # merges, would repeat the same line once per merge commit.
+              [[ -z "$line" ]] && continue
+              url=${line##* }
+              case " $seen " in *" $url "*) continue ;; esac
+              seen+=" $url"
+              changes+="$line"$'\n'
+            done
+            echo "generate=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "extra<<RELEASE_EXTRA"
+              echo ""
+              echo "## What's Changed"
+              if [[ -n "$changes" ]]; then
+                printf '%s' "$changes"
+              else
+                echo "No pull requests were merged between $previous and v$version."
+              fi
+              echo ""
+              echo "**Full Changelog**: https://github.com/$GITHUB_REPOSITORY/compare/$previous...v$version"
+              echo "RELEASE_EXTRA"
+            } >> "$GITHUB_OUTPUT"
+          else
+            # No earlier v* release here, so there is nothing to diff: the first
+            # Gen3 release on this remote points readers at the roadmap instead
+            # of a changelog against an unrelated tag.
+            echo "generate=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "extra<<RELEASE_EXTRA"
+              echo ""
+              echo "### What's in this release"
+              echo ""
+              echo "First Gen3 release published from this repository. See the"
+              echo "[roadmap](https://cosmosos.github.io/roadmap.html) for what"
+              echo "is done and what is next."
+              echo "RELEASE_EXTRA"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "v${{ needs.build-packages.outputs.version }}"
+          name: ${{ steps.release.outputs.name }}
           body: |
             ### Downloads
 
@@ -324,7 +492,7 @@ jobs:
             | Windows | `CosmosSetup-${{ needs.build-packages.outputs.version }}-windows.exe` | Requires .NET 10 SDK, run installer |
             | Linux / macOS | `dotnet tool install -g Cosmos.Tools && cosmos install` | Requires .NET 10 SDK |
 
-            Already installed? Run `cosmos update` to move to this release — or `dotnet tool update -g Cosmos.Tools && cosmos install` if your CLI predates the update command.
+            Already installed? Run `cosmos update` to move to this release, or `dotnet tool update -g Cosmos.Tools && cosmos install` if your CLI predates the update command.
 
             ### Prerequisites
 
@@ -333,10 +501,14 @@ jobs:
             ### Quick Start
 
             - [Installation guide](https://cosmosos.github.io/articles/user/install.html)
-          # Append the auto-generated changelog (merged PRs / commits since the
-          # previous tag) below the download table — releases had no change
-          # description at all before this.
-          generate_release_notes: true
+            ${{ steps.release.outputs.extra }}
+          # Append the changelog GitHub generates from the pull requests merged
+          # since previous_tag. Off for the first release on a remote, which has
+          # no earlier v* tag to compare against, and off on CosmosOS/Cosmos,
+          # where the compose step builds the same list into `extra` because
+          # the pull requests live upstream.
+          generate_release_notes: ${{ steps.release.outputs.generate }}
+          previous_tag: ${{ steps.release.outputs.previous_tag }}
           draft: false
           prerelease: false
           files: |

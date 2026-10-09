@@ -6,13 +6,13 @@ namespace Cosmos.Kernel;
 /// <summary>
 /// Handles CPU exceptions.
 /// </summary>
-public static class ExceptionHandler
+internal static class ExceptionHandler
 {
     /// <summary>
     /// Initializes CPU exception handlers.
     /// Must be called explicitly after InterruptManager is initialized.
     /// </summary>
-    public static void Initialize()
+    internal static void Initialize()
     {
 #if ARCH_ARM64
         // ARM64 exception types: 0=Sync, 1=IRQ, 2=FIQ, 3=SError

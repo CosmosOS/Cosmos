@@ -6,7 +6,6 @@
     <projectFile>src/Cosmos.Patcher/Cosmos.Patcher.csproj</projectFile>
     <projectFile>src/Cosmos.Tools/Cosmos.Tools.csproj</projectFile>
     <projectFile>tests/ConsoleApp1/ConsoleApp1.csproj</projectFile>
-    <projectFile>tests/Kernels/Cosmos.Kernel.Tests.Process/Cosmos.Kernel.Tests.Process.csproj</projectFile>
   </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
@@ -20,9 +19,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f8cd28f8-8db5-4f5c-b0cb-c82b7fbea921" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.nativeaot-patcher/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.nativeaot-patcher/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/global.json" beforeDir="false" afterPath="$PROJECT_DIR$/global.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/VAS/PageFaultHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/VAS/PageFaultHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.Native.X64/CPU/Gdt.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.Native.X64/CPU/Gdt.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.HAL/Cosmos.Kernel.HAL.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.HAL/Cosmos.Kernel.HAL.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/MaskedAddress.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/MaskedAddress.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Cosmos.Kernel.System/PublicAPI.Unshipped.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Cosmos.Kernel.System/PublicAPI.Unshipped.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,42 +32,33 @@
     <option name="firstShow" value="$MSBuildEnableWorkloadResolver$" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="79" />
+    <option name="cachedIndexableFilesCount" value="560" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="zarlo/analyzer/0" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4ac38e449eb749c4a6c4081231b3deb2db3000/ae/0680b67e/Span`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2ed6f244870d54f694c6f5115739457d9178a47783a6e2c2d7251171a868a8/IEnumerable.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/63f3e01f9393dbe71876c2440ea55d19c936bbbfc91d5cda0fc86b6f7c387f1/Thread.CoreCLR.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/de86ea5398da271e6aed3ad1ad09ec9653b6135ce8ccd8e4625a85f355de7/Queue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/examples/DevKernel/Commands/NetworkCommands.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/examples/DevKernel/Kernel.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/examples/DevKernel/NuGet.Config" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core.X64/Bridge/Import/GdtNative.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core.X64/Cpu/Gdt.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core.X64/Memory/X64VirtualMemoryMapper.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Extensions/ByteArray.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/VAS/AddressSpace.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/VAS/AddressType.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/VAS/IVirtualMemoryMapper.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/VAS/PageTable.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/VAS/VirtualMemoryMapper.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Memory/Structures/RingBuffer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Runtime/Casting.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Scheduler/Process.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.Core/Scheduler/ProcessSignals.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.HAL/Cpu/Enums/EFlagsEnum.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.HAL/DebugInfo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.HAL/PlatformHAL.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/Cosmos.Kernel.HAL/Vfs/ModeEnum.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Tools/Commands/BuildCommand.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Cosmos.Tools/Program.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/tests/Kernels/Cosmos.Kernel.Tests.Process/Kernel.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/tests/profiles.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///mnt/data/projects/git/zarlo/CosmosMe/src/Cosmos.Kernel.Core/Runtime/GC.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///mnt/data/projects/git/zarlo/CosmosMe/src/Cosmos.Kernel.HAL/Structures/RingBuffer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///mnt/data/projects/git/zarlo/CosmosMe/src/Cosmos.Kernel.System/Network/MaskedAddress.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
     <commands />
@@ -77,61 +67,61 @@
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="false" />
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0436458132400221" />
-      <entry key="MS500" value="1.9881619861267266" />
-      <entry key="S2" value="3.4490215152364136" />
-      <entry key="S5" value="4.214376405860907" />
-      <entry key="S10" value="4.679668377045797" />
-      <entry key="S30" value="8.483809451780155" />
-      <entry key="S60" value="14.233607204602055" />
-      <entry key="M2" value="20.11707744412658" />
-      <entry key="M5" value="25.414506116572078" />
-      <entry key="M10" value="27.58916750952313" />
-      <entry key="M15" value="28.442155922114335" />
-      <entry key="M30" value="31.73999835482193" />
-      <entry key="H1" value="46.467130275105056" />
-      <entry key="H2" value="74.41315482285755" />
-      <entry key="H4" value="102.92233997677329" />
-      <entry key="D1" value="140.4194322613491" />
-      <entry key="W1" value="148.58147858619967" />
+      <entry key="MS100" value="2.716076002191458" />
+      <entry key="MS500" value="6.424385225971068" />
+      <entry key="S2" value="8.229189075202303" />
+      <entry key="S5" value="8.679692288894712" />
+      <entry key="S10" value="8.837771282290248" />
+      <entry key="S30" value="8.971701962091" />
+      <entry key="S60" value="9.36950822685797" />
+      <entry key="M2" value="10.52964856243073" />
+      <entry key="M5" value="12.698411342226573" />
+      <entry key="M10" value="15.70139982428809" />
+      <entry key="M15" value="19.05139866505339" />
+      <entry key="M30" value="31.377716084397573" />
+      <entry key="H1" value="58.75311580964546" />
+      <entry key="H2" value="103.62056859948645" />
+      <entry key="H4" value="154.45328750838715" />
+      <entry key="D1" value="232.12312913902392" />
+      <entry key="W1" value="250.7087634434662" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
       <entry key="S2" value="0.0" />
-      <entry key="S5" value="0.0" />
-      <entry key="S10" value="2.1589211326638058E-217" />
-      <entry key="S30" value="8.892647763214598E-73" />
-      <entry key="S60" value="1.4968005136774805E-36" />
-      <entry key="M2" value="2.0633292776753552E-18" />
-      <entry key="M5" value="1.6762653028391754E-7" />
-      <entry key="M10" value="9.601936073841238E-4" />
-      <entry key="M15" value="0.02309036707394807" />
-      <entry key="M30" value="0.7764463224936713" />
-      <entry key="H1" value="5.115319223146296" />
-      <entry key="H2" value="13.47402982366639" />
-      <entry key="H4" value="21.9881272310248" />
-      <entry key="D1" value="33.153006498688185" />
-      <entry key="W1" value="35.57860341472628" />
+      <entry key="S5" value="9.484925208E-313" />
+      <entry key="S10" value="1.4795320843664477E-156" />
+      <entry key="S30" value="2.3096306451852462E-52" />
+      <entry key="S60" value="3.19437251258163E-26" />
+      <entry key="M2" value="4.945577373172449E-13" />
+      <entry key="M5" value="5.034832452737345E-5" />
+      <entry key="M10" value="0.02685262192588749" />
+      <entry key="M15" value="0.23495162500608033" />
+      <entry key="M30" value="2.2754384248057447" />
+      <entry key="H1" value="8.360361501613399" />
+      <entry key="H2" value="19.501037417231505" />
+      <entry key="H4" value="32.87205005994485" />
+      <entry key="D1" value="53.973153919580355" />
+      <entry key="W1" value="59.091571392136714" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9663922527462478" />
-      <entry key="MS500" value="1.9274284431086757" />
-      <entry key="S2" value="3.4155408675089096" />
-      <entry key="S5" value="4.19743059752994" />
-      <entry key="S10" value="4.670297147885378" />
-      <entry key="S30" value="8.478905001116035" />
-      <entry key="S60" value="14.22938707268399" />
-      <entry key="M2" value="20.113916812341436" />
-      <entry key="M5" value="25.41283113157571" />
-      <entry key="M10" value="27.589195158365765" />
-      <entry key="M15" value="28.464496389378784" />
-      <entry key="M30" value="32.514417004770344" />
-      <entry key="H1" value="51.5770218330097" />
-      <entry key="H2" value="87.88037227540529" />
-      <entry key="H4" value="124.90501063992353" />
-      <entry key="D1" value="173.57108603967518" />
-      <entry key="W1" value="184.15987506949236" />
+      <entry key="MS100" value="2.47685222414776" />
+      <entry key="MS500" value="6.3035837383197695" />
+      <entry key="S2" value="8.18845683714052" />
+      <entry key="S5" value="8.662312015281978" />
+      <entry key="S10" value="8.828888976859632" />
+      <entry key="S30" value="8.968685112606718" />
+      <entry key="S60" value="9.36790726314481" />
+      <entry key="M2" value="10.528712088160448" />
+      <entry key="M5" value="12.697992729808647" />
+      <entry key="M10" value="15.72786135158699" />
+      <entry key="M15" value="19.285421536081433" />
+      <entry key="M30" value="33.64923930524947" />
+      <entry key="H1" value="67.10598900842716" />
+      <entry key="H2" value="123.11258008149706" />
+      <entry key="H4" value="187.31762507753172" />
+      <entry key="D1" value="286.09415677653647" />
+      <entry key="W1" value="309.8000019984929" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -145,31 +135,43 @@
     <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;zarlo/userland/0&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
+    "KEY_CHAT_IN_TOOLWINDOW": "false",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "zarlo/ringbuffer/0",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "editor.preferences.appearance",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "GitStage.ChangesTree.GroupingKeys": [
+      "directory",
+      "module",
+      "repository"
+    ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CidrAttachToUnstartedProcessDialog.programPattern">
       <recent name="C:\Program Files\dotnet\sdk\9.0.308\MSBuild.dll" />
@@ -222,12 +224,6 @@
       <workItem from="1777937585773" duration="2828000" />
       <workItem from="1780157711350" duration="1878000" />
       <workItem from="1784650578782" duration="8785000" />
-      <workItem from="1784806990460" duration="2945000" />
-      <workItem from="1784879455346" duration="4417000" />
-      <workItem from="1784964741878" duration="8721000" />
-      <workItem from="1785264013875" duration="11561000" />
-      <workItem from="1785361140253" duration="489000" />
-      <workItem from="1785365678315" duration="7154000" />
     </task>
     <task id="LOCAL-00001" summary="work">
       <option name="closed" value="true" />
@@ -325,47 +321,7 @@
       <option name="project" value="LOCAL" />
       <updated>1784663168405</updated>
     </task>
-    <task id="LOCAL-00013" summary="pull in main">
-      <option name="closed" value="true" />
-      <created>1784802511025</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1784802511025</updated>
-    </task>
-    <task id="LOCAL-00014" summary="pull in main">
-      <option name="closed" value="true" />
-      <created>1784802526733</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1784802526733</updated>
-    </task>
-    <task id="LOCAL-00015" summary="remove dupe lai">
-      <option name="closed" value="true" />
-      <created>1784879572653</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1784879572653</updated>
-    </task>
-    <task id="LOCAL-00016" summary="allow IDE0270">
-      <option name="closed" value="true" />
-      <created>1784880384293</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1784880384293</updated>
-    </task>
-    <task id="LOCAL-00017" summary="fix build issues">
-      <option name="closed" value="true" />
-      <created>1784881224485</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1784881224485</updated>
-    </task>
-    <option name="localTasksCounter" value="18" />
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -397,11 +353,31 @@
     <MESSAGE value="upd: fix Cosmos.Tools" />
     <MESSAGE value="upd: fix Cosmos.Build.Common.targets" />
     <MESSAGE value="upd: patcher structure" />
-    <MESSAGE value="pull in main" />
-    <MESSAGE value="remove dupe lai" />
-    <MESSAGE value="allow IDE0270" />
-    <MESSAGE value="fix build issues" />
-    <MESSAGE value="work on system calls" />
-    <option name="LAST_COMMIT_MESSAGE" value="work on system calls" />
+    <MESSAGE value="Introduce `RingBuffer` and replace `Queue` in `KeyboardManager`" />
+    <MESSAGE value="revert small change." />
+    <MESSAGE value="Run format." />
+    <option name="LAST_COMMIT_MESSAGE" value="Run format." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/IPv6/Address6.cs</url>
+          <line>213</line>
+          <properties documentPath="$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/IPv6/Address6.cs" containingFunctionPresentation="Method 'IsStartMask'" />
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/IPv6/Address6.cs</url>
+          <line>508</line>
+          <properties documentPath="$PROJECT_DIR$/src/Cosmos.Kernel.System/Network/IPv6/Address6.cs" containingFunctionPresentation="Method 'ToString'" />
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

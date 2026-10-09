@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Core.ARM64.Cpu;
 /// sparse GICv3 LPI lookup (INTID &gt;= 8192), EOI, and synchronous-exception
 /// fatal handling. Native imports live in Cosmos.Kernel.Core.ARM64/Bridge/Import/Arm64ExceptionVectorNative.cs.
 /// </summary>
-public class ARM64InterruptController : IInterruptController
+internal class ARM64InterruptController : IInterruptController
 {
     private bool _initialized;
     private uint _lastAckedIntId;
@@ -40,8 +40,18 @@ public class ARM64InterruptController : IInterruptController
     /// <summary>GIC priority for the timer PPI (lower value = higher priority; 0x80 = medium).</summary>
     private const byte TimerPriorityMedium = 0x80;
 
-    /// <summary>Size in bytes of the NEON save area the vector stub pushes below the IRQContext (public: GenericTimer derives the saved-context SP from it).</summary>
-    public const int NeonSaveAreaBytes = 512;
+    /// <summary>
+    /// The SGI of the scheduler's self-interrupt (<see cref="TryRaiseReschedule"/>).
+    /// Not 0 to 3: an IRQ's INTID indexes the same handler table where
+    /// ExceptionHandler puts the four exception types.
+    /// </summary>
+    private const uint RescheduleSgi = 8;
+
+    /// <summary>GIC priority of the reschedule SGI: the timer's, so neither preempts the other.</summary>
+    private const byte ReschedulePriority = 0x80;
+
+    /// <summary>Size in bytes of the NEON save area the vector stub pushes below the IRQContext.</summary>
+    private const int NeonSaveAreaBytes = 512;
 
     /// <summary>Bit position of the EC (Exception Class) field in ESR_EL1 (bits [31:26]).</summary>
     private const int EsrEcShift = 26;
@@ -64,11 +74,12 @@ public class ARM64InterruptController : IInterruptController
     private const uint EcDataAbortCurrentEl = 0x25;
     /// <summary>ESR_EL1 EC: SP alignment fault (EC = 0b100110).</summary>
     private const uint EcSpAlignmentFault = 0x26;
-    private static InterruptManager.IrqDelegate[]? s_lpiHandlers;
+    private static InterruptManager.IrqDelegate?[]? s_lpiHandlers;
     private static int s_nextLpiOffset;
 
-    // Guards s_lpiHandlers RMW in AllocateLpi so concurrent device probes
-    // can't both grab the same slot and silently drop one handler.
+    // Guards s_lpiHandlers RMW in AllocateLpi and FreeLpi so concurrent
+    // device probes can't both grab the same slot and silently drop one
+    // handler.
     private static Scheduler.SpinLock s_lpiLock;
 
     public bool IsInitialized => _initialized;
@@ -83,7 +94,7 @@ public class ARM64InterruptController : IInterruptController
 
         // Allocate the LPI handler table before the GIC (and therefore ITS)
         // comes online — Arm64MsiBinder can call AllocateLpi mid-bring-up.
-        s_lpiHandlers = new InterruptManager.IrqDelegate[LpiHandlerCount];
+        s_lpiHandlers = new InterruptManager.IrqDelegate?[LpiHandlerCount];
 
         // Initialize the GIC (Generic Interrupt Controller)
         GIC.Initialize();
@@ -92,9 +103,27 @@ public class ARM64InterruptController : IInterruptController
         GIC.SetPriority(GIC.TIMER_NONSEC_PHYS, TimerPriorityMedium);  // Medium priority
         GIC.EnableInterrupt(GIC.TIMER_NONSEC_PHYS);
 
+        // A handler, though it does nothing, is what takes the SGI down
+        // Dispatch's IRQ path: the EOI, then the pending reschedule.
+        InterruptManager.SetHandler((byte)RescheduleSgi, HandleReschedule);
+        GIC.SetPriority(RescheduleSgi, ReschedulePriority);
+        GIC.EnableInterrupt(RescheduleSgi);
+
         Serial.Write("[ARM64InterruptController] ARM64 interrupt system ready\n");
 
         _initialized = true;
+    }
+
+    /// <inheritdoc/>
+    public bool TryRaiseReschedule()
+    {
+        if (!_initialized)
+        {
+            return false;
+        }
+
+        GIC.SendSgiToSelf(RescheduleSgi);
+        return true;
     }
 
     public void RouteIrq(byte irqNo, byte vector, bool startMasked)
@@ -112,13 +141,21 @@ public class ARM64InterruptController : IInterruptController
         Serial.Write("\n");
     }
 
+    /// <summary>Disables the INTID at the GIC; <paramref name="irqNo"/> is the INTID, as <see cref="RouteIrq"/> treats it. Allocation-free; any context.</summary>
+    /// <param name="irqNo">The INTID.</param>
+    public void MaskIrq(byte irqNo) => GIC.DisableInterrupt(irqNo);
+
+    /// <summary>Enables the INTID at the GIC; <paramref name="irqNo"/> is the INTID, as <see cref="RouteIrq"/> treats it. Allocation-free; any context.</summary>
+    /// <param name="irqNo">The INTID.</param>
+    public void UnmaskIrq(byte irqNo) => GIC.EnableInterrupt(irqNo);
+
     /// <summary>
     /// Allocates an unused LPI (GICv3 ITS), registers <paramref name="handler"/>,
     /// and returns the absolute INTID (&gt;= <see cref="LpiBase"/>). The matching
     /// LPI must still be enabled in the redistributor's PROPBASER table by
     /// <see cref="GICv3Lpi"/> before it can fire. Throws on exhaustion.
     /// </summary>
-    public static uint AllocateLpi(InterruptManager.IrqDelegate handler)
+    internal static uint AllocateLpi(InterruptManager.IrqDelegate handler)
     {
         if (s_lpiHandlers == null)
         {
@@ -152,6 +189,35 @@ public class ARM64InterruptController : IInterruptController
             s_lpiLock.Release();
         }
         throw new System.InvalidOperationException("ARM64InterruptController: LPI range exhausted");
+    }
+
+    /// <summary>
+    /// Releases an LPI returned by <see cref="AllocateLpi"/>: clears its
+    /// handler so the slot can be handed out again (the allocator's wrap
+    /// pass picks freed slots back up). DISCARD every ITS event mapped to
+    /// it first (<see cref="GICv3Its.DiscardEvent"/>): that removes the
+    /// translation and the pending state, so the next owner never runs on
+    /// an interrupt meant for this one. The LPI stays enabled in the
+    /// configuration table; the next <see cref="GICv3Lpi.EnableLpi"/> writes
+    /// the same byte. INTIDs outside the dispatch window are ignored.
+    /// Thread context only: <see cref="s_lpiLock"/> is a plain spinlock.
+    /// </summary>
+    internal static void FreeLpi(uint lpi)
+    {
+        if (s_lpiHandlers is null || lpi < LpiBase || lpi - LpiBase >= (uint)s_lpiHandlers.Length)
+        {
+            return;
+        }
+
+        s_lpiLock.Acquire();
+        try
+        {
+            s_lpiHandlers[(int)(lpi - LpiBase)] = null;
+        }
+        finally
+        {
+            s_lpiLock.Release();
+        }
     }
 
     public void Dispatch(ref IRQContext ctx)
@@ -231,9 +297,26 @@ public class ARM64InterruptController : IInterruptController
         HandleFatalException(ctx.interrupt, ctx.cpu_flags, ctx.fault_address);
     }
 
-    private static unsafe void RunPendingReschedule(ref IRQContext ctx)
+    /// <summary>
+    /// The stack pointer of the context the vector stub saved for an
+    /// interrupt: the start of the NEON save area it pushed below
+    /// <paramref name="ctx"/>, which is what the scheduler switches from.
+    /// Interrupt context.
+    /// </summary>
+    /// <param name="ctx">The interrupt's context, as the vector stub passed it.</param>
+    public static unsafe nuint SavedContextStackPointer(ref IRQContext ctx)
     {
-        SchedulerManager.ReschedulePendingFromIrq(0, (nuint)Unsafe.AsPointer(ref ctx) - NeonSaveAreaBytes);
+        return (nuint)Unsafe.AsPointer(ref ctx) - NeonSaveAreaBytes;
+    }
+
+    /// <summary>The reschedule SGI's handler: nothing to do, Dispatch runs the reschedule on its exit.</summary>
+    private static void HandleReschedule(ref IRQContext ctx)
+    {
+    }
+
+    private static void RunPendingReschedule(ref IRQContext ctx)
+    {
+        SchedulerManager.ReschedulePendingFromIrq(0, SavedContextStackPointer(ref ctx));
     }
 
     private void SendEOI()

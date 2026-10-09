@@ -9,7 +9,7 @@
     <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591;CS1998;NU1903;SYSLIB0011;IDE0270;</NoWarn>
+    <NoWarn>$(NoWarn);CS1998;NU1903;SYSLIB0011;IDE0270;</NoWarn>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
     <UseArtifactsOutput>true</UseArtifactsOutput>
@@ -17,6 +17,21 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <!--pack as nuget-->
 
+  </PropertyGroup>
+
+  <!--
+    Package identity shared by every Cosmos package. Gen3 ships from
+    CosmosOS/Cosmos and publishes under the CosmosOS profile on nuget.org, so
+    the repository links live here instead of being restated - and drifting -
+    in each packable csproj. Per-package identity (PackageId, Title,
+    Description, PackageTags) stays with the project it describes.
+  -->
+  <PropertyGroup>
+    <Authors>CosmosOS</Authors>
+    <Company>CosmosOS</Company>
+    <PackageProjectUrl>https://github.com/CosmosOS/Cosmos</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CosmosOS/Cosmos</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <!--
@@ -85,10 +100,21 @@
   <PropertyGroup>
     <CosmosApiBaselineVersion></CosmosApiBaselineVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(CosmosTrackPublicApi)' == 'true'">
-    <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion Condition="'$(CosmosApiBaselineVersion)' != ''">$(CosmosApiBaselineVersion)</PackageValidationBaselineVersion>
+  <!--
+    Every driver assembly in the tree is listed here, semicolon separated. A driver
+    assembly is built as a kernel author's driver library would be: it references the
+    driver kit and the ring only, and no project grants it InternalsVisibleTo. The grant
+    check in Directory.Build.targets (CosmosForbidDriverAssemblyGrants) reads this list
+    and fails any project whose InternalsVisibleTo names one of these assemblies.
+  -->
+  <PropertyGroup>
+    <CosmosDriverAssemblyNames>Cosmos.Kernel.Drivers;Cosmos.Kernel.Tests.Drivers.Library</CosmosDriverAssemblyNames>
   </PropertyGroup>
+
+  <!-- The property side of the flag (package validation, WarningsAsErrors) lives
+       in Directory.Build.targets: this file is imported before the project body
+       sets CosmosTrackPublicApi, so property conditions on it are always false
+       here. Item conditions evaluate after all properties, so this works. -->
   <ItemGroup Condition="'$(CosmosTrackPublicApi)' == 'true'">
     <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
   </ItemGroup>

@@ -106,6 +106,23 @@ internal static unsafe class InteropSysFilePlug
         return error == PalError.SUCCESS ? bytesWritten : Fail(error);
     }
 
+    // Scatter/gather I/O: RandomAccess.Read/Write over several buffers, and the
+    // SafeFileHandle thread-pool source behind every async FileStream operation.
+
+    [PlugMember]
+    public static long PReadV(SafeHandle fd, PalSys.IOVector* vectors, int vectorCount, long fileOffset)
+    {
+        PalError error = FileDescriptorTable.PReadV(DescriptorOf(fd), vectors, vectorCount, fileOffset, out long bytesRead);
+        return error == PalError.SUCCESS ? bytesRead : Fail(error);
+    }
+
+    [PlugMember]
+    public static long PWriteV(SafeHandle fd, PalSys.IOVector* vectors, int vectorCount, long fileOffset)
+    {
+        PalError error = FileDescriptorTable.PWriteV(DescriptorOf(fd), vectors, vectorCount, fileOffset, out long bytesWritten);
+        return error == PalError.SUCCESS ? bytesWritten : Fail(error);
+    }
+
     [PlugMember]
     public static long LSeek(SafeFileHandle fd, long offset, PalSys.SeekWhence whence)
     {
@@ -353,6 +370,12 @@ internal static unsafe class InteropSysFilePlug
     [PlugMember]
     public static uint GetEUid() => 0;
 
+    /// <summary>Effective gid 0 matches the Gid the VFS reports on every node. With
+    /// <see cref="GetEUid"/> this keeps mode checks off the group database, which
+    /// the kernel does not have.</summary>
+    [PlugMember]
+    public static bool IsMemberOfGroup(uint gid) => gid == 0;
+
     private static string ErrorMessage(PalError error)
     {
         switch (error)
@@ -389,6 +412,12 @@ internal static unsafe class InteropSysFilePlug
                 return "Permission denied";
             case PalError.ENOTSUP:
                 return "Operation not supported";
+            case PalError.EAFNOSUPPORT:
+                return "Address family not supported by protocol";
+            case PalError.ENETUNREACH:
+                return "Network is unreachable";
+            case PalError.EHOSTNOTFOUND:
+                return "Name or service not known";
             default:
                 return "I/O error";
         }

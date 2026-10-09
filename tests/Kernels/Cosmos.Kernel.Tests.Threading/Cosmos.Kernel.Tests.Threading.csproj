@@ -5,6 +5,18 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- White-box suite over the experimental scheduler seam (COSMOS0001). -->
+    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
+    <!-- Off on purpose: the share and ticket cells measure the policies with
+         this suite's own threads only, and the suite uses no network. QEMU's
+         default NIC (q35's E1000E on x64, the virt machine's virtio-net-pci on
+         arm64, polled there without an ITS) would bind a network driver that
+         drains on the driver kit's worker every 50 ms, a thread outside the
+         suite waking and blocking twenty times a second while a cell runs:
+         Round-Robin then stops sharing two equal spinners evenly, and the
+         ticket total moves between the idle-contention cell's two reads. With
+         the switch off no network driver is in the manifest. -->
+    <CosmosEnableNetwork>false</CosmosEnableNetwork>
   </PropertyGroup>
 
   <!-- Core kernel packages (using project references for development) -->

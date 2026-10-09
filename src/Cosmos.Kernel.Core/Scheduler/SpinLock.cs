@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// CPU holding the plain lock when the ISR fires will spin forever waiting
 /// for itself.</para>
 /// </summary>
-public struct SpinLock
+internal struct SpinLock
 {
     private int _locked;
 
@@ -60,7 +60,7 @@ public struct SpinLock
 /// the lock must be released before interrupts are re-enabled so an ISR
 /// firing immediately after restore never sees the lock held.
 /// </summary>
-public ref struct IrqLockScope
+internal ref struct IrqLockScope
 {
     private InternalCpu.InterruptScope _irq;
     private readonly ref SpinLock _lock;

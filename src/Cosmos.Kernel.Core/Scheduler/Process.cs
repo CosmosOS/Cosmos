@@ -66,7 +66,7 @@ public class Process
     /// <summary>
     /// Threads belonging to this process.
     /// </summary>
-    public List<Thread> Threads { get; } = new List<Thread>();
+    public List<SchedulerThread> Threads { get; } = new List<SchedulerThread>();
 
     /// <summary>
     /// Process state.
@@ -78,7 +78,7 @@ public class Process
     /// </summary>
     public int ExitCode { get; private set; }
 
-    public void StartThread(Thread thread)
+    public void StartThread(SchedulerThread thread)
     {
         thread.AddressSpace = AddressSpace;
 
@@ -96,7 +96,7 @@ public class Process
         Serial.WriteNumber((uint)exitCode);
         Serial.WriteString("\n");
 
-        foreach (Thread thread in Threads)
+        foreach (SchedulerThread thread in Threads)
         {
             SchedulerManager.ExitThread(thread.CpuId, thread); // kill them all
         }

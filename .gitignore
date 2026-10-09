@@ -471,4 +471,8 @@ src/Cosmos.Kernel/Bootstrap/kmain_version.h
 
 global.json
 
-.claude
+.claude/*
+!.claude/agents/
+
+# The audio disk image `cosmos run --audio` builds for the DevKernel.
+disk-audio.img

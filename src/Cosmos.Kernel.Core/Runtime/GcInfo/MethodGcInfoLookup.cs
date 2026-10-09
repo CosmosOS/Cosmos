@@ -17,7 +17,7 @@ using Cosmos.Kernel.Core.Bridge;
 namespace Cosmos.Kernel.Core.Runtime.GcInfo;
 
 /// <summary>Maps an instruction pointer to its method's GCInfo blob, LSDA, and CFI data.</summary>
-public static unsafe class MethodGcInfoLookup
+internal static unsafe class MethodGcInfoLookup
 {
     // LSDA "unwind block" flags (UnixNativeCodeManager.cpp).
     public const byte UBF_FUNC_KIND_MASK = 0x03;

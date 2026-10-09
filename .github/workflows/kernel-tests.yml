@@ -36,8 +36,6 @@ on:
 permissions:
   contents: read
   checks: write
-  issues: write
-  pull-requests: write
 
 jobs:
   # ── Setup ─────────────────────────────────────────────────────────────────────
@@ -190,9 +188,11 @@ jobs:
       suite_name: Threading
       suite_id: threading
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Threading
-      timeout_x64: 120
-      timeout_arm64: 180
-      step_timeout_minutes: 10
+      # The scheduling-policy cells run three fixed CPU-share measurement
+      # windows on top of the lock/mutex waits, which TCG stretches further.
+      timeout_x64: 150
+      timeout_arm64: 240
+      step_timeout_minutes: 12
 
   threading-results:
     needs: threading-tests
@@ -228,6 +228,31 @@ jobs:
       event_name: ${{ github.event_name }}
       head_ref: ${{ github.head_ref || github.ref_name }}
 
+  # ── Random ────────────────────────────────────────────────────────────────────
+  # x64 cells have RDSEED/RDRAND (KVM host or -cpu max); arm64's cortex-a72
+  # has no FEAT_RNG, so that cell seeds from timer jitter alone.
+  random-tests:
+    needs: setup
+    uses: ./.github/workflows/kernel-test-run.yml
+    with:
+      suite_name: Random
+      suite_id: random
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Random
+      timeout_x64: 90
+      timeout_arm64: 180
+      step_timeout_minutes: 10
+
+  random-results:
+    needs: random-tests
+    if: always()
+    uses: ./.github/workflows/kernel-test-results.yml
+    with:
+      suite_name: Random
+      suite_id: random
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Random
+      event_name: ${{ github.event_name }}
+      head_ref: ${{ github.head_ref || github.ref_name }}
+
   # ── Graphic ───────────────────────────────────────────────────────────────────
   graphic-tests:
     needs: setup
@@ -248,6 +273,32 @@ jobs:
       suite_name: Graphic
       suite_id: graphic
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Graphic
+      event_name: ${{ github.event_name }}
+      head_ref: ${{ github.head_ref || github.ref_name }}
+
+  # ── Audio ─────────────────────────────────────────────────────────────────────
+  # Two cells per arch: bare, and hda, which adds QEMU's intel-hda played into
+  # the none backend, so the playback tests wait on a stream the device drains
+  # in real time.
+  audio-tests:
+    needs: setup
+    uses: ./.github/workflows/kernel-test-run.yml
+    with:
+      suite_name: Audio
+      suite_id: audio
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Audio
+      timeout_x64: 60
+      timeout_arm64: 120
+      step_timeout_minutes: 5
+
+  audio-results:
+    needs: audio-tests
+    if: always()
+    uses: ./.github/workflows/kernel-test-results.yml
+    with:
+      suite_name: Audio
+      suite_id: audio
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Audio
       event_name: ${{ github.event_name }}
       head_ref: ${{ github.head_ref || github.ref_name }}
 
@@ -332,7 +383,10 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Virtio
       timeout_x64: 60
       timeout_arm64: 90
-      step_timeout_minutes: 5
+      # arm64 expands to 4 cells ({virtio-pci,virtio-mmio} x acpi-off) at up
+      # to 90 s each, plus the build in the same step; 5 min would kill the
+      # step before OutputHandlerXml writes results whenever cells hang.
+      step_timeout_minutes: 10
 
   virtio-results:
     needs: virtio-tests
@@ -355,12 +409,15 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Storage
       timeout_x64: 90
       timeout_arm64: 180
-      # arm64 expands to 12 matrix cells ({ahci,nvme} x gic/acpi modifier
-      # subsets) at up to 180s each; a 5-minute budget would kill the step
-      # before OutputHandlerXml writes results whenever one cell hangs. The
-      # job budget must stay above the step budget plus setup/build time.
-      step_timeout_minutes: 45
-      job_timeout_minutes: 60
+      # arm64 expands to 30 matrix cells ({ahci,nvme,usb,virtio-blk-pci,virtio-blk-mmio}
+      # x gic/acpi modifier subsets) at up to 180s per boot, and every cell with a
+      # disk boots twice (Boot_RebootAfterGptWrite). The 60-minute budget covers
+      # typical cells and a few hung ones, not every cell running to its timeout;
+      # a 5-minute budget would kill the step before OutputHandlerXml writes
+      # results whenever one cell hangs. The job budget must stay above the step
+      # budget plus setup/build time.
+      step_timeout_minutes: 60
+      job_timeout_minutes: 75
 
   storage-results:
     needs: storage-tests
@@ -385,8 +442,8 @@ jobs:
       timeout_arm64: 90
       # arm64 expands to 3 profile cells (bare/gicv2/gicv3) × up to 90 s of
       # QEMU each, plus the publish/ILC/ISO build in the same step. 5 min
-      # left no headroom: hung cells — the case the QEMU timeouts exist
-      # for — killed the step before OutputHandlerXml wrote results, and
+      # left no headroom: hung cells, the case the QEMU timeouts exist
+      # for, killed the step before OutputHandlerXml wrote results, and
       # the results job showed "No results" instead of the failing cells.
       step_timeout_minutes: 10
 
@@ -398,6 +455,31 @@ jobs:
       suite_name: Interrupts
       suite_id: interrupts
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Interrupts
+      event_name: ${{ github.event_name }}
+      head_ref: ${{ github.head_ref || github.ref_name }}
+
+  # ── Drivers ───────────────────────────────────────────────────────────────────
+  # bare, usb-kbd, usb-mouse and virtio-blk-pci on both arches, virtio-blk-mmio
+  # on arm64 (five arm64 cells); the hardware half runs on q35's default NIC on x64.
+  drivers-tests:
+    needs: setup
+    uses: ./.github/workflows/kernel-test-run.yml
+    with:
+      suite_name: Drivers
+      suite_id: drivers
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Drivers
+      timeout_x64: 60
+      timeout_arm64: 120
+      step_timeout_minutes: 10
+
+  drivers-results:
+    needs: drivers-tests
+    if: always()
+    uses: ./.github/workflows/kernel-test-results.yml
+    with:
+      suite_name: Drivers
+      suite_id: drivers
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Drivers
       event_name: ${{ github.event_name }}
       head_ref: ${{ github.head_ref || github.ref_name }}
 
@@ -453,9 +535,9 @@ jobs:
     runs-on: ubuntu-24.04
     # Both the *-tests and *-results jobs are dependencies: the summary rows
     # read `needs.<suite>-tests.result`, and the `needs` context only exposes
-    # direct dependencies — without the *-tests entries every row evaluates
+    # direct dependencies: without the *-tests entries every row evaluates
     # to an empty string and renders "Failed" regardless of the real outcome.
-    needs: [ helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, math-tests, graphic-tests, power-tests, garbagecollector-tests, interrupts-tests, pci-tests, virtio-tests, storage-tests, fat-tests, file-tests, helloworld-results, memory-results, typecasting-results, timer-results, network-results, runtime-results, threading-results, math-results, graphic-results, power-results, garbagecollector-results, interrupts-results, pci-results, virtio-results, storage-results, fat-results, file-results ]
+    needs: [ helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, math-tests, random-tests, graphic-tests, audio-tests, power-tests, garbagecollector-tests, interrupts-tests, drivers-tests, pci-tests, virtio-tests, storage-tests, fat-tests, file-tests, helloworld-results, memory-results, typecasting-results, timer-results, network-results, runtime-results, threading-results, math-results, random-results, graphic-results, audio-results, power-results, garbagecollector-results, interrupts-results, drivers-results, pci-results, virtio-results, storage-results, fat-results, file-results ]
     if: always()
     steps:
       - name: 📊 Generate Summary
@@ -482,11 +564,14 @@ jobs:
           add_row "Network"          "${{ needs.network-tests.result }}"
           add_row "Runtime"          "${{ needs.runtime-tests.result }}"
           add_row "Math"             "${{ needs.math-tests.result }}"
+          add_row "Random"           "${{ needs.random-tests.result }}"
           add_row "Threading"        "${{ needs.threading-tests.result }}"
           add_row "Graphic"          "${{ needs.graphic-tests.result }}"
+          add_row "Audio"            "${{ needs.audio-tests.result }}"
           add_row "Power"            "${{ needs.power-tests.result }}"
           add_row "GarbageCollector" "${{ needs.garbagecollector-tests.result }}"
           add_row "Interrupts"       "${{ needs.interrupts-tests.result }}"
+          add_row "Drivers"          "${{ needs.drivers-tests.result }}"
           add_row "Pci"              "${{ needs.pci-tests.result }}"
           add_row "Storage"          "${{ needs.storage-tests.result }}"
           add_row "Fat"              "${{ needs.fat-tests.result }}"

@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 
 /// <summary>Flags controlling which parts of a GCInfo blob the decoder pre-decodes.</summary>
 [Flags]
-public enum GcInfoDecoderFlags : uint
+internal enum GcInfoDecoderFlags : uint
 {
     DECODE_EVERYTHING = 0x0,
     DECODE_SECURITY_OBJECT = 0x01,
@@ -34,7 +34,7 @@ public enum GcInfoDecoderFlags : uint
 
 /// <summary>Flags stored at the start of a (fat) GCInfo header.</summary>
 [Flags]
-public enum GcInfoHeaderFlags : uint
+internal enum GcInfoHeaderFlags : uint
 {
     GC_INFO_HAS_GS_COOKIE = 0x4,
     GC_INFO_HAS_GENERICS_INST_CONTEXT_MASK = 0x30,
@@ -54,7 +54,7 @@ public enum GcInfoHeaderFlags : uint
 
 /// <summary>Per-slot flags decoded from the 2-bit field in the slot table (matches GcSlotFlags / GC_CALL_*).</summary>
 [Flags]
-public enum GcSlotFlags
+internal enum GcSlotFlags
 {
     GC_SLOT_BASE = 0x0,
     GC_SLOT_INTERIOR = 0x1,   // == GC_CALL_INTERIOR
@@ -63,7 +63,7 @@ public enum GcSlotFlags
 }
 
 /// <summary>Stack-slot base register kind (matches GcStackSlotBase).</summary>
-public enum GcStackSlotBase
+internal enum GcStackSlotBase
 {
     GC_CALLER_SP_REL = 0x0,
     GC_SP_REL = 0x1,
@@ -72,7 +72,7 @@ public enum GcStackSlotBase
 
 /// <summary>Per-frame flags passed to <see cref="GcInfoDecoder.EnumerateLiveSlots"/> (subset of ICodeManagerFlags).</summary>
 [Flags]
-public enum CodeManagerFlags : uint
+internal enum CodeManagerFlags : uint
 {
     None = 0,
     ActiveStackFrame = 0x0001, // currently-active (leaf) frame
@@ -83,14 +83,14 @@ public enum CodeManagerFlags : uint
 }
 
 /// <summary>GC reference flags reported to the enum callback (matches GC_CALL_INTERIOR / GC_CALL_PINNED).</summary>
-public static class GcRefFlags
+internal static class GcRefFlags
 {
     public const uint GC_CALL_INTERIOR = 0x1;
     public const uint GC_CALL_PINNED = 0x2;
 }
 
 /// <summary>One decoded slot-table entry: a register, or a (base,offset) stack location.</summary>
-public struct GcSlotDesc
+internal struct GcSlotDesc
 {
     public uint RegisterNumber;     // valid when IsRegister
     public int SpOffset;            // valid when !IsRegister; denormalized (bytes)
@@ -108,7 +108,7 @@ public struct GcSlotDesc
 /// Architecture-specific GCInfo encoding parameters (the AMD64GcInfoEncoding / ARM64GcInfoEncoding
 /// constants from gcinfotypes.h). Format version is fixed at <see cref="GCINFO_VERSION"/>.
 /// </summary>
-public static class GcInfoEncoding
+internal static class GcInfoEncoding
 {
     /// <summary>The GCInfo format version this decoder understands (GCINFO_VERSION in gcinfo.h).</summary>
     public const uint GCINFO_VERSION = 4;

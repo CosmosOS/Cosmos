@@ -9,8 +9,8 @@ namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 public static class TcpClientPlug
 {
     // Store client socket and data stream per instance
-    public static readonly Dictionary<int, Socket> _clientSockets = new();
-    public static readonly Dictionary<int, NetworkStream> _dataStreams = new();
+    public static readonly Dictionary<int, Socket> _clientSockets = [];
+    public static readonly Dictionary<int, NetworkStream> _dataStreams = [];
 
     // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
     public static unsafe int GetId(TcpClient aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
@@ -65,7 +65,7 @@ public static class TcpClientPlug
     [PlugMember("get_ReceiveBufferSize")]
     public static int get_ReceiveBufferSize(TcpClient aThis)
     {
-        return Cosmos.Kernel.System.Network.IPv4.TCP.Tcp.TcpWindowSize;
+        return Kernel.System.Network.Protocols.Tcp.TcpConnection.TcpWindowSize;
     }
 
     [PlugMember("set_ReceiveBufferSize")]
@@ -77,7 +77,7 @@ public static class TcpClientPlug
     [PlugMember("get_SendBufferSize")]
     public static int get_SendBufferSize(TcpClient aThis)
     {
-        return Cosmos.Kernel.System.Network.IPv4.TCP.Tcp.TcpWindowSize;
+        return Kernel.System.Network.Protocols.Tcp.TcpConnection.TcpWindowSize;
     }
 
     [PlugMember("set_SendBufferSize")]
@@ -128,12 +128,12 @@ public static class TcpClientPlug
     {
         int id = GetId(aThis);
 
-        if (!_clientSockets.TryGetValue(id, out var socket) || socket == null)
+        if (!_clientSockets.TryGetValue(id, out Socket? socket))
         {
             throw new InvalidOperationException("TcpClient is not connected");
         }
 
-        if (_dataStreams.TryGetValue(id, out var stream) && stream != null)
+        if (_dataStreams.TryGetValue(id, out NetworkStream? stream))
         {
             return stream;
         }
@@ -174,7 +174,7 @@ public static class TcpClientPlug
         }
         _clientSockets.Remove(id);
 
-        if (stream != null)
+        if (stream is not null)
         {
             stream.Dispose();
         }

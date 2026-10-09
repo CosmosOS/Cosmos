@@ -9,6 +9,11 @@
     <SelfContained>true</SelfContained>
     <PublishTrimmed>true</PublishTrimmed>
     <IlcSystemModule>System.Private.CoreLib</IlcSystemModule>
+    <!-- Write the generated entry point and driver manifest under obj/ (the
+         generated/ folder of the intermediate path), so a kernel author can read
+         which drivers the build registered. A project that sets the property
+         itself keeps its value. -->
+    <EmitCompilerGeneratedFiles Condition="'$(EmitCompilerGeneratedFiles)' == ''">true</EmitCompilerGeneratedFiles>
 
     <!-- We require Microsoft.NET.Sdk for building propertly -->
     <_ImportMicrosoftNETSdkFromCosmosSdk Condition=" '$(UsingMicrosoftNETSdk)' == '' ">true</_ImportMicrosoftNETSdkFromCosmosSdk>
@@ -40,6 +45,11 @@
     <CosmosEnableFat Condition="'$(CosmosEnableFat)' == ''">true</CosmosEnableFat>
     <CosmosEnableGraphics Condition="'$(CosmosEnableGraphics)' == ''">true</CosmosEnableGraphics>
     <CosmosEnableScheduler Condition="'$(CosmosEnableScheduler)' == ''">true</CosmosEnableScheduler>
+    <CosmosEnableAudio Condition="'$(CosmosEnableAudio)' == ''">true</CosmosEnableAudio>
+    <!-- CosmosEnableUsb has no default here: it follows CosmosEnableKeyboard,
+         CosmosEnableMouse and CosmosEnableStorage, which the kernel project sets
+         after this file is imported, so Sdk.targets defaults it once their
+         values are final. -->
     <CosmosEnablePaging Condition="'$(CosmosEnablePaging)' == ''">false</CosmosEnablePaging>
     <CosmosEnableUserLand Condition="'$(CosmosEnableUserLand)' == ''">false</CosmosEnableUserLand>
     <CosmosEnableSysCalls Condition="'$(CosmosEnableSysCalls)' == ''">false</CosmosEnableSysCalls>
@@ -72,8 +82,10 @@
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Network.Enabled" Value="$(CosmosEnableNetwork)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Storage.Enabled" Value="$(CosmosEnableStorage)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Filesystems.Fat.Enabled" Value="$(CosmosEnableFat)" Trim="true"/>
+    <RuntimeHostConfigurationOption Include="Cosmos.Kernel.HAL.Usb.Enabled" Value="$(CosmosEnableUsb)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Graphics.Enabled" Value="$(CosmosEnableGraphics)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.Core.Scheduler.Enabled" Value="$(CosmosEnableScheduler)" Trim="true"/>
+    <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Audio.Enabled" Value="$(CosmosEnableAudio)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.Core.Paging.Enabled" Value="$(CosmosEnablePaging)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.Core.UserLand.Enabled" Value="$(CosmosEnableUserLand)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.Core.SysCalls.Enabled" Value="$(CosmosEnableSysCalls)" Trim="true"/>
@@ -114,12 +126,19 @@
              Version="[$(BundledNETCoreAppPackageVersion)]" />
   </ItemGroup>
 
-  <!-- Library Initializers to Run -->
+  <!-- Library initializers, run by the ILC startup code before Main.
+       SortAutoInitialedAssemblies (Cosmos.Build.Ilc) orders them in three stages:
+       Stage="Runtime" first (Core brings up the heap, the GC and the managed
+       modules), then the runtime's own initializers, which Cosmos.Build.Ilc adds
+       as Stage="Framework", then the kernel libraries below, each after the
+       assemblies it references. Cosmos.Kernel and Cosmos.Kernel.System reference
+       neither the other, so their declared order is their run order: the
+       scheduler comes up before System's storage scan issues interrupt-driven I/O. -->
   <ItemGroup>
-    <AutoInitializedAssemblies Include="Cosmos.Kernel.Core" />
+    <AutoInitializedAssemblies Include="Cosmos.Kernel.Core" Stage="Runtime" />
     <AutoInitializedAssemblies Include="Cosmos.Kernel.HAL" />
-    <AutoInitializedAssemblies Include="Cosmos.Kernel.System" />
     <AutoInitializedAssemblies Include="Cosmos.Kernel" />
+    <AutoInitializedAssemblies Include="Cosmos.Kernel.System" />
   </ItemGroup>
 
   <!-- Build tools.

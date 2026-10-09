@@ -14,6 +14,7 @@ internal static partial class Interop
 
         E2BIG = 0x10001,
         EACCES = 0x10002,
+        EAFNOSUPPORT = 0x10005,
         EAGAIN = 0x10006,
         EBADF = 0x10008,
         EBUSY = 0x1000A,
@@ -28,6 +29,7 @@ internal static partial class Interop
         EMFILE = 0x10021,
         EMLINK = 0x10022,
         ENAMETOOLONG = 0x10025,
+        ENETUNREACH = 0x10028,
         ENFILE = 0x10029,
         ENODEV = 0x1002C,
         ENOENT = 0x1002D,
@@ -44,5 +46,6 @@ internal static partial class Interop
         EROFS = 0x10048,
         ESPIPE = 0x10049,
         EXDEV = 0x1004F,
+        EHOSTNOTFOUND = 0x20001,
     }
 }

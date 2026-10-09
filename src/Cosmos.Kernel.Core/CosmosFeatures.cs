@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Core;
 /// These flags can be set via RuntimeHostConfigurationOption in csproj
 /// and are used by ILC for trimming.
 /// </summary>
-public static class CosmosFeatures
+internal static class CosmosFeatures
 {
     /// <summary>
     /// Controls interrupt setup (IDT/IRQ). Disabling this also disables Timer, Keyboard,
@@ -128,4 +128,26 @@ public static class CosmosFeatures
     [FeatureSwitchDefinition("Cosmos.Kernel.System.Filesystems.Fat.Enabled")]
     public static bool FatEnabled =>
         AppContext.TryGetSwitch("Cosmos.Kernel.System.Filesystems.Fat.Enabled", out bool enabled) ? enabled : true;
+
+    /// <summary>
+    /// Controls USB: the kit's xHCI host controller driver, the hub driver and
+    /// the USB keyboard, mouse and mass storage class drivers, which the driver
+    /// manifest registers under this switch. Requires PCI; the MSBuild
+    /// cascade in Sdk.targets disables this when PCI is off. When the property
+    /// is not set, Sdk.targets enables it only if Keyboard, Mouse or Storage is on.
+    /// Set via CosmosEnableUsb property in csproj.
+    /// </summary>
+    [FeatureSwitchDefinition("Cosmos.Kernel.HAL.Usb.Enabled")]
+    public static bool UsbEnabled =>
+        AppContext.TryGetSwitch("Cosmos.Kernel.HAL.Usb.Enabled", out bool enabled) ? enabled : true;
+
+    /// <summary>
+    /// Controls the audio stack: the HD Audio controller driver and the
+    /// audio manager the ring reaches it through. Requires PCI; the MSBuild
+    /// cascade in Sdk.targets disables this when PCI is off.
+    /// Set via CosmosEnableAudio property in csproj.
+    /// </summary>
+    [FeatureSwitchDefinition("Cosmos.Kernel.System.Audio.Enabled")]
+    public static bool AudioEnabled =>
+        AppContext.TryGetSwitch("Cosmos.Kernel.System.Audio.Enabled", out bool enabled) ? enabled : true;
 }

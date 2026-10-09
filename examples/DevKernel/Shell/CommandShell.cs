@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DevKernel.Shell;
 
@@ -51,7 +52,7 @@ internal sealed class CommandShell
     }
 
     /// <summary>Finds the command invoked by <paramref name="token"/> (its name or one of its aliases).</summary>
-    public bool TryResolve(string token, out ShellCommand? command)
+    public bool TryResolve(string token, [NotNullWhen(true)] out ShellCommand? command)
     {
         for (int i = 0; i < _commands.Count; i++)
         {
@@ -81,7 +82,7 @@ internal sealed class CommandShell
         }
 
         string token = tokens[0].ToLower();
-        if (!TryResolve(token, out ShellCommand? command) || command == null)
+        if (!TryResolve(token, out ShellCommand? command))
         {
             Terminal.Error($"\"{token}\" is not a command");
             Terminal.Info("Type 'help' for available commands.");

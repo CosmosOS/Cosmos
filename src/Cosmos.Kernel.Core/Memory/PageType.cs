@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.Core.Memory;
 /// PageType enum. Used to define the type of the page.
 /// Data Types from 1, special meanings from 255 down.
 /// </summary>
-public enum PageType : byte
+internal enum PageType : byte
 {
     /// <summary>
     /// Empty page.

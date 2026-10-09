@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace Cosmos.Kernel.Debug;
@@ -62,17 +61,14 @@ public static class Debugger
     public static void DoSendNumber(double number, [CallerMemberName] string callingMethod = null!, [CallerLineNumber] int callingLineNumber = 0, [CallerFilePath] string callingFilePath = null!) { }
 
     /// <summary>
-    /// Sends a kernel panic error code to connected debugging hosts.
+    /// Sends a kernel panic error code to connected debugging hosts. It
+    /// returns: the transport is still a stub, and until it halts the CPU a
+    /// caller that must not continue has to say so itself, which every call
+    /// site does with its own halt loop or throw.
     /// </summary>
-    [DoesNotReturn]
     [Conditional("COSMOSDEBUG")]
     public static void SendKernelPanic(uint id, [CallerMemberName] string callingMethod = null!, [CallerLineNumber] int callingLineNumber = 0, [CallerFilePath] string callingFilePath = null!)
     {
-        while (true)
-        {
-            break; // remove this later
-        }
-        // ReSharper disable once FunctionNeverReturns
     }
 
 }

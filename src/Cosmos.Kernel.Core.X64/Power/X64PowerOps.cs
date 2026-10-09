@@ -6,7 +6,7 @@ using Cosmos.Kernel.Core.X64.Bridge;
 
 namespace Cosmos.Kernel.Core.X64.Power;
 
-public class X64PowerOps : IPowerOps
+internal class X64PowerOps : IPowerOps
 {
     // 8042 keyboard controller ports.
     private const ushort Kbc_StatusPort = 0x64;

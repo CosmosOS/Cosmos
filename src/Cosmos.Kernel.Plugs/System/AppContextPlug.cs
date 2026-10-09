@@ -1,8 +1,8 @@
 using System.Text.Unicode;
 using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.Core.Bridge;
-using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Utilities;
+using Cosmos.Kernel.System.Diagnostics;
 
 namespace Cosmos.Kernel.Plugs.System;
 
@@ -10,13 +10,13 @@ namespace Cosmos.Kernel.Plugs.System;
 public static class AppContextPlug
 {
     // Native import lives in Cosmos.Kernel.Core/Bridge/Import/KnobsNative.cs.
-    private static SimpleDictionary<string, object?>? dataStore;
-    private static SimpleDictionary<string, bool>? switches;
+    private static SimpleDictionary<string, object?>? s_dataStore;
+    private static SimpleDictionary<string, bool>? s_switches;
 
     [PlugMember]
     public static void EnsureInitialized()
     {
-        if (dataStore is not null)
+        if (s_dataStore is not null)
         {
             return;
         }
@@ -25,8 +25,8 @@ public static class AppContextPlug
         {
             uint count = KnobsNative.GetKnobValues(out byte** knobKeys, out byte** knobValues);
 
-            dataStore = new(capacity: (int)count);
-            switches = new();
+            s_dataStore = new(capacity: (int)count);
+            s_switches = new();
 
             for (int i = 0; i < count; i++)
             {
@@ -36,15 +36,15 @@ public static class AppContextPlug
                 string key = Utf8Decode(new(ptrKey, Strlen(ptrKey)));
                 string value = Utf8Decode(new(ptrVal, Strlen(ptrVal)));
 
-                Serial.WriteString(key);
-                Serial.WriteString(" = ");
-                Serial.WriteString(value + "\n");
+                Log.WriteString(key);
+                Log.WriteString(" = ");
+                Log.WriteString($"{value}\n");
 
-                dataStore[key] = value;
+                s_dataStore[key] = value;
 
                 if (bool.TryParse(value, out bool result))
                 {
-                    switches.Add(key, result);
+                    s_switches.Add(key, result);
                 }
             }
         }
@@ -59,9 +59,9 @@ public static class AppContextPlug
 
         ArgumentException.ThrowIfNullOrEmpty(switchName);
 
-        if (switches != null)
+        if (s_switches is not null)
         {
-            if (switches.TryGetValue(switchName, out isEnabled))
+            if (s_switches.TryGetValue(switchName, out isEnabled))
             {
                 return true;
             }
@@ -83,7 +83,7 @@ public static class AppContextPlug
     {
         EnsureInitialized();
 
-        dataStore!.TryGetValue(name, out object? data);
+        s_dataStore!.TryGetValue(name, out object? data);
 
         return data;
     }
@@ -92,7 +92,7 @@ public static class AppContextPlug
     {
         EnsureInitialized();
 
-        dataStore![switchName] = data;
+        s_dataStore![switchName] = data;
     }
 
     [PlugMember]
@@ -100,7 +100,7 @@ public static class AppContextPlug
     {
         EnsureInitialized();
 
-        dataStore![switchName] = isEnabled;
+        s_dataStore![switchName] = isEnabled;
     }
 
 

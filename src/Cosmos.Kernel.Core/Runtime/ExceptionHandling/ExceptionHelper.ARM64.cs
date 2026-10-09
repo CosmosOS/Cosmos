@@ -1,6 +1,6 @@
-namespace Cosmos.Kernel.Core.Runtime;
+namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 
-public static unsafe partial class ExceptionHelper
+internal static unsafe partial class ExceptionHelper
 {
     private static partial void InitUnwindStateFromContext(ref UnwindState state, PAL_LIMITED_CONTEXT* pContext)
     {

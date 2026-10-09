@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.Core.Memory.Heap;
 /// <summary>
 /// will use more then 1 page
 /// </summary>
-public static unsafe class LargeHeap
+internal static unsafe class LargeHeap
 {
     public static ulong PrefixBytes => (ulong)sizeof(LargeHeapHeader);
 

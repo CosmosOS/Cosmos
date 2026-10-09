@@ -1,17 +1,18 @@
-﻿using System;
+﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
+using System;
 using System.Collections.Generic;
-using System.Resources;
 using System.Text;
 using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.System.Graphics.Fonts;
 
 /// <summary>
-/// Represents a font in the PC Screen Font (PCF) format.
+/// Represents a font in the PC Screen Font (PSF) format.
 /// </summary>
 public class PCScreenFont : Font
 {
-    readonly List<UnicodeMapping> _unicodeMappings; // Maps the fonts to the corresponding unicode characters
+    private readonly List<UnicodeMapping> _unicodeMappings; // Maps the fonts to the corresponding unicode characters
 
     #region DefaultFontData
     // Credit to fcambus https://github.com/fcambus/spleen under BSD-2 License
@@ -41,24 +42,40 @@ public class PCScreenFont : Font
     // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     // POSSIBILITY OF SUCH DAMAGE.
 
-    public static class Default
+    /// <summary>
+    /// Names identifying the default font resource.
+    /// </summary>
+    internal static class Default
     {
+        /// <summary>
+        /// The <see cref="AppContext"/> data key checked for an overriding
+        /// embedded-resource name before falling back to <see cref="DefaultFontName"/>.
+        /// </summary>
         public const string DefaultFontKey = "Cosmos.Kernel.System.Graphics.Fonts.DefaultFont";
+
+        /// <summary>
+        /// The embedded-resource name of the default PSF font.
+        /// </summary>
         public const string DefaultFontName = $"{DefaultFontKey}.psf";
     }
 
-    static PCScreenFont? s_default = null;
+    private static PCScreenFont? s_default;
+
+    /// <summary>
+    /// The default console font, loaded lazily from the embedded PSF resource,
+    /// or from a built-in fallback font when the resource is absent.
+    /// </summary>
     public static PCScreenFont DefaultFont
     {
         get
         {
-            if (s_default == null)
+            if (s_default is null)
             {
                 try
                 {
                     // Try to load from resources first
                     string embeddedResourceName = AppContext.GetData(Default.DefaultFontKey)?.ToString() ?? Default.DefaultFontName;
-                    var resourceSpan = Core.Runtime.ResourceManager.GetResourceAsSpan(embeddedResourceName);
+                    ReadOnlySpan<byte> resourceSpan = Core.Runtime.ResourceManager.GetResourceAsSpan(embeddedResourceName);
 
                     if (resourceSpan.Length > 0)
                     {
@@ -97,12 +114,12 @@ public class PCScreenFont : Font
     }
     #endregion
 
-    enum PSFVersion1Mode
+    private enum PSFVersion1Mode
     {
-        MODE512 = 1,
-        HASTAB = 2,
-        HASSEQ = 4,
-        MAXMODE = 5
+        Mode512 = 1,
+        HasTab = 2,
+        HasSeq = 4,
+        MaxMode = 5
     }
 
     /// <summary>
@@ -110,48 +127,48 @@ public class PCScreenFont : Font
     /// </summary>
     /// <param name="width">The width of a single character in pixels</param>
     /// <param name="height">The height of a single character in pixels</param>
-    /// <param name="data">The PCF data.</param>
-    /// <param name="_unicodeMappings">The mappings of Unicode characters to font indexes.</param>
-    public PCScreenFont(byte width, byte height, byte[] data, List<UnicodeMapping> _unicodeMappings) : base(width, height, data)
+    /// <param name="data">The glyph bitmaps parsed from the PSF data.</param>
+    /// <param name="unicodeMappings">The mappings of Unicode characters to font indexes.</param>
+    internal PCScreenFont(byte width, byte height, byte[] data, List<UnicodeMapping> unicodeMappings) : base(width, height, data)
     {
-        this._unicodeMappings = _unicodeMappings;
+        _unicodeMappings = unicodeMappings;
     }
 
     /// <summary>
     /// Loads the given PC Screen Font using the given raw data array.
     /// </summary>
-    /// <param name="fontData">The raw PCF data.</param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException">Thrown when a PCF version 2 file is provided.</exception>
-    /// <exception cref="ArgumentException">Thrown when the provided font data is incorrect.</exception>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="fontData"/> is <see langword="null"/>.</exception>
+    /// <param name="fontData">The raw PSF data. Both version 1 and version 2 are parsed.</param>
+    /// <returns>The parsed font, with its glyph bitmaps and any Unicode table the file carried.</returns>
+    /// <exception cref="ArgumentException"><paramref name="fontData"/> starts with neither
+    /// version's magic number, or carries a header the parser cannot use.</exception>
     public static PCScreenFont LoadFont(byte[] fontData)
     {
         byte charHeight;
         byte charWidth;
         byte[] parsedFontData;
-        var mappings = new List<UnicodeMapping>();
+        List<UnicodeMapping> mappings = [];
 
         bool version1 = fontData[0] == 0x36 && fontData[1] == 0x04;
         bool version2 = BitConverter.ToUInt32(fontData, 0) == 0x864ab572;
 
-        // Check the header
         if (!version1 && !version2)
         {
             Serial.WriteString($"PCF load: Invalid magic {fontData[0]} {fontData[1]} {fontData[2]} {fontData[3]}");
-            throw new Exception($"Invalid magic value {fontData[0]} {fontData[1]} {fontData[2]} {fontData[3]}.");
+            throw new ArgumentException(
+                $"Invalid magic value {fontData[0]} {fontData[1]} {fontData[2]} {fontData[3]}.",
+                nameof(fontData));
         }
 
         if (version1)
         {
             byte mode = fontData[2];
             charHeight = fontData[3];
-            charWidth = 8; //Always 8 in this case
-            int length = (mode & (int)PSFVersion1Mode.MODE512) == 1 ? 512 : 256;
-            bool hasUnicodeTable = (mode & (int)PSFVersion1Mode.HASTAB) > 0;
-            ushort seperator = 0xFFFF;
+            charWidth = 8; // PSF1 glyphs are always 8 pixels wide
+            int length = (mode & (int)PSFVersion1Mode.Mode512) == 1 ? 512 : 256;
+            bool hasUnicodeTable = (mode & (int)PSFVersion1Mode.HasTab) > 0;
+            ushort separator = 0xFFFF;
             ushort sequenceStart = 0xFFFE;
-            parsedFontData = new byte[length * charHeight]; //Every row is one byte
+            parsedFontData = new byte[length * charHeight]; // Every row is one byte
 
             for (int i = 0; i < length; i++)
             {
@@ -164,36 +181,35 @@ public class PCScreenFont : Font
             int position = 4 + (length * charHeight);
             if (hasUnicodeTable)
             {
-                mappings = new List<UnicodeMapping>();
-                var currentEntry = new List<byte>();
+                List<byte> currentEntry = [];
                 while (position < fontData.Length)
                 {
-                    if (BitConverter.ToUInt16(fontData, position) == seperator)
+                    if (BitConverter.ToUInt16(fontData, position) == separator)
                     {
-                        var mapping = new UnicodeMapping
+                        UnicodeMapping mapping = new()
                         {
                             FontPosition = mappings.Count,
-                            UnicodeCharacters = new List<ushort>(),
-                            UnicodeCharactersWithModifiers = new List<ushort[]>(),
-                            ASCIICharacters = new List<byte>()
+                            UnicodeCharacters = [],
+                            UnicodeCharactersWithModifiers = [],
+                            ASCIICharacters = []
                         };
                         for (int i = 0; i < currentEntry.Count / 2; i++)
                         {
                             mapping.UnicodeCharacters.Add(BitConverter.ToUInt16(currentEntry.ToArray(), i * 2));
                         }
 
-                        // At this point we filter combined unicode letters out of the unicode charactesr
-                        bool reachedFirstSeperator = false;
-                        var unicodeCombination = new List<ushort>();
+                        // At this point we filter combined unicode letters out of the unicode characters
+                        bool reachedFirstSeparator = false;
+                        List<ushort> unicodeCombination = [];
                         int index = 0;
                         while (index < mapping.UnicodeCharacters.Count)
                         {
                             if (mapping.UnicodeCharacters[index] == sequenceStart)
                             {
                                 mapping.UnicodeCharacters.RemoveAt(index);
-                                if (!reachedFirstSeperator)
+                                if (!reachedFirstSeparator)
                                 {
-                                    reachedFirstSeperator = true;
+                                    reachedFirstSeparator = true;
                                 }
                                 else
                                 {
@@ -202,7 +218,7 @@ public class PCScreenFont : Font
                             }
                             else
                             {
-                                if (reachedFirstSeperator)
+                                if (reachedFirstSeparator)
                                 {
                                     unicodeCombination.Add(mapping.UnicodeCharacters[index]);
                                     mapping.UnicodeCharacters.RemoveAt(index);
@@ -215,9 +231,10 @@ public class PCScreenFont : Font
                         }
 
                         // Now convert all the unicode characters we can to ASCII
-                        foreach (var uc in mapping.UnicodeCharacters)
+                        foreach (ushort uc in mapping.UnicodeCharacters)
                         {
                             byte ac = Encoding.ASCII.GetBytes(Encoding.Unicode.GetString(BitConverter.GetBytes(uc)))[0];
+                            // The ASCII encoder substitutes '?' for a character it cannot map: keep '?' only for U+003F itself
                             if (!(ac == 63 && uc != 0x003F))
                             {
                                 if (!mapping.ASCIICharacters.Contains(ac))
@@ -229,7 +246,7 @@ public class PCScreenFont : Font
 
                         mappings.Add(mapping);
                         currentEntry.Clear();
-                        position++; // Skip the second seperator character as well
+                        position++; // Skip the second separator byte as well
                     }
                     else
                     {
@@ -242,6 +259,7 @@ public class PCScreenFont : Font
 
             return new PCScreenFont(charWidth, charHeight, parsedFontData, mappings);
         }
+
         if (version2)
         {
             uint length = BitConverter.ToUInt32(fontData, 16);
@@ -266,7 +284,6 @@ public class PCScreenFont : Font
                 }
             }
 
-
             return new PCScreenFont(charWidth, charHeight, parsedFontData, mappings);
         }
 
@@ -276,7 +293,7 @@ public class PCScreenFont : Font
     /// <summary>
     /// Converts the PC screen font to a VGA font.
     /// </summary>
-    public byte[] CreateVGAFont()
+    internal byte[] CreateVGAFont()
     {
         byte[] font = new byte[256 * Height * Width / 8];
 
@@ -286,7 +303,6 @@ public class PCScreenFont : Font
 
         for (int i = 0; i < 256; i++)
         {
-            // Find font offset
             int offset = FindASCIIOffset((byte)i);
             if (offset >= 256) // If nothing was found
             {
@@ -309,13 +325,13 @@ public class PCScreenFont : Font
         return font;
     }
 
-    private int FindASCIIOffset(byte i)
+    private int FindASCIIOffset(byte character)
     {
         int offset;
         for (offset = 0; offset < _unicodeMappings.Count; offset++)
         {
             UnicodeMapping mapping = _unicodeMappings[offset];
-            if (mapping.ASCIICharacters.Contains(i))
+            if (mapping.ASCIICharacters.Contains(character))
             {
                 break;
             }
@@ -328,7 +344,7 @@ public class PCScreenFont : Font
 /// <summary>
 /// Represents a Unicode to font position mapping.
 /// </summary>
-public struct UnicodeMapping
+internal struct UnicodeMapping
 {
     public int FontPosition;
     public List<ushort> UnicodeCharacters;

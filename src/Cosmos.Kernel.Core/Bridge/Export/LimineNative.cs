@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// NOTE: This is a data accessor wrapper - C code gets managed data, then continues in C.
 /// We do NOT call C code from managed code - only provide data access.
 /// </summary>
-public static unsafe class LimineNative
+internal static unsafe class LimineNative
 {
     /// <summary>
     /// Wrapper to expose Limine RSDP address to C bootstrap for LAI ACPI initialization

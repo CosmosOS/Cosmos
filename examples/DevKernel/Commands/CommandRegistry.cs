@@ -14,14 +14,20 @@ internal static class CommandRegistry
         CommandShell shell = new();
 
         SystemCommands.Register(shell);
+        SessionCommands.Register(shell);
+        KeyboardCommands.Register(shell);
         MemoryCommands.Register(shell);
         SchedulerCommands.Register(shell);
+        DriverCommands.Register(shell);
         GraphicsCommands.Register(shell);
         NetworkCommands.Register(shell);
+        FtpCommands.Register(shell);
+        AudioCommands.Register(shell);
         DiskCommands.Register(shell);
         PartitionCommands.Register(shell);
         MountCommands.Register(shell);
         FileCommands.Register(shell);
+        LuaCommands.Register(shell);
 
         return shell;
     }

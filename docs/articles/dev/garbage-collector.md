@@ -11,7 +11,7 @@ The garbage collector (it identifies itself as **OrionGC** in the runtime config
 - the [GC handle store](#handle-store), references to heap objects held from outside the heap,
 - [frozen segments](#frozen-segments), read-only objects baked into the kernel binary, never collected.
 
-The GC usually operates in a threaded kernel, but does not require one. When the [scheduler](scheduler.md) is running, it preempts threads from the timer interrupt, keeps every live thread in a global registry the GC scans from, and stores each thread's allocation state on its `Thread` control block; interrupt handlers allocate too (the scheduler tick, input drivers). Before the scheduler starts, or in kernels that compile it out, the GC works the same way with a single static allocation context and the current stack as the only stack root. In either mode there is no dedicated GC thread: a collection runs on whichever thread triggered it, inside `InternalCpu.DisableInterruptsScope()`, so no thread switch or interrupt handler can observe the heap mid-collection.
+The GC usually operates in a threaded kernel, but does not require one. When the [scheduler](scheduler.md) is running, it preempts threads from the timer interrupt, keeps every live thread in a global registry the GC scans from, and stores each thread's allocation state on its `SchedulerThread` control block; interrupt handlers allocate too (the scheduler tick, input drivers). Before the scheduler starts, or in kernels that compile it out, the GC works the same way with a single static allocation context and the current stack as the only stack root. In either mode there is no dedicated GC thread: a collection runs on whichever thread triggered it, inside `InternalCpu.DisableInterruptsScope()`, so no thread switch or interrupt handler can observe the heap mid-collection.
 
 Since every thread and interrupt handler can allocate, allocation goes through per-thread [TLABs](gc-concepts/tlab.md) (thread-local allocation buffers): each thread bumps a pointer inside its own buffer and, apart from a global allocated-bytes counter, only touches shared state when the buffer runs out and needs a refill. Collection is a last resort. When a refill fails, the collector first grows the heap; `Collect()` runs only when the page allocator itself has nothing left to give, or when called explicitly.
 
@@ -38,13 +38,13 @@ Every managed type compiled by ILC (the NativeAOT ahead-of-time compiler; see [K
 | `HasComponentSize` | True for arrays and strings |
 | `ContainsGCPointers` | True if instances contain references the GC must trace |
 
-Because `MethodTable` pointers always live in kernel space, outside the heap, the GC uses that as a validity filter: a candidate object whose first word is null, points inside the GC heap, or sits below `AddressSpace.KernelSpaceStart` cannot be a real object.
+Because `MethodTable` pointers always live in kernel space, outside the heap, the GC uses that as a validity filter: a candidate object whose first word is null, points inside the GC heap, or sits below `AddressSpaceConst.KernelSpaceStart` cannot be a real object.
 
 The one thing these fields do not describe is where the references inside an instance sit. That layout lives in the GCDesc stored just before the `MethodTable` (see [GCDesc](#gcdesc)).
 
 ### Object header
 
-Every object on the GC heap starts with a [`GCObject`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCObject.cs) header:
+Every object on the GC heap starts with a [`GCObject`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCObject.cs) header:
 
 | Offset | Size (x64) | Contents | Notes |
 |--------|------------|----------|-------|
@@ -68,7 +68,7 @@ The header is 24 bytes, which is why `MinBlockSize` is 24: every allocation is r
 
 ### AllocContext (TLAB)
 
-[`AllocContext`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/AllocContext.cs) is the per-thread allocation state (the [TLAB](gc-concepts/tlab.md) itself), stored inline on each `Scheduler.Thread` (with a static fallback context used before the scheduler runs, and for the whole kernel lifetime when the scheduler is compiled out):
+[`AllocContext`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/AllocContext.cs) is the per-thread allocation state (the [TLAB](gc-concepts/tlab.md) itself), stored inline on each `SchedulerThread` (with a static fallback context used before the scheduler runs, and for the whole kernel lifetime when the scheduler is compiled out):
 
 | Field | Meaning |
 |-------|---------|
@@ -85,7 +85,7 @@ This section answers where managed memory lives and how the GC finds its way aro
 
 ### Segments
 
-A segment is a contiguous range of pages from the page allocator (`PageType.GCHeap`). The [`GCSegment`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegment.cs) header sits at the base of the allocation, followed by the segment's brick table, then 8 reserved bytes, then the usable region:
+A segment is a contiguous range of pages from the page allocator (`PageType.GCHeap`). The [`GCSegment`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegment.cs) header sits at the base of the allocation, followed by the segment's brick table, then 8 reserved bytes, then the usable region:
 
 <div style="overflow-x:auto">
 <img src="images/diagrams/gc-segment-layout.svg" alt="Memory layout of one GC segment: the GCSegment header, the brick table, 8 reserved bytes, then the usable region. Start points at the first usable byte, Bump at the boundary between allocated objects and free space, End one past the last byte, Next at the following segment." style="width:100%;min-width:620px;max-width:760px">
@@ -97,15 +97,17 @@ The strip is one contiguous allocation in address order, page-aligned base on th
 - `Bump` to `End` is untouched space; [bump allocation](gc-concepts/bump-allocation.md) hands out memory from `Bump` and advances it.
 - The 8 reserved bytes before `Start` exist because the runtime writes a [runtime object header](gc-concepts/object-header.md) (identity hash or thin lock) at `objRef - 4`. For the first object in a segment that write must land in reserved filler instead of the segment's own metadata.
 
-Segment allocation lives in [`GCSegmentManager`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegmentManager.cs). `AllocateSegment(requestedSize)` clamps the request to at least one page, sizes the brick table, rounds the total up to whole pages, and appends the new segment to its manager's linked list. Page rounding slack is given to the usable region, so `TotalSize` is usually a bit larger than the request.
+Segment allocation lives in [`GCSegmentManager`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegmentManager.cs). `AllocateSegment(requestedSize)` clamps the request to at least one page, sizes the brick table, rounds the total up to whole pages, and appends the new segment to its manager's linked list. Page rounding slack is given to the usable region, so `TotalSize` is usually a bit larger than the request.
 
 ### Brick table
 
-During marking the GC sometimes holds an address that points into the middle of an object rather than at its start: a `ref` to an array element, or the reference inside a `Span<T>` (see [Interior pointers](#interior-pointers)). To mark the object it must first find where the object starts, and heap memory offers no way back: objects sit end to end with no back-pointers, so the only guaranteed way to find a start from an arbitrary interior address is to walk the segment from `Start`, object by object, until reaching the one that contains the address. For a large segment that is far too slow to do once per pointer.
+During marking the GC sometimes holds an address that points into the middle of an object rather than at its start: a `ref` to an array element, or the reference inside a `Span<T>` (see [Interior pointers](#interior-pointers)). To mark the object it must first find where the object starts, and heap memory offers no way back: objects sit end to end with no back-pointers, so the only guaranteed way to find a start from an arbitrary interior address is to walk the segment from `Start`, object by object, until reaching the one that contains the address.
 
-The brick table is the shortcut. Each segment carries a coarse index that records where recent objects start, so a lookup can jump close to the target and walk forward only a short distance instead of starting from the beginning. The standard .NET GC keeps a brick table for exactly the same job, which is where the name comes from.
+The brick table was meant to shorten that walk: a coarse per-segment index of where objects start, so a lookup could jump close to the target and walk forward only a short distance. The standard .NET GC keeps a brick table for the same job, which is where the name comes from.
 
-The mechanics: the usable region is divided into chunks of 255 pointer-sized slots (about 2 KiB, sized so a slot index fits in one byte), and the table stores one byte per chunk holding the 1-based slot index of the last recorded object start in that chunk (0 means none). `GCSegment.MarkObject(addr)` records starts at allocation time: on the pinned heap that is every object, but on the regular heap only each buffer bump-allocated from the segment, which in practice means each TLAB. So the first object of a TLAB is recorded, the objects that follow inside it are not, and a TLAB recycled from the free list adds no entry at all. Entries are therefore hints, not truth: `FindClosestObjectBelow(addr)` scans the table backwards for the nearest recorded start at or below the address, and the caller walks forward object by object from there until it reaches the object containing the address. The forward walk is what guarantees correctness; the table only shortens it.
+The mechanics: the usable region is divided into chunks of 255 pointer-sized slots (about 2 KiB, sized so a slot index fits in one byte), and the table stores one byte per chunk holding the 1-based slot index of the last recorded object start in that chunk (0 means none). `GCSegment.MarkObject(addr)` records starts at allocation time: on the pinned heap that is every object, but on the regular heap only each buffer bump-allocated from the segment, which in practice means each TLAB.
+
+The table is currently written but never read, because its entries are not a safe place to start a walk. They are incomplete: the objects that follow the first one inside a TLAB are never recorded, and a TLAB recycled from the free list adds no entry at all. They are also stale: nothing clears an entry when a sweep pulls `Bump` back or a free-list refill reuses the space, and `MarkObject` only ever raises an entry, so an old entry can point into the middle of a live object, where a walk would read object data as headers. The interior-pointer lookup therefore always walks from `Start`. That stays cheap because segments are small: a new segment is sized for the request that needed it, which is at least one page, 8 KiB for a TLAB refill, or one large object.
 
 ### Segment chains
 
@@ -142,7 +144,7 @@ A GC handle is a reference to a managed object that lives outside normal root sc
 > [!NOTE]
 > Official docs: [GCHandle](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.gchandle), [Weak references](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/weak-references), [DependentHandle](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.dependenthandle).
 
-The store is owned by a single [`GCHandleManager`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleManager.cs) (the `s_gCHandleManager` instance) and is organized by handle type: one `GCHandleSegmentStore` per handle type, plus a separate store for dependent handles.
+The store is owned by a single [`GCHandleManager`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleManager.cs) (the `s_gCHandleManager` instance) and is organized by handle type: one `GCHandleSegmentStore` per handle type, plus a separate store for dependent handles.
 
 | Type | Value | Keeps target alive? | Notes |
 |------|-------|--------------------|-------|
@@ -191,7 +193,7 @@ This section answers how a `new` becomes a pointer in a handful of instructions,
 
 ### Runtime bridge
 
-The NativeAOT runtime calls exported functions in [`Memory.cs`](../../../src/Cosmos.Kernel.Core/Runtime/Memory.cs). The allocation exports funnel into `GarbageCollector.AllocObject(size, flags)`; before the GC is initialized they fall back to the boot allocator (`MemoryOp.Alloc` plus an explicit zero).
+The NativeAOT runtime calls exported functions in [`Memory.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Runtime/Memory.cs). The allocation exports funnel into `GarbageCollector.AllocObject(size, flags)`; before the GC is initialized they fall back to the boot allocator (`MemoryOp.Alloc` plus an explicit zero).
 
 | Runtime export | Maps to | Purpose |
 |----------------|---------|---------|
@@ -240,7 +242,7 @@ The fast path is two pointer operations: if `AllocPtr + size <= AllocLimit`, bum
 
 ### TLAB refill
 
-`RefillAllocContext` (in [`GarbageCollector.Tlab.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Tlab.cs)) replaces an exhausted TLAB, trying cheap sources before expensive ones: recycled [free-list](#free-lists) space first, then untouched segment space, then new pages, and a collection only when everything else has failed.
+`RefillAllocContext` (in [`GarbageCollector.Tlab.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Tlab.cs)) replaces an exhausted TLAB, trying cheap sources before expensive ones: recycled [free-list](#free-lists) space first, then untouched segment space, then new pages, and a collection only when everything else has failed.
 
 ```mermaid
 flowchart TD
@@ -401,33 +403,34 @@ The scanner starts a cursor at `obj + startOffset` and, for every array element,
 
 A `ref` into an array element, a `Span<T>`'s `_reference`, or any other byref can be the only live reference to an object. Such a pointer does not point at the object header, so `TryMarkRoot`'s MethodTable check would discard it and the object would be collected while still in use (issue [#384](https://github.com/valentinbreiz/nativeaot-patcher/issues/384), fixed by the interior-pointer support from [#376](https://github.com/valentinbreiz/nativeaot-patcher/issues/376) for precisely scanned frames; conservatively scanned threads still miss them, see [Limitations and evolution](#limitations-and-evolution)).
 
-The precise stack scan fixes this for the GC-triggering thread. GCInfo tags byref slots with `GC_CALL_INTERIOR`, and the scan's root callback resolves them before marking:
+The precise stack scan fixes this for the GC-triggering thread. GCInfo tags byref slots with `GC_CALL_INTERIOR`, and the scan's root callback resolves them to their containing object with `GetParentObject` before marking:
 
 ```mermaid
 flowchart TD
-    BYREF["Byref slot tagged GC_CALL_INTERIOR"] --> PINQ{"GC_CALL_PINNED too?"}
-    PINQ -->|yes| SEGP["Find the segment containing
-    the address in the pinned chain"]
-    PINQ -->|no| SEGR["Find the segment containing
-    the address in the regular chain"]
-    SEGP --> FOUND{"Segment found?"}
-    SEGR --> FOUND
-    FOUND -->|no| PASS["Pass the value through unchanged:
-    TryMarkRoot's normal validation
-    discards it"]
-    FOUND -->|yes| BRICK["Brick table: closest recorded
-    object start at or below the address
-    (FindClosestObjectBelow)"]
-    BRICK --> WALK["Enumerate objects forward
-    (GCSegment.Enumerator, stepping by
-    ComputeSize) until the object whose
-    range contains the address"]
-    WALK --> MARK["Mark that object"]
+    BYREF["Byref slot tagged GC_CALL_INTERIOR"] --> SEG["Find the segment containing
+    the address: regular chain,
+    then pinned chain"]
+    SEG --> FOUND{"Segment found, and
+    address below its Bump?"}
+    FOUND -->|no| NONE["Mark nothing"]
+    FOUND -->|yes| WALK["Walk from Start with the sweep's rules:
+    free block by its Size, filler word
+    by one word, object by its aligned size"]
+    WALK --> HIT{"Address inside
+    an object?"}
+    HIT -->|"no (free block or filler)"| NONE
+    HIT -->|yes| MARK["TryMarkRoot on that object"]
 ```
 
-The brick table entry the lookup lands on may be a few objects behind the target (see [Brick table](#brick-table)); the forward walk covers the distance.
+Three choices in that lookup are deliberate:
 
-The conservative scan still only accepts pointers that hit an object header exactly. `GC_InteriorPointerRoot` is the acceptance test: an `int[2100]` reachable only through a `ref int` into element 8 must survive a collection followed by allocation churn.
+- **Both chains, by address.** A slot's `GC_CALL_PINNED` flag describes the stack slot (a pinned local, which is what a `fixed` statement creates), not the heap the object came from: a `fixed` pointer into a regular-heap array and a plain `Span<T>` over a `GC.AllocateArray<T>(n, pinned: true)` array are both ordinary. The pinned sweep's free runs also feed the shared free lists, so a regular-heap TLAB can sit inside a pinned segment.
+- **From `Start`.** The [brick table](#brick-table) is not a safe place to start a walk, so every lookup walks its segment from the first object.
+- **The [sweep](#sweep-phase)'s stepping rules.** The walk classifies each word the way `SweepSegment` does and steps over objects by `Align(ComputeSize())`, the size the allocator reserved, so the object it finds is one `SweepSegment` also visits as an object start and unmarks for the next cycle. `ComputeSize()` alone is not a stride: strings and arrays of 1- or 2-byte elements have sizes that are not pointer multiples.
+
+An address that lands in a free block, in filler, or past `Bump` marks nothing, rather than being handed to `TryMarkRoot` as if it were a header.
+
+The conservative scan still only accepts pointers that hit an object header exactly. `GC_InteriorPointerRoot` is the acceptance test: an `int[2100]` reachable only through a `ref int` into element 8 must survive a collection followed by allocation churn. The first two choices have cells of their own: `GC_InteriorPointerRootMidTlab` roots an array that sits behind another object in its TLAB, so its start was never recorded in the brick table; `GC_InteriorPointerRootPinnedHeap` roots a pinned-heap array through a plain byref; and `GC_InteriorPointerRootFixed` roots a regular-heap array through a `fixed` pointer only.
 
 ### Handles during marking
 
@@ -487,7 +490,7 @@ After the sweep, each chain is regrouped in one pass into FULL segments first, t
 
 ## Statistics and memory info
 
-[`GarbageCollector.Info.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) backs the runtime's memory queries:
+[`GarbageCollector.Info.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) backs the runtime's memory queries:
 
 - `GetStats(out totalCollections, out totalObjectsFreed)` exposes the two running counters. `Collect()`'s return value and these counters are exact: the test suite asserts the deltas match.
 - `GetSimpleMemoryInfo()` fills the snapshot behind `RhGetMemoryInfo`, which is what `GC.GetGCMemoryInfo()` reads: heap size (occupied range of regular plus pinned segments), fragmented bytes (sum of all free-list blocks), committed bytes (segments, frozen segments, mark stack, free-list page, handle store pages), pinned object count (pinned-heap objects plus `Pinned` handles), collection index, and [condemned generation](gc-concepts/gc-generations.md) (always 0; the collector is not generational, so promoted bytes are always 0 too).
@@ -516,11 +519,11 @@ Retiring the conservative path is the keystone: once every thread can be scanned
 
 ## Tests
 
-The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](../../../tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 45 tests (`make test KERNEL=GarbageCollector`). Highlights:
+The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 50 tests (`make test KERNEL=GarbageCollector`). Highlights:
 
 - exact collection accounting (`GC_CollectBasic`, `GC_UnreachableExactCount`),
 - weak and dependent handle behavior (`GC_WeakReference`, `GC_DependentHandle`, `GC_DependentHandleCleanup`),
-- interior pointer roots (`GC_InteriorPointerRoot`, the acceptance test for #384),
+- interior pointer roots (`GC_InteriorPointerRoot`, the acceptance test for #384, and `GC_InteriorPointerRootMidTlab`, `GC_InteriorPointerRootPinnedHeap`, `GC_InteriorPointerRootFixed`),
 - statics reachability through the handle spine (`GC_StaticOnlyReachability`),
 - precise stack scanning and funclet frames (`GC_PreciseStackScan`, `GC_FuncletNoFalseRoot`, `GC_FuncletNoCrashOnAllocInCatch`, `GC_StackScanPaddingStress`),
 - the malloc heaps staying untouched (`GC_MallocHeapNotSwept`),
@@ -534,18 +537,18 @@ The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](
 
 | Area | Path |
 |------|------|
-| GC core | [`src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.cs) |
-| Allocation | [`GarbageCollector.Alloc.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Alloc.cs), [`GarbageCollector.Tlab.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Tlab.cs) |
-| Mark phase | [`GarbageCollector.Mark.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Mark.cs), [`GarbageCollector.PreciseStack.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.PreciseStack.cs) |
-| GCInfo decoder (precise scan) | [`GcInfo/`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GcInfo/), see [Precise Stack Scanning](garbage-collector-gcinfo.md) |
-| Sweep phase | [`GarbageCollector.Sweep.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Sweep.cs) |
-| Segments | [`GCSegment.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegment.cs), [`GCSegmentManager.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegmentManager.cs) |
-| GC handles | [`GCHandle.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandle.cs), [`GCHandleSegment.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleSegment.cs), [`GCHandleManager.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleManager.cs), [`GarbageCollector.GCHandler.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.GCHandler.cs) |
-| Pinned heap | [`GarbageCollector.PinnedHeap.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.PinnedHeap.cs) |
-| Frozen segments | [`GarbageCollector.Frozen.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Frozen.cs) |
-| Statistics | [`GarbageCollector.Info.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) |
-| Object header | [`GCObject.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCObject.cs) |
-| TLAB struct | [`AllocContext.cs`](../../../src/Cosmos.Kernel.Core/Memory/GarbageCollector/AllocContext.cs) |
-| Runtime exports | [`src/Cosmos.Kernel.Core/Runtime/Memory.cs`](../../../src/Cosmos.Kernel.Core/Runtime/Memory.cs) |
-| Module and statics setup | [`src/Cosmos.Kernel.Core/Runtime/ManagedModule.cs`](../../../src/Cosmos.Kernel.Core/Runtime/ManagedModule.cs) |
-| Page allocator | [`src/Cosmos.Kernel.Core/Memory/PageAllocator.cs`](../../../src/Cosmos.Kernel.Core/Memory/PageAllocator.cs) |
+| GC core | [`src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.cs) |
+| Allocation | [`GarbageCollector.Alloc.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Alloc.cs), [`GarbageCollector.Tlab.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Tlab.cs) |
+| Mark phase | [`GarbageCollector.Mark.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Mark.cs), [`GarbageCollector.PreciseStack.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.PreciseStack.cs) |
+| GCInfo decoder (precise scan) | [`GcInfo/`](https://github.com/CosmosOS/Cosmos/tree/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GcInfo), see [Precise Stack Scanning](garbage-collector-gcinfo.md) |
+| Sweep phase | [`GarbageCollector.Sweep.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Sweep.cs) |
+| Segments | [`GCSegment.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegment.cs), [`GCSegmentManager.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegmentManager.cs) |
+| GC handles | [`GCHandle.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandle.cs), [`GCHandleSegment.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleSegment.cs), [`GCHandleManager.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleManager.cs), [`GarbageCollector.GCHandler.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.GCHandler.cs) |
+| Pinned heap | [`GarbageCollector.PinnedHeap.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.PinnedHeap.cs) |
+| Frozen segments | [`GarbageCollector.Frozen.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Frozen.cs) |
+| Statistics | [`GarbageCollector.Info.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) |
+| Object header | [`GCObject.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCObject.cs) |
+| TLAB struct | [`AllocContext.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/AllocContext.cs) |
+| Runtime exports | [`src/Cosmos.Kernel.Core/Runtime/Memory.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Runtime/Memory.cs) |
+| Module and statics setup | [`src/Cosmos.Kernel.Core/Runtime/ManagedModule.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Runtime/ManagedModule.cs) |
+| Page allocator | [`src/Cosmos.Kernel.Core/Memory/PageAllocator.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/PageAllocator.cs) |

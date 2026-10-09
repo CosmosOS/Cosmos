@@ -1,29 +1,32 @@
 using System.Runtime;
 using System.Runtime.InteropServices.Marshalling;
 using Cosmos.Kernel.Core.Bridge;
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 
 namespace Cosmos.Kernel.Core.Runtime;
 
-public class Thread
+internal class Thread
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    private static object[][] s_threadData;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    /// <summary>
+    /// Thread-static storage of the boot code while it is not a scheduler
+    /// thread: always when the scheduler is compiled out, and otherwise
+    /// until the scheduler makes it CPU 0's idle thread, which happens after
+    /// HAL initialization (an exception thrown there reads thread statics).
+    /// Null until CoreLib allocates it through the reference below, the same
+    /// way a scheduled thread's slot starts.
+    /// </summary>
+    private static object[][]? s_threadData;
+
     [RuntimeExport("RhGetThreadStaticStorage")]
-    internal static ref object[][] RhGetThreadStaticStorage()
+    internal static ref object[][]? RhGetThreadStaticStorage()
     {
-        if (CosmosFeatures.SchedulerEnabled)
+        if (CosmosFeatures.SchedulerEnabled && SchedulerManager.CurrentCpuState?.CurrentThread is { } current)
         {
-            var cpuState = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId());
-            return ref cpuState.CurrentThread!.GetThreadStaticStorage();
+            return ref current.GetThreadStaticStorage();
         }
-        else
-        {
-            return ref s_threadData;
-        }
+
+        return ref s_threadData;
     }
 
     [RuntimeExport("RhGetCurrentThreadStackBounds")]
@@ -31,8 +34,8 @@ public class Thread
     {
         if (CosmosFeatures.SchedulerEnabled)
         {
-            Scheduler.Thread? current = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())?.CurrentThread;
-            if (current != null && current.StackBase != 0)
+            SchedulerThread? current = SchedulerManager.CurrentCpuState?.CurrentThread;
+            if (current is not null && current.StackBase != 0)
             {
                 pStackLow = (nint)current.StackBase;
                 pStackHigh = (nint)(current.StackBase + current.StackSize);
@@ -52,7 +55,7 @@ public class Thread
     [RuntimeExport("RhGetDefaultStackSize")]
     internal static IntPtr RhGetDefaultStackSize()
     {
-        return (nint)Scheduler.Thread.DefaultStackSize;
+        return (nint)SchedulerThread.DefaultStackSize;
     }
 
     /// <summary>
@@ -85,21 +88,17 @@ public class Thread
         }
     }
 
+    /// <summary>
+    /// Backs <c>Thread.Yield</c>, and through it CoreLib's spin waits: asks
+    /// the next interrupt exit to switch, and returns before it does.
+    /// </summary>
+    /// <returns>0: no other thread has run yet when it returns.</returns>
     [RuntimeExport("RhYield")]
     internal static int RhYield()
     {
-        Serial.WriteString("RhYield Called\n");
-        if (CosmosFeatures.SchedulerEnabled)
+        if (CosmosFeatures.SchedulerEnabled && SchedulerManager.CurrentCpuState is not null)
         {
-            Scheduler.Thread? thread = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())?.CurrentThread;
-            if (thread != null)
-            {
-                //TODO: Switch Threads (if possible)
-                SchedulerManager.YieldThread(SchedulerManager.GetCurrentCpuId(), thread);
-                InternalCpu.Halt();
-
-                return 0;
-            }
+            SchedulerManager.YieldThread(SchedulerManager.GetCurrentCpuId());
         }
 
         return 0;

@@ -19,9 +19,14 @@ Everything you need to create, build and run your own Cosmos kernel:
  - [Kernel Startup](articles/user/startup.md): the boot chain and the `BeforeRun`/`Run`/`AfterRun` lifecycle.
  - [File System](articles/user/filesystem.md): mount a disk and use the standard .NET `System.IO` API (`File`, `Directory`, streams).
  - [Network](articles/user/network.md): DHCP, UDP and TCP through the standard .NET `System.Net.Sockets` API, plus DNS.
+ - [Timers and Alarms](articles/user/timers.md): block for a while, or run a callback later from the timer interrupt (`TimerManager`) or a kernel thread (`AlarmManager`).
  - [Graphics](articles/user/graphics.md): draw shapes, text and images on the screen with the Canvas API.
+ - [Audio](articles/user/audio.md): play tones, WAV files and sound you generate through the HD Audio output with `AudioManager` and `Console.Beep`.
  - [Keyboard](articles/user/keyboard.md): read lines, key events and layouts through `Console` and `KeyboardManager`.
+ - [Console Sessions and Telnet](articles/user/sessions.md): run several shells side by side on virtual consoles, and serve them to remote terminals over Telnet.
  - [Mouse](articles/user/mouse.md): pointer position, buttons and scroll wheel through `MouseManager`.
+ - [Writing a Driver](articles/user/drivers.md): match a driver to a device, reach the hardware, hand the kernel a device, and test it without hardware.
+ - [Writing a Scheduler](articles/user/scheduler-plugging.md): how to implement and install a scheduling policy.
  - [Debugging with VSCode and QEMU](articles/user/debugging.md): set breakpoints in your kernel with remote GDB.
 
 ## Contributor Docs
@@ -38,10 +43,24 @@ Architecture and internals, for contributors and the curious:
  - [Garbage Collector - Precise Stack Scan](articles/dev/garbage-collector-gcinfo.md): how GCInfo makes the triggering thread's stack scan exact.
  - [Garbage Collector - Glossary](articles/dev/garbage-collector-glossary.md): background notes on the GC concepts the articles build on.
  - [Scheduler](articles/dev/scheduler.md): the preemptive, pluggable scheduler.
- - [Scheduler - Writing a Scheduler](articles/dev/scheduler-plugging.md): how to implement and install a scheduling policy.
  - [Scheduler - Glossary](articles/dev/scheduler-glossary.md): background notes on the scheduling concepts the article builds on.
  - [Kernel Compilation Steps](articles/dev/build/kernel-compilation-steps.md): C# to bootable ISO, end to end.
  - [Cosmos.Build.Asm](articles/dev/build/asm-build.md), [Cosmos.Build.GCC](articles/dev/build/gcc-build.md), [Cosmos.Build.Patcher](articles/dev/build/patcher-build.md), [Cosmos.Build.Ilc](articles/dev/build/ilc-build.md): the build pipeline components.
+ - [Driver Manifest](articles/dev/build/driver-manifest.md): which `[Driver]` classes the build registers, in what order, and how a kernel keeps one out or opts one in.
+
+## Cross-referencing
+
+The API reference publishes a DocFX cross-reference map at [`/xrefmap.yml`](https://cosmosos.github.io/xrefmap.yml), covering every documented namespace, type and member. Another DocFX site consumes it by adding that URL to the `xref` list of its own `docfx.json`:
+
+```json
+{
+  "build": {
+    "xref": [ "https://cosmosos.github.io/xrefmap.yml" ]
+  }
+}
+```
+
+Cosmos types are then linked by UID instead of by URL, as `<xref:Cosmos.Kernel.System.Graphics.Canvas>` or its `@Cosmos.Kernel.System.Graphics.Canvas` shorthand. Each frozen release copy carries its own map beside it, at `/vX.Y.Z/xrefmap.yml` and `/latest/xrefmap.yml`.
 
 ## Resources
 - [Cosmos Gen3: The NativeAOT Era and the End of IL2CPU?](https://valentin.bzh/posts/3)

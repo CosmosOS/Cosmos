@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// <summary>
 /// Bridge functions for memcpy / memcmp used by C library code.
 /// </summary>
-public static unsafe class MemNative
+internal static unsafe class MemNative
 {
     /// <summary>
     /// Copy memory using Cosmos MemoryOp.MemCopy

@@ -3,8 +3,9 @@
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
-using Cosmos.Kernel.Core.Runtime;
+using Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 using Cosmos.Kernel.Core.Runtime.GcInfo;
+using Internal.Runtime;
 
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 
@@ -22,7 +23,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// can describe (asm entry stubs, native imports, IRQ entry — no CFI at all) or a frame's slot table
 /// is too large to decode.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     private const int MaxPreciseFrames = 256;
 
@@ -136,7 +137,7 @@ public static unsafe partial class GarbageCollector
         // UnixNativeCodeManager::EnumGcRefs; this is the scan path that targets issue #227.
         CodeManagerFlags flags = (mi.IsFunclet && mi.IsFilter) ? CodeManagerFlags.NoReportUntracked : CodeManagerFlags.None;
 
-        GcInfoDecoder decoder = new GcInfoDecoder(mi.GcInfo, GcInfoEncoding.GCINFO_VERSION, GcInfoDecoderFlags.DECODE_GC_LIFETIMES, mi.CodeOffset);
+        GcInfoDecoder decoder = new(mi.GcInfo, GcInfoEncoding.GCINFO_VERSION, GcInfoDecoderFlags.DECODE_GC_LIFETIMES, mi.CodeOffset);
         bool fit = decoder.EnumerateLiveSlots(rd, reportScratchSlots: false, flags, &PreciseRootTrampoline, null);
         if (!fit)
         {
@@ -151,10 +152,10 @@ public static unsafe partial class GarbageCollector
     /// <summary>
     /// <see cref="GcInfoDecoder.EnumerateLiveSlots"/> callback: marks each reported root via
     /// <see cref="TryMarkRoot"/>. <paramref name="pObjRef"/> is null for scratch registers Cosmos's
-    /// REGDISPLAY does not track (skipped). An interior pointer (<c>GC_CALL_INTERIOR</c>) is passed
-    /// through as-is — <see cref="TryMarkRoot"/>'s MethodTable check then drops a non-header byref,
-    /// the same hole the conservative scanner has; pinned (<c>GC_CALL_PINNED</c>) is a no-op for the
-    /// non-moving mark phase.
+    /// REGDISPLAY does not track (skipped). An interior pointer (<c>GC_CALL_INTERIOR</c>: a byref or a
+    /// span) is resolved to the object that contains it by <see cref="GetParentObject"/>, and marks
+    /// nothing when it lies in no object; pinned (<c>GC_CALL_PINNED</c>) is a no-op for the non-moving
+    /// mark phase.
     /// </summary>
     private static void PreciseRootTrampoline(void* ctx, nuint* pObjRef, uint gcRefFlags)
     {
@@ -165,47 +166,85 @@ public static unsafe partial class GarbageCollector
 
         if ((gcRefFlags & GcRefFlags.GC_CALL_INTERIOR) != 0)
         {
-            // An interior pointer is reported. Find the parent object in the GC heap and mark it.
-            // Check if we are dealing with a pinned object, we need to use the correct segment list.
-            void* obj = (gcRefFlags & GcRefFlags.GC_CALL_PINNED) != 0
-                        ? GetParentObject((void*)*pObjRef, s_pinnedSegmentManager.Segments)
-                        : GetParentObject((void*)*pObjRef, s_segmentManager.Segments);
+            GCObject* parent = GetParentObject((byte*)*pObjRef);
+            if (parent != null)
+            {
+                TryMarkRoot((nint)parent);
+            }
 
-            TryMarkRoot((nint)obj);
             return;
         }
+
         TryMarkRoot((nint)(*pObjRef));
     }
 
-    private static void* GetParentObject(void* obj, GCSegment* s_segments)
+    /// <summary>
+    /// Resolves an interior pointer to the GC object that contains it.
+    /// </summary>
+    /// <remarks>
+    /// The segment is found by address, in the SOH or the pinned heap. The slot's
+    /// <c>GC_CALL_PINNED</c> flag cannot choose the heap: it describes the stack slot (a <c>fixed</c>
+    /// local), not the heap the object was allocated on, and the pinned sweep's free runs feed the
+    /// shared free lists, so SOH TLABs can sit inside pinned segments.
+    /// </remarks>
+    /// <param name="interior">
+    /// The pointer reported by the GCInfo decoder, or a word found by conservative scanning.
+    /// </param>
+    /// <returns>
+    /// The containing object, or <c>null</c> when the pointer is outside every segment or lies in a
+    /// free block, filler or unallocated space.
+    /// </returns>
+    private static GCObject* GetParentObject(byte* interior)
     {
-        var segment = s_segments;
+        GCSegment* segment = GetSegmentContaining(interior);
+        return segment != null ? FindObjectContaining(segment, interior) : null;
+    }
 
-        while (segment != null)
+    /// <summary>
+    /// Walks <paramref name="segment"/> from its first object to the object whose extent covers
+    /// <paramref name="interior"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The walk steps with <see cref="GetHeapEntrySize"/>, so the object it returns is one the sweep
+    /// also visits as an object start and unmarks.
+    /// </para>
+    /// <para>
+    /// It starts at <see cref="GCSegment.Start"/>, not at a brick-table entry. Objects allocated inside
+    /// a TLAB, and TLABs refilled from the free list, are never recorded in the brick table, and its
+    /// entries are never cleared when a sweep or a free-list refill reshapes the segment, so an entry
+    /// can point inside a live object. The cost is one walk of one segment per interior root (a precise
+    /// interior slot, or a conservatively scanned word that falls in the heap), and segments are sized
+    /// for one TLAB refill or one large allocation.
+    /// </para>
+    /// </remarks>
+    /// <param name="segment">The segment that contains <paramref name="interior"/>.</param>
+    /// <param name="interior">The address to resolve.</param>
+    /// <returns>The containing object, or <c>null</c> when no object covers the address.</returns>
+    private static GCObject* FindObjectContaining(GCSegment* segment, byte* interior)
+    {
+        if (interior >= segment->Bump)
         {
-            if (obj >= segment->Start && obj < segment->End)
-            {
-                var start = segment->FindClosestObjectBelow((nint)obj);
-
-                var segEnum = new GCSegment.Enumerator((byte*)start, (byte*)obj);
-
-                while (segEnum.MoveNext())
-                {
-                    var current = segEnum.Current;
-                    if (current == obj)
-                    {
-                        return current;
-                    }
-
-                    if (obj > current && obj < (byte*)current + current->ComputeSize())
-                    {
-                        return current;
-                    }
-                }
-            }
-            segment = segment->Next;
+            return null;
         }
 
-        return obj;
+        byte* ptr = segment->Start;
+        while (ptr < segment->Bump)
+        {
+            uint size = GetHeapEntrySize(segment, ptr, out bool isObject);
+            if (size == 0)
+            {
+                return null;
+            }
+
+            if (interior < ptr + size)
+            {
+                return isObject ? (GCObject*)ptr : null;
+            }
+
+            ptr += size;
+        }
+
+        return null;
     }
 }

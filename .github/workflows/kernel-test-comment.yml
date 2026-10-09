@@ -1,0 +1,107 @@
+name: Post Kernel Test Comments
+
+# Posts the PR comments that Kernel Tests and Kernel Coverage render into
+# pr-comment-* artifacts. Those workflows run on pull_request, where a run
+# for a pull request from a fork holds a read-only token and cannot comment.
+# A workflow_run job runs in the base repository with this file's own
+# permissions whatever the origin of the pull request, and GitHub only fires
+# it from the default branch, so it never executes code from the PR: it
+# downloads the rendered comments and posts them, nothing else.
+#
+# Each artifact holds body.md and pr-number, both written by the untrusted
+# run. The number is trusted only once the pull request it names has the
+# run's head commit as its head, so a run cannot post to another PR, and
+# the body is handed to the API as data.
+
+on:
+  workflow_run:
+    workflows: ["Kernel Tests", "Kernel Coverage"]
+    types: [completed]
+
+permissions:
+  actions: read
+  pull-requests: write
+
+jobs:
+  post-comments:
+    name: Post PR Comments
+    runs-on: ubuntu-24.04
+    if: github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.event == 'workflow_dispatch'
+    steps:
+      - name: 📥 Download Rendered Comments
+        uses: actions/download-artifact@v4
+        # A run whose results jobs never ran uploads nothing; the download
+        # then fails and the script below finds an empty directory.
+        continue-on-error: true
+        with:
+          pattern: pr-comment-*
+          path: comments/
+          merge-multiple: false
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: 💬 Post PR Comments
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const headSha = context.payload.workflow_run.head_sha;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const root = 'comments';
+            const dirs = fs.existsSync(root)
+              ? fs.readdirSync(root).filter(d => d.startsWith('pr-comment-'))
+              : [];
+            if (dirs.length === 0) {
+              core.info('No rendered comments in this run.');
+              return;
+            }
+
+            // One PR per run: every artifact names the same number, and the
+            // number is only trusted once that PR's head is this run's head.
+            const numbers = new Set(dirs.map(d => fs.readFileSync(path.join(root, d, 'pr-number'), 'utf8').trim()));
+            if (numbers.size !== 1) {
+              core.setFailed(`Artifacts name ${numbers.size} different pull requests: ${[...numbers].join(', ')}`);
+              return;
+            }
+            const prNumber = Number([...numbers][0]);
+            if (!Number.isInteger(prNumber) || prNumber <= 0) {
+              core.setFailed(`Invalid pull request number: ${[...numbers][0]}`);
+              return;
+            }
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            if (pr.head.sha !== headSha) {
+              core.info(`PR #${prNumber} head is ${pr.head.sha}, run head is ${headSha}: superseded, not posting.`);
+              return;
+            }
+
+            // Only comments the Actions bot wrote are candidates for an
+            // update: the bodies come from an untrusted run, and a heading
+            // chosen to match a reviewer's comment must not overwrite it.
+            const existing = (await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: prNumber, per_page: 100 }))
+              .filter(c => c.user?.type === 'Bot');
+
+            for (const dir of dirs.sort()) {
+              const key = dir.slice('pr-comment-'.length);
+              const marker = `<!-- cosmos-ci-comment: ${key} -->`;
+              const rendered = fs.readFileSync(path.join(root, dir, 'body.md'), 'utf8').trimEnd();
+              const body = `${marker}\n${rendered}`;
+              const heading = rendered.split('\n')[0];
+
+              // The marker identifies comments this workflow posted; the
+              // heading fallback picks up the ones the results jobs posted
+              // directly before the hand-off, so those are updated in place
+              // rather than duplicated.
+              const mine = existing.find(c => c.body.startsWith(marker))
+                ?? existing.find(c => c.body.split('\n')[0] === heading);
+
+              if (mine) {
+                await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+                core.info(`Updated ${key} comment on PR #${prNumber}.`);
+              } else {
+                await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });
+                core.info(`Posted ${key} comment on PR #${prNumber}.`);
+              }
+            }

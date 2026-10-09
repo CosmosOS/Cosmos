@@ -6,11 +6,23 @@
   href: filesystem.md
 - name: Network
   href: network.md
+- name: Timers and Alarms
+  href: timers.md
+- name: Random Numbers
+  href: random.md
 - name: Graphics
   href: graphics.md
+- name: Audio
+  href: audio.md
 - name: Keyboard
   href: keyboard.md
+- name: Console Sessions and Telnet
+  href: sessions.md
 - name: Mouse
   href: mouse.md
+- name: Writing a Driver
+  href: drivers.md
+- name: Writing a Scheduler
+  href: scheduler-plugging.md
 - name: Debugging with VSCode and QEMU
   href: debugging.md

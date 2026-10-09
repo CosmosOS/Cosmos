@@ -34,21 +34,21 @@ public partial class ProcessSignals
         {
             using (InternalCpu.DisableInterruptsScope())
             {
-                foreach (Thread thread in _process.Threads)
+                foreach (SchedulerThread thread in _process.Threads)
                 {
-                    thread.State = ThreadState.Dead;
+                    thread.State = SchedulerThreadState.Dead;
                 }
             }
         }
         if (handel != null)
         {
             nuint entryPoint = handel.Value;
-            Thread thread = new Thread
+            SchedulerThread thread = new SchedulerThread
             {
                 Id = SchedulerManager.AllocateThreadId(),
                 CpuId = 0,
-                State = ThreadState.Created,
-                Flags = ThreadFlags.NativeProcess
+                State = SchedulerThreadState.Created,
+                Flags = SchedulerThreadFlags.NativeProcess
             };
 
             byte ring = _process.Ring;

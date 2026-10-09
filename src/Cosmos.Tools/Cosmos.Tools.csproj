@@ -16,10 +16,7 @@
     <Title>Cosmos Development Tools</Title>
     <Description>CLI tools for Cosmos kernel development. Includes tool checking, installation, project creation, building, and QEMU integration.</Description>
     <PackageTags>cosmos;kernel;os;tools;cli;qemu;nativeaot</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
-    <Authors>CosmosOS</Authors>
   </PropertyGroup>
 
   <ItemGroup>

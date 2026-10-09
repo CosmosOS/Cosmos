@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.Memory.VAS;
 using Cosmos.Kernel.Core.X64.Bridge;
 using Cosmos.Kernel.Core.X64.Memory;
+using Cosmos.Kernel.HAL.Boot;
 
 namespace Cosmos.Kernel.HAL.X64;
 

@@ -46,6 +46,13 @@ public class TestResult
     public TestStatus Status { get; set; }
     public uint DurationMs { get; set; }
     public string ErrorMessage { get; set; } = string.Empty;
+
+    /// <summary>
+    /// True once a Pass, Fail or Skip frame has been parsed for this test.
+    /// False for a test that only sent TestStart, which is how a test the
+    /// kernel died in looks in the log.
+    /// </summary>
+    public bool HasResult { get; set; }
 }
 
 /// <summary>

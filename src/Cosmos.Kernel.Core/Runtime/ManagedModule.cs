@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
+using Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 using Internal.Runtime;
 
 namespace Cosmos.Kernel.Core.Runtime;
@@ -14,7 +15,7 @@ namespace Cosmos.Kernel.Core.Runtime;
 /// </summary>
 // https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/readytorun-format.md
 
-public static unsafe partial class ManagedModule
+internal static unsafe partial class ManagedModule
 {
     /// <summary>
     /// Table of logical modules.
@@ -64,7 +65,7 @@ public static unsafe partial class ManagedModule
 
         // Allocate classlib functions array on unmanaged heap (never moved by GC)
         // Must match ClassLibFunctionId enum (12 entries, 0-11)
-        s_pClasslibFunctions = (void**)Cosmos.Kernel.Core.Memory.Heap.Heap.Alloc((uint)(ClasslibFunctionCount * sizeof(void*)));
+        s_pClasslibFunctions = (void**)Core.Memory.Heap.Heap.Alloc((uint)(ClasslibFunctionCount * sizeof(void*)));
         s_pClasslibFunctions[0] = (void*)(delegate*<ExceptionIDs, Exception>)&ExceptionHelper.GetRuntimeException;
         s_pClasslibFunctions[1] = null; // FailFast - not implemented yet
         s_pClasslibFunctions[2] = null; // ThreadEntryPoint - not implemented yet

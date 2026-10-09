@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// - IRQContext (GPRs + system regs) at offset 512
 /// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public unsafe struct ThreadContext
+internal unsafe struct ThreadContext
 {
     // NEON/SIMD registers Q0-Q31 (32 * 16 = 512 bytes)
     public fixed byte Neon[512];

@@ -3,7 +3,7 @@ using Cosmos.Kernel.Core.X64.Bridge;
 
 namespace Cosmos.Kernel.Core.X64.IO;
 
-public class X64PortIO : IPortIO
+internal class X64PortIO : IPortIO
 {
     public byte ReadByte(ushort port) => PortIoNative.ReadByte(port);
     public ushort ReadWord(ushort port) => PortIoNative.ReadWord(port);

@@ -41,7 +41,7 @@ namespace Cosmos.TestRunner.Protocol
 
     /// <summary>
     /// Messages from Guest (Kernel) to Host (Test Runner)
-    /// Extended with test-specific message types (100-108)
+    /// Extended with test-specific message types (100-109)
     /// </summary>
     public static class Ds2Vs
     {
@@ -127,6 +127,14 @@ namespace Cosmos.TestRunner.Protocol
         /// (test number).
         /// </summary>
         public const byte TestDestructiveReached = 108;
+
+        /// <summary>
+        /// Sent when a test needs the host to change the machine under the
+        /// running guest, such as pulling a USB stick out. Payload: string
+        /// (the request, e.g. <c>usb-unplug</c> or <c>usb-plug 0</c>). No
+        /// reply comes back: the test waits for the change to show up.
+        /// </summary>
+        public const byte HostRequest = 109;
     }
 
     /// <summary>

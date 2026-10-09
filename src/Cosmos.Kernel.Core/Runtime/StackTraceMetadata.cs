@@ -7,7 +7,7 @@ using Internal.StackTraceMetadata;
 
 namespace Cosmos.Kernel.Core.Runtime
 {
-    public static class StackTraceMetadata
+    internal static class StackTraceMetadata
     {
         /// <summary>
         /// Indicates whether stack trace metadata support is enabled.
@@ -69,7 +69,7 @@ namespace Cosmos.Kernel.Core.Runtime
                     {
                         // Validate handles before calling FormatMethodName to avoid BadImageFormatException
                         // during exception handling (which would cause recursive exception detection)
-                        if (resolver.Reader == null ||
+                        if (resolver.Reader is null ||
                             stackTraceData.OwningType.IsNil ||
                             stackTraceData.Name.IsNil ||
                             stackTraceData.Signature.IsNil)
@@ -135,7 +135,7 @@ namespace Cosmos.Kernel.Core.Runtime
                 else
                 {
                     // No stack trace metadata available
-                    _stacktraceDatas = Array.Empty<StackTraceData>();
+                    _stacktraceDatas = [];
                     Reader = null;
                 }
             }
@@ -201,28 +201,69 @@ namespace Cosmos.Kernel.Core.Runtime
                         => address + *(int*)address;
                 }
 
-                // Use simple insertion sort instead of Array.Sort
-                // Array.Sort uses IntroSort which is recursive and causes page faults in kernel
-                InsertionSort(_stacktraceDatas, current);
+                // Not Array.Sort: its IntroSort is recursive, which page-faults in the kernel.
+                HeapSort(_stacktraceDatas, current);
             }
 
             /// <summary>
-            /// Simple insertion sort - iterative, no allocations, safe for kernel use
+            /// Sorts the first <paramref name="count"/> entries by RVA: a heap sort,
+            /// iterative and in place, in O(n log n). The map holds an entry for
+            /// every method (tens of thousands): the insertion sort this replaces
+            /// made the first exception of a session take seconds. Nothing is done
+            /// when the entries are already in order.
             /// </summary>
-            private static void InsertionSort(StackTraceData[] array, int count)
+            private static void HeapSort(StackTraceData[] array, int count)
             {
-                for (int i = 1; i < count; i++)
+                int i = 1;
+                while (i < count && array[i - 1].Rva <= array[i].Rva)
                 {
-                    var key = array[i];
-                    int j = i - 1;
-
-                    while (j >= 0 && array[j].Rva > key.Rva)
-                    {
-                        array[j + 1] = array[j];
-                        j--;
-                    }
-                    array[j + 1] = key;
+                    i++;
                 }
+
+                if (i >= count)
+                {
+                    return;
+                }
+
+                for (int start = count / 2 - 1; start >= 0; start--)
+                {
+                    SiftDown(array, start, count);
+                }
+
+                for (int end = count - 1; end > 0; end--)
+                {
+                    (array[0], array[end]) = (array[end], array[0]);
+                    SiftDown(array, 0, end);
+                }
+            }
+
+            /// <summary>Moves the entry at <paramref name="root"/> down the max-heap held in the first <paramref name="count"/> entries.</summary>
+            private static void SiftDown(StackTraceData[] array, int root, int count)
+            {
+                StackTraceData moving = array[root];
+                while (true)
+                {
+                    int child = 2 * root + 1;
+                    if (child >= count)
+                    {
+                        break;
+                    }
+
+                    if (child + 1 < count && array[child + 1].Rva > array[child].Rva)
+                    {
+                        child++;
+                    }
+
+                    if (array[child].Rva <= moving.Rva)
+                    {
+                        break;
+                    }
+
+                    array[root] = array[child];
+                    root = child;
+                }
+
+                array[root] = moving;
             }
 
             /// <summary>
@@ -230,7 +271,7 @@ namespace Cosmos.Kernel.Core.Runtime
             /// </summary>
             public bool TryGetStackTraceData(int rva, out StackTraceData data)
             {
-                if (_stacktraceDatas == null)
+                if (_stacktraceDatas is null)
                 {
                     // No stack trace metadata for this module
                     data = default;

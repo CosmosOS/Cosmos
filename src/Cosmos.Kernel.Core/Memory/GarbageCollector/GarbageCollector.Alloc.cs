@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// <summary>
 /// Allocation methods: segment management, bump allocation, and free list operations.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     /// <summary>
     /// Aligns a size up to the nearest pointer-sized boundary.
@@ -85,6 +85,8 @@ public static unsafe partial class GarbageCollector
                         s_freeLists[i] = block->Next;
                     }
 
+                    s_freeListBytes -= (uint)block->Size;
+
                     // Split if remainder is usable
                     if (remainder >= MinBlockSize)
                     {
@@ -139,8 +141,16 @@ public static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Slow allocation path: walks all segments looking for space, then allocates a new segment if needed.
+    /// Slow allocation path: walks the segments from <see cref="s_lastSegment"/> looking for space,
+    /// then allocates a new segment if needed.
     /// </summary>
+    /// <remarks>
+    /// The segments before <see cref="s_lastSegment"/> are not walked again: the sweep orders the
+    /// full ones first and <see cref="s_lastSegment"/> after them, and between collections it only
+    /// moves forward, past segments that had no room for a request. Walking them from the head for
+    /// every request made each one cost the whole heap, so that filling the heap took time in the
+    /// square of its size; the room left at their end comes back with the next sweep.
+    /// </remarks>
     /// <param name="size">Number of bytes to allocate.</param>
     /// <returns>Pointer to the allocated memory, or <c>null</c> if allocation fails.</returns>
     private static void* AllocateObjectSlow(uint size)
@@ -155,20 +165,7 @@ public static unsafe partial class GarbageCollector
             s_lastSegment = s_segmentManager.Segments;
         }
 
-        GCSegment* start = s_lastSegment;
-
-        // Pass 1: from s_lastSegment to end
-        for (GCSegment* seg = start; seg != null; seg = seg->Next)
-        {
-            void* result = BumpAllocInSegment(seg, size);
-            if (result != null)
-            {
-                return result;
-            }
-        }
-
-        // Pass 2: from head to s_lastSegment (exclusive)
-        for (GCSegment* seg = s_segmentManager.Segments; seg != start; seg = seg->Next)
+        for (GCSegment* seg = s_lastSegment; seg != null; seg = seg->Next)
         {
             void* result = BumpAllocInSegment(seg, size);
             if (result != null)
@@ -184,7 +181,6 @@ public static unsafe partial class GarbageCollector
         {
             return null;
         }
-        s_heapRangeDirty = true;
         s_lastSegment = newSegment;
         s_currentSegment = newSegment;
 
@@ -250,6 +246,8 @@ public static unsafe partial class GarbageCollector
                         s_freeLists[i] = block->Next;
                     }
 
+                    s_freeListBytes -= (uint)block->Size;
+
                     if (remainder >= MinBlockSize)
                     {
                         FreeBlock* split = (FreeBlock*)((byte*)block + size);
@@ -272,13 +270,19 @@ public static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Removes and returns the largest free-list block of at least
-    /// <paramref name="minSize"/> bytes, taken whole (no split) and zeroed.
+    /// Removes and returns a free-list block of at least <paramref name="minSize"/>
+    /// bytes from the highest size class that has one, taken whole (no split) and
+    /// zeroed: one of the largest blocks, at least half the size of the largest.
     /// TLAB-refill fallback: lets refills reuse the sub-TlabSize blocks that
     /// sweep leaves in partially live segments instead of growing the heap
     /// with a new segment. The unused tail is stamped back to the free list
     /// by the next <see cref="StampUnusedTlab"/> like any other TLAB gap.
     /// </summary>
+    /// <remarks>
+    /// It takes the first block of the class that fits rather than the largest: a
+    /// class can hold every gap a sweep left, and finding the largest walked it
+    /// whole for every refill.
+    /// </remarks>
     private static void* AllocLargestFromFreeListRaw(uint minSize, out uint blockSize)
     {
         blockSize = 0;
@@ -289,34 +293,34 @@ public static unsafe partial class GarbageCollector
 
         for (int i = NumSizeClasses - 1; i >= 0; i--)
         {
+            // Below the top class (which also takes larger blocks) a class holds no
+            // block larger than its size: neither it nor any class under it can fit.
+            if (i < NumSizeClasses - 1 && (MinSizeClass << i) < minSize)
+            {
+                break;
+            }
+
             FreeBlock* prev = null;
-            FreeBlock* best = null;
-            FreeBlock* bestPrev = null;
             for (FreeBlock* block = s_freeLists[i]; block != null; block = block->Next)
             {
-                if ((uint)block->Size >= minSize && (best == null || block->Size > best->Size))
+                if ((uint)block->Size >= minSize)
                 {
-                    best = block;
-                    bestPrev = prev;
+                    if (prev != null)
+                    {
+                        prev->Next = block->Next;
+                    }
+                    else
+                    {
+                        s_freeLists[i] = block->Next;
+                    }
+
+                    s_freeListBytes -= (uint)block->Size;
+                    blockSize = (uint)block->Size;
+                    MemoryOp.MemSet((byte*)block, 0, (int)blockSize);
+                    return block;
                 }
 
                 prev = block;
-            }
-
-            if (best != null)
-            {
-                if (bestPrev != null)
-                {
-                    bestPrev->Next = best->Next;
-                }
-                else
-                {
-                    s_freeLists[i] = best->Next;
-                }
-
-                blockSize = (uint)best->Size;
-                MemoryOp.MemSet((byte*)best, 0, (int)blockSize);
-                return best;
             }
         }
 
@@ -351,7 +355,8 @@ public static unsafe partial class GarbageCollector
 
     /// <summary>
     /// Slow allocation path without incrementing <see cref="s_totalAllocatedBytes"/>.
-    /// Walks segments and allocates a new one if needed. Used by TLAB refill.
+    /// Walks the segments from <see cref="s_lastSegment"/>, as <see cref="AllocateObjectSlow"/>
+    /// does, and allocates a new one if needed. Used by TLAB refill.
     /// </summary>
     private static void* AllocateObjectSlowRaw(uint size)
     {
@@ -365,18 +370,7 @@ public static unsafe partial class GarbageCollector
             s_lastSegment = s_segmentManager.Segments;
         }
 
-        GCSegment* start = s_lastSegment;
-
-        for (GCSegment* seg = start; seg != null; seg = seg->Next)
-        {
-            void* result = BumpAllocInSegmentRaw(seg, size);
-            if (result != null)
-            {
-                return result;
-            }
-        }
-
-        for (GCSegment* seg = s_segmentManager.Segments; seg != start; seg = seg->Next)
+        for (GCSegment* seg = s_lastSegment; seg != null; seg = seg->Next)
         {
             void* result = BumpAllocInSegmentRaw(seg, size);
             if (result != null)
@@ -391,7 +385,6 @@ public static unsafe partial class GarbageCollector
             return null;
         }
 
-        s_heapRangeDirty = true;
         s_lastSegment = newSegment;
         s_currentSegment = newSegment;
 
@@ -448,5 +441,6 @@ public static unsafe partial class GarbageCollector
 
         block->Next = s_freeLists[sizeClass];
         s_freeLists[sizeClass] = block;
+        s_freeListBytes += size;
     }
 }

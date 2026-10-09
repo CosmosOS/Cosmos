@@ -5,6 +5,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- The suite exercises the experimental packet seam (COSMOS0002). -->
+    <NoWarn>$(NoWarn);COSMOS0002</NoWarn>
   </PropertyGroup>
 
   <!-- Run the whole protocol suite once per NIC driver, two cells per arch:

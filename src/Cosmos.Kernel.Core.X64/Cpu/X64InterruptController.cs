@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Core.X64.Cpu;
 /// X64 interrupt controller - manages IDT and APIC, owns the x64 dispatch
 /// path (vector lookup, EOI for hardware IRQs, fatal CPU-exception halt).
 /// </summary>
-public class X64InterruptController : IInterruptController
+internal class X64InterruptController : IInterruptController
 {
     /// <summary>Highest CPU-exception vector; vectors 0-31 are reserved for exceptions (SDM 3A §6.2).</summary>
     private const ulong MaxCpuExceptionVector = 31;
@@ -27,10 +27,20 @@ public class X64InterruptController : IInterruptController
     /// <summary>Size in bytes of the XMM save area the asm stub pushes below the IRQContext. Internal: shared with the LAPIC timer handler's RSP derivation.</summary>
     internal const int XmmSaveAreaSizeBytes = 256;
 
-    /// <summary>Upper canonical bits of a kernel-space (higher-half) address, used as both mask and expected value. Internal: shared with the LAPIC timer handler's RSP sanity check.</summary>
-    internal const ulong KernelSpaceCanonicalMask = 0xFFFF000000000000;
+    /// <summary>
+    /// The vector of the scheduler's self-IPI (<see cref="TryRaiseReschedule"/>):
+    /// above the LAPIC timer's <see cref="LocalApic.TIMER_VECTOR"/>, outside
+    /// the ISA lines and the dynamic range devices allocate from.
+    /// </summary>
+    private const byte RescheduleVector = 0xF0;
 
-    public bool IsInitialized => ApicManager.IsInitialized;
+    /// <summary>
+    /// True once a hardware line can be routed, which on x64 takes the I/O
+    /// APIC the MADT describes. The Local APIC alone, which a machine without
+    /// ACPI still has, delivers the timer and MSI messages but no line, so
+    /// line sources refuse to connect and their drivers poll.
+    /// </summary>
+    public bool IsInitialized => ApicManager.CanRouteIrqs;
 
     public void Initialize()
     {
@@ -44,13 +54,47 @@ public class X64InterruptController : IInterruptController
         Gdt.Load();
         Idt.RegisterAllInterrupts();
         Serial.Write("[X64InterruptController] IDT initialization complete\n");
+
+        // A handler, though it does nothing, is what takes the vector down
+        // Dispatch's hardware-IRQ path: the EOI, then the pending reschedule.
+        InterruptManager.SetHandler(RescheduleVector, HandleReschedule);
+    }
+
+    /// <inheritdoc/>
+    public bool TryRaiseReschedule()
+    {
+        if (!ApicManager.IsInitialized)
+        {
+            return false;
+        }
+
+        LocalApic.SendSelfIpi(RescheduleVector);
+        return true;
     }
 
     public void RouteIrq(byte irqNo, byte vector, bool startMasked)
     {
-        if (ApicManager.IsInitialized)
+        if (ApicManager.CanRouteIrqs)
         {
             ApicManager.RouteIrq(irqNo, vector, startMasked);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void MaskIrq(byte irqNo)
+    {
+        if (ApicManager.CanRouteIrqs)
+        {
+            ApicManager.MaskIrq(irqNo);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void UnmaskIrq(byte irqNo)
+    {
+        if (ApicManager.CanRouteIrqs)
+        {
+            ApicManager.UnmaskIrq(irqNo);
         }
     }
 
@@ -68,7 +112,7 @@ public class X64InterruptController : IInterruptController
                 // the APIC spurious vector: a spurious delivery sets no ISR
                 // bit, so an EOI here would retire whichever real interrupt
                 // is currently in service (SDM 3A §11.9).
-                if (ctx.interrupt >= FirstHardwareIrqVector && ctx.interrupt != LocalApic.SPURIOUS_VECTOR && IsInitialized)
+                if (ctx.interrupt >= FirstHardwareIrqVector && ctx.interrupt != LocalApic.SPURIOUS_VECTOR && ApicManager.IsInitialized)
                 {
                     SendEOI();
 
@@ -100,10 +144,15 @@ public class X64InterruptController : IInterruptController
         // The spurious vector is the exception (see above): it arrives here
         // because nothing registers a handler for it, and it must be
         // dismissed without EOI.
-        if (ctx.interrupt >= FirstHardwareIrqVector && ctx.interrupt != LocalApic.SPURIOUS_VECTOR && IsInitialized)
+        if (ctx.interrupt >= FirstHardwareIrqVector && ctx.interrupt != LocalApic.SPURIOUS_VECTOR && ApicManager.IsInitialized)
         {
             SendEOI();
         }
+    }
+
+    /// <summary>The reschedule self-IPI's handler: nothing to do, Dispatch runs the reschedule on its exit.</summary>
+    private static void HandleReschedule(ref IRQContext ctx)
+    {
     }
 
     private static void SendEOI()
@@ -146,7 +195,7 @@ public class X64InterruptController : IInterruptController
         if (HasErrorCode(interrupt))
         {
             Serial.Write("[INT] Error code: 0x");
-            Serial.WriteHex(Cosmos.Kernel.Core.X64.Bridge.IdtNative.GetLastErrorCode());
+            Serial.WriteHex(Bridge.IdtNative.GetLastErrorCode());
             Serial.Write("\n");
         }
 

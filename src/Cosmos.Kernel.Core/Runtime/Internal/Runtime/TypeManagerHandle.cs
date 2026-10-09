@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Runtime.InteropServices;
 
 namespace Internal.Runtime
@@ -6,7 +9,7 @@ namespace Internal.Runtime
     /// TypeManagerHandle represents an AOT module in MRT based runtimes.
     /// These handles are a pointer to a TypeManager
     /// </summary>
-    public readonly unsafe partial struct TypeManagerHandle(TypeManager* handleValue)
+    internal readonly unsafe partial struct TypeManagerHandle(TypeManager* handleValue)
     {
         internal readonly TypeManager* _handleValue = handleValue;
 
@@ -21,7 +24,7 @@ namespace Internal.Runtime
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct TypeManager
+    internal unsafe struct TypeManager
     {
         public IntPtr OsHandle;
         public ReadyToRunHeader* Header;
@@ -77,7 +80,7 @@ namespace Internal.Runtime
         }
     }
 
-    public enum ClassLibFunctionId
+    internal enum ClassLibFunctionId
     {
         GetRuntimeException = 0,
         FailFast = 1,

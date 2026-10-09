@@ -1,15 +1,13 @@
 <p align="center">
   <img src="https://user-images.githubusercontent.com/63316499/89792973-43587480-daf3-11ea-99d6-82f89dd2ffc3.png" width="25%" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://img.shields.io/badge/gen3-preview-yellow?style=for-the-badge" align="bottom" />
 </p>
 
 <p align="center">
+  <a href="https://chat.gocosmos.org"><img src="https://img.shields.io/badge/official-chat-blue?logo=matrix" /></a>
   <a href="https://discord.com/invite/kwtBwv6jhD"><img src="https://img.shields.io/discord/833970409337913344?label=discord&logo=discord&color=5865F2" /></a>
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/dotnet.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/dotnet.yml?branch=gen3&label=.NET%20tests&logo=github" /></a>
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/kernel-tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/kernel-tests.yml?branch=gen3&label=kernel%20tests&logo=github" /></a>
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/release.yml?label=release&logo=github" /></a>
-  <a href="https://cosmosos.github.io/roadmap.html"><img src="https://img.shields.io/badge/gen3_release-90%25-yellow" /></a>
 </p>
 
 # Cosmos gen3
@@ -28,8 +26,7 @@ Cosmos gen2 (the current public Cosmos OS) compiles C# IL to x86 assembly throug
 - x64 and ARM64
 - [Limine](https://github.com/Limine-Bootloader/Limine) boot protocol
 - [Cosmos plug system](https://cosmosos.github.io/articles/dev/plugs.html)
-- Native runtime stubs
-- .NET runtime support (String, Collections, List, Dictionary, Math, Console, Date Time, Random, Bit Operations, Threading, Generics)
+- .NET runtime support
 - [Mark-and-sweep Garbage Collector](https://cosmosos.github.io/articles/dev/garbage-collector.html)
 - [Priority-based Stride Scheduler](https://cosmosos.github.io/articles/dev/scheduler.html)
 - Exception handling
@@ -37,34 +34,16 @@ Cosmos gen2 (the current public Cosmos OS) compiles C# IL to x86 assembly throug
 - ACPI (via [LAI](https://github.com/managarm/lai))
 - PCI and MMIO drivers
 - UART serial
-- [Cosmos Graphics Subsystem](https://cosmosos.github.io/articles/user/graphics.html), double-buffered Canvas API (shapes, text fonts, images) on the UEFI GOP framebuffer
+- [Cosmos Graphics Subsystem](https://cosmosos.github.io/articles/user/graphics.html)
 - [Keyboard](https://cosmosos.github.io/articles/user/keyboard.html) and [Mouse](https://cosmosos.github.io/articles/user/mouse.html) input
-- [Network stack](https://cosmosos.github.io/articles/user/network.html), standard `System.Net.Sockets` TCP/UDP over ARP, IPv4, DHCP and DNS (no HTTPS *yet*)
-- Storage drivers (AHCI/SATA, NVMe) with MBR, GPT and EBR partitioning
-- [FAT12/16/32 filesystem](https://cosmosos.github.io/articles/user/filesystem.html) on a Unix-style VFS (mount, superblocks, inodes), exposed through the standard `System.IO` API
+- [Network stack](https://cosmosos.github.io/articles/user/network.html)
+- Storage drivers (AHCI/SATA, NVMe, virtio-blk, USB mass storage) with MBR, GPT and EBR partitioning
+- [FAT12/16/32 filesystem](https://cosmosos.github.io/articles/user/filesystem.html) on a Unix-style VFS (mount, superblocks, inodes)
 - Timer / Clock
 
 ## Documentation
 
-[Documentation site](https://cosmosos.github.io/index.html): split into a **User Guide** (build your own OS with Cosmos) and **Developer Docs** (contribute to Cosmos itself / architecture internals).
-
-## Contributors
-
-Thanks to everyone who has contributed code, reviews, plugs, and bug reports:
-
-- [@zarlo](https://github.com/zarlo)
-- [@valentinbreiz](https://github.com/valentinbreiz)
-- [@Guillermo-Santos](https://github.com/Guillermo-Santos)
-- [@kumja1](https://github.com/kumja1)
-- [@AzureianGH](https://github.com/AzureianGH)
-- [@warquys](https://github.com/warquys)
-- [@ascpixi](https://github.com/ascpixi)
-- [@Demiomad](https://github.com/Demiomad)
-- [@ilobilo](https://github.com/ilobilo)
-- [@spectradevv](https://github.com/spectradevv)
-- All [Cosmos gen2 contributors](https://github.com/CosmosOS/Cosmos/graphs/contributors)
-
-See the live list on the [Contributors page](https://github.com/CosmosOS/Cosmos/graphs/contributors).
+[Documentation site](https://cosmosos.github.io/index.html): split into a **User Guide** (build your own OS with Cosmos) and **Contributor Docs** (contribute to Cosmos itself / architecture internals).
 
 ## License
 

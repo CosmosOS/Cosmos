@@ -1,11 +1,17 @@
-# There are some Interop.Sys methods that cannot be plugged directly or through their callers,
-# so we add them here to enable static linking. 
-# 
-# Valid values are `<libname>` so all DllImports of lib are statically linked or `<libname>!<functionname>`
-# for a specific function.
+# Every libSystem.Native import is linked statically. There is no dynamic
+# loading on bare metal, so a P/Invoke the kernel does not provide has to fail
+# at link time ("undefined symbol: SystemNative_X"), not reach the runtime's
+# LoadLibrary fixup path: that path has nothing to load, and its own error
+# reporting is more unplugged P/Invokes, which it then tried to resolve
+# recursively until the boot stack overflowed.
 #
-# For more information see: https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/interop
+# A symbol is provided either by a plug on its managed caller
+# (Cosmos.Kernel.Plugs, the usual way) or, for the few the plug system cannot
+# reach, by an [UnmanagedCallersOnly] export in
+# src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs.
+#
+# Format: `<libname>` links every DllImport of the library statically,
+# `<libname>!<function>` one function. See
+# https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/interop
 
-libSystem.Native!SystemNative_SchedGetCpu
-libSystem.Native!SystemNative_GetCpuUtilization
-libSystem.Native!SystemNative_CreateThread
+libSystem.Native

@@ -1,138 +1,154 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using Cosmos.Kernel.Core;
-using Cosmos.Kernel.HAL.Pci;
-using Cosmos.Kernel.HAL.Pci.Enums;
+using Cosmos.Kernel.System.Graphics.Rendering3D;
 
 namespace Cosmos.Kernel.System.Graphics;
 
 /// <summary>
-/// Provides functionality to fetch canvases that write directly to the
-/// underlying display device.
+/// Hands out the canvas on the primary display the driver kit published,
+/// caching one canvas until <see cref="Disable"/> drops it.
 /// </summary>
-public static class FullScreenCanvas
+/// <remarks>
+/// Internal: a kernel reaches all of this through <see cref="Canvas"/>'s
+/// static full-screen members, which are the ring's single acquisition point.
+/// </remarks>
+internal static class FullScreenCanvas
 {
     /// <summary>
-    /// Whether the CGS (Cosmos Graphics Subsystem) is currently in use.
+    /// The canvas currently driving the screen, or <see langword="null"/> when
+    /// nothing has acquired it yet or the last one was disabled.
     /// </summary>
-    public static bool IsInUse { get; private set; }
+    internal static Canvas? Current { get; private set; }
 
     /// <summary>
-    /// Disables the specified graphics driver used, and returns to VGA text mode 80x25.
+    /// Runs the cached canvas's <see cref="Canvas.Disable"/>, which releases
+    /// the device resources a 3D canvas holds, and drops the cache, so a
+    /// later acquisition builds a fresh canvas on the primary display. The
+    /// display stays in its mode: there is no device-level text mode to
+    /// return to. A second acquisition with another mode then switches the
+    /// display under a console still holding the old canvas, whose output is
+    /// clipped until it re-acquires.
     /// </summary>
-    public static void Disable()
+    internal static void Disable()
     {
-        if (IsInUse)
+        if (Current is null)
         {
-            s_videoDriver!.Disable();
-            IsInUse = false;
-        }
-    }
-
-    private static Canvas? s_videoDriver = null;
-
-    /// <summary>
-    /// Gets a <see cref="Canvas"/> instance, using an implementation based on
-    /// the currently used video driver.
-    /// </summary>
-    private static Canvas GetVideoDriver()
-    {
-        if (CosmosFeatures.PCIEnabled)
-        {
-            PciDevice? svgaDevice = PciManager.GetDevice(VendorId.VmWare, DeviceId.SvgaiiAdapter);
-            if (svgaDevice is not null)
-            {
-                return new SVGAII3DCanvas(svgaDevice);
-            }
+            return;
         }
 
-        return new GopCanvas();
-    }
-
-    /// <summary>
-    /// Gets a <see cref="Canvas"/> instance, using an implementation based on
-    /// the currently used video driver, constructing the canvas with the given
-    /// <paramref name="mode"/>.
-    /// </summary>
-    private static Canvas GetVideoDriver(Mode mode)
-    {
-        if (CosmosFeatures.PCIEnabled)
-        {
-            PciDevice? svgaDevice = PciManager.GetDevice(VendorId.VmWare, DeviceId.SvgaiiAdapter);
-            if (svgaDevice is not null)
-            {
-                return new SVGAII3DCanvas(svgaDevice);
-            }
-        }
-
-        return new GopCanvas(mode);
+        Current.Disable();
+        Current = null;
     }
 
     /// <summary>
     /// Gets the screen display canvas. The canvas's <see cref="Canvas.Mode"/> reflects the
-    /// actual framebuffer resolution (set by the driver at construction); subsequent calls
+    /// actual display mode (read from the display at construction); subsequent calls
     /// return the same canvas without resetting the mode, so callers always see the real
-    /// screen width/height.
+    /// screen width/height. A cached canvas whose display was withdrawn is
+    /// dropped first, so the call rebuilds on the current primary display.
     /// </summary>
-    public static Canvas GetFullScreenCanvas()
+    /// <exception cref="InvalidOperationException">Graphics support is compiled out, or no display is published.</exception>
+    internal static Canvas Get()
     {
-        if (!Cosmos.Kernel.Core.CosmosFeatures.GraphicsEnabled)
-        {
-            throw new InvalidOperationException("Graphics support is disabled. Set CosmosEnableGraphics=true in your csproj to enable it.");
-        }
+        ThrowIfGraphicsDisabled();
+        DropIfWithdrawn();
 
-        s_videoDriver ??= GetVideoDriver();
-
-        IsInUse = true;
-        return s_videoDriver;
+        Current ??= CreateVideoDriver(null);
+        return Current;
     }
 
     /// <summary>
-    /// Gets a screen display canvas, and changes the display mode to the given <paramref name="mode"/>.
+    /// Gets the screen display canvas, changing the display mode to
+    /// <paramref name="mode"/>. A cached canvas whose display was withdrawn
+    /// is dropped first, so the mode is applied to a canvas on the current
+    /// primary display rather than to a dead one.
     /// </summary>
-    public static Canvas GetFullScreenCanvas(Mode mode)
+    /// <param name="mode">The display mode to switch to.</param>
+    /// <exception cref="InvalidOperationException">Graphics support is compiled out, or no display is published.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The display can switch modes and does not support the mode.</exception>
+    internal static Canvas Get(Mode mode)
     {
-        if (!Cosmos.Kernel.Core.CosmosFeatures.GraphicsEnabled)
-        {
-            throw new InvalidOperationException("Graphics support is disabled. Set CosmosEnableGraphics=true in your csproj to enable it.");
-        }
+        ThrowIfGraphicsDisabled();
+        DropIfWithdrawn();
 
-        if (s_videoDriver == null)
+        if (Current is null)
         {
-            s_videoDriver = GetVideoDriver(mode);
+            Current = CreateVideoDriver(mode);
         }
         else
         {
-            s_videoDriver.Mode = mode;
+            Current.Mode = mode;
         }
 
-        IsInUse = true;
-        return s_videoDriver;
+        return Current;
     }
 
     /// <summary>
-    /// Attempts to get a screen display canvas, and changes the display mode to the default.
+    /// Creates the canvas on the primary display. A display that implements
+    /// <see cref="ICanvas3DFactory"/> hands out its own <see cref="Canvas3D"/>,
+    /// which then takes the requested mode through its setter, so a kernel
+    /// discovers 3D capability with <c>canvas is Canvas3D</c>; every other
+    /// display gets the framework canvas. Runs only after
+    /// <see cref="ThrowIfGraphicsDisabled"/>: the switch folding after that
+    /// throw is what keeps the display manager and the canvas out of a
+    /// graphics-off kernel.
     /// </summary>
-    /// <returns><see langword="true"/> if the operation was successful; otherwise, <see langword="false"/>.</returns>
-    public static bool TryGetFullScreenCanvas(Mode mode, out Canvas? canvas)
+    /// <param name="mode">The mode to switch the display to, or null for its current or default mode.</param>
+    /// <exception cref="InvalidOperationException">No display is published.</exception>
+    private static Canvas CreateVideoDriver(Mode? mode)
     {
-        try
+        DisplayDevice primary = DisplayManager.Primary
+            ?? throw new InvalidOperationException("No display is published. The kernel has no framebuffer from the bootloader and no display driver bound a device.");
+
+        if (primary.TryGetFacet(out ICanvas3DFactory? factory))
         {
-            canvas = GetFullScreenCanvas(mode);
-            IsInUse = true;
-            return true;
-        }
-        catch
-        {
+            Canvas3D canvas3D = factory.CreateCanvas3D(primary);
+            if (mode is Mode requested)
+            {
+                try
+                {
+                    canvas3D.Mode = requested;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    // The canvas built its device resources in its constructor;
+                    // a refused mode must not orphan them.
+                    canvas3D.Disable();
+                    throw;
+                }
+            }
+
+            return canvas3D;
         }
 
-        canvas = null;
-        return false;
+        return new Canvas(primary, mode);
     }
 
     /// <summary>
-    /// Gets the currently used screen display canvas.
+    /// Runs <see cref="Disable"/> when the cached canvas sits on a display the
+    /// kit has withdrawn (its driver unbound, or the firmware display retired
+    /// after the canvas was acquired), so the next acquisition builds on the
+    /// display that is primary now.
     /// </summary>
-    public static Canvas? GetCurrentFullScreenCanvas()
+    private static void DropIfWithdrawn()
     {
-        return s_videoDriver;
+        if (Current is { IsDisplayWithdrawn: true })
+        {
+            Disable();
+        }
+    }
+
+    /// <summary>
+    /// Throws when graphics support is compiled out, before anything of the
+    /// display path is touched.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Graphics support is compiled out.</exception>
+    private static void ThrowIfGraphicsDisabled()
+    {
+        if (!CosmosFeatures.GraphicsEnabled)
+        {
+            throw new InvalidOperationException("Graphics support is disabled. Set CosmosEnableGraphics=true in your csproj to enable it.");
+        }
     }
 }

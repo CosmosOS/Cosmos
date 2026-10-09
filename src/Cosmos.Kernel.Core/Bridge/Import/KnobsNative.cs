@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// Native import for the runtime-provided knob values table.
 /// Consumed by the AppContext plug.
 /// </summary>
-public static unsafe partial class KnobsNative
+internal static unsafe partial class KnobsNative
 {
     [LibraryImport("*", EntryPoint = "RhGetKnobValues")]
     [SuppressGCTransition]

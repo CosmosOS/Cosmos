@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.X64.Bridge;
 
-public static unsafe partial class IdtNative
+internal static unsafe partial class IdtNative
 {
     [LibraryImport("*", EntryPoint = "_native_x64_load_idt")]
     [SuppressGCTransition]

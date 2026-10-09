@@ -2,7 +2,7 @@ using System.Runtime;
 
 namespace Cosmos.Kernel.Core.Runtime;
 
-public static class Cpu
+internal static class Cpu
 {
     /// <summary>
     /// replace this with some thing better

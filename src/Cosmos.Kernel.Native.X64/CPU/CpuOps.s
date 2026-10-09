@@ -9,6 +9,7 @@
 .global _native_cpu_read_cr3
 .global _native_cpu_write_cr3
 .global _native_cpu_invlpg
+.global _native_cpu_rdmsr
 .global RhCpuIdEx
 
 .text
@@ -64,6 +65,15 @@ _native_cpu_write_cr3:
 // Invalidate the TLB entry covering the virtual address in RDI.
 _native_cpu_invlpg:
     invlpg  [rdi]
+    ret
+
+// Read the model-specific register whose index is in EDI.
+// Returns: the 64-bit MSR value in RAX.
+_native_cpu_rdmsr:
+    mov     ecx, edi        // MSR index
+    rdmsr                   // EDX:EAX = MSR (upper halves zeroed)
+    shl     rdx, 32         // Shift high 32 bits to upper half of RDX
+    or      rax, rdx        // Combine into RAX (return value)
     ret
 
 // NativeAOT runtime helper backing System.Runtime.Intrinsics.X86.X86Base.CpuId.

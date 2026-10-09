@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 /// Mark-and-sweep garbage collector with free list allocation.
 /// Manages GC heap segments, pinned heap, frozen segments, and GC handles.
 /// </summary>
-public static unsafe partial class GarbageCollector
+internal static unsafe partial class GarbageCollector
 {
     // --- Nested types ---
 
@@ -119,6 +119,13 @@ public static unsafe partial class GarbageCollector
     private static bool s_freeListsInitialized;
 
     /// <summary>
+    /// Total size of the blocks on the free lists, kept as blocks go on and off them: the
+    /// fragmentation metrics read it instead of walking the lists, which hold every gap a sweep
+    /// leaves, and the scheduler tick reads them for the debug snapshot.
+    /// </summary>
+    private static ulong s_freeListBytes;
+
+    /// <summary>
     /// MethodTable pointer used to tag <see cref="FreeBlock"/> entries in the heap.
     /// </summary>
     private static MethodTable* s_freeMethodTable;
@@ -147,24 +154,9 @@ public static unsafe partial class GarbageCollector
     internal static GCHandleManager s_gCHandleManager = new();
 
     /// <summary>
-    /// Default segment size. Grows as needed.
+    /// Size requested from the segment manager for every new segment.
     /// </summary>
-    private static uint s_maxSegmentSize = (uint)PageAllocator.PageSize;
-
-    /// <summary>
-    /// Lowest address across all GC segments (for fast heap range pre-check).
-    /// </summary>
-    private static byte* s_gcHeapMin;
-
-    /// <summary>
-    /// Highest address across all GC segments (for fast heap range pre-check).
-    /// </summary>
-    private static byte* s_gcHeapMax;
-
-    /// <summary>
-    /// Set to <c>true</c> when segments are added or removed, triggering a range recomputation.
-    /// </summary>
-    private static bool s_heapRangeDirty;
+    private const uint MaxSegmentSize = (uint)PageAllocator.PageSize;
 
     /// <summary>
     /// Stack used during the mark phase for iterative object traversal.
@@ -185,6 +177,24 @@ public static unsafe partial class GarbageCollector
     /// Number of pages currently backing the mark stack.
     /// </summary>
     private static ulong s_markStackPageCount = 1;
+
+    /// <summary>
+    /// Set when the mark stack could not grow during this collection. A collection runs when the
+    /// heap is out of pages, so a failed growth would fail again: the rest of the mark phase works
+    /// within the capacity it has.
+    /// </summary>
+    private static bool s_markStackFull;
+
+    /// <summary>
+    /// Lowest address of a marked object that a full mark stack left unscanned, or <c>null</c>
+    /// when there is none. See <see cref="ProcessMarkOverflow"/>.
+    /// </summary>
+    private static byte* s_markOverflowMin;
+
+    /// <summary>
+    /// Highest address of a marked object that a full mark stack left unscanned.
+    /// </summary>
+    private static byte* s_markOverflowMax;
 
     /// <summary>
     /// Whether the GC has been initialized.
@@ -221,6 +231,14 @@ public static unsafe partial class GarbageCollector
     private static ulong s_lastGen0FragmentationBefore;
     private static ulong s_lastGen0SizeAfter;
     private static ulong s_lastGen0FragmentationAfter;
+
+    /// <summary>
+    /// Heap-wide metrics as they stood at the end of the last collection.
+    /// This is what <see cref="GCMemoryInfo"/> reports.
+    /// Stays zeroed until the first collection runs.
+    /// Matches what the runtime reports before its first GC.
+    /// </summary>
+    private static SimpleMemoryInfo s_lastGCMemoryInfo;
 
     /// <summary>
     /// Cumulative total of all bytes ever allocated through the GC.
@@ -291,10 +309,8 @@ public static unsafe partial class GarbageCollector
         s_freeMethodTable = MethodTable.Of<FreeMarker>();
 
         // Allocate initial segment
-        s_currentSegment = s_segmentManager.AllocateSegment(s_maxSegmentSize);
+        s_currentSegment = s_segmentManager.AllocateSegment(MaxSegmentSize);
         s_lastSegment = s_currentSegment;
-        s_heapRangeDirty = true;
-        RecomputeHeapRange();
         if (s_segmentManager.Segments == null)
         {
             Serial.WriteString("[GC] ERROR: Failed to allocate initial segment\n");
@@ -356,11 +372,13 @@ public static unsafe partial class GarbageCollector
                 s_freeLists[i] = null;
             }
 
+            s_freeListBytes = 0;
+
             // Mark reachable objects
             MarkPhase();
 
-            // Free Weak GC Handles
-            s_gCHandleManager.FreeWeakHandles();
+            // Clear the weak and dependent GC handles whose targets died
+            s_gCHandleManager.ClearWeakHandles();
 
             // Sweep and rebuild free lists
             freedCount = SweepPhase();
@@ -368,7 +386,6 @@ public static unsafe partial class GarbageCollector
             // Reorder segments and free empty ones
             ReorderSegmentsAndFreeEmpty();
             ReorderPinnedSegmentsAndFreeEmpty();
-            RecomputeHeapRange();
 
             // Record post-GC metrics
             s_lastGen0SizeAfter = GetGenerationSize(0);
@@ -376,6 +393,10 @@ public static unsafe partial class GarbageCollector
 
             s_totalCollections++;
             s_totalObjectsFreed += freedCount;
+
+            // Freeze the heap-wide metrics reported by GCMemoryInfo. Recorded after the
+            // counters above so the snapshot carries the index of this very collection.
+            RecordLastGCMemoryInfo();
 
             Serial.WriteString("[GC] Freed ");
             Serial.WriteNumber((uint)freedCount);
@@ -395,13 +416,15 @@ public static unsafe partial class GarbageCollector
     // --- Internal methods ---
 
     /// <summary>
-    /// Allocates memory for a managed object. Called by the runtime allocation helpers.
+    /// Allocates a managed object and stores its header. Called by the runtime allocation helpers.
     /// Uses per-thread TLAB fast path for non-pinned allocations.
     /// </summary>
     /// <param name="size">Requested object size in bytes.</param>
+    /// <param name="pMT">MethodTable stored in the object's header.</param>
+    /// <param name="length">Component count stored for an array or a string; ignored for any other type.</param>
     /// <param name="flags">Runtime allocation flags (e.g., pinned object heap).</param>
     /// <returns>Pointer to the allocated object, or <c>null</c> if allocation fails.</returns>
-    internal static GCObject* AllocObject(nint size, GC_ALLOC_FLAGS flags)
+    internal static GCObject* AllocObject(nint size, MethodTable* pMT, int length, GC_ALLOC_FLAGS flags)
     {
         if (!s_initialized)
         {
@@ -415,9 +438,25 @@ public static unsafe partial class GarbageCollector
         // AllocLimit (seen as delta=104 in #382 debugging). RefillAllocContext
         // and Collect already disable interrupts internally; the scope nests
         // via saved flags.
+        // The header is stored inside the scope too: until its MethodTable is
+        // set the object is a zeroed block, which a collection run by another
+        // thread (after a tick preempts this one) neither marks nor walks as an
+        // object, so the sweep folds it into a free run and a later allocation
+        // overlaps it. An array's Length must be in place as well, or the heap
+        // walk sizes it as an empty array.
         using (InternalCpu.DisableInterruptsScope())
         {
-            return AllocObjectCore(size, flags);
+            GCObject* result = AllocObjectCore(size, flags);
+            if (result != null)
+            {
+                result->MethodTable = pMT;
+                if (pMT->HasComponentSize)
+                {
+                    result->Length = length;
+                }
+            }
+
+            return result;
         }
     }
 

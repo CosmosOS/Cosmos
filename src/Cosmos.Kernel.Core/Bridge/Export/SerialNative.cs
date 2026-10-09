@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// NOTE: These are NOT called from C bootstrap (kmain.c) - only from library code.
 /// C bootstrap uses pure C implementations for clean architecture.
 /// </summary>
-public static unsafe class SerialNative
+internal static unsafe class SerialNative
 {
     /// <summary>
     /// Initialize serial port (COM1 at 115200 baud, 8N1)

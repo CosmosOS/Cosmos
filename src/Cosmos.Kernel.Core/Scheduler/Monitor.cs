@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// This monitor combines a <see cref="Mutex"/> and a <see cref="ConditionVariable"/> to provide
 /// acquire/release semantics and wait/signal behavior for the scheduler.
 /// </remarks>
-public class Monitor : IDisposable
+internal class Monitor : IDisposable
 {
     /// <summary>
     /// Mutex used to protect the monitor's critical section.

@@ -38,6 +38,9 @@ public class RunCommandTests
     [InlineData("nvme", DiskKind.Nvme)]
     [InlineData("NVME", DiskKind.Nvme)]
     [InlineData("ahci", DiskKind.Ahci)]
+    [InlineData("usb", DiskKind.Usb)]
+    [InlineData("virtio-blk", DiskKind.VirtioBlk)]
+    [InlineData("virtio-blk-mmio", DiskKind.VirtioBlkMmio)]
     public void ParseDisks_HonorsExplicitKindSuffix(string suffix, DiskKind expected)
     {
         string img = CreateTempImage();
@@ -108,6 +111,7 @@ public class RunCommandTests
     [Theory]
     [InlineData("none")]
     [InlineData("usb-kbd")]
+    [InlineData("usb-mouse")]
     public void ResolveInputDevice_ExplicitValueWinsOnArm64(string requested)
     {
         Assert.Equal(requested,

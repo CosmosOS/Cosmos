@@ -1,6 +1,5 @@
 using System.Runtime;
 using Cosmos.Kernel.Core.Scheduler;
-using SchedThread = Cosmos.Kernel.Core.Scheduler.Thread;
 
 namespace Cosmos.Kernel.Core.Runtime;
 
@@ -27,7 +26,7 @@ internal static class DebugIntrospection
     [RuntimeExport("CosmosDbg_GetThreadSlotCount")]
     internal static int GetThreadSlotCount()
     {
-        SchedThread?[]? threads = SchedulerManager.Threads;
+        SchedulerThread?[]? threads = SchedulerManager.Threads;
         return threads?.Length ?? 0;
     }
 
@@ -39,36 +38,36 @@ internal static class DebugIntrospection
     [RuntimeExport("CosmosDbg_GetThreadId")]
     internal static uint GetThreadId(int slot)
     {
-        SchedThread?[]? threads = SchedulerManager.Threads;
+        SchedulerThread?[]? threads = SchedulerManager.Threads;
         if (threads is null || (uint)slot >= (uint)threads.Length)
         {
             return 0;
         }
-        SchedThread? t = threads[slot];
+        SchedulerThread? t = threads[slot];
         return t is null ? 0u : (t.Id + 1u);
     }
 
     [RuntimeExport("CosmosDbg_GetThreadState")]
     internal static int GetThreadState(int slot)
     {
-        SchedThread?[]? threads = SchedulerManager.Threads;
+        SchedulerThread?[]? threads = SchedulerManager.Threads;
         if (threads is null || (uint)slot >= (uint)threads.Length)
         {
             return -1;
         }
-        SchedThread? t = threads[slot];
+        SchedulerThread? t = threads[slot];
         return t is null ? -1 : (int)t.State;
     }
 
     [RuntimeExport("CosmosDbg_GetThreadCpu")]
     internal static int GetThreadCpu(int slot)
     {
-        SchedThread?[]? threads = SchedulerManager.Threads;
+        SchedulerThread?[]? threads = SchedulerManager.Threads;
         if (threads is null || (uint)slot >= (uint)threads.Length)
         {
             return -1;
         }
-        SchedThread? t = threads[slot];
+        SchedulerThread? t = threads[slot];
         return t is null ? -1 : (int)t.CpuId;
     }
 }

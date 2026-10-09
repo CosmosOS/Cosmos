@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.IO;
 /// Safe to call from the very first kernel instruction as long as Limine has filled in
 /// the framebuffer response (i.e. as soon as static fields are accessible).
 /// </summary>
-public static unsafe class EarlyGop
+internal static unsafe class EarlyGop
 {
     private static int s_col;
     private static int s_row;

@@ -8,7 +8,7 @@ The main differences if you come from Gen2:
 | | Gen2 | Gen3 |
 |---|---|---|
 | Paths | DOS drive letters (`0:\file.txt`) | Unix paths (`/mnt/file.txt`) |
-| Setup | `CosmosVFS` + `VFSManager.RegisterVFS` | `VfsManager.RegisterFilesystem` + `VfsManager.TryMount` |
+| Setup | `CosmosVFS` + `VFSManager.RegisterVFS` | `VfsManager.RegisterFileSystem` + `VfsManager.TryMount` |
 | API surface | Plugged subset of `System.IO` | Full `System.IO` (streams, enumeration patterns, `FileInfo`, …) |
 | `File.Move` | Not plugged (copy + delete) | Works, including onto-existing overwrite semantics |
 | Filesystems | FAT32 (FAT12/16 partial) | FAT12/16/32 |
@@ -27,7 +27,9 @@ Storage support is behind a feature switch. Make sure your kernel's `.csproj` do
 </PropertyGroup>
 ```
 
-At boot the kernel initializes `StorageManager`, which registers every AHCI and NVMe device it finds and scans their MBR/GPT partition tables into `StorageManager.Partitions`.
+At boot the kernel initializes `StorageManager`, which installs its consumer of the [driver kit](drivers.md)'s block devices. The kit's AHCI, NVMe, virtio-blk and USB mass storage drivers then publish every SATA disk (`sata0`, `sata1`, ...), every NVMe namespace (`nvme0n1`, ...), every virtio-blk disk (`vblk0`, ...) and every USB stick (`usb0`, `usb1`, ...) they find during the driver stage, and the manager registers each one as it is published and scans its MBR/GPT partition table into `StorageManager.Partitions` before the publish returns. USB sticks need `CosmosEnableUsb`, which is on by default whenever `CosmosEnableStorage` is, and setting it to `false` keeps AHCI and NVMe disks and drops USB ones along with the xHCI driver. The manager keeps its tables in one order, which decides the primary device: by node path, `pci:` before `usb:` before `virtio:`, in `Devices`, in `Partitions` and as `PrimaryDevice`; a disk the kernel registered itself after every kit disk; then registration order. So an internal disk on a PCI controller is the primary over a USB stick present at boot whichever registered first, and a kit disk arriving after a USB stick moves ahead of it and renumbers `Partitions`, which is why a mount by `Partition` (below) is preferred to one by index string.
+
+USB disks, and virtio-blk disks behind a PCI Express hot-plug slot, can also be plugged in and pulled out while the kernel runs. One plugged in is published by the kit and registered and scanned like a disk found at boot, under the lowest `usbN` or `vblkN` name free. One pulled out is withdrawn: it leaves `StorageManager.Devices` and `StorageManager.Partitions`, the mounts made on its partitions with the `Partition` overload of `TryMount` (below) are detached, and files still open on it fail with `IOException` (the USB mass storage driver throws `IOException("USB device detached")` and the virtio-blk driver `IOException("virtio-blk device detached")`, as the NVMe driver throws `IOException` while it detaches); a disk whose driver's memory the kit has released fails with the kit's `InvalidOperationException` instead, since the ring does not wrap the driver's device. A mount made from a source string names no disk, so it stays, and fails its I/O the same way. A detached mount is not flushed, since the disk is gone, so call `VfsManager.TryUnmount` before pulling a disk out. Both lists can change between two reads while a USB or virtio-blk disk comes or goes, from the kit worker: read `Devices` or `Partitions` once and index that copy.
 
 To give your kernel a disk in QEMU, attach an image with `cosmos run`:
 
@@ -35,9 +37,18 @@ To give your kernel a disk in QEMU, attach an image with `cosmos run`:
 $ qemu-img create disk.img 64M
 $ cosmos run --disk disk.img            # attached as an AHCI disk (default)
 $ cosmos run --disk disk.img,nvme       # or as an NVMe namespace
+$ cosmos run --disk disk.img,usb        # or as a USB stick on an xHCI controller
+$ cosmos run --disk disk.img,virtio-blk # or as a virtio-blk-pci function
+$ cosmos run --disk disk.img,virtio-blk-mmio # or, on arm64, in the virt machine's virtio-mmio window
 ```
 
-`--disk` is repeatable if you want several drives.
+`--disk` is repeatable if you want several drives. A `usb` disk also gives the machine its xHCI controller, `usbxhci0`, which lets you plug another stick in and pull it out while the kernel runs, from the QEMU monitor (Ctrl+Alt+2 in the QEMU window):
+
+```console
+(qemu) drive_add 0 if=none,id=stick,file=stick.img,format=raw
+(qemu) device_add usb-storage,drive=stick,id=stick,bus=usbxhci0.0
+(qemu) device_del stick
+```
 
 ## Register a filesystem driver and mount it
 
@@ -45,24 +56,44 @@ These are the `using`s the snippets below rely on:
 
 ```csharp
 using System.IO;
+using Cosmos.Kernel.HAL.Devices.Storage;
+using Cosmos.Kernel.System.FileSystem;
+using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.Kernel.System.Storage;
-using Cosmos.Kernel.System.Vfs;
-using Cosmos.Kernel.System.Filesystems.Fat;
-using Cosmos.Kernel.HAL.Vfs;
 ```
 
-First, register a FAT driver under a name of your choice, then mount a partition at a mount point. For the FAT driver, the `source` argument is the index into `StorageManager.Partitions` as a string (`"0"` = first discovered partition across all disks). Add this to your kernel's `BeforeRun()`:
+`Cosmos.Kernel.System.FileSystem` holds the whole VFS in one namespace: the manager and what it hands out (`VfsManager`, `VfsMount`, `IVfsNodeHandle`, `IVfsFileHandle` and `IVfsDirectoryHandle`), the contracts a filesystem driver implements (`IVfsFileSystemType`, `IVfsSuperblock`, `IVfsInode`, `IVfsOpenFile` and their operations interfaces), and the flag, mode and metadata types every mount, create and stat call names (`MountFlags`, `VfsMode`, `VfsStat`, `VfsStatFs`, `SetAttrFlags`, `SeekWhence`, `VfsTimespec`). That is why `MountFlags.None` appears in a kernel's `BeforeRun()` under the same `using` as `VfsManager`, and why the `IVfsInode` that `IVfsNodeHandle.Inode` gives you needs no other `using`. Filesystem drivers sit one level down, a namespace each: the FAT driver's `FatFileSystemType` and `FatFormatOptions` are in `Cosmos.Kernel.System.FileSystem.Fat`.
+
+`Cosmos.Kernel.HAL.Devices.Storage` is needed only by the RAM-disk snippet further down, which implements `IBlockDevice`. Drop that and mounting a real partition takes the three `Cosmos.Kernel.System` ones.
+
+First, register a FAT driver under a name of your choice, then mount a partition at a mount point. Add this to your kernel's `BeforeRun()`:
 
 ```csharp
-FatFilesystemType fat = new();
+FatFileSystemType fat = new();
 
-VfsManager.RegisterFilesystem("fat", fat);
-
-if (VfsManager.TryMount("fat", "0", MountFlags.None, "/mnt", out VfsManager.VfsMount? mount))
+if (!VfsManager.RegisterFileSystem("fat", fat))
 {
-    Console.WriteLine("Mounted " + mount.Name + " partition " + mount.Source + " at " + mount.MountPoint);
+    Console.WriteLine("The name \"fat\" is already registered.");
+    return;
+}
+
+if (StorageManager.Partitions.Count == 0)
+{
+    Console.WriteLine("No partitions found.");
+    return;
+}
+
+if (VfsManager.TryMount("fat", StorageManager.Partitions[0], MountFlags.None, "/mnt", out VfsMount? mount))
+{
+    Console.WriteLine("Mounted " + mount.Name + " at " + mount.MountPoint);
 }
 ```
+
+`Partitions` is empty before storage is scanned, when no disk is attached, and when storage is compiled out, so index it only after checking `Count`. Every call above returns whether it worked: `RegisterFileSystem` refuses a name already in use, and `TryMount` refuses a source the driver does not recognize.
+
+`StorageManager.GetPartitions(device)` lists the partitions of one disk, numbered the way a user numbers them; `StorageManager.Partitions` is the flat list across every disk.
+
+There is a second spelling, `VfsManager.TryMount("fat", "0", ...)`, where `source` is a driver-specific string. Every driver accepts one, and the FAT driver reads it as an index into `StorageManager.Partitions`. Prefer the `Partition` overload: creating or deleting a partition renumbers that list, so an index held across a rescan can come to name a different partition.
 
 <!-- screenshot: kernel console right after boot showing the "Mounted fat partition 0 at /mnt" line -->
 ![Mount](images/filesystem-mount.png)
@@ -73,7 +104,7 @@ From this point on, everything under `/mnt` is served by the FAT driver, and eve
 
 ### Alternative: a RAM disk
 
-For quick experiments you don't need a disk image at all. A block device is just an `IBlockDevice` (from `Cosmos.Kernel.HAL.Interfaces.Devices`), and a RAM-backed one fits in a few lines; this is exactly what the kernel test suites use:
+For quick experiments you don't need a disk image at all. A block device is just an `IBlockDevice` (from `Cosmos.Kernel.HAL.Devices.Storage`), and a RAM-backed one fits in a few lines; this is exactly what the kernel test suites use:
 
 ```csharp
 internal sealed class MemoryBlockDevice : IBlockDevice
@@ -102,21 +133,98 @@ internal sealed class MemoryBlockDevice : IBlockDevice
 }
 ```
 
-The FAT driver accepts an injected device directly (leave `source` empty when formatting and mounting):
+The FAT driver accepts an injected device directly. Register it as usual and leave `source` empty: with a device already in hand the driver has nothing to look up.
 
 ```csharp
 MemoryBlockDevice ramDisk = new("RAMDISK", 512, 65536);   // 32 MiB
-FatFilesystemType fat = new(ramDisk);
+FatFileSystemType fat = new(ramDisk);
 
-fat.TryFormat(default, new FatFormatOptions { Type = FatType.Fat16 });
-
-VfsManager.RegisterFilesystem("ramfat", fat);
-VfsManager.TryMount("ramfat", "", MountFlags.None, "/mnt", out _);
+if (!VfsManager.RegisterFileSystem("ramfat", fat)
+    || !VfsManager.TryFormat("ramfat", "", new FatFormatOptions { Type = FatType.Fat16 })
+    || !VfsManager.TryMount("ramfat", "", MountFlags.None, "/mnt", out _))
+{
+    Console.WriteLine("RAM disk setup failed.");
+    return;
+}
 ```
+
+## Partition a disk
+
+Formatting needs a partition to format. `StorageManager.Partitions` lists the ones already on the disks the kernel found at boot; when there are none, or you want a different layout, `Gpt`, `Mbr` and `PartitionManager` write the partition table itself. They all take an `IBlockDevice`, which `StorageManager.PrimaryDevice` hands you.
+
+Start by asking what scheme the disk already carries:
+
+```csharp
+IBlockDevice? disk = StorageManager.PrimaryDevice;
+if (disk is null)
+{
+    Console.WriteLine("No disk");
+    return;
+}
+
+if (Gpt.IsGpt(disk))
+{
+    Console.WriteLine("GPT, " + Gpt.Parse(disk).Count + " partition(s)");
+}
+else if (Mbr.IsMbr(disk))
+{
+    Console.WriteLine("MBR, " + Mbr.Parse(disk).Count + " partition(s)");
+}
+else
+{
+    Console.WriteLine("No partition table");
+}
+```
+
+`Gpt.Create` and `Mbr.Create` lay down an empty table of that scheme, **destroying whatever was there**. `PartitionManager.Create` then adds a partition, working on whichever scheme the disk carries so you do not have to branch:
+
+```csharp
+Gpt.Create(disk);
+
+/* 64 MiB at LBA 2048, on a 512-byte-sector disk. The MBR system id and the
+   GPT type GUID are both given; only the one matching the disk's scheme is
+   used. */
+if (!PartitionManager.Create(disk, startSector: 2048, sectorCount: 131072,
+                             mbrSystemId: 0x0C, gptType: Gpt.BasicDataPartitionType))
+{
+    Console.WriteLine("Create failed");
+    return;
+}
+
+StorageManager.RescanPartitions(disk);
+```
+
+`RescanPartitions` is what makes the new partition show up in `StorageManager.Partitions`. Until you call it the list still describes the old table.
+
+Existing partitions are addressed by a `PartitionLocation`, which is the start sector and length rather than an index, so a partition does not change identity when the table is renumbered:
+
+```csharp
+PartitionManager.PartitionLocation where = new(startSector: 2048, sectorCount: 131072);
+
+PartitionManager.Resize(disk, where, newSectorCount: 262144);
+PartitionManager.MoveWithData(disk, where, newStartSector: 4096);
+PartitionManager.Delete(disk, where);
+```
+
+`MoveWithData` copies the contents to the new location before rewriting the entry; `Resize` and `Delete` only touch the table, so shrinking a partition below its filesystem's size loses data.
+
+**Every partition index is positional.** Deleting one renumbers the entries after it, and `StorageManager.Partitions` renumbers with them, so re-read the list after any change rather than holding an index across one.
+
+MBR's four primary slots are extended with a chain of logical partitions. `PartitionManager.TryCreateLogical` adds one inside the extended partition, and `Mbr.TryGetExtendedPartition` finds it:
+
+```csharp
+if (Mbr.TryGetExtendedPartition(disk, out ulong extendedStart, out ulong extendedCount)
+    && PartitionManager.TryCreateLogical(disk, systemId: 0x0C, sectorCount: 65536, out ulong logicalStart))
+{
+    Console.WriteLine("logical partition at LBA " + logicalStart);
+}
+```
+
+`Gpt`, `Mbr` and `Ebr` are the lower layer, one type per scheme, for when you need to write entries the manager does not expose.
 
 ## Format a disk
 
-To format (mkfs) a partition through the VFS, use `VfsManager.TryFormat` with the driver name, the partition index and the driver's option type. The FAT formatter picks sane geometry from the options you give it:
+To format (mkfs) a partition through the VFS, use `VfsManager.TryFormat` with the driver name, the partition and the driver's option type. The FAT formatter picks sane geometry from the options you give it:
 
 ```csharp
 FatFormatOptions options = new()
@@ -125,7 +233,8 @@ FatFormatOptions options = new()
     VolumeLabel = "COSMOS     ",
 };
 
-if (!VfsManager.TryFormat("fat", "0", options))
+if (StorageManager.Partitions.Count == 0
+    || !VfsManager.TryFormat("fat", StorageManager.Partitions[0], options))
 {
     Console.WriteLine("Format failed");
 }
@@ -138,7 +247,7 @@ Formatting is refused while the source is mounted: unmount first with `VfsManage
 `VfsManager.Mounts` is the mount table. Each entry tells you the driver name, the backing source and the mount point:
 
 ```csharp
-foreach (VfsManager.VfsMount m in VfsManager.Mounts)
+foreach (VfsMount m in VfsManager.Mounts)
 {
     Console.WriteLine(m.MountPoint + " -> " + m.Name + " (source " + m.Source + ")");
 }
@@ -146,6 +255,21 @@ foreach (VfsManager.VfsMount m in VfsManager.Mounts)
 
 <!-- screenshot: console output of the mount-table loop, e.g. "/mnt -> fat (source 0)" -->
 ![Mounts](images/filesystem-mounts.png)
+
+`m.Partition` is the partition itself, for mounts made with the `Partition` overload. Prefer it to parsing `m.Source` back into an index: it keeps naming the same range on the same disk after a rescan renumbers `StorageManager.Partitions`.
+
+## Check free space
+
+`VfsManager.TryStatFs` reports a mount's block accounting. Free space is the available block count times the block size:
+
+```csharp
+if (VfsManager.TryStatFs("/mnt", out VfsStatFs stats))
+{
+    ulong freeBytes = stats.AvailableBlocks * stats.BlockSize;
+    ulong totalBytes = stats.Blocks * stats.BlockSize;
+    Console.WriteLine(freeBytes + " of " + totalBytes + " bytes free");
+}
+```
 
 ## Get a list of files
 
@@ -362,12 +486,12 @@ With **nothing mounted at all**, `System.IO` still degrades gracefully: `Directo
 
 - Symbolic links and hard links are not supported (`ENOTSUP`/`EPERM` under the hood; the BCL surfaces `IOException`).
 - File timestamps are not persisted yet (`File.SetLastWriteTime` is accepted but a FAT timestamp lands later).
-- `DriveInfo` (free-space queries) is not wired up yet.
-- FAT is the only filesystem driver today; the `IVfsFilesystemType` interface is what a new driver implements.
+- `DriveInfo` is not wired up yet; use `VfsManager.TryStatFs` for free-space queries.
+- FAT is the only filesystem driver the kernel suites cover; an ext2 driver, `Ext2FileSystemType` in `Cosmos.Kernel.System.FileSystem.Ext2`, ships beside it and is tested on the host only. The `IVfsFileSystemType` interface is what a new driver implements.
 
 ## How it works
 
-Your code calls the stock BCL, which bottoms out in the Unix PAL (`Interop.Sys.*` P/Invokes). Those ~45 entry points are [plugged](../dev/plugs.md) in `Cosmos.Kernel.Plugs`: a file-descriptor table adapts the PAL contract (fds, dir streams, PAL errnos) and delegates to `VfsManager`, which owns path resolution, the mount table, the current directory and open-handle semantics, and dispatches to the mounted filesystem driver, which reads and writes an `IBlockDevice` (AHCI or NVMe via `StorageManager`, RAM via `MemoryBlockDevice`).
+Your code calls the stock BCL, which bottoms out in the Unix PAL (`Interop.Sys.*` P/Invokes). Those ~45 entry points are [plugged](../dev/plugs.md) in `Cosmos.Kernel.Plugs`: a file-descriptor table adapts the PAL contract (fds, dir streams, PAL errnos) and delegates to `VfsManager`, which owns path resolution, the mount table, the current directory and open-handle semantics, and dispatches to the mounted filesystem driver, which reads and writes an `IBlockDevice` (a SATA disk, an NVMe namespace, a virtio-blk disk or a USB mass storage unit published by the driver kit's `AhciDriver`, `NvmeDriver`, `VirtioBlkDriver` or `UsbMassStorageDriver`, all via `StorageManager`; RAM via `MemoryBlockDevice`).
 
 ```
 File / Directory / FileStream          (stock BCL)
@@ -378,7 +502,7 @@ FileDescriptorTable                    (Cosmos.Kernel.Plugs: fds, dir streams, e
         │
 VfsManager                             (mounts, paths, CWD, open handles)
         │
-IVfsFilesystemType / IVfsSuperblock    (FAT driver)
+IVfsFileSystemType / IVfsSuperblock    (FAT driver)
         │
-IBlockDevice                           (AHCI, NVMe, MemoryBlockDevice)
+IBlockDevice                           (the kit's AHCI, NVMe, virtio-blk and USB mass storage drivers, MemoryBlockDevice)
 ```

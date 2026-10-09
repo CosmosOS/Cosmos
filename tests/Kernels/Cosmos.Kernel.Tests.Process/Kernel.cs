@@ -8,8 +8,8 @@ using Cosmos.TestRunner.Framework;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
 using Sys = Cosmos.Kernel.System;
 using SchedProcess = Cosmos.Kernel.Core.Scheduler.Process;
-using SchedThread = Cosmos.Kernel.Core.Scheduler.Thread;
-using SchedThreadState = Cosmos.Kernel.Core.Scheduler.ThreadState;
+using SchedThread = Cosmos.Kernel.Core.Scheduler.SchedulerThread;
+using SchedThreadState = Cosmos.Kernel.Core.Scheduler.SchedulerThreadState;
 
 #if ARCH_X64
 using Cosmos.Kernel.Core.X64.Cpu;
@@ -160,7 +160,7 @@ public unsafe class Kernel : Sys.Kernel
             CpuId = 0,
             State = SchedThreadState.Created,
             AddressSpace = procSpace,
-            Flags = ThreadFlags.NativeProcess
+            Flags = SchedulerThreadFlags.NativeProcess
         };
 
         nuint entryPoint = UserCodeVa;

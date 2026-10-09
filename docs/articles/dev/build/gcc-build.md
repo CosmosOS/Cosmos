@@ -62,4 +62,4 @@ Notes:
 
 ## Related components
 
-- [`Cosmos.Build.GCC`](../../../../src/Cosmos.Build.GCC)
+- [`Cosmos.Build.GCC`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Build.CC)

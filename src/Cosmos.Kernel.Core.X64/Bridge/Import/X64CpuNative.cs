@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.X64.Bridge;
 
-public static partial class X64CpuNative
+internal static partial class X64CpuNative
 {
     [LibraryImport("*", EntryPoint = "_native_cpu_rdtsc")]
     [SuppressGCTransition]
@@ -15,6 +15,10 @@ public static partial class X64CpuNative
     [LibraryImport("*", EntryPoint = "_native_cpu_invlpg")]
     [SuppressGCTransition]
     public static partial void InvalidatePage(ulong virtualAddress);
+
+    [LibraryImport("*", EntryPoint = "_native_cpu_rdmsr")]
+    [SuppressGCTransition]
+    public static partial ulong ReadMsr(uint index);
 
     [LibraryImport("*", EntryPoint = "_native_cpu_write_cr3")]
     [SuppressGCTransition]

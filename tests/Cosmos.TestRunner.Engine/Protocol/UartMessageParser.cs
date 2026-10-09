@@ -82,6 +82,25 @@ public class UartMessageParser
         Console.WriteLine($"[UartParser] Suite name: {results.SuiteName}");
         Console.WriteLine($"[UartParser] Tests found: {results.Tests.Count}");
 
+        // A TestStart with no Pass/Fail/Skip behind it is a test the kernel
+        // died in (page fault, hang, triple fault). Its placeholder status is
+        // Passed only so a later result frame has an entry to update; once
+        // the log has ended without a validated TestSuiteEnd, no such frame
+        // is coming. A completed suite is left alone: there a missing frame
+        // is UART corruption of a test that did finish, and the run is
+        // judged by the counters TestSuiteEnd carries.
+        if (!results.SuiteCompleted)
+        {
+            foreach (TestResult test in results.Tests)
+            {
+                if (!test.HasResult)
+                {
+                    test.Status = TestStatus.Failed;
+                    test.ErrorMessage = "Test started but produced no result (kernel crashed or hung)";
+                }
+            }
+        }
+
         return results;
     }
 
@@ -110,7 +129,7 @@ public class UartMessageParser
         byte command = data[offset + CommandOffset];
 
         // Only proceed if this looks like a valid protocol command
-        if (command < Ds2Vs.TestSuiteStart || command > Ds2Vs.TestDestructiveReached)
+        if (command < Ds2Vs.TestSuiteStart || command > Ds2Vs.HostRequest)
         {
             return false;
         }
@@ -124,7 +143,6 @@ public class UartMessageParser
             return false;
         }
 
-        // Validate we have enough data for payload
         if (offset + HeaderLengthBytes + length > data.Length)
         {
             return false;
@@ -136,7 +154,6 @@ public class UartMessageParser
         // Only advance offset after we've validated this is a real message
         offset += HeaderLengthBytes + length;
 
-        // Parse based on command
         switch (command)
         {
             case Ds2Vs.TestSuiteStart:
@@ -175,6 +192,10 @@ public class UartMessageParser
             case Ds2Vs.TestDestructiveReached:
                 // Sentinel for the engine's re-launch heuristic. The frame must be
                 // consumed as a valid message; no parsing into TestResults needed.
+                return true;
+
+            case Ds2Vs.HostRequest:
+                // Acted on live by the QEMU host while the guest ran.
                 return true;
 
             default:
@@ -280,6 +301,7 @@ public class UartMessageParser
 
         test.Status = TestStatus.Passed;
         test.DurationMs = durationMs;
+        test.HasResult = true;
     }
 
     private static void ParseTestFail(byte[] payload, TestResults results)
@@ -310,6 +332,7 @@ public class UartMessageParser
 
         test.Status = TestStatus.Failed;
         test.ErrorMessage = errorMessage;
+        test.HasResult = true;
     }
 
     private static void ParseTestSkip(byte[] payload, TestResults results)
@@ -335,6 +358,7 @@ public class UartMessageParser
 
         test.Status = TestStatus.Skipped;
         test.ErrorMessage = reason;
+        test.HasResult = true;
     }
 
     private static void ParseTestSuiteEnd(byte[] payload, TestResults results)

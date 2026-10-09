@@ -29,8 +29,16 @@ public class InstallSettings : CommandSettings
 
 public class InstallCommand : AsyncCommand<InstallSettings>
 {
-    internal const string ToolsRepo = "valentinbreiz/nativeaot-patcher";
+    /// <summary>Repository whose <c>tools-latest</c> release carries the LLVM, QEMU, xorriso and GDB archives.</summary>
+    internal const string ToolsRepo = "CosmosOS/Cosmos";
+
+    /// <summary>Rolling release tag build-tools.yml republishes the toolchain archives under.</summary>
     internal const string ToolsReleaseTag = "tools-latest";
+
+    // Repositories whose latest release carries each IDE extension: a .vsix for VS Code and Visual Studio, a plugin .zip for Rider.
+    private const string VSCodeExtensionRepo = "CosmosOS/CosmosVsCodeExtension";
+    private const string VisualStudioExtensionRepo = "CosmosOS/CosmosVsExtension";
+    private const string RiderExtensionRepo = "CosmosOS/CosmosRiderExtension";
 
     public override async Task<int> ExecuteAsync(CommandContext context, InstallSettings settings)
     {
@@ -352,14 +360,14 @@ public class InstallCommand : AsyncCommand<InstallSettings>
     }
 
     // ═══════════════════════════════════════════════════════════════════════
-    //  VS Code extension
+    //  IDE extensions
     // ═══════════════════════════════════════════════════════════════════════
 
-    private static async Task<(string? url, string? name)> GetVSCodeExtensionInfoAsync()
+    // Finds the first asset of repo's latest release whose name ends with extension.
+    private static async Task<(string? url, string? name)> GetLatestReleaseAssetAsync(string repo, string extension)
     {
         using var http = CreateHttpClient();
-        string json = await http.GetStringAsync(
-            "https://api.github.com/repos/valentinbreiz/CosmosVsCodeExtension/releases/latest");
+        string json = await http.GetStringAsync($"https://api.github.com/repos/{repo}/releases/latest");
         var release = JsonDocument.Parse(json);
 
         if (release.RootElement.TryGetProperty("assets", out var assets))
@@ -367,7 +375,7 @@ public class InstallCommand : AsyncCommand<InstallSettings>
             foreach (var asset in assets.EnumerateArray())
             {
                 string? name = asset.GetProperty("name").GetString();
-                if (name?.EndsWith(".vsix") == true)
+                if (name?.EndsWith(extension) == true)
                 {
                     return (asset.GetProperty("browser_download_url").GetString(), name);
                 }
@@ -376,11 +384,11 @@ public class InstallCommand : AsyncCommand<InstallSettings>
         return (null, null);
     }
 
-    // Downloads the latest .vsix to destDir. Returns the written file path,
+    // Downloads repo's latest .vsix to destDir. Returns the written file path,
     // or null if no asset was found. Caller prints context-appropriate output.
-    private static async Task<string?> DownloadVSCodeExtensionAsync(string destDir)
+    private static async Task<string?> DownloadExtensionAsync(string repo, string destDir)
     {
-        var (url, name) = await GetVSCodeExtensionInfoAsync();
+        (string? url, string? name) = await GetLatestReleaseAssetAsync(repo, ".vsix");
         if (url == null || name == null)
         {
             return null;
@@ -404,7 +412,7 @@ public class InstallCommand : AsyncCommand<InstallSettings>
         AnsiConsole.Markup("  Downloading extension from GitHub... ");
         try
         {
-            string? tempPath = await DownloadVSCodeExtensionAsync(Path.GetTempPath());
+            string? tempPath = await DownloadExtensionAsync(VSCodeExtensionRepo, Path.GetTempPath());
             if (tempPath == null)
             {
                 AnsiConsole.MarkupLine("[yellow]SKIPPED (no .vsix found)[/]");
@@ -676,7 +684,7 @@ public class InstallCommand : AsyncCommand<InstallSettings>
 
     // ═══════════════════════════════════════════════════════════════════════
     //  Setup bundle mode — downloads tools-latest Windows assets for the
-    //  offline installer, stages packages/extension, then runs Inno Setup.
+    //  offline installer, stages packages and the IDE extensions, then runs Inno Setup.
     // ═══════════════════════════════════════════════════════════════════════
 
     private static async Task<int> BuildSetupAsync(InstallSettings settings)
@@ -714,9 +722,34 @@ public class InstallCommand : AsyncCommand<InstallSettings>
             AnsiConsole.MarkupLine(ok ? "[green]OK[/]" : "[red]FAILED[/]");
         }
 
-        AnsiConsole.Markup("  VS Code Extension ... ");
-        string? vsix = await DownloadVSCodeExtensionAsync(Path.Combine(baseDir, "extensions"));
-        AnsiConsole.MarkupLine(vsix != null ? "[green]OK[/]" : "[yellow]SKIPPED (no .vsix found)[/]");
+        // One folder per IDE: Cosmos.iss installs each into the IDEs it finds.
+        // Start clean so a previous run's older versions are not bundled too.
+        string extensionsDir = Path.Combine(baseDir, "extensions");
+        if (Directory.Exists(extensionsDir))
+        {
+            Directory.Delete(extensionsDir, recursive: true);
+        }
+
+        AnsiConsole.Markup("  VS Code extension -> extensions/vscode/ ... ");
+        string? vsix = await DownloadExtensionAsync(VSCodeExtensionRepo, Path.Combine(extensionsDir, "vscode"));
+        AnsiConsole.MarkupLine(vsix is not null ? "[green]OK[/]" : "[yellow]SKIPPED (no .vsix found)[/]");
+
+        AnsiConsole.Markup("  Visual Studio extension -> extensions/visualstudio/ ... ");
+        vsix = await DownloadExtensionAsync(VisualStudioExtensionRepo, Path.Combine(extensionsDir, "visualstudio"));
+        AnsiConsole.MarkupLine(vsix is not null ? "[green]OK[/]" : "[yellow]SKIPPED (no .vsix found)[/]");
+
+        // The plugin zip holds its plugin folder; the installer copies that folder into Rider's plugins.
+        AnsiConsole.Markup("  Rider plugin -> extensions/rider/ ... ");
+        (string? riderUrl, _) = await GetLatestReleaseAssetAsync(RiderExtensionRepo, ".zip");
+        if (riderUrl is null)
+        {
+            AnsiConsole.MarkupLine("[yellow]SKIPPED (no .zip found)[/]");
+        }
+        else
+        {
+            bool ok = await DownloadAndExtractAsync(riderUrl, Path.Combine(extensionsDir, "rider"), "zip");
+            AnsiConsole.MarkupLine(ok ? "[green]OK[/]" : "[red]FAILED[/]");
+        }
 
         string issFile = Path.Combine(Path.GetDirectoryName(baseDir)!, "Cosmos.iss");
         if (File.Exists(issFile))

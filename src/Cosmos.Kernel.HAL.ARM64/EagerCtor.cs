@@ -3,6 +3,7 @@
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.ARM64.Memory;
 using Cosmos.Kernel.Core.Memory.VAS;
+using Cosmos.Kernel.HAL.Boot;
 
 namespace Cosmos.Kernel.HAL.ARM64;
 

@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.Runtime;
 /// <summary>
 /// Contains runtime exports for various metadata and dispatch operations
 /// </summary>
-public unsafe class MetaTable
+internal unsafe class MetaTable
 {
     [RuntimeExport("RhGetModuleFileName")]
     internal static int RhGetModuleFileName(IntPtr moduleHandle, out byte* moduleName)

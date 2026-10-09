@@ -6,10 +6,10 @@ namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 
 /// <summary>
 /// Per-thread allocation context (Thread-Local Allocation Buffer).
-/// Stored inline on each <see cref="Scheduler.Thread"/> to provide contention-free allocation.
+/// Stored inline on each <see cref="Scheduler.SchedulerThread"/> to provide contention-free allocation.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct AllocContext
+internal unsafe struct AllocContext
 {
     /// <summary>
     /// Current allocation pointer within the TLAB. Advances toward <see cref="AllocLimit"/>.

@@ -6,6 +6,13 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/build-docs.yml'
+  # Build on PRs too, without publishing. docfx.json names four projects by
+  # path, and the articles link into src/; either can break without anything
+  # failing until the merge lands on main.
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/build-docs.yml'
 
 jobs:
   build:
@@ -54,7 +61,7 @@ jobs:
     # wipe them. Tradeoff: files deleted from docs/ linger on the branch until
     # overwritten; acceptable, they are unreachable from the rebuilt site.
     - name: Publish to GitHub Pages
-      if: github.repository == 'valentinbreiz/nativeaot-patcher'
+      if: github.event_name == 'push' && github.repository == 'valentinbreiz/nativeaot-patcher'
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -66,7 +73,7 @@ jobs:
     # deploy key of the org Pages repository instead of the expired GH_PAGES
     # PAT. The site is served at https://cosmosos.github.io/.
     - name: Publish to cosmosos.github.io
-      if: github.repository == 'CosmosOS/Cosmos'
+      if: github.event_name == 'push' && github.repository == 'CosmosOS/Cosmos'
       uses: peaceiris/actions-gh-pages@v3
       with:
         deploy_key: ${{ secrets.GH_PAGES_DEPLOY_KEY }}

@@ -5,7 +5,7 @@ using Cosmos.Kernel.Core.Power;
 
 namespace Cosmos.Kernel.Core.ARM64.Power;
 
-public class ARM64PowerOps : IPowerOps
+internal class ARM64PowerOps : IPowerOps
 {
     [DoesNotReturn]
     public void Reboot()

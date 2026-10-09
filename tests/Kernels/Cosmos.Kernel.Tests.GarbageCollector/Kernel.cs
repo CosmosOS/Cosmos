@@ -7,7 +7,7 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 using Cosmos.Kernel.Core.Memory.Heap;
 using Cosmos.Kernel.Core.Runtime.GcInfo;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using CoreGC = Cosmos.Kernel.Core.Memory.GarbageCollector.GarbageCollector;
 using Sys = Cosmos.Kernel.System;
@@ -24,7 +24,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[GarbageCollector] BeforeRun() reached!\n");
         Serial.WriteString("[GarbageCollector] Starting tests...\n");
 
-        TR.Start("GarbageCollector Tests", expectedTests: 45);
+        TR.Start("GarbageCollector Tests", expectedTests: 50);
 
         // Garbage Collection Tests
         TR.Run("GC_IsEnabled", TestGCIsEnabled);
@@ -47,6 +47,7 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_PageAccounting", TestGCPageAccounting);
         TR.Run("GC_DependentHandle", TestGCDependentHandle);
         TR.Run("GC_DependentHandleCleanup", TestGCDependentHandleCleanup);
+        TR.Run("GC_DependentHandleNullValue", TestGCDependentHandleNullValue);
         TR.Run("GC_HandleStoreIntegrity", TestGCHandleStoreIntegrity);
         TR.Run("GC_PinnedHeapReuse", TestGCPinnedHeapReuse);
         TR.Run("GC_StackScanPaddingStress", TestGCStackScanPaddingStress);
@@ -56,9 +57,15 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_FuncletNoCrashOnAllocInCatch", TestGCFuncletNoCrashOnAllocInCatch);
         TR.Run("GC_ThrowThroughDeepChain", TestGCThrowThroughDeepChain);
 
-        // GC Soundness Tests. GC_InteriorPointerRoot FAILS until interior-pointer
-        // support (#376) lands — it is the acceptance test for #384.
+        // GC Soundness Tests. GC_InteriorPointerRoot is the acceptance test for #384;
+        // GC_InteriorPointerRootMidTlab pins the interior-pointer lookup to a layout
+        // where the parent's start was never recorded in the brick table. The PinnedHeap
+        // and Fixed cells cross the slot's GC_CALL_PINNED flag with the heap the parent
+        // lives on, since the lookup must not take one for the other.
         TR.Run("GC_InteriorPointerRoot", TestGCInteriorPointerRoot);
+        TR.Run("GC_InteriorPointerRootMidTlab", TestGCInteriorPointerRootMidTlab);
+        TR.Run("GC_InteriorPointerRootPinnedHeap", TestGCInteriorPointerRootPinnedHeap);
+        TR.Run("GC_InteriorPointerRootFixed", TestGCInteriorPointerRootFixed);
         TR.Run("GC_StaticOnlyReachability", TestGCStaticOnlyReachability);
         TR.Run("GC_MultithreadChurnUnderCollect", TestGCMultithreadChurnUnderCollect);
         TR.Run("GC_MallocHeapNotSwept", TestGCMallocHeapNotSwept);
@@ -71,6 +78,7 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_Info_GetObjectGeneration", TestGCInfoGetObjectGeneration);
         TR.Run("GC_Info_GCSegmentSizeAndPercent", TestGCInfoGCSegmentSizeAndPercent);
         TR.Run("GC_Info_RhGetMemoryInfoWiring", TestGCInfoRhGetMemoryInfoWiring);
+        TR.Run("GC_Info_MemoryInfoFrozenBetweenCollections", TestGCInfoMemoryInfoFrozenBetweenCollections);
         TR.Run("GC_Variables", TestGCVariables);
 
         // TLAB (Thread-Local Allocation Buffer) Tests
@@ -485,6 +493,23 @@ public class Kernel : Sys.Kernel
         Assert.Equal(0, count, "GC: ConditionalWeakTable entries cleared when key is dead");
     }
 
+    private static void TestGCDependentHandleNullValue()
+    {
+        // A null value is a dependent handle with no secondary. SharedArrayPool registers
+        // its thread-local buckets that way, so the first formatted interpolated string
+        // leaves one behind; the mark phase must skip it instead of reading a mark bit
+        // through the null secondary.
+        ConditionalWeakTable<object, object?> table = new();
+        object key = new();
+        table.Add(key, null);
+
+        CoreGC.Collect();
+
+        bool found = table.TryGetValue(key, out object? value);
+        Assert.True(found && value is null, "GC: dependent handle with no secondary survives a collection");
+        GC.KeepAlive(key);
+    }
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static (WeakReference, WeakReference, WeakReference) CreateThreeWeakRefs()
     {
@@ -645,7 +670,7 @@ public class Kernel : Sys.Kernel
 
         // --- 3. EnumerateLiveSlots must run to completion at the prolog without faulting ---
         GcInfoDecoder enumDecoder = new GcInfoDecoder(mi.GcInfo, GcInfoEncoding.GCINFO_VERSION, GcInfoDecoderFlags.DECODE_GC_LIFETIMES, 0);
-        Cosmos.Kernel.Core.Runtime.REGDISPLAY rd = default;
+        Cosmos.Kernel.Core.Runtime.ExceptionHandling.REGDISPLAY rd = default;
         int reportCount = 0;
         bool ok = enumDecoder.EnumerateLiveSlots(&rd, reportScratchSlots: false, CodeManagerFlags.None, &CountGcRefCallback, &reportCount);
         Assert.True(ok, "GcInfo: EnumerateLiveSlots must return true (slot table fit, no fault)");
@@ -891,7 +916,7 @@ public class Kernel : Sys.Kernel
         // kernel halts and the test runner reports the test as failed (or never completes).
         string caught = CatchAtopDeepChain();
         Assert.True(caught == "deep-throw",
-            "EH: a throw must propagate through 5 intermediate frames that may omit RBP/X29 — got '" + caught + "'");
+            "EH: a throw must propagate through 5 intermediate frames that may omit RBP/X29, got '" + caught + "'");
     }
 
     // ==================== GC Soundness Tests ====================
@@ -939,6 +964,108 @@ public class Kernel : Sys.Kernel
 
         Assert.Equal(0x5A5A0008, r,
             "GC: an object whose only root is an interior pointer (byref/Span) must survive collection (#384)");
+    }
+
+    /// <summary>
+    /// Allocates a small array at the current TLAB's bump pointer and returns a byref to its first
+    /// element, with a weak reference to the array. A non-null bump pointer always sits behind the
+    /// first object of its TLAB, so the array is neither its segment's nor its TLAB's first object,
+    /// whatever the boot heap layout: a lookup that only knows recorded TLAB starts (the brick
+    /// table) cannot find it. NoInlining so the array reference dies with this frame and the byref
+    /// is its only root.
+    /// </summary>
+    /// <param name="weak">Receives a weak reference to the array.</param>
+    /// <param name="midTlab"><c>true</c> when the array was placed behind another object in its TLAB.</param>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static unsafe ref int LeakInteriorRefMidTlab(out WeakReference weak, out bool midTlab)
+    {
+        int[] arr = [];
+        midTlab = false;
+
+        // The first attempt after a collection finds no TLAB and opens one; any attempt can also
+        // land on a refill. Either way the next attempt starts behind an object.
+        for (int attempt = 0; attempt < 8 && !midTlab; attempt++)
+        {
+            nint allocPtr = (nint)CoreGC.GetCurrentAllocContext().AllocPtr;
+            arr = new int[4];
+            midTlab = allocPtr != 0 && Unsafe.As<int[], nint>(ref arr) == allocPtr;
+        }
+
+        arr[0] = 0x5A5B0000;
+        weak = new WeakReference(arr);
+        return ref arr[0];
+    }
+
+    private static void TestGCInteriorPointerRootMidTlab()
+    {
+        ref int r = ref LeakInteriorRefMidTlab(out WeakReference weak, out bool midTlab);
+
+        Assert.True(midTlab, "GC: the array must be allocated behind another object in its TLAB");
+
+        CoreGC.Collect();
+
+        // Freeing the array would also free its weak handle: this does not depend on whether a
+        // later allocation reuses and overwrites the array's memory.
+        Assert.True(weak.IsAlive,
+            "GC: an array whose only root is a byref must survive collection when it is not its TLAB's first object");
+        Assert.True(weak.Target is int[] target && Unsafe.AreSame(ref target[0], ref r) && r == 0x5A5B0000,
+            "GC: the byref must still point into the surviving array");
+    }
+
+    /// <summary>
+    /// Allocates an <c>int[8]</c> through <see cref="GC.AllocateArray{T}(int, bool)"/> and returns a
+    /// byref to its first element, with a weak reference to the array. NoInlining so the array
+    /// reference dies with this frame and the byref is its only root.
+    /// </summary>
+    /// <param name="pinned"><c>true</c> to allocate the array on the pinned object heap.</param>
+    /// <param name="marker">The value stored in the first element.</param>
+    /// <param name="weak">Receives a weak reference to the array.</param>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static ref int LeakSmallArrayInteriorRef(bool pinned, int marker, out WeakReference weak)
+    {
+        int[] arr = GC.AllocateArray<int>(8, pinned);
+        arr[0] = marker;
+        weak = new WeakReference(arr);
+        return ref arr[0];
+    }
+
+    private static void TestGCInteriorPointerRootPinnedHeap()
+    {
+        ulong pinnedBytesBefore = CoreGC.GetCurrentAllocContext().AllocBytesUoh;
+
+        // A plain byref: the decoder reports it without GC_CALL_PINNED, yet the array sits in a
+        // pinned segment.
+        ref int r = ref LeakSmallArrayInteriorRef(pinned: true, marker: 0x5A5C0000, out WeakReference weak);
+
+        Assert.True(CoreGC.GetCurrentAllocContext().AllocBytesUoh > pinnedBytesBefore,
+            "GC: the array must be allocated on the pinned object heap");
+
+        CoreGC.Collect();
+
+        Assert.True(weak.IsAlive,
+            "GC: a pinned-heap array whose only root is a byref must survive collection");
+        Assert.True(weak.Target is int[] target && Unsafe.AreSame(ref target[0], ref r) && r == 0x5A5C0000,
+            "GC: the byref must still point into the surviving pinned-heap array");
+    }
+
+    private static unsafe void TestGCInteriorPointerRootFixed()
+    {
+        WeakReference weak;
+        bool alive;
+        int value;
+
+        // The fixed statement's pinned local is reported with GC_CALL_PINNED, yet the array sits
+        // on the regular heap. That local is the array's only root while Collect runs.
+        fixed (int* p = &LeakSmallArrayInteriorRef(pinned: false, marker: 0x5A5D0000, out weak))
+        {
+            CoreGC.Collect();
+            alive = weak.IsAlive;
+            value = *p;
+        }
+
+        Assert.True(alive,
+            "GC: a regular-heap array whose only root is a fixed (pinned) byref must survive collection");
+        Assert.Equal(0x5A5D0000, value, "GC: the fixed pointer must still point into the surviving array");
     }
 
     /// <summary>Holds the only reference to the statics-reachability test array.</summary>
@@ -1272,28 +1399,29 @@ public class Kernel : Sys.Kernel
     private static void TestGCInfoRhGetMemoryInfoWiring()
     {
         // System.GC.GetGCMemoryInfo() routes through RhGetMemoryInfo, which fills a
-        // GCMemoryInfoData struct from CoreGC.GetSimpleMemoryInfo() plus the
+        // GCMemoryInfoData struct from CoreGC.GetLastGCMemoryInfo() plus the
         // per-generation last-collect snapshots. The struct layout must match exactly.
         //
-        // Order matters: GC.GetGCMemoryInfo() allocates a GCMemoryInfoData class instance
-        // before populating it, which can consume a free-list block and shift FragmentedBytes.
-        // Read the runtime snapshot first, then take the direct snapshot — both then reflect
-        // the post-allocation heap state and must agree.
+        // Both sides read the same frozen snapshot, so the order of these two calls no
+        // longer matters: the GCMemoryInfoData instance that GC.GetGCMemoryInfo() allocates
+        // may still consume a free-list block, but that cannot shift the reported values.
+        CoreGC.Collect();
+
         GCMemoryInfo runtimeInfo = GC.GetGCMemoryInfo();
-        CoreGC.SimpleMemoryInfo direct = CoreGC.GetSimpleMemoryInfo();
+        CoreGC.SimpleMemoryInfo direct = CoreGC.GetLastGCMemoryInfo();
 
         Assert.Equal((long)direct.HeapSizeBytes, runtimeInfo.HeapSizeBytes,
-            "GC.Info: GCMemoryInfo.HeapSizeBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.HeapSizeBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.FragmentedBytes, runtimeInfo.FragmentedBytes,
-            "GC.Info: GCMemoryInfo.FragmentedBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.FragmentedBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.TotalCommittedBytes, runtimeInfo.TotalCommittedBytes,
-            "GC.Info: GCMemoryInfo.TotalCommittedBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.TotalCommittedBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.MemoryLoadBytes, runtimeInfo.MemoryLoadBytes,
-            "GC.Info: GCMemoryInfo.MemoryLoadBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.MemoryLoadBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.PromotedBytes, runtimeInfo.PromotedBytes,
-            "GC.Info: GCMemoryInfo.PromotedBytes must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.PromotedBytes must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.PinnedObjectsCount, runtimeInfo.PinnedObjectsCount,
-            "GC.Info: GCMemoryInfo.PinnedObjectsCount must mirror GetSimpleMemoryInfo");
+            "GC.Info: GCMemoryInfo.PinnedObjectsCount must mirror GetLastGCMemoryInfo");
         Assert.Equal((long)direct.CollectionIndex, runtimeInfo.Index,
             "GC.Info: GCMemoryInfo.Index must equal CollectionIndex");
         Assert.Equal(direct.CondemnedGeneration, runtimeInfo.Generation,
@@ -1314,6 +1442,48 @@ public class Kernel : Sys.Kernel
             "GC.Info: GenerationInfo[0].FragmentationBeforeBytes must mirror GetLastGenFragmentationBefore(0)");
         Assert.Equal((long)CoreGC.GetLastGenFragmentationAfter(0), runtimeInfo.GenerationInfo[0].FragmentationAfterBytes,
             "GC.Info: GenerationInfo[0].FragmentationAfterBytes must mirror GetLastGenFragmentationAfter(0)");
+    }
+
+    private static void TestGCInfoMemoryInfoFrozenBetweenCollections()
+    {
+        // GCMemoryInfo describes the heap as of the last collection, so allocating must not
+        // move any of its values: only the next collection may. Regression guard for the
+        // live readings that used to be reported through RhGetMemoryInfo.
+        CoreGC.Collect();
+
+        GCMemoryInfo before = GC.GetGCMemoryInfo();
+
+        // This changes the live heap: it consumes free-list blocks to refill TLABs, which is
+        // exactly what used to shift FragmentedBytes between two reads.
+        AllocateGarbage(40, 256);
+
+        GCMemoryInfo after = GC.GetGCMemoryInfo();
+
+        // A heap-pressure collection may have run on its own during the allocations above;
+        // the freeze only has to hold as long as no collection happened in between.
+        if (before.Index == after.Index)
+        {
+            Assert.Equal(before.FragmentedBytes, after.FragmentedBytes,
+                "GC.Info: FragmentedBytes must not change without a collection");
+            Assert.Equal(before.HeapSizeBytes, after.HeapSizeBytes,
+                "GC.Info: HeapSizeBytes must not change without a collection");
+            Assert.Equal(before.TotalCommittedBytes, after.TotalCommittedBytes,
+                "GC.Info: TotalCommittedBytes must not change without a collection");
+            Assert.Equal(before.MemoryLoadBytes, after.MemoryLoadBytes,
+                "GC.Info: MemoryLoadBytes must not change without a collection");
+        }
+
+        // This GC only has generation 0, so the heap-wide fragmentation is by construction
+        // the fragmentation gen0 was left with by the last collection.
+        Assert.Equal(after.GenerationInfo[0].FragmentationAfterBytes, after.FragmentedBytes,
+            "GC.Info: FragmentedBytes must equal GenerationInfo[0].FragmentationAfterBytes");
+
+        // A collection is what publishes new values.
+        CoreGC.Collect();
+
+        GCMemoryInfo collected = GC.GetGCMemoryInfo();
+        Assert.True(collected.Index > after.Index,
+            "GC.Info: Index must advance after a collection");
     }
 
     private static void TestGCVariables()

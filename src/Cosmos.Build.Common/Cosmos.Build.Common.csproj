@@ -5,7 +5,7 @@
 
     <!-- Pack compiled tasks DLL to tasks/ folder (MSBuild convention) -->
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
-    <NoWarn>NU5100</NoWarn>
+    <NoWarn>$(NoWarn);NU5100</NoWarn>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
   </PropertyGroup>
 

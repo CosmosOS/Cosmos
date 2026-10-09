@@ -1,8 +1,7 @@
 using System;
-using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL.Vfs;
-using Cosmos.Kernel.System.Filesystems.Fat;
-using Cosmos.Kernel.System.Vfs;
+using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.FileSystem;
+using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -13,7 +12,7 @@ public class Kernel : Sys.Kernel
 {
     /// <summary>Exact TR.Run cell count — the harness synthesizes failures
     /// for missing tests, so a mid-suite hang can't report ALL TESTS PASSED.</summary>
-    private const ushort ExpectedTestCount = 41;
+    private const ushort ExpectedTestCount = 42;
 
     private const string Fat16Mount = "/fat";
     private const string Fat32Mount = "/fat32";
@@ -294,8 +293,8 @@ public class Kernel : Sys.Kernel
     /// <summary>Pattern salt of the cluster-hog payload.</summary>
     private const byte HogSalt = 0xDE;
 
-    /// <summary>Allowed Bfree drift (clusters) across the hog's create + unlink — tolerance for root-directory growth.</summary>
-    private const ulong BfreeToleranceClusters = 8;
+    /// <summary>Allowed FreeBlocks drift (clusters) across the hog's create + unlink — tolerance for root-directory growth.</summary>
+    private const ulong FreeBlocksToleranceClusters = 8;
 
     /// <summary>Payload bytes of the file that must survive unmount + remount.</summary>
     private const int SurvivePayloadBytes = 800;
@@ -386,17 +385,17 @@ public class Kernel : Sys.Kernel
 
     protected override void BeforeRun()
     {
-        Serial.WriteString("[FatTests] BeforeRun() reached!\n");
+        Log.WriteString("[FatTests] BeforeRun() reached!\n");
 
         TR.Start("FAT Driver Tests", expectedTests: ExpectedTestCount);
 
         // Two independent disks + drivers, mounted at distinct points so the
         // FAT16 and FAT32 suites can't perturb one another.
         MemoryBlockDevice fat16Disk = FatTestVolume.CreateFat16("MEMFAT16");
-        FatFilesystemType fat16Driver = new(fat16Disk);
+        FatFileSystemType fat16Driver = new(fat16Disk);
 
         MemoryBlockDevice fat32Disk = FatTestVolume.CreateFat32("MEMFAT32");
-        FatFilesystemType fat32Driver = new(fat32Disk);
+        FatFileSystemType fat32Driver = new(fat32Disk);
 
         // Every cell that needs its own disk recycles this one buffer via
         // Reconfigure. Per-cell devices looked collectable but are not:
@@ -406,26 +405,26 @@ public class Kernel : Sys.Kernel
         // (~504 MiB) finished with ~5 MiB to spare.
         MemoryBlockDevice scratchDisk = new("SCRATCH", FatTestVolume.BlockSize, FatTestVolume.Fat32BlockCount);
 
-        TR.Run("Test_RegisterFilesystem_Fat16", () =>
+        TR.Run("Test_RegisterFileSystem_Fat16", () =>
         {
-            Assert.True(VfsManager.RegisterFilesystem("fat16-test", fat16Driver));
+            Assert.True(VfsManager.RegisterFileSystem("fat16-test", fat16Driver));
         });
 
-        TR.Run("Test_RegisterFilesystem_Fat32", () =>
+        TR.Run("Test_RegisterFileSystem_Fat32", () =>
         {
-            Assert.True(VfsManager.RegisterFilesystem("fat32-test", fat32Driver));
+            Assert.True(VfsManager.RegisterFileSystem("fat32-test", fat32Driver));
         });
 
         TR.Run("Test_Mount_FAT16", () =>
         {
-            Assert.True(VfsManager.TryMount("fat16-test", "", MountFlags.None, Fat16Mount, out VfsManager.VfsMount? mount));
+            Assert.True(VfsManager.TryMount("fat16-test", "", MountFlags.None, Fat16Mount, out VfsMount? mount));
             Assert.NotNull(mount);
             Assert.Equal<long>(SectorSizeBytes, mount!.Superblock.BlockSize);
         });
 
         TR.Run("Test_Mount_FAT32", () =>
         {
-            Assert.True(VfsManager.TryMount("fat32-test", "", MountFlags.None, Fat32Mount, out VfsManager.VfsMount? mount));
+            Assert.True(VfsManager.TryMount("fat32-test", "", MountFlags.None, Fat32Mount, out VfsMount? mount));
             Assert.NotNull(mount);
             Assert.Equal<long>(SectorSizeBytes, mount!.Superblock.BlockSize);
             Assert.True(mount.Superblock.MaxNameLength >= FatDirectory.MaxLfnNameLength);
@@ -439,20 +438,20 @@ public class Kernel : Sys.Kernel
 
         TR.Run("Test_StatFs_FAT16", () =>
         {
-            Assert.True(VfsManager.TryGetMount(Fat16Mount, out VfsManager.VfsMount? mount));
+            Assert.True(VfsManager.TryGetMount(Fat16Mount, out VfsMount? mount));
             Assert.True(mount!.Superblock.SuperOperations.StatFs(mount.Superblock, out VfsStatFs stat));
             Assert.True(stat.Blocks > 0);
-            Assert.True(stat.Bfree > 0);
-            Assert.True(stat.NameMax >= FatDirectory.MaxLfnNameLength);
+            Assert.True(stat.FreeBlocks > 0);
+            Assert.True(stat.MaxNameLength >= FatDirectory.MaxLfnNameLength);
         });
 
         TR.Run("Test_StatFs_FAT32", () =>
         {
-            Assert.True(VfsManager.TryGetMount(Fat32Mount, out VfsManager.VfsMount? mount));
+            Assert.True(VfsManager.TryGetMount(Fat32Mount, out VfsMount? mount));
             Assert.True(mount!.Superblock.SuperOperations.StatFs(mount.Superblock, out VfsStatFs stat));
             Assert.True(stat.Blocks >= Fat32MinClusterCount);
-            Assert.True(stat.Bfree > 0);
-            Assert.True(stat.NameMax >= FatDirectory.MaxLfnNameLength);
+            Assert.True(stat.FreeBlocks > 0);
+            Assert.True(stat.MaxNameLength >= FatDirectory.MaxLfnNameLength);
         });
 
         // ---------- FAT16 inode-level coverage (kept from prior pass) ----------
@@ -460,7 +459,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat16_Create_Write_Read_RoundTrip", () =>
         {
             IVfsInode root = ResolveRoot(Fat16Mount);
-            Assert.True(root.InodeOperations.Create(root, "HELLO.TXT", ModeEnum.RegularFile, out IVfsInode? created));
+            Assert.True(root.InodeOperations.Create(root, "HELLO.TXT", VfsMode.RegularFile, out IVfsInode? created));
             Assert.NotNull(created);
 
             byte[] payload = MakePayload(RoundTripPayloadBytes, RoundTripSalt);
@@ -475,7 +474,7 @@ public class Kernel : Sys.Kernel
         {
             IVfsInode root = ResolveRoot(Fat16Mount);
             const string longName = "longfilename.txt";
-            Assert.True(root.InodeOperations.Create(root, longName, ModeEnum.RegularFile, out _));
+            Assert.True(root.InodeOperations.Create(root, longName, VfsMode.RegularFile, out _));
             Assert.True(root.InodeOperations.Lookup(root, longName, out IVfsInode? byLong));
             Assert.NotNull(byLong);
             Assert.True(root.InodeOperations.Lookup(root, "LONGFI~1.TXT", out IVfsInode? byShort));
@@ -485,8 +484,8 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat16_Mkdir_Nested_Lookup", () =>
         {
             IVfsInode root = ResolveRoot(Fat16Mount);
-            Assert.True(root.InodeOperations.Mkdir(root, "DIR", ModeEnum.Directory, out IVfsInode? dir));
-            Assert.True(dir!.InodeOperations.Create(dir, "INNER.TXT", ModeEnum.RegularFile, out IVfsInode? inner));
+            Assert.True(root.InodeOperations.Mkdir(root, "DIR", VfsMode.Directory, out IVfsInode? dir));
+            Assert.True(dir!.InodeOperations.Create(dir, "INNER.TXT", VfsMode.RegularFile, out IVfsInode? inner));
 
             byte[] data = MakePayload(NestedInnerPayloadBytes, NestedInnerSalt);
             WriteAll(inner!, data);
@@ -500,7 +499,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat16_Unlink_RemovesFile", () =>
         {
             IVfsInode root = ResolveRoot(Fat16Mount);
-            Assert.True(root.InodeOperations.Create(root, "GONE.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(root.InodeOperations.Create(root, "GONE.TXT", VfsMode.RegularFile, out _));
             Assert.True(root.InodeOperations.Unlink(root, "GONE.TXT"));
             Assert.False(root.InodeOperations.Lookup(root, "GONE.TXT", out _));
         });
@@ -508,7 +507,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat16_Rmdir_RemovesEmptyDir", () =>
         {
             IVfsInode root = ResolveRoot(Fat16Mount);
-            Assert.True(root.InodeOperations.Mkdir(root, "EMPTY", ModeEnum.Directory, out _));
+            Assert.True(root.InodeOperations.Mkdir(root, "EMPTY", VfsMode.Directory, out _));
             Assert.True(root.InodeOperations.Rmdir(root, "EMPTY"));
             Assert.False(root.InodeOperations.Lookup(root, "EMPTY", out _));
         });
@@ -516,7 +515,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat16_LargeWrite_CrossesClusters", () =>
         {
             IVfsInode root = ResolveRoot(Fat16Mount);
-            Assert.True(root.InodeOperations.Create(root, "BIG.BIN", ModeEnum.RegularFile, out IVfsInode? created));
+            Assert.True(root.InodeOperations.Create(root, "BIG.BIN", VfsMode.RegularFile, out IVfsInode? created));
             byte[] payload = MakePayload(CrossClusterPayloadBytes, CrossClusterSalt);
             WriteAll(created!, payload);
             byte[] readBack = ReadAll(created!, payload.Length);
@@ -530,13 +529,21 @@ public class Kernel : Sys.Kernel
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
             Assert.NotNull(root);
             Assert.True(root!.TryStat(out VfsStat stat));
-            Assert.True((stat.Mode & ModeEnum.FileTypeMask) == ModeEnum.Directory);
+            Assert.True(stat.IsDirectory);
+        });
+
+        TR.Run("Test_Fat32_OpenDirectory_RejectsRegularFile", () =>
+        {
+            Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
+            Assert.True(root!.TryCreateFile("NOTDIR.TXT", VfsMode.RegularFile, out _));
+            Assert.False(VfsManager.TryOpenDirectory(Fat32Mount + "/NOTDIR.TXT", out IVfsDirectoryHandle? bad));
+            Assert.Null(bad);
         });
 
         TR.Run("Test_Fat32_Vfs_CreateFile_OpenByPath_RoundTrip", () =>
         {
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
-            Assert.True(root!.TryCreateFile("HELLO32.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(root!.TryCreateFile("HELLO32.TXT", VfsMode.RegularFile, out _));
 
             using IVfsFileHandle? file = OpenFile(Fat32Mount + "/HELLO32.TXT");
             Assert.NotNull(file);
@@ -545,7 +552,7 @@ public class Kernel : Sys.Kernel
             long written = file!.Write(payload);
             Assert.Equal<long>(payload.Length, written);
             Assert.Equal<long>(payload.Length, file.Position);
-            Assert.True(file.Flush());
+            Assert.True(file.TryFlush());
 
             using IVfsFileHandle? reader = OpenFile(Fat32Mount + "/HELLO32.TXT");
             Assert.NotNull(reader);
@@ -558,7 +565,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat32_Vfs_Seek_Set_Cur_End", () =>
         {
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
-            Assert.True(root!.TryCreateFile("SEEK.BIN", ModeEnum.RegularFile, out _));
+            Assert.True(root!.TryCreateFile("SEEK.BIN", VfsMode.RegularFile, out _));
 
             byte[] payload = MakePayload(SeekPayloadBytes, SeekSalt);
             using (IVfsFileHandle? w = OpenFile(Fat32Mount + "/SEEK.BIN"))
@@ -596,7 +603,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat32_Vfs_Read_AtEof_ReturnsZero", () =>
         {
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
-            Assert.True(root!.TryCreateFile("EOF.BIN", ModeEnum.RegularFile, out _));
+            Assert.True(root!.TryCreateFile("EOF.BIN", VfsMode.RegularFile, out _));
 
             byte[] payload = MakePayload(EofPayloadBytes, EofSalt);
             using (IVfsFileHandle? w = OpenFile(Fat32Mount + "/EOF.BIN"))
@@ -614,7 +621,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat32_Vfs_LargeFile_AcrossManyClusters", () =>
         {
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
-            Assert.True(root!.TryCreateFile("BIG32.BIN", ModeEnum.RegularFile, out _));
+            Assert.True(root!.TryCreateFile("BIG32.BIN", VfsMode.RegularFile, out _));
 
             // 256 KB file at 512 B/cluster (FAT32 SPC=1) = 512 clusters.
             const int totalBytes = Big32PayloadBytes;
@@ -636,13 +643,13 @@ public class Kernel : Sys.Kernel
         {
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
             const string lfn = "very_long_file_name_test.bin";
-            Assert.True(root!.TryCreateFile(lfn, ModeEnum.RegularFile, out _));
+            Assert.True(root!.TryCreateFile(lfn, VfsMode.RegularFile, out _));
 
             using IVfsFileHandle? f = OpenFile(Fat32Mount + "/" + lfn);
             Assert.NotNull(f);
             byte[] payload = MakePayload(LfnPayloadBytes, LfnSalt);
             f!.Write(payload);
-            f.Flush();
+            f.TryFlush();
 
             using IVfsFileHandle? rByLong = OpenFile(Fat32Mount + "/" + lfn);
             Assert.NotNull(rByLong);
@@ -665,24 +672,27 @@ public class Kernel : Sys.Kernel
             for (int i = 0; i < count; i++)
             {
                 string name = "F" + IntToHex(i, HexNameDigits) + ".TXT";
-                Assert.True(root!.TryCreateFile(name, ModeEnum.RegularFile, out _));
+                Assert.True(root!.TryCreateFile(name, VfsMode.RegularFile, out _));
             }
 
             for (int i = 0; i < count; i++)
             {
                 string name = "F" + IntToHex(i, HexNameDigits) + ".TXT";
                 Assert.True(root!.TryLookup(name, out IVfsNodeHandle? child));
-                Assert.NotNull(child);
+                using (child)
+                {
+                    Assert.NotNull(child);
+                }
             }
         });
 
         TR.Run("Test_Fat32_Vfs_NestedDirectories", () =>
         {
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
-            Assert.True(root!.TryCreateDirectory("A", ModeEnum.Directory, out IVfsDirectoryHandle? a));
-            Assert.True(a!.TryCreateDirectory("B", ModeEnum.Directory, out IVfsDirectoryHandle? b));
-            Assert.True(b!.TryCreateDirectory("C", ModeEnum.Directory, out IVfsDirectoryHandle? c));
-            Assert.True(c!.TryCreateFile("LEAF.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(root!.TryCreateDirectory("A", VfsMode.Directory, out IVfsDirectoryHandle? a));
+            Assert.True(a!.TryCreateDirectory("B", VfsMode.Directory, out IVfsDirectoryHandle? b));
+            Assert.True(b!.TryCreateDirectory("C", VfsMode.Directory, out IVfsDirectoryHandle? c));
+            Assert.True(c!.TryCreateFile("LEAF.TXT", VfsMode.RegularFile, out _));
 
             byte[] payload = MakePayload(NestedDirsPayloadBytes, NestedDirsSalt);
             using (IVfsFileHandle? leaf = OpenFile(Fat32Mount + "/A/B/C/LEAF.TXT"))
@@ -701,14 +711,17 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat32_Vfs_Truncate_GrowsViaSetAttr", () =>
         {
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
-            Assert.True(root!.TryCreateFile("GROW.BIN", ModeEnum.RegularFile, out IVfsNodeHandle? created));
+            Assert.True(root!.TryCreateFile("GROW.BIN", VfsMode.RegularFile, out IVfsNodeHandle? created));
             Assert.NotNull(created);
 
-            // SetAttr to enlarge the file from 0 to 4096 bytes; the FS must
-            // allocate clusters and zero-fill them.
-            VfsStat want = default;
-            want.Size = GrowTargetBytes;
-            Assert.True(created!.Inode.InodeOperations.SetAttr(created.Inode, SetAttrFlags.Size, want));
+            using (created)
+            {
+                // SetAttr to enlarge the file from 0 to 4096 bytes; the FS must
+                // allocate clusters and zero-fill them.
+                VfsStat want = default;
+                want.Size = GrowTargetBytes;
+                Assert.True(created!.Inode.InodeOperations.SetAttr(created.Inode, SetAttrFlags.Size, want));
+            }
 
             using IVfsFileHandle? r = OpenFile(Fat32Mount + "/GROW.BIN");
             Assert.NotNull(r);
@@ -723,11 +736,11 @@ public class Kernel : Sys.Kernel
 
         TR.Run("Test_Fat32_Vfs_Unlink_FreesClusters", () =>
         {
-            Assert.True(VfsManager.TryGetMount(Fat32Mount, out VfsManager.VfsMount? mount));
+            Assert.True(VfsManager.TryGetMount(Fat32Mount, out VfsMount? mount));
             Assert.True(mount!.Superblock.SuperOperations.StatFs(mount.Superblock, out VfsStatFs before));
 
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
-            Assert.True(root!.TryCreateFile("HOG.BIN", ModeEnum.RegularFile, out _));
+            Assert.True(root!.TryCreateFile("HOG.BIN", VfsMode.RegularFile, out _));
             using (IVfsFileHandle? w = OpenFile(Fat32Mount + "/HOG.BIN"))
             {
                 w!.Write(MakePayload(HogPayloadBytes, HogSalt));
@@ -737,30 +750,30 @@ public class Kernel : Sys.Kernel
             Assert.False(root.TryLookup("HOG.BIN", out _));
 
             Assert.True(mount.Superblock.SuperOperations.StatFs(mount.Superblock, out VfsStatFs after));
-            // Unlink must return Bfree to within +/-8 clusters of its
+            // Unlink must return FreeBlocks to within +/-8 clusters of its
             // pre-test value: net-neutrality catches any of the 128
             // freed clusters (64 KiB at SPC=1) leaking, with tolerance
             // for root-directory growth.
-            Assert.True(after.Bfree >= before.Bfree - BfreeToleranceClusters && after.Bfree + BfreeToleranceClusters >= before.Bfree);
+            Assert.True(after.FreeBlocks >= before.FreeBlocks - FreeBlocksToleranceClusters && after.FreeBlocks + FreeBlocksToleranceClusters >= before.FreeBlocks);
         });
 
         TR.Run("Test_Fat32_Persistence_AcrossUnmount", () =>
         {
             Assert.True(VfsManager.TryOpenDirectory(Fat32Mount, out IVfsDirectoryHandle? root));
-            Assert.True(root!.TryCreateFile("SURVIVE.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(root!.TryCreateFile("SURVIVE.TXT", VfsMode.RegularFile, out _));
             byte[] payload = MakePayload(SurvivePayloadBytes, SurviveSalt);
             using (IVfsFileHandle? w = OpenFile(Fat32Mount + "/SURVIVE.TXT"))
             {
                 w!.Write(payload);
-                w.Flush();
+                w.TryFlush();
             }
 
             // Drop the superblock and remount on the same backing buffer.
-            Assert.True(VfsManager.TryGetMount(Fat32Mount, out VfsManager.VfsMount? oldMount));
+            Assert.True(VfsManager.TryGetMount(Fat32Mount, out VfsMount? oldMount));
             oldMount!.Superblock.SuperOperations.Drop(oldMount.Superblock);
 
-            FatFilesystemType freshDriver = new(fat32Disk);
-            Assert.True(VfsManager.RegisterFilesystem("fat32-remount", freshDriver));
+            FatFileSystemType freshDriver = new(fat32Disk);
+            Assert.True(VfsManager.RegisterFileSystem("fat32-remount", freshDriver));
             Assert.True(VfsManager.TryMount("fat32-remount", "", MountFlags.None, "/fat32b", out _));
 
             using IVfsFileHandle? r = OpenFile("/fat32b/SURVIVE.TXT");
@@ -778,8 +791,8 @@ public class Kernel : Sys.Kernel
             // write across cluster boundaries -> read back. Proves the formatter
             // produced a real FAT32, not just one that statfs's correctly.
             MemoryBlockDevice freshDisk = scratchDisk.Reconfigure("MEMFAT32B", FatTestVolume.BlockSize, FatTestVolume.Fat32BlockCount);
-            FatFilesystemType driver = new(freshDisk);
-            Assert.True(VfsManager.RegisterFilesystem("fat32-fresh", driver));
+            FatFileSystemType driver = new(freshDisk);
+            Assert.True(VfsManager.RegisterFileSystem("fat32-fresh", driver));
 
             FatFormatOptions opts = new()
             {
@@ -793,19 +806,19 @@ public class Kernel : Sys.Kernel
             };
             Assert.True(VfsManager.TryFormat("fat32-fresh", "", opts));
 
-            Assert.True(VfsManager.TryMount("fat32-fresh", "", MountFlags.None, "/freshfat32", out VfsManager.VfsMount? mount));
+            Assert.True(VfsManager.TryMount("fat32-fresh", "", MountFlags.None, "/freshfat32", out VfsMount? mount));
             Assert.True(mount!.Superblock.SuperOperations.StatFs(mount.Superblock, out VfsStatFs stat));
             Assert.True(stat.Blocks >= Fat32MinClusterCount);
 
             // Write spans many clusters at SPC=1 (8 KiB = 16 clusters).
             byte[] payload = MakePayload(FreshFormatPayloadBytes, FreshFormatSalt);
             Assert.True(VfsManager.TryOpenDirectory("/freshfat32", out IVfsDirectoryHandle? rootDir));
-            Assert.True(rootDir!.TryCreateFile("FORMAT.BIN", ModeEnum.RegularFile, out _));
+            Assert.True(rootDir!.TryCreateFile("FORMAT.BIN", VfsMode.RegularFile, out _));
             using (IVfsFileHandle? w = OpenFile("/freshfat32/FORMAT.BIN"))
             {
                 Assert.NotNull(w);
                 Assert.Equal<long>(payload.Length, w!.Write(payload));
-                w.Flush();
+                w.TryFlush();
             }
 
             using IVfsFileHandle? r = OpenFile("/freshfat32/FORMAT.BIN");
@@ -815,11 +828,11 @@ public class Kernel : Sys.Kernel
             AssertBytesEqual(payload, readBack);
 
             // Persist across remount on the same backing buffer.
-            Assert.True(VfsManager.TryGetMount("/freshfat32", out VfsManager.VfsMount? m2));
+            Assert.True(VfsManager.TryGetMount("/freshfat32", out VfsMount? m2));
             m2!.Superblock.SuperOperations.Drop(m2.Superblock);
 
-            FatFilesystemType remountDriver = new(freshDisk);
-            Assert.True(VfsManager.RegisterFilesystem("fat32-fresh-remount", remountDriver));
+            FatFileSystemType remountDriver = new(freshDisk);
+            Assert.True(VfsManager.RegisterFileSystem("fat32-fresh-remount", remountDriver));
             Assert.True(VfsManager.TryMount("fat32-fresh-remount", "", MountFlags.None, "/freshfat32b", out _));
 
             using IVfsFileHandle? r2 = OpenFile("/freshfat32b/FORMAT.BIN");
@@ -833,8 +846,8 @@ public class Kernel : Sys.Kernel
         {
             MemoryBlockDevice disk = FatTestVolume.FormatFat16(
                 scratchDisk.Reconfigure("MEMFAT16D", FatTestVolume.BlockSize, FatTestVolume.Fat16BlockCount));
-            FatFilesystemType driver = new(disk);
-            Assert.True(VfsManager.RegisterFilesystem("fat16-destroy", driver));
+            FatFileSystemType driver = new(disk);
+            Assert.True(VfsManager.RegisterFileSystem("fat16-destroy", driver));
 
             // Pre-destroy: the BPB is valid, mount works.
             Assert.True(VfsManager.TryMount("fat16-destroy", "", MountFlags.None, "/destroy-pre", out _));
@@ -844,8 +857,8 @@ public class Kernel : Sys.Kernel
             Assert.True(VfsManager.TryUnmount("/destroy-pre"));
             Assert.True(VfsManager.TryDestroy("fat16-destroy", ""));
 
-            FatFilesystemType post = new(disk);
-            Assert.True(VfsManager.RegisterFilesystem("fat16-destroyed", post));
+            FatFileSystemType post = new(disk);
+            Assert.True(VfsManager.RegisterFileSystem("fat16-destroyed", post));
             Assert.False(VfsManager.TryMount("fat16-destroyed", "", MountFlags.None, "/destroy-post", out _));
         });
 
@@ -853,8 +866,8 @@ public class Kernel : Sys.Kernel
         {
             // ~3 MiB / SPC=1 / 1-sector reserved -> ~6000 sectors of data, well inside FAT12 band.
             MemoryBlockDevice disk = scratchDisk.Reconfigure("MEMFAT12", FatTestVolume.BlockSize, Fat12DiskBlockCount);
-            FatFilesystemType driver = new(disk);
-            Assert.True(VfsManager.RegisterFilesystem("fat12-fresh", driver));
+            FatFileSystemType driver = new(disk);
+            Assert.True(VfsManager.RegisterFileSystem("fat12-fresh", driver));
 
             FatFormatOptions opts = new()
             {
@@ -868,7 +881,7 @@ public class Kernel : Sys.Kernel
             };
             Assert.True(VfsManager.TryFormat("fat12-fresh", "", opts));
 
-            Assert.True(VfsManager.TryMount("fat12-fresh", "", MountFlags.None, "/fat12", out VfsManager.VfsMount? mount));
+            Assert.True(VfsManager.TryMount("fat12-fresh", "", MountFlags.None, "/fat12", out VfsMount? mount));
             Assert.True(mount!.Superblock.SuperOperations.StatFs(mount.Superblock, out VfsStatFs stat));
             Assert.True(stat.Blocks > 0);
             Assert.True(stat.Blocks < Fat16MinClusterCount);
@@ -876,12 +889,12 @@ public class Kernel : Sys.Kernel
             // Real write through the freshly formatted FAT12.
             byte[] payload = MakePayload(Fat12PayloadBytes, Fat12Salt);
             Assert.True(VfsManager.TryOpenDirectory("/fat12", out IVfsDirectoryHandle? rootDir));
-            Assert.True(rootDir!.TryCreateFile("HELLO.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(rootDir!.TryCreateFile("HELLO.TXT", VfsMode.RegularFile, out _));
             using (IVfsFileHandle? w = OpenFile("/fat12/HELLO.TXT"))
             {
                 Assert.NotNull(w);
                 Assert.Equal<long>(payload.Length, w!.Write(payload));
-                w.Flush();
+                w.TryFlush();
             }
             using IVfsFileHandle? r = OpenFile("/fat12/HELLO.TXT");
             Assert.NotNull(r);
@@ -989,10 +1002,10 @@ public class Kernel : Sys.Kernel
 
             // ClusterToLba bounds on a healthy volume.
             MemoryBlockDevice valid = scratchDisk.Reconfigure("BPBRANGE", FatTestVolume.BlockSize, HardeningDiskBlockCount);
-            FatFilesystemType fmt = new(valid);
+            FatFileSystemType fmt = new(valid);
             Assert.True(fmt.TryFormat(default, new FatFormatOptions()));
             valid.ReadBlock(BootSectorLba, 1, sector);
-            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs) && bs != null);
+            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs));
             Assert.True(ClusterToLbaThrows(bs!, ReservedClusterZero),
                 "ClusterToLba(0) must throw, not underflow into an exabyte LBA");
             Assert.True(ClusterToLbaThrows(bs!, bs!.ClusterCount + ClusterCountOvershoot),
@@ -1008,11 +1021,11 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_FatTable_BoundsClusterNumbers", () =>
         {
             MemoryBlockDevice disk = scratchDisk.Reconfigure("FATBOUND", FatTestVolume.BlockSize, HardeningDiskBlockCount);
-            FatFilesystemType driver = new(disk);
+            FatFileSystemType driver = new(disk);
             Assert.True(driver.TryFormat(default, new FatFormatOptions()));
             byte[] sector = new byte[SectorSizeBytes];
             disk.ReadBlock(BootSectorLba, 1, sector);
-            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs) && bs != null);
+            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs));
             FatTable table = new(disk, bs!);
 
             uint first = table.AllocateChain(ProbeChainClusters);
@@ -1053,7 +1066,7 @@ public class Kernel : Sys.Kernel
             MemoryBlockDevice disk32 = FatTestVolume.FormatFat32(
                 scratchDisk.Reconfigure("FATBOUND32", FatTestVolume.BlockSize, FatTestVolume.Fat32BlockCount));
             disk32.ReadBlock(BootSectorLba, 1, sector);
-            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs32) && bs32 != null);
+            Assert.True(FatBootSector.TryParse(sector, out FatBootSector? bs32));
             FatTable table32 = new(disk32, bs32!);
             Assert.True(GetReturnsEocSafely(table32, Fat32WildCluster),
                 "a wild FAT32 cluster must resolve to EOC, not out-of-range I/O");
@@ -1066,14 +1079,14 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat16_StaleHandleFsync_DoesNotClobberReusedSlot", () =>
         {
             IVfsInode root = ResolveRoot(Fat16Mount);
-            Assert.True(root.InodeOperations.Create(root, "STALEA.TXT", ModeEnum.RegularFile, out IVfsInode? fileA));
+            Assert.True(root.InodeOperations.Create(root, "STALEA.TXT", VfsMode.RegularFile, out IVfsInode? fileA));
             byte[] payloadA = MakePayload(StaleAPayloadBytes, StaleASalt);
             WriteAll(fileA!, payloadA);
 
             Assert.True(root.InodeOperations.Unlink(root, "STALEA.TXT"));
 
             // Same slot count (plain 8.3 name): reuses A's freed slot.
-            Assert.True(root.InodeOperations.Create(root, "STALEB.TXT", ModeEnum.RegularFile, out IVfsInode? fileB));
+            Assert.True(root.InodeOperations.Create(root, "STALEB.TXT", VfsMode.RegularFile, out IVfsInode? fileB));
             byte[] payloadB = MakePayload(StaleBPayloadBytes, StaleBSalt);
             WriteAll(fileB!, payloadB);
 
@@ -1097,19 +1110,19 @@ public class Kernel : Sys.Kernel
             // Create writable (mode with a write bit maps to no ReadOnly
             // attribute), then chmod it read-only via SetAttr.
             Assert.True(root.InodeOperations.Create(
-                root, "ROFLAG.TXT", ModeEnum.RegularFile | ModeEnum.OwnerRead | ModeEnum.OwnerWrite, out IVfsInode? created));
+                root, "ROFLAG.TXT", VfsMode.RegularFile | VfsMode.OwnerRead | VfsMode.OwnerWrite, out IVfsInode? created));
             Assert.True(root.InodeOperations.Lookup(root, "ROFLAG.TXT", out IVfsInode? sanity));
             Assert.True(sanity!.InodeOperations.GetAttr(sanity, out VfsStat sanityStat));
-            Assert.True((sanityStat.Mode & ModeEnum.OwnerWrite) != 0, "baseline file must be writable on disk");
+            Assert.True((sanityStat.Mode & VfsMode.OwnerWrite) != 0, "baseline file must be writable on disk");
 
             VfsStat wanted = default;
-            wanted.Mode = ModeEnum.RegularFile | ModeEnum.OwnerRead | ModeEnum.GroupRead | ModeEnum.OtherRead;
+            wanted.Mode = VfsMode.RegularFile | VfsMode.OwnerRead | VfsMode.GroupRead | VfsMode.OtherRead;
             Assert.True(created!.InodeOperations.SetAttr(created, SetAttrFlags.Mode, wanted));
 
             // A fresh Lookup re-parses the on-disk entry.
             Assert.True(root.InodeOperations.Lookup(root, "ROFLAG.TXT", out IVfsInode? lookup));
             Assert.True(lookup!.InodeOperations.GetAttr(lookup, out VfsStat stat));
-            Assert.True((stat.Mode & ModeEnum.OwnerWrite) == 0,
+            Assert.True((stat.Mode & VfsMode.OwnerWrite) == 0,
                 "the ReadOnly attribute must survive a re-parse of the on-disk entry");
         });
 
@@ -1119,21 +1132,21 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_GrowDirectory_FitsMaxLfnRun", () =>
         {
             MemoryBlockDevice disk = scratchDisk.Reconfigure("GROWDIR", FatTestVolume.BlockSize, Fat16ScratchBlockCount);
-            FatFilesystemType driver = new(disk);
+            FatFileSystemType driver = new(disk);
             Assert.True(driver.TryFormat(default, new FatFormatOptions { Type = FatType.Fat16, SectorsPerCluster = OneSectorPerCluster }));
             Assert.True(driver.TryMount(default, MountFlags.None, out IVfsSuperblock? sb));
             IVfsInode root = sb!.Root;
 
-            Assert.True(root.InodeOperations.Mkdir(root, "PACK", ModeEnum.Directory, out IVfsInode? dir));
+            Assert.True(root.InodeOperations.Mkdir(root, "PACK", VfsMode.Directory, out IVfsInode? dir));
             // '.' and '..' occupy 2 of the 16 slots; fill the other 14.
             for (int i = 0; i < PackFillEntries; i++)
             {
                 string name = "F" + (i / DecimalBase) + (i % DecimalBase) + ".TXT";
-                Assert.True(dir!.InodeOperations.Create(dir, name, ModeEnum.RegularFile, out _));
+                Assert.True(dir!.InodeOperations.Create(dir, name, VfsMode.RegularFile, out _));
             }
 
             string maxLfn = new string('x', MaxLfnStemLength) + ".txt";
-            Assert.True(dir!.InodeOperations.Create(dir, maxLfn, ModeEnum.RegularFile, out _),
+            Assert.True(dir!.InodeOperations.Create(dir, maxLfn, VfsMode.RegularFile, out _),
                 "a packed directory must grow enough clusters to fit a maximal LFN run");
             Assert.True(dir.InodeOperations.Lookup(dir, maxLfn, out _));
         });
@@ -1143,7 +1156,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Superblock_SyncAndDrop_Flush", () =>
         {
             MemoryBlockDevice disk = scratchDisk.Reconfigure("SYNCFLUSH", FatTestVolume.BlockSize, Fat16ScratchBlockCount);
-            FatFilesystemType driver = new(disk);
+            FatFileSystemType driver = new(disk);
             Assert.True(driver.TryFormat(default, new FatFormatOptions { Type = FatType.Fat16, SectorsPerCluster = Fat16ScratchSectorsPerCluster }));
             Assert.True(driver.TryMount(default, MountFlags.None, out IVfsSuperblock? sb));
 
@@ -1163,12 +1176,12 @@ public class Kernel : Sys.Kernel
         {
             IVfsInode root = ResolveRoot(Fat16Mount);
 
-            Assert.True(root.InodeOperations.Create(root, "A+B.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(root.InodeOperations.Create(root, "A+B.TXT", VfsMode.RegularFile, out _));
             Assert.True(root.InodeOperations.Lookup(root, "A+B.TXT", out _),
                 "a name the 8.3 encoder mangles must take the LFN path");
 
-            Assert.True(root.InodeOperations.Create(root, "TailCollisionA.txt", ModeEnum.RegularFile, out IVfsInode? lfA));
-            Assert.True(root.InodeOperations.Create(root, "TailCollisionB.txt", ModeEnum.RegularFile, out IVfsInode? lfB));
+            Assert.True(root.InodeOperations.Create(root, "TailCollisionA.txt", VfsMode.RegularFile, out IVfsInode? lfA));
+            Assert.True(root.InodeOperations.Create(root, "TailCollisionB.txt", VfsMode.RegularFile, out IVfsInode? lfB));
             WriteAll(lfA!, MakePayload(TailCollisionPayloadBytes, TailCollisionASalt));
             WriteAll(lfB!, MakePayload(TailCollisionPayloadBytes, TailCollisionBSalt));
             Assert.True(root.InodeOperations.Lookup(root, "TAILCO~2.TXT", out IVfsInode? byTail),
@@ -1178,7 +1191,7 @@ public class Kernel : Sys.Kernel
                 AssertBytesEqual(MakePayload(TailCollisionPayloadBytes, TailCollisionBSalt), ReadAll(byTail, TailCollisionPayloadBytes));
             }
 
-            Assert.False(root.InodeOperations.Create(root, new string('y', OverlongNameLength), ModeEnum.RegularFile, out _),
+            Assert.False(root.InodeOperations.Create(root, new string('y', OverlongNameLength), VfsMode.RegularFile, out _),
                 "names longer than the 255-char LFN cap must be refused");
         });
 
@@ -1190,16 +1203,16 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_FatDirectory_DistrustsOnDiskMetadata", () =>
         {
             MemoryBlockDevice disk = scratchDisk.Reconfigure("DIRHARD", FatTestVolume.BlockSize, Fat16ScratchBlockCount);
-            FatFilesystemType driver = new(disk);
+            FatFileSystemType driver = new(disk);
             Assert.True(driver.TryFormat(default, new FatFormatOptions { Type = FatType.Fat16, SectorsPerCluster = Fat16ScratchSectorsPerCluster }));
             Assert.True(driver.TryMount(default, MountFlags.None, out IVfsSuperblock? sb));
             IVfsInode root = sb!.Root;
             byte[] bpbSector = new byte[SectorSizeBytes];
             disk.ReadBlock(BootSectorLba, 1, bpbSector);
-            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs) && bs != null);
+            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs));
 
             // FstClusHI carries an EA handle on real FAT16 volumes.
-            Assert.True(root.InodeOperations.Create(root, "EAFILE.TXT", ModeEnum.RegularFile, out IVfsInode? ea));
+            Assert.True(root.InodeOperations.Create(root, "EAFILE.TXT", VfsMode.RegularFile, out IVfsInode? ea));
             byte[] payload = MakePayload(EaFilePayloadBytes, EaFileSalt);
             WriteAll(ea!, payload);
             PatchRootEntry(disk, bs!, "EAFILE  TXT", static (region, off) =>
@@ -1215,8 +1228,8 @@ public class Kernel : Sys.Kernel
             // A non-LFN-aware tool renaming the 8.3 entry in place leaves
             // the preceding LFN chain orphaned; its checksum no longer
             // matches and it must not lend its name to the renamed entry.
-            Assert.True(root.InodeOperations.Create(root, "orphantest.txt", ModeEnum.RegularFile, out _));
-            Assert.True(root.InodeOperations.Create(root, "PLAIN.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(root.InodeOperations.Create(root, "orphantest.txt", VfsMode.RegularFile, out _));
+            Assert.True(root.InodeOperations.Create(root, "PLAIN.TXT", VfsMode.RegularFile, out _));
             PatchRootEntry(disk, bs!, "ORPHAN~1TXT", static (region, off) =>
             {
                 ReadOnlySpan<char> renamed = "RENAMED TXT";
@@ -1233,7 +1246,7 @@ public class Kernel : Sys.Kernel
             // Plant a plausible stale entry right after the terminator,
             // then create a file over the terminator slot.
             PlantAfterTerminator(disk, bs!);
-            Assert.True(root.InodeOperations.Create(root, "REALFILE.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(root.InodeOperations.Create(root, "REALFILE.TXT", VfsMode.RegularFile, out _));
             Assert.False(root.InodeOperations.Lookup(root, "GHOST.TXT", out _),
                 "stale bytes past the consumed terminator must not be parsed back to life");
         });
@@ -1242,36 +1255,36 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_FatInodeOps_OrderingAndGuards", () =>
         {
             MemoryBlockDevice disk = scratchDisk.Reconfigure("INODEOPS", FatTestVolume.BlockSize, Fat16ScratchBlockCount);
-            FatFilesystemType driver = new(disk);
+            FatFileSystemType driver = new(disk);
             Assert.True(driver.TryFormat(default, new FatFormatOptions { Type = FatType.Fat16, SectorsPerCluster = Fat16ScratchSectorsPerCluster }));
             Assert.True(driver.TryMount(default, MountFlags.None, out IVfsSuperblock? sb));
             IVfsInode root = sb!.Root;
 
             // Duplicate names produce an invalid volume with the second
             // entry unreachable — Create/Mkdir/Rename must refuse them.
-            Assert.True(root.InodeOperations.Create(root, "DUP.TXT", ModeEnum.RegularFile, out _));
-            Assert.False(root.InodeOperations.Create(root, "DUP.TXT", ModeEnum.RegularFile, out _),
+            Assert.True(root.InodeOperations.Create(root, "DUP.TXT", VfsMode.RegularFile, out _));
+            Assert.False(root.InodeOperations.Create(root, "DUP.TXT", VfsMode.RegularFile, out _),
                 "creating an existing name must fail");
-            Assert.True(root.InodeOperations.Mkdir(root, "DUPDIR", ModeEnum.Directory, out _));
-            Assert.False(root.InodeOperations.Mkdir(root, "DUPDIR", ModeEnum.Directory, out _),
+            Assert.True(root.InodeOperations.Mkdir(root, "DUPDIR", VfsMode.Directory, out _));
+            Assert.False(root.InodeOperations.Mkdir(root, "DUPDIR", VfsMode.Directory, out _),
                 "mkdir over an existing name must fail");
-            Assert.True(root.InodeOperations.Create(root, "RSRC.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(root.InodeOperations.Create(root, "RSRC.TXT", VfsMode.RegularFile, out _));
             Assert.False(root.InodeOperations.Rename(root, "RSRC.TXT", root, "DUP.TXT"),
                 "renaming onto an existing name must fail");
 
             // A failed rename must leave the source intact (destination
             // allocation refused here by the 255-char LFN cap).
-            Assert.True(root.InodeOperations.Create(root, "KEEP.TXT", ModeEnum.RegularFile, out _));
+            Assert.True(root.InodeOperations.Create(root, "KEEP.TXT", VfsMode.RegularFile, out _));
             Assert.False(root.InodeOperations.Rename(root, "KEEP.TXT", root, new string('z', OverlongNameLength)));
             Assert.True(root.InodeOperations.Lookup(root, "KEEP.TXT", out _),
                 "a failed rename must leave the source entry intact");
 
             // SetAttr size: 4 GiB wraps the uint cast to 0 and truncates
             // the file — silent data loss instead of a refusal.
-            Assert.True(root.InodeOperations.Create(root, "BIGSZ.TXT", ModeEnum.RegularFile, out IVfsInode? bigsz));
+            Assert.True(root.InodeOperations.Create(root, "BIGSZ.TXT", VfsMode.RegularFile, out IVfsInode? bigsz));
             WriteAll(bigsz!, MakePayload(SizeCapPayloadBytes, SizeCapSalt));
             VfsStat huge = default;
-            huge.Mode = ModeEnum.RegularFile;
+            huge.Mode = VfsMode.RegularFile;
             huge.Size = SizeBeyondFatCap;
             Assert.False(bigsz!.InodeOperations.SetAttr(bigsz, SetAttrFlags.Size, huge),
                 "a size beyond FAT's 4 GiB cap must be refused");
@@ -1282,7 +1295,7 @@ public class Kernel : Sys.Kernel
             // clusters via the grow path and stamp a nonzero size.
             Assert.True(root.InodeOperations.Lookup(root, "DUPDIR", out IVfsInode? dupdir));
             VfsStat dirGrow = default;
-            dirGrow.Mode = ModeEnum.Directory;
+            dirGrow.Mode = VfsMode.Directory;
             dirGrow.Size = DirGrowAttemptBytes;
             Assert.False(dupdir!.InodeOperations.SetAttr(dupdir, SetAttrFlags.Size, dirGrow),
                 "size changes on directories must be refused");
@@ -1295,19 +1308,19 @@ public class Kernel : Sys.Kernel
             // A directory moved across parents must get its '..' rewritten.
             byte[] bpbSector = new byte[SectorSizeBytes];
             disk.ReadBlock(BootSectorLba, 1, bpbSector);
-            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs) && bs != null);
-            Assert.True(root.InodeOperations.Mkdir(root, "MOVEME", ModeEnum.Directory, out _));
-            Assert.True(root.InodeOperations.Mkdir(root, "DEST", ModeEnum.Directory, out IVfsInode? dest));
+            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs));
+            Assert.True(root.InodeOperations.Mkdir(root, "MOVEME", VfsMode.Directory, out _));
+            Assert.True(root.InodeOperations.Mkdir(root, "DEST", VfsMode.Directory, out IVfsInode? dest));
             Assert.True(root.InodeOperations.Rename(root, "MOVEME", dest!, "MOVEME"));
             Assert.True(dest!.InodeOperations.Lookup(dest, "MOVEME", out IVfsInode? moved));
             Assert.True(moved!.InodeOperations.GetAttr(moved, out VfsStat movedStat));
             Assert.True(dest.InodeOperations.GetAttr(dest, out VfsStat destStat));
-            Assert.Equal<uint>((uint)destStat.Ino & FatDirectory.ClusterWordMask, ReadDotDotClusterLow(disk, bs!, (uint)movedStat.Ino),
+            Assert.Equal<uint>((uint)destStat.InodeNumber & FatDirectory.ClusterWordMask, ReadDotDotClusterLow(disk, bs!, (uint)movedStat.InodeNumber),
                 "a moved directory's '..' must point at its new parent");
 
             // Writing past EOF must zero the gap (holes read as zero, and
             // unzeroed clusters leak other files' freed data).
-            Assert.True(root.InodeOperations.Create(root, "HOLE.BIN", ModeEnum.RegularFile, out IVfsInode? hole));
+            Assert.True(root.InodeOperations.Create(root, "HOLE.BIN", VfsMode.RegularFile, out IVfsInode? hole));
             WriteAll(hole!, MakePayload(HoleChunkBytes, HoleHeadSalt));
             IFileOperations holeOps = hole!.FileOperations!;
             TestOpenFile holeHandle = new(hole!, holeOps);
@@ -1330,12 +1343,12 @@ public class Kernel : Sys.Kernel
         TR.Run("Test_Fat32_Mkdir_DotDotIsZeroForRoot", () =>
         {
             IVfsInode root = ResolveRoot(Fat32Mount);
-            Assert.True(root.InodeOperations.Mkdir(root, "DOTZERO", ModeEnum.Directory, out IVfsInode? dir));
+            Assert.True(root.InodeOperations.Mkdir(root, "DOTZERO", VfsMode.Directory, out IVfsInode? dir));
             Assert.True(dir!.InodeOperations.GetAttr(dir, out VfsStat dirStat));
             byte[] bpbSector = new byte[SectorSizeBytes];
             fat32Disk.ReadBlock(BootSectorLba, 1, bpbSector);
-            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs32) && bs32 != null);
-            Assert.Equal<uint>(RootDotDotClusterValue, ReadDotDotClusterLow(fat32Disk, bs32!, (uint)dirStat.Ino),
+            Assert.True(FatBootSector.TryParse(bpbSector, out FatBootSector? bs32));
+            Assert.Equal<uint>(RootDotDotClusterValue, ReadDotDotClusterLow(fat32Disk, bs32!, (uint)dirStat.InodeNumber),
                 "'..' of a root child must store cluster 0 per the FAT spec");
         });
 
@@ -1346,8 +1359,8 @@ public class Kernel : Sys.Kernel
         {
             MemoryBlockDevice disk = FatTestVolume.FormatFat16(
                 scratchDisk.Reconfigure("MNTGUARD", FatTestVolume.BlockSize, FatTestVolume.Fat16BlockCount));
-            FatFilesystemType driver = new(disk);
-            Assert.True(VfsManager.RegisterFilesystem("fat16-guard", driver));
+            FatFileSystemType driver = new(disk);
+            Assert.True(VfsManager.RegisterFileSystem("fat16-guard", driver));
             Assert.True(VfsManager.TryMount("fat16-guard", "", MountFlags.None, "/guard", out _));
 
             Assert.False(VfsManager.TryFormat("fat16-guard", "", null),
@@ -1368,7 +1381,7 @@ public class Kernel : Sys.Kernel
             // its count in the 16-bit field (strict drivers and fsck.fat
             // read only TotSec16 there), with TotSec32 zero.
             MemoryBlockDevice small16 = scratchDisk.Reconfigure("FMT16SMALL", FatTestVolume.BlockSize, Fat16ScratchBlockCount);
-            FatFilesystemType driver16 = new(small16);
+            FatFileSystemType driver16 = new(small16);
             Assert.True(driver16.TryFormat(default, new FatFormatOptions { Type = FatType.Fat16, SectorsPerCluster = Fat16ScratchSectorsPerCluster }));
             Assert.True(small16.FlushCount > 0, "Format must flush the device before reporting success");
             byte[] bpb = new byte[SectorSizeBytes];
@@ -1381,7 +1394,7 @@ public class Kernel : Sys.Kernel
             // and mount the volume.
             MemoryBlockDevice disk32 = FatTestVolume.FormatFat32(
                 scratchDisk.Reconfigure("FMTDESTROY", FatTestVolume.BlockSize, FatTestVolume.Fat32BlockCount));
-            FatFilesystemType driver32 = new(disk32);
+            FatFileSystemType driver32 = new(disk32);
             Assert.True(driver32.TryDestroy(default));
             byte[] sector = new byte[SectorSizeBytes];
             disk32.ReadBlock(FsInfoSectorLba, 1, sector);
@@ -1392,7 +1405,7 @@ public class Kernel : Sys.Kernel
 
         TR.Finish();
 
-        Serial.WriteString("\n[Tests Complete - System Halting]\n");
+        Log.WriteString("\n[Tests Complete - System Halting]\n");
     }
 
     protected override void Run()
@@ -1407,7 +1420,7 @@ public class Kernel : Sys.Kernel
 
     private static IVfsInode ResolveRoot(string mountPoint)
     {
-        Assert.True(VfsManager.TryGetMount(mountPoint, out VfsManager.VfsMount? mount));
+        Assert.True(VfsManager.TryGetMount(mountPoint, out VfsMount? mount));
         Assert.NotNull(mount);
         return mount!.Superblock.Root;
     }
@@ -1422,7 +1435,7 @@ public class Kernel : Sys.Kernel
     // back. Keeps the corruption cells to one line per scenario.
     private static MemoryBlockDevice CorruptBpb(MemoryBlockDevice disk, Action<byte[]> patch)
     {
-        FatFilesystemType driver = new(disk);
+        FatFileSystemType driver = new(disk);
         Assert.True(driver.TryFormat(default, new FatFormatOptions()), "baseline format for a corruption cell failed");
         byte[] sector = new byte[SectorSizeBytes];
         disk.ReadBlock(BootSectorLba, 1, sector);
@@ -1464,7 +1477,7 @@ public class Kernel : Sys.Kernel
     {
         try
         {
-            FatFilesystemType driver = new(disk);
+            FatFileSystemType driver = new(disk);
             return !driver.TryMount(default, MountFlags.None, out _);
         }
         catch (Exception)
@@ -1584,7 +1597,7 @@ public class Kernel : Sys.Kernel
     {
         try
         {
-            FatFilesystemType driver = new(disk);
+            FatFileSystemType driver = new(disk);
             return !driver.TryFormat(default, opts);
         }
         catch (Exception)
@@ -1611,7 +1624,7 @@ public class Kernel : Sys.Kernel
     // clusters + 2 reserved entries must fit).
     private static void AssertFormattedFatCovers(MemoryBlockDevice disk, FatFormatOptions opts)
     {
-        FatFilesystemType driver = new(disk);
+        FatFileSystemType driver = new(disk);
         Assert.True(driver.TryFormat(default, opts));
 
         byte[] bpb = new byte[SectorSizeBytes];

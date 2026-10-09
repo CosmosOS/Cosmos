@@ -1,9 +1,9 @@
 {
     "sdk": {
-        "version": "10.0",
+        "version": "10.0.201",
         "rollForward": "latestFeature"
     },
     "msbuild-sdks": {
-        "Cosmos.Sdk": "3.0.82.20260816"
+        "Cosmos.Sdk": "3.0.94"
     }
 }

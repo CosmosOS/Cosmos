@@ -58,7 +58,10 @@ internal static unsafe class GC
         fixed (byte* pRawData = &rawData)
         {
             var data = (GCMemoryInfoDataStruct*)pRawData;
-            GarbageCollector.SimpleMemoryInfo info = GarbageCollector.GetSimpleMemoryInfo();
+
+            // I did the mistake once, the doc clearly specify that the memory info should not change bettewin GC.
+            // It's not writen in the public API, it's writen in System.Private.CoreLib
+            GarbageCollector.SimpleMemoryInfo info = GetLastGCMemoryInfo();
 
             // the ration 0.5 is arbitrary, should be change in the future
             data->_highMemoryLoadThresholdBytes = (long)(PageAllocator.RamSize / 2);
@@ -80,10 +83,10 @@ internal static unsafe class GC
 
             // Populate generation info. GC is non-generational; report generation 0
             // Use last recorded before/after metrics from the GC (recorded at Collect())
-            data->_generationInfo0.sizeBeforeBytes = (long)GarbageCollector.GetLastGenSizeBefore(0);
-            data->_generationInfo0.fragmentationBeforeBytes = (long)GarbageCollector.GetLastGenFragmentationBefore(0);
-            data->_generationInfo0.sizeAfterBytes = (long)GarbageCollector.GetLastGenSizeAfter(0);
-            data->_generationInfo0.fragmentationAfterBytes = (long)GarbageCollector.GetLastGenFragmentationAfter(0);
+            data->_generationInfo0.sizeBeforeBytes = (long)GetLastGenSizeBefore(0);
+            data->_generationInfo0.fragmentationBeforeBytes = (long)GetLastGenFragmentationBefore(0);
+            data->_generationInfo0.sizeAfterBytes = (long)GetLastGenSizeAfter(0);
+            data->_generationInfo0.fragmentationAfterBytes = (long)GetLastGenFragmentationAfter(0);
 
             // Other generation infos remain zero
             data->_generationInfo1 = default;
@@ -99,7 +102,7 @@ internal static unsafe class GC
     [RuntimeExport("RhGetGcTotalMemory")]
     internal static long RhGetGcTotalMemory()
     {
-        ulong heapBytes = GarbageCollector.GetHeapSizeBytes();
+        ulong heapBytes = GetHeapSizeBytes();
         if (heapBytes > long.MaxValue)
         {
             return long.MaxValue;
@@ -112,14 +115,14 @@ internal static unsafe class GC
     internal static void RhCollect(int generation, InternalGCCollectionMode mode)
     {
         // Do not support generation for now nor modes
-        GarbageCollector.Collect();
+        Collect();
     }
 
     [RuntimeExport("RhGetGeneration")]
     internal static int RhGetGeneration(object obj)
     {
         nint addr = Unsafe.As<object, nint>(ref obj);
-        return GarbageCollector.GetObjectGeneration(addr);
+        return GetObjectGeneration(addr);
     }
 
     [RuntimeExport("RhGetGenerationSize")]
@@ -127,7 +130,7 @@ internal static unsafe class GC
     {
         // Our GC is currently non-generational. Delegate to the GC helper which
         // returns the total used bytes for generation 0 and 0 for others.
-        ulong size = GarbageCollector.GetGenerationSize(gen);
+        ulong size = GetGenerationSize(gen);
         if (size > int.MaxValue)
         {
             return int.MaxValue;
@@ -139,7 +142,7 @@ internal static unsafe class GC
     [RuntimeExport("RhGetLastGCPercentTimeInGC")]
     internal static int RhGetLastGCPercentTimeInGC()
     {
-        return GarbageCollector.GetLastGCPercentTimeInGC();
+        return GetLastGCPercentTimeInGC();
     }
 
     // In the runtime the handle is a pointer-to-a-pointer to an object which can be cast to the object in different ways.
@@ -147,7 +150,7 @@ internal static unsafe class GC
     [RuntimeExport("RhHandleGet")]
     internal static object? RhHandleGet(IntPtr handle)
     {
-        GCObject* primary = GarbageCollector.HandleGetPrimary(handle);
+        GCObject* primary = HandleGetPrimary(handle);
         if (primary == null)
         {
             return null;
@@ -165,7 +168,7 @@ internal static unsafe class GC
             return 0;
         }
 
-        return GarbageCollector.GetCollectionIndex();
+        return GetCollectionIndex();
     }
 
     [RuntimeExport("RhIsPromoted")]
@@ -184,7 +187,7 @@ internal static unsafe class GC
     [RuntimeExport("RhGetGCSegmentSize")]
     internal static ulong RhGetGCSegmentSize()
     {
-        return GarbageCollector.GetGCSegmentSizeBytes();
+        return GetGCSegmentSizeBytes();
     }
 
     [RuntimeExport("RhGetAllocatedBytesForCurrentThread")]
@@ -192,14 +195,14 @@ internal static unsafe class GC
     {
         // Cumulative bytes allocated by this thread. Does not subtract unused TLAB space
         // (that would cause the value to decrease on TLAB refill).
-        ref AllocContext ac = ref GarbageCollector.GetCurrentAllocContext();
+        ref AllocContext ac = ref GetCurrentAllocContext();
         return (long)(ac.AllocBytes + ac.AllocBytesUoh);
     }
 
     [RuntimeExport("RhGetTotalAllocatedBytes")]
     internal static long RhGetTotalAllocatedBytes()
     {
-        ulong allocated = GarbageCollector.GetTotalAllocatedBytes();
+        ulong allocated = GetTotalAllocatedBytes();
         if (allocated > long.MaxValue)
         {
             return long.MaxValue;
@@ -211,7 +214,7 @@ internal static unsafe class GC
     [RuntimeExport("RhGetTotalAllocatedBytesPrecise")]
     internal static long RhGetTotalAllocatedBytesPrecise()
     {
-        return (long)GarbageCollector.GetTotalAllocatedBytesPrecise();
+        return (long)GetTotalAllocatedBytesPrecise();
     }
 
     [RuntimeExport("RhRegisterForGCReporting")]

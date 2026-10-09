@@ -8,8 +8,6 @@
     <Title>Cosmos Kernel ARM64 Native Assembly</Title>
     <Description>ARM64/AArch64 native assembly routines for Cosmos kernel development including memory operations, barriers, and interrupt management.</Description>
     <PackageTags>cosmos;kernel;arm64;aarch64;assembly;native;asm;memory;barriers</PackageTags>
-    <RepositoryUrl>https://github.com/valentinbreiz/nativeaot-patcher</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/valentinbreiz/nativeaot-patcher</PackageProjectUrl>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
   </PropertyGroup>
 

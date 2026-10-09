@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Cosmos.TestRunner.Engine.Protocol;
 using Cosmos.TestRunner.Protocol;
 using Cosmos.Tools.Launcher;
 
@@ -22,7 +23,7 @@ public class QemuX64Host : IQemuHost
 
     // Test runner protocol needle: 0x19740807 magic little-endian + command
     // byte (Ds2Vs.TestPass). Used to detect "kernel reached at least one test"
-    // so we can declare a stall when UART goes silent — handles destructive
+    // so we can declare a stall when UART goes silent: handles destructive
     // ops (e.g. Power.Shutdown's LAI panic) that hang instead of cleanly
     // exiting QEMU.
     private static readonly byte[] TestPassMarker =
@@ -45,7 +46,7 @@ public class QemuX64Host : IQemuHost
         _memoryMb = memoryMb;
     }
 
-    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null)
+    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuMonitor? monitor = null)
     {
         if (!File.Exists(isoPath))
         {
@@ -56,14 +57,12 @@ public class QemuX64Host : IQemuHost
             };
         }
 
-        // Ensure UART log directory exists
-        var logDir = Path.GetDirectoryName(uartLogPath);
+        string? logDir = Path.GetDirectoryName(uartLogPath);
         if (!string.IsNullOrEmpty(logDir) && !Directory.Exists(logDir))
         {
             Directory.CreateDirectory(logDir);
         }
 
-        // Delete existing UART log
         if (File.Exists(uartLogPath))
         {
             File.Delete(uartLogPath);
@@ -83,18 +82,21 @@ public class QemuX64Host : IQemuHost
             NetworkCard = devices?.NetworkCard,
             KeyboardDevice = devices?.KeyboardDevice,
             MouseDevice = devices?.MouseDevice,
-            VgaAdapter = devices?.VgaAdapter
+            VgaAdapter = devices?.VgaAdapter,
+            GpuDevice = devices?.GpuDevice,
+            AudioDevice = devices?.AudioDevice,
+            AudioBackend = QemuHostDefaults.AudioBackend,
+            MonitorPort = monitor?.Port
         });
-        var startInfo = QemuLauncher.ToProcessStartInfo(plan);
+        ProcessStartInfo startInfo = QemuLauncher.ToProcessStartInfo(plan);
         if (_qemuBinaryOverride is not null)
         {
             startInfo.FileName = _qemuBinaryOverride;
         }
 
-        using var process = new Process { StartInfo = startInfo };
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
+        using Process process = new() { StartInfo = startInfo };
+        using CancellationTokenSource cts = new(TimeSpan.FromSeconds(timeoutSeconds));
 
-        // Only create test servers for network tests
         UdpTestServer? udpServer = null;
         TcpTestServer? tcpServer = null;
         IcmpTestServer? icmpServer = null;
@@ -117,22 +119,23 @@ public class QemuX64Host : IQemuHost
             icmpServer?.Start();
 
             process.Start();
+            monitor?.Attach(cts.Token);
 
             // Capture stderr asynchronously for diagnostics
-            var stderrTask = process.StandardError.ReadToEndAsync();
+            Task<string> stderrTask = process.StandardError.ReadToEndAsync();
 
             // Monitor UART log for the suite-end marker or a stall after a test
             // was reached, while waiting for QEMU to exit on its own.
-            var monitorTask = MonitorUartLogAsync(uartLogPath, cts.Token);
-            var processTask = process.WaitForExitAsync(cts.Token);
+            Task<UartMonitorOutcome> monitorTask = MonitorUartLogAsync(uartLogPath, monitor, cts.Token);
+            Task processTask = process.WaitForExitAsync(cts.Token);
 
-            var completedTask = await Task.WhenAny(monitorTask, processTask);
+            Task completedTask = await Task.WhenAny(monitorTask, processTask);
 
             if (completedTask == monitorTask)
             {
                 UartMonitorOutcome outcome = await monitorTask;
                 testSuiteCompleted = outcome == UartMonitorOutcome.EndMarkerSeen;
-                // Either EndMarkerSeen or Stalled — kill QEMU now. Stalled means
+                // Either EndMarkerSeen or Stalled: kill QEMU now. Stalled means
                 // a destructive op (e.g. Power.Shutdown) hung after pre-emitting
                 // its Pass marker; the engine will see the markers in the UART
                 // log and roll on to the next boot.
@@ -145,25 +148,24 @@ public class QemuX64Host : IQemuHost
             }
             else if (!process.HasExited)
             {
-                // Process task completed (process exited on its own — guest reboot/shutdown)
+                // Process task completed (process exited on its own: guest reboot/shutdown)
                 await processTask;
             }
 
             // Give UART log a moment to flush
             await Task.Delay(QemuHostDefaults.UartFlushDelayMs);
 
-            // Stop test servers if running
-            if (udpServer != null)
+            if (udpServer is not null)
             {
                 await udpServer.StopAsync();
             }
 
-            if (tcpServer != null)
+            if (tcpServer is not null)
             {
                 await tcpServer.StopAsync();
             }
 
-            if (icmpServer != null)
+            if (icmpServer is not null)
             {
                 await icmpServer.StopAsync();
             }
@@ -175,7 +177,6 @@ public class QemuX64Host : IQemuHost
                 Console.WriteLine($"[QEMU stderr] {stderr.Trim()}");
             }
 
-            // Read UART log
             string uartLog = string.Empty;
             if (File.Exists(uartLogPath))
             {
@@ -202,18 +203,17 @@ public class QemuX64Host : IQemuHost
             // Give UART log a moment to flush
             await Task.Delay(QemuHostDefaults.UartFlushDelayMs);
 
-            // Stop test servers if running
-            if (udpServer != null)
+            if (udpServer is not null)
             {
                 await udpServer.StopAsync();
             }
 
-            if (tcpServer != null)
+            if (tcpServer is not null)
             {
                 await tcpServer.StopAsync();
             }
 
-            if (icmpServer != null)
+            if (icmpServer is not null)
             {
                 await icmpServer.StopAsync();
             }
@@ -235,18 +235,17 @@ public class QemuX64Host : IQemuHost
         }
         catch (Exception ex)
         {
-            // Stop test servers on error if running
-            if (udpServer != null)
+            if (udpServer is not null)
             {
                 await udpServer.StopAsync();
             }
 
-            if (tcpServer != null)
+            if (tcpServer is not null)
             {
                 await tcpServer.StopAsync();
             }
 
-            if (icmpServer != null)
+            if (icmpServer is not null)
             {
                 await icmpServer.StopAsync();
             }
@@ -268,17 +267,18 @@ public class QemuX64Host : IQemuHost
     /// op fired but didn't exit QEMU"). Returns <see cref="UartMonitorOutcome.NotFinished"/>
     /// only on cancellation.
     /// </summary>
-    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, CancellationToken cancellationToken)
+    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, QemuMonitor? monitor, CancellationToken cancellationToken)
     {
         long lastPosition = 0;
         int endMarkerIndex = 0;
         int testPassMarkerIndex = 0;
         bool sawTestPass = false;
-        // Track time of the last protocol-frame magic — not just any UART byte.
+        // Track time of the last protocol-frame magic, not just any UART byte.
         // After Power.Shutdown's LAI panic the scheduler keeps writing text to
         // UART, so a "no growth" check would never fire; "no protocol magic"
         // does, since the test framework emits no more frames once hung.
         DateTime lastMagicAt = DateTime.UtcNow;
+        HostRequestScanner hostRequests = new();
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -286,17 +286,25 @@ public class QemuX64Host : IQemuHost
             {
                 if (File.Exists(uartLogPath))
                 {
-                    using var fs = new FileStream(uartLogPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using FileStream fs = new(uartLogPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     if (fs.Length > lastPosition)
                     {
                         fs.Seek(lastPosition, SeekOrigin.Begin);
-                        var buffer = new byte[fs.Length - lastPosition];
+                        byte[] buffer = new byte[fs.Length - lastPosition];
                         int bytesRead = await fs.ReadAsync(buffer, cancellationToken);
                         lastPosition += bytesRead;
 
                         for (int i = 0; i < bytesRead; i++)
                         {
                             byte b = buffer[i];
+
+                            // The guest's test waits for what it asked, so it is
+                            // done now rather than after the run.
+                            if (hostRequests.Feed(b) is string request)
+                            {
+                                await QemuMonitor.DispatchAsync(monitor, request, cancellationToken);
+                                lastMagicAt = DateTime.UtcNow;
+                            }
 
                             if (b == TestEndMarker[endMarkerIndex])
                             {
@@ -311,7 +319,7 @@ public class QemuX64Host : IQemuHost
                                 endMarkerIndex = (b == TestEndMarker[0]) ? 1 : 0;
                             }
 
-                            // TestPass marker scan also reuses the magic prefix —
+                            // TestPass marker scan also reuses the magic prefix:
                             // when its 4-byte magic+cmd are matched, both flags
                             // get bumped: lastMagicAt and (once) sawTestPass.
                             if (b == TestPassMarker[testPassMarkerIndex])
@@ -319,7 +327,7 @@ public class QemuX64Host : IQemuHost
                                 testPassMarkerIndex++;
                                 if (testPassMarkerIndex == Consts.SerialSignatureLengthBytes)
                                 {
-                                    // Full magic 0x19740807 hit — kernel emitted a frame.
+                                    // Full magic 0x19740807 hit: kernel emitted a frame.
                                     lastMagicAt = DateTime.UtcNow;
                                 }
                                 if (testPassMarkerIndex == TestPassMarker.Length)

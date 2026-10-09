@@ -2,15 +2,17 @@
 
 using System;
 using System.Diagnostics;
+using System.Text;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core;
+using Cosmos.Kernel.Core.Security;
+using Cosmos.Kernel.System;
+using Cosmos.Kernel.System.Diagnostics;
 using Monitor = Cosmos.Kernel.Core.Scheduler.Monitor;
 using System.Runtime.InteropServices;
-using Cosmos.Kernel.Core.IO;
-#if ARCH_X64
-using Cosmos.Kernel.HAL.X64.Devices.Clock;
-#elif ARCH_ARM64
-using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
+#if ARCH_ARM64
+using Rtc = Cosmos.Kernel.HAL.ARM64.PL031Rtc;
+#else
+using Rtc = Cosmos.Kernel.HAL.X64.CmosRtc;
 #endif
 
 
@@ -49,29 +51,48 @@ public static class InteropSysPlug
     }
 
     /// <summary>
-    /// Provides cryptographically secure random bytes.
-    /// In a real kernel, this would use hardware RNG (RDRAND) if available.
+    /// Provides cryptographically secure random bytes, for <c>Guid.NewGuid</c>
+    /// and the rest of CoreLib's secure randomness, from the kernel's CSPRNG
+    /// (<see cref="KernelRandom"/>, the generator behind the
+    /// <c>RandomNumberGenerator</c> plug too). Its first use seeds it, which
+    /// takes a few milliseconds. The non-cryptographic sibling above stays on
+    /// its xorshift, which works however early the runtime first seeds
+    /// <c>HashCode</c>, string hashing (Marvin) and <c>System.Random</c> from
+    /// it. No key or nonce depends on those seeds, though Marvin's is what
+    /// keeps an attacker from colliding the hashes of a string-keyed
+    /// dictionary on purpose, which a xorshift over the counter only weakly
+    /// prevents.
     /// </summary>
+    /// <returns>Zero, which the caller reads as success. The target returns
+    /// <see langword="int"/> rather than <see langword="void"/>, unlike its
+    /// non-cryptographic sibling, and a plug whose return type disagrees with
+    /// the target patches in a body that leaves the wrong thing on the stack:
+    /// ILC then reports the method as always throwing on invalid IL.</returns>
     [PlugMember]
-    public static unsafe void GetCryptographicallySecureRandomBytes(byte* buffer, int length)
+    public static unsafe int GetCryptographicallySecureRandomBytes(byte* buffer, int length)
     {
-        // For now, use the same non-crypto implementation
-        // TODO: Use RDRAND instruction if available
-        GetNonCryptographicallySecureRandomBytes(buffer, length);
+        KernelRandom.Fill(buffer, length);
+
+        // Anything but zero makes the caller throw CryptographicException, and
+        // the kernel generator has no failure mode.
+        return 0;
     }
 
+    /// <summary>
+    /// Milliseconds elapsed since the platform RTC captured its boot reference;
+    /// 0 when the timer feature is compiled out or the RTC is not initialized.
+    /// </summary>
     [PlugMember]
     public static long GetLowResolutionTimestamp()
     {
-
-        if (CosmosFeatures.TimerEnabled)
+        if (KernelFeatures.Timer)
         {
-            if (RTC.Instance == null)
+            if (Rtc.Instance is null)
             {
                 return 0;
             }
 
-            return RTC.Instance.GetElapsedTicks() / TimeSpan.TicksPerMillisecond;
+            return Rtc.Instance.GetElapsedTicks() / TimeSpan.TicksPerMillisecond;
         }
         else
         {
@@ -93,28 +114,37 @@ public static class InteropSysPlug
     }
 
     /// <summary>
-    /// dlopen replacement. There is no dynamic library loading on bare metal, so
-    /// every load fails. This is what turns a call to an unplugged
-    /// libSystem.Native P/Invoke into a catchable <see cref="DllNotFoundException"/>:
-    /// without it, the lazy P/Invoke resolver recurses through its own unplugged
-    /// P/Invokes (LoadLibrary, GetProcessPath, ...) until the stack overflows and
-    /// the kernel triple-faults.
-    /// </summary>
-    [PlugMember]
-    internal static IntPtr LoadLibrary(string filename)
-    {
-        return IntPtr.Zero;
-    }
-
-    /// <summary>
-    /// The kernel image is the process. A fixed path keeps
-    /// <c>AppContext.BaseDirectory</c> (used by the P/Invoke resolver's library
-    /// search, among others) from re-entering an unresolvable P/Invoke.
+    /// The kernel image is the process; <c>Environment.ProcessPath</c> and
+    /// <c>AppContext.BaseDirectory</c> derive from this.
     /// </summary>
     [PlugMember]
     internal static string? GetProcessPath()
     {
         return "/kernel.elf";
+    }
+
+    /// <summary>
+    /// The runtime's last step once <c>FailFast</c> has written its report: on
+    /// Unix it ends the process. The kernel is the process, so park the CPU for
+    /// good. The report itself arrives through <see cref="LogError"/>.
+    /// </summary>
+    [PlugMember]
+    internal static void Abort()
+    {
+        while (true)
+        {
+            Power.Halt();
+        }
+    }
+
+    /// <summary>
+    /// Where the runtime writes its own diagnostics, the <c>FailFast</c> report
+    /// among them. There is no stderr; the serial log is where they go.
+    /// </summary>
+    [PlugMember]
+    internal static unsafe void LogError(byte* buffer, int count)
+    {
+        Log.WriteString(Encoding.UTF8.GetString(buffer, count));
     }
 
     [PlugMember]
@@ -137,16 +167,16 @@ public static class InteropSysPlug
     [PlugMember]
     internal static void LowLevelMonitor_Acquire(IntPtr monitor)
     {
-        Serial.Write("[LowLevelMonitor] Acquire BEGIN\n");
+        Log.Write("[LowLevelMonitor] Acquire BEGIN\n");
         var gchandle = GCHandle<Monitor>.FromIntPtr(monitor);
         gchandle.Target.Acquire();
-        Serial.Write("[LowLevelMonitor] Acquire END\n");
+        Log.Write("[LowLevelMonitor] Acquire END\n");
     }
 
     [PlugMember]
     internal static void LowLevelMonitor_Release(IntPtr monitor)
     {
-        Serial.Write("[LowLevelMonitor] Release\n");
+        Log.Write("[LowLevelMonitor] Release\n");
         var gchandle = GCHandle<Monitor>.FromIntPtr(monitor);
         gchandle.Target.Release();
     }
@@ -154,18 +184,18 @@ public static class InteropSysPlug
     [PlugMember]
     internal static void LowLevelMonitor_Wait(IntPtr monitor)
     {
-        Serial.Write("[LowLevelMonitor] Wait BEGIN\n");
+        Log.Write("[LowLevelMonitor] Wait BEGIN\n");
         var gchandle = GCHandle<Monitor>.FromIntPtr(monitor);
         gchandle.Target.Wait();
-        Serial.Write("[LowLevelMonitor] Wait END\n");
+        Log.Write("[LowLevelMonitor] Wait END\n");
     }
 
     [PlugMember]
     internal static bool LowLevelMonitor_TimedWait(IntPtr monitor, int timeoutMilliseconds)
     {
-        Serial.Write("[LowLevelMonitor] LowLevelMonitor_TimedWait: BEGIN, timeout=");
-        Serial.Write(timeoutMilliseconds);
-        Serial.Write("ms\n");
+        Log.Write("[LowLevelMonitor] LowLevelMonitor_TimedWait: BEGIN, timeout=");
+        Log.WriteNumber(timeoutMilliseconds);
+        Log.Write("ms\n");
         var mon = GCHandle<Monitor>.FromIntPtr(monitor).Target;
 
         if (timeoutMilliseconds < 0)
@@ -182,7 +212,7 @@ public static class InteropSysPlug
     [PlugMember]
     internal static void LowLevelMonitor_Signal_Release(IntPtr monitor)
     {
-        Serial.Write("[LowLevelMonitor] Signal_Release\n");
+        Log.Write("[LowLevelMonitor] Signal_Release\n");
         var gchandle = GCHandle<Monitor>.FromIntPtr(monitor);
         gchandle.Target.Signal();
     }

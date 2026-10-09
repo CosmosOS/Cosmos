@@ -4,7 +4,7 @@
 // desktop .NET 10 produces; any deviation is a Cosmos bug.
 // -----------------------------------------------------------------------------
 
-using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -62,8 +62,8 @@ public class Kernel : Sys.Kernel
 
     protected override void BeforeRun()
     {
-        Serial.WriteString("[Math] BeforeRun() reached!\n");
-        Serial.WriteString("[Math] Starting System.Math tests...\n");
+        Log.WriteString("[Math] BeforeRun() reached!\n");
+        Log.WriteString("[Math] Starting System.Math tests...\n");
 
         TR.Start("Math Tests", expectedTests: 30);
 
@@ -119,7 +119,7 @@ public class Kernel : Sys.Kernel
 
         TR.Finish();
 
-        Serial.WriteString("\n[Tests Complete - System Halting]\n");
+        Log.WriteString("\n[Tests Complete - System Halting]\n");
     }
 
     protected override void Run()

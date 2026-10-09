@@ -8,9 +8,9 @@ namespace Cosmos.Kernel.Core.Bridge;
 /// threads. The architecture-specific context-switch assembly returns (via iretq
 /// on x64 / eret on ARM64) into <see cref="EntryPointStub"/>, which then calls
 /// the scheduler's managed entry implementation. Thread-start registration lives
-/// in <see cref="SchedulerManager.RegisterThreadStart"/>.
+/// in <see cref="SchedulerManager.InvokeCurrentThreadStart"/>.
 /// </summary>
-public static class ThreadNative
+internal static class ThreadNative
 {
     [UnmanagedCallersOnly]
     public static void EntryPointStub(IntPtr parameter)

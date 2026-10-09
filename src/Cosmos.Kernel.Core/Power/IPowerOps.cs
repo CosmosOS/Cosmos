@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.Power;
 /// Implementations route through firmware mechanisms (8042 / ACPI on x64,
 /// PSCI on ARM64) rather than per-CPU instructions.
 /// </summary>
-public interface IPowerOps
+internal interface IPowerOps
 {
     /// <summary>
     /// Restart the machine. Does not return on success.

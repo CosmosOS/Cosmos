@@ -1,5 +1,5 @@
-using Cosmos.Kernel.HAL.Vfs;
-using Cosmos.Kernel.System.Vfs;
+using System.Diagnostics.CodeAnalysis;
+using Cosmos.Kernel.System.FileSystem;
 
 namespace DevKernel.Shell;
 
@@ -30,7 +30,7 @@ internal static class VfsGuards
     }
 
     /// <summary>Opens the parent directory of <paramref name="fullPath"/> and yields its last component.</summary>
-    public static bool TryOpenParent(string fullPath, out IVfsDirectoryHandle? parentDir, out string leaf)
+    public static bool TryOpenParent(string fullPath, [NotNullWhen(true)] out IVfsDirectoryHandle? parentDir, out string leaf)
     {
         (string parent, string leafName) = VfsPath.Split(fullPath);
         leaf = leafName;
@@ -42,7 +42,7 @@ internal static class VfsGuards
             return false;
         }
 
-        if (!VfsManager.TryOpenDirectory(parent, out parentDir) || parentDir == null)
+        if (!VfsManager.TryOpenDirectory(parent, out parentDir))
         {
             Terminal.Error("Parent directory not found: " + parent);
             return false;

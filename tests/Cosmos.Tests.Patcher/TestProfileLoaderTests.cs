@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Cosmos.TestRunner.Engine;
+using Cosmos.Tools.Launcher;
 
 namespace Cosmos.Tests.Patcher;
 
@@ -61,7 +62,9 @@ public class TestProfileLoaderTests : IDisposable
           "nic": "virtio-net-pci",
           "keyboard": "virtio-keyboard-pci",
           "mouse": "virtio-mouse-pci",
-          "vga": "virtio"
+          "vga": "virtio",
+          "gpu": "virtio-gpu-pci",
+          "audio": "intel-hda"
         },
         {
           "name": "virtio-mmio",
@@ -69,7 +72,9 @@ public class TestProfileLoaderTests : IDisposable
           "nic": "virtio-net-device",
           "keyboard": "virtio-keyboard-device",
           "mouse": "virtio-mouse-device",
-          "vga": "virtio"
+          "vga": "virtio",
+          "gpu": "virtio-gpu-pci",
+          "audio": "ich9-intel-hda"
         },
         {
           "name": "plain"
@@ -102,11 +107,94 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Equal("virtio-keyboard-pci", profile.KeyboardDevice);
         Assert.Equal("virtio-mouse-pci", profile.MouseDevice);
         Assert.Equal("virtio", profile.VgaAdapter);
+        Assert.Equal("virtio-gpu-pci", profile.GpuDevice);
+        Assert.Equal("intel-hda", profile.AudioDevice);
+    }
+
+    // The two virtio-blk kinds a profile names reach the launcher as their
+    // DiskKind, in the order the profile lists them.
+    [Fact]
+    public void LoadFor_ReadsTheVirtioBlkDiskKinds()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            {
+              "name": "vb",
+              "architectures": ["arm64"],
+              "disks": [
+                { "type": "virtio-blk" },
+                { "type": "virtio-blk-mmio" }
+              ]
+            }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "vb");
+
+        TestProfile profile = Assert.Single(TestProfileLoader.LoadFor(_suiteDir, "arm64"));
+
+        Assert.Equal("vb", profile.Name);
+        Assert.Collection(profile.Disks,
+            disk => Assert.Equal(DiskKind.VirtioBlk, disk.Kind),
+            disk => Assert.Equal(DiskKind.VirtioBlkMmio, disk.Kind));
+    }
+
+    // The hotplug flag puts a virtio-blk disk behind a root port of its own;
+    // a disk without it stays on the root bus.
+    [Fact]
+    public void LoadFor_ReadsTheHotPlugFlagOffTheDisk()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            {
+              "name": "vb",
+              "disks": [
+                { "type": "virtio-blk", "hotplug": true },
+                { "type": "virtio-blk" }
+              ]
+            }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "vb");
+
+        TestProfile profile = Assert.Single(TestProfileLoader.LoadFor(_suiteDir, "x64"));
+
+        Assert.Collection(profile.Disks,
+            disk => Assert.True(disk.HotPlug),
+            disk => Assert.False(disk.HotPlug));
+    }
+
+    // Only a virtio-blk-pci function sits behind a root port in the launcher,
+    // so the flag on any other kind is a catalog error, not a silent no-op.
+    [Fact]
+    public void LoadFor_RejectsHotPlugOnANonVirtioBlkDisk()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            {
+              "name": "oops",
+              "disks": [
+                { "type": "nvme", "hotplug": true }
+              ]
+            }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "oops");
+
+        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
+            () => TestProfileLoader.LoadFor(_suiteDir, "x64"));
+
+        Assert.Contains("only a 'virtio-blk' disk", ex.Message);
     }
 
     // One suite, two architectures, one csproj: each arch keeps only the
     // profile describing hardware it can actually present. Uses the two
-    // arch-pinned profiles — virtio-pci deliberately spans both, so it would
+    // arch-pinned profiles: virtio-pci deliberately spans both, so it would
     // not exercise the filter.
     [Theory]
     [InlineData("x64", "e1000e", "e1000e")]
@@ -132,6 +220,8 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Null(profile.KeyboardDevice);
         Assert.Null(profile.MouseDevice);
         Assert.Null(profile.VgaAdapter);
+        Assert.Null(profile.GpuDevice);
+        Assert.Null(profile.AudioDevice);
     }
 
     // A modifier overlays machine/device options; everything it does not touch
@@ -149,6 +239,8 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Equal("virtio-keyboard-device", withModifier.KeyboardDevice);
         Assert.Equal("virtio-mouse-device", withModifier.MouseDevice);
         Assert.Equal("virtio", withModifier.VgaAdapter);
+        Assert.Equal("virtio-gpu-pci", withModifier.GpuDevice);
+        Assert.Equal("ich9-intel-hda", withModifier.AudioDevice);
         Assert.Equal("3", withModifier.MachineOptions["gic-version"]);
     }
 

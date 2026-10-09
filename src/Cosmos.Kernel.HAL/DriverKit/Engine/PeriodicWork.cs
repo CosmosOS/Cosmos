@@ -1,0 +1,45 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
+using Cosmos.Kernel.HAL.DriverKit.Threading;
+using Cosmos.Kernel.HAL.Timers;
+
+namespace Cosmos.Kernel.HAL.DriverKit.Engine;
+
+/// <summary>
+/// A work item the platform timer schedules at a fixed interval, set up by
+/// <see cref="DeviceBinding.TrySchedulePeriodic"/>. The software timer's
+/// callback runs in the timer interrupt and only queues the item, which is
+/// allocation-free; the item itself runs on the worker.
+/// </summary>
+internal sealed class PeriodicWork
+{
+    private const ulong NanosecondsPerMillisecond = 1_000_000;
+
+    private readonly TickSource _tickSource;
+    private readonly TimerEntry _entry;
+    private readonly WorkItem _item;
+
+    internal PeriodicWork(TickSource tickSource, WorkItem item, uint intervalMilliseconds)
+    {
+        _tickSource = tickSource;
+        _item = item;
+        _entry = new TimerEntry(Fire, intervalMilliseconds * NanosecondsPerMillisecond, recurring: true);
+    }
+
+    /// <summary>Registers the timer; the first firing is one interval away.</summary>
+    internal void Start()
+    {
+        _tickSource.RegisterTimer(_entry);
+    }
+
+    /// <summary>Unregisters the timer. Teardown only.</summary>
+    internal void Cancel()
+    {
+        _tickSource.UnregisterTimer(_entry);
+    }
+
+    private void Fire()
+    {
+        _item.Schedule();
+    }
+}

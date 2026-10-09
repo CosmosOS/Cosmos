@@ -19,7 +19,7 @@ namespace Cosmos.TestRunner.Engine;
 /// </summary>
 public sealed record TestProfile
 {
-    /// <summary>Display label used to prefix test names — base profile name, or "profile+modifier".</summary>
+    /// <summary>Display label used to prefix test names: base profile name, or "profile+modifier".</summary>
     public required string Name { get; init; }
 
     /// <summary>Disks to attach for this profile, with any modifier options already merged in.</summary>
@@ -41,10 +41,26 @@ public sealed record TestProfile
     /// <summary>
     /// VGA adapter to swap in for the architecture default, as a QEMU
     /// <c>-vga</c> backend name (e.g. <c>vmware</c>), or null to leave the
-    /// default in place. Replaces rather than adds — a second display adapter
+    /// default in place. Replaces rather than adds: a second display adapter
     /// would leave firmware free to pick either one as primary.
     /// </summary>
     public string? VgaAdapter { get; init; }
+
+    /// <summary>
+    /// Display adapter to attach as a <c>-device</c> line (e.g.
+    /// <c>virtio-gpu-pci</c>), or null for none. Additive, unlike
+    /// <see cref="VgaAdapter"/>: the machine's default adapter stays and keeps
+    /// providing the framebuffer the bootloader hands the kernel, so this cell
+    /// differs from the bare one only by the extra device on the PCI bus.
+    /// </summary>
+    public string? GpuDevice { get; init; }
+
+    /// <summary>
+    /// HD Audio controller to attach (e.g. <c>intel-hda</c>), with the codec
+    /// the launcher adds beside it, or null for none. The engine plays it
+    /// into QEMU's <c>none</c> backend: a CI runner has no audio server.
+    /// </summary>
+    public string? AudioDevice { get; init; }
 
     /// <summary>
     /// Architectures this profile applies to; null means any. Mirrors the
@@ -74,6 +90,13 @@ public sealed record TestProfileDisk
     public required DiskKind Kind { get; init; }
     public IReadOnlyDictionary<string, string> Options { get; init; } = new Dictionary<string, string>();
 
+    /// <summary>
+    /// The disk sits behind a PCI Express root port of its own and may be
+    /// pulled and replugged by the pci-unplug and pci-plug requests;
+    /// virtio-blk only.
+    /// </summary>
+    public bool HotPlug { get; init; }
+
     public string FormatOptions()
     {
         if (Options.Count == 0)
@@ -100,8 +123,8 @@ public sealed record TestProfileDisk
 /// <summary>
 /// A named overlay of QEMU options that compose with a profile to produce a
 /// variant. Two orthogonal axes:
-///   * <see cref="DeviceOptions"/> — per-disk-kind overrides (e.g. NVMe MSI-X).
-///   * <see cref="MachineOptions"/> — <c>-M</c> properties (e.g. GIC version).
+///   * <see cref="DeviceOptions"/>: per-disk-kind overrides (e.g. NVMe MSI-X).
+///   * <see cref="MachineOptions"/>: <c>-M</c> properties (e.g. GIC version).
 /// <see cref="Architectures"/> gates the modifier to one or more arches; null
 /// means any. A modifier is silently skipped for a profile when its arch
 /// doesn't match or when it has only device options none of which target a
@@ -122,7 +145,7 @@ internal sealed record TestModifier
             return false;
         }
 
-        // Machine-only modifier — applies regardless of disks.
+        // Machine-only modifier: applies regardless of disks.
         if (DeviceOptions.Count == 0)
         {
             return MachineOptions.Count > 0;
@@ -223,7 +246,7 @@ public static class TestProfileLoader
                     $"Known profiles: {string.Join(", ", catalog.Profiles.Keys)}.");
             }
 
-            // A profile pinned to another architecture drops out silently —
+            // A profile pinned to another architecture drops out silently:
             // that is how one suite declares per-arch hardware (virtio-mmio is
             // arm64-only) in a single csproj.
             if (!profile.AppliesTo(architecture))
@@ -267,14 +290,14 @@ public static class TestProfileLoader
         }
 
         // Build the cell list: for each profile, every conflict-free COMBINATION
-        // of its applicable modifiers (the matrix mix), so configs compose —
+        // of its applicable modifiers (the matrix mix), so configs compose:
         // e.g. nvme+gicv2+acpi-off, not just nvme+gicv2 and nvme+acpi-off as
         // separate cells. A combination is dropped when two of its modifiers
         // write the same -M / device-option key (e.g. gicv2 + gicv3 both set
         // gic-version), which would be a contradictory machine.
         //
         // Cell count is 2^(applicable modifiers) per profile minus conflicting
-        // subsets, so each added modifier roughly doubles a profile's cells —
+        // subsets, so each added modifier roughly doubles a profile's cells:
         // keep the catalog lean.
         var matrix = new List<TestProfile>();
         foreach (TestProfile profile in resolvedProfiles)
@@ -319,7 +342,7 @@ public static class TestProfileLoader
 
     /// <summary>
     /// True when two modifiers in <paramref name="combo"/> write the same
-    /// machine (<c>-M</c>) property or the same per-disk device option — a
+    /// machine (<c>-M</c>) property or the same per-disk device option: a
     /// contradictory cell (e.g. gicv2 and gicv3 both set gic-version). Such
     /// combinations are dropped from the matrix.
     /// </summary>
@@ -464,10 +487,18 @@ public static class TestProfileLoader
                 foreach (DiskEntry disk in entry.Disks)
                 {
                     DiskKind kind = ParseDiskKind(path, $"profile '{entry.Name}'", disk.Type);
+                    bool hotPlug = disk.HotPlug ?? false;
+                    if (hotPlug && kind != DiskKind.VirtioBlk)
+                    {
+                        throw new InvalidOperationException(
+                            $"{path}: profile '{entry.Name}' sets hotplug on a '{disk.Type}' disk; only a 'virtio-blk' disk can sit behind a PCI Express root port.");
+                    }
+
                     disks.Add(new TestProfileDisk
                     {
                         Kind = kind,
-                        Options = disk.Options ?? new Dictionary<string, string>()
+                        Options = disk.Options ?? new Dictionary<string, string>(),
+                        HotPlug = hotPlug
                     });
                 }
             }
@@ -480,6 +511,8 @@ public static class TestProfileLoader
                 KeyboardDevice = NullIfBlank(entry.Keyboard),
                 MouseDevice = NullIfBlank(entry.Mouse),
                 VgaAdapter = NullIfBlank(entry.Vga),
+                GpuDevice = NullIfBlank(entry.Gpu),
+                AudioDevice = NullIfBlank(entry.Audio),
                 Architectures = entry.Architectures
             };
 
@@ -491,7 +524,7 @@ public static class TestProfileLoader
             //
             // Scoped per architecture so ONE profile can span both: gic-version
             // is a virt property that q35 would reject, and without the scoping
-            // the same hardware shape needs two profile names — which shows up
+            // the same hardware shape needs two profile names, which shows up
             // as two half-empty rows in the results matrix.
             var perArch = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
             if (entry.MachineOptions != null)
@@ -569,8 +602,11 @@ public static class TestProfileLoader
         {
             "ahci" or "sata" => DiskKind.Ahci,
             "nvme" => DiskKind.Nvme,
+            "usb" => DiskKind.Usb,
+            "virtio-blk" => DiskKind.VirtioBlk,
+            "virtio-blk-mmio" => DiskKind.VirtioBlkMmio,
             _ => throw new InvalidOperationException(
-                $"{path}: {context} references unknown device kind '{type}'. Expected 'ahci' or 'nvme'.")
+                $"{path}: {context} references unknown device kind '{type}'. Expected 'ahci', 'nvme', 'usb', 'virtio-blk' or 'virtio-blk-mmio'.")
         };
     }
 
@@ -589,12 +625,14 @@ public static class TestProfileLoader
         string? Keyboard,
         string? Mouse,
         string? Vga,
+        string? Gpu,
+        string? Audio,
         List<string>? Architectures,
         // Keyed by architecture, unlike a modifier's flat map: a modifier is
         // already scoped by its own "architectures" list, while a profile
         // describes one hardware shape that may span several.
         Dictionary<string, Dictionary<string, string>>? MachineOptions);
-    private sealed record DiskEntry(string? Type, Dictionary<string, string>? Options);
+    private sealed record DiskEntry(string? Type, Dictionary<string, string>? Options, bool? HotPlug);
     private sealed record ModifierEntry(
         string? Name,
         List<string>? Architectures,

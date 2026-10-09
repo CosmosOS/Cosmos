@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.ARM64.Bridge;
 
-public static partial class ARM64MmioNative
+internal static partial class ARM64MmioNative
 {
     [LibraryImport("*", EntryPoint = "_native_arm64_mmio_read_byte")]
     [SuppressGCTransition]

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.ARM64.Bridge;
 
-public static partial class PsciNative
+internal static partial class PsciNative
 {
     [LibraryImport("*", EntryPoint = "_native_psci_system_off")]
     [SuppressGCTransition]

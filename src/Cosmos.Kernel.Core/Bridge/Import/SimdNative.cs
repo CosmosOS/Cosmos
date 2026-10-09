@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.Bridge;
 
-public static unsafe partial class SimdNative
+internal static unsafe partial class SimdNative
 {
     [LibraryImport("*", EntryPoint = "_simd_copy_16")]
     [SuppressGCTransition]

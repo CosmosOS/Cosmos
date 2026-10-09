@@ -1,0 +1,66 @@
+#nullable enable
+[COSMOS0001]const Cosmos.Kernel.Core.Scheduler.SchedulerManager.DefaultQuantumNs = 10000000 -> ulong
+[COSMOS0001]const Cosmos.Kernel.Core.Scheduler.SchedulerManager.NanosecondsPerMillisecond = 1000000 -> ulong
+[COSMOS0001]const Cosmos.Kernel.Core.Scheduler.SchedulerThread.DefaultStackSize = 262144 -> nuint
+[COSMOS0001]const Cosmos.Kernel.Core.Scheduler.SchedulerThread.MaxThreadCount = 256 -> int
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.InterruptMaskScope
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.InterruptMaskScope.Dispose() -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.InterruptMaskScope.InterruptMaskScope() -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.Balance(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, Cosmos.Kernel.Core.Scheduler.PerCpuState![]! allCpuStates) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.GetPriority(Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread) -> long
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.GetRunQueueCount(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState) -> int
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.GetRunQueueThread(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, int index) -> Cosmos.Kernel.Core.Scheduler.SchedulerThread?
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.InitializeCpu(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.Name.get -> string!
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.OnPickFailed(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.OnThreadBlocked(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.OnThreadCreate(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.OnThreadExit(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.OnThreadMigrate(Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread, Cosmos.Kernel.Core.Scheduler.PerCpuState! fromState, Cosmos.Kernel.Core.Scheduler.PerCpuState! toState) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.OnThreadReady(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.OnThreadYield(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.OnTick(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, Cosmos.Kernel.Core.Scheduler.SchedulerThread! current, ulong elapsedNs) -> bool
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.PickNext(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState) -> Cosmos.Kernel.Core.Scheduler.SchedulerThread?
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.SelectCpu(Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread, uint currentCpu, uint cpuCount) -> uint
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.SetPriority(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState, Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread, long priority) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.IScheduler.ShutdownCpu(Cosmos.Kernel.Core.Scheduler.PerCpuState! cpuState) -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.PerCpuState
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.PerCpuState.CpuId.get -> uint
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.PerCpuState.CurrentThread.get -> Cosmos.Kernel.Core.Scheduler.SchedulerThread?
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.PerCpuState.IdleThread.get -> Cosmos.Kernel.Core.Scheduler.SchedulerThread?
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerExtensible
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerExtensible.SchedulerData.get -> object?
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerExtensible.SchedulerData.set -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerExtensible.SchedulerExtensible() -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerManager
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.CpuId.get -> uint
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.Flags.get -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.Id.get -> uint
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.StackBase.get -> nuint
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.StackPointer.get -> nuint
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.StackSize.get -> nuint
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.State.get -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadState
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.TotalRuntime.get -> ulong
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.TotalRuntime.set -> void
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThread.WakeupTime.get -> ulong
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags.IdleThread = 2 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags.Managed = 8 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags.None = 0 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags.Pinned = 4 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadState
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Blocked = 3 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadState
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Created = 0 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadState
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Dead = 5 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadState
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Ready = 1 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadState
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Running = 2 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadState
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadState.Sleeping = 4 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadState
+[COSMOS0001]static Cosmos.Kernel.Core.Scheduler.SchedulerManager.Current.get -> Cosmos.Kernel.Core.Scheduler.IScheduler?
+[COSMOS0001]static Cosmos.Kernel.Core.Scheduler.SchedulerManager.GetCpuState(uint cpuId) -> Cosmos.Kernel.Core.Scheduler.PerCpuState?
+[COSMOS0001]static Cosmos.Kernel.Core.Scheduler.SchedulerManager.GetPriority(Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread) -> long
+[COSMOS0001]static Cosmos.Kernel.Core.Scheduler.SchedulerManager.IsReady.get -> bool
+[COSMOS0001]static Cosmos.Kernel.Core.Scheduler.SchedulerManager.MaskInterrupts() -> Cosmos.Kernel.Core.Scheduler.InterruptMaskScope
+[COSMOS0001]static Cosmos.Kernel.Core.Scheduler.SchedulerManager.SetPriority(uint cpuId, Cosmos.Kernel.Core.Scheduler.SchedulerThread! thread, long priority) -> void
+[COSMOS0001]static Cosmos.Kernel.Core.Scheduler.SchedulerManager.SetScheduler(Cosmos.Kernel.Core.Scheduler.IScheduler! scheduler) -> void

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Cosmos.Kernel.Core.Memory.Heap;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct LargeHeapHeader
+internal struct LargeHeapHeader
 {
     public ulong Used;
     public uint Size;

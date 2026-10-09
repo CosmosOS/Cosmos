@@ -3,6 +3,7 @@ name: Mirror to CosmosOS/Cosmos
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ]
   workflow_dispatch:
 
 concurrency:
@@ -31,7 +32,17 @@ jobs:
           printf '%s\n' "$MIRROR_DEPLOY_KEY" > ~/.ssh/mirror_key
           chmod 600 ~/.ssh/mirror_key
           ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
-          GIT_SSH_COMMAND="ssh -i ~/.ssh/mirror_key" \
-            git push --force git@github.com:CosmosOS/Cosmos.git \
-            HEAD:refs/heads/gen3 \
-            HEAD:refs/heads/gen3-dev
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/mirror_key"
+          remote=git@github.com:CosmosOS/Cosmos.git
+
+          # A release tag forwards on its own: the branch push that preceded it
+          # already carried the commit, and release.yml has to fire over there
+          # because the nuget.org Trusted Publishing policy only trusts
+          # CosmosOS/Cosmos. Tags are never force-pushed.
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            git push "$remote" "$GITHUB_REF:$GITHUB_REF"
+          else
+            git push --force "$remote" \
+              HEAD:refs/heads/gen3 \
+              HEAD:refs/heads/gen3-dev
+          fi

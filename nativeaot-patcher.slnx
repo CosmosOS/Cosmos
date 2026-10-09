@@ -8,6 +8,7 @@
         <Project Path="src/Cosmos.Kernel.Core.X64/Cosmos.Kernel.Core.X64.csproj" />
         <Project Path="src/Cosmos.Kernel.Core.ARM64/Cosmos.Kernel.Core.ARM64.csproj" />
         <Project Path="src/Cosmos.Kernel.Debug/Cosmos.Kernel.Debug.csproj" />
+        <Project Path="src/Cosmos.Kernel.Drivers/Cosmos.Kernel.Drivers.csproj" />
         <Project Path="src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
         <Project Path="src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj" />
         <Project Path="src/Cosmos.Kernel.HAL/Cosmos.Kernel.HAL.csproj" />
@@ -17,7 +18,6 @@
         <Project Path="src/Cosmos.Kernel.SourceGenerators/Cosmos.Kernel.SourceGenerators.csproj" />
         <Project Path="src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
         <Project Path="src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
-        <Project Path="src\Cosmos.Kernel.HAL.Interfaces\Cosmos.Kernel.HAL.Interfaces.csproj" />
     </Folder>
     <Folder Name="/src/Build/">
         <Project Path="src/Cosmos.Build.Analyzer.Patcher.CodeFixes/Cosmos.Build.Analyzer.Patcher.CodeFixes.csproj" />
@@ -33,5 +33,8 @@
         <Project Path="src/Cosmos.Tools/Cosmos.Tools.csproj" />
         <Project Path="src/Cosmos.Patcher/Cosmos.Patcher.csproj" />
         <Project Path="src/Cosmos.Sdk/Cosmos.Sdk.csproj" />
+    </Folder>
+    <Folder Name="/tests/">
+        <Project Path="tests/Cosmos.Kernel.Tests.System/Cosmos.Kernel.Tests.System.csproj" />
     </Folder>
 </Solution>

@@ -76,14 +76,19 @@ public class BuildFixture
     /// <summary>
     /// Run dotnet publish on the DevKernel project.
     /// </summary>
-    public BuildResult Build()
+    /// <param name="extraArguments">
+    /// Further command line arguments, such as a <c>-p:</c> property override,
+    /// appended after the standard ones.
+    /// </param>
+    public BuildResult Build(params string[] extraArguments)
     {
+        string extra = extraArguments.Length == 0 ? string.Empty : " " + string.Join(" ", extraArguments);
         ProcessStartInfo psi = new()
         {
             FileName = "dotnet",
             Arguments = $"publish -c Debug -r {Rid} " +
                         $"-p:DefineConstants=\"{Define}\" -p:CosmosArch={Arch} " +
-                        $"\"{DevKernelCsproj}\" -o \"{OutputDir}\"",
+                        $"\"{DevKernelCsproj}\" -o \"{OutputDir}\"{extra}",
             WorkingDirectory = RootDir,
             UseShellExecute = false,
             RedirectStandardOutput = true,
@@ -154,7 +159,7 @@ public class BuildFixture
         }
 
         throw new InvalidOperationException(
-            "Could not find repo root. Run tests from within the nativeaot-patcher repository.");
+            "Could not find repo root. Run tests from within the Cosmos repository.");
     }
 
     private sealed class FileRestorer : IDisposable

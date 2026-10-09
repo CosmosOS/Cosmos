@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.Memory;
 /// <summary>
 /// MemoryBlock class. Used to read and write to memory blocks.
 /// </summary>
-public class MemoryBlock
+internal class MemoryBlock
 {
     /// <summary>
     /// Memory block base address.
@@ -31,6 +31,13 @@ public class MemoryBlock
     public readonly MemoryBlock32 DWords;
 
     /// <summary>
+    /// The block as bytes, at most <see cref="int.MaxValue"/> of them: how the
+    /// layers above Core, which compile without unsafe code, read and write
+    /// it. Allocation-free.
+    /// </summary>
+    public unsafe Span<byte> Span => new((void*)Base, (int)Math.Min(Size, int.MaxValue));
+
+    /// <summary>
     /// Create new instance of the <see cref="MemoryBlock"/> class.
     /// </summary>
     /// <param name="aBase">A base.</param>
@@ -42,6 +49,16 @@ public class MemoryBlock
         Bytes = new MemoryBlock08(aBase, aByteSize);
         Words = new MemoryBlock16(aBase, aByteSize);
         DWords = new MemoryBlock32(aBase, aByteSize);
+    }
+
+    /// <summary>
+    /// The block as values of <typeparamref name="T"/>, as many as fit, at
+    /// most <see cref="int.MaxValue"/>. Allocation-free.
+    /// </summary>
+    /// <typeparam name="T">The element type, an unmanaged struct such as a descriptor.</typeparam>
+    public unsafe Span<T> AsSpan<T>() where T : unmanaged
+    {
+        return new Span<T>((void*)Base, (int)Math.Min(Size / (uint)sizeof(T), int.MaxValue));
     }
 
     //TODO: Fill all these methods with fast ASM
@@ -253,20 +270,6 @@ public class MemoryBlock
     }
 
     /// <summary>
-    /// Copy ManagedMemoryBlock into MemoryBlock.
-    /// Non-temporal: a MemoryBlock is MMIO (e.g. the linear framebuffer) that is
-    /// written whole and never read back, so the copy must not go through the cache.
-    /// </summary>
-    /// <param name="block">ManagedMemoryBlock to copy.</param>
-    public unsafe void Copy(ManagedMemoryBlock block)
-    {
-        fixed (byte* src = block.Span)
-        {
-            MemoryOp.MemCopyNonTemporal((byte*)Base, src, (int)block.Size);
-        }
-    }
-
-    /// <summary>
     /// Copies data from the memory block to the specified array.
     /// </summary>
     /// <param name="aByteOffset">The byte offset in the memory block from which to start copying.</param>
@@ -466,7 +469,7 @@ public class MemoryBlock
 /// <summary>
 /// MemoryBlock08 class.
 /// </summary>
-public class MemoryBlock08
+internal class MemoryBlock08
 {
     /// <summary>
     /// Base.
@@ -518,7 +521,7 @@ public class MemoryBlock08
 /// <summary>
 /// MemoryBlock16 class.
 /// </summary>
-public class MemoryBlock16
+internal class MemoryBlock16
 {
     /// <summary>
     /// Base.
@@ -571,7 +574,7 @@ public class MemoryBlock16
 /// <summary>
 /// MemoryBlock32 class.
 /// </summary>
-public class MemoryBlock32
+internal class MemoryBlock32
 {
     /// <summary>
     /// Base.

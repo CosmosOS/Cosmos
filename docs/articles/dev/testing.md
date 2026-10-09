@@ -1,17 +1,18 @@
 # Testing
 
-NativeAOT-Patcher has two complementary testing layers: **unit tests** that validate the build-time toolchain (patcher, scanner, analyzer) and **kernel integration tests** that run compiled kernel images inside QEMU and report results over a binary UART protocol.
+NativeAOT-Patcher has two complementary testing layers: **unit tests** that run in the host process, for the build-time toolchain (patcher, scanner, analyzer) and for kernel library logic that needs no hardware, and **kernel integration tests** that run compiled kernel images inside QEMU and report results over a binary UART protocol.
 
 ---
 
 ## Unit Tests
 
-Unit tests live in `tests/Cosmos.Tests.*` projects and are run with the standard .NET test runner. They do not require QEMU or any special infrastructure.
+Unit tests live in the `tests/Cosmos.Tests.*` projects (xunit) and in `tests/Cosmos.Kernel.Tests.System` (NUnit), and are run with the standard .NET test runner. They do not require QEMU or any special infrastructure. CI runs each of them as its own job of the `.NET Tests` workflow (`.github/workflows/dotnet.yml`) on every push and pull request.
 
 ### Running Unit Tests
 
 ```bash
-dotnet test
+dotnet test tests/Cosmos.Tests.Patcher            # one toolchain project
+dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
 ```
 
 ### Test Projects
@@ -31,6 +32,7 @@ dotnet test
   - `LoadPlugs_ShouldIgnoreClassesWithoutPlugAttribute`
   - `LoadPlugs_ShouldHandleOptionalPlugs`
   - `FindPluggedAssemblies_ShouldReturnMatchingAssemblies`
+- **Cosmos.Tests.SourceGenerators**: Runs `CosmosEntryPointGenerator` and `DriverManifestGenerator` on in-memory compilations and checks the generated entry point, the driver manifest and the `COSMOSGEN` diagnostics exactly; `FeatureParityTests` keeps `DriverFeature`, `KernelFeatures` and the test stubs in step, `ReferencedDriverTests` covers drivers from referenced assemblies, public and under an `InternalsVisibleTo` grant, and `CachingTests` checks that adding a driver leaves the entry point cached.
 - **Cosmos.Tests.Patcher**: Ensures that plugs are applied successfully to target methods and types.
   - `PatchAssembly_ShouldSkipWhenNoMatchingPlugs`
   - `PatchObjectWithAThis_ShouldPlugInstanceCorrectly`
@@ -39,6 +41,28 @@ dotnet test
   - `PatchType_ShouldReplaceAllMethodsCorrectly`
   - `PatchType_ShouldPlugAssembly`
   - `AddMethod_BehaviorBeforeAndAfterPlug`
+- **Cosmos.Kernel.Tests.System**: Exercises `Cosmos.Kernel.System` logic that needs no hardware, in the host process (`TcpConnection` receive buffer, `Address` identity and formatting, the WAV reading of `WaveHeader`, `MemoryAudioStream` and `WaveAudioStream`, the last one over an in-memory `IVfsFileHandle`, and the square wave `ToneAudioStream` generates for `Console.Beep`). One nested fixture per member under test, holding an `InternalsVisibleTo` grant from the library.
+  - `AppendToData.WhenBothData_AndOtherAreEmpty_DataIsEmpty`
+  - `AppendToData.WhenDataIsNotEmpty_AndOtherIsEmpty_DataDoesNotChange`
+  - `AppendToData.WhenDataIsNotEmpty_AndOtherIsNotEmpty_OtherIsAppendedToData`
+  - `AppendToData.WhenPartOfDataWasRead_AndOtherIsAppended_TheUnreadDataIsKept`
+  - `AppendToData.WhenPartOfDataWasRead_AndOtherOutgrowsTheBuffer_TheUnreadDataIsKept`
+  - `AppendToData.WhenAllDataWasRead_AndOtherIsAppended_OnlyOtherIsKept`
+  - `AdvanceDataOffset.WhenAdvancingByZero_NoChangesAreMade`
+  - `AdvanceDataOffset.WhenAdvancingByOneAndLengthIsTwo_OnlyLastElementRemains`
+  - `AdvanceDataOffset.WhenAdvancingByTwoAndLengthIsTwo_DataLengthIsZero`
+  - `Constructors.GivenPackedValue_SplitsItMostSignificantOctetFirst`
+  - `Constructors.GivenBufferAndOffset_ReadsFourBytesFromTheOffset`
+  - `Constructors.GivenSpanOfWrongLength_Throws`
+  - `Id.GivenOctets_PacksThemMostSignificantFirst`
+  - `Equality.GivenTheSameOctets_TwoInstancesAreEqualAndHashAlike`
+  - `Equality.GivenDifferentOctets_TwoInstancesAreNotEqual`
+  - `Equality.GivenNull_IsNotEqual`
+  - `CompareTo.GivenTwoAddresses_OrdersByPackedValue`
+  - `CompareTo.GivenNull_OrdersAfterIt`
+  - `Formatting.GivenAddress_WritesDottedDecimal`
+  - `IsBroadcastAddress.GivenAllOnes_IsTrue`
+  - `IsBroadcastAddress.GivenAnyOtherAddress_IsFalse`
 - **Cosmos.Tests.NativeWrapper**: Contains runtime assets; no unit tests.
 - **Cosmos.Tests.NativeLibrary**: Provides native code used in tests; no unit tests.
 
@@ -54,6 +78,13 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 |-------|-------|-------------|
 | **HelloWorld** | 3 | Basic arithmetic, boolean logic, integer comparison |
 | **Memory** | 85 | Boxing/unboxing, memory allocation, collections, memory copy, GC |
+| **Drivers** | 60 per cell | Driver kit over the synthetic bus: manifest, arbitration, publish, interrupts, deferred work, teardown, children, a display reaching the display manager, a block device reaching the storage manager; on x64, the PCI host and the E1000E driver on q35's default NIC; on the usb-kbd cell, the xHCI driver and the USB keyboard driver on a usb-kbd plugged in at boot, declined first by the suite's own driver, then unplugged and replugged; on the usb-mouse cell, the USB mouse driver on a usb-mouse plugged in at boot, with pointer events injected over QMP; on x64, the 8042 driver and the PS/2 keyboard and mouse drivers on q35's built-in controller, with a key and pointer events injected over QMP; on the virtio-blk-pci and virtio-blk-mmio cells, the virtio-blk driver on the cell's disk; on virtio-blk-pci, the PCI Express root port driver on the port the disk sits behind, with the disk pulled out and plugged back in |
+| **Pci** | 8 | The driver kit's PCI host node, its configuration mechanism and the function nodes it publishes, read through `DriverDiagnostics`, the host's `PciHostAccess` and the nodes' `PciAccess`, checked against a raw scan of the host's buses |
+| **Virtio** | 14 per cell | The virtio drivers over the driver kit on both transports and with ACPI off: the net, input and block nodes bound, the interface consumed with its link, MAC and interrupt mode per cell, the disk registered, and the PCI function or the MMIO slot bound by its transport driver |
+| **Graphic** | 25 | The 2D canvas, fonts and images on every cell; the display manager and the primary display per cell; the virtio-gpu display driver on the virtio-gpu cells; the VMware SVGA II adapter through its facets and its SVGA3D FIFO wire tests on vmware-svga |
+| **Audio** | 22 per cell | The audio stack on two cells, `bare` and `hda`: the Intel HD Audio driver bound to QEMU's `intel-hda`, the output it publishes and the audio manager listing it, the format contract, the stream engine draining the ring and its completion interrupt where the line connects, and the player and background playback running a stream to completion, stopping one early and playing a WAV file from memory, and `Console.Beep` playing its tone through the output and returning at once when the output is busy; on bare, a manager with no output that refuses to play and a `Console.Beep` that returns at once; on both, `Console.Beep` refusing the arguments Windows refuses |
+| **Storage** | 83 per cell | The storage manager and the block devices behind it on five profiles, `ahci`, `nvme`, `usb`, `virtio-blk-pci` and `virtio-blk-mmio` (arm64), each combined with the `acpi-off` modifier on x64 (8 cells) and with `gicv2`, `gicv3` and `acpi-off` on arm64 (30 cells): the disk the kit's `AhciDriver`, `NvmeDriver`, `UsbMassStorageDriver` or `VirtioBlkDriver` published, under the same block I/O, partition table, partition lifecycle and reboot assertions; the kit's view of the disk in `DriverDiagnostics` on every cell; the NVMe interrupt mode per cell; USB hot-plug on the usb cells and PCI Express hot-plug on the virtio-blk-pci cells |
+| **Random** | 16 | The kernel CSPRNG: BLAKE2s and ChaCha20 known-answer tests, fast key erasure, the RDSEED/RDRAND and RNDRRS/RNDR detection, seeding, and `RandomNumberGenerator`, `GetInt32` and `Guid.NewGuid` on top, across a reseed and from two threads |
 
 #### HelloWorld Tests
 
@@ -108,6 +139,107 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 - `GC_DictSurvival`, `GC_PageAccounting`, `GC_DependentHandle`
 - `GC_DependentHandleCleanup`, `GC_HandleStoreIntegrity`, `GC_PinnedHeapReuse`
 
+#### Drivers Tests
+
+The suite is two projects. `tests/Kernels/Cosmos.Kernel.Tests.Drivers` is the kernel: the harness (`Kernel.cs` and its two consumers, `TestKeyboardConsumer` and `TestPointerConsumer`) with an `InternalsVisibleTo` grant from `Cosmos.Kernel.HAL`, which it spends on its consumers and, in the hardware groups, on reaching the shipped drivers' states through `DriverEngine.Nodes`: `TestKeyboardConsumer` derives from the internal `KeyboardConsumer` and `TestPointerConsumer` from the internal `PointerConsumer`, and both are installed through the internal `DeviceRegistry.SetConsumer` in `BeforeRun`, replacing the ring's own keyboard and pointer consumers for the run, which is the one-consumer-per-kind rule at work. `tests/Kernels/Cosmos.Kernel.Tests.Drivers.Library` holds every `[Driver]` class the suite drives and the state and identity types they need: a driver assembly (`<CosmosDriverAssembly>true</CosmosDriverAssembly>`, listed in `CosmosDriverAssemblyNames`) with no grant from any project, written over the public seam only, so its compiling is the proof that a third party can write each of those drivers. The kernel references the library, runs on four cells on x64 and five on arm64: `bare`, `usb-kbd` (a qemu-xhci controller with a usb-kbd plugged in at boot), `usb-mouse` (the same controller with a usb-mouse), `virtio-blk-pci` (a virtio-blk disk behind a PCI Express root port) and, on arm64, `virtio-blk-mmio` (the same disk in the virt machine's window); it drives the library's drivers through the synthetic bus with no hardware behind any node and the shipped drivers on what each cell carries (the Hardware, USB keyboard, USB mouse, PS/2, virtio-blk and PCI Express root port groups below), and waits for the kit through `SyntheticBus.WaitForQueuedJobs`. It builds with `CosmosEnableFat` off and with one `CosmosDriverExclude` and one `CosmosDriverInclude` item naming the library's types, so the manifest policy is under test too. Every assertion reads `DriverDiagnostics` or the suite's own drivers and consumer, never the serial log.
+
+Manifest order for the library's drivers follows the referenced-assembly rule: the generator sorts them by assembly name and then by full type name, both ordinal, after the kernel's own drivers. `Manifest_Order_ReferencedByTypeName` asserts that `TieFirstDriver` precedes `TieSecondDriver` on that rule alone (`F` sorts before `S`); where the two are declared plays no part. `Interrupt_WorkItemDeferredToWorker` proves deferral without asking the engine where it ran: the handler notes the work item's run count as it returns, with interrupts still disabled, so an unchanged count means the item did not run inside `RaiseInterrupt`, and the run seen after `WaitForQueuedJobs` is the worker's.
+
+**Manifest (6 tests):**
+- `Manifest_HighPriorityDriver_Present`, `Manifest_FatFeatureDriver_Absent`, `Manifest_ExcludedDriver_Absent`
+- `Manifest_OptInDriver_Present`, `Manifest_OptOutDriver_Absent`, `Manifest_Order_ReferencedByTypeName`
+
+**Engine (2 tests):**
+- `Engine_Started_WithWorker`, `BootPath_NodeFromConstructor_Bound`
+
+**Arbitration (5 tests):**
+- `Arbitration_ByPriority`, `Arbitration_BySpecificity`, `Arbitration_TieByManifestOrder`
+- `Decline_UnwindsResources`, `ThrowingProbe_RecordedAsFailed`
+
+**Keyboard device (7 tests):**
+- `Publish_ReachesConsumer`, `WindowAndDma_Contents`
+- `Interrupt_HandlerReadsWindow_ReportsKey`, `Interrupt_WorkItemDeferredToWorker`, `Interrupt_MaskUnmask`
+- `Periodic_FiresAtLeastThreeTimes`, `BlockingHandler_FaultRecorded`
+
+**Display (1 test):**
+- `Publish_Display_ReachesDisplayManager`: the library's `DisplayDriver` publishes a `DisplayState`, a display in one fixed 64x32 mode with no framebuffer; `DisplayManager.Count` grows by one, the display is found by its node path in `DriverDiagnostics` with `IsConsumed`, reports the driver's mode, is the primary (a driver display beats the firmware one) and yields the state as a facet but no `IDisplayModes`; after the retraction it has left the manager and the published list, has no facet, and the primary is the firmware display again, or none
+
+**Block device (1 test):**
+- `Publish_Block_ReachesStorageManager`: the library's `BlockDriver` publishes a `BlockState`, a blank 64-block disk named `synthetic-block` over a byte array; `StorageManager.DeviceCount` grows by one, `Devices` holds the state, `GetPartitions` finds nothing on it, it is the primary when nothing else was registered, and `DriverDiagnostics` lists it under its node as a consumed, not withdrawn block device named by the driver; after the retraction the count, the list and the primary are what they were, the published entry is gone, and the driver recorded one probe and one detach. The UART carries `[StorageManager] synthetic-block registered by BlockDriver (primary)` and `[StorageManager] synthetic-block unregistered (no primary)`, read from the log, not asserted
+
+**Retract (3 tests):**
+- `Retract_DetachOrderAndAccounting`, `Retract_DriverThreadExited`, `Retract_SinkReportDiscarded`
+
+**Children (3 tests):**
+- `Children_PublishedFromProbe`, `UnmatchedNode_UnboundWithNoOffers`, `Children_RetractedWithParent`
+
+**Diagnostics (1 test):**
+- `DriverDiagnostics_OutOfRange_ReturnsFalse`
+
+**Hardware (5 tests):**
+- `Hardware_PciHost_Bound`, `Hardware_E1000E_NodeBound`, `Hardware_E1000E_DeviceConsumed`
+- `Hardware_E1000E_LinkUp`, `Hardware_E1000E_Transmit`
+
+The hardware group runs the shipped drivers on real (emulated) hardware without a profile of its own: QEMU's q35 adds a default e1000e whenever a cell passes no `-netdev`, so the suite's bare x64 cell already carries the controller, while virt's default NIC is a virtio-net-pci function that the kit's `VirtioNetDriver` binds, so the four E1000E tests skip on arm64 with `no e1000e on this machine`. Their gate is a `DriverDiagnostics` node with `BusName` `pci` whose `Description` starts with `8086:10d3`. `Hardware_PciHost_Bound` is unconditional: a `platform` node whose description contains `pci-host-` is `Bound` by `PciHostDriver`. `Hardware_E1000E_NodeBound` reads that the function is `Bound` by `E1000EDriver` with one published device and at least seven held resources (the register window, the four DMA buffers, the drain work item and its periodic registration, plus the interrupt handle when the line connected); `Hardware_E1000E_DeviceConsumed` finds a published device of kind `Network` at that node path with `IsConsumed` true and a non-zero `NetworkManager.MacAddress`; `Hardware_E1000E_LinkUp` polls `NetworkManager.LinkUp` for up to 2 s; and `Hardware_E1000E_Transmit` spends the kernel's HAL grant on reaching the node's `E1000EState` through `DriverEngine.Nodes`, sends a 60-byte broadcast frame through `NetworkManager.Send` and asserts `FramesTransmitted` grew.
+
+**USB keyboard (6 tests):**
+- `Usb_XhciHost_Bound`, `Usb_Keyboard_BoundAfterDecline`, `Usb_Keyboard_SetLedsRoundTrip`
+- `Usb_Keyboard_Unplug_RetractsNode`, `Usb_Keyboard_Replug_PublishesAgain`, `Usb_Keyboard_Replug_SetLeds`
+
+They run on the usb-kbd cell and skip on the others with `no xHCI controller on this cell`, except on usb-mouse, where `Usb_XhciHost_Bound` runs and the keyboard tests skip with `no USB keyboard on this cell`. The gate is a `DriverDiagnostics` node with `BusName` `pci` whose `Description` contains `class 0c.03.30`, the xHCI function, and for the keyboard tests a `usb` node whose `Description` ends with `class 03.01.01`, the HID boot keyboard interface, found in `BeforeRun`, which sees every device present at boot since the xHCI probe scans the root ports at the driver stage; the keyboard is that node, the HID boot keyboard interface, `usb:1-5:0` at boot (QEMU's xHCI numbers its USB 3 ports 1 to 4 and its USB 2 ports 5 to 8). `Usb_XhciHost_Bound` reads that the function is `Bound` by `XhciDriver` with a child and a held resource, and through the HAL grant that its `XhciState` runs the hot-plug thread, has an interrupt or polls, and has one device on a bus of ordinal 1. `Usb_Keyboard_BoundAfterDecline` is the decline-after-open proof: the library's `UsbDeclineDriver` matches the same interface triplet at priority 1, opens the keyboard's interrupt pipe in its probe and declines with `declined after opening a pipe`, so the node's first offer is declined with `ReleasedResourceCount` 1, the pipe the kit closed, and the second is the shipped `UsbKeyboardDriver`, bound with one published device, the keyboard `usb-keyboard` consumed by the ring's manager. `Usb_Keyboard_SetLedsRoundTrip` calls `SetLeds` on the `UsbKeyboardState` and reads `LastLedReport` 0x03 and `LastLedStatus` `Success` back. `Usb_Keyboard_Unplug_RetractsNode` asks the engine for `usb-kbd-unplug` and waits, in 50 ms polls for up to 8 s, for the node to leave the tree and the bus to release its device: the node is `Retracted`, its binding `IsDetaching`, the published device gone, the node count, the device count and the host's `ChildCount` down by one, the suite's consumer's `WithdrawnCount` up by one and the host's `PipesClosed` at least one. `Usb_Keyboard_Replug_PublishesAgain` asks for `usb-kbd-plug` and waits for a new, bound keyboard node (`usb:1-6:0`, the next free port, logged `[DriversTests] replugged keyboard at usb:1-6:0`), declined by `UsbDeclineDriver` again and published to the suite's consumer this time; `Usb_Keyboard_Replug_SetLeds` writes an LED report through the fresh state. The engine's `[Monitor] usb-kbd-unplug: done` and `[Monitor] usb-kbd-plug: done` and the kit's `withdrew keyboard`, `retracted` and `usb 1-5: disconnected` lines are read from the UART, not asserted; the counts per cell are under the PCI Express root port group below.
+
+**USB mouse (4 tests):**
+- `Usb_Mouse_Bound`, `Usb_Mouse_MovementInjected`, `Usb_Mouse_ButtonInjected`, `Usb_Mouse_WheelInjected`
+
+They run on the usb-mouse cell and skip with `no xHCI controller on this cell` on the cells without a controller and with `no USB mouse on this cell` on usb-kbd. The gate is a `usb` node whose `Description` ends with `class 03.01.02`, the HID boot mouse interface, `usb:1-5:0`, found in `BeforeRun` as the keyboard's is. `Usb_Mouse_Bound` reads that it is `Bound` by the shipped `UsbMouseDriver` on the first offer, under the controller's node, with no resources, no interrupts and one published device, the pointer `usb-mouse` consumed by the ring's mouse manager. The other three ask the engine for the PS/2 group's pointer events, which QEMU hands to its usb-mouse rather than q35's PS/2 mouse once the driver's pipe has polled it: `Usb_Mouse_MovementInjected` asks for `mouse-move 10 0` and waits, in 50 ms polls for up to 8 s, for the suite's pointer consumer to total 10 by 0 from `usb-mouse`, with no button and no wheel, and reads from the `UsbMouseState` through the HAL grant a forwarded report, no short report and a last report of 4 bytes, the boot part and QEMU's wheel byte; `Usb_Mouse_ButtonInjected` asks for `mouse-button left down` and `up` and reads the left button from `usb-mouse`, then none; `Usb_Mouse_WheelInjected` asks for `mouse-button wheel-down down` and `up` and reads a wheel total of +1, the ring's scroll down, which pins the driver's negation of the HID wheel.
+
+**PS/2 (7 tests):**
+- `Ps2_Controller_Bound`, `Ps2_Keyboard_Bound`, `Ps2_Keyboard_KeyInjected`, `Ps2_Keyboard_SetLedsRoundTrip`
+- `Ps2_Mouse_Bound`, `Ps2_Mouse_MovementInjected`, `Ps2_Mouse_ButtonInjected`
+
+They run on every x64 cell and skip on arm64 with `no 8042 on this cell`; `Ps2_Keyboard_KeyInjected` also skips on usb-kbd with `a usb-kbd on this cell takes the host's keys`, since QEMU hands `send-key` to a USB keyboard when one is present, and `Ps2_Mouse_MovementInjected` and `Ps2_Mouse_ButtonInjected` skip on usb-mouse with `a usb-mouse on this cell takes the host's pointer events`, since QEMU hands pointer events to a USB mouse once it is polled. The gate is a `DriverDiagnostics` node with `BusName` `platform` whose `Description` contains `pnp0303`. `Ps2_Controller_Bound` reads that `platform:i8042@60` is `Bound` by `I8042Driver` with two resources, two interrupts, two children and four held resources, and through the HAL grant that its `I8042State` is dual channel and interrupt driven. `Ps2_Keyboard_Bound` and `Ps2_Mouse_Bound` read the `ps2:kbd` and `ps2:aux` nodes under it, bound by `Ps2KeyboardDriver` and `Ps2MouseDriver` with `ps2-keyboard` and `ps2-mouse` published and consumed, an MF2 keyboard and a wheel mouse. `Ps2_Keyboard_KeyInjected` asks the engine for `key-press a` and waits, in 50 ms polls for up to 8 s, for two reports in the suite's consumer: make 0x1E then its release, from the PS/2 keyboard. `Ps2_Keyboard_SetLedsRoundTrip` calls `SetLeds` on the `Ps2KeyboardState` and reads back the 0xED byte 0x06, acknowledged. `Ps2_Mouse_MovementInjected` asks for `mouse-move 10 0` and reads one relative report of 10 by 0 from `ps2-mouse` in the suite's pointer consumer; `Ps2_Mouse_ButtonInjected` asks for `mouse-button left down` and `up` and reads the left button in the buttons, then none. The engine's `[Monitor] key-press a: done`, `[Monitor] mouse-move 10 0: done`, `[Monitor] mouse-button left down: done` and `[Monitor] mouse-button left up: done` are read from its output, not asserted.
+
+**virtio-blk (6 tests):**
+- `VirtioBlk_Bound`, `VirtioBlk_TransportMatchesCell`, `VirtioBlk_CapacityMatchesImage`
+- `VirtioBlk_ReadWriteRoundTrip`, `VirtioBlk_FlushCompletes`, `VirtioBlk_InterruptOrPolled`
+
+They run on the virtio-blk-pci and virtio-blk-mmio cells. The group skips on bare, usb-kbd and usb-mouse with `no virtio-blk device on this cell`; the driver under test is the shipped `VirtioBlkDriver`, which this suite's library held first. The gate is a `DriverDiagnostics` node with `BusName` `virtio` whose `Description` starts with `type 2 `, and every body reads the node's `VirtioBlkState` through the HAL grant. `VirtioBlk_Bound` reads that the node is `Bound` by `VirtioBlkDriver` with one published device, consumed, not withdrawn and named after the state, which is `vblk0`, index 0, in `StorageManager.Devices`. `VirtioBlk_TransportMatchesCell` reads that the path starts with `virtio:pci:` when a virtio-blk function (`1af4:1001` or `1af4:1042`) is on the PCI bus and with `virtio:mmio:` otherwise, and that the parent is `Bound` by `VirtioPciTransportDriver` or `VirtioMmioTransportDriver` with one child. `VirtioBlk_CapacityMatchesImage` reads 524288 blocks of 512 bytes, the engine's 256 MiB image, writable, with at least one block per request. `VirtioBlk_ReadWriteRoundTrip` saves one block at LBA 200000 and the 130 blocks after it, writes a pattern over each, reads both back equal, then writes the saved contents back and reads them back equal; 130 blocks are 66560 bytes, more than the 65536 one request moves, so the chunking runs. `VirtioBlk_FlushCompletes` flushes and reads one more completed request when FLUSH was negotiated and none otherwise. `VirtioBlk_InterruptOrPolled` reads that the disk takes its completions from the queue interrupt or polls, never both or neither, and that the round trip raised the interrupt when one is connected; the mode is not pinned, since these cells carry no GIC modifier (the x64 disk and the arm64 MMIO disk interrupt, the arm64 PCI disk polls on the default GICv2). On arm64 the engine attaches the boot ISO through a virtio-scsi controller rather than `-cdrom`, which the virt machine turns into a virtio-blk function of its own, so the only virtio-blk device on a cell is the disk its profile attaches.
+
+**PCI Express root port (3 tests):**
+- `Pci_RootPort_Bound`, `Pci_HotPlug_Unplug_RetractsNode`, `Pci_HotPlug_Replug_PublishesAgain`
+
+They run on the virtio-blk-pci cell, whose disk the engine puts behind a `pcie-root-port` of its own, and skip elsewhere with `no PCI Express root port on this cell`. The gate is a `pci` node whose `Description` starts with `1b36:000c`, QEMU's generic root port, and every body reads its `PcieRootPortState` through the HAL grant. `Pci_RootPort_Bound` reads that the port is `Bound` by `PcieRootPortDriver` with one child; that the slot is present and powered on, its thread running, its events taken from a message interrupt or a poll, never both or neither, behind a secondary bus; that the child is `Bound` by `VirtioPciTransportDriver` with the virtio node beneath it; that the child's memory resources lie inside the port's memory or prefetchable window, decoded from the port's own registers; and that the port's resource 0 is a memory window, the BAR0 holding its MSI-X table, and its resources 1 to 5 are `None`. `Pci_HotPlug_Unplug_RetractsNode` asks the engine for `pci-unplug 0` and waits, in 50 ms polls for up to 8 s, for the function node to leave the tree and the port to have handled the attention button: no child, one more removal, the slot empty and powered off. The function node is then `Retracted`, the node count down by two (the function and the virtio node beneath it), the published devices and the storage manager's disks down by one, and the port still `Bound` with one child less. `Pci_HotPlug_Replug_PublishesAgain` asks for `pci-plug 0` and waits for a function node at the same path, a new object, `Bound` by `VirtioPciTransportDriver` with its virtio node `Bound` by `VirtioBlkDriver`, the disk registered, one more arrival and the slot powered on; the node count is then back up by two, the slot present, the new function's memory resources inside the port's windows, which the kit placed since QEMU leaves a hot-added function's registers unassigned, and `vblk0` published and consumed. The port's `slot 1: attention button, 1 functions retracted, slot powered off` and `slot 1: device arrived, 1 functions published` and the engine's `[Monitor] pci-unplug 0: done` and `[Monitor] pci-plug 0: done` are read from the UART and the engine's output, not asserted. Per cell: on x64 bare 41 passed and 19 skipped, usb-kbd 46 and 14, usb-mouse 44 and 16, virtio-blk-pci 50 and 10; on arm64 bare 30 and 30, usb-kbd 36 and 24, usb-mouse 35 and 25, virtio-blk-pci 39 and 21, virtio-blk-mmio 36 and 24; 181 passed, 59 skipped and 0 failed out of 240 on x64, 176, 124 and 0 out of 300 on arm64.
+
+#### Pci Tests
+
+`tests/Kernels/Cosmos.Kernel.Tests.Pci` reads the driver kit's PCI support with eight tests on both architectures (arm64's EDK2 boot carries ACPI, so MCFG is present and the ECAM host node exists there). Four host tests are unconditional. `Host_PlatformNode_BoundByPciHostDriver`: a `platform` node whose description contains `pci-host-` is `Bound` with `DriverName` `PciHostDriver`. `Host_ConfigMechanism_MatchesCompatible`: the platform node that carries a `PciHostAccess`, found in `DriverEngine.Nodes` through the kernel's HAL grant, decodes at least one bus; compatible with `pci-host-legacy`, its mechanism is `PciConfigSpace.Ports`, 256 bytes per function, and its one resource is the port range at 0xCF8 of 8 ports; compatible with `pci-host-ecam-generic`, its mechanism is a `PciEcamConfigSpace`, 4096 bytes per function, and its one resource is a memory window of 1 MiB per bus the host maps; every function node on the host's segment and buses is reached through that same mechanism. `Host_PublishesPciNodes`: at least one `pci` node has the host's path as `ParentPath`, and every such node has `ResourceCount` 6 and an `InterruptCount` of its legacy line plus one source per described message: the node's `PciAccess` is read and the count checked against `1 + Math.Min(pci.MessageInterruptCount, PciHostAccess.MaxDescribedMessages)`, 32 at most, when `pci.IsMsiXCapable` and against 1 otherwise; the first source's `Describe()` starts with `line`, and on an MSI-X capable function the second's equals `message 0 of ` followed by the table size, compared ordinally. `Host_NodeCount_MatchesConfigSpaceScan`: a raw scan of every bus the host decodes through `PciHostAccess.ReadConfig16` and `ReadConfig8` (function 0 of devices 0 to 31, and functions 1 to 7 when the header type has the multi-function bit; a function is present when its vendor id reads neither 0xFFFF nor 0x0000) finds at least one function, and exactly as many as there are nodes with a `PciIdentity` on the host's segment and buses. Four configuration space tests run over every function node (a node with a `PciIdentity` and a `PciAccess`) and skip with `no PCI function node in the tree, the PCI host was not described or published nothing` when there is none. `ConfigSpace_VendorId_NotAllOnes`: `PciAccess.ReadConfig16(0x00)` is neither 0xFFFF nor 0x0000 and equals the identity's `VendorId`. `ConfigSpace_DeviceId_NotAllOnes`: `ReadConfig16(0x02)` is not 0xFFFF and equals `DeviceId`. `ConfigSpace_ClassCode_InRange`: the identity's `ClassCode` is at most 0x13 and `ReadConfig8(0x0B)` equals it. `ConfigSpace_VendorRead_StableAcrossCalls`: two reads of the vendor id through the node agree, and agree with the host's raw read of the same register. Both default cells carry an MSI-X capable function (q35's e1000e, virt's virtio-net-pci) and functions without the capability (the host bridge), so the per-node formula covers every mix; the project suppresses `COSMOS0003`, since `DeviceNode`, `DeviceResource`, `PlatformIdentity`, `PciHostAccess`, `PciIdentity` and `PciAccess` are experimental.
+
+#### Virtio Tests
+
+`tests/Kernels/Cosmos.Kernel.Tests.Virtio` proves the virtio drivers in `Cosmos.Kernel.Drivers` over both transports with the same assertions. Its two profiles attach a virtio NIC, keyboard, mouse and block disk to every cell, and each runs with and without ACPI: `virtio-pci` and `virtio-pci+acpi-off` on x64 and arm64 (the arm64 cells launch with `gic-version=3`, since the ITS is what routes the function's MSI-X messages), `virtio-mmio` and `virtio-mmio+acpi-off` on arm64 alone, through the virt machine's virtio-mmio window (q35 has none); the arm64 acpi-off cells are the ones on which the bootloader hands over a device tree, so the ECAM host and the slots come from it there. Which transport a cell presents is a property of the profile, not of the architecture, so the same kernel serves every arm64 cell and detects the transport at run time: `BeforeRun` captures the virtio-net node (a `DriverDiagnostics` node with `BusName` `virtio` whose `Description` starts with `type 1 `), the virtio-input nodes (`type 18 `), the virtio-blk node (`type 2 `), and the PCI function node (`BusName` `pci`, `Description` starting with `1af4:1041` or `1af4:1000`), whose presence makes the cell a PCI cell. The kernel keeps a HAL grant for two purposes, reaching a node's binding state through `DriverEngine.Nodes` as the Drivers suite does and reading `PlatformHAL.Architecture` for the one cell whose interrupt mode depends on it, and suppresses `COSMOS0003`.
+
+The fourteen tests: `Net_DriverBound` (the net node is `Bound` by `VirtioNetDriver`), `Net_TransportMatchesCell` (its `Path` starts with `virtio:pci:` on the PCI cell and `virtio:mmio:` otherwise), `Net_DeviceReady` (a published `Network` device at the node's path with `IsConsumed` true, `NetworkManager.DeviceCount` at least 1 and `NetworkManager.Ready`), `Net_LinkUp` (`NetworkManager.LinkUp`: QEMU's user backend reports the link up at once), `Net_MacAddressProgrammed` (`NetworkManager.MacAddress` not null and not all zero), `Net_InterruptModeMatchesCell` (the node's `VirtioNetState.HasInterrupt` true and `IsPolling` false on every cell but the arm64 PCI cell under acpi-off, where the ITS is not discovered and the driver polls, so the two flags read the other way there; MSI-X routes over PCI elsewhere, the GIC line over MMIO), `Input_KeyboardBound` and `Input_MouseBound` (a `type 18` node `Bound` by `VirtioInputDriver` whose published `Keyboard`, respectively `Pointer`, device is consumed), `Blk_DriverBound` (a `type 2` node `Bound` by `VirtioBlkDriver` whose published `Block` device is `vblk0`, consumed and not withdrawn, the storage manager's only disk) and `Blk_TransportMatchesCell` (its path names the cell's transport and, on the PCI cell, the virtio-blk function is `Bound` by `VirtioPciTransportDriver` with one child), then two per transport. On the PCI cell, `Pci_FunctionBoundByTransport` (the function node is `Bound` by `VirtioPciTransportDriver` with `ChildCount` 1) and `Pci_Version1Negotiated` (`VirtioNetState.Version1Negotiated`; QEMU's virtio-mmio is legacy by default, so the MMIO cell does not assert it), skipped elsewhere with `this cell presents virtio over MMIO`. On the MMIO cell, `Mmio_SlotBoundByTransport` (a `platform` node whose `Description` contains `virtio,mmio` is `Bound` by `VirtioMmioTransportDriver` with `ChildCount` 1, the assertion that catches a lost MMIO window) and `Mmio_AnyLayoutNegotiated` (`VirtioNetState.AnyLayoutNegotiated` on the legacy device, whose `any_layout` property QEMU defaults on), skipped elsewhere with `this cell presents virtio over PCI`. The Network suite's `virtio-net-pci` and `virtio-net-mmio` cells exercise the same driver's data path with no test change. Per cell, 12 passed and 2 skipped on each of x64's two cells (`24/28`) and on each of arm64's four (`48/56`).
+
+#### Graphic Tests
+
+`tests/Kernels/Cosmos.Kernel.Tests.Graphic` runs on three profiles, `bare`, `vmware-svga` (x64 only, the adapter is programmed through port I/O) and `virtio-gpu` (a virtio-gpu-pci added beside the machine's default adapter, on both architectures), and registers the same 25 tests on every cell: a cell-specific test runs where its device is and skips elsewhere, `no virtio-gpu device on this cell, needs the virtio-gpu profile` or `VMware SVGA II adapter not present, needs the vmware-svga profile`. The cell is read in `BeforeRun` from the device tree, never from the profile name or from which driver bound, so a display driver that failed to bind fails the suite instead of skipping it: a `pci` node whose `Description` starts with `15ad:0405` marks the vmware-svga cell, a `pci` node starting with `1af4:1050` or a `virtio` node starting with `type 16 ` marks the virtio-gpu cell, and neither marks bare. The suite reaches the driver states in `Cosmos.Kernel.Drivers` through the facets of `DisplayManager.Primary` and holds no grant; the project suppresses `COSMOS0003` for the facets.
+
+The 2D tests (9), every cell: `PCScreenFont_ChangeFont`, `Bitmap_Basic`, `Png_Decode`, `Ttf_Render`, `ColorClass_Basic`, `Canvas_Basic`, `VirtualCanvas_Basic`, `Canvas_CopyPixels_Overlap`, `Canvas_Compositing` (exact blend values of `DrawImage` and a translucent `DrawPoint` over an opaque pixel, `DrawArray` copying raw, the alpha kept over a transparent layer and combined over a translucent one, `DrawCanvas` and `DrawImage` with and without opacity, the stretched `DrawCanvas` at 200% and 150%, clipped at the top-left and with an opacity that blends every repeated row over its own background, and the region and scaled `DrawImage` overloads); `Bitmap_Basic` also loads a 32-bit BMP without alpha as opaque. The display tests (4), every cell: `Display_PrimaryPresent` (a primary exists, the console's canvas has its width and a `Name` starting with its `DriverName`), `Display_PrimaryMatchesCell` (bare: the primary is the firmware display and it is the only one; virtio-gpu: `VirtioGpuDriver`'s display is primary beside the firmware one; vmware-svga: `VmwareSvgaDriver`'s display is the only one and `DriverDiagnostics` lists no display without a node path, the firmware display having been retired), `Display_ListedInDriverDiagnostics` (every display of the manager is a consumed `Display` device in `DriverDiagnostics`, with a null `NodePath` exactly for the firmware one) and `Display_ModeRequest_FollowsFacet` (`Canvas.GetFullScreen(new Mode(640, 480, ColorDepth.ColorDepth32))` reports 640x480 when the primary offers `IDisplayModes` and the real size otherwise; it runs after the facet tests, with only `Canvas3D_Discovery` after it, since it switches the mode they measure). `VirtioGpu_DriverState` (1), on the virtio-gpu cells: the primary yields a `VirtioGpuState` that is not faulted, has an interrupt or polls, counts at least one scanout, matches the primary's size and sent the probe's four commands; one `Display()` of the console's canvas grows `FlushCount` by one and `CommandsSent` by two. The SVGA tests (9), on vmware-svga: `Svga_AdapterFacet` (`ISvgaAdapter` with capabilities, `FifoMin` below `FifoMax`, no 3D negotiated on QEMU, no `ICanvas3DFactory`, the scanout enabled since the console programmed a mode), `Svga_DisplayModesFacet` (`IDisplayModes` listing 1024x768x32, the default the console chose), `Svga_HardwareCursorFacet` (`IHardwareCursor`; `TryDefine` returns false on QEMU, which has no alpha cursor; `Set(1, 1, false)` does not throw), then the FIFO wire tests, each of which captures `NextCommand`, reads the commands its calls wrote back dword by dword, and rewinds: `Canvas3D_SceneSetup_Fifo` opens the block by re-programming the display's own mode (so the FIFO is back at its start), turning the scanout off through the facet (so the host consumes nothing) and creating the SVGA3D canvas through `CreateCanvas3D`, which the later tests share, and pins the scene setup (context, colour and depth targets sized to the canvas, the two render target binds, viewport, depth range, seven render states, the untextured stage); `Canvas3D_MeshUpload_Fifo` (per stream a `SURFACE_DEFINE` of a buffer and a `SURFACE_DMA` from the framebuffer region, surfaces 3, 4 and 5 for the cube), `Canvas3D_MeshValidation`, `Canvas3D_DrawCube_Fifo`, `Canvas3D_CameraCaching_Fifo` and `Canvas3D_DisposedTexture_Rejected` (`CreateTexture` defines and uploads an A8R8G8B8 surface, `Dispose` destroys it, and a mesh mapping it is rejected without a write) follow, and the last one restores the scanout. `Camera3D_Defaults` and `Canvas3D_Discovery` (2), every cell: `Canvas.GetFullScreen()` is not a `Canvas3D` on any CI cell. Per cell on x64: bare 15 passed and 10 skipped, vmware-svga 24 passed and 1 skipped, virtio-gpu 16 passed and 9 skipped; arm64 runs bare and virtio-gpu. The UART log holds every cell's boot in order, with the `[Display] primary` line of each.
+
+#### Audio Tests
+
+`tests/Kernels/Cosmos.Kernel.Tests.Audio` runs on two profiles on both architectures, `bare` and `hda`, which adds QEMU's `intel-hda` with the `hda-duplex` codec the launcher attaches beside it and leaves the default NIC off, and registers the same 22 tests on every cell. The NIC is off because the kit gives a legacy line to one handler and refuses a second, and on q35 the default e1000e takes the line the controller shares with it. The engine plays the controller into QEMU's `none` backend (`-audiodev none`): a CI runner has no audio server, and QEMU's default backend then fails to open the codec's output voice, while `none` still takes the frames at the stream's rate, so the guest's stream engine advances in real time. The cell is read in `BeforeRun` from the device tree, a `pci` node whose `Description` ends with `class 04.03.00`, never from the profile name, so a driver that failed to bind fails the suite instead of skipping it; the device tests skip on bare with `no HD Audio controller on this cell, needs the hda profile`. The suite holds an `InternalsVisibleTo` grant from `Cosmos.Kernel.System` to count the completions the primary output reported (`AudioManager.Completions`) and to read the formats its contract lists, one from `Cosmos.Kernel.Drivers` to read whether the driver's `HdAudioState` connected the function's line, and suppresses `COSMOS0003` for `AudioFormat` and `AudioBitDepth` and `CA1416` for `Console.Beep(int, int)`, which .NET implements on Windows alone.
+
+The manager tests (3): `Feature_Enabled` (`KernelFeatures.Audio` and `AudioManager.IsEnabled`), `Manager_CountMatchesCell` (one output at index 0, the primary, on hda; none, and every index empty, on bare) and, on bare alone, `Manager_PlayWithoutOutputRefused` (`AudioManager.Play` and `TryStartPlayback` both refuse and hand back no playback). The driver tests (2), on hda: `Driver_BoundByHdAudioDriver` (the controller's node is `Bound` by `HdAudioDriver`, which published one device and recorded no fault) and `Driver_OutputListedInDiagnostics` (`DriverDiagnostics` lists an `hda` device on the controller's node, published by `HdAudioDriver`, consumed and not withdrawn). The output tests (7), on hda: `Output_IdentityMatchesNode`, `Output_DefaultFormat` (signed 16-bit stereo at 48 kHz, idle, unclaimed, and the one layout the contract lists), `Output_TrySetFormat_AcceptsDerivableRates` (44.1, 96, 22.05, 8 and 192 kHz, then back to 48), `Output_TrySetFormat_RefusesOtherLayouts` (mono, unsigned 16-bit, 8, 24 and 32-bit, a rate the link cannot derive and a zero rate, with the format unchanged), `Output_WritableWhileStopped`, `Output_EngineDrainsRing` (a started output refuses a format change, takes whole frames until a write comes back short, and frees room as its engine reads the ring) and `Output_CompletionsFollowLine` (with the line connected, a running stream raises the buffer-completed interrupt and the driver reports it through its sink; without one, the stream runs and nothing is reported; the UART log says which: `line connected` on x64, `no line` on arm64, where the kit routes no PCI legacy line). The player tests (5), on hda: `Player_PlaysStreamToEnd` and `Player_RefusesUnsupportedFormat` on the calling thread, `Playback_CompletesOnThread` (`AudioManager.TryStartPlayback` claims the output at once, so a second playback is refused, and the playback ends `Completed` with the stream read to its end and its owned object disposed), `Playback_StopEndsEarly` (a three-second stream stopped once the output runs ends `Stopped` with the stream not read to its end) and `Wave_FromMemoryPlays` (a WAV file built in memory, with an odd-length `LIST` chunk before `data`, reads as the layout and length it declares and plays). The `Console.Beep` tests (5): `Beep_RejectsOutOfRange` on both cells (36 Hz, 32768 Hz, a zero and a negative length throw `ArgumentOutOfRangeException`, as on Windows), then on hda `Beep_PlaysForItsDuration` (`Console.Beep(440, 300)` holds the caller at least half its length, measured on the `Stopwatch`, returns within the 2 s bound and leaves the output released and stopped), `Beep_DefaultPlaysWindowsTone` (`Console.Beep()` plays its 200 ms the same way instead of writing a bell to a terminal) and `Beep_WhileOutputBusyReturnsAtOnce` (with a background playback holding the output, a one-second beep returns within 500 ms and the playback carries on), and on bare alone `Beep_WithoutOutputReturnsAtOnce` (both overloads return within 500 ms, without throwing). Every wait polls with `TimerManager.Wait`, which lets the scheduler run the playback thread in between, against a 2 s bound on the `Stopwatch`, never a count of sleeps, so a test's waits together stay inside the engine's 10 s stall window. Per architecture, bare reports 5 passed and 17 skipped and hda 20 passed and 2 skipped, 25 passed and 19 skipped of 44.
+
+#### Storage Tests
+
+`tests/Kernels/Cosmos.Kernel.Tests.Storage` runs on five profiles, `ahci`, `nvme`, `usb`, `virtio-blk-pci` and `virtio-blk-mmio` (arm64 only), each attaching one disk, combined with the `acpi-off` modifier on x64 (8 cells) and with `gicv2`, `gicv3` and `acpi-off` on arm64 (30 cells), and registers the same 83 tests on every cell: 3 manager, 1 boot scan, 2 profile, 1 driver diagnostics, 12 device, 7 partition, 42 partition lifecycle (MBR mutation, the EBR chain, `PartitionManager`, the superfloppy), 2 bounds probes, 2 MMIO/PCI, 5 USB hot-plug, 5 PCI hot-plug and 1 reboot. `BeforeRun` takes `StorageManager.GetDevice(0)` as the cell's disk, and every test that needs one skips where none bound, with `no block device bound for this profile` (`no block device bound for partition-table tests` in the two partition groups), which is a failure of `Manager_ExactlyOneDevice` on every cell: on x64 PCI enumerates with or without ACPI, and on arm64 the acpi-off cells take the ECAM host from the device tree the firmware exposes only then. The ahci and nvme cells' disks are published by the kit's `AhciDriver` and `NvmeDriver`, the usb cell's by the kit's `UsbMassStorageDriver`, the virtio-blk cells' by the kit's `VirtioBlkDriver`, and the storage manager's consumer registers each one during the driver stage. `Profile_DeviceKindMatches` checks the disk's name against the profile (`sata0`, `nvme0n1`, `usb0`, `vblk0`); `Manager_DeviceListedInDriverDiagnostics` finds it in `DriverDiagnostics` as a consumed, not withdrawn block device with the `DriverName` the cell expects on every profile; `Profile_NvmeInterruptModeMatches` reads `HasInterrupt` off the `NvmeNamespace`'s `Controller` and pins it where the cell determines it (interrupt on both x64 nvme cells, since the Local APIC comes up from `IA32_APIC_BASE` and routes MSI-X even when acpi-off leaves no MADT, and on arm64 gicv3; polling on gicv2 and on the arm64 acpi-off cells, where the ITS is not discovered), skipping elsewhere (`not an NVMe profile`, `interrupt mode not pinned by this cell`). The device and partition groups drive the disk through `IBlockDevice` and the ring's partition tables; `Boot_PartitionScanMatchesBootState` proves the scan the manager ran at boot, before `BeforeRun` (inside the publish on every cell); the two MMIO/PCI probes relocate the NVMe controller's BAR above 4 GiB on x64 while no command is in flight, through the `PciAccess` of the controller's `pci` node (found in `DriverEngine.Nodes` through the HAL grant by class 01 subclass 08): `Mmio_HighBar_RemappedOnDemand` reads the VS register back through the relocated BAR after `EnsureMmioMapped`, and `Pci_DescribeBar64_ReadsLiveConfig` checks the published node's BAR0 against the raw registers, then describes the function again through the PCI host and reads the relocated address whole from the new description; the hot-plug tests pull the stick out and back in through the engine's host requests, checking that the disk leaves the manager and its `usb:` node the tree, that a file open on it fails with `IOException`, and that the stick comes back as `usb0` on the next free root port with its data, and, on the virtio-blk-pci cells, the `PciHotPlug_*` tests pull the disk out of its root port and plug it back in through `pci-unplug` and `pci-plug`, checking that the disk leaves the manager and its function and virtio nodes the tree, that a read on the removed disk fails with `IOException`, and that it comes back as `vblk0` at the same node path with its data. The first test of each hot-plug group asserts that the thread following the change runs, the `XhciState`'s hot-plug thread or the `PcieRootPortState`'s slot thread, read through the HAL grant, and every wait after one host request shares one 8 s deadline on the `Stopwatch`: the request is the last protocol message before them, so a change that never shows up fails its assertions inside the engine's 10 s stall window instead of costing the cell; and `Boot_RebootAfterGptWrite`, last, stamps a GPT and reboots, so each cell with a disk boots twice and the second boot's scan finds the partition. On x64 the eight cells report 586 passed, 78 skipped and 0 failed out of 664; on arm64 the thirty report 2165 passed, 325 skipped and 0 failed out of 2490. The Fat and File suites drive an in-memory block device and never name the manager, so the move of the storage drivers into the kit left them unchanged.
+
+#### Random Tests
+
+`tests/Kernels/Cosmos.Kernel.Tests.Random` checks the kernel CSPRNG in `Cosmos.Kernel.Core/Security` (see [Random numbers](../user/random.md)) through the grant Core gives the suite. The known-answer tests (6): `ChaCha20_Block_Rfc8439` (RFC 8439 section 2.3.2), `ChaCha20_Keystream_Rfc8439` (section 2.4.2, the 114-byte "sunscreen" plaintext, so a partial last block), `Blake2s_Abc_Rfc7693` (Appendix B), `Blake2s_Empty` (`69217a30...1ed0eef9`), `Blake2s_SelfTest_Rfc7693` (the Appendix E grand hash over keyed and unkeyed hashes of 0 to 1024 bytes at digest sizes 16 to 32) and `FastKeyErasure_NextKeyNeverOutput` (one request through `FastKeyErasure`: the next key is the first 32 bytes of the retired key's keystream, the output is the rest of it and never contains the next key, and the scratch is wiped). The entropy tests (2): `Hardware_Detection` (the CPUID or `ID_AA64ISAR0_EL1` probe runs, and an advertised instruction yields words that are neither zero, all ones nor repeated) and `KernelRandom_Seeding` (seeding completes, and draws from the instruction when one is advertised); both log what the cell has, and the jitter health verdict is logged, not asserted. The BCL tests (8): `Fill_TwoDrawsDiffer`, `Fill_ZeroLength` (the BCL's empty requests, and `KernelRandom.Fill` called directly with a count of 0, a negative count and a null buffer, which the BCL never passes down), `Fill_64KiB_Statistics` (bit balance within 1% of half, every byte value between 144 and 368 times, no 8-byte word twice), `Create_GetBytes_NonZero`, `GetInt32_Range`, `Guid_NewGuid_Differ` (version 4), `Fill_AcrossReseed` (past the request and the byte reseed intervals, each of which must grow `KernelRandom.ReseedCount`) and `Fill_ConcurrentThreads` (two threads released together from a start gate draw for 300 ms, many scheduler quanta, while the main thread waits on the timer: a shared sequence number taken before each draw must show their draws interleaved, the generator must reseed meanwhile, and no two of their draws may share their first 8 bytes). x64 cells run under KVM's `host` CPU or TCG's `max`, which have RDSEED and RDRAND; arm64's `cortex-a72` has no FEAT_RNG, so that cell exercises the jitter-only path, and its log carries the jitter-alone warning.
+
 ### Running Kernel Tests
 
 #### From VS Code
@@ -157,6 +289,10 @@ dotnet run --project tests/Cosmos.TestRunner.Engine/Cosmos.TestRunner.Engine.csp
 |-------|-----|-------|
 | HelloWorld | 60 s | 90 s |
 | Memory | 180 s | 300 s |
+| Drivers | 60 s | 120 s |
+| Pci | 60 s | 90 s |
+| Graphic | 60 s | 90 s |
+| Storage | 90 s | 180 s |
 
 ### Output Formats
 
@@ -225,7 +361,7 @@ After the final `TestSuiteEnd` message the kernel also sends an 8-byte terminati
 
 ### Commands (Kernel → Host, `Ds2Vs`)
 
-Test-runner-specific commands occupy the range **100-106**. The original CosmosOS debug commands (0-25) are also defined but are not used by the test runner.
+Test-runner-specific commands occupy the range **100-109**. The original CosmosOS debug commands (0-25) are also defined but are not used by the test runner.
 
 | Command | Value | Payload format | Description |
 |---------|-------|----------------|-------------|
@@ -236,6 +372,9 @@ Test-runner-specific commands occupy the range **100-106**. The original CosmosO
 | `TestSkip` | 104 | `[TestNumber: 2 LE][SkipReason: UTF-8]` | Sent when a test is explicitly skipped |
 | `TestSuiteEnd` | 105 | `[Total: 2 LE][Passed: 2 LE][Failed: 2 LE]` | Sent once when the test suite ends |
 | `ArchitectureInfo` | 106 | `[ArchId: 1][CpuCount: 1]` | Sent on kernel startup (arch IDs: 1=x86, 2=x64, 3=ARM32, 4=ARM64) |
+| `CoverageData` | 107 | `[HitCount: 2 LE][MethodId: 2 LE]...` | Sent after the suite ends by a kernel built with coverage |
+| `TestDestructiveReached` | 108 | `[TestNumber: 2 LE]` | Sent by `TR.RunDestructive` right before an action that never returns (reboot, shutdown) |
+| `HostRequest` | 109 | `[Request: ASCII]` | Asks the engine to change the machine under the running guest (see below) |
 
 ### Message Flow
 
@@ -259,6 +398,24 @@ A typical session looks like this:
 
 Corruption detection: the `TestSuiteEnd` payload is validated by checking `total == passed + failed`. If this invariant does not hold (e.g. due to a timer-interrupt interleave corrupting UART bytes), the end message is ignored and results fall back to the individually tracked counters.
 
+### Host Requests
+
+A test calls `TR.RequestHost(request)` when it needs the machine changed under it, and the engine carries the request out through QEMU's QMP monitor as soon as the frame shows up on the UART:
+
+| Request | Effect |
+|---------|--------|
+| `usb-unplug [n]` | Pulls USB stick `n` (0 by default) off the xHCI controller |
+| `usb-plug [n]` | Plugs it back in, on the same disk image |
+| `pci-unplug [n]` | Deletes hot-pluggable PCI disk `n` (0 by default) from QEMU, which raises the slot's attention button and finishes the removal when the guest powers the slot off |
+| `pci-plug [n]` | Adds it back behind the same root port, on the same disk image; the guest powers the slot on and places the function's registers |
+| `usb-kbd-unplug` | Pulls the profile's USB keyboard off the xHCI controller |
+| `usb-kbd-plug` | Plugs it back in |
+| `key-press <qcode>` | Presses and releases one key by its QEMU QKeyCode name (`a`, `ret`, `spc`, ...); QEMU releases it after its default hold time of 100 ms |
+| `mouse-move <dx> <dy>` | Moves the pointer by `dx`, `dy` in device units, as one `input-send-event` with two relative events |
+| `mouse-button <left or middle or right> <down or up>` | Presses or releases a pointer button |
+
+Nothing replies. The test waits for the change itself, and must see it within 10 s: that long without a protocol message and the engine takes the kernel for hung. The keyboard requests take no index: a profile has one `usb-kbd` keyboard at most; the PCI requests index the profile's hot-pluggable disks (`"hotplug": true` on a `virtio-blk` disk). Every cell launches QEMU with a monitor; a request the run cannot carry out is reported and dropped (`[Monitor] usb-kbd-unplug failed: the profile attaches no USB keyboard`), and the guest's test fails by timing out. The Storage suite's `UsbHotPlug_*` and `PciHotPlug_*` tests and the Drivers suite's `Usb_Keyboard_*`, `Usb_Mouse_*`, `Ps2_*` and `Pci_HotPlug_*` tests are the examples.
+
 ### Host → Kernel Commands (`Vs2Ds`)
 
 The test runner currently does not send commands to the kernel. The `Vs2Ds` class (`Noop=0`, `Continue=4`, `Ping=17`) is inherited from the CosmosOS debug connector and reserved for future use.
@@ -277,6 +434,7 @@ tests/
 │   ├── TestResults.cs               # Result model
 │   ├── Hosts/                       # QEMU host implementations
 │   │   ├── IQemuHost.cs
+│   │   ├── QemuMonitor.cs           # The QMP monitor: USB and PCI hot-plug, key and pointer injection
 │   │   ├── QemuX64Host.cs
 │   │   └── QemuARM64Host.cs
 │   ├── OutputHandlers/              # Result output formats
@@ -292,10 +450,12 @@ tests/
 ├── Cosmos.TestRunner.Protocol/      # Shared protocol definitions
 │   ├── Consts.cs                    # Magic signature and constants
 │   └── Messages.cs                  # Typed message classes
+├── Cosmos.Kernel.Tests.System/      # Unit tests: Cosmos.Kernel.System (NUnit)
 ├── Cosmos.Tests.Build.Asm/          # Unit tests: Clang assembly build task
 ├── Cosmos.Tests.Build.Analyzer.Patcher/ # Unit tests: plug analyzer
 ├── Cosmos.Tests.Scanner/            # Unit tests: plug scanner
 ├── Cosmos.Tests.Patcher/            # Unit tests: IL patcher
+├── Cosmos.Tests.SourceGenerators/   # Unit tests: entry point and driver manifest generator
 ├── Cosmos.Tests.NativeWrapper/      # Runtime assets (no tests)
 ├── Cosmos.Tests.NativeLibrary/      # Native code for tests (no tests)
 └── Kernels/                         # Kernel test projects
@@ -306,6 +466,8 @@ tests/
         ├── Kernel.cs
         └── Bootloader/limine.conf
 ```
+
+`tests/Cosmos.Kernel.Tests.System/` holds the host-side tests of `Cosmos.Kernel.System`. It takes a project reference on the library and an `InternalsVisibleTo` grant from it, and its folders mirror the library's (`Network/`, `Network/Protocols/`, `Input/`, `FileSystem/Ext2/`).
 
 ---
 
@@ -394,7 +556,7 @@ Assert.False(condition);
 Assert.Fail("Custom error message");
 ```
 
-> **Note:** `Assert` uses static failure state (no exceptions) for NativeAOT compatibility.
+> `Assert` uses static failure state (no exceptions) for NativeAOT compatibility.
 > Only the first failure per test is recorded; subsequent assertions in the same `TR.Run` block are still evaluated.
 
 ### Test Status
@@ -412,7 +574,7 @@ Assert.Fail("Custom error message");
 3. Implement tests using `TestRunner.Framework`
 4. Add a CI job in `.github/workflows/kernel-tests.yml`:
    - Copy an existing `*-tests` job, rename it, and update the kernel path
-   - Add a corresponding `{name}-results` job for PR comments
+   - Add a corresponding `{name}-results` job, which renders the PR comment
    - Add the new job to the `test-summary` dependencies
 5. Add VS Code tasks in `.vscode/tasks.json`
 
@@ -424,9 +586,9 @@ The CI workflow (`.github/workflows/kernel-tests.yml`) runs kernel integration t
 
 **Jobs:**
 - `helloworld-tests`: Matrix build for x64/arm64
-- `helloworld-results`: Combined PR comment
+- `helloworld-results`: Renders the combined PR comment into a `pr-comment-helloworld` artifact
 - `memory-tests`: Matrix build for x64/arm64
-- `memory-results`: Combined PR comment
+- `memory-results`: Renders the combined PR comment into a `pr-comment-memory` artifact
 - `test-summary`: Final status summary
 
 **Triggers:**
@@ -434,7 +596,7 @@ The CI workflow (`.github/workflows/kernel-tests.yml`) runs kernel integration t
 - Pull requests (any branch)
 - Manual dispatch with architecture selection
 
-**PR Comments:** Each test suite posts a comment with separate rows for x64 and arm64, showing test counts, duration, and links to artifacts.
+**PR Comments:** Each test suite gets one comment with separate rows for x64 and arm64, showing test counts, duration, and links to artifacts. The `*-results` jobs only render the comment: a `pull_request` run for a pull request from a fork holds a read-only token and cannot post. `.github/workflows/kernel-test-comment.yml` runs on `workflow_run` once Kernel Tests or Kernel Coverage completes, in the base repository and with write access whatever the origin of the pull request, downloads the `pr-comment-*` artifacts and posts or updates the comments. It trusts the PR number in an artifact only when that pull request's head is the run's head commit, and GitHub runs it from the default branch, so a change to it takes effect after merge.
 
 **Artifacts (30-day retention):**
 - `test-results-{suite}-{arch}.xml`: JUnit XML results

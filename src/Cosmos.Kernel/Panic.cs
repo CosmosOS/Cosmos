@@ -1,26 +1,14 @@
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
-using CorePanic = Cosmos.Kernel.Core.Panic;
 
 namespace Cosmos.Kernel;
 
 /// <summary>
 /// Extended kernel panic handler with CPU exception support.
 /// </summary>
-public static class Panic
+internal static class Panic
 {
-    /// <summary>
-    /// Triggers a kernel panic with the specified message.
-    /// Disables interrupts and halts the CPU.
-    /// </summary>
-    /// <param name="message">The panic message describing the error.</param>
-    public static void Halt(string message)
-    {
-        // Use core panic for basic halt
-        CorePanic.Halt(message);
-    }
-
     /// <summary>
     /// Triggers a CPU exception panic with context information.
     /// This method is allocation-free to avoid recursive faults.
@@ -28,7 +16,7 @@ public static class Panic
     /// </summary>
     /// <param name="exceptionName">The name of the CPU exception.</param>
     /// <param name="ctx">The interrupt context with register state.</param>
-    public static void CpuException(string exceptionName, ref IRQContext ctx)
+    internal static void CpuException(string exceptionName, ref IRQContext ctx)
     {
         InternalCpu.DisableInterrupts();
 

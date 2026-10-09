@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Core.Utilities;
 /// <summary>
 /// Utility class that expose helpers to parse cmdlines.
 /// </summary>
-public static unsafe class ArgvParser
+internal static unsafe class ArgvParser
 {
     private const byte DoubleQuote = (byte)'"';
     private const byte Backslash = (byte)'\\';

@@ -1,11 +1,14 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.Boot.Limine;
+
 namespace Cosmos.Kernel.Core.Memory;
 
 /// <summary>
-/// Virtual address-space layout constants shared across the kernel.
+/// Virtual address-space layout constants shared across the kernel, and the
+/// higher-half direct map offset the bootloader reported.
 /// </summary>
-public static class AddressSpaceConst
+internal static class AddressSpaceConst
 {
     /// <summary>
     /// Lowest canonical higher-half address (48-bit virtual addressing) — the start of
@@ -27,4 +30,12 @@ public static class AddressSpaceConst
     /// linker scripts); addresses at or above it are kernel-image mappings, not HHDM aliases.
     /// </summary>
     public const ulong KernelImageWindow = 0xFFFFFFFF80000000UL;
+
+    /// <summary>
+    /// Limine's higher-half direct map offset: a physical address plus it is
+    /// the kernel's virtual alias of the same bytes.
+    /// <see cref="PageAllocator.DefaultHhdmOffset"/> without a bootloader
+    /// response. Any context; allocation-free.
+    /// </summary>
+    public static unsafe ulong HhdmOffset => Limine.HHDM.Response != null ? Limine.HHDM.Response->Offset : PageAllocator.DefaultHhdmOffset;
 }

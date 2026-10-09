@@ -20,9 +20,45 @@
     <CosmosEnableStorage   Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableStorage>
     <!-- Storage off → no block device for filesystems to mount on -->
     <CosmosEnableFat       Condition="'$(CosmosEnableStorage)' == 'false'">false</CosmosEnableFat>
+    <!-- USB default: on while one of the kit's USB class drivers (USB keyboard,
+         USB mouse, USB mass storage) has a manager to feed. Decided here, after
+         the lines above, because it reads the final Keyboard, Mouse and Storage
+         values. A value the project set, including true with all three off, is
+         kept. -->
+    <CosmosEnableUsb       Condition="'$(CosmosEnableUsb)' == '' AND ('$(CosmosEnableKeyboard)' == 'true' OR '$(CosmosEnableMouse)' == 'true' OR '$(CosmosEnableStorage)' == 'true')">true</CosmosEnableUsb>
+    <CosmosEnableUsb       Condition="'$(CosmosEnableUsb)' == ''">false</CosmosEnableUsb>
+    <!-- PCI off → no xHCI function for the kit to offer. That also covers
+         Interrupts off, which turned PCI off above. USB follows no other switch:
+         without a message interrupt the xHCI driver polls its event ring, its
+         delays come from the kit, and the hot-plug thread's need for the
+         scheduler is checked by the xHCI driver where it starts the thread. -->
+    <CosmosEnableUsb       Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableUsb>
+    <!-- PCI off → no HD Audio controller to find. That also covers Interrupts
+         off, which turned PCI off above. The stream is driven by the codec's
+         own clock and topped up from the kit worker, so audio rides no other
+         switch; without a scheduler the ring is written inline instead. -->
+    <CosmosEnableAudio     Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableAudio>
     <!-- UserLand off → nowhere for the syscall trap stub to come from -->
     <CosmosEnableSysCalls Condition="'$(CosmosEnableUserLand)' == 'false'">false</CosmosEnableSysCalls>
   </PropertyGroup>
+
+  <!-- Driver policy: a kernel project drops a driver from its manifest with
+       <CosmosDriverExclude Include="Full.Type.Name" /> and opts into a
+       [Driver(Default = false)] one with <CosmosDriverInclude Include="..." />.
+       The manifest generator reads the two lists as build properties (declared
+       CompilerVisibleProperty in Cosmos.Kernel.SourceGenerators.props), so the
+       items are joined here. It has to happen in a target: item references do
+       not expand inside an evaluation-time PropertyGroup, and the properties
+       must exist before the compiler's editorconfig is written. The separator
+       is a comma, not MSBuild's semicolon: the compiler reads that file as an
+       editorconfig, where a semicolon starts a comment and would cut the list
+       after its first name. -->
+  <Target Name="CosmosCollectDriverPolicy" BeforeTargets="GenerateMSBuildEditorConfigFileCore">
+    <PropertyGroup>
+      <CosmosDriverExcludeList Condition="'@(CosmosDriverExclude)' != ''">@(CosmosDriverExclude, ',')</CosmosDriverExcludeList>
+      <CosmosDriverIncludeList Condition="'@(CosmosDriverInclude)' != ''">@(CosmosDriverInclude, ',')</CosmosDriverIncludeList>
+    </PropertyGroup>
+  </Target>
 
   <!-- Disable standard ILLink - Cosmos uses custom NativeAOT compilation via Cosmos.Build.Ilc -->
   <!-- This prevents the "Missing predefined 'System.NotSupportedException' type" error -->
@@ -51,10 +87,10 @@
 
   <!-- Resolve InteropAPI.txt from Cosmos.Kernel.Core. Without this, ILC
        has no DirectPInvokeList for project-referenced kernels and every
-       libSystem.Native P/Invoke (SystemNative_GetCpuUtilization etc.)
-       routes through the runtime's LoadLibrary fixup path instead of
-       being statically linked to the kernel's [UnmanagedCallersOnly]
-       exports in src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs. -->
+       libSystem.Native P/Invoke routes through the runtime's LoadLibrary
+       fixup path at run time instead of being resolved at link time against
+       the kernel's plugs and [UnmanagedCallersOnly] exports, so a missing
+       one becomes a crash instead of an undefined-symbol error. -->
   <Target Name="ResolveCosmosKernelCoreInteropAPI" BeforeTargets="CustomizeReferences">
     <ItemGroup>
       <_CosmosKernelCoreProjectRef Include="@(ProjectReference)" Condition="$([System.String]::Copy('%(Filename)').EndsWith('Cosmos.Kernel.Core'))" />
