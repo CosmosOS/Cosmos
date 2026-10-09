@@ -28,13 +28,6 @@ _native_x64_gdt:
     .quad 0x00AFFA000000FFFF          // 0x1B ring-3 64-bit code
     .quad 0x00CFF2000000FFFF          // 0x23 ring-3 64-bit data
 
-// Far pointer used by the reload path below. 10-byte logical address
-// (8-byte offset, 2-byte selector), aligned/padded to 16.
-.balign 8
-_native_x64_reload_target:
-    .quad _native_x64_gdt_reload_cs
-    .short 0x08
-
 // GDT register image loaded by lgdt: 16-bit limit, 64-bit base.
 .balign 8
 .global _native_x64_gdt_pointer
@@ -45,25 +38,11 @@ _native_x64_gdt_pointer:
 .text
 
 // ----------------------------------------------------------------------------
-// CS-reload trampoline reached via the far jump. At entry here the new GDT
-// is active and CS=0x08. Reload the data segments to the ring-0 data
-// selector (0x10) and return to the caller. Caller-saved only.
-// ----------------------------------------------------------------------------
-.global _native_x64_gdt_reload_cs
-_native_x64_gdt_reload_cs:
-    xor     ax, ax
-    mov     ax, 0x10
-    mov     ss, ax
-    mov     ds, ax
-    mov     es, ax
-    ret
-
-// ----------------------------------------------------------------------------
 // void _native_x64_load_gdt(void)
 // Loads the kernel GDT (the _native_x64_gdt_pointer image in .data above),
-// reloads CS=0x08 via a far jump to 0x08:_native_x64_gdt_reload_cs, then
-// restores the data segments from 0x10. Interrupts are disabled on entry;
-// the caller re-enables them once the IDT has been (re)loaded.
+// reloads the data segments from 0x10, then reloads CS=0x08 with a far
+// return. Interrupts are disabled on entry; the caller re-enables them once
+// the IDT has been (re)loaded.
 // ----------------------------------------------------------------------------
 .global _native_x64_load_gdt
 _native_x64_load_gdt:
@@ -78,15 +57,18 @@ _native_x64_load_gdt:
     mov     ds, ax
     mov     es, ax
 
-    // Far-jump to reload CS=0x08. clang's intel_syntax has no clean form for
-    // an indirect far jump ("jmp far [rax]" is misparsed as a near indirect
-    // jump with "far" as a displacement symbol), so switch to AT&T for the
-    // ljmp and back. 0x08:_native_x64_gdt_reload_cs is encoded as the
-    // 8:2 logical-address pointer in .data above.
-    lea     rax, [rip + _native_x64_reload_target]
+    // Reload CS=0x08 with a far return to the next instruction: push the
+    // selector and the target, then lretq pops both. A memory-indirect far
+    // jump (ljmpq m16:64) does not work everywhere: AMD CPUs ignore REX.W on
+    // it and read an m16:32 pointer, so the selector comes from the wrong
+    // bytes and the CPU triple-faults. clang's intel_syntax has no form for
+    // the 64-bit far return, so switch to AT&T for it and back.
+    lea     rax, [rip + .Lgdt_cs_reloaded]
+    push    0x08
+    push    rax
     .att_syntax prefix
-    ljmpq    *(%rax)
+    lretq
     .intel_syntax noprefix
 
-    // _native_x64_gdt_reload_cs returns here.
+.Lgdt_cs_reloaded:
     ret
