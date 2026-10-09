@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.X64.Memory;
 /// x64 Page Map Level 4 table: 512 PML4 entries.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct Pml4Table
+internal unsafe struct Pml4Table
 {
     public fixed ulong RawEntries[512];
 

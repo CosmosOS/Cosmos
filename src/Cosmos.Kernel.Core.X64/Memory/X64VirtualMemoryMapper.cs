@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Core.X64.Memory;
 /// x64 implementation of <see cref="IVirtualMemoryMapper"/>.
 /// Manages 4-level page tables with 4 KiB pages.
 /// </summary>
-public sealed unsafe class X64VirtualMemoryMapper : IVirtualMemoryMapper
+internal sealed unsafe class X64VirtualMemoryMapper : IVirtualMemoryMapper
 {
     private const int Pml4Shift = 39;
     private const int PdptShift = 30;

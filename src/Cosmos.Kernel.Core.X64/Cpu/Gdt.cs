@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Core.X64.Cpu;
 ///   0x08 ring-0 code, 0x10 ring-0 data,
 ///   0x1B ring-3 code, 0x23 ring-3 data.
 /// </summary>
-public static unsafe class Gdt
+internal static unsafe class Gdt
 {
     /// <summary>Ring-0 64-bit code selector (DPL=0).</summary>
     public const ushort KernelCodeSelector = 0x08;

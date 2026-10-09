@@ -21,7 +21,7 @@ namespace Cosmos.Kernel.Core.SysCalls;
 /// at byte 4 and fault on AArch64 strict-alignment load/store.
 /// </remarks>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct SysCallContext
+internal unsafe struct SysCallContext
 {
     /// <summary>Syscall number (from x8 on AArch64). 4 bytes followed by 4
     /// bytes of alignment padding before <see cref="Arg0"/>.</summary>
@@ -66,7 +66,7 @@ public unsafe struct SysCallContext
 /// land <see cref="Arg0"/> at byte 4 as an unaligned 8-byte slot.
 /// </remarks>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct SysCallContext
+internal unsafe struct SysCallContext
 {
     /// <summary>Syscall number (from rax on x86-64). 4 bytes followed by 4
     /// bytes of alignment padding before <see cref="Arg0"/>.</summary>

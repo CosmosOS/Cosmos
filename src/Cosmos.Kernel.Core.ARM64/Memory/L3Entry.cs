@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.ARM64.Memory;
 /// ARM64 level 3 entry — a 4 KiB page descriptor.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 8)]
-public struct L3Entry
+internal struct L3Entry
 {
     [FieldOffset(0)]
     private PageTableEntry _entry;

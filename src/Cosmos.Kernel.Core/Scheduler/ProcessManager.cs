@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// implement a loader; callers build processes manually with AddressSpace,
 /// Thread, and SchedulerManager APIs.
 /// </summary>
-public static class ProcessManager
+internal static class ProcessManager
 {
     private static AtomicIdULong s_nextProcessId = new AtomicIdULong();
     private static readonly List<Process> s_processes = new List<Process>();

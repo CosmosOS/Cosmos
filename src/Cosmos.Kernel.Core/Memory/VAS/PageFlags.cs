@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.Core.Memory.VAS;
 /// Each architecture mapper translates these to its own descriptor bits.
 /// </summary>
 [Flags]
-public enum PageFlags : byte
+internal enum PageFlags : byte
 {
     /// <summary>No flags set.</summary>
     None = 0,

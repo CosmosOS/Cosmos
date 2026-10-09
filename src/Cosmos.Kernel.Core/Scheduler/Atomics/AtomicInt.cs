@@ -2,7 +2,7 @@
 
 namespace Cosmos.Kernel.Core.Scheduler.Atomics;
 
-public struct AtomicIdULong
+internal struct AtomicIdULong
 {
     private ulong _value;
 
@@ -13,7 +13,7 @@ public struct AtomicIdULong
 
 }
 
-public struct AtomicIdLong
+internal struct AtomicIdLong
 {
     private long _value;
 
@@ -24,7 +24,7 @@ public struct AtomicIdLong
 
 }
 
-public struct AtomicIdUInt
+internal struct AtomicIdUInt
 {
     private uint _value;
 
@@ -35,7 +35,7 @@ public struct AtomicIdUInt
 
 }
 
-public struct AtomicIdInt
+internal struct AtomicIdInt
 {
     private int _value;
 

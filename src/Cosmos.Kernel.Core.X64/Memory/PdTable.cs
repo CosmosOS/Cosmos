@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.X64.Memory;
 /// x64 Page Directory: 512 PD entries.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct PdTable
+internal unsafe struct PdTable
 {
     public fixed ulong RawEntries[512];
 

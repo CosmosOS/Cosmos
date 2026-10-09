@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.ARM64.Memory;
 /// ARM64 level 1 table: 512 L1 entries.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct L1Table
+internal unsafe struct L1Table
 {
     public fixed ulong RawEntries[512];
 

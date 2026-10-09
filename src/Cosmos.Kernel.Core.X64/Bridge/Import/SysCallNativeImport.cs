@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.X64.Bridge;
 
-public static unsafe partial class SysCallNativeImport
+internal static unsafe partial class SysCallNativeImport
 {
     /// <summary>
     /// One-time wiring of the x64 SYSCALL fast path: programs the

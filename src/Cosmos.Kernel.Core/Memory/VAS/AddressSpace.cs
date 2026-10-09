@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Core.Memory.VAS;
 /// Provides the architecture-specific page-table mapper used by <see cref="AddressSpace"/>.
 /// Set during platform initialization from the architecture-specific Core package.
 /// </summary>
-public static class VirtualMemoryProvider
+internal static class VirtualMemoryProvider
 {
     /// <summary>
     /// The current architecture's page-table mapper. Null until platform initialization.
@@ -19,7 +19,7 @@ public static class VirtualMemoryProvider
 /// Kernel code uses the singleton <see cref="KernelSpace"/>. Each user process
 /// has its own address space that shares the kernel/higher-half mappings.
 /// </summary>
-public class AddressSpace
+internal class AddressSpace
 {
     /// <summary>
     /// The kernel's address space, initialized from the bootloader page tables.

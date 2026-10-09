@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.SysCalls;
 /// values mirror the POSIX errno constants where there is a direct
 /// equivalent so userland ABI code can reuse the same defines.
 /// </summary>
-public enum SysCallError : uint
+internal enum SysCallError : uint
 {
     /// <summary>No error — the call succeeded, see <see cref="SysCallResult.Value"/>.</summary>
     None = 0,

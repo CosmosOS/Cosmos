@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Core.SysCalls;
 /// into a single long return register so callers receive a C-style
 /// <c>&gt;= 0</c> success / <c>&lt; 0</c> <c>-errno</c> value.
 /// </summary>
-public readonly struct SysCallResult
+internal readonly struct SysCallResult
 {
     /// <summary>
     /// Construct a success result carrying <paramref name="value"/>.

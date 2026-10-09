@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.X64.Memory;
 /// x64 Page Table: 512 4 KiB page entries.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct PtTable
+internal unsafe struct PtTable
 {
     public fixed ulong RawEntries[512];
 

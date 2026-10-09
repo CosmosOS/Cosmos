@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.ARM64.Memory;
 /// ARM64 level 1 entry. Can be a table descriptor to an L2 table or a 1 GiB block descriptor.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 8)]
-public struct L1Entry
+internal struct L1Entry
 {
     [FieldOffset(0)]
     private PageTableEntry _entry;

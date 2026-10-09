@@ -8,7 +8,7 @@ using Cosmos.Kernel.Core.Memory.VAS;
 
 namespace Cosmos.Kernel.Core.Scheduler;
 
-public partial class ProcessSignals
+internal partial class ProcessSignals
 {
 
     public const uint SstackSize = 1024 * 4;
@@ -85,13 +85,13 @@ public partial class ProcessSignals
 
 
 
-public readonly struct ProcessSignalConfig
+internal readonly struct ProcessSignalConfig
 {
     public readonly ulong TimeOut { get; init; }
     public readonly bool KillProcess { get; init; }
 }
 
-public class ProcessSignalConfigs
+internal class ProcessSignalConfigs
 {
 
     /// <summary>Hangup detected on controlling terminal.</summary>

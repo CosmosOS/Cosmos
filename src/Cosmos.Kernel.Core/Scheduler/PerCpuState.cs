@@ -44,7 +44,7 @@ public sealed class PerCpuState : SchedulerExtensible
     /// <summary>
     /// Address space currently active on this CPU. Updated during context switch.
     /// </summary>
-    public AddressSpace? CurrentAddressSpace { get; set; }
+    internal AddressSpace? CurrentAddressSpace { get; set; }
 
     // Set by ReadyThread when it wakes a thread (typically an ISR-side
     // InterruptEvent.Signal); consumed by ReschedulePendingFromIrq on

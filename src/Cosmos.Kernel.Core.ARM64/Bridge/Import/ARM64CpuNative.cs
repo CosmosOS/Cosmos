@@ -5,7 +5,7 @@ namespace Cosmos.Kernel.Core.ARM64.Bridge;
 /// <summary>
 /// Native CPU operations for ARM64.
 /// </summary>
-public static partial class ARM64CpuNative
+internal static partial class ARM64CpuNative
 {
     [LibraryImport("*", EntryPoint = "_native_arm64_read_ttbr1_el1")]
     [SuppressGCTransition]

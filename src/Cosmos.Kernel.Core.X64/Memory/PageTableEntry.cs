@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.X64.Memory;
 /// Shared 64-bit x64 page-table entry layout used by PML4, PDPT, PD, and PT.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 8)]
-public struct PageTableEntry
+internal struct PageTableEntry
 {
     [FieldOffset(0)]
     public ulong RawValue;

@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.Core.Memory.VAS;
 /// <summary>
 /// Information about a CPU page fault / data abort.
 /// </summary>
-public readonly struct PageFaultInfo
+internal readonly struct PageFaultInfo
 {
     /// <summary>
     /// Virtual address that caused the fault (CR2 on x64, FAR on ARM64).

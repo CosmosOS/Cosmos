@@ -4,7 +4,7 @@ namespace Cosmos.Kernel.Core.Memory.VAS;
 /// Architecture-specific page-table operations used by <see cref="AddressSpace"/>.
 /// Implementations live in Cosmos.Kernel.Core.X64 and Cosmos.Kernel.Core.ARM64.
 /// </summary>
-public unsafe interface IVirtualMemoryMapper
+internal unsafe interface IVirtualMemoryMapper
 {
     /// <summary>
     /// Maps <paramref name="pageCount"/> consecutive 4 KiB pages.

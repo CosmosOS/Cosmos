@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Core.SysCalls;
 /// these never being renumbered (only appended). Unallocated slots in the
 /// dispatcher return <see cref="SysCallError.Enosys"/>.
 /// </summary>
-public enum SysCallNumber : uint
+internal enum SysCallNumber : uint
 {
     /// <summary>Terminate the calling process. Args: exit code.</summary>
     Exit = 0,

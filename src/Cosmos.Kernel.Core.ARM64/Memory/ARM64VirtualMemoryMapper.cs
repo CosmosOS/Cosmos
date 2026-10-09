@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Core.ARM64.Memory;
 /// ARM64 implementation of <see cref="IVirtualMemoryMapper"/>.
 /// Manages 4-level translation tables with a 4 KiB granule.
 /// </summary>
-public sealed unsafe class ARM64VirtualMemoryMapper : IVirtualMemoryMapper
+internal sealed unsafe class ARM64VirtualMemoryMapper : IVirtualMemoryMapper
 {
     private const int L0Shift = 39;
     private const int L1Shift = 30;

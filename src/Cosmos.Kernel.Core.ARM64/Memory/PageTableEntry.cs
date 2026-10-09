@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.Core.ARM64.Memory;
 /// Used by L0/L1/L2 table descriptors and by L1/L2 block and L3 page descriptors.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 8)]
-public struct PageTableEntry
+internal struct PageTableEntry
 {
     [FieldOffset(0)]
     public ulong RawValue;

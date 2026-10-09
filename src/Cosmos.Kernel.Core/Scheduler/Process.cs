@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// execution happens through its threads. The caller is responsible for building
 /// the address space, mapping memory, and creating threads.
 /// </summary>
-public class Process
+internal class Process
 {
     /// <summary>
     /// Unique process identifier.
@@ -113,7 +113,7 @@ public class Process
 /// <summary>
 /// Lifecycle state of a process.
 /// </summary>
-public enum ProcessState : byte
+internal enum ProcessState : byte
 {
     /// <summary>Process is being constructed.</summary>
     Created,

@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.X64.Memory;
 /// Page Table entry — a 4 KiB page descriptor.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 8)]
-public struct PtEntry
+internal struct PtEntry
 {
     [FieldOffset(0)]
     private PageTableEntry _entry;

@@ -56,12 +56,12 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// <summary>
     /// Address space this thread runs in. If null, the thread uses the kernel space.
     /// </summary>
-    public AddressSpace? AddressSpace { get; set; }
+    internal AddressSpace? AddressSpace { get; set; }
 
     /// <summary>
     /// if set then this is a userspace thread
     /// </summary>
-    public Process? Process { get; set; }
+    internal Process? Process { get; set; }
 
     // ===== Context (architecture-specific values) =====
 

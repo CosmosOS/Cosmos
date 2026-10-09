@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.X64.Memory;
 /// Always a table descriptor pointing to a PDPT.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 8)]
-public struct Pml4Entry
+internal struct Pml4Entry
 {
     [FieldOffset(0)]
     private PageTableEntry _entry;

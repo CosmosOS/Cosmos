@@ -7,7 +7,7 @@ namespace Cosmos.Kernel.Core.ARM64.Memory;
 /// ARM64 level 3 table: 512 4 KiB page entries.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct L3Table
+internal unsafe struct L3Table
 {
     public fixed ulong RawEntries[512];
 

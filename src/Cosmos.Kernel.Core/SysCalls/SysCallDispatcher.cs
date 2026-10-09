@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Core.SysCalls;
 /// <see cref="SysCallContext"/> here, and the per-syscall handlers are
 /// plugged in by Cosmos.Kernel.System (file/console/process drivers, ...).
 /// </summary>
-public static class SysCallDispatcher
+internal static class SysCallDispatcher
 {
     /// <summary>
     /// Syscall handler signature. Receives the captured register frame by

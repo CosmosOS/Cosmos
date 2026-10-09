@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.Core.X64.Bridge;
 
-public static unsafe partial class GdtNative
+internal static unsafe partial class GdtNative
 {
     /// <summary>
     /// Loads the kernel GDT (5 entries: null, ring-0 code/data,

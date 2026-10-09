@@ -48,6 +48,7 @@
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags.IdleThread = 2 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags.Managed = 8 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags.NativeProcess = 16 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags.None = 0 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags.Pinned = 4 -> Cosmos.Kernel.Core.Scheduler.SchedulerThreadFlags
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerThreadState

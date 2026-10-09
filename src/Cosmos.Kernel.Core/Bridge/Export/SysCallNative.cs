@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Core.Bridge.Export;
 /// follows the C convention: <c>&gt;= 0</c> on success, <c>-(long)errno</c>
 /// on failure (see <see cref="SysCallResult.Pack"/>).
 /// </summary>
-public static unsafe class SysCallNative
+internal static unsafe class SysCallNative
 {
     [UnmanagedCallersOnly(EntryPoint = "__managed__syscall")]
     public static long Dispatch(SysCallContext* context)
