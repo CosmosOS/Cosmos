@@ -11,6 +11,13 @@ namespace Cosmos.Kernel.Core.CPU;
 /// </summary>
 internal static class InternalCpu
 {
+
+    public static IEnumerable<T> Where<T>(this IEnumerable<T> me, Func<T, bool> action)
+    {
+        return Enumerable.Where(me, item => action(item));
+    }
+
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void DisableInterrupts() => CpuNative.DisableInterrupts();
 

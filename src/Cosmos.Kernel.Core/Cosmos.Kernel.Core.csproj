@@ -24,12 +24,14 @@
   <!-- Architecture-specific source files (defines are set by Cosmos.ArchitecturePicker.props) -->
   <ItemGroup Condition="'$(CosmosArch)' != 'arm64'">
     <Compile Remove="Scheduler\ThreadContext.ARM64.cs" />
+    <Compile Remove="Memory\VAS\VirtualMemoryMapper.ARM64.cs" />
     <Compile Remove="Runtime\ExceptionHandling\CfiArch.ARM64.cs" />
     <Compile Remove="Runtime\ExceptionHandling\RegisterContext.ARM64.cs" />
     <Compile Remove="Runtime\ExceptionHandling\ExceptionHelper.ARM64.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(CosmosArch)' == 'arm64'">
     <Compile Remove="Scheduler\ThreadContext.X64.cs" />
+    <Compile Remove="Memory\VAS\VirtualMemoryMapper.X64.cs" />
     <Compile Remove="Runtime\ExceptionHandling\CfiArch.X64.cs" />
     <Compile Remove="Runtime\ExceptionHandling\RegisterContext.X64.cs" />
     <Compile Remove="Runtime\ExceptionHandling\ExceptionHelper.X64.cs" />
