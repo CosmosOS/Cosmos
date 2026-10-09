@@ -6,7 +6,7 @@ public class ProjectPinUpdaterTests
 {
     private const string NewVersion = "3.0.72";
 
-    // Mirrors src/Cosmos.Build.Templates/templates/cosmos-kernel/KernelName.csproj
+    // Mirrors src/Cosmos.Build.Templates/templates/cosmos-kernel-csharp/KernelName.csproj
     // after pack-time token substitution — the exact shape every generated project has.
     private const string TemplateCsproj = """
         <Project Sdk="Cosmos.Sdk/3.0.70">

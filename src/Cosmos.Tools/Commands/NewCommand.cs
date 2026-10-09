@@ -45,7 +45,7 @@ public class NewCommand : AsyncCommand<NewSettings>
 
         var args = new List<string>
         {
-            "new", "cosmos-kernel",
+            "new", "cosmos-kernel-csharp",
             "-n", settings.Name,
             "-o", outputDir
             /*

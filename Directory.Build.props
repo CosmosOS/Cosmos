@@ -52,7 +52,7 @@
          see the same value the setup script generated)
 
     Everything else (Directory.Packages.props, the Cosmos.Sdk shipped Sdk.props,
-    the cosmos-kernel template, Cosmos.Kernel's generated VersionString and
+    the kernel templates, Cosmos.Kernel's generated VersionString and
     kmain_version.h, the BuildCache test fixture) derives from $(VersionPrefix).
   -->
   <PropertyGroup>
