@@ -1229,13 +1229,15 @@ public static class SchedulerManager
             next.LastScheduledAt = GetTimestamp();
 
             // Determine the target address space. Kernel threads with no explicit
-            // AddressSpace use the singleton kernel space.
-            AddressSpace nextSpace = next.AddressSpace ?? AddressSpace.KernelSpace!;
+            // AddressSpace use the singleton kernel space, which is null when
+            // kernel-owned paging is off.
+            AddressSpace? nextSpace = next.AddressSpace ?? AddressSpace.KernelSpace;
             state.CurrentAddressSpace = nextSpace;
 
             // Request context switch - set new thread flag, target RSP, and target CR3
+            // (0 keeps the current page-table root).
             ContextSwitchNative.SetContextSwitchNewThread(isNewThread ? 1 : 0);
-            ContextSwitchNative.SetContextSwitchCr3(nextSpace.PageTableRoot);
+            ContextSwitchNative.SetContextSwitchCr3(nextSpace?.PageTableRoot ?? 0);
             ContextSwitchNative.SetContextSwitchSp(next.StackPointer);
         }
         else if (next.State == SchedulerThreadState.Ready)
