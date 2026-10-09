@@ -13,9 +13,14 @@
     <CosmosArch Condition="'$(CosmosArch)' == 'x86_64'">x64</CosmosArch>
     <CosmosArch Condition="'$(CosmosArch)' == 'aarch64'">arm64</CosmosArch>
 
-    <!-- Set architecture-specific defines -->
-    <DefineConstants Condition="'$(CosmosArch)' == 'x64'">$(DefineConstants);ARCH_X64</DefineConstants>
-    <DefineConstants Condition="'$(CosmosArch)' == 'arm64'">$(DefineConstants);ARCH_ARM64</DefineConstants>
+    <!-- Set architecture-specific defines. Visual Basic passes DefineConstants
+         to the compiler as written, where constants are separated by commas
+         and an empty one is an error, so a Visual Basic project joins with a
+         comma and drops the leading one when DefineConstants was empty. -->
+    <_CosmosArchDefine Condition="'$(CosmosArch)' == 'x64'">ARCH_X64</_CosmosArchDefine>
+    <_CosmosArchDefine Condition="'$(CosmosArch)' == 'arm64'">ARCH_ARM64</_CosmosArchDefine>
+    <DefineConstants Condition="'$(_CosmosArchDefine)' != '' AND '$(MSBuildProjectExtension)' != '.vbproj'">$(DefineConstants);$(_CosmosArchDefine)</DefineConstants>
+    <DefineConstants Condition="'$(_CosmosArchDefine)' != '' AND '$(MSBuildProjectExtension)' == '.vbproj'">$([System.String]::Copy('$(DefineConstants),$(_CosmosArchDefine)').TrimStart(','))</DefineConstants>
   </PropertyGroup>
 
 </Project>
