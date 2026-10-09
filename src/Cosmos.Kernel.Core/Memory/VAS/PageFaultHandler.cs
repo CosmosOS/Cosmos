@@ -7,8 +7,12 @@ namespace Cosmos.Kernel.Core.Memory.VAS;
 /// Handles CPU page faults / data aborts. For the PoC, unhandled user-space
 /// faults terminate the owning process; kernel faults remain fatal.
 /// </summary>
-public static class PageFaultHandler
+internal static class PageFaultHandler
 {
+    /// <summary>
+    /// End (exclusive) of the x64 lower canonical half, where user mappings live.
+    /// </summary>
+    private const ulong X64UserSpaceLimit = 0x0000_8000_0000_0000UL;
 
     /// <summary>
     /// Handles a page fault. Returns true if the fault was handled (e.g. process killed).
@@ -16,7 +20,14 @@ public static class PageFaultHandler
     /// </summary>
     public static bool Handle(PageFaultInfo info)
     {
-        AddressSpace? currentSpace = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId()).CurrentThread?.AddressSpace;
+        // No kernel-owned paging (the default), or a fault before the HAL captured
+        // the kernel space: no process can own the faulting context.
+        if (AddressSpace.KernelSpace is null)
+        {
+            return false;
+        }
+
+        AddressSpace? currentSpace = SchedulerManager.CurrentCpuState?.CurrentThread?.AddressSpace;
 
         // Kernel fault: no process owns the faulting context.
         if (currentSpace == null || currentSpace == AddressSpace.KernelSpace)
