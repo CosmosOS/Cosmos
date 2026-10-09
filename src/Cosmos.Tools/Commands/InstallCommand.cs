@@ -362,7 +362,7 @@ public class InstallCommand : AsyncCommand<InstallSettings>
     {
         using var http = CreateHttpClient();
         string json = await http.GetStringAsync(
-            "https://api.github.com/repos/valentinbreiz/CosmosVsCodeExtension/releases/latest");
+            "https://api.github.com/repos/CosmosOS/CosmosVsCodeExtension/releases/latest");
         var release = JsonDocument.Parse(json);
 
         if (release.RootElement.TryGetProperty("assets", out var assets))
