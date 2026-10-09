@@ -124,17 +124,6 @@ syscall_entry:
     mov     gs:[8], rsp                 // save user RSP (CPU left it here)
     mov     rsp, gs:[0]                 // load per-CPU kernel RSP (16-aligned)
 
-    // Swap to the kernel page-table root (mirror the IRQ stub). Process
-    // page tables only guarantee the shared higher-half is mapped; the
-    // dispatcher and its handlers may touch identity-mapped MMIO.
-    mov     rax, cr3
-    mov     [rip + _native_x64_syscall_saved_cr3], rax
-    mov     rax, [rip + _kernel_cr3]
-    test    rax, rax
-    jz      .Lsyscall_no_kcr3
-    mov     cr3, rax
-.Lsyscall_no_kcr3:
-
     // ----- build SysCallContext (88 bytes, padded to 96 for 16B alignment) -----
     sub     rsp, 96
     mov     [rsp + 0], eax              // Number (RAX = syscall number, 32-bit)
@@ -149,6 +138,18 @@ syscall_entry:
     mov     [rsp + 64], rcx             // Rip (SYSCALL saved user RIP in RCX)
     mov     [rsp + 72], r11             // Rflags (SYSCALL saved RFLAGS in R11)
     mov     qword ptr [rsp + 80], 0     // Thread = 0 (C# resolves the thread)
+
+    // Swap to the kernel page-table root (mirror the IRQ stub). Process
+    // page tables only guarantee the shared higher-half is mapped; the
+    // dispatcher and its handlers may touch identity-mapped MMIO. Done once
+    // the context holds the syscall number, which arrived in RAX.
+    mov     rax, cr3
+    mov     [rip + _native_x64_syscall_saved_cr3], rax
+    mov     rax, [rip + _kernel_cr3]
+    test    rax, rax
+    jz      .Lsyscall_no_kcr3
+    mov     cr3, rax
+.Lsyscall_no_kcr3:
 
     mov     rdi, rsp                    // first arg = &SysCallContext
     call    __managed__syscall          // returns packed long result in RAX

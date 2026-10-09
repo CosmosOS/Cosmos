@@ -674,13 +674,22 @@ irq\n\()_stub:
     // PCI ECAM, etc.) that lives outside the higher-half, so enter every
     // interrupt with the kernel CR3 loaded. The original CR3 is restored on
     // iretq unless a context switch deliberately loads a different one.
-    mov rax, cr3
-    mov [rip + _irq_saved_cr3], rax
+    // RAX and RCX are borrowed on the stack and put back before SAVE CONTEXT
+    // stores the interrupted code's registers. CR3 is only written when it
+    // differs from the kernel root, so no switch means no TLB flush.
+    push rax
+    push rcx
     mov rax, [rip + _kernel_cr3]
     test rax, rax
     jz .Lskip_kernel_cr3_\n
+    mov rcx, cr3
+    cmp rcx, rax
+    je .Lskip_kernel_cr3_\n
+    mov [rip + _irq_saved_cr3], rcx
     mov cr3, rax
 .Lskip_kernel_cr3_\n:
+    pop rcx
+    pop rax
 
     // === SAVE CONTEXT ===
     // CPU pushes: RIP, CS, RFLAGS (and RSP, SS if privilege change)
@@ -821,12 +830,13 @@ irq\n\()_stub:
     mov r11, [rip + _context_switch_target_cr3]
     test r11, r11
     jz .Lskip_cr3_\n
+    // The next thread's root replaces the interrupted one's, even when it is
+    // already loaded; do not restore the old one.
+    mov qword ptr [rip + _irq_saved_cr3], 0
     mov rcx, cr3
     cmp rcx, r11
     je .Lskip_cr3_\n
     mov cr3, r11
-    // Context switch is loading a new CR3; do not restore the old one.
-    mov qword ptr [rip + _irq_saved_cr3], 0
 
 .Lskip_cr3_\n:
     xor rcx, rcx
