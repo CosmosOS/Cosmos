@@ -18,17 +18,17 @@ internal partial class ProcessSignals
         _process = process;
     }
 
-    private nuint?[] Handels = new nuint?[31];
+    private nuint?[] _handlers = new nuint?[31];
     private readonly Process _process;
 
     public void RegisterHandel(ushort signal, nuint func)
     {
-        Handels[signal] = func;
+        _handlers[signal] = func;
     }
 
     public void Send(ushort signal)
     {
-        nuint? handel = Handels[signal];
+        nuint? handel = _handlers[signal];
         ProcessSignalConfig config = ProcessSignalConfigs.Configs[signal];
         if (config.KillProcess)
         {

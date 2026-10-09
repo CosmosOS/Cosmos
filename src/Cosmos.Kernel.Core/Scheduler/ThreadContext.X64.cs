@@ -52,7 +52,7 @@ internal unsafe struct ThreadContext
     /// </summary>
     public const int Size = 256 + (15 * 8) + (3 * 8) + 8 + (5 * 8);  // XMM + GPRs + info + temp + full CPU frame
 
-/// <summary>
+    /// <summary>
     /// Sets up initial context for a new thread.
     /// </summary>
     /// <param name="entryPoint">Thread entry point function address.</param>
