@@ -15,6 +15,18 @@ public class NewSettings : CommandSettings
     [Description("Output directory (defaults to current directory)")]
     public string? Output { get; set; }
 
+    [CommandOption("-l|--language")]
+    [Description("Language of the kernel project (csharp, vb)")]
+    [DefaultValue("csharp")]
+    public string Language { get; set; } = "csharp";
+
+    public override ValidationResult Validate()
+    {
+        return NewCommand.TemplateFor(Language) is null
+            ? ValidationResult.Error($"Unknown language '{Language}': use csharp or vb.")
+            : ValidationResult.Success();
+    }
+
     /*
     [CommandOption("-a|--arch")]
     [Description("Target architecture (x64, arm64)")]
@@ -30,12 +42,32 @@ public class NewSettings : CommandSettings
 
 public class NewCommand : AsyncCommand<NewSettings>
 {
+    /// <summary>
+    /// The <c>dotnet new</c> template that creates a kernel in
+    /// <paramref name="language"/>, or null for a language Cosmos has no
+    /// template for.
+    /// </summary>
+    /// <param name="language"><c>csharp</c> or <c>vb</c>, in any case.</param>
+    internal static string? TemplateFor(string language)
+    {
+        return language.ToLowerInvariant() switch
+        {
+            "csharp" => "cosmos-kernel-csharp",
+            "vb" => "cosmos-kernel-vb",
+            _ => null,
+        };
+    }
+
     public override async Task<int> ExecuteAsync(CommandContext context, NewSettings settings)
     {
+        string template = TemplateFor(settings.Language)
+            ?? throw new InvalidOperationException($"No template for language '{settings.Language}'");
+
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("  [bold]Creating Cosmos Kernel Project[/]");
         AnsiConsole.WriteLine("  " + new string('-', 50));
         AnsiConsole.MarkupLine($"  Name: [blue]{settings.Name}[/]");
+        AnsiConsole.MarkupLine($"  Language: [blue]{settings.Language.ToLowerInvariant()}[/]");
         // AnsiConsole.MarkupLine($"  Architecture: [blue]{settings.Arch}[/]");
         // AnsiConsole.MarkupLine($"  Graphics: [blue]{(settings.Graphics ? "Yes" : "No")}[/]");
         AnsiConsole.WriteLine("  " + new string('-', 50));
@@ -45,7 +77,7 @@ public class NewCommand : AsyncCommand<NewSettings>
 
         var args = new List<string>
         {
-            "new", "cosmos-kernel",
+            "new", template,
             "-n", settings.Name,
             "-o", outputDir
             /*

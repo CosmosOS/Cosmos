@@ -42,7 +42,7 @@ public static class ProjectPinUpdater
 
     /// <summary>
     /// Finds the files under <paramref name="rootDir"/> that carry Cosmos version
-    /// pins: *.csproj, Directory.Packages.props (CPM), and global.json
+    /// pins: *.csproj and *.vbproj, Directory.Packages.props (CPM), and global.json
     /// (msbuild-sdks form). Build output is skipped and recursion is depth-capped
     /// so running from an unexpectedly broad directory stays cheap.
     /// </summary>
@@ -56,7 +56,7 @@ public static class ProjectPinUpdater
         };
 
         List<string> files = new List<string>();
-        foreach (string pattern in (string[])["*.csproj", "Directory.Packages.props", "global.json"])
+        foreach (string pattern in (string[])["*.csproj", "*.vbproj", "Directory.Packages.props", "global.json"])
         {
             foreach (string file in Directory.EnumerateFiles(rootDir, pattern, options))
             {

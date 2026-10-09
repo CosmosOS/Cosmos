@@ -38,6 +38,9 @@ public class BuildSettings : CommandSettings
 
 public class BuildCommand : AsyncCommand<BuildSettings>
 {
+    /// <summary>The project files a kernel can have, in the order a directory is searched: C#, then Visual Basic.</summary>
+    private static readonly string[] s_projectExtensions = [".csproj", ".vbproj"];
+
     private record BuildResult(string Arch, bool Success, string OutputDir, string? IsoPath, string? ElfPath, string Runtime);
 
     public override async Task<int> ExecuteAsync(CommandContext context, BuildSettings settings)
@@ -49,23 +52,23 @@ public class BuildCommand : AsyncCommand<BuildSettings>
             AnsiConsole.WriteLine("  " + new string('-', 50));
         }
 
-        string? csprojPath = FindProjectFile(settings.Project);
-        if (csprojPath == null)
+        string? projectFile = FindProjectFile(settings.Project);
+        if (projectFile is null)
         {
             if (settings.Json)
             {
-                PrintJsonError("No .csproj file found in the current directory.");
+                PrintJsonError("No .csproj or .vbproj file found in the current directory.");
             }
             else
             {
-                AnsiConsole.MarkupLine("  [red]No .csproj file found in the current directory.[/]");
+                AnsiConsole.MarkupLine("  [red]No .csproj or .vbproj file found in the current directory.[/]");
                 AnsiConsole.MarkupLine("  Use [blue]--project[/] to specify the project path.");
             }
             return 1;
         }
 
-        string projectName = Path.GetFileNameWithoutExtension(csprojPath);
-        string projectDir = Path.GetDirectoryName(csprojPath)!;
+        string projectName = Path.GetFileNameWithoutExtension(projectFile);
+        string projectDir = Path.GetDirectoryName(projectFile)!;
 
         if (!settings.Json)
         {
@@ -93,7 +96,7 @@ public class BuildCommand : AsyncCommand<BuildSettings>
         }
         else
         {
-            string detectedArch = DetectArchitecture(csprojPath);
+            string detectedArch = DetectArchitecture(projectFile);
             architectures.Add(detectedArch);
             if (!settings.Json)
             {
@@ -114,7 +117,7 @@ public class BuildCommand : AsyncCommand<BuildSettings>
         {
             string runtimeId = buildArch == "arm64" ? "linux-arm64" : "linux-x64";
             string outputDir = Path.Combine(projectDir, $"output-{buildArch}");
-            bool result = await BuildForArchitectureAsync(csprojPath, projectDir, buildArch, settings.Config, settings.Verbose, settings.Json);
+            bool result = await BuildForArchitectureAsync(projectFile, projectDir, buildArch, settings.Config, settings.Verbose, settings.Json);
 
             string? isoPath = null;
             string? elfPath = null;
@@ -215,34 +218,51 @@ public class BuildCommand : AsyncCommand<BuildSettings>
         return s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r");
     }
 
+    /// <summary>
+    /// The kernel project at <paramref name="projectPath"/>, a project file or a
+    /// directory holding one, or in the current directory when it is empty. A
+    /// kernel is a C# or a Visual Basic project; a directory holding both kinds
+    /// yields its C# project.
+    /// </summary>
     private static string? FindProjectFile(string? projectPath)
     {
         if (!string.IsNullOrEmpty(projectPath))
         {
-            if (File.Exists(projectPath) && projectPath.EndsWith(".csproj"))
+            if (File.Exists(projectPath) && s_projectExtensions.Contains(Path.GetExtension(projectPath), StringComparer.OrdinalIgnoreCase))
             {
                 return projectPath;
             }
 
             if (Directory.Exists(projectPath))
             {
-                string[] files = Directory.GetFiles(projectPath, "*.csproj");
-                return files.FirstOrDefault();
+                return FindProjectFileIn(projectPath);
             }
 
             return null;
         }
 
-        string currentDir = Directory.GetCurrentDirectory();
-        string[] csprojFiles = Directory.GetFiles(currentDir, "*.csproj");
-        return csprojFiles.FirstOrDefault();
+        return FindProjectFileIn(Directory.GetCurrentDirectory());
     }
 
-    private static string DetectArchitecture(string csprojPath)
+    private static string? FindProjectFileIn(string directory)
+    {
+        foreach (string extension in s_projectExtensions)
+        {
+            string? file = Directory.EnumerateFiles(directory, $"*{extension}").FirstOrDefault();
+            if (file is not null)
+            {
+                return file;
+            }
+        }
+
+        return null;
+    }
+
+    private static string DetectArchitecture(string projectFile)
     {
         try
         {
-            string content = File.ReadAllText(csprojPath);
+            string content = File.ReadAllText(projectFile);
 
             // Check for CosmosTargetArch (set by cosmos new)
             var targetArchMatch = Regex.Match(content, @"<CosmosTargetArch>([^<]+)</CosmosTargetArch>");
@@ -269,7 +289,7 @@ public class BuildCommand : AsyncCommand<BuildSettings>
         return PlatformInfo.IsArm64 ? "arm64" : "x64";
     }
 
-    private static async Task<bool> BuildForArchitectureAsync(string csprojPath, string projectDir, string arch, string config, bool verbose, bool json)
+    private static async Task<bool> BuildForArchitectureAsync(string projectFile, string projectDir, string arch, string config, bool verbose, bool json)
     {
         if (!json)
         {
@@ -283,7 +303,7 @@ public class BuildCommand : AsyncCommand<BuildSettings>
         string[] args = new[]
         {
             "publish",
-            csprojPath,
+            projectFile,
             "-c", config,
             "-r", runtimeId,
             $"-p:DefineConstants={defineConstants}",

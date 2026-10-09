@@ -2,7 +2,6 @@
 
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cosmos.Kernel.SourceGenerators;
 
@@ -31,16 +30,20 @@ internal static class DriverDiscovery
     /// <summary>
     /// Reduces one attributed class of the kernel's own source to a candidate.
     /// Called by <c>ForAttributeWithMetadataName</c> for each declaration
-    /// carrying the attribute.
+    /// carrying the attribute, in either language.
     /// </summary>
     /// <param name="context">The declaration, its symbol and the attribute.</param>
     /// <param name="cancellationToken">Cancels the inspection.</param>
-    public static DriverCandidate FromSource(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
+    /// <returns>The candidate, or null when the attribute is on something other than a type, which the compiler reports.</returns>
+    public static DriverCandidate? FromSource(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
     {
-        INamedTypeSymbol type = (INamedTypeSymbol)context.TargetSymbol;
+        if (context.TargetSymbol is not INamedTypeSymbol type)
+        {
+            return null;
+        }
+
         AttributeData attribute = context.Attributes[0];
         SyntaxNode node = context.TargetNode;
-        Location classLocation = node is BaseTypeDeclarationSyntax declaration ? declaration.Identifier.GetLocation() : node.GetLocation();
         Location? attributeLocation = attribute.ApplicationSyntaxReference?.GetSyntax(cancellationToken).GetLocation();
         return Inspect(
             type,
@@ -48,8 +51,28 @@ internal static class DriverDiscovery
             context.SemanticModel.Compilation,
             node.SyntaxTree.FilePath,
             node.SpanStart,
-            SourceLocationInfo.From(classLocation),
+            SourceLocationInfo.From(NameLocation(type, node)),
             SourceLocationInfo.From(attributeLocation));
+    }
+
+    /// <summary>
+    /// Where <paramref name="declaration"/> names <paramref name="type"/>: the
+    /// symbol's location inside that declaration, which is the class name in
+    /// both languages, or the whole declaration if none falls inside it.
+    /// </summary>
+    /// <param name="type">The declared type.</param>
+    /// <param name="declaration">One declaration of it.</param>
+    private static Location NameLocation(INamedTypeSymbol type, SyntaxNode declaration)
+    {
+        foreach (Location location in type.Locations)
+        {
+            if (location.SourceTree == declaration.SyntaxTree && declaration.Span.Contains(location.SourceSpan))
+            {
+                return location;
+            }
+        }
+
+        return declaration.GetLocation();
     }
 
     /// <summary>

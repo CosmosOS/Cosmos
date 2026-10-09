@@ -32,7 +32,7 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
   - `LoadPlugs_ShouldIgnoreClassesWithoutPlugAttribute`
   - `LoadPlugs_ShouldHandleOptionalPlugs`
   - `FindPluggedAssemblies_ShouldReturnMatchingAssemblies`
-- **Cosmos.Tests.SourceGenerators**: Runs `CosmosEntryPointGenerator` and `DriverManifestGenerator` on in-memory compilations and checks the generated entry point, the driver manifest and the `COSMOSGEN` diagnostics exactly; `FeatureParityTests` keeps `DriverFeature`, `KernelFeatures` and the test stubs in step, `ReferencedDriverTests` covers drivers from referenced assemblies, public and under an `InternalsVisibleTo` grant, and `CachingTests` checks that adding a driver leaves the entry point cached.
+- **Cosmos.Tests.SourceGenerators**: Runs `CosmosEntryPointGenerator` and `DriverManifestGenerator` on in-memory compilations and checks the generated entry point, the driver manifest and the `COSMOSGEN` diagnostics exactly; `FeatureParityTests` keeps `DriverFeature`, `KernelFeatures` and the test stubs in step, `ReferencedDriverTests` covers drivers from referenced assemblies, public and under an `InternalsVisibleTo` grant, `VisualBasicTests` checks the Visual Basic files a Visual Basic kernel gets, and `CachingTests` checks that adding a driver leaves the entry point cached.
 - **Cosmos.Tests.Patcher**: Ensures that plugs are applied successfully to target methods and types.
   - `PatchAssembly_ShouldSkipWhenNoMatchingPlugs`
   - `PatchObjectWithAThis_ShouldPlugInstanceCorrectly`

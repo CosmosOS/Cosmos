@@ -20,38 +20,49 @@
     <Compile Remove="**\*" />
   </ItemGroup>
 
-  <!-- Include template files as Content. KernelName.csproj is excluded here and
-       re-injected by GenerateKernelTemplateProj below with @CosmosPackageVersion@
-       substituted at pack time. -->
+  <!-- One template per language. KernelName.csproj and KernelName.vbproj are
+       materialized verbatim by `dotnet new cosmos-kernel-csharp` and
+       `dotnet new cosmos-kernel-vb`, and carry @CosmosPackageVersion@ tokens
+       that must be replaced with the literal version at pack time, so they
+       are left out of the Content below and re-injected by
+       GenerateKernelTemplateProjects. -->
   <ItemGroup>
-    <Content Include="templates\**\*" Exclude="templates\cosmos-kernel\KernelName.csproj" />
+    <KernelTemplateProject Include="templates\cosmos-kernel-csharp\KernelName.csproj" />
+    <KernelTemplateProject Include="templates\cosmos-kernel-vb\KernelName.vbproj" />
+  </ItemGroup>
+
+  <!-- Each template's own files keep their path in the package. The files the
+       templates share (the bootloader configuration, the VS Code tasks and
+       launch configurations, the native source folder) live once under
+       templates\common and are packed into each template's folder. -->
+  <ItemGroup>
+    <Content Include="templates\**\*" Exclude="templates\common\**;@(KernelTemplateProject)" />
+    <Content Include="templates\common\**\*" PackagePath="content\templates\cosmos-kernel-csharp" />
+    <Content Include="templates\common\**\*" PackagePath="content\templates\cosmos-kernel-vb" />
     <Content Include="Linker\**\*" />
     <Content Include="Bootloader\**\*" />
   </ItemGroup>
 
-  <!--
-    KernelName.csproj ships into the Cosmos.Build.Templates NuGet template package
-    and is materialized verbatim by `dotnet new cosmos-kernel`. It contains
-    @CosmosPackageVersion@ tokens that must be replaced with the literal version
-    at pack time.
-  -->
-  <Target Name="GenerateKernelTemplateProj"
+  <!-- Writes each template project with @CosmosPackageVersion@ substituted
+       under the intermediate path, and packs it in the template's folder. The
+       target runs once per project. -->
+  <Target Name="GenerateKernelTemplateProjects"
           BeforeTargets="AssignTargetPaths"
-          Inputs="templates\cosmos-kernel\KernelName.csproj"
-          Outputs="$(IntermediateOutputPath)KernelName.csproj">
+          Inputs="@(KernelTemplateProject)"
+          Outputs="$(IntermediateOutputPath)%(KernelTemplateProject.RelativeDir)%(KernelTemplateProject.Filename)%(KernelTemplateProject.Extension)">
     <PropertyGroup>
-      <_KernelTemplateTemplate>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)templates\cosmos-kernel\KernelName.csproj'))</_KernelTemplateTemplate>
-      <_KernelTemplateBaked>$(_KernelTemplateTemplate.Replace('@CosmosPackageVersion@', '$(VersionPrefix)'))</_KernelTemplateBaked>
+      <_KernelTemplateProjectPath>%(KernelTemplateProject.RelativeDir)%(KernelTemplateProject.Filename)%(KernelTemplateProject.Extension)</_KernelTemplateProjectPath>
+      <_KernelTemplateProjectBaked>$([System.IO.File]::ReadAllText('%(KernelTemplateProject.FullPath)').Replace('@CosmosPackageVersion@', '$(VersionPrefix)'))</_KernelTemplateProjectBaked>
     </PropertyGroup>
-    <MakeDir Directories="$(IntermediateOutputPath)" />
-    <WriteLinesToFile File="$(IntermediateOutputPath)KernelName.csproj"
-                      Lines="$(_KernelTemplateBaked)"
+    <MakeDir Directories="$(IntermediateOutputPath)%(KernelTemplateProject.RelativeDir)" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)$(_KernelTemplateProjectPath)"
+                      Lines="$(_KernelTemplateProjectBaked)"
                       Overwrite="true"
                       WriteOnlyWhenDifferent="true" />
     <ItemGroup>
-      <FileWrites Include="$(IntermediateOutputPath)KernelName.csproj" />
-      <Content Include="$(IntermediateOutputPath)KernelName.csproj"
-               PackagePath="content\templates\cosmos-kernel\KernelName.csproj"
+      <FileWrites Include="$(IntermediateOutputPath)$(_KernelTemplateProjectPath)" />
+      <Content Include="$(IntermediateOutputPath)$(_KernelTemplateProjectPath)"
+               PackagePath="content\$(_KernelTemplateProjectPath)"
                Pack="true"
                Visible="false" />
     </ItemGroup>

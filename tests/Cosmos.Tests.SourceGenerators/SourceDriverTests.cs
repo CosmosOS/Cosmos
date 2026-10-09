@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
 namespace Cosmos.Tests.SourceGenerators;
@@ -244,6 +245,29 @@ public sealed class SourceDriverTests
             .ExpectDiagnostic(Diagnostics.DriverSkipped(3, "MyOS.Drivers.NeedsArgument", "the class has no parameterless constructor the kernel assembly can call"))
             .ExpectDiagnostic(Diagnostics.DriverSkipped(4, "MyOS.Drivers.Outer.Hidden", "the class is not accessible from the kernel assembly"))
             .RunAsync();
+
+    [Fact]
+    public Task WhenAttributeIsOnAMethod_LeavesItToTheCompiler()
+    {
+        return new ManifestTest()
+            .WithKernelClass(KitStubs.KernelClass)
+            .WithSource("/k/Drivers.cs", Prelude + """
+                namespace MyOS.Drivers
+                {
+                    internal static class Probes
+                    {
+                        [{|#0:Driver|}]
+                        internal static void Board()
+                        {
+                        }
+                    }
+                }
+                """)
+            .ExpectEntryPoint(KitStubs.KernelClass)
+            .ExpectManifest()
+            .ExpectDiagnostic(DiagnosticResult.CompilerError("CS0592").WithLocation(0).WithArguments("Driver", "class"))
+            .RunAsync();
+    }
 
     [Fact]
     public Task WhenPolicyNamesNoDriver_ReportsGen002() =>

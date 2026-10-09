@@ -6,8 +6,9 @@ public class ProjectPinUpdaterTests
 {
     private const string NewVersion = "3.0.72";
 
-    // Mirrors src/Cosmos.Build.Templates/templates/cosmos-kernel/KernelName.csproj
-    // after pack-time token substitution — the exact shape every generated project has.
+    // Mirrors src/Cosmos.Build.Templates/templates/cosmos-kernel-csharp/KernelName.csproj
+    // after pack-time token substitution — the exact shape every generated project has
+    // (cosmos-kernel-vb/KernelName.vbproj carries the same three pins).
     private const string TemplateCsproj = """
         <Project Sdk="Cosmos.Sdk/3.0.70">
 
@@ -262,8 +263,11 @@ public class ProjectPinUpdaterTests
             Directory.CreateDirectory(Path.Combine(root, "bin"));
             Directory.CreateDirectory(Path.Combine(root, "obj"));
             Directory.CreateDirectory(Path.Combine(root, "output-x64"));
+            Directory.CreateDirectory(Path.Combine(root, "VbKernel", "bin"));
 
             File.WriteAllText(Path.Combine(root, "Kernel.csproj"), TemplateCsproj);
+            File.WriteAllText(Path.Combine(root, "VbKernel", "VbKernel.vbproj"), TemplateCsproj);
+            File.WriteAllText(Path.Combine(root, "VbKernel", "bin", "VbKernel.vbproj"), TemplateCsproj);
             File.WriteAllText(Path.Combine(root, "bin", "Kernel.csproj"), TemplateCsproj);
             File.WriteAllText(Path.Combine(root, "obj", "Kernel.csproj"), TemplateCsproj);
             File.WriteAllText(Path.Combine(root, "output-x64", "Kernel.csproj"), TemplateCsproj);
@@ -275,8 +279,9 @@ public class ProjectPinUpdaterTests
             List<string> files = ProjectPinUpdater.FindPinFiles(root);
             List<string> names = files.Select(f => Path.GetRelativePath(root, f)).ToList();
 
-            Assert.Equal(3, files.Count);
+            Assert.Equal(4, files.Count);
             Assert.Contains("Kernel.csproj", names);
+            Assert.Contains(Path.Combine("VbKernel", "VbKernel.vbproj"), names);
             Assert.Contains("global.json", names);
             Assert.Contains("Directory.Packages.props", names);
         }
