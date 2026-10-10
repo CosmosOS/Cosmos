@@ -1,6 +1,6 @@
 # Driver glossary
 
-These notes give the background on the hardware and operating system concepts that [Writing a driver](drivers.md) builds on, for a reader who has not written a driver before. Each page explains the concept on its own, then closes with how the Cosmos driver kit applies it. The table groups them in three parts: how a driver reaches a device, how the device and the driver signal each other, then the buses. Interrupt context also builds on two scheduling notes from the contributor documentation, [preemption](../dev/sched-concepts/preemption.md) and the [instruction boundary](../dev/sched-concepts/instruction-boundary.md).
+These notes give the background on the hardware, operating system and build concepts that [Writing a driver](drivers.md) and the contributor page on the [Driver manifest](../dev/build/driver-manifest.md) build on, for a reader who has not written a driver before. Each page explains the concept on its own, then closes with how Cosmos applies it. The table groups them in four parts: how a driver reaches a device, how the device and the driver signal each other, the buses, then how a kernel comes to carry a driver and picks one for each device. Interrupt context also builds on two scheduling notes from the contributor documentation, [preemption](../dev/sched-concepts/preemption.md) and the [instruction boundary](../dev/sched-concepts/instruction-boundary.md).
 
 | Concept | Summary |
 |---------|---------|
@@ -18,3 +18,6 @@ These notes give the background on the hardware and operating system concepts th
 | [Virtio](driver-concepts/virtio.md) | Paravirtual devices: transports, the status handshake, feature negotiation and virtqueues |
 | [USB](driver-concepts/usb.md) | Interfaces, endpoints, transfer types, polled interrupt endpoints, enumeration, the HID boot protocol |
 | [PS/2 and the 8042 controller](driver-concepts/ps2.md) | The 8042 controller, its two ports, commands, acknowledgements and scanning |
+| [Source generators](driver-concepts/source-generators.md) | Compiler plug-ins that add code at build time, in place of reflection, and how build properties reach them |
+| [Trimming and feature switches](driver-concepts/trimming.md) | Leaving unreachable code out of the image, and build-time switches that make a branch unreachable |
+| [Driver matching](driver-concepts/driver-matching.md) | Match tables, specificity and rank, and a deterministic last key when several drivers fit one device |

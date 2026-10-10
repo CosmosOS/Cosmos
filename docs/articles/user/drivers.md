@@ -154,11 +154,11 @@ Calling a thread-context member of the kit from a handler (a `DeviceBinding` met
 
 ## The attribute and the manifest
 
-The build registers every class marked `[Driver]`: a source generator writes `DriverManifest.g.cs` into the kernel project, which constructs each driver once at boot ([Driver Manifest](../dev/build/driver-manifest.md) describes the generator). A driver class must derive from `Driver`, be concrete and non-generic, and have a parameterless constructor. It may be `internal` in the kernel project, but must be `public` in a driver library ([A driver library](#a-driver-library)). A class that breaks one of these rules is left out of the manifest with warning `COSMOSGEN001`, and so does not appear in the boot log's `manifest:` line.
+The build registers every class marked `[Driver]`: a [source generator](driver-concepts/source-generators.md) writes `DriverManifest.g.cs` into the kernel project, which constructs each driver once at boot ([Driver manifest](../dev/build/driver-manifest.md) describes the generator). A driver class must derive from `Driver`, be concrete and non-generic, and have a parameterless constructor. It may be `internal` in the kernel project, but must be `public` in a driver library ([A driver library](#a-driver-library)). A class that breaks one of these rules is left out of the manifest with warning `COSMOSGEN001`, and so does not appear in the boot log's `manifest:` line.
 
 The attribute takes two options:
 
-- `[Driver(Feature = DriverFeature.Keyboard)]` registers the driver only when the matching feature switch (`CosmosEnableKeyboard`) is on; otherwise it is trimmed, left out of the compiled kernel.
+- `[Driver(Feature = DriverFeature.Keyboard)]` registers the driver only when the matching [feature switch](driver-concepts/trimming.md) (`CosmosEnableKeyboard`) is on; otherwise it is trimmed, left out of the compiled kernel.
 - `[Driver(Default = false)]` registers the driver only when the kernel opts into it by name ([Excluding and opting in](#excluding-and-opting-in)).
 
 The manifest order is deterministic (the kernel's own drivers first, then those of referenced libraries) and is printed at boot.
@@ -179,7 +179,7 @@ private readonly DeviceMatch[] _matches = [SyntheticMatch.Key("kbd")];
 private readonly DeviceMatch[] _matches = [SyntheticMatch.Any()];
 ```
 
-When a node appears, the kit orders the matching drivers by `Priority`, then by specificity (highest first), then by manifest order, and offers the node to each until one returns `Bound`:
+When a node appears, the kit [orders the matching drivers](driver-concepts/driver-matching.md) by `Priority`, then by specificity (highest first), then by manifest order, and offers the node to each until one returns `Bound`:
 
 ```
 [Drivers] synthetic:prio candidates: HighPriorityDriver(prio 10, spec 1) LowPriorityDriver(prio 0, spec 1)
