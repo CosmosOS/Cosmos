@@ -4,6 +4,7 @@ using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.X64.Bridge;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.Core.X64.Memory;
 
@@ -57,6 +58,29 @@ internal sealed unsafe class X64PagerBackend : IPagerBackend
     /// <summary>Physical frames a huge page covers at each level.</summary>
     private const ulong PagesPer2MiB = 512;
 
+    /// <summary>
+    /// Serializes page-table walks and edits. Without it, two threads mapping
+    /// regions under the same empty PML4 or PDPT slot can each allocate a table
+    /// and link it: the second link overwrites the first, and the mappings made
+    /// through the first table vanish with it.
+    /// <para>
+    /// This is the same hazard and the same lock <c>DeviceMapper</c> guards, and
+    /// deliberately the same instance concern in reverse: both writers edit the
+    /// kernel's live tables, so a region one of them installs can be lost to a
+    /// concurrent commit by the other. They do not share a lock, so overlapping
+    /// the two is still unsafe — they only must not race on the same empty
+    /// intermediate slot from two threads each.
+    /// </para>
+    /// <para>
+    /// IRQ-safe so a preemption never parks a holder mid-edit while another
+    /// thread spins on it. Lock order: this lock may take the
+    /// <see cref="PageAllocator"/> lock beneath it (table allocation), never the
+    /// reverse, and nothing under it may call <see cref="Commit"/> again: the
+    /// lock is not reentrant.
+    /// </para>
+    /// </summary>
+    private static SchedSpinLock s_lock;
+
     /// <inheritdoc />
     public bool IsAvailable => true;
 
@@ -92,10 +116,13 @@ internal sealed unsafe class X64PagerBackend : IPagerBackend
 
         ulong* pml4 = (ulong*)(rootFrame + hhdm);
 
-        for (int i = 0; i < space->RegionCount; i++)
+        using (s_lock.AcquireIrqSafe())
         {
-            ref AddressSpaceRegion region = ref space->Regions[i];
-            InstallRegion(pml4, in region, hhdm);
+            for (int i = 0; i < space->RegionCount; i++)
+            {
+                ref AddressSpaceRegion region = ref space->Regions[i];
+                InstallRegion(pml4, in region, hhdm);
+            }
         }
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -283,6 +284,7 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("Pager_Translate_AllZeroRegions_MapsNothing", TestPagerTranslateZeroRegions);
         TR.Run("Pager_Translate_CapacityLimitUnaffected", TestPagerTranslateCapacityUnaffected);
         TR.Run("Pager_Translate_SinglePageRegion", TestPagerTranslateSinglePage);
+        TR.Run("Pager_Commit_2MiBRegion", TestPagerCommit2MiB);
         TR.Run("Pager_Commit_MultiPageRange", TestPagerCommitMultiPage);
 
         // The write-through test, last: it is the only one that faults on a
@@ -2476,6 +2478,89 @@ public unsafe class Kernel : Sys.Kernel
                 $"page {i} of a {Pages}-page region must translate");
             Assert.True(resolved.Value == frame + (i * Pager.PageSize),
                 $"page {i} of a large region must resolve to its own frame");
+        }
+
+        PagerCleanup(space);
+        PageAllocator.Free(memory);
+    }
+
+    /// <summary>
+    /// A 512-page region, the one shape that makes the backend install a single
+    /// 2 MiB entry instead of a page table full of 4 KiB leaves.
+    /// </summary>
+    /// <remarks>
+    /// The fast path is reached deliberately rather than left to chance: it runs
+    /// only when the virtual and physical addresses are both 2 MiB-aligned, and
+    /// while <see cref="PageAllocator.AllocPages"/> guarantees a contiguous run
+    /// it does not guarantee that alignment — the first run it hands back is
+    /// rarely aligned, which would silently leave <c>Install2MiB</c> untested.
+    /// So this allocates twice the span, finds a 2 MiB-aligned frame inside it,
+    /// and maps only that. The rest is released with the whole run.
+    /// </remarks>
+    private static unsafe void TestPagerCommit2MiB()
+    {
+        const ulong Pages = 512;
+        const ulong Oversize = Pages * 2;
+
+        void* memory = PageAllocator.AllocPages(PageType.Unmanaged, Oversize, zero: true);
+        Assert.True(memory != null, "2MiB-region page allocation must succeed");
+
+        if (memory is null)
+        {
+            return;
+        }
+
+        ulong run = PageAllocator.VirtualToPhysical((ulong)memory);
+
+        // Round the frame up to the next 2 MiB boundary. The outer modulo keeps the
+        // skew at zero when the run is already aligned, so the span below always
+        // has room for a whole 2 MiB inside a two-granule run.
+        ulong align = 0x20_0000;
+        ulong skew = (align - (run % align)) % align;
+        if (skew + (Pages * Pager.PageSize) > Oversize * Pager.PageSize)
+        {
+            Serial.WriteString("[Pager_Commit_2MiBRegion] run holds no aligned 2MiB span, skipped\n");
+            PageAllocator.Free(memory);
+            return;
+        }
+
+        ulong frame = run + skew;
+        ulong alias = PagerRoundTripAlias(0x2E);
+        Assert.True((alias & 0x1F_FFFF) == 0, "the alias base must keep slots 2MiB-aligned");
+        Assert.True((frame & 0x1F_FFFF) == 0, "the chosen frame must be 2MiB-aligned");
+
+        Serial.WriteString("[Pager_Commit_2MiBRegion] run ");
+        Serial.WriteHex(run);
+        Serial.WriteString(" -> frame ");
+        Serial.WriteHex(frame);
+        Serial.WriteString(" -> one 2MiB entry\n");
+
+        AddressSpaceDescriptor* space = PagerCreateOrNull();
+        if (space is null)
+        {
+            PageAllocator.Free(memory);
+            return;
+        }
+
+        Pager.Add(space, VirtualAddress.From(alias), PhysicalAddress.From(frame), Pages,
+            PageFlags.Present | PageFlags.Writable | PageFlags.Cacheable);
+        Pager.Commit(space);
+
+        // First, middle and last: the boundaries are where a wrong base or a
+        // wrong size shows up first.
+        ulong[] probes = { 0, Pages / 2, Pages - 1 };
+        for (int p = 0; p < probes.Length; p++)
+        {
+            VirtualAddress page = VirtualAddress.From(alias + (probes[p] * Pager.PageSize));
+            Assert.True(Pager.Translate(space, page, out PhysicalAddress resolved),
+                $"page {probes[p]} of a 512-page region must translate");
+            Assert.True(resolved.Value == frame + (probes[p] * Pager.PageSize),
+                $"page {probes[p]} of a 2MiB region must resolve to its own frame");
+
+            byte* target = (byte*)(ulong)page.Value;
+            target[0] = PagerTestMarker;
+            Assert.True(target[0] == PagerTestMarker,
+                $"page {probes[p]} of a 2MiB region must be writable");
         }
 
         PagerCleanup(space);

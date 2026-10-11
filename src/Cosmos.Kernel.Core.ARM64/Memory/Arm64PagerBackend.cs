@@ -4,6 +4,7 @@ using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core.ARM64.Bridge;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.Core.ARM64.Memory;
 
@@ -71,21 +72,46 @@ internal sealed unsafe class Arm64PagerBackend : IPagerBackend
 
     private const ulong PagesPer2MiB = 512;
 
+    /// <summary>Bit 63, which a sign-extended address always sets.</summary>
+    private const ulong SignBit = 1UL << 63;
+
     /// <summary>
-    /// A resolved MAIR attribute index plus whether it is Device memory.
+    /// Translated-bit mask per half, as derived from TCR_EL1's T0SZ and T1SZ.
+    /// Zero until <see cref="GetAddressMask"/> reads the register. See that
+    /// method for why they are cached.
     /// </summary>
-    /// <remarks>
-    /// The distinction is load-bearing rather than cosmetic: Device attributes
-    /// are architecturally read-only, so a block using one must leave AP[2]
-    /// clear no matter what <see cref="PageFlags.Writable"/> asks for.
-    /// </remarks>
-    private readonly struct MairAttr(ulong index, bool isDevice)
+    private static ulong s_lowHalfMask;
+    private static ulong s_highHalfMask;
+
+    /// <summary>
+    /// Serializes page-table walks and edits. Without it, two threads mapping
+    /// regions under the same empty L0 or L1 slot can each allocate a table and
+    /// link it: the second link overwrites the first, and the mappings made
+    /// through the first table vanish with it.
+    /// <para>
+    /// This is the same hazard and the same lock <c>DeviceMapper</c> guards.
+    /// Both writers edit the kernel's live tables, so they do not share a lock
+    /// and overlapping them is still unsafe; each only has to keep two of its
+    /// own threads off the same empty intermediate slot.
+    /// </para>
+    /// <para>
+    /// IRQ-safe so a preemption never parks a holder mid-edit while another
+    /// thread spins on it. Lock order: this lock may take the
+    /// <see cref="PageAllocator"/> lock beneath it (table allocation), never the
+    /// reverse, and nothing under it may call <see cref="Commit"/> again: the
+    /// lock is not reentrant.
+    /// </para>
+    /// </summary>
+    private static SchedSpinLock s_lock;
+
+    /// <summary>
+    /// A resolved MAIR attribute index, carried alongside the flags so
+    /// <see cref="EncodeFlags"/> does not have to re-read MAIR_EL1 per region.
+    /// </summary>
+    private readonly struct MairAttr(ulong index)
     {
         /// <summary>AttrIndx value placed in bits [4:2] of a block descriptor.</summary>
         public ulong Index { get; } = index;
-
-        /// <summary>True when the attribute is Device-nGnRnE or Device-nGnRE.</summary>
-        public bool IsDevice { get; } = isDevice;
     }
 
     /// <inheritdoc />
@@ -116,27 +142,29 @@ internal sealed unsafe class Arm64PagerBackend : IPagerBackend
         // Device region and a Normal RAM region need different attribute
         // indices, and picking one for both is what made the first round-trip
         // test trap on write.
-        for (int i = 0; i < space->RegionCount; i++)
+        using (s_lock.AcquireIrqSafe())
         {
-            ref AddressSpaceRegion region = ref space->Regions[i];
-
-            // A region belongs to whichever half its virtual address falls in,
-            // and each half has its own root table. Committing a lower-half
-            // region into the upper-half tree would write a descriptor the CPU
-            // never consults for that address.
-            ulong normalized = NormalizeAddress(region.Virt.Value);
-            ulong rootFrame = IsHighHalf(region.Virt.Value)
-                ? space->RootFrame
-                : space->LowRootFrame;
-
-            if (rootFrame == 0)
+            for (int i = 0; i < space->RegionCount; i++)
             {
-                continue;
+                ref AddressSpaceRegion region = ref space->Regions[i];
+
+                // A region belongs to whichever half its virtual address falls in,
+                // and each half has its own root table. Committing a lower-half
+                // region into the upper-half tree would write a descriptor the CPU
+                // never consults for that address.
+                ulong normalized = NormalizeAddress(region.Virt.Value);
+                ulong rootFrame = IsHighHalf(region.Virt.Value)
+                    ? space->RootFrame
+                    : space->LowRootFrame;
+
+                if (rootFrame == 0)
+                {
+                    continue;
+                }
+
+                InstallRegion((ulong*)(rootFrame + hhdm), region, normalized, region.Virt.Value,
+                    ResolveAttrIndex(region.Flags), hhdm);
             }
-
-            InstallRegion((ulong*)(rootFrame + hhdm), region, normalized, region.Virt.Value,
-                ResolveAttrIndex(region.Flags), hhdm);
-
         }
     }
 
@@ -236,23 +264,16 @@ internal sealed unsafe class Arm64PagerBackend : IPagerBackend
     /// TTBR1 translates. Everything else, including the identity-mapped kernel
     /// heap, is the lower half served by TTBR0.
     /// </summary>
-    private static bool IsHighHalf(ulong address) => (address >> 48) == 0xFFFF;
-
-    /// <summary>
-    /// The sign-extension bits of whichever half <paramref name="address"/> is in,
-    /// i.e. everything above the 48 translated bits.
-    /// </summary>
     /// <remarks>
-    /// Index extraction works on the normalised (sign-extension-stripped) address
-    /// so the table indices line up, but the TLB is tagged with the full virtual
-    /// address. Rebuilding a full VA for an invalidation therefore means keeping
-    /// the half's upper bits and swapping in the current page offset.
+    /// Bit 63 is the discriminator, not bit 47: whichever half a sign-extended
+    /// address falls in, the extension sets the top bit. Testing a fixed bit 47
+    /// would assume the 48-bit regime this class is otherwise careful not to.
     /// </remarks>
-    private static ulong CurrentHalfMask(ulong address) => address & ~((1UL << 48) - 1);
+    private static bool IsHighHalf(ulong address) => (address & SignBit) != 0;
 
     /// <summary>
     /// Reduces a virtual address to the bits the configured regime actually
-    /// translates, by discarding the sign extension above it.
+    /// translates, by discarding the sign extension above them.
     /// </summary>
     /// <remarks>
     /// The level shifts below are absolute (L0 at [47:39]), so the top of the
@@ -264,39 +285,72 @@ internal sealed unsafe class Arm64PagerBackend : IPagerBackend
     /// </remarks>
     private static ulong NormalizeAddress(ulong address)
     {
-        ulong mask = GetAddressMask();
-        ulong normalized = address & mask;
-
         // A sign-extended high-half address normalizes to a small value, which
         // is correct: the upper half is translated relative to its own root, so
         // the index bits really do start from zero at the bottom of the range.
-        return normalized;
+        return address & GetAddressMask(IsHighHalf(address));
     }
 
     /// <summary>
-    /// The translated-bit mask for the configured VA size, read from TCR_EL1.
+    /// The sign-extension bits of whichever half <paramref name="address"/> is in,
+    /// i.e. everything above that half's translated bits.
     /// </summary>
     /// <remarks>
-    /// T0SZ (bits [5:0]) and T1SZ (bits [21:16]) give each half's VA size as
-    /// 64 - T0SZ and 64 - T1SZ. Reading them removes the assumption that the
-    /// regime is 48-bit. Falls back to 48 bits if the read is unavailable or
-    /// yields an implausible size, since every known configuration uses it.
+    /// Index extraction works on the normalised (sign-extension-stripped) address
+    /// so the table indices line up, but the TLB is tagged with the full virtual
+    /// address. Rebuilding a full VA for an invalidation therefore means keeping
+    /// the half's upper bits and swapping in the current page offset.
     /// </remarks>
-    private static ulong GetAddressMask()
+    private static ulong SignExtensionBits(ulong address)
     {
-        ulong tcr = DeviceMapperNative.ReadTcr();
+        return address & ~GetAddressMask(IsHighHalf(address));
+    }
 
-        ulong t1sz = (tcr >> 16) & 0x3F;
-        int sizeBits = 64 - (int)t1sz;
+    /// <summary>
+    /// The translated-bit mask for the half <paramref name="address"/> falls in,
+    /// read from TCR_EL1.
+    /// </summary>
+    /// <remarks>
+    /// T0SZ (bits [5:0]) sizes the lower half and T1SZ (bits [21:16]) the upper
+    /// one, each as 64 - T*SZ. Reading both is what lets the walk stay correct
+    /// whatever the bootloader configured: the two halves are sized
+    /// independently, and an address normalized with the wrong one loses or
+    /// keeps the wrong bits. Falls back to 48 bits if the read yields an
+    /// implausible size, since every known configuration uses it.
+    /// <para>
+    /// Read once per half and cached. TCR_EL1 is fixed for the life of the
+    /// regime here — there is nothing that changes it after boot — and this runs
+    /// once per region on commit and once per translate, including from fault
+    /// handlers, so the <c>MRS</c> does not belong on that path. A race to
+    /// compute the same value twice is harmless.
+    /// </para>
+    /// </remarks>
+    private static ulong GetAddressMask(bool highHalf)
+    {
+        ulong cached = highHalf ? s_highHalfMask : s_lowHalfMask;
+        if (cached != 0)
+        {
+            return cached;
+        }
+
+        ulong tcr = DeviceMapperNative.ReadTcr();
+        ulong tsz = highHalf ? (tcr >> 16) & 0x3F : tcr & 0x3F;
+        int sizeBits = 64 - (int)tsz;
 
         // 39 bits is the minimum supported AArch64 VA size (4 levels of 512
         // entries covering 12 page-offset bits); anything smaller is nonsense.
-        if (sizeBits < 39 || sizeBits > 48)
+        ulong mask = (sizeBits < 39 || sizeBits > 48) ? (1UL << 48) - 1 : (1UL << sizeBits) - 1;
+
+        if (highHalf)
         {
-            return (1UL << 48) - 1;
+            s_highHalfMask = mask;
+        }
+        else
+        {
+            s_lowHalfMask = mask;
         }
 
-        return (1UL << sizeBits) - 1;
+        return mask;
     }
 
     /// <summary>
@@ -410,7 +464,7 @@ internal sealed unsafe class Arm64PagerBackend : IPagerBackend
                 return;
             }
 
-            Publish(cursor | CurrentHalfMask(realVirt));
+            Publish(cursor | SignExtensionBits(realVirt));
             cursor += PageAllocator.PageSize;
             frame += PageAllocator.PageSize;
             remaining--;
@@ -456,21 +510,17 @@ internal sealed unsafe class Arm64PagerBackend : IPagerBackend
             return false;
         }
 
-        // DescTable is set on the leaf as well as on intermediate levels. That
-        // reads backwards against the Arm ARM, where a block descriptor is
-        // 0b01 in bits [1:0] and bit 1 selects "table" — but on this platform it
-        // is required, and it was measured rather than assumed:
+        // An L3 leaf carries DescTable even though the Arm ARM calls a block
+        // descriptor 0b01 in bits [1:0] with bit 1 selecting "table". At this
+        // level it is required, which was measured rather than assumed: clearing
+        // it makes the MMU ignore the mapping, and a write through the alias
+        // then aborts during translation at level 1 (ESR EC 0x25). The bootloader's
+        // own leaf entries carry bit 1 too, so this matches the tables already
+        // in the hardware rather than diverging from them.
         //
-        //   leaf without bit 1 -> AT S1E1R returns 0 (translation fault),
-        //                          the MMU ignores the mapping, and a write
-        //                          through the alias traps at level 1.
-        //   leaf with bit 1    -> AT returns the mapped frame, the mapping is
-        //                          live, and the full round trip passes.
-        //
-        // The same encoding is what the bootloader's own leaf entries use (they
-        // carry bit 1 too), so this matches the tables already in the hardware
-        // rather than diverging from them. `DescTable` is a shared constant for
-        // that reason: at intermediate levels it genuinely means "descend".
+        // This is specific to the L3 leaf. At L2 bit 1 keeps its architectural
+        // meaning — see Install2MiB — and clearing it there is what lets a
+        // 2 MiB block be told apart from a table by the walk.
         l3[(int)((virt >> L3Shift) & TableIndexMask)] = phys | attributes | DescValid | DescTable;
         return true;
     }
@@ -500,10 +550,13 @@ internal sealed unsafe class Arm64PagerBackend : IPagerBackend
             return false;
         }
 
-        // Bit 1 set for the same reason as the L3 leaf in Install4KiB: it is what
-        // this MMU accepts on a leaf, and omitting it leaves the block visible to
-        // a software walk but invisible to translation.
-        l2[(int)((virt >> L2Shift) & TableIndexMask)] = phys | attributes | DescValid | DescTable;
+        // A 2 MiB block leaves DescTable clear, as the architecture requires and as
+        // DeviceMapper — the writer every ARM64 driver actually goes through —
+        // already does at this same level. Bit 1 has to stay meaningful here:
+        // Walk and ResolveTablesToL3 use it to tell a 2 MiB block from a table,
+        // and setting it would make them follow a block's physical address as a
+        // table pointer. The L3 leaf is the opposite case; see Install4KiB.
+        l2[(int)((virt >> L2Shift) & TableIndexMask)] = phys | attributes | DescValid;
         return true;
     }
 
@@ -700,17 +753,28 @@ internal sealed unsafe class Arm64PagerBackend : IPagerBackend
 
         if (wantsDevice)
         {
-            return deviceIndex >= 0
-                ? new MairAttr((ulong)deviceIndex, true)
-                : new MairAttr(0, false);
+            if (deviceIndex >= 0)
+            {
+                return new MairAttr((ulong)deviceIndex);
+            }
+
+            // Falling through to the Normal index here would hand a caller who
+            // asked for device memory a cacheable mapping of it. That is the
+            // worst of the available answers — the wrong one, silently — so say
+            // so: there is no Device attribute to point AttrIndx at, and adding
+            // one means rewriting MAIR_EL1, which would re-attribute every live
+            // mapping in the kernel. DeviceMapper, the other writer, reports the
+            // same condition as a failure instead of substituting Normal.
+            Serial.WriteString("[Pager] MAIR holds no Device attribute; a Device region falls back to Normal\n");
         }
 
-        // Normal memory is the common case, and it must resolve to a
-        // cacheable attribute: mapping RAM through the Device index silently
-        // makes every write trap (Device memory is not writable).
-        return normalIndex >= 0
-            ? new MairAttr((ulong)normalIndex, false)
-            : new MairAttr(0, false);
+        // Normal memory is the common case, and it is what RAM wants: the Device
+        // types are uncached and non-Gathering, so mapping ordinary memory
+        // through one would leave every access reaching the bus individually.
+        // Device memory is writable — the G/R/E suffixes govern Gathering,
+        // Reordering and early write acknowledgement, not permission — so this
+        // ordering is about the attribute a caller meant, not about trapping.
+        return new MairAttr((ulong)(normalIndex >= 0 ? normalIndex : 0));
     }
 
     /// <summary>

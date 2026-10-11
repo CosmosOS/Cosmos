@@ -276,9 +276,14 @@ public static unsafe class DeviceMapper
 
         DeviceMapperNative.DsbIsb();
 
-        // Flush entire TLB since we changed a 1GiB mapping
-        // (vale1 only flushes one page; we need broader flush)
-        DeviceMapperNative.FlushTlb(0); // will be followed by individual flushes if needed
+        // The old 1 GiB block no longer exists: its 1 GiB range is now 512
+        // independent 2 MiB blocks, so a stale translation cached for any address
+        // in that range is wrong. tlbi vae1is only invalidates the one address it
+        // is given — the old code passed 0, which is a low-half VA unrelated to
+        // this TTBR1 range, so nothing at all was invalidated. A page-size change
+        // is exactly what the broad invalidation is for; the per-address flush in
+        // MapPage then covers the one block being re-typed.
+        DeviceMapperNative.FlushAllTlb();
 
         s_spareL2Used = true;
 

@@ -24,6 +24,22 @@ internal static partial class DeviceMapperNative
     [SuppressGCTransition]
     public static partial void FlushTlb(ulong vaShifted);
 
+    /// <summary>
+    /// Invalidate every EL1 TLB entry, inner shareable, then DSB SY and ISB.
+    /// </summary>
+    /// <remarks>
+    /// The broad invalidation <see cref="FlushTlb"/> cannot express: it targets
+    /// one virtual address, so a change of page size leaves the rest of the
+    /// affected range holding translations resolved from the old entry. EL1 has
+    /// no global-page concept, so there is nothing to preserve and no reason to
+    /// avoid it — but it is much more expensive than a single-address flush, so
+    /// it belongs to the rare paths that restructure a mapping rather than to
+    /// the per-page ones.
+    /// </remarks>
+    [LibraryImport("*", EntryPoint = "_native_arm64_tlbi_all")]
+    [SuppressGCTransition]
+    public static partial void FlushAllTlb();
+
     [LibraryImport("*", EntryPoint = "_native_arm64_va_to_pa")]
     [SuppressGCTransition]
     public static partial ulong VirtToPhys(ulong va);
