@@ -8,8 +8,10 @@ using Cosmos.Kernel.Core.Memory;
 namespace Cosmos.Kernel.Core.ARM64.Memory;
 
 /// <summary>
-/// ARM64 implementation of <see cref="IPagerBackend"/>: a three-level walk over
-/// the TTBR1 tables Limine left installed.
+/// ARM64 implementation of <see cref="IPagerBackend"/>: a four-level walk over
+/// the translation tables Limine left installed, covering both halves —
+/// TTBR1_EL1 for the upper half where the HHDM and kernel image live, and
+/// TTBR0_EL1 for the lower half where the kernel heap is identity-mapped.
 /// </summary>
 /// <remarks>
 /// This is the paging machinery <c>DeviceMapper</c> does a single fixed-purpose
@@ -59,7 +61,7 @@ internal sealed unsafe class Arm64PagerBackend : IPagerBackend
     /// <remarks>
     /// These shifts are only valid for the default 48-bit VA size (T0SZ/T1SZ
     /// of 16). A regime configured for a different size shifts every index
-    /// down, so <see cref="AddressMask"/> is derived from the live TCR_EL1
+    /// down, so the translated-bit mask is derived from the live TCR_EL1
     /// instead and applied before the shifts — see <see cref="GetAddressMask"/>.
     /// </remarks>
     private const int L0Shift = 39;

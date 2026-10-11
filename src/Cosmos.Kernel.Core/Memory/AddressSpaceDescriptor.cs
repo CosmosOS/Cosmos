@@ -67,15 +67,6 @@ internal unsafe struct AddressSpaceDescriptor
     /// </summary>
     public ulong LowRootFrame;
 
-    /// <summary>
-    /// x86 PCID assigned to this space, used to invalidate its TLB entries
-    /// cheaply on switch. Zero means "unassigned": on hardware without INVPCID,
-    /// and for a descriptor that never opts in, a root of 0 selects the
-    /// legacy flush-everything behaviour. Populated by the backend, not by
-    /// callers.
-    /// </summary>
-    public ulong Pcid;
-
     /// <summary>Number of populated slots in <see cref="Regions"/>.</summary>
     public int RegionCount;
 
@@ -94,17 +85,20 @@ internal unsafe struct AddressSpaceDescriptor
     public bool IsCommitted;
 
     /// <summary>
-    /// The slot after the last populated one, where
-    /// <see cref="Pager.Add"/> writes next. Never addresses past
-    /// <see cref="AddressSpaceRegionStore.MaxRegions"/> — the caller checks
-    /// <see cref="RegionCount"/> against <see cref="MaxRegionCount"/> first and
-    /// declines the add, so this relies on that contract rather than
-    /// bounds-checking the write.
+    /// The slot after the last populated one, where <see cref="Pager.Add"/>
+    /// writes next.
     /// </summary>
     /// <remarks>
-    /// Returns by reference, so the write lands in the descriptor's inline
-    /// storage without copying the element out and back. Requires a pointer to
-    /// a descriptor, which is how every caller already holds one.
+    /// <see cref="Pager.Add"/> checks <see cref="RegionCount"/> against
+    /// <see cref="MaxRegionCount"/> and declines the add before this is
+    /// reached, so the index is in range on every real call. The clamp below is
+    /// a backstop against escaping the descriptor's own allocation — which would
+    /// corrupt whatever the heap placed next — not a bounds check: a caller that
+    /// bypassed <see cref="Pager.Add"/> would overwrite the last region rather
+    /// than be caught. Returns by reference, so the write lands in the
+    /// descriptor's inline storage without copying the element out and back.
+    /// Requires a pointer to a descriptor, which is how every caller already
+    /// holds one.
     /// </remarks>
     public ref AddressSpaceRegion NextRegion =>
         ref Regions[RegionCount < MaxRegionCount ? RegionCount : MaxRegionCount - 1];

@@ -18,15 +18,19 @@ namespace Cosmos.Kernel.Core.ARM64.Cpu;
 /// </summary>
 public static unsafe class DeviceMapper
 {
-    // Page table descriptor bits
-    private const ulong DESC_VALID = 1UL << 0;
-    private const ulong DESC_TABLE = 1UL << 1;  // 1 = table, 0 = block
-    private const ulong DESC_AF = 1UL << 10;
-    private const ulong DESC_PXN = 1UL << 53;
-    private const ulong DESC_UXN = 1UL << 54;
-    private const ulong ADDR_MASK = 0x0000FFFFFFFFF000UL;
-    private const ulong BLOCK_2MB_ADDR_MASK = 0x0000FFFFFFE00000UL;
-    private const ulong BLOCK_1GB_ADDR_MASK = 0x0000FFFFC0000000UL;
+    // Page table descriptor bits (Arm ARM DDI 0487, Table D5-30).
+    private const ulong DescValid = 1UL << 0;
+    /// <summary>Bit 1: set means "another table", clear means "block" at the level it appears on.</summary>
+    private const ulong DescTable = 1UL << 1;
+    private const ulong DescAf = 1UL << 10;
+    private const ulong DescPxN = 1UL << 53;
+    private const ulong DescUxN = 1UL << 54;
+    /// <summary>Physical-address field shared by table and block descriptors.</summary>
+    private const ulong AddrMask = 0x0000FFFFFFFFF000UL;
+    /// <summary>Physical-address field of a 2 MiB block descriptor (bits 47:21).</summary>
+    private const ulong Block2MiBAddrMask = 0x0000FFFFFFE00000UL;
+    /// <summary>Physical-address field of a 1 GiB block descriptor (bits 47:30).</summary>
+    private const ulong Block1GiBAddrMask = 0x0000FFFFC0000000UL;
 
     private static bool s_spareL2Used;
 
@@ -82,7 +86,7 @@ public static unsafe class DeviceMapper
     private static bool MapPage(ulong physBase, ulong hhdmOffset)
     {
         // 2MiB-align
-        ulong aligned = physBase & BLOCK_2MB_ADDR_MASK;
+        ulong aligned = physBase & Block2MiBAddrMask;
         ulong virtAddr = aligned + hhdmOffset;
 
         // ── Find Device memory MAIR index ────────────────────────
@@ -95,7 +99,7 @@ public static unsafe class DeviceMapper
         }
 
         // ── Read TTBR1 and walk page tables ──────────────────────
-        ulong ttbr1Phys = DeviceMapperNative.ReadTtbr1() & ADDR_MASK;
+        ulong ttbr1Phys = DeviceMapperNative.ReadTtbr1() & AddrMask;
         ulong* l0 = (ulong*)(ttbr1Phys + hhdmOffset);
 
         // L0 index (bits [47:39] of the VA offset within TTBR1 space)
@@ -105,33 +109,33 @@ public static unsafe class DeviceMapper
         int l0idx = (int)((aligned >> 39) & 0x1FF);
         ulong l0entry = l0[l0idx];
 
-        if ((l0entry & DESC_VALID) == 0)
+        if ((l0entry & DescValid) == 0)
         {
             WriteEntryError("L0", l0idx, l0entry, "invalid", aligned);
             return false;
         }
-        if ((l0entry & DESC_TABLE) == 0)
+        if ((l0entry & DescTable) == 0)
         {
             WriteEntryError("L0", l0idx, l0entry, "is block (unexpected)", aligned);
             return false;
         }
 
         // Follow L0 table → L1
-        ulong* l1 = (ulong*)((l0entry & ADDR_MASK) + hhdmOffset);
+        ulong* l1 = (ulong*)((l0entry & AddrMask) + hhdmOffset);
         int l1idx = (int)((aligned >> 30) & 0x1FF);
         ulong l1entry = l1[l1idx];
 
         ulong* l2;
 
-        if ((l1entry & DESC_VALID) == 0)
+        if ((l1entry & DescValid) == 0)
         {
             WriteEntryError("L1", l1idx, l1entry, "invalid", aligned);
             return false;
         }
-        else if ((l1entry & DESC_TABLE) != 0)
+        else if ((l1entry & DescTable) != 0)
         {
             // Table descriptor → follow to L2
-            l2 = (ulong*)((l1entry & ADDR_MASK) + hhdmOffset);
+            l2 = (ulong*)((l1entry & AddrMask) + hhdmOffset);
         }
         else
         {
@@ -150,7 +154,7 @@ public static unsafe class DeviceMapper
         ulong l2entry = l2[l2idx];
 
         // Check if existing mapping already has Device attributes
-        if ((l2entry & DESC_VALID) != 0)
+        if ((l2entry & DescValid) != 0)
         {
             int existingIdx = (int)((l2entry >> 2) & 0x7);
             byte existingAttr = (byte)((mair >> (existingIdx * 8)) & 0xFF);
@@ -172,12 +176,12 @@ public static unsafe class DeviceMapper
 
         // Build 2MiB block descriptor with Device attributes
         // Bits: Valid=1, Block(bit1=0), AttrIndx[4:2], AF[10], PXN[53], UXN[54]
-        ulong desc = (aligned & BLOCK_2MB_ADDR_MASK)
+        ulong desc = (aligned & Block2MiBAddrMask)
                    | ((ulong)deviceIdx << 2)
-                   | DESC_AF
-                   | DESC_PXN
-                   | DESC_UXN
-                   | DESC_VALID;
+                   | DescAf
+                   | DescPxN
+                   | DescUxN
+                   | DescValid;
 
         Serial.Write("[DeviceMapper] Mapping phys 0x");
         Serial.WriteHex(aligned);
@@ -250,7 +254,7 @@ public static unsafe class DeviceMapper
         ulong* l2 = (ulong*)l2va;
 
         // Extract the 1GiB block's physical base and attributes
-        ulong blockPhysBase = l1entry & BLOCK_1GB_ADDR_MASK;
+        ulong blockPhysBase = l1entry & Block1GiBAddrMask;
         // Lower attributes [11:2] (AttrIndx, NS, AP, SH, AF, nG)
         ulong lowerAttrs = l1entry & 0xFFC;
         // Upper attributes [54:52] (PXN, UXN, Contiguous)
@@ -260,7 +264,7 @@ public static unsafe class DeviceMapper
         for (int i = 0; i < 512; i++)
         {
             ulong entryPhys = blockPhysBase + ((ulong)i << 21);
-            l2[i] = entryPhys | lowerAttrs | upperAttrs | DESC_VALID; // bit1=0 → block
+            l2[i] = entryPhys | lowerAttrs | upperAttrs | DescValid; // bit1=0 → block
         }
 
         // Ensure all L2 entries are written before updating L1
@@ -268,7 +272,7 @@ public static unsafe class DeviceMapper
 
         // Replace L1 block with table descriptor pointing to L2
         // Table descriptor: PA | 0x3 (valid + table)
-        l1[l1idx] = l2pa | DESC_VALID | DESC_TABLE;
+        l1[l1idx] = l2pa | DescValid | DescTable;
 
         DeviceMapperNative.DsbIsb();
 

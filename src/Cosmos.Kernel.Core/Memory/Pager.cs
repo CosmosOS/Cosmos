@@ -17,9 +17,10 @@ namespace Cosmos.Kernel.Core.Memory;
 /// <see cref="PageFlags.User"/> exists but is not yet exercised.
 /// <para>
 /// Lifecycle is <see cref="Create"/> → <see cref="Add"/> (repeatedly) →
-/// <see cref="Commit"/>. Committing is idempotent per region and installs the
-/// whole set, so adding a region and committing again is the way to grow a
-/// space. <see cref="Translate(AddressSpaceDescriptor*, VirtualAddress, out PhysicalAddress)"/>
+/// <see cref="Commit"/>. <see cref="Commit"/> installs the whole set every time,
+/// so adding a region and committing again is the way to grow a space; it
+/// rewrites the entries of already-installed regions rather than inspecting them
+/// first. <see cref="Translate(AddressSpaceDescriptor*, VirtualAddress, out PhysicalAddress)"/>
 /// answers whether an address is backed.
 /// </para>
 /// <para>
@@ -28,6 +29,19 @@ namespace Cosmos.Kernel.Core.Memory;
 /// collector is non-moving: an object's address never changes. It also means
 /// callers own the allocation — there is no finalizer, and nothing frees a
 /// descriptor.
+/// </para>
+/// <para>
+/// Nothing here gives a space a private root, switches to one, or tears one
+/// down: <see cref="Create"/> seeds a descriptor from the live root and
+/// <see cref="Commit"/> only edits the tables that root already names, so a
+/// space is a view over the kernel's own mappings rather than an isolated one.
+/// Isolation would need all three, and is what ring-3 support would add.
+/// </para>
+/// <para>
+/// Committing does not notify other CPUs: <c>invlpg</c> and <c>tlbi</c> are
+/// local to the PE that issues them and nothing here sends an IPI, so a
+/// multi-CPU kernel would need TLB shootdown before a region could be relied on
+/// across all of them. The kernel is single-CPU today.
 /// </para>
 /// </remarks>
 internal static unsafe class Pager
@@ -51,15 +65,16 @@ internal static unsafe class Pager
     }
 
     /// <summary>
-    /// Allocates an empty address space, rooted at whatever tables the CPU is
+    /// Allocates an empty region list rooted at whatever tables the CPU is
     /// currently using.
     /// </summary>
     /// <remarks>
     /// The descriptor's <see cref="AddressSpaceDescriptor.RootFrame"/> starts at
-    /// the live root rather than at zero. A new space therefore begins as a
-    /// copy-by-reference of the kernel's own mappings, which is what keeps the
-    /// kernel image and HHDM aliases reachable under it — see
-    /// <see cref="Commit"/>.
+    /// the live root rather than at zero, so a new space begins as a
+    /// copy-by-reference of the kernel's own mappings — which is what keeps the
+    /// kernel image and HHDM aliases reachable under it — rather than as an
+    /// isolated one. Committing to it edits the kernel's live tables; see the
+    /// type remarks for what that rules out.
     /// </remarks>
     /// <returns>
     /// A heap-allocated descriptor the caller owns, or null when no backend is
@@ -140,9 +155,10 @@ internal static unsafe class Pager
     /// Installs every region of <paramref name="space"/> into its page tables.
     /// </summary>
     /// <remarks>
-    /// Safe to call repeatedly: regions already installed are recognised and
-    /// left alone unless their attributes changed, so a caller can commit after
-    /// each <see cref="Add"/> without special-casing the first one.
+    /// Safe to call repeatedly, so a caller can commit after each
+    /// <see cref="Add"/> without special-casing the first one. Regions already
+    /// installed are rewritten, not compared against what is there: the backends
+    /// write each leaf entry unconditionally.
     /// </remarks>
     /// <exception cref="PlatformNotSupportedException">
     /// No backend is registered. Committing is the one operation with no
@@ -168,10 +184,13 @@ internal static unsafe class Pager
     /// Resolves a virtual address within a specific space.
     /// </summary>
     /// <returns>
-    /// False when the space is not committed, the address is unmapped, or it is
-    /// not page-aligned. Unaligned addresses are rejected rather than rounded:
-    /// the answer would be ambiguous, and a caller asking about a byte address
-    /// probably has an arithmetic bug.
+    /// False when the space is null, the address is unmapped, or it is not
+    /// page-aligned. Unaligned addresses are rejected rather than rounded: the
+    /// answer would be ambiguous, and a caller asking about a byte address
+    /// probably has an arithmetic bug. A space that was never committed is not
+    /// rejected on that basis — a descriptor's root is seeded from the live root
+    /// at creation, so <see cref="AddressSpaceDescriptor.IsCommitted"/> records
+    /// whether <see cref="Commit"/> has run without being what decides this.
     /// </returns>
     public static bool Translate(AddressSpaceDescriptor* space, VirtualAddress virt, out PhysicalAddress phys)
     {

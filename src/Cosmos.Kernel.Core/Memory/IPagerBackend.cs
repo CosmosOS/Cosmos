@@ -57,11 +57,17 @@ internal unsafe interface IPagerBackend
     /// rooted at <see cref="AddressSpaceDescriptor.RootFrame"/>.
     /// </summary>
     /// <remarks>
-    /// May be called repeatedly on the same descriptor as regions are added.
-    /// Must be safe against a concurrent
-    /// <see cref="Translate(AddressSpaceDescriptor*, VirtualAddress, out PhysicalAddress)"/>
-    /// only in the sense that the TLB flush at the end publishes the whole batch:
-    /// a reader either sees the old mapping or the new one, never a torn entry.
+    /// May be called repeatedly on the same descriptor as regions are added,
+    /// and rewrites the entries of regions installed by an earlier call rather
+    /// than inspecting them.
+    /// <para>
+    /// Implementations publish each page as they write it — barrier, then the
+    /// TLB invalidation for that address — rather than invalidating once at the
+    /// end, so a page becomes visible as it is installed. An implementation
+    /// serialises its own table edits against other writers of the same tables;
+    /// it does not serialise against <see cref="Translate(AddressSpaceDescriptor*, VirtualAddress, out PhysicalAddress)"/>,
+    /// which is not safe to call concurrently with a commit.
+    /// </para>
     /// </remarks>
     void Commit(AddressSpaceDescriptor* space);
 
