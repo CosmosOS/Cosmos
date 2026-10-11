@@ -1,6 +1,8 @@
 #nullable enable
 Cosmos.Kernel.Drivers.Pci.Audio.HdAudio.HdAudioDriver
 Cosmos.Kernel.Drivers.Pci.Audio.HdAudio.HdAudioDriver.HdAudioDriver() -> void
+Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver
+Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.EhciDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver
 Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.PcieRootPortDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver
@@ -49,6 +51,10 @@ override Cosmos.Kernel.Drivers.Pci.Audio.HdAudio.HdAudioDriver.Matches.get -> Sy
 override Cosmos.Kernel.Drivers.Pci.Audio.HdAudio.HdAudioDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Audio.HdAudio.HdAudioDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.Pci.Audio.HdAudio.HdAudioDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
