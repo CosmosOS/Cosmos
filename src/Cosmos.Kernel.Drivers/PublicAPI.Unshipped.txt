@@ -3,6 +3,8 @@ Cosmos.Kernel.Drivers.Pci.Audio.HdAudio.HdAudioDriver
 Cosmos.Kernel.Drivers.Pci.Audio.HdAudio.HdAudioDriver.HdAudioDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver
 Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.EhciDriver() -> void
+Cosmos.Kernel.Drivers.Pci.Bus.Ohci.OhciDriver
+Cosmos.Kernel.Drivers.Pci.Bus.Ohci.OhciDriver.OhciDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver
 Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.PcieRootPortDriver() -> void
 Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci.VirtioPciTransportDriver
@@ -55,6 +57,10 @@ override Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.Matches.get -> System.Rea
 override Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
 override Cosmos.Kernel.Drivers.Pci.Bus.Ehci.EhciDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
+override Cosmos.Kernel.Drivers.Pci.Bus.Ohci.OhciDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
+override Cosmos.Kernel.Drivers.Pci.Bus.Ohci.OhciDriver.Name.get -> string!
+override Cosmos.Kernel.Drivers.Pci.Bus.Ohci.OhciDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
+override Cosmos.Kernel.Drivers.Pci.Bus.Ohci.OhciDriver.Probe(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding) -> Cosmos.Kernel.HAL.DriverKit.ProbeResult
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Matches.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.DeviceMatch!>
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.Name.get -> string!
 override Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort.PcieRootPortDriver.OnDetach(Cosmos.Kernel.HAL.DriverKit.DeviceBinding! binding, Cosmos.Kernel.HAL.DriverKit.DetachReason reason) -> void
