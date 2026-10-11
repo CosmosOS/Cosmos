@@ -39,48 +39,58 @@ internal static unsafe partial class ExceptionHelper
     // running a page) throws dozens of times a second.
     internal static bool s_traceThrows;
 
-    // The catch clauses whose funclets are running, recorded just before control transfers to
-    // each funclet, with the ExInfo of the exception that entered them. A funclet runs on top of
-    // the dispatcher, itself on top of the frames of the throw, so an exception thrown while it
-    // runs — a `throw;`, or a new exception — walks back from the funclet through that throw's
-    // frames: they are unwound as far as the program goes, and must not catch it, nor must the
-    // clause that is running re-enter. A chain (not a single record) because funclets nest: a
-    // catch that throws from its handler runs the next catch on top of itself.
+    // The funclets running on top of the dispatcher — a catch, or a finally the second pass
+    // entered — recorded just before control transfers to each, with the index of the clause it
+    // runs and the ExInfo of the exception that entered it. A funclet runs on top of the
+    // dispatcher, itself on top of the frames of the throw, so an exception thrown while it runs
+    // — a `throw;`, or a new exception — walks back from the funclet through that throw's frames:
+    // they are unwound as far as the program goes, and must not see it. In the funclet's own
+    // frame, the clauses the first dispatch went past — the funclet's, and those listed before it,
+    // nested inside its try region — must neither catch it nor run again. A chain (not a single
+    // record) because funclets nest: a catch that throws from its handler runs the next catch on
+    // top of itself.
     //
-    // A record lives as long as its funclet: RhpThrowEx links an ExInfo into a chain for every
-    // throw, and RhpCallCatchFunclet unlinks those of the frames it unwinds once the funclet
-    // returns, so the funclets still running are those whose ExInfo the chain still holds (see
-    // PruneFinishedCatches). Telling a rethrow by its exception object instead let a new
-    // exception thrown from a catch re-enter that catch, and a completed catch's object, thrown
-    // again later, skip it.
-    private const int MaxActiveCatchDepth = 64;
-    private static readonly nuint[] s_activeCatchFramePointers = new nuint[MaxActiveCatchDepth];
-    private static readonly nuint[] s_activeCatchHandlers = new nuint[MaxActiveCatchDepth];
-    private static readonly nuint[] s_activeCatchExInfos = new nuint[MaxActiveCatchDepth];
-    private static int s_activeCatchCount;
+    // A catch's record lives as long as its funclet: RhpThrowEx links an ExInfo into a chain for
+    // every throw, and RhpCallCatchFunclet unlinks those of the frames it unwinds once the funclet
+    // returns, so the catches still running are those whose ExInfo the chain still holds (see
+    // PruneFinishedFunclets). A finally's record is dropped when its funclet returns to the
+    // dispatcher, or with its ExInfo when an exception it throws is caught. Telling a rethrow by
+    // its exception object instead let a new exception thrown from a catch re-enter that catch,
+    // and a completed catch's object, thrown again later, skip it.
+    private const int MaxRunningFuncletDepth = 64;
+    private static readonly nuint[] s_runningFuncletFramePointers = new nuint[MaxRunningFuncletDepth];
+    private static readonly int[] s_runningFuncletClauses = new int[MaxRunningFuncletDepth];
+    private static readonly nuint[] s_runningFuncletExInfos = new nuint[MaxRunningFuncletDepth];
+    private static int s_runningFuncletCount;
 
-    private static bool IsActiveCatchClause(nuint framePointer, nuint handlerAddress)
+    /// <summary>
+    /// The index of the last clause of the frame at <paramref name="framePointer"/> that the
+    /// dispatch of a funclet running in it went past, the clause that funclet runs, or -1 when no
+    /// funclet runs there.
+    /// </summary>
+    private static int LastPassedClause(nuint framePointer)
     {
-        for (int i = 0; i < s_activeCatchCount; i++)
+        int lastPassed = -1;
+        for (int i = 0; i < s_runningFuncletCount; i++)
         {
-            if (s_activeCatchFramePointers[i] == framePointer && s_activeCatchHandlers[i] == handlerAddress)
+            if (s_runningFuncletFramePointers[i] == framePointer && s_runningFuncletClauses[i] > lastPassed)
             {
-                return true;
+                lastPassed = s_runningFuncletClauses[i];
             }
         }
 
-        return false;
+        return lastPassed;
     }
 
     /// <summary>
-    /// Whether a frame belongs to a throw whose catch funclet is running: it lies between that
-    /// throw's ExInfo, on the stack of <c>RhpThrowEx</c>, and the frame that caught it.
+    /// Whether a frame belongs to a throw whose funclet is running: it lies between that throw's
+    /// ExInfo, on the stack of <c>RhpThrowEx</c>, and the frame of the funclet.
     /// </summary>
     private static bool IsUnwoundFrame(nuint framePointer)
     {
-        for (int i = 0; i < s_activeCatchCount; i++)
+        for (int i = 0; i < s_runningFuncletCount; i++)
         {
-            if (s_activeCatchExInfos[i] < framePointer && framePointer < s_activeCatchFramePointers[i])
+            if (s_runningFuncletExInfos[i] < framePointer && framePointer < s_runningFuncletFramePointers[i])
             {
                 return true;
             }
@@ -90,18 +100,18 @@ internal static unsafe partial class ExceptionHelper
     }
 
     /// <summary>
-    /// Drops the records of the catches whose funclets returned: those whose ExInfo the chain
-    /// behind <paramref name="pExInfo"/> (this throw's, linked first) no longer holds.
+    /// Drops the records of the funclets that finished: those whose ExInfo the chain behind
+    /// <paramref name="pExInfo"/> (this throw's, linked first) no longer holds.
     /// </summary>
-    private static void PruneFinishedCatches(void* pExInfo)
+    private static void PruneFinishedFunclets(void* pExInfo)
     {
         int kept = 0;
-        for (int i = 0; i < s_activeCatchCount; i++)
+        for (int i = 0; i < s_runningFuncletCount; i++)
         {
             bool inFlight = false;
             for (nuint* p = pExInfo == null ? null : *(nuint**)pExInfo; p != null; p = *(nuint**)p)
             {
-                if ((nuint)p == s_activeCatchExInfos[i])
+                if ((nuint)p == s_runningFuncletExInfos[i])
                 {
                     inFlight = true;
                     break;
@@ -110,14 +120,33 @@ internal static unsafe partial class ExceptionHelper
 
             if (inFlight)
             {
-                s_activeCatchFramePointers[kept] = s_activeCatchFramePointers[i];
-                s_activeCatchHandlers[kept] = s_activeCatchHandlers[i];
-                s_activeCatchExInfos[kept] = s_activeCatchExInfos[i];
+                s_runningFuncletFramePointers[kept] = s_runningFuncletFramePointers[i];
+                s_runningFuncletClauses[kept] = s_runningFuncletClauses[i];
+                s_runningFuncletExInfos[kept] = s_runningFuncletExInfos[i];
                 kept++;
             }
         }
 
-        s_activeCatchCount = kept;
+        s_runningFuncletCount = kept;
+    }
+
+    /// <summary>
+    /// Records a funclet about to run clause <paramref name="clauseIndex"/> of the frame at
+    /// <paramref name="framePointer"/>, so an exception thrown while it runs is dispatched past it.
+    /// </summary>
+    private static void EnterFunclet(nuint framePointer, int clauseIndex, void* pExInfo)
+    {
+        if (s_runningFuncletCount < MaxRunningFuncletDepth)
+        {
+            s_runningFuncletFramePointers[s_runningFuncletCount] = framePointer;
+            s_runningFuncletClauses[s_runningFuncletCount] = clauseIndex;
+            s_runningFuncletExInfos[s_runningFuncletCount] = (nuint)pExInfo;
+            s_runningFuncletCount++;
+        }
+        else
+        {
+            Serial.WriteString("[EH] Too many nested funclets to track\n");
+        }
     }
 
     // Arch-specific hooks — defined in ExceptionHelper.X64.cs / ExceptionHelper.ARM64.cs.
@@ -131,9 +160,9 @@ internal static unsafe partial class ExceptionHelper
 
     /// <summary>
     /// Pin the frame register (RBP on x64, FP on ARM64) to <paramref name="framePointer"/> in the
-    /// REGDISPLAY a filter funclet runs against.
+    /// REGDISPLAY a filter or finally funclet runs against.
     /// </summary>
-    private static partial void PinPass1FrameRegister(REGDISPLAY* regDisplay, nuint framePointer);
+    private static partial void PinFrameRegister(REGDISPLAY* regDisplay, nuint framePointer);
 
     /// <summary>
     /// Pin the REGDISPLAY for the catch funclet that <c>RhpCallCatchFunclet</c> will run with. x64
@@ -146,7 +175,7 @@ internal static unsafe partial class ExceptionHelper
     /// Fill a <see cref="REGDISPLAY"/> from the current register values in <paramref name="s"/>.
     /// On x64 the <c>pRxx</c> save-location pointers are wired to point at the value slots inside
     /// <paramref name="rd"/> itself. Used by the precise GC stack scan and by the exception
-    /// dispatcher when it hands a REGDISPLAY to a filter/catch funclet.
+    /// dispatcher when it hands a REGDISPLAY to a filter/finally/catch funclet.
     /// </summary>
     internal static partial void ProjectRegDisplay(ref UnwindState s, REGDISPLAY* rd);
 
@@ -158,8 +187,8 @@ internal static unsafe partial class ExceptionHelper
 
     /// <summary>
     /// Managed entry point for a thrown exception, called from <c>RhThrowEx</c> (the assembly stub)
-    /// with the throw-site register context. Walks the stack, runs filters, and transfers to the
-    /// catch handler; if nothing catches it, halts.
+    /// with the throw-site register context. Walks the stack, runs filters and finally funclets,
+    /// and transfers to the catch handler; if nothing catches it, halts.
     /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ThrowExceptionWithContext(Exception ex, nuint throwAddress, nuint throwRbp, nuint throwRsp, void* pExInfo)
@@ -178,7 +207,7 @@ internal static unsafe partial class ExceptionHelper
         }
         s_isHandlingException = true;
 
-        PruneFinishedCatches(pExInfo);
+        PruneFinishedFunclets(pExInfo);
 
         // Before the stack walk, in case the walk crashes.
         if (s_traceThrows)
@@ -225,10 +254,12 @@ internal static unsafe partial class ExceptionHelper
 
     /// <summary>
     /// Two-pass exception dispatch from the throw-site context: pass 1 walks the stack to find a
-    /// handler (unwinding the register state at each frame so filters can run); pass 2 replays the
-    /// walk from the throw to the catch, running any fault / finally funclets along the way, then
-    /// transfers control to the catch handler via <see cref="InvokeSecondPass"/>, which does not
-    /// return. Returns only when no handler was found (or the throw-site frame pointer was missing).
+    /// handler (unwinding the register state at each frame so filters can run); pass 2 walks it
+    /// again to run the finally funclets of the try regions the exception leaves
+    /// (<see cref="RunFinallyFunclets"/>), then transfers to the catch handler via
+    /// <see cref="InvokeCatchHandler"/>, which does not return. Returns only when no handler was
+    /// found (or the throw-site frame pointer was missing); the finally funclets do not run then,
+    /// as in NativeAOT, which fails fast on an unhandled exception before its second pass.
     /// </summary>
     private static void DispatchExceptionWithContext(Exception ex, nuint throwAddress, nuint throwRbp, nuint throwRsp, void* pExInfo)
     {
@@ -254,16 +285,19 @@ internal static unsafe partial class ExceptionHelper
             }
         }
 
+        StackFrame throwFrame;
+        throwFrame.FramePointer = throwRbp;
+        throwFrame.StackPointer = throwRsp;
+        throwFrame.ReturnAddress = throwAddress;
+
         // Pass 1: walk the frame-pointer chain looking for a handler, unwinding registers as we go.
         StackFrame catchFrame = default;
         EHClause catchClause = default;
+        int catchClauseIndex = -1;
+        int catchFrameIndex = -1;
         bool foundHandler = false;
 
-        StackFrame frame;
-        frame.FramePointer = throwRbp;
-        frame.StackPointer = throwRsp;
-        frame.ReturnAddress = throwAddress;
-
+        StackFrame frame = throwFrame;
         int frameCount = 0;
         while (frameCount < MAX_STACK_FRAMES && frame.FramePointer != 0)
         {
@@ -274,19 +308,19 @@ internal static unsafe partial class ExceptionHelper
             {
                 pRegDisplay = &regDisplay;
                 ProjectRegDisplay(ref unwindState, pRegDisplay);
-                PinPass1FrameRegister(pRegDisplay, frame.FramePointer);
+                PinFrameRegister(pRegDisplay, frame.FramePointer);
                 regDisplay.SP = frame.FramePointer;
             }
 
             // Does this frame have a handler covering the call that threw? Not if it is a frame
-            // of a throw whose catch is running, and not that catch's clause again.
+            // of a throw whose funclet is running, and not that funclet's clause again.
             // Probe one byte back into the call: every ReturnAddress here — including frame 0's
             // throwAddress, captured as RhpThrowEx's return address — points at the instruction
             // AFTER the call, and clause try-ends are exclusive, so a call ending a try region
             // would otherwise miss its handler (#387). RyuJIT pads such calls with nop/int3
             // today, making this adjustment behavior-preserving on the current codegen.
             if (!IsUnwoundFrame(frame.FramePointer)
-                && TryFindHandler(ex, frame.ReturnAddress - 1, frame.FramePointer, out EHClause clause, pRegDisplay))
+                && TryFindHandler(ex, frame.ReturnAddress - 1, frame.FramePointer, out EHClause clause, out int clauseIndex, pRegDisplay))
             {
                 if (s_traceThrows)
                 {
@@ -297,12 +331,11 @@ internal static unsafe partial class ExceptionHelper
 
                 catchFrame = frame;
                 catchClause = clause;
+                catchClauseIndex = clauseIndex;
+                catchFrameIndex = frameCount;
                 foundHandler = true;
                 break;
             }
-
-            // Capture this frame's IP before stepping up.
-            nuint currentFrameIP = frame.ReturnAddress;
 
             // Step to the caller. CFI (the .eh_frame unwinder) is the source of truth: it works
             // regardless of whether the current method keeps RBP/X29 (RyuJIT omits the frame
@@ -313,13 +346,10 @@ internal static unsafe partial class ExceptionHelper
             // case where there is no throw context to seed the unwind state with.
             if (pThrowContext != null)
             {
-                if (!UnwindOneFrameWithCFI(ref unwindState, currentFrameIP))
+                if (!UnwindToCaller(ref unwindState, ref frame))
                 {
                     break;   // No CFI for this IP — can't unwind further precisely.
                 }
-                frame.ReturnAddress = unwindState.ReturnAddress;
-                frame.FramePointer = unwindState.GetRegValue(CfiArch.FramePointerReg);
-                frame.StackPointer = unwindState.StackPointer;
             }
             else if (!UnwindOneFrame(ref frame))
             {
@@ -334,224 +364,89 @@ internal static unsafe partial class ExceptionHelper
             return;
         }
 
-        // Build the REGDISPLAY the catch funclet runs with — and that RhpCallCatchFunclet resumes
-        // the catching method from once the funclet returns. The CFI walk that landed on the
-        // catching frame already reconstructed its body register state at the call that threw, so
-        // `unwindState` carries the callee-saved registers and the resume SP directly — that's what
-        // `ProjectRegDisplay` copies in (and, on x64, what it wires the pRxx pointers to point at).
-        // The frame pointer is overridden separately: `catchFrame.FramePointer` was derived from
-        // the same CFI walk, so the two should agree, but we pin it explicitly to match what the
-        // funclet expects to find at function entry (`push rbp; mov rbp, rsp` semantics on x64;
-        // the establisher's X29 on ARM64).
+        // Pass 2, from the throw-site context the walk rebuilds each frame's registers from:
+        // without it, the catch below fails fast anyway.
         if (pThrowContext != null)
         {
+            RunFinallyFunclets(pThrowContext, throwFrame, catchFrameIndex, catchClauseIndex, pExInfo);
+
+            // Build the REGDISPLAY the catch funclet runs with — and that RhpCallCatchFunclet
+            // resumes the catching method from once the funclet returns. The pass 1 walk that
+            // landed on the catching frame already reconstructed its body register state at the
+            // call that threw, so `unwindState` carries the callee-saved registers and the resume
+            // SP directly — that's what `ProjectRegDisplay` copies in (and, on x64, what it wires
+            // the pRxx pointers to point at). The frame pointer is overridden separately:
+            // `catchFrame.FramePointer` was derived from the same CFI walk, so the two should
+            // agree, but we pin it explicitly to match what the funclet expects to find at
+            // function entry (`push rbp; mov rbp, rsp` semantics on x64; the establisher's X29 on
+            // ARM64).
             pRegDisplay = &regDisplay;
             ProjectRegDisplay(ref unwindState, pRegDisplay);
             PinPass2RegDisplay(pRegDisplay, catchFrame.FramePointer);
         }
 
         // Record the clause about to run so an exception thrown from inside its funclet is
-        // dispatched past it instead of re-entering it (see s_activeCatch* above).
-        if (s_activeCatchCount < MaxActiveCatchDepth)
-        {
-            s_activeCatchFramePointers[s_activeCatchCount] = catchFrame.FramePointer;
-            s_activeCatchHandlers[s_activeCatchCount] = (nuint)catchClause.HandlerAddress;
-            s_activeCatchExInfos[s_activeCatchCount] = (nuint)pExInfo;
-            s_activeCatchCount++;
-        }
-        else
-        {
-            Serial.WriteString("[EH] Too many nested catch funclets to track\n");
-        }
+        // dispatched past it instead of re-entering it (see s_runningFunclet* above).
+        EnterFunclet(catchFrame.FramePointer, catchClauseIndex, pExInfo);
 
-        // Pass 2: run any fault/finally funclets in frames between the throw and the catch,
-        // then transfer to the catch handler.
-        InvokeSecondPass(ex, throwAddress, throwRbp, throwRsp, catchFrame, ref catchClause, pExInfo, pRegDisplay, pThrowContext);
-        // InvokeSecondPass does not return (it calls InvokeCatchHandler which transfers out).
+        InvokeCatchHandler(ex, ref catchClause, pExInfo, pRegDisplay);
+        // InvokeCatchHandler jumps to the resume address and does not return.
     }
 
     /// <summary>
-    /// Pass 2 of two-pass exception dispatch: replays the frame walk from the throw site up to (but
-    /// not including) the catching frame, invoking any fault / finally funclets encountered on the
-    /// way, then calls <see cref="InvokeCatchHandler"/> to transfer to the catch handler.
-    /// Does not return.
+    /// The first half of pass 2: walks the frames again from the throw site to the catching frame
+    /// and runs, innermost first, the finally (and fault) funclets of the try regions covering
+    /// each frame's call site — in the catching frame only those listed before the catching
+    /// clause, which are nested inside its try region. The frames and clauses pass 1 went past
+    /// for a running funclet are passed again.
     /// </summary>
-    private static void InvokeSecondPass(
-        Exception ex,
-        nuint throwAddress, nuint throwRbp, nuint throwRsp,
-        StackFrame catchFrame,
-        ref EHClause catchClause,
-        void* pExInfo,
-        REGDISPLAY* pCatchRegDisplay,
-        PAL_LIMITED_CONTEXT* pThrowContext)
+    private static void RunFinallyFunclets(PAL_LIMITED_CONTEXT* pThrowContext, StackFrame frame, int catchFrameIndex, int catchClauseIndex, void* pExInfo)
     {
-        // Rebuild the unwind state from scratch for the second pass.
-        UnwindState unwindState2 = default;
-        if (pThrowContext != null)
+        UnwindState unwindState = default;
+        InitUnwindStateFromContext(ref unwindState, pThrowContext);
+
+        REGDISPLAY regDisplay = default;
+        for (int frameIndex = 0; ; frameIndex++)
         {
-            InitUnwindStateFromContext(ref unwindState2, pThrowContext);
-        }
-
-        // The REGDISPLAY used for finally funclets at each frame during pass 2.
-        REGDISPLAY pass2RegDisplay = default;
-        REGDISPLAY* pPass2RegDisplay = pThrowContext != null ? &pass2RegDisplay : null;
-
-        StackFrame frame2;
-        frame2.FramePointer = throwRbp;
-        frame2.StackPointer = throwRsp;
-        frame2.ReturnAddress = throwAddress;
-
-        int frameCount2 = 0;
-        while (frameCount2 < MAX_STACK_FRAMES && frame2.FramePointer != 0)
-        {
-            // Stop when we reach the catching frame — it will be handled by InvokeCatchHandler.
-            if (frame2.FramePointer == catchFrame.FramePointer)
+            if (!IsUnwoundFrame(frame.FramePointer)
+                && TryGetFrameClauses(frame.ReturnAddress - 1, frame.FramePointer, out FrameClauses clauses))
             {
-                break;
-            }
+                // A finally funclet runs on its frame's registers, as a filter does in pass 1.
+                ProjectRegDisplay(ref unwindState, &regDisplay);
+                PinFrameRegister(&regDisplay, frame.FramePointer);
 
-            // Build the pass-2 REGDISPLAY for this frame's finally funclets.
-            if (pThrowContext != null)
-            {
-                pPass2RegDisplay = &pass2RegDisplay;
-                ProjectRegDisplay(ref unwindState2, pPass2RegDisplay);
-                PinPass1FrameRegister(pPass2RegDisplay, frame2.FramePointer);
-                pass2RegDisplay.SP = frame2.FramePointer;
-            }
-
-            // Run all fault/finally clauses in this frame that cover the call that threw.
-            InvokeFaultHandlers(ex, frame2.ReturnAddress - 1, frame2.FramePointer, pPass2RegDisplay);
-
-            nuint currentFrameIP2 = frame2.ReturnAddress;
-
-            if (pThrowContext != null)
-            {
-                if (!UnwindOneFrameWithCFI(ref unwindState2, currentFrameIP2))
+                int clauseLimit = frameIndex == catchFrameIndex ? catchClauseIndex : int.MaxValue;
+                while (clauses.MoveNext(out EHClause clause, out int clauseIndex) && clauseIndex < clauseLimit)
                 {
-                    break;
+                    if (clause.ClauseKind == EHClauseKind.EH_CLAUSE_FAULT)
+                    {
+                        InvokeFinallyHandler(clause.HandlerAddress, clauseIndex, frame.FramePointer, &regDisplay, pExInfo);
+                    }
                 }
-                frame2.ReturnAddress = unwindState2.ReturnAddress;
-                frame2.FramePointer = unwindState2.GetRegValue(CfiArch.FramePointerReg);
-                frame2.StackPointer = unwindState2.StackPointer;
             }
-            else if (!UnwindOneFrame(ref frame2))
+
+            if (frameIndex == catchFrameIndex || !UnwindToCaller(ref unwindState, ref frame))
             {
-                break;
+                return;
             }
-
-            frameCount2++;
         }
-
-        // Transfer to the catch handler — does not return.
-        InvokeCatchHandler(ex, ref catchClause, pExInfo, pCatchRegDisplay);
     }
 
     /// <summary>
-    /// Runs all fault/finally funclets in the method that contains <paramref name="instructionPointer"/>
-    /// and whose try regions cover that instruction pointer, in the order they appear in the LSDA
-    /// (innermost to outermost, i.e., the same order NativeAOT's second pass uses).
+    /// Steps <paramref name="frame"/> to its caller with the CFI unwinder, carrying
+    /// <paramref name="state"/> along. Returns <c>false</c> when no CFI covers the frame's IP.
     /// </summary>
-    private static void InvokeFaultHandlers(Exception ex, nuint instructionPointer, nuint framePointer, REGDISPLAY* pRegDisplay)
+    private static bool UnwindToCaller(ref UnwindState state, ref StackFrame frame)
     {
-        if (!TryGetMethodLSDA(instructionPointer, out nuint methodStart, out byte* pLSDA))
+        if (!UnwindOneFrameWithCFI(ref state, frame.ReturnAddress))
         {
-            return;
+            return false;
         }
 
-        if (pLSDA == null)
-        {
-            return;
-        }
-
-        byte* p = pLSDA;
-        byte unwindBlockFlags = *p++;
-
-        // Skip the funclet→main redirect (present only in a funclet's LSDA).
-        if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_KIND_MASK) != MethodGcInfoLookup.UBF_FUNC_KIND_ROOT)
-        {
-            p += sizeof(int); // main-LSDA offset
-            p += sizeof(int); // method-start offset
-        }
-
-        // Skip the associated-data offset if present.
-        if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_HAS_ASSOCIATED_DATA) != 0)
-        {
-            p += sizeof(int);
-        }
-
-        if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_HAS_EHINFO) == 0)
-        {
-            return;
-        }
-
-        // Follow the EH-info offset to the clause table.
-        int ehInfoOffset = *(int*)p;
-        byte* pEHInfo = p + ehInfoOffset;
-
-        uint nClauses = ReadUnsigned(ref pEHInfo);
-        uint codeOffset = (uint)(instructionPointer - methodStart);
-
-        for (uint i = 0; i < nClauses; i++)
-        {
-            uint tryStartOffset = ReadUnsigned(ref pEHInfo);
-            uint tryEndDeltaAndKind = ReadUnsigned(ref pEHInfo);
-
-            EHClauseKind kind = (EHClauseKind)(tryEndDeltaAndKind & 0x3);
-            uint tryEndOffset = tryStartOffset + (tryEndDeltaAndKind >> 2);
-
-            uint handlerOffset = 0;
-
-            switch (kind)
-            {
-                case EHClauseKind.EH_CLAUSE_TYPED:
-                    handlerOffset = ReadUnsigned(ref pEHInfo);
-                    // Skip the type reference (4-byte relative address).
-                    pEHInfo += sizeof(int);
-                    break;
-
-                case EHClauseKind.EH_CLAUSE_FAULT:
-                    handlerOffset = ReadUnsigned(ref pEHInfo);
-                    break;
-
-                case EHClauseKind.EH_CLAUSE_FILTER:
-                    handlerOffset = ReadUnsigned(ref pEHInfo);
-                    // Skip the filter offset.
-                    ReadUnsigned(ref pEHInfo);
-                    break;
-            }
-
-            // Only fault clauses run during unwinding.
-            if (kind != EHClauseKind.EH_CLAUSE_FAULT)
-            {
-                continue;
-            }
-
-            // Only if the throw site is inside this try region.
-            if (codeOffset < tryStartOffset || codeOffset >= tryEndOffset)
-            {
-                continue;
-            }
-
-            if (pRegDisplay == null)
-            {
-                if (s_traceThrows)
-                {
-                    Serial.WriteString("[EH] Skipping finally funclet (no register context)\n");
-                }
-                continue;
-            }
-
-            byte* handlerAddress = (byte*)(methodStart + handlerOffset);
-
-            if (s_traceThrows)
-            {
-                Serial.WriteString("[EH] Running finally funclet at 0x");
-                Serial.WriteHex((nuint)handlerAddress);
-                Serial.WriteString("\n");
-            }
-
-            RhpCallFinallyFunclet(handlerAddress, pRegDisplay);
-        }
+        frame.ReturnAddress = state.ReturnAddress;
+        frame.FramePointer = state.GetRegValue(CfiArch.FramePointerReg);
+        frame.StackPointer = state.StackPointer;
+        return true;
     }
 
     /// <summary>
@@ -590,30 +485,84 @@ internal static unsafe partial class ExceptionHelper
     }
 
     /// <summary>
-    /// Looks for an exception handler covering <paramref name="instructionPointer"/> by parsing the
-    /// method's LSDA. <paramref name="pRegDisplay"/> (if non-null) lets a <c>when</c>-filter clause
-    /// be evaluated. Also appends the method name to the exception's stack trace.
+    /// Looks for the clause that catches <paramref name="ex"/> among those covering
+    /// <paramref name="instructionPointer"/>: a typed catch, or a <c>when</c>-filter clause whose
+    /// filter funclet (called via <see cref="RhpCallFilterFunclet"/>, against
+    /// <paramref name="pRegDisplay"/> when non-null) returns non-zero. Finally and fault clauses do
+    /// not catch: pass 2 runs them on the way to the catch. <paramref name="clauseIndex"/> is the
+    /// clause's position in the method's clause table. Also appends the method name to the
+    /// exception's stack trace.
     /// </summary>
-    private static bool TryFindHandler(Exception ex, nuint instructionPointer, nuint framePointer, out EHClause clause, REGDISPLAY* pRegDisplay)
+    private static bool TryFindHandler(Exception ex, nuint instructionPointer, nuint framePointer, out EHClause clause, out int clauseIndex, REGDISPLAY* pRegDisplay)
     {
-        clause = default;
-
-        if (!TryGetMethodLSDA(instructionPointer, out nuint methodStart, out byte* pLSDA))
+        if (!TryGetFrameClauses(instructionPointer, framePointer, out FrameClauses clauses))
         {
+            clause = default;
+            clauseIndex = -1;
             return false;
         }
 
         if (StackTraceMetadata.IsSupported
-            && StackTraceMetadata.TryGetMethodNameFromStartAddress(methodStart, out string methodName))
+            && StackTraceMetadata.TryGetMethodNameFromStartAddress(clauses.MethodStart, out string methodName))
         {
             ref string? stackTraceString = ref StackTraceMetadata.GetStackTraceString(ex);
             stackTraceString = stackTraceString is null
                 ? methodName
-                : stackTraceString + Environment.NewLine + "at " + methodName;
+                : $"{stackTraceString}{Environment.NewLine}at {methodName}";
         }
 
-        uint codeOffset = (uint)(instructionPointer - methodStart);
-        return TryFindHandlerInLSDA(ex, pLSDA, methodStart, codeOffset, framePointer, out clause, pRegDisplay);
+        while (clauses.MoveNext(out clause, out clauseIndex))
+        {
+            if (clause.ClauseKind == EHClauseKind.EH_CLAUSE_FAULT)
+            {
+                continue;
+            }
+
+            // A typed clause catches its type and the types derived from it, nothing else:
+            // `catch (A) {} catch (B) {}` must leave a B to the second clause.
+            if (clause.ClauseKind == EHClauseKind.EH_CLAUSE_TYPED
+                && Casting.RhTypeCast_IsInstanceOfClass(ex, (Internal.Runtime.MethodTable*)clause.TargetType) is null)
+            {
+                continue;
+            }
+
+            // A `when`-filter clause matches only if its filter funclet returns non-zero, and that
+            // needs a register context to run the funclet against.
+            if (clause.ClauseKind == EHClauseKind.EH_CLAUSE_FILTER)
+            {
+                if (pRegDisplay == null || clause.FilterAddress == null)
+                {
+                    continue;
+                }
+
+                nint exceptionPtr = Unsafe.As<Exception, nint>(ref ex);
+                if (RhpCallFilterFunclet(exceptionPtr, clause.FilterAddress, pRegDisplay) == 0)
+                {
+                    continue;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// The EH clauses of the frame at <paramref name="framePointer"/> covering
+    /// <paramref name="instructionPointer"/>, past those the dispatch of a funclet running in the
+    /// frame went past. Returns <c>false</c> when no LSDA describes the method.
+    /// </summary>
+    private static bool TryGetFrameClauses(nuint instructionPointer, nuint framePointer, out FrameClauses clauses)
+    {
+        if (!TryGetMethodLSDA(instructionPointer, out nuint methodStart, out byte* pLSDA))
+        {
+            clauses = default;
+            return false;
+        }
+
+        clauses = new FrameClauses(pLSDA, methodStart, (uint)(instructionPointer - methodStart), LastPassedClause(framePointer));
+        return true;
     }
 
     /// <summary>
@@ -672,129 +621,130 @@ internal static unsafe partial class ExceptionHelper
     }
 
     /// <summary>
-    /// Parses the LSDA EH-clause table for <paramref name="codeOffset"/> and returns the first
-    /// clause that covers it: a typed catch, or a <c>when</c>-filter clause whose filter funclet
-    /// (called via <see cref="RhpCallFilterFunclet"/>) returns non-zero. Fault clauses are
-    /// recognised but not yet executed. Returns <c>false</c> if no clause matches.
+    /// The EH clauses of one frame whose try region covers its call site, innermost first, read
+    /// from the method's LSDA clause table (NativeAOT's encoding: ILCompiler's EncodeEHInfo). The
+    /// clauses the dispatch of a funclet running in the frame went past are left out: that
+    /// funclet's clause and those listed before it, then the clauses sharing its try region, the
+    /// other catches of its try (ILCompiler separates distinct try regions at the same native
+    /// offsets with an empty marker clause).
     /// </summary>
-    private static bool TryFindHandlerInLSDA(Exception ex, byte* pLSDA, nuint methodStart, uint codeOffset, nuint framePointer, out EHClause clause, REGDISPLAY* pRegDisplay)
+    private struct FrameClauses
     {
-        clause = default;
+        public readonly nuint MethodStart;
+        private readonly uint _codeOffset;
+        private readonly uint _count;
+        private byte* _next;
+        private int _index;
+        private int _lastPassed;
+        private uint _passedTryStart;
+        private uint _passedTryEnd;
 
-        if (pLSDA == null)
+        public FrameClauses(byte* pLSDA, nuint methodStart, uint codeOffset, int lastPassed)
         {
+            MethodStart = methodStart;
+            _codeOffset = codeOffset;
+            _lastPassed = lastPassed;
+            _next = FindClauseTable(pLSDA, out _count);
+        }
+
+        /// <summary>
+        /// Steps to the next clause covering the call site; <paramref name="index"/> is its
+        /// position in the clause table. Returns <c>false</c> past the last.
+        /// </summary>
+        public bool MoveNext(out EHClause clause, out int index)
+        {
+            while ((uint)_index < _count)
+            {
+                index = _index++;
+                clause = ReadClause(ref _next, MethodStart);
+
+                if (_lastPassed >= 0)
+                {
+                    if (index <= _lastPassed)
+                    {
+                        _passedTryStart = clause.TryStartOffset;
+                        _passedTryEnd = clause.TryEndOffset;
+                        continue;
+                    }
+
+                    if (clause.TryStartOffset == _passedTryStart && clause.TryEndOffset == _passedTryEnd)
+                    {
+                        continue;
+                    }
+
+                    _lastPassed = -1;
+                }
+
+                if (_codeOffset >= clause.TryStartOffset && _codeOffset < clause.TryEndOffset)
+                {
+                    return true;
+                }
+            }
+
+            clause = default;
+            index = -1;
             return false;
         }
 
-        byte* p = pLSDA;
-        byte unwindBlockFlags = *p++;
-
-        // Skip the funclet→main redirect (present only in a funclet's LSDA).
-        if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_KIND_MASK) != MethodGcInfoLookup.UBF_FUNC_KIND_ROOT)
+        /// <summary>
+        /// The clause table of the method whose LSDA is <paramref name="pLSDA"/>, with its clause
+        /// <paramref name="count"/>; null with a count of 0 when the method has no EH clauses.
+        /// </summary>
+        private static byte* FindClauseTable(byte* pLSDA, out uint count)
         {
-            p += sizeof(int); // main-LSDA offset
-            p += sizeof(int); // method-start offset
+            count = 0;
+
+            byte* p = pLSDA;
+            byte unwindBlockFlags = *p++;
+
+            // Skip the funclet→main redirect (present only in a funclet's LSDA).
+            if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_KIND_MASK) != MethodGcInfoLookup.UBF_FUNC_KIND_ROOT)
+            {
+                p += sizeof(int); // main-LSDA offset
+                p += sizeof(int); // method-start offset
+            }
+
+            // Skip the associated-data offset if present.
+            if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_HAS_ASSOCIATED_DATA) != 0)
+            {
+                p += sizeof(int);
+            }
+
+            if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_HAS_EHINFO) == 0)
+            {
+                return null;
+            }
+
+            // Follow the EH-info offset to the clause table.
+            byte* pEHInfo = p + *(int*)p;
+            count = ReadUnsigned(ref pEHInfo);
+            return pEHInfo;
         }
 
-        // Skip the associated-data offset if present.
-        if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_HAS_ASSOCIATED_DATA) != 0)
+        /// <summary>Reads the clause at <paramref name="p"/> and steps past it.</summary>
+        private static EHClause ReadClause(ref byte* p, nuint methodStart)
         {
-            p += sizeof(int);
-        }
+            EHClause clause = default;
+            clause.TryStartOffset = ReadUnsigned(ref p);
+            uint tryEndDeltaAndKind = ReadUnsigned(ref p);
+            clause.ClauseKind = (EHClauseKind)(tryEndDeltaAndKind & 0x3);
+            clause.TryEndOffset = clause.TryStartOffset + (tryEndDeltaAndKind >> 2);
+            clause.HandlerAddress = (byte*)(methodStart + ReadUnsigned(ref p));
 
-        if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_HAS_EHINFO) == 0)
-        {
-            return false;
-        }
-
-        // Follow the EH-info offset to the clause table.
-        int ehInfoOffset = *(int*)p;
-        byte* pEHInfo = p + ehInfoOffset;
-
-        uint nClauses = ReadUnsigned(ref pEHInfo);
-        for (uint i = 0; i < nClauses; i++)
-        {
-            uint tryStartOffset = ReadUnsigned(ref pEHInfo);
-            uint tryEndDeltaAndKind = ReadUnsigned(ref pEHInfo);
-
-            EHClauseKind kind = (EHClauseKind)(tryEndDeltaAndKind & 0x3);
-            uint tryEndOffset = tryStartOffset + (tryEndDeltaAndKind >> 2);
-
-            uint handlerOffset = 0;
-            byte* filterAddress = null;
-            void* targetType = null;
-
-            switch (kind)
+            switch (clause.ClauseKind)
             {
                 case EHClauseKind.EH_CLAUSE_TYPED:
-                    handlerOffset = ReadUnsigned(ref pEHInfo);
-                    byte* pTypeBase = pEHInfo;
-                    int typeRelAddr = ReadInt32(ref pEHInfo);
-                    targetType = pTypeBase + typeRelAddr;
-                    break;
-
-                case EHClauseKind.EH_CLAUSE_FAULT:
-                    handlerOffset = ReadUnsigned(ref pEHInfo);
+                    byte* pTypeBase = p;
+                    clause.TargetType = pTypeBase + ReadInt32(ref p);
                     break;
 
                 case EHClauseKind.EH_CLAUSE_FILTER:
-                    handlerOffset = ReadUnsigned(ref pEHInfo);
-                    uint filterOffset = ReadUnsigned(ref pEHInfo);
-                    filterAddress = (byte*)(methodStart + filterOffset);
+                    clause.FilterAddress = (byte*)(methodStart + ReadUnsigned(ref p));
                     break;
             }
 
-            if (codeOffset < tryStartOffset || codeOffset >= tryEndOffset)
-            {
-                continue;
-            }
-
-            // Fault handlers (finally) run during pass 2 (InvokeSecondPass), not as catch handlers.
-            if (kind == EHClauseKind.EH_CLAUSE_FAULT)
-            {
-                continue;
-            }
-
-            // A clause whose funclet is running must not catch what that funclet throws.
-            if (IsActiveCatchClause(framePointer, methodStart + handlerOffset))
-            {
-                continue;
-            }
-
-            // A typed clause catches its type and the types derived from it, nothing else:
-            // `catch (A) {} catch (B) {}` must leave a B to the second clause.
-            if (kind == EHClauseKind.EH_CLAUSE_TYPED
-                && Casting.RhTypeCast_IsInstanceOfClass(ex, (Internal.Runtime.MethodTable*)targetType) is null)
-            {
-                continue;
-            }
-
-            // A `when`-filter clause matches only if its filter funclet returns non-zero, and that
-            // needs a register context to run the funclet against.
-            if (kind == EHClauseKind.EH_CLAUSE_FILTER)
-            {
-                if (pRegDisplay == null || filterAddress == null)
-                {
-                    continue;
-                }
-
-                nint exceptionPtr = Unsafe.As<Exception, nint>(ref ex);
-                if (RhpCallFilterFunclet(exceptionPtr, filterAddress, pRegDisplay) == 0)
-                {
-                    continue;
-                }
-            }
-
-            clause.ClauseKind = kind;
-            clause.TryStartOffset = tryStartOffset;
-            clause.TryEndOffset = tryEndOffset;
-            clause.HandlerAddress = (byte*)(methodStart + handlerOffset);
-            clause.FilterAddress = filterAddress;
-            clause.TargetType = targetType;
-            return true;
+            return clause;
         }
-
-        return false;
     }
 
     /// <summary>
@@ -842,6 +792,31 @@ internal static unsafe partial class ExceptionHelper
         int value = *p | (*(p + 1) << 8) | (*(p + 2) << 16) | (*(p + 3) << 24);
         p += 4;
         return value;
+    }
+
+    /// <summary>
+    /// Runs a finally (or fault) funclet of the frame at <paramref name="framePointer"/> via
+    /// <see cref="RhpCallFinallyFunclet"/>, which returns once the funclet does.
+    /// </summary>
+    private static void InvokeFinallyHandler(byte* handlerAddress, int clauseIndex, nuint framePointer, REGDISPLAY* pRegDisplay, void* pExInfo)
+    {
+        if (s_traceThrows)
+        {
+            Serial.WriteString("[EH] Finally at 0x");
+            Serial.WriteHex((nuint)handlerAddress);
+            Serial.WriteString("\n");
+        }
+
+        // The funclet is program code: an exception it throws, or one thrown and caught below it,
+        // is a dispatch of its own rather than a recursive one, and goes past the frames and
+        // clauses this dispatch went past. Once the funclet returns, every funclet entered while
+        // it ran has returned too.
+        int runningFuncletCount = s_runningFuncletCount;
+        EnterFunclet(framePointer, clauseIndex, pExInfo);
+        s_isHandlingException = false;
+        RhpCallFinallyFunclet(handlerAddress, pRegDisplay);
+        s_isHandlingException = true;
+        s_runningFuncletCount = runningFuncletCount;
     }
 
     /// <summary>

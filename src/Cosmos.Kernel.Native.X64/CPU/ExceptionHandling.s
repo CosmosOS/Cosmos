@@ -367,16 +367,22 @@ RhpCallFilterFunclet:
 
 
 //=============================================================================
-// RhpCallFinallyFunclet - Call a finally/fault funclet during exception unwinding
+// RhpCallFinallyFunclet - Call a finally (or fault) funclet while an exception unwinds its frame
 //
 // INPUT:  RDI = handler funclet address
-//         RSI = REGDISPLAY*
+//         RSI = REGDISPLAY*  (pRbx/pRbp/pR12..pR15 -> the frame's body register values at the call
+//                              the exception unwinds; the dispatcher fills these from the CFI unwind)
 //
-// Restores callee-saved registers from REGDISPLAY, calls the funclet with no
-// arguments, then writes any updated callee-saved regs back to REGDISPLAY so
-// subsequent finally funclets see the correct state. Returns normally.
+// The funclet runs with the frame's RBP/RBX/R12-R15 (restored below) and returns here, and this
+// stub returns to the dispatcher, which goes on with the next clause or frame. The funclet keeps
+// the callee-saved registers as it found them, so nothing is written back to the REGDISPLAY.
 //
-// CFI: only the prologue is described — GC cannot fire in this stub.
+// Stack alignment: the prologue pushes 6 callee-saved regs + the handler address = 7 eight-byte
+// slots (odd), so RSP is 16-byte aligned at the `call qword ptr [rsp]` below (see
+// RhpCallCatchFunclet).
+//
+// CFI: see the note on RhpCallCatchFunclet. The epilogue here is the ordinary `add rsp, 8` + 6 pops
+// + `ret`; GC cannot fire in it, so prologue CFI is sufficient.
 //=============================================================================
 .global RhpCallFinallyFunclet
 .cfi_startproc
@@ -401,53 +407,28 @@ RhpCallFinallyFunclet:
     .cfi_adjust_cfa_offset 8
     .cfi_rel_offset r15, 0
 
-    // Save arguments: handler addr (RDI) and REGDISPLAY* (RSI).
-    // Three slots to keep 16-byte alignment (6 pushes above = 48 bytes, one more aligns to 64).
-    push    rdi                     // [rsp+16] handler address
-    .cfi_adjust_cfa_offset 8
-    push    rsi                     // [rsp+8]  REGDISPLAY*
-    .cfi_adjust_cfa_offset 8
-    sub     rsp, 8                  // [rsp+0]  alignment padding
+    // Save the handler address (caller-saved — only the CFA offset advances)
+    push    rdi                     // [rsp+0] handler address
     .cfi_adjust_cfa_offset 8
 
-    // Use RDX as a scratch copy of REGDISPLAY* (RSI is now saved on stack).
-    mov     rdx, rsi
-
-    // Restore callee-saved registers from REGDISPLAY before calling the funclet.
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pRbx]
+    // Restore the frame's callee-saved registers from REGDISPLAY
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pRbx]
     mov     rbx, [rax]
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pRbp]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pRbp]
     mov     rbp, [rax]
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pR12]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pR12]
     mov     r12, [rax]
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pR13]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pR13]
     mov     r13, [rax]
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pR14]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pR14]
     mov     r14, [rax]
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pR15]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pR15]
     mov     r15, [rax]
 
-    // Call the finally/fault funclet (no argument).
-    call    qword ptr [rsp + 16]    // handler address
+    call    qword ptr [rsp]         // call finally funclet
 
-    // Write updated callee-saved registers back into REGDISPLAY so subsequent
-    // finally funclets and the catch funclet see the correct state.
-    mov     rdx, [rsp + 8]          // reload REGDISPLAY*
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pRbx]
-    mov     [rax], rbx
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pRbp]
-    mov     [rax], rbp
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pR12]
-    mov     [rax], r12
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pR13]
-    mov     [rax], r13
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pR14]
-    mov     [rax], r14
-    mov     rax, [rdx + OFFSETOF__REGDISPLAY__pR15]
-    mov     [rax], r15
-
-    // Restore stack and our callee-saved registers.
-    add     rsp, 24                 // pop padding + REGDISPLAY* + handler addr
+    // Clean up stack and restore our callee-saved registers
+    add     rsp, 8                  // pop handler address
     pop     r15
     pop     r14
     pop     r13

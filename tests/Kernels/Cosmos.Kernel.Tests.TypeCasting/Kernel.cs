@@ -13,7 +13,7 @@ public class Kernel : Sys.Kernel
     protected override void BeforeRun()
     {
         Log.WriteString("[TypeCasting Tests] Starting test suite\n");
-        TR.Start("TypeCasting Tests", expectedTests: 21);
+        TR.Start("TypeCasting Tests", expectedTests: 26);
 
         // Class hierarchy type checks (RhTypeCast_IsInstanceOfClass)
         TR.Run("IsInstanceOfClass_AnimalIsDog", TestIsInstanceOfClass);
@@ -49,7 +49,12 @@ public class Kernel : Sys.Kernel
         TR.Run("TryCatch_Filter_When", TestTryCatchFilterWhen);
         TR.Run("TryCatch_Filter_WhenFalse", TestTryCatchFilterWhenFalse);
         TR.Run("TryFinally", TestTryFinally);
-        TR.Run("TryFinally_OnException", TestTryFinallyOnException);
+        TR.Run("TryFinally_RunsBeforeOuterCatch", TestFinallyRunsBeforeOuterCatch);
+        TR.Run("TryFinally_RunsInUnwoundFrames", TestFinallyRunsInUnwoundFrames);
+        TR.Run("TryFinally_FilterRunsFirst", TestFilterRunsBeforeFinally);
+        TR.Run("TryFinally_UsingDisposesOnThrow", TestUsingDisposesOnThrow);
+        TR.Run("TryFinally_ThrowReplacesException", TestFinallyThrowReplacesException);
+        TR.Run("TryFinally_CatchThrowRunsFinallyOnce", TestCatchThrowRunsFinallyOnce);
         TR.Run("FilterAndCatchResume", TestFilterAndCatchResume);
         TR.Run("TryCatch_ConsoleWriteLineExMessage", TestTryCatchConsoleWriteLineExMessage);
         TR.Run("TryCatch_TypedClauseSkipsOtherTypes", TestTypedClauseSkipsOtherTypes);
@@ -310,31 +315,199 @@ public class Kernel : Sys.Kernel
         Assert.True(finallyExecuted, "Finally block should always execute");
     }
 
-    private static void TestTryFinallyOnException()
+    private static void TestFinallyRunsBeforeOuterCatch()
     {
-        bool finallyExecuted = false;
-        bool caughtException = false;
-
+        // #3318: the finally of the try region an exception leaves runs before the catch that
+        // handles it, in the same method
+        int step = 0;
+        int finallyStep = 0;
+        int catchStep = 0;
+        int outerFinallyStep = 0;
         try
         {
             try
             {
-                throw new Exception("Finally unwind test");
+                throw new InvalidOperationException("Leaves a finally");
             }
             finally
             {
-                // This finally block MUST run during exception unwinding (pass 2)
-                // before the outer catch handler is invoked.
-                finallyExecuted = true;
+                finallyStep = ++step;
             }
         }
-        catch (Exception)
+        catch (InvalidOperationException)
         {
-            caughtException = true;
+            catchStep = ++step;
+        }
+        finally
+        {
+            outerFinallyStep = ++step;
         }
 
-        Assert.True(finallyExecuted, "Finally block must execute during exception unwinding");
-        Assert.True(caughtException, "Catch block must execute after finally");
+        Assert.Equal(1, finallyStep, "The inner finally must run first, as the exception leaves its try region");
+        Assert.Equal(2, catchStep, "The catch must run after the inner finally");
+        Assert.Equal(3, outerFinallyStep, "The outer finally must run last");
+    }
+
+    private static void TestFinallyRunsInUnwoundFrames()
+    {
+        int step = 0;
+        int calleeFinallyStep = 0;
+        int callerFinallyStep = 0;
+        int catchStep = 0;
+        try
+        {
+            ThrowPastTwoFinallys(ref step, ref callerFinallyStep, ref calleeFinallyStep);
+        }
+        catch (InvalidOperationException)
+        {
+            catchStep = ++step;
+        }
+
+        Assert.Equal(1, calleeFinallyStep, "The finally of the frame that threw must run first");
+        Assert.Equal(2, callerFinallyStep, "The finally of its caller must run next");
+        Assert.Equal(3, catchStep, "The catch must run after the finallys of the frames it unwinds");
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ThrowPastTwoFinallys(ref int step, ref int callerFinallyStep, ref int calleeFinallyStep)
+    {
+        try
+        {
+            ThrowFromTryFinally(ref step, ref calleeFinallyStep);
+        }
+        finally
+        {
+            callerFinallyStep = ++step;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ThrowFromTryFinally(ref int step, ref int finallyStep)
+    {
+        try
+        {
+            throw new InvalidOperationException("Unwinds a finally");
+        }
+        finally
+        {
+            finallyStep = ++step;
+        }
+    }
+
+    private static void TestFilterRunsBeforeFinally()
+    {
+        // The first pass picks the handler, running its filter, before the second runs a finally
+        int step = 0;
+        int filterStep = 0;
+        int finallyStep = 0;
+        int catchStep = 0;
+        try
+        {
+            ThrowFromTryFinally(ref step, ref finallyStep);
+        }
+        catch (InvalidOperationException) when (RecordStep(ref step, ref filterStep))
+        {
+            catchStep = ++step;
+        }
+
+        Assert.Equal(1, filterStep, "The filter must run first, in the first pass");
+        Assert.Equal(2, finallyStep, "The finally must run next, in the second pass");
+        Assert.Equal(3, catchStep, "The catch must run last");
+    }
+
+    private static bool RecordStep(ref int step, ref int recorded)
+    {
+        recorded = ++step;
+        return true;
+    }
+
+    private static void TestUsingDisposesOnThrow()
+    {
+        // The shape of InternalCpu.DisableInterruptsScope: a using whose body throws
+        DisposeProbe probe = new();
+        bool caught = false;
+        try
+        {
+            using (probe)
+            {
+                throw new InvalidOperationException("Leaves a using");
+            }
+        }
+        catch (InvalidOperationException)
+        {
+            caught = true;
+        }
+
+        Assert.True(probe.Disposed, "A using must dispose its resource when an exception leaves it");
+        Assert.True(caught, "The exception must reach the catch after the dispose");
+    }
+
+    private static void TestFinallyThrowReplacesException()
+    {
+        int outerFinallyRuns = 0;
+        bool caughtOriginal = false;
+        bool caughtReplacement = false;
+        try
+        {
+            try
+            {
+                try
+                {
+                    throw new InvalidOperationException("Replaced");
+                }
+                finally
+                {
+                    throw new ArgumentException("Replacement");
+                }
+            }
+            finally
+            {
+                outerFinallyRuns++;
+            }
+        }
+        catch (InvalidOperationException)
+        {
+            caughtOriginal = true;
+        }
+        catch (ArgumentException)
+        {
+            caughtReplacement = true;
+        }
+
+        Assert.True(!caughtOriginal, "An exception thrown from a finally must replace the one unwinding it");
+        Assert.True(caughtReplacement, "The exception thrown from the finally must be caught");
+        Assert.Equal(1, outerFinallyRuns, "The outer finally must run once, for the replacement");
+    }
+
+    private static void TestCatchThrowRunsFinallyOnce()
+    {
+        int finallyRuns = 0;
+        bool caughtSecond = false;
+        try
+        {
+            try
+            {
+                try
+                {
+                    throw new InvalidOperationException("First");
+                }
+                finally
+                {
+                    finallyRuns++;
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                throw new ArgumentException("Second");
+            }
+        }
+        catch (ArgumentException)
+        {
+            caughtSecond = true;
+        }
+
+        Assert.Equal(1, finallyRuns, "A finally the first exception left must not run again for the one its catch throws");
+        Assert.True(caughtSecond, "The exception thrown from the catch must be caught");
     }
 
     private static void TestFilterAndCatchResume()
