@@ -354,6 +354,87 @@ RhpCallFilterFunclet:
 .cfi_endproc
 
 
+
+//=============================================================================
+// RhpCallFinallyFunclet - Call a finally/fault funclet during exception unwinding
+//
+// INPUT:  x0 = handler funclet address
+//         x1 = REGDISPLAY*
+//
+// Restores callee-saved registers from REGDISPLAY, calls the funclet with no
+// arguments, then writes any updated callee-saved regs back to REGDISPLAY so
+// subsequent finally funclets see the correct state. Returns normally.
+//=============================================================================
+.global RhpCallFinallyFunclet
+.balign 4
+.cfi_startproc
+RhpCallFinallyFunclet:
+    // Save callee-saved registers and x0/x1 (handler addr and REGDISPLAY*).
+    // Frame: x29/x30, then x19-x28 (10 regs = 80 bytes), then x0/x1 (16 bytes) = 0x70 bytes total.
+    stp     x29, x30, [sp, #-0x70]!
+    .cfi_adjust_cfa_offset 0x70
+    .cfi_rel_offset x29, 0
+    .cfi_rel_offset x30, 8
+    mov     x29, sp
+    stp     x19, x20, [sp, #0x10]
+    .cfi_rel_offset x19, 0x10
+    .cfi_rel_offset x20, 0x18
+    stp     x21, x22, [sp, #0x20]
+    .cfi_rel_offset x21, 0x20
+    .cfi_rel_offset x22, 0x28
+    stp     x23, x24, [sp, #0x30]
+    .cfi_rel_offset x23, 0x30
+    .cfi_rel_offset x24, 0x38
+    stp     x25, x26, [sp, #0x40]
+    .cfi_rel_offset x25, 0x40
+    .cfi_rel_offset x26, 0x48
+    stp     x27, x28, [sp, #0x50]
+    .cfi_rel_offset x27, 0x50
+    .cfi_rel_offset x28, 0x58
+    stp     x0, x1, [sp, #0x60]    // save handler addr and REGDISPLAY*
+
+    // Restore callee-saved registers from REGDISPLAY (x1) before calling funclet.
+    ldr     x29, [x1, #OFFSETOF__REGDISPLAY__FP]
+    ldr     x19, [x1, #OFFSETOF__REGDISPLAY__X19]
+    ldr     x20, [x1, #OFFSETOF__REGDISPLAY__X20]
+    ldr     x21, [x1, #OFFSETOF__REGDISPLAY__X21]
+    ldr     x22, [x1, #OFFSETOF__REGDISPLAY__X22]
+    ldr     x23, [x1, #OFFSETOF__REGDISPLAY__X23]
+    ldr     x24, [x1, #OFFSETOF__REGDISPLAY__X24]
+    ldr     x25, [x1, #OFFSETOF__REGDISPLAY__X25]
+    ldr     x26, [x1, #OFFSETOF__REGDISPLAY__X26]
+    ldr     x27, [x1, #OFFSETOF__REGDISPLAY__X27]
+    ldr     x28, [x1, #OFFSETOF__REGDISPLAY__X28]
+
+    // Call the finally/fault funclet with no arguments.
+    ldr     x8, [sp, #0x60]        // reload handler address
+    blr     x8
+
+    // Write updated callee-saved registers back into REGDISPLAY.
+    ldr     x1, [sp, #0x68]        // reload REGDISPLAY*
+    str     x29, [x1, #OFFSETOF__REGDISPLAY__FP]
+    str     x19, [x1, #OFFSETOF__REGDISPLAY__X19]
+    str     x20, [x1, #OFFSETOF__REGDISPLAY__X20]
+    str     x21, [x1, #OFFSETOF__REGDISPLAY__X21]
+    str     x22, [x1, #OFFSETOF__REGDISPLAY__X22]
+    str     x23, [x1, #OFFSETOF__REGDISPLAY__X23]
+    str     x24, [x1, #OFFSETOF__REGDISPLAY__X24]
+    str     x25, [x1, #OFFSETOF__REGDISPLAY__X25]
+    str     x26, [x1, #OFFSETOF__REGDISPLAY__X26]
+    str     x27, [x1, #OFFSETOF__REGDISPLAY__X27]
+    str     x28, [x1, #OFFSETOF__REGDISPLAY__X28]
+
+    // Restore our callee-saved registers and return.
+    ldp     x27, x28, [sp, #0x50]
+    ldp     x25, x26, [sp, #0x40]
+    ldp     x23, x24, [sp, #0x30]
+    ldp     x21, x22, [sp, #0x20]
+    ldp     x19, x20, [sp, #0x10]
+    ldp     x29, x30, [sp], #0x70
+    ret
+.cfi_endproc
+
+
 //=============================================================================
 // RhpRethrow - Rethrow the current exception
 //

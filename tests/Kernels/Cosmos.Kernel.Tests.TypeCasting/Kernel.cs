@@ -13,7 +13,7 @@ public class Kernel : Sys.Kernel
     protected override void BeforeRun()
     {
         Log.WriteString("[TypeCasting Tests] Starting test suite\n");
-        TR.Start("TypeCasting Tests", expectedTests: 20);
+        TR.Start("TypeCasting Tests", expectedTests: 21);
 
         // Class hierarchy type checks (RhTypeCast_IsInstanceOfClass)
         TR.Run("IsInstanceOfClass_AnimalIsDog", TestIsInstanceOfClass);
@@ -49,6 +49,7 @@ public class Kernel : Sys.Kernel
         TR.Run("TryCatch_Filter_When", TestTryCatchFilterWhen);
         TR.Run("TryCatch_Filter_WhenFalse", TestTryCatchFilterWhenFalse);
         TR.Run("TryFinally", TestTryFinally);
+        TR.Run("TryFinally_OnException", TestTryFinallyOnException);
         TR.Run("FilterAndCatchResume", TestFilterAndCatchResume);
         TR.Run("TryCatch_ConsoleWriteLineExMessage", TestTryCatchConsoleWriteLineExMessage);
         TR.Run("TryCatch_TypedClauseSkipsOtherTypes", TestTypedClauseSkipsOtherTypes);
@@ -307,6 +308,33 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.True(finallyExecuted, "Finally block should always execute");
+    }
+
+    private static void TestTryFinallyOnException()
+    {
+        bool finallyExecuted = false;
+        bool caughtException = false;
+
+        try
+        {
+            try
+            {
+                throw new Exception("Finally unwind test");
+            }
+            finally
+            {
+                // This finally block MUST run during exception unwinding (pass 2)
+                // before the outer catch handler is invoked.
+                finallyExecuted = true;
+            }
+        }
+        catch (Exception)
+        {
+            caughtException = true;
+        }
+
+        Assert.True(finallyExecuted, "Finally block must execute during exception unwinding");
+        Assert.True(caughtException, "Catch block must execute after finally");
     }
 
     private static void TestFilterAndCatchResume()

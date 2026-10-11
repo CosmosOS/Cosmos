@@ -25,6 +25,10 @@ internal static unsafe partial class ExceptionHelper
     [SuppressGCTransition]
     private static partial nint RhpCallFilterFunclet(nint exceptionPtr, void* filterAddress, void* pRegDisplay);
 
+    [LibraryImport("*", EntryPoint = "RhpCallFinallyFunclet")]
+    [SuppressGCTransition]
+    private static partial void RhpCallFinallyFunclet(void* handlerAddress, void* pRegDisplay);
+
     // Guard against recursive exception handling.
     private static bool s_isHandlingException = false;
 
@@ -221,9 +225,10 @@ internal static unsafe partial class ExceptionHelper
 
     /// <summary>
     /// Two-pass exception dispatch from the throw-site context: pass 1 walks the stack to find a
-    /// handler (unwinding the register state at each frame so filters can run); pass 2 transfers to
-    /// the catch handler via <see cref="InvokeCatchHandler"/>, which does not return. Returns only
-    /// when no handler was found (or the throw-site frame pointer was missing).
+    /// handler (unwinding the register state at each frame so filters can run); pass 2 replays the
+    /// walk from the throw to the catch, running any fault / finally funclets along the way, then
+    /// transfers control to the catch handler via <see cref="InvokeSecondPass"/>, which does not
+    /// return. Returns only when no handler was found (or the throw-site frame pointer was missing).
     /// </summary>
     private static void DispatchExceptionWithContext(Exception ex, nuint throwAddress, nuint throwRbp, nuint throwRsp, void* pExInfo)
     {
@@ -359,10 +364,194 @@ internal static unsafe partial class ExceptionHelper
             Serial.WriteString("[EH] Too many nested catch funclets to track\n");
         }
 
-        // Pass 2: transfer to the catch handler.
-        // TODO: execute finally handlers between the throw and the catch first.
-        InvokeCatchHandler(ex, ref catchClause, pExInfo, pRegDisplay);
-        // InvokeCatchHandler jumps to the resume address and does not return.
+        // Pass 2: run any fault/finally funclets in frames between the throw and the catch,
+        // then transfer to the catch handler.
+        InvokeSecondPass(ex, throwAddress, throwRbp, throwRsp, catchFrame, ref catchClause, pExInfo, pRegDisplay, pThrowContext);
+        // InvokeSecondPass does not return (it calls InvokeCatchHandler which transfers out).
+    }
+
+    /// <summary>
+    /// Pass 2 of two-pass exception dispatch: replays the frame walk from the throw site up to (but
+    /// not including) the catching frame, invoking any fault / finally funclets encountered on the
+    /// way, then calls <see cref="InvokeCatchHandler"/> to transfer to the catch handler.
+    /// Does not return.
+    /// </summary>
+    private static void InvokeSecondPass(
+        Exception ex,
+        nuint throwAddress, nuint throwRbp, nuint throwRsp,
+        StackFrame catchFrame,
+        ref EHClause catchClause,
+        void* pExInfo,
+        REGDISPLAY* pCatchRegDisplay,
+        PAL_LIMITED_CONTEXT* pThrowContext)
+    {
+        // Rebuild the unwind state from scratch for the second pass.
+        UnwindState unwindState2 = default;
+        if (pThrowContext != null)
+        {
+            InitUnwindStateFromContext(ref unwindState2, pThrowContext);
+        }
+
+        // The REGDISPLAY used for finally funclets at each frame during pass 2.
+        REGDISPLAY pass2RegDisplay = default;
+        REGDISPLAY* pPass2RegDisplay = pThrowContext != null ? &pass2RegDisplay : null;
+
+        StackFrame frame2;
+        frame2.FramePointer = throwRbp;
+        frame2.StackPointer = throwRsp;
+        frame2.ReturnAddress = throwAddress;
+
+        int frameCount2 = 0;
+        while (frameCount2 < MAX_STACK_FRAMES && frame2.FramePointer != 0)
+        {
+            // Stop when we reach the catching frame — it will be handled by InvokeCatchHandler.
+            if (frame2.FramePointer == catchFrame.FramePointer)
+            {
+                break;
+            }
+
+            // Build the pass-2 REGDISPLAY for this frame's finally funclets.
+            if (pThrowContext != null)
+            {
+                pPass2RegDisplay = &pass2RegDisplay;
+                ProjectRegDisplay(ref unwindState2, pPass2RegDisplay);
+                PinPass1FrameRegister(pPass2RegDisplay, frame2.FramePointer);
+                pass2RegDisplay.SP = frame2.FramePointer;
+            }
+
+            // Run all fault/finally clauses in this frame that cover the call that threw.
+            InvokeFaultHandlers(ex, frame2.ReturnAddress - 1, frame2.FramePointer, pPass2RegDisplay);
+
+            nuint currentFrameIP2 = frame2.ReturnAddress;
+
+            if (pThrowContext != null)
+            {
+                if (!UnwindOneFrameWithCFI(ref unwindState2, currentFrameIP2))
+                {
+                    break;
+                }
+                frame2.ReturnAddress = unwindState2.ReturnAddress;
+                frame2.FramePointer = unwindState2.GetRegValue(CfiArch.FramePointerReg);
+                frame2.StackPointer = unwindState2.StackPointer;
+            }
+            else if (!UnwindOneFrame(ref frame2))
+            {
+                break;
+            }
+
+            frameCount2++;
+        }
+
+        // Transfer to the catch handler — does not return.
+        InvokeCatchHandler(ex, ref catchClause, pExInfo, pCatchRegDisplay);
+    }
+
+    /// <summary>
+    /// Runs all fault/finally funclets in the method that contains <paramref name="instructionPointer"/>
+    /// and whose try regions cover that instruction pointer, in the order they appear in the LSDA
+    /// (innermost to outermost, i.e., the same order NativeAOT's second pass uses).
+    /// </summary>
+    private static void InvokeFaultHandlers(Exception ex, nuint instructionPointer, nuint framePointer, REGDISPLAY* pRegDisplay)
+    {
+        if (!TryGetMethodLSDA(instructionPointer, out nuint methodStart, out byte* pLSDA))
+        {
+            return;
+        }
+
+        if (pLSDA == null)
+        {
+            return;
+        }
+
+        byte* p = pLSDA;
+        byte unwindBlockFlags = *p++;
+
+        // Skip the funclet→main redirect (present only in a funclet's LSDA).
+        if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_KIND_MASK) != MethodGcInfoLookup.UBF_FUNC_KIND_ROOT)
+        {
+            p += sizeof(int); // main-LSDA offset
+            p += sizeof(int); // method-start offset
+        }
+
+        // Skip the associated-data offset if present.
+        if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_HAS_ASSOCIATED_DATA) != 0)
+        {
+            p += sizeof(int);
+        }
+
+        if ((unwindBlockFlags & MethodGcInfoLookup.UBF_FUNC_HAS_EHINFO) == 0)
+        {
+            return;
+        }
+
+        // Follow the EH-info offset to the clause table.
+        int ehInfoOffset = *(int*)p;
+        byte* pEHInfo = p + ehInfoOffset;
+
+        uint nClauses = ReadUnsigned(ref pEHInfo);
+        uint codeOffset = (uint)(instructionPointer - methodStart);
+
+        for (uint i = 0; i < nClauses; i++)
+        {
+            uint tryStartOffset = ReadUnsigned(ref pEHInfo);
+            uint tryEndDeltaAndKind = ReadUnsigned(ref pEHInfo);
+
+            EHClauseKind kind = (EHClauseKind)(tryEndDeltaAndKind & 0x3);
+            uint tryEndOffset = tryStartOffset + (tryEndDeltaAndKind >> 2);
+
+            uint handlerOffset = 0;
+
+            switch (kind)
+            {
+                case EHClauseKind.EH_CLAUSE_TYPED:
+                    handlerOffset = ReadUnsigned(ref pEHInfo);
+                    // Skip the type reference (4-byte relative address).
+                    pEHInfo += sizeof(int);
+                    break;
+
+                case EHClauseKind.EH_CLAUSE_FAULT:
+                    handlerOffset = ReadUnsigned(ref pEHInfo);
+                    break;
+
+                case EHClauseKind.EH_CLAUSE_FILTER:
+                    handlerOffset = ReadUnsigned(ref pEHInfo);
+                    // Skip the filter offset.
+                    ReadUnsigned(ref pEHInfo);
+                    break;
+            }
+
+            // Only fault clauses run during unwinding.
+            if (kind != EHClauseKind.EH_CLAUSE_FAULT)
+            {
+                continue;
+            }
+
+            // Only if the throw site is inside this try region.
+            if (codeOffset < tryStartOffset || codeOffset >= tryEndOffset)
+            {
+                continue;
+            }
+
+            if (pRegDisplay == null)
+            {
+                if (s_traceThrows)
+                {
+                    Serial.WriteString("[EH] Skipping finally funclet (no register context)\n");
+                }
+                continue;
+            }
+
+            byte* handlerAddress = (byte*)(methodStart + handlerOffset);
+
+            if (s_traceThrows)
+            {
+                Serial.WriteString("[EH] Running finally funclet at 0x");
+                Serial.WriteHex((nuint)handlerAddress);
+                Serial.WriteString("\n");
+            }
+
+            RhpCallFinallyFunclet(handlerAddress, pRegDisplay);
+        }
     }
 
     /// <summary>
@@ -560,7 +749,7 @@ internal static unsafe partial class ExceptionHelper
                 continue;
             }
 
-            // Fault handlers run during unwinding, not as a catch — not implemented yet.
+            // Fault handlers (finally) run during pass 2 (InvokeSecondPass), not as catch handlers.
             if (kind == EHClauseKind.EH_CLAUSE_FAULT)
             {
                 continue;
