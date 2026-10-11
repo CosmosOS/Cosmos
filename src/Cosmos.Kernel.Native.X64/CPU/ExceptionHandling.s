@@ -367,6 +367,79 @@ RhpCallFilterFunclet:
 
 
 //=============================================================================
+// RhpCallFinallyFunclet - Call a finally (or fault) funclet while an exception unwinds its frame
+//
+// INPUT:  RDI = handler funclet address
+//         RSI = REGDISPLAY*  (pRbx/pRbp/pR12..pR15 -> the frame's body register values at the call
+//                              the exception unwinds; the dispatcher fills these from the CFI unwind)
+//
+// The funclet runs with the frame's RBP/RBX/R12-R15 (restored below) and returns here, and this
+// stub returns to the dispatcher, which goes on with the next clause or frame. The funclet keeps
+// the callee-saved registers as it found them, so nothing is written back to the REGDISPLAY.
+//
+// Stack alignment: the prologue pushes 6 callee-saved regs + the handler address = 7 eight-byte
+// slots (odd), so RSP is 16-byte aligned at the `call qword ptr [rsp]` below (see
+// RhpCallCatchFunclet).
+//
+// CFI: see the note on RhpCallCatchFunclet. The epilogue here is the ordinary `add rsp, 8` + 6 pops
+// + `ret`; GC cannot fire in it, so prologue CFI is sufficient.
+//=============================================================================
+.global RhpCallFinallyFunclet
+.cfi_startproc
+RhpCallFinallyFunclet:
+    // Save callee-saved registers
+    push    rbp
+    .cfi_adjust_cfa_offset 8
+    .cfi_rel_offset rbp, 0
+    push    rbx
+    .cfi_adjust_cfa_offset 8
+    .cfi_rel_offset rbx, 0
+    push    r12
+    .cfi_adjust_cfa_offset 8
+    .cfi_rel_offset r12, 0
+    push    r13
+    .cfi_adjust_cfa_offset 8
+    .cfi_rel_offset r13, 0
+    push    r14
+    .cfi_adjust_cfa_offset 8
+    .cfi_rel_offset r14, 0
+    push    r15
+    .cfi_adjust_cfa_offset 8
+    .cfi_rel_offset r15, 0
+
+    // Save the handler address (caller-saved — only the CFA offset advances)
+    push    rdi                     // [rsp+0] handler address
+    .cfi_adjust_cfa_offset 8
+
+    // Restore the frame's callee-saved registers from REGDISPLAY
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pRbx]
+    mov     rbx, [rax]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pRbp]
+    mov     rbp, [rax]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pR12]
+    mov     r12, [rax]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pR13]
+    mov     r13, [rax]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pR14]
+    mov     r14, [rax]
+    mov     rax, [rsi + OFFSETOF__REGDISPLAY__pR15]
+    mov     r15, [rax]
+
+    call    qword ptr [rsp]         // call finally funclet
+
+    // Clean up stack and restore our callee-saved registers
+    add     rsp, 8                  // pop handler address
+    pop     r15
+    pop     r14
+    pop     r13
+    pop     r12
+    pop     rbx
+    pop     rbp
+    ret
+.cfi_endproc
+
+
+//=============================================================================
 // RhpRethrow - Rethrow the current exception
 //
 // Called when a 'throw;' statement (without exception object) is executed.
