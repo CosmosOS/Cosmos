@@ -24,7 +24,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[GarbageCollector] BeforeRun() reached!\n");
         Serial.WriteString("[GarbageCollector] Starting tests...\n");
 
-        TR.Start("GarbageCollector Tests", expectedTests: 50);
+        TR.Start("GarbageCollector Tests", expectedTests: 50 + FinalizerTests.TestCount);
 
         // Garbage Collection Tests
         TR.Run("GC_IsEnabled", TestGCIsEnabled);
@@ -87,6 +87,9 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_TLAB_PreciseLessOrEqualTotal", TestTlabPreciseLessOrEqualTotal);
         TR.Run("GC_TLAB_SurvivalAfterCollect", TestTlabSurvivalAfterCollect);
         TR.Run("GC_TLAB_GapStampedOnCollect", TestTlabGapStampedOnCollect);
+
+        // Finalizer Tests
+        FinalizerTests.RunAll();
 
         TR.Finish();
 
