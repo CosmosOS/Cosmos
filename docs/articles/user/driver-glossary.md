@@ -16,7 +16,7 @@ These notes give the background on the hardware, operating system and build conc
 | [PCI](driver-concepts/pci.md) | The PCI function, its configuration space, class codes, capabilities and BARs |
 | [Hot-plug](driver-concepts/hot-plug.md) | Devices arriving and leaving at run time, and surprise removal |
 | [Virtio](driver-concepts/virtio.md) | Paravirtual devices: transports, the status handshake, feature negotiation and virtqueues |
-| [USB](driver-concepts/usb.md) | Interfaces, endpoints, transfer types, polled interrupt endpoints, enumeration, the HID boot protocol |
+| [USB](driver-concepts/usb.md) | Interfaces, endpoints, transfer types, polled interrupt endpoints, enumeration, the three host controller interfaces with their companions and hubs, the HID boot protocol |
 | [PS/2 and the 8042 controller](driver-concepts/ps2.md) | The 8042 controller, its two ports, commands, acknowledgements and scanning |
 | [Source generators](driver-concepts/source-generators.md) | Compiler plug-ins that add code at build time, in place of reflection, and how build properties reach them |
 | [Trimming and feature switches](driver-concepts/trimming.md) | Leaving unreachable code out of the image, and build-time switches that make a branch unreachable |
