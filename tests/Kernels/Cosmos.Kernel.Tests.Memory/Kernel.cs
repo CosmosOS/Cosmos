@@ -2592,10 +2592,16 @@ public unsafe class Kernel : Sys.Kernel
     /// two tests cannot collide on an alias.
     /// </summary>
     /// <remarks>
-    /// Sits in the higher half, above the HHDM window (0xFFFF_8000_0000_0000 on
-    /// x64, 0xFFFF_0000_0000_0000 on ARM64) but well below the kernel image at
-    /// 0xFFFF_FFFF_8000_0000, so it is not already mapped on either
-    /// architecture.
+    /// The base must be a canonical higher-half address, or dereferencing the
+    /// alias raises #GP on x86-64 whatever the page tables say. Canonical means
+    /// bits 63:48 equal a replication of bit 47, so the higher half starts at
+    /// 0xFFFF_8000_0000_0000. This base is above the HHDM window (0xFFFF_8000_
+    /// 0000_0000 on x64, 0xFFFF_0000_0000_0000 on ARM64) and far below the
+    /// kernel image at 0xFFFF_FFFF_8000_0000, so it is not already mapped on
+    /// either architecture. It must not be lowered to 0xFFFF_4000_0000_0000:
+    /// that has bit 47 clear while bits 63:48 are set, which is the
+    /// non-canonical hole, and a translate-only test passes there while the
+    /// first actual store faults with #GP.
     /// <para>
     /// The higher half is required rather than cosmetic: the ARM64 backend
     /// installs into the TTBR1 tables, which translate only the upper half. A
@@ -2607,7 +2613,7 @@ public unsafe class Kernel : Sys.Kernel
     /// </remarks>
     private static ulong PagerRoundTripAlias(ulong slot = 0)
     {
-        const ulong Base = 0xFFFF_4000_0000_0000;
+        const ulong Base = 0xFFFF_9000_0000_0000;
         const ulong SlotStride = 0x20_0000;
         return Base + (slot * SlotStride);
     }
