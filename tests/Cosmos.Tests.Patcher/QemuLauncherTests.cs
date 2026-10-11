@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Cosmos.Tools.Launcher;
 
@@ -276,6 +277,269 @@ public class QemuLauncherTests
         args.Clear();
         Assert.False(QemuLauncher.AppendUsbMouseArgs(args, none, QemuLauncher.AppendUsbKeyboardArgs(args, none, QemuLauncher.AppendStorageArgs(args, none))));
         Assert.DoesNotContain("qemu-xhci", args.ToString());
+    }
+
+    // The EHCI and the OHCI number their root ports in one space that QEMU
+    // fills in command-line order, inserting a hub of its own on the last
+    // free port, so every device is pinned: the keyboard on 1, the mouse on
+    // 2, the sticks from 3. The controller is emitted once, ahead of them.
+    [Theory]
+    [InlineData(UsbHostControllerModel.Ehci, "usb-ehci,id=usbehci0", "usbehci0.0")]
+    [InlineData(UsbHostControllerModel.Ohci, "pci-ohci,id=usbohci0,num-ports=6", "usbohci0.0")]
+    public void AppendUsbKeyboardArgs_PinsTheDevicesToThePortsOfOneController(UsbHostControllerModel model, string controller, string bus)
+    {
+        QemuLaunchOptions options = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            UsbController = model,
+            KeyboardDevice = "usb-kbd",
+            MouseDevice = "usb-mouse",
+            Disks =
+            [
+                new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.Usb },
+                new DiskAttachment { Path = "/tmp/b.img", Kind = DiskKind.Usb }
+            ]
+        };
+        StringBuilder args = new();
+        Assert.True(QemuLauncher.AppendUsbMouseArgs(args, options, QemuLauncher.AppendUsbKeyboardArgs(args, options, QemuLauncher.AppendStorageArgs(args, options))));
+
+        string text = args.ToString();
+        Assert.Contains($" -device {controller}", text);
+        Assert.Equal(text.IndexOf(controller, StringComparison.Ordinal), text.LastIndexOf(controller, StringComparison.Ordinal));
+        Assert.True(text.IndexOf(controller, StringComparison.Ordinal) < text.IndexOf("usb-storage", StringComparison.Ordinal), "the controller precedes its devices");
+        Assert.DoesNotContain("qemu-xhci", text);
+        Assert.DoesNotContain("masterbus", text);
+        Assert.DoesNotContain("usb-hub", text);
+        Assert.DoesNotContain("usb_version", text);
+        Assert.Contains($" -device usb-storage,drive=usbdisk0,bus={bus},id=usbstick0,port=3", text);
+        Assert.Contains($" -device usb-storage,drive=usbdisk1,bus={bus},id=usbstick1,port=4", text);
+        Assert.Contains($" -device usb-kbd,bus={bus},id=usbkbd0,port=1", text);
+        Assert.Contains($" -device usb-mouse,bus={bus},id=usbmouse0,port=2", text);
+    }
+
+    // The port plan leaves root ports 3 to 6 to the sticks, so four fit a
+    // port-pinning controller; QEMU would refuse a fifth at startup with
+    // "usb port 7 not found", naming neither the plan nor the disk, so the
+    // launcher refuses first. The xHCI picks its own ports and takes any number.
+    [Theory]
+    [InlineData(UsbHostControllerModel.Ehci)]
+    [InlineData(UsbHostControllerModel.Ohci)]
+    [InlineData(UsbHostControllerModel.EhciWithOhciCompanion)]
+    public void AppendStorageArgs_RefusesAFifthUsbDiskOnAPortPinningController(UsbHostControllerModel model)
+    {
+        StringBuilder args = new();
+        Assert.True(QemuLauncher.AppendStorageArgs(args, OptionsWithUsbDisks(model, 4)));
+        Assert.Contains($",id=usbstick3,port={QemuLauncher.UsbRootPortCount}", args.ToString());
+
+        args.Clear();
+        ArgumentException ex = Assert.Throws<ArgumentException>(() => QemuLauncher.AppendStorageArgs(args, OptionsWithUsbDisks(model, 5)));
+        Assert.Contains("At most 4 USB disks", ex.Message);
+        Assert.Contains($"ports {QemuLauncher.FirstUsbDiskPort} to {QemuLauncher.UsbRootPortCount}", ex.Message);
+
+        args.Clear();
+        Assert.True(QemuLauncher.AppendStorageArgs(args, OptionsWithUsbDisks(UsbHostControllerModel.Xhci, 5)));
+        Assert.Contains(",id=usbstick4", args.ToString());
+        Assert.DoesNotContain("port=", args.ToString());
+    }
+
+    /// <summary>A run with <paramref name="count"/> USB sticks on the controller <paramref name="model"/> names.</summary>
+    private static QemuLaunchOptions OptionsWithUsbDisks(UsbHostControllerModel model, int count)
+    {
+        List<DiskAttachment> disks = new(count);
+        for (int i = 0; i < count; i++)
+        {
+            disks.Add(new DiskAttachment { Path = $"/tmp/{i}.img", Kind = DiskKind.Usb });
+        }
+
+        return new QemuLaunchOptions
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            UsbController = model,
+            Disks = disks
+        };
+    }
+
+    // Only the ICH9 EHCI takes a companion in QEMU, and the companion must
+    // precede the devices as the master does: QEMU resolves bus= against
+    // what is already on the command line, and the OHCI registers its ports
+    // with the EHCI when it is created. usb_version=1 goes on the HID
+    // device alone: usb-storage has no such property.
+    [Fact]
+    public void AppendUsbKeyboardArgs_EmitsTheCompanionBetweenTheMasterAndTheDevices()
+    {
+        QemuLaunchOptions options = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            UsbController = UsbHostControllerModel.EhciWithOhciCompanion,
+            UsbDeviceVersion = QemuLauncher.FullSpeedUsbDeviceVersion,
+            KeyboardDevice = "usb-kbd",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.Usb }]
+        };
+        StringBuilder args = new();
+        Assert.True(QemuLauncher.AppendUsbKeyboardArgs(args, options, QemuLauncher.AppendStorageArgs(args, options)));
+
+        string text = args.ToString();
+        Assert.StartsWith(" -device ich9-usb-ehci1,id=usbehci0 -device pci-ohci,id=usbohci0,masterbus=usbehci0.0,firstport=0,num-ports=6 -drive ", text, StringComparison.Ordinal);
+        Assert.Equal(text.IndexOf("ich9-usb-ehci1", StringComparison.Ordinal), text.LastIndexOf("ich9-usb-ehci1", StringComparison.Ordinal));
+        Assert.Equal(text.IndexOf("pci-ohci", StringComparison.Ordinal), text.LastIndexOf("pci-ohci", StringComparison.Ordinal));
+        Assert.DoesNotContain(" -device usb-ehci,", text);
+        Assert.Contains(" -device usb-storage,drive=usbdisk0,bus=usbehci0.0,id=usbstick0,port=3", text);
+        Assert.Contains(" -device usb-kbd,bus=usbehci0.0,id=usbkbd0,port=1,usb_version=1", text);
+        Assert.Equal(text.IndexOf("usb_version", StringComparison.Ordinal), text.LastIndexOf("usb_version", StringComparison.Ordinal));
+    }
+
+    // usb_version=1 leaves a HID device with its full-speed descriptor set
+    // alone; on the xHCI it lands on a USB 2 port as the default one does,
+    // and the default version is QEMU's own, left unsaid.
+    [Fact]
+    public void AppendUsbKeyboardArgs_AddsUsbVersionOneWhenAsked()
+    {
+        QemuLaunchOptions options = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            UsbDeviceVersion = QemuLauncher.FullSpeedUsbDeviceVersion,
+            KeyboardDevice = "usb-kbd",
+            MouseDevice = "usb-mouse"
+        };
+        StringBuilder args = new();
+        QemuLauncher.AppendUsbMouseArgs(args, options, QemuLauncher.AppendUsbKeyboardArgs(args, options, false));
+
+        Assert.Equal(
+            " -device qemu-xhci,id=usbxhci0 -device usb-kbd,bus=usbxhci0.0,id=usbkbd0,usb_version=1 -device usb-mouse,bus=usbxhci0.0,id=usbmouse0,usb_version=1",
+            args.ToString());
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    public void AppendUsbKeyboardArgs_RejectsAUsbVersionQemuDoesNotTake(int version)
+    {
+        QemuLaunchOptions options = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            UsbDeviceVersion = version,
+            KeyboardDevice = "usb-kbd"
+        };
+        StringBuilder args = new();
+
+        Assert.Throws<ArgumentException>(() => QemuLauncher.AppendUsbKeyboardArgs(args, options, false));
+    }
+
+    // The hub goes on root port 1 right after the controller, before any
+    // device, and the keyboard behind it on the hub's port 1; a stick keeps
+    // its own root port. The hub is emitted with the controller, so once.
+    [Fact]
+    public void AppendUsbKeyboardArgs_PutsTheHubOnPortOneAndTheKeyboardBehindIt()
+    {
+        QemuLaunchOptions options = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            UsbController = UsbHostControllerModel.Ohci,
+            UsbHub = true,
+            KeyboardDevice = "usb-kbd",
+            Disks = [new DiskAttachment { Path = "/tmp/a.img", Kind = DiskKind.Usb }]
+        };
+        StringBuilder args = new();
+        Assert.True(QemuLauncher.AppendUsbKeyboardArgs(args, options, QemuLauncher.AppendStorageArgs(args, options)));
+
+        string text = args.ToString();
+        Assert.StartsWith(" -device pci-ohci,id=usbohci0,num-ports=6 -device usb-hub,bus=usbohci0.0,id=usbhub0,port=1 -drive ", text, StringComparison.Ordinal);
+        Assert.Equal(text.IndexOf("usb-hub", StringComparison.Ordinal), text.LastIndexOf("usb-hub", StringComparison.Ordinal));
+        Assert.Contains(" -device usb-storage,drive=usbdisk0,bus=usbohci0.0,id=usbstick0,port=3", text);
+        Assert.Contains(" -device usb-kbd,bus=usbohci0.0,id=usbkbd0,port=1.1", text);
+    }
+
+    // On the companion model the hub sits on the EHCI's bus, where its full
+    // speed routes it to the OHCI.
+    [Fact]
+    public void AppendUsbKeyboardArgs_TakesAHubOnTheCompanionModel()
+    {
+        QemuLaunchOptions options = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            UsbController = UsbHostControllerModel.EhciWithOhciCompanion,
+            UsbHub = true,
+            KeyboardDevice = "usb-kbd"
+        };
+        StringBuilder args = new();
+        QemuLauncher.AppendUsbKeyboardArgs(args, options, false);
+
+        Assert.Contains(" -device usb-hub,bus=usbehci0.0,id=usbhub0,port=1 -device usb-kbd,bus=usbehci0.0,id=usbkbd0,port=1.1", args.ToString());
+    }
+
+    // The hub is full speed only: the xHCI's port 1 is a USB 3 port and a
+    // standalone EHCI has high-speed ports alone, so QEMU would refuse the
+    // attach at startup; the launcher refuses first, with the reason.
+    [Theory]
+    [InlineData(UsbHostControllerModel.Xhci)]
+    [InlineData(UsbHostControllerModel.Ehci)]
+    public void AppendUsbKeyboardArgs_RefusesAHubOnAHighSpeedOnlyController(UsbHostControllerModel model)
+    {
+        QemuLaunchOptions options = new()
+        {
+            Architecture = "x64",
+            IsoPath = "/tmp/kernel.iso",
+            UsbController = model,
+            UsbHub = true,
+            KeyboardDevice = "usb-kbd"
+        };
+        StringBuilder args = new();
+
+        ArgumentException ex = Assert.Throws<ArgumentException>(() => QemuLauncher.AppendUsbKeyboardArgs(args, options, false));
+        Assert.Contains("usb-hub", ex.Message);
+    }
+
+    // The engine's monitor replugs a device on the bus and the port the
+    // command line used, which these name; the xHCI picks its own ports.
+    [Theory]
+    [InlineData(UsbHostControllerModel.Xhci, "usbxhci0", null, null, null)]
+    [InlineData(UsbHostControllerModel.Ehci, "usbehci0", "1", "2", "3")]
+    [InlineData(UsbHostControllerModel.Ohci, "usbohci0", "1", "2", "3")]
+    [InlineData(UsbHostControllerModel.EhciWithOhciCompanion, "usbehci0", "1", "2", "3")]
+    public void UsbControllerId_NamesTheControllerAndThePortsTheDevicesSitOn(UsbHostControllerModel model, string id, string? keyboardPort, string? mousePort, string? firstDiskPort)
+    {
+        Assert.Equal(id, QemuLauncher.UsbControllerId(model));
+        Assert.Equal($"{id}.0", QemuLauncher.UsbBus(model));
+        Assert.Equal(keyboardPort, QemuLauncher.UsbKeyboardPortOf(model, hub: false));
+        Assert.Equal(mousePort, QemuLauncher.UsbMousePortOf(model));
+        Assert.Equal(firstDiskPort, QemuLauncher.UsbDiskPortOf(model, 0));
+    }
+
+    [Fact]
+    public void UsbKeyboardPortOf_PutsTheKeyboardBehindTheHubWhenAsked()
+    {
+        Assert.Equal("1.1", QemuLauncher.UsbKeyboardPortOf(UsbHostControllerModel.Ohci, hub: true));
+        Assert.Equal("5", QemuLauncher.UsbDiskPortOf(UsbHostControllerModel.Ohci, 2));
+        Assert.Null(QemuLauncher.UsbKeyboardPortOf(UsbHostControllerModel.Xhci, hub: true));
+    }
+
+    [Theory]
+    [InlineData("xhci", UsbHostControllerModel.Xhci)]
+    [InlineData("EHCI", UsbHostControllerModel.Ehci)]
+    [InlineData(" ohci ", UsbHostControllerModel.Ohci)]
+    [InlineData("ehci-ohci", UsbHostControllerModel.EhciWithOhciCompanion)]
+    public void TryParseUsbController_ReadsTheFourSpellings(string name, UsbHostControllerModel expected)
+    {
+        Assert.True(QemuLauncher.TryParseUsbController(name, out UsbHostControllerModel model));
+        Assert.Equal(expected, model);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("uhci")]
+    [InlineData("ohci-ehci")]
+    public void TryParseUsbController_RejectsAnyOtherSpelling(string? name)
+    {
+        Assert.False(QemuLauncher.TryParseUsbController(name, out UsbHostControllerModel model));
+        Assert.Equal(UsbHostControllerModel.Xhci, model);
     }
 
     [Fact]
