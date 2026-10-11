@@ -29,6 +29,7 @@ internal static unsafe partial class GarbageCollector
         s_markOverflowMin = null;
         s_markOverflowMax = null;
         ScanStackRoots();
+        MarkFinalizerQueue();
         ScanGCHandles();
     }
 
@@ -41,9 +42,25 @@ internal static unsafe partial class GarbageCollector
     {
         ScanGCHandles(GCHandleType.Normal);
         ScanGCHandles(GCHandleType.Pinned);
+        ScanDependentHandles();
 
-        // Pass 2: Dependent handle convergence loop
-        // If primary is live, mark secondary. Repeat until no new marks (handles transitive chains).
+        void ScanGCHandles(GCHandleType type)
+        {
+            var storeEnum = s_gCHandleManager.GCHandleControllers[(int)type].GetEnumerator();
+            while (storeEnum.MoveNext())
+            {
+                TryMarkRoot((nint)storeEnum.Current->Object);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Dependent handle convergence loop: if a primary is live, marks its secondary, and repeats
+    /// until no new marks (handles transitive chains). Runs again once the objects queued for
+    /// finalization are marked, for the secondaries that hang on them.
+    /// </summary>
+    private static void ScanDependentHandles()
+    {
         bool markedNew = true;
         while (markedNew)
         {
@@ -66,15 +83,6 @@ internal static unsafe partial class GarbageCollector
                     // for ever with interrupts masked, the whole machine stopped.
                     markedNew |= secondary->IsMarked;
                 }
-            }
-        }
-
-        void ScanGCHandles(GCHandleType type)
-        {
-            var storeEnum = s_gCHandleManager.GCHandleControllers[(int)type].GetEnumerator();
-            while (storeEnum.MoveNext())
-            {
-                TryMarkRoot((nint)storeEnum.Current->Object);
             }
         }
     }
