@@ -1,11 +1,11 @@
-using Cosmos.Kernel.System.Keyboard;
-using Cosmos.Kernel.System.Keyboard.ScanMaps;
+using Cosmos.Kernel.System.Input;
+using Cosmos.Kernel.System.Input.Layouts;
 using DevKernel.Shell;
 
 namespace DevKernel.Commands;
 
 /// <summary>
-/// Keyboard commands: showing and switching the scan map the shell reads
+/// Keyboard commands: showing and switching the layout the shell reads
 /// keys through.
 /// </summary>
 internal static class KeyboardCommands
@@ -44,7 +44,7 @@ internal static class KeyboardCommands
 
     private static void SwitchLayout(string name)
     {
-        ScanMapBase? layout = name switch
+        KeyboardLayout? layout = name switch
         {
             "us" => new USStandardLayout(),
             "fr" => new FRStandardLayout(),
@@ -62,7 +62,7 @@ internal static class KeyboardCommands
             return;
         }
 
-        KeyboardManager.SetKeyLayout(layout);
+        KeyboardManager.SetLayout(layout);
         s_current = name;
         Terminal.Success($"Keyboard layout set to {name}");
     }

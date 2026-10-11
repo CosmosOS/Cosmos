@@ -183,16 +183,20 @@ public static class IoApic
     }
 
     /// <summary>
-    /// Masks (disables) an IRQ at the I/O APIC level.
+    /// Masks (disables) a global system interrupt at the I/O APIC level.
+    /// The caller resolves an ISA IRQ to its GSI first (the MADT override)
+    /// and holds interrupts disabled: the register pair below shares the
+    /// IOREGSEL latch with every other caller.
     /// </summary>
-    public static void MaskIrq(byte irq)
+    /// <param name="gsi">The global system interrupt.</param>
+    public static void MaskIrq(uint gsi)
     {
         if (!s_initialized)
         {
             return;
         }
 
-        uint redirIndex = irq - s_gsiBase;
+        uint redirIndex = gsi - s_gsiBase;
         if (redirIndex > s_maxRedirectionEntry)
         {
             return;
@@ -204,16 +208,18 @@ public static class IoApic
     }
 
     /// <summary>
-    /// Unmasks (enables) an IRQ at the I/O APIC level.
+    /// Unmasks (enables) a global system interrupt at the I/O APIC level.
+    /// Same rules as <see cref="MaskIrq"/>.
     /// </summary>
-    public static void UnmaskIrq(byte irq)
+    /// <param name="gsi">The global system interrupt.</param>
+    public static void UnmaskIrq(uint gsi)
     {
         if (!s_initialized)
         {
             return;
         }
 
-        uint redirIndex = irq - s_gsiBase;
+        uint redirIndex = gsi - s_gsiBase;
         if (redirIndex > s_maxRedirectionEntry)
         {
             return;

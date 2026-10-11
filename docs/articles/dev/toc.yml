@@ -20,8 +20,6 @@
   href: garbage-collector-glossary.md
 - name: Scheduler
   href: scheduler.md
-- name: Scheduler - Writing a Scheduler
-  href: scheduler-plugging.md
 - name: Scheduler - Glossary
   href: scheduler-glossary.md
 - name: Kernel Compilation Steps
@@ -34,3 +32,5 @@
   href: build/patcher-build.md
 - name: Cosmos.Build.Ilc
   href: build/ilc-build.md
+- name: Driver Manifest
+  href: build/driver-manifest.md

@@ -1,11 +1,6 @@
 using System;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
-using Cosmos.Kernel.System.Network.Config;
-using Cosmos.Kernel.System.Network.DNS;
-using Cosmos.Kernel.System.Network.IPv4;
-using Cosmos.Kernel.System.Network.IPv4.DHCP;
-using Cosmos.Kernel.System.Network.UDP;
 using DevKernel.Network;
 using DevKernel.Shell;
 

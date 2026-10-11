@@ -13,7 +13,7 @@
 
 .text
 
-// REGDISPLAY field offsets — must match [FieldOffset(...)] in ExceptionHandling.cs (Size = 0x88).
+// REGDISPLAY field offsets: they must match the [FieldOffset(...)] values in RegisterContext.X64.cs (Size = 0x88).
 .equ REGDISPLAY__Rbx,   0x00
 .equ REGDISPLAY__Rbp,   0x08
 .equ REGDISPLAY__Rsi,   0x10

@@ -24,8 +24,6 @@ Kernel debugging uses remote GDB: QEMU exposes a GDB server on `localhost:1234`,
 3. Open the **Run and Debug** view and select **Debug x64 Kernel** (or **Debug ARM64 Kernel**).
 4. Press F5. The pre-launch task builds the kernel, starts QEMU with `-s -S` (GDB server, frozen at startup), and the debugger attaches. Execution stops at your breakpoints.
 
-The configuration names above are what the template generates. When working on the framework repository itself, the equivalent configurations are named **Debug x64 DevKernel** / **Debug ARM64 DevKernel**.
-
 ---
 
 ## Serial log

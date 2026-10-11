@@ -45,6 +45,36 @@
            />
   </Target>
 
+  <!--
+    A driver assembly (one named in CosmosDriverAssemblyNames, declared in
+    Directory.Build.props) holds no InternalsVisibleTo grant from any project, and the
+    compiler is then the proof that it uses only the public driver kit seam: the assembly
+    can call only what a third party can call. This target keeps that proof from eroding
+    quietly. A grant naming a driver assembly, whether as an InternalsVisibleTo item or as
+    an AssemblyAttribute item for InternalsVisibleToAttribute, fails the granting project's
+    build. The fix is never the grant: add the missing capability to the driver kit.
+  -->
+  <Target Name="CosmosForbidDriverAssemblyGrants" BeforeTargets="BeforeBuild" Condition="'$(CosmosDriverAssemblyNames)' != ''">
+    <PropertyGroup>
+      <!-- Lower case, no blanks around the separators: a grant is matched the way
+           the compiler matches it, by assembly name and ignoring case. -->
+      <_CosmosDriverAssemblyNamesNormalized>;$([System.Text.RegularExpressions.Regex]::Replace('$(CosmosDriverAssemblyNames)', '\s*;\s*', ';').Trim().ToLowerInvariant());</_CosmosDriverAssemblyNamesNormalized>
+    </PropertyGroup>
+    <ItemGroup>
+      <_CosmosGrantedAssembly Include="@(InternalsVisibleTo)" />
+      <_CosmosGrantedAssembly Include="@(AssemblyAttribute->'%(_Parameter1)')"
+                              Condition="'%(AssemblyAttribute.Identity)' == 'System.Runtime.CompilerServices.InternalsVisibleToAttribute' or '%(AssemblyAttribute.Identity)' == 'System.Runtime.CompilerServices.InternalsVisibleTo'" />
+      <!-- The assembly name alone: a public key after the comma does not change which assembly is granted. -->
+      <_CosmosGrantedAssembly>
+        <Normalized>$([System.Text.RegularExpressions.Regex]::Replace('%(Identity)', ',.*$', '').Trim().ToLowerInvariant())</Normalized>
+      </_CosmosGrantedAssembly>
+      <_CosmosForbiddenDriverGrant Include="@(_CosmosGrantedAssembly)"
+                                   Condition="$(_CosmosDriverAssemblyNamesNormalized.Contains(';%(_CosmosGrantedAssembly.Normalized);'))" />
+    </ItemGroup>
+    <Error Condition="'@(_CosmosForbiddenDriverGrant)' != ''"
+           Text="$(MSBuildProjectName) grants InternalsVisibleTo to a driver assembly (@(_CosmosForbiddenDriverGrant, ', ')). A driver assembly uses only the public driver kit seam, and the compiler is the proof; remove the grant and add the missing capability to the driver kit instead. The list of driver assemblies is CosmosDriverAssemblyNames in Directory.Build.props." />
+  </Target>
+
   <!-- Clang is the same binary name on all platforms — no per-platform resolution needed.
        CCPath defaults to 'clang' in Cosmos.Build.CC.props. -->
 

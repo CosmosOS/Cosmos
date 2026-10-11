@@ -1,27 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Unsafe code is contained in Cosmos.Kernel.Core: this layer reaches memory through its address-based entry points. -->
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <PackageId>Cosmos.Kernel.HAL.ARM64</PackageId>
     <Title>Cosmos Kernel HAL ARM64</Title>
     <Description>Hardware abstraction layer ARM64 implementation for Cosmos kernel.</Description>
     <PackageTags>cosmos;kernel;hal;arm64;aarch64;hardware</PackageTags>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <DefineConstants>$(DefineConstants);ARCH_ARM64</DefineConstants>
-    <!-- The generic timer feeds ticks into the experimental scheduler seam (COSMOS0001). -->
-    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
+    <!-- The generic timer feeds ticks into the experimental scheduler seam (COSMOS0001);
+         the machine description seeds the platform bus through the experimental driver kit seam (COSMOS0003). -->
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.Core.ARM64\Cosmos.Kernel.Core.ARM64.csproj" />
-    <ProjectReference Include="..\Cosmos.Kernel.HAL.Interfaces\Cosmos.Kernel.HAL.Interfaces.csproj" />
     <ProjectReference Include="..\Cosmos.Kernel.HAL\Cosmos.Kernel.HAL.csproj" />
     <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- DateTime/Stopwatch plugs read the RTC driver singleton. -->
+    <!-- The DateTime and Interop.Sys plugs read the PL031Rtc singleton. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
-    <!-- White-box timer suite exercises the generic timer and RTC directly. -->
+    <!-- White-box timer suite exercises PL031Rtc directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
   </ItemGroup>
 </Project>

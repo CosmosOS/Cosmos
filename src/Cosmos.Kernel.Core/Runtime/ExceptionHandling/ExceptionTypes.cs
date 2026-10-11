@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Kernel.Core.Runtime;
+namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 
 /// <summary>
 /// Runtime exception IDs.

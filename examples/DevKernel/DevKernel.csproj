@@ -4,6 +4,8 @@
     <CosmosKernelClass>DevKernel.Kernel</CosmosKernelClass>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- Drivers/SampleDriver.cs, the sampledev command and the commands that read device facets (display, audio, disks) are written over the experimental driver kit seam (COSMOS0003). -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
   <!-- Core kernel packages (resolved from local-packages NuGet source set up by `make setup`).
@@ -11,6 +13,46 @@
   <ItemGroup>
     <PackageReference Include="Cosmos.Kernel" />
     <PackageReference Include="Cosmos.Kernel.System" />
+  </ItemGroup>
+
+  <!-- The FTP server behind the ftpd command (CosmosOS/Cosmos.Network.Ftp). A
+       clone of that repository next to this one is built from source, so a
+       change to the server can be tried in the DevKernel before it is
+       published; otherwise the package comes from nuget.org. -->
+  <PropertyGroup>
+    <CosmosNetworkFtpProject>$(MSBuildThisFileDirectory)../../../Cosmos.Network.Ftp/src/Cosmos.Network.Ftp/Cosmos.Network.Ftp.csproj</CosmosNetworkFtpProject>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(CosmosNetworkFtpProject)')">
+    <ProjectReference Include="$(CosmosNetworkFtpProject)" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('$(CosmosNetworkFtpProject)')">
+    <PackageReference Include="Cosmos.Network.Ftp" />
+  </ItemGroup>
+
+  <!-- The Lua interpreter behind the lua command (CosmosOS/Cosmos.Executable.Lua),
+       built from a clone next to this repository the same way. -->
+  <PropertyGroup>
+    <CosmosExecutableLuaProject>$(MSBuildThisFileDirectory)../../../Cosmos.Executable.Lua/src/Cosmos.Executable.Lua/Cosmos.Executable.Lua.csproj</CosmosExecutableLuaProject>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(CosmosExecutableLuaProject)')">
+    <ProjectReference Include="$(CosmosExecutableLuaProject)" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('$(CosmosExecutableLuaProject)')">
+    <PackageReference Include="Cosmos.Executable.Lua" />
+  </ItemGroup>
+
+  <!-- The Telnet server behind the telnetd command (CosmosOS/Cosmos.Network.Telnet).
+       A clone of that repository next to this one is built from source, so a
+       change to the server can be tried in the DevKernel before it is
+       published; otherwise the package comes from nuget.org. -->
+  <PropertyGroup>
+    <CosmosNetworkTelnetProject>$(MSBuildThisFileDirectory)../../../Cosmos.Network.Telnet/src/Cosmos.Network.Telnet/Cosmos.Network.Telnet.csproj</CosmosNetworkTelnetProject>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(CosmosNetworkTelnetProject)')">
+    <ProjectReference Include="$(CosmosNetworkTelnetProject)" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('$(CosmosNetworkTelnetProject)')">
+    <PackageReference Include="Cosmos.Network.Telnet" />
   </ItemGroup>
 
   <!-- DevKernel-specific C files -->

@@ -2,5 +2,12 @@
   <ItemGroup>
     <!-- Allow the 'CosmosKernelClass' Project Property to be read from the Source Generator -->
     <CompilerVisibleProperty Include="CosmosKernelClass" />
+    <!-- The driver policy: Sdk.targets joins the CosmosDriverExclude and
+         CosmosDriverInclude items into these two comma-separated properties
+         right before the compiler's editorconfig is written, and the manifest
+         generator reads them as build_property.CosmosDriverExcludeList /
+         IncludeList. -->
+    <CompilerVisibleProperty Include="CosmosDriverExcludeList" />
+    <CompilerVisibleProperty Include="CosmosDriverIncludeList" />
   </ItemGroup>
 </Project>

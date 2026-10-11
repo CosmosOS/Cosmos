@@ -43,7 +43,7 @@ public interface IScheduler
 
     /// <summary>
     /// Display name for this policy, used in boot logs and reported on the
-    /// ring as <c>SchedulerInfo.SchedulerName</c>.
+    /// ring as <c>SchedulerDiagnostics.SchedulerName</c>.
     /// </summary>
     string Name { get; }
 
@@ -123,12 +123,11 @@ public interface IScheduler
     void OnThreadExit(PerCpuState cpuState, SchedulerThread thread);
 
     /// <summary>
-    /// Re-insert a thread that gave up the CPU while still runnable. Called
-    /// from an explicit yield in thread context with interrupts masked, and
-    /// from the preemption path in interrupt context, where it runs
-    /// <em>after</em> <see cref="PickNext"/> has already chosen the
-    /// replacement: the outgoing thread is not a candidate for the switch it
-    /// is being preempted by.
+    /// Re-insert a thread that gave up the CPU while still runnable, whether
+    /// preempted or yielding. Called in interrupt context by the switch that
+    /// takes the thread off the CPU, <em>after</em> <see cref="PickNext"/>
+    /// has already chosen the replacement: the outgoing thread is not a
+    /// candidate for the switch it is leaving by.
     /// </summary>
     /// <param name="cpuState">CPU the thread is queued on.</param>
     /// <param name="thread">Thread giving up the CPU.</param>
@@ -230,7 +229,7 @@ public interface IScheduler
     /// <summary>
     /// Report a thread's current priority in the same policy-defined units
     /// <see cref="SetPriority"/> takes. Called from thread context with no
-    /// guard at all, on every thread snapshot the <c>SchedulerInfo</c> facade
+    /// guard at all, on every thread snapshot the <c>SchedulerDiagnostics</c> facade
     /// takes, so it must not mutate anything and must mask itself if it reads
     /// something a tick can be rewriting.
     /// </summary>
@@ -242,7 +241,7 @@ public interface IScheduler
 
     /// <summary>
     /// Report how many threads are waiting in the run structure. Read-only
-    /// introspection for the <c>SchedulerInfo</c> facade, called from thread
+    /// introspection for the <c>SchedulerDiagnostics</c> facade, called from thread
     /// context with no guard, so guard it yourself with
     /// <see cref="SchedulerManager.MaskInterrupts"/> if a concurrent tick
     /// could be mutating the structure underneath it. Masking inside the hook

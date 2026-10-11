@@ -56,17 +56,14 @@ public static class SchedulerManager
     /// <summary>Timer ticks between debug-live snapshot refreshes (~100ms at 100Hz).</summary>
     private const uint SnapshotRefreshTickInterval = 10;
 
-    /// <summary>Number of initial timer ticks that are always logged to serial.</summary>
+    /// <summary>Number of initial timer ticks logged to serial, to show at boot that the tick is live.</summary>
     private const uint InitialTickLogCount = 10;
-
-    /// <summary>After the initial ticks, log every Nth timer tick to avoid flooding serial output.</summary>
-    private const uint TickLogInterval = 50;
 
     /// <summary>
     /// Whether scheduler support is compiled into this kernel
     /// (the <c>CosmosEnableScheduler</c> feature switch). Internal: the ring
     /// already publishes this fact as <c>KernelFeatures.Scheduler</c> and
-    /// <c>SchedulerInfo.IsSupported</c>, so a policy author reads it there.
+    /// <c>SchedulerDiagnostics.IsSupported</c>, so a policy author reads it there.
     /// </summary>
     internal static bool IsEnabled => CosmosFeatures.SchedulerEnabled;
 
@@ -107,9 +104,9 @@ public static class SchedulerManager
         s_allThreads = new SchedulerThread?[SchedulerThread.MaxThreadCount];
         s_allThreadCount = 0;
 
-        Cosmos.Kernel.Core.Runtime.DebugLiveSnapshot.Initialize();
-        Cosmos.Kernel.Core.Runtime.DebugLiveGCSnapshot.Initialize();
-        Cosmos.Kernel.Core.Runtime.DebugLiveMemorySnapshot.Initialize();
+        Runtime.DebugLiveSnapshot.Initialize();
+        Runtime.DebugLiveGCSnapshot.Initialize();
+        Runtime.DebugLiveMemorySnapshot.Initialize();
     }
 
     /// <summary>
@@ -223,7 +220,7 @@ public static class SchedulerManager
     /// </summary>
     /// <param name="cpuId">
     /// CPU to look up. The count is on the ring as
-    /// <c>SchedulerInfo.CpuCount</c>; a policy normally takes the state it
+    /// <c>SchedulerDiagnostics.CpuCount</c>; a policy normally takes the state it
     /// needs from its hook parameters instead.
     /// </param>
     /// <exception cref="IndexOutOfRangeException">
@@ -268,7 +265,7 @@ public static class SchedulerManager
     /// threads. The boot path arms it once the manager, the policy and the
     /// idle threads are all wired, so the first tick cannot race a
     /// half-built scheduler. Surfaced on the ring as
-    /// <c>SchedulerInfo.IsRunning</c>.
+    /// <c>SchedulerDiagnostics.IsRunning</c>.
     /// </summary>
     internal static bool IsRunning
     {
@@ -331,7 +328,7 @@ public static class SchedulerManager
     /// Entry body for newly scheduled threads. Called from
     /// <see cref="Cosmos.Kernel.Core.Bridge.ThreadNative.EntryPointStub"/>,
     /// whose address is passed as the initial RIP / PC to the context-switch
-    /// assembly by whoever creates the thread (e.g. ThreadPlug).
+    /// assembly by whoever creates the thread (e.g. SystemNative_CreateThread).
     /// </para>
     ///
     /// This method handles exceptions, marks the thread as exited, and halts. The scheduler will
@@ -452,11 +449,11 @@ public static class SchedulerManager
     /// <see cref="ExitThread"/>'s own scope. An unmasked walk that read the exited
     /// total first and met that pair mid-scan would count the thread in neither
     /// term and report less than the previous call, which is the one thing
-    /// <c>SchedulerInfo.BusyCpuTimeNs</c> promises never happens.
+    /// <c>SchedulerDiagnostics.BusyCpuTimeNs</c> promises never happens.
     /// </summary>
     internal static ulong GetBusyCpuTimeNs()
     {
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             SchedulerThread?[]? threads = s_allThreads;
             if (threads is null)
@@ -509,7 +506,7 @@ public static class SchedulerManager
             return;
         }
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             // Idempotent: SetScheduler hands every registry entry to the
             // incoming policy exactly once, so a thread must hold one slot.
@@ -598,7 +595,7 @@ public static class SchedulerManager
 
         Serial.WriteString("[SCHED] CreateThread: entering\n");
         RegisterThread(thread);
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             var state = s_cpuStates[cpuId];
             s_currentScheduler.OnThreadCreate(state, thread);
@@ -612,9 +609,18 @@ public static class SchedulerManager
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
-            var state = s_cpuStates[cpuId];
+            PerCpuState state = s_cpuStates[cpuId];
+
+            // A wake for a thread that is already runnable does nothing: a
+            // Ready thread is queued and a Running one is on its CPU, and
+            // the run queue must never hold a thread twice (see
+            // ScheduleFromInterrupt for what a second entry does).
+            if (thread.State == SchedulerThreadState.Ready || thread.State == SchedulerThreadState.Running)
+            {
+                return;
+            }
 
             // Only set to Ready if not a new thread (Created).
             // New threads stay Created until they actually start running.
@@ -629,13 +635,9 @@ public static class SchedulerManager
             // Ask the next hardware-IRQ exit to reschedule: when this wake
             // comes from an ISR (InterruptEvent.Signal), the woken thread
             // would otherwise sit in the run queue until the next timer tick.
+            // No per-wake log here: this runs with interrupts masked, often
+            // from an ISR, and each polled UART byte would stall every IRQ.
             state._needReschedule = true;
-
-            Serial.WriteString("[SCHED] Thread ");
-            Serial.WriteNumber(thread.Id);
-            Serial.WriteString(" is now ready, RSP=");
-            Serial.WriteHexWithPrefix((ulong)thread.StackPointer);
-            Serial.WriteString("\n");
         }
     }
 
@@ -644,22 +646,19 @@ public static class SchedulerManager
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             PerCpuState state = s_cpuStates[cpuId];
 
             thread.State = SchedulerThreadState.Blocked;
             s_currentScheduler.OnThreadBlocked(state, thread);
 
-            // Ask the next IRQ exit to switch away (same as ReadyThread): a
-            // blocked current thread otherwise keeps re-entering its halt
-            // loop until the quantum tick preempts it — or forever when the
-            // periodic tick is not running.
+            // Ask the next IRQ exit to switch away (same as ReadyThread);
+            // Park raises that interrupt at once. Without the flag, a
+            // blocked current thread would wait for the quantum tick, or
+            // forever when the periodic tick is not running. Not logged, for
+            // the same reason as ReadyThread: interrupts are masked here.
             state._needReschedule = true;
-
-            Serial.WriteString("[SCHED] BlockThread id=");
-            Serial.WriteNumber(thread.Id);
-            Serial.WriteString("\n");
         }
     }
 
@@ -673,7 +672,7 @@ public static class SchedulerManager
         // callback does all three, but it takes no argument and reads
         // t_currentThread, so it can only clean the thread it runs on. A
         // thread exiting itself gets that callback; a thread reaped from
-        // someone else's context (SchedulerInfo.RequestKill on a queued
+        // someone else's context (SchedulerDiagnostics.RequestKill on a queued
         // thread) gets the same three steps addressed at it explicitly.
         if (ReferenceEquals(GetCpuState(cpuId)?.CurrentThread, thread))
         {
@@ -708,7 +707,7 @@ public static class SchedulerManager
         Serial.WriteNumber(thread.Id);
         Serial.WriteString("\n");
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
+        using (InternalCpu.DisableInterruptsScope())
         {
             PerCpuState state = s_cpuStates[cpuId];
 
@@ -730,17 +729,22 @@ public static class SchedulerManager
         }
     }
 
-    internal static void YieldThread(uint cpuId, SchedulerThread thread)
+    /// <summary>
+    /// Gives up the CPU at the next interrupt exit: sets the request
+    /// <see cref="BlockThread"/> makes, so that exit switches even when the
+    /// quantum has not run out. The switch re-queues the thread through
+    /// <see cref="IScheduler.OnThreadYield"/> after the policy picked another,
+    /// as a preemption does. Returns at once: nothing switches outside an
+    /// interrupt exit, and waiting for one would cost every call up to a
+    /// tick, while CoreLib's spin-then-block loops call Thread.Yield once per
+    /// spin (70 times before an idle thread pool worker parks on one CPU).
+    /// </summary>
+    /// <param name="cpuId">CPU ID of the calling thread.</param>
+    internal static void YieldThread(uint cpuId)
     {
         ThrowIfCpuStateNotInitialized();
-        ThrowIfSchedulerNotSet();
 
-        using (CPU.InternalCpu.DisableInterruptsScope())
-        {
-            PerCpuState state = s_cpuStates[cpuId];
-
-            s_currentScheduler.OnThreadYield(state, thread);
-        }
+        Volatile.Write(ref s_cpuStates[cpuId]._needReschedule, true);
     }
 
     /// <summary>
@@ -753,13 +757,64 @@ public static class SchedulerManager
     internal static void Sleep(uint cpuId, SchedulerThread thread, uint timeoutMs)
     {
         MarkSleeping(cpuId, thread, timeoutMs);
+        Park(thread);
+    }
 
-        // Only park the CPU while still Sleeping: if a wake already landed between
+    /// <summary>
+    /// Takes the CPU from <paramref name="thread"/>, the caller, once it has
+    /// marked itself Blocked (<see cref="BlockThread"/>) or Sleeping
+    /// (<see cref="MarkSleeping"/>) and left its IRQ-off section, and
+    /// returns once a wake has readied it and the scheduler has put it back
+    /// on the CPU. The switch happens now: the controller raises its
+    /// reschedule interrupt on this CPU and the exit of that interrupt runs
+    /// the next thread. A halt would leave the CPU idle until the next tick,
+    /// which every thread that blocks pays, up to a whole tick period each
+    /// time, out of the time of the threads that could run. Returns at once
+    /// when a wake already landed. The idle thread, and any thread before the
+    /// controller can raise the interrupt, halts instead. Thread context,
+    /// interrupts enabled.
+    /// </summary>
+    /// <param name="thread">The calling thread.</param>
+    internal static void Park(SchedulerThread thread)
+    {
+        if (!IsParked(thread))
+        {
+            return;
+        }
+
+        PerCpuState[]? states = s_cpuStates;
+        if (states is not null && thread.CpuId < s_cpuCount && (thread.Flags & SchedulerThreadFlags.IdleThread) == 0)
+        {
+            Volatile.Write(ref states[thread.CpuId]._needReschedule, true);
+            if (InterruptManager.TryRaiseReschedule())
+            {
+                // The interrupt lands within a few instructions and switches
+                // away; this thread is back here once it runs again.
+                while (IsParked(thread))
+                {
+                }
+
+                return;
+            }
+        }
+
+        // Only halt while still parked: if a wake already landed between
         // scope-dispose and this point, halting would sleep past it.
-        if (thread.State == SchedulerThreadState.Sleeping)
+        if (IsParked(thread))
         {
             InternalCpu.Halt();
         }
+    }
+
+    /// <summary>
+    /// Whether <paramref name="thread"/> is still Blocked or Sleeping. Not
+    /// inlined, so <see cref="Park"/>'s wait reads the state on every pass:
+    /// the interrupt that changes it is invisible to the compiler.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool IsParked(SchedulerThread thread)
+    {
+        return thread.State is SchedulerThreadState.Blocked or SchedulerThreadState.Sleeping;
     }
 
     /// <summary>
@@ -929,17 +984,32 @@ public static class SchedulerManager
 
     // ========== Timer Interrupt Handling ==========
 
-    // Debug counter to avoid flooding serial output
     private static uint s_tickCount;
 
+    private static uint s_switchCount;
+
     private static ulong s_tickPeriodNs;
+
+    /// <summary>
+    /// Timer interrupts handled since boot, counted before every early
+    /// return of <see cref="OnTimerInterrupt"/>, so a tick that schedules
+    /// nothing still counts. Wraps: compare differences. Any context.
+    /// </summary>
+    internal static uint TickCount => Volatile.Read(ref s_tickCount);
+
+    /// <summary>
+    /// Context switches staged since boot, by <see cref="ScheduleFromInterrupt"/>,
+    /// the one path that switches threads. Wraps: compare differences. Any
+    /// context.
+    /// </summary>
+    internal static uint SwitchCount => Volatile.Read(ref s_switchCount);
 
     /// <summary>
     /// Interval between scheduler ticks in nanoseconds, as the timer last
     /// reported it, or 0 before the first tick. This is the real preemption
     /// granularity: whatever slice a policy believes it is handing out, it
     /// cannot preempt more finely than the timer fires. Surfaced on the ring
-    /// as <c>SchedulerInfo.TickPeriodNs</c>.
+    /// as <c>SchedulerDiagnostics.TickPeriodNs</c>.
     /// </summary>
     internal static ulong TickPeriodNs => s_tickPeriodNs;
 
@@ -966,13 +1036,16 @@ public static class SchedulerManager
         // pausing the kernel.
         if ((s_tickCount % SnapshotRefreshTickInterval) == 0)
         {
-            Cosmos.Kernel.Core.Runtime.DebugLiveSnapshot.Update();
-            Cosmos.Kernel.Core.Runtime.DebugLiveGCSnapshot.Update();
-            Cosmos.Kernel.Core.Runtime.DebugLiveMemorySnapshot.Update();
+            Runtime.DebugLiveSnapshot.Update();
+            Runtime.DebugLiveGCSnapshot.Update();
+            Runtime.DebugLiveMemorySnapshot.Update();
         }
 
-        // Log first 10 ticks and then every 50 ticks
-        if (s_tickCount <= InitialTickLogCount || s_tickCount % TickLogInterval == 0)
+        // Only the first ticks are logged, to show at boot that the tick is
+        // live. This runs in the timer ISR with interrupts masked, and a
+        // periodic line would stall every IRQ on polled UART bytes for the
+        // whole uptime.
+        if (s_tickCount <= InitialTickLogCount)
         {
             Serial.WriteString("[SCHED] Tick ");
             Serial.WriteNumber(s_tickCount);
@@ -991,7 +1064,7 @@ public static class SchedulerManager
             return;
         }
 
-        var state = s_cpuStates[cpuId];
+        PerCpuState state = s_cpuStates[cpuId];
         if (state.CurrentThread is null)
         {
             return;
@@ -1034,11 +1107,9 @@ public static class SchedulerManager
             // Check if wakeup time has been reached
             if (currentTime >= thread.WakeupTime)
             {
-                Serial.WriteString("[SCHED] Waking sleeping thread ");
-                Serial.WriteNumber(thread.Id);
-                Serial.WriteString(" (time expired)\n");
-
-                // Wake the thread by marking it as ready
+                // Wake the thread by marking it as ready. Not logged, for the
+                // same reason as ReadyThread: this is the timer ISR, with
+                // interrupts masked.
                 thread.WakeupTime = 0;
                 ReadyThread(thread.CpuId, thread);
             }
@@ -1117,6 +1188,8 @@ public static class SchedulerManager
 
         if (next != prev)
         {
+            s_switchCount++;
+
             /*
             Serial.WriteString("[SCHED] Context switch: thread ");
             Serial.WriteNumber(prev?.Id ?? 0);
@@ -1127,18 +1200,19 @@ public static class SchedulerManager
             Serial.WriteString("\n");
             */
 
-            // Save current thread's stack pointer
+            // A prev that is already Ready is queued: it parked itself
+            // (blocked or slept) and a wake readied it before this switch
+            // took it off the CPU. Yielding it again would leave a second
+            // entry behind, whose pass keeps rising with the thread while its
+            // place in the queue does not move, so the queue stops being
+            // sorted and every thread queued behind that entry, a newly
+            // created one included, never reaches the head.
             if (prev is not null)
             {
                 prev.StackPointer = currentRsp;
                 if (prev.State == SchedulerThreadState.Running)
                 {
                     prev.State = SchedulerThreadState.Ready;
-                }
-
-                // Put previous thread back in run queue if still runnable
-                if (prev.State == SchedulerThreadState.Ready)
-                {
                     s_currentScheduler.OnThreadYield(state, prev);
                 }
             }
@@ -1155,6 +1229,12 @@ public static class SchedulerManager
             // Request context switch - set new thread flag and target RSP
             ContextSwitchNative.SetContextSwitchNewThread(isNewThread ? 1 : 0);
             ContextSwitchNative.SetContextSwitchSp(next.StackPointer);
+        }
+        else if (next.State == SchedulerThreadState.Ready)
+        {
+            // The policy handed back the current thread's own entry, queued
+            // by a wake that came before it left the CPU: it stays on.
+            next.State = SchedulerThreadState.Running;
         }
     }
 

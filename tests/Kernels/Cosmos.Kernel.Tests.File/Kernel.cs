@@ -8,9 +8,8 @@ namespace Cosmos.Kernel.Tests.File;
 using global::System;
 using global::System.IO;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.HAL.Vfs;
-using Cosmos.Kernel.System.Filesystems.Fat;
-using Cosmos.Kernel.System.Vfs;
+using Cosmos.Kernel.System.FileSystem;
+using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -51,7 +50,7 @@ public class Kernel : Sys.Kernel
         TR.Start("System.IO File Tests", expectedTests: ExpectedTestCount);
 
         MemoryBlockDevice disk = FileTestVolume.Create("MEMFILE16");
-        FatFilesystemType driver = new(disk);
+        FatFileSystemType driver = new(disk);
 
         // ---------- before any mount ----------
 
@@ -79,8 +78,8 @@ public class Kernel : Sys.Kernel
 
         TR.Run("Test_Mount_Volume", () =>
         {
-            Assert.True(VfsManager.RegisterFilesystem(DriverName, driver));
-            Assert.True(VfsManager.TryMount(DriverName, "", MountFlags.None, MountPoint, out VfsManager.VfsMount? mount));
+            Assert.True(VfsManager.RegisterFileSystem(DriverName, driver));
+            Assert.True(VfsManager.TryMount(DriverName, "", MountFlags.None, MountPoint, out VfsMount? mount));
             Assert.NotNull(mount);
         });
 

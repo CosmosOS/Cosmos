@@ -516,19 +516,13 @@ namespace Cosmos.Build.Analyzer.Patcher
         }
 
         /// <summary>
-        /// Writes debug log messages if DEBUG is defined.
+        /// Writes debug log messages if DEBUG is defined. The trace listener, not the
+        /// console: an analyzer runs inside the compiler server, whose console is not its own.
         /// </summary>
         private static void DebugLog(string message, [CallerMemberName] string memberName = "")
         {
 #if DEBUG
-            try
-            {
-                Console.WriteLine($"[DEBUG] [{memberName}]: {message}");
-            }
-            catch
-            {
-                // swallow any logging errors - logging should not break analysis
-            }
+            System.Diagnostics.Debug.WriteLine($"[DEBUG] [{memberName}]: {message}");
 #endif
         }
 

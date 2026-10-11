@@ -2,9 +2,9 @@ namespace Cosmos.TestRunner.Engine.Hosts;
 
 /// <summary>
 /// Shared tuning knobs of the QEMU test hosts (<see cref="QemuX64Host"/> and
-/// <see cref="QemuARM64Host"/>): run timeout, guest sizing, and the UART
-/// monitor loop's delays. Implementation policy, deliberately kept off the
-/// <see cref="IQemuHost"/> contract.
+/// <see cref="QemuARM64Host"/>): run timeout, guest sizing, the UART
+/// monitor loop's delays and the audio backend. Implementation policy,
+/// deliberately kept off the <see cref="IQemuHost"/> contract.
 /// </summary>
 internal static class QemuHostDefaults
 {
@@ -29,4 +29,12 @@ internal static class QemuHostDefaults
     /// (e.g. Power.Shutdown) that hang instead of cleanly exiting QEMU.
     /// </summary>
     internal const int StallSecondsAfterTestPass = 10;
+
+    /// <summary>
+    /// The <c>-audiodev</c> driver a profile's audio controller plays into.
+    /// A runner has no audio server, and QEMU's default backend then opens no
+    /// voice for the codec; <c>none</c> takes the frames at the stream's rate
+    /// and discards them, so the guest's stream engine still advances.
+    /// </summary>
+    internal const string AudioBackend = "none";
 }

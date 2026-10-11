@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <!-- The audio tests build streams in AudioFormat and AudioBitDepth,
+             the driver kit's experimental audio vocabulary (COSMOS0003). -->
+        <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.NET.Test.Sdk" />
+      <PackageReference Include="NUnit" />
+      <PackageReference Include="NUnit3TestAdapter" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Cosmos.Kernel.System\Cosmos.Kernel.System.csproj" />
+    </ItemGroup>
+</Project>

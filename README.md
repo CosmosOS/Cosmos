@@ -37,7 +37,7 @@ Cosmos gen2 (the current public Cosmos OS) compiles C# IL to x86 assembly throug
 - [Cosmos Graphics Subsystem](https://cosmosos.github.io/articles/user/graphics.html)
 - [Keyboard](https://cosmosos.github.io/articles/user/keyboard.html) and [Mouse](https://cosmosos.github.io/articles/user/mouse.html) input
 - [Network stack](https://cosmosos.github.io/articles/user/network.html)
-- Storage drivers (AHCI/SATA, NVMe) with MBR, GPT and EBR partitioning
+- Storage drivers (AHCI/SATA, NVMe, virtio-blk, USB mass storage) with MBR, GPT and EBR partitioning
 - [FAT12/16/32 filesystem](https://cosmosos.github.io/articles/user/filesystem.html) on a Unix-style VFS (mount, superblocks, inodes)
 - Timer / Clock
 

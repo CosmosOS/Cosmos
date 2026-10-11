@@ -21,6 +21,10 @@
     <PackageVersion Include="Cosmos.Kernel.Core.ARM64" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.HAL.X64" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.HAL.ARM64" Version="$(VersionPrefix)" />
+    <!-- External packages from nuget.org -->
+    <PackageVersion Include="Cosmos.Network.Ftp" Version="2.0.0" />
+    <PackageVersion Include="Cosmos.Executable.Lua" Version="4.0.0" />
+    <PackageVersion Include="Cosmos.Network.Telnet" Version="1.0.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
     <PackageVersion Include="log4net" Version="3.0.3" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.4.0" />

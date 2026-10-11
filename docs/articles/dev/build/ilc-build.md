@@ -32,7 +32,8 @@ flowchart TD
 | --- | --- | --- |
 | `ResolveIlcPath` | Downloads and locates ILCompiler, setting `IlcToolsPath`. | `Build` |
 | `WriteIlcRsp` | Produces the ILCompiler response file listing inputs, references, and options. | `ResolveIlcPath` |
-| `CompileWithIlc` | Runs `ilc` using the response file to emit a native object file. | `WriteIlcRsp` |
+| `CheckIlcCache` | Hashes the inputs, the references and the response file and compares the hash with the one of the last compilation. | `WriteIlcRsp` |
+| `CompileWithIlc` | Runs `ilc` using the response file to emit a native object file, unless `CheckIlcCache` found the object up to date. | `WriteIlcRsp`, `CheckIlcCache` |
 
 ---
 
@@ -40,8 +41,9 @@ flowchart TD
 
 1. **ResolveIlcPath** uses `GetPackageDirectory` to find the `runtime.<RID>.Microsoft.DotNet.ILCompiler` package and sets `IlcToolsPath`.
 2. **WriteIlcRsp** creates `$(IlcIntermediateOutputPath)$(AssemblyName).ilc.rsp`, gathering patched assemblies from `$(IntermediateOutputPath)/cosmos`, references from `cosmos/ref`, and ILCompiler options such as `--runtimeknob` and `--feature` flags.
-3. **CompileWithIlc** executes `ilc` with the generated response file, producing `$(AssemblyName).o` in `$(IlcIntermediateOutputPath)`.
-4. The native binary is ready for further packaging, such as bootloader integration.
+3. **CheckIlcCache** computes one SHA-256 over the input assemblies, the reference assemblies and the response file, and compares it with `.ilc-hash` from the last compilation. The response file is part of the key on purpose: a feature switch flipped in the kernel's `.csproj` changes no assembly, only the `--runtimeknob` arguments in the response file, and a key over the assemblies alone would keep the object compiled for the old value.
+4. **CompileWithIlc** executes `ilc` with the generated response file, producing `$(AssemblyName).o` in `$(IlcIntermediateOutputPath)`, and writes the new hash. When the hash matched, the step is skipped and the log says `ILC cache hit`.
+5. The native binary is ready for further packaging, such as bootloader integration.
 
 ---
 
@@ -49,6 +51,7 @@ flowchart TD
 
 - Response file: `$(IntermediateOutputPath)/cosmos/native/$(AssemblyName).ilc.rsp` listing inputs, references, and ILCompiler options.
 - Native object: `$(IntermediateOutputPath)/cosmos/native/$(AssemblyName).o` produced by `CompileWithIlc` for linking.
+- Cache key: `$(IntermediateOutputPath)/cosmos/native/.ilc-hash`, the hash of the inputs the object was compiled from.
 
 Notes:
 - Reference assemblies resolved by ILC are located under `$(IntermediateOutputPath)/cosmos/ref/` and come from the Patcher step.

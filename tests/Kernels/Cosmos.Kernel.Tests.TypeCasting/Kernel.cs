@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -12,7 +13,7 @@ public class Kernel : Sys.Kernel
     protected override void BeforeRun()
     {
         Log.WriteString("[TypeCasting Tests] Starting test suite\n");
-        TR.Start("TypeCasting Tests", expectedTests: 17);
+        TR.Start("TypeCasting Tests", expectedTests: 20);
 
         // Class hierarchy type checks (RhTypeCast_IsInstanceOfClass)
         TR.Run("IsInstanceOfClass_AnimalIsDog", TestIsInstanceOfClass);
@@ -50,6 +51,9 @@ public class Kernel : Sys.Kernel
         TR.Run("TryFinally", TestTryFinally);
         TR.Run("FilterAndCatchResume", TestFilterAndCatchResume);
         TR.Run("TryCatch_ConsoleWriteLineExMessage", TestTryCatchConsoleWriteLineExMessage);
+        TR.Run("TryCatch_TypedClauseSkipsOtherTypes", TestTypedClauseSkipsOtherTypes);
+        TR.Run("TryCatch_TypedClauseSkipsToCaller", TestTypedClauseSkipsToCaller);
+        TR.Run("TryCatch_DeepThrow", TestDeepThrow);
 
         Log.WriteString("[TypeCasting Tests] All tests completed\n");
         TR.Finish();
@@ -325,6 +329,84 @@ public class Kernel : Sys.Kernel
         Assert.True(filterRan, "Filter should have run");
         Assert.True(catchRan, "Catch should have run");
         Assert.True(resumed, "Execution should resume after catch");
+    }
+
+    private static void TestTypedClauseSkipsOtherTypes()
+    {
+        bool caughtByWrongClause = false;
+        bool caughtByRightClause = false;
+        try
+        {
+            throw new ArgumentException("Second clause");
+        }
+        catch (InvalidOperationException)
+        {
+            caughtByWrongClause = true;
+        }
+        catch (ArgumentException)
+        {
+            caughtByRightClause = true;
+        }
+
+        Assert.True(!caughtByWrongClause, "A typed clause must not catch an exception of an unrelated type");
+        Assert.True(caughtByRightClause, "The clause of the exception's type must catch it");
+    }
+
+    private static void TestTypedClauseSkipsToCaller()
+    {
+        bool caughtInCallee = false;
+        bool caughtInCaller = false;
+        try
+        {
+            ThrowPastInvalidOperationCatch(ref caughtInCallee);
+        }
+        catch (ArgumentException)
+        {
+            caughtInCaller = true;
+        }
+
+        Assert.True(!caughtInCallee, "The callee's clause of another type must let the exception pass");
+        Assert.True(caughtInCaller, "The caller's clause of the exception's type must catch it");
+    }
+
+    private static void ThrowPastInvalidOperationCatch(ref bool caught)
+    {
+        try
+        {
+            throw new ArgumentException("For the caller");
+        }
+        catch (InvalidOperationException)
+        {
+            caught = true;
+        }
+    }
+
+    private static void TestDeepThrow()
+    {
+        // Far more frames between the throw and its catch than the 64 the dispatcher once walked
+        const int Depth = 300;
+        int caughtAtDepth = -1;
+        try
+        {
+            Recurse(Depth);
+        }
+        catch (InvalidOperationException ex)
+        {
+            caughtAtDepth = int.Parse(ex.Message);
+        }
+
+        Assert.Equal(0, caughtAtDepth);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int Recurse(int depth)
+    {
+        if (depth == 0)
+        {
+            throw new InvalidOperationException("0");
+        }
+
+        return Recurse(depth - 1) + 1;
     }
 
     private static bool RunFilter(ref bool flag)

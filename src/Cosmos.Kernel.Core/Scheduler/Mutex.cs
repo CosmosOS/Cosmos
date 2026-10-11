@@ -1,4 +1,3 @@
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.Core.Scheduler;
@@ -147,14 +146,10 @@ internal class Mutex : IDisposable
                 SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
             }
 
-            // Only park the CPU while still Blocked (same rationale as
-            // InterruptEvent.WaitCore): if the hand-off already readied us
-            // between scope-dispose and this point, halting would sleep past
-            // the wake-up until an unrelated interrupt.
-            if (currentThread.State == SchedulerThreadState.Blocked)
-            {
-                InternalCpu.Halt();
-            }
+            // Give the CPU to the next thread until the hand-off readies
+            // this one (same as InterruptEvent.WaitCore); returns at once
+            // when it already landed between scope-dispose and this point.
+            SchedulerManager.Park(currentThread);
         }
     }
 

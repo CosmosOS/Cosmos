@@ -1,3 +1,4 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
@@ -64,10 +65,36 @@ public sealed class DiagnosticMessages
         DiagnosticSeverity.Warning,
         true,
         "Cosmos kernel layers must only reference the layer immediately below them. " +
-        "Layer order (lowest to highest): Native, Core, HAL, System, User."
+        "Layer order (lowest to highest): Native, Core, HAL, System, User.",
+        customTags: WellKnownDiagnosticTags.CompilationEnd
+    );
+
+    public static readonly DiagnosticDescriptor DriverAssemblyUsesUnsafeAccessor = new(
+        "NAOT0008",
+        "Driver assembly uses UnsafeAccessor",
+        "Member '{0}' carries [{1}]; a driver assembly reaches the kernel through the public driver kit seam only",
+        "Architecture",
+        DiagnosticSeverity.Error,
+        true,
+        "A driver assembly (<CosmosDriverAssembly>true</CosmosDriverAssembly>) must use only what a third-party " +
+        "driver library can use. UnsafeAccessor and UnsafeAccessorType reach internals without a grant, so they " +
+        "are refused there. Add the missing capability to the driver kit instead."
+    );
+
+    public static readonly DiagnosticDescriptor DriverAssemblyGrantedInternals = new(
+        "NAOT0009",
+        "Driver assembly is granted internals",
+        "Assembly '{0}' grants InternalsVisibleTo to this driver assembly; a driver assembly must not be granted internals",
+        "Architecture",
+        DiagnosticSeverity.Error,
+        true,
+        "A driver assembly (<CosmosDriverAssembly>true</CosmosDriverAssembly>) is proof that a driver needs " +
+        "nothing beyond the public driver kit seam, and the compiler is that proof only while no Cosmos assembly " +
+        "grants it internals. Remove the InternalsVisibleTo and add the missing capability to the driver kit.",
+        customTags: WellKnownDiagnosticTags.CompilationEnd
     );
 
     public static ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
         MemberNeedsPlug, MemberCanNotBeUsed, PlugNameDoesNotMatch, MethodNotImplemented, StaticConstructorTooManyParams,
-        LayerViolation);
+        LayerViolation, DriverAssemblyUsesUnsafeAccessor, DriverAssemblyGrantedInternals);
 }

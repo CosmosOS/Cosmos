@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Cosmos.Sdk" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Off on purpose: FatFeatureDriver is tied to the FAT feature and the suite
+         asserts the manifest leaves it out; the suite mounts nothing. The mouse
+         stays on for the PS/2 mouse of the x64 cells. -->
+    <CosmosEnableFat>false</CosmosEnableFat>
+    <!-- The harness reads the experimental driver kit seam (COSMOS0003); the
+         drivers themselves live in Cosmos.Kernel.Tests.Drivers.Library. -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+  </PropertyGroup>
+
+  <!-- Four cells on x64 and five on arm64: bare, where the synthetic groups
+       need no hardware and the hardware group reads what the machine carries
+       by default (the PCI host on both arches; q35's default e1000e on x64,
+       while virt's default NIC is a virtio-net-pci function that the kit's
+       VirtioNetDriver binds, so the E1000E tests skip there); usb-kbd, which
+       adds a qemu-xhci controller with a usb-kbd plugged in at boot for the
+       USB keyboard group, which skips elsewhere; usb-mouse, the same
+       controller with a usb-mouse for the USB mouse group; virtio-blk-pci, a virtio-blk
+       disk behind a PCI Express root port for the virtio-blk and root port
+       groups; and, on arm64 alone, virtio-blk-mmio, the same disk in the virt
+       machine's window.
+       Definitions live in tests/profiles.json. -->
+  <ItemGroup>
+    <CosmosTestProfile Include="bare" />
+    <CosmosTestProfile Include="usb-kbd" />
+    <CosmosTestProfile Include="usb-mouse" />
+    <CosmosTestProfile Include="virtio-blk-pci" />
+    <CosmosTestProfile Include="virtio-blk-mmio" />
+  </ItemGroup>
+
+  <!-- Manifest policy under test: a default driver dropped by name, and an
+       opt-in driver ([Driver(Default = false)]) taken in by name. Both are
+       referenced-assembly drivers, named by their full type name in the library. -->
+  <ItemGroup>
+    <CosmosDriverExclude Include="Cosmos.Kernel.Tests.Drivers.Library.ExcludedDriver" />
+    <CosmosDriverInclude Include="Cosmos.Kernel.Tests.Drivers.Library.OptInDriver" />
+  </ItemGroup>
+
+  <!-- The suite's drivers: a driver assembly with no InternalsVisibleTo grant,
+       written over the public seam only. This kernel keeps its own HAL grant for
+       the harness (TestKeyboardConsumer and TestPointerConsumer through
+       DeviceRegistry.SetConsumer). -->
+  <ItemGroup>
+    <ProjectReference Include="../Cosmos.Kernel.Tests.Drivers.Library/Cosmos.Kernel.Tests.Drivers.Library.csproj" />
+  </ItemGroup>
+
+  <!-- Core kernel packages (using project references for development) -->
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
+    <ProjectReference Include="../../../src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
+    <ProjectReference Include="../../Cosmos.TestRunner.Framework/Cosmos.TestRunner.Framework.csproj" />
+  </ItemGroup>
+
+  <!-- Architecture-specific HAL (using project references for development) -->
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_X64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_ARM64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
+  </ItemGroup>
+
+</Project>

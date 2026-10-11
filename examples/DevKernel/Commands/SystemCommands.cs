@@ -1,6 +1,6 @@
 using System;
 using Cosmos.Kernel.System.Graphics;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using DevKernel.Shell;
 using Sys = Cosmos.Kernel.System;
 

@@ -221,11 +221,24 @@
       <_PatcherCoverageFlag Condition="'$(CosmosCoverage)' != 'true'"></_PatcherCoverageFlag>
     </PropertyGroup>
 
+    <!-- Where the patcher resolves the assemblies a patched one references:
+         writing a constant typed as an enum from another assembly needs that
+         enum's definition, and Mono.Cecil looks only in the current directory
+         and the host runtime on its own. Every candidate's directory is
+         listed, plus ref/, where the non-patched references were copied. -->
+    <ItemGroup>
+      <_PatcherSearchDirectory Include="$([MSBuild]::NormalizeDirectory('$(IntermediateOutputPath)', 'cosmos', 'ref'))" />
+      <_PatcherSearchDirectory Include="@(CandidateAssemblies->'%(RootDir)%(Directory)')" />
+    </ItemGroup>
+    <RemoveDuplicates Inputs="@(_PatcherSearchDirectory)">
+      <Output TaskParameter="Filtered" ItemName="_PatcherSearchDirectoryUnique" />
+    </RemoveDuplicates>
+
     <Message Importance="High"
              Text="Batch patching: %(AssembliesToPatch.Identity) -> %(AssembliesToPatch.PatcherOutputPath)" />
 
     <Exec
-      Command="$(_CosmosPatcherCommand) patch --target &quot;%(AssembliesToPatch.Identity)&quot; --target-platform &quot;$(PatcherTargetPlatform)&quot; --output &quot;%(AssembliesToPatch.PatcherOutputPath)&quot; --plugs &quot;@(PlugRef-&gt;'%(Identity)', ';')&quot; $(_PatcherCoverageFlag)"
+      Command="$(_CosmosPatcherCommand) patch --target &quot;%(AssembliesToPatch.Identity)&quot; --target-platform &quot;$(PatcherTargetPlatform)&quot; --output &quot;%(AssembliesToPatch.PatcherOutputPath)&quot; --plugs &quot;@(PlugRef-&gt;'%(Identity)', ';')&quot; --search &quot;@(_PatcherSearchDirectoryUnique-&gt;'%(Identity)', ';')&quot; $(_PatcherCoverageFlag)"
       ConsoleToMSBuild="true"
       IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="PatcherExitCode" />

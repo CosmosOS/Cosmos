@@ -1,6 +1,6 @@
 using Cosmos.Kernel.Core.Runtime.GcInfo;
 
-namespace Cosmos.Kernel.Core.Runtime;
+namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 
 /// <summary>
 /// Arch-neutral DWARF Call-Frame-Information interpreter. Parses CIE/FDE instruction streams into

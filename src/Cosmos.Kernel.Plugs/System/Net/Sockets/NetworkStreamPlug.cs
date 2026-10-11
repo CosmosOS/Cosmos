@@ -1,239 +1,131 @@
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.System.Diagnostics;
 
 namespace Cosmos.Kernel.Plugs.System.Net.Sockets;
 
+/// <summary>
+/// Plugs what of .NET's <see cref="NetworkStream"/> reaches past what the
+/// socket plug keeps: the constructor's checks, the timeouts, which .NET
+/// keeps as socket options, and Dispose, which shuts the socket down through
+/// its native handle. The stream keeps its state in its own fields, so the
+/// rest is .NET's own code: Read and Write go through the socket plug's
+/// Receive and Send, which wait as .NET's do.
+/// </summary>
 [Plug(typeof(NetworkStream))]
 public static class NetworkStreamPlug
 {
-    // Store stream state per instance
-    public static readonly Dictionary<int, Socket> _streamSockets = [];
-    public static readonly Dictionary<int, bool> _ownsSocket = [];
-    public static readonly Dictionary<int, bool> _readable = [];
-    public static readonly Dictionary<int, bool> _writeable = [];
-
-    // Use object memory address as unique ID (RuntimeHelpers.GetHashCode not available in bare metal)
-    public static unsafe int GetId(NetworkStream aThis) => (int)*(nint*)Unsafe.AsPointer(ref aThis);
-
-    [PlugMember(".ctor")]
-    public static void Ctor(NetworkStream aThis, Socket socket)
-    {
-        Ctor(aThis, socket, FileAccess.ReadWrite, false);
-    }
-
-    [PlugMember(".ctor")]
-    public static void Ctor(NetworkStream aThis, Socket socket, bool ownsSocket)
-    {
-        Ctor(aThis, socket, FileAccess.ReadWrite, ownsSocket);
-    }
-
-    [PlugMember(".ctor")]
-    public static void Ctor(NetworkStream aThis, Socket socket, FileAccess access)
-    {
-        Ctor(aThis, socket, access, false);
-    }
-
+    // The three other constructors chain to this one.
     [PlugMember(".ctor")]
     public static void Ctor(NetworkStream aThis, Socket socket, FileAccess access, bool ownsSocket)
     {
-        Log.WriteString("[NetworkStreamPlug] Ctor(socket, access, ownsSocket)\n");
-
-        ArgumentNullException.ThrowIfNull(socket);
-
-        if (!socket.Connected)
-        {
-            Log.WriteString("[NetworkStreamPlug] socket is not connected\n");
-            throw new IOException("Socket not connected.");
-        }
-
-        int id = GetId(aThis);
-        _streamSockets[id] = socket;
-        _ownsSocket[id] = ownsSocket;
-
-        switch (access)
-        {
-            case FileAccess.Read:
-                _readable[id] = true;
-                _writeable[id] = false;
-                break;
-            case FileAccess.Write:
-                _readable[id] = false;
-                _writeable[id] = true;
-                break;
-            case FileAccess.ReadWrite:
-            default:
-                _readable[id] = true;
-                _writeable[id] = true;
-                break;
-        }
+        Initialize(aThis, socket, access, ownsSocket);
     }
 
-    [PlugMember("get_CanRead")]
-    public static bool get_CanRead(NetworkStream aThis)
+    [PlugMember("get_ReadTimeout")]
+    public static int get_ReadTimeout(NetworkStream aThis)
     {
-        int id = GetId(aThis);
-        return _readable.TryGetValue(id, out bool readable) && readable;
+        return ToStreamTimeout(aThis.Socket.ReceiveTimeout);
     }
 
-    [PlugMember("get_CanWrite")]
-    public static bool get_CanWrite(NetworkStream aThis)
+    [PlugMember("set_ReadTimeout")]
+    public static void set_ReadTimeout(NetworkStream aThis, int value)
     {
-        int id = GetId(aThis);
-        return _writeable.TryGetValue(id, out bool writeable) && writeable;
+        aThis.Socket.ReceiveTimeout = CheckStreamTimeout(value);
     }
 
-    [PlugMember("get_CanSeek")]
-    public static bool get_CanSeek(NetworkStream aThis)
+    [PlugMember("get_WriteTimeout")]
+    public static int get_WriteTimeout(NetworkStream aThis)
     {
-        return false;
+        return ToStreamTimeout(aThis.Socket.SendTimeout);
     }
 
-    [PlugMember("get_DataAvailable")]
-    public static bool get_DataAvailable(NetworkStream aThis)
+    [PlugMember("set_WriteTimeout")]
+    public static void set_WriteTimeout(NetworkStream aThis, int value)
     {
-        int id = GetId(aThis);
-        if (!_streamSockets.TryGetValue(id, out var socket))
-        {
-            return false;
-        }
-
-        return socket.Available > 0;
-    }
-
-    [PlugMember("get_Length")]
-    public static long get_Length(NetworkStream aThis)
-    {
-        throw new NotSupportedException("NetworkStream does not support Length");
-    }
-
-    [PlugMember("get_Position")]
-    public static long get_Position(NetworkStream aThis)
-    {
-        throw new NotSupportedException("NetworkStream does not support Position");
-    }
-
-    [PlugMember("set_Position")]
-    public static void set_Position(NetworkStream aThis, long value)
-    {
-        throw new NotSupportedException("NetworkStream does not support Position");
-    }
-
-    [PlugMember("get_Socket")]
-    public static Socket? get_Socket(NetworkStream aThis)
-    {
-        int id = GetId(aThis);
-        return _streamSockets.TryGetValue(id, out var socket) ? socket : null;
-    }
-
-    [PlugMember]
-    public static int Read(NetworkStream aThis, byte[] buffer, int offset, int count)
-    {
-        int id = GetId(aThis);
-        if (!_streamSockets.TryGetValue(id, out var socket))
-        {
-            throw new ObjectDisposedException(nameof(NetworkStream));
-        }
-
-        return socket.Receive(buffer, offset, count, SocketFlags.None);
-    }
-
-    [PlugMember]
-    public static int ReadByte(NetworkStream aThis)
-    {
-        int id = GetId(aThis);
-        if (!_streamSockets.TryGetValue(id, out var socket))
-        {
-            throw new ObjectDisposedException(nameof(NetworkStream));
-        }
-
-        byte[] buffer = new byte[1];
-        int read = socket.Receive(buffer, 0, 1, SocketFlags.None);
-        return read == 0 ? -1 : buffer[0];
-    }
-
-    [PlugMember]
-    public static void Write(NetworkStream aThis, byte[] buffer, int offset, int count)
-    {
-        Log.WriteString("[NetworkStreamPlug] Write: entering, count=");
-        Log.WriteNumber((ulong)count);
-        Log.WriteString("\n");
-
-        int id = GetId(aThis);
-        if (!_streamSockets.TryGetValue(id, out var socket))
-        {
-            Log.WriteString("[NetworkStreamPlug] Write: socket disposed\n");
-            throw new ObjectDisposedException(nameof(NetworkStream));
-        }
-
-        Log.WriteString("[NetworkStreamPlug] Write: calling socket.Send\n");
-        socket.Send(buffer, offset, count, SocketFlags.None);
-        Log.WriteString("[NetworkStreamPlug] Write: socket.Send returned\n");
-    }
-
-    [PlugMember]
-    public static void Write(NetworkStream aThis, ReadOnlySpan<byte> buffer)
-    {
-        Write(aThis, buffer.ToArray(), 0, buffer.Length);
-    }
-
-    [PlugMember]
-    public static void WriteByte(NetworkStream aThis, byte value)
-    {
-        Write(aThis, [value], 0, 1);
-    }
-
-    [PlugMember]
-    public static void Flush(NetworkStream aThis)
-    {
-        // No-op for network streams
-    }
-
-    [PlugMember]
-    public static long Seek(NetworkStream aThis, long offset, SeekOrigin origin)
-    {
-        throw new NotSupportedException("NetworkStream does not support Seek");
-    }
-
-    [PlugMember]
-    public static void SetLength(NetworkStream aThis, long value)
-    {
-        throw new NotSupportedException("NetworkStream does not support SetLength");
-    }
-
-    [PlugMember]
-    public static void Close(NetworkStream aThis)
-    {
-        Dispose(aThis, true);
-    }
-
-    [PlugMember]
-    public static void Dispose(NetworkStream aThis)
-    {
-        Dispose(aThis, true);
+        aThis.Socket.SendTimeout = CheckStreamTimeout(value);
     }
 
     [PlugMember]
     public static void Dispose(NetworkStream aThis, bool disposing)
     {
-        int id = GetId(aThis);
-        Socket? socket = null;
-        bool owns = false;
+        Release(aThis, disposing);
+    }
 
-        if (_streamSockets.TryGetValue(id, out socket))
+    public static void Initialize(NetworkStream stream, Socket socket, FileAccess access, bool ownsSocket)
+    {
+        ArgumentNullException.ThrowIfNull(socket);
+
+        // .NET checks Blocking, Connected and SocketType. The socket plug
+        // keeps neither Blocking nor SocketType, and its Connected turns false
+        // once the peer has closed its side, where .NET's stays true: a
+        // client's request and its FIN can both arrive before Accept returns,
+        // and the request is still to be read.
+        if (!SocketPlug.HoldsConnection(socket))
         {
-            _ownsSocket.TryGetValue(id, out owns);
+            throw new IOException("The operation is not allowed on non-connected sockets.");
         }
 
-        _streamSockets.Remove(id);
-        _ownsSocket.Remove(id);
-        _readable.Remove(id);
-        _writeable.Remove(id);
+        StreamSocket(stream) = socket;
+        OwnsSocket(stream) = ownsSocket;
+        Readable(stream) = access != FileAccess.Write;
+        Writeable(stream) = access != FileAccess.Read;
+    }
 
-        if (socket is not null && owns)
+    public static void Release(NetworkStream stream, bool disposing)
+    {
+        if (Disposed(stream))
         {
-            socket.Close();
+            return;
+        }
+
+        Disposed(stream) = true;
+
+        if (disposing)
+        {
+            Readable(stream) = false;
+            Writeable(stream) = false;
+
+            // .NET shuts the socket down before closing it, through a native
+            // handle the socket plug doesn't have: its Close sends the FIN.
+            if (OwnsSocket(stream))
+            {
+                stream.Socket.Close(CloseTimeout(stream));
+            }
         }
     }
+
+    // A socket timeout of 0 is none, which a stream says with -1.
+    public static int ToStreamTimeout(int socketTimeout)
+    {
+        return socketTimeout == 0 ? Timeout.Infinite : socketTimeout;
+    }
+
+    public static int CheckStreamTimeout(int value)
+    {
+        if (value <= 0 && value != Timeout.Infinite)
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), "Timeout can be only be set to 'System.Threading.Timeout.Infinite' or a value > 0.");
+        }
+
+        return value;
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_streamSocket")]
+    private static extern ref Socket StreamSocket(NetworkStream stream);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_ownsSocket")]
+    private static extern ref bool OwnsSocket(NetworkStream stream);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_readable")]
+    private static extern ref bool Readable(NetworkStream stream);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_writeable")]
+    private static extern ref bool Writeable(NetworkStream stream);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_disposed")]
+    private static extern ref bool Disposed(NetworkStream stream);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_closeTimeout")]
+    private static extern ref int CloseTimeout(NetworkStream stream);
 }

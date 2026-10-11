@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.HAL.Vfs;
-using Cosmos.Kernel.System.Vfs;
+using Cosmos.Kernel.System.FileSystem;
 
 namespace DevKernel.Shell;
 

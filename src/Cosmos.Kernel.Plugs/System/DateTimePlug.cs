@@ -1,9 +1,9 @@
 using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.System;
-#if ARCH_X64
-using Cosmos.Kernel.HAL.X64.Devices.Clock;
-#elif ARCH_ARM64
-using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
+#if ARCH_ARM64
+using Rtc = Cosmos.Kernel.HAL.ARM64.PL031Rtc;
+#else
+using Rtc = Cosmos.Kernel.HAL.X64.CmosRtc;
 #endif
 
 namespace Cosmos.Kernel.Plugs.System;
@@ -24,12 +24,12 @@ public static partial class DateTimePlug
     {
         if (KernelFeatures.Timer)
         {
-            if (RTC.Instance is null)
+            if (Rtc.Instance is null)
             {
                 return 0;
             }
 
-            return RTC.Instance.GetCurrentTicks();
+            return Rtc.Instance.GetCurrentTicks();
         }
         else
         {

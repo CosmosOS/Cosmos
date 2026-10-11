@@ -217,9 +217,10 @@ internal static unsafe partial class GarbageCollector
         // new buffer; if every attempt fails it returns with the context intact,
         // and the subsequent Collect() → ReturnAllAllocContexts() would stamp
         // the SAME gap again. That second head-insert makes the free block point
-        // at itself (block->Next = head = block), and the next free-list walk —
-        // GetCurrentFragmentation at the top of Collect() — spins forever with
-        // interrupts disabled: the "hang at [GC] Collection #1" bug.
+        // at itself (block->Next = head = block), and the next free-list walk
+        // spins forever with interrupts disabled: the "hang at [GC] Collection #1"
+        // bug, when the fragmentation metrics at the top of Collect() still walked
+        // the lists.
         ac.AllocPtr = null;
         ac.AllocLimit = null;
     }

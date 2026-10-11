@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using Cosmos.Kernel.HAL.Vfs;
 using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Filesystems.Fat;
+using Cosmos.Kernel.System.FileSystem;
+using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.Kernel.System.Storage;
-using Cosmos.Kernel.System.Vfs;
 
 namespace DevKernel.Storage;
 
@@ -28,7 +27,7 @@ internal static class FatBootstrap
             return;
         }
 
-        if (!VfsManager.RegisterFilesystem(DriverName, new FatFilesystemType()))
+        if (!VfsManager.RegisterFileSystem(DriverName, new FatFileSystemType()))
         {
             Log.WriteString("[DevKernel] FAT driver already registered or invalid\n");
             return;

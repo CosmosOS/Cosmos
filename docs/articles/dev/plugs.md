@@ -62,7 +62,11 @@ public static class IPEndPointPlug
     }
 
     [PlugMember]
-    public static bool StaticMethod() => true;   // static member: no aThis
+    public static bool StaticMethod()
+    {
+        // static member: no aThis
+        return true;
+    }
 }
 ```
 

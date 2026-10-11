@@ -136,5 +136,14 @@ internal static partial class Interop
             internal long TvSec;
             internal long TvNsec;
         }
+
+        /// <summary>CoreLib's <c>Interop.Sys.IOVector</c> (a struct iovec): the
+        /// buffers of PReadV/PWriteV.</summary>
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct IOVector
+        {
+            internal byte* Base;
+            internal nuint Count;
+        }
     }
 }

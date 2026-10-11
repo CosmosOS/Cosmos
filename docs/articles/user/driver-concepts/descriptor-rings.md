@@ -1,0 +1,11 @@
+# Descriptor rings
+
+A device that moves a stream of packets or disk blocks cannot be handed one buffer at a time: the driver would wait for each transfer, and a burst of incoming frames would find nowhere to land. A descriptor ring solves both: a fixed array of small records, the descriptors, in [DMA](dma.md) memory that the driver and the device both read and write. Each descriptor holds the [physical address](physical-addresses.md) and length of one data buffer, plus status bits, and the array is used as a circular queue that wraps back to the first entry after the last.
+
+At any moment each descriptor belongs to one side. The driver fills the descriptors it owns and hands them over; the device processes its own in order and hands each back when done. Two conventions mark the boundary, often combined. In one, the tail index is where the driver puts the next descriptor, the head index is where the device takes the next one, and the entries from head to tail belong to the device. In the other, each descriptor carries an ownership or "done" bit that the side giving it up flips. A network card keeps two rings: a receive ring the driver stocks with empty buffers, and a transmit ring it fills with outgoing frames.
+
+The driver tells the device that new descriptors are ready by writing a register, the doorbell, often the tail register itself. The way back needs no register: the driver reads which descriptors are done from the status the device writes into them, so one interrupt, or one poll, reaps a whole batch.
+
+The trap is ordering. The device may read a descriptor as soon as it sees the doorbell or the ownership bit, so the descriptor's contents must reach memory first, and the driver must not read a buffer's length or data before the "done" bit that guards them. [Barriers](barriers.md) enforce both.
+
+In the driver kit, a ring lives in a `DmaBuffer` from `binding.AllocateDma`, with `DmaBuffer.WriteBarrier()` before handing a descriptor over, `DmaBuffer.ReadBarrier()` after reading a "done" bit, and the doorbell written through a `RegisterWindow`, whose writes carry their own barrier. Virtio devices use the kit's own ring, the `Virtqueue` ([virtio](virtio.md)); see [DMA memory](../drivers.md#dma-memory) and [Queues](../drivers.md#queues).

@@ -1,6 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices.Storage;
 
 namespace Cosmos.Kernel.System.Storage;
 
@@ -121,7 +121,7 @@ public static class Mbr
             // the protective entry as a data partition (e.g. when the
             // primary GPT header is damaged) would let a write destroy the
             // remaining GPT structures.
-            if (systemId == SystemIdEmpty || systemId == SystemIdExtendedChs || systemId == SystemIdExtendedLba || systemId == SystemIdLinuxExtended || systemId == SystemIdGptProtective)
+            if (systemId is SystemIdEmpty or SystemIdExtendedChs or SystemIdExtendedLba or SystemIdLinuxExtended or SystemIdGptProtective)
             {
                 continue;
             }
@@ -251,7 +251,7 @@ public static class Mbr
         {
             int offset = PartitionTableOffset + i * PartitionEntrySize;
             byte systemId = mbr[offset + EntrySystemIdOffset];
-            if (systemId == SystemIdExtendedChs || systemId == SystemIdExtendedLba || systemId == SystemIdLinuxExtended)
+            if (systemId is SystemIdExtendedChs or SystemIdExtendedLba or SystemIdLinuxExtended)
             {
                 ulong start = BitConverter.ToUInt32(mbr.Slice(offset + EntryStartLbaOffset, LbaFieldSizeBytes));
                 ulong count = BitConverter.ToUInt32(mbr.Slice(offset + EntrySectorCountOffset, LbaFieldSizeBytes));
@@ -392,11 +392,7 @@ public static class Mbr
     /// </remarks>
     internal static bool IsMutableSystemId(byte systemId)
     {
-        return systemId != SystemIdEmpty
-            && systemId != SystemIdExtendedChs
-            && systemId != SystemIdExtendedLba
-            && systemId != SystemIdLinuxExtended
-            && systemId != SystemIdGptProtective;
+        return systemId is not (SystemIdEmpty or SystemIdExtendedChs or SystemIdExtendedLba or SystemIdLinuxExtended or SystemIdGptProtective);
     }
 
     /// <summary>
@@ -420,7 +416,7 @@ public static class Mbr
     /// intersects any occupied primary slot other than <paramref name="index"/>.
     /// Slots with geometry <see cref="Parse"/> would drop are skipped.
     /// </summary>
-    private static bool OverlapsOtherPrimary(Span<byte> mbr, int index, ulong startSector, ulong sectorCount)
+    private static bool OverlapsOtherPrimary(ReadOnlySpan<byte> mbr, int index, ulong startSector, ulong sectorCount)
     {
         for (int i = 0; i < MaxPartitions; i++)
         {

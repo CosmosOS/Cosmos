@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Cosmos.Kernel.HAL.Vfs;
-using Cosmos.Kernel.System.Vfs;
+using Cosmos.Kernel.System.FileSystem;
 using DevKernel.Shell;
 
 namespace DevKernel.Commands;
@@ -184,10 +183,10 @@ internal static class FileCommands
     {
         Terminal.Hint("Available mount points (cd into one):");
 
-        IReadOnlyList<VfsManager.VfsMount> mounts = VfsManager.Mounts;
+        IReadOnlyList<VfsMount> mounts = VfsManager.Mounts;
         for (int i = 0; i < mounts.Count; i++)
         {
-            VfsManager.VfsMount mount = mounts[i];
+            VfsMount mount = mounts[i];
             Console.Write("  ");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write(mount.MountPoint);

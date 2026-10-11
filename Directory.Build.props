@@ -100,6 +100,17 @@
   <PropertyGroup>
     <CosmosApiBaselineVersion></CosmosApiBaselineVersion>
   </PropertyGroup>
+  <!--
+    Every driver assembly in the tree is listed here, semicolon separated. A driver
+    assembly is built as a kernel author's driver library would be: it references the
+    driver kit and the ring only, and no project grants it InternalsVisibleTo. The grant
+    check in Directory.Build.targets (CosmosForbidDriverAssemblyGrants) reads this list
+    and fails any project whose InternalsVisibleTo names one of these assemblies.
+  -->
+  <PropertyGroup>
+    <CosmosDriverAssemblyNames>Cosmos.Kernel.Drivers;Cosmos.Kernel.Tests.Drivers.Library</CosmosDriverAssemblyNames>
+  </PropertyGroup>
+
   <!-- The property side of the flag (package validation, WarningsAsErrors) lives
        in Directory.Build.targets: this file is imported before the project body
        sets CosmosTrackPublicApi, so property conditions on it are always false

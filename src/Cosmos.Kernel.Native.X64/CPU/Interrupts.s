@@ -832,10 +832,16 @@ irq\n\()_stub:
 .Lnew_thread\n:
     // NEW thread - need to set up RSP from context and jump
     // Stack: RIP, CS, RFLAGS, RSP, SS
+    // Interrupts stay masked until RSP is the thread's own stack. The
+    // context block has no headroom below its RSP slot, so an interrupt
+    // taken before the switch would push its frame, and this stub's
+    // 448-byte save, past the bottom of the stack allocation into the heap.
     pop r11          // RIP -> r11
     add rsp, 8       // skip CS
-    popfq            // restore RFLAGS (enables interrupts)
-    pop rsp          // load thread's stack pointer
+    pop r10          // RFLAGS -> r10 (r10 is zero in a new context, caller-saved)
+    pop rsp          // load thread's stack pointer, interrupts still masked
+    push r10
+    popfq            // restore RFLAGS (enables interrupts) on the thread's stack
     jmp r11          // jump to entry point
 .endm
 

@@ -301,11 +301,11 @@ internal class StrideScheduler : IScheduler
         // Log every 100 ticks
         if (s_onTickLogCount % 100 == 0)
         {
-            Cosmos.Kernel.Core.IO.Serial.WriteString("[STRIDE] OnTick: current=");
-            Cosmos.Kernel.Core.IO.Serial.WriteNumber(current.Id);
-            Cosmos.Kernel.Core.IO.Serial.WriteString(" runQ=");
-            Cosmos.Kernel.Core.IO.Serial.WriteNumber((uint)cpuData.RunQueue.Count);
-            Cosmos.Kernel.Core.IO.Serial.WriteString("\n");
+            IO.Serial.WriteString("[STRIDE] OnTick: current=");
+            IO.Serial.WriteNumber(current.Id);
+            IO.Serial.WriteString(" runQ=");
+            IO.Serial.WriteNumber((uint)cpuData.RunQueue.Count);
+            IO.Serial.WriteString("\n");
         }
 
         // Check for preemption
@@ -576,7 +576,7 @@ internal class StrideScheduler : IScheduler
         {
             for (int i = 0; i < queue.Count; i++)
             {
-                if (object.ReferenceEquals(queue[i], thread))
+                if (ReferenceEquals(queue[i], thread))
                 {
                     queue.RemoveAt(i);
                     return;

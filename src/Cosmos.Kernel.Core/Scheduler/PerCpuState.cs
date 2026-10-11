@@ -43,7 +43,8 @@ public sealed class PerCpuState : SchedulerExtensible
     // Set by ReadyThread when it wakes a thread (typically an ISR-side
     // InterruptEvent.Signal); consumed by ReschedulePendingFromIrq on
     // hardware-IRQ exit so the woken thread runs immediately instead of
-    // sitting in the run queue until the next timer tick.
+    // sitting in the run queue until the next timer tick. BlockThread and
+    // YieldThread set it to give up the CPU on that same exit.
     internal bool _needReschedule;
 
     // ===== Synchronization =====

@@ -39,7 +39,7 @@ private static extern ref string GetName(Partition partition);
 
 ## Limits
 
-- **Byref returns of inaccessible types throw.** An accessor cannot `ref`-return a field whose own type is inaccessible to the declaring assembly; the runtime rejects it by spec. This is why `ThreadPlug` does not plug `Thread.CreateThread`: the upstream body reads the private `StartHelper`, whose type cannot be byref-returned, so the seam runs below it instead (see the comment in [ThreadPlug.cs](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Plugs/System/Threading/ThreadPlug.cs)).
+- **Byref returns of inaccessible types throw.** An accessor cannot `ref`-return a field whose own type is inaccessible to the declaring assembly; the runtime rejects it by spec. This is why `Thread.CreateThread` is not plugged: the upstream body reads the private `StartHelper`, whose type cannot be byref-returned, so the seam runs below it instead (see `SystemNative_CreateThread` in [libSystemNative.cs](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Bridge/Interop/libSystemNative.cs)).
 - **Resolution failures surface at the call site**, not as a compile error: a renamed or removed target member turns the accessor into a throwing stub.
 - **Signatures must match exactly**, including custom modifiers on the rare members that carry them.
 
@@ -50,6 +50,6 @@ private static extern ref string GetName(Partition partition);
 In order of preference:
 
 1. The supported surface (`Cosmos.Kernel.System` plus the contract interfaces). If it is missing something a kernel legitimately needs, open an issue: extending the ring is the intended fix.
-2. An `[Experimental]` seam where one exists (the scheduler seam, [Scheduler - Writing a Scheduler](scheduler-plugging.md)).
+2. An `[Experimental]` seam where one exists (the scheduler seam, [Writing a Scheduler](../user/scheduler-plugging.md); the driver kit, [Writing a Driver](../user/drivers.md)).
 3. A [plug](plugs.md), when the goal is replacing behavior rather than reaching state.
 4. `[UnsafeAccessor]`/`[UnsafeAccessorType]`, accepting that any release may break it.

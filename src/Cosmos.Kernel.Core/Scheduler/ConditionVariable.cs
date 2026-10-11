@@ -1,6 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.Core.CPU;
-using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.Core.Scheduler;
 
@@ -56,10 +54,6 @@ internal class ConditionVariable : IDisposable
         }
         while (currentThread is null);
 
-        Serial.WriteString("[CV] Wait BEGIN thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString("\n");
-
         using (_lockGuard.AcquireIrqSafe())
         {
             if (!ContainsWaiterLocked(currentThread))
@@ -71,24 +65,12 @@ internal class ConditionVariable : IDisposable
             SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
         }
 
-        // Only park the CPU while still Blocked (same rationale as Mutex.Acquire): if a Signal
-        // already readied this thread between scope-dispose and this point, halting would sleep
-        // past the wake-up until an unrelated interrupt.
-        if (currentThread.State == SchedulerThreadState.Blocked)
-        {
-            InternalCpu.Halt();
-        }
-
-        Serial.WriteString("[CV] Wait WOKE thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString("\n");
+        // Give the CPU to the next thread until a Signal readies this one (same as Mutex.Acquire);
+        // returns at once when a Signal already landed between scope-dispose and this point.
+        SchedulerManager.Park(currentThread);
 
         // Reacquire the mutex before returning
         mutex.Acquire();
-
-        Serial.WriteString("[CV] Wait END thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString("\n");
     }
 
     /// <summary>
@@ -105,12 +87,6 @@ internal class ConditionVariable : IDisposable
             return false;
         }
 
-        Serial.WriteString("[CV] WaitTimeout BEGIN thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString(" timeoutMs=");
-        Serial.WriteNumber(timeoutMs);
-        Serial.WriteString("\n");
-
         // Same atomic insert+release+park section as Wait — the old order (release, then
         // insert) additionally lost any Signal landing between the two: it found no waiters.
         using (_lockGuard.AcquireIrqSafe())
@@ -124,14 +100,7 @@ internal class ConditionVariable : IDisposable
             SchedulerManager.MarkSleeping(currentThread.CpuId, currentThread, timeoutMs);
         }
 
-        if (currentThread.State == SchedulerThreadState.Sleeping)
-        {
-            InternalCpu.Halt();
-        }
-
-        Serial.WriteString("[CV] WaitTimeout WOKE thread=");
-        Serial.WriteNumber(currentThread.Id);
-        Serial.WriteString("\n");
+        SchedulerManager.Park(currentThread);
 
         // Signaled iff Signal/SignalAll removed this thread from the wait list before the
         // timeout fired. On timeout the stale entry must be removed here, or a later Signal
@@ -199,16 +168,8 @@ internal class ConditionVariable : IDisposable
                 SchedulerThread waitingThread = _waitingThreads[0];
                 _waitingThreads.RemoveAt(0);
 
-                Serial.WriteString("[CV] Signal -> ReadyThread id=");
-                Serial.WriteNumber(waitingThread.Id);
-                Serial.WriteString("\n");
-
                 // Wake the thread by marking it ready
                 SchedulerManager.ReadyThread(waitingThread.CpuId, waitingThread);
-            }
-            else
-            {
-                Serial.WriteString("[CV] Signal (no waiters)\n");
             }
         }
     }

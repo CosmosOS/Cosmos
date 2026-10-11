@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -58,17 +60,25 @@ public sealed class TrueTypeFont : Font
     /// Returns whether the font contains a glyph for the given character.
     /// </summary>
     /// <param name="c">The character to look up.</param>
-    public bool HasGlyph(char c) => _font.HasGlyph(c);
+    public bool HasGlyph(char c)
+    {
+        return _font.HasGlyph(c);
+    }
 
     /// <inheritdoc cref="GetLineMetrics(int, out int, out int, out int)"/>
     public void GetLineMetrics(out int ascent, out int descent, out int lineGap)
-        => GetLineMetrics(SizePx, out ascent, out descent, out lineGap);
+    {
+        GetLineMetrics(SizePx, out ascent, out descent, out lineGap);
+    }
 
     /// <summary>
     /// Gets the distance in pixels from the top of a text line to the baseline
     /// at this font's <see cref="SizePx"/>.
     /// </summary>
-    public int GetAscent() => GetAscent(SizePx);
+    public int GetAscent()
+    {
+        return GetAscent(SizePx);
+    }
 
     /// <summary>
     /// Gets the kerning adjustment in pixels for a pair of characters at this
@@ -76,13 +86,22 @@ public sealed class TrueTypeFont : Font
     /// </summary>
     /// <param name="left">The left character of the pair.</param>
     /// <param name="right">The right character of the pair.</param>
-    public int GetKerning(char left, char right) => GetKerning(left, right, SizePx);
+    public int GetKerning(char left, char right)
+    {
+        return GetKerning(left, right, SizePx);
+    }
 
     /// <inheritdoc />
-    public override int GetLineHeight() => GetLineHeight(SizePx);
+    public override int GetLineHeight()
+    {
+        return GetLineHeight(SizePx);
+    }
 
     /// <inheritdoc />
-    public override int GetAdvance(char c) => GetAdvance(c, SizePx);
+    public override int GetAdvance(char c)
+    {
+        return GetAdvance(c, SizePx);
+    }
 
     /// <inheritdoc />
     public override int MeasureString(string text)
@@ -175,7 +194,10 @@ public sealed class TrueTypeFont : Font
     /// <param name="left">The left character of the pair.</param>
     /// <param name="right">The right character of the pair.</param>
     /// <param name="sizePx">The text size in pixels.</param>
-    public int GetKerning(char left, char right, int sizePx) => _font.GetKerning(left, right, GetScale(sizePx));
+    public int GetKerning(char left, char right, int sizePx)
+    {
+        return _font.GetKerning(left, right, GetScale(sizePx));
+    }
 
     /// <summary>
     /// Measures the width in pixels that <see cref="Canvas.DrawString(string, TrueTypeFont, int, global::System.Drawing.Color, int, int)"/>
@@ -254,7 +276,10 @@ public sealed class TrueTypeFont : Font
         return new TrueTypeGlyph(image.Pixels, image.Width, image.Height, rendered.xOfs, rendered.yOfs, rendered.xAdvance);
     }
 
-    private float GetScale(int sizePx) => _font.ScaleInPixels(sizePx);
+    private float GetScale(int sizePx)
+    {
+        return _font.ScaleInPixels(sizePx);
+    }
 
     private static byte[] ReadAllBytes(string path)
     {

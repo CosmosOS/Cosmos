@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 namespace Cosmos.Kernel.System.Graphics;
 
@@ -19,10 +15,10 @@ public enum ColorDepth
     /// <summary>
     /// 8 bits per pixel; 256 colors.
     /// </summary>
-    ColorDepth8 = 8,   /* VGA 256 colors */
+    ColorDepth8 = 8,
 
     /// <summary>
-    /// 16 bits per pixel; 65535 colors.
+    /// 16 bits per pixel; 65,536 colors.
     /// </summary>
     ColorDepth16 = 16,
 
@@ -32,7 +28,7 @@ public enum ColorDepth
     ColorDepth24 = 24,
 
     /// <summary>
-    /// 32 bits per pixel; 16,777,216 of colors with transparency (alpha values).
+    /// 32 bits per pixel; 16,777,216 colors with transparency (alpha values).
     /// </summary>
     ColorDepth32 = 32
 }

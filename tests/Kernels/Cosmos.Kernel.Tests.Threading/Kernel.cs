@@ -2,10 +2,11 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.System.Diagnostics;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using Monitor = System.Threading.Monitor;
@@ -17,7 +18,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 74;
+    private const int ExpectedTestCount = 78;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -54,6 +55,11 @@ public class Kernel : Sys.Kernel
 
     /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
     private const uint UnregisteredCpuId = 4096;
+
+    /// <summary>Turns each side of the Thread.Yield ping-pong takes.</summary>
+    private const int PingPongRounds = 20;
+    /// <summary>Scheduler ticks one side of the ping-pong waits for its turn before it calls the exchange stalled.</summary>
+    private const uint PingPongTurnTicks = 100;
 
     /// <summary>Polling interval (ms) while waiting on scheduler-test flags (worker holding, parked, woke, ...).</summary>
     private const int FlagPollIntervalMs = 50;
@@ -166,6 +172,8 @@ public class Kernel : Sys.Kernel
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
         TR.Run("Mutex_ThreeContenders_AllAcquire", TestMutexThreeContenders);
         TR.Run("Mutex_ReleaseHandsOffToParkedWaiter", TestMutexReleaseHandsOff);
+        TR.Run("Thread_Yield_PingPong_BothWaitersFinish", TestThreadYieldPingPong);
+        TR.Run("Thread_Yield_InterruptsMasked_ReturnsFalse", TestThreadYieldInterruptsMasked);
 
         // ThreadPool / Task / async-await tests (validate fix for #245, #246)
         TR.Run("ThreadPool_QueueUserWorkItem_ExecutesCallback", TestThreadPoolQueueUserWorkItem);
@@ -859,6 +867,85 @@ public class Kernel : Sys.Kernel
         s_handoffMutex.Release();
     }
 
+    // ===== Thread.Yield =====
+    // Thread.Yield reaches RhYield unplugged. Each of two threads waits for
+    // the other on Thread.Yield alone, so a yield that never lets the other
+    // run, or a run queue that strands it behind a stale entry, stalls the
+    // exchange instead of finishing it.
+    private static volatile int s_pingPongTurn;
+    private static volatile bool s_pingPongStop;
+
+    private static void TestThreadYieldPingPong()
+    {
+        s_pingPongTurn = 0;
+        s_pingPongStop = false;
+
+        SysThread worker = new(PingPongWorker);
+        worker.Start();
+
+        int rounds = 0;
+        for (; rounds < PingPongRounds; rounds++)
+        {
+            int handedTurn = (2 * rounds) + 1;
+            s_pingPongTurn = handedTurn;
+            if (!YieldUntilTurn(handedTurn + 1))
+            {
+                break;
+            }
+        }
+
+        s_pingPongStop = true;
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        Assert.Equal(PingPongRounds, rounds, "two threads waiting on each other through Thread.Yield must finish every round");
+    }
+
+    private static void PingPongWorker()
+    {
+        for (int turn = 1; turn < 2 * PingPongRounds; turn += 2)
+        {
+            if (!YieldUntilTurn(turn))
+            {
+                return;
+            }
+
+            s_pingPongTurn = turn + 1;
+        }
+    }
+
+    /// <summary>
+    /// Yields until the ping-pong turn reads <paramref name="turn"/>, for at
+    /// most <see cref="PingPongTurnTicks"/> scheduler ticks: a yield returns
+    /// before the switch it asks for, so only the tick count measures how
+    /// long the other side had.
+    /// </summary>
+    private static bool YieldUntilTurn(int turn)
+    {
+        uint since = SchedulerManager.TickCount;
+        while (s_pingPongTurn != turn && !s_pingPongStop && SchedulerManager.TickCount - since < PingPongTurnTicks)
+        {
+            SysThread.Yield();
+        }
+
+        return s_pingPongTurn == turn;
+    }
+
+    /// <summary>
+    /// A yield asks for a switch and returns before it, so with interrupts
+    /// masked, where no interrupt exit comes to switch, it must still return,
+    /// reporting that no other thread ran.
+    /// </summary>
+    private static void TestThreadYieldInterruptsMasked()
+    {
+        bool switched;
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            switched = SysThread.Yield();
+        }
+
+        Assert.False(switched, "Thread.Yield with interrupts masked must return without switching");
+    }
+
     private static void TestMultipleThreads()
     {
         Serial.WriteString("[Test] Testing multiple threads...\n");
@@ -974,7 +1061,7 @@ public class Kernel : Sys.Kernel
 
     private static void KillVictimWorker()
     {
-        if (SchedulerInfo.TryGetCurrentThread(SchedulerManager.GetCurrentCpuId(), out KernelThreadInfo info))
+        if (SchedulerDiagnostics.TryGetCurrentThread(SchedulerManager.GetCurrentCpuId(), out KernelThreadInfo info))
         {
             s_killVictimId = info.Id;
         }
@@ -1001,7 +1088,7 @@ public class Kernel : Sys.Kernel
         }
         Assert.True(s_killVictimStarted, "the victim must have started before it is killed");
 
-        ThreadKillResult result = SchedulerInfo.RequestKill(s_killVictimId);
+        ThreadKillResult result = SchedulerDiagnostics.RequestKill(s_killVictimId);
         Assert.Equal((int)ThreadKillResult.Killed, (int)result, "a preempted thread sits in the run queue and is killed outright");
 
         // The managed thread stops with the kernel one: joiners are released

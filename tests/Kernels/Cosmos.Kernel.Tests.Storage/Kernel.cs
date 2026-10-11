@@ -1,17 +1,23 @@
 using System;
+using System.Diagnostics;
 using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.HAL;
+using Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort;
+using Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
+using Cosmos.Kernel.Drivers.Pci.Storage.Ahci;
+using Cosmos.Kernel.Drivers.Pci.Storage.Nvme;
+using Cosmos.Kernel.Drivers.Usb.Storage.UsbMassStorage;
+using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
+using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.Devices.Storage;
-using Cosmos.Kernel.HAL.Devices.Usb;
-using Cosmos.Kernel.HAL.Interfaces.Devices;
-using Cosmos.Kernel.HAL.Pci;
-using Cosmos.Kernel.HAL.Pci.Enums;
-using Cosmos.Kernel.HAL.Vfs;
-using Cosmos.Kernel.System.Filesystems.Fat;
+using Cosmos.Kernel.HAL.DriverKit;
+using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
+using Cosmos.Kernel.HAL.DriverKit.Engine;
+using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.FileSystem;
+using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.Kernel.System.Storage;
-using Cosmos.Kernel.System.Vfs;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using SysThread = System.Threading.Thread;
@@ -22,15 +28,16 @@ namespace Cosmos.Kernel.Tests.Storage;
 public class Kernel : Sys.Kernel
 {
     // The single block device the active QEMU profile attached, captured
-    // once at BeforeRun. The profile name (set by the engine — ahci,
+    // once at BeforeRun. The profile name (set by the engine: ahci,
     // ahci+gicv2, nvme, nvme+gicv3, nvme+acpi-off, ...) is what the report's
     // [profile] prefix shows; this field just holds whatever device bound.
     private static IBlockDevice? s_dev;
 
     // Reason surfaced through TR.RunIf when a test depends on a device
-    // having actually bound. A profile whose driver did not enumerate
-    // (e.g. nvme+acpi-off on arm64, where no-ACPI removes PCIe discovery)
-    // lands here and the device tests skip.
+    // having actually bound. Every cell of this suite attaches one disk and
+    // the machine description finds the PCI host on both architectures with
+    // or without ACPI (on arm64 from the device tree when ACPI is off), so a
+    // cell landing here has Manager_ExactlyOneDevice failing above it.
     private const string SkipNoDevice = "no block device bound for this profile";
 
     // Same gating reason for the partition-table tests, which also need
@@ -38,7 +45,7 @@ public class Kernel : Sys.Kernel
     private const string SkipNoHost = "no block device bound for partition-table tests";
 
     /// <summary>Total tests this suite reports per profile; the breakdown is at the TR.Start call site.</summary>
-    private const ushort ExpectedTestCount = 73;
+    private const ushort ExpectedTestCount = 83;
 
     /// <summary>Block devices the engine attaches per QEMU profile; any other count is a bind or double-registration regression.</summary>
     private const int AttachedDisksPerProfile = 1;
@@ -171,24 +178,6 @@ public class Kernel : Sys.Kernel
 
     /// <summary>Sectors past the device end where the corrupt EBR next pointer lands, so the chain walk must stop rather than read it.</summary>
     private const ulong WildNextOvershootSectors = 10;
-
-    /// <summary>NSID of the controller's single namespace (NVMe namespace IDs are 1-based).</summary>
-    private const uint NvmeNamespaceId = 1;
-
-    /// <summary>NVMe 0's-based Number of Logical Blocks value for a one-block transfer (NVMe spec: NLB is zero-based).</summary>
-    private const ushort NvmeSingleBlockNlb = 0;
-
-    /// <summary>Scratch LBA the NVMe short-span cell writes, clear of every other test window.</summary>
-    private const ulong ShortSpanLba = 4242;
-
-    /// <summary>Fill byte of the full-block write whose residue must not leak into the short-span tail.</summary>
-    private const byte ShortSpanResidueFill = 0xA5;
-
-    /// <summary>Length of the deliberately short span handed to NvmeController.Write (bytes, less than one sector).</summary>
-    private const int ShortSpanLengthBytes = 100;
-
-    /// <summary>Fill byte of the short-span payload.</summary>
-    private const byte ShortSpanFill = 0x5B;
 
     /// <summary>XOR seed decorrelating the single-block round-trip pattern from a plain index ramp.</summary>
     private const byte SingleBlockXorSeed = 0xA5;
@@ -361,12 +350,24 @@ public class Kernel : Sys.Kernel
     /// <summary>Asks the engine to plug the stick back in, on the same image.</summary>
     private const string UsbPlugRequest = "usb-plug";
 
+    /// <summary>Asks the engine to pull the profile's hot-pluggable PCI disk out of its root port (see TR.RequestHost).</summary>
+    private const string PciUnplugRequest = "pci-unplug";
+
+    /// <summary>Asks the engine to plug the PCI disk back into its root port, on the same image.</summary>
+    private const string PciPlugRequest = "pci-plug";
+
     /// <summary>
-    /// Longest wait for the hot-plug thread to follow a plug or an unplug.
-    /// Well inside the engine's stall window: 10 s without a protocol
-    /// message and it kills the guest.
+    /// Longest wait for the hot-plug thread to follow one host request, all
+    /// the waits after that request together: the request is the last
+    /// protocol message before them, and the engine's stall window (10 s of
+    /// host time without one) kills the guest. Measured on the
+    /// <see cref="Stopwatch"/>, whose counter runs on host time under
+    /// emulation as well, never by counting sleeps, which delayed ticks
+    /// stretch.
     /// </summary>
     private const int HotPlugTimeoutMs = 8000;
+
+    private const long MillisecondsPerSecond = 1000;
 
     /// <summary>How often a hot-plug wait looks at the storage manager again.</summary>
     private const int HotPlugPollMs = 50;
@@ -390,16 +391,22 @@ public class Kernel : Sys.Kernel
     private const string HotPlugFilePath = $"{HotPlugMountPoint}/{HotPlugFileName}";
 
     /// <summary>The stick as it was before the unplug, for the cells that check what it left behind.</summary>
-    private static UsbMassStorage? s_unpluggedDisk;
+    private static UsbMassStorageUnit? s_unpluggedDisk;
+
+    /// <summary>The virtio-blk disk as it was before the PCI unplug, for the cells that check what it left behind.</summary>
+    private static VirtioBlkState? s_unpluggedPciDisk;
+
+    /// <summary>The virtio node path of the PCI disk before the unplug, which the replugged disk must come back under.</summary>
+    private static string? s_unpluggedPciNodePath;
 
     protected override void BeforeRun()
     {
         Serial.WriteString("[Storage] BeforeRun() reached!\n");
 
-        // 3 manager + 1 boot-scan + 2 profile + 13 device + 7 partition
-        // + 37 partition-lifecycle (MBR mutation, EBR chain, PartitionManager,
-        // superfloppy) + 2 bounds probes + 2 mmio/pci + 5 USB hot-plug
-        // + 1 boot-reboot = 73 tests per profile.
+        // 3 manager + 1 boot-scan + 2 profile + 1 driver-info + 12 device
+        // + 7 partition + 42 partition-lifecycle (MBR mutation, EBR chain,
+        // PartitionManager, superfloppy) + 2 bounds probes + 2 mmio/pci
+        // + 5 USB hot-plug + 5 PCI hot-plug + 1 boot-reboot = 83 tests per profile.
         TR.Start("Storage Block Device Tests", expectedTests: ExpectedTestCount);
 
         bool hasDevice = StorageManager.DeviceCount > 0;
@@ -407,15 +414,12 @@ public class Kernel : Sys.Kernel
 
         // ==================== Manager ====================
         TR.Run("Manager_StorageInitialized", TestManager_StorageInitialized);
-        // A cell that attached a disk must SEE a disk: on x64 PCI enumerates
-        // with or without ACPI, so zero devices is always a bind regression
-        // and must fail, not skip; on arm64, acpi-off removes PCIe discovery,
-        // so only those cells may legitimately come up empty.
-#if ARCH_X64
+        // A cell that attached a disk must SEE a disk on both architectures:
+        // on x64 PCI enumerates with or without ACPI, and on arm64 the machine
+        // description takes the ECAM host from the device tree when ACPI is
+        // off (the acpi-off cells), so zero devices is always a bind
+        // regression and must fail, not skip.
         bool deviceExpected = true;
-#else
-        bool deviceExpected = !TR.ProfileContains("acpi-off");
-#endif
         TR.RunIf(deviceExpected, "Manager_ExactlyOneDevice", TestManager_ExactlyOneDevice, SkipNoDevice);
         TR.RunIf(hasDevice, "Manager_DuplicateRegistrationIgnored", TestManager_DuplicateRegistrationIgnored, SkipNoDevice);
 
@@ -429,47 +433,60 @@ public class Kernel : Sys.Kernel
 
         // ==================== Profile (assert the cell's hardware path) ====================
         // Prove the cell exercised the hardware it names, not just that block
-        // I/O happened to work — the gap that let a silent MSI-X->polled
+        // I/O happened to work, the gap that let a silent MSI-X->polled
         // regression pass before.
         TR.RunIf(hasDevice, "Profile_DeviceKindMatches", TestProfile_DeviceKindMatches, SkipNoDevice);
+
+        // The kit's view of the same device: every disk of these cells is
+        // published by a kit driver and consumed by the manager, so
+        // DriverDiagnostics lists it under the driver the cell names.
+        TR.RunIf(hasDevice, "Manager_DeviceListedInDriverDiagnostics", TestManager_DeviceListedInDriverDiagnostics, SkipNoDevice);
 
         if (!TR.ProfileHasPrefix("nvme"))
         {
             TR.Skip("Profile_NvmeInterruptModeMatches", "not an NVMe profile");
         }
-        else if (Nvme.Controllers.Count == 0)
+        else if (s_dev is not NvmeNamespace)
         {
             TR.Skip("Profile_NvmeInterruptModeMatches", SkipNoDevice);
+        }
+        else if (TR.ProfileContains("acpi-off"))
+        {
+#if ARCH_X64
+            // acpi-off x64: SeaBIOS builds no ACPI tables, so there is no MADT
+            // and no I/O APIC, but the Local APIC comes up from IA32_APIC_BASE
+            // and registers the MSI binder, so MSI-X routes as on the plain
+            // cell. A driver that fell back to polling here means the Local
+            // APIC waited on ACPI again. expect-interrupt = true.
+            TR.RunWithExpectation(true, "Profile_NvmeInterruptModeMatches", TestProfile_NvmeInterruptMode);
+#else
+            // acpi-off arm64: the GIC comes up on the virt defaults and the ITS
+            // is not discovered without ACPI, so MSI-X cannot route on any GIC
+            // version and the driver must poll. expect-interrupt = false.
+            TR.RunWithExpectation(false, "Profile_NvmeInterruptModeMatches", TestProfile_NvmeInterruptMode);
+#endif
         }
         else if (TR.ProfileContains("gicv2") || TR.ProfileContains("gicv3"))
         {
             // Only the GIC-version cells pin a determinate NVMe interrupt path:
             // gicv3 brings up the ITS so MSI-X can route; gicv2 has no ITS so
-            // the driver must fall back to polled. The expectation flag is
-            // "expect MSI-X" == this is the gicv3 cell.
+            // the driver must fall back to polling. The expectation flag is
+            // "expect an interrupt" == this is the gicv3 cell.
             TR.RunWithExpectation(TR.ProfileContains("gicv3"), "Profile_NvmeInterruptModeMatches", TestProfile_NvmeInterruptMode);
         }
         else
         {
 #if ARCH_X64
-            if (!TR.ProfileContains("acpi-off"))
-            {
-                // Plain x64 nvme: ACPI is on and the LAPIC MSI binder is
-                // always registered (the Interrupts suite asserts
-                // MsiRouting.IsAvailable unconditionally on x64), so the
-                // driver landing in MSI-X mode IS determinate — a silent
-                // MSI-X→polled regression here is exactly the failure this
-                // cell exists to catch. expect-MSI-X = true.
-                TR.RunWithExpectation(true, "Profile_NvmeInterruptModeMatches", TestProfile_NvmeInterruptMode);
-            }
-            else
-            {
-                // acpi-off x64: no MADT → no LAPIC MSI routing to pin.
-                TR.Skip("Profile_NvmeInterruptModeMatches", "acpi-off has no MSI routing to pin");
-            }
+            // Plain x64 nvme: ACPI is on and the LAPIC MSI binder is
+            // always registered (the Interrupts suite asserts
+            // MsiRouting.IsAvailable unconditionally on x64), so the
+            // driver landing in interrupt mode IS determinate: a silent
+            // interrupt-to-polling regression here is exactly the failure
+            // this cell exists to catch. expect-interrupt = true.
+            TR.RunWithExpectation(true, "Profile_NvmeInterruptModeMatches", TestProfile_NvmeInterruptMode);
 #else
             // arm64 bare nvme: the interrupt mode depends on the machine's
-            // default gic-version, so it is not pinned here — the
+            // default gic-version, so it is not pinned here, the
             // gicv2/gicv3 cells assert both paths explicitly.
             TR.Skip("Profile_NvmeInterruptModeMatches", "interrupt mode not pinned by this cell");
 #endif
@@ -489,11 +506,10 @@ public class Kernel : Sys.Kernel
         TR.RunIf(dev, "Device_LBA_Stride_Sweep",           TestDevice_LBAStrideSweep,           SkipNoDevice);
         TR.RunIf(dev, "Device_RandomOrder_ReadAfterWrite", TestDevice_RandomOrderReadAfterWrite, SkipNoDevice);
         TR.RunIf(dev, "Device_Multiblock_TailBoundary",    TestDevice_MultiblockTailBoundary,   SkipNoDevice);
-        TR.RunIf(dev && TR.ProfileHasPrefix("nvme"), "Nvme_ShortSpanWritesDeterministicTail", TestNvme_ShortSpanTail, "NVMe controller API is nvme-profile only");
 
         // ==================== Partition (MBR/GPT, partition translation) ====================
         // These run last because they overwrite LBA 0..33, which the device
-        // round-trip tests above also touch — ordering them last keeps the
+        // round-trip tests above also touch, ordering them last keeps the
         // earlier results from being affected by the partition-table writes.
         TR.RunIf(dev, "Partition_MBR_RoundTrip",          TestPartition_MBRRoundTrip,          SkipNoHost);
         TR.RunIf(dev, "Partition_GPT_RoundTrip",          TestPartition_GPTRoundTrip,          SkipNoHost);
@@ -564,11 +580,11 @@ public class Kernel : Sys.Kernel
 #if ARCH_X64
         TR.RunIf(dev && TR.ProfileHasPrefix("nvme"), "Mmio_HighBar_RemappedOnDemand", TestMmio_HighBarRemapped,
             "64-bit BAR relocation probe is nvme-profile only");
-        TR.RunIf(dev && TR.ProfileHasPrefix("nvme"), "Pci_GetBar64_ReadsLiveConfig", TestPciGetBar64ReadsLiveConfig,
+        TR.RunIf(dev && TR.ProfileHasPrefix("nvme"), "Pci_DescribeBar64_ReadsLiveConfig", TestPciDescribeBar64ReadsLiveConfig,
             "64-bit BAR relocation probe is nvme-profile only");
 #else
         TR.Skip("Mmio_HighBar_RemappedOnDemand", "x64 mapper cell; arm64 installs Device mappings via DeviceMapper");
-        TR.Skip("Pci_GetBar64_ReadsLiveConfig", "BAR relocation probe is x64-only (same harness as the mapper cell)");
+        TR.Skip("Pci_DescribeBar64_ReadsLiveConfig", "BAR relocation probe is x64-only (same harness as the mapper cell)");
 #endif
 
         // ==================== USB hot-plug (pulls the stick out and back in) ====================
@@ -576,13 +592,26 @@ public class Kernel : Sys.Kernel
         // monitor. After the block I/O and partition cells, so a hot-plug
         // regression cannot take them down; before the reboot cell, which
         // writes to whatever stick is plugged in by then.
-        string hotPlugSkip = HotPlugSkipReason();
+        string hotPlugSkip = UsbHotPlugSkipReason();
         bool hotPlug = hotPlugSkip.Length == 0;
         TR.RunIf(hotPlug, "UsbHotPlug_UnplugUnregistersDisk", TestUsbHotPlug_UnplugUnregistersDisk, hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_RemovedDiskFailsIo",    TestUsbHotPlug_RemovedDiskFailsIo,    hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_ReplugRegistersDisk",   TestUsbHotPlug_ReplugRegistersDisk,   hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_ReplugKeepsData",       TestUsbHotPlug_ReplugKeepsData,       hotPlugSkip);
         TR.RunIf(hotPlug, "UsbHotPlug_UnplugDetachesMount",   TestUsbHotPlug_UnplugDetachesMount,   hotPlugSkip);
+
+        // ==================== PCI hot-plug (pulls the disk out of its root port and back in) ====================
+        // The virtio-blk-pci cells boot with the disk behind a PCI Express root
+        // port the engine adds; its port driver powers the slot off when the
+        // engine deletes the device and on again when it adds it back, placing
+        // the new function's registers inside the port's windows.
+        string pciHotPlugSkip = PciHotPlugSkipReason();
+        bool pciHotPlug = pciHotPlugSkip.Length == 0;
+        TR.RunIf(pciHotPlug, "PciHotPlug_UnplugUnregistersDisk", TestPciHotPlug_UnplugUnregistersDisk, pciHotPlugSkip);
+        TR.RunIf(pciHotPlug, "PciHotPlug_RemovedDiskFailsIo",    TestPciHotPlug_RemovedDiskFailsIo,    pciHotPlugSkip);
+        TR.RunIf(pciHotPlug, "PciHotPlug_ReplugRegistersDisk",   TestPciHotPlug_ReplugRegistersDisk,   pciHotPlugSkip);
+        TR.RunIf(pciHotPlug, "PciHotPlug_ReplugKeepsData",       TestPciHotPlug_ReplugKeepsData,       pciHotPlugSkip);
+        TR.RunIf(pciHotPlug, "PciHotPlug_UnplugDetachesMount",   TestPciHotPlug_UnplugDetachesMount,   pciHotPlugSkip);
         dev = s_dev is not null;
 
         // ==================== Boot persistence (destructive: reboots QEMU) ====================
@@ -628,8 +657,8 @@ public class Kernel : Sys.Kernel
     }
 
     // Re-registering an already-known device must be a no-op: RegisterDevice
-    // is public and unguarded (unlike Initialize), so a second
-    // RegisterHalDevices call would otherwise double-count the device and
+    // is public and unguarded (unlike Initialize), so a kernel handing the
+    // same device over twice would otherwise double-count the device and
     // duplicate every partition under identical names.
     private static void TestManager_DuplicateRegistrationIgnored()
     {
@@ -672,7 +701,7 @@ public class Kernel : Sys.Kernel
     }
 
     // Regression guard: Mbr.Parse must not turn corrupt on-disk entries into
-    // live partitions — start 0 aliases the MBR sector itself (formatting
+    // live partitions, start 0 aliases the MBR sector itself (formatting
     // that "partition" destroys the table) and past-end ranges authorize
     // wild host I/O. The GPT parser got this hardening; MBR must match.
     private static void TestPartition_MbrParseRejectsBogus()
@@ -724,7 +753,7 @@ public class Kernel : Sys.Kernel
 
         // Raw-craft an entry starting INSIDE the GPT entry array (LBA 10):
         // a write through such a partition would corrupt the table itself,
-        // so Parse must drop it (CRCs are 0 — corruption is undetectable).
+        // so Parse must drop it (CRCs are 0, corruption is undetectable).
         int sector = (int)s_dev!.BlockSize;
         byte[] entries = new byte[sector];
         Span<byte> e = entries;
@@ -734,42 +763,6 @@ public class Kernel : Sys.Kernel
         BitConverter.TryWriteBytes(e.Slice(GptEntryEndLbaOffset, GptLbaFieldBytes), GptOverlapEndLba); // endLba
         s_dev!.WriteBlock(GptEntryArrayLba, 1, entries);
         Assert.Equal(0, Gpt.Parse(s_dev!).Count, "entry overlapping the GPT structures must be rejected");
-    }
-
-    // The NvmeController.Read/Write public API accepts spans shorter than
-    // the device transfer; the bounce tail must then be deterministic
-    // (zeroed), not the previous command's residue leaking to disk.
-    private static void TestNvme_ShortSpanTail()
-    {
-        NvmeController controller = Nvme.Controllers[0];
-        uint nsid = NvmeNamespaceId;
-        ulong lba = ShortSpanLba;
-        int sector = (int)s_dev!.BlockSize;
-
-        byte[] full = new byte[sector];
-        for (int i = 0; i < sector; i++)
-        {
-            full[i] = ShortSpanResidueFill;
-        }
-        controller.Write(nsid, lba, full, NvmeSingleBlockNlb);
-
-        byte[] shortSpan = new byte[ShortSpanLengthBytes];
-        for (int i = 0; i < shortSpan.Length; i++)
-        {
-            shortSpan[i] = ShortSpanFill;
-        }
-        controller.Write(nsid, lba, shortSpan, NvmeSingleBlockNlb);
-
-        byte[] readBack = new byte[sector];
-        controller.Read(nsid, lba, readBack, NvmeSingleBlockNlb);
-        for (int i = 0; i < shortSpan.Length; i++)
-        {
-            Assert.Equal(ShortSpanFill, readBack[i], "short-span payload");
-        }
-        for (int i = shortSpan.Length; i < sector; i++)
-        {
-            Assert.Equal((byte)0, readBack[i], "tail must be zeroed, not stale bounce residue");
-        }
     }
 
     // ==================== Manager ====================
@@ -791,14 +784,45 @@ public class Kernel : Sys.Kernel
     // ==================== Profile ====================
 
     // The cell name encodes the controller it attached: ahci => sata*,
-    // nvme-* => nvme*, usb => usb*. Proves the driver that bound matches the
-    // cell's intent. Device names are unique per instance ("sata0",
-    // "nvme0n1", "usb0"), so only the driver prefix is pinned here.
+    // nvme-* => nvme*, usb => usb*, virtio-blk-* => vblk*. Proves the driver
+    // that bound matches the cell's intent. Device names are unique per
+    // instance ("sata0", "nvme0n1", "usb0", "vblk0"), so only the driver
+    // prefix is pinned here.
     private static void TestProfile_DeviceKindMatches()
     {
-        string expected = TR.ProfileHasPrefix("ahci") ? "sata" : TR.ProfileHasPrefix("usb") ? "usb" : "nvme";
+        string expected = TR.ProfileHasPrefix("ahci") ? "sata" : TR.ProfileHasPrefix("usb") ? "usb" : TR.ProfileHasPrefix("virtio-blk") ? "vblk" : "nvme";
         Assert.True(HasOrdinalPrefix(s_dev!.Name, expected),
             "device name does not match the cell's controller kind");
+    }
+
+    // The manager's device is the kit's device: DriverDiagnostics lists a block
+    // device under the manager's name, published by the driver the cell
+    // names, consumed (the manager's block consumer registered it) and not
+    // withdrawn. Pins the publish-to-register path that replaced the
+    // manager's boot-time walk over the HAL controllers.
+    private static void TestManager_DeviceListedInDriverDiagnostics()
+    {
+        string expectedDriver = TR.ProfileHasPrefix("ahci") ? nameof(AhciDriver) : TR.ProfileHasPrefix("usb") ? nameof(UsbMassStorageDriver) : TR.ProfileHasPrefix("virtio-blk") ? nameof(VirtioBlkDriver) : nameof(NvmeDriver);
+        bool found = false;
+        for (int i = 0; i < DriverDiagnostics.DeviceCount; i++)
+        {
+            if (!DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info))
+            {
+                break;
+            }
+
+            if (info.Kind != PublishedDeviceKind.Block || info.Name != s_dev!.Name)
+            {
+                continue;
+            }
+
+            Assert.True(info.IsConsumed, "the storage manager must have consumed the published block device");
+            Assert.False(info.IsWithdrawn, "the published block device must not be withdrawn");
+            Assert.True(info.DriverName == expectedDriver, "the block device must be published by the cell's driver");
+            found = true;
+        }
+
+        Assert.True(found, "the bound block device must be listed among the kit's published devices");
     }
 
     // Hand-rolled ordinal prefix check, mirroring TR.ProfileHasPrefix: the
@@ -821,19 +845,23 @@ public class Kernel : Sys.Kernel
         return true;
     }
 
-    // A gicv3 cell must come up MSI-X (arm64 GICv3 ITS routes it); a gicv2 cell
-    // must fall back to polled (no ITS). The bool is the cell's expected mode
-    // (true = MSI-X), supplied by the adaptive RunIf overload.
-    private static void TestProfile_NvmeInterruptMode(bool expectMsix)
+    // A gicv3 cell must come up on an interrupt (the arm64 GICv3 ITS routes
+    // the controller's MSI-X); a gicv2 cell must fall back to polling (no
+    // ITS). The bool is the cell's expected mode (true = interrupt), supplied
+    // by the adaptive RunIf overload. The driver's state object records the
+    // mode it settled on; BeforeRun only registers this test when the bound
+    // device is the kit's NVMe namespace, so the cast holds.
+    private static void TestProfile_NvmeInterruptMode(bool expectInterrupt)
     {
-        bool actual = Nvme.Controllers[0].IsMsiXEnabled;
-        if (expectMsix)
+        NvmeNamespace ns = (NvmeNamespace)s_dev!;
+        bool actual = ns.Controller.HasInterrupt;
+        if (expectInterrupt)
         {
-            Assert.True(actual, "expected NVMe MSI-X interrupts but the controller is polled");
+            Assert.True(actual, "expected NVMe completion interrupts but the controller is polling");
         }
         else
         {
-            Assert.False(actual, "expected NVMe polled fallback but the controller enabled MSI-X");
+            Assert.False(actual, "expected NVMe polling fallback but the controller requested an interrupt");
         }
     }
 
@@ -1051,7 +1079,7 @@ public class Kernel : Sys.Kernel
         }
     }
 
-    // Reads in non-sequential order should still return the right data —
+    // Reads in non-sequential order should still return the right data,
     // catches code that assumes the last-touched LBA is "current".
     private static void TestDevice_RandomOrderReadAfterWrite()
     {
@@ -1150,7 +1178,7 @@ public class Kernel : Sys.Kernel
     }
 
     // Layout left by Partition_GPTRoundTrip: GPT with two partitions on s_dev.
-    // Run order matters — depends on the previous test having succeeded.
+    // Run order matters, depends on the previous test having succeeded.
     private static void TestPartition_RescanPartitions()
     {
         StorageManager.RescanPartitions(s_dev!);
@@ -1168,7 +1196,7 @@ public class Kernel : Sys.Kernel
     }
 
     // Issue #410: a FAT volume laid straight onto an unpartitioned disk
-    // (a "superfloppy" — what mkfs.vfat / Windows format produce on a raw
+    // (a "superfloppy", what mkfs.vfat / Windows format produce on a raw
     // image attached via --disk) carries the MBR's 0xAA55 boot signature in
     // its BPB sector, so the scanner claimed the disk as an MBR with zero
     // partitions and surfaced nothing. VfsManager.TryMount/TryFormat by
@@ -1184,7 +1212,7 @@ public class Kernel : Sys.Kernel
         {
             s_dev.WriteBlock(lba, 1, zero);
         }
-        FatFilesystemType rawDriver = new(s_dev);
+        FatFileSystemType rawDriver = new(s_dev);
         Assert.True(rawDriver.TryFormat(string.Empty, null), "FAT format of the raw device must succeed");
 
         StorageManager.RescanPartitions(s_dev);
@@ -1212,8 +1240,8 @@ public class Kernel : Sys.Kernel
         Assert.Equal<ulong>(s_dev.BlockCount, whole.BlockCount, "whole-disk partition must span the device");
 
         // The issue's exact call shape: mount by StorageManager partition index.
-        Assert.True(VfsManager.RegisterFilesystem(SuperfloppyDriverName, new FatFilesystemType()));
-        Assert.True(VfsManager.TryMount(SuperfloppyDriverName, index.ToString(), MountFlags.None, SuperfloppyMountPoint, out VfsManager.VfsMount? mount),
+        Assert.True(VfsManager.RegisterFileSystem(SuperfloppyDriverName, new FatFileSystemType()));
+        Assert.True(VfsManager.TryMount(SuperfloppyDriverName, index.ToString(), MountFlags.None, SuperfloppyMountPoint, out VfsMount? mount),
             "mount by partition index must succeed on a superfloppy volume");
         Assert.NotNull(mount);
         Assert.Equal<long>((long)SectorSizeBytes, mount!.Superblock.BlockSize);
@@ -1257,40 +1285,58 @@ public class Kernel : Sys.Kernel
     // ==================== USB hot-plug ====================
 
     // Empty when the cell can pull its stick out: a USB cell whose stick
-    // bound, with the hot-plug thread running. It cannot run on x64 with
-    // ACPI off, where the scheduler's timer never starts.
-    private static string HotPlugSkipReason()
+    // bound, with the kit's worker running the hot-plug thread. Without a
+    // worker (no scheduler) nothing follows a port change.
+    private static string UsbHotPlugSkipReason()
     {
         if (!TR.ProfileHasPrefix("usb"))
         {
             return "not a USB profile";
         }
 
-        if (s_dev is not UsbMassStorage)
+        if (s_dev is not UsbMassStorageUnit)
         {
             return SkipNoDevice;
         }
 
-        return UsbManager.IsHotPlugRunning ? string.Empty : "USB hot-plug thread not running (scheduler timer not ticking)";
+        return DriverDiagnostics.HasWorker ? string.Empty : "the driver kit has no worker (no scheduler)";
     }
 
     // Pulling the stick out must take it out of the storage manager and the
-    // USB storage driver, and mark the object they handed out removed. The
-    // sector stamped first is read back once the stick is plugged in again.
+    // kit's published devices, retract its interface node, and mark the
+    // object they handed out disconnected. The sector stamped first is read
+    // back once the stick is plugged in again.
     private static void TestUsbHotPlug_UnplugUnregistersDisk()
     {
-        UsbMassStorage disk = (UsbMassStorage)s_dev!;
+        // Only the controller's hot-plug thread follows a port change: one
+        // that did not start would leave every wait below to time out.
+        Assert.True(FindDriverState<XhciState>()?.HotPlugRunning == true, "the xHCI hot-plug thread is not running");
+
+        UsbMassStorageUnit disk = (UsbMassStorageUnit)s_dev!;
         disk.WriteBlock(HotPlugMarkerLba, 1, HotPlugMarker((int)disk.BlockSize));
         disk.Flush();
 
+        string? nodePath = FindBlockNodePath(disk.Name);
+        Assert.NotNull(nodePath, "the stick must be a kit device");
+        if (nodePath is null)
+        {
+            return;
+        }
+
+        int nodesBefore = DriverDiagnostics.NodeCount;
+
         s_unpluggedDisk = disk;
         TR.RequestHost(UsbUnplugRequest);
-        bool gone = WaitForDeviceCount(0);
+        long deadline = HotPlugDeadline();
+        bool gone = WaitForDeviceCount(0, deadline);
+        bool nodeGone = WaitForNodeGone(nodePath, deadline);
         s_dev = null;
 
         Assert.True(gone, "the stick is still registered after being unplugged");
-        Assert.Equal(0, UsbMassStorageDriver.Disks.Count, "the USB storage driver still lists the stick");
-        Assert.True(disk.IsRemoved, "the unplugged stick is not marked removed");
+        Assert.True(FindBlockDeviceIndexByName(disk.Name) < 0, "the USB disk should have left the kit's published devices");
+        Assert.True(nodeGone, "the stick's node should have left the tree");
+        Assert.Equal(nodesBefore - 1, DriverDiagnostics.NodeCount, "the node count should drop by one");
+        Assert.True(disk.IsDisconnected, "the unplugged stick is not marked disconnected");
     }
 
     // I/O on a stick that is gone must fail as an IOException, not wait for
@@ -1320,20 +1366,22 @@ public class Kernel : Sys.Kernel
     private static void TestUsbHotPlug_ReplugRegistersDisk()
     {
         TR.RequestHost(UsbPlugRequest);
-        Assert.True(WaitForDeviceCount(1), "the stick did not come back after being plugged in");
+        Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the stick did not come back after being plugged in");
         if (StorageManager.DeviceCount != 1)
         {
             return;
         }
 
         s_dev = StorageManager.GetDevice(0);
-        Assert.True(s_dev is UsbMassStorage, "the device that came back is not a USB stick");
+        Assert.True(s_dev is UsbMassStorageUnit, "the device that came back is not a USB stick");
         Assert.False(ReferenceEquals(s_dev, s_unpluggedDisk), "the removed device object came back");
         if (s_unpluggedDisk is not null)
         {
             Assert.Equal(s_unpluggedDisk.Name, s_dev!.Name, "a stick plugged back in gets its name back");
             Assert.Equal<ulong>(s_unpluggedDisk.BlockCount, s_dev.BlockCount, "block count of the stick plugged back in");
         }
+
+        Assert.True(FindBlockDeviceIndexByName(s_dev!.Name) >= 0, "the replugged stick should be a kit device again");
     }
 
     private static void TestUsbHotPlug_ReplugKeepsData()
@@ -1367,10 +1415,10 @@ public class Kernel : Sys.Kernel
         {
             s_dev.WriteBlock(lba, 1, zero);
         }
-        Assert.True(new FatFilesystemType(s_dev).TryFormat(string.Empty, null), "FAT format of the stick must succeed");
+        Assert.True(new FatFileSystemType(s_dev).TryFormat(string.Empty, null), "FAT format of the stick must succeed");
         StorageManager.RescanPartitions(s_dev);
 
-        _ = VfsManager.RegisterFilesystem(HotPlugDriverName, new FatFilesystemType());
+        _ = VfsManager.RegisterFileSystem(HotPlugDriverName, new FatFileSystemType());
         if (!MountStickPartition())
         {
             return;
@@ -1387,13 +1435,13 @@ public class Kernel : Sys.Kernel
         }
 
         TR.RequestHost(UsbUnplugRequest);
-        Assert.True(WaitForDeviceCount(0), "the stick is still registered after being unplugged");
+        Assert.True(WaitForDeviceCount(0, HotPlugDeadline()), "the stick is still registered after being unplugged");
         s_dev = null;
         Assert.False(IsMounted(HotPlugMountPoint), "the mount outlived its stick");
         Assert.Equal(0, StorageManager.Partitions.Count, "the stick's partition outlived it");
 
         TR.RequestHost(UsbPlugRequest);
-        Assert.True(WaitForDeviceCount(1), "the stick did not come back after being plugged in");
+        Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the stick did not come back after being plugged in");
         if (StorageManager.DeviceCount != 1)
         {
             return;
@@ -1417,6 +1465,228 @@ public class Kernel : Sys.Kernel
         Assert.True(VfsManager.TryUnmount(HotPlugMountPoint));
     }
 
+    // ==================== PCI hot-plug ====================
+
+    // Empty when the cell can pull its disk out of the root port: a
+    // virtio-blk-pci cell whose disk bound, with the kit's worker running the
+    // offers the port's slot thread waits for. Without a worker (no
+    // scheduler) nothing follows a slot event.
+    private static string PciHotPlugSkipReason()
+    {
+        if (!TR.ProfileHasPrefix("virtio-blk-pci"))
+        {
+            return "no hot-pluggable PCI disk on this cell";
+        }
+
+        if (s_dev is not VirtioBlkState)
+        {
+            return SkipNoDevice;
+        }
+
+        return DriverDiagnostics.HasWorker ? string.Empty : "the driver kit has no worker (no scheduler)";
+    }
+
+    // Pulling the disk out of its root port must take it out of the storage
+    // manager and the kit's published devices, retract the function node and
+    // the virtio node beneath it, leave the port bound with one child less,
+    // and mark the object they handed out detached. The sector stamped first
+    // is read back once the disk is plugged in again.
+    private static void TestPciHotPlug_UnplugUnregistersDisk()
+    {
+        VirtioBlkState disk = (VirtioBlkState)s_dev!;
+        disk.WriteBlock(HotPlugMarkerLba, 1, HotPlugMarker((int)disk.BlockSize));
+        disk.Flush();
+
+        string? nodePath = FindBlockNodePath(disk.Name);
+        Assert.NotNull(nodePath, "the disk must be a kit device");
+        if (nodePath is null)
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(nodePath, out DeviceNodeInfo virtioInfo), "the disk's virtio node should be in the tree");
+        string? functionPath = virtioInfo.ParentPath;
+        Assert.NotNull(functionPath, "the virtio node should sit under its PCI function");
+        if (functionPath is null)
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(functionPath, out DeviceNodeInfo functionInfo), "the disk's function node should be in the tree");
+        string? portPath = functionInfo.ParentPath;
+        Assert.NotNull(portPath, "the function should sit under its root port");
+        if (portPath is null || !TryFindNode(portPath, out DeviceNodeInfo portBefore))
+        {
+            Assert.Fail("the root port's node should be in the tree");
+            return;
+        }
+
+        int nodesBefore = DriverDiagnostics.NodeCount;
+        int portChildrenBefore = portBefore.ChildCount;
+        PcieRootPortState? port = FindDriverState<PcieRootPortState>();
+        int removalsBefore = port?.RemovalCount ?? 0;
+
+        // Only the port's slot thread follows a slot event: one that did not
+        // start would leave every wait below to time out.
+        Assert.True(port?.HotPlugRunning == true, "the root port's slot thread is not running");
+
+        s_unpluggedPciDisk = disk;
+        s_unpluggedPciNodePath = nodePath;
+        TR.RequestHost(PciUnplugRequest);
+        long deadline = HotPlugDeadline();
+        bool gone = WaitForDeviceCount(0, deadline);
+        bool nodeGone = WaitForNodeGone(nodePath, deadline);
+        bool functionGone = WaitForNodeGone(functionPath, deadline);
+        bool poweredOff = gone && functionGone && WaitForSlotPoweredOff(port, removalsBefore, deadline);
+        s_dev = null;
+
+        Assert.True(gone, "the disk is still registered after being unplugged");
+        Assert.True(FindBlockDeviceIndexByName(disk.Name) < 0, "the virtio-blk disk should have left the kit's published devices");
+        Assert.True(nodeGone, "the disk's virtio node should have left the tree");
+        Assert.True(functionGone, "the disk's function node should have left the tree");
+        Assert.Equal(nodesBefore - 2, DriverDiagnostics.NodeCount, "the function node and the virtio node beneath it leave together");
+        Assert.True(TryFindNode(portPath, out DeviceNodeInfo portAfter), "the root port should stay in the tree");
+        Assert.True(portAfter.State == DeviceNodeState.Bound, "the root port should stay bound");
+        Assert.Equal(portChildrenBefore - 1, portAfter.ChildCount, "the root port should count one child less");
+        Assert.True(disk.IsDetached, "the unplugged disk is not marked detached");
+        Assert.True(poweredOff, "the root port should have powered the slot off after the unplug");
+    }
+
+    // I/O on a disk that is gone must fail as an IOException, not wait for
+    // a request that never completes or hand back stale bytes.
+    private static void TestPciHotPlug_RemovedDiskFailsIo()
+    {
+        Assert.NotNull(s_unpluggedPciDisk);
+        if (s_unpluggedPciDisk is null)
+        {
+            return;
+        }
+
+        Span<byte> buffer = new byte[s_unpluggedPciDisk.BlockSize];
+        try
+        {
+            s_unpluggedPciDisk.ReadBlock(HotPlugMarkerLba, 1, buffer);
+            Assert.Fail("reading the unplugged disk did not throw");
+        }
+        catch (IOException)
+        {
+            // Expected.
+        }
+    }
+
+    // Plugged back in, the disk must come back as a new device with its old
+    // name (the lowest vblkN free) and geometry, under the same node path:
+    // device 0 function 0 of the port's bus again.
+    private static void TestPciHotPlug_ReplugRegistersDisk()
+    {
+        TR.RequestHost(PciPlugRequest);
+        Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the disk did not come back after being plugged in");
+        if (StorageManager.DeviceCount != 1)
+        {
+            return;
+        }
+
+        s_dev = StorageManager.GetDevice(0);
+        Assert.True(s_dev is VirtioBlkState, "the device that came back is not a virtio-blk disk");
+        Assert.False(ReferenceEquals(s_dev, s_unpluggedPciDisk), "the removed device object came back");
+        if (s_unpluggedPciDisk is not null)
+        {
+            Assert.Equal(s_unpluggedPciDisk.Name, s_dev!.Name, "a disk plugged back in gets its name back");
+            Assert.Equal<ulong>(s_unpluggedPciDisk.BlockCount, s_dev.BlockCount, "block count of the disk plugged back in");
+        }
+
+        string? nodePath = FindBlockNodePath(s_dev!.Name);
+        Assert.True(nodePath is not null && nodePath == s_unpluggedPciNodePath, "the replugged disk should come back under the same virtio node path");
+        Assert.True(FindBlockDeviceIndexByName(s_dev.Name) >= 0, "the replugged disk should be a kit device again");
+    }
+
+    private static void TestPciHotPlug_ReplugKeepsData()
+    {
+        Assert.NotNull(s_dev);
+        if (s_dev is null)
+        {
+            return;
+        }
+
+        byte[] actual = new byte[s_dev.BlockSize];
+        s_dev.ReadBlock(HotPlugMarkerLba, 1, actual);
+        Assert.Equal(HotPlugMarker((int)s_dev.BlockSize), actual, "the sector written before the unplug");
+    }
+
+    // A filesystem mounted from the disk's partition must be detached when
+    // the disk leaves its root port, and the partition dropped with it.
+    // Plugged back in, the partition is found again and the file written
+    // before is there.
+    private static void TestPciHotPlug_UnplugDetachesMount()
+    {
+        Assert.NotNull(s_dev);
+        if (s_dev is null)
+        {
+            return;
+        }
+
+        // A superfloppy, as in the USB cell: one partition covering the
+        // whole disk.
+        Span<byte> zero = new byte[(int)s_dev.BlockSize];
+        for (ulong lba = 0; lba < SuperfloppyWipeHeadSectors; lba++)
+        {
+            s_dev.WriteBlock(lba, 1, zero);
+        }
+        Assert.True(new FatFileSystemType(s_dev).TryFormat(string.Empty, null), "FAT format of the disk must succeed");
+        StorageManager.RescanPartitions(s_dev);
+
+        _ = VfsManager.RegisterFileSystem(HotPlugDriverName, new FatFileSystemType());
+        if (!MountStickPartition())
+        {
+            return;
+        }
+
+        byte[] payload = HotPlugMarker(SuperfloppyPayloadBytes);
+        Assert.True(VfsManager.TryOpenDirectory(HotPlugMountPoint, out IVfsDirectoryHandle? root));
+        Assert.True(root!.TryCreateFile(HotPlugFileName, VfsMode.RegularFile, out _));
+        using (IVfsFileHandle? writer = OpenVfsFile(HotPlugFilePath))
+        {
+            Assert.NotNull(writer);
+            Assert.Equal<long>(payload.Length, writer!.Write(payload));
+            Assert.True(writer.TryFlush());
+        }
+
+        PcieRootPortState? port = FindDriverState<PcieRootPortState>();
+        int removalsBefore = port?.RemovalCount ?? 0;
+        TR.RequestHost(PciUnplugRequest);
+        long deadline = HotPlugDeadline();
+        bool gone = WaitForDeviceCount(0, deadline);
+        Assert.True(gone, "the disk is still registered after being unplugged");
+        s_dev = null;
+        Assert.False(IsMounted(HotPlugMountPoint), "the mount outlived its disk");
+        Assert.Equal(0, StorageManager.Partitions.Count, "the disk's partition outlived it");
+        Assert.True(gone && WaitForSlotPoweredOff(port, removalsBefore, deadline), "the root port should have powered the slot off after the unplug");
+
+        TR.RequestHost(PciPlugRequest);
+        Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the disk did not come back after being plugged in");
+        if (StorageManager.DeviceCount != 1)
+        {
+            return;
+        }
+
+        s_dev = StorageManager.GetDevice(0);
+        if (!MountStickPartition())
+        {
+            return;
+        }
+
+        using (IVfsFileHandle? reader = OpenVfsFile(HotPlugFilePath))
+        {
+            Assert.NotNull(reader);
+            byte[] readBack = new byte[payload.Length];
+            Assert.Equal<long>(payload.Length, reader!.Read(readBack));
+            Assert.Equal(payload, readBack, "the file written before the unplug");
+        }
+
+        // The reboot cell rewrites the disk underneath.
+        Assert.True(VfsManager.TryUnmount(HotPlugMountPoint));
+    }
+
     // Mounts the stick's one partition at HotPlugMountPoint through the
     // partition overload, the kind of mount a removed disk takes along.
     private static bool MountStickPartition()
@@ -1435,7 +1705,7 @@ public class Kernel : Sys.Kernel
 
     private static bool IsMounted(string mountPoint)
     {
-        foreach (VfsManager.VfsMount mount in VfsManager.Mounts)
+        foreach (VfsMount mount in VfsManager.Mounts)
         {
             if (mount.MountPoint == mountPoint)
             {
@@ -1446,13 +1716,79 @@ public class Kernel : Sys.Kernel
         return false;
     }
 
-    // Waits for the hot-plug thread to bring the storage manager to
-    // `count` devices, sleeping so that thread gets to run.
-    private static bool WaitForDeviceCount(int count)
+    // The deadline every wait after a host request shares; see HotPlugTimeoutMs.
+    private static long HotPlugDeadline() => Stopwatch.GetTimestamp() + (Stopwatch.Frequency * HotPlugTimeoutMs / MillisecondsPerSecond);
+
+    // Waits for the kit's worker to bring the storage manager to `count`
+    // devices, sleeping so that thread gets to run.
+    private static bool WaitForDeviceCount(int count, long deadline)
     {
-        for (int waitedMs = 0; StorageManager.DeviceCount != count; waitedMs += HotPlugPollMs)
+        while (StorageManager.DeviceCount != count)
         {
-            if (waitedMs >= HotPlugTimeoutMs)
+            if (Stopwatch.GetTimestamp() >= deadline)
+            {
+                return false;
+            }
+
+            SysThread.Sleep(HotPlugPollMs);
+        }
+
+        return true;
+    }
+
+    // The driver state of the first node bound to a driver whose state is a
+    // T, through the kit's tree (the HAL grant): the usb cells carry one
+    // xHCI controller, the virtio-blk-pci cells one root port.
+#pragma warning disable COSMOS0003
+    private static T? FindDriverState<T>()
+        where T : class
+    {
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            if (nodes[i].Binding?.DriverState is T state)
+            {
+                return state;
+            }
+        }
+
+        return null;
+    }
+#pragma warning restore COSMOS0003
+
+    // The port's slot thread powers the slot off only after the retraction
+    // it waited for returned, and QEMU finishes a device_del inside that
+    // write: a plug requested before it would find the old device still in
+    // the slot and its drive still holding the image.
+    private static bool WaitForSlotPoweredOff(PcieRootPortState? port, int removalsBefore, long deadline)
+    {
+        if (port is null)
+        {
+            return false;
+        }
+
+        while (port.RemovalCount != removalsBefore + 1 || port.IsPoweredOn)
+        {
+            if (Stopwatch.GetTimestamp() >= deadline)
+            {
+                return false;
+            }
+
+            SysThread.Sleep(HotPlugPollMs);
+        }
+
+        return true;
+    }
+
+    // Waits for the node at `path` to leave the kit's tree. The manager's
+    // count drops in the teardown's second step while the node leaves the
+    // tree only once the teardown has run through, so a poll that saw the
+    // count drop can wake between the two.
+    private static bool WaitForNodeGone(string path, long deadline)
+    {
+        while (TryFindNode(path, out _))
+        {
+            if (Stopwatch.GetTimestamp() >= deadline)
             {
                 return false;
             }
@@ -1475,7 +1811,7 @@ public class Kernel : Sys.Kernel
     }
 
     // Attach a partition starting at an arbitrary LBA, write to its LBA 0,
-    // and verify the bytes show up at the host's StartSector — proves
+    // and verify the bytes show up at the host's StartSector, proves
     // the translation isn't off by one.
     private static void TestPartition_ReadWriteTranslatesLba()
     {
@@ -1930,7 +2266,7 @@ public class Kernel : Sys.Kernel
     }
 
     // Regression guard: Ebr.Parse is the trust boundary for on-disk EBR
-    // corruption, same rule as Mbr.Parse for primaries — a logical whose
+    // corruption, same rule as Mbr.Parse for primaries, a logical whose
     // range leaves the extended envelope authorizes wild host I/O, and a
     // relative start of 0 aliases the EBR sector itself (writing through
     // that "partition" destroys the chain).
@@ -2004,7 +2340,7 @@ public class Kernel : Sys.Kernel
 
     // Ebr.TryAddLogical must reject geometry its own parser would drop: the
     // caller-supplied envelope is on-disk metadata (the MBR's extended
-    // entry), so it cannot authorize I/O past the device end — and a
+    // entry), so it cannot authorize I/O past the device end, and a
     // sector count that does not fit the 32-bit on-disk field would be
     // silently truncated (2^32 stamps a zero-length entry).
     private static void TestEbr_AddLogicalRejectsBogusGeometry()
@@ -2029,7 +2365,7 @@ public class Kernel : Sys.Kernel
 
     // ResolveExtendedCount hands ResizeLogical/MoveLogical their upper
     // bound. A corrupt extended count must clamp to the device end, and a
-    // missing MBR extended entry must grant nothing — the whole-disk
+    // missing MBR extended entry must grant nothing, the whole-disk
     // fallback let a resize grow the last logical into whatever follows
     // the extended partition.
     private static void TestEbr_ResizeLogicalRespectsEnvelopeBounds()
@@ -2059,7 +2395,7 @@ public class Kernel : Sys.Kernel
             "a resize without a confirmable extended envelope must be refused");
     }
 
-    // Mbr.TryGetExtendedPartition is the root every EBR walk starts from —
+    // Mbr.TryGetExtendedPartition is the root every EBR walk starts from,
     // it must apply the same on-disk distrust as Parse instead of handing
     // Ebr whatever geometry the extended slot claims, and a corrupt slot
     // must not hide a valid one behind it.
@@ -2110,7 +2446,7 @@ public class Kernel : Sys.Kernel
             "moving the extended container must be refused");
         Assert.Equal(1, EbrParseCountSafe(host));
 
-        // GPT protective entry (0xEE) in slot 1 — also never surfaced.
+        // GPT protective entry (0xEE) in slot 1, also never surfaced.
         int sector = (int)host.BlockSize;
         byte[] mbr = new byte[sector];
         host.ReadBlock(MbrLba, 1, mbr);
@@ -2179,7 +2515,7 @@ public class Kernel : Sys.Kernel
 
     // One corrupt entry ahead of the target must not shift MutateEntry's
     // index space away from Parse's: Delete/Resize would then hit a
-    // different, healthy partition (CRCs are 0 — nothing on disk flags the
+    // different, healthy partition (CRCs are 0, nothing on disk flags the
     // damage), and mutators could see unvalidated LBAs (the
     // BlockCount - startLba underflow in ResizePartition).
     private static void TestGpt_MutateSkipsEntriesParseRejects()
@@ -2203,7 +2539,7 @@ public class Kernel : Sys.Kernel
         host.WriteBlock(GptEntryArrayLba, 1, entries);
         Assert.Equal(1, Gpt.Parse(host).Count);
 
-        // Index 0 in Parse's space is the surviving partition — resize and
+        // Index 0 in Parse's space is the surviving partition, resize and
         // delete must land on it, not on the corrupt slot ahead of it.
         Assert.True(Gpt.ResizePartition(host, 0, resized));
         List<GptPartitionEntry> parts = Gpt.Parse(host);
@@ -2214,7 +2550,7 @@ public class Kernel : Sys.Kernel
     }
 
     // UEFI expects unused entries fully zeroed, and AddPartition's slot
-    // reuse never rewrites the name field — a deleted partition's UTF-16
+    // reuse never rewrites the name field, a deleted partition's UTF-16
     // name would resurface on the next partition created in that slot.
     private static void TestGpt_RemoveClearsWholeEntry()
     {
@@ -2273,9 +2609,9 @@ public class Kernel : Sys.Kernel
         AssertMovedPattern(host, freeDest, count, sentinelSeed);
     }
 
-    // The destination of a data-copying move must be free space —
+    // The destination of a data-copying move must be free space,
     // copying first physically clobbers the neighbour before the table
-    // edit can refuse — and Create must not stamp a range intersecting
+    // edit can refuse, and Create must not stamp a range intersecting
     // an existing partition.
     private static void TestPartitionManager_RejectsOccupiedRanges()
     {
@@ -2566,7 +2902,7 @@ public class Kernel : Sys.Kernel
     // One try/catch per method on purpose (cf. MbrAddPartitionRejects):
     // -1 marks "Parse threw", which every caller asserts against. Exception
     // (not ArgumentOutOfRangeException) because a past-end read surfaces
-    // driver-specific errors — AHCI raises "SATA Fatal error: Command
+    // driver-specific errors, AHCI raises "SATA Fatal error: Command
     // aborted" and leaves the port wedged for every later test.
     private static int EbrParseCountSafe(IBlockDevice host)
     {
@@ -2707,7 +3043,7 @@ public class Kernel : Sys.Kernel
     }
 
     // Re-derives the per-LBA pattern at the destination and compares every
-    // byte — shared tail of the three move-with-data cells.
+    // byte, shared tail of the three move-with-data cells.
     private static void AssertMovedPattern(IBlockDevice host, ulong newStart, ulong count, uint seedBase)
     {
         Span<byte> readBuf = new byte[host.BlockSize];
@@ -2752,23 +3088,63 @@ public class Kernel : Sys.Kernel
     }
 
 #if ARCH_X64
+#pragma warning disable COSMOS0003
     // Physical address for the relocation probe: above 4 GiB, where Limine's
     // base-revision-0 blanket map (identity + HHDM of the low 4 GiB plus
     // memory-map regions) no longer covers anything, and clear of RAM and of
     // every fixed q35 window (ECAM, LAPIC, IO-APIC all sit below 4 GiB).
     private const ulong HighBarPhys = 0x1_1000_0000;
 
+    /// <summary>Base class code of a mass storage controller, the class the BAR probes find the NVMe function by.</summary>
+    private const byte PciMassStorageClass = 0x01;
+
+    /// <summary>Mass storage subclass of a non-volatile memory controller; with <see cref="PciMassStorageClass"/>, the NVMe function the BAR probes relocate.</summary>
+    private const byte PciNvmSubclass = 0x08;
+
     /// <summary>Index of the NVMe controller's 64-bit register BAR (BAR0).</summary>
     private const int NvmeRegisterBarIndex = 0;
 
-    /// <summary>Mask of the type bits in a memory BAR's lower dword (bits 0-2), composed from the PciDevice BAR field layout.</summary>
-    private const uint PciBarTypeMask = (PciDevice.BarTypeMask << PciDevice.BarTypeShift) | PciDevice.BarIoSpaceMask;
+    /// <summary>Configuration offset of the Command register (PCI 3.0 6.2.2).</summary>
+    private const ushort PciCommandOffset = 0x04;
+
+    /// <summary>Configuration offset of the first base address register (PCI 3.0 6.2.5.1).</summary>
+    private const ushort PciBarBaseOffset = 0x10;
+
+    /// <summary>Bytes of one base address register slot in configuration space.</summary>
+    private const int PciBarSlotBytes = 4;
+
+    /// <summary>Configuration offset of the lower dword of the NVMe register BAR.</summary>
+    private const ushort NvmeBarLowOffset = PciBarBaseOffset + (NvmeRegisterBarIndex * PciBarSlotBytes);
+
+    /// <summary>Configuration offset of the upper dword of the NVMe register BAR: the next slot, as for every 64-bit BAR.</summary>
+    private const ushort NvmeBarHighOffset = NvmeBarLowOffset + PciBarSlotBytes;
+
+    /// <summary>BAR bit 0: set when the register maps I/O space instead of memory space.</summary>
+    private const uint PciBarIoSpaceBit = 0x1;
+
+    /// <summary>Shift down to the memory BAR type field (bits 2:1).</summary>
+    private const int PciBarTypeShift = 1;
+
+    /// <summary>Mask of the memory BAR type field after shifting.</summary>
+    private const uint PciBarTypeFieldMask = 0x3;
+
+    /// <summary>Memory BAR type field value of a 64-bit register.</summary>
+    private const uint PciBarType64Bit = 0x2;
+
+    /// <summary>Mask selecting the address bits of a memory BAR's lower dword (the low 4 bits are flags).</summary>
+    private const uint PciBarMemoryAddressMask = 0xFFFF_FFF0;
+
+    /// <summary>Shift placing a 64-bit BAR's upper dword into bits 63:32 of the address.</summary>
+    private const int PciBarUpperHalfShift = 32;
+
+    /// <summary>Mask of the type bits in a memory BAR's lower dword (bits 0-2), composed from the BAR field layout above.</summary>
+    private const uint PciBarTypeMask = (PciBarTypeFieldMask << PciBarTypeShift) | PciBarIoSpaceBit;
 
     /// <summary>Type-bit value marking a 64-bit memory BAR.</summary>
-    private const uint PciBar64BitMemoryType = PciDevice.BarType64Bit << PciDevice.BarTypeShift;
+    private const uint PciBar64BitMemoryType = PciBarType64Bit << PciBarTypeShift;
 
     /// <summary>Mask selecting the flag bits of a memory BAR's lower dword.</summary>
-    private const uint PciBarFlagsMask = ~PciDevice.BarMemoryAddressMask;
+    private const uint PciBarFlagsMask = ~PciBarMemoryAddressMask;
 
     /// <summary>All-ones 32-bit MMIO read value, meaning nothing decodes the address.</summary>
     private const uint MmioAllOnesValue = 0xFFFF_FFFF;
@@ -2779,101 +3155,171 @@ public class Kernel : Sys.Kernel
     // Proves 64-bit BAR MMIO stays reachable when the BAR sits above 4 GiB,
     // where firmware on real hardware may place it: the HHDM alias of such a
     // BAR is unmapped until EnsureMmioMapped installs a page-table entry for
-    // it. The cell relocates the NVMe controller's own BAR0 up there, mirrors
-    // the driver-init access pattern (EnsureMmioMapped + phys-plus-HHDM
-    // arithmetic) against the new address, and asserts the VS register reads
-    // back identical — then restores the original BAR before returning. With
-    // a no-op x64 EnsureMmioMapped this cell dies on an unhandled page fault.
+    // it. The cell relocates the NVMe controller's own BAR0 up there through
+    // its node's PciAccess, mirrors the driver-init access pattern
+    // (EnsureMmioMapped + phys-plus-HHDM arithmetic) against the new
+    // address, and asserts the VS register reads back identical, then
+    // restores the original BAR before returning. With a no-op x64
+    // EnsureMmioMapped this cell dies on an unhandled page fault.
     private static void TestMmio_HighBarRemapped()
     {
-        PciDevice? nvmePci = PciManager.GetDeviceClass(ClassId.MassStorageController, SubclassId.NvmController);
-        Assert.True(nvmePci != null, "an NVMe PCI function must exist on an nvme profile");
+        // NVMe controller registers: VS (version) sits at byte offset 8.
+        const ulong NvmeVersionOffset = 0x08;
+        DeviceNode? nvmeNode = FindNvmeFunctionNode();
+        if (nvmeNode is null)
+        {
+            Assert.Fail("an NVMe PCI function must exist on an nvme profile");
+            return;
+        }
 
-        uint barLow = nvmePci!.ReadRegister32((byte)Config.Bar0);
-        uint barHigh = nvmePci.ReadRegister32((byte)Config.Bar1);
+        PciAccess nvmePci = nvmeNode.Access<PciAccess>();
+        uint barLow = nvmePci.ReadConfig32(NvmeBarLowOffset);
+        uint barHigh = nvmePci.ReadConfig32(NvmeBarHighOffset);
         Assert.True((barLow & PciBarTypeMask) == PciBar64BitMemoryType, "NVMe BAR0 must be a 64-bit memory BAR");
 
-        ulong origPhys = ((ulong)barHigh << PciDevice.BarUpperHalfShift) | (barLow & PciDevice.BarMemoryAddressMask);
+        ulong origPhys = ((ulong)barHigh << PciBarUpperHalfShift) | (barLow & PciBarMemoryAddressMask);
         ulong hhdm = HhdmOffset();
-        uint vsOrig = Native.MMIO.Read32(origPhys + hhdm + NvmeRegisters.VsOffset);
+        uint vsOrig = Native.MMIO.Read32(origPhys + hhdm + NvmeVersionOffset);
         Assert.True(vsOrig != 0 && vsOrig != MmioAllOnesValue, "NVMe VS must read sane at the original BAR");
 
         // Quiesce decode while the BAR moves, like firmware would. No block
         // I/O is in flight (every I/O cell ran earlier), so nothing touches
         // the controller through the stale driver mapping meanwhile.
-        ushort command = nvmePci.ReadRegister16((byte)Config.Command);
-        nvmePci.WriteRegister16((byte)Config.Command, (ushort)(command & ~(ushort)PciCommand.Memory));
-        nvmePci.WriteRegister32((byte)Config.Bar0, (uint)(HighBarPhys & PciDevice.BarMemoryAddressMask) | (barLow & PciBarFlagsMask));
-        nvmePci.WriteRegister32((byte)Config.Bar1, (uint)(HighBarPhys >> PciDevice.BarUpperHalfShift));
-        nvmePci.WriteRegister16((byte)Config.Command, command);
+        ushort command = nvmePci.ReadConfig16(PciCommandOffset);
+        nvmePci.EnableMemorySpace(false);
+        nvmePci.WriteConfig32(NvmeBarLowOffset, (uint)(HighBarPhys & PciBarMemoryAddressMask) | (barLow & PciBarFlagsMask));
+        nvmePci.WriteConfig32(NvmeBarHighOffset, (uint)(HighBarPhys >> PciBarUpperHalfShift));
+        nvmePci.WriteConfig16(PciCommandOffset, command);
 
         uint vsHigh;
+        bool mapped;
         try
         {
-            PlatformHAL.Initializer?.EnsureMmioMapped(HighBarPhys);
-            vsHigh = Native.MMIO.Read32(HighBarPhys + hhdm + NvmeRegisters.VsOffset);
+            mapped = PlatformHAL.Initializer?.EnsureMmioMapped(HighBarPhys) == true;
+            vsHigh = Native.MMIO.Read32(HighBarPhys + hhdm + NvmeVersionOffset);
         }
         finally
         {
             // Put the BAR back exactly as found so the destructive reboot
             // cell (and boot 1's scan) still see a working controller.
-            nvmePci.WriteRegister16((byte)Config.Command, (ushort)(command & ~(ushort)PciCommand.Memory));
-            nvmePci.WriteRegister32((byte)Config.Bar0, barLow);
-            nvmePci.WriteRegister32((byte)Config.Bar1, barHigh);
-            nvmePci.WriteRegister16((byte)Config.Command, command);
+            nvmePci.EnableMemorySpace(false);
+            nvmePci.WriteConfig32(NvmeBarLowOffset, barLow);
+            nvmePci.WriteConfig32(NvmeBarHighOffset, barHigh);
+            nvmePci.WriteConfig16(PciCommandOffset, command);
         }
 
+        Assert.True(mapped, "EnsureMmioMapped must report the high BAR's block as mapped");
         Assert.True(vsHigh == vsOrig, "VS read through the remapped high BAR must match the original");
     }
 
-    // GetBar64Address must read BOTH halves of a 64-bit BAR from live
-    // config space: mixing the enumeration-time cached lower half with a
-    // live upper half splices two different addresses together the moment
-    // a BAR is reprogrammed (exactly what the remap cell above — or any
-    // future PCI resource allocator — does). Decode stays disabled for the
-    // whole probe window: only config space is touched.
-    private static void TestPciGetBar64ReadsLiveConfig()
+    // The kit reads a 64-bit BAR in one place, the describe that builds a
+    // function's node (PciHostAccess.TryDescribeFunction, or a bridge's
+    // PciAccess.TryDescribeChild), and it must read BOTH halves from live
+    // config space: the published node's BAR0 has to match the raw
+    // registers, and a describe after a reprogram has to report the new
+    // address whole rather than splice a stale half with a live one, the
+    // moment a BAR is reprogrammed (exactly what the remap cell above, or
+    // the kit's own placement behind a hot-plug slot, does). Decode stays
+    // disabled for the whole probe window: only config space is touched,
+    // the describe puts every register it sizes back, and its description
+    // is dropped unpublished.
+    private static void TestPciDescribeBar64ReadsLiveConfig()
     {
-        PciDevice? nvmePci = PciManager.GetDeviceClass(ClassId.MassStorageController, SubclassId.NvmController);
-        Assert.True(nvmePci != null, "an NVMe PCI function must exist on an nvme profile");
+        DeviceNode? nvmeNode = FindNvmeFunctionNode();
+        if (nvmeNode is null)
+        {
+            Assert.Fail("an NVMe PCI function must exist on an nvme profile");
+            return;
+        }
 
-        uint barLow = nvmePci!.ReadRegister32((byte)Config.Bar0);
-        uint barHigh = nvmePci.ReadRegister32((byte)Config.Bar1);
-        ulong origPhys = ((ulong)barHigh << PciDevice.BarUpperHalfShift) | (barLow & PciDevice.BarMemoryAddressMask);
-        Assert.True(nvmePci.GetBar64Address(NvmeRegisterBarIndex) == origPhys, "baseline: GetBar64Address must match raw config space");
+        PciAccess nvmePci = nvmeNode.Access<PciAccess>();
+        uint barLow = nvmePci.ReadConfig32(NvmeBarLowOffset);
+        uint barHigh = nvmePci.ReadConfig32(NvmeBarHighOffset);
+        ulong origPhys = ((ulong)barHigh << PciBarUpperHalfShift) | (barLow & PciBarMemoryAddressMask);
+        PciBar published = nvmePci.Bars[NvmeRegisterBarIndex];
+        Assert.True(published.IsAssigned && published.Is64Bit && published.Base == origPhys, "baseline: the published node's BAR0 must match raw config space");
 
-        ushort command = nvmePci.ReadRegister16((byte)Config.Command);
-        nvmePci.WriteRegister16((byte)Config.Command, (ushort)(command & ~(ushort)PciCommand.Memory));
-        nvmePci.WriteRegister32((byte)Config.Bar0, (uint)(HighBarPhys & PciDevice.BarMemoryAddressMask) | (barLow & PciBarFlagsMask));
-        nvmePci.WriteRegister32((byte)Config.Bar1, (uint)(HighBarPhys >> PciDevice.BarUpperHalfShift));
+        ushort command = nvmePci.ReadConfig16(PciCommandOffset);
+        nvmePci.EnableMemorySpace(false);
+        nvmePci.WriteConfig32(NvmeBarLowOffset, (uint)(HighBarPhys & PciBarMemoryAddressMask) | (barLow & PciBarFlagsMask));
+        nvmePci.WriteConfig32(NvmeBarHighOffset, (uint)(HighBarPhys >> PciBarUpperHalfShift));
 
-        ulong reported = nvmePci.GetBar64Address(NvmeRegisterBarIndex);
+        bool described = TryDescribeAgain(nvmeNode, out PciFunctionDescription description);
+        PciBar reported = described ? description.Access.Bars[NvmeRegisterBarIndex] : default;
 
-        nvmePci.WriteRegister32((byte)Config.Bar0, barLow);
-        nvmePci.WriteRegister32((byte)Config.Bar1, barHigh);
-        nvmePci.WriteRegister16((byte)Config.Command, command);
+        nvmePci.WriteConfig32(NvmeBarLowOffset, barLow);
+        nvmePci.WriteConfig32(NvmeBarHighOffset, barHigh);
+        nvmePci.WriteConfig16(PciCommandOffset, command);
 
-        Assert.True(reported == HighBarPhys,
-            "GetBar64Address must read both halves live after a BAR reprogram, not splice cached low with live high");
+        Assert.True(described, "the NVMe function must describe again through its parent's access object");
+        Assert.True(reported.Is64Bit && reported.Base == HighBarPhys,
+            "a describe must read both halves of a 64-bit BAR live after a reprogram, not splice a stale half with a live one");
     }
+
+    // The NVMe function's node, through the kit's tree (the HAL grant): the
+    // first node whose identity is a PCI function of class 01 subclass 08,
+    // any programming interface, the pair the probes looked the function up
+    // by before the kit, with a PciAccess; null when there is none. Every
+    // nvme cell attaches one controller on the root bus, the one NvmeDriver
+    // bound.
+    private static DeviceNode? FindNvmeFunctionNode()
+    {
+        IReadOnlyList<DeviceNode> nodes = DriverEngine.Nodes;
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            DeviceNode node = nodes[i];
+            if (node.Identity is PciIdentity identity
+                && identity.ClassCode == PciMassStorageClass
+                && identity.Subclass == PciNvmSubclass
+                && node.TryGetAccess(out PciAccess? _))
+            {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    // Describes a PCI function afresh through the access object of the node
+    // that published it: the PCI host's for a function its walk found, a
+    // bridge's (without placement) for one behind a hot-plug slot. Nothing
+    // is published.
+    private static bool TryDescribeAgain(DeviceNode node, out PciFunctionDescription description)
+    {
+        DeviceNode? parent = node.Parent;
+        if (node.Identity is PciIdentity identity && parent is not null)
+        {
+            if (parent.TryGetAccess(out PciHostAccess? host))
+            {
+                return host.TryDescribeFunction(identity.Bus, identity.Device, identity.Function, out description);
+            }
+
+            if (parent.TryGetAccess(out PciAccess? bridge))
+            {
+                return bridge.TryDescribeChild(identity.Device, identity.Function, assignResources: false, out description);
+            }
+        }
+
+        description = default;
+        return false;
+    }
+#pragma warning restore COSMOS0003
 #endif
 
     // Contract-faithful degenerate device: one 512-byte block, throws on any
     // out-of-range access like real drivers do.
-    private sealed class TinyDevice : BlockDevice
+    private sealed class TinyDevice : IBlockDevice
     {
         /// <summary>Single-block capacity of the degenerate probe: too small for even the GPT header at LBA 1.</summary>
         private const ulong TinyBlockCount = 1;
 
-        public TinyDevice()
-        {
-            BlockSize = SectorSizeBytes;
-            BlockCount = TinyBlockCount;
-        }
+        public ulong BlockCount => TinyBlockCount;
 
-        public override string Name => "tiny-probe";
+        public ulong BlockSize => SectorSizeBytes;
 
-        public override void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
+        public string Name => "tiny-probe";
+
+        public void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
         {
             if (blockNo > BlockCount || blockCount > BlockCount - blockNo)
             {
@@ -2882,34 +3328,91 @@ public class Kernel : Sys.Kernel
             data.Clear();
         }
 
-        public override void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
+        public void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
         {
             if (blockNo > BlockCount || blockCount > BlockCount - blockNo)
             {
                 throw new ArgumentOutOfRangeException(nameof(blockNo));
             }
         }
+
+        public void Flush()
+        {
+        }
     }
 
-    private sealed class BoundsProbeDevice : BlockDevice
+    private sealed class BoundsProbeDevice : IBlockDevice
     {
         /// <summary>Backing block count of the in-memory probe device.</summary>
         private const ulong ProbeBlockCount = 1024;
 
-        public BoundsProbeDevice()
-        {
-            BlockSize = SectorSizeBytes;
-            BlockCount = ProbeBlockCount;
-        }
+        public ulong BlockCount => ProbeBlockCount;
 
-        public override string Name => "bounds-probe";
+        public ulong BlockSize => SectorSizeBytes;
 
-        public override void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
+        public string Name => "bounds-probe";
+
+        public void ReadBlock(ulong blockNo, ulong blockCount, Span<byte> data)
         {
         }
 
-        public override void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
+        public void WriteBlock(ulong blockNo, ulong blockCount, ReadOnlySpan<byte> data)
         {
         }
+
+        public void Flush()
+        {
+        }
+    }
+
+    // ==================== Kit lookups ====================
+
+    // The index of the kit node at `path` in DriverDiagnostics, or -1.
+    private static int FindNodeIndex(string path)
+    {
+        int count = DriverDiagnostics.NodeCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info) && info.Path == path)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static bool TryFindNode(string path, out DeviceNodeInfo info) => DriverDiagnostics.TryGetNode(FindNodeIndex(path), out info);
+
+    // The node path of the published block device named `name`, or null
+    // when no kit driver published a block device of that name.
+    private static string? FindBlockNodePath(string name)
+    {
+        int count = DriverDiagnostics.DeviceCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.Name == name)
+            {
+                return info.NodePath;
+            }
+        }
+
+        return null;
+    }
+
+    // The index of the published block device named `name` in DriverDiagnostics,
+    // or -1.
+    private static int FindBlockDeviceIndexByName(string name)
+    {
+        int count = DriverDiagnostics.DeviceCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (DriverDiagnostics.TryGetDevice(i, out PublishedDeviceInfo info) && info.Kind == PublishedDeviceKind.Block && info.Name == name)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

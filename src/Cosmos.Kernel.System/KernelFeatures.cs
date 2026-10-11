@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using Cosmos.Kernel.Core;
 
 namespace Cosmos.Kernel.System;
@@ -70,4 +72,19 @@ public static class KernelFeatures
     /// (<c>CosmosEnableFat</c>). Requires Storage.
     /// </summary>
     public static bool Fat => CosmosFeatures.FatEnabled;
+
+    /// <summary>
+    /// Whether USB is enabled (<c>CosmosEnableUsb</c>): the kit's xHCI host
+    /// controller driver, the hub driver and the USB keyboard, mouse and mass
+    /// storage class drivers, which the driver manifest registers under this
+    /// switch. Requires PCI. When the property is not set, it is on only if
+    /// Keyboard, Mouse or Storage is on.
+    /// </summary>
+    public static bool Usb => CosmosFeatures.UsbEnabled;
+
+    /// <summary>
+    /// Whether the audio stack is enabled (<c>CosmosEnableAudio</c>).
+    /// Requires PCI.
+    /// </summary>
+    public static bool Audio => CosmosFeatures.AudioEnabled;
 }

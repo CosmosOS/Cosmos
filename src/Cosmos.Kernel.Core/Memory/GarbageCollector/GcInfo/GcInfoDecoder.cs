@@ -11,7 +11,7 @@
 // scratch registers and they are skipped — sound for the GC-triggering thread, which is always
 // stopped at a call site, where GC refs are never live in caller-saved registers.
 
-using Cosmos.Kernel.Core.Runtime;
+using Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 

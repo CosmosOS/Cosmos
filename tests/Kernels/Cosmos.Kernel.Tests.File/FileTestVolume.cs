@@ -3,7 +3,7 @@ namespace Cosmos.Kernel.Tests.File;
 // global:: because a plain "System" binds to Cosmos.Kernel.System from
 // inside this namespace.
 using global::System;
-using Cosmos.Kernel.System.Filesystems.Fat;
+using Cosmos.Kernel.System.FileSystem.Fat;
 
 /// <summary>
 /// Builds the clean FAT16 volume the System.IO tests run on, using the same
@@ -36,7 +36,7 @@ internal static class FileTestVolume
     public static MemoryBlockDevice Create(string name)
     {
         MemoryBlockDevice device = new(name, BlockSize, BlockCount);
-        FatFilesystemType driver = new(device);
+        FatFileSystemType driver = new(device);
         FatFormatOptions options = new()
         {
             Type = FatType.Fat16,

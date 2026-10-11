@@ -1,11 +1,13 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics.X86;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.Core.X64.Bridge;
 
 namespace Cosmos.Kernel.Core.X64.Cpu;
 
@@ -68,6 +70,18 @@ public static class LocalApic
     /// <summary>PIT command byte: latch the current count of channel 0 for read-back.</summary>
     private const byte PIT_CMD_LATCH_CHANNEL0 = 0x00;
 
+    // Discovery
+    /// <summary>IA32_APIC_BASE: the Local APIC's physical base and its global enable bit (Intel SDM Vol 3 §11.4.4).</summary>
+    private const uint Ia32ApicBaseMsr = 0x1B;
+    /// <summary>IA32_APIC_BASE bit 11, APIC global enable: clear when firmware left the Local APIC off.</summary>
+    private const ulong ApicBaseGlobalEnable = 1UL << 11;
+    /// <summary>IA32_APIC_BASE bits 51:12, the 4 KiB-aligned physical base of the register page.</summary>
+    private const ulong ApicBaseAddressMask = 0x000F_FFFF_FFFF_F000;
+    /// <summary>CPUID leaf 1, the processor feature flags.</summary>
+    private const int CpuidFeatureLeaf = 1;
+    /// <summary>CPUID.01H:EDX bit 9: an on-chip APIC, and with it the IA32_APIC_BASE MSR.</summary>
+    private const int CpuidEdxApic = 1 << 9;
+
     // Software policy
     /// <summary>Mask selecting the low byte of a 16-bit PIT count.</summary>
     private const int LowByteMask = 0xFF;
@@ -100,7 +114,33 @@ public static class LocalApic
     public static bool IsInitialized => s_initialized;
 
     /// <summary>
-    /// Initializes the Local APIC with the given base address from MADT.
+    /// Reads the Local APIC's physical base from IA32_APIC_BASE. The register
+    /// is architectural, so it names the Local APIC on every boot, with or
+    /// without ACPI; the MADT's Local APIC address only repeats it. False when
+    /// the CPU reports no APIC (the MSR does not exist then) or firmware left
+    /// the Local APIC globally disabled. Allocation-free.
+    /// </summary>
+    /// <param name="baseAddress">The physical address of the register page, or 0.</param>
+    internal static bool TryReadBaseAddress(out ulong baseAddress)
+    {
+        baseAddress = 0;
+        if ((X86Base.CpuId(CpuidFeatureLeaf, 0).Edx & CpuidEdxApic) == 0)
+        {
+            return false;
+        }
+
+        ulong apicBase = X64CpuNative.ReadMsr(Ia32ApicBaseMsr);
+        if ((apicBase & ApicBaseGlobalEnable) == 0)
+        {
+            return false;
+        }
+
+        baseAddress = apicBase & ApicBaseAddressMask;
+        return true;
+    }
+
+    /// <summary>
+    /// Initializes the Local APIC at the base <see cref="TryReadBaseAddress"/> read.
     /// </summary>
     /// <param name="baseAddress">The physical address of the Local APIC registers.</param>
     public static void Initialize(ulong baseAddress)

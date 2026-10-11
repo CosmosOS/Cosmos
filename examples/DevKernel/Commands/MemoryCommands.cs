@@ -39,7 +39,7 @@ internal static class MemoryCommands
                 Name = "free",
                 Usage = "free",
                 Description = "Force a heap collection and report freed objects",
-                Execute = static (context, args) => Terminal.Info(MemoryInfo.Collect() + " objects collected."),
+                Execute = static (context, args) => Terminal.Info(MemoryDiagnostics.Collect() + " objects collected."),
             },
             new ShellCommand
             {
@@ -67,10 +67,10 @@ internal static class MemoryCommands
     {
         Terminal.Header("Memory Information:");
 
-        ulong totalPages = MemoryInfo.TotalPages;
-        ulong freePages = MemoryInfo.FreePages;
+        ulong totalPages = MemoryDiagnostics.TotalPages;
+        ulong freePages = MemoryDiagnostics.FreePages;
         ulong usedPages = totalPages - freePages;
-        ulong pageSize = MemoryInfo.PageSizeBytes;
+        ulong pageSize = MemoryDiagnostics.PageSizeBytes;
 
         Terminal.InfoLine("Page Size", Units.ToKiB(pageSize).ToString() + " KB");
         Terminal.InfoLine("Total Pages", totalPages.ToString());

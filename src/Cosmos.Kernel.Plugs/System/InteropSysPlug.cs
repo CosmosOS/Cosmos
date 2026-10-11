@@ -4,14 +4,15 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using Cosmos.Build.API.Attributes;
+using Cosmos.Kernel.Core.Security;
 using Cosmos.Kernel.System;
 using Cosmos.Kernel.System.Diagnostics;
 using Monitor = Cosmos.Kernel.Core.Scheduler.Monitor;
 using System.Runtime.InteropServices;
-#if ARCH_X64
-using Cosmos.Kernel.HAL.X64.Devices.Clock;
-#elif ARCH_ARM64
-using Cosmos.Kernel.HAL.ARM64.Devices.Clock;
+#if ARCH_ARM64
+using Rtc = Cosmos.Kernel.HAL.ARM64.PL031Rtc;
+#else
+using Rtc = Cosmos.Kernel.HAL.X64.CmosRtc;
 #endif
 
 
@@ -50,8 +51,17 @@ public static class InteropSysPlug
     }
 
     /// <summary>
-    /// Provides cryptographically secure random bytes.
-    /// In a real kernel, this would use hardware RNG (RDRAND) if available.
+    /// Provides cryptographically secure random bytes, for <c>Guid.NewGuid</c>
+    /// and the rest of CoreLib's secure randomness, from the kernel's CSPRNG
+    /// (<see cref="KernelRandom"/>, the generator behind the
+    /// <c>RandomNumberGenerator</c> plug too). Its first use seeds it, which
+    /// takes a few milliseconds. The non-cryptographic sibling above stays on
+    /// its xorshift, which works however early the runtime first seeds
+    /// <c>HashCode</c>, string hashing (Marvin) and <c>System.Random</c> from
+    /// it. No key or nonce depends on those seeds, though Marvin's is what
+    /// keeps an attacker from colliding the hashes of a string-keyed
+    /// dictionary on purpose, which a xorshift over the counter only weakly
+    /// prevents.
     /// </summary>
     /// <returns>Zero, which the caller reads as success. The target returns
     /// <see langword="int"/> rather than <see langword="void"/>, unlike its
@@ -61,27 +71,28 @@ public static class InteropSysPlug
     [PlugMember]
     public static unsafe int GetCryptographicallySecureRandomBytes(byte* buffer, int length)
     {
-        // For now, use the same non-crypto implementation
-        // TODO: Use RDRAND instruction if available
-        GetNonCryptographicallySecureRandomBytes(buffer, length);
+        KernelRandom.Fill(buffer, length);
 
         // Anything but zero makes the caller throw CryptographicException, and
-        // the fallback generator has no failure mode.
+        // the kernel generator has no failure mode.
         return 0;
     }
 
+    /// <summary>
+    /// Milliseconds elapsed since the platform RTC captured its boot reference;
+    /// 0 when the timer feature is compiled out or the RTC is not initialized.
+    /// </summary>
     [PlugMember]
     public static long GetLowResolutionTimestamp()
     {
-
         if (KernelFeatures.Timer)
         {
-            if (RTC.Instance is null)
+            if (Rtc.Instance is null)
             {
                 return 0;
             }
 
-            return RTC.Instance.GetElapsedTicks() / TimeSpan.TicksPerMillisecond;
+            return Rtc.Instance.GetElapsedTicks() / TimeSpan.TicksPerMillisecond;
         }
         else
         {

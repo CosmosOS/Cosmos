@@ -1,0 +1,12 @@
+<Project>
+  <!--
+    Imported into every project that references the Cosmos.Build.Analyzer.Patcher
+    package. A project that sets <CosmosDriverAssembly>true</CosmosDriverAssembly>
+    is a driver assembly: the layer analyzer holds it to the User layer and the
+    driver assembly rules (NAOT0008, NAOT0009) run in it. This item is what lets
+    the analyzers read the property.
+  -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="CosmosDriverAssembly" />
+  </ItemGroup>
+</Project>

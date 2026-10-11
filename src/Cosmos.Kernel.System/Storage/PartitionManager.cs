@@ -1,6 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.HAL.Interfaces.Devices;
+using Cosmos.Kernel.HAL.Devices.Storage;
 
 namespace Cosmos.Kernel.System.Storage;
 
@@ -82,7 +82,7 @@ public static class PartitionManager
         }
 
         // AddPartition owns the 32-bit on-disk field bound and reports it the
-        // same way this does, so the facade no longer pre-checks it.
+        // same way this does, so the facade does not pre-check it.
         return Mbr.AddPartition(device, freeSlot, mbrSystemId, startSector, sectorCount);
     }
 
@@ -273,8 +273,7 @@ public static class PartitionManager
         // The mutability test belongs with the other pre-copy checks: this
         // walks the raw table, so it matches the extended container and the
         // GPT protective entry, which Mbr.MovePartition then refuses. Asking
-        // afterwards meant the sectors were already copied and the refusal
-        // arrived as an exception out of a bool-returning method.
+        // after the copy would report false with the sectors already copied.
         int slot = FindMbrSlot(device, location, out byte systemId);
         if (slot < 0 || !Mbr.IsMutableSystemId(systemId))
         {

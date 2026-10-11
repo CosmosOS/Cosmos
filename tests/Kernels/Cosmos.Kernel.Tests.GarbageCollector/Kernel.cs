@@ -7,7 +7,7 @@ using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 using Cosmos.Kernel.Core.Memory.Heap;
 using Cosmos.Kernel.Core.Runtime.GcInfo;
-using Cosmos.Kernel.System.Timer;
+using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using CoreGC = Cosmos.Kernel.Core.Memory.GarbageCollector.GarbageCollector;
 using Sys = Cosmos.Kernel.System;
@@ -670,7 +670,7 @@ public class Kernel : Sys.Kernel
 
         // --- 3. EnumerateLiveSlots must run to completion at the prolog without faulting ---
         GcInfoDecoder enumDecoder = new GcInfoDecoder(mi.GcInfo, GcInfoEncoding.GCINFO_VERSION, GcInfoDecoderFlags.DECODE_GC_LIFETIMES, 0);
-        Cosmos.Kernel.Core.Runtime.REGDISPLAY rd = default;
+        Cosmos.Kernel.Core.Runtime.ExceptionHandling.REGDISPLAY rd = default;
         int reportCount = 0;
         bool ok = enumDecoder.EnumerateLiveSlots(&rd, reportScratchSlots: false, CodeManagerFlags.None, &CountGcRefCallback, &reportCount);
         Assert.True(ok, "GcInfo: EnumerateLiveSlots must return true (slot table fit, no fault)");

@@ -31,6 +31,13 @@ internal class MemoryBlock
     public readonly MemoryBlock32 DWords;
 
     /// <summary>
+    /// The block as bytes, at most <see cref="int.MaxValue"/> of them: how the
+    /// layers above Core, which compile without unsafe code, read and write
+    /// it. Allocation-free.
+    /// </summary>
+    public unsafe Span<byte> Span => new((void*)Base, (int)Math.Min(Size, int.MaxValue));
+
+    /// <summary>
     /// Create new instance of the <see cref="MemoryBlock"/> class.
     /// </summary>
     /// <param name="aBase">A base.</param>
@@ -42,6 +49,16 @@ internal class MemoryBlock
         Bytes = new MemoryBlock08(aBase, aByteSize);
         Words = new MemoryBlock16(aBase, aByteSize);
         DWords = new MemoryBlock32(aBase, aByteSize);
+    }
+
+    /// <summary>
+    /// The block as values of <typeparamref name="T"/>, as many as fit, at
+    /// most <see cref="int.MaxValue"/>. Allocation-free.
+    /// </summary>
+    /// <typeparam name="T">The element type, an unmanaged struct such as a descriptor.</typeparam>
+    public unsafe Span<T> AsSpan<T>() where T : unmanaged
+    {
+        return new Span<T>((void*)Base, (int)Math.Min(Size / (uint)sizeof(T), int.MaxValue));
     }
 
     //TODO: Fill all these methods with fast ASM
@@ -249,20 +266,6 @@ internal class MemoryBlock
         fixed (int* aDataPtr = aData)
         {
             MemoryOp.MemCopy((byte*)xDest, (byte*)(aDataPtr + aIndex), aCount);
-        }
-    }
-
-    /// <summary>
-    /// Copy ManagedMemoryBlock into MemoryBlock.
-    /// Non-temporal: a MemoryBlock is MMIO (e.g. the linear framebuffer) that is
-    /// written whole and never read back, so the copy must not go through the cache.
-    /// </summary>
-    /// <param name="block">ManagedMemoryBlock to copy.</param>
-    public unsafe void Copy(ManagedMemoryBlock block)
-    {
-        fixed (byte* src = block.Span)
-        {
-            MemoryOp.MemCopyNonTemporal((byte*)Base, src, (int)block.Size);
         }
     }
 

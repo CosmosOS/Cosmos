@@ -5,6 +5,7 @@
     <OutputType>Library</OutputType>
     <!-- Avoid ID conflicts with the package project. -->
     <PackageId>_Cosmos.Build.Analyzer.Patcher</PackageId>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">

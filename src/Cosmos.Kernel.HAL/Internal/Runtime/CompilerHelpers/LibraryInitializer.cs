@@ -1,97 +1,85 @@
-using Cosmos.Kernel;
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
+using Cosmos.Kernel.Core.Firmware;
 using Cosmos.Kernel.Core.IO;
-using Cosmos.Kernel.Core.Memory;
-using Cosmos.Kernel.Core.Memory.GarbageCollector;
-using Cosmos.Kernel.Core.Runtime;
-using Cosmos.Kernel.Core.Scheduler;
-using Cosmos.Kernel.Core.Scheduler.Stride;
-using Cosmos.Kernel.HAL;
-using Cosmos.Kernel.HAL.Devices.Storage;
-using Cosmos.Kernel.HAL.Devices.Usb;
-using Cosmos.Kernel.HAL.Devices.Virtio;
-using Cosmos.Kernel.HAL.Interfaces;
-using Cosmos.Kernel.HAL.Pci;
+using Cosmos.Kernel.HAL.Boot;
+using Cosmos.Kernel.HAL.Devices.Display;
 
 namespace Internal.Runtime.CompilerHelpers;
 
 /// <summary>
-/// This class is responsible for initializing the library and its dependencies. It is called by the runtime before any managed code is executed.
+/// Boot-time initializer of Cosmos.Kernel.HAL. ILC finds this type by name and calls <see cref="InitializeLibrary"/> before the kernel's entry point runs.
 /// </summary>
-internal class LibraryInitializer
+internal static class LibraryInitializer
 {
     /// <summary>
-    /// Initialize HAL, interrupts, PCI, and platform-specific hardware. This method is called by the runtime before any managed code is executed.
+    /// Initialize the HAL, the interrupt controller, the platform hardware and the driver kit's platform nodes.
     /// </summary>
     public static void InitializeLibrary()
     {
-        // Get the platform initializer (registered by HAL.X64 or HAL.ARM64 module initializer)
+        // Registered by the HAL.X64 or HAL.ARM64 module initializer.
         IPlatformInitializer? initializer = PlatformHAL.Initializer;
         if (initializer is null)
         {
             Panic.Halt("No platform initializer registered. Reference Cosmos.Kernel.HAL.X64 or Cosmos.Kernel.HAL.ARM64.");
         }
 
-        // Display architecture
         Serial.WriteString("[KERNEL]   - Architecture: ");
         Serial.WriteString(initializer.PlatformName);
         Serial.WriteString("\n");
 
-        // Initialize platform-specific HAL
         Serial.WriteString("[KERNEL]   - Initializing HAL...\n");
         PlatformHAL.Initialize(initializer);
 
-        // Initialize interrupts (skipped if CosmosEnableInterrupts=false)
+        // Record the device tree the bootloader handed over, if any, before the
+        // interrupt controller and the machine description run: both may read it.
+        // The heap is up (Core's initializer ran first), the blob is RAM in the
+        // higher-half map and stays mapped for the kernel's lifetime.
+        Serial.WriteString("[KERNEL]   - Recording the firmware device tree...\n");
+        BootFirmware.DiscoverDeviceTree();
+
+        // Skipped if CosmosEnableInterrupts=false.
         if (InterruptManager.IsEnabled)
         {
             Serial.WriteString("[KERNEL]   - Initializing interrupts...\n");
             InterruptManager.Initialize(initializer.CreateInterruptController());
 
-            if (CosmosFeatures.PCIEnabled)
-            {
-                // Initialize PCI (requires interrupts for MSI/MSI-X)
-                Serial.WriteString("[KERNEL]   - Initializing PCI...\n");
-                ulong ecamBase = AcpiMcfg.GetEcamBase();
-                initializer.PreparePciMapping(ecamBase);
-                PciDevice.SetEcamBase(ecamBase);
-                PciManager.Setup();
-            }
-
-            // Initialize platform-specific hardware (ACPI, APIC, GIC, timers, etc.)
+            // ACPI, APIC, GIC, timers, etc.
             Serial.WriteString("[KERNEL]   - Initializing platform hardware...\n");
             initializer.InitializeHardware();
 
-            // Bind drivers to virtio PCI devices on any architecture.
-            // Must run after InitializeHardware: MSI-X routing needs the
-            // platform MSI binder (LAPIC on x64, GICv3 ITS on ARM64).
-            if (CosmosFeatures.PCIEnabled &&
-                (CosmosFeatures.NetworkEnabled || CosmosFeatures.KeyboardEnabled || CosmosFeatures.MouseEnabled))
+            // Seed the driver kit's platform bus with this machine's root
+            // nodes: on x64 the 8042 keyboard controller and the PCI host, on
+            // ARM64 the ECAM host from ACPI's MCFG or from the device tree and
+            // one node per occupied virtio-mmio slot, from the device tree or
+            // the virt machine's table. Interrupts are still disabled and the
+            // nodes wait in the engine's queue until Kernel.Start runs the
+            // driver stage. A machine description that throws costs the kit
+            // its nodes, not the boot.
+            Serial.WriteString("[KERNEL]   - Publishing platform nodes...\n");
+            try
             {
-                Serial.WriteString("[KERNEL]   - Scanning for virtio PCI devices...\n");
-                VirtioDevice.InitializePciBus();
+                initializer.PublishPlatformNodes();
             }
-
-            // Bring up USB host controllers and enumerate the devices behind
-            // them. Keyboards and mass storage are its clients so far, hence
-            // the switches. Same ordering constraint as virtio: MSI-X needs
-            // the platform binder InitializeHardware installed.
-            if (CosmosFeatures.PCIEnabled && (CosmosFeatures.KeyboardEnabled || CosmosFeatures.StorageEnabled))
+            catch (Exception exception)
             {
-                Serial.WriteString("[KERNEL]   - Initializing USB...\n");
-                UsbManager.Initialize();
+                Serial.WriteString("[KERNEL]   - Platform nodes not published: ");
+                Serial.WriteString(exception.Message);
+                Serial.WriteString("\n");
             }
+        }
 
-            // Initialize storage controllers (AHCI for SATA, NVMe for PCIe).
-            // Both drivers are architecture-independent and live in HAL.
-            if (CosmosFeatures.StorageEnabled)
-            {
-                Serial.WriteString("[KERNEL]   - Initializing AHCI...\n");
-                Ahci.Initialize();
-
-                Serial.WriteString("[KERNEL]   - Initializing NVMe...\n");
-                Nvme.Initialize();
-            }
+        // Record the framebuffer the bootloader handed over, for the driver
+        // stage to publish as the firmware display. Outside the interrupts
+        // block: the framebuffer is there whenever graphics are on, as the
+        // early console reads it. The graphics switch alone, so a kernel
+        // that turned it off carries no firmware display.
+        if (CosmosFeatures.GraphicsEnabled)
+        {
+            Serial.WriteString("[KERNEL]   - Recording the firmware framebuffer...\n");
+            FirmwareDisplay.DiscoverBoot();
         }
     }
 }

@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Cosmos.Kernel.HAL.Vfs;
-using Cosmos.Kernel.System.Filesystems.Fat;
+using Cosmos.Kernel.System.FileSystem;
+using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.Kernel.System.Storage;
-using Cosmos.Kernel.System.Vfs;
 using DevKernel.Shell;
 using DevKernel.Storage;
 
@@ -119,10 +118,10 @@ internal static class MountCommands
         // flush cached FAT and directory state with the old geometry over the
         // fresh volume. VfsManager.TryFormat refuses this too; the loop is here
         // for the message that names the mount point.
-        IReadOnlyList<VfsManager.VfsMount> mounts = VfsManager.Mounts;
+        IReadOnlyList<VfsMount> mounts = VfsManager.Mounts;
         for (int i = 0; i < mounts.Count; i++)
         {
-            VfsManager.VfsMount mount = mounts[i];
+            VfsMount mount = mounts[i];
             if (ReferenceEquals(mount.Partition, target))
             {
                 Terminal.Error($"Partition is mounted at {mount.MountPoint}. Run 'umount {mount.MountPoint}' first.");
@@ -206,7 +205,7 @@ internal static class MountCommands
     {
         Terminal.Header("Mounted Filesystems:");
 
-        IReadOnlyList<VfsManager.VfsMount> mounts = VfsManager.Mounts;
+        IReadOnlyList<VfsMount> mounts = VfsManager.Mounts;
         if (mounts.Count == 0)
         {
             Terminal.Warning("No filesystems mounted.");
@@ -215,7 +214,7 @@ internal static class MountCommands
 
         for (int i = 0; i < mounts.Count; i++)
         {
-            VfsManager.VfsMount mount = mounts[i];
+            VfsMount mount = mounts[i];
             Console.Write("  ");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write(mount.MountPoint);
@@ -241,7 +240,7 @@ internal static class MountCommands
     /// mkpart/rmpart/format trigger; only the disk and slot it is reported
     /// under are looked up fresh.
     /// </summary>
-    private static void PrintMountSource(VfsManager.VfsMount mount)
+    private static void PrintMountSource(VfsMount mount)
     {
         Partition? partition = mount.Partition;
         if (partition is null || !StorageView.TryDescribePartition(partition, out int diskNumber, out int partitionNumber))

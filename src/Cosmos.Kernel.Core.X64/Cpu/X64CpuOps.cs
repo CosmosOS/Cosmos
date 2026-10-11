@@ -8,9 +8,9 @@ internal class X64CpuOps : ICpuOps
 {
     public void Halt() => InternalCpu.Halt();
 
-    public void DisableInterrupts() => Cosmos.Kernel.Core.CPU.InternalCpu.DisableInterrupts();
+    public void DisableInterrupts() => InternalCpu.DisableInterrupts();
 
-    public void EnableInterrupts() => Cosmos.Kernel.Core.CPU.InternalCpu.EnableInterrupts();
+    public void EnableInterrupts() => InternalCpu.EnableInterrupts();
 
     /// <summary>
     /// TSC (Time Stamp Counter) frequency in Hz.
@@ -39,7 +39,7 @@ internal class X64CpuOps : ICpuOps
     /// </summary>
     public static void CalibrateTsc()
     {
-        if (!Cpu.LocalApic.IsTimerCalibrated)
+        if (!LocalApic.IsTimerCalibrated)
         {
             Serial.Write("[TSC] ERROR: LAPIC timer not calibrated\n");
             return;
@@ -51,7 +51,7 @@ internal class X64CpuOps : ICpuOps
         ulong tscStart = X64CpuNative.ReadTsc();
 
         // Wait using calibrated LAPIC timer
-        Cpu.LocalApic.Wait(calibrationMs);
+        LocalApic.Wait(calibrationMs);
 
         // Read TSC after
         ulong tscEnd = X64CpuNative.ReadTsc();

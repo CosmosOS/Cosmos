@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The drivers of the Drivers suite, built exactly as a kernel author's driver
+    library would be: a driver assembly over the public driver kit seam, holding
+    no InternalsVisibleTo grant from any project. Directory.Build.props lists it
+    in CosmosDriverAssemblyNames and the CosmosForbidDriverAssemblyGrants target
+    fails any project that grants it internals, so the compiler is the proof that
+    every driver here calls only what a third party can call. The test kernel
+    next door references it and drives its drivers through the synthetic bus.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <!-- Held to the surface a third party gets: the layer analyzer treats it as a
+         User assembly, NAOT0008 forbids UnsafeAccessor in it and NAOT0009 any grant to it. -->
+    <CosmosDriverAssembly>true</CosmosDriverAssembly>
+    <!-- The library is written over the experimental driver kit seam (COSMOS0003). -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+  </PropertyGroup>
+
+  <!-- The analyzer package's build props declare this item for a library that
+       references the package; this one references the analyzer project, so it
+       declares the item itself. -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="CosmosDriverAssembly" />
+  </ItemGroup>
+
+  <!-- The kit and the ring, nothing lower: what a kernel author's driver library references. -->
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL/Cosmos.Kernel.HAL.csproj" />
+    <ProjectReference Include="../../../src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
+    <ProjectReference Include="../../../src/Cosmos.Build.Analyzer.Patcher/Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>
