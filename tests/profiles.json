@@ -7,6 +7,21 @@
   //     alongside that default) attached. An optional "architectures" filter
   //     pins a profile to the arch that can present that hardware; a suite
   //     listing per-arch profiles runs the matching one on each.
+  //     Three optional fields pick the USB host controller the usb disks,
+  //     the usb-kbd and the usb-mouse sit on. "usbController" is "xhci"
+  //     (the default, qemu-xhci), "ehci" (usb-ehci alone), "ohci" (pci-ohci
+  //     alone, six root ports) or "ehci-ohci" (an ICH9 EHCI with a pci-ohci
+  //     companion over its six ports, which takes the full-speed devices).
+  //     "usbDeviceVersion" (1, or the default 2) is the USB version QEMU's
+  //     usb-kbd and usb-mouse present: 1 leaves them the full-speed
+  //     descriptor set alone, the shape an EHCI hands to its companion.
+  //     "usbHub" (false by default) puts a usb-hub on root port 1 with the
+  //     keyboard behind it on the hub's port 1; the hub is full speed only,
+  //     so it needs ohci or ehci-ohci. On the EHCI and OHCI models the
+  //     launcher pins each device to a root port (keyboard 1, mouse 2,
+  //     sticks from 3): QEMU fills their ports in command-line order and
+  //     inserts a hub of its own on the last free one, and the engine's
+  //     replug puts a device back on the port it left.
   //   * modifiers: generic knobs that compose with a profile. Two flavors:
   //       - deviceOptions: per-disk-kind overrides (msix tuning, cache mode)
   //       - machineOptions: -M property overrides (gic-version, ...)
@@ -69,6 +84,41 @@
       ]
     },
     {
+      // The same stick on a usb-ehci controller alone, attached at high
+      // speed on root port 3 (the launcher's port plan keeps 1 and 2 for a
+      // keyboard and a mouse), so its node is usb:1-3:0. The kit's
+      // EhciDriver binds the controller and UsbMassStorageDriver runs the
+      // Bulk-Only Transport over the EHCI's async schedule: 20 KiB qTDs
+      // through the bounce page, the CBW in one 31-byte packet, the
+      // device's asynchronous completions. The UsbHotPlug_* tests pull the
+      // stick out and put it back on the same port. No NIC: the EHCI is an
+      // INTx-only function and with QEMU's default e1000e on the bus
+      // SeaBIOS routes its INTD# to the line the NIC's driver claims first,
+      // which would leave the EHCI polling and its handler untested; without
+      // the NIC the line is free (the AHCI polls).
+      "name": "usb-ehci",
+      "nic": "none",
+      "usbController": "ehci",
+      "disks": [
+        { "type": "usb" }
+      ]
+    },
+    {
+      // The same stick on a pci-ohci controller alone, attached at full
+      // speed (12 Mb/s, 64-byte bulk packets) on root port 3, node
+      // usb:1-3:0: the slowest disk the suite runs on. OhciDriver runs the
+      // Bulk-Only Transport over its bulk list, one 8 KiB TD per wait,
+      // under the same block-device, partition and reboot assertions as the
+      // other cells, and the UsbHotPlug_* tests pull the stick out and put
+      // it back on the same port. No NIC, for the OHCI's INTA# as above.
+      "name": "usb-ohci",
+      "nic": "none",
+      "usbController": "ohci",
+      "disks": [
+        { "type": "usb" }
+      ]
+    },
+    {
       // A virtio-blk disk: a virtio-blk-pci function the kit's PCI
       // transport binds (transitional 1af4:1001 on the root bus,
       // modern-only 1af4:1042 behind a PCI Express root port);
@@ -125,6 +175,75 @@
       // device too, so the node is usb:1-5:0.
       "name": "usb-mouse",
       "mouse": "usb-mouse"
+    },
+    {
+      // A USB keyboard (usb-kbd) on a usb-ehci controller alone, plugged in
+      // at boot on root port 1. The kit's EhciDriver binds the controller,
+      // enumerates the high-speed keyboard through its async schedule and
+      // publishes its HID interface as usb:1-1:0 (an EHCI numbers its ports
+      // from 1, with no USB 3 block ahead of them), which UsbKeyboardDriver
+      // binds after the Drivers suite's UsbDeclineDriver opened its pipe
+      // and declined. The cell proves the EHCI's control pipe, the LED
+      // write, the interrupt pipe (the key the engine types lands through
+      // the periodic schedule's dummy-qTD re-queue) and the unplug and
+      // replug the engine performs over QMP, which put the keyboard back
+      // on port 1. No NIC: the EHCI is an INTx-only function and with
+      // QEMU's default e1000e on the bus SeaBIOS routes its INTD# to the
+      // line the NIC's driver claims first, so the controller would poll
+      // and its handler would go untested; without the NIC the line is
+      // free (the AHCI polls) and Usb_EhciHost_Bound asserts the handler
+      // path on x64. ARM64 routes no legacy line, so the EHCI polls there.
+      "name": "usb-kbd-ehci",
+      "nic": "none",
+      "usbController": "ehci",
+      "keyboard": "usb-kbd"
+    },
+    {
+      // The same keyboard on a pci-ohci controller alone, where every
+      // device is full speed: OhciDriver enumerates it through its control
+      // list and polls its report endpoint through the periodic tree, and
+      // the key the engine types lands through the done-queue re-queue. The
+      // node is usb:1-1:0, as on the EHCI. No NIC for the same reason: on
+      // q35 the OHCI's INTA# shares the default NIC's line, and the cell
+      // proves the OHCI's handler path.
+      "name": "usb-kbd-ohci",
+      "nic": "none",
+      "usbController": "ohci",
+      "keyboard": "usb-kbd"
+    },
+    {
+      // An ICH9 EHCI with a pci-ohci companion over its six ports, and a
+      // usb_version=1 keyboard: a device with the full-speed descriptor set
+      // alone. The EHCI binds first (bus 1), resets the port, finds it not
+      // enabled (no high-speed handshake) and releases it to the companion
+      // (CompanionPortsReleased); the OHCI binds second (bus 2) and
+      // enumerates the keyboard, so its node is usb:2-1:0 under the OHCI's
+      // function node, the EHCI's bus stays empty and the keyboard group
+      // runs on the OHCI. The one cell with two host controllers and the
+      // only reachable companion hand-off: QEMU's standalone usb-ehci
+      // refuses a full-speed device outright. No NIC: both functions are
+      // INTx-only and the cell proves both handler paths.
+      "name": "usb-kbd-ehci-ohci",
+      "nic": "none",
+      "usbController": "ehci-ohci",
+      "usbDeviceVersion": 1,
+      "keyboard": "usb-kbd"
+    },
+    {
+      // A usb-hub on root port 1 of a pci-ohci controller with the keyboard
+      // behind it on the hub's port 1. UsbHubDriver binds the hub's
+      // interface node (usb:1-1:0), has the OHCI configure it as a hub
+      // (ConfigureAsHubCore) and enumerates the keyboard on the hub's port,
+      // publishing its node (usb:1-1.1:0) under the hub's. The cell proves
+      // hub-port enumeration on the full-speed host, which no xHCI cell
+      // covers (QEMU's hub is full speed only and cannot sit on an EHCI
+      // root port either), with the unplug and replug putting the keyboard
+      // back behind the hub. No NIC, as on the other OHCI cells.
+      "name": "usb-kbd-ohci-hub",
+      "nic": "none",
+      "usbController": "ohci",
+      "usbHub": true,
+      "keyboard": "usb-kbd"
     },
     {
       // Intel E1000E NIC, the historical x64 default, kept as an explicit

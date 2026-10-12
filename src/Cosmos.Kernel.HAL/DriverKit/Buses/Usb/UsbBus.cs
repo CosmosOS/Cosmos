@@ -41,9 +41,10 @@ public sealed class UsbBus
 
     /// <summary>
     /// Creates the bus of a host controller and takes the next ordinal: the
-    /// first controller bound is 1, a second xHCI function 2; a controller
-    /// unbound and rebound takes a new number. Thread context, the host
-    /// driver's probe.
+    /// first controller bound is 1, a second controller function 2 whatever
+    /// its interface (an EHCI beside an xHCI, or its OHCI companion); a
+    /// controller unbound and rebound takes a new number. Thread context, the
+    /// host driver's probe.
     /// </summary>
     /// <param name="binding">The host driver's binding, the owner of the root ports' interface nodes.</param>
     /// <param name="host">The host controller contract.</param>

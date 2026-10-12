@@ -65,6 +65,10 @@ public class RunSettings : CommandSettings
     [CommandOption("--audio <MODEL>")]
     [Description("Audio controller to attach: a QEMU HD Audio model such as intel-hda or ich9-intel-hda. A codec is attached alongside it. Omit, or pass 'none', for no audio.")]
     public string? Audio { get; set; }
+
+    [CommandOption("--usb-controller <MODEL>")]
+    [Description("USB host controller the USB disks, keyboard and mouse sit on: xhci (default), ehci, ohci, or ehci-ohci (an ICH9 EHCI with an OHCI companion that takes the full-speed devices). Added only when a USB device is attached; on ehci and ohci every device is pinned to a root port.")]
+    public string? UsbController { get; set; }
 }
 
 public class RunCommand : AsyncCommand<RunSettings>
@@ -113,6 +117,7 @@ public class RunCommand : AsyncCommand<RunSettings>
                 KeyboardDevice = ResolveInputDevice(settings.Arch, settings.Keyboard, "virtio-keyboard-device"),
                 MouseDevice = ResolveInputDevice(settings.Arch, settings.Mouse, "virtio-mouse-device"),
                 AudioDevice = settings.Audio,
+                UsbController = ParseUsbController(settings.UsbController),
                 ExtraArgs = context.Remaining.Raw.ToArray()
             });
         }
@@ -169,6 +174,26 @@ public class RunCommand : AsyncCommand<RunSettings>
     /// </summary>
     internal static string? ResolveInputDevice(string arch, string? requested, string arm64Default)
         => requested ?? (arch == "arm64" ? arm64Default : null);
+
+    /// <summary>
+    /// Turns <c>--usb-controller</c> into its model: unset keeps the xHCI the
+    /// launcher has always put USB devices on, and any spelling but the four
+    /// the launcher knows is an error rather than a silent fallback.
+    /// </summary>
+    internal static UsbHostControllerModel ParseUsbController(string? requested)
+    {
+        if (string.IsNullOrWhiteSpace(requested))
+        {
+            return UsbHostControllerModel.Xhci;
+        }
+
+        if (!QemuLauncher.TryParseUsbController(requested, out UsbHostControllerModel model))
+        {
+            throw new ArgumentException($"Unknown USB host controller '{requested}'. Expected {QemuLauncher.UsbControllerNames}.");
+        }
+
+        return model;
+    }
 
     /// <summary>
     /// Turns <c>--disk</c> specs (<c>path[,kind]</c>) into <see cref="DiskAttachment"/>s.

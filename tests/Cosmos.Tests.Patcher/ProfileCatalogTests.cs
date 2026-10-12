@@ -183,6 +183,81 @@ public class ProfileCatalogTests
         }
     }
 
+    // The Drivers suite's four EHCI/OHCI cells are the only runs where those
+    // host controllers exist at all. Each drops the default NIC, which on
+    // q35 takes the INTx line the controller shares with it and would leave
+    // the handler path untested; the companion cell asks for a full-speed
+    // keyboard so the EHCI has something to hand to the OHCI; the hub cell
+    // is the one place a device sits behind a hub.
+    [Theory]
+    [InlineData("usb-kbd-ehci", UsbHostControllerModel.Ehci, QemuLauncher.DefaultUsbDeviceVersion, false)]
+    [InlineData("usb-kbd-ohci", UsbHostControllerModel.Ohci, QemuLauncher.DefaultUsbDeviceVersion, false)]
+    [InlineData("usb-kbd-ehci-ohci", UsbHostControllerModel.EhciWithOhciCompanion, QemuLauncher.FullSpeedUsbDeviceVersion, false)]
+    [InlineData("usb-kbd-ohci-hub", UsbHostControllerModel.Ohci, QemuLauncher.DefaultUsbDeviceVersion, true)]
+    public void DriversSuiteCoversTheUsbHostControllersOnBothArchitectures(string profileName, UsbHostControllerModel controller, int deviceVersion, bool hub)
+    {
+        string suiteDir = Path.Combine(FindRepoRoot(), "tests", "Kernels", "Cosmos.Kernel.Tests.Drivers");
+
+        foreach (string architecture in Architectures)
+        {
+            IReadOnlyList<TestProfile> cells = TestProfileLoader.LoadFor(suiteDir, architecture);
+
+            TestProfile cell = Assert.Single(cells, c => c.Name == profileName);
+            Assert.Equal(controller, cell.UsbController);
+            Assert.Equal(deviceVersion, cell.UsbDeviceVersion);
+            Assert.Equal(hub, cell.UsbHub);
+            Assert.Equal("usb-kbd", cell.KeyboardDevice);
+            Assert.Equal("none", cell.NetworkCard);
+            Assert.Empty(cell.Disks);
+        }
+    }
+
+    // The xHCI cells keep the default controller, the default device
+    // version and q35's default NIC: the xHCI takes a message interrupt and
+    // shares no line with it.
+    [Theory]
+    [InlineData("usb-kbd")]
+    [InlineData("usb-mouse")]
+    public void DriversSuiteKeepsTheXhciCellsOnTheDefaultController(string profileName)
+    {
+        string suiteDir = Path.Combine(FindRepoRoot(), "tests", "Kernels", "Cosmos.Kernel.Tests.Drivers");
+
+        foreach (string architecture in Architectures)
+        {
+            IReadOnlyList<TestProfile> cells = TestProfileLoader.LoadFor(suiteDir, architecture);
+
+            TestProfile cell = Assert.Single(cells, c => c.Name == profileName);
+            Assert.Equal(UsbHostControllerModel.Xhci, cell.UsbController);
+            Assert.Equal(QemuLauncher.DefaultUsbDeviceVersion, cell.UsbDeviceVersion);
+            Assert.False(cell.UsbHub);
+            Assert.Null(cell.NetworkCard);
+        }
+    }
+
+    // The Storage suite runs its one stick on every host controller model:
+    // the xHCI at SuperSpeed, the EHCI at high speed and the OHCI at full
+    // speed, under the same block-device assertions. The EHCI and OHCI
+    // cells drop the NIC for the line reason above.
+    [Theory]
+    [InlineData("usb", UsbHostControllerModel.Xhci, null)]
+    [InlineData("usb-ehci", UsbHostControllerModel.Ehci, "none")]
+    [InlineData("usb-ohci", UsbHostControllerModel.Ohci, "none")]
+    public void StorageSuiteCoversAUsbStickOnEveryHostController(string profileName, UsbHostControllerModel controller, string? nic)
+    {
+        string suiteDir = Path.Combine(FindRepoRoot(), "tests", "Kernels", "Cosmos.Kernel.Tests.Storage");
+
+        foreach (string architecture in Architectures)
+        {
+            IReadOnlyList<TestProfile> cells = TestProfileLoader.LoadFor(suiteDir, architecture);
+
+            TestProfile cell = Assert.Single(cells, c => c.Name == profileName);
+            Assert.Equal(controller, cell.UsbController);
+            Assert.Equal(DiskKind.Usb, Assert.Single(cell.Disks).Kind);
+            Assert.Equal(nic, cell.NetworkCard);
+            Assert.False(cell.UsbHub);
+        }
+    }
+
     // The hda cell is the only run with an audio controller on the bus, and
     // the Audio suite pairs it with bare, where the manager must list none.
     // It drops the default NIC, which on q35 holds the controller's line.

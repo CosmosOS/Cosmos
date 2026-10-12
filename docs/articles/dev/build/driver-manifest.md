@@ -72,7 +72,7 @@ The kernel's own drivers come first, then the referenced ones. An assembly that 
 
 To be registered, a class must be concrete (not abstract, not static) and non-generic, derive from `Cosmos.Kernel.HAL.DriverKit.Driver`, and have a parameterless constructor the kernel assembly can call. A marked class that fails one of these is reported (`COSMOSGEN001`) and left out.
 
-The drivers Cosmos ships take the second path. They live in `Cosmos.Kernel.Drivers`, which the `Cosmos.Kernel` aggregator every kernel references carries, so all twenty-three are in every kernel's manifest after its own drivers without the kernel referencing the package itself. They are ordered by full type name, and a shipped driver's full name carries its bus kind, category and driver folder (`Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeDriver`), so that order groups them by bus kind (`Pci`, `Platform`, `Ps2`, `Usb`, `Virtio`) and, within one, by category. Twenty of them are registered under a feature guard, and three under none:
+The drivers Cosmos ships take the second path. They live in `Cosmos.Kernel.Drivers`, which the `Cosmos.Kernel` aggregator every kernel references carries, so all twenty-five are in every kernel's manifest after its own drivers without the kernel referencing the package itself. They are ordered by full type name, and a shipped driver's full name carries its bus kind, category and driver folder (`Cosmos.Kernel.Drivers.Pci.Storage.Nvme.NvmeDriver`), so that order groups them by bus kind (`Pci`, `Platform`, `Ps2`, `Usb`, `Virtio`) and, within one, by category. Twenty-two of them are registered under a feature guard, and three under none:
 
 | Feature | Drivers |
 |---------|---------|
@@ -81,7 +81,7 @@ The drivers Cosmos ships take the second path. They live in `Cosmos.Kernel.Drive
 | `Graphics` | `VirtioGpuDriver`, `VmwareSvgaDriver`, `AmdDcnDriver`, `IntelGraphicsDriver` |
 | `Storage` | `AhciDriver`, `NvmeDriver`, `VirtioBlkDriver` |
 | `Audio` | `HdAudioDriver` |
-| `Usb` | `XhciDriver`, `UsbHubDriver`, `UsbKeyboardDriver`, `UsbMouseDriver`, `UsbMassStorageDriver` |
+| `Usb` | `XhciDriver`, `EhciDriver`, `OhciDriver`, `UsbHubDriver`, `UsbKeyboardDriver`, `UsbMouseDriver`, `UsbMassStorageDriver` |
 | `Keyboard` | `Ps2KeyboardDriver` |
 | `Mouse` | `Ps2MouseDriver` |
 | None | `VirtioMmioTransportDriver`, `VirtioInputDriver`, `I8042Driver` |

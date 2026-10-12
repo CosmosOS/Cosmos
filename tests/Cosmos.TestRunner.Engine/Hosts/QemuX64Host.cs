@@ -86,6 +86,9 @@ public class QemuX64Host : IQemuHost
             GpuDevice = devices?.GpuDevice,
             AudioDevice = devices?.AudioDevice,
             AudioBackend = QemuHostDefaults.AudioBackend,
+            UsbController = devices?.UsbController ?? UsbHostControllerModel.Xhci,
+            UsbDeviceVersion = devices?.UsbDeviceVersion ?? QemuLauncher.DefaultUsbDeviceVersion,
+            UsbHub = devices?.UsbHub ?? false,
             MonitorPort = monitor?.Port
         });
         ProcessStartInfo startInfo = QemuLauncher.ToProcessStartInfo(plan);

@@ -11,7 +11,7 @@ The main differences if you come from Gen2:
 | Position | `X`, `Y` clamped to the screen size | Same |
 | Scroll wheel | `ScrollDelta` + `ResetScrollDelta()` | Same |
 | Cursor | Drawn by your code | Drawn by your code |
-| Devices | PS/2 mouse | PS/2 mouse with scroll wheel (x64), virtio-mouse and USB mouse, all over the driver kit (the 8042 on q35 and every PC; virtio over PCI on both architectures, MMIO on ARM64; USB on an xHCI controller on both) |
+| Devices | PS/2 mouse | PS/2 mouse with scroll wheel (x64), virtio-mouse and USB mouse, all over the driver kit (the 8042 on q35 and every PC; virtio over PCI on both architectures, MMIO on ARM64; USB on an xHCI, EHCI or OHCI controller on both) |
 
 If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
@@ -36,9 +36,9 @@ using Cosmos.Kernel.System.Input;
 
 Like the keyboard, the PS/2 mouse (x64) is bound by the driver kit's `Ps2MouseDriver`, a virtio mouse by `VirtioInputDriver` and a USB mouse by `UsbMouseDriver` during the driver stage, each published to the manager's consumer, which registers it ([PS/2 devices](drivers.md#ps2-devices), [Virtio devices](drivers.md#virtio-devices), [USB devices](drivers.md#usb-devices)); `MouseManager` is ready as soon as your kernel runs.
 
-USB mice also need the USB drivers, `CosmosEnableUsb`. You do not have to set it: left unset, it is on whenever `CosmosEnableMouse` is. Setting it to `false` keeps PS/2 and virtio mice and drops the USB ones with the xHCI driver.
+USB mice also need the USB drivers, `CosmosEnableUsb`. You do not have to set it: left unset, it is on whenever `CosmosEnableMouse` is. Setting it to `false` keeps PS/2 and virtio mice and drops the USB ones with the host controller drivers.
 
-To try a USB mouse in QEMU, pass `--mouse usb-mouse` to `cosmos run`: the launcher adds a `qemu-xhci` controller (or reuses the one USB disks or a `usb-kbd` keyboard already brought) and plugs the mouse into it, on either architecture.
+To try a USB mouse in QEMU, pass `--mouse usb-mouse` to `cosmos run`: the launcher adds a `qemu-xhci` controller (or reuses the one USB disks or a `usb-kbd` keyboard already brought) and plugs the mouse into it, on either architecture. `--usb-controller ehci`, `ohci` or `ehci-ohci` puts an EHCI, an OHCI or an EHCI with an OHCI companion there instead, with every USB device pinned to a root port of it.
 
 ## Position and buttons
 
@@ -161,12 +161,12 @@ Two more knobs on `MouseManager`:
 
 ## How it works
 
-On x64 the PS/2 mouse raises IRQ 12 for every byte of a movement packet, which the 8042 driver reads and hands to the auxiliary port's `Ps2Access`; the mouse driver's handler assembles the 3 bytes of buttons and X/Y deltas, extended to 4 by the scroll wheel byte once its probe has enabled the IntelliMouse protocol (the sample-rate sequence 200, 100, 80), drops a byte that cannot start a packet, and hands one report per packet through the pointer sink to the manager's consumer. A virtio mouse delivers the same information as event records on its queue, over PCI or MMIO: the driver kit's `VirtioInputDriver` drains them on the kit's worker (woken by the queue's interrupt, or every 20 ms when none could be routed), folds the axis and button events into one report per sync event, and hands it through the pointer sink to the manager's consumer. A USB mouse's boot reports arrive on its interrupt IN pipe, delivered by the xHCI driver's message interrupt or, when none could be routed, by its 20 ms polled drain of the event ring; `UsbMouseDriver`'s handler turns each report into one relative movement (HID points Y down as the manager does, and its wheel is negated so that positive scrolls down, as on PS/2) and hands it through the same sink. Either way the deltas reach `MouseManager`, which applies `Sensitivity`, adds them to `X` and `Y`, clamps to the screen size and updates the button booleans; wheel deltas accumulate in `ScrollDelta` until a poller consumes them. Your render loop only ever reads state, which is why no locking is needed.
+On x64 the PS/2 mouse raises IRQ 12 for every byte of a movement packet, which the 8042 driver reads and hands to the auxiliary port's `Ps2Access`; the mouse driver's handler assembles the 3 bytes of buttons and X/Y deltas, extended to 4 by the scroll wheel byte once its probe has enabled the IntelliMouse protocol (the sample-rate sequence 200, 100, 80), drops a byte that cannot start a packet, and hands one report per packet through the pointer sink to the manager's consumer. A virtio mouse delivers the same information as event records on its queue, over PCI or MMIO: the driver kit's `VirtioInputDriver` drains them on the kit's worker (woken by the queue's interrupt, or every 20 ms when none could be routed), folds the axis and button events into one report per sync event, and hands it through the pointer sink to the manager's consumer. A USB mouse's boot reports arrive on its interrupt IN pipe, delivered by the host controller driver's interrupt (an MSI-X message on xHCI, the function's legacy line on EHCI and OHCI) or, when none could be routed, by its 20 ms poll; `UsbMouseDriver`'s handler turns each report into one relative movement (HID points Y down as the manager does, and its wheel is negated so that positive scrolls down, as on PS/2) and hands it through the same sink. Either way the deltas reach `MouseManager`, which applies `Sensitivity`, adds them to `X` and `Y`, clamps to the screen size and updates the button booleans; wheel deltas accumulate in `ScrollDelta` until a poller consumes them. Your render loop only ever reads state, which is why no locking is needed.
 
 ```
 Render loop (reads X/Y, buttons, ScrollDelta)
         │
 MouseManager ── Sensitivity, screen clamping, ScrollDelta accumulation
         │
-PS/2 mouse over the driver kit (the 8042, IRQ 12, x64)  /  virtio-mouse over the driver kit (PCI, MMIO)  /  USB mouse over the driver kit (xHCI)
+PS/2 mouse over the driver kit (the 8042, IRQ 12, x64)  /  virtio-mouse over the driver kit (PCI, MMIO)  /  USB mouse over the driver kit (xHCI, EHCI, OHCI)
 ```

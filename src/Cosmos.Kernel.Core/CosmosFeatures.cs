@@ -101,11 +101,12 @@ internal static class CosmosFeatures
         AppContext.TryGetSwitch("Cosmos.Kernel.System.Filesystems.Fat.Enabled", out bool enabled) ? enabled : true;
 
     /// <summary>
-    /// Controls USB: the kit's xHCI host controller driver, the hub driver and
-    /// the USB keyboard, mouse and mass storage class drivers, which the driver
-    /// manifest registers under this switch. Requires PCI; the MSBuild
-    /// cascade in Sdk.targets disables this when PCI is off. When the property
-    /// is not set, Sdk.targets enables it only if Keyboard, Mouse or Storage is on.
+    /// Controls USB: the kit's xHCI, EHCI and OHCI host controller drivers,
+    /// the hub driver and the USB keyboard, mouse and mass storage class
+    /// drivers, which the driver manifest registers under this switch.
+    /// Requires PCI; the MSBuild cascade in Sdk.targets disables this when
+    /// PCI is off. When the property is not set, Sdk.targets enables it only
+    /// if Keyboard, Mouse or Storage is on.
     /// Set via CosmosEnableUsb property in csproj.
     /// </summary>
     [FeatureSwitchDefinition("Cosmos.Kernel.HAL.Usb.Enabled")]
