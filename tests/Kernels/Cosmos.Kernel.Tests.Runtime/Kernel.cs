@@ -119,8 +119,8 @@
 // │ RhpNewFinalizable                                 │ Std │  1 │   1 │ real │   1   │  33  │ 100  │
 // │ RhpTrapThreads                                    │ Std │  0 │   0 │ stub │   1   │  —   │  50  │
 // │ RhRegisterForGCReporting                          │ GC  │  1 │   0 │ stub │   1   │  33  │  50  │
-// │ RhReRegisterForFinalize                           │ Std │  1 │   0 │ stub │   1   │  33  │  50  │
-// │ RhSuppressFinalize                                │ Std │  1 │   0 │ stub │   1   │  33  │  50  │
+// │ RhReRegisterForFinalize                           │ Std │  1 │   0 │ real │   1   │  33  │  50  │
+// │ RhSuppressFinalize                                │ Std │  1 │   0 │ real │   1   │  33  │  50  │
 // │ RhUnregisterForGCReporting                        │ GC  │  1 │   0 │ stub │   1   │  33  │  50  │
 // │ ----- Threading / Runtime Info ------------------ │     │    │     │      │       │      │      │
 // │ DebugDebugger_IsNativeDebuggerAttached            │ Dbg │  0 │   1 │ stub │   1   │  —   │ 100  │
@@ -1278,16 +1278,15 @@ public unsafe class Kernel : Sys.Kernel
     private static void Test_RhReRegisterForFinalize_Smoke()
     {
         object obj = new();
-        StartupCodeHelpers.RhReRegisterForFinalize(obj);
-        Assert.True(true, "RhReRegisterForFinalize no-op returned");
+        Assert.True(RuntimeGC.RhReRegisterForFinalize(obj), "RhReRegisterForFinalize must succeed");
     }
 
     // -- RhSuppressFinalize --
     private static void Test_RhSuppressFinalize_Smoke()
     {
         object obj = new();
-        StartupCodeHelpers.RhSuppressFinalize(obj);
-        Assert.True(true, "RhSuppressFinalize no-op returned");
+        RuntimeGC.RhSuppressFinalize(obj);
+        Assert.True(true, "RhSuppressFinalize returned");
     }
 
     // =============================================================================

@@ -183,12 +183,6 @@ namespace Cosmos.Kernel.Core.Runtime
             return 1;
         }
 
-        [RuntimeExport("RhSuppressFinalize")]
-        internal static void RhSuppressFinalize(object obj) { }
-
-        [RuntimeExport("RhReRegisterForFinalize")]
-        internal static void RhReRegisterForFinalize(object obj) { }
-
         /// <summary>
         /// Returns the MethodTable* for System.Array. This is used by the runtime when
         /// it needs to determine the base type of array types.
