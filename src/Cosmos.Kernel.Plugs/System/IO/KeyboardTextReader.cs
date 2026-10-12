@@ -13,7 +13,9 @@ internal sealed class KeyboardTextReader : TextReader
 {
     public override int Read()
     {
-        if (SessionManager.CurrentInput is { } session && session.TryReadKey(out KeyEvent? result))
+        KeyEvent? result = SessionManager.CurrentInput is { } session ? session.WaitForKey() : null;
+
+        if (result is not null)
         {
             return result.KeyChar;
         }
