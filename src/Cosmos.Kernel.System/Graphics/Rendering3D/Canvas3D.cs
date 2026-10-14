@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Numerics;
 
@@ -54,6 +55,17 @@ public abstract class Canvas3D : Canvas
             OnCameraChanged();
         }
     }
+
+    /// <summary>
+    /// The universal 3D engine the specific canvas installed from its
+    /// constructor, based on the driver it was built on, or
+    /// <see langword="null"/> when the canvas drives its device directly.
+    /// The engine is an independent layer: it renders device-side and
+    /// presents onto whatever canvas owns it, so an engine written for one
+    /// driver's canvas carries over to another canvas type unchanged.
+    /// </summary>
+    [Experimental(Experimentals.DriverKitSeamDiagId)]
+    public ICosmEngine? Engine { get; protected internal set; }
 
     /// <summary>
     /// Initializes a 3D canvas over a published display, in the display's

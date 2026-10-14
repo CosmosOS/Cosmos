@@ -387,6 +387,106 @@ Cosmos.Kernel.System.Graphics.ColorDepth.ColorDepth8 = 8 -> Cosmos.Kernel.System
 Cosmos.Kernel.System.Graphics.ColorOrder
 Cosmos.Kernel.System.Graphics.ColorOrder.BGR = 1 -> Cosmos.Kernel.System.Graphics.ColorOrder
 Cosmos.Kernel.System.Graphics.ColorOrder.RGB = 0 -> Cosmos.Kernel.System.Graphics.ColorOrder
+Cosmos.Kernel.System.Graphics.CosmSl.AssignmentStatement.AssignmentStatement() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.BinaryOpExpression.BinaryOpExpression() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.CosmCompiler
+Cosmos.Kernel.System.Graphics.CosmSl.CosmSlException
+Cosmos.Kernel.System.Graphics.CosmSl.CosmSlException.CosmSlException(string message, int line) -> void
+Cosmos.Kernel.System.Graphics.CosmSl.CosmSlException.Line.get -> int
+Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode.ExpressionNode() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FieldNode.FieldNode() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionCallExpression.Arguments.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode!>!
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionCallExpression.FunctionCallExpression() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.Body.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Graphics.CosmSl.StatementNode!>!
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.FunctionDeclNode() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.Parameters.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Graphics.CosmSl.ParameterNode!>!
+Cosmos.Kernel.System.Graphics.CosmSl.LiteralExpression.LiteralExpression() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.MemberAccessExpression.MemberAccessExpression() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ParameterNode.ParameterNode() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ReturnStatement.ReturnStatement() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ShaderProgramNode
+Cosmos.Kernel.System.Graphics.CosmSl.ShaderProgramNode.Functions.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode!>!
+Cosmos.Kernel.System.Graphics.CosmSl.ShaderProgramNode.Functions.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ShaderProgramNode.ShaderProgramNode() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ShaderProgramNode.Structs.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Graphics.CosmSl.StructDeclNode!>!
+Cosmos.Kernel.System.Graphics.CosmSl.ShaderProgramNode.Structs.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ShaderProgramNode.Uniforms.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Graphics.CosmSl.UniformNode!>!
+Cosmos.Kernel.System.Graphics.CosmSl.ShaderProgramNode.Uniforms.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.StatementNode.StatementNode() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.StructDeclNode
+Cosmos.Kernel.System.Graphics.CosmSl.StructDeclNode.Fields.get -> System.Collections.Generic.List<Cosmos.Kernel.System.Graphics.CosmSl.FieldNode!>!
+Cosmos.Kernel.System.Graphics.CosmSl.StructDeclNode.Fields.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.StructDeclNode.Name.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.StructDeclNode.Name.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FieldNode
+Cosmos.Kernel.System.Graphics.CosmSl.FieldNode.Name.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.FieldNode.Name.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FieldNode.Semantic.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.FieldNode.Semantic.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FieldNode.Type.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.FieldNode.Type.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.StructDeclNode.StructDeclNode() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.UniformNode
+Cosmos.Kernel.System.Graphics.CosmSl.UniformNode.Name.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.UniformNode.Name.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.UniformNode.Type.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.UniformNode.Type.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.Body.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.Name.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.Name.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.Parameters.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.ReturnSemantic.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.ReturnSemantic.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.ReturnType.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionDeclNode.ReturnType.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ParameterNode
+Cosmos.Kernel.System.Graphics.CosmSl.ParameterNode.Name.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.ParameterNode.Name.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ParameterNode.Type.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.ParameterNode.Type.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.StatementNode
+Cosmos.Kernel.System.Graphics.CosmSl.UniformNode.UniformNode() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.VariableDeclarationStatement
+Cosmos.Kernel.System.Graphics.CosmSl.VariableDeclarationStatement.Initializer.get -> Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode?
+Cosmos.Kernel.System.Graphics.CosmSl.VariableDeclarationStatement.Initializer.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.VariableDeclarationStatement.Type.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.VariableDeclarationStatement.Type.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.VariableDeclarationStatement.VariableDeclarationStatement() -> void
+Cosmos.Kernel.System.Graphics.CosmSl.VariableDeclarationStatement.VariableName.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.VariableDeclarationStatement.VariableName.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.AssignmentStatement
+Cosmos.Kernel.System.Graphics.CosmSl.AssignmentStatement.Target.get -> Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode!
+Cosmos.Kernel.System.Graphics.CosmSl.AssignmentStatement.Target.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.AssignmentStatement.Value.get -> Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode!
+Cosmos.Kernel.System.Graphics.CosmSl.AssignmentStatement.Value.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ReturnStatement
+Cosmos.Kernel.System.Graphics.CosmSl.ReturnStatement.Expression.get -> Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode?
+Cosmos.Kernel.System.Graphics.CosmSl.ReturnStatement.Expression.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode
+Cosmos.Kernel.System.Graphics.CosmSl.LiteralExpression
+Cosmos.Kernel.System.Graphics.CosmSl.LiteralExpression.Value.get -> float
+Cosmos.Kernel.System.Graphics.CosmSl.LiteralExpression.Value.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.VariableRefExpression
+Cosmos.Kernel.System.Graphics.CosmSl.VariableRefExpression.VariableName.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.VariableRefExpression.VariableName.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.MemberAccessExpression
+Cosmos.Kernel.System.Graphics.CosmSl.MemberAccessExpression.MemberName.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.MemberAccessExpression.MemberName.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.MemberAccessExpression.ObjectRef.get -> Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode!
+Cosmos.Kernel.System.Graphics.CosmSl.MemberAccessExpression.ObjectRef.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.BinaryOpExpression
+Cosmos.Kernel.System.Graphics.CosmSl.BinaryOpExpression.Left.get -> Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode!
+Cosmos.Kernel.System.Graphics.CosmSl.BinaryOpExpression.Left.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.BinaryOpExpression.Operator.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.BinaryOpExpression.Operator.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.BinaryOpExpression.Right.get -> Cosmos.Kernel.System.Graphics.CosmSl.ExpressionNode!
+Cosmos.Kernel.System.Graphics.CosmSl.BinaryOpExpression.Right.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionCallExpression
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionCallExpression.Arguments.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionCallExpression.FunctionName.get -> string!
+Cosmos.Kernel.System.Graphics.CosmSl.FunctionCallExpression.FunctionName.set -> void
+Cosmos.Kernel.System.Graphics.CosmSl.VariableRefExpression.VariableRefExpression() -> void
 Cosmos.Kernel.System.Graphics.DisplayDevice
 Cosmos.Kernel.System.Graphics.DisplayDevice.BitsPerPixel.get -> int
 Cosmos.Kernel.System.Graphics.DisplayDevice.DriverName.get -> string!
@@ -467,6 +567,9 @@ Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateMesh(System.ReadOnlySpa
 Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateMesh(System.ReadOnlySpan<System.Numerics.Vector3> positions, System.ReadOnlySpan<uint> colors, System.ReadOnlySpan<ushort> indices) -> Cosmos.Kernel.System.Graphics.Rendering3D.Mesh!
 Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateMeshHandle(int vertexCount, int indexCount, Cosmos.Kernel.System.Graphics.Rendering3D.Texture? texture, Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology topology, object? driverData) -> Cosmos.Kernel.System.Graphics.Rendering3D.Mesh!
 Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.CreateTextureHandle(int width, int height, object? driverData) -> Cosmos.Kernel.System.Graphics.Rendering3D.Texture!
+static Cosmos.Kernel.System.Graphics.CosmSl.CosmCompiler.Parse(string! source) -> Cosmos.Kernel.System.Graphics.CosmSl.ShaderProgramNode!
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.Engine.get -> Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine?
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.Engine.set -> void
 Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DrawCube(System.Numerics.Vector3 position, System.Numerics.Vector3 size, System.Drawing.Color color) -> void
 Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DrawGrid(int slices, float spacing, System.Drawing.Color color) -> void
 Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D.DrawLine3D(System.Numerics.Vector3 start, System.Numerics.Vector3 end, System.Drawing.Color color) -> void
@@ -1395,3 +1498,14 @@ virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnWritten(char value, bool 
 [COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.Send(Cosmos.Kernel.System.Network.Protocols.InternetPacket! packet) -> bool
 [COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICanvas3DFactory
 [COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICanvas3DFactory.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.ClearScene(System.Drawing.Color color, float depth) -> void
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.CreateMeshData(System.ReadOnlySpan<System.Numerics.Vector3> positions, System.ReadOnlySpan<uint> colors, System.ReadOnlySpan<System.Numerics.Vector2> uvs, Cosmos.Kernel.System.Graphics.Rendering3D.Texture? texture, System.ReadOnlySpan<ushort> indices, Cosmos.Kernel.System.Graphics.Rendering3D.MeshTopology topology) -> object!
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.CreateTextureData(Cosmos.Kernel.System.Graphics.Image! image) -> object!
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.DestroyMeshData(object! meshData) -> void
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.DestroyTextureData(object! textureData) -> void
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.DrawMesh(object! meshData, in System.Numerics.Matrix4x4 world) -> void
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.Name.get -> string
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.Present() -> void
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.Ready.get -> bool
+[COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICosmEngine.SetCamera(in System.Numerics.Matrix4x4 view, in System.Numerics.Matrix4x4 projection) -> void
