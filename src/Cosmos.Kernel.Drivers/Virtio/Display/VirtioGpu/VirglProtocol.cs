@@ -28,6 +28,7 @@ internal static class Virgl
     public const uint CmdSetSamplerViews = 10;
     public const uint CmdSetIndexBuffer = 11;
     public const uint CmdSetUniformBuffer = 27;
+    public const uint CmdSetConstantBuffer = 12;
     public const uint CmdBindSamplerStates = 18;
     public const uint CmdBindShader = 31;
     public const uint CmdTransfer3D = 43;

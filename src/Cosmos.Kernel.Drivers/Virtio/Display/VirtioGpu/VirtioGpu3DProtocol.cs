@@ -149,6 +149,9 @@ internal struct VirtioGpuResourceCreate3D
 
     /// <summary>Reserved.</summary>
     public uint Flags;
+
+    /// <summary>Reserved; the device struct carries one dword more.</summary>
+    public uint Padding;
 }
 
 /// <summary>

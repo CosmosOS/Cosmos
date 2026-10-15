@@ -194,7 +194,7 @@ internal static class TgsiEmitter
 
             if (_constantSlots > 0)
             {
-                _decls.Add(TgsiDecl.TwoDimensional(FileConstant, 0, _constantSlots - 1, 0));
+                _decls.Add(TgsiDecl.TwoDimensional(FileConstant, 0, 0, _constantSlots - 1));
             }
 
             for (int i = 0; i < _samplerCount; i++)
@@ -1156,6 +1156,7 @@ internal static class TgsiEmitter
                 // END and friends carry no operands at all.
                 if (instruction.Dst.File != 0)
                 {
+                    text.Append(' ');
                     AppendDst(text, instruction.Dst);
                 }
 
@@ -1239,16 +1240,20 @@ internal static class TgsiEmitter
             text.Append(source.Index);
             text.Append(']');
 
-            if (!string.IsNullOrEmpty(source.Swizzle) && source.Swizzle != "xyzw")
+            // Sampler operands carry no swizzle: the host's translator appends
+            // it verbatim to the GLSL sampler name, which then fails to compile.
+            if (source.File == FileSampler || string.IsNullOrEmpty(source.Swizzle) || source.Swizzle == "xyzw")
             {
-                text.Append('.');
-                // Source swizzles are always four components on the wire;
-                // the host's parser rejects shorter forms.
-                char[] swizzleChars = source.Swizzle.ToCharArray();
-                for (int c = 0; c < 4; c++)
-                {
-                    text.Append(swizzleChars[Math.Min(c, swizzleChars.Length - 1)]);
-                }
+                return;
+            }
+
+            text.Append('.');
+            // Source swizzles are always four components on the wire;
+            // the host's parser rejects shorter forms.
+            char[] swizzleChars = source.Swizzle.ToCharArray();
+            for (int c = 0; c < 4; c++)
+            {
+                text.Append(swizzleChars[Math.Min(c, swizzleChars.Length - 1)]);
             }
         }
 

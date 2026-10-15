@@ -52,9 +52,7 @@ internal sealed class Virtio3DEngine : ICosmEngine
     private const uint FirstMeshElementHandle = 100;
     private const uint FirstSamplerViewHandle = 1000;
 
-    // The uniform buffer holds the clip-space matrix rows of the current
-    // draw (4 vec4). Sized to a round 256 bytes for headroom.
-    private const uint UniformBufferLength = 256;
+    // The clip transform rides as inline vertex constants (4 vec4 rows).
     private const int MatrixFloats = 16;
 
     // Bytes of one page, the alignment every backing asks for.
@@ -68,10 +66,8 @@ internal sealed class Virtio3DEngine : ICosmEngine
     private readonly float[] _uniforms = new float[MatrixFloats];
 
     private DmaBuffer? _colorStaging;
-    private DmaBuffer? _uniformBacking;
     private uint _colorResourceId;
     private uint _depthResourceId;
-    private uint _uniformResourceId;
     private bool _ready;
     private bool _sceneOpen;
     private Matrix4x4 _view = Matrix4x4.Identity;
@@ -129,7 +125,7 @@ internal sealed class Virtio3DEngine : ICosmEngine
         int streamCount = 1 + (colored ? 1 : 0) + (textured ? 1 : 0);
         uint[] streamResourceIds = new uint[streamCount];
 
-        if (CreateBufferResource((uint)(positions.Length * 12), out streamResourceIds[0]) is DmaBuffer positionBuffer)
+        if (CreateBufferResource((uint)(positions.Length * 12), Virgl.BindVertexBuffer, out streamResourceIds[0]) is DmaBuffer positionBuffer)
         {
             positions.CopyTo(MemoryMarshal.Cast<byte, Vector3>(positionBuffer.Span));
             UploadBuffer(streamResourceIds[0], (uint)(positions.Length * 12));
@@ -138,7 +134,7 @@ internal sealed class Virtio3DEngine : ICosmEngine
         int stream = 1;
         if (colored)
         {
-            if (CreateBufferResource((uint)(colors.Length * 4), out streamResourceIds[stream]) is DmaBuffer colorBuffer)
+            if (CreateBufferResource((uint)(colors.Length * 4), Virgl.BindVertexBuffer, out streamResourceIds[stream]) is DmaBuffer colorBuffer)
             {
                 colors.CopyTo(MemoryMarshal.Cast<byte, uint>(colorBuffer.Span));
                 UploadBuffer(streamResourceIds[stream], (uint)(colors.Length * 4));
@@ -148,7 +144,7 @@ internal sealed class Virtio3DEngine : ICosmEngine
 
         if (textured)
         {
-            if (CreateBufferResource((uint)(uvs.Length * 8), out streamResourceIds[stream]) is DmaBuffer uvBuffer)
+            if (CreateBufferResource((uint)(uvs.Length * 8), Virgl.BindVertexBuffer, out streamResourceIds[stream]) is DmaBuffer uvBuffer)
             {
                 uvs.CopyTo(MemoryMarshal.Cast<byte, Vector2>(uvBuffer.Span));
                 UploadBuffer(streamResourceIds[stream], (uint)(uvs.Length * 8));
@@ -157,7 +153,7 @@ internal sealed class Virtio3DEngine : ICosmEngine
         }
 
         uint indexResourceId = 0;
-        if (CreateBufferResource((uint)(indices.Length * 2), out indexResourceId) is DmaBuffer indexBuffer)
+        if (CreateBufferResource((uint)(indices.Length * 2), Virgl.BindIndexBuffer, out indexResourceId) is DmaBuffer indexBuffer)
         {
             indices.CopyTo(MemoryMarshal.Cast<byte, ushort>(indexBuffer.Span));
             UploadBuffer(indexResourceId, (uint)(indices.Length * 2));
@@ -338,7 +334,7 @@ internal sealed class Virtio3DEngine : ICosmEngine
 
         _stream.Clear();
         Cmd(Virgl.CmdClear, 0, 8);
-        U(Virgl.ClearColorOffset0 | Virgl.ClearDepth);
+        U(Virgl.ClearColor0 | Virgl.ClearDepth);
         F(color.R / 255f);
         F(color.G / 255f);
         F(color.B / 255f);
@@ -359,8 +355,10 @@ internal sealed class Virtio3DEngine : ICosmEngine
         }
 
         // The clip transform composes in row-vector order, matching the
-        // System.Numerics matrices the canvas layer feeds in.
-        Matrix4x4 clip = world * _view * _projection;
+        // System.Numerics matrices the canvas layer feeds in; the transpose
+        // fits the shader's DP4 chain, which multiplies the matrix rows
+        // column-style.
+        Matrix4x4 clip = Matrix4x4.Transpose(world * _view * _projection);
         _uniforms[0] = clip.M11;
         _uniforms[1] = clip.M12;
         _uniforms[2] = clip.M13;
@@ -378,15 +376,28 @@ internal sealed class Virtio3DEngine : ICosmEngine
         _uniforms[14] = clip.M43;
         _uniforms[15] = clip.M44;
 
-        DmaBuffer? uniformBacking = _uniformBacking;
-        if (uniformBacking is null)
-        {
-            return;
-        }
-
-        _uniforms.CopyTo(MemoryMarshal.Cast<byte, float>(uniformBacking.Span));
-
         _stream.Clear();
+
+        // The shader pair follows the mesh: the colored pair for plain
+        // meshes, the textured pair once a texture maps.
+        if (data.HasTexture)
+        {
+            Cmd(Virgl.CmdBindShader, 0, 2);
+            U(TexturedVertexShaderHandle);
+            U(Virgl.ShaderVertex);
+            Cmd(Virgl.CmdBindShader, 0, 2);
+            U(TexturedFragmentShaderHandle);
+            U(Virgl.ShaderFragment);
+        }
+        else
+        {
+            Cmd(Virgl.CmdBindShader, 0, 2);
+            U(ColoredVertexShaderHandle);
+            U(Virgl.ShaderVertex);
+            Cmd(Virgl.CmdBindShader, 0, 2);
+            U(ColoredFragmentShaderHandle);
+            U(Virgl.ShaderFragment);
+        }
 
         // Vertex buffers, in the same order as the vertex elements object.
         Cmd(Virgl.CmdSetVertexBuffers, 0, (uint)data.StreamResourceIds.Length * 3);
@@ -405,16 +416,16 @@ internal sealed class Virtio3DEngine : ICosmEngine
         U(2);
         U(0);
 
-        // The clip matrix rows ride in uniform buffer slot 0; uploaded per
-        // draw because the world matrix changes constantly.
-        AppendTransfer3D(_uniformResourceId, MatrixFloats * 4);
-
-        Cmd(Virgl.CmdSetUniformBuffer, 0, 5);
+        // The clip matrix rows ride as inline vertex constants; SET_UNIFORM_BUFFER
+        // only feeds shaders declaring their constants in a UBO slot above zero,
+        // while the built-in shaders read CONST[0][x], the classic const set.
+        Cmd(Virgl.CmdSetConstantBuffer, 0, 2 + MatrixFloats);
         U(Virgl.ShaderVertex);
-        U(0);
-        U(0);
-        U(MatrixFloats * 4);
-        U(_uniformResourceId);
+        U(0); // unused buffer index dword
+        for (int i = 0; i < MatrixFloats; i++)
+        {
+            U((uint)BitConverter.SingleToInt32Bits(_uniforms[i]));
+        }
 
         VirtioTextureData? textureData = TextureDataOf(data.Texture);
         if (data.HasTexture && textureData is not null)
@@ -617,17 +628,6 @@ internal sealed class Virtio3DEngine : ICosmEngine
             return false;
         }
 
-        // Uniform buffer: guest-side constant store for the clip matrix.
-        _uniformResourceId = _state.ReserveResourceId();
-        _uniformBacking = _state.AllocateBacking((int)UniformBufferLength, PageBytes);
-        if (!_state.Create3DResource(_uniformResourceId, Virgl.PipeBuffer, Virgl.FormatR8Unorm,
-                                     Virgl.BindConstantBuffer, UniformBufferLength, 1, 1, 1, 0, 1)
-            || !_state.AttachBacking(_uniformResourceId, _uniformBacking)
-            || !_state.AttachResourceToContext(ContextId, _uniformResourceId))
-        {
-            return false;
-        }
-
         return true;
     }
 
@@ -645,14 +645,7 @@ internal sealed class Virtio3DEngine : ICosmEngine
             _depthResourceId = 0;
         }
 
-        if (_uniformResourceId != 0)
-        {
-            _state.Destroy3DResource(_uniformResourceId);
-            _uniformResourceId = 0;
-        }
-
         _colorStaging = null;
-        _uniformBacking = null;
     }
 
     /// <summary>
@@ -799,7 +792,11 @@ internal sealed class Virtio3DEngine : ICosmEngine
         Cmd(Virgl.CmdBindObject, Virgl.ObjectRasterizer, 1);
         U(RasterizerHandle);
 
-        Cmd(Virgl.CmdBindObject, Virgl.ObjectSamplerState, 1);
+        // The host only accepts blend, dsa, rasterizer and vertex elements
+        // objects on BIND_OBJECT; sampler states carry their own command.
+        Cmd(Virgl.CmdBindSamplerStates, 0, 3);
+        U(Virgl.ShaderFragment);
+        U(0);
         U(SamplerStateHandle);
 
         Cmd(Virgl.CmdSetFramebufferState, 0, 3);
@@ -823,12 +820,11 @@ internal sealed class Virtio3DEngine : ICosmEngine
 
     // --- Mesh resource helpers ---
 
-    private DmaBuffer? CreateBufferResource(uint byteLength, out uint resourceId)
+    private DmaBuffer? CreateBufferResource(uint byteLength, uint bind, out uint resourceId)
     {
         resourceId = _state.ReserveResourceId();
         if (!_state.Create3DResource(resourceId, Virgl.PipeBuffer, Virgl.FormatR8Unorm,
-                                     Virgl.BindVertexBuffer | Virgl.BindIndexBuffer | Virgl.BindConstantBuffer,
-                                     byteLength, 1, 1, 1, 0, 1))
+                                     bind, byteLength, 1, 1, 1, 0, 1))
         {
             resourceId = 0;
             return null;
