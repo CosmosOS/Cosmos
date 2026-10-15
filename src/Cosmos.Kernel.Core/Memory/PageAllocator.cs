@@ -141,78 +141,6 @@ internal static unsafe class PageAllocator
     }
 
     /// <summary>
-    /// Check if an address is in a usable memory region according to Limine memory map
-    /// </summary>
-    /// <param name="address">Virtual address to check</param>
-    /// <param name="size">Size of the region</param>
-    /// <returns>True if the region is usable, false otherwise</returns>
-    private static bool IsUsableMemoryRegion(byte* address, ulong size)
-    {
-        if (Limine.MemoryMap.Response == null)
-        {
-            Serial.WriteString("[PageAllocator] Warning: No memory map available, assuming usable\n");
-            return true;
-        }
-
-        ulong virtualAddressStart = (ulong)address;
-        ulong virtualAddressEnd = virtualAddressStart + size;
-
-        // Convert virtual addresses to physical addresses for comparison with memory map
-        ulong physicalAddressStart = VirtualToPhysical(virtualAddressStart);
-        ulong physicalAddressEnd = VirtualToPhysical(virtualAddressEnd);
-
-        Serial.WriteString("[PageAllocator] Checking virtual 0x");
-        Serial.WriteHex(virtualAddressStart);
-        Serial.WriteString(" -> physical 0x");
-        Serial.WriteHex(physicalAddressStart);
-        Serial.WriteString("\n");
-
-        bool foundMatch = false;
-        for (ulong i = 0; i < Limine.MemoryMap.Response->EntryCount; i++)
-        {
-            LimineMemmapEntry* entry = Limine.MemoryMap.Response->Entries[i];
-            ulong entryStart = (ulong)entry->Base;
-            ulong entryEnd = entryStart + entry->Length;
-
-            // Check if our physical allocation overlaps with this memory region
-            if (physicalAddressStart < entryEnd && physicalAddressEnd > entryStart)
-            {
-                foundMatch = true;
-                Serial.WriteString("[PageAllocator] Physical region 0x");
-                Serial.WriteHex(physicalAddressStart);
-                Serial.WriteString("-0x");
-                Serial.WriteHex(physicalAddressEnd);
-                Serial.WriteString(" overlaps with entry ");
-                Serial.WriteNumber(i);
-                Serial.WriteString(" (0x");
-                Serial.WriteHex(entryStart);
-                Serial.WriteString("-0x");
-                Serial.WriteHex(entryEnd);
-                Serial.WriteString(") type: ");
-                Serial.WriteNumber((uint)entry->Type);
-                Serial.WriteString("\n");
-
-                // Only allow allocation in usable memory
-                if (entry->Type != LimineMemmapType.Usable)
-                {
-                    Serial.WriteString("[PageAllocator] ERROR: Attempting to allocate in non-usable memory region!\n");
-                    return false;
-                }
-            }
-        }
-
-        if (!foundMatch)
-        {
-            Serial.WriteString("[PageAllocator] ERROR: Physical address 0x");
-            Serial.WriteHex(physicalAddressStart);
-            Serial.WriteString(" not found in any usable memory map entry!\n");
-            return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
     /// Init RAT based on Limine memory map usable regions only.
     /// This follows the Cosmos OS memory structure with RAT at the END of heap.
     /// </summary>
@@ -892,35 +820,5 @@ internal static unsafe class PageAllocator
                 default: unknown++; break;
             }
         }
-    }
-
-    internal static void DumpPageCounts()
-    {
-        GetPageCountsByType(
-            out ulong empty,
-            out ulong gcHeap,
-            out ulong heapSmall,
-            out ulong heapMedium,
-            out ulong heapLarge,
-            out ulong unmanaged,
-            out ulong pageDirectory,
-            out ulong pageAllocator,
-            out ulong smt,
-            out ulong extension,
-            out ulong unknown);
-
-        Serial.WriteString("[PageAllocator] Page counts by type:\n");
-        Serial.WriteString("  Empty: "); Serial.WriteNumber(empty); Serial.WriteString("\n");
-        Serial.WriteString("  GCHeap: "); Serial.WriteNumber(gcHeap); Serial.WriteString("\n");
-        Serial.WriteString("  HeapSmall: "); Serial.WriteNumber(heapSmall); Serial.WriteString("\n");
-        Serial.WriteString("  HeapMedium: "); Serial.WriteNumber(heapMedium); Serial.WriteString("\n");
-        Serial.WriteString("  HeapLarge: "); Serial.WriteNumber(heapLarge); Serial.WriteString("\n");
-        Serial.WriteString("  Unmanaged: "); Serial.WriteNumber(unmanaged); Serial.WriteString("\n");
-        Serial.WriteString("  PageDirectory: "); Serial.WriteNumber(pageDirectory); Serial.WriteString("\n");
-        Serial.WriteString("  PageAllocator: "); Serial.WriteNumber(pageAllocator); Serial.WriteString("\n");
-        Serial.WriteString("  SMT: "); Serial.WriteNumber(smt); Serial.WriteString("\n");
-        Serial.WriteString("  Extension: "); Serial.WriteNumber(extension); Serial.WriteString("\n");
-        if (unknown > 0) { Serial.WriteString("  Unknown/Other: "); Serial.WriteNumber(unknown); Serial.WriteString("\n"); }
-        Serial.WriteString("  Total: "); Serial.WriteNumber(TotalPageCount); Serial.WriteString("\n");
     }
 }

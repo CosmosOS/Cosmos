@@ -1,7 +1,9 @@
 // ARM64 Page Table helpers for modifying TTBR1 mappings.
 // Used to add Device MMIO entries to Limine's HHDM page tables.
 
+.global _native_arm64_read_ttbr0_el1
 .global _native_arm64_read_ttbr1_el1
+.global _native_arm64_read_tcr_el1
 .global _native_arm64_read_mair_el1
 .global _native_arm64_tlbi_vale1
 .global _native_arm64_tlbi_all
@@ -19,10 +21,29 @@ spare_l2_table:
 
 .section .text
 
+// ulong _native_arm64_read_ttbr0_el1(void)
+// Lower-half translation table root. The kernel heap is identity-mapped, so
+// every heap pointer is a low-half VA served by this table; reading TTBR1
+// alone makes the whole heap untranslatable.
+.balign 4
+_native_arm64_read_ttbr0_el1:
+    mrs     x0, ttbr0_el1
+    ret
+
 // ulong _native_arm64_read_ttbr1_el1(void)
 .balign 4
 _native_arm64_read_ttbr1_el1:
     mrs     x0, ttbr1_el1
+    ret
+
+// ulong _native_arm64_read_tcr_el1(void)
+// T0SZ is bits [5:0] and T1SZ is bits [21:16]. Each gives the low/high half's
+// virtual-address size as 64 - T0SZ / 64 - T1SZ, i.e. how many bits below the
+// sign-extension are actually translated. Reading these instead of assuming
+// T1SZ=16 keeps the page-table walk correct whatever the bootloader chose.
+.balign 4
+_native_arm64_read_tcr_el1:
+    mrs     x0, tcr_el1
     ret
 
 // ulong _native_arm64_read_mair_el1(void)
