@@ -422,7 +422,7 @@ internal static unsafe partial class GarbageCollector
 
         // Outside the masked section; left to the next allocation when the caller masked
         // interrupts itself (the allocator does)
-        RunPendingFinalizers();
+        SignalPendingFinalizers();
 
         return freedCount;
     }
@@ -448,7 +448,7 @@ internal static unsafe partial class GarbageCollector
         // allocation, not after: nothing would keep the new object alive while they run.
         if (s_finalizerQueueHead != s_finalizerQueue.Count)
         {
-            RunPendingFinalizers();
+            WaitPendingFinalizers();
         }
 
         // The whole allocation must be atomic with respect to interrupts: IRQ

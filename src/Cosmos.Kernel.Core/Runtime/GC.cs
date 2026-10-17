@@ -157,7 +157,7 @@ internal static unsafe class GC
     internal static void RhWaitForPendingFinalizers(int allowReentrantWait)
     {
         // No finalizer thread to wait for: the caller runs what is pending
-        GarbageCollector.RunPendingFinalizers();
+        GarbageCollector.WaitPendingFinalizers();
     }
 
     [RuntimeExport("RhGetMaxGcGeneration")]
