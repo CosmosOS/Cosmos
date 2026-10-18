@@ -161,7 +161,7 @@ internal static unsafe partial class GarbageCollector
             {
                 return;
             }
-            
+
             if (value)
             {
                 if (Interlocked.CompareExchange(ref s_finalizerThreadState, FinalizerStarting, FinalizerStopped) != FinalizerStopped)
@@ -416,7 +416,7 @@ internal static unsafe partial class GarbageCollector
             }
 
             s_finalizerMutex.Acquire();
-            if (s_finalizerRequested) 
+            if (s_finalizerRequested)
             {
                 s_finalizerMutex.Release();
                 continue;
