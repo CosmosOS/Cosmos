@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
-using Mutex = Cosmos.Kernel.Core.Scheduler.Mutex;
+using Monitor = Cosmos.Kernel.Core.Scheduler.Monitor;
 
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
 
@@ -88,6 +88,19 @@ internal static unsafe partial class GarbageCollector
         }
     }
 
+    /// <summary>
+    /// State of the finalizer thread. Do not use it outside of GargageColection.Finalizer.
+    /// If you are using it you should now what your doing.
+    /// </summary>
+    private enum ThreadFinalizerStatus
+    {
+        Stopped,
+        Starting,
+        Running,
+        Stopping,
+        Exited,
+    }
+
     // --- Static fields ---
 
     /// <summary>
@@ -124,20 +137,24 @@ internal static unsafe partial class GarbageCollector
     /// </summary>
     private static SchedulerThread? s_finalizerThread;
 
-    // state machine of the finilize, we can't use a Mutex here. Mutex imply to have an started GC
-    private const int FinalizerStopped = 0, FinalizerStarting = 1, FinalizerRunning = 2, FinalizerStopping = 3;
+    /// <summary>
+    /// Monitor for <see cref="s_finalizerThread"/> thread.
+    /// Lazy init by <see cref="ThreadedFinalizer"/>.
+    /// Use to protect <see cref="s_finalizerRequested"/>,
+    /// <see cref="s_finalizerRequestSeq"/> and <see cref="s_finalizerDoneSeq"/>.
+    /// </summary>
+    private static Monitor? s_finalizerMonitor = null;
 
-    private static InterruptEvent? s_finalizerWake = null;
-    private static InterruptEvent? s_finalizerExited = null;
-    private static InterruptEvent? s_finalizerWorkDone = null;
+    private static bool s_finalizerRequested;       // protected by s_finalizerMonitor
+    private static ulong s_finalizerRequestSeq;     // protected by s_finalizerMonitor
+    private static ulong s_finalizerDoneSeq;        // protected by s_finalizerMonitor
 
-    private static volatile bool s_stopRequested;
-    private static volatile int s_finalizerThreadState;
-
-    private static Mutex? s_finalizerMutex = null;
-    private static bool s_finalizerRequested;       // protected by s_finalizerMutex
-    private static int s_waitPendingFinalizers;     // protected by s_finalizerMutex
-    private static bool s_finalizerThreadWorking;   // protected by s_finalizerMutex
+    /// <summary>
+    /// Use <see cref="s_finalizerMonitor"/> to signal a major state.
+    /// Like <see cref="ThreadFinalizerStatus.Stopped"/> and <see cref="ThreadFinalizerStatus.Running"/>.
+    /// Use <see cref="Interlocked"/> to interact with it.
+    /// </summary>
+    private static volatile ThreadFinalizerStatus s_threadFinalizerStatus = ThreadFinalizerStatus.Stopped;
 
     // --- Properties ---
 
@@ -147,70 +164,40 @@ internal static unsafe partial class GarbageCollector
     /// Starting or stopping the thread will be reported as the thread not started.
     /// Edge case: The thread is stopping and you set to true. It will not start the thread.
     /// </summary>
-    [MemberNotNullWhen(true, "s_finalizerThreadState")]
-    [MemberNotNullWhen(true, "s_finalizerWake")]
-    [MemberNotNullWhen(true, "s_finalizerExited")]
-    [MemberNotNullWhen(true, "s_finalizerWorkDone")]
-    [MemberNotNullWhen(true, "s_finalizerMutex")]
+    [MemberNotNullWhen(true, "s_finalizerMonitor")] // lazy init, also true after
+    [MemberNotNullWhen(true, "s_finalizerThread")]
     public static bool ThreadedFinalizer
     {
-        get => s_finalizerThreadState is FinalizerRunning;
+        get => s_threadFinalizerStatus is ThreadFinalizerStatus.Running or ThreadFinalizerStatus.Starting;
         set
         {
             if (!CosmosFeatures.SchedulerEnabled)
             {
                 return;
             }
-
             if (value)
             {
-                if (Interlocked.CompareExchange(ref s_finalizerThreadState, FinalizerStarting, FinalizerStopped) != FinalizerStopped)
-                {
-                    // todo the edge case, wait the thread end to restart it...
-                    return;
-                }
-
-                s_stopRequested = false;
-                s_finalizerWake = new InterruptEvent();
-                s_finalizerExited = new InterruptEvent();
-                s_finalizerWorkDone = new InterruptEvent();
-                s_finalizerMutex ??= new Mutex(); // lazy init can't init beffor GC inited
-                s_waitPendingFinalizers = 0;
-
-                if (KernelThread.TryStart(RunFinalizerWorker, out s_finalizerThread))
-                {
-                    s_finalizerThreadState = FinalizerRunning;
-                }
-                else
-                {
-                    // TODO: error, report it?
-                    s_finalizerThreadState = FinalizerStopped;
-                }
+                StartFinalizerThread();
             }
             else
             {
-                if (Interlocked.CompareExchange(ref s_finalizerThreadState, FinalizerStopping, FinalizerRunning) != FinalizerRunning)
-                {
-                    return;
-                }
-                s_stopRequested = true;
-                s_finalizerWake!.Signal();
-                s_finalizerExited!.Wait();
-                s_finalizerThread = null;
-
-                s_finalizerMutex!.Acquire();
-                while (s_waitPendingFinalizers > 0)
-                {
-                    s_finalizerWorkDone!.Signal();
-                    s_waitPendingFinalizers--;
-                }
-                s_finalizerThreadWorking = false;
-                s_finalizerThreadState = FinalizerStopped;
-                s_finalizerMutex.Release();
+                StopFinalizerThread();
             }
-
         }
     }
+
+    // --- Public methods ---
+
+    /// <summary>
+    /// Returns the number of objects that were waiting for their finalizer when the last
+    /// collection ended.
+    /// </summary>
+    /// <returns>The count recorded by the last collection.</returns>
+    public static int GetFinalizationPendingCount()
+    {
+        return s_lastFinalizationPendingCount;
+    }
+
     // --- Internal methods ---
 
     /// <summary>
@@ -276,6 +263,10 @@ internal static unsafe partial class GarbageCollector
         }
     }
 
+    /// <summary>
+    /// Run a pass with the finalizer thread if <see cref="ThreadedFinalizer"/> is <see langword="true"/>
+    /// Else use the current thread to execute the finalizers.
+    /// </summary>
     internal static void WaitPendingFinalizers()
     {
         if (!FinalizationPending()
@@ -287,24 +278,33 @@ internal static unsafe partial class GarbageCollector
 
         if (ThreadedFinalizer)
         {
-            // TODO: set the thread as waiting beffor editing values
-            // else the thread can be kill (from what i have read)
-            s_finalizerMutex.Acquire();
-            s_finalizerRequested = true;
-            s_waitPendingFinalizers++;
-            if (!s_finalizerThreadWorking)
-            {
-                s_finalizerThreadWorking = true;
-                s_finalizerWake.Signal();
-            }
-            s_finalizerMutex.Release();
+            Monitor monitor = s_finalizerMonitor!;
 
-            s_finalizerWorkDone!.Wait();
+            monitor.Acquire();
+            // uncheck in case of an overflow after ~500 year it reset
+            ulong ticket = unchecked(++s_finalizerRequestSeq);
+            s_finalizerRequested = true;
+            monitor.SignalAll();
+
+            monitor.Acquire();
+            while (!IsPassDone(s_finalizerDoneSeq, ticket) && ThreadedFinalizer)
+            {
+                monitor.Wait();
+            }
+            bool done = s_finalizerDoneSeq >= ticket;
+            monitor.Release();
+
+            if (!done)
+            {
+                RunPendingFinalizers();
+            }
         }
         else
         {
             RunPendingFinalizers();
         }
+
+        static bool IsPassDone(ulong done, ulong ticket) => unchecked((long)(done - ticket)) >= 0;
     }
 
     /// <summary>
@@ -315,14 +315,10 @@ internal static unsafe partial class GarbageCollector
     {
         if (ThreadedFinalizer)
         {
-            s_finalizerMutex.Acquire();
+            Monitor monitor = s_finalizerMonitor!;
+            monitor.Acquire();
             s_finalizerRequested = true;
-            if (!s_finalizerThreadWorking)
-            {
-                s_finalizerThreadWorking = true;
-                s_finalizerWake.Signal();
-            }
-            s_finalizerMutex.Release();
+            monitor.SignalAll();
         }
         else
         {
@@ -330,17 +326,139 @@ internal static unsafe partial class GarbageCollector
         }
     }
 
-    /// <summary>
-    /// Returns the number of objects that were waiting for their finalizer when the last
-    /// collection ended.
-    /// </summary>
-    /// <returns>The count recorded by the last collection.</returns>
-    public static int GetFinalizationPendingCount()
+    // --- Private methods ---
+
+    private static void RunFinalizerWorker()
     {
-        return s_lastFinalizationPendingCount;
+        Monitor monitor = s_finalizerMonitor!;
+        monitor.Acquire();
+
+        while (!s_finalizerRequested && ThreadedFinalizer)
+        {
+            monitor.Wait();
+        }
+
+        while (ThreadedFinalizer)
+        {
+            s_finalizerRequested = false;
+            ulong seq = s_finalizerRequestSeq;
+            monitor.Release();
+
+            RunPendingFinalizers();
+
+            monitor.Acquire();
+            s_finalizerDoneSeq = seq;
+            monitor.SignalAll();
+            monitor.Acquire();
+
+            while (!s_finalizerRequested && ThreadedFinalizer)
+            {
+                monitor.Wait();
+            }
+        }
+
+        s_threadFinalizerStatus = ThreadFinalizerStatus.Exited;
+        monitor.SignalAll();
     }
 
-    // --- Private methods ---
+    /// <summary>
+    /// DO NOT CALL THIS METHOD use <see cref="ThreadedFinalizer"/>.
+    /// It's an helper method for a cleaner code.
+    /// </summary>
+    private static void StartFinalizerThread()
+    {
+        // This enum do verrrrry long code but i did some mistak when i use an int.
+        ThreadFinalizerStatus prev = Interlocked.CompareExchange(ref s_threadFinalizerStatus,
+                                                                 ThreadFinalizerStatus.Starting, ThreadFinalizerStatus.Stopped);
+        if (prev is ThreadFinalizerStatus.Starting or ThreadFinalizerStatus.Running)
+        {
+            return;
+        }
+
+        if (prev != ThreadFinalizerStatus.Stopped)
+        {
+            // Stopping / Exited: wait for the stopper to publish Stopped, then claim it.
+            // if we are here some one init the lazy beffor use
+            Monitor m = s_finalizerMonitor!;
+            m.Acquire();
+            while (true)
+            {
+                prev = Interlocked.CompareExchange(ref s_threadFinalizerStatus,
+                                                   ThreadFinalizerStatus.Starting, ThreadFinalizerStatus.Stopped);
+                if (prev == ThreadFinalizerStatus.Stopped)
+                {
+                    break;
+                }
+                if (prev is ThreadFinalizerStatus.Starting or ThreadFinalizerStatus.Running)
+                {
+                    // if some one else was waiting to restart
+                    m.Release();
+                    return;
+                }
+                m.Wait();
+            }
+            m.Release();
+        }
+
+        // Only the CAS winner reaches here, so the lazy ??= is not racy.
+        s_finalizerMonitor ??= new Monitor();
+        Monitor monitor = s_finalizerMonitor;
+
+        monitor.Acquire();
+        s_finalizerRequested = false;
+        s_finalizerDoneSeq = s_finalizerRequestSeq;
+
+        if (KernelThread.TryStart(RunFinalizerWorker, out s_finalizerThread))
+        {
+            s_threadFinalizerStatus = ThreadFinalizerStatus.Running;
+        }
+        else
+        {
+            // TODO: report the error
+            s_threadFinalizerStatus = ThreadFinalizerStatus.Stopped;     
+        }
+        monitor.SignalAll();
+    }
+
+    /// <summary>
+    /// DO NOT CALL THIS METHOD use <see cref="ThreadedFinalizer"/>
+    /// It's an helper method for a cleaner code.
+    /// </summary>
+    private static void StopFinalizerThread()
+    {
+        Monitor? monitor = s_finalizerMonitor;
+        if (monitor is null)
+        {
+            return;
+        }
+
+        monitor.Acquire();
+
+        while (s_threadFinalizerStatus == ThreadFinalizerStatus.Starting)
+        {
+            monitor.Wait();
+        }
+
+        if (s_threadFinalizerStatus != ThreadFinalizerStatus.Running)
+        {
+            // already Stopping/Exited/Stopped
+            monitor.Release();
+            return;
+        }
+
+        s_threadFinalizerStatus = ThreadFinalizerStatus.Stopping;
+        monitor.SignalAll();
+
+        monitor.Acquire();
+        while (s_threadFinalizerStatus != ThreadFinalizerStatus.Exited)
+        {
+            monitor.Wait();
+        }
+
+        s_finalizerThread = null;
+        s_threadFinalizerStatus = ThreadFinalizerStatus.Stopped;
+        monitor.SignalAll();
+    }
 
     private static bool FinalizationPending()
     {
@@ -358,6 +476,8 @@ internal static unsafe partial class GarbageCollector
     /// from an interrupt handler or a critical section. The queue is then left for the next
     /// call; the allocator makes one before each allocation.
     /// </remarks>
+    // TODO: RunPendingFinalizers is not thread safe! For now not big deal only one core on Cosmos
+    // InternalCpu.DisableInterruptsScope() made it thread safe (for now)
     private static void RunPendingFinalizers()
     {
         if (s_finalizerQueueHead == s_finalizerQueue.Count || !InternalCpu.InterruptsEnabled)
@@ -390,43 +510,6 @@ internal static unsafe partial class GarbageCollector
             }
             target = DequeueFinalizable(out finalizer);
         }
-    }
-
-    private static void RunFinalizerWorker()
-    {
-        InterruptEvent wake = s_finalizerWake!;
-        InterruptEvent exit = s_finalizerExited!;
-        InterruptEvent workDone = s_finalizerWorkDone!;
-
-        wake.Wait();
-        while (!s_stopRequested)
-        {
-            int served;
-            s_finalizerMutex!.Acquire();
-            s_finalizerRequested = false;
-            served = s_waitPendingFinalizers;
-            s_waitPendingFinalizers = 0;
-            s_finalizerMutex.Release();
-
-            RunPendingFinalizers();
-
-            for (int i = 0; i < served; i++)
-            {
-                workDone.Signal();
-            }
-
-            s_finalizerMutex.Acquire();
-            if (s_finalizerRequested)
-            {
-                s_finalizerMutex.Release();
-                continue;
-            }
-            s_finalizerThreadWorking = false;
-            s_finalizerMutex.Release();
-
-            wake.Wait();
-        }
-        exit.Signal();
     }
 
     /// <summary>
