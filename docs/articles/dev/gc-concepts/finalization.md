@@ -7,4 +7,4 @@ Resurrection is the side effect: while queued, the object is reachable again (th
 > [!NOTE]
 > Official docs: [Finalizers](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/finalizers).
 
-OrionGC does not implement finalization yet: finalizers never run, the allocation flags requesting finalization are accepted and ignored, and `WeakTrackResurrection` handles behave as plain storage. See [Handles during marking](../garbage-collector.md#handles-during-marking).
+OrionGC keeps the objects awaiting their finalizer in a queue that is a root of every collection, clears the short weak handles before queuing them and the resurrection-tracking ones after, and runs the finalizers after the collection. By default they run on the thread that collected, and on a dedicated finalizer thread only when Core turns `GarbageCollector.ThreadedFinalizer` on. See [Finalization](../garbage-collector.md#finalization) and [Handles during marking](../garbage-collector.md#handles-during-marking).

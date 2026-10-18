@@ -148,8 +148,8 @@ The store is owned by a single [`GCHandleManager`](https://github.com/CosmosOS/C
 
 | Type | Value | Keeps target alive? | Notes |
 |------|-------|--------------------|-------|
-| `Weak` | 0 | No | Freed after collection if the target died |
-| `WeakTrackResurrection` | 1 | No | Allocatable; there is no [finalization](gc-concepts/finalization.md) yet, so it behaves like storage only |
+| `Weak` | 0 | No | Cleared once marking finds the target dead, before [finalization](gc-concepts/finalization.md) can revive it |
+| `WeakTrackResurrection` | 1 | No | Cleared only once the target is dead after finalization too |
 | `Normal` | 2 | Yes | Scanned as a strong root |
 | `Pinned` | 3 | Yes | Scanned as a strong root; the target sits on the non-moving heap anyway |
 | dependent | 6 | Conditional | Primary in `Object`, secondary in `ExtraInfo`; matches the runtime's `HNDTYPE_DEPENDENT`. There is no named enum member for it |
@@ -215,7 +215,16 @@ The handle and frozen-segment exports:
 | `RhRegisterFrozenSegment` | `RegisterFrozenSegment` | Register a frozen region at startup |
 | `RhUpdateFrozenSegment` | `UpdateFrozenSegment` | Update a registered frozen region's bounds |
 
-Of the allocation flags only `GC_ALLOC_PINNED_OBJECT_HEAP` is honored; everything else (finalization, alignment, optional zeroing) is accepted and ignored. Regular-heap allocations are always handed out zeroed, whatever the flags say.
+The finalization exports live in [`GC.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Runtime/GC.cs) beside `RhGetMaxGcGeneration`, and back the `GC` class's finalizer methods and `GC.MaxGeneration`; [Finalization](#finalization) describes what they act on:
+
+| Runtime export | Maps to | Purpose |
+|----------------|---------|---------|
+| `RhSuppressFinalize` | `SuppressFinalize` | `GC.SuppressFinalize`: cancel every registration of the object |
+| `RhReRegisterForFinalize` | `TryRegisterForFinalize` | `GC.ReRegisterForFinalize`: register the object once more; false makes CoreLib throw `OutOfMemoryException` |
+| `RhWaitForPendingFinalizers` | `WaitPendingFinalizers` | `GC.WaitForPendingFinalizers`: waits for a pass of the finalizer thread, or runs the queue on the calling thread when the thread is off |
+| `RhGetMaxGcGeneration` | returns `0` | `GC.MaxGeneration`: the collector has a single generation |
+
+Of the allocation flags only `GC_ALLOC_PINNED_OBJECT_HEAP` is honored. The finalization flag is ignored because it is not needed: `AllocObject` registers every object whose type has a finalizer, whatever the flags say. The alignment and optional-zeroing flags are accepted and ignored too, and regular-heap allocations are always handed out zeroed.
 
 ### Allocation flow
 
@@ -303,7 +312,7 @@ Pinned objects bypass TLABs entirely: `AllocPinnedObject` bump-allocates in the 
 
 ## Collection
 
-A collection marks everything reachable, then reclaims everything that is not. The phase order below is forced by dependencies: TLABs must be returned before anything walks the heap, weak handles can only be judged once marking is complete, the free lists are rebuilt by the sweep that empties them, and the segment chains are tidied last so the next allocation lands well. `Collect()` returns the number of objects freed:
+A collection marks everything reachable, then reclaims everything that is not. The phase order below is forced by dependencies: TLABs must be returned before anything walks the heap, weak handles can only be judged once marking is complete, the dead objects that have a finalizer are revived between the clearing of the two kinds of weak handle, the free lists are rebuilt by the sweep that empties them, and the segment chains are tidied last so the next allocation lands well. The finalizers themselves run outside the masked section: `SignalPendingFinalizers` runs them or wakes the finalizer thread, and leaves them to the next allocation when the caller still has interrupts masked. `Collect()` returns the number of objects freed:
 
 ```mermaid
 sequenceDiagram
@@ -316,14 +325,18 @@ sequenceDiagram
     Note over GC: Interrupts disabled
     GC->>GC: ReturnAllAllocContexts (stamp TLAB gaps)
     GC->>GC: Clear all free lists
-    GC->>GC: MarkPhase (stacks, then handles)
-    GC->>GC: FreeWeakHandles
+    GC->>GC: MarkPhase (stacks, finalizer queue, handles)
+    GC->>GC: ClearShortWeakHandles
+    GC->>GC: MarkFinalizableObjects (queue and revive the dead finalizable objects)
+    GC->>GC: ScanDependentHandles (secondaries of the revived)
+    GC->>GC: ClearLongWeakHandles (resurrection-tracking, dependent)
     GC->>GC: SweepPhase (rebuild free lists)
     GC->>GC: Reorder regular segments, free empty ones
     GC->>GC: Reorder pinned segments, free empty ones
     GC->>PA: Free(empty multi-page segments)
     GC->>GC: RecomputeHeapRange
     Note over GC: Interrupts enabled
+    GC->>GC: SignalPendingFinalizers
     deactivate GC
     GC-->>App: freed object count
 ```
@@ -332,12 +345,14 @@ Generation 0 size and fragmentation are snapshotted before and after the phases,
 
 ### Mark phase
 
-The mark phase finds all reachable objects with a worklist. `MarkPhase` resets the mark stack, scans stack roots, then scans GC handles.
+The mark phase finds all reachable objects with a worklist. `MarkPhase` resets the mark stack, scans stack roots, marks the objects still waiting in the finalizer queue (they stay alive until their finalizer has run, see [Finalization](#finalization)), then scans GC handles.
 
 Stack scanning is a hybrid:
 
 - The **GC-triggering thread** is scanned **precisely**. It reached the collector through a managed call chain, so every return address up its stack is a call-site [safepoint](gc-concepts/safepoint.md) where GCInfo is valid. `PreciseScanCurrentThread` walks its frames one by one and reports exactly the slots the compiler says are live, including exception [funclet](gc-concepts/funclet.md) frames. The mechanism has its own article: [Precise Stack Scanning (GCInfo)](garbage-collector-gcinfo.md).
 - **Every other registered thread** was preempted at an arbitrary instruction, where a GCInfo lookup would be meaningless. Those threads get a **conservative** scan: each saved register and every pointer-sized word of their stack is treated as a potential reference. Replacing this last conservative path needs return-address hijacking, tracked in issue [#385](https://github.com/valentinbreiz/nativeaot-patcher/issues/385). Dead threads are skipped.
+
+Both scans need to know where a stack ends, and the boot thread, the kernel's main thread, has no stack the scheduler allocated: it runs on the bootloader stack, so its scan ends at the top `kmain` recorded (`BootStack.Top`). On ARM64 it runs in EL1t, on `SP_EL0`, while an interrupt saves its context on the `SP_EL1` stack. The interrupt stub therefore saves `SP_EL0` in the context's stack-pointer slot, and when the saved `SPSR` shows EL1t the conservative scan starts from that value. Starting from the saved context instead would scan from the `SP_EL1` stack up to `BootStack.Top`, across most of the address space.
 
 There is no static-root pass. `ManagedModule.InitializeStatics` stores every module's GC-statics base objects in a spine array reachable from a strong (`Normal`) GC handle, so scanning the handle stores covers all static fields transitively (the `GC_StaticOnlyReachability` test proves this).
 
@@ -439,15 +454,15 @@ Handle scanning happens after stack scanning, in two passes:
 1. All `Normal` handles, then all `Pinned` handles, are marked as strong roots.
 2. Dependent handles run to a fixpoint: whenever a handle's primary is marked and its secondary is not, the secondary is marked, and the loop repeats until a pass marks nothing new. This handles chains where one dependent handle's secondary is another's primary.
 
-Weak handles are never scanned. Between mark and sweep, `FreeWeakHandles` walks the `Weak` store and the dependent store and frees every handle whose target (for dependent handles, whose primary) is unmarked. Freeing returns the slot to its segment's free list.
+Weak handles are never scanned. Once marking is complete, the collector clears the target of every weak handle whose target is unmarked, in two steps around finalization. `ClearShortWeakHandles` clears the `Weak` store first, so a short weak reference reads null as soon as its target is found dead, even if a finalizer revives it. The dead objects that have a finalizer are then queued and marked, with what they reference, and the dependent-handle loop runs once more for the secondaries hanging on them. `ClearLongWeakHandles` finally clears the `WeakTrackResurrection` store and the dependent handles whose primary is still unmarked, zeroing their secondary too, since the handle no longer keeps it alive. A cleared handle stays allocated, since its owner still holds it, reads null from it, and frees it or sets a new target later.
 
 | Type | Scanned as root? | Cleanup after mark |
 |------|------------------|--------------------|
-| `Weak` | No | Freed if the target is unmarked |
-| `WeakTrackResurrection` | No | Not cleaned up (no finalization support yet) |
+| `Weak` | No | Cleared if the target is unmarked, before finalization |
+| `WeakTrackResurrection` | No | Cleared if the target is unmarked after finalization |
 | `Normal` | Yes | None |
 | `Pinned` | Yes | None |
-| dependent (6) | Secondary, if primary is marked | Freed if the primary is unmarked |
+| dependent (6) | Secondary, if primary is marked | Cleared if the primary is unmarked after finalization |
 
 ### Sweep phase
 
@@ -488,12 +503,32 @@ After the sweep, each chain is regrouped in one pass into FULL segments first, t
 
 ---
 
+## Finalization
+
+A type with a finalizer (`~ClassName`) asks the collector to run that code before the object's memory is reclaimed, and the [concept page](gc-concepts/finalization.md) explains why that forces a dead object to be kept for one more collection. The implementation lives in [`GarbageCollector.Finalizer.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Finalizer.cs) and rests on two arrays of object pointers, held in pages of their own so that adding an entry never allocates on the GC heap and the collector never scans them by accident.
+
+The registry, `s_finalizable`, holds every live object whose finalizer is still to run. `AllocObject` adds each object whose `MethodTable` says it is finalizable, and `GC.ReRegisterForFinalize` adds one more entry; as in .NET, an object registered twice is finalized twice. When the registry cannot grow, the allocation still succeeds, the collector logs a warning, and that object is never finalized; only `GC.ReRegisterForFinalize` reports the failure, which CoreLib turns into an `OutOfMemoryException`. The registry is not a root. During a collection, once the roots are marked and the short weak handles cleared, `MarkFinalizableObjects` moves every registered object that nothing reached into the queue, `s_finalizerQueue`, and only then marks the queued objects and what they reference. Queuing them all before marking any means an object that only another dead finalizable object references is finalized by this same collection, as .NET does. The queue is a root from then on: `MarkPhase` marks its entries in every later collection, so an object and everything it references stay alive until its finalizer has run, and its memory is reclaimed by the first collection after that which finds it dead again. If the queue cannot grow, the dead objects stay registered and alive, and the next collection tries again.
+
+`GC.SuppressFinalize` removes every entry of the object from the registry, and nulls its entries in the queue when a collection had already queued it, which happens when code reaches a queued object before its finalizer has run: another finalizer that died with it, or a holder of a resurrection-tracking weak reference. Both scans are linear and run with interrupts masked.
+
+The finalizers never run inside the collection, which has interrupts masked, nor anywhere else interrupts are masked: a finalizer is arbitrary code, and may allocate, take locks or collect. Where they run depends on `GarbageCollector.ThreadedFinalizer`. The property is off by default, and only Core code can turn it on, since `GarbageCollector` is internal; nothing in the kernel does yet.
+
+While it is off, the finalizers run on the thread that collected, right after the collection. When the collection ran with interrupts masked, which `Heap.Collect` does and so does a collection the allocator starts when it runs out of memory, they run on the next thread to allocate instead. The allocator checks the queue before it allocates rather than after, so the new object cannot be swept while the finalizers run. `GC.WaitForPendingFinalizers` runs the queue on the calling thread.
+
+Turning `ThreadedFinalizer` on starts a kernel thread that runs the finalizers in passes. It has no effect when the scheduler is compiled out, and if the thread cannot start, a warning is logged and the property stays off. A collection, or an allocation that finds the queue non-empty, then only takes the thread's monitor to request a pass, and does not even do that when a request is pending or a pass is running; it never waits for the pass. `GC.WaitForPendingFinalizers` requests a pass and waits until one that began after its request has ended. It returns at once when interrupts are masked, when nothing is pending, or when a finalizer calls it, since the thread would wait for itself. Turning `ThreadedFinalizer` off stops the thread once its current pass has ended, and the collecting thread runs the finalizers again. A finalizer cannot turn it off, since the thread would wait for its own exit, so the call is logged and ignored.
+
+One pass runs at a time: `RunPendingFinalizers` claims a flag with interrupts masked, and returns at once when another pass holds it, a finalizer that collects included. The pass takes the queue's entries one by one and ends only when it finds the queue empty, releasing the flag in the same masked step, so what a collection queues during a pass is run by that pass. An exception a finalizer lets escape is logged and the pass goes on with the next one, where .NET would end the process.
+
+`GCMemoryInfo.FinalizationPendingCount` reports how many objects the last collection left in the queue. It rarely drops to zero: CoreLib's `Gen2GcCallback`, which `ArrayPool` uses to trim itself, re-registers itself from its own finalizer to be called back after every collection, so each collection finds it dead again.
+
+---
+
 ## Statistics and memory info
 
 [`GarbageCollector.Info.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) backs the runtime's memory queries:
 
 - `GetStats(out totalCollections, out totalObjectsFreed)` exposes the two running counters. `Collect()`'s return value and these counters are exact: the test suite asserts the deltas match.
-- `GetSimpleMemoryInfo()` fills the snapshot behind `RhGetMemoryInfo`, which is what `GC.GetGCMemoryInfo()` reads: heap size (occupied range of regular plus pinned segments), fragmented bytes (sum of all free-list blocks), committed bytes (segments, frozen segments, mark stack, free-list page, handle store pages), pinned object count (pinned-heap objects plus `Pinned` handles), collection index, and [condemned generation](gc-concepts/gc-generations.md) (always 0; the collector is not generational, so promoted bytes are always 0 too).
+- `GetSimpleMemoryInfo()` fills the snapshot behind `RhGetMemoryInfo`, which is what `GC.GetGCMemoryInfo()` reads: heap size (occupied range of regular plus pinned segments), fragmented bytes (sum of all free-list blocks), committed bytes (segments, frozen segments, mark stack, free-list page, handle store pages), pinned object count (pinned-heap objects plus `Pinned` handles), collection index, and [condemned generation](gc-concepts/gc-generations.md) (always 0; the collector is not generational, so promoted bytes are always 0 too). `RhGetMemoryInfo` adds the finalization pending count beside the snapshot, read from `GetFinalizationPendingCount()`: the number of objects the last collection left in the finalizer queue.
 - `GetTotalAllocatedBytes()` / `GetTotalAllocatedBytesPrecise()` back `GC.GetTotalAllocatedBytes()`; the precise variant subtracts the unused tail of every live TLAB.
 - `GetLastGCPercentTimeInGC()` derives from the last collection's duration and the interval since the previous one.
 - `Variables` is the runtime configuration table; it reports `GCName = "OrionGC"` with server GC, concurrent GC, and large pages all off.
@@ -509,7 +544,8 @@ Every choice above trades something away. This section collects the sharp edges 
 - **Conservative scanning over-retains and blocks moving.** On preempted threads, an integer that happens to resemble a heap address keeps a dead object alive, and nothing those stacks appear to reference may ever be relocated. The exit is return-address hijacking ([#385](https://github.com/valentinbreiz/nativeaot-patcher/issues/385)), which would let every thread be scanned precisely.
 - **Interior pointers resolve on the precise path only.** A byref kept alive solely by a preempted thread's stack must hit an object header exactly to be found ([#376](https://github.com/valentinbreiz/nativeaot-patcher/issues/376), [#384](https://github.com/valentinbreiz/nativeaot-patcher/issues/384)).
 - **Frozen segments are not traced.** A frozen object holding the only reference to a regular-heap object would not keep it alive. Frozen objects normally reference only other frozen data, so no such reference should exist, but nothing verifies it either way.
-- **No [finalization](gc-concepts/finalization.md).** Finalizers never run, allocation flags requesting them are ignored, and `WeakTrackResurrection` handles behave as plain storage.
+- **[Finalization](#finalization) leans on a single CPU too.** One pass at a time is enforced by a flag claimed with interrupts masked, which only excludes threads sharing the CPU.
+- **Finalizers run on borrowed threads.** Unless Core turns the finalizer thread on, and nothing in the kernel does yet, finalizers run on whichever thread collected or allocated next, possibly one holding a lock a finalizer needs. `GC.SuppressFinalize` also scans the whole registry with interrupts masked, where .NET flips a bit in the object header.
 - **A mark-stack growth failure can under-mark.** If the mark stack cannot grow mid-collection, pointers are dropped with a logged warning, and an unmarked live object would be swept. There is no overflow fallback yet.
 - **Allocation failure returns null.** When even a collection cannot free enough memory, the allocation helpers return null; there is no `OutOfMemoryException` path from the allocator.
 
@@ -519,7 +555,7 @@ Retiring the conservative path is the keystone: once every thread can be scanned
 
 ## Tests
 
-The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 50 tests (`make test KERNEL=GarbageCollector`). Highlights:
+The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 89 tests (`make test KERNEL=GarbageCollector`). Highlights:
 
 - exact collection accounting (`GC_CollectBasic`, `GC_UnreachableExactCount`),
 - weak and dependent handle behavior (`GC_WeakReference`, `GC_DependentHandle`, `GC_DependentHandleCleanup`),
@@ -529,7 +565,9 @@ The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](
 - the malloc heaps staying untouched (`GC_MallocHeapNotSwept`),
 - multithreaded allocation under repeated collections (`GC_MultithreadChurnUnderCollect`),
 - TLAB accounting and gap stamping (`GC_TLAB_*`),
-- the memory info wiring (`GC_Info_*`).
+- the memory info wiring (`GC_Info_*`),
+- finalization on the collecting thread (`GC_Finalizer_*`, in `FinalizerTests.cs`): finalizers run once per registration and only for unreachable objects, resurrection, suppression and re-registration, the order against weak and dependent handles, finalizers that allocate, collect or throw, allocations made with interrupts masked, and the pending count and `GC.MaxGeneration`,
+- the finalizer thread (`GC_FinalizerThread_*`, in `FinalizerThreadTests.cs`): starting, stopping and restarting it, waiting for its passes, and the same finalizer behavior run from that thread.
 
 ---
 
@@ -544,6 +582,7 @@ The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](
 | Sweep phase | [`GarbageCollector.Sweep.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Sweep.cs) |
 | Segments | [`GCSegment.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegment.cs), [`GCSegmentManager.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCSegmentManager.cs) |
 | GC handles | [`GCHandle.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandle.cs), [`GCHandleSegment.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleSegment.cs), [`GCHandleManager.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GCHandleManager.cs), [`GarbageCollector.GCHandler.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.GCHandler.cs) |
+| Finalization | [`GarbageCollector.Finalizer.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Finalizer.cs) |
 | Pinned heap | [`GarbageCollector.PinnedHeap.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.PinnedHeap.cs) |
 | Frozen segments | [`GarbageCollector.Frozen.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Frozen.cs) |
 | Statistics | [`GarbageCollector.Info.cs`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Memory/GarbageCollector/GarbageCollector.Info.cs) |
