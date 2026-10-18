@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 78;
+    private const int ExpectedTestCount = 80;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -52,6 +52,18 @@ public class Kernel : Sys.Kernel
 
     /// <summary>How long a Join on a killed thread may take before the test calls it a hang.</summary>
     private const int KillJoinTimeoutMs = 2000;
+
+    /// <summary>Rounds of two threads throwing unhandled exceptions in the per-thread dispatch test (the scenario of valentinbreiz/nativeaot-patcher#440).</summary>
+    private const int UncaughtThrowRounds = 5;
+
+    /// <summary>Threads throwing, catching and rethrowing at once in the concurrent catch test.</summary>
+    private const int ThrowWorkerCount = 4;
+
+    /// <summary>Throws each worker of the concurrent catch test makes.</summary>
+    private const int ThrowsPerWorker = 300;
+
+    /// <summary>How long a Join on a throwing thread may take before the test calls it a hang.</summary>
+    private const int ThrowJoinTimeoutMs = 30_000;
 
     /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
     private const uint UnregisteredCpuId = 4096;
@@ -122,6 +134,9 @@ public class Kernel : Sys.Kernel
     private static volatile int s_sharedCounter;
     private static volatile int s_thread1Counter;
     private static volatile int s_thread2Counter;
+    private static int s_throwWorkersDone;
+    private static int s_throwFinallyRuns;
+    private static int s_throwMismatches;
     private static Cosmos.Kernel.Core.Scheduler.SpinLock s_testLock;
 
     // Shared state for Monitor/lock tests
@@ -159,6 +174,8 @@ public class Kernel : Sys.Kernel
         // Thread tests
         TR.Run("Thread_Start_ExecutesDelegate", TestThreadExecution);
         TR.Run("Thread_Multiple_CanRunConcurrently", TestMultipleThreads);
+        TR.Run("Thread_Throw_TwoThreadsUnhandled_BothJoin", TestUnhandledThrowsOnTwoThreads);
+        TR.Run("Thread_Throw_ConcurrentCatchRethrow_OwnExceptions", TestConcurrentCatchAndRethrow);
         TR.Run("SpinLock_ProtectsSharedData_AcrossThreads", TestSpinLockWithThreads);
         TR.Run("Thread_ThreadStatics", TestThreadStatics);
         TR.Run("Thread_EnsureSufficientExecutionStack_Passes", TestEnsureSufficientStackInThread);
@@ -976,6 +993,97 @@ public class Kernel : Sys.Kernel
 
         Assert.Equal(WorkerIterationCount, s_thread1Counter);
         Assert.Equal(WorkerIterationCount, s_thread2Counter);
+    }
+
+    private static void TestUnhandledThrowsOnTwoThreads()
+    {
+        // The scenario of valentinbreiz/nativeaot-patcher#440: each thread's throw is dispatched on
+        // its own stack, so a thread preempted inside its dispatch must not make the other thread's
+        // throw a "recursive" one, which halted that thread and left its Join waiting forever.
+        for (int round = 0; round < UncaughtThrowRounds; round++)
+        {
+            SysThread first = new(ThrowUnhandled);
+            SysThread second = new(ThrowUnhandled);
+
+            first.Start();
+            second.Start();
+
+            Assert.True(first.Join(ThrowJoinTimeoutMs), "A thread whose exception is unhandled must exit and be joinable");
+            Assert.True(second.Join(ThrowJoinTimeoutMs), "The second throwing thread must exit as well");
+        }
+    }
+
+    private static void ThrowUnhandled()
+    {
+        throw new InvalidOperationException("Unhandled on purpose");
+    }
+
+    private static void TestConcurrentCatchAndRethrow()
+    {
+        // Several threads throw, run a finally, catch and rethrow at once: the ExInfo chain, the
+        // dispatch guard and the records of the running funclets are each thread's own, so a `throw;`
+        // rethrows the thread's own exception and no throw lands as "recursive".
+        s_throwWorkersDone = 0;
+        s_throwFinallyRuns = 0;
+        s_throwMismatches = 0;
+
+        SysThread[] workers = new SysThread[ThrowWorkerCount];
+        for (int i = 0; i < ThrowWorkerCount; i++)
+        {
+            int id = i;
+            workers[i] = new SysThread(() => ThrowCatchRethrowWorker(id));
+        }
+
+        for (int i = 0; i < ThrowWorkerCount; i++)
+        {
+            workers[i].Start();
+        }
+
+        for (int i = 0; i < ThrowWorkerCount; i++)
+        {
+            Assert.True(workers[i].Join(ThrowJoinTimeoutMs), "Every throwing worker must finish");
+        }
+
+        Assert.Equal(ThrowWorkerCount, s_throwWorkersDone);
+        Assert.Equal(ThrowWorkerCount * ThrowsPerWorker, s_throwFinallyRuns);
+        Assert.Equal(0, s_throwMismatches);
+    }
+
+    private static void ThrowCatchRethrowWorker(int id)
+    {
+        for (int i = 0; i < ThrowsPerWorker; i++)
+        {
+            string expected = $"worker {id} throw {i}";
+            InvalidOperationException? thrown = null;
+            try
+            {
+                try
+                {
+                    try
+                    {
+                        throw new InvalidOperationException(expected);
+                    }
+                    finally
+                    {
+                        Interlocked.Increment(ref s_throwFinallyRuns);
+                    }
+                }
+                catch (InvalidOperationException caught)
+                {
+                    thrown = caught;
+                    throw;
+                }
+            }
+            catch (InvalidOperationException rethrown)
+            {
+                if (!ReferenceEquals(thrown, rethrown) || rethrown.Message != expected)
+                {
+                    Interlocked.Increment(ref s_throwMismatches);
+                }
+            }
+        }
+
+        Interlocked.Increment(ref s_throwWorkersDone);
     }
 
     private static void Thread1Worker()

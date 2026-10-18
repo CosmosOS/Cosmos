@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
+using Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 
 namespace Cosmos.Kernel.Core.Scheduler;
 
@@ -122,6 +123,14 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     private object[][]? _threadStaticStorage;
 
     /// <summary>
+    /// The exception dispatcher's state for this thread: the chain of its in-flight throws, its
+    /// dispatch guard and the funclets running on it, handed out by reference through
+    /// <see cref="GetExceptionDispatchState"/>. The boot code, before it is a scheduler thread,
+    /// uses the dispatcher's own.
+    /// </summary>
+    private ExceptionDispatchState _exceptionDispatchState;
+
+    /// <summary>
     /// Default stack size for new threads (256KB). Must stay above CoreLib's
     /// 128KB MinExecutionStackSize (64-bit) or
     /// RuntimeHelpers.EnsureSufficientExecutionStack, called by generated
@@ -186,6 +195,14 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     internal ref object[][]? GetThreadStaticStorage()
     {
         return ref _threadStaticStorage;
+    }
+
+    /// <summary>
+    /// Hands the exception dispatcher this thread's state by reference.
+    /// </summary>
+    internal ref ExceptionDispatchState GetExceptionDispatchState()
+    {
+        return ref _exceptionDispatchState;
     }
 
     /// <summary>
