@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -66,8 +68,6 @@ internal static class FinalizerTests
         TR.Run("GC_Finalizer_AllocWhileMaskedDefers", TestAllocWhileMaskedDefers);
         TR.Run("GC_Finalizer_MaxGeneration", TestMaxGeneration);
     }
-
-    // ==================== Probes ====================
 
     private class CountingProbe
     {
@@ -163,7 +163,7 @@ internal static class FinalizerTests
         {
             int nodes = 0;
             bool intact = true;
-            for (Node? node = _head; node != null; node = node.Next)
+            for (Node? node = _head; node is not null; node = node.Next)
             {
                 intact &= IsPatternArray(node.Data);
                 nodes++;
@@ -236,7 +236,7 @@ internal static class FinalizerTests
         private static void SpawnChild(int[] childCounter)
         {
             object child = new CountingProbe(childCounter);
-            if (child == null)
+            if (child is null)
             {
                 childCounter[0] = -1;
             }
@@ -301,7 +301,7 @@ internal static class FinalizerTests
         ~SuppressingProbe()
         {
             _counter[0]++;
-            if (Victim != null)
+            if (Victim is not null)
             {
                 GC.SuppressFinalize(Victim);
             }
@@ -324,12 +324,10 @@ internal static class FinalizerTests
         ~TableProbe()
         {
             ConditionalWeakTable<object, int[]>? table = s_table;
-            bool found = table != null && table.TryGetValue(this, out int[]? data) && IsPatternArray(data);
+            bool found = table is not null && table.TryGetValue(this, out int[]? data) && IsPatternArray(data);
             _result[0] = found ? 1 : -1;
         }
     }
-
-    // ==================== Helpers ====================
 
     private static int[] NewPatternArray()
     {
@@ -344,7 +342,7 @@ internal static class FinalizerTests
 
     private static bool IsPatternArray(int[]? data)
     {
-        return data != null && data.Length == 64 && data[0] == Pattern && data[63] == Pattern + 63;
+        return data is not null && data.Length == 64 && data[0] == Pattern && data[63] == Pattern + 63;
     }
 
     private static void Collect(int passes)
@@ -375,7 +373,7 @@ internal static class FinalizerTests
         for (int i = 0; i < count; i++)
         {
             object probe = new CountingProbe(counter);
-            if (probe == null)
+            if (probe is null)
             {
                 break;
             }
@@ -392,7 +390,7 @@ internal static class FinalizerTests
     private static void CreateGenericProbe()
     {
         object probe = CreateGeneric<GenericProbe>();
-        if (probe == null)
+        if (probe is null)
         {
             s_genericFinalized = -1;
         }
@@ -402,7 +400,7 @@ internal static class FinalizerTests
     private static void CreateDerivedProbe(int[] counter, int[] order)
     {
         object probe = new DerivedProbe(counter, order);
-        if (probe == null)
+        if (probe is null)
         {
             order[0] = -1;
         }
@@ -423,7 +421,7 @@ internal static class FinalizerTests
     private static void CreateReRegisteringProbe(int[] counter, int runs)
     {
         object probe = new ReRegisteringProbe(counter, runs);
-        if (probe == null)
+        if (probe is null)
         {
             counter[0] = -1;
         }
@@ -433,7 +431,7 @@ internal static class FinalizerTests
     private static void CreateGraphProbe(int[] result, int depth)
     {
         object probe = new GraphProbe(result, depth);
-        if (probe == null)
+        if (probe is null)
         {
             result[0] = -1;
         }
@@ -455,7 +453,7 @@ internal static class FinalizerTests
     private static void CreateAllocatingProbe(int[] result)
     {
         object probe = new AllocatingProbe(result);
-        if (probe == null)
+        if (probe is null)
         {
             result[0] = -1;
         }
@@ -465,7 +463,7 @@ internal static class FinalizerTests
     private static void CreateSpawningProbe(int[] counter, int[] childCounter)
     {
         object probe = new SpawningProbe(counter, childCounter);
-        if (probe == null)
+        if (probe is null)
         {
             counter[0] = -1;
         }
@@ -475,7 +473,7 @@ internal static class FinalizerTests
     private static void CreateCollectingProbe(int[] counter)
     {
         object probe = new CollectingProbe(counter);
-        if (probe == null)
+        if (probe is null)
         {
             counter[0] = -1;
         }
@@ -485,7 +483,7 @@ internal static class FinalizerTests
     private static void CreateThrowingProbe(int[] counter)
     {
         object probe = new ThrowingProbe(counter);
-        if (probe == null)
+        if (probe is null)
         {
             counter[0] = -1;
         }
@@ -515,8 +513,6 @@ internal static class FinalizerTests
             GC.SuppressFinalize(probe);
         }
     }
-
-    // ==================== Tests ====================
 
     private static void TestRunsOnUnreachable()
     {
@@ -645,7 +641,7 @@ internal static class FinalizerTests
 
         Collect(1);
         Assert.Equal(1, counter[0], "Finalizer: the resurrecting finalizer ran");
-        Assert.True(s_resurrected != null, "Finalizer: the finalizer stored the object in a static");
+        Assert.True(s_resurrected is not null, "Finalizer: the finalizer stored the object in a static");
 
         // Now reachable again: it must survive like any other object, and not be finalized again.
         AllocateGarbage();
@@ -658,7 +654,7 @@ internal static class FinalizerTests
         s_resurrected = null;
         Collect(2);
         Assert.Equal(1, counter[0], "Finalizer: dropping a resurrected object does not finalize it again");
-        Assert.True(tracking.Target == null, "Finalizer: a resurrected object is reclaimed once it is dropped");
+        Assert.True(tracking.Target is null, "Finalizer: a resurrected object is reclaimed once it is dropped");
     }
 
     private static void TestShortWeakCleared()
@@ -670,7 +666,7 @@ internal static class FinalizerTests
         Collect(1);
 
         Assert.Equal(1, counter[0], "Finalizer: the finalizer ran");
-        Assert.True(shortRef.Target == null,
+        Assert.True(shortRef.Target is null,
             "Finalizer: a short weak reference is cleared when its target is queued for finalization, resurrected or not");
 
         s_resurrected = null;
@@ -686,14 +682,14 @@ internal static class FinalizerTests
         Collect(1);
 
         Assert.Equal(1, counter[0], "Finalizer: the finalizer ran");
-        Assert.True(longRef.Target != null,
+        Assert.True(longRef.Target is not null,
             "Finalizer: a weak reference tracking resurrection keeps its target past finalization");
         Assert.True(ReferenceEquals(longRef.Target, s_resurrected),
             "Finalizer: the tracking weak reference still points at the resurrected object");
 
         s_resurrected = null;
         Collect(2);
-        Assert.True(longRef.Target == null, "Finalizer: the tracking weak reference is cleared once the object is gone");
+        Assert.True(longRef.Target is null, "Finalizer: the tracking weak reference is cleared once the object is gone");
     }
 
     private static void TestAllocInFinalizer()
@@ -782,7 +778,7 @@ internal static class FinalizerTests
         for (int i = 0; i < 3000; i++)
         {
             object probe = new WorkerProbe();
-            if (probe != null)
+            if (probe is not null)
             {
                 Interlocked.Increment(ref s_workerAllocated);
             }
@@ -931,7 +927,7 @@ internal static class FinalizerTests
         {
             CoreGC.Collect();
             object fresh = new object();
-            allocated = fresh != null;
+            allocated = fresh is not null;
             ranInside = counter[0];
         }
 

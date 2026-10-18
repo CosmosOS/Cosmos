@@ -236,7 +236,7 @@ internal unsafe struct GCHandleManager()
         // or sets a new target (RuntimeType does so for its RuntimeTypeInfo cache). Freeing it
         // here put it back on the free list while still in use: a later handle shared its slot,
         // and a target set in it was no longer cleared, so it dangled once collected.
-        var handleEnum = store.GetEnumerator();
+        GCHandleSegmentStore.Enumerator handleEnum = store.GetEnumerator();
         while (handleEnum.MoveNext())
         {
             GCHandle* handle = handleEnum.Current;

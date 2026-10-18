@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
@@ -89,8 +88,9 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// State of the finalizer thread. Do not use it outside of GargageColection.Finalizer.
-    /// If you are using it you should now what your doing.
+    /// State of the finalizer thread. <see cref="StartFinalizerThread"/> moves it from Stopped to
+    /// Starting, then Running; <see cref="StopFinalizerThread"/> moves it to Stopping, the thread
+    /// to Exited once it left its loop, and the stopper back to Stopped.
     /// </summary>
     private enum ThreadFinalizerStatus
     {
@@ -133,39 +133,51 @@ internal static unsafe partial class GarbageCollector
     private static int s_lastFinalizationPendingCount;
 
     /// <summary>
-    /// Thread use to rune the finalize instances.
+    /// The thread that runs the finalizers while <see cref="ThreadedFinalizer"/> is on.
     /// </summary>
     private static SchedulerThread? s_finalizerThread;
 
     /// <summary>
-    /// Monitor for <see cref="s_finalizerThread"/> thread.
-    /// Lazy init by <see cref="ThreadedFinalizer"/>.
-    /// Use to protect <see cref="s_finalizerRequested"/>,
-    /// <see cref="s_finalizerRequestSeq"/> and <see cref="s_finalizerDoneSeq"/>.
+    /// Monitor of the finalizer thread, created by its first start and kept afterwards. Protects
+    /// <see cref="s_finalizerRequested"/>, <see cref="s_finalizerRequestSeq"/> and
+    /// <see cref="s_finalizerDoneSeq"/>, and signals the changes of
+    /// <see cref="s_threadFinalizerStatus"/>.
     /// </summary>
-    private static Monitor? s_finalizerMonitor = null;
-
-    private static bool s_finalizerRequested;       // protected by s_finalizerMonitor
-    private static ulong s_finalizerRequestSeq;     // protected by s_finalizerMonitor
-    private static ulong s_finalizerDoneSeq;        // protected by s_finalizerMonitor
+    private static Monitor? s_finalizerMonitor;
 
     /// <summary>
-    /// Use <see cref="s_finalizerMonitor"/> to signal a major state.
-    /// Like <see cref="ThreadFinalizerStatus.Stopped"/> and <see cref="ThreadFinalizerStatus.Running"/>.
-    /// Use <see cref="Interlocked"/> to interact with it.
+    /// Whether a pass was asked of the finalizer thread since its last one began.
     /// </summary>
-    private static volatile ThreadFinalizerStatus s_threadFinalizerStatus = ThreadFinalizerStatus.Stopped;
+    private static bool s_finalizerRequested;
+
+    /// <summary>
+    /// Number of passes asked of the finalizer thread; a waiter takes the next one as its ticket.
+    /// </summary>
+    private static ulong s_finalizerRequestSeq;
+
+    /// <summary>
+    /// The request number the finalizer thread's last finished pass covered.
+    /// </summary>
+    private static ulong s_finalizerDoneSeq;
+
+    /// <summary>
+    /// State of the finalizer thread. Claimed with <see cref="Interlocked.CompareExchange{T}"/> by a
+    /// start; every change is signalled on <see cref="s_finalizerMonitor"/>.
+    /// </summary>
+    private static volatile ThreadFinalizerStatus s_threadFinalizerStatus;
 
     // --- Properties ---
 
     /// <summary>
-    /// Set to <see langword="true"/> to run instance waiting for finaliazer on a side thread.
-    /// Getting <see langword="false"/> indicate that the thread has not started.
-    /// Starting or stopping the thread will be reported as the thread not started.
-    /// Edge case: The thread is stopping and you set to true. It will not start the thread.
+    /// Whether the finalizers run on a thread of their own instead of the thread that allocates
+    /// or collects. Setting it starts or stops that thread and returns once it is done; turning it
+    /// on while the thread is stopping waits for the stop, then starts it again.
     /// </summary>
-    [MemberNotNullWhen(true, "s_finalizerMonitor")] // lazy init, also true after
-    [MemberNotNullWhen(true, "s_finalizerThread")]
+    /// <remarks>
+    /// Reads <see langword="true"/> from the start of a start to the start of a stop. Does
+    /// nothing without the scheduler, and turning it off from a finalizer is ignored: the
+    /// finalizer thread cannot wait for its own exit.
+    /// </remarks>
     public static bool ThreadedFinalizer
     {
         get => s_threadFinalizerStatus is ThreadFinalizerStatus.Running or ThreadFinalizerStatus.Starting;
@@ -175,6 +187,7 @@ internal static unsafe partial class GarbageCollector
             {
                 return;
             }
+
             if (value)
             {
                 StartFinalizerThread();
@@ -266,17 +279,21 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Run a pass with the finalizer thread if <see cref="ThreadedFinalizer"/> is <see langword="true"/>
-    /// Else use the current thread to execute the finalizers.
+    /// Returns once the finalizers queued so far have run: asks the finalizer thread for a pass
+    /// and waits for it when <see cref="ThreadedFinalizer"/> is on, runs them on the calling
+    /// thread otherwise.
     /// </summary>
+    /// <remarks>
+    /// Returns at once when interrupts are masked, and on the finalizer thread itself.
+    /// </remarks>
     internal static void WaitPendingFinalizers()
     {
         // Masked (an IRQ handler, a spin-locked section): the monitor would block a CPU nothing
-        // preempts any more, and a finalizer is not to run there either
+        // preempts any more, and a finalizer is not to run there either. The finalizer thread
+        // would wait for itself.
         if (!InternalCpu.InterruptsEnabled
             || !FinalizationPending()
-            // if the finalizer try to wait it's self (avoid deadlock)
-            || ReferenceEquals(SchedulerManager.CurrentCpuState?.CurrentThread, s_finalizerThread))
+            || IsOnFinalizerThread())
         {
             return;
         }
@@ -287,7 +304,7 @@ internal static unsafe partial class GarbageCollector
             Monitor monitor = s_finalizerMonitor!;
 
             monitor.Acquire();
-            // uncheck in case of an overflow after ~500 year it reset
+            // Wraps after 2^64 requests; IsPassDone compares across the wrap
             ulong ticket = unchecked(++s_finalizerRequestSeq);
             s_finalizerRequested = true;
             monitor.SignalAll();
@@ -310,12 +327,15 @@ internal static unsafe partial class GarbageCollector
             RunPendingFinalizers();
         }
 
-        static bool IsPassDone(ulong done, ulong ticket) => unchecked((long)(done - ticket)) >= 0;
+        static bool IsPassDone(ulong done, ulong ticket)
+        {
+            return unchecked((long)(done - ticket)) >= 0;
+        }
     }
 
     /// <summary>
-    /// Run the finalizers on the calling thread if <see cref="ThreadedFinalizer"/> is <see langword="false"/>.
-    /// Else signal the thread in charge to finalize all instances, without waiting for it.
+    /// Runs the queued finalizers on the calling thread when <see cref="ThreadedFinalizer"/> is
+    /// off; otherwise asks the finalizer thread for a pass, without waiting for it.
     /// </summary>
     /// <remarks>
     /// Does nothing when interrupts are masked: the queue is left to the next allocation.
@@ -349,6 +369,10 @@ internal static unsafe partial class GarbageCollector
 
     // --- Private methods ---
 
+    /// <summary>
+    /// Body of the finalizer thread: runs a pass for each request until the thread is stopped,
+    /// then reports <see cref="ThreadFinalizerStatus.Exited"/> to the stopper.
+    /// </summary>
     private static void RunFinalizerWorker()
     {
         Monitor monitor = s_finalizerMonitor!;
@@ -383,12 +407,11 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// DO NOT CALL THIS METHOD use <see cref="ThreadedFinalizer"/>.
-    /// It's an helper method for a cleaner code.
+    /// Starts the finalizer thread, the setter of <see cref="ThreadedFinalizer"/> turning it on.
+    /// Does nothing when it is starting or running already.
     /// </summary>
     private static void StartFinalizerThread()
     {
-        // This enum do verrrrry long code but i did some mistak when i use an int.
         ThreadFinalizerStatus prev = Interlocked.CompareExchange(ref s_threadFinalizerStatus,
                                                                  ThreadFinalizerStatus.Starting, ThreadFinalizerStatus.Stopped);
         if (prev is ThreadFinalizerStatus.Starting or ThreadFinalizerStatus.Running)
@@ -398,8 +421,8 @@ internal static unsafe partial class GarbageCollector
 
         if (prev != ThreadFinalizerStatus.Stopped)
         {
-            // Stopping / Exited: wait for the stopper to publish Stopped, then claim it.
-            // if we are here some one init the lazy beffor use
+            // Stopping or Exited: wait for the stopper to publish Stopped, then claim it. A stop
+            // means a start ran before, so the monitor exists.
             Monitor m = s_finalizerMonitor!;
             m.Acquire();
             while (true)
@@ -412,7 +435,7 @@ internal static unsafe partial class GarbageCollector
                 }
                 if (prev is ThreadFinalizerStatus.Starting or ThreadFinalizerStatus.Running)
                 {
-                    // if some one else was waiting to restart
+                    // Another waiting start claimed it first
                     m.Release();
                     return;
                 }
@@ -435,21 +458,29 @@ internal static unsafe partial class GarbageCollector
         }
         else
         {
-            // TODO: report the error
+            Serial.WriteString("[GC] WARNING: finalizer thread did not start, finalizers run on the collecting thread\n");
             s_threadFinalizerStatus = ThreadFinalizerStatus.Stopped;
         }
+
         monitor.SignalAll();
     }
 
     /// <summary>
-    /// DO NOT CALL THIS METHOD use <see cref="ThreadedFinalizer"/>
-    /// It's an helper method for a cleaner code.
+    /// Stops the finalizer thread, the setter of <see cref="ThreadedFinalizer"/> turning it off,
+    /// and returns once the thread has exited. Its current pass ends first.
     /// </summary>
     private static void StopFinalizerThread()
     {
         Monitor? monitor = s_finalizerMonitor;
         if (monitor is null)
         {
+            return;
+        }
+
+        // From a finalizer: the thread would wait for its own exit
+        if (IsOnFinalizerThread())
+        {
+            Serial.WriteString("[GC] WARNING: the finalizer thread cannot stop itself, ThreadedFinalizer stays on\n");
             return;
         }
 
@@ -481,6 +512,20 @@ internal static unsafe partial class GarbageCollector
         monitor.SignalAll();
     }
 
+    /// <summary>
+    /// Whether the calling thread is the finalizer thread. False while there is none: without
+    /// the scheduler both it and the current thread are null, which is no finalizer thread.
+    /// </summary>
+    private static bool IsOnFinalizerThread()
+    {
+        SchedulerThread? finalizerThread = s_finalizerThread;
+        return finalizerThread is not null
+            && ReferenceEquals(SchedulerManager.CurrentCpuState?.CurrentThread, finalizerThread);
+    }
+
+    /// <summary>
+    /// Whether a finalizer is queued or a pass is running.
+    /// </summary>
     private static bool FinalizationPending()
     {
         using (InternalCpu.DisableInterruptsScope())
@@ -496,9 +541,11 @@ internal static unsafe partial class GarbageCollector
     /// Returns at once when interrupts are masked: a finalizer is arbitrary code, not to be run
     /// from an interrupt handler or a critical section. The queue is then left for the next
     /// call; the allocator makes one before each allocation.
+    /// <para>
+    /// One pass at a time relies on a single CPU: <see cref="s_runningFinalizers"/> is claimed
+    /// with interrupts masked, which excludes the other threads only while they share that CPU.
+    /// </para>
     /// </remarks>
-    // TODO: RunPendingFinalizers is not thread safe! For now not big deal only one core on Cosmos
-    // InternalCpu.DisableInterruptsScope() made it thread safe (for now)
     private static void RunPendingFinalizers()
     {
         if (s_finalizerQueueHead == s_finalizerQueue.Count || !InternalCpu.InterruptsEnabled)
@@ -518,7 +565,7 @@ internal static unsafe partial class GarbageCollector
 
         object? target = DequeueFinalizable(out IntPtr finalizer);
 
-        while (target != null)
+        while (target is not null)
         {
             try
             {
@@ -526,9 +573,11 @@ internal static unsafe partial class GarbageCollector
             }
             catch (Exception)
             {
-                // TODO, open question
+                // .NET fails fast on an exception a finalizer lets escape; the kernel logs it and
+                // goes on with the next finalizer, so one faulty type does not stop finalization
                 Serial.WriteString("[GC] WARNING: unhandled exception in a finalizer\n");
             }
+
             target = DequeueFinalizable(out finalizer);
         }
     }

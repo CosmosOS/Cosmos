@@ -1,3 +1,5 @@
+// This code is licensed under the BSD 3-Clause license (see LICENSE for details)
+
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -48,13 +50,11 @@ internal static class FinalizerThreadTests
         TR.Run("GC_FinalizerThread_Restart", TestRestart);
         TR.Run("GC_FinalizerThread_StopFromAnotherThread", TestStopFromAnotherThread);
 
-        // Last: with the code as it stands it hangs the CPU (a masked wait on the monitor).
+        // Last: a regression hangs the CPU (a masked wait on the monitor), and no later test would run.
         TR.Run("GC_FinalizerThread_AllocWhileMasked", TestAllocWhileMasked);
 
         CoreGC.ThreadedFinalizer = false;
     }
-
-    // ==================== Probes ====================
 
     /// <summary>
     /// Counts its finalization in <c>counter[0]</c> and stores the id of the thread that ran it
@@ -156,8 +156,6 @@ internal static class FinalizerThreadTests
         }
     }
 
-    // ==================== Helpers ====================
-
     private static uint CurrentThreadId()
     {
         // White-box read of the experimental scheduler seam: the finalizer thread is a kernel
@@ -190,7 +188,7 @@ internal static class FinalizerThreadTests
         for (int i = 0; i < count; i++)
         {
             object probe = new ThreadProbe(counter);
-            if (probe == null)
+            if (probe is null)
             {
                 break;
             }
@@ -203,7 +201,7 @@ internal static class FinalizerThreadTests
         for (int i = 0; i < count; i++)
         {
             object probe = new SlowProbe(counter);
-            if (probe == null)
+            if (probe is null)
             {
                 break;
             }
@@ -214,7 +212,7 @@ internal static class FinalizerThreadTests
     private static void CreateAllocatingProbe(uint[] result)
     {
         object probe = new AllocatingProbe(result);
-        if (probe == null)
+        if (probe is null)
         {
             result[0] = 2;
         }
@@ -224,7 +222,7 @@ internal static class FinalizerThreadTests
     private static void CreateCollectingProbe(uint[] counter)
     {
         object probe = new CollectingProbe(counter);
-        if (probe == null)
+        if (probe is null)
         {
             counter[0] = 100;
         }
@@ -234,13 +232,11 @@ internal static class FinalizerThreadTests
     private static void CreateThrowingProbe(uint[] counter)
     {
         object probe = new ThrowingProbe(counter);
-        if (probe == null)
+        if (probe is null)
         {
             counter[0] = 100;
         }
     }
-
-    // ==================== Tests ====================
 
     private static void TestStart()
     {
@@ -357,7 +353,7 @@ internal static class FinalizerThreadTests
         for (int i = 0; i < 2000; i++)
         {
             object probe = new WorkerProbe();
-            if (probe != null)
+            if (probe is not null)
             {
                 Interlocked.Increment(ref s_workerAllocated);
             }
@@ -466,7 +462,7 @@ internal static class FinalizerThreadTests
             // the allocation below sees it.
             CoreGC.Collect();
             object fresh = new object();
-            allocated = fresh != null;
+            allocated = fresh is not null;
             ranInside = counter[0];
         }
 

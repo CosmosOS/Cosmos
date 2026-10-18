@@ -46,7 +46,7 @@ internal static unsafe partial class GarbageCollector
 
         void ScanGCHandles(GCHandleType type)
         {
-            var storeEnum = s_gCHandleManager.GCHandleControllers[(int)type].GetEnumerator();
+            GCHandleSegmentStore.Enumerator storeEnum = s_gCHandleManager.GCHandleControllers[(int)type].GetEnumerator();
             while (storeEnum.MoveNext())
             {
                 TryMarkRoot((nint)storeEnum.Current->Object);
@@ -65,7 +65,7 @@ internal static unsafe partial class GarbageCollector
         while (markedNew)
         {
             markedNew = false;
-            var storeEnum = s_gCHandleManager.DependentHandleStore.GetEnumerator();
+            GCHandleSegmentStore.Enumerator storeEnum = s_gCHandleManager.DependentHandleStore.GetEnumerator();
             while (storeEnum.MoveNext())
             {
                 // No secondary means nothing to keep alive: ConditionalWeakTable stores a null
