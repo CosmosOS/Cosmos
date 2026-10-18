@@ -231,6 +231,10 @@ internal static unsafe partial class GarbageCollector
     /// <summary>
     /// Cancels the finalizer of an object, whether it is still alive or queued already.
     /// </summary>
+    /// <remarks>
+    /// As in .NET, every registration of the object is cancelled, however many times it was
+    /// registered, until the next <see cref="TryRegisterForFinalize"/>.
+    /// </remarks>
     /// <param name="obj">The object whose finalizer must not run.</param>
     internal static void SuppressFinalize(GCObject* obj)
     {
@@ -247,7 +251,6 @@ internal static unsafe partial class GarbageCollector
                 if (s_finalizable.Items[i] == obj)
                 {
                     s_finalizable.Items[i] = s_finalizable.Items[--s_finalizable.Count];
-                    return;
                 }
             }
 
@@ -257,7 +260,6 @@ internal static unsafe partial class GarbageCollector
                 if (s_finalizerQueue.Items[i] == obj)
                 {
                     s_finalizerQueue.Items[i] = null;
-                    return;
                 }
             }
         }
@@ -269,14 +271,18 @@ internal static unsafe partial class GarbageCollector
     /// </summary>
     internal static void WaitPendingFinalizers()
     {
-        if (!FinalizationPending()
+        // Masked (an IRQ handler, a spin-locked section): the monitor would block a CPU nothing
+        // preempts any more, and a finalizer is not to run there either
+        if (!InternalCpu.InterruptsEnabled
+            || !FinalizationPending()
             // if the finalizer try to wait it's self (avoid deadlock)
             || ReferenceEquals(SchedulerManager.CurrentCpuState?.CurrentThread, s_finalizerThread))
         {
             return;
         }
 
-        if (ThreadedFinalizer)
+        // Running, not Starting: the starter holds the monitor, and may not have created it yet
+        if (s_threadFinalizerStatus == ThreadFinalizerStatus.Running)
         {
             Monitor monitor = s_finalizerMonitor!;
 
@@ -291,7 +297,7 @@ internal static unsafe partial class GarbageCollector
             {
                 monitor.Wait();
             }
-            bool done = s_finalizerDoneSeq >= ticket;
+            bool done = IsPassDone(s_finalizerDoneSeq, ticket);
             monitor.Release();
 
             if (!done)
@@ -309,12 +315,27 @@ internal static unsafe partial class GarbageCollector
 
     /// <summary>
     /// Run the finalizers on the calling thread if <see cref="ThreadedFinalizer"/> is <see langword="false"/>.
-    /// Else signal the thread in charge to finalize all instances.
+    /// Else signal the thread in charge to finalize all instances, without waiting for it.
     /// </summary>
+    /// <remarks>
+    /// Does nothing when interrupts are masked: the queue is left to the next allocation.
+    /// </remarks>
     internal static void SignalPendingFinalizers()
     {
-        if (ThreadedFinalizer)
+        if (!InternalCpu.InterruptsEnabled)
         {
+            return;
+        }
+
+        if (s_threadFinalizerStatus == ThreadFinalizerStatus.Running)
+        {
+            // Signalled already, or in a pass, which drains the queue to its end, what a
+            // collection queues meanwhile included (a finalizer that collects lands here too)
+            if (s_finalizerRequested || s_runningFinalizers)
+            {
+                return;
+            }
+
             Monitor monitor = s_finalizerMonitor!;
             monitor.Acquire();
             s_finalizerRequested = true;
@@ -415,7 +436,7 @@ internal static unsafe partial class GarbageCollector
         else
         {
             // TODO: report the error
-            s_threadFinalizerStatus = ThreadFinalizerStatus.Stopped;     
+            s_threadFinalizerStatus = ThreadFinalizerStatus.Stopped;
         }
         monitor.SignalAll();
     }

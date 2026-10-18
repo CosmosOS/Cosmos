@@ -445,10 +445,11 @@ internal static unsafe partial class GarbageCollector
         }
 
         // Finalizers a collection left behind because it ran with interrupts masked. Before the
-        // allocation, not after: nothing would keep the new object alive while they run.
+        // allocation, not after: nothing would keep the new object alive while they run. With
+        // the finalizer thread on, the allocation only signals it: it never waits for a pass.
         if (s_finalizerQueueHead != s_finalizerQueue.Count)
         {
-            WaitPendingFinalizers();
+            SignalPendingFinalizers();
         }
 
         // The whole allocation must be atomic with respect to interrupts: IRQ
