@@ -622,6 +622,13 @@ public static class SchedulerManager
                 return;
             }
 
+            // The hook runs before the state changes, so the policy sees what
+            // the thread is waking from (Blocked, Sleeping, or Created for a
+            // first start), the same order MarkSleeping keeps for
+            // OnThreadBlocked. Interrupts are masked, so nothing observes the
+            // thread queued but not yet Ready.
+            s_currentScheduler.OnThreadReady(state, thread);
+
             // Only set to Ready if not a new thread (Created).
             // New threads stay Created until they actually start running.
             // This allows ScheduleFromInterrupt to detect first-time execution.
@@ -629,8 +636,6 @@ public static class SchedulerManager
             {
                 thread.State = SchedulerThreadState.Ready;
             }
-
-            s_currentScheduler.OnThreadReady(state, thread);
 
             // Ask the next hardware-IRQ exit to reschedule: when this wake
             // comes from an ISR (InterruptEvent.Signal), the woken thread
