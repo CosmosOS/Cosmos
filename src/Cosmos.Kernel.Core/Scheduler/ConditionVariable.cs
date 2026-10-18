@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Cosmos.Kernel.Core.Scheduler;
@@ -7,6 +8,8 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// </summary>
 internal class ConditionVariable : IDisposable
 {
+    private const long MillisecondsPerSecond = 1000;
+
     /// <summary>
     /// Protects access to the condition variable internal state.
     /// </summary>
@@ -54,6 +57,12 @@ internal class ConditionVariable : IDisposable
         }
         while (currentThread is null);
 
+        if (IsIdleThread(currentThread))
+        {
+            WaitPolling(mutex, currentThread, deadline: 0);
+            return;
+        }
+
         using (_lockGuard.AcquireIrqSafe())
         {
             if (!ContainsWaiterLocked(currentThread))
@@ -87,6 +96,13 @@ internal class ConditionVariable : IDisposable
             return false;
         }
 
+        if (IsIdleThread(currentThread))
+        {
+            // At least one Stopwatch tick, so a 0 ms wait still reads as timed.
+            long deadline = Stopwatch.GetTimestamp() + Math.Max(1, Stopwatch.Frequency / MillisecondsPerSecond * timeoutMs);
+            return WaitPolling(mutex, currentThread, deadline);
+        }
+
         // Same atomic insert+release+park section as Wait — the old order (release, then
         // insert) additionally lost any Signal landing between the two: it found no waiters.
         using (_lockGuard.AcquireIrqSafe())
@@ -118,6 +134,70 @@ internal class ConditionVariable : IDisposable
         currentThread.WakeupTime = 0;
 
         // Reacquire the mutex before returning
+        mutex.Acquire();
+
+        return signaled;
+    }
+
+    /// <summary>
+    /// Whether <paramref name="thread"/> is a CPU's idle thread, the main kernel thread on the boot CPU.
+    /// </summary>
+    private static bool IsIdleThread(SchedulerThread thread)
+    {
+        return (thread.Flags & SchedulerThreadFlags.IdleThread) != 0;
+    }
+
+    /// <summary>
+    /// The wait of an idle-thread caller: it stays runnable and polls the waiter list with
+    /// interrupts enabled between checks, the rule Mutex and InterruptEvent follow. The idle
+    /// thread is the scheduler's fallback (PickNext ?? IdleThread), so it must never be Blocked
+    /// or Sleeping: when the run queue empties the fallback puts it back on the CPU as Running
+    /// without a wake, so the ReadyThread that would return its tickets never comes (a later
+    /// Signal finds it Running and does nothing). Each such wait then drops the idle thread's
+    /// tickets from the stride total for good; once the total reaches zero GlobalPass stops,
+    /// the idle thread's pass runs ahead of it while it runs alone, and every thread created
+    /// after that starts at GlobalPass and keeps the idle thread off the CPU until its pass
+    /// catches up. Signal still finds this thread in the waiter list, and its ReadyThread does
+    /// nothing on a thread that is already Running or Ready.
+    /// </summary>
+    /// <param name="mutex">The mutex protecting the condition, held by the caller.</param>
+    /// <param name="currentThread">The calling idle thread.</param>
+    /// <param name="deadline">Stopwatch timestamp to give up at, or 0 to wait until signaled.</param>
+    /// <returns>true if signaled, false if the deadline passed first.</returns>
+    private bool WaitPolling(Mutex mutex, SchedulerThread currentThread, long deadline)
+    {
+        // Insert and release in one section, as in Wait: a Signal after the release
+        // must find this thread in the list.
+        using (_lockGuard.AcquireIrqSafe())
+        {
+            if (!ContainsWaiterLocked(currentThread))
+            {
+                _waitingThreads.Add(currentThread);
+            }
+
+            mutex.Release();
+        }
+
+        bool signaled;
+        while (true)
+        {
+            using (_lockGuard.AcquireIrqSafe())
+            {
+                if (!ContainsWaiterLocked(currentThread))
+                {
+                    signaled = true;
+                    break;
+                }
+
+                if (deadline != 0 && Stopwatch.GetTimestamp() >= deadline)
+                {
+                    RemoveWaiterLocked(currentThread);
+                    signaled = false;
+                    break;
+                }
+            }
+        }
+
         mutex.Acquire();
 
         return signaled;
