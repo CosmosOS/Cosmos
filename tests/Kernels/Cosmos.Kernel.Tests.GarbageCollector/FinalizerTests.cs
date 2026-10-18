@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Memory.Heap;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
@@ -25,11 +26,12 @@ internal static class FinalizerTests
     /// <summary>
     /// Number of tests <see cref="RunAll"/> registers; the suite adds it to its expected count.
     /// </summary>
-    public const int TestCount = 19;
+    public const int TestCount = 26;
 
     private const int Pattern = 0x5F1A0000;
 
     private static object? s_resurrected;
+    private static ConditionalWeakTable<object, int[]>? s_table;
     private static int s_genericFinalized;
     private static int s_workerAllocated;
     private static int s_workerFinalized;
@@ -56,6 +58,13 @@ internal static class FinalizerTests
         TR.Run("GC_Finalizer_ThrowingFinalizer", TestThrowingFinalizer);
         TR.Run("GC_Finalizer_DeferredWhenInterruptsMasked", TestDeferredWhenInterruptsMasked);
         TR.Run("GC_Finalizer_MultithreadRegistration", TestMultithreadRegistration);
+        TR.Run("GC_Finalizer_PendingCount", TestPendingCount);
+        TR.Run("GC_Finalizer_SuppressQueuedFromFinalizer", TestSuppressQueuedFromFinalizer);
+        TR.Run("GC_Finalizer_DependentValueAliveInFinalizer", TestDependentValueAliveInFinalizer);
+        TR.Run("GC_Finalizer_DoubleRegistrationRunsTwice", TestDoubleRegistrationRunsTwice);
+        TR.Run("GC_Finalizer_SuppressCancelsEveryRegistration", TestSuppressCancelsEveryRegistration);
+        TR.Run("GC_Finalizer_AllocWhileMaskedDefers", TestAllocWhileMaskedDefers);
+        TR.Run("GC_Finalizer_MaxGeneration", TestMaxGeneration);
     }
 
     // ==================== Probes ====================
@@ -275,6 +284,51 @@ internal static class FinalizerTests
         }
     }
 
+    /// <summary>
+    /// Cancels the finalizer of another object that died in the same collection. Registered
+    /// first, so it is queued, and runs, before its victim.
+    /// </summary>
+    private sealed class SuppressingProbe
+    {
+        public object? Victim;
+        private readonly int[] _counter;
+
+        public SuppressingProbe(int[] counter)
+        {
+            _counter = counter;
+        }
+
+        ~SuppressingProbe()
+        {
+            _counter[0]++;
+            if (Victim != null)
+            {
+                GC.SuppressFinalize(Victim);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Looks itself up in <see cref="s_table"/> from its finalizer: the value a dependent handle
+    /// hangs on it must stay alive until the finalizer has run.
+    /// </summary>
+    private sealed class TableProbe
+    {
+        private readonly int[] _result;
+
+        public TableProbe(int[] result)
+        {
+            _result = result;
+        }
+
+        ~TableProbe()
+        {
+            ConditionalWeakTable<object, int[]>? table = s_table;
+            bool found = table != null && table.TryGetValue(this, out int[]? data) && IsPatternArray(data);
+            _result[0] = found ? 1 : -1;
+        }
+    }
+
     // ==================== Helpers ====================
 
     private static int[] NewPatternArray()
@@ -434,6 +488,31 @@ internal static class FinalizerTests
         if (probe == null)
         {
             counter[0] = -1;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateSuppressingPair(int[] suppressor, int[] victim)
+    {
+        SuppressingProbe probe = new SuppressingProbe(suppressor);
+        probe.Victim = new CountingProbe(victim);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateTableProbe(ConditionalWeakTable<object, int[]> table, int[] result)
+    {
+        TableProbe probe = new TableProbe(result);
+        table.Add(probe, NewPatternArray());
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateDoubleRegisteredProbe(int[] counter, bool suppress)
+    {
+        CountingProbe probe = new CountingProbe(counter);
+        GC.ReRegisterForFinalize(probe);
+        if (suppress)
+        {
+            GC.SuppressFinalize(probe);
         }
     }
 
@@ -741,5 +820,130 @@ internal static class FinalizerTests
             "Finalizer: no object finalized twice under concurrent registration (" + finalized + " of " + allocated + ")");
         Assert.True(finalized >= allocated - 8,
             "Finalizer: no registration lost under concurrent registration (" + finalized + " of " + allocated + ")");
+    }
+
+    private static void TestPendingCount()
+    {
+        const int count = 10;
+
+        // CoreLib's Gen2GcCallback re-registers itself from its finalizer to be called back after
+        // every collection: each one finds it dead again. Measured here, once the probes earlier
+        // tests left behind are finalized.
+        Collect(2);
+        GC.WaitForPendingFinalizers();
+        Collect(1);
+        int baseline = CoreGC.GetFinalizationPendingCount();
+        GC.WaitForPendingFinalizers();
+
+        int[] counter = new int[1];
+        CreateCountingProbes(counter, count);
+
+        // Masked: the probes are queued, not run, so the collection ends with them pending.
+        Heap.Collect();
+        int pending = CoreGC.GetFinalizationPendingCount();
+        int ranInMaskedCollect = counter[0];
+
+        GC.WaitForPendingFinalizers();
+        long reported = GC.GetGCMemoryInfo().FinalizationPendingCount;
+
+        Assert.Equal(0, ranInMaskedCollect, "Finalizer: the masked collection left its finalizers pending");
+        Assert.True(pending >= baseline + count - 2,
+            "Finalizer: the pending count covers the queued objects, expected at least " + (baseline + count - 2) + ", got " + pending);
+        Assert.Equal((long)pending, reported, "Finalizer: GCMemoryInfo.FinalizationPendingCount reports the collector's count");
+
+        // The probes the conservative scan kept die in a later collection: finalize them first.
+        Collect(2);
+        GC.WaitForPendingFinalizers();
+
+        // No probe died: the next collection ends with the baseline alone pending.
+        Collect(1);
+        int leftover = CoreGC.GetFinalizationPendingCount();
+        Assert.Equal(baseline, leftover,
+            "Finalizer: no probe pending after a collection that found none dead, got " + leftover + " for a baseline of " + baseline);
+    }
+
+    private static void TestSuppressQueuedFromFinalizer()
+    {
+        // Both die in the same collection; the first one's finalizer cancels the second's while
+        // it waits in the queue.
+        int[] suppressor = new int[1];
+        int[] victim = new int[1];
+        CreateSuppressingPair(suppressor, victim);
+
+        Collect(1);
+        Collect(2);
+
+        Assert.Equal(1, suppressor[0], "Finalizer: the suppressing finalizer ran");
+        Assert.Equal(0, victim[0], "Finalizer: GC.SuppressFinalize cancels an object already queued for finalization");
+    }
+
+    private static void TestDependentValueAliveInFinalizer()
+    {
+        int[] result = new int[1];
+        ConditionalWeakTable<object, int[]> table = new ConditionalWeakTable<object, int[]>();
+        s_table = table;
+        CreateTableProbe(table, result);
+
+        Collect(1);
+        AllocateGarbage();
+        Collect(1);
+
+        Assert.Equal(1, result[0],
+            "Finalizer: a ConditionalWeakTable value hung on an object is still there when its finalizer runs");
+
+        s_table = null;
+        GC.KeepAlive(table);
+    }
+
+    private static void TestDoubleRegistrationRunsTwice()
+    {
+        // As in .NET: ReRegisterForFinalize on an object still registered adds a second run.
+        int[] counter = new int[1];
+        CreateDoubleRegisteredProbe(counter, false);
+
+        Collect(3);
+
+        Assert.Equal(2, counter[0], "Finalizer: an object registered twice is finalized twice");
+    }
+
+    private static void TestSuppressCancelsEveryRegistration()
+    {
+        // .NET marks the object, so SuppressFinalize cancels the finalizer however many times it
+        // was registered, until the next ReRegisterForFinalize.
+        int[] counter = new int[1];
+        CreateDoubleRegisteredProbe(counter, true);
+
+        Collect(3);
+
+        Assert.Equal(0, counter[0], "Finalizer: GC.SuppressFinalize cancels every pending registration of an object");
+    }
+
+    private static void TestAllocWhileMaskedDefers()
+    {
+        // An allocation made with interrupts masked (an IRQ handler, a spin-locked section) must
+        // neither run the queued finalizers nor block: it leaves them to a later call.
+        int[] counter = new int[1];
+        CreateCountingProbes(counter, 1);
+
+        int ranInside;
+        bool allocated;
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            CoreGC.Collect();
+            object fresh = new object();
+            allocated = fresh != null;
+            ranInside = counter[0];
+        }
+
+        GC.WaitForPendingFinalizers();
+
+        Assert.True(allocated, "Finalizer: allocating with interrupts masked and finalizers pending succeeds");
+        Assert.Equal(0, ranInside, "Finalizer: no finalizer runs from an allocation made with interrupts masked");
+        Assert.Equal(1, counter[0], "Finalizer: the finalizer runs once interrupts are back");
+    }
+
+    private static void TestMaxGeneration()
+    {
+        Assert.Equal(0, GC.MaxGeneration, "Finalizer: the collector has a single generation");
     }
 }

@@ -24,7 +24,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[GarbageCollector] BeforeRun() reached!\n");
         Serial.WriteString("[GarbageCollector] Starting tests...\n");
 
-        TR.Start("GarbageCollector Tests", expectedTests: 50 + FinalizerTests.TestCount);
+        TR.Start("GarbageCollector Tests", expectedTests: 50 + FinalizerTests.TestCount + FinalizerThreadTests.TestCount);
 
         // Garbage Collection Tests
         TR.Run("GC_IsEnabled", TestGCIsEnabled);
@@ -90,6 +90,7 @@ public class Kernel : Sys.Kernel
 
         // Finalizer Tests
         FinalizerTests.RunAll();
+        FinalizerThreadTests.RunAll();
 
         TR.Finish();
 
