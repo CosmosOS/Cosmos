@@ -3,16 +3,11 @@
 
 .intel_syntax noprefix
 
-.data
-
-// Global exception info stack head (single-threaded kernel, no TLS needed)
-.global __cosmos_exinfo_stack_head
-__cosmos_exinfo_stack_head: .quad 0
-
 .text
 
 // External managed functions
 .extern RhThrowEx                   // C# exception dispatcher
+.extern __cosmos_exinfo_head        // &head of the running thread's ExInfo chain (ExceptionNative)
 
 //=============================================================================
 // Structure offsets (from AsmOffsetsCpu.h)
@@ -108,19 +103,22 @@ RhpThrowEx:
     // Save exception object temporarily
     mov     rbx, rdi                // rbx = exception object
 
+    // RAX = &head of this thread's ExInfo chain. A managed callout, so it may clobber every
+    // caller-saved register: it runs before RSI is set up below. The exception object sits in RBX,
+    // which it preserves, and RSP is 16-byte aligned here (the pushes above plus
+    // STACKSIZEOF_ExInfo are a multiple of 16).
+    call    __cosmos_exinfo_head
+
     // RSI = ExInfo* (current RSP)
     mov     rsi, rsp
 
     // Initialize ExInfo fields
-    xor     rdx, rdx
     mov     [rsi + OFFSETOF__ExInfo__m_exception], rbx                       // exception object — RhpRethrow reads it back
     mov     byte ptr [rsi + OFFSETOF__ExInfo__m_passNumber], 1               // passNumber = 1
     mov     dword ptr [rsi + OFFSETOF__ExInfo__m_idxCurClause], 0xFFFFFFFF   // idxCurClause = -1
     mov     byte ptr [rsi + OFFSETOF__ExInfo__m_kind], ExKind_Throw          // kind = Throw
 
-    // Link ExInfo into the global exception chain
-    // (In a real OS, this would be thread-local via INLINE_GETTHREAD)
-    lea     rax, [rip + __cosmos_exinfo_stack_head]
+    // Link ExInfo into this thread's exception chain
     mov     rdx, [rax]                                                       // rdx = current head
     mov     [rsi + OFFSETOF__ExInfo__m_pPrevExInfo], rdx                     // pExInfo->m_pPrevExInfo = head
     mov     [rax], rsi                                                       // head = pExInfo
@@ -150,8 +148,8 @@ RhpThrowEx:
 //         RDX = REGDISPLAY*  (REGDISPLAY.SP = the catching method's body RSP at the protected
 //                              region; pRbx/pRbp/pR12..pR15 -> the establisher's body register
 //                              values; the dispatcher fills these from the CFI unwind)
-//         RCX = ExInfo*       (unused — the ExInfo pop loop below walks __cosmos_exinfo_stack_head
-//                              directly, so RCX is not saved)
+//         RCX = ExInfo*       (unused — the ExInfo pop loop below walks this thread's chain from
+//                              the head __cosmos_exinfo_head returns, so RCX is not saved)
 //
 // The catch funclet runs with the establisher frame's RBP/RBX/R12-R15 (restored below) and the
 // exception object in RDI; it returns, in RAX, the IP in the catching method right after the
@@ -169,8 +167,9 @@ RhpThrowEx:
 // CFI: the prologue is described so the precise GC stack scan / exception unwinder (issue #346)
 // can step from inside the funclet up through this trampoline into the dispatcher's managed frame.
 // Only the post-`call qword ptr [rsp + 8]` IP is ever a CFI target here (GC cannot fire elsewhere
-// in this stub — interrupts off, no allocations), and the `mov rsp, r9 / jmp r8` resume tail runs
-// strictly after that point, so describing just the prologue is sufficient and correct.
+// in this stub — interrupts off, no allocations; the __cosmos_exinfo_head callout allocates
+// nothing), and the `mov rsp, r9 / jmp r8` resume tail runs strictly after that point, so
+// describing just the prologue is sufficient and correct.
 //=============================================================================
 .global RhpCallCatchFunclet
 .cfi_startproc
@@ -233,10 +232,15 @@ RhpCallCatchFunclet:
     mov     rdi, [rsp + 16]         // exception object
     call    qword ptr [rsp + 8]     // call handler funclet
 
-    // RAX = the IP in the catching method right after the protected region. Stash it; reload
-    // REGDISPLAY* (the funclet may have clobbered RDX).
+    // RAX = the IP in the catching method right after the protected region. Keep it in the handler
+    // slot, dead now, across the callout for the head of this thread's ExInfo chain: a managed call
+    // that may clobber every caller-saved register. RSP is still 16-byte aligned here, as it was
+    // for the funclet call. Then reload REGDISPLAY* (the funclet may have clobbered RDX).
     // Stack layout from the prologue pushes: [rsp+0]=REGDISPLAY* [rsp+8]=handler [rsp+16]=exObj
-    mov     r8, rax                 // r8 = resume IP
+    mov     [rsp + 8], rax          // [rsp+8] = resume IP
+    call    __cosmos_exinfo_head
+    mov     r11, rax                // r11 = &head of this thread's ExInfo chain
+    mov     r8, [rsp + 8]           // r8 = resume IP
     mov     rdx, [rsp]              // rdx = REGDISPLAY*
 
     // r9 = the catching method's body RSP at the protected region (REGDISPLAY.SP). The dispatcher
@@ -244,8 +248,7 @@ RhpCallCatchFunclet:
     mov     r9, [rdx + OFFSETOF__REGDISPLAY__SP]
 
     // Pop ExInfo entries that belong to the frames we unwound past (those below the resume SP).
-    // r10/r11 are scratch — avoid rdi/rsi/rax which the resume point may rely on.
-    lea     r11, [rip + __cosmos_exinfo_stack_head]
+    // r10 is scratch.
 .Lpop_exinfo_loop:
     mov     r10, [r11]              // current ExInfo
     test    r10, r10
@@ -446,8 +449,12 @@ RhpCallFinallyFunclet:
 //=============================================================================
 .global RhpRethrow
 RhpRethrow:
-    // Get current exception from ExInfo chain
-    lea     rax, [rip + __cosmos_exinfo_stack_head]
+    // The exception to rethrow is the one at the head of this thread's ExInfo chain. The head comes
+    // from a managed callout, which wants a 16-byte aligned stack: on entry here, right after the
+    // funclet's call, RSP is off by 8.
+    sub     rsp, 8
+    call    __cosmos_exinfo_head
+    add     rsp, 8
     mov     rax, [rax]
     test    rax, rax
     jz      .Lhalt

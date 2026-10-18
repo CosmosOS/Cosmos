@@ -33,6 +33,7 @@ A [`SchedulerThread`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Ke
 | `TotalRuntime` | Accumulated CPU time, charged to the current thread by the active policy |
 | `AllocContext` | The thread's [TLAB](gc-concepts/tlab.md) (see [the GC article](garbage-collector.md#alloccontext-tlab)) |
 | `_threadStaticStorage` | The backing store for `[ThreadStatic]` fields, handed to CoreLib by ref |
+| `_exceptionDispatchState` | The exception dispatcher's state for the thread, which throws, unwinds and catches on its own stack: the head of its ExInfo chain, its guard against a throw from inside a dispatch, and the funclets running on it. `ExceptionHelper.State` reads it by ref, and the boot code uses the dispatcher's own before it is a scheduler thread (valentinbreiz/nativeaot-patcher#440) |
 | `SchedulerData` | A single `object?` slot the active scheduler attaches its bookkeeping to (inherited from `SchedulerExtensible`) |
 
 Two flags change behavior elsewhere:
@@ -380,9 +381,10 @@ The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfa
 
 ## Tests
 
-Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 58 tests (`make test KERNEL=Threading`):
+Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 80 tests (`make test KERNEL=Threading`):
 
 - thread lifecycle and concurrency (`Thread_Start_ExecutesDelegate`, `Thread_Multiple_CanRunConcurrently`),
+- exception dispatch on several threads at once (`Thread_Throw_TwoThreadsUnhandled_BothJoin`, `Thread_Throw_ConcurrentCatchRethrow_OwnExceptions`),
 - stack sizing and the #433 floor (`Thread_MaxStackSize_IsHonored`, `Thread_MaxStackSize_TinyRequestIsFloored`, `Thread_EnsureSufficientExecutionStack_Passes`),
 - thread statics (`Thread_ThreadStatics`),
 - mutex contention, hand-off, and idle accounting (`Mutex_ThreeContenders_AllAcquire`, `Mutex_ReleaseHandsOffToParkedWaiter`, `Mutex_IdleThreadContention_KeepsTicketAccounting`),

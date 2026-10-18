@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Runtime.GcInfo;
+using Cosmos.Kernel.Core.Scheduler;
 using Unsafe = System.Runtime.CompilerServices.Unsafe;
 
 namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
@@ -29,8 +30,8 @@ internal static unsafe partial class ExceptionHelper
     [SuppressGCTransition]
     private static partial void RhpCallFinallyFunclet(void* handlerAddress, void* pRegDisplay);
 
-    // Guard against recursive exception handling.
-    private static bool s_isHandlingException = false;
+    // The dispatcher's state for the boot code, before it is a scheduler thread (see State).
+    private static ExceptionDispatchState s_bootState;
 
     // Whether every throw is told on the serial port (its message and where it was thrown), and
     // the handler found for it: for debugging the dispatcher, whose crash would otherwise lose
@@ -57,11 +58,30 @@ internal static unsafe partial class ExceptionHelper
     // dispatcher, or with its ExInfo when an exception it throws is caught. Telling a rethrow by
     // its exception object instead let a new exception thrown from a catch re-enter that catch,
     // and a completed catch's object, thrown again later, skip it.
-    private const int MaxRunningFuncletDepth = 64;
-    private static readonly nuint[] s_runningFuncletFramePointers = new nuint[MaxRunningFuncletDepth];
-    private static readonly int[] s_runningFuncletClauses = new int[MaxRunningFuncletDepth];
-    private static readonly nuint[] s_runningFuncletExInfos = new nuint[MaxRunningFuncletDepth];
-    private static int s_runningFuncletCount;
+    //
+    // The records, like the chain and the guard against a throw from inside a dispatch, are the
+    // throwing thread's (ExceptionDispatchState): a funclet runs on the stack of the thread that
+    // threw, and what one thread's dispatch keeps must not be seen by another thread's throw.
+
+    /// <summary>
+    /// The dispatcher's state for the running thread: the scheduler thread's own once one runs,
+    /// the boot code's before. A thread throws, unwinds and catches on its own stack, so its
+    /// ExInfo chain, its dispatch guard and the funclets running on it are its own; shared, a
+    /// thread preempted inside a dispatch made the next thread's throw a "recursive" one, and a
+    /// <c>throw;</c> rethrew whichever thread had thrown last (valentinbreiz/nativeaot-patcher#440).
+    /// </summary>
+    internal static ref ExceptionDispatchState State
+    {
+        get
+        {
+            if (CosmosFeatures.SchedulerEnabled && SchedulerManager.CurrentCpuState?.CurrentThread is { } current)
+            {
+                return ref current.GetExceptionDispatchState();
+            }
+
+            return ref s_bootState;
+        }
+    }
 
     /// <summary>
     /// The index of the last clause of the frame at <paramref name="framePointer"/> that the
@@ -70,12 +90,14 @@ internal static unsafe partial class ExceptionHelper
     /// </summary>
     private static int LastPassedClause(nuint framePointer)
     {
+        ref ExceptionDispatchState state = ref State;
         int lastPassed = -1;
-        for (int i = 0; i < s_runningFuncletCount; i++)
+        for (int i = 0; i < state.FuncletCount; i++)
         {
-            if (s_runningFuncletFramePointers[i] == framePointer && s_runningFuncletClauses[i] > lastPassed)
+            ref RunningFunclet funclet = ref state.Funclets[i];
+            if (funclet.FramePointer == framePointer && funclet.ClauseIndex > lastPassed)
             {
-                lastPassed = s_runningFuncletClauses[i];
+                lastPassed = funclet.ClauseIndex;
             }
         }
 
@@ -88,9 +110,11 @@ internal static unsafe partial class ExceptionHelper
     /// </summary>
     private static bool IsUnwoundFrame(nuint framePointer)
     {
-        for (int i = 0; i < s_runningFuncletCount; i++)
+        ref ExceptionDispatchState state = ref State;
+        for (int i = 0; i < state.FuncletCount; i++)
         {
-            if (s_runningFuncletExInfos[i] < framePointer && framePointer < s_runningFuncletFramePointers[i])
+            ref RunningFunclet funclet = ref state.Funclets[i];
+            if (funclet.ExInfo < framePointer && framePointer < funclet.FramePointer)
             {
                 return true;
             }
@@ -105,13 +129,14 @@ internal static unsafe partial class ExceptionHelper
     /// </summary>
     private static void PruneFinishedFunclets(void* pExInfo)
     {
+        ref ExceptionDispatchState state = ref State;
         int kept = 0;
-        for (int i = 0; i < s_runningFuncletCount; i++)
+        for (int i = 0; i < state.FuncletCount; i++)
         {
             bool inFlight = false;
             for (nuint* p = pExInfo == null ? null : *(nuint**)pExInfo; p != null; p = *(nuint**)p)
             {
-                if ((nuint)p == s_runningFuncletExInfos[i])
+                if ((nuint)p == state.Funclets[i].ExInfo)
                 {
                     inFlight = true;
                     break;
@@ -120,14 +145,12 @@ internal static unsafe partial class ExceptionHelper
 
             if (inFlight)
             {
-                s_runningFuncletFramePointers[kept] = s_runningFuncletFramePointers[i];
-                s_runningFuncletClauses[kept] = s_runningFuncletClauses[i];
-                s_runningFuncletExInfos[kept] = s_runningFuncletExInfos[i];
+                state.Funclets[kept] = state.Funclets[i];
                 kept++;
             }
         }
 
-        s_runningFuncletCount = kept;
+        state.FuncletCount = kept;
     }
 
     /// <summary>
@@ -136,12 +159,14 @@ internal static unsafe partial class ExceptionHelper
     /// </summary>
     private static void EnterFunclet(nuint framePointer, int clauseIndex, void* pExInfo)
     {
-        if (s_runningFuncletCount < MaxRunningFuncletDepth)
+        ref ExceptionDispatchState state = ref State;
+        if (state.FuncletCount < ExceptionDispatchState.MaxRunningFunclets)
         {
-            s_runningFuncletFramePointers[s_runningFuncletCount] = framePointer;
-            s_runningFuncletClauses[s_runningFuncletCount] = clauseIndex;
-            s_runningFuncletExInfos[s_runningFuncletCount] = (nuint)pExInfo;
-            s_runningFuncletCount++;
+            ref RunningFunclet funclet = ref state.Funclets[state.FuncletCount];
+            funclet.FramePointer = framePointer;
+            funclet.ClauseIndex = clauseIndex;
+            funclet.ExInfo = (nuint)pExInfo;
+            state.FuncletCount++;
         }
         else
         {
@@ -199,13 +224,14 @@ internal static unsafe partial class ExceptionHelper
             return;
         }
 
-        // Guard against an exception thrown while we're already dispatching one.
-        if (s_isHandlingException)
+        // Guard against an exception thrown while this thread is already dispatching one.
+        ref ExceptionDispatchState state = ref State;
+        if (state.IsHandlingException)
         {
             FailFast("Recursive exception", ex);
             return;
         }
-        s_isHandlingException = true;
+        state.IsHandlingException = true;
 
         PruneFinishedFunclets(pExInfo);
 
@@ -386,7 +412,7 @@ internal static unsafe partial class ExceptionHelper
         }
 
         // Record the clause about to run so an exception thrown from inside its funclet is
-        // dispatched past it instead of re-entering it (see s_runningFunclet* above).
+        // dispatched past it instead of re-entering it (see the running-funclet records above).
         EnterFunclet(catchFrame.FramePointer, catchClauseIndex, pExInfo);
 
         InvokeCatchHandler(ex, ref catchClause, pExInfo, pRegDisplay);
@@ -811,12 +837,13 @@ internal static unsafe partial class ExceptionHelper
         // is a dispatch of its own rather than a recursive one, and goes past the frames and
         // clauses this dispatch went past. Once the funclet returns, every funclet entered while
         // it ran has returned too.
-        int runningFuncletCount = s_runningFuncletCount;
+        ref ExceptionDispatchState state = ref State;
+        int runningFuncletCount = state.FuncletCount;
         EnterFunclet(framePointer, clauseIndex, pExInfo);
-        s_isHandlingException = false;
+        state.IsHandlingException = false;
         RhpCallFinallyFunclet(handlerAddress, pRegDisplay);
-        s_isHandlingException = true;
-        s_runningFuncletCount = runningFuncletCount;
+        state.IsHandlingException = true;
+        state.FuncletCount = runningFuncletCount;
     }
 
     /// <summary>
@@ -837,7 +864,7 @@ internal static unsafe partial class ExceptionHelper
 
         // The exception is about to be handled — clear the recursion guard before transferring out
         // (RhpCallCatchFunclet jumps to the resume address and never comes back here).
-        s_isHandlingException = false;
+        State.IsHandlingException = false;
         RhpCallCatchFunclet(exceptionPtr, clause.HandlerAddress, pRegDisplay, pExInfo);
     }
 
