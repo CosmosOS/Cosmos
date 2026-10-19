@@ -114,7 +114,6 @@
       <IlcArg Include="@(DirectPInvokeList->'--directpinvokelist:%(Identity)')"/>
       <IlcArg Include="--splitinit"/>
       <IlcArg Include="--nativelib"/>
-      <IlcArg Include="--noinlinetls"/>
       <IlcArg Include="--scanreflection"/>
       <IlcArg Include="-g"/>
       <IlcArg Include="--gdwarf-5"/>

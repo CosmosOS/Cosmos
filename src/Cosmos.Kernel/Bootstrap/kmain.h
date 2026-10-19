@@ -14,6 +14,8 @@ typedef unsigned int size_t;
 extern void* __Modules_start[];
 extern void* __Modules_end[];
 extern char* __kernel_start;
+extern void* __tdata_start[];
+extern void* __tdata_end[];
 
 // Managed code entry points
 extern void __managed__Startup(void);

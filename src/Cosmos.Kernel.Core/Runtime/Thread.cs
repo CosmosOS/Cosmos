@@ -28,6 +28,15 @@ internal class Thread
 
         return ref s_threadData;
     }
+    
+    [RuntimeExport("RhRegisterInlinedThreadStaticRoot")]
+    internal static void RhRegisterInlinedThreadStaticRoot(nint newRoot, nint TypeManager)
+    {
+        //TODO: Implement this method to register inlined thread static roots for the current thread.
+        // 1) It should be implemented as a linked list of roots and replace the current Thread's Static storage.
+        // 2) This linked list should be scanned during GC Collection as we loose the thread object won't root it
+        //    like the current implementation.
+    }
 
     [RuntimeExport("RhGetCurrentThreadStackBounds")]
     internal static void RhGetCurrentThreadStackBounds(out IntPtr pStackLow, out IntPtr pStackHigh)

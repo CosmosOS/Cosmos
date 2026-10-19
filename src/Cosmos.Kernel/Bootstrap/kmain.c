@@ -101,3 +101,8 @@ size_t GetModules(void** modules)
     *modules = __Modules_start;
     return __Modules_end - __Modules_start;
 }
+
+size_t GetTlsRegion(void** tlsStart){
+    *tlsStart = __tdata_start;
+    return __tdata_end - __tdata_start;
+}

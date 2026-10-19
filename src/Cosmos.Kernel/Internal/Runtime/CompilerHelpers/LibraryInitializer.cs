@@ -1,4 +1,5 @@
 using Cosmos.Kernel;
+using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
@@ -84,6 +85,24 @@ internal class LibraryInitializer
                 State = SchedulerThreadState.Running,
                 Flags = SchedulerThreadFlags.Pinned | SchedulerThreadFlags.IdleThread
             };
+
+            unsafe{
+                var tls = ThreadNative.GetTlsRegion(out byte* pTlsStart);
+                
+                Serial.WriteString("[SCHED] Allocating TLS region for idle thread on CPU ");
+                Serial.WriteNumber(cpu);
+                Serial.WriteString(" (");
+                Serial.WriteNumber(tls);
+                Serial.WriteString(" bytes)\n");
+                
+                // Allocate a TLS region for the idle thread and set it in the CPU's TLS register
+                var ptr1 = (byte*)Cosmos.Kernel.Core.Memory.Heap.Heap.Alloc((uint)(tls * IntPtr.Size));
+                MemoryOp.MemMove(ptr1, pTlsStart, (int)tls);
+                var ptr2 = (void**)Cosmos.Kernel.Core.Memory.Heap.Heap.Alloc((uint)IntPtr.Size);
+                *ptr2 = ptr1;
+                
+                ThreadNative.SetThreadLocalStorage((nint)ptr2);            
+            }
 
             SchedulerManager.SetupIdleThread(cpu, idleThread);
 

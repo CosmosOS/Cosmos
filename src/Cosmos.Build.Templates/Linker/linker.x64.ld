@@ -7,6 +7,7 @@ PHDRS
     text PT_LOAD;
     rodata PT_LOAD;
     data PT_LOAD;
+    tls PT_TLS;
 }
 
 SECTIONS
@@ -72,6 +73,24 @@ SECTIONS
         *(COMMON)
         __bss_end = .;
     } :data
+    
+    /* initialized TLS data */
+    .tdata : {
+        __tdata_start = .;
+        *(.tdata .tdata.*)
+        __tdata_end = .;
+    } :tls  /* <------ !!!! */
+
+    __tbss_start = .;
+
+    /* uninitialized TLS data */
+    .tbss : {
+        *(.tbss .tbss.*)
+    } :tls  /* <------ !!!! */
+
+    __tbss_end = .;
+
+    __tls_size = __tbss_end - __tdata_start;
 
     /* Cosmos OS Memory Structure:
      * Mark the end of the kernel image - heap will start after this + alignment
