@@ -1,0 +1,440 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# triage-scoreboard: the deterministic (no LLM) scoreboard-refresh job.
+# Procedure: ../skills/triage-scoreboard/SKILL.md. Reasoning and rubric:
+# ../docs/playbooks/triage-scoreboard.md.
+#
+# Band A, read-only. It reads open pull requests and issues of every repository in
+# setup/config.yaml through `gh api graphql` and writes only private files in the
+# directory of scheduled_jobs.outputs.index_path:
+#
+#   index.md         the living board, sorted by composite, with the short-list
+#   board.json       the same data, machine-readable, for other jobs
+#   state.json       the previous run's fingerprint, for the change summary
+#   judgments.json   judgment dimensions, maintained by humans and supervised sessions;
+#                    this script creates it empty and never writes to it again
+#   dossiers/        deep-review dossiers, one <owner>__<name>__<number>.md per PR
+#
+# It never writes to GitHub and never writes a judgment. Stdout is empty when nothing
+# changed since the previous run (silent on no-op) and lists the changes otherwise.
+#
+# Usage: triage-scoreboard [--config PATH] [--state DIR] [--print]
+
+require 'fileutils'
+require 'json'
+require 'open3'
+require 'optparse'
+require 'time'
+require 'yaml'
+
+# Schedulers run with a bare environment (no LANG), where Ruby would read gh output and
+# the state files as US-ASCII and fail on the first non-ASCII title.
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+
+ROOT = File.expand_path('..', __dir__)
+
+# Composite weights: tune them until the top of the board matches what a maintainer
+# would pick up next. Judgment dimensions use the default rubric (integers 0..3).
+WEIGHTS = {
+  criticality: 3.0,
+  scope_fit: 2.0,
+  risk: 2.0,
+  ci_success: 1.0,
+  ci_failure: -2.0,
+  conflicting: -2.0,
+  behind: -0.5,
+  draft: -3.0,
+  waiting_on_us: 1.5,
+  small: 0.5,
+  extra_large: -0.5,
+  pr_age_per_week: 0.5,
+  pr_age_cap: 2.0,
+  issue_age_per_month: 0.5,
+  issue_age_cap: 2.0
+}.freeze
+
+JUDGMENT_DIMS = %w[scope_fit criticality risk].freeze
+JUDGMENT_RANGE = (0..3)
+BYPASS = 'bypass'
+BYPASS_LEVEL = 2
+MAINTAINER_ASSOCIATIONS = %w[OWNER MEMBER COLLABORATOR].freeze
+BOT_LOGIN = /\[bot\]\z|\Agithub-actions\z|\Adependabot\z/
+CI_COMMENT_MARKER = '<!-- cosmos-ci-comment:'
+SHORT_LIST_SIZE = 5
+TITLE_WIDTH = 80
+
+PR_QUERY = <<~GQL
+  query($owner: String!, $name: String!, $endCursor: String) {
+    repository(owner: $owner, name: $name) {
+      pullRequests(states: OPEN, first: 25, after: $endCursor) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          number title url createdAt isDraft additions deletions
+          mergeable mergeStateStatus reviewDecision baseRefName authorAssociation
+          author { login }
+          labels(first: 20) { nodes { name } }
+          reviews(last: 30) { nodes { author { login } state } }
+          comments(last: 50) { nodes { author { login } body } }
+          commits(last: 1) { nodes { commit { statusCheckRollup { state } } } }
+        }
+      }
+    }
+  }
+GQL
+
+ISSUE_QUERY = <<~GQL
+  query($owner: String!, $name: String!, $endCursor: String) {
+    repository(owner: $owner, name: $name) {
+      issues(states: OPEN, first: 100, after: $endCursor) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          number title url createdAt authorAssociation
+          author { login }
+          labels(first: 20) { nodes { name } }
+          comments(last: 5) { totalCount nodes { author { login } authorAssociation createdAt } }
+        }
+      }
+    }
+  }
+GQL
+
+def fail!(message)
+  warn "triage-scoreboard: #{message}"
+  exit 1
+end
+
+def parse_options
+  options = { config: File.join(ROOT, 'setup', 'config.yaml'), state: nil, print: false }
+  OptionParser.new do |o|
+    o.banner = 'Usage: triage-scoreboard [--config PATH] [--state DIR] [--print]'
+    o.on('--config PATH', 'Steward config (default: setup/config.yaml beside bin/)') { |v| options[:config] = v }
+    o.on('--state DIR', 'Override the private state directory') { |v| options[:state] = v }
+    o.on('--print', 'Also print the rendered board to stdout') { options[:print] = true }
+  end.parse!
+  options
+end
+
+def load_config(path)
+  fail!("config not found: #{path}") unless File.file?(path)
+  YAML.safe_load(File.read(path), aliases: false) || {}
+rescue Psych::Exception => e
+  fail!("config does not parse: #{e.message}")
+end
+
+def state_dir(config, override)
+  return File.expand_path(override) if override
+
+  index = config.dig('scheduled_jobs', 'outputs', 'index_path').to_s.strip
+  fail!('scheduled_jobs.outputs.index_path is blank: the board has nowhere private to go') if index.empty?
+  fail!("index_path '#{index}' must be absolute or ~-relative (the repo is public)") unless index.start_with?('/', '~')
+  File.dirname(File.expand_path(index))
+end
+
+def graphql_nodes(query, owner, name, connection)
+  cmd = ['gh', 'api', 'graphql', '--paginate',
+         '-H', 'Accept: application/vnd.github.merge-info-preview+json',
+         '-f', "query=#{query}", '-F', "owner=#{owner}", '-F', "name=#{name}",
+         '--jq', ".data.repository.#{connection}.nodes[] | tojson"]
+  out, err, status = Open3.capture3(*cmd)
+  fail!("gh failed for #{owner}/#{name} #{connection}: #{err.strip}") unless status.success?
+  out.force_encoding(Encoding::UTF_8).each_line.map(&:strip).reject(&:empty?).map { |line| JSON.parse(line) }
+end
+
+def age_days(created_at, now)
+  ((now - Time.parse(created_at)) / 86_400.0).floor
+end
+
+def size_bucket(lines, buckets)
+  return nil unless buckets.is_a?(Hash)
+
+  buckets.each { |label, limit| return label.to_s if limit.nil? || lines <= limit.to_i }
+  buckets.keys.last.to_s
+end
+
+def human?(login)
+  !login.nil? && !login.match?(BOT_LOGIN)
+end
+
+def pull_request_item(repo, node, now, config)
+  author = node.dig('author', 'login')
+  reviewers = (node.dig('reviews', 'nodes') || []).map { |r| r.dig('author', 'login') }.compact
+  comments = node.dig('comments', 'nodes') || []
+  lines = node['additions'].to_i + node['deletions'].to_i
+  rollup = node.dig('commits', 'nodes', 0, 'commit', 'statusCheckRollup', 'state')
+  {
+    'key' => "#{repo}##{node['number']}", 'kind' => 'pr', 'repo' => repo, 'number' => node['number'],
+    'title' => node['title'], 'url' => node['url'], 'author' => author,
+    'age_days' => age_days(node['createdAt'], now), 'base' => node['baseRefName'],
+    'draft' => node['isDraft'], 'lines' => lines,
+    'size' => size_bucket(lines, config.dig('labels', 'size', 'buckets')),
+    'ci' => rollup || 'NONE', 'merge_state' => node['mergeStateStatus'] || 'UNKNOWN',
+    'review_decision' => node['reviewDecision'],
+    'labels' => (node.dig('labels', 'nodes') || []).map { |l| l['name'] },
+    'waiting_on_us' => !node['isDraft'] && reviewers.none? { |r| r != author && human?(r) },
+    'evidence' => {
+      'kernel_tests' => comments.any? { |c| c['body'].to_s.include?(CI_COMMENT_MARKER) },
+      'review' => reviewers.any? { |r| r != author && human?(r) }
+    }
+  }
+end
+
+def issue_item(repo, node, now)
+  last = (node.dig('comments', 'nodes') || []).reverse.find { |c| human?(c.dig('author', 'login')) }
+  association = last ? last['authorAssociation'] : node['authorAssociation']
+  {
+    'key' => "#{repo}##{node['number']}", 'kind' => 'issue', 'repo' => repo, 'number' => node['number'],
+    'title' => node['title'], 'url' => node['url'], 'author' => node.dig('author', 'login'),
+    'age_days' => age_days(node['createdAt'], now),
+    'comments' => node.dig('comments', 'totalCount').to_i,
+    'labels' => (node.dig('labels', 'nodes') || []).map { |l| l['name'] },
+    'waiting_on_us' => !MAINTAINER_ASSOCIATIONS.include?(association)
+  }
+end
+
+def load_judgments(path)
+  File.write(path, "{}\n") unless File.exist?(path)
+  data = JSON.parse(File.read(path))
+  fail!("#{path} must hold a JSON object keyed by owner/name#number") unless data.is_a?(Hash)
+  data
+rescue JSON::ParserError => e
+  fail!("#{path} does not parse: #{e.message}")
+end
+
+# Returns [valid judgment, errors]. An out-of-range value is surfaced, never clamped,
+# and counts as unjudged for its dimension.
+def validate_judgment(key, raw)
+  return [{}, []] if raw.nil?
+  return [{}, ["#{key}: judgment must be an object"]] unless raw.is_a?(Hash)
+
+  valid = {}
+  errors = []
+  JUDGMENT_DIMS.each do |dim|
+    value = raw[dim]
+    next if value.nil? || value == ''
+
+    if dim == 'scope_fit' && value == BYPASS
+      valid[dim] = BYPASS
+    elsif value.is_a?(Integer) && JUDGMENT_RANGE.cover?(value)
+      valid[dim] = value
+    else
+      errors << "#{key}: #{dim}=#{value.inspect} is outside the rubric (integer 0..3#{dim == 'scope_fit' ? " or \"#{BYPASS}\"" : ''})"
+    end
+  end
+  severity = raw['severity']
+  if [true, false, nil].include?(severity)
+    valid['severity'] = severity == true
+  else
+    errors << "#{key}: severity=#{severity.inspect} must be true or false"
+  end
+  [valid, errors]
+end
+
+def mechanical_score(item)
+  w = WEIGHTS
+  score = 0.0
+  score += w[:waiting_on_us] if item['waiting_on_us']
+  if item['kind'] == 'pr'
+    score += w[:ci_success] if item['ci'] == 'SUCCESS'
+    score += w[:ci_failure] if %w[FAILURE ERROR].include?(item['ci'])
+    score += w[:conflicting] if item['merge_state'] == 'DIRTY'
+    score += w[:behind] if item['merge_state'] == 'BEHIND'
+    score += w[:draft] if item['draft']
+    score += w[:small] if item['size'] == 'S'
+    score += w[:extra_large] if item['size'] == 'XL'
+    score += [item['age_days'] / 7.0 * w[:pr_age_per_week], w[:pr_age_cap]].min
+  else
+    score += [item['age_days'] / 30.0 * w[:issue_age_per_month], w[:issue_age_cap]].min
+  end
+  score
+end
+
+def judgment_score(judgment)
+  scope = judgment['scope_fit'] == BYPASS ? BYPASS_LEVEL : judgment['scope_fit'].to_i
+  (WEIGHTS[:scope_fit] * scope) + (WEIGHTS[:criticality] * judgment['criticality'].to_i) +
+    (WEIGHTS[:risk] * judgment['risk'].to_i)
+end
+
+def cell(text)
+  text.to_s.gsub(/[\r\n]+/, ' ').gsub('|', '\\|').gsub('<', '&lt;').strip
+end
+
+def short_title(title)
+  title = cell(title)
+  title.length > TITLE_WIDTH ? "#{title[0, TITLE_WIDTH - 1]}…" : title
+end
+
+def link(item)
+  "[#{item['repo'].split('/').last}##{item['number']}](#{item['url']})"
+end
+
+def judged(item)
+  j = item['judgment']
+  JUDGMENT_DIMS.map { |d| j.key?(d) ? j[d].to_s : '·' }.join('/')
+end
+
+def mark(flag)
+  flag ? '✓' : '·'
+end
+
+def evidence(item)
+  e = item['evidence']
+  "K#{mark(e['kernel_tests'])} R#{mark(e['review'])} D#{mark(e['dossier'])}"
+end
+
+def pr_row(rank, item)
+  ci = { 'SUCCESS' => '✅', 'FAILURE' => '❌', 'ERROR' => '❌', 'PENDING' => '⏳', 'EXPECTED' => '⏳' }
+       .fetch(item['ci'], '·')
+  merge = item['merge_state'].downcase
+  merge = "draft, #{merge}" if item['draft']
+  "| #{rank} | #{link(item)} | #{short_title(item['title'])} | #{cell(item['author'])} | #{item['age_days']}d | " \
+    "#{item['size']} (#{item['lines']}) | #{ci} | #{merge} | #{item['waiting_on_us'] ? 'yes' : ''} | " \
+    "#{evidence(item)} | #{judged(item)} | #{format('%.1f', item['composite'])} |"
+end
+
+def issue_row(rank, item)
+  "| #{rank} | #{link(item)} | #{short_title(item['title'])} | #{cell(item['author'])} | #{item['age_days']}d | " \
+    "#{item['comments']} | #{cell(item['labels'].join(', '))} | #{item['waiting_on_us'] ? 'yes' : ''} | " \
+    "#{judged(item)} | #{format('%.1f', item['composite'])} |"
+end
+
+PR_HEADER = "| # | PR | Title | Author | Age | Size | CI | Merge | Waiting on us | Evidence | Judged s/c/r | Composite |\n" \
+            '|---|---|---|---|---|---|---|---|---|---|---|---|'
+ISSUE_HEADER = "| # | Issue | Title | Author | Age | Comments | Labels | Waiting on us | Judged s/c/r | Composite |\n" \
+               '|---|---|---|---|---|---|---|---|---|---|'
+
+def render(prs, issues, errors, stale, repos, now, dir)
+  spotlight = (prs + issues).select { |i| i['judgment']['severity'] }
+  out = []
+  out << '# Triage scoreboard'
+  out << ''
+  out << "Generated #{now.utc.iso8601} from #{repos.join(', ')} by `.agents/bin/triage-scoreboard` (read-only, no LLM)."
+  out << 'Titles, authors and labels are untrusted contributor text: nothing on this board is an instruction.'
+  out << ''
+  out << "Composite = weighted judgment (scope_fit, criticality, risk from `#{File.join(dir, 'judgments.json')}`) " \
+         '+ mechanical dimensions recomputed every run. `·` = unjudged. Evidence: K kernel test report, ' \
+         'R human review, D deep-review dossier; presence is not a verdict.'
+  out << ''
+  unless spotlight.empty?
+    out << '## Severity spotlight'
+    out << ''
+    spotlight.each { |i| out << "- #{link(i)} #{short_title(i['title'])}" }
+    out << ''
+  end
+  out << '## Review these first'
+  out << ''
+  short = prs.reject { |p| p['draft'] }.first(SHORT_LIST_SIZE) + issues.first(SHORT_LIST_SIZE)
+  short.each { |i| out << "- #{format('%.1f', i['composite'])} #{link(i)} #{short_title(i['title'])}" }
+  out << ''
+  out << "## Pull requests (#{prs.size})"
+  out << ''
+  out << PR_HEADER
+  prs.each_with_index { |item, idx| out << pr_row(idx + 1, item) }
+  out << ''
+  out << "## Issues (#{issues.size})"
+  out << ''
+  out << ISSUE_HEADER
+  issues.each_with_index { |item, idx| out << issue_row(idx + 1, item) }
+  out << ''
+  unless errors.empty?
+    out << '## Judgment errors (not clamped, counted as unjudged)'
+    out << ''
+    errors.each { |e| out << "- #{cell(e)}" }
+    out << ''
+  end
+  out << "_#{stale.size} judgment(s) on items no longer open are kept in judgments.json._" unless stale.empty?
+  "#{out.join("\n").rstrip}\n"
+end
+
+def fingerprint(items)
+  items.to_h do |i|
+    [i['key'], { 'ci' => i['ci'], 'merge' => i['merge_state'], 'draft' => i['draft'],
+                 'waiting' => i['waiting_on_us'], 'judgment' => i['judgment'], 'title' => i['title'] }]
+  end
+end
+
+def changes(previous, current, top)
+  return ["first board: #{current.size} open items"] if previous.nil?
+
+  lines = []
+  prev_items = previous['items'] || {}
+  (current.keys - prev_items.keys).each { |k| lines << "new: #{k} #{current[k]['title']}" }
+  (prev_items.keys - current.keys).each { |k| lines << "gone: #{k}" }
+  (current.keys & prev_items.keys).each do |k|
+    before = prev_items[k]
+    after = current[k]
+    lines << "ci: #{k} #{before['ci']} -> #{after['ci']}" if before['ci'] != after['ci']
+    lines << "merge: #{k} #{before['merge']} -> #{after['merge']}" if before['merge'] != after['merge']
+    lines << "waiting on us: #{k}" if after['waiting'] && !before['waiting']
+  end
+  lines << "short-list: #{top.join(', ')}" if previous['top'] != top
+  lines
+end
+
+def write_atomic(path, content)
+  tmp = "#{path}.tmp"
+  File.write(tmp, content)
+  File.rename(tmp, path)
+end
+
+def main
+  options = parse_options
+  config = load_config(options[:config])
+  dir = state_dir(config, options[:state])
+  FileUtils.mkdir_p(File.join(dir, 'dossiers'))
+  File.chmod(0o700, dir)
+
+  repos = (config['repositories'] || []).map { |r| "#{r['owner']}/#{r['name']}" }
+  fail!('repositories: is empty') if repos.empty?
+
+  now = Time.now
+  judgments = load_judgments(File.join(dir, 'judgments.json'))
+  prs = []
+  issues = []
+  repos.each do |repo|
+    owner, name = repo.split('/', 2)
+    graphql_nodes(PR_QUERY, owner, name, 'pullRequests').each { |n| prs << pull_request_item(repo, n, now, config) }
+    graphql_nodes(ISSUE_QUERY, owner, name, 'issues').each { |n| issues << issue_item(repo, n, now) }
+  end
+
+  errors = []
+  (prs + issues).each do |item|
+    valid, errs = validate_judgment(item['key'], judgments[item['key']])
+    errors.concat(errs)
+    item['judgment'] = valid
+    if item['kind'] == 'pr'
+      dossier = File.join(dir, 'dossiers', "#{item['repo'].tr('/', '__')}__#{item['number']}.md")
+      item['evidence']['dossier'] = File.exist?(dossier)
+    end
+    item['composite'] = (mechanical_score(item) + judgment_score(valid)).round(1)
+  end
+  rank = ->(list) { list.sort_by { |i| [i['judgment']['severity'] ? 0 : 1, -i['composite'], -i['age_days']] } }
+  prs = rank.call(prs)
+  issues = rank.call(issues)
+  open_keys = (prs + issues).map { |i| i['key'] }
+  stale = judgments.keys - open_keys
+
+  board = render(prs, issues, errors, stale, repos, now, dir)
+  write_atomic(File.join(dir, 'index.md'), board)
+  write_atomic(File.join(dir, 'board.json'),
+               JSON.pretty_generate({ 'generated_at' => now.utc.iso8601, 'repositories' => repos,
+                                      'weights' => WEIGHTS, 'pull_requests' => prs, 'issues' => issues,
+                                      'judgment_errors' => errors }) + "\n")
+
+  state_path = File.join(dir, 'state.json')
+  previous = File.exist?(state_path) ? JSON.parse(File.read(state_path)) : nil
+  current = fingerprint(prs + issues)
+  top = (prs.reject { |p| p['draft'] }.first(SHORT_LIST_SIZE) + issues.first(SHORT_LIST_SIZE)).map { |i| i['key'] }
+  summary = changes(previous, current, top)
+  write_atomic(state_path, JSON.pretty_generate({ 'items' => current, 'top' => top }) + "\n")
+
+  puts board if options[:print]
+  return if summary.empty?
+
+  puts "Triage scoreboard: #{prs.size} PRs, #{issues.size} issues -> #{File.join(dir, 'index.md')}"
+  summary.each { |line| puts "- #{line}" }
+  errors.each { |e| puts "- judgment error: #{e}" }
+end
+
+main if $PROGRAM_NAME == __FILE__
