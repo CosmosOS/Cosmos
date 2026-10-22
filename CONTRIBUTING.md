@@ -82,15 +82,7 @@ make run ARCH=arm64                     # same, for ARM64
 
 ## Code Style
 
-The full rules are in the [Coding Guidelines](docs/articles/dev/coding-guidelines.md); naming and formatting are enforced by `.editorconfig`. In short:
-
-- C# 14 / .NET 10, 4-space indentation, Allman braces
-- Braces are always required; use explicit types instead of `var`
-- No `while (true)`: a loop's header states what ends it (an index against an end, a deadline, a flag); only a loop that never returns and halts the CPU in its body spins
-- Private fields `_camelCase`, static fields `s_camelCase`, constants `PascalCase`
-- Nullable reference types are enabled solution-wide; do not introduce nullable warnings: declare `?` honestly, guard late-initialized state with `[MemberNotNull]` helpers, and avoid the null-forgiving `!`
-- Kernel code must be AOT-compatible: no reflection, no dynamic code generation
-- Architecture-specific code goes behind `#if ARCH_X64` / `#if ARCH_ARM64`, only in `Cosmos.Kernel.Core` or `Cosmos.Kernel.Plugs`
+The full rules are in the [Coding Guidelines](docs/articles/dev/coding-guidelines.md); naming and formatting are enforced by `.editorconfig`.
 
 ---
 

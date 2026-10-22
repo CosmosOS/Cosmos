@@ -29,18 +29,7 @@ Build pipeline: Source -> Patcher (IL method replacement via Mono.Cecil) -> ILC 
 
 ## Code style
 
-- C# 14, .NET 10, 4-space indentation, Allman braces (see `.editorconfig`)
-- Kernel code must be AOT-compatible: no reflection, no dynamic code generation
-- `[UnmanagedCallersOnly(EntryPoint = "...")]` for native-to-managed entry points
-- `[RuntimeExport("name")]` only for NativeAOT/runtime-required exports in Core (`Rh*`, `memmove`, `sqrt`, etc.)
-- `[LibraryImport("*")]` for native imports
-- Architecture-specific code: `#if ARCH_X64` / `#if ARCH_ARM64` to avoid + only tolerated in Cosmos.Kernel.Core or Cosmos.Kernel.Plugs.
-- Unsafe code only in Cosmos.Kernel.Core (and its arch projects): HAL, HAL.X64, HAL.ARM64, System and Drivers compile with `AllowUnsafeBlocks=false` and reach memory through Core's address-based entry points (`MemoryBlock` with `PageAllocator.AllocBlock`, `AddressSpace.HhdmOffset`)
-- Private fields: `_camelCase`, static fields: `s_camelCase`, constants: `PascalCase`
-- Braces required (`csharp_prefer_braces = true:error`)
-- Avoid `var` - use explicit types
-- No `while (true)`: the loop header states its bound (an index against an end, a deadline, a flag); the one exemption is a loop that never returns and halts the CPU in its body
-- Namespace follows folder: the project name plus the folder path (IDE0130 at error for `src/Cosmos.Kernel*`, `tests/Kernels`, `tests/Cosmos.Kernel.Tests.System`, `examples`; the exemptions close `.editorconfig`)
+The full rules are in the [Coding Guidelines](docs/articles/dev/coding-guidelines.md); naming and formatting are enforced by `.editorconfig`.
 
 ## Architecture
 
