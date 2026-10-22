@@ -7,6 +7,7 @@
 *                   Port of Cosmos Code.
 */
 
+using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Network.Protocols.Dns;
 using Cosmos.Kernel.System.Timers;
 
@@ -104,6 +105,15 @@ public sealed class DnsClient : UdpClient
 
         if ((ushort)(packet.DnsFlags & 0x0F) != (ushort)ReplyCode.OK)
         {
+            return null;
+        }
+
+        if (packet.Truncated)
+        {
+            // The parser stopped at a malformed section. The reply is dropped
+            // whole, as a reply with a server error is: an address list cut
+            // short would read as a shorter list.
+            Serial.WriteString("[DNS] Malformed reply, dropping\n");
             return null;
         }
 
