@@ -51,6 +51,14 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// </summary>
     public SchedulerThreadFlags Flags { get; internal set; }
 
+    /// <summary>
+    /// Whether this is a CPU's idle thread: the boot thread itself on the boot CPU, the
+    /// scheduler's fallback when <see cref="IScheduler.PickNext"/> returns null. The blocking
+    /// primitives make it spin or poll instead of parking, since a parked idle thread comes
+    /// back through that fallback as Running without the wake that returns its tickets.
+    /// </summary>
+    public bool IsIdle => (Flags & SchedulerThreadFlags.IdleThread) != 0;
+
     // ===== Context (architecture-specific values) =====
 
     /// <summary>

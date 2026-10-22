@@ -26,7 +26,7 @@ A [`SchedulerThread`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Ke
 |-------|---------|
 | `Id`, `CpuId` | Globally unique id (a bare incrementing counter) and the assigned CPU |
 | `State` | One of `Created`, `Ready`, `Running`, `Blocked`, `Sleeping`, `Dead` |
-| `Flags` | `IdleThread`, `Pinned`, `Managed`; bits 8 to 15 are reserved for schedulers |
+| `Flags` | `IdleThread`, `Pinned`, `Managed`; bits 8 to 15 are reserved for schedulers. `IsIdle` reads the first: the thread the blocking primitives make spin or poll instead of parking |
 | `StackBase`, `StackSize`, `StackPointer` | The stack allocation and the saved stack pointer (see below) |
 | `InstructionPointer` | The entry point, staged into the initial context. Manager bookkeeping, not on the seam |
 | `LastScheduledAt`, `WakeupTime` | Accounting kept by the manager, not on the seam; `WakeupTime` is the sleep deadline in `Stopwatch` ticks |

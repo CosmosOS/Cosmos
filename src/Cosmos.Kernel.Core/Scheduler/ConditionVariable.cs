@@ -57,7 +57,7 @@ internal class ConditionVariable : IDisposable
         }
         while (currentThread is null);
 
-        if (IsIdleThread(currentThread))
+        if (currentThread.IsIdle)
         {
             WaitPolling(mutex, currentThread, deadline: 0);
             return;
@@ -96,7 +96,7 @@ internal class ConditionVariable : IDisposable
             return false;
         }
 
-        if (IsIdleThread(currentThread))
+        if (currentThread.IsIdle)
         {
             // At least one Stopwatch tick, so a 0 ms wait still reads as timed.
             long deadline = Stopwatch.GetTimestamp() + Math.Max(1, Stopwatch.Frequency / MillisecondsPerSecond * timeoutMs);
@@ -137,14 +137,6 @@ internal class ConditionVariable : IDisposable
         mutex.Acquire();
 
         return signaled;
-    }
-
-    /// <summary>
-    /// Whether <paramref name="thread"/> is a CPU's idle thread, the main kernel thread on the boot CPU.
-    /// </summary>
-    private static bool IsIdleThread(SchedulerThread thread)
-    {
-        return (thread.Flags & SchedulerThreadFlags.IdleThread) != 0;
     }
 
     /// <summary>
