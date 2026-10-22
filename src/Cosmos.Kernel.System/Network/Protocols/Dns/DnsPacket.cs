@@ -317,23 +317,20 @@ public class DnsPacket : UdpPacket
         // met: the labels after it belong to the pointer's target.
         int after = -1;
 
-        while (true)
+        // A zero-length label closes the name. A label moves pos forward and a
+        // pointer may move it back at most MaxPointerJumps times, so the loop
+        // reaches the end of the message when no zero label closes the name.
+        bool closed = false;
+        while (pos < end && !closed)
         {
-            if (pos >= end)
-            {
-                index = end;
-                return null;
-            }
-
             byte lengthOrPointer = rawData[pos];
 
             if (lengthOrPointer == 0x00)
             {
                 pos++;
-                break;
+                closed = true;
             }
-
-            if ((lengthOrPointer & 0xC0) == 0xC0)
+            else if ((lengthOrPointer & 0xC0) == 0xC0)
             {
                 if (pos + 1 >= end || jumps++ >= MaxPointerJumps)
                 {
@@ -347,22 +344,28 @@ public class DnsPacket : UdpPacket
                 }
 
                 pos = messageBase + (((lengthOrPointer & 0x3F) << 8) | rawData[pos + 1]);
-                continue;
             }
-
-            // The two spare bit patterns are reserved (RFC 1035 section 4.1.4).
-            if ((lengthOrPointer & 0xC0) != 0 || pos + 1 + lengthOrPointer > end)
+            else if ((lengthOrPointer & 0xC0) != 0 || pos + 1 + lengthOrPointer > end)
             {
+                // The two spare bit patterns are reserved (RFC 1035 section 4.1.4).
                 index = end;
                 return null;
             }
-
-            pos++;
-            for (int j = 0; j < lengthOrPointer; j++, pos++)
+            else
             {
-                name.Append((char)rawData[pos]);
+                pos++;
+                for (int j = 0; j < lengthOrPointer; j++, pos++)
+                {
+                    name.Append((char)rawData[pos]);
+                }
+                name.Append('.');
             }
-            name.Append('.');
+        }
+
+        if (!closed)
+        {
+            index = end;
+            return null;
         }
 
         index = after < 0 ? pos : after;
