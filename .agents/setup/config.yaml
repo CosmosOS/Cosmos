@@ -1,0 +1,149 @@
+# Steward: project configuration for Cosmos gen3.
+# Produced by the setup interview (setup-interview.md beside this file), from
+# config.template.yaml. Every Steward playbook and skill under .agents/ reads this file.
+# Not to be confused with the repository's top-level setup/ folder (the Gen2 Inno installer).
+# NEVER put secrets here, only paths. See `secrets:` below.
+
+project:
+  name: "Cosmos gen3: a bare-metal C# kernel framework that builds x64 and ARM64 kernels with the .NET NativeAOT toolchain and the Cosmos plug system"
+  trunk_branch: "gen3"
+  release_model:
+    style: "tag-per-release"     # a v3.0.N tag fires .github/workflows/release.yml
+    changelog_file: ""           # no changelog file: the GitHub Release "User Kit YYYYMMDD (3.0.N)" carries the notes
+    shipped_means: "a v3.0.N tag on CosmosOS/Cosmos contains the commit and its Release workflow published the Cosmos packages to nuget.org"
+
+repositories:
+  - host: "github.com"
+    owner: "CosmosOS"
+    name: "Cosmos"
+    role: "primary"              # gen3 trunk, issues, PRs, releases and the docs site (docs/)
+    visibility: "public"
+  - host: "github.com"
+    owner: "valentinbreiz"
+    name: "nativeaot-patcher"
+    role: "legacy"               # former gen3 development repo; holds an open backlog, new work lands on CosmosOS/Cosmos
+    visibility: "public"
+
+scope:
+  anchors:                       # a change must serve at least one; the scoreboard grades how directly (scope_fit)
+    - "Build bare-metal C# kernels with the stock .NET NativeAOT toolchain on x64 and ARM64 (patcher, ILC, SDK, link, ISO)"
+    - "Run the .NET runtime and BCL inside the kernel through the Cosmos plug system (GC, exceptions, threading)"
+    - "Drive QEMU and real hardware through the HAL driver kit and the shipped drivers, exposed via Cosmos.Kernel.System services"
+    - "Make the User Kit usable: the cosmos CLI, Cosmos.Sdk, the docs and the test suites"
+  philosophy_veto:               # disqualifies a change even if well-built
+    - "breaks AOT compatibility (reflection, dynamic code generation)"
+    - "unsafe code outside Cosmos.Kernel.Core, or #if ARCH_* outside Core and Plugs"
+    - "Gen2/IL2CPU work, or an x64-only feature with no ARM64 path"
+    - "breaks the public API (the release API compatibility guard) without a deliberate decision"
+    - "an abstraction that serves no real kernel use case"
+  bypass_scope_gate:
+    - "bug-fix-on-shipped-feature"
+    - "security-fix"
+    - "reliability-fix"
+
+community:
+  chat:
+    platform: "discord"          # https://discord.com/invite/kwtBwv6jhD (also Matrix at chat.gocosmos.org)
+    server_id: "833970409337913344"
+    bug_channels: []             # TODO: name the channels that carry bug reports before enabling monitoring
+    monitor: false               # off: issue_capture is disabled and no chat integration is wired
+    capture_reaction: "white_check_mark"
+  mentions_sweep:
+    enabled: false
+    disambiguate_against: "Cosmos SDK (the Cosmos blockchain framework)"
+
+issue_capture:                   # disabled: no pre-tracker capture yet
+  enabled: false
+  sources: []
+  queue_path: ""
+  ledger_path: ""
+  checkpoint_path: ""
+  max_per_run: 10
+  max_public_files_per_run: 0
+  capture_marker: ""
+
+security:
+  security_contact: "github-advisory"   # CosmosOS/Cosmos private vulnerability reporting (must be enabled in the repo settings)
+  security_sensitive_surfaces:          # a report naming one of these is a suspected vulnerability until cleared
+    - "network stack parsing"
+    - "filesystem image parsing"
+    - "USB descriptor parsing"
+    - "release pipeline and NuGet publishing"
+
+ci_and_gates:
+  test_command: "make setup && for t in Patcher Scanner Tools BuildCache SourceGenerators Build.Asm Build.Analyzer.Patcher; do dotnet test tests/Cosmos.Tests.$t || exit 1; done && dotnet test tests/Cosmos.Kernel.Tests.System && for k in Audio Drivers Fat File GarbageCollector Graphic HelloWorld Interrupts Math Memory Network Pci Power Random Runtime Storage Threading Timer TypeCasting Virtio; do make test KERNEL=$k ARCH=x64 && make test KERNEL=$k ARCH=arm64 || exit 1; done"
+  test_runtime_estimate: "about 6 min for the .NET suites; about 25 min for the kernel suites in parallel CI, hours when run sequentially on one machine (rely on CI, never sample)"
+  ci_present: true               # dotnet.yml, kernel-tests.yml (x64 + arm64), format.yml on every PR; a PR needs both architectures green
+  code_review_tool: ""           # none: github-actions only posts kernel test result comments
+  adversarial_review_tool: ""
+  visual_preview_tool: ""
+  ui_viewports: []               # no web UI; the Graphic suite covers display output
+
+autonomy:                        # conservative start: supervised sessions, nothing public without a human
+  pr_labeling: "B"
+  issue_triage_replies: "B"
+  issue_autoclose: "C"
+  announcements: "C"
+  pr_merge: "B"
+  human_reachable_at: "@valentinbreiz on GitHub (CosmosOS/Cosmos), and the supervised agent session that runs the playbook"
+
+labels:                          # taxonomy for the deterministic label-sync job (disabled); every value is an existing repo label
+  add_only: true
+  size: { by: diff_lines,   buckets: { S: 50, M: 200, L: 500, XL: null } }  # TODO: the repo has no size labels yet; create them before enabling label-sync
+  area:
+    by: paths
+    map:
+      "src/Cosmos.Patcher/**": "Area: Build"
+      "src/Cosmos.Build.*/**": "Area: Build"
+      "src/Cosmos.Sdk/**": "Area: Build"
+      ".github/workflows/**": "Area: Build"
+      "src/Cosmos.Kernel.Plugs/**": "Area: Plugs"
+      "src/Cosmos.Kernel.Core/Memory/**": "Area: Memory"
+      "src/Cosmos.Kernel.System/Network/**": "Area: Networking"
+      "src/Cosmos.Kernel.System/FileSystem/**": "Area: File System"
+      "src/Cosmos.Kernel.System/Graphics/**": "Area: CGS"
+      "src/Cosmos.Kernel.*/**": "Area: Kernel"
+      "src/Cosmos.Kernel.Native.X64/**": "x64"
+      "src/Cosmos.Kernel.HAL.X64/**": "x64"
+      "src/Cosmos.Kernel.Native.ARM64/**": "arm64"
+      "src/Cosmos.Kernel.HAL.ARM64/**": "arm64"
+      "tests/**": "Area: Testing"
+      "docs/**": "Area: Documentation"
+  type:
+    by: title_prefix             # gitmoji on commits and PRs, issue-template prefixes on issues
+    map:
+      "🐛": "Bug"
+      "✨": "Enhancement"
+      "📝": "documentation"
+      "✅": "test"
+      "[Bug]": "Bug"
+      "[Feature]": "Enhancement"
+      "[Question]": "Question"
+      "[Epic]": "Epic"
+
+trust:                           # disabled until a private ledger path is configured
+  ledger_path: ""
+  prior: 0.5
+  shrinkage: 3.0
+  half_life_days: 180
+
+secrets:
+  credentials_file: ""           # none: no autonomous public writes yet
+  execute_contributor_code: false
+  sandbox_available: false       # untrusted PR code never runs; CI and a human run the suite
+
+scheduled_jobs:                  # Level 2: the read-only scoreboard only
+  jobs:
+    - { name: "scoreboard-refresh", every: "2h",  enabled: true,  agent: false }   # .agents/bin/triage-scoreboard
+    - { name: "chat-monitor",       every: "1h",  enabled: false, agent: true  }
+    - { name: "issue-capture",      every: "1h",  enabled: false, agent: true  }
+    - { name: "mentions-sweep",     every: "24h", enabled: false, agent: true  }
+    - { name: "announcements",      every: "8h",  enabled: false, agent: true  }
+    - { name: "label-sync",         every: "4h",  enabled: false, agent: false }
+    - { name: "issue-autoclose",    every: "4h",  enabled: false, agent: false }
+    - { name: "action-watchdog",    every: "6h",  enabled: false, agent: false }
+    - { name: "fleet-heartbeat",    cron:  "30 8 * * *", enabled: false, agent: false }
+  outputs:
+    index_path: "~/.local/state/steward/cosmos/index.md"   # private, per machine, outside the public repo
+    digest_to: ""
+    alarms_to: ""                # TODO: required before issue_capture is enabled
