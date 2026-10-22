@@ -89,7 +89,7 @@ autonomy:                        # conservative start: supervised sessions, noth
 
 labels:                          # taxonomy for the deterministic label-sync job (disabled); every value is an existing repo label
   add_only: true
-  size: { by: diff_lines,   buckets: { S: 50, M: 200, L: 500, XL: null } }  # TODO: the repo has no size labels yet; create them before enabling label-sync
+  size: { by: diff_lines,   buckets: { "Size: S": 50, "Size: M": 200, "Size: L": 500, "Size: XL": null } }  # PRs only; the labels exist on both repositories
   area:
     by: paths
     map:

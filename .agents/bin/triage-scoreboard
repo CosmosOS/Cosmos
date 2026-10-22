@@ -146,11 +146,19 @@ def age_days(created_at, now)
   ((now - Time.parse(created_at)) / 86_400.0).floor
 end
 
+# Returns the label of the bucket the line count falls in and its rung: :smallest for the
+# first bucket, :largest for the last, :middle otherwise. The bucket keys are the label
+# names label-sync applies, so the rung is read from the position, never from the name.
 def size_bucket(lines, buckets)
-  return nil unless buckets.is_a?(Hash)
+  return [nil, nil] unless buckets.is_a?(Hash) && !buckets.empty?
 
-  buckets.each { |label, limit| return label.to_s if limit.nil? || lines <= limit.to_i }
-  buckets.keys.last.to_s
+  labels = buckets.keys.map(&:to_s)
+  index = buckets.values.index { |limit| limit.nil? || lines <= limit.to_i } || (labels.size - 1)
+  rung = if index.zero? then :smallest
+         elsif index == labels.size - 1 then :largest
+         else :middle
+         end
+  [labels[index], rung]
 end
 
 def human?(login)
@@ -162,13 +170,14 @@ def pull_request_item(repo, node, now, config)
   reviewers = (node.dig('reviews', 'nodes') || []).map { |r| r.dig('author', 'login') }.compact
   comments = node.dig('comments', 'nodes') || []
   lines = node['additions'].to_i + node['deletions'].to_i
+  size, size_rung = size_bucket(lines, config.dig('labels', 'size', 'buckets'))
   rollup = node.dig('commits', 'nodes', 0, 'commit', 'statusCheckRollup', 'state')
   {
     'key' => "#{repo}##{node['number']}", 'kind' => 'pr', 'repo' => repo, 'number' => node['number'],
     'title' => node['title'], 'url' => node['url'], 'author' => author,
     'age_days' => age_days(node['createdAt'], now), 'base' => node['baseRefName'],
     'draft' => node['isDraft'], 'lines' => lines,
-    'size' => size_bucket(lines, config.dig('labels', 'size', 'buckets')),
+    'size' => size, 'size_rung' => size_rung&.to_s,
     'ci' => rollup || 'NONE', 'merge_state' => node['mergeStateStatus'] || 'UNKNOWN',
     'review_decision' => node['reviewDecision'],
     'labels' => (node.dig('labels', 'nodes') || []).map { |l| l['name'] },
@@ -241,8 +250,8 @@ def mechanical_score(item)
     score += w[:conflicting] if item['merge_state'] == 'DIRTY'
     score += w[:behind] if item['merge_state'] == 'BEHIND'
     score += w[:draft] if item['draft']
-    score += w[:small] if item['size'] == 'S'
-    score += w[:extra_large] if item['size'] == 'XL'
+    score += w[:small] if item['size_rung'] == 'smallest'
+    score += w[:extra_large] if item['size_rung'] == 'largest'
     score += [item['age_days'] / 7.0 * w[:pr_age_per_week], w[:pr_age_cap]].min
   else
     score += [item['age_days'] / 30.0 * w[:issue_age_per_month], w[:issue_age_cap]].min
