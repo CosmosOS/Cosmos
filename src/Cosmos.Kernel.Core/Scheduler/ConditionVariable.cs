@@ -146,9 +146,10 @@ internal class ConditionVariable : IDisposable
     /// or Sleeping: when the run queue empties the fallback puts it back on the CPU as Running
     /// without a wake, so the ReadyThread that would return its tickets never comes (a later
     /// Signal finds it Running and does nothing). Each such wait then drops the idle thread's
-    /// tickets from the stride total for good; once the total reaches zero GlobalPass stops,
-    /// the idle thread's pass runs ahead of it while it runs alone, and every thread created
-    /// after that starts at GlobalPass and keeps the idle thread off the CPU until its pass
+    /// tickets from the stride total for good: the total, a ulong, wraps below zero, so
+    /// Stride1 / TotalTickets in UpdateGlobalPass rounds to 0 and GlobalPass stops. The idle
+    /// thread's pass then runs ahead of it while it runs alone, and every thread created after
+    /// that starts at the frozen GlobalPass and keeps the idle thread off the CPU until its pass
     /// catches up. Signal still finds this thread in the waiter list, and its ReadyThread does
     /// nothing on a thread that is already Running or Ready.
     /// </summary>
