@@ -39,6 +39,7 @@ Build pipeline: Source -> Patcher (IL method replacement via Mono.Cecil) -> ILC 
 - Private fields: `_camelCase`, static fields: `s_camelCase`, constants: `PascalCase`
 - Braces required (`csharp_prefer_braces = true:error`)
 - Avoid `var` - use explicit types
+- No `while (true)`: the loop header states its bound (an index against an end, a deadline, a flag); the one exemption is a loop that never returns and halts the CPU in its body
 - Namespace follows folder: the project name plus the folder path (IDE0130 at error for `src/Cosmos.Kernel*`, `tests/Kernels`, `tests/Cosmos.Kernel.Tests.System`, `examples`; the exemptions close `.editorconfig`)
 
 ## Architecture

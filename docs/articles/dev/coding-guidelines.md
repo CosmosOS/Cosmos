@@ -1075,11 +1075,38 @@ if (map.ContainsKey(key))         // Bad: two lookups
 {
     device = map[key];
 }
+
+// Don't loop on a literal; the condition says what ends the loop
+while (true)                      // Bad: nothing in the header bounds it
+{
+    if (pos >= end)
+    {
+        break;
+    }
+    pos += Step(pos);
+}
+
+while (pos < end)                 // Good: the bound is the condition
+{
+    pos += Step(pos);
+}
 ```
 
 > Braces are enforced by `.editorconfig` (`csharp_prefer_braces = true:error`) and by CI (`dotnet format style --severity error`).
 
 Methods, constructors, operators and local functions take a block body, even for a single statement: a wrapped `=>` hides where the body starts. A property, indexer or accessor uses `=>` only when the whole member fits on one line, and a lambda keeps its `=>`. The vendored trees under `ThirdParty/` follow this rule too, and each one's README lists the members it changed. `.editorconfig` records this in the `csharp_style_expression_bodied_*` options at `silent`, so CI does not enforce it.
+
+### Bounded Loops
+
+`while (true)` is not written. A loop's header states what ends it: a count, a bound on an index, a deadline, a flag the body sets when it has found what it was looking for. With the bound in the header, a reader checks in one place that every path moves toward it; with `while (true)`, the exit is wherever a `break` or `return` happens to be, and the loop that lost its exit through an edit reads exactly like the one that never had one. The three kinds of loop that look unbounded each have a bound to state:
+
+| Loop | Header |
+|------|--------|
+| A parse that walks a buffer | `while (pos < end && !closed)`, with the parse's end as the bound and a flag for the record that closes it |
+| A wait on hardware or on another thread | `while (!ready && Stopwatch.GetTimestamp() < deadline)` or `while (!ready && attempts++ < MaxAttempts)`; a poll with no budget is the hang [#365](https://github.com/valentinbreiz/nativeaot-patcher/issues/365) tracks |
+| A kernel's main loop, or a halt that never returns | `while (!_stopped)` for the first; the second halts the CPU in its loop body, so its spin is the point and `while (true) { Halt(); }` stays |
+
+The last row is the one exemption: a method that never returns and whose loop body halts the CPU, as `Power.Reboot` and `Power.Shutdown` fall back to when the platform cannot do either, and as `Kernel.Start` does after `AfterRun`. A loop with an empty body is not that exemption; it burns the CPU to go nowhere, and halts instead. Everything else states its bound. The existing `while (true)` loops in `src/` predate this rule and are converted as the code around them is touched, not in a sweep; no analyzer checks it.
 
 ### Feature Switches
 
