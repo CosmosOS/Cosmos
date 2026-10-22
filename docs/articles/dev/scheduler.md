@@ -200,7 +200,7 @@ A thread that blocks or sleeps gives the CPU away through `SchedulerManager.Park
 | x64 | Local APIC self-IPI, vector `0xF0` |
 | ARM64 | SGI 8, through `ICC_SGI1R_EL1` on GICv3 or `GICD_SGIR` on GICv2 |
 
-`Park` then waits until the state leaves `Blocked` or `Sleeping`, which happens once a wake readied the thread and the scheduler ran it again, or at once when the wake landed before the switch. Halting instead left the CPU idle for the rest of the tick every time a thread blocked. The idle thread, and any thread parking before the controller can raise the interrupt, still halt.
+`Park` then waits until the state leaves `Blocked` or `Sleeping`, which happens once a wake readied the thread and the scheduler ran it again, or at once when the wake landed before the switch. Halting instead left the CPU idle for the rest of the tick every time a thread blocked. A thread parking before the controller can raise the interrupt still halts; the idle thread never parks at all (see the primitives below).
 
 ### What there is not: a voluntary switch
 
@@ -286,6 +286,8 @@ Two special cases: the idle thread never parks (blocking it would just get it re
 ### ConditionVariable and Monitor
 
 [`ConditionVariable`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/ConditionVariable.cs) is wait/signal with mutex integration. `Wait(mutex)` inserts itself, releases the mutex, and blocks, all in one scope (rule 1; releasing the mutex outside the scope is the #357 bug), then re-acquires the mutex on wake. `WaitTimeout` parks through `MarkSleeping` with the deadline, and reports signaled-vs-timeout by membership (rule 3). `Signal` readies the FIFO head; `SignalAll` readies everyone.
+
+The same special case as `Mutex`: the idle thread never parks here either. It inserts itself and releases the mutex in the one scope, then polls the waiter list with interrupts enabled between checks until a `Signal` removes it or the deadline passes. Parking it took its tickets out of the Stride total without the wake that returns them (the idle fallback puts it back as `Running`), so the total wrapped, `GlobalPass` froze, and threads created afterwards kept the main thread off the CPU; CoreLib's `Thread.Sleep` and `Thread.Join` reach this path through the low-level monitor, so the main kernel thread hits it constantly.
 
 [`Monitor`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/Monitor.cs) composes one `Mutex` and one `ConditionVariable` into the classic monitor shape; its `Signal`/`SignalAll` also release the mutex, so signaling exits the monitor.
 
