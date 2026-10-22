@@ -469,7 +469,7 @@ public static class SchedulerManager
                 {
                     continue;
                 }
-                if ((t.Flags & SchedulerThreadFlags.IdleThread) != 0)
+                if (t.IsIdle)
                 {
                     continue;
                 }
@@ -548,7 +548,7 @@ public static class SchedulerManager
         {
             if (s_allThreads[i] == thread)
             {
-                if ((thread.Flags & SchedulerThreadFlags.IdleThread) == 0)
+                if (!thread.IsIdle)
                 {
                     s_exitedNonIdleRuntimeNs += thread.TotalRuntime;
                 }
@@ -783,7 +783,7 @@ public static class SchedulerManager
         }
 
         PerCpuState[]? states = s_cpuStates;
-        if (states is not null && thread.CpuId < s_cpuCount && (thread.Flags & SchedulerThreadFlags.IdleThread) == 0)
+        if (states is not null && thread.CpuId < s_cpuCount && !thread.IsIdle)
         {
             Volatile.Write(ref states[thread.CpuId]._needReschedule, true);
             if (InterruptManager.TryRaiseReschedule())

@@ -460,7 +460,7 @@ public abstract class ConsoleSession
             ? SchedulerManager.CurrentCpuState?.CurrentThread
             : null;
 
-        if (current is null || (current.Flags & SchedulerThreadFlags.IdleThread) != 0)
+        if (current is null || current.IsIdle)
         {
             PlatformHAL.CpuOps?.Halt();
         }
