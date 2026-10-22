@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 80;
+    private const int ExpectedTestCount = 81;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -83,6 +83,10 @@ public class Kernel : Sys.Kernel
     private const int ExitGraceWaitMs = 200;
     /// <summary>Hold time (ms) the idle-contention worker keeps the mutex, spanning several scheduler ticks.</summary>
     private const int IdleMutexHoldMs = 300;
+    /// <summary>Rounds of Thread.Sleep the main (idle) thread makes in the condition-variable ticket test.</summary>
+    private const int IdleSleepRounds = 3;
+    /// <summary>Length (ms) of each Thread.Sleep the main (idle) thread makes in the condition-variable ticket test.</summary>
+    private const int IdleSleepMs = 50;
     /// <summary>Hold time (ms) each contender keeps the mutex so the others pile up in _waitingThreads.</summary>
     private const int MutexContenderHoldMs = 100;
     /// <summary>Wait (ms) giving the hand-off contender a few quanta to park in _waitingThreads.</summary>
@@ -186,6 +190,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Thread_Kill_Queued_StopsManagedSide", TestKillQueuedThreadStopsManagedSide);
         TR.Run("ScheduleFromInterrupt_UnregisteredCpu_IsNoOp", TestScheduleFromInterruptIgnoresUnregisteredCpu);
         TR.Run("Mutex_IdleThreadContention_KeepsTicketAccounting", TestMutexIdleThreadContention);
+        TR.Run("ConditionVariable_IdleThreadWait_KeepsTicketAccounting", TestConditionVariableIdleThreadWait);
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
         TR.Run("Mutex_ThreeContenders_AllAcquire", TestMutexThreeContenders);
         TR.Run("Mutex_ReleaseHandsOffToParkedWaiter", TestMutexReleaseHandsOff);
@@ -715,6 +720,64 @@ public class Kernel : Sys.Kernel
             // stay runnable until the main thread has sampled TotalTickets
         }
         s_mutexWorkerExited = true;
+    }
+
+    // ===== ConditionVariable idle-thread wait (CoreLib waits from the main thread) =====
+    // CoreLib's own waits, Thread.Sleep and Thread.Join among them, reach the
+    // kernel's ConditionVariable through LowLevelMonitor. Parking the idle
+    // thread there took its tickets out of the Stride total without the wake
+    // that would return them (the idle fallback resurrects it as Running), so
+    // the total wrapped under zero, Stride1 / TotalTickets became 0 and
+    // GlobalPass stopped; every thread created afterwards then started at a
+    // frozen GlobalPass and kept the main thread off the CPU
+    // (Stride_ProportionalShare_FollowsTickets hung). Unlike that hang, the
+    // drift is deterministic, and the Mutex cell above does not see it: it
+    // compares before/after inside its own window.
+    private static void TestConditionVariableIdleThreadWait()
+    {
+        uint cpuId = SchedulerManager.GetCurrentCpuId();
+        Cosmos.Kernel.Core.Scheduler.Stride.StrideCpuData? cpuData =
+            SchedulerManager.GetCpuState(cpuId)?.SchedulerData
+                as Cosmos.Kernel.Core.Scheduler.Stride.StrideCpuData;
+        Assert.True(cpuData is not null, "stride per-CPU data should exist");
+
+        ulong ticketsBefore = cpuData!.TotalTickets;
+        ulong passBefore = cpuData.GlobalPass;
+
+        // Thread.Sleep: LowLevelMonitor.TimedWait -> ConditionVariable.WaitTimeout.
+        for (int i = 0; i < IdleSleepRounds; i++)
+        {
+            SysThread.Sleep(IdleSleepMs);
+        }
+
+        ulong ticketsAfterSleep = cpuData.TotalTickets;
+
+        // Thread.Join: LowLevelMonitor.Wait -> ConditionVariable.Wait. The grace
+        // wait lets the worker's exit finish inside this cell, since its
+        // OnThreadExit takes the worker's own tickets back out of the total.
+        SysThread worker = new(static () => { });
+        worker.Start();
+        worker.Join();
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        ulong ticketsAfterJoin = cpuData.TotalTickets;
+        ulong passAfterJoin = cpuData.GlobalPass;
+
+        Serial.WriteString("[IdleWait] TotalTickets before=");
+        Serial.WriteNumber((long)ticketsBefore);
+        Serial.WriteString(" afterSleep=");
+        Serial.WriteNumber((long)ticketsAfterSleep);
+        Serial.WriteString(" afterJoin=");
+        Serial.WriteNumber((long)ticketsAfterJoin);
+        Serial.WriteString(" GlobalPass before=");
+        Serial.WriteNumber((long)passBefore);
+        Serial.WriteString(" afterJoin=");
+        Serial.WriteNumber((long)passAfterJoin);
+        Serial.WriteString("\n");
+
+        Assert.True(ticketsBefore == ticketsAfterSleep, "Thread.Sleep from the idle thread must not drift TotalTickets");
+        Assert.True(ticketsBefore == ticketsAfterJoin, "Thread.Join from the idle thread must not drift TotalTickets");
+        Assert.True(passAfterJoin > passBefore, "GlobalPass must keep advancing across idle-thread waits");
     }
 
     // ===== Multi-waiter paths (List<Thread> scans on non-empty lists) =====
