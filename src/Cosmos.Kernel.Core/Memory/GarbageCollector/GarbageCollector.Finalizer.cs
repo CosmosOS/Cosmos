@@ -422,26 +422,27 @@ internal static unsafe partial class GarbageCollector
         if (prev != ThreadFinalizerStatus.Stopped)
         {
             // Stopping or Exited: wait for the stopper to publish Stopped, then claim it. A stop
-            // means a start ran before, so the monitor exists.
+            // means a start ran before, so the monitor exists. The loop ends on the state word:
+            // either this start claims Stopped, or another waiting start claimed it first. The
+            // claim under the monitor comes before the first wait: a Stopped published, and
+            // signalled, between the claim above and the acquire would otherwise be missed.
             Monitor m = s_finalizerMonitor!;
             m.Acquire();
-            while (true)
+            prev = Interlocked.CompareExchange(ref s_threadFinalizerStatus,
+                                               ThreadFinalizerStatus.Starting, ThreadFinalizerStatus.Stopped);
+            while (prev is ThreadFinalizerStatus.Stopping or ThreadFinalizerStatus.Exited)
             {
+                m.Wait();
                 prev = Interlocked.CompareExchange(ref s_threadFinalizerStatus,
                                                    ThreadFinalizerStatus.Starting, ThreadFinalizerStatus.Stopped);
-                if (prev == ThreadFinalizerStatus.Stopped)
-                {
-                    break;
-                }
-                if (prev is ThreadFinalizerStatus.Starting or ThreadFinalizerStatus.Running)
-                {
-                    // Another waiting start claimed it first
-                    m.Release();
-                    return;
-                }
-                m.Wait();
             }
+
             m.Release();
+            if (prev != ThreadFinalizerStatus.Stopped)
+            {
+                // Another waiting start claimed it first: Starting or Running
+                return;
+            }
         }
 
         // Only the CAS winner reaches here, so the lazy ??= is not racy.
