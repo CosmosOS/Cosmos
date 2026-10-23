@@ -515,7 +515,7 @@ The finalizers never run inside the collection, which has interrupts masked, nor
 
 While it is off, the finalizers run on the thread that collected, right after the collection. When the collection ran with interrupts masked, which `Heap.Collect` does and so does a collection the allocator starts when it runs out of memory, they run on the next thread to allocate instead. The allocator checks the queue before it allocates rather than after, so the new object cannot be swept while the finalizers run. `GC.WaitForPendingFinalizers` runs the queue on the calling thread.
 
-Turning `ThreadedFinalizer` on starts a kernel thread that runs the finalizers in passes. It has no effect when the scheduler is compiled out, and if the thread cannot start, a warning is logged and the property stays off. A collection, or an allocation that finds the queue non-empty, then only takes the thread's monitor to request a pass, and does not even do that when a request is pending or a pass is running; it never waits for the pass. `GC.WaitForPendingFinalizers` requests a pass and waits until one that began after its request has ended. It returns at once when interrupts are masked, when nothing is pending, or when a finalizer calls it, since the thread would wait for itself. Turning `ThreadedFinalizer` off stops the thread once its current pass has ended, and the collecting thread runs the finalizers again. A finalizer cannot turn it off, since the thread would wait for its own exit, so the call is logged and ignored.
+Turning `ThreadedFinalizer` on starts a kernel thread that runs the finalizers in passes. It has no effect when the scheduler is compiled out, and if the thread cannot start, a warning is logged and the property stays off. A collection, or an allocation that finds the queue non-empty, then only takes the thread's monitor to request a pass, and does not even do that when a request is pending or a pass is running; it never waits for the pass. `GC.WaitForPendingFinalizers` requests a pass and waits until one that began after its request has ended. It returns at once when interrupts are masked, when nothing is pending, or when a finalizer calls it, since the thread would wait for itself. Turning `ThreadedFinalizer` off stops the thread once its current pass has ended, and the collecting thread runs the finalizers again; a wait in progress, or one that begins during the stop, lasts until the thread has exited, since the queue is the thread's until then, and runs what its last pass left on the calling thread. A finalizer cannot turn it off, since the thread would wait for its own exit, so the call is logged and ignored.
 
 One pass runs at a time: `RunPendingFinalizers` claims a flag with interrupts masked, and returns at once when another pass holds it, a finalizer that collects included. The pass takes the queue's entries one by one and ends only when it finds the queue empty, releasing the flag in the same masked step, so what a collection queues during a pass is run by that pass. An exception a finalizer lets escape is logged and the pass goes on with the next one, where .NET would end the process.
 
@@ -555,7 +555,7 @@ Retiring the conservative path is the keystone: once every thread can be scanned
 
 ## Tests
 
-The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 93 tests (`make test KERNEL=GarbageCollector`). Highlights:
+The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 94 tests (`make test KERNEL=GarbageCollector`). Highlights:
 
 - exact collection accounting (`GC_CollectBasic`, `GC_UnreachableExactCount`),
 - weak and dependent handle behavior (`GC_WeakReference`, `GC_DependentHandle`, `GC_DependentHandleCleanup`),
@@ -568,7 +568,7 @@ The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](
 - TLAB accounting and gap stamping (`GC_TLAB_*`),
 - the memory info wiring (`GC_Info_*`),
 - finalization on the collecting thread (`GC_Finalizer_*`, in `FinalizerTests.cs`): finalizers run once per registration and only for unreachable objects, resurrection, suppression and re-registration (the suppressed flag beside the thin lock, left stale in a recycled header word, and on an object a collection dropped), the order against weak and dependent handles, finalizers that allocate, collect or throw, allocations made with interrupts masked, and the pending count and `GC.MaxGeneration`,
-- the finalizer thread (`GC_FinalizerThread_*`, in `FinalizerThreadTests.cs`): starting, stopping and restarting it, waiting for its passes, and the same finalizer behavior run from that thread.
+- the finalizer thread (`GC_FinalizerThread_*`, in `FinalizerThreadTests.cs`): starting, stopping and restarting it, waiting for its passes, including one a stop cuts into, and the same finalizer behavior run from that thread.
 
 ---
 

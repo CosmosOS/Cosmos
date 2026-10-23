@@ -28,7 +28,7 @@ internal static class FinalizerThreadTests
     /// <summary>
     /// Number of tests <see cref="RunAll"/> registers; the suite adds it to its expected count.
     /// </summary>
-    public const int TestCount = 13;
+    public const int TestCount = 14;
 
     private static uint s_finalizerThreadId;
     private static int s_workerAllocated;
@@ -49,6 +49,7 @@ internal static class FinalizerThreadTests
         TR.Run("GC_FinalizerThread_Stop", TestStop);
         TR.Run("GC_FinalizerThread_Restart", TestRestart);
         TR.Run("GC_FinalizerThread_StopFromAnotherThread", TestStopFromAnotherThread);
+        TR.Run("GC_FinalizerThread_WaitDuringStop", TestWaitDuringStop);
 
         // Last: a regression hangs the CPU (a masked wait on the monitor), and no later test would run.
         TR.Run("GC_FinalizerThread_AllocWhileMasked", TestAllocWhileMasked);
@@ -445,6 +446,52 @@ internal static class FinalizerThreadTests
 
         CoreGC.ThreadedFinalizer = true;
         Assert.True(CoreGC.ThreadedFinalizer, "FinalizerThread: and it starts again afterwards");
+    }
+
+    private static void TestWaitDuringStop()
+    {
+        // The thread is in the middle of a slow pass when another thread stops it. A wait that
+        // began meanwhile must last until that pass has ended: the stop ends the thread's
+        // current pass first, and the queue is the thread's until it has exited.
+        const int count = 10;
+        uint[] counter = new uint[2];
+        CreateSlowProbes(counter, count);
+        Collect(1);
+
+        // The pass is running once its first finalizer has counted: nine more sleeps follow
+        for (int i = 0; i < 200 && counter[0] == 0; i++)
+        {
+            TimerManager.Wait(1);
+        }
+
+        uint ranBefore = counter[0];
+
+        s_workerDone = 0;
+        Thread stopper = new Thread(Stopper);
+        stopper.Start();
+        for (int i = 0; i < 200 && CoreGC.ThreadedFinalizer; i++)
+        {
+            TimerManager.Wait(1);
+        }
+
+        Assert.False(CoreGC.ThreadedFinalizer, "FinalizerThread: the stop began while the pass was running");
+        GC.WaitForPendingFinalizers();
+        uint ranAfterWait = counter[0];
+
+        for (int i = 0; i < 200 && s_workerDone == 0; i++)
+        {
+            TimerManager.Wait(5);
+        }
+
+        Assert.Equal(1, s_workerDone, "FinalizerThread: the stopper returned");
+        Assert.True(ranBefore >= 1 && ranBefore < count,
+            "FinalizerThread: the pass was running when the stop began, " + ranBefore + " of " + count + " done");
+        // The conservative scan may falsely retain one or two of them.
+        Assert.True(ranAfterWait >= count - 2,
+            "FinalizerThread: GC.WaitForPendingFinalizers during a stop waits for the pass to end, got " + ranAfterWait + " of " + count);
+
+        CoreGC.ThreadedFinalizer = true;
+        Assert.True(CoreGC.ThreadedFinalizer, "FinalizerThread: on again after the stop");
     }
 
     private static void TestAllocWhileMasked()

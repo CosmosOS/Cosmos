@@ -321,7 +321,8 @@ internal static unsafe partial class GarbageCollector
         }
 
         // Running, not Starting: the starter holds the monitor, and may not have created it yet
-        if (s_threadFinalizerStatus == ThreadFinalizerStatus.Running)
+        ThreadFinalizerStatus status = s_threadFinalizerStatus;
+        if (status == ThreadFinalizerStatus.Running)
         {
             Monitor monitor = s_finalizerMonitor!;
 
@@ -331,8 +332,10 @@ internal static unsafe partial class GarbageCollector
             s_finalizerRequested = true;
             monitor.SignalAll();
 
+            // Until the pass, or until the thread has exited when a stop cuts in: its last pass
+            // holds the running flag to its end, and the fallback would return at once
             monitor.Acquire();
-            while (!IsPassDone(s_finalizerDoneSeq, ticket) && ThreadedFinalizer)
+            while (!IsPassDone(s_finalizerDoneSeq, ticket) && !HasExited(s_threadFinalizerStatus))
             {
                 monitor.Wait();
             }
@@ -344,6 +347,21 @@ internal static unsafe partial class GarbageCollector
                 RunPendingFinalizers();
             }
         }
+        else if (status == ThreadFinalizerStatus.Stopping)
+        {
+            // A stop under way: the queue is the thread's until it has exited, for the same
+            // reason. A stop means a start ran before, so the monitor exists.
+            Monitor monitor = s_finalizerMonitor!;
+
+            monitor.Acquire();
+            while (!HasExited(s_threadFinalizerStatus))
+            {
+                monitor.Wait();
+            }
+            monitor.Release();
+
+            RunPendingFinalizers();
+        }
         else
         {
             RunPendingFinalizers();
@@ -352,6 +370,13 @@ internal static unsafe partial class GarbageCollector
         static bool IsPassDone(ulong done, ulong ticket)
         {
             return unchecked((long)(done - ticket)) >= 0;
+        }
+
+        // Exited, or Stopped and beyond once the stopper has moved on; Stopping is not enough,
+        // the thread's last pass may still be running
+        static bool HasExited(ThreadFinalizerStatus status)
+        {
+            return status is not (ThreadFinalizerStatus.Running or ThreadFinalizerStatus.Stopping);
         }
     }
 
