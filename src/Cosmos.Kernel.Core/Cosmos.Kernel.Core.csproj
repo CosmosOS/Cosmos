@@ -138,6 +138,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Generates the Pager address value objects (Memory\VirtualAddress.cs,
+         Memory\PhysicalAddress.cs).
+
+         The generated code carries a real type reference to
+         Vogen.SharedTypes (the ValueObject attribute and its generation-flag
+         enums are not embedded), so that assembly has to be visible to the
+         ILC step as well as to csc. PrivateAssets="all" would drop it from
+         ReferencePath and ILC would fail with "Failed to load assembly
+         'Vogen.SharedTypes'". It is a compile-time reference only: nothing in
+         Cosmos.Kernel.Core calls into it, and the attribute types it holds
+         are stripped like any other unreferenced metadata. -->
+    <PackageReference Include="Vogen" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="build\**" PackagePath="build\" />
   </ItemGroup>
 

@@ -322,7 +322,17 @@ public static unsafe class DeviceMapper
         }
 
         pdpt[index] = PageAllocator.VirtualToPhysical((ulong)page) | FlagPresent | FlagWritable;
-        X64CpuNative.InvalidatePage(virt);
+
+        // Every address in the old 1 GiB page was cached under an entry that no
+        // longer exists, so the whole range has to be invalidated, not just
+        // `virt`: changing a page's size invalidates the cached large-page entry
+        // it was reachable through (Intel SDM Vol 3A, "Methods for Caching
+        // Translation Information"). The other 511 blocks keep their mapping and
+        // attributes, but they were all covered by that one entry.
+        for (int i = 0; i < TableEntries; i++)
+        {
+            X64CpuNative.InvalidatePage(virt + ((ulong)i * LargePageSize));
+        }
 
         Serial.WriteString("[DeviceMapper] Split the 1GiB page at phys 0x");
         Serial.WriteHex(phys);

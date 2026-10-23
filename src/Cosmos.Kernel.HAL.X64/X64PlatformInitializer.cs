@@ -4,10 +4,12 @@ using Cosmos.Build.API.Enum;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Power;
 using Cosmos.Kernel.Core.X64;
 using Cosmos.Kernel.Core.X64.Cpu;
 using Cosmos.Kernel.Core.X64.IO;
+using Cosmos.Kernel.Core.X64.Memory;
 using Cosmos.Kernel.Core.X64.Power;
 using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
@@ -111,6 +113,13 @@ internal class X64PlatformInitializer : IPlatformInitializer
     /// <inheritdoc />
     public void InitializeHardware()
     {
+        // Register the paging backend before any driver asks for a mapping:
+        // Pager.Create seeds a descriptor from the live CR3, so it has to be
+        // available from the first use rather than lazily.
+        Serial.WriteString("[X64HAL] Registering pager backend...\n");
+        Pager.RegisterBackend(new X64PagerBackend());
+
+        // Display ACPI MADT information
         Serial.WriteString("[X64HAL] Displaying ACPI MADT info...\n");
         AcpiMadt.DisplayMadtInfo();
 
