@@ -476,7 +476,7 @@ internal static unsafe partial class GarbageCollector
                     result->Length = length;
                 }
 
-                TryRegisterForFinalize(result);
+                RegisterNewObject(result);
             }
 
             return result;

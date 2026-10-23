@@ -28,7 +28,7 @@ internal static class FinalizerTests
     /// <summary>
     /// Number of tests <see cref="RunAll"/> registers; the suite adds it to its expected count.
     /// </summary>
-    public const int TestCount = 26;
+    public const int TestCount = 29;
 
     private const int Pattern = 0x5F1A0000;
 
@@ -65,6 +65,9 @@ internal static class FinalizerTests
         TR.Run("GC_Finalizer_DependentValueAliveInFinalizer", TestDependentValueAliveInFinalizer);
         TR.Run("GC_Finalizer_DoubleRegistrationRunsTwice", TestDoubleRegistrationRunsTwice);
         TR.Run("GC_Finalizer_SuppressCancelsEveryRegistration", TestSuppressCancelsEveryRegistration);
+        TR.Run("GC_Finalizer_SuppressUnderLock", TestSuppressUnderLock);
+        TR.Run("GC_Finalizer_StaleSuppressedFlagCleared", TestStaleSuppressedFlagCleared);
+        TR.Run("GC_Finalizer_ReRegisterDroppedSuppressed", TestReRegisterDroppedSuppressed);
         TR.Run("GC_Finalizer_AllocWhileMaskedDefers", TestAllocWhileMaskedDefers);
         TR.Run("GC_Finalizer_MaxGeneration", TestMaxGeneration);
     }
@@ -329,6 +332,25 @@ internal static class FinalizerTests
         }
     }
 
+    /// <summary>
+    /// Holds a suppressed probe that dies with it. Its finalizer resurrects that probe and
+    /// registers it again: a dropped object, kept alive by the finalizer that owned it, gets a
+    /// registration back.
+    /// </summary>
+    private sealed class ReRegisteringOwnerProbe
+    {
+        public CountingProbe? Owned;
+
+        ~ReRegisteringOwnerProbe()
+        {
+            if (Owned is not null)
+            {
+                s_resurrected = Owned;
+                GC.ReRegisterForFinalize(Owned);
+            }
+        }
+    }
+
     private static int[] NewPatternArray()
     {
         int[] data = new int[64];
@@ -512,6 +534,74 @@ internal static class FinalizerTests
         {
             GC.SuppressFinalize(probe);
         }
+    }
+
+    /// <summary>
+    /// Allocates a probe over a runtime header word that already carries the suppressed flag,
+    /// as the first object of a recycled block does when a suppressed object died there. The
+    /// word is the last 4 bytes of the allocation before the object, so it is planted in the
+    /// tail of a probe allocated just before, with the stride two earlier probes gave. The
+    /// probe counts in <paramref name="hit"/> only when it landed over the planted word.
+    /// </summary>
+    /// <returns>
+    /// <see langword="false"/> when the probes did not land side by side (a TLAB refill fell
+    /// between two of them), and the planted word is one no object reads.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static unsafe bool CreateProbeOverStaleFlag(int[] hit, int[] others)
+    {
+        CountingProbe first = new CountingProbe(others);
+        CountingProbe second = new CountingProbe(others);
+        nint stride = Unsafe.As<CountingProbe, nint>(ref second) - Unsafe.As<CountingProbe, nint>(ref first);
+        if (stride <= 0 || stride > 64)
+        {
+            return false;
+        }
+
+        // .NET's BIT_SBLK_FINALIZER_RUN, the bit GC.SuppressFinalize sets
+        *(int*)(Unsafe.As<CountingProbe, nint>(ref second) + stride - sizeof(int)) = 0x40000000;
+        nint expected = Unsafe.As<CountingProbe, nint>(ref second) + stride;
+        CountingProbe third = new CountingProbe(hit);
+        bool adjacent = Unsafe.As<CountingProbe, nint>(ref third) == expected;
+        if (!adjacent)
+        {
+            // Not over the planted word: its count must not be taken for the hit
+            GC.SuppressFinalize(third);
+        }
+
+        GC.KeepAlive(first);
+        GC.KeepAlive(second);
+        return adjacent;
+    }
+
+    /// <summary>
+    /// Suppresses the finalizer while the probe's thin lock is held, then takes the lock again:
+    /// the flag and the lock share the runtime header word.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool CreateSuppressedProbeUnderLock(int[] counter)
+    {
+        CountingProbe probe = new CountingProbe(counter);
+        lock (probe)
+        {
+            GC.SuppressFinalize(probe);
+        }
+
+        bool released = !Monitor.IsEntered(probe);
+        lock (probe)
+        {
+            released &= Monitor.IsEntered(probe);
+        }
+
+        return released && !Monitor.IsEntered(probe);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateReRegisteringOwner(int[] counter)
+    {
+        ReRegisteringOwnerProbe owner = new ReRegisteringOwnerProbe();
+        owner.Owned = new CountingProbe(counter);
+        GC.SuppressFinalize(owner.Owned);
     }
 
     private static void TestRunsOnUnreachable()
@@ -912,6 +1002,57 @@ internal static class FinalizerTests
         Collect(3);
 
         Assert.Equal(0, counter[0], "Finalizer: GC.SuppressFinalize cancels every pending registration of an object");
+    }
+
+    private static void TestSuppressUnderLock()
+    {
+        // The suppressed flag lives in the runtime header word, beside the thin lock and the
+        // hash code: setting it must neither break the lock held at the time nor the next one.
+        int[] counter = new int[1];
+        bool lockIntact = CreateSuppressedProbeUnderLock(counter);
+
+        Collect(3);
+
+        Assert.True(lockIntact, "Finalizer: the thin lock survives GC.SuppressFinalize on the locked object");
+        Assert.Equal(0, counter[0], "Finalizer: GC.SuppressFinalize under the lock still cancels the finalizer");
+    }
+
+    private static void TestStaleSuppressedFlagCleared()
+    {
+        // The allocator does not zero the runtime header word of the object it hands out: the
+        // first object of a recycled block reads the header of the object that died there,
+        // suppressed flag included. The flag is planted by hand where that word lives.
+        int[] hit = new int[1];
+        int[] others = new int[1];
+        bool planted = false;
+        for (int attempt = 0; attempt < 8 && !planted; attempt++)
+        {
+            planted = CreateProbeOverStaleFlag(hit, others);
+        }
+
+        Collect(2);
+
+        Assert.True(planted, "Finalizer: three probes allocated side by side (a TLAB refill fell between them on every attempt)");
+        Assert.Equal(1, hit[0], "Finalizer: a probe allocated over a stale suppressed flag is finalized");
+    }
+
+    private static void TestReRegisterDroppedSuppressed()
+    {
+        // The owned probe is suppressed and dies with its owner: the collection drops it, but
+        // the owner's finalizer keeps it alive and registers it again, so it has a registration
+        // back and is finalized once dropped for good.
+        s_resurrected = null;
+        int[] counter = new int[1];
+        CreateReRegisteringOwner(counter);
+
+        Collect(1);
+        Assert.True(s_resurrected is not null, "Finalizer: the owner's finalizer resurrected the suppressed probe");
+        Assert.Equal(0, counter[0], "Finalizer: the resurrected probe was not finalized while suppressed");
+
+        s_resurrected = null;
+        Collect(3);
+        Assert.Equal(1, counter[0],
+            "Finalizer: GC.ReRegisterForFinalize on a dropped suppressed object registers it once more");
     }
 
     private static void TestAllocWhileMaskedDefers()

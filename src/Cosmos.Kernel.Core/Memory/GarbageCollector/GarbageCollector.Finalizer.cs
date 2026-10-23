@@ -104,6 +104,15 @@ internal static unsafe partial class GarbageCollector
     // --- Static fields ---
 
     /// <summary>
+    /// Bit of the runtime object header that marks an object's finalizer as suppressed. The
+    /// header is the 4 bytes before the object (objRef - 4), where CoreLib keeps the identity
+    /// hash code or the thin lock; its <c>ObjectHeader</c> reserves bits 29 to 31 for the
+    /// collector and its compare-exchange loops leave them as they are. .NET's
+    /// <c>BIT_SBLK_FINALIZER_RUN</c>.
+    /// </summary>
+    private const int FinalizerSuppressedBit = 0x40000000;
+
+    /// <summary>
     /// The live objects whose finalizer is still to run. Not a root: an entry no root reaches is
     /// what a collection moves to <see cref="s_finalizerQueue"/>.
     /// </summary>
@@ -112,7 +121,8 @@ internal static unsafe partial class GarbageCollector
     /// <summary>
     /// The objects a collection found dead, waiting for their finalizer. A root: an entry and
     /// everything it references stay alive until its finalizer has run. Entries before
-    /// <see cref="s_finalizerQueueHead"/> are done; a null entry had its finalizer suppressed.
+    /// <see cref="s_finalizerQueueHead"/> are done; an entry whose finalizer was suppressed
+    /// meanwhile is skipped when its turn comes.
     /// </summary>
     private static FinalizerList s_finalizerQueue;
 
@@ -214,11 +224,35 @@ internal static unsafe partial class GarbageCollector
     // --- Internal methods ---
 
     /// <summary>
-    /// Registers an object for finalization. Does nothing for a type without a finalizer.
+    /// Registers a freshly allocated object for finalization. Does nothing for a type without a
+    /// finalizer.
     /// </summary>
     /// <remarks>
-    /// As in .NET, registering an object that is registered already makes its finalizer run
-    /// once per registration.
+    /// Clears the suppressed flag first: the allocator does not zero the runtime header, so the
+    /// first object of a recycled block reads the header of the object that died there, which
+    /// may have been suppressed.
+    /// </remarks>
+    /// <param name="obj">The object just allocated.</param>
+    internal static void RegisterNewObject(GCObject* obj)
+    {
+        if (!obj->GetMethodTable()->IsFinalizable)
+        {
+            return;
+        }
+
+        ClearFinalizerSuppressed(obj);
+        AddFinalizable(obj);
+    }
+
+    /// <summary>
+    /// Registers an object for finalization again, <see cref="GC.ReRegisterForFinalize"/>. Does
+    /// nothing for a type without a finalizer.
+    /// </summary>
+    /// <remarks>
+    /// As in .NET, a suppressed object has its flag cleared and its registrations stand again;
+    /// one that is not suppressed gets one more registration, and its finalizer runs once per
+    /// registration. An object a collection dropped while suppressed, kept alive since by
+    /// another finalizer, has no registration left and gets one.
     /// </remarks>
     /// <param name="obj">The object to register.</param>
     /// <returns><see langword="false"/> when the registry is full and cannot grow.</returns>
@@ -229,24 +263,31 @@ internal static unsafe partial class GarbageCollector
             return true;
         }
 
-        using (InternalCpu.DisableInterruptsScope())
+        if (IsFinalizerSuppressed(obj))
         {
-            if (!s_finalizable.Add(obj))
+            ClearFinalizerSuppressed(obj);
+            using (InternalCpu.DisableInterruptsScope())
             {
-                Serial.WriteString("[GC] WARNING: finalizer registry full, object will not be finalized\n");
-                return false;
+                if (IsRegistered(obj))
+                {
+                    return true;
+                }
             }
         }
 
-        return true;
+        return AddFinalizable(obj);
     }
 
     /// <summary>
-    /// Cancels the finalizer of an object, whether it is still alive or queued already.
+    /// Cancels the finalizer of an object, whether it is still alive or queued already:
+    /// sets the suppressed flag in its runtime header, which the collection honours when it
+    /// finds the object dead, and a pass when the object's turn comes.
     /// </summary>
     /// <remarks>
-    /// As in .NET, every registration of the object is cancelled, however many times it was
-    /// registered, until the next <see cref="TryRegisterForFinalize"/>.
+    /// Every registration of the object is cancelled, however many times it was registered,
+    /// until the next <see cref="TryRegisterForFinalize"/>. The flag stays set on an object a
+    /// collection dropped, so the other registrations it had are dropped too, and the allocator
+    /// clears it for the next object at that address.
     /// </remarks>
     /// <param name="obj">The object whose finalizer must not run.</param>
     internal static void SuppressFinalize(GCObject* obj)
@@ -256,26 +297,7 @@ internal static unsafe partial class GarbageCollector
             return;
         }
 
-        using (InternalCpu.DisableInterruptsScope())
-        {
-            // From the end: what is disposed is most often what was created last.
-            for (int i = s_finalizable.Count - 1; i >= 0; i--)
-            {
-                if (s_finalizable.Items[i] == obj)
-                {
-                    s_finalizable.Items[i] = s_finalizable.Items[--s_finalizable.Count];
-                }
-            }
-
-            // Queued by a collection and revived since, or suppressed from another finalizer.
-            for (int i = s_finalizerQueueHead; i < s_finalizerQueue.Count; i++)
-            {
-                if (s_finalizerQueue.Items[i] == obj)
-                {
-                    s_finalizerQueue.Items[i] = null;
-                }
-            }
-        }
+        SetFinalizerSuppressed(obj);
     }
 
     /// <summary>
@@ -584,9 +606,10 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Takes the next object to finalize off the queue. An empty queue ends the pass: the
-    /// running flag is released in the same step, so an object queued right after is not left
-    /// behind by a pass that had already seen the queue empty.
+    /// Takes the next object to finalize off the queue, skipping those suppressed since they
+    /// were queued. An empty queue ends the pass: the running flag is released in the same
+    /// step, so an object queued right after is not left behind by a pass that had already seen
+    /// the queue empty.
     /// </summary>
     /// <param name="finalizer">Address of the finalizer of the object's type.</param>
     /// <returns>The object, now held by the caller's reference, or <c>null</c> when none is left.</returns>
@@ -597,12 +620,17 @@ internal static unsafe partial class GarbageCollector
             while (s_finalizerQueueHead < s_finalizerQueue.Count)
             {
                 GCObject* entry = s_finalizerQueue.Items[s_finalizerQueueHead++];
-                if (entry != null)
+                if (IsFinalizerSuppressed(entry))
                 {
-                    finalizer = entry->GetMethodTable()->FinalizerCode;
-                    nint obj = (nint)entry;
-                    return Unsafe.As<nint, object>(ref obj);
+                    // Suppressed from another finalizer, or through a resurrection-tracking
+                    // weak reference. Cleared, as .NET does: registered again, it is queued again.
+                    ClearFinalizerSuppressed(entry);
+                    continue;
                 }
+
+                finalizer = entry->GetMethodTable()->FinalizerCode;
+                nint obj = (nint)entry;
+                return Unsafe.As<nint, object>(ref obj);
             }
 
             s_finalizerQueueHead = 0;
@@ -627,8 +655,9 @@ internal static unsafe partial class GarbageCollector
 
     /// <summary>
     /// Moves the registered objects no root reached to the finalizer queue, then marks them and
-    /// what they reference: they stay alive until their finalizer has run. Runs once the roots
-    /// are marked and the short weak handles are cleared.
+    /// what they reference: they stay alive until their finalizer has run. A dead object whose
+    /// finalizer was suppressed is dropped instead, and swept. Runs once the roots are marked
+    /// and the short weak handles are cleared.
     /// </summary>
     /// <remarks>
     /// Every dead object is queued before any is marked, as in .NET: one that only another dead
@@ -639,44 +668,129 @@ internal static unsafe partial class GarbageCollector
         int dead = 0;
         for (int i = 0; i < s_finalizable.Count; i++)
         {
-            if (!s_finalizable.Items[i]->IsMarked)
+            GCObject* obj = s_finalizable.Items[i];
+            if (!obj->IsMarked && !IsFinalizerSuppressed(obj))
             {
                 dead++;
             }
         }
 
-        if (dead != 0)
+        if (s_finalizerQueue.EnsureRoom(dead))
         {
-            if (s_finalizerQueue.EnsureRoom(dead))
+            int kept = 0;
+            for (int i = 0; i < s_finalizable.Count; i++)
             {
-                int kept = 0;
-                for (int i = 0; i < s_finalizable.Count; i++)
+                GCObject* obj = s_finalizable.Items[i];
+                if (obj->IsMarked)
                 {
-                    GCObject* obj = s_finalizable.Items[i];
-                    if (obj->IsMarked)
-                    {
-                        s_finalizable.Items[kept++] = obj;
-                    }
-                    else
-                    {
-                        s_finalizerQueue.Items[s_finalizerQueue.Count++] = obj;
-                    }
+                    s_finalizable.Items[kept++] = obj;
                 }
+                else if (!IsFinalizerSuppressed(obj))
+                {
+                    s_finalizerQueue.Items[s_finalizerQueue.Count++] = obj;
+                }
+            }
 
-                s_finalizable.Count = kept;
+            s_finalizable.Count = kept;
+            if (dead != 0)
+            {
                 MarkFinalizerQueue();
             }
-            else
+        }
+        else
+        {
+            // No room to queue them: kept alive and registered, the next collection retries.
+            Serial.WriteString("[GC] WARNING: finalizer queue cannot grow, finalization postponed\n");
+            for (int i = 0; i < s_finalizable.Count; i++)
             {
-                // No room to queue them: kept alive and registered, the next collection retries.
-                Serial.WriteString("[GC] WARNING: finalizer queue cannot grow, finalization postponed\n");
-                for (int i = 0; i < s_finalizable.Count; i++)
-                {
-                    TryMarkRoot((nint)s_finalizable.Items[i]);
-                }
+                TryMarkRoot((nint)s_finalizable.Items[i]);
             }
         }
 
         s_lastFinalizationPendingCount = s_finalizerQueue.Count - s_finalizerQueueHead;
+    }
+
+    /// <summary>
+    /// Adds an object to the registry, with a warning when the registry cannot grow.
+    /// </summary>
+    /// <param name="obj">The object to register.</param>
+    /// <returns><see langword="false"/> when the registry is full and cannot grow.</returns>
+    private static bool AddFinalizable(GCObject* obj)
+    {
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            if (!s_finalizable.Add(obj))
+            {
+                Serial.WriteString("[GC] WARNING: finalizer registry full, object will not be finalized\n");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Whether an object has a registration left, in the registry or in the queue. Called with
+    /// interrupts masked; linear, on the re-registration of a suppressed object only.
+    /// </summary>
+    /// <param name="obj">The object to look for.</param>
+    private static bool IsRegistered(GCObject* obj)
+    {
+        for (int i = 0; i < s_finalizable.Count; i++)
+        {
+            if (s_finalizable.Items[i] == obj)
+            {
+                return true;
+            }
+        }
+
+        for (int i = s_finalizerQueueHead; i < s_finalizerQueue.Count; i++)
+        {
+            if (s_finalizerQueue.Items[i] == obj)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// The runtime object header of an object: the 4 bytes before it, see
+    /// <see cref="FinalizerSuppressedBit"/>.
+    /// </summary>
+    private static int* RuntimeHeaderOf(GCObject* obj)
+    {
+        return (int*)obj - 1;
+    }
+
+    /// <summary>
+    /// Whether <see cref="SuppressFinalize"/> was called on the object since its last
+    /// registration.
+    /// </summary>
+    private static bool IsFinalizerSuppressed(GCObject* obj)
+    {
+        return (*RuntimeHeaderOf(obj) & FinalizerSuppressedBit) != 0;
+    }
+
+    /// <summary>
+    /// Sets the suppressed flag. Atomic against CoreLib's compare-exchange on the same word (a
+    /// thin lock taken or released, a hash code assigned).
+    /// </summary>
+    private static void SetFinalizerSuppressed(GCObject* obj)
+    {
+        Interlocked.Or(ref *RuntimeHeaderOf(obj), FinalizerSuppressedBit);
+    }
+
+    /// <summary>
+    /// Clears the suppressed flag, see <see cref="SetFinalizerSuppressed"/>. A plain read first:
+    /// the flag is clear on most objects, and a read costs nothing.
+    /// </summary>
+    private static void ClearFinalizerSuppressed(GCObject* obj)
+    {
+        if (IsFinalizerSuppressed(obj))
+        {
+            Interlocked.And(ref *RuntimeHeaderOf(obj), ~FinalizerSuppressedBit);
+        }
     }
 }
