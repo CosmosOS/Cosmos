@@ -91,7 +91,7 @@ Most hooks receive the `PerCpuState` they operate on, and run either with interr
 | `InitializeCpu(state)` | once per CPU, when the policy is installed | Allocate the per-CPU bookkeeping into `state.SchedulerData` |
 | `ShutdownCpu(state)` | once per CPU, when the policy is replaced | Release it, leaving a clean slot for the incoming policy |
 | `OnThreadCreate(state, thread)` | a thread is created, and once for every live thread when the policy is installed | Allocate the per-thread bookkeeping into `thread.SchedulerData`; do not queue the thread yet |
-| `OnThreadReady(state, thread)` | a thread becomes runnable: its first start, a wake, an expired sleep, or the `Ready` state at the swap | Place the thread and insert it into the run structure, once |
+| `OnThreadReady(state, thread)` | a thread becomes runnable: its first start, a wake, an expired sleep, or the `Ready` state at the swap | Place the thread and insert it into the run structure, once. The manager writes `Ready` after the hook returns, so `thread.State` still says which of the four it is: `Created`, `Blocked`, `Sleeping` or `Ready` |
 | `OnThreadBlocked(state, thread)` | a thread blocks on a primitive or goes to sleep | Remove the thread from the run structure; save whatever must survive the park |
 | `OnThreadYield(state, thread)` | a switch takes the thread off the CPU while it is still `Running`, preempted or yielding | Re-insert the thread |
 | `OnThreadExit(state, thread)` | a thread returns, or `SchedulerDiagnostics.RequestKill` kills it while it waits in the run structure, and for every live thread when the policy is replaced | Remove it everywhere and drop its bookkeeping |

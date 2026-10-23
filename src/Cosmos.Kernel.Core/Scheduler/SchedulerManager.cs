@@ -469,7 +469,7 @@ public static class SchedulerManager
                 {
                     continue;
                 }
-                if ((t.Flags & SchedulerThreadFlags.IdleThread) != 0)
+                if (t.IsIdle)
                 {
                     continue;
                 }
@@ -548,7 +548,7 @@ public static class SchedulerManager
         {
             if (s_allThreads[i] == thread)
             {
-                if ((thread.Flags & SchedulerThreadFlags.IdleThread) == 0)
+                if (!thread.IsIdle)
                 {
                     s_exitedNonIdleRuntimeNs += thread.TotalRuntime;
                 }
@@ -622,6 +622,13 @@ public static class SchedulerManager
                 return;
             }
 
+            // The hook runs before the state changes, so the policy sees what
+            // the thread is waking from (Blocked, Sleeping, or Created for a
+            // first start), the same order MarkSleeping keeps for
+            // OnThreadBlocked. Interrupts are masked, so nothing observes the
+            // thread queued but not yet Ready.
+            s_currentScheduler.OnThreadReady(state, thread);
+
             // Only set to Ready if not a new thread (Created).
             // New threads stay Created until they actually start running.
             // This allows ScheduleFromInterrupt to detect first-time execution.
@@ -629,8 +636,6 @@ public static class SchedulerManager
             {
                 thread.State = SchedulerThreadState.Ready;
             }
-
-            s_currentScheduler.OnThreadReady(state, thread);
 
             // Ask the next hardware-IRQ exit to reschedule: when this wake
             // comes from an ISR (InterruptEvent.Signal), the woken thread
@@ -783,7 +788,7 @@ public static class SchedulerManager
         }
 
         PerCpuState[]? states = s_cpuStates;
-        if (states is not null && thread.CpuId < s_cpuCount && (thread.Flags & SchedulerThreadFlags.IdleThread) == 0)
+        if (states is not null && thread.CpuId < s_cpuCount && !thread.IsIdle)
         {
             Volatile.Write(ref states[thread.CpuId]._needReschedule, true);
             if (InterruptManager.TryRaiseReschedule())

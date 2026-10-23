@@ -26,7 +26,7 @@ A [`SchedulerThread`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Ke
 |-------|---------|
 | `Id`, `CpuId` | Globally unique id (a bare incrementing counter) and the assigned CPU |
 | `State` | One of `Created`, `Ready`, `Running`, `Blocked`, `Sleeping`, `Dead` |
-| `Flags` | `IdleThread`, `Pinned`, `Managed`; bits 8 to 15 are reserved for schedulers |
+| `Flags` | `IdleThread`, `Pinned`, `Managed`; bits 8 to 15 are reserved for schedulers. `IsIdle` reads the first: the thread the blocking primitives make spin or poll instead of parking |
 | `StackBase`, `StackSize`, `StackPointer` | The stack allocation and the saved stack pointer (see below) |
 | `InstructionPointer` | The entry point, staged into the initial context. Manager bookkeeping, not on the seam |
 | `LastScheduledAt`, `WakeupTime` | Accounting kept by the manager, not on the seam; `WakeupTime` is the sleep deadline in `Stopwatch` ticks |
@@ -104,7 +104,7 @@ stateDiagram-v2
 | Entry point | State change | Policy hook | Also |
 |-------------|--------------|-------------|------|
 | `CreateThread` | none (`InitializeStack` already set `Created`) | `OnThreadCreate` | registers the thread in the registry |
-| `ReadyThread` | `Ready`, unless the thread is still `Created` | `OnThreadReady` | sets the per-CPU `_needReschedule` flag |
+| `ReadyThread` | `Ready`, unless the thread is still `Created`, after the hook | `OnThreadReady` | sets the per-CPU `_needReschedule` flag |
 | `BlockThread` | `Blocked` | `OnThreadBlocked` | sets `_needReschedule` |
 | `MarkSleeping` | `Sleeping`, after computing `WakeupTime` | `OnThreadBlocked` | no halt; the caller parks itself (see [the park protocol](#the-park-protocol)) |
 | `Sleep` | via `MarkSleeping` | | then `Park` |
@@ -200,7 +200,7 @@ A thread that blocks or sleeps gives the CPU away through `SchedulerManager.Park
 | x64 | Local APIC self-IPI, vector `0xF0` |
 | ARM64 | SGI 8, through `ICC_SGI1R_EL1` on GICv3 or `GICD_SGIR` on GICv2 |
 
-`Park` then waits until the state leaves `Blocked` or `Sleeping`, which happens once a wake readied the thread and the scheduler ran it again, or at once when the wake landed before the switch. Halting instead left the CPU idle for the rest of the tick every time a thread blocked. The idle thread, and any thread parking before the controller can raise the interrupt, still halt.
+`Park` then waits until the state leaves `Blocked` or `Sleeping`, which happens once a wake readied the thread and the scheduler ran it again, or at once when the wake landed before the switch. Halting instead left the CPU idle for the rest of the tick every time a thread blocked. A thread parking before the controller can raise the interrupt still halts; the idle thread never parks at all (see the primitives below), and halts between its checks of the condition variable.
 
 ### What there is not: a voluntary switch
 
@@ -236,12 +236,10 @@ What Stride does in each hook:
 | `OnThreadMigrate` | Move the tickets between CPUs and rebase `Pass` on the destination's `GlobalPass + Remain` |
 | `SetPriority` / `GetPriority` | Set / read tickets; on a change, the current offset from `GlobalPass` is scaled by the stride ratio so relative position survives |
 
-Wakeup placement is where fairness needs judgment. A woken thread cannot keep its old `Pass`: it fell far behind `GlobalPass` while parked, and running it until it caught up would starve everyone else. The code carries two placements for this:
+Wakeup placement is where fairness needs judgment. A woken thread cannot keep its old `Pass`: it fell far behind `GlobalPass` while parked, and running it until it caught up would starve everyone else. `ReadyThread` calls the hook before it marks the thread `Ready`, so the hook tells a wake (`Blocked` or `Sleeping`) from a first start (`Created`, placed at `GlobalPass`), and a wake takes one of two placements:
 
 - a **starvation cap**, `Pass = max(GlobalPass + Remain, GlobalPass - 2 * Stride1)`: `Remain` restores the fraction of its quantum the thread had left when it blocked, and the cap bounds how far behind `GlobalPass` any waker can be placed;
-- an **interactive boost**, `Pass = GlobalPass - Stride / 2`, half a quantum of head start for threads classified interactive (sleeps long relative to accumulated runtime), so input-driven threads preempt batch work promptly.
-
-Neither runs today: the placement branch tests for `State == Blocked`, but the manager marks the thread `Ready` before calling the hook, so every wakeup takes the fallback path, `Pass = GlobalPass` (issue [#445](https://github.com/valentinbreiz/nativeaot-patcher/issues/445)). That is still fair (a waker rejoins at the virtual present, with no catch-up advantage and no starvation), just blunter than designed.
+- an **interactive boost**, `Pass = GlobalPass - Stride / 2`, half a quantum of head start for threads classified interactive, so input-driven threads preempt batch work promptly. A thread is interactive when it stayed parked more than twice as long as it ran since its previous wake. `OnThreadBlocked` timestamps the park, `OnTick` adds the run time since the wake, both are compared in nanoseconds, and the classification is redone at every wake, so a thread that turns CPU-bound loses it. The run side is as coarse as [the tick](sched-concepts/scheduler-tick.md): a thread is charged a whole period when the tick lands on it and nothing when it parks before, so one wake can read interactive and the next not for the same behaviour; the average is right, the per-wake answer is not. A thread inherited parked at a policy swap has neither on record: its park is dated from the swap and its lifetime runtime stands in for the run, so that first wake can withhold a boost, never grant one the real measure would refuse.
 
 Two implementation notes carry over to anyone touching this code. Queue removal runs under `DisableInterruptsScope` and scans with `ReferenceEquals` instead of `List.Remove`, because `EqualityComparer<T>.Default` needs runtime helpers the kernel does not have. And `OnTick` tolerates a thread whose `SchedulerData` is already null (it exited mid-quantum) by rescheduling if anything else is queued.
 
@@ -286,6 +284,8 @@ Two special cases: the idle thread never parks (blocking it would just get it re
 ### ConditionVariable and Monitor
 
 [`ConditionVariable`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/ConditionVariable.cs) is wait/signal with mutex integration. `Wait(mutex)` inserts itself, releases the mutex, and blocks, all in one scope (rule 1; releasing the mutex outside the scope is the #357 bug), then re-acquires the mutex on wake. `WaitTimeout` parks through `MarkSleeping` with the deadline, and reports signaled-vs-timeout by membership (rule 3). `Signal` readies the FIFO head; `SignalAll` readies everyone.
+
+The same special case as `Mutex`: the idle thread never parks here either. It inserts itself and releases the mutex in the one scope, then checks the waiter list between halts until a `Signal` removes it or the deadline passes. It halts rather than spins, unlike the mutex (whose holds are short by contract) and the interrupt event (whose signal may come from an ISR with no interrupt after it): a condition-variable signal comes from a thread, which only runs on an interrupt exit, so the halt ends on the next tick at the latest, and a kernel pacing its `Run` with `Thread.Sleep` does not burn the CPU for the whole sleep. Parking it took its tickets out of the Stride total without the wake that returns them (the idle fallback puts it back as `Running`), so the total wrapped, `GlobalPass` froze, and threads created afterwards kept the main thread off the CPU; CoreLib's `Thread.Sleep` and `Thread.Join` reach this path through the low-level monitor, so the main kernel thread hits it constantly.
 
 [`Monitor`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Kernel.Core/Scheduler/Monitor.cs) composes one `Mutex` and one `ConditionVariable` into the classic monitor shape; its `Signal`/`SignalAll` also release the mutex, so signaling exits the monitor.
 
@@ -374,7 +374,6 @@ The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfa
 - **No stack protection.** No guard page, and the saved context sits in the overflow path of the thread's own frames.
 - **No priority inheritance.** `Mutex` wakes FIFO and hands off directly, which is fair but [inverts priorities](sched-concepts/priority-inversion.md): a low-tickets holder is not boosted while a high-tickets thread waits. The `SetPriority` hook is the raw material for an inheritance protocol; no policy implements one.
 - **Parked threads pin their referents.** The conservative scan of parked stacks is the GC-side cost of preemption at arbitrary instructions; return-address hijacking ([#385](https://github.com/valentinbreiz/nativeaot-patcher/issues/385)) is the exit.
-- **Stride's wakeup placement is inert.** The starvation cap and the interactive boost are coded but unreachable ([#445](https://github.com/valentinbreiz/nativeaot-patcher/issues/445)): the state flip lands before the hook that tests it, so every wakeup rebases to `GlobalPass`. Reviving the branch also means fixing the heuristic's own quirks, catalogued in the issue.
 - **The tick is nominal.** `OnTimerInterrupt` receives the configured interval, not a measurement ([the tick and the quantum](sched-concepts/scheduler-tick.md)), so time accounting drifts by whatever the hardware does between ticks.
 
 ---

@@ -233,7 +233,7 @@ internal static unsafe partial class GarbageCollector
         {
             stackEnd = thread.StackBase + thread.StackSize;
         }
-        else if (stackStart != 0 && thread.CpuId == 0 && (thread.Flags & SchedulerThreadFlags.IdleThread) != 0)
+        else if (stackStart != 0 && thread.CpuId == 0 && thread.IsIdle)
         {
             // The boot/idle thread (the kernel's main thread) has no StackBase/StackSize: it
             // runs on the bootloader stack, where the IRQ stub that switched it out saved its
