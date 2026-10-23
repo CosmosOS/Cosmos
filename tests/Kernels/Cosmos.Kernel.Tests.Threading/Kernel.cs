@@ -19,7 +19,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 83;
+    private const int ExpectedTestCount = 84;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -249,6 +249,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Scheduler_BootPolicy_IsStride", TestBootPolicyIsStride);
         TR.Run("Stride_ProportionalShare_FollowsTickets", TestStrideProportionalShare);
         TR.Run("Stride_Hooks_WakePlacement_BoostThenCap", TestStrideHooksWakePlacement);
+        TR.Run("Stride_Hooks_InheritedParkedThread_FirstWakeJudged", TestStrideHooksInheritedParkedFirstWake);
         TR.Run("Stride_SleepWake_ClassifiesInteractive", TestStrideSleepWakeClassifiesInteractive);
         TR.Run("SetScheduler_InstallsRoundRobinPolicy", TestSetSchedulerInstallsRoundRobin);
         TR.Run("RoundRobin_ThreadRuns_UnderNewPolicy", TestThreadRunsUnderRoundRobin);
@@ -2004,6 +2005,50 @@ public class Kernel : Sys.Kernel
         Assert.True(data.Pass == capped,
             "a non-interactive wake must be placed at GlobalPass + Remain, floored two Stride1 behind");
         Assert.Equal(1, policy.GetRunQueueCount(state), "each wake must queue the thread once");
+    }
+
+    private static void TestStrideHooksInheritedParkedFirstWake()
+    {
+        StrideScheduler policy = new();
+        PerCpuState state = new();
+        policy.InitializeCpu(state);
+
+        // Two threads handed over parked, as SetScheduler does: one that never
+        // ran, one that ran a hundred quanta under the previous policy.
+        SchedulerThread fresh = new();
+        SchedulerThread seasoned = new();
+        fresh.State = SchedulerThreadState.Blocked;
+        seasoned.State = SchedulerThreadState.Sleeping;
+        seasoned.TotalRuntime = WakeClassifyRunQuanta * SchedulerManager.DefaultQuantumNs;
+        policy.OnThreadCreate(state, fresh);
+        policy.OnThreadCreate(state, seasoned);
+
+        // Let real time pass, so the park measured from the hand-over is not
+        // a few timestamp ticks that could round to nothing.
+        TimerManager.Wait(FlagPollIntervalMs);
+
+        StrideCpuData? cpuData = state.SchedulerData as StrideCpuData;
+        StrideThreadData? freshData = fresh.SchedulerData as StrideThreadData;
+        StrideThreadData? seasonedData = seasoned.SchedulerData as StrideThreadData;
+        Assert.True(cpuData is not null && freshData is not null && seasonedData is not null,
+            "OnThreadCreate should attach Stride bookkeeping to an inherited thread");
+        if (cpuData is null || freshData is null || seasonedData is null)
+        {
+            return;
+        }
+
+        policy.OnThreadReady(state, fresh);
+        Assert.True(freshData.IsInteractive,
+            "an inherited parked thread that never ran must wake interactive: any park outweighs no run");
+
+        policy.OnThreadReady(state, seasoned);
+        long capped = Math.Max((long)cpuData.GlobalPass + seasonedData.Remain,
+            (long)cpuData.GlobalPass - (long)(2 * StrideScheduler.Stride1));
+        Assert.False(seasonedData.IsInteractive,
+            "an inherited parked thread is judged on its lifetime runtime, not on a run of zero");
+        Assert.True(seasonedData.Pass == capped,
+            "a non-interactive inherited wake must take the capped placement");
+        Assert.Equal(2, policy.GetRunQueueCount(state), "each inherited thread must be queued once");
     }
 
     private static volatile bool s_sleepWakeDone;

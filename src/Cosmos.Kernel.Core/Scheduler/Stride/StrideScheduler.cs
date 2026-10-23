@@ -80,12 +80,23 @@ internal class StrideScheduler : IScheduler
             Stride = Stride1 / DefaultTickets,
             Pass = 0,
             Remain = 0,
-            // A thread inherited from another policy while blocked has no
-            // park of its own to date its sleep from. Anchoring it here keeps
-            // that first wake from reading as an age-old sleep and earning an
-            // interactive boost it never slept for.
+            // A thread inherited from another policy while parked has no park
+            // of its own on record; dated from the swap, so its first wake
+            // does not read the whole timestamp as the park.
             LastParked = GetTimestamp()
         };
+
+        // The run side of that first wake has no record either, and a
+        // RunSinceWakeNs of 0 would make any park at all read interactive.
+        // The lifetime runtime stands in for the run since the last wake.
+        // Both stand-ins err the same way, a park shorter and a run longer
+        // than the truth, so the first wake can withhold a boost the real
+        // measure would have given, never grant one it would refuse.
+        if (thread.State is SchedulerThreadState.Blocked or SchedulerThreadState.Sleeping)
+        {
+            data.RunSinceWakeNs = thread.TotalRuntime;
+        }
+
         thread.SchedulerData = data;
 
         // A thread normally arrives Created and passes through OnThreadReady
