@@ -38,11 +38,6 @@ internal class StrideThreadData
     public ulong RunSinceWakeNs { get; internal set; }
 
     /// <summary>
-    /// Number of times thread has slept (I/O pattern tracking).
-    /// </summary>
-    public uint SleepCount { get; internal set; }
-
-    /// <summary>
     /// Whether the last wake classified the thread interactive: it parked for
     /// more than twice what it had run since the wake before.
     /// </summary>

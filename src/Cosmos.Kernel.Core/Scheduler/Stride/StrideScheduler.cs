@@ -184,7 +184,6 @@ internal class StrideScheduler : IScheduler
 
         threadData.Remain = threadData.Pass - (long)cpuData.GlobalPass;
         threadData.LastParked = GetTimestamp();
-        threadData.SleepCount++;
 
         RemoveThreadFromQueue(cpuData.RunQueue, thread);
         cpuData.TotalTickets -= threadData.Tickets;
