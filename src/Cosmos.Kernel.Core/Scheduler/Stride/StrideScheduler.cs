@@ -288,6 +288,12 @@ internal class StrideScheduler : IScheduler
         }
 
         current.TotalRuntime += elapsedNs;
+        // Charged in whole ticks to whichever thread holds the CPU when the
+        // tick lands: a thread that parks before every tick is charged
+        // nothing, one the tick catches is charged the full period for a
+        // shorter run. The interactive test reads it per wake, so a single
+        // answer can flip either way; only the average is right. That is the
+        // nominal tick, not a clock worth replacing here.
         threadData.RunSinceWakeNs += elapsedNs;
 
         ulong quantum = SchedulerManager.DefaultQuantumNs;
