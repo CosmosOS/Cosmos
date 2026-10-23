@@ -99,7 +99,11 @@ public interface IScheduler
     /// expiry, so it arrives both from thread context with interrupts masked
     /// and from interrupt context, either the timer tick waking a sleeper or
     /// a device ISR signalling a waiter. It is the hook most likely to fire
-    /// twice for one thread, so guard against inserting it twice.
+    /// twice for one thread, so guard against inserting it twice. The manager
+    /// calls it before it marks the thread Ready, so
+    /// <see cref="SchedulerThread.State"/> still tells a wake (Blocked or
+    /// Sleeping) from a first start (Created) and from the Ready threads a
+    /// policy swap hands over.
     /// </summary>
     /// <param name="cpuState">CPU the thread is queued on.</param>
     /// <param name="thread">Thread becoming runnable.</param>

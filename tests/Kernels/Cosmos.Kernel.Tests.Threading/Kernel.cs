@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
@@ -18,7 +19,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 81;
+    private const int ExpectedTestCount = 84;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -87,6 +88,10 @@ public class Kernel : Sys.Kernel
     private const int IdleSleepRounds = 3;
     /// <summary>Length (ms) of each Thread.Sleep the main (idle) thread makes in the condition-variable ticket test.</summary>
     private const int IdleSleepMs = 50;
+    /// <summary>Sleep (ms) of the worker whose wake Stride must classify interactive: far longer than the few ticks it can have run.</summary>
+    private const int WakeClassifySleepMs = 200;
+    /// <summary>Quanta of run charged through OnTick to the synthetic Stride thread before its second park, so that park, microseconds long, reads as a short one.</summary>
+    private const int WakeClassifyRunQuanta = 100;
     /// <summary>Hold time (ms) each contender keeps the mutex so the others pile up in _waitingThreads.</summary>
     private const int MutexContenderHoldMs = 100;
     /// <summary>Wait (ms) giving the hand-off contender a few quanta to park in _waitingThreads.</summary>
@@ -243,6 +248,9 @@ public class Kernel : Sys.Kernel
         TR.Run("RoundRobin_Hooks_BlockYieldExit", TestRoundRobinHooksBlockAndYield);
         TR.Run("Scheduler_BootPolicy_IsStride", TestBootPolicyIsStride);
         TR.Run("Stride_ProportionalShare_FollowsTickets", TestStrideProportionalShare);
+        TR.Run("Stride_Hooks_WakePlacement_BoostThenCap", TestStrideHooksWakePlacement);
+        TR.Run("Stride_Hooks_InheritedParkedThread_FirstWakeJudged", TestStrideHooksInheritedParkedFirstWake);
+        TR.Run("Stride_SleepWake_ClassifiesInteractive", TestStrideSleepWakeClassifiesInteractive);
         TR.Run("SetScheduler_InstallsRoundRobinPolicy", TestSetSchedulerInstallsRoundRobin);
         TR.Run("RoundRobin_ThreadRuns_UnderNewPolicy", TestThreadRunsUnderRoundRobin);
         TR.Run("RoundRobin_DispatchesEveryThread", TestRoundRobinDispatchesEveryThread);
@@ -1933,6 +1941,151 @@ public class Kernel : Sys.Kernel
             "both spinners must make progress under Stride (proportional share, not starvation)");
         Assert.True(s_spinACount * PolicySkewDenominator >= s_spinBCount * PolicySkewNumerator,
             "a 4x ticket edge must yield a clearly larger (>= 1.5x) CPU share under Stride");
+    }
+
+    // ===== Stride wakeup placement =====
+    // ReadyThread calls OnThreadReady before it marks the thread Ready, so the
+    // policy reads the state the thread wakes from (nativeaot-patcher#445).
+    // The first cell drives a throwaway StrideScheduler over a throwaway
+    // thread, as the Round-Robin hook cells do, and sets the state by hand to
+    // reach each placement; GlobalPass only moves inside the hooks, so the
+    // value read right after OnThreadReady is the one the placement used. The
+    // second cell checks the live order through a real sleep: a worker that
+    // slept far longer than it ran wakes classified interactive only if the
+    // hook saw it Sleeping rather than Ready.
+
+    private static void TestStrideHooksWakePlacement()
+    {
+        StrideScheduler policy = new();
+        PerCpuState state = new();
+        policy.InitializeCpu(state);
+
+        SchedulerThread thread = new();
+        policy.OnThreadCreate(state, thread);
+
+        StrideCpuData? cpuData = state.SchedulerData as StrideCpuData;
+        StrideThreadData? data = thread.SchedulerData as StrideThreadData;
+        Assert.True(cpuData is not null && data is not null,
+            "InitializeCpu and OnThreadCreate should attach Stride bookkeeping");
+        if (cpuData is null || data is null)
+        {
+            return;
+        }
+
+        // First start: a Created thread is placed at GlobalPass, unboosted.
+        policy.OnThreadReady(state, thread);
+        Assert.True(data.Pass == (long)cpuData.GlobalPass, "a first start must be placed at GlobalPass");
+        Assert.False(data.IsInteractive, "a first start must not be classified interactive");
+
+        // A wake after a park with no run since the previous wake: interactive,
+        // half a quantum ahead of GlobalPass.
+        policy.OnThreadBlocked(state, thread);
+        thread.State = SchedulerThreadState.Blocked;
+        policy.OnThreadReady(state, thread);
+        Assert.True(data.IsInteractive,
+            "a thread that parked longer than twice what it ran since its wake must be interactive");
+        Assert.True(data.Pass == (long)cpuData.GlobalPass - (long)(data.Stride / 2),
+            "an interactive wake must be placed half a quantum ahead of GlobalPass");
+
+        // A wake after a long run and a short park: reclassified, and placed
+        // at GlobalPass + Remain, never more than two Stride1 behind.
+        Assert.True(ReferenceEquals(policy.PickNext(state), thread), "the sole queued thread must be picked");
+        thread.State = SchedulerThreadState.Running;
+        for (int i = 0; i < WakeClassifyRunQuanta; i++)
+        {
+            policy.OnTick(state, thread, SchedulerManager.DefaultQuantumNs);
+        }
+        policy.OnThreadBlocked(state, thread);
+        thread.State = SchedulerThreadState.Blocked;
+        policy.OnThreadReady(state, thread);
+        long capped = Math.Max((long)cpuData.GlobalPass + data.Remain,
+            (long)cpuData.GlobalPass - (long)(2 * StrideScheduler.Stride1));
+        Assert.False(data.IsInteractive,
+            "a thread that ran far longer than it parked must lose the interactive classification");
+        Assert.True(data.Pass == capped,
+            "a non-interactive wake must be placed at GlobalPass + Remain, floored two Stride1 behind");
+        Assert.Equal(1, policy.GetRunQueueCount(state), "each wake must queue the thread once");
+    }
+
+    private static void TestStrideHooksInheritedParkedFirstWake()
+    {
+        StrideScheduler policy = new();
+        PerCpuState state = new();
+        policy.InitializeCpu(state);
+
+        // Two threads handed over parked, as SetScheduler does: one that never
+        // ran, one that ran a hundred quanta under the previous policy.
+        SchedulerThread fresh = new();
+        SchedulerThread seasoned = new();
+        fresh.State = SchedulerThreadState.Blocked;
+        seasoned.State = SchedulerThreadState.Sleeping;
+        seasoned.TotalRuntime = WakeClassifyRunQuanta * SchedulerManager.DefaultQuantumNs;
+        policy.OnThreadCreate(state, fresh);
+        policy.OnThreadCreate(state, seasoned);
+
+        // Let real time pass, so the park measured from the hand-over is not
+        // a few timestamp ticks that could round to nothing.
+        TimerManager.Wait(FlagPollIntervalMs);
+
+        StrideCpuData? cpuData = state.SchedulerData as StrideCpuData;
+        StrideThreadData? freshData = fresh.SchedulerData as StrideThreadData;
+        StrideThreadData? seasonedData = seasoned.SchedulerData as StrideThreadData;
+        Assert.True(cpuData is not null && freshData is not null && seasonedData is not null,
+            "OnThreadCreate should attach Stride bookkeeping to an inherited thread");
+        if (cpuData is null || freshData is null || seasonedData is null)
+        {
+            return;
+        }
+
+        policy.OnThreadReady(state, fresh);
+        Assert.True(freshData.IsInteractive,
+            "an inherited parked thread that never ran must wake interactive: any park outweighs no run");
+
+        policy.OnThreadReady(state, seasoned);
+        long capped = Math.Max((long)cpuData.GlobalPass + seasonedData.Remain,
+            (long)cpuData.GlobalPass - (long)(2 * StrideScheduler.Stride1));
+        Assert.False(seasonedData.IsInteractive,
+            "an inherited parked thread is judged on its lifetime runtime, not on a run of zero");
+        Assert.True(seasonedData.Pass == capped,
+            "a non-interactive inherited wake must take the capped placement");
+        Assert.Equal(2, policy.GetRunQueueCount(state), "each inherited thread must be queued once");
+    }
+
+    private static volatile bool s_sleepWakeDone;
+    private static volatile bool s_sleepWakeHadData;
+    private static volatile bool s_sleepWakeInteractive;
+
+    private static void SleepWakeWorker()
+    {
+        // Thread.Sleep on a worker: MarkSleeping, then the tick's
+        // CheckSleepingThreads readies it from the Sleeping state.
+        SysThread.Sleep(WakeClassifySleepMs);
+
+        StrideThreadData? data = CurrentSchedulerThread()?.SchedulerData as StrideThreadData;
+        s_sleepWakeHadData = data is not null;
+        s_sleepWakeInteractive = data is not null && data.IsInteractive;
+        s_sleepWakeDone = true;
+    }
+
+    private static void TestStrideSleepWakeClassifiesInteractive()
+    {
+        s_sleepWakeDone = false;
+        s_sleepWakeHadData = false;
+        s_sleepWakeInteractive = false;
+
+        SysThread worker = new(SleepWakeWorker);
+        worker.Start();
+
+        for (int i = 0; i < FlagPollRetries && !s_sleepWakeDone; i++)
+        {
+            TimerManager.Wait(FlagPollIntervalMs);
+        }
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        Assert.True(s_sleepWakeDone, "the sleeping worker should wake and finish");
+        Assert.True(s_sleepWakeHadData, "the worker should carry Stride bookkeeping");
+        Assert.True(s_sleepWakeInteractive,
+            "a thread that slept far longer than it ran must wake classified interactive, which needs the hook to see it Sleeping rather than Ready");
     }
 
     private static void TestSetSchedulerInstallsRoundRobin()
