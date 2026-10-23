@@ -241,7 +241,7 @@ internal static class FinalizerThreadTests
 
     private static void TestStart()
     {
-        Assert.False(CoreGC.ThreadedFinalizer, "FinalizerThread: off until a kernel turns it on");
+        Assert.False(CoreGC.ThreadedFinalizer, "FinalizerThread: off since GC_FinalizerThread_OnByDefault turned it off");
 
         CoreGC.ThreadedFinalizer = true;
 

@@ -4,6 +4,7 @@ using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.System.Graphics;
+using CoreGC = Cosmos.Kernel.Core.Memory.GarbageCollector.GarbageCollector;
 
 namespace Cosmos.Kernel.System;
 
@@ -47,7 +48,8 @@ public abstract partial class Kernel
 
     /// <summary>
     /// Starts the kernel lifecycle. Called by the generated entry point.
-    /// Interrupts are enabled and the driver stage runs first, returning
+    /// Interrupts are enabled, the finalizer thread is started when its
+    /// switch is on, and the driver stage runs first, returning
     /// once every node, the children a bus driver published from its probe
     /// included, has been offered, so <see cref="OnBoot"/> and everything
     /// after it see the devices the kernel's drivers bound; a kernel that
@@ -61,6 +63,18 @@ public abstract partial class Kernel
         {
             Serial.WriteString("[Kernel] Enabling interrupts...\n");
             InternalCpu.EnableInterrupts();
+        }
+
+        // Finalizers on a thread of their own, as in .NET, rather than on the
+        // thread that collected or allocated next, which may hold a plain
+        // SpinLock a finalizer needs (KernelConsole allocates under its lock).
+        // The setter waits for the thread to begin, so it comes after the
+        // interrupts, which the scheduler's ticks need; the switch is off
+        // without a scheduler.
+        if (Core.CosmosFeatures.FinalizerThreadEnabled)
+        {
+            Serial.WriteString("[Kernel] Starting the finalizer thread...\n");
+            CoreGC.ThreadedFinalizer = true;
         }
 
         // The driver stage: offers every node published so far to the

@@ -511,7 +511,7 @@ The registry, `s_finalizable`, holds every live object whose finalizer is still 
 
 `GC.SuppressFinalize` sets a flag in the object's [runtime object header](gc-concepts/object-header.md), the 4 bytes before the object where CoreLib keeps the identity hash code and the thin lock, in one of the three bits CoreLib reserves for the collector (.NET's `BIT_SBLK_FINALIZER_RUN`); the registry and the queue are not touched, so the call costs one atomic or. A collection that finds a flagged object dead drops it from the registry instead of queuing it, and it is swept; a pass that meets a flagged entry in the queue, suppressed after a collection queued it (from another finalizer that died with it, or through a resurrection-tracking weak reference), skips it and clears the flag, as .NET does. `GC.ReRegisterForFinalize` on a flagged object clears the flag, and its registrations stand again; on an object the collection already dropped, kept alive since by another finalizer, it adds a registration back, after a linear scan of the registry and the queue that only this rare path pays. The allocator clears the flag on every finalizable object it hands out: it does not zero the header word, and a recycled block starts where a suppressed object may have died.
 
-The finalizers never run inside the collection, which has interrupts masked, nor anywhere else interrupts are masked: a finalizer is arbitrary code, and may allocate, take locks or collect. Where they run depends on `GarbageCollector.ThreadedFinalizer`. The property is off by default, and only Core code can turn it on, since `GarbageCollector` is internal; nothing in the kernel does yet.
+The finalizers never run inside the collection, which has interrupts masked, nor anywhere else interrupts are masked: a finalizer is arbitrary code, and may allocate, take locks or collect. Where they run depends on `GarbageCollector.ThreadedFinalizer`. `Kernel.Start` turns it on, right after it enables interrupts, when the `CosmosEnableFinalizerThread` switch is on, which it is by default in every kernel with a scheduler (`Sdk.targets` turns it off with the scheduler); a kernel built with the switch off, or one that overrides `Start`, leaves it off. Only Core and the ring can reach the property, since `GarbageCollector` is internal.
 
 While it is off, the finalizers run on the thread that collected, right after the collection. When the collection ran with interrupts masked, which `Heap.Collect` does and so does a collection the allocator starts when it runs out of memory, they run on the next thread to allocate instead. The allocator checks the queue before it allocates rather than after, so the new object cannot be swept while the finalizers run. `GC.WaitForPendingFinalizers` runs the queue on the calling thread.
 
@@ -545,7 +545,7 @@ Every choice above trades something away. This section collects the sharp edges 
 - **Interior pointers resolve on the precise path only.** A byref kept alive solely by a preempted thread's stack must hit an object header exactly to be found ([#376](https://github.com/valentinbreiz/nativeaot-patcher/issues/376), [#384](https://github.com/valentinbreiz/nativeaot-patcher/issues/384)).
 - **Frozen segments are not traced.** A frozen object holding the only reference to a regular-heap object would not keep it alive. Frozen objects normally reference only other frozen data, so no such reference should exist, but nothing verifies it either way.
 - **[Finalization](#finalization) leans on a single CPU too.** One pass at a time is enforced by a flag claimed with interrupts masked, which only excludes threads sharing the CPU.
-- **Finalizers run on borrowed threads.** Unless Core turns the finalizer thread on, and nothing in the kernel does yet, finalizers run on whichever thread collected or allocated next, possibly one holding a lock a finalizer needs.
+- **Finalizers run on borrowed threads without the finalizer thread.** With `CosmosEnableFinalizerThread` off, or without a scheduler, finalizers run on whichever thread collected or allocated next, under whatever plain `SpinLock` that thread holds: `KernelConsole` allocates under its lock, so a finalizer that writes to the console from there spins the CPU on itself. The thread is on by default for that reason; the finalizers the kernel ships (`Monitor`, `WeakReference`, `ConditionalWeakTable`, `SafeHandle`) take IRQ-safe locks or none.
 - **A mark-stack growth failure can under-mark.** If the mark stack cannot grow mid-collection, pointers are dropped with a logged warning, and an unmarked live object would be swept. There is no overflow fallback yet.
 - **Allocation failure returns null.** When even a collection cannot free enough memory, the allocation helpers return null; there is no `OutOfMemoryException` path from the allocator.
 
@@ -555,7 +555,7 @@ Retiring the conservative path is the keystone: once every thread can be scanned
 
 ## Tests
 
-The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 94 tests (`make test KERNEL=GarbageCollector`). Highlights:
+The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 95 tests (`make test KERNEL=GarbageCollector`). Highlights:
 
 - exact collection accounting (`GC_CollectBasic`, `GC_UnreachableExactCount`),
 - weak and dependent handle behavior (`GC_WeakReference`, `GC_DependentHandle`, `GC_DependentHandleCleanup`),
@@ -568,7 +568,7 @@ The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](
 - TLAB accounting and gap stamping (`GC_TLAB_*`),
 - the memory info wiring (`GC_Info_*`),
 - finalization on the collecting thread (`GC_Finalizer_*`, in `FinalizerTests.cs`): finalizers run once per registration and only for unreachable objects, resurrection, suppression and re-registration (the suppressed flag beside the thin lock, left stale in a recycled header word, and on an object a collection dropped), the order against weak and dependent handles, finalizers that allocate, collect or throw, allocations made with interrupts masked, and the pending count and `GC.MaxGeneration`,
-- the finalizer thread (`GC_FinalizerThread_*`, in `FinalizerThreadTests.cs`): starting, stopping and restarting it, waiting for its passes, including one a stop cuts into, and the same finalizer behavior run from that thread.
+- the finalizer thread (`GC_FinalizerThread_*`, in `FinalizerThreadTests.cs`, and `GC_FinalizerThread_OnByDefault` first of all, which checks `Kernel.Start` turned it on and turns it off for the cells that check the collecting thread): starting, stopping and restarting it, waiting for its passes, including one a stop cuts into, and the same finalizer behavior run from that thread.
 
 ---
 

@@ -46,6 +46,7 @@
     <CosmosEnableGraphics Condition="'$(CosmosEnableGraphics)' == ''">true</CosmosEnableGraphics>
     <CosmosEnableScheduler Condition="'$(CosmosEnableScheduler)' == ''">true</CosmosEnableScheduler>
     <CosmosEnableAudio Condition="'$(CosmosEnableAudio)' == ''">true</CosmosEnableAudio>
+    <CosmosEnableFinalizerThread Condition="'$(CosmosEnableFinalizerThread)' == ''">true</CosmosEnableFinalizerThread>
     <!-- CosmosEnableUsb has no default here: it follows CosmosEnableKeyboard,
          CosmosEnableMouse and CosmosEnableStorage, which the kernel project sets
          after this file is imported, so Sdk.targets defaults it once their
@@ -83,6 +84,7 @@
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Graphics.Enabled" Value="$(CosmosEnableGraphics)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.Core.Scheduler.Enabled" Value="$(CosmosEnableScheduler)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Audio.Enabled" Value="$(CosmosEnableAudio)" Trim="true"/>
+    <RuntimeHostConfigurationOption Include="Cosmos.Kernel.Core.FinalizerThread.Enabled" Value="$(CosmosEnableFinalizerThread)" Trim="true"/>
     <!-- Key must match PCScreenFont.Default.DefaultFontKey ("...Fonts.DefaultFont");
          it was previously written as "...Fonts.CustomFont", which nothing reads. -->
     <RuntimeHostConfigurationOption Condition="'$(CosmosDefaultFont)' != ''" Include="Cosmos.Kernel.System.Graphics.Fonts.DefaultFont" Value="$(CosmosDefaultFont)" />

@@ -24,7 +24,13 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[GarbageCollector] BeforeRun() reached!\n");
         Serial.WriteString("[GarbageCollector] Starting tests...\n");
 
-        TR.Start("GarbageCollector Tests", expectedTests: 51 + FinalizerTests.TestCount + FinalizerThreadTests.TestCount);
+        TR.Start("GarbageCollector Tests", expectedTests: 52 + FinalizerTests.TestCount + FinalizerThreadTests.TestCount);
+
+        // First: Kernel.Start turned the finalizer thread on, CosmosEnableFinalizerThread being on
+        // in this kernel. The cells below check the collector with the finalizers run inline, on
+        // the collecting thread, so the cell turns the thread off again; FinalizerThreadTests
+        // turns it on and checks the thread.
+        TR.Run("GC_FinalizerThread_OnByDefault", TestFinalizerThreadOnByDefault);
 
         // Garbage Collection Tests
         TR.Run("GC_IsEnabled", TestGCIsEnabled);
@@ -105,6 +111,15 @@ public class Kernel : Sys.Kernel
     {
         // All tests ran in BeforeRun; stop the main loop after one iteration
         Stop();
+    }
+
+    private static void TestFinalizerThreadOnByDefault()
+    {
+        Assert.True(Sys.KernelFeatures.FinalizerThread, "GC: CosmosEnableFinalizerThread is on in this kernel");
+        Assert.True(CoreGC.ThreadedFinalizer, "GC: Kernel.Start turned the finalizer thread on");
+
+        CoreGC.ThreadedFinalizer = false;
+        Assert.False(CoreGC.ThreadedFinalizer, "GC: the cells below run the finalizers on the collecting thread");
     }
 
     protected override void AfterRun()

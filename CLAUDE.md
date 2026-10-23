@@ -45,7 +45,7 @@ Dual-arch (x64/ARM64) with compile-time selection via `DefineConstants` and `Run
 
 Kernel features are toggled via MSBuild properties in kernel `.csproj` files (all default to `true`):
 
-`CosmosEnableInterrupts`, `CosmosEnableUART`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, `CosmosEnableUsb`
+`CosmosEnableInterrupts`, `CosmosEnableUART`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, `CosmosEnableUsb`, `CosmosEnableFinalizerThread` (the finalizers' own thread, off with the scheduler)
 
 ## Key paths
 
