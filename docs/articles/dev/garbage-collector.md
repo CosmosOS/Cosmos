@@ -555,7 +555,7 @@ Retiring the conservative path is the keystone: once every thread can be scanned
 
 ## Tests
 
-The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 89 tests (`make test KERNEL=GarbageCollector`). Highlights:
+The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 90 tests (`make test KERNEL=GarbageCollector`). Highlights:
 
 - exact collection accounting (`GC_CollectBasic`, `GC_UnreachableExactCount`),
 - weak and dependent handle behavior (`GC_WeakReference`, `GC_DependentHandle`, `GC_DependentHandleCleanup`),
@@ -564,6 +564,7 @@ The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](
 - precise stack scanning and funclet frames (`GC_PreciseStackScan`, `GC_FuncletNoFalseRoot`, `GC_FuncletNoCrashOnAllocInCatch`, `GC_StackScanPaddingStress`),
 - the malloc heaps staying untouched (`GC_MallocHeapNotSwept`),
 - multithreaded allocation under repeated collections (`GC_MultithreadChurnUnderCollect`),
+- a collection run by a worker thread while the main thread, on the bootloader stack, is switched out (`GC_CollectFromWorkerThread`),
 - TLAB accounting and gap stamping (`GC_TLAB_*`),
 - the memory info wiring (`GC_Info_*`),
 - finalization on the collecting thread (`GC_Finalizer_*`, in `FinalizerTests.cs`): finalizers run once per registration and only for unreachable objects, resurrection, suppression and re-registration, the order against weak and dependent handles, finalizers that allocate, collect or throw, allocations made with interrupts masked, and the pending count and `GC.MaxGeneration`,
