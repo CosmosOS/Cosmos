@@ -110,6 +110,7 @@
 // │ RhGetGenerationSize                               │ GC  │  1 │   1 │ real │   1   │  67  │ 100  │
 // │ RhGetGCSegmentSize                                │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
 // │ RhGetLastGCPercentTimeInGC                        │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
+// | RhGetMaxGcGeneration                              │ GC  │  0 |   1 | real |   1   |  —   | 100  │
 // │ RhGetMemoryInfo                                   │ GC  │  2 │   0 │ real │   1   │  33  │  50  │
 // │ RhGetTotalAllocatedBytes                          │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
 // │ RhGetTotalAllocatedBytesPrecise                   │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
@@ -226,7 +227,7 @@
 //   RhGetGcLatencyMode, RhGetGCNow,
 //   RhGetKnobValues, RhGetLastGCDuration,
 //   RhGetLastGCStartTime, RhGetLoadedOSModules, RhGetLohCompactionMode,
-//   RhGetMaxGcGeneration, RhGetTotalPauseDuration,
+//   RhGetTotalPauseDuration,
 //   RhIsGCBridgeActive, RhpGetNextFinalizableObject,
 //   RhpInitializeGcStress, RhRegisterForFullGCNotification, RhRegisterGcCallout,
 //   RhSetGcLatencyMode, RhSetLohCompactionMode, RhStartNoGCRegion,
@@ -284,7 +285,7 @@ public unsafe class Kernel : Sys.Kernel
         Serial.WriteString("[Runtime] BeforeRun() reached!\n");
         Serial.WriteString("[Runtime] Starting tests...\n");
 
-        TR.Start("Runtime Tests", expectedTests: 103);
+        TR.Start("Runtime Tests", expectedTests: 104);
 
         // ==================== Memory Allocation Stubs ====================
         // -- memmove --
@@ -414,6 +415,8 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("RhGetGCSegmentSize_Positive", Test_RhGetGCSegmentSize_Positive);
         // -- RhGetLastGCPercentTimeInGC --
         TR.Run("RhGetLastGCPercentTimeInGC_InRange", Test_RhGetLastGCPercentTimeInGC_InRange);
+        // -- RhGetMaxGcGeneration --
+        TR.Run("Test_RhGetMaxGcGeneration_NonGenerational", Test_RhGetMaxGcGeneration_NonGenerational);
         // -- RhGetMemoryInfo --
         TR.Run("RhGetMemoryInfo_Smoke", Test_RhGetMemoryInfo_Smoke);
         // -- RhGetTotalAllocatedBytes --
@@ -1197,6 +1200,12 @@ public unsafe class Kernel : Sys.Kernel
     {
         int pct = RuntimeGC.RhGetLastGCPercentTimeInGC();
         Assert.True(pct >= 0 && pct <= 100, "RhGetLastGCPercentTimeInGC must be in [0, 100]");
+    }
+
+    private static void Test_RhGetMaxGcGeneration_NonGenerational()
+    {
+        int maxgen = RuntimeGC.RhGetMaxGcGeneration();
+        Assert.Equal(0, maxgen, "RhGetMaxGcGeneration must be 0 (the gc is non-generational)");
     }
 
     // -- RhGetMemoryInfo --
