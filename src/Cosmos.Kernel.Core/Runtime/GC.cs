@@ -141,16 +141,16 @@ internal static unsafe class GC
     }
 
     [RuntimeExport("RhSuppressFinalize")]
-    internal static void RhSuppressFinalize(object obj)
+    internal static void RhSuppressFinalize(GCObject* obj)
     {
-        GarbageCollector.SuppressFinalize((GCObject*)Unsafe.As<object, nint>(ref obj));
+        GarbageCollector.SuppressFinalize(obj);
     }
 
     // CoreLib throws OutOfMemoryException when this returns false
     [RuntimeExport("RhReRegisterForFinalize")]
-    internal static bool RhReRegisterForFinalize(object obj)
+    internal static bool RhReRegisterForFinalize(GCObject* obj)
     {
-        return GarbageCollector.TryRegisterForFinalize((GCObject*)Unsafe.As<object, nint>(ref obj));
+        return GarbageCollector.TryRegisterForFinalize(obj);
     }
 
     [RuntimeExport("RhWaitForPendingFinalizers")]

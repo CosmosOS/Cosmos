@@ -1287,14 +1287,16 @@ public unsafe class Kernel : Sys.Kernel
     private static void Test_RhReRegisterForFinalize_Smoke()
     {
         object obj = new();
-        Assert.True(RuntimeGC.RhReRegisterForFinalize(obj), "RhReRegisterForFinalize must succeed");
+        GCObject* gcObject = (GCObject*)Unsafe.As<object, nint>(ref obj);
+        Assert.True(RuntimeGC.RhReRegisterForFinalize(gcObject), "RhReRegisterForFinalize must succeed");
     }
 
     // -- RhSuppressFinalize --
     private static void Test_RhSuppressFinalize_Smoke()
     {
         object obj = new();
-        RuntimeGC.RhSuppressFinalize(obj);
+        GCObject* gcObject = (GCObject*)Unsafe.As<object, nint>(ref obj);
+        RuntimeGC.RhSuppressFinalize(gcObject);
         Assert.True(true, "RhSuppressFinalize returned");
     }
 
