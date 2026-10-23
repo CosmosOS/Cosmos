@@ -29,4 +29,12 @@ internal static partial class CpuNative
     [LibraryImport("*", EntryPoint = "_native_cpu_restore_irq")]
     [SuppressGCTransition]
     public static partial void RestoreIrq(ulong flags);
+
+    /// <summary>
+    /// Reads the current interrupt-enable state (RFLAGS / DAIF) without changing it, for a
+    /// caller that only asks the question: no interrupt window is closed and reopened.
+    /// </summary>
+    [LibraryImport("*", EntryPoint = "_native_cpu_read_irq_flags")]
+    [SuppressGCTransition]
+    public static partial ulong ReadIrqFlags();
 }

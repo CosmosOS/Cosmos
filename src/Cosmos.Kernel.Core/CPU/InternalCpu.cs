@@ -22,14 +22,14 @@ internal static class InternalCpu
 
     /// <summary>
     /// Whether the calling code runs with interrupts enabled: neither in an interrupt handler
-    /// nor inside a <see cref="DisableInterruptsScope"/>.
+    /// nor inside a <see cref="DisableInterruptsScope"/>. A plain read of the flags register,
+    /// with no side effect: the allocator and the collector ask on their hot path.
     /// </summary>
     public static bool InterruptsEnabled
     {
         get
         {
-            ulong flags = CpuNative.SaveIrqAndDisable();
-            CpuNative.RestoreIrq(flags);
+            ulong flags = CpuNative.ReadIrqFlags();
 #if ARCH_ARM64
             // DAIF.I: IRQs masked when set
             return (flags & 0x80) == 0;
