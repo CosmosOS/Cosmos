@@ -1,0 +1,79 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Config-contract lint. Fails (exit 1) when a config violates one of the
+# fail-closed invariants that config.template.yaml, security-spine.md #6, and
+# issue-capture/SKILL.md state in prose. Warnings report but do not fail.
+# See lib/config_contract.rb.
+
+require_relative '../lib/config_contract'
+
+ROOT = File.expand_path('..', __dir__)
+TEMPLATE_PATH = File.join(ROOT, 'setup', 'config.template.yaml')
+DEFAULT_TARGETS = [TEMPLATE_PATH, File.join(ROOT, 'setup', 'config.yaml')].freeze
+
+BOUNDARY = <<~TEXT
+  This lint proves the statically decidable subset of Steward's fail-closed config
+  invariants. It does not replace the runtime preflight in issue-capture/SKILL.md,
+  which still owns writability, reachability, and the privacy of any destination
+  outside the repo.
+TEXT
+
+if ARGV.include?('--help') || ARGV.include?('-h')
+  puts 'Usage: bin/config-lint [config.yaml ...]'
+  puts
+  puts 'With no arguments, checks setup/config.template.yaml and setup/config.yaml.'
+  puts
+  puts BOUNDARY
+  puts 'Not checked: keys inside labels.area.map, labels.type.map, and'
+  puts 'labels.size.buckets are adopter-defined and are not validated.'
+  puts 'Type and value guards cover only the invariant-bearing keys; every other'
+  puts 'key is checked for presence and spelling only.'
+  exit 0
+end
+
+targets = ARGV.empty? ? DEFAULT_TARGETS : ARGV
+
+begin
+  template = ConfigContract::Extract.load(TEMPLATE_PATH)
+rescue StandardError => e
+  warn "could not read #{TEMPLATE_PATH}: #{e.message}"
+  exit 1
+end
+
+total_errors = 0
+total_warnings = 0
+
+targets.each do |path|
+  begin
+    config = ConfigContract::Extract.load(path)
+  rescue StandardError => e
+    puts "#{path}: could not read — #{e.message}"
+    total_errors += 1
+    next
+  end
+
+  violations = ConfigContract.check(config: config, template: template)
+  errors   = violations.select { |v| v.severity == :error }
+  warnings = violations.select { |v| v.severity == :warning }
+  infos    = violations.select { |v| v.severity == :info }
+
+  puts "#{path} — #{errors.size} error(s), #{warnings.size} warning(s)"
+  errors.each   { |v| puts v.to_line }
+  warnings.each { |v| puts v.to_line }
+  infos.each    { |v| puts v.to_line }
+
+  total_errors += errors.size
+  total_warnings += warnings.size
+end
+
+puts
+puts BOUNDARY
+
+if total_errors.zero?
+  puts "OK — contract holds (#{total_warnings} unverifiable, see above)."
+  exit 0
+else
+  puts "FAILED — #{total_errors} violation(s)."
+  exit 1
+end
