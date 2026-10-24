@@ -39,10 +39,10 @@
 //            100%  = every return value / out param / buffer state asserted against expected
 //
 // Summary:
-//   120 runtime exports implemented in src/Cosmos.Kernel.Core/Runtime/
-//   103 tests written in this file, covering 95 distinct endpoints (79%)
+//   121 runtime exports implemented in src/Cosmos.Kernel.Core/Runtime/
+//   105 tests written in this file, covering 96 distinct endpoints (79%)
 //    25 implemented endpoints are intentionally NOT directly tested (notes below)
-//    66 endpoints expected by the dotnet NativeAOT CoreLib are NOT implemented
+//    65 endpoints expected by the dotnet NativeAOT CoreLib are NOT implemented
 //
 // ┌───────────────────────────────────────────────────┬─────┬────┬─────┬──────┬───────┬──────┬──────┐
 // │ Endpoint                                          │File │ In │ Out │ Impl │ Tests │ In%  │ Out% │
@@ -110,7 +110,7 @@
 // │ RhGetGenerationSize                               │ GC  │  1 │   1 │ real │   1   │  67  │ 100  │
 // │ RhGetGCSegmentSize                                │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
 // │ RhGetLastGCPercentTimeInGC                        │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
-// | RhGetMaxGcGeneration                              │ GC  │  0 |   1 | real |   1   |  —   | 100  │
+// │ RhGetMaxGcGeneration                              │ GC  │  0 │   1 │ stub │   1   │  —   │ 100  │
 // │ RhGetMemoryInfo                                   │ GC  │  2 │   0 │ real │   1   │  33  │  50  │
 // │ RhGetTotalAllocatedBytes                          │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
 // │ RhGetTotalAllocatedBytesPrecise                   │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
@@ -123,6 +123,7 @@
 // │ RhReRegisterForFinalize                           │ Std │  1 │   0 │ real │   1   │  33  │  50  │
 // │ RhSuppressFinalize                                │ Std │  1 │   0 │ real │   1   │  33  │  50  │
 // │ RhUnregisterForGCReporting                        │ GC  │  1 │   0 │ stub │   1   │  33  │  50  │
+// │ RhWaitForPendingFinalizers                        │ GC  │  1 │   0 │ real │   1   │  33  │ 100  │
 // │ ----- Threading / Runtime Info ------------------ │     │    │     │      │       │      │      │
 // │ DebugDebugger_IsNativeDebuggerAttached            │ Dbg │  0 │   1 │ stub │   1   │  —   │ 100  │
 // │ GetSystemArrayEEType                              │ Std │  0 │   1 │ real │   1   │  —   │ 100  │
@@ -222,7 +223,7 @@
 //   RhpFirstChanceExceptionNotification, RhpSfiInit, RhpSfiNext,
 //   RhpValidateExInfoStack, RhpGetDispatchCellInfo
 //
-// GC (full / background / server / knobs) (19 — 11 now implemented):
+// GC (full / background / server / knobs) (22):
 //   RhCancelFullGCNotification, RhEndNoGCRegion, RhGetCurrentObjSize,
 //   RhGetGcLatencyMode, RhGetGCNow,
 //   RhGetKnobValues, RhGetLastGCDuration,
@@ -285,7 +286,7 @@ public unsafe class Kernel : Sys.Kernel
         Serial.WriteString("[Runtime] BeforeRun() reached!\n");
         Serial.WriteString("[Runtime] Starting tests...\n");
 
-        TR.Start("Runtime Tests", expectedTests: 104);
+        TR.Start("Runtime Tests", expectedTests: 105);
 
         // ==================== Memory Allocation Stubs ====================
         // -- memmove --
@@ -416,7 +417,7 @@ public unsafe class Kernel : Sys.Kernel
         // -- RhGetLastGCPercentTimeInGC --
         TR.Run("RhGetLastGCPercentTimeInGC_InRange", Test_RhGetLastGCPercentTimeInGC_InRange);
         // -- RhGetMaxGcGeneration --
-        TR.Run("Test_RhGetMaxGcGeneration_NonGenerational", Test_RhGetMaxGcGeneration_NonGenerational);
+        TR.Run("RhGetMaxGcGeneration_ReturnsZero", Test_RhGetMaxGcGeneration_ReturnsZero);
         // -- RhGetMemoryInfo --
         TR.Run("RhGetMemoryInfo_Smoke", Test_RhGetMemoryInfo_Smoke);
         // -- RhGetTotalAllocatedBytes --
@@ -439,6 +440,8 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("RhReRegisterForFinalize_Smoke", Test_RhReRegisterForFinalize_Smoke);
         // -- RhSuppressFinalize --
         TR.Run("RhSuppressFinalize_Smoke", Test_RhSuppressFinalize_Smoke);
+        // -- RhWaitForPendingFinalizers --
+        TR.Run("RhWaitForPendingFinalizers_RunsQueuedFinalizers", Test_RhWaitForPendingFinalizers_RunsQueuedFinalizers);
 
         // ==================== Threading / Runtime Info Stubs ====================
         // -- GetSystemArrayEEType --
@@ -1202,10 +1205,11 @@ public unsafe class Kernel : Sys.Kernel
         Assert.True(pct >= 0 && pct <= 100, "RhGetLastGCPercentTimeInGC must be in [0, 100]");
     }
 
-    private static void Test_RhGetMaxGcGeneration_NonGenerational()
+    // -- RhGetMaxGcGeneration --
+    private static void Test_RhGetMaxGcGeneration_ReturnsZero()
     {
-        int maxgen = RuntimeGC.RhGetMaxGcGeneration();
-        Assert.Equal(0, maxgen, "RhGetMaxGcGeneration must be 0 (the gc is non-generational)");
+        int maxGeneration = RuntimeGC.RhGetMaxGcGeneration();
+        Assert.Equal(0, maxGeneration, "RhGetMaxGcGeneration must be 0: the collector has a single generation");
     }
 
     // -- RhGetMemoryInfo --
@@ -1298,6 +1302,48 @@ public unsafe class Kernel : Sys.Kernel
         GCObject* gcObject = (GCObject*)Unsafe.As<object, nint>(ref obj);
         RuntimeGC.RhSuppressFinalize(gcObject);
         Assert.True(true, "RhSuppressFinalize returned");
+    }
+
+    // -- RhWaitForPendingFinalizers --
+    private static void Test_RhWaitForPendingFinalizers_RunsQueuedFinalizers()
+    {
+        // The collection queues the dead probe; the wait returns once its finalizer has run,
+        // on the finalizer thread when Kernel.Start turned it on, on this thread otherwise.
+        int[] counter = new int[1];
+        CreateFinalizableProbe(counter);
+
+        RuntimeGC.RhCollect(0, default);
+        RuntimeGC.RhWaitForPendingFinalizers(0);
+
+        Assert.Equal(1, counter[0], "RhWaitForPendingFinalizers must return once the finalizer the collection queued has run");
+    }
+
+    /// <summary>
+    /// Allocates the probe in a frame of its own, so no slot of the caller keeps it reachable.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateFinalizableProbe(int[] counter)
+    {
+        object probe = new FinalizableProbe(counter);
+        if (probe is null)
+        {
+            Assert.Fail("probe allocation returned null");
+        }
+    }
+
+    private sealed class FinalizableProbe
+    {
+        private readonly int[] _counter;
+
+        public FinalizableProbe(int[] counter)
+        {
+            _counter = counter;
+        }
+
+        ~FinalizableProbe()
+        {
+            _counter[0]++;
+        }
     }
 
     // =============================================================================
