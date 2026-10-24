@@ -40,7 +40,7 @@
 //
 // Summary:
 //   121 runtime exports implemented in src/Cosmos.Kernel.Core/Runtime/
-//   105 tests written in this file, covering 96 distinct endpoints (79%)
+//   107 tests written in this file, covering 96 distinct endpoints (79%)
 //    25 implemented endpoints are intentionally NOT directly tested (notes below)
 //    65 endpoints expected by the dotnet NativeAOT CoreLib are NOT implemented
 //
@@ -51,7 +51,7 @@
 // │ memmove                                           │ Mem │  3 │   0 │ real │   2   │  50  │ 100  │
 // │ memset                                            │ Mem │  3 │   0 │ real │   1   │  33  │ 100  │
 // │ RhAllocateNewArray                                │ Mem │  3 │   1 │ real │   1   │  33  │ 100  │
-// │ RhAllocateNewObject                               │ Mem │  3 │   1 │ real │   1   │  33  │ 100  │
+// │ RhAllocateNewObject                               │ Mem │  3 │   1 │ real │   2   │  67  │ 100  │
 // │ RhHandleFree                                      │ Mem │  1 │   0 │ real │   1   │  33  │  50  │
 // │ RhHandleSet                                       │ Mem │  1 │   0 │ real │   1   │  33  │ 100  │
 // │ RhNewArray                                        │ Mem │  2 │   1 │ real │   1   │  33  │ 100  │
@@ -117,7 +117,7 @@
 // │ RhIsPromoted                                      │ GC  │  1 │   1 │ stub │   1   │  33  │ 100  │
 // │ RhIsServerGc                                      │ GC  │  0 │   1 │ stub │   1   │  —   │ 100  │
 // │ RhpGcPoll                                         │ Std │  0 │   0 │ stub │   1   │  —   │  50  │
-// │ RhpNewFinalizable                                 │ Std │  1 │   1 │ real │   1   │  33  │ 100  │
+// │ RhpNewFinalizable                                 │ Std │  1 │   1 │ real │   2   │  67  │ 100  │
 // │ RhpTrapThreads                                    │ Std │  0 │   0 │ stub │   1   │  —   │  50  │
 // │ RhRegisterForGCReporting                          │ GC  │  1 │   0 │ stub │   1   │  33  │  50  │
 // │ RhReRegisterForFinalize                           │ Std │  1 │   0 │ real │   1   │  33  │  50  │
@@ -286,7 +286,7 @@ public unsafe class Kernel : Sys.Kernel
         Serial.WriteString("[Runtime] BeforeRun() reached!\n");
         Serial.WriteString("[Runtime] Starting tests...\n");
 
-        TR.Start("Runtime Tests", expectedTests: 105);
+        TR.Start("Runtime Tests", expectedTests: 107);
 
         // ==================== Memory Allocation Stubs ====================
         // -- memmove --
@@ -431,7 +431,10 @@ public unsafe class Kernel : Sys.Kernel
         // -- RhpGcPoll --
         TR.Run("RhpGcPoll_Smoke", Test_RhpGcPoll_Smoke);
         // -- RhpNewFinalizable --
-        TR.Run("RhpNewFinalizable_Object_NonNull", Test_RhpNewFinalizable_Object_NonNull);
+        TR.Run("RhpNewFinalizable_NonNull", Test_RhpNewFinalizable_NonNull);
+        TR.Run("RhpNewFinalizable_RegistersForFinalization", Test_RhpNewFinalizable_RegistersForFinalization);
+        // -- RhAllocateNewObject, the finalize flag --
+        TR.Run("RhAllocateNewObject_NoFlags_NotRegistered", Test_RhAllocateNewObject_NoFlags_NotRegistered);
         // -- RhpTrapThreads --
         TR.Run("RhpTrapThreads_Smoke", Test_RhpTrapThreads_Smoke);
         // -- RhRegisterForGCReporting / RhUnregisterForGCReporting --
@@ -1261,14 +1264,69 @@ public unsafe class Kernel : Sys.Kernel
     }
 
     // -- RhpNewFinalizable --
-    private static void Test_RhpNewFinalizable_Object_NonNull()
+    private static void Test_RhpNewFinalizable_NonNull()
     {
-        void* raw = StartupCodeHelpers.RhpNewFinalizable(MethodTable.Of<object>());
+        // The helper's contract is a type with a finalizer, as ILC calls it; the pass reads that
+        // type's finalizer slot, which a type without one does not have.
+        void* raw = StartupCodeHelpers.RhpNewFinalizable(MethodTable.Of<FinalizableProbe>());
         Assert.True(raw != null, "RhpNewFinalizable returned null");
 
         object obj = null!;
         *(void**)Unsafe.AsPointer(ref obj) = raw;
         Assert.NotNull(obj, "RhpNewFinalizable result should cast to object");
+    }
+
+    private static void Test_RhpNewFinalizable_RegistersForFinalization()
+    {
+        // The helper's GC_ALLOC_FINALIZE flag is what registers the object: the collection must
+        // queue the dead probe and the wait must run its finalizer.
+        int[] counter = new int[1];
+        CreateProbeThroughRhpNewFinalizable(counter);
+
+        RuntimeGC.RhCollect(0, default);
+        RuntimeGC.RhWaitForPendingFinalizers(0);
+
+        Assert.Equal(1, counter[0], "RhpNewFinalizable must register the object for finalization");
+    }
+
+    private static void Test_RhAllocateNewObject_NoFlags_NotRegistered()
+    {
+        // The flag, not the type, is the request: a finalizable type allocated without it is
+        // reclaimed without its finalizer running, as in .NET.
+        int[] counter = new int[1];
+        CreateProbeWithoutFinalizeFlag(counter);
+
+        RuntimeGC.RhCollect(0, default);
+        RuntimeGC.RhWaitForPendingFinalizers(0);
+
+        Assert.Equal(0, counter[0], "RhAllocateNewObject without GC_ALLOC_FINALIZE must not register the object");
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateProbeThroughRhpNewFinalizable(int[] counter)
+    {
+        void* raw = StartupCodeHelpers.RhpNewFinalizable(MethodTable.Of<FinalizableProbe>());
+        Assert.True(raw != null, "RhpNewFinalizable returned null");
+        InitializeProbe(raw, counter);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateProbeWithoutFinalizeFlag(int[] counter)
+    {
+        void* raw;
+        RuntimeMemory.RhAllocateNewObject(MethodTable.Of<FinalizableProbe>(), GC_ALLOC_FLAGS.GC_ALLOC_NO_FLAGS, &raw);
+        Assert.True(raw != null, "RhAllocateNewObject returned null");
+        InitializeProbe(raw, counter);
+    }
+
+    /// <summary>
+    /// Gives a probe allocated through a raw helper the counter its constructor would have set.
+    /// </summary>
+    private static void InitializeProbe(void* raw, int[] counter)
+    {
+        FinalizableProbe probe = null!;
+        *(void**)Unsafe.AsPointer(ref probe) = raw;
+        probe.SetCounter(counter);
     }
 
     // -- RhpTrapThreads --
@@ -1333,16 +1391,26 @@ public unsafe class Kernel : Sys.Kernel
 
     private sealed class FinalizableProbe
     {
-        private readonly int[] _counter;
+        private int[] _counter;
 
         public FinalizableProbe(int[] counter)
         {
             _counter = counter;
         }
 
+        /// <summary>Sets the counter on a probe a raw allocation helper handed out unconstructed.</summary>
+        public void SetCounter(int[] counter)
+        {
+            _counter = counter;
+        }
+
         ~FinalizableProbe()
         {
-            _counter[0]++;
+            // A probe a raw helper handed out and nothing counted (the smoke cell) has no counter.
+            if (_counter is not null)
+            {
+                _counter[0]++;
+            }
         }
     }
 

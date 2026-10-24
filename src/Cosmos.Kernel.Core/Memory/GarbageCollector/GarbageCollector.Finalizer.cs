@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
+using Internal.Runtime;
 using Monitor = Cosmos.Kernel.Core.Scheduler.Monitor;
 
 namespace Cosmos.Kernel.Core.Memory.GarbageCollector;
@@ -224,8 +225,12 @@ internal static unsafe partial class GarbageCollector
     // --- Internal methods ---
 
     /// <summary>
-    /// Registers a freshly allocated object for finalization. Does nothing for a type without a
-    /// finalizer.
+    /// Registers a freshly allocated object for finalization when its allocation asked for it,
+    /// <see cref="GC_ALLOC_FLAGS.GC_ALLOC_FINALIZE"/>. The flag is the request, as in .NET:
+    /// <c>RhpNewFinalizable</c>, the helper ILC calls for every <c>new</c> of a type with a
+    /// finalizer, and <c>RhNewObject</c> for such a type set it; an allocation without it is not
+    /// registered, whatever the type says. The caller owes a type with a finalizer: the pass
+    /// calls the MethodTable's finalizer slot, which only such a type has.
     /// </summary>
     /// <remarks>
     /// Clears the suppressed flag first: the allocator does not zero the runtime header, so the
@@ -233,9 +238,10 @@ internal static unsafe partial class GarbageCollector
     /// may have been suppressed.
     /// </remarks>
     /// <param name="obj">The object just allocated.</param>
-    internal static void RegisterNewObject(GCObject* obj)
+    /// <param name="flags">The allocation's flags.</param>
+    internal static void RegisterNewObject(GCObject* obj, GC_ALLOC_FLAGS flags)
     {
-        if (!obj->GetMethodTable()->IsFinalizable)
+        if ((flags & GC_ALLOC_FLAGS.GC_ALLOC_FINALIZE) == 0)
         {
             return;
         }

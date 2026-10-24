@@ -196,7 +196,15 @@ namespace Cosmos.Kernel.Core.Runtime
         [RuntimeExport("RhNewObject")]
         internal static unsafe void* RhNewObject(MethodTable* pEEType)
         {
-            return Memory.RhpNewFast(pEEType); // Simplified implementation
+            // The slow allocation path CoreLib takes for MemberwiseClone, GetUninitializedObject
+            // and reflection: the finalizer flag comes from the type, as Runtime.Base's RhNewObject
+            // picks RhpNewFinalizable for a finalizable type.
+            if (pEEType->IsFinalizable)
+            {
+                return RhpNewFinalizable(pEEType);
+            }
+
+            return Memory.RhpNewFast(pEEType);
         }
 
         [RuntimeExport("RhpStelemRef")]
@@ -256,8 +264,11 @@ namespace Cosmos.Kernel.Core.Runtime
         [RuntimeExport("RhpNewFinalizable")]
         internal static unsafe void* RhpNewFinalizable(MethodTable* pEEType)
         {
-            // TODO: Should actually be Memory.RhAllocateNewObject with finalizable flag
-            return Memory.RhpNewFast(pEEType); // Simplified implementation (Should set gc flag)
+            // ILC calls this helper for every `new` of a type with a finalizer; the flag is what
+            // registers the object for finalization, as in .NET (portable.cpp passes the same).
+            void* result;
+            Memory.RhAllocateNewObject(pEEType, GC_ALLOC_FLAGS.GC_ALLOC_FINALIZE, &result);
+            return result;
         }
 
         // RhpRethrow is now implemented in assembly (CPU/ExceptionHandling.s)
