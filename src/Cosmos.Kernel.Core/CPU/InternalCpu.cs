@@ -21,6 +21,26 @@ internal static class InternalCpu
     public static void Halt() => CpuNative.Halt();
 
     /// <summary>
+    /// Whether the calling code runs with interrupts enabled: neither in an interrupt handler
+    /// nor inside a <see cref="DisableInterruptsScope"/>. A plain read of the flags register,
+    /// with no side effect: the allocator and the collector ask on their hot path.
+    /// </summary>
+    public static bool InterruptsEnabled
+    {
+        get
+        {
+            ulong flags = CpuNative.ReadIrqFlags();
+#if ARCH_ARM64
+            // DAIF.I: IRQs masked when set
+            return (flags & 0x80) == 0;
+#else
+            // RFLAGS.IF
+            return (flags & 0x200) != 0;
+#endif
+        }
+    }
+
+    /// <summary>
     /// Creates a scope that disables interrupts and automatically re-enables them on dispose.
     /// Usage: using (InternalCpu.DisableInterruptsScope()) { ... }
     /// </summary>

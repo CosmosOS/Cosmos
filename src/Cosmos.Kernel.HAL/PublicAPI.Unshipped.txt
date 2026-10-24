@@ -572,6 +572,7 @@ static Cosmos.Kernel.HAL.Devices.Network.MacAddress.None.get -> Cosmos.Kernel.HA
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Audio = 13 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Fat = 9 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.FinalizerThread = 14 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Graphics = 10 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Interrupts = 1 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Keyboard = 5 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature

@@ -3,6 +3,7 @@
 .global _native_cpu_enable_interrupts
 .global _native_cpu_save_irq_and_disable
 .global _native_cpu_restore_irq
+.global _native_cpu_read_irq_flags
 
 .text
 .align 4
@@ -31,4 +32,10 @@ _native_cpu_save_irq_and_disable:
 // Restore DAIF from first argument (x0 on AAPCS64).
 _native_cpu_restore_irq:
     msr     daif, x0
+    ret
+
+// Read DAIF without changing it: the interrupt state, with no window closed.
+// Returns: DAIF in x0 (AAPCS64).
+_native_cpu_read_irq_flags:
+    mrs     x0, daif
     ret
