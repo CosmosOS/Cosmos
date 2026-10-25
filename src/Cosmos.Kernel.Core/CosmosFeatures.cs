@@ -122,4 +122,16 @@ internal static class CosmosFeatures
     [FeatureSwitchDefinition("Cosmos.Kernel.System.Audio.Enabled")]
     public static bool AudioEnabled =>
         AppContext.TryGetSwitch("Cosmos.Kernel.System.Audio.Enabled", out bool enabled) ? enabled : true;
+
+    /// <summary>
+    /// Controls the finalizer thread: whether <c>Kernel.Start</c> turns
+    /// <c>GarbageCollector.ThreadedFinalizer</c> on once the driver stage is done, so
+    /// finalizers run on a thread of their own, as in .NET, rather than on the thread that
+    /// collected or allocated. Requires Scheduler; the MSBuild cascade in Sdk.targets
+    /// disables this when the scheduler is off.
+    /// Set via CosmosEnableFinalizerThread property in csproj.
+    /// </summary>
+    [FeatureSwitchDefinition("Cosmos.Kernel.Core.FinalizerThread.Enabled")]
+    public static bool FinalizerThreadEnabled =>
+        AppContext.TryGetSwitch("Cosmos.Kernel.Core.FinalizerThread.Enabled", out bool enabled) ? enabled : true;
 }

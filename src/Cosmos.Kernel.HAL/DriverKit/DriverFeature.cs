@@ -56,4 +56,7 @@ public enum DriverFeature
 
     /// <summary><c>CosmosEnableAudio</c>.</summary>
     Audio,
+
+    /// <summary><c>CosmosEnableFinalizerThread</c>.</summary>
+    FinalizerThread,
 }

@@ -87,4 +87,12 @@ public static class KernelFeatures
     /// Requires PCI.
     /// </summary>
     public static bool Audio => CosmosFeatures.AudioEnabled;
+
+    /// <summary>
+    /// Whether the finalizers run on a thread of their own
+    /// (<c>CosmosEnableFinalizerThread</c>), started by <c>Kernel.Start</c>
+    /// once the driver stage is done. Requires Scheduler. Off, they run on
+    /// the thread that collected or allocated.
+    /// </summary>
+    public static bool FinalizerThread => CosmosFeatures.FinalizerThreadEnabled;
 }

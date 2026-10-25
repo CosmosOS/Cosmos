@@ -80,17 +80,18 @@ public static class CosmosEntryPoint
 `Cosmos.Kernel.System.Kernel` is the abstract base class of every user kernel. Its `Start()` drives the whole lifecycle:
 
 1. Enables hardware interrupts (everything before this point ran with interrupts off).
-2. Runs the driver stage: the kit logs its manifest, publishes the firmware framebuffer recorded in phase 3 as the firmware display (the display manager's primary until a display driver publishes one), and then the drivers listed in the kernel's manifest are offered every node the buses have published, the platform nodes seeded in phase 3 first (the 8042 driver publishes its two PS/2 port nodes from its probe, and the keyboard and mouse drivers bind them during the stage), then every PCI function the PCI host driver found and every one a root port driver found behind its hot-plug slot, then every virtio device a transport driver published beneath a function or a slot, and the step returns once each node, children included, has been offered; the AHCI, NVMe, virtio-blk and USB mass storage drivers publish the disks they find here (the host controller drivers enumerate their root ports inside their probes, so a stick present at boot is published during the stage too), and the storage manager registers and scans each one inside the publish, so `StorageManager.Partitions` is filled by the time the step returns. Each USB host controller driver's hot-plug thread, started inside its probe, follows the devices plugged in or pulled out from then on; it needs the scheduler. The root port driver's slot thread does the same for a device plugged into or pulled out of a PCI Express hot-plug slot, placing the registers of one that arrives; it needs the scheduler too.
+2. Starts the finalizer thread when `CosmosEnableFinalizerThread` is on, which it is by default whenever the scheduler is: from here on, finalizers run on a thread of their own rather than on the thread that collected or allocated ([Finalization](../dev/garbage-collector.md#finalization)).
+3. Runs the driver stage: the kit logs its manifest, publishes the firmware framebuffer recorded in phase 3 as the firmware display (the display manager's primary until a display driver publishes one), and then the drivers listed in the kernel's manifest are offered every node the buses have published, the platform nodes seeded in phase 3 first (the 8042 driver publishes its two PS/2 port nodes from its probe, and the keyboard and mouse drivers bind them during the stage), then every PCI function the PCI host driver found and every one a root port driver found behind its hot-plug slot, then every virtio device a transport driver published beneath a function or a slot, and the step returns once each node, children included, has been offered; the AHCI, NVMe, virtio-blk and USB mass storage drivers publish the disks they find here (the host controller drivers enumerate their root ports inside their probes, so a stick present at boot is published during the stage too), and the storage manager registers and scans each one inside the publish, so `StorageManager.Partitions` is filled by the time the step returns. Each USB host controller driver's hot-plug thread, started inside its probe, follows the devices plugged in or pulled out from then on; it needs the scheduler. The root port driver's slot thread does the same for a device plugged into or pulled out of a PCI Express hot-plug slot, placing the registers of one that arrives; it needs the scheduler too.
 3. Calls `OnBoot()`, whose default implementation initializes the graphical `KernelConsole` on whatever display is primary by then, which is what makes `Console.WriteLine` work.
-4. Turns off the early-boot text renderer: up to here, the boot log you see on screen is the serial log mirrored by a minimal framebuffer writer; from now on the screen belongs to `Console` and the [Canvas](graphics.md).
-5. Calls `BeforeRun()` once.
-6. Calls `Run()` in a loop until `Stop()` is called.
-7. Calls `AfterRun()` once.
-8. Halts the CPU. There is no operating system to return to: a kernel never exits.
+5. Turns off the early-boot text renderer: up to here, the boot log you see on screen is the serial log mirrored by a minimal framebuffer writer; from now on the screen belongs to `Console` and the [Canvas](graphics.md).
+6. Calls `BeforeRun()` once.
+7. Calls `Run()` in a loop until `Stop()` is called.
+8. Calls `AfterRun()` once.
+9. Halts the CPU. There is no operating system to return to: a kernel never exits.
 
 ## Stopping the machine
 
-Step 8 above is where a kernel ends up on its own. `Power` is how you get there deliberately, and the three members differ in how far they go:
+Step 9 above is where a kernel ends up on its own. `Power` is how you get there deliberately, and the three members differ in how far they go:
 
 ```csharp
 using Cosmos.Kernel.System;

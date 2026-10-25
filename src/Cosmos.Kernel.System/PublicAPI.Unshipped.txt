@@ -1030,6 +1030,7 @@ static Cosmos.Kernel.System.Internal.KernelEntry.Start(Cosmos.Kernel.System.Kern
 static Cosmos.Kernel.System.Kernel.Current.get -> Cosmos.Kernel.System.Kernel?
 static Cosmos.Kernel.System.KernelFeatures.Audio.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Fat.get -> bool
+static Cosmos.Kernel.System.KernelFeatures.FinalizerThread.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Graphics.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Interrupts.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Keyboard.get -> bool

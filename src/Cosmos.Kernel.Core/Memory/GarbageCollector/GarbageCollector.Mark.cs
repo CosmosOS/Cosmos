@@ -29,6 +29,7 @@ internal static unsafe partial class GarbageCollector
         s_markOverflowMin = null;
         s_markOverflowMax = null;
         ScanStackRoots();
+        MarkFinalizerQueue();
         ScanGCHandles();
     }
 
@@ -41,14 +42,30 @@ internal static unsafe partial class GarbageCollector
     {
         ScanGCHandles(GCHandleType.Normal);
         ScanGCHandles(GCHandleType.Pinned);
+        ScanDependentHandles();
 
-        // Pass 2: Dependent handle convergence loop
-        // If primary is live, mark secondary. Repeat until no new marks (handles transitive chains).
+        void ScanGCHandles(GCHandleType type)
+        {
+            GCHandleSegmentStore.Enumerator storeEnum = s_gCHandleManager.GCHandleControllers[(int)type].GetEnumerator();
+            while (storeEnum.MoveNext())
+            {
+                TryMarkRoot((nint)storeEnum.Current->Object);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Dependent handle convergence loop: if a primary is live, marks its secondary, and repeats
+    /// until no new marks (handles transitive chains). Runs again once the objects queued for
+    /// finalization are marked, for the secondaries that hang on them.
+    /// </summary>
+    private static void ScanDependentHandles()
+    {
         bool markedNew = true;
         while (markedNew)
         {
             markedNew = false;
-            var storeEnum = s_gCHandleManager.DependentHandleStore.GetEnumerator();
+            GCHandleSegmentStore.Enumerator storeEnum = s_gCHandleManager.DependentHandleStore.GetEnumerator();
             while (storeEnum.MoveNext())
             {
                 // No secondary means nothing to keep alive: ConditionalWeakTable stores a null
@@ -66,15 +83,6 @@ internal static unsafe partial class GarbageCollector
                     // for ever with interrupts masked, the whole machine stopped.
                     markedNew |= secondary->IsMarked;
                 }
-            }
-        }
-
-        void ScanGCHandles(GCHandleType type)
-        {
-            var storeEnum = s_gCHandleManager.GCHandleControllers[(int)type].GetEnumerator();
-            while (storeEnum.MoveNext())
-            {
-                TryMarkRoot((nint)storeEnum.Current->Object);
             }
         }
     }
@@ -232,6 +240,15 @@ internal static unsafe partial class GarbageCollector
             // context, at StackPointer. Skipping it lost every main-thread stack root whenever
             // another thread collected.
             stackEnd = GetCurrentStackEndForBootStack();
+#if ARCH_ARM64
+            // It runs in EL1t, on SP_EL0: the IRQ stub saved its context on the SP_EL1 stack, not
+            // on the bootloader one, and its stack pointer in the context. Scanning from the
+            // context up to the boot stack top read most of the address space and hung the CPU.
+            if (ctx != null && (ctx->Spsr & 1) == 0)
+            {
+                stackStart = (nuint)ctx->Sp;
+            }
+#endif
         }
         else
         {
