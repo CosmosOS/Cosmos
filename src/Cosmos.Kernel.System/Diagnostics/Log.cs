@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.System.Diagnostics;
@@ -122,20 +121,15 @@ public static class Log
 
     /// <summary>
     /// Writes raw bytes to the log stream as one uninterrupted sequence.
-    /// Interrupts are masked for the duration of the write, so traces
-    /// logged from IRQ handlers cannot interleave into the middle of the
-    /// data. Use this for binary wire formats that share the serial port
-    /// with text output, such as the kernel test protocol.
+    /// The port is locked and interrupts are masked for the duration of the
+    /// write, so neither another CPU's line nor a trace logged from an IRQ
+    /// handler can interleave into the middle of the data. Use this for
+    /// binary wire formats that share the serial port with text output,
+    /// such as the kernel test protocol.
     /// </summary>
     /// <param name="bytes">Bytes to write.</param>
     public static void WriteBytes(ReadOnlySpan<byte> bytes)
     {
-        using (InternalCpu.DisableInterruptsScope())
-        {
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                Serial.ComWrite(bytes[i]);
-            }
-        }
+        Serial.WriteBytes(bytes);
     }
 }

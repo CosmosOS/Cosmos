@@ -26,20 +26,8 @@ internal static unsafe class SerialNative
     [UnmanagedCallersOnly(EntryPoint = "__cosmos_serial_write")]
     public static void Write(byte* str)
     {
-        if (str == null)
-        {
-            return;
-        }
-
-        // C strings are null-terminated, write char by char
-        // Use while loop with explicit pointer arithmetic to avoid potential codegen issues
-        byte* p = str;
-        while (*p != 0)
-        {
-            EarlyGop.PutChar((char)*p); // Echo to screen for early debugging
-            Serial.ComWrite(*p);
-            p++;
-        }
+        // One locked sequence: the native code's line does not interleave with a managed one.
+        Serial.WriteAsciiz(str);
     }
 
     /// <summary>
