@@ -140,7 +140,16 @@ if (second.IsValid
 }
 ```
 
-DHCP needs no handle: `SendDiscoverPacket` runs the exchange on every registered device.
+DHCP configures one adapter at a time. `new DhcpClient()` runs the exchange on the primary adapter and `new DhcpClient(adapter)` on the one the handle names; the other adapters keep their configuration either way. `SendReleasePacket()` gives that adapter's address back to the server and leaves it unconfigured:
+
+```csharp
+NetworkAdapter second = NetworkManager.GetAdapter(1);
+
+if (second.IsValid && new DhcpClient(second).SendDiscoverPacket() != -1)
+{
+    Console.WriteLine("Second adapter: " + second.IPConfig?.Address.ToString());
+}
+```
 
 ### Read the configuration back
 
