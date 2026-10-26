@@ -12,6 +12,17 @@ internal unsafe struct GCHandleSegmentStore
 {
     private GCHandleSegment* _head;
     private GCHandleSegment* _tail;
+
+    /// <summary>
+    /// The lock of the segment chain: taken IRQ-safe to append a segment, and
+    /// by the collector to walk the chain clearing dead targets. Slot
+    /// allocation and free within a segment stay lock-free (a compare-exchange
+    /// on the segment's packed word), and the chain only grows, so reading it
+    /// to find a segment with room needs no lock. Nothing under it allocates a
+    /// managed object: a new segment is a page from the page allocator.
+    /// </summary>
+    private Scheduler.SpinLock _lock;
+
     public ulong CommitedSize;
     public readonly ulong Count
     {
@@ -22,6 +33,22 @@ internal unsafe struct GCHandleSegmentStore
             for (var segment = _head; segment != null; segment = segment->Next)
             {
                 result += (ulong)segment->AliveCount;
+            }
+
+            return result;
+        }
+    }
+
+    /// <summary>Segments in the chain; each is one page of <see cref="CommitedSize"/>.</summary>
+    public readonly int SegmentCount
+    {
+        get
+        {
+            int result = 0;
+
+            for (var segment = _head; segment != null; segment = segment->Next)
+            {
+                result++;
             }
 
             return result;
@@ -57,17 +84,34 @@ internal unsafe struct GCHandleSegmentStore
         }
 
         // Fallback: Allocate a new GCHandleSegment, use it to allocate the GCHandle.
-        var newSegment = AllocateSegment();
-
-        if (newSegment == null)
+        // Under the chain lock: two threads here at once each allocated a segment
+        // and linked it onto the same tail, and the second link orphaned the first
+        // segment, whose handles the collector then neither scanned nor cleared.
+        // The loser of the race finds room in the segment the winner appended.
+        using (_lock.AcquireIrqSafe())
         {
-            return null;
+            result = _tail->TryAllocate();
+            if (result != null)
+            {
+                return result;
+            }
+
+            var newSegment = AllocateSegment();
+
+            if (newSegment == null)
+            {
+                return null;
+            }
+
+            // The segment is initialized before it is published: the barrier
+            // orders its initialization before the link, so a reader walking
+            // the chain without the lock sees it whole or not at all.
+            Interlocked.MemoryBarrier();
+            _tail->Next = newSegment;
+            _tail = newSegment;
+
+            return newSegment->TryAllocate();
         }
-
-        _tail->Next = newSegment;
-        _tail = newSegment;
-
-        return newSegment->TryAllocate();
     }
 
     public void FreeHandle(GCHandle* handle)
@@ -78,6 +122,38 @@ internal unsafe struct GCHandleSegmentStore
             {
                 segment->Free(handle);
                 return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Clears the targets of this store that the mark phase did not reach, under
+    /// the chain lock. Called from the collection with interrupts masked, so the
+    /// lock only ever waits for another CPU's append to finish.
+    /// </summary>
+    /// <param name="dependent">Whether the store holds dependent handles, whose secondary dies with the primary.</param>
+    public void ClearDeadTargets(bool dependent)
+    {
+        using (_lock.AcquireIrqSafe())
+        {
+            // The handle stays allocated: its owner still holds it, reads null from it, and frees it
+            // or sets a new target (RuntimeType does so for its RuntimeTypeInfo cache). Freeing it
+            // here put it back on the free list while still in use: a later handle shared its slot,
+            // and a target set in it was no longer cleared, so it dangled once collected.
+            Enumerator handleEnum = GetEnumerator();
+            while (handleEnum.MoveNext())
+            {
+                GCHandle* handle = handleEnum.Current;
+
+                // A frozen target is never marked, and never dies.
+                if (handle->Object != null && !GarbageCollector.IsLive(handle->Object))
+                {
+                    handle->Object = null;
+                    if (dependent)
+                    {
+                        handle->ExtraInfo = 0; // the secondary was alive only through the primary
+                    }
+                }
             }
         }
     }
@@ -193,9 +269,11 @@ internal unsafe struct GCHandleManager()
     {
         if (IsValidHandleType(handleType))
         {
-            GCHandle* handle = handleType == (GCHandleType)6
-                        ? DependentHandleStore.AllocateHandle()
-                        : _gcHandleControllers[(int)handleType].AllocateHandle();
+            // By reference: the store carries the chain lock, which a copy would not share.
+            ref GCHandleSegmentStore store = ref handleType == (GCHandleType)6
+                        ? ref DependentHandleStore
+                        : ref _gcHandleControllers[(int)handleType];
+            GCHandle* handle = store.AllocateHandle();
 
             handle->Object = obj;
             handle->Type = handleType;
@@ -211,9 +289,9 @@ internal unsafe struct GCHandleManager()
     /// Called before the dead objects that have a finalizer are marked again: a short weak
     /// handle does not follow its target through finalization, even when the finalizer revives it.
     /// </summary>
-    public readonly void ClearShortWeakHandles()
+    public void ClearShortWeakHandles()
     {
-        ClearDeadTargets(_gcHandleControllers[(int)GCHandleType.Weak], false);
+        _gcHandleControllers[(int)GCHandleType.Weak].ClearDeadTargets(false);
     }
 
     /// <summary>
@@ -221,36 +299,10 @@ internal unsafe struct GCHandleManager()
     /// the dependent handles whose primary is not. Called between the marking of the objects
     /// queued for finalization and the sweep: what is cleared here is about to be freed.
     /// </summary>
-    public readonly void ClearLongWeakHandles()
+    public void ClearLongWeakHandles()
     {
-        ClearDeadTargets(_gcHandleControllers[(int)GCHandleType.WeakTrackResurrection], false);
-        ClearDeadTargets(DependentHandleStore, true);
-    }
-
-    /// <summary>
-    /// Clears the targets of a store that the mark phase did not reach.
-    /// </summary>
-    private static void ClearDeadTargets(GCHandleSegmentStore store, bool dependent)
-    {
-        // The handle stays allocated: its owner still holds it, reads null from it, and frees it
-        // or sets a new target (RuntimeType does so for its RuntimeTypeInfo cache). Freeing it
-        // here put it back on the free list while still in use: a later handle shared its slot,
-        // and a target set in it was no longer cleared, so it dangled once collected.
-        GCHandleSegmentStore.Enumerator handleEnum = store.GetEnumerator();
-        while (handleEnum.MoveNext())
-        {
-            GCHandle* handle = handleEnum.Current;
-
-            // A frozen target is never marked, and never dies.
-            if (handle->Object != null && !GarbageCollector.IsLive(handle->Object))
-            {
-                handle->Object = null;
-                if (dependent)
-                {
-                    handle->ExtraInfo = 0; // the secondary was alive only through the primary
-                }
-            }
-        }
+        _gcHandleControllers[(int)GCHandleType.WeakTrackResurrection].ClearDeadTargets(false);
+        DependentHandleStore.ClearDeadTargets(true);
     }
 
     /// <summary>
@@ -261,10 +313,10 @@ internal unsafe struct GCHandleManager()
     {
         if (handle != null && IsValidHandleType(handle->Type))
         {
-
-            var store = handle->Type == (GCHandleType)6
-                        ? DependentHandleStore
-                        : _gcHandleControllers[(int)handle->Type];
+            // By reference: the store carries the chain lock, which a copy would not share.
+            ref GCHandleSegmentStore store = ref handle->Type == (GCHandleType)6
+                        ? ref DependentHandleStore
+                        : ref _gcHandleControllers[(int)handle->Type];
             store.FreeHandle(handle);
         }
     }
