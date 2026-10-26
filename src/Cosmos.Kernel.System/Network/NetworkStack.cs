@@ -49,7 +49,7 @@ public static class NetworkStack
         AddressMap[Address6.LinkLocalFor(mac)] = device;
         MACMap.Add(mac.Hash, device);
 
-        device.OnPacketReceived = HandlePacket;
+        Listen(device);
 
         Serial.WriteString("[NetworkStack] Configured IP ");
         Serial.WriteString(ipAddress.ToString());
@@ -72,6 +72,30 @@ public static class NetworkStack
     {
         ConfigIP(device, config.Address);
         IPConfig.Set(device, config);
+    }
+
+    /// <summary>
+    /// Routes the frames a device receives into the stack. Configuring an
+    /// address does this; the DHCP client does it ahead of any address, so
+    /// the server's offer can reach it.
+    /// </summary>
+    /// <param name="device">The device to receive from.</param>
+    internal static void Listen(INetworkDevice device)
+    {
+        device.OnPacketReceived = HandlePacket;
+    }
+
+    /// <summary>
+    /// Forgets one device's IP configuration: its addresses, its MAC and its
+    /// routing entry. Every other device keeps its own. The counterpart of
+    /// <see cref="IPConfig.Enable(NetworkAdapter, Address, Address, Address)"/>.
+    /// </summary>
+    /// <param name="device">The device to leave unconfigured.</param>
+    internal static void RemoveConfigIP(INetworkDevice device)
+    {
+        MACMap.Remove(device.MacAddress.Hash);
+        RemoveAddresses(device);
+        IPConfig.Remove(device);
     }
 
     /// <summary>

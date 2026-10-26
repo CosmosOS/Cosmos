@@ -9,13 +9,17 @@
 */
 
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.System.Network.Protocols.IPv4;
 using Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp;
 using Cosmos.Kernel.System.Timers;
 
 namespace Cosmos.Kernel.System.Network;
 
 /// <summary>
-/// Used to manage the DHCP connection to a server.
+/// Obtains an IPv4 configuration for one network adapter from a DHCP server:
+/// the primary adapter by default, or the one handed to the constructor. The
+/// exchange leaves through that adapter alone and only that adapter's
+/// configuration is touched; every other adapter keeps its own.
 /// </summary>
 public sealed class DhcpClient : UdpClient
 {
@@ -25,207 +29,216 @@ public sealed class DhcpClient : UdpClient
     // assumption that the server sends it as the first option.
     private const int MessageTypeOffset = 284;
 
+    // chaddr, the client hardware address a server copies back from the
+    // request it answers: what tells this adapter's replies from another's.
+    private const int ClientHardwareAddressOffset = 70;
+
     private const byte OfferMessageType = 0x02;
     private const byte AckMessageType = 0x05;
     private const byte NakMessageType = 0x06;
 
-    // Set once an ACK's configuration is in force; SendDiscoverPacket clears it.
-    private bool _applied;
+    /// <summary>What <see cref="SendDiscoverPacket"/> returns when the exchange ends without a lease.</summary>
+    private const int NoLease = -1;
+
+    // Null for a client of the primary adapter, whichever it is when an
+    // exchange runs: a kernel may build its client before the drivers bind.
+    private readonly NetworkAdapter? _adapter;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DhcpClient"/> class.
+    /// Initializes a client for the primary adapter, <see cref="NetworkManager.Primary"/>
+    /// as of each exchange.
     /// </summary>
     public DhcpClient() : base(68)
     {
     }
 
     /// <summary>
-    /// Gets the address of the DHCP server for a device, taken to be its default
-    /// gateway, or null when the device has no IP configuration.
+    /// Initializes a client for one adapter. The handle is resolved when an
+    /// exchange runs, so a device withdrawn in between is reported then.
     /// </summary>
-    internal static Address? DHCPServerAddress(INetworkDevice networkDevice)
+    /// <param name="adapter">Handle to the adapter to configure, from <see cref="NetworkManager.GetAdapter(int)"/>.</param>
+    public DhcpClient(NetworkAdapter adapter) : base(68)
     {
-        return IPConfig.Get(networkDevice)?.DefaultGateway;
+        _adapter = adapter;
     }
 
     /// <summary>
-    /// Waits for the server's reply and acts on it: an offer is answered with a
-    /// request, whose reply is awaited in turn, and an ACK or a NAK is applied.
+    /// The device the client configures.
     /// </summary>
+    /// <exception cref="InvalidOperationException">The adapter names no registered device.</exception>
+    private INetworkDevice RequireDevice()
+    {
+        NetworkAdapter adapter = _adapter ?? NetworkManager.Primary;
+        return adapter.Device ?? throw new InvalidOperationException("The adapter names no registered network device.");
+    }
+
+    /// <summary>
+    /// Waits for the server's reply to this adapter's exchange and acts on it:
+    /// an offer is answered with a request, whose reply is awaited in turn, an
+    /// ACK is applied, and a NAK ends the exchange with no lease. A reply that
+    /// carries another hardware address belongs to another adapter's exchange
+    /// and is skipped.
+    /// </summary>
+    /// <param name="device">The device the exchange runs on.</param>
     /// <param name="timeout">How long to wait, in milliseconds.</param>
-    /// <returns>The milliseconds waited for the last reply, or -1 when none arrived in time.</returns>
-    private int Receive(int timeout = 5000)
+    /// <returns>The milliseconds waited for the last reply, or -1 when none arrived in time or the server declined.</returns>
+    private int Receive(INetworkDevice device, int timeout = 5000)
     {
         int waited = 0;
 
-        while (_rxBuffer.Count < 1 && waited < timeout)
+        while (waited < timeout)
         {
-            TimerManager.Wait(100);
-            waited += 100;
-        }
+            if (_rxBuffer.Count < 1)
+            {
+                TimerManager.Wait(100);
+                waited += 100;
+                continue;
+            }
 
-        if (_rxBuffer.Count < 1)
-        {
-            return -1;
-        }
+            DhcpPacket packet = new(_rxBuffer.Dequeue().RawData);
+            if (packet.Operation != BootReplyOperation || !IsAddressedTo(packet, device))
+            {
+                continue;
+            }
 
-        DhcpPacket packet = new(_rxBuffer.Dequeue().RawData);
-
-        if (packet.Operation == BootReplyOperation)
-        {
             byte messageType = packet.RawData[MessageTypeOffset];
             if (messageType == OfferMessageType)
             {
                 Serial.WriteString("[DHCP] Offer received.\n");
-                return SendRequestPacket(packet.Client ?? throw new Exception($"{nameof(packet.Client)} can not be null"));
+                return SendRequestPacket(device, packet.Client ?? throw new InvalidOperationException($"{nameof(packet.Client)} can not be null"));
             }
-            else if (messageType == AckMessageType || messageType == NakMessageType)
-            {
-                if (!_applied)
-                {
-                    Apply(packet);
 
-                    Close();
-                }
+            if (messageType == AckMessageType)
+            {
+                Apply(device, packet);
+                Close();
+                return waited;
+            }
+
+            if (messageType == NakMessageType)
+            {
+                Serial.WriteString("[DHCP] Request declined by the server (NAK), no lease.\n");
+                Close();
+                return NoLease;
             }
         }
 
-        return waited;
+        // No reply in time: stop receiving on the client port, so the frames
+        // that keep arriving are not queued for nobody.
+        Close();
+        return NoLease;
     }
 
     /// <summary>
-    /// Sends a packet to the DHCP server in order to make the address available again.
+    /// Whether a reply answers this device's request: the server copies the
+    /// client hardware address of the request it answers.
     /// </summary>
-    /// <exception cref="Exception">A registered device has no IP
-    /// configuration to take the server address from, or no configured interface
-    /// can reach that address.</exception>
-    public void SendReleasePacket()
+    private static bool IsAddressedTo(DhcpPacket packet, INetworkDevice device)
     {
-        for (int i = 0; i < NetworkManager.DeviceCount; i++)
+        byte[] mac = device.MacAddress._bytes;
+        for (int i = 0; i < mac.Length; i++)
         {
-            INetworkDevice? networkDevice = NetworkManager.GetDevice(i);
-            if (networkDevice is null)
+            if (packet.RawData[ClientHardwareAddressOffset + i] != mac[i])
             {
-                continue;
+                return false;
             }
-
-            Address destIp = DHCPServerAddress(networkDevice) ?? throw new Exception("IP can not be null");
-            Address source = IPConfig.FindNetwork(destIp)
-                ?? throw new Exception("Address can not be null");
-            DhcpRelease dhcpRelease = new(source, destIp, networkDevice.MacAddress);
-
-            dhcpRelease.Network.Enqueue();
-            NetworkStack.Update();
-
-            NetworkStack.RemoveAllConfigIP();
-
-            IPConfig.Enable(networkDevice, new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0));
         }
 
+        return true;
+    }
+
+    /// <summary>
+    /// Tells the server the adapter's address is free again and drops the
+    /// adapter's IP configuration, leaving it unconfigured. The server is taken
+    /// to be the adapter's default gateway. Other adapters are left alone.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The adapter names no
+    /// registered device, or has no IP configuration to release.</exception>
+    public void SendReleasePacket()
+    {
+        INetworkDevice device = RequireDevice();
+        IPConfig config = IPConfig.Get(device) ?? throw new InvalidOperationException("The adapter has no IP configuration to release.");
+
+        DhcpRelease dhcpRelease = new(config.Address, config.DefaultGateway, device.MacAddress);
+        Transmit(dhcpRelease, device);
+
+        NetworkStack.RemoveConfigIP(device);
         Close();
     }
 
     /// <summary>
-    /// Send a packet to find the DHCP server and inform the host that we
-    /// are requesting a new IP address.
+    /// Runs the DISCOVER, OFFER, REQUEST, ACK exchange on the adapter and
+    /// applies the lease to it. The adapter's configuration is replaced when
+    /// the server acknowledges and left as it was otherwise; no other adapter
+    /// is touched.
     /// </summary>
-    /// <returns>The amount of time elapsed, or -1 if a timeout has been reached.</returns>
-    /// <exception cref="Exception">The server answered with an offer,
-    /// an ACK or a NAK that carries no client address.</exception>
+    /// <returns>The milliseconds waited, or -1 when no lease was obtained:
+    /// no reply arrived in time, or the server declined with a NAK.</returns>
+    /// <exception cref="InvalidOperationException">The adapter names no
+    /// registered device, or the server answered with an offer or an ACK that
+    /// carries no client address.</exception>
     public int SendDiscoverPacket()
     {
-        NetworkStack.RemoveAllConfigIP();
+        INetworkDevice device = RequireDevice();
 
-        for (int i = 0; i < NetworkManager.DeviceCount; i++)
-        {
-            INetworkDevice? networkDevice = NetworkManager.GetDevice(i);
-            if (networkDevice is null)
-            {
-                continue;
-            }
+        // The stack hands a device's frames up only once it listens on it, and
+        // a device with no address yet has to hear the offer all the same.
+        NetworkStack.Listen(device);
 
-            IPConfig.Enable(networkDevice, new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0), new Address4(0, 0, 0, 0));
+        DhcpDiscover dhcpDiscover = new(device.MacAddress);
+        Transmit(dhcpDiscover, device);
 
-            DhcpDiscover dhcpDiscover = new(networkDevice.MacAddress);
-            dhcpDiscover.Network.Enqueue();
-            NetworkStack.Update();
-
-            _applied = false;
-        }
-
-        return Receive();
+        return Receive(device);
     }
 
     /// <summary>
-    /// Sends a request to apply the new IP configuration.
+    /// Sends a request for the offered address and waits for the server's answer.
     /// </summary>
     /// <returns>The amount of time elapsed, or -1 if a timeout has been reached.</returns>
-    private int SendRequestPacket(Address requestedAddress)
+    private int SendRequestPacket(INetworkDevice device, Address requestedAddress)
     {
-        for (int i = 0; i < NetworkManager.DeviceCount; i++)
-        {
-            INetworkDevice? networkDevice = NetworkManager.GetDevice(i);
-            if (networkDevice is null)
-            {
-                continue;
-            }
+        DhcpRequest dhcpRequest = new(device.MacAddress, requestedAddress);
+        Transmit(dhcpRequest, device);
 
-            DhcpRequest dhcpRequest = new(networkDevice.MacAddress, requestedAddress);
-            dhcpRequest.Network.Enqueue();
-            NetworkStack.Update();
-        }
-        return Receive();
+        return Receive(device);
     }
 
     /// <summary>
-    /// Applies the newly received IP configuration.
+    /// Queues a packet on the exchange's own device and pumps the queue. The
+    /// stack would otherwise pick the device from the packet's source address,
+    /// and a client with no lease yet sends from 0.0.0.0, which names none.
     /// </summary>
-    /// <param name="packet">The DHCP ACK packet.</param>
-    private void Apply(DhcpPacket packet)
+    private static void Transmit(DhcpPacket packet, INetworkDevice device)
     {
-        if (!_applied)
+        IPv4OutgoingBuffer.AddPacket((IPPacket)packet.Network, device);
+        NetworkStack.Update();
+    }
+
+    /// <summary>
+    /// Applies the acknowledged configuration to the device.
+    /// </summary>
+    /// <param name="device">The device the lease is for.</param>
+    /// <param name="packet">The DHCP ACK packet.</param>
+    private static void Apply(INetworkDevice device, DhcpPacket packet)
+    {
+        if (packet.Client is null)
         {
-            NetworkStack.RemoveAllConfigIP();
-
-            for (int i = 0; i < NetworkManager.DeviceCount; i++)
-            {
-                INetworkDevice? networkDevice = NetworkManager.GetDevice(i);
-                if (networkDevice is null)
-                {
-                    continue;
-                }
-
-                if (packet.Client is null || packet.Client.ToString() is null)
-                {
-                    throw new Exception("Parsing DHCP ACK Packet failed, can't apply network configuration.");
-                }
-                else
-                {
-                    Serial.WriteString("[DHCP ACK] Packet received, applying IP configuration...\n");
-                    Serial.WriteString($"   IP Address  : {packet.Client}\n");
-                    Serial.WriteString($"   Subnet mask : {packet.Subnet?.ToString() ?? "null"}\n");
-                    Serial.WriteString($"   Gateway     : {packet.Gateway?.ToString() ?? "null"}\n");
-                    Serial.WriteString($"   DNS server  : {packet.DNS?.ToString() ?? "null"}\n");
-
-                    IPConfig.Enable(networkDevice, packet.Client, packet.Subnet ?? new Address4(255, 255, 255, 0), packet.Gateway ?? Address4.Zero);
-                    if (packet.DNS is not null)
-                    {
-                        DnsConfig.Add(packet.DNS);
-                    }
-
-                    Serial.WriteString("[DHCP CONFIG] IP configuration _applied.\n");
-
-                    _applied = true;
-
-                    return;
-                }
-            }
-
-            Serial.WriteString("[DHCP CONFIG] No DHCP Config _applied!\n");
+            throw new InvalidOperationException("Parsing DHCP ACK Packet failed, can't apply network configuration.");
         }
-        else
+
+        Serial.WriteString("[DHCP ACK] Packet received, applying IP configuration...\n");
+        Serial.WriteString($"   Device      : {device.Name}\n");
+        Serial.WriteString($"   IP Address  : {packet.Client}\n");
+        Serial.WriteString($"   Subnet mask : {packet.Subnet?.ToString() ?? "null"}\n");
+        Serial.WriteString($"   Gateway     : {packet.Gateway?.ToString() ?? "null"}\n");
+        Serial.WriteString($"   DNS server  : {packet.DNS?.ToString() ?? "null"}\n");
+
+        IPConfig.Enable(device, packet.Client, packet.Subnet ?? new Address4(255, 255, 255, 0), packet.Gateway ?? Address4.Zero);
+        if (packet.DNS is not null)
         {
-            Serial.WriteString("[DHCP CONFIG] DHCP already _applied.\n");
+            DnsConfig.Add(packet.DNS);
         }
+
+        Serial.WriteString("[DHCP CONFIG] IP configuration applied.\n");
     }
 }
