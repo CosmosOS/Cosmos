@@ -214,9 +214,9 @@ public class ConsolePlug
         ConsoleSession session = SessionManager.RequireCurrent();
         ThrowIfKeyboardDisabled(session);
 
-        KeyEvent keyEvent = session.ReadKey();
+        KeyEvent keyEvent = session.ReadKey(out bool echoed);
 
-        if (!intercept && keyEvent.KeyChar != '\0')
+        if (!intercept && !echoed && keyEvent.KeyChar != '\0')
         {
             session.Write(keyEvent.KeyChar);
             session.Flush();

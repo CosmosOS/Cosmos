@@ -7,6 +7,8 @@ using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.Input;
+using Cosmos.Kernel.System.Sessions;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -19,7 +21,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 84;
+    private const int ExpectedTestCount = 87;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -261,6 +263,12 @@ public class Kernel : Sys.Kernel
         TR.Run("RoundRobin_BlockedThread_LeavesRunQueue", TestRoundRobinBlockedLeavesQueue);
         TR.Run("SetScheduler_RestoresStrideDefault", TestSetSchedulerRestoresStride);
         TR.Run("SetScheduler_RehomesLiveThreads", TestSetSchedulerRehomesLiveThreads);
+
+        // Console.Read on a session thread (CosmosOS/Cosmos#3276): the reader
+        // blocks for a line and hands it out character by character
+        TR.Run("ConsoleRead_WaitsForLine_ThenReturnsItsCharacters", TestConsoleReadWaitsForLine);
+        TR.Run("ConsoleRead_ReadLine_TakesTheRestOfTheLine", TestConsoleReadLineTakesRest);
+        TR.Run("ConsoleRead_ClosedSession_ReturnsEndOfStream", TestConsoleReadClosedSession);
 
         // Finish test suite
         TR.Finish();
@@ -2616,5 +2624,186 @@ public class Kernel : Sys.Kernel
         Assert.True(backUnderStride > underRoundRobin,
             "a thread alive across the swap back must keep running under Stride");
         Assert.True(s_rehomeDone, "the re-homed spinner should observe stop and exit");
+    }
+
+    // ==================== Console.Read on a session ====================
+
+    /// <summary>How long the reader thread gets to start and block before the cell checks that it did.</summary>
+    private const int ConsoleReadSettleMs = 1000;
+
+    /// <summary>Polls of <see cref="ConsoleReadPollMs"/> before a Console.Read cell gives up on its reader thread.</summary>
+    private const int ConsoleReadPollRetries = 100;
+
+    /// <summary>Poll interval while a Console.Read cell waits for its reader thread.</summary>
+    private const int ConsoleReadPollMs = 50;
+
+    /// <summary>What the reader threads report: the values Console.Read and Peek returned.</summary>
+    private static readonly int[] s_consoleReadResults = new int[3];
+    private static volatile string? s_consoleReadLine;
+    private static volatile bool s_consoleReadKeyAvailable;
+    private static volatile int s_consoleReadPhase;
+    private static volatile bool s_consoleReadDone;
+
+    /// <summary>
+    /// A session with no terminal behind it: keys come from
+    /// <see cref="ConsoleSession.EnqueueInput"/> and the echo goes to its
+    /// hidden screen. What the Telnet server's session is, minus the socket.
+    /// </summary>
+    private sealed class ProbeSession : ConsoleSession
+    {
+        public ProbeSession() : base(80, 25)
+        {
+        }
+
+        public override string Name => "probe";
+
+        public override bool IsRemote => true;
+
+        /// <summary>Types a line: its characters, then Enter. Any thread, as a terminal server's would.</summary>
+        public void Type(string text)
+        {
+            foreach (char c in text)
+            {
+                // The line editor reads the character; the key matters only
+                // for the editing keys.
+                EnqueueInput(new KeyEvent(c, Key.NoName, shift: false, alt: false, control: false, KeyEvent.KeyEventType.Make));
+            }
+
+            EnqueueInput(new KeyEvent('\0', Key.Enter, shift: false, alt: false, control: false, KeyEvent.KeyEventType.Make));
+        }
+    }
+
+    private static bool WaitForConsoleRead()
+    {
+        for (int i = 0; i < ConsoleReadPollRetries && !s_consoleReadDone; i++)
+        {
+            TimerManager.Wait(ConsoleReadPollMs);
+        }
+
+        return s_consoleReadDone;
+    }
+
+    private static void ResetConsoleRead()
+    {
+        for (int i = 0; i < s_consoleReadResults.Length; i++)
+        {
+            s_consoleReadResults[i] = int.MinValue;
+        }
+
+        s_consoleReadLine = null;
+        s_consoleReadKeyAvailable = false;
+        s_consoleReadPhase = 0;
+        s_consoleReadDone = false;
+    }
+
+    /// <summary>Starts a thread bound to a fresh probe session, or fails the cell.</summary>
+    private static ProbeSession? StartProbe(Action body)
+    {
+        ProbeSession session = new();
+        if (!SessionManager.TryRegister(session))
+        {
+            Assert.Fail("the session manager should list the probe session");
+            return null;
+        }
+
+        SessionManager.Start(session, body);
+        return session;
+    }
+
+    // Console.Read on gen3 answered -1, the end of the stream, whenever no key
+    // was waiting, so this reader was done before the keys were typed with
+    // -1 in every slot; a reader that waited for one key at a time read the
+    // Enter as '\0'. It now waits for the line and returns its characters in
+    // order, the new line last.
+    private static void TestConsoleReadWaitsForLine()
+    {
+        ResetConsoleRead();
+        ProbeSession? session = StartProbe(() =>
+        {
+            s_consoleReadPhase = 1;
+            s_consoleReadResults[0] = Console.Read();
+            s_consoleReadResults[1] = Console.Read();
+            s_consoleReadResults[2] = Console.Read();
+            s_consoleReadDone = true;
+        });
+        if (session is null)
+        {
+            return;
+        }
+
+        // The reader is blocked in Read before anything is typed.
+        TimerManager.Wait(ConsoleReadSettleMs);
+        Assert.Equal(1, s_consoleReadPhase, "the reader thread should have started");
+        Assert.False(s_consoleReadDone, "Console.Read should block while no line was entered");
+
+        session.Type("hi");
+
+        Assert.True(WaitForConsoleRead(), "the reader should return once the line is entered");
+        Assert.Equal((int)'h', s_consoleReadResults[0], "the first Read should return the line's first character");
+        Assert.Equal((int)'i', s_consoleReadResults[1], "the second Read should return the line's second character");
+        Assert.Equal((int)'\n', s_consoleReadResults[2], "the Enter that ended the line should read as a new line");
+    }
+
+    // The session holds what is left of a line Read started on, as .NET's
+    // reader does: KeyAvailable reports it, Peek sees the next character
+    // without taking it, and ReadLine returns the rest without its
+    // terminator rather than waiting for a second line.
+    private static void TestConsoleReadLineTakesRest()
+    {
+        ResetConsoleRead();
+        ProbeSession? session = StartProbe(() =>
+        {
+            s_consoleReadResults[0] = Console.Read();
+            s_consoleReadKeyAvailable = Console.KeyAvailable;
+            s_consoleReadResults[1] = Console.In.Peek();
+            s_consoleReadLine = Console.ReadLine();
+            s_consoleReadResults[2] = Console.Read();
+            s_consoleReadDone = true;
+        });
+        if (session is null)
+        {
+            return;
+        }
+
+        session.Type("abc");
+        TimerManager.Wait(ConsoleReadSettleMs);
+        Assert.False(s_consoleReadDone, "the last Read should block for a second line");
+
+        session.Type("d");
+
+        Assert.True(WaitForConsoleRead(), "the reader should finish once the second line is entered");
+        Assert.Equal((int)'a', s_consoleReadResults[0], "Read should take the first character");
+        Assert.True(s_consoleReadKeyAvailable, "KeyAvailable should report the rest of the line");
+        Assert.Equal((int)'b', s_consoleReadResults[1], "Peek should show the next character without taking it");
+        Assert.True(s_consoleReadLine == "bc", "ReadLine should return the rest of the line, without the new line");
+        Assert.Equal((int)'d', s_consoleReadResults[2], "the next Read should start on the second line");
+    }
+
+    // Closing the session ends the stream: a Read blocked on it returns -1,
+    // and so does every Read after it.
+    private static void TestConsoleReadClosedSession()
+    {
+        ResetConsoleRead();
+        ProbeSession? session = StartProbe(() =>
+        {
+            s_consoleReadPhase = 1;
+            s_consoleReadResults[0] = Console.Read();
+            s_consoleReadResults[1] = Console.In.Peek();
+            s_consoleReadDone = true;
+        });
+        if (session is null)
+        {
+            return;
+        }
+
+        TimerManager.Wait(ConsoleReadSettleMs);
+        Assert.Equal(1, s_consoleReadPhase, "the reader thread should have started");
+        Assert.False(s_consoleReadDone, "Console.Read should block until the session closes");
+
+        session.Close();
+
+        Assert.True(WaitForConsoleRead(), "the reader should return once the session is closed");
+        Assert.Equal(-1, s_consoleReadResults[0], "a Read blocked on a session that closes should return -1");
+        Assert.Equal(-1, s_consoleReadResults[1], "Peek on a closed session should return -1");
     }
 }

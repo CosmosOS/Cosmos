@@ -53,8 +53,7 @@ internal sealed class ConsoleStream : Stream
 
         if (_readLineSB.Length == 0)
         {
-            ConsoleSession? session = SessionManager.CurrentInput;
-            string? line = session is null ? null : LineEditor.ReadLine(session);
+            string? line = SessionManager.CurrentInput?.ReadLine();
             if (line is null)
             {
                 return 0;

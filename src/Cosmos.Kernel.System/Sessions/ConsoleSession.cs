@@ -1,6 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Boot;
@@ -47,6 +48,14 @@ public abstract class ConsoleSession
 
     private readonly Queue<KeyEvent> _input = new(InputQueueCapacity);
     private int _closed;
+
+    /// <summary>
+    /// What is left of the line <see cref="ReadChar"/> started on, its new
+    /// line included: handed out a character at a time until it is empty.
+    /// The session's, not the reader's, so a line entered on one session is
+    /// never handed to a thread reading another.
+    /// </summary>
+    private readonly StringBuilder _pendingLine = new();
 
     /// <summary>
     /// The session's number, from 1: its slot in the session table, and the
@@ -142,14 +151,20 @@ public abstract class ConsoleSession
     }
 
     /// <summary>
-    /// Whether a key is waiting. True as well once the session is closed, so
-    /// a loop that polls for a key goes on to read it and learns that the
-    /// input ended.
+    /// Whether a key is waiting: one queued, or the rest of a line
+    /// <see cref="ReadChar"/> started on. True as well once the session is
+    /// closed, so a loop that polls for a key goes on to read it and learns
+    /// that the input ended.
     /// </summary>
     internal bool KeyAvailable
     {
         get
         {
+            if (_pendingLine.Length > 0)
+            {
+                return true;
+            }
+
             PollInput();
             using (InternalCpu.DisableInterruptsScope())
             {
@@ -351,7 +366,97 @@ public abstract class ConsoleSession
 
     /// <summary>Waits for the next key.</summary>
     /// <exception cref="EndOfStreamException">The session was closed.</exception>
-    internal KeyEvent ReadKey() => WaitForKey() ?? throw new EndOfStreamException($"The console session {Name} was closed.");
+    internal KeyEvent ReadKey() => ReadKey(out _);
+
+    /// <summary>
+    /// Waits for the next key. The rest of a line <see cref="ReadChar"/>
+    /// started on comes first, a character per key, as .NET's console reader
+    /// hands the keys of a line it read ahead to <c>ReadKey</c>.
+    /// </summary>
+    /// <param name="echoed">Whether the key was echoed already, by the line editor that read its line.</param>
+    /// <exception cref="EndOfStreamException">The session was closed.</exception>
+    internal KeyEvent ReadKey(out bool echoed)
+    {
+        if (_pendingLine.Length > 0)
+        {
+            char value = _pendingLine[0];
+            _pendingLine.Remove(0, 1);
+            echoed = true;
+            return value == '\n'
+                ? new KeyEvent('\0', Key.Enter, shift: false, alt: false, control: false, KeyEvent.KeyEventType.Make)
+                : new KeyEvent(value, Key.NoName, shift: false, alt: false, control: false, KeyEvent.KeyEventType.Make);
+        }
+
+        echoed = false;
+        return WaitForKey() ?? throw new EndOfStreamException($"The console session {Name} was closed.");
+    }
+
+    /// <summary>
+    /// Reads the next character the way .NET's console reader does: a whole
+    /// line is read through the line editor, echoed and editable until
+    /// Enter, then handed out one character at a time, the Enter that ended
+    /// it as <c>'\n'</c>. Waits for a line when none is pending. The thread
+    /// bound to the session calls this, through <see cref="Console.Read"/>.
+    /// </summary>
+    /// <returns>The character, or -1 once the session is closed.</returns>
+    internal int ReadChar()
+    {
+        if (!FillPendingLine())
+        {
+            return -1;
+        }
+
+        char value = _pendingLine[0];
+        _pendingLine.Remove(0, 1);
+        return value;
+    }
+
+    /// <summary>
+    /// Looks at the next character without taking it, waiting for a line
+    /// when none is pending, as .NET's console reader does.
+    /// </summary>
+    /// <returns>The character, or -1 once the session is closed.</returns>
+    internal int PeekChar()
+    {
+        return FillPendingLine() ? _pendingLine[0] : -1;
+    }
+
+    /// <summary>
+    /// Reads a line: the rest of the one <see cref="ReadChar"/> started on,
+    /// or the next one entered through the line editor.
+    /// </summary>
+    /// <returns>The line without its terminator, or null once the session is closed.</returns>
+    internal string? ReadLine()
+    {
+        if (_pendingLine.Length > 0)
+        {
+            string rest = _pendingLine.ToString(0, _pendingLine.Length - 1);
+            _pendingLine.Clear();
+            return rest;
+        }
+
+        return LineEditor.ReadLine(this);
+    }
+
+    /// <summary>Makes sure a character is pending, reading the next line when none is.</summary>
+    /// <returns>False once the session is closed.</returns>
+    private bool FillPendingLine()
+    {
+        if (_pendingLine.Length > 0)
+        {
+            return true;
+        }
+
+        string? line = LineEditor.ReadLine(this);
+        if (line is null)
+        {
+            return false;
+        }
+
+        _pendingLine.Append(line);
+        _pendingLine.Append('\n');
+        return true;
+    }
 
     /// <summary>
     /// Resizes the screen, keeping the cells that fit: a remote session
