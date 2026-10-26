@@ -52,8 +52,6 @@ Console.WriteLine("Hello, " + name + "!");
 
 The line editor supports more than typing: Left and Right arrows move the cursor inside the input, Home and End jump to either end, Backspace and Delete remove characters, and typing in the middle of the line inserts rather than overwrites.
 
-`Console.Read()` and `Console.In.Peek()` go through the same line editor, as they do on .NET: the first call waits for a whole line, which then comes back one character at a time, the Enter that ended it as `'\n'`, so `while ((c = Console.Read()) != -1)` reads what is typed and ends only when the session closes. `Console.ReadLine()` returns the rest of a line `Read` started on.
-
 <!-- video: typing "Comsos Gen3", then fixing the typo with Home, arrows and Delete before pressing Enter -->
 <video src="images/keyboard-readline.mp4" controls autoplay muted loop playsinline style="max-width:100%"></video>
 
