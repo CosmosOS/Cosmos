@@ -724,6 +724,7 @@ Cosmos.Kernel.System.Network.AddressNumericStyle.Dec = 0 -> Cosmos.Kernel.System
 Cosmos.Kernel.System.Network.AddressNumericStyle.Hex = 1 -> Cosmos.Kernel.System.Network.AddressNumericStyle
 Cosmos.Kernel.System.Network.DhcpClient
 Cosmos.Kernel.System.Network.DhcpClient.DhcpClient() -> void
+Cosmos.Kernel.System.Network.DhcpClient.DhcpClient(Cosmos.Kernel.System.Network.NetworkAdapter adapter) -> void
 Cosmos.Kernel.System.Network.DhcpClient.SendDiscoverPacket() -> int
 Cosmos.Kernel.System.Network.DhcpClient.SendReleasePacket() -> void
 Cosmos.Kernel.System.Network.DnsClient

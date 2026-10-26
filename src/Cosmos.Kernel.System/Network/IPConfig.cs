@@ -95,6 +95,24 @@ public class IPConfig
     }
 
     /// <summary>
+    /// Forget one device's configuration. Internal: like <see cref="RemoveAll"/>
+    /// this drops the routing entry alone; <see cref="NetworkStack.RemoveConfigIP"/>
+    /// drops the stack's maps with it and is the only caller.
+    /// </summary>
+    /// <param name="device">The device to forget.</param>
+    internal static void Remove(INetworkDevice device)
+    {
+        for (int i = 0; i < s_configs.Count; i++)
+        {
+            if (s_configs[i].Device == device)
+            {
+                s_configs.RemoveAt(i);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
     /// The configuration in force on a device, or null when it has none.
     /// </summary>
     /// <param name="device">The device to look up.</param>

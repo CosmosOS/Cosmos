@@ -42,6 +42,14 @@ public class Kernel : Sys.Kernel
     private const ushort TcpServerPort = 5558;  // Kernel listens, test runner connects
     private const ushort TcpLingerPort = 5559;  // Kernel connects, test runner echoes but never closes its side
 
+    // The second adapter of the multi-adapter DHCP cells: its MAC, and a static
+    // configuration on a network the profile's NIC is not on, so a lookup that
+    // lands on it is a wrong answer.
+    private static readonly byte[] s_secondMac = [0x52, 0x54, 0x00, 0xAA, 0xBB, 0xCC];
+    private static readonly Address4 s_secondAddress = new(192, 168, 77, 2);
+    private static readonly Address4 s_secondMask = new(255, 255, 255, 0);
+    private static readonly Address4 s_secondGateway = new(192, 168, 77, 1);
+
     protected override void BeforeRun()
     {
         Log.WriteString("[Network Tests] Starting test suite\n");
@@ -53,12 +61,17 @@ public class Kernel : Sys.Kernel
         // VirtioNetDriver over either transport, PCI on both arches and MMIO on
         // arm64, through the VirtioPciTransportDriver or VirtioMmioTransportDriver
         // node above it.
-        TR.Start("Network Tests", expectedTests: 24);
+        TR.Start("Network Tests", expectedTests: 26);
 
         // Network initialization tests
         TR.Run("Network_DeviceDetected", TestNetworkDeviceDetected);
         TR.Run("Network_DeviceReady", TestNetworkDeviceReady);
         TR.Run("DHCP_AutoConfigure", TestDHCPConfiguration);
+
+        // Multi-adapter DHCP (CosmosOS/Cosmos#3275): a second, statically
+        // configured adapter sits beside the profile's NIC during the exchange
+        TR.Run("DHCP_LeavesOtherAdaptersAlone", TestDHCPLeavesOtherAdaptersAlone);
+        TR.Run("DHCP_ReleaseLeavesOtherAdaptersAlone", TestDHCPReleaseLeavesOtherAdaptersAlone);
 
         // ICMP tests
         TR.Run("ICMP_PingGateway", TestICMPPingGateway);
@@ -204,6 +217,131 @@ public class Kernel : Sys.Kernel
 
         // Verify we got a valid IP (not 0.0.0.0)
         Assert.True(s_localIP != Address4.Zero, "DHCP should assign a non-zero IP address");
+    }
+
+    // ==================== Multi-adapter DHCP ====================
+
+    /// <summary>
+    /// Registers a second adapter beside the profile's NIC and gives it the
+    /// static configuration above, through the public handle API.
+    /// </summary>
+    /// <returns>The adapter's handle, or an invalid one when the manager refused the device.</returns>
+    private static NetworkAdapter RegisterSecondAdapter(RecordingNetworkDevice device)
+    {
+        if (!NetworkManager.RegisterDevice(device))
+        {
+            return default;
+        }
+
+        NetworkAdapter adapter = NetworkManager.GetAdapter(NetworkManager.DeviceCount - 1);
+        IPConfig.Enable(adapter, s_secondAddress, s_secondMask, s_secondGateway);
+        return adapter;
+    }
+
+    /// <summary>
+    /// Takes the second adapter out again, configuration and registration
+    /// both, so the cells after this one see the profile's NIC alone.
+    /// </summary>
+    private static void UnregisterSecondAdapter(RecordingNetworkDevice device)
+    {
+        NetworkStack.RemoveConfigIP(device);
+        NetworkManager.UnregisterDevice(device);
+    }
+
+    /// <summary>
+    /// The second adapter still carries its static configuration and the
+    /// exchange sent nothing through it.
+    /// </summary>
+    private static void AssertSecondAdapterUntouched(NetworkAdapter adapter, RecordingNetworkDevice device, string when)
+    {
+        IPConfig? config = adapter.IPConfig;
+        Assert.True(config is not null, "The second adapter should still be configured " + when);
+        if (config is not null)
+        {
+            Assert.True(config.Address == s_secondAddress && config.SubnetMask == s_secondMask && config.DefaultGateway == s_secondGateway,
+                "The second adapter should keep its static configuration " + when);
+        }
+
+        Assert.True(device.FramesSent == 0, "The exchange should leave through the primary adapter only, not the second one (" + when + ")");
+    }
+
+    private static void TestDHCPLeavesOtherAdaptersAlone()
+    {
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        RecordingNetworkDevice second = new("second0", new MacAddress(s_secondMac));
+        NetworkAdapter adapter = RegisterSecondAdapter(second);
+        if (!adapter.IsValid)
+        {
+            Assert.Fail("The network manager should register a second adapter");
+            return;
+        }
+
+        try
+        {
+            // A fresh exchange on the primary adapter while the second one is
+            // configured: the lease lands on the primary, the second keeps
+            // its address, and no DHCP frame leaves through it.
+            int result = new DhcpClient().SendDiscoverPacket();
+            Assert.True(result != -1, "DHCP should obtain a lease for the primary adapter");
+
+            IPConfig? primary = NetworkManager.Primary.IPConfig;
+            Assert.True(primary is not null && primary.Address != Address4.Zero, "The primary adapter should carry the lease");
+
+            AssertSecondAdapterUntouched(adapter, second, "after the exchange");
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("DHCP threw with two adapters registered: " + ex.Message);
+        }
+        finally
+        {
+            UnregisterSecondAdapter(second);
+        }
+    }
+
+    private static void TestDHCPReleaseLeavesOtherAdaptersAlone()
+    {
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        RecordingNetworkDevice second = new("second0", new MacAddress(s_secondMac));
+        NetworkAdapter adapter = RegisterSecondAdapter(second);
+        if (!adapter.IsValid)
+        {
+            Assert.Fail("The network manager should register a second adapter");
+            return;
+        }
+
+        try
+        {
+            // Releasing the primary's lease leaves the primary unconfigured
+            // and the second adapter as it was.
+            new DhcpClient().SendReleasePacket();
+            Assert.True(NetworkManager.Primary.IPConfig is null, "Release should leave the primary adapter unconfigured");
+            AssertSecondAdapterUntouched(adapter, second, "after the release");
+
+            // The cells after this one need the lease back.
+            int result = new DhcpClient().SendDiscoverPacket();
+            Assert.True(result != -1, "DHCP should hand the primary adapter a lease again after the release");
+
+            IPConfig? primary = NetworkManager.Primary.IPConfig;
+            Assert.True(primary is not null && primary.Address != Address4.Zero, "The primary adapter should carry the new lease");
+            AssertSecondAdapterUntouched(adapter, second, "after the new lease");
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("DHCP release threw with two adapters registered: " + ex.Message);
+        }
+        finally
+        {
+            UnregisterSecondAdapter(second);
+        }
     }
 
     // ==================== ICMP Tests ====================
