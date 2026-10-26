@@ -39,7 +39,7 @@
 //            100%  = every return value / out param / buffer state asserted against expected
 //
 // Summary:
-//   121 runtime exports implemented in src/Cosmos.Kernel.Core/Runtime/
+//   121 runtime exports implemented in src/Cosmos.Kernel.Core/Runtime/ (2 of them in the native Runtime.s)
 //   107 tests written in this file, covering 96 distinct endpoints (79%)
 //    25 implemented endpoints are intentionally NOT directly tested (notes below)
 //    65 endpoints expected by the dotnet NativeAOT CoreLib are NOT implemented
@@ -88,8 +88,8 @@
 // │ RhpAssignRef                                      │ Std │  2 │   0 │ real │   1   │  33  │ 100  │
 // │ RhpByRefAssignRef (ARM64)                         │ Std │  2 │   0 │ real │   -   │   0  │   0  │
 // │ RhpCheckedAssignRef                               │ Std │  2 │   0 │ real │   1   │  33  │ 100  │
-// │ RhpCheckedLockCmpXchg                             │ Std │  4 │   1 │ real │   2   │ 100  │ 100  │
-// │ RhpCheckedXchg                                    │ Std │  2 │   1 │ real │   1   │  33  │ 100  │
+// │ RhpCheckedLockCmpXchg (asm)                       │ Std │  3 │   1 │ real │   2   │ 100  │ 100  │
+// │ RhpCheckedXchg (asm)                              │ Std │  2 │   1 │ real │   1   │  50  │ 100  │
 // │ RhpLdelemaRef                                     │ Std │  3 │   1 │ real │   1   │  33  │ 100  │
 // │ RhpStelemRef                                      │ Std │  3 │   0 │ real │   2   │  67  │ 100  │
 // │ RhSpanHelpers_MemZero                             │ Std │  2 │   0 │ real │   1   │  33  │ 100  │
@@ -209,6 +209,11 @@
 //   RhpByRefAssignRef           — ARM64 only; forwards to an assembly stub. Indirectly
 //                                 exercised by the kernel's own ref-assignment paths
 //                                 on ARM64 CI.
+//
+// Endpoints marked "(asm)" are assembly in Cosmos.Kernel.Native.X64/ARM64 (Runtime.s), with
+// no C# body in src/Cosmos.Kernel.Core/Runtime/: their cells reach them the way CoreLib
+// does (Interlocked.CompareExchange / Exchange on a reference). A second thread racing them
+// is Threading's Interlocked_ReferenceExchange_TwoThreads.
 //
 // =============================================================================
 // MISSING STUBS (expected by dotnet NativeAOT, not implemented in cosmos)
@@ -1029,14 +1034,24 @@ public unsafe class Kernel : Sys.Kernel
     }
 
     // -- RhpCheckedXchg --
+    // Reached as CoreLib reaches it: Interlocked.Exchange on a reference is a call to
+    // RuntimeImports.InterlockedExchange, which the assembly stub implements.
+    // The values are heap objects: ILC inlines the exchange of a null or a frozen object
+    // (a string literal) itself, without the stub.
     private static void Test_RhpCheckedXchg_SwapsAndReturnsOriginal()
     {
-        int originalSentinel = 1;
-        int newSentinel = 2;
-        void* location = &originalSentinel;
-        void* original = StartupCodeHelpers.InterlockedExchange(&location, &newSentinel);
-        Assert.True(original == &originalSentinel, "RhpCheckedXchg must return original");
-        Assert.True(location == &newSentinel, "RhpCheckedXchg must install new value");
+        object originalSentinel = new object();
+        object newSentinel = new object();
+        object? location = originalSentinel;
+        object? original = Interlocked.Exchange(ref location, newSentinel);
+        Assert.True(ReferenceEquals(original, originalSentinel), "RhpCheckedXchg must return original");
+        Assert.True(ReferenceEquals(location, newSentinel), "RhpCheckedXchg must install new value");
+
+        // From a null location: the previous value is null, the new one goes in.
+        location = null;
+        original = Interlocked.Exchange(ref location, originalSentinel);
+        Assert.True(original is null, "RhpCheckedXchg must return null from a null location");
+        Assert.True(ReferenceEquals(location, originalSentinel), "RhpCheckedXchg must install the value over null");
     }
 
     // -- RhpLdelemaRef --
@@ -1487,28 +1502,36 @@ public unsafe class Kernel : Sys.Kernel
     }
 
     // -- RhpCheckedLockCmpXchg --
+    // Reached as CoreLib reaches it: Interlocked.CompareExchange on a reference is a call to
+    // RuntimeImports.InterlockedCompareExchange, which the assembly stub implements. The
+    // comparand and the value are distinct non-null objects, so that ILC cannot inline the
+    // null and frozen-object cases it handles itself.
     private static void Test_RhpCheckedLockCmpXchg_MatchSwaps()
     {
-        object a = "a";
-        object b = "b";
-        object location = a;
-        object* locPtr = (object*)Unsafe.AsPointer(ref location);
+        object a = new object();
+        object b = new object();
+        object? location = a;
         // comparand == *location → value wins
-        object result = StartupCodeHelpers.RhpCheckedLockCmpXchg(locPtr, b, a, 0);
+        object? result = Interlocked.CompareExchange(ref location, b, a);
         Assert.True(ReferenceEquals(result, a), "RhpCheckedLockCmpXchg returns original when comparand matches");
         Assert.True(ReferenceEquals(location, b), "RhpCheckedLockCmpXchg writes value when comparand matches");
     }
 
     private static void Test_RhpCheckedLockCmpXchg_NoMatchKeeps()
     {
-        object a = "first";
-        object b = "second";
-        object location = a;
-        object* locPtr = (object*)Unsafe.AsPointer(ref location);
+        object a = new object();
+        object b = new object();
+        object? location = a;
         // comparand != *location → location stays as a
-        object result = StartupCodeHelpers.RhpCheckedLockCmpXchg(locPtr, b, b, 0);
+        object? result = Interlocked.CompareExchange(ref location, b, b);
         Assert.True(ReferenceEquals(result, a), "RhpCheckedLockCmpXchg returns original when comparand differs");
         Assert.True(ReferenceEquals(location, a), "RhpCheckedLockCmpXchg leaves location unchanged when comparand differs");
+
+        // A null location against a null comparand is a match: the value goes in.
+        location = null;
+        result = Interlocked.CompareExchange(ref location, a, null);
+        Assert.True(result is null, "RhpCheckedLockCmpXchg returns null from a null location");
+        Assert.True(ReferenceEquals(location, a), "RhpCheckedLockCmpXchg writes value over a matching null");
     }
 
     // -- RhpGetTickCount64 --

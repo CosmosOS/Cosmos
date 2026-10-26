@@ -1,11 +1,14 @@
 // x64 NativeAOT Runtime Stubs
-// EH section accessors and core math functions (x87 FPU)
+// Interlocked reference exchanges, EH section accessors and core math functions (x87 FPU)
 //
 // Core transcendentals (sin, cos, tan, exp, log, atan) use x87 hardware.
 // Derived functions (asin, acos, atan2, pow, log2, log10) are shared C#
 // implementations in Cosmos.Kernel.Core/Runtime/Math.cs.
 
 .intel_syntax noprefix
+
+.global RhpCheckedLockCmpXchg
+.global RhpCheckedXchg
 
 .global get_eh_frame_start
 .global get_eh_frame_end
@@ -33,6 +36,35 @@
 .global logf
 
 .text
+
+// =============================================================================
+// Interlocked exchanges on object references
+//
+// CoreLib reaches these through RuntimeImports.InterlockedCompareExchange and
+// InterlockedExchange: Interlocked.CompareExchange and Exchange on a reference,
+// so Lock, LazyInitializer, the thread pool's queues and ConcurrentQueue. ILC
+// inlines the integer forms; the reference forms are calls, and were plain
+// read-then-write C#, which a tick between the two halves broke. The whole
+// operation is one locked instruction here. No write barrier follows the
+// store: the collector is neither generational nor concurrent, and
+// RhpCheckedAssignRef is a plain store as well.
+// =============================================================================
+
+// object RhpCheckedLockCmpXchg(object* location, object value, object comparand)
+// System V: rdi = location, rsi = value, rdx = comparand. Returns the value
+// the location held before, in rax, whether or not it was replaced.
+RhpCheckedLockCmpXchg:
+    mov     rax, rdx
+    lock cmpxchg [rdi], rsi
+    ret
+
+// object RhpCheckedXchg(object* location, object value)
+// System V: rdi = location, rsi = value. Returns the previous value in rax.
+// xchg with a memory operand is locked on its own.
+RhpCheckedXchg:
+    mov     rax, rsi
+    xchg    [rdi], rax
+    ret
 
 // =============================================================================
 // EH section accessors
