@@ -117,4 +117,34 @@ public class RunCommandTests
         Assert.Equal(requested,
             RunCommand.ResolveInputDevice("arm64", requested, "virtio-keyboard-device"));
     }
+
+    // Unset keeps the xHCI every USB device rode before the option existed.
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void ParseUsbController_DefaultsToTheXhci(string? requested)
+    {
+        Assert.Equal(UsbHostControllerModel.Xhci, RunCommand.ParseUsbController(requested));
+    }
+
+    [Theory]
+    [InlineData("xhci", UsbHostControllerModel.Xhci)]
+    [InlineData("ehci", UsbHostControllerModel.Ehci)]
+    [InlineData("OHCI", UsbHostControllerModel.Ohci)]
+    [InlineData("ehci-ohci", UsbHostControllerModel.EhciWithOhciCompanion)]
+    public void ParseUsbController_ReadsTheLauncherSpellings(string requested, UsbHostControllerModel expected)
+    {
+        Assert.Equal(expected, RunCommand.ParseUsbController(requested));
+    }
+
+    // A typo must not quietly boot the xHCI the user was trying to avoid.
+    [Fact]
+    public void ParseUsbController_RejectsAnUnknownModelNamingTheChoices()
+    {
+        ArgumentException ex = Assert.Throws<ArgumentException>(() => RunCommand.ParseUsbController("uhci"));
+
+        Assert.Contains("uhci", ex.Message);
+        Assert.Contains("ehci-ohci", ex.Message);
+    }
 }

@@ -377,8 +377,17 @@ internal static unsafe partial class GarbageCollector
             // Mark reachable objects
             MarkPhase();
 
-            // Clear the weak and dependent GC handles whose targets died
-            s_gCHandleManager.ClearWeakHandles();
+            // Clear the short weak GC handles whose targets died: they do not follow an object
+            // through its finalization
+            s_gCHandleManager.ClearShortWeakHandles();
+
+            // Queue the dead objects that have a finalizer and keep them alive until it has run,
+            // with what the dependent handles hang on them
+            MarkFinalizableObjects();
+            ScanDependentHandles();
+
+            // Clear the resurrection-tracking weak and the dependent GC handles whose targets died
+            s_gCHandleManager.ClearLongWeakHandles();
 
             // Sweep and rebuild free lists
             freedCount = SweepPhase();
@@ -411,6 +420,10 @@ internal static unsafe partial class GarbageCollector
             s_lastGCEndTick = gcEnd;
         }
 
+        // Outside the masked section; left to the next allocation when the caller masked
+        // interrupts itself (the allocator does)
+        SignalPendingFinalizers();
+
         return freedCount;
     }
     // --- Internal methods ---
@@ -429,6 +442,14 @@ internal static unsafe partial class GarbageCollector
         if (!s_initialized)
         {
             Initialize();
+        }
+
+        // Finalizers a collection left behind because it ran with interrupts masked. Before the
+        // allocation, not after: nothing would keep the new object alive while they run. With
+        // the finalizer thread on, the allocation only signals it: it never waits for a pass.
+        if (s_finalizerQueueHead != s_finalizerQueue.Count)
+        {
+            SignalPendingFinalizers();
         }
 
         // The whole allocation must be atomic with respect to interrupts: IRQ
@@ -454,6 +475,8 @@ internal static unsafe partial class GarbageCollector
                 {
                     result->Length = length;
                 }
+
+                RegisterNewObject(result, flags);
             }
 
             return result;

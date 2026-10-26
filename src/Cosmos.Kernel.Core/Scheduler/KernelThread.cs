@@ -11,7 +11,8 @@ namespace Cosmos.Kernel.Core.Scheduler;
 
 /// <summary>
 /// Starts the kernel's own service threads (the USB and PCI Express
-/// hot-plug threads) and bounds how long the caller waits for one to begin.
+/// hot-plug threads, the collector's finalizer thread) and bounds how long
+/// the caller waits for one to begin.
 ///
 /// <para>CoreLib's <c>Thread.Start</c> does not return until the new thread
 /// has run, and only a scheduler switch runs it. A timer that never ticks

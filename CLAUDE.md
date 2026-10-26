@@ -29,17 +29,7 @@ Build pipeline: Source -> Patcher (IL method replacement via Mono.Cecil) -> ILC 
 
 ## Code style
 
-- C# 14, .NET 10, 4-space indentation, Allman braces (see `.editorconfig`)
-- Kernel code must be AOT-compatible: no reflection, no dynamic code generation
-- `[UnmanagedCallersOnly(EntryPoint = "...")]` for native-to-managed entry points
-- `[RuntimeExport("name")]` only for NativeAOT/runtime-required exports in Core (`Rh*`, `memmove`, `sqrt`, etc.)
-- `[LibraryImport("*")]` for native imports
-- Architecture-specific code: `#if ARCH_X64` / `#if ARCH_ARM64` to avoid + only tolerated in Cosmos.Kernel.Core or Cosmos.Kernel.Plugs.
-- Unsafe code only in Cosmos.Kernel.Core (and its arch projects): HAL, HAL.X64, HAL.ARM64, System and Drivers compile with `AllowUnsafeBlocks=false` and reach memory through Core's address-based entry points (`MemoryBlock` with `PageAllocator.AllocBlock`, `AddressSpace.HhdmOffset`)
-- Private fields: `_camelCase`, static fields: `s_camelCase`, constants: `PascalCase`
-- Braces required (`csharp_prefer_braces = true:error`)
-- Avoid `var` - use explicit types
-- Namespace follows folder: the project name plus the folder path (IDE0130 at error for `src/Cosmos.Kernel*`, `tests/Kernels`, `tests/Cosmos.Kernel.Tests.System`, `examples`; the exemptions close `.editorconfig`)
+The full rules are in the [Coding Guidelines](docs/articles/dev/coding-guidelines.md); naming and formatting are enforced by `.editorconfig`.
 
 ## Architecture
 
@@ -55,7 +45,7 @@ Dual-arch (x64/ARM64) with compile-time selection via `DefineConstants` and `Run
 
 Kernel features are toggled via MSBuild properties in kernel `.csproj` files (all default to `true`):
 
-`CosmosEnableInterrupts`, `CosmosEnableUART`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, `CosmosEnableUsb`
+`CosmosEnableInterrupts`, `CosmosEnableUART`, `CosmosEnablePCI`, `CosmosEnableTimer`, `CosmosEnableKeyboard`, `CosmosEnableMouse`, `CosmosEnableNetwork`, `CosmosEnableStorage`, `CosmosEnableGraphics`, `CosmosEnableScheduler`, `CosmosEnableUsb`, `CosmosEnableFinalizerThread` (the finalizers' own thread, off with the scheduler)
 
 ## Key paths
 
@@ -69,7 +59,7 @@ Kernel features are toggled via MSBuild properties in kernel `.csproj` files (al
 - `src/Cosmos.Kernel.HAL/DriverKit/` - How a driver finds and binds a device: the driver and its binding at the root (`Driver`, `DeviceBinding`, `DeviceNode`, matching and probing), what a binding hands out under `Resources/` (registers, regions, DMA), `Interrupts/` and `Threading/` (locks, events, threads, deferred work), the bus kinds under `Buses/`, a folder each (synthetic, platform, PCI with the bridge describe and resource placement behind hot-plug slots, virtio, USB, PS/2), and the internal plumbing (the registry, the engine, arbitration, `DriverLog`) under `Engine/`
 - `src/Cosmos.Kernel.HAL/Boot/` - Internal only: the boot contract (`IPlatformInitializer`) and platform registration (`PlatformHAL`)
 - `src/Cosmos.Kernel.HAL/Timers/` - Internal only: the tick source base with its timer entries (`TimerEntry`); `SoftwareTimer`, the handle `TimerManager.Schedule` returns, is the ring's wrapper over one, in `System/Timers/`
-- `src/Cosmos.Kernel.Drivers/` - Shipped drivers over the kit (PCI host and PCI Express root port (hot-plug), E1000E, the virtio PCI and MMIO transports, virtio-net, virtio-input, the display drivers virtio-gpu, VMware SVGA II with its SVGA3D layer, AMD DCN 3.1.5 (the Raphael integrated GPU) and Intel integrated graphics (Sandy Bridge to Raptor Lake), the storage drivers AHCI, NVMe and virtio-blk, whose disks `StorageManager` consumes, the xHCI host controller with the USB hub, HID boot keyboard, HID boot mouse and mass storage class drivers, and the 8042 controller with the PS/2 keyboard and mouse class drivers), filed in bus kind / category / driver folders (`Pci/Bus/Xhci/`, `Virtio/Display/VirtioGpu/`) whose namespaces follow the folders; a User-layer driver assembly, one RID-less package
+- `src/Cosmos.Kernel.Drivers/` - Shipped drivers over the kit (PCI host and PCI Express root port (hot-plug), E1000E, the virtio PCI and MMIO transports, virtio-net, virtio-input, the display drivers virtio-gpu, VMware SVGA II with its SVGA3D layer, AMD DCN 3.1.5 (the Raphael integrated GPU) and Intel integrated graphics (Sandy Bridge to Raptor Lake), the storage drivers AHCI, NVMe and virtio-blk, whose disks `StorageManager` consumes, the xHCI, EHCI and OHCI host controllers with the USB hub, HID boot keyboard, HID boot mouse and mass storage class drivers, and the 8042 controller with the PS/2 keyboard and mouse class drivers), filed in bus kind / category / driver folders (`Pci/Bus/Xhci/`, `Virtio/Display/VirtioGpu/`) whose namespaces follow the folders; a User-layer driver assembly, one RID-less package
 - `examples/DevKernel/` - Development kernel (use for testing changes)
 - `tests/Kernels/` - 19 kernel test suites and the Drivers suite's driver library
 - `dotnet/runtime/` - .NET runtime submodule (release/10.0 branch)

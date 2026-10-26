@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - [.NET SDK 10.0](https://dotnet.microsoft.com/download) or later
-- [Visual Studio Code](https://code.visualstudio.com/)
+- An IDE with its Cosmos extension: [Visual Studio Code](https://code.visualstudio.com/), [Visual Studio](https://visualstudio.microsoft.com/) or [JetBrains Rider](https://www.jetbrains.com/rider/) (see [IDE Extensions](#ide-extensions))
 - [Homebrew](https://brew.sh/) on macOS
 
 ## Windows
@@ -13,6 +13,8 @@ Download and run the latest installer from the [Releases](https://github.com/Cos
 ```
 CosmosSetup-<version>-windows.exe
 ```
+
+The installer looks for VS Code, Visual Studio and Rider and offers to install the Cosmos extension in each one it finds (see [IDE Extensions](#ide-extensions)). Visual Studio must be closed, and the Visual Studio extension asks for administrator rights because it installs for all users. Rider is found only once it has been started at least once.
 
 After installation, open a new terminal and verify:
 
@@ -86,6 +88,16 @@ cosmos run -a arm64
 ```
 
 If a build failed before Rosetta 2 was installed, delete the project's `obj/` folder before building again.
+
+## IDE Extensions
+
+Each extension creates, builds, runs and debugs a kernel from the IDE, and can check and install the toolchain itself.
+
+| IDE | Extension | Install |
+|-----|-----------|---------|
+| Visual Studio Code | [CosmosVsCodeExtension](https://github.com/CosmosOS/CosmosVsCodeExtension) | The Windows installer or `cosmos install` |
+| Visual Studio 2026 (or 2022 17.14+) | [CosmosVsExtension](https://github.com/CosmosOS/CosmosVsExtension) | The Windows installer, or the `.vsix` from the [releases page](https://github.com/CosmosOS/CosmosVsExtension/releases) |
+| JetBrains Rider 2025.3+ | [CosmosRiderExtension](https://github.com/CosmosOS/CosmosRiderExtension) | The Windows installer, or the plugin from the [releases page](https://github.com/CosmosOS/CosmosRiderExtension/releases) |
 
 ## Quick Start
 

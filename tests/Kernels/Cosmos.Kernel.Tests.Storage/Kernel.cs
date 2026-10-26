@@ -3,6 +3,8 @@ using System.Diagnostics;
 using Cosmos.Kernel.Boot.Limine;
 using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.Drivers.Pci.Bus.Ehci;
+using Cosmos.Kernel.Drivers.Pci.Bus.Ohci;
 using Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort;
 using Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
 using Cosmos.Kernel.Drivers.Pci.Storage.Ahci;
@@ -1310,7 +1312,7 @@ public class Kernel : Sys.Kernel
     {
         // Only the controller's hot-plug thread follows a port change: one
         // that did not start would leave every wait below to time out.
-        Assert.True(FindDriverState<XhciState>()?.HotPlugRunning == true, "the xHCI hot-plug thread is not running");
+        Assert.True(UsbHostHotPlugRunning(), "the USB host controller's hot-plug thread is not running");
 
         UsbMassStorageUnit disk = (UsbMassStorageUnit)s_dev!;
         disk.WriteBlock(HotPlugMarkerLba, 1, HotPlugMarker((int)disk.BlockSize));
@@ -1738,7 +1740,8 @@ public class Kernel : Sys.Kernel
 
     // The driver state of the first node bound to a driver whose state is a
     // T, through the kit's tree (the HAL grant): the usb cells carry one
-    // xHCI controller, the virtio-blk-pci cells one root port.
+    // host controller (an xHCI, an EHCI or an OHCI), the virtio-blk-pci
+    // cells one root port.
 #pragma warning disable COSMOS0003
     private static T? FindDriverState<T>()
         where T : class
@@ -1755,6 +1758,16 @@ public class Kernel : Sys.Kernel
         return null;
     }
 #pragma warning restore COSMOS0003
+
+    // Whether the hot-plug thread of the host controller the cell carries is
+    // running: the usb cell's xHCI, the usb-ehci cell's EHCI or the usb-ohci
+    // cell's OHCI, each with a state type of its own.
+    private static bool UsbHostHotPlugRunning()
+    {
+        return FindDriverState<XhciState>()?.HotPlugRunning == true
+            || FindDriverState<EhciState>()?.HotPlugRunning == true
+            || FindDriverState<OhciState>()?.HotPlugRunning == true;
+    }
 
     // The port's slot thread powers the slot off only after the retraction
     // it waited for returned, and QEMU finishes a device_del inside that

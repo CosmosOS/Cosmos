@@ -33,7 +33,7 @@ Beyond Gen2 parity, Gen3 brings new capabilities:
 | **Threading & Scheduler** | ✅ | Priority-based stride scheduler (x64 + ARM64). `lock` keyword supported. |
 | **Feature Flags** | ✅ |  |
 | **Cosmos Vs Code Extension** | ✅ |  |
-| **USB Support** | ✅ | xHCI host controller with hubs and hot-plug (x64 + ARM64) as driver kit drivers, with the HID boot keyboard, HID boot mouse and mass storage (Bulk-Only Transport) class drivers. No EHCI yet. |
+| **USB Support** | ✅ | xHCI, EHCI and OHCI host controllers with hubs and hot-plug (x64 + ARM64) as driver kit drivers, with the HID boot keyboard, HID boot mouse and mass storage (Bulk-Only Transport) class drivers. No UHCI (Intel's USB 1.1 companion over port I/O). |
 
 ## Future Releases
 

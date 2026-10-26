@@ -27,17 +27,24 @@
          kept. -->
     <CosmosEnableUsb       Condition="'$(CosmosEnableUsb)' == '' AND ('$(CosmosEnableKeyboard)' == 'true' OR '$(CosmosEnableMouse)' == 'true' OR '$(CosmosEnableStorage)' == 'true')">true</CosmosEnableUsb>
     <CosmosEnableUsb       Condition="'$(CosmosEnableUsb)' == ''">false</CosmosEnableUsb>
-    <!-- PCI off → no xHCI function for the kit to offer. That also covers
-         Interrupts off, which turned PCI off above. USB follows no other switch:
-         without a message interrupt the xHCI driver polls its event ring, its
-         delays come from the kit, and the hot-plug thread's need for the
-         scheduler is checked by the xHCI driver where it starts the thread. -->
+    <!-- PCI off → no USB host controller function (xHCI, EHCI or OHCI) for the
+         kit to offer. That also covers Interrupts off, which turned PCI off
+         above. USB follows no other switch: without an interrupt the host
+         controller drivers poll (the xHCI driver its event ring, the EHCI
+         driver its status register and descriptors, the OHCI driver its done
+         queue), their delays come from the kit, and the hot-plug thread's need
+         for the scheduler is checked by each host driver where it starts the
+         thread. -->
     <CosmosEnableUsb       Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableUsb>
     <!-- PCI off → no HD Audio controller to find. That also covers Interrupts
          off, which turned PCI off above. The stream is driven by the codec's
          own clock and topped up from the kit worker, so audio rides no other
          switch; without a scheduler the ring is written inline instead. -->
     <CosmosEnableAudio     Condition="'$(CosmosEnablePCI)' == 'false'">false</CosmosEnableAudio>
+    <!-- Scheduler off → no thread for the finalizers to run on; they run on the
+         thread that collected or allocated. That also covers Interrupts off and
+         Timer off, which turned the scheduler off above. -->
+    <CosmosEnableFinalizerThread Condition="'$(CosmosEnableScheduler)' == 'false'">false</CosmosEnableFinalizerThread>
   </PropertyGroup>
 
   <!-- Driver policy: a kernel project drops a driver from its manifest with

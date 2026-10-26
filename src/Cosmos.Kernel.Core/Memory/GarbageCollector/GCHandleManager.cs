@@ -207,36 +207,47 @@ internal unsafe struct GCHandleManager()
     }
 
     /// <summary>
-    /// Clears the weak handles whose target objects were not marked during the mark phase, and
-    /// the dependent handles whose primary was not. Called between mark and sweep to allow weak
-    /// references to be collected.
+    /// Clears the short weak handles whose target objects were not marked during the mark phase.
+    /// Called before the dead objects that have a finalizer are marked again: a short weak
+    /// handle does not follow its target through finalization, even when the finalizer revives it.
     /// </summary>
-    public readonly void ClearWeakHandles()
+    public readonly void ClearShortWeakHandles()
     {
-        // Both weak kinds: with no finalization, tracking resurrection changes nothing.
         ClearDeadTargets(_gcHandleControllers[(int)GCHandleType.Weak], false);
+    }
+
+    /// <summary>
+    /// Clears the resurrection-tracking weak handles whose target objects are not marked, and
+    /// the dependent handles whose primary is not. Called between the marking of the objects
+    /// queued for finalization and the sweep: what is cleared here is about to be freed.
+    /// </summary>
+    public readonly void ClearLongWeakHandles()
+    {
         ClearDeadTargets(_gcHandleControllers[(int)GCHandleType.WeakTrackResurrection], false);
         ClearDeadTargets(DependentHandleStore, true);
+    }
 
+    /// <summary>
+    /// Clears the targets of a store that the mark phase did not reach.
+    /// </summary>
+    private static void ClearDeadTargets(GCHandleSegmentStore store, bool dependent)
+    {
         // The handle stays allocated: its owner still holds it, reads null from it, and frees it
         // or sets a new target (RuntimeType does so for its RuntimeTypeInfo cache). Freeing it
         // here put it back on the free list while still in use: a later handle shared its slot,
         // and a target set in it was no longer cleared, so it dangled once collected.
-        static void ClearDeadTargets(GCHandleSegmentStore store, bool dependent)
+        GCHandleSegmentStore.Enumerator handleEnum = store.GetEnumerator();
+        while (handleEnum.MoveNext())
         {
-            var handleEnum = store.GetEnumerator();
-            while (handleEnum.MoveNext())
-            {
-                GCHandle* handle = handleEnum.Current;
+            GCHandle* handle = handleEnum.Current;
 
-                // A frozen target is never marked, and never dies.
-                if (handle->Object != null && !GarbageCollector.IsLive(handle->Object))
+            // A frozen target is never marked, and never dies.
+            if (handle->Object != null && !GarbageCollector.IsLive(handle->Object))
+            {
+                handle->Object = null;
+                if (dependent)
                 {
-                    handle->Object = null;
-                    if (dependent)
-                    {
-                        handle->ExtraInfo = 0; // the secondary was alive only through the primary
-                    }
+                    handle->ExtraInfo = 0; // the secondary was alive only through the primary
                 }
             }
         }

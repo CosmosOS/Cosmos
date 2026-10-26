@@ -58,7 +58,7 @@ internal static unsafe partial class ExceptionHelper
         DwarfCfiParser.InitRegRulesSameValue(ref s);
     }
 
-    private static partial void PinPass1FrameRegister(REGDISPLAY* regDisplay, nuint framePointer)
+    private static partial void PinFrameRegister(REGDISPLAY* regDisplay, nuint framePointer)
     {
         regDisplay->FP = framePointer;
     }

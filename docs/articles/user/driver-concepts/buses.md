@@ -1,0 +1,11 @@
+# Buses and enumeration
+
+A bus connects devices to the processor, and enumeration is how software finds out what is on it. PCI and USB can be enumerated because every device answers at a predictable place with a standard description of itself: software reads the vendor id at each PCI address, where an empty slot reads as all ones ([PCI](pci.md)), and asks each new [USB](usb.md) device for its descriptors.
+
+Other devices offer no such place to ask. A PC's [PS/2](ps2.md) controller sits at fixed I/O ports, an ARM machine's devices at fixed memory addresses, and the PCI host bridge that every PCI scan starts from is one of them. Reading an address where nothing answers can fault, and a device that answers has no standard way to say what it is, so these platform devices must be described to the kernel. On PCs and ARM servers the firmware's ACPI tables describe them. On many ARM boards a device tree does: a structure the bootloader hands over, whose nodes list each device's registers, interrupts and compatible strings, the names of the programming models it follows. A machine with a fixed layout, such as QEMU's virt machine, can also be described by a table in the kernel.
+
+The two kinds combine into a tree. The description yields the roots, and the driver of a root that is a bus controller enumerates its bus and publishes what it finds as children for other drivers to bind: a PCI host yields PCI functions, one of which may be a USB controller that yields USB devices.
+
+The trap is that nothing confirms a description. A device it leaves out is invisible, and one it lists that is absent leaves a driver probing empty addresses.
+
+In the driver kit, the platform nodes are published at boot by the machine description: on x64 a fixed PC layout of the 8042 controller (`pnp0303`) and the PCI host (`pci-host-legacy`), on ARM64 the PCI host from ACPI or the device tree and each occupied `virtio,mmio` slot from the device tree or the virt machine's fixed layout ([Platform nodes](../drivers.md#platform-nodes)). Drivers match them with `PlatformMatch.Compatible`, and a bus driver adds children with `binding.PublishChild`, so each node's `Parent` and `Children` form the tree ([Publishing child nodes](../drivers.md#publishing-child-nodes), [Buses](../drivers.md#buses)).

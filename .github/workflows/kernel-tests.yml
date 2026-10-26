@@ -409,15 +409,17 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Storage
       timeout_x64: 90
       timeout_arm64: 180
-      # arm64 expands to 30 matrix cells ({ahci,nvme,usb,virtio-blk-pci,virtio-blk-mmio}
-      # x gic/acpi modifier subsets) at up to 180s per boot, and every cell with a
-      # disk boots twice (Boot_RebootAfterGptWrite). The 60-minute budget covers
-      # typical cells and a few hung ones, not every cell running to its timeout;
-      # a 5-minute budget would kill the step before OutputHandlerXml writes
-      # results whenever one cell hangs. The job budget must stay above the step
-      # budget plus setup/build time.
-      step_timeout_minutes: 60
-      job_timeout_minutes: 75
+      # x64 expands to 12 matrix cells ({ahci,nvme,usb,usb-ehci,usb-ohci,virtio-blk-pci}
+      # x {bare,acpi-off}) at up to 90s per boot and arm64 to 42 ({ahci,nvme,usb,
+      # usb-ehci,usb-ohci,virtio-blk-pci,virtio-blk-mmio} x gic/acpi modifier
+      # subsets) at up to 180s per boot, and every cell with a disk boots twice
+      # (Boot_RebootAfterGptWrite); the usb-ohci cells run the whole suite on a
+      # full-speed stick. The 90-minute budget covers typical cells and a few hung
+      # ones, not every cell running to its timeout; a 5-minute budget would kill
+      # the step before OutputHandlerXml writes results whenever one cell hangs.
+      # The job budget must stay above the step budget plus setup/build time.
+      step_timeout_minutes: 90
+      job_timeout_minutes: 105
 
   storage-results:
     needs: storage-tests
@@ -459,8 +461,19 @@ jobs:
       head_ref: ${{ github.head_ref || github.ref_name }}
 
   # ── Drivers ───────────────────────────────────────────────────────────────────
-  # bare, usb-kbd, usb-mouse and virtio-blk-pci on both arches, virtio-blk-mmio
-  # on arm64 (five arm64 cells); the hardware half runs on q35's default NIC on x64.
+  # bare, usb-kbd, usb-kbd-ehci, usb-kbd-ohci, usb-kbd-ehci-ohci, usb-kbd-ohci-hub,
+  # usb-mouse and virtio-blk-pci on both arches (eight x64 cells), virtio-blk-mmio
+  # on arm64 as well (nine arm64 cells); the hardware half runs on q35's default
+  # NIC on x64, except the four EHCI/OHCI cells, which drop it to keep the
+  # controllers' legacy line free. Nine arm64 cells at up to 120 s each plus the
+  # publish/ILC/ISO build in the same step need more than the 10 minutes five
+  # cells did; hung cells must still leave OutputHandlerXml time to write.
+  # The job budget stays above the step budget by the setup time (checkout,
+  # the SDK install, the package download, the tool installs, the build-tools
+  # download on a cache miss and the engine build), as the Storage pair's
+  # does: the reusable workflow's 30-minute default left 5 minutes, which a
+  # cold cache exceeds, cancelling the job before the step's own timeout
+  # fires and before OutputHandlerXml writes.
   drivers-tests:
     needs: setup
     uses: ./.github/workflows/kernel-test-run.yml
@@ -470,7 +483,8 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Drivers
       timeout_x64: 60
       timeout_arm64: 120
-      step_timeout_minutes: 10
+      step_timeout_minutes: 25
+      job_timeout_minutes: 45
 
   drivers-results:
     needs: drivers-tests

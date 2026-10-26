@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
@@ -18,7 +19,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 78;
+    private const int ExpectedTestCount = 84;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -53,6 +54,18 @@ public class Kernel : Sys.Kernel
     /// <summary>How long a Join on a killed thread may take before the test calls it a hang.</summary>
     private const int KillJoinTimeoutMs = 2000;
 
+    /// <summary>Rounds of two threads throwing unhandled exceptions in the per-thread dispatch test (the scenario of valentinbreiz/nativeaot-patcher#440).</summary>
+    private const int UncaughtThrowRounds = 5;
+
+    /// <summary>Threads throwing, catching and rethrowing at once in the concurrent catch test.</summary>
+    private const int ThrowWorkerCount = 4;
+
+    /// <summary>Throws each worker of the concurrent catch test makes.</summary>
+    private const int ThrowsPerWorker = 300;
+
+    /// <summary>How long a Join on a throwing thread may take before the test calls it a hang.</summary>
+    private const int ThrowJoinTimeoutMs = 30_000;
+
     /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
     private const uint UnregisteredCpuId = 4096;
 
@@ -71,6 +84,14 @@ public class Kernel : Sys.Kernel
     private const int ExitGraceWaitMs = 200;
     /// <summary>Hold time (ms) the idle-contention worker keeps the mutex, spanning several scheduler ticks.</summary>
     private const int IdleMutexHoldMs = 300;
+    /// <summary>Rounds of Thread.Sleep the main (idle) thread makes in the condition-variable ticket test.</summary>
+    private const int IdleSleepRounds = 3;
+    /// <summary>Length (ms) of each Thread.Sleep the main (idle) thread makes in the condition-variable ticket test.</summary>
+    private const int IdleSleepMs = 50;
+    /// <summary>Sleep (ms) of the worker whose wake Stride must classify interactive: far longer than the few ticks it can have run.</summary>
+    private const int WakeClassifySleepMs = 200;
+    /// <summary>Quanta of run charged through OnTick to the synthetic Stride thread before its second park, so that park, microseconds long, reads as a short one.</summary>
+    private const int WakeClassifyRunQuanta = 100;
     /// <summary>Hold time (ms) each contender keeps the mutex so the others pile up in _waitingThreads.</summary>
     private const int MutexContenderHoldMs = 100;
     /// <summary>Wait (ms) giving the hand-off contender a few quanta to park in _waitingThreads.</summary>
@@ -122,6 +143,9 @@ public class Kernel : Sys.Kernel
     private static volatile int s_sharedCounter;
     private static volatile int s_thread1Counter;
     private static volatile int s_thread2Counter;
+    private static int s_throwWorkersDone;
+    private static int s_throwFinallyRuns;
+    private static int s_throwMismatches;
     private static Cosmos.Kernel.Core.Scheduler.SpinLock s_testLock;
 
     // Shared state for Monitor/lock tests
@@ -159,6 +183,8 @@ public class Kernel : Sys.Kernel
         // Thread tests
         TR.Run("Thread_Start_ExecutesDelegate", TestThreadExecution);
         TR.Run("Thread_Multiple_CanRunConcurrently", TestMultipleThreads);
+        TR.Run("Thread_Throw_TwoThreadsUnhandled_BothJoin", TestUnhandledThrowsOnTwoThreads);
+        TR.Run("Thread_Throw_ConcurrentCatchRethrow_OwnExceptions", TestConcurrentCatchAndRethrow);
         TR.Run("SpinLock_ProtectsSharedData_AcrossThreads", TestSpinLockWithThreads);
         TR.Run("Thread_ThreadStatics", TestThreadStatics);
         TR.Run("Thread_EnsureSufficientExecutionStack_Passes", TestEnsureSufficientStackInThread);
@@ -169,6 +195,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Thread_Kill_Queued_StopsManagedSide", TestKillQueuedThreadStopsManagedSide);
         TR.Run("ScheduleFromInterrupt_UnregisteredCpu_IsNoOp", TestScheduleFromInterruptIgnoresUnregisteredCpu);
         TR.Run("Mutex_IdleThreadContention_KeepsTicketAccounting", TestMutexIdleThreadContention);
+        TR.Run("ConditionVariable_IdleThreadWait_KeepsTicketAccounting", TestConditionVariableIdleThreadWait);
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
         TR.Run("Mutex_ThreeContenders_AllAcquire", TestMutexThreeContenders);
         TR.Run("Mutex_ReleaseHandsOffToParkedWaiter", TestMutexReleaseHandsOff);
@@ -221,6 +248,9 @@ public class Kernel : Sys.Kernel
         TR.Run("RoundRobin_Hooks_BlockYieldExit", TestRoundRobinHooksBlockAndYield);
         TR.Run("Scheduler_BootPolicy_IsStride", TestBootPolicyIsStride);
         TR.Run("Stride_ProportionalShare_FollowsTickets", TestStrideProportionalShare);
+        TR.Run("Stride_Hooks_WakePlacement_BoostThenCap", TestStrideHooksWakePlacement);
+        TR.Run("Stride_Hooks_InheritedParkedThread_FirstWakeJudged", TestStrideHooksInheritedParkedFirstWake);
+        TR.Run("Stride_SleepWake_ClassifiesInteractive", TestStrideSleepWakeClassifiesInteractive);
         TR.Run("SetScheduler_InstallsRoundRobinPolicy", TestSetSchedulerInstallsRoundRobin);
         TR.Run("RoundRobin_ThreadRuns_UnderNewPolicy", TestThreadRunsUnderRoundRobin);
         TR.Run("RoundRobin_DispatchesEveryThread", TestRoundRobinDispatchesEveryThread);
@@ -700,6 +730,64 @@ public class Kernel : Sys.Kernel
         s_mutexWorkerExited = true;
     }
 
+    // ===== ConditionVariable idle-thread wait (CoreLib waits from the main thread) =====
+    // CoreLib's own waits, Thread.Sleep and Thread.Join among them, reach the
+    // kernel's ConditionVariable through LowLevelMonitor. Parking the idle
+    // thread there took its tickets out of the Stride total without the wake
+    // that would return them (the idle fallback resurrects it as Running), so
+    // the total wrapped under zero, Stride1 / TotalTickets became 0 and
+    // GlobalPass stopped; every thread created afterwards then started at a
+    // frozen GlobalPass and kept the main thread off the CPU
+    // (Stride_ProportionalShare_FollowsTickets hung). Unlike that hang, the
+    // drift is deterministic, and the Mutex cell above does not see it: it
+    // compares before/after inside its own window.
+    private static void TestConditionVariableIdleThreadWait()
+    {
+        uint cpuId = SchedulerManager.GetCurrentCpuId();
+        Cosmos.Kernel.Core.Scheduler.Stride.StrideCpuData? cpuData =
+            SchedulerManager.GetCpuState(cpuId)?.SchedulerData
+                as Cosmos.Kernel.Core.Scheduler.Stride.StrideCpuData;
+        Assert.True(cpuData is not null, "stride per-CPU data should exist");
+
+        ulong ticketsBefore = cpuData!.TotalTickets;
+        ulong passBefore = cpuData.GlobalPass;
+
+        // Thread.Sleep: LowLevelMonitor.TimedWait -> ConditionVariable.WaitTimeout.
+        for (int i = 0; i < IdleSleepRounds; i++)
+        {
+            SysThread.Sleep(IdleSleepMs);
+        }
+
+        ulong ticketsAfterSleep = cpuData.TotalTickets;
+
+        // Thread.Join: LowLevelMonitor.Wait -> ConditionVariable.Wait. The grace
+        // wait lets the worker's exit finish inside this cell, since its
+        // OnThreadExit takes the worker's own tickets back out of the total.
+        SysThread worker = new(static () => { });
+        worker.Start();
+        worker.Join();
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        ulong ticketsAfterJoin = cpuData.TotalTickets;
+        ulong passAfterJoin = cpuData.GlobalPass;
+
+        Serial.WriteString("[IdleWait] TotalTickets before=");
+        Serial.WriteNumber((long)ticketsBefore);
+        Serial.WriteString(" afterSleep=");
+        Serial.WriteNumber((long)ticketsAfterSleep);
+        Serial.WriteString(" afterJoin=");
+        Serial.WriteNumber((long)ticketsAfterJoin);
+        Serial.WriteString(" GlobalPass before=");
+        Serial.WriteNumber((long)passBefore);
+        Serial.WriteString(" afterJoin=");
+        Serial.WriteNumber((long)passAfterJoin);
+        Serial.WriteString("\n");
+
+        Assert.True(ticketsBefore == ticketsAfterSleep, "Thread.Sleep from the idle thread must not drift TotalTickets");
+        Assert.True(ticketsBefore == ticketsAfterJoin, "Thread.Join from the idle thread must not drift TotalTickets");
+        Assert.True(passAfterJoin > passBefore, "GlobalPass must keep advancing across idle-thread waits");
+    }
+
     // ===== Multi-waiter paths (List<Thread> scans on non-empty lists) =====
     // The single-waiter driver flow keeps _waiters/_waitingThreads empty at
     // the Contains call, so the list-scan path (EqualityComparer<Thread>)
@@ -976,6 +1064,97 @@ public class Kernel : Sys.Kernel
 
         Assert.Equal(WorkerIterationCount, s_thread1Counter);
         Assert.Equal(WorkerIterationCount, s_thread2Counter);
+    }
+
+    private static void TestUnhandledThrowsOnTwoThreads()
+    {
+        // The scenario of valentinbreiz/nativeaot-patcher#440: each thread's throw is dispatched on
+        // its own stack, so a thread preempted inside its dispatch must not make the other thread's
+        // throw a "recursive" one, which halted that thread and left its Join waiting forever.
+        for (int round = 0; round < UncaughtThrowRounds; round++)
+        {
+            SysThread first = new(ThrowUnhandled);
+            SysThread second = new(ThrowUnhandled);
+
+            first.Start();
+            second.Start();
+
+            Assert.True(first.Join(ThrowJoinTimeoutMs), "A thread whose exception is unhandled must exit and be joinable");
+            Assert.True(second.Join(ThrowJoinTimeoutMs), "The second throwing thread must exit as well");
+        }
+    }
+
+    private static void ThrowUnhandled()
+    {
+        throw new InvalidOperationException("Unhandled on purpose");
+    }
+
+    private static void TestConcurrentCatchAndRethrow()
+    {
+        // Several threads throw, run a finally, catch and rethrow at once: the ExInfo chain, the
+        // dispatch guard and the records of the running funclets are each thread's own, so a `throw;`
+        // rethrows the thread's own exception and no throw lands as "recursive".
+        s_throwWorkersDone = 0;
+        s_throwFinallyRuns = 0;
+        s_throwMismatches = 0;
+
+        SysThread[] workers = new SysThread[ThrowWorkerCount];
+        for (int i = 0; i < ThrowWorkerCount; i++)
+        {
+            int id = i;
+            workers[i] = new SysThread(() => ThrowCatchRethrowWorker(id));
+        }
+
+        for (int i = 0; i < ThrowWorkerCount; i++)
+        {
+            workers[i].Start();
+        }
+
+        for (int i = 0; i < ThrowWorkerCount; i++)
+        {
+            Assert.True(workers[i].Join(ThrowJoinTimeoutMs), "Every throwing worker must finish");
+        }
+
+        Assert.Equal(ThrowWorkerCount, s_throwWorkersDone);
+        Assert.Equal(ThrowWorkerCount * ThrowsPerWorker, s_throwFinallyRuns);
+        Assert.Equal(0, s_throwMismatches);
+    }
+
+    private static void ThrowCatchRethrowWorker(int id)
+    {
+        for (int i = 0; i < ThrowsPerWorker; i++)
+        {
+            string expected = $"worker {id} throw {i}";
+            InvalidOperationException? thrown = null;
+            try
+            {
+                try
+                {
+                    try
+                    {
+                        throw new InvalidOperationException(expected);
+                    }
+                    finally
+                    {
+                        Interlocked.Increment(ref s_throwFinallyRuns);
+                    }
+                }
+                catch (InvalidOperationException caught)
+                {
+                    thrown = caught;
+                    throw;
+                }
+            }
+            catch (InvalidOperationException rethrown)
+            {
+                if (!ReferenceEquals(thrown, rethrown) || rethrown.Message != expected)
+                {
+                    Interlocked.Increment(ref s_throwMismatches);
+                }
+            }
+        }
+
+        Interlocked.Increment(ref s_throwWorkersDone);
     }
 
     private static void Thread1Worker()
@@ -1762,6 +1941,151 @@ public class Kernel : Sys.Kernel
             "both spinners must make progress under Stride (proportional share, not starvation)");
         Assert.True(s_spinACount * PolicySkewDenominator >= s_spinBCount * PolicySkewNumerator,
             "a 4x ticket edge must yield a clearly larger (>= 1.5x) CPU share under Stride");
+    }
+
+    // ===== Stride wakeup placement =====
+    // ReadyThread calls OnThreadReady before it marks the thread Ready, so the
+    // policy reads the state the thread wakes from (nativeaot-patcher#445).
+    // The first cell drives a throwaway StrideScheduler over a throwaway
+    // thread, as the Round-Robin hook cells do, and sets the state by hand to
+    // reach each placement; GlobalPass only moves inside the hooks, so the
+    // value read right after OnThreadReady is the one the placement used. The
+    // second cell checks the live order through a real sleep: a worker that
+    // slept far longer than it ran wakes classified interactive only if the
+    // hook saw it Sleeping rather than Ready.
+
+    private static void TestStrideHooksWakePlacement()
+    {
+        StrideScheduler policy = new();
+        PerCpuState state = new();
+        policy.InitializeCpu(state);
+
+        SchedulerThread thread = new();
+        policy.OnThreadCreate(state, thread);
+
+        StrideCpuData? cpuData = state.SchedulerData as StrideCpuData;
+        StrideThreadData? data = thread.SchedulerData as StrideThreadData;
+        Assert.True(cpuData is not null && data is not null,
+            "InitializeCpu and OnThreadCreate should attach Stride bookkeeping");
+        if (cpuData is null || data is null)
+        {
+            return;
+        }
+
+        // First start: a Created thread is placed at GlobalPass, unboosted.
+        policy.OnThreadReady(state, thread);
+        Assert.True(data.Pass == (long)cpuData.GlobalPass, "a first start must be placed at GlobalPass");
+        Assert.False(data.IsInteractive, "a first start must not be classified interactive");
+
+        // A wake after a park with no run since the previous wake: interactive,
+        // half a quantum ahead of GlobalPass.
+        policy.OnThreadBlocked(state, thread);
+        thread.State = SchedulerThreadState.Blocked;
+        policy.OnThreadReady(state, thread);
+        Assert.True(data.IsInteractive,
+            "a thread that parked longer than twice what it ran since its wake must be interactive");
+        Assert.True(data.Pass == (long)cpuData.GlobalPass - (long)(data.Stride / 2),
+            "an interactive wake must be placed half a quantum ahead of GlobalPass");
+
+        // A wake after a long run and a short park: reclassified, and placed
+        // at GlobalPass + Remain, never more than two Stride1 behind.
+        Assert.True(ReferenceEquals(policy.PickNext(state), thread), "the sole queued thread must be picked");
+        thread.State = SchedulerThreadState.Running;
+        for (int i = 0; i < WakeClassifyRunQuanta; i++)
+        {
+            policy.OnTick(state, thread, SchedulerManager.DefaultQuantumNs);
+        }
+        policy.OnThreadBlocked(state, thread);
+        thread.State = SchedulerThreadState.Blocked;
+        policy.OnThreadReady(state, thread);
+        long capped = Math.Max((long)cpuData.GlobalPass + data.Remain,
+            (long)cpuData.GlobalPass - (long)(2 * StrideScheduler.Stride1));
+        Assert.False(data.IsInteractive,
+            "a thread that ran far longer than it parked must lose the interactive classification");
+        Assert.True(data.Pass == capped,
+            "a non-interactive wake must be placed at GlobalPass + Remain, floored two Stride1 behind");
+        Assert.Equal(1, policy.GetRunQueueCount(state), "each wake must queue the thread once");
+    }
+
+    private static void TestStrideHooksInheritedParkedFirstWake()
+    {
+        StrideScheduler policy = new();
+        PerCpuState state = new();
+        policy.InitializeCpu(state);
+
+        // Two threads handed over parked, as SetScheduler does: one that never
+        // ran, one that ran a hundred quanta under the previous policy.
+        SchedulerThread fresh = new();
+        SchedulerThread seasoned = new();
+        fresh.State = SchedulerThreadState.Blocked;
+        seasoned.State = SchedulerThreadState.Sleeping;
+        seasoned.TotalRuntime = WakeClassifyRunQuanta * SchedulerManager.DefaultQuantumNs;
+        policy.OnThreadCreate(state, fresh);
+        policy.OnThreadCreate(state, seasoned);
+
+        // Let real time pass, so the park measured from the hand-over is not
+        // a few timestamp ticks that could round to nothing.
+        TimerManager.Wait(FlagPollIntervalMs);
+
+        StrideCpuData? cpuData = state.SchedulerData as StrideCpuData;
+        StrideThreadData? freshData = fresh.SchedulerData as StrideThreadData;
+        StrideThreadData? seasonedData = seasoned.SchedulerData as StrideThreadData;
+        Assert.True(cpuData is not null && freshData is not null && seasonedData is not null,
+            "OnThreadCreate should attach Stride bookkeeping to an inherited thread");
+        if (cpuData is null || freshData is null || seasonedData is null)
+        {
+            return;
+        }
+
+        policy.OnThreadReady(state, fresh);
+        Assert.True(freshData.IsInteractive,
+            "an inherited parked thread that never ran must wake interactive: any park outweighs no run");
+
+        policy.OnThreadReady(state, seasoned);
+        long capped = Math.Max((long)cpuData.GlobalPass + seasonedData.Remain,
+            (long)cpuData.GlobalPass - (long)(2 * StrideScheduler.Stride1));
+        Assert.False(seasonedData.IsInteractive,
+            "an inherited parked thread is judged on its lifetime runtime, not on a run of zero");
+        Assert.True(seasonedData.Pass == capped,
+            "a non-interactive inherited wake must take the capped placement");
+        Assert.Equal(2, policy.GetRunQueueCount(state), "each inherited thread must be queued once");
+    }
+
+    private static volatile bool s_sleepWakeDone;
+    private static volatile bool s_sleepWakeHadData;
+    private static volatile bool s_sleepWakeInteractive;
+
+    private static void SleepWakeWorker()
+    {
+        // Thread.Sleep on a worker: MarkSleeping, then the tick's
+        // CheckSleepingThreads readies it from the Sleeping state.
+        SysThread.Sleep(WakeClassifySleepMs);
+
+        StrideThreadData? data = CurrentSchedulerThread()?.SchedulerData as StrideThreadData;
+        s_sleepWakeHadData = data is not null;
+        s_sleepWakeInteractive = data is not null && data.IsInteractive;
+        s_sleepWakeDone = true;
+    }
+
+    private static void TestStrideSleepWakeClassifiesInteractive()
+    {
+        s_sleepWakeDone = false;
+        s_sleepWakeHadData = false;
+        s_sleepWakeInteractive = false;
+
+        SysThread worker = new(SleepWakeWorker);
+        worker.Start();
+
+        for (int i = 0; i < FlagPollRetries && !s_sleepWakeDone; i++)
+        {
+            TimerManager.Wait(FlagPollIntervalMs);
+        }
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        Assert.True(s_sleepWakeDone, "the sleeping worker should wake and finish");
+        Assert.True(s_sleepWakeHadData, "the worker should carry Stride bookkeeping");
+        Assert.True(s_sleepWakeInteractive,
+            "a thread that slept far longer than it ran must wake classified interactive, which needs the hook to see it Sleeping rather than Ready");
     }
 
     private static void TestSetSchedulerInstallsRoundRobin()

@@ -10,7 +10,7 @@ The main differences if you come from Gen2:
 | `Console.ReadLine` / `Console.ReadKey` | Plugged, backed by the manager | Plugged, backed by the manager |
 | Key events | `KeyEvent` (`KeyChar`, `Key`, `Modifiers`), keys as `ConsoleKeyEx` | Same, keys as `Key` with the same members |
 | Layouts | US, FR, DE, ES, GB, TR, Dvorak layouts over `ScanMapBase` | Same set over `KeyboardLayout`, in `Cosmos.Kernel.System.Input.Layouts` |
-| Devices | PS/2 keyboard | PS/2 keyboard (x64), virtio-keyboard and USB keyboard, all over the driver kit (the 8042 on q35 and every PC; virtio over PCI on both architectures and MMIO on ARM64; USB on an xHCI controller on both) |
+| Devices | PS/2 keyboard | PS/2 keyboard (x64), virtio-keyboard and USB keyboard, all over the driver kit (the 8042 on q35 and every PC; virtio over PCI on both architectures and MMIO on ARM64; USB on an xHCI, EHCI or OHCI controller on both) |
 
 If you find bugs or something abnormal, please [submit an issue](https://github.com/CosmosOS/Cosmos/issues/new/choose) on our repository.
 
@@ -36,7 +36,7 @@ using Cosmos.Kernel.System.Input.Layouts;
 
 There is nothing to initialize by hand: the PS/2 keyboard (x64), a virtio keyboard or a USB keyboard is bound by the driver kit's `Ps2KeyboardDriver`, `VirtioInputDriver` or `UsbKeyboardDriver` during the driver stage and published to the manager's consumer, which registers it ([PS/2 devices](drivers.md#ps2-devices), [Virtio devices](drivers.md#virtio-devices), [USB devices](drivers.md#usb-devices)).
 
-USB keyboards also need the USB drivers, `CosmosEnableUsb`. You do not have to set it: left unset, it is on whenever `CosmosEnableKeyboard` is. Setting it to `false` keeps PS/2 and virtio keyboards and drops the USB ones with the xHCI driver.
+USB keyboards also need the USB drivers, `CosmosEnableUsb`. You do not have to set it: left unset, it is on whenever `CosmosEnableKeyboard` is. Setting it to `false` keeps PS/2 and virtio keyboards and drops the USB ones with the host controller drivers.
 
 ## Reading a line
 
@@ -193,7 +193,7 @@ Keys.Add(new KeyMapping(0x10, 'q', 'Q', 'q', 'Q', 'q', 'Q', '@', Key.Q));
 
 ## How it works
 
-Every key press on the PS/2 keyboard raises IRQ 1 on x64; the 8042 driver's handler reads the byte from the controller's data port and hands it to the keyboard port's `Ps2Access`, whose source wakes the keyboard driver's handler: it folds the 0xE0 prefix and the release bit into set 1 scan codes (the right Alt as 0x60) and reports them through the keyboard sink to the manager's consumer. A virtio keyboard delivers an event record on its queue instead: the queue's interrupt (an MSI-X message over PCI, the slot's GIC line over MMIO) schedules the driver's drain on the driver kit's worker, or the drain runs every 20 ms when no interrupt could be routed, and the drain converts the Linux key code to the same set 1 scan code and reports it through the keyboard sink to the manager's consumer, which feeds `KeyboardManager` as the PS/2 keyboard's does. A USB keyboard's 8-byte boot reports arrive on its interrupt IN pipe, delivered by the xHCI driver's message interrupt or, when none could be routed, by its 20 ms polled drain of the event ring; `UsbKeyboardDriver`'s handler diffs each report against the previous one into the same set 1 scan codes and reports them through the same sink, and the lock keys light its indicators through `SetLeds`, one SET_REPORT control transfer on the kit worker. The lock keys light the PS/2 keyboard's indicators too, through `SetLeds` (0xED and the indicator byte) on the kit worker. The manager routes lock and modifier keys to the state properties and converts everything else through the active layout into a `KeyEvent`, queued in the key buffer. `ReadKey()` halts the CPU until an interrupt delivers the next event; `TryReadKey()` just dequeues. `Console.ReadLine` and `Console.ReadKey` are plugs on top of the same queue, so console input and raw key events never conflict.
+Every key press on the PS/2 keyboard raises IRQ 1 on x64; the 8042 driver's handler reads the byte from the controller's data port and hands it to the keyboard port's `Ps2Access`, whose source wakes the keyboard driver's handler: it folds the 0xE0 prefix and the release bit into set 1 scan codes (the right Alt as 0x60) and reports them through the keyboard sink to the manager's consumer. A virtio keyboard delivers an event record on its queue instead: the queue's interrupt (an MSI-X message over PCI, the slot's GIC line over MMIO) schedules the driver's drain on the driver kit's worker, or the drain runs every 20 ms when no interrupt could be routed, and the drain converts the Linux key code to the same set 1 scan code and reports it through the keyboard sink to the manager's consumer, which feeds `KeyboardManager` as the PS/2 keyboard's does. A USB keyboard's 8-byte boot reports arrive on its interrupt IN pipe, delivered by the host controller driver's interrupt (an MSI-X message on xHCI, the function's legacy line on EHCI and OHCI) or, when none could be routed, by its 20 ms poll; `UsbKeyboardDriver`'s handler diffs each report against the previous one into the same set 1 scan codes and reports them through the same sink, and the lock keys light its indicators through `SetLeds`, one SET_REPORT control transfer on the kit worker. The lock keys light the PS/2 keyboard's indicators too, through `SetLeds` (0xED and the indicator byte) on the kit worker. The manager routes lock and modifier keys to the state properties and converts everything else through the active layout into a `KeyEvent`, queued in the key buffer. `ReadKey()` halts the CPU until an interrupt delivers the next event; `TryReadKey()` just dequeues. `Console.ReadLine` and `Console.ReadKey` are plugs on top of the same queue, so console input and raw key events never conflict.
 
 ```
 Console.ReadLine / Console.ReadKey        (plugs, Cosmos.Kernel.Plugs)
@@ -202,5 +202,5 @@ KeyboardManager ── KeyEvent queue ◀── active layout
         │                                    ▲
         │                              raw scan codes
         │                                    │
-PS/2 keyboard over the driver kit (the 8042, IRQ 1, x64)  /  virtio-keyboard over the driver kit (PCI, MMIO)  /  USB keyboard over the driver kit (xHCI)
+PS/2 keyboard over the driver kit (the 8042, IRQ 1, x64)  /  virtio-keyboard over the driver kit (PCI, MMIO)  /  USB keyboard over the driver kit (xHCI, EHCI, OHCI)
 ```

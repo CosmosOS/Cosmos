@@ -20,14 +20,10 @@ internal class StrideScheduler : IScheduler
     public const ulong DefaultTickets = 100;
 
     /// <summary>
-    /// Sleep 2x more than run = interactive.
+    /// A thread that parked for more than this many times what it ran since
+    /// its previous wake is interactive.
     /// </summary>
     private const ulong InteractiveSleepRatio = 2;
-
-    /// <summary>
-    /// Priority boost decays after 5ms.
-    /// </summary>
-    private const ulong WakeupBoostDecayNs = 5_000_000;
 
     /// <summary>
     /// Nanoseconds per second, for converting the Stopwatch frequency into
@@ -84,12 +80,23 @@ internal class StrideScheduler : IScheduler
             Stride = Stride1 / DefaultTickets,
             Pass = 0,
             Remain = 0,
-            // A thread inherited from another policy while blocked has no
-            // wake of its own to date its sleep from. Anchoring it here keeps
-            // that first wake from reading as an age-old sleep and earning an
-            // interactive boost it never slept for.
-            LastWakeup = GetTimestamp()
+            // A thread inherited from another policy while parked has no park
+            // of its own on record; dated from the swap, so its first wake
+            // does not read the whole timestamp as the park.
+            LastParked = GetTimestamp()
         };
+
+        // The run side of that first wake has no record either, and a
+        // RunSinceWakeNs of 0 would make any park at all read interactive.
+        // The lifetime runtime stands in for the run since the last wake.
+        // Both stand-ins err the same way, a park shorter and a run longer
+        // than the truth, so the first wake can withhold a boost the real
+        // measure would have given, never grant one it would refuse.
+        if (thread.State is SchedulerThreadState.Blocked or SchedulerThreadState.Sleeping)
+        {
+            data.RunSinceWakeNs = thread.TotalRuntime;
+        }
+
         thread.SchedulerData = data;
 
         // A thread normally arrives Created and passes through OnThreadReady
@@ -123,27 +130,27 @@ internal class StrideScheduler : IScheduler
 
         UpdateGlobalPass(cpuData);
 
-        ulong now = GetTimestamp();
-        bool wasBlocked = thread.State == SchedulerThreadState.Blocked;
+        // The manager calls this hook before it marks the thread Ready, so
+        // the state still says what it wakes from. A sleep expiry and a
+        // signalled wait are both a wake: OnThreadBlocked saved Remain and
+        // LastParked for each.
+        bool wasParked = thread.State is SchedulerThreadState.Blocked or SchedulerThreadState.Sleeping;
 
-        if (wasBlocked)
+        if (wasParked)
         {
-            ulong sleepDuration = now - threadData.LastWakeup;
+            // Both sides in nanoseconds, and both for the last cycle only:
+            // how long the thread was parked against what it ran between its
+            // previous wake and this park. Reclassified on every wake, so a
+            // thread that turns CPU-bound stops being interactive.
+            ulong parkedNs = TicksToNanoseconds(GetTimestamp() - threadData.LastParked);
+            threadData.IsInteractive = parkedNs > threadData.RunSinceWakeNs * InteractiveSleepRatio;
+            threadData.RunSinceWakeNs = 0;
 
-            // Detect interactive behavior
-            if (sleepDuration > 0 && thread.TotalRuntime > 0)
-            {
-                if (sleepDuration > thread.TotalRuntime * InteractiveSleepRatio)
-                {
-                    threadData.IsInteractive = true;
-                }
-            }
-
-            // Apply priority boost for interactive threads
             if (threadData.IsInteractive)
             {
+                // Half a quantum of head start, so an input-driven thread
+                // preempts batch work promptly.
                 threadData.Pass = (long)cpuData.GlobalPass - (long)(threadData.Stride / 2);
-                threadData.IsBoosted = true;
             }
             else
             {
@@ -152,8 +159,6 @@ internal class StrideScheduler : IScheduler
                 long newPass = (long)cpuData.GlobalPass + threadData.Remain;
                 threadData.Pass = Math.Max(newPass, minPass);
             }
-
-            threadData.LastWakeup = now;
         }
         else
         {
@@ -178,7 +183,7 @@ internal class StrideScheduler : IScheduler
         UpdateGlobalPass(cpuData);
 
         threadData.Remain = threadData.Pass - (long)cpuData.GlobalPass;
-        threadData.SleepCount++;
+        threadData.LastParked = GetTimestamp();
 
         RemoveThreadFromQueue(cpuData.RunQueue, thread);
         cpuData.TotalTickets -= threadData.Tickets;
@@ -282,19 +287,16 @@ internal class StrideScheduler : IScheduler
         }
 
         current.TotalRuntime += elapsedNs;
+        // Charged in whole ticks to whichever thread holds the CPU when the
+        // tick lands: a thread that parks before every tick is charged
+        // nothing, one the tick catches is charged the full period for a
+        // shorter run. The interactive test reads it per wake, so a single
+        // answer can flip either way; only the average is right. That is the
+        // nominal tick, not a clock worth replacing here.
+        threadData.RunSinceWakeNs += elapsedNs;
 
         ulong quantum = SchedulerManager.DefaultQuantumNs;
         threadData.Pass += (long)((threadData.Stride * elapsedNs) / quantum);
-
-        // Decay priority boost
-        if (threadData.IsBoosted)
-        {
-            ulong timeSinceWake = GetTimestamp() - threadData.LastWakeup;
-            if (timeSinceWake > WakeupBoostDecayNs)
-            {
-                threadData.IsBoosted = false;
-            }
-        }
 
         UpdateGlobalPass(cpuData);
 
@@ -564,6 +566,19 @@ internal class StrideScheduler : IScheduler
     private ulong GetTimestamp()
     {
         return (ulong)Stopwatch.GetTimestamp();
+    }
+
+    /// <summary>
+    /// Converts a Stopwatch tick delta to nanoseconds through
+    /// <see cref="s_ticksPerQuantum"/>, never through
+    /// <see cref="Stopwatch.Frequency"/> (see the field for why). Whole quanta
+    /// first, then the remainder, so the multiply cannot overflow.
+    /// </summary>
+    private static ulong TicksToNanoseconds(ulong ticks)
+    {
+        ulong ticksPerQuantum = s_ticksPerQuantum == 0 ? 1 : s_ticksPerQuantum;
+        ulong quantum = SchedulerManager.DefaultQuantumNs;
+        return (ticks / ticksPerQuantum * quantum) + (ticks % ticksPerQuantum * quantum / ticksPerQuantum);
     }
 
     /// <summary>

@@ -76,7 +76,7 @@ internal class InterruptEvent
         // subtracts tickets that OnThreadReady never added for it). Treat an
         // idle-thread caller — the main kernel thread — like the no-context
         // case and poll the latch instead.
-        if (currentThread is not null && (currentThread.Flags & SchedulerThreadFlags.IdleThread) != 0)
+        if (currentThread is not null && currentThread.IsIdle)
         {
             currentThread = null;
         }
@@ -189,7 +189,7 @@ internal class InterruptEvent
             : null;
         // Same rule as WaitCore: the idle thread is the scheduler's fallback
         // and must never be put to sleep, so it polls like the no-context case.
-        if (currentThread is not null && (currentThread.Flags & SchedulerThreadFlags.IdleThread) != 0)
+        if (currentThread is not null && currentThread.IsIdle)
         {
             currentThread = null;
         }

@@ -71,7 +71,7 @@ internal class Mutex : IDisposable
         // ownership stays real, it just never parks in _waitingThreads.
         // Interrupts stay enabled between attempts, so the timer keeps
         // preempting to the (runnable) holder until it releases.
-        if ((currentThread.Flags & SchedulerThreadFlags.IdleThread) != 0)
+        if (currentThread.IsIdle)
         {
             while (true)
             {

@@ -1030,6 +1030,7 @@ static Cosmos.Kernel.System.Internal.KernelEntry.Start(Cosmos.Kernel.System.Kern
 static Cosmos.Kernel.System.Kernel.Current.get -> Cosmos.Kernel.System.Kernel?
 static Cosmos.Kernel.System.KernelFeatures.Audio.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Fat.get -> bool
+static Cosmos.Kernel.System.KernelFeatures.FinalizerThread.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Graphics.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Interrupts.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Keyboard.get -> bool
@@ -1243,6 +1244,7 @@ virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnWritten(char value, bool 
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacket.TransactionID.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketAnswer
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketAnswer.DnsPacketAnswer(byte[]! rawData) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketAnswer.Truncated.get -> bool
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketQuery
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketQuery.DnsPacketQuery(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketQuery.DnsPacketQuery(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, string! url, ushort recordType = 1) -> void
