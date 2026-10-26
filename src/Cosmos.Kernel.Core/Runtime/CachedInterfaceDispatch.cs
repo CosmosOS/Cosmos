@@ -379,9 +379,10 @@ namespace Cosmos.Kernel.Core.Runtime
         [RuntimeExport("RhNewInterfaceDispatchCell")]
         internal static IntPtr RhNewInterfaceDispatchCell(MethodTable* pInterface, int slotNumber)
         {
-            // Allocate two cells (8 bytes * 2 = 16 bytes on 32-bit, 16 bytes * 2 = 32 bytes on 64-bit)
+            // Allocate two cells (8 bytes * 2 = 16 bytes on 32-bit, 16 bytes * 2 = 32 bytes on 64-bit),
+            // through the heap's locked entry rather than the small heap directly.
             InterfaceDispatchCell* pCell = (InterfaceDispatchCell*)
-                SmallHeap.Alloc((uint)(sizeof(InterfaceDispatchCell) * 2));
+                Heap.Alloc((uint)(sizeof(InterfaceDispatchCell) * 2));
 
             if (pCell == null)
             {
