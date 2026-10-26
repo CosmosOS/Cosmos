@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
@@ -10,6 +11,7 @@ using Cosmos.Kernel.Core.Runtime.GcInfo;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using CoreGC = Cosmos.Kernel.Core.Memory.GarbageCollector.GarbageCollector;
+using GCHandle = System.Runtime.InteropServices.GCHandle;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
 
@@ -24,7 +26,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[GarbageCollector] BeforeRun() reached!\n");
         Serial.WriteString("[GarbageCollector] Starting tests...\n");
 
-        TR.Start("GarbageCollector Tests", expectedTests: 52 + FinalizerTests.TestCount + FinalizerThreadTests.TestCount);
+        TR.Start("GarbageCollector Tests", expectedTests: 53 + FinalizerTests.TestCount + FinalizerThreadTests.TestCount);
 
         // First: Kernel.Start turned the finalizer thread on, CosmosEnableFinalizerThread being on
         // in this kernel. The cells below check the collector with the finalizers run inline, on
@@ -55,6 +57,7 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_DependentHandleCleanup", TestGCDependentHandleCleanup);
         TR.Run("GC_DependentHandleNullValue", TestGCDependentHandleNullValue);
         TR.Run("GC_HandleStoreIntegrity", TestGCHandleStoreIntegrity);
+        TR.Run("GC_HandleStore_ConcurrentSegmentGrowth", TestGCHandleStoreConcurrentSegmentGrowth);
         TR.Run("GC_PinnedHeapReuse", TestGCPinnedHeapReuse);
         TR.Run("GC_StackScanPaddingStress", TestGCStackScanPaddingStress);
         TR.Run("GC_GcInfoDecoder", TestGCGcInfoDecoder);
@@ -569,6 +572,72 @@ public class Kernel : Sys.Kernel
         CoreGC.Collect();
         Assert.True(ReferenceEquals(wr4.Target, alive),
             "GC: handle store works after cleanup (weak ref still resolves to the strong local)");
+    }
+
+    /// <summary>Handles each worker of the segment-growth test allocates: over two segments' worth between them.</summary>
+    private const int HandleGrowthPerWorker = 400;
+
+    private static int s_handleGrowthWorkersDone;
+    private static int s_handleGrowthLostTargets;
+
+    private static void TestGCHandleStoreConcurrentSegmentGrowth()
+    {
+        // Two threads allocate Normal handles (GCHandle.Alloc) past the capacity of the store's
+        // segments at once, so both reach the fallback that appends a segment. Without the chain
+        // lock, each appended its own segment onto the same tail and the second link orphaned
+        // the first: handles in the orphan were neither scanned as roots nor found by Free. Every
+        // handle must still resolve its target after collections, and freeing them all must
+        // leave the store as it was.
+        s_handleGrowthWorkersDone = 0;
+        s_handleGrowthLostTargets = 0;
+
+        Thread worker1 = new Thread(HandleGrowthWorker);
+        Thread worker2 = new Thread(HandleGrowthWorker);
+        worker1.Start();
+        worker2.Start();
+
+        for (int i = 0; i < 600 && s_handleGrowthWorkersDone < 2; i++)
+        {
+            TimerManager.Wait(10);
+        }
+
+        Assert.Equal(2, s_handleGrowthWorkersDone, "GC: both handle-growth workers must finish");
+        Assert.Equal(0, s_handleGrowthLostTargets, "GC: every handle must keep and resolve its target across a collection");
+    }
+
+    private static void HandleGrowthWorker()
+    {
+        GCHandle[] handles = new GCHandle[HandleGrowthPerWorker];
+        for (int i = 0; i < HandleGrowthPerWorker; i++)
+        {
+            handles[i] = GCHandle.Alloc(new HandleGrowthTarget(i));
+        }
+
+        // The targets are only reachable through the handles: a handle the collector does not
+        // see as a root lets its target die, and the next read of it is a freed object.
+        CoreGC.Collect();
+
+        int lost = 0;
+        for (int i = 0; i < HandleGrowthPerWorker; i++)
+        {
+            if (handles[i].Target is not HandleGrowthTarget target || target.Index != i)
+            {
+                lost++;
+            }
+        }
+
+        for (int i = 0; i < HandleGrowthPerWorker; i++)
+        {
+            handles[i].Free();
+        }
+
+        Interlocked.Add(ref s_handleGrowthLostTargets, lost);
+        Interlocked.Increment(ref s_handleGrowthWorkersDone);
+    }
+
+    private sealed class HandleGrowthTarget(int index)
+    {
+        public int Index { get; } = index;
     }
 
     private static void TestGCPinnedHeapReuse()

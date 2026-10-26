@@ -380,10 +380,11 @@ The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfa
 
 ## Tests
 
-Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 80 tests (`make test KERNEL=Threading`):
+Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 89 tests (`make test KERNEL=Threading`):
 
-- thread lifecycle and concurrency (`Thread_Start_ExecutesDelegate`, `Thread_Multiple_CanRunConcurrently`),
+- thread lifecycle and concurrency (`Thread_Start_ExecutesDelegate`, `Thread_Multiple_CanRunConcurrently`), and thread ids handed out from two creating threads at once (`Thread_Ids_UniqueAcrossConcurrentStarts`),
 - exception dispatch on several threads at once (`Thread_Throw_TwoThreadsUnhandled_BothJoin`, `Thread_Throw_ConcurrentCatchRethrow_OwnExceptions`),
+- the reference form of `Interlocked.CompareExchange` (the runtime's `RhpCheckedLockCmpXchg`, assembly since it has to be atomic against a tick) raced from two threads (`Interlocked_ReferenceExchange_TwoThreads`),
 - stack sizing and the #433 floor (`Thread_MaxStackSize_IsHonored`, `Thread_MaxStackSize_TinyRequestIsFloored`, `Thread_EnsureSufficientExecutionStack_Passes`),
 - thread statics (`Thread_ThreadStatics`),
 - mutex contention, hand-off, and idle accounting (`Mutex_ThreeContenders_AllAcquire`, `Mutex_ReleaseHandsOffToParkedWaiter`, `Mutex_IdleThreadContention_KeepsTicketAccounting`),

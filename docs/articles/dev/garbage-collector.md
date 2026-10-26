@@ -160,7 +160,7 @@ Each store is a linked list of `GCHandleSegment` pages. A segment is one 4 KiB p
 <img src="images/diagrams/gc-handle-store.svg" alt="The handle store. Top: one GCHandleSegmentStore is a linked list of GCHandleSegment pages, _head pointing at Page 0, Next links leading through Page 1 and elided further pages to Page N and then null; _tail points at Page N and allocation tries the tail first. Bottom: inside one 4 KiB page, a 16-byte header (Next and the packed _freeHead word) followed by 170 GCHandle slots of 24 bytes; _freeHead holds the index of the first free slot and free slots chain to the next free index through ExtraInfo." style="width:100%;min-width:620px;max-width:760px">
 </div>
 
-A `GCHandle` slot is `{ GCObject* Object; nint ExtraInfo; GCHandleType Type; }`. Free slots are stamped with the sentinel type `(GCHandleType)(-1)` and chained through `ExtraInfo` into an intra-segment free list. The list head, the alive count, and an [ABA](gc-concepts/aba-problem.md) version tag are packed into one 64-bit word updated with `Interlocked.CompareExchange`, so slot allocation and free are lock-free within a segment. When every segment of a store is full, the store allocates one more page.
+A `GCHandle` slot is `{ GCObject* Object; nint ExtraInfo; GCHandleType Type; }`. Free slots are stamped with the sentinel type `(GCHandleType)(-1)` and chained through `ExtraInfo` into an intra-segment free list. The list head, the alive count, and an [ABA](gc-concepts/aba-problem.md) version tag are packed into one 64-bit word updated with `Interlocked.CompareExchange`, so slot allocation and free are lock-free within a segment. When every segment of a store is full, the store allocates one more page and appends it under the store's IRQ-safe spinlock: two threads growing the store at once would otherwise each link a segment onto the same tail, and the second link would orphan the first, whose handles no collection would scan or clear. The chain only grows, so finding a segment with room reads it without the lock; the collector takes the lock to walk a store clearing dead targets.
 
 A handle value handed to the runtime is simply the address of its slot. Allocation, `RhHandleSet`, dependent secondary access, and freeing all cast the `IntPtr` back to a `GCHandle*`.
 
@@ -183,7 +183,7 @@ Frozen segments take no part in mark or sweep. `IsInFrozenSegment` answers membe
 
 ### What the GC does not touch
 
-The kernel's malloc-style heaps (SmallHeap, MediumHeap, LargeHeap in `Memory/Heap/`) are not part of the GC. Managed objects never live there, and the sweep deliberately never walks them: a live unmanaged block whose first word happens to hold a GC heap pointer would be indistinguishable from an unmarked object header, and sweeping it would free live memory (issue [#386](https://github.com/valentinbreiz/nativeaot-patcher/issues/386), covered by the `GC_MallocHeapNotSwept` test).
+The kernel's malloc-style heaps (SmallHeap, MediumHeap, LargeHeap in `Memory/Heap/`) are not part of the GC. Managed objects never live there, and the sweep deliberately never walks them: a live unmanaged block whose first word happens to hold a GC heap pointer would be indistinguishable from an unmarked object header, and sweeping it would free live memory (issue [#386](https://github.com/valentinbreiz/nativeaot-patcher/issues/386), covered by the `GC_MallocHeapNotSwept` test). Their one entry point, `Heap` (`Alloc`, `Free`, `Realloc`, and the prune of empty small-heap pages after a collection), takes an IRQ-safe spinlock of its own around the sub-heaps' chains, as `PageAllocator` does around its page table: thread stacks, the runtime's unmanaged blocks and `NativeMemory` allocate there from any thread.
 
 ---
 
@@ -555,10 +555,10 @@ Retiring the conservative path is the keystone: once every thread can be scanned
 
 ## Tests
 
-The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 95 tests (`make test KERNEL=GarbageCollector`). Highlights:
+The kernel test suite in [`tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector/Kernel.cs) runs 96 tests (`make test KERNEL=GarbageCollector`). Highlights:
 
 - exact collection accounting (`GC_CollectBasic`, `GC_UnreachableExactCount`),
-- weak and dependent handle behavior (`GC_WeakReference`, `GC_DependentHandle`, `GC_DependentHandleCleanup`),
+- weak and dependent handle behavior (`GC_WeakReference`, `GC_DependentHandle`, `GC_DependentHandleCleanup`), and the handle store growing under two threads at once (`GC_HandleStore_ConcurrentSegmentGrowth`),
 - interior pointer roots (`GC_InteriorPointerRoot`, the acceptance test for #384, and `GC_InteriorPointerRootMidTlab`, `GC_InteriorPointerRootPinnedHeap`, `GC_InteriorPointerRootFixed`),
 - statics reachability through the handle spine (`GC_StaticOnlyReachability`),
 - precise stack scanning and funclet frames (`GC_PreciseStackScan`, `GC_FuncletNoFalseRoot`, `GC_FuncletNoCrashOnAllocInCatch`, `GC_StackScanPaddingStress`),
