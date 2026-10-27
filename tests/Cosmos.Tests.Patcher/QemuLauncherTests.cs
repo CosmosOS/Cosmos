@@ -840,4 +840,38 @@ public class QemuLauncherTests
     {
         Assert.Throws<ArgumentException>(() => QemuLauncher.ResolveNetworkTestNic("x64", model));
     }
+
+    // The CPU count rides its own switch: one CPU is QEMU's default and stays
+    // implicit, so a cell without the smp modifier launches as it always did.
+    [Theory]
+    [InlineData("x64")]
+    [InlineData("arm64")]
+    public void AppendCpuCount_EmitsSmpOnlyPastOneCpu(string architecture)
+    {
+        StringBuilder one = new();
+        StringBuilder four = new();
+        QemuLaunchOptions oneCpu = new() { Architecture = architecture, IsoPath = "/tmp/kernel.iso" };
+        QemuLaunchOptions fourCpus = new() { Architecture = architecture, IsoPath = "/tmp/kernel.iso", CpuCount = 4 };
+        if (architecture == "x64")
+        {
+            QemuLauncher.AppendX64Args(one, oneCpu);
+            QemuLauncher.AppendX64Args(four, fourCpus);
+        }
+        else
+        {
+            QemuLauncher.AppendArm64Args(one, oneCpu);
+            QemuLauncher.AppendArm64Args(four, fourCpus);
+        }
+
+        Assert.DoesNotContain("-smp", one.ToString());
+        Assert.Contains(" -smp 4 ", four.ToString());
+    }
+
+    [Fact]
+    public void AppendCpuCount_RejectsAGuestWithoutCpus()
+    {
+        StringBuilder args = new();
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            QemuLauncher.AppendX64Args(args, new QemuLaunchOptions { Architecture = "x64", IsoPath = "/tmp/kernel.iso", CpuCount = 0 }));
+    }
 }

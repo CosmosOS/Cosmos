@@ -52,7 +52,8 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.HelloWorld
       timeout_x64: 60
       timeout_arm64: 90
-      step_timeout_minutes: 5
+      # Two cells since SMP phase 2 (bare and bare+smp4).
+      step_timeout_minutes: 8
 
   helloworld-results:
     needs: helloworld-tests
@@ -121,7 +122,8 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Timer
       timeout_x64: 120
       timeout_arm64: 180
-      step_timeout_minutes: 10
+      # Two cells since SMP phase 2 (bare and bare+smp4).
+      step_timeout_minutes: 15
 
   timer-results:
     needs: timer-tests
@@ -190,9 +192,11 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Threading
       # The scheduling-policy cells run three fixed CPU-share measurement
       # windows on top of the lock/mutex waits, which TCG stretches further.
+      # Two cells since SMP phase 2 (bare and bare+smp4, four CPUs on the
+      # second), so the step takes twice the QEMU time.
       timeout_x64: 150
       timeout_arm64: 240
-      step_timeout_minutes: 12
+      step_timeout_minutes: 20
 
   threading-results:
     needs: threading-tests
@@ -337,7 +341,8 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector
       timeout_x64: 120
       timeout_arm64: 180
-      step_timeout_minutes: 10
+      # Two cells since SMP phase 2 (bare and bare+smp4).
+      step_timeout_minutes: 15
 
   garbagecollector-results:
     needs: garbagecollector-tests
@@ -442,12 +447,13 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Interrupts
       timeout_x64: 60
       timeout_arm64: 90
-      # arm64 expands to 3 profile cells (bare/gicv2/gicv3) × up to 90 s of
-      # QEMU each, plus the publish/ILC/ISO build in the same step. 5 min
-      # left no headroom: hung cells, the case the QEMU timeouts exist
-      # for, killed the step before OutputHandlerXml wrote results, and
-      # the results job showed "No results" instead of the failing cells.
-      step_timeout_minutes: 10
+      # arm64 expands to 6 profile cells (bare/gicv2/gicv3, each with and
+      # without smp4 since SMP phase 2) × up to 90 s of QEMU each, x64 to 2,
+      # plus the publish/ILC/ISO build in the same step. 5 min left no
+      # headroom: hung cells, the case the QEMU timeouts exist for, killed
+      # the step before OutputHandlerXml wrote results, and the results job
+      # showed "No results" instead of the failing cells.
+      step_timeout_minutes: 15
 
   interrupts-results:
     needs: interrupts-tests
