@@ -164,14 +164,10 @@ __exception_common:
 
     // Save sp (original sp before we modified it)
     // We subbed 816. The vector pushed 16. So original SP is sp + 832.
-    // Code interrupted in EL1t (SPSR.M[0] = 0: the boot thread, on the bootloader stack) ran
-    // on SP_EL0: the exception switched to SP_EL1, where this frame is, so its sp is SP_EL0.
-    mrs     x0, spsr_el1
-    tst     x0, #1
+    // Every CPU runs EL1h: kmain selects SP_EL1 on the boot CPU before its first frame, the
+    // application processor trampoline does the same, and the scheduler's threads start with
+    // SPSR 0x3C5. So the interrupted code ran on this very stack and its sp is the frame's base.
     add     x0, sp, #832
-    b.ne    1f
-    mrs     x0, sp_el0
-1:
     str     x0, [x10, #248]         // sp at offset 248
 
     // Save elr_el1 (exception return address)

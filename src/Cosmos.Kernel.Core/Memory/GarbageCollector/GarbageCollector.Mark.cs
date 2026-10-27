@@ -240,15 +240,6 @@ internal static unsafe partial class GarbageCollector
             // context, at StackPointer. Skipping it lost every main-thread stack root whenever
             // another thread collected.
             stackEnd = GetCurrentStackEndForBootStack();
-#if ARCH_ARM64
-            // It runs in EL1t, on SP_EL0: the IRQ stub saved its context on the SP_EL1 stack, not
-            // on the bootloader one, and its stack pointer in the context. Scanning from the
-            // context up to the boot stack top read most of the address space and hung the CPU.
-            if (ctx != null && (ctx->Spsr & 1) == 0)
-            {
-                stackStart = (nuint)ctx->Sp;
-            }
-#endif
         }
         else
         {
