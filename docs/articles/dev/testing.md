@@ -77,7 +77,7 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 | Suite | Tests | Description |
 |-------|-------|-------------|
 | **HelloWorld** | 3 | Basic arithmetic, boolean logic, integer comparison |
-| **Memory** | 85 | Boxing/unboxing, memory allocation, collections, memory copy, GC |
+| **Memory** | 74 | Boxing/unboxing, struct equality, memory allocation, collections, memory copy, address translation |
 | **Drivers** | 63 per cell | Driver kit over the synthetic bus: manifest, arbitration, publish, interrupts, deferred work, teardown, children, a display reaching the display manager, a block device reaching the storage manager; on x64, the PCI host and the E1000E driver on q35's default NIC; on the usb-kbd cell, the xHCI driver and the USB keyboard driver on a usb-kbd plugged in at boot, declined first by the suite's own driver, with a key injected over QMP, then unplugged and replugged; on the usb-kbd-ehci, usb-kbd-ohci, usb-kbd-ehci-ohci and usb-kbd-ohci-hub cells, the EHCI and OHCI drivers and the USB keyboard driver on the same keyboard, on a usb-ehci, on a pci-ohci, on an ICH9 EHCI that hands the full-speed keyboard to its pci-ohci companion, and behind a usb-hub on a pci-ohci; on the usb-mouse cell, the USB mouse driver on a usb-mouse plugged in at boot, with pointer events injected over QMP; on x64, the 8042 driver and the PS/2 keyboard and mouse drivers on q35's built-in controller, with a key and pointer events injected over QMP; on the virtio-blk-pci and virtio-blk-mmio cells, the virtio-blk driver on the cell's disk; on virtio-blk-pci, the PCI Express root port driver on the port the disk sits behind, with the disk pulled out and plugged back in |
 | **Pci** | 8 | The driver kit's PCI host node, its configuration mechanism and the function nodes it publishes, read through `DriverDiagnostics`, the host's `PciHostAccess` and the nodes' `PciAccess`, checked against a raw scan of the host's buses |
 | **Virtio** | 14 per cell | The virtio drivers over the driver kit on both transports and with ACPI off: the net, input and block nodes bound, the interface consumed with its link, MAC and interrupt mode per cell, the disk registered, and the PCI function or the MMIO slot bound by its transport driver |
@@ -98,6 +98,9 @@ Kernel integration tests compile a real NativeAOT kernel, boot it in QEMU, and c
 - `Boxing_Char`, `Boxing_Int32`, `Boxing_Byte`, `Boxing_Long`
 - `Boxing_Nullable`, `Boxing_Interface`, `Boxing_CustomStruct`
 - `Boxing_ArrayCopy`, `Boxing_Enum`, `Boxing_ValueTuple`, `Boxing_NullInterface`
+
+**Struct equality (3 tests):** the inherited `ValueType.Equals`/`GetHashCode` and `EqualityComparer<T>.Default` on a struct compared byte by byte, on a `record struct` with a reference field (its own generated `Equals`), and on a plain struct with a reference field, which CoreLib compares field by field through the ILC-injected `__GetFieldHelper` and `RhBoxAny`
+- `StructEquals_BitwiseFields`, `StructEquals_RecordStructReferenceField`, `StructEquals_ReferenceField`
 
 **Memory Allocation (8 tests):**
 - `Memory_CharArray`, `Memory_StringAllocation`, `Memory_IntArray`

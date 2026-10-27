@@ -333,7 +333,7 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("RhBox_NullableNullFlag_ReturnsNull", Test_RhBox_NullableNullFlag_ReturnsNull);
         TR.Run("RhBox_NullableWithValue_Boxes", Test_RhBox_NullableWithValue_Boxes);
         // -- RhBoxAny --
-        TR.Run("RhBoxAny_ReferenceType_Passthrough", Test_RhBoxAny_ReferenceType_Passthrough);
+        TR.Run("RhBoxAny_ReferenceType_ReturnsReferent", Test_RhBoxAny_ReferenceType_ReturnsReferent);
         TR.Run("RhBoxAny_ValueType_DelegatesToRhBox", Test_RhBoxAny_ValueType_DelegatesToRhBox);
         // -- RhUnbox --
         TR.Run("RhUnbox_CopiesValueToDest", Test_RhUnbox_CopiesValueToDest);
@@ -816,12 +816,21 @@ public unsafe class Kernel : Sys.Kernel
     }
 
     // -- RhBoxAny --
-    private static void Test_RhBoxAny_ReferenceType_Passthrough()
+    private static void Test_RhBoxAny_ReferenceType_ReturnsReferent()
     {
-        string input = "hello";
-        byte* inputPtr = (byte*)Unsafe.AsPointer(ref input);
-        void* result = Boxing.RhBoxAny(inputPtr, MethodTable.Of<string>());
-        Assert.True(result == inputPtr, "RhBoxAny on reference type must pass through");
+        // CoreLib (ValueType.Equals, Attribute.Equals) passes the address of a
+        // field and, for a reference-typed field, the MethodTable of object:
+        // the boxed value is the reference stored in the field, not the
+        // field's address (CosmosOS/Cosmos#3362).
+        string slot = "hello";
+        byte* slotPtr = (byte*)Unsafe.AsPointer(ref slot);
+        void* referent = *(void**)slotPtr;
+        void* result = Boxing.RhBoxAny(slotPtr, MethodTable.Of<object>());
+        Assert.True(result == referent, "RhBoxAny on a reference field must return the stored reference");
+        Assert.True(result != slotPtr, "RhBoxAny on a reference field must not return the field's address");
+
+        slot = null!;
+        Assert.True(Boxing.RhBoxAny(slotPtr, MethodTable.Of<object>()) == null, "RhBoxAny on a null reference field must return null");
     }
 
     private static void Test_RhBoxAny_ValueType_DelegatesToRhBox()
