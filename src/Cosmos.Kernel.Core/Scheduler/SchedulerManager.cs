@@ -440,15 +440,14 @@ public static class SchedulerManager
     internal static int ThreadCount => s_allThreadCount;
 
     /// <summary>
-    /// Returns the CPU ID currently executing this code path. Single-CPU
-    /// today. Internal: a policy is handed the CPU it operates on by every
-    /// hook, and a caller holding a <see cref="SchedulerThread"/> reads
-    /// <see cref="SchedulerThread.CpuId"/>, which stays correct under SMP where this
-    /// constant does not.
-    /// TODO(SMP): replace with x86_64 GS-relative per-CPU storage or ARM64 MPIDR_EL1
-    /// affinity read once application processors are brought online.
+    /// The index of the CPU executing this code path: one load from its
+    /// per-CPU block (<see cref="PerCpuBlock"/>) through the per-CPU
+    /// register, so the answer is this CPU's whatever CPU the caller runs on.
+    /// Internal: a policy is handed the CPU it operates on by every hook, and
+    /// a caller holding a <see cref="SchedulerThread"/> reads
+    /// <see cref="SchedulerThread.CpuId"/>, the CPU the thread is assigned to.
     /// </summary>
-    internal static uint GetCurrentCpuId() => 0;
+    internal static uint GetCurrentCpuId() => PerCpuBlock.CurrentIndex;
 
     /// <summary>
     /// Sum of TotalRuntime across all non-idle threads, in nanoseconds.

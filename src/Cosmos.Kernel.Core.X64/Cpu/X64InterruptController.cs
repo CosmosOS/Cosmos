@@ -118,7 +118,7 @@ internal class X64InterruptController : IInterruptController
                     nuint currentRsp = (nuint)Unsafe.AsPointer(ref ctx) - XmmSaveAreaSizeBytes;
                     if ((currentRsp & AddressSpace.KernelSpaceCanonicalMask) == AddressSpace.KernelSpaceCanonicalMask)
                     {
-                        SchedulerManager.ReschedulePendingFromIrq(LocalApic.GetId(), currentRsp);
+                        SchedulerManager.ReschedulePendingFromIrq(SchedulerManager.GetCurrentCpuId(), currentRsp);
                     }
                 }
                 return;
