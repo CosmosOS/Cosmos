@@ -212,4 +212,12 @@ internal class X64PlatformInitializer : IPlatformInitializer
         Serial.WriteString("[X64HAL] Starting LAPIC timer for scheduling...\n");
         LocalApic.StartPeriodicTimer(quantumMs);
     }
+
+    /// <inheritdoc />
+    public void StartSchedulerTimerOnCurrentCpu()
+    {
+        // The handler is registered once, in the shared vector table; this CPU's own timer is
+        // what starts here, with the boot CPU's interval and calibration.
+        LocalApic.StartPeriodicTimerOnCurrentCpu();
+    }
 }

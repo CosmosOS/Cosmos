@@ -2,6 +2,7 @@
 
 using System.Runtime.CompilerServices;
 using Cosmos.Kernel.Core.ARM64.Bridge;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 
 namespace Cosmos.Kernel.Core.ARM64.Cpu;
@@ -22,9 +23,12 @@ public static class GICv3
     private static ulong s_gicDistBase = GIC.QemuVirtGicdBase;
     private static ulong s_gicReDistBase = QemuVirtGicrBase;
 
-    // Discovered redistributor base for the current CPU (found by TYPER walk)
-    private static ulong s_currentCpuRdBase;
-    private static ulong s_currentCpuSgiBase;
+    // The redistributor of the boot CPU, found by the GICR_TYPER walk: what the LPI and ITS
+    // code program, since the ITS collections are mapped to it. Every CPU's own redistributor
+    // frame (its RD_base and SGI_base, the banked SGI and PPI registers) is in its per-CPU
+    // block, written by the walk run on that CPU, so EnableInterrupt and SetPriority on a PPI
+    // or SGI act on the calling CPU's redistributor rather than the boot CPU's.
+    private static ulong s_bootCpuRdBase;
 
     /// <summary>
     /// Physical address field (bits [51:12], 4 KiB aligned) shared by GITS_CBASER and
@@ -148,11 +152,15 @@ public static class GICv3
     public static bool IsMmioAvailable => s_mmioAvailable;
 
     /// <summary>
-    /// RD_base of the redistributor for the current (boot) CPU, discovered
-    /// via TYPER walk. Exposed so the LPI / ITS drivers can program
-    /// PROPBASER/PENDBASER and the ITS collection-mapping target.
+    /// RD_base of the boot CPU's redistributor, discovered via TYPER walk.
+    /// Exposed so the LPI / ITS drivers can program PROPBASER/PENDBASER and
+    /// the ITS collection-mapping target: the collections are mapped to the
+    /// boot CPU, so every LPI lands there.
     /// </summary>
-    public static ulong CurrentCpuRdBase => s_currentCpuRdBase;
+    public static ulong BootCpuRdBase => s_bootCpuRdBase;
+
+    /// <summary>The SGI_base frame of the calling CPU's redistributor, found by the walk run on it; 0 before.</summary>
+    private static ulong CurrentCpuSgiBase => PerCpuBlock.Current.GicRedistributorBase + GICR_SGI_OFFSET;
 
     /// <summary>
     /// Configures the GICv3 base addresses. Must be called before Initialize()
@@ -278,10 +286,10 @@ public static class GICv3
         {
             Serial.Write("[GIC] WARNING: Failed to find redistributor, trying index 0\n");
             // Fallback: assume first redistributor
-            s_currentCpuRdBase = s_gicReDistBase;
-            s_currentCpuSgiBase = s_gicReDistBase + GICR_SGI_OFFSET;
-            InitializeRedistributorAt(s_currentCpuRdBase, s_currentCpuSgiBase);
+            PerCpuBlock.Current.GicRedistributorBase = s_gicReDistBase;
+            InitializeRedistributorAt(s_gicReDistBase, s_gicReDistBase + GICR_SGI_OFFSET);
         }
+        s_bootCpuRdBase = PerCpuBlock.Current.GicRedistributorBase;
 
         // Step 9: Initialize CPU interface via system registers
         InitializeCpuInterface();
@@ -309,6 +317,38 @@ public static class GICv3
 
         s_initialized = true;
         Serial.Write("[GIC] GICv3 initialized (sysreg-only)\n");
+    }
+
+    /// <summary>
+    /// Brings the calling CPU's banked share of the GICv3 up, once <see cref="Initialize"/> ran
+    /// on the boot CPU: ICC_SRE_EL1 so the CPU interface's system registers work, the
+    /// redistributor whose GICR_TYPER affinity is this CPU's MPIDR (woken, its SGIs and PPIs in
+    /// group 1 NS, disabled, cleared and at the default priority), then the CPU interface
+    /// (priority mask, binary point, group 1 enabled). The distributor is shared and stays as
+    /// the boot CPU left it. In the sysreg-only mode the firmware's redistributor configuration
+    /// is trusted, as on the boot CPU. An application processor, from its managed entry with
+    /// interrupts masked (SMP phase 2). Allocation-free: the heap is the boot CPU's until
+    /// phase 4, and the log lines write constants and numbers only.
+    /// </summary>
+    internal static void InitializeCurrentCpu()
+    {
+        if (!s_initialized)
+        {
+            return;
+        }
+
+        EnableSystemRegisterAccess();
+
+        if (s_mmioAvailable)
+        {
+            ulong mpidr = GICv3Native.ReadMpidr();
+            if (!FindAndInitRedistributor(mpidr))
+            {
+                Serial.Write("[GIC] WARNING: no redistributor matches this CPU's MPIDR\n");
+            }
+        }
+
+        InitializeCpuInterface();
     }
 
     /// <summary>
@@ -401,8 +441,7 @@ public static class GICv3
                 Serial.WriteHex(rdBase);
                 Serial.Write("\n");
 
-                s_currentCpuRdBase = rdBase;
-                s_currentCpuSgiBase = rdBase + GICR_SGI_OFFSET;
+                PerCpuBlock.Current.GicRedistributorBase = rdBase;
                 InitializeRedistributorAt(rdBase, rdBase + GICR_SGI_OFFSET);
                 return true;
             }
@@ -510,7 +549,7 @@ public static class GICv3
         {
             // SGI/PPI: use redistributor SGI_base frame
             uint bit = 1u << (int)(intId % IntsPerBitmapReg);
-            WriteRedistributor(s_currentCpuSgiBase, GICR_ISENABLER0, bit);
+            WriteRedistributor(CurrentCpuSgiBase, GICR_ISENABLER0, bit);
         }
         else
         {
@@ -540,7 +579,7 @@ public static class GICv3
         if (intId < GIC.SPI_START)
         {
             uint bit = 1u << (int)(intId % IntsPerBitmapReg);
-            WriteRedistributor(s_currentCpuSgiBase, GICR_ICENABLER0, bit);
+            WriteRedistributor(CurrentCpuSgiBase, GICR_ICENABLER0, bit);
         }
         else
         {
@@ -573,7 +612,7 @@ public static class GICv3
             // SGI/PPI: use redistributor SGI_base frame
             unsafe
             {
-                byte* ptr = (byte*)(s_currentCpuSgiBase + GICR_IPRIORITYR + intId);
+                byte* ptr = (byte*)(CurrentCpuSgiBase + GICR_IPRIORITYR + intId);
                 *ptr = priority;
             }
         }
@@ -629,7 +668,7 @@ public static class GICv3
         if (intId < GIC.SPI_START)
         {
             uint bit = 1u << (int)(intId % IntsPerBitmapReg);
-            return (ReadRedistributor(s_currentCpuSgiBase, GICR_ISPENDR0) & bit) != 0;
+            return (ReadRedistributor(CurrentCpuSgiBase, GICR_ISPENDR0) & bit) != 0;
         }
         else
         {
@@ -654,7 +693,7 @@ public static class GICv3
         if (intId < GIC.SPI_START)
         {
             uint bit = 1u << (int)(intId % IntsPerBitmapReg);
-            WriteRedistributor(s_currentCpuSgiBase, GICR_ICPENDR0, bit);
+            WriteRedistributor(CurrentCpuSgiBase, GICR_ICPENDR0, bit);
         }
         else
         {
@@ -684,7 +723,7 @@ public static class GICv3
             uint regOffset = (regIdx == 0) ? GICR_ICFGR0 : GICR_ICFGR1;
             uint localId = intId - (regIdx * IntsPerCfgReg);
             uint shift = localId * CfgBitsPerInt;
-            uint value = ReadRedistributor(s_currentCpuSgiBase, regOffset);
+            uint value = ReadRedistributor(CurrentCpuSgiBase, regOffset);
 
             if (edgeTriggered)
             {
@@ -695,7 +734,7 @@ public static class GICv3
                 value &= ~(GicArch.IcfgrEdgeTriggered << (int)shift);
             }
 
-            WriteRedistributor(s_currentCpuSgiBase, regOffset, value);
+            WriteRedistributor(CurrentCpuSgiBase, regOffset, value);
         }
         else
         {

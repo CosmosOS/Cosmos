@@ -121,6 +121,27 @@ internal class ARM64InterruptController : IInterruptController
     }
 
     /// <inheritdoc/>
+    public void InitializeCurrentCpu()
+    {
+        if (!_initialized)
+        {
+            return;
+        }
+
+        // The vector table is loaded by the trampoline, before any managed code runs on this
+        // CPU. What is banked per CPU and so has to be done here: this CPU's identity, its GIC
+        // redistributor (found by its MPIDR) and CPU interface, and the enables and priorities
+        // of the two PPI/SGI lines the scheduler uses, which the redistributor keeps per CPU.
+        PerCpuBlock.Current.HardwareId = GICv3.ExtractAffinity(GICv3Native.ReadMpidr());
+
+        GIC.InitializeCurrentCpu();
+        GIC.SetPriority(GIC.TIMER_NONSEC_PHYS, TimerPriorityMedium);
+        GIC.EnableInterrupt(GIC.TIMER_NONSEC_PHYS);
+        GIC.SetPriority(RescheduleSgi, ReschedulePriority);
+        GIC.EnableInterrupt(RescheduleSgi);
+    }
+
+    /// <inheritdoc/>
     public bool TryRaiseReschedule()
     {
         if (!_initialized)

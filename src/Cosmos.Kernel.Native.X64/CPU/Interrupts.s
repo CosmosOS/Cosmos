@@ -270,6 +270,14 @@ _native_x64_load_idt:
     sti
     ret
 
+// void _native_x64_lidt(IdtPointer* ptr)
+// Loads the IDT and leaves the interrupt flag alone: for an application processor, which loads
+// the shared table before it has anything to enable interrupts for.
+.global _native_x64_lidt
+_native_x64_lidt:
+    lidt [rdi]
+    ret
+
 // uint64_t _native_x64_get_code_selector()
 // Returns the current CS (code segment selector) value
 .global _native_x64_get_code_selector

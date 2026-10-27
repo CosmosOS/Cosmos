@@ -40,6 +40,19 @@ public sealed class PerCpuState : SchedulerExtensible
     /// </summary>
     public SchedulerThread? IdleThread { get; internal set; }
 
+    // ===== Tick =====
+
+    internal uint _tickCount;
+
+    /// <summary>
+    /// Timer interrupts this CPU handled since it started its tick. Each CPU's timer fires on
+    /// its own, so the per-CPU count is the one that says a CPU is alive;
+    /// <see cref="SchedulerManager.TickCount"/> is CPU 0's and keeps the pace of the thread
+    /// clock (the timed waits, the suites' tick budgets) whatever the CPU count. Written by the
+    /// tick on this CPU alone, read from any thread. Wraps: compare differences.
+    /// </summary>
+    public uint TickCount => Volatile.Read(ref _tickCount);
+
     // Set by ReadyThread when it wakes a thread (typically an ISR-side
     // InterruptEvent.Signal); consumed by ReschedulePendingFromIrq on
     // hardware-IRQ exit so the woken thread runs immediately instead of

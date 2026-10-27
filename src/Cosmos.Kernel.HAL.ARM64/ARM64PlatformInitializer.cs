@@ -457,4 +457,12 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
             _timer.Start();
         }
     }
+
+    /// <inheritdoc />
+    public void StartSchedulerTimerOnCurrentCpu()
+    {
+        // The generic timer's CNTP_* registers are banked per CPU and the counter is system
+        // wide: arming this CPU's with the period the boot CPU set is the whole start.
+        _timer?.StartOnCurrentCpu();
+    }
 }
