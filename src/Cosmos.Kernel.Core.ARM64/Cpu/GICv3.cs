@@ -118,8 +118,20 @@ public static class GICv3
     private const int Sgi1rIntIdShift = 24;
     /// <summary>ICC_SGI1R_EL1.IRM bit (bit 40): route to all PEs other than self.</summary>
     private const ulong Sgi1rIrmBit = (1ul << 40);
-    /// <summary>ICC_SGI1R_EL1 TargetList bit for CPU 0 (self on the boot CPU).</summary>
-    private const ulong Sgi1rTargetListCpu0 = 1;
+    /// <summary>Width of one MPIDR affinity field, and the mask of one.</summary>
+    private const ulong MpidrAffinityFieldMask = 0xFF;
+    /// <summary>Bit positions of Aff1, Aff2 and Aff3 in MPIDR_EL1.</summary>
+    private const int MpidrAff1Shift = 8;
+    private const int MpidrAff2Shift = 16;
+    private const int MpidrAff3Shift = 32;
+    /// <summary>Bit positions of Aff1 (bits [23:16]), Aff2 ([39:32]) and Aff3 ([55:48]) in ICC_SGI1R_EL1.</summary>
+    private const int Sgi1rAff1Shift = 16;
+    private const int Sgi1rAff2Shift = 32;
+    private const int Sgi1rAff3Shift = 48;
+    /// <summary>ICC_SGI1R_EL1.RangeSelector (bits [47:44]): which group of 16 Aff0 values the target list covers.</summary>
+    private const int Sgi1rRangeSelectorShift = 44;
+    /// <summary>Aff0 values one target list covers: bit n of the list is Aff0 = RangeSelector * 16 + n.</summary>
+    private const int Sgi1rTargetListWidth = 16;
 
     /// <summary>GICD_PIDR2 offset in the GICv2-compatible 4KB register frame.</summary>
     private const uint Pidr2OffsetGicv2 = 0xFE8;
@@ -764,15 +776,25 @@ public static class GICv3
     public static void SendSGI(uint sgiId, bool targetSelf)
     {
         // ICC_SGI1R_EL1 format:
-        // [27:24] = INTID (SGI number)
-        // [40]    = IRM (1 = all other PEs, 0 = use target list)
-        // [15:0]  = TargetList (bit mask of target CPUs in lowest affinity level)
+        // [55:48] = Aff3, [47:44] = RangeSelector, [40] = IRM (1 = all other PEs, 0 = use target list)
+        // [39:32] = Aff2, [27:24] = INTID (SGI number), [23:16] = Aff1
+        // [15:0]  = TargetList (bit mask of Aff0 values within the selected range)
         ulong value = ((ulong)(sgiId & SgiIdMask) << Sgi1rIntIdShift);
 
         if (targetSelf)
         {
-            // Target self: set TargetList bit 0 (assumes CPU 0)
-            value |= Sgi1rTargetListCpu0;
+            // The calling CPU, named by its own MPIDR: affinity levels 1 to 3
+            // in the routing fields, affinity 0 as one bit of the target list
+            // (the range selector covers an Aff0 past the list's 16). Every
+            // CPU raises its own reschedule SGI (SMP phase 2), so bit 0, the
+            // boot CPU on the virt machine, is not the target any more.
+            ulong mpidr = GICv3Native.ReadMpidr();
+            ulong aff0 = mpidr & MpidrAffinityFieldMask;
+            value |= ((mpidr >> MpidrAff1Shift) & MpidrAffinityFieldMask) << Sgi1rAff1Shift;
+            value |= ((mpidr >> MpidrAff2Shift) & MpidrAffinityFieldMask) << Sgi1rAff2Shift;
+            value |= ((mpidr >> MpidrAff3Shift) & MpidrAffinityFieldMask) << Sgi1rAff3Shift;
+            value |= (aff0 / (ulong)Sgi1rTargetListWidth) << Sgi1rRangeSelectorShift;
+            value |= 1ul << (int)(aff0 % (ulong)Sgi1rTargetListWidth);
         }
         else
         {
