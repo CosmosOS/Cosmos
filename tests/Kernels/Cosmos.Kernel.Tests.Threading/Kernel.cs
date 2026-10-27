@@ -21,7 +21,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 87;
+    private const int ExpectedTestCount = 89;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -67,6 +67,18 @@ public class Kernel : Sys.Kernel
 
     /// <summary>How long a Join on a throwing thread may take before the test calls it a hang.</summary>
     private const int ThrowJoinTimeoutMs = 30_000;
+
+    /// <summary>Scheduler ticks the reference compare-exchange race runs for: a tick has to land inside an exchange for the race to exist, so the cell counts ticks, not claims.</summary>
+    private const uint ExchangeRunTicks = 300;
+
+    /// <summary>Workers racing on the reference compare-exchange.</summary>
+    private const int ExchangeWorkerCount = 2;
+
+    /// <summary>Threads started in a burst by each worker of the thread-id uniqueness test.</summary>
+    private const int IdBurstThreadsPerWorker = 24;
+
+    /// <summary>Workers starting threads in the thread-id uniqueness test.</summary>
+    private const int IdBurstWorkerCount = 2;
 
     /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
     private const uint UnregisteredCpuId = 4096;
@@ -150,6 +162,17 @@ public class Kernel : Sys.Kernel
     private static int s_throwMismatches;
     private static Cosmos.Kernel.Core.Scheduler.SpinLock s_testLock;
 
+    // Shared state for the reference compare-exchange race
+    private static object? s_exchangeSlot;
+    private static int s_exchangeDoubleWins;
+    private static int s_exchangeWins;
+    private static int s_exchangeWorkersDone;
+
+    // Shared state for the thread-id uniqueness test
+    private static readonly uint[] s_burstThreadIds = new uint[IdBurstWorkerCount * IdBurstThreadsPerWorker];
+    private static int s_burstThreadsStarted;
+    private static int s_burstWorkersDone;
+
     // Shared state for Monitor/lock tests
     private static readonly object s_lockObj = new object();
     private static volatile int s_lockCounter;
@@ -187,6 +210,8 @@ public class Kernel : Sys.Kernel
         TR.Run("Thread_Multiple_CanRunConcurrently", TestMultipleThreads);
         TR.Run("Thread_Throw_TwoThreadsUnhandled_BothJoin", TestUnhandledThrowsOnTwoThreads);
         TR.Run("Thread_Throw_ConcurrentCatchRethrow_OwnExceptions", TestConcurrentCatchAndRethrow);
+        TR.Run("Interlocked_ReferenceExchange_TwoThreads", TestInterlockedReferenceExchangeTwoThreads);
+        TR.Run("Thread_Ids_UniqueAcrossConcurrentStarts", TestThreadIdsUniqueAcrossConcurrentStarts);
         TR.Run("SpinLock_ProtectsSharedData_AcrossThreads", TestSpinLockWithThreads);
         TR.Run("Thread_ThreadStatics", TestThreadStatics);
         TR.Run("Thread_EnsureSufficientExecutionStack_Passes", TestEnsureSufficientStackInThread);
@@ -1163,6 +1188,156 @@ public class Kernel : Sys.Kernel
         }
 
         Interlocked.Increment(ref s_throwWorkersDone);
+    }
+
+    private static void TestInterlockedReferenceExchangeTwoThreads()
+    {
+        // Interlocked.CompareExchange on a reference is RhpCheckedLockCmpXchg, and the two
+        // workers claim one slot with it: a claim is from null to the worker's own token, the
+        // release is a plain store of null, and a worker that wins while the other holds the slot
+        // has seen two "successful" exchanges for one slot. The C# read-then-write stub this
+        // replaces lost that race whenever the tick landed between its read and its write.
+        s_exchangeSlot = null;
+        s_exchangeDoubleWins = 0;
+        s_exchangeWins = 0;
+        s_exchangeWorkersDone = 0;
+
+        SysThread[] workers = new SysThread[ExchangeWorkerCount];
+        for (int i = 0; i < ExchangeWorkerCount; i++)
+        {
+            workers[i] = new SysThread(ExchangeClaimWorker);
+        }
+
+        for (int i = 0; i < ExchangeWorkerCount; i++)
+        {
+            workers[i].Start();
+        }
+
+        for (int i = 0; i < ExchangeWorkerCount; i++)
+        {
+            Assert.True(workers[i].Join(ThrowJoinTimeoutMs), "Every exchange worker must finish");
+        }
+
+        Serial.WriteString("[Test] exchange wins: ");
+        Serial.WriteNumber((uint)s_exchangeWins);
+        Serial.WriteString(", double wins: ");
+        Serial.WriteNumber((uint)s_exchangeDoubleWins);
+        Serial.WriteString("\n");
+
+        Assert.Equal(ExchangeWorkerCount, s_exchangeWorkersDone);
+        Assert.True(s_exchangeWins > ExchangeWorkerCount, "Both workers must claim the slot many times over the run");
+        Assert.Equal(0, s_exchangeDoubleWins);
+    }
+
+    private static void ExchangeClaimWorker()
+    {
+        // A fresh object: a null or a frozen literal would let ILC inline the exchange without the stub.
+        object token = new object();
+        int claims = 0;
+        // Runs for ExchangeRunTicks scheduler ticks: the race needs a tick to land between the read
+        // and the write of a broken exchange, so the run is sized in ticks (3 s at 100 Hz), and the
+        // loop body is kept short so that window is a large share of it.
+        uint start = SchedulerManager.TickCount;
+        while (SchedulerManager.TickCount - start < ExchangeRunTicks)
+        {
+            if (Interlocked.CompareExchange(ref s_exchangeSlot, token, null) is not null)
+            {
+                continue;
+            }
+
+            claims++;
+            // The slot is ours: it must still hold our token, and nobody else may have claimed it.
+            if (!ReferenceEquals(Volatile.Read(ref s_exchangeSlot), token))
+            {
+                Interlocked.Increment(ref s_exchangeDoubleWins);
+            }
+
+            Volatile.Write(ref s_exchangeSlot, null);
+        }
+
+        Interlocked.Add(ref s_exchangeWins, claims);
+        Interlocked.Increment(ref s_exchangeWorkersDone);
+    }
+
+    private static void TestThreadIdsUniqueAcrossConcurrentStarts()
+    {
+        // AllocateThreadId was a bare increment: two threads creating threads across a tick
+        // could read the same id. Two workers each start a burst of threads that record the id
+        // the scheduler gave them; every recorded id must be distinct.
+        for (int i = 0; i < s_burstThreadIds.Length; i++)
+        {
+            s_burstThreadIds[i] = 0;
+        }
+
+        s_burstThreadsStarted = 0;
+        s_burstWorkersDone = 0;
+
+        SysThread[] workers = new SysThread[IdBurstWorkerCount];
+        for (int i = 0; i < IdBurstWorkerCount; i++)
+        {
+            workers[i] = new SysThread(IdBurstWorker);
+        }
+
+        for (int i = 0; i < IdBurstWorkerCount; i++)
+        {
+            workers[i].Start();
+        }
+
+        for (int i = 0; i < IdBurstWorkerCount; i++)
+        {
+            Assert.True(workers[i].Join(ThrowJoinTimeoutMs), "Every id-burst worker must finish");
+        }
+
+        Assert.Equal(IdBurstWorkerCount, s_burstWorkersDone);
+        Assert.Equal(s_burstThreadIds.Length, s_burstThreadsStarted);
+
+        int duplicates = 0;
+        for (int i = 0; i < s_burstThreadIds.Length; i++)
+        {
+            Assert.True(s_burstThreadIds[i] != 0, "Every burst thread must record its id");
+            for (int j = i + 1; j < s_burstThreadIds.Length; j++)
+            {
+                if (s_burstThreadIds[i] == s_burstThreadIds[j])
+                {
+                    duplicates++;
+                }
+            }
+        }
+
+        Assert.Equal(0, duplicates);
+    }
+
+    private static void IdBurstWorker()
+    {
+        SysThread[] burst = new SysThread[IdBurstThreadsPerWorker];
+        for (int i = 0; i < IdBurstThreadsPerWorker; i++)
+        {
+            burst[i] = new SysThread(RecordOwnThreadId);
+        }
+
+        for (int i = 0; i < IdBurstThreadsPerWorker; i++)
+        {
+            burst[i].Start();
+        }
+
+        for (int i = 0; i < IdBurstThreadsPerWorker; i++)
+        {
+            burst[i].Join();
+        }
+
+        Interlocked.Increment(ref s_burstWorkersDone);
+    }
+
+    private static void RecordOwnThreadId()
+    {
+        if (SchedulerDiagnostics.TryGetCurrentThread(SchedulerManager.GetCurrentCpuId(), out KernelThreadInfo info))
+        {
+            int slot = Interlocked.Increment(ref s_burstThreadsStarted) - 1;
+            if (slot < s_burstThreadIds.Length)
+            {
+                s_burstThreadIds[slot] = info.Id;
+            }
+        }
     }
 
     private static void Thread1Worker()

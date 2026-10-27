@@ -1,3 +1,5 @@
+using Cosmos.Kernel.Core.CPU;
+
 namespace Cosmos.Kernel.Core.IO;
 
 /// <summary>
@@ -78,8 +80,65 @@ internal static class Serial
     private const string FALSE = "FALSE";
 
     /// <summary>
+    /// The port's lock, held around the bytes of one string, one number or one
+    /// byte sequence, so that two CPUs' lines (or, on one CPU, two threads'
+    /// lines across a preemption) do not interleave byte by byte. Interrupts are
+    /// masked under it: the tick logs too, and would otherwise spin on the
+    /// thread it interrupted. The formatting stays outside: <see cref="Write"/>
+    /// boxes and <c>ToString()</c>s its arguments, which allocates, and nothing
+    /// may allocate under a spinlock. Plain zeroed static data, usable from the
+    /// first byte the kernel writes.
+    /// </summary>
+    private static Scheduler.SpinLock s_lock;
+
+    /// <summary>
+    /// Tries of the lock before a writer gives up and writes anyway. The holder
+    /// is another CPU in the middle of a line, which a few lines' worth of
+    /// polling the port at 115200 baud outlasts; or it is this CPU, interrupted
+    /// by a fault (which no mask stops) whose handler is logging, and that
+    /// message is the one that must get out, garbled at worst, rather than
+    /// hang in silence on the lock its own CPU holds.
+    /// </summary>
+    private const int LockSpinLimit = 1_000_000;
+
+    /// <summary>
+    /// The port taken for one write: interrupts masked, then the lock, for at
+    /// most <see cref="LockSpinLimit"/> tries. Disposing releases what was
+    /// taken, the lock first.
+    /// </summary>
+    private ref struct PortScope
+    {
+        private InternalCpu.InterruptScope _irq;
+        private readonly bool _held;
+
+        public PortScope()
+        {
+            _irq = new InternalCpu.InterruptScope();
+            bool held = false;
+            for (int spin = 0; spin < LockSpinLimit && !held; spin++)
+            {
+                held = s_lock.TryAcquire();
+            }
+
+            _held = held;
+        }
+
+        public void Dispose()
+        {
+            if (_held)
+            {
+                s_lock.Release();
+            }
+
+            _irq.Dispose();
+        }
+    }
+
+    /// <summary>
     /// Write a single byte to the serial port.
     /// Waits for transmit buffer to be ready before writing.
+    /// Unlocked: a caller writing several bytes as one unit goes through
+    /// <see cref="WriteBytes"/>, which takes the port's lock around them.
     /// </summary>
     public static void ComWrite(byte value)
     {
@@ -155,8 +214,54 @@ internal static class Serial
         }
     }
 
+    /// <summary>
+    /// Writes the bytes as one uninterrupted sequence: the port is locked and
+    /// interrupts are masked for the duration, so neither another CPU's line
+    /// nor a trace logged from an interrupt handler can land in the middle of
+    /// them. For binary wire formats that share the port with text output,
+    /// such as the kernel test protocol.
+    /// </summary>
+    /// <param name="bytes">Bytes to write.</param>
+    public static void WriteBytes(ReadOnlySpan<byte> bytes)
+    {
+        PortScope port = new();
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            ComWrite(bytes[i]);
+        }
+
+        port.Dispose();
+    }
+
+    /// <summary>
+    /// Writes a NUL-terminated byte string, as the native code's output comes,
+    /// as one uninterrupted sequence.
+    /// </summary>
+    /// <param name="str">The string; nothing is written for null.</param>
+    public static unsafe void WriteAsciiz(byte* str)
+    {
+        if (str == null)
+        {
+            return;
+        }
+
+        PortScope port = new();
+        // C strings are null-terminated, write char by char
+        // Use while loop with explicit pointer arithmetic to avoid potential codegen issues
+        byte* p = str;
+        while (*p != 0)
+        {
+            EarlyGop.PutChar((char)*p); // Echo to screen for early debugging
+            ComWrite(*p);
+            p++;
+        }
+
+        port.Dispose();
+    }
+
     public static unsafe void WriteString(string str)
     {
+        PortScope port = new();
         fixed (char* ptr = str)
         {
             for (int i = 0; i < str.Length; i++)
@@ -165,25 +270,34 @@ internal static class Serial
                 ComWrite((byte)ptr[i]);
             }
         }
+
+        port.Dispose();
     }
 
-    public static unsafe void WriteNumber(ulong number, bool hex = false)
+    public static void WriteNumber(ulong number, bool hex = false)
     {
-        if (number == 0)
-        {
-            EarlyGop.PutChar('0');
-            ComWrite((byte)'0');
-            return;
-        }
+        WriteNumber(number, hex, negative: false);
+    }
 
-        const int maxDigits = 20; // Enough for 64-bit numbers
+    /// <summary>
+    /// Writes a number: formatted into a stack buffer first, sign included, then
+    /// written under the port's lock as one sequence.
+    /// </summary>
+    private static unsafe void WriteNumber(ulong magnitude, bool hex, bool negative)
+    {
+        const int maxDigits = 21; // Enough for 64-bit numbers and a sign
         byte* buffer = stackalloc byte[maxDigits];
         int index = 0;
         ulong baseValue = hex ? 16u : 10u;
 
-        while (number > 0)
+        if (magnitude == 0)
         {
-            ulong digit = number % baseValue;
+            buffer[index++] = (byte)'0';
+        }
+
+        while (magnitude > 0)
+        {
+            ulong digit = magnitude % baseValue;
             if (hex && digit >= 10)
             {
                 buffer[index] = (byte)('A' + (digit - 10));
@@ -192,16 +306,24 @@ internal static class Serial
             {
                 buffer[index] = (byte)('0' + digit);
             }
-            number /= baseValue;
+            magnitude /= baseValue;
             index++;
         }
 
+        if (negative)
+        {
+            buffer[index++] = (byte)'-';
+        }
+
         // Write digits in reverse order
+        PortScope port = new();
         for (int i = index - 1; i >= 0; i--)
         {
             EarlyGop.PutChar((char)buffer[i]);
             ComWrite(buffer[i]);
         }
+
+        port.Dispose();
     }
 
     public static void WriteNumber(uint number, bool hex = false)
@@ -211,29 +333,19 @@ internal static class Serial
 
     public static void WriteNumber(int number, bool hex = false)
     {
-        if (number < 0)
-        {
-            EarlyGop.PutChar('-');
-            ComWrite((byte)'-');
-            WriteNumber((ulong)(-number), hex);
-        }
-        else
-        {
-            WriteNumber((ulong)number, hex);
-        }
+        WriteNumber((long)number, hex);
     }
 
     public static void WriteNumber(long number, bool hex = false)
     {
         if (number < 0)
         {
-            EarlyGop.PutChar('-');
-            ComWrite((byte)'-');
-            WriteNumber((ulong)(-number), hex);
+            // unchecked: long.MinValue negated overflows, and its magnitude is the wrap.
+            WriteNumber(unchecked((ulong)(-number)), hex, negative: true);
         }
         else
         {
-            WriteNumber((ulong)number, hex);
+            WriteNumber((ulong)number, hex, negative: false);
         }
     }
 

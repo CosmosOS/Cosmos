@@ -328,11 +328,16 @@ namespace Cosmos.Kernel.Core.Runtime
         /// <remarks>
         /// A cell's target only depends on the type: the dispatch cells of the
         /// image, and the ones <see cref="RhNewInterfaceDispatchCell"/> makes for
-        /// the type loader, live as long as the kernel. The entry is written with
-        /// interrupts off, so that no thread reads it half-written (Cosmos runs
-        /// on one CPU), and its sequence changes: a stub that read part of it
-        /// before the thread writing it took the CPU sees the change, and
-        /// resolves the call.
+        /// the type loader, live as long as the kernel. The entry is a seqlock:
+        /// its sequence is odd while it is written, and a stub that read part of
+        /// it before or during a write sees the change and resolves the call.
+        /// The writer claims the entry by moving the sequence from even to odd
+        /// with a compare-exchange, so a second writer (another CPU resolving a
+        /// call that hashes to the same entry) backs off instead of interleaving
+        /// its stores with the first; the call it resolved is served from the
+        /// return value, and the next one resolves again. Interrupts stay off
+        /// meanwhile so a tick cannot leave the entry odd, unusable, for a
+        /// quantum.
         /// </remarks>
         private static void Remember(IntPtr cell, MethodTable* type, IntPtr target)
         {
@@ -343,12 +348,16 @@ namespace Cosmos.Kernel.Core.Runtime
             }
 
             InternalCpu.InterruptScope scope = InternalCpu.DisableInterruptsScope();
-            nuint sequence = entry->Sequence;
-            Volatile.Write(ref entry->Sequence, sequence + 1);
-            entry->Cell = (nuint)cell;
-            entry->Type = type;
-            entry->Target = (nuint)target;
-            Volatile.Write(ref entry->Sequence, sequence + 2);
+            nuint sequence = Volatile.Read(ref entry->Sequence);
+            if ((sequence & 1) == 0 &&
+                Interlocked.CompareExchange(ref entry->Sequence, sequence + 1, sequence) == sequence)
+            {
+                entry->Cell = (nuint)cell;
+                entry->Type = type;
+                entry->Target = (nuint)target;
+                Volatile.Write(ref entry->Sequence, sequence + 2);
+            }
+
             scope.Dispose();
         }
 
@@ -379,9 +388,10 @@ namespace Cosmos.Kernel.Core.Runtime
         [RuntimeExport("RhNewInterfaceDispatchCell")]
         internal static IntPtr RhNewInterfaceDispatchCell(MethodTable* pInterface, int slotNumber)
         {
-            // Allocate two cells (8 bytes * 2 = 16 bytes on 32-bit, 16 bytes * 2 = 32 bytes on 64-bit)
+            // Allocate two cells (8 bytes * 2 = 16 bytes on 32-bit, 16 bytes * 2 = 32 bytes on 64-bit),
+            // through the heap's locked entry rather than the small heap directly.
             InterfaceDispatchCell* pCell = (InterfaceDispatchCell*)
-                SmallHeap.Alloc((uint)(sizeof(InterfaceDispatchCell) * 2));
+                Heap.Alloc((uint)(sizeof(InterfaceDispatchCell) * 2));
 
             if (pCell == null)
             {

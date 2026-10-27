@@ -132,14 +132,11 @@ namespace Cosmos.Kernel.Core.Runtime
             *location = value;
         }
 
-        [RuntimeExport("RhpCheckedXchg")]
-        internal static void* InterlockedExchange(void** location1, void* value)
-        {
-            void* original = *location1;
-            *location1 = value;
-            return original;
-        }
-
+        // RhpCheckedXchg and RhpCheckedLockCmpXchg, the reference forms of
+        // Interlocked.Exchange and CompareExchange, are assembly (Runtime.s of
+        // Cosmos.Kernel.Native.X64 and .ARM64): a locked instruction, or an
+        // exclusive load/store loop. In C# they were a read then a write, and a
+        // tick between the two let a second thread's exchange succeed as well.
 
         [RuntimeExport("RhpTrapThreads")]
         internal static void RhpTrapThreads() { }
@@ -163,18 +160,6 @@ namespace Cosmos.Kernel.Core.Runtime
         internal static unsafe void RhBulkMoveWithWriteBarrier(void* dest, void* src, UIntPtr len)
         {
             memmove((byte*)dest, (byte*)src, len);
-        }
-
-        [RuntimeExport("RhpCheckedLockCmpXchg")]
-        internal static unsafe object RhpCheckedLockCmpXchg(object* location, object value, object comparand, int typeHandle)
-        {
-            object original = *location;
-            if (original == comparand)
-            {
-                *location = value;
-            }
-
-            return original;
         }
 
         [RuntimeExport("RhGetProcessCpuCount")]

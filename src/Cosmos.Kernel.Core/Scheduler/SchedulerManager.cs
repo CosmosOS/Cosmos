@@ -274,9 +274,10 @@ public static class SchedulerManager
     }
 
     /// <summary>
-    /// Allocates a new unique thread ID.
+    /// Allocates a new unique thread ID. Atomic: threads are created from any
+    /// thread, and a bare increment read by two of them handed out one id twice.
     /// </summary>
-    internal static uint AllocateThreadId() => s_nextThreadId++;
+    internal static uint AllocateThreadId() => Interlocked.Increment(ref s_nextThreadId) - 1;
 
     // ========== Thread Entry Dispatch ==========
     [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "StartThread")]
@@ -1027,7 +1028,8 @@ public static class SchedulerManager
     /// <param name="elapsedNs">Nanoseconds since last tick.</param>
     internal static void OnTimerInterrupt(uint cpuId, nuint currentRsp, ulong elapsedNs)
     {
-        s_tickCount++;
+        // Atomic: one tick per CPU, and the counters are read from any thread.
+        uint tick = Interlocked.Increment(ref s_tickCount);
 
         // Recorded before the early returns below, so the period is readable
         // whether or not the scheduler is armed yet. The timer owns this
@@ -1039,7 +1041,7 @@ public static class SchedulerManager
         // Refresh the debug-live snapshot every 10 ticks (~100ms at 100Hz)
         // so the host-side QMP poller sees fresh thread state without
         // pausing the kernel.
-        if ((s_tickCount % SnapshotRefreshTickInterval) == 0)
+        if ((tick % SnapshotRefreshTickInterval) == 0)
         {
             Runtime.DebugLiveSnapshot.Update();
             Runtime.DebugLiveGCSnapshot.Update();
@@ -1050,10 +1052,10 @@ public static class SchedulerManager
         // live. This runs in the timer ISR with interrupts masked, and a
         // periodic line would stall every IRQ on polled UART bytes for the
         // whole uptime.
-        if (s_tickCount <= InitialTickLogCount)
+        if (tick <= InitialTickLogCount)
         {
             Serial.WriteString("[SCHED] Tick ");
-            Serial.WriteNumber(s_tickCount);
+            Serial.WriteNumber(tick);
             Serial.WriteString(" enabled=");
             Serial.WriteString(s_enabled ? "1" : "0");
             Serial.WriteString("\n");
@@ -1193,7 +1195,7 @@ public static class SchedulerManager
 
         if (next != prev)
         {
-            s_switchCount++;
+            Interlocked.Increment(ref s_switchCount);
 
             /*
             Serial.WriteString("[SCHED] Context switch: thread ");
