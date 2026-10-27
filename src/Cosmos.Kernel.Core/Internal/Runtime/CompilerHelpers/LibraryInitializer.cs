@@ -1,3 +1,4 @@
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
@@ -15,6 +16,13 @@ internal class LibraryInitializer
     /// </summary>
     public static void InitializeLibrary()
     {
+        // The boot CPU's per-CPU block, before anything else: from here on the exception stubs
+        // find the ExInfo chain head through the per-CPU register and the interrupt stubs stage
+        // the context switch through it, so a throw anywhere below works and the platform can
+        // turn interrupts on. The only managed code that runs earlier is RhpRegisterOsModule's
+        // three serial writes, from kmain.
+        PerCpuBlock.InstallBootCpu();
+
         // Initialize heap for memory allocations
         Serial.WriteString("[KERNEL]   - Initializing heap...\n");
         MemoryOp.InitializeHeap(0, 0);
