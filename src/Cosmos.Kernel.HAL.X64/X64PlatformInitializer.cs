@@ -196,7 +196,10 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
     public uint GetCpuCount()
     {
-        return AcpiMadt.CpuCount;
+        // The bootloader's list, not the MADT's: it is what Limine could start, and the index
+        // the scheduler gives a CPU follows that list (SMP phase 2). The MADT keeps the I/O APIC
+        // and the overrides.
+        return Smp.CpuCount;
     }
 
     public void StartSchedulerTimer(uint quantumMs)

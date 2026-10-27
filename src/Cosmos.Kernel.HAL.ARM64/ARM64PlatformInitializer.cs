@@ -439,8 +439,9 @@ internal class ARM64PlatformInitializer : IPlatformInitializer
 
     public uint GetCpuCount()
     {
-        // For now, single CPU on ARM64
-        return 1;
+        // The bootloader's list: every CPU Limine could start through PSCI, in the order the
+        // scheduler indexes them by (SMP phase 2). One on a boot it could not enumerate.
+        return Smp.CpuCount;
     }
 
     public void StartSchedulerTimer(uint quantumMs)
