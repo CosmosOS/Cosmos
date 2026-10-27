@@ -407,7 +407,7 @@ Corruption detection: the `TestSuiteEnd` payload is validated by checking `total
 
 ### Host Requests
 
-A test calls `TR.RequestHost(request)` when it needs the machine changed under it, and the engine carries the request out through QEMU's QMP monitor as soon as the frame shows up on the UART:
+A test calls `TR.RequestHost(request)` when it needs the machine changed under it, or the host to act, and the engine carries the request out as soon as the frame shows up on the UART, through QEMU's QMP monitor for the machine requests and through its own TCP test server for `tcp-connect`:
 
 | Request | Effect |
 |---------|--------|
@@ -420,6 +420,7 @@ A test calls `TR.RequestHost(request)` when it needs the machine changed under i
 | `key-press <qcode>` | Presses and releases one key by its QEMU QKeyCode name (`a`, `ret`, `spc`, ...); QEMU releases it after its default hold time of 100 ms |
 | `mouse-move <dx> <dy>` | Moves the pointer by `dx`, `dy` in device units, as one `input-send-event` with two relative events |
 | `mouse-button <left or middle or right> <down or up>` | Presses or releases a pointer button |
+| `tcp-connect` | Connects the engine's TCP test server to the kernel's TCP server on port 5558 and runs the `TEST_FROM_HOST` echo exchange; the Network suite's `TCP_ServerAccept` sends it right after `listener.Start()`, so the SYN leaves while the listener is up (port 5558 is a `hostfwd`, which slirp accepts on the host side at once and delivers to the guest on its own retransmit schedule, 6 then 12 s apart: a connect made on a clock missed a listener that came up late, #3361) |
 
 Nothing replies. The test waits for the change itself, and must see it within 10 s: that long without a protocol message and the engine takes the kernel for hung. The keyboard requests take no index: a profile has one `usb-kbd` keyboard at most; the PCI requests index the profile's hot-pluggable disks (`"hotplug": true` on a `virtio-blk` disk). Every cell launches QEMU with a monitor; a request the run cannot carry out is reported and dropped (`[Monitor] usb-kbd-unplug failed: the profile attaches no USB keyboard`), and the guest's test fails by timing out. The Storage suite's `UsbHotPlug_*` and `PciHotPlug_*` tests and the Drivers suite's `Usb_Keyboard_*`, `Usb_Mouse_*`, `Ps2_*` and `Pci_HotPlug_*` tests are the examples.
 

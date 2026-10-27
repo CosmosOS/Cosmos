@@ -142,7 +142,7 @@ public class QemuARM64Host : IQemuHost
 
             // Monitor UART log for the suite-end marker or a stall after a test
             // was reached, while waiting for QEMU to exit on its own.
-            Task<UartMonitorOutcome> monitorTask = MonitorUartLogAsync(uartLogPath, monitor, cts.Token);
+            Task<UartMonitorOutcome> monitorTask = MonitorUartLogAsync(uartLogPath, monitor, tcpServer, cts.Token);
             Task processTask = process.WaitForExitAsync(cts.Token);
 
             Task completedTask = await Task.WhenAny(monitorTask, processTask);
@@ -274,7 +274,7 @@ public class QemuARM64Host : IQemuHost
     /// Monitor UART log for the suite-end marker or a stall after a test was
     /// reached. See <see cref="QemuX64Host"/> for the full rationale.
     /// </summary>
-    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, QemuMonitor? monitor, CancellationToken cancellationToken)
+    private static async Task<UartMonitorOutcome> MonitorUartLogAsync(string uartLogPath, QemuMonitor? monitor, TcpTestServer? tcpServer, CancellationToken cancellationToken)
     {
         long lastPosition = 0;
         int endMarkerIndex = 0;
@@ -305,10 +305,16 @@ public class QemuARM64Host : IQemuHost
                             byte b = buffer[i];
 
                             // The guest's test waits for what it asked, so it is
-                            // done now rather than after the run.
+                            // done now rather than after the run. The TCP test
+                            // server's own request goes to it; the rest go to
+                            // QEMU's monitor.
                             if (hostRequests.Feed(b) is string request)
                             {
-                                await QemuMonitor.DispatchAsync(monitor, request, cancellationToken);
+                                if (tcpServer is null || !tcpServer.TryDispatch(request))
+                                {
+                                    await QemuMonitor.DispatchAsync(monitor, request, cancellationToken);
+                                }
+
                                 lastMagicAt = DateTime.UtcNow;
                             }
 

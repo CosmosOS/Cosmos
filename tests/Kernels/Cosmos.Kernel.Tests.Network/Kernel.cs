@@ -42,6 +42,20 @@ public class Kernel : Sys.Kernel
     private const ushort TcpServerPort = 5558;  // Kernel listens, test runner connects
     private const ushort TcpLingerPort = 5559;  // Kernel connects, test runner echoes but never closes its side
 
+    // The host request TCP_ServerAccept sends once its listener is up: the
+    // engine's TcpTestServer then connects to TcpServerPort and runs the echo
+    // exchange. Port 5558 is a QEMU hostfwd, so a connect the engine made on
+    // its own clock was accepted by slirp before the guest listened and
+    // reached it as a SYN on slirp's retransmit schedule, 6 then 12 s apart,
+    // which misses a listener that comes up late (#3361).
+    private const string TcpConnectRequest = "tcp-connect";
+
+    // How long TCP_ServerAccept waits for the engine's connection after the
+    // request, in 100 ms polls. Under the engine's 10 s stall window: the
+    // request is the cell's last protocol frame before the wait, so a
+    // connection that never comes fails the cell, not the run.
+    private const int TcpAcceptWaitMilliseconds = 8000;
+
     // The second adapter of the multi-adapter DHCP cells: its MAC, and a static
     // configuration on a network the profile's NIC is not on, so a lookup that
     // lands on it is a wrong answer.
@@ -1097,13 +1111,15 @@ public class Kernel : Sys.Kernel
             var listener = new DotNetTcpListener(IPAddress.Any, TcpServerPort);
             listener.Start();
 
-            Log.WriteString("[Test] Listening, waiting for connection from test runner...\n");
+            // The listener is up: ask the engine to connect now, so the SYN
+            // leaves while something answers it.
+            TR.RequestHost(TcpConnectRequest);
+            Log.WriteString("[Test] Listening, asked the test runner to connect...\n");
 
-            // Wait for connection from test runner (it connects after a delay)
             DotNetTcpClient? client = null;
             int waitTime = 0;
 
-            while (client == null && waitTime < 10000)
+            while (client == null && waitTime < TcpAcceptWaitMilliseconds)
             {
                 if (listener.Pending())
                 {

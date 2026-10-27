@@ -11,12 +11,26 @@ namespace Cosmos.TestRunner.Engine.Hosts;
 /// TCP test server for network testing with QEMU guests.
 /// Handles three test scenarios:
 /// 1. ClientConnectTest: Listens for kernel's TCP connection, receives data and echoes it back
-/// 2. ServerConnectTest: Connects to the kernel's TCP server and sends data, expects echo
+/// 2. ServerConnectTest: Connects to the kernel's TCP server when the kernel asks for it
+///    (<see cref="ConnectRequest"/>), sends data, expects echo
 /// 3. CloseNoPeerFinTest: Listens for kernel's TCP connection, echoes, then deliberately
 ///    keeps its side of the connection open — the kernel's Close() must still succeed (issue #369)
 /// </summary>
 public class TcpTestServer : IDisposable
 {
+    /// <summary>
+    /// The host request a kernel test sends once its listener is up: the
+    /// server then connects to the kernel's TCP server and runs the echo
+    /// exchange. Port 5558 is a QEMU <c>hostfwd</c>, so a connect from this
+    /// side is accepted by slirp whether or not the guest listens yet, and
+    /// what reaches the guest is slirp's SYN on its own retransmit schedule
+    /// (6 s, then 12 s apart); a connect on a clock therefore misses a
+    /// listener that comes up late, as it does on an arm64 runner without
+    /// KVM (CosmosOS/Cosmos#3361). The request makes the SYN leave while
+    /// the listener is up, by construction.
+    /// </summary>
+    public const string ConnectRequest = "tcp-connect";
+
     private readonly int _listenPort;
     private readonly int _connectPort;
     private readonly int _lingerPort;
@@ -42,6 +56,11 @@ public class TcpTestServer : IDisposable
     /// Last data received from kernel.
     /// </summary>
     public string? LastReceivedFromKernel { get; private set; }
+
+    /// <summary>
+    /// What the kernel's TCP server echoed back on the last <see cref="ConnectRequest"/>, null until it did.
+    /// </summary>
+    public string? LastEchoFromKernel { get; private set; }
 
     /// <summary>
     /// Creates a new TCP test server.
@@ -70,6 +89,7 @@ public class TcpTestServer : IDisposable
         ConnectionsAccepted = 0;
         EchosSent = 0;
         LastReceivedFromKernel = null;
+        LastEchoFromKernel = null;
 
         // Task 1: Listen for kernel's TCP connections (kernel connects to us)
         try
@@ -84,16 +104,9 @@ public class TcpTestServer : IDisposable
             Console.WriteLine($"[TcpTestServer] Failed to start listener: {ex.Message}");
         }
 
-        // Task 2: Connect to kernel's TCP server after delay (kernel listens, we connect)
-        try
-        {
-            _connectTask = ConnectToKernelAsync(_cts.Token);
-            Console.WriteLine($"[TcpTestServer] Will connect to kernel on port {_connectPort}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[TcpTestServer] Failed to start connect task: {ex.Message}");
-        }
+        // Task 2, the connect to the kernel's TCP server, starts on the
+        // kernel's request (TryDispatch), not here: see ConnectRequest.
+        Console.WriteLine($"[TcpTestServer] Will connect to kernel on port {_connectPort} when it asks ({ConnectRequest})");
 
         // Task 3: Listen for kernel connections that we echo but never close
         // ourselves — validates the kernel's Close() against a lingering peer.
@@ -165,6 +178,31 @@ public class TcpTestServer : IDisposable
         {
             Console.WriteLine($"[TcpTestServer] Last received from kernel: {LastReceivedFromKernel}");
         }
+    }
+
+    /// <summary>
+    /// Carries out a host request addressed to this server: on
+    /// <see cref="ConnectRequest"/>, starts the connect-and-echo exchange
+    /// with the kernel's TCP server and returns at once, the exchange running
+    /// on its own task so the caller's UART scan is not held. Returns false
+    /// for any other request, which is not this server's to handle.
+    /// </summary>
+    public bool TryDispatch(string request)
+    {
+        if (request != ConnectRequest)
+        {
+            return false;
+        }
+
+        if (_cts is null)
+        {
+            Console.WriteLine($"[TcpTestServer] Ignored '{request}': the server is not running");
+            return true;
+        }
+
+        Console.WriteLine($"[TcpTestServer] {request}: connecting to kernel on port {_connectPort}");
+        _connectTask = ConnectToKernelAsync(_cts.Token);
+        return true;
     }
 
     /// <summary>
@@ -311,12 +349,12 @@ public class TcpTestServer : IDisposable
     /// <summary>
     /// Connects to kernel's TCP server and sends test data.
     /// Kernel listens, we connect and send "TEST_FROM_HOST", expect echo.
+    /// Runs when the kernel asks (<see cref="ConnectRequest"/>), so its
+    /// listener is up when the SYN leaves; the attempts below cover a
+    /// connect the host side refuses, not a guest that is not ready.
     /// </summary>
     private async Task ConnectToKernelAsync(CancellationToken cancellationToken)
     {
-        // Wait for kernel to initialize and start listening
-        await Task.Delay(4000, cancellationToken);
-
         int attempts = 0;
         while (!cancellationToken.IsCancellationRequested && attempts < 10)
         {
@@ -342,6 +380,7 @@ public class TcpTestServer : IDisposable
                 if (bytesRead > 0)
                 {
                     string echoData = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    LastEchoFromKernel = echoData;
                     Console.WriteLine($"[TcpTestServer] Received echo from kernel: '{echoData}'");
                 }
 
