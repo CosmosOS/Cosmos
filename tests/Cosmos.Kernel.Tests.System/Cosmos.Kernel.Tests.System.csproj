@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\Cosmos.Kernel.HAL\Cosmos.Kernel.HAL.csproj" />
       <ProjectReference Include="..\..\src\Cosmos.Kernel.System\Cosmos.Kernel.System.csproj" />
     </ItemGroup>
 </Project>
