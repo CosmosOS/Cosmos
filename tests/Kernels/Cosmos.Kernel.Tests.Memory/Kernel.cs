@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Tests.Memory;
 public unsafe class Kernel : Sys.Kernel
 {
     /// <summary>Number of test cases registered with the TestRunner in BeforeRun.</summary>
-    private const int ExpectedTestCount = 71;
+    private const int ExpectedTestCount = 74;
 
     /// <summary>Expected argv length: argv[0] ("cosmos") plus the 3 args passed by limine.conf.</summary>
     private const int ExpectedArgvLength = 4;
@@ -105,6 +105,12 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("Boxing_Enum", TestBoxingEnum);
         TR.Run("Boxing_ValueTuple", TestBoxingValueTuple);
         TR.Run("Boxing_NullInterface", TestBoxingNullInterface);
+
+        // Struct equality: ValueType.Equals/GetHashCode, byte-wise or field by
+        // field through the ILC-injected __GetFieldHelper and RhBoxAny (#3362)
+        TR.Run("StructEquals_BitwiseFields", TestStructEqualsBitwiseFields);
+        TR.Run("StructEquals_RecordStructReferenceField", TestRecordStructEqualsReferenceField);
+        TR.Run("StructEquals_ReferenceField", TestStructEqualsReferenceField);
 
         // Memory Allocation Tests
         TR.Run("Memory_CharArray", TestCharArrayAllocation);
@@ -307,6 +313,68 @@ public unsafe class Kernel : Sys.Kernel
         IComparable comparable = null;
         object boxed = comparable;
         Assert.True(boxed == null, "Boxing: null interface is null object");
+    }
+
+    // ==================== Struct Equality Tests ====================
+    // ValueType.Equals compares a struct without GC references byte by byte.
+    // A struct with a reference field gets an ILC-injected __GetFieldHelper
+    // override and is compared field by field: CoreLib boxes each field
+    // through RhBoxAny, which for a reference-typed field must return the
+    // reference stored in the field, not the field's address (CosmosOS/Cosmos#3362).
+
+    private static void TestStructEqualsBitwiseFields()
+    {
+        TestPoint a = new TestPoint { X = 10, Y = 20 };
+        TestPoint same = new TestPoint { X = 10, Y = 20 };
+        TestPoint other = new TestPoint { X = 10, Y = 21 };
+
+        Assert.True(a.Equals(same), "StructEquals: bitwise struct equals the same values");
+        Assert.False(a.Equals(other), "StructEquals: bitwise struct differs on one field");
+        Assert.False(a.Equals(null), "StructEquals: bitwise struct never equals null");
+        Assert.True(a.GetHashCode() == same.GetHashCode(), "StructEquals: bitwise struct hash codes agree");
+        Assert.True(EqualityComparer<TestPoint>.Default.Equals(a, same), "StructEquals: EqualityComparer<T>.Default on a bitwise struct");
+    }
+
+    private static void TestRecordStructEqualsReferenceField()
+    {
+        // A record struct implements IEquatable<T> itself and compares its
+        // fields through EqualityComparer<TField>.Default, never through
+        // ValueType.Equals: it works whatever RhBoxAny does.
+        TestTaggedRecord a = new TestTaggedRecord(20, new string('t', 3));
+        TestTaggedRecord same = new TestTaggedRecord(20, "ttt");
+        TestTaggedRecord otherTag = new TestTaggedRecord(20, "other");
+
+        Assert.True(a.Equals(same), "StructEquals: record struct equals the same values");
+        Assert.True(a == same, "StructEquals: record struct == on the same values");
+        Assert.True(a != otherTag, "StructEquals: record struct != on another tag");
+        Assert.True(a.Equals((object)same), "StructEquals: record struct Equals(object)");
+        Assert.False(a.Equals(default(TestTaggedRecord)), "StructEquals: record struct vs default");
+        Assert.True(EqualityComparer<TestTaggedRecord>.Default.Equals(a, same), "StructEquals: EqualityComparer<T>.Default on a record struct");
+        Assert.True(a.GetHashCode() == same.GetHashCode(), "StructEquals: record struct hash codes agree");
+    }
+
+    private static void TestStructEqualsReferenceField()
+    {
+        // The issue's shape: a plain struct with an int and a string, compared
+        // with the inherited ValueType.Equals. The string of `same` is built at
+        // run time so the two fields hold distinct objects with equal contents.
+        TestTaggedValue a = new TestTaggedValue { Value = 20, Tag = "ttt" };
+        TestTaggedValue same = new TestTaggedValue { Value = 20, Tag = new string('t', 3) };
+        TestTaggedValue otherTag = new TestTaggedValue { Value = 20, Tag = "other" };
+        TestTaggedValue otherValue = new TestTaggedValue { Value = 21, Tag = "ttt" };
+        TestTaggedValue untagged = new TestTaggedValue { Value = 20, Tag = null };
+
+        Assert.True(a.Equals(same), "StructEquals: reference field struct equals the same values");
+        Assert.False(a.Equals(otherTag), "StructEquals: reference field struct differs on the string");
+        Assert.False(a.Equals(otherValue), "StructEquals: reference field struct differs on the int");
+        Assert.False(a.Equals(untagged), "StructEquals: reference field struct vs a null field");
+        Assert.False(untagged.Equals(a), "StructEquals: null field vs a reference field struct");
+        Assert.True(untagged.Equals(new TestTaggedValue { Value = 20 }), "StructEquals: two null fields are equal");
+        Assert.False(a.Equals(default(TestTaggedValue)), "StructEquals: reference field struct vs default");
+        Assert.True(Equals(a, same), "StructEquals: object.Equals(a, b) on a reference field struct");
+        Assert.False(EqualityComparer<TestTaggedValue>.Default.Equals(a, default), "StructEquals: EqualityComparer<T>.Default vs default");
+        Assert.True(EqualityComparer<TestTaggedValue>.Default.Equals(a, same), "StructEquals: EqualityComparer<T>.Default on the same values");
+        Assert.True(a.GetHashCode() == same.GetHashCode(), "StructEquals: reference field struct hash codes agree");
     }
 
     // ==================== Memory Allocation Tests ====================
@@ -1268,3 +1336,13 @@ internal struct TestPoint
     public int X;
     public int Y;
 }
+
+// Struct with a reference field: ValueType.Equals compares it field by field
+internal struct TestTaggedValue
+{
+    public int Value;
+    public string? Tag;
+}
+
+// Record struct with a reference field: the compiler generates its own Equals
+internal readonly record struct TestTaggedRecord(int Value, string Tag);
