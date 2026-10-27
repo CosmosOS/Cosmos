@@ -2,8 +2,10 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.System.Diagnostics;
@@ -12,6 +14,7 @@ using Cosmos.Kernel.System.Sessions;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
+using BootStack = Cosmos.Kernel.Core.Runtime.BootStack;
 using Monitor = System.Threading.Monitor;
 using SysThread = System.Threading.Thread;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -21,7 +24,22 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 89;
+    private const int ExpectedTestCount = 95;
+
+    /// <summary>Size of one per-CPU block, as <c>PerCpuBlock</c> lays it out and the native stubs assume.</summary>
+    private const int PerCpuBlockNativeSize = 128;
+    /// <summary>Slot offsets the native stubs use (<c>CpuOps.s</c>, <c>Interrupts.s</c>, <c>ExceptionHandling.s</c>); the managed layout must agree with them.</summary>
+    private const int PerCpuSelfOffset = 0x00;
+    private const int PerCpuCpuIndexOffset = 0x08;
+    private const int PerCpuHardwareIdOffset = 0x10;
+    private const int PerCpuSwitchTargetSpOffset = 0x18;
+    private const int PerCpuSwitchIsNewThreadOffset = 0x20;
+    private const int PerCpuTempIsNewThreadOffset = 0x28;
+    private const int PerCpuLastErrorCodeOffset = 0x30;
+    private const int PerCpuCurrentExInfoHeadOffset = 0x38;
+    private const int PerCpuBootStackTopOffset = 0x40;
+    private const int PerCpuOnlineOffset = 0x48;
+    private const int PerCpuStoppedForGcOffset = 0x50;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -221,6 +239,15 @@ public class Kernel : Sys.Kernel
         TR.Run("Thread_MaxStackSize_TinyRequestIsFloored", TestThreadTinyStackSizeFloored);
         TR.Run("Thread_Kill_Queued_StopsManagedSide", TestKillQueuedThreadStopsManagedSide);
         TR.Run("ScheduleFromInterrupt_UnregisteredCpu_IsNoOp", TestScheduleFromInterruptIgnoresUnregisteredCpu);
+
+        // The per-CPU block (CosmosOS/Cosmos#3338, SMP phase 1): the running CPU finds its
+        // identity, its boot stack and the running thread's exception chain through it
+        TR.Run("PerCpuBlock_Layout_MatchesNativeTable", TestPerCpuBlockLayoutMatchesNative);
+        TR.Run("PerCpuBlock_BootCpu_IsIndexZeroAndOnline", TestPerCpuBlockBootCpuIsIndexZero);
+        TR.Run("PerCpuBlock_BootStackTop_BoundsMainThreadStack", TestPerCpuBlockBootStackTopBoundsMainStack);
+        TR.Run("PerCpuBlock_ExInfoHead_FollowsCurrentThread", TestPerCpuBlockExInfoHeadFollowsCurrentThread);
+        TR.Run("PerCpuBlock_ExInfoChain_EmptyAfterCatchAndRethrow", TestPerCpuBlockExInfoChainEmptyAfterCatch);
+        TR.Run("Thread_GetCurrentProcessorId_IsBootCpu", TestThreadGetCurrentProcessorIdIsBootCpu);
         TR.Run("Mutex_IdleThreadContention_KeepsTicketAccounting", TestMutexIdleThreadContention);
         TR.Run("ConditionVariable_IdleThreadWait_KeepsTicketAccounting", TestConditionVariableIdleThreadWait);
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
@@ -1482,6 +1509,133 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.False(threw, "an unregistered CPU id must leave the interrupt path silently, not raise");
+    }
+
+    // ==================== Per-CPU block (SMP phase 1) ====================
+
+    // The native stubs reach the block's slots by the offsets they assume (the context switch
+    // staging in Interrupts.s, the ExInfo chain head in ExceptionHandling.s, the index and the
+    // self pointer in CpuOps.s); the managed layout, the layout's home, must put every field at
+    // the offset the stubs use.
+    private static unsafe void TestPerCpuBlockLayoutMatchesNative()
+    {
+        PerCpuBlock block = default;
+        byte* start = (byte*)&block;
+
+        Assert.Equal(PerCpuBlockNativeSize, sizeof(PerCpuBlock), "the block is the size the stubs assume");
+        Assert.Equal(PerCpuBlockNativeSize, PerCpuBlock.Size, "PerCpuBlock.Size is that size");
+        Assert.Equal(PerCpuSelfOffset, (int)((byte*)&block.Self - start), "Self");
+        Assert.Equal(PerCpuCpuIndexOffset, (int)((byte*)&block.CpuIndex - start), "CpuIndex");
+        Assert.Equal(PerCpuHardwareIdOffset, (int)((byte*)&block.HardwareId - start), "HardwareId");
+        Assert.Equal(PerCpuSwitchTargetSpOffset, (int)((byte*)&block.SwitchTargetSp - start), "SwitchTargetSp");
+        Assert.Equal(PerCpuSwitchIsNewThreadOffset, (int)((byte*)&block.SwitchIsNewThread - start), "SwitchIsNewThread");
+        Assert.Equal(PerCpuTempIsNewThreadOffset, (int)((byte*)&block.TempIsNewThread - start), "TempIsNewThread");
+        Assert.Equal(PerCpuLastErrorCodeOffset, (int)((byte*)&block.LastErrorCode - start), "LastErrorCode");
+        Assert.Equal(PerCpuCurrentExInfoHeadOffset, (int)((byte*)&block.CurrentExInfoHead - start), "CurrentExInfoHead");
+        Assert.Equal(PerCpuBootStackTopOffset, (int)((byte*)&block.BootStackTop - start), "BootStackTop");
+        Assert.Equal(PerCpuOnlineOffset, (int)((byte*)&block.Online - start), "Online");
+        Assert.Equal(PerCpuStoppedForGcOffset, (int)((byte*)&block.StoppedForGc - start), "StoppedForGc");
+    }
+
+    // Core's library initializer installs block 0 on the boot CPU, the first managed code the
+    // boot runs: the CPU index the scheduler indexes its state by, the staging the stubs consume
+    // and the block's own address all come from there.
+    private static unsafe void TestPerCpuBlockBootCpuIsIndexZero()
+    {
+        ref PerCpuBlock block = ref PerCpuBlock.Current;
+
+        Assert.Equal(0, (int)block.CpuIndex, "the boot CPU is index 0");
+        Assert.Equal(0, (int)SchedulerManager.GetCurrentCpuId(), "GetCurrentCpuId reads the block's index");
+        Assert.Equal(0, (int)PerCpuBlock.CurrentIndex, "CurrentIndex reads the block's index");
+        Assert.True(block.Self == (nuint)Unsafe.AsPointer(ref block), "Self is the block's own address");
+        Assert.True(Unsafe.AreSame(ref block, ref PerCpuBlock.At(0)), "the running CPU's block is block 0 of the table");
+        Assert.True(block.Online == 1, "the boot CPU is online");
+        Assert.True(block.SwitchTargetSp == 0, "no context switch is staged while a thread runs");
+        Assert.True(PerCpuBlock.At(1).Online == 0 && PerCpuBlock.At(1).CpuIndex == 0, "block 1 is not installed: no application processor runs yet");
+    }
+
+    // BeforeRun runs on CPU 0's idle thread, the boot thread, on the bootloader stack whose top
+    // kmain captured and the block carries: the live stack pointer lies below it, within the
+    // stack's size.
+    private static void TestPerCpuBlockBootStackTopBoundsMainStack()
+    {
+        SchedulerThread? current = SchedulerManager.CurrentCpuState?.CurrentThread;
+        Assert.True(current is not null && current.IsIdle, "BeforeRun runs on CPU 0's idle thread, on the bootloader stack");
+
+        nuint sp = ContextSwitchNative.GetSp();
+        nuint top = PerCpuBlock.Current.BootStackTop;
+        Assert.True(top != 0, "block 0 carries the boot stack top kmain captured");
+        Assert.True(sp < top, "the main thread's stack pointer lies below the boot stack top");
+        Assert.True(top - sp <= BootStack.Size, "the main thread's stack pointer lies within the boot stack's size");
+        Assert.True(BootStack.Top == top, "BootStack.Top reads the block");
+    }
+
+    private static nuint s_workerSeenExInfoHead;
+    private static nuint s_workerOwnExInfoSlot;
+
+    // The exception stubs find the running thread's ExInfo chain head through the block's
+    // CurrentExInfoHead: the scheduler points it at the thread it switches to, so each thread
+    // sees its own slot there, and the boot code's chain head is no longer the head once a
+    // thread is current.
+    private static unsafe void TestPerCpuBlockExInfoHeadFollowsCurrentThread()
+    {
+        SchedulerThread main = SchedulerManager.CurrentCpuState!.CurrentThread!;
+        nuint bootSlot = ExceptionHelper.BootExInfoHeadSlot;
+
+        Assert.True(PerCpuBlock.Current.CurrentExInfoHead == main.ExInfoHeadSlot, "on the main thread the block points at the main thread's chain head");
+        Assert.True(PerCpuBlock.Current.CurrentExInfoHead != bootSlot, "once a thread is current the boot code's chain head is no longer the head");
+
+        s_workerSeenExInfoHead = 0;
+        s_workerOwnExInfoSlot = 0;
+        SysThread worker = new SysThread(() =>
+        {
+            s_workerOwnExInfoSlot = SchedulerManager.CurrentCpuState!.CurrentThread!.ExInfoHeadSlot;
+            s_workerSeenExInfoHead = PerCpuBlock.Current.CurrentExInfoHead;
+        });
+        worker.Start();
+        Assert.True(worker.Join(ThrowJoinTimeoutMs), "the worker must finish");
+
+        Assert.True(s_workerOwnExInfoSlot != 0 && s_workerSeenExInfoHead == s_workerOwnExInfoSlot, "on the worker the block points at the worker's chain head");
+        Assert.True(s_workerOwnExInfoSlot != main.ExInfoHeadSlot, "two threads, two chain heads");
+        Assert.True(PerCpuBlock.Current.CurrentExInfoHead == main.ExInfoHeadSlot, "back on the main thread the block points at its chain head again");
+    }
+
+    // A throw links its ExInfo into the chain the block points at, a catch that ends it unlinks
+    // it, and a rethrow reads the exception from the same head: the three stubs agree on where
+    // the chain is, and leave it empty once the catches are done.
+    private static unsafe void TestPerCpuBlockExInfoChainEmptyAfterCatch()
+    {
+        nuint* head = (nuint*)PerCpuBlock.Current.CurrentExInfoHead;
+        Assert.True(*head == 0, "no throw is in flight before the cell");
+
+        bool rethrown = false;
+        bool linkedInCatch = false;
+        try
+        {
+            try
+            {
+                throw new InvalidOperationException("per-CPU chain");
+            }
+            catch (InvalidOperationException)
+            {
+                linkedInCatch = *head != 0;
+                throw;
+            }
+        }
+        catch (InvalidOperationException e) when (e.Message == "per-CPU chain")
+        {
+            rethrown = true;
+        }
+
+        Assert.True(linkedInCatch, "inside the catch the throw's ExInfo is the chain head");
+        Assert.True(rethrown, "the rethrow found its exception at the chain head");
+        Assert.True(*head == 0, "the catch funclet unlinked the throws it ended");
+    }
+
+    // Thread.GetCurrentProcessorId reaches SystemNative_SchedGetCpu, which reads the block.
+    private static void TestThreadGetCurrentProcessorIdIsBootCpu()
+    {
+        Assert.Equal(0, SysThread.GetCurrentProcessorId(), "the boot CPU reports index 0 through SchedGetCpu");
     }
 
     private static void TestThreadStatics()
