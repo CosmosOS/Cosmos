@@ -133,10 +133,11 @@ internal static unsafe partial class libSystemNative
             // Create scheduler thread with SchedulerThreadFlags.Managed set.
             // SchedulerManager.InvokeCurrentThreadStart evaluates it to
             // call the managed startup or not.
+            // No CPU here: CreateThread assigns it from the set the thread
+            // inherits (its creator's, or the default from an idle creator).
             SchedulerThread thread = new SchedulerThread
             {
                 Id = SchedulerManager.AllocateThreadId(),
-                CpuId = 0,
                 State = SchedulerThreadState.Created,
                 Flags = SchedulerThreadFlags.Managed,
                 // CoreLib's handle in `parameter` lives only until the thread
@@ -146,12 +147,12 @@ internal static unsafe partial class libSystemNative
             };
 
             nuint entryPoint = (nuint)(delegate* unmanaged<IntPtr, void>)&ThreadNative.EntryPointStub;
-#if ARCH_X64
-            ushort cs = (ushort)GetCurrentCodeSelector();
-            thread.InitializeStack(entryPoint, cs, (nuint)parameter, size);
-#elif ARCH_ARM64
+#if ARCH_ARM64
             // ARM64: no code selector needed, use 0.
             thread.InitializeStack(entryPoint, 0, (nuint)parameter, size);
+#else
+            ushort cs = (ushort)GetCurrentCodeSelector();
+            thread.InitializeStack(entryPoint, cs, (nuint)parameter, size);
 #endif
             // A full registry refuses the thread (#444): the registry is the
             // collector's root set, so a thread that ran unregistered would

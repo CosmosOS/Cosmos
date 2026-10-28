@@ -94,7 +94,6 @@ internal static unsafe partial class KernelThread
         SchedulerThread started = new()
         {
             Id = SchedulerManager.AllocateThreadId(),
-            CpuId = 0,
             State = SchedulerThreadState.Created,
         };
 
@@ -116,8 +115,10 @@ internal static unsafe partial class KernelThread
         using (InternalCpu.DisableInterruptsScope())
         {
             // A full registry refuses the thread (#444): it never runs, its
-            // stack goes back, and the caller hears it did not start.
-            if (!SchedulerManager.CreateThread(started))
+            // stack goes back, and the caller hears it did not start. The
+            // kernel's own threads are housekeeping: CPU 0, whatever the
+            // default set says and wherever the caller runs.
+            if (!SchedulerManager.CreateThread(started, SchedulerManager.HousekeepingCpus))
             {
                 started.ReleaseStack();
                 handle.Dispose();
@@ -156,30 +157,27 @@ internal static unsafe partial class KernelThread
             }
         }
 
-        // Masked, so on this CPU it cannot start between the verdict and the
-        // reap. The thread was placed on CPU 0 and the callers run there
-        // (the driver kit's threads; a caller moved elsewhere by
-        // MigrateThread would race CPU 0's switch here, which no caller does).
-        using (InternalCpu.DisableInterruptsScope())
+        if (!handshake.TryAbandon())
         {
-            if (!handshake.TryAbandon())
-            {
-                // It began between the last look and the verdict.
-                thread = started;
-                return true;
-            }
+            // It began between the last look and the verdict.
+            thread = started;
+            return true;
+        }
 
-            // ReadyThread asked the next interrupt exit to reschedule, so a
-            // device interrupt would still switch to a thread left queued. It
-            // would exit at once, but then halt until a timer tick moves the
-            // CPU on, and with a timer that never ticks the caller would not
-            // run again. A thread that never ran holds nothing, so it goes
-            // now, with the handle InvokeCurrentThreadStart would have freed.
-            if (started.State == SchedulerThreadState.Created)
-            {
-                SchedulerManager.ExitThread(started);
-                handle.Dispose();
-            }
+        // ReadyThread asked the next interrupt exit to reschedule, so a
+        // device interrupt would still switch to a thread left queued. It
+        // would exit at once, but then halt until a timer tick moves the
+        // CPU on, and with a timer that never ticks the caller would not
+        // run again. A thread that never ran holds nothing, so it goes now,
+        // with the handle InvokeCurrentThreadStart would have freed. The
+        // verdict is taken again under the thread's queue lock, the lock
+        // CPU 0's switch-in takes to start it: a mask here would exclude
+        // that switch only on CPU 0, and the caller may run elsewhere (SMP
+        // phase 3b). Began after the abandon, the thread frees the handle
+        // itself and runs nothing.
+        if (SchedulerManager.TryReapCreated(started))
+        {
+            handle.Dispose();
         }
 
         return false;

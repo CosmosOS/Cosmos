@@ -52,6 +52,41 @@ public static class SchedulerManager
     // keep GetBusyCpuTimeNs monotonic across thread lifecycle.
     private static ulong s_exitedNonIdleRuntimeNs;
 
+    // The set a thread created from an idle thread takes (SMP phase 3b):
+    // CPU 0 until a kernel widens it through the ring. Read and written
+    // under the registry lock, so a reader never sees half of a change.
+    // Set in Initialize: a static initializer would give the manager a
+    // class constructor, which runs through a lock that needs a current
+    // thread, and the manager is reached from boot before one exists.
+    private static CpuSet s_defaultAffinity;
+
+    /// <summary>
+    /// The CPUs the kernel's own service threads run on, whatever
+    /// <see cref="DefaultAffinity"/> says: CPU 0, where the collector runs
+    /// until it stops every CPU (SMP phase 4) and where the driver stack's
+    /// interrupt masks exclude its handlers. Every thread
+    /// <see cref="KernelThread.TryStart(Action)"/> starts takes it.
+    /// </summary>
+    internal static CpuSet HousekeepingCpus => CpuSet.Single(0);
+
+    /// <summary>
+    /// Bound (ms) of the self-move wait in <see cref="SetAffinity"/>: the
+    /// reschedule interrupt the caller raised on its own CPU lands within a
+    /// few instructions and the thread is back on its new CPU, so the bound
+    /// only guards a set that changed back under the move and left the
+    /// thread where it was.
+    /// </summary>
+    private const long SelfMoveTimeoutMs = 1000;
+
+    /// <summary>
+    /// Bound (ms) of <see cref="SetAffinity"/>'s wait on a parked thread
+    /// whose CPU's stub has not left its stack yet: that stub runs within a
+    /// few hundred instructions of the park, so the bound is only a guard.
+    /// When it runs out the set is written and the thread's next switch-out
+    /// evicts it.
+    /// </summary>
+    private const long OffCpuTimeoutMs = 1000;
+
     /// <summary>
     /// The interval the boot path asks the platform to arm the scheduler
     /// timer at, in nanoseconds (10 ms), and the slice the built-in Stride
@@ -109,6 +144,7 @@ public static class SchedulerManager
         ThrowIfDisabled();
 
         s_cpuCount = cpuCount;
+        s_defaultAffinity = HousekeepingCpus;
         s_cpuStates = new PerCpuState[cpuCount];
 
         for (uint i = 0; i < cpuCount; i++)
@@ -258,6 +294,325 @@ public static class SchedulerManager
     internal static PerCpuState? CurrentCpuState => s_cpuStates?[GetCurrentCpuId()];
 
     /// <summary>
+    /// The thread running this code, or <see langword="null"/> before the
+    /// scheduler has a current thread on this CPU. The boot thread, where
+    /// <c>Main</c> runs, is CPU 0's idle thread: reachable this way and
+    /// through no managed handle.
+    /// </summary>
+    internal static SchedulerThread? CurrentThread => CurrentCpuState?.CurrentThread;
+
+    // ========== Affinity ==========
+
+    /// <summary>
+    /// The CPU set a thread created from an idle thread takes: CPU 0 until a
+    /// kernel sets it. A thread created from any other thread takes its
+    /// creator's set. Only the threads <c>System.Threading.Thread</c> starts
+    /// look here; the kernel's own are <see cref="HousekeepingCpus"/>.
+    /// </summary>
+    internal static CpuSet DefaultAffinity
+    {
+        get
+        {
+            using (s_registryLock.AcquireIrqSafe())
+            {
+                return s_defaultAffinity;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sets <see cref="DefaultAffinity"/>. False for an empty set or one that
+    /// names no CPU the scheduler manages; the set may name CPUs that are not
+    /// online, which the effective set drops.
+    /// </summary>
+    /// <param name="affinity">The set every new thread of an idle creator takes.</param>
+    internal static bool TrySetDefaultAffinity(CpuSet affinity)
+    {
+        if (!NamesManagedCpu(affinity))
+        {
+            return false;
+        }
+
+        using (s_registryLock.AcquireIrqSafe())
+        {
+            s_defaultAffinity = affinity;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// The CPUs that run their scheduler tick: CPU 0 and every application
+    /// processor that came up (<see cref="PerCpuBlock.Online"/>). A snapshot;
+    /// CPUs only come online in this tree, never go.
+    /// </summary>
+    internal static CpuSet OnlineCpus
+    {
+        get
+        {
+            CpuSet online = CpuSet.Single(0);
+            for (uint cpu = 1; cpu < s_cpuCount; cpu++)
+            {
+                if (Volatile.Read(ref PerCpuBlock.At(cpu).Online) != 0)
+                {
+                    online = online.With(cpu);
+                }
+            }
+
+            return online;
+        }
+    }
+
+    /// <summary>
+    /// The CPUs <paramref name="thread"/> may actually go to: its set
+    /// restricted to the CPUs online, or every online CPU when that leaves
+    /// nothing (a kernel pinned it to a CPU that is not up). Never empty.
+    /// </summary>
+    /// <param name="thread">The thread.</param>
+    internal static CpuSet EffectiveAffinity(SchedulerThread thread)
+    {
+        return EffectiveOf(thread.Affinity);
+    }
+
+    private static CpuSet EffectiveOf(CpuSet affinity)
+    {
+        CpuSet online = OnlineCpus;
+        CpuSet effective = affinity.Intersect(online);
+        return effective.IsEmpty ? online : effective;
+    }
+
+    /// <summary>Whether the set names at least one CPU the scheduler manages.</summary>
+    private static bool NamesManagedCpu(CpuSet affinity)
+    {
+        for (uint cpu = 0; cpu < s_cpuCount; cpu++)
+        {
+            if (affinity.Contains(cpu))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Finds the control block of a managed thread: a walk of the registry
+    /// under its lock, comparing the handle each block keeps. Null for a
+    /// thread the scheduler is not running (not started, exited) and for an
+    /// idle thread, which no handle reaches; the caller resolves its own
+    /// thread through <see cref="CurrentThread"/> first. Allocates nothing.
+    /// </summary>
+    /// <param name="managed">The managed thread.</param>
+    internal static SchedulerThread? FindByManagedThread(SysThread managed)
+    {
+        if (s_allThreads is null)
+        {
+            return null;
+        }
+
+        using (s_registryLock.AcquireIrqSafe())
+        {
+            for (int i = 0; i < s_allThreads.Length; i++)
+            {
+                SchedulerThread? thread = s_allThreads[i];
+                if (thread is not null && thread._managedThread.IsAllocated
+                    && ReferenceEquals(thread._managedThread.Target, managed))
+                {
+                    return thread;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Changes the CPUs <paramref name="thread"/> may run on. Under the queue
+    /// lock of the thread's CPU the set is written and the ideal CPU pulled
+    /// inside it; when the effective set still allows that CPU nothing else
+    /// happens. Otherwise a thread no CPU is on (parked, or queued) moves at
+    /// once through <see cref="MigrateThread"/>; a thread a CPU is still on
+    /// is left to that CPU's switch-out, which evicts a thread its CPU is
+    /// excluded from: the CPU is asked to reschedule, by interrupt when it is
+    /// not the caller's, and when the thread is the caller itself the call
+    /// returns once it runs on its new CPU. A thread parked moments ago,
+    /// whose CPU's stub has not left its stack, is waited for and then moved.
+    /// Thread context, interrupts enabled; an idle thread never moves, and an
+    /// empty set is refused.
+    /// </summary>
+    /// <param name="thread">The thread.</param>
+    /// <param name="affinity">The CPUs it may run on.</param>
+    /// <exception cref="ArgumentException"><paramref name="affinity"/> is empty.</exception>
+    internal static void SetAffinity(SchedulerThread thread, CpuSet affinity)
+    {
+        ThrowIfCpuStateNotInitialized();
+        ThrowIfSchedulerNotSet();
+
+        if (affinity.IsEmpty)
+        {
+            throw new ArgumentException("A thread's CPU set must name at least one CPU.", nameof(affinity));
+        }
+
+        if (thread.IsIdle)
+        {
+            return;
+        }
+
+        if (affinity.Intersect(OnlineCpus).IsEmpty)
+        {
+            // Thread context, no lock: the one place this is said.
+            Serial.WriteString("[SCHED] Thread ");
+            Serial.WriteNumber(thread.Id);
+            Serial.WriteString(" has no online CPU in its set, running it on any\n");
+        }
+
+        // One pass decides for a thread no CPU is on, or one that runs. A
+        // thread parked an instant ago, whose CPU's stub has not left its
+        // stack, is looked at again once it has, and so is a queued thread
+        // its CPU picked between the verdict and the move. Bounded by that
+        // stub, which nothing holds up.
+        long deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * OffCpuTimeoutMs / 1000;
+        do
+        {
+            AffinityVerdict verdict;
+            uint cpuId;
+            using (InternalCpu.DisableInterruptsScope())
+            {
+                PerCpuState state = AcquireThreadQueueLock(thread);
+                thread.Affinity = affinity;
+                CpuSet effective = EffectiveOf(affinity);
+                cpuId = state.CpuId;
+
+                if (effective.Contains(cpuId))
+                {
+                    if (!effective.Contains(thread.IdealCpu))
+                    {
+                        thread.IdealCpu = cpuId;
+                    }
+
+                    verdict = AffinityVerdict.Stays;
+                }
+                else if (thread.State == SchedulerThreadState.Running)
+                {
+                    // On its CPU, or picked by it an instant ago: that CPU's
+                    // next interrupt exit evicts it.
+                    Volatile.Write(ref state._needReschedule, true);
+                    verdict = cpuId == GetCurrentCpuId() ? AffinityVerdict.EvictSelf : AffinityVerdict.EvictRemote;
+                }
+                else if (!thread.IsOnCpu)
+                {
+                    // Parked or queued, no CPU on its stack: moved below,
+                    // under both locks, once this one is released. Created
+                    // or Dead: the first switch-out moves it, or nothing to.
+                    verdict = thread.State is SchedulerThreadState.Ready
+                        or SchedulerThreadState.Blocked or SchedulerThreadState.Sleeping
+                        ? AffinityVerdict.MoveNow
+                        : AffinityVerdict.Stays;
+                }
+                else
+                {
+                    // Parked, but its CPU's stub has not switched away yet.
+                    verdict = AffinityVerdict.LookAgain;
+                }
+
+                state._lock.Release();
+            }
+
+            switch (verdict)
+            {
+                case AffinityVerdict.Stays:
+                    return;
+
+                case AffinityVerdict.MoveNow:
+                    if (MigrateThread(thread, SelectCpuVerified(thread, EffectiveAffinity(thread))))
+                    {
+                        return;
+                    }
+
+                    // Its CPU picked it meanwhile: now Running, or on the stack.
+                    break;
+
+                case AffinityVerdict.EvictSelf:
+                    SelfMove(thread, cpuId);
+                    return;
+
+                case AffinityVerdict.EvictRemote:
+                    if (Volatile.Read(ref PerCpuBlock.At(cpuId).Online) != 0)
+                    {
+                        InterruptManager.SendReschedule(PerCpuBlock.At(cpuId).HardwareId);
+                    }
+
+                    return;
+            }
+        }
+        while (Stopwatch.GetTimestamp() < deadline);
+    }
+
+    /// <summary>What one look at a thread under its queue lock told <see cref="SetAffinity"/>.</summary>
+    private enum AffinityVerdict : byte
+    {
+        /// <summary>The effective set allows its CPU, or nothing can move it.</summary>
+        Stays,
+
+        /// <summary>Parked or queued with no CPU on its stack: <see cref="MigrateThread"/> now.</summary>
+        MoveNow,
+
+        /// <summary>The caller itself: raise the reschedule here and wait for the new CPU.</summary>
+        EvictSelf,
+
+        /// <summary>Running on another CPU: that CPU's next interrupt exit evicts it.</summary>
+        EvictRemote,
+
+        /// <summary>Parked, but its CPU's stub has not left its stack: look again.</summary>
+        LookAgain,
+    }
+
+    /// <summary>
+    /// The caller changed its own set to one that excludes its CPU: raises
+    /// the reschedule interrupt here, as <see cref="Park"/> does, whose exit
+    /// evicts and moves the thread, and spins until it runs on the new CPU,
+    /// so the caller returns there. Falls back to the next tick when the
+    /// interrupt cannot be raised yet.
+    /// </summary>
+    private static void SelfMove(SchedulerThread thread, uint cpuId)
+    {
+        if (!InterruptManager.TryRaiseReschedule())
+        {
+            return;
+        }
+
+        long deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * SelfMoveTimeoutMs / 1000;
+        while (thread.CpuId == cpuId && Stopwatch.GetTimestamp() < deadline)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Sets the CPU the policy prefers for <paramref name="thread"/>. False
+    /// when its set does not name <paramref name="cpu"/>; checked under the
+    /// thread's queue lock, so a set change in flight is not raced.
+    /// </summary>
+    /// <param name="thread">The thread.</param>
+    /// <param name="cpu">The CPU, one of the thread's set.</param>
+    internal static bool SetIdealCpu(SchedulerThread thread, uint cpu)
+    {
+        ThrowIfCpuStateNotInitialized();
+
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            PerCpuState state = AcquireThreadQueueLock(thread);
+            bool allowed = cpu < s_cpuCount && thread.Affinity.Contains(cpu);
+            if (allowed)
+            {
+                thread.IdealCpu = cpu;
+            }
+
+            state._lock.Release();
+            return allowed;
+        }
+    }
+
+    /// <summary>
     /// Returns the per-CPU state array, or <see langword="null"/> before
     /// initialization.
     /// </summary>
@@ -308,6 +663,8 @@ public static class SchedulerManager
         if (cpuId == GetCurrentCpuId())
         {
             PerCpuBlock.Current.CurrentExInfoHead = idleThread.ExInfoHeadSlot;
+            // And the idle thread is on this CPU: its first switch-out clears this.
+            Volatile.Write(ref idleThread._onCpu, 1);
         }
     }
 
@@ -614,6 +971,15 @@ public static class SchedulerManager
                     }
                     s_allThreads[i] = null;
                     s_allThreadCount--;
+
+                    // The managed handle goes with the slot, under this lock:
+                    // FindByManagedThread reads it under the same one.
+                    if (thread._managedThread.IsAllocated)
+                    {
+                        thread._managedThread.Dispose();
+                        thread._managedThread = default;
+                    }
+
                     return;
                 }
             }
@@ -684,10 +1050,21 @@ public static class SchedulerManager
     /// registry lock. A full registry refuses the thread
     /// (<see cref="RegisterThread"/>): the policy's record is dropped again
     /// and the caller must not start the thread.
+    /// <para>
+    /// The thread's CPU set is assigned here (SMP phase 3b):
+    /// <paramref name="affinity"/> when the caller names one (the kernel's
+    /// own threads pass <see cref="HousekeepingCpus"/>), else the creating
+    /// thread's set, or <see cref="DefaultAffinity"/> when the creator is an
+    /// idle thread (the boot thread running <c>Main</c>). The ideal CPU is
+    /// the creating CPU, and so is the thread's CPU when the effective set
+    /// allows it; otherwise the policy chooses one
+    /// (<see cref="IScheduler.SelectCpu"/>).
+    /// </para>
     /// </summary>
     /// <param name="thread">The thread, <see cref="SchedulerThreadState.Created"/>, with its stack initialized.</param>
+    /// <param name="affinity">The CPUs the thread may run on, or <see langword="null"/> to inherit.</param>
     /// <returns>False when the registry is full; the thread was not handed to the policy.</returns>
-    internal static bool CreateThread(SchedulerThread thread)
+    internal static bool CreateThread(SchedulerThread thread, CpuSet? affinity = null)
     {
         ThrowIfDisabled();
         ThrowIfCpuStateNotInitialized();
@@ -696,6 +1073,24 @@ public static class SchedulerManager
         Serial.WriteString("[SCHED] CreateThread: entering\n");
         using (InternalCpu.DisableInterruptsScope())
         {
+            uint current = GetCurrentCpuId();
+            SchedulerThread? creator = s_cpuStates[current].CurrentThread;
+            CpuSet set = affinity ?? (creator is null || creator.IsIdle ? DefaultAffinity : creator.Affinity);
+            if (set.IsEmpty)
+            {
+                set = HousekeepingCpus;
+            }
+
+            // Nothing else can see the thread yet, so no lock around these.
+            thread.Affinity = set;
+            thread.IdealCpu = current;
+            CpuSet effective = EffectiveOf(set);
+            thread.CpuId = effective.Contains(current) ? current : SelectCpuVerified(thread, effective);
+            if (!effective.Contains(thread.IdealCpu))
+            {
+                thread.IdealCpu = thread.CpuId;
+            }
+
             PerCpuState state = s_cpuStates[thread.CpuId];
             s_currentScheduler.OnThreadCreate(state, thread);
 
@@ -851,11 +1246,9 @@ public static class SchedulerManager
             StopManagedThread(thread._managedThread.Target);
         }
 
-        if (thread._managedThread.IsAllocated)
-        {
-            thread._managedThread.Dispose();
-            thread._managedThread = default;
-        }
+        // The handle itself goes in UnregisterThread, under the registry lock:
+        // a walk of the registry (FindByManagedThread) reads it under that
+        // lock, and must never read a freed one.
 
         Serial.WriteString("[SCHED] ExitThread: entering DisableInterruptsScope for thread ");
         Serial.WriteNumber(thread.Id);
@@ -883,6 +1276,45 @@ public static class SchedulerManager
             UnregisterThread(thread);
             Serial.WriteString("[SCHED] ExitThread: OnThreadExit done\n");
         }
+    }
+
+    /// <summary>
+    /// Takes back a thread that never ran: the verdict and the removal under
+    /// the thread's queue lock, so the switch-in of its CPU, which turns it
+    /// Running under that same lock, either came first or cannot come. True
+    /// once the thread is gone from the policy and the registry; false when
+    /// it began, in which case its own start frees what it holds. What
+    /// <see cref="KernelThread.TryStart(Action)"/> calls when its wait ended
+    /// without the thread, from whatever CPU the caller runs on.
+    /// </summary>
+    /// <param name="thread">The thread, expected <see cref="SchedulerThreadState.Created"/>.</param>
+    internal static bool TryReapCreated(SchedulerThread thread)
+    {
+        ThrowIfCpuStateNotInitialized();
+        ThrowIfSchedulerNotSet();
+
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            PerCpuState state = AcquireThreadQueueLock(thread);
+            if (thread.State != SchedulerThreadState.Created)
+            {
+                state._lock.Release();
+                return false;
+            }
+
+            thread.State = SchedulerThreadState.Dead;
+            s_currentScheduler.OnThreadExit(state, thread);
+            state._lock.Release();
+
+            if (GarbageCollector.IsEnabled)
+            {
+                GarbageCollector.ReturnAllocContext(ref thread._allocContext);
+            }
+
+            UnregisterThread(thread);
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -1031,10 +1463,11 @@ public static class SchedulerManager
     /// the destination is asked to reschedule, by interrupt when it is not
     /// the caller's CPU. A blocked or sleeping thread is in no run structure:
     /// only its CPU changes, and the wake that readies it queues it there.
-    /// A running thread does not move here (its CPU's switch-out re-queue
-    /// will, once affinity lands in phase 3b), nor an idle thread, which is
-    /// its CPU's. Placement keeps every thread on CPU 0 until phase 5; this
-    /// is the primitive the cells use to put one elsewhere.
+    /// A thread a CPU is still on does not move here (that CPU's switch-out
+    /// evicts it when its set excludes the CPU, SMP phase 3b), nor an idle
+    /// thread, which is its CPU's, nor any thread to a CPU its effective set
+    /// excludes. <see cref="SetAffinity"/> is what the ring and the suites
+    /// call; this is the primitive under it.
     /// </summary>
     /// <param name="thread">The thread to move.</param>
     /// <param name="targetCpu">The CPU to move it to.</param>
@@ -1066,7 +1499,7 @@ public static class SchedulerManager
                 {
                     PerCpuState fromState = s_cpuStates[fromCpu];
                     PerCpuState toState = s_cpuStates[targetCpu];
-                    bool moved = MigrateLocked(thread, fromState, toState);
+                    bool moved = MigrateLocked(thread, fromState, toState, evicting: false);
 
                     second._lock.Release();
                     first._lock.Release();
@@ -1089,13 +1522,41 @@ public static class SchedulerManager
         }
     }
 
-    /// <summary>The move itself, both queue locks held by the caller.</summary>
-    private static bool MigrateLocked(SchedulerThread thread, PerCpuState fromState, PerCpuState toState)
+    /// <summary>
+    /// The move itself, both queue locks held by the caller. A thread whose
+    /// CPU is still on its stack (<see cref="SchedulerThread.IsOnCpu"/>)
+    /// moves only when that CPU is the caller, evicting it from its own
+    /// switch-out (<paramref name="evicting"/>): the one path that moves a
+    /// Running thread, which turns Ready here, after the policy saw it as
+    /// the thread the switch-out took off. Any other caller is refused the
+    /// thread until the stub has left it, and refused a destination the
+    /// thread's effective set excludes.
+    /// </summary>
+    private static bool MigrateLocked(SchedulerThread thread, PerCpuState fromState, PerCpuState toState, bool evicting)
     {
+        if (!evicting && (thread.IsOnCpu || !EffectiveAffinity(thread).Contains(toState.CpuId)))
+        {
+            return false;
+        }
+
         switch (thread.State)
         {
+            case SchedulerThreadState.Running:
+                if (!evicting)
+                {
+                    return false;
+                }
+
+                thread.CpuId = toState.CpuId;
+                FollowMove(thread, toState);
+                s_currentScheduler!.OnThreadMigrate(thread, fromState, toState);
+                thread.State = SchedulerThreadState.Ready;
+                Volatile.Write(ref toState._needReschedule, true);
+                return true;
+
             case SchedulerThreadState.Ready:
                 thread.CpuId = toState.CpuId;
+                FollowMove(thread, toState);
                 s_currentScheduler!.OnThreadMigrate(thread, fromState, toState);
                 Volatile.Write(ref toState._needReschedule, true);
                 return true;
@@ -1103,14 +1564,136 @@ public static class SchedulerManager
             case SchedulerThreadState.Blocked:
             case SchedulerThreadState.Sleeping:
                 thread.CpuId = toState.CpuId;
+                FollowMove(thread, toState);
                 return true;
 
             default:
-                // Running: on a CPU, whose switch-out is the only thing that
-                // can take it off. Created: not yet handed to the policy, or
-                // queued without the state saying so. Dead: gone.
+                // Created: not yet handed to the policy, or queued without
+                // the state saying so. Dead: gone.
                 return false;
         }
+    }
+
+    /// <summary>
+    /// The ideal CPU follows a move its set forced: a set that excludes the
+    /// preference points it at the CPU the thread goes to, so it is always
+    /// inside the set. Both queue locks held.
+    /// </summary>
+    private static void FollowMove(SchedulerThread thread, PerCpuState toState)
+    {
+        if (!thread.Affinity.Contains(thread.IdealCpu))
+        {
+            thread.IdealCpu = toState.CpuId;
+        }
+    }
+
+    /// <summary>
+    /// Moves the thread the last switch-out on <paramref name="state"/>'s CPU
+    /// evicted (<see cref="PerCpuState._pendingMigration"/>): on that CPU,
+    /// on the same interrupt exit, once the caller released this CPU's queue
+    /// lock and before the resume guard. The policy chooses the destination
+    /// under no lock; both queue locks are then taken in index order and the
+    /// thread moved by its state (Running turns Ready in the destination's
+    /// structure, a queued thread migrates, a parked one changes CPU), and
+    /// the destination is sent the reschedule interrupt. When the set
+    /// changed back in the window and allows this CPU after all, the thread
+    /// goes back into this CPU's run structure instead, as a preemption
+    /// would have put it.
+    /// </summary>
+    private static void MigratePending(PerCpuState state)
+    {
+        SchedulerThread? thread = state._pendingMigration;
+        if (thread is null)
+        {
+            return;
+        }
+
+        state._pendingMigration = null;
+
+        uint fromCpu = state.CpuId;
+        CpuSet allowed = EffectiveAffinity(thread);
+        uint target = allowed.Contains(fromCpu) ? fromCpu : SelectCpuVerified(thread, allowed);
+
+        PerCpuState first = s_cpuStates![Math.Min(fromCpu, target)];
+        PerCpuState second = s_cpuStates[Math.Max(fromCpu, target)];
+        first._lock.Acquire();
+        if (target != fromCpu)
+        {
+            second._lock.Acquire();
+        }
+
+        bool moved = false;
+        if (thread.CpuId == fromCpu)
+        {
+            if (target == fromCpu)
+            {
+                // Back where a preemption would have put it: a Running thread
+                // through the yield hook; a Ready one is queued here already
+                // (the eviction put a popped one back), and a parked one is
+                // in no structure until its wake queues it.
+                if (thread.State == SchedulerThreadState.Running)
+                {
+                    thread.State = SchedulerThreadState.Ready;
+                    s_currentScheduler!.OnThreadYield(state, thread);
+                }
+
+                Volatile.Write(ref state._needReschedule, true);
+            }
+            else
+            {
+                // The destination was chosen under no lock: a set that
+                // changed meanwhile to exclude it is caught by that CPU's own
+                // switch-out, which evicts the thread again.
+                moved = MigrateLocked(thread, state, s_cpuStates[target], evicting: true);
+            }
+        }
+
+        if (target != fromCpu)
+        {
+            second._lock.Release();
+        }
+
+        first._lock.Release();
+
+        // The interrupt after the locks, never under them: the destination's
+        // exit takes its lock first thing.
+        if (moved && Volatile.Read(ref PerCpuBlock.At(target).Online) != 0)
+        {
+            InterruptManager.SendReschedule(PerCpuBlock.At(target).HardwareId);
+        }
+    }
+
+    /// <summary>
+    /// The resume guard, the last scheduler step of an interrupt exit, on
+    /// the CPU taking the exit with interrupts masked and no lock held. When
+    /// this exit staged a switch, waits until the thread it switches to is
+    /// off the stack of the CPU that last ran it (its on-CPU marker, which
+    /// that CPU's stub clears right after its own stack switch), then marks
+    /// it on this CPU. The wait is bounded by that stub, which nothing holds
+    /// up: a handler past its scheduler hooks takes no lock and runs masked
+    /// to the switch, and a thread still marked never enters another CPU's
+    /// run structure except through the eviction its own CPU runs after its
+    /// pick, so two CPUs cannot wait on each other.
+    /// </summary>
+    /// <param name="cpuId">Current CPU ID.</param>
+    internal static void FinishSwitchFromIrq(uint cpuId)
+    {
+        if (s_cpuStates is null || cpuId >= s_cpuCount || ContextSwitchNative.GetContextSwitchSp() == 0)
+        {
+            return;
+        }
+
+        SchedulerThread? next = s_cpuStates[cpuId].CurrentThread;
+        if (next is null)
+        {
+            return;
+        }
+
+        while (Volatile.Read(ref next._onCpu) != 0)
+        {
+        }
+
+        Volatile.Write(ref next._onCpu, 1);
     }
 
     // ========== Scheduling ==========
@@ -1199,32 +1782,72 @@ public static class SchedulerManager
     // ========== Load Balancing ==========
 
     /// <summary>
-    /// Asks the installed scheduler to pick the best CPU for a new or
-    /// migrating thread (<see cref="IScheduler.SelectCpu"/>). Dormant: nothing
-    /// calls it until placement lands (SMP phase 5), and every thread is
-    /// readied on the CPU it is assigned to.
+    /// Asks the installed scheduler which of <paramref name="allowed"/> a
+    /// thread goes to (<see cref="IScheduler.SelectCpu"/>) and checks the
+    /// answer: a CPU outside the set, or past the ones managed, becomes the
+    /// set's first. Under no lock, the hook's contract.
     /// </summary>
     /// <param name="thread">Thread being placed.</param>
-    /// <param name="currentCpu">CPU the thread is currently on.</param>
-    internal static uint SelectCpu(SchedulerThread thread, uint currentCpu)
+    /// <param name="allowed">The thread's effective set, never empty.</param>
+    private static uint SelectCpuVerified(SchedulerThread thread, CpuSet allowed)
     {
-        ThrowIfSchedulerNotSet();
-
-        return s_currentScheduler.SelectCpu(thread, currentCpu, s_cpuCount);
+        uint cpu = s_currentScheduler!.SelectCpu(thread, s_cpuStates!, allowed);
+        return cpu < s_cpuCount && allowed.Contains(cpu) ? cpu : allowed.First;
     }
 
     /// <summary>
-    /// Gives the installed scheduler a load-balancing opportunity for one
-    /// CPU (<see cref="IScheduler.Balance"/>). Dormant, as <see cref="SelectCpu"/>.
+    /// Gives the installed scheduler a chance to pull a thread onto one CPU
+    /// (<see cref="IScheduler.Balance"/>) and applies its answer once it
+    /// holds under both queue locks: the thread is still queued on the CPU
+    /// it named, no CPU is on its stack, and its effective set allows the
+    /// puller. Dormant: nothing in the kernel calls it until placement lands
+    /// (SMP phase 5); the Smp suite does. Thread context, no lock on entry.
     /// </summary>
-    /// <param name="cpuId">CPU to balance.</param>
-    internal static void Balance(uint cpuId)
+    /// <param name="cpuId">CPU asking for work.</param>
+    /// <returns>True when a thread moved to <paramref name="cpuId"/>.</returns>
+    internal static bool Balance(uint cpuId)
     {
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
 
-        PerCpuState state = s_cpuStates[cpuId];
-        s_currentScheduler.Balance(state, s_cpuStates);
+        if (cpuId >= s_cpuCount)
+        {
+            return false;
+        }
+
+        PerCpuState toState = s_cpuStates[cpuId];
+        SchedulerThread? victim = s_currentScheduler.Balance(toState, s_cpuStates);
+        if (victim is null || victim.IsIdle)
+        {
+            return false;
+        }
+
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            uint fromCpu = victim.CpuId;
+            if (fromCpu == cpuId)
+            {
+                return false;
+            }
+
+            PerCpuState first = s_cpuStates[Math.Min(fromCpu, cpuId)];
+            PerCpuState second = s_cpuStates[Math.Max(fromCpu, cpuId)];
+            first._lock.Acquire();
+            second._lock.Acquire();
+
+            bool moved = victim.CpuId == fromCpu && victim.State == SchedulerThreadState.Ready
+                && MigrateLocked(victim, s_cpuStates[fromCpu], toState, evicting: false);
+
+            second._lock.Release();
+            first._lock.Release();
+
+            if (moved && cpuId != GetCurrentCpuId() && Volatile.Read(ref PerCpuBlock.At(cpuId).Online) != 0)
+            {
+                InterruptManager.SendReschedule(PerCpuBlock.At(cpuId).HardwareId);
+            }
+
+            return moved;
+        }
     }
 
     // ========== Timer Interrupt Handling ==========
@@ -1357,6 +1980,7 @@ public static class SchedulerManager
         }
 
         state._lock.Release();
+        MigratePending(state);
     }
 
     /// <summary>
@@ -1438,6 +2062,7 @@ public static class SchedulerManager
 
         ScheduleFromInterruptLocked(state, currentRsp);
         state._lock.Release();
+        MigratePending(state);
     }
 
     /// <summary>
@@ -1468,9 +2093,15 @@ public static class SchedulerManager
         state._lock.Acquire();
         ScheduleFromInterruptLocked(state, currentRsp);
         state._lock.Release();
+        MigratePending(state);
     }
 
-    /// <summary>The switch itself, the CPU's queue lock held by the caller, on that CPU, in interrupt context.</summary>
+    /// <summary>
+    /// The switch itself, the CPU's queue lock held by the caller, on that CPU, in interrupt
+    /// context. The caller releases the lock and then runs <see cref="MigratePending"/>: a
+    /// thread whose set excludes this CPU is evicted here (left out of the run structure,
+    /// still Running when it was) and moved there, under both CPUs' locks.
+    /// </summary>
     private static void ScheduleFromInterruptLocked(PerCpuState state, nuint currentRsp)
     {
         SchedulerThread? prev = state.CurrentThread;
@@ -1483,6 +2114,35 @@ public static class SchedulerManager
             return;
         }
 
+        // The eviction (SMP phase 3b): a thread this CPU is excluded from
+        // leaves now, whatever the policy picked. The cheap check first, the
+        // online intersection only when the set excludes this CPU.
+        bool evict = prev is not null && !prev.IsIdle && prev.State != SchedulerThreadState.Dead
+            && !prev.Affinity.Contains(state.CpuId) && !EffectiveAffinity(prev).Contains(state.CpuId);
+        if (evict)
+        {
+            state._pendingMigration = prev;
+            if (next == prev)
+            {
+                // The policy handed prev back: run the idle thread meanwhile.
+                // A Ready prev was popped from its queue by that pick and
+                // goes back in, so that an evicted Ready thread is queued on
+                // this CPU whichever way the pick went, which is what the
+                // move (OnThreadMigrate) and a set change back both expect.
+                if (next.State == SchedulerThreadState.Ready)
+                {
+                    s_currentScheduler.OnPickFailed(state, next);
+                }
+
+                next = state.IdleThread;
+                if (next is null)
+                {
+                    state._pendingMigration = null;
+                    return;
+                }
+            }
+        }
+
         if (next != prev)
         {
             Interlocked.Increment(ref s_switchCount);
@@ -1493,15 +2153,21 @@ public static class SchedulerManager
             // entry behind, whose pass keeps rising with the thread while its
             // place in the queue does not move, so the queue stops being
             // sorted and every thread queued behind that entry, a newly
-            // created one included, never reaches the head.
+            // created one included, never reaches the head. An evicted prev
+            // stays Running and out of the structure: MigratePending moves
+            // it once this lock is released.
             if (prev is not null)
             {
                 prev.StackPointer = currentRsp;
-                if (prev.State == SchedulerThreadState.Running)
+                if (prev.State == SchedulerThreadState.Running && !evict)
                 {
                     prev.State = SchedulerThreadState.Ready;
                     s_currentScheduler.OnThreadYield(state, prev);
                 }
+
+                // The stub clears prev's on-CPU marker right after it has
+                // switched stacks: until then a CPU that resumes prev waits.
+                ContextSwitchNative.SetContextSwitchPrevOnCpu(prev.OnCpuSlot);
             }
 
             // Switch to next thread. The exception stubs find the running
@@ -1540,7 +2206,14 @@ public static class SchedulerManager
             return;
         }
 
-        prev?.State = SchedulerThreadState.Ready;
+        if (prev is not null)
+        {
+            prev.State = SchedulerThreadState.Ready;
+
+            // As in ScheduleFromInterruptLocked: the stub that applies this
+            // switch clears prev's on-CPU marker once it has left its stack.
+            ContextSwitchNative.SetContextSwitchPrevOnCpu(prev.OnCpuSlot);
+        }
 
         next.State = SchedulerThreadState.Running;
         ContextSwitchNative.SetContextSwitchSp(next.StackPointer);

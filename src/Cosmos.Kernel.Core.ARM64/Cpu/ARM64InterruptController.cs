@@ -300,7 +300,7 @@ internal class ARM64InterruptController : IInterruptController
             if (intId >= LpiBase)
             {
                 uint off = intId - LpiBase;
-                if (s_lpiHandlers != null && off < (uint)s_lpiHandlers.Length)
+                if (s_lpiHandlers is not null && off < (uint)s_lpiHandlers.Length)
                 {
                     handler = s_lpiHandlers[(int)off];
                 }
@@ -308,13 +308,13 @@ internal class ARM64InterruptController : IInterruptController
             else
             {
                 InterruptManager.IrqDelegate?[]? handlers = InterruptManager.s_irqHandlers;
-                if (handlers != null && intId < (uint)handlers.Length)
+                if (handlers is not null && intId < (uint)handlers.Length)
                 {
                     handler = handlers[(int)intId];
                 }
             }
 
-            if (handler != null)
+            if (handler is not null)
             {
                 ctx.interrupt = intId;
                 handler(ref ctx);
@@ -322,7 +322,7 @@ internal class ARM64InterruptController : IInterruptController
 
             SendEOI(intId);
 
-            if (handler != null)
+            if (handler is not null)
             {
                 // Mirror of the x64 IRQ-exit reschedule (see
                 // X64InterruptController.Dispatch): the ARM64 vector stub also
@@ -330,17 +330,22 @@ internal class ARM64InterruptController : IInterruptController
                 // context sits 512 bytes (NEON save area) below the
                 // IRQContext, same derivation as the GenericTimer handler.
                 RunPendingReschedule(ref ctx);
+
+                // Last, after every switch this exit could stage: the thread
+                // the vector is about to resume must be off its previous
+                // CPU's stack (SMP phase 3b).
+                SchedulerManager.FinishSwitchFromIrq(SchedulerManager.GetCurrentCpuId());
             }
             return;
         }
 
-        if (ctx.interrupt == ExceptionTypeSync)  // Synchronous exception
+        if (ctx.interrupt == ExceptionTypeSync)
         {
             InterruptManager.IrqDelegate?[]? handlers = InterruptManager.s_irqHandlers;
-            if (handlers != null)
+            if (handlers is not null)
             {
                 InterruptManager.IrqDelegate? handler = handlers[0];
-                if (handler != null)
+                if (handler is not null)
                 {
                     handler(ref ctx);
                     return;

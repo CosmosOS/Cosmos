@@ -171,6 +171,14 @@ internal static unsafe class Smp
 
         s_startTickOnCurrentCpu?.Invoke();
 
+        // This CPU runs its idle thread from here on: mark it on-CPU before a switch can stage
+        // its clear, as SetupIdleThread does for the boot CPU.
+        SchedulerThread? idle = SchedulerManager.GetCpuState((uint)block.CpuIndex)?.IdleThread;
+        if (idle is not null)
+        {
+            Volatile.Write(ref idle._onCpu, 1);
+        }
+
         Volatile.Write(ref block.Online, 1);
 
         InternalCpu.EnableInterrupts();

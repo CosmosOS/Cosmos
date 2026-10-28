@@ -6,13 +6,26 @@
 
 .equ PERCPU_SWITCH_TARGET_SP,     0x18
 .equ PERCPU_SWITCH_IS_NEW_THREAD, 0x20
+.equ PERCPU_SWITCH_PREV_ON_CPU,   0x60
 
 .global _native_set_context_switch_sp
 .global _native_get_context_switch_sp
 .global _native_get_sp
 .global _native_set_context_switch_new_thread
+.global _native_set_context_switch_prev_on_cpu
 
 .section .text
+
+// void _native_set_context_switch_prev_on_cpu(nuint slot)
+// Stages the address of the outgoing thread's on-CPU marker: the vector
+// stores 0 through it once it has switched stacks, so another CPU may resume
+// that thread. 0 for none.
+// x0 = address of the marker
+.balign 4
+_native_set_context_switch_prev_on_cpu:
+    mrs     x1, tpidr_el1
+    str     x0, [x1, #PERCPU_SWITCH_PREV_ON_CPU]
+    ret
 
 // void _native_set_context_switch_sp(nuint newSp)
 // Stages a context switch on the calling CPU: the vector that runs on this

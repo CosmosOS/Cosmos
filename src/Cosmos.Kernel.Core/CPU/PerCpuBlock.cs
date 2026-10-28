@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Core.CPU;
 /// the table of blocks (a static, so every block has a fixed address the register can hold) and
 /// this struct is the layout's home: the native stubs reach the slots by offset
 /// (<c>CPU/CpuOps.s</c>, <c>CPU/Interrupts.s</c>, <c>CPU/ExceptionHandling.s</c> of each native
-/// package mirror the offsets they use). The boot CPU installs block zero in Core's library
+/// package, and ARM64's <c>CPU/ContextSwitch.s</c>, mirror the offsets they use). The boot CPU installs block zero in Core's library
 /// initializer, the first managed code the boot runs; an application processor's is prepared
 /// by the boot CPU before it is released and loaded into the register by the trampoline
 /// (<see cref="Smp"/>). The interrupt stubs stage the context switch in the running
@@ -82,7 +82,15 @@ internal struct PerCpuBlock
     /// </summary>
     public ulong GicRedistributorBase;
 
-    private ulong _reserved0;
+    /// <summary>
+    /// Context switch staging: the address of the outgoing thread's on-CPU marker
+    /// (<c>SchedulerThread._onCpu</c>), 0 for none. Staged by the switch-out next to
+    /// <see cref="SwitchTargetSp"/>; the stub stores 0 through it right after it has switched
+    /// stacks, then clears the slot, so a CPU that resumes the thread elsewhere knows this one has
+    /// left its stack.
+    /// </summary>
+    public nuint SwitchPrevOnCpu;
+
     private ulong _reserved1;
     private ulong _reserved2;
     private ulong _reserved3;

@@ -97,7 +97,10 @@ internal class LibraryInitializer
                 Id = SchedulerManager.AllocateThreadId(),
                 CpuId = cpu,
                 State = SchedulerThreadState.Running,
-                Flags = SchedulerThreadFlags.Pinned | SchedulerThreadFlags.IdleThread
+                Flags = SchedulerThreadFlags.IdleThread,
+                // An idle thread is its CPU's: the set that never lets it move.
+                Affinity = CpuSet.Single(cpu),
+                IdealCpu = cpu
             };
 
             SchedulerManager.SetupIdleThread(cpu, idleThread);
