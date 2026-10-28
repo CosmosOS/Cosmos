@@ -4,6 +4,8 @@
   href: kernel-project-layout.md
 - name: Coding Guidelines
   href: coding-guidelines.md
+- name: Translating the Docs
+  href: translations.md
 - name: Plugs
   href: plugs.md
 - name: Testing

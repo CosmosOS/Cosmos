@@ -6,6 +6,7 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/build-docs.yml'
+      - '.github/scripts/docs-i18n.py'
   # Build on PRs too, without publishing. docfx.json names four projects by
   # path, and the articles link into src/; either can break without anything
   # failing until the merge lands on main.
@@ -13,6 +14,7 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/build-docs.yml'
+      - '.github/scripts/docs-i18n.py'
 
 jobs:
   build:
@@ -33,9 +35,12 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
+    # Pinned: the Chinese site's search worker (docs/templates/zh) speaks the
+    # theme's internal worker protocol, which a docfx release may change.
+    # Keep the version in step with release.yml and the Makefile.
     - name: Install DocFX
       run: |
-        dotnet tool update -g docfx
+        dotnet tool update -g docfx --version 2.81.0
         echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
     # Restore only what DocFX consumes (the src/Cosmos.Kernel.* projects).
@@ -47,10 +52,23 @@ jobs:
     - name: Restore docs projects
       run: dotnet restore src/Cosmos.Kernel/Cosmos.Kernel.csproj
 
+    # English first: its metadata pass writes the API pages the translated
+    # sites reuse. Each translation is a docfx project of its own under
+    # docs/<lang>/, built into docs/_site/<lang>.
     - name: Build Docs
       run: |
         cd docs
         docfx docfx.json
+        for config in */docfx.json; do
+          docfx "$config"
+        done
+
+    # Non-blocking: the translations that are missing, stale or misshapen
+    # become warning annotations, one per page, and a table in the step
+    # summary, so an English change never waits for translators.
+    - name: Check translations
+      continue-on-error: true
+      run: python3 .github/scripts/docs-i18n.py check
 
     - name: Verify output
       run: find docs/_site -type f | head -50
@@ -59,7 +77,10 @@ jobs:
     # to the frozen per-release copies (v*/ subfolders, latest/, versions.json)
     # that release.yml publishes on tags. Without it every dev deploy would
     # wipe them. Tradeoff: files deleted from docs/ linger on the branch until
-    # overwritten; acceptable, they are unreachable from the rebuilt site.
+    # overwritten. The rebuilt site no longer links to them, but the language
+    # and version dropdowns find a page by probing its URL, so a translation
+    # deleted from docs/<lang>/ stays reachable through them until it is
+    # removed from the Pages repository by hand.
     - name: Publish to GitHub Pages
       if: github.event_name == 'push' && github.repository == 'valentinbreiz/nativeaot-patcher'
       uses: peaceiris/actions-gh-pages@v3

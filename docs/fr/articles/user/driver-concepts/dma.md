@@ -1,0 +1,16 @@
+---
+source_hash: 4ced592143b1e340c4e1d57187cc89ff684bc0eb
+---
+<a id="dma-direct-memory-access"></a>
+
+# DMA (accès direct à la mémoire)
+
+Avec les E/S programmées, le CPU copie lui-même chaque mot à travers un registre du périphérique, ce qui accaparerait un cœur pour une carte réseau ou un disque rapide. Avec l'accès direct à la mémoire, le périphérique lit et écrit la mémoire principale de lui-même : le pilote lui donne l'[adresse physique](physical-addresses.md) et la longueur d'un tampon, généralement par l'intermédiaire d'un [anneau de descripteurs](descriptor-rings.md), le périphérique déplace les données pendant que le CPU fait autre chose, puis il signale la fin du transfert, souvent par une interruption.
+
+Un périphérique qui lance de lui-même des transactions mémoire est un maître de bus. Sur [PCI](pci.md), une fonction ne peut le faire que tant que le bit Bus Master Enable de son registre de commande est positionné, ce qui permet au système d'exploitation de l'arrêter. Certains périphériques ne pilotent que 32 bits d'adresse et n'atteignent que les 4 premiers Gio de la mémoire physique.
+
+Le CPU met la mémoire en cache, et un périphérique qui travaille derrière les caches pourrait lire des données périmées ou laisser des lignes de cache périmées. Sur une plateforme cohérente, ce que sont les PC x64, le matériel maintient les accès des périphériques cohérents avec les caches ; sur une plateforme non cohérente, le pilote nettoie ou invalide les lignes de cache autour de chaque transfert. La cohérence n'impose pourtant aucun ordre, si bien qu'un pilote a toujours besoin de [barrières](barriers.md) entre l'écriture des données et le moment où il indique au périphérique qu'elles sont là.
+
+Le piège est que le DMA contourne tout ce que le noyau utilise pour protéger la mémoire. Un périphérique continue d'écrire à l'adresse qu'on lui a donnée tant qu'on ne l'arrête pas, si bien qu'un tampon libéré alors qu'un transfert est en cours est écrasé à l'intérieur de ce qui le réutilise, quel qu'il soit. Un ramasse-miettes ajoute une façon d'en libérer un par surprise : il récupère un objet dès qu'il n'en reste plus aucune référence, et une adresse dans un descripteur n'est pas une référence qu'il peut voir.
+
+Dans le kit de pilotes, un `DmaBuffer` obtenu par `binding.AllocateDma` vit jusqu'à ce que le démontage le libère après `OnDetach` ; un pilote ne remet donc à un périphérique que de tels tampons, jamais un tableau managé. `TryAllocateDma` avec `DmaConstraints.Addressable32Bit` renvoie `false` pour un tampon qui se terminerait au-dessus de 4 Gio : le kit n'a pas de réserve de mémoire basse, il alloue donc comme d'habitude et rend un tel tampon. Le kit traite le DMA comme cohérent sur x64 et ARM64. Il désactive le bus mastering d'une fonction PCI avant le premier sondage, puis de nouveau après chaque sondage qui n'aboutit pas à une liaison, avant que les tampons de ce sondage soient libérés : ainsi, chaque sondage part d'une fonction qui ne peut pas écrire en mémoire, et le périphérique d'un sondage décliné s'arrête avant que ses tampons soient rendus ; un pilote le réactive avec `PciAccess.EnableBusMastering(true)`. Voir [Mémoire DMA](../drivers.md#dma-memory) et [L'objet d'accès PCI](../drivers.md#the-pci-access-object).
