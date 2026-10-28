@@ -43,6 +43,10 @@ public static class LocalApic
     private const int APIC_ID_SHIFT = 24;
     /// <summary>ICR destination shorthand "self" (bits 19:18 = 01b, Intel SDM Vol 3 §10.6.1).</summary>
     private const uint ICR_DEST_SHORTHAND_SELF = 0b01u << 18;
+    /// <summary>ICR delivery status (bit 12): 1 while the previous IPI is still being sent (SDM Vol 3 §10.6.1).</summary>
+    private const uint ICR_DELIVERY_STATUS_PENDING = 1u << 12;
+    /// <summary>Bit position of the destination field in ICR high (bits 31:24, xAPIC physical destination mode).</summary>
+    private const int ICR_DESTINATION_SHIFT = 24;
     /// <summary>LVT mask bit (bit 16) - masks delivery of the LVT entry's interrupt (Intel SDM Vol 3 §10.5.1).</summary>
     private const uint LVT_MASKED = 0x10000;
     /// <summary>Timer LVT periodic mode bit (bit 17) - periodic vs one-shot.</summary>
@@ -249,6 +253,33 @@ public static class LocalApic
         {
             Write(LAPIC_ICR_LOW, vector | ICR_DEST_SHORTHAND_SELF);
         }
+    }
+
+    /// <summary>
+    /// Sends a fixed-delivery IPI to the CPU whose Local APIC has <paramref name="apicId"/>, in
+    /// xAPIC physical destination mode (the kernel drives the MMIO window, not x2APIC, so the
+    /// id is the 8-bit one of ICR high). The two ICR writes are one message, and the ICR is this
+    /// CPU's: the caller masks interrupts around the call, since a handler on the same CPU may
+    /// be sending too, and the wait on the delivery-status bit keeps the writes from landing on
+    /// top of a send still in flight. Allocation-free; any context (SMP phase 3a).
+    /// </summary>
+    /// <param name="apicId">The target's Local APIC id, as its per-CPU block records it.</param>
+    /// <param name="vector">The vector to raise on it.</param>
+    internal static void SendIpi(ulong apicId, byte vector)
+    {
+        if (!s_initialized)
+        {
+            return;
+        }
+
+        // Bounded by the hardware: the bit clears once the previous message left this APIC,
+        // within a few bus cycles, and never stays set on a healthy machine.
+        while ((Read(LAPIC_ICR_LOW) & ICR_DELIVERY_STATUS_PENDING) != 0)
+        {
+        }
+
+        Write(LAPIC_ICR_HIGH, (uint)apicId << ICR_DESTINATION_SHIFT);
+        Write(LAPIC_ICR_LOW, vector);
     }
 
     /// <summary>

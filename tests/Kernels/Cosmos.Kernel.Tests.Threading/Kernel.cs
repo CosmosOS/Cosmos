@@ -39,7 +39,7 @@ public class Kernel : Sys.Kernel
     private const int PerCpuCurrentExInfoHeadOffset = 0x38;
     private const int PerCpuBootStackTopOffset = 0x40;
     private const int PerCpuOnlineOffset = 0x48;
-    private const int PerCpuStoppedForGcOffset = 0x50;
+    private const int PerCpuStoppedOffset = 0x50;
     private const int PerCpuGicRedistributorBaseOffset = 0x58;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
@@ -1549,7 +1549,7 @@ public class Kernel : Sys.Kernel
         Assert.Equal(PerCpuCurrentExInfoHeadOffset, (int)((byte*)&block.CurrentExInfoHead - start), "CurrentExInfoHead");
         Assert.Equal(PerCpuBootStackTopOffset, (int)((byte*)&block.BootStackTop - start), "BootStackTop");
         Assert.Equal(PerCpuOnlineOffset, (int)((byte*)&block.Online - start), "Online");
-        Assert.Equal(PerCpuStoppedForGcOffset, (int)((byte*)&block.StoppedForGc - start), "StoppedForGc");
+        Assert.Equal(PerCpuStoppedOffset, (int)((byte*)&block.Stopped - start), "Stopped");
         Assert.Equal(PerCpuGicRedistributorBaseOffset, (int)((byte*)&block.GicRedistributorBase - start), "GicRedistributorBase");
     }
 

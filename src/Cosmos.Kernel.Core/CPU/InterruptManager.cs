@@ -258,6 +258,30 @@ internal static class InterruptManager
     }
 
     /// <summary>
+    /// Raises the platform's reschedule interrupt on another CPU
+    /// (<see cref="IInterruptController.SendReschedule"/>); nothing before the
+    /// controller is registered. Allocation-free; any context, interrupts
+    /// masked by the caller.
+    /// </summary>
+    /// <param name="hardwareId">The target CPU's controller identity, from its block.</param>
+    internal static void SendReschedule(ulong hardwareId)
+    {
+        s_controller?.SendReschedule(hardwareId);
+    }
+
+    /// <summary>
+    /// Raises the platform's stop interrupt on another CPU
+    /// (<see cref="IInterruptController.SendStop"/>); nothing before the
+    /// controller is registered. Allocation-free; any context, interrupts
+    /// masked by the caller.
+    /// </summary>
+    /// <param name="hardwareId">The target CPU's controller identity, from its block.</param>
+    internal static void SendStop(ulong hardwareId)
+    {
+        s_controller?.SendStop(hardwareId);
+    }
+
+    /// <summary>
     /// Undoes <see cref="SetIrqHandler"/>: masks the line at the controller,
     /// then clears the slot at 0x20 + <paramref name="irqNo"/>, so a
     /// delivery already latched finds no handler and is dismissed with its

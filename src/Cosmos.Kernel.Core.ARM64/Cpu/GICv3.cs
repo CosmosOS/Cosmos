@@ -806,6 +806,29 @@ public static class GICv3
     }
 
     /// <summary>
+    /// Sends SGI <paramref name="sgiId"/> to the CPU whose MPIDR affinity is
+    /// <paramref name="affinity"/> (<c>Aff3:Aff2:Aff1:Aff0</c> in the GICR_TYPER layout, what a
+    /// per-CPU block records as its hardware id): affinity levels 1 to 3 in the routing fields
+    /// of ICC_SGI1R_EL1, affinity 0 as one bit of the target list under its range selector. One
+    /// system register write, so nothing to serialize against another sender on this CPU.
+    /// Allocation-free; any context (SMP phase 3a).
+    /// </summary>
+    /// <param name="sgiId">SGI ID (0-15).</param>
+    /// <param name="affinity">The target CPU's affinity.</param>
+    internal static void SendSgiTo(uint sgiId, ulong affinity)
+    {
+        ulong aff0 = affinity & MpidrAffinityFieldMask;
+        ulong value = ((ulong)(sgiId & SgiIdMask) << Sgi1rIntIdShift);
+        value |= ((affinity >> MpidrAff1Shift) & MpidrAffinityFieldMask) << Sgi1rAff1Shift;
+        value |= ((affinity >> MpidrAff2Shift) & MpidrAffinityFieldMask) << Sgi1rAff2Shift;
+        value |= ((affinity >> MpidrAff3Shift) & MpidrAffinityFieldMask) << Sgi1rAff3Shift;
+        value |= (aff0 / (ulong)Sgi1rTargetListWidth) << Sgi1rRangeSelectorShift;
+        value |= 1ul << (int)(aff0 % (ulong)Sgi1rTargetListWidth);
+
+        GICv3Native.WriteSgi1r(value);
+    }
+
+    /// <summary>
     /// Detects whether the system has GICv3 support by reading GICD_PIDR2.ArchRev.
     /// Uses a two-step probe: first reads at the GICv2-compatible offset (0xFE8, within
     /// the 4KB page - always safe), then falls back to the GICv3 offset (0xFFE8, within

@@ -69,8 +69,11 @@ internal struct PerCpuBlock
     /// <summary>1 once this CPU runs its scheduler tick: the boot CPU from its block's installation, an application processor once <see cref="Smp.ApMain"/> started its tick.</summary>
     public ulong Online;
 
-    /// <summary>1 while a collection on another CPU holds this one (SMP phase 4).</summary>
-    public ulong StoppedForGc;
+    /// <summary>
+    /// 1 while this CPU sits in its stop handler, held by another CPU's rendezvous
+    /// (<see cref="CpuStop"/>): the policy swap's, and the collector's from SMP phase 4.
+    /// </summary>
+    public ulong Stopped;
 
     /// <summary>
     /// The RD_base of this CPU's GICv3 redistributor, found by the GICR_TYPER walk run on it;

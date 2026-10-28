@@ -256,7 +256,8 @@ internal class ConditionVariable : IDisposable
                 SchedulerThread waitingThread = _waitingThreads[0];
                 _waitingThreads.RemoveAt(0);
 
-                // Wake the thread by marking it ready
+                // Wake the thread by marking it ready, on whatever CPU it
+                // waits on (SMP phase 3a).
                 SchedulerManager.ReadyThread(waitingThread);
             }
         }

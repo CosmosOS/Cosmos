@@ -351,7 +351,8 @@ internal class InterruptEvent
             // (the tick) while still listed here: ReadyThread does nothing
             // for a thread that is already Ready or Running, under the queue
             // lock of the waiter's CPU, so the look and the ready are one
-            // step whichever CPU the tick runs on.
+            // step whichever CPU the tick runs on. The wake goes to that CPU
+            // by interrupt when it is not this one (SMP phase 3a).
             SchedulerManager.ReadyThread(toReady);
         }
     }

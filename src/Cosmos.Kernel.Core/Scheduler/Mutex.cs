@@ -264,6 +264,9 @@ internal class Mutex : IDisposable
 
         if (toReady is not null)
         {
+            // The wake goes to the waiter's CPU, by interrupt when it is not
+            // this one (SMP phase 3a), so a waiter parked on another CPU runs
+            // on that CPU's next interrupt exit rather than its next tick.
             SchedulerManager.ReadyThread(toReady);
         }
     }
