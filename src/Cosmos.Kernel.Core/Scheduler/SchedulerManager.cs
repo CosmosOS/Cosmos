@@ -709,7 +709,10 @@ public static class SchedulerManager
     /// Makes a thread runnable on the CPU it is assigned to: under that CPU's
     /// queue lock the policy queues it (<see cref="IScheduler.OnThreadReady"/>),
     /// the thread turns <see cref="SchedulerThreadState.Ready"/> and the CPU's
-    /// next interrupt exit is asked to reschedule. Any context: thread
+    /// next interrupt exit is asked to reschedule. When that CPU is not the
+    /// caller's, the reschedule interrupt is sent to it once the lock is
+    /// released, so its exit runs the thread at once rather than on its next
+    /// tick; a CPU halted in its idle loop wakes on it. Any context: thread
     /// context, the tick's sleeper walk, a device handler's signal.
     /// </summary>
     /// <param name="thread">The thread to wake, or to start for the first time.</param>
@@ -754,7 +757,16 @@ public static class SchedulerManager
             // No per-wake log here: this runs with interrupts masked, often
             // from an ISR, and each polled UART byte would stall every IRQ.
             Volatile.Write(ref state._needReschedule, true);
+
+            uint cpuId = state.CpuId;
             state._lock.Release();
+
+            // The interrupt after the lock, not under it: the target's exit
+            // takes this lock first thing, and would only spin on it.
+            if (cpuId != GetCurrentCpuId() && Volatile.Read(ref PerCpuBlock.At(cpuId).Online) != 0)
+            {
+                InterruptManager.SendReschedule(PerCpuBlock.At(cpuId).HardwareId);
+            }
         }
     }
 
@@ -1004,6 +1016,96 @@ public static class SchedulerManager
         if (currentThread is not null)
         {
             Sleep(currentThread, timeoutMs);
+        }
+    }
+
+    /// <summary>
+    /// Moves a thread that is not running to another CPU: under both CPUs'
+    /// queue locks, taken in ascending index order, its <see cref="SchedulerThread.CpuId"/>
+    /// is rewritten and, when it is waiting in a run structure, the policy
+    /// moves its bookkeeping (<see cref="IScheduler.OnThreadMigrate"/>) and
+    /// the destination is asked to reschedule, by interrupt when it is not
+    /// the caller's CPU. A blocked or sleeping thread is in no run structure:
+    /// only its CPU changes, and the wake that readies it queues it there.
+    /// A running thread does not move here (its CPU's switch-out re-queue
+    /// will, once affinity lands in phase 3b), nor an idle thread, which is
+    /// its CPU's. Placement keeps every thread on CPU 0 until phase 5; this
+    /// is the primitive the cells use to put one elsewhere.
+    /// </summary>
+    /// <param name="thread">The thread to move.</param>
+    /// <param name="targetCpu">The CPU to move it to.</param>
+    /// <returns>True once the thread is assigned to <paramref name="targetCpu"/>; false when it cannot move.</returns>
+    internal static bool MigrateThread(SchedulerThread thread, uint targetCpu)
+    {
+        ThrowIfCpuStateNotInitialized();
+        ThrowIfSchedulerNotSet();
+
+        if (targetCpu >= s_cpuCount || thread.IsIdle)
+        {
+            return false;
+        }
+
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            // Both locks in index order, then the CPU read again under them,
+            // as AcquireThreadQueueLock does with one. Bounded by the
+            // migrations in flight on this thread.
+            uint fromCpu = thread.CpuId;
+            while (fromCpu != targetCpu)
+            {
+                PerCpuState first = s_cpuStates[Math.Min(fromCpu, targetCpu)];
+                PerCpuState second = s_cpuStates[Math.Max(fromCpu, targetCpu)];
+                first._lock.Acquire();
+                second._lock.Acquire();
+
+                if (thread.CpuId == fromCpu)
+                {
+                    PerCpuState fromState = s_cpuStates[fromCpu];
+                    PerCpuState toState = s_cpuStates[targetCpu];
+                    bool moved = MigrateLocked(thread, fromState, toState);
+
+                    second._lock.Release();
+                    first._lock.Release();
+
+                    if (moved && targetCpu != GetCurrentCpuId() && thread.State == SchedulerThreadState.Ready
+                        && Volatile.Read(ref PerCpuBlock.At(targetCpu).Online) != 0)
+                    {
+                        InterruptManager.SendReschedule(PerCpuBlock.At(targetCpu).HardwareId);
+                    }
+
+                    return moved;
+                }
+
+                second._lock.Release();
+                first._lock.Release();
+                fromCpu = thread.CpuId;
+            }
+
+            return true;
+        }
+    }
+
+    /// <summary>The move itself, both queue locks held by the caller.</summary>
+    private static bool MigrateLocked(SchedulerThread thread, PerCpuState fromState, PerCpuState toState)
+    {
+        switch (thread.State)
+        {
+            case SchedulerThreadState.Ready:
+                thread.CpuId = toState.CpuId;
+                s_currentScheduler!.OnThreadMigrate(thread, fromState, toState);
+                Volatile.Write(ref toState._needReschedule, true);
+                return true;
+
+            case SchedulerThreadState.Blocked:
+            case SchedulerThreadState.Sleeping:
+                thread.CpuId = toState.CpuId;
+                return true;
+
+            default:
+                // Running: on a CPU, whose switch-out is the only thing that
+                // can take it off. Created: not yet handed to the policy, or
+                // queued without the state saying so. Dead: gone.
+                return false;
         }
     }
 

@@ -210,9 +210,12 @@ public interface IScheduler
     uint SelectCpu(SchedulerThread thread, uint currentCpu, uint cpuCount);
 
     /// <summary>
-    /// Move a thread's bookkeeping, and any virtual-time base, between CPUs.
-    /// The mechanism never calls this; a policy calls it from its own
-    /// <see cref="Balance"/>.
+    /// Move a thread's bookkeeping, and any virtual-time base, between CPUs:
+    /// out of <paramref name="fromState"/>'s run structure, into
+    /// <paramref name="toState"/>'s. The mechanism calls it for a
+    /// <see cref="SchedulerThreadState.Ready"/> thread it migrates, under both
+    /// CPUs' queue locks, with <see cref="SchedulerThread.CpuId"/> already
+    /// rewritten; a policy may call it from its own <see cref="Balance"/>.
     /// </summary>
     /// <param name="thread">Thread being migrated.</param>
     /// <param name="fromState">CPU the thread is leaving.</param>
