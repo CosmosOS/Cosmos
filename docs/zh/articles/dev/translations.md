@@ -1,5 +1,5 @@
 ---
-source_hash: a26414dec2e20dc7b931459cf194b7489982135c
+source_hash: 764844b2f9b77dcefd260b00130e02ca26a487a6
 ---
 <a id="translating-the-docs"></a>
 
@@ -43,13 +43,15 @@ docfx 根据标题文本生成标题的 id，因此翻译后的标题会得到�
 
 `stamp` 还会记录翻译所依据的英文页面。它把英文页面的 git blob 哈希作为 `source_hash` 写入翻译的前置元数据（front matter），对于翻译版的 `toc.yml`，则写在文件顶部的一行 `# source_hash:` 注释中。英文页面的任何修改都会改变这个哈希，因此将它与当前英文页面比较，就能知道翻译是否仍与英文页面同步。
 
+仓库的 README 也有翻译，即与它放在一起的 `README_FR.md` 和 `README_CN.md`，每个 README 徽章下方的语言链接行都指向它们。README 的翻译逐段对应 `README.md`，但它的链接指向其自身语言的文档（`https://cosmosos.github.io/fr/...`），徽章标签也经过翻译，因此 `check` 不会把它的结构与 `README.md` 比较。`stamp README_FR.md` 会把 `README.md` 的哈希写入其第一行的 `<!-- source_hash: ... -->` 注释中，GitHub 不会显示这条注释；`check` 会报告缺失、未打标记或过时的 README 翻译。README 发生变化时，文档工作流也会运行，这样过时的 README 翻译就会出现在它的摘要中。
+
 <a id="checking-the-translations"></a>
 
 ## 检查翻译
 
 `python3 .github/scripts/docs-i18n.py check` 遍历每个英文页面，并针对每种语言报告以下几类翻译：缺失的、过时的（其 `source_hash` 与英文页面不再匹配）、孤立的（英文页面已不存在），以及结构与英文页面不再一致的，即标题、代码块、链接目标、行内代码、表格行或段落不同，有一行与六个词或更多词的英文行完全相同，使用了文档风格规范禁止的破折号，或者有 toc 条目指向该语言文件夹之外。它无法读取的文件，例如未以 UTF-8 保存的文件，会像其他发现一样被报告。
 
-文档工作流在构建完三个站点后运行它。每个有发现的页面都会成为工作流运行上的一条警告注释，完整列表则写入该运行的摘要，因为 GitHub 只显示一个步骤的前十条注释。这一步从不让构建失败，因为英文的修改不应等待能写法文和中文的人；过时的翻译会继续在其提示横幅下发布，直到有人更新它。在本地，`--strict` 让它以错误状态退出，`--lang fr` 将它限制在一种语言，而一组英文路径（相对于 `docs/`）则将它限制在这些页面。
+文档工作流在构建完三个站点后运行它。每个有发现的页面都会成为工作流运行上的一条警告注释，完整列表则写入该运行的摘要，因为 GitHub 只显示一个步骤的前十条注释。这一步从不让构建失败，因为英文的修改不应等待能写法文和中文的人；过时的翻译会继续在其提示横幅下发布，直到有人更新它。在本地，`--strict` 让它以错误状态退出，`--lang fr` 将它限制在一种语言，而一组英文路径（相对于 `docs/`，或者 `README.md`）则将它限制在这些页面。
 
 <a id="when-you-change-an-english-page"></a>
 
@@ -77,9 +79,10 @@ python3 .github/scripts/docs-i18n.py check articles/user/timers.md
 - 一个根 `toc.yml`，其 API 条目写作 `../api/`；
 - 一个包含主题字符串的 `templates/<folder>/token.json`；
 - 在 `main.js` 中，在 `languages` 列表里加入一个条目，添加提示横幅文本，并在 lunr 有该语言的词干提取器时把它加入 `lunrLanguages`；
-- 对于词与词之间不加空格的语言，需要一个按子串匹配的搜索 worker，例如 `templates/zh/public/search-worker.min.js`，并在 `docs-i18n.py` 中加入检查页面是否包含该文字的规则，就像中文的那条一样。
+- 对于词与词之间不加空格的语言，需要一个按子串匹配的搜索 worker，例如 `templates/zh/public/search-worker.min.js`，并在 `docs-i18n.py` 中加入检查页面是否包含该文字的规则，就像中文的那条一样；
+- 与 `README.md` 放在一起的一份 README 翻译，在 `docs-i18n.py` 的 `READMES` 中加入其文件名，并在每个 README 的语言行中加入指向它的链接。
 
-`Makefile`、`build-docs.yml`、`release.yml` 和 `docs-i18n.py` 通过 `docs/<folder>/docfx.json` 找到各种语言，因此它们无需修改。
+`Makefile`、`build-docs.yml` 和 `release.yml` 通过 `docs/<folder>/docfx.json` 找到各种语言，`docs-i18n.py` 对页面也是如此，因此它们无需其他修改。
 
 <a id="terms"></a>
 

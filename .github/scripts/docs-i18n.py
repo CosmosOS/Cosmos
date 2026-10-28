@@ -17,6 +17,13 @@ docs CI reports drift without failing on it. When the site has been built
 (docs/_site), check also compares the heading ids it computes with the ids
 docfx wrote, and the theme's search protocol with the one a language's own
 search worker speaks.
+
+The repository README has translations too, at the root (READMES below).
+stamp records the hash of README.md on a comment on their first line, which
+GitHub does not display, and check reports a README translation that is
+missing, not stamped or stale. Their shape is not compared: their links lead
+to the documentation of their own language, and their badge labels are
+translated.
 """
 import argparse
 import collections
@@ -29,6 +36,13 @@ import unicodedata
 
 DOCS = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "docs"))
 SITE = os.path.join(DOCS, "_site")
+ROOT = os.path.dirname(DOCS)
+
+# The translations of the repository README, by language folder, and the
+# hidden comment that carries their source hash.
+README = os.path.join(ROOT, "README.md")
+READMES = {"fr": "README_FR.md", "zh": "README_CN.md"}
+README_HASH = re.compile(r"\A<!-- source_hash: (\w+) -->\n")
 
 # Folders of docs/ that hold no English page to translate: generated output,
 # the generated API reference (published in English in every language), and
@@ -309,7 +323,20 @@ def source_of(path):
     return parts[0], os.path.join(*parts[1:])
 
 
+def readme_translations():
+    return {os.path.join(ROOT, name) for name in READMES.values()}
+
+
+def stamp_readme(path):
+    text = README_HASH.sub("", read(path))
+    write(path, f"<!-- source_hash: {git_hash(README)} -->\n" + text)
+    print(f"stamped {os.path.basename(path)}")
+
+
 def stamp(path):
+    if os.path.abspath(path) in readme_translations():
+        stamp_readme(path)
+        return
     lang, rel = source_of(path)
     source = os.path.join(DOCS, rel)
     if not os.path.isfile(source):
@@ -500,8 +527,13 @@ def check(args):
     findings = []
 
     sources = english_sources(languages())
+    scoped = bool(args.paths)
+    readme_wanted = not scoped
     wanted = set()
     for path in args.paths:
+        if os.path.abspath(path) in readme_translations() | {README}:
+            readme_wanted = True
+            continue
         rel = os.path.normpath(path).removeprefix("docs" + os.sep)
         head = rel.split(os.sep)[0]
         if head in languages():
@@ -515,7 +547,7 @@ def check(args):
 
     for lang in langs:
         for rel in sources:
-            if wanted and rel not in wanted:
+            if scoped and rel not in wanted:
                 continue
             shown = f"docs/{lang}/{rel}"
             translated = os.path.join(DOCS, lang, rel)
@@ -534,14 +566,28 @@ def check(args):
                     report(shown, message, line)
             except Unreadable as e:
                 report(shown, str(e))
-        if not wanted:
+        if not scoped:
             for rel in translated_files(lang):
                 if rel not in sources:
                     report(f"docs/{lang}/{rel}", f"orphan: docs/{rel} does not exist")
+        name = READMES.get(lang)
+        if readme_wanted and name is not None:
+            translated = os.path.join(ROOT, name)
+            if not os.path.isfile(translated):
+                report(name, "missing translation of README.md")
+            elif not args.no_hash:
+                try:
+                    m = README_HASH.match(read(translated))
+                    if m is None:
+                        report(name, "not stamped (no source_hash comment on the first line)")
+                    elif m.group(1) != git_hash(README):
+                        report(name, "stale: README.md changed since this translation")
+                except Unreadable as e:
+                    report(name, str(e))
 
     # The anchors stamp writes are only as good as the ids computed here.
     for rel in sources:
-        if rel.endswith(".md") and (not wanted or rel in wanted):
+        if rel.endswith(".md") and (not scoped or rel in wanted):
             built = site_ids(rel)
             if built is not None:
                 _, body = split_front_matter(read(os.path.join(DOCS, rel)))

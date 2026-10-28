@@ -1,5 +1,5 @@
 ---
-source_hash: a26414dec2e20dc7b931459cf194b7489982135c
+source_hash: 764844b2f9b77dcefd260b00130e02ca26a487a6
 ---
 <a id="translating-the-docs"></a>
 
@@ -43,13 +43,15 @@ Au chargement, `main.js` reporte chacun de ces identifiants sur le titre qui le 
 
 `stamp` enregistre aussi la page anglaise dont la traduction est issue. Il écrit le hash de blob git de la page anglaise comme `source_hash` dans le front matter de la traduction, ou sur une ligne de commentaire `# source_hash:` en tête d'un `toc.yml` traduit. Le hash change à chaque modification de la page anglaise, si bien que le comparer à la page anglaise actuelle indique si la traduction la suit toujours.
 
+Le README du dépôt est lui aussi traduit, dans `README_FR.md` et `README_CN.md` placés à côté de lui, vers lesquels mène la ligne de liens de langues sous les badges de chaque README. Une traduction du README suit `README.md` paragraphe par paragraphe, mais ses liens mènent à la documentation de sa propre langue (`https://cosmosos.github.io/fr/...`) et les libellés de ses badges sont traduits, si bien que `check` ne compare pas sa forme à celle de `README.md`. `stamp README_FR.md` écrit le hash de `README.md` dans un commentaire `<!-- source_hash: ... -->` sur sa première ligne, que GitHub n'affiche pas, et `check` signale une traduction du README manquante, non estampillée ou périmée. Le workflow de la documentation se lance aussi quand un README change, afin qu'une traduction du README périmée apparaisse dans son résumé.
+
 <a id="checking-the-translations"></a>
 
 ## Vérifier les traductions
 
 `python3 .github/scripts/docs-i18n.py check` parcourt chaque page anglaise et signale, pour chaque langue, une traduction manquante, une traduction périmée (son `source_hash` ne correspond plus à la page anglaise), une traduction orpheline (la page anglaise n'existe plus) et une traduction dont la forme ne correspond plus à la page anglaise : des titres, des blocs de code, des cibles de liens, du code inline, des lignes de tableau ou des paragraphes différents, une ligne restée identique à une ligne anglaise de six mots ou plus, un tiret que la charte de rédaction interdit, ou une entrée de toc qui sort du dossier de la langue. Un fichier qu'il ne peut pas lire, par exemple un fichier qui n'est pas enregistré en UTF-8, est signalé comme n'importe quel autre constat.
 
-Le workflow de la documentation le lance après avoir généré les trois sites. Chaque page qui a des constats devient une annotation d'avertissement sur l'exécution du workflow, et la liste complète va dans le résumé de l'exécution, puisque GitHub n'affiche que les dix premières annotations d'une étape. L'étape ne fait jamais échouer le build, parce qu'une modification en anglais ne doit pas attendre quelqu'un qui sait écrire le français et le chinois ; la traduction périmée continue d'être publiée, sous son bandeau, jusqu'à ce que quelqu'un la mette à jour. En local, `--strict` le fait sortir avec une erreur, `--lang fr` le limite à une langue, et une liste de chemins anglais (relatifs à `docs/`) le limite à ces pages.
+Le workflow de la documentation le lance après avoir généré les trois sites. Chaque page qui a des constats devient une annotation d'avertissement sur l'exécution du workflow, et la liste complète va dans le résumé de l'exécution, puisque GitHub n'affiche que les dix premières annotations d'une étape. L'étape ne fait jamais échouer le build, parce qu'une modification en anglais ne doit pas attendre quelqu'un qui sait écrire le français et le chinois ; la traduction périmée continue d'être publiée, sous son bandeau, jusqu'à ce que quelqu'un la mette à jour. En local, `--strict` le fait sortir avec une erreur, `--lang fr` le limite à une langue, et une liste de chemins anglais (relatifs à `docs/`, ou `README.md`) le limite à ces pages.
 
 <a id="when-you-change-an-english-page"></a>
 
@@ -77,9 +79,10 @@ Une nouvelle langue demande :
 - un `toc.yml` racine dont l'entrée API indique `../api/` ;
 - un `templates/<folder>/token.json` avec les chaînes du thème ;
 - dans `main.js`, une entrée dans la liste `languages`, le texte du bandeau, et le stemmer lunr de la langue dans `lunrLanguages` quand lunr en a un ;
-- pour une langue qui s'écrit sans espace entre les mots, un worker de recherche par sous-chaîne comme `templates/zh/public/search-worker.min.js`, et dans `docs-i18n.py` la vérification qu'une page contient du texte dans cette écriture, comme celle du chinois.
+- pour une langue qui s'écrit sans espace entre les mots, un worker de recherche par sous-chaîne comme `templates/zh/public/search-worker.min.js`, et dans `docs-i18n.py` la vérification qu'une page contient du texte dans cette écriture, comme celle du chinois ;
+- une traduction du README à côté de `README.md`, son nom de fichier dans `READMES` dans `docs-i18n.py`, et son lien dans la ligne de langues de chaque README.
 
-Le `Makefile`, `build-docs.yml`, `release.yml` et `docs-i18n.py` trouvent les langues par leur `docs/<folder>/docfx.json`, si bien qu'ils n'ont besoin d'aucune modification.
+Le `Makefile`, `build-docs.yml` et `release.yml` trouvent les langues par leur `docs/<folder>/docfx.json`, tout comme `docs-i18n.py` pour les pages, si bien qu'ils n'ont besoin d'aucune autre modification.
 
 <a id="terms"></a>
 
