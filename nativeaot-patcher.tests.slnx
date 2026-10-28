@@ -18,6 +18,7 @@
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.HelloWorld/Cosmos.Kernel.Tests.HelloWorld.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Memory/Cosmos.Kernel.Tests.Memory.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Network/Cosmos.Kernel.Tests.Network.csproj"/>
+        <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Smp/Cosmos.Kernel.Tests.Smp.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Threading/Cosmos.Kernel.Tests.Threading.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Timer/Cosmos.Kernel.Tests.Timer.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.TypeCasting/Cosmos.Kernel.Tests.TypeCasting.csproj"/>

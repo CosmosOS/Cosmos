@@ -42,6 +42,7 @@ public class Kernel : Sys.Kernel
     private const int PerCpuOnlineOffset = 0x48;
     private const int PerCpuStoppedOffset = 0x50;
     private const int PerCpuGicRedistributorBaseOffset = 0x58;
+    private const int PerCpuSwitchPrevOnCpuOffset = 0x60;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -1562,6 +1563,7 @@ public class Kernel : Sys.Kernel
         Assert.Equal(PerCpuOnlineOffset, (int)((byte*)&block.Online - start), "Online");
         Assert.Equal(PerCpuStoppedOffset, (int)((byte*)&block.Stopped - start), "Stopped");
         Assert.Equal(PerCpuGicRedistributorBaseOffset, (int)((byte*)&block.GicRedistributorBase - start), "GicRedistributorBase");
+        Assert.Equal(PerCpuSwitchPrevOnCpuOffset, (int)((byte*)&block.SwitchPrevOnCpu - start), "SwitchPrevOnCpu");
     }
 
     // Core's library initializer installs block 0 on the boot CPU, the first managed code the
@@ -1657,13 +1659,13 @@ public class Kernel : Sys.Kernel
     }
 
     // ===== The mechanism across CPUs (SMP phase 3a) =====
-    // A worker starts on CPU 0, parks, and is moved to another CPU while it is parked, which is
-    // when a thread can move; the wake then goes to that CPU by interrupt and the worker runs
-    // there. It parks again once it has reported in, and comes back to CPU 0 the same way
-    // before it exits: the exit path allocates, and until the collector stops every CPU (SMP
-    // phase 4) a thread may allocate on CPU 0 alone. The worker touches statics only while it
-    // is away, for the same reason: a collection on CPU 0 does not scan the stack of a thread
-    // running elsewhere.
+    // A worker starts on CPU 0, parks, and is pinned to another CPU through its CPU set (SMP
+    // phase 3b): parked, it moves at once; the wake then goes to that CPU by interrupt and the
+    // worker runs there. It parks again once it has reported in, and comes back to CPU 0 the
+    // same way before it exits: the exit path allocates, and until the collector stops every
+    // CPU (SMP phase 4) a thread may allocate on CPU 0 alone. The worker touches statics only
+    // while it is away, for the same reason: a collection on CPU 0 does not scan the stack of
+    // a thread running elsewhere.
     private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_crossCpuGate;
     private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_crossCpuRelease;
     private static Cosmos.Kernel.Core.Scheduler.Mutex? s_crossCpuMutex;
@@ -1708,22 +1710,33 @@ public class Kernel : Sys.Kernel
         CrossCpuReportAndPark();
     }
 
-    // Moves the worker to `cpu` once it has parked; a running thread does not move, so the
-    // attempt repeats until the park landed.
-    private static void MoveParkedWorker(uint cpu)
+    // Pins the worker to `cpu` once it has reported in: a parked worker moves at once, a
+    // running one on the next interrupt exit of its CPU, so the CPU is polled afterwards.
+    private static void MoveWorker(uint cpu)
     {
-        bool moved = false;
-        for (int i = 0; i < FlagPollRetries && !moved; i++)
+        SchedulerThread? thread = null;
+        for (int i = 0; i < FlagPollRetries && thread is null; i++)
         {
-            SchedulerThread? thread = s_crossCpuThread;
-            moved = thread is not null && thread.State == SchedulerThreadState.Blocked && SchedulerManager.MigrateThread(thread, cpu);
-            if (!moved)
+            thread = s_crossCpuThread;
+            if (thread is null)
             {
                 TimerManager.Wait(FlagPollIntervalMs);
             }
         }
 
-        Assert.True(moved, "the parked worker moves to the other CPU");
+        Assert.True(thread is not null, "the worker reported its control block");
+        MoveThread(thread!, cpu);
+    }
+
+    private static void MoveThread(SchedulerThread thread, uint cpu)
+    {
+        SchedulerManager.SetAffinity(thread, CpuSet.Single(cpu));
+        for (int i = 0; i < FlagPollRetries && thread.CpuId != cpu; i++)
+        {
+            TimerManager.Wait(FlagPollIntervalMs);
+        }
+
+        Assert.Equal(cpu, thread.CpuId, "the pinned worker is assigned to that CPU");
     }
 
     // Waits for the worker's report from the other CPU, brings it back to CPU 0 and lets it exit.
@@ -1738,7 +1751,7 @@ public class Kernel : Sys.Kernel
         Assert.Equal(CrossCpuTarget, s_crossCpuSeenCpu, "the worker ran on the CPU it was moved to");
         Assert.Equal(CrossCpuTarget, s_crossCpuThread!.CpuId, "the worker is assigned to that CPU");
 
-        MoveParkedWorker(0);
+        MoveWorker(0);
         s_crossCpuRelease!.Signal();
         Assert.True(worker.Join(ThrowJoinTimeoutMs), "the worker exits once released on CPU 0");
         Assert.True(s_crossCpuDone, "the worker ran to its end");
@@ -1755,7 +1768,7 @@ public class Kernel : Sys.Kernel
         SysThread worker = new(CrossCpuEventWorker);
         worker.Start();
 
-        MoveParkedWorker(CrossCpuTarget);
+        MoveWorker(CrossCpuTarget);
         s_crossCpuGate.Signal();
         FinishCrossCpuWorker(worker);
     }
@@ -1769,7 +1782,7 @@ public class Kernel : Sys.Kernel
         SysThread worker = new(CrossCpuMutexWorker);
         worker.Start();
 
-        MoveParkedWorker(CrossCpuTarget);
+        MoveWorker(CrossCpuTarget);
         s_crossCpuMutex.Release();
         FinishCrossCpuWorker(worker);
     }
@@ -1817,7 +1830,7 @@ public class Kernel : Sys.Kernel
             s_crossCpuThread = null;
             spinners[cpu] = new SysThread(SwapSpinner);
             spinners[cpu].Start();
-            MoveParkedWorker(cpu);
+            MoveWorker(cpu);
             s_crossCpuGate.Signal();
             for (int i = 0; i < FlagPollRetries && SwapCounter(cpu) == 0; i++)
             {
@@ -1847,7 +1860,8 @@ public class Kernel : Sys.Kernel
                 }
             }
 
-            Assert.True(thread is not null && SchedulerManager.MigrateThread(thread, 0), "the stopped spinner moves back to CPU 0");
+            Assert.True(thread is not null, "the stopped spinner parked on its CPU");
+            MoveThread(thread!, 0);
         }
 
         for (uint cpu = 1; cpu < cpuCount; cpu++)
