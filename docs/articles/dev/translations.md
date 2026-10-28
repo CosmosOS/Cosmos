@@ -32,11 +32,13 @@ At load time, `main.js` moves each of these ids onto the heading that follows it
 
 `stamp` also records which English page the translation was made from. It writes the git blob hash of the English page as `source_hash` in the translation's front matter, or on a `# source_hash:` comment line at the top of a translated `toc.yml`. The hash changes with any edit of the English page, so comparing it with the current English page tells whether the translation still follows it.
 
+The repository README is translated as well, into `README_FR.md` and `README_CN.md` next to it, which the line of language links under the badges of each README leads to. A README translation follows `README.md` paragraph for paragraph, but its links lead to the documentation of its own language (`https://cosmosos.github.io/fr/...`) and its badge labels are translated, so `check` does not compare its shape with `README.md`. `stamp README_FR.md` writes the hash of `README.md` on a `<!-- source_hash: ... -->` comment on its first line, which GitHub does not display, and `check` reports a README translation that is missing, not stamped or stale. The docs workflow also runs when a README changes, so that a stale README translation shows up in its summary.
+
 ## Checking the translations
 
 `python3 .github/scripts/docs-i18n.py check` walks every English page and reports, for each language, a translation that is missing, one that is stale (its `source_hash` no longer matches the English page), one that is orphaned (the English page is gone), and one whose shape no longer matches the English page: different headings, code blocks, link targets, inline code, table rows or paragraphs, a line left identical to an English line of six words or more, a dash the house style bans, or a toc entry that leaves the language's folder. A file it cannot read, such as one not saved as UTF-8, is reported like any other finding.
 
-The docs workflow runs it after building the three sites. Each page with findings becomes one warning annotation on the workflow run, and the full list goes to the run's summary, since GitHub shows only the first ten annotations of a step. The step never fails the build, because an English change must not wait for someone who can write French and Chinese; the stale translation keeps being published, under its notice, until someone updates it. Locally, `--strict` makes it exit with an error, `--lang fr` limits it to one language, and a list of English paths (relative to `docs/`) limits it to those pages.
+The docs workflow runs it after building the three sites. Each page with findings becomes one warning annotation on the workflow run, and the full list goes to the run's summary, since GitHub shows only the first ten annotations of a step. The step never fails the build, because an English change must not wait for someone who can write French and Chinese; the stale translation keeps being published, under its notice, until someone updates it. Locally, `--strict` makes it exit with an error, `--lang fr` limits it to one language, and a list of English paths (relative to `docs/`, or `README.md`) limits it to those pages.
 
 ## When you change an English page
 
@@ -60,9 +62,10 @@ A new language needs:
 - a root `toc.yml` whose API entry reads `../api/`;
 - a `templates/<folder>/token.json` with the theme strings;
 - in `main.js`, an entry in the `languages` list, the notice text, and the lunr stemmer of the language in `lunrLanguages` when lunr has one;
-- for a language written without spaces between words, a substring search worker such as `templates/zh/public/search-worker.min.js`, and in `docs-i18n.py` the check that a page holds text in that script, like the one for Chinese.
+- for a language written without spaces between words, a substring search worker such as `templates/zh/public/search-worker.min.js`, and in `docs-i18n.py` the check that a page holds text in that script, like the one for Chinese;
+- a translation of the README next to `README.md`, its file name in `READMES` in `docs-i18n.py`, and its link in the language line of every README.
 
-The `Makefile`, `build-docs.yml`, `release.yml` and `docs-i18n.py` find the languages by their `docs/<folder>/docfx.json`, so they need no change.
+The `Makefile`, `build-docs.yml` and `release.yml` find the languages by their `docs/<folder>/docfx.json`, and so does `docs-i18n.py` for the pages, so they need no other change.
 
 ## Terms
 

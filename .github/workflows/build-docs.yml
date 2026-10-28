@@ -7,6 +7,8 @@ on:
       - 'docs/**'
       - '.github/workflows/build-docs.yml'
       - '.github/scripts/docs-i18n.py'
+      # The check step also reports README translations that fell behind.
+      - 'README*.md'
   # Build on PRs too, without publishing. docfx.json names four projects by
   # path, and the articles link into src/; either can break without anything
   # failing until the merge lands on main.
@@ -15,6 +17,7 @@ on:
       - 'docs/**'
       - '.github/workflows/build-docs.yml'
       - '.github/scripts/docs-i18n.py'
+      - 'README*.md'
 
 jobs:
   build:
