@@ -373,7 +373,7 @@ internal static class CpuStat
             _ => "???"
         };
 
-        return "T" + thread.Id + " " + kind + " " + state + " " + FormatRuntime(thread.TotalRuntimeNs);
+        return $"T{thread.Id} {kind} {state} {FormatRuntime(thread.TotalRuntimeNs)} ideal{thread.IdealCpu}";
     }
 
     private static string FormatRuntime(ulong nanoseconds)
