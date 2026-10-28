@@ -1,0 +1,39 @@
+# source_hash: 816b26aa35f17c75c12fbe5d529fa78da1326ffd
+- name: Configuration du dev container
+  href: install-dev.md
+- name: Organisation d'un projet de noyau
+  href: kernel-project-layout.md
+- name: Règles de codage
+  href: coding-guidelines.md
+- name: Traduire la documentation
+  href: translations.md
+- name: Plugs
+  href: plugs.md
+- name: Tests
+  href: testing.md
+- name: Suivi de l'API publique
+  href: public-api.md
+- name: API publique - Accéder aux éléments internes
+  href: accessing-internals.md
+- name: Ramasse-miettes
+  href: garbage-collector.md
+- name: Ramasse-miettes - Parcours précis de la pile
+  href: garbage-collector-gcinfo.md
+- name: Ramasse-miettes - Glossaire
+  href: garbage-collector-glossary.md
+- name: Ordonnanceur
+  href: scheduler.md
+- name: Ordonnanceur - Glossaire
+  href: scheduler-glossary.md
+- name: Étapes de compilation du noyau
+  href: build/kernel-compilation-steps.md
+- name: Cosmos.Build.Asm
+  href: build/asm-build.md
+- name: Cosmos.Build.GCC
+  href: build/gcc-build.md
+- name: Cosmos.Build.Patcher
+  href: build/patcher-build.md
+- name: Cosmos.Build.Ilc
+  href: build/ilc-build.md
+- name: Manifeste des pilotes
+  href: build/driver-manifest.md
