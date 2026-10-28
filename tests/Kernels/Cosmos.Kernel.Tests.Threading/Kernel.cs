@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 97;
+    private const int ExpectedTestCount = 100;
 
     /// <summary>Size of one per-CPU block, as <c>PerCpuBlock</c> lays it out and the native stubs assume.</summary>
     private const int PerCpuBlockNativeSize = 128;
@@ -108,6 +109,10 @@ public class Kernel : Sys.Kernel
     private const uint ApTickWindowTicks = 30;
     /// <summary>Polls of FlagPollIntervalMs the application processor tick cell makes for CPU 0's window to pass before it calls the clock stalled.</summary>
     private const int ApTickWindowPolls = 40;
+    /// <summary>The CPU the cross-CPU cells move their worker to: the first application processor.</summary>
+    private const uint CrossCpuTarget = 1;
+    /// <summary>Window (ms) the policy-swap cell samples each spinner's counter across, on either side of a swap.</summary>
+    private const int SwapSampleWindowMs = 200;
 
     /// <summary>Turns each side of the Thread.Yield ping-pong takes.</summary>
     private const int PingPongRounds = 20;
@@ -259,6 +264,12 @@ public class Kernel : Sys.Kernel
         TR.Run("PerCpuBlock_BootCpu_IsIndexZeroAndOnline", TestPerCpuBlockBootCpuIsIndexZero);
         TR.RunIf(smp, "PerCpuBlock_ApplicationProcessors_OnlineWithOwnBlocks", TestPerCpuBlockApplicationProcessorsOnline, OneCpuCell);
         TR.RunIf(smp, "PerCpuBlock_ApplicationProcessors_TickOnTheirOwn", TestPerCpuBlockApplicationProcessorsTick, OneCpuCell);
+        // The mechanism across CPUs (CosmosOS/Cosmos#3340, SMP phase 3a): a thread moved to an
+        // application processor runs there on a wake sent from CPU 0, and a policy swap stops
+        // the other CPUs while they run threads
+        TR.RunIf(smp, "InterruptEvent_WakesThreadOnOtherCpu", TestInterruptEventWakesThreadOnOtherCpu, OneCpuCell);
+        TR.RunIf(smp, "Mutex_CrossCpuHandoff", TestMutexCrossCpuHandoff, OneCpuCell);
+        TR.RunIf(smp, "SetScheduler_SwapsWhileOtherCpusRun", TestSetSchedulerSwapsWhileOtherCpusRun, OneCpuCell);
         TR.Run("PerCpuBlock_BootStackTop_BoundsMainThreadStack", TestPerCpuBlockBootStackTopBoundsMainStack);
         TR.Run("PerCpuBlock_ExInfoHead_FollowsCurrentThread", TestPerCpuBlockExInfoHeadFollowsCurrentThread);
         TR.Run("PerCpuBlock_ExInfoChain_EmptyAfterCatchAndRethrow", TestPerCpuBlockExInfoChainEmptyAfterCatch);
@@ -1643,6 +1654,259 @@ public class Kernel : Sys.Kernel
             // window separates a ticking CPU from a dead one.
             Assert.True(ticks >= ApTickWindowTicks / 2, "the application processor's timer ticks on its own");
         }
+    }
+
+    // ===== The mechanism across CPUs (SMP phase 3a) =====
+    // A worker starts on CPU 0, parks, and is moved to another CPU while it is parked, which is
+    // when a thread can move; the wake then goes to that CPU by interrupt and the worker runs
+    // there. It parks again once it has reported in, and comes back to CPU 0 the same way
+    // before it exits: the exit path allocates, and until the collector stops every CPU (SMP
+    // phase 4) a thread may allocate on CPU 0 alone. The worker touches statics only while it
+    // is away, for the same reason: a collection on CPU 0 does not scan the stack of a thread
+    // running elsewhere.
+    private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_crossCpuGate;
+    private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_crossCpuRelease;
+    private static Cosmos.Kernel.Core.Scheduler.Mutex? s_crossCpuMutex;
+    private static SchedulerThread? s_crossCpuThread;
+    private static volatile uint s_crossCpuSeenCpu;
+    private static volatile bool s_crossCpuReported;
+    private static volatile bool s_crossCpuDone;
+
+    [MemberNotNull(nameof(s_crossCpuGate), nameof(s_crossCpuRelease), nameof(s_crossCpuMutex))]
+    private static void ResetCrossCpu()
+    {
+        s_crossCpuGate = new Cosmos.Kernel.Core.Scheduler.InterruptEvent();
+        s_crossCpuRelease = new Cosmos.Kernel.Core.Scheduler.InterruptEvent();
+        s_crossCpuMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
+        s_crossCpuThread = null;
+        s_crossCpuSeenCpu = 0;
+        s_crossCpuReported = false;
+        s_crossCpuDone = false;
+    }
+
+    // Reports the CPU this code runs on and parks until main brings the thread home.
+    private static void CrossCpuReportAndPark()
+    {
+        s_crossCpuSeenCpu = SchedulerManager.GetCurrentCpuId();
+        s_crossCpuReported = true;
+        s_crossCpuRelease!.Wait();
+        s_crossCpuDone = true;
+    }
+
+    private static void CrossCpuEventWorker()
+    {
+        s_crossCpuThread = CurrentSchedulerThread();
+        s_crossCpuGate!.Wait();
+        CrossCpuReportAndPark();
+    }
+
+    private static void CrossCpuMutexWorker()
+    {
+        s_crossCpuThread = CurrentSchedulerThread();
+        s_crossCpuMutex!.Acquire();
+        s_crossCpuMutex.Release();
+        CrossCpuReportAndPark();
+    }
+
+    // Moves the worker to `cpu` once it has parked; a running thread does not move, so the
+    // attempt repeats until the park landed.
+    private static void MoveParkedWorker(uint cpu)
+    {
+        bool moved = false;
+        for (int i = 0; i < FlagPollRetries && !moved; i++)
+        {
+            SchedulerThread? thread = s_crossCpuThread;
+            moved = thread is not null && thread.State == SchedulerThreadState.Blocked && SchedulerManager.MigrateThread(thread, cpu);
+            if (!moved)
+            {
+                TimerManager.Wait(FlagPollIntervalMs);
+            }
+        }
+
+        Assert.True(moved, "the parked worker moves to the other CPU");
+    }
+
+    // Waits for the worker's report from the other CPU, brings it back to CPU 0 and lets it exit.
+    private static void FinishCrossCpuWorker(SysThread worker)
+    {
+        for (int i = 0; i < FlagPollRetries && !s_crossCpuReported; i++)
+        {
+            TimerManager.Wait(FlagPollIntervalMs);
+        }
+
+        Assert.True(s_crossCpuReported, "the worker ran after its wake");
+        Assert.Equal(CrossCpuTarget, s_crossCpuSeenCpu, "the worker ran on the CPU it was moved to");
+        Assert.Equal(CrossCpuTarget, s_crossCpuThread!.CpuId, "the worker is assigned to that CPU");
+
+        MoveParkedWorker(0);
+        s_crossCpuRelease!.Signal();
+        Assert.True(worker.Join(ThrowJoinTimeoutMs), "the worker exits once released on CPU 0");
+        Assert.True(s_crossCpuDone, "the worker ran to its end");
+    }
+
+    // A thread parked on an interrupt event and moved to another CPU runs there when the
+    // event is signalled from CPU 0: the wake queues it on that CPU and sends the reschedule
+    // interrupt, whose exit switches to it. Before phase 3a a wake only set the caller's own
+    // reschedule request, and a thread queued on another CPU waited for that CPU's next tick,
+    // or forever on a CPU halted in its idle loop.
+    private static void TestInterruptEventWakesThreadOnOtherCpu()
+    {
+        ResetCrossCpu();
+        SysThread worker = new(CrossCpuEventWorker);
+        worker.Start();
+
+        MoveParkedWorker(CrossCpuTarget);
+        s_crossCpuGate.Signal();
+        FinishCrossCpuWorker(worker);
+    }
+
+    // The mutex hand-off across CPUs: the waiter parks on CPU 0, moves, and the release on
+    // CPU 0 hands it the mutex and wakes it on the other CPU, where it owns the mutex.
+    private static void TestMutexCrossCpuHandoff()
+    {
+        ResetCrossCpu();
+        s_crossCpuMutex.Acquire();
+        SysThread worker = new(CrossCpuMutexWorker);
+        worker.Start();
+
+        MoveParkedWorker(CrossCpuTarget);
+        s_crossCpuMutex.Release();
+        FinishCrossCpuWorker(worker);
+    }
+
+    // ===== A policy swap while the other CPUs run threads =====
+    private static uint[]? s_swapCounters;
+    private static volatile bool s_swapStop;
+
+    // Spins on the CPU it woke on, counting in its CPU's slot; statics only (see above).
+    private static void SwapSpinner()
+    {
+        s_crossCpuThread = CurrentSchedulerThread();
+        s_crossCpuGate!.Wait();
+
+        uint cpu = SchedulerManager.GetCurrentCpuId();
+        uint[] counters = s_swapCounters!;
+        while (!s_swapStop)
+        {
+            Interlocked.Increment(ref counters[cpu]);
+        }
+
+        s_crossCpuRelease!.Wait();
+    }
+
+    private static uint SwapCounter(uint cpu)
+    {
+        return Volatile.Read(ref s_swapCounters![cpu]);
+    }
+
+    // SetScheduler stops every other CPU for the swap: a spinner on each of them keeps
+    // counting after the swap in each direction, under the incoming policy. Without the stop,
+    // a tick on another CPU would reach a run structure the incoming policy has not built yet.
+    private static void TestSetSchedulerSwapsWhileOtherCpusRun()
+    {
+        uint cpuCount = SchedulerManager.CpuCount;
+        ResetCrossCpu();
+        s_swapCounters = new uint[cpuCount];
+        s_swapStop = false;
+
+        // One spinner per application processor, moved there one at a time: each parks on the
+        // gate on CPU 0, moves, and is the only waiter the signal can wake.
+        SysThread[] spinners = new SysThread[cpuCount];
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            s_crossCpuThread = null;
+            spinners[cpu] = new SysThread(SwapSpinner);
+            spinners[cpu].Start();
+            MoveParkedWorker(cpu);
+            s_crossCpuGate.Signal();
+            for (int i = 0; i < FlagPollRetries && SwapCounter(cpu) == 0; i++)
+            {
+                TimerManager.Wait(FlagPollIntervalMs);
+            }
+
+            Assert.True(SwapCounter(cpu) > 0, "the spinner counts on its CPU");
+        }
+
+        RoundRobinScheduler roundRobin = new();
+        AssertSpinnersAdvanceAcrossSwap(roundRobin, cpuCount, "Round-Robin");
+        Cosmos.Kernel.Core.Scheduler.Stride.StrideScheduler stride = new();
+        AssertSpinnersAdvanceAcrossSwap(stride, cpuCount, "Stride");
+
+        // Home and release: each spinner parks on its CPU once stopped, moves back and exits on
+        // CPU 0; a release wakes one waiter, so one per spinner.
+        s_swapStop = true;
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            SchedulerThread? thread = null;
+            for (int i = 0; i < FlagPollRetries && thread is null; i++)
+            {
+                thread = FindBlockedThreadOn(cpu);
+                if (thread is null)
+                {
+                    TimerManager.Wait(FlagPollIntervalMs);
+                }
+            }
+
+            Assert.True(thread is not null && SchedulerManager.MigrateThread(thread, 0), "the stopped spinner moves back to CPU 0");
+        }
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            s_crossCpuRelease.Signal();
+        }
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            Assert.True(spinners[cpu].Join(ThrowJoinTimeoutMs), "the spinner exits once released on CPU 0");
+        }
+    }
+
+    private static void AssertSpinnersAdvanceAcrossSwap(IScheduler policy, uint cpuCount, string name)
+    {
+        uint[] before = new uint[cpuCount];
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            before[cpu] = SwapCounter(cpu);
+        }
+
+        SchedulerManager.SetScheduler(policy);
+        Assert.True(ReferenceEquals(SchedulerManager.Current, policy), "the policy is installed");
+        TimerManager.Wait(SwapSampleWindowMs);
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            Serial.WriteString("[Threading] CPU ");
+            Serial.WriteNumber(cpu);
+            Serial.WriteString(" spun ");
+            Serial.WriteNumber(SwapCounter(cpu) - before[cpu]);
+            Serial.WriteString(" times after the swap to ");
+            Serial.WriteString(name);
+            Serial.WriteString("\n");
+            Assert.True(SwapCounter(cpu) != before[cpu], "the spinner keeps running under the incoming policy");
+        }
+    }
+
+    // The registered thread parked on `cpu`, or null. The spinners share one event and the
+    // gate's FIFO decides which one each signal woke, so the thread on a CPU is found by its
+    // assignment, not remembered.
+    private static SchedulerThread? FindBlockedThreadOn(uint cpu)
+    {
+        SchedulerThread?[]? threads = SchedulerManager.Threads;
+        if (threads is null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < threads.Length; i++)
+        {
+            SchedulerThread? thread = threads[i];
+            if (thread is not null && !thread.IsIdle && thread.CpuId == cpu && thread.State == SchedulerThreadState.Blocked)
+            {
+                return thread;
+            }
+        }
+
+        return null;
     }
 
     // BeforeRun runs on CPU 0's idle thread, the boot thread, on the bootloader stack whose top
