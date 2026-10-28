@@ -25,8 +25,10 @@ A [`SchedulerThread`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Ke
 | Field | Purpose |
 |-------|---------|
 | `Id`, `CpuId` | Globally unique id (a bare incrementing counter) and the assigned CPU |
+| `Affinity`, `IdealCpu` | The CPUs the thread may run on (a `CpuSet`, never empty) and the one the policy prefers, inside the set ([CPU affinity](sched-concepts/cpu-affinity.md)) |
+| `_onCpu` | 1 while a CPU has staged a switch to the thread or is still on its stack, cleared by that CPU's interrupt stub after its stack switch; what a resume on another CPU waits on. Manager bookkeeping, not on the seam |
 | `State` | One of `Created`, `Ready`, `Running`, `Blocked`, `Sleeping`, `Dead` |
-| `Flags` | `IdleThread`, `Pinned`, `Managed`; bits 8 to 15 are reserved for schedulers. `IsIdle` reads the first: the thread the blocking primitives make spin or poll instead of parking |
+| `Flags` | `IdleThread`, `Managed`; bits 8 to 15 are reserved for schedulers. `IsIdle` reads the first: the thread the blocking primitives make spin or poll instead of parking |
 | `StackBase`, `StackSize`, `StackPointer` | The stack allocation and the saved stack pointer (see below) |
 | `InstructionPointer` | The entry point, staged into the initial context. Manager bookkeeping, not on the seam |
 | `LastScheduledAt`, `WakeupTime` | Accounting kept by the manager, not on the seam; `WakeupTime` is the sleep deadline in `Stopwatch` ticks |
@@ -38,7 +40,7 @@ A [`SchedulerThread`](https://github.com/CosmosOS/Cosmos/blob/gen3/src/Cosmos.Ke
 
 Two flags change behavior elsewhere:
 
-- `Pinned`: the thread must not migrate between CPUs. Stride's `SelectCpu` and `Balance` honor it.
+- `IdleThread`: the CPU's own thread, pinned to it by its set, never moved and never evicted; a thread it creates takes the kernel's default set rather than its own.
 - `Managed`: the entry parameter is a `GCHandle` of a `System.Threading.Thread`, and the entry trampoline calls into CoreLib's `Thread.StartThread` instead of decoding the parameter as a free `Action`.
 
 ### Per-thread stack
@@ -193,7 +195,9 @@ The staging itself is two writes into the running CPU's per-CPU block: the new-t
 
 Device interrupt handlers wake threads too: the NVMe driver's message interrupt handler signals a driver kit `DeviceEvent`, an [`InterruptEvent`](#interruptevent) underneath, whose waiter must run. The tick path alone would leave that thread queued for up to a full quantum, so wake-ups take a shortcut. `ReadyThread` (and `BlockThread` and `YieldThread`) set a per-CPU `_needReschedule` flag, and the interrupt dispatcher calls `ReschedulePendingFromIrq` when a handled hardware interrupt exits: if the flag is set and no switch is already staged for this interrupt, it runs `ScheduleFromInterrupt` right there, on the device interrupt's own exit path. The already-staged check matters: the timer handler may have staged a switch during the same interrupt, and a second `ScheduleFromInterrupt` would save this frame's stack pointer into a thread whose real context lives elsewhere.
 
-A wake for a thread assigned to another CPU (SMP phase 3a, [#3340](https://github.com/CosmosOS/Cosmos/issues/3340)) queues it there, under that CPU's queue lock, sets that CPU's flag, and once the lock is released sends that CPU the reschedule interrupt (`IInterruptController.SendReschedule`: a fixed-delivery IPI to the target's APIC id on x64, SGI 8 routed to the target's affinity on ARM64), so its exit switches to the woken thread at once; a CPU halted in its idle loop wakes on it. The interrupt is sent after the lock, not under it, since the target's exit takes the lock first thing. Every thread is still placed on CPU 0, so the remote wake runs only for a thread the Threading suite moved through `SchedulerManager.MigrateThread`, the primitive that rewrites a parked or queued thread's `CpuId` under both CPUs' queue locks and moves its bookkeeping through `OnThreadMigrate`; placement proper comes in phase 5.
+A wake for a thread assigned to another CPU (SMP phase 3a, [#3340](https://github.com/CosmosOS/Cosmos/issues/3340)) queues it there, under that CPU's queue lock, sets that CPU's flag, and once the lock is released sends that CPU the reschedule interrupt (`IInterruptController.SendReschedule`: a fixed-delivery IPI to the target's APIC id on x64, SGI 8 routed to the target's affinity on ARM64), so its exit switches to the woken thread at once; a CPU halted in its idle loop wakes on it. The interrupt is sent after the lock, not under it, since the target's exit takes the lock first thing.
+
+What puts a thread on another CPU in the first place is its CPU set (SMP phase 3b, [#3341](https://github.com/CosmosOS/Cosmos/issues/3341), [CPU affinity and load balancing](sched-concepts/cpu-affinity.md)): a set change on a parked or queued thread moves it at once through `SchedulerManager.MigrateThread`, the primitive that rewrites its `CpuId` under both CPUs' queue locks and moves its bookkeeping through `OnThreadMigrate`, and a set change on a running thread is carried out by its CPU's next switch-out, which evicts a thread its CPU is excluded from and moves it on the same interrupt exit. Every resume on another CPU waits on the thread's on-CPU marker, which the previous CPU's stub clears right after its stack switch, since the handler that took the thread off ran on the thread's own stack. The default set is CPU 0, so nothing moves until a kernel widens it; placement at wake comes in phase 5.
 
 ### Parking
 
@@ -235,9 +239,9 @@ What Stride does in each hook:
 | `OnThreadYield` | Clamp `Pass` up to `GlobalPass` if it fell behind, then re-insert |
 | `PickNext` | Pop the head (lowest `Pass`); null on an empty queue, and the manager runs the idle thread |
 | `OnPickFailed` | Re-insert a thread the manager could not switch to |
-| `SelectCpu` | Honor `Pinned`; otherwise accept a CPU whose load (`TotalTickets`) is under 80% of the best load found so far |
-| `Balance` | Only when this CPU's queue is empty: steal the tail thread (highest `Pass`) from the peer with the longest queue, if that queue holds at least two and the tail is not `Pinned` |
-| `OnThreadMigrate` | Move the tickets between CPUs and rebase `Pass` on the destination's `GlobalPass + Remain` |
+| `SelectCpu` | Start from the ideal CPU, else the thread's CPU, else the set's first, then take any allowed CPU whose load (`TotalTickets`) is under 80% of the best found so far |
+| `Balance` | Only when this CPU's queue is empty: name the tail thread (highest `Pass`) of the peer with the longest queue, if that queue holds at least two and the tail's set allows this CPU; the manager moves it |
+| `OnThreadMigrate` | Move the tickets between CPUs and rebase `Pass` on the destination's `GlobalPass + Remain`; for a thread the switch-out evicted (still `Running`), `Remain` is its distance from the source's clock now |
 | `SetPriority` / `GetPriority` | Set / read tickets; on a change, the current offset from `GlobalPass` is scaled by the stride ratio so relative position survives |
 
 Wakeup placement is where fairness needs judgment. A woken thread cannot keep its old `Pass`: it fell far behind `GlobalPass` while parked, and running it until it caught up would starve everyone else. `ReadyThread` calls the hook before it marks the thread `Ready`, so the hook tells a wake (`Blocked` or `Sleeping`) from a first start (`Created`, placed at `GlobalPass`), and a wake takes one of two placements:
@@ -378,7 +382,7 @@ The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfa
 
 ## Limitations and evolution
 
-- **One CPU runs threads** ([CPU affinity and load balancing](sched-concepts/cpu-affinity.md)). The application processors are started (SMP phase 2, [#3339](https://github.com/CosmosOS/Cosmos/issues/3339)) and the mechanism is safe with several CPUs touching it (phase 3a, [#3340](https://github.com/CosmosOS/Cosmos/issues/3340): the queue and registry locks, the remote wake, the migration primitive, the stopped-world policy swap), but every thread is still placed on CPU 0 and nothing ever calls `SelectCpu` or `Balance`. What SMP still needs is a collector that stops every CPU, since a thread running on another CPU is neither stopped nor scanned by a collection on CPU 0 (phase 4, [#3342](https://github.com/CosmosOS/Cosmos/issues/3342)), affinity (phase 3b) and a placement call site (phase 5); the epic is CosmosOS/Cosmos#3336.
+- **Threads leave CPU 0 only by their CPU set** ([CPU affinity and load balancing](sched-concepts/cpu-affinity.md)). The application processors are started (SMP phase 2, [#3339](https://github.com/CosmosOS/Cosmos/issues/3339)), the mechanism is safe with several CPUs touching it (phase 3a, [#3340](https://github.com/CosmosOS/Cosmos/issues/3340): the queue and registry locks, the remote wake, the migration primitive, the stopped-world policy swap), and a thread carries a CPU set the mechanism enforces, running or not (phase 3b, [#3341](https://github.com/CosmosOS/Cosmos/issues/3341)), but the default set is CPU 0, `Balance` has no caller in the kernel, and a wake queues a thread where it is assigned. What SMP still needs is a collector that stops every CPU, since a thread running on another CPU is neither stopped nor scanned by a collection on CPU 0 (phase 4, [#3342](https://github.com/CosmosOS/Cosmos/issues/3342)), which is why the members that move a thread are experimental (`COSMOS0004`), and a placement call site (phase 5); the epic is CosmosOS/Cosmos#3336.
 - **No voluntary switch.** A thread that blocks raises the reschedule interrupt on its own CPU and switches on its exit, but `Thread.Yield` only sets `_needReschedule` and waits for the next interrupt, up to one quantum on an idle system. The fix is a synchronous save path symmetrical to the IRQ stub's.
 - **The registry caps at 256 threads.** A full registry refuses the thread: `Thread.Start` throws, as on an OS that could not create the thread, and `KernelThread.TryStart` returns false (issue [#444](https://github.com/valentinbreiz/nativeaot-patcher/issues/444)). The cap itself stays.
 - **No stack protection.** No guard page, and the saved context sits in the overflow path of the thread's own frames.
@@ -390,12 +394,12 @@ The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfa
 
 ## Tests
 
-Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 100 tests on the `bare` cell and again on `bare+smp4`, a four-CPU machine (`make test KERNEL=Threading`):
+Three kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 100 tests on the `bare` cell and again on `bare+smp4`, a four-CPU machine (`make test KERNEL=Threading`):
 
 - thread lifecycle and concurrency (`Thread_Start_ExecutesDelegate`, `Thread_Multiple_CanRunConcurrently`), and thread ids handed out from two creating threads at once (`Thread_Ids_UniqueAcrossConcurrentStarts`),
 - exception dispatch on several threads at once (`Thread_Throw_TwoThreadsUnhandled_BothJoin`, `Thread_Throw_ConcurrentCatchRethrow_OwnExceptions`),
 - the per-CPU block: its layout against the native table, the boot CPU's index and boot stack, the application processors online with blocks, idle threads and ticks of their own on the `smp4` cell, the ExInfo chain head following the current thread and emptying after a catch and a rethrow, and `Thread.GetCurrentProcessorId` (`PerCpuBlock_*`, `Thread_GetCurrentProcessorId_IsBootCpu`),
-- the mechanism across CPUs on the `smp4` cell: a parked thread moved to an application processor runs there on a wake sent from CPU 0, through an interrupt event and through a mutex hand-off, and a policy swap in each direction while a spinner runs on every other CPU (`InterruptEvent_WakesThreadOnOtherCpu`, `Mutex_CrossCpuHandoff`, `SetScheduler_SwapsWhileOtherCpusRun`),
+- the mechanism across CPUs on the `smp4` cell: a parked thread pinned to an application processor runs there on a wake sent from CPU 0, through an interrupt event and through a mutex hand-off, and a policy swap in each direction while a spinner runs on every other CPU (`InterruptEvent_WakesThreadOnOtherCpu`, `Mutex_CrossCpuHandoff`, `SetScheduler_SwapsWhileOtherCpusRun`),
 - the reference form of `Interlocked.CompareExchange` (the runtime's `RhpCheckedLockCmpXchg`, assembly since it has to be atomic against a tick) raced from two threads (`Interlocked_ReferenceExchange_TwoThreads`),
 - stack sizing and the #433 floor (`Thread_MaxStackSize_IsHonored`, `Thread_MaxStackSize_TinyRequestIsFloored`, `Thread_EnsureSufficientExecutionStack_Passes`),
 - thread statics (`Thread_ThreadStatics`),
@@ -403,6 +407,8 @@ Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](htt
 - spinlocks, monitors and the `lock` statement (`SpinLock_*`, `Monitor_*`, `Lock_Statement_*`),
 - interrupt events (`InterruptEvent_TwoWaiters_BothWake`),
 - the BCL surface above it all: delegates, `Task`, `async`/`await`, `ThreadPool`.
+
+[`Cosmos.Kernel.Tests.Smp`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Smp/Kernel.cs) runs 30 tests on `bare` and `bare+smp4` (`make test KERNEL=Smp`): the `CpuSet` arithmetic, what `KernelCpus` reports and the default set, the inheritance of a thread's set from its creator and from `Main`, the housekeeping rule for the threads `KernelThread.TryStart` starts, `ThreadAffinity` and `KernelThreadInfo` over a thread and their refusals (an unstarted or exited thread, the boot thread, a masked caller, an empty set, an ideal CPU outside the set), and on four CPUs the moves themselves: a thread pinned to another CPU running there (`Affinity_PinnedThread_RunsOnThatCpu`), two pinned spinners running at once (`Affinity_TwoPinnedSpinners_RunAtOnce`), a running thread moved by a set change from a third CPU (`Affinity_ChangeWhileRunning_Migrates`), a thread returning from its own set change on the new CPU (`Affinity_SetCurrent_ReturnsOnNewCpu`), a two-hundred-round ping-pong between CPU 1 and CPU 2 with a stack-local checksum, the cell the on-CPU marker exists for (`Affinity_PingPong_KeepsStackIntact`), a parked thread moved and woken on its new CPU (`Affinity_ParkedThread_MovesAndWakesOnNewCpu`), and an idle CPU pulling a queued thread through `SchedulerManager.Balance` (`Balance_IdleCpuPullsQueuedThread`).
 
 [`Cosmos.Kernel.Tests.Timer`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) runs 24 tests on x64 and 18 on ARM64 (`make test KERNEL=Timer`), covering both deferred-work tiers (`TimerManager_Schedule_*`, `AlarmSystem_*`), the BCL `System.Threading.Timer` on top of them, `Stopwatch`, `DateTime`, and the per-architecture timer hardware (PIT and LAPIC on x64).
 

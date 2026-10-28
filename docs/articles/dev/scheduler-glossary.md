@@ -15,4 +15,4 @@ These notes give the background on the scheduling concepts that the contributor 
 | [Starvation and aging](sched-concepts/starvation.md) | Ready threads that never run, and the guards against it |
 | [Priority inversion and inheritance](sched-concepts/priority-inversion.md) | A high-priority thread stuck behind a lock holder that a medium-priority thread preempts |
 | [Real-time scheduling](sched-concepts/real-time-scheduling.md) | Deadlines, Rate Monotonic and EDF, utilization bounds and admission control |
-| [CPU affinity and load balancing](sched-concepts/cpu-affinity.md) | Per-CPU run queues, placement, migration and pinned threads |
+| [CPU affinity and load balancing](sched-concepts/cpu-affinity.md) | Per-CPU run queues, the CPU set and the ideal CPU a thread carries, migration, the eviction of a running thread and the on-CPU marker |
