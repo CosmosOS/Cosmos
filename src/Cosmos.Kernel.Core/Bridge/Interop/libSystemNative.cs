@@ -152,8 +152,8 @@ internal static unsafe partial class libSystemNative
             // ARM64: no code selector needed, use 0.
             thread.InitializeStack(entryPoint, 0, (nuint)parameter, size);
 #endif
-            SchedulerManager.CreateThread(0, thread);
-            SchedulerManager.ReadyThread(0, thread);
+            SchedulerManager.CreateThread(thread);
+            SchedulerManager.ReadyThread(thread);
 
             Serial.WriteString("[libSystemNative] Thread ");
             Serial.WriteNumber(thread.Id);

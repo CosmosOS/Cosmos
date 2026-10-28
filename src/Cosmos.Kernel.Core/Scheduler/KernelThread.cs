@@ -70,7 +70,10 @@ internal static unsafe partial class KernelThread
     /// preempted before it looked at the handshake returns as soon as it
     /// resumes.
     /// </returns>
-    internal static bool TryStart(Action entry) => TryStart(entry, out _);
+    internal static bool TryStart(Action entry)
+    {
+        return TryStart(entry, out _);
+    }
 
     /// <summary>
     /// <see cref="TryStart(Action)"/> that also hands back the thread, for a
@@ -112,8 +115,8 @@ internal static unsafe partial class KernelThread
         uint readiedAtSwitch;
         using (InternalCpu.DisableInterruptsScope())
         {
-            SchedulerManager.CreateThread(started.CpuId, started);
-            SchedulerManager.ReadyThread(started.CpuId, started);
+            SchedulerManager.CreateThread(started);
+            SchedulerManager.ReadyThread(started);
             readiedAtTick = SchedulerManager.TickCount;
             readiedAtSwitch = SchedulerManager.SwitchCount;
         }
@@ -145,8 +148,10 @@ internal static unsafe partial class KernelThread
             }
         }
 
-        // Masked, so on this CPU, the only one that runs threads, the thread
-        // cannot move between the verdict and the reap.
+        // Masked, so on this CPU it cannot start between the verdict and the
+        // reap. The thread was placed on CPU 0 and the callers run there
+        // (the driver kit's threads; a caller moved elsewhere by
+        // MigrateThread would race CPU 0's switch here, which no caller does).
         using (InternalCpu.DisableInterruptsScope())
         {
             if (!handshake.TryAbandon())
@@ -164,7 +169,7 @@ internal static unsafe partial class KernelThread
             // now, with the handle InvokeCurrentThreadStart would have freed.
             if (started.State == SchedulerThreadState.Created)
             {
-                SchedulerManager.ExitThread(started.CpuId, started);
+                SchedulerManager.ExitThread(started);
                 handle.Dispose();
             }
         }

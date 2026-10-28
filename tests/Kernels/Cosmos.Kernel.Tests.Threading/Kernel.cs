@@ -2218,11 +2218,11 @@ public class Kernel : Sys.Kernel
             return false;
         }
 
-        // One mask over the whole scan: the count and the per-index reads each
-        // mask individually, so between them the tick could rotate the queue
-        // and move the target past an index already visited. Nesting the
-        // policy's own guards inside this one is harmless.
-        using (SchedulerManager.MaskInterrupts())
+        // The CPU's queue lock over the whole scan: the hooks take no guard
+        // of their own, and between the count and the per-index reads the
+        // tick could otherwise rotate the queue and move the target past an
+        // index already visited.
+        using (SchedulerManager.LockCpu(state))
         {
             int count = scheduler.GetRunQueueCount(state);
             for (int i = 0; i < count; i++)
@@ -2310,16 +2310,12 @@ public class Kernel : Sys.Kernel
             TimerManager.Wait(FlagPollIntervalMs);
         }
 
-        uint cpuId = SchedulerManager.GetCurrentCpuId();
         if (s_spinAThread is not null && s_spinBThread is not null)
         {
-            // SetPriority runs under a spinlock only (see the plugging guide's
-            // kernel constraints); mask the tick around it ourselves.
-            using (SchedulerManager.MaskInterrupts())
-            {
-                SchedulerManager.SetPriority(cpuId, s_spinAThread, priorityA);
-                SchedulerManager.SetPriority(cpuId, s_spinBThread, priorityB);
-            }
+            // SetPriority takes the thread's CPU queue lock itself (SMP phase
+            // 3a), which is what keeps the tick out of the rewrite.
+            SchedulerManager.SetPriority(s_spinAThread, priorityA);
+            SchedulerManager.SetPriority(s_spinBThread, priorityB);
 
             // Capture what the policy reports while the threads are alive:
             // OnThreadExit drops the bookkeeping GetPriority reads.
@@ -2520,12 +2516,10 @@ public class Kernel : Sys.Kernel
     {
         s_roundRobin = new RoundRobinScheduler();
 
-        // Mask the tick across the swap so nothing can observe the window
-        // between ShutdownCpu (old policy) and InitializeCpu (new policy).
-        using (SchedulerManager.MaskInterrupts())
-        {
-            SchedulerManager.SetScheduler(s_roundRobin);
-        }
+        // The swap stops the world itself (SMP phase 3a): no tick on any CPU
+        // can observe the window between ShutdownCpu (old policy) and
+        // InitializeCpu (new policy).
+        SchedulerManager.SetScheduler(s_roundRobin);
 
         Assert.True(ReferenceEquals(SchedulerManager.Current, s_roundRobin),
             "SchedulerManager.Current should be the installed Round-Robin instance");
@@ -2696,14 +2690,11 @@ public class Kernel : Sys.Kernel
     }
 
     // ===== Round-Robin live dispatch =====
-    private static volatile int s_fifoRecorded;
+    private static int s_fifoRecorded;
 
     private static void FifoWorker()
     {
-        using (SchedulerManager.MaskInterrupts())
-        {
-            s_fifoRecorded++;
-        }
+        Interlocked.Increment(ref s_fifoRecorded);
     }
 
     private static void TestRoundRobinDispatchesEveryThread()
@@ -2721,13 +2712,13 @@ public class Kernel : Sys.Kernel
         w1.Start();
         w2.Start();
 
-        for (int i = 0; i < FlagPollRetries && s_fifoRecorded < FifoWorkerCount; i++)
+        for (int i = 0; i < FlagPollRetries && Volatile.Read(ref s_fifoRecorded) < FifoWorkerCount; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         TimerManager.Wait(ExitGraceWaitMs);
 
-        Assert.Equal(FifoWorkerCount, s_fifoRecorded,
+        Assert.Equal(FifoWorkerCount, Volatile.Read(ref s_fifoRecorded),
             "Round-Robin must dispatch every ready thread (no starvation)");
     }
 
@@ -2969,10 +2960,7 @@ public class Kernel : Sys.Kernel
             "every Round-Robin worker of the cells above should have exited");
 
         Cosmos.Kernel.Core.Scheduler.Stride.StrideScheduler stride = new();
-        using (SchedulerManager.MaskInterrupts())
-        {
-            SchedulerManager.SetScheduler(stride);
-        }
+        SchedulerManager.SetScheduler(stride);
 
         Assert.True(ReferenceEquals(SchedulerManager.Current, stride),
             "SchedulerManager.Current should be the restored Stride instance");
@@ -3016,18 +3004,12 @@ public class Kernel : Sys.Kernel
         uint underStride = s_rehomeCounter;
 
         RoundRobinScheduler roundRobin = new();
-        using (SchedulerManager.MaskInterrupts())
-        {
-            SchedulerManager.SetScheduler(roundRobin);
-        }
+        SchedulerManager.SetScheduler(roundRobin);
         TimerManager.Wait(PreemptSampleIntervalMs);
         uint underRoundRobin = s_rehomeCounter;
 
         Cosmos.Kernel.Core.Scheduler.Stride.StrideScheduler stride = new();
-        using (SchedulerManager.MaskInterrupts())
-        {
-            SchedulerManager.SetScheduler(stride);
-        }
+        SchedulerManager.SetScheduler(stride);
         TimerManager.Wait(PreemptSampleIntervalMs);
         uint backUnderStride = s_rehomeCounter;
 

@@ -143,7 +143,7 @@ internal class Mutex : IDisposable
                 }
 
                 queued = true;
-                SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
+                SchedulerManager.BlockThread(currentThread);
             }
 
             // Give the CPU to the next thread until the hand-off readies
@@ -264,7 +264,7 @@ internal class Mutex : IDisposable
 
         if (toReady is not null)
         {
-            SchedulerManager.ReadyThread(toReady.CpuId, toReady);
+            SchedulerManager.ReadyThread(toReady);
         }
     }
 
@@ -326,7 +326,7 @@ internal class Mutex : IDisposable
                 _waitingThreads.RemoveAt(0);
             }
 
-            SchedulerManager.ReadyThread(waitingThread.CpuId, waitingThread);
+            SchedulerManager.ReadyThread(waitingThread);
         }
 
         _ownerThread = null;
