@@ -63,9 +63,9 @@ internal static unsafe partial class KernelThread
     /// <param name="entry">The thread's body; the thread exits when it returns.</param>
     /// <returns>
     /// True once the thread began. False when the scheduler is not running,
-    /// its timer went <see cref="NoTickTimeoutMs"/> without a tick, or it
-    /// handled <see cref="NoSwitchTicks"/> ticks without switching any
-    /// thread: that thread then never runs <paramref name="entry"/>. One that
+    /// the thread registry is full, its timer went <see cref="NoTickTimeoutMs"/>
+    /// without a tick, or it handled <see cref="NoSwitchTicks"/> ticks without
+    /// switching any thread: that thread then never runs <paramref name="entry"/>. One that
     /// never ran is taken off the run queue at once; one that ran but was
     /// preempted before it looked at the handshake returns as soon as it
     /// resumes.
@@ -115,7 +115,15 @@ internal static unsafe partial class KernelThread
         uint readiedAtSwitch;
         using (InternalCpu.DisableInterruptsScope())
         {
-            SchedulerManager.CreateThread(started);
+            // A full registry refuses the thread (#444): it never runs, its
+            // stack goes back, and the caller hears it did not start.
+            if (!SchedulerManager.CreateThread(started))
+            {
+                started.ReleaseStack();
+                handle.Dispose();
+                return false;
+            }
+
             SchedulerManager.ReadyThread(started);
             readiedAtTick = SchedulerManager.TickCount;
             readiedAtSwitch = SchedulerManager.SwitchCount;

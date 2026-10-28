@@ -218,6 +218,22 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     }
 
     /// <summary>
+    /// Frees the stack <see cref="InitializeStack"/> allocated, for a thread the registry
+    /// refused before it ever ran. Nothing of the thread lives on that stack yet.
+    /// </summary>
+    internal void ReleaseStack()
+    {
+        if (StackBase != 0)
+        {
+            Memory.MemoryOp.Free((void*)StackBase);
+        }
+
+        StackBase = 0;
+        StackSize = 0;
+        StackPointer = 0;
+    }
+
+    /// <summary>
     /// Hands CoreLib the thread's thread-static storage slot by reference so
     /// it can allocate and grow it in place.
     /// </summary>

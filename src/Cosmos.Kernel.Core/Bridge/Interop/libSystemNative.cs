@@ -105,6 +105,7 @@ internal static unsafe partial class libSystemNative
     /// private StartHelper. A plug of <c>Thread.CreateThread</c> could not
     /// reach that field: an <c>UnsafeAccessor</c> rejects a byref return of a
     /// field whose type is inaccessible, so the seam runs here, below it.
+    /// Returns 0, CoreLib's failure, when the thread registry is full.
     /// </summary>
     [UnmanagedCallersOnly(EntryPoint = "SystemNative_CreateThread")]
     internal static int SystemNative_CreateThread(IntPtr stackSize, delegate* unmanaged<IntPtr, IntPtr> startAddress, IntPtr parameter)
@@ -152,7 +153,21 @@ internal static unsafe partial class libSystemNative
             // ARM64: no code selector needed, use 0.
             thread.InitializeStack(entryPoint, 0, (nuint)parameter, size);
 #endif
-            SchedulerManager.CreateThread(thread);
+            // A full registry refuses the thread (#444): the registry is the
+            // collector's root set, so a thread that ran unregistered would
+            // have the objects on its stack freed under it. The failure code
+            // is what CoreLib's Thread.Start turns into its exception, as on
+            // an OS that could not create the thread.
+            if (!SchedulerManager.CreateThread(thread))
+            {
+                thread.ReleaseStack();
+                thread._managedThread.Dispose();
+                Serial.WriteString("[libSystemNative] Thread ");
+                Serial.WriteNumber(thread.Id);
+                Serial.WriteString(" refused: the thread registry is full\n");
+                return 0;
+            }
+
             SchedulerManager.ReadyThread(thread);
 
             Serial.WriteString("[libSystemNative] Thread ");
