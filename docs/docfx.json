@@ -20,7 +20,7 @@
       {
         "src": ".",
         "files": [ "**/*.md", "**/*.yml" ],
-        "exclude": [ "_site/**" ]
+        "exclude": [ "_site/**", "fr/**", "zh/**" ]
       }
     ],
     "resource": [
@@ -37,6 +37,7 @@
       "_appLogoPath": "images/logo.png",
       "_appFaviconPath": "images/favicon.ico",
       "_enableSearch": true,
+      "_lang": "en",
       "pdf": false
     }
   }

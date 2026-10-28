@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+
+  "rules": {
+    "InvalidFileLink": "info"
+  },
+
+  "build": {
+    "content": [
+      {
+        "src": ".",
+        "files": [ "**/*.md", "**/*.yml" ]
+      },
+      {
+        "src": "..",
+        "files": [ "api/**/*.yml", "api/index.md" ]
+      }
+    ],
+    "resource": [
+      {
+        "src": "..",
+        "files": [ "images/**", "articles/**/images/**" ]
+      }
+    ],
+    "output": "../_site/zh",
+    "template": [ "default", "modern", "../templates/custom", "../templates/zh" ],
+    "globalMetadata": {
+      "_appName": "Cosmos Gen 3",
+      "_appTitle": "Cosmos Gen 3",
+      "_appLogoPath": "images/logo.png",
+      "_appFaviconPath": "images/favicon.ico",
+      "_enableSearch": true,
+      "_lang": "zh-Hans",
+      "pdf": false
+    }
+  }
+}
