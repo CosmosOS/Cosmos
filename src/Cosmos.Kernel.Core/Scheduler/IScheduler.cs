@@ -56,9 +56,10 @@ public interface IScheduler
     /// <see cref="SchedulerExtensible.SchedulerData"/> on
     /// <paramref name="cpuState"/>. Called once per CPU by
     /// <see cref="SchedulerManager.SetScheduler"/>, in thread context with
-    /// interrupts masked across the whole swap, so no tick observes the
-    /// window between the outgoing policy's <see cref="ShutdownCpu"/> and
-    /// this call. No queue lock is held: allocate here.
+    /// the world stopped (interrupts masked on the calling CPU, every other
+    /// CPU held in its stop handler) across the whole swap, so no tick on any
+    /// CPU observes the window between the outgoing policy's
+    /// <see cref="ShutdownCpu"/> and this call. No lock is held: allocate here.
     /// </summary>
     /// <param name="cpuState">CPU whose state to attach bookkeeping to.</param>
     void InitializeCpu(PerCpuState cpuState);
@@ -67,8 +68,8 @@ public interface IScheduler
     /// Release the per-CPU bookkeeping, leaving a clean slot for the incoming
     /// policy. Called once per CPU by
     /// <see cref="SchedulerManager.SetScheduler"/> before the replacement is
-    /// initialized, in thread context with interrupts masked, like
-    /// <see cref="InitializeCpu"/>. Thread slots are not cleared here; see
+    /// initialized, in thread context with the world stopped and no lock
+    /// held, like <see cref="InitializeCpu"/>. Thread slots are not cleared here; see
     /// <see cref="SchedulerExtensible.SchedulerData"/>.
     /// </summary>
     /// <param name="cpuState">CPU whose state to release bookkeeping from.</param>
@@ -105,7 +106,7 @@ public interface IScheduler
     /// signalling a waiter, and from whichever CPU woke the thread, under
     /// the queue lock of <paramref name="cpuState"/>, the CPU the thread is
     /// assigned to; at a policy swap, for each thread that was waiting in a
-    /// run queue, with interrupts masked and no queue lock. It is the hook most
+    /// run queue, with the world stopped and no lock. It is the hook most
     /// likely to fire twice for one thread, so guard against inserting it
     /// twice. The manager calls it before it marks the thread Ready, so
     /// <see cref="SchedulerThread.State"/> still tells a wake (Blocked or
@@ -128,7 +129,7 @@ public interface IScheduler
     /// <summary>
     /// Remove the thread everywhere and drop its bookkeeping. Called under
     /// the CPU's queue lock, before the mechanism unregisters the thread;
-    /// with interrupts masked and no queue lock at a policy swap; with interrupts
+    /// with the world stopped and no lock at a policy swap; with interrupts
     /// masked and no lock for a thread the registry refused right after
     /// <see cref="OnThreadCreate"/>, which no run structure has seen.
     /// </summary>

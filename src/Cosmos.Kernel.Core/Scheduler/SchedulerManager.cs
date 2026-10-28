@@ -134,24 +134,24 @@ public static class SchedulerManager
     /// <see cref="IScheduler.OnThreadCreate"/> for each live thread and
     /// <see cref="IScheduler.OnThreadReady"/> for those that were waiting in
     /// a run queue, so no thread is left behind in a run structure that no
-    /// longer exists. The whole swap runs with interrupts masked, so no tick
-    /// can land in the window where the incoming policy is installed but its
-    /// per-CPU state does not exist yet, and every CPU reschedules on its
-    /// next interrupt exit so the incoming policy picks from its own queue.
+    /// longer exists. The swap runs with the world stopped: interrupts masked
+    /// on the calling CPU and every other online CPU held in its stop handler
+    /// (<see cref="CpuStop"/>), so no tick, no wake and no interrupt exit on
+    /// any CPU can reach a run structure while the incoming policy is
+    /// installed but its per-CPU state does not exist yet. That is the whole
+    /// exclusion: no spinlock is held, which is what lets the hooks allocate
+    /// here, and every CPU reschedules on its next interrupt exit so the
+    /// incoming policy picks from its own queue.
     /// </summary>
     /// <param name="scheduler">Scheduler to install.</param>
     public static void SetScheduler(IScheduler scheduler)
     {
         ThrowIfCpuStateNotInitialized();
 
-        // IRQ-safe, not the plain pair: between the ShutdownCpu loop nulling
-        // every per-CPU slot and the InitializeCpu loop refilling them, the
-        // installed policy is already the one the timer dispatches to. A tick
-        // in that window reaches its hooks with an empty slot, and the
-        // outgoing thread can be dropped from a run structure that no longer
-        // exists.
-        using (s_registryLock.AcquireIrqSafe())
+        using (InternalCpu.DisableInterruptsScope())
         {
+            CpuStop.StopOthers(s_cpuCount);
+
             SchedulerThread?[]? threads = s_allThreads;
             IScheduler? outgoing = s_currentScheduler;
 
@@ -214,6 +214,10 @@ public static class SchedulerManager
             {
                 Volatile.Write(ref s_cpuStates[i]._needReschedule, true);
             }
+
+            // The release store that publishes the swap to the CPUs leaving
+            // their stop handlers.
+            CpuStop.ReleaseAll();
         }
     }
 
