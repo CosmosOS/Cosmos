@@ -1,5 +1,5 @@
 ---
-source_hash: e7e2cb8d10abf88cdff8b806161aa683da6afd90
+source_hash: 865d50043863bc3a2f5497b9ef584501ef2d275c
 ---
 <a id="file-system"></a>
 
@@ -185,6 +185,25 @@ foreach (string path in Directory.GetFiles("/cd/docs"))
 string text = File.ReadAllText("/cd/hello.txt");
 ```
 
+`cdrom` est n'importe quel `IBlockDevice` qui porte un volume. Quand le lecteur depuis lequel le noyau a démarré se trouve derrière un contrôleur SATA en mode AHCI, il est l'une des entrées de `StorageManager.Devices`, celle dont le support est en lecture seule : un lecteur de CD-ROM implémente `IRemovableMedia` à côté d'`IBlockDevice`, un type du seam du kit de pilotes (`[Experimental("COSMOS0003")]`, si bien qu'un projet de noyau qui le teste reconnaît l'identifiant avec `<NoWarn>$(NoWarn);COSMOS0003</NoWarn>`), avec `IsReadOnly`, `IsRemovable` et `HasMedia`. Le trouver tient en une boucle sur la liste :
+
+```csharp
+using Cosmos.Kernel.HAL.Devices.Storage;   // IBlockDevice, IRemovableMedia
+using Cosmos.Kernel.System.Storage;        // StorageManager
+
+IBlockDevice? cdrom = null;
+foreach (IBlockDevice device in StorageManager.Devices)
+{
+    if (device is IRemovableMedia { IsReadOnly: true })
+    {
+        cdrom = device;
+        break;
+    }
+}
+```
+
+Le gestionnaire de stockage porte un tel support comme une seule partition qui couvre tout le disque et ne le scanne jamais à la recherche d'une table de partitions, puisqu'un support en lecture seule n'en porte aucune qu'un noyau pourrait écrire et que le MBR protecteur d'une ISO compte en unités de 512 octets qu'un périphérique à secteurs de 2048 octets lirait de travers. Il classe le support après tous les disques inscriptibles, si bien que `StorageManager.PrimaryDevice` reste un disque que le noyau peut formater tant qu'un est attaché et devient le CD sur une machine qui n'a rien d'autre. Une partition sur laquelle une image a été écrite, ou un `MemoryBlockDevice` sur les octets de l'image, se monte de la même façon.
+
 Le volume est en lecture seule, et le VFS le sait : `VfsMount.IsReadOnly` vaut `true` et `VfsMount.Flags` porte `MountFlags.ReadOnly` quels que soient les indicateurs du montage, `FileInfo.IsReadOnly` vaut `true` pour chaque fichier, et toute modification sous le point de montage échoue comme sous Linux, avec une simple `IOException` (« Read-only file system ») et non une exception d'absence :
 
 | Appel | Résultat sur un montage ISO 9660 |
@@ -198,7 +217,7 @@ Le volume est en lecture seule, et le VFS le sait : `VfsMount.IsReadOnly` vaut `
 
 Les mêmes refus s'appliquent à n'importe quel pilote quand vous montez avec `MountFlags.ReadOnly` : une partition FAT montée ainsi ne prend aucune écriture par ce point de montage, alors que la même partition montée ailleurs sans l'indicateur en prend toujours.
 
-Ce que le pilote ne lit pas : les noms longs d'un volume Joliet seul (il présente les identifiants bruts), un fichier de plus de 4 Gio réparti sur plusieurs extents (il n'est pas listé), les sessions suivantes d'un disque multisession, UDF, et El Torito, dont le catalogue de démarrage n'est qu'un fichier. Le lecteur de CD-ROM lui-même n'est pas encore un périphérique bloc : le pilote AHCI du kit ignore les périphériques ATAPI, donc en attendant qu'il les atteigne, le pilote lit une image depuis la RAM, depuis une partition de disque ou depuis une clé USB sur laquelle l'image a été écrite.
+Ce que le pilote ne lit pas : les noms longs d'un volume Joliet seul (il présente les identifiants bruts), un fichier de plus de 4 Gio réparti sur plusieurs extents (il n'est pas listé), les sessions suivantes d'un disque multisession, UDF, et El Torito, dont le catalogue de démarrage n'est qu'un fichier. Un contrôleur SATA en mode AHCI est l'endroit où la machine q35 de QEMU place son lecteur de CD, et où VMware le place quand le lecteur virtuel est sur le contrôleur SATA plutôt que sur le contrôleur IDE ; là, l'`AhciDriver` du kit publie le lecteur sous le nom `cdrom<n>` ([Les pilotes de stockage](drivers.md#the-storage-drivers)). Un lecteur derrière un contrôleur USB, virtio-scsi ou IDE n'est pas encore un périphérique bloc, si bien qu'un noyau démarré depuis l'un d'eux lit plutôt une image : depuis la RAM, depuis une partition de disque ou depuis une clé USB sur laquelle l'image a été écrite.
 
 <a id="partition-a-disk"></a>
 
@@ -573,7 +592,7 @@ Quand **rien du tout n'est monté**, `System.IO` se dégrade quand même proprem
 - Les horodatages des fichiers ne sont pas encore persistés (`File.SetLastWriteTime` est accepté, mais l'horodatage FAT viendra plus tard).
 - `DriveInfo` n'est pas encore branché ; utilisez `VfsManager.TryStatFs` pour connaître l'espace libre.
 - FAT et ISO 9660 sont les pilotes de système de fichiers que couvrent les suites du noyau ; le pilote ext2, `Ext2FileSystemType` dans `Cosmos.Kernel.System.FileSystem.Ext2`, est livré à côté et n'est testé que sur l'hôte. L'interface `IVfsFileSystemType` est ce qu'implémente un nouveau pilote.
-- Le pilote ISO 9660 lit les images et les volumes sur lesquels elles ont été écrites ; le lecteur de CD-ROM lui-même (ATAPI derrière le contrôleur AHCI) n'est pas encore un périphérique bloc.
+- Le pilote ISO 9660 lit un lecteur de CD-ROM derrière un contrôleur AHCI, les images, et les volumes sur lesquels des images ont été écrites ; un lecteur derrière un contrôleur USB, virtio-scsi ou IDE n'est pas encore un périphérique bloc.
 
 <a id="how-it-works"></a>
 

@@ -3,9 +3,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.FileSystem;
 using Cosmos.Kernel.System.FileSystem.Iso9660;
+using Cosmos.Kernel.System.Storage;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -23,16 +25,38 @@ namespace Cosmos.Kernel.Tests.Iso9660;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Exact TR.Run cell count — the harness synthesizes failures
+    /// <summary>Exact TR.Run cell count: the harness synthesizes failures
     /// for missing tests, so a mid-suite hang can't report ALL TESTS PASSED.</summary>
-    private const ushort ExpectedTestCount = 47;
+    private const ushort ExpectedTestCount = 50;
 
     private const string CdDriverName = "iso-cd";
     private const string DiskDriverName = "iso-disk";
     private const string Level1DriverName = "iso-level1";
+    private const string BootDriverName = "iso-boot";
+    private const string BootPartitionDriverName = "iso-boot-partition";
     private const string CdMount = "/cd";
     private const string DiskMount = "/stick";
     private const string Level1Mount = "/plain";
+    private const string BootMount = "/bootcd";
+    private const string BootPartitionMount = "/bootcd-p0";
+
+    /// <summary>Why the boot CD cells skip on arm64: the engine attaches the ISO there as a virtio-scsi drive no driver binds.</summary>
+    private const string SkipNoBootCd = "the boot medium is not a block device on this cell";
+
+    /// <summary>This kernel's image, the file limine.conf on the boot CD names.</summary>
+    private const string KernelFileName = "Cosmos.Kernel.Tests.Iso9660.elf";
+
+    /// <summary>Where the build puts the Limine configuration on the ISO.</summary>
+    private const string LimineConfPath = "/boot/limine/limine.conf";
+
+    /// <summary>Where the build puts the kernel image on the ISO.</summary>
+    private const string KernelPath = "/boot/" + KernelFileName;
+
+    /// <summary>The first four bytes of an ELF image.</summary>
+    private static ReadOnlySpan<byte> ElfMagic => [0x7F, (byte)'E', (byte)'L', (byte)'F'];
+
+    /// <summary>The standard identifier at byte 1 of every volume descriptor.</summary>
+    private static ReadOnlySpan<byte> StandardIdentifier => "CD001"u8;
 
     /// <summary>2026-10-28 12:00:00 UTC, the stamp every fixture entry carries.</summary>
     private const long FixtureEpoch = 1_793_188_800;
@@ -504,6 +528,91 @@ public class Kernel : Sys.Kernel
             Assert.True(File.Exists("/cd/hello.txt"), "the first mount survives the second's unmount");
         });
 
+        // ---------- the boot CD ----------
+
+        // On x64 the engine boots every cell from an ide-cd on q35's AHCI
+        // controller, the drive the kit's AhciDriver publishes as cdrom0:
+        // the ISO this very kernel was loaded from, read back through the
+        // storage manager and the driver the way a kernel on real hardware
+        // or under VMware reads its own disc. arm64 boots from a virtio-scsi
+        // drive no driver binds, so the cells skip there.
+#if ARCH_X64
+        TR.Run("Test_BootCd_Registered", () =>
+        {
+            IBlockDevice? cd = FindBootCd();
+            Assert.True(cd is not null, "the boot CD should be registered by the storage manager");
+            if (cd is null)
+            {
+                return;
+            }
+
+            Assert.True(cd.Name.StartsWith("cdrom", StringComparison.Ordinal), "the boot CD should be named cdrom<n>");
+            Assert.Equal<ulong>(FixtureImages.CdBlockSize, cd.BlockSize);
+            Assert.True(cd.BlockCount > PrimaryDescriptorSector, "the boot CD should report its sectors");
+            byte[] sector = new byte[(int)cd.BlockSize];
+            cd.ReadBlock(PrimaryDescriptorSector, 1, sector);
+            Assert.True(sector.AsSpan(1, StandardIdentifier.Length).SequenceEqual(StandardIdentifier), "sector 16 of the boot CD should hold the primary volume descriptor");
+            IReadOnlyList<Partition> partitions = StorageManager.GetPartitions(cd);
+            Assert.Equal(1, partitions.Count, "the boot CD should carry its whole extent as its one partition");
+            if (partitions.Count == 1)
+            {
+                Assert.Equal<ulong>(0, partitions[0].StartSector);
+                Assert.Equal<ulong>(cd.BlockCount, partitions[0].BlockCount);
+            }
+        });
+
+        TR.Run("Test_BootCd_Mount_ReadsThisKernel", () =>
+        {
+            IBlockDevice? cd = FindBootCd();
+            Assert.True(cd is not null, "the boot CD should be registered by the storage manager");
+            if (cd is null)
+            {
+                return;
+            }
+
+            Assert.True(VfsManager.RegisterFileSystem(BootDriverName, new Iso9660FileSystemType(cd)));
+            Assert.True(VfsManager.TryMount(BootDriverName, "", MountFlags.None, BootMount, out VfsMount? mount));
+            Assert.True(mount is { IsReadOnly: true }, "the boot CD mounts read-only");
+            string conf = File.ReadAllText(BootMount + LimineConfPath);
+            Assert.True(conf.Contains(KernelFileName), "limine.conf on the boot CD should name this kernel");
+            string elf = BootMount + KernelPath;
+            Assert.True(File.Exists(elf), "the kernel image should be on the boot CD");
+            byte[] magic = new byte[ElfMagic.Length];
+            using (FileStream stream = File.OpenRead(elf))
+            {
+                Assert.True(stream.Length > magic.Length, "the kernel image should not be empty");
+                Assert.Equal(magic.Length, stream.Read(magic, 0, magic.Length));
+            }
+
+            Assert.True(magic.AsSpan().SequenceEqual(ElfMagic), "the kernel image should start with the ELF magic");
+            Assert.True(ThrowsReadOnly(() => File.WriteAllText(BootMount + "/new.txt", "x")), "a write to the boot CD is refused");
+        });
+
+        TR.Run("Test_BootCd_Partition_Mounts", () =>
+        {
+            // The same volume through the partition the manager carved for
+            // the medium: a kernel that mounts "partition 0 of the CD", as
+            // it mounts a disk's, reaches the volume.
+            IBlockDevice? cd = FindBootCd();
+            IReadOnlyList<Partition> partitions = cd is null ? [] : StorageManager.GetPartitions(cd);
+            Assert.Equal(1, partitions.Count, "the boot CD should carry one partition");
+            if (partitions.Count != 1)
+            {
+                return;
+            }
+
+            Assert.True(VfsManager.RegisterFileSystem(BootPartitionDriverName, new Iso9660FileSystemType(partitions[0])));
+            Assert.True(VfsManager.TryMount(BootPartitionDriverName, "", MountFlags.None, BootPartitionMount, out _));
+            Assert.Equal(File.ReadAllText(BootMount + LimineConfPath), File.ReadAllText(BootPartitionMount + LimineConfPath));
+            Assert.True(VfsManager.TryUnmount(BootPartitionMount));
+            Assert.True(VfsManager.TryUnmount(BootMount));
+        });
+#else
+        TR.Skip("Test_BootCd_Registered", SkipNoBootCd);
+        TR.Skip("Test_BootCd_Mount_ReadsThisKernel", SkipNoBootCd);
+        TR.Skip("Test_BootCd_Partition_Mounts", SkipNoBootCd);
+#endif
+
         TR.Finish();
 
         Log.WriteString("\n[Tests Complete - System Halting]\n");
@@ -619,5 +728,20 @@ public class Kernel : Sys.Kernel
         {
             return e is IOException && e is not FileNotFoundException && e is not DirectoryNotFoundException;
         }
+    }
+
+    /// <summary>The first read-only removable medium the storage manager holds: the boot CD on x64, or null.</summary>
+    private static IBlockDevice? FindBootCd()
+    {
+        IReadOnlyList<IBlockDevice> devices = StorageManager.Devices;
+        for (int i = 0; i < devices.Count; i++)
+        {
+            if (devices[i] is IRemovableMedia { IsReadOnly: true })
+            {
+                return devices[i];
+            }
+        }
+
+        return null;
     }
 }

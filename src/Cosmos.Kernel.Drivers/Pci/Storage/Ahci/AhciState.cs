@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 using System.Threading;
+using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Resources;
 using Cosmos.Kernel.HAL.DriverKit.Threading;
@@ -13,13 +14,15 @@ namespace Cosmos.Kernel.Drivers.Pci.Storage.Ahci;
 /// <see cref="DeviceBinding.DriverState"/>: the ABAR window, the command
 /// region in DMA memory (the command lists, the received FIS areas and the
 /// command tables of every port index), the capability snapshot, the kit
-/// lock every port's busy claim runs under, the published ports and the
-/// counters the Storage suite reads. The port engine helpers
-/// (<see cref="StopCommandEngine"/>, <see cref="StartCommandEngine"/>,
+/// lock every port's busy claim runs under, the published ports (disks and
+/// CD-ROM drives) and the counters the Storage suite reads. The port engine
+/// helpers (<see cref="StopCommandEngine"/>, <see cref="StartCommandEngine"/>,
 /// <see cref="ResetPort"/>, <see cref="KickPort"/>) run in thread context
-/// on the kit worker, from the probe and the detach hook; the register
-/// accessors are used from any thread by <see cref="AhciPort"/>. The HBA
-/// stays strictly polled: no interrupt is connected to it.
+/// on the kit worker, from the probe and the detach hook, and the first two
+/// from a drive's check-condition recovery on any thread; the register
+/// accessors are used from any thread by <see cref="AhciPort"/> and
+/// <see cref="AhciAtapiPort"/>. The HBA stays strictly polled: no interrupt
+/// is connected to it.
 /// </summary>
 internal sealed class AhciState
 {
@@ -56,7 +59,8 @@ internal sealed class AhciState
     private readonly bool _supports64Bit;
     private readonly bool _supportsCommandListOverride;
     private readonly uint _implementedPorts;
-    private AhciPort[] _ports = [];
+    private IBlockDevice[] _ports = [];
+    private uint[] _portNumbers = [];
     private DeviceLock? _lock;
     private int _index;
     private int _commandsIssued;
@@ -97,7 +101,7 @@ internal sealed class AhciState
         internal set => _index = value;
     }
 
-    /// <summary>How many SATA ports the probe published. Any context.</summary>
+    /// <summary>How many ports the probe published, disks and CD-ROM drives together. Any context.</summary>
     public int PortCount => _ports.Length;
 
     /// <summary>VS as read: the major version in bits 31:16, the minor in bits 15:8. Any context.</summary>
@@ -129,11 +133,19 @@ internal sealed class AhciState
     /// <summary>The command region. Any context.</summary>
     internal DmaBuffer CommandRegion => _commandRegion;
 
-    /// <summary>The published ports, in port order; set by the probe before publication.</summary>
-    internal AhciPort[] Ports
+    /// <summary>The published block devices, in port order: an <see cref="AhciPort"/> for a disk, an <see cref="AhciAtapiPort"/> for a drive; set by the probe before publication. Any context.</summary>
+    internal IBlockDevice[] Ports => _ports;
+
+    /// <summary>The HBA port index of each entry of <see cref="Ports"/>, for the detach hook's engine stops. Any context.</summary>
+    internal uint[] PortNumbers => _portNumbers;
+
+    /// <summary>Records what the probe brought up, before any of it is published. Thread context, the probe.</summary>
+    /// <param name="ports">The block devices, in port order.</param>
+    /// <param name="portNumbers">Their HBA port indices, in the same order.</param>
+    internal void SetPorts(IBlockDevice[] ports, uint[] portNumbers)
     {
-        get => _ports;
-        set => _ports = value;
+        _ports = ports;
+        _portNumbers = portNumbers;
     }
 
     /// <summary>The lock every port's busy claim and release runs under, held only around the flag; set by the probe before any port is created.</summary>
@@ -181,7 +193,10 @@ internal sealed class AhciState
     /// waits for CR to clear, waits for PxCI to drain, clears FRE, applies
     /// the command list override when the HBA supports it and the device
     /// reads busy, then waits for CR, FR, ST and FRE to all read clear.
-    /// Thread context on the kit worker.
+    /// Thread context: on the kit worker from the probe and the detach hook,
+    /// and on any thread from <see cref="AhciAtapiPort"/>'s check-condition
+    /// recovery, which holds the port's busy claim; the detach hook runs
+    /// only once the consumer withdrew the port, so the two never overlap.
     /// </summary>
     /// <param name="port">The port index.</param>
     /// <returns>False when an engine stayed running past its budget; the port must then be left alone.</returns>
@@ -221,7 +236,9 @@ internal sealed class AhciState
 
     /// <summary>
     /// Starts the port's engines: waits for CR to read clear, then sets FRE
-    /// and ST. Thread context on the kit worker.
+    /// and ST. Thread context: on the kit worker from the probe, and on any
+    /// thread from <see cref="AhciAtapiPort"/>'s check-condition recovery,
+    /// which holds the port's busy claim.
     /// </summary>
     /// <param name="port">The port index.</param>
     /// <returns>False when CR stayed set past its budget; nothing was written then.</returns>

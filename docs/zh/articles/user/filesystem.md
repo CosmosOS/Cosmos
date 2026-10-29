@@ -1,5 +1,5 @@
 ---
-source_hash: e7e2cb8d10abf88cdff8b806161aa683da6afd90
+source_hash: 865d50043863bc3a2f5497b9ef584501ef2d275c
 ---
 <a id="file-system"></a>
 
@@ -185,6 +185,25 @@ foreach (string path in Directory.GetFiles("/cd/docs"))
 string text = File.ReadAllText("/cd/hello.txt");
 ```
 
+`cdrom` 是任何承载着卷的 `IBlockDevice`。当内核启动所用的驱动器位于 AHCI 模式的 SATA 控制器之后时，它就是 `StorageManager.Devices` 中的一个条目，即介质为只读的那一个：CD-ROM 驱动器在 `IBlockDevice` 之外还实现了 `IRemovableMedia`，这是驱动工具包接缝上的一个类型（`[Experimental("COSMOS0003")]`，因此对它做类型测试的内核项目要用 `<NoWarn>$(NoWarn);COSMOS0003</NoWarn>` 确认该标识符），带有 `IsReadOnly`、`IsRemovable` 和 `HasMedia`。找到它只需对列表做一次循环：
+
+```csharp
+using Cosmos.Kernel.HAL.Devices.Storage;   // IBlockDevice, IRemovableMedia
+using Cosmos.Kernel.System.Storage;        // StorageManager
+
+IBlockDevice? cdrom = null;
+foreach (IBlockDevice device in StorageManager.Devices)
+{
+    if (device is IRemovableMedia { IsReadOnly: true })
+    {
+        cdrom = device;
+        break;
+    }
+}
+```
+
+存储管理器把这样的介质作为一个覆盖整张光盘的分区来承载，从不扫描它的分区表，因为只读介质上没有内核可以写入的分区表，而 ISO 的保护性 MBR 以 512 字节为单位计数，2048 字节扇区的设备会读错。它把该介质排在所有可写磁盘之后，因此只要接有磁盘，`StorageManager.PrimaryDevice` 就仍是内核可以格式化的磁盘，而在没有其他设备的机器上它才是 CD。写入了镜像的分区，或者包着镜像字节的 `MemoryBlockDevice`，以同样的方式挂载。
+
 该卷是只读的，而且 VFS 知道这一点：无论挂载时传入什么标志，`VfsMount.IsReadOnly` 都为 `true`，`VfsMount.Flags` 都带有 `MountFlags.ReadOnly`；每个文件的 `FileInfo.IsReadOnly` 都为 `true`；挂载点下的任何修改都像在 Linux 上一样失败，抛出普通的 `IOException`（"Read-only file system"），而不是表示不存在的异常：
 
 | 调用 | 在 ISO 9660 挂载上的结果 |
@@ -198,7 +217,7 @@ string text = File.ReadAllText("/cd/hello.txt");
 
 用 `MountFlags.ReadOnly` 挂载时，同样的拒绝适用于任何驱动程序：这样挂载的 FAT 分区不接受经由该挂载点的写入，而同一分区在别处不带该标志挂载时仍然可写。
 
-该驱动程序不读取的内容：仅有 Joliet 的卷的长文件名（它呈现原始标识符）、超过 4 GiB 并分布在多个 extent 上的文件（不会列出）、多会话光盘的后续会话、UDF，以及 El Torito（其启动目录只是一个普通文件）。CD-ROM 驱动器本身还不是块设备：驱动工具包的 AHCI 驱动程序会跳过 ATAPI 设备，所以在它支持 ATAPI 之前，该驱动程序从 RAM、磁盘分区或写入了镜像的 U 盘读取镜像。
+该驱动程序不读取的内容：仅有 Joliet 的卷的长文件名（它呈现原始标识符）、超过 4 GiB 并分布在多个 extent 上的文件（不会列出）、多会话光盘的后续会话、UDF，以及 El Torito（其启动目录只是一个普通文件）。QEMU 的 q35 机器把 CD 驱动器放在 AHCI 模式的 SATA 控制器之后，VMware 在虚拟驱动器接在 SATA 控制器而不是 IDE 控制器上时也是如此；在那里，驱动工具包的 `AhciDriver` 把该驱动器以 `cdrom<n>` 的名字发布（[存储驱动程序](drivers.md#the-storage-drivers)）。位于 USB、virtio-scsi 或 IDE 控制器之后的驱动器还不是块设备，因此从这类驱动器启动的内核改为读取镜像：从 RAM、磁盘分区或写入了镜像的 U 盘读取。
 
 <a id="partition-a-disk"></a>
 
@@ -573,7 +592,7 @@ Directory.SetCurrentDirectory("/");
 - 文件时间戳尚未持久化（`File.SetLastWriteTime` 会被接受，但 FAT 时间戳的支持要在以后的版本中才会实现）。
 - `DriveInfo` 尚未接入；查询可用空间请使用 `VfsManager.TryStatFs`。
 - FAT 和 ISO 9660 是内核测试套件覆盖的文件系统驱动程序；ext2 驱动程序 `Ext2FileSystemType`（位于 `Cosmos.Kernel.System.FileSystem.Ext2`）与它们一起提供，但只在主机上测试。新的驱动程序要实现的是 `IVfsFileSystemType` 接口。
-- ISO 9660 驱动程序读取镜像以及写入了镜像的卷；CD-ROM 驱动器本身（AHCI 控制器后面的 ATAPI 设备）还不是块设备。
+- ISO 9660 驱动程序读取 AHCI 控制器之后的 CD-ROM 驱动器、镜像，以及写入了镜像的卷；位于 USB、virtio-scsi 或 IDE 控制器之后的驱动器还不是块设备。
 
 <a id="how-it-works"></a>
 

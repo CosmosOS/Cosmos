@@ -5,6 +5,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- The suite names IRemovableMedia, a driver kit seam type, to find the boot CD. -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
   <!-- Core kernel packages (using project references for development) -->

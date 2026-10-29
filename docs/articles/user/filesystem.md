@@ -172,6 +172,25 @@ foreach (string path in Directory.GetFiles("/cd/docs"))
 string text = File.ReadAllText("/cd/hello.txt");
 ```
 
+`cdrom` is any `IBlockDevice` holding a volume. When the drive the kernel booted from sits behind a SATA controller in AHCI mode, it is one of `StorageManager.Devices`, the entry whose medium is read-only: a CD-ROM drive implements `IRemovableMedia` beside `IBlockDevice`, a driver kit seam type (`[Experimental("COSMOS0003")]`, so a kernel project that tests for it acknowledges the id with `<NoWarn>$(NoWarn);COSMOS0003</NoWarn>`), with `IsReadOnly`, `IsRemovable` and `HasMedia`. Finding it is one loop over the list:
+
+```csharp
+using Cosmos.Kernel.HAL.Devices.Storage;   // IBlockDevice, IRemovableMedia
+using Cosmos.Kernel.System.Storage;        // StorageManager
+
+IBlockDevice? cdrom = null;
+foreach (IBlockDevice device in StorageManager.Devices)
+{
+    if (device is IRemovableMedia { IsReadOnly: true })
+    {
+        cdrom = device;
+        break;
+    }
+}
+```
+
+The storage manager carries such a medium as one partition spanning the whole disc and never scans it for a partition table, since a read-only medium carries none a kernel could write and an ISO's protective MBR counts in 512-byte units that a 2048-byte-sector device would misread. It orders the medium after every writable disk, so `StorageManager.PrimaryDevice` stays a disk a kernel can format while one is attached and becomes the CD on a machine that has nothing else. A partition an image was written to, or a `MemoryBlockDevice` over the image's bytes, mounts the same way.
+
 The volume is read-only, and the VFS knows it: `VfsMount.IsReadOnly` is true and `VfsMount.Flags` carries `MountFlags.ReadOnly` whatever flags you mounted with, `FileInfo.IsReadOnly` is true for every file, and every mutation under the mount point fails the way it does on Linux, with a plain `IOException` ("Read-only file system") rather than a not-found exception:
 
 | Call | Result on an ISO 9660 mount |
@@ -185,7 +204,7 @@ The volume is read-only, and the VFS knows it: `VfsMount.IsReadOnly` is true and
 
 The same refusals apply to any driver when you mount with `MountFlags.ReadOnly`: a FAT partition mounted that way takes no writes through that mount point, while the same partition mounted elsewhere without the flag still does.
 
-What the driver does not read: a Joliet-only volume's long names (it presents the plain identifiers), a file past 4 GiB split over several extents (it is not listed), the later sessions of a multi-session disc, UDF, and El Torito, whose boot catalog is just a file. The CD-ROM drive itself is not a block device yet: the kit's AHCI driver skips ATAPI devices, so until it reaches them the driver reads an image from RAM, from a disk partition, or from a USB stick the image was written to.
+What the driver does not read: a Joliet-only volume's long names (it presents the plain identifiers), a file past 4 GiB split over several extents (it is not listed), the later sessions of a multi-session disc, UDF, and El Torito, whose boot catalog is just a file. A SATA controller in AHCI mode is where QEMU's q35 machine puts its CD drive, and where VMware puts it when the virtual drive sits on the SATA controller rather than the IDE one; there the kit's `AhciDriver` publishes the drive as `cdrom<n>` ([The storage drivers](drivers.md#the-storage-drivers)). A drive behind a USB, virtio-scsi or IDE controller is not a block device yet, so a kernel booted from one reads an image instead: from RAM, from a disk partition, or from a USB stick the image was written to.
 
 ## Partition a disk
 
@@ -528,7 +547,7 @@ With **nothing mounted at all**, `System.IO` still degrades gracefully: `Directo
 - File timestamps are not persisted yet (`File.SetLastWriteTime` is accepted but a FAT timestamp lands later).
 - `DriveInfo` is not wired up yet; use `VfsManager.TryStatFs` for free-space queries.
 - FAT and ISO 9660 are the filesystem drivers the kernel suites cover; the ext2 driver, `Ext2FileSystemType` in `Cosmos.Kernel.System.FileSystem.Ext2`, ships beside them and is tested on the host only. The `IVfsFileSystemType` interface is what a new driver implements.
-- The ISO 9660 driver reads images and the volumes they were written to; the CD-ROM drive itself (ATAPI behind the AHCI controller) is not a block device yet.
+- The ISO 9660 driver reads a CD-ROM drive behind an AHCI controller, images, and the volumes images were written to; a drive behind a USB, virtio-scsi or IDE controller is not a block device yet.
 
 ## How it works
 
