@@ -1,7 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System.Diagnostics;
-using Cosmos.Kernel.Core.CPU;
 
 namespace Cosmos.Kernel.Core.Scheduler;
 
@@ -134,7 +133,7 @@ internal class InterruptEvent
                 // would bury the wakeup forever (lost-wakeup race). With
                 // the transition done under the scope, Signal can only
                 // observe a genuinely Blocked thread.
-                SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
+                SchedulerManager.BlockThread(currentThread);
             }
 
             // Give the CPU to the next thread until a Signal (or an
@@ -239,7 +238,7 @@ internal class InterruptEvent
                 // Round up so the deadline is never undershot, and never pass
                 // 0, which MarkSleeping reads as "wake on the next tick".
                 long remainingMilliseconds = (remainingTicks + ticksPerMillisecond - 1) / ticksPerMillisecond;
-                SchedulerManager.MarkSleeping(currentThread.CpuId, currentThread, (uint)Math.Max(1, remainingMilliseconds));
+                SchedulerManager.MarkSleeping(currentThread, (uint)Math.Max(1, remainingMilliseconds));
             }
 
             // Give the CPU to the next thread until a Signal or the deadline
@@ -349,16 +348,12 @@ internal class InterruptEvent
         if (toReady is not null)
         {
             // A timed waiter may already have been readied by its deadline
-            // (the tick) while still listed here; readying it a second time
-            // would queue it twice. Masked so the tick cannot slip in between
-            // the look and the ready on this CPU.
-            using (InternalCpu.DisableInterruptsScope())
-            {
-                if (toReady.State == SchedulerThreadState.Blocked || toReady.State == SchedulerThreadState.Sleeping)
-                {
-                    SchedulerManager.ReadyThread(toReady.CpuId, toReady);
-                }
-            }
+            // (the tick) while still listed here: ReadyThread does nothing
+            // for a thread that is already Ready or Running, under the queue
+            // lock of the waiter's CPU, so the look and the ready are one
+            // step whichever CPU the tick runs on. The wake goes to that CPU
+            // by interrupt when it is not this one (SMP phase 3a).
+            SchedulerManager.ReadyThread(toReady);
         }
     }
 

@@ -8,6 +8,11 @@ internal static unsafe partial class IdtNative
     [SuppressGCTransition]
     public static partial void LoadIdt(void* ptr);
 
+    /// <summary>Loads the IDT without touching the interrupt flag: an application processor's load, before it enables interrupts.</summary>
+    [LibraryImport("*", EntryPoint = "_native_x64_lidt")]
+    [SuppressGCTransition]
+    public static partial void LoadIdtKeepFlags(void* ptr);
+
     [LibraryImport("*", EntryPoint = "_native_x64_get_code_selector")]
     [SuppressGCTransition]
     public static partial ulong GetCurrentCodeSelector();

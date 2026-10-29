@@ -162,13 +162,15 @@ public sealed class RoundRobinScheduler : IScheduler
         return true;
     }
 
-    // ========== Load Balancing (dormant until SMP) ==========
+    // ========== Placement and load balancing ==========
 
-    public uint SelectCpu(SchedulerThread thread, uint currentCpu, uint cpuCount)
+    public uint SelectCpu(SchedulerThread thread, PerCpuState[] cpus, CpuSet allowed)
     {
-        // One FIFO per CPU and no load metric worth consulting: keep the
-        // thread where it is, which also honors SchedulerThreadFlags.Pinned.
-        return currentCpu;
+        // One FIFO per CPU and no load metric worth consulting: the thread's
+        // preference, then where it is, then the lowest CPU its set allows.
+        return allowed.Contains(thread.IdealCpu) ? thread.IdealCpu
+             : allowed.Contains(thread.CpuId) ? thread.CpuId
+             : allowed.First;
     }
 
     public void OnThreadMigrate(SchedulerThread thread, PerCpuState fromState, PerCpuState toState)
@@ -180,14 +182,17 @@ public sealed class RoundRobinScheduler : IScheduler
             return;
         }
 
+        // A thread the switch-out evicted (still Running) is in no queue:
+        // the remove finds nothing and the thread joins the tail here.
         RemoveFromQueue(fromData, thread);
         EnqueueTail(toData, thread);
     }
 
-    public void Balance(PerCpuState cpuState, PerCpuState[] allCpuStates)
+    public SchedulerThread? Balance(PerCpuState cpuState, PerCpuState[] allCpuStates)
     {
-        // FIFO order carries no cross-CPU invariant to rebalance; placement
-        // stays wherever SelectCpu (which honors Pinned) put the thread.
+        // FIFO order carries no cross-CPU invariant to rebalance; a thread
+        // stays wherever SelectCpu put it until its set moves it.
+        return null;
     }
 
     // ========== Dynamic Reconfiguration ==========
@@ -207,27 +212,21 @@ public sealed class RoundRobinScheduler : IScheduler
 
     public int GetRunQueueCount(PerCpuState cpuState)
     {
-        // The SchedulerDiagnostics facade calls the diagnostics hooks from thread
-        // context; guard them against the tick ourselves, per the plugging guide.
-        using (SchedulerManager.MaskInterrupts())
-        {
-            RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-            return cpuData?.RunQueue.Count ?? 0;
-        }
+        // The caller holds the CPU's queue lock (SchedulerManager.LockCpu),
+        // per the plugging guide: a hook never takes it itself.
+        RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
+        return cpuData?.RunQueue.Count ?? 0;
     }
 
     public SchedulerThread? GetRunQueueThread(PerCpuState cpuState, int index)
     {
-        using (SchedulerManager.MaskInterrupts())
+        RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
+        if (cpuData is null || index < 0 || index >= cpuData.RunQueue.Count)
         {
-            RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-            if (cpuData is null || index < 0 || index >= cpuData.RunQueue.Count)
-            {
-                return null;
-            }
-
-            return cpuData.RunQueue[index];
+            return null;
         }
+
+        return cpuData.RunQueue[index];
     }
 
     // ========== Private Helpers ==========

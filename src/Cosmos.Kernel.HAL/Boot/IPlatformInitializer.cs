@@ -129,4 +129,13 @@ internal interface IPlatformInitializer
     /// </summary>
     /// <param name="quantumMs">Scheduler time quantum in milliseconds.</param>
     void StartSchedulerTimer(uint quantumMs);
+
+    /// <summary>
+    /// Starts the scheduler tick on the calling CPU with the period
+    /// <see cref="StartSchedulerTimer"/> set on the boot CPU: the Local APIC timer, per CPU and
+    /// reusing the boot CPU's calibration, on x64; the generic timer's banked <c>CNTP_*</c>
+    /// registers on ARM64. Called once per application processor from its managed entry, after
+    /// <see cref="StartSchedulerTimer"/> ran on the boot CPU (SMP phase 2). Allocation-free.
+    /// </summary>
+    void StartSchedulerTimerOnCurrentCpu();
 }

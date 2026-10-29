@@ -17,6 +17,16 @@ internal interface IInterruptController
     void Initialize();
 
     /// <summary>
+    /// Brings the calling CPU's share of the interrupt hardware up, once <see cref="Initialize"/>
+    /// ran on the boot CPU: the shared IDT loaded and the Local APIC programmed on x64; the
+    /// vector table, this CPU's GIC redistributor and CPU interface, and the lines of its timer
+    /// and its reschedule interrupt on ARM64, all banked per CPU. Records the CPU's controller
+    /// identity in its per-CPU block. Called once per application processor from its managed
+    /// entry, with interrupts masked, before it starts its tick (SMP phase 2).
+    /// </summary>
+    void InitializeCurrentCpu();
+
+    /// <summary>
     /// Route a hardware IRQ to a specific vector.
     /// </summary>
     /// <param name="irqNo">Hardware IRQ index (0-15 for ISA IRQs).</param>
@@ -56,6 +66,25 @@ internal interface IInterruptController
     /// </summary>
     /// <returns>False when the controller cannot deliver one yet; nothing was raised.</returns>
     bool TryRaiseReschedule();
+
+    /// <summary>
+    /// Raises the controller's reschedule interrupt on another CPU, named by the identity its
+    /// block carries (<see cref="PerCpuBlock.HardwareId"/>): a fixed-delivery IPI to that Local
+    /// APIC id on x64, the SGI to that affinity on ARM64. What a wake sends to the CPU it queued
+    /// a thread on, so the CPU's interrupt exit switches to it instead of waiting for its tick;
+    /// a target halted in its idle loop wakes on it. Allocation-free; any context, interrupts
+    /// masked by the caller (SMP phase 3a).
+    /// </summary>
+    /// <param name="hardwareId">The target CPU's controller identity.</param>
+    void SendReschedule(ulong hardwareId);
+
+    /// <summary>
+    /// Raises the stop interrupt on another CPU, named as for <see cref="SendReschedule"/>: its
+    /// handler holds the CPU, interrupts masked, until the sender releases it
+    /// (<see cref="CpuStop"/>). Allocation-free; any context, interrupts masked by the caller.
+    /// </summary>
+    /// <param name="hardwareId">The target CPU's controller identity.</param>
+    void SendStop(ulong hardwareId);
 
     /// <summary>
     /// Dispatch an interrupt delivered by the arch's assembly stub. The

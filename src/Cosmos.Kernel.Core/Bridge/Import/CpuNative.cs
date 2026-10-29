@@ -37,4 +37,37 @@ internal static partial class CpuNative
     [LibraryImport("*", EntryPoint = "_native_cpu_read_irq_flags")]
     [SuppressGCTransition]
     public static partial ulong ReadIrqFlags();
+
+    /// <summary>
+    /// Makes <paramref name="block"/> the calling CPU's: loads the per-CPU register,
+    /// <c>IA32_GS_BASE</c> on x64 and <c>TPIDR_EL1</c> on ARM64, with its address. Once per CPU,
+    /// by <see cref="CPU.PerCpuBlock.InstallBootCpu"/> for the boot CPU.
+    /// </summary>
+    [LibraryImport("*", EntryPoint = "_native_cpu_set_block")]
+    [SuppressGCTransition]
+    public static partial void SetCurrentBlock(nuint block);
+
+    /// <summary>
+    /// The index of the calling CPU, read from its per-CPU block (<see cref="CPU.PerCpuBlock"/>)
+    /// through the per-CPU register: <c>IA32_GS_BASE</c> on x64, <c>TPIDR_EL1</c> on ARM64.
+    /// </summary>
+    [LibraryImport("*", EntryPoint = "_native_cpu_read_index")]
+    [SuppressGCTransition]
+    public static partial ulong ReadCpuIndex();
+
+    /// <summary>The calling CPU's per-CPU block (<see cref="CPU.PerCpuBlock"/>).</summary>
+    [LibraryImport("*", EntryPoint = "_native_cpu_block_address")]
+    [SuppressGCTransition]
+    public static partial nuint GetCurrentBlock();
+
+    /// <summary>
+    /// The address of the application processor trampoline (<c>CPU/Smp.s</c> of the native
+    /// package): what <see cref="CPU.Smp.StartApplicationProcessors"/> writes into a parked
+    /// CPU's <c>goto_address</c>. The trampoline loads the per-CPU register from the entry's
+    /// <c>extra_argument</c>, puts the CPU in the state <c>kmain</c> gives the boot CPU, and
+    /// calls <c>__managed__ap_main</c>.
+    /// </summary>
+    [LibraryImport("*", EntryPoint = "_native_cpu_ap_trampoline_address")]
+    [SuppressGCTransition]
+    public static partial nuint GetApTrampolineAddress();
 }

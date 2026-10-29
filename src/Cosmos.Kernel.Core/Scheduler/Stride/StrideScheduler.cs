@@ -260,13 +260,8 @@ internal class StrideScheduler : IScheduler
         InsertByPass(cpuData, thread);
     }
 
-    // Debug counter for OnTick logging
-    private static uint s_onTickLogCount;
-
     public bool OnTick(PerCpuState cpuState, SchedulerThread current, ulong elapsedNs)
     {
-        s_onTickLogCount++;
-
         if (current is null)
         {
             return false;
@@ -277,6 +272,13 @@ internal class StrideScheduler : IScheduler
         {
             return false;
         }
+
+        // Counted on every CPU, in its own data: a static shared by every
+        // CPU's tick would be written by all of them at once. The line itself
+        // is CPU 0's: every CPU ticks at the same period, so one CPU's count
+        // paces it, and an application processor's tick must not write to the
+        // polled UART nor box until the collector stops every CPU (phase 4).
+        cpuData.OnTickLogCount++;
 
         StrideThreadData? threadData = ThreadDataOf(current);
 
@@ -301,7 +303,7 @@ internal class StrideScheduler : IScheduler
         UpdateGlobalPass(cpuData);
 
         // Log every 100 ticks
-        if (s_onTickLogCount % 100 == 0)
+        if (cpuState.CpuId == 0 && cpuData.OnTickLogCount % 100 == 0)
         {
             IO.Serial.WriteString("[STRIDE] OnTick: current=");
             IO.Serial.WriteNumber(current.Id);
@@ -325,24 +327,25 @@ internal class StrideScheduler : IScheduler
 
     // ========== Load Balancing ==========
 
-    public uint SelectCpu(SchedulerThread thread, uint currentCpu, uint cpuCount)
+    public uint SelectCpu(SchedulerThread thread, PerCpuState[] cpus, CpuSet allowed)
     {
-        if ((thread.Flags & SchedulerThreadFlags.Pinned) != 0)
-        {
-            return currentCpu;
-        }
+        // The thread's preference first, then where it is, then the lowest
+        // allowed CPU; a clearly lighter allowed CPU wins over that start.
+        // The loads are read under no lock: a snapshot is enough for a
+        // placement the mechanism verifies against the set anyway.
+        uint best = allowed.Contains(thread.IdealCpu) ? thread.IdealCpu
+                  : allowed.Contains(thread.CpuId) ? thread.CpuId
+                  : allowed.First;
+        ulong bestLoad = GetCpuLoad(cpus, best);
 
-        uint best = currentCpu;
-        ulong bestLoad = GetCpuLoad(currentCpu);
-
-        for (uint cpu = 0; cpu < cpuCount; cpu++)
+        for (uint cpu = 0; cpu < cpus.Length; cpu++)
         {
-            if (cpu == currentCpu)
+            if (cpu == best || !allowed.Contains(cpu))
             {
                 continue;
             }
 
-            ulong load = GetCpuLoad(cpu);
+            ulong load = GetCpuLoad(cpus, cpu);
             if (load < bestLoad * 80 / 100)
             {
                 best = cpu;
@@ -364,7 +367,19 @@ internal class StrideScheduler : IScheduler
             return;
         }
 
-        RemoveThreadFromQueue(fromData.RunQueue, thread);
+        if (thread.State == SchedulerThreadState.Running)
+        {
+            // Evicted by the switch-out: it was on the CPU, not queued, and
+            // the saved Remain dates from its last park. What it has left of
+            // its slice is its distance from the source's clock now.
+            UpdateGlobalPass(fromData);
+            threadData.Remain = threadData.Pass - (long)fromData.GlobalPass;
+        }
+        else
+        {
+            RemoveThreadFromQueue(fromData.RunQueue, thread);
+        }
+
         fromData.TotalTickets -= threadData.Tickets;
 
         threadData.Pass = (long)toData.GlobalPass + threadData.Remain;
@@ -373,18 +388,23 @@ internal class StrideScheduler : IScheduler
         toData.TotalTickets += threadData.Tickets;
     }
 
-    public void Balance(PerCpuState cpuState, PerCpuState[] allCpuStates)
+    public SchedulerThread? Balance(PerCpuState cpuState, PerCpuState[] allCpuStates)
     {
+        // Only an idle CPU pulls, and it pulls the tail (the highest Pass,
+        // the thread the busiest CPU would run last) of the longest queue
+        // that holds at least two and whose tail may run here. Reads are
+        // snapshots under no lock; the mechanism re-checks the answer under
+        // both queue locks before it moves anything.
         StrideCpuData? cpuData = CpuDataOf(cpuState);
         if (cpuData is null || cpuData.RunQueue.Count > 0)
         {
-            return;
+            return null;
         }
 
-        PerCpuState? busiest = null;
-        int maxCount = 0;
+        SchedulerThread? victim = null;
+        int maxCount = 1;
 
-        foreach (var state in allCpuStates)
+        foreach (PerCpuState state in allCpuStates)
         {
             if (state == cpuState)
             {
@@ -392,30 +412,20 @@ internal class StrideScheduler : IScheduler
             }
 
             StrideCpuData? data = CpuDataOf(state);
-            if (data is not null && data.RunQueue.Count > maxCount)
+            if (data is null || data.RunQueue.Count <= maxCount)
+            {
+                continue;
+            }
+
+            SchedulerThread tail = data.RunQueue[data.RunQueue.Count - 1];
+            if (tail.Affinity.Contains(cpuState.CpuId))
             {
                 maxCount = data.RunQueue.Count;
-                busiest = state;
+                victim = tail;
             }
         }
 
-        if (busiest is null || maxCount <= 1)
-        {
-            return;
-        }
-
-        StrideCpuData? busiestData = CpuDataOf(busiest);
-        if (busiestData is null || busiestData.RunQueue.Count == 0)
-        {
-            return;
-        }
-
-        var victim = busiestData.RunQueue[busiestData.RunQueue.Count - 1];
-
-        if ((victim.Flags & SchedulerThreadFlags.Pinned) == 0)
-        {
-            OnThreadMigrate(victim, busiest, cpuState);
-        }
+        return victim;
     }
 
     // ========== Dynamic Reconfiguration ==========
@@ -427,49 +437,44 @@ internal class StrideScheduler : IScheduler
             priority = 1;
         }
 
-        // The manager holds only a spinlock here, which excludes another
-        // caller but not the tick, and this rewrites the run queue.
-        using (SchedulerManager.MaskInterrupts())
+        // Under the CPU's queue lock, taken by the manager: this rewrites the
+        // run queue, and the lock is what keeps the tick and a remote wake out.
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
+        StrideThreadData? threadData = ThreadDataOf(thread);
+
+        if (cpuData is null || threadData is null)
         {
-            StrideCpuData? cpuData = CpuDataOf(cpuState);
-            StrideThreadData? threadData = ThreadDataOf(thread);
+            return;
+        }
 
-            if (cpuData is null || threadData is null)
-            {
-                return;
-            }
+        UpdateGlobalPass(cpuData);
 
-            UpdateGlobalPass(cpuData);
+        ulong oldTickets = threadData.Tickets;
+        ulong newTickets = (ulong)priority;
+        ulong newStride = Stride1 / newTickets;
 
-            ulong oldTickets = threadData.Tickets;
-            ulong newTickets = (ulong)priority;
-            ulong newStride = Stride1 / newTickets;
+        long remain = threadData.Pass - (long)cpuData.GlobalPass;
+        remain = (remain * (long)newStride) / (long)threadData.Stride;
+        threadData.Pass = (long)cpuData.GlobalPass + remain;
 
-            long remain = threadData.Pass - (long)cpuData.GlobalPass;
-            remain = (remain * (long)newStride) / (long)threadData.Stride;
-            threadData.Pass = (long)cpuData.GlobalPass + remain;
+        cpuData.TotalTickets = cpuData.TotalTickets - oldTickets + newTickets;
+        threadData.Tickets = newTickets;
+        threadData.Stride = newStride;
 
-            cpuData.TotalTickets = cpuData.TotalTickets - oldTickets + newTickets;
-            threadData.Tickets = newTickets;
-            threadData.Stride = newStride;
-
-            if (thread.State == SchedulerThreadState.Ready)
-            {
-                RemoveThreadFromQueue(cpuData.RunQueue, thread);
-                InsertByPass(cpuData, thread);
-            }
+        if (thread.State == SchedulerThreadState.Ready)
+        {
+            RemoveThreadFromQueue(cpuData.RunQueue, thread);
+            InsertByPass(cpuData, thread);
         }
     }
 
     public long GetPriority(SchedulerThread thread)
     {
-        // The tick can replace the thread's extension record between the read
+        // Under the thread's CPU queue lock, taken by the manager, so the
+        // tick cannot replace the thread's extension record between the read
         // of the slot and the read of the field it holds.
-        using (SchedulerManager.MaskInterrupts())
-        {
-            StrideThreadData? data = ThreadDataOf(thread);
-            return data is not null ? (long)data.Tickets : 0;
-        }
+        StrideThreadData? data = ThreadDataOf(thread);
+        return data is not null ? (long)data.Tickets : 0;
     }
 
     // ========== Private Helpers ==========
@@ -556,10 +561,9 @@ internal class StrideScheduler : IScheduler
         cpuData.RunQueue.Insert(index, thread);
     }
 
-    private ulong GetCpuLoad(uint cpuId)
+    private static ulong GetCpuLoad(PerCpuState[] cpus, uint cpuId)
     {
-        var state = SchedulerManager.GetCpuState(cpuId);
-        StrideCpuData? data = state is not null ? CpuDataOf(state) : null;
+        StrideCpuData? data = CpuDataOf(cpus[cpuId]);
         return data?.TotalTickets ?? 0;
     }
 
@@ -587,15 +591,12 @@ internal class StrideScheduler : IScheduler
     /// </summary>
     private void RemoveThreadFromQueue(System.Collections.Generic.List<SchedulerThread> queue, SchedulerThread thread)
     {
-        using (SchedulerManager.MaskInterrupts())
+        for (int i = 0; i < queue.Count; i++)
         {
-            for (int i = 0; i < queue.Count; i++)
+            if (ReferenceEquals(queue[i], thread))
             {
-                if (ReferenceEquals(queue[i], thread))
-                {
-                    queue.RemoveAt(i);
-                    return;
-                }
+                queue.RemoveAt(i);
+                return;
             }
         }
     }
@@ -604,26 +605,21 @@ internal class StrideScheduler : IScheduler
 
     public int GetRunQueueCount(PerCpuState cpuState)
     {
-        // Disable interrupts to prevent timer from modifying RunQueue while we read
-        using (SchedulerManager.MaskInterrupts())
-        {
-            StrideCpuData? cpuData = CpuDataOf(cpuState);
-            return cpuData?.RunQueue.Count ?? 0;
-        }
+        // Under the CPU's queue lock, which the caller holds through
+        // SchedulerManager.LockCpu: the tick cannot rewrite the queue
+        // underneath this read.
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
+        return cpuData?.RunQueue.Count ?? 0;
     }
 
     public SchedulerThread? GetRunQueueThread(PerCpuState cpuState, int index)
     {
-        // Disable interrupts to prevent timer from modifying RunQueue while we read
-        using (SchedulerManager.MaskInterrupts())
+        StrideCpuData? cpuData = CpuDataOf(cpuState);
+        if (cpuData is null || index < 0 || index >= cpuData.RunQueue.Count)
         {
-            StrideCpuData? cpuData = CpuDataOf(cpuState);
-            if (cpuData is null || index < 0 || index >= cpuData.RunQueue.Count)
-            {
-                return null;
-            }
-
-            return cpuData.RunQueue[index];
+            return null;
         }
+
+        return cpuData.RunQueue[index];
     }
 }

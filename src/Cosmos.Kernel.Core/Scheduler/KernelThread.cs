@@ -63,14 +63,17 @@ internal static unsafe partial class KernelThread
     /// <param name="entry">The thread's body; the thread exits when it returns.</param>
     /// <returns>
     /// True once the thread began. False when the scheduler is not running,
-    /// its timer went <see cref="NoTickTimeoutMs"/> without a tick, or it
-    /// handled <see cref="NoSwitchTicks"/> ticks without switching any
-    /// thread: that thread then never runs <paramref name="entry"/>. One that
+    /// the thread registry is full, its timer went <see cref="NoTickTimeoutMs"/>
+    /// without a tick, or it handled <see cref="NoSwitchTicks"/> ticks without
+    /// switching any thread: that thread then never runs <paramref name="entry"/>. One that
     /// never ran is taken off the run queue at once; one that ran but was
     /// preempted before it looked at the handshake returns as soon as it
     /// resumes.
     /// </returns>
-    internal static bool TryStart(Action entry) => TryStart(entry, out _);
+    internal static bool TryStart(Action entry)
+    {
+        return TryStart(entry, out _);
+    }
 
     /// <summary>
     /// <see cref="TryStart(Action)"/> that also hands back the thread, for a
@@ -91,7 +94,6 @@ internal static unsafe partial class KernelThread
         SchedulerThread started = new()
         {
             Id = SchedulerManager.AllocateThreadId(),
-            CpuId = 0,
             State = SchedulerThreadState.Created,
         };
 
@@ -112,8 +114,18 @@ internal static unsafe partial class KernelThread
         uint readiedAtSwitch;
         using (InternalCpu.DisableInterruptsScope())
         {
-            SchedulerManager.CreateThread(started.CpuId, started);
-            SchedulerManager.ReadyThread(started.CpuId, started);
+            // A full registry refuses the thread (#444): it never runs, its
+            // stack goes back, and the caller hears it did not start. The
+            // kernel's own threads are housekeeping: CPU 0, whatever the
+            // default set says and wherever the caller runs.
+            if (!SchedulerManager.CreateThread(started, SchedulerManager.HousekeepingCpus))
+            {
+                started.ReleaseStack();
+                handle.Dispose();
+                return false;
+            }
+
+            SchedulerManager.ReadyThread(started);
             readiedAtTick = SchedulerManager.TickCount;
             readiedAtSwitch = SchedulerManager.SwitchCount;
         }
@@ -145,28 +157,27 @@ internal static unsafe partial class KernelThread
             }
         }
 
-        // Masked, so on this CPU, the only one that runs threads, the thread
-        // cannot move between the verdict and the reap.
-        using (InternalCpu.DisableInterruptsScope())
+        if (!handshake.TryAbandon())
         {
-            if (!handshake.TryAbandon())
-            {
-                // It began between the last look and the verdict.
-                thread = started;
-                return true;
-            }
+            // It began between the last look and the verdict.
+            thread = started;
+            return true;
+        }
 
-            // ReadyThread asked the next interrupt exit to reschedule, so a
-            // device interrupt would still switch to a thread left queued. It
-            // would exit at once, but then halt until a timer tick moves the
-            // CPU on, and with a timer that never ticks the caller would not
-            // run again. A thread that never ran holds nothing, so it goes
-            // now, with the handle InvokeCurrentThreadStart would have freed.
-            if (started.State == SchedulerThreadState.Created)
-            {
-                SchedulerManager.ExitThread(started.CpuId, started);
-                handle.Dispose();
-            }
+        // ReadyThread asked the next interrupt exit to reschedule, so a
+        // device interrupt would still switch to a thread left queued. It
+        // would exit at once, but then halt until a timer tick moves the
+        // CPU on, and with a timer that never ticks the caller would not
+        // run again. A thread that never ran holds nothing, so it goes now,
+        // with the handle InvokeCurrentThreadStart would have freed. The
+        // verdict is taken again under the thread's queue lock, the lock
+        // CPU 0's switch-in takes to start it: a mask here would exclude
+        // that switch only on CPU 0, and the caller may run elsewhere (SMP
+        // phase 3b). Began after the abandon, the thread frees the handle
+        // itself and runs nothing.
+        if (SchedulerManager.TryReapCreated(started))
+        {
+            handle.Dispose();
         }
 
         return false;

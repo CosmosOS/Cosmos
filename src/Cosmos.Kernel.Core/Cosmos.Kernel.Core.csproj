@@ -119,6 +119,10 @@
     <!-- White-box scheduler suite reads Stride bookkeeping and drives the
          sync primitives directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Threading" />
+    <!-- The affinity suite (SMP phase 3b) calls the dormant Balance entry,
+         parks its workers on an InterruptEvent, starts a kernel thread to
+         read its housekeeping set, and masks interrupts for one refusal. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Smp" />
     <!-- White-box suites over Core primitives: vector allocation and MSI
          routing (Interrupts), copy routines and page allocation (Memory),
          MMIO probes (Storage). -->

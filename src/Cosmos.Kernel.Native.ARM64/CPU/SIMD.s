@@ -1,8 +1,23 @@
 .global _native_enable_simd
 .global _native_arm64_disable_alignment_check
+.global _native_arm64_select_sp_el1
 
 .text
 .align 4
+
+// Run on SP_EL1 from here on: copies the stack pointer into SP_EL1 and selects it (EL1h), so
+// the exceptions this CPU takes stack their frames below the running sp, on the stack it runs
+// on, as every scheduler thread's do (ThreadContext starts them with SPSR 0x3C5). Limine enters
+// every CPU in EL1t, on SP_EL0, with SP_EL1 left as the firmware had it: on the boot CPU the
+// loader's UEFI stack in bootloader-reclaimable memory, on an application processor whatever
+// PSCI handed over. Called first thing by kmain on the boot CPU and by the application
+// processor trampoline. The return address is in x30, untouched, and the stack's contents do
+// not move: only the bank the sp register names changes.
+_native_arm64_select_sp_el1:
+    mov     x0, sp
+    msr     spsel, #1
+    mov     sp, x0
+    ret
 
 // Enable NEON/FP (SIMD) access
 // Sets CPACR_EL1.FPEN bits [21:20] to 0b11 to enable FP/SIMD at EL1 and EL0

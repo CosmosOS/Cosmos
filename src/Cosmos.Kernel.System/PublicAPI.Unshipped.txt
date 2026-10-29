@@ -28,6 +28,7 @@ const Cosmos.Kernel.System.Sessions.SessionManager.MaxSessions = 12 -> int
 const Cosmos.Kernel.System.Storage.Gpt.FirstUsableLba = 34 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.PrimaryHeaderLba = 1 -> ulong
 const Cosmos.Kernel.System.Storage.Gpt.ProtectiveMbrStartLba = 1 -> uint
+const Cosmos.Kernel.System.Threading.CpuSet.Capacity = 256 -> int
 Cosmos.Kernel.System.Audio.AudioDevice
 Cosmos.Kernel.System.Audio.AudioDevice.DriverName.get -> string!
 Cosmos.Kernel.System.Audio.AudioDevice.Format.get -> Cosmos.Kernel.HAL.Devices.Audio.AudioFormat
@@ -118,9 +119,11 @@ Cosmos.Kernel.System.Diagnostics.DriverInfo.DriverInfo() -> void
 Cosmos.Kernel.System.Diagnostics.DriverInfo.Name.get -> string!
 Cosmos.Kernel.System.Diagnostics.DriverInfo.Priority.get -> int
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo
+Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.Affinity.get -> Cosmos.Kernel.System.Threading.CpuSet
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.CpuId.get -> uint
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.HasPriority.get -> bool
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.Id.get -> uint
+Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.IdealCpu.get -> uint
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.IsIdle.get -> bool
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.IsManaged.get -> bool
 Cosmos.Kernel.System.Diagnostics.KernelThreadInfo.KernelThreadInfo() -> void
@@ -854,6 +857,17 @@ Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation.PartitionLocatio
 Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation.SectorCount.get -> ulong
 Cosmos.Kernel.System.Storage.PartitionManager.PartitionLocation.StartSector.get -> ulong
 Cosmos.Kernel.System.Storage.StorageManager
+Cosmos.Kernel.System.Threading.CpuSet
+Cosmos.Kernel.System.Threading.CpuSet.Contains(uint cpu) -> bool
+Cosmos.Kernel.System.Threading.CpuSet.Count.get -> int
+Cosmos.Kernel.System.Threading.CpuSet.CpuSet() -> void
+Cosmos.Kernel.System.Threading.CpuSet.Equals(Cosmos.Kernel.System.Threading.CpuSet other) -> bool
+Cosmos.Kernel.System.Threading.CpuSet.First.get -> uint
+Cosmos.Kernel.System.Threading.CpuSet.Intersect(Cosmos.Kernel.System.Threading.CpuSet other) -> Cosmos.Kernel.System.Threading.CpuSet
+Cosmos.Kernel.System.Threading.CpuSet.IsEmpty.get -> bool
+Cosmos.Kernel.System.Threading.CpuSet.With(uint cpu) -> Cosmos.Kernel.System.Threading.CpuSet
+Cosmos.Kernel.System.Threading.CpuSet.Without(uint cpu) -> Cosmos.Kernel.System.Threading.CpuSet
+Cosmos.Kernel.System.Threading.KernelCpus
 Cosmos.Kernel.System.Timers.AlarmManager
 Cosmos.Kernel.System.Timers.SoftwareTimer
 Cosmos.Kernel.System.Timers.SoftwareTimer.IsActive.get -> bool
@@ -905,6 +919,8 @@ override Cosmos.Kernel.System.Network.MaskedAddress.Equals(object! obj) -> bool
 override Cosmos.Kernel.System.Network.MaskedAddress.GetHashCode() -> int
 override Cosmos.Kernel.System.Network.NetworkAdapter.Equals(object? obj) -> bool
 override Cosmos.Kernel.System.Network.NetworkAdapter.GetHashCode() -> int
+override Cosmos.Kernel.System.Threading.CpuSet.Equals(object? obj) -> bool
+override Cosmos.Kernel.System.Threading.CpuSet.GetHashCode() -> int
 static Cosmos.Kernel.System.Audio.AudioManager.Count.get -> int
 static Cosmos.Kernel.System.Audio.AudioManager.IsEnabled.get -> bool
 static Cosmos.Kernel.System.Audio.AudioManager.Play(Cosmos.Kernel.System.Audio.AudioStream! stream) -> bool
@@ -1125,6 +1141,17 @@ static Cosmos.Kernel.System.Storage.StorageManager.Partitions.get -> System.Coll
 static Cosmos.Kernel.System.Storage.StorageManager.PrimaryDevice.get -> Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice?
 static Cosmos.Kernel.System.Storage.StorageManager.RegisterDevice(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
 static Cosmos.Kernel.System.Storage.StorageManager.RescanPartitions(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
+static Cosmos.Kernel.System.Threading.CpuSet.All.get -> Cosmos.Kernel.System.Threading.CpuSet
+static Cosmos.Kernel.System.Threading.CpuSet.Empty.get -> Cosmos.Kernel.System.Threading.CpuSet
+static Cosmos.Kernel.System.Threading.CpuSet.operator !=(Cosmos.Kernel.System.Threading.CpuSet left, Cosmos.Kernel.System.Threading.CpuSet right) -> bool
+static Cosmos.Kernel.System.Threading.CpuSet.operator ==(Cosmos.Kernel.System.Threading.CpuSet left, Cosmos.Kernel.System.Threading.CpuSet right) -> bool
+static Cosmos.Kernel.System.Threading.CpuSet.Single(uint cpu) -> Cosmos.Kernel.System.Threading.CpuSet
+static Cosmos.Kernel.System.Threading.KernelCpus.Compute.get -> Cosmos.Kernel.System.Threading.CpuSet
+static Cosmos.Kernel.System.Threading.KernelCpus.Count.get -> int
+static Cosmos.Kernel.System.Threading.KernelCpus.Current.get -> uint
+static Cosmos.Kernel.System.Threading.KernelCpus.DefaultAffinity.get -> Cosmos.Kernel.System.Threading.CpuSet
+static Cosmos.Kernel.System.Threading.KernelCpus.Housekeeping.get -> Cosmos.Kernel.System.Threading.CpuSet
+static Cosmos.Kernel.System.Threading.KernelCpus.Online.get -> Cosmos.Kernel.System.Threading.CpuSet
 static Cosmos.Kernel.System.Timers.AlarmManager.Cancel(ulong id) -> bool
 static Cosmos.Kernel.System.Timers.AlarmManager.Schedule(System.Action! callback, System.TimeSpan delay) -> ulong
 static Cosmos.Kernel.System.Timers.AlarmManager.ScheduleRecurring(System.Action! callback, System.TimeSpan period) -> ulong
@@ -1398,3 +1425,12 @@ virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnWritten(char value, bool 
 [COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.Send(Cosmos.Kernel.System.Network.Protocols.InternetPacket! packet) -> bool
 [COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICanvas3DFactory
 [COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICanvas3DFactory.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!
+[COSMOS0004]Cosmos.Kernel.System.Threading.ThreadAffinity
+[COSMOS0004]static Cosmos.Kernel.System.Threading.KernelCpus.DefaultAffinity.set -> void
+[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.Current.get -> Cosmos.Kernel.System.Threading.CpuSet
+[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.Current.set -> void
+[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.Pin(System.Threading.Thread! thread, uint cpu) -> bool
+[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.Set(System.Threading.Thread! thread, Cosmos.Kernel.System.Threading.CpuSet affinity) -> bool
+[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.SetIdealCpu(System.Threading.Thread! thread, uint cpu) -> bool
+[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.TryGet(System.Threading.Thread! thread, out Cosmos.Kernel.System.Threading.CpuSet affinity) -> bool
+[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.TryGetIdealCpu(System.Threading.Thread! thread, out uint cpu) -> bool
