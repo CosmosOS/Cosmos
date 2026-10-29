@@ -1,5 +1,5 @@
 ---
-source_hash: 898401504468456b06b981435c670ebe3699a3b2
+source_hash: edf985c0eddbd5cc55626a43d392ca4bf9ca80bd
 ---
 <a id="testing"></a>
 
@@ -100,6 +100,7 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
 | **Audio** | 每个单元格 22 个 | `bare` 和 `hda` 两个单元格上的音频栈：绑定到 QEMU `intel-hda` 的 Intel HD Audio 驱动程序、它发布的输出以及列出该输出的音频管理器、格式契约、排空环形缓冲区的流引擎及其在中断线已连接时的完成中断，以及播放器和后台播放：将一个流播放到结束、提前停止一个流、从内存播放一个 WAV 文件，还有 `Console.Beep` 通过该输出播放其音调、在输出繁忙时立即返回；在 bare 上，没有输出的管理器拒绝播放，`Console.Beep` 立即返回；在两者上，`Console.Beep` 都拒绝 Windows 所拒绝的参数 |
 | **Storage** | 每个单元格 83 个 | 存储管理器及其背后的块设备，涵盖七种配置方案（profile）`ahci`、`nvme`、`usb`、`usb-ehci`、`usb-ohci`、`virtio-blk-pci` 和 `virtio-blk-mmio`（arm64），每种在 x64 上与 `acpi-off` 修饰符组合（12 个单元格），在 arm64 上与 `gicv2`、`gicv3` 和 `acpi-off` 组合（42 个单元格）：由工具包的 `AhciDriver`、`NvmeDriver`、`UsbMassStorageDriver` 或 `VirtioBlkDriver` 发布的磁盘，接受相同的块 I/O、分区表、分区生命周期和重启断言；每个单元格上工具包在 `DriverDiagnostics` 中对该磁盘的视图；每个单元格的 NVMe 中断模式；usb 单元格上的 USB 热插拔和 virtio-blk-pci 单元格上的 PCI Express 热插拔 |
 | **Random** | 16 | 内核 CSPRNG：BLAKE2s 和 ChaCha20 已知答案测试、快速密钥擦除、RDSEED/RDRAND 和 RNDRRS/RNDR 检测、播种，以及构建于其上的 `RandomNumberGenerator`、`GetInt32` 和 `Guid.NewGuid`，测试跨越一次重新播种并从两个线程调用 |
+| **Iso9660** | 47 | ISO 9660 驱动程序，基于 xorriso 在编译时从套件的 fixture 目录树构建的两个镜像：在 CD 和磁盘几何结构上挂载，拒绝全零、损坏或过短的设备，Rock Ridge 的文件名、属性、时间戳、符号链接、continuation 区和重定位目录，不区分大小写匹配的 level 1 原始标识符，整体读取、分块读取、seek 后读取和逐行读取，经由 `System.IO`（`IOException`）和 `VfsManager`（`false`）的只读挂载，卸载和重新挂载 |
 
 <a id="helloworld-tests"></a>
 
@@ -282,6 +283,14 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
 #### Random 测试
 
 `tests/Kernels/Cosmos.Kernel.Tests.Random` 通过 Core 授予该套件的授权，检查 `Cosmos.Kernel.Core/Security` 中的内核 CSPRNG（参见[随机数](../user/random.md)）。已知答案测试（6 个）：`ChaCha20_Block_Rfc8439`（RFC 8439 第 2.3.2 节）、`ChaCha20_Keystream_Rfc8439`（第 2.4.2 节，114 字节的“sunscreen”明文，因此最后一个块不完整）、`Blake2s_Abc_Rfc7693`（附录 B）、`Blake2s_Empty`（`69217a30...1ed0eef9`）、`Blake2s_SelfTest_Rfc7693`（附录 E 的总哈希，覆盖摘要长度 16 到 32、0 到 1024 字节输入的带密钥和不带密钥哈希）和 `FastKeyErasure_NextKeyNeverOutput`（通过 `FastKeyErasure` 发起一次请求：下一个密钥是被弃用密钥的密钥流的前 32 字节，输出是其余部分且从不包含下一个密钥，临时缓冲区被擦除）。熵测试（2 个）：`Hardware_Detection`（CPUID 或 `ID_AA64ISAR0_EL1` 检测会运行，声明支持的指令产生的字既不为零、也不全为一，且不重复）和 `KernelRandom_Seeding`（播种完成，并在声明支持该指令时从中取数）；两者都会记录单元格具备的能力，抖动健康判定会被记录，但不做断言。BCL 测试（8 个）：`Fill_TwoDrawsDiffer`、`Fill_ZeroLength`（BCL 的空请求，以及直接以 0 计数、负计数和 null 缓冲区调用 `KernelRandom.Fill`，这些都是 BCL 从不向下传递的）、`Fill_64KiB_Statistics`（比特平衡在一半的 1% 以内，每个字节值出现 144 到 368 次，没有重复的 8 字节字）、`Create_GetBytes_NonZero`、`GetInt32_Range`、`Guid_NewGuid_Differ`（版本 4）、`Fill_AcrossReseed`（越过按请求数和按字节数的重新播种间隔，每次都必须使 `KernelRandom.ReseedCount` 增加）和 `Fill_ConcurrentThreads`（两个线程从起跑闸门同时释放，抽取 300 毫秒，即多个调度器时间片，同时主线程在定时器上等待：每次抽取前获取的共享序列号必须显示它们的抽取相互交错，生成器必须在此期间重新播种，且它们的任何两次抽取的前 8 字节都不得相同）。x64 单元格在 KVM 的 `host` CPU 或 TCG 的 `max` CPU 下运行，它们具备 RDSEED 和 RDRAND；arm64 的 `cortex-a72` 没有 FEAT_RNG，因此该单元格走的是仅依赖抖动的路径，其日志中包含仅用抖动的警告。
+
+<a id="iso9660-tests"></a>
+
+#### Iso9660 测试
+
+`tests/Kernels/Cosmos.Kernel.Tests.Iso9660` 在两种架构上检查 `Cosmos.Kernel.System/FileSystem/Iso9660` 中的 ISO 9660 驱动程序，不使用配置文件。它的镜像不提交到仓库：项目文件在编译时对 `Fixtures/` 下的目录树运行 xorriso（每个 Cosmos ISO 都用它构建，由 `Cosmos.Build.Common` 的 `GetXorriso` 目标解析），并固定所有者、权限模式和全部时间戳（2026-10-28 12:00:00 UTC），使生成的字节不依赖于检出、时钟或时区，然后把两个镜像嵌入内核，内核通过 Core 的 `ResourceManager` 读取它们（授权在 `Cosmos.Kernel.Core.csproj` 中）。`Fixtures/rockridge/` 以 Rock Ridge 映射：一个 140 字符的文件名，其 `NM` 条目溢出到 `CE` continuation 中；一个超过深度 8、被 xorriso 重定位到 `rr_moved` 的目录（`CL`、`RE`、`PL`）；四十个条目，把一个目录铺到四个逻辑块上；一个以部分块结尾的 10 000 字节文件；一个由构建生成的 200 KiB 模式文件；一个空文件；指向文件、目录和不存在目标的符号链接；以及一个空目录。`Fixtures/level1/` 只以 level 1 标识符映射，并带有驱动程序必须跳过的 Joliet 描述符。Rock Ridge 镜像挂载两次：一次来自 2048 字节扇区的设备（CD），一次来自 512 字节扇区的设备（写入了镜像的 U 盘）。
+
+测试单元：挂载（`Test_Mount_*`、`Test_StatFs`、`Test_FormatAndDestroy_Refused`）、列目录（`Test_RootListing_*`、`Test_Listing_*`）、查找（`Test_Lookup_*`：Rock Ridge 上精确匹配，level 1 上不区分大小写，长文件名，重定位目录，`.` 和 `..`）、读取（`Test_Read_*`：整体读取、按 4 097 字节分块读取以便一次读取的头、体、尾都得到执行、seek 后读取、逐行读取，并对 200 KiB 文件的设备读取次数设上限）、属性（`Test_Attributes_*`：只读、固定的时间戳、共享同一 extent 的条目拥有不同的 inode 号）、符号链接（`Test_Symlink_*`）、拒绝（`Test_ReadOnly_*`：每次修改经由 `System.IO` 都是普通的 `IOException`，经由 `VfsManager` 都是 `false`），以及 `Test_Unmount_And_Remount` 和 `Test_TwoMounts_SameDevice`。
 
 <a id="running-kernel-tests"></a>
 
@@ -677,6 +686,7 @@ CI 工作流（`.github/workflows/kernel-tests.yml`）在 x64 和 ARM64 上运�
 - `helloworld-results`：将合并后的 PR 评论生成到 `pr-comment-helloworld` 产物中
 - `memory-tests`：x64/arm64 的矩阵构建
 - `memory-results`：将合并后的 PR 评论生成到 `pr-comment-memory` 产物中
+- 每个套件都有这样一对作业，直到 `fat-tests`/`fat-results`、`file-tests`/`file-results` 和 `iso9660-tests`/`iso9660-results`
 - `test-summary`：最终状态汇总
 
 **触发条件：**

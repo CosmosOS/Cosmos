@@ -8,7 +8,7 @@
 | Memory Management | ✅ | ✅ ||
 | Driver support | ✅ | ✅ | PCI and MMIO over the driver kit; the platform bus seeded from ACPI, the device tree (ARM64) or the machine's table; PCI Express hot-plug on root ports |
 | Garbage Collection | ✅ | ✅ | Mark-and-sweep GC |
-| Filesystem | ✅ | ✅ | FAT12/16/32 on a Unix-style VFS (mount, superblocks, inodes) with formatting; MBR/GPT/EBR partitioning. Exposed through `System.IO.File`/`FileStream`. |
+| Filesystem | ✅ | ✅ | FAT12/16/32 and ext2 on a Unix-style VFS (mount, superblocks, inodes) with formatting, ISO 9660 with Rock Ridge read-only; MBR/GPT/EBR partitioning. Exposed through `System.IO.File`/`FileStream`. |
 | .NET core library features | 🟡 | 🟡 Partial | Core types work (String, Collections, List, Dictionary). Math, Console, DateTime, Random, BitOperations, `System.IO.File` plugged. |
 | Plug system | ✅ | ✅  |  |
 | Test Framework | ✅ | ✅  |  |

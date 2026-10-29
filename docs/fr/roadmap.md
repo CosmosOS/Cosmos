@@ -1,5 +1,5 @@
 ---
-source_hash: 7aa2a3169afd5d41363f78c3362e35ebefe75b76
+source_hash: 2b7d4286a991fa90d672a6a811459287d010f39a
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -13,7 +13,7 @@ source_hash: 7aa2a3169afd5d41363f78c3362e35ebefe75b76
 | Gestion de la mémoire | ✅ | ✅ ||
 | Prise en charge des pilotes | ✅ | ✅ | PCI et MMIO au-dessus du kit de pilotes ; le bus de plateforme peuplé à partir d'ACPI, du device tree (ARM64) ou de la table de la machine ; branchement à chaud PCI Express sur les ports racines |
 | Ramasse-miettes | ✅ | ✅ | GC par marquage-balayage |
-| Système de fichiers | ✅ | ✅ | FAT12/16/32 sur un VFS de style Unix (montage, superblocs, inodes) avec formatage ; partitionnement MBR/GPT/EBR. Exposé via `System.IO.File`/`FileStream`. |
+| Système de fichiers | ✅ | ✅ | FAT12/16/32 et ext2 sur un VFS de style Unix (montage, superblocs, inodes) avec formatage, ISO 9660 avec Rock Ridge en lecture seule ; partitionnement MBR/GPT/EBR. Exposé via `System.IO.File`/`FileStream`. |
 | Fonctionnalités de la bibliothèque de base .NET | 🟡 | 🟡 Partiel | Les types de base fonctionnent (String, Collections, List, Dictionary). Math, Console, DateTime, Random, BitOperations et `System.IO.File` sont couverts par des plugs. |
 | Système de plugs | ✅ | ✅  |  |
 | Framework de tests | ✅ | ✅  |  |

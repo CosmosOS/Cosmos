@@ -1,5 +1,5 @@
 ---
-source_hash: 7aa2a3169afd5d41363f78c3362e35ebefe75b76
+source_hash: 2b7d4286a991fa90d672a6a811459287d010f39a
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -13,7 +13,7 @@ source_hash: 7aa2a3169afd5d41363f78c3362e35ebefe75b76
 | 内存管理 | ✅ | ✅ ||
 | 驱动程序支持 | ✅ | ✅ | 基于驱动工具包的 PCI 和 MMIO；平台总线由 ACPI、设备树（ARM64）或机器的表填充；根端口上的 PCI Express 热插拔 |
 | 垃圾回收 | ✅ | ✅ | 标记-清除 GC |
-| 文件系统 | ✅ | ✅ | 基于 Unix 风格 VFS（挂载、超级块、inode）的 FAT12/16/32，支持格式化；MBR/GPT/EBR 分区。通过 `System.IO.File`/`FileStream` 对外提供。 |
+| 文件系统 | ✅ | ✅ | 基于 Unix 风格 VFS（挂载、超级块、inode）的 FAT12/16/32 和 ext2，支持格式化，以及只读的带 Rock Ridge 的 ISO 9660；MBR/GPT/EBR 分区。通过 `System.IO.File`/`FileStream` 对外提供。 |
 | .NET 核心库功能 | 🟡 | 🟡 部分 | 核心类型可用（String、Collections、List、Dictionary）。Math、Console、DateTime、Random、BitOperations、`System.IO.File` 已通过 plug 实现。 |
 | Plug 系统 | ✅ | ✅  |  |
 | 测试框架 | ✅ | ✅  |  |
