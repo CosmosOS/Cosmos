@@ -1,5 +1,5 @@
 ---
-source_hash: 769c3cf27a43d17cbdb567ef163f4e468bb826c5
+source_hash: 2c5474ae3977dfe1ea99e21b017baa3fa7230fd6
 ---
 <a id="writing-a-driver"></a>
 
@@ -1267,13 +1267,15 @@ public void OnInterrupt(InterruptContext context)
 
 ### 存储驱动程序
 
-| 驱动程序 | 硬件 | 磁盘名称 |
+| 驱动程序 | 硬件 | 设备名称 |
 |--------|----------|------------|
-| `AhciDriver` | AHCI 模式下的 SATA 控制器（仅限磁盘，不支持 CD-ROM） | `sata<n>` |
+| `AhciDriver` | AHCI 模式下的 SATA 控制器：磁盘，以及 CD-ROM 或 DVD 驱动器（ATAPI），只读 | `sata<n>`、`cdrom<n>` |
 | `NvmeDriver` | NVMe 控制器 | `nvme<controller>n<namespace>` |
 | `VirtioBlkDriver` | virtio-blk，通过 PCI 或 MMIO | `vblk<n>` |
 
 NVMe 命名空间是控制器公开的磁盘之一，这就是 NVMe 磁盘名称中第二个数字的由来。U 盘由 `UsbMassStorageDriver` 处理（[USB 类驱动程序](#the-usb-class-drivers)）。每个磁盘在发布时都会注册到 `StorageManager`。
+
+CD-ROM 驱动器以同样的方式发布，作为一个 2048 字节扇区的块设备，其 `WriteBlock` 会抛出 `IOException`，`Flush` 则无事可做；它通过同一对象上的第二个接口 `IRemovableMedia` 表明自己是什么：`IsReadOnly`、`IsRemovable` 和 `HasMedia`，像显示器上的 `IHardwareCursor` 一样通过类型测试找到，工具包把这样的接口称为侧面。`AhciDriver` 只在驱动器中有光盘且驱动器报告就绪时才启用它，因此它发布的每个驱动器的 `HasMedia` 都为真；没有光盘的驱动器会被记录日志并跳过，因为该驱动程序不会监视之后插入的光盘，一个空着发布的驱动器对内核来说会一直是空的。存储管理器读取这个侧面，把光盘作为一个覆盖整个介质的分区来承载而不扫描分区表，因为只读介质上没有内核可以写入的分区表，而 ISO 的保护性 MBR 以 512 字节为单位计数，2048 字节扇区的设备会读错；并在其排序中把驱动器放在所有可写磁盘之后，因此只有在没有磁盘的机器上 `StorageManager.PrimaryDevice` 才是 CD。ISO 9660 驱动程序负责挂载它（[读取 CD-ROM 或 ISO 镜像](filesystem.md#read-a-cd-rom-or-an-iso-image)）。
 
 <a id="the-audio-driver"></a>
 

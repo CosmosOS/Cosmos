@@ -1,5 +1,5 @@
 ---
-source_hash: 9b04988dbdc8f7a8d61c653d6d072c35311c1acb
+source_hash: db304f0812395a27197f268510f7a0343bbe304c
 ---
 <a id="kernel-project-layout"></a>
 
@@ -36,7 +36,7 @@ flowchart LR;
 
 | 项目 | 用途 |
 |---------|---------|
-| **Cosmos.Kernel.System** | 高层操作系统 API：Console、FileSystem（带有 FAT 和 ext2 文件系统的 VFS）、Graphics（以及 `Graphics.Rendering3D` 下需显式启用的 3D 类型）、Input、Network（以及 `Network.Protocols` 下的实验性数据包扩展点）、Timers。这是用户内核与之交互的层。 |
+| **Cosmos.Kernel.System** | 高层操作系统 API：Console、FileSystem（带有 FAT、ext2 和 ISO 9660 文件系统的 VFS）、Graphics（以及 `Graphics.Rendering3D` 下需显式启用的 3D 类型）、Input、Network（以及 `Network.Protocols` 下的实验性数据包扩展点）、Timers。这是用户内核与之交互的层。 |
 | **Cosmos.Kernel.Drivers** | Cosmos 基于驱动工具包随附的二十五个驱动程序：PCI 主机和 PCI Express 根端口驱动程序，Intel E1000E 驱动程序，virtio PCI 和 MMIO 传输驱动程序，virtio-net 和 virtio-input 驱动程序，四个显示驱动程序 `VirtioGpuDriver`、`VmwareSvgaDriver`（及其 SVGA3D 命令层和 `Canvas3D`）、`AmdDcnDriver` 和 `IntelGraphicsDriver`，三个块设备驱动程序 `AhciDriver`、`NvmeDriver` 和 virtio 叶子驱动 `VirtioBlkDriver`（存储管理器使用它们的磁盘），HD Audio 驱动程序 `HdAudioDriver`，USB 驱动程序：`XhciDriver`、`EhciDriver` 和 `OhciDriver`，以及集线器、HID 启动键盘、HID 启动鼠标和大容量存储类驱动程序，还有 PS/2 驱动程序：`I8042Driver` 以及 `Ps2KeyboardDriver` 和 `Ps2MouseDriver`。每个驱动程序位于“总线种类 / 类别 / 驱动程序”结构的文件夹中，其命名空间与文件夹一致（[驱动程序文件夹](coding-guidelines.md#driver-folders)）：`Pci/`（`Audio/HdAudio`、`Bus/Ehci`、`Bus/Ohci`、`Bus/PcieRootPort`、`Bus/VirtioPci`、`Bus/Xhci`、`Display/AmdDcn`、`Display/IntelGraphics`、`Display/VmwareSvga`、`Network/E1000E`、`Storage/Ahci`、`Storage/Nvme`）、`Platform/Bus/`（`I8042`、`PciHost`、`VirtioMmio`）、`Ps2/Input/`（`Ps2Keyboard`、`Ps2Mouse`）、`Usb/`（`Bus/UsbHub`、`Input/UsbKeyboard`、`Input/UsbMouse`、`Storage/UsbMassStorage`）和 `Virtio/`（`Display/VirtioGpu`、`Input/VirtioInput`、`Network/VirtioNet`、`Storage/VirtioBlk`），因此 xHCI 驱动程序是 `Cosmos.Kernel.Drivers.Pci.Bus.Xhci.XhciDriver`。它是一个 User 层驱动程序程序集（`CosmosDriverAssembly`），分层分析器把它限制在内核作者能够引用的范围内，任何项目都不向它授予 `InternalsVisibleTo`；它是一个不区分 RID 的 `lib/net10.0` 包，因为其中没有任何特定于架构的代码。它被 Cosmos.Kernel 引用，因此每个内核都会在清单中带上它的驱动程序。 |
 | **Cosmos.Kernel.HAL** | 硬件抽象层：共享逻辑、平台契约，全部为内部（`Boot/`：启动契约 `IPlatformInitializer` 和平台注册 `PlatformHAL`；`Timers/`：节拍源基类及其定时器条目（**System** 中的每个 `SoftwareTimer` 句柄包装其中一个）），设备类别（`Devices/`：`Display/`（含显示设备的能力接口（facet））、`Input/`、`Network/` 和 `Storage/`，每个类别都包含该设备种类的契约和词汇、驱动程序用来报告的接收器（块设备种类没有接收器）以及受支持层的内部消费者；`IBlockDevice`（内核直接实现并驱动它）和 `MacAddress` 是其中稳定的类型），驱动工具包（`DriverKit/`，根目录下是驱动程序及其绑定，绑定所提供的资源位于 `Resources/`、`Interrupts/` 和 `Threading/` 下，六种总线种类位于 `DriverKit/Buses/` 下（合成、平台、PCI、virtio、USB 和 PS/2，各占一个文件夹），内部注册表和引擎位于 `DriverKit/Engine/` 下）。工具包基于启动帧缓冲区发布的固件显示设备与显示设备种类放在一起。没有不安全代码（[不安全代码](coding-guidelines.md#unsafe-code)）。[HAL 文件夹](coding-guidelines.md#hal-folders)给出了其文件夹的规则。 |
 | **Cosmos.Kernel.HAL.X64** | x86-64 平台代码：机器描述（8042 和 PCI 主机节点）、I/O APIC 中断线路由、PIT 和 CMOS RTC。不包含设备驱动程序。 |

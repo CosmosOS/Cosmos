@@ -128,6 +128,9 @@
     <!-- White-box CSPRNG suite: known-answer tests of the BLAKE2s and ChaCha20
          primitives, and which entropy source seeded KernelRandom. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Random" />
+    <!-- The ISO 9660 suite reads its fixture images, embedded in the test
+         kernel, through ResourceManager. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Iso9660" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,5 @@
 ---
-source_hash: 6032e53537c9e5361c2d34a5d4d69910ee4ab1fd
+source_hash: 2b7afb99afc8c55ef3f028a25059801b69bbabd9
 ---
 <a id="file-system"></a>
 
@@ -16,7 +16,8 @@ source_hash: 6032e53537c9e5361c2d34a5d4d69910ee4ab1fd
 | 初始化 | `CosmosVFS` + `VFSManager.RegisterVFS` | `VfsManager.RegisterFileSystem` + `VfsManager.TryMount` |
 | API 面 | 经 plug 实现的 `System.IO` 子集 | 完整的 `System.IO`（流、枚举模式、`FileInfo` 等） |
 | `File.Move` | 没有 plug（只能先复制再删除） | 可用，包括覆盖已有目标的语义 |
-| 文件系统 | FAT32（FAT12/16 部分支持） | FAT12/16/32 |
+| 文件系统 | FAT32（FAT12/16 部分支持）、ISO 9660 | FAT12/16/32、ext2、带 Rock Ridge 的 ISO 9660（只读） |
+| ISO 上的文件 | 项目中的 `isoFiles` 文件夹 | 同样的 `isoFiles` 文件夹，外加 `CosmosIsoFile` 项（[在启动 ISO 上附带文件](#ship-files-on-the-boot-iso)） |
 
 **注意**：如果你打算在 Cosmos 中使用某个驱动器，请**始终**用 Cosmos 格式化它，并且**只**用 Cosmos。Parted 或 FDisk 等工具要高级得多，它们对磁盘的布局可能与 Cosmos 预期的不同。
 
@@ -71,7 +72,7 @@ using Cosmos.Kernel.System.FileSystem.Fat;
 using Cosmos.Kernel.System.Storage;
 ```
 
-`Cosmos.Kernel.System.FileSystem` 在一个命名空间中容纳了整个 VFS：管理器及其交出的对象（`VfsManager`、`VfsMount`、`IVfsNodeHandle`、`IVfsFileHandle` 和 `IVfsDirectoryHandle`），文件系统驱动程序要实现的契约（`IVfsFileSystemType`、`IVfsSuperblock`、`IVfsInode`、`IVfsOpenFile` 及其操作接口），以及每次挂载、创建和 stat 调用都会用到的标志、模式和元数据类型（`MountFlags`、`VfsMode`、`VfsStat`、`VfsStatFs`、`SetAttrFlags`、`SeekWhence`、`VfsTimespec`）。这就是为什么内核的 `BeforeRun()` 中出现的 `MountFlags.None` 与 `VfsManager` 用的是同一个 `using`，也是为什么 `IVfsNodeHandle.Inode` 给你的 `IVfsInode` 不需要其他 `using`。文件系统驱动程序位于下一级，每个驱动程序一个命名空间：FAT 驱动程序的 `FatFileSystemType` 和 `FatFormatOptions` 位于 `Cosmos.Kernel.System.FileSystem.Fat` 中。
+`Cosmos.Kernel.System.FileSystem` 在一个命名空间中容纳了整个 VFS：管理器及其交出的对象（`VfsManager`、`VfsMount`、`IVfsNodeHandle`、`IVfsFileHandle` 和 `IVfsDirectoryHandle`），文件系统驱动程序要实现的契约（`IVfsFileSystemType`、`IVfsSuperblock`、`IVfsInode`、`IVfsOpenFile` 及其操作接口），以及每次挂载、创建和 stat 调用都会用到的标志、模式和元数据类型（`MountFlags`、`VfsMode`、`VfsStat`、`VfsStatFs`、`SetAttrFlags`、`SeekWhence`、`VfsTimespec`）。这就是为什么内核的 `BeforeRun()` 中出现的 `MountFlags.None` 与 `VfsManager` 用的是同一个 `using`，也是为什么 `IVfsNodeHandle.Inode` 给你的 `IVfsInode` 不需要其他 `using`。文件系统驱动程序位于下一级，每个驱动程序一个命名空间：FAT 驱动程序的 `FatFileSystemType` 和 `FatFormatOptions` 位于 `Cosmos.Kernel.System.FileSystem.Fat` 中，ext2 驱动程序的 `Ext2FileSystemType` 位于 `Cosmos.Kernel.System.FileSystem.Ext2` 中，ISO 9660 驱动程序的 `Iso9660FileSystemType` 位于 `Cosmos.Kernel.System.FileSystem.Iso9660` 中。
 
 只有下文中实现了 `IBlockDevice` 的 RAM 磁盘代码片段才需要 `Cosmos.Kernel.HAL.Devices.Storage`。去掉它之后，挂载真实分区只需要 `Cosmos.Kernel.System` 下的那三个命名空间。
 
@@ -158,6 +159,94 @@ if (!VfsManager.RegisterFileSystem("ramfat", fat)
     return;
 }
 ```
+
+<a id="read-a-cd-rom-or-an-iso-image"></a>
+
+### 读取 CD-ROM 或 ISO 镜像
+
+`Cosmos.Kernel.System.FileSystem.Iso9660` 中的 `Iso9660FileSystemType` 读取 CD-ROM 以及各种刻录工具和 `cosmos build` 生成的 `.iso` 镜像所用的格式：带 Rock Ridge 扩展的 ISO 9660。正是 Rock Ridge 给了卷它的 POSIX 文件名（`hello.txt` 而不是 `HELLO.TXT;1`）、权限、时间戳和符号链接。没有 Rock Ridge 的卷呈现去掉版本号的原始标识符（`README`、`FILE.TXT`），查找时不区分大小写；Joliet 目录树会被忽略。该驱动程序接受与其他驱动程序相同的两种来源：分区索引，或注入的 `IBlockDevice`，扇区大小不限，因此同一个镜像既可以从 CD（2048 字节扇区）挂载，也可以从写入了它的 U 盘（512 字节扇区）或 RAM 挂载：
+
+```csharp
+using Cosmos.Kernel.System.FileSystem.Iso9660;
+
+Iso9660FileSystemType iso = new(cdrom);   // any IBlockDevice holding an ISO 9660 volume
+
+if (!VfsManager.RegisterFileSystem("iso", iso)
+    || !VfsManager.TryMount("iso", "", MountFlags.None, "/cd", out VfsMount? cd))
+{
+    Console.WriteLine("No ISO 9660 volume there.");
+    return;
+}
+
+Console.WriteLine(cd.IsReadOnly);                       // True
+foreach (string path in Directory.GetFiles("/cd/docs"))
+{
+    Console.WriteLine(path + ": " + new FileInfo(path).Length + " bytes");
+}
+string text = File.ReadAllText("/cd/hello.txt");
+```
+
+`cdrom` 是任何承载着卷的 `IBlockDevice`。当内核启动所用的驱动器位于 AHCI 模式的 SATA 控制器之后时，它就是 `StorageManager.Devices` 中的一个条目，即介质为只读的那一个：CD-ROM 驱动器在 `IBlockDevice` 之外还实现了 `IRemovableMedia`，这是驱动工具包接缝上的一个类型（`[Experimental("COSMOS0003")]`，因此对它做类型测试的内核项目要用 `<NoWarn>$(NoWarn);COSMOS0003</NoWarn>` 确认该标识符），带有 `IsReadOnly`、`IsRemovable` 和 `HasMedia`。找到它只需对列表做一次循环：
+
+```csharp
+using Cosmos.Kernel.HAL.Devices.Storage;   // IBlockDevice, IRemovableMedia
+using Cosmos.Kernel.System.Storage;        // StorageManager
+
+IBlockDevice? cdrom = null;
+foreach (IBlockDevice device in StorageManager.Devices)
+{
+    if (device is IRemovableMedia { IsReadOnly: true })
+    {
+        cdrom = device;
+        break;
+    }
+}
+```
+
+存储管理器把这样的介质作为一个覆盖整张光盘的分区来承载，从不扫描它的分区表，因为只读介质上没有内核可以写入的分区表，而 ISO 的保护性 MBR 以 512 字节为单位计数，2048 字节扇区的设备会读错。它把该介质排在所有可写磁盘之后，因此只要接有磁盘，`StorageManager.PrimaryDevice` 就仍是内核可以格式化的磁盘，而在没有其他设备的机器上它才是 CD。写入了镜像的分区，或者包着镜像字节的 `MemoryBlockDevice`，以同样的方式挂载。
+
+该卷是只读的，而且 VFS 知道这一点：无论挂载时传入什么标志，`VfsMount.IsReadOnly` 都为 `true`，`VfsMount.Flags` 都带有 `MountFlags.ReadOnly`；每个文件的 `FileInfo.IsReadOnly` 都为 `true`；挂载点下的任何修改都像在 Linux 上一样失败，抛出普通的 `IOException`（"Read-only file system"），而不是表示不存在的异常：
+
+| 调用 | 在 ISO 9660 挂载上的结果 |
+|---|---|
+| `File.ReadAllText`、`File.ReadAllBytes`、以读方式打开的 `FileStream`、`StreamReader`、`Directory.GetFiles`、`FileInfo` | 正常工作 |
+| `File.Create`、`File.WriteAllText`、`File.AppendAllText`、以写方式打开的 `FileStream`、`FileMode.Truncate` | `IOException` |
+| `File.Delete`、`File.Move`、复制到该挂载的 `File.Copy`、`File.SetAttributes` | `IOException` |
+| `Directory.CreateDirectory`、`Directory.Delete`、`Directory.Move` | `IOException` |
+| `VfsManager.TryCreateFile`、`TryCreateDirectory`、`TryUnlink`、`TryRemoveDirectory`、`TryRename` | `false` |
+| `VfsManager.TryFormat`、`TryDestroy` | `false`：该驱动程序不写入任何卷 |
+
+用 `MountFlags.ReadOnly` 挂载时，同样的拒绝适用于任何驱动程序：这样挂载的 FAT 分区不接受经由该挂载点的写入，而同一分区在别处不带该标志挂载时仍然可写。
+
+该驱动程序不读取的内容：仅有 Joliet 的卷的长文件名（它呈现原始标识符）、超过 4 GiB 并分布在多个 extent 上的文件（不会列出）、多会话光盘的后续会话、UDF，以及 El Torito（其启动目录只是一个普通文件）。QEMU 的 q35 机器把 CD 驱动器放在 AHCI 模式的 SATA 控制器之后，VMware 在虚拟驱动器接在 SATA 控制器而不是 IDE 控制器上时也是如此；在那里，驱动工具包的 `AhciDriver` 把该驱动器以 `cdrom<n>` 的名字发布（[存储驱动程序](drivers.md#the-storage-drivers)）。位于 USB、virtio-scsi 或 IDE 控制器之后的驱动器还不是块设备，因此从这类驱动器启动的内核改为读取镜像：从 RAM、磁盘分区或写入了镜像的 U 盘读取。
+
+<a id="ship-files-on-the-boot-iso"></a>
+
+### 在启动 ISO 上附带文件
+
+`cosmos build` 生成的 ISO 在 `/boot` 和 `/EFI` 下存放内核和 Limine。内核可以像在 Gen2 中那样在它们旁边附带自己的文件：放在内核 `.csproj` 旁边 `isoFiles` 文件夹中的所有内容，连同其子文件夹一起放到 ISO 的根目录，因此 `isoFiles/data/config.txt` 在光盘上就是 `/data/config.txt`。位于别处的文件，或者需要换一个名字的文件，在 `.csproj` 中写成 `CosmosIsoFile` 项，其 `IsoPath` 元数据就是它在 ISO 上的路径。以 `/` 结尾的 `IsoPath` 表示一个文件夹，并保留文件原名；没有 `IsoPath` 的文件放在根目录：
+
+```xml
+<ItemGroup>
+  <CosmosIsoFile Include="../assets/logo.bmp" IsoPath="images/logo.bmp" />
+  <CosmosIsoFile Include="../assets/readme.txt" IsoPath="docs/" />
+</ItemGroup>
+```
+
+`CosmosIsoFilesDirectory` 属性可以把该文件夹指向别处。文件夹中的内容不参与编译，因此放在那里的 `.cs` 文件会被附带到 ISO 上，而不会被编译进内核。以下情况会使构建失败：文件会落到 `/boot` 或 `/EFI` 之下，因为那里存放着 SDK 写入的内核和引导加载程序；路径中含有 `.` 或 `..` 段，因为 `..` 可能离开根目录；两个文件对应同一路径（比较时不区分大小写），因为在 Windows 主机上第二次复制会覆盖第一次。ISO 的构建缓存涵盖这些文件及其路径，因此添加、修改、重命名或删除其中一个文件都会重新生成 ISO，而无需重新编译内核。
+
+光盘上的名字是 Rock Ridge 名字，保留大小写和空格；内核按上文的方法找到启动 CD 并挂载后，就可以读取它们：
+
+```csharp
+using Cosmos.Kernel.System.FileSystem;           // VfsManager, MountFlags
+using Cosmos.Kernel.System.FileSystem.Iso9660;   // Iso9660FileSystemType
+
+VfsManager.RegisterFileSystem("bootcd", new Iso9660FileSystemType(cdrom));
+VfsManager.TryMount("bootcd", "", MountFlags.None, "/cdrom", out _);
+string config = File.ReadAllText("/cdrom/data/config.txt");
+```
+
+这种读取要求启动驱动器是块设备，而它位于 AHCI 控制器之后时正是如此。在不满足这一点的机器上，例如从 virtio-scsi 启动的 arm64 机器，文件虽然在光盘上，内核却还无法访问它们。
 
 <a id="partition-a-disk"></a>
 
@@ -518,6 +607,7 @@ Directory.SetCurrentDirectory("/");
 - 打开一个父目录存在、自身却不存在的文件 → `FileNotFoundException`
 - 位于不存在的目录（或未挂载的前缀）下的任何路径 → `DirectoryNotFoundException`
 - 直接在虚拟根 `/` 中创建文件 → `IOException`（只读文件系统）
+- 在只读挂载（ISO 9660 卷，或用 `MountFlags.ReadOnly` 建立的挂载）下进行任何修改 → `IOException`（只读文件系统）
 - 不带 `recursive: true` 删除非空目录 → `IOException`
 - 不允许覆盖时，用 `File.Copy`/`File.Move` 写到已存在的文件上 → `IOException`
 
@@ -527,16 +617,17 @@ Directory.SetCurrentDirectory("/");
 
 ## 当前限制
 
-- 不支持符号链接和硬链接（底层为 `ENOTSUP`/`EPERM`；BCL 将其表现为 `IOException`）。
+- 不能创建符号链接，也不支持硬链接（底层为 `ENOTSUP`/`EPERM`；BCL 将其表现为 `IOException`）。ext2 和 ISO 9660 驱动程序会解析其卷上已有的符号链接。
 - 文件时间戳尚未持久化（`File.SetLastWriteTime` 会被接受，但 FAT 时间戳的支持要在以后的版本中才会实现）。
 - `DriveInfo` 尚未接入；查询可用空间请使用 `VfsManager.TryStatFs`。
-- FAT 是内核测试套件覆盖的唯一文件系统驱动程序；ext2 驱动程序 `Ext2FileSystemType`（位于 `Cosmos.Kernel.System.FileSystem.Ext2`）与它一起提供，但只在主机上测试。新的驱动程序要实现的是 `IVfsFileSystemType` 接口。
+- FAT 和 ISO 9660 是内核测试套件覆盖的文件系统驱动程序；ext2 驱动程序 `Ext2FileSystemType`（位于 `Cosmos.Kernel.System.FileSystem.Ext2`）与它们一起提供，但只在主机上测试。新的驱动程序要实现的是 `IVfsFileSystemType` 接口。
+- ISO 9660 驱动程序读取 AHCI 控制器之后的 CD-ROM 驱动器、镜像，以及写入了镜像的卷；位于 USB、virtio-scsi 或 IDE 控制器之后的驱动器还不是块设备。
 
 <a id="how-it-works"></a>
 
 ## 工作原理
 
-你的代码调用未经修改的 BCL，后者最终落到 Unix PAL（`Interop.Sys.*` P/Invoke）。这大约 45 个入口点在 `Cosmos.Kernel.Plugs` 中[通过 plug 替换](../dev/plugs.md)：一个文件描述符表适配 PAL 的契约（文件描述符、目录流、PAL errno），并委托给 `VfsManager`；`VfsManager` 负责路径解析、挂载表、当前目录和打开句柄的语义，并分派给已挂载的文件系统驱动程序；该驱动程序读写一个 `IBlockDevice`（由驱动工具包的 `AhciDriver`、`NvmeDriver`、`VirtioBlkDriver` 或 `UsbMassStorageDriver` 发布的 SATA 磁盘、NVMe 命名空间、virtio-blk 磁盘或 USB 大容量存储单元，全部经由 `StorageManager`；RAM 则经由 `MemoryBlockDevice`）。
+你的代码调用未经修改的 BCL，后者最终落到 Unix PAL（`Interop.Sys.*` P/Invoke）。这大约 45 个入口点在 `Cosmos.Kernel.Plugs` 中[通过 plug 替换](../dev/plugs.md)：一个文件描述符表适配 PAL 的契约（文件描述符、目录流、PAL errno），并委托给 `VfsManager`；`VfsManager` 负责路径解析、带有各挂载标志的挂载表（只读挂载下的修改在这里被拒绝，plug 将其报告为 `EROFS`）、当前目录和打开句柄的语义，并分派给已挂载的文件系统驱动程序（FAT、ext2 或 ISO 9660）；该驱动程序读写一个 `IBlockDevice`（由驱动工具包的 `AhciDriver`、`NvmeDriver`、`VirtioBlkDriver` 或 `UsbMassStorageDriver` 发布的 SATA 磁盘、NVMe 命名空间、virtio-blk 磁盘或 USB 大容量存储单元，全部经由 `StorageManager`；RAM 则经由 `MemoryBlockDevice`）。
 
 ```
 File / Directory / FileStream          (stock BCL)
@@ -547,7 +638,7 @@ FileDescriptorTable                    (Cosmos.Kernel.Plugs: fds, dir streams, e
         │
 VfsManager                             (mounts, paths, CWD, open handles)
         │
-IVfsFileSystemType / IVfsSuperblock    (FAT driver)
+IVfsFileSystemType / IVfsSuperblock    (the FAT, ext2 and ISO 9660 drivers)
         │
 IBlockDevice                           (the kit's AHCI, NVMe, virtio-blk and USB mass storage drivers, MemoryBlockDevice)
 ```

@@ -1,5 +1,5 @@
 ---
-source_hash: 769c3cf27a43d17cbdb567ef163f4e468bb826c5
+source_hash: 2c5474ae3977dfe1ea99e21b017baa3fa7230fd6
 ---
 <a id="writing-a-driver"></a>
 
@@ -1265,13 +1265,15 @@ Les bus ci-dessus portent aussi les pilotes fournis pour les écrans, les disque
 
 ### Les pilotes de stockage
 
-| Pilote | Matériel | Noms de disque |
-|--------|----------|------------|
-| `AhciDriver` | Contrôleurs SATA en mode AHCI (disques uniquement, pas de CD-ROM) | `sata<n>` |
+| Pilote | Matériel | Noms de périphérique |
+|--------|----------|----------------------|
+| `AhciDriver` | Contrôleurs SATA en mode AHCI : disques, et lecteurs de CD-ROM ou de DVD (ATAPI), en lecture seule | `sata<n>`, `cdrom<n>` |
 | `NvmeDriver` | Contrôleurs NVMe | `nvme<controller>n<namespace>` |
 | `VirtioBlkDriver` | virtio-blk, sur PCI ou MMIO | `vblk<n>` |
 
 Un espace de noms NVMe est l'un des disques qu'expose un contrôleur, d'où le second nombre dans le nom d'un disque NVMe. Une clé USB est prise en charge par `UsbMassStorageDriver` ([Les pilotes de classe USB](#the-usb-class-drivers)). Chaque disque est enregistré auprès de `StorageManager` quand il est publié.
+
+Un lecteur de CD-ROM est publié de la même façon, comme un périphérique bloc à secteurs de 2048 octets dont `WriteBlock` lève `IOException` et dont `Flush` n'a rien à faire, et il dit ce qu'il est par une seconde interface sur le même objet, `IRemovableMedia` : `IsReadOnly`, `IsRemovable` et `HasMedia`, trouvée par un test de type comme `IHardwareCursor` l'est sur un affichage ; le kit appelle une telle interface une facette. `AhciDriver` ne met un lecteur en service que lorsqu'un disque s'y trouve et que le lecteur le déclare prêt, si bien que `HasMedia` est vrai pour chaque lecteur qu'il publie ; un lecteur sans disque est journalisé et ignoré, parce que le pilote ne guette pas un disque inséré plus tard et qu'un lecteur publié vide resterait vide pour le noyau. Le gestionnaire de stockage lit cette facette pour porter le disque comme une seule partition couvrant tout le support sans le scanner à la recherche d'une table, puisqu'un support en lecture seule n'en porte aucune qu'un noyau pourrait écrire et que le MBR protecteur d'une ISO compte en unités de 512 octets qu'un périphérique à secteurs de 2048 octets lirait de travers, et pour garder le lecteur après tous les disques inscriptibles dans son ordre, si bien que `StorageManager.PrimaryDevice` n'est le CD que sur une machine sans disque. Le pilote ISO 9660 le monte ([Lire un CD-ROM ou une image ISO](filesystem.md#read-a-cd-rom-or-an-iso-image)).
 
 <a id="the-audio-driver"></a>
 

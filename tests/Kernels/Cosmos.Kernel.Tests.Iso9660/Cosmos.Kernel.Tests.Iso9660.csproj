@@ -1,0 +1,118 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Cosmos.Sdk" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- The suite names IRemovableMedia, a driver kit seam type, to find the boot CD. -->
+    <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+  </PropertyGroup>
+
+  <!-- Core kernel packages (using project references for development) -->
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
+    <ProjectReference Include="../../../src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
+    <ProjectReference Include="../../Cosmos.TestRunner.Framework/Cosmos.TestRunner.Framework.csproj" />
+  </ItemGroup>
+
+  <!-- Architecture-specific HAL (using project references for development) -->
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_X64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_ARM64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
+  </ItemGroup>
+
+  <!--
+    The fixture images. xorriso, the producer of every Cosmos ISO, builds
+    them from the trees under Fixtures/ at compile time, so a reviewer reads
+    the fixture as files and the kernel reads the images it embeds through
+    Core's ResourceManager. Ownership, modes and every date are pinned so the
+    bytes do not depend on the checkout, the clock or the time zone:
+    1793188800 is 2026-10-28 12:00:00 UTC, the stamp the suite asserts.
+
+    rockridge.iso: Rock Ridge names, attributes, stamps and symbolic links,
+    a directory relocated past depth 8 into rr_moved, a 140-character name
+    whose NM entry needs a CE continuation, and a 200 KiB pattern the build
+    generates. level1.iso: ISO 9660 level 1 identifiers alone, with a Joliet
+    descriptor the driver must skip.
+  -->
+  <PropertyGroup>
+    <Iso9660FixtureDir>$(MSBuildProjectDirectory)/Fixtures/</Iso9660FixtureDir>
+    <Iso9660FixtureEpoch>1793188800</Iso9660FixtureEpoch>
+    <Iso9660FixtureVolumeDate>2026102812000000</Iso9660FixtureVolumeDate>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Iso9660FixtureFile Include="$(Iso9660FixtureDir)**/*" />
+  </ItemGroup>
+
+  <!-- IntermediateOutputPath is set by the common targets, after this file
+       is evaluated, so the image paths and the resources are declared when
+       the targets run. -->
+  <Target Name="Iso9660FixturePaths">
+    <PropertyGroup>
+      <Iso9660ImageDir>$(IntermediateOutputPath)fixtures/</Iso9660ImageDir>
+      <Iso9660PatternFile>$(Iso9660ImageDir)pattern-200k.bin</Iso9660PatternFile>
+      <Iso9660RockRidgeImage>$(Iso9660ImageDir)rockridge.iso</Iso9660RockRidgeImage>
+      <Iso9660Level1Image>$(Iso9660ImageDir)level1.iso</Iso9660Level1Image>
+    </PropertyGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="$(Iso9660RockRidgeImage)" LogicalName="Cosmos.Kernel.Tests.Iso9660.rockridge.iso" />
+      <EmbeddedResource Include="$(Iso9660Level1Image)" LogicalName="Cosmos.Kernel.Tests.Iso9660.level1.iso" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="BuildIso9660Fixtures"
+          BeforeTargets="PrepareForBuild"
+          DependsOnTargets="Iso9660FixturePaths;GetXorriso"
+          Inputs="@(Iso9660FixtureFile);$(MSBuildProjectFullPath)"
+          Outputs="$(Iso9660RockRidgeImage);$(Iso9660Level1Image)">
+    <MakeDir Directories="$(Iso9660ImageDir)" />
+    <WriteIso9660Pattern File="$(Iso9660PatternFile)" Length="204800" />
+    <Exec Command="&quot;$(XorrisoBinary)&quot; -outdev &quot;$(Iso9660RockRidgeImage)&quot; -blank as_needed -volid COSMOSRR -padding 0 -compliance deep_paths_off -rr_reloc_dir rr_moved -map &quot;$(Iso9660FixtureDir)rockridge&quot; / -map &quot;$(Iso9660PatternFile)&quot; /docs/pattern-200k.bin -lns hello.txt /link-to-hello -lns docs/deep1 /link-to-docs -lns missing /dangling -mkdir /emptydir -- -chown_r 0 / -- -chgrp_r 0 / -- -chmod_r 0755 / -- -find / -type f -exec chmod 0644 -- -alter_date_r m =$(Iso9660FixtureEpoch) / -- -alter_date_r a =$(Iso9660FixtureEpoch) / -- -alter_date_r c =$(Iso9660FixtureEpoch) / -- -volume_date uuid $(Iso9660FixtureVolumeDate) -commit"
+          StandardOutputImportance="low" />
+    <Exec Command="&quot;$(XorrisoBinary)&quot; -outdev &quot;$(Iso9660Level1Image)&quot; -blank as_needed -volid COSMOSL1 -padding 0 -compliance iso_9660_level=1 -rockridge off -joliet on -map &quot;$(Iso9660FixtureDir)level1&quot; / -- -alter_date_r m =$(Iso9660FixtureEpoch) / -- -alter_date_r a =$(Iso9660FixtureEpoch) / -- -alter_date_r c =$(Iso9660FixtureEpoch) / -- -volume_date uuid $(Iso9660FixtureVolumeDate) -commit"
+          StandardOutputImportance="low" />
+    <Message Importance="High" Text="📀 [Iso9660] Built the fixture images in $(Iso9660ImageDir)" />
+    <ItemGroup>
+      <FileWrites Include="$(Iso9660PatternFile);$(Iso9660RockRidgeImage);$(Iso9660Level1Image)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    What the suite ships on its own boot CD, read back by
+    Test_BootCd_ShippedFiles: isoFiles/ goes to the ISO root with its folders
+    (NotCompiled.cs is not C#, so the build fails if the SDK lets the folder
+    into the compilation), and two fixture files go through CosmosIsoFile,
+    one renamed by its IsoPath, one placed in a folder by an IsoPath ending
+    in /.
+  -->
+  <ItemGroup>
+    <CosmosIsoFile Include="Fixtures/rockridge/hello.txt" IsoPath="extra/hello-from-item.txt" />
+    <CosmosIsoFile Include="Fixtures/level1/FILE.TXT" IsoPath="extra/" />
+  </ItemGroup>
+
+  <!-- The 200 KiB pattern (i * 7 + 3) &amp; 0xFF the read cells compare
+       against, generated rather than committed so the only binary in the
+       fixture tree is the 10 000-byte file of the same pattern. -->
+  <UsingTask TaskName="WriteIso9660Pattern" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <File ParameterType="System.String" Required="true" />
+      <Length ParameterType="System.Int32" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        byte[] pattern = new byte[Length];
+        for (int i = 0; i < pattern.Length; i++)
+        {
+            pattern[i] = (byte)((i * 7 + 3) & 0xFF);
+        }
+        System.IO.File.WriteAllBytes(File, pattern);
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+</Project>

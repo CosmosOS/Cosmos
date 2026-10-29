@@ -543,6 +543,29 @@ jobs:
       event_name: ${{ github.event_name }}
       head_ref: ${{ github.head_ref || github.ref_name }}
 
+  # ── Iso9660 ───────────────────────────────────────────────────────────────────
+  iso9660-tests:
+    needs: setup
+    uses: ./.github/workflows/kernel-test-run.yml
+    with:
+      suite_name: Iso9660
+      suite_id: iso9660
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Iso9660
+      timeout_x64: 180
+      timeout_arm64: 360
+      step_timeout_minutes: 10
+
+  iso9660-results:
+    needs: iso9660-tests
+    if: always()
+    uses: ./.github/workflows/kernel-test-results.yml
+    with:
+      suite_name: Iso9660
+      suite_id: iso9660
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Iso9660
+      event_name: ${{ github.event_name }}
+      head_ref: ${{ github.head_ref || github.ref_name }}
+
   # ── Summary ───────────────────────────────────────────────────────────────────
   test-summary:
     name: Test Summary
@@ -551,7 +574,7 @@ jobs:
     # read `needs.<suite>-tests.result`, and the `needs` context only exposes
     # direct dependencies: without the *-tests entries every row evaluates
     # to an empty string and renders "Failed" regardless of the real outcome.
-    needs: [ helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, math-tests, random-tests, graphic-tests, audio-tests, power-tests, garbagecollector-tests, interrupts-tests, drivers-tests, pci-tests, virtio-tests, storage-tests, fat-tests, file-tests, helloworld-results, memory-results, typecasting-results, timer-results, network-results, runtime-results, threading-results, math-results, random-results, graphic-results, audio-results, power-results, garbagecollector-results, interrupts-results, drivers-results, pci-results, virtio-results, storage-results, fat-results, file-results ]
+    needs: [ helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, math-tests, random-tests, graphic-tests, audio-tests, power-tests, garbagecollector-tests, interrupts-tests, drivers-tests, pci-tests, virtio-tests, storage-tests, fat-tests, file-tests, iso9660-tests, helloworld-results, memory-results, typecasting-results, timer-results, network-results, runtime-results, threading-results, math-results, random-results, graphic-results, audio-results, power-results, garbagecollector-results, interrupts-results, drivers-results, pci-results, virtio-results, storage-results, fat-results, file-results, iso9660-results ]
     if: always()
     steps:
       - name: 📊 Generate Summary
@@ -590,6 +613,7 @@ jobs:
           add_row "Storage"          "${{ needs.storage-tests.result }}"
           add_row "Fat"              "${{ needs.fat-tests.result }}"
           add_row "File"             "${{ needs.file-tests.result }}"
+          add_row "Iso9660"          "${{ needs.iso9660-tests.result }}"
 
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Run ID:** ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY

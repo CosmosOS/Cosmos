@@ -1,5 +1,5 @@
 ---
-source_hash: 23e46dacd2fdf78d032c70cf67a36a77947285ca
+source_hash: 175a9522f3bda585b51358557f4c94979cf5e5cf
 ---
 <a id="coding-guidelines"></a>
 
@@ -205,7 +205,7 @@ Cosmos.Kernel.HAL/
     Display/                 ← IDisplay, its facets, DisplayMode, DisplaySink, DisplayConsumer, FirmwareDisplay
     Input/
     Network/                 ← INetworkInterface, NetworkSink, NetworkConsumer, MacAddress
-    Storage/                 ← IBlockDevice, BlockConsumer
+    Storage/                 ← IBlockDevice, its facet IRemovableMedia, BlockConsumer
   DriverKit/                 ← how a driver finds and binds a device
     Driver.cs                ← the driver and its binding: matching, probing, the node tree
     DeviceBinding.cs
