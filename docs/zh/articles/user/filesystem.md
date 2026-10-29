@@ -1,5 +1,5 @@
 ---
-source_hash: 865d50043863bc3a2f5497b9ef584501ef2d275c
+source_hash: 2b7afb99afc8c55ef3f028a25059801b69bbabd9
 ---
 <a id="file-system"></a>
 
@@ -17,6 +17,7 @@ source_hash: 865d50043863bc3a2f5497b9ef584501ef2d275c
 | API 面 | 经 plug 实现的 `System.IO` 子集 | 完整的 `System.IO`（流、枚举模式、`FileInfo` 等） |
 | `File.Move` | 没有 plug（只能先复制再删除） | 可用，包括覆盖已有目标的语义 |
 | 文件系统 | FAT32（FAT12/16 部分支持）、ISO 9660 | FAT12/16/32、ext2、带 Rock Ridge 的 ISO 9660（只读） |
+| ISO 上的文件 | 项目中的 `isoFiles` 文件夹 | 同样的 `isoFiles` 文件夹，外加 `CosmosIsoFile` 项（[在启动 ISO 上附带文件](#ship-files-on-the-boot-iso)） |
 
 **注意**：如果你打算在 Cosmos 中使用某个驱动器，请**始终**用 Cosmos 格式化它，并且**只**用 Cosmos。Parted 或 FDisk 等工具要高级得多，它们对磁盘的布局可能与 Cosmos 预期的不同。
 
@@ -218,6 +219,34 @@ foreach (IBlockDevice device in StorageManager.Devices)
 用 `MountFlags.ReadOnly` 挂载时，同样的拒绝适用于任何驱动程序：这样挂载的 FAT 分区不接受经由该挂载点的写入，而同一分区在别处不带该标志挂载时仍然可写。
 
 该驱动程序不读取的内容：仅有 Joliet 的卷的长文件名（它呈现原始标识符）、超过 4 GiB 并分布在多个 extent 上的文件（不会列出）、多会话光盘的后续会话、UDF，以及 El Torito（其启动目录只是一个普通文件）。QEMU 的 q35 机器把 CD 驱动器放在 AHCI 模式的 SATA 控制器之后，VMware 在虚拟驱动器接在 SATA 控制器而不是 IDE 控制器上时也是如此；在那里，驱动工具包的 `AhciDriver` 把该驱动器以 `cdrom<n>` 的名字发布（[存储驱动程序](drivers.md#the-storage-drivers)）。位于 USB、virtio-scsi 或 IDE 控制器之后的驱动器还不是块设备，因此从这类驱动器启动的内核改为读取镜像：从 RAM、磁盘分区或写入了镜像的 U 盘读取。
+
+<a id="ship-files-on-the-boot-iso"></a>
+
+### 在启动 ISO 上附带文件
+
+`cosmos build` 生成的 ISO 在 `/boot` 和 `/EFI` 下存放内核和 Limine。内核可以像在 Gen2 中那样在它们旁边附带自己的文件：放在内核 `.csproj` 旁边 `isoFiles` 文件夹中的所有内容，连同其子文件夹一起放到 ISO 的根目录，因此 `isoFiles/data/config.txt` 在光盘上就是 `/data/config.txt`。位于别处的文件，或者需要换一个名字的文件，在 `.csproj` 中写成 `CosmosIsoFile` 项，其 `IsoPath` 元数据就是它在 ISO 上的路径。以 `/` 结尾的 `IsoPath` 表示一个文件夹，并保留文件原名；没有 `IsoPath` 的文件放在根目录：
+
+```xml
+<ItemGroup>
+  <CosmosIsoFile Include="../assets/logo.bmp" IsoPath="images/logo.bmp" />
+  <CosmosIsoFile Include="../assets/readme.txt" IsoPath="docs/" />
+</ItemGroup>
+```
+
+`CosmosIsoFilesDirectory` 属性可以把该文件夹指向别处。文件夹中的内容不参与编译，因此放在那里的 `.cs` 文件会被附带到 ISO 上，而不会被编译进内核。以下情况会使构建失败：文件会落到 `/boot` 或 `/EFI` 之下，因为那里存放着 SDK 写入的内核和引导加载程序；路径中含有 `.` 或 `..` 段，因为 `..` 可能离开根目录；两个文件对应同一路径（比较时不区分大小写），因为在 Windows 主机上第二次复制会覆盖第一次。ISO 的构建缓存涵盖这些文件及其路径，因此添加、修改、重命名或删除其中一个文件都会重新生成 ISO，而无需重新编译内核。
+
+光盘上的名字是 Rock Ridge 名字，保留大小写和空格；内核按上文的方法找到启动 CD 并挂载后，就可以读取它们：
+
+```csharp
+using Cosmos.Kernel.System.FileSystem;           // VfsManager, MountFlags
+using Cosmos.Kernel.System.FileSystem.Iso9660;   // Iso9660FileSystemType
+
+VfsManager.RegisterFileSystem("bootcd", new Iso9660FileSystemType(cdrom));
+VfsManager.TryMount("bootcd", "", MountFlags.None, "/cdrom", out _);
+string config = File.ReadAllText("/cdrom/data/config.txt");
+```
+
+这种读取要求启动驱动器是块设备，而它位于 AHCI 控制器之后时正是如此。在不满足这一点的机器上，例如从 virtio-scsi 启动的 arm64 机器，文件虽然在光盘上，内核却还无法访问它们。
 
 <a id="partition-a-disk"></a>
 

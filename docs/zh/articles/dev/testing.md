@@ -1,5 +1,5 @@
 ---
-source_hash: 511cc09585776abce54e1894f2b13edd552055e0
+source_hash: b9cbb8aeb98722a2ae3c92e34ff6ccc51a282da8
 ---
 <a id="testing"></a>
 
@@ -100,7 +100,7 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
 | **Audio** | 每个单元格 22 个 | `bare` 和 `hda` 两个单元格上的音频栈：绑定到 QEMU `intel-hda` 的 Intel HD Audio 驱动程序、它发布的输出以及列出该输出的音频管理器、格式契约、排空环形缓冲区的流引擎及其在中断线已连接时的完成中断，以及播放器和后台播放：将一个流播放到结束、提前停止一个流、从内存播放一个 WAV 文件，还有 `Console.Beep` 通过该输出播放其音调、在输出繁忙时立即返回；在 bare 上，没有输出的管理器拒绝播放，`Console.Beep` 立即返回；在两者上，`Console.Beep` 都拒绝 Windows 所拒绝的参数 |
 | **Storage** | 每个单元格 84 个 | 存储管理器及其背后的块设备，涵盖七种配置方案（profile）`ahci`、`nvme`、`usb`、`usb-ehci`、`usb-ohci`、`virtio-blk-pci` 和 `virtio-blk-mmio`（arm64），每种在 x64 上与 `acpi-off` 修饰符组合（12 个单元格），在 arm64 上与 `gicv2`、`gicv3` 和 `acpi-off` 组合（42 个单元格）：由工具包的 `AhciDriver`、`NvmeDriver`、`UsbMassStorageDriver` 或 `VirtioBlkDriver` 发布的磁盘，接受相同的块 I/O、分区表、分区生命周期和重启断言；在 x64 上，工具包的 `AhciDriver` 在磁盘旁边发布的启动 CD；每个单元格上工具包在 `DriverDiagnostics` 中对该磁盘的视图；每个单元格的 NVMe 中断模式；usb 单元格上的 USB 热插拔和 virtio-blk-pci 单元格上的 PCI Express 热插拔 |
 | **Random** | 16 | 内核 CSPRNG：BLAKE2s 和 ChaCha20 已知答案测试、快速密钥擦除、RDSEED/RDRAND 和 RNDRRS/RNDR 检测、播种，以及构建于其上的 `RandomNumberGenerator`、`GetInt32` 和 `Guid.NewGuid`，测试跨越一次重新播种并从两个线程调用 |
-| **Iso9660** | 50 | ISO 9660 驱动程序，基于 xorriso 在编译时从套件的 fixture 目录树构建的两个镜像：在 CD 和磁盘几何结构上挂载，拒绝全零、损坏或过短的设备，Rock Ridge 的文件名、属性、时间戳、符号链接、continuation 区和重定位目录，不区分大小写匹配的 level 1 原始标识符，整体读取、分块读取、seek 后读取和逐行读取，经由 `System.IO`（`IOException`）和 `VfsManager`（`false`）的只读挂载，卸载和重新挂载；在 x64 上还有启动 CD 本身，即工具包的 `AhciDriver` 发布的 ATAPI 驱动器，挂载并读回 |
+| **Iso9660** | 51 | ISO 9660 驱动程序，基于 xorriso 在编译时从套件的 fixture 目录树构建的两个镜像：在 CD 和磁盘几何结构上挂载，拒绝全零、损坏或过短的设备，Rock Ridge 的文件名、属性、时间戳、符号链接、continuation 区和重定位目录，不区分大小写匹配的 level 1 原始标识符，整体读取、分块读取、seek 后读取和逐行读取，经由 `System.IO`（`IOException`）和 `VfsManager`（`false`）的只读挂载，卸载和重新挂载；在 x64 上还有启动 CD 本身，即工具包的 `AhciDriver` 发布的 ATAPI 驱动器，挂载并读回，连同套件通过 `isoFiles/` 和 `CosmosIsoFile` 附带在上面的文件 |
 
 <a id="helloworld-tests"></a>
 
@@ -290,7 +290,7 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
 
 `tests/Kernels/Cosmos.Kernel.Tests.Iso9660` 在两种架构上检查 `Cosmos.Kernel.System/FileSystem/Iso9660` 中的 ISO 9660 驱动程序，不使用配置文件。它的镜像不提交到仓库：项目文件在编译时对 `Fixtures/` 下的目录树运行 xorriso（每个 Cosmos ISO 都用它构建，由 `Cosmos.Build.Common` 的 `GetXorriso` 目标解析），并固定所有者、权限模式和全部时间戳（2026-10-28 12:00:00 UTC），使生成的字节不依赖于检出、时钟或时区，然后把两个镜像嵌入内核，内核通过 Core 的 `ResourceManager` 读取它们（授权在 `Cosmos.Kernel.Core.csproj` 中）。`Fixtures/rockridge/` 以 Rock Ridge 映射：一个 140 字符的文件名，其 `NM` 条目溢出到 `CE` continuation 中；一个超过深度 8、被 xorriso 重定位到 `rr_moved` 的目录（`CL`、`RE`、`PL`）；四十个条目，把一个目录铺到四个逻辑块上；一个以部分块结尾的 10 000 字节文件；一个由构建生成的 200 KiB 模式文件；一个空文件；指向文件、目录和不存在目标的符号链接；以及一个空目录。`Fixtures/level1/` 只以 level 1 标识符映射，并带有驱动程序必须跳过的 Joliet 描述符。Rock Ridge 镜像挂载两次：一次来自 2048 字节扇区的设备（CD），一次来自 512 字节扇区的设备（写入了镜像的 U 盘）。
 
-测试单元：挂载（`Test_Mount_*`、`Test_StatFs`、`Test_FormatAndDestroy_Refused`）、列目录（`Test_RootListing_*`、`Test_Listing_*`）、查找（`Test_Lookup_*`：Rock Ridge 上精确匹配，level 1 上不区分大小写，长文件名，重定位目录，`.` 和 `..`）、读取（`Test_Read_*`：整体读取、按 4 097 字节分块读取以便一次读取的头、体、尾都得到执行、seek 后读取、逐行读取，并对 200 KiB 文件的设备读取次数设上限）、属性（`Test_Attributes_*`：只读、固定的时间戳、共享同一 extent 的条目拥有不同的 inode 号）、符号链接（`Test_Symlink_*`）、拒绝（`Test_ReadOnly_*`：每次修改经由 `System.IO` 都是普通的 `IOException`，经由 `VfsManager` 都是 `false`）、`Test_Unmount_And_Remount` 和 `Test_TwoMounts_SameDevice`，以及仅在 x64 上运行的启动 CD（`Test_BootCd_*`）：单元格启动所用的 ISO 由引擎作为 `ide-cd` 挂在 q35 的 AHCI 控制器上，工具包的 `AhciDriver` 把它以 `cdrom0` 的名字发布，测试通过只读侧面在 `StorageManager.Devices` 中找到它，在第 16 扇区读取主卷描述符，确认管理器把它作为一个覆盖整个介质的分区来承载，先从驱动器挂载，读回 `limine.conf` 和这个内核镜像的 ELF 魔数，写入则以 `IOException` 被拒绝，再从该分区挂载，读回同一个 `limine.conf`；在 arm64 上，引擎把 ISO 作为没有驱动程序绑定的 virtio-scsi 驱动器挂接，这三个测试单元以 `the boot medium is not a block device on this cell` 跳过。
+测试单元：挂载（`Test_Mount_*`、`Test_StatFs`、`Test_FormatAndDestroy_Refused`）、列目录（`Test_RootListing_*`、`Test_Listing_*`）、查找（`Test_Lookup_*`：Rock Ridge 上精确匹配，level 1 上不区分大小写，长文件名，重定位目录，`.` 和 `..`）、读取（`Test_Read_*`：整体读取、按 4 097 字节分块读取以便一次读取的头、体、尾都得到执行、seek 后读取、逐行读取，并对 200 KiB 文件的设备读取次数设上限）、属性（`Test_Attributes_*`：只读、固定的时间戳、共享同一 extent 的条目拥有不同的 inode 号）、符号链接（`Test_Symlink_*`）、拒绝（`Test_ReadOnly_*`：每次修改经由 `System.IO` 都是普通的 `IOException`，经由 `VfsManager` 都是 `false`）、`Test_Unmount_And_Remount` 和 `Test_TwoMounts_SameDevice`，以及仅在 x64 上运行的启动 CD（`Test_BootCd_*`）：单元格启动所用的 ISO 由引擎作为 `ide-cd` 挂在 q35 的 AHCI 控制器上，工具包的 `AhciDriver` 把它以 `cdrom0` 的名字发布，测试通过只读侧面在 `StorageManager.Devices` 中找到它，在第 16 扇区读取主卷描述符，确认管理器把它作为一个覆盖整个介质的分区来承载，先从驱动器挂载，读回 `limine.conf` 和这个内核镜像的 ELF 魔数，写入则以 `IOException` 被拒绝，接着通过该挂载读取套件项目附带在自己 ISO 上的文件（`isoFiles/shipped/` 连同其文件夹位于 ISO 根目录，其中有一个带空格的名字和一个构建必须排除在编译之外的 `.cs` 文件；另有两个作为 `CosmosIsoFile` 项的 fixture 文件，一个由其 `IsoPath` 重命名，一个由以 `/` 结尾的 `IsoPath` 放入文件夹），再从该分区挂载，读回同一个 `limine.conf`；在 arm64 上，引擎把 ISO 作为没有驱动程序绑定的 virtio-scsi 驱动器挂接，这四个测试单元以 `the boot medium is not a block device on this cell` 跳过。
 
 <a id="running-kernel-tests"></a>
 

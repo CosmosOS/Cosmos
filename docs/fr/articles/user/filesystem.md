@@ -1,5 +1,5 @@
 ---
-source_hash: 865d50043863bc3a2f5497b9ef584501ef2d275c
+source_hash: 2b7afb99afc8c55ef3f028a25059801b69bbabd9
 ---
 <a id="file-system"></a>
 
@@ -17,6 +17,7 @@ Les principales différences si vous venez de Gen2 :
 | Surface d'API | Sous-ensemble de `System.IO` remplacé par des plugs | `System.IO` complet (flux, motifs d'énumération, `FileInfo`, …) |
 | `File.Move` | Sans plug (copie + suppression) | Fonctionne, y compris l'écrasement d'une destination existante |
 | Systèmes de fichiers | FAT32 (FAT12/16 en partie), ISO 9660 | FAT12/16/32, ext2, ISO 9660 avec Rock Ridge (lecture seule) |
+| Fichiers sur l'ISO | Un dossier `isoFiles` dans le projet | Le même dossier `isoFiles`, plus des éléments `CosmosIsoFile` ([Livrer des fichiers sur l'ISO de démarrage](#ship-files-on-the-boot-iso)) |
 
 **Attention** : formatez **toujours** votre disque avec Cosmos, et **uniquement** avec Cosmos, si vous comptez l'utiliser avec Cosmos. Des outils comme Parted ou FDisk sont bien plus avancés et peuvent organiser le disque autrement que ce qu'attend Cosmos.
 
@@ -218,6 +219,34 @@ Le volume est en lecture seule, et le VFS le sait : `VfsMount.IsReadOnly` vaut `
 Les mêmes refus s'appliquent à n'importe quel pilote quand vous montez avec `MountFlags.ReadOnly` : une partition FAT montée ainsi ne prend aucune écriture par ce point de montage, alors que la même partition montée ailleurs sans l'indicateur en prend toujours.
 
 Ce que le pilote ne lit pas : les noms longs d'un volume Joliet seul (il présente les identifiants bruts), un fichier de plus de 4 Gio réparti sur plusieurs extents (il n'est pas listé), les sessions suivantes d'un disque multisession, UDF, et El Torito, dont le catalogue de démarrage n'est qu'un fichier. Un contrôleur SATA en mode AHCI est l'endroit où la machine q35 de QEMU place son lecteur de CD, et où VMware le place quand le lecteur virtuel est sur le contrôleur SATA plutôt que sur le contrôleur IDE ; là, l'`AhciDriver` du kit publie le lecteur sous le nom `cdrom<n>` ([Les pilotes de stockage](drivers.md#the-storage-drivers)). Un lecteur derrière un contrôleur USB, virtio-scsi ou IDE n'est pas encore un périphérique bloc, si bien qu'un noyau démarré depuis l'un d'eux lit plutôt une image : depuis la RAM, depuis une partition de disque ou depuis une clé USB sur laquelle l'image a été écrite.
+
+<a id="ship-files-on-the-boot-iso"></a>
+
+### Livrer des fichiers sur l'ISO de démarrage
+
+L'ISO que produit `cosmos build` contient le noyau et Limine sous `/boot` et `/EFI`. Un noyau livre ses propres fichiers à côté comme il le faisait en Gen2 : tout ce qui se trouve dans un dossier `isoFiles` à côté du `.csproj` du noyau va à la racine de l'ISO avec ses sous-dossiers, si bien que `isoFiles/data/config.txt` devient `/data/config.txt` sur le disque. Un fichier qui se trouve ailleurs, ou qui doit porter un autre nom, est un élément `CosmosIsoFile` du `.csproj`, dont la métadonnée `IsoPath` est son chemin sur l'ISO. Un `IsoPath` qui se termine par `/` désigne un dossier et garde le nom du fichier, et un fichier qui n'en a pas va à la racine :
+
+```xml
+<ItemGroup>
+  <CosmosIsoFile Include="../assets/logo.bmp" IsoPath="images/logo.bmp" />
+  <CosmosIsoFile Include="../assets/readme.txt" IsoPath="docs/" />
+</ItemGroup>
+```
+
+La propriété `CosmosIsoFilesDirectory` désigne un autre dossier. Ce que contient le dossier reste hors de la compilation, si bien qu'un fichier `.cs` qui s'y trouve est livré sur l'ISO au lieu d'être compilé dans le noyau. La compilation échoue sur un fichier qui atterrirait sous `/boot` ou `/EFI`, puisque ces dossiers contiennent le noyau et le chargeur d'amorçage qu'écrit le SDK ; sur un chemin qui contient un segment `.` ou `..`, puisque `..` pourrait sortir de la racine ; et sur deux fichiers au même chemin, comparés sans tenir compte de la casse, puisque sur un hôte Windows la seconde copie écraserait la première. Le cache de compilation de l'ISO couvre les fichiers et leurs chemins, si bien qu'ajouter, modifier, renommer ou retirer l'un d'eux reconstruit l'ISO sans recompiler le noyau.
+
+Les noms sur le disque sont des noms Rock Ridge, casse et espaces conservées, et le noyau les lit une fois qu'il a monté le CD de démarrage, trouvé comme plus haut :
+
+```csharp
+using Cosmos.Kernel.System.FileSystem;           // VfsManager, MountFlags
+using Cosmos.Kernel.System.FileSystem.Iso9660;   // Iso9660FileSystemType
+
+VfsManager.RegisterFileSystem("bootcd", new Iso9660FileSystemType(cdrom));
+VfsManager.TryMount("bootcd", "", MountFlags.None, "/cdrom", out _);
+string config = File.ReadAllText("/cdrom/data/config.txt");
+```
+
+Cette lecture suppose que le lecteur de démarrage soit un périphérique bloc, ce qu'il est derrière un contrôleur AHCI. Là où il ne l'est pas, par exemple sur une machine arm64 qui démarre depuis virtio-scsi, les fichiers sont sur le disque mais le noyau ne peut pas encore les atteindre.
 
 <a id="partition-a-disk"></a>
 

@@ -12,6 +12,7 @@ The main differences if you come from Gen2:
 | API surface | Plugged subset of `System.IO` | Full `System.IO` (streams, enumeration patterns, `FileInfo`, …) |
 | `File.Move` | Not plugged (copy + delete) | Works, including onto-existing overwrite semantics |
 | Filesystems | FAT32 (FAT12/16 partial), ISO 9660 | FAT12/16/32, ext2, ISO 9660 with Rock Ridge (read-only) |
+| Files on the ISO | An `isoFiles` folder in the project | The same `isoFiles` folder, plus `CosmosIsoFile` items ([Ship files on the boot ISO](#ship-files-on-the-boot-iso)) |
 
 **Attention**: **Always** format your drive with Cosmos and **only** Cosmos if you plan to use it with Cosmos. Tools like Parted or FDisk are much more advanced and may lay the disk out differently than Cosmos expects.
 
@@ -205,6 +206,32 @@ The volume is read-only, and the VFS knows it: `VfsMount.IsReadOnly` is true and
 The same refusals apply to any driver when you mount with `MountFlags.ReadOnly`: a FAT partition mounted that way takes no writes through that mount point, while the same partition mounted elsewhere without the flag still does.
 
 What the driver does not read: a Joliet-only volume's long names (it presents the plain identifiers), a file past 4 GiB split over several extents (it is not listed), the later sessions of a multi-session disc, UDF, and El Torito, whose boot catalog is just a file. A SATA controller in AHCI mode is where QEMU's q35 machine puts its CD drive, and where VMware puts it when the virtual drive sits on the SATA controller rather than the IDE one; there the kit's `AhciDriver` publishes the drive as `cdrom<n>` ([The storage drivers](drivers.md#the-storage-drivers)). A drive behind a USB, virtio-scsi or IDE controller is not a block device yet, so a kernel booted from one reads an image instead: from RAM, from a disk partition, or from a USB stick the image was written to.
+
+### Ship files on the boot ISO
+
+The ISO `cosmos build` produces holds the kernel and Limine under `/boot` and `/EFI`. A kernel ships its own files beside them as it did in Gen2: whatever sits in an `isoFiles` folder next to the kernel's `.csproj` goes to the root of the ISO with its folders, so `isoFiles/data/config.txt` is `/data/config.txt` on the disc. A file that lives elsewhere, or that should go under another name, is a `CosmosIsoFile` item in the `.csproj`, whose `IsoPath` metadata is its path on the ISO. An `IsoPath` ending in `/` names a folder and keeps the file's name, and a file without one goes to the root:
+
+```xml
+<ItemGroup>
+  <CosmosIsoFile Include="../assets/logo.bmp" IsoPath="images/logo.bmp" />
+  <CosmosIsoFile Include="../assets/readme.txt" IsoPath="docs/" />
+</ItemGroup>
+```
+
+The `CosmosIsoFilesDirectory` property points the folder elsewhere. What the folder holds is left out of the compilation, so a `.cs` file there is shipped rather than built into the kernel. The build fails on a file that would land under `/boot` or `/EFI`, since those hold the kernel and the bootloader the SDK writes; on a path with a `.` or `..` segment, since `..` could leave the root; and on two files with one path, compared without case, since on a Windows host the second copy would overwrite the first. The ISO's build cache covers the files and their paths, so adding, changing, renaming or removing one rebuilds the ISO without compiling the kernel again.
+
+The names on the disc are Rock Ridge names, case and spaces kept, and the kernel reads them once it has mounted the boot CD, found as above:
+
+```csharp
+using Cosmos.Kernel.System.FileSystem;           // VfsManager, MountFlags
+using Cosmos.Kernel.System.FileSystem.Iso9660;   // Iso9660FileSystemType
+
+VfsManager.RegisterFileSystem("bootcd", new Iso9660FileSystemType(cdrom));
+VfsManager.TryMount("bootcd", "", MountFlags.None, "/cdrom", out _);
+string config = File.ReadAllText("/cdrom/data/config.txt");
+```
+
+That read needs the boot drive to be a block device, which it is behind an AHCI controller. Where it is not, on an arm64 machine booting from virtio-scsi for one, the files are on the disc but the kernel cannot reach them yet.
 
 ## Partition a disk
 

@@ -82,6 +82,19 @@
     </ItemGroup>
   </Target>
 
+  <!--
+    What the suite ships on its own boot CD, read back by
+    Test_BootCd_ShippedFiles: isoFiles/ goes to the ISO root with its folders
+    (NotCompiled.cs is not C#, so the build fails if the SDK lets the folder
+    into the compilation), and two fixture files go through CosmosIsoFile,
+    one renamed by its IsoPath, one placed in a folder by an IsoPath ending
+    in /.
+  -->
+  <ItemGroup>
+    <CosmosIsoFile Include="Fixtures/rockridge/hello.txt" IsoPath="extra/hello-from-item.txt" />
+    <CosmosIsoFile Include="Fixtures/level1/FILE.TXT" IsoPath="extra/" />
+  </ItemGroup>
+
   <!-- The 200 KiB pattern (i * 7 + 3) &amp; 0xFF the read cells compare
        against, generated rather than committed so the only binary in the
        fixture tree is the 10 000-byte file of the same pattern. -->

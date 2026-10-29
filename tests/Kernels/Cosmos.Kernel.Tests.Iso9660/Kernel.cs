@@ -27,7 +27,7 @@ public class Kernel : Sys.Kernel
 {
     /// <summary>Exact TR.Run cell count: the harness synthesizes failures
     /// for missing tests, so a mid-suite hang can't report ALL TESTS PASSED.</summary>
-    private const ushort ExpectedTestCount = 50;
+    private const ushort ExpectedTestCount = 51;
 
     private const string CdDriverName = "iso-cd";
     private const string DiskDriverName = "iso-disk";
@@ -51,6 +51,21 @@ public class Kernel : Sys.Kernel
 
     /// <summary>Where the build puts the kernel image on the ISO.</summary>
     private const string KernelPath = "/boot/" + KernelFileName;
+
+    /// <summary>The suite's isoFiles/shipped/ folder, at the ISO root.</summary>
+    private const string ShippedFolder = "/shipped";
+
+    /// <summary>The text file isoFiles/ ships, its Rock Ridge name holding spaces.</summary>
+    private const string ShippedReadMe = ShippedFolder + "/Read Me First.txt";
+
+    /// <summary>The .cs file isoFiles/ ships, which the build must leave out of the compilation.</summary>
+    private const string ShippedSource = ShippedFolder + "/NotCompiled.cs";
+
+    /// <summary>Fixtures/rockridge/hello.txt, shipped by a CosmosIsoFile whose IsoPath renames it.</summary>
+    private const string ShippedRenamed = "/extra/hello-from-item.txt";
+
+    /// <summary>Fixtures/level1/FILE.TXT, shipped by a CosmosIsoFile whose IsoPath names only its folder.</summary>
+    private const string ShippedIntoFolder = "/extra/FILE.TXT";
 
     /// <summary>The first four bytes of an ELF image.</summary>
     private static ReadOnlySpan<byte> ElfMagic => [0x7F, (byte)'E', (byte)'L', (byte)'F'];
@@ -588,6 +603,19 @@ public class Kernel : Sys.Kernel
             Assert.True(ThrowsReadOnly(() => File.WriteAllText(BootMount + "/new.txt", "x")), "a write to the boot CD is refused");
         });
 
+        TR.Run("Test_BootCd_ShippedFiles", () =>
+        {
+            // The files the suite's project ships beside the kernel, through
+            // the mount the cell above made: isoFiles/ at the root with its
+            // folders, then the two CosmosIsoFile items.
+            Assert.True(File.Exists(BootMount + ShippedReadMe), "isoFiles/shipped/Read Me First.txt should be on the boot CD with its folder and its name");
+            Assert.Equal("Shipped on the boot CD from the suite's isoFiles folder.", File.ReadAllText(BootMount + ShippedReadMe).TrimEnd());
+            Assert.Equal("This file is shipped on the boot CD and never compiled: it is not C#.", File.ReadAllText(BootMount + ShippedSource).TrimEnd());
+            Assert.Equal("hello from the cd\n", File.ReadAllText(BootMount + ShippedRenamed));
+            Assert.Equal("abc\n", File.ReadAllText(BootMount + ShippedIntoFolder));
+            Assert.Equal(2, Directory.GetFiles(BootMount + "/extra").Length, "/extra should hold the two CosmosIsoFile items");
+        });
+
         TR.Run("Test_BootCd_Partition_Mounts", () =>
         {
             // The same volume through the partition the manager carved for
@@ -610,6 +638,7 @@ public class Kernel : Sys.Kernel
 #else
         TR.Skip("Test_BootCd_Registered", SkipNoBootCd);
         TR.Skip("Test_BootCd_Mount_ReadsThisKernel", SkipNoBootCd);
+        TR.Skip("Test_BootCd_ShippedFiles", SkipNoBootCd);
         TR.Skip("Test_BootCd_Partition_Mounts", SkipNoBootCd);
 #endif
 
