@@ -44,7 +44,7 @@ Cosmos gen2 kompilował IL C# do asemblera x86 przy pomocy **IL2CPU**, czyli wł
 
 ## Dokumentacja
 
-[Strona dokumentacji](https://cosmosos.github.io/index.html): podzielona na **przewodnik użytkownika** (zbuduj własny system operacyjny przy użyciu Cosmosa) oraz **dokumentację kontrybutora** (ang. **Contributor Docs**) (współtworzenie samego Cosmosa / wewnętrzna architektura)
+[Strona dokumentacji](https://cosmosos.github.io/index.html): podzielona na **przewodnik użytkownika** (zbuduj własny system operacyjny przy użyciu Cosmosa) oraz **dokumentację kontrybutora** (współtworzenie samego Cosmosa / wewnętrzna architektura)
 
 ## Licencja
 
