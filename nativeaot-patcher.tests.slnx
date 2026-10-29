@@ -16,6 +16,7 @@
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.File/Cosmos.Kernel.Tests.File.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Graphic/Cosmos.Kernel.Tests.Graphic.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.HelloWorld/Cosmos.Kernel.Tests.HelloWorld.csproj"/>
+        <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Iso9660/Cosmos.Kernel.Tests.Iso9660.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Memory/Cosmos.Kernel.Tests.Memory.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Network/Cosmos.Kernel.Tests.Network.csproj"/>
         <Project Path="tests/Kernels/Cosmos.Kernel.Tests.Threading/Cosmos.Kernel.Tests.Threading.csproj"/>
