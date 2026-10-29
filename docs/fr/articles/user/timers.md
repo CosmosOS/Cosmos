@@ -1,5 +1,5 @@
 ---
-source_hash: 2887234aca8973282e3c09d77045754365502467
+source_hash: bc6ddd1dddb90bf5c519f048164d2f7cfc9bb955
 ---
 <a id="timers-and-alarms"></a>
 
@@ -120,7 +120,7 @@ La période d'une alarme récurrente repart au moment où le callback se déclen
 
 ## Changer la fréquence des ticks
 
-`TimerManager.Frequency` lit et écrit la fréquence de la source de ticks en hertz. Chaque source de ticks divise un compteur fixe, chacune accepte donc une plage bornée : de 19 Hz à 1193180 Hz sur le PIT x64, et de 1 Hz jusqu'à `CNTFRQ_EL0` sur le minuteur générique ARM64. Une valeur hors de cette plage lève `ArgumentOutOfRangeException` plutôt que d'être ignorée en silence :
+`TimerManager.Frequency` lit et écrit la fréquence de la source de ticks en hertz. Les deux sources de ticks démarrent à 100 Hz, un tick de 10 ms, qui est la résolution de `TimerManager.Wait` et d'un rappel planifié. Chaque source de ticks divise un compteur fixe, chacune accepte donc une plage bornée : de 19 Hz à 1193180 Hz sur le PIT x64, et de 1 Hz jusqu'à `CNTFRQ_EL0` sur le minuteur générique ARM64. Une valeur hors de cette plage lève `ArgumentOutOfRangeException` plutôt que d'être ignorée en silence :
 
 ```csharp
 Console.WriteLine("timer runs at " + TimerManager.Frequency + " Hz");

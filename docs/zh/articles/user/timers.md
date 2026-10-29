@@ -1,5 +1,5 @@
 ---
-source_hash: 2887234aca8973282e3c09d77045754365502467
+source_hash: bc6ddd1dddb90bf5c519f048164d2f7cfc9bb955
 ---
 <a id="timers-and-alarms"></a>
 
@@ -120,7 +120,7 @@ AlarmManager.Cancel(id);
 
 ## 更改节拍频率
 
-`TimerManager.Frequency` 以赫兹为单位读取和设置节拍源的频率。每个节拍源都是对一个固定计数器进行分频，因此各自只接受一个有限的范围：在 x64 PIT 上为 19 Hz 到 1193180 Hz，在 ARM64 通用定时器上为 1 Hz 到 `CNTFRQ_EL0`。超出范围的值会抛出 `ArgumentOutOfRangeException`，而不是被悄悄忽略：
+`TimerManager.Frequency` 以赫兹为单位读取和设置节拍源的频率。两个节拍源都以 100 Hz 启动，即每个节拍 10 ms，这就是 `TimerManager.Wait` 和已调度回调的精度。每个节拍源都是对一个固定计数器进行分频，因此各自只接受一个有限的范围：在 x64 PIT 上为 19 Hz 到 1193180 Hz，在 ARM64 通用定时器上为 1 Hz 到 `CNTFRQ_EL0`。超出范围的值会抛出 `ArgumentOutOfRangeException`，而不是被悄悄忽略：
 
 ```csharp
 Console.WriteLine("timer runs at " + TimerManager.Frequency + " Hz");
