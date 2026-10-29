@@ -236,6 +236,12 @@ Cosmos.Kernel.System.FileSystem.IInodeOperations.SetAttr(Cosmos.Kernel.System.Fi
 Cosmos.Kernel.System.FileSystem.IInodeOperations.Symlink(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name, System.ReadOnlySpan<char> target, out Cosmos.Kernel.System.FileSystem.IVfsInode? inode) -> bool
 Cosmos.Kernel.System.FileSystem.IInodeOperations.TryReadLink(Cosmos.Kernel.System.FileSystem.IVfsInode! symlink, out string? target) -> bool
 Cosmos.Kernel.System.FileSystem.IInodeOperations.Unlink(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name) -> bool
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.Iso9660FileSystemType() -> void
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.Iso9660FileSystemType(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.IVfsFormatOptions? options) -> bool
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.MountFlags flags, out Cosmos.Kernel.System.FileSystem.IVfsSuperblock? superblock) -> bool
 Cosmos.Kernel.System.FileSystem.ISuperblockOperations
 Cosmos.Kernel.System.FileSystem.ISuperblockOperations.Drop(Cosmos.Kernel.System.FileSystem.IVfsSuperblock! superblock) -> void
 Cosmos.Kernel.System.FileSystem.ISuperblockOperations.StatFs(Cosmos.Kernel.System.FileSystem.IVfsSuperblock! superblock, out Cosmos.Kernel.System.FileSystem.VfsStatFs statFs) -> bool
@@ -277,6 +283,7 @@ Cosmos.Kernel.System.FileSystem.IVfsOpenFile.Position.get -> long
 Cosmos.Kernel.System.FileSystem.IVfsOpenFile.Position.set -> void
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock.BlockSize.get -> long
+Cosmos.Kernel.System.FileSystem.IVfsSuperblock.IsReadOnly.get -> bool
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock.MaxNameLength.get -> ulong
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock.Root.get -> Cosmos.Kernel.System.FileSystem.IVfsInode!
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock.SuperOperations.get -> Cosmos.Kernel.System.FileSystem.ISuperblockOperations!
@@ -323,6 +330,8 @@ Cosmos.Kernel.System.FileSystem.VfsMode.Socket = Cosmos.Kernel.System.FileSystem
 Cosmos.Kernel.System.FileSystem.VfsMode.Sticky = 512 -> Cosmos.Kernel.System.FileSystem.VfsMode
 Cosmos.Kernel.System.FileSystem.VfsMode.SymbolicLink = Cosmos.Kernel.System.FileSystem.VfsMode.CharacterDevice | Cosmos.Kernel.System.FileSystem.VfsMode.RegularFile -> Cosmos.Kernel.System.FileSystem.VfsMode
 Cosmos.Kernel.System.FileSystem.VfsMount
+Cosmos.Kernel.System.FileSystem.VfsMount.Flags.get -> Cosmos.Kernel.System.FileSystem.MountFlags
+Cosmos.Kernel.System.FileSystem.VfsMount.IsReadOnly.get -> bool
 Cosmos.Kernel.System.FileSystem.VfsMount.MountPoint.get -> string!
 Cosmos.Kernel.System.FileSystem.VfsMount.Name.get -> string!
 Cosmos.Kernel.System.FileSystem.VfsMount.Partition.get -> Cosmos.Kernel.System.Storage.Partition?
