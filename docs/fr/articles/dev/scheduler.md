@@ -1,5 +1,5 @@
 ---
-source_hash: 67b91cddc06e52ca660f8db7bed8f4cc008b56e3
+source_hash: 2abdec05a85fd00fdade0543f3d0b3faea7532f0
 ---
 <a id="overview"></a>
 
@@ -161,7 +161,7 @@ L'ordonnanceur ne possède pas de minuteur ; il expose `OnTimerInterrupt` et lai
 
 | Architecture | Tick de l'ordonnanceur | Minuteurs logiciels ([Minuteurs et alarmes](#timers-and-alarms)) |
 |--------------|----------------|------------------------------|
-| x64 | Minuteur LAPIC, vecteur 239, périodique, 10 ms | PIT sur l'IRQ 0, ponctuel, réarmé à chaque interruption |
+| x64 | Minuteur LAPIC, vecteur 239, périodique, 10 ms | PIT sur l'IRQ 0, ponctuel, réarmé à chaque interruption, 10 ms |
 | ARM64 | Generic Timer, INTID 30, réarmé à chaque interruption, 10 ms | même interruption, traitée avant le tick de l'ordonnanceur |
 
 Dans les deux cas, le gestionnaire d'interruption passe l'intervalle *configuré* comme `elapsedNs`, et non un temps écoulé mesuré, et calcule lui-même l'adresse du contexte sauvegardé : l'entrée IRQ managée reçoit un pointeur vers le bloc des registres généraux, et le gestionnaire d'interruption soustrait la zone de sauvegarde SIMD (256 octets sur x64, 512 sur ARM64) pour retrouver la base du `ThreadContext`. C'est cette adresse que contiendra le `StackPointer` d'un thread préempté.
@@ -443,7 +443,7 @@ Deux suites de tests de noyau couvrent cet article. [`Cosmos.Kernel.Tests.Thread
 - les événements d'interruption (`InterruptEvent_TwoWaiters_BothWake`),
 - la surface de la BCL au-dessus de tout cela : délégués, `Task`, `async`/`await`, `ThreadPool`.
 
-[`Cosmos.Kernel.Tests.Timer`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) exécute 24 tests sur x64 et 18 sur ARM64 (`make test KERNEL=Timer`), et couvre les deux niveaux de travail différé (`TimerManager_Schedule_*`, `AlarmSystem_*`), le `System.Threading.Timer` de la BCL bâti au-dessus, `Stopwatch`, `DateTime`, et le matériel de minuterie propre à chaque architecture (PIT et LAPIC sur x64).
+[`Cosmos.Kernel.Tests.Timer`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) exécute 27 tests sur x64 et 21 sur ARM64 (`make test KERNEL=Timer`), et couvre les deux niveaux de travail différé (`TimerManager_Schedule_*`, `AlarmSystem_*`), le `System.Threading.Timer` de la BCL bâti au-dessus, `Stopwatch`, `DateTime`, et le matériel de minuterie propre à chaque architecture (PIT et LAPIC sur x64).
 
 ---
 

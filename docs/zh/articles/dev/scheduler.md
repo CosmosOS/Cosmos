@@ -1,5 +1,5 @@
 ---
-source_hash: 67b91cddc06e52ca660f8db7bed8f4cc008b56e3
+source_hash: 2abdec05a85fd00fdade0543f3d0b3faea7532f0
 ---
 <a id="overview"></a>
 
@@ -161,7 +161,7 @@ stateDiagram-v2
 
 | 架构 | 调度器节拍 | 软件定时器（[定时器与闹钟](#timers-and-alarms)） |
 |--------------|----------------|------------------------------|
-| x64 | LAPIC 定时器，向量 239，周期性，10 ms | IRQ 0 上的 PIT，一次性，每次中断后重新设置 |
+| x64 | LAPIC 定时器，向量 239，周期性，10 ms | IRQ 0 上的 PIT，一次性，每次中断后重新设置，10 ms |
 | ARM64 | Generic Timer，INTID 30，每次中断后重新设置，10 ms | 同一个中断，在调度器节拍之前分派 |
 
 两种情况下，处理程序都把*配置的*间隔作为 `elapsedNs` 传入，而不是实际测得的经过时间，并且自己计算保存的上下文的地址：托管 IRQ 入口收到一个指向通用寄存器块的指针，处理程序减去 SIMD 保存区（x64 上 256 字节，ARM64 上 512 字节）以得到 `ThreadContext` 的基址。被抢占线程的 `StackPointer` 中保存的就是这个地址。
@@ -445,7 +445,7 @@ flowchart TD
 - 中断事件（`InterruptEvent_TwoWaiters_BothWake`）；
 - 在这一切之上的 BCL 接口：委托、`Task`、`async`/`await`、`ThreadPool`。
 
-[`Cosmos.Kernel.Tests.Timer`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) 在 x64 上运行 24 个测试，在 ARM64 上运行 18 个（`make test KERNEL=Timer`），覆盖两层延迟工作（`TimerManager_Schedule_*`、`AlarmSystem_*`）、构建在它们之上的 BCL `System.Threading.Timer`、`Stopwatch`、`DateTime`，以及各架构的定时器硬件（x64 上的 PIT 和 LAPIC）。
+[`Cosmos.Kernel.Tests.Timer`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) 在 x64 上运行 27 个测试，在 ARM64 上运行 21 个（`make test KERNEL=Timer`），覆盖两层延迟工作（`TimerManager_Schedule_*`、`AlarmSystem_*`）、构建在它们之上的 BCL `System.Threading.Timer`、`Stopwatch`、`DateTime`，以及各架构的定时器硬件（x64 上的 PIT 和 LAPIC）。
 
 ---
 

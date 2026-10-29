@@ -138,7 +138,7 @@ The scheduler does not own a timer; it exposes `OnTimerInterrupt` and lets the p
 
 | Architecture | Scheduler tick | Software timers ([Timers and alarms](#timers-and-alarms)) |
 |--------------|----------------|------------------------------|
-| x64 | LAPIC timer, vector 239, periodic, 10 ms | PIT on IRQ 0, one-shot re-armed per interrupt |
+| x64 | LAPIC timer, vector 239, periodic, 10 ms | PIT on IRQ 0, one-shot re-armed per interrupt, 10 ms |
 | ARM64 | Generic Timer, INTID 30, re-armed per interrupt, 10 ms | same interrupt, dispatched before the scheduler tick |
 
 In both cases the handler passes the *configured* interval as `elapsedNs`, not a measured elapsed time, and computes the saved-context address itself: the managed IRQ entry receives a pointer to the general-register block, and the handler subtracts the SIMD save area (256 bytes on x64, 512 on ARM64) to recover the `ThreadContext` base. That address is what a preempted thread's `StackPointer` will hold.
@@ -392,7 +392,7 @@ Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](htt
 - interrupt events (`InterruptEvent_TwoWaiters_BothWake`),
 - the BCL surface above it all: delegates, `Task`, `async`/`await`, `ThreadPool`.
 
-[`Cosmos.Kernel.Tests.Timer`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) runs 24 tests on x64 and 18 on ARM64 (`make test KERNEL=Timer`), covering both deferred-work tiers (`TimerManager_Schedule_*`, `AlarmSystem_*`), the BCL `System.Threading.Timer` on top of them, `Stopwatch`, `DateTime`, and the per-architecture timer hardware (PIT and LAPIC on x64).
+[`Cosmos.Kernel.Tests.Timer`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) runs 27 tests on x64 and 21 on ARM64 (`make test KERNEL=Timer`), covering both deferred-work tiers (`TimerManager_Schedule_*`, `AlarmSystem_*`), the BCL `System.Threading.Timer` on top of them, `Stopwatch`, `DateTime`, and the per-architecture timer hardware (PIT and LAPIC on x64).
 
 ---
 

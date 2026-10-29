@@ -10,7 +10,9 @@ namespace Cosmos.Kernel.HAL.X64;
 
 /// <summary>
 /// Handles the Programmable Interval Timer (PIT). Software timers registered
-/// via <see cref="TickSource.RegisterTimer"/> are driven by the channel 0 IRQ.
+/// via <see cref="TickSource.RegisterTimer"/> are driven by the channel 0 IRQ,
+/// which ticks at <see cref="DefaultFrequency"/> from <see cref="Initialize"/>
+/// on.
 /// </summary>
 internal class PIT : TickSource
 {
@@ -21,6 +23,17 @@ internal class PIT : TickSource
 
     public const uint PITFrequency = 1193180;
     public const uint PITDelayNS = 838;
+
+    /// <summary>
+    /// Tick rate <see cref="Initialize"/> programs: 100 Hz, a 10 ms tick, the
+    /// period of the ARM64 generic timer and of the scheduler tick. Without it
+    /// channel 0 runs at its widest divisor, a 55 ms tick, and every wait is
+    /// rounded up to a multiple of 55 ms.
+    /// </summary>
+    public const uint DefaultFrequency = 100;
+
+    /// <summary>Nanoseconds in one second.</summary>
+    private const ulong NanosecondsPerSecond = 1_000_000_000;
 
     public bool T0RateGen = false;
 
@@ -56,7 +69,7 @@ internal class PIT : TickSource
         Serial.Write("[PIT] Initializing...\n");
 
         Instance = this;
-        T0Countdown = 65535;
+        T0Frequency = DefaultFrequency;
 
         Serial.Write("[PIT] Initialized\n");
     }
@@ -86,9 +99,9 @@ internal class PIT : TickSource
     }
 
     /// <summary>
-    /// Gets the timer frequency in Hz.
+    /// Gets the timer frequency in Hz, rounded to the nearest.
     /// </summary>
-    public override uint Frequency => PITFrequency / _t0Countdown;
+    public override uint Frequency => T0Frequency;
 
     /// <summary>
     /// Lowest frequency the 16-bit divisor can express: <see cref="PITFrequency"/>
@@ -97,9 +110,16 @@ internal class PIT : TickSource
     /// </summary>
     public const uint MinFrequency = 19;
 
+    /// <summary>
+    /// Channel 0's rate in Hz. Read, it is rounded to the nearest; written,
+    /// the divisor is rounded up, so the tick is never shorter than the period
+    /// asked for and a wait of whole periods takes that many ticks: the
+    /// truncated divisor of 100 Hz, 11931, gives a 9.9993 ms tick, and every
+    /// Wait(10) would then last two.
+    /// </summary>
     public uint T0Frequency
     {
-        get => PITFrequency / _t0Countdown;
+        get => (PITFrequency + (_t0Countdown / 2u)) / _t0Countdown;
         set
         {
             if (value < MinFrequency || value > PITFrequency)
@@ -108,7 +128,7 @@ internal class PIT : TickSource
                 return;
             }
 
-            T0Countdown = (ushort)(PITFrequency / value);
+            T0Countdown = (ushort)((PITFrequency + value - 1) / value);
         }
     }
 
@@ -124,9 +144,15 @@ internal class PIT : TickSource
         return true;
     }
 
+    /// <summary>
+    /// Channel 0's period in nanoseconds, the elapsed time each tick reports.
+    /// Read from <see cref="PITFrequency"/> rather than <see cref="PITDelayNS"/>,
+    /// which truncates the 838.1 ns input period: at the 100 Hz divisor that
+    /// truncation alone puts the tick under 10 ms.
+    /// </summary>
     public uint T0DelayNS
     {
-        get => PITDelayNS * _t0Countdown;
+        get => (uint)(_t0Countdown * NanosecondsPerSecond / PITFrequency);
         set
         {
             if (value > 54918330)
