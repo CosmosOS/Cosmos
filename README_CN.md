@@ -10,7 +10,7 @@
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/release.yml?label=%E5%8F%91%E5%B8%83&logo=github" /></a>
 </p>
 
-[English](README.md) | [Français](README_FR.md) | 简体中文
+[English](README.md) | [Français](README_FR.md) | 简体中文 | [Polski](README_PL.md)
 
 # Cosmos gen3
 
