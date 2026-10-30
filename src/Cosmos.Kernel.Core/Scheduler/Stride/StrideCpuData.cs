@@ -21,6 +21,13 @@ internal class StrideCpuData
     public ulong LastPassUpdate { get; internal set; }
 
     /// <summary>
+    /// Ticks this CPU's <see cref="StrideScheduler.OnTick"/> has counted. Per CPU, under the
+    /// CPU's queue lock like the rest of this record: a static shared by every CPU's tick would
+    /// be written by all of them at once. CPU 0's paces the periodic log line.
+    /// </summary>
+    internal uint OnTickLogCount { get; set; }
+
+    /// <summary>
     /// Run queue sorted by Pass value (ascending). Pre-sized to the thread
     /// registry limit: InsertByPass runs in interrupt context (the tick's
     /// OnThreadYield and the sleep-expiry OnThreadReady), and a List growth

@@ -19,6 +19,18 @@
     <CosmosEnableNetwork>false</CosmosEnableNetwork>
   </PropertyGroup>
 
+  <!--
+    The bare cell, and the same cells on four CPUs: the per-CPU block cells
+    read the blocks of the application processors the kernel started (SMP
+    phase 2), and the whole suite runs on the four-CPU machine too, since
+    every thread is still placed on CPU 0 and the three others tick on their
+    idle threads. Definitions live in tests/profiles.json.
+  -->
+  <ItemGroup>
+    <CosmosTestProfile Include="bare" />
+    <CosmosTestModifier Include="smp4" />
+  </ItemGroup>
+
   <!-- Core kernel packages (using project references for development) -->
   <ItemGroup>
     <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />

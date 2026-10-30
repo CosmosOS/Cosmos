@@ -207,27 +207,21 @@ public sealed class RoundRobinScheduler : IScheduler
 
     public int GetRunQueueCount(PerCpuState cpuState)
     {
-        // The SchedulerDiagnostics facade calls the diagnostics hooks from thread
-        // context; guard them against the tick ourselves, per the plugging guide.
-        using (SchedulerManager.MaskInterrupts())
-        {
-            RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-            return cpuData?.RunQueue.Count ?? 0;
-        }
+        // The caller holds the CPU's queue lock (SchedulerManager.LockCpu),
+        // per the plugging guide: a hook never takes it itself.
+        RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
+        return cpuData?.RunQueue.Count ?? 0;
     }
 
     public SchedulerThread? GetRunQueueThread(PerCpuState cpuState, int index)
     {
-        using (SchedulerManager.MaskInterrupts())
+        RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
+        if (cpuData is null || index < 0 || index >= cpuData.RunQueue.Count)
         {
-            RoundRobinCpuData? cpuData = CpuDataOf(cpuState);
-            if (cpuData is null || index < 0 || index >= cpuData.RunQueue.Count)
-            {
-                return null;
-            }
-
-            return cpuData.RunQueue[index];
+            return null;
         }
+
+        return cpuData.RunQueue[index];
     }
 
     // ========== Private Helpers ==========

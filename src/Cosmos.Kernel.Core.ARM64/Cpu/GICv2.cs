@@ -50,6 +50,10 @@ public static class GICv2
     private const uint TargetCpu0AllBytes = 0x01010101;
     /// <summary>GICD_SGIR.TargetListFilter (bits [25:24]) set to 0b10: forward the SGI to the requesting CPU only.</summary>
     private const uint SgirTargetSelf = 0b10u << 24;
+    /// <summary>Bit position of GICD_SGIR.CPUTargetList (bits [23:16]): one bit per CPU interface, with the filter at 0b00.</summary>
+    private const int SgirTargetListShift = 16;
+    /// <summary>CPU interfaces a GICv2 distributor addresses: the width of CPUTargetList and of a GICD_ITARGETSR byte.</summary>
+    private const uint MaxCpuInterfaces = 8;
     /// <summary>GICD_SGIR.SGIINTID field mask (bits [3:0]).</summary>
     private const uint SgirIntIdMask = 0xF;
 
@@ -215,6 +219,25 @@ public static class GICv2
     public static void SendSgiToSelf(uint sgiId)
     {
         WriteDistributor(GICD_SGIR, SgirTargetSelf | (sgiId & SgirIntIdMask));
+    }
+
+    /// <summary>
+    /// Raises SGI <paramref name="sgiId"/> on the CPU interface whose number is
+    /// <paramref name="cpuInterface"/>, through GICD_SGIR with an explicit target list. A GICv2
+    /// numbers its interfaces 0 to 7 in the order the CPUs' Aff0 give them on the virt machine,
+    /// which is where the caller's affinity comes from; a target past the eight is dropped
+    /// rather than aimed at a wrong CPU. One distributor write. Allocation-free; any context.
+    /// </summary>
+    /// <param name="sgiId">SGI ID (0-15).</param>
+    /// <param name="cpuInterface">The target's CPU interface number.</param>
+    internal static void SendSgiTo(uint sgiId, ulong cpuInterface)
+    {
+        if (cpuInterface >= MaxCpuInterfaces)
+        {
+            return;
+        }
+
+        WriteDistributor(GICD_SGIR, ((1u << (int)cpuInterface) << SgirTargetListShift) | (sgiId & SgirIntIdMask));
     }
 
     /// <summary>

@@ -63,14 +63,17 @@ internal static unsafe partial class KernelThread
     /// <param name="entry">The thread's body; the thread exits when it returns.</param>
     /// <returns>
     /// True once the thread began. False when the scheduler is not running,
-    /// its timer went <see cref="NoTickTimeoutMs"/> without a tick, or it
-    /// handled <see cref="NoSwitchTicks"/> ticks without switching any
-    /// thread: that thread then never runs <paramref name="entry"/>. One that
+    /// the thread registry is full, its timer went <see cref="NoTickTimeoutMs"/>
+    /// without a tick, or it handled <see cref="NoSwitchTicks"/> ticks without
+    /// switching any thread: that thread then never runs <paramref name="entry"/>. One that
     /// never ran is taken off the run queue at once; one that ran but was
     /// preempted before it looked at the handshake returns as soon as it
     /// resumes.
     /// </returns>
-    internal static bool TryStart(Action entry) => TryStart(entry, out _);
+    internal static bool TryStart(Action entry)
+    {
+        return TryStart(entry, out _);
+    }
 
     /// <summary>
     /// <see cref="TryStart(Action)"/> that also hands back the thread, for a
@@ -112,8 +115,16 @@ internal static unsafe partial class KernelThread
         uint readiedAtSwitch;
         using (InternalCpu.DisableInterruptsScope())
         {
-            SchedulerManager.CreateThread(started.CpuId, started);
-            SchedulerManager.ReadyThread(started.CpuId, started);
+            // A full registry refuses the thread (#444): it never runs, its
+            // stack goes back, and the caller hears it did not start.
+            if (!SchedulerManager.CreateThread(started))
+            {
+                started.ReleaseStack();
+                handle.Dispose();
+                return false;
+            }
+
+            SchedulerManager.ReadyThread(started);
             readiedAtTick = SchedulerManager.TickCount;
             readiedAtSwitch = SchedulerManager.SwitchCount;
         }
@@ -145,8 +156,10 @@ internal static unsafe partial class KernelThread
             }
         }
 
-        // Masked, so on this CPU, the only one that runs threads, the thread
-        // cannot move between the verdict and the reap.
+        // Masked, so on this CPU it cannot start between the verdict and the
+        // reap. The thread was placed on CPU 0 and the callers run there
+        // (the driver kit's threads; a caller moved elsewhere by
+        // MigrateThread would race CPU 0's switch here, which no caller does).
         using (InternalCpu.DisableInterruptsScope())
         {
             if (!handshake.TryAbandon())
@@ -164,7 +177,7 @@ internal static unsafe partial class KernelThread
             // now, with the handle InvokeCurrentThreadStart would have freed.
             if (started.State == SchedulerThreadState.Created)
             {
-                SchedulerManager.ExitThread(started.CpuId, started);
+                SchedulerManager.ExitThread(started);
                 handle.Dispose();
             }
         }

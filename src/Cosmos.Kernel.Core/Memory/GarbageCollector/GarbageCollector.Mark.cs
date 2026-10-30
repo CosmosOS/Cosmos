@@ -2,6 +2,7 @@
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Internal.Runtime;
@@ -137,11 +138,7 @@ internal static unsafe partial class GarbageCollector
         }
     }
 
-    /// <summary>
-    /// Stack-end bound for the current thread when its <see cref="SchedulerThread"/> has no
-    /// allocated <c>StackBase</c>/<c>StackSize</c> — the boot/idle thread runs on the bootloader's
-    /// stack, whose top kmain captured before any managed code ran.
-    /// </summary>
+    /// <summary>Stack-end bound for the current thread when it is an idle thread: the top of the bootloader stack of the running CPU, from its per-CPU block.</summary>
     private static nuint GetCurrentStackEndForBootStack()
     {
         return Runtime.BootStack.Top;
@@ -159,10 +156,14 @@ internal static unsafe partial class GarbageCollector
         }
 
         // ScanStackRoots never passes the current thread, so a thread still marked Running here is
-        // another CPU's: the idle thread of an application processor, which Cosmos does not start
-        // yet. It never ran, so it has no saved context and no stack. Scanning it from this CPU's
-        // stack pointer up to BootStack.Top read, on a multi-core machine, whatever memory lies
-        // between the collecting thread's stack and the boot stack.
+        // another CPU's current thread: the idle thread of an application processor, which halts in
+        // Smp.ApMain and is never switched out, so the switch path has recorded neither its stack
+        // pointer nor a context for it (and it holds no reference: nothing on that path allocates),
+        // or a thread the scheduler moved there (SMP phase 3a), which keeps running while this CPU
+        // collects and whose frames only the stop rendezvous of phase 4 can capture. Scanning the
+        // idle thread from this CPU's stack pointer up to a boot stack top read, on a multi-core
+        // machine, whatever memory lies between the collecting thread's stack and that top; the
+        // moved thread's saved stack pointer and context are stale, from its last switch-out.
         if (thread.State == SchedulerThreadState.Running)
         {
             return;
@@ -233,22 +234,16 @@ internal static unsafe partial class GarbageCollector
         {
             stackEnd = thread.StackBase + thread.StackSize;
         }
-        else if (stackStart != 0 && thread.CpuId == 0 && thread.IsIdle)
+        else if (stackStart != 0 && thread.IsIdle)
         {
-            // The boot/idle thread (the kernel's main thread) has no StackBase/StackSize: it
-            // runs on the bootloader stack, where the IRQ stub that switched it out saved its
-            // context, at StackPointer. Skipping it lost every main-thread stack root whenever
-            // another thread collected.
-            stackEnd = GetCurrentStackEndForBootStack();
-#if ARCH_ARM64
-            // It runs in EL1t, on SP_EL0: the IRQ stub saved its context on the SP_EL1 stack, not
-            // on the bootloader one, and its stack pointer in the context. Scanning from the
-            // context up to the boot stack top read most of the address space and hung the CPU.
-            if (ctx != null && (ctx->Spsr & 1) == 0)
-            {
-                stackStart = (nuint)ctx->Sp;
-            }
-#endif
+            // An idle thread (the kernel's main thread on CPU 0, the halt loop of an
+            // application processor) has no StackBase/StackSize: it runs on the bootloader stack
+            // of its CPU, where the IRQ stub that switched it out saved its context, at
+            // StackPointer. Skipping it lost every main-thread stack root whenever another thread
+            // collected. On ARM64 the frame is on that stack too: every CPU runs EL1h from its
+            // first instruction in the kernel (kmain, the trampoline), so an exception stacks its
+            // frame below the interrupted sp.
+            stackEnd = PerCpuBlock.At(thread.CpuId).BootStackTop;
         }
         else
         {
