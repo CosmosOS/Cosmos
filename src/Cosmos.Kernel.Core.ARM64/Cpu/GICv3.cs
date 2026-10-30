@@ -349,9 +349,10 @@ public static class GICv3
     /// <summary>
     /// Extracts the routing affinity value from MPIDR_EL1 in the format
     /// expected by GICD_IROUTER and GICR_TYPER:
-    /// bits [31:24] = Aff3, [23:16] = Aff2, [15:8] = Aff1, [7:0] = Aff0
+    /// bits [39:32] = Aff3, [23:16] = Aff2, [15:8] = Aff1, [7:0] = Aff0.
+    /// Also what the per-CPU block records as a CPU's hardware identity.
     /// </summary>
-    private static ulong ExtractAffinity(ulong mpidr)
+    internal static ulong ExtractAffinity(ulong mpidr)
     {
         // MPIDR_EL1: Aff3[39:32], Aff2[23:16], Aff1[15:8], Aff0[7:0]
         // IROUTER:    Aff3[39:32], Aff2[23:16], Aff1[15:8], Aff0[7:0]

@@ -16,6 +16,7 @@ using SysThread = System.Threading.Thread;
 #if ARCH_X64
 using Cosmos.Kernel.Core.X64.Cpu;
 #else
+using Cosmos.Kernel.Core.ARM64.Bridge;
 using Cosmos.Kernel.Core.ARM64.Cpu;
 #endif
 
@@ -35,8 +36,8 @@ namespace Cosmos.Kernel.Tests.Interrupts;
 // registers afterwards.
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests per cell: 10 cross-arch + 6 arch-specific.</summary>
-    private const int ExpectedTestCount = 16;
+    /// <summary>Total tests per cell: 10 cross-arch + 7 arch-specific.</summary>
+    private const int ExpectedTestCount = 17;
 
     /// <summary>First vector of the dynamic MSI/MSI-X allocation window [0x40, 0xFE].</summary>
     private const byte DynamicVectorFirst = 0x40;
@@ -124,7 +125,7 @@ public class Kernel : Sys.Kernel
     {
         Serial.WriteString("[Interrupts] BeforeRun() reached!\n");
 
-        // 10 cross-arch + 6 arch-specific = 16 tests per cell.
+        // 10 cross-arch + 7 arch-specific = 17 tests per cell.
         TR.Start("Interrupt System Tests", expectedTests: ExpectedTestCount);
 
         s_barlessPciFunction = FindBarlessPciFunction();
@@ -156,6 +157,7 @@ public class Kernel : Sys.Kernel
         TR.Run("IrqExit_ReschedulesSignaledWaiter", TestIrqExitReschedulesSignaledWaiter);
         TR.Run("Msi_AddressTargetsRunningLapic", TestMsiAddressTargetsRunningLapic);
         TR.Run("TimerVector_OutsideDynamicWindow", TestTimerVectorOutsideDynamicWindow);
+        TR.Run("PerCpuBlock_HardwareId_IsRunningLapicId", TestPerCpuBlockHardwareIdIsLapicId);
 #else
         // ==================== arm64 (GIC, per cell's gic-version) ====================
         TR.Run("Gic_Initialized", TestGicInitialized);
@@ -186,6 +188,7 @@ public class Kernel : Sys.Kernel
         TR.Skip("IrqExit_ReschedulesSignaledWaiter", "self-IPI harness is x64-only");
         TR.Skip("Msi_AddressTargetsRunningLapic", "LAPIC MSI address contract is x64-only");
         TR.Skip("TimerVector_OutsideDynamicWindow", "LAPIC timer vector is x64-only");
+        TR.Run("PerCpuBlock_HardwareId_IsMpidrAffinity", TestPerCpuBlockHardwareIdIsMpidrAffinity);
 #endif
 
         TR.Finish();
@@ -806,6 +809,8 @@ public class Kernel : Sys.Kernel
     private const int MsiDestinationIdShift = 12;
     /// <summary>Width mask of the destination APIC ID field in the MSI message address (8 bits).</summary>
     private const int MsiDestinationIdMask = 0xFF;
+    /// <summary>A CPU index whose per-CPU block is not installed: no application processor runs yet.</summary>
+    private const uint OfflineCpuIndex = 1;
     private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? _wakeEvent;
     private static volatile bool _waiterReady;
     private static volatile bool _waiterDone;
@@ -888,11 +893,13 @@ public class Kernel : Sys.Kernel
     }
 
     // Pins the MSI address contract: the destination field must carry the
-    // running CPU's ACTUAL APIC ID (LocalApic.GetId()), not its scheduler
-    // index. QEMU's BSP APIC ID is 0, so this cell cannot fail there today —
-    // it exists to catch the index-as-ID shortcut on any machine (or future
+    // target CPU's ACTUAL APIC ID (what its per-CPU block records, the id
+    // LocalApic.GetId() reads on the boot CPU), not its scheduler index.
+    // QEMU's BSP APIC ID is 0, so this cell cannot fail there today — it
+    // exists to catch the index-as-ID shortcut on any machine (or future
     // emulator config) whose BSP APIC ID is nonzero, where the mistake makes
-    // device MSIs silently target a nonexistent LAPIC.
+    // device MSIs silently target a nonexistent LAPIC. A CPU that is not
+    // online has no id to aim at: the binder refuses it before allocating.
     private static void TestMsiAddressTargetsRunningLapic()
     {
         MsiRouting.BindEntry(null, 0, NoopHandler, 0, out ulong address, out uint data);
@@ -901,6 +908,26 @@ public class Kernel : Sys.Kernel
         byte destination = (byte)((address >> MsiDestinationIdShift) & MsiDestinationIdMask);
         Assert.True(destination == LocalApic.GetId(), "MSI destination must be the running CPU's actual APIC ID, not its index");
         Assert.True(data != 0, "MSI data must carry the allocated vector");
+
+        bool refused = false;
+        try
+        {
+            MsiRouting.BindEntry(null, 0, NoopHandler, OfflineCpuIndex, out _, out _);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            refused = true;
+        }
+
+        Assert.True(refused, "a message aimed at a CPU that is not online must be refused, not silently dropped by the LAPIC");
+    }
+
+    // The boot CPU's per-CPU block records the Local APIC id its bring-up
+    // read: what the MSI binder and the I/O APIC routing aim at by index.
+    private static void TestPerCpuBlockHardwareIdIsLapicId()
+    {
+        Assert.True(PerCpuBlock.Current.HardwareId == LocalApic.GetId(), "the running CPU's block records its Local APIC id");
+        Assert.True(PerCpuBlock.At(0).HardwareId == LocalApic.GetId(), "block 0 is the boot CPU's");
     }
 
     private static void IrqLatencyWaiter()
@@ -991,6 +1018,16 @@ public class Kernel : Sys.Kernel
     private static void TestMsiRoutingUnavailableOnGicv2()
     {
         Assert.False(MsiRouting.IsAvailable, "GICv2 has no ITS, so MSI routing must be unavailable");
+    }
+
+    // The boot CPU's per-CPU block records its MPIDR_EL1 affinity, what the
+    // distributor routes SPIs to and an SGI names a target CPU by. The virt
+    // machine's first CPU is affinity 0 on either GIC.
+    private static void TestPerCpuBlockHardwareIdIsMpidrAffinity()
+    {
+        ulong affinity = GICv3.ExtractAffinity(GICv3Native.ReadMpidr());
+        Assert.True(PerCpuBlock.Current.HardwareId == affinity, "the running CPU's block records its MPIDR affinity");
+        Assert.True(PerCpuBlock.At(0).HardwareId == affinity, "block 0 is the boot CPU's");
     }
 
 #endif

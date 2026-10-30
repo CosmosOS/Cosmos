@@ -68,10 +68,14 @@ internal static unsafe partial class libSystemNative
         return utilization;
     }
 
+    /// <summary>
+    /// The index of the CPU the caller runs on, what <c>Thread.GetCurrentProcessorNumber</c>
+    /// returns: read from the per-CPU block, so it is right on every CPU.
+    /// </summary>
     [UnmanagedCallersOnly(EntryPoint = "SystemNative_SchedGetCpu")]
     internal static int SystemNative_SchedGetCpu()
     {
-        return (int)SchedulerManager.GetCurrentCpuId();
+        return (int)PerCpuBlock.CurrentIndex;
     }
 
     /// <summary>

@@ -258,6 +258,16 @@ public static class SchedulerManager
         state.IdleThread = idleThread;
         state.CurrentThread = idleThread;
         RegisterThread(idleThread);
+
+        // The idle thread is the code running right now on this CPU, so from
+        // here on a throw links into the thread's own chain, not the boot
+        // code's. Only the running CPU's block can be the one: another CPU's
+        // idle thread becomes current on that CPU when it comes online
+        // (phase 2), through the same assignment.
+        if (cpuId == GetCurrentCpuId())
+        {
+            PerCpuBlock.Current.CurrentExInfoHead = idleThread.ExInfoHeadSlot;
+        }
     }
 
     /// <summary>
@@ -430,15 +440,14 @@ public static class SchedulerManager
     internal static int ThreadCount => s_allThreadCount;
 
     /// <summary>
-    /// Returns the CPU ID currently executing this code path. Single-CPU
-    /// today. Internal: a policy is handed the CPU it operates on by every
-    /// hook, and a caller holding a <see cref="SchedulerThread"/> reads
-    /// <see cref="SchedulerThread.CpuId"/>, which stays correct under SMP where this
-    /// constant does not.
-    /// TODO(SMP): replace with x86_64 GS-relative per-CPU storage or ARM64 MPIDR_EL1
-    /// affinity read once application processors are brought online.
+    /// The index of the CPU executing this code path: one load from its
+    /// per-CPU block (<see cref="PerCpuBlock"/>) through the per-CPU
+    /// register, so the answer is this CPU's whatever CPU the caller runs on.
+    /// Internal: a policy is handed the CPU it operates on by every hook, and
+    /// a caller holding a <see cref="SchedulerThread"/> reads
+    /// <see cref="SchedulerThread.CpuId"/>, the CPU the thread is assigned to.
     /// </summary>
-    internal static uint GetCurrentCpuId() => 0;
+    internal static uint GetCurrentCpuId() => PerCpuBlock.CurrentIndex;
 
     /// <summary>
     /// Sum of TotalRuntime across all non-idle threads, in nanoseconds.
@@ -897,6 +906,7 @@ public static class SchedulerManager
         if (next != prev)
         {
             state.CurrentThread = next;
+            PerCpuBlock.Current.CurrentExInfoHead = next.ExInfoHeadSlot;
             next.State = SchedulerThreadState.Running;
             next.LastScheduledAt = GetTimestamp();
 
@@ -1224,8 +1234,12 @@ public static class SchedulerManager
                 }
             }
 
-            // Switch to next thread
+            // Switch to next thread. The exception stubs find the running
+            // thread's ExInfo chain through the per-CPU block: point it at the
+            // next thread's before the switch, on this CPU's block, the one
+            // the interrupt exit switches on.
             state.CurrentThread = next;
+            PerCpuBlock.Current.CurrentExInfoHead = next.ExInfoHeadSlot;
 
             // Check if this is a NEW thread (never run before) or RESUMED
             bool isNewThread = next.State == SchedulerThreadState.Created;
