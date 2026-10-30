@@ -1,5 +1,5 @@
 ---
-source_hash: f72a86ce81abff6fe262713b54335f180a566d31
+source_hash: 37a71e0f8dee3f1eab54e1fb4e293ebfafe2b1e5
 ---
 <a id="audio"></a>
 
@@ -415,3 +415,24 @@ driver kit: IAudioOutput "hda"                                           (HdAudi
         │  16 KiB cyclic DMA buffer, drained on the codec's clock
 HD Audio controller → codec converter → pin → speakers (or QEMU's audio backend)
 ```
+
+<a id="summary"></a>
+
+## 总结
+
+| 任务 | 调用 |
+|---|---|
+| 检查音频是否已编译进内核 | `AudioManager.IsEnabled` |
+| 获取主输出 | `AudioManager.Primary` |
+| 列出输出 | `AudioManager.Count`、`AudioManager.TryGet(index, out device)` |
+| 在其他输出上播放 | `new AudioPlayer(device).Play(stream)`、`AudioPlayback.TryStart(device, stream, owned, out playback)` |
+| 播放音调 | `Console.Beep()`、`Console.Beep(frequency, duration)` |
+| 读取已在内存中的 WAV 文件 | `MemoryAudioStream.FromWave(file)` |
+| 播放流并等待其结束 | `AudioManager.Play(stream)` |
+| 从卷中流式读取 WAV 文件 | `VfsManager.TryOpenFile(path, out file)`、`WaveAudioStream.TryOpen(file, out stream)` |
+| 在后台播放流 | `AudioManager.TryStartPlayback(stream, owned, out playback)` |
+| 跟踪后台播放的进度 | `AudioPlayback.IsPlaying`、`AudioPlayback.State` |
+| 提前结束播放 | `AudioPlayback.Stop()` |
+| 播放样本缓冲区 | `new MemoryAudioStream(format, sampleRate, data)` |
+| 在读取时即时计算声音 | `AudioStream.Format`、`SampleRate`、`Depleted`、`Read(destination)` |
+| 直接向输出写入帧 | `AudioDevice.TrySetFormat(format, sampleRate)`、`Start()`、`Write(frames)`、`Stop()` |

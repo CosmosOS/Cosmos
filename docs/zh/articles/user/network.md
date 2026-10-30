@@ -1,5 +1,5 @@
 ---
-source_hash: a63f41cf5136e78ecfbc13da065cd517c7fdee53
+source_hash: d883bf1abaafffe6663f5e9072ef8923a95b19f7
 ---
 <a id="network"></a>
 
@@ -485,3 +485,25 @@ IPv4 / ARP and IPv6 / Neighbor Discovery / Ethernet
         │
 Network device                                          (e1000e or virtio-net, over the driver kit)
 ```
+
+<a id="summary"></a>
+
+## 总结
+
+| 任务 | 调用 |
+|---|---|
+| 检查网卡是否就绪 | `NetworkManager.DeviceCount`、`NetworkManager.Ready` |
+| 列出适配器 | `NetworkManager.GetAdapter(index)` |
+| 选择主适配器 | `NetworkManager.Primary` |
+| 通过 DHCP 配置 IPv4 | `DhcpClient.SendDiscoverPacket()` |
+| 手动配置 IPv4 | `IPConfig.Enable(address, subnetMask, defaultGateway)` |
+| 读取适配器的配置 | `NetworkAdapter.IPConfig` |
+| 读取 IPv6 链路本地地址 | `NetworkAdapter.LinkLocalAddress` |
+| Ping 一个 IPv6 地址 | `Icmpv6Client.Connect(dest)`、`SendEcho()`、`Receive(ref source, timeout)` |
+| 发送和接收 UDP 数据报 | `System.Net.Sockets.UdpClient` |
+| 连接到 TCP 服务器 | `TcpClient.Connect(address, port)`、`TcpClient.GetStream()` |
+| 接受 TCP 连接 | `TcpListener.Start()`、`Pending()`、`AcceptTcpClient()` |
+| 注册域名服务器 | `DnsConfig.Add(nameserver)` |
+| 解析名称 | `Dns.GetHostAddresses(hostNameOrAddress)` |
+| 读取一个名称的全部地址记录 | `DnsClient.SendQuery(url)`、`DnsClient.ReceiveAll(timeout)` |
+| 发送自己构造的数据包 | `NetworkStack.Send(packet)` |

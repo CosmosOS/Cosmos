@@ -204,3 +204,21 @@ KeyboardManager ── KeyEvent queue ◀── active layout
         │                                    │
 PS/2 keyboard over the driver kit (the 8042, IRQ 1, x64)  /  virtio-keyboard over the driver kit (PCI, MMIO)  /  USB keyboard over the driver kit (xHCI, EHCI, OHCI)
 ```
+
+## Summary
+
+| Task | Call |
+|---|---|
+| Read a line | `Console.ReadLine()` |
+| Wait for a key press | `KeyboardManager.ReadKey()` |
+| Tell which key was pressed and what it typed | `KeyEvent.Key`, `KeyEvent.KeyChar`, `KeyEvent.Modifiers` |
+| Read a key through the console, with or without echo | `Console.ReadKey()`, `Console.ReadKey(true)` |
+| Poll for a key without blocking | `KeyboardManager.TryReadKey(out key)` |
+| Check whether a key is waiting | `KeyboardManager.KeyAvailable`, `Console.KeyAvailable` |
+| Look at the next key without taking it | `KeyboardManager.Peek()` |
+| Check whether Shift, Control or Alt is held | `KeyboardManager.ShiftPressed`, `ControlPressed`, `AltPressed` |
+| Read the lock key state | `KeyboardManager.CapsLock`, `NumLock`, `ScrollLock` |
+| Switch the layout | `KeyboardManager.SetLayout(layout)` |
+| Read the active layout | `KeyboardManager.GetLayout()` |
+| Write a custom layout | `KeyboardLayout`, `InitializeKeys()`, `KeyMapping` |
+| Make the right Alt an AltGr | `Keys.Add(new KeyMapping(0x60, Key.AltGr))` |

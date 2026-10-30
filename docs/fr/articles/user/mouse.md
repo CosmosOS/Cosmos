@@ -1,5 +1,5 @@
 ---
-source_hash: 7ace168b5c49e9ad05d5761d8de79dc459f89135
+source_hash: f60a5f1bb89b90d7a97d4d5541a34c9417e27865
 ---
 <a id="mouse"></a>
 
@@ -189,3 +189,18 @@ MouseManager ── Sensitivity, screen clamping, ScrollDelta accumulation
         │
 PS/2 mouse over the driver kit (the 8042, IRQ 12, x64)  /  virtio-mouse over the driver kit (PCI, MMIO)  /  USB mouse over the driver kit (xHCI, EHCI, OHCI)
 ```
+
+<a id="summary"></a>
+
+## Résumé
+
+| Tâche | Appel |
+|---|---|
+| Lire la position du pointeur | `MouseManager.X`, `MouseManager.Y` |
+| Lire les boutons | `MouseManager.LeftButton`, `MouseManager.RightButton`, `MouseManager.MiddleButton` |
+| Dessiner un curseur à la position du pointeur | `canvas.DrawFilledCircle(color, MouseManager.X, MouseManager.Y, radius)` |
+| Limiter le pointeur à l'écran | `MouseManager.SetScreenSize(width, height)` |
+| Lire le mouvement de la molette | `MouseManager.ScrollDelta` |
+| Le remettre à zéro une fois appliqué | `MouseManager.ResetScrollDelta()` |
+| Ralentir ou accélérer le pointeur | `MouseManager.Sensitivity` |
+| Déplacer le pointeur | `MouseManager.SetPosition(x, y)` |

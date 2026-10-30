@@ -1,5 +1,5 @@
 ---
-source_hash: 0280d257e8fe6bc488a435d4da7fbf63f81c4bae
+source_hash: 8d0f230ec473eae077557f2d1a5f9bfe4f661bc7
 ---
 <a id="graphics"></a>
 
@@ -485,3 +485,29 @@ Back buffer ──── Display() ────▶ the primary display's framebu
                      driver kit: the firmware display "framebuffer" (Limine, x64 & ARM64)
                                  or a driver's display (virtio-gpu, vmware-svga, amd-dcn, intel-graphics)
 ```
+
+<a id="summary"></a>
+
+## 总结
+
+| 任务 | 调用 |
+|---|---|
+| 获取屏幕的画布 | `Canvas.GetFullScreen()` |
+| 切换视频模式 | `Canvas.GetFullScreen(mode)` |
+| 读取分辨率 | `canvas.Width`、`canvas.Height` |
+| 显示完成的帧 | `canvas.Display()` |
+| 清空画布 | `canvas.Clear(color)` |
+| 绘制形状 | `canvas.DrawPoint`、`DrawLine`、`DrawRectangle`、`DrawCircle`、`DrawEllipse`、`DrawArc`、`DrawTriangle`、`DrawPolygon` |
+| 绘制填充形状 | `canvas.DrawFilledRectangle`、`DrawFilledCircle` |
+| 获取 PSF 字体 | `PCScreenFont.DefaultFont`、`PCScreenFont.LoadFont(fontData)` |
+| 绘制文本 | `canvas.DrawString(text, font, color, x, y)` |
+| 以任意尺寸绘制 TrueType 文本 | `new TrueTypeFont(path)`、`canvas.DrawString(text, font, size, color, x, y)` |
+| 测量文本 | `font.MeasureString(text, size)`、`font.GetLineHeight(size)` |
+| 加载 BMP 或 PNG 文件 | `new Bitmap(path)`、`new Png(path)` |
+| 绘制图像 | `canvas.DrawImage(image, x, y)`、`canvas.DrawImage(image, x, y, width, height)` |
+| 创建离屏画布 | `new Canvas(width, height)` |
+| 将画布绘制到另一个画布上 | `canvas.DrawCanvas(tile, x, y)`、`canvas.DrawCanvas(tile, x, y, width, height)` |
+| 读回像素 | `canvas.GetPointColor(x, y)`、`canvas.GetImage(x, y, width, height)` |
+| 获取 3D 画布 | `Canvas.GetFullScreen() is Canvas3D canvas3D` |
+| 绘制 3D 场景 | `canvas3D.Camera`、`ClearScene`、`DrawCube`、`DrawGrid` |
+| 绘制网格 | `canvas3D.CreateMesh(positions, colors, indices)`、`canvas3D.DrawMesh(mesh, world)` |

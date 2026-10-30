@@ -1,5 +1,5 @@
 ---
-source_hash: ab8aa3258dbf81e84a5cfb2ad016a23e6e500cf4
+source_hash: 5fa39ad645c5d9a09f04707b4b2c70ec39ff2796
 ---
 <a id="console-sessions-and-telnet"></a>
 
@@ -155,3 +155,23 @@ $ telnet localhost 2323
 每个会话都把自己的屏幕保存为显示设备画布上的一个 `KernelConsole` 网格。只有活动会话的网格会绘制到画布上；其他会话保持各自单元格的最新状态，并在被显示时重绘整个显示设备。Telnet 会话还会在每次变化发生时就把它发送给客户端：每个字符，以及每次光标移动和颜色变化对应的转义序列，这些都取自网格。因此两者对每一行在何处换行的判断是一致的：网格在一行写满时立即换行，而会话会在客户端上显式结束该行。
 
 会话的读取者阻塞在一个 `InterruptEvent` 上，当有按键为该会话入队时，这个事件就会被触发。按键要么来自键盘解码器（它把按键加入活动会话的队列，可能是在中断上下文中），要么来自远程会话的服务器：Telnet 服务器的线程在连接空闲时每 10 ms 检查一次这些连接，并把客户端发送的按键加入队列。切换键会唤醒一个原本处于阻塞状态的线程。主控制台的读取者运行在调度器的空闲线程上，因此它等待下一次中断而不是阻塞，键盘一直以来都是这样做的。
+
+<a id="summary"></a>
+
+## 总结
+
+| 任务 | 调用 |
+|---|---|
+| 打开虚拟控制台 | `SessionManager.CreateVirtualConsole()` |
+| 在会话上运行线程 | `SessionManager.Start(session, body)` |
+| 在会话的线程上读写该会话 | `Console.ReadLine()`、`Console.WriteLine()` |
+| 列出已打开的会话 | `SessionManager.GetSessions()` |
+| 查找显示设备上的会话 | `SessionManager.Active` |
+| 在显示设备上显示会话 | `SessionManager.Switch(id)` |
+| 通过 Telnet 提供 shell | `new TelnetServer(shell)`、`server.Start()`、`server.Stop()` |
+| 为远程终端编写会话类 | `ConsoleSession(cols, rows)`、`Name`、`IsRemote` |
+| 将终端发送的按键加入队列 | `EnqueueInput(key)` |
+| 跟随终端窗口的大小 | `Resize(cols, rows)` |
+| 获知需要发送给终端的变化 | `OnWritten`、`OnCleared`、`OnCursorMoved`、`OnCursorVisibilityChanged`、`OnColorsChanged` |
+| 读取光标位置和颜色 | `CursorLeft`、`CursorTop`、`ExplicitForeground`、`ExplicitBackground` |
+| 将远程会话加入列表并启动其线程 | `SessionManager.TryRegister(session)`、`SessionManager.Start(session, body)` |

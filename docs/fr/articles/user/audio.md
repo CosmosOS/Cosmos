@@ -1,5 +1,5 @@
 ---
-source_hash: f72a86ce81abff6fe262713b54335f180a566d31
+source_hash: 37a71e0f8dee3f1eab54e1fb4e293ebfafe2b1e5
 ---
 # Audio
 
@@ -413,3 +413,24 @@ driver kit: IAudioOutput "hda"                                           (HdAudi
         │  16 KiB cyclic DMA buffer, drained on the codec's clock
 HD Audio controller → codec converter → pin → speakers (or QEMU's audio backend)
 ```
+
+<a id="summary"></a>
+
+## Résumé
+
+| Tâche | Appel |
+|---|---|
+| Vérifier que l'audio est inclus dans la compilation | `AudioManager.IsEnabled` |
+| Obtenir la sortie principale | `AudioManager.Primary` |
+| Lister les sorties | `AudioManager.Count`, `AudioManager.TryGet(index, out device)` |
+| Jouer sur une autre sortie | `new AudioPlayer(device).Play(stream)`, `AudioPlayback.TryStart(device, stream, owned, out playback)` |
+| Jouer une tonalité | `Console.Beep()`, `Console.Beep(frequency, duration)` |
+| Lire un fichier WAV déjà en mémoire | `MemoryAudioStream.FromWave(file)` |
+| Jouer un flux et attendre sa fin | `AudioManager.Play(stream)` |
+| Lire en flux un fichier WAV depuis un volume | `VfsManager.TryOpenFile(path, out file)`, `WaveAudioStream.TryOpen(file, out stream)` |
+| Jouer un flux en arrière-plan | `AudioManager.TryStartPlayback(stream, owned, out playback)` |
+| Suivre une lecture en arrière-plan | `AudioPlayback.IsPlaying`, `AudioPlayback.State` |
+| Arrêter une lecture avant la fin | `AudioPlayback.Stop()` |
+| Jouer un tampon d'échantillons | `new MemoryAudioStream(format, sampleRate, data)` |
+| Calculer un son au fur et à mesure de sa lecture | `AudioStream.Format`, `SampleRate`, `Depleted`, `Read(destination)` |
+| Écrire directement des trames sur une sortie | `AudioDevice.TrySetFormat(format, sampleRate)`, `Start()`, `Write(frames)`, `Stop()` |

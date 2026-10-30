@@ -1,5 +1,5 @@
 ---
-source_hash: 182026ee40c8fb202dff9cc679d4cedf12c97e13
+source_hash: 008972e4c041882d29d3f228490422663868a801
 ---
 <a id="kernel-startup"></a>
 
@@ -252,3 +252,22 @@ Les deux lignes `sata0` apparaissent quand un disque est attaché (`cosmos run -
 ```
 
 Pour un débogage interactif en plus du journal série, consultez [Déboguer avec VSCode et QEMU](debugging.md).
+
+<a id="summary"></a>
+
+## Résumé
+
+| Tâche | Appel |
+|---|---|
+| Initialiser une fois avant la boucle principale | `BeforeRun()` |
+| Écrire le corps de la boucle principale | `Run()` |
+| Nettoyer une fois la boucle terminée | `AfterRun()` |
+| Mettre le CPU en attente jusqu'à une interruption | `Power.Halt()` |
+| Redémarrer la machine | `Power.Reboot()` |
+| Éteindre la machine | `Power.Shutdown()` |
+| Terminer la boucle principale | `Stop()` |
+| Atteindre le noyau en cours d'exécution depuis du code statique | `Kernel.Current` |
+| Faire des initialisations précoces avant que la console n'existe | `OnBoot()` |
+| Faire apparaître la console sur un noyau headless | `KernelConsole.Initialize()` |
+| Prendre en main tout le cycle de vie | `Start()` |
+| Lire la ligne de commande du noyau | `Environment.GetCommandLineArgs()` |
