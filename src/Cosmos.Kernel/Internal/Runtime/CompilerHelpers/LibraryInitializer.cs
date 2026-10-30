@@ -53,6 +53,17 @@ internal class LibraryInitializer
             // time against DefaultQuantumNs, so the two have to agree.
             initializer.StartSchedulerTimer(
                 (uint)(SchedulerManager.DefaultQuantumNs / SchedulerManager.NanosecondsPerMillisecond));
+
+            // The application processors, last: each needs its idle thread
+            // (set up above), the shared interrupt tables and the timer's
+            // calibration, and comes online with interrupts enabled, halted
+            // on its own tick. Before the drivers so a driver that binds a
+            // line to a CPU (phase 3) finds every CPU up.
+            if (InterruptManager.IsEnabled)
+            {
+                Serial.WriteString("[KERNEL]   - Starting application processors...\n");
+                Smp.StartApplicationProcessors(initializer.StartSchedulerTimerOnCurrentCpu);
+            }
         }
     }
 
@@ -74,7 +85,11 @@ internal class LibraryInitializer
         // is installed. Thread statics live on the current thread, and a
         // policy hook may read a static whose class constructor has not run
         // yet; the class constructor runner's lock identifies its holder by a
-        // thread static, so it needs a current thread to exist.
+        // thread static, so it needs a current thread to exist. On an
+        // application processor the idle thread is the halt loop its managed
+        // entry ends in, on the boot stack the loader gave it; the CPU's
+        // block points at the thread's ExInfo chain head before the CPU is
+        // released (Smp.StartApplicationProcessors).
         for (uint cpu = 0; cpu < cpuCount; cpu++)
         {
             SchedulerThread idleThread = new()

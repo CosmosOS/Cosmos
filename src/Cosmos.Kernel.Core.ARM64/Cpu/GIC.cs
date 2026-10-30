@@ -108,9 +108,9 @@ public static class GIC
             Serial.Write("[GIC] No ITS in MADT, MSI-X path disabled\n");
             return;
         }
-        if (GICv3.CurrentCpuRdBase == 0)
+        if (GICv3.BootCpuRdBase == 0)
         {
-            Serial.Write("[GIC] CurrentCpuRdBase == 0, ITS init skipped\n");
+            Serial.Write("[GIC] BootCpuRdBase == 0, ITS init skipped\n");
             return;
         }
 
@@ -123,11 +123,11 @@ public static class GIC
         // because QEMU TCG ignores memory attributes. Addresses programmed
         // INTO the hardware (GITS_TRANSLATER MSI doorbell, MAPC RDbase)
         // remain physical, so both spaces are passed explicitly. On the
-        // ACPI path CurrentCpuRdBase is already the HHDM alias (Configure
+        // ACPI path BootCpuRdBase is already the HHDM alias (Configure
         // received PhysToVirt bases) and VirtualToPhysical recovers the
         // physical; on the legacy no-ACPI fallback it is a raw identity
         // address, which VirtualToPhysical passes through unchanged.
-        ulong rdVirt = GICv3.CurrentCpuRdBase;
+        ulong rdVirt = GICv3.BootCpuRdBase;
         ulong rdPhys = PageAllocator.VirtualToPhysical(rdVirt);
 
         GICv3Lpi.Initialize(rdVirt);
@@ -168,7 +168,7 @@ public static class GIC
                 // ITS, we MUST take the full MMIO path: LPI delivery
                 // requires GICR_PROPBASER/PENDBASER writes against the
                 // redistributor, and the redistributor walk to populate
-                // CurrentCpuRdBase, neither of which run in sysreg-only.
+                // BootCpuRdBase, neither of which run in sysreg-only.
                 bool useSysregOnly = acpiGic->ItsFound == 0;
                 Serial.Write("[GIC] ACPI: GICv3 GICD=0x");
                 Serial.WriteHex(acpiGic->DistBase);
@@ -298,6 +298,24 @@ public static class GIC
     }
 
     /// <summary>
+    /// Brings the calling CPU's banked share of the GIC up, once <see cref="Initialize"/> ran
+    /// on the boot CPU: on GICv3 the system register access, this CPU's redistributor (found by
+    /// its MPIDR) and its CPU interface; on GICv2 its CPU interface. An application processor,
+    /// from its managed entry, with interrupts masked (SMP phase 2). Allocation-free.
+    /// </summary>
+    internal static void InitializeCurrentCpu()
+    {
+        if (s_isV3)
+        {
+            GICv3.InitializeCurrentCpu();
+        }
+        else
+        {
+            GICv2.InitializeCpuInterface();
+        }
+    }
+
+    /// <summary>
     /// Enables a specific interrupt.
     /// </summary>
     public static void EnableInterrupt(uint intId)
@@ -344,8 +362,8 @@ public static class GIC
 
     /// <summary>
     /// Raises SGI <paramref name="sgiId"/> on the calling CPU: ICC_SGI1R_EL1
-    /// with the boot CPU in its target list on GICv3, GICD_SGIR with the
-    /// requester filter on GICv2.
+    /// with the calling CPU, named by its MPIDR, in its target list on GICv3,
+    /// GICD_SGIR with the requester filter on GICv2.
     /// </summary>
     /// <param name="sgiId">SGI ID (0-15).</param>
     public static void SendSgiToSelf(uint sgiId)

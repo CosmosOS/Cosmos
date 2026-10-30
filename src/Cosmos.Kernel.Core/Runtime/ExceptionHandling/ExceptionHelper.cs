@@ -30,8 +30,16 @@ internal static unsafe partial class ExceptionHelper
     [SuppressGCTransition]
     private static partial void RhpCallFinallyFunclet(void* handlerAddress, void* pRegDisplay);
 
-    // The dispatcher's state for the boot code, before it is a scheduler thread (see State).
+    // The dispatcher's state for the boot code, before it is a scheduler thread (see State). The
+    // per-CPU block points the native stubs at its chain head from the block's installation until
+    // the idle thread is current (PerCpuBlock.InstallBootCpu, SchedulerManager.SetupIdleThread).
     private static ExceptionDispatchState s_bootState;
+
+    /// <summary>
+    /// The address of the boot code's ExInfo chain head, what the per-CPU block hands the native
+    /// stubs before a thread is current. A static, so the address holds for the kernel's life.
+    /// </summary>
+    internal static nuint BootExInfoHeadSlot => (nuint)Unsafe.AsPointer(ref s_bootState.ExInfoHead);
 
     // Whether every throw is told on the serial port (its message and where it was thrown), and
     // the handler found for it: for debugging the dispatcher, whose crash would otherwise lose

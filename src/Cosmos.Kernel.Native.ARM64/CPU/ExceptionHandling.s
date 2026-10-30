@@ -5,7 +5,12 @@
 
 // External managed functions
 .extern RhThrowEx                    // C# exception dispatcher
-.extern __cosmos_exinfo_head         // &head of the running thread's ExInfo chain (ExceptionNative)
+
+// The head of the running thread's ExInfo chain is reached through the per-CPU block
+// (Core/CPU/PerCpuBlock.cs, the layout's home): its CurrentExInfoHead slot holds the address of
+// the running thread's chain head, kept current by the scheduler's switch path, and the boot
+// code's before a thread is current. TPIDR_EL1 then one load, no callout.
+.equ PERCPU_CURRENT_EXINFO_HEAD,  0x38
 
 //=============================================================================
 // Structure offsets
@@ -120,11 +125,9 @@ RhpThrowEx:
     sub     sp, sp, #STACKSIZEOF_ExInfo
     .cfi_adjust_cfa_offset STACKSIZEOF_ExInfo
 
-    // x4 = &head of this thread's ExInfo chain. A managed callout, so it may clobber x0-x17 and
-    // LR: it runs before the ExInfo is set up through x1. The exception object sits in x19, which
-    // it preserves, and the throw site's LR is already in the context.
-    bl      __cosmos_exinfo_head
-    mov     x4, x0
+    // x4 = &head of this thread's ExInfo chain: TPIDR_EL1 then one load through the per-CPU block.
+    mrs     x4, tpidr_el1
+    ldr     x4, [x4, #PERCPU_CURRENT_EXINFO_HEAD]
 
     // x1 = ExInfo* (current SP)
     mov     x1, sp
@@ -231,12 +234,12 @@ RhpCallCatchFunclet:
     ldr     x8, [sp, #0x68]             // handler address
     blr     x8                          // call handler funclet
 
-    // x0 = the resume address. Keep it in the handler slot, dead now, across the callout for the
-    // head of this thread's ExInfo chain: a managed call that may clobber x0-x17 and LR.
-    str     x0, [sp, #0x68]
-    bl      __cosmos_exinfo_head
-    mov     x8, x0                      // x8 = &head of this thread's ExInfo chain
-    ldr     x9, [sp, #0x68]             // x9 = resume address
+    // x0 = the resume address. The head of this thread's ExInfo chain is TPIDR_EL1 then one load
+    // through the per-CPU block (the funclet may have switched CPUs, under SMP, so it is read
+    // now, not before the call).
+    mov     x9, x0                      // x9 = resume address
+    mrs     x8, tpidr_el1
+    ldr     x8, [x8, #PERCPU_CURRENT_EXINFO_HEAD]   // x8 = &head of this thread's ExInfo chain
 
     // Reload REGDISPLAY* from stack (x2 may have been clobbered)
     ldr     x2, [sp, #0x70]             // REGDISPLAY*
@@ -428,11 +431,10 @@ RhpCallFinallyFunclet:
 .global RhpRethrow
 .balign 4
 RhpRethrow:
-    // The exception to rethrow is the one at the head of this thread's ExInfo chain. The head comes
-    // from a managed callout, which clobbers LR, the rethrow site RhpThrowEx records: keep it.
-    str     x30, [sp, #-16]!
-    bl      __cosmos_exinfo_head
-    ldr     x30, [sp], #16
+    // The exception to rethrow is the one at the head of this thread's ExInfo chain: TPIDR_EL1
+    // then one load through the per-CPU block. LR, the rethrow site RhpThrowEx records, is kept.
+    mrs     x0, tpidr_el1
+    ldr     x0, [x0, #PERCPU_CURRENT_EXINFO_HEAD]
     ldr     x0, [x0]
     cbz     x0, .halt
 

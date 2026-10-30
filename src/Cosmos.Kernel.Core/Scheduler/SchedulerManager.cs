@@ -258,6 +258,16 @@ public static class SchedulerManager
         state.IdleThread = idleThread;
         state.CurrentThread = idleThread;
         RegisterThread(idleThread);
+
+        // The idle thread is the code running right now on this CPU, so from
+        // here on a throw links into the thread's own chain, not the boot
+        // code's. Only the running CPU's block can be the one: another CPU's
+        // idle thread becomes current on that CPU when it comes online
+        // (phase 2), through the same assignment.
+        if (cpuId == GetCurrentCpuId())
+        {
+            PerCpuBlock.Current.CurrentExInfoHead = idleThread.ExInfoHeadSlot;
+        }
     }
 
     /// <summary>
@@ -430,15 +440,14 @@ public static class SchedulerManager
     internal static int ThreadCount => s_allThreadCount;
 
     /// <summary>
-    /// Returns the CPU ID currently executing this code path. Single-CPU
-    /// today. Internal: a policy is handed the CPU it operates on by every
-    /// hook, and a caller holding a <see cref="SchedulerThread"/> reads
-    /// <see cref="SchedulerThread.CpuId"/>, which stays correct under SMP where this
-    /// constant does not.
-    /// TODO(SMP): replace with x86_64 GS-relative per-CPU storage or ARM64 MPIDR_EL1
-    /// affinity read once application processors are brought online.
+    /// The index of the CPU executing this code path: one load from its
+    /// per-CPU block (<see cref="PerCpuBlock"/>) through the per-CPU
+    /// register, so the answer is this CPU's whatever CPU the caller runs on.
+    /// Internal: a policy is handed the CPU it operates on by every hook, and
+    /// a caller holding a <see cref="SchedulerThread"/> reads
+    /// <see cref="SchedulerThread.CpuId"/>, the CPU the thread is assigned to.
     /// </summary>
-    internal static uint GetCurrentCpuId() => 0;
+    internal static uint GetCurrentCpuId() => PerCpuBlock.CurrentIndex;
 
     /// <summary>
     /// Sum of TotalRuntime across all non-idle threads, in nanoseconds.
@@ -897,6 +906,7 @@ public static class SchedulerManager
         if (next != prev)
         {
             state.CurrentThread = next;
+            PerCpuBlock.Current.CurrentExInfoHead = next.ExInfoHeadSlot;
             next.State = SchedulerThreadState.Running;
             next.LastScheduledAt = GetTimestamp();
 
@@ -997,9 +1007,13 @@ public static class SchedulerManager
     private static ulong s_tickPeriodNs;
 
     /// <summary>
-    /// Timer interrupts handled since boot, counted before every early
+    /// Timer interrupts CPU 0 handled since boot, counted before every early
     /// return of <see cref="OnTimerInterrupt"/>, so a tick that schedules
-    /// nothing still counts. Wraps: compare differences. Any context.
+    /// nothing still counts. CPU 0's alone: every CPU's timer fires at the
+    /// same period, and a count every CPU advanced would run N times faster
+    /// than the clock the timed waits and the tick budgets are written
+    /// against. Each CPU's own count is <see cref="PerCpuState.TickCount"/>.
+    /// Wraps: compare differences. Any context.
     /// </summary>
     internal static uint TickCount => Volatile.Read(ref s_tickCount);
 
@@ -1028,37 +1042,46 @@ public static class SchedulerManager
     /// <param name="elapsedNs">Nanoseconds since last tick.</param>
     internal static void OnTimerInterrupt(uint cpuId, nuint currentRsp, ulong elapsedNs)
     {
-        // Atomic: one tick per CPU, and the counters are read from any thread.
-        uint tick = Interlocked.Increment(ref s_tickCount);
-
-        // Recorded before the early returns below, so the period is readable
-        // whether or not the scheduler is armed yet. The timer owns this
-        // number: the boot path asks for DefaultQuantumNs, but a driver can
-        // retune the device afterwards, and on ARM64 the scheduler tick and
-        // the ring's TimerManager are the same device.
-        s_tickPeriodNs = elapsedNs;
-
-        // Refresh the debug-live snapshot every 10 ticks (~100ms at 100Hz)
-        // so the host-side QMP poller sees fresh thread state without
-        // pausing the kernel.
-        if ((tick % SnapshotRefreshTickInterval) == 0)
+        // Every CPU takes its own timer here (phase 2), on its own stack and
+        // with its own saved context; the handler reads the state of the CPU
+        // it runs on and nothing else is shared yet, since no thread is
+        // placed on another CPU before phase 5. The pacing is CPU 0's: the
+        // snapshot refresh, the boot log and the thread clock follow its
+        // ticks, and every CPU counts its own in its state.
+        if (cpuId == 0)
         {
-            Runtime.DebugLiveSnapshot.Update();
-            Runtime.DebugLiveGCSnapshot.Update();
-            Runtime.DebugLiveMemorySnapshot.Update();
-        }
+            // Atomic: the counter is read from any thread.
+            uint tick = Interlocked.Increment(ref s_tickCount);
 
-        // Only the first ticks are logged, to show at boot that the tick is
-        // live. This runs in the timer ISR with interrupts masked, and a
-        // periodic line would stall every IRQ on polled UART bytes for the
-        // whole uptime.
-        if (tick <= InitialTickLogCount)
-        {
-            Serial.WriteString("[SCHED] Tick ");
-            Serial.WriteNumber(tick);
-            Serial.WriteString(" enabled=");
-            Serial.WriteString(s_enabled ? "1" : "0");
-            Serial.WriteString("\n");
+            // Recorded before the early returns below, so the period is readable
+            // whether or not the scheduler is armed yet. The timer owns this
+            // number: the boot path asks for DefaultQuantumNs, but a driver can
+            // retune the device afterwards, and on ARM64 the scheduler tick and
+            // the ring's TimerManager are the same device.
+            s_tickPeriodNs = elapsedNs;
+
+            // Refresh the debug-live snapshot every 10 ticks (~100ms at 100Hz)
+            // so the host-side QMP poller sees fresh thread state without
+            // pausing the kernel.
+            if ((tick % SnapshotRefreshTickInterval) == 0)
+            {
+                Runtime.DebugLiveSnapshot.Update();
+                Runtime.DebugLiveGCSnapshot.Update();
+                Runtime.DebugLiveMemorySnapshot.Update();
+            }
+
+            // Only the first ticks are logged, to show at boot that the tick is
+            // live. This runs in the timer ISR with interrupts masked, and a
+            // periodic line would stall every IRQ on polled UART bytes for the
+            // whole uptime.
+            if (tick <= InitialTickLogCount)
+            {
+                Serial.WriteString("[SCHED] Tick ");
+                Serial.WriteNumber(tick);
+                Serial.WriteString(" enabled=");
+                Serial.WriteString(s_enabled ? "1" : "0");
+                Serial.WriteString("\n");
+            }
         }
 
         if (!s_enabled || s_currentScheduler is null || s_cpuStates is null)
@@ -1072,13 +1095,20 @@ public static class SchedulerManager
         }
 
         PerCpuState state = s_cpuStates[cpuId];
+        state._tickCount++;
+
         if (state.CurrentThread is null)
         {
             return;
         }
 
-        // Check and wake up sleeping threads whose timeout has expired
-        CheckSleepingThreads(elapsedNs);
+        // Check and wake up sleeping threads whose timeout has expired. CPU
+        // 0's tick alone: every thread is placed on CPU 0 until phase 5, and
+        // the registry is not locked against a second CPU walking it.
+        if (cpuId == 0)
+        {
+            CheckSleepingThreads(elapsedNs);
+        }
 
         // Update timing and check if preemption needed
         bool needsReschedule = s_currentScheduler.OnTick(state, state.CurrentThread, elapsedNs);
@@ -1224,8 +1254,12 @@ public static class SchedulerManager
                 }
             }
 
-            // Switch to next thread
+            // Switch to next thread. The exception stubs find the running
+            // thread's ExInfo chain through the per-CPU block: point it at the
+            // next thread's before the switch, on this CPU's block, the one
+            // the interrupt exit switches on.
             state.CurrentThread = next;
+            PerCpuBlock.Current.CurrentExInfoHead = next.ExInfoHeadSlot;
 
             // Check if this is a NEW thread (never run before) or RESUMED
             bool isNewThread = next.State == SchedulerThreadState.Created;

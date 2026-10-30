@@ -29,6 +29,11 @@ public class RunSettings : CommandSettings
     [DefaultValue(512)]
     public int MemoryMb { get; set; } = 512;
 
+    [CommandOption("--cpus <COUNT>")]
+    [Description("CPUs the guest gets (-smp). Default: 1. The kernel starts every CPU past the first as an application processor.")]
+    [DefaultValue(1)]
+    public int Cpus { get; set; } = 1;
+
     [CommandOption("--cpu <MODEL>")]
     [Description("QEMU CPU model, e.g. host, max, qemu64, cortex-a72. Omit for auto: on x64, 'host' when KVM is available, else 'max'. 'host' needs KVM and falls back to 'max' without it.")]
     public string? Cpu { get; set; }
@@ -107,6 +112,7 @@ public class RunCommand : AsyncCommand<RunSettings>
                 Architecture = settings.Arch,
                 IsoPath = isoPath,
                 MemoryMb = settings.MemoryMb,
+                CpuCount = settings.Cpus,
                 CpuModel = settings.Cpu,
                 Headless = settings.Headless,
                 Debug = settings.Debug,

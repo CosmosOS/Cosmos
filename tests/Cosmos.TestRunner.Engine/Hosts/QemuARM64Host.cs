@@ -51,7 +51,7 @@ public class QemuARM64Host : IQemuHost
         _ = uefiFirmwarePath;
     }
 
-    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuMonitor? monitor = null)
+    public async Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuMonitor? monitor = null, int cpuCount = 1)
     {
         if (!File.Exists(isoPath))
         {
@@ -97,6 +97,7 @@ public class QemuARM64Host : IQemuHost
                 UsbDeviceVersion = devices?.UsbDeviceVersion ?? QemuLauncher.DefaultUsbDeviceVersion,
                 UsbHub = devices?.UsbHub ?? false,
                 MonitorPort = monitor?.Port,
+                CpuCount = cpuCount,
                 AllowGuestShutdown = true
             });
         }
