@@ -1,5 +1,5 @@
 ---
-source_hash: 54cecb45b8a36c017b0cac120a075fa8070ee93d
+source_hash: 7a8ea5072103da736273432b7ddc44efa50597cc
 ---
 <a id="random-numbers"></a>
 
@@ -87,3 +87,19 @@ Lorsqu'il n'y a pas d'instruction de nombres aléatoires mais que les mesures pa
 ```
 
 Les tests de santé détectent un minuteur bloqué ou qui répète un motif court, mais pas tous les minuteurs prévisibles : une machine qui s'exécute de façon déterministe, comme QEMU sous `-icount` ou en mode enregistrement/rejeu, peut les réussir et produire malgré tout la même sortie à chaque démarrage.
+
+---
+
+<a id="summary"></a>
+
+## Résumé
+
+| Tâche | Appel |
+|---|---|
+| Remplir un tampon d'octets aléatoires sûrs | `RandomNumberGenerator.Fill(data)` |
+| Obtenir des octets aléatoires sûrs dans un nouveau tableau | `RandomNumberGenerator.GetBytes(count)` |
+| Tirer un entier aléatoire sûr dans un intervalle | `RandomNumberGenerator.GetInt32(fromInclusive, toExclusive)` |
+| Remplir un tampon d'octets aléatoires sûrs dont aucun n'est nul | `RandomNumberGenerator.Create().GetNonZeroBytes(data)` |
+| Obtenir une instance du générateur | `RandomNumberGenerator.Create()` |
+| Créer un identifiant unique | `Guid.NewGuid()` |
+| Obtenir des nombres aléatoires pour un jeu ou un mélange | `System.Random`, `Random.Shared` |

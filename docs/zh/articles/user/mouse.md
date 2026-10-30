@@ -1,5 +1,5 @@
 ---
-source_hash: 7ace168b5c49e9ad05d5761d8de79dc459f89135
+source_hash: f60a5f1bb89b90d7a97d4d5541a34c9417e27865
 ---
 <a id="mouse"></a>
 
@@ -189,3 +189,18 @@ MouseManager ── Sensitivity, screen clamping, ScrollDelta accumulation
         │
 PS/2 mouse over the driver kit (the 8042, IRQ 12, x64)  /  virtio-mouse over the driver kit (PCI, MMIO)  /  USB mouse over the driver kit (xHCI, EHCI, OHCI)
 ```
+
+<a id="summary"></a>
+
+## 总结
+
+| 任务 | 调用 |
+|---|---|
+| 读取指针位置 | `MouseManager.X`、`MouseManager.Y` |
+| 读取按键状态 | `MouseManager.LeftButton`、`MouseManager.RightButton`、`MouseManager.MiddleButton` |
+| 在指针位置绘制光标 | `canvas.DrawFilledCircle(color, MouseManager.X, MouseManager.Y, radius)` |
+| 将指针限制在屏幕范围内 | `MouseManager.SetScreenSize(width, height)` |
+| 读取滚轮的移动 | `MouseManager.ScrollDelta` |
+| 应用后将其清零 | `MouseManager.ResetScrollDelta()` |
+| 让指针变慢或变快 | `MouseManager.Sensitivity` |
+| 移动指针 | `MouseManager.SetPosition(x, y)` |

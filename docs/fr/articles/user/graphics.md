@@ -1,5 +1,5 @@
 ---
-source_hash: 0280d257e8fe6bc488a435d4da7fbf63f81c4bae
+source_hash: 8d0f230ec473eae077557f2d1a5f9bfe4f661bc7
 ---
 <a id="graphics"></a>
 
@@ -485,3 +485,29 @@ Back buffer ──── Display() ────▶ the primary display's framebu
                      driver kit: the firmware display "framebuffer" (Limine, x64 & ARM64)
                                  or a driver's display (virtio-gpu, vmware-svga, amd-dcn, intel-graphics)
 ```
+
+<a id="summary"></a>
+
+## Résumé
+
+| Tâche | Appel |
+|---|---|
+| Obtenir le canvas de l'écran | `Canvas.GetFullScreen()` |
+| Changer de mode vidéo | `Canvas.GetFullScreen(mode)` |
+| Lire la résolution | `canvas.Width`, `canvas.Height` |
+| Afficher l'image terminée | `canvas.Display()` |
+| Effacer le canvas | `canvas.Clear(color)` |
+| Dessiner une forme | `canvas.DrawPoint`, `DrawLine`, `DrawRectangle`, `DrawCircle`, `DrawEllipse`, `DrawArc`, `DrawTriangle`, `DrawPolygon` |
+| Dessiner une forme pleine | `canvas.DrawFilledRectangle`, `DrawFilledCircle` |
+| Obtenir une police PSF | `PCScreenFont.DefaultFont`, `PCScreenFont.LoadFont(fontData)` |
+| Dessiner du texte | `canvas.DrawString(text, font, color, x, y)` |
+| Dessiner du texte TrueType à n'importe quelle taille | `new TrueTypeFont(path)`, `canvas.DrawString(text, font, size, color, x, y)` |
+| Mesurer du texte | `font.MeasureString(text, size)`, `font.GetLineHeight(size)` |
+| Charger un fichier BMP ou PNG | `new Bitmap(path)`, `new Png(path)` |
+| Dessiner une image | `canvas.DrawImage(image, x, y)`, `canvas.DrawImage(image, x, y, width, height)` |
+| Créer un canvas hors écran | `new Canvas(width, height)` |
+| Dessiner un canvas sur un autre | `canvas.DrawCanvas(tile, x, y)`, `canvas.DrawCanvas(tile, x, y, width, height)` |
+| Relire les pixels | `canvas.GetPointColor(x, y)`, `canvas.GetImage(x, y, width, height)` |
+| Obtenir un canvas 3D | `Canvas.GetFullScreen() is Canvas3D canvas3D` |
+| Dessiner une scène 3D | `canvas3D.Camera`, `ClearScene`, `DrawCube`, `DrawGrid` |
+| Dessiner un maillage | `canvas3D.CreateMesh(positions, colors, indices)`, `canvas3D.DrawMesh(mesh, world)` |

@@ -1,5 +1,5 @@
 ---
-source_hash: 049e8aed74cf7cf5090635dc78c7ceb48e901a9d
+source_hash: 2cbf6ad4186d6d05f52343bb41f9eb69a7b3bdbe
 ---
 <a id="keyboard"></a>
 
@@ -225,3 +225,23 @@ KeyboardManager ── KeyEvent queue ◀── active layout
         │                                    │
 PS/2 keyboard over the driver kit (the 8042, IRQ 1, x64)  /  virtio-keyboard over the driver kit (PCI, MMIO)  /  USB keyboard over the driver kit (xHCI, EHCI, OHCI)
 ```
+
+<a id="summary"></a>
+
+## Résumé
+
+| Tâche | Appel |
+|---|---|
+| Lire une ligne | `Console.ReadLine()` |
+| Attendre l'appui d'une touche | `KeyboardManager.ReadKey()` |
+| Connaître la touche appuyée et le caractère qu'elle produit | `KeyEvent.Key`, `KeyEvent.KeyChar`, `KeyEvent.Modifiers` |
+| Lire une touche par la console, avec ou sans écho | `Console.ReadKey()`, `Console.ReadKey(true)` |
+| Scruter les touches sans bloquer | `KeyboardManager.TryReadKey(out key)` |
+| Savoir si un appui de touche attend | `KeyboardManager.KeyAvailable`, `Console.KeyAvailable` |
+| Regarder la touche suivante sans la retirer de la file | `KeyboardManager.Peek()` |
+| Savoir si Maj, Ctrl ou Alt est maintenue | `KeyboardManager.ShiftPressed`, `ControlPressed`, `AltPressed` |
+| Lire l'état des touches de verrouillage | `KeyboardManager.CapsLock`, `NumLock`, `ScrollLock` |
+| Changer de disposition | `KeyboardManager.SetLayout(layout)` |
+| Lire la disposition active | `KeyboardManager.GetLayout()` |
+| Écrire une disposition personnalisée | `KeyboardLayout`, `InitializeKeys()`, `KeyMapping` |
+| Faire de la touche Alt droite une touche AltGr | `Keys.Add(new KeyMapping(0x60, Key.AltGr))` |

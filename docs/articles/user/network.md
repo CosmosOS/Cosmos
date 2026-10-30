@@ -464,3 +464,23 @@ IPv4 / ARP and IPv6 / Neighbor Discovery / Ethernet
         │
 Network device                                          (e1000e or virtio-net, over the driver kit)
 ```
+
+## Summary
+
+| Task | Call |
+|---|---|
+| Check that a NIC is ready | `NetworkManager.DeviceCount`, `NetworkManager.Ready` |
+| List the adapters | `NetworkManager.GetAdapter(index)` |
+| Pick the primary adapter | `NetworkManager.Primary` |
+| Configure IPv4 through DHCP | `DhcpClient.SendDiscoverPacket()` |
+| Configure IPv4 by hand | `IPConfig.Enable(address, subnetMask, defaultGateway)` |
+| Read an adapter's configuration | `NetworkAdapter.IPConfig` |
+| Read the IPv6 link-local address | `NetworkAdapter.LinkLocalAddress` |
+| Ping an IPv6 address | `Icmpv6Client.Connect(dest)`, `SendEcho()`, `Receive(ref source, timeout)` |
+| Send and receive UDP datagrams | `System.Net.Sockets.UdpClient` |
+| Connect to a TCP server | `TcpClient.Connect(address, port)`, `TcpClient.GetStream()` |
+| Accept TCP connections | `TcpListener.Start()`, `Pending()`, `AcceptTcpClient()` |
+| Register a nameserver | `DnsConfig.Add(nameserver)` |
+| Resolve a name | `Dns.GetHostAddresses(hostNameOrAddress)` |
+| Read every address record of a name | `DnsClient.SendQuery(url)`, `DnsClient.ReceiveAll(timeout)` |
+| Send a packet you built | `NetworkStack.Send(packet)` |

@@ -1,5 +1,5 @@
 ---
-source_hash: 049e8aed74cf7cf5090635dc78c7ceb48e901a9d
+source_hash: 2cbf6ad4186d6d05f52343bb41f9eb69a7b3bdbe
 ---
 <a id="keyboard"></a>
 
@@ -225,3 +225,23 @@ KeyboardManager ── KeyEvent queue ◀── active layout
         │                                    │
 PS/2 keyboard over the driver kit (the 8042, IRQ 1, x64)  /  virtio-keyboard over the driver kit (PCI, MMIO)  /  USB keyboard over the driver kit (xHCI, EHCI, OHCI)
 ```
+
+<a id="summary"></a>
+
+## 总结
+
+| 任务 | 调用 |
+|---|---|
+| 读取一行 | `Console.ReadLine()` |
+| 等待按键 | `KeyboardManager.ReadKey()` |
+| 查看按下的键及其产生的字符 | `KeyEvent.Key`、`KeyEvent.KeyChar`、`KeyEvent.Modifiers` |
+| 通过控制台读取按键，带或不带回显 | `Console.ReadKey()`、`Console.ReadKey(true)` |
+| 非阻塞轮询按键 | `KeyboardManager.TryReadKey(out key)` |
+| 检查是否有按键在等待 | `KeyboardManager.KeyAvailable`、`Console.KeyAvailable` |
+| 查看下一个按键但不取出 | `KeyboardManager.Peek()` |
+| 检查是否按住了 Shift、Control 或 Alt | `KeyboardManager.ShiftPressed`、`ControlPressed`、`AltPressed` |
+| 读取锁定键状态 | `KeyboardManager.CapsLock`、`NumLock`、`ScrollLock` |
+| 切换布局 | `KeyboardManager.SetLayout(layout)` |
+| 读取当前布局 | `KeyboardManager.GetLayout()` |
+| 编写自定义布局 | `KeyboardLayout`、`InitializeKeys()`、`KeyMapping` |
+| 让右 Alt 成为 AltGr | `Keys.Add(new KeyMapping(0x60, Key.AltGr))` |

@@ -1,5 +1,5 @@
 ---
-source_hash: ab8aa3258dbf81e84a5cfb2ad016a23e6e500cf4
+source_hash: 5fa39ad645c5d9a09f04707b4b2c70ec39ff2796
 ---
 <a id="console-sessions-and-telnet"></a>
 
@@ -155,3 +155,23 @@ Les sockets du noyau ne peuvent pas être utilisés sans risque par deux threads
 Chaque session conserve son écran sous la forme d'une grille `KernelConsole` sur le canvas de l'écran. Seule la grille de la session active peint le canvas ; les autres tiennent leurs cellules à jour et repeignent tout l'écran quand elles sont affichées. Une session Telnet envoie aussi chaque changement à son client au moment où il se produit : chaque caractère, et la séquence d'échappement de chaque déplacement du curseur et de chaque changement de couleur, tirés de la grille. Les deux s'accordent donc sur l'endroit où chaque ligne est coupée : la grille passe à la ligne dès qu'une ligne est pleine, et la session termine explicitement la ligne sur le client.
 
 Le lecteur d'une session se bloque sur un `InterruptEvent` qui est signalé quand une touche est mise en file pour elle. Les touches viennent soit du décodeur du clavier, qui les met en file sur la session active, éventuellement en contexte d'interruption, soit du serveur d'une session distante : le thread du serveur Telnet examine ses connexions toutes les 10 ms tant qu'elles sont inactives, et met en file les touches qu'un client a envoyées. Une touche de changement de session réveille un thread qui resterait sinon bloqué. Le lecteur de la console principale s'exécute sur le thread inactif de l'ordonnanceur : il attend donc l'interruption suivante au lieu de se bloquer, comme le clavier l'a toujours fait.
+
+<a id="summary"></a>
+
+## Résumé
+
+| Tâche | Appel |
+|---|---|
+| Ouvrir une console virtuelle | `SessionManager.CreateVirtualConsole()` |
+| Exécuter un thread sur une session | `SessionManager.Start(session, body)` |
+| Lire et écrire sur la session depuis son thread | `Console.ReadLine()`, `Console.WriteLine()` |
+| Lister les sessions ouvertes | `SessionManager.GetSessions()` |
+| Trouver la session à l'écran | `SessionManager.Active` |
+| Afficher une session à l'écran | `SessionManager.Switch(id)` |
+| Servir un shell par Telnet | `new TelnetServer(shell)`, `server.Start()`, `server.Stop()` |
+| Écrire une classe de session pour un terminal distant | `ConsoleSession(cols, rows)`, `Name`, `IsRemote` |
+| Mettre en file une touche envoyée par le terminal | `EnqueueInput(key)` |
+| Suivre la taille de la fenêtre du terminal | `Resize(cols, rows)` |
+| Repérer les changements à envoyer au terminal | `OnWritten`, `OnCleared`, `OnCursorMoved`, `OnCursorVisibilityChanged`, `OnColorsChanged` |
+| Lire la position du curseur et les couleurs | `CursorLeft`, `CursorTop`, `ExplicitForeground`, `ExplicitBackground` |
+| Inscrire une session distante dans la liste et démarrer son thread | `SessionManager.TryRegister(session)`, `SessionManager.Start(session, body)` |

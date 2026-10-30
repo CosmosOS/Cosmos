@@ -1,5 +1,5 @@
 ---
-source_hash: 54cecb45b8a36c017b0cac120a075fa8070ee93d
+source_hash: 7a8ea5072103da736273432b7ddc44efa50597cc
 ---
 <a id="random-numbers"></a>
 
@@ -87,3 +87,19 @@ Guid id = Guid.NewGuid();
 ```
 
 健康测试能发现卡住或重复短模式的定时器，但不能发现所有可预测的定时器：以确定性方式运行的机器，例如处于 `-icount` 或记录/回放（record/replay）模式下的 QEMU，可能通过这些测试，却在每次启动时都产生相同的输出。
+
+---
+
+<a id="summary"></a>
+
+## 总结
+
+| 任务 | 调用 |
+|---|---|
+| 用安全随机字节填充缓冲区 | `RandomNumberGenerator.Fill(data)` |
+| 以新数组获取安全随机字节 | `RandomNumberGenerator.GetBytes(count)` |
+| 在某个范围内选取安全随机整数 | `RandomNumberGenerator.GetInt32(fromInclusive, toExclusive)` |
+| 用不含零的安全随机字节填充缓冲区 | `RandomNumberGenerator.Create().GetNonZeroBytes(data)` |
+| 获取生成器实例 | `RandomNumberGenerator.Create()` |
+| 生成唯一标识符 | `Guid.NewGuid()` |
+| 为游戏或洗牌获取随机数 | `System.Random`、`Random.Shared` |

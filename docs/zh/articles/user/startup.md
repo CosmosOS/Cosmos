@@ -1,5 +1,5 @@
 ---
-source_hash: 182026ee40c8fb202dff9cc679d4cedf12c97e13
+source_hash: 008972e4c041882d29d3f228490422663868a801
 ---
 <a id="kernel-startup"></a>
 
@@ -252,3 +252,22 @@ foreach (string arg in Environment.GetCommandLineArgs())
 ```
 
 如需在串口日志之外进行交互式调试，请参阅[使用 VSCode 和 QEMU 调试](debugging.md)。
+
+<a id="summary"></a>
+
+## 总结
+
+| 任务 | 调用 |
+|---|---|
+| 在主循环之前进行一次性初始化 | `BeforeRun()` |
+| 编写主循环的循环体 | `Run()` |
+| 循环结束后进行清理 | `AfterRun()` |
+| 让 CPU 停下等待中断 | `Power.Halt()` |
+| 重启机器 | `Power.Reboot()` |
+| 关闭机器电源 | `Power.Shutdown()` |
+| 结束主循环 | `Stop()` |
+| 从静态代码访问正在运行的内核 | `Kernel.Current` |
+| 在控制台存在之前进行早期初始化 | `OnBoot()` |
+| 在无头内核上启动控制台 | `KernelConsole.Initialize()` |
+| 接管整个生命周期 | `Start()` |
+| 读取内核命令行 | `Environment.GetCommandLineArgs()` |

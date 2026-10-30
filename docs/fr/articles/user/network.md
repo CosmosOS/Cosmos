@@ -1,5 +1,5 @@
 ---
-source_hash: a63f41cf5136e78ecfbc13da065cd517c7fdee53
+source_hash: d883bf1abaafffe6663f5e9072ef8923a95b19f7
 ---
 <a id="network"></a>
 
@@ -485,3 +485,25 @@ IPv4 / ARP and IPv6 / Neighbor Discovery / Ethernet
         │
 Network device                                          (e1000e or virtio-net, over the driver kit)
 ```
+
+<a id="summary"></a>
+
+## Résumé
+
+| Tâche | Appel |
+|---|---|
+| Vérifier qu'une carte réseau est prête | `NetworkManager.DeviceCount`, `NetworkManager.Ready` |
+| Lister les adaptateurs | `NetworkManager.GetAdapter(index)` |
+| Choisir l'adaptateur principal | `NetworkManager.Primary` |
+| Configurer IPv4 par DHCP | `DhcpClient.SendDiscoverPacket()` |
+| Configurer IPv4 manuellement | `IPConfig.Enable(address, subnetMask, defaultGateway)` |
+| Lire la configuration d'un adaptateur | `NetworkAdapter.IPConfig` |
+| Lire l'adresse IPv6 lien-local | `NetworkAdapter.LinkLocalAddress` |
+| Envoyer un ping à une adresse IPv6 | `Icmpv6Client.Connect(dest)`, `SendEcho()`, `Receive(ref source, timeout)` |
+| Envoyer et recevoir des datagrammes UDP | `System.Net.Sockets.UdpClient` |
+| Se connecter à un serveur TCP | `TcpClient.Connect(address, port)`, `TcpClient.GetStream()` |
+| Accepter des connexions TCP | `TcpListener.Start()`, `Pending()`, `AcceptTcpClient()` |
+| Enregistrer un serveur de noms | `DnsConfig.Add(nameserver)` |
+| Résoudre un nom | `Dns.GetHostAddresses(hostNameOrAddress)` |
+| Lire tous les enregistrements d'adresse d'un nom | `DnsClient.SendQuery(url)`, `DnsClient.ReceiveAll(timeout)` |
+| Envoyer un paquet fabriqué à la main | `NetworkStack.Send(packet)` |
