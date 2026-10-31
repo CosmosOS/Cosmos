@@ -53,6 +53,7 @@ public partial class Engine
         {
             "x64" => new QemuX64Host(),
             "arm64" => new QemuARM64Host(),
+            "riscv64" => new QemuRISCV64Host(),
             _ => throw new ArgumentException($"Unsupported architecture: {_config.Architecture}")
         };
 
@@ -723,7 +724,7 @@ public partial class Engine
     {
         string projectDir = _config.KernelProjectPath;
         string projectName = Path.GetFileName(projectDir);
-        string rid = _config.Architecture == "arm64" ? "linux-arm64" : "linux-x64";
+        string rid = $"linux-{_config.Architecture.ToLowerInvariant()}";
 
         // Candidate paths: standard obj layout and UseArtifactsOutput layout
         string[] candidates =

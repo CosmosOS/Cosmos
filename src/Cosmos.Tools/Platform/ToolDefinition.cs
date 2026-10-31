@@ -115,6 +115,19 @@ public static class ToolDefinitions
         ReleaseAsset = "qemu"
     };
 
+    public static readonly CommandToolDefinition QemuRiscv64 = new()
+    {
+        Name = "qemu-system-riscv64",
+        DisplayName = "QEMU RISC-V 64",
+        Description = "RISC-V 64 system emulator for testing kernels",
+        WindowsCommands = ["qemu-system-riscv64"],
+        LinuxCommands = ["qemu-system-riscv64"],
+        MacOSCommands = ["qemu-system-riscv64"],
+        VersionArg = "--version",
+        Required = false,
+        ReleaseAsset = "qemu"
+    };
+
     public static readonly CommandToolDefinition Gdb = new()
     {
         Name = "gdb-multiarch",
@@ -136,6 +149,7 @@ public static class ToolDefinitions
         Xorriso,
         QemuX64,
         QemuArm64,
+        QemuRiscv64,
         Gdb
     ];
 }

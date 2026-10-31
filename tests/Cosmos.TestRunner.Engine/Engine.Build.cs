@@ -44,6 +44,7 @@ public partial class Engine
         {
             "x64" => "linux-x64",
             "arm64" => "linux-arm64",
+            "riscv64" => "linux-riscv64",
             _ => throw new ArgumentException($"Unsupported architecture: {_config.Architecture}")
         };
 
@@ -51,6 +52,7 @@ public partial class Engine
         {
             "X64" => "ARCH_X64",
             "ARM64" => "ARCH_ARM64",
+            "RISCV64" => "ARCH_RISCV64",
             _ => throw new ArgumentException($"Unsupported architecture: {_config.Architecture}")
         };
 

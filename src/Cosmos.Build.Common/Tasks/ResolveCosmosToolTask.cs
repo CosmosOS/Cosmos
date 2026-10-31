@@ -26,7 +26,7 @@ public sealed class ResolveCosmosToolTask : Microsoft.Build.Utilities.Task
 {
     private const int CommandTimeoutMs = 5000;
 
-    /// <summary>Logical tool name: clang | lld | xorriso | qemu-x64 | qemu-arm64.</summary>
+    /// <summary>Logical tool name: clang | lld | xorriso | qemu-x64 | qemu-arm64 | qemu-riscv64.</summary>
     [Required]
     public string ToolName { get; set; } = string.Empty;
 
@@ -45,7 +45,7 @@ public sealed class ResolveCosmosToolTask : Microsoft.Build.Utilities.Task
         ToolSpec? spec = LookupTool(ToolName);
         if (spec is null)
         {
-            Log.LogError("ResolveCosmosTool: unknown tool name '{0}'. Valid: clang, lld, xorriso, qemu-x64, qemu-arm64.", ToolName);
+            Log.LogError("ResolveCosmosTool: unknown tool name '{0}'. Valid: clang, lld, xorriso, qemu-x64, qemu-arm64, qemu-riscv64.", ToolName);
             return false;
         }
 
@@ -113,6 +113,7 @@ public sealed class ResolveCosmosToolTask : Microsoft.Build.Utilities.Task
             case "xorriso": return new ToolSpec { ReleaseAsset = "xorriso", Commands = new[] { "xorriso" } };
             case "qemu-x64": return new ToolSpec { ReleaseAsset = "qemu", Commands = new[] { "qemu-system-x86_64" } };
             case "qemu-arm64": return new ToolSpec { ReleaseAsset = "qemu", Commands = new[] { "qemu-system-aarch64" } };
+            case "qemu-riscv64": return new ToolSpec { ReleaseAsset = "qemu", Commands = new[] { "qemu-system-riscv64" } };
             default: return null;
         }
     }

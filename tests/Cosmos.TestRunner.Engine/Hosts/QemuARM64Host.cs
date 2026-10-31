@@ -35,7 +35,12 @@ public class QemuARM64Host : IQemuHost
         Ds2Vs.TestPass
     };
 
-    public string Architecture => "arm64";
+    /// <summary>
+    /// The architecture the host launches. The RISC-V virt machine runs the
+    /// same way (virtio-scsi ISO, ramfb, serial file), so
+    /// <see cref="QemuRISCV64Host"/> only overrides this.
+    /// </summary>
+    public virtual string Architecture => "arm64";
 
     private readonly string? _qemuBinaryOverride;
     private readonly int _memoryMb;
@@ -78,7 +83,7 @@ public class QemuARM64Host : IQemuHost
         {
             plan = await QemuLauncher.BuildAsync(new QemuLaunchOptions
             {
-                Architecture = "arm64",
+                Architecture = Architecture,
                 IsoPath = isoPath,
                 MemoryMb = _memoryMb,
                 Headless = !showDisplay,

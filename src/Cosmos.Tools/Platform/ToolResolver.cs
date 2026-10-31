@@ -77,6 +77,8 @@ public static class ToolResolver
         //    stamp. If no bundle is installed there's nothing to compare against,
         //    so we accept the system tool as-is (user is opting out of the bundle).
         string? pinnedVersion = ReadBundleVersion(tool);
+        string? mismatchedSystemPath = null;
+        string? mismatchedSystemVersion = null;
         foreach (string command in tool.GetCommands(PlatformInfo.CurrentOS))
         {
             string? systemPath = await FindOnPathAsync(command);
@@ -90,6 +92,8 @@ public static class ToolResolver
                 return new ResolvedTool(systemPath, ClassifySource(systemPath, ToolSource.System), systemVersion);
             }
             // Version mismatch — fall through to bundle.
+            mismatchedSystemPath ??= systemPath;
+            mismatchedSystemVersion ??= systemVersion;
         }
 
         // 3. Bundle. Prefer the stamped pinned version, but for bundles released
@@ -101,6 +105,14 @@ public static class ToolResolver
         {
             string? bundleVersion = pinnedVersion ?? await TryGetVersionAsync(bundlePath, tool.VersionArg);
             return new ResolvedTool(bundlePath, ToolSource.Bundle, bundleVersion);
+        }
+
+        // 4. The bundle is installed but does not carry this tool (a bundle older
+        //    than the tool, such as one without qemu-system-riscv64): the version
+        //    gate has nothing to fall back to, so the system tool is used as-is.
+        if (mismatchedSystemPath is not null)
+        {
+            return new ResolvedTool(mismatchedSystemPath, ClassifySource(mismatchedSystemPath, ToolSource.System), mismatchedSystemVersion);
         }
 
         return new ResolvedTool(string.Empty, ToolSource.NotFound, null);
