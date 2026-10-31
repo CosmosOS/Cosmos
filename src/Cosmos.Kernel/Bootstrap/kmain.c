@@ -30,8 +30,10 @@ void kmain()
     __cosmos_serial_write("\n");
     __cosmos_serial_write("========================================\n");
     __cosmos_serial_write("  CosmosOS v" COSMOS_VERSION_STRING " (" COSMOS_CODENAME ")\n");
-#ifdef __aarch64__
+#if defined(__aarch64__)
     __cosmos_serial_write("  Architecture: ARM64/AArch64\n");
+#elif defined(__riscv)
+    __cosmos_serial_write("  Architecture: RISC-V 64\n");
 #else
     __cosmos_serial_write("  Architecture: x86-64\n");
 #endif

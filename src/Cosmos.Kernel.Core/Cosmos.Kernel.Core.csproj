@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- Multi-arch package: contains both x64 and arm64 builds -->
+    <!-- Multi-arch package: contains the x64, arm64 and riscv64 builds -->
     <IsMultiArchPackage>true</IsMultiArchPackage>
     <IsPackable>true</IsPackable>
 
@@ -22,17 +22,23 @@
   </PropertyGroup>
 
   <!-- Architecture-specific source files (defines are set by Cosmos.ArchitecturePicker.props) -->
+  <ItemGroup Condition="'$(CosmosArch)' != 'x64'">
+    <Compile Remove="Scheduler\ThreadContext.X64.cs" />
+    <Compile Remove="Runtime\ExceptionHandling\CfiArch.X64.cs" />
+    <Compile Remove="Runtime\ExceptionHandling\RegisterContext.X64.cs" />
+    <Compile Remove="Runtime\ExceptionHandling\ExceptionHelper.X64.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(CosmosArch)' != 'arm64'">
     <Compile Remove="Scheduler\ThreadContext.ARM64.cs" />
     <Compile Remove="Runtime\ExceptionHandling\CfiArch.ARM64.cs" />
     <Compile Remove="Runtime\ExceptionHandling\RegisterContext.ARM64.cs" />
     <Compile Remove="Runtime\ExceptionHandling\ExceptionHelper.ARM64.cs" />
   </ItemGroup>
-  <ItemGroup Condition="'$(CosmosArch)' == 'arm64'">
-    <Compile Remove="Scheduler\ThreadContext.X64.cs" />
-    <Compile Remove="Runtime\ExceptionHandling\CfiArch.X64.cs" />
-    <Compile Remove="Runtime\ExceptionHandling\RegisterContext.X64.cs" />
-    <Compile Remove="Runtime\ExceptionHandling\ExceptionHelper.X64.cs" />
+  <ItemGroup Condition="'$(CosmosArch)' != 'riscv64'">
+    <Compile Remove="Scheduler\ThreadContext.RISCV64.cs" />
+    <Compile Remove="Runtime\ExceptionHandling\CfiArch.RISCV64.cs" />
+    <Compile Remove="Runtime\ExceptionHandling\RegisterContext.RISCV64.cs" />
+    <Compile Remove="Runtime\ExceptionHandling\ExceptionHelper.RISCV64.cs" />
   </ItemGroup>
 
   <!-- The metadata readers, TypeHashingAlgorithms, and ExceptionIDs used to be
@@ -94,6 +100,7 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Runtime" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.Core.ARM64" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Core.RISCV64" />
     <!-- HAL builds without unsafe code, so it takes memory and firmware data
          through Core (MemoryBlock with PageAllocator.AllocBlock,
          AddressSpace.HhdmOffset, BootFirmware), and IPlatformInitializer's
@@ -116,6 +123,7 @@
          Core's EagerStaticClassConstructionAttribute. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.RISCV64" />
     <!-- White-box scheduler suite reads Stride bookkeeping and drives the
          sync primitives directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Threading" />

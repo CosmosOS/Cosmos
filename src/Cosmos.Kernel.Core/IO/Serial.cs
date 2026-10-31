@@ -74,6 +74,18 @@ internal static class Serial
 
     #endregion
 
+    #region RISC-V NS16550A UART Constants
+
+    // NS16550A UART0 base address (QEMU virt machine): the 16550 registers
+    // above, one byte apart (reg-shift 0), memory-mapped
+    private const ulong NS16550_BASE = 0x10000000;
+
+    // Baud rate divisor for 115200 baud (3.6864 MHz / (16 * 115200) = 2)
+    private const byte NS16550_DIVISOR_LO = 0x02;
+    private const byte NS16550_DIVISOR_HI = 0x00;
+
+    #endregion
+
     // String constants for output
     private const string NULL = "null";
     private const string TRUE = "TRUE";
@@ -151,6 +163,14 @@ internal static class Serial
                 ;
             }
             Native.MMIO.Write8(PL011_BASE + PL011_DR, value);
+#elif ARCH_RISCV64
+            // NS16550A: Wait for transmit buffer to be empty
+            while ((Native.MMIO.Read8(NS16550_BASE + REG_LSR) & LSR_TX_EMPTY) == 0)
+            {
+                ;
+            }
+
+            Native.MMIO.Write8(NS16550_BASE + REG_DATA, value);
 #else
             // 16550: Wait for transmit buffer to be empty
             while ((Native.IO.Read8(COM1_BASE + REG_LSR) & LSR_TX_EMPTY) == 0)
@@ -189,6 +209,15 @@ internal static class Serial
 
             // Enable UART, TX, and RX
             Native.MMIO.Write32(PL011_BASE + PL011_CR, CR_UARTEN | CR_TXE | CR_RXE);
+#elif ARCH_RISCV64
+            // === NS16550A UART Initialization (the x64 sequence, memory-mapped) ===
+            Native.MMIO.Write8(NS16550_BASE + REG_IER, 0x00);
+            Native.MMIO.Write8(NS16550_BASE + REG_LCR, LCR_DLAB);
+            Native.MMIO.Write8(NS16550_BASE + REG_DATA, NS16550_DIVISOR_LO);
+            Native.MMIO.Write8(NS16550_BASE + REG_IER, NS16550_DIVISOR_HI);
+            Native.MMIO.Write8(NS16550_BASE + REG_LCR, LCR_8N1);
+            Native.MMIO.Write8(NS16550_BASE + REG_FCR, FCR_ENABLE);
+            Native.MMIO.Write8(NS16550_BASE + REG_MCR, MCR_DTR_RTS_OUT2);
 #else
             // === 16550 UART Initialization ===
 

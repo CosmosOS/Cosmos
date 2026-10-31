@@ -93,6 +93,92 @@ internal struct IRQContext
     public ulong fault_address;
 }
 
+#elif ARCH_RISCV64
+
+/// <summary>
+/// Register state saved by the RISC-V trap entry stub, as handed to interrupt
+/// and exception handlers (<see cref="IInterruptController.Dispatch"/>). The
+/// layout mirrors the stub's save order exactly (register xN at offset 8 * N);
+/// changing it requires changing the assembly.
+/// </summary>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+internal struct IRQContext
+{
+    /// <summary>x0: always zero, keeps xN at offset 8 * N.</summary>
+    public ulong x0;
+    /// <summary>x1: return address.</summary>
+    public ulong ra;
+    /// <summary>x2: the interrupted code's stack pointer.</summary>
+    public ulong sp;
+    /// <summary>x3: global pointer.</summary>
+    public ulong gp;
+    /// <summary>x4: thread pointer.</summary>
+    public ulong tp;
+    /// <summary>x5: temporary.</summary>
+    public ulong t0;
+    /// <summary>x6: temporary.</summary>
+    public ulong t1;
+    /// <summary>x7: temporary.</summary>
+    public ulong t2;
+    /// <summary>x8: saved register 0, the frame pointer.</summary>
+    public ulong s0;
+    /// <summary>x9: saved register 1.</summary>
+    public ulong s1;
+    /// <summary>x10: argument 0.</summary>
+    public ulong a0;
+    /// <summary>x11: argument 1.</summary>
+    public ulong a1;
+    /// <summary>x12: argument 2.</summary>
+    public ulong a2;
+    /// <summary>x13: argument 3.</summary>
+    public ulong a3;
+    /// <summary>x14: argument 4.</summary>
+    public ulong a4;
+    /// <summary>x15: argument 5.</summary>
+    public ulong a5;
+    /// <summary>x16: argument 6.</summary>
+    public ulong a6;
+    /// <summary>x17: argument 7.</summary>
+    public ulong a7;
+    /// <summary>x18: saved register 2.</summary>
+    public ulong s2;
+    /// <summary>x19: saved register 3.</summary>
+    public ulong s3;
+    /// <summary>x20: saved register 4.</summary>
+    public ulong s4;
+    /// <summary>x21: saved register 5.</summary>
+    public ulong s5;
+    /// <summary>x22: saved register 6.</summary>
+    public ulong s6;
+    /// <summary>x23: saved register 7.</summary>
+    public ulong s7;
+    /// <summary>x24: saved register 8.</summary>
+    public ulong s8;
+    /// <summary>x25: saved register 9.</summary>
+    public ulong s9;
+    /// <summary>x26: saved register 10.</summary>
+    public ulong s10;
+    /// <summary>x27: saved register 11.</summary>
+    public ulong s11;
+    /// <summary>x28: temporary.</summary>
+    public ulong t3;
+    /// <summary>x29: temporary.</summary>
+    public ulong t4;
+    /// <summary>x30: temporary.</summary>
+    public ulong t5;
+    /// <summary>x31: temporary.</summary>
+    public ulong t6;
+    /// <summary>sepc: where the trap was taken, where sret returns.</summary>
+    public ulong sepc;
+    /// <summary>sstatus at the trap: SPP, SPIE and FS carry the interrupted code's state.</summary>
+    public ulong sstatus;
+    /// <summary>0 for an exception, 1 for an interrupt, as the stub writes it; the dispatcher replaces it with the vector before calling a handler.</summary>
+    public ulong interrupt;
+    /// <summary>scause: the trap's cause, bit 63 set for an interrupt.</summary>
+    public ulong cpu_flags;
+    /// <summary>stval: the faulting address or instruction, when the cause has one.</summary>
+    public ulong fault_address;
+}
 #else
 
 /// <summary>

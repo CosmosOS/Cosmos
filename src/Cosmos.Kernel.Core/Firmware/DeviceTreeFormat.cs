@@ -92,6 +92,9 @@ internal static class DeviceTreeFormat
     /// <summary>The INTID of SPI 0: a specifier's number plus this is the line.</summary>
     internal const uint GicSpiBase = 32;
 
+    /// <summary>Cells of one RISC-V PLIC interrupt specifier: the source number.</summary>
+    internal const uint PlicInterruptCells = 1;
+
     /// <summary>Rounds a byte offset or length up to the next cell boundary. Any context; allocation-free.</summary>
     /// <param name="value">The offset or length.</param>
     internal static uint AlignUp(uint value)

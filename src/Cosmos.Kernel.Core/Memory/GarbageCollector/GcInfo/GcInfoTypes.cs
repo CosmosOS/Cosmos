@@ -45,7 +45,7 @@ internal enum GcInfoHeaderFlags : uint
     GC_INFO_HAS_STACK_BASE_REGISTER = 0x40,
 #if ARCH_X64
     GC_INFO_WANTS_REPORT_ONLY_LEAF = 0x80,
-#elif ARCH_ARM64
+#elif ARCH_ARM64 || ARCH_RISCV64
     GC_INFO_HAS_TAILCALLS = 0x80,
 #endif
     GC_INFO_HAS_EDIT_AND_CONTINUE_INFO = 0x100,
@@ -143,8 +143,22 @@ internal static class GcInfoEncoding
     public const int NUM_STACK_SLOTS_ENCBASE = 2;
     public const int NUM_SAFE_POINTS_ENCBASE = 3;
     public const int SIZE_OF_EDIT_AND_CONTINUE_FIXED_STACK_FRAME_ENCBASE = 4;
+#elif ARCH_RISCV64
+    // RISCV64GcInfoEncoding in gcinfotypes.h: ARM64's encoding but for the
+    // stack base register, which is FP (x8) or SP (x2), encoded 0 or 1.
+    private const int STACK_SLOT_NORM_SHIFT = 3;
+    private const int CODE_LENGTH_NORM_SHIFT = 2;          // ILC's riscv64 code has 4-byte instructions only
+    private const int CODE_OFFSET_NORM_SHIFT = 2;
+    private const int SIZE_OF_STACK_AREA_NORM_SHIFT = 3;
+
+    public const int CODE_LENGTH_ENCBASE = 8;
+    public const int STACK_BASE_REGISTER_ENCBASE = 2;
+    public const int NUM_REGISTERS_ENCBASE = 3;
+    public const int NUM_STACK_SLOTS_ENCBASE = 2;
+    public const int NUM_SAFE_POINTS_ENCBASE = 3;
+    public const int SIZE_OF_EDIT_AND_CONTINUE_FIXED_STACK_FRAME_ENCBASE = 4;
 #else
-#error "GcInfoDecoder supports ARCH_X64 and ARCH_ARM64 only"
+#error "GcInfoDecoder supports ARCH_X64, ARCH_ARM64 and ARCH_RISCV64 only"
 #endif
 
     // Encoding bases shared by AMD64 and ARM64.
@@ -176,8 +190,13 @@ internal static class GcInfoEncoding
     public static uint DenormalizeCodeOffset(uint x) => x << CODE_OFFSET_NORM_SHIFT;
     public static uint NormalizeSizeOfStackArea(uint x) => x >> SIZE_OF_STACK_AREA_NORM_SHIFT;
     public static uint DenormalizeSizeOfStackArea(uint x) => x << SIZE_OF_STACK_AREA_NORM_SHIFT;
+#if ARCH_RISCV64
+    public static uint NormalizeStackBaseRegister(uint x) => x == 8 ? 0u : 1u;
+    public static uint DenormalizeStackBaseRegister(uint x) => x == 0 ? 8u : 2u;
+#else
     public static uint NormalizeStackBaseRegister(uint x) => x ^ STACK_BASE_REGISTER_XOR;
     public static uint DenormalizeStackBaseRegister(uint x) => x ^ STACK_BASE_REGISTER_XOR;
+#endif
 
     /// <summary>ceil(log2(x)) for x &gt; 0 — bits needed to represent the values 0..x-1.</summary>
     public static int CeilOfLog2(ulong x)

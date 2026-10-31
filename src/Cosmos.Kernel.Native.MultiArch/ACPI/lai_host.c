@@ -88,7 +88,7 @@ void laihost_log(int level, const char* message) {
 void laihost_panic(const char* message) {
     cosmos_log("[LAI PANIC] ");
     cosmos_log(message);
-#ifdef __aarch64__
+#if defined(__aarch64__) || defined(__riscv)
     while (1) { __asm__ volatile ("wfi"); }
 #else
     while (1) { __asm__ volatile ("hlt"); }
@@ -122,10 +122,10 @@ uint32_t laihost_pci_read(uint16_t seg, uint8_t bus, uint8_t slot,
 }
 
 // ============================================================================
-// LAI Host Interface - Port I/O (x86 only, stubs for ARM64)
+// LAI Host Interface - Port I/O (x86 only, stubs for ARM64 and RISC-V)
 // ============================================================================
 
-#ifdef __aarch64__
+#if defined(__aarch64__) || defined(__riscv)
 
 void laihost_outb(uint16_t port, uint8_t value) { (void)port; (void)value; }
 void laihost_outw(uint16_t port, uint16_t value) { (void)port; (void)value; }

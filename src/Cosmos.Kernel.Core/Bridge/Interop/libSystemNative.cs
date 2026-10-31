@@ -144,8 +144,8 @@ internal static unsafe partial class libSystemNative
 #if ARCH_X64
             ushort cs = (ushort)GetCurrentCodeSelector();
             thread.InitializeStack(entryPoint, cs, (nuint)parameter, size);
-#elif ARCH_ARM64
-            // ARM64: no code selector needed, use 0.
+#elif ARCH_ARM64 || ARCH_RISCV64
+            // ARM64 and RISC-V: no code selector needed, use 0.
             thread.InitializeStack(entryPoint, 0, (nuint)parameter, size);
 #endif
             SchedulerManager.CreateThread(0, thread);

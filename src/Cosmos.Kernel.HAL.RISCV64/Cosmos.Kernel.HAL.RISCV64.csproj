@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Unsafe code is contained in Cosmos.Kernel.Core: this layer reaches memory through its address-based entry points. -->
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <PackageId>Cosmos.Kernel.HAL.RISCV64</PackageId>
+    <Title>Cosmos Kernel HAL RISC-V 64</Title>
+    <Description>Hardware abstraction layer RISC-V 64 implementation for Cosmos kernel.</Description>
+    <PackageTags>cosmos;kernel;hal;riscv64;risc-v;hardware</PackageTags>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <DefineConstants>$(DefineConstants);ARCH_RISCV64</DefineConstants>
+    <!-- The SBI timer feeds ticks into the experimental scheduler seam (COSMOS0001);
+         the machine description seeds the platform bus through the experimental driver kit seam (COSMOS0003). -->
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0003</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" />
+    <ProjectReference Include="..\Cosmos.Kernel.Core.RISCV64\Cosmos.Kernel.Core.RISCV64.csproj" />
+    <ProjectReference Include="..\Cosmos.Kernel.HAL\Cosmos.Kernel.HAL.csproj" />
+    <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The DateTime and Interop.Sys plugs read the GoldfishRtc singleton. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
+    <!-- White-box timer suite exercises GoldfishRtc directly. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Timer" />
+  </ItemGroup>
+</Project>

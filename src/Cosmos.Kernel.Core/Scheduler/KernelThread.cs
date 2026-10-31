@@ -101,8 +101,8 @@ internal static unsafe partial class KernelThread
         GCHandle<Action> handle = new(handshake.Run);
         nuint parameter = (nuint)GCHandle<Action>.ToIntPtr(handle);
         nuint entryPoint = (nuint)(delegate* unmanaged<IntPtr, void>)&ThreadNative.EntryPointStub;
-#if ARCH_ARM64
-        // ARM64 has no code segment: the context ignores the selector.
+#if ARCH_ARM64 || ARCH_RISCV64
+        // ARM64 and RISC-V have no code segment: the context ignores the selector.
         started.InitializeStack(entryPoint, 0, parameter);
 #else
         started.InitializeStack(entryPoint, (ushort)GetCurrentCodeSelector(), parameter);

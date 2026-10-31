@@ -323,7 +323,7 @@ dotnet_diagnostic.IDE0130.severity = none
 # A bridge's direction is a folder, not a namespace: Bridge/Import (native
 # imports) and Bridge/Export (managed exports) share the project's Bridge
 # namespace. Bridge/Interop has a namespace of its own and stays checked.
-[src/Cosmos.Kernel.{Core,Core.X64,Core.ARM64}/Bridge/{Import,Export}/**.cs]
+[src/Cosmos.Kernel.{Core,Core.X64,Core.ARM64,Core.RISCV64}/Bridge/{Import,Export}/**.cs]
 dotnet_diagnostic.IDE0130.severity = none
 
 # The dotnet/runtime mirrors keep their upstream namespaces. Runtime/Internal

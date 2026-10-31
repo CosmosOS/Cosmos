@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- Multi-arch package: contains both x64 and arm64 builds -->
+    <!-- Multi-arch package: contains the x64, arm64 and riscv64 builds -->
     <IsMultiArchPackage>true</IsMultiArchPackage>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
@@ -26,6 +26,9 @@
   </ItemGroup>
   <ItemGroup Condition="'$(CosmosArch)' == 'arm64'">
     <ProjectReference Include="..\Cosmos.Kernel.HAL.ARM64\Cosmos.Kernel.HAL.ARM64.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(CosmosArch)' == 'riscv64'">
+    <ProjectReference Include="..\Cosmos.Kernel.HAL.RISCV64\Cosmos.Kernel.HAL.RISCV64.csproj" />
   </ItemGroup>
 
   <!-- Multi-arch packaging support -->
