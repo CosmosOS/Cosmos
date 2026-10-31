@@ -137,7 +137,7 @@
       // business, so the arm64 cells cover the polled path (default GICv2,
       // no ITS) and the message interrupt path (gicv3) both.
       "name": "virtio-blk-pci",
-      "architectures": ["x64", "arm64"],
+      "architectures": ["x64", "arm64", "riscv64"],
       "disks": [
         { "type": "virtio-blk", "hotplug": true }
       ]
@@ -148,7 +148,7 @@
       // line the machine description routes: the legacy virtio interface
       // and the one block cell that needs no PCI at all.
       "name": "virtio-blk-mmio",
-      "architectures": ["arm64"],
+      "architectures": ["arm64", "riscv64"],
       "disks": [
         { "type": "virtio-blk-mmio" }
       ]
@@ -257,7 +257,7 @@
       // suite. One shape on both arches; only the MSI backend differs
       // underneath (LAPIC on x64, GICv3 ITS on arm64).
       "name": "virtio-net-pci",
-      "architectures": ["x64", "arm64"],
+      "architectures": ["x64", "arm64", "riscv64"],
       "machineOptions": { "arm64": { "gic-version": "3" } },
       "nic": "virtio-net-pci"
     },
@@ -265,7 +265,7 @@
       // virtio-net over MMIO, what the arm64 virt machine presents, and
       // what the suite ran with before NICs became a profile axis.
       "name": "virtio-net-mmio",
-      "architectures": ["arm64"],
+      "architectures": ["arm64", "riscv64"],
       "nic": "virtio-net-device"
     },
     {
@@ -305,7 +305,7 @@
       // MSI-X is routed by the GICv3 ITS and virt defaults to GICv2, which has
       // none. q35 rejects the property, hence the scoping.
       "name": "virtio-gpu",
-      "architectures": ["x64", "arm64"],
+      "architectures": ["x64", "arm64", "riscv64"],
       "machineOptions": { "arm64": { "gic-version": "3" } },
       "gpu": "virtio-gpu-pci"
     },
@@ -327,7 +327,7 @@
       // controller at 00:03.0 shares with it, which would leave the stream's
       // completion interrupt unconnected on every cell.
       "name": "hda",
-      "architectures": ["x64", "arm64"],
+      "architectures": ["x64", "arm64", "riscv64"],
       "nic": "none",
       "audio": "intel-hda"
     },
@@ -347,7 +347,7 @@
       // is what the virtio-pci+acpi-off cell on arm64 shows (no ITS without
       // ACPI). q35 rejects the property, hence the scoping.
       "name": "virtio-pci",
-      "architectures": ["x64", "arm64"],
+      "architectures": ["x64", "arm64", "riscv64"],
       "machineOptions": { "arm64": { "gic-version": "3" } },
       "nic": "virtio-net-pci",
       "keyboard": "virtio-keyboard-pci",
@@ -360,7 +360,7 @@
       // The same device set over the virt machine's virtio-mmio window, so
       // one suite covers both transports with the same assertions.
       "name": "virtio-mmio",
-      "architectures": ["arm64"],
+      "architectures": ["arm64", "riscv64"],
       "nic": "virtio-net-device",
       "keyboard": "virtio-keyboard-device",
       "mouse": "virtio-mouse-device",

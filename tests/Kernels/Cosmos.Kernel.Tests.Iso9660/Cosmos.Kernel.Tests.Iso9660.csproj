@@ -25,6 +25,10 @@
     <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_RISCV64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.RISCV64/Cosmos.Kernel.HAL.RISCV64.csproj" />
+  </ItemGroup>
+
   <!--
     The fixture images. xorriso, the producer of every Cosmos ISO, builds
     them from the trees under Fixtures/ at compile time, so a reviewer reads

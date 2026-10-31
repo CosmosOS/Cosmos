@@ -43,4 +43,8 @@
     <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_RISCV64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.RISCV64/Cosmos.Kernel.HAL.RISCV64.csproj" />
+  </ItemGroup>
+
 </Project>

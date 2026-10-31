@@ -1575,8 +1575,9 @@ public class Kernel : Sys.Kernel
     /// Checks how an EHCI or OHCI takes its events. Both are INTx-only
     /// functions: on x64 the I/O APIC routes the line and the cell's profile
     /// leaves it free (no NIC), so the handler path must be the one in use,
-    /// not only the invariant; the ARM64 platform routes no legacy line, so
-    /// there the controller polls, and either way it is one or the other.
+    /// not only the invariant; the ARM64 and RISC-V platforms route no legacy
+    /// line, so there the controller polls, and either way it is one or the
+    /// other.
     /// </summary>
     /// <param name="hasInterrupt">The state's HasInterrupt.</param>
     /// <param name="isPolling">The state's IsPolling.</param>
@@ -1584,7 +1585,7 @@ public class Kernel : Sys.Kernel
     private static void AssertLegacyLineEvents(bool hasInterrupt, bool isPolling, string profileFragment)
     {
         Assert.True(hasInterrupt != isPolling, "the controller takes its events from the line interrupt or polls, never both or neither");
-        if (PlatformHAL.Architecture != PlatformArchitecture.ARM64 && TR.ProfileContains(profileFragment))
+        if (PlatformHAL.Architecture == PlatformArchitecture.X64 && TR.ProfileContains(profileFragment))
         {
             Assert.True(hasInterrupt, "on x64 the function's line is routed and free, so the handler should be the path in use");
         }

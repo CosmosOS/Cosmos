@@ -10,6 +10,8 @@ using TR = Cosmos.TestRunner.Framework.TestRunner;
 using Cosmos.Kernel.Core.X64.Cpu;
 using Cosmos.Kernel.HAL.X64;
 using Rtc = Cosmos.Kernel.HAL.X64.CmosRtc;
+#elif ARCH_RISCV64
+using Rtc = Cosmos.Kernel.HAL.RISCV64.GoldfishRtc;
 #else
 using Rtc = Cosmos.Kernel.HAL.ARM64.PL031Rtc;
 #endif
@@ -37,7 +39,7 @@ public class Kernel : Sys.Kernel
         TR.Run("LAPIC_Wait_Proportional", TestLAPICWaitProportional);
 
 #else
-        // ARM64: No PIT or LAPIC, just basic timer manager tests
+        // ARM64 and RISC-V: No PIT or LAPIC, just basic timer manager tests
         // Stopwatch (2) + TimerManager (8) + DateTime (4) + AlarmManager (3) + BCL Timer (4) = 21
         TR.Start("Timer Tests", expectedTests: 21);
 #endif
