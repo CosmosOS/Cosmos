@@ -201,6 +201,17 @@ internal static class Math
         return x - intPart;
     }
 
+    // MathF.Truncate lowers to modff. A float widens to double exactly, and
+    // both parts of a float are floats, so the narrowing loses nothing.
+    [RuntimeExport("modff")]
+    internal static unsafe float modff(float x, float* intptr)
+    {
+        double intPart;
+        double fraction = ModF(x, &intPart);
+        *intptr = (float)intPart;
+        return (float)fraction;
+    }
+
     // --------------- fmod (fdlibm e_fmod.c) ---------------
     // Bit-exact remainder; NativeAOT emits calls to this for the C# `%`
     // operator on double (and fmodf for float).
