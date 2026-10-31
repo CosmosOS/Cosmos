@@ -26,12 +26,17 @@ public sealed class AsmBuildTask : ToolTask
     {
         Log.LogMessage(MessageImportance.Low, $"[Debug] Generating command-line args for {FilePath} -> {FileName}");
 
-        string triple = TargetArchitecture == "arm64"
-            ? "aarch64-none-elf"
-            : "x86_64-elf";
+        // RISC-V also names the base ISA and the float ABI: lld refuses to link
+        // objects whose ABIs differ, and ILC's objects use the double-float one.
+        string target = TargetArchitecture switch
+        {
+            "arm64" => "--target=aarch64-none-elf",
+            "riscv64" => "--target=riscv64-unknown-elf -march=rv64gc -mabi=lp64d",
+            _ => "--target=x86_64-elf",
+        };
 
         StringBuilder sb = new();
-        sb.Append($" --target={triple} -c ");
+        sb.Append($" {target} -c ");
         sb.Append($" -o {Path.Combine(OutputPath!, FileName!)} ");
         sb.Append($" {FilePath} ");
         return sb.ToString();

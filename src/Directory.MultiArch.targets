@@ -8,6 +8,7 @@
       build/{PackageId}.props                      - Adds correct reference based on RID
       runtimes/linux-x64/lib/{tfm}/Assembly.dll    - x64 assembly
       runtimes/linux-arm64/lib/{tfm}/Assembly.dll  - arm64 assembly
+      runtimes/linux-riscv64/lib/{tfm}/Assembly.dll - riscv64 assembly
 
     Usage: Set IsMultiArchPackage=true and import this file.
   -->
@@ -45,6 +46,11 @@
       <Pack>true</Pack>
       <PackagePath>runtimes/linux-arm64/lib/$(_MultiArchTFM)/</PackagePath>
     </None>
+    <None Include="$(MultiArchStagingBase)riscv64/$(AssemblyName).dll"
+          Condition="Exists('$(MultiArchStagingBase)riscv64/$(AssemblyName).dll')">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/linux-riscv64/lib/$(_MultiArchTFM)/</PackagePath>
+    </None>
   </ItemGroup>
 
   <!-- Generate props file for compile-time assembly resolution -->
@@ -66,6 +72,7 @@
   <!-- Auto-generated props for multi-arch compile-time and patcher resolution -->
   <PropertyGroup>
     <_$(_PropPrefix)RidFolder Condition="'%24(RuntimeIdentifier)' == 'linux-arm64'">linux-arm64</_$(_PropPrefix)RidFolder>
+    <_$(_PropPrefix)RidFolder Condition="'%24(RuntimeIdentifier)' == 'linux-riscv64'">linux-riscv64</_$(_PropPrefix)RidFolder>
     <_$(_PropPrefix)RidFolder Condition="'%24(_$(_PropPrefix)RidFolder)' == ''">linux-x64</_$(_PropPrefix)RidFolder>
     <_$(_PropPrefix)AssemblyPath>%24(MSBuildThisFileDirectory)../runtimes/%24(_$(_PropPrefix)RidFolder)/lib/$(_TFM)/$(AssemblyName).dll</_$(_PropPrefix)AssemblyPath>
   </PropertyGroup>
@@ -106,6 +113,7 @@
     <Message Importance="High" Text="  props: build/$(PackageId).props" />
     <Message Importance="High" Text="  x64: runtimes/linux-x64/lib/$(_MultiArchTFM)/$(AssemblyName).dll" />
     <Message Importance="High" Text="  arm64: runtimes/linux-arm64/lib/$(_MultiArchTFM)/$(AssemblyName).dll" />
+    <Message Importance="High" Text="  riscv64: runtimes/linux-riscv64/lib/$(_MultiArchTFM)/$(AssemblyName).dll" />
   </Target>
 
 </Project>

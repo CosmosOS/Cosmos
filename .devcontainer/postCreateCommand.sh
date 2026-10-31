@@ -4,6 +4,12 @@ set -e
 
 echo "=== Starting postCreate setup (multi-arch) ==="
 
+# RISC-V 64 is opt-in: Microsoft publishes neither the cross JIT nor the
+# riscv64 CoreLib NativeAOT needs, so they are built from the dotnet/runtime
+# submodule (tens of minutes the first time, seconds after). COSMOS_RISCV64=1
+# (or `make setup ARCH=riscv64`) adds the architecture to every package.
+COSMOS_RISCV64="${COSMOS_RISCV64:-0}"
+
 # ── Resolve Cosmos package version ───────────────────────────────────────────
 # Single source of truth, in order of precedence:
 #   1. $VersionPrefix env var (set by Release CI from the git tag)
@@ -77,10 +83,22 @@ dotnet build src/Cosmos.Build.Analyzer.Patcher.Package/Cosmos.Build.Analyzer.Pat
 dotnet build src/Cosmos.Patcher/Cosmos.Patcher.csproj -c Release --no-incremental
 dotnet build src/Cosmos.Tools/Cosmos.Tools.csproj -c Release --no-incremental
 
+# RISC-V 64 NativeAOT toolchain: the cross JIT and CoreLib, packed as
+# Cosmos.Build.Ilc.RISCV64 (after the artifacts wipe above: it lands in
+# artifacts/riscv64-toolchain, the submodule keeps the build itself)
+if [[ "$COSMOS_RISCV64" == "1" ]]; then
+  echo "Building the RISC-V 64 NativeAOT toolchain..."
+  ./.devcontainer/build-riscv64-toolchain.sh
+  dotnet pack src/Cosmos.Build.Ilc.RISCV64/Cosmos.Build.Ilc.RISCV64.csproj -c Release -o artifacts/package/release
+fi
+
 # Native packages (content-only)
 echo "Packing native packages..."
 dotnet pack src/Cosmos.Kernel.Native.X64/Cosmos.Kernel.Native.X64.csproj -c Release -o artifacts/package/release
 dotnet pack src/Cosmos.Kernel.Native.ARM64/Cosmos.Kernel.Native.ARM64.csproj -c Release -o artifacts/package/release
+if [[ "$COSMOS_RISCV64" == "1" ]]; then
+  dotnet pack src/Cosmos.Kernel.Native.RISCV64/Cosmos.Kernel.Native.RISCV64.csproj -c Release -o artifacts/package/release
+fi
 dotnet pack src/Cosmos.Kernel.Native.MultiArch/Cosmos.Kernel.Native.MultiArch.csproj -c Release -o artifacts/package/release
 
 echo "Verifying native packages..."
@@ -112,6 +130,10 @@ dotnet build src/Cosmos.Kernel.Core.X64/Cosmos.Kernel.Core.X64.csproj -c Release
 dotnet pack src/Cosmos.Kernel.Core.X64/Cosmos.Kernel.Core.X64.csproj -c Release --no-build -o artifacts/package/release
 dotnet build src/Cosmos.Kernel.Core.ARM64/Cosmos.Kernel.Core.ARM64.csproj -c Release -p:GeneratePackageOnBuild=false
 dotnet pack src/Cosmos.Kernel.Core.ARM64/Cosmos.Kernel.Core.ARM64.csproj -c Release --no-build -o artifacts/package/release
+if [[ "$COSMOS_RISCV64" == "1" ]]; then
+  dotnet build src/Cosmos.Kernel.Core.RISCV64/Cosmos.Kernel.Core.RISCV64.csproj -c Release -p:GeneratePackageOnBuild=false
+  dotnet pack src/Cosmos.Kernel.Core.RISCV64/Cosmos.Kernel.Core.RISCV64.csproj -c Release --no-build -o artifacts/package/release
+fi
 
 # Architecture-specific HAL packages (build first, then pack)
 echo "Building and packing architecture-specific HAL packages..."
@@ -119,6 +141,10 @@ dotnet build src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj -c Release -
 dotnet pack src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj -c Release --no-build -o artifacts/package/release
 dotnet build src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj -c Release -p:GeneratePackageOnBuild=false
 dotnet pack src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj -c Release --no-build -o artifacts/package/release
+if [[ "$COSMOS_RISCV64" == "1" ]]; then
+  dotnet build src/Cosmos.Kernel.HAL.RISCV64/Cosmos.Kernel.HAL.RISCV64.csproj -c Release -p:GeneratePackageOnBuild=false
+  dotnet pack src/Cosmos.Kernel.HAL.RISCV64/Cosmos.Kernel.HAL.RISCV64.csproj -c Release --no-build -o artifacts/package/release
+fi
 
 echo "Verifying HAL packages..."
 ls -la artifacts/package/release/Cosmos.Kernel.HAL.X64.*.nupkg
@@ -156,6 +182,18 @@ for proj in "${MULTIARCH_PROJECTS[@]}"; do
     cp "artifacts/bin/$proj/release_linux-arm64/$proj.dll" "artifacts/multiarch/$proj/arm64/" 2>/dev/null || \
     cp "artifacts/bin/$proj/release/$proj.dll" "artifacts/multiarch/$proj/arm64/" 2>/dev/null || true
 done
+
+if [[ "$COSMOS_RISCV64" == "1" ]]; then
+  echo "Building all multi-arch packages for riscv64..."
+  dotnet build src/Cosmos.Kernel/Cosmos.Kernel.csproj -c Release -r linux-riscv64 -p:CosmosArch=riscv64 --no-incremental
+
+  echo "Staging riscv64 builds..."
+  for proj in "${MULTIARCH_PROJECTS[@]}"; do
+      mkdir -p "artifacts/multiarch/$proj/riscv64"
+      cp "artifacts/bin/$proj/release_linux-riscv64/$proj.dll" "artifacts/multiarch/$proj/riscv64/" 2>/dev/null || \
+      cp "artifacts/bin/$proj/release/$proj.dll" "artifacts/multiarch/$proj/riscv64/" 2>/dev/null || true
+  done
+fi
 
 # No ref assembly needed - NuGet will select the correct RID-specific assembly
 echo "Multi-arch staging complete (no ref assembly - NuGet selects by RID)"

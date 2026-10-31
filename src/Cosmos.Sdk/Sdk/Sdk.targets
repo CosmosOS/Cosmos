@@ -117,6 +117,11 @@
     <PropertyGroup>
       <!-- Detect macOS host so we pick the correct ILCompiler host pack. -->
       <HostIsOsx Condition="'$(OS)' != 'Windows_NT' and Exists('/System/Library/CoreServices/SystemVersion.plist')">true</HostIsOsx>
+      <!-- The NativeAOT runtime pack whose framework assemblies ILC references.
+           No linux-riscv64 pack exists: riscv64 takes the linux-x64 one (see
+           Sdk.props) and its own System.Private.* assemblies, below. -->
+      <_CosmosNativeAotPackRid>$(RuntimeIdentifier)</_CosmosNativeAotPackRid>
+      <_CosmosNativeAotPackRid Condition="'$(CosmosTargetsRiscv64)' == 'true'">linux-x64</_CosmosNativeAotPackRid>
     </PropertyGroup>
     <ItemGroup>
       <!-- Prefer macOS host ILC packs when running on macOS -->
@@ -139,9 +144,9 @@
         <NuGetPackageId>runtime.$(RuntimeIdentifier).Microsoft.DotNet.ILCompiler</NuGetPackageId>
       </HostILCompilerPack>
 
-      <NAOTRuntimePack Include="Microsoft.NETCore.App.Runtime.NativeAOT.$(RuntimeIdentifier)">
+      <NAOTRuntimePack Include="Microsoft.NETCore.App.Runtime.NativeAOT.$(_CosmosNativeAotPackRid)">
         <NuGetPackageVersion>$(BundledNETCoreAppPackageVersion)</NuGetPackageVersion>
-        <NuGetPackageId>Microsoft.NETCore.App.Runtime.NativeAOT.$(RuntimeIdentifier)</NuGetPackageId>
+        <NuGetPackageId>Microsoft.NETCore.App.Runtime.NativeAOT.$(_CosmosNativeAotPackRid)</NuGetPackageId>
       </NAOTRuntimePack>
     </ItemGroup>
 
@@ -180,7 +185,7 @@
     <ItemGroup>
       <!-- find the runtime pack(s) that actually contain the native folder for this RID -->
       <ResolvedRuntimeNative Include="@(ResolvedRuntimePack)"
-                             Condition="Exists('%(ResolvedRuntimePack.PackageDirectory)/runtimes/$(RuntimeIdentifier)/native')" />
+                             Condition="Exists('%(ResolvedRuntimePack.PackageDirectory)/runtimes/$(_CosmosNativeAotPackRid)/native')" />
 
       <!-- If ResolvedRuntimeNative is empty, we'll fall back to the first ResolvedRuntimePack item -->
       <ResolvedRuntimeFallback Include="@(ResolvedRuntimePack)" Condition="@(ResolvedRuntimeNative->Count()) == 0" />
@@ -198,13 +203,17 @@
       <IlcRuntimePackagePath Condition="@(ResolvedRuntimeNative) != ''">%(ResolvedRuntimeNative.PackageDirectory)</IlcRuntimePackagePath>
       <IlcRuntimePackagePath Condition="@(ResolvedRuntimeNative) == '' and @(ResolvedRuntimeFallback) != ''">%(ResolvedRuntimeFallback.PackageDirectory)</IlcRuntimePackagePath>
 
-      <IlcSdkPath Condition="$(IlcRuntimePackagePath) != ''">$([MSBuild]::NormalizePath('$(IlcRuntimePackagePath)/runtimes/$(RuntimeIdentifier)/native/'))</IlcSdkPath>
-      <IlcFrameworkPath Condition="$(IlcRuntimePackagePath) != ''">$([MSBuild]::NormalizePath('$(IlcRuntimePackagePath)/runtimes/$(RuntimeIdentifier)/lib/net10.0/'))</IlcFrameworkPath>
+      <IlcSdkPath Condition="$(IlcRuntimePackagePath) != ''">$([MSBuild]::NormalizePath('$(IlcRuntimePackagePath)/runtimes/$(_CosmosNativeAotPackRid)/native/'))</IlcSdkPath>
+      <IlcFrameworkPath Condition="$(IlcRuntimePackagePath) != ''">$([MSBuild]::NormalizePath('$(IlcRuntimePackagePath)/runtimes/$(_CosmosNativeAotPackRid)/lib/net10.0/'))</IlcFrameworkPath>
+      <!-- riscv64: System.Private.CoreLib and its siblings are compiled per architecture -->
+      <IlcSdkPath Condition="'$(CosmosTargetsRiscv64)' == 'true'">$(CosmosIlcRiscv64AotSdkPath)</IlcSdkPath>
       <IlcToolsPath Condition="$(IlcHostPackagePath) != ''">$([MSBuild]::NormalizePath('$(IlcHostPackagePath)/tools/'))</IlcToolsPath>
       <IlcReferencePackagePath Condition="@(ResolvedReferencePack) != ''">%(ResolvedReferencePack.PackageDirectory)</IlcReferencePackagePath>
       <IlcFrameworkPath Condition="$(IlcFrameworkPath) == '' and $(IlcReferencePackagePath) != ''">$([MSBuild]::NormalizePath('$(IlcReferencePackagePath)/ref/net10.0/'))</IlcFrameworkPath>
     </PropertyGroup>
     <Message Importance="High" Text="⚙️ [ILC] Using ILCompiler from: $(IlcToolsPath)" />
+    <Error Condition="'$(CosmosTargetsRiscv64)' == 'true' AND !Exists('$(IlcSdkPath)System.Private.CoreLib.dll')"
+           Text="No riscv64 System.Private.CoreLib at '$(IlcSdkPath)'. The Cosmos.Build.Ilc.RISCV64 package provides it: restore with -r linux-riscv64 so the package is restored." />
     <Message Importance="High" Text="⚙️ [ILC] Using SDK Path: $(IlcSdkPath)" />
     <Message Importance="High" Text="⚙️ [ILC] Using Framework Path: $(IlcFrameworkPath)" />
   </Target>

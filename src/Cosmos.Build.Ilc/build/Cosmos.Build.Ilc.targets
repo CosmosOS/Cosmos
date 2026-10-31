@@ -47,6 +47,17 @@
     <Message Importance="High" Text="⚙️ [ILC] Using ILCompiler from: $(IlcToolsPath)"/>
   </Target>
 
+  <!-- The feature switches ILC compiles in: each RuntimeHostConfigurationOption
+       marked Trim="true" becomes a feature argument. PrepareForILLink, from the
+       trimming tooling, fills _TrimmerFeatureSettings when the build restores that
+       tooling; a riscv64 build does not (Cosmos.Sdk's Sdk.props says why), and the
+       items are made from the options here then. -->
+  <Target Name="CosmosResolveFeatureSettings">
+    <ItemGroup Condition="'@(_TrimmerFeatureSettings)' == ''">
+      <_TrimmerFeatureSettings Include="@(RuntimeHostConfigurationOption)" Condition="'%(RuntimeHostConfigurationOption.Trim)' == 'true'" />
+    </ItemGroup>
+  </Target>
+
   <!-- Writes the response file for ILC compilation. -->
   <Target Name="WriteIlcRsp" DependsOnTargets="$(IlcDependsOn)">
     <PropertyGroup>
@@ -105,6 +116,8 @@
       <IlcArg Include="@(RuntimeHostConfigurationOption->'--runtimeknob:%(Identity)=%(Value)')"/>
       <IlcArg Include="--runtimeknob:RUNTIME_IDENTIFIER=$(RuntimeIdentifier)"/>
       <IlcArg Include="--targetarch:$(CosmosArch)"/>
+      <!-- A JIT the host ILCompiler package lacks: the riscv64 cross JIT, from Cosmos.Build.Ilc.RISCV64 -->
+      <IlcArg Condition="'$(CosmosIlcJitPath)' != ''" Include="--jitpath:$(CosmosIlcJitPath)"/>
       <IlcArg Include="--targetos:linux"/>
       <IlcArg Include="--export-dynamic-symbol:g_compilerEmbeddedKnobsBlob"/> <!-- Required to implement 'RhGetKnobValues' -->
       <IlcArg Condition="$(ExportsFile) != ''" Include="--exportsfile:&quot;$(ExportsFile)&quot;"/>

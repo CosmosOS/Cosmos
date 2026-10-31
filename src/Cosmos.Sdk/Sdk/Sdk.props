@@ -21,6 +21,23 @@
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" Condition=" '$(_ImportMicrosoftNETSdkFromCosmosSdk)' == 'true' " />
 
+  <!-- RISC-V 64. Microsoft publishes no linux-riscv64 runtime packs on nuget.org:
+       not the runtime pack and apphost a self-contained build restores, nor the
+       NativeAOT runtime pack and the ILCompiler cross JIT Cosmos compiles with.
+       The SDK restores a RID's runtime pack whenever the build is self-contained
+       or uses the trimming tooling, so a riscv64 kernel is framework-dependent and
+       untrimmed as far as the SDK knows. ILC compiles it all the same: the cross
+       JIT and the riscv64 System.Private.* assemblies come from
+       Cosmos.Build.Ilc.RISCV64, built from the dotnet/runtime submodule, and
+       Cosmos.Build.Ilc turns the feature switches into feature arguments itself. -->
+  <PropertyGroup Condition="$(RuntimeIdentifier.EndsWith('-riscv64')) Or '$(CosmosArch)' == 'riscv64'">
+    <CosmosTargetsRiscv64>true</CosmosTargetsRiscv64>
+    <SelfContained>false</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+    <UseAppHost>false</UseAppHost>
+    <DisableTransitiveFrameworkReferenceDownloads>true</DisableTransitiveFrameworkReferenceDownloads>
+  </PropertyGroup>
+
   <!-- Default startup object for Cosmos kernels -->
   <PropertyGroup>
     <StartupObject Condition="'$(StartupObject)' == ''">Cosmos.Kernel.System.Internal.CosmosEntryPoint</StartupObject>
@@ -28,7 +45,11 @@
 
   <!-- ILC and build dependencies -->
   <PropertyGroup>
-    <IlcDependsOn>RunPatcher;InstrumentCoverage;$(IlcDependsOn);PrepareForILLink</IlcDependsOn>
+    <!-- PrepareForILLink turns the feature switches into the items ILC reads; it
+         comes with the trimming tooling, which a riscv64 build does not restore
+         (see above), and CosmosResolveFeatureSettings fills them in then. -->
+    <_CosmosPrepareForILLink Condition="'$(PublishTrimmed)' == 'true'">PrepareForILLink</_CosmosPrepareForILLink>
+    <IlcDependsOn>RunPatcher;InstrumentCoverage;$(IlcDependsOn);$(_CosmosPrepareForILLink);CosmosResolveFeatureSettings</IlcDependsOn>
     <LinkTargetDependsOn>CompileWithIlc;BuildAsm;BuildCC;$(LinkTargetDependsOn)</LinkTargetDependsOn>
   </PropertyGroup>
 
@@ -91,6 +112,7 @@
     <!-- Root architecture-specific HAL assemblies to ensure module initializers run -->
     <IlcArg Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_X64'))" Include="--root:Cosmos.Kernel.HAL.X64"/>
     <IlcArg Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_ARM64'))" Include="--root:Cosmos.Kernel.HAL.ARM64"/>
+    <IlcArg Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_RISCV64'))" Include="--root:Cosmos.Kernel.HAL.RISCV64"/>
   </ItemGroup>
 
   <!-- Plugs -->
@@ -111,7 +133,13 @@
   <ItemGroup>
     <PackageDownload Include="Microsoft.NETCore.App.Runtime.NativeAOT.$(RuntimeIdentifier)"
                      Version="[$(BundledNETCoreAppPackageVersion)]"
-                     Condition="'$(RuntimeIdentifier)' != ''" />
+                     Condition="'$(RuntimeIdentifier)' != '' AND '$(CosmosTargetsRiscv64)' != 'true'" />
+    <!-- riscv64: the framework assemblies come from the linux-x64 pack, whose IL is
+         the same for every Linux architecture (the packs differ by their signatures
+         only); the riscv64 System.Private.* assemblies come from Cosmos.Build.Ilc.RISCV64. -->
+    <PackageDownload Include="Microsoft.NETCore.App.Runtime.NativeAOT.linux-x64"
+                     Version="[$(BundledNETCoreAppPackageVersion)]"
+                     Condition="'$(CosmosTargetsRiscv64)' == 'true'" />
     <!-- ILC tool must match the host (build machine) architecture, not the target architecture, for cross-compilation support -->
     <PackageDownload Include="runtime.$(HostRuntimeIdentifier).Microsoft.DotNet.ILCompiler"
                      Version="[$(BundledNETCoreAppPackageVersion)]"
@@ -172,6 +200,7 @@
     <CosmosArch Condition="'$(CosmosArch)' == ''">x64</CosmosArch>
     <CosmosArch Condition="'$(CosmosArch)' == 'x86_64'">x64</CosmosArch>
     <CosmosArch Condition="'$(CosmosArch)' == 'aarch64'">arm64</CosmosArch>
+    <CosmosArch Condition="'$(CosmosArch)' == 'rv64'">riscv64</CosmosArch>
   </PropertyGroup>
 
   <!-- Architecture-specific kernel packages -->
@@ -183,6 +212,10 @@
     <PackageReference Include="Cosmos.Kernel.Core.ARM64" Version="@CosmosPackageVersion@" Condition="'$(CosmosArch)' == 'arm64'" />
     <PackageReference Include="Cosmos.Kernel.HAL.X64" Version="@CosmosPackageVersion@" Condition="'$(CosmosArch)' == 'x64'" />
     <PackageReference Include="Cosmos.Kernel.HAL.ARM64" Version="@CosmosPackageVersion@" Condition="'$(CosmosArch)' == 'arm64'" />
+    <PackageReference Include="Cosmos.Kernel.Native.RISCV64" Version="@CosmosPackageVersion@" Condition="'$(CosmosArch)' == 'riscv64'" />
+    <PackageReference Include="Cosmos.Kernel.Core.RISCV64" Version="@CosmosPackageVersion@" Condition="'$(CosmosArch)' == 'riscv64'" />
+    <PackageReference Include="Cosmos.Kernel.HAL.RISCV64" Version="@CosmosPackageVersion@" Condition="'$(CosmosArch)' == 'riscv64'" />
+    <PackageReference Include="Cosmos.Build.Ilc.RISCV64" Version="@CosmosPackageVersion@" Condition="'$(CosmosArch)' == 'riscv64'" />
   </ItemGroup>
   <ItemGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true'">
     <PackageReference Include="Cosmos.Kernel.Native.X64" Condition="'$(CosmosArch)' == 'x64'" />
@@ -192,5 +225,9 @@
     <PackageReference Include="Cosmos.Kernel.Core.ARM64" Condition="'$(CosmosArch)' == 'arm64'" />
     <PackageReference Include="Cosmos.Kernel.HAL.X64" Condition="'$(CosmosArch)' == 'x64'" />
     <PackageReference Include="Cosmos.Kernel.HAL.ARM64" Condition="'$(CosmosArch)' == 'arm64'" />
+    <PackageReference Include="Cosmos.Kernel.Native.RISCV64" Condition="'$(CosmosArch)' == 'riscv64'" />
+    <PackageReference Include="Cosmos.Kernel.Core.RISCV64" Condition="'$(CosmosArch)' == 'riscv64'" />
+    <PackageReference Include="Cosmos.Kernel.HAL.RISCV64" Condition="'$(CosmosArch)' == 'riscv64'" />
+    <PackageReference Include="Cosmos.Build.Ilc.RISCV64" Condition="'$(CosmosArch)' == 'riscv64'" />
   </ItemGroup>
 </Project>

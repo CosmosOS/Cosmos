@@ -406,6 +406,7 @@ main
 output
 output-x64/
 output-arm64/
+output-riscv64/
 uart-arm64.log
 test-results-*.xml
 
