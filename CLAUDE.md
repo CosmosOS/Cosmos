@@ -1,6 +1,6 @@
 # NativeAOT-Patcher (Cosmos Gen3)
 
-Bare-metal C# kernel framework using NativeAOT. Ports the Cosmos plug system to NativeAOT for building x64 and ARM64 OS kernels.
+Bare-metal C# kernel framework using NativeAOT. Ports the Cosmos plug system to NativeAOT for building x64 and ARM64 OS kernels, with experimental RISC-V 64 support.
 
 ## Setup
 
@@ -12,17 +12,20 @@ Requires .NET SDK 10.0.100+ (see `global.json`). First time or after `src/` chan
 
 This builds all packages in dependency order, installs global tools (`cosmos-patcher`, `cosmos`), and configures a local NuGet source at `artifacts/package/release/`.
 
+RISC-V 64 is opt-in (`COSMOS_RISCV64=1`, or `make setup ARCH=riscv64`): Microsoft publishes neither the riscv64 cross JIT nor the riscv64 NativeAOT CoreLib, so `.devcontainer/build-riscv64-toolchain.sh` builds both from the `dotnet/runtime` submodule (Linux x64 host only, long the first time) and `Cosmos.Build.Ilc.RISCV64` packs them. See [RISC-V 64](docs/articles/dev/riscv64.md).
+
 ## Makefile (development with DevKernel)
 
-Defaults: `ARCH=x64`, `TIMEOUT=30`, `KERNEL=HelloWorld`. Append `ARCH=arm64` to any target for ARM64.
+Defaults: `ARCH=x64`, `TIMEOUT=30`, `KERNEL=HelloWorld`. Append `ARCH=arm64` (or `ARCH=riscv64`) to any target for ARM64 (or RISC-V 64).
 
 ```bash
 make setup                          # Build all packages (.devcontainer/postCreateCommand.sh)
 make build                          # Build DevKernel ISO
 make run                            # Build + run in QEMU (x64 uses KVM)
-make clean                          # Remove output-x64/, output-arm64/, artifacts/
+make clean                          # Remove output-x64/, output-arm64/, output-riscv64/
 make test KERNEL=Memory             # Run a kernel test suite (HelloWorld, Memory, TypeCasting, Timer, Network, Runtime, Threading, Math, GarbageCollector, Graphic, Audio, Storage, Fat, File, Iso9660, ...)
 make test KERNEL=HelloWorld ARCH=arm64 TIMEOUT=90
+make test KERNEL=Memory ARCH=riscv64 TIMEOUT=240   # QEMU virt under TCG: slower than arm64
 ```
 
 Build pipeline: Source -> Patcher (IL method replacement via Mono.Cecil) -> ILC (AOT) -> GCC (linking) -> ISO (xorriso + Limine bootloader).
@@ -33,13 +36,15 @@ The full rules are in the [Coding Guidelines](docs/articles/dev/coding-guideline
 
 ## Architecture
 
-Dual-arch (x64/ARM64) with compile-time selection via `DefineConstants` and `RuntimeIdentifier`:
+Multi-arch (x64, ARM64, experimental RISC-V 64) with compile-time selection via `DefineConstants` and `RuntimeIdentifier`:
 
 - **Native x64**: `src/Cosmos.Kernel.Native.X64/` - YASM `.asm` files (Runtime, WriteBarriers, InterfaceDispatch, Interrupts, etc.)
 - **Native ARM64**: `src/Cosmos.Kernel.Native.ARM64/` - GAS `.s` files
+- **Native RISC-V 64**: `src/Cosmos.Kernel.Native.RISCV64/` - GAS `.s` files (RV64GC, LP64D; S-mode under OpenSBI)
 - **HAL x64**: `src/Cosmos.Kernel.HAL.X64/` (platform code only: the machine description, the line routing, the tick source, the firmware clock)
 - **HAL ARM64**: `src/Cosmos.Kernel.HAL.ARM64/` (platform code only: the machine description over ACPI, the device tree and the virt table, the line routing, the tick source, the firmware clock)
-- Multi-arch packages bundle both architectures; NuGet selects by RID at build time
+- **HAL RISC-V 64**: `src/Cosmos.Kernel.HAL.RISCV64/` (platform code only: the QEMU virt description over the device tree, the PLIC line routing, the SBI timer, the Goldfish clock); `src/Cosmos.Kernel.Core.RISCV64/` holds the SBI calls, the PLIC and the interrupt controller
+- Multi-arch packages bundle every architecture; NuGet selects by RID at build time
 
 ## Feature switches
 
