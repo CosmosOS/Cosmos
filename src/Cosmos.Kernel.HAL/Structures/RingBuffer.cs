@@ -5,7 +5,7 @@ using System.Collections;
 namespace Cosmos.Kernel.HAL.Structures;
 
 /// <summary>
-/// A fixed capacity circular buffer of <typeparamref name="T"/> values.
+///     A fixed capacity circular buffer of <typeparamref name="T" /> values.
 /// </summary>
 /// <typeparam name="T">The type of the buffered values.</typeparam>
 public class RingBuffer<T> : IEnumerable<T>
@@ -15,7 +15,7 @@ public class RingBuffer<T> : IEnumerable<T>
     private int _tail;
 
     /// <summary>
-    /// Creates a ring buffer able to hold up to <paramref name="capacity"/> values.
+    ///     Creates a ring buffer able to hold up to <paramref name="capacity" /> values.
     /// </summary>
     /// <param name="capacity">The maximum number of values the buffer can hold.</param>
     public RingBuffer(ulong capacity)
@@ -24,7 +24,26 @@ public class RingBuffer<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Appends an item to the buffer, overwriting the oldest item when the buffer is full.
+    ///     Gets the number of items currently buffered.
+    /// </summary>
+    public int Count { get; private set; }
+
+    /// <summary>
+    ///     Drains the buffer, yielding each buffered item and removing it as it is returned.
+    /// </summary>
+    /// <returns>An enumerator over the buffered items, leaving the buffer empty.</returns>
+    public IEnumerator<T> GetEnumerator()
+    {
+        return new Enumerator(this);
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    /// <summary>
+    ///     Appends an item to the buffer, overwriting the oldest item when the buffer is full.
     /// </summary>
     /// <param name="item">The item to append.</param>
     public void Push(T item)
@@ -38,10 +57,10 @@ public class RingBuffer<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Removes the oldest item from the buffer.
+    ///     Removes the oldest item from the buffer.
     /// </summary>
     /// <param name="item">The removed item, or the default value when the buffer is empty.</param>
-    /// <returns><see langword="true"/> if an item; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> if an item; otherwise <see langword="false" />.</returns>
     public bool Pop(out T? item)
     {
         if (Count == 0)
@@ -57,10 +76,10 @@ public class RingBuffer<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Read the oldest item from the buffer.
+    ///     Read the oldest item from the buffer.
     /// </summary>
     /// <param name="item">The item, or the default value when the buffer is empty.</param>
-    /// <returns><see langword="true"/> if an item; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> if an item; otherwise <see langword="false" />.</returns>
     public bool Peek(out T? item)
     {
         if (Count == 0)
@@ -74,7 +93,7 @@ public class RingBuffer<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Discards every buffered item.
+    ///     Discards every buffered item.
     /// </summary>
     public void Clear()
     {
@@ -84,25 +103,43 @@ public class RingBuffer<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Gets the number of items currently buffered.
+    ///     Enumerator for <see cref="RingBuffer{T}" />.
     /// </summary>
-    public int Count { get; private set; }
-
-    /// <summary>
-    /// Drains the buffer, yielding each buffered item and removing it as it is returned.
-    /// </summary>
-    /// <returns>An enumerator over the buffered items, leaving the buffer empty.</returns>
-    public IEnumerator<T> GetEnumerator()
+    public struct Enumerator : IEnumerator<T>
     {
-        while (Pop(out T? item))
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Enumerator" /> struct.
+        /// </summary>
+        /// <param name="buffer">The list to enumerate.</param>
+        public Enumerator(RingBuffer<T> buffer)
         {
-            yield return item!;
+            _buffer = buffer;
+        }
+
+        private readonly RingBuffer<T> _buffer;
+        private T _current;
+        /// <inheritdoc />
+        public bool MoveNext()
+        {
+            return _buffer.Pop(out _current);
+
+        }
+
+        /// <inheritdoc />
+        public readonly T Current => _current;
+
+        /// <inheritdoc />
+        public void Reset()
+        {
+        }
+
+        readonly T IEnumerator<T>.Current => _current;
+
+        readonly object? IEnumerator.Current => _current;
+
+        /// <inheritdoc />
+        public readonly void Dispose()
+        {
         }
     }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
 }
