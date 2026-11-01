@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Core.Bridge;
 internal static unsafe class LimineNative
 {
     /// <summary>
-    /// Wrapper to expose Limine RSDP address to C bootstrap for LAI ACPI initialization
+    /// Wrapper to expose Limine RSDP address to C bootstrap for ACPI (uACPI) initialization
     /// </summary>
     [UnmanagedCallersOnly(EntryPoint = "__get_limine_rsdp_address")]
     public static void* GetRsdpAddress()
