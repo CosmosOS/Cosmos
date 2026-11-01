@@ -18,7 +18,9 @@
     combine, and arch-filtered ones drop out on the wrong arch). For this
     suite that means: x64 = 6 profiles x {bare, acpi-off} = 12 cells;
     arm64 = 7 profiles x {bare, gicv2, gicv3, acpi-off, gicv2+acpi-off,
-    gicv3+acpi-off} = 42 cells. Budget CI timeouts accordingly. The three
+    gicv3+acpi-off} = 42 cells; riscv64 = 7 profiles x {bare} = 7 cells
+    (its virt machine always runs with acpi=off, so acpi-off does not apply
+    there). Budget CI timeouts accordingly. The three
     usb profiles are the same stick on each shipped host controller: the
     xHCI, a usb-ehci and a pci-ohci.
   -->

@@ -394,8 +394,11 @@
       // so there is no MADT and no I/O APIC: PCI enumerates over the port
       // mechanism, the Local APIC comes up from IA32_APIC_BASE and routes
       // MSI messages, and every line source is refused, so the 8042 and any
-      // INTx-only function poll.
+      // INTx-only function poll. riscv64 is left out: QemuLauncher always
+      // starts its virt machine with acpi=off, so the modifier would only
+      // run the bare cell a second time.
       "name": "acpi-off",
+      "architectures": ["x64", "arm64"],
       "machineOptions": { "acpi": "off" }
     }
   ]

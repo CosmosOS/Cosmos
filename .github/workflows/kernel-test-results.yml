@@ -43,12 +43,19 @@ jobs:
           path: results-arm64/
         continue-on-error: true
 
+      - name: 📥 Download riscv64 Results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results-${{ inputs.suite_id }}-riscv64
+          path: results-riscv64/
+        continue-on-error: true
+
       - name: 📊 Parse Test Results
         id: parse
         run: |
-          # Render a mirrored x64-vs-arm64 view. Testcase names carry a leading
+          # Render the architectures side by side. Testcase names carry a leading
           # [profile] prefix (the QEMU profile-matrix cell); bucket by it so each
-          # cell becomes one row with x64 and arm64 side by side. Suites with no
+          # cell becomes one row with one column per architecture. Suites with no
           # profiles collapse to a single _all_ row. Also collect skip reasons
           # and failures so the comment says what ran, what was skipped and why,
           # and what failed. NOTE: the output is embedded in a JS template
@@ -58,7 +65,7 @@ jobs:
           from collections import Counter
 
           PROF_RE = re.compile(r'^\[([^\]]+)\]\s+')
-          ARCHES = ('x64', 'arm64')
+          ARCHES = ('x64', 'arm64', 'riscv64')
 
           def parse(path):
               if not os.path.exists(path):
@@ -130,12 +137,12 @@ jobs:
                   names.update(d['cells'].keys())
           ordered = (['_all_'] if '_all_' in names else []) + sorted(n for n in names if n != '_all_')
 
-          lines = ['| Cell | x64 | arm64 |', '|---|---|---|']
+          lines = ['| Cell | ' + ' | '.join(ARCHES) + ' |', '|---' * (len(ARCHES) + 1) + '|']
           if not ordered:
-              lines.append('| _all_ | ⚠️ No results | ⚠️ No results |')
+              lines.append('| _all_ | ' + ' | '.join('⚠️ No results' for _ in ARCHES) + ' |')
           for name in ordered:
               cols = [cell_text(data[a]['cells'].get(name)) if data[a] else '⚠️ No results' for a in ARCHES]
-              lines.append(f"| {name} | {cols[0]} | {cols[1]} |")
+              lines.append(f"| {name} | " + ' | '.join(cols) + ' |')
 
           skip_lines = []
           for arch in ARCHES:
@@ -219,6 +226,7 @@ jobs:
               '|--------------|--------------|----------|------------|',
               `| x64 | [XML](${getArtifactUrl('test-results-' + suiteId + '-x64')}) | [Log](${getArtifactUrl('uart-log-' + suiteId + '-x64')}) | [ISO](${getArtifactUrl(suiteName + '-Test-ISO-x64')}) |`,
               `| arm64 | [XML](${getArtifactUrl('test-results-' + suiteId + '-arm64')}) | [Log](${getArtifactUrl('uart-log-' + suiteId + '-arm64')}) | [ISO](${getArtifactUrl(suiteName + '-Test-ISO-arm64')}) |`,
+              `| riscv64 | [XML](${getArtifactUrl('test-results-' + suiteId + '-riscv64')}) | [Log](${getArtifactUrl('uart-log-' + suiteId + '-riscv64')}) | [ISO](${getArtifactUrl(suiteName + '-Test-ISO-riscv64')}) |`,
               '',
               `📋 [View full test summary](https://github.com/${repo}/actions/runs/${runId}) | 📄 [Kernel.cs](${kernelSrcUrl})`
             ].join('\n');
