@@ -63,8 +63,8 @@ Every kernel suite runs on QEMU 8.2's virt machine under TCG through `make test 
 | Suite | Passed / total | Suite | Passed / total |
 |---|---|---|---|
 | HelloWorld | 3 / 3 | Pci | 8 / 8 |
-| Runtime | 107 / 107 | Virtio | 48 / 56 |
-| TypeCasting | 26 / 26 | Storage | 731 / 840 |
+| Runtime | 107 / 107 | Virtio | 24 / 28 |
+| TypeCasting | 26 / 26 | Storage | 510 / 588 |
 | Memory | 74 / 74 | Fat | 42 / 42 |
 | GarbageCollector | 96 / 96 | File | 39 / 39 |
 | Math | 30 / 30 | Iso9660 | 47 / 51 |
@@ -76,11 +76,21 @@ Every kernel suite runs on QEMU 8.2's virt machine under TCG through `make test 
 
 The DevKernel boots to its shell on the ramfb display, takes keys from a virtio keyboard and runs Lua.
 
+The `acpi-off` test modifier does not apply to riscv64: the launcher always starts its virt machine with ACPI off, so the modifier would only run the bare cell a second time.
+
+## CI
+
+Kernel Tests run every suite on riscv64 next to x64 and arm64, and a suite's results comment has a riscv64 column. The setup job builds the packages with `COSMOS_RISCV64=1`. It caches the toolchain build's outputs on the `dotnet/runtime` commit and on `build-riscv64-toolchain.sh`, so the cross JIT is built once per runtime bump and the script skips the build on every other run. A riscv64 leg takes a suite's arm64 QEMU timeout unless the suite passes `timeout_riscv64`, since both run under TCG at about the same speed.
+
+The tools release does not carry `qemu-system-riscv64` until `build-tools.yml` runs again with the riscv64 target. Until then, a riscv64 leg installs Ubuntu's QEMU 8.2: `qemu-system-misc` (with OpenSBI and the virtio-gpu module through its dependencies), `qemu-efi-riscv64` for the EDK2 image and `ipxe-qemu` for the network cards' option ROMs. The leg uses the bundle by itself once the bundle has both the binary and `edk2-riscv-code.fd`.
+
+The .NET Tests workflow builds the DevKernel ISO for riscv64 in `linux-iso-tests`, beside the Windows and macOS ISO builds for x64 and arm64, since the toolchain builds on a Linux x64 host only. Kernel Coverage runs riscv64 as well, and its report leaves the other architectures' HALs out of the riscv64 figures.
+
 ## What is missing
 
 - One hart: the kernel starts no secondary hart, and the PLIC context is hart 0's S-mode context.
 - No PCI interrupts: the virt machine delivers MSIs through the AIA's IMSIC, which the kernel does not drive yet, and the PCI host's INTx lines are not routed to the PLIC either, so PCI drivers run polled. virtio-mmio devices take their PLIC line.
 - No port I/O, as on ARM64: the port accessors read 0 and drop writes.
-- The toolchain builds on a Linux x64 host only, and CI does not run the riscv64 suites yet.
+- The toolchain builds on a Linux x64 host only.
 - A kernel cannot reference an AOT-compatible library project (`IsAotCompatible`): built with the kernel's RID, such a project restores the linux-riscv64 runtime pack, which nuget.org does not have. Its package works, since a package is IL only; this is why the DevKernel takes the FTP, Telnet and Lua packages on riscv64 even next to clones of those repositories.
 - The kernel template's getting-started text and VS Code tasks cover x64 and ARM64 only. The project it creates picks its architecture from the RID, so it builds for riscv64 with `cosmos build -a riscv64` once the riscv64 packages are set up.

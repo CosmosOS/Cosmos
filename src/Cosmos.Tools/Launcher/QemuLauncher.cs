@@ -657,8 +657,8 @@ public static class QemuLauncher
     /// Emits the RISC-V virt machine with ACPI off, its CPU and memory, EDK2
     /// from pflash over QEMU's default M-mode firmware (OpenSBI), the ISO
     /// behind a virtio-scsi controller as on arm64, <c>ramfb</c>, the disks and
-    /// the USB keyboard and mouse. ACPI is off because Limine refuses to boot
-    /// when the ACPI RHCT table describes no MMU, which QEMU 8.2's does not;
+    /// the USB keyboard and mouse. ACPI is off because with it on the boot does
+    /// not reach the kernel on QEMU 8.2 (the cause is not tracked down yet);
     /// the kernel reads the machine from the device tree either way.
     /// </summary>
     /// <param name="args">The command line being built.</param>
