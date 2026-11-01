@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Tests.Memory;
 public unsafe class Kernel : Sys.Kernel
 {
     /// <summary>Number of test cases registered with the TestRunner in BeforeRun.</summary>
-    private const int ExpectedTestCount = 74;
+    private const int ExpectedTestCount = 77;
 
     /// <summary>Expected argv length: argv[0] ("cosmos") plus the 3 args passed by limine.conf.</summary>
     private const int ExpectedArgvLength = 4;
@@ -61,6 +61,15 @@ public unsafe class Kernel : Sys.Kernel
 
     /// <summary>Large SIMD test length with an 8-byte unaligned tail.</summary>
     private const int CopyLength264Bytes = 264;
+
+    /// <summary>MemCmp test length: one 8-byte block plus a 5-byte tail.</summary>
+    private const int CompareLength13Bytes = 13;
+
+    /// <summary>Index of the byte the MemCmp tail test changes: the last one, past every whole 4- and 8-byte word.</summary>
+    private const int CompareTailIndex = 12;
+
+    /// <summary>Index of the first differing byte in the MemCmp sign test, inside the 8-byte block.</summary>
+    private const int CompareFirstDiffIndex = 2;
 
     /// <summary>Mask that truncates an index to a byte value when building fill patterns.</summary>
     private const int ByteValueMask = 0xFF;
@@ -168,6 +177,9 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("MemCopy_0Bytes", TestMemCopy0Bytes);
         TR.Run("MemCopy_1Byte", TestMemCopy1Byte);
         TR.Run("MemMove_Overlap_DestBeforeSrc", TestMemMoveOverlapDestBeforeSrc);
+        TR.Run("MemCmp_EqualBuffers", TestMemCmpEqualBuffers);
+        TR.Run("MemCmp_DifferenceInTail", TestMemCmpDifferenceInTail);
+        TR.Run("MemCmp_SignFollowsFirstUnsignedByte", TestMemCmpSignFollowsFirstUnsignedByte);
 
         // Per-thread allocation accounting (TLAB)
         TR.Run("Memory_ThreadAllocBytesPositive", TestThreadAllocBytesPositive);
@@ -1131,6 +1143,50 @@ public unsafe class Kernel : Sys.Kernel
             }
         }
         Assert.True(passed, "MemMove: overlapping regions (dest < src)");
+    }
+
+    private static void FillComparePair(byte* a, byte* b)
+    {
+        for (int i = 0; i < CompareLength13Bytes; i++)
+        {
+            a[i] = (byte)(i + 1);
+            b[i] = (byte)(i + 1);
+        }
+    }
+
+    private static void TestMemCmpEqualBuffers()
+    {
+        byte* a = stackalloc byte[CompareLength13Bytes];
+        byte* b = stackalloc byte[CompareLength13Bytes];
+        FillComparePair(a, b);
+        Assert.True(MemoryOp.MemCmp(a, b, CompareLength13Bytes) == 0, "MemCmp: equal buffers compare to 0");
+        Assert.True(MemoryOp.MemCmp(a, b, 0) == 0, "MemCmp: 0 bytes compare to 0");
+    }
+
+    private static void TestMemCmpDifferenceInTail()
+    {
+        byte* a = stackalloc byte[CompareLength13Bytes];
+        byte* b = stackalloc byte[CompareLength13Bytes];
+        FillComparePair(a, b);
+        b[CompareTailIndex]++;
+        Assert.True(MemoryOp.MemCmp(a, b, CompareLength13Bytes) < 0, "MemCmp: a difference past the last 8-byte block counts");
+        Assert.True(MemoryOp.MemCmp(a, b, CompareTailIndex) == 0, "MemCmp: bytes past count are ignored");
+    }
+
+    private static void TestMemCmpSignFollowsFirstUnsignedByte()
+    {
+        byte* a = stackalloc byte[CompareLength13Bytes];
+        byte* b = stackalloc byte[CompareLength13Bytes];
+        FillComparePair(a, b);
+
+        // The first difference decides, even when a later byte differs the other way
+        // (a numeric compare of little-endian words would let the later byte win).
+        a[CompareFirstDiffIndex] = 0x80;
+        b[CompareFirstDiffIndex] = 0x01;
+        a[CompareFirstDiffIndex + 1] = 0x00;
+        b[CompareFirstDiffIndex + 1] = 0xFF;
+        Assert.True(MemoryOp.MemCmp(a, b, CompareLength13Bytes) > 0, "MemCmp: 0x80 sorts after 0x01 (unsigned bytes)");
+        Assert.True(MemoryOp.MemCmp(b, a, CompareLength13Bytes) < 0, "MemCmp: swapping the operands flips the sign");
     }
 
     // ==================== Array.Copy Tests ====================
