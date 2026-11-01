@@ -25,6 +25,17 @@ extern void __cosmos_heap_free(void* ptr);
 extern void __cosmos_serial_write(const char* message);
 extern uint64_t __cosmos_get_nanoseconds(void);
 
+// Cosmos.Kernel.Native.X64 / ARM64 (CPU/CpuOps.s, IO/PortIO.s). The port
+// functions are stubs on ARM64, which has no port space.
+extern uint64_t _native_cpu_save_irq_and_disable(void);
+extern void _native_cpu_restore_irq(uint64_t state);
+extern uint8_t _native_io_read_byte(uint16_t port);
+extern uint16_t _native_io_read_word(uint16_t port);
+extern uint32_t _native_io_read_dword(uint16_t port);
+extern void _native_io_write_byte(uint16_t port, uint8_t value);
+extern void _native_io_write_word(uint16_t port, uint16_t value);
+extern void _native_io_write_dword(uint16_t port, uint32_t value);
+
 // acpi_wrapper.c: the ECAM window the MCFG describes, if any.
 extern int cosmos_acpi_ecam_lookup(uint16_t segment, uint8_t bus, uint64_t* out_base);
 
@@ -155,41 +166,14 @@ void uacpi_kernel_sleep(uacpi_u64 msec)
 // Interrupt state
 // ============================================================================
 
-static inline uacpi_interrupt_state arch_save_and_disable_interrupts(void)
-{
-#ifdef __aarch64__
-    unsigned long daif;
-    __asm__ volatile("mrs %0, daif" : "=r"(daif));
-    __asm__ volatile("msr daifset, #3" ::: "memory");
-    return daif;
-#else
-    unsigned long flags = (unsigned long)__builtin_ia32_readeflags_u64();
-    __asm__ volatile("cli" ::: "memory");
-    return flags;
-#endif
-}
-
-static inline void arch_restore_interrupts(uacpi_interrupt_state state)
-{
-#ifdef __aarch64__
-    __asm__ volatile("msr daif, %0" : : "r"(state) : "memory");
-#else
-    // RFLAGS.IF
-    if (state & (1ul << 9))
-    {
-        __asm__ volatile("sti" ::: "memory");
-    }
-#endif
-}
-
 uacpi_interrupt_state uacpi_kernel_disable_interrupts(void)
 {
-    return arch_save_and_disable_interrupts();
+    return _native_cpu_save_irq_and_disable();
 }
 
 void uacpi_kernel_restore_interrupts(uacpi_interrupt_state state)
 {
-    arch_restore_interrupts(state);
+    _native_cpu_restore_irq(state);
 }
 
 // ============================================================================
@@ -292,7 +276,7 @@ void uacpi_kernel_free_spinlock(uacpi_handle handle)
 uacpi_cpu_flags uacpi_kernel_lock_spinlock(uacpi_handle handle)
 {
     cosmos_spinlock* lock = (cosmos_spinlock*)handle;
-    uacpi_cpu_flags flags = arch_save_and_disable_interrupts();
+    uacpi_cpu_flags flags = _native_cpu_save_irq_and_disable();
     while (__atomic_exchange_n(&lock->locked, 1, __ATOMIC_ACQUIRE) != 0)
     {
         cpu_relax();
@@ -304,7 +288,7 @@ void uacpi_kernel_unlock_spinlock(uacpi_handle handle, uacpi_cpu_flags flags)
 {
     cosmos_spinlock* lock = (cosmos_spinlock*)handle;
     __atomic_store_n(&lock->locked, 0, __ATOMIC_RELEASE);
-    arch_restore_interrupts(flags);
+    _native_cpu_restore_irq(flags);
 }
 
 // ============================================================================
@@ -375,56 +359,26 @@ uacpi_status uacpi_kernel_wait_for_work_completion(void)
 }
 
 // ============================================================================
-// Port I/O (x86 only)
+// Port I/O
 // ============================================================================
 
-#ifdef ARCH_X64
-
-static inline void port_out8(uint16_t port, uint8_t value)
-{
-    __asm__ volatile("outb %0, %1" : : "a"(value), "Nd"(port));
-}
-
-static inline void port_out16(uint16_t port, uint16_t value)
-{
-    __asm__ volatile("outw %0, %1" : : "a"(value), "Nd"(port));
-}
-
-static inline void port_out32(uint16_t port, uint32_t value)
-{
-    __asm__ volatile("outl %0, %1" : : "a"(value), "Nd"(port));
-}
-
-static inline uint8_t port_in8(uint16_t port)
-{
-    uint8_t value;
-    __asm__ volatile("inb %1, %0" : "=a"(value) : "Nd"(port));
-    return value;
-}
-
-static inline uint16_t port_in16(uint16_t port)
-{
-    uint16_t value;
-    __asm__ volatile("inw %1, %0" : "=a"(value) : "Nd"(port));
-    return value;
-}
-
-static inline uint32_t port_in32(uint16_t port)
-{
-    uint32_t value;
-    __asm__ volatile("inl %1, %0" : "=a"(value) : "Nd"(port));
-    return value;
-}
-
-// The handle is the base port itself.
+// The handle is the base port itself. ARM64 has no port space: mapping fails,
+// so the accessors below are never reached there.
 uacpi_status uacpi_kernel_io_map(uacpi_io_addr base, uacpi_size len, uacpi_handle* out_handle)
 {
+#ifdef ARCH_X64
     if (base > 0xFFFF || len > 0x10000 - base)
     {
         return UACPI_STATUS_INVALID_ARGUMENT;
     }
     *out_handle = (uacpi_handle)(uintptr_t)base;
     return UACPI_STATUS_OK;
+#else
+    (void)base;
+    (void)len;
+    (void)out_handle;
+    return UACPI_STATUS_UNIMPLEMENTED;
+#endif
 }
 
 void uacpi_kernel_io_unmap(uacpi_handle handle)
@@ -436,105 +390,39 @@ void uacpi_kernel_io_unmap(uacpi_handle handle)
 
 uacpi_status uacpi_kernel_io_read8(uacpi_handle handle, uacpi_size offset, uacpi_u8* out_value)
 {
-    *out_value = port_in8(IO_PORT(handle, offset));
+    *out_value = _native_io_read_byte(IO_PORT(handle, offset));
     return UACPI_STATUS_OK;
 }
 
 uacpi_status uacpi_kernel_io_read16(uacpi_handle handle, uacpi_size offset, uacpi_u16* out_value)
 {
-    *out_value = port_in16(IO_PORT(handle, offset));
+    *out_value = _native_io_read_word(IO_PORT(handle, offset));
     return UACPI_STATUS_OK;
 }
 
 uacpi_status uacpi_kernel_io_read32(uacpi_handle handle, uacpi_size offset, uacpi_u32* out_value)
 {
-    *out_value = port_in32(IO_PORT(handle, offset));
+    *out_value = _native_io_read_dword(IO_PORT(handle, offset));
     return UACPI_STATUS_OK;
 }
 
 uacpi_status uacpi_kernel_io_write8(uacpi_handle handle, uacpi_size offset, uacpi_u8 in_value)
 {
-    port_out8(IO_PORT(handle, offset), in_value);
+    _native_io_write_byte(IO_PORT(handle, offset), in_value);
     return UACPI_STATUS_OK;
 }
 
 uacpi_status uacpi_kernel_io_write16(uacpi_handle handle, uacpi_size offset, uacpi_u16 in_value)
 {
-    port_out16(IO_PORT(handle, offset), in_value);
+    _native_io_write_word(IO_PORT(handle, offset), in_value);
     return UACPI_STATUS_OK;
 }
 
 uacpi_status uacpi_kernel_io_write32(uacpi_handle handle, uacpi_size offset, uacpi_u32 in_value)
 {
-    port_out32(IO_PORT(handle, offset), in_value);
+    _native_io_write_dword(IO_PORT(handle, offset), in_value);
     return UACPI_STATUS_OK;
 }
-
-#else // !ARCH_X64
-
-// ARM64 has no port I/O space.
-uacpi_status uacpi_kernel_io_map(uacpi_io_addr base, uacpi_size len, uacpi_handle* out_handle)
-{
-    (void)base;
-    (void)len;
-    (void)out_handle;
-    return UACPI_STATUS_UNIMPLEMENTED;
-}
-
-void uacpi_kernel_io_unmap(uacpi_handle handle)
-{
-    (void)handle;
-}
-
-uacpi_status uacpi_kernel_io_read8(uacpi_handle handle, uacpi_size offset, uacpi_u8* out_value)
-{
-    (void)handle;
-    (void)offset;
-    (void)out_value;
-    return UACPI_STATUS_UNIMPLEMENTED;
-}
-
-uacpi_status uacpi_kernel_io_read16(uacpi_handle handle, uacpi_size offset, uacpi_u16* out_value)
-{
-    (void)handle;
-    (void)offset;
-    (void)out_value;
-    return UACPI_STATUS_UNIMPLEMENTED;
-}
-
-uacpi_status uacpi_kernel_io_read32(uacpi_handle handle, uacpi_size offset, uacpi_u32* out_value)
-{
-    (void)handle;
-    (void)offset;
-    (void)out_value;
-    return UACPI_STATUS_UNIMPLEMENTED;
-}
-
-uacpi_status uacpi_kernel_io_write8(uacpi_handle handle, uacpi_size offset, uacpi_u8 in_value)
-{
-    (void)handle;
-    (void)offset;
-    (void)in_value;
-    return UACPI_STATUS_UNIMPLEMENTED;
-}
-
-uacpi_status uacpi_kernel_io_write16(uacpi_handle handle, uacpi_size offset, uacpi_u16 in_value)
-{
-    (void)handle;
-    (void)offset;
-    (void)in_value;
-    return UACPI_STATUS_UNIMPLEMENTED;
-}
-
-uacpi_status uacpi_kernel_io_write32(uacpi_handle handle, uacpi_size offset, uacpi_u32 in_value)
-{
-    (void)handle;
-    (void)offset;
-    (void)in_value;
-    return UACPI_STATUS_UNIMPLEMENTED;
-}
-
-#endif // ARCH_X64
 
 // ============================================================================
 // PCI configuration space
@@ -606,7 +494,7 @@ static uint16_t pci_select(const cosmos_pci_device* device, uacpi_size offset)
         | ((uint32_t)(device->address.device & 0x1F) << 11)
         | ((uint32_t)(device->address.function & 0x07) << 8)
         | ((uint32_t)offset & 0xFC);
-    port_out32(PCI_CONFIG_ADDRESS, address);
+    _native_io_write_dword(PCI_CONFIG_ADDRESS, address);
     return (uint16_t)(PCI_CONFIG_DATA + (offset & 3));
 }
 
@@ -619,6 +507,7 @@ static int pci_use_ecam(const cosmos_pci_device* device, uacpi_size offset)
 #ifdef ARCH_X64
     return offset >= 0x100 && device->ecam != 0;
 #else
+    (void)offset;
     return device->ecam != 0;
 #endif
 }
@@ -675,19 +564,25 @@ static uacpi_status pci_check_offset(const cosmos_pci_device* device, uacpi_size
     }
 
 #ifdef ARCH_X64
+#define PCI_PORT_READ8 _native_io_read_byte
+#define PCI_PORT_READ16 _native_io_read_word
+#define PCI_PORT_READ32 _native_io_read_dword
+#define PCI_PORT_WRITE8 _native_io_write_byte
+#define PCI_PORT_WRITE16 _native_io_write_word
+#define PCI_PORT_WRITE32 _native_io_write_dword
 #define PCI_LEGACY_READ(bits, type)                                                     \
     do                                                                                  \
     {                                                                                   \
-        uacpi_interrupt_state state = arch_save_and_disable_interrupts();               \
-        *value = port_in##bits(pci_select(device, offset));                             \
-        arch_restore_interrupts(state);                                                 \
+        uacpi_interrupt_state state = _native_cpu_save_irq_and_disable();               \
+        *value = PCI_PORT_READ##bits(pci_select(device, offset));                       \
+        _native_cpu_restore_irq(state);                                                 \
     } while (0)
 #define PCI_LEGACY_WRITE(bits, type)                                                    \
     do                                                                                  \
     {                                                                                   \
-        uacpi_interrupt_state state = arch_save_and_disable_interrupts();               \
-        port_out##bits(pci_select(device, offset), value);                              \
-        arch_restore_interrupts(state);                                                 \
+        uacpi_interrupt_state state = _native_cpu_save_irq_and_disable();               \
+        PCI_PORT_WRITE##bits(pci_select(device, offset), value);                        \
+        _native_cpu_restore_irq(state);                                                 \
     } while (0)
 #else
 // Unreachable: pci_device_open never hands out a device on ARM64.
