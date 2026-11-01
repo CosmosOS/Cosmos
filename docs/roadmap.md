@@ -3,7 +3,7 @@
 | Feature | Gen2 | Gen3 | Notes |
 |---------|------|-------------|-------|
 | Low level assembly access | ✅ | ✅ | Before X# now x64 NASM + ARM64 GAS assembly. |
-| ACPI | ✅ | ✅ | LAI (Lightweight ACPI Implementation) via C interop.  |
+| ACPI | ✅ | ✅ | [uACPI](https://github.com/uACPI/uACPI) via C interop: the tables on both architectures, its AML interpreter for power-off and reset on x64.  |
 | Interrupt Handling | ✅  | ✅  | x64: APIC (Local + I/O). ARM64: GIC. |
 | Memory Management | ✅ | ✅ ||
 | Driver support | ✅ | ✅ | PCI and MMIO over the driver kit; the platform bus seeded from ACPI, the device tree (ARM64) or the machine's table; PCI Express hot-plug on root ports |

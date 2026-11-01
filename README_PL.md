@@ -32,7 +32,7 @@ Cosmos gen2 kompilował IL C# do asemblera x86 przy pomocy **IL2CPU**, czyli wł
 - [Scheduler typu stride z priorytetami](https://cosmosos.github.io/articles/dev/scheduler.html)
 - Obsługa wyjątków
 - Przerwania (APIC w x64, GIC w ARM64)
-- ACPI (za pomocą [LAI](https://github.com/managarm/lai))
+- ACPI (za pomocą [uACPI](https://github.com/uACPI/uACPI))
 - Sterowniki PCI oraz MMIO
 - Port szeregowy UART
 - [Podsystem graficzny Cosmos](https://cosmosos.github.io/articles/user/graphics.html)

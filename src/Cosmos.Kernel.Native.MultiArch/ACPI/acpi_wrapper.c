@@ -1,14 +1,18 @@
 // ACPI wrapper for Cosmos OS (Multi-Architecture)
-// Shared RSDP/XSDT/RSDT walking code using LAI struct typedefs.
+// Finds the tables through uACPI's table API (early table access from kmain)
+// and keeps what the kernel reads from them:
 // x86: parses MADT for Local APIC / IO APIC / ISOs
 // ARM64: parses MADT for GICD / GICR / GICC entries
+// Both: MCFG (PCI ECAM), ARM64 also IORT.
+// x86 power-off and reset go through uACPI's AML interpreter.
 
 #include <stdint.h>
 #include <stddef.h>
 
-#include <lai/core.h>
-#include <lai/helpers/pm.h>
-#include <acpispec/tables.h>
+#include <uacpi/uacpi.h>
+#include <uacpi/tables.h>
+#include <uacpi/acpi.h>
+#include <uacpi/sleep.h>
 
 #define NULL_PTR ((void*)0)
 
@@ -19,9 +23,8 @@ extern void __cosmos_serial_write_hex_u64(uint64_t value);
 extern void __cosmos_serial_write_dec_u32(uint32_t value);
 extern void __cosmos_serial_write_dec_u64(uint64_t value);
 
-// Cosmos support
-extern void cosmos_acpi_set_rsdp(void* rsdp);
-extern void* cosmos_acpi_get_rsdp(void);
+// uacpi_host.c
+extern void cosmos_uacpi_set_boot_info(void* rsdp_address, uint64_t hhdm_offset);
 
 // ============================================================================
 // ARM64 GIC structures (MADT subtable types 0x0B-0x0F)
@@ -117,90 +120,32 @@ static acpi_mcfg_info_t g_mcfg_info;
 // ============================================================================
 
 static uint8_t g_initialized = 0;
-static uint64_t g_hhdm_offset = 0;
 
-// Physical-to-virtual address translation via Limine HHDM
-// ACPI tables store physical addresses; the kernel accesses memory via HHDM.
-static inline void* phys_to_virt(uint64_t phys) {
-    if (phys == 0) return NULL_PTR;
-    // If address already looks virtual (high bit set), don't translate
-    if (phys >= g_hhdm_offset && g_hhdm_offset != 0) return (void*)phys;
-    return (void*)(phys + g_hhdm_offset);
-}
+// uACPI keeps its table list here until uacpi_initialize() moves it to the
+// heap: kmain looks the tables up before the heap exists. About 56 bytes per
+// table, on top of uACPI's 16 static slots.
+static uint64_t g_early_table_buffer[4096 / sizeof(uint64_t)];
 
-// 4-byte signature compare (ACPI table signatures are exactly 4 ASCII chars).
-static inline int sig_eq(const char* a, const char* b) {
-    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3];
-}
-
-// Walk XSDT/RSDT looking for the Nth table whose signature matches `signature`.
-// Returns a virtual pointer to the table header, or NULL if not found.
-// Used by laihost_scan() to fulfill LAI's namespace-creation table requests
-// (FACP/DSDT/SSDT/PSDT) and by lai_acpi_reset() for the FADT reset register.
-//
-// DSDT is special-cased: per ACPI spec it is NOT a top-level XSDT/RSDT entry —
-// its physical address is stored inside the FADT (x_dsdt / dsdt fields), so we
-// must resolve it via FACP before falling back to the XSDT/RSDT walk.
-void* cosmos_acpi_scan_table(const char* signature, size_t index) {
-    if (signature == NULL_PTR) return NULL_PTR;
-
-    acpi_rsdp_t* rsdp = (acpi_rsdp_t*)cosmos_acpi_get_rsdp();
-    if (rsdp == NULL_PTR) return NULL_PTR;
-
-    if (index == 0 && sig_eq(signature, "DSDT")) {
-        acpi_fadt_t* fadt = (acpi_fadt_t*)cosmos_acpi_scan_table("FACP", 0);
-        if (fadt == NULL_PTR) return NULL_PTR;
-        uint64_t dsdt_phys = 0;
-        if (fadt->header.length >= sizeof(acpi_fadt_t) && fadt->x_dsdt != 0) {
-            dsdt_phys = fadt->x_dsdt;
-        } else if (fadt->dsdt != 0) {
-            dsdt_phys = (uint64_t)fadt->dsdt;
-        }
-        if (dsdt_phys == 0) return NULL_PTR;
-        acpi_header_t* dsdt = (acpi_header_t*)phys_to_virt(dsdt_phys);
-        if (dsdt && sig_eq(dsdt->signature, "DSDT")) return dsdt;
-        return NULL_PTR;
-    }
-
-    size_t matches = 0;
-
-    if (rsdp->revision >= 2 && ((acpi_xsdp_t*)rsdp)->xsdt != 0) {
-        acpi_xsdt_t* xsdt = (acpi_xsdt_t*)phys_to_virt(((acpi_xsdp_t*)rsdp)->xsdt);
-        uint32_t count = (xsdt->header.length - sizeof(acpi_header_t)) / sizeof(uint64_t);
-        for (uint32_t i = 0; i < count; i++) {
-            acpi_header_t* tbl = (acpi_header_t*)phys_to_virt(xsdt->tables[i]);
-            if (tbl && sig_eq(tbl->signature, signature)) {
-                if (matches++ == index) return tbl;
-            }
-        }
-    } else if (rsdp->rsdt != 0) {
-        acpi_rsdt_t* rsdt = (acpi_rsdt_t*)phys_to_virt((uint64_t)rsdp->rsdt);
-        uint32_t count = (rsdt->header.length - sizeof(acpi_header_t)) / sizeof(uint32_t);
-        for (uint32_t i = 0; i < count; i++) {
-            acpi_header_t* tbl = (acpi_header_t*)phys_to_virt((uint64_t)rsdt->tables[i]);
-            if (tbl && sig_eq(tbl->signature, signature)) {
-                if (matches++ == index) return tbl;
-            }
-        }
-    }
-
-    return NULL_PTR;
+static void write_status(const char* prefix, uacpi_status status) {
+    __cosmos_serial_write(prefix);
+    __cosmos_serial_write(uacpi_status_to_string(status));
+    __cosmos_serial_write("\n");
 }
 
 // ============================================================================
 // MADT parsing - shared entry point
 // ============================================================================
 
-static void parse_madt(acpi_header_t* madt_header) {
+static void parse_madt(struct acpi_sdt_hdr* madt_header) {
     uint8_t* madt = (uint8_t*)madt_header;
     uint32_t length = madt_header->length;
 
     // MADT: header(36) + local_controller_addr(4) + flags(4) + entries
-    uint32_t offset = sizeof(acpi_header_t) + 8;
+    uint32_t offset = sizeof(struct acpi_sdt_hdr) + 8;
 
 #ifdef ARCH_X64
     // x86: Extract Local APIC address from MADT header
-    g_madt_info.local_apic_address = *(uint32_t*)(madt + sizeof(acpi_header_t));
+    g_madt_info.local_apic_address = *(uint32_t*)(madt + sizeof(struct acpi_sdt_hdr));
     __cosmos_serial_write("[ACPI] Local APIC at: 0x");
     __cosmos_serial_write_hex_u32(g_madt_info.local_apic_address);
     __cosmos_serial_write("\n");
@@ -363,12 +308,12 @@ static void parse_madt(acpi_header_t* madt_header) {
 // MCFG parsing (PCI ECAM base address discovery)
 // ============================================================================
 
-static void parse_mcfg(acpi_header_t* mcfg_header) {
+static void parse_mcfg(struct acpi_sdt_hdr* mcfg_header) {
     uint8_t* mcfg = (uint8_t*)mcfg_header;
     uint32_t length = mcfg_header->length;
 
     // MCFG: header(36) + reserved(8) + entries(16 each)
-    uint32_t offset = sizeof(acpi_header_t) + 8;
+    uint32_t offset = sizeof(struct acpi_sdt_hdr) + 8;
 
     if (offset + 16 > length) {
         __cosmos_serial_write("[ACPI-MCFG] No entries in MCFG table\n");
@@ -428,12 +373,12 @@ static const uint8_t* iort_node_at(uint32_t node_off) {
     return g_iort_base + node_off;
 }
 
-static void parse_iort(acpi_header_t* iort_header) {
+static void parse_iort(struct acpi_sdt_hdr* iort_header) {
     g_iort_base = (uint8_t*)iort_header;
     g_iort_length = iort_header->length;
 
-    uint32_t node_count = iort_rd32(g_iort_base, sizeof(acpi_header_t));
-    uint32_t node_array_off = iort_rd32(g_iort_base, sizeof(acpi_header_t) + 4);
+    uint32_t node_count = iort_rd32(g_iort_base, sizeof(struct acpi_sdt_hdr));
+    uint32_t node_array_off = iort_rd32(g_iort_base, sizeof(struct acpi_sdt_hdr) + 4);
 
     __cosmos_serial_write("[ACPI-IORT] nodes=");
     __cosmos_serial_write_dec_u32(node_count);
@@ -475,8 +420,8 @@ int acpi_iort_resolve_device_id(uint32_t segment, uint32_t bdf, uint32_t* out_de
 
     if (g_iort_base == NULL_PTR) return 1;
 
-    uint32_t node_count = iort_rd32(g_iort_base, sizeof(acpi_header_t));
-    uint32_t node_array_off = iort_rd32(g_iort_base, sizeof(acpi_header_t) + 4);
+    uint32_t node_count = iort_rd32(g_iort_base, sizeof(struct acpi_sdt_hdr));
+    uint32_t node_array_off = iort_rd32(g_iort_base, sizeof(struct acpi_sdt_hdr) + 4);
 
     // Find Root Complex matching segment.
     uint32_t off = node_array_off;
@@ -582,8 +527,6 @@ void acpi_early_init(void* rsdp_address, uint64_t hhdm_offset) {
         return;
     }
 
-    g_hhdm_offset = hhdm_offset;
-
     // Clear state
 #ifdef ARCH_X64
     for (int i = 0; i < (int)sizeof(g_madt_info); i++)
@@ -596,7 +539,7 @@ void acpi_early_init(void* rsdp_address, uint64_t hhdm_offset) {
     for (int i = 0; i < (int)sizeof(g_mcfg_info); i++)
         ((uint8_t*)&g_mcfg_info)[i] = 0;
 
-    acpi_rsdp_t* rsdp = (acpi_rsdp_t*)rsdp_address;
+    struct acpi_rsdp* rsdp = (struct acpi_rsdp*)rsdp_address;
 
     // Validate RSDP signature
     if (rsdp->signature[0] != 'R' || rsdp->signature[1] != 'S' ||
@@ -607,36 +550,38 @@ void acpi_early_init(void* rsdp_address, uint64_t hhdm_offset) {
         return;
     }
 
-    int acpi_rev = (rsdp->revision == 0) ? 1 : 2;
-    __cosmos_serial_write("[ACPI] ACPI revision: ");
-    if (acpi_rev == 1) __cosmos_serial_write("1.0\n");
-    else __cosmos_serial_write("2.0+\n");
+    cosmos_uacpi_set_boot_info(rsdp_address, hhdm_offset);
 
-    lai_set_acpi_revision(acpi_rev);
-    cosmos_acpi_set_rsdp(rsdp_address);
+    uacpi_status ret = uacpi_setup_early_table_access(
+        g_early_table_buffer, sizeof(g_early_table_buffer));
+    if (uacpi_unlikely_error(ret)) {
+        write_status("[ACPI] ERROR: uACPI early table access failed: ", ret);
+        return;
+    }
 
-    acpi_header_t* madt = (acpi_header_t*)cosmos_acpi_scan_table("APIC", 0);
-    acpi_header_t* mcfg = (acpi_header_t*)cosmos_acpi_scan_table("MCFG", 0);
-    if (madt) __cosmos_serial_write("[ACPI] MADT found\n");
-    if (mcfg) __cosmos_serial_write("[ACPI] MCFG found\n");
-
-    if (madt) {
-        __cosmos_serial_write("[ACPI] Parsing MADT...\n");
-        parse_madt(madt);
+    uacpi_table madt;
+    if (uacpi_table_find_by_signature(ACPI_MADT_SIGNATURE, &madt) == UACPI_STATUS_OK) {
+        __cosmos_serial_write("[ACPI] MADT found, parsing...\n");
+        parse_madt(madt.hdr);
+        uacpi_table_unref(&madt);
     } else {
         __cosmos_serial_write("[ACPI] WARNING: MADT not found\n");
     }
 
-    if (mcfg) {
-        __cosmos_serial_write("[ACPI] Parsing MCFG...\n");
-        parse_mcfg(mcfg);
+    uacpi_table mcfg;
+    if (uacpi_table_find_by_signature(ACPI_MCFG_SIGNATURE, &mcfg) == UACPI_STATUS_OK) {
+        __cosmos_serial_write("[ACPI] MCFG found, parsing...\n");
+        parse_mcfg(mcfg.hdr);
+        uacpi_table_unref(&mcfg);
     }
 
 #ifdef __aarch64__
-    acpi_header_t* iort = (acpi_header_t*)cosmos_acpi_scan_table("IORT", 0);
-    if (iort) {
+    // The reference is kept: acpi_iort_resolve_device_id() walks the table
+    // for as long as the kernel runs.
+    uacpi_table iort;
+    if (uacpi_table_find_by_signature("IORT", &iort) == UACPI_STATUS_OK) {
         __cosmos_serial_write("[ACPI] IORT found, parsing...\n");
-        parse_iort(iort);
+        parse_iort(iort.hdr);
     } else {
         __cosmos_serial_write("[ACPI] IORT not present (DeviceID = BDF)\n");
     }
@@ -666,36 +611,106 @@ const acpi_mcfg_info_t* acpi_get_mcfg_info(void) {
     return g_initialized ? &g_mcfg_info : NULL_PTR;
 }
 
+// For uacpi_host.c: the ECAM base (the address of bus 0) of the window the
+// MCFG gives for 'segment', if it covers 'bus'.
+int cosmos_acpi_ecam_lookup(uint16_t segment, uint8_t bus, uint64_t* out_base) {
+    if (!g_mcfg_info.found || g_mcfg_info.segment != segment ||
+        bus < g_mcfg_info.start_bus || bus > g_mcfg_info.end_bus) {
+        return 0;
+    }
+    *out_base = g_mcfg_info.base_address;
+    return 1;
+}
+
 // ============================================================================
-// Power management — ACPI _S5 / FADT reset via LAI (x86 only)
+// Power management: ACPI S5 and the FADT reset register through uACPI (x86)
 // ============================================================================
 
 #ifdef ARCH_X64
 
-// Lazily build the AML namespace on first PM call. lai_acpi_reset() reads the
-// FADT directly via laihost_scan and doesn't need the namespace, but
-// lai_enter_sleep(5) must resolve \\_S5_ from the DSDT.
-static int g_namespace_created = 0;
+// The interpreter is brought up by the first power call rather than at boot:
+// nothing else in the kernel evaluates AML yet, and this keeps the firmware's
+// _INI methods off every boot. uacpi_initialize() also switches the chipset
+// to ACPI mode (SMI_CMD), which firmware that boots in legacy mode needs
+// before it honours a sleep request.
+static uacpi_status acpi_bring_up(uacpi_init_level target) {
+    uacpi_status ret;
+
+    if (uacpi_get_current_init_level() < UACPI_INIT_LEVEL_SUBSYSTEM_INITIALIZED) {
+        __cosmos_serial_write("[ACPI-PM] Initializing uACPI...\n");
+        ret = uacpi_initialize(0);
+        if (uacpi_unlikely_error(ret)) {
+            write_status("[ACPI-PM] uacpi_initialize failed: ", ret);
+            return ret;
+        }
+    }
+
+    if (target < UACPI_INIT_LEVEL_NAMESPACE_LOADED) {
+        return UACPI_STATUS_OK;
+    }
+
+    if (uacpi_get_current_init_level() < UACPI_INIT_LEVEL_NAMESPACE_LOADED) {
+        __cosmos_serial_write("[ACPI-PM] Loading the AML namespace...\n");
+        ret = uacpi_namespace_load();
+        if (uacpi_unlikely_error(ret)) {
+            write_status("[ACPI-PM] uacpi_namespace_load failed: ", ret);
+            return ret;
+        }
+    }
+
+    if (uacpi_get_current_init_level() < UACPI_INIT_LEVEL_NAMESPACE_INITIALIZED) {
+        ret = uacpi_namespace_initialize();
+        if (uacpi_unlikely_error(ret)) {
+            write_status("[ACPI-PM] uacpi_namespace_initialize failed: ", ret);
+            return ret;
+        }
+    }
+
+    return UACPI_STATUS_OK;
+}
+
+// Brings the interpreter up without using it: 0 once the namespace is loaded
+// and initialized, 1 if that failed, 2 where there is no interpreter (ARM64).
+int cosmos_acpi_load_namespace(void) {
+    return uacpi_unlikely_error(acpi_bring_up(UACPI_INIT_LEVEL_NAMESPACE_INITIALIZED)) ? 1 : 0;
+}
 
 int cosmos_acpi_shutdown(void) {
-    if (cosmos_acpi_get_rsdp() == NULL_PTR) return 1;
-    if (!g_namespace_created) {
-        __cosmos_serial_write("[ACPI-PM] Creating AML namespace...\n");
-        lai_create_namespace();
-        g_namespace_created = 1;
+    uacpi_status ret = acpi_bring_up(UACPI_INIT_LEVEL_NAMESPACE_INITIALIZED);
+    if (uacpi_unlikely_error(ret)) {
+        return 1;
     }
-    __cosmos_serial_write("[ACPI-PM] lai_enter_sleep(S5)\n");
-    return (int)lai_enter_sleep(5);
+
+    // Reads \_S5 and runs _PTS.
+    ret = uacpi_prepare_for_sleep_state(UACPI_SLEEP_STATE_S5);
+    if (uacpi_unlikely_error(ret)) {
+        write_status("[ACPI-PM] Preparing for S5 failed: ", ret);
+        return 1;
+    }
+
+    __cosmos_serial_write("[ACPI-PM] Entering S5\n");
+    ret = uacpi_enter_sleep_state(UACPI_SLEEP_STATE_S5);
+    write_status("[ACPI-PM] Still running after the S5 request: ", ret);
+    return 1;
 }
 
 int cosmos_acpi_reset(void) {
-    __cosmos_serial_write("[ACPI-PM] lai_acpi_reset\n");
-    return (int)lai_acpi_reset();
+    // The reset register is in the FADT: no namespace needed.
+    uacpi_status ret = acpi_bring_up(UACPI_INIT_LEVEL_SUBSYSTEM_INITIALIZED);
+    if (uacpi_unlikely_error(ret)) {
+        return 1;
+    }
+
+    __cosmos_serial_write("[ACPI-PM] Resetting through the FADT reset register\n");
+    ret = uacpi_reboot();
+    write_status("[ACPI-PM] Still running after the FADT reset: ", ret);
+    return 1;
 }
 
 #else
 
-// LAI's PM helpers are x86-only (port I/O via FADT PM1a). ARM64 uses PSCI.
+// ARM64 powers off and resets through PSCI.
+int cosmos_acpi_load_namespace(void) { return 2; }
 int cosmos_acpi_shutdown(void) { return 1; }
 int cosmos_acpi_reset(void) { return 1; }
 
