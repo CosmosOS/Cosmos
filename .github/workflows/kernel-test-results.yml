@@ -202,14 +202,18 @@ jobs:
             const owner = context.repo.owner;
             const repoName = context.repo.repo;
 
-            const { data: artifactsData } = await github.rest.actions.listWorkflowRunArtifacts({
+            // A run uploads four artifacts per suite and architecture, far
+            // more than the API's first page of 30, so list them all: a link
+            // to an artifact past the first page used to fall back to the run.
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
               owner,
               repo: repoName,
               run_id: runId,
+              per_page: 100,
             });
 
             const getArtifactUrl = (name) => {
-              const artifact = artifactsData.artifacts.find(a => a.name === name);
+              const artifact = artifacts.find(a => a.name === name);
               if (artifact) {
                 return `https://github.com/${repo}/actions/runs/${runId}/artifacts/${artifact.id}`;
               }

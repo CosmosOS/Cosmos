@@ -483,7 +483,7 @@ jobs:
   linux-iso-tests:
     name: Run ISO Build Tests - Linux (${{ matrix.arch }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 30
     strategy:
       matrix:
         dotnet-version: [ 10.0.x ]
