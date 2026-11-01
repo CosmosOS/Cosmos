@@ -117,6 +117,68 @@ public class ProjectPinUpdaterTests
         Assert.Contains("<PackageReference Include=\"Spectre.Console\" Version=\"0.49.1\" />", edit.NewContent);
     }
 
+    [Theory]
+    [InlineData("Cosmos.Kernel")]
+    [InlineData("Cosmos.Kernel.System")]
+    [InlineData("Cosmos.Kernel.Drivers")]
+    [InlineData("Cosmos.Kernel.Native.X64")]
+    [InlineData("Cosmos.Build.Ilc")]
+    [InlineData("Cosmos.Build.Templates")]
+    [InlineData("Cosmos.Sdk")]
+    [InlineData("Cosmos.Patcher")]
+    [InlineData("Cosmos.Tools")]
+    public void ReleaseTrainPackages_AreUpdated(string packageId)
+    {
+        string content = $"<ItemGroup>\n  <PackageReference Include=\"{packageId}\" Version=\"3.0.70\" />\n</ItemGroup>";
+
+        ProjectPinUpdater.PinEdit edit = ProjectPinUpdater.ComputeEdit("Kernel.csproj", content, NewVersion);
+
+        Assert.Equal(1, edit.ChangedCount);
+        Assert.Contains($"<PackageReference Include=\"{packageId}\" Version=\"{NewVersion}\" />", edit.NewContent);
+    }
+
+    [Theory]
+    [InlineData("Cosmos.Executable.Lua", "4.0.1")]
+    [InlineData("Cosmos.Network.Http", "3.0.0")]
+    [InlineData("Cosmos.Network.Ftp", "2.0.2")]
+    [InlineData("Cosmos.Coroutines", "1.0.1")]
+    [InlineData("Cosmos.KernelTools", "1.0.0")]
+    [InlineData("Cosmos.SdkHelpers", "1.0.0")]
+    public void CosmosPackagesOutsideTheReleaseTrain_AreUntouched(string packageId, string version)
+    {
+        // These ship with their own versions; moving them to the Sdk version
+        // names a release that does not exist.
+        string content = $"<ItemGroup>\n  <PackageReference Include=\"{packageId}\" Version=\"{version}\" />\n</ItemGroup>";
+
+        ProjectPinUpdater.PinEdit edit = ProjectPinUpdater.ComputeEdit("Kernel.csproj", content, NewVersion);
+
+        Assert.Equal(0, edit.PinCount);
+        Assert.Equal(content, edit.NewContent);
+    }
+
+    [Fact]
+    public void ProjectWithLuaPackage_MovesOnlyTheReleaseTrainPins()
+    {
+        // The shape of the project in #3369: Cosmos.Executable.Lua at 4.0.1 beside
+        // the kernel packages. Lua's version must not count as a pin, or the
+        // update reads it as a newer dev pin and skips the whole file. The
+        // lowercase "kernel" is from that project too: NuGet ids ignore case.
+        string content = """
+            <ItemGroup>
+              <PackageReference Include="Cosmos.Executable.Lua" Version="4.0.1" />
+              <PackageReference Include="Cosmos.kernel.System" Version="3.0.70" />
+            </ItemGroup>
+            """;
+
+        ProjectPinUpdater.PinEdit edit = ProjectPinUpdater.ComputeEdit("Kernel.csproj", content, NewVersion);
+
+        Assert.Equal(1, edit.PinCount);
+        Assert.Equal(1, edit.ChangedCount);
+        Assert.Equal(["3.0.70"], edit.PreviousVersions);
+        Assert.Contains("<PackageReference Include=\"Cosmos.Executable.Lua\" Version=\"4.0.1\" />", edit.NewContent);
+        Assert.Contains($"<PackageReference Include=\"Cosmos.kernel.System\" Version=\"{NewVersion}\" />", edit.NewContent);
+    }
+
     [Fact]
     public void UnderscorePrefixedInternalPackage_IsUntouched()
     {
@@ -269,6 +331,8 @@ public class ProjectPinUpdaterTests
             File.WriteAllText(Path.Combine(root, "output-x64", "Kernel.csproj"), TemplateCsproj);
             File.WriteAllText(Path.Combine(root, "global.json"), "{ \"msbuild-sdks\": { \"Cosmos.Sdk\": \"3.0.70\" } }");
             File.WriteAllText(Path.Combine(root, "Unrelated.csproj"), "<Project Sdk=\"Microsoft.NET.Sdk\"></Project>");
+            File.WriteAllText(Path.Combine(root, "Library.csproj"),
+                "<Project Sdk=\"Microsoft.NET.Sdk\"><ItemGroup><PackageReference Include=\"Cosmos.Executable.Lua\" Version=\"4.0.1\" /></ItemGroup></Project>");
             File.WriteAllText(Path.Combine(root, "Directory.Packages.props"),
                 "<Project><ItemGroup><PackageVersion Include=\"Cosmos.Kernel\" Version=\"3.0.70\" /></ItemGroup></Project>");
 

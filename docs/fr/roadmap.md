@@ -1,5 +1,5 @@
 ---
-source_hash: 2b7d4286a991fa90d672a6a811459287d010f39a
+source_hash: 42f0471f49f8b9b09b952a9954c1ebbaa078489f
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -8,7 +8,7 @@ source_hash: 2b7d4286a991fa90d672a6a811459287d010f39a
 | Fonctionnalité | Gen2 | Gen3 | Remarques |
 |---------|------|-------------|-------|
 | Accès bas niveau à l'assembleur | ✅ | ✅ | Auparavant X#, désormais assembleur NASM x64 + GAS ARM64. |
-| ACPI | ✅ | ✅ | LAI (Lightweight ACPI Implementation) via l'interopérabilité C.  |
+| ACPI | ✅ | ✅ | [uACPI](https://github.com/uACPI/uACPI) via l'interopérabilité C : les tables sur les deux architectures, son interpréteur AML pour l'arrêt et le redémarrage sur x64.  |
 | Gestion des interruptions | ✅  | ✅  | x64 : APIC (local + I/O). ARM64 : GIC. |
 | Gestion de la mémoire | ✅ | ✅ ||
 | Prise en charge des pilotes | ✅ | ✅ | PCI et MMIO au-dessus du kit de pilotes ; le bus de plateforme peuplé à partir d'ACPI, du device tree (ARM64) ou de la table de la machine ; branchement à chaud PCI Express sur les ports racines |

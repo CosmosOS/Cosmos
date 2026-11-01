@@ -111,16 +111,21 @@ internal static unsafe class Memory
         MemoryOp.MemCopy(dest, src, (int)len);
     }
 
+    // memmove and memset return dest, as in C: the C code linked in relies on
+    // it (clang tail-calls memset from uACPI's zeroing allocator and hands the
+    // result back as the allocation).
     [RuntimeExport("memmove")]
-    internal static unsafe void memmove(byte* dest, byte* src, UIntPtr len)
+    internal static unsafe byte* memmove(byte* dest, byte* src, UIntPtr len)
     {
         MemoryOp.MemMove(dest, src, (int)len);
+        return dest;
     }
 
     [RuntimeExport("memset")]
-    internal static unsafe void memset(byte* dest, int value, UIntPtr len)
+    internal static unsafe byte* memset(byte* dest, int value, UIntPtr len)
     {
         MemoryOp.MemSet(dest, (byte)value, (int)len);
+        return dest;
     }
 
     [RuntimeExport("RhNewString")]

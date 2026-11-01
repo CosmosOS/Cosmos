@@ -1,4 +1,4 @@
-<!-- source_hash: d5ff5f01a22b6c6c817dd35bad89a06658cb6a45 -->
+<!-- source_hash: 0b7fc587374d85f0272654836d48a1450f83505b -->
 <p align="center">
   <img src="https://user-images.githubusercontent.com/63316499/89792973-43587480-daf3-11ea-99d6-82f89dd2ffc3.png" width="25%" />
 </p>
@@ -33,7 +33,7 @@ Cosmos gen2 通过自定义的转译器 **IL2CPU** 把 C# IL 编译为 x86 汇�
 - [基于优先级的 Stride 调度器](https://cosmosos.github.io/zh/articles/dev/scheduler.html)
 - 异常处理
 - 中断（x64 上为 APIC，ARM64 上为 GIC）
-- ACPI（通过 [LAI](https://github.com/managarm/lai)）
+- ACPI（通过 [uACPI](https://github.com/uACPI/uACPI)）
 - PCI 和 MMIO 驱动程序
 - UART 串口
 - [Cosmos 图形子系统](https://cosmosos.github.io/zh/articles/user/graphics.html)

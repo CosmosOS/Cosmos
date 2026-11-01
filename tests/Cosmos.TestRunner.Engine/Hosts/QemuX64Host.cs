@@ -24,7 +24,7 @@ public class QemuX64Host : IQemuHost
     // Test runner protocol needle: 0x19740807 magic little-endian + command
     // byte (Ds2Vs.TestPass). Used to detect "kernel reached at least one test"
     // so we can declare a stall when UART goes silent: handles destructive
-    // ops (e.g. Power.Shutdown's LAI panic) that hang instead of cleanly
+    // ops (e.g. a Power.Shutdown that fails to power off) that hang instead of cleanly
     // exiting QEMU.
     private static readonly byte[] TestPassMarker =
     {
@@ -277,7 +277,7 @@ public class QemuX64Host : IQemuHost
         int testPassMarkerIndex = 0;
         bool sawTestPass = false;
         // Track time of the last protocol-frame magic, not just any UART byte.
-        // After Power.Shutdown's LAI panic the scheduler keeps writing text to
+        // After a Power.Shutdown that failed to power off the scheduler keeps writing text to
         // UART, so a "no growth" check would never fire; "no protocol magic"
         // does, since the test framework emits no more frames once hung.
         DateTime lastMagicAt = DateTime.UtcNow;

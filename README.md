@@ -32,7 +32,7 @@ Cosmos gen2 compiled C# IL to x86 assembly through **IL2CPU**, a custom transpil
 - [Priority-based Stride Scheduler](https://cosmosos.github.io/articles/dev/scheduler.html)
 - Exception handling
 - Interrupts (APIC on x64, GIC on ARM64)
-- ACPI (via [LAI](https://github.com/managarm/lai))
+- ACPI (via [uACPI](https://github.com/uACPI/uACPI))
 - PCI and MMIO drivers
 - UART serial
 - [Cosmos Graphics Subsystem](https://cosmosos.github.io/articles/user/graphics.html)

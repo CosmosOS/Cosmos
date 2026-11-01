@@ -1,5 +1,5 @@
 ---
-source_hash: 2b7d4286a991fa90d672a6a811459287d010f39a
+source_hash: 42f0471f49f8b9b09b952a9954c1ebbaa078489f
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -8,7 +8,7 @@ source_hash: 2b7d4286a991fa90d672a6a811459287d010f39a
 | 功能 | Gen2 | Gen3 | 说明 |
 |---------|------|-------------|-------|
 | 底层汇编访问 | ✅ | ✅ | 以前使用 X#，现在使用 x64 NASM + ARM64 GAS 汇编。 |
-| ACPI | ✅ | ✅ | 通过 C 互操作使用 LAI（Lightweight ACPI Implementation）。  |
+| ACPI | ✅ | ✅ | 通过 C 互操作使用 [uACPI](https://github.com/uACPI/uACPI)：两种架构都用它读取 ACPI 表，x64 上用它的 AML 解释器关机和重启。  |
 | 中断处理 | ✅  | ✅  | x64：APIC（Local + I/O）。ARM64：GIC。 |
 | 内存管理 | ✅ | ✅ ||
 | 驱动程序支持 | ✅ | ✅ | 基于驱动工具包的 PCI 和 MMIO；平台总线由 ACPI、设备树（ARM64）或机器的表填充；根端口上的 PCI Express 热插拔 |

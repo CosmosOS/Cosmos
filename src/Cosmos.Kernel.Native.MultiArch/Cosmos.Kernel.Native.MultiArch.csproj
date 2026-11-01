@@ -13,10 +13,8 @@
     <Content Include="build\Cosmos.Kernel.Native.MultiArch.props" PackagePath="build\" />
     <Content Include="C\*.c" PackagePath="build\C" />
     <Content Include="ACPI\*.c" PackagePath="build\ACPI" />
-    <Content Include="ACPI\lai\core\*.c" PackagePath="build\ACPI\lai\core" />
-    <Content Include="ACPI\lai\core\*.h" PackagePath="build\ACPI\lai\core" />
-    <Content Include="ACPI\lai\helpers\*.c" PackagePath="build\ACPI\lai\helpers" />
-    <Content Include="ACPI\lai\drivers\*.c" PackagePath="build\ACPI\lai\drivers" />
-    <Content Include="ACPI\lai\include\**\*.h" PackagePath="build\ACPI\lai\include" />
+    <Content Include="ACPI\uacpi\source\*.c" PackagePath="build\ACPI\uacpi\source" />
+    <Content Include="ACPI\uacpi\include\**\*.h" PackagePath="build\ACPI\uacpi\include" />
+    <Content Include="ACPI\uacpi\LICENSE" PackagePath="build\ACPI\uacpi" />
   </ItemGroup>
 </Project>

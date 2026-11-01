@@ -1,5 +1,5 @@
 ---
-source_hash: 2abdec05a85fd00fdade0543f3d0b3faea7532f0
+source_hash: 50ffdcc4a3dfed2ca6dd6d6c7ef48241b4e26579
 ---
 <a id="overview"></a>
 
@@ -230,6 +230,8 @@ Un thread qui se bloque ou s'endort cède le CPU par `SchedulerManager.Park`, ap
 | ARM64 | SGI 8, par `ICC_SGI1R_EL1` sur GICv3 ou `GICD_SGIR` sur GICv2 |
 
 `Park` attend ensuite que l'état quitte `Blocked` ou `Sleeping`, ce qui arrive une fois qu'un réveil a rendu le thread prêt et que l'ordonnanceur l'a de nouveau exécuté, ou immédiatement quand le réveil est arrivé avant le changement. S'arrêter (halt) à la place laissait le CPU inactif pendant le reste du tick chaque fois qu'un thread se bloquait. Un thread qui se met en attente avant que le contrôleur puisse déclencher l'interruption s'arrête toujours ; le thread inactif ne se met jamais en attente (voir les primitives plus bas), et s'arrête entre ses vérifications de la variable de condition.
+
+Un thread ne doit pas se mettre en attente avec les interruptions masquées. L'interruption de replanification et le tick resteraient tous deux en suspens, rien ne pourrait ni le remplacer sur le CPU ni le réveiller, et le CPU tournerait en boucle, minuteur coupé, jusqu'à ce que quelque chose de l'extérieur arrête la machine. `Park` vérifie donc d'abord le drapeau et déclenche une panique à la place, en nommant le membre qui s'est mis en attente (`Mutex.Acquire`, `ConditionVariable.Wait`, `InterruptEvent.WaitCore`...) : un verrou bloquant atteint depuis une section masquée, ou sous un spinlock pris en mode sûr vis-à-vis des IRQ, arrête le noyau en indiquant l'endroit au lieu de le figer sans un mot ([#3387](https://github.com/CosmosOS/Cosmos/issues/3387) : le chemin de réception de la pile réseau tournait masqué et restait bloqué sur un verrou de CoreLib déjà pris).
 
 <a id="what-there-is-not-a-voluntary-switch"></a>
 
