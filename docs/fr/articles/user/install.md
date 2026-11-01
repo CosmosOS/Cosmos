@@ -1,5 +1,5 @@
 ---
-source_hash: efa0e487ab8d5e0d0a48f4f88281e5ec483a36ad
+source_hash: b8511205455a0e82eb341f34d4468eec418e0c58
 ---
 <a id="installation-guide"></a>
 
@@ -61,7 +61,7 @@ Pour mettre à jour :
 cosmos update
 ```
 
-Exécutez cette commande dans le dossier d'un projet de noyau pour faire aussi passer les versions de Cosmos épinglées par le projet (l'attribut `Sdk="Cosmos.Sdk/..."` et les références de package `Cosmos.*`) à la dernière version. Options supplémentaires :
+Exécutez cette commande dans le dossier d'un projet de noyau pour faire aussi passer les versions de Cosmos épinglées par le projet (l'attribut `Sdk="Cosmos.Sdk/..."` et les références de package `Cosmos.Kernel*` et `Cosmos.Build.*`) à la dernière version. Les autres packages `Cosmos.*`, comme `Cosmos.Executable.Lua`, gardent leur propre version. Options supplémentaires :
 
 | Option | Effet |
 |--------|--------|
