@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.System.Network.Protocols.IPv6;
 using Cosmos.Kernel.System.Timers;
 
@@ -51,10 +52,13 @@ public sealed class Icmpv6Client : IDisposable
         // Reconnecting to a second host has to drop the first registration:
         // s_clients is static, so a stale entry both misroutes replies and
         // roots this client for the life of the kernel.
-        Close();
+        using (NetworkStackLock.Enter())
+        {
+            Close();
 
-        _destination = dest;
-        s_clients[dest] = this;
+            _destination = dest;
+            s_clients[dest] = this;
+        }
     }
 
     /// <summary>
@@ -62,9 +66,12 @@ public sealed class Icmpv6Client : IDisposable
     /// </summary>
     public void Close()
     {
-        if (_destination is not null)
+        using (NetworkStackLock.Enter())
         {
-            s_clients.Remove(_destination);
+            if (_destination is not null)
+            {
+                s_clients.Remove(_destination);
+            }
         }
     }
 
@@ -113,12 +120,11 @@ public sealed class Icmpv6Client : IDisposable
             waited += 10;
         }
 
-        if (_rxBuffer.Count < 1)
+        if (!TryDequeue(out Icmpv6EchoReply? packet))
         {
             return -1;
         }
 
-        Icmpv6EchoReply packet = _rxBuffer.Dequeue();
         source.Address = packet.SourceIP;
 
         return waited;
@@ -131,6 +137,20 @@ public sealed class Icmpv6Client : IDisposable
     internal void ReceiveData(Icmpv6EchoReply packet)
     {
         _rxBuffer.Enqueue(packet);
+    }
+
+    /// <summary>
+    /// Takes the oldest queued reply, under the stack's lock: the receive
+    /// path queues replies from the kit worker.
+    /// </summary>
+    /// <param name="packet">The reply, when one was queued.</param>
+    /// <returns>True when a reply was taken.</returns>
+    private bool TryDequeue([NotNullWhen(true)] out Icmpv6EchoReply? packet)
+    {
+        using (NetworkStackLock.Enter())
+        {
+            return _rxBuffer.TryDequeue(out packet);
+        }
     }
 
     /// <summary>

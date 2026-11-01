@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Cosmos.Build.API.Attributes;
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Network;
 using Cosmos.Kernel.System.Network.Protocols.Tcp;
@@ -330,14 +329,16 @@ public static class SocketPlug
             throw new InvalidOperationException("Socket not bound");
         }
 
-        // Masked while the connection joins the table: the kit worker looks
-        // connections up in it. Nothing in between can throw, so the restore
-        // is an explicit call.
-        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
-        TcpConnection sm = TcpConnection.CreateConnection((ushort)ep.Port, 0, Address4.Zero, Address4.Zero);
-        sm.LocalEndPoint.Port = (ushort)ep.Port;
-        sm.Status = Status.LISTEN;
-        mask.Dispose();
+        // Under the stack's lock while the connection joins the table: the
+        // kit worker looks connections up in it, and must not find this one
+        // before it listens.
+        TcpConnection sm;
+        using (NetworkStackLock.Enter())
+        {
+            sm = TcpConnection.CreateConnection((ushort)ep.Port, 0, Address4.Zero, Address4.Zero);
+            sm.LocalEndPoint.Port = (ushort)ep.Port;
+            sm.Status = Status.LISTEN;
+        }
 
         s_tcpStateMachines[id] = sm;
     }
@@ -560,11 +561,17 @@ public static class SocketPlug
 
             for (int i = 0; i < chunks.Length; i++)
             {
-                TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, i == chunks.Length - 1 ? (byte)(TcpFlags.PSH | TcpFlags.ACK) : (byte)TcpFlags.ACK, (ushort)sm.TCB.RcvWnd, 0, chunks[i]);
-                packet.Network.Enqueue();
+                // The segment is built from the TCB and queued under the
+                // stack's lock, which the receive path updates the TCB under.
+                using (NetworkStackLock.Enter())
+                {
+                    TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, i == chunks.Length - 1 ? (byte)(TcpFlags.PSH | TcpFlags.ACK) : (byte)TcpFlags.ACK, (ushort)sm.TCB.RcvWnd, 0, chunks[i]);
+                    packet.Network.Enqueue();
 
-                // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
-                sm.TCB.SndNxt += (uint)chunks[i].Length;
+                    // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
+                    sm.TCB.SndNxt += (uint)chunks[i].Length;
+                }
+
                 bytesSent += chunks[i].Length;
 
                 NetworkStack.Update();
@@ -579,11 +586,16 @@ public static class SocketPlug
             byte[] data = new byte[size];
             buffer.AsSpan(offset, size).CopyTo(data);
 
-            TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), (ushort)sm.TCB.RcvWnd, 0, data);
-            packet.Network.Enqueue();
+            // Built and queued under the stack's lock, as each chunk above is.
+            using (NetworkStackLock.Enter())
+            {
+                TcpPacket packet = new(sm.LocalEndPoint.Address, sm.RemoteEndPoint.Address, sm.LocalEndPoint.Port, sm.RemoteEndPoint.Port, sm.TCB.SndNxt, sm.TCB.RcvNxt, 20, (byte)(TcpFlags.PSH | TcpFlags.ACK), (ushort)sm.TCB.RcvWnd, 0, data);
+                packet.Network.Enqueue();
 
-            // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
-            sm.TCB.SndNxt += (uint)size;
+                // Increment SndNxt BEFORE NetworkStack.Update() so incoming packets see the correct value
+                sm.TCB.SndNxt += (uint)size;
+            }
+
             bytesSent = size;
 
             NetworkStack.Update();
@@ -729,8 +741,8 @@ public static class SocketPlug
         ThrowIfRangeInvalid(buffer, offset, size);
 
         // The bytes are taken through ReadData, which copies and consumes
-        // them in one step with interrupts masked: the kit worker appends to
-        // the same buffer and can preempt this thread anywhere else.
+        // them in one step under the stack's lock: the kit worker appends to
+        // the same buffer under it.
         Span<byte> target = buffer.AsSpan(offset, size);
         if (size == 0)
         {
@@ -914,10 +926,11 @@ public static class SocketPlug
             // peer's immediate FIN|ACK inline. Under ESTABLISHED that runs the
             // passive close all the way to CLOSED, and an assignment after the
             // send would overwrite CLOSED with FIN_WAIT1 and hang the close.
-            // The check and the assignment are one masked step for the same
-            // reason: the kit worker can take the peer's FIN between them and
-            // run the passive close, which sends our FIN itself, and whose
-            // LAST_ACK or CLOSED the assignment would overwrite.
+            // The check and the assignment are one step under the stack's lock
+            // for the same reason: the kit worker can take the peer's FIN
+            // between them and run the passive close, which sends our FIN
+            // itself, and whose LAST_ACK or CLOSED the assignment would
+            // overwrite.
             if (TryChangeStatus(sm, Status.ESTABLISHED, Status.FIN_WAIT1))
             {
                 sm.SendEmptyPacket(TcpFlags.FIN | TcpFlags.ACK);
@@ -961,41 +974,44 @@ public static class SocketPlug
     }
 
     // Moves the connection to status unless the kit worker moved it away from
-    // expected first. One masked step: the worker changes the status from
-    // segments and can preempt this thread between the check and the write.
+    // expected first. One step under the stack's lock: the worker changes the
+    // status from segments, under the same lock, and could otherwise do so
+    // between the check and the write.
     private static bool TryChangeStatus(TcpConnection sm, Status expected, Status status)
     {
-        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
-        bool changed = sm.Status == expected;
-        if (changed)
+        using (NetworkStackLock.Enter())
         {
-            sm.Status = status;
-        }
+            bool changed = sm.Status == expected;
+            if (changed)
+            {
+                sm.Status = status;
+            }
 
-        mask.Dispose();
-        return changed;
+            return changed;
+        }
     }
 
     // Removes a closed connection, or detaches one still closing for TcpConnection to
-    // reap once it reaches CLOSED; true when it was removed. One masked step:
-    // TcpConnection reaps only a detached connection, so a CLOSED the kit worker reached
-    // between the check and the flag would leave the connection in the table
-    // for good. Nothing in it can throw, so the restore is an explicit call.
+    // reap once it reaches CLOSED; true when it was removed. One step under the
+    // stack's lock: TcpConnection reaps only a detached connection, so a CLOSED the kit
+    // worker reached between the check and the flag would leave the connection
+    // in the table for good.
     private static bool RemoveOrDetach(TcpConnection sm)
     {
-        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
-        bool closed = sm.Status == Status.CLOSED;
-        if (closed)
+        using (NetworkStackLock.Enter())
         {
-            TcpConnection.RemoveConnection(sm);
-        }
-        else
-        {
-            sm.Detached = true;
-        }
+            bool closed = sm.Status == Status.CLOSED;
+            if (closed)
+            {
+                TcpConnection.RemoveConnection(sm);
+            }
+            else
+            {
+                sm.Detached = true;
+            }
 
-        mask.Dispose();
-        return closed;
+            return closed;
+        }
     }
 
     [PlugMember]

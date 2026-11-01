@@ -1,5 +1,5 @@
 ---
-source_hash: 2abdec05a85fd00fdade0543f3d0b3faea7532f0
+source_hash: 50ffdcc4a3dfed2ca6dd6d6c7ef48241b4e26579
 ---
 <a id="overview"></a>
 
@@ -230,6 +230,8 @@ sequenceDiagram
 | ARM64 | SGI 8，在 GICv3 上通过 `ICC_SGI1R_EL1`，在 GICv2 上通过 `GICD_SGIR` |
 
 随后 `Park` 等待状态离开 `Blocked` 或 `Sleeping`：当一次唤醒使线程就绪、且调度器再次运行了它时就会如此；如果唤醒在切换之前就已到达，则会立即如此。以前改用停机的做法，每当有线程阻塞，都会让 CPU 在该节拍剩余的时间里空闲。在控制器能够触发该中断之前就挂起的线程仍然会停机；空闲线程则从不挂起（见下文的原语），而是在检查条件变量的间隙停机。
+
+线程不能在中断被屏蔽时挂起。那样重新调度中断和节拍都会一直处于挂起状态，没有任何东西能把它从 CPU 上换下或唤醒它，CPU 会在定时器关闭的情况下一直空转，直到外部把机器停掉。因此 `Park` 会先检查中断标志，遇到这种情况就触发内核恐慌，并给出发起挂起的成员（`Mutex.Acquire`、`ConditionVariable.Wait`、`InterruptEvent.WaitCore` 等）：从屏蔽中断的代码段中，或在以 IRQ 安全方式持有的自旋锁之下，碰到一个会阻塞的锁时，内核会停下并指出位置，而不是一声不响地卡死（[#3387](https://github.com/CosmosOS/Cosmos/issues/3387)：网络协议栈的接收路径曾在屏蔽中断的情况下运行，卡在一个已被占用的 CoreLib 锁上）。
 
 <a id="what-there-is-not-a-voluntary-switch"></a>
 

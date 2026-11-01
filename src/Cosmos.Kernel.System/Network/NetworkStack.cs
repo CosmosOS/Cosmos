@@ -38,16 +38,19 @@ public static class NetworkStack
     {
         MacAddress mac = device.MacAddress;
 
-        if (MACMap.Remove(mac.Hash))
+        using (NetworkStackLock.Enter())
         {
-            RemoveAddresses(device);
-        }
+            if (MACMap.Remove(mac.Hash))
+            {
+                RemoveAddresses(device);
+            }
 
-        // The link-local IPv6 address needs nothing from the caller: it is
-        // derived from the MAC, so it comes up with the first configuration.
-        AddressMap.Add(ipAddress, device);
-        AddressMap[Address6.LinkLocalFor(mac)] = device;
-        MACMap.Add(mac.Hash, device);
+            // The link-local IPv6 address needs nothing from the caller: it is
+            // derived from the MAC, so it comes up with the first configuration.
+            AddressMap.Add(ipAddress, device);
+            AddressMap[Address6.LinkLocalFor(mac)] = device;
+            MACMap.Add(mac.Hash, device);
+        }
 
         Listen(device);
 
@@ -70,8 +73,11 @@ public static class NetworkStack
     /// </remarks>
     internal static void ConfigIP(INetworkDevice device, IPConfig config)
     {
-        ConfigIP(device, config.Address);
-        IPConfig.Set(device, config);
+        using (NetworkStackLock.Enter())
+        {
+            ConfigIP(device, config.Address);
+            IPConfig.Set(device, config);
+        }
     }
 
     /// <summary>
@@ -93,13 +99,16 @@ public static class NetworkStack
     /// <param name="device">The device to leave unconfigured.</param>
     internal static void RemoveConfigIP(INetworkDevice device)
     {
-        MACMap.Remove(device.MacAddress.Hash);
-        RemoveAddresses(device);
-        IPConfig.Remove(device);
+        using (NetworkStackLock.Enter())
+        {
+            MACMap.Remove(device.MacAddress.Hash);
+            RemoveAddresses(device);
+            IPConfig.Remove(device);
+        }
     }
 
     /// <summary>
-    /// Forgets every address mapped to a device.
+    /// Forgets every address mapped to a device. Under the stack's lock.
     /// </summary>
     /// <param name="device">The device being reconfigured.</param>
     private static void RemoveAddresses(INetworkDevice device)
@@ -126,15 +135,18 @@ public static class NetworkStack
     /// <param name="device">The device to look up.</param>
     internal static Address6? LinkLocalOf(INetworkDevice device)
     {
-        foreach (KeyValuePair<Address, INetworkDevice> pair in AddressMap)
+        using (NetworkStackLock.Enter())
         {
-            if (pair.Value == device && pair.Key is Address6 address6)
+            foreach (KeyValuePair<Address, INetworkDevice> pair in AddressMap)
             {
-                return address6;
+                if (pair.Value == device && pair.Key is Address6 address6)
+                {
+                    return address6;
+                }
             }
-        }
 
-        return null;
+            return null;
+        }
     }
 
     /// <summary>
@@ -143,27 +155,45 @@ public static class NetworkStack
     /// </summary>
     public static void RemoveAllConfigIP()
     {
-        AddressMap.Clear();
-        MACMap.Clear();
-        IPConfig.RemoveAll();
+        using (NetworkStackLock.Enter())
+        {
+            AddressMap.Clear();
+            MACMap.Clear();
+            IPConfig.RemoveAll();
+        }
     }
 
     /// <summary>
     /// Updates the network stack (sends pending packets). Internal: every
     /// path that queues a packet pumps the queue itself, including
-    /// <see cref="Send"/> and each protocol client.
+    /// <see cref="Send"/> and each protocol client. One thread pumps at a
+    /// time; a caller that finds the pump running returns at once and leaves
+    /// its packets to it, since the pump goes on until the queues are empty.
+    /// The pump takes the stack's lock one pass at a time and waits between
+    /// passes without it, so the receive path can deliver the ARP replies and
+    /// neighbor advertisements it waits for.
     /// </summary>
     internal static void Update()
     {
-        if (s_updating)
+        using (NetworkStackLock.Enter())
         {
-            return;
+            if (s_updating)
+            {
+                return;
+            }
+
+            s_updating = true;
         }
 
-        s_updating = true;
-        IPv4OutgoingBuffer.Send();
-        IPv6OutgoingBuffer.Send();
-        s_updating = false;
+        try
+        {
+            IPv4OutgoingBuffer.Send();
+            IPv6OutgoingBuffer.Send();
+        }
+        finally
+        {
+            Volatile.Write(ref s_updating, false);
+        }
     }
 
     /// <summary>
@@ -192,7 +222,10 @@ public static class NetworkStack
     /// Injects a received Ethernet frame into the stack: the frame is
     /// dispatched to the ARP, IPv4 or IPv6 handler by EtherType, exactly as a
     /// frame arriving from a network device would be. This is the receive
-    /// entry point registered on every configured device.
+    /// entry point registered on every configured device. The frame is
+    /// handled under the stack's lock (<see cref="NetworkStackLock"/>), with
+    /// interrupts on: on the kit worker, a contended lock anywhere below
+    /// blocks it until the holder lets go.
     /// </summary>
     /// <param name="packetData">Packet data array.</param>
     /// <param name="length">Packet length.</param>
@@ -209,20 +242,23 @@ public static class NetworkStack
 
         ushort etherType = (ushort)((packetData[12] << 8) | packetData[13]);
 
-        switch (etherType)
+        using (NetworkStackLock.Enter())
         {
-            case 0x0806: // ARP
-                ArpPacket.ARPHandler(packetData);
-                break;
-            case 0x0800: // IPv4
-                IPPacket.IPv4Handler(packetData);
-                break;
-            case 0x86DD: // IPv6
-                IPv6Packet.IPv6Handler(packetData);
-                break;
-            default:
-                Serial.WriteString("[NetworkStack] Unknown EtherType, ignoring\n");
-                break;
+            switch (etherType)
+            {
+                case 0x0806: // ARP
+                    ArpPacket.ARPHandler(packetData);
+                    break;
+                case 0x0800: // IPv4
+                    IPPacket.IPv4Handler(packetData);
+                    break;
+                case 0x86DD: // IPv6
+                    IPv6Packet.IPv6Handler(packetData);
+                    break;
+                default:
+                    Serial.WriteString("[NetworkStack] Unknown EtherType, ignoring\n");
+                    break;
+            }
         }
     }
 }

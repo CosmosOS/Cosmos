@@ -44,72 +44,95 @@ internal static class IPv6OutgoingBuffer
     /// <returns>False when no configured interface carries the packet's source address.</returns>
     internal static bool AddPacket(IPv6Packet packet)
     {
-        if (!NetworkStack.AddressMap.TryGetValue(packet.SourceIP, out INetworkDevice? device))
+        using (NetworkStackLock.Enter())
         {
-            return false;
-        }
+            if (!NetworkStack.AddressMap.TryGetValue(packet.SourceIP, out INetworkDevice? device))
+            {
+                return false;
+            }
 
-        packet.SourceMac = device.MacAddress;
-        s_queue.Add(new Entry(device, packet));
-        return true;
+            packet.SourceMac = device.MacAddress;
+            s_queue.Add(new Entry(device, packet));
+            return true;
+        }
     }
 
     /// <summary>
     /// Sends what the queue holds, soliciting the neighbors it has no MAC
     /// address for and spinning until every packet left or the iteration
-    /// cap is reached.
+    /// cap is reached. Each pass runs under the stack's lock; the wait
+    /// between two passes does not, since the advertisements a pass asked
+    /// for come in on the kit worker, which needs the lock to deliver them.
     /// </summary>
     internal static void Send()
     {
         int iterations = 0;
 
-        while (s_queue.Count > 0)
+        while (true)
         {
-            iterations++;
-            if (iterations >= MaxIterations)
+            using (NetworkStackLock.Enter())
             {
-                Serial.WriteString("[IPv6] Neighbor resolution timeout\n");
-                s_queue.Clear();
-                break;
-            }
-
-            for (int e = s_queue.Count - 1; e >= 0; e--)
-            {
-                Entry entry = s_queue[e];
-                IPv6Packet packet = entry.Packet;
-
-                if (packet.DestinationIP.IsMulticast)
+                if (s_queue.Count == 0)
                 {
-                    entry.Nic.Send(packet.RawData, packet.RawData.Length);
-                    s_queue.RemoveAt(e);
-                    continue;
+                    return;
                 }
 
-                MacAddress? neighborMac = NeighborCache.Resolve(packet.DestinationIP);
-                if (neighborMac is not null)
+                iterations++;
+                if (iterations >= MaxIterations)
                 {
-                    packet.DestinationMac = neighborMac;
-                    entry.Nic.Send(packet.RawData, packet.RawData.Length);
-                    s_queue.RemoveAt(e);
-                    continue;
+                    Serial.WriteString("[IPv6] Neighbor resolution timeout\n");
+                    s_queue.Clear();
+                    return;
                 }
 
-                if (!entry.SolicitationSent)
+                SendPass();
+                if (s_queue.Count == 0)
                 {
-                    Serial.WriteString("[IPv6] Sending neighbor solicitation for ");
-                    Serial.WriteString(packet.DestinationIP.ToString());
-                    Serial.WriteString("\n");
-
-                    NeighborSolicitation solicitation = new(packet.SourceIP, packet.DestinationIP, entry.Nic.MacAddress);
-                    entry.Nic.Send(solicitation.RawData, solicitation.RawData.Length);
-                    entry.SolicitationSent = true;
+                    return;
                 }
             }
 
-            // Spin to allow interrupt processing (neighbor advertisements)
-            if (s_queue.Count > 0)
+            // Spin to let the receive path take the neighbor advertisements.
+            Thread.SpinWait(10_000);
+        }
+    }
+
+    /// <summary>
+    /// One pass over the queue: sends every packet whose neighbor resolved
+    /// and solicits the others once. Under the stack's lock.
+    /// </summary>
+    private static void SendPass()
+    {
+        for (int e = s_queue.Count - 1; e >= 0; e--)
+        {
+            Entry entry = s_queue[e];
+            IPv6Packet packet = entry.Packet;
+
+            if (packet.DestinationIP.IsMulticast)
             {
-                Thread.SpinWait(10_000);
+                entry.Nic.Send(packet.RawData, packet.RawData.Length);
+                s_queue.RemoveAt(e);
+                continue;
+            }
+
+            MacAddress? neighborMac = NeighborCache.Resolve(packet.DestinationIP);
+            if (neighborMac is not null)
+            {
+                packet.DestinationMac = neighborMac;
+                entry.Nic.Send(packet.RawData, packet.RawData.Length);
+                s_queue.RemoveAt(e);
+                continue;
+            }
+
+            if (!entry.SolicitationSent)
+            {
+                Serial.WriteString("[IPv6] Sending neighbor solicitation for ");
+                Serial.WriteString(packet.DestinationIP.ToString());
+                Serial.WriteString("\n");
+
+                NeighborSolicitation solicitation = new(packet.SourceIP, packet.DestinationIP, entry.Nic.MacAddress);
+                entry.Nic.Send(solicitation.RawData, solicitation.RawData.Length);
+                entry.SolicitationSent = true;
             }
         }
     }

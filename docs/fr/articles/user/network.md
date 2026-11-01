@@ -1,5 +1,5 @@
 ---
-source_hash: d883bf1abaafffe6663f5e9072ef8923a95b19f7
+source_hash: fc502b2b1e2ff37915f1b2615ddc7f7bc1243dd0
 ---
 <a id="network"></a>
 
@@ -472,7 +472,7 @@ Le contrat que les types de paquets implémentent réellement :
 
 ## Fonctionnement
 
-Votre code appelle les classes de socket .NET standard, dont la PAL aboutit à des [plugs](../dev/plugs.md) au niveau de `Socket` dans `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`, et `NameResolutionPalPlug` pour `Dns`). Ceux-ci délèguent à la pile réseau de Cosmos (la machine à états TCP et la couche UDP sur les deux versions d'IP, avec ARP et Ethernet sous IPv4, et ICMPv6 et Neighbor Discovery sous IPv6), qui envoie et reçoit les trames par le périphérique réseau enregistré auprès de `NetworkManager` : une interface publiée par un pilote du kit de pilotes, celle de l'E1000E ou celle du virtio-net. Une trame que reçoit le pilote du kit est remise à la pile sur le thread de travail du kit, avec les interruptions désactivées pendant tout le traitement de la trame. Les `DhcpClient` et `DnsClient` de Cosmos reposent directement sur la couche UDP de Cosmos, `DhcpClient` sur IPv4 uniquement.
+Votre code appelle les classes de socket .NET standard, dont la PAL aboutit à des [plugs](../dev/plugs.md) au niveau de `Socket` dans `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`, et `NameResolutionPalPlug` pour `Dns`). Ceux-ci délèguent à la pile réseau de Cosmos (la machine à états TCP et la couche UDP sur les deux versions d'IP, avec ARP et Ethernet sous IPv4, et ICMPv6 et Neighbor Discovery sous IPv6), qui envoie et reçoit les trames par le périphérique réseau enregistré auprès de `NetworkManager` : une interface publiée par un pilote du kit de pilotes, celle de l'E1000E ou celle du virtio-net. Une trame que reçoit le pilote du kit est remise à la pile sur le thread de travail du kit, interruptions actives. La pile se protège avec un verrou à elle, que le chemin de réception tient pendant le traitement d'une trame et que tous les autres points d'entrée (les clients, les plugs de socket) prennent autour de ce qu'ils partagent avec ce chemin. C'est un verrou bloquant, jamais tenu pendant que la pile attend le réseau : un verrou déjà pris sous lui donne une attente ordinaire. Les `DhcpClient` et `DnsClient` de Cosmos reposent directement sur la couche UDP de Cosmos, `DhcpClient` sur IPv4 uniquement.
 
 ```
 TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
