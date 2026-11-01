@@ -1,4 +1,4 @@
-<!-- source_hash: d5ff5f01a22b6c6c817dd35bad89a06658cb6a45 -->
+<!-- source_hash: 0b7fc587374d85f0272654836d48a1450f83505b -->
 <p align="center">
   <img src="https://user-images.githubusercontent.com/63316499/89792973-43587480-daf3-11ea-99d6-82f89dd2ffc3.png" width="25%" />
 </p>
@@ -33,7 +33,7 @@ Cosmos gen2 compilait l'IL C# en assembleur x86 au moyen d'**IL2CPU**, un transp
 - [Ordonnanceur Stride à priorités](https://cosmosos.github.io/fr/articles/dev/scheduler.html)
 - Gestion des exceptions
 - Interruptions (APIC sur x64, GIC sur ARM64)
-- ACPI (avec [LAI](https://github.com/managarm/lai))
+- ACPI (avec [uACPI](https://github.com/uACPI/uACPI))
 - Pilotes PCI et MMIO
 - Port série UART
 - [Sous-système graphique de Cosmos](https://cosmosos.github.io/fr/articles/user/graphics.html)
