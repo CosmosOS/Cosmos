@@ -1,5 +1,5 @@
 ---
-source_hash: d883bf1abaafffe6663f5e9072ef8923a95b19f7
+source_hash: fc502b2b1e2ff37915f1b2615ddc7f7bc1243dd0
 ---
 <a id="network"></a>
 
@@ -472,7 +472,7 @@ icmp.Close();
 
 ## 工作原理
 
-你的代码调用标准的 .NET 套接字类，其 PAL 最终落到 `Cosmos.Kernel.Plugs` 中 `Socket` 层级的 [plug](../dev/plugs.md)（`SocketPlug`、`TcpClientPlug`、`TcpListenerPlug`、`UdpClientPlug`、`NetworkStreamPlug`，以及用于 `Dns` 的 `NameResolutionPalPlug`）。这些 plug 再委托给 Cosmos 网络协议栈（基于两个 IP 版本的 TCP 状态机和 UDP 层，IPv4 之下是 ARP 和以太网，IPv6 之下是 ICMPv6 和邻居发现），协议栈通过注册到 `NetworkManager` 的网络设备收发帧：即某个驱动工具包驱动程序发布的接口，E1000E 的或 virtio-net 的。工具包驱动程序收到的帧会在工具包的工作线程上交给协议栈，在处理程序执行期间中断处于禁用状态。Cosmos 的 `DhcpClient` 和 `DnsClient` 直接建立在 Cosmos 的 UDP 层之上，其中 `DhcpClient` 只支持 IPv4。
+你的代码调用标准的 .NET 套接字类，其 PAL 最终落到 `Cosmos.Kernel.Plugs` 中 `Socket` 层级的 [plug](../dev/plugs.md)（`SocketPlug`、`TcpClientPlug`、`TcpListenerPlug`、`UdpClientPlug`、`NetworkStreamPlug`，以及用于 `Dns` 的 `NameResolutionPalPlug`）。这些 plug 再委托给 Cosmos 网络协议栈（基于两个 IP 版本的 TCP 状态机和 UDP 层，IPv4 之下是 ARP 和以太网，IPv6 之下是 ICMPv6 和邻居发现），协议栈通过注册到 `NetworkManager` 的网络设备收发帧：即某个驱动工具包驱动程序发布的接口，E1000E 的或 virtio-net 的。工具包驱动程序收到的帧会在工具包的工作线程上交给协议栈，此时中断保持开启。协议栈用自己的一把锁来保证串行：接收路径在处理一帧期间持有它，其他所有入口（各个客户端、套接字 plug）在访问与接收路径共享的状态时也会获取它。这是一把会阻塞的锁，协议栈等待网络时从不持有它：在它之下碰到一个已被占用的锁，只是一次普通的等待。Cosmos 的 `DhcpClient` 和 `DnsClient` 直接建立在 Cosmos 的 UDP 层之上，其中 `DhcpClient` 只支持 IPv4。
 
 ```
 TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
