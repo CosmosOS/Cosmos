@@ -79,7 +79,7 @@ public class Kernel : Sys.Kernel
         int namespaceState = AcpiPmNative.LoadNamespace();
         if (namespaceState == AcpiPmNative.NamespaceUnsupported)
         {
-            TR.Skip("Acpi_Namespace_Loads", "no AML interpreter on this architecture, which powers off through PSCI");
+            TR.Skip("Acpi_Namespace_Loads", "no AML interpreter on this architecture, which powers off through PSCI or SBI");
         }
         else
         {
