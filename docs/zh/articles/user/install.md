@@ -1,5 +1,5 @@
 ---
-source_hash: efa0e487ab8d5e0d0a48f4f88281e5ec483a36ad
+source_hash: b8511205455a0e82eb341f34d4468eec418e0c58
 ---
 <a id="installation-guide"></a>
 
@@ -61,7 +61,7 @@ dotnet tool uninstall -g Cosmos.Tools
 cosmos update
 ```
 
-在内核项目目录中运行该命令，还会把项目中固定的 Cosmos 版本（`Sdk="Cosmos.Sdk/..."` 属性和 `Cosmos.*` 包引用）更新到最新版本。其他选项：
+在内核项目目录中运行该命令，还会把项目中固定的 Cosmos 版本（`Sdk="Cosmos.Sdk/..."` 属性以及 `Cosmos.Kernel*` 和 `Cosmos.Build.*` 包引用）更新到最新版本。`Cosmos.Executable.Lua` 等其余 `Cosmos.*` 包保留各自的版本。其他选项：
 
 | 选项 | 作用 |
 |--------|--------|
