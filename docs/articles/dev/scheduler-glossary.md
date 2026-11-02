@@ -10,7 +10,7 @@ These notes give the background on the scheduling concepts that the contributor 
 | [The tick and the quantum](sched-concepts/scheduler-tick.md) | The timer interrupt that gives the scheduler control, the time slice, and accounting by sample |
 | [Context switch](sched-concepts/context-switch.md) | Saving one thread's registers and restoring another's, and when the switch actually happens |
 | [Interrupts at instruction boundaries](sched-concepts/instruction-boundary.md) | An interrupt lands after one instruction and before the next; nothing longer is atomic against it |
-| [Spinlocks and interrupt masking](sched-concepts/spinlocks-and-masking.md) | Why a lock does not keep out an interrupt handler on the same CPU, and what does |
+| [Spinlocks and interrupt masking](sched-concepts/spinlocks-and-masking.md) | Why a lock does not keep out an interrupt handler on the same CPU, what does, and why nothing allocates under one |
 | [Virtual-time fair-share](sched-concepts/virtual-time-fair-share.md) | Weighted CPU shares, enforced by always running the thread whose virtual clock is furthest behind |
 | [Starvation and aging](sched-concepts/starvation.md) | Ready threads that never run, and the guards against it |
 | [Priority inversion and inheritance](sched-concepts/priority-inversion.md) | A high-priority thread stuck behind a lock holder that a medium-priority thread preempts |
