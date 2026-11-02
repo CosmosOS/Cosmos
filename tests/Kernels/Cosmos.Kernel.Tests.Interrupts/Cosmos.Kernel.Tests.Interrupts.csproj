@@ -21,6 +21,10 @@
     <CosmosTestProfile Include="bare" />
     <CosmosTestModifier Include="gicv2" />
     <CosmosTestModifier Include="gicv3" />
+    <!-- Four CPUs: the per-CPU block cells read the controller identity of the
+         application processors the kernel started (SMP phase 2), on both GIC
+         versions on arm64 and on the Local APIC on x64. -->
+    <CosmosTestModifier Include="smp4" />
   </ItemGroup>
 
   <!-- Core kernel packages (using project references for development) -->

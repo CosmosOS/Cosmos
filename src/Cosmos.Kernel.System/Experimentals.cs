@@ -4,8 +4,9 @@ namespace Cosmos.Kernel.System;
 
 /// <summary>
 /// Diagnostic IDs of the experimental API seams exposed by
-/// Cosmos.Kernel.System: the network packet seam and the ring's side of the
-/// driver kit seam. An experimental API is usable today but carries no
+/// Cosmos.Kernel.System: the network packet seam, the ring's side of the
+/// driver kit seam and the members that move a thread between CPUs. An
+/// experimental API is usable today but carries no
 /// compatibility promise; referencing one produces an error with the ID
 /// below until the caller suppresses it, which is the caller's
 /// acknowledgement of that contract.
@@ -28,4 +29,14 @@ internal static class Experimentals
     /// driver implements beside the kit's facets.
     /// </summary>
     internal const string DriverKitSeamDiagId = "COSMOS0003";
+
+    /// <summary>
+    /// The members that move a thread between CPUs:
+    /// <see cref="Threading.ThreadAffinity"/> and the setter of
+    /// <see cref="Threading.KernelCpus.DefaultAffinity"/>. Experimental until
+    /// the collector stops every CPU (SMP phase 4): until then a thread away
+    /// from CPU 0 must not allocate, and the id is what tells a kernel so.
+    /// The reads beside them, and the sets they take, are stable.
+    /// </summary>
+    internal const string AffinitySeamDiagId = "COSMOS0004";
 }

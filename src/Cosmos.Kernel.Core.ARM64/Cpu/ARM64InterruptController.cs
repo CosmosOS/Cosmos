@@ -17,7 +17,6 @@ namespace Cosmos.Kernel.Core.ARM64.Cpu;
 internal class ARM64InterruptController : IInterruptController
 {
     private bool _initialized;
-    private uint _lastAckedIntId;
 
     // ARM64 LPIs (GICv3 ITS) live in INTID space starting at 8192 (see
     // GIC.LPI_START). The dense InterruptManager.s_irqHandlers[256] table
@@ -47,8 +46,14 @@ internal class ARM64InterruptController : IInterruptController
     /// </summary>
     private const uint RescheduleSgi = 8;
 
-    /// <summary>GIC priority of the reschedule SGI: the timer's, so neither preempts the other.</summary>
-    private const byte ReschedulePriority = 0x80;
+    /// <summary>
+    /// The SGI of the stop interrupt (<see cref="SendStop"/>), next to the reschedule SGI: its
+    /// handler holds the CPU until the sender releases it (<see cref="CpuStop"/>).
+    /// </summary>
+    private const uint StopSgi = 9;
+
+    /// <summary>GIC priority of the reschedule and stop SGIs: the timer's, so none of the three preempts another.</summary>
+    private const byte SchedulerSgiPriority = 0x80;
 
     /// <summary>Size in bytes of the NEON save area the vector stub pushes below the IRQContext.</summary>
     private const int NeonSaveAreaBytes = 512;
@@ -92,6 +97,12 @@ internal class ARM64InterruptController : IInterruptController
         Arm64ExceptionVectorNative.InitExceptionVectors();
         Serial.Write("[ARM64InterruptController] Exception vectors initialized\n");
 
+        // This CPU's identity for the interrupts aimed at it, in its per-CPU
+        // block: the MPIDR_EL1 affinity (Aff3:Aff2:Aff1:Aff0), what
+        // GICD_IROUTER and an SGI's target field name a CPU by. Not the CPU
+        // index, which is Limine's order (phase 2) and the scheduler's.
+        PerCpuBlock.Current.HardwareId = GICv3.ExtractAffinity(GICv3Native.ReadMpidr());
+
         // Allocate the LPI handler table before the GIC (and therefore ITS)
         // comes online — Arm64MsiBinder can call AllocateLpi mid-bring-up.
         s_lpiHandlers = new InterruptManager.IrqDelegate?[LpiHandlerCount];
@@ -106,12 +117,38 @@ internal class ARM64InterruptController : IInterruptController
         // A handler, though it does nothing, is what takes the SGI down
         // Dispatch's IRQ path: the EOI, then the pending reschedule.
         InterruptManager.SetHandler((byte)RescheduleSgi, HandleReschedule);
-        GIC.SetPriority(RescheduleSgi, ReschedulePriority);
+        GIC.SetPriority(RescheduleSgi, SchedulerSgiPriority);
         GIC.EnableInterrupt(RescheduleSgi);
+        InterruptManager.SetHandler((byte)StopSgi, HandleStop);
+        GIC.SetPriority(StopSgi, SchedulerSgiPriority);
+        GIC.EnableInterrupt(StopSgi);
 
         Serial.Write("[ARM64InterruptController] ARM64 interrupt system ready\n");
 
         _initialized = true;
+    }
+
+    /// <inheritdoc/>
+    public void InitializeCurrentCpu()
+    {
+        if (!_initialized)
+        {
+            return;
+        }
+
+        // The vector table is loaded by the trampoline, before any managed code runs on this
+        // CPU. What is banked per CPU and so has to be done here: this CPU's identity, its GIC
+        // redistributor (found by its MPIDR) and CPU interface, and the enables and priorities
+        // of the three PPI/SGI lines the scheduler uses, which the redistributor keeps per CPU.
+        PerCpuBlock.Current.HardwareId = GICv3.ExtractAffinity(GICv3Native.ReadMpidr());
+
+        GIC.InitializeCurrentCpu();
+        GIC.SetPriority(GIC.TIMER_NONSEC_PHYS, TimerPriorityMedium);
+        GIC.EnableInterrupt(GIC.TIMER_NONSEC_PHYS);
+        GIC.SetPriority(RescheduleSgi, SchedulerSgiPriority);
+        GIC.EnableInterrupt(RescheduleSgi);
+        GIC.SetPriority(StopSgi, SchedulerSgiPriority);
+        GIC.EnableInterrupt(StopSgi);
     }
 
     /// <inheritdoc/>
@@ -124,6 +161,24 @@ internal class ARM64InterruptController : IInterruptController
 
         GIC.SendSgiToSelf(RescheduleSgi);
         return true;
+    }
+
+    /// <inheritdoc/>
+    public void SendReschedule(ulong hardwareId)
+    {
+        if (_initialized)
+        {
+            GIC.SendSgiTo(RescheduleSgi, hardwareId);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void SendStop(ulong hardwareId)
+    {
+        if (_initialized)
+        {
+            GIC.SendSgiTo(StopSgi, hardwareId);
+        }
     }
 
     public void RouteIrq(byte irqNo, byte vector, bool startMasked)
@@ -225,8 +280,13 @@ internal class ARM64InterruptController : IInterruptController
         // ARM64 exception types: 0 = sync, 1 = IRQ (GIC), 2 = FIQ, 3 = SError.
         if (ctx.interrupt == ExceptionTypeIrq)
         {
+            // The acknowledged INTID stays on this CPU's stack: the controller
+            // is one object for every CPU, and a field written here by two
+            // CPUs at once (CPU 0's reschedule SGI between an application
+            // processor's acknowledge and its end of interrupt) made the
+            // second CPU end the first one's interrupt, so its own timer line
+            // stayed active and it never ticked again.
             uint intId = GIC.AcknowledgeInterrupt();
-            _lastAckedIntId = intId;
 
             // INTIDs 1020..1023 are GICv3-reserved (1023 = spurious); LPIs
             // start at 8192 and must NOT be treated as spurious.
@@ -240,7 +300,7 @@ internal class ARM64InterruptController : IInterruptController
             if (intId >= LpiBase)
             {
                 uint off = intId - LpiBase;
-                if (s_lpiHandlers != null && off < (uint)s_lpiHandlers.Length)
+                if (s_lpiHandlers is not null && off < (uint)s_lpiHandlers.Length)
                 {
                     handler = s_lpiHandlers[(int)off];
                 }
@@ -248,40 +308,44 @@ internal class ARM64InterruptController : IInterruptController
             else
             {
                 InterruptManager.IrqDelegate?[]? handlers = InterruptManager.s_irqHandlers;
-                if (handlers != null && intId < (uint)handlers.Length)
+                if (handlers is not null && intId < (uint)handlers.Length)
                 {
                     handler = handlers[(int)intId];
                 }
             }
 
-            if (handler != null)
+            if (handler is not null)
             {
                 ctx.interrupt = intId;
                 handler(ref ctx);
             }
 
-            SendEOI();
+            SendEOI(intId);
 
-            if (handler != null)
+            if (handler is not null)
             {
                 // Mirror of the x64 IRQ-exit reschedule (see
                 // X64InterruptController.Dispatch): the ARM64 vector stub also
-                // applies the staged context switch on every exit. Single-CPU
-                // ARM64 for now (cpuId 0); the saved context sits 512 bytes
-                // (NEON save area) below the IRQContext, same derivation as
-                // the GenericTimer handler.
+                // applies the staged context switch on every exit. The saved
+                // context sits 512 bytes (NEON save area) below the
+                // IRQContext, same derivation as the GenericTimer handler.
                 RunPendingReschedule(ref ctx);
+
+                // Last, after every switch this exit could stage: the thread
+                // the vector is about to resume must be off its previous
+                // CPU's stack (SMP phase 3b).
+                SchedulerManager.FinishSwitchFromIrq(SchedulerManager.GetCurrentCpuId());
             }
             return;
         }
 
-        if (ctx.interrupt == ExceptionTypeSync)  // Synchronous exception
+        if (ctx.interrupt == ExceptionTypeSync)
         {
             InterruptManager.IrqDelegate?[]? handlers = InterruptManager.s_irqHandlers;
-            if (handlers != null)
+            if (handlers is not null)
             {
                 InterruptManager.IrqDelegate? handler = handlers[0];
-                if (handler != null)
+                if (handler is not null)
                 {
                     handler(ref ctx);
                     return;
@@ -314,12 +378,22 @@ internal class ARM64InterruptController : IInterruptController
     {
     }
 
-    private static void RunPendingReschedule(ref IRQContext ctx)
+    /// <summary>
+    /// The stop SGI's handler: holds this CPU in the rendezvous until the sender releases it.
+    /// Dispatch ends the interrupt after it returns, so the CPU interface keeps the SGI active,
+    /// and so every other line masked, for as long as the CPU is held.
+    /// </summary>
+    private static void HandleStop(ref IRQContext ctx)
     {
-        SchedulerManager.ReschedulePendingFromIrq(0, SavedContextStackPointer(ref ctx));
+        CpuStop.HandleStopInterrupt();
     }
 
-    private void SendEOI()
+    private static void RunPendingReschedule(ref IRQContext ctx)
+    {
+        SchedulerManager.ReschedulePendingFromIrq(SchedulerManager.GetCurrentCpuId(), SavedContextStackPointer(ref ctx));
+    }
+
+    private static void SendEOI(uint intId)
     {
         // INTIDs 1020..1023 are GIC-reserved (1023 = spurious); writing those
         // to ICC_EOIR1_EL1 is UNPREDICTABLE per ARM IHI 0069G. Everything
@@ -327,9 +401,9 @@ internal class ARM64InterruptController : IInterruptController
         // delivered by the ITS — must be EOI'd or the CPU interface keeps
         // the priority active and silently drops every subsequent IRQ at
         // equal/lower priority.
-        if (_lastAckedIntId < SpecialIntIdBase || _lastAckedIntId >= SpecialIntIdLimit)
+        if (intId < SpecialIntIdBase || intId >= SpecialIntIdLimit)
         {
-            GIC.EndOfInterrupt(_lastAckedIntId);
+            GIC.EndOfInterrupt(intId);
         }
     }
 
