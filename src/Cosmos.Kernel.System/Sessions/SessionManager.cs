@@ -1,10 +1,10 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Input;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.System.Sessions;
 
@@ -57,6 +57,17 @@ public static class SessionManager
 
     /// <summary>Wakes the switching thread; null until keys are routed.</summary>
     private static InterruptEvent? s_switchSignal;
+
+    /// <summary>
+    /// The manager's lock, IRQ-safe (SMP phase 4b, CosmosOS/Cosmos#3347):
+    /// around the table, the primary and active sessions and the routing
+    /// hand-over. Nothing allocates under it: what a member installs is
+    /// allocated before it takes the lock and dropped when another thread
+    /// won. Taken before a session's lock and the keyboard queue's, which
+    /// the drain takes inside it, and before a screen's, which a switch
+    /// takes inside it; never after any of them.
+    /// </summary>
+    private static SchedSpinLock s_lock;
 
     /// <summary>
     /// The primary console, tty1, or null while there is no
@@ -114,18 +125,21 @@ public static class SessionManager
     {
         _ = Primary;
 
-        List<ConsoleSession> sessions = [];
-        using (InternalCpu.DisableInterruptsScope())
+        // The snapshot is taken into an array sized for the table before
+        // the lock, and the list built after it: nothing allocates under a
+        // spinlock.
+        ConsoleSession?[] snapshot = new ConsoleSession?[MaxSessions];
+        using (s_lock.AcquireIrqSafe())
         {
-            if (s_slots is not null)
+            s_slots?.CopyTo(snapshot, 0);
+        }
+
+        List<ConsoleSession> sessions = [];
+        foreach (ConsoleSession? session in snapshot)
+        {
+            if (session is not null)
             {
-                foreach (ConsoleSession? session in s_slots)
-                {
-                    if (session is not null)
-                    {
-                        sessions.Add(session);
-                    }
-                }
+                sessions.Add(session);
             }
         }
 
@@ -139,7 +153,7 @@ public static class SessionManager
     {
         _ = Primary;
 
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_lock.AcquireIrqSafe())
         {
             return s_slots is not null && id >= 1 && id <= MaxSessions ? s_slots[id - 1] : null;
         }
@@ -228,12 +242,16 @@ public static class SessionManager
 
         _ = Primary;
 
+        // The table is allocated before the lock in case this is the first
+        // registration, and dropped when Primary or another registrar made
+        // it meanwhile.
+        ConsoleSession?[] slots = new ConsoleSession?[MaxSessions];
         int count = 0;
         bool registered = false;
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_lock.AcquireIrqSafe())
         {
-            // Checked masked: a session closed before this point is not
-            // listed, one closed after it is unlisted by its Close().
+            // Checked under the lock: a session closed before this point is
+            // not listed, one closed after it is unlisted by its Close().
             if (session.IsClosed)
             {
                 return false;
@@ -244,7 +262,7 @@ public static class SessionManager
                 return true;
             }
 
-            s_slots ??= new ConsoleSession?[MaxSessions];
+            s_slots ??= slots;
             for (int i = 0; i < s_slots.Length; i++)
             {
                 if (s_slots[i] is null && !registered)
@@ -273,7 +291,7 @@ public static class SessionManager
     internal static void Unregister(ConsoleSession session)
     {
         bool wasActive;
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_lock.AcquireIrqSafe())
         {
             if (s_slots is not null && session.Id >= 1 && ReferenceEquals(s_slots[session.Id - 1], session))
             {
@@ -292,15 +310,18 @@ public static class SessionManager
     /// <summary>Makes <see cref="KernelConsole.Default"/> the primary console, tty1, on the display.</summary>
     private static void CreatePrimary(KernelConsole screen)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        // The session and the table are allocated before the lock and
+        // dropped when another thread created the primary meanwhile.
+        VirtualConsole primary = new(screen) { Id = 1 };
+        ConsoleSession?[] slots = new ConsoleSession?[MaxSessions];
+        using (s_lock.AcquireIrqSafe())
         {
             if (s_primary is not null)
             {
                 return;
             }
 
-            VirtualConsole primary = new(screen) { Id = 1 };
-            s_slots ??= new ConsoleSession?[MaxSessions];
+            s_slots ??= slots;
             s_slots[0] = primary;
             s_active = primary;
             s_primary = primary;
@@ -310,11 +331,15 @@ public static class SessionManager
     /// <summary>Hides the session on the display and shows <paramref name="target"/>, repainting the display from its screen.</summary>
     private static void Show(ConsoleSession target)
     {
-        // Masked throughout, so two switches cannot interleave and leave two
-        // screens painting the one canvas.
-        using (InternalCpu.DisableInterruptsScope())
+        // Under the lock throughout, so two switches cannot interleave and
+        // leave two screens painting the one canvas; each screen's own lock
+        // is taken inside.
+        using (s_lock.AcquireIrqSafe())
         {
-            ConsoleSession? previous = Active;
+            // Read directly: Active falls back to Primary, which takes this
+            // lock to create the primary console, and the lock is not
+            // re-entrant.
+            ConsoleSession? previous = s_active ?? s_primary;
             if (ReferenceEquals(previous, target))
             {
                 return;
@@ -378,14 +403,17 @@ public static class SessionManager
             return;
         }
 
-        using (InternalCpu.DisableInterruptsScope())
+        // The signal is allocated before the lock and dropped when another
+        // registrar started the routing meanwhile.
+        InterruptEvent signal = new();
+        using (s_lock.AcquireIrqSafe())
         {
             if (s_switchSignal is not null)
             {
                 return;
             }
 
-            s_switchSignal = new InterruptEvent();
+            s_switchSignal = signal;
         }
 
         if (!KernelThread.TryStart(SwitchOnRequest))
@@ -396,18 +424,26 @@ public static class SessionManager
             return;
         }
 
-        // Masked, so no key lands in the keyboard's queue between the drain
-        // and the router taking over.
-        using (InternalCpu.DisableInterruptsScope())
+        // Under the lock, so no key lands in the keyboard's queue between
+        // the drain and the router taking over; the queue's lock and the
+        // session's are taken inside. The router's delegate is built before
+        // the lock, and the session's reader woken once after it, so no lock
+        // of the ring is held across a call into the scheduler.
+        Action<KeyEvent> router = RouteKey;
+        ConsoleSession? active;
+        using (s_lock.AcquireIrqSafe())
         {
+            active = s_active;
             while (KeyboardManager.TryReadKey(out KeyEvent? pending))
             {
-                s_active?.EnqueueInput(pending);
+                active?.QueueInput(pending);
             }
 
-            KeyboardManager.KeyRouter = RouteKey;
+            KeyboardManager.KeyRouter = router;
             IsRoutingKeyboard = true;
         }
+
+        active?.WakeReader();
     }
 
     /// <summary>
