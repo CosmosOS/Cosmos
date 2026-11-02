@@ -15,7 +15,7 @@
 | Debugger| ✅ | 🟡 Partial | Source link + variables bugs in vscode |
 | CPU/FPU accelerated math | ✅ | ✅ | x64 only: x87 FPU (sin/cos/tan/exp/log/atan) |
 | Cosmos Graphic Subsystem | ✅ | ✅ | The firmware framebuffer via Limine, plus the virtio-gpu, VMware SVGA II, AMD DCN 3.1.5 and Intel integrated graphics display drivers over the driver kit (SVGA3D on the VMware one). |
-| Network interface | ✅ | ✅ | |
+| Network interface | ✅ | ✅ | Intel E1000E (which also binds the 8254x e1000) and virtio-net over the driver kit. ARP, IPv4, link-local IPv6, UDP, TCP, DHCP and DNS through the standard `System.Net.Sockets` and `System.Net.Dns`; Telnet, FTP and HTTP (client and server) as packages. |
 | Timer / Clock | ✅ | ✅ | |
 | Keyboard Input | ✅ | ✅ | PS/2 (x64), virtio and USB keyboards, all as driver kit drivers |
 | Mouse Input | ✅ | ✅ | PS/2 (x64), virtio and USB mice, all as driver kit drivers |
@@ -34,6 +34,7 @@ Beyond Gen2 parity, Gen3 brings new capabilities:
 | **Feature Flags** | ✅ |  |
 | **Cosmos Vs Code Extension** | ✅ |  |
 | **USB Support** | ✅ | xHCI, EHCI and OHCI host controllers with hubs and hot-plug (x64 + ARM64) as driver kit drivers, with the HID boot keyboard, HID boot mouse and mass storage (Bulk-Only Transport) class drivers. No UHCI (Intel's USB 1.1 companion over port I/O). |
+| **HTTPS** | ✅ | TLS 1.3 and 1.2 in managed code (BouncyCastle), through the Cosmos.Network.Http package ([HTTP and HTTPS](articles/user/network.md#http-and-https)): `HttpClient` and `HttpListener` over `https://`, with certificates checked against Mozilla's roots. |
 
 ## Future Releases
 

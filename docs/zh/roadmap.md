@@ -1,5 +1,5 @@
 ---
-source_hash: 3b9076646871e91a946ae8d5df58a74bd8d6d705
+source_hash: 2bad57cfc5819f387da608190853fc35b52a1fd8
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -20,7 +20,7 @@ source_hash: 3b9076646871e91a946ae8d5df58a74bd8d6d705
 | 调试器| ✅ | 🟡 部分 | vscode 中存在 Source link 和变量相关的 bug |
 | CPU/FPU 加速数学运算 | ✅ | ✅ | 仅限 x64：x87 FPU（sin/cos/tan/exp/log/atan） |
 | Cosmos 图形子系统 | ✅ | ✅ | 通过 Limine 获得的固件帧缓冲区，以及基于驱动工具包的 virtio-gpu、VMware SVGA II、AMD DCN 3.1.5 和 Intel 集成显卡显示驱动程序（VMware 驱动程序上还有 SVGA3D）。 |
-| 网络接口 | ✅ | ✅ | |
+| 网络接口 | ✅ | ✅ | 基于驱动工具包的 Intel E1000E（它同样会绑定 8254x e1000）和 virtio-net。通过标准的 `System.Net.Sockets` 和 `System.Net.Dns` 提供 ARP、IPv4、IPv6 链路本地地址、UDP、TCP、DHCP 和 DNS；Telnet、FTP 和 HTTP（客户端和服务器）以包的形式提供。 |
 | 定时器 / 时钟 | ✅ | ✅ | |
 | 键盘输入 | ✅ | ✅ | PS/2（x64）、virtio 和 USB 键盘，均以驱动工具包驱动程序的形式实现 |
 | 鼠标输入 | ✅ | ✅ | PS/2（x64）、virtio 和 USB 鼠标，均以驱动工具包驱动程序的形式实现 |
@@ -41,6 +41,7 @@ source_hash: 3b9076646871e91a946ae8d5df58a74bd8d6d705
 | **功能开关** | ✅ |  |
 | **Cosmos VS Code 扩展** | ✅ |  |
 | **USB 支持** | ✅ | xHCI、EHCI 和 OHCI 主机控制器，支持集线器和热插拔（x64 + ARM64），均以驱动工具包驱动程序的形式实现，并配有 HID 启动键盘、HID 启动鼠标和大容量存储（Bulk-Only Transport）类驱动程序。不支持 UHCI（Intel 通过端口 I/O 访问的 USB 1.1 配套控制器）。 |
+| **HTTPS** | ✅ | 由 BouncyCastle 以托管代码实现 TLS 1.3 和 1.2，通过 Cosmos.Network.Http 包提供（[HTTP 和 HTTPS](articles/user/network.md#http-and-https)）：`HttpClient` 和 `HttpListener` 支持 `https://`，并根据 Mozilla 的根证书校验证书。 |
 
 <a id="future-releases"></a>
 
