@@ -1256,15 +1256,10 @@ public static class SchedulerManager
 
         using (InternalCpu.DisableInterruptsScope())
         {
-            // Return TLAB and track unused bytes before unregistering
+            // Return the TLAB and keep what the thread allocated in the total before unregistering
             if (GarbageCollector.IsEnabled)
             {
-                unsafe
-                {
-                    ulong unused = (ulong)(thread._allocContext.AllocLimit - thread._allocContext.AllocPtr);
-                    GarbageCollector.AddDeadThreadNonAllocBytes(unused);
-                    GarbageCollector.ReturnAllocContext(ref thread._allocContext);
-                }
+                GarbageCollector.RetireAllocContext(ref thread._allocContext);
             }
 
             PerCpuState state = AcquireThreadQueueLock(thread);
