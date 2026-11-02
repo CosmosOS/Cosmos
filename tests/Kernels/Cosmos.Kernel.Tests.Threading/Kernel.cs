@@ -1594,6 +1594,10 @@ public class Kernel : Sys.Kernel
         });
         worker.Start();
         Assert.True(worker.Join(ThrowJoinTimeoutMs), "the worker must finish");
+        // Join returns once the worker's exit callback signals it, before OnThreadExit takes
+        // the worker's tickets back out of the Stride total: the grace wait lets that exit
+        // finish inside this cell, not in a later cell that compares TotalTickets.
+        TimerManager.Wait(ExitGraceWaitMs);
 
         Assert.True(s_workerOwnExInfoSlot != 0 && s_workerSeenExInfoHead == s_workerOwnExInfoSlot, "on the worker the block points at the worker's chain head");
         Assert.True(s_workerOwnExInfoSlot != main.ExInfoHeadSlot, "two threads, two chain heads");
