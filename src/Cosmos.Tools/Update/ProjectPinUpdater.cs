@@ -10,7 +10,7 @@ namespace Cosmos.Tools.Update;
 ///   &lt;Project Sdk="Cosmos.Sdk/3.0.71"&gt;                          (template output)
 ///   &lt;Sdk Name="Cosmos.Sdk" Version="3.0.71" /&gt;                  (element form)
 ///   "msbuild-sdks": { "Cosmos.Sdk": "3.0.71" }                  (global.json)
-///   &lt;PackageReference Include="Cosmos.*" Version="3.0.71" /&gt;    (and CPM PackageVersion)
+///   &lt;PackageReference Include="Cosmos.Kernel" Version="3.0.71" /&gt;  (and CPM PackageVersion)
 /// </code>
 /// The pins must move as one set: the Sdk pin controls the versions of every
 /// transitive Cosmos package via the baked Sdk.props, so a partial bump restores
@@ -18,6 +18,16 @@ namespace Cosmos.Tools.Update;
 /// </summary>
 public static class ProjectPinUpdater
 {
+    /// <summary>
+    /// The package ids that ship with Cosmos.Sdk and share its version: Cosmos.Sdk,
+    /// Cosmos.Patcher, Cosmos.Tools, Cosmos.Kernel and Cosmos.Kernel.*, and
+    /// Cosmos.Build.*. Other Cosmos.* packages (Cosmos.Executable.Lua,
+    /// Cosmos.Network.Http, third-party libraries) have versions of their own and
+    /// are not pins. NuGet ids ignore case, so the match does too.
+    /// </summary>
+    private const string ReleaseTrainPackageId =
+        "(?i:Cosmos\\.(?:Sdk|Patcher|Tools|Kernel(?:\\.[^\"]+)?|Build\\.[^\"]+))";
+
     private static readonly Regex s_sdkAttribute = new Regex(
         "(?<pre>\\bSdk\\s*=\\s*\"Cosmos\\.Sdk/)(?<ver>[^\"]+)(?=\")",
         RegexOptions.Compiled);
@@ -27,7 +37,7 @@ public static class ProjectPinUpdater
         RegexOptions.Compiled | RegexOptions.Singleline);
 
     private static readonly Regex s_packagePin = new Regex(
-        "(?<pre><(?:PackageReference|PackageVersion)\\b(?=[^>]*\\bInclude\\s*=\\s*\"Cosmos\\.[^\"]*\")[^>]*?\\bVersion\\s*=\\s*\")(?<ver>[^\"]+)(?=\")",
+        "(?<pre><(?:PackageReference|PackageVersion)\\b(?=[^>]*\\bInclude\\s*=\\s*\"" + ReleaseTrainPackageId + "\")[^>]*?\\bVersion\\s*=\\s*\")(?<ver>[^\"]+)(?=\")",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
     private static readonly Regex s_globalJsonSdk = new Regex(

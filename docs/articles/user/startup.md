@@ -231,3 +231,20 @@ The two `sata0` lines appear when a disk is attached (`cosmos run --disk disk.im
 ```
 
 For interactive debugging on top of the serial log, see [Debugging with VSCode and QEMU](debugging.md).
+
+## Summary
+
+| Task | Call |
+|---|---|
+| Set up once before the main loop | `BeforeRun()` |
+| Write the main loop body | `Run()` |
+| Clean up after the loop ends | `AfterRun()` |
+| Park the CPU until an interrupt | `Power.Halt()` |
+| Restart the machine | `Power.Reboot()` |
+| Power the machine off | `Power.Shutdown()` |
+| End the main loop | `Stop()` |
+| Reach the running kernel from static code | `Kernel.Current` |
+| Run early setup before the console exists | `OnBoot()` |
+| Bring the console up on a headless kernel | `KernelConsole.Initialize()` |
+| Take over the whole lifecycle | `Start()` |
+| Read the kernel command line | `Environment.GetCommandLineArgs()` |

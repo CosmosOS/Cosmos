@@ -9,6 +9,8 @@
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/release.yml?label=release&logo=github" /></a>
 </p>
 
+English | [Français](README_FR.md) | [简体中文](README_CN.md) | [Polski](README_PL.md)
+
 # Cosmos gen3
 
 A bare-metal C# kernel framework built on **NativeAOT**. Cosmos gen3 is the next generation of the [Cosmos](https://github.com/CosmosOS/Cosmos) operating system project, replacing the IL2CPU transpiler with the official .NET ahead-of-time compiler. The result is an ordinary `dotnet build` that produces a bootable kernel ELF for **x64 or ARM64**, linked with an integrated runtime, plugged with the Cosmos plug system, and packaged into an ISO with the Limine bootloader.
@@ -30,14 +32,14 @@ Cosmos gen2 compiled C# IL to x86 assembly through **IL2CPU**, a custom transpil
 - [Priority-based Stride Scheduler](https://cosmosos.github.io/articles/dev/scheduler.html)
 - Exception handling
 - Interrupts (APIC on x64, GIC on ARM64)
-- ACPI (via [LAI](https://github.com/managarm/lai))
+- ACPI (via [uACPI](https://github.com/uACPI/uACPI))
 - PCI and MMIO drivers
 - UART serial
 - [Cosmos Graphics Subsystem](https://cosmosos.github.io/articles/user/graphics.html)
 - [Keyboard](https://cosmosos.github.io/articles/user/keyboard.html) and [Mouse](https://cosmosos.github.io/articles/user/mouse.html) input
 - [Network stack](https://cosmosos.github.io/articles/user/network.html)
 - Storage drivers (AHCI/SATA, NVMe, virtio-blk, USB mass storage) with MBR, GPT and EBR partitioning
-- [FAT12/16/32 filesystem](https://cosmosos.github.io/articles/user/filesystem.html) on a Unix-style VFS (mount, superblocks, inodes)
+- [FAT12/16/32, ext2 and ISO 9660 filesystems](https://cosmosos.github.io/articles/user/filesystem.html) on a Unix-style VFS (mount, superblocks, inodes, read-only mounts)
 - Timer / Clock
 
 ## Documentation

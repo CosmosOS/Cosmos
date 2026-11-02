@@ -9,6 +9,7 @@
 
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Network.Protocols.Dns;
+using Cosmos.Kernel.System.Network.Protocols.Udp;
 using Cosmos.Kernel.System.Timers;
 
 namespace Cosmos.Kernel.System.Network;
@@ -96,12 +97,12 @@ public sealed class DnsClient : UdpClient
             waited += 10;
         }
 
-        if (_rxBuffer.Count < 1)
+        if (!TryDequeue(out UdpPacket? received))
         {
             return null;
         }
 
-        DnsPacketAnswer packet = new(_rxBuffer.Dequeue().RawData);
+        DnsPacketAnswer packet = new(received.RawData);
 
         if ((ushort)(packet.DnsFlags & 0x0F) != (ushort)ReplyCode.OK)
         {

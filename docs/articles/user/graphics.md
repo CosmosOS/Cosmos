@@ -456,3 +456,27 @@ Back buffer ──── Display() ────▶ the primary display's framebu
                      driver kit: the firmware display "framebuffer" (Limine, x64 & ARM64)
                                  or a driver's display (virtio-gpu, vmware-svga, amd-dcn, intel-graphics)
 ```
+
+## Summary
+
+| Task | Call |
+|---|---|
+| Get the screen's canvas | `Canvas.GetFullScreen()` |
+| Switch the video mode | `Canvas.GetFullScreen(mode)` |
+| Read the resolution | `canvas.Width`, `canvas.Height` |
+| Show the finished frame | `canvas.Display()` |
+| Clear the canvas | `canvas.Clear(color)` |
+| Draw a shape | `canvas.DrawPoint`, `DrawLine`, `DrawRectangle`, `DrawCircle`, `DrawEllipse`, `DrawArc`, `DrawTriangle`, `DrawPolygon` |
+| Draw a filled shape | `canvas.DrawFilledRectangle`, `DrawFilledCircle` |
+| Get a PSF font | `PCScreenFont.DefaultFont`, `PCScreenFont.LoadFont(fontData)` |
+| Draw text | `canvas.DrawString(text, font, color, x, y)` |
+| Draw TrueType text at any size | `new TrueTypeFont(path)`, `canvas.DrawString(text, font, size, color, x, y)` |
+| Measure text | `font.MeasureString(text, size)`, `font.GetLineHeight(size)` |
+| Load a BMP or PNG file | `new Bitmap(path)`, `new Png(path)` |
+| Draw an image | `canvas.DrawImage(image, x, y)`, `canvas.DrawImage(image, x, y, width, height)` |
+| Create an off-screen canvas | `new Canvas(width, height)` |
+| Draw a canvas onto another | `canvas.DrawCanvas(tile, x, y)`, `canvas.DrawCanvas(tile, x, y, width, height)` |
+| Read pixels back | `canvas.GetPointColor(x, y)`, `canvas.GetImage(x, y, width, height)` |
+| Get a 3D canvas | `Canvas.GetFullScreen() is Canvas3D canvas3D` |
+| Draw a 3D scene | `canvas3D.Camera`, `ClearScene`, `DrawCube`, `DrawGrid` |
+| Draw a mesh | `canvas3D.CreateMesh(positions, colors, indices)`, `canvas3D.DrawMesh(mesh, world)` |

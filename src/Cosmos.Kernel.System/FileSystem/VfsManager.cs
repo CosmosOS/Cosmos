@@ -140,8 +140,11 @@ public static partial class VfsManager
             return false;
         }
 
+        // A volume the driver cannot write is read-only whatever the caller
+        // asked for, so the mount records what it will enforce.
+        MountFlags effectiveFlags = superblock.IsReadOnly ? flags | MountFlags.ReadOnly : flags;
         string normalizedMountPoint = NormalizeMountPoint(mountPoint);
-        mount = new VfsMount(name, source.ToString(), normalizedMountPoint, fileSystemType, superblock, partition);
+        mount = new VfsMount(name, source.ToString(), normalizedMountPoint, fileSystemType, superblock, partition, effectiveFlags);
         s_mountLock.Acquire();
         try
         {
@@ -652,6 +655,17 @@ public static partial class VfsManager
         }
 
         return path.Length == mountPoint.Length || path[mountPoint.Length] == Path.DirectorySeparatorChar;
+    }
+
+    /// <summary>
+    /// True when the mount covering <paramref name="fullPath"/> is read-only
+    /// (<see cref="VfsMount.IsReadOnly"/>). A path no mount covers is not:
+    /// the virtual root has its own refusal.
+    /// </summary>
+    /// <param name="fullPath">The absolute path to check.</param>
+    internal static bool IsReadOnlyPath(string fullPath)
+    {
+        return FindMount(fullPath) is { IsReadOnly: true };
     }
 
     private static VfsMount? FindMount(string path)

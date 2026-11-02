@@ -1,0 +1,3 @@
+# The fixture trees are mapped byte for byte into the ISO images the suite
+# asserts on: no line-ending conversion on any checkout.
+* -text

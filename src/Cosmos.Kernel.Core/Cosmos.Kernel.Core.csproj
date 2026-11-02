@@ -132,6 +132,13 @@
     <!-- White-box CSPRNG suite: known-answer tests of the BLAKE2s and ChaCha20
          primitives, and which entropy source seeded KernelRandom. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Random" />
+    <!-- The power suite brings uACPI's namespace up without powering off
+         (AcpiPmNative.LoadNamespace): its Shutdown cell cannot tell ACPI S5
+         from the emulator port fallback. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Power" />
+    <!-- The ISO 9660 suite reads its fixture images, embedded in the test
+         kernel, through ResourceManager. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Iso9660" />
   </ItemGroup>
 
   <ItemGroup>

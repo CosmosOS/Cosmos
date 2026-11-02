@@ -36,6 +36,8 @@
 // | T12 CC hash    | -                   | -                   | -                   | edit/revert RT      | -                   | -                   |
 // | T13 Clean+cache | runs -> OK hit      | runs -> OK hit      | runs -> snapshot eq | runs -> snapshot eq | runs -> OK hit      | runs -> OK hit      |
 // | T14 Switch flip | OK hit              | rebuilds (mtime)    | OK snapshot eq      | OK snapshot eq      | rebuilds (mtime)    | rebuilds (mtime)    |
+// | T15 isoFiles    | OK hit              | OK hit              | -                   | -                   | OK hit              | rebuilds (mtime)    |
+// | T16 /boot clash | build fails         | -                   | -                   | -                   | -                   | -                   |
 // |-----------------------------------------------------------------------------------------------------------------------------------------------------|
 //
 // =====================================================================
@@ -91,6 +93,24 @@ public class BuildCacheTests : IClassFixture<BuildFixture>
         Assert.True(result.Stdout.Contains("ILC cache hit"), $"{label}: missing ILC cache hit\n{result.Output}");
         Assert.True(result.Stdout.Contains("Linker cache hit"), $"{label}: missing linker cache hit\n{result.Output}");
         Assert.True(result.Stdout.Contains("ISO cache hit"), $"{label}: missing ISO cache hit\n{result.Output}");
+    }
+
+    /// <summary>Builds and asserts that the ISO, and nothing upstream of it, was rebuilt.</summary>
+    private void AssertIsoOnlyRebuild(string label)
+    {
+        DateTime elfBefore = File.GetLastWriteTimeUtc(_fixture.ElfFile);
+        DateTime isoBefore = File.GetLastWriteTimeUtc(_fixture.IsoFile);
+
+        Thread.Sleep(1100);
+        BuildResult result = _fixture.Build();
+
+        Assert.True(result.Success, $"{label}: build failed:\n{result.Output}");
+        Assert.True(result.Stdout.Contains("Patcher cache hit"), $"{label}: missing patcher cache hit\n{result.Output}");
+        Assert.True(result.Stdout.Contains("ILC cache hit"), $"{label}: missing ILC cache hit\n{result.Output}");
+        Assert.True(result.Stdout.Contains("Linker cache hit"), $"{label}: missing linker cache hit\n{result.Output}");
+        Assert.True(result.Stdout.Contains("ISO created at:"), $"{label}: the ISO was not rebuilt\n{result.Output}");
+        Assert.Equal(elfBefore, File.GetLastWriteTimeUtc(_fixture.ElfFile));
+        Assert.NotEqual(isoBefore, File.GetLastWriteTimeUtc(_fixture.IsoFile));
     }
 
     // ==================================================================
@@ -551,5 +571,85 @@ public class BuildCacheTests : IClassFixture<BuildFixture>
         BuildResult verify = _fixture.Build();
         Assert.True(verify.Success, $"Verify build failed:\n{verify.Output}");
         AssertAllCacheHits(verify, "after feature switch revert");
+    }
+
+    // ==================================================================
+    // TEST 15: A file shipped through isoFiles/ -> only the ISO rebuilds.
+    //          Adding it, changing its bytes, renaming it (same bytes, so
+    //          only the manifest of ISO paths tells) and removing it each
+    //          rebuild the ISO with the patcher, ILC and linker cached, and
+    //          iso_root follows every step. Then every cache hits again.
+    // ==================================================================
+    [Fact, TestPriority(15)]
+    public void T15_IsoFilesChange_RebuildsIsoOnly()
+    {
+        string isoFilesDir = Path.Combine(_fixture.DevKernelDir, "isoFiles");
+        bool createdIsoFilesDir = !Directory.Exists(isoFilesDir);
+        string testDir = Path.Combine(isoFilesDir, "cache-test");
+        string shipped = Path.Combine(testDir, "shipped.txt");
+        string renamed = Path.Combine(testDir, "renamed.txt");
+        string shippedOnIso = Path.Combine(_fixture.IsoRootDir, "cache-test", "shipped.txt");
+        string renamedOnIso = Path.Combine(_fixture.IsoRootDir, "cache-test", "renamed.txt");
+
+        try
+        {
+            Directory.CreateDirectory(testDir);
+            File.WriteAllText(shipped, "first");
+            AssertIsoOnlyRebuild("isoFiles file added");
+            Assert.Equal("first", File.ReadAllText(shippedOnIso));
+
+            File.WriteAllText(shipped, "second");
+            AssertIsoOnlyRebuild("isoFiles file changed");
+            Assert.Equal("second", File.ReadAllText(shippedOnIso));
+
+            File.Move(shipped, renamed);
+            AssertIsoOnlyRebuild("isoFiles file renamed");
+            Assert.False(File.Exists(shippedOnIso), "the old name should leave iso_root");
+            Assert.Equal("second", File.ReadAllText(renamedOnIso));
+        }
+        finally
+        {
+            Directory.Delete(createdIsoFilesDir ? isoFilesDir : testDir, true);
+        }
+
+        AssertIsoOnlyRebuild("isoFiles file removed");
+        Assert.False(File.Exists(renamedOnIso), "a removed file should leave iso_root");
+
+        BuildResult verify = _fixture.Build();
+        Assert.True(verify.Success, $"Verify build failed:\n{verify.Output}");
+        AssertAllCacheHits(verify, "after the isoFiles round trip");
+    }
+
+    // ==================================================================
+    // TEST 16: A shipped file on /boot fails the build, naming the file,
+    //          and leaves every cache as it was: once it is gone, every
+    //          step hits.
+    // ==================================================================
+    [Fact, TestPriority(16)]
+    public void T16_IsoFilesOnBoot_FailsTheBuild()
+    {
+        string isoFilesDir = Path.Combine(_fixture.DevKernelDir, "isoFiles");
+        bool createdIsoFilesDir = !Directory.Exists(isoFilesDir);
+        string bootDir = Path.Combine(isoFilesDir, "boot");
+        string clash = Path.Combine(bootDir, "clash.txt");
+
+        try
+        {
+            Directory.CreateDirectory(bootDir);
+            File.WriteAllText(clash, "not the kernel");
+            BuildResult result = _fixture.Build();
+
+            Assert.False(result.Success, $"A file on /boot should fail the build:\n{result.Output}");
+            Assert.Contains("clash.txt", result.Output);
+            Assert.Contains("/boot and /EFI hold the kernel and the bootloader", result.Output);
+        }
+        finally
+        {
+            Directory.Delete(createdIsoFilesDir ? isoFilesDir : bootDir, true);
+        }
+
+        BuildResult verify = _fixture.Build();
+        Assert.True(verify.Success, $"Verify build failed:\n{verify.Output}");
+        AssertAllCacheHits(verify, "after the /boot clash is removed");
     }
 }

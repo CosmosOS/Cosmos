@@ -1362,14 +1362,29 @@ public static class SchedulerManager
     /// time, out of the time of the threads that could run. Returns at once
     /// when a wake already landed. The idle thread, and any thread before the
     /// controller can raise the interrupt, halts instead. Thread context,
-    /// interrupts enabled.
+    /// interrupts enabled: a thread that parks with interrupts masked is
+    /// stopped with a panic naming the wait it came from, since the
+    /// reschedule interrupt and the tick both stay pending and nothing can
+    /// switch away from it or wake it.
     /// </summary>
     /// <param name="thread">The calling thread.</param>
-    internal static void Park(SchedulerThread thread)
+    /// <param name="waiter">The member that parks, for the panic. Filled in by the compiler.</param>
+    /// <param name="file">Its source file. Filled in by the compiler.</param>
+    /// <param name="line">Its line. Filled in by the compiler.</param>
+    internal static void Park(
+        SchedulerThread thread,
+        [CallerMemberName] string waiter = "",
+        [CallerFilePath] string file = "",
+        [CallerLineNumber] int line = 0)
     {
         if (!IsParked(thread))
         {
             return;
+        }
+
+        if (!InternalCpu.InterruptsEnabled)
+        {
+            PanicMaskedPark(thread, waiter, file, line);
         }
 
         PerCpuState[]? states = s_cpuStates;
@@ -1396,6 +1411,28 @@ public static class SchedulerManager
         {
             InternalCpu.Halt();
         }
+    }
+
+    /// <summary>
+    /// Stops the kernel for a thread that parked with interrupts masked, the
+    /// freeze of #3387: a wait under an interrupt mask, or under a spinlock
+    /// taken with <see cref="SpinLock.AcquireIrqSafe"/>, spun with the timer
+    /// masked until a watchdog killed the machine, and the log ended on the
+    /// wait without saying who waited. Allocation-free.
+    /// </summary>
+    [DoesNotReturn]
+    private static void PanicMaskedPark(SchedulerThread thread, string waiter, string file, int line)
+    {
+        Serial.WriteString("[SCHED] Thread ");
+        Serial.WriteNumber(thread.Id);
+        Serial.WriteString(" parked with interrupts masked\n");
+        Panic.Halt(
+            "A thread blocked with interrupts masked: the reschedule interrupt and the tick stay pending, "
+            + "so nothing can switch away from it or wake it. Leave the masked section (or the IRQ-safe "
+            + "spinlock) before waiting, or take a lock that blocks instead.",
+            waiter,
+            file,
+            line);
     }
 
     /// <summary>

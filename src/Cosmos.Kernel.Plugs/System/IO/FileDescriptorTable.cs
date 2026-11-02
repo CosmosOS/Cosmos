@@ -58,16 +58,19 @@ internal static unsafe class FileDescriptorTable
 
     private sealed class DirectoryStreamState
     {
-        public DirectoryStreamState(string[] names, bool[] isDirectory, byte* nameBuffer)
+        public DirectoryStreamState(string[] names, PalSys.NodeType[] types, byte* nameBuffer)
         {
             Names = names;
-            IsDirectory = isDirectory;
+            Types = types;
             NameBuffer = nameBuffer;
             Index = 0;
         }
 
         public string[] Names { get; }
-        public bool[] IsDirectory { get; }
+
+        /// <summary>The d_type of each entry: a symbolic link is reported as one, so
+        /// the BCL stats its target to learn whether it lists as a directory.</summary>
+        public PalSys.NodeType[] Types { get; }
         public byte* NameBuffer { get; }
         public int Index { get; set; }
     }
@@ -92,6 +95,7 @@ internal static unsafe class FileDescriptorTable
         PalSys.OpenFlags access = flags & AccessModeMask;
         bool writable = access == PalSys.OpenFlags.O_WRONLY || access == PalSys.OpenFlags.O_RDWR;
         bool readable = access == PalSys.OpenFlags.O_RDONLY || access == PalSys.OpenFlags.O_RDWR;
+        bool readOnlyMount = VfsManager.IsReadOnlyPath(fullPath);
 
         IVfsFileHandle? handle;
         if (VfsManager.TryStat(fullPath, out VfsStat stat))
@@ -111,6 +115,14 @@ internal static unsafe class FileDescriptorTable
                 return PalError.EISDIR;
             }
 
+            // open(2) order: a write-mode open on a read-only mount is EROFS
+            // before the file is touched, so FileMode.Open with FileAccess.Write
+            // and FileMode.Truncate fail the way they do on a mounted CD.
+            if (readOnlyMount && (writable || (flags & PalSys.OpenFlags.O_TRUNC) != 0))
+            {
+                return PalError.EROFS;
+            }
+
             if (!VfsManager.TryOpenFile(fullPath, out handle))
             {
                 return PalError.EIO;
@@ -128,6 +140,11 @@ internal static unsafe class FileDescriptorTable
             if ((flags & PalSys.OpenFlags.O_CREAT) == 0)
             {
                 return PalError.ENOENT;
+            }
+
+            if (readOnlyMount)
+            {
+                return PalError.EROFS;
             }
 
             PalError createError = CreateRegularFile(fullPath, mode);
@@ -415,6 +432,11 @@ internal static unsafe class FileDescriptorTable
             return PalError.EINVAL;
         }
 
+        if (VfsManager.IsReadOnlyPath(file.Path))
+        {
+            return PalError.EROFS;
+        }
+
         if (!SetSize(file.Handle.Inode, (ulong)length))
         {
             return length > uint.MaxValue ? PalError.EFBIG : PalError.EIO;
@@ -429,6 +451,11 @@ internal static unsafe class FileDescriptorTable
         if (file is null)
         {
             return PalError.EBADF;
+        }
+
+        if (VfsManager.IsReadOnlyPath(file.Path))
+        {
+            return PalError.EROFS;
         }
 
         return ApplyMode(file.Handle.Inode, mode);
@@ -527,6 +554,11 @@ internal static unsafe class FileDescriptorTable
             return PalError.EISDIR;
         }
 
+        if (VfsManager.IsReadOnlyPath(fullPath))
+        {
+            return PalError.EROFS;
+        }
+
         return VfsManager.TryUnlink(fullPath) ? PalError.SUCCESS : PalError.EIO;
     }
 
@@ -583,6 +615,11 @@ internal static unsafe class FileDescriptorTable
             return PalError.ENOTDIR;
         }
 
+        if (VfsManager.IsReadOnlyPath(fullPath))
+        {
+            return PalError.EROFS;
+        }
+
         if (VfsManager.TryOpenDirectory(fullPath, out IVfsDirectoryHandle? target)
             && target.TryReadDir(out IReadOnlyList<IVfsInode> entries) && entries.Count > 0)
         {
@@ -632,6 +669,11 @@ internal static unsafe class FileDescriptorTable
         if (!ReferenceEquals(oldMount, newMount))
         {
             return PalError.EXDEV;
+        }
+
+        if (newMount.IsReadOnly)
+        {
+            return PalError.EROFS;
         }
 
         // Errno discrimination for an existing destination; VfsManager.TryRename
@@ -688,6 +730,11 @@ internal static unsafe class FileDescriptorTable
 
         using (node)
         {
+            if (VfsManager.IsReadOnlyPath(fullPath))
+            {
+                return PalError.EROFS;
+            }
+
             return ApplyMode(node.Inode, mode);
         }
     }
@@ -726,16 +773,16 @@ internal static unsafe class FileDescriptorTable
         }
 
         string[] names;
-        bool[] isDirectory;
+        PalSys.NodeType[] types;
         if (fullPath == "/" && !VfsManager.TryOpenDirectory("/", out _))
         {
             // Nothing is mounted at "/": list the virtual root (the first
             // segments of the mount points; empty with no mounts at all).
             names = VfsManager.GetVirtualRootEntries();
-            isDirectory = new bool[names.Length];
-            for (int i = 0; i < isDirectory.Length; i++)
+            types = new PalSys.NodeType[names.Length];
+            for (int i = 0; i < types.Length; i++)
             {
-                isDirectory[i] = true;
+                types[i] = PalSys.NodeType.DT_DIR;
             }
         }
         else
@@ -757,18 +804,20 @@ internal static unsafe class FileDescriptorTable
             }
 
             names = new string[entries.Count];
-            isDirectory = new bool[entries.Count];
+            types = new PalSys.NodeType[entries.Count];
             for (int i = 0; i < entries.Count; i++)
             {
                 IVfsInode entry = entries[i];
                 names[i] = entry.Name;
-                bool directoryEntry = entry.FileOperations is null;
+                PalSys.NodeType type = entry.FileOperations is null ? PalSys.NodeType.DT_DIR : PalSys.NodeType.DT_REG;
                 if (entry.InodeOperations is not null && entry.InodeOperations.GetAttr(entry, out VfsStat entryStat))
                 {
-                    directoryEntry = entryStat.IsDirectory;
+                    type = entryStat.IsSymbolicLink ? PalSys.NodeType.DT_LNK
+                        : entryStat.IsDirectory ? PalSys.NodeType.DT_DIR
+                        : PalSys.NodeType.DT_REG;
                 }
 
-                isDirectory[i] = directoryEntry;
+                types[i] = type;
             }
         }
 
@@ -779,7 +828,7 @@ internal static unsafe class FileDescriptorTable
         }
 
         byte* nameBuffer = (byte*)NativeMemory.Alloc(DirectoryNameBufferBytes);
-        s_directoryStreams[slot] = new DirectoryStreamState(names, isDirectory, nameBuffer);
+        s_directoryStreams[slot] = new DirectoryStreamState(names, types, nameBuffer);
         handle = new IntPtr(slot + 1);
         return PalError.SUCCESS;
     }
@@ -808,7 +857,7 @@ internal static unsafe class FileDescriptorTable
 
         entry->Name = stream.NameBuffer;
         entry->NameLength = length;
-        entry->InodeType = stream.IsDirectory[index] ? PalSys.NodeType.DT_DIR : PalSys.NodeType.DT_REG;
+        entry->InodeType = stream.Types[index];
         return 0;
     }
 
@@ -883,7 +932,8 @@ internal static unsafe class FileDescriptorTable
 
     /// <summary>Errno discrimination for creating an entry at <paramref name="fullPath"/>:
     /// missing parent → ENOENT, parent is a file → ENOTDIR, parent stats as a
-    /// directory but is not backed by a mount (the virtual root) → EROFS.</summary>
+    /// directory but is not backed by a mount (the virtual root) or sits on a
+    /// read-only mount → EROFS.</summary>
     private static PalError RequireMountedParent(string fullPath)
     {
         VfsManager.SplitParentLeaf(fullPath, out string parentPath, out _);
@@ -898,7 +948,7 @@ internal static unsafe class FileDescriptorTable
             return PalError.ENOTDIR;
         }
 
-        if (!VfsManager.TryOpenDirectory(parentPath, out IVfsDirectoryHandle? parent))
+        if (VfsManager.IsReadOnlyPath(parentPath) || !VfsManager.TryOpenDirectory(parentPath, out _))
         {
             return PalError.EROFS;
         }

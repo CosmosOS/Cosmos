@@ -1,0 +1,16 @@
+---
+source_hash: 2d28ba3a433ee3fc999a8da8a33a3797015f3d1b
+---
+<a id="source-generators"></a>
+
+# Générateurs de source
+
+Un générateur de source est une extension qui s'exécute dans le compilateur C#. Pendant la compilation d'un projet, le compilateur fournit au générateur un modèle du programme en lecture seule : la syntaxe de chaque fichier source et les symboles de chaque type, y compris ceux des assemblies référencés. Le générateur peut ajouter des fichiers C# à la compilation et signaler des diagnostics, mais il ne peut ni modifier ni supprimer le code déjà présent. Ce qu'il ajoute est compilé avec le reste du projet, comme si l'auteur du projet l'avait écrit.
+
+Un générateur convient à un travail mécanique qui doit pourtant suivre le programme, comme lister chaque classe marquée d'un attribut. Le faire à l'exécution, c'est de la réflexion : le programme parcourt ses propres métadonnées pendant qu'il s'exécute. Le faire au moment du build produit du code ordinaire qui nomme chaque classe directement, ce qui ne coûte rien au démarrage et fonctionne là où la réflexion n'est pas disponible. Les générateurs sont incrémentaux : le compilateur met en cache la sortie de chaque étape et ne réexécute une étape que si son entrée a changé, de sorte qu'un générateur qui ne dépend que d'une propriété de build n'est pas réexécuté lorsqu'un fichier source est modifié.
+
+Les paramètres de build n'atteignent pas un générateur d'eux-mêmes. Un projet déclare chaque propriété MSBuild qu'un générateur peut lire comme `CompilerVisibleProperty`, et le build écrit ces propriétés dans un fichier editorconfig qu'il transmet au compilateur, où le générateur les lit sous la forme `build_property.<Name>`.
+
+Le piège, c'est le code que personne ne voit. Les fichiers générés ne sont pas dans le dossier du projet : un lecteur peut donc chercher une classe que le compilateur voit mais que la liste des fichiers ne montre pas, et une erreur dans un générateur se manifeste par une erreur de compilation dans un fichier que personne n'a écrit. Un générateur ne voit par ailleurs que ce que voit la compilation : une classe à laquelle le projet ne peut pas accéder, comme une classe imbriquée privée ou une classe à visibilité internal d'un autre assembly, est hors de portée du code qu'il génère.
+
+Dans Cosmos, un noyau est compilé à l'avance et le code du noyau n'utilise pas la réflexion : le noyau ne peut donc pas chercher les pilotes dans ses assemblies au démarrage. `DriverManifestGenerator`, dans `Cosmos.Kernel.SourceGenerators`, fait cette recherche au moment du build : il trouve chaque classe `[Driver]` du projet du noyau et des assemblies référencés qui référencent `Cosmos.Kernel.HAL`, et écrit `DriverManifest.g.cs`, qui construit chacune d'elles. `CosmosEntryPointGenerator` écrit le point d'entrée qui appelle le manifeste. `Cosmos.Sdk` active `EmitCompilerGeneratedFiles` : les deux fichiers sont donc aussi écrits sous `obj/` pour qu'on puisse les lire, et une classe marquée que le générateur ne peut pas construire est signalée par l'avertissement `COSMOSGEN001` au lieu d'être écartée en silence. Voir [L'attribut et le manifeste](../drivers.md#the-attribute-and-the-manifest) et le [Manifeste des pilotes](../../dev/build/driver-manifest.md).

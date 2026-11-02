@@ -3,13 +3,14 @@
     width: auto;
 }
 
-/* Version dropdown injected by main.js next to #navbar */
-.version-select {
+/* Version and language dropdowns injected by main.js next to #navbar */
+.navbar-selects {
     display: flex;
     align-items: center;
+    gap: .5rem;
     margin-left: .75rem;
 }
 
-.version-select select {
+.navbar-selects select {
     width: auto;
 }

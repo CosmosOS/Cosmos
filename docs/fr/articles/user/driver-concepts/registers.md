@@ -1,0 +1,14 @@
+---
+source_hash: f21bd83415e85fcd47737d7826598dbac697f4af
+---
+<a id="mmio-memory-mapped-io-and-port-io"></a>
+
+# MMIO (E/S mappées en mémoire) et E/S de port
+
+Un périphérique expose son interface de contrôle sous forme de registres, de petits emplacements que le pilote lit pour connaître l'état du périphérique et dans lesquels il écrit pour lui donner des ordres. Avec les E/S mappées en mémoire (MMIO), le périphérique répond à une plage d'[adresses physiques](physical-addresses.md), et les lectures et écritures mémoire ordinaires l'atteignent une fois la plage mappée. Le x86 possède en outre un espace de ports distinct de 65 536 adresses, accessible uniquement par les instructions `in` et `out`, 32 bits au plus à la fois ; des périphériques plus anciens comme le [contrôleur PS/2](ps2.md) s'y trouvent encore. ARM64 n'a pas d'espace de ports.
+
+Les registres ne sont pas de la mémoire. Une lecture peut avoir un effet de bord, comme effacer la cause d'une interruption ou retirer un octet d'une FIFO, et une écriture peut lancer une commande, si bien qu'écrire deux fois une valeur peut exécuter la commande deux fois. Chaque accès doit avoir lieu exactement une fois, dans l'ordre du programme, à la largeur que documente le périphérique : un registre de 32 bits lu comme quatre octets donne quatre accès différents, et beaucoup de périphériques se comportent mal face à une mauvaise largeur ou à un accès non aligné sur sa largeur.
+
+Le mappage décide de la façon dont le CPU met les adresses en cache, page par page. Les registres demandent de la mémoire de périphérique non mise en cache, où chaque accès atteint le périphérique dans l'ordre et où rien n'est lu de manière spéculative. Un framebuffer est de la mémoire ordinaire située sur le périphérique, dans laquelle dessiner sans cache est lent ; il est donc mappé en write-combining : les écritures sont regroupées en rafales et renoncent à leur ordre. La mémoire normale, mise en cache, convient à la RAM qu'un périphérique cohérent partage avec le CPU. Un registre mis en cache échoue silencieusement : il renvoie des valeurs périmées et retient les écritures dans le cache.
+
+Dans le kit de pilotes, `binding.MapRegisters` renvoie une `RegisterWindow`, dont les méthodes `Read8` à `Read64` et `Write8` à `Write64` font chacune un accès de cette largeur, vérifié contre les bornes et, sur une fenêtre mémoire, contre l'alignement ; sur une plage de ports x64, elles utilisent `in` et `out`, acceptent n'importe quel décalage, et celles de 64 bits lèvent une exception. `binding.MapRegion` prend un `RegionCaching` valant `Device`, `WriteCombining` ou `Normal`, mais aujourd'hui seul x64 applique `WriteCombining`, dans les blocs de 2 Mio qu'une région couvre entièrement, et toute autre fenêtre mémoire est mappée en `Device`. Voir [Fenêtres de registres](../drivers.md#register-windows) et [Régions en bloc](../drivers.md#bulk-regions).

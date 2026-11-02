@@ -1,0 +1,16 @@
+---
+source_hash: b16ce39ef8f0897f4656b4c0a765bf01e2cdc395
+---
+<a id="interrupt-context"></a>
+
+# Contexte d'interruption
+
+Quand un périphérique lève une interruption, le CPU arrête le code en cours d'exécution à la prochaine [frontière d'instruction](../../dev/sched-concepts/instruction-boundary.md) et saute vers un gestionnaire d'interruption. Celui-ci n'est pas un thread : il emprunte la pile de ce qu'il a interrompu et s'exécute interruptions masquées, si bien que rien d'autre ne s'exécute sur ce CPU avant qu'il ne rende la main, pas même le tick du minuteur qui pilote la [préemption](../../dev/sched-concepts/preemption.md). Un gestionnaire d'interruption s'exécute en contexte d'interruption, et tout le reste en contexte de thread.
+
+Un gestionnaire d'interruption ne peut donc pas attendre. Attendre, c'est céder le CPU à un autre thread, et un gestionnaire d'interruption n'a aucun thread à mettre en attente : s'il dort, attend un événement ou tourne en boucle sur un verrou que détient le code interrompu, il attend indéfiniment. Les noyaux coupent le traitement des interruptions en deux. La partie haute, dans le gestionnaire d'interruption, acquitte le périphérique et réveille ceux qui attendent. La partie basse s'exécute plus tard en contexte de thread, où elle peut bloquer et prendre des verrous ordinaires.
+
+Les données qu'un gestionnaire d'interruption partage avec un thread exigent un spinlock qui désactive les interruptions tant qu'il est détenu ; sans cela, le gestionnaire d'interruption peut se déclencher sur le CPU du détenteur et tourner en boucle indéfiniment en attendant un thread qui ne peut pas s'exécuter avant que le gestionnaire d'interruption ne rende la main. Un tel verrou n'est détenu que brièvement, jamais pendant une attente.
+
+Dans le kit de pilotes, un gestionnaire d'interruption acquitte le périphérique à travers sa fenêtre de registres et passe le relais à travers son `InterruptContext` : `Mask()` masque sa source, `Signal(DeviceEvent)` réveille un thread en attente et `Schedule(WorkItem)` place la partie basse dans la file du thread de travail du kit, tandis que `DeviceLock.Acquire()` est le spinlock qui désactive les interruptions. Le garde-fou intercepte les appels aux méthodes de `DeviceBinding` et à certains membres d'objets d'accès, comme les transferts `UsbAccess` et `Ps2Access.TryCommand` : lors d'une vraie interruption, il arrête le noyau en nommant le membre ; lors d'un dispatch synthétique, il lève une exception, et le kit enregistre alors l'erreur et masque la source.
+
+Le kit ajoute aussi une règle qui lui est propre : le gestionnaire d'interruption d'un pilote ne doit pas allouer. Les gestionnaires d'interruption du noyau lui-même allouent, et le ramasse-miettes le tolère ; il s'agit d'une règle de sécurité, car une allocation peut entraîner des mécanismes du runtime qui se comportent mal en contexte d'interruption, notamment la résolution du dispatch d'interface et la levée d'exceptions. Rien ne détecte une allocation : le garde-fou ne s'exécute qu'à l'intérieur de ces membres du kit, jamais dans le code du pilote lui-même. Voir [Les deux contextes d'exécution et le garde-fou](../drivers.md#the-two-execution-contexts-and-the-guard), [Éléments de travail](../drivers.md#work-items) et [Verrous de périphérique](../drivers.md#device-locks).

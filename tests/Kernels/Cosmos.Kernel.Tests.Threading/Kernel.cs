@@ -968,9 +968,14 @@ public class Kernel : Sys.Kernel
     // Release used to clear ownership and merely ready the parked waiter;
     // until that waiter's retry ran, ANY thread could re-take the mutex and
     // send the waiter to the back of the queue again, repeatably, so a
-    // waiter on a contended mutex could starve. The releaser's immediate
-    // TryAcquire is the deterministic probe: with ownership handed off in
-    // Release it must fail.
+    // waiter on a contended mutex could starve. The releaser's TryAcquire
+    // right after Release is the probe: with ownership handed off in Release
+    // it must fail. It is deterministic because both calls run with
+    // interrupts masked, not because they are back to back: Release readies
+    // the waiter, the next interrupt exit switches to it, and the waiter
+    // could take the mutex, release it and exit before the TryAcquire, which
+    // would then find the mutex free and report a barge that never happened
+    // (#3385).
     private static Cosmos.Kernel.Core.Scheduler.Mutex? s_handoffMutex;
     private static volatile bool s_handoffWorkerHolding;
     private static volatile bool s_handoffReleaseRequested;
@@ -1026,8 +1031,14 @@ public class Kernel : Sys.Kernel
         {
             // spin: stay runnable so the contender has to park behind us
         }
-        s_handoffMutex.Release();
-        bool barged = s_handoffMutex.TryAcquire();
+        // The switch Release asks for happens when the scope ends.
+        bool barged;
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            s_handoffMutex.Release();
+            barged = s_handoffMutex.TryAcquire();
+        }
+
         s_handoffBargeResult = barged ? BargeResultBarged : BargeResultNoBarge;
         if (barged)
         {

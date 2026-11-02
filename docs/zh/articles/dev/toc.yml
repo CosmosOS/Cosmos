@@ -1,0 +1,39 @@
+# source_hash: 816b26aa35f17c75c12fbe5d529fa78da1326ffd
+- name: 开发容器配置
+  href: install-dev.md
+- name: 内核项目结构
+  href: kernel-project-layout.md
+- name: 编码规范
+  href: coding-guidelines.md
+- name: 翻译文档
+  href: translations.md
+- name: Plug
+  href: plugs.md
+- name: 测试
+  href: testing.md
+- name: 公共 API 跟踪
+  href: public-api.md
+- name: 公共 API - 访问内部成员
+  href: accessing-internals.md
+- name: 垃圾回收器
+  href: garbage-collector.md
+- name: 垃圾回收器 - 精确栈扫描
+  href: garbage-collector-gcinfo.md
+- name: 垃圾回收器 - 术语表
+  href: garbage-collector-glossary.md
+- name: 调度器
+  href: scheduler.md
+- name: 调度器 - 术语表
+  href: scheduler-glossary.md
+- name: 内核编译步骤
+  href: build/kernel-compilation-steps.md
+- name: Cosmos.Build.Asm
+  href: build/asm-build.md
+- name: Cosmos.Build.GCC
+  href: build/gcc-build.md
+- name: Cosmos.Build.Patcher
+  href: build/patcher-build.md
+- name: Cosmos.Build.Ilc
+  href: build/ilc-build.md
+- name: 驱动程序清单
+  href: build/driver-manifest.md

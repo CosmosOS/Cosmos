@@ -241,9 +241,10 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      # Same pinned version as build-docs.yml.
       - name: Install DocFX
         run: |
-          dotnet tool update -g docfx
+          dotnet tool update -g docfx --version 2.81.0
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
       # Same restore scope as build-docs.yml: Cosmos.Kernel transitively
@@ -251,10 +252,19 @@ jobs:
       - name: Restore docs projects
         run: dotnet restore src/Cosmos.Kernel/Cosmos.Kernel.csproj
 
+      # The translated sites build after the English one, whose metadata pass
+      # writes the API pages they reuse. A backfilled tag older than the
+      # translations has no docs/<lang>/docfx.json, and is published in English
+      # only.
       - name: Build Docs
         run: |
           cd docs
           docfx docfx.json
+          for config in */docfx.json; do
+            if [[ -f "$config" ]]; then
+              docfx "$config"
+            fi
+          done
 
       # versions.json lists the frozen releases already on gh-pages plus this
       # one, newest first. The dropdown adds the dev entry (site root) itself.

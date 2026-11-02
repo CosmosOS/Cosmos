@@ -37,6 +37,22 @@ public sealed class VfsMount
     public Partition? Partition { get; }
 
     /// <summary>
+    /// The flags this mount runs under: the ones <see cref="VfsManager.TryMount(string, global::System.ReadOnlySpan{char}, MountFlags, string, out VfsMount)"/>
+    /// was given, plus <see cref="MountFlags.ReadOnly"/> when the superblock
+    /// reports <see cref="IVfsSuperblock.IsReadOnly"/>.
+    /// </summary>
+    public MountFlags Flags { get; }
+
+    /// <summary>
+    /// True when nothing under this mount can be created, written, renamed,
+    /// removed or have its attributes changed: the mount was made with
+    /// <see cref="MountFlags.ReadOnly"/>, or the volume itself cannot be
+    /// written. <c>System.IO</c> reports such a mutation as
+    /// <see cref="global::System.IO.IOException"/> ("Read-only file system").
+    /// </summary>
+    public bool IsReadOnly => (Flags & MountFlags.ReadOnly) != 0;
+
+    /// <summary>
     /// Creates a mount record.
     /// </summary>
     /// <param name="name">The registered driver name.</param>
@@ -45,7 +61,8 @@ public sealed class VfsMount
     /// <param name="fileSystemType">The filesystem driver.</param>
     /// <param name="superblock">The mounted filesystem instance.</param>
     /// <param name="partition">The partition mounted, when the mount named one.</param>
-    internal VfsMount(string name, string source, string mountPoint, IVfsFileSystemType fileSystemType, IVfsSuperblock superblock, Partition? partition)
+    /// <param name="flags">The flags the mount runs under.</param>
+    internal VfsMount(string name, string source, string mountPoint, IVfsFileSystemType fileSystemType, IVfsSuperblock superblock, Partition? partition, MountFlags flags)
     {
         Name = name;
         Source = source;
@@ -53,5 +70,6 @@ public sealed class VfsMount
         FileSystemType = fileSystemType;
         Superblock = superblock;
         Partition = partition;
+        Flags = flags;
     }
 }

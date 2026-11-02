@@ -7,7 +7,17 @@
     <CosmosIntermediateOutputPath Condition="$(CosmosIntermediateOutputPath) == ''">$([MSBuild]::NormalizePath('$(IntermediateOutputPath)', 'cosmos'))</CosmosIntermediateOutputPath>
     <IsoRoot Condition="$(IsoRoot) == ''">$([MSBuild]::NormalizePath('$(CosmosIntermediateOutputPath)', 'iso_root'))</IsoRoot>
     <IsoOutput Condition="$(IsoOutput) == ''">$([MSBuild]::NormalizePath('$(CosmosOutputPath)', '$(AssemblyName).iso'))</IsoOutput>
+    <!-- The folder whose tree goes to the ISO root, gen2's isoFiles/. -->
+    <CosmosIsoFilesDirectory Condition="'$(CosmosIsoFilesDirectory)' == ''">$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', 'isoFiles'))</CosmosIsoFilesDirectory>
   </PropertyGroup>
+
+  <!-- What the folder holds is shipped on the ISO, not built into the kernel:
+       a .cs or .resx file there would otherwise be caught by the SDK's
+       default globs. None items stay, so an IDE still lists the folder. -->
+  <ItemGroup>
+    <Compile Remove="$(CosmosIsoFilesDirectory)/**" />
+    <EmbeddedResource Remove="$(CosmosIsoFilesDirectory)/**" />
+  </ItemGroup>
 
   <!-- Platform detection -->
   <PropertyGroup>
@@ -101,8 +111,52 @@
     <WriteLinesToFile File="$(_LinkCacheFile)" Lines="$(_CurrentLinkHash)" Overwrite="true" />
   </Target>
 
-  <!-- Content-hash based ISO caching: hash ELF + limine.conf -->
-  <Target Name="CheckIsoCache" DependsOnTargets="LinkTarget">
+  <!--
+    The files a kernel ships on its ISO: the tree under isoFiles/ (the
+    CosmosIsoFilesDirectory property), at the ISO root with its folders, and
+    every <CosmosIsoFile Include="..." />, at its IsoPath metadata (the file's
+    path on the ISO; one ending in / names a folder that keeps the file's
+    name; none puts the file at the root). /boot and /EFI are the SDK's, a
+    . or .. segment is refused since .. could leave the root, and so are two
+    files on one path, compared without case: on a Windows host the second
+    copy into iso_root would overwrite the first.
+
+    The manifest pairs each ISO path with its source, so the ISO cache sees a
+    file renamed or moved, not only a file whose bytes changed. Its first line
+    keeps it from being empty: the last file removed still changes it.
+  -->
+  <Target Name="CollectCosmosIsoFiles">
+    <PropertyGroup>
+      <_CosmosIsoFilesManifest>$([MSBuild]::NormalizePath('$(IntermediateOutputPath)', 'cosmos', 'iso-files.txt'))</_CosmosIsoFilesManifest>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <!-- RecursiveDir is set once the glob is expanded, so the ISO path is a second step. -->
+      <_CosmosIsoFolderFile Include="$(CosmosIsoFilesDirectory)/**/*" Condition="Exists('$(CosmosIsoFilesDirectory)')" />
+      <_CosmosIsoFolderFile IsoPath="%(_CosmosIsoFolderFile.RecursiveDir)%(Filename)%(Extension)" />
+      <_CosmosIsoFile Include="@(_CosmosIsoFolderFile)" />
+      <_CosmosIsoFile Include="@(CosmosIsoFile->'%(FullPath)')" />
+      <_CosmosIsoFile Condition="'%(_CosmosIsoFile.IsoPath)' == ''" IsoPath="%(Filename)%(Extension)" />
+      <_CosmosIsoFile IsoPath="$([System.String]::Copy('%(_CosmosIsoFile.IsoPath)').Replace('\', '/').TrimStart('/'))" />
+      <_CosmosIsoFile Condition="$([System.String]::Copy('%(_CosmosIsoFile.IsoPath)').EndsWith('/'))" IsoPath="%(_CosmosIsoFile.IsoPath)%(Filename)%(Extension)" />
+      <_CosmosIsoFile ManifestLine="%(_CosmosIsoFile.IsoPath) &lt;- $([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)', '%(_CosmosIsoFile.FullPath)'))" />
+    </ItemGroup>
+
+    <Error Condition="$([System.String]::Copy('/%(_CosmosIsoFile.IsoPath)').ToLowerInvariant().StartsWith('/boot/')) OR $([System.String]::Copy('/%(_CosmosIsoFile.IsoPath)').ToLowerInvariant().StartsWith('/efi/')) OR '%(_CosmosIsoFile.IsoPath)' == 'boot' OR '%(_CosmosIsoFile.IsoPath)' == 'EFI'"
+           Text="'%(_CosmosIsoFile.Identity)' would go to /%(_CosmosIsoFile.IsoPath) on the ISO, but /boot and /EFI hold the kernel and the bootloader the SDK writes there." />
+    <Error Condition="$([System.String]::Copy('/%(_CosmosIsoFile.IsoPath)/').Contains('/../')) OR $([System.String]::Copy('/%(_CosmosIsoFile.IsoPath)/').Contains('/./'))"
+           Text="'%(_CosmosIsoFile.Identity)' has the ISO path '%(_CosmosIsoFile.IsoPath)': a . or .. segment is refused, since .. could leave the ISO root." />
+    <Error Condition="'@(_CosmosIsoFile->Count())' &gt; '1'"
+           Text="Several files would go to /%(_CosmosIsoFile.IsoPath) on the ISO: @(_CosmosIsoFile, ', ')." />
+
+    <WriteLinesToFile File="$(_CosmosIsoFilesManifest)"
+                      Lines="Cosmos ISO files;@(_CosmosIsoFile->'%(ManifestLine)')"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true" />
+  </Target>
+
+  <!-- Content-hash based ISO caching: hash ELF + limine.conf + the shipped files and their manifest -->
+  <Target Name="CheckIsoCache" DependsOnTargets="LinkTarget;CollectCosmosIsoFiles">
     <PropertyGroup>
       <_IsoCacheFile>$([MSBuild]::NormalizePath('$(IntermediateOutputPath)', 'cosmos', '.iso-hash'))</_IsoCacheFile>
       <_LimineConf>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', 'Bootloader', 'limine.conf'))</_LimineConf>
@@ -111,6 +165,8 @@
     <ItemGroup>
       <_IsoInputFiles Include="$(ElfBinary)" Condition="Exists('$(ElfBinary)')"/>
       <_IsoInputFiles Include="$(_LimineConf)" Condition="Exists('$(_LimineConf)')"/>
+      <_IsoInputFiles Include="$(_CosmosIsoFilesManifest)"/>
+      <_IsoInputFiles Include="@(_CosmosIsoFile)"/>
     </ItemGroup>
 
     <ComputeInputsHashTask InputFiles="@(_IsoInputFiles)">
@@ -175,6 +231,10 @@
     <!-- Copy architecture-specific UEFI bootloader -->
     <Copy Condition="'$(CosmosArch)' == 'x64'" SourceFiles="$([MSBuild]::NormalizePath('$(LimineDir)', 'BOOTX64.EFI'))" DestinationFolder="$(IsoRootEfiBoot)"/>
     <Copy Condition="'$(CosmosArch)' == 'arm64'" SourceFiles="$([MSBuild]::NormalizePath('$(LimineDir)', 'BOOTAA64.EFI'))" DestinationFolder="$(IsoRootEfiBoot)"/>
+
+    <!-- Copy the files the kernel ships, CollectCosmosIsoFiles having placed and checked them -->
+    <Copy SourceFiles="@(_CosmosIsoFile)" DestinationFiles="@(_CosmosIsoFile->'$(IsoRoot)/%(IsoPath)')"/>
+    <Message Condition="'@(_CosmosIsoFile)' != ''" Importance="High" Text="Shipping @(_CosmosIsoFile->Count()) file(s) on the ISO"/>
 
     <!-- Arguments for xorriso to generate an ISO with MBR and UEFI boot entries -->
     <ItemGroup>

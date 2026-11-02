@@ -37,6 +37,10 @@ TEST_ENGINE := ./tests/Cosmos.TestRunner.Engine/Cosmos.TestRunner.Engine.csproj
 
 DOCS_DIR   := ./docs
 DOCS_PORT  ?= 8080
+# The translated sites, one docfx project each under docs/<lang>/.
+DOCS_LANGS := $(patsubst $(DOCS_DIR)/%/docfx.json,%,$(wildcard $(DOCS_DIR)/*/docfx.json))
+# Same pinned version as .github/workflows/build-docs.yml.
+DOCFX_VERSION := 2.81.0
 # Cosmos.Kernel transitively project-references every project DocFX reads, so
 # restoring it alone covers the metadata step. Restoring the slnx instead pulls
 # in examples/DevKernel, whose NuGet.Config needs artifacts/package/release.
@@ -127,11 +131,16 @@ test:
 test-cache:
 	dotnet test tests/Cosmos.Tests.BuildCache/ -c Debug
 
-# Generate the API metadata and render the static site into docs/_site.
+# Generate the API metadata and render the static site into docs/_site, then
+# each translation into docs/_site/<lang> (after the English site, whose
+# metadata pass writes the API pages they reuse), then report the translations
+# that fell behind the English pages.
 docs:
-	@command -v docfx >/dev/null 2>&1 || dotnet tool update -g docfx
+	@command -v docfx >/dev/null 2>&1 || dotnet tool update -g docfx --version $(DOCFX_VERSION)
 	dotnet restore $(DOCS_RESTORE)
 	cd $(DOCS_DIR) && docfx docfx.json
+	for lang in $(DOCS_LANGS); do (cd $(DOCS_DIR) && docfx $$lang/docfx.json) || exit 1; done
+	python3 .github/scripts/docs-i18n.py check
 
 # Serve the built site on http://localhost:$(DOCS_PORT) (Ctrl+C to stop).
 docs-serve: docs

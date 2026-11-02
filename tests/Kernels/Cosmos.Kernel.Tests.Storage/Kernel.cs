@@ -47,10 +47,13 @@ public class Kernel : Sys.Kernel
     private const string SkipNoHost = "no block device bound for partition-table tests";
 
     /// <summary>Total tests this suite reports per profile; the breakdown is at the TR.Start call site.</summary>
-    private const ushort ExpectedTestCount = 83;
+    private const ushort ExpectedTestCount = 84;
 
     /// <summary>Block devices the engine attaches per QEMU profile; any other count is a bind or double-registration regression.</summary>
     private const int AttachedDisksPerProfile = 1;
+
+    /// <summary>Why a cell that needs the boot medium as a block device skips where the kit cannot publish it.</summary>
+    private const string SkipNoBootCd = "the boot medium is not a block device on this cell";
 
     /// <summary>Logical block size every disk in these profiles exposes (bytes).</summary>
     private const ulong SectorSizeBytes = 512;
@@ -405,14 +408,19 @@ public class Kernel : Sys.Kernel
     {
         Serial.WriteString("[Storage] BeforeRun() reached!\n");
 
-        // 3 manager + 1 boot-scan + 2 profile + 1 driver-info + 12 device
+        // 4 manager + 1 boot-scan + 2 profile + 1 driver-info + 12 device
         // + 7 partition + 42 partition-lifecycle (MBR mutation, EBR chain,
         // PartitionManager, superfloppy) + 2 bounds probes + 2 mmio/pci
-        // + 5 USB hot-plug + 5 PCI hot-plug + 1 boot-reboot = 83 tests per profile.
+        // + 5 USB hot-plug + 5 PCI hot-plug + 1 boot-reboot = 84 tests per profile.
         TR.Start("Storage Block Device Tests", expectedTests: ExpectedTestCount);
 
-        bool hasDevice = StorageManager.DeviceCount > 0;
-        s_dev = hasDevice ? StorageManager.GetDevice(0) : null;
+        // The cell's disk is the first writable device the manager holds:
+        // on x64 the boot ISO's ATAPI drive is registered beside it as
+        // cdrom0 (a read-only medium the kit's AHCI driver publishes), which
+        // the manager orders after every writable disk. The counts the suite
+        // asserts against the engine's one disk leave the drive out.
+        bool hasDevice = DiskCount() > 0;
+        s_dev = hasDevice ? FirstDisk() : null;
 
         // ==================== Manager ====================
         TR.Run("Manager_StorageInitialized", TestManager_StorageInitialized);
@@ -423,6 +431,11 @@ public class Kernel : Sys.Kernel
         // regression and must fail, not skip.
         bool deviceExpected = true;
         TR.RunIf(deviceExpected, "Manager_ExactlyOneDevice", TestManager_ExactlyOneDevice, SkipNoDevice);
+#if ARCH_X64
+        TR.Run("Manager_BootCdRegistered", TestManager_BootCdRegistered);
+#else
+        TR.Skip("Manager_BootCdRegistered", SkipNoBootCd);
+#endif
         TR.RunIf(hasDevice, "Manager_DuplicateRegistrationIgnored", TestManager_DuplicateRegistrationIgnored, SkipNoDevice);
 
         // ==================== Boot persistence (works with Boot_RebootAfterGptWrite) ====================
@@ -777,10 +790,41 @@ public class Kernel : Sys.Kernel
 
     // The engine attaches exactly one disk per profile, so anything other
     // than 1 means either the profile is misconfigured or the driver
-    // double-registered. Bound devices stay enumerated for the run.
+    // double-registered. Bound devices stay enumerated for the run. The
+    // boot CD the x64 cells carry is not a disk: it is counted by
+    // Manager_BootCdRegistered.
     private static void TestManager_ExactlyOneDevice()
     {
-        Assert.Equal(AttachedDisksPerProfile, StorageManager.DeviceCount);
+        Assert.Equal(AttachedDisksPerProfile, DiskCount());
+    }
+
+    // On x64 every cell boots from an ide-cd on q35's AHCI controller, which
+    // the kit's AhciDriver publishes as cdrom0: a read-only, removable
+    // medium the manager registers with its whole extent as its one
+    // partition, never scanned for a table. arm64 boots from a virtio-scsi
+    // drive no driver binds, so the cell skips there.
+    private static void TestManager_BootCdRegistered()
+    {
+        IBlockDevice? cd = FirstCdRom();
+        Assert.True(cd is not null, "the boot CD should be registered");
+        if (cd is null)
+        {
+            return;
+        }
+
+        Assert.True(HasOrdinalPrefix(cd.Name, "cdrom"), "the boot CD should be named cdrom<n>");
+        Assert.Equal<ulong>(2048, cd.BlockSize);
+        Assert.True(cd.BlockCount > 0, "the boot CD should report its sectors");
+        Assert.True(cd is IRemovableMedia { IsReadOnly: true, IsRemovable: true, HasMedia: true }, "the boot CD should report a read-only, removable medium that is present");
+        IReadOnlyList<Partition> partitions = StorageManager.GetPartitions(cd);
+        Assert.Equal(1, partitions.Count, "the boot CD should carry its whole extent as one partition");
+        if (partitions.Count == 1)
+        {
+            Assert.Equal<ulong>(0, partitions[0].StartSector);
+            Assert.Equal<ulong>(cd.BlockCount, partitions[0].BlockCount);
+        }
+
+        Assert.True(WriteThrowsIOException(cd), "a write to the boot CD should throw IOException");
     }
 
     // ==================== Profile ====================
@@ -1369,12 +1413,12 @@ public class Kernel : Sys.Kernel
     {
         TR.RequestHost(UsbPlugRequest);
         Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the stick did not come back after being plugged in");
-        if (StorageManager.DeviceCount != 1)
+        if (DiskCount() != 1)
         {
             return;
         }
 
-        s_dev = StorageManager.GetDevice(0);
+        s_dev = FirstDisk();
         Assert.True(s_dev is UsbMassStorageUnit, "the device that came back is not a USB stick");
         Assert.False(ReferenceEquals(s_dev, s_unpluggedDisk), "the removed device object came back");
         if (s_unpluggedDisk is not null)
@@ -1440,16 +1484,16 @@ public class Kernel : Sys.Kernel
         Assert.True(WaitForDeviceCount(0, HotPlugDeadline()), "the stick is still registered after being unplugged");
         s_dev = null;
         Assert.False(IsMounted(HotPlugMountPoint), "the mount outlived its stick");
-        Assert.Equal(0, StorageManager.Partitions.Count, "the stick's partition outlived it");
+        Assert.Equal(0, DiskPartitionCount(), "the stick's partition outlived it");
 
         TR.RequestHost(UsbPlugRequest);
         Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the stick did not come back after being plugged in");
-        if (StorageManager.DeviceCount != 1)
+        if (DiskCount() != 1)
         {
             return;
         }
 
-        s_dev = StorageManager.GetDevice(0);
+        s_dev = FirstDisk();
         if (!MountStickPartition())
         {
             return;
@@ -1583,12 +1627,12 @@ public class Kernel : Sys.Kernel
     {
         TR.RequestHost(PciPlugRequest);
         Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the disk did not come back after being plugged in");
-        if (StorageManager.DeviceCount != 1)
+        if (DiskCount() != 1)
         {
             return;
         }
 
-        s_dev = StorageManager.GetDevice(0);
+        s_dev = FirstDisk();
         Assert.True(s_dev is VirtioBlkState, "the device that came back is not a virtio-blk disk");
         Assert.False(ReferenceEquals(s_dev, s_unpluggedPciDisk), "the removed device object came back");
         if (s_unpluggedPciDisk is not null)
@@ -1661,17 +1705,17 @@ public class Kernel : Sys.Kernel
         Assert.True(gone, "the disk is still registered after being unplugged");
         s_dev = null;
         Assert.False(IsMounted(HotPlugMountPoint), "the mount outlived its disk");
-        Assert.Equal(0, StorageManager.Partitions.Count, "the disk's partition outlived it");
+        Assert.Equal(0, DiskPartitionCount(), "the disk's partition outlived it");
         Assert.True(gone && WaitForSlotPoweredOff(port, removalsBefore, deadline), "the root port should have powered the slot off after the unplug");
 
         TR.RequestHost(PciPlugRequest);
         Assert.True(WaitForDeviceCount(1, HotPlugDeadline()), "the disk did not come back after being plugged in");
-        if (StorageManager.DeviceCount != 1)
+        if (DiskCount() != 1)
         {
             return;
         }
 
-        s_dev = StorageManager.GetDevice(0);
+        s_dev = FirstDisk();
         if (!MountStickPartition())
         {
             return;
@@ -1722,10 +1766,11 @@ public class Kernel : Sys.Kernel
     private static long HotPlugDeadline() => Stopwatch.GetTimestamp() + (Stopwatch.Frequency * HotPlugTimeoutMs / MillisecondsPerSecond);
 
     // Waits for the kit's worker to bring the storage manager to `count`
-    // devices, sleeping so that thread gets to run.
+    // disks (the boot CD, when registered, not counted), sleeping so that
+    // thread gets to run.
     private static bool WaitForDeviceCount(int count, long deadline)
     {
-        while (StorageManager.DeviceCount != count)
+        while (DiskCount() != count)
         {
             if (Stopwatch.GetTimestamp() >= deadline)
             {
@@ -1736,6 +1781,84 @@ public class Kernel : Sys.Kernel
         }
 
         return true;
+    }
+
+    // The registered devices that are disks: everything but a read-only
+    // removable medium, the boot CD the x64 cells carry.
+    private static int DiskCount()
+    {
+        IReadOnlyList<IBlockDevice> devices = StorageManager.Devices;
+        int count = 0;
+        for (int i = 0; i < devices.Count; i++)
+        {
+            if (devices[i] is not IRemovableMedia { IsReadOnly: true })
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    // The first registered disk in the manager's order, or null.
+    private static IBlockDevice? FirstDisk()
+    {
+        IReadOnlyList<IBlockDevice> devices = StorageManager.Devices;
+        for (int i = 0; i < devices.Count; i++)
+        {
+            if (devices[i] is not IRemovableMedia { IsReadOnly: true })
+            {
+                return devices[i];
+            }
+        }
+
+        return null;
+    }
+
+    // The first registered read-only removable medium, the boot CD, or null.
+    private static IBlockDevice? FirstCdRom()
+    {
+        IReadOnlyList<IBlockDevice> devices = StorageManager.Devices;
+        for (int i = 0; i < devices.Count; i++)
+        {
+            if (devices[i] is IRemovableMedia { IsReadOnly: true })
+            {
+                return devices[i];
+            }
+        }
+
+        return null;
+    }
+
+    // The partitions the manager holds on disks, the boot CD's whole-medium
+    // partition left out.
+    private static int DiskPartitionCount()
+    {
+        IReadOnlyList<Partition> partitions = StorageManager.Partitions;
+        int count = 0;
+        for (int i = 0; i < partitions.Count; i++)
+        {
+            if (partitions[i].Host is not IRemovableMedia { IsReadOnly: true })
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static bool WriteThrowsIOException(IBlockDevice device)
+    {
+        try
+        {
+            Span<byte> zero = new byte[(int)device.BlockSize];
+            device.WriteBlock(0, 1, zero);
+            return false;
+        }
+        catch (Exception e)
+        {
+            return e is IOException;
+        }
     }
 
     // The driver state of the first node bound to a driver whose state is a

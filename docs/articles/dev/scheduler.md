@@ -140,7 +140,7 @@ The scheduler does not own a timer; it exposes `OnTimerInterrupt` and lets the p
 
 | Architecture | Scheduler tick | Software timers ([Timers and alarms](#timers-and-alarms)) |
 |--------------|----------------|------------------------------|
-| x64 | LAPIC timer, vector 239, periodic, 10 ms | PIT on IRQ 0, one-shot re-armed per interrupt |
+| x64 | LAPIC timer, vector 239, periodic, 10 ms | PIT on IRQ 0, one-shot re-armed per interrupt, 10 ms |
 | ARM64 | Generic Timer, INTID 30, re-armed per interrupt, 10 ms | same interrupt, dispatched before the scheduler tick |
 
 In both cases the handler passes the *configured* interval as `elapsedNs`, not a measured elapsed time, and computes the saved-context address itself: the managed IRQ entry receives a pointer to the general-register block, and the handler subtracts the SIMD save area (256 bytes on x64, 512 on ARM64) to recover the `ThreadContext` base. That address is what a preempted thread's `StackPointer` will hold.
@@ -209,6 +209,8 @@ A thread that blocks or sleeps gives the CPU away through `SchedulerManager.Park
 | ARM64 | SGI 8, through `ICC_SGI1R_EL1` on GICv3 or `GICD_SGIR` on GICv2 |
 
 `Park` then waits until the state leaves `Blocked` or `Sleeping`, which happens once a wake readied the thread and the scheduler ran it again, or at once when the wake landed before the switch. Halting instead left the CPU idle for the rest of the tick every time a thread blocked. A thread parking before the controller can raise the interrupt still halts; the idle thread never parks at all (see the primitives below), and halts between its checks of the condition variable.
+
+A thread must not park with interrupts masked. The reschedule interrupt and the tick would both stay pending, nothing could switch away from the thread or wake it, and the CPU would spin with the timer off until something outside killed the machine. `Park` checks the flag first and panics instead, naming the member that parked (`Mutex.Acquire`, `ConditionVariable.Wait`, `InterruptEvent.WaitCore`...), so a blocking lock reached from a masked section, or from under an IRQ-safe spinlock, stops the kernel with its location rather than freezing it without a word ([#3387](https://github.com/CosmosOS/Cosmos/issues/3387): the network stack's receive path ran masked and hung on a contended CoreLib lock).
 
 ### What there is not: a voluntary switch
 
@@ -410,7 +412,7 @@ Three kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](h
 
 [`Cosmos.Kernel.Tests.Smp`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Smp/Kernel.cs) runs 30 tests on `bare` and `bare+smp4` (`make test KERNEL=Smp`): the `CpuSet` arithmetic, what `KernelCpus` reports and the default set, the inheritance of a thread's set from its creator and from `Main`, the housekeeping rule for the threads `KernelThread.TryStart` starts, `ThreadAffinity` and `KernelThreadInfo` over a thread and their refusals (an unstarted or exited thread, the boot thread, a masked caller, an empty set, an ideal CPU outside the set), and on four CPUs the moves themselves: a thread pinned to another CPU running there (`Affinity_PinnedThread_RunsOnThatCpu`), two pinned spinners running at once (`Affinity_TwoPinnedSpinners_RunAtOnce`), a running thread moved by a set change from a third CPU (`Affinity_ChangeWhileRunning_Migrates`), a thread returning from its own set change on the new CPU (`Affinity_SetCurrent_ReturnsOnNewCpu`), a two-hundred-round ping-pong between CPU 1 and CPU 2 with a stack-local checksum, the cell the on-CPU marker exists for (`Affinity_PingPong_KeepsStackIntact`), a parked thread moved and woken on its new CPU (`Affinity_ParkedThread_MovesAndWakesOnNewCpu`), and an idle CPU pulling a queued thread through `SchedulerManager.Balance` (`Balance_IdleCpuPullsQueuedThread`).
 
-[`Cosmos.Kernel.Tests.Timer`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) runs 24 tests on x64 and 18 on ARM64 (`make test KERNEL=Timer`), covering both deferred-work tiers (`TimerManager_Schedule_*`, `AlarmSystem_*`), the BCL `System.Threading.Timer` on top of them, `Stopwatch`, `DateTime`, and the per-architecture timer hardware (PIT and LAPIC on x64).
+[`Cosmos.Kernel.Tests.Timer`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Timer/Kernel.cs) runs 27 tests on x64 and 21 on ARM64 (`make test KERNEL=Timer`), covering both deferred-work tiers (`TimerManager_Schedule_*`, `AlarmSystem_*`), the BCL `System.Threading.Timer` on top of them, `Stopwatch`, `DateTime`, and the per-architecture timer hardware (PIT and LAPIC on x64).
 
 ---
 

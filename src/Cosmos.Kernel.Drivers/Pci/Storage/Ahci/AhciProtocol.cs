@@ -209,6 +209,12 @@ internal static class AhciProtocol
     /// <summary>IDENTIFY DEVICE.</summary>
     public const byte AtaIdentify = 0xEC;
 
+    /// <summary>PACKET: the command whose 12- or 16-byte command block follows in the table's ATAPI area.</summary>
+    public const byte AtaPacket = 0xA0;
+
+    /// <summary>The features register bit a PACKET command sets so the data moves by DMA.</summary>
+    public const byte PacketFeatureDma = 0x01;
+
     /// <summary>The register host to device FIS type.</summary>
     public const byte FisTypeRegisterH2D = 0x27;
 
@@ -220,6 +226,86 @@ internal static class AhciProtocol
 
     /// <summary>Bytes of one sector.</summary>
     public const uint SectorBytes = 512;
+
+    /// <summary>Bytes of one CD-ROM sector, the logical block a packet device reports.</summary>
+    public const uint CdSectorBytes = 2048;
+
+    /// <summary>Bytes of the ATAPI command block in a command table; a 12-byte command is padded to it.</summary>
+    public const int AtapiCommandBytes = 16;
+
+    // --- The SCSI MMC command blocks a packet device takes ---
+
+    /// <summary>TEST UNIT READY: no data; failure says why in the sense data.</summary>
+    public const byte ScsiTestUnitReady = 0x00;
+
+    /// <summary>REQUEST SENSE: the fixed-format sense data of the last failure.</summary>
+    public const byte ScsiRequestSense = 0x03;
+
+    /// <summary>INQUIRY: the peripheral type and the vendor and product strings.</summary>
+    public const byte ScsiInquiry = 0x12;
+
+    /// <summary>READ CAPACITY(10): the last logical block and the block length.</summary>
+    public const byte ScsiReadCapacity10 = 0x25;
+
+    /// <summary>READ(12): logical blocks from a 32-bit LBA, a 32-bit count.</summary>
+    public const byte ScsiRead12 = 0xA8;
+
+    /// <summary>Bytes of the INQUIRY data read: the standard header with the strings.</summary>
+    public const int InquiryBytes = 36;
+
+    /// <summary>Offset of the vendor identification in the INQUIRY data.</summary>
+    public const int InquiryVendorOffset = 8;
+
+    /// <summary>Bytes of the vendor identification.</summary>
+    public const int InquiryVendorBytes = 8;
+
+    /// <summary>Offset of the product identification in the INQUIRY data.</summary>
+    public const int InquiryProductOffset = 16;
+
+    /// <summary>Bytes of the product identification.</summary>
+    public const int InquiryProductBytes = 16;
+
+    /// <summary>Mask of the peripheral device type in the INQUIRY data's first byte.</summary>
+    public const byte InquiryPeripheralTypeMask = 0x1F;
+
+    /// <summary>Peripheral device type 5: a CD-ROM or DVD device.</summary>
+    public const byte PeripheralCdRom = 0x05;
+
+    /// <summary>Bytes the fixed-format sense data holds.</summary>
+    public const int SenseBytes = 18;
+
+    /// <summary>Offset of the allocation length in a 6-byte command block.</summary>
+    public const int Command6AllocationLengthOffset = 4;
+
+    /// <summary>Offset of the sense key in fixed-format sense data, low nibble.</summary>
+    public const int SenseKeyOffset = 2;
+
+    /// <summary>Mask of the sense key.</summary>
+    public const byte SenseKeyMask = 0x0F;
+
+    /// <summary>Offset of the additional sense code in fixed-format sense data.</summary>
+    public const int SenseAdditionalCodeOffset = 12;
+
+    /// <summary>Sense key 2: the unit is not ready; the additional code says why.</summary>
+    public const byte SenseKeyNotReady = 0x02;
+
+    /// <summary>Sense key 6: unit attention, a reset or a medium change the device reports once.</summary>
+    public const byte SenseKeyUnitAttention = 0x06;
+
+    /// <summary>Additional sense code 0x3A: no medium in the device.</summary>
+    public const byte SenseMediumNotPresent = 0x3A;
+
+    /// <summary>Bytes READ CAPACITY(10) returns.</summary>
+    public const int ReadCapacity10Bytes = 8;
+
+    /// <summary>Offset of the block length in the READ CAPACITY(10) data, after the last LBA.</summary>
+    public const int ReadCapacity10BlockLengthOffset = 4;
+
+    /// <summary>Offset of the LBA in a READ(12) command block.</summary>
+    public const int Read12LbaOffset = 2;
+
+    /// <summary>Offset of the transfer length in a READ(12) command block.</summary>
+    public const int Read12LengthOffset = 6;
 
     // --- Command region: one DMA run for all 32 port indices ---
 
