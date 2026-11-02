@@ -1,23 +1,29 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using Cosmos.Kernel.Core;
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.System.Network;
 
 /// <summary>
 /// Manages network devices: every interface a driver kit driver publishes,
 /// which the manager's <see cref="KitNetworkConsumer"/> registers from the
-/// kit worker and unregisters when it is withdrawn. The table is updated
-/// with interrupts disabled, so a registration from the worker and a read
-/// from the ring's thread never see it half-written.
+/// kit worker and unregisters when it is withdrawn. The table is read and
+/// updated under its lock, so a withdrawal on the worker and a read from a
+/// thread on any CPU never see it half-written.
 /// </summary>
 public static class NetworkManager
 {
     private static INetworkDevice?[]? s_devices;
     private static int s_primaryIndex = -1;
+
+    /// <summary>
+    /// The table's lock, IRQ-safe (SMP phase 4b, CosmosOS/Cosmos#3347).
+    /// The table is fixed at its creation, so nothing allocates under it.
+    /// </summary>
+    private static SchedSpinLock s_lock;
 
     /// <summary>
     /// Whether network support is enabled. Uses centralized feature flag.
@@ -57,7 +63,12 @@ public static class NetworkManager
     {
         get
         {
-            return s_primaryIndex >= 0 && s_devices is not null ? s_devices[s_primaryIndex] : null;
+            // Under the lock: a withdrawal moves the primary index and the
+            // entries together.
+            using (s_lock.AcquireIrqSafe())
+            {
+                return s_primaryIndex >= 0 && s_devices is not null ? s_devices[s_primaryIndex] : null;
+            }
         }
     }
 
@@ -82,7 +93,11 @@ public static class NetworkManager
                 throw new ArgumentException("Handle names no registered network device", nameof(value));
             }
 
-            s_primaryIndex = value.Index;
+            // Under the lock, ordered against a withdrawal moving the index.
+            using (s_lock.AcquireIrqSafe())
+            {
+                s_primaryIndex = value.Index;
+            }
         }
     }
 
@@ -144,14 +159,13 @@ public static class NetworkManager
     /// <summary>
     /// Registers a network device with the manager; the first registered
     /// becomes the primary. Thread context, from the kit worker when a
-    /// published interface is consumed; the table is updated with interrupts
-    /// disabled.
+    /// published interface is consumed; the table is updated under its lock.
     /// </summary>
     /// <param name="device">The network device to register.</param>
     /// <returns>False when the manager is not initialized or the table's eight slots are taken; the device is not registered then.</returns>
     internal static bool RegisterDevice(INetworkDevice device)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_lock.AcquireIrqSafe())
         {
             if (s_devices is null || DeviceCount >= s_devices.Length)
             {
@@ -174,7 +188,7 @@ public static class NetworkManager
     /// and moving the primary index with them; a withdrawn primary falls
     /// back to the first remaining device. Thread context, from the kit
     /// worker when a published interface is withdrawn; the table is updated
-    /// with interrupts disabled. The device's IP configuration is not
+    /// under its lock. The device's IP configuration is not
     /// removed and <see cref="NetworkAdapter"/> handles stay positional, so a
     /// handle taken before the withdrawal may name the device that moved
     /// into the slot.
@@ -182,7 +196,7 @@ public static class NetworkManager
     /// <param name="device">The network device to remove; nothing when it is not registered.</param>
     internal static void UnregisterDevice(INetworkDevice device)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_lock.AcquireIrqSafe())
         {
             if (s_devices is null)
             {
@@ -230,12 +244,15 @@ public static class NetworkManager
     /// <returns>The network device, or null if not found.</returns>
     internal static INetworkDevice? GetDevice(int index)
     {
-        if (s_devices is null || index < 0 || index >= DeviceCount)
+        using (s_lock.AcquireIrqSafe())
         {
-            return null;
-        }
+            if (s_devices is null || index < 0 || index >= DeviceCount)
+            {
+                return null;
+            }
 
-        return s_devices[index];
+            return s_devices[index];
+        }
     }
 
     /// <summary>
