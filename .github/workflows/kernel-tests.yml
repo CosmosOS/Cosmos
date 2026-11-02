@@ -341,8 +341,10 @@ jobs:
       kernel_path: tests/Kernels/Cosmos.Kernel.Tests.GarbageCollector
       timeout_x64: 120
       timeout_arm64: 180
-      # Two cells since SMP phase 2 (bare and bare+smp4).
-      step_timeout_minutes: 15
+      # Two cells since SMP phase 2 (bare and bare+smp4); the four stop-the-world
+      # cells of phase 4 run an allocation storm and repeated collections that
+      # stop every CPU of the four-CPU machine under TCG.
+      step_timeout_minutes: 20
 
   garbagecollector-results:
     needs: garbagecollector-tests
