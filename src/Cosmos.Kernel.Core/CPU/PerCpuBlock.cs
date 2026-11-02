@@ -70,8 +70,11 @@ internal struct PerCpuBlock
     public ulong Online;
 
     /// <summary>
-    /// 1 while this CPU sits in its stop handler, held by another CPU's rendezvous
-    /// (<see cref="CpuStop"/>): the policy swap's, and the collector's from SMP phase 4.
+    /// The sequence number of the stop this CPU acknowledged, while it sits held in its stop
+    /// handler or its safepoint by another CPU's rendezvous (<see cref="CpuStop"/>): the
+    /// policy swap's, and the collector's. The sequence rather than a flag, so a stale
+    /// acknowledgement of an earlier stop is never read as this one's; 0 once the CPU has
+    /// left.
     /// </summary>
     public ulong Stopped;
 
@@ -91,7 +94,18 @@ internal struct PerCpuBlock
     /// </summary>
     public nuint SwitchPrevOnCpu;
 
-    private ulong _reserved1;
+    /// <summary>
+    /// How many of the locks a collection takes (the heap lock, the handle store's chain lock,
+    /// the page allocator's) this CPU holds, counted by
+    /// <see cref="Scheduler.SpinLock.AcquireCollectorLock"/>. A holder is masked and cannot
+    /// migrate, so the count is this CPU's alone. The stop's safepoint
+    /// (<see cref="CpuStop.Safepoint"/>) acknowledges only at zero, so a CPU never sits stopped
+    /// holding a lock the collector waits for, and <see cref="CpuStop.Enter"/> at a nonzero
+    /// count is an allocation under one of them, a panic. Managed code alone reads it: no stub
+    /// mirrors its offset.
+    /// </summary>
+    public ulong CollectorLockDepth;
+
     private ulong _reserved2;
     private ulong _reserved3;
 

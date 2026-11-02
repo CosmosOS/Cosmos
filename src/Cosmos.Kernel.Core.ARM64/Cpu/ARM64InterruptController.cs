@@ -379,13 +379,14 @@ internal class ARM64InterruptController : IInterruptController
     }
 
     /// <summary>
-    /// The stop SGI's handler: holds this CPU in the rendezvous until the sender releases it.
-    /// Dispatch ends the interrupt after it returns, so the CPU interface keeps the SGI active,
-    /// and so every other line masked, for as long as the CPU is held.
+    /// The stop SGI's handler: records the interrupted frame as the current thread's saved
+    /// context and holds this CPU in the rendezvous until the sender releases it. Dispatch ends
+    /// the interrupt after it returns, so the CPU interface keeps the SGI active, and so every
+    /// other line masked, for as long as the CPU is held.
     /// </summary>
     private static void HandleStop(ref IRQContext ctx)
     {
-        CpuStop.HandleStopInterrupt();
+        CpuStop.HandleStopInterrupt(SavedContextStackPointer(ref ctx));
     }
 
     private static void RunPendingReschedule(ref IRQContext ctx)

@@ -43,6 +43,7 @@ public class Kernel : Sys.Kernel
     private const int PerCpuStoppedOffset = 0x50;
     private const int PerCpuGicRedistributorBaseOffset = 0x58;
     private const int PerCpuSwitchPrevOnCpuOffset = 0x60;
+    private const int PerCpuCollectorLockDepthOffset = 0x68;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -1575,6 +1576,7 @@ public class Kernel : Sys.Kernel
         Assert.Equal(PerCpuStoppedOffset, (int)((byte*)&block.Stopped - start), "Stopped");
         Assert.Equal(PerCpuGicRedistributorBaseOffset, (int)((byte*)&block.GicRedistributorBase - start), "GicRedistributorBase");
         Assert.Equal(PerCpuSwitchPrevOnCpuOffset, (int)((byte*)&block.SwitchPrevOnCpu - start), "SwitchPrevOnCpu");
+        Assert.Equal(PerCpuCollectorLockDepthOffset, (int)((byte*)&block.CollectorLockDepth - start), "CollectorLockDepth");
     }
 
     // Core's library initializer installs block 0 on the boot CPU, the first managed code the

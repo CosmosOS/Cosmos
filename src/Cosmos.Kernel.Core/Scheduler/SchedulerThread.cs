@@ -119,10 +119,36 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
 
     // ===== Context (architecture-specific values) =====
 
+    private nuint _stackPointer;
+
     /// <summary>
-    /// Saved stack pointer while the thread is not running.
+    /// Saved stack pointer while the thread is not running: the base of its
+    /// <see cref="ThreadContext"/>, written by the switch-out, by
+    /// <see cref="SchedulerThread.InitializeStack"/>, and by the stop handler
+    /// for a thread another CPU stopped; or, when <see cref="SavedContextIsCapture"/>
+    /// is set, the register capture a safepoint made. A write here is a
+    /// context, so it clears that flag.
     /// </summary>
-    public nuint StackPointer { get; internal set; }
+    public nuint StackPointer
+    {
+        get => _stackPointer;
+        internal set
+        {
+            _stackPointer = value;
+            SavedContextIsCapture = false;
+        }
+    }
+
+    /// <summary>
+    /// Whether <see cref="StackPointer"/> points at a <c>REGDISPLAY</c> a
+    /// safepoint captured on this thread's stack (<see cref="CPU.CpuStop.Safepoint"/>)
+    /// rather than at a <see cref="ThreadContext"/>: the collector then scans the
+    /// stack from there with no register decode. Set by the safepoint alone,
+    /// after its write to <see cref="StackPointer"/>; cleared by every other
+    /// write, so a thread switched out after a capture is scanned from its
+    /// context again.
+    /// </summary>
+    internal bool SavedContextIsCapture { get; set; }
 
     /// <summary>
     /// Entry point address the thread was created with. Recorded by

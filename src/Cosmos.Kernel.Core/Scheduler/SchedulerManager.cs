@@ -171,7 +171,7 @@ public static class SchedulerManager
     /// <see cref="IScheduler.OnThreadReady"/> for those that were waiting in
     /// a run queue, so no thread is left behind in a run structure that no
     /// longer exists. The swap runs with the world stopped: interrupts masked
-    /// on the calling CPU and every other online CPU held in its stop handler
+    /// on the calling CPU and every other online CPU held by the stop
     /// (<see cref="CpuStop"/>), so no tick, no wake and no interrupt exit on
     /// any CPU can reach a run structure while the incoming policy is
     /// installed but its per-CPU state does not exist yet. That is the whole
@@ -186,7 +186,7 @@ public static class SchedulerManager
 
         using (InternalCpu.DisableInterruptsScope())
         {
-            CpuStop.StopOthers(s_cpuCount);
+            CpuStop.Enter(s_cpuCount);
 
             SchedulerThread?[]? threads = s_allThreads;
             IScheduler? outgoing = s_currentScheduler;
@@ -251,9 +251,9 @@ public static class SchedulerManager
                 Volatile.Write(ref s_cpuStates[i]._needReschedule, true);
             }
 
-            // The release store that publishes the swap to the CPUs leaving
-            // their stop handlers.
-            CpuStop.ReleaseAll();
+            // The release store that publishes the swap to the CPUs the stop
+            // held.
+            CpuStop.Exit();
         }
     }
 
@@ -1707,10 +1707,13 @@ public static class SchedulerManager
     /// off the stack of the CPU that last ran it (its on-CPU marker, which
     /// that CPU's stub clears right after its own stack switch), then marks
     /// it on this CPU. The wait is bounded by that stub, which nothing holds
-    /// up: a handler past its scheduler hooks takes no lock and runs masked
-    /// to the switch, and a thread still marked never enters another CPU's
-    /// run structure except through the eviction its own CPU runs after its
-    /// pick, so two CPUs cannot wait on each other.
+    /// up but a stop: a handler past its scheduler hooks takes no lock and
+    /// runs masked to the switch, and a thread still marked never enters
+    /// another CPU's run structure except through the eviction its own CPU
+    /// runs after its pick, so two CPUs cannot wait on each other. The CPU
+    /// whose stub this waits on may be held in its stop handler, so the wait
+    /// answers the stop itself (<see cref="CpuStop.Safepoint"/>): the switch
+    /// is staged, both threads' contexts are current, and nothing is captured.
     /// </summary>
     /// <param name="cpuId">Current CPU ID.</param>
     internal static void FinishSwitchFromIrq(uint cpuId)
@@ -1728,6 +1731,7 @@ public static class SchedulerManager
 
         while (Volatile.Read(ref next._onCpu) != 0)
         {
+            CpuStop.Safepoint();
         }
 
         Volatile.Write(ref next._onCpu, 1);
