@@ -1,5 +1,5 @@
 ---
-source_hash: 42f0471f49f8b9b09b952a9954c1ebbaa078489f
+source_hash: 3b9076646871e91a946ae8d5df58a74bd8d6d705
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -51,7 +51,6 @@ source_hash: 42f0471f49f8b9b09b952a9954c1ebbaa078489f
 | 功能 | 状态 | 说明 |
 |---------|--------|-------|
 | **SMP（对称多处理）** | ❌ 未开始 | 多核 AP 启动、每 CPU 调度、负载均衡器。 |
-| **HTTPS** | ❌ 未开始 | TLS/SSL 实现、证书处理、安全套接字。 |
 | **分代 GC** | ❌ 未开始 | 用分代回收器（Gen0/Gen1/Gen2）替换当前的标记-清除，以获得更好的性能。 |
 | **代码执行** | ❌ 未开始 | 用户态 WASM 虚拟机 |
 | **从设备树获取 GIC、ITS 和时钟** | ❌ 未开始 | 目前 ARM64 中断控制器来自 ACPI 或 virt 默认值，因此以 acpi=off 启动时没有 MSI；平台总线已经会读取设备树。x64 从来没有设备树。 |
