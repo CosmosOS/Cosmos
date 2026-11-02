@@ -1,6 +1,6 @@
 # Network
 
-In this article, we will discuss networking on Cosmos Gen3: how to bring the network stack up and send and receive packets. The available protocols are **ARP**, **IPv4**, **IPv6**, **UDP**, **TCP**, **DHCP** and **DNS**.
+In this article, we will discuss networking on Cosmos Gen3: how to bring the network stack up and send and receive packets. The available protocols are **ARP**, **IPv4**, **IPv6**, **UDP**, **TCP**, **DHCP** and **DNS**, and three packages build on TCP: a **Telnet** server, an **FTP** server, and an **HTTP** client and server, `https://` included.
 
 The main differences if you come from Gen2:
 
@@ -300,6 +300,109 @@ new Thread(server.Listen).Start(); // Listen() serves every client until server.
 
 Clients see `/mnt` as `/` and cannot leave it. Leaving `Authenticate` unset lets any user name in with any password; set it to check credentials. Transfers are passive, on ports 50000 to 50009 by default (`PassivePortMin` and `PassivePortMax`), so under QEMU user networking forward those as well as the control port: `cosmos run --hostfwd tcp::2121-:21 --hostfwd tcp::50000-:50000 ...`, then `curl ftp://localhost:2121/`. A `PASV` reply names the guest's own address, 10.0.2.15, which the host cannot reach: curl ignores it, but FileZilla connects to it, so set `PassiveAddress = IPAddress.Loopback` for `PASV` to name 127.0.0.1 instead.
 
+## HTTP and HTTPS
+
+HTTP is the protocol of the web and of most online APIs, and nearly all of it now travels encrypted as `https://`. The [Cosmos.Network.Http](https://github.com/CosmosOS/Cosmos.Network.Http) package gives your kernel an HTTP/1.1 client and server for both. It is [.NET nanoFramework's System.Net.Http](https://github.com/nanoframework/System.Net.Http) ported to Gen3, so its `HttpClient` waits for the response inside calls such as `Get` and `GetString`, nanoFramework's equivalents of the desktop's `GetAsync` and `GetStringAsync`.
+
+Add the package with a second line that takes `System.Net.Http` out of the implicit usings, because the Cosmos SDK turns `ImplicitUsings` on, and the .NET `HttpClient` that namespace brings would make every use of the package's `HttpClient` an ambiguous reference (CS0104):
+
+```xml
+<ItemGroup>
+  <PackageReference Include="Cosmos.Network.Http" Version="3.0.0" />
+  <Using Remove="System.Net.Http" />
+</ItemGroup>
+```
+
+The package also declares its own `HttpListener`, `HttpStatusCode` and other types that `System.Net` has, so for the same reason a file that uses the package does not import `System.Net`, although the list of usings at the top of this page does.
+
+### Fetch a page
+
+A host name needs a nameserver, which DHCP registers when the server's acknowledgement names one; with a manual configuration, add one as the [DNS](#dns) section below shows. Once the network is configured, the client fetches a page in one call:
+
+```csharp
+using Cosmos.Network.Http;
+
+using HttpClient client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+
+using HttpResponseMessage response = client.Get("https://example.com/");
+Console.WriteLine("GET https://example.com/: " + (int)response.StatusCode + " " + response.ReasonPhrase);
+Console.WriteLine("Content-Type: " + response.Content.Headers.ContentType);
+
+string html = response.Content.ReadAsString();
+int start = html.IndexOf("<title>") + "<title>".Length;
+Console.WriteLine("Title: " + html.Substring(start, html.IndexOf("</title>") - start));
+```
+
+<!-- screenshot: console showing "GET https://example.com/: 200 OK", "Content-Type: text/html; charset=utf-8" and "Title: Example Domain" -->
+![HTTPS client](images/network-http.png)
+
+`Get` returns the response whatever its status, as `Post`, `Put`, `Patch`, `Delete` and `Send` do, and that includes a redirect: the client follows none, so a 3xx comes back as the response, with its `Location` in its headers. `GetString` and `GetByteArray` return the body alone, which leaves them no way to report the status, so they throw an `HttpRequestException` for an error status such as 404. Dispose each response, as the `using` declaration does, so that its connection is closed or goes back to the pool for the next request.
+
+Every other failure is an `HttpRequestException` too, whichever call made the request: a refused connection, a name that does not resolve, a refused certificate or a response cut short. Its innermost exception says why.
+
+**Set `Timeout`.** It is infinite by default, as on nanoFramework, so a server that stops answering holds the calling thread for the five minutes each read of the socket may wait. `Timeout` shortens that wait for every read, of the response's head and of its body, so a server that goes silent fails the call with an `HttpRequestException` once that long has passed without data. A server that keeps sending, however slowly, is not cut off.
+
+An `https://` address runs TLS inside the package, in BouncyCastle's managed code, because the BCL's `SslStream` calls OpenSSL, which a kernel does not have. The client goes on only with a server whose certificate chain leads to one of Mozilla's root certificates, which the package embeds, and whose certificate names the host the client asked for. The first handshake takes longer than the next ones, because it parses those root certificates first.
+
+Three properties of the client change what it offers and whom it trusts. `SslProtocols` is TLS 1.2 alone, as on nanoFramework, and `SslProtocols.None` offers TLS 1.3 as well; the property takes .NET's own `SslProtocols` enum, so the file needs `using System.Security.Authentication;`. `HttpsAuthentCert` takes the certificate of your own certificate authority, as the package's `X509Certificate` (PEM or DER), and that client then trusts the servers it signed instead of Mozilla's roots. `SslVerification = SslVerification.NoVerification` skips the check altogether, which lets anyone between the kernel and the server pose as the server and read the traffic, so keep it to tests.
+
+Whatever the settings, the kernel supplies two things to the exchange. The session keys come from BouncyCastle's generator, which seeds itself from `RandomNumberGenerator`, the kernel CSPRNG in Cosmos ([Random numbers](random.md)). The certificate dates are compared with `DateTime.UtcNow`, so the kernel's clock has to be right. Under QEMU it is, because QEMU's RTC holds UTC.
+
+### Serve requests
+
+`HttpListener` is the server half. `GetContext` accepts connections and hands back the next request, and it does not return until a request has arrived or the listener has stopped, so the loop runs on a thread of its own rather than in `Run()`, which it would otherwise hold for as long as no request comes:
+
+```csharp
+using System.Text;
+using System.Threading;
+using Cosmos.Network.Http;
+
+HttpListener listener = new HttpListener("http", 8080);
+listener.Start();
+
+new Thread(() =>
+{
+    while (listener.IsListening)
+    {
+        HttpListenerContext context = listener.GetContext();
+        if (context == null)
+        {
+            break; // Stop() or Close() was called from another thread
+        }
+
+        byte[] body = Encoding.UTF8.GetBytes("Hello from Cosmos! You asked for " + context.Request.RawUrl + "\n");
+        HttpListenerResponse response = context.Response;
+        response.ContentType = "text/plain";
+        response.ContentLength64 = body.Length;
+        response.OutputStream.Write(body, 0, body.Length);
+        response.Close();
+    }
+}).Start();
+```
+
+The thread that calls `GetContext` serves every connection, TLS handshakes included, without waiting on any one client. Handle each request it returns on that same thread, because the listener keeps its sockets to the thread that serves it: closing a response hands a kept-alive connection back to the list `GetContext` watches.
+
+`Stop()` may come from another thread. A `GetContext` waiting for a request then returns `null` within 50 ms, and a thread busy with one finds `IsListening` false once it has answered, so the loop ends either way.
+
+To reach the server under QEMU user networking, forward its port and query it from your host:
+
+```console
+$ cosmos run --hostfwd tcp::8080-:8080    # in one terminal
+$ curl http://localhost:8080/hello        # in another
+Hello from Cosmos! You asked for /hello
+```
+
+A listener created with the `"https"` prefix serves `https://` once `HttpsCert` holds a certificate and its private key, PEM or DER, and it offers TLS 1.3 and 1.2 by default. With the certificate and its key in two strings of PEM text, the listener is created like this, then started and served with the same loop as above:
+
+```csharp
+HttpListener listener = new HttpListener("https", 443)
+{
+    HttpsCert = new X509Certificate2(certificatePem, privateKeyPem, null),
+};
+```
+
+That `X509Certificate2` is the package's class, not the one in `System.Security.Cryptography.X509Certificates`, because .NET's parses certificates through OpenSSL too. Its constructor takes the key as its second argument and the key's password as its third, `null` for a key that is not encrypted. Forwarded the same way (`--hostfwd tcp::8443-:443`), the listener answers `curl --cacert cert.pem https://localhost:8443/` when `cert.pem` is a certificate that names `localhost`.
+
 ## DNS
 
 Two APIs resolve a name: the standard `System.Net.Dns`, and the Cosmos `DnsClient`. Register a nameserver with either one, because there is no `resolv.conf` to read one from and DHCP is what normally supplies it:
@@ -443,7 +546,7 @@ The contract the packet types actually implement:
 - Reverse lookups are not supported. `Dns.GetHostEntry(IPAddress)` needs a PTR query against `in-addr.arpa`, which the resolver does not send, so it throws rather than returning a name.
 - The asynchronous `Dns` overloads are unverified. `GetHostAddressesAsync` and the `Begin`/`End` pairs reach the same plug, but they get there by queueing the blocking call to the thread pool, which this kernel has not been exercised against. The blocking overloads are the tested path.
 - IPv6 stops at the link. There is a link-local address, Neighbor Discovery, ICMPv6 echo, and UDP and TCP now ride IPv6 through the same packet classes as IPv4, but there is no routing table, so every destination has to be on the link. No SLAAC or DHCPv6, no address configuration beyond the link-local address, and `IPAddress` stays IPv4-only in the socket plugs, so the standard .NET socket classes reach IPv4 only.
-- No TLS, so no `HttpClient`/HTTPS: raw TCP only.
+- TLS is not part of the kernel, because the BCL's `SslStream` calls OpenSSL, which a kernel does not have. `https://` goes through the Cosmos.Network.Http package instead ([HTTP and HTTPS](#http-and-https)), which speaks HTTP/1.1 only, checks no certificate revocation, and reaches IPv4 only, as the standard socket classes it is built on do.
 - Several NICs are registered and configured, and outbound packets are routed by matching the source address against each interface's configuration, so `NetworkManager.Primary` decides only where the unrouted helpers (`NetworkManager.Send`, the no-handle `IPConfig.Enable`) go.
 - An interface the driver kit withdraws leaves the manager's table, but its IP configuration is not removed and `NetworkAdapter` handles stay positional, so a handle taken before the withdrawal may name the device that moved into its slot.
 - Half-close is not supported: `Close()` on an established TCP connection expects the peer to answer the FIN handshake within 5 seconds and throws if it keeps the connection open.
@@ -480,6 +583,9 @@ Network device                                          (e1000e or virtio-net, o
 | Send and receive UDP datagrams | `System.Net.Sockets.UdpClient` |
 | Connect to a TCP server | `TcpClient.Connect(address, port)`, `TcpClient.GetStream()` |
 | Accept TCP connections | `TcpListener.Start()`, `Pending()`, `AcceptTcpClient()` |
+| Fetch a page over HTTP or HTTPS | `HttpClient.Get(requestUri)`, `HttpClient.GetString(requestUri)` |
+| Serve HTTP requests | `new HttpListener("http", port)`, `Start()`, `GetContext()` |
+| Serve HTTPS | `new HttpListener("https", port)`, `HttpListener.HttpsCert` |
 | Register a nameserver | `DnsConfig.Add(nameserver)` |
 | Resolve a name | `Dns.GetHostAddresses(hostNameOrAddress)` |
 | Read every address record of a name | `DnsClient.SendQuery(url)`, `DnsClient.ReceiveAll(timeout)` |

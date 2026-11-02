@@ -1,5 +1,5 @@
 ---
-source_hash: 42f0471f49f8b9b09b952a9954c1ebbaa078489f
+source_hash: 3b9076646871e91a946ae8d5df58a74bd8d6d705
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -51,7 +51,6 @@ Fonctionnalités prévues après la première version :
 | Fonctionnalité | État | Remarques |
 |---------|--------|-------|
 | **SMP (multitraitement symétrique)** | ❌ Non commencé | Démarrage des AP sur plusieurs cœurs, ordonnancement par CPU, équilibreur de charge. |
-| **HTTPS** | ❌ Non commencé | Implémentation de TLS/SSL, gestion des certificats, sockets sécurisés. |
 | **GC générationnel** | ❌ Non commencé | Remplacer l'actuel marquage-balayage par un collecteur générationnel (Gen0/Gen1/Gen2) pour de meilleures performances. |
 | **Exécution de code** | ❌ Non commencé | VM WASM en espace utilisateur |
 | **Le GIC, l'ITS et les horloges à partir du device tree** | ❌ Non commencé | Aujourd'hui, le contrôleur d'interruptions ARM64 provient d'ACPI ou des valeurs par défaut de virt, si bien qu'un démarrage avec acpi=off n'a pas de MSI ; le bus de plateforme lit déjà l'arbre. x64 n'en a jamais. |
