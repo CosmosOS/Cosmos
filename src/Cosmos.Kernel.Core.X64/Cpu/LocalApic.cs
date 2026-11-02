@@ -206,7 +206,7 @@ public static class LocalApic
     /// the software enable, LINT0, LINT1, the timer and the error LVTs masked. The timer is
     /// started separately (<see cref="StartPeriodicTimerOnCurrentCpu"/>). An application
     /// processor, from its managed entry, with interrupts masked (SMP phase 2). Allocation-free:
-    /// the heap is the boot CPU's until phase 4.
+    /// it runs before the CPU is online.
     /// </summary>
     internal static void InitializeCurrentCpu()
     {
@@ -540,17 +540,18 @@ public static class LocalApic
         // Sanity check RSP - should be in kernel space (0xFFFF800000000000+)
         if ((currentRsp & AddressSpace.KernelSpaceCanonicalMask) != AddressSpace.KernelSpaceCanonicalMask)
         {
-            Serial.Write("[LAPIC] ERROR: Invalid RSP at tick ", s_timerTickCount, ": ");
+            // Allocation-free: this is interrupt context, on whichever CPU took the tick
+            Serial.WriteString("[LAPIC] ERROR: Invalid RSP at tick ");
+            Serial.WriteNumber(s_timerTickCount);
+            Serial.WriteString(": ");
             Serial.WriteHex((ulong)currentRsp);
-            Serial.Write("\n");
+            Serial.WriteString("\n");
             return;  // Don't call scheduler with bad RSP
         }
 
         // The boot CPU's ticks alone are counted and logged here: every CPU
-        // has its own timer and takes this handler, and a shared counter would
-        // advance once per CPU per period, while the log lines box their
-        // arguments, which an application processor must not do (the heap is
-        // the boot CPU's until phase 4).
+        // has its own timer and takes this handler, a shared counter would
+        // advance once per CPU per period, and the log follows the count.
         if (cpuId == 0)
         {
             s_timerTickCount++;

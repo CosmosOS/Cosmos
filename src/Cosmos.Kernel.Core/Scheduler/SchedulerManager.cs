@@ -62,9 +62,9 @@ public static class SchedulerManager
 
     /// <summary>
     /// The CPUs the kernel's own service threads run on, whatever
-    /// <see cref="DefaultAffinity"/> says: CPU 0, where the collector runs
-    /// until it stops every CPU (SMP phase 4) and where the driver stack's
-    /// interrupt masks exclude its handlers. Every thread
+    /// <see cref="DefaultAffinity"/> says: CPU 0, where the driver stack's
+    /// interrupt masks exclude its handlers, which holds exactly as long as
+    /// handler and thread share a CPU. Every thread
     /// <see cref="KernelThread.TryStart(Action)"/> starts takes it.
     /// </summary>
     internal static CpuSet HousekeepingCpus => CpuSet.Single(0);

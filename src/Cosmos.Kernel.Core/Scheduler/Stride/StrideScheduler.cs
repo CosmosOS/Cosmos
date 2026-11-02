@@ -276,8 +276,7 @@ internal class StrideScheduler : IScheduler
         // Counted on every CPU, in its own data: a static shared by every
         // CPU's tick would be written by all of them at once. The line itself
         // is CPU 0's: every CPU ticks at the same period, so one CPU's count
-        // paces it, and an application processor's tick must not write to the
-        // polled UART nor box until the collector stops every CPU (phase 4).
+        // paces it.
         cpuData.OnTickLogCount++;
 
         StrideThreadData? threadData = ThreadDataOf(current);

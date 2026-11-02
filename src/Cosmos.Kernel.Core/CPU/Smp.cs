@@ -146,8 +146,7 @@ internal static unsafe class Smp
     /// logs its counter against the boot CPU's, starts its tick, reports online, enables
     /// interrupts and halts; its first tick finds nothing queued and keeps halting, and the
     /// first thread placed on it (phase 5) arrives by a reschedule interrupt. Nothing here
-    /// allocates: the heap has no lock across CPUs until phase 4, and a tick on this CPU must
-    /// not allocate either.
+    /// allocates: the CPU is not online yet, so a collection would neither stop nor scan it.
     /// </summary>
     /// <param name="bootStackTop">The top of this CPU's boot stack, as the trampoline aligned it.</param>
     internal static void ApMain(nuint bootStackTop)
