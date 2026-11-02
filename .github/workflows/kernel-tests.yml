@@ -479,7 +479,8 @@ jobs:
       timeout_x64: 90
       timeout_arm64: 150
       # Two cells (bare and bare+smp4); the affinity cells on the four-CPU
-      # machine add a few fixed polling windows.
+      # machine add a few fixed polling windows, and the two lock cells of
+      # phase 4b a keyboard run of three thousand keys and six hundred timers.
       step_timeout_minutes: 10
 
   smp-results:

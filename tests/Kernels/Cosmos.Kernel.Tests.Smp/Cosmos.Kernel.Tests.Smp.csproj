@@ -23,7 +23,8 @@
   <!--
     The bare cell, and the same cells on four CPUs: the CPU set arithmetic
     and the ring's reads and refusals run on both, and the cells that move a
-    thread between CPUs run on the four-CPU machine and skip on one CPU.
+    thread between CPUs, or share a queue or a registry between them, run on
+    the four-CPU machine and skip on one CPU.
     Definitions live in tests/profiles.json.
   -->
   <ItemGroup>
