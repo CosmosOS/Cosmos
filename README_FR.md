@@ -1,4 +1,4 @@
-<!-- source_hash: 0b7fc587374d85f0272654836d48a1450f83505b -->
+<!-- source_hash: c51eb2611255fdfd661a0f3f81257c491c185ca8 -->
 <p align="center">
   <img src="https://user-images.githubusercontent.com/63316499/89792973-43587480-daf3-11ea-99d6-82f89dd2ffc3.png" width="25%" />
 </p>
@@ -38,7 +38,7 @@ Cosmos gen2 compilait l'IL C# en assembleur x86 au moyen d'**IL2CPU**, un transp
 - Port série UART
 - [Sous-système graphique de Cosmos](https://cosmosos.github.io/fr/articles/user/graphics.html)
 - Saisie au [clavier](https://cosmosos.github.io/fr/articles/user/keyboard.html) et à la [souris](https://cosmosos.github.io/fr/articles/user/mouse.html)
-- [Pile réseau](https://cosmosos.github.io/fr/articles/user/network.html)
+- [Pile réseau](https://cosmosos.github.io/fr/articles/user/network.html), avec [HTTP et HTTPS](https://cosmosos.github.io/fr/articles/user/network.html#http-and-https), FTP et Telnet sous forme de paquets
 - Pilotes de stockage (AHCI/SATA, NVMe, virtio-blk, stockage de masse USB) avec partitionnement MBR, GPT et EBR
 - [Systèmes de fichiers FAT12/16/32, ext2 et ISO 9660](https://cosmosos.github.io/fr/articles/user/filesystem.html) sur un VFS de type Unix (montage, superblocs, inodes, montages en lecture seule)
 - Minuteur / horloge
