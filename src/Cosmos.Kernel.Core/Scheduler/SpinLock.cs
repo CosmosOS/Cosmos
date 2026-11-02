@@ -13,6 +13,20 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// pair where the ISR signals), use <see cref="AcquireIrqSafe"/>: a single
 /// CPU holding the plain lock when the ISR fires will spin forever waiting
 /// for itself.</para>
+///
+/// <para>Nothing allocates while holding one, whichever form took it: a
+/// holder that starts a collection stops every other CPU, and a CPU that
+/// spins on this lock with interrupts masked cannot take the stop interrupt.
+/// The spin answers the stop in its place (<see cref="CpuStop.Safepoint"/>),
+/// so a waiter never holds a collection up; a holder of one of the three
+/// locks a collection takes (the heap lock, the handle store's chain lock,
+/// the page allocator's) would, so those are taken through
+/// <see cref="AcquireCollectorLock"/>, which counts them per CPU
+/// (<see cref="PerCpuBlock.CollectorLockDepth"/>): the safepoint acknowledges
+/// at zero only, and <see cref="CpuStop.Enter"/> at a nonzero count panics.
+/// The scheduler's locks are taken in one order, queue locks by ascending
+/// CPU index, then the registry lock, then the stop, then the heap lock, and
+/// two queue locks at once only by a migration (<see cref="SchedulerManager"/>).</para>
 /// </summary>
 internal struct SpinLock
 {
@@ -22,7 +36,9 @@ internal struct SpinLock
     {
         while (Interlocked.CompareExchange(ref _locked, 1, 0) != 0)
         {
-            // Spin until lock is acquired
+            // Bounded by the holder's release; a stop that lands meanwhile is
+            // answered from here, interrupts staying as they are.
+            CpuStop.Safepoint();
         }
     }
 
@@ -50,7 +66,54 @@ internal struct SpinLock
         return new IrqLockScope(ref this);
     }
 
+    /// <summary>
+    /// <see cref="AcquireIrqSafe"/> for one of the locks a collection takes: the
+    /// hold is counted in the CPU's <see cref="PerCpuBlock.CollectorLockDepth"/>,
+    /// which keeps a CPU from acknowledging a stop while it holds the lock and
+    /// makes an allocation under it a panic rather than a hang.
+    /// </summary>
+    [UnscopedRef]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public CollectorLockScope AcquireCollectorLock()
+    {
+        return new CollectorLockScope(ref this);
+    }
+
     public readonly bool IsLocked => _locked != 0;
+}
+
+/// <summary>
+/// RAII scope returned by <see cref="SpinLock.AcquireCollectorLock"/>: an
+/// <see cref="IrqLockScope"/> whose hold is counted in the CPU's
+/// <see cref="PerCpuBlock.CollectorLockDepth"/>. The count goes up once the
+/// lock is held and down before it is released, so the spin in between runs
+/// at the outer depth: a CPU waiting for its first collector lock answers a
+/// stop, one waiting for an inner lock while holding an outer one does not.
+/// </summary>
+internal ref struct CollectorLockScope
+{
+    private IrqLockScope _scope;
+    private bool _disposed;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal CollectorLockScope(ref SpinLock spinLock)
+    {
+        _scope = new IrqLockScope(ref spinLock);
+        _disposed = false;
+        PerCpuBlock.Current.CollectorLockDepth++;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+        _disposed = true;
+        PerCpuBlock.Current.CollectorLockDepth--;
+        _scope.Dispose();
+    }
 }
 
 /// <summary>

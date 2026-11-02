@@ -22,5 +22,8 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
     <!-- The Stopwatch plug reads the counter through GenericTimerNative. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
+    <!-- The Interrupts suite checks the per-CPU block's hardware id against
+         MPIDR_EL1 (GICv3Native.ReadMpidr, GICv3.ExtractAffinity). -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
   </ItemGroup>
 </Project>

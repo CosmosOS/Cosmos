@@ -25,13 +25,23 @@ internal static unsafe partial class GarbageCollector
     // --- Methods ---
 
     /// <summary>
-    /// Allocates a pinned object on the pinned heap.
+    /// Allocates a pinned object on the pinned heap, under the heap lock: the pinned segments
+    /// are shared by every CPU and have no per-thread buffer.
     /// Pinned objects are not subject to compaction but can still be collected when unreachable.
     /// </summary>
     /// <param name="size">Requested object size in bytes.</param>
     /// <param name="flags">Allocation flags from the runtime.</param>
     /// <returns>Pointer to the allocated object, or <c>null</c> if allocation fails.</returns>
     private static GCObject* AllocPinnedObject(nint size, GC_ALLOC_FLAGS flags)
+    {
+        using (s_heapLock.AcquireCollectorLock())
+        {
+            return AllocPinnedObjectLocked(size, flags);
+        }
+    }
+
+    /// <summary>The allocation itself, the heap lock held.</summary>
+    private static GCObject* AllocPinnedObjectLocked(nint size, GC_ALLOC_FLAGS flags)
     {
         uint allocSize = Align((uint)size);
         if (allocSize < MinBlockSize)
@@ -80,7 +90,6 @@ internal static unsafe partial class GarbageCollector
             segment->MarkObject((nint)result);
             segment->Bump = newBump;
             segment->UsedSize += size;
-            s_totalAllocatedBytes += size;
             s_pinnedHeapObjectCount++;
             return result;
         }

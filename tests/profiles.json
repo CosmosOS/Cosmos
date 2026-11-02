@@ -25,6 +25,7 @@
   //   * modifiers: generic knobs that compose with a profile. Two flavors:
   //       - deviceOptions: per-disk-kind overrides (msix tuning, cache mode)
   //       - machineOptions: -M property overrides (gic-version, ...)
+  //       - cpus: the CPU count (-smp), which QEMU takes on its own switch
   //     plus an optional architectures filter so arch-specific knobs (GIC) are
   //     silently skipped on the wrong arch.
   //
@@ -397,6 +398,17 @@
       // INTx-only function poll.
       "name": "acpi-off",
       "machineOptions": { "acpi": "off" }
+    },
+    {
+      // Four CPUs. The bootloader parks the three application processors and
+      // the kernel starts them at the end of its initializer (SMP phase 2):
+      // each loads its per-CPU block, the shared IDT or its GIC redistributor,
+      // its own Local APIC or generic timer, reports online and halts on its
+      // idle thread. The suites that read the per-CPU blocks and the per-CPU
+      // tick counts opt in; every other suite keeps one CPU, which is what
+      // its timings are written against.
+      "name": "smp4",
+      "cpus": 4
     }
   ]
 }
