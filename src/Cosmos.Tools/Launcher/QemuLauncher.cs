@@ -15,6 +15,13 @@ public sealed class QemuLaunchOptions
     public required string Architecture { get; init; }
     public required string IsoPath { get; init; }
     public int MemoryMb { get; init; } = DefaultMemoryMb;
+
+    /// <summary>
+    /// CPUs the guest gets (<c>-smp</c>), 1 by default. Every CPU past the first is an
+    /// application processor the bootloader parks and the kernel starts (SMP phase 2).
+    /// </summary>
+    public int CpuCount { get; init; } = 1;
+
     public bool Headless { get; init; }
     public bool Debug { get; init; }
     /// <summary>If null, serial goes to stdio (interactive CLI). Otherwise, to this file path (test runner).</summary>
@@ -570,7 +577,7 @@ public static class QemuLauncher
         return new QemuLaunchPlan(resolved.Path, args.ToString().TrimStart(), resolved.Source);
     }
 
-    private static void AppendX64Args(StringBuilder args, QemuLaunchOptions options)
+    internal static void AppendX64Args(StringBuilder args, QemuLaunchOptions options)
     {
         args.Append("-M q35");
         AppendMachineOptions(args, options.MachineOptions);
@@ -592,6 +599,7 @@ public static class QemuLauncher
             args.Append(" -enable-kvm");
         }
         args.Append($" -cpu {cpu} -m {options.MemoryMb}M");
+        AppendCpuCount(args, options);
         // Explicit CD drive with bootindex=0 so SeaBIOS picks the ISO over
         // any attached HDDs whose 0xAA55 MBR signature would otherwise
         // satisfy the BIOS and hang when their boot code is empty (the case
@@ -630,6 +638,7 @@ public static class QemuLauncher
             : options.CpuModel.Trim();
         ValidateOptionToken(cpu, "cpu model");
         args.Append($" -cpu {cpu} -m {options.MemoryMb}M");
+        AppendCpuCount(args, options);
         args.Append(" -bios edk2-aarch64-code.fd");
         // The ISO goes through a virtio-scsi controller, not -cdrom: the virt
         // machine attaches -cdrom as a virtio-blk-pci function, which the
@@ -684,6 +693,23 @@ public static class QemuLauncher
             args.Append(kv.Key);
             args.Append('=');
             args.Append(kv.Value);
+        }
+    }
+
+    /// <summary>
+    /// Emits <c>-smp N</c> for a guest with more than one CPU. One CPU is QEMU's default
+    /// and stays implicit, so a launch that asks for nothing keeps the command line it had.
+    /// </summary>
+    private static void AppendCpuCount(StringBuilder args, QemuLaunchOptions options)
+    {
+        if (options.CpuCount < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(options), options.CpuCount, "A guest has at least one CPU.");
+        }
+
+        if (options.CpuCount > 1)
+        {
+            args.Append($" -smp {options.CpuCount}");
         }
     }
 

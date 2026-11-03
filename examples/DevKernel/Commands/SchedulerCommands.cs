@@ -1,5 +1,6 @@
 using System;
 using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.Threading;
 using Cosmos.Kernel.System.Timers;
 using DevKernel.Diagnostics;
 using DevKernel.Shell;
@@ -137,7 +138,7 @@ internal static class SchedulerCommands
     {
         Console.Write("    ");
         Console.ForegroundColor = ConsoleColor.White;
-        Console.Write("Thread " + info.Id);
+        Console.Write($"Thread {info.Id}");
 
         Console.Write(" ");
         switch (info.State)
@@ -168,15 +169,33 @@ internal static class SchedulerCommands
         if (info.HasPriority)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write(" Pri=" + info.Priority);
+            Console.Write($" Pri={info.Priority}");
         }
+
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.Write($" Cpu={info.CpuId} Aff={{{FormatCpuSet(info.Affinity)}}} Ideal={info.IdealCpu}");
 
         ulong runtimeMs = info.TotalRuntimeNs / Units.NsPerMs;
         Console.ForegroundColor = ConsoleColor.DarkGray;
-        Console.Write(" Run=" + runtimeMs + "ms");
+        Console.Write($" Run={runtimeMs}ms");
 
         Console.ResetColor();
         Console.WriteLine();
+    }
+
+    // The CPUs a set names among the ones this kernel manages, as "0,2,3".
+    private static string FormatCpuSet(CpuSet set)
+    {
+        string text = "";
+        for (uint cpu = 0; cpu < KernelCpus.Count; cpu++)
+        {
+            if (set.Contains(cpu))
+            {
+                text += text.Length == 0 ? cpu.ToString() : $",{cpu}";
+            }
+        }
+
+        return text;
     }
 
     private static void TestTimers()

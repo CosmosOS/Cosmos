@@ -102,7 +102,9 @@
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL" />
     <!-- Plugs read feature knobs (KnobsNative) and module metadata (ManagedModule). -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
-    <!-- White-box GC tests drive the CFI unwinder through ExceptionHelper. -->
+    <!-- White-box GC tests drive the CFI unwinder through ExceptionHelper and,
+         since SMP phase 4, enter the stop themselves and read its acknowledgement
+         counters (CpuStop) and the collector's refill count. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.GarbageCollector" />
     <!-- The aggregator bootstraps the scheduler (Initialize, CreateThread,
          idle-thread setup) from its library initializer. -->
@@ -119,6 +121,10 @@
     <!-- White-box scheduler suite reads Stride bookkeeping and drives the
          sync primitives directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Threading" />
+    <!-- The affinity suite (SMP phase 3b) calls the dormant Balance entry,
+         parks its workers on an InterruptEvent, starts a kernel thread to
+         read its housekeeping set, and masks interrupts for one refusal. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Smp" />
     <!-- White-box suites over Core primitives: vector allocation and MSI
          routing (Interrupts), copy routines and page allocation (Memory),
          MMIO probes (Storage). -->

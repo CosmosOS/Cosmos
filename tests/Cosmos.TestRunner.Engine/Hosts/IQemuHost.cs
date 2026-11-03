@@ -53,8 +53,9 @@ public interface IQemuHost
     /// <param name="machineOptions">Extra <c>-M</c> properties (e.g. <c>{"gic-version", "2"}</c> on ARM64). Caller is responsible for passing arch-appropriate keys.</param>
     /// <param name="devices">Per-profile NIC and input device models; null leaves the architecture defaults in place.</param>
     /// <param name="monitor">Carries out the guest's requests (USB and PCI hot-plug, key and pointer injection) through the QMP monitor QEMU is launched with; null when the caller opened none.</param>
+    /// <param name="cpuCount">CPUs the guest gets (<c>-smp</c>); 1 by default, more on the cells that prove the application processors come up.</param>
     /// <returns>Exit code and UART log content</returns>
-    Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuMonitor? monitor = null);
+    Task<QemuRunResult> RunKernelAsync(string isoPath, string uartLogPath, int timeoutSeconds = QemuHostDefaults.DefaultTimeoutSeconds, bool showDisplay = false, bool enableNetworkTesting = false, IReadOnlyList<DiskAttachment>? disks = null, IReadOnlyDictionary<string, string>? machineOptions = null, ProfileDevices? devices = null, QemuMonitor? monitor = null, int cpuCount = 1);
 }
 
 /// <summary>

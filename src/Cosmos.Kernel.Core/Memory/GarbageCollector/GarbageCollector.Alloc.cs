@@ -21,176 +21,11 @@ internal static unsafe partial class GarbageCollector
         return (size + ((uint)sizeof(nint) - 1)) & ~((uint)sizeof(nint) - 1);
     }
 
-    /// <summary>
-    /// Searches the free lists for a block of the requested size.
-    /// Splits oversized blocks and returns the remainder to the free list.
-    /// </summary>
-    /// <param name="size">Aligned allocation size in bytes.</param>
-    /// <returns>Pointer to zeroed memory, or <c>null</c> if no suitable block is found.</returns>
-    private static void* AllocFromFreeList(uint size)
-    {
-        if (!s_freeListsInitialized)
-        {
-            return null;
-        }
-
-        int sizeClass = -1;
-        uint classSize = MinSizeClass;
-        for (int i = 0; i < NumSizeClasses; i++, classSize <<= 1)
-        {
-            if (size <= classSize)
-            {
-                sizeClass = i;
-                break;
-            }
-        }
-
-        if (sizeClass < 0)
-        {
-            return null; // Too large
-        }
-
-        // Try this size class and larger
-        for (int i = sizeClass; i < NumSizeClasses; i++)
-        {
-            FreeBlock* block = s_freeLists[i];
-            if (block == null)
-            {
-                continue;
-            }
-
-            // Check each block in this class
-            FreeBlock* prev = null;
-            while (block != null)
-            {
-                if (block->Size >= size)
-                {
-                    uint remainder = (uint)(block->Size - size);
-
-                    // Avoid unsplittable tail: skip this block if it would leave a tiny remainder
-                    if (remainder != 0 && remainder < MinBlockSize)
-                    {
-                        prev = block;
-                        block = block->Next;
-                        continue;
-                    }
-
-                    // Remove from free list
-                    if (prev != null)
-                    {
-                        prev->Next = block->Next;
-                    }
-                    else
-                    {
-                        s_freeLists[i] = block->Next;
-                    }
-
-                    s_freeListBytes -= (uint)block->Size;
-
-                    // Split if remainder is usable
-                    if (remainder >= MinBlockSize)
-                    {
-                        var split = (FreeBlock*)((byte*)block + size);
-                        split->MethodTable = s_freeMethodTable;
-                        split->Size = (int)remainder;
-                        split->Next = null;
-                        AddToFreeList(split, 'a');
-                    }
-
-                    // Clear and return
-                    MemoryOp.MemSet((byte*)block, 0, (int)size);
-                    s_totalAllocatedBytes += size;
-                    return block;
-                }
-
-                prev = block;
-                block = block->Next;
-            }
-        }
-
-        return null;
-    }
+    // --- The allocation sources of a TLAB refill ---
 
     /// <summary>
-    /// Attempts bump allocation within a specific segment.
-    /// </summary>
-    /// <param name="segment">The segment to allocate from.</param>
-    /// <param name="size">Number of bytes to allocate.</param>
-    /// <returns>Pointer to the allocated memory, or <c>null</c> if the segment has insufficient space.</returns>
-    private static void* BumpAllocInSegment(GCSegment* segment, uint size)
-    {
-        if (segment == null)
-        {
-            return null;
-        }
-
-        byte* newBump = segment->Bump + size;
-        if (newBump <= segment->End)
-        {
-            void* result = segment->Bump;
-            segment->Bump = newBump;
-            segment->UsedSize += size;
-            segment->MarkObject((nint)result);
-            s_totalAllocatedBytes += size;
-            s_currentSegment = segment;
-            s_lastSegment = segment;
-            return result;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Slow allocation path: walks the segments from <see cref="s_lastSegment"/> looking for space,
-    /// then allocates a new segment if needed.
-    /// </summary>
-    /// <remarks>
-    /// The segments before <see cref="s_lastSegment"/> are not walked again: the sweep orders the
-    /// full ones first and <see cref="s_lastSegment"/> after them, and between collections it only
-    /// moves forward, past segments that had no room for a request. Walking them from the head for
-    /// every request made each one cost the whole heap, so that filling the heap took time in the
-    /// square of its size; the room left at their end comes back with the next sweep.
-    /// </remarks>
-    /// <param name="size">Number of bytes to allocate.</param>
-    /// <returns>Pointer to the allocated memory, or <c>null</c> if allocation fails.</returns>
-    private static void* AllocateObjectSlow(uint size)
-    {
-        if (s_segmentManager.Segments == null)
-        {
-            return null;
-        }
-
-        if (s_lastSegment == null)
-        {
-            s_lastSegment = s_segmentManager.Segments;
-        }
-
-        for (GCSegment* seg = s_lastSegment; seg != null; seg = seg->Next)
-        {
-            void* result = BumpAllocInSegment(seg, size);
-            if (result != null)
-            {
-                return result;
-            }
-        }
-
-        // No segment fits: allocate and append a new segment at tail
-        GCSegment* newSegment = s_segmentManager.AllocateSegment(size);
-
-        if (newSegment == null)
-        {
-            return null;
-        }
-        s_lastSegment = newSegment;
-        s_currentSegment = newSegment;
-
-        return BumpAllocInSegment(newSegment, size);
-    }
-    // --- Raw variants (no s_totalAllocatedBytes increment) for TLAB refill ---
-
-    /// <summary>
-    /// Allocates from the free list without incrementing <see cref="s_totalAllocatedBytes"/>.
-    /// Used by TLAB refill to avoid double-counting (individual objects are counted at TLAB alloc time).
+    /// Allocates from the free list for a TLAB refill: the bytes are counted per thread as the
+    /// TLAB hands them out, not here.
     /// </summary>
     private static void* AllocFromFreeListRaw(uint size)
     {
@@ -328,8 +163,7 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Bump allocation in a segment without incrementing <see cref="s_totalAllocatedBytes"/>.
-    /// Used by TLAB refill.
+    /// Bump allocation in a segment for a TLAB refill.
     /// </summary>
     private static void* BumpAllocInSegmentRaw(GCSegment* segment, uint size)
     {
@@ -354,10 +188,16 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Slow allocation path without incrementing <see cref="s_totalAllocatedBytes"/>.
-    /// Walks the segments from <see cref="s_lastSegment"/>, as <see cref="AllocateObjectSlow"/>
-    /// does, and allocates a new one if needed. Used by TLAB refill.
+    /// Slow allocation path for a TLAB refill: walks the segments from
+    /// <see cref="s_lastSegment"/> looking for space, then allocates a new one if needed.
     /// </summary>
+    /// <remarks>
+    /// The segments before <see cref="s_lastSegment"/> are not walked again: the sweep orders the
+    /// full ones first and <see cref="s_lastSegment"/> after them, and between collections it only
+    /// moves forward, past segments that had no room for a request. Walking them from the head for
+    /// every request made each one cost the whole heap, so that filling the heap took time in the
+    /// square of its size; the room left at their end comes back with the next sweep.
+    /// </remarks>
     private static void* AllocateObjectSlowRaw(uint size)
     {
         if (s_segmentManager.Segments == null)
@@ -395,8 +235,8 @@ internal static unsafe partial class GarbageCollector
     /// Inserts a free block into the appropriate size-class free list.
     /// </summary>
     /// <param name="block">The free block to add.</param>
-    /// <param name="source">Call-site tag for diagnostics: 'a'=AllocFromFreeList split,
-    /// 'r'=AllocFromFreeListRaw split, 't'=TLAB gap stamp, 's'=sweep, 'p'=pinned heap.</param>
+    /// <param name="source">Call-site tag for diagnostics: 'r'=AllocFromFreeListRaw split,
+    /// 't'=TLAB gap stamp, 's'=sweep, 'p'=pinned heap.</param>
     private static void AddToFreeList(FreeBlock* block, char source)
     {
         if (!s_freeListsInitialized || block == null || block->Size < MinBlockSize)
@@ -432,7 +272,7 @@ internal static unsafe partial class GarbageCollector
         if (s_freeLists[sizeClass] == block)
         {
             Serial.WriteString("[GC] BUG: duplicate free-list head insert src=");
-            Serial.WriteString(source == 'a' ? "a" : source == 'r' ? "r" : source == 't' ? "t" : source == 's' ? "s" : "p");
+            Serial.WriteString(source == 'r' ? "r" : source == 't' ? "t" : source == 's' ? "s" : "p");
             Serial.WriteString(" blk=0x");
             Serial.WriteHex((ulong)block);
             Serial.WriteString("\n");

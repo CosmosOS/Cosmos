@@ -3,7 +3,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core;
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
@@ -11,6 +10,7 @@ using Cosmos.Kernel.HAL.DriverKit.Threading;
 using Cosmos.Kernel.HAL.Structures;
 using Cosmos.Kernel.System.Input.Layouts;
 using Cosmos.Kernel.System.Sessions;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.System.Input;
 
@@ -47,7 +47,23 @@ public static class KeyboardManager
     /// <summary>Whether the refused indicator schedule of a kernel with no kit worker has been logged.</summary>
     private static bool s_ledsRefusedLogged;
 
+    /// <summary>
+    /// Keys the queue holds unread; past it the oldest is overwritten. Fixed
+    /// at the queue's creation, so nothing allocates under its lock.
+    /// </summary>
+    internal const int QueueDepth = 200;
+
     private static RingBuffer<KeyEvent>? s_queuedKeys;
+
+    /// <summary>
+    /// The queue's lock, IRQ-safe: a key is queued from the sink caller's
+    /// context, an interrupt included, on the CPU the keyboard's handler
+    /// runs on, and read from a thread on any CPU (SMP phase 4b,
+    /// CosmosOS/Cosmos#3347). The ring is fixed at its creation, so nothing
+    /// allocates under it.
+    /// </summary>
+    private static SchedSpinLock s_queueLock;
+
     private static KeyboardLayout? s_layout;
 
     /// <summary>
@@ -148,7 +164,7 @@ public static class KeyboardManager
             return;
         }
 
-        s_queuedKeys = new RingBuffer<KeyEvent>(200);
+        s_queuedKeys = new RingBuffer<KeyEvent>(QueueDepth);
         s_layout = new USStandardLayout();
         s_keyboards = [];
         s_ledsWork = new WorkItem(ApplyLeds, binding: null);
@@ -209,10 +225,10 @@ public static class KeyboardManager
     /// <summary>
     /// Enqueues the given key-press event to the internal keyboard buffer.
     /// Runs in the sink caller's context, an interrupt included, against
-    /// readers that are always in thread context, so every touch of the
-    /// queue masks interrupts for its duration. <see cref="Queue{T}"/> is not
-    /// reentrant: an enqueue that grows the queue reallocates the backing
-    /// array and rehomes its head while a reader may be indexing the old one.
+    /// readers that are always in thread context, on any CPU, so every touch
+    /// of the queue takes its lock. The <see cref="RingBuffer{T}"/> is fixed
+    /// at its creation and overwrites its oldest key when full, so nothing
+    /// allocates under the lock.
     /// </summary>
     private static void Enqueue(KeyEvent keyEvent)
     {
@@ -222,7 +238,7 @@ public static class KeyboardManager
             return;
         }
 
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_queueLock.AcquireIrqSafe())
         {
             s_queuedKeys?.Push(keyEvent);
         }
@@ -374,7 +390,7 @@ public static class KeyboardManager
 
         ThrowIfNotInitialized();
 
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_queueLock.AcquireIrqSafe())
         {
             if (s_queuedKeys.Peek(out KeyEvent? o))
             {
@@ -382,7 +398,6 @@ public static class KeyboardManager
             }
 
             return new KeyEvent();
-
         }
     }
 
@@ -428,9 +443,10 @@ public static class KeyboardManager
         }
 
         // One call rather than Count-then-Dequeue, so an empty queue is the
-        // bool this member returns rather than a throw out of it. The mask is
-        // what makes the read safe against the interrupt that fills the queue.
-        using (InternalCpu.DisableInterruptsScope())
+        // bool this member returns rather than a throw out of it. The lock is
+        // what makes the read safe against the handler that fills the queue,
+        // on this CPU or another.
+        using (s_queueLock.AcquireIrqSafe())
         {
             if (s_queuedKeys is not null && s_queuedKeys.Pop(out KeyEvent? pending))
             {
@@ -467,9 +483,9 @@ public static class KeyboardManager
 
         while (true)
         {
-            // The mask covers the take and nothing else: the halt below waits
-            // for the very interrupt this scope masks.
-            using (InternalCpu.DisableInterruptsScope())
+            // The lock covers the take and nothing else: the halt below waits
+            // for the very interrupt the lock's scope masks.
+            using (s_queueLock.AcquireIrqSafe())
             {
                 if (s_queuedKeys.Pop(out KeyEvent? key))
                 {

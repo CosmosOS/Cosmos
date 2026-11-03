@@ -4,8 +4,8 @@ namespace Cosmos.Kernel.System;
 
 /// <summary>
 /// Diagnostic IDs of the experimental API seams exposed by
-/// Cosmos.Kernel.System: the network packet seam and the ring's side of the
-/// driver kit seam. An experimental API is usable today but carries no
+/// Cosmos.Kernel.System: the network packet seam and the ring's side of
+/// the driver kit seam. An experimental API is usable today but carries no
 /// compatibility promise; referencing one produces an error with the ID
 /// below until the caller suppresses it, which is the caller's
 /// acknowledgement of that contract.
