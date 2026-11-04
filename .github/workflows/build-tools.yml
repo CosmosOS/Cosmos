@@ -199,9 +199,10 @@ jobs:
           path: xorriso-${{ env.XORRISO_VERSION }}-*.*
 
   # ═══════════════════════════════════════════════════════════════════════
-  #  QEMU — system emulators for x64 and ARM64
+  #  QEMU — system emulators for x64, ARM64 and RISC-V 64
   #  Builds from source with minimal dependencies (headless, no GUI)
-  #  Includes edk2 UEFI firmware for ARM64
+  #  Includes edk2 UEFI firmware for ARM64 and RISC-V 64 (OpenSBI, the
+  #  RISC-V M-mode firmware, ships in pc-bios/ with the source)
   # ═══════════════════════════════════════════════════════════════════════
   build-qemu:
     name: QEMU ${{ matrix.target }}
@@ -271,6 +272,13 @@ jobs:
           curl -L -o firmware/edk2-aarch64-code.fd.bz2 \
             "https://github.com/qemu/qemu/raw/v${{ env.QEMU_VERSION }}/pc-bios/edk2-aarch64-code.fd.bz2"
           bunzip2 firmware/edk2-aarch64-code.fd.bz2
+          # The RISC-V virt machine loads EDK2 from two 32 MiB pflash images:
+          # the code and a variable store template the launchers copy.
+          for fd in edk2-riscv-code.fd edk2-riscv-vars.fd; do
+            curl -L -o "firmware/$fd.bz2" \
+              "https://github.com/qemu/qemu/raw/v${{ env.QEMU_VERSION }}/pc-bios/$fd.bz2"
+            bunzip2 "firmware/$fd.bz2"
+          done
 
       - name: Build QEMU (Linux/macOS)
         if: runner.os != 'Windows'
@@ -279,12 +287,12 @@ jobs:
           NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           cd qemu-${{ env.QEMU_VERSION }}
           ./configure \
-            --target-list=x86_64-softmmu,aarch64-softmmu \
+            --target-list=x86_64-softmmu,aarch64-softmmu,riscv64-softmmu \
             --enable-slirp \
             --enable-sdl \
             --disable-docs
           # Build only the binaries we need (skip tests — broken on Windows mingw)
-          ninja -C build -j$NPROC qemu-system-x86_64 qemu-system-aarch64 qemu-img
+          ninja -C build -j$NPROC qemu-system-x86_64 qemu-system-aarch64 qemu-system-riscv64 qemu-img
 
       - name: Build QEMU (Windows)
         if: runner.os == 'Windows'
@@ -292,12 +300,12 @@ jobs:
         run: |
           cd qemu-${{ env.QEMU_VERSION }}
           ./configure \
-            --target-list=x86_64-softmmu,aarch64-softmmu \
+            --target-list=x86_64-softmmu,aarch64-softmmu,riscv64-softmmu \
             --enable-slirp \
             --enable-sdl \
             --disable-docs
           # Build only the binaries we need (skip tests — broken on Windows mingw)
-          ninja -C build -j$(nproc) qemu-system-x86_64.exe qemu-system-aarch64.exe qemu-img.exe
+          ninja -C build -j$(nproc) qemu-system-x86_64.exe qemu-system-aarch64.exe qemu-system-riscv64.exe qemu-img.exe
 
       - name: Package (Linux/macOS)
         if: runner.os != 'Windows'
@@ -306,7 +314,7 @@ jobs:
           BUILD_DIR="qemu-${{ env.QEMU_VERSION }}/build"
           mkdir -p pkg/qemu/share/qemu
           # Find binaries — macOS uses *-unsigned suffix (code signing)
-          for bin in qemu-system-x86_64 qemu-system-aarch64 qemu-img; do
+          for bin in qemu-system-x86_64 qemu-system-aarch64 qemu-system-riscv64 qemu-img; do
             SRC=$(find "$BUILD_DIR" -maxdepth 2 \( -name "$bin" -o -name "${bin}-unsigned" \) -type f | head -1)
             if [ -n "$SRC" ]; then
               cp "$SRC" "pkg/qemu/$bin"
@@ -336,7 +344,7 @@ jobs:
             done || true
           }
           # Pass 1: direct deps of QEMU binaries
-          for bin in pkg/qemu/qemu-system-x86_64 pkg/qemu/qemu-system-aarch64 pkg/qemu/qemu-img; do
+          for bin in pkg/qemu/qemu-system-x86_64 pkg/qemu/qemu-system-aarch64 pkg/qemu/qemu-system-riscv64 pkg/qemu/qemu-img; do
             [ -f "$bin" ] || continue
             copy_deps "$bin"
           done
@@ -354,7 +362,7 @@ jobs:
           else
             LIB_VAR="DYLD_LIBRARY_PATH"
           fi
-          for bin in qemu-system-x86_64 qemu-system-aarch64 qemu-img; do
+          for bin in qemu-system-x86_64 qemu-system-aarch64 qemu-system-riscv64 qemu-img; do
             [ -f "pkg/qemu/$bin" ] || continue
             mv "pkg/qemu/$bin" "pkg/qemu/$bin.real"
             {
@@ -372,7 +380,7 @@ jobs:
           cp -r "$BUILD_DIR"/pc-bios/* pkg/qemu/share/qemu/ 2>/dev/null || true
           cp qemu-${{ env.QEMU_VERSION }}/pc-bios/*.bin pkg/qemu/share/qemu/ 2>/dev/null || true
           cp qemu-${{ env.QEMU_VERSION }}/pc-bios/*.rom pkg/qemu/share/qemu/ 2>/dev/null || true
-          cp firmware/edk2-aarch64-code.fd pkg/qemu/share/qemu/
+          cp firmware/edk2-aarch64-code.fd firmware/edk2-riscv-code.fd firmware/edk2-riscv-vars.fd pkg/qemu/share/qemu/
           echo "=== Firmware files packaged ==="
           ls pkg/qemu/share/qemu/*.bin pkg/qemu/share/qemu/*.fd 2>/dev/null || echo "WARNING: no firmware files found"
           # Stamp the bundle with its version (see Windows packaging step for rationale)
@@ -393,6 +401,7 @@ jobs:
           mkdir -p pkg/qemu/bin pkg/qemu/share/qemu
           find "$BUILD_DIR" -maxdepth 2 -name 'qemu-system-x86_64.exe' -type f | head -1 | xargs -I{} cp {} pkg/qemu/bin/
           find "$BUILD_DIR" -maxdepth 2 -name 'qemu-system-aarch64.exe' -type f | head -1 | xargs -I{} cp {} pkg/qemu/bin/
+          find "$BUILD_DIR" -maxdepth 2 -name 'qemu-system-riscv64.exe' -type f | head -1 | xargs -I{} cp {} pkg/qemu/bin/
           find "$BUILD_DIR" -maxdepth 2 -name 'qemu-img.exe' -type f | head -1 | xargs -I{} cp {} pkg/qemu/bin/ 2>/dev/null || true
           strip pkg/qemu/bin/*.exe 2>/dev/null || true
           ls -la pkg/qemu/bin/qemu-system-*
@@ -400,7 +409,7 @@ jobs:
           cp -r "$BUILD_DIR"/pc-bios/* pkg/qemu/share/qemu/ 2>/dev/null || true
           cp qemu-${{ env.QEMU_VERSION }}/pc-bios/*.bin pkg/qemu/share/qemu/ 2>/dev/null || true
           cp qemu-${{ env.QEMU_VERSION }}/pc-bios/*.rom pkg/qemu/share/qemu/ 2>/dev/null || true
-          cp firmware/edk2-aarch64-code.fd pkg/qemu/share/qemu/
+          cp firmware/edk2-aarch64-code.fd firmware/edk2-riscv-code.fd firmware/edk2-riscv-vars.fd pkg/qemu/share/qemu/
           # Bundle MINGW64 runtime DLLs by walking PE imports transitively.
           # objdump -p lists each DLL imported by a binary; we recurse so deps
           # of deps (e.g. libgio -> libgmodule -> libffi) are captured. Anything
@@ -410,7 +419,7 @@ jobs:
           MINGW_BIN="/mingw64/bin"
           declare -A seen
           queue=()
-          for exe in pkg/qemu/bin/qemu-system-x86_64.exe pkg/qemu/bin/qemu-system-aarch64.exe pkg/qemu/bin/qemu-img.exe; do
+          for exe in pkg/qemu/bin/qemu-system-x86_64.exe pkg/qemu/bin/qemu-system-aarch64.exe pkg/qemu/bin/qemu-system-riscv64.exe pkg/qemu/bin/qemu-img.exe; do
             [ -f "$exe" ] && queue+=("$exe")
           done
           while [ ${#queue[@]} -gt 0 ]; do

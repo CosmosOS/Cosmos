@@ -65,10 +65,11 @@ def main():
                     arch_data[arch][key] = True
 
     # Assemblies that only apply to a specific architecture.
-    # When reporting for x64, exclude the ARM64 HAL (and vice versa).
+    # When reporting for one architecture, exclude the other ones' HALs.
     ARCH_SPECIFIC = {
-        "x64":   {"Cosmos.Kernel.HAL.ARM64"},
-        "arm64": {"Cosmos.Kernel.HAL.X64"},
+        "x64":     {"Cosmos.Kernel.HAL.ARM64", "Cosmos.Kernel.HAL.RISCV64"},
+        "arm64":   {"Cosmos.Kernel.HAL.X64", "Cosmos.Kernel.HAL.RISCV64"},
+        "riscv64": {"Cosmos.Kernel.HAL.X64", "Cosmos.Kernel.HAL.ARM64"},
     }
 
     # Build per-project stats for each architecture

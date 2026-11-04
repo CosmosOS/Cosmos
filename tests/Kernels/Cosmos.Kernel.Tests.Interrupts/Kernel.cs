@@ -15,6 +15,8 @@ using TR = Cosmos.TestRunner.Framework.TestRunner;
 using SysThread = System.Threading.Thread;
 #if ARCH_X64
 using Cosmos.Kernel.Core.X64.Cpu;
+#elif ARCH_RISCV64
+using Cosmos.Kernel.Core.RISCV64.Cpu;
 #else
 using Cosmos.Kernel.Core.ARM64.Cpu;
 #endif
@@ -156,6 +158,19 @@ public class Kernel : Sys.Kernel
         TR.Run("IrqExit_ReschedulesSignaledWaiter", TestIrqExitReschedulesSignaledWaiter);
         TR.Run("Msi_AddressTargetsRunningLapic", TestMsiAddressTargetsRunningLapic);
         TR.Run("TimerVector_OutsideDynamicWindow", TestTimerVectorOutsideDynamicWindow);
+#elif ARCH_RISCV64
+        // ==================== riscv64 (PLIC + SBI timer) ====================
+        TR.Run("Plic_Initialized", TestPlicInitialized);
+
+        // MSIs reach a RISC-V hart through the AIA's IMSIC, which the kernel
+        // does not drive yet: the kernel must report MSI routing absent so
+        // drivers take the polled fallback.
+        TR.Skip("Imsic_BroughtUp", "the AIA's IMSIC is not driven yet");
+        TR.Run("Msi_RoutingAvailable", TestMsiRoutingUnavailableOnRiscv64);
+
+        TR.Skip("IrqExit_ReschedulesSignaledWaiter", "self-IPI harness is x64-only");
+        TR.Skip("Msi_AddressTargetsRunningLapic", "LAPIC MSI address contract is x64-only");
+        TR.Skip("TimerVector_OutsideDynamicWindow", "LAPIC timer vector is x64-only");
 #else
         // ==================== arm64 (GIC, per cell's gic-version) ====================
         TR.Run("Gic_Initialized", TestGicInitialized);
@@ -959,6 +974,21 @@ public class Kernel : Sys.Kernel
         Assert.True(count > 0, "the dynamic range should not already be exhausted");
         Assert.True(!timerVectorHandedOut,
             "the LAPIC timer vector must be outside the dynamic window: FreeVector+AllocateVector must never touch it");
+    }
+
+#elif ARCH_RISCV64
+
+    // The interrupt controller configured the PLIC from the device tree (or
+    // the virt machine's defaults) before it initialized it.
+    private static void TestPlicInitialized()
+    {
+        Assert.True(Plic.Base != 0, "the PLIC should have a register window");
+        Assert.True(Plic.SourceCount > 1, "the PLIC should report its interrupt sources");
+    }
+
+    private static void TestMsiRoutingUnavailableOnRiscv64()
+    {
+        Assert.False(MsiRouting.IsAvailable, "RISC-V has no MSI binder without the IMSIC, so MSI routing must be unavailable");
     }
 
 #else

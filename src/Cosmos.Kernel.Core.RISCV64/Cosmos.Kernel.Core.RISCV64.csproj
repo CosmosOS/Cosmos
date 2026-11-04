@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageId>Cosmos.Kernel.Core.RISCV64</PackageId>
+    <Title>Cosmos Kernel Core RISC-V 64</Title>
+    <Description>RISC-V 64-specific Core bridges (LibraryImport declarations for native symbols consumed by Cosmos.Kernel.Core and Cosmos.Kernel.HAL.RISCV64), the SBI calls and the PLIC interrupt controller.</Description>
+    <PackageTags>cosmos;kernel;core;riscv64;risc-v;bridge;interop;sbi;plic</PackageTags>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <DefineConstants>$(DefineConstants);ARCH_RISCV64</DefineConstants>
+    <!-- Feeds timer ticks into the experimental scheduler seam (COSMOS0001). -->
+    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" />
+    <ProjectReference Include="..\Cosmos.Build.Analyzer.Patcher\Cosmos.Build.Analyzer.Patcher.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The RISC-V HAL drives the timer (CsrNative, Sbi) and the PLIC. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.RISCV64" />
+    <!-- The Stopwatch plug reads the time CSR through CsrNative. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Plugs" />
+    <!-- White-box interrupt suite reads the PLIC state. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Interrupts" />
+  </ItemGroup>
+</Project>

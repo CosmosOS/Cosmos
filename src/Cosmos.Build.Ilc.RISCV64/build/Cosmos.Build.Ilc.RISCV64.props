@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Read by Cosmos.Sdk (ResolveIlcPath) and Cosmos.Build.Ilc (WriteIlcRsp) in a riscv64 build -->
+  <PropertyGroup Condition="'$(CosmosArch)' == 'riscv64' Or $(RuntimeIdentifier.EndsWith('-riscv64'))">
+    <!-- System.Private.CoreLib and its siblings, compiled for riscv64 -->
+    <CosmosIlcRiscv64AotSdkPath>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', 'aotsdk'))</CosmosIlcRiscv64AotSdkPath>
+    <!-- The riscv64 cross JIT for the host ILC runs on. Built for a Linux x64 host only so far. -->
+    <CosmosIlcJitPath Condition="'$(CosmosIlcJitPath)' == '' AND $([MSBuild]::IsOSPlatform('Linux')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'">$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)', '..', 'jit', 'linux-x64', 'libclrjit_unix_riscv64_x64.so'))</CosmosIlcJitPath>
+  </PropertyGroup>
+</Project>

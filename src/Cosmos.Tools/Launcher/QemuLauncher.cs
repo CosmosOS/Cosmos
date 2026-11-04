@@ -459,6 +459,7 @@ public static class QemuLauncher
         {
             "x64" => ToolDefinitions.QemuX64,
             "arm64" => ToolDefinitions.QemuArm64,
+            "riscv64" => ToolDefinitions.QemuRiscv64,
             _ => throw new ArgumentException($"Unsupported architecture: {options.Architecture}", nameof(options))
         };
 
@@ -467,10 +468,11 @@ public static class QemuLauncher
         {
             throw new InvalidOperationException(
                 $"QEMU for {options.Architecture} not found. Run `cosmos install` to fetch the bundled toolchain, " +
-                $"or install qemu-system-{(options.Architecture == "x64" ? "x86_64" : "aarch64")} system-wide.");
+                $"or install qemu-system-{options.Architecture switch { "x64" => "x86_64", "riscv64" => "riscv64", _ => "aarch64" }} system-wide.");
         }
 
         StringBuilder args = new();
+        string? shareQemu = null;
 
         // Single rule, all OSes: when QEMU is bundled, point it at the bundle's
         // share/qemu/ for BIOS/firmware lookup. The MSYS2 Windows build never
@@ -480,7 +482,7 @@ public static class QemuLauncher
         // the only universally reliable mechanism.
         if (resolved.Source == ToolSource.Bundle)
         {
-            string shareQemu = Path.GetFullPath(
+            shareQemu = Path.GetFullPath(
                 Path.Combine(Path.GetDirectoryName(resolved.Path)!, "..", "share", "qemu"));
             args.Append($"-L \"{shareQemu}\" ");
         }
@@ -494,6 +496,10 @@ public static class QemuLauncher
         if (options.Architecture == "x64")
         {
             AppendX64Args(args, options);
+        }
+        else if (options.Architecture == "riscv64")
+        {
+            AppendRiscv64Args(args, options, ResolveRiscv64Firmware(shareQemu));
         }
         else
         {
@@ -648,6 +654,77 @@ public static class QemuLauncher
     }
 
     /// <summary>
+    /// Emits the RISC-V virt machine with ACPI off, its CPU and memory, EDK2
+    /// from pflash over QEMU's default M-mode firmware (OpenSBI), the ISO
+    /// behind a virtio-scsi controller as on arm64, <c>ramfb</c>, the disks and
+    /// the USB keyboard and mouse. ACPI is off because with it on the boot does
+    /// not reach the kernel on QEMU 8.2 (the cause is not tracked down yet);
+    /// the kernel reads the machine from the device tree either way.
+    /// </summary>
+    /// <param name="args">The command line being built.</param>
+    /// <param name="options">The launch options.</param>
+    /// <param name="firmware">The EDK2 code image, from <see cref="ResolveRiscv64Firmware"/>.</param>
+    internal static void AppendRiscv64Args(StringBuilder args, QemuLaunchOptions options, string firmware)
+    {
+        args.Append("-M virt,acpi=off");
+        AppendMachineOptions(args, options.MachineOptions);
+        string cpu = string.IsNullOrWhiteSpace(options.CpuModel)
+            ? "rv64"
+            : options.CpuModel.Trim();
+        ValidateOptionToken(cpu, "cpu model");
+        args.Append($" -cpu {cpu} -m {options.MemoryMb}M");
+        RejectQuotes(firmware, "RISC-V firmware path");
+        // pflash takes no data dir search, unlike -bios: the image is passed by
+        // path. Without a variable store EDK2 keeps its variables in memory.
+        args.Append($" -drive if=pflash,format=raw,unit=0,readonly=on,file=\"{EscapeDriveFileValue(firmware)}\"");
+        args.Append(" -device virtio-scsi-pci,id=scsi0");
+        args.Append($" -drive file=\"{EscapeDriveFileValue(options.IsoPath)}\",if=none,id=cosmoscd,format=raw,readonly=on,media=cdrom");
+        args.Append(" -device scsi-cd,drive=cosmoscd,bus=scsi0.0,bootindex=0");
+        args.Append(" -boot d -no-reboot");
+        // ramfb gives Limine and the kernel a framebuffer, as on arm64.
+        args.Append(" -device ramfb");
+        AppendUsbMouseArgs(args, options, AppendUsbKeyboardArgs(args, options, AppendStorageArgs(args, options)));
+    }
+
+    /// <summary>
+    /// Finds the RISC-V EDK2 code image: <c>COSMOS_RISCV64_EDK2</c> when set,
+    /// then the bundle's share/qemu, then the paths distributions install it
+    /// at (QEMU's own, then Debian and Ubuntu's qemu-efi-riscv64).
+    /// </summary>
+    /// <param name="shareQemu">The bundle's share/qemu, null for a system QEMU.</param>
+    internal static string ResolveRiscv64Firmware(string? shareQemu)
+    {
+        List<string> candidates = [];
+        string? overridePath = Environment.GetEnvironmentVariable("COSMOS_RISCV64_EDK2");
+        if (!string.IsNullOrWhiteSpace(overridePath))
+        {
+            candidates.Add(overridePath);
+        }
+
+        if (shareQemu is not null)
+        {
+            candidates.Add(Path.Combine(shareQemu, "edk2-riscv-code.fd"));
+        }
+
+        candidates.Add("/usr/share/qemu/edk2-riscv-code.fd");
+        candidates.Add("/usr/local/share/qemu/edk2-riscv-code.fd");
+        candidates.Add("/usr/share/qemu-efi-riscv64/RISCV_VIRT_CODE.fd");
+        candidates.Add("/opt/homebrew/share/qemu/edk2-riscv-code.fd");
+
+        foreach (string candidate in candidates)
+        {
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        throw new FileNotFoundException(
+            "RISC-V EDK2 firmware not found (edk2-riscv-code.fd). Run `cosmos install`, install qemu-efi-riscv64, " +
+            "or point COSMOS_RISCV64_EDK2 at the image.");
+    }
+
+    /// <summary>
     /// True when the x64 guest can run under KVM: Linux x64 host with an
     /// openable /dev/kvm (the open is the canonical access check, which also
     /// catches "exists but not in the kvm group"). Set COSMOS_NO_KVM=1 to
@@ -782,9 +859,9 @@ public static class QemuLauncher
                     break;
 
                 case DiskKind.VirtioBlkMmio:
-                    if (!options.Architecture.Equals("arm64", StringComparison.OrdinalIgnoreCase))
+                    if (options.Architecture.Equals("x64", StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new ArgumentException("A virtio-blk disk over MMIO needs the arm64 virt machine: q35 has no virtio-mmio window.");
+                        throw new ArgumentException("A virtio-blk disk over MMIO needs a virt machine (arm64 or riscv64): q35 has no virtio-mmio window.");
                     }
                     if (disk.HotPlug)
                     {

@@ -83,6 +83,7 @@
          tick sources derive from TickSource. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.X64" />
     <InternalsVisibleTo Include="Cosmos.Kernel.HAL.ARM64" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.HAL.RISCV64" />
     <!-- White-box suites over HAL internals: the kit's MSI-X table and the
          nodes' PciAccess (Interrupts), the PCI host's configuration
          mechanism and the nodes' PciAccess (Pci), the kit's tree behind

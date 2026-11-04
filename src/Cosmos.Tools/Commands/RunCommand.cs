@@ -16,7 +16,7 @@ public class RunSettings : CommandSettings
     public string? Project { get; set; }
 
     [CommandOption("-a|--arch")]
-    [Description("Target architecture (x64, arm64). Default: x64.")]
+    [Description("Target architecture (x64, arm64, riscv64). Default: x64.")]
     [DefaultValue("x64")]
     public string Arch { get; set; } = "x64";
 
@@ -42,7 +42,7 @@ public class RunSettings : CommandSettings
     public bool Debug { get; set; }
 
     [CommandOption("--disk <SPEC>")]
-    [Description("Attach a disk image the kernel can use at boot. Format: 'path' or 'path,kind' where kind is ahci (default), nvme, usb, virtio-blk or virtio-blk-mmio (arm64 only). Repeatable.")]
+    [Description("Attach a disk image the kernel can use at boot. Format: 'path' or 'path,kind' where kind is ahci (default), nvme, usb, virtio-blk or virtio-blk-mmio (arm64 and riscv64 only). Repeatable.")]
     [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Spectre.Console.Cli binds a repeatable option to an array.")]
     public string[] Disks { get; set; } = Array.Empty<string>();
 
@@ -75,7 +75,7 @@ public class RunCommand : AsyncCommand<RunSettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, RunSettings settings)
     {
-        if (settings.Arch != "x64" && settings.Arch != "arm64")
+        if (settings.Arch != "x64" && settings.Arch != "arm64" && settings.Arch != "riscv64")
         {
             AnsiConsole.MarkupLine($"  [red]Unsupported architecture: {settings.Arch}[/]");
             return 1;
@@ -173,7 +173,7 @@ public class RunCommand : AsyncCommand<RunSettings>
     /// virtio scan finds; <c>none</c>/<c>ps2</c> still opt out explicitly.
     /// </summary>
     internal static string? ResolveInputDevice(string arch, string? requested, string arm64Default)
-        => requested ?? (arch == "arm64" ? arm64Default : null);
+        => requested ?? (arch is "arm64" or "riscv64" ? arm64Default : null);
 
     /// <summary>
     /// Turns <c>--usb-controller</c> into its model: unset keeps the xHCI the

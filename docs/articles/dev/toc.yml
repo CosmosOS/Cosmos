@@ -24,6 +24,8 @@
   href: scheduler.md
 - name: Scheduler - Glossary
   href: scheduler-glossary.md
+- name: RISC-V 64
+  href: riscv64.md
 - name: Kernel Compilation Steps
   href: build/kernel-compilation-steps.md
 - name: Cosmos.Build.Asm

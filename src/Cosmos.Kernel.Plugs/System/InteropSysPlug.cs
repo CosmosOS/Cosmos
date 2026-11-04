@@ -11,6 +11,8 @@ using Monitor = Cosmos.Kernel.Core.Scheduler.Monitor;
 using System.Runtime.InteropServices;
 #if ARCH_ARM64
 using Rtc = Cosmos.Kernel.HAL.ARM64.PL031Rtc;
+#elif ARCH_RISCV64
+using Rtc = Cosmos.Kernel.HAL.RISCV64.GoldfishRtc;
 #else
 using Rtc = Cosmos.Kernel.HAL.X64.CmosRtc;
 #endif

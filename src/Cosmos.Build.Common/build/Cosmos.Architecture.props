@@ -9,6 +9,10 @@
     <CosmosLinkerEmulation>aarch64elf</CosmosLinkerEmulation>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(CosmosArch)' == 'riscv64'">
+    <CosmosLinkerEmulation>elf64lriscv</CosmosLinkerEmulation>
+  </PropertyGroup>
+
   <ItemGroup>
     <CompilerVisibleProperty Include="CosmosArch" />
   </ItemGroup>
@@ -17,10 +21,13 @@
   <ItemGroup Condition="'$(CosmosNativePackageVersion)' != ''">
     <PackageReference Include="Cosmos.Kernel.Native.X64" Version="$(CosmosNativePackageVersion)" />
     <PackageReference Include="Cosmos.Kernel.Native.ARM64" Version="$(CosmosNativePackageVersion)" />
+    <!-- The RISC-V packages are opt-in (they need the riscv64 toolchain build): only a riscv64 kernel asks for them. -->
+    <PackageReference Include="Cosmos.Kernel.Native.RISCV64" Version="$(CosmosNativePackageVersion)" Condition="'$(CosmosArch)' == 'riscv64'" />
   </ItemGroup>
   <ItemGroup Condition="'$(CosmosPackageVersion)' != ''">
     <PackageReference Include="Cosmos.Kernel.HAL.X64" Version="$(CosmosPackageVersion)" />
     <PackageReference Include="Cosmos.Kernel.HAL.ARM64" Version="$(CosmosPackageVersion)" />
+    <PackageReference Include="Cosmos.Kernel.HAL.RISCV64" Version="$(CosmosPackageVersion)" Condition="'$(CosmosArch)' == 'riscv64'" />
   </ItemGroup>
 
 </Project>

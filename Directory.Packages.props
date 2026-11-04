@@ -10,17 +10,21 @@
     <PackageVersion Include="Cosmos.Build.Common" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Build.CC" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Build.Ilc" Version="$(VersionPrefix)" />
+    <PackageVersion Include="Cosmos.Build.Ilc.RISCV64" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Build.Patcher" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.SourceGenerators" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.System" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.Native.x64" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.Native.ARM64" Version="$(VersionPrefix)" />
+    <PackageVersion Include="Cosmos.Kernel.Native.RISCV64" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.Native.MultiArch" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.Core.X64" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.Core.ARM64" Version="$(VersionPrefix)" />
+    <PackageVersion Include="Cosmos.Kernel.Core.RISCV64" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.HAL.X64" Version="$(VersionPrefix)" />
     <PackageVersion Include="Cosmos.Kernel.HAL.ARM64" Version="$(VersionPrefix)" />
+    <PackageVersion Include="Cosmos.Kernel.HAL.RISCV64" Version="$(VersionPrefix)" />
     <!-- External packages from nuget.org -->
     <PackageVersion Include="Cosmos.Network.Ftp" Version="2.0.0" />
     <PackageVersion Include="Cosmos.Executable.Lua" Version="4.0.0" />

@@ -231,6 +231,7 @@
     <!-- Copy architecture-specific UEFI bootloader -->
     <Copy Condition="'$(CosmosArch)' == 'x64'" SourceFiles="$([MSBuild]::NormalizePath('$(LimineDir)', 'BOOTX64.EFI'))" DestinationFolder="$(IsoRootEfiBoot)"/>
     <Copy Condition="'$(CosmosArch)' == 'arm64'" SourceFiles="$([MSBuild]::NormalizePath('$(LimineDir)', 'BOOTAA64.EFI'))" DestinationFolder="$(IsoRootEfiBoot)"/>
+    <Copy Condition="'$(CosmosArch)' == 'riscv64'" SourceFiles="$([MSBuild]::NormalizePath('$(LimineDir)', 'BOOTRISCV64.EFI'))" DestinationFolder="$(IsoRootEfiBoot)"/>
 
     <!-- Copy the files the kernel ships, CollectCosmosIsoFiles having placed and checked them -->
     <Copy SourceFiles="@(_CosmosIsoFile)" DestinationFiles="@(_CosmosIsoFile->'$(IsoRoot)/%(IsoPath)')"/>

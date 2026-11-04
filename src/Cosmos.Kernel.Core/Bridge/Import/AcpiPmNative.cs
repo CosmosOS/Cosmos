@@ -10,7 +10,7 @@ internal static partial class AcpiPmNative
     /// <summary><see cref="LoadNamespace"/>: uACPI failed to bring the namespace up.</summary>
     public const int NamespaceFailed = 1;
 
-    /// <summary><see cref="LoadNamespace"/>: the architecture runs no AML interpreter (ARM64 powers off through PSCI).</summary>
+    /// <summary><see cref="LoadNamespace"/>: the architecture runs no AML interpreter (ARM64 powers off through PSCI, riscv64 through SBI).</summary>
     public const int NamespaceUnsupported = 2;
 
     /// <summary>

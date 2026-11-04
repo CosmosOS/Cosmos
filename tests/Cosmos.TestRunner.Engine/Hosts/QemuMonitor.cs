@@ -547,9 +547,41 @@ public sealed class QemuMonitor : IAsyncDisposable
             throw new InvalidOperationException($"drive_add: {output}");
         }
 
-        await ExecuteAsync("device_add", PciPlugArguments(driveId, QemuLauncher.RootPortId(launcherIndex), deviceId), cancellationToken);
+        // The guest powering the slot off is what lets QEMU finish the last
+        // device_del, and a plug that follows the guest's power-off closely
+        // can still find the image locked by the removed device's drive
+        // ("Failed to get "write" lock", seen with QEMU 8.2 on riscv64, about
+        // one cell in three). Retrying for a bounded time keeps the unplug
+        // free of a wait for DEVICE_DELETED, which would hold the UART scan
+        // loop, and stays well inside the guest's 8 s deadline. Each attempt
+        // sends its own copy of the arguments: a JSON node takes one parent.
+        JsonObject plugArguments = PciPlugArguments(driveId, QemuLauncher.RootPortId(launcherIndex), deviceId);
+        for (int attempt = 1; ; attempt++)
+        {
+            try
+            {
+                await ExecuteAsync("device_add", plugArguments.DeepClone().AsObject(), cancellationToken);
+                break;
+            }
+            catch (InvalidOperationException ex) when (attempt < PciPlugLockAttempts && ex.Message.Contains("lock", StringComparison.Ordinal))
+            {
+                if (attempt == 1)
+                {
+                    Console.WriteLine($"[Monitor] {PciPlugRequest}: the image is still locked by the removed disk, retrying");
+                }
+
+                await Task.Delay(PciPlugLockRetryDelayMs, cancellationToken);
+            }
+        }
+
         _pciDeviceIds[index] = deviceId;
     }
+
+    /// <summary>How many times a <see cref="PciPlugRequest"/> tries device_add while the removed disk's image is still locked.</summary>
+    private const int PciPlugLockAttempts = 30;
+
+    /// <summary>The pause between two of those attempts: 30 of them cover 3 s.</summary>
+    private const int PciPlugLockRetryDelayMs = 100;
 
     private async Task UnplugKeyboardAsync(CancellationToken cancellationToken)
     {

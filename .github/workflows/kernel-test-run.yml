@@ -23,6 +23,11 @@ on:
         description: 'QEMU timeout for arm64 (seconds)'
         required: true
         type: number
+      timeout_riscv64:
+        description: 'QEMU timeout for riscv64 (seconds); 0 takes the arm64 one, since both run under TCG at about the same speed'
+        required: false
+        type: number
+        default: 0
       step_timeout_minutes:
         description: 'GitHub step timeout in minutes'
         required: true
@@ -47,7 +52,7 @@ jobs:
       fail-fast: false
       matrix:
         dotnet-version: [ 10.0.x ]
-        arch: [ x64, arm64 ]
+        arch: [ x64, arm64, riscv64 ]
 
     steps:
       - name: 📥 Checkout Repository
@@ -122,6 +127,24 @@ jobs:
       - name: 🔍 Verify Tools Installation
         run: cosmos check
 
+      # riscv64 runs on Ubuntu's QEMU until the tool bundle carries
+      # qemu-system-riscv64 and its EDK2 image (build-tools.yml builds them
+      # into the next tools release). qemu-system-misc brings OpenSBI where
+      # QEMU looks for it (qemu-system-data) and the virtio-gpu module
+      # (qemu-system-common), qemu-efi-riscv64 the EDK2 image QemuLauncher
+      # falls back to, and ipxe-qemu the network cards' option ROMs.
+      - name: 🧰 Install QEMU for riscv64
+        if: matrix.arch == 'riscv64'
+        run: |
+          QEMU_DIR="$HOME/.cosmos/tools/qemu"
+          if [ -x "$QEMU_DIR/qemu-system-riscv64" ] && [ -f "$QEMU_DIR/share/qemu/edk2-riscv-code.fd" ]; then
+            echo "The tool bundle carries qemu-system-riscv64."
+          else
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends qemu-system-misc qemu-efi-riscv64 ipxe-qemu
+            qemu-system-riscv64 --version
+          fi
+
       - name: 🔨 Build Test Runner Engine
         run: dotnet build tests/Cosmos.TestRunner.Engine/Cosmos.TestRunner.Engine.csproj -c Debug --verbosity normal
 
@@ -130,6 +153,11 @@ jobs:
         run: |
           if [ "${{ matrix.arch }}" = "arm64" ]; then
             TIMEOUT=${{ inputs.timeout_arm64 }}
+          elif [ "${{ matrix.arch }}" = "riscv64" ]; then
+            TIMEOUT=${{ inputs.timeout_riscv64 }}
+            if [ "$TIMEOUT" = "0" ]; then
+              TIMEOUT=${{ inputs.timeout_arm64 }}
+            fi
           else
             TIMEOUT=${{ inputs.timeout_x64 }}
           fi

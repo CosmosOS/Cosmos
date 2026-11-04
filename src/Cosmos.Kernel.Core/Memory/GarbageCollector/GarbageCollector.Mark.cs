@@ -206,6 +206,40 @@ internal static unsafe partial class GarbageCollector
             TryMarkConservativeRoot((nint)ctx->X30);  // LR (Link Register)
             TryMarkConservativeRoot((nint)ctx->Sp);   // Stack Pointer
             TryMarkConservativeRoot((nint)ctx->Elr);  // Exception Link Register (return address)
+#elif ARCH_RISCV64
+            // Scan all general-purpose registers x1-x31 (x0 is always zero; x2 is sp)
+            TryMarkConservativeRoot((nint)ctx->X1);
+            TryMarkConservativeRoot((nint)ctx->X2);
+            TryMarkConservativeRoot((nint)ctx->X3);
+            TryMarkConservativeRoot((nint)ctx->X4);
+            TryMarkConservativeRoot((nint)ctx->X5);
+            TryMarkConservativeRoot((nint)ctx->X6);
+            TryMarkConservativeRoot((nint)ctx->X7);
+            TryMarkConservativeRoot((nint)ctx->X8);
+            TryMarkConservativeRoot((nint)ctx->X9);
+            TryMarkConservativeRoot((nint)ctx->X10);
+            TryMarkConservativeRoot((nint)ctx->X11);
+            TryMarkConservativeRoot((nint)ctx->X12);
+            TryMarkConservativeRoot((nint)ctx->X13);
+            TryMarkConservativeRoot((nint)ctx->X14);
+            TryMarkConservativeRoot((nint)ctx->X15);
+            TryMarkConservativeRoot((nint)ctx->X16);
+            TryMarkConservativeRoot((nint)ctx->X17);
+            TryMarkConservativeRoot((nint)ctx->X18);
+            TryMarkConservativeRoot((nint)ctx->X19);
+            TryMarkConservativeRoot((nint)ctx->X20);
+            TryMarkConservativeRoot((nint)ctx->X21);
+            TryMarkConservativeRoot((nint)ctx->X22);
+            TryMarkConservativeRoot((nint)ctx->X23);
+            TryMarkConservativeRoot((nint)ctx->X24);
+            TryMarkConservativeRoot((nint)ctx->X25);
+            TryMarkConservativeRoot((nint)ctx->X26);
+            TryMarkConservativeRoot((nint)ctx->X27);
+            TryMarkConservativeRoot((nint)ctx->X28);
+            TryMarkConservativeRoot((nint)ctx->X29);
+            TryMarkConservativeRoot((nint)ctx->X30);
+            TryMarkConservativeRoot((nint)ctx->X31);
+            TryMarkConservativeRoot((nint)ctx->Sepc); // Where the thread resumes
 #else
             // x64: Scan all general-purpose registers
             TryMarkConservativeRoot((nint)ctx->Rax);

@@ -16,7 +16,7 @@ class Program
         {
             Console.WriteLine("Usage: Cosmos.TestRunner.Engine <kernel-project-path> [architecture] [timeout] [xml-output] [mode] [--coverage]");
             Console.WriteLine("  kernel-project-path: Path to test kernel project directory");
-            Console.WriteLine("  architecture: x64 or arm64 (default: x64)");
+            Console.WriteLine("  architecture: x64, arm64 or riscv64 (default: x64)");
             Console.WriteLine("  timeout: Timeout in seconds (default: 30)");
             Console.WriteLine("  xml-output: Optional path for JUnit XML output (use '-' to skip)");
             Console.WriteLine("  mode: ci or dev (default: ci)");

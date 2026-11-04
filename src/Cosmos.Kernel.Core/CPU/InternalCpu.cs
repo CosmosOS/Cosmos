@@ -33,6 +33,9 @@ internal static class InternalCpu
 #if ARCH_ARM64
             // DAIF.I: IRQs masked when set
             return (flags & 0x80) == 0;
+#elif ARCH_RISCV64
+            // sstatus.SIE: interrupts taken in S-mode when set
+            return (flags & 0x2) != 0;
 #else
             // RFLAGS.IF
             return (flags & 0x200) != 0;

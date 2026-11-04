@@ -457,7 +457,7 @@ public static class TestProfileLoader
         IReadOnlyDictionary<string, IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>> ProfileMachineOptions);
 
     /// <summary>Architectures a profile may scope machine options to.</summary>
-    private static readonly string[] KnownArchitectures = ["x64", "arm64"];
+    private static readonly string[] KnownArchitectures = ["x64", "arm64", "riscv64"];
 
     private static Catalog LoadCatalog(string path)
     {

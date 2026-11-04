@@ -54,5 +54,15 @@ internal static unsafe partial class RandomNative
     [LibraryImport("*", EntryPoint = "_native_cpu_cntpct_ordered")]
     [SuppressGCTransition]
     public static partial ulong ReadCounter();
+#elif ARCH_RISCV64
+    /// <summary>
+    /// The time CSR, at the platform's timebase frequency (10 MHz on QEMU
+    /// virt). The jitter collector calibrates its walks to the counter's
+    /// resolution. No random instruction: the Zkr seed CSR is M-mode's to
+    /// hand to S-mode, and the SBI exposes no way to ask for it.
+    /// </summary>
+    [LibraryImport("*", EntryPoint = "_native_riscv64_read_time")]
+    [SuppressGCTransition]
+    public static partial ulong ReadCounter();
 #endif
 }

@@ -17,6 +17,24 @@ ifeq ($(ARCH),arm64)
                    -device virtio-keyboard-device -device virtio-mouse-device \
                    -device ramfb -serial stdio
   DEV_READY    := QEMU-DEVKERNEL-ARM64-DEBUG-READY
+else ifeq ($(ARCH),riscv64)
+  RID          := linux-riscv64
+  DEFINE       := ARCH_RISCV64
+  COSMOS_ARCH  := riscv64
+  # OpenSBI (QEMU's default -bios) runs in M-mode and hands S-mode to EDK2,
+  # which loads Limine's BOOTRISCV64.EFI from the ISO. The virt machine wants
+  # both pflash images 32 MiB; the variable store is a scratch copy.
+  RISCV64_EDK2 ?= ~/.cosmos/tools/qemu/share/qemu/edk2-riscv-code.fd
+  RISCV64_VARS := $(OUTPUT)/edk2-riscv-vars.fd
+  QEMU         := qemu-system-riscv64 -M virt -cpu rv64 -m 512M \
+                    -drive if=pflash,format=raw,unit=0,file=$(RISCV64_EDK2),readonly=on \
+                    -drive if=pflash,format=raw,unit=1,file=$(RISCV64_VARS)
+  DEV_QEMU     := $(QEMU)
+  DEV_ISO_FLAGS := -drive if=none,id=cd,file=$(OUTPUT)/DevKernel.iso \
+                   -device virtio-scsi-pci -device scsi-cd,drive=cd,bootindex=0 \
+                   -device virtio-keyboard-device -device virtio-mouse-device \
+                   -device ramfb -serial stdio
+  DEV_READY    := QEMU-DEVKERNEL-RISCV64-DEBUG-READY
 else
   RID          := linux-x64
   DEFINE       := ARCH_X64
@@ -57,8 +75,9 @@ DEV_DISK_FLAGS := -drive file=$(AHCI_IMG),if=none,id=ahcidisk,format=raw \
 .PHONY: setup build clean distclean run run-dev debug-dev disks test test-cache api \
         docs docs-serve docs-clean
 
+# ARCH=riscv64 also builds the RISC-V NativeAOT toolchain (see postCreateCommand.sh).
 setup:
-	./.devcontainer/postCreateCommand.sh
+	COSMOS_RISCV64=$(if $(filter riscv64,$(ARCH)),1,$${COSMOS_RISCV64:-0}) ./.devcontainer/postCreateCommand.sh
 
 # Reseed the PublicAPI.*.txt files of the API-tracked projects: builds the
 # project, then applies the RS0016/RS0017 code fixes (declare new public
@@ -79,7 +98,7 @@ build:
 		$(DEVKERNEL) -o $(OUTPUT)
 
 clean:
-	rm -rf ./output-x64 ./output-arm64 uart.log
+	rm -rf ./output-x64 ./output-arm64 ./output-riscv64 uart.log
 
 distclean: clean
 	rm -rf ./artifacts

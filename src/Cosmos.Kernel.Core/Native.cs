@@ -43,12 +43,12 @@ internal static class Native
         public static extern uint Read32(ushort Port);
 #else
         // ARM64 does not support port I/O - these are compile-time errors to prevent misuse
-        public static void Write8(ushort Port, byte Value) => throw new System.PlatformNotSupportedException("Port I/O not available on ARM64");
-        public static void Write16(ushort Port, ushort Value) => throw new System.PlatformNotSupportedException("Port I/O not available on ARM64");
-        public static void Write32(ushort Port, uint Value) => throw new System.PlatformNotSupportedException("Port I/O not available on ARM64");
-        public static byte Read8(ushort Port) => throw new System.PlatformNotSupportedException("Port I/O not available on ARM64");
-        public static ushort Read16(ushort Port) => throw new System.PlatformNotSupportedException("Port I/O not available on ARM64");
-        public static uint Read32(ushort Port) => throw new System.PlatformNotSupportedException("Port I/O not available on ARM64");
+        public static void Write8(ushort Port, byte Value) => throw new System.PlatformNotSupportedException("Port I/O not available on this architecture");
+        public static void Write16(ushort Port, ushort Value) => throw new System.PlatformNotSupportedException("Port I/O not available on this architecture");
+        public static void Write32(ushort Port, uint Value) => throw new System.PlatformNotSupportedException("Port I/O not available on this architecture");
+        public static byte Read8(ushort Port) => throw new System.PlatformNotSupportedException("Port I/O not available on this architecture");
+        public static ushort Read16(ushort Port) => throw new System.PlatformNotSupportedException("Port I/O not available on this architecture");
+        public static uint Read32(ushort Port) => throw new System.PlatformNotSupportedException("Port I/O not available on this architecture");
 #endif
     }
 

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <!-- The package carries native and runtime files only: no lib folder, no dependencies -->
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
+
+    <!-- Package Metadata -->
+    <PackageId>Cosmos.Build.Ilc.RISCV64</PackageId>
+    <Title>Cosmos ILC inputs for RISC-V 64</Title>
+    <Description>What NativeAOT needs to compile a Cosmos kernel for riscv64 and nuget.org lacks: the riscv64 cross JIT for ILC and System.Private.CoreLib and its siblings compiled for riscv64, both built from the dotnet/runtime commit Cosmos pins.</Description>
+    <PackageTags>cosmos;kernel;riscv64;risc-v;nativeaot;ilc;jit</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <!-- Staged by .devcontainer/build-riscv64-toolchain.sh -->
+    <CosmosRiscv64ToolchainDir>$(MSBuildThisFileDirectory)../../artifacts/riscv64-toolchain/</CosmosRiscv64ToolchainDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="build\Cosmos.Build.Ilc.RISCV64.props" PackagePath="build\" />
+    <Content Include="$(CosmosRiscv64ToolchainDir)aotsdk\*.dll" PackagePath="aotsdk\" />
+    <Content Include="$(CosmosRiscv64ToolchainDir)jit\linux-x64\*.so" PackagePath="jit\linux-x64\" />
+    <Content Include="$(CosmosRiscv64ToolchainDir)runtime-commit.txt" PackagePath="" />
+  </ItemGroup>
+
+  <Target Name="CheckRiscv64Toolchain" BeforeTargets="GenerateNuspec">
+    <Error Condition="!Exists('$(CosmosRiscv64ToolchainDir)aotsdk/System.Private.CoreLib.dll') OR !Exists('$(CosmosRiscv64ToolchainDir)jit/linux-x64/libclrjit_unix_riscv64_x64.so')"
+           Text="The riscv64 toolchain is not staged in $(CosmosRiscv64ToolchainDir): run .devcontainer/build-riscv64-toolchain.sh first." />
+  </Target>
+</Project>

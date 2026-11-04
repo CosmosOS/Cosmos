@@ -104,8 +104,8 @@ namespace Cosmos.Kernel.Core.Runtime
                     throwAddress = *(nuint*)((byte*)pContext + 0x00);
                     throwSp = *(nuint*)((byte*)pContext + 0x08);
                     throwFp = *(nuint*)((byte*)pContext + 0x10);
-#elif ARCH_ARM64
-                    // ARM64 PAL_LIMITED_CONTEXT layout:
+#elif ARCH_ARM64 || ARCH_RISCV64
+                    // ARM64 and RISC-V PAL_LIMITED_CONTEXT layout:
                     // 0x00: SP (stack pointer)
                     // 0x08: IP (instruction pointer / LR)
                     // 0x10: FP (frame pointer / x29)
@@ -126,7 +126,14 @@ namespace Cosmos.Kernel.Core.Runtime
             *location = value;
         }
 
+        // On RISC-V, ILC calls RhpCheckedAssignRef as the JIT's checked write
+        // barrier (destination in t3, reference in t4; ARM64 has the Arm64
+        // suffixed name for it): the symbol is the stub in
+        // Cosmos.Kernel.Native.RISCV64's Runtime.s there, and this method is
+        // only the managed form.
+#if !ARCH_RISCV64
         [RuntimeExport("RhpCheckedAssignRef")]
+#endif
         internal static unsafe void RhpCheckedAssignRef(void** location, void* value)
         {
             *location = value;

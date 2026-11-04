@@ -36,6 +36,9 @@
       <!-- Architecture-specific flags with target for cross-compilation -->
       <CCCompilerFlags Condition="'$(TargetArchitecture)' == 'x64'">$(CCCompilerFlags) --target=x86_64-elf -DARCH_X64 -m64 -mcmodel=kernel -fno-PIC -ffreestanding</CCCompilerFlags>
       <CCCompilerFlags Condition="'$(TargetArchitecture)' == 'arm64'">$(CCCompilerFlags) --target=aarch64-none-elf -DARCH_ARM64 -march=armv8-a -mcmodel=large -fno-PIC -ffreestanding -mno-outline-atomics</CCCompilerFlags>
+      <!-- medany: PC-relative addressing, so the higher-half kernel (top 2 GiB) links;
+           lp64d matches the float ABI of ILC's objects, which lld requires. -->
+      <CCCompilerFlags Condition="'$(TargetArchitecture)' == 'riscv64'">$(CCCompilerFlags) --target=riscv64-unknown-elf -DARCH_RISCV64 -march=rv64gc -mabi=lp64d -mcmodel=medany -fno-PIC -ffreestanding</CCCompilerFlags>
       <!-- Add include paths from GCCIncludePath items -->
       <CCCompilerFlags Condition="'@(GCCIncludePath)' != ''">$(CCCompilerFlags) @(GCCIncludePath->'-I%(Identity)', ' ')</CCCompilerFlags>
     </PropertyGroup>

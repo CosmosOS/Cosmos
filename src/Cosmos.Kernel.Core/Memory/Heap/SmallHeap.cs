@@ -69,6 +69,8 @@ internal static unsafe class SmallHeap
     /// </summary>
 #if ARCH_ARM64
     public const ulong PrefixBytes = 8;  // 8-byte alignment required for ARM64 atomic ops (LDAR/STLR)
+#elif ARCH_RISCV64
+    public const ulong PrefixBytes = 8;  // LR/SC and AMOs fault on a misaligned address
 #else
     public const ulong PrefixBytes = 2 * sizeof(ushort);  // 4 bytes for x64
 #endif

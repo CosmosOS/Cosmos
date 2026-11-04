@@ -15,6 +15,14 @@
     <PackageReference Include="Cosmos.Kernel.System" />
   </ItemGroup>
 
+  <!-- A riscv64 kernel takes the packages below even next to the clones: a clone
+       builds with the kernel's RID, and an AOT-compatible library built for
+       linux-riscv64 restores the riscv64 runtime pack, which nuget.org does not
+       have. The packages are IL only, so nothing asks for it. -->
+  <PropertyGroup>
+    <DevKernelUsesClones Condition="'$(CosmosArch)' != 'riscv64'">true</DevKernelUsesClones>
+  </PropertyGroup>
+
   <!-- The FTP server behind the ftpd command (CosmosOS/Cosmos.Network.Ftp). A
        clone of that repository next to this one is built from source, so a
        change to the server can be tried in the DevKernel before it is
@@ -22,10 +30,10 @@
   <PropertyGroup>
     <CosmosNetworkFtpProject>$(MSBuildThisFileDirectory)../../../Cosmos.Network.Ftp/src/Cosmos.Network.Ftp/Cosmos.Network.Ftp.csproj</CosmosNetworkFtpProject>
   </PropertyGroup>
-  <ItemGroup Condition="Exists('$(CosmosNetworkFtpProject)')">
+  <ItemGroup Condition="'$(DevKernelUsesClones)' == 'true' And Exists('$(CosmosNetworkFtpProject)')">
     <ProjectReference Include="$(CosmosNetworkFtpProject)" />
   </ItemGroup>
-  <ItemGroup Condition="!Exists('$(CosmosNetworkFtpProject)')">
+  <ItemGroup Condition="'$(DevKernelUsesClones)' != 'true' Or !Exists('$(CosmosNetworkFtpProject)')">
     <PackageReference Include="Cosmos.Network.Ftp" />
   </ItemGroup>
 
@@ -34,10 +42,10 @@
   <PropertyGroup>
     <CosmosExecutableLuaProject>$(MSBuildThisFileDirectory)../../../Cosmos.Executable.Lua/src/Cosmos.Executable.Lua/Cosmos.Executable.Lua.csproj</CosmosExecutableLuaProject>
   </PropertyGroup>
-  <ItemGroup Condition="Exists('$(CosmosExecutableLuaProject)')">
+  <ItemGroup Condition="'$(DevKernelUsesClones)' == 'true' And Exists('$(CosmosExecutableLuaProject)')">
     <ProjectReference Include="$(CosmosExecutableLuaProject)" />
   </ItemGroup>
-  <ItemGroup Condition="!Exists('$(CosmosExecutableLuaProject)')">
+  <ItemGroup Condition="'$(DevKernelUsesClones)' != 'true' Or !Exists('$(CosmosExecutableLuaProject)')">
     <PackageReference Include="Cosmos.Executable.Lua" />
   </ItemGroup>
 
@@ -48,10 +56,10 @@
   <PropertyGroup>
     <CosmosNetworkTelnetProject>$(MSBuildThisFileDirectory)../../../Cosmos.Network.Telnet/src/Cosmos.Network.Telnet/Cosmos.Network.Telnet.csproj</CosmosNetworkTelnetProject>
   </PropertyGroup>
-  <ItemGroup Condition="Exists('$(CosmosNetworkTelnetProject)')">
+  <ItemGroup Condition="'$(DevKernelUsesClones)' == 'true' And Exists('$(CosmosNetworkTelnetProject)')">
     <ProjectReference Include="$(CosmosNetworkTelnetProject)" />
   </ItemGroup>
-  <ItemGroup Condition="!Exists('$(CosmosNetworkTelnetProject)')">
+  <ItemGroup Condition="'$(DevKernelUsesClones)' != 'true' Or !Exists('$(CosmosNetworkTelnetProject)')">
     <PackageReference Include="Cosmos.Network.Telnet" />
   </ItemGroup>
 

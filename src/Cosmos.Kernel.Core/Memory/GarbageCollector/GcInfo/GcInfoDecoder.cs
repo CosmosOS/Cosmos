@@ -75,7 +75,7 @@ internal unsafe struct GcInfoDecoder
 
             // v4: no ReturnKind in the slim header.
             remainingFlags &= ~(int)(GcInfoDecoderFlags.DECODE_RETURN_KIND | GcInfoDecoderFlags.DECODE_VARARG);
-#if ARCH_ARM64
+#if ARCH_ARM64 || ARCH_RISCV64
             remainingFlags &= ~(int)GcInfoDecoderFlags.DECODE_HAS_TAILCALLS;
 #endif
             if (remainingFlags == 0)
@@ -140,7 +140,7 @@ internal unsafe struct GcInfoDecoder
 
         // v4: no ReturnKind.
         remainingFlags &= ~(int)(GcInfoDecoderFlags.DECODE_RETURN_KIND | GcInfoDecoderFlags.DECODE_VARARG);
-#if ARCH_ARM64
+#if ARCH_ARM64 || ARCH_RISCV64
         remainingFlags &= ~(int)GcInfoDecoderFlags.DECODE_HAS_TAILCALLS;
 #endif
         if (remainingFlags == 0)
@@ -208,7 +208,7 @@ internal unsafe struct GcInfoDecoder
         if ((_headerFlags & GcInfoHeaderFlags.GC_INFO_HAS_EDIT_AND_CONTINUE_INFO) != 0)
         {
             _reader.DecodeVarLengthUnsigned(GcInfoEncoding.SIZE_OF_EDIT_AND_CONTINUE_PRESERVED_AREA_ENCBASE);
-#if ARCH_ARM64
+#if ARCH_ARM64 || ARCH_RISCV64
             _reader.DecodeVarLengthUnsigned(GcInfoEncoding.SIZE_OF_EDIT_AND_CONTINUE_FIXED_STACK_FRAME_ENCBASE);
 #endif
         }
@@ -737,5 +737,33 @@ internal unsafe struct GcInfoDecoder
     }
 
     private static bool IsScratchRegister(int regNum) => regNum <= 17 || regNum >= 29;
+#elif ARCH_RISCV64
+    private static nuint* GetRegisterSlot(int regNum, REGDISPLAY* pRD)
+    {
+        // GcInfo RISC-V register numbering: the x register number, 0=x0..31=x31.
+        // Cosmos's REGDISPLAY stores the stack pointer and the callee-saved
+        // values only: s0/FP (x8), s1 (x9), s2-s11 (x18-x27) and ra (x1).
+        switch (regNum)
+        {
+            case 1: return &pRD->RA;
+            case 2: return &pRD->SP;
+            case 8: return &pRD->FP;
+            case 9: return &pRD->S1;
+            case 18: return &pRD->S2;
+            case 19: return &pRD->S3;
+            case 20: return &pRD->S4;
+            case 21: return &pRD->S5;
+            case 22: return &pRD->S6;
+            case 23: return &pRD->S7;
+            case 24: return &pRD->S8;
+            case 25: return &pRD->S9;
+            case 26: return &pRD->S10;
+            case 27: return &pRD->S11;
+            default: return null;
+        }
+    }
+
+    // The callee-saved registers of the LP64D convention: s0 (x8), s1 (x9), s2-s11 (x18-x27).
+    private static bool IsScratchRegister(int regNum) => regNum != 8 && regNum != 9 && (regNum < 18 || regNum > 27);
 #endif
 }

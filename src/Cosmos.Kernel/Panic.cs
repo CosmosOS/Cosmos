@@ -58,6 +58,41 @@ internal static class Panic
         Serial.WriteString("  SP:  0x"); Serial.WriteHex(ctx.sp);
         Serial.WriteString("  ELR: 0x"); Serial.WriteHex(ctx.elr); Serial.WriteString("\n");
         Serial.WriteString("  SPSR: 0x"); Serial.WriteHex(ctx.spsr); Serial.WriteString("\n");
+#elif ARCH_RISCV64
+        Serial.WriteString("  RA:  0x"); Serial.WriteHex(ctx.ra);
+        Serial.WriteString("  SP:  0x"); Serial.WriteHex(ctx.sp); Serial.WriteString("\n");
+        Serial.WriteString("  GP:  0x"); Serial.WriteHex(ctx.gp);
+        Serial.WriteString("  TP:  0x"); Serial.WriteHex(ctx.tp); Serial.WriteString("\n");
+        Serial.WriteString("  T0:  0x"); Serial.WriteHex(ctx.t0);
+        Serial.WriteString("  T1:  0x"); Serial.WriteHex(ctx.t1); Serial.WriteString("\n");
+        Serial.WriteString("  T2:  0x"); Serial.WriteHex(ctx.t2);
+        Serial.WriteString("  S0:  0x"); Serial.WriteHex(ctx.s0); Serial.WriteString("\n");
+        Serial.WriteString("  S1:  0x"); Serial.WriteHex(ctx.s1);
+        Serial.WriteString("  A0:  0x"); Serial.WriteHex(ctx.a0); Serial.WriteString("\n");
+        Serial.WriteString("  A1:  0x"); Serial.WriteHex(ctx.a1);
+        Serial.WriteString("  A2:  0x"); Serial.WriteHex(ctx.a2); Serial.WriteString("\n");
+        Serial.WriteString("  A3:  0x"); Serial.WriteHex(ctx.a3);
+        Serial.WriteString("  A4:  0x"); Serial.WriteHex(ctx.a4); Serial.WriteString("\n");
+        Serial.WriteString("  A5:  0x"); Serial.WriteHex(ctx.a5);
+        Serial.WriteString("  A6:  0x"); Serial.WriteHex(ctx.a6); Serial.WriteString("\n");
+        Serial.WriteString("  A7:  0x"); Serial.WriteHex(ctx.a7);
+        Serial.WriteString("  S2:  0x"); Serial.WriteHex(ctx.s2); Serial.WriteString("\n");
+        Serial.WriteString("  S3:  0x"); Serial.WriteHex(ctx.s3);
+        Serial.WriteString("  S4:  0x"); Serial.WriteHex(ctx.s4); Serial.WriteString("\n");
+        Serial.WriteString("  S5:  0x"); Serial.WriteHex(ctx.s5);
+        Serial.WriteString("  S6:  0x"); Serial.WriteHex(ctx.s6); Serial.WriteString("\n");
+        Serial.WriteString("  S7:  0x"); Serial.WriteHex(ctx.s7);
+        Serial.WriteString("  S8:  0x"); Serial.WriteHex(ctx.s8); Serial.WriteString("\n");
+        Serial.WriteString("  S9:  0x"); Serial.WriteHex(ctx.s9);
+        Serial.WriteString("  S10: 0x"); Serial.WriteHex(ctx.s10); Serial.WriteString("\n");
+        Serial.WriteString("  S11: 0x"); Serial.WriteHex(ctx.s11);
+        Serial.WriteString("  T3:  0x"); Serial.WriteHex(ctx.t3); Serial.WriteString("\n");
+        Serial.WriteString("  T4:  0x"); Serial.WriteHex(ctx.t4);
+        Serial.WriteString("  T5:  0x"); Serial.WriteHex(ctx.t5); Serial.WriteString("\n");
+        Serial.WriteString("  T6:  0x"); Serial.WriteHex(ctx.t6); Serial.WriteString("\n");
+        Serial.WriteString("  SEPC:  0x"); Serial.WriteHex(ctx.sepc);
+        Serial.WriteString("  SSTATUS: 0x"); Serial.WriteHex(ctx.sstatus); Serial.WriteString("\n");
+        Serial.WriteString("  STVAL: 0x"); Serial.WriteHex(ctx.fault_address); Serial.WriteString("\n");
 #elif ARCH_X64
         Serial.WriteString("  RAX: 0x"); Serial.WriteHex(ctx.rax);
         Serial.WriteString("  RBX: 0x"); Serial.WriteHex(ctx.rbx); Serial.WriteString("\n");
@@ -99,6 +134,10 @@ internal static class Panic
         ulong ip = ctx.elr;
         ulong sp = ctx.sp;
         ulong fp = ctx.x29;
+#elif ARCH_RISCV64
+        ulong ip = ctx.sepc;
+        ulong sp = ctx.sp;
+        ulong fp = ctx.s0;
 #else
         ulong ip = ctx.rip;
         ulong sp = ctx.rsp;
@@ -123,6 +162,9 @@ internal static class Panic
 #if ARCH_ARM64
         // On ARM64 the immediate caller of a leaf is in the link register.
         Serial.WriteString("  lr:  0x"); Serial.WriteHex(ctx.x30); Serial.WriteString("\n");
+#elif ARCH_RISCV64
+        // On RISC-V the immediate caller of a leaf is in ra.
+        Serial.WriteString("  ra:  0x"); Serial.WriteHex(ctx.ra); Serial.WriteString("\n");
 #else
         // Frameless leaf helpers (write barriers, memcpy, ...) leave their
         // caller's return address at [rsp]; ignore this line if ip is not a leaf.
@@ -130,8 +172,10 @@ internal static class Panic
         Serial.WriteString(" (return address if ip is a frameless leaf)\n");
 #endif
 
-        // Both SysV x64 and AAPCS64 lay frames out as [fp] = caller fp,
-        // [fp+8] = return address.
+        // SysV x64, AAPCS64 and the RyuJIT RISC-V frames ILC emits lay frames
+        // out as [fp] = caller fp, [fp+8] = return address. (C code built to
+        // the RISC-V psABI puts them at [fp-16] and [fp-8]: the walk stops
+        // at the first such frame.)
         int frame = 0;
         while (frame < 32 &&
                IsPlausibleStackAddress(fp) &&

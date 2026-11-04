@@ -15,7 +15,7 @@ public class BuildSettings : CommandSettings
     public string? Project { get; set; }
 
     [CommandOption("-a|--arch")]
-    [Description("Target architecture (x64, arm64). If not specified, builds for detected/default arch")]
+    [Description("Target architecture (x64, arm64, riscv64). If not specified, builds for detected/default arch")]
     public string? Arch { get; set; }
 
     [CommandOption("-c|--config")]
@@ -112,7 +112,7 @@ public class BuildCommand : AsyncCommand<BuildSettings>
 
         foreach (string buildArch in architectures)
         {
-            string runtimeId = buildArch == "arm64" ? "linux-arm64" : "linux-x64";
+            string runtimeId = RuntimeIdFor(buildArch);
             string outputDir = Path.Combine(projectDir, $"output-{buildArch}");
             bool result = await BuildForArchitectureAsync(csprojPath, projectDir, buildArch, settings.Config, settings.Verbose, settings.Json);
 
@@ -249,7 +249,7 @@ public class BuildCommand : AsyncCommand<BuildSettings>
             if (targetArchMatch.Success)
             {
                 string targetArch = targetArchMatch.Groups[1].Value.Trim().ToLowerInvariant();
-                if (targetArch == "x64" || targetArch == "arm64")
+                if (targetArch is "x64" or "arm64" or "riscv64")
                 {
                     return targetArch;
                 }
@@ -269,6 +269,14 @@ public class BuildCommand : AsyncCommand<BuildSettings>
         return PlatformInfo.IsArm64 ? "arm64" : "x64";
     }
 
+    /// <summary>The runtime identifier a kernel is published for: linux-&lt;arch&gt; whatever the host.</summary>
+    private static string RuntimeIdFor(string arch) => arch switch
+    {
+        "arm64" => "linux-arm64",
+        "riscv64" => "linux-riscv64",
+        _ => "linux-x64"
+    };
+
     private static async Task<bool> BuildForArchitectureAsync(string csprojPath, string projectDir, string arch, string config, bool verbose, bool json)
     {
         if (!json)
@@ -276,8 +284,13 @@ public class BuildCommand : AsyncCommand<BuildSettings>
             AnsiConsole.Markup($"  Building for [blue]{arch}[/]... ");
         }
 
-        string runtimeId = arch == "arm64" ? "linux-arm64" : "linux-x64";
-        string defineConstants = arch == "arm64" ? "ARCH_ARM64" : "ARCH_X64";
+        string runtimeId = RuntimeIdFor(arch);
+        string defineConstants = arch switch
+        {
+            "arm64" => "ARCH_ARM64",
+            "riscv64" => "ARCH_RISCV64",
+            _ => "ARCH_X64"
+        };
         string outputDir = Path.Combine(projectDir, $"output-{arch}");
 
         string[] args = new[]

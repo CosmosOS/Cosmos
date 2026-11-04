@@ -134,8 +134,12 @@ uacpi_u64 uacpi_kernel_get_nanoseconds_since_boot(void)
 
 static inline void cpu_relax(void)
 {
-#ifdef __aarch64__
+#if defined(__aarch64__)
     __asm__ volatile("yield");
+#elif defined(__riscv)
+    // Zihintpause's pause, spelled out because -march=rv64gc lacks the
+    // extension: a FENCE hint that cores without it run as a no-op.
+    __asm__ volatile(".insn i 0x0F, 0, x0, x0, 0x010");
 #else
     __asm__ volatile("pause");
 #endif

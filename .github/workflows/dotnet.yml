@@ -475,3 +475,79 @@ jobs:
         with:
           name: DevKernel-ISO-macOS-${{ matrix.arch }}-${{ github.run_number }}
           path: ./output-${{ matrix.arch }}/DevKernel.iso
+
+  # The riscv64 toolchain (the cross JIT and CoreLib build-riscv64-toolchain.sh
+  # builds from the dotnet/runtime submodule) builds on a Linux x64 host only,
+  # so riscv64 has its ISO build test here rather than in the Windows and macOS
+  # matrices. The toolchain cache is the one Kernel Tests' setup job fills.
+  linux-iso-tests:
+    name: Run ISO Build Tests - Linux (${{ matrix.arch }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        dotnet-version: [ 10.0.x ]
+        arch: [ riscv64 ]
+        include:
+          - arch: riscv64
+            rid: linux-riscv64
+            define: ARCH_RISCV64
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: 🛠️ Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: 🗑️ Clear NuGet Cache
+        run: dotnet nuget locals all --clear
+
+      - name: 🔑 riscv64 Toolchain Cache Key
+        id: riscv64-key
+        run: echo "commit=$(git -C dotnet/runtime rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: ♻️ Cache riscv64 Toolchain
+        id: riscv64-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            dotnet/runtime/artifacts/bin/coreclr/linux.x64.Release/libclrjit_unix_riscv64_x64.so
+            dotnet/runtime/artifacts/bin/coreclr/linux.riscv64.Release/aotsdk
+            dotnet/runtime/artifacts/.cosmos-riscv64-toolchain
+          key: riscv64-toolchain-${{ steps.riscv64-key.outputs.commit }}-${{ hashFiles('.devcontainer/build-riscv64-toolchain.sh') }}
+
+      - name: 🧰 Install riscv64 Toolchain Build Prerequisites
+        if: steps.riscv64-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clang lld llvm cmake ninja-build python3
+
+      - name: 🔄 Compile Packages (multi-arch, with riscv64)
+        run: ./.devcontainer/postCreateCommand.sh
+        env:
+          COSMOS_RISCV64: 1
+
+      - name: 🔧 Install Build Tools
+        run: cosmos install --tools --auto
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: 🔍 Verify Tools Installation
+        run: cosmos check
+
+      - name: Build ISO for ${{ matrix.arch }}
+        run: dotnet publish -c Debug -r ${{ matrix.rid }} -p:DefineConstants="${{ matrix.define }}" -p:CosmosArch=${{ matrix.arch }} --verbosity detailed ./examples/DevKernel/DevKernel.csproj -o ./output-${{ matrix.arch }}
+
+      - name: 🕵️‍♂️ Verify Output
+        run: |
+          [ -f ./output-${{ matrix.arch }}/DevKernel.iso ] && echo "ISO exists for ${{ matrix.arch }}" || (echo "ISO missing for ${{ matrix.arch }}" && exit 1)
+
+      - name: 📤 Upload ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: DevKernel-ISO-Linux-${{ matrix.arch }}-${{ github.run_number }}
+          path: ./output-${{ matrix.arch }}/DevKernel.iso

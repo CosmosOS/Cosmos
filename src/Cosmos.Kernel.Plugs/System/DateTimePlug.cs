@@ -2,6 +2,8 @@ using Cosmos.Build.API.Attributes;
 using Cosmos.Kernel.System;
 #if ARCH_ARM64
 using Rtc = Cosmos.Kernel.HAL.ARM64.PL031Rtc;
+#elif ARCH_RISCV64
+using Rtc = Cosmos.Kernel.HAL.RISCV64.GoldfishRtc;
 #else
 using Rtc = Cosmos.Kernel.HAL.X64.CmosRtc;
 #endif

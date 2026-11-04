@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+
+    <!-- Package Metadata -->
+    <PackageId>Cosmos.Kernel.Native.RISCV64</PackageId>
+    <Title>Cosmos Kernel RISC-V 64 Native Assembly</Title>
+    <Description>RISC-V 64 native assembly routines for Cosmos kernel development: the trap entry, context switching, SBI calls, write barriers and exception dispatch stubs.</Description>
+    <PackageTags>cosmos;kernel;riscv64;risc-v;assembly;native;asm;sbi</PackageTags>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="build\Cosmos.Kernel.Native.RISCV64.props" PackagePath="build\" />
+    <Content Include="IO\*.s" PackagePath="build\IO" />
+    <Content Include="Debug\*.s" PackagePath="build\Debug" />
+    <Content Include="CPU\*.s" PackagePath="build\CPU" />
+    <Content Include="Runtime\*.s" PackagePath="build\Runtime" />
+    <Content Include="Memory\*.s" PackagePath="build\Memory" />
+    <Content Include="Devices\*.s" PackagePath="build\Devices" />
+  </ItemGroup>
+</Project>

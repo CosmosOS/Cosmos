@@ -763,7 +763,7 @@ internal static class Math
     // On x64 these symbols come from x87 FPU assembly.
     // =========================================================================
 
-#if ARCH_ARM64
+#if ARCH_ARM64 || ARCH_RISCV64
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static double SinCore(double x)

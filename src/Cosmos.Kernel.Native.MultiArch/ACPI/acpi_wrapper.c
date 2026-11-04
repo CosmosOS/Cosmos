@@ -709,7 +709,8 @@ int cosmos_acpi_reset(void) {
 
 #else
 
-// ARM64 powers off and resets through PSCI.
+// ARM64 powers off and resets through PSCI, riscv64 through the SBI system
+// reset extension.
 int cosmos_acpi_load_namespace(void) { return 2; }
 int cosmos_acpi_shutdown(void) { return 1; }
 int cosmos_acpi_reset(void) { return 1; }

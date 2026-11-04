@@ -343,6 +343,11 @@ internal static unsafe class PageAllocator
                     // ARM64: Use physical addresses directly (identity mapping)
                     virtualStart = physStart;
                     Serial.WriteString("[PageAllocator] ARM64: Using identity mapping (phys == virt)\n");
+#elif ARCH_RISCV64
+                    // RISC-V: as on ARM64, the RAM of the virt machine sits in the
+                    // low 4 GiB Limine identity-maps
+                    virtualStart = physStart;
+                    Serial.WriteString("[PageAllocator] RISCV64: Using identity mapping (phys == virt)\n");
 #else
                     // x64: Use higher-half mapping
                     virtualStart = physStart + DefaultHhdmOffset;

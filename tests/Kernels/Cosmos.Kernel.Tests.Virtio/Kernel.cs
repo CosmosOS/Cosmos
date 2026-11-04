@@ -269,9 +269,12 @@ public class Kernel : Sys.Kernel
     // ITS, the transport publishes the device with no message entry, and the
     // driver falls back to the periodic drain. Over MMIO the GIC line routes
     // with or without ACPI; on x64 the Local APIC does too, since it comes up
-    // from IA32_APIC_BASE when acpi=off leaves no MADT. A driver on the wrong
-    // side of that line passes every other test here, so the flags are read
-    // off the binding's state.
+    // from IA32_APIC_BASE when acpi=off leaves no MADT. On riscv64 the MMIO
+    // device's PLIC line routes, but no PCI cell gets a wake: MSIs need the
+    // AIA's IMSIC, which the kernel does not drive yet, and the PCI host's
+    // INTx lines are not routed. A driver on the wrong side of that line
+    // passes every other test here, so the flags are read off the binding's
+    // state.
     private static void TestNet_InterruptModeMatchesCell()
     {
         if (!TryGetNetState(out VirtioNetState? state))
@@ -291,9 +294,14 @@ public class Kernel : Sys.Kernel
         }
     }
 
-    /// <summary>True on every cell but the arm64 PCI cell under acpi-off.</summary>
+    /// <summary>True on every cell but the arm64 PCI cell under acpi-off and the riscv64 PCI cells.</summary>
     private static bool ExpectsInterrupt() =>
-        PlatformHAL.Architecture != PlatformArchitecture.ARM64 || !s_isPciCell || !TR.ProfileContains("acpi-off");
+        PlatformHAL.Architecture switch
+        {
+            PlatformArchitecture.ARM64 => !s_isPciCell || !TR.ProfileContains("acpi-off"),
+            PlatformArchitecture.RISCV64 => !s_isPciCell,
+            _ => true,
+        };
 
     // ==================== Input ====================
     //

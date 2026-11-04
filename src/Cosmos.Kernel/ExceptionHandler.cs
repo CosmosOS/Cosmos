@@ -22,6 +22,12 @@ internal static class ExceptionHandler
         InterruptManager.SetHandler(0x03, SErrorException);
 
         Serial.WriteString("[ExceptionHandler] ARM64 exception handlers registered\n");
+#elif ARCH_RISCV64
+        // Every RISC-V exception arrives at vector 0, its scause in cpu_flags;
+        // interrupts have vectors of their own and never reach this handler.
+        InterruptManager.SetHandler(0x00, SynchronousException);
+
+        Serial.WriteString("[ExceptionHandler] RISC-V exception handler registered\n");
 #elif ARCH_X64
         // Register handlers for common CPU exceptions
         // Vector 0x00: Divide by Zero
@@ -113,6 +119,37 @@ internal static class ExceptionHandler
     private static void SErrorException(ref IRQContext ctx)
     {
         Panic.CpuException("SError", ref ctx);
+    }
+#endif
+
+#if ARCH_RISCV64
+    private static void SynchronousException(ref IRQContext ctx)
+    {
+        Panic.CpuException(ExceptionName(ctx.cpu_flags), ref ctx);
+    }
+
+    /// <summary>The name of an exception scause code (RISC-V privileged specification, table 3.6).</summary>
+    private static string ExceptionName(ulong cause)
+    {
+        return cause switch
+        {
+            0 => "Instruction address misaligned",
+            1 => "Instruction access fault",
+            2 => "Illegal instruction",
+            3 => "Breakpoint",
+            4 => "Load address misaligned",
+            5 => "Load access fault",
+            6 => "Store/AMO address misaligned",
+            7 => "Store/AMO access fault",
+            8 => "Environment call from U-mode",
+            9 => "Environment call from S-mode",
+            12 => "Instruction page fault",
+            13 => "Load page fault",
+            15 => "Store/AMO page fault",
+            18 => "Software check",
+            19 => "Hardware error",
+            _ => "Reserved exception",
+        };
     }
 #endif
 
@@ -225,6 +262,12 @@ internal static class ExceptionHandler
         WriteDebugLine("  X29: 0x" + ctx.x29.ToString("X16") + "  X30: 0x" + ctx.x30.ToString("X16"));
         WriteDebugLine("  SP:  0x" + ctx.sp.ToString("X16") + "  ELR: 0x" + ctx.elr.ToString("X16"));
         WriteDebugLine("  SPSR: 0x" + ctx.spsr.ToString("X16"));
+#elif ARCH_RISCV64
+        WriteDebugLine("  A0:  0x" + ctx.a0.ToString("X16") + "  A1:  0x" + ctx.a1.ToString("X16"));
+        WriteDebugLine("  A2:  0x" + ctx.a2.ToString("X16") + "  A3:  0x" + ctx.a3.ToString("X16"));
+        WriteDebugLine("  S0:  0x" + ctx.s0.ToString("X16") + "  RA:  0x" + ctx.ra.ToString("X16"));
+        WriteDebugLine("  SP:  0x" + ctx.sp.ToString("X16") + "  SEPC: 0x" + ctx.sepc.ToString("X16"));
+        WriteDebugLine("  STVAL: 0x" + ctx.fault_address.ToString("X16"));
 #else
         WriteDebugLine("  RAX: 0x" + ctx.rax.ToString("X16") + "  RBX: 0x" + ctx.rbx.ToString("X16"));
         WriteDebugLine("  RCX: 0x" + ctx.rcx.ToString("X16") + "  RDX: 0x" + ctx.rdx.ToString("X16"));

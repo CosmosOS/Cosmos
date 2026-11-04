@@ -297,6 +297,41 @@ internal readonly struct DeviceTreeNode
             && interrupts.TryReadCell(first + 2, out flags);
     }
 
+    /// <summary>
+    /// Reads entry <paramref name="index"/> of interrupts in the one-cell
+    /// form of the RISC-V PLIC: the source number. Thread context;
+    /// allocation-free.
+    /// </summary>
+    /// <param name="index">The entry's index.</param>
+    /// <param name="number">The PLIC source.</param>
+    internal bool TryReadPlicInterrupt(int index, out uint number)
+    {
+        number = 0;
+        if (index < 0 || InterruptCells != DeviceTreeFormat.PlicInterruptCells)
+        {
+            return false;
+        }
+
+        if (!TryGetProperty("interrupts", out DeviceTreeProperty interrupts))
+        {
+            return false;
+        }
+
+        return interrupts.TryReadCell(index, out number);
+    }
+
+    /// <summary>
+    /// Reads the one-cell property <paramref name="name"/>, as
+    /// <c>timebase-frequency</c> is. Thread context; allocation-free.
+    /// </summary>
+    /// <param name="name">The property's name.</param>
+    /// <param name="value">The cell.</param>
+    internal bool TryReadU32(string name, out uint value)
+    {
+        value = 0;
+        return TryGetProperty(name, out DeviceTreeProperty property) && property.TryReadCell(0, out value);
+    }
+
     /// <summary>Reads the two cells of bus-range. Thread context; allocation-free.</summary>
     /// <param name="first">The first bus.</param>
     /// <param name="last">The last bus.</param>

@@ -11,6 +11,7 @@ on:
       - '.github/workflows/kernel-setup.yml'
       - '.github/workflows/kernel-test-run.yml'
       - '.github/workflows/kernel-test-results.yml'
+      - '.devcontainer/build-riscv64-toolchain.sh'
   pull_request:
     branches: [ "**" ]
     paths:
@@ -21,6 +22,7 @@ on:
       - '.github/workflows/kernel-setup.yml'
       - '.github/workflows/kernel-test-run.yml'
       - '.github/workflows/kernel-test-results.yml'
+      - '.devcontainer/build-riscv64-toolchain.sh'
   workflow_dispatch:
     inputs:
       architecture:
@@ -32,6 +34,7 @@ on:
           - all
           - x64
           - arm64
+          - riscv64
 
 permissions:
   contents: read
