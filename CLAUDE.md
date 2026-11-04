@@ -64,6 +64,7 @@ Kernel features are toggled via MSBuild properties in kernel `.csproj` files (al
 - `tests/Kernels/` - 20 kernel test suites and the Drivers suite's driver library
 - `dotnet/runtime/` - .NET runtime submodule (release/10.0 branch)
 - `artifacts/` - Build outputs, NuGet packages, Limine bootloader
+- `.agents/` - Steward, the AI co-maintenance operating model: the skills and playbooks agents load for PR and issue triage, and `setup/config.yaml` (scope anchors, philosophy veto, autonomy bands) they read; see `.agents/README.md`
 
 ## GitHub
 

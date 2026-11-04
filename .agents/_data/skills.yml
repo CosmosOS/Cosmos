@@ -1,0 +1,26 @@
+# Skills-contract policy — read by bin/skills-contract-lint (and safe to render in docs).
+#
+# The lint asserts that every skill named by a lifecycle "Skills for this area"
+# section or wired as a scheduled job has a runnable skills/<name>/SKILL.md. The
+# three lists below are the only hand-maintained policy; everything else is derived.
+
+# Skills named/wired but intentionally not yet built. The repo stays green because
+# these are expected. A NEW dangling reference not listed here fails the lint.
+# This list only shrinks — author the skill, then delete its line here.
+planned:
+  - chat-monitor
+  - mentions-sweep
+  - fleet-heartbeat
+
+# Scheduled-job names that legitimately differ from the skill they run. Until the
+# job/skill names are reconciled (a separate backlog item), the alias tells the
+# lint which existing skill a job maps to.
+job_aliases:
+  scoreboard-refresh: triage-scoreboard
+  announcements: release-announce
+
+# Present skills intentionally not wired to any lifecycle section or scheduled job
+# (loaded on demand, not run on a schedule). Suppresses the orphan warning.
+standalone:
+  - project-system-setup
+  - coding-principles

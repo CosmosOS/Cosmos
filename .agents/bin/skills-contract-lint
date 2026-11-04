@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Skills-contract lint. Fails (exit 1) when a lifecycle playbook or the config
+# template names a skill that has no skills/<name>/SKILL.md and is not declared
+# planned. Warnings (orphans) report but do not fail. See lib/skills_contract.rb.
+
+require_relative '../lib/skills_contract'
+
+ROOT = File.expand_path('..', __dir__)
+
+policy = YAML.safe_load(File.read(File.join(ROOT, '_data', 'skills.yml'))) || {}
+planned = policy['planned'] || []
+job_aliases = policy['job_aliases'] || {}
+standalone = policy['standalone'] || []
+
+doc_paths = Dir.glob(File.join(ROOT, 'docs', '**', '*.md'))
+skills_dir = File.join(ROOT, 'skills')
+config_path = File.join(ROOT, 'setup', 'config.template.yaml')
+
+present = SkillsContract::Extract.present_skills(skills_dir)
+indexed = SkillsContract::Extract.indexed_skills(File.join(skills_dir, 'README.md'))
+referenced = SkillsContract::Extract.referenced_strict(
+  doc_paths: doc_paths, config_path: config_path, job_aliases: job_aliases
+)
+
+violations = SkillsContract.check(
+  present: present, referenced_strict: referenced, indexed: indexed,
+  planned: planned, standalone: standalone
+)
+
+errors   = violations.select { |v| v.severity == :error }
+warnings = violations.select { |v| v.severity == :warning }
+infos    = violations.select { |v| v.severity == :info }
+
+puts "Skills-contract lint — #{present.size} skills present, #{referenced.size} referenced"
+
+unless errors.empty?
+  puts "\nErrors (#{errors.size}):"
+  errors.each { |v| puts v.to_line }
+end
+unless warnings.empty?
+  puts "\nWarnings (#{warnings.size}):"
+  warnings.each { |v| puts v.to_line }
+end
+unless infos.empty?
+  puts "\nPlanned, not yet built (#{infos.size}):"
+  infos.each { |v| puts v.to_line }
+end
+
+if errors.empty?
+  puts "\nOK — contract holds."
+  exit 0
+else
+  puts "\nFAILED — #{errors.size} contract violation(s). Fix the skill or update _data/skills.yml."
+  exit 1
+end

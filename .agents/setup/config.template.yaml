@@ -1,0 +1,130 @@
+# Steward — project configuration
+# Produced by the setup interview (setup/setup-interview.md). Every playbook and skill reads from
+# this file. Fill what applies; leave optional sections blank/"skip" and they stay disabled.
+# NEVER put secrets (tokens, keys) in this file — see `secrets:` below.
+
+project:
+  name: ""                      # one-line description of the project
+  trunk_branch: "main"
+  release_model:
+    style: "tag-per-release"    # tag-per-release | continuous | other
+    changelog_file: "CHANGELOG.md"
+    shipped_means: "tag-exists-and-deployed"   # how "shipped" is verified
+
+repositories:                   # list every repo the project spans
+  - host: "github.com"
+    owner: ""
+    name: ""
+    role: "primary"             # primary | desktop | mobile | docs | site | ...
+    visibility: "public"
+  # - { host: github.com, owner: "", name: "", role: "desktop", visibility: public }
+
+scope:                          # the fit/scope screen — the most important section
+  anchors:                      # a change must serve at least one of these to be in-scope; the scoreboard grades how directly (scope_fit)
+    - ""
+  philosophy_veto:              # qualities that disqualify a change even if well-built
+    - ""
+  bypass_scope_gate:            # change classes that skip the scope screen entirely; they carry a bypass marker on the scoreboard
+    - "bug-fix-on-shipped-feature"
+    - "security-fix"
+    - "reliability-fix"
+
+community:                      # optional — leave platform blank to disable chat monitoring
+  chat:
+    platform: ""                # discord | slack | ... | "" to disable
+    server_id: ""
+    bug_channels: []            # channel ids/names that carry bug reports
+    monitor: false              # off until issue_capture.enabled and platform are set; shared issue_capture owns capture + reaction
+    capture_reaction: "white_check_mark"   # chat-source marker; NEVER free-text public voice
+  mentions_sweep:
+    enabled: false
+    disambiguate_against: ""    # namesake to exclude, if any
+
+issue_capture:                  # shared pre-tracker capture core for chat and non-chat adapters
+  enabled: false               # required before community.chat.monitor may run
+  sources: []                   # non-chat adapter names/locators; chat stays under community.chat
+  queue_path: ""                # PRIVATE staged records; may retain a minimal source reference
+  ledger_path: ""               # PRIVATE append-only transition + capture-marker audit
+  checkpoint_path: ""           # PRIVATE per-source last-successful checkpoint
+  max_per_run: 10               # deterministic bound; remainder continues next run
+  max_public_files_per_run: 0   # 0 disables downstream auto-file; human approval remains available
+  capture_marker: ""            # non-chat mechanical marker; requires enabled action-watchdog
+
+security:                       # the vulnerability divert — how suspected vulns leave the public path
+  # A capture that looks like a vulnerability (unauthorized access, data exposure, tampering, code
+  # execution, or attacker-triggerable service loss) is NEVER auto-filed or publicly drafted. It
+  # diverts here. See docs/reference/security-spine.md #6.
+  security_contact: ""          # private destination: a person/DM, a private channel, an email, or
+                                # "github-advisory" to use the repo's private security advisories.
+                                # BLANK = fail closed: suppress the file, route to alarms_to, never public.
+                                # If autonomous capture is enabled, alarms_to is required; set this as
+                                # the preferred first destination when one is available.
+                                # A confirmed-private index is the emergency third fallback, not the
+                                # normal configured destination.
+  security_sensitive_surfaces: []   # optional: surfaces a report naming is treated as suspected until
+                                    # cleared (e.g. ["auth", "payments", "crypto", "session"]).
+
+ci_and_gates:
+  test_command: ""              # exact command to run the full suite
+  test_runtime_estimate: ""     # rough wall-clock, so jobs budget and never sample
+  ci_present: true
+  code_review_tool: ""          # automated reviewer, if any
+  adversarial_review_tool: ""   # second/independent reviewer, if any
+  visual_preview_tool: ""       # visual/screenshot preview, if any
+  ui_viewports: []              # e.g. ["1280x800", "390x844"] — empty if no UI
+
+autonomy:                       # starting band per action: A | B | C
+  pr_labeling: "B"
+  issue_triage_replies: "B"
+  issue_autoclose: "C"
+  announcements: "C"
+  pr_merge: "B"
+  human_reachable_at: ""        # channel/DM for Band-B decisions and Band-C approvals
+
+labels:                         # declared taxonomy for the deterministic `label-sync` job (add-only)
+  add_only: true                # never remove or override a human's label; skip labels already present
+  # PRs: size from the diff, area from changed paths, type from the title prefix.
+  # Issues: area/type from structured issue-template fields (never the free-text body); size is N/A.
+  # The allowlist label-sync may apply is exactly the label values named below.
+  size: { by: diff_lines,   buckets: { S: 50, M: 200, L: 500, XL: null } }  # PRs only; null = open-ended top bucket
+  area: { by: paths,        map: { "skills/**": "area:skills", "docs/**": "area:docs", "setup/**": "area:setup" } }
+  type: { by: title_prefix, map: { feat: "type:feature", fix: "type:bug", docs: "type:docs", chore: "type:chore" } }
+
+trust:                          # the contributor trust ledger the `contributor-trust` skill aggregates
+  # Events are written at close by release-pipeline (one terminal outcome per PR); this block only
+  # controls how they are scored. NOTE: today only shipped PRs produce events, so the score is
+  # upward-biased until a reconcile job records stale/abandoned outcomes — read it with effective_n.
+  ledger_path: ""               # append-only outcome events; blank disables scoring entirely
+  prior: 0.5                    # the neutral prior a contributor starts at (zero events → exactly this)
+  shrinkage: 3.0                # pseudo-count k — roughly how many events before the score leaves the prior
+  half_life_days: 180           # decay: an event's weight halves every N days, so the score tracks recency
+
+secrets:
+  # Secrets live ONLY in a permission-locked file read by helper scripts. Record the PATH here,
+  # never the value. Helpers read it and never return it to the agent's context.
+  credentials_file: ""          # e.g. a locked-down dotenv path
+  execute_contributor_code: false   # if true, a sandbox MUST be configured
+  sandbox_available: false          # both false: untrusted PR code never runs; a human runs the suite
+
+scheduled_jobs:                 # start with a few; add as you climb the autonomy ladder
+  jobs:
+    - { name: "scoreboard-refresh", every: "2h",  enabled: true,  agent: false }
+    - { name: "chat-monitor",       every: "1h",  enabled: false, agent: true  }
+    - { name: "issue-capture",      every: "1h",  enabled: false, agent: true  }
+    - { name: "mentions-sweep",     every: "24h", enabled: false, agent: true  }
+    - { name: "announcements",      every: "8h",  enabled: false, agent: true  }
+    - { name: "label-sync",         every: "4h",  enabled: false, agent: false }
+    - { name: "issue-autoclose",    every: "4h",  enabled: false, agent: false }
+    - { name: "action-watchdog",    every: "6h",  enabled: false, agent: false }
+    - { name: "fleet-heartbeat",    cron:  "30 8 * * *", enabled: false, agent: false }
+  outputs:
+    # Discovery is the default: actionable output lands in a pull-based index the human always
+    # checks. Delivery (push to a chat channel) is an optional enhancement on top — if it fails,
+    # the index still has the work. See docs/playbooks/output-loop.md.
+    index_path: ""              # pull-based review queue the human checks (e.g. state/index.md).
+                                # If it hosts the vuln-divert level-3 fallback, it must NOT be a public
+                                # surface — a repo-hosted index in a public repo is not a valid destination.
+    digest_to: ""               # optional: push routine digests here (enhancement, not the only path).
+                                # Must not be a public channel if the index it digests can hold a
+                                # diverted vuln (level-3 fallback) — a digest would republish it.
+    alarms_to: ""               # independent human route; REQUIRED when issue_capture is enabled

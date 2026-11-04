@@ -474,5 +474,8 @@ global.json
 .claude/*
 !.claude/agents/
 
+# Steward's tools (.agents/README.md), not a build output.
+!.agents/bin/
+
 # The audio disk image `cosmos run --audio` builds for the DevKernel.
 disk-audio.img
