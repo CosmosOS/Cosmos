@@ -92,6 +92,12 @@ internal class ARM64InterruptController : IInterruptController
         Arm64ExceptionVectorNative.InitExceptionVectors();
         Serial.Write("[ARM64InterruptController] Exception vectors initialized\n");
 
+        // This CPU's identity for the interrupts aimed at it, in its per-CPU
+        // block: the MPIDR_EL1 affinity (Aff3:Aff2:Aff1:Aff0), what
+        // GICD_IROUTER and an SGI's target field name a CPU by. Not the CPU
+        // index, which is Limine's order (phase 2) and the scheduler's.
+        PerCpuBlock.Current.HardwareId = GICv3.ExtractAffinity(GICv3Native.ReadMpidr());
+
         // Allocate the LPI handler table before the GIC (and therefore ITS)
         // comes online — Arm64MsiBinder can call AllocateLpi mid-bring-up.
         s_lpiHandlers = new InterruptManager.IrqDelegate?[LpiHandlerCount];
@@ -266,10 +272,9 @@ internal class ARM64InterruptController : IInterruptController
             {
                 // Mirror of the x64 IRQ-exit reschedule (see
                 // X64InterruptController.Dispatch): the ARM64 vector stub also
-                // applies the staged context switch on every exit. Single-CPU
-                // ARM64 for now (cpuId 0); the saved context sits 512 bytes
-                // (NEON save area) below the IRQContext, same derivation as
-                // the GenericTimer handler.
+                // applies the staged context switch on every exit. The saved
+                // context sits 512 bytes (NEON save area) below the
+                // IRQContext, same derivation as the GenericTimer handler.
                 RunPendingReschedule(ref ctx);
             }
             return;
@@ -316,7 +321,7 @@ internal class ARM64InterruptController : IInterruptController
 
     private static void RunPendingReschedule(ref IRQContext ctx)
     {
-        SchedulerManager.ReschedulePendingFromIrq(0, SavedContextStackPointer(ref ctx));
+        SchedulerManager.ReschedulePendingFromIrq(SchedulerManager.GetCurrentCpuId(), SavedContextStackPointer(ref ctx));
     }
 
     private void SendEOI()

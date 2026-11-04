@@ -156,6 +156,13 @@ public static class LocalApic
         Serial.Write("[LocalAPIC] ID: ", (id >> APIC_ID_SHIFT), "\n");
         Serial.Write("[LocalAPIC] Version: 0x", version.ToString("X"), "\n");
 
+        // This CPU's identity for the messages and IPIs aimed at it, in its
+        // per-CPU block: the Local APIC id is not the CPU index (the BSP's is
+        // not architecturally 0; QEMU's is), so the MSI binder and the I/O
+        // APIC routing look it up here by index rather than reading the LAPIC
+        // of whichever CPU they happen to run on.
+        PerCpuBlock.Current.HardwareId = id >> APIC_ID_SHIFT;
+
         // Clear error status register (requires two writes)
         Write(LAPIC_ESR, 0);
         Write(LAPIC_ESR, 0);
@@ -444,8 +451,9 @@ public static class LocalApic
     {
         s_timerTickCount++;
 
-        // Get current CPU ID from APIC
-        uint cpuId = (uint)GetId();
+        // The index of this CPU, from its per-CPU block: the scheduler indexes
+        // its per-CPU state by it, and the LAPIC id is not that index.
+        uint cpuId = SchedulerManager.GetCurrentCpuId();
 
         // Calculate RSP pointing to saved context for context switching
         nuint contextPtr = (nuint)Unsafe.AsPointer(ref context);

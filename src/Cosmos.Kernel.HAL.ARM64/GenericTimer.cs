@@ -200,8 +200,8 @@ internal class GenericTimer : TickSource
         // Advance software timers and invoke the OnTick handler
         Instance.HandleTick(Instance._periodNs);
 
-        // Get current CPU ID (for now, always 0 on single CPU ARM64)
-        uint cpuId = 0;
+        // The index of this CPU, from its per-CPU block.
+        uint cpuId = SchedulerManager.GetCurrentCpuId();
 
         // The saved context's SP, which the scheduler switches from.
         nuint currentSp = ARM64InterruptController.SavedContextStackPointer(ref ctx);
