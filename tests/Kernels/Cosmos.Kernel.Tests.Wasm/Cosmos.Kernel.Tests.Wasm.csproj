@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Cosmos.Sdk" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- The kernel is published trimmed, not through PublishAot, so ILLink
+         leaves the defaults of a JIT application in place. WACS validates
+         modules with FluentValidation, which compiles expression trees: with
+         those defaults, System.Linq.Expressions builds each delegate from
+         MakeGenericMethod thunks the image holds no code for. These are the
+         values a NativeAOT publish sets. -->
+    <DynamicCodeSupport>false</DynamicCodeSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="System.Linq.Expressions.CanEmitObjectArrayDelegate" Value="false" Trim="true" />
+  </ItemGroup>
+
+  <!-- Core kernel packages (using project references for development) -->
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
+    <ProjectReference Include="../../../src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
+    <ProjectReference Include="../../Cosmos.TestRunner.Framework/Cosmos.TestRunner.Framework.csproj" />
+  </ItemGroup>
+
+  <!-- The two pure C# WebAssembly VMs the suite runs side by side, from nuget.org. -->
+  <ItemGroup>
+    <PackageReference Include="DotWasm" />
+    <PackageReference Include="WACS" />
+  </ItemGroup>
+
+  <!-- Architecture-specific HAL (using project references for development) -->
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_X64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_ARM64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
+  </ItemGroup>
+
+</Project>
