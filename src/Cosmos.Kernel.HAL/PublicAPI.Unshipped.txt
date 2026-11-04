@@ -12,9 +12,54 @@ Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice.Flush() -> void
 Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice.Name.get -> string!
 Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice.ReadBlock(ulong blockNo, ulong blockCount, System.Span<byte> data) -> void
 Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice.WriteBlock(ulong blockNo, ulong blockCount, System.ReadOnlySpan<byte> data) -> void
+Cosmos.Kernel.HAL.Structures.BufferBuilder<T>
+Cosmos.Kernel.HAL.Structures.BufferBuilder<T>.BufferBuilder() -> void
+Cosmos.Kernel.HAL.Structures.BufferBuilder<T>.Build() -> Cosmos.Kernel.HAL.Structures.RentedMemory<T>
+Cosmos.Kernel.HAL.Structures.BufferBuilder<T>.Dispose() -> void
+Cosmos.Kernel.HAL.Structures.BufferBuilder<T>.NewChunk(int index, int size) -> Cosmos.Kernel.HAL.Structures.BufferChunk<T>
+Cosmos.Kernel.HAL.Structures.BufferBuilder<T>.NewChunk(int size) -> Cosmos.Kernel.HAL.Structures.BufferChunk<T>
+Cosmos.Kernel.HAL.Structures.BufferBuilder<T>.RemoveIndex(int index) -> void
+Cosmos.Kernel.HAL.Structures.BufferChunk<T>
+Cosmos.Kernel.HAL.Structures.BufferChunk<T>.BufferChunk() -> void
+Cosmos.Kernel.HAL.Structures.BufferChunk<T>.Data() -> System.Memory<T>
+Cosmos.Kernel.HAL.Structures.BufferChunk<T>.Resize(int size) -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Add(T item) -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Clear() -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Contains(T item) -> bool
+Cosmos.Kernel.HAL.Structures.RentedList<T>.CopyTo(T[]! array, int arrayIndex) -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Count.get -> int
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Dispose() -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Enumerator
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Enumerator.Enumerator() -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Enumerator.Enumerator(Cosmos.Kernel.HAL.Structures.RentedList<T> rentedList) -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Enumerator.Current.get -> T
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Enumerator.Dispose() -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Enumerator.MoveNext() -> bool
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Enumerator.Reset() -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.GetEnumerator() -> Cosmos.Kernel.HAL.Structures.RentedList<T>.Enumerator
+Cosmos.Kernel.HAL.Structures.RentedList<T>.IndexOf(T item) -> int
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Insert(int index, T item) -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.IsReadOnly.get -> bool
+Cosmos.Kernel.HAL.Structures.RentedList<T>.Remove(T item) -> bool
+Cosmos.Kernel.HAL.Structures.RentedList<T>.RemoveAt(int index) -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.RentedList() -> void
+Cosmos.Kernel.HAL.Structures.RentedList<T>.this[int index].get -> T
+Cosmos.Kernel.HAL.Structures.RentedList<T>.this[int index].set -> void
+Cosmos.Kernel.HAL.Structures.RentedMemory<T>
+Cosmos.Kernel.HAL.Structures.RentedMemory<T>.Dispose() -> void
+Cosmos.Kernel.HAL.Structures.RentedMemory<T>.Memory.get -> System.Memory<T>
+Cosmos.Kernel.HAL.Structures.RentedMemory<T>.RentedMemory() -> void
 Cosmos.Kernel.HAL.Structures.RingBuffer<T>
 Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Clear() -> void
 Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Count.get -> int
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Enumerator
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Enumerator.Current.get -> T
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Enumerator.Dispose() -> void
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Enumerator.Enumerator() -> void
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Enumerator.Enumerator(Cosmos.Kernel.HAL.Structures.RingBuffer<T>! buffer) -> void
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Enumerator.MoveNext() -> bool
+Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Enumerator.Reset() -> void
 Cosmos.Kernel.HAL.Structures.RingBuffer<T>.GetEnumerator() -> System.Collections.Generic.IEnumerator<T>!
 Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Pop(out T? item) -> bool
 Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Push(T item) -> void
@@ -23,6 +68,8 @@ Cosmos.Kernel.HAL.Structures.RingBuffer<T>.Peek(out T? item) -> bool
 override Cosmos.Kernel.HAL.Devices.Network.MacAddress.Equals(object? obj) -> bool
 override Cosmos.Kernel.HAL.Devices.Network.MacAddress.GetHashCode() -> int
 override Cosmos.Kernel.HAL.Devices.Network.MacAddress.ToString() -> string!
+override Cosmos.Kernel.HAL.Structures.BufferChunk<T>.Equals(object? obj) -> bool
+override Cosmos.Kernel.HAL.Structures.BufferChunk<T>.GetHashCode() -> int
 static Cosmos.Kernel.HAL.Devices.Network.MacAddress.Broadcast.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
 static Cosmos.Kernel.HAL.Devices.Network.MacAddress.None.get -> Cosmos.Kernel.HAL.Devices.Network.MacAddress!
 [COSMOS0003]abstract Cosmos.Kernel.HAL.DriverKit.Buses.Ps2.Ps2Controller.InterruptDriven.get -> bool
