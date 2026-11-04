@@ -93,6 +93,13 @@ public sealed record TestProfile
     /// <summary>Extra <c>-M</c> machine properties (e.g. <c>{"gic-version", "2"}</c>). Merged from base profile + applied modifier.</summary>
     public IReadOnlyDictionary<string, string> MachineOptions { get; init; } = new Dictionary<string, string>();
 
+    /// <summary>
+    /// CPUs the cell's machine gets (<c>-smp</c>): 1 unless a modifier sets it (<c>smp4</c>),
+    /// since every suite is written against one CPU and the ones that prove the application
+    /// processors come up opt in.
+    /// </summary>
+    public int CpuCount { get; init; } = 1;
+
     /// <summary>True when this is the synthetic single-profile fallback used by suites that opt into nothing.</summary>
     public bool IsDefault { get; init; }
 
@@ -156,9 +163,12 @@ internal sealed record TestModifier
         = new Dictionary<DiskKind, IReadOnlyDictionary<string, string>>();
     public IReadOnlyDictionary<string, string> MachineOptions { get; init; } = new Dictionary<string, string>();
 
+    /// <summary>The CPU count (<c>-smp</c>) the modifier sets, or null to leave the profile's.</summary>
+    public int? CpuCount { get; init; }
+
     public bool AppliesTo(TestProfile profile, string architecture)
     {
-        if (Architectures != null && !Architectures.Contains(architecture, StringComparer.OrdinalIgnoreCase))
+        if (Architectures is not null && !Architectures.Contains(architecture, StringComparer.OrdinalIgnoreCase))
         {
             return false;
         }
@@ -166,7 +176,7 @@ internal sealed record TestModifier
         // Machine-only modifier: applies regardless of disks.
         if (DeviceOptions.Count == 0)
         {
-            return MachineOptions.Count > 0;
+            return MachineOptions.Count > 0 || CpuCount is not null;
         }
 
         foreach (TestProfileDisk disk in profile.Disks)
@@ -211,7 +221,8 @@ internal sealed record TestModifier
         {
             Name = $"{baseProfile.Name}+{Name}",
             Disks = newDisks,
-            MachineOptions = mergedMachine
+            MachineOptions = mergedMachine,
+            CpuCount = CpuCount ?? baseProfile.CpuCount
         };
     }
 }
@@ -360,16 +371,25 @@ public static class TestProfileLoader
 
     /// <summary>
     /// True when two modifiers in <paramref name="combo"/> write the same
-    /// machine (<c>-M</c>) property or the same per-disk device option: a
-    /// contradictory cell (e.g. gicv2 and gicv3 both set gic-version). Such
-    /// combinations are dropped from the matrix.
+    /// machine (<c>-M</c>) property, the same per-disk device option or both
+    /// set the CPU count: a contradictory cell (e.g. gicv2 and gicv3 both set
+    /// gic-version). Such combinations are dropped from the matrix.
     /// </summary>
     private static bool HasOptionConflict(List<TestModifier> combo)
     {
         var machineKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var deviceKeys = new HashSet<string>(StringComparer.Ordinal);
+        bool cpuCountSet = false;
         foreach (TestModifier mod in combo)
         {
+            if (mod.CpuCount is not null)
+            {
+                if (cpuCountSet)
+                {
+                    return true;
+                }
+                cpuCountSet = true;
+            }
             foreach (string key in mod.MachineOptions.Keys)
             {
                 if (!machineKeys.Add(key))
@@ -480,7 +500,7 @@ public static class TestProfileLoader
                 $"({string.Join(", ", KnownArchitectures)}), e.g. \"machineOptions\": {{ \"arm64\": {{ \"gic-version\": \"3\" }} }}. " +
                 $"Parser error: {ex.Message}", ex);
         }
-        if (parsed?.Profiles == null || parsed.Profiles.Count == 0)
+        if (parsed?.Profiles is null || parsed.Profiles.Count == 0)
         {
             throw new InvalidOperationException($"{path}: 'profiles' array is missing or empty.");
         }
@@ -500,7 +520,7 @@ public static class TestProfileLoader
             }
 
             var disks = new List<TestProfileDisk>();
-            if (entry.Disks != null)
+            if (entry.Disks is not null)
             {
                 foreach (DiskEntry disk in entry.Disks)
                 {
@@ -584,7 +604,7 @@ public static class TestProfileLoader
             // the same hardware shape needs two profile names, which shows up
             // as two half-empty rows in the results matrix.
             var perArch = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
-            if (entry.MachineOptions != null)
+            if (entry.MachineOptions is not null)
             {
                 foreach (KeyValuePair<string, Dictionary<string, string>> kv in entry.MachineOptions)
                 {
@@ -606,7 +626,7 @@ public static class TestProfileLoader
         }
 
         var modifiers = new Dictionary<string, TestModifier>(StringComparer.Ordinal);
-        if (parsed.Modifiers != null)
+        if (parsed.Modifiers is not null)
         {
             foreach (ModifierEntry entry in parsed.Modifiers)
             {
@@ -619,16 +639,23 @@ public static class TestProfileLoader
                     throw new InvalidOperationException($"{path}: duplicate modifier name '{entry.Name}'.");
                 }
 
-                bool hasMachine = entry.MachineOptions != null && entry.MachineOptions.Count > 0;
-                bool hasDevice = entry.DeviceOptions != null && entry.DeviceOptions.Count > 0;
-                if (!hasMachine && !hasDevice)
+                bool hasMachine = entry.MachineOptions is not null && entry.MachineOptions.Count > 0;
+                bool hasDevice = entry.DeviceOptions is not null && entry.DeviceOptions.Count > 0;
+                bool hasCpus = entry.Cpus is not null;
+                if (!hasMachine && !hasDevice && !hasCpus)
                 {
                     throw new InvalidOperationException(
-                        $"{path}: modifier '{entry.Name}' has neither 'machineOptions' nor 'deviceOptions'. A modifier with no targets can never apply.");
+                        $"{path}: modifier '{entry.Name}' has neither 'machineOptions', 'deviceOptions' nor 'cpus'. A modifier with no targets can never apply.");
+                }
+
+                if (entry.Cpus is int cpus && cpus < 1)
+                {
+                    throw new InvalidOperationException(
+                        $"{path}: modifier '{entry.Name}' sets cpus to {cpus}; a machine has at least one CPU.");
                 }
 
                 var perKind = new Dictionary<DiskKind, IReadOnlyDictionary<string, string>>();
-                if (entry.DeviceOptions != null)
+                if (entry.DeviceOptions is not null)
                 {
                     foreach (KeyValuePair<string, Dictionary<string, string>> kv in entry.DeviceOptions)
                     {
@@ -642,7 +669,8 @@ public static class TestProfileLoader
                     Name = entry.Name,
                     Architectures = entry.Architectures,
                     DeviceOptions = perKind,
-                    MachineOptions = entry.MachineOptions ?? new Dictionary<string, string>()
+                    MachineOptions = entry.MachineOptions ?? new Dictionary<string, string>(),
+                    CpuCount = entry.Cpus
                 };
             }
         }
@@ -699,5 +727,8 @@ public static class TestProfileLoader
         string? Name,
         List<string>? Architectures,
         Dictionary<string, Dictionary<string, string>>? DeviceOptions,
-        Dictionary<string, string>? MachineOptions);
+        Dictionary<string, string>? MachineOptions,
+        // The CPU count (-smp), the one knob that is neither a -M property nor
+        // a device option: QEMU takes it on its own switch.
+        int? Cpus);
 }

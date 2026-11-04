@@ -156,6 +156,13 @@ public static class LocalApic
         Serial.Write("[LocalAPIC] ID: ", (id >> APIC_ID_SHIFT), "\n");
         Serial.Write("[LocalAPIC] Version: 0x", version.ToString("X"), "\n");
 
+        // This CPU's identity for the messages and IPIs aimed at it, in its
+        // per-CPU block: the Local APIC id is not the CPU index (the BSP's is
+        // not architecturally 0; QEMU's is), so the MSI binder and the I/O
+        // APIC routing look it up here by index rather than reading the LAPIC
+        // of whichever CPU they happen to run on.
+        PerCpuBlock.Current.HardwareId = id >> APIC_ID_SHIFT;
+
         // Clear error status register (requires two writes)
         Write(LAPIC_ESR, 0);
         Write(LAPIC_ESR, 0);
@@ -186,6 +193,35 @@ public static class LocalApic
         MsiRouting.RegisterBinder(new X64MsiBinder());
 
         Serial.Write("[LocalAPIC] Initialization complete\n");
+    }
+
+    /// <summary>
+    /// Programs the calling CPU's Local APIC the way <see cref="Initialize"/> programmed the boot
+    /// CPU's, at the same MMIO base (the window is per CPU, the address is not): its id into the
+    /// per-CPU block, the error status cleared, the task priority at 0, the spurious vector and
+    /// the software enable, LINT0, LINT1, the timer and the error LVTs masked. The timer is
+    /// started separately (<see cref="StartPeriodicTimerOnCurrentCpu"/>). An application
+    /// processor, from its managed entry, with interrupts masked (SMP phase 2). Allocation-free:
+    /// the heap is the boot CPU's until phase 4.
+    /// </summary>
+    internal static void InitializeCurrentCpu()
+    {
+        if (!s_initialized)
+        {
+            return;
+        }
+
+        uint id = Read(LAPIC_ID);
+        PerCpuBlock.Current.HardwareId = id >> APIC_ID_SHIFT;
+
+        Write(LAPIC_ESR, 0);
+        Write(LAPIC_ESR, 0);
+        Write(LAPIC_TPR, 0);
+        Write(LAPIC_SVR, SPURIOUS_VECTOR | SVR_ENABLE);
+        Write(LAPIC_LINT0, LVT_MASKED);
+        Write(LAPIC_LINT1, LVT_MASKED);
+        Write(LAPIC_TIMER_LVT, LVT_MASKED);
+        Write(LAPIC_ERROR_LVT, LVT_MASKED);
     }
 
     /// <summary>
@@ -417,6 +453,26 @@ public static class LocalApic
     }
 
     /// <summary>
+    /// Starts the calling CPU's Local APIC timer with the interval
+    /// <see cref="StartPeriodicTimer"/> set on the boot CPU, on the boot CPU's calibration: the
+    /// timer runs off the bus clock, which every Local APIC of the machine shares, so one
+    /// calibration serves them all. An application processor, from its managed entry (SMP
+    /// phase 2). Allocation-free, and silent: the ticks are logged by the boot CPU's handler
+    /// alone.
+    /// </summary>
+    internal static void StartPeriodicTimerOnCurrentCpu()
+    {
+        if (!s_timerCalibrated || s_timerIntervalMs == 0)
+        {
+            return;
+        }
+
+        Write(LAPIC_TIMER_DIVIDE, TIMER_DIVIDE_BY_16);
+        Write(LAPIC_TIMER_LVT, TIMER_PERIODIC | TIMER_VECTOR);
+        Write(LAPIC_TIMER_INIT, s_ticksPerMs * s_timerIntervalMs);
+    }
+
+    /// <summary>
     /// Stops the LAPIC timer.
     /// </summary>
     public static void StopTimer()
@@ -442,10 +498,9 @@ public static class LocalApic
     private static uint s_timerTickCount;
     private static unsafe void HandleTimerInterrupt(ref IRQContext context)
     {
-        s_timerTickCount++;
-
-        // Get current CPU ID from APIC
-        uint cpuId = (uint)GetId();
+        // The index of this CPU, from its per-CPU block: the scheduler indexes
+        // its per-CPU state by it, and the LAPIC id is not that index.
+        uint cpuId = SchedulerManager.GetCurrentCpuId();
 
         // Calculate RSP pointing to saved context for context switching
         nuint contextPtr = (nuint)Unsafe.AsPointer(ref context);
@@ -460,12 +515,22 @@ public static class LocalApic
             return;  // Don't call scheduler with bad RSP
         }
 
-        // Log first few and then periodically
-        if (s_timerTickCount <= TimerLogInitialTicks || s_timerTickCount % TimerLogPeriodTicks == 0)
+        // The boot CPU's ticks alone are counted and logged here: every CPU
+        // has its own timer and takes this handler, and a shared counter would
+        // advance once per CPU per period, while the log lines box their
+        // arguments, which an application processor must not do (the heap is
+        // the boot CPU's until phase 4).
+        if (cpuId == 0)
         {
-            Serial.Write("[LAPIC] Timer tick ", s_timerTickCount, " RSP=");
-            Serial.WriteHex((ulong)currentRsp);
-            Serial.Write("\n");
+            s_timerTickCount++;
+
+            // Log first few and then periodically
+            if (s_timerTickCount <= TimerLogInitialTicks || s_timerTickCount % TimerLogPeriodTicks == 0)
+            {
+                Serial.Write("[LAPIC] Timer tick ", s_timerTickCount, " RSP=");
+                Serial.WriteHex((ulong)currentRsp);
+                Serial.Write("\n");
+            }
         }
 
         // Call scheduler with elapsed time

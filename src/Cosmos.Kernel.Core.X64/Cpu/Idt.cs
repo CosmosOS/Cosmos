@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.Core;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.X64.Bridge;
 using Cosmos.Kernel.Core.X64.Cpu.Data;
@@ -67,6 +68,31 @@ public static unsafe class Idt
         }
 
         Serial.Write("[IDT] IDT loaded.\n");
+    }
+
+    /// <summary>
+    /// Loads the table <see cref="RegisterAllInterrupts"/> built into the calling CPU's IDTR,
+    /// leaving its interrupt flag alone: an application processor, from its managed entry with
+    /// interrupts masked (SMP phase 2). The table is one array for every CPU; only the
+    /// register that points at it is per CPU. Allocation-free.
+    /// </summary>
+    internal static void LoadOnCurrentCpu()
+    {
+        if (s_idtEntries is null)
+        {
+            Panic.Halt("The IDT was not built on the boot CPU before an application processor loaded it.");
+        }
+
+        fixed (void* ptr = &s_idtEntries[0])
+        {
+            IdtPointer idtPtr = new IdtPointer
+            {
+                Limit = (ushort)(256 * 16 - 1),
+                Base = (ulong)ptr
+            };
+
+            IdtNative.LoadIdtKeepFlags((void*)&idtPtr);
+        }
     }
 
     public static delegate* unmanaged<void> GetStub(int index)

@@ -59,6 +59,17 @@ internal static class InterruptManager
     }
 
     /// <summary>
+    /// Brings the calling CPU's share of the interrupt hardware up
+    /// (<see cref="IInterruptController.InitializeCurrentCpu"/>): an application processor,
+    /// from its managed entry, with interrupts masked, after <see cref="Initialize"/> ran on the
+    /// boot CPU. Nothing to do when interrupts are compiled out. Allocation-free.
+    /// </summary>
+    public static void InitializeCurrentCpu()
+    {
+        s_controller?.InitializeCurrentCpu();
+    }
+
+    /// <summary>
     /// Registers a handler for an interrupt vector, or clears the slot when
     /// <paramref name="handler"/> is null.
     /// </summary>
