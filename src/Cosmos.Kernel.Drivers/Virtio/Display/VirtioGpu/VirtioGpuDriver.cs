@@ -8,7 +8,8 @@ namespace Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu;
 
 /// <summary>
 /// The virtio-gpu driver (virtio specification section 5.7) over the
-/// driver kit, 2D path only: creates the control queue on the kit's access,
+/// driver kit, 2D path plus the virgl 3D path when the device keeps the
+/// VIRTIO_GPU_F_VIRGL bit: creates the control queue on the kit's access,
 /// allocates one page of scratch DMA for the commands and their responses,
 /// connects the control queue's interrupt when the transport delivers one
 /// and polls otherwise, asks the device for the first scanout's size,
@@ -16,20 +17,22 @@ namespace Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu;
 /// backed by it, binds it to scanout 0 and publishes the display to the
 /// ring; the ring's canvas draws into the framebuffer and every
 /// <c>Flush</c> pushes the dirty rectangle through TRANSFER_TO_HOST_2D and
-/// RESOURCE_FLUSH. No virgl: the guest renders, the host composites.
-/// Everything it holds for one device lives on a
-/// <see cref="VirtioGpuState"/> in <see cref="DeviceBinding.DriverState"/>.
-/// The transport underneath (PCI on both architectures, MMIO on ARM64) is
-/// invisible here. <see cref="Probe"/> and <see cref="OnDetach"/> run in
-/// thread context on the kit worker.
+/// RESOURCE_FLUSH. With virgl negotiated the published state also carries
+/// the ring's <see cref="Cosmos.Kernel.System.Graphics.Rendering3D.ICanvas3DFactory"/>, so the canvas the ring
+/// acquires is a 3D one and the 2D path stays underneath it. Everything it
+/// holds for one device lives on a <see cref="VirtioGpuState"/> in
+/// <see cref="DeviceBinding.DriverState"/>. The transport underneath (PCI
+/// on both architectures, MMIO on ARM64) is invisible here.
+/// <see cref="Probe"/> and <see cref="OnDetach"/> run in thread context on
+/// the kit worker.
 /// </summary>
 [Driver(Feature = DriverFeature.Graphics)]
 public sealed class VirtioGpuDriver : Driver
 {
     // --- Constants ---
 
-    /// <summary>The features asked for: none; VIRTIO_F_VERSION_1 comes from the kit and the 2D path needs nothing else.</summary>
-    private const uint RequestedFeatures = 0;
+    /// <summary>The features asked for: the virgl bit, so the device keeps it when it renders 3D; VIRTIO_F_VERSION_1 comes from the kit and the 2D path needs nothing else. A device that does not offer the bit drops it in the negotiation.</summary>
+    private const uint RequestedFeatures = VirtioGpuCmd.FeatureVirgl;
 
     /// <summary>The queue size asked for; the device's maximum caps it. Three descriptors are in use at most.</summary>
     private const ushort QueueSize = 16;
@@ -69,12 +72,16 @@ public sealed class VirtioGpuDriver : Driver
     /// <returns>Bound with the display published; failed when the device did not come up.</returns>
     public override ProbeResult Probe(DeviceBinding binding)
     {
-        // 1. The features.
+        // 1. The features. A device that kept the virgl bit renders 3D
+        //    through the host's virglrenderer, and the published state
+        //    grows the canvas factory for it.
         VirtioAccess dev = binding.Node.Access<VirtioAccess>();
-        if (!dev.NegotiateFeatures(RequestedFeatures, out _))
+        if (!dev.NegotiateFeatures(RequestedFeatures, out uint negotiated))
         {
             return ProbeResult.Failed("the device rejected the feature set");
         }
+
+        bool virgl = (negotiated & VirtioGpuCmd.FeatureVirgl) != 0;
 
         // 2. The control queue, and the cursor queue when the device has one.
         if (!dev.TryCreateQueue(binding, VirtioGpuState.ControlQueue, QueueSize, out Virtqueue? controlQueue))
@@ -89,9 +96,12 @@ public sealed class VirtioGpuDriver : Driver
 
         // 3. The scratch block: the command, the memory entry and the
         //    response, each at its offset; then the state, its lock and
-        //    its event.
+        //    its event. The 3D state is the published one when virgl is
+        //    negotiated, so the ring finds the canvas factory on it.
         DmaBuffer scratch = binding.AllocateDma(VirtioGpuState.PageBytes, VirtioGpuState.PageBytes);
-        VirtioGpuState state = new(binding, dev, controlQueue, cursorQueue, scratch);
+        VirtioGpuState state = virgl
+            ? new VirtioGpu3DState(binding, dev, controlQueue, cursorQueue, scratch)
+            : new VirtioGpuState(binding, dev, controlQueue, cursorQueue, scratch);
         binding.DriverState = state;
         state.Lock = binding.CreateLock();
         state.Event = binding.CreateEvent();
@@ -156,7 +166,8 @@ public sealed class VirtioGpuDriver : Driver
         // 9. The ring.
         state.Sink = binding.PublishDisplay(state);
         string wake = connected ? "interrupt" : "polling";
-        binding.Log($"{width}x{height}, {scanouts} scanouts, {wake}");
+        string renderer = virgl ? "virgl" : "2D";
+        binding.Log($"{width}x{height}, {scanouts} scanouts, {renderer}, {wake}");
         return ProbeResult.Bound;
     }
 
