@@ -13,6 +13,14 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// pair where the ISR signals), use <see cref="AcquireIrqSafe"/>: a single
 /// CPU holding the plain lock when the ISR fires will spin forever waiting
 /// for itself.</para>
+///
+/// <para>Nothing allocates while holding one, whichever form took it: a
+/// holder that starts a collection waits for the other CPUs to stop, and
+/// a CPU spinning on this lock with interrupts masked cannot stop until the
+/// holder releases (<see cref="Memory.GarbageCollector.GarbageCollector"/>, SMP phase 4).
+/// The scheduler's locks are taken in one order, queue locks by ascending
+/// CPU index, then the registry lock, then the heap lock, and two queue
+/// locks at once only by a migration (<see cref="SchedulerManager"/>).</para>
 /// </summary>
 internal struct SpinLock
 {

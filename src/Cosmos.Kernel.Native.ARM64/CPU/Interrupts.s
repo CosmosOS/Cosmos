@@ -6,6 +6,12 @@
 
 .extern __managed__irq
 
+// The context switch is staged in the running CPU's per-CPU block (Core/CPU/PerCpuBlock.cs, the
+// layout's home), reached through TPIDR_EL1, so the vector consumes its own CPU's staging on every exit.
+.equ PERCPU_SWITCH_TARGET_SP,     0x18
+.equ PERCPU_SWITCH_IS_NEW_THREAD, 0x20
+.equ PERCPU_TEMP_IS_NEW_THREAD,   0x28
+
 // ============================================================================
 // Exception Vector Table - must be 2KB aligned for VBAR_EL1
 // Each entry is 0x80 (128) bytes
@@ -158,14 +164,10 @@ __exception_common:
 
     // Save sp (original sp before we modified it)
     // We subbed 816. The vector pushed 16. So original SP is sp + 832.
-    // Code interrupted in EL1t (SPSR.M[0] = 0: the boot thread, on the bootloader stack) ran
-    // on SP_EL0: the exception switched to SP_EL1, where this frame is, so its sp is SP_EL0.
-    mrs     x0, spsr_el1
-    tst     x0, #1
+    // Every CPU runs EL1h: kmain selects SP_EL1 on the boot CPU before its first frame, the
+    // application processor trampoline does the same, and the scheduler's threads start with
+    // SPSR 0x3C5. So the interrupted code ran on this very stack and its sp is the frame's base.
     add     x0, sp, #832
-    b.ne    1f
-    mrs     x0, sp_el0
-1:
     str     x0, [x10, #248]         // sp at offset 248
 
     // Save elr_el1 (exception return address)
@@ -193,25 +195,21 @@ __exception_common:
 
     // =====================================================
     // CHECK FOR CONTEXT SWITCH
+    // Staged in this CPU's per-CPU block (PerCpuBlock.cs), reached through TPIDR_EL1
     // =====================================================
-    adrp    x11, _context_switch_target_sp
-    add     x11, x11, :lo12:_context_switch_target_sp
-    ldr     x12, [x11]
+    mrs     x11, tpidr_el1
+    ldr     x12, [x11, #PERCPU_SWITCH_TARGET_SP]
     cbz     x12, __restore_context    // No context switch requested
 
-    // Context switch requested - clear the flag
-    str     xzr, [x11]
+    // Context switch requested - clear the slot
+    str     xzr, [x11, #PERCPU_SWITCH_TARGET_SP]
 
-    // Save the is_new_thread flag (we need it after stack switch)
-    adrp    x11, _context_switch_is_new_thread
-    add     x11, x11, :lo12:_context_switch_is_new_thread
-    ldr     x13, [x11]
-    str     xzr, [x11]               // Clear the flag
+    // Save the is_new_thread flag (we need it after stack switch), then clear it
+    ldr     x13, [x11, #PERCPU_SWITCH_IS_NEW_THREAD]
+    str     xzr, [x11, #PERCPU_SWITCH_IS_NEW_THREAD]
 
-    // Save is_new_thread to temp location
-    adrp    x11, _temp_is_new_thread
-    add     x11, x11, :lo12:_temp_is_new_thread
-    str     x13, [x11]
+    // Save is_new_thread to the temp slot
+    str     x13, [x11, #PERCPU_TEMP_IS_NEW_THREAD]
 
     // Switch to new context's stack
     // x12 = new SP (points to start of saved context)
@@ -225,10 +223,9 @@ __restore_context:
     // Calculate base pointer for IRQContext
     add     x10, sp, #512
 
-    // Load is_new_thread flag to check exit path
-    adrp    x11, _temp_is_new_thread
-    add     x11, x11, :lo12:_temp_is_new_thread
-    ldr     x13, [x11]
+    // Load is_new_thread flag from this CPU's block to check exit path
+    mrs     x11, tpidr_el1
+    ldr     x13, [x11, #PERCPU_TEMP_IS_NEW_THREAD]
 
     // Check if this is a new thread
     cbnz    x13, __new_thread_start
@@ -294,10 +291,8 @@ __new_thread_start:
     // =====================================================
     // NEW THREAD - load SP from context and branch to entry
     // =====================================================
-    // Clear the temp flag
-    adrp    x11, _temp_is_new_thread
-    add     x11, x11, :lo12:_temp_is_new_thread
-    str     xzr, [x11]
+    // Clear the temp flag (x11 still holds this CPU's block)
+    str     xzr, [x11, #PERCPU_TEMP_IS_NEW_THREAD]
 
     // ThreadContext layout (at sp+512):
     //   x0 at offset 0

@@ -59,6 +59,17 @@ internal static class InterruptManager
     }
 
     /// <summary>
+    /// Brings the calling CPU's share of the interrupt hardware up
+    /// (<see cref="IInterruptController.InitializeCurrentCpu"/>): an application processor,
+    /// from its managed entry, with interrupts masked, after <see cref="Initialize"/> ran on the
+    /// boot CPU. Nothing to do when interrupts are compiled out. Allocation-free.
+    /// </summary>
+    public static void InitializeCurrentCpu()
+    {
+        s_controller?.InitializeCurrentCpu();
+    }
+
+    /// <summary>
     /// Registers a handler for an interrupt vector, or clears the slot when
     /// <paramref name="handler"/> is null.
     /// </summary>
@@ -244,6 +255,30 @@ internal static class InterruptManager
     internal static bool TryRaiseReschedule()
     {
         return s_controller?.TryRaiseReschedule() ?? false;
+    }
+
+    /// <summary>
+    /// Raises the platform's reschedule interrupt on another CPU
+    /// (<see cref="IInterruptController.SendReschedule"/>); nothing before the
+    /// controller is registered. Allocation-free; any context, interrupts
+    /// masked by the caller.
+    /// </summary>
+    /// <param name="hardwareId">The target CPU's controller identity, from its block.</param>
+    internal static void SendReschedule(ulong hardwareId)
+    {
+        s_controller?.SendReschedule(hardwareId);
+    }
+
+    /// <summary>
+    /// Raises the platform's stop interrupt on another CPU
+    /// (<see cref="IInterruptController.SendStop"/>); nothing before the
+    /// controller is registered. Allocation-free; any context, interrupts
+    /// masked by the caller.
+    /// </summary>
+    /// <param name="hardwareId">The target CPU's controller identity, from its block.</param>
+    internal static void SendStop(ulong hardwareId)
+    {
+        s_controller?.SendStop(hardwareId);
     }
 
     /// <summary>

@@ -270,6 +270,14 @@ _native_x64_load_idt:
     sti
     ret
 
+// void _native_x64_lidt(IdtPointer* ptr)
+// Loads the IDT and leaves the interrupt flag alone: for an application processor, which loads
+// the shared table before it has anything to enable interrupts for.
+.global _native_x64_lidt
+_native_x64_lidt:
+    lidt [rdi]
+    ret
+
 // uint64_t _native_x64_get_code_selector()
 // Returns the current CS (code segment selector) value
 .global _native_x64_get_code_selector
@@ -286,20 +294,30 @@ _native_x64_test_int32:
     int 32
     ret
 
+// The context switch is staged in the calling CPU's per-CPU block (PerCpuBlock.cs, the layout's home),
+// reached through IA32_GS_BASE: `gs:[slot]` is this CPU's slot, so the staging and the stub that
+// consumes it on this interrupt's exit never see another CPU's.
+.equ PERCPU_SWITCH_TARGET_SP,     0x18
+.equ PERCPU_SWITCH_IS_NEW_THREAD, 0x20
+.equ PERCPU_TEMP_IS_NEW_THREAD,   0x28
+.equ PERCPU_LAST_ERROR_CODE,      0x30
+
 // void _native_set_context_switch_sp(nuint newSp)
-// Sets the target SP for context switch. Called from managed code
-// during timer interrupt to request a context switch.
+// Stages a context switch on the calling CPU: the stub that runs on this
+// interrupt's exit switches to the saved context at newSp. Called from
+// managed code during the timer interrupt.
 // rdi = new RSP to switch to (pointing to saved context)
 .global _native_set_context_switch_sp
 _native_set_context_switch_sp:
-    mov [rip + _context_switch_target_rsp], rdi
+    mov qword ptr gs:[PERCPU_SWITCH_TARGET_SP], rdi
     ret
 
 // nuint _native_get_context_switch_sp()
-// Gets the current context switch target SP (for debugging)
+// The switch staged on the calling CPU, 0 when none is (the "already
+// staged" guard of the IRQ-exit reschedule)
 .global _native_get_context_switch_sp
 _native_get_context_switch_sp:
-    mov rax, [rip + _context_switch_target_rsp]
+    mov rax, qword ptr gs:[PERCPU_SWITCH_TARGET_SP]
     ret
 
 // nuint _native_get_sp()
@@ -311,39 +329,22 @@ _native_get_sp:
 
 // uint64_t _native_x64_get_last_error_code()
 // Returns the error code stashed by the most recent error-code exception
-// stub (vectors 8, 10-14, 17, 21, 29, 30). Only meaningful while handling
-// that exception; a nested error-code exception overwrites it.
+// stub (vectors 8, 10-14, 17, 21, 29, 30) on the calling CPU. Only
+// meaningful while handling that exception; a nested error-code exception
+// overwrites it.
 .global _native_x64_get_last_error_code
 _native_x64_get_last_error_code:
-    mov rax, [rip + _irq_last_error_code]
+    mov rax, qword ptr gs:[PERCPU_LAST_ERROR_CODE]
     ret
 
 // void _native_set_context_switch_new_thread(int isNew)
 // Sets whether the target thread is NEW (1) or RESUMED (0)
-// rdi = isNew flag
+// edi = isNew flag (an int: the upper half of rdi is not part of the argument)
 .global _native_set_context_switch_new_thread
 _native_set_context_switch_new_thread:
-    mov [rip + _context_switch_is_new_thread], rdi
+    mov edi, edi
+    mov qword ptr gs:[PERCPU_SWITCH_IS_NEW_THREAD], rdi
     ret
-
-.bss
-// Per-CPU context switch target RSP (0 = no switch, non-zero = switch to this RSP)
-// For SMP, this would be per-CPU, but for now single-CPU
-.global _context_switch_target_rsp
-_context_switch_target_rsp: .zero 8
-
-// Flag indicating if the target thread is NEW (1) or RESUMED (0)
-// NEW threads need RSP loaded from context, RESUMED threads use iretq
-.global _context_switch_is_new_thread
-_context_switch_is_new_thread: .zero 8
-
-// Temporary storage for is_new_thread flag during restore
-// Used to avoid destroying RAX when checking if this is a new thread
-_temp_is_new_thread: .zero 8
-
-// Error code stashed by the error-code exception stubs before they unify
-// the stack frame with the no-error-code vectors
-_irq_last_error_code: .zero 8
 
 .data
 _native_x64_irq_table:
@@ -628,7 +629,8 @@ irq\n\()_stub:
     // and the 16-byte alignment of the __managed__irq call depend on a
     // uniform frame. (Leaving the extra qword put RSP 8 bytes off; the first
     // movaps in managed code then raised #GP, recursing to a triple fault.)
-    pop qword ptr [rip + _irq_last_error_code]
+    // The slot is this CPU's, in its per-CPU block.
+    pop qword ptr gs:[PERCPU_LAST_ERROR_CODE]
     .endif
     // === SAVE CONTEXT ===
     // CPU pushes: RIP, CS, RFLAGS (and RSP, SS if privilege change)
@@ -750,17 +752,18 @@ irq\n\()_stub:
     call __managed__irq
 
     // === CHECK FOR CONTEXT SWITCH ===
-    mov rax, [rip + _context_switch_target_rsp]
+    // Staged in this CPU's per-CPU block (PerCpuBlock.cs), reached through GS
+    mov rax, qword ptr gs:[PERCPU_SWITCH_TARGET_SP]
     test rax, rax
     jz .Lrestore\n
 
-    // Switch to new context - clear flags and switch stack
+    // Switch to new context - clear the slots and switch stack
     xor rcx, rcx
-    mov [rip + _context_switch_target_rsp], rcx
+    mov qword ptr gs:[PERCPU_SWITCH_TARGET_SP], rcx
 
     // Save the is_new_thread flag before clearing (we need it after restore)
-    mov rdx, [rip + _context_switch_is_new_thread]
-    mov [rip + _context_switch_is_new_thread], rcx
+    mov rdx, qword ptr gs:[PERCPU_SWITCH_IS_NEW_THREAD]
+    mov qword ptr gs:[PERCPU_SWITCH_IS_NEW_THREAD], rcx
 
     // Switch stack
     mov rsp, rax
@@ -779,7 +782,7 @@ irq\n\()_stub:
     // First, read TempRcx BEFORE restoring GPRs (so we don't destroy RAX)
     // TempRcx is at: XMM(256) + GPRs(120) + interrupt(8) + cpuflags(8) + cr2(8) = offset 400
     mov rax, [rsp + 256 + 120 + 24]  // Read TempRcx (is_new_thread flag)
-    mov [rip + _temp_is_new_thread], rax  // Save it in a global variable
+    mov qword ptr gs:[PERCPU_TEMP_IS_NEW_THREAD], rax  // Keep it in this CPU's block across the restore
 
     // Restore XMM
     movdqu xmm0, [rsp + 0]
@@ -823,7 +826,7 @@ irq\n\()_stub:
     // === EXIT PATH ===
     // Stack now: RIP, CS, RFLAGS, [RSP, SS if privilege change]
     // Check saved flag for new thread
-    cmp qword ptr [rip + _temp_is_new_thread], 0
+    cmp qword ptr gs:[PERCPU_TEMP_IS_NEW_THREAD], 0
     jnz .Lnew_thread\n
 
     // RESUMED thread or normal return - use iretq
