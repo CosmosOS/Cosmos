@@ -3,6 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/dotnet/runtime" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/Cosmos.Kernel.Native.MultiArch/ACPI/lai" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/Cosmos.Kernel.Native.MultiArch/ACPI/uacpi" vcs="Git" />
   </component>
 </project>
