@@ -685,7 +685,9 @@ public class KernelConsole
             _lock.Acquire();
             try
             {
+                EraseCursor();
                 WriteInternal(c);
+                DrawCursor();
             }
             finally
             {
@@ -748,24 +750,7 @@ public class KernelConsole
     /// Writes a string at the current cursor position.
     /// Thread-safe: uses spinlock with interrupt protection.
     /// </summary>
-    internal void Write(string text)
-    {
-        using (InternalCpu.DisableInterruptsScope())
-        {
-            _lock.Acquire();
-            try
-            {
-                foreach (char c in text)
-                {
-                    WriteInternal(c);
-                }
-            }
-            finally
-            {
-                _lock.Release();
-            }
-        }
-    }
+    internal void Write(string text)=> Write(text.AsSpan());
 
     /// <summary>
     /// Writes a span of characters at the current cursor position.
@@ -774,19 +759,28 @@ public class KernelConsole
     /// <param name="buffer">The characters to write.</param>
     internal void Write(ReadOnlySpan<char> buffer)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        const int chunkSize = 256;
+        for (int i =0; i < buffer.Length; i+= chunkSize)
         {
-            _lock.Acquire();
-            try
+            int count = Math.Min(chunkSize, buffer.Length - i);
+            var chunk = buffer.Slice(i, count);
+            using (InternalCpu.DisableInterruptsScope())
             {
-                foreach (char c in buffer)
+                _lock.Acquire();
+                try
                 {
-                    WriteInternal(c);
+                    EraseCursor();
+                    foreach (char c in chunk)
+                    {
+                        WriteInternal(c);
+                    }
+
+                    DrawCursor();
                 }
-            }
-            finally
-            {
-                _lock.Release();
+                finally
+                {
+                    _lock.Release();
+                }
             }
         }
     }
@@ -888,26 +882,42 @@ public class KernelConsole
     /// </summary>
     private void Scroll()
     {
-        // Shift all rows up by one
-        for (int row = 0; row < Rows - 1; row++)
+        Array.Copy(_cells, Cols, _cells, 0, (Rows - 1) * Cols);
+        Array.Fill(_cells, Cell.Empty(_foregroundColor, _backgroundColor), (Rows - 1) * Cols, Cols);
+
+        if (!_visible)
         {
-            for (int col = 0; col < Cols; col++)
+            return;
+        }
+
+        EraseCursor();
+
+        int visibleCols = Math.Min(Cols, Canvas.Width / _charWidth);
+        int visibleRows = Math.Min(Rows, Canvas.Height / _charHeight);
+        if (visibleCols <= 0 || visibleRows <= 0)
+        {
+            return;
+        }
+
+        int width = visibleCols * _charWidth;
+        int copyHeight = (visibleRows - 1) * _charHeight;
+
+        if (copyHeight > 0)
+        {
+            Canvas.CopyPixels(0, _charHeight, 0, 0, width, copyHeight);
+        }
+
+        if (visibleRows == Rows)
+        {
+            Canvas.DrawFilledRectangle(Color.FromArgb((int)_backgroundColor), 0, copyHeight, width, _charHeight);
+        }
+        else
+        {
+            for (int col = 0; col < visibleCols; col++)
             {
-                int currentIndex = GetIndex(row, col);
-                int nextIndex = GetIndex(row + 1, col);
-                _cells[currentIndex] = _cells[nextIndex];
+                DrawCharAt(col, visibleRows - 1);
             }
         }
-
-        // Clear the last row
-        for (int col = 0; col < Cols; col++)
-        {
-            int index = GetIndex(Rows - 1, col);
-            _cells[index] = Cell.Empty(_foregroundColor, _backgroundColor);
-        }
-
-        // Redraw the entire screen (lock already held)
-        RedrawInternal();
     }
 
     /// <summary>

@@ -135,6 +135,7 @@
     <!-- The ISO 9660 suite reads its fixture images, embedded in the test
          kernel, through ResourceManager. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Iso9660" />
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.System" />
   </ItemGroup>
 
   <ItemGroup>
