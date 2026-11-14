@@ -61,13 +61,16 @@ public static class SchedulerManager
     // keep GetBusyCpuTimeNs monotonic across thread lifecycle.
     private static ulong s_exitedNonIdleRuntimeNs;
 
-    // The set a thread created from an idle thread takes (SMP phase 3b):
-    // CPU 0 until a kernel widens it through the ring. Read and written
-    // under the registry lock, so a reader never sees half of a change.
-    // Set in Initialize: a static initializer would give the manager a
-    // class constructor, which runs through a lock that needs a current
-    // thread, and the manager is reached from boot before one exists.
+    // The set a thread created from an idle thread takes, once a kernel has
+    // set one through the ring; until then the default is the compute CPUs
+    // (SMP phase 5), read when asked since the application processors come
+    // online after the manager is initialized. Both read and written under
+    // the registry lock, so a reader never sees half of a change. No
+    // initializer: it would give the manager a class constructor, which runs
+    // through a lock that needs a current thread, and the manager is reached
+    // from boot before one exists.
     private static CpuSet s_defaultAffinity;
+    private static bool s_defaultAffinitySet;
 
     /// <summary>
     /// The CPUs the kernel's own service threads run on, whatever
@@ -160,7 +163,6 @@ public static class SchedulerManager
         ThrowIfDisabled();
 
         s_cpuCount = cpuCount;
-        s_defaultAffinity = HousekeepingCpus;
         s_cpuStates = new PerCpuState[cpuCount];
 
         for (uint i = 0; i < cpuCount; i++)
@@ -345,10 +347,11 @@ public static class SchedulerManager
     // ========== Affinity ==========
 
     /// <summary>
-    /// The CPU set a thread created from an idle thread takes: CPU 0 until a
-    /// kernel sets it. A thread created from any other thread takes its
-    /// creator's set. Only the threads <c>System.Threading.Thread</c> starts
-    /// look here; the kernel's own are <see cref="HousekeepingCpus"/>.
+    /// The CPU set a thread created from an idle thread takes:
+    /// <see cref="ComputeCpus"/> until a kernel sets it. A thread created
+    /// from any other thread takes its creator's set. Only the threads
+    /// <c>System.Threading.Thread</c> starts look here; the kernel's own are
+    /// <see cref="HousekeepingCpus"/>.
     /// </summary>
     internal static CpuSet DefaultAffinity
     {
@@ -356,8 +359,13 @@ public static class SchedulerManager
         {
             using (s_registryLock.AcquireIrqSafe())
             {
-                return s_defaultAffinity;
+                if (s_defaultAffinitySet)
+                {
+                    return s_defaultAffinity;
+                }
             }
+
+            return ComputeCpus;
         }
     }
 
@@ -377,9 +385,69 @@ public static class SchedulerManager
         using (s_registryLock.AcquireIrqSafe())
         {
             s_defaultAffinity = affinity;
+            s_defaultAffinitySet = true;
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// The CPUs left to a kernel's own work: every online CPU but the
+    /// housekeeping ones, or every online CPU when that leaves none (a
+    /// machine with one CPU). A snapshot, as <see cref="OnlineCpus"/> is.
+    /// </summary>
+    internal static CpuSet ComputeCpus
+    {
+        get
+        {
+            CpuSet online = OnlineCpus;
+            CpuSet compute = online.Without(0);
+            return compute.IsEmpty ? online : compute;
+        }
+    }
+
+    /// <summary>
+    /// How many CPUs CoreLib is told the process has
+    /// (<c>RhGetProcessCpuCount</c>, behind <c>Environment.ProcessorCount</c>):
+    /// the CPUs <see cref="DefaultAffinity"/> names, since those are the ones
+    /// the threads CoreLib sizes itself for (the thread pool's workers) run
+    /// on, and the count honors the affinity mask on Linux and Windows too.
+    /// Counted over the CPUs the bootloader lists, not the ones online:
+    /// CoreLib reads the count once and keeps it, <c>Lock</c> on its first
+    /// contention included, which can come before the application
+    /// processors are released, and every listed CPU comes online or the
+    /// boot stops. 1 with the scheduler compiled out.
+    /// </summary>
+    internal static int ProcessCpuCount
+    {
+        get
+        {
+            if (!IsEnabled)
+            {
+                return 1;
+            }
+
+            uint listed = s_cpuStates is null ? Smp.CpuCount : s_cpuCount;
+            CpuSet affinity;
+            bool isSet;
+            using (s_registryLock.AcquireIrqSafe())
+            {
+                affinity = s_defaultAffinity;
+                isSet = s_defaultAffinitySet;
+            }
+
+            // Unset, the default is every listed CPU but CPU 0.
+            int count = 0;
+            for (uint cpu = 0; cpu < listed; cpu++)
+            {
+                if (isSet ? affinity.Contains(cpu) : cpu != 0)
+                {
+                    count++;
+                }
+            }
+
+            return count == 0 ? (int)Math.Max(listed, 1) : count;
+        }
     }
 
     /// <summary>

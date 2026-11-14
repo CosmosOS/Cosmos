@@ -13,11 +13,15 @@ namespace Cosmos.Kernel.System.Threading;
 /// scheduler (<c>CosmosEnableScheduler</c>).
 /// <para>
 /// The split is a default, not a mechanism: the kernel's own service threads
-/// (the finalizer, the driver kit's, the console sessions', audio) stay on
-/// <see cref="Housekeeping"/> whatever the default says, and a kernel that
-/// wants its main flow everywhere sets <see cref="DefaultAffinity"/> to
-/// <see cref="Online"/> before it creates threads. A thread allocates on
-/// whichever CPU it runs: the collector stops every CPU (SMP phase 4).
+/// (the finalizer, the driver kit's, the console sessions', audio, alarms) stay on
+/// <see cref="Housekeeping"/> whatever the default says, where the device
+/// interrupts and the timers' callbacks are, and the threads a kernel starts
+/// from <c>Main</c> go to <see cref="Compute"/>, where the scheduler spreads
+/// them. A kernel that wants its main flow everywhere sets
+/// <see cref="DefaultAffinity"/> to <see cref="Online"/> before it creates
+/// threads. On two CPUs <see cref="Compute"/> is CPU 1 alone, so those threads
+/// share one CPU, as they did on one. A thread allocates on whichever CPU it
+/// runs: the collector stops every CPU.
 /// </para>
 /// </summary>
 public static class KernelCpus
@@ -45,15 +49,7 @@ public static class KernelCpus
     /// <see cref="Housekeeping"/>, or <see cref="Online"/> itself on a
     /// machine with one CPU.
     /// </summary>
-    public static CpuSet Compute
-    {
-        get
-        {
-            CpuSet online = Online;
-            CpuSet compute = online.Without(0);
-            return compute.IsEmpty ? online : compute;
-        }
-    }
+    public static CpuSet Compute => SchedulerManager.IsReady ? new(SchedulerManager.ComputeCpus) : Housekeeping;
 
     /// <summary>
     /// The index of the CPU this code runs on, exact on every read, with or
@@ -64,8 +60,11 @@ public static class KernelCpus
 
     /// <summary>
     /// The set a thread created from the boot thread (<c>Main</c>) takes:
-    /// <see cref="Housekeeping"/> until a kernel sets it. A thread created
-    /// from any other thread takes its creator's set.
+    /// <see cref="Compute"/> until a kernel sets it. A thread created from
+    /// any other thread takes its creator's set. It is also what
+    /// <c>Environment.ProcessorCount</c> counts, and CoreLib keeps the count
+    /// it reads the first time something asks: set the default first thing,
+    /// or the thread pool keeps the size it took for the set it found.
     /// </summary>
     /// <exception cref="InvalidOperationException">On set: scheduler support is compiled out, or the scheduler is not up yet.</exception>
     /// <exception cref="ArgumentException">On set: the set is empty, or names no CPU under <see cref="Count"/>.</exception>
