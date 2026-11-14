@@ -324,6 +324,13 @@ public class Kernel : Sys.Kernel
         // to the user-style Round-Robin policy (RoundRobinScheduler.cs), the
         // Round-Robin semantics, and the switch back. Kept last: they replace
         // the installed policy, so nothing else should run between the swaps.
+        // They compare the shares of threads that compete for one CPU and
+        // read that CPU's run queue, so their workers stay on the CPU Main
+        // runs on: under the default set each would take a compute CPU of
+        // its own (SMP phase 5, CosmosOS/Cosmos#3343) and no queue would
+        // ever hold two of them.
+        Sys.Threading.CpuSet mainFlow = Sys.Threading.KernelCpus.DefaultAffinity;
+        Sys.Threading.KernelCpus.DefaultAffinity = Sys.Threading.KernelCpus.Housekeeping;
         TR.Run("RoundRobin_Hooks_ReadyTail_PickHead", TestRoundRobinHooksFifoOrder);
         TR.Run("RoundRobin_Hooks_DoubleReady_QueuesOnce", TestRoundRobinHooksReadyIsIdempotent);
         TR.Run("RoundRobin_Hooks_QuantumAccounting", TestRoundRobinHooksQuantumAccounting);
@@ -343,6 +350,7 @@ public class Kernel : Sys.Kernel
         TR.Run("RoundRobin_BlockedThread_LeavesRunQueue", TestRoundRobinBlockedLeavesQueue);
         TR.Run("SetScheduler_RestoresStrideDefault", TestSetSchedulerRestoresStride);
         TR.Run("SetScheduler_RehomesLiveThreads", TestSetSchedulerRehomesLiveThreads);
+        Sys.Threading.KernelCpus.DefaultAffinity = mainFlow;
 
         // Console.Read on a session thread (CosmosOS/Cosmos#3276): the reader
         // blocks for a line and hands it out character by character
@@ -697,7 +705,7 @@ public class Kernel : Sys.Kernel
 
     private static void StackSizeProbeWorker()
     {
-        s_observedStackSize = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())!.CurrentThread!.StackSize;
+        s_observedStackSize = SchedulerManager.CurrentThread!.StackSize;
         s_observedStackSufficient = RuntimeHelpers.TryEnsureSufficientExecutionStack();
         s_stackSizeProbeDone = true;
     }
@@ -976,7 +984,9 @@ public class Kernel : Sys.Kernel
     // the waiter, the next interrupt exit switches to it, and the waiter
     // could take the mutex, release it and exit before the TryAcquire, which
     // would then find the mutex free and report a barge that never happened
-    // (#3385).
+    // (#3385). A mask holds back only the threads of its own CPU, so holder
+    // and contender share one: on a CPU of its own the contender is resumed by
+    // the wake's interrupt while the holder is still inside its scope.
     private static Cosmos.Kernel.Core.Scheduler.Mutex? s_handoffMutex;
     private static volatile bool s_handoffWorkerHolding;
     private static volatile bool s_handoffReleaseRequested;
@@ -991,16 +1001,16 @@ public class Kernel : Sys.Kernel
         s_handoffContenderAcquired = false;
         s_handoffBargeResult = BargeResultPending;
 
-        var holder = new global::System.Threading.Thread(HandoffHolderWorker);
-        holder.Start();
+        SysThread holder = new(HandoffHolderWorker);
+        StartOnMainCpu(holder);
         for (int i = 0; i < FlagPollRetries && !s_handoffWorkerHolding; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         Assert.True(s_handoffWorkerHolding, "holder should own the mutex");
 
-        var contender = new global::System.Threading.Thread(HandoffContenderWorker);
-        contender.Start();
+        SysThread contender = new(HandoffContenderWorker);
+        StartOnMainCpu(contender);
         // Give the contender a few quanta to park in _waitingThreads.
         TimerManager.Wait(ContenderParkWaitMs);
 
@@ -1508,8 +1518,11 @@ public class Kernel : Sys.Kernel
         s_killVictimRelease = false;
         s_killVictimId = 0;
 
+        // The victim shares the CPU Main runs on, so that it is queued while
+        // Main kills it: on a compute CPU of its own it would be running, and
+        // a running thread is only marked.
         SysThread victim = new(KillVictimWorker);
-        victim.Start();
+        StartOnMainCpu(victim);
         for (int i = 0; i < KillVictimPollRetries && !s_killVictimStarted; i++)
         {
             TimerManager.Wait(KillVictimPollWaitMs);
@@ -1970,8 +1983,14 @@ public class Kernel : Sys.Kernel
         s_workerOwnExInfoSlot = 0;
         SysThread worker = new SysThread(() =>
         {
-            s_workerOwnExInfoSlot = SchedulerManager.CurrentCpuState!.CurrentThread!.ExInfoHeadSlot;
-            s_workerSeenExInfoHead = PerCpuBlock.Current.CurrentExInfoHead;
+            // Masked: the worker runs on a compute CPU of the scheduler's
+            // choice, and moved between the two reads it would compare its
+            // own slot with the block of the CPU it left.
+            using (InternalCpu.DisableInterruptsScope())
+            {
+                s_workerOwnExInfoSlot = SchedulerManager.CurrentThread!.ExInfoHeadSlot;
+                s_workerSeenExInfoHead = PerCpuBlock.Current.CurrentExInfoHead;
+            }
         });
         worker.Start();
         Assert.True(worker.Join(ThrowJoinTimeoutMs), "the worker must finish");
@@ -2487,9 +2506,35 @@ public class Kernel : Sys.Kernel
     private static ulong s_spinACount, s_spinBCount;
     private static long s_observedPriorityA, s_observedPriorityB;
 
+    // Through the manager's own lookup, which a move between CPUs cannot
+    // split: the CPU's index and then that CPU's current thread, read in two
+    // steps by a worker an idle CPU may pull in between, would name the
+    // thread its old CPU runs now.
     private static SchedulerThread? CurrentSchedulerThread()
     {
-        return SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())!.CurrentThread;
+        return SchedulerManager.CurrentThread;
+    }
+
+    /// <summary>
+    /// Starts a worker that shares the CPU Main runs on. Started from Main a
+    /// thread takes the default set, the compute CPUs, and runs beside Main
+    /// on a CPU of its own (SMP phase 5, CosmosOS/Cosmos#3343); a cell whose
+    /// reasoning needs its threads to take turns on one CPU starts them
+    /// through here. The set is taken at the start, so the default is back
+    /// before this returns.
+    /// </summary>
+    private static void StartOnMainCpu(SysThread thread)
+    {
+        Sys.Threading.CpuSet mainFlow = Sys.Threading.KernelCpus.DefaultAffinity;
+        Sys.Threading.KernelCpus.DefaultAffinity = Sys.Threading.KernelCpus.Housekeeping;
+        try
+        {
+            thread.Start();
+        }
+        finally
+        {
+            Sys.Threading.KernelCpus.DefaultAffinity = mainFlow;
+        }
     }
 
     /// <summary>

@@ -1,7 +1,9 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Threading;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Scheduler;
@@ -28,12 +30,18 @@ namespace Cosmos.Kernel.Tests.Smp;
 /// to prove it. A worker comes back to CPU 0 before it exits because the cells prove the
 /// move each way. Two cells share the ring's structures between CPUs (CosmosOS/Cosmos#3347,
 /// SMP phase 4b): the keyboard's queue filled on CPU 0 and drained on CPU 1, and the tick
-/// source's registry registered into from CPUs 1 to 3 while CPU 0 ticks.
+/// source's registry registered into from CPUs 1 to 3 while CPU 0 ticks. The last cells are
+/// placement's (CosmosOS/Cosmos#3343, SMP phase 5): a thread started from Main takes the
+/// compute CPUs and the scheduler spreads such threads over them, an idle CPU pulls work
+/// from a busy one, a sleeper wakes on its own CPU's tick, the thread pool sizes itself for
+/// the compute CPUs, and the kernel's own threads stay on CPU 0. Since that phase a worker
+/// started from Main no longer begins on CPU 0, so the cells that move a worker away from
+/// CPU 0 start it under a housekeeping default (<see cref="StartOnHousekeeping"/>).
 /// </summary>
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 31;
+    private const int ExpectedTestCount = 39;
 
     /// <summary>CPUs the smp4 cell's machine has: what the bootloader lists and the kernel starts there.</summary>
     private const uint Smp4CpuCount = 4;
@@ -46,6 +54,31 @@ public class Kernel : Sys.Kernel
     private const int SpinWindowMs = 200;
     /// <summary>Maximum wait (ms) for a worker to exit once released on CPU 0.</summary>
     private const int JoinTimeoutMs = 30_000;
+    /// <summary>Times the wake cell parks its worker and wakes it again.</summary>
+    private const int WakeRounds = 20;
+    /// <summary>The CPU the sleep cell pins its worker to: not CPU 0, whose tick alone woke every sleeper before.</summary>
+    private const uint SleepCpu = 2;
+    /// <summary>Times the sleep cell's worker sleeps on its CPU.</summary>
+    private const int SleepRounds = 10;
+    /// <summary>How long (ms) each of those sleeps lasts: two ticks.</summary>
+    private const int SleepMs = 20;
+    /// <summary>Window (ms) the parallel cell's calibration counts iterations across: the work of one of its spinners.</summary>
+    private const int ParallelCalibrationMs = 300;
+    /// <summary>Iterations the calibration runs between two looks at the clock.</summary>
+    private const int ParallelChunk = 10_000;
+    /// <summary>Spinners the parallel cell runs at once: one more than the four-CPU cell has compute CPUs, so one CPU holds two until another is free to pull one.</summary>
+    private const int ParallelSpinners = 4;
+    /// <summary>
+    /// Attempts at the parallel cell's timing. The claim is about what the machine can do, and
+    /// a host that deschedules a virtual CPU for a while stretches one attempt, not all three.
+    /// </summary>
+    private const int ParallelAttempts = 3;
+    /// <summary>Work items the pool cell queues: several rounds for a pool sized to the compute CPUs.</summary>
+    private const int PoolWorkItems = 12;
+    /// <summary>How long (ms) each of those work items spins, noting the CPUs it runs on.</summary>
+    private const int PoolWorkMs = 150;
+    /// <summary>Delay (ms) of the alarm the housekeeping cell schedules to bring the alarm thread up.</summary>
+    private const int AlarmDelayMs = 20;
     /// <summary>
     /// Looks for a thread among what a CPU holds; a tick between two looks swaps the current
     /// thread and the queue, so a handful of looks is enough.
@@ -106,6 +139,21 @@ public class Kernel : Sys.Kernel
     private static volatile uint s_pingPongWrong;
     private static volatile bool s_pingPongDone;
 
+    private static volatile uint s_creatorCpuBefore;
+    private static volatile uint s_creatorCpuAfter;
+    private static volatile uint s_infoCpu;
+    private static volatile int s_wakeCount;
+    private static volatile int s_wakeCpuChanges;
+    private static volatile int s_sleepsDone;
+    private static volatile int s_sleepWrongCpu;
+    private static long s_workIterations;
+    private static ulong s_workSink;
+    private static long[]? s_workFinished;
+    private static int s_workNextIndex;
+    private static int s_poolCpuMask;
+    private static int s_poolDone;
+    private static volatile uint s_alarmCpu;
+
     private static volatile int s_keysTyped;
     private static volatile int s_keysRead;
     private static volatile int s_keysWrong;
@@ -136,8 +184,9 @@ public class Kernel : Sys.Kernel
         // The CPUs the kernel reports, and the default set
         TR.Run("KernelCpus_ReportsCountOnlineHousekeepingCompute", () => TestKernelCpusReports(smp));
         TR.Run("KernelCpus_Current_IsBootCpuFromMain", TestKernelCpusCurrentFromMain);
-        TR.Run("KernelCpus_DefaultAffinity_IsHousekeeping", TestDefaultAffinityIsHousekeeping);
+        TR.Run("KernelCpus_DefaultAffinity_IsCompute", TestDefaultAffinityIsCompute);
         TR.Run("KernelCpus_DefaultAffinity_Set_RefusesEmptyAndUnmanaged", TestDefaultAffinitySetRefuses);
+        TR.Run("Environment_ProcessorCount_CountsDefaultAffinity", TestProcessorCountCountsDefaultAffinity);
 
         // Inheritance at the two creation seams
         TR.Run("Thread_InheritsCreatorAffinity", TestThreadInheritsCreatorAffinity);
@@ -167,6 +216,16 @@ public class Kernel : Sys.Kernel
         // The ring's locks across CPUs (SMP phase 4b)
         TR.RunIf(smp, "Keyboard_EnqueueFromCpu0_ReadFromComputeCpu", TestKeyboardEnqueueFromCpu0ReadFromComputeCpu, OneCpuCell);
         TR.RunIf(smp, "Timer_RegisterFromComputeCpu_FiresOnCpu0", TestTimerRegisterFromComputeCpuFiresOnCpu0, OneCpuCell);
+
+        // Placement and load balancing (SMP phase 5). The pool cell after the ones that
+        // count on idle compute CPUs: its workers stay around once it is done.
+        TR.RunIf(smp, "Placement_ThreadsFromMain_SpreadOverComputeCpus", TestThreadsFromMainSpreadOverComputeCpus, OneCpuCell);
+        TR.RunIf(smp, "Placement_WokenThread_StaysOnItsCpuWhileIdle", TestWokenThreadStaysOnItsCpuWhileIdle, OneCpuCell);
+        TR.RunIf(smp, "Sleep_OnComputeCpu_WakesOnItsOwnTick", TestSleepOnComputeCpuWakesOnItsOwnTick, OneCpuCell);
+        TR.RunIf(smp, "Balance_IdleCpuPullsRunnable", TestBalanceIdleCpuPullsRunnable, OneCpuCell);
+        TR.RunIf(smp, "Parallel_FourSpinnersFinishInUnderTwiceOneSpinnersTime", TestFourSpinnersFinishInUnderTwiceOneSpinnersTime, OneCpuCell);
+        TR.RunIf(smp, "ThreadPool_WorkersSpreadAcrossCpus", TestThreadPoolWorkersSpreadAcrossCpus, OneCpuCell);
+        TR.Run("DriverKit_ThreadsStayOnHousekeepingCpu", TestKernelThreadsStayOnHousekeepingCpu);
 
         TR.Finish();
 
@@ -333,9 +392,17 @@ public class Kernel : Sys.Kernel
         Assert.Equal(0u, (uint)SysThread.GetCurrentProcessorId());
     }
 
-    private static void TestDefaultAffinityIsHousekeeping()
+    private static void TestDefaultAffinityIsCompute()
     {
-        Assert.Equal(KernelCpus.Housekeeping, KernelCpus.DefaultAffinity, "nothing leaves CPU 0 until a kernel says so");
+        Assert.Equal(KernelCpus.Compute, KernelCpus.DefaultAffinity, "a thread started from Main takes the compute CPUs until a kernel says otherwise");
+        Assert.True(KernelCpus.Count == 1 || !KernelCpus.DefaultAffinity.Contains(0), "which leave CPU 0 out when there is another");
+    }
+
+    // What CoreLib sizes itself for is the default set, not the CPUs online: the thread pool's
+    // workers run where that set says, and it reads the count once.
+    private static void TestProcessorCountCountsDefaultAffinity()
+    {
+        Assert.Equal(KernelCpus.Compute.Count, Environment.ProcessorCount, "Environment.ProcessorCount is the count of the default set");
     }
 
     private static void TestDefaultAffinitySetRefuses()
@@ -360,7 +427,7 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.Equal(2, threw, "an empty set and a set naming no CPU under Count are refused");
-        Assert.Equal(KernelCpus.Housekeeping, KernelCpus.DefaultAffinity, "a refused set leaves the default alone");
+        Assert.Equal(KernelCpus.Compute, KernelCpus.DefaultAffinity, "a refused set leaves the default alone");
     }
 
     // ===== Inheritance =====
@@ -381,11 +448,15 @@ public class Kernel : Sys.Kernel
     {
         ThreadAffinity.Current = WidenedSet;
         SysThread child = new(InheritanceChild);
+        s_creatorCpuBefore = KernelCpus.Current;
         child.Start();
+        s_creatorCpuAfter = KernelCpus.Current;
         child.Join();
     }
 
-    // A thread takes its creator's set, and the creating CPU as its ideal CPU.
+    // A thread takes its creator's set, and the creating CPU as its ideal CPU. The creator's
+    // set names two CPUs, so the scheduler may move it between them: it reports the CPU it
+    // ran on around the start, and the child's ideal CPU is one of the two.
     private static void TestThreadInheritsCreatorAffinity()
     {
         s_childReported = false;
@@ -394,7 +465,8 @@ public class Kernel : Sys.Kernel
         Assert.True(creator.Join(JoinTimeoutMs), "the creator and its child exit");
         Assert.True(s_childReported, "the child ran");
         Assert.Equal(WidenedSet, s_childSet, "the child carries the set its creator had when it started it");
-        Assert.Equal(0u, s_childIdeal, "the ideal CPU is the CPU the child was created on");
+        Assert.True(s_childIdeal == s_creatorCpuBefore || s_childIdeal == s_creatorCpuAfter, "the ideal CPU is the CPU the child was created on");
+        Assert.True(WidenedSet.Contains(s_childIdeal), "and is inside the child's set");
     }
 
     private static void InheritedReporter()
@@ -417,12 +489,12 @@ public class Kernel : Sys.Kernel
         }
         finally
         {
-            KernelCpus.DefaultAffinity = KernelCpus.Housekeeping;
+            KernelCpus.DefaultAffinity = KernelCpus.Compute;
         }
 
         Assert.True(s_inheritedReported, "the worker ran");
         Assert.Equal(WidenedSet, s_inheritedSet, "a thread started from Main takes the default set");
-        Assert.Equal(KernelCpus.Housekeeping, KernelCpus.DefaultAffinity, "the default is back to housekeeping");
+        Assert.Equal(KernelCpus.Compute, KernelCpus.DefaultAffinity, "the default is back to the compute CPUs");
     }
 
     private static void KernelThreadBody()
@@ -444,7 +516,7 @@ public class Kernel : Sys.Kernel
         }
         finally
         {
-            KernelCpus.DefaultAffinity = KernelCpus.Housekeeping;
+            KernelCpus.DefaultAffinity = KernelCpus.Compute;
         }
 
         WaitForFlag(() => s_kernelThreadReported, "the kernel thread reported");
@@ -460,7 +532,15 @@ public class Kernel : Sys.Kernel
         {
         }
 
-        SchedulerDiagnostics.TryGetCurrentThread(KernelCpus.Current, out s_info);
+        // Masked: the worker's set names two CPUs, and moved between the read of its CPU
+        // and the snapshot it would snapshot whatever its old CPU runs.
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            uint cpu = KernelCpus.Current;
+            s_infoCpu = cpu;
+            SchedulerDiagnostics.TryGetCurrentThread(cpu, out s_info);
+        }
+
         s_infoReported = true;
     }
 
@@ -468,15 +548,14 @@ public class Kernel : Sys.Kernel
     {
         s_proceed = false;
         s_infoReported = false;
-        SysThread worker = new(InfoReporter);
-        worker.Start();
+        SysThread worker = StartOnHousekeeping(InfoReporter);
         Assert.True(ThreadAffinity.Set(worker, WidenedSet), "the running worker takes the set");
         s_proceed = true;
         Assert.True(worker.Join(JoinTimeoutMs), "the worker exits");
         Assert.True(s_infoReported, "the worker snapshotted itself");
         Assert.Equal(WidenedSet, s_info.Affinity, "the snapshot carries the set");
-        Assert.Equal(0u, s_info.IdealCpu, "the snapshot carries the ideal CPU");
-        Assert.Equal(0u, s_info.CpuId);
+        Assert.Equal(0u, s_info.IdealCpu, "the snapshot carries the ideal CPU, the CPU the worker was created on");
+        Assert.Equal(s_infoCpu, s_info.CpuId, "and the CPU the worker runs on");
         Assert.False(s_info.IsIdle);
         Assert.True(s_info.IsManaged);
     }
@@ -649,11 +728,29 @@ public class Kernel : Sys.Kernel
         return Volatile.Read(ref s_counters![cpu]);
     }
 
+    // Starts a worker whose set is CPU 0 alone, as every thread started from Main was before
+    // placement: the default set is the compute CPUs now, so the worker is started under a
+    // housekeeping default, put back before this returns. What the cells that move a thread
+    // away from CPU 0, and back, start from.
+    private static SysThread StartOnHousekeeping(ThreadStart body)
+    {
+        CpuSet previous = KernelCpus.DefaultAffinity;
+        KernelCpus.DefaultAffinity = KernelCpus.Housekeeping;
+        try
+        {
+            SysThread worker = new(body);
+            worker.Start();
+            return worker;
+        }
+        finally
+        {
+            KernelCpus.DefaultAffinity = previous;
+        }
+    }
+
     private static SysThread StartSpinner()
     {
-        SysThread worker = new(Spinner);
-        worker.Start();
-        return worker;
+        return StartOnHousekeeping(Spinner);
     }
 
     private static void WaitForFlag(Func<bool> flag, string what)
@@ -927,8 +1024,7 @@ public class Kernel : Sys.Kernel
     {
         ResetWorkers();
         s_seenCpu = uint.MaxValue;
-        SysThread worker = new(Parker);
-        worker.Start();
+        SysThread worker = StartOnHousekeeping(Parker);
         WaitForFlag(() => s_workerThread is { State: SchedulerThreadState.Blocked }, "the worker parked on CPU 0");
 
         Assert.True(ThreadAffinity.Pin(worker, 2), "a parked worker takes a pin");
@@ -946,22 +1042,30 @@ public class Kernel : Sys.Kernel
         Assert.True(worker.Join(JoinTimeoutMs), "the worker exits on CPU 0");
     }
 
+    // A preference, not a move: a parked worker allowed on two CPUs is given the other one as
+    // its ideal CPU and stays assigned where it is. Parked, because a runnable thread allowed
+    // on two CPUs is the scheduler's to move.
     private static void TestSetIdealCpuInsideSetUpdates()
     {
         ResetWorkers();
-        SysThread worker = StartSpinner();
-        WaitForCounter(0);
+        s_seenCpu = uint.MaxValue;
+        SysThread worker = StartOnHousekeeping(Parker);
+        WaitForFlag(() => s_workerThread is { State: SchedulerThreadState.Blocked }, "the worker parked on CPU 0");
+
         Assert.True(ThreadAffinity.Set(worker, WidenedSet));
         Assert.True(ThreadAffinity.SetIdealCpu(worker, 1), "a CPU inside the set is accepted");
         Assert.True(ThreadAffinity.TryGetIdealCpu(worker, out uint ideal));
         Assert.Equal(1u, ideal);
-
-        TimerManager.Wait(SpinWindowMs);
-        Assert.Equal(0u, s_seenCpu, "a preference moves nothing: the spinner stays on CPU 0");
+        Assert.Equal(0u, s_workerThread!.CpuId, "a preference moves nothing: the worker stays assigned to CPU 0");
+        Assert.True(s_workerThread.State == SchedulerThreadState.Blocked, "and stays parked");
         Assert.True(ThreadAffinity.SetIdealCpu(worker, 0));
 
-        s_stop = true;
-        Assert.True(worker.Join(JoinTimeoutMs), "the spinner exits");
+        s_gate.Signal();
+        WaitForFlag(() => s_seenCpu != uint.MaxValue, "the worker woke");
+        Assert.True(WidenedSet.Contains(s_seenCpu), "on a CPU of its set");
+        WaitForFlag(() => s_workerThread is { State: SchedulerThreadState.Blocked }, "the worker parked again");
+        s_release.Signal();
+        Assert.True(worker.Join(JoinTimeoutMs), "the worker exits");
     }
 
     private static void TestSetIdealCpuExcludedCpuThrows()
@@ -1177,5 +1281,325 @@ public class Kernel : Sys.Kernel
 
             handles[(cpu - 1) * TimersPerRegistrar + i] = handle;
         }
+    }
+
+    // ===== Placement and load balancing (SMP phase 5, CosmosOS/Cosmos#3343) =====
+
+    // Three spinners started from Main with nothing else said: each takes the default set,
+    // the compute CPUs, and the scheduler has one on each of them, since a CPU that runs a
+    // spinner is clearly busier than one that runs none. Nothing of theirs runs on CPU 0.
+    private static void TestThreadsFromMainSpreadOverComputeCpus()
+    {
+        ResetWorkers();
+        SysThread[] workers = new SysThread[Smp4CpuCount - 1];
+        for (int i = 0; i < workers.Length; i++)
+        {
+            workers[i] = new SysThread(Spinner);
+            workers[i].Start();
+        }
+
+        for (uint cpu = 1; cpu < Smp4CpuCount; cpu++)
+        {
+            WaitForCounter(cpu);
+        }
+
+        foreach (SysThread worker in workers)
+        {
+            Assert.True(ThreadAffinity.TryGet(worker, out CpuSet set), "a spinner resolves");
+            Assert.Equal(KernelCpus.Compute, set, "a thread started from Main carries the compute set");
+        }
+
+        uint[] before = new uint[Smp4CpuCount];
+        for (uint cpu = 1; cpu < Smp4CpuCount; cpu++)
+        {
+            before[cpu] = Counter(cpu);
+        }
+
+        TimerManager.Wait(SpinWindowMs);
+        for (uint cpu = 1; cpu < Smp4CpuCount; cpu++)
+        {
+            Assert.True(Counter(cpu) > before[cpu], "every compute CPU keeps running a spinner");
+        }
+
+        Assert.Equal(0u, Counter(0), "no spinner ran on the housekeeping CPU");
+
+        s_stop = true;
+        foreach (SysThread worker in workers)
+        {
+            Assert.True(worker.Join(JoinTimeoutMs), "a spinner exits once stopped");
+        }
+
+        Assert.Equal(0, s_keptErrors, "every object the spinners allocated survived the collections");
+    }
+
+    private static void WakeLoop()
+    {
+        s_workerThread = SchedulerManager.CurrentThread;
+        uint last = uint.MaxValue;
+        int changes = 0;
+        for (int round = 0; round < WakeRounds; round++)
+        {
+            s_gate!.Wait();
+            uint cpu = KernelCpus.Current;
+            if (last != uint.MaxValue && cpu != last)
+            {
+                changes++;
+            }
+
+            last = cpu;
+            s_seenCpu = cpu;
+            s_wakeCpuChanges = changes;
+            s_wakeCount = round + 1;
+        }
+    }
+
+    // A thread allowed on every compute CPU parks and is woken from CPU 0 twenty times while
+    // those CPUs have nothing else to run. Every wake asks the policy where the thread goes,
+    // and it stays on the CPU it last ran on, where its data is: no other CPU is lighter.
+    private static void TestWokenThreadStaysOnItsCpuWhileIdle()
+    {
+        ResetWorkers();
+        s_seenCpu = uint.MaxValue;
+        s_wakeCount = 0;
+        s_wakeCpuChanges = 0;
+        SysThread worker = new(WakeLoop);
+        worker.Start();
+
+        for (int round = 0; round < WakeRounds; round++)
+        {
+            int parkedAfter = round;
+            WaitForFlag(
+                () => s_wakeCount == parkedAfter && s_workerThread is { State: SchedulerThreadState.Blocked },
+                "the worker parked");
+            s_gate.Signal();
+        }
+
+        Assert.True(worker.Join(JoinTimeoutMs), "the worker exits");
+        Assert.Equal(WakeRounds, s_wakeCount, "the worker woke every time");
+        Assert.True(KernelCpus.Compute.Contains(s_seenCpu), "on a compute CPU");
+        Assert.Equal(0, s_wakeCpuChanges, "and on the same one: every wake left it on the CPU it last ran on");
+    }
+
+    private static void Sleeper()
+    {
+        ThreadAffinity.Current = CpuSet.Single(SleepCpu);
+        int wrong = 0;
+        for (int i = 0; i < SleepRounds; i++)
+        {
+            SysThread.Sleep(SleepMs);
+            if (KernelCpus.Current != SleepCpu)
+            {
+                wrong++;
+            }
+
+            s_sleepsDone = i + 1;
+        }
+
+        s_sleepWrongCpu = wrong;
+    }
+
+    // A thread pinned to CPU 2 sleeps ten times. Each timeout is found by CPU 2's own tick,
+    // which walks the registry for the sleepers assigned to it; CPU 0's tick wakes only its
+    // own, so a sleeper nobody's tick looks for would never come back.
+    private static void TestSleepOnComputeCpuWakesOnItsOwnTick()
+    {
+        s_sleepsDone = 0;
+        s_sleepWrongCpu = -1;
+        long start = Stopwatch.GetTimestamp();
+        SysThread worker = new(Sleeper);
+        worker.Start();
+        Assert.True(worker.Join(JoinTimeoutMs), "every sleep ended");
+        long elapsedMs = (Stopwatch.GetTimestamp() - start) * 1000 / Stopwatch.Frequency;
+
+        Assert.Equal(SleepRounds, s_sleepsDone, "the sleeper slept every round");
+        Assert.Equal(0, s_sleepWrongCpu, "and woke on the CPU it is pinned to every time");
+        Assert.True(elapsedMs >= SleepRounds * SleepMs, "not before its timeouts");
+    }
+
+    // Two spinners on CPU 0 become allowed on CPU 1 as well, and nothing is asked of the
+    // scheduler: CPU 1, about to run its idle thread, pulls one of the two queued on CPU 0
+    // by itself, and from then on each CPU runs one.
+    private static void TestBalanceIdleCpuPullsRunnable()
+    {
+        ResetWorkers();
+        SysThread first = StartSpinner();
+        SysThread second = StartSpinner();
+        WaitForCounter(0);
+        Assert.Equal(0u, Counter(1), "nothing has run on CPU 1 yet");
+
+        Assert.True(ThreadAffinity.Set(first, WidenedSet) && ThreadAffinity.Set(second, WidenedSet), "both spinners may run on CPU 1");
+        WaitForCounter(1);
+        Assert.True(TryFindWorkerOn(1, out KernelThreadInfo info), "CPU 1 holds the spinner it pulled");
+        Assert.Equal(WidenedSet, info.Affinity);
+
+        uint beforeZero = Counter(0);
+        uint beforeOne = Counter(1);
+        TimerManager.Wait(SpinWindowMs);
+        Assert.True(Counter(0) > beforeZero && Counter(1) > beforeOne, "one spinner stays on CPU 0 and the other runs on CPU 1");
+
+        StopSpinners(first, second);
+    }
+
+    private static void Calibrator()
+    {
+        long deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * ParallelCalibrationMs / 1000;
+        long iterations = 0;
+        ulong x = PingPongSeed;
+        while (Stopwatch.GetTimestamp() < deadline)
+        {
+            for (int i = 0; i < ParallelChunk; i++)
+            {
+                x = x * PingPongMultiplier + (ulong)i;
+            }
+
+            iterations += ParallelChunk;
+        }
+
+        s_workSink = x;
+        Volatile.Write(ref s_workIterations, iterations);
+    }
+
+    // The same arithmetic the calibration counted, a fixed number of times. No allocation: a
+    // collection stops every CPU, and would charge every spinner the same pause.
+    private static void FixedWork()
+    {
+        long iterations = Volatile.Read(ref s_workIterations);
+        ulong x = PingPongSeed;
+        for (long i = 0; i < iterations; i++)
+        {
+            x = x * PingPongMultiplier + (ulong)i;
+        }
+
+        s_workSink = x;
+        int index = Interlocked.Increment(ref s_workNextIndex) - 1;
+        Volatile.Write(ref s_workFinished![index], Stopwatch.GetTimestamp());
+    }
+
+    // Starts that many spinners of the fixed work from Main and returns how long the last one
+    // took to finish, in Stopwatch ticks.
+    private static long TimeFixedWork(int spinners)
+    {
+        s_workFinished = new long[spinners];
+        s_workNextIndex = 0;
+        SysThread[] workers = new SysThread[spinners];
+        for (int i = 0; i < spinners; i++)
+        {
+            workers[i] = new SysThread(FixedWork);
+        }
+
+        long start = Stopwatch.GetTimestamp();
+        foreach (SysThread worker in workers)
+        {
+            worker.Start();
+        }
+
+        foreach (SysThread worker in workers)
+        {
+            Assert.True(worker.Join(JoinTimeoutMs), "a spinner finished its work");
+        }
+
+        long last = start;
+        for (int i = 0; i < spinners; i++)
+        {
+            last = Math.Max(last, Volatile.Read(ref s_workFinished[i]));
+        }
+
+        return last - start;
+    }
+
+    // One spinner does a fixed amount of work; then four do that amount each, at once. On one
+    // CPU the four would take four times as long. Spread over the three compute CPUs, with the
+    // CPU that holds two relieved by the first one that goes idle, they take well under twice.
+    private static void TestFourSpinnersFinishInUnderTwiceOneSpinnersTime()
+    {
+        s_workIterations = 0;
+        SysThread calibrator = new(Calibrator);
+        calibrator.Start();
+        Assert.True(calibrator.Join(JoinTimeoutMs), "the calibration ended");
+        Assert.True(Volatile.Read(ref s_workIterations) > 0, "and counted some work");
+
+        long one = 0;
+        long four = 0;
+        bool under = false;
+        for (int attempt = 0; attempt < ParallelAttempts && !under; attempt++)
+        {
+            one = TimeFixedWork(1);
+            four = TimeFixedWork(ParallelSpinners);
+            under = four < 2 * one;
+        }
+
+        long frequency = Stopwatch.Frequency;
+        Log.WriteString($"[Smp] One spinner: {one * 1000 / frequency} ms, four at once: {four * 1000 / frequency} ms\n");
+        Assert.True(under, "four spinners finish in under twice the time one takes: they ran on several CPUs at once");
+    }
+
+    private static void PoolWork(object? state)
+    {
+        long deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * PoolWorkMs / 1000;
+        while (Stopwatch.GetTimestamp() < deadline)
+        {
+            Interlocked.Or(ref s_poolCpuMask, 1 << (int)KernelCpus.Current);
+        }
+
+        Interlocked.Increment(ref s_poolDone);
+    }
+
+    // CoreLib's thread pool reads Environment.ProcessorCount, the count of the default set, and
+    // keeps that many workers; started from Main they take the compute CPUs, and a dozen work
+    // items that each spin for a while end up running on more than one of them, none on CPU 0.
+    private static void TestThreadPoolWorkersSpreadAcrossCpus()
+    {
+        ThreadPool.GetMinThreads(out int minWorkers, out _);
+        Assert.Equal(Environment.ProcessorCount, minWorkers, "the pool keeps a worker per CPU of the default set");
+
+        s_poolCpuMask = 0;
+        s_poolDone = 0;
+        for (int i = 0; i < PoolWorkItems; i++)
+        {
+            Assert.True(ThreadPool.QueueUserWorkItem(PoolWork), "a work item is queued");
+        }
+
+        for (int waited = 0; waited < JoinTimeoutMs && Volatile.Read(ref s_poolDone) < PoolWorkItems; waited += PollIntervalMs)
+        {
+            TimerManager.Wait(PollIntervalMs);
+        }
+
+        Assert.Equal(PoolWorkItems, Volatile.Read(ref s_poolDone), "every work item ran");
+        int mask = Volatile.Read(ref s_poolCpuMask);
+        Assert.True((mask & 1) == 0, "no work item ran on the housekeeping CPU");
+        Assert.True(BitOperations.PopCount((uint)mask) >= 2, "the pool's workers ran on more than one CPU");
+    }
+
+    // What placement does not move: the kernel's own threads (the driver kit's worker and its
+    // drivers' threads, the finalizer, the alarm thread) carry the housekeeping set and sit on
+    // CPU 0, where every device interrupt and the timers' callbacks are, after everything the
+    // cells above spread over the other CPUs. An alarm is scheduled first, from Main, so the
+    // alarm thread exists: its callback runs on CPU 0 too.
+    private static void TestKernelThreadsStayOnHousekeepingCpu()
+    {
+        s_alarmCpu = uint.MaxValue;
+        ulong alarm = AlarmManager.Schedule(static () => s_alarmCpu = KernelCpus.Current, TimeSpan.FromMilliseconds(AlarmDelayMs));
+        Assert.True(alarm != 0, "the alarm is scheduled");
+        WaitForFlag(() => s_alarmCpu != uint.MaxValue, "the alarm fired");
+        Assert.Equal(0u, s_alarmCpu, "an alarm's callback runs on the housekeeping CPU");
+
+        int kernelThreads = 0;
+        int away = 0;
+        for (int slot = 0; slot < SchedulerDiagnostics.ThreadSlotCount; slot++)
+        {
+            if (!SchedulerDiagnostics.TryGetThreadInSlot(slot, out KernelThreadInfo info) || info.IsIdle || info.IsManaged)
+            {
+                continue;
+            }
+
+            kernelThreads++;
+            if (info.Affinity != KernelCpus.Housekeeping || info.CpuId != 0)
+            {
+                away++;
+            }
+        }
+
+        Assert.True(kernelThreads >= 2, "the driver kit's worker and the alarm thread, at least");
+        Assert.Equal(0, away, "every thread of the kernel's own carries the housekeeping set and is assigned to CPU 0");
     }
 }
