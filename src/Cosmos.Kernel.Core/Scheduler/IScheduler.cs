@@ -21,13 +21,14 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// run under no lock, with interrupts masked, and may allocate.
 /// </para>
 /// <para>
-/// Several hooks have no mechanism-side caller a policy can count on:
-/// <see cref="SelectCpu"/>, <see cref="OnThreadMigrate"/> and
-/// <see cref="OnPickFailed"/> run only when a thread's CPU set takes it off
-/// its CPU, and the default set is CPU 0 until a kernel widens it;
-/// <see cref="Balance"/> is reached only through
-/// <see cref="SchedulerManager.Balance"/>, which nothing calls until
-/// placement lands (SMP phase 5); and nothing in-tree sets priorities.
+/// Three hooks spread threads over the CPUs (SMP phase 5):
+/// <see cref="SelectCpu"/> places a thread when it is created and at every
+/// wake, <see cref="Balance"/> names a thread for a CPU to pull when it is
+/// about to run idle and once in a hundred of its ticks, and
+/// <see cref="OnThreadMigrate"/> moves the bookkeeping of a queued thread the
+/// mechanism moves. On one CPU none of them runs. Two hooks have no caller a
+/// policy can count on: <see cref="OnPickFailed"/> runs only when a set
+/// change takes a thread off its CPU, and nothing in-tree sets priorities.
 /// Implement them, but do not expect them to be exercised.
 /// </para>
 /// <para>
@@ -170,7 +171,10 @@ public interface IScheduler
     /// <see cref="OnThreadYield"/> after this call, and does not remove the
     /// incoming one, so leaving it queued grants it a second turn. The
     /// manager does not check the thread's state either, so never return one
-    /// that is dead or parked.
+    /// that is dead or parked. After a <see langword="null"/> on a machine
+    /// with several CPUs the mechanism asks <see cref="Balance"/>, and when a
+    /// thread was pulled it calls this hook once more for the same
+    /// reschedule: a <see langword="null"/> must leave nothing behind.
     /// </returns>
     SchedulerThread? PickNext(PerCpuState cpuState);
 
@@ -209,14 +213,33 @@ public interface IScheduler
     /// <summary>
     /// Choose the CPU a thread goes to, among <paramref name="allowed"/>: the
     /// thread's effective set, never empty, which the mechanism computed from
-    /// <see cref="SchedulerThread.Affinity"/> and the CPUs online. Called when
-    /// a thread is created on a CPU its set excludes, when a set change
-    /// excludes the thread's CPU, and from the interrupt exit that evicts a
-    /// running thread for the same reason; the answer is checked against the
-    /// set and <paramref name="allowed"/>'s first CPU is used when it is not
-    /// in it. Under no queue lock: what the hook reads of other CPUs' data is
-    /// a snapshot. Must not allocate. <see cref="SchedulerThread.IdealCpu"/>
-    /// is the thread's preference and is inside the set.
+    /// <see cref="SchedulerThread.Affinity"/> and the CPUs online. Called
+    /// when a thread is created, which places its first start
+    /// (<see cref="SchedulerThreadState.Created"/>, with
+    /// <see cref="SchedulerThread.CpuId"/> and
+    /// <see cref="SchedulerThread.IdealCpu"/> both the creating CPU, in the
+    /// set or not); at every wake of a parked thread no CPU is on
+    /// (<see cref="SchedulerThreadState.Blocked"/> or
+    /// <see cref="SchedulerThreadState.Sleeping"/>, with
+    /// <see cref="SchedulerThread.CpuId"/> the CPU it parked on, or the one
+    /// a set change moved it to since), from whatever context wakes it, an
+    /// interrupt handler included; when a set change excludes the thread's
+    /// CPU; and from the interrupt exit that evicts a running thread for
+    /// the same reason. Not called when <paramref name="allowed"/> names one
+    /// CPU, which is the answer. The answer is checked against the set and
+    /// <paramref name="allowed"/>'s first CPU is used when it is not in it.
+    /// It places the thread and promises nothing more: the wake that asked
+    /// may find the thread runnable already, or asleep again on a later
+    /// deadline, and then no other hook follows. Under no queue lock, though
+    /// the caller may hold a lock of its own (a primitive wakes its waiter
+    /// under its guard): what the hook reads of other CPUs' data is a
+    /// snapshot, and a structure another CPU rewrites is walked under that
+    /// CPU's lock (<see cref="SchedulerManager.LockCpu"/>). Must not
+    /// allocate or block. <see cref="SchedulerThread.IdealCpu"/> is the
+    /// thread's preference and can name a CPU outside
+    /// <paramref name="allowed"/>: at a creation, and in the two calls a set
+    /// change causes, where the mechanism repoints it only once the thread
+    /// has moved.
     /// </summary>
     /// <param name="thread">Thread being placed.</param>
     /// <param name="cpus">Every CPU the scheduler manages, by index.</param>
@@ -236,7 +259,13 @@ public interface IScheduler
     /// set excludes that CPU, and it turns Ready right after the hook); in
     /// both cases the thread's load is accounted on
     /// <paramref name="fromState"/>, so the hook moves it. The state tells
-    /// the two apart.
+    /// the two apart. A queued thread moves when a set change excludes its
+    /// CPU and when <see cref="Balance"/> named it. A parked thread that
+    /// <see cref="SelectCpu"/> sends to another CPU at its wake is in no run
+    /// structure: it moves without this hook, and
+    /// <see cref="OnThreadReady"/> on the CPU it went to is what follows, so
+    /// whatever a policy saved at the park must not be tied to the CPU the
+    /// thread parked on.
     /// </summary>
     /// <param name="thread">Thread being migrated.</param>
     /// <param name="fromState">CPU the thread is leaving.</param>
@@ -246,12 +275,18 @@ public interface IScheduler
     /// <summary>
     /// Name a thread the policy wants pulled onto <paramref name="cpuState"/>
     /// from another CPU, the one <see cref="SchedulerThread.CpuId"/> names, or
-    /// <see langword="null"/> for none. Under no lock: what the hook reads is a
-    /// snapshot, and the mechanism checks the answer under both CPUs' queue
-    /// locks before it calls <see cref="OnThreadMigrate"/> (still Ready, still
-    /// on that CPU, its set allows <paramref name="cpuState"/>), so a stale
-    /// answer is dropped, not applied. Dormant until placement lands (SMP
-    /// phase 5): nothing in the kernel calls it today.
+    /// <see langword="null"/> for none. Called on <paramref name="cpuState"/>'s
+    /// CPU, in interrupt context, when <see cref="PickNext"/> returned
+    /// <see langword="null"/> and the CPU is about to run its idle thread, and
+    /// from its tick once in a hundred, whatever it runs; only on a machine
+    /// with several CPUs. Under no lock, with interrupts
+    /// masked: what the hook reads is a snapshot, and a run structure another
+    /// CPU rewrites is walked under that CPU's lock
+    /// (<see cref="SchedulerManager.LockCpu"/>), one CPU at a time. The
+    /// mechanism checks the answer under both CPUs' queue locks before it
+    /// calls <see cref="OnThreadMigrate"/> (still Ready, still on that CPU, no
+    /// CPU on its stack, its set allows <paramref name="cpuState"/>), so a
+    /// stale answer is dropped, not applied. Must not allocate.
     /// </summary>
     /// <param name="cpuState">CPU asking for work.</param>
     /// <param name="allCpuStates">Every CPU the scheduler manages.</param>

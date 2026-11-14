@@ -94,7 +94,8 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// <summary>
     /// The CPU the policy prefers for this thread, always inside <see cref="Affinity"/>: the
     /// CPU the thread was created on until a kernel sets it, and the CPU the thread moves to
-    /// when a set change excludes it. What <see cref="IScheduler.SelectCpu"/> reads first.
+    /// when a set change excludes it. A hint to <see cref="IScheduler.SelectCpu"/>: the default
+    /// policy starts a new thread from it, and tries it first among the lighter CPUs at a wake.
     /// </summary>
     public uint IdealCpu { get; internal set; }
 

@@ -33,7 +33,7 @@ namespace Cosmos.Kernel.Tests.Smp;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 32;
+    private const int ExpectedTestCount = 31;
 
     /// <summary>CPUs the smp4 cell's machine has: what the bootloader lists and the kernel starts there.</summary>
     private const uint Smp4CpuCount = 4;
@@ -46,8 +46,6 @@ public class Kernel : Sys.Kernel
     private const int SpinWindowMs = 200;
     /// <summary>Maximum wait (ms) for a worker to exit once released on CPU 0.</summary>
     private const int JoinTimeoutMs = 30_000;
-    /// <summary>Attempts at a pull through Balance, each a window apart, before the cell gives up.</summary>
-    private const int BalanceAttempts = 20;
     /// <summary>
     /// Looks for a thread among what a CPU holds; a tick between two looks swaps the current
     /// thread and the queue, so a handful of looks is enough.
@@ -163,7 +161,6 @@ public class Kernel : Sys.Kernel
         TR.RunIf(smp, "Affinity_SetCurrent_ReturnsOnNewCpu", TestSetCurrentReturnsOnNewCpu, OneCpuCell);
         TR.RunIf(smp, "Affinity_PingPong_KeepsStackIntact", TestPingPongKeepsStackIntact, OneCpuCell);
         TR.RunIf(smp, "Affinity_ParkedThread_MovesAndWakesOnNewCpu", TestParkedThreadMovesAndWakesOnNewCpu, OneCpuCell);
-        TR.RunIf(smp, "Balance_IdleCpuPullsQueuedThread", TestBalanceIdleCpuPullsQueuedThread, OneCpuCell);
         TR.RunIf(smp, "ThreadAffinity_SetIdealCpu_InsideSet_Updates", TestSetIdealCpuInsideSetUpdates, OneCpuCell);
         TR.RunIf(smp, "ThreadAffinity_SetIdealCpu_ExcludedCpu_Throws", TestSetIdealCpuExcludedCpuThrows, OneCpuCell);
 
@@ -947,36 +944,6 @@ public class Kernel : Sys.Kernel
         Assert.Equal(0u, s_workerThread.CpuId);
         s_release.Signal();
         Assert.True(worker.Join(JoinTimeoutMs), "the worker exits on CPU 0");
-    }
-
-    // The Balance hook, dormant in the kernel until placement lands (SMP phase 5), through
-    // the manager's entry: two spinners allowed on CPU 1 are queued on CPU 0 while Main runs,
-    // and CPU 1, idle, pulls the tail of that queue.
-    private static void TestBalanceIdleCpuPullsQueuedThread()
-    {
-        ResetWorkers();
-        SysThread first = StartSpinner();
-        SysThread second = StartSpinner();
-        WaitForCounter(0);
-        Assert.True(ThreadAffinity.Set(first, WidenedSet) && ThreadAffinity.Set(second, WidenedSet), "both spinners may run on CPU 1");
-        Assert.Equal(0u, Counter(1), "nothing has run on CPU 1 yet");
-
-        bool pulled = false;
-        for (int i = 0; i < BalanceAttempts && !pulled; i++)
-        {
-            pulled = SchedulerManager.Balance(1);
-            if (!pulled)
-            {
-                TimerManager.Wait(PollIntervalMs);
-            }
-        }
-
-        Assert.True(pulled, "the idle CPU pulled a queued spinner");
-        WaitForCounter(1);
-        Assert.True(TryFindWorkerOn(1, out KernelThreadInfo info), "CPU 1 holds the pulled spinner");
-        Assert.Equal(WidenedSet, info.Affinity);
-
-        StopSpinners(first, second);
     }
 
     private static void TestSetIdealCpuInsideSetUpdates()

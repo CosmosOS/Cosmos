@@ -40,6 +40,21 @@ internal class StrideScheduler : IScheduler
     private const ulong MaxCatchUpQuanta = 1000;
 
     /// <summary>
+    /// Share of a CPU's load, in percent, another CPU's has to be under for
+    /// <see cref="SelectCpu"/> to prefer it: a thread leaves the CPU the scan
+    /// starts from only for a clearly lighter one, so two CPUs that are about
+    /// as busy do not trade it back and forth.
+    /// </summary>
+    private const ulong LighterLoadPercent = 80;
+
+    /// <summary>
+    /// Queued threads a CPU has to hold before <see cref="Balance"/> takes
+    /// one from it: with two, the CPU keeps something to run after the pull,
+    /// its idle thread included, which waits in the queue like any other.
+    /// </summary>
+    private const int MinQueuedToSteal = 2;
+
+    /// <summary>
     /// Stopwatch ticks in one <see cref="SchedulerManager.DefaultQuantumNs"/>,
     /// captured by <see cref="InitializeCpu"/>. The tick path must not be the
     /// first reader of <see cref="Stopwatch.Frequency"/>: that read runs
@@ -328,14 +343,38 @@ internal class StrideScheduler : IScheduler
 
     public uint SelectCpu(SchedulerThread thread, PerCpuState[] cpus, CpuSet allowed)
     {
-        // The thread's preference first, then where it is, then the lowest
-        // allowed CPU; a clearly lighter allowed CPU wins over that start.
-        // The loads are read under no lock: a snapshot is enough for a
-        // placement the mechanism verifies against the set anyway.
-        uint best = allowed.Contains(thread.IdealCpu) ? thread.IdealCpu
-                  : allowed.Contains(thread.CpuId) ? thread.CpuId
+        // Where the scan starts is where the thread goes unless another CPU
+        // is clearly lighter. A woken thread starts from the CPU it is
+        // assigned to, the one it last ran on unless a set change moved it
+        // since, whose caches still hold its data: it leaves only for a CPU
+        // that carries under LighterLoadPercent of that CPU's load, so two
+        // CPUs about as busy do not trade it back and forth. Any other
+        // placement (a new thread, a thread its set took off its CPU) starts
+        // from the thread's preference, then from where it is, then from the
+        // lowest allowed CPU. The loads are read under no lock: a snapshot is
+        // enough for a placement the mechanism verifies against the set
+        // anyway.
+        uint last = thread.CpuId;
+        uint ideal = thread.IdealCpu;
+        bool waking = thread.State is SchedulerThreadState.Blocked or SchedulerThreadState.Sleeping;
+
+        uint best = waking && allowed.Contains(last) ? last
+                  : allowed.Contains(ideal) ? ideal
+                  : allowed.Contains(last) ? last
                   : allowed.First;
         ulong bestLoad = GetCpuLoad(cpus, best);
+
+        // The preference first among the others, so that it wins a tie
+        // between two lighter CPUs.
+        if (ideal != best && allowed.Contains(ideal))
+        {
+            ulong load = GetCpuLoad(cpus, ideal);
+            if (load < bestLoad * LighterLoadPercent / 100)
+            {
+                best = ideal;
+                bestLoad = load;
+            }
+        }
 
         for (uint cpu = 0; cpu < cpus.Length; cpu++)
         {
@@ -345,7 +384,7 @@ internal class StrideScheduler : IScheduler
             }
 
             ulong load = GetCpuLoad(cpus, cpu);
-            if (load < bestLoad * 80 / 100)
+            if (load < bestLoad * LighterLoadPercent / 100)
             {
                 best = cpu;
                 bestLoad = load;
@@ -389,11 +428,17 @@ internal class StrideScheduler : IScheduler
 
     public SchedulerThread? Balance(PerCpuState cpuState, PerCpuState[] allCpuStates)
     {
-        // Only an idle CPU pulls, and it pulls the tail (the highest Pass,
-        // the thread the busiest CPU would run last) of the longest queue
-        // that holds at least two and whose tail may run here. Reads are
-        // snapshots under no lock; the mechanism re-checks the answer under
-        // both queue locks before it moves anything.
+        // Only a CPU with nothing queued pulls, and it pulls from the longest
+        // queue that holds at least two: the thread nearest its tail (the
+        // highest Pass, the one that CPU would run last) that may run here.
+        // The counts are read under no lock, as snapshots. A queue is a list
+        // its CPU rewrites at every switch, so the walk that looks for the
+        // thread runs under that CPU's queue lock, one CPU at a time; the
+        // mechanism holds none when it calls this hook, and checks the answer
+        // again under both locks before it moves anything. An idle thread is
+        // queued like any other here, so a CPU whose last thread parks picks
+        // its idle thread, and asks from that thread's next reschedule, the
+        // tick that follows.
         StrideCpuData? cpuData = CpuDataOf(cpuState);
         if (cpuData is null || cpuData.RunQueue.Count > 0)
         {
@@ -401,7 +446,7 @@ internal class StrideScheduler : IScheduler
         }
 
         SchedulerThread? victim = null;
-        int maxCount = 1;
+        int victimQueueCount = MinQueuedToSteal - 1;
 
         foreach (PerCpuState state in allCpuStates)
         {
@@ -411,20 +456,52 @@ internal class StrideScheduler : IScheduler
             }
 
             StrideCpuData? data = CpuDataOf(state);
-            if (data is null || data.RunQueue.Count <= maxCount)
+            if (data is null || data.RunQueue.Count <= victimQueueCount)
             {
                 continue;
             }
 
-            SchedulerThread tail = data.RunQueue[data.RunQueue.Count - 1];
-            if (tail.Affinity.Contains(cpuState.CpuId))
+            using (SchedulerManager.LockCpu(state))
             {
-                maxCount = data.RunQueue.Count;
-                victim = tail;
+                int count = data.RunQueue.Count;
+                if (count <= victimQueueCount)
+                {
+                    continue;
+                }
+
+                SchedulerThread? candidate = LastThreadAllowedOn(data.RunQueue, cpuState.CpuId);
+                if (candidate is not null)
+                {
+                    victim = candidate;
+                    victimQueueCount = count;
+                }
             }
         }
 
         return victim;
+    }
+
+    /// <summary>
+    /// The queued thread nearest the tail that may move to <paramref name="cpuId"/>:
+    /// not an idle thread, which is its CPU's, not a thread whose set excludes
+    /// that CPU, not one its CPU's interrupt exit has not left yet, and not
+    /// one queued for its first run, still
+    /// <see cref="SchedulerThreadState.Created"/>, all of which the mechanism
+    /// would refuse. Under the queue's lock.
+    /// </summary>
+    private static SchedulerThread? LastThreadAllowedOn(List<SchedulerThread> queue, uint cpuId)
+    {
+        for (int i = queue.Count - 1; i >= 0; i--)
+        {
+            SchedulerThread thread = queue[i];
+            if (!thread.IsIdle && !thread.IsOnCpu && thread.State == SchedulerThreadState.Ready
+                && thread.Affinity.Contains(cpuId))
+            {
+                return thread;
+            }
+        }
+
+        return null;
     }
 
     // ========== Dynamic Reconfiguration ==========

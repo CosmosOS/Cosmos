@@ -9,7 +9,10 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// the scope; disposing it releases the lock and restores the previous interrupt state.
 /// Obtained from <see cref="SchedulerManager.LockCpu"/>. What a caller takes around a walk of
 /// a CPU's run structure through the diagnostics hooks, or around a tuning setter of its own:
-/// the policy hooks run under this lock, taken by the mechanism, and never take it themselves.
+/// the policy hooks that touch a run structure run under this lock, taken by the mechanism, and
+/// never take it themselves. The two hooks called under no lock,
+/// <see cref="IScheduler.SelectCpu"/> and <see cref="IScheduler.Balance"/>, may take it around
+/// a walk of another CPU's structure, one CPU at a time.
 /// </summary>
 [Experimental(Experimentals.SchedulerSeamDiagId)]
 public ref struct CpuLockScope
