@@ -133,10 +133,11 @@ internal static unsafe partial class GarbageCollector
     private static int s_finalizerQueueHead;
 
     /// <summary>
-    /// Whether a thread is inside <see cref="RunPendingFinalizers"/>. A collection a finalizer
+    /// 1 while a thread is inside <see cref="RunPendingFinalizers"/>, claimed by compare-exchange
+    /// so one pass runs at a time whichever CPUs the callers are on. A collection a finalizer
     /// triggers, and any other thread, leave the queue to that thread.
     /// </summary>
-    private static bool s_runningFinalizers;
+    private static int s_runningFinalizers;
 
     /// <summary>
     /// Number of objects waiting for their finalizer when the last collection ended.
@@ -272,7 +273,7 @@ internal static unsafe partial class GarbageCollector
         if (IsFinalizerSuppressed(obj))
         {
             ClearFinalizerSuppressed(obj);
-            using (InternalCpu.DisableInterruptsScope())
+            using (s_heapLock.AcquireCollectorLock())
             {
                 if (IsRegistered(obj))
                 {
@@ -404,7 +405,7 @@ internal static unsafe partial class GarbageCollector
         {
             // Signalled already, or in a pass, which drains the queue to its end, what a
             // collection queues meanwhile included (a finalizer that collects lands here too)
-            if (s_finalizerRequested || s_runningFinalizers)
+            if (s_finalizerRequested || Volatile.Read(ref s_runningFinalizers) != 0)
             {
                 return;
             }
@@ -574,7 +575,7 @@ internal static unsafe partial class GarbageCollector
     {
         SchedulerThread? finalizerThread = s_finalizerThread;
         return finalizerThread is not null
-            && ReferenceEquals(SchedulerManager.CurrentCpuState?.CurrentThread, finalizerThread);
+            && ReferenceEquals(SchedulerManager.CurrentThread, finalizerThread);
     }
 
     /// <summary>
@@ -582,9 +583,9 @@ internal static unsafe partial class GarbageCollector
     /// </summary>
     private static bool FinalizationPending()
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_heapLock.AcquireCollectorLock())
         {
-            return s_finalizerQueueHead < s_finalizerQueue.Count || s_runningFinalizers;
+            return s_finalizerQueueHead < s_finalizerQueue.Count || s_runningFinalizers != 0;
         }
     }
 
@@ -596,8 +597,9 @@ internal static unsafe partial class GarbageCollector
     /// from an interrupt handler or a critical section. The queue is then left for the next
     /// call; the allocator makes one before each allocation.
     /// <para>
-    /// One pass at a time relies on a single CPU: <see cref="s_runningFinalizers"/> is claimed
-    /// with interrupts masked, which excludes the other threads only while they share that CPU.
+    /// One pass at a time on any number of CPUs: <see cref="s_runningFinalizers"/> is claimed
+    /// by compare-exchange, and the pass that releases it does so under the heap lock, in the
+    /// same step that finds the queue empty.
     /// </para>
     /// </remarks>
     private static void RunPendingFinalizers()
@@ -607,14 +609,9 @@ internal static unsafe partial class GarbageCollector
             return;
         }
 
-        using (InternalCpu.DisableInterruptsScope())
+        if (Interlocked.CompareExchange(ref s_runningFinalizers, 1, 0) != 0)
         {
-            if (s_runningFinalizers)
-            {
-                return;
-            }
-
-            s_runningFinalizers = true;
+            return;
         }
 
         object? target = DequeueFinalizable(out IntPtr finalizer);
@@ -646,7 +643,7 @@ internal static unsafe partial class GarbageCollector
     /// <returns>The object, now held by the caller's reference, or <c>null</c> when none is left.</returns>
     private static object? DequeueFinalizable(out IntPtr finalizer)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_heapLock.AcquireCollectorLock())
         {
             while (s_finalizerQueueHead < s_finalizerQueue.Count)
             {
@@ -666,7 +663,7 @@ internal static unsafe partial class GarbageCollector
 
             s_finalizerQueueHead = 0;
             s_finalizerQueue.Count = 0;
-            s_runningFinalizers = false;
+            Volatile.Write(ref s_runningFinalizers, 0);
             finalizer = IntPtr.Zero;
             return null;
         }
@@ -748,7 +745,7 @@ internal static unsafe partial class GarbageCollector
     /// <returns><see langword="false"/> when the registry is full and cannot grow.</returns>
     private static bool AddFinalizable(GCObject* obj)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_heapLock.AcquireCollectorLock())
         {
             if (!s_finalizable.Add(obj))
             {
@@ -761,8 +758,8 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Whether an object has a registration left, in the registry or in the queue. Called with
-    /// interrupts masked; linear, on the re-registration of a suppressed object only.
+    /// Whether an object has a registration left, in the registry or in the queue. Called under
+    /// the heap lock; linear, on the re-registration of a suppressed object only.
     /// </summary>
     /// <param name="obj">The object to look for.</param>
     private static bool IsRegistered(GCObject* obj)

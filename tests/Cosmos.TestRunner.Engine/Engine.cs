@@ -255,7 +255,7 @@ public partial class Engine
                     bootIsoPath, bootLogPath, _config.TimeoutSeconds, _config.ShouldShowDisplay, enableNetworkTesting, disks, profile.MachineOptions,
                     new ProfileDevices(profile.NetworkCard, profile.KeyboardDevice, profile.MouseDevice, profile.VgaAdapter, profile.GpuDevice, profile.AudioDevice,
                         profile.UsbController, profile.UsbDeviceVersion, profile.UsbHub),
-                    monitor);
+                    monitor, profile.CpuCount);
 
                 combinedLog.Append(result.UartLog);
                 lastResult = result;

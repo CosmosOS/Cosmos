@@ -43,7 +43,7 @@ internal class ConditionVariable : IDisposable
     /// Waiter-list insertion, the mutex release, and the park form one IRQ-off section so a Signal
     /// can only ever observe a fully parked thread. The mutex must be released before BlockThread
     /// (a Blocked thread still holding it could never be signaled), but inside the scope: releasing
-    /// with interrupts enabled re-opens the lost-wakeup window (#357) — the release hands the mutex
+    /// with interrupts enabled re-opens the lost-wakeup window (#357): the release hands the mutex
     /// to a waiter and requests a reschedule, so the very next IRQ exit can run the new owner, whose
     /// Signal readies this still-Running thread; the subsequent BlockThread then buries the wakeup
     /// forever. Same shape as Mutex.Acquire / InterruptEvent.WaitCore (eab7e338).
@@ -54,7 +54,7 @@ internal class ConditionVariable : IDisposable
 
         do
         {
-            currentThread = SchedulerManager.CurrentCpuState?.CurrentThread;
+            currentThread = SchedulerManager.CurrentThread;
         }
         while (currentThread is null);
 
@@ -72,7 +72,7 @@ internal class ConditionVariable : IDisposable
             }
 
             mutex.Release();
-            SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
+            SchedulerManager.BlockThread(currentThread);
         }
 
         // Give the CPU to the next thread until a Signal readies this one (same as Mutex.Acquire);
@@ -91,7 +91,7 @@ internal class ConditionVariable : IDisposable
     /// <returns>true if signaled, false if timeout occurred.</returns>
     public bool WaitTimeout(Mutex mutex, uint timeoutMs)
     {
-        SchedulerThread? currentThread = SchedulerManager.CurrentCpuState?.CurrentThread;
+        SchedulerThread? currentThread = SchedulerManager.CurrentThread;
         if (currentThread is null)
         {
             return false;
@@ -104,7 +104,7 @@ internal class ConditionVariable : IDisposable
             return WaitPolling(mutex, currentThread, deadline);
         }
 
-        // Same atomic insert+release+park section as Wait — the old order (release, then
+        // Same atomic insert+release+park section as Wait: the old order (release, then
         // insert) additionally lost any Signal landing between the two: it found no waiters.
         using (_lockGuard.AcquireIrqSafe())
         {
@@ -114,7 +114,7 @@ internal class ConditionVariable : IDisposable
             }
 
             mutex.Release();
-            SchedulerManager.MarkSleeping(currentThread.CpuId, currentThread, timeoutMs);
+            SchedulerManager.MarkSleeping(currentThread, timeoutMs);
         }
 
         SchedulerManager.Park(currentThread);
@@ -256,8 +256,9 @@ internal class ConditionVariable : IDisposable
                 SchedulerThread waitingThread = _waitingThreads[0];
                 _waitingThreads.RemoveAt(0);
 
-                // Wake the thread by marking it ready
-                SchedulerManager.ReadyThread(waitingThread.CpuId, waitingThread);
+                // Wake the thread by marking it ready, on whatever CPU it
+                // waits on (SMP phase 3a).
+                SchedulerManager.ReadyThread(waitingThread);
             }
         }
     }
@@ -271,8 +272,7 @@ internal class ConditionVariable : IDisposable
         {
             foreach (SchedulerThread thread in _waitingThreads)
             {
-                // Wake each thread by marking it ready
-                SchedulerManager.ReadyThread(thread.CpuId, thread);
+                SchedulerManager.ReadyThread(thread);
             }
 
             _waitingThreads.Clear();

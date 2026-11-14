@@ -11,7 +11,9 @@ namespace Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 /// "recursive" one, and a <c>throw;</c> rethrew whichever thread had thrown last
 /// (valentinbreiz/nativeaot-patcher#440). Each <see cref="Scheduler.SchedulerThread"/> carries
 /// one, and <see cref="ExceptionHelper.State"/> finds the running thread's, or the boot code's
-/// before it is a scheduler thread.
+/// before it is a scheduler thread; the per-CPU block's
+/// <see cref="CPU.PerCpuBlock.CurrentExInfoHead"/> points the native stubs at the chain head of
+/// whichever one is the running code's.
 /// </summary>
 internal struct ExceptionDispatchState
 {
@@ -23,9 +25,11 @@ internal struct ExceptionDispatchState
 
     /// <summary>
     /// The innermost in-flight ExInfo of the thread, the head of the chain through each one's
-    /// <c>m_pPrevExInfo</c>. The native stubs reach it through <c>__cosmos_exinfo_head</c>:
-    /// <c>RhpThrowEx</c> links a throw in, <c>RhpCallCatchFunclet</c> unlinks the throws a catch
-    /// ends, <c>RhpRethrow</c> reads the exception a <c>throw;</c> rethrows from it.
+    /// <c>m_pPrevExInfo</c>. The native stubs reach it in one load through the per-CPU block
+    /// (<see cref="CPU.PerCpuBlock.CurrentExInfoHead"/>, which the scheduler points at the
+    /// running thread's): <c>RhpThrowEx</c> links a throw in, <c>RhpCallCatchFunclet</c> unlinks
+    /// the throws a catch ends, <c>RhpRethrow</c> reads the exception a <c>throw;</c> rethrows
+    /// from it.
     /// </summary>
     public nuint ExInfoHead;
 

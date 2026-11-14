@@ -1,9 +1,12 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
+using Cosmos.Kernel.Core.Runtime.ExceptionHandling;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.System.Diagnostics;
@@ -12,6 +15,7 @@ using Cosmos.Kernel.System.Sessions;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
+using BootStack = Cosmos.Kernel.Core.Runtime.BootStack;
 using Monitor = System.Threading.Monitor;
 using SysThread = System.Threading.Thread;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -21,7 +25,25 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 89;
+    private const int ExpectedTestCount = 100;
+
+    /// <summary>Size of one per-CPU block, as <c>PerCpuBlock</c> lays it out and the native stubs assume.</summary>
+    private const int PerCpuBlockNativeSize = 128;
+    /// <summary>Slot offsets the native stubs use (<c>CpuOps.s</c>, <c>Interrupts.s</c>, <c>ExceptionHandling.s</c>); the managed layout must agree with them.</summary>
+    private const int PerCpuSelfOffset = 0x00;
+    private const int PerCpuCpuIndexOffset = 0x08;
+    private const int PerCpuHardwareIdOffset = 0x10;
+    private const int PerCpuSwitchTargetSpOffset = 0x18;
+    private const int PerCpuSwitchIsNewThreadOffset = 0x20;
+    private const int PerCpuTempIsNewThreadOffset = 0x28;
+    private const int PerCpuLastErrorCodeOffset = 0x30;
+    private const int PerCpuCurrentExInfoHeadOffset = 0x38;
+    private const int PerCpuBootStackTopOffset = 0x40;
+    private const int PerCpuOnlineOffset = 0x48;
+    private const int PerCpuStoppedOffset = 0x50;
+    private const int PerCpuGicRedistributorBaseOffset = 0x58;
+    private const int PerCpuSwitchPrevOnCpuOffset = 0x60;
+    private const int PerCpuCollectorLockDepthOffset = 0x68;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -82,6 +104,17 @@ public class Kernel : Sys.Kernel
 
     /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
     private const uint UnregisteredCpuId = 4096;
+
+    /// <summary>CPUs the smp4 cell's machine has: what the bootloader lists and the kernel starts there.</summary>
+    private const uint Smp4CpuCount = 4;
+    /// <summary>Ticks of CPU 0 the application processor tick cell waits across, at the 10 ms quantum: 300 ms, thirty of each CPU's own ticks.</summary>
+    private const uint ApTickWindowTicks = 30;
+    /// <summary>Polls of FlagPollIntervalMs the application processor tick cell makes for CPU 0's window to pass before it calls the clock stalled.</summary>
+    private const int ApTickWindowPolls = 40;
+    /// <summary>The CPU the cross-CPU cells move their worker to: the first application processor.</summary>
+    private const uint CrossCpuTarget = 1;
+    /// <summary>Window (ms) the policy-swap cell samples each spinner's counter across, on either side of a swap.</summary>
+    private const int SwapSampleWindowMs = 200;
 
     /// <summary>Turns each side of the Thread.Yield ping-pong takes.</summary>
     private const int PingPongRounds = 20;
@@ -188,6 +221,11 @@ public class Kernel : Sys.Kernel
 
         TR.Start("Threading Tests", expectedTests: ExpectedTestCount);
 
+        // The smp4 cell boots the machine with four CPUs; the application
+        // processor cells read the blocks of the three the kernel started.
+        bool smp = TR.ProfileContains("smp4");
+        const string OneCpuCell = "one CPU on this cell";
+
         // SpinLock tests
         TR.Run("SpinLock_InitialState_IsUnlocked", TestSpinLockInitialState);
         TR.Run("SpinLock_Acquire_SetsLockedState", TestSpinLockAcquire);
@@ -221,6 +259,23 @@ public class Kernel : Sys.Kernel
         TR.Run("Thread_MaxStackSize_TinyRequestIsFloored", TestThreadTinyStackSizeFloored);
         TR.Run("Thread_Kill_Queued_StopsManagedSide", TestKillQueuedThreadStopsManagedSide);
         TR.Run("ScheduleFromInterrupt_UnregisteredCpu_IsNoOp", TestScheduleFromInterruptIgnoresUnregisteredCpu);
+
+        // The per-CPU block (CosmosOS/Cosmos#3338, SMP phase 1): the running CPU finds its
+        // identity, its boot stack and the running thread's exception chain through it
+        TR.Run("PerCpuBlock_Layout_MatchesNativeTable", TestPerCpuBlockLayoutMatchesNative);
+        TR.Run("PerCpuBlock_BootCpu_IsIndexZeroAndOnline", TestPerCpuBlockBootCpuIsIndexZero);
+        TR.RunIf(smp, "PerCpuBlock_ApplicationProcessors_OnlineWithOwnBlocks", TestPerCpuBlockApplicationProcessorsOnline, OneCpuCell);
+        TR.RunIf(smp, "PerCpuBlock_ApplicationProcessors_TickOnTheirOwn", TestPerCpuBlockApplicationProcessorsTick, OneCpuCell);
+        // The mechanism across CPUs (CosmosOS/Cosmos#3340, SMP phase 3a): a thread moved to an
+        // application processor runs there on a wake sent from CPU 0, and a policy swap stops
+        // the other CPUs while they run threads
+        TR.RunIf(smp, "InterruptEvent_WakesThreadOnOtherCpu", TestInterruptEventWakesThreadOnOtherCpu, OneCpuCell);
+        TR.RunIf(smp, "Mutex_CrossCpuHandoff", TestMutexCrossCpuHandoff, OneCpuCell);
+        TR.RunIf(smp, "SetScheduler_SwapsWhileOtherCpusRun", TestSetSchedulerSwapsWhileOtherCpusRun, OneCpuCell);
+        TR.Run("PerCpuBlock_BootStackTop_BoundsMainThreadStack", TestPerCpuBlockBootStackTopBoundsMainStack);
+        TR.Run("PerCpuBlock_ExInfoHead_FollowsCurrentThread", TestPerCpuBlockExInfoHeadFollowsCurrentThread);
+        TR.Run("PerCpuBlock_ExInfoChain_EmptyAfterCatchAndRethrow", TestPerCpuBlockExInfoChainEmptyAfterCatch);
+        TR.Run("Thread_GetCurrentProcessorId_IsBootCpu", TestThreadGetCurrentProcessorIdIsBootCpu);
         TR.Run("Mutex_IdleThreadContention_KeepsTicketAccounting", TestMutexIdleThreadContention);
         TR.Run("ConditionVariable_IdleThreadWait_KeepsTicketAccounting", TestConditionVariableIdleThreadWait);
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
@@ -269,6 +324,13 @@ public class Kernel : Sys.Kernel
         // to the user-style Round-Robin policy (RoundRobinScheduler.cs), the
         // Round-Robin semantics, and the switch back. Kept last: they replace
         // the installed policy, so nothing else should run between the swaps.
+        // They compare the shares of threads that compete for one CPU and
+        // read that CPU's run queue, so their workers stay on the CPU Main
+        // runs on: under the default set each would take a compute CPU of
+        // its own (SMP phase 5, CosmosOS/Cosmos#3343) and no queue would
+        // ever hold two of them.
+        Sys.Threading.CpuSet mainFlow = Sys.Threading.KernelCpus.DefaultAffinity;
+        Sys.Threading.KernelCpus.DefaultAffinity = Sys.Threading.KernelCpus.Housekeeping;
         TR.Run("RoundRobin_Hooks_ReadyTail_PickHead", TestRoundRobinHooksFifoOrder);
         TR.Run("RoundRobin_Hooks_DoubleReady_QueuesOnce", TestRoundRobinHooksReadyIsIdempotent);
         TR.Run("RoundRobin_Hooks_QuantumAccounting", TestRoundRobinHooksQuantumAccounting);
@@ -288,6 +350,7 @@ public class Kernel : Sys.Kernel
         TR.Run("RoundRobin_BlockedThread_LeavesRunQueue", TestRoundRobinBlockedLeavesQueue);
         TR.Run("SetScheduler_RestoresStrideDefault", TestSetSchedulerRestoresStride);
         TR.Run("SetScheduler_RehomesLiveThreads", TestSetSchedulerRehomesLiveThreads);
+        Sys.Threading.KernelCpus.DefaultAffinity = mainFlow;
 
         // Console.Read on a session thread (CosmosOS/Cosmos#3276): the reader
         // blocks for a line and hands it out character by character
@@ -642,7 +705,7 @@ public class Kernel : Sys.Kernel
 
     private static void StackSizeProbeWorker()
     {
-        s_observedStackSize = SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())!.CurrentThread!.StackSize;
+        s_observedStackSize = SchedulerManager.CurrentThread!.StackSize;
         s_observedStackSufficient = RuntimeHelpers.TryEnsureSufficientExecutionStack();
         s_stackSizeProbeDone = true;
     }
@@ -921,7 +984,9 @@ public class Kernel : Sys.Kernel
     // the waiter, the next interrupt exit switches to it, and the waiter
     // could take the mutex, release it and exit before the TryAcquire, which
     // would then find the mutex free and report a barge that never happened
-    // (#3385).
+    // (#3385). A mask holds back only the threads of its own CPU, so holder
+    // and contender share one: on a CPU of its own the contender is resumed by
+    // the wake's interrupt while the holder is still inside its scope.
     private static Cosmos.Kernel.Core.Scheduler.Mutex? s_handoffMutex;
     private static volatile bool s_handoffWorkerHolding;
     private static volatile bool s_handoffReleaseRequested;
@@ -936,16 +1001,16 @@ public class Kernel : Sys.Kernel
         s_handoffContenderAcquired = false;
         s_handoffBargeResult = BargeResultPending;
 
-        var holder = new global::System.Threading.Thread(HandoffHolderWorker);
-        holder.Start();
+        SysThread holder = new(HandoffHolderWorker);
+        StartOnMainCpu(holder);
         for (int i = 0; i < FlagPollRetries && !s_handoffWorkerHolding; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         Assert.True(s_handoffWorkerHolding, "holder should own the mutex");
 
-        var contender = new global::System.Threading.Thread(HandoffContenderWorker);
-        contender.Start();
+        SysThread contender = new(HandoffContenderWorker);
+        StartOnMainCpu(contender);
         // Give the contender a few quanta to park in _waitingThreads.
         TimerManager.Wait(ContenderParkWaitMs);
 
@@ -1453,8 +1518,11 @@ public class Kernel : Sys.Kernel
         s_killVictimRelease = false;
         s_killVictimId = 0;
 
+        // The victim shares the CPU Main runs on, so that it is queued while
+        // Main kills it: on a compute CPU of its own it would be running, and
+        // a running thread is only marked.
         SysThread victim = new(KillVictimWorker);
-        victim.Start();
+        StartOnMainCpu(victim);
         for (int i = 0; i < KillVictimPollRetries && !s_killVictimStarted; i++)
         {
             TimerManager.Wait(KillVictimPollWaitMs);
@@ -1493,6 +1561,485 @@ public class Kernel : Sys.Kernel
         }
 
         Assert.False(threw, "an unregistered CPU id must leave the interrupt path silently, not raise");
+    }
+
+    // ==================== Per-CPU block (SMP phase 1) ====================
+
+    // The native stubs reach the block's slots by the offsets they assume (the context switch
+    // staging in Interrupts.s, the ExInfo chain head in ExceptionHandling.s, the index and the
+    // self pointer in CpuOps.s); the managed layout, the layout's home, must put every field at
+    // the offset the stubs use.
+    private static unsafe void TestPerCpuBlockLayoutMatchesNative()
+    {
+        PerCpuBlock block = default;
+        byte* start = (byte*)&block;
+
+        Assert.Equal(PerCpuBlockNativeSize, sizeof(PerCpuBlock), "the block is the size the stubs assume");
+        Assert.Equal(PerCpuBlockNativeSize, PerCpuBlock.Size, "PerCpuBlock.Size is that size");
+        Assert.Equal(PerCpuSelfOffset, (int)((byte*)&block.Self - start), "Self");
+        Assert.Equal(PerCpuCpuIndexOffset, (int)((byte*)&block.CpuIndex - start), "CpuIndex");
+        Assert.Equal(PerCpuHardwareIdOffset, (int)((byte*)&block.HardwareId - start), "HardwareId");
+        Assert.Equal(PerCpuSwitchTargetSpOffset, (int)((byte*)&block.SwitchTargetSp - start), "SwitchTargetSp");
+        Assert.Equal(PerCpuSwitchIsNewThreadOffset, (int)((byte*)&block.SwitchIsNewThread - start), "SwitchIsNewThread");
+        Assert.Equal(PerCpuTempIsNewThreadOffset, (int)((byte*)&block.TempIsNewThread - start), "TempIsNewThread");
+        Assert.Equal(PerCpuLastErrorCodeOffset, (int)((byte*)&block.LastErrorCode - start), "LastErrorCode");
+        Assert.Equal(PerCpuCurrentExInfoHeadOffset, (int)((byte*)&block.CurrentExInfoHead - start), "CurrentExInfoHead");
+        Assert.Equal(PerCpuBootStackTopOffset, (int)((byte*)&block.BootStackTop - start), "BootStackTop");
+        Assert.Equal(PerCpuOnlineOffset, (int)((byte*)&block.Online - start), "Online");
+        Assert.Equal(PerCpuStoppedOffset, (int)((byte*)&block.Stopped - start), "Stopped");
+        Assert.Equal(PerCpuGicRedistributorBaseOffset, (int)((byte*)&block.GicRedistributorBase - start), "GicRedistributorBase");
+        Assert.Equal(PerCpuSwitchPrevOnCpuOffset, (int)((byte*)&block.SwitchPrevOnCpu - start), "SwitchPrevOnCpu");
+        Assert.Equal(PerCpuCollectorLockDepthOffset, (int)((byte*)&block.CollectorLockDepth - start), "CollectorLockDepth");
+    }
+
+    // Core's library initializer installs block 0 on the boot CPU, the first managed code the
+    // boot runs: the CPU index the scheduler indexes its state by, the staging the stubs consume
+    // and the block's own address all come from there.
+    private static unsafe void TestPerCpuBlockBootCpuIsIndexZero()
+    {
+        ref PerCpuBlock block = ref PerCpuBlock.Current;
+
+        Assert.Equal(0, (int)block.CpuIndex, "the boot CPU is index 0");
+        Assert.Equal(0, (int)SchedulerManager.GetCurrentCpuId(), "GetCurrentCpuId reads the block's index");
+        Assert.Equal(0, (int)PerCpuBlock.CurrentIndex, "CurrentIndex reads the block's index");
+        Assert.True(block.Self == (nuint)Unsafe.AsPointer(ref block), "Self is the block's own address");
+        Assert.True(Unsafe.AreSame(ref block, ref PerCpuBlock.At(0)), "the running CPU's block is block 0 of the table");
+        Assert.True(block.Online == 1, "the boot CPU is online");
+        Assert.True(block.SwitchTargetSp == 0, "no context switch is staged while a thread runs");
+
+        // Past the machine's CPUs the table is untouched: on the bare cell block 1 is the
+        // first such block, on the smp4 cell block 4.
+        uint cpuCount = SchedulerManager.CpuCount;
+        Assert.True(PerCpuBlock.At(cpuCount).Online == 0 && PerCpuBlock.At(cpuCount).CpuIndex == 0, "the block past the last CPU is not installed");
+    }
+
+    // The boot CPU started every application processor the bootloader listed before the
+    // drivers came up (SMP phase 2): each one's block carries its index, its own address, the
+    // ExInfo chain head of its idle thread and the top of the boot stack it runs on, and
+    // reports online. The scheduler has a state and an idle thread per CPU, the idle thread
+    // being each CPU's current thread while nothing is placed on it.
+    private static unsafe void TestPerCpuBlockApplicationProcessorsOnline()
+    {
+        uint cpuCount = SchedulerManager.CpuCount;
+        Assert.Equal(Smp4CpuCount, cpuCount, "the scheduler counts the CPUs the bootloader listed");
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            ref PerCpuBlock block = ref PerCpuBlock.At(cpu);
+            PerCpuState? state = SchedulerManager.GetCpuState(cpu);
+
+            Assert.True(block.Online == 1, "the application processor reported online");
+            Assert.Equal(cpu, (uint)block.CpuIndex, "the block carries the CPU's index");
+            Assert.True(block.Self == (nuint)Unsafe.AsPointer(ref block), "Self is the block's own address");
+            Assert.True(block.BootStackTop != 0, "the block carries the top of the CPU's boot stack");
+            Assert.True(block.BootStackTop != PerCpuBlock.At(0).BootStackTop, "each CPU boots on a stack of its own");
+            Assert.True(block.SwitchTargetSp == 0, "no context switch is staged on an idle CPU");
+            Assert.True(state is not null && state.IdleThread is not null, "the CPU has a state and an idle thread");
+            Assert.True(state!.CurrentThread == state.IdleThread, "nothing is placed on the CPU: its idle thread is current");
+            Assert.True(state.IdleThread!.CpuId == cpu && state.IdleThread.IsIdle, "the idle thread is the CPU's own");
+            Assert.True(block.CurrentExInfoHead == state.IdleThread.ExInfoHeadSlot, "the block points at the idle thread's ExInfo chain head");
+            Assert.True(block.HardwareId != PerCpuBlock.At(0).HardwareId, "the controller identity differs from the boot CPU's");
+        }
+    }
+
+    // Every application processor runs its own timer and takes the scheduler tick on it: its
+    // per-CPU count advances while CPU 0's does, and CPU 0's count, the thread clock, keeps
+    // the pace of one CPU.
+    private static void TestPerCpuBlockApplicationProcessorsTick()
+    {
+        uint cpuCount = SchedulerManager.CpuCount;
+        uint[] before = new uint[cpuCount];
+        for (uint cpu = 0; cpu < cpuCount; cpu++)
+        {
+            before[cpu] = SchedulerManager.GetCpuState(cpu)!.TickCount;
+        }
+
+        uint globalBefore = SchedulerManager.TickCount;
+        int polls = 0;
+        while (SchedulerManager.TickCount - globalBefore < ApTickWindowTicks && polls < ApTickWindowPolls)
+        {
+            SysThread.Sleep(FlagPollIntervalMs);
+            polls++;
+        }
+
+        uint globalTicks = SchedulerManager.TickCount - globalBefore;
+        Assert.True(globalTicks >= ApTickWindowTicks, "CPU 0's ticks passed the window");
+        Assert.Equal(globalTicks, SchedulerManager.GetCpuState(0)!.TickCount - before[0], "the thread clock is CPU 0's count");
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            uint ticks = SchedulerManager.GetCpuState(cpu)!.TickCount - before[cpu];
+            Serial.WriteString("[Threading] CPU ");
+            Serial.WriteNumber(cpu);
+            Serial.WriteString(" ticked ");
+            Serial.WriteNumber(ticks);
+            Serial.WriteString(" times across ");
+            Serial.WriteNumber(globalTicks);
+            Serial.WriteString(" of CPU 0's\n");
+
+            // A lower bound only: the counters start at different instants and TCG runs the
+            // CPUs on host threads it schedules as it likes, so the two counts drift. Half the
+            // window separates a ticking CPU from a dead one.
+            Assert.True(ticks >= ApTickWindowTicks / 2, "the application processor's timer ticks on its own");
+        }
+    }
+
+    // ===== The mechanism across CPUs (SMP phase 3a) =====
+    // A worker starts on CPU 0, parks, and is pinned to another CPU through its CPU set (SMP
+    // phase 3b): parked, it moves at once; the wake then goes to that CPU by interrupt and the
+    // worker runs there. It parks again once it has reported in, and comes back to CPU 0 the
+    // same way before it exits: the cells prove the move each way. The worker touches statics
+    // only while it is away, so that what it reports is read on CPU 0 without a lock; it may
+    // allocate there since the collector stops every CPU (SMP phase 4).
+    private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_crossCpuGate;
+    private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_crossCpuRelease;
+    private static Cosmos.Kernel.Core.Scheduler.Mutex? s_crossCpuMutex;
+    private static SchedulerThread? s_crossCpuThread;
+    private static volatile uint s_crossCpuSeenCpu;
+    private static volatile bool s_crossCpuReported;
+    private static volatile bool s_crossCpuDone;
+
+    [MemberNotNull(nameof(s_crossCpuGate), nameof(s_crossCpuRelease), nameof(s_crossCpuMutex))]
+    private static void ResetCrossCpu()
+    {
+        s_crossCpuGate = new Cosmos.Kernel.Core.Scheduler.InterruptEvent();
+        s_crossCpuRelease = new Cosmos.Kernel.Core.Scheduler.InterruptEvent();
+        s_crossCpuMutex = new Cosmos.Kernel.Core.Scheduler.Mutex();
+        s_crossCpuThread = null;
+        s_crossCpuSeenCpu = 0;
+        s_crossCpuReported = false;
+        s_crossCpuDone = false;
+    }
+
+    // Reports the CPU this code runs on and parks until main brings the thread home.
+    private static void CrossCpuReportAndPark()
+    {
+        s_crossCpuSeenCpu = SchedulerManager.GetCurrentCpuId();
+        s_crossCpuReported = true;
+        s_crossCpuRelease!.Wait();
+        s_crossCpuDone = true;
+    }
+
+    private static void CrossCpuEventWorker()
+    {
+        s_crossCpuThread = CurrentSchedulerThread();
+        s_crossCpuGate!.Wait();
+        CrossCpuReportAndPark();
+    }
+
+    private static void CrossCpuMutexWorker()
+    {
+        s_crossCpuThread = CurrentSchedulerThread();
+        s_crossCpuMutex!.Acquire();
+        s_crossCpuMutex.Release();
+        CrossCpuReportAndPark();
+    }
+
+    // Pins the worker to `cpu` once it has reported in: a parked worker moves at once, a
+    // running one on the next interrupt exit of its CPU, so the CPU is polled afterwards.
+    private static void MoveWorker(uint cpu)
+    {
+        SchedulerThread? thread = null;
+        for (int i = 0; i < FlagPollRetries && thread is null; i++)
+        {
+            thread = s_crossCpuThread;
+            if (thread is null)
+            {
+                TimerManager.Wait(FlagPollIntervalMs);
+            }
+        }
+
+        Assert.True(thread is not null, "the worker reported its control block");
+        MoveThread(thread!, cpu);
+    }
+
+    private static void MoveThread(SchedulerThread thread, uint cpu)
+    {
+        SchedulerManager.SetAffinity(thread, CpuSet.Single(cpu));
+        for (int i = 0; i < FlagPollRetries && thread.CpuId != cpu; i++)
+        {
+            TimerManager.Wait(FlagPollIntervalMs);
+        }
+
+        Assert.Equal(cpu, thread.CpuId, "the pinned worker is assigned to that CPU");
+    }
+
+    // Waits for the worker's report from the other CPU, brings it back to CPU 0 and lets it exit.
+    private static void FinishCrossCpuWorker(SysThread worker)
+    {
+        for (int i = 0; i < FlagPollRetries && !s_crossCpuReported; i++)
+        {
+            TimerManager.Wait(FlagPollIntervalMs);
+        }
+
+        Assert.True(s_crossCpuReported, "the worker ran after its wake");
+        Assert.Equal(CrossCpuTarget, s_crossCpuSeenCpu, "the worker ran on the CPU it was moved to");
+        Assert.Equal(CrossCpuTarget, s_crossCpuThread!.CpuId, "the worker is assigned to that CPU");
+
+        MoveWorker(0);
+        s_crossCpuRelease!.Signal();
+        Assert.True(worker.Join(ThrowJoinTimeoutMs), "the worker exits once released on CPU 0");
+        Assert.True(s_crossCpuDone, "the worker ran to its end");
+    }
+
+    // A thread parked on an interrupt event and moved to another CPU runs there when the
+    // event is signalled from CPU 0: the wake queues it on that CPU and sends the reschedule
+    // interrupt, whose exit switches to it. Before phase 3a a wake only set the caller's own
+    // reschedule request, and a thread queued on another CPU waited for that CPU's next tick,
+    // or forever on a CPU halted in its idle loop.
+    private static void TestInterruptEventWakesThreadOnOtherCpu()
+    {
+        ResetCrossCpu();
+        SysThread worker = new(CrossCpuEventWorker);
+        worker.Start();
+
+        MoveWorker(CrossCpuTarget);
+        s_crossCpuGate.Signal();
+        FinishCrossCpuWorker(worker);
+    }
+
+    // The mutex hand-off across CPUs: the waiter parks on CPU 0, moves, and the release on
+    // CPU 0 hands it the mutex and wakes it on the other CPU, where it owns the mutex.
+    private static void TestMutexCrossCpuHandoff()
+    {
+        ResetCrossCpu();
+        s_crossCpuMutex.Acquire();
+        SysThread worker = new(CrossCpuMutexWorker);
+        worker.Start();
+
+        MoveWorker(CrossCpuTarget);
+        s_crossCpuMutex.Release();
+        FinishCrossCpuWorker(worker);
+    }
+
+    // ===== A policy swap while the other CPUs run threads =====
+    private static uint[]? s_swapCounters;
+    private static volatile bool s_swapStop;
+
+    // Spins on the CPU it woke on, counting in its CPU's slot; statics only (see above).
+    private static void SwapSpinner()
+    {
+        s_crossCpuThread = CurrentSchedulerThread();
+        s_crossCpuGate!.Wait();
+
+        uint cpu = SchedulerManager.GetCurrentCpuId();
+        uint[] counters = s_swapCounters!;
+        while (!s_swapStop)
+        {
+            Interlocked.Increment(ref counters[cpu]);
+        }
+
+        s_crossCpuRelease!.Wait();
+    }
+
+    private static uint SwapCounter(uint cpu)
+    {
+        return Volatile.Read(ref s_swapCounters![cpu]);
+    }
+
+    // SetScheduler stops every other CPU for the swap: a spinner on each of them keeps
+    // counting after the swap in each direction, under the incoming policy. Without the stop,
+    // a tick on another CPU would reach a run structure the incoming policy has not built yet.
+    private static void TestSetSchedulerSwapsWhileOtherCpusRun()
+    {
+        uint cpuCount = SchedulerManager.CpuCount;
+        ResetCrossCpu();
+        s_swapCounters = new uint[cpuCount];
+        s_swapStop = false;
+
+        // One spinner per application processor, moved there one at a time: each parks on the
+        // gate on CPU 0, moves, and is the only waiter the signal can wake.
+        SysThread[] spinners = new SysThread[cpuCount];
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            s_crossCpuThread = null;
+            spinners[cpu] = new SysThread(SwapSpinner);
+            spinners[cpu].Start();
+            MoveWorker(cpu);
+            s_crossCpuGate.Signal();
+            for (int i = 0; i < FlagPollRetries && SwapCounter(cpu) == 0; i++)
+            {
+                TimerManager.Wait(FlagPollIntervalMs);
+            }
+
+            Assert.True(SwapCounter(cpu) > 0, "the spinner counts on its CPU");
+        }
+
+        RoundRobinScheduler roundRobin = new();
+        AssertSpinnersAdvanceAcrossSwap(roundRobin, cpuCount, "Round-Robin");
+        Cosmos.Kernel.Core.Scheduler.Stride.StrideScheduler stride = new();
+        AssertSpinnersAdvanceAcrossSwap(stride, cpuCount, "Stride");
+
+        // Home and release: each spinner parks on its CPU once stopped, moves back and exits on
+        // CPU 0; a release wakes one waiter, so one per spinner.
+        s_swapStop = true;
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            SchedulerThread? thread = null;
+            for (int i = 0; i < FlagPollRetries && thread is null; i++)
+            {
+                thread = FindBlockedThreadOn(cpu);
+                if (thread is null)
+                {
+                    TimerManager.Wait(FlagPollIntervalMs);
+                }
+            }
+
+            Assert.True(thread is not null, "the stopped spinner parked on its CPU");
+            MoveThread(thread!, 0);
+        }
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            s_crossCpuRelease.Signal();
+        }
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            Assert.True(spinners[cpu].Join(ThrowJoinTimeoutMs), "the spinner exits once released on CPU 0");
+        }
+    }
+
+    private static void AssertSpinnersAdvanceAcrossSwap(IScheduler policy, uint cpuCount, string name)
+    {
+        uint[] before = new uint[cpuCount];
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            before[cpu] = SwapCounter(cpu);
+        }
+
+        SchedulerManager.SetScheduler(policy);
+        Assert.True(ReferenceEquals(SchedulerManager.Current, policy), "the policy is installed");
+        TimerManager.Wait(SwapSampleWindowMs);
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            Serial.WriteString("[Threading] CPU ");
+            Serial.WriteNumber(cpu);
+            Serial.WriteString(" spun ");
+            Serial.WriteNumber(SwapCounter(cpu) - before[cpu]);
+            Serial.WriteString(" times after the swap to ");
+            Serial.WriteString(name);
+            Serial.WriteString("\n");
+            Assert.True(SwapCounter(cpu) != before[cpu], "the spinner keeps running under the incoming policy");
+        }
+    }
+
+    // The registered thread parked on `cpu`, or null. The spinners share one event and the
+    // gate's FIFO decides which one each signal woke, so the thread on a CPU is found by its
+    // assignment, not remembered.
+    private static SchedulerThread? FindBlockedThreadOn(uint cpu)
+    {
+        SchedulerThread?[]? threads = SchedulerManager.Threads;
+        if (threads is null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < threads.Length; i++)
+        {
+            SchedulerThread? thread = threads[i];
+            if (thread is not null && !thread.IsIdle && thread.CpuId == cpu && thread.State == SchedulerThreadState.Blocked)
+            {
+                return thread;
+            }
+        }
+
+        return null;
+    }
+
+    // BeforeRun runs on CPU 0's idle thread, the boot thread, on the bootloader stack whose top
+    // kmain captured and the block carries: the live stack pointer lies below it, within the
+    // stack's size.
+    private static void TestPerCpuBlockBootStackTopBoundsMainStack()
+    {
+        SchedulerThread? current = SchedulerManager.CurrentCpuState?.CurrentThread;
+        Assert.True(current is not null && current.IsIdle, "BeforeRun runs on CPU 0's idle thread, on the bootloader stack");
+
+        nuint sp = ContextSwitchNative.GetSp();
+        nuint top = PerCpuBlock.Current.BootStackTop;
+        Assert.True(top != 0, "block 0 carries the boot stack top kmain captured");
+        Assert.True(sp < top, "the main thread's stack pointer lies below the boot stack top");
+        Assert.True(top - sp <= BootStack.Size, "the main thread's stack pointer lies within the boot stack's size");
+        Assert.True(BootStack.Top == top, "BootStack.Top reads the block");
+    }
+
+    private static nuint s_workerSeenExInfoHead;
+    private static nuint s_workerOwnExInfoSlot;
+
+    // The exception stubs find the running thread's ExInfo chain head through the block's
+    // CurrentExInfoHead: the scheduler points it at the thread it switches to, so each thread
+    // sees its own slot there, and the boot code's chain head is no longer the head once a
+    // thread is current.
+    private static unsafe void TestPerCpuBlockExInfoHeadFollowsCurrentThread()
+    {
+        SchedulerThread main = SchedulerManager.CurrentCpuState!.CurrentThread!;
+        nuint bootSlot = ExceptionHelper.BootExInfoHeadSlot;
+
+        Assert.True(PerCpuBlock.Current.CurrentExInfoHead == main.ExInfoHeadSlot, "on the main thread the block points at the main thread's chain head");
+        Assert.True(PerCpuBlock.Current.CurrentExInfoHead != bootSlot, "once a thread is current the boot code's chain head is no longer the head");
+
+        s_workerSeenExInfoHead = 0;
+        s_workerOwnExInfoSlot = 0;
+        SysThread worker = new SysThread(() =>
+        {
+            // Masked: the worker runs on a compute CPU of the scheduler's
+            // choice, and moved between the two reads it would compare its
+            // own slot with the block of the CPU it left.
+            using (InternalCpu.DisableInterruptsScope())
+            {
+                s_workerOwnExInfoSlot = SchedulerManager.CurrentThread!.ExInfoHeadSlot;
+                s_workerSeenExInfoHead = PerCpuBlock.Current.CurrentExInfoHead;
+            }
+        });
+        worker.Start();
+        Assert.True(worker.Join(ThrowJoinTimeoutMs), "the worker must finish");
+        // Join returns once the worker's exit callback signals it, before OnThreadExit takes
+        // the worker's tickets back out of the Stride total: the grace wait lets that exit
+        // finish inside this cell, not in a later cell that compares TotalTickets.
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        Assert.True(s_workerOwnExInfoSlot != 0 && s_workerSeenExInfoHead == s_workerOwnExInfoSlot, "on the worker the block points at the worker's chain head");
+        Assert.True(s_workerOwnExInfoSlot != main.ExInfoHeadSlot, "two threads, two chain heads");
+        Assert.True(PerCpuBlock.Current.CurrentExInfoHead == main.ExInfoHeadSlot, "back on the main thread the block points at its chain head again");
+    }
+
+    // A throw links its ExInfo into the chain the block points at, a catch that ends it unlinks
+    // it, and a rethrow reads the exception from the same head: the three stubs agree on where
+    // the chain is, and leave it empty once the catches are done.
+    private static unsafe void TestPerCpuBlockExInfoChainEmptyAfterCatch()
+    {
+        nuint* head = (nuint*)PerCpuBlock.Current.CurrentExInfoHead;
+        Assert.True(*head == 0, "no throw is in flight before the cell");
+
+        bool rethrown = false;
+        bool linkedInCatch = false;
+        try
+        {
+            try
+            {
+                throw new InvalidOperationException("per-CPU chain");
+            }
+            catch (InvalidOperationException)
+            {
+                linkedInCatch = *head != 0;
+                throw;
+            }
+        }
+        catch (InvalidOperationException e) when (e.Message == "per-CPU chain")
+        {
+            rethrown = true;
+        }
+
+        Assert.True(linkedInCatch, "inside the catch the throw's ExInfo is the chain head");
+        Assert.True(rethrown, "the rethrow found its exception at the chain head");
+        Assert.True(*head == 0, "the catch funclet unlinked the throws it ended");
+    }
+
+    // Thread.GetCurrentProcessorId reaches SystemNative_SchedGetCpu, which reads the block.
+    private static void TestThreadGetCurrentProcessorIdIsBootCpu()
+    {
+        Assert.Equal(0, SysThread.GetCurrentProcessorId(), "the boot CPU reports index 0 through SchedGetCpu");
     }
 
     private static void TestThreadStatics()
@@ -1959,9 +2506,35 @@ public class Kernel : Sys.Kernel
     private static ulong s_spinACount, s_spinBCount;
     private static long s_observedPriorityA, s_observedPriorityB;
 
+    // Through the manager's own lookup, which a move between CPUs cannot
+    // split: the CPU's index and then that CPU's current thread, read in two
+    // steps by a worker an idle CPU may pull in between, would name the
+    // thread its old CPU runs now.
     private static SchedulerThread? CurrentSchedulerThread()
     {
-        return SchedulerManager.GetCpuState(SchedulerManager.GetCurrentCpuId())!.CurrentThread;
+        return SchedulerManager.CurrentThread;
+    }
+
+    /// <summary>
+    /// Starts a worker that shares the CPU Main runs on. Started from Main a
+    /// thread takes the default set, the compute CPUs, and runs beside Main
+    /// on a CPU of its own (SMP phase 5, CosmosOS/Cosmos#3343); a cell whose
+    /// reasoning needs its threads to take turns on one CPU starts them
+    /// through here. The set is taken at the start, so the default is back
+    /// before this returns.
+    /// </summary>
+    private static void StartOnMainCpu(SysThread thread)
+    {
+        Sys.Threading.CpuSet mainFlow = Sys.Threading.KernelCpus.DefaultAffinity;
+        Sys.Threading.KernelCpus.DefaultAffinity = Sys.Threading.KernelCpus.Housekeeping;
+        try
+        {
+            thread.Start();
+        }
+        finally
+        {
+            Sys.Threading.KernelCpus.DefaultAffinity = mainFlow;
+        }
     }
 
     /// <summary>
@@ -1984,11 +2557,11 @@ public class Kernel : Sys.Kernel
             return false;
         }
 
-        // One mask over the whole scan: the count and the per-index reads each
-        // mask individually, so between them the tick could rotate the queue
-        // and move the target past an index already visited. Nesting the
-        // policy's own guards inside this one is harmless.
-        using (SchedulerManager.MaskInterrupts())
+        // The CPU's queue lock over the whole scan: the hooks take no guard
+        // of their own, and between the count and the per-index reads the
+        // tick could otherwise rotate the queue and move the target past an
+        // index already visited.
+        using (SchedulerManager.LockCpu(state))
         {
             int count = scheduler.GetRunQueueCount(state);
             for (int i = 0; i < count; i++)
@@ -2076,16 +2649,12 @@ public class Kernel : Sys.Kernel
             TimerManager.Wait(FlagPollIntervalMs);
         }
 
-        uint cpuId = SchedulerManager.GetCurrentCpuId();
         if (s_spinAThread is not null && s_spinBThread is not null)
         {
-            // SetPriority runs under a spinlock only (see the plugging guide's
-            // kernel constraints); mask the tick around it ourselves.
-            using (SchedulerManager.MaskInterrupts())
-            {
-                SchedulerManager.SetPriority(cpuId, s_spinAThread, priorityA);
-                SchedulerManager.SetPriority(cpuId, s_spinBThread, priorityB);
-            }
+            // SetPriority takes the thread's CPU queue lock itself (SMP phase
+            // 3a), which is what keeps the tick out of the rewrite.
+            SchedulerManager.SetPriority(s_spinAThread, priorityA);
+            SchedulerManager.SetPriority(s_spinBThread, priorityB);
 
             // Capture what the policy reports while the threads are alive:
             // OnThreadExit drops the bookkeeping GetPriority reads.
@@ -2286,12 +2855,10 @@ public class Kernel : Sys.Kernel
     {
         s_roundRobin = new RoundRobinScheduler();
 
-        // Mask the tick across the swap so nothing can observe the window
-        // between ShutdownCpu (old policy) and InitializeCpu (new policy).
-        using (SchedulerManager.MaskInterrupts())
-        {
-            SchedulerManager.SetScheduler(s_roundRobin);
-        }
+        // The swap stops the world itself (SMP phase 3a): no tick on any CPU
+        // can observe the window between ShutdownCpu (old policy) and
+        // InitializeCpu (new policy).
+        SchedulerManager.SetScheduler(s_roundRobin);
 
         Assert.True(ReferenceEquals(SchedulerManager.Current, s_roundRobin),
             "SchedulerManager.Current should be the installed Round-Robin instance");
@@ -2462,14 +3029,11 @@ public class Kernel : Sys.Kernel
     }
 
     // ===== Round-Robin live dispatch =====
-    private static volatile int s_fifoRecorded;
+    private static int s_fifoRecorded;
 
     private static void FifoWorker()
     {
-        using (SchedulerManager.MaskInterrupts())
-        {
-            s_fifoRecorded++;
-        }
+        Interlocked.Increment(ref s_fifoRecorded);
     }
 
     private static void TestRoundRobinDispatchesEveryThread()
@@ -2487,13 +3051,13 @@ public class Kernel : Sys.Kernel
         w1.Start();
         w2.Start();
 
-        for (int i = 0; i < FlagPollRetries && s_fifoRecorded < FifoWorkerCount; i++)
+        for (int i = 0; i < FlagPollRetries && Volatile.Read(ref s_fifoRecorded) < FifoWorkerCount; i++)
         {
             TimerManager.Wait(FlagPollIntervalMs);
         }
         TimerManager.Wait(ExitGraceWaitMs);
 
-        Assert.Equal(FifoWorkerCount, s_fifoRecorded,
+        Assert.Equal(FifoWorkerCount, Volatile.Read(ref s_fifoRecorded),
             "Round-Robin must dispatch every ready thread (no starvation)");
     }
 
@@ -2735,10 +3299,7 @@ public class Kernel : Sys.Kernel
             "every Round-Robin worker of the cells above should have exited");
 
         Cosmos.Kernel.Core.Scheduler.Stride.StrideScheduler stride = new();
-        using (SchedulerManager.MaskInterrupts())
-        {
-            SchedulerManager.SetScheduler(stride);
-        }
+        SchedulerManager.SetScheduler(stride);
 
         Assert.True(ReferenceEquals(SchedulerManager.Current, stride),
             "SchedulerManager.Current should be the restored Stride instance");
@@ -2782,18 +3343,12 @@ public class Kernel : Sys.Kernel
         uint underStride = s_rehomeCounter;
 
         RoundRobinScheduler roundRobin = new();
-        using (SchedulerManager.MaskInterrupts())
-        {
-            SchedulerManager.SetScheduler(roundRobin);
-        }
+        SchedulerManager.SetScheduler(roundRobin);
         TimerManager.Wait(PreemptSampleIntervalMs);
         uint underRoundRobin = s_rehomeCounter;
 
         Cosmos.Kernel.Core.Scheduler.Stride.StrideScheduler stride = new();
-        using (SchedulerManager.MaskInterrupts())
-        {
-            SchedulerManager.SetScheduler(stride);
-        }
+        SchedulerManager.SetScheduler(stride);
         TimerManager.Wait(PreemptSampleIntervalMs);
         uint backUnderStride = s_rehomeCounter;
 

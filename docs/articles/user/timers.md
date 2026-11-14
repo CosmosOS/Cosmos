@@ -78,7 +78,7 @@ The handle is read-only: `TimeoutNs`, `Recurring` and `IsActive` are what a call
 
 **The callback runs in interrupt context.** It must not block, must not allocate, and must not take a lock, because the thread it interrupted may be holding one. It must also not let an exception escape: nothing above the interrupt dispatch catches one, and the kernel halts.
 
-`Schedule` and `ScheduleRecurring` return `null` when the timer is compiled out or no tick source is registered, which is why the handle is nullable. `Cancel` accepts null and answers `false`.
+`Schedule` and `ScheduleRecurring` return `null` when the timer is compiled out or no tick source is registered, which is why the handle is nullable. `Cancel` accepts null and answers `false`. All three may be called from any thread on any CPU, and `Cancel` from a timer callback as well: the registry is guarded by an interrupt-safe spinlock that the tick, on the boot CPU, takes to find the due timers and releases before it runs their callbacks. `Schedule` and `ScheduleRecurring` allocate the handle, which is why a callback may cancel a timer but not schedule one.
 
 ---
 
@@ -97,7 +97,7 @@ AlarmManager.Cancel(id);
 
 The shape is deliberately the same as `TimerManager`'s so that switching between them is one word. What differs is what you get back: an alarm belongs to the alarm system rather than to a tick source's registry, so it is identified by a `ulong` id. Zero means the alarm was not scheduled, which happens when the scheduler is not running or the period is not positive.
 
-**The scheduling calls themselves are thread-context only.** Every `AlarmManager` member takes the alarm list's mutex and parks if it is held. Calling one from an interrupt handler parks inside the handler and hangs, and a `TimerManager` callback is an interrupt handler. The `TimerManager` members mask interrupts instead of parking and carry no such restriction, so a timer callback that needs to do real work should signal a thread rather than schedule an alarm.
+**The scheduling calls themselves are thread-context only.** Every `AlarmManager` member takes the alarm list's mutex and parks if it is held. Calling one from an interrupt handler parks inside the handler and hangs, and a `TimerManager` callback is an interrupt handler. The `TimerManager` members take a spinlock instead of parking and carry no such restriction, so a timer callback that needs to do real work should signal a thread rather than schedule an alarm.
 
 A recurring alarm's period restarts when the callback fires, not when it returns, so a callback that runs longer than its period leaves the next firing already due.
 

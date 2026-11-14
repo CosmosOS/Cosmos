@@ -33,6 +33,8 @@ extern uintptr_t __cosmos_get_boot_stack_top(void);
 #ifdef __aarch64__
 // ARM64-specific: Disable alignment checking
 extern void _native_arm64_disable_alignment_check(void);
+// ARM64-specific: run on SP_EL1 (EL1h) from here on, so exception frames land on this stack
+extern void _native_arm64_select_sp_el1(void);
 #endif
 
 // ACPI early initialization (shared - MADT parsing)

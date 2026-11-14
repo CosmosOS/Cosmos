@@ -24,7 +24,7 @@ internal static class KitTime
         get
         {
             return SchedulerManager.IsReady
-                ? SchedulerManager.CurrentCpuState?.CurrentThread
+                ? SchedulerManager.CurrentThread
                 : null;
         }
     }
