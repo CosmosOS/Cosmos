@@ -82,7 +82,7 @@ internal static unsafe partial class ExceptionHelper
     {
         get
         {
-            if (CosmosFeatures.SchedulerEnabled && SchedulerManager.CurrentCpuState?.CurrentThread is { } current)
+            if (CosmosFeatures.SchedulerEnabled && SchedulerManager.CurrentThread is { } current)
             {
                 return ref current.GetExceptionDispatchState();
             }

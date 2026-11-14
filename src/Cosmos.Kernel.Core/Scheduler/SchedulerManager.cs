@@ -289,7 +289,12 @@ public static class SchedulerManager
     /// The scheduling state of the CPU running this code, or
     /// <see langword="null"/> when <see cref="IsReady"/> is false. Internal:
     /// a policy is handed the <see cref="PerCpuState"/> it operates on by
-    /// every hook, so it never has to ask which CPU it is on.
+    /// every hook, so it never has to ask which CPU it is on. The answer
+    /// holds as long as the caller stays on that CPU: an interrupt handler,
+    /// a section with interrupts masked, a thread whose set names one CPU.
+    /// Any other thread may be preempted right after the read and resume on
+    /// another CPU, so it asks <see cref="CurrentThread"/> for itself and
+    /// never goes through the state.
     /// </summary>
     internal static PerCpuState? CurrentCpuState => s_cpuStates?[GetCurrentCpuId()];
 
@@ -297,9 +302,29 @@ public static class SchedulerManager
     /// The thread running this code, or <see langword="null"/> before the
     /// scheduler has a current thread on this CPU. The boot thread, where
     /// <c>Main</c> runs, is CPU 0's idle thread: reachable this way and
-    /// through no managed handle.
+    /// through no managed handle. Right from any context: the lookup is two
+    /// steps, the CPU's index and then that CPU's current thread, and a
+    /// thread preempted between them can resume on another CPU (a wake
+    /// places it there, an idle CPU pulls it), where the second step would
+    /// hand it the thread its old CPU runs now. The two steps run with
+    /// interrupts masked, so they are one.
     /// </summary>
-    internal static SchedulerThread? CurrentThread => CurrentCpuState?.CurrentThread;
+    internal static SchedulerThread? CurrentThread
+    {
+        get
+        {
+            PerCpuState[]? states = s_cpuStates;
+            if (states is null)
+            {
+                return null;
+            }
+
+            using (InternalCpu.DisableInterruptsScope())
+            {
+                return states[GetCurrentCpuId()].CurrentThread;
+            }
+        }
+    }
 
     // ========== Affinity ==========
 
@@ -748,8 +773,7 @@ public static class SchedulerManager
     /// <param name="parameter">Generic parameter of the Thread Start, it is decoded based on the <see cref="SchedulerThreadFlags"/> set in the thread.</param>
     internal static void InvokeCurrentThreadStart(IntPtr parameter)
     {
-        PerCpuState? cpuState = CurrentCpuState;
-        SchedulerThread? currentThread = cpuState?.CurrentThread;
+        SchedulerThread? currentThread = CurrentThread;
 
         if (currentThread is null)
         {
@@ -776,7 +800,7 @@ public static class SchedulerManager
                 }
                 else
                 {
-                    var handle = GCHandle<Action>.FromIntPtr(parameter);
+                    GCHandle<Action> handle = GCHandle<Action>.FromIntPtr(parameter);
                     Action start = handle.Target;
                     handle.Dispose();
                     start();
@@ -786,9 +810,8 @@ public static class SchedulerManager
             catch (Exception ex)
             {
                 exitCode = 1;
-                // Re-query thread ID — locals may be clobbered across the catch funclet.
-                PerCpuState? exCpuState = CurrentCpuState;
-                uint exThreadId = exCpuState?.CurrentThread?.Id ?? 0;
+                // Re-query thread ID: locals may be clobbered across the catch funclet.
+                uint exThreadId = CurrentThread?.Id ?? 0;
                 Serial.WriteString("[SCHED] Thread ");
                 Serial.WriteNumber(exThreadId);
                 Serial.WriteString(" threw exception: ");
@@ -803,9 +826,8 @@ public static class SchedulerManager
             Serial.WriteString("\n");
         }
 
-        // Re-query current thread for exit — locals may be corrupted after the catch funclet.
-        PerCpuState? exitCpuState = CurrentCpuState;
-        SchedulerThread? exitThread = exitCpuState?.CurrentThread;
+        // Re-query current thread for exit: locals may be corrupted after the catch funclet.
+        SchedulerThread? exitThread = CurrentThread;
         uint exitThreadId = exitThread?.Id ?? 0;
 
         Serial.WriteString("[SCHED] Thread ");
@@ -819,7 +841,7 @@ public static class SchedulerManager
             ExitThread(exitThread);
         }
 
-        // Halt forever — scheduler should not pick this thread again.
+        // Halt forever: scheduler should not pick this thread again.
         while (true)
         {
             InternalCpu.Halt();
@@ -1223,7 +1245,7 @@ public static class SchedulerManager
         // someone else's context (SchedulerDiagnostics.RequestKill on a queued
         // thread) gets the same three steps addressed at it explicitly. Both
         // may allocate, so they run before any lock is taken.
-        if (ReferenceEquals(CurrentCpuState?.CurrentThread, thread))
+        if (ReferenceEquals(CurrentThread, thread))
         {
             nint managedCallback = OnThreadExitCallback;
             if (managedCallback != IntPtr.Zero)
@@ -1480,7 +1502,7 @@ public static class SchedulerManager
     /// <param name="timeoutMs">Timeout in milliseconds. 0 does not mean "forever": the next tick wakes the thread.</param>
     internal static void Sleep(uint timeoutMs)
     {
-        SchedulerThread? currentThread = CurrentCpuState?.CurrentThread;
+        SchedulerThread? currentThread = CurrentThread;
         if (currentThread is not null)
         {
             Sleep(currentThread, timeoutMs);

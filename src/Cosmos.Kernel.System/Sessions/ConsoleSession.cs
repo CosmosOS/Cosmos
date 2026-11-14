@@ -611,7 +611,7 @@ public abstract class ConsoleSession
     private void WaitForInput()
     {
         SchedulerThread? current = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentCpuState?.CurrentThread
+            ? SchedulerManager.CurrentThread
             : null;
 
         if (current is null || current.IsIdle)

@@ -53,7 +53,7 @@ internal class Mutex : IDisposable
     public void Acquire()
     {
         SchedulerThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentCpuState?.CurrentThread
+            ? SchedulerManager.CurrentThread
             : null;
 
         if (currentThread is null)
@@ -63,11 +63,11 @@ internal class Mutex : IDisposable
 
         // The idle thread is the scheduler's fallback (PickNext ?? IdleThread):
         // blocking it only gets it resurrected on the next tick, which re-runs
-        // this loop — every pass calls OnThreadBlocked again and drifts
+        // this loop: every pass calls OnThreadBlocked again and drifts
         // TotalTickets (and Release's ReadyThread would insert the idle
         // thread into the run queue it is supposed to back-stop). Unlike
-        // InterruptEvent the context can't be nulled — Release checks
-        // ownership — so an idle-thread caller spin-acquires instead:
+        // InterruptEvent the context can't be nulled (Release checks
+        // ownership), so an idle-thread caller spin-acquires instead:
         // ownership stays real, it just never parks in _waitingThreads.
         // Interrupts stay enabled between attempts, so the timer keeps
         // preempting to the (runnable) holder until it releases.
@@ -99,7 +99,7 @@ internal class Mutex : IDisposable
             // IRQ-safe for two reasons: a holder preempted mid-section
             // would deadlock any other thread spinning on the state lock
             // with interrupts masked, and blocking must be atomic with
-            // the wait-queue insertion — a Release() racing between the
+            // the wait-queue insertion: a Release() racing between the
             // insertion and BlockThread would ready a still-Running
             // thread whose subsequent BlockThread buries the wakeup
             // forever (lost-wakeup race, same shape as InterruptEvent).
@@ -187,7 +187,7 @@ internal class Mutex : IDisposable
     public bool TryAcquire()
     {
         SchedulerThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentCpuState?.CurrentThread
+            ? SchedulerManager.CurrentThread
             : null;
 
         if (currentThread is null)
@@ -223,7 +223,7 @@ internal class Mutex : IDisposable
     public void Release()
     {
         SchedulerThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentCpuState?.CurrentThread
+            ? SchedulerManager.CurrentThread
             : null;
 
         if (currentThread is null)

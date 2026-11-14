@@ -575,7 +575,7 @@ internal static unsafe partial class GarbageCollector
     {
         SchedulerThread? finalizerThread = s_finalizerThread;
         return finalizerThread is not null
-            && ReferenceEquals(SchedulerManager.CurrentCpuState?.CurrentThread, finalizerThread);
+            && ReferenceEquals(SchedulerManager.CurrentThread, finalizerThread);
     }
 
     /// <summary>

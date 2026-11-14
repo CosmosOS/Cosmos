@@ -12,6 +12,20 @@
 // code's before a thread is current. TPIDR_EL1 then one load, no callout.
 .equ PERCPU_CURRENT_EXINFO_HEAD,  0x38
 
+// Loads \dst with the address of the running thread's ExInfo chain head. The register and the
+// load are two instructions, and a thread preempted between them can resume on another CPU (a
+// wake places it there, an idle CPU pulls it): the load would then go through the block of the
+// CPU it left, whose slot names the chain of whatever thread that CPU runs now. IRQ and FIQ are
+// masked across the two, as _native_cpu_save_irq_and_disable masks them, so they are one. What
+// comes out is the thread's own slot, right on whichever CPU it runs next. \tmp is clobbered.
+.macro LOAD_EXINFO_HEAD dst, tmp
+    mrs     \tmp, daif
+    msr     daifset, #3
+    mrs     \dst, tpidr_el1
+    ldr     \dst, [\dst, #PERCPU_CURRENT_EXINFO_HEAD]
+    msr     daif, \tmp
+.endm
+
 //=============================================================================
 // Structure offsets
 //=============================================================================
@@ -125,9 +139,8 @@ RhpThrowEx:
     sub     sp, sp, #STACKSIZEOF_ExInfo
     .cfi_adjust_cfa_offset STACKSIZEOF_ExInfo
 
-    // x4 = &head of this thread's ExInfo chain: TPIDR_EL1 then one load through the per-CPU block.
-    mrs     x4, tpidr_el1
-    ldr     x4, [x4, #PERCPU_CURRENT_EXINFO_HEAD]
+    // x4 = &head of this thread's ExInfo chain, through the per-CPU block (x5 is scratch).
+    LOAD_EXINFO_HEAD x4, x5
 
     // x1 = ExInfo* (current SP)
     mov     x1, sp
@@ -234,12 +247,10 @@ RhpCallCatchFunclet:
     ldr     x8, [sp, #0x68]             // handler address
     blr     x8                          // call handler funclet
 
-    // x0 = the resume address. The head of this thread's ExInfo chain is TPIDR_EL1 then one load
-    // through the per-CPU block (the funclet may have switched CPUs, under SMP, so it is read
-    // now, not before the call).
+    // x0 = the resume address. The head of this thread's ExInfo chain is read through the
+    // per-CPU block now, not before the call: the funclet may have switched CPUs, under SMP.
     mov     x9, x0                      // x9 = resume address
-    mrs     x8, tpidr_el1
-    ldr     x8, [x8, #PERCPU_CURRENT_EXINFO_HEAD]   // x8 = &head of this thread's ExInfo chain
+    LOAD_EXINFO_HEAD x8, x10            // x8 = &head of this thread's ExInfo chain (x10 is scratch)
 
     // Reload REGDISPLAY* from stack (x2 may have been clobbered)
     ldr     x2, [sp, #0x70]             // REGDISPLAY*
@@ -431,10 +442,9 @@ RhpCallFinallyFunclet:
 .global RhpRethrow
 .balign 4
 RhpRethrow:
-    // The exception to rethrow is the one at the head of this thread's ExInfo chain: TPIDR_EL1
-    // then one load through the per-CPU block. LR, the rethrow site RhpThrowEx records, is kept.
-    mrs     x0, tpidr_el1
-    ldr     x0, [x0, #PERCPU_CURRENT_EXINFO_HEAD]
+    // The exception to rethrow is the one at the head of this thread's ExInfo chain, found
+    // through the per-CPU block (x1 is scratch). LR, the rethrow site RhpThrowEx records, is kept.
+    LOAD_EXINFO_HEAD x0, x1
     ldr     x0, [x0]
     cbz     x0, .halt
 

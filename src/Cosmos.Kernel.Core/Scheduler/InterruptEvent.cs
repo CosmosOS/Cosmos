@@ -67,13 +67,13 @@ internal class InterruptEvent
     {
         ulong iterations = 0;
         SchedulerThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentCpuState?.CurrentThread
+            ? SchedulerManager.CurrentThread
             : null;
         // The idle thread is the scheduler's fallback (PickNext ?? IdleThread):
         // blocking it only gets it resurrected on the next tick, which re-runs
         // the retry loop and drifts the stride accounting (OnThreadBlocked
         // subtracts tickets that OnThreadReady never added for it). Treat an
-        // idle-thread caller — the main kernel thread — like the no-context
+        // idle-thread caller (the main kernel thread) like the no-context
         // case and poll the latch instead.
         if (currentThread is not null && currentThread.IsIdle)
         {
@@ -83,7 +83,7 @@ internal class InterruptEvent
         {
             // Single execution context: nothing to block, so spin on the
             // latch with interrupts enabled between checks. Deliberately no
-            // Halt here — if the signaling ISR fires between the check and
+            // Halt here: if the signaling ISR fires between the check and
             // a hypothetical Halt, no further interrupt may ever arrive
             // (e.g. a build without a timer) and the CPU would sleep past
             // a latched signal forever.
@@ -184,7 +184,7 @@ internal class InterruptEvent
         long deadline = Stopwatch.GetTimestamp() + ticksPerMillisecond * timeoutMilliseconds;
 
         SchedulerThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentCpuState?.CurrentThread
+            ? SchedulerManager.CurrentThread
             : null;
         // Same rule as WaitCore: the idle thread is the scheduler's fallback
         // and must never be put to sleep, so it polls like the no-context case.
