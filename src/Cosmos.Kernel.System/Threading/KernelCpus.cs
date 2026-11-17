@@ -15,11 +15,13 @@ namespace Cosmos.Kernel.System.Threading;
 /// The split is a default, not a mechanism: the kernel's own service threads
 /// (the finalizer, the driver kit's, the console sessions', audio, alarms) stay on
 /// <see cref="Housekeeping"/> whatever the default says, where the device
-/// interrupts and the timers' callbacks are, and the threads a kernel starts
-/// from <c>Main</c> go to <see cref="Compute"/>, where the scheduler spreads
-/// them. A kernel that wants its main flow everywhere sets
-/// <see cref="DefaultAffinity"/> to <see cref="Online"/> before it creates
-/// threads. On two CPUs <see cref="Compute"/> is CPU 1 alone, so those threads
+/// interrupts and the timers' callbacks are, and <c>Main</c>, which runs on
+/// a thread of its own, and the threads a kernel starts from it go to
+/// <see cref="Compute"/>, where the scheduler spreads them. A kernel that
+/// wants the threads it starts everywhere sets <see cref="DefaultAffinity"/>
+/// to <see cref="Online"/> before it creates them, and moves <c>Main</c>
+/// itself with <see cref="ThreadAffinity.Current"/>. On two CPUs
+/// <see cref="Compute"/> is CPU 1 alone, so <c>Main</c> and those threads
 /// share one CPU, as they did on one. A thread allocates on whichever CPU it
 /// runs: the collector stops every CPU.
 /// </para>
@@ -59,9 +61,12 @@ public static class KernelCpus
     public static uint Current => PerCpuBlock.CurrentIndex;
 
     /// <summary>
-    /// The set a thread created from the boot thread (<c>Main</c>) takes:
-    /// <see cref="Compute"/> until a kernel sets it. A thread created from
-    /// any other thread takes its creator's set. It is also what
+    /// The set a thread created from the main thread (<c>Main</c>) takes,
+    /// and the one the main thread itself was created with:
+    /// <see cref="Compute"/> until a kernel sets it. Setting it does not
+    /// move the main thread, which changes its own set through
+    /// <see cref="ThreadAffinity.Current"/>. A thread created from any
+    /// other thread takes its creator's set. It is also what
     /// <c>Environment.ProcessorCount</c> counts, and CoreLib keeps the count
     /// it reads the first time something asks: set the default first thing,
     /// or the thread pool keeps the size it took for the set it found.

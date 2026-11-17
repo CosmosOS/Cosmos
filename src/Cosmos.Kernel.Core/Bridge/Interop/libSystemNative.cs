@@ -135,7 +135,8 @@ internal static unsafe partial class libSystemNative
             // SchedulerManager.InvokeCurrentThreadStart evaluates it to
             // call the managed startup or not.
             // No CPU here: CreateThread assigns it from the set the thread
-            // inherits (its creator's, or the default from an idle creator).
+            // inherits (its creator's, or the default when the main thread
+            // or boot code creates it).
             SchedulerThread thread = new SchedulerThread
             {
                 Id = SchedulerManager.AllocateThreadId(),

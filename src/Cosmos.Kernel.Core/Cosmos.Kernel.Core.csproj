@@ -124,7 +124,10 @@
     <!-- The affinity suite (SMP phase 3b) parks its workers on an
          InterruptEvent, starts a kernel thread to read its housekeeping
          set, and masks interrupts for one refusal and around a worker's
-         look at its own CPU. -->
+         look at its own CPU. Since Main has a thread of its own (SMP phase
+         5b) it also reads that thread: the scheduler's main thread and
+         its stack size (KernelMain), the live stack pointer, CPU 0's idle
+         thread and the scheduler's tick count. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Smp" />
     <!-- White-box suites over Core primitives: vector allocation and MSI
          routing (Interrupts), copy routines and page allocation (Memory),

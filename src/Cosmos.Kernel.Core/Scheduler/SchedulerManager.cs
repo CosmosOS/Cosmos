@@ -61,16 +61,22 @@ public static class SchedulerManager
     // keep GetBusyCpuTimeNs monotonic across thread lifecycle.
     private static ulong s_exitedNonIdleRuntimeNs;
 
-    // The set a thread created from an idle thread takes, once a kernel has
-    // set one through the ring; until then the default is the compute CPUs
-    // (SMP phase 5), read when asked since the application processors come
-    // online after the manager is initialized. Both read and written under
-    // the registry lock, so a reader never sees half of a change. No
+    // The set a thread takes when its creator is the main thread or boot
+    // code, once a kernel has set one through the ring; until then the
+    // default is the compute CPUs (SMP phase 5), read when asked since the
+    // application processors come online after the manager is initialized.
+    // The main thread is created before a kernel's Main runs, so it starts
+    // on the default as it stands then. Both read and written
+    // under the registry lock, so a reader never sees half of a change. No
     // initializer: it would give the manager a class constructor, which runs
     // through a lock that needs a current thread, and the manager is reached
     // from boot before one exists.
     private static CpuSet s_defaultAffinity;
     private static bool s_defaultAffinitySet;
+
+    // The thread Main runs on, written once by that thread before it calls
+    // Main. Null on a kernel whose Main runs on the boot context.
+    private static SchedulerThread? s_mainThread;
 
     /// <summary>
     /// The CPUs the kernel's own service threads run on, whatever
@@ -139,12 +145,14 @@ public static class SchedulerManager
 
     /// <summary>
     /// Whether the boot path has built the per-CPU state, which is what
-    /// makes the rest of this class usable. Blocking primitives (and
-    /// drivers built on them) must check this before touching
-    /// <see cref="GetCpuState"/>: with the scheduler feature compiled out,
-    /// or before its library initializer runs, there is exactly one
-    /// execution context, so callers fall back to spin/polled paths
-    /// instead of blocking.
+    /// makes the rest of this class usable. Code that may run with the
+    /// scheduler feature compiled out, or before its library initializer,
+    /// checks this before touching <see cref="GetCpuState"/>: there is
+    /// exactly one execution context then. Ready does not mean a caller may
+    /// block: a scheduler stopped at boot stays ready, and the code a CPU's
+    /// idle thread runs must not wait. The blocking primitives ask for a
+    /// running scheduler and a calling thread it can park, and take their
+    /// polled paths without them.
     /// </summary>
     public static bool IsReady => IsEnabled && s_cpuStates is not null;
 
@@ -180,8 +188,10 @@ public static class SchedulerManager
     }
 
     /// <summary>
-    /// Installs a scheduling policy. Every live thread moves with it. The
-    /// outgoing policy, if any, gets <see cref="IScheduler.OnThreadExit"/>
+    /// Installs a scheduling policy. Every live thread moves with it, the
+    /// idle threads apart: a policy never holds one (SMP phase 5b), the
+    /// mechanism runs a CPU's idle thread when that CPU has nothing else to
+    /// run. The outgoing policy, if any, gets <see cref="IScheduler.OnThreadExit"/>
     /// for each thread it was managing and then
     /// <see cref="IScheduler.ShutdownCpu"/> on every CPU. The incoming policy
     /// gets <see cref="IScheduler.InitializeCpu"/> on every CPU, then
@@ -216,7 +226,7 @@ public static class SchedulerManager
                     for (int i = 0; i < threads.Length; i++)
                     {
                         SchedulerThread? thread = threads[i];
-                        if (thread is null || thread.State == SchedulerThreadState.Dead)
+                        if (thread is null || thread.IsIdle || thread.State == SchedulerThreadState.Dead)
                         {
                             continue;
                         }
@@ -250,7 +260,7 @@ public static class SchedulerManager
                 for (int i = 0; i < threads.Length; i++)
                 {
                     SchedulerThread? thread = threads[i];
-                    if (thread is null || thread.State == SchedulerThreadState.Dead)
+                    if (thread is null || thread.IsIdle || thread.State == SchedulerThreadState.Dead)
                     {
                         continue;
                     }
@@ -318,14 +328,14 @@ public static class SchedulerManager
 
     /// <summary>
     /// The thread running this code, or <see langword="null"/> before the
-    /// scheduler has a current thread on this CPU. The boot thread, where
-    /// <c>Main</c> runs, is CPU 0's idle thread: reachable this way and
-    /// through no managed handle. Right from any context: the lookup is two
-    /// steps, the CPU's index and then that CPU's current thread, and a
-    /// thread preempted between them can resume on another CPU (a wake
-    /// places it there, an idle CPU pulls it), where the second step would
-    /// hand it the thread its old CPU runs now. The two steps run with
-    /// interrupts masked, so they are one.
+    /// scheduler has a current thread on this CPU. Boot code between the
+    /// scheduler's start and <c>Main</c>'s runs on CPU 0's idle thread, which
+    /// is reachable this way and through no managed handle. Right from any
+    /// context: the lookup is two steps, the CPU's index and then that CPU's
+    /// current thread, and a thread preempted between them can resume on
+    /// another CPU (a wake places it there, an idle CPU pulls it), where the
+    /// second step would hand it the thread its old CPU runs now. The two
+    /// steps run with interrupts masked, so they are one.
     /// </summary>
     internal static SchedulerThread? CurrentThread
     {
@@ -344,10 +354,63 @@ public static class SchedulerManager
         }
     }
 
+    /// <summary>
+    /// The calling thread when the scheduler is running, else
+    /// <see langword="null"/>: what a blocking primitive asks before it makes
+    /// its caller wait. Null means nothing can wait, because there is one
+    /// flow: the scheduler is compiled out, has not started, or was stopped
+    /// at boot because the main thread could not start
+    /// (<see cref="KernelMain.Run"/>). The primitive then takes the path it
+    /// has for a kernel without a scheduler.
+    /// </summary>
+    internal static SchedulerThread? CurrentThreadIfRunning => IsRunning ? CurrentThread : null;
+
+    // ========== Main thread ==========
+
+    /// <summary>
+    /// The thread <c>Main</c> runs on (SMP phase 5b), or <see langword="null"/>
+    /// when it runs on the boot context: the scheduler is compiled out, or it
+    /// was stopped at boot because the main thread could not start
+    /// (<see cref="KernelMain.Run"/>). The thread names itself, first thing
+    /// (<see cref="RegisterMainThread"/>), so every thread it creates finds
+    /// it. Volatile: read by <see cref="CreateThread"/> on whatever CPU the
+    /// creator runs.
+    /// </summary>
+    internal static SchedulerThread? MainThread
+    {
+        get => Volatile.Read(ref s_mainThread);
+        private set => Volatile.Write(ref s_mainThread, value);
+    }
+
+    /// <summary>
+    /// Names <paramref name="thread"/> the main thread and ties it to its
+    /// managed <see cref="System.Threading.Thread"/>, which CoreLib did not
+    /// start and so never handed over: from here on the ring resolves the
+    /// main thread from any thread, as it does one <c>Thread.Start</c>
+    /// created. Called by the main thread for itself, before <c>Main</c>.
+    /// The handle is written under the registry lock, the lock
+    /// <see cref="FindByManagedThread"/> reads it under, and freed with the
+    /// thread's slot.
+    /// </summary>
+    /// <param name="thread">The calling thread.</param>
+    /// <param name="managed">Its managed thread object.</param>
+    internal static void RegisterMainThread(SchedulerThread thread, SysThread managed)
+    {
+        // Allocated before the lock: nothing allocates under a spinlock.
+        GCHandle<SysThread> handle = new(managed);
+        using (s_registryLock.AcquireIrqSafe())
+        {
+            thread._managedThread = handle;
+        }
+
+        MainThread = thread;
+    }
+
     // ========== Affinity ==========
 
     /// <summary>
-    /// The CPU set a thread created from an idle thread takes:
+    /// The CPU set the main thread is created with, and the one a thread
+    /// takes when the main thread or boot code creates it:
     /// <see cref="ComputeCpus"/> until a kernel sets it. A thread created
     /// from any other thread takes its creator's set. Only the threads
     /// <c>System.Threading.Thread</c> starts look here; the kernel's own are
@@ -374,7 +437,7 @@ public static class SchedulerManager
     /// names no CPU the scheduler manages; the set may name CPUs that are not
     /// online, which the effective set drops.
     /// </summary>
-    /// <param name="affinity">The set every new thread of an idle creator takes.</param>
+    /// <param name="affinity">The set a thread created by the main thread, or by boot code, takes from now on.</param>
     internal static bool TrySetDefaultAffinity(CpuSet affinity)
     {
         if (!NamesManagedCpu(affinity))
@@ -752,8 +815,9 @@ public static class SchedulerManager
     /// Makes <paramref name="idleThread"/> the idle and current thread of a CPU
     /// and registers it. Boot calls this before the first policy is installed:
     /// from here on the CPU has a current thread, so thread statics resolve
-    /// and a policy hook may run a class constructor. <see cref="SetScheduler"/>
-    /// then hands the thread to the policy like any other live thread.
+    /// and a policy hook may run a class constructor. No policy is ever
+    /// handed the thread: the mechanism runs it when the CPU has nothing
+    /// else to run, and it is in no run structure.
     /// </summary>
     internal static void SetupIdleThread(uint cpuId, SchedulerThread idleThread)
     {
@@ -1163,10 +1227,11 @@ public static class SchedulerManager
     /// The thread's CPU set is assigned here (SMP phase 3b):
     /// <paramref name="affinity"/> when the caller names one (the kernel's
     /// own threads pass <see cref="HousekeepingCpus"/>), else the creating
-    /// thread's set, or <see cref="DefaultAffinity"/> when the creator is an
-    /// idle thread (the boot thread running <c>Main</c>). The ideal CPU is
-    /// the creating CPU when the effective set allows it, and the policy
-    /// chooses the thread's CPU among that set
+    /// thread's set, or <see cref="DefaultAffinity"/> when the creator is the
+    /// main thread (<see cref="MainThread"/>) or an idle thread (boot code,
+    /// or <c>Main</c> on a kernel that runs it on the boot context). The
+    /// ideal CPU is the creating CPU when the effective set allows it, and
+    /// the policy chooses the thread's CPU among that set
     /// (<see cref="IScheduler.SelectCpu"/>, SMP phase 5): this is the
     /// placement of the thread's first start, done here, where nothing else
     /// can see the thread, since the two creation seams ready it right after.
@@ -1186,7 +1251,8 @@ public static class SchedulerManager
         {
             uint current = GetCurrentCpuId();
             SchedulerThread? creator = s_cpuStates[current].CurrentThread;
-            CpuSet set = affinity ?? (creator is null || creator.IsIdle ? DefaultAffinity : creator.Affinity);
+            bool takesDefault = creator is null || creator.IsIdle || ReferenceEquals(creator, MainThread);
+            CpuSet set = affinity ?? (takesDefault ? DefaultAffinity : creator!.Affinity);
             if (set.IsEmpty)
             {
                 set = HousekeepingCpus;
@@ -1382,6 +1448,11 @@ public static class SchedulerManager
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
 
+        if (thread.IsIdle)
+        {
+            PanicIdleWait(thread);
+        }
+
         using (InternalCpu.DisableInterruptsScope())
         {
             PerCpuState state = AcquireThreadQueueLock(thread);
@@ -1555,12 +1626,12 @@ public static class SchedulerManager
     /// the next thread. A halt would leave the CPU idle until the next tick,
     /// which every thread that blocks pays, up to a whole tick period each
     /// time, out of the time of the threads that could run. Returns at once
-    /// when a wake already landed. The idle thread, and any thread before the
-    /// controller can raise the interrupt, halts instead. Thread context,
-    /// interrupts enabled: a thread that parks with interrupts masked is
-    /// stopped with a panic naming the wait it came from, since the
-    /// reschedule interrupt and the tick both stay pending and nothing can
-    /// switch away from it or wake it.
+    /// when a wake already landed. A thread that parks before the controller
+    /// can raise the interrupt halts instead. Thread context, interrupts
+    /// enabled: a thread that parks with interrupts masked is stopped with a
+    /// panic naming the wait it came from, since the reschedule interrupt
+    /// and the tick both stay pending and nothing can switch away from it or
+    /// wake it.
     /// </summary>
     /// <param name="thread">The calling thread.</param>
     /// <param name="waiter">The member that parks, for the panic. Filled in by the compiler.</param>
@@ -1583,7 +1654,7 @@ public static class SchedulerManager
         }
 
         PerCpuState[]? states = s_cpuStates;
-        if (states is not null && !thread.IsIdle)
+        if (states is not null)
         {
             // This CPU's own request: the caller runs here, whatever CPU the
             // thread is assigned to once a wake moves it.
@@ -1606,6 +1677,26 @@ public static class SchedulerManager
         {
             InternalCpu.Halt();
         }
+    }
+
+    /// <summary>
+    /// Stops the kernel for an idle thread about to wait. An idle thread is
+    /// what its CPU runs when nothing else can, in no run structure and
+    /// handed to no policy (SMP phase 5b), so nothing would ever wake it into
+    /// one: marked parked, it would come back as the fallback of the next
+    /// pick without the wake its primitive counts on. The only code that
+    /// runs on one outside the halt loop is boot code between the scheduler's
+    /// start and <c>Main</c>'s, which has nothing to wait for. Allocation-free.
+    /// </summary>
+    [DoesNotReturn]
+    private static void PanicIdleWait(SchedulerThread thread)
+    {
+        Serial.WriteString("[SCHED] Idle thread ");
+        Serial.WriteNumber(thread.Id);
+        Serial.WriteString(" asked to wait\n");
+        Panic.Halt(
+            "An idle thread cannot block or sleep: it is its CPU's fallback and nothing wakes it. "
+            + "Code that waits belongs on a thread, from Main onwards.");
     }
 
     /// <summary>
@@ -1655,6 +1746,11 @@ public static class SchedulerManager
     {
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
+
+        if (thread.IsIdle)
+        {
+            PanicIdleWait(thread);
+        }
 
         using (InternalCpu.DisableInterruptsScope())
         {
@@ -1978,7 +2074,9 @@ public static class SchedulerManager
     /// Changes a thread's priority through the installed scheduler
     /// (<see cref="IScheduler.SetPriority"/>), under the queue lock of the
     /// CPU the thread is assigned to, whose run structure the update
-    /// rewrites. Interpretation is scheduler-specific.
+    /// rewrites. Interpretation is scheduler-specific. A CPU's idle thread
+    /// has no priority: it belongs to no policy (SMP phase 5b), so the call
+    /// does nothing for one.
     /// </summary>
     /// <param name="thread">Thread to reprioritize.</param>
     /// <param name="priority">New priority value.</param>
@@ -1986,6 +2084,11 @@ public static class SchedulerManager
     {
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
+
+        if (thread.IsIdle)
+        {
+            return;
+        }
 
         using (InternalCpu.DisableInterruptsScope())
         {
@@ -1998,13 +2101,19 @@ public static class SchedulerManager
     /// <summary>
     /// Returns a thread's priority as reported by the installed scheduler
     /// (<see cref="IScheduler.GetPriority"/>), under the queue lock of the
-    /// CPU the thread is assigned to.
+    /// CPU the thread is assigned to. 0 for a CPU's idle thread, which no
+    /// policy is asked about.
     /// </summary>
     /// <param name="thread">Thread to query.</param>
     public static long GetPriority(SchedulerThread thread)
     {
         ThrowIfCpuStateNotInitialized();
         ThrowIfSchedulerNotSet();
+
+        if (thread.IsIdle)
+        {
+            return 0;
+        }
 
         using (InternalCpu.DisableInterruptsScope())
         {
@@ -2223,8 +2332,30 @@ public static class SchedulerManager
         state._lock.Acquire();
 
         // Update timing and check if preemption needed. The current thread is
-        // this CPU's own, written by its switch under the lock just taken.
-        bool needsReschedule = s_currentScheduler.OnTick(state, current, elapsedNs);
+        // this CPU's own, written by its switch under the lock just taken. An
+        // idle thread is no policy's (SMP phase 5b): its time is charged here,
+        // and every tick it takes asks for a pick, which finds whatever was
+        // queued meanwhile and otherwise asks the policy for a thread to pull.
+        bool needsReschedule;
+        if (current.IsIdle)
+        {
+            current.TotalRuntime += elapsedNs;
+            needsReschedule = true;
+        }
+        else if (current.State == SchedulerThreadState.Dead)
+        {
+            // A thread that ended on this CPU (it returned, or was killed
+            // while it ran) halts until a switch takes it off. The policy
+            // has let go of it, so the policy is not asked: the CPU leaves
+            // the thread now. Left to the policy's answer, a dead thread
+            // whose CPU queued nothing stayed current there, and the CPU,
+            // idle by no reading, pulled no work.
+            needsReschedule = true;
+        }
+        else
+        {
+            needsReschedule = s_currentScheduler.OnTick(state, current, elapsedNs);
+        }
 
         if (needsReschedule)
         {
@@ -2357,13 +2488,26 @@ public static class SchedulerManager
     /// context. The caller releases the lock and then runs <see cref="MigratePending"/>: a
     /// thread whose set excludes this CPU is evicted here (left out of the run structure,
     /// still Running when it was) and moved there, under both CPUs' locks. When the policy has
-    /// nothing to run, the lock is released around the pull of a thread from another CPU
-    /// (<see cref="PullWork"/>) and taken again before anything is staged.
+    /// nothing to run and the thread on the CPU cannot go on, the lock is released around the
+    /// pull of a thread from another CPU (<see cref="PullWork"/>) and taken again before
+    /// anything is staged.
     /// </summary>
     private static void ScheduleFromInterruptLocked(PerCpuState state, nuint currentRsp)
     {
         SchedulerThread? prev = state.CurrentThread;
         SchedulerThread? next = s_currentScheduler!.PickNext(state);
+
+        // The policy has nothing else for this CPU. A thread that can go on
+        // keeps it (SMP phase 5b): the idle thread is what a CPU with nothing
+        // to run falls back on, not a thread that takes turns, so a quantum
+        // that ends with nothing queued behind it changes nothing, and the
+        // CPU does not go looking for work either. A thread that parked or
+        // died, or that this CPU is excluded from, cannot go on: the CPU
+        // pulls or idles below.
+        if (next is null && KeepsCpu(state, prev))
+        {
+            return;
+        }
 
         // Nothing to run here, so the CPU is about to run its idle thread:
         // the policy is first asked for a thread to pull from another CPU
@@ -2388,8 +2532,8 @@ public static class SchedulerManager
 
         if (next is null)
         {
-            // No thread to switch to - just continue with current
-            // This happens when all threads have exited
+            // A CPU with no idle thread yet: nothing to switch to, the
+            // current flow goes on.
             return;
         }
 
@@ -2397,7 +2541,7 @@ public static class SchedulerManager
         // leaves now, whatever the policy picked. The cheap check first, the
         // online intersection only when the set excludes this CPU.
         bool evict = prev is not null && !prev.IsIdle && prev.State != SchedulerThreadState.Dead
-            && !prev.Affinity.Contains(state.CpuId) && !EffectiveAffinity(prev).Contains(state.CpuId);
+            && !IsAllowedOn(prev, state.CpuId);
         if (evict)
         {
             state._pendingMigration = prev;
@@ -2440,8 +2584,13 @@ public static class SchedulerManager
                 prev.StackPointer = currentRsp;
                 if (prev.State == SchedulerThreadState.Running && !evict)
                 {
+                    // An idle thread turns Ready and goes to no structure:
+                    // the next pick that finds nothing falls back to it.
                     prev.State = SchedulerThreadState.Ready;
-                    s_currentScheduler.OnThreadYield(state, prev);
+                    if (!prev.IsIdle)
+                    {
+                        s_currentScheduler.OnThreadYield(state, prev);
+                    }
                 }
 
                 // The stub clears prev's on-CPU marker right after it has
@@ -2472,6 +2621,29 @@ public static class SchedulerManager
             // by a wake that came before it left the CPU: it stays on.
             next.State = SchedulerThreadState.Running;
         }
+    }
+
+    /// <summary>
+    /// Whether <paramref name="thread"/>, the thread <paramref name="state"/>'s
+    /// CPU runs, goes on running there when the policy picks nothing: a
+    /// thread of a policy's, still Running (neither parked nor dead), on a CPU
+    /// its set allows. Under the CPU's queue lock.
+    /// </summary>
+    private static bool KeepsCpu(PerCpuState state, SchedulerThread? thread)
+    {
+        return thread is not null && !thread.IsIdle && thread.State == SchedulerThreadState.Running
+            && IsAllowedOn(thread, state.CpuId);
+    }
+
+    /// <summary>
+    /// Whether <paramref name="thread"/> may run on <paramref name="cpuId"/>:
+    /// the cheap check first, its set, and the online intersection only when
+    /// the set excludes the CPU. One test for the eviction and for the thread
+    /// that keeps its CPU, which must agree.
+    /// </summary>
+    private static bool IsAllowedOn(SchedulerThread thread, uint cpuId)
+    {
+        return thread.Affinity.Contains(cpuId) || EffectiveAffinity(thread).Contains(cpuId);
     }
 
     // ========== Platform-specific ==========

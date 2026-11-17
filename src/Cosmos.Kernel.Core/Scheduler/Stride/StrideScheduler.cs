@@ -49,10 +49,11 @@ internal class StrideScheduler : IScheduler
 
     /// <summary>
     /// Queued threads a CPU has to hold before <see cref="Balance"/> takes
-    /// one from it: with two, the CPU keeps something to run after the pull,
-    /// its idle thread included, which waits in the queue like any other.
+    /// one from it. One is enough: the queue holds the threads that wait,
+    /// not the one the CPU runs, so a CPU that runs a thread and queues
+    /// another keeps the first after the pull.
     /// </summary>
-    private const int MinQueuedToSteal = 2;
+    private const int MinQueuedToSteal = 1;
 
     /// <summary>
     /// Stopwatch ticks in one <see cref="SchedulerManager.DefaultQuantumNs"/>,
@@ -116,9 +117,9 @@ internal class StrideScheduler : IScheduler
 
         // A thread normally arrives Created and passes through OnThreadReady
         // before it runs; that is where a runnable thread's tickets enter the
-        // total. A thread that is already running when it is handed over (the
-        // boot thread at startup, or the caller of SetScheduler on a policy
-        // swap) never takes that path, yet the OnThreadBlocked or
+        // total. A thread that is already running when it is handed over (on
+        // a policy swap: the caller of SetScheduler, and whatever the other
+        // CPUs run) never takes that path, yet the OnThreadBlocked or
         // OnThreadExit that eventually follows subtracts its tickets. Count
         // them here so the total cannot underflow.
         if (thread.State == SchedulerThreadState.Running)
@@ -237,8 +238,9 @@ internal class StrideScheduler : IScheduler
         }
 
         // Ensure thread's pass is at least GlobalPass to prevent starvation of newer threads.
-        // Without this, a thread that started with Pass=0 (like the idle thread) would
-        // perpetually have lower pass than threads added later with Pass=GlobalPass.
+        // Without this, a thread whose pass fell behind (one handed over while it ran starts
+        // at the GlobalPass of that moment) would perpetually have lower pass than threads
+        // added later with Pass=GlobalPass.
         if (threadData.Pass < (long)cpuData.GlobalPass)
         {
             threadData.Pass = (long)cpuData.GlobalPass;
@@ -296,7 +298,9 @@ internal class StrideScheduler : IScheduler
 
         StrideThreadData? threadData = ThreadDataOf(current);
 
-        // Thread may have exited - its SchedulerData would be null
+        // No record: an empty slot, which the seam asks every hook to
+        // tolerate. Nothing to account, and the thread gives way to whatever
+        // is queued.
         if (threadData is null)
         {
             return cpuData.RunQueue.Count > 0;
@@ -326,17 +330,32 @@ internal class StrideScheduler : IScheduler
             IO.Serial.WriteString("\n");
         }
 
-        // Check for preemption
-        if (cpuData.RunQueue.Count > 0)
+        // The running thread gives way when a queued thread is due: the head
+        // of the queue, the lowest Pass waiting, is at or behind the place
+        // the running thread would take if it yielded now, its own Pass or
+        // GlobalPass when it lags behind (the floor OnThreadYield applies). A
+        // tie goes to the queued thread, so equal threads take turns tick by
+        // tick, and a thread at or behind GlobalPass never waits past a tick.
+        // A head that ran ahead of its share waits its turn, which is what
+        // gives the thread with more tickets more of a CPU two threads
+        // share: PickNext hands out the head whatever the running thread's
+        // Pass, so a tick that always asked for a pick made them alternate.
+        // That went unseen while the idle thread waited in every queue as a
+        // third thread (SMP phase 5b). With nothing queued the thread goes on.
+        if (cpuData.RunQueue.Count == 0)
         {
-            StrideThreadData? nextData = ThreadDataOf(cpuData.RunQueue[0]);
-            if (nextData is not null && nextData.Pass < threadData.Pass)
-            {
-                return true;
-            }
+            return false;
         }
 
-        return elapsedNs >= quantum;
+        StrideThreadData? nextData = ThreadDataOf(cpuData.RunQueue[0]);
+        if (nextData is null)
+        {
+            // No record, so no Pass to rank it by: it gets its turn at
+            // every tick.
+            return true;
+        }
+
+        return nextData.Pass <= Math.Max(threadData.Pass, (long)cpuData.GlobalPass);
     }
 
     // ========== Load Balancing ==========
@@ -428,19 +447,32 @@ internal class StrideScheduler : IScheduler
 
     public SchedulerThread? Balance(PerCpuState cpuState, PerCpuState[] allCpuStates)
     {
-        // Only a CPU with nothing queued pulls, and it pulls from the longest
-        // queue that holds at least two: the thread nearest its tail (the
-        // highest Pass, the one that CPU would run last) that may run here.
-        // The counts are read under no lock, as snapshots. A queue is a list
-        // its CPU rewrites at every switch, so the walk that looks for the
-        // thread runs under that CPU's queue lock, one CPU at a time; the
-        // mechanism holds none when it calls this hook, and checks the answer
-        // again under both locks before it moves anything. An idle thread is
-        // queued like any other here, so a CPU whose last thread parks picks
-        // its idle thread, and asks from that thread's next reschedule, the
-        // tick that follows.
+        // Only a CPU out of work pulls: nothing queued, and no thread of its
+        // own that goes on. The queue alone does not say so since the idle
+        // threads left it (SMP phase 5b): it is empty too on a CPU that runs
+        // its only thread, and a CPU that pulled on that would trade a queued
+        // thread with its neighbour at every periodic call. A thread this CPU
+        // is being excluded from reads as going on, so the CPU it leaves
+        // pulls a tick later, from its idle thread.
+        //
+        // It pulls from the longest queue of a CPU that is running a thread:
+        // the thread nearest its tail (the highest Pass, the one that CPU
+        // would run last) that may run here. A CPU on its idle thread is
+        // left what it holds: a thread queued there was woken onto it an
+        // instant ago, and its own interrupt exit is about to run it. The
+        // counts and the states are read under no lock, as snapshots. A
+        // queue is a list its CPU rewrites at every switch, so the walk that
+        // looks for the thread runs under that CPU's queue lock, one CPU at
+        // a time; the mechanism holds none when it calls this hook, and
+        // checks the answer again under both locks before it moves anything.
         StrideCpuData? cpuData = CpuDataOf(cpuState);
         if (cpuData is null || cpuData.RunQueue.Count > 0)
+        {
+            return null;
+        }
+
+        SchedulerThread? own = cpuState.CurrentThread;
+        if (own is not null && !own.IsIdle && own.State == SchedulerThreadState.Running)
         {
             return null;
         }
@@ -464,7 +496,8 @@ internal class StrideScheduler : IScheduler
             using (SchedulerManager.LockCpu(state))
             {
                 int count = data.RunQueue.Count;
-                if (count <= victimQueueCount)
+                SchedulerThread? running = state.CurrentThread;
+                if (count <= victimQueueCount || running is null || running.IsIdle)
                 {
                     continue;
                 }
@@ -483,9 +516,8 @@ internal class StrideScheduler : IScheduler
 
     /// <summary>
     /// The queued thread nearest the tail that may move to <paramref name="cpuId"/>:
-    /// not an idle thread, which is its CPU's, not a thread whose set excludes
-    /// that CPU, not one its CPU's interrupt exit has not left yet, and not
-    /// one queued for its first run, still
+    /// not a thread whose set excludes that CPU, not one its CPU's interrupt
+    /// exit has not left yet, and not one queued for its first run, still
     /// <see cref="SchedulerThreadState.Created"/>, all of which the mechanism
     /// would refuse. Under the queue's lock.
     /// </summary>
@@ -494,7 +526,7 @@ internal class StrideScheduler : IScheduler
         for (int i = queue.Count - 1; i >= 0; i--)
         {
             SchedulerThread thread = queue[i];
-            if (!thread.IsIdle && !thread.IsOnCpu && thread.State == SchedulerThreadState.Ready
+            if (!thread.IsOnCpu && thread.State == SchedulerThreadState.Ready
                 && thread.Affinity.Contains(cpuId))
             {
                 return thread;
@@ -574,12 +606,20 @@ internal class StrideScheduler : IScheduler
 
     private void UpdateGlobalPass(StrideCpuData cpuData)
     {
+        ulong now = GetTimestamp();
         if (cpuData.TotalTickets == 0)
         {
+            // Nothing runnable, which is what a CPU on its idle thread looks
+            // like since the idle thread holds no tickets: virtual time
+            // stands still. The stretch is dropped here, or the first update
+            // after the next wake would add it whole to GlobalPass, past the
+            // thread that just woke at the old value, and the yield floor
+            // would then snap every thread up to GlobalPass at each switch,
+            // which flattens ticket ratios into equal shares.
+            cpuData.LastPassUpdate = now;
             return;
         }
 
-        ulong now = GetTimestamp();
         ulong elapsed = now - cpuData.LastPassUpdate;
         ulong globalStride = Stride1 / cpuData.TotalTickets;
 

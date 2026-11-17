@@ -7,11 +7,12 @@ namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 
 /// <summary>
 /// The kit's clock and its one rule for sleeping: a thread the scheduler
-/// owns sleeps through the scheduler; the boot thread, which is the
-/// scheduler's idle thread, and any code running before the scheduler exists
-/// spin on a <see cref="Stopwatch"/> deadline with interrupts enabled and
-/// never halt. Putting the idle thread to sleep would take the scheduler's
-/// fallback off its queue, and a halt with no interrupt to end it never ends.
+/// owns sleeps through the scheduler; code on a CPU's idle thread (boot code
+/// before <c>Main</c>'s thread exists, or the whole kernel when the
+/// scheduler was stopped at boot) and any code running before the scheduler
+/// exists spin on a <see cref="Stopwatch"/> deadline with interrupts enabled
+/// and never halt. An idle thread is its CPU's fallback and nothing would
+/// wake it, and a halt with no interrupt to end it never ends.
 /// </summary>
 internal static class KitTime
 {

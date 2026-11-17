@@ -43,7 +43,8 @@ internal class Thread
             }
         }
 
-        // Boot/idle thread: runs on the bootloader-provided stack.
+        // Boot code and the idle threads run on the bootloader-provided stack
+        // of their CPU, as Main does on a kernel without the scheduler.
         pStackHigh = (nint)BootStack.Top;
         pStackLow = pStackHigh - (nint)BootStack.Size;
     }

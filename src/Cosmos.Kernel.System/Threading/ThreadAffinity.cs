@@ -11,14 +11,14 @@ namespace Cosmos.Kernel.System.Threading;
 /// it: a hard set the scheduler never leaves (a thread running on a CPU its
 /// set excludes is moved at that CPU's next interrupt exit) and an ideal CPU
 /// inside it. A thread inherits its creator's set, or
-/// <see cref="KernelCpus.DefaultAffinity"/> when created from the boot
+/// <see cref="KernelCpus.DefaultAffinity"/> when created from the main
 /// thread. A thread allocates on whichever CPU it runs: the collector stops
 /// every CPU (SMP phase 4), so a thread away from CPU 0 is scanned like any
 /// other.
 /// <para>
 /// A <see cref="global::System.Threading.Thread"/> resolves to the scheduler's thread by its
-/// handle: the calling thread always resolves, the boot thread included;
-/// another thread resolves while the scheduler runs it, from its start to
+/// handle: the calling thread always resolves; another thread, the main
+/// thread included, resolves while the scheduler runs it, from its start to
 /// its exit. The members that take a thread answer false for one that does
 /// not resolve, and the writes answer false for a CPU's idle thread, which
 /// never moves.
@@ -29,10 +29,12 @@ public static class ThreadAffinity
     /// <summary>
     /// The CPUs the calling thread may run on. Setting a set that excludes
     /// the CPU the caller runs on returns once the caller runs on one it
-    /// names; the boot thread, which runs <c>Main</c> on CPU 0's idle thread,
-    /// cannot move.
+    /// names. <c>Main</c> runs on a thread of its own and moves like any
+    /// other. Code on a CPU's idle thread cannot: boot code that runs before
+    /// <c>Main</c>, and <c>Main</c> itself on a kernel whose scheduler was
+    /// stopped at boot.
     /// </summary>
-    /// <exception cref="InvalidOperationException">On set: the scheduler is compiled out or not up, the caller is the boot thread or another idle thread, or interrupts are masked, which the move waits on.</exception>
+    /// <exception cref="InvalidOperationException">On set: the scheduler is compiled out or not up, the caller runs on an idle thread (boot code before <c>Main</c>, or <c>Main</c> itself on a kernel whose scheduler was stopped at boot), or interrupts are masked, which the move waits on.</exception>
     /// <exception cref="ArgumentException">On set: the set is empty, or names no CPU under <see cref="KernelCpus.Count"/>.</exception>
     public static CpuSet Current
     {
@@ -45,7 +47,7 @@ public static class ThreadAffinity
             SchedulerThread? thread = SchedulerManager.CurrentThread;
             if (thread is null || thread.IsIdle)
             {
-                throw new InvalidOperationException("The boot thread runs Main on CPU 0's idle thread and cannot move; start a thread and set its CPU set.");
+                throw new InvalidOperationException("The caller runs on a CPU's idle thread, which cannot move: only a thread the scheduler runs changes its CPU set.");
             }
 
             ThrowIfInterruptsMasked();
@@ -168,8 +170,9 @@ public static class ThreadAffinity
 
     /// <summary>
     /// The scheduler's thread behind a managed one: the current CPU's current
-    /// thread for the caller (which is how the boot thread, reached by no
-    /// handle, resolves), a registry walk for any other.
+    /// thread for the caller (which is how a thread the kernel started
+    /// itself, reached by no handle, resolves), a registry walk for any
+    /// other, the main thread included.
     /// </summary>
     private static SchedulerThread? Resolve(SysThread thread)
     {

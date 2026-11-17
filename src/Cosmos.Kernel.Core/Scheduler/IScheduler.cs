@@ -42,6 +42,16 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// re-homes every live thread through <see cref="OnThreadExit"/> on the
 /// outgoing policy and <see cref="OnThreadCreate"/> on the incoming one.
 /// </para>
+/// <para>
+/// A policy never sees an idle thread (SMP phase 5b). Each CPU has one,
+/// <see cref="PerCpuState.IdleThread"/>, which the mechanism runs when the
+/// CPU has nothing else: <see cref="PickNext"/> returned
+/// <see langword="null"/> and the thread on the CPU cannot go on. No hook is
+/// called for it, it is in no run structure, and it carries no record. While
+/// a CPU runs its idle thread, <see cref="PerCpuState.CurrentThread"/> is
+/// that thread, <see cref="OnTick"/> is not called, and every tick asks for
+/// a pick instead.
+/// </para>
 /// <para>Inspired by Ekiben's EkibenScheduler trait.</para>
 /// </summary>
 [Experimental(Experimentals.SchedulerSeamDiagId)]
@@ -97,8 +107,9 @@ public interface IScheduler
     /// <see cref="OnThreadReady"/> right after, blocked and sleeping ones
     /// come back through it when they wake, and a
     /// <see cref="SchedulerThreadState.Running"/> one keeps running and must
-    /// be accounted as runnable without being queued. The boot thread
-    /// arrives that way at startup as well.
+    /// be accounted as runnable without being queued. The first policy,
+    /// installed at boot, inherits nothing: only the idle threads exist
+    /// then, and a policy is never handed one.
     /// </summary>
     /// <param name="cpuState">CPU the thread is being created on.</param>
     /// <param name="thread">Thread entering this policy's management.</param>
@@ -165,16 +176,20 @@ public interface IScheduler
     /// </summary>
     /// <param name="cpuState">CPU to schedule.</param>
     /// <returns>
-    /// The thread to switch to, or <see langword="null"/> to fall back to the
-    /// CPU's idle thread. Remove the thread you return from the run
-    /// structure: the manager re-inserts the outgoing thread through
+    /// The thread to switch to, or <see langword="null"/> when the policy
+    /// has none: the thread on the CPU then keeps it when it can go on (still
+    /// Running, on a CPU its set allows), without a call to
+    /// <see cref="OnThreadYield"/>, and the CPU falls back to its idle thread
+    /// when it cannot. Remove the thread you return from the run structure:
+    /// the manager re-inserts the outgoing thread through
     /// <see cref="OnThreadYield"/> after this call, and does not remove the
     /// incoming one, so leaving it queued grants it a second turn. The
     /// manager does not check the thread's state either, so never return one
-    /// that is dead or parked. After a <see langword="null"/> on a machine
-    /// with several CPUs the mechanism asks <see cref="Balance"/>, and when a
-    /// thread was pulled it calls this hook once more for the same
-    /// reschedule: a <see langword="null"/> must leave nothing behind.
+    /// that is dead or parked. After a <see langword="null"/> that leaves
+    /// the CPU nothing to run, on a machine with several CPUs, the mechanism
+    /// asks <see cref="Balance"/>, and when a thread was pulled it calls this
+    /// hook once more for the same reschedule: a <see langword="null"/> must
+    /// leave nothing behind.
     /// </returns>
     SchedulerThread? PickNext(PerCpuState cpuState);
 
@@ -191,15 +206,21 @@ public interface IScheduler
 
     /// <summary>
     /// Account the elapsed time and decide whether to preempt. Called from
-    /// the timer interrupt, on every tick, under the CPU's queue lock, and it
-    /// is the only hook that runs on a fixed schedule: keep it allocation-free.
+    /// the timer interrupt, under the CPU's queue lock, on every tick that
+    /// lands on one of the policy's threads: keep it allocation-free. A tick
+    /// that lands on the CPU's idle thread, or on a thread that ended, does
+    /// not come here; the mechanism asks for a pick at once.
     /// </summary>
     /// <param name="cpuState">CPU being ticked.</param>
-    /// <param name="current">Thread running on it.</param>
+    /// <param name="current">
+    /// Thread running on it. Never the CPU's idle thread, whose time the
+    /// mechanism charges itself, and never a thread that ended, which the
+    /// mechanism takes off the CPU without asking.
+    /// </param>
     /// <param name="elapsedNs">
     /// The timer's configured period in nanoseconds, not a measurement of
     /// how long the thread actually ran. Charging it to
-    /// <c>Thread.TotalRuntime</c> is the policy's job, and the ring's
+    /// <see cref="SchedulerThread.TotalRuntime"/> is the policy's job, and the ring's
     /// busy-CPU-time reading depends on the policy doing it.
     /// </param>
     /// <returns>

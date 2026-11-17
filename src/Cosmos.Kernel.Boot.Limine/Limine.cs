@@ -83,9 +83,10 @@ public static class Limine
     public static readonly LimineExecutableCmdlineRequest ExecutableCmdline = new();
 
     /// <summary>
-    /// Asks for a boot stack larger than the protocol's 64 KiB default: the whole main
-    /// thread runs on it, and <c>EnsureSufficientExecutionStack</c> needs more than
-    /// 128 KiB to ever succeed. <c>BootStack.Size</c> reports the requested size when the
+    /// Asks for a boot stack larger than the protocol's 64 KiB default: the library
+    /// initializers run on it, and so does the whole of <c>Main</c> on a kernel without the
+    /// scheduler, where <c>EnsureSufficientExecutionStack</c> needs more than 128 KiB to
+    /// ever succeed. <c>BootStack.Size</c> reports the requested size when the
     /// loader answered and the default when it did not; the loader gives every CPU it
     /// starts (see <see cref="Mp"/>) a stack of the same size.
     /// </summary>
