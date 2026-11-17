@@ -1,18 +1,54 @@
 name: Build Tools
 
+# Builds LLVM, xorriso, QEMU and GDB for Linux, macOS and Windows and publishes
+# them as the `tools-latest` release, which `cosmos install` and the other
+# workflows download.
+#
+# The Linux tools are built in an ubuntu:22.04 container, the oldest Ubuntu
+# release still supported, and not on the runner itself: a binary built against
+# an old C library starts on every later one, while one built on the runner
+# stops starting on older releases each time `ubuntu-latest` moves on. Each
+# package also brings the libraries its tool needs that a bare Ubuntu may lack.
+# verify-linux then runs every packaged tool in a bare image of each supported
+# release, and nothing is published unless all of them pass.
+#
+# A pull request that changes this file runs the builds and the verification
+# and publishes nothing. Publishing takes a manual run.
+
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/build-tools.yml
+
+defaults:
+  run:
+    shell: bash
 
 env:
+  # No question from apt in the build containers
+  DEBIAN_FRONTEND: noninteractive
   LLVM_VERSION: "22.1.3"
   LLVM_TAG: "llvmorg-22.1.3"
+  # libxml2 shipped beside the Linux ld.lld (see build-llvm). 2.13 is the last
+  # series whose library is named libxml2.so.2, the name that linker asks for.
+  LIBXML2_VERSION: "2.13.9"
+  LIBXML2_SHA256: "a2c9ae7b770da34860050c309f903221c67830c86e4a7e760692b803df95143a"
   XORRISO_VERSION: "1.5.8.pl01"
   XORRISO_DIR: "1.5.8"
   QEMU_VERSION: "10.2.2"
+  # SDL built for the Linux QEMU (see build-qemu)
+  SDL2_VERSION: "2.32.10"
+  SDL2_SHA256: "5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165"
   GDB_VERSION: "17.1"
   # CPython embedded in gdb for scripting (pretty-printers, kernel debug
   # helpers). macOS bundling paths are keyed on this exact version.
   PYTHON_VERSION: "3.13"
+  # The CPython of that series the Linux gdb carries, a standalone build from
+  # astral-sh/python-build-standalone (see build-gdb).
+  PYTHON_STANDALONE_VERSION: "3.13.18"
+  PYTHON_STANDALONE_RELEASE: "20261110"
+  PYTHON_STANDALONE_SHA256: "f2d2199eb25880e07863b391cf7124e7ffa1338b0d65600dfcec117c4223a7fb"
 
 jobs:
   # ═══════════════════════════════════════════════════════════════════════
@@ -22,6 +58,9 @@ jobs:
   build-llvm:
     name: LLVM ${{ matrix.target }}
     runs-on: ubuntu-latest
+    # The oldest Ubuntu release still supported. What is compiled in it asks
+    # for its C library or a later one, whatever image the runner has.
+    container: ubuntu:22.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -31,6 +70,11 @@ jobs:
           - target: darwin-arm64
           - target: win-x64
     steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential ca-certificates curl xz-utils zip
+
       - name: Download & repackage LLVM
         shell: bash
         run: |
@@ -84,7 +128,35 @@ jobs:
           # Stamp the bundle so ToolResolver can compare against system tools
           echo "${LLVM_VERSION}" > pkg/llvm-tools/VERSION
 
-          # Package
+      # The upstream Linux ld.lld is linked against libxml2.so.2 and looks for
+      # it in ../lib first (its RUNPATH is $ORIGIN/../lib). A distribution on
+      # libxml2 2.14 or later ships libxml2.so.16 only, and the linker does not
+      # start there (#3245). The bundle therefore carries its own copy, built
+      # from source with every optional dependency off, so that it needs
+      # nothing but the C library.
+      - name: Bundle libxml2 beside ld.lld (Linux)
+        if: matrix.target == 'linux-x64'
+        run: |
+          curl -fL -o libxml2.tar.xz \
+            "https://download.gnome.org/sources/libxml2/${LIBXML2_VERSION%.*}/libxml2-${LIBXML2_VERSION}.tar.xz"
+          echo "${LIBXML2_SHA256}  libxml2.tar.xz" | sha256sum -c -
+          mkdir libxml2 && tar xf libxml2.tar.xz -C libxml2 --strip-components=1
+
+          cd libxml2
+          ./configure --disable-static --without-python --without-zlib --without-lzma \
+            --without-icu --without-iconv --without-http --without-modules \
+            --without-debug --without-readline --without-history
+          make -j"$(nproc)" libxml2.la
+          cd ..
+
+          # One regular file under the name the linker asks for, no symlink chain
+          cp -L libxml2/.libs/libxml2.so.2 pkg/llvm-tools/lib/libxml2.so.2
+          strip pkg/llvm-tools/lib/libxml2.so.2
+          cp libxml2/Copyright pkg/llvm-tools/lib/libxml2.so.2.LICENSE
+          ls -la pkg/llvm-tools/lib/
+
+      - name: Package
+        run: |
           if [ "${{ matrix.target }}" = "win-x64" ]; then
             cd pkg && zip -r ../llvm-tools-${LLVM_VERSION}-${{ matrix.target }}.zip llvm-tools
           else
@@ -103,6 +175,8 @@ jobs:
   build-xorriso:
     name: xorriso ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
+    # Linux only (see the matrix): macOS and Windows build on the runner itself
+    container: ${{ matrix.container }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -110,11 +184,20 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux-x64
+            container: ubuntu:22.04
           - os: macos-latest
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
     steps:
+      # The image is bare. zlib is the one optional library xorriso was built
+      # with on the runner, and every Ubuntu has it installed.
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential ca-certificates curl zlib1g-dev
+
       - name: Setup MSYS2 (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
@@ -206,6 +289,8 @@ jobs:
   build-qemu:
     name: QEMU ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
+    # Linux only (see the matrix): macOS and Windows build on the runner itself
+    container: ${{ matrix.container }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -213,39 +298,70 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux-x64
+            container: ubuntu:22.04
           - os: macos-latest
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
     steps:
+      # The image is bare: everything the build uses is named here. The second
+      # group is what SDL can drive (X11, Wayland, the sound servers). It is
+      # needed to build SDL and is not linked into anything: see Build SDL2.
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-venv \
-            ninja-build pkg-config libglib2.0-dev libpixman-1-dev \
-            libslirp-dev libsdl2-dev libfdt-dev flex bison
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential ca-certificates curl xz-utils bzip2 pkg-config \
+            python3 python3-venv python3-tomli ninja-build \
+            libglib2.0-dev libpixman-1-dev libslirp-dev libfdt-dev libzstd-dev
+          apt-get install -y --no-install-recommends \
+            libx11-dev libxext-dev libxcursor-dev libxi-dev libxfixes-dev libxrandr-dev libxss-dev \
+            libwayland-dev wayland-protocols libxkbcommon-dev libdecor-0-dev \
+            libegl-dev libgles-dev libgl-dev \
+            libasound2-dev libpulse-dev libpipewire-0.3-dev libdbus-1-dev
+
+      # Ubuntu's SDL is linked against the whole desktop (X11, Wayland,
+      # PulseAudio and what they pull in): some fifty libraries the package
+      # then has to carry, in this image's versions, ahead of those of the
+      # machine QEMU runs on. Built from source, SDL loads them from that
+      # machine instead, and only once a window or a sound device is opened.
+      # The library itself needs the C library and nothing else.
+      - name: Build SDL2 (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl -fL -o sdl2.tar.gz \
+            "https://github.com/libsdl-org/SDL/releases/download/release-${SDL2_VERSION}/SDL2-${SDL2_VERSION}.tar.gz"
+          echo "${SDL2_SHA256}  sdl2.tar.gz" | sha256sum -c -
+          tar xzf sdl2.tar.gz
+          cd "SDL2-${SDL2_VERSION}"
+          ./configure --disable-static
+          make -j"$(nproc)"
+          make install
+          ldconfig
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: brew install glib pixman ninja python pkg-config libslirp sdl2 dtc
 
+      # UCRT64 is the environment MSYS2 builds for: MINGW64 is deprecated and
+      # has started to lose packages (libslirp is gone from it).
       - name: Setup MSYS2 (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: UCRT64
           install: >-
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-glib2
-            mingw-w64-x86_64-pixman
-            mingw-w64-x86_64-libslirp
-            mingw-w64-x86_64-ninja
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-pkg-config
-            mingw-w64-x86_64-meson
-            mingw-w64-x86_64-SDL2
-            mingw-w64-x86_64-dtc
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-glib2
+            mingw-w64-ucrt-x86_64-pixman
+            mingw-w64-ucrt-x86_64-libslirp
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-meson
+            mingw-w64-ucrt-x86_64-SDL2
+            mingw-w64-ucrt-x86_64-dtc
             make flex bison diffutils git
 
       - name: Download QEMU source
@@ -277,12 +393,21 @@ jobs:
         shell: bash
         run: |
           NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          PLATFORM_FLAGS=()
+          if [ "$(uname)" = "Linux" ]; then
+            # Sound goes through SDL, like the window: QEMU's own ALSA,
+            # PulseAudio and PipeWire drivers would link those libraries into
+            # it. gio only serves the D-Bus display and audio, unused here,
+            # and brings GObject, libmount and SELinux with it.
+            PLATFORM_FLAGS=(--audio-drv-list=sdl --disable-alsa --disable-pa --disable-pipewire --disable-gio)
+          fi
           cd qemu-${{ env.QEMU_VERSION }}
           ./configure \
             --target-list=x86_64-softmmu,aarch64-softmmu \
             --enable-slirp \
             --enable-sdl \
-            --disable-docs
+            --disable-docs \
+            "${PLATFORM_FLAGS[@]}"
           # Build only the binaries we need (skip tests — broken on Windows mingw)
           ninja -C build -j$NPROC qemu-system-x86_64 qemu-system-aarch64 qemu-img
 
@@ -363,7 +488,12 @@ jobs:
               echo "export ${LIB_VAR}=\"\$DIR/lib\${${LIB_VAR}:+:\$${LIB_VAR}}\""
               # QEMU ignores QEMU_DATADIR; it searches exec_dir/../share/qemu.
               # Our layout keeps share/qemu as a sibling of the binary, so pass -L explicitly.
-              echo 'exec "$DIR/$(basename "$0").real" -L "$DIR/share/qemu" "$@"'
+              # qemu-img loads no firmware and refuses the option.
+              if [ "$bin" = "qemu-img" ]; then
+                echo 'exec "$DIR/$(basename "$0").real" "$@"'
+              else
+                echo 'exec "$DIR/$(basename "$0").real" -L "$DIR/share/qemu" "$@"'
+              fi
             } > "pkg/qemu/$bin"
             chmod +x "pkg/qemu/$bin"
           done
@@ -401,13 +531,14 @@ jobs:
           cp qemu-${{ env.QEMU_VERSION }}/pc-bios/*.bin pkg/qemu/share/qemu/ 2>/dev/null || true
           cp qemu-${{ env.QEMU_VERSION }}/pc-bios/*.rom pkg/qemu/share/qemu/ 2>/dev/null || true
           cp firmware/edk2-aarch64-code.fd pkg/qemu/share/qemu/
-          # Bundle MINGW64 runtime DLLs by walking PE imports transitively.
+          # Bundle the MSYS2 runtime DLLs by walking PE imports transitively.
           # objdump -p lists each DLL imported by a binary; we recurse so deps
           # of deps (e.g. libgio -> libgmodule -> libffi) are captured. Anything
-          # that doesn't resolve under /mingw64/bin is assumed to be a Windows
-          # system DLL (kernel32, ole32, api-ms-win-*) and skipped. DLLs land
-          # in pkg/qemu/bin/ alongside the exes so Windows' loader finds them.
-          MINGW_BIN="/mingw64/bin"
+          # that doesn't resolve under the environment's bin directory is
+          # assumed to be a Windows system DLL (kernel32, ole32, api-ms-win-*)
+          # and skipped. DLLs land in pkg/qemu/bin/ alongside the exes so
+          # Windows' loader finds them.
+          MINGW_BIN="${MINGW_PREFIX}/bin"
           declare -A seen
           queue=()
           for exe in pkg/qemu/bin/qemu-system-x86_64.exe pkg/qemu/bin/qemu-system-aarch64.exe pkg/qemu/bin/qemu-img.exe; do
@@ -433,8 +564,19 @@ jobs:
           # Stamp the bundle with its version so the resolver can compare
           # against system-installed QEMU and accept it when versions match.
           echo "${{ env.QEMU_VERSION }}" > pkg/qemu/VERSION
-          echo "=== Bundled MINGW64 DLLs ==="
+          echo "=== Bundled DLLs ==="
           ls pkg/qemu/bin/*.dll
+
+      # Runs in pwsh, NOT the msys2 shell: the MSYS2 directories are absent
+      # from PATH here, so a DLL the bundle lacks stops the job.
+      - name: Smoke test bundled QEMU (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          foreach ($exe in 'qemu-system-x86_64', 'qemu-system-aarch64', 'qemu-img') {
+            & "pkg\qemu\bin\$exe.exe" --version
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
 
       - name: Create zip (Windows)
         if: runner.os == 'Windows'
@@ -454,6 +596,11 @@ jobs:
   build-gdb:
     name: GDB ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
+    # Linux only (see the matrix): macOS and Windows build on the runner itself
+    container: ${{ matrix.container }}
+    env:
+      # Linux: where gdb is configured to live and where its Python is unpacked
+      GDB_PREFIX: /opt/gdb
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -461,35 +608,54 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux-x64
+            container: ubuntu:22.04
           - os: macos-latest
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
     steps:
+      # The image is bare: everything the build uses is named here.
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential texinfo \
-            libgmp-dev libmpfr-dev libexpat1-dev libxml2-dev
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential ca-certificates curl xz-utils texinfo pkg-config patchelf \
+            libgmp-dev libmpfr-dev libexpat1-dev libzstd-dev libncurses-dev
+
+      # gdb embeds CPython, and a gdb linked against the distribution's
+      # libpython starts on that one release: 3.10, 3.12 and 3.14 on the last
+      # three LTS. The Linux package carries its own instead, as the macOS and
+      # Windows ones do: a standalone build that needs the C library alone,
+      # unpacked under the prefix gdb is configured with, so that gdb finds the
+      # standard library from its own location wherever the package lands.
+      - name: Install the Python gdb embeds (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl -fL -o python.tar.gz \
+            "https://github.com/astral-sh/python-build-standalone/releases/download/${PYTHON_STANDALONE_RELEASE}/cpython-${PYTHON_STANDALONE_VERSION}+${PYTHON_STANDALONE_RELEASE}-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+          echo "${PYTHON_STANDALONE_SHA256}  python.tar.gz" | sha256sum -c -
+          mkdir -p "${GDB_PREFIX}"
+          tar xzf python.tar.gz -C "${GDB_PREFIX}" --strip-components=1
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: brew install gmp mpfr expat libxml2 texinfo python@${PYTHON_VERSION}
 
+      # UCRT64, as for QEMU: MINGW64 is deprecated.
       - name: Setup MSYS2 (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: UCRT64
           install: >-
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-gmp
-            mingw-w64-x86_64-mpfr
-            mingw-w64-x86_64-expat
-            mingw-w64-x86_64-libxml2
-            mingw-w64-x86_64-pkg-config
-            mingw-w64-x86_64-python
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-gmp
+            mingw-w64-ucrt-x86_64-mpfr
+            mingw-w64-ucrt-x86_64-expat
+            mingw-w64-ucrt-x86_64-libxml2
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-python
             make texinfo bison flex
 
       - name: Download GDB source (Unix)
@@ -527,6 +693,7 @@ jobs:
         shell: bash
         run: |
           NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          PLATFORM_FLAGS=()
           # Apple Silicon brew lives at /opt/homebrew, not on the default
           # compiler search path — configure won't find gmp/mpfr/expat
           # headers without the explicit -I/-L. Linux apt installs to
@@ -539,8 +706,11 @@ jobs:
             # fails configure's libpython link test; use brew's.
             PYTHON_BIN="$(brew --prefix python@${PYTHON_VERSION})/bin/python${PYTHON_VERSION}"
           else
-            # Links the distro libpython3.x; ubuntu-latest ships dev files.
-            PYTHON_BIN=/usr/bin/python3
+            # The standalone CPython, under gdb's own prefix. The C++ runtime
+            # is linked in, so that the package does not have to carry it.
+            PYTHON_BIN="${GDB_PREFIX}/bin/python3"
+            export LDFLAGS="-L${GDB_PREFIX}/lib"
+            PLATFORM_FLAGS=(--prefix="${GDB_PREFIX}" --with-static-standard-libraries)
           fi
           cd gdb-${GDB_VERSION}
           # --target=x86_64-pc-linux-gnu builds gdb as a cross-debugger.
@@ -568,7 +738,8 @@ jobs:
             --disable-sim \
             --disable-gdbserver \
             --with-python="${PYTHON_BIN}" \
-            --without-guile
+            --without-guile \
+            "${PLATFORM_FLAGS[@]}"
           make -j$NPROC
           strip gdb/gdb gdb/gdb-unsigned 2>/dev/null || true
 
@@ -595,7 +766,7 @@ jobs:
             --disable-gprofng \
             --disable-sim \
             --disable-gdbserver \
-            --with-python=/mingw64/bin/python3 \
+            --with-python="${MINGW_PREFIX}/bin/python3" \
             --without-guile
           make -j$(nproc)
           strip gdb/gdb.exe
@@ -626,6 +797,39 @@ jobs:
               cp -R "gdb-${GDB_VERSION}/gdb/data-directory/$d" pkg/gdb/share/gdb/
             fi
           done
+          # The parts of the standard library a debugger has no use for
+          trim_python_stdlib() {
+            rm -rf "pkg/gdb/lib/python${PYTHON_VERSION}/test" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/idlelib" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/tkinter" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/turtledemo" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/ensurepip" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/site-packages"
+            find pkg/gdb/lib -name __pycache__ -type d -prune -exec rm -rf {} +
+          }
+          if [ "$(uname)" = "Linux" ]; then
+            # The Python runtime gdb is linked against and its standard
+            # library, then every other library gdb needs, the C library
+            # excepted. gdb looks for them in ../lib, and finds the standard
+            # library there by itself (it sits under the prefix it was
+            # configured with).
+            mkdir -p pkg/gdb/lib
+            cp -L "${GDB_PREFIX}/lib/libpython${PYTHON_VERSION}.so.1.0" pkg/gdb/lib/
+            cp -R "${GDB_PREFIX}/lib/python${PYTHON_VERSION}" pkg/gdb/lib/
+            # Also out: what serves to build extension modules, and the Tk
+            # binding, whose libraries the package does not carry.
+            rm -rf "pkg/gdb/lib/python${PYTHON_VERSION}"/config-* \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}"/lib-dynload/_tkinter*
+            trim_python_stdlib
+            patchelf --set-rpath '$ORIGIN/../lib' pkg/gdb/bin/gdb-multiarch
+            ldd pkg/gdb/bin/gdb-multiarch | awk '/=> \//{print $3}' | while read -r lib; do
+              case "$(basename "$lib")" in
+                libc.so.*|libm.so.*|libdl.so.*|libpthread.so.*|librt.so.*|libutil.so.*) ;;
+                *) [ -e "pkg/gdb/lib/$(basename "$lib")" ] || cp -L "$lib" pkg/gdb/lib/ ;;
+              esac
+            done
+            ls -la pkg/gdb/lib/
+          fi
           if [ "$(uname)" = "Darwin" ]; then
             # Bundle the brew CPython runtime so the artifact runs on machines
             # without Homebrew: relink gdb against a copied libpython, ship the
@@ -649,13 +853,7 @@ jobs:
             # macOS refuses to run unsigned binaries, so re-sign.
             codesign --force -s - "pkg/gdb/lib/libpython${PYTHON_VERSION}.dylib" pkg/gdb/bin/gdb-multiarch-bin
             cp -R "${PYPREFIX}/lib/python${PYTHON_VERSION}" pkg/gdb/lib/
-            rm -rf "pkg/gdb/lib/python${PYTHON_VERSION}/test" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/idlelib" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/tkinter" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/turtledemo" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/ensurepip" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/site-packages"
-            find pkg/gdb/lib -name __pycache__ -type d -prune -exec rm -rf {} +
+            trim_python_stdlib
             printf '%s\n' \
               '#!/bin/sh' \
               'here="$(cd "$(dirname "$0")" && pwd)"' \
@@ -692,10 +890,10 @@ jobs:
           cp "$SRC" pkg/gdb/bin/gdb-multiarch.exe
           echo "=== Packaged binary ==="
           ls -la pkg/gdb/bin/
-          # Walk PE imports to bundle MINGW64 DLLs (same recursive pattern as
-          # the QEMU bundle). Anything not under /mingw64/bin is a Windows
+          # Walk PE imports to bundle the MSYS2 DLLs (same recursive pattern as
+          # the QEMU bundle). Anything not under its bin directory is a Windows
           # system DLL (kernel32, ws2_32, …) and is skipped.
-          MINGW_BIN="/mingw64/bin"
+          MINGW_BIN="${MINGW_PREFIX}/bin"
           declare -A seen
           queue=("pkg/gdb/bin/gdb-multiarch.exe")
           while [ ${#queue[@]} -gt 0 ]; do
@@ -717,9 +915,9 @@ jobs:
           done
           # Python stdlib — embedded CPython locates it relative to the
           # libpython3.x.dll bundled in bin/ (../lib/python3.x).
-          PYVER=$(/mingw64/bin/python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')
+          PYVER=$("${MINGW_PREFIX}/bin/python3" -c 'import sys; print("%d.%d" % sys.version_info[:2])')
           mkdir -p pkg/gdb/lib
-          cp -R "/mingw64/lib/python${PYVER}" pkg/gdb/lib/
+          cp -R "${MINGW_PREFIX}/lib/python${PYVER}" pkg/gdb/lib/
           rm -rf "pkg/gdb/lib/python${PYVER}/test" \
                  "pkg/gdb/lib/python${PYVER}/idlelib" \
                  "pkg/gdb/lib/python${PYVER}/tkinter" \
@@ -736,10 +934,10 @@ jobs:
             fi
           done
           echo "${GDB_VERSION}" > pkg/gdb/VERSION
-          echo "=== Bundled MINGW64 DLLs ==="
+          echo "=== Bundled DLLs ==="
           ls pkg/gdb/bin/*.dll || echo "(no DLLs bundled — gdb-multiarch.exe must be statically linked)"
 
-      # Runs in pwsh, NOT the msys2 shell: /mingw64 is absent from PATH here,
+      # Runs in pwsh, NOT the msys2 shell: /ucrt64 is absent from PATH here,
       # so this proves the bundle is self-contained (DLLs + python stdlib).
       - name: Smoke test bundled gdb (Windows)
         if: runner.os == 'Windows'
@@ -760,6 +958,78 @@ jobs:
           path: gdb-${{ env.GDB_VERSION }}-*.*
 
   # ═══════════════════════════════════════════════════════════════════════
+  #  Verify (Linux): every packaged tool does its job on a bare image of
+  #  each supported Ubuntu release
+  # ═══════════════════════════════════════════════════════════════════════
+  verify-linux:
+    name: Verify on ${{ matrix.image }}
+    needs:
+      - build-llvm
+      - build-xorriso
+      - build-qemu
+      - build-gdb
+    # Whatever happened to the macOS and Windows builds: the Linux packages
+    # are verified as soon as they exist.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    # Nothing is installed in these images: a tool that needs a library its
+    # package does not bring fails here, before the release.
+    container: ${{ matrix.image }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # The LTS releases still supported, and the latest release, where the
+        # next incompatibility shows first.
+        image: [ "ubuntu:22.04", "ubuntu:24.04", "ubuntu:26.04", "ubuntu:rolling" ]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "*-linux-x64"
+          path: artifacts
+          merge-multiple: true
+
+      - name: Unpack the tools
+        run: |
+          mkdir tools
+          for archive in artifacts/*.tar.gz; do
+            tar xzf "$archive" -C tools
+          done
+          ls tools
+
+      - name: clang and ld.lld build a freestanding image for both architectures
+        run: |
+          printf '#include <stdint.h>\nuint64_t ticks;\nvoid _start(void) { for (;;) { ticks++; } }\n' > kernel.c
+          for triple in x86_64-elf aarch64-none-elf; do
+            tools/llvm-tools/bin/clang --target=$triple -ffreestanding -nostdlib -c kernel.c -o kernel-$triple.o
+            tools/llvm-tools/bin/ld.lld -nostdlib -static -e _start kernel-$triple.o -o kernel-$triple.elf
+          done
+
+      - name: xorriso writes an ISO and reads it back
+        run: |
+          mkdir iso
+          cp kernel-x86_64-elf.elf iso/kernel.elf
+          tools/xorriso/xorriso -as mkisofs -o test.iso iso
+          tools/xorriso/xorriso -indev test.iso -find / -name kernel.elf | grep kernel.elf
+
+      # No display, as in the test runs. Each machine is built, loads its
+      # firmware from the package and answers on its monitor.
+      - name: QEMU creates both machines and a disk image
+        run: |
+          echo quit | tools/qemu/qemu-system-x86_64 -M q35 -cdrom test.iso -display none -monitor stdio
+          echo quit | tools/qemu/qemu-system-aarch64 -M virt -cpu cortex-a72 -bios edk2-aarch64-code.fd -display none -monitor stdio
+          tools/qemu/qemu-img create -f qcow2 disk.qcow2 16M
+          tools/qemu/qemu-img info disk.qcow2
+
+      - name: GDB runs its Python and reads both images
+        run: |
+          tools/gdb/bin/gdb-multiarch --batch -ex 'python import sys; print("PYTHON_OK", sys.version)' | tee python.log
+          grep -q PYTHON_OK python.log
+          for triple in x86_64-elf aarch64-none-elf; do
+            tools/gdb/bin/gdb-multiarch --batch -ex 'info address _start' kernel-$triple.elf
+          done
+
+  # ═══════════════════════════════════════════════════════════════════════
   #  Release — collect all artifacts and create a GitHub release
   # ═══════════════════════════════════════════════════════════════════════
   release:
@@ -769,6 +1039,9 @@ jobs:
       - build-xorriso
       - build-qemu
       - build-gdb
+      - verify-linux
+    # A pull request builds and verifies; only a manual run publishes.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
