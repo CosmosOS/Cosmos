@@ -32,6 +32,12 @@ internal static class FinalizerTests
 
     private const int Pattern = 0x5F1A0000;
 
+    // How long a cell waits for a worker it started to exit, and how long it then leaves the
+    // exit to finish: Join returns once the thread is stopped for its joiners, before the
+    // scheduler has let go of it.
+    private const int WorkerJoinTimeoutMs = 20000;
+    private const uint WorkerExitGraceMs = 200;
+
     private static object? s_resurrected;
     private static ConditionalWeakTable<object, int[]>? s_table;
     private static int s_genericFinalized;
@@ -896,6 +902,16 @@ internal static class FinalizerTests
         }
 
         Assert.Equal(2, s_workerDone, "Finalizer: both registration workers must finish");
+
+        // The workers are gone before the cell counts and before the next one starts. A worker
+        // that has finished its loop is still exiting: its managed thread object stays rooted
+        // until the scheduler frees the thread's handle, and dies, with the finalizable objects
+        // it owns, in whichever collection comes after that. On several CPUs the worker exits
+        // beside this thread, a little at a time between two collections, which stop it; left
+        // to itself the exit ended inside the next cell, whose pending counts it shifted.
+        Assert.True(worker1.Join(WorkerJoinTimeoutMs) && worker2.Join(WorkerJoinTimeoutMs),
+            "Finalizer: both registration workers exit");
+        TimerManager.Wait(WorkerExitGraceMs);
 
         Collect(3);
 
