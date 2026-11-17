@@ -1,7 +1,25 @@
 name: Build Tools
 
+# Builds LLVM, xorriso, QEMU and GDB for Linux, macOS and Windows and publishes
+# them as the `tools-latest` release, which `cosmos install` and the other
+# workflows download.
+#
+# The Linux tools are built in an ubuntu:22.04 container, the oldest Ubuntu
+# release still supported, and not on the runner itself: a binary built against
+# an old C library starts on every later one, while one built on the runner
+# stops starting on older releases each time `ubuntu-latest` moves on. Each
+# package also brings the libraries its tool needs that a bare Ubuntu may lack.
+# verify-linux then runs every packaged tool in a bare image of each supported
+# release, and nothing is published unless all of them pass.
+#
+# A pull request that changes this file runs the builds and the verification
+# and publishes nothing. Publishing takes a manual run.
+
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/build-tools.yml
 
 defaults:
   run:
@@ -925,6 +943,78 @@ jobs:
           path: gdb-${{ env.GDB_VERSION }}-*.*
 
   # ═══════════════════════════════════════════════════════════════════════
+  #  Verify (Linux): every packaged tool does its job on a bare image of
+  #  each supported Ubuntu release
+  # ═══════════════════════════════════════════════════════════════════════
+  verify-linux:
+    name: Verify on ${{ matrix.image }}
+    needs:
+      - build-llvm
+      - build-xorriso
+      - build-qemu
+      - build-gdb
+    # Whatever happened to the macOS and Windows builds: the Linux packages
+    # are verified as soon as they exist.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    # Nothing is installed in these images: a tool that needs a library its
+    # package does not bring fails here, before the release.
+    container: ${{ matrix.image }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # The LTS releases still supported, and the latest release, where the
+        # next incompatibility shows first.
+        image: [ "ubuntu:22.04", "ubuntu:24.04", "ubuntu:26.04", "ubuntu:rolling" ]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "*-linux-x64"
+          path: artifacts
+          merge-multiple: true
+
+      - name: Unpack the tools
+        run: |
+          mkdir tools
+          for archive in artifacts/*.tar.gz; do
+            tar xzf "$archive" -C tools
+          done
+          ls tools
+
+      - name: clang and ld.lld build a freestanding image for both architectures
+        run: |
+          printf '#include <stdint.h>\nuint64_t ticks;\nvoid _start(void) { for (;;) { ticks++; } }\n' > kernel.c
+          for triple in x86_64-elf aarch64-none-elf; do
+            tools/llvm-tools/bin/clang --target=$triple -ffreestanding -nostdlib -c kernel.c -o kernel-$triple.o
+            tools/llvm-tools/bin/ld.lld -nostdlib -static -e _start kernel-$triple.o -o kernel-$triple.elf
+          done
+
+      - name: xorriso writes an ISO and reads it back
+        run: |
+          mkdir iso
+          cp kernel-x86_64-elf.elf iso/kernel.elf
+          tools/xorriso/xorriso -as mkisofs -o test.iso iso
+          tools/xorriso/xorriso -indev test.iso -find / -name kernel.elf | grep kernel.elf
+
+      # No display, as in the test runs. Each machine is built, loads its
+      # firmware from the package and answers on its monitor.
+      - name: QEMU creates both machines and a disk image
+        run: |
+          echo quit | tools/qemu/qemu-system-x86_64 -M q35 -cdrom test.iso -display none -monitor stdio
+          echo quit | tools/qemu/qemu-system-aarch64 -M virt -cpu cortex-a72 -bios edk2-aarch64-code.fd -display none -monitor stdio
+          tools/qemu/qemu-img create -f qcow2 disk.qcow2 16M
+          tools/qemu/qemu-img info disk.qcow2
+
+      - name: GDB runs its Python and reads both images
+        run: |
+          tools/gdb/bin/gdb-multiarch --batch -ex 'python import sys; print("PYTHON_OK", sys.version)' | tee python.log
+          grep -q PYTHON_OK python.log
+          for triple in x86_64-elf aarch64-none-elf; do
+            tools/gdb/bin/gdb-multiarch --batch -ex 'info address _start' kernel-$triple.elf
+          done
+
+  # ═══════════════════════════════════════════════════════════════════════
   #  Release — collect all artifacts and create a GitHub release
   # ═══════════════════════════════════════════════════════════════════════
   release:
@@ -934,6 +1024,9 @@ jobs:
       - build-xorriso
       - build-qemu
       - build-gdb
+      - verify-linux
+    # A pull request builds and verifies; only a manual run publishes.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
