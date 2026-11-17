@@ -83,6 +83,14 @@ public class Kernel : Sys.Kernel
     /// a host that deschedules a virtual CPU for a while stretches one attempt, not all three.
     /// </summary>
     private const int ParallelAttempts = 3;
+    /// <summary>
+    /// How many times one spinner's time the four may take. On one CPU they take four times;
+    /// on three compute CPUs that each have a host core, one and a half times. The host
+    /// decides the rest: when the three compute CPUs share two cores, four hardware threads,
+    /// which is what a CI runner has, the four take a little over twice (2.0 to 2.4 measured),
+    /// whatever the kernel does. The bound sits between that and one CPU's four.
+    /// </summary>
+    private const int ParallelBound = 3;
     /// <summary>Work items the pool cell queues: several rounds for a pool sized to the compute CPUs.</summary>
     private const int PoolWorkItems = 12;
     /// <summary>How long (ms) each of those work items spins, noting the CPUs it runs on.</summary>
@@ -261,7 +269,7 @@ public class Kernel : Sys.Kernel
         TR.RunIf(smp, "Sleep_OnComputeCpu_WakesOnItsOwnTick", TestSleepOnComputeCpuWakesOnItsOwnTick, OneCpuCell);
         TR.RunIf(smp, "Balance_IdleCpuPullsRunnable", TestBalanceIdleCpuPullsRunnable, OneCpuCell);
         TR.RunIf(smp, "Balance_BusyCpu_DoesNotPull", TestBalanceBusyCpuDoesNotPull, OneCpuCell);
-        TR.RunIf(smp, "Parallel_FourSpinnersFinishInUnderTwiceOneSpinnersTime", TestFourSpinnersFinishInUnderTwiceOneSpinnersTime, OneCpuCell);
+        TR.RunIf(smp, "Parallel_FourSpinnersFinishInUnderThreeTimesOneSpinnersTime", TestFourSpinnersFinishInUnderThreeTimesOneSpinnersTime, OneCpuCell);
         TR.RunIf(smp, "ThreadPool_WorkersSpreadAcrossCpus", TestThreadPoolWorkersSpreadAcrossCpus, OneCpuCell);
         ThreadAffinity.Current = mainSet;
         TR.Run("DriverKit_ThreadsStayOnHousekeepingCpu", TestKernelThreadsStayOnHousekeepingCpu);
@@ -1720,8 +1728,10 @@ public class Kernel : Sys.Kernel
 
     // One spinner does a fixed amount of work; then four do that amount each, at once. On one
     // CPU the four would take four times as long. Spread over the three compute CPUs, with the
-    // CPU that holds two relieved by the first one that goes idle, they take well under twice.
-    private static void TestFourSpinnersFinishInUnderTwiceOneSpinnersTime()
+    // CPU that holds two relieved by the first one that goes idle, they take one and a half
+    // times as long when each compute CPU has a host core, and a little over twice when the
+    // three share two (ParallelBound).
+    private static void TestFourSpinnersFinishInUnderThreeTimesOneSpinnersTime()
     {
         s_workIterations = 0;
         SysThread calibrator = new(Calibrator);
@@ -1736,12 +1746,12 @@ public class Kernel : Sys.Kernel
         {
             one = TimeFixedWork(1);
             four = TimeFixedWork(ParallelSpinners);
-            under = four < 2 * one;
+            under = four < ParallelBound * one;
         }
 
         long frequency = Stopwatch.Frequency;
         Log.WriteString($"[Smp] One spinner: {one * 1000 / frequency} ms, four at once: {four * 1000 / frequency} ms\n");
-        Assert.True(under, "four spinners finish in under twice the time one takes: they ran on several CPUs at once");
+        Assert.True(under, "four spinners finish in under three times the time one takes: they ran on several CPUs at once");
     }
 
     private static void PoolWork(object? state)
