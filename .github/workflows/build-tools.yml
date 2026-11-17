@@ -344,22 +344,24 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install glib pixman ninja python pkg-config libslirp sdl2 dtc
 
+      # UCRT64 is the environment MSYS2 builds for: MINGW64 is deprecated and
+      # has started to lose packages (libslirp is gone from it).
       - name: Setup MSYS2 (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: UCRT64
           install: >-
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-glib2
-            mingw-w64-x86_64-pixman
-            mingw-w64-x86_64-libslirp
-            mingw-w64-x86_64-ninja
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-pkg-config
-            mingw-w64-x86_64-meson
-            mingw-w64-x86_64-SDL2
-            mingw-w64-x86_64-dtc
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-glib2
+            mingw-w64-ucrt-x86_64-pixman
+            mingw-w64-ucrt-x86_64-libslirp
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-meson
+            mingw-w64-ucrt-x86_64-SDL2
+            mingw-w64-ucrt-x86_64-dtc
             make flex bison diffutils git
 
       - name: Download QEMU source
@@ -529,13 +531,14 @@ jobs:
           cp qemu-${{ env.QEMU_VERSION }}/pc-bios/*.bin pkg/qemu/share/qemu/ 2>/dev/null || true
           cp qemu-${{ env.QEMU_VERSION }}/pc-bios/*.rom pkg/qemu/share/qemu/ 2>/dev/null || true
           cp firmware/edk2-aarch64-code.fd pkg/qemu/share/qemu/
-          # Bundle MINGW64 runtime DLLs by walking PE imports transitively.
+          # Bundle the MSYS2 runtime DLLs by walking PE imports transitively.
           # objdump -p lists each DLL imported by a binary; we recurse so deps
           # of deps (e.g. libgio -> libgmodule -> libffi) are captured. Anything
-          # that doesn't resolve under /mingw64/bin is assumed to be a Windows
-          # system DLL (kernel32, ole32, api-ms-win-*) and skipped. DLLs land
-          # in pkg/qemu/bin/ alongside the exes so Windows' loader finds them.
-          MINGW_BIN="/mingw64/bin"
+          # that doesn't resolve under the environment's bin directory is
+          # assumed to be a Windows system DLL (kernel32, ole32, api-ms-win-*)
+          # and skipped. DLLs land in pkg/qemu/bin/ alongside the exes so
+          # Windows' loader finds them.
+          MINGW_BIN="${MINGW_PREFIX}/bin"
           declare -A seen
           queue=()
           for exe in pkg/qemu/bin/qemu-system-x86_64.exe pkg/qemu/bin/qemu-system-aarch64.exe pkg/qemu/bin/qemu-img.exe; do
@@ -561,8 +564,19 @@ jobs:
           # Stamp the bundle with its version so the resolver can compare
           # against system-installed QEMU and accept it when versions match.
           echo "${{ env.QEMU_VERSION }}" > pkg/qemu/VERSION
-          echo "=== Bundled MINGW64 DLLs ==="
+          echo "=== Bundled DLLs ==="
           ls pkg/qemu/bin/*.dll
+
+      # Runs in pwsh, NOT the msys2 shell: the MSYS2 directories are absent
+      # from PATH here, so a DLL the bundle lacks stops the job.
+      - name: Smoke test bundled QEMU (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          foreach ($exe in 'qemu-system-x86_64', 'qemu-system-aarch64', 'qemu-img') {
+            & "pkg\qemu\bin\$exe.exe" --version
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
 
       - name: Create zip (Windows)
         if: runner.os == 'Windows'
@@ -628,19 +642,20 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install gmp mpfr expat libxml2 texinfo python@${PYTHON_VERSION}
 
+      # UCRT64, as for QEMU: MINGW64 is deprecated.
       - name: Setup MSYS2 (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: UCRT64
           install: >-
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-gmp
-            mingw-w64-x86_64-mpfr
-            mingw-w64-x86_64-expat
-            mingw-w64-x86_64-libxml2
-            mingw-w64-x86_64-pkg-config
-            mingw-w64-x86_64-python
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-gmp
+            mingw-w64-ucrt-x86_64-mpfr
+            mingw-w64-ucrt-x86_64-expat
+            mingw-w64-ucrt-x86_64-libxml2
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-python
             make texinfo bison flex
 
       - name: Download GDB source (Unix)
@@ -751,7 +766,7 @@ jobs:
             --disable-gprofng \
             --disable-sim \
             --disable-gdbserver \
-            --with-python=/mingw64/bin/python3 \
+            --with-python="${MINGW_PREFIX}/bin/python3" \
             --without-guile
           make -j$(nproc)
           strip gdb/gdb.exe
@@ -875,10 +890,10 @@ jobs:
           cp "$SRC" pkg/gdb/bin/gdb-multiarch.exe
           echo "=== Packaged binary ==="
           ls -la pkg/gdb/bin/
-          # Walk PE imports to bundle MINGW64 DLLs (same recursive pattern as
-          # the QEMU bundle). Anything not under /mingw64/bin is a Windows
+          # Walk PE imports to bundle the MSYS2 DLLs (same recursive pattern as
+          # the QEMU bundle). Anything not under its bin directory is a Windows
           # system DLL (kernel32, ws2_32, …) and is skipped.
-          MINGW_BIN="/mingw64/bin"
+          MINGW_BIN="${MINGW_PREFIX}/bin"
           declare -A seen
           queue=("pkg/gdb/bin/gdb-multiarch.exe")
           while [ ${#queue[@]} -gt 0 ]; do
@@ -900,9 +915,9 @@ jobs:
           done
           # Python stdlib — embedded CPython locates it relative to the
           # libpython3.x.dll bundled in bin/ (../lib/python3.x).
-          PYVER=$(/mingw64/bin/python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')
+          PYVER=$("${MINGW_PREFIX}/bin/python3" -c 'import sys; print("%d.%d" % sys.version_info[:2])')
           mkdir -p pkg/gdb/lib
-          cp -R "/mingw64/lib/python${PYVER}" pkg/gdb/lib/
+          cp -R "${MINGW_PREFIX}/lib/python${PYVER}" pkg/gdb/lib/
           rm -rf "pkg/gdb/lib/python${PYVER}/test" \
                  "pkg/gdb/lib/python${PYVER}/idlelib" \
                  "pkg/gdb/lib/python${PYVER}/tkinter" \
@@ -919,10 +934,10 @@ jobs:
             fi
           done
           echo "${GDB_VERSION}" > pkg/gdb/VERSION
-          echo "=== Bundled MINGW64 DLLs ==="
+          echo "=== Bundled DLLs ==="
           ls pkg/gdb/bin/*.dll || echo "(no DLLs bundled — gdb-multiarch.exe must be statically linked)"
 
-      # Runs in pwsh, NOT the msys2 shell: /mingw64 is absent from PATH here,
+      # Runs in pwsh, NOT the msys2 shell: /ucrt64 is absent from PATH here,
       # so this proves the bundle is self-contained (DLLs + python stdlib).
       - name: Smoke test bundled gdb (Windows)
         if: runner.os == 'Windows'
