@@ -149,6 +149,8 @@ jobs:
   build-xorriso:
     name: xorriso ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
+    # Linux only (see the matrix): macOS and Windows build on the runner itself
+    container: ${{ matrix.container }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -156,11 +158,20 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux-x64
+            container: ubuntu:22.04
           - os: macos-latest
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
     steps:
+      # The image is bare. zlib is the one optional library xorriso was built
+      # with on the runner, and every Ubuntu has it installed.
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential ca-certificates curl zlib1g-dev
+
       - name: Setup MSYS2 (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
