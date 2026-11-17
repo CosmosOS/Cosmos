@@ -877,6 +877,7 @@ Cosmos.Kernel.System.Threading.CpuSet.IsEmpty.get -> bool
 Cosmos.Kernel.System.Threading.CpuSet.With(uint cpu) -> Cosmos.Kernel.System.Threading.CpuSet
 Cosmos.Kernel.System.Threading.CpuSet.Without(uint cpu) -> Cosmos.Kernel.System.Threading.CpuSet
 Cosmos.Kernel.System.Threading.KernelCpus
+Cosmos.Kernel.System.Threading.ThreadAffinity
 Cosmos.Kernel.System.Timers.AlarmManager
 Cosmos.Kernel.System.Timers.SoftwareTimer
 Cosmos.Kernel.System.Timers.SoftwareTimer.IsActive.get -> bool
@@ -1159,8 +1160,16 @@ static Cosmos.Kernel.System.Threading.KernelCpus.Compute.get -> Cosmos.Kernel.Sy
 static Cosmos.Kernel.System.Threading.KernelCpus.Count.get -> int
 static Cosmos.Kernel.System.Threading.KernelCpus.Current.get -> uint
 static Cosmos.Kernel.System.Threading.KernelCpus.DefaultAffinity.get -> Cosmos.Kernel.System.Threading.CpuSet
+static Cosmos.Kernel.System.Threading.KernelCpus.DefaultAffinity.set -> void
 static Cosmos.Kernel.System.Threading.KernelCpus.Housekeeping.get -> Cosmos.Kernel.System.Threading.CpuSet
 static Cosmos.Kernel.System.Threading.KernelCpus.Online.get -> Cosmos.Kernel.System.Threading.CpuSet
+static Cosmos.Kernel.System.Threading.ThreadAffinity.Current.get -> Cosmos.Kernel.System.Threading.CpuSet
+static Cosmos.Kernel.System.Threading.ThreadAffinity.Current.set -> void
+static Cosmos.Kernel.System.Threading.ThreadAffinity.Pin(System.Threading.Thread! thread, uint cpu) -> bool
+static Cosmos.Kernel.System.Threading.ThreadAffinity.Set(System.Threading.Thread! thread, Cosmos.Kernel.System.Threading.CpuSet affinity) -> bool
+static Cosmos.Kernel.System.Threading.ThreadAffinity.SetIdealCpu(System.Threading.Thread! thread, uint cpu) -> bool
+static Cosmos.Kernel.System.Threading.ThreadAffinity.TryGet(System.Threading.Thread! thread, out Cosmos.Kernel.System.Threading.CpuSet affinity) -> bool
+static Cosmos.Kernel.System.Threading.ThreadAffinity.TryGetIdealCpu(System.Threading.Thread! thread, out uint cpu) -> bool
 static Cosmos.Kernel.System.Timers.AlarmManager.Cancel(ulong id) -> bool
 static Cosmos.Kernel.System.Timers.AlarmManager.Schedule(System.Action! callback, System.TimeSpan delay) -> ulong
 static Cosmos.Kernel.System.Timers.AlarmManager.ScheduleRecurring(System.Action! callback, System.TimeSpan period) -> ulong
@@ -1434,12 +1443,3 @@ virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnWritten(char value, bool 
 [COSMOS0002]static Cosmos.Kernel.System.Network.NetworkStack.Send(Cosmos.Kernel.System.Network.Protocols.InternetPacket! packet) -> bool
 [COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICanvas3DFactory
 [COSMOS0003]Cosmos.Kernel.System.Graphics.Rendering3D.ICanvas3DFactory.CreateCanvas3D(Cosmos.Kernel.System.Graphics.DisplayDevice! display) -> Cosmos.Kernel.System.Graphics.Rendering3D.Canvas3D!
-[COSMOS0004]Cosmos.Kernel.System.Threading.ThreadAffinity
-[COSMOS0004]static Cosmos.Kernel.System.Threading.KernelCpus.DefaultAffinity.set -> void
-[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.Current.get -> Cosmos.Kernel.System.Threading.CpuSet
-[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.Current.set -> void
-[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.Pin(System.Threading.Thread! thread, uint cpu) -> bool
-[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.Set(System.Threading.Thread! thread, Cosmos.Kernel.System.Threading.CpuSet affinity) -> bool
-[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.SetIdealCpu(System.Threading.Thread! thread, uint cpu) -> bool
-[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.TryGet(System.Threading.Thread! thread, out Cosmos.Kernel.System.Threading.CpuSet affinity) -> bool
-[COSMOS0004]static Cosmos.Kernel.System.Threading.ThreadAffinity.TryGetIdealCpu(System.Threading.Thread! thread, out uint cpu) -> bool

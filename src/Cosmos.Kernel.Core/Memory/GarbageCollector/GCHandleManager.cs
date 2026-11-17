@@ -14,8 +14,10 @@ internal unsafe struct GCHandleSegmentStore
     private GCHandleSegment* _tail;
 
     /// <summary>
-    /// The lock of the segment chain: taken IRQ-safe to append a segment, and
-    /// by the collector to walk the chain clearing dead targets. Slot
+    /// The lock of the segment chain, one of the three locks the collector
+    /// counts (<see cref="Scheduler.SpinLock.AcquireCollectorLock"/>): taken to
+    /// append a segment, and by the collector to walk the chain clearing dead
+    /// targets. Slot
     /// allocation and free within a segment stay lock-free (a compare-exchange
     /// on the segment's packed word), and the chain only grows, so reading it
     /// to find a segment with room needs no lock. Nothing under it allocates a
@@ -74,7 +76,7 @@ internal unsafe struct GCHandleSegmentStore
         }
 
         // Slow Path: Iterate over all GCHandle Segments.
-        for (var segment = _head; segment != null; segment = segment->Next)
+        for (GCHandleSegment* segment = _head; segment != null; segment = segment->Next)
         {
             result = segment->TryAllocate();
             if (result != null)
@@ -88,7 +90,7 @@ internal unsafe struct GCHandleSegmentStore
         // and linked it onto the same tail, and the second link orphaned the first
         // segment, whose handles the collector then neither scanned nor cleared.
         // The loser of the race finds room in the segment the winner appended.
-        using (_lock.AcquireIrqSafe())
+        using (_lock.AcquireCollectorLock())
         {
             result = _tail->TryAllocate();
             if (result != null)
@@ -96,7 +98,7 @@ internal unsafe struct GCHandleSegmentStore
                 return result;
             }
 
-            var newSegment = AllocateSegment();
+            GCHandleSegment* newSegment = AllocateSegment();
 
             if (newSegment == null)
             {
@@ -128,13 +130,13 @@ internal unsafe struct GCHandleSegmentStore
 
     /// <summary>
     /// Clears the targets of this store that the mark phase did not reach, under
-    /// the chain lock. Called from the collection with interrupts masked, so the
-    /// lock only ever waits for another CPU's append to finish.
+    /// the chain lock. Called from the collection with the world stopped: a CPU
+    /// holding this lock does not acknowledge a stop, so no other CPU holds it then.
     /// </summary>
     /// <param name="dependent">Whether the store holds dependent handles, whose secondary dies with the primary.</param>
     public void ClearDeadTargets(bool dependent)
     {
-        using (_lock.AcquireIrqSafe())
+        using (_lock.AcquireCollectorLock())
         {
             // The handle stays allocated: its owner still holds it, reads null from it, and frees it
             // or sets a new target (RuntimeType does so for its RuntimeTypeInfo cache). Freeing it

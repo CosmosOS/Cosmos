@@ -214,11 +214,9 @@ internal class GenericTimer : TickSource
         nuint currentSp = ARM64InterruptController.SavedContextStackPointer(ref ctx);
 
         // The boot CPU's ticks alone drive the software timers and the log:
-        // every CPU's banked timer takes this handler, and the ring's timers
+        // every CPU's banked timer takes this handler, the ring's timers
         // (TimerManager, the alarms) run on the boot CPU, where the drivers
-        // that registered them live. The log lines box their arguments, which
-        // an application processor must not do: the heap is the boot CPU's
-        // until phase 4.
+        // that registered them live, and the log follows the tick count.
         if (cpuId == 0)
         {
             s_timerTickCount++;

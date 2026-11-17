@@ -459,28 +459,43 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Returns the cumulative total of all bytes ever allocated through the GC.
-    /// Subtracts dead thread unused TLAB bytes for accuracy.
+    /// Returns the cumulative total of all bytes ever allocated through the GC: the sum of what
+    /// every registered thread and the fallback context allocated, read without a lock as a
+    /// statistic, plus what the threads that have exited had allocated.
     /// </summary>
     public static ulong GetTotalAllocatedBytes()
     {
-        ulong total = s_totalAllocatedBytes;
-        if (total > s_deadThreadsNonAllocBytes)
+        ulong total = s_deadThreadsAllocBytes;
+        if (CosmosFeatures.SchedulerEnabled)
         {
-            total -= s_deadThreadsNonAllocBytes;
+            SchedulerThread?[]? threads = SchedulerManager.Threads;
+            if (threads is not null)
+            {
+                int count = SchedulerManager.ThreadCount;
+                for (int i = 0; i < threads.Length && count > 0; i++)
+                {
+                    SchedulerThread? thread = threads[i];
+                    if (thread is not null)
+                    {
+                        total += thread._allocContext.AllocBytes + thread._allocContext.AllocBytesUoh;
+                        count--;
+                    }
+                }
+            }
         }
 
+        total += s_fallbackAllocContext.AllocBytes + s_fallbackAllocContext.AllocBytesUoh;
         return total;
     }
 
     /// <summary>
-    /// Returns a precise total of allocated bytes, subtracting both dead thread
-    /// unused bytes and live threads' current unused TLAB space.
+    /// Returns a precise total of allocated bytes: the total less the live threads' current
+    /// unused TLAB space.
     /// </summary>
     public static ulong GetTotalAllocatedBytesPrecise()
     {
-        ulong total = s_totalAllocatedBytes;
-        ulong unused = s_deadThreadsNonAllocBytes;
+        ulong total = GetTotalAllocatedBytes();
+        ulong unused = 0;
 
         // Subtract live threads' unused TLAB space
         if (CosmosFeatures.SchedulerEnabled)

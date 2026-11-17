@@ -241,11 +241,28 @@ internal static unsafe partial class GarbageCollector
     private static SimpleMemoryInfo s_lastGCMemoryInfo;
 
     /// <summary>
-    /// Cumulative total of all bytes ever allocated through the GC.
-    /// Increments on every allocation, never decrements.
-    /// Used by <c>RhGetTotalAllocatedBytes</c> / <c>GC.GetTotalAllocatedBytes()</c>.
+    /// The heap lock: what serializes the allocation slow paths and the collection across CPUs.
+    /// Around a TLAB refill, a pinned allocation, a TLAB's return, the finalizer registry and
+    /// queue, and the phases of a collection, which <see cref="CpuStop.Enter"/> has already
+    /// made the only code running. The fast path does not take it: a TLAB belongs to one
+    /// thread, a thread runs on one CPU at a time, and an interrupt handler that allocates uses
+    /// the interrupted thread's TLAB on the same CPU, which <see cref="AllocObject"/>'s
+    /// interrupt mask keeps atomic. Taken after the stop ownership and before the handle
+    /// store's lock and the page allocator's, through
+    /// <see cref="Scheduler.SpinLock.AcquireCollectorLock"/>: a holder never acknowledges a
+    /// stop and never allocates.
     /// </summary>
-    private static ulong s_totalAllocatedBytes;
+    private static Scheduler.SpinLock s_heapLock;
+
+    /// <summary>
+    /// TLAB refills since the collector started, counted under the heap lock. Every refill is
+    /// a lock acquisition, so the rate says how the TLAB size holds up with several CPUs
+    /// allocating; the collection log prints the refills since the previous collection.
+    /// </summary>
+    private static ulong s_refillCount;
+
+    /// <summary>The value of <see cref="s_refillCount"/> when the last collection ran.</summary>
+    private static ulong s_refillsAtLastCollection;
 
     /// <summary>
     /// Number of live objects currently on the pinned object heap.
@@ -259,11 +276,16 @@ internal static unsafe partial class GarbageCollector
     private static AllocContext s_fallbackAllocContext;
 
     /// <summary>
-    /// Cumulative unused TLAB bytes from dead threads. Subtracted from total allocation stats.
+    /// What the threads that have exited had allocated, added by <see cref="RetireAllocContext"/>
+    /// under the heap lock. The total allocated is summed over the live threads on read, and
+    /// this is the dead ones' share of it.
     /// </summary>
-    private static ulong s_deadThreadsNonAllocBytes;
+    private static ulong s_deadThreadsAllocBytes;
 
     // --- Properties ---
+
+    /// <summary>TLAB refills since the collector started, for the suites' measurement.</summary>
+    internal static ulong RefillCount => Volatile.Read(ref s_refillCount);
 
     /// <summary>
     /// Gets a value indicating whether the garbage collector is enabled.
@@ -338,10 +360,25 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Performs a full garbage collection: mark, sweep, and segment reordering.
+    /// Performs a full garbage collection: mark, sweep, and segment reordering. Stops every
+    /// other CPU first (<see cref="CpuStop.Enter"/>) and runs the phases under the heap lock.
     /// </summary>
     /// <returns>The number of objects freed during this collection.</returns>
     public static int Collect()
+    {
+        return CollectUnlessCollectedSince(-1);
+    }
+
+    /// <summary>
+    /// <see cref="Collect"/>, unless another CPU has collected since the caller read
+    /// <paramref name="collectionsSeen"/> from <see cref="s_totalCollections"/>, in which case
+    /// nothing is collected and 0 is returned: the allocation slow path that lost the stop to
+    /// another CPU's collection retries its refill on what that collection freed rather than
+    /// repeat it. A negative value always collects.
+    /// </summary>
+    /// <param name="collectionsSeen">The collection count the caller saw before deciding to collect, or -1.</param>
+    /// <returns>The number of objects freed during this collection.</returns>
+    private static int CollectUnlessCollectedSince(int collectionsSeen)
     {
         if (!s_initialized)
         {
@@ -349,80 +386,109 @@ internal static unsafe partial class GarbageCollector
         }
 
         // TODO: Add compilation option to disable metric collection
-        int freedCount;
+        int freedCount = 0;
         using (InternalCpu.DisableInterruptsScope())
         {
-            // Record GC start timestamp
-            long gcStart = Stopwatch.GetTimestamp();
+            // The stop before the heap lock: a CPU waiting for the stop holds nothing another
+            // CPU's collection needs, and the policy swap, which allocates under the stop it
+            // owns, finds the stop its own on the nested entry.
+            CpuStop.Enter(SchedulerManager.CpuCount);
 
-            Serial.WriteString("[GC] Collection #");
-            Serial.WriteNumber((uint)s_totalCollections + 1);
-            Serial.WriteString("\n");
-
-            // Return all TLABs before collection — stamps unused gaps as FreeBlocks
-            ReturnAllAllocContexts();
-
-            // Record pre-GC metrics
-            s_lastGen0SizeBefore = GetGenerationSize(0);
-            s_lastGen0FragmentationBefore = GetCurrentFragmentation(0);
-
-            // Clear free lists - will be rebuilt during sweep
-            for (int i = 0; i < NumSizeClasses; i++)
+            if (collectionsSeen >= 0 && s_totalCollections != collectionsSeen)
             {
-                s_freeLists[i] = null;
+                CpuStop.Exit();
+                return 0;
             }
 
-            s_freeListBytes = 0;
+            using (s_heapLock.AcquireCollectorLock())
+            {
+                freedCount = CollectLocked();
+            }
 
-            // Mark reachable objects
-            MarkPhase();
-
-            // Clear the short weak GC handles whose targets died: they do not follow an object
-            // through its finalization
-            s_gCHandleManager.ClearShortWeakHandles();
-
-            // Queue the dead objects that have a finalizer and keep them alive until it has run,
-            // with what the dependent handles hang on them
-            MarkFinalizableObjects();
-            ScanDependentHandles();
-
-            // Clear the resurrection-tracking weak and the dependent GC handles whose targets died
-            s_gCHandleManager.ClearLongWeakHandles();
-
-            // Sweep and rebuild free lists
-            freedCount = SweepPhase();
-
-            // Reorder segments and free empty ones
-            ReorderSegmentsAndFreeEmpty();
-            ReorderPinnedSegmentsAndFreeEmpty();
-
-            // Record post-GC metrics
-            s_lastGen0SizeAfter = GetGenerationSize(0);
-            s_lastGen0FragmentationAfter = GetCurrentFragmentation(0);
-
-            s_totalCollections++;
-            s_totalObjectsFreed += freedCount;
-
-            // Freeze the heap-wide metrics reported by GCMemoryInfo. Recorded after the
-            // counters above so the snapshot carries the index of this very collection.
-            RecordLastGCMemoryInfo();
-
-            Serial.WriteString("[GC] Freed ");
-            Serial.WriteNumber((uint)freedCount);
-            Serial.WriteString(" objects\n");
-
-            // Record GC end timestamp and compute duration/interval
-            long gcEnd = Stopwatch.GetTimestamp();
-            long duration = gcEnd - gcStart;
-            long interval = s_lastGCEndTick == 0 ? duration : gcEnd - s_lastGCEndTick;
-            s_lastGCDurationTicks = duration;
-            s_lastGCIntervalTicks = interval;
-            s_lastGCEndTick = gcEnd;
+            CpuStop.Exit();
         }
 
         // Outside the masked section; left to the next allocation when the caller masked
         // interrupts itself (the allocator does)
         SignalPendingFinalizers();
+
+        return freedCount;
+    }
+
+    /// <summary>The phases of a collection, the world stopped and the heap lock held.</summary>
+    private static int CollectLocked()
+    {
+        int freedCount;
+
+        // Record GC start timestamp
+        long gcStart = Stopwatch.GetTimestamp();
+
+        Serial.WriteString("[GC] Collection #");
+        Serial.WriteNumber((uint)s_totalCollections + 1);
+        Serial.WriteString(", refills since the last: ");
+        Serial.WriteNumber(s_refillCount - s_refillsAtLastCollection);
+        Serial.WriteString("\n");
+        s_refillsAtLastCollection = s_refillCount;
+
+        // Return all TLABs before collection — stamps unused gaps as FreeBlocks
+        ReturnAllAllocContexts();
+
+        // Record pre-GC metrics
+        s_lastGen0SizeBefore = GetGenerationSize(0);
+        s_lastGen0FragmentationBefore = GetCurrentFragmentation(0);
+
+        // Clear free lists - will be rebuilt during sweep
+        for (int i = 0; i < NumSizeClasses; i++)
+        {
+            s_freeLists[i] = null;
+        }
+
+        s_freeListBytes = 0;
+
+        // Mark reachable objects
+        MarkPhase();
+
+        // Clear the short weak GC handles whose targets died: they do not follow an object
+        // through its finalization
+        s_gCHandleManager.ClearShortWeakHandles();
+
+        // Queue the dead objects that have a finalizer and keep them alive until it has run,
+        // with what the dependent handles hang on them
+        MarkFinalizableObjects();
+        ScanDependentHandles();
+
+        // Clear the resurrection-tracking weak and the dependent GC handles whose targets died
+        s_gCHandleManager.ClearLongWeakHandles();
+
+        // Sweep and rebuild free lists
+        freedCount = SweepPhase();
+
+        // Reorder segments and free empty ones
+        ReorderSegmentsAndFreeEmpty();
+        ReorderPinnedSegmentsAndFreeEmpty();
+
+        // Record post-GC metrics
+        s_lastGen0SizeAfter = GetGenerationSize(0);
+        s_lastGen0FragmentationAfter = GetCurrentFragmentation(0);
+
+        s_totalCollections++;
+        s_totalObjectsFreed += freedCount;
+
+        // Freeze the heap-wide metrics reported by GCMemoryInfo. Recorded after the
+        // counters above so the snapshot carries the index of this very collection.
+        RecordLastGCMemoryInfo();
+
+        Serial.WriteString("[GC] Freed ");
+        Serial.WriteNumber((uint)freedCount);
+        Serial.WriteString(" objects\n");
+
+        // Record GC end timestamp and compute duration/interval
+        long gcEnd = Stopwatch.GetTimestamp();
+        long duration = gcEnd - gcStart;
+        long interval = s_lastGCEndTick == 0 ? duration : gcEnd - s_lastGCEndTick;
+        s_lastGCDurationTicks = duration;
+        s_lastGCIntervalTicks = interval;
+        s_lastGCEndTick = gcEnd;
 
         return freedCount;
     }
@@ -456,8 +522,10 @@ internal static unsafe partial class GarbageCollector
         // handlers (scheduler tick, input) allocate too, and an interleaved
         // refill or bump on the same AllocContext leaves AllocPtr/AllocLimit
         // from different TLABs — overlapping objects and AllocPtr past
-        // AllocLimit (seen as delta=104 in #382 debugging). RefillAllocContext
-        // and Collect already disable interrupts internally; the scope nests
+        // AllocLimit (seen as delta=104 in #382 debugging). The mask is the
+        // whole exclusion the fast path needs: a TLAB belongs to one thread and
+        // a thread runs on one CPU at a time. The slow paths take the heap lock
+        // on top, against the other CPUs; Collect stops them. The scope nests
         // via saved flags.
         // The header is stored inside the scope too: until its MethodTable is
         // set the object is a zeroed block, which a collection run by another
@@ -512,7 +580,6 @@ internal static unsafe partial class GarbageCollector
             byte* result = ac.AllocPtr;
             ac.AllocPtr = newPtr;
             ac.AllocBytes += allocSize;
-            s_totalAllocatedBytes += allocSize;
             return (GCObject*)result;
         }
 
@@ -521,22 +588,25 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Slow path for object allocation: refills the TLAB, then retries. If all else fails, triggers GC.
+    /// Slow path for object allocation: refills the TLAB, then retries. If all else fails,
+    /// collects and retries, unless another CPU collected while this one waited for the stop,
+    /// in which case the refill is retried on what that collection freed.
     /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static GCObject* AllocObjectSlow(ref AllocContext ac, uint allocSize)
     {
+        int collectionsSeen = s_totalCollections;
         if (RefillAllocContext(ref ac, allocSize))
         {
             byte* result = ac.AllocPtr;
             ac.AllocPtr += allocSize;
             ac.AllocBytes += allocSize;
-            s_totalAllocatedBytes += allocSize;
             return (GCObject*)result;
         }
 
-        // Last resort: collect and retry
-        Collect();
+        // Last resort: collect and retry. The heap lock is not held here: the refill released
+        // it, so the stop is claimed with nothing another CPU's collection could wait for.
+        CollectUnlessCollectedSince(collectionsSeen);
 
         // Re-acquire ref after Collect (ReturnAllAllocContexts resets them)
         ac = ref GetCurrentAllocContext();
@@ -546,19 +616,9 @@ internal static unsafe partial class GarbageCollector
             byte* result = ac.AllocPtr;
             ac.AllocPtr += allocSize;
             ac.AllocBytes += allocSize;
-            s_totalAllocatedBytes += allocSize;
             return (GCObject*)result;
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Adds unused TLAB bytes from a dead thread to the cumulative counter.
-    /// Called from <see cref="SchedulerManager.ExitThread"/> before the thread is unregistered.
-    /// </summary>
-    public static void AddDeadThreadNonAllocBytes(ulong unused)
-    {
-        s_deadThreadsNonAllocBytes += unused;
     }
 }

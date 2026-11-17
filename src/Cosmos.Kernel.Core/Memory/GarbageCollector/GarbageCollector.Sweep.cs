@@ -152,7 +152,7 @@ internal static unsafe partial class GarbageCollector
     /// Converts a contiguous free run into a <see cref="FreeBlock"/> and adds it to the free list.
     /// The last <see cref="ReservedHeaderSlotSize"/> bytes of the run are excluded from the block:
     /// they may hold the runtime object header (objRef-4) of the object that follows the run,
-    /// which must survive block recycling (<see cref="AllocFromFreeList"/> zeroes what it hands out).
+    /// which must survive block recycling (<see cref="AllocFromFreeListRaw"/> zeroes what it hands out).
     /// </summary>
     /// <param name="start">Start of the free run.</param>
     /// <param name="size">Size of the free run in bytes.</param>

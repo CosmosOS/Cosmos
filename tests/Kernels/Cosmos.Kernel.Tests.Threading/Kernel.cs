@@ -43,6 +43,7 @@ public class Kernel : Sys.Kernel
     private const int PerCpuStoppedOffset = 0x50;
     private const int PerCpuGicRedistributorBaseOffset = 0x58;
     private const int PerCpuSwitchPrevOnCpuOffset = 0x60;
+    private const int PerCpuCollectorLockDepthOffset = 0x68;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -1575,6 +1576,7 @@ public class Kernel : Sys.Kernel
         Assert.Equal(PerCpuStoppedOffset, (int)((byte*)&block.Stopped - start), "Stopped");
         Assert.Equal(PerCpuGicRedistributorBaseOffset, (int)((byte*)&block.GicRedistributorBase - start), "GicRedistributorBase");
         Assert.Equal(PerCpuSwitchPrevOnCpuOffset, (int)((byte*)&block.SwitchPrevOnCpu - start), "SwitchPrevOnCpu");
+        Assert.Equal(PerCpuCollectorLockDepthOffset, (int)((byte*)&block.CollectorLockDepth - start), "CollectorLockDepth");
     }
 
     // Core's library initializer installs block 0 on the boot CPU, the first managed code the
@@ -1673,10 +1675,9 @@ public class Kernel : Sys.Kernel
     // A worker starts on CPU 0, parks, and is pinned to another CPU through its CPU set (SMP
     // phase 3b): parked, it moves at once; the wake then goes to that CPU by interrupt and the
     // worker runs there. It parks again once it has reported in, and comes back to CPU 0 the
-    // same way before it exits: the exit path allocates, and until the collector stops every
-    // CPU (SMP phase 4) a thread may allocate on CPU 0 alone. The worker touches statics only
-    // while it is away, for the same reason: a collection on CPU 0 does not scan the stack of
-    // a thread running elsewhere.
+    // same way before it exits: the cells prove the move each way. The worker touches statics
+    // only while it is away, so that what it reports is read on CPU 0 without a lock; it may
+    // allocate there since the collector stops every CPU (SMP phase 4).
     private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_crossCpuGate;
     private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_crossCpuRelease;
     private static Cosmos.Kernel.Core.Scheduler.Mutex? s_crossCpuMutex;

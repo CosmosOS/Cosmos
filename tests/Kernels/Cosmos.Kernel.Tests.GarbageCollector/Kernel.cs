@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector.GcInfo;
 using Cosmos.Kernel.Core.Memory.Heap;
 using Cosmos.Kernel.Core.Runtime.GcInfo;
+using Cosmos.Kernel.System.Threading;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using CoreGC = Cosmos.Kernel.Core.Memory.GarbageCollector.GarbageCollector;
+using CoreSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 using GCHandle = System.Runtime.InteropServices.GCHandle;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
@@ -26,7 +29,7 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[GarbageCollector] BeforeRun() reached!\n");
         Serial.WriteString("[GarbageCollector] Starting tests...\n");
 
-        TR.Start("GarbageCollector Tests", expectedTests: 53 + FinalizerTests.TestCount + FinalizerThreadTests.TestCount);
+        TR.Start("GarbageCollector Tests", expectedTests: 57 + FinalizerTests.TestCount + FinalizerThreadTests.TestCount);
 
         // First: Kernel.Start turned the finalizer thread on, CosmosEnableFinalizerThread being on
         // in this kernel. The cells below check the collector with the finalizers run inline, on
@@ -81,6 +84,16 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_StaticOnlyReachability", TestGCStaticOnlyReachability);
         TR.Run("GC_MultithreadChurnUnderCollect", TestGCMultithreadChurnUnderCollect);
         TR.Run("GC_CollectFromWorkerThread", TestGCCollectFromWorkerThread);
+
+        // Stop-the-world across CPUs (SMP phase 4): on the four-CPU cell only, and counted
+        // on the bare cell as skips.
+        bool smp = TR.ProfileContains("smp4");
+        const string OneCpuCell = "one CPU on this cell";
+        TR.RunIf(smp, "GC_StopTheWorld_AllocationStormOnEveryCpu", TestGCStopTheWorldAllocationStorm, OneCpuCell);
+        TR.RunIf(smp, "GC_Stop_SafepointAcknowledgesAMaskedSpinner", TestGCStopSafepointAcknowledgesMaskedSpinner, OneCpuCell);
+        TR.RunIf(smp, "GC_Stop_TwoCpusCollectAtOnce", TestGCStopTwoCpusCollectAtOnce, OneCpuCell);
+        TR.RunIf(smp, "GC_Stop_NestedCollectionUnderAStop", TestGCStopNestedCollectionUnderAStop, OneCpuCell);
+
         TR.Run("GC_MallocHeapNotSwept", TestGCMallocHeapNotSwept);
 
         // GC Info & Configuration Tests
@@ -1252,6 +1265,13 @@ public class Kernel : Sys.Kernel
         worker1.Start();
         worker2.Start();
 
+        // On the four-CPU cell the workers churn on CPUs of their own: their survivors are
+        // then reachable only through the contexts the stop saved (SMP phase 4).
+        if (TR.ProfileContains("smp4"))
+        {
+            Assert.True(ThreadAffinity.Pin(worker1, 1) && ThreadAffinity.Pin(worker2, 2), "GC: the churn workers take CPU 1 and CPU 2");
+        }
+
         for (int i = 0; i < 200 && s_churnStartedCount < 2; i++)
         {
             TimerManager.Wait(10);
@@ -1259,8 +1279,9 @@ public class Kernel : Sys.Kernel
 
         Assert.Equal(2, s_churnStartedCount, "GC: both churn workers must start");
 
-        // Force collections while the workers allocate. The workers are parked during each
-        // Collect, so their survivors are only reachable through the parked-thread stack scan.
+        // Force collections while the workers allocate. On one CPU the workers are parked
+        // during each Collect, so their survivors are only reachable through the parked-thread
+        // stack scan; on four CPUs they are stopped mid-run and scanned from the stop's context.
         for (int c = 0; c < 10; c++)
         {
             for (int i = 0; i < 64; i++)
@@ -1341,6 +1362,290 @@ public class Kernel : Sys.Kernel
         Assert.Equal(collsBefore + 2, collsAfter, "GC: both collections of the worker must be recorded");
         Assert.True(survivor[0] == 0x7D000000 && survivor[63] == 0x7D00003F,
             "GC: a main-thread local must survive a collection run by another thread");
+    }
+
+    // ==================== Stop-the-world across CPUs (SMP phase 4) ====================
+
+    /// <summary>Rounds each storm worker completed, one slot per CPU.</summary>
+    private static int[]? s_stormRounds;
+    /// <summary>The last eight lists each storm worker built, one row per CPU: reachable through a static as well as its stack.</summary>
+    private static StormNode?[]?[]? s_stormKept;
+    private static volatile bool s_stormStop;
+    private static int s_stormErrors;
+    private static int s_stormDone;
+    private static int s_stormNextCpu;
+    private static CoreSpinLock s_probeLock;
+    private static volatile int s_probeSpinning;
+    private static volatile int s_probeDone;
+    private static int s_collectorsDone;
+    private static int s_collectorsNextCpu;
+
+    private sealed class StormNode
+    {
+        public int Value;
+        public StormNode? Next;
+    }
+
+    private const int StormListLength = 32;
+    private const int StormKeptLists = 8;
+    private const int StormCollections = 20;
+    private const int StormJoinTimeoutMs = 20000;
+    private const int CollectionsPerCpu = 10;
+
+    /// <summary>
+    /// Moves itself to the next free CPU, then builds a list of <see cref="StormListLength"/>
+    /// nodes per round whose values sum to a known total, and verifies the eight it kept
+    /// before: a node a collection freed under it reads as garbage or as a later allocation.
+    /// The worker moves itself rather than being pinned by the main thread, so that its first
+    /// instructions on CPU 0 are over before it starts the storm there.
+    /// </summary>
+    private static void StormWorker()
+    {
+        uint cpu = (uint)Interlocked.Increment(ref s_stormNextCpu);
+        ThreadAffinity.Current = CpuSet.Single(cpu);
+        StormNode?[] kept = new StormNode?[StormKeptLists];
+        s_stormKept![cpu] = kept;
+        int round = 0;
+        while (!s_stormStop)
+        {
+            StormNode? head = null;
+            for (int i = 0; i < StormListLength; i++)
+            {
+                head = new StormNode { Value = round * StormListLength + i, Next = head };
+            }
+
+            kept[round % StormKeptLists] = head;
+
+            for (int k = 0; k < StormKeptLists; k++)
+            {
+                StormNode? list = kept[k];
+                if (list is null)
+                {
+                    continue;
+                }
+
+                int expectedRound = list.Value / StormListLength;
+                int length = 0;
+                int sum = 0;
+                for (StormNode? node = list; node is not null; node = node.Next)
+                {
+                    sum += node.Value;
+                    length++;
+                }
+
+                int expectedSum = expectedRound * StormListLength * StormListLength + StormListLength * (StormListLength - 1) / 2;
+                if (length != StormListLength || sum != expectedSum)
+                {
+                    Interlocked.Increment(ref s_stormErrors);
+                }
+            }
+
+            round++;
+            s_stormRounds![cpu] = round;
+        }
+
+        Interlocked.Increment(ref s_stormDone);
+    }
+
+    /// <summary>
+    /// Three allocators pinned to CPUs 1 to 3 build and verify object graphs they keep on
+    /// their stack and in a static while CPU 0 forces collections: every collection stops the
+    /// three, scans their graphs from the contexts the stop saved, and releases them; no graph
+    /// is corrupted, every collection returns, and the stop was answered from the handler or a
+    /// safepoint at least three times per collection. The refill count the storm caused is
+    /// printed for the TLAB measurement.
+    /// </summary>
+    private static void TestGCStopTheWorldAllocationStorm()
+    {
+        int cpus = KernelCpus.Count;
+        s_stormRounds = new int[cpus];
+        s_stormKept = new StormNode?[]?[cpus];
+        s_stormStop = false;
+        s_stormErrors = 0;
+        s_stormDone = 0;
+        s_stormNextCpu = 0;
+
+        Thread[] workers = new Thread[cpus - 1];
+        for (int i = 0; i < workers.Length; i++)
+        {
+            workers[i] = new Thread(StormWorker);
+            workers[i].Start();
+        }
+
+        ulong handlersBefore = CpuStop.HandlerAcknowledgements;
+        ulong safepointsBefore = CpuStop.SafepointAcknowledgements;
+        ulong refillsBefore = CoreGC.RefillCount;
+        CoreGC.GetStats(out int collsBefore, out int _);
+
+        for (int c = 0; c < StormCollections; c++)
+        {
+            for (int i = 0; i < 64; i++)
+            {
+                int[] garbage = new int[48];
+                garbage[0] = i;
+            }
+
+            CoreGC.Collect();
+            TimerManager.Wait(5);
+        }
+
+        s_stormStop = true;
+        for (int i = 0; i < workers.Length; i++)
+        {
+            Assert.True(workers[i].Join(StormJoinTimeoutMs), "GC: every storm worker exits");
+        }
+
+        CoreGC.GetStats(out int collsAfter, out int _2);
+        ulong handlers = CpuStop.HandlerAcknowledgements - handlersBefore;
+        ulong safepoints = CpuStop.SafepointAcknowledgements - safepointsBefore;
+
+        Serial.WriteString("[Test] storm rounds:");
+        for (int cpu = 1; cpu < cpus; cpu++)
+        {
+            Serial.WriteString(" ");
+            Serial.WriteNumber((uint)s_stormRounds[cpu]);
+        }
+
+        Serial.WriteString(", refills during the storm: ");
+        Serial.WriteNumber(CoreGC.RefillCount - refillsBefore);
+        Serial.WriteString(", stop acknowledgements: ");
+        Serial.WriteNumber(handlers + safepoints);
+        Serial.WriteString(" (from the handler ");
+        Serial.WriteNumber(handlers);
+        Serial.WriteString(", from a safepoint ");
+        Serial.WriteNumber(safepoints);
+        Serial.WriteString(")\n");
+
+        Assert.Equal(workers.Length, s_stormDone, "GC: every storm worker finished");
+        for (int cpu = 1; cpu < cpus; cpu++)
+        {
+            Assert.True(s_stormRounds[cpu] > 0, "GC: every storm worker ran rounds on its CPU");
+        }
+
+        Assert.Equal(0, s_stormErrors, "GC: no object graph built on another CPU was corrupted by a collection");
+        Assert.True(collsAfter - collsBefore >= StormCollections, "GC: every forced collection ran (the workers may add their own)");
+        Assert.True(handlers + safepoints >= (ulong)(StormCollections * workers.Length),
+            "GC: every collection stopped every other CPU, from its handler or a safepoint");
+    }
+
+    /// <summary>
+    /// Moves itself to CPU 1, then spins on a kernel spinlock the main thread holds, with
+    /// interrupts masked, so a stop that lands meanwhile can only be answered from the
+    /// safepoint inside the spin. Moving itself first matters: masked on CPU 0, it would spin
+    /// there forever with the main thread, the lock's holder, switched out under it.
+    /// </summary>
+    private static void ProbeSpinner()
+    {
+        ThreadAffinity.Current = CpuSet.Single(1);
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            s_probeSpinning = 1;
+            s_probeLock.Acquire();
+            s_probeLock.Release();
+        }
+
+        s_probeDone = 1;
+    }
+
+    /// <summary>
+    /// A worker on CPU 1 spins masked on a plain spinlock CPU 0 holds while CPU 0 collects:
+    /// the collection completes, and the stop was answered once from the safepoint (the
+    /// spinner; CPUs 2 and 3 answer from their handlers). The one place a collection runs
+    /// under a plain spinlock on purpose: the lock is not one the collector takes, so the
+    /// holder's depth is zero and the stop is allowed.
+    /// </summary>
+    private static void TestGCStopSafepointAcknowledgesMaskedSpinner()
+    {
+        s_probeSpinning = 0;
+        s_probeDone = 0;
+        s_probeLock = default;
+        s_probeLock.Acquire();
+
+        Thread spinner = new Thread(ProbeSpinner);
+        spinner.Start();
+        for (int i = 0; i < 200 && s_probeSpinning == 0; i++)
+        {
+            TimerManager.Wait(10);
+        }
+
+        Assert.Equal(1, s_probeSpinning, "GC: the spinner reached its masked spin");
+        TimerManager.Wait(50);
+
+        ulong safepointsBefore = CpuStop.SafepointAcknowledgements;
+        ulong handlersBefore = CpuStop.HandlerAcknowledgements;
+        CoreGC.Collect();
+        ulong safepointsAfter = CpuStop.SafepointAcknowledgements;
+        ulong handlersAfter = CpuStop.HandlerAcknowledgements;
+
+        s_probeLock.Release();
+        Assert.True(spinner.Join(StormJoinTimeoutMs), "GC: the spinner exits once the lock is released");
+        Assert.Equal(1, s_probeDone, "GC: the spinner took and released the lock after the collection");
+        Assert.Equal(1UL, safepointsAfter - safepointsBefore, "GC: the masked spinner answered the stop from the safepoint");
+        Assert.Equal((ulong)(KernelCpus.Count - 2), handlersAfter - handlersBefore, "GC: every other CPU answered from its handler");
+    }
+
+    private static void CollectingWorker()
+    {
+        ThreadAffinity.Current = CpuSet.Single((uint)Interlocked.Increment(ref s_collectorsNextCpu));
+        for (int i = 0; i < CollectionsPerCpu; i++)
+        {
+            CoreGC.Collect();
+        }
+
+        Interlocked.Increment(ref s_collectorsDone);
+    }
+
+    /// <summary>
+    /// Workers on CPU 1 and CPU 2 collect ten times each while CPU 0 does the same: every
+    /// call returns and every collection is counted, the stop being claimed by one CPU at a
+    /// time and the others answering it from wherever they are, their own claim included.
+    /// </summary>
+    private static void TestGCStopTwoCpusCollectAtOnce()
+    {
+        s_collectorsDone = 0;
+        s_collectorsNextCpu = 0;
+        CoreGC.GetStats(out int collsBefore, out int _);
+
+        Thread first = new Thread(CollectingWorker);
+        Thread second = new Thread(CollectingWorker);
+        first.Start();
+        second.Start();
+
+        for (int i = 0; i < CollectionsPerCpu; i++)
+        {
+            CoreGC.Collect();
+        }
+
+        Assert.True(first.Join(StormJoinTimeoutMs) && second.Join(StormJoinTimeoutMs), "GC: both collecting workers exit");
+        CoreGC.GetStats(out int collsAfter, out int _2);
+        Assert.Equal(2, s_collectorsDone, "GC: both collecting workers finished their calls");
+        Assert.Equal(collsBefore + 3 * CollectionsPerCpu, collsAfter, "GC: every collection of the three CPUs was recorded");
+    }
+
+    /// <summary>
+    /// A collection under a stop this CPU already owns (what the policy swap's allocations
+    /// do) stops nobody again: the other CPUs were stopped once, by the outer entry, and the
+    /// collection scans them from the contexts that stop saved.
+    /// </summary>
+    private static void TestGCStopNestedCollectionUnderAStop()
+    {
+        CoreGC.GetStats(out int collsBefore, out int _);
+        ulong acksOuter;
+        ulong acksInner;
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            ulong before = CpuStop.HandlerAcknowledgements + CpuStop.SafepointAcknowledgements;
+            CpuStop.Enter((uint)KernelCpus.Count);
+            acksOuter = CpuStop.HandlerAcknowledgements + CpuStop.SafepointAcknowledgements - before;
+            CoreGC.Collect();
+            acksInner = CpuStop.HandlerAcknowledgements + CpuStop.SafepointAcknowledgements - before - acksOuter;
+            CpuStop.Exit();
+        }
+
+        CoreGC.GetStats(out int collsAfter, out int _2);
+        Assert.Equal((ulong)(KernelCpus.Count - 1), acksOuter, "GC: the outer entry stopped every other CPU");
+        Assert.Equal(0UL, acksInner, "GC: the nested collection stopped nobody again");
+        Assert.Equal(collsBefore + 1, collsAfter, "GC: the nested collection ran");
     }
 
     /// <summary>

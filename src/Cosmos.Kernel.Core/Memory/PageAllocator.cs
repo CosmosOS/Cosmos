@@ -83,7 +83,9 @@ internal static unsafe class PageAllocator
     /// <summary>
     /// Guards the RAT and <see cref="FreePageCount"/> in <see cref="AllocPages"/>
     /// and <see cref="Free(uint)"/>. IRQ-safe because the masked heap and
-    /// preemptible driver threads both allocate pages. Held over RAT reads
+    /// preemptible driver threads both allocate pages; one of the three locks
+    /// the collector counts (<see cref="Scheduler.SpinLock.AcquireCollectorLock"/>).
+    /// Held over RAT reads
     /// and writes only: anything under it that allocates or throws would
     /// re-enter <see cref="AllocPages"/> with interrupts masked and spin on
     /// itself. Plain zeroed static data, so it works from the first
@@ -569,7 +571,7 @@ internal static unsafe class PageAllocator
         // The scan and the mark are one step under the lock: a preemption
         // between finding an empty run and claiming it would let another
         // thread claim the same pages.
-        using (s_ratLock.AcquireIrqSafe())
+        using (s_ratLock.AcquireCollectorLock())
         {
             // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
             // Each search starts where the last one of its kind ended, and scans the whole
@@ -741,7 +743,7 @@ internal static unsafe class PageAllocator
     /// Reads the address's RAT entry, and the entries before it while they are
     /// <see cref="PageType.Extension"/>: the cost depends on the size of the run, not on how many
     /// runs there are. Takes no lock: the caller keeps the run from being freed meanwhile (the
-    /// garbage collector runs with interrupts disabled).
+    /// garbage collector runs with the world stopped).
     /// </remarks>
     /// <param name="aPtr">Any address.</param>
     /// <param name="aStart">The first page of the run, or <c>null</c> when the address is in none.</param>
@@ -781,7 +783,7 @@ internal static unsafe class PageAllocator
     {
         // Same lock as AllocPages: a concurrent scan must not see a run
         // half-released, and FreePageCount is a read-modify-write.
-        using (s_ratLock.AcquireIrqSafe())
+        using (s_ratLock.AcquireCollectorLock())
         {
             byte* p = s_mRAT + aPageIdx;
             byte* ratEnd = s_mRAT + TotalPageCount;

@@ -95,8 +95,9 @@ internal static unsafe partial class GarbageCollector
     /// still gets a conservative word-by-word scan of its saved registers and stack until
     /// return-address hijacking lands. See issue #385.
     /// <para>
-    /// <see cref="GarbageCollector.Collect"/> runs this inside <c>InternalCpu.DisableInterruptsScope()</c>,
-    /// so the other registered threads are quiescent for the duration.
+    /// <see cref="GarbageCollector.Collect"/> runs this with the world stopped
+    /// (<see cref="CpuStop"/>): every other CPU is held, and every registered thread but the
+    /// collecting one has a saved context that is current.
     /// </para>
     /// </summary>
     private static void ScanStackRoots()
@@ -118,12 +119,12 @@ internal static unsafe partial class GarbageCollector
 
             PreciseScanCurrentThread(stackEnd);
 
-            var threads = SchedulerManager.Threads;
+            SchedulerThread?[]? threads = SchedulerManager.Threads;
             if (threads is not null)
             {
                 for (int i = 0; i < threads.Length; i++)
                 {
-                    var thread = threads[i];
+                    SchedulerThread? thread = threads[i];
                     if (thread is not null && !ReferenceEquals(thread, current) && thread.State != SchedulerThreadState.Dead)
                     {
                         ScanThreadStack(thread);
@@ -155,21 +156,13 @@ internal static unsafe partial class GarbageCollector
             return;
         }
 
-        // ScanStackRoots never passes the current thread, so a thread still marked Running here is
-        // another CPU's current thread: the idle thread of an application processor, which halts in
-        // Smp.ApMain and is never switched out, so the switch path has recorded neither its stack
-        // pointer nor a context for it (and it holds no reference: nothing on that path allocates),
-        // or a thread whose CPU set put it there (SMP phases 3a and 3b), which keeps running while this CPU
-        // collects and whose frames only the stop rendezvous of phase 4 can capture. Scanning the
-        // idle thread from this CPU's stack pointer up to a boot stack top read, on a multi-core
-        // machine, whatever memory lies between the collecting thread's stack and that top; the
-        // moved thread's saved stack pointer and context are stale, from its last switch-out.
-        if (thread.State == SchedulerThreadState.Running)
-        {
-            return;
-        }
-
-        Scheduler.ThreadContext* ctx = thread.GetContext();
+        // ScanStackRoots never passes the current thread, and the world is stopped: every other
+        // thread has a saved context that is current. Switched out, the switch-out wrote its
+        // ThreadContext; evicted and pending, the same; created and never run, InitializeStack
+        // wrote one; running on a CPU the stop held, the stop handler wrote the frame's base,
+        // or a safepoint captured the registers on its stack. A capture has no register file
+        // to decode: the conservative walk starts at it and covers the frames above it.
+        Scheduler.ThreadContext* ctx = thread.SavedContextIsCapture ? null : thread.GetContext();
         if (ctx != null)
         {
 #if ARCH_ARM64
@@ -238,11 +231,11 @@ internal static unsafe partial class GarbageCollector
         {
             // An idle thread (the kernel's main thread on CPU 0, the halt loop of an
             // application processor) has no StackBase/StackSize: it runs on the bootloader stack
-            // of its CPU, where the IRQ stub that switched it out saved its context, at
-            // StackPointer. Skipping it lost every main-thread stack root whenever another thread
-            // collected. On ARM64 the frame is on that stack too: every CPU runs EL1h from its
-            // first instruction in the kernel (kmain, the trampoline), so an exception stacks its
-            // frame below the interrupted sp.
+            // of its CPU, where the IRQ stub that switched it out, or the stop interrupt that
+            // held it, saved its context, at StackPointer. Skipping it lost every main-thread
+            // stack root whenever another thread collected. On ARM64 the frame is on that stack
+            // too: every CPU runs EL1h from its first instruction in the kernel (kmain, the
+            // trampoline), so an exception stacks its frame below the interrupted sp.
             stackEnd = PerCpuBlock.At(thread.CpuId).BootStackTop;
         }
         else

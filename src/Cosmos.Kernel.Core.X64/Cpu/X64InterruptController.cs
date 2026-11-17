@@ -184,13 +184,14 @@ internal class X64InterruptController : IInterruptController
     }
 
     /// <summary>
-    /// The stop IPI's handler: holds this CPU in the rendezvous until the sender releases it.
-    /// The EOI comes after, on Dispatch's exit, so no interrupt of equal or lower priority is
-    /// taken while the CPU is held; none could be, with interrupts masked here.
+    /// The stop IPI's handler: records the interrupted frame as the current thread's saved
+    /// context and holds this CPU in the rendezvous until the sender releases it. The EOI
+    /// comes after, on Dispatch's exit, so no interrupt of equal or lower priority is taken
+    /// while the CPU is held; none could be, with interrupts masked here.
     /// </summary>
-    private static void HandleStop(ref IRQContext ctx)
+    private static unsafe void HandleStop(ref IRQContext ctx)
     {
-        CpuStop.HandleStopInterrupt();
+        CpuStop.HandleStopInterrupt((nuint)Unsafe.AsPointer(ref ctx) - XmmSaveAreaSizeBytes);
     }
 
     private static void SendEOI()

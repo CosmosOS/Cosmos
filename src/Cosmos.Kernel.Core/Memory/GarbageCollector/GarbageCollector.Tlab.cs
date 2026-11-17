@@ -42,14 +42,17 @@ internal static unsafe partial class GarbageCollector
     /// <summary>
     /// Refills a thread's TLAB from the GC heap (free list, then segment bump, then new segment).
     /// Returns the unused gap from the old TLAB to the free list before acquiring a new buffer.
+    /// Under the heap lock: the free lists and the segments are shared by every CPU.
     /// </summary>
     /// <param name="ac">The allocation context to refill.</param>
     /// <param name="size">Minimum allocation size that must fit in the new TLAB.</param>
     /// <returns><c>true</c> if the TLAB was successfully refilled; otherwise, <c>false</c>.</returns>
     internal static bool RefillAllocContext(ref AllocContext ac, uint size)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_heapLock.AcquireCollectorLock())
         {
+            s_refillCount++;
+
             // Return unused portion of old TLAB
             StampUnusedTlab(ref ac);
 
@@ -125,17 +128,40 @@ internal static unsafe partial class GarbageCollector
     }
 
     /// <summary>
-    /// Returns a thread's TLAB to the GC heap. Stamps the unused gap as a FreeBlock
-    /// and resets the allocation pointers.
+    /// Returns a thread's TLAB to the GC heap under the heap lock: stamps the unused gap as a
+    /// FreeBlock and resets the allocation pointers. For a thread reaped before it ran; a
+    /// thread that exits goes through <see cref="RetireAllocContext"/>, which also keeps what
+    /// it allocated in the total.
     /// </summary>
     /// <param name="ac">The allocation context to return.</param>
     public static void ReturnAllocContext(ref AllocContext ac)
     {
-        StampUnusedTlab(ref ac);
+        using (s_heapLock.AcquireCollectorLock())
+        {
+            StampUnusedTlab(ref ac);
+        }
     }
 
     /// <summary>
-    /// Returns all live threads' TLABs to the GC heap. Called at the start of GC collection.
+    /// Retires the allocation context of a thread that exits: adds what the thread allocated
+    /// to the dead threads' share of the total, which <see cref="GetTotalAllocatedBytes"/> adds
+    /// to the live threads' counts, and returns its TLAB. Under the heap lock.
+    /// </summary>
+    /// <param name="ac">The exiting thread's allocation context.</param>
+    internal static void RetireAllocContext(ref AllocContext ac)
+    {
+        using (s_heapLock.AcquireCollectorLock())
+        {
+            s_deadThreadsAllocBytes += ac.AllocBytes + ac.AllocBytesUoh;
+            ac.AllocBytes = 0;
+            ac.AllocBytesUoh = 0;
+            StampUnusedTlab(ref ac);
+        }
+    }
+
+    /// <summary>
+    /// Returns all live threads' TLABs to the GC heap. Called at the start of a collection,
+    /// the world stopped and the heap lock held, so it stamps each TLAB directly.
     /// After this call, all threads have AllocPtr == AllocLimit == null and will refill on next alloc.
     /// </summary>
     internal static void ReturnAllAllocContexts()
@@ -151,14 +177,14 @@ internal static unsafe partial class GarbageCollector
                     SchedulerThread? thread = threads[i];
                     if (thread is not null)
                     {
-                        ReturnAllocContext(ref thread._allocContext);
+                        StampUnusedTlab(ref thread._allocContext);
                         count--;
                     }
                 }
             }
         }
 
-        ReturnAllocContext(ref s_fallbackAllocContext);
+        StampUnusedTlab(ref s_fallbackAllocContext);
     }
 
     /// <summary>

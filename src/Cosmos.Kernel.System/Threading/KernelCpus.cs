@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Scheduler;
 
@@ -17,8 +16,8 @@ namespace Cosmos.Kernel.System.Threading;
 /// (the finalizer, the driver kit's, the console sessions', audio) stay on
 /// <see cref="Housekeeping"/> whatever the default says, and a kernel that
 /// wants its main flow everywhere sets <see cref="DefaultAffinity"/> to
-/// <see cref="Online"/> before it creates threads. Until the collector stops
-/// every CPU (SMP phase 4), a thread away from CPU 0 must not allocate.
+/// <see cref="Online"/> before it creates threads. A thread allocates on
+/// whichever CPU it runs: the collector stops every CPU (SMP phase 4).
 /// </para>
 /// </summary>
 public static class KernelCpus
@@ -37,7 +36,7 @@ public static class KernelCpus
 
     /// <summary>
     /// The CPUs the kernel's own service threads run on: CPU 0, where the
-    /// collector runs and where the driver stack's interrupt handlers are.
+    /// driver stack's interrupt handlers are.
     /// </summary>
     public static CpuSet Housekeeping => new(SchedulerManager.HousekeepingCpus);
 
@@ -66,17 +65,13 @@ public static class KernelCpus
     /// <summary>
     /// The set a thread created from the boot thread (<c>Main</c>) takes:
     /// <see cref="Housekeeping"/> until a kernel sets it. A thread created
-    /// from any other thread takes its creator's set. Setting it is
-    /// experimental until the collector stops every CPU (SMP phase 4): a
-    /// thread away from CPU 0 must not allocate.
+    /// from any other thread takes its creator's set.
     /// </summary>
     /// <exception cref="InvalidOperationException">On set: scheduler support is compiled out, or the scheduler is not up yet.</exception>
     /// <exception cref="ArgumentException">On set: the set is empty, or names no CPU under <see cref="Count"/>.</exception>
     public static CpuSet DefaultAffinity
     {
         get => SchedulerManager.IsReady ? new(SchedulerManager.DefaultAffinity) : Housekeeping;
-
-        [Experimental(Experimentals.AffinitySeamDiagId)]
         set
         {
             ThrowIfSchedulerUnavailable();

@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System.Diagnostics.CodeAnalysis;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Scheduler;
 using SysThread = System.Threading.Thread;
@@ -13,8 +12,9 @@ namespace Cosmos.Kernel.System.Threading;
 /// set excludes is moved at that CPU's next interrupt exit) and an ideal CPU
 /// inside it. A thread inherits its creator's set, or
 /// <see cref="KernelCpus.DefaultAffinity"/> when created from the boot
-/// thread. Experimental until the collector stops every CPU (SMP phase 4): a
-/// thread away from CPU 0 must not allocate, so what moves one is marked.
+/// thread. A thread allocates on whichever CPU it runs: the collector stops
+/// every CPU (SMP phase 4), so a thread away from CPU 0 is scanned like any
+/// other.
 /// <para>
 /// A <see cref="global::System.Threading.Thread"/> resolves to the scheduler's thread by its
 /// handle: the calling thread always resolves, the boot thread included;
@@ -24,7 +24,6 @@ namespace Cosmos.Kernel.System.Threading;
 /// never moves.
 /// </para>
 /// </summary>
-[Experimental(Experimentals.AffinitySeamDiagId)]
 public static class ThreadAffinity
 {
     /// <summary>

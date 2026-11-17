@@ -21,10 +21,11 @@ namespace Cosmos.Kernel.Tests.Smp;
 /// CPU affinity (CosmosOS/Cosmos#3341, SMP phase 3b): the CPU set and the ideal CPU a
 /// thread carries, what it inherits, the ring that reads and sets them, and the mechanism
 /// that moves a thread its set excludes from its CPU, running or not. The cells that move
-/// a thread run on the four-CPU cell and skip on one CPU. A worker away from CPU 0 touches
-/// statics only and allocates nothing, and comes back to CPU 0 before it exits: until the
-/// collector stops every CPU (SMP phase 4) a collection on CPU 0 neither stops nor scans a
-/// thread running elsewhere, and the exit path allocates.
+/// a thread run on the four-CPU cell and skip on one CPU. A worker away from CPU 0 reports
+/// through statics, read on CPU 0 without a lock, and allocates there like anywhere else:
+/// the collector stops every CPU (SMP phase 4), and the spinners keep an object per round
+/// to prove it. A worker comes back to CPU 0 before it exits because the cells prove the
+/// move each way.
 /// </summary>
 public class Kernel : Sys.Kernel
 {
@@ -65,6 +66,8 @@ public class Kernel : Sys.Kernel
     private static volatile bool s_stop;
     private static volatile uint s_seenCpu;
     private static uint[]? s_counters;
+    private static int[]?[]? s_kept;
+    private static int s_keptErrors;
     private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_gate;
     private static Cosmos.Kernel.Core.Scheduler.InterruptEvent? s_release;
     private static volatile bool s_proceed;
@@ -574,26 +577,40 @@ public class Kernel : Sys.Kernel
 
     // ===== The mechanism across CPUs =====
 
-    // Spins, reporting the CPU it runs on and counting in that CPU's slot. Statics only.
+    // Spins, reporting the CPU it runs on and counting in that CPU's slot. Allocates an object
+    // per round on whichever CPU it runs and checks the previous one: a collection on another
+    // CPU must stop this one and scan the object it holds (SMP phase 4).
     private static void Spinner()
     {
         s_workerThread = SchedulerManager.CurrentThread;
         uint[] counters = s_counters!;
+        int[]?[] kept = s_kept!;
+        uint round = 0;
         while (!s_stop)
         {
             uint cpu = KernelCpus.Current;
             s_seenCpu = cpu;
-            Interlocked.Increment(ref counters[cpu]);
+            uint count = Interlocked.Increment(ref counters[cpu]);
+            int[]? previous = kept[cpu];
+            if (previous is not null && previous[0] != (int)cpu)
+            {
+                Interlocked.Increment(ref s_keptErrors);
+            }
+
+            kept[cpu] = [(int)cpu, (int)count, (int)round];
+            round++;
         }
     }
 
-    [MemberNotNull(nameof(s_counters), nameof(s_gate), nameof(s_release))]
+    [MemberNotNull(nameof(s_counters), nameof(s_kept), nameof(s_gate), nameof(s_release))]
     private static void ResetWorkers()
     {
         s_workerThread = null;
         s_stop = false;
         s_seenCpu = 0;
         s_counters = new uint[KernelCpus.Count];
+        s_kept = new int[]?[KernelCpus.Count];
+        s_keptErrors = 0;
         s_gate = new Cosmos.Kernel.Core.Scheduler.InterruptEvent();
         s_release = new Cosmos.Kernel.Core.Scheduler.InterruptEvent();
     }
@@ -683,14 +700,16 @@ public class Kernel : Sys.Kernel
         return false;
     }
 
-    // Pins a spinner back to CPU 0, waits until it counts there, stops it and joins: the exit
-    // path allocates, so a worker exits on CPU 0 alone.
+    // Pins a spinner back to CPU 0, waits until it counts there, stops it and joins: the cell
+    // proves the move home as it proved the move away, and the objects the spinner kept on
+    // every CPU it ran on are intact.
     private static void StopSpinner(SysThread worker)
     {
         Assert.True(ThreadAffinity.Pin(worker, 0), "the spinner is pinned home");
         WaitForCounter(0);
         s_stop = true;
         Assert.True(worker.Join(JoinTimeoutMs), "the spinner exits once stopped on CPU 0");
+        Assert.Equal(0, s_keptErrors, "every object a spinner allocated away from CPU 0 survived the collections");
     }
 
     private static void StopSpinners(SysThread first, SysThread second)
@@ -699,6 +718,7 @@ public class Kernel : Sys.Kernel
         WaitForCounter(0);
         s_stop = true;
         Assert.True(first.Join(JoinTimeoutMs) && second.Join(JoinTimeoutMs), "both spinners exit once stopped on CPU 0");
+        Assert.Equal(0, s_keptErrors, "every object the two spinners allocated away from CPU 0 survived the collections");
     }
 
     // A thread pinned to another CPU runs there, keeps running there, and reports its set and
@@ -808,6 +828,7 @@ public class Kernel : Sys.Kernel
     {
         ulong checksum = PingPongSeed;
         uint wrong = 0;
+        int[] kept = [-1];
         for (uint round = 0; round < PingPongRounds; round++)
         {
             uint target = 1 + round % 2;
@@ -817,6 +838,14 @@ public class Kernel : Sys.Kernel
                 wrong++;
             }
 
+            // An object allocated on each side and checked on the other: the collector stops
+            // and scans this thread wherever it runs (SMP phase 4).
+            if (kept[0] != (int)round - 1)
+            {
+                wrong++;
+            }
+
+            kept = [(int)round];
             checksum = checksum * PingPongMultiplier + round;
         }
 
@@ -838,9 +867,10 @@ public class Kernel : Sys.Kernel
     }
 
     // A thread moves itself between CPU 1 and CPU 2 two hundred times, checking a stack-local
-    // value and its CPU on every round: each round resumes the thread on the CPU the other
-    // one's stub is leaving, which is what the off-CPU marker orders. Without it a resume
-    // could land while the other CPU still runs on the thread's stack.
+    // value, an object it allocated on the other CPU, and its CPU on every round: each round
+    // resumes the thread on the CPU the other one's stub is leaving, which is what the
+    // off-CPU marker orders. Without it a resume could land while the other CPU still runs
+    // on the thread's stack.
     private static void TestPingPongKeepsStackIntact()
     {
         s_pingPongDone = false;

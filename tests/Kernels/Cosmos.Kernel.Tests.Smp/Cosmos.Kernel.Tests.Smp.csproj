@@ -8,10 +8,8 @@
     <!-- COSMOS0001: the cross-CPU cells drive SchedulerManager (the Balance
          cell, the offline-set cell) and read a SchedulerThread and its state
          (the TryStart cell, the parked cell, the workers), all on the
-         experimental scheduler seam. COSMOS0004: the suite is the proof of
-         ThreadAffinity and the DefaultAffinity setter, experimental until the
-         collector stops every CPU (SMP phase 4). -->
-    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0004</NoWarn>
+         experimental scheduler seam. -->
+    <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
     <!-- Off on purpose: the suite uses no network, and QEMU's default NIC
          would bind a driver whose drain wakes the driver kit's worker every
          10 ms (q35's E1000E on x64) or 50 ms (the virt machine's virtio-net

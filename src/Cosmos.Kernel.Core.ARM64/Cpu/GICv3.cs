@@ -339,8 +339,8 @@ public static class GICv3
     /// (priority mask, binary point, group 1 enabled). The distributor is shared and stays as
     /// the boot CPU left it. In the sysreg-only mode the firmware's redistributor configuration
     /// is trusted, as on the boot CPU. An application processor, from its managed entry with
-    /// interrupts masked (SMP phase 2). Allocation-free: the heap is the boot CPU's until
-    /// phase 4, and the log lines write constants and numbers only.
+    /// interrupts masked (SMP phase 2). Allocation-free: it runs before the CPU is online, and
+    /// the log lines write constants and numbers only.
     /// </summary>
     internal static void InitializeCurrentCpu()
     {
