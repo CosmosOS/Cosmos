@@ -1,4 +1,5 @@
 using System;
+using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -22,7 +23,7 @@ public class Kernel : Sys.Kernel
         Log.WriteNumber((uint)skip);
         Log.WriteString("\n");
 
-        TR.Start("Power Tests", expectedTests: 4);
+        TR.Start("Power Tests", expectedTests: 5);
 
         // The ring's own answer to "did the platform wire up power
         // management". The initializer builds the CPU and power operations
@@ -68,6 +69,26 @@ public class Kernel : Sys.Kernel
             return;
         }
         TR.Run("Shutdown_FiresAndExits", () => { });
+
+        // Test #5: what the Shutdown cell cannot see. On QEMU the emulator
+        // port fallback powers off too, so Shutdown passes even when ACPI S5
+        // failed; this one asserts that uACPI loads and initializes the
+        // firmware's AML. It runs in the last boot only, so the Shutdown cell
+        // keeps covering the interpreter being brought up by the power-off
+        // path itself.
+        int namespaceState = AcpiPmNative.LoadNamespace();
+        if (namespaceState == AcpiPmNative.NamespaceUnsupported)
+        {
+            TR.Skip("Acpi_Namespace_Loads", "no AML interpreter on this architecture, which powers off through PSCI");
+        }
+        else
+        {
+            TR.Run("Acpi_Namespace_Loads", () =>
+            {
+                Assert.Equal(AcpiPmNative.NamespaceLoaded, namespaceState,
+                    "uACPI should load and initialize the firmware's AML namespace");
+            });
+        }
 
         // skip >= 2: both destructive tests already fired in earlier boots.
         // Wrap up the suite cleanly so the runner sees a TestSuiteEnd.

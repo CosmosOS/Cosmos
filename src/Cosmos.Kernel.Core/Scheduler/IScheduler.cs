@@ -21,8 +21,13 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// run under no lock, with interrupts masked, and may allocate.
 /// </para>
 /// <para>
-/// Several hooks have no mechanism-side caller yet, because every thread is
-/// placed on CPU 0 until SMP phase 5 and nothing in-tree sets priorities.
+/// Several hooks have no mechanism-side caller a policy can count on:
+/// <see cref="SelectCpu"/>, <see cref="OnThreadMigrate"/> and
+/// <see cref="OnPickFailed"/> run only when a thread's CPU set takes it off
+/// its CPU, and the default set is CPU 0 until a kernel widens it;
+/// <see cref="Balance"/> is reached only through
+/// <see cref="SchedulerManager.Balance"/>, which nothing calls until
+/// placement lands (SMP phase 5); and nothing in-tree sets priorities.
 /// Implement them, but do not expect them to be exercised.
 /// </para>
 /// <para>
@@ -170,8 +175,11 @@ public interface IScheduler
     SchedulerThread? PickNext(PerCpuState cpuState);
 
     /// <summary>
-    /// Put back a thread the mechanism picked but could not switch to.
-    /// Declared for completeness; nothing calls it today.
+    /// Put back a thread the mechanism picked but could not switch to. One
+    /// caller: the switch-out that evicts a thread whose set excludes its CPU
+    /// overrides a pick of that same thread, and when the set changes back
+    /// before the move the thread is re-queued through this hook. Under the
+    /// CPU's queue lock, in interrupt context.
     /// </summary>
     /// <param name="cpuState">CPU the pick was made for.</param>
     /// <param name="thread">Thread that could not be switched to.</param>
@@ -199,24 +207,36 @@ public interface IScheduler
     // ========== Load Balancing ==========
 
     /// <summary>
-    /// Choose a starting CPU for a new or migrating thread, honouring
-    /// <see cref="SchedulerThreadFlags.Pinned"/>. Dormant until placement
-    /// lands (SMP phase 5): nothing calls it today, and this hook receives
-    /// no <see cref="PerCpuState"/>.
+    /// Choose the CPU a thread goes to, among <paramref name="allowed"/>: the
+    /// thread's effective set, never empty, which the mechanism computed from
+    /// <see cref="SchedulerThread.Affinity"/> and the CPUs online. Called when
+    /// a thread is created on a CPU its set excludes, when a set change
+    /// excludes the thread's CPU, and from the interrupt exit that evicts a
+    /// running thread for the same reason; the answer is checked against the
+    /// set and <paramref name="allowed"/>'s first CPU is used when it is not
+    /// in it. Under no queue lock: what the hook reads of other CPUs' data is
+    /// a snapshot. Must not allocate. <see cref="SchedulerThread.IdealCpu"/>
+    /// is the thread's preference and is inside the set.
     /// </summary>
     /// <param name="thread">Thread being placed.</param>
-    /// <param name="currentCpu">CPU the thread is on now.</param>
-    /// <param name="cpuCount">Number of CPUs the scheduler manages.</param>
-    /// <returns>The CPU to place the thread on.</returns>
-    uint SelectCpu(SchedulerThread thread, uint currentCpu, uint cpuCount);
+    /// <param name="cpus">Every CPU the scheduler manages, by index.</param>
+    /// <param name="allowed">The CPUs the thread may go to; never empty.</param>
+    /// <returns>The CPU to place the thread on, one of <paramref name="allowed"/>.</returns>
+    uint SelectCpu(SchedulerThread thread, PerCpuState[] cpus, CpuSet allowed);
 
     /// <summary>
     /// Move a thread's bookkeeping, and any virtual-time base, between CPUs:
     /// out of <paramref name="fromState"/>'s run structure, into
-    /// <paramref name="toState"/>'s. The mechanism calls it for a
-    /// <see cref="SchedulerThreadState.Ready"/> thread it migrates, under both
-    /// CPUs' queue locks, with <see cref="SchedulerThread.CpuId"/> already
-    /// rewritten; a policy may call it from its own <see cref="Balance"/>.
+    /// <paramref name="toState"/>'s. Called under both CPUs' queue locks with
+    /// <see cref="SchedulerThread.CpuId"/> already rewritten, for a thread
+    /// that is either <see cref="SchedulerThreadState.Ready"/> and queued on
+    /// <paramref name="fromState"/> (a migration of a queued thread) or
+    /// <see cref="SchedulerThreadState.Running"/> and in no run structure
+    /// (the switch-out on <paramref name="fromState"/> evicted it because its
+    /// set excludes that CPU, and it turns Ready right after the hook); in
+    /// both cases the thread's load is accounted on
+    /// <paramref name="fromState"/>, so the hook moves it. The state tells
+    /// the two apart.
     /// </summary>
     /// <param name="thread">Thread being migrated.</param>
     /// <param name="fromState">CPU the thread is leaving.</param>
@@ -224,12 +244,19 @@ public interface IScheduler
     void OnThreadMigrate(SchedulerThread thread, PerCpuState fromState, PerCpuState toState);
 
     /// <summary>
-    /// Rebalance load across CPUs, honouring <see cref="SchedulerThreadFlags.Pinned"/>.
-    /// Dormant until placement lands (SMP phase 5): nothing calls it today.
+    /// Name a thread the policy wants pulled onto <paramref name="cpuState"/>
+    /// from another CPU, the one <see cref="SchedulerThread.CpuId"/> names, or
+    /// <see langword="null"/> for none. Under no lock: what the hook reads is a
+    /// snapshot, and the mechanism checks the answer under both CPUs' queue
+    /// locks before it calls <see cref="OnThreadMigrate"/> (still Ready, still
+    /// on that CPU, its set allows <paramref name="cpuState"/>), so a stale
+    /// answer is dropped, not applied. Dormant until placement lands (SMP
+    /// phase 5): nothing in the kernel calls it today.
     /// </summary>
-    /// <param name="cpuState">CPU asking for work, or offering it.</param>
+    /// <param name="cpuState">CPU asking for work.</param>
     /// <param name="allCpuStates">Every CPU the scheduler manages.</param>
-    void Balance(PerCpuState cpuState, PerCpuState[] allCpuStates);
+    /// <returns>The thread to pull, or <see langword="null"/>.</returns>
+    SchedulerThread? Balance(PerCpuState cpuState, PerCpuState[] allCpuStates);
 
     // ========== Dynamic Reconfiguration ==========
 

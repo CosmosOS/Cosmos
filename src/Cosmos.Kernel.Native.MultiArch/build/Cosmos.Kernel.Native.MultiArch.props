@@ -4,13 +4,10 @@
     <GCCProject Include="$(MSBuildThisFileDirectory)/C/" />
   </ItemGroup>
 
-  <!-- ACPI/LAI shared sources -->
+  <!-- ACPI/uACPI shared sources -->
   <ItemGroup>
     <GCCProject Include="$(MSBuildThisFileDirectory)/ACPI/" />
-    <GCCProject Include="$(MSBuildThisFileDirectory)/ACPI/lai/core/" />
-    <GCCProject Include="$(MSBuildThisFileDirectory)/ACPI/lai/helpers/" />
-    <GCCProject Include="$(MSBuildThisFileDirectory)/ACPI/lai/drivers/" />
-    <GCCIncludePath Include="$(MSBuildThisFileDirectory)/ACPI/lai/include/" />
-    <GCCIncludePath Include="$(MSBuildThisFileDirectory)/ACPI/lai/core/" />
+    <GCCProject Include="$(MSBuildThisFileDirectory)/ACPI/uacpi/source/" />
+    <GCCIncludePath Include="$(MSBuildThisFileDirectory)/ACPI/uacpi/include/" />
   </ItemGroup>
 </Project>

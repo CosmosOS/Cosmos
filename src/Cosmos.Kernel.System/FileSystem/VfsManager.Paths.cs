@@ -163,11 +163,12 @@ public static partial class VfsManager
     }
 
     /// <summary>Creates a regular file at <paramref name="fullPath"/>; the parent
-    /// directory must already exist on a mounted filesystem.</summary>
+    /// directory must already exist on a mounted filesystem that is not
+    /// read-only.</summary>
     public static bool TryCreateFile(string fullPath, VfsMode permissions)
     {
         SplitParentLeaf(fullPath, out string parentPath, out string leaf);
-        if (leaf.Length == 0)
+        if (leaf.Length == 0 || IsReadOnlyPath(parentPath))
         {
             return false;
         }
@@ -182,11 +183,12 @@ public static partial class VfsManager
     }
 
     /// <summary>Creates a directory at <paramref name="fullPath"/>; the parent
-    /// directory must already exist on a mounted filesystem.</summary>
+    /// directory must already exist on a mounted filesystem that is not
+    /// read-only.</summary>
     public static bool TryCreateDirectory(string fullPath, VfsMode permissions)
     {
         SplitParentLeaf(fullPath, out string parentPath, out string leaf);
-        if (leaf.Length == 0)
+        if (leaf.Length == 0 || IsReadOnlyPath(parentPath))
         {
             return false;
         }
@@ -203,9 +205,15 @@ public static partial class VfsManager
     /// <summary>Removes the file at <paramref name="fullPath"/>. When open handles
     /// still reference the node the removal is deferred to the last close
     /// (delete-pending) instead — FAT-style drivers free the data clusters
-    /// immediately on unlink, out from under any live handle.</summary>
+    /// immediately on unlink, out from under any live handle. Refused on a
+    /// read-only mount.</summary>
     public static bool TryUnlink(string fullPath)
     {
+        if (IsReadOnlyPath(fullPath))
+        {
+            return false;
+        }
+
         if (MarkPendingIfOpen(fullPath))
         {
             return true;
@@ -220,9 +228,15 @@ public static partial class VfsManager
         return parent.TryUnlink(leaf);
     }
 
-    /// <summary>Removes the directory at <paramref name="fullPath"/> (driver enforces emptiness).</summary>
+    /// <summary>Removes the directory at <paramref name="fullPath"/> (driver
+    /// enforces emptiness). Refused on a read-only mount.</summary>
     public static bool TryRemoveDirectory(string fullPath)
     {
+        if (IsReadOnlyPath(fullPath))
+        {
+            return false;
+        }
+
         SplitParentLeaf(fullPath, out string parentPath, out string leaf);
         if (!TryOpenDirectory(parentPath, out IVfsDirectoryHandle? parent))
         {
@@ -244,9 +258,10 @@ public static partial class VfsManager
     /// <param name="newFullPath">Absolute path it should have afterwards.</param>
     /// <returns><see langword="false"/> when either path is a mount point, the
     /// source does not exist, the destination is inside the source's own
-    /// subtree, the two sit on different mounts, the two are of different
-    /// kinds, the destination is a directory that is not empty, or the driver
-    /// refuses the move. Renaming a path onto itself succeeds.</returns>
+    /// subtree, the two sit on different mounts, the mount is read-only, the
+    /// two are of different kinds, the destination is a directory that is not
+    /// empty, or the driver refuses the move. Renaming a path onto itself
+    /// succeeds.</returns>
     public static bool TryRename(string oldFullPath, string newFullPath)
     {
         if (IsMountPoint(oldFullPath) || IsMountPoint(newFullPath))
@@ -275,7 +290,7 @@ public static partial class VfsManager
 
         VfsMount? oldMount = FindMount(oldFullPath);
         VfsMount? newMount = FindMount(newFullPath);
-        if (newMount is null || !ReferenceEquals(oldMount, newMount))
+        if (newMount is null || !ReferenceEquals(oldMount, newMount) || newMount.IsReadOnly)
         {
             return false;
         }

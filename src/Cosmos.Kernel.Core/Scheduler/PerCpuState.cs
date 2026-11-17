@@ -68,6 +68,14 @@ public sealed class PerCpuState : SchedulerExtensible
     // its read is served by the next exit.
     internal bool _needReschedule;
 
+    // The thread the last switch-out on this CPU evicted because its set
+    // excludes this CPU (SMP phase 3b): left out of the run structure, still
+    // Running when it was, and moved by SchedulerManager.MigratePending on
+    // the same interrupt exit once this CPU's queue lock is released, under
+    // both CPUs' locks in order. Written and read on this CPU alone, in
+    // interrupt context.
+    internal SchedulerThread? _pendingMigration;
+
     // ===== Synchronization =====
 
     // The queue lock: held around every policy hook that touches this CPU's

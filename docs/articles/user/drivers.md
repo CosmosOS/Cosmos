@@ -1148,13 +1148,15 @@ The buses above also carry the shipped drivers for displays, disks and sound. Th
 
 ### The storage drivers
 
-| Driver | Hardware | Disk names |
-|--------|----------|------------|
-| `AhciDriver` | SATA controllers in AHCI mode (disks only, no CD-ROM) | `sata<n>` |
+| Driver | Hardware | Device names |
+|--------|----------|--------------|
+| `AhciDriver` | SATA controllers in AHCI mode: disks, and CD-ROM or DVD drives (ATAPI), read-only | `sata<n>`, `cdrom<n>` |
 | `NvmeDriver` | NVMe controllers | `nvme<controller>n<namespace>` |
 | `VirtioBlkDriver` | virtio-blk, over PCI or MMIO | `vblk<n>` |
 
 An NVMe namespace is one of the disks a controller exposes, hence the second number in an NVMe disk's name. A USB stick is handled by `UsbMassStorageDriver` ([The USB class drivers](#the-usb-class-drivers)). Every disk is registered with `StorageManager` when it is published.
+
+A CD-ROM drive is published the same way, as a block device of 2048-byte sectors whose `WriteBlock` throws `IOException` and whose `Flush` has nothing to do, and it says what it is through a second interface on the same object, `IRemovableMedia`: `IsReadOnly`, `IsRemovable` and `HasMedia`, found by a type test as `IHardwareCursor` is on a display; the kit calls such an interface a facet. `AhciDriver` brings a drive up only when a disc is in it and the drive reports it ready, so `HasMedia` is true for every drive it publishes; a drive with no disc is logged and skipped, because the driver does not watch for a disc inserted later and a drive published empty would stay empty for the kernel. The storage manager reads the facet to carry the disc as one whole-medium partition without scanning it for a table, since a read-only medium carries none a kernel could write and an ISO's protective MBR counts in 512-byte units that a 2048-byte-sector device would misread, and to keep the drive after every writable disk in its order, so `StorageManager.PrimaryDevice` is the CD only on a machine with no disk. The ISO 9660 driver mounts it ([Read a CD-ROM or an ISO image](filesystem.md#read-a-cd-rom-or-an-iso-image)).
 
 ### The audio driver
 

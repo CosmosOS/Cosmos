@@ -119,6 +119,10 @@
     <!-- White-box scheduler suite reads Stride bookkeeping and drives the
          sync primitives directly. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Threading" />
+    <!-- The affinity suite (SMP phase 3b) calls the dormant Balance entry,
+         parks its workers on an InterruptEvent, starts a kernel thread to
+         read its housekeeping set, and masks interrupts for one refusal. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Smp" />
     <!-- White-box suites over Core primitives: vector allocation and MSI
          routing (Interrupts), copy routines and page allocation (Memory),
          MMIO probes (Storage). -->
@@ -128,6 +132,13 @@
     <!-- White-box CSPRNG suite: known-answer tests of the BLAKE2s and ChaCha20
          primitives, and which entropy source seeded KernelRandom. -->
     <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Random" />
+    <!-- The power suite brings uACPI's namespace up without powering off
+         (AcpiPmNative.LoadNamespace): its Shutdown cell cannot tell ACPI S5
+         from the emulator port fallback. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Power" />
+    <!-- The ISO 9660 suite reads its fixture images, embedded in the test
+         kernel, through ResourceManager. -->
+    <InternalsVisibleTo Include="Cosmos.Kernel.Tests.Iso9660" />
   </ItemGroup>
 
   <ItemGroup>

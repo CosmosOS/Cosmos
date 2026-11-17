@@ -290,6 +290,8 @@ public static class SchedulerDiagnostics
         return new KernelThreadInfo(
             thread.Id,
             thread.CpuId,
+            new Threading.CpuSet(thread.Affinity),
+            thread.IdealCpu,
             MapState(thread.State),
             thread.IsIdle,
             (thread.Flags & SchedulerThreadFlags.Managed) != 0,

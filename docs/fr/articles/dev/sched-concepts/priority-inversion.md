@@ -1,0 +1,14 @@
+---
+source_hash: 337cf7029ab3ac3eef1d6f201f039e05429022df
+---
+<a id="priority-inversion-and-inheritance"></a>
+
+# Inversion et héritage de priorité
+
+L'inversion de priorité se produit quand un thread de haute priorité attend un verrou que détient un thread de basse priorité. L'attente elle-même est prévue, puisque le détenteur n'a qu'à terminer sa section critique. L'inversion vient d'un troisième thread, de priorité moyenne, qui n'a besoin d'aucun verrou : il préempte le détenteur, le détenteur ne peut pas relâcher le verrou tant qu'il est hors du CPU, et le thread de haute priorité attend donc le thread de priorité moyenne, aussi longtemps que ce dernier s'exécute. Le cas le plus connu est celui de l'atterrisseur Mars Pathfinder en 1997, qui redémarrait sans cesse parce qu'une tâche de haute priorité attendait un verrou détenu par une tâche de basse priorité que des tâches de priorité moyenne tenaient à l'écart du CPU.
+
+L'héritage de priorité borne l'attente. Tant qu'un thread détient un verrou qu'attend un thread de priorité plus haute, il s'exécute à la priorité de ce thread en attente, si bien qu'aucun thread de priorité moyenne ne peut le préempter, et il revient à sa propre priorité quand il relâche le verrou. Le protocole de plafond de priorité est l'alternative statique : chaque verrou porte la priorité de son utilisateur le plus prioritaire, et tout thread qui prend le verrou s'exécute à cette priorité tant qu'il le détient.
+
+Le piège, c'est d'annuler correctement l'élévation de priorité. L'héritage est transitif, puisque le détenteur peut lui-même attendre un verrou détenu par un troisième thread, qui doit alors hériter à son tour, et un thread qui détient plusieurs verrous doit, quand il en relâche un, redescendre à la plus haute priorité qui lui est encore due, et non à sa priorité de base. L'ordre dans lequel un verrou se transmet compte aussi : un verrou qui sert ses threads en attente dans l'ordre d'arrivée peut passer à un thread en attente de basse priorité alors qu'un thread de haute priorité attend dans la file derrière lui.
+
+Dans Cosmos, le `Mutex` du noyau garde ses threads en attente dans une file FIFO et, au relâchement, transmet directement la propriété au thread en attente de tête, sans élever la priorité du détenteur pendant que d'autres attendent : c'est équitable, mais exposé à l'inversion sous une politique à priorités fixes. Sous la politique Stride par défaut, la priorité est une part, si bien qu'un détenteur continue de recevoir sa part et que l'attente d'un thread de haute priorité reste bornée, seulement plus longue. Le hook qu'utiliserait un protocole d'héritage est `SetPriority`, que l'on atteint par `SchedulerManager.SetPriority` ; rien dans le noyau ne l'appelle, et aucune politique n'implémente l'héritage. Voir [Mutex](../scheduler.md#mutex) et [Remarques sur le temps réel](../../user/scheduler-plugging.md#real-time-notes).

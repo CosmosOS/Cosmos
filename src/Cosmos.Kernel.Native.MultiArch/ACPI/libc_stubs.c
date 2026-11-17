@@ -1,5 +1,6 @@
 // Minimal libc stubs for kernel environment
-// Provides essential C library functions for LAI and other code
+// Provides the C library functions uACPI and other C code need that the
+// runtime does not export (it exports memmove and memset).
 // Uses Cosmos MemoryOp for memory operations
 
 #include <stdint.h>

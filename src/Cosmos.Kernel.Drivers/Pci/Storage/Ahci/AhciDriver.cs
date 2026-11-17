@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Pci;
 using Cosmos.Kernel.HAL.DriverKit.Resources;
@@ -15,10 +16,11 @@ namespace Cosmos.Kernel.Drivers.Pci.Storage.Ahci;
 /// AHCI mode, allocates one command region for every port index, walks the
 /// implemented ports, trains the PHY firmware left down, rebases each port
 /// onto the region, classifies its signature and publishes every SATA disk
-/// to the ring as <c>sata{n}</c>. Everything it holds for one HBA lives on an
-/// <see cref="AhciState"/> in <see cref="DeviceBinding.DriverState"/>. The
-/// driver stays strictly polled: no interrupt is requested, GHC.IE is never
-/// set and every PxIE stays 0. The legacy IDE-mode SATA function has
+/// to the ring as <c>sata{n}</c> and every SATAPI drive (a CD-ROM or DVD
+/// drive, read-only) as <c>cdrom{n}</c>. Everything it holds for one HBA
+/// lives on an <see cref="AhciState"/> in <see cref="DeviceBinding.DriverState"/>.
+/// The driver stays strictly polled: no interrupt is requested, GHC.IE is
+/// never set and every PxIE stays 0. The legacy IDE-mode SATA function has
 /// another programming interface and is never offered here.
 /// <see cref="Probe"/> and <see cref="OnDetach"/> run in thread context on
 /// the kit worker.
@@ -67,6 +69,9 @@ public sealed class AhciDriver : Driver
 
     /// <summary>The next <c>sata{n}</c> number, global across controllers and never reused: a port whose bring-up fails consumes it.</summary>
     private int _nextPortIndex;
+
+    /// <summary>The next <c>cdrom{n}</c> number, global across controllers and never reused, as the disk numbers are.</summary>
+    private int _nextCdRomIndex;
 
     // --- Properties ---
 
@@ -155,7 +160,10 @@ public sealed class AhciDriver : Driver
         state.Lock = binding.CreateLock();
 
         // 7. The ports, in ascending order of their PI bit.
-        List<AhciPort> ports = [];
+        List<IBlockDevice> ports = [];
+        List<uint> portNumbers = [];
+        int diskCount = 0;
+        int cdRomCount = 0;
         for (uint port = 0; port < AhciProtocol.MaxPorts; port++)
         {
             if ((implementedPorts & (1u << (int)port)) == 0)
@@ -169,16 +177,25 @@ public sealed class AhciDriver : Driver
                 continue;
             }
 
-            AhciPort? published = BringUpPort(binding, state, port);
+            IBlockDevice? published = BringUpPort(binding, state, port);
             if (published is not null)
             {
                 ports.Add(published);
+                portNumbers.Add(port);
+                if (published is AhciAtapiPort)
+                {
+                    cdRomCount++;
+                }
+                else
+                {
+                    diskCount++;
+                }
             }
         }
 
         // 8. The state, then the ring, one port at a time in port order.
         state.Index = _nextControllerIndex++;
-        state.Ports = ports.ToArray();
+        state.SetPorts(ports.ToArray(), portNumbers.ToArray());
         binding.DriverState = state;
         for (int i = 0; i < ports.Count; i++)
         {
@@ -189,7 +206,7 @@ public sealed class AhciDriver : Driver
         int implemented = BitOperations.PopCount(implementedPorts);
         uint major = version >> AhciProtocol.VersionMajorShift;
         uint minor = (version >> AhciProtocol.VersionMinorShift) & AhciProtocol.VersionByteMask;
-        binding.Log($"{state.PortCount} sata ports of {implemented} implemented, version {major}.{minor}, {state.CommandSlots} slots, {(state.Supports64Bit ? "64" : "32")}-bit");
+        binding.Log($"{diskCount} sata ports and {cdRomCount} satapi ports of {implemented} implemented, version {major}.{minor}, {state.CommandSlots} slots, {(state.Supports64Bit ? "64" : "32")}-bit");
         return ProbeResult.Bound;
     }
 
@@ -209,10 +226,10 @@ public sealed class AhciDriver : Driver
             return;
         }
 
-        AhciPort[] ports = state.Ports;
-        for (int i = 0; i < ports.Length; i++)
+        uint[] portNumbers = state.PortNumbers;
+        for (int i = 0; i < portNumbers.Length; i++)
         {
-            state.StopCommandEngine(ports[i].PortNumber);
+            state.StopCommandEngine(portNumbers[i]);
         }
 
         binding.Node.Access<PciAccess>().EnableBusMastering(false);
@@ -242,13 +259,14 @@ public sealed class AhciDriver : Driver
     /// Brings one implemented port up: trains the PHY when firmware left it
     /// down, skips a port without a device, rebases it onto the command
     /// region, starts its engine, reads its signature and creates the
-    /// <see cref="AhciPort"/> for a SATA disk. A rebased port that is not
-    /// published is stopped again before it is skipped, so no engine keeps
-    /// a FIS area inside memory the kit frees. Thread context on the kit
-    /// worker.
+    /// <see cref="AhciPort"/> for a SATA disk or the
+    /// <see cref="AhciAtapiPort"/> for a SATAPI drive. A rebased port that
+    /// is not published is stopped again before it is skipped, so no engine
+    /// keeps a FIS area inside memory the kit frees. Thread context on the
+    /// kit worker.
     /// </summary>
     /// <returns>The port to publish, or null when it was skipped; the reason was logged.</returns>
-    private AhciPort? BringUpPort(DeviceBinding binding, AhciState state, uint port)
+    private IBlockDevice? BringUpPort(DeviceBinding binding, AhciState state, uint port)
     {
         uint status = state.ReadPort(port, AhciProtocol.PxSsts);
         if ((status & AhciProtocol.SstsDetMask) != AhciProtocol.SstsDetPresent)
@@ -312,9 +330,27 @@ public sealed class AhciDriver : Driver
 
         if (kind == AhciProtocol.SignatureSatapi)
         {
-            binding.Log($"port {port}: satapi not supported");
+            // The HBA needs telling the device is ATAPI before a PACKET
+            // command: PxCMD.ATAPI makes it send the command block from
+            // the table, and a drive signals its check conditions through
+            // the same task file error path a disk does.
+            state.WritePort(port, AhciProtocol.PxCmd, state.ReadPort(port, AhciProtocol.PxCmd) | AhciProtocol.CmdAtapi);
+            int index = _nextCdRomIndex++;
+            try
+            {
+                AhciAtapiPort drive = new(state, binding, port, index);
+                binding.Log($"port {port}: {drive.Name}, {drive.Vendor} {drive.Product}, {drive.BlockCount} sectors of {drive.BlockSize} bytes");
+                return drive;
+            }
+            catch (Exception exception)
+            {
+                binding.Log($"port {port}: satapi bring-up failed: {exception.Message}");
+                state.StopCommandEngine(port);
+                return null;
+            }
         }
-        else if (kind == AhciProtocol.SignatureSemb)
+
+        if (kind == AhciProtocol.SignatureSemb)
         {
             binding.Log($"port {port}: semb not supported");
         }

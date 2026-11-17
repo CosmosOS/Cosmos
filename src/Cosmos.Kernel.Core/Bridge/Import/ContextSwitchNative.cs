@@ -29,6 +29,15 @@ internal static unsafe partial class ContextSwitchNative
     public static partial void SetContextSwitchNewThread(int isNew);
 
     /// <summary>
+    /// Stages the address of the outgoing thread's on-CPU marker
+    /// (<c>SchedulerThread.OnCpuSlot</c>): the stub stores 0 through it right after it
+    /// has switched stacks, and clears the slot. 0 for none.
+    /// </summary>
+    [LibraryImport("*", EntryPoint = "_native_set_context_switch_prev_on_cpu")]
+    [SuppressGCTransition]
+    public static partial void SetContextSwitchPrevOnCpu(nuint slot);
+
+    /// <summary>
     /// Captures the calling frame's callee-saved registers + stack pointer into the supplied
     /// <c>REGDISPLAY</c> and returns the caller's return address (IP). Used by the precise GC
     /// stack scan to bootstrap a per-frame walk of the GC-triggering thread (issue #346).

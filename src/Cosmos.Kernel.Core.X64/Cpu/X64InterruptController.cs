@@ -124,10 +124,10 @@ internal class X64InterruptController : IInterruptController
     public unsafe void Dispatch(ref IRQContext ctx)
     {
         InterruptManager.IrqDelegate?[]? handlers = InterruptManager.s_irqHandlers;
-        if (handlers != null && ctx.interrupt < (ulong)handlers.Length)
+        if (handlers is not null && ctx.interrupt < (ulong)handlers.Length)
         {
             InterruptManager.IrqDelegate? handler = handlers[(int)ctx.interrupt];
-            if (handler != null)
+            if (handler is not null)
             {
                 handler(ref ctx);
 
@@ -152,6 +152,11 @@ internal class X64InterruptController : IInterruptController
                         SchedulerManager.ReschedulePendingFromIrq(SchedulerManager.GetCurrentCpuId(), currentRsp);
                     }
                 }
+
+                // Last, after every switch this exit could stage, whichever
+                // handler staged it: the thread the stub is about to resume
+                // must be off its previous CPU's stack (SMP phase 3b).
+                SchedulerManager.FinishSwitchFromIrq(SchedulerManager.GetCurrentCpuId());
                 return;
             }
         }

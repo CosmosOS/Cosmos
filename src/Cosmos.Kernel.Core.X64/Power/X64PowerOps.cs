@@ -14,8 +14,8 @@ internal class X64PowerOps : IPowerOps
     private const byte Kbc_InputBufferFull = 0x02;
     private const byte Kbc_PulseResetCommand = 0xFE;
 
-    // Emulator ACPI shutdown ports - used as fallback when LAI/ACPI _S5 is
-    // unavailable (e.g. firmware without DSDT, or namespace creation failed).
+    // Emulator ACPI shutdown ports - used as fallback when ACPI S5 through
+    // uACPI is unavailable (e.g. firmware without DSDT, or the namespace failed to load).
     private const ushort Qemu_ShutdownPort = 0x604;
     private const ushort Bochs_ShutdownPort = 0xB004;
     private const ushort Vbox_ShutdownPort = 0x4004;
@@ -25,8 +25,8 @@ internal class X64PowerOps : IPowerOps
     {
         InternalCpu.DisableInterrupts();
 
-        // 1. ACPI reset via FADT reset register (works on real hardware that
-        //    advertises support; doesn't require AML namespace).
+        // 1. ACPI reset via the FADT reset register through uACPI (works on
+        //    real hardware that advertises support; doesn't require the AML namespace).
         AcpiPmNative.Reset();
 
         // 2. 8042 keyboard-controller pulse-reset (works on most PCs and QEMU).
@@ -58,8 +58,8 @@ internal class X64PowerOps : IPowerOps
     {
         InternalCpu.DisableInterrupts();
 
-        // 1. ACPI S5 via LAI (real-hardware path; also works on QEMU/KVM with
-        //    the firmware-provided DSDT). Builds the AML namespace on first call.
+        // 1. ACPI S5 through uACPI (real-hardware path; also works on QEMU/KVM
+        //    with the firmware-provided DSDT). Loads the AML namespace on first call.
         AcpiPmNative.Shutdown();
 
         // 2. Emulator-specific ACPI shutdown ports for environments where

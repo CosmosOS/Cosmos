@@ -80,6 +80,43 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// </summary>
     public bool IsIdle => (Flags & SchedulerThreadFlags.IdleThread) != 0;
 
+    // ===== Affinity =====
+
+    /// <summary>
+    /// The CPUs this thread may run on. Never empty: a new thread takes its creator's set,
+    /// or the kernel's default when the creator is an idle thread, and a kernel changes it
+    /// through the ring. Written under the queue lock of the thread's CPU and read under it
+    /// wherever it decides a move (the switch-out, a set change, the creation); a bare read
+    /// is a snapshot. A set that names no online CPU is treated as every online CPU.
+    /// </summary>
+    public CpuSet Affinity { get; internal set; } = CpuSet.Single(0);
+
+    /// <summary>
+    /// The CPU the policy prefers for this thread, always inside <see cref="Affinity"/>: the
+    /// CPU the thread was created on until a kernel sets it, and the CPU the thread moves to
+    /// when a set change excludes it. What <see cref="IScheduler.SelectCpu"/> reads first.
+    /// </summary>
+    public uint IdealCpu { get; internal set; }
+
+    /// <summary>
+    /// 1 while a CPU has staged a switch to this thread or still runs on its stack, 0 once
+    /// that CPU's interrupt stub has switched to another stack. The resuming CPU sets it
+    /// after its queue lock is released, having waited for 0; the stub clears it through
+    /// <see cref="CPU.PerCpuBlock.SwitchPrevOnCpu"/>. The thread's state says nothing about
+    /// this: a thread turns Ready, Blocked or Sleeping before its CPU's handler has returned
+    /// into the stub, so a resume on another CPU waits on this word, not on the state.
+    /// </summary>
+    internal ulong _onCpu;
+
+    /// <summary>Whether a CPU is still on this thread's stack (<see cref="_onCpu"/>).</summary>
+    internal bool IsOnCpu => Volatile.Read(ref _onCpu) != 0;
+
+    /// <summary>
+    /// The address of <see cref="_onCpu"/>: what the switch-out stages into the per-CPU
+    /// block for the stub to clear. Stable: the collector does not move objects.
+    /// </summary>
+    internal nuint OnCpuSlot => (nuint)Unsafe.AsPointer(ref _onCpu);
+
     // ===== Context (architecture-specific values) =====
 
     /// <summary>

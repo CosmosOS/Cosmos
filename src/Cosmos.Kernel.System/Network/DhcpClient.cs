@@ -11,6 +11,7 @@
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Network.Protocols.IPv4;
 using Cosmos.Kernel.System.Network.Protocols.IPv4.Dhcp;
+using Cosmos.Kernel.System.Network.Protocols.Udp;
 using Cosmos.Kernel.System.Timers;
 
 namespace Cosmos.Kernel.System.Network;
@@ -88,14 +89,14 @@ public sealed class DhcpClient : UdpClient
 
         while (waited < timeout)
         {
-            if (_rxBuffer.Count < 1)
+            if (!TryDequeue(out UdpPacket? received))
             {
                 TimerManager.Wait(100);
                 waited += 100;
                 continue;
             }
 
-            DhcpPacket packet = new(_rxBuffer.Dequeue().RawData);
+            DhcpPacket packet = new(received.RawData);
             if (packet.Operation != BootReplyOperation || !IsAddressedTo(packet, device))
             {
                 continue;

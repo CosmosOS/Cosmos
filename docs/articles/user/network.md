@@ -451,7 +451,7 @@ The contract the packet types actually implement:
 
 ## How it works
 
-Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`, and `NameResolutionPalPlug` for `Dns`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over both IP versions, with ARP and Ethernet under IPv4 and ICMPv6 and Neighbor Discovery under IPv6), which sends and receives frames through the network device registered with `NetworkManager`: an interface a driver kit driver published, the E1000E's or the virtio-net's. A frame the kit driver receives is handed to the stack on the kit's worker thread, with interrupts disabled for the handler's duration. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer, `DhcpClient` over IPv4 only.
+Your code calls the standard .NET socket classes, whose PAL bottoms out in `Socket`-level [plugs](../dev/plugs.md) in `Cosmos.Kernel.Plugs` (`SocketPlug`, `TcpClientPlug`, `TcpListenerPlug`, `UdpClientPlug`, `NetworkStreamPlug`, and `NameResolutionPalPlug` for `Dns`). Those delegate to the Cosmos network stack (the TCP state machine and UDP layer over both IP versions, with ARP and Ethernet under IPv4 and ICMPv6 and Neighbor Discovery under IPv6), which sends and receives frames through the network device registered with `NetworkManager`: an interface a driver kit driver published, the E1000E's or the virtio-net's. A frame the kit driver receives is handed to the stack on the kit's worker thread, with interrupts on. The stack serializes itself with a lock of its own, which the receive path holds while it handles a frame and which every other entry point (the clients, the socket plugs) takes around what it shares with that path. It is a blocking lock, and it is never held while the stack waits for the network: a lock contended under it is an ordinary wait. The Cosmos `DhcpClient` and `DnsClient` sit directly on the Cosmos UDP layer, `DhcpClient` over IPv4 only.
 
 ```
 TcpClient / TcpListener / UdpClient / NetworkStream     (stock BCL)
@@ -464,3 +464,23 @@ IPv4 / ARP and IPv6 / Neighbor Discovery / Ethernet
         │
 Network device                                          (e1000e or virtio-net, over the driver kit)
 ```
+
+## Summary
+
+| Task | Call |
+|---|---|
+| Check that a NIC is ready | `NetworkManager.DeviceCount`, `NetworkManager.Ready` |
+| List the adapters | `NetworkManager.GetAdapter(index)` |
+| Pick the primary adapter | `NetworkManager.Primary` |
+| Configure IPv4 through DHCP | `DhcpClient.SendDiscoverPacket()` |
+| Configure IPv4 by hand | `IPConfig.Enable(address, subnetMask, defaultGateway)` |
+| Read an adapter's configuration | `NetworkAdapter.IPConfig` |
+| Read the IPv6 link-local address | `NetworkAdapter.LinkLocalAddress` |
+| Ping an IPv6 address | `Icmpv6Client.Connect(dest)`, `SendEcho()`, `Receive(ref source, timeout)` |
+| Send and receive UDP datagrams | `System.Net.Sockets.UdpClient` |
+| Connect to a TCP server | `TcpClient.Connect(address, port)`, `TcpClient.GetStream()` |
+| Accept TCP connections | `TcpListener.Start()`, `Pending()`, `AcceptTcpClient()` |
+| Register a nameserver | `DnsConfig.Add(nameserver)` |
+| Resolve a name | `Dns.GetHostAddresses(hostNameOrAddress)` |
+| Read every address record of a name | `DnsClient.SendQuery(url)`, `DnsClient.ReceiveAll(timeout)` |
+| Send a packet you built | `NetworkStack.Send(packet)` |

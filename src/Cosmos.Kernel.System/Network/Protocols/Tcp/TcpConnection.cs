@@ -8,7 +8,6 @@
 */
 
 using System.Buffers;
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.System.Timers;
 
@@ -99,11 +98,10 @@ internal class TcpConnection : IDisposable
     public bool Detached { get; set; }
 
     /// <summary>
-    /// The received data buffer. A plain array the connection owns, not one
-    /// from <see cref="ArrayPool{T}.Shared"/>: the receive path grows it on
-    /// the kit worker with interrupts masked, and the shared pool takes a
-    /// lock there that an app thread preempted inside it would never release,
-    /// hanging the machine.
+    /// The received data buffer, a plain array the connection owns rather
+    /// than one from <see cref="ArrayPool{T}.Shared"/>. The receive path grows
+    /// it on the kit worker under the stack's lock (<see cref="NetworkStackLock"/>),
+    /// and every other access takes the same lock.
     /// </summary>
     private byte[] _data = [];
     /// <summary>
@@ -116,15 +114,14 @@ internal class TcpConnection : IDisposable
     /// <summary>
     /// The received bytes not consumed yet, unsynchronized: the receive path
     /// appends to them on the kit worker and may move them to a bigger array
-    /// at any moment. The hosted tests read it, as they cannot mask
-    /// interrupts; kernel code uses <see cref="DataLength"/> and
-    /// <see cref="ReadData"/>.
+    /// at any moment. The hosted tests read it; kernel code uses
+    /// <see cref="DataLength"/> and <see cref="ReadData"/>.
     /// </summary>
     public ReadOnlySpan<byte> Data => _data.AsSpan().Slice(_dataOffset, _dataLength);
 
     /// <summary>
     /// How many received bytes wait to be consumed. A single read of one
-    /// field, so any thread may take it without masking interrupts: it never
+    /// field, so any thread may take it without the stack's lock: it never
     /// sees a half-updated buffer, only a count the receive path may raise
     /// right after.
     /// </summary>
@@ -145,22 +142,25 @@ internal class TcpConnection : IDisposable
     /// <returns>The new <see cref="TcpConnection"/>, registered in the connection table.</returns>
     internal static TcpConnection CreateNewConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
     {
-        TcpConnection tcp = new(localPort, remotePort, localIp, remoteIp);
-        Connections.Add(tcp);
-        return tcp;
+        return CreateConnection(localPort, remotePort, localIp, remoteIp);
     }
 
     /// <summary>
-    /// Creates a connection and adds it to the table. Kernel callers mask
-    /// interrupts around it: the kit worker looks connections up in the same
-    /// table, and <see cref="List{T}.Add"/> counts the new slot before it
-    /// stores into it.
+    /// Creates a connection and adds it to the table, under the stack's lock:
+    /// the kit worker looks connections up in the same table, and
+    /// <see cref="List{T}.Add"/> counts the new slot before it stores into it.
+    /// A caller that sets the connection up further before the worker may
+    /// see it (its status, its end points) holds the lock around both.
     /// </summary>
     /// <returns>The new <see cref="TcpConnection"/>, registered in the connection table.</returns>
     public static TcpConnection CreateConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
     {
         TcpConnection tcp = new(localPort, remotePort, localIp, remoteIp);
-        Connections.Add(tcp);
+        using (NetworkStackLock.Enter())
+        {
+            Connections.Add(tcp);
+        }
+
         return tcp;
     }
 
@@ -170,49 +170,47 @@ internal class TcpConnection : IDisposable
     /// <returns>A port no registered connection uses locally, or 0 when all <paramref name="tries"/> ports tried are in use.</returns>
     public static ushort GetDynamicPort(int tries = 10)
     {
-        for (int i = 0; i < tries; i++)
+        using (NetworkStackLock.Enter())
         {
-            ushort port = s_nextPort++;
-            if (s_nextPort >= 65535)
+            for (int i = 0; i < tries; i++)
             {
-                s_nextPort = DynamicPortStart;
+                ushort port = s_nextPort++;
+                if (s_nextPort >= 65535)
+                {
+                    s_nextPort = DynamicPortStart;
+                }
+
+                if (!IsLocalPortInUse(port))
+                {
+                    return port;
+                }
             }
 
-            if (!IsLocalPortInUse(port))
-            {
-                return port;
-            }
+            return 0;
         }
-
-        return 0;
     }
 
     /// <summary>
     /// Whether a connection in the table uses <paramref name="port"/> locally.
-    /// The scan runs with interrupts masked: the kit worker removes closed
-    /// connections from the table, which would skip an entry or break an
-    /// enumerator mid-scan. Nothing in it can throw, so the restore is an
-    /// explicit call.
+    /// Under the stack's lock: the kit worker removes closed connections from
+    /// the table, which would skip an entry or break an enumerator mid-scan.
     /// </summary>
     private static bool IsLocalPortInUse(ushort port)
     {
-        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
-        bool inUse = false;
         for (int i = 0; i < Connections.Count; i++)
         {
             if (Connections[i].LocalEndPoint.Port == port)
             {
-                inUse = true;
-                break;
+                return true;
             }
         }
 
-        mask.Dispose();
-        return inUse;
+        return false;
     }
 
     /// <summary>
     /// Gets a TCP connection object that matches the specified local and remote ports and addresses.
+    /// Called by the receive path, under the stack's lock.
     /// </summary>
     internal static TcpConnection? GetConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
     {
@@ -245,24 +243,23 @@ internal class TcpConnection : IDisposable
     /// <returns>True when a connection was removed, false when none matched.</returns>
     public static bool RemoveConnection(ushort localPort, ushort remotePort, Address localIp, Address remoteIp)
     {
-        // Masked from the search to the removal, for the same reason as the
+        // Locked from the search to the removal, for the same reason as the
         // overload below.
-        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
-        bool removed = false;
-        for (int i = 0; i < Connections.Count; i++)
+        using (NetworkStackLock.Enter())
         {
-            TcpConnection conn = Connections[i];
-            if (conn.Equals(localPort, remotePort, localIp, remoteIp))
+            for (int i = 0; i < Connections.Count; i++)
             {
-                conn.Dispose();
-                Connections.RemoveAt(i);
-                removed = true;
-                break;
+                TcpConnection conn = Connections[i];
+                if (conn.Equals(localPort, remotePort, localIp, remoteIp))
+                {
+                    conn.Dispose();
+                    Connections.RemoveAt(i);
+                    return true;
+                }
             }
-        }
 
-        mask.Dispose();
-        return removed;
+            return false;
+        }
     }
 
     /// <summary>
@@ -271,27 +268,25 @@ internal class TcpConnection : IDisposable
     /// <returns>True when the connection was removed, false when it was not registered.</returns>
     public static bool RemoveConnection(TcpConnection connection)
     {
-        // Masked from the search to the removal: the kit worker reaps closed
+        // Locked from the search to the removal: the kit worker reaps closed
         // connections from the same table, and an index found before it
         // removed an earlier entry would take out the next connection
-        // instead. Nothing in between can throw, so the restore is an
-        // explicit call.
-        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
-        bool removed = false;
-        for (int i = 0; i < Connections.Count; i++)
+        // instead.
+        using (NetworkStackLock.Enter())
         {
-            TcpConnection conn = Connections[i];
-            if (ReferenceEquals(conn, connection))
+            for (int i = 0; i < Connections.Count; i++)
             {
-                conn.Dispose();
-                Connections.RemoveAt(i);
-                removed = true;
-                break;
+                TcpConnection conn = Connections[i];
+                if (ReferenceEquals(conn, connection))
+                {
+                    conn.Dispose();
+                    Connections.RemoveAt(i);
+                    return true;
+                }
             }
-        }
 
-        mask.Dispose();
-        return removed;
+            return false;
+        }
     }
 
     #endregion
@@ -761,27 +756,41 @@ internal class TcpConnection : IDisposable
     }
 
     /// <summary>
-    /// Sends an empty packet.
+    /// Sends an empty packet. The segment is built from the TCB and queued
+    /// under the stack's lock, so the numbers it carries are the ones the
+    /// receive path sees next; the queue is pumped after the lock is let go.
     /// </summary>
     public void SendEmptyPacket(TcpFlags flag)
     {
-        SendPacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
-            TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, (ushort)TCB.RcvWnd, 0));
+        using (NetworkStackLock.Enter())
+        {
+            QueuePacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
+                TCB.SndNxt, TCB.RcvNxt, 20, (byte)flag, (ushort)TCB.RcvWnd, 0));
+        }
+
+        NetworkStack.Update();
     }
 
     /// <summary>
-    /// Sends an empty packet.
+    /// Sends an empty packet with the given sequence number, as
+    /// <see cref="SendEmptyPacket(TcpFlags)"/> does.
     /// </summary>
     internal void SendEmptyPacket(TcpFlags flag, uint sequenceNumber)
     {
-        SendPacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
-            sequenceNumber, TCB.RcvNxt, 20, (byte)flag, (ushort)TCB.RcvWnd, 0));
+        using (NetworkStackLock.Enter())
+        {
+            QueuePacket(new TcpPacket(LocalEndPoint.Address, RemoteEndPoint.Address, LocalEndPoint.Port, RemoteEndPoint.Port,
+                sequenceNumber, TCB.RcvNxt, 20, (byte)flag, (ushort)TCB.RcvWnd, 0));
+        }
+
+        NetworkStack.Update();
     }
 
     /// <summary>
-    /// Sends a TCP packet.
+    /// Queues a TCP packet and moves SndNxt past its SYN or FIN. Under the
+    /// stack's lock.
     /// </summary>
-    private void SendPacket(TcpPacket packet)
+    private void QueuePacket(TcpPacket packet)
     {
         packet.Network.Enqueue();
 
@@ -791,36 +800,30 @@ internal class TcpConnection : IDisposable
         {
             TCB.SndNxt++;
         }
-
-        NetworkStack.Update();
     }
 
     /// <summary>
     /// Copies up to <paramref name="destination"/>'s length of the received
-    /// bytes into it and consumes them, as one step with interrupts masked.
-    /// The receive path runs on the kit worker, which can preempt any other
-    /// thread: a copy and a consume made apart could read a buffer the worker
-    /// just moved, or race its append and lose acknowledged bytes. Any thread.
+    /// bytes into it and consumes them, as one step under the stack's lock.
+    /// The receive path appends on the kit worker, under the same lock: a
+    /// copy and a consume made apart could read a buffer the worker just
+    /// moved, or race its append and lose acknowledged bytes. Any thread.
     /// </summary>
     /// <param name="destination">Where the bytes go.</param>
     /// <returns>How many bytes were copied; zero when none are waiting.</returns>
     public int ReadData(Span<byte> destination)
     {
-        // Nothing between the mask and its restore can throw: the count fits
-        // both the destination and the live bytes, and every writer of the
-        // buffer runs masked too. The restore is an explicit call, not a
-        // using: the kernel skips finally blocks while an exception unwinds,
-        // so the region is kept free of anything that could throw instead.
-        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
-        int count = Math.Min(_dataLength, destination.Length);
-        if (count > 0)
+        using (NetworkStackLock.Enter())
         {
-            _data.AsSpan(_dataOffset, count).CopyTo(destination);
-            ConsumeData(count);
-        }
+            int count = Math.Min(_dataLength, destination.Length);
+            if (count > 0)
+            {
+                _data.AsSpan(_dataOffset, count).CopyTo(destination);
+                ConsumeData(count);
+            }
 
-        mask.Dispose();
-        return count;
+            return count;
+        }
     }
 
     /// <summary>
@@ -856,9 +859,9 @@ internal class TcpConnection : IDisposable
     }
 
     /// <summary>
-    /// Appends bytes to <see cref="_data"/>. Called by the receive path, which
-    /// runs with interrupts masked, so a reader's <see cref="ReadData"/> never
-    /// sees it half-done.
+    /// Appends bytes to <see cref="_data"/>. Called by the receive path, under
+    /// the stack's lock, so a reader's <see cref="ReadData"/> never sees it
+    /// half-done.
     /// </summary>
     internal void AppendToData(ReadOnlySpan<byte> other)
     {
@@ -909,13 +912,14 @@ internal class TcpConnection : IDisposable
     /// </summary>
     public void Dispose()
     {
-        // The buffer is dropped with interrupts masked: the kit worker can
-        // preempt this thread to append, and between the three stores it
-        // would find the empty array with the old offset and length.
-        InternalCpu.InterruptScope mask = InternalCpu.DisableInterruptsScope();
-        _data = [];
-        _dataOffset = 0;
-        _dataLength = 0;
-        mask.Dispose();
+        // The buffer is dropped under the stack's lock: the kit worker
+        // appends under it, and between the three stores it would find the
+        // empty array with the old offset and length.
+        using (NetworkStackLock.Enter())
+        {
+            _data = [];
+            _dataOffset = 0;
+            _dataLength = 0;
+        }
     }
 }

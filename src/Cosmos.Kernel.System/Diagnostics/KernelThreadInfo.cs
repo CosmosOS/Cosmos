@@ -1,5 +1,7 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.System.Threading;
+
 namespace Cosmos.Kernel.System.Diagnostics;
 
 /// <summary>
@@ -27,6 +29,16 @@ public readonly struct KernelThreadInfo
 
     /// <summary>CPU the thread is assigned to.</summary>
     public uint CpuId { get; }
+
+    /// <summary>
+    /// The CPUs the thread may run on (<see cref="Threading.ThreadAffinity"/>).
+    /// <see cref="CpuId"/> is one of them, or will be at the next switch of
+    /// its CPU.
+    /// </summary>
+    public CpuSet Affinity { get; }
+
+    /// <summary>The CPU the scheduler prefers for the thread, one of <see cref="Affinity"/>.</summary>
+    public uint IdealCpu { get; }
 
     /// <summary>Lifecycle state at the time of the snapshot.</summary>
     public KernelThreadState State { get; }
@@ -63,6 +75,8 @@ public readonly struct KernelThreadInfo
     internal KernelThreadInfo(
         uint id,
         uint cpuId,
+        CpuSet affinity,
+        uint idealCpu,
         KernelThreadState state,
         bool isIdle,
         bool isManaged,
@@ -73,6 +87,8 @@ public readonly struct KernelThreadInfo
     {
         Id = id;
         CpuId = cpuId;
+        Affinity = affinity;
+        IdealCpu = idealCpu;
         State = state;
         IsIdle = isIdle;
         IsManaged = isManaged;

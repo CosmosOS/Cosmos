@@ -41,7 +41,10 @@ public class UdpClient : IDisposable
         _localPort = localPort;
         if (localPort > 0)
         {
-            s_clients[(uint)localPort] = this;
+            using (NetworkStackLock.Enter())
+            {
+                s_clients[(uint)localPort] = this;
+            }
         }
     }
 
@@ -67,20 +70,23 @@ public class UdpClient : IDisposable
     /// caller that keeps the value must not later read it back as a binding.</returns>
     public static ushort GetDynamicPort(int tries = 10)
     {
-        for (int i = 0; i < tries; i++)
+        using (NetworkStackLock.Enter())
         {
-            ushort port = s_nextPort++;
-            if (s_nextPort >= 65535)
+            for (int i = 0; i < tries; i++)
             {
-                s_nextPort = DynamicPortStart;
+                ushort port = s_nextPort++;
+                if (s_nextPort >= 65535)
+                {
+                    s_nextPort = DynamicPortStart;
+                }
+                if (!s_clients.ContainsKey(port))
+                {
+                    return port;
+                }
             }
-            if (!s_clients.ContainsKey(port))
-            {
-                return port;
-            }
-        }
 
-        return 0;
+            return 0;
+        }
     }
 
     /// <summary>
@@ -122,7 +128,10 @@ public class UdpClient : IDisposable
     /// </summary>
     public void Close()
     {
-        s_clients.Remove((uint)_localPort);
+        using (NetworkStackLock.Enter())
+        {
+            s_clients.Remove((uint)_localPort);
+        }
     }
 
     /// <summary>
@@ -219,12 +228,11 @@ public class UdpClient : IDisposable
             waited += 10;
         }
 
-        if (_rxBuffer.Count < 1)
+        if (!TryDequeue(out UdpPacket? packet))
         {
             return null;
         }
 
-        UdpPacket packet = _rxBuffer.Dequeue();
         source.Address = packet.SourceIP;
         source.Port = packet.SourcePort;
 
@@ -255,18 +263,29 @@ public class UdpClient : IDisposable
             waited += 10;
         }
 
-        if (_rxBuffer.Count < 1)
-        {
-            return null;
-        }
+        return TryDequeue(out UdpPacket? packet) ? packet : null;
+    }
 
-        return _rxBuffer.Dequeue();
+    /// <summary>
+    /// Takes the oldest queued datagram, under the stack's lock: the receive
+    /// path queues datagrams from the kit worker under the same lock, so the
+    /// two never see the queue half-updated.
+    /// </summary>
+    /// <param name="packet">The datagram, when one was queued.</param>
+    /// <returns>True when a datagram was taken.</returns>
+    internal bool TryDequeue([NotNullWhen(true)] out UdpPacket? packet)
+    {
+        using (NetworkStackLock.Enter())
+        {
+            return _rxBuffer.TryDequeue(out packet);
+        }
     }
 
     /// <summary>
     /// Receives data from the given packet.
     /// </summary>
     /// <param name="packet">Packet to receive.</param>
+    /// <remarks>Called by the receive path, under the stack's lock.</remarks>
     internal void ReceiveData(UdpPacket packet)
     {
         _rxBuffer.Enqueue(packet);

@@ -162,11 +162,25 @@ jobs:
       step_timeout_minutes: 10
       coverage: true
 
+  # ── Smp ───────────────────────────────────────────────────────────────────────
+  smp-tests:
+    needs: setup
+    if: always() && needs.setup.result == 'success'
+    uses: ./.github/workflows/kernel-test-run.yml
+    with:
+      suite_name: Smp
+      suite_id: smp
+      kernel_path: tests/Kernels/Cosmos.Kernel.Tests.Smp
+      timeout_x64: 90
+      timeout_arm64: 150
+      step_timeout_minutes: 10
+      coverage: true
+
   # ── Coverage Report ──────────────────────────────────────────────────────────
   coverage-report:
     name: Coverage Report
     runs-on: ubuntu-latest
-    needs: [helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, graphic-tests, power-tests, garbagecollector-tests]
+    needs: [helloworld-tests, memory-tests, typecasting-tests, timer-tests, network-tests, runtime-tests, threading-tests, graphic-tests, power-tests, garbagecollector-tests, smp-tests]
     if: always() && (github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'run-coverage'))
     steps:
       - name: 📥 Checkout (for aggregation script)

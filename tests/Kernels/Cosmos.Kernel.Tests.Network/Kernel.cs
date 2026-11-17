@@ -64,6 +64,13 @@ public class Kernel : Sys.Kernel
     private static readonly Address4 s_secondMask = new(255, 255, 255, 0);
     private static readonly Address4 s_secondGateway = new(192, 168, 77, 1);
 
+    // UDP_HandlerWaitsOnHeldLock: a lock the test holds while the stack's
+    // receive path, on the kit worker, tries to take it from a datagram
+    // callback, and what the callback got to.
+    private static readonly Lock s_handlerGate = new();
+    private static volatile bool s_handlerReached;
+    private static volatile bool s_handlerEntered;
+
     protected override void BeforeRun()
     {
         Log.WriteString("[Network Tests] Starting test suite\n");
@@ -75,7 +82,7 @@ public class Kernel : Sys.Kernel
         // VirtioNetDriver over either transport, PCI on both arches and MMIO on
         // arm64, through the VirtioPciTransportDriver or VirtioMmioTransportDriver
         // node above it.
-        TR.Start("Network Tests", expectedTests: 26);
+        TR.Start("Network Tests", expectedTests: 27);
 
         // Network initialization tests
         TR.Run("Network_DeviceDetected", TestNetworkDeviceDetected);
@@ -99,6 +106,7 @@ public class Kernel : Sys.Kernel
         // UDP tests
         TR.Run("UDP_SendPacket", TestUDPSendPacket);
         TR.Run("UDP_ReceivePacket", TestUDPReceivePacket);
+        TR.Run("UDP_HandlerWaitsOnHeldLock", TestUDPHandlerWaitsOnHeldLock);
 
         // Packet seam (COSMOS0002): crafted packets through the public packet types
         TR.Run("PacketSeam_CraftedEchoRoundTrip", TestPacketSeamCraftedEchoRoundTrip);
@@ -846,6 +854,88 @@ public class Kernel : Sys.Kernel
         }
 
         udpClient.Close();
+    }
+
+    // The receive path reaching a lock another thread holds (#3387). The
+    // callback below runs on the kit worker for every datagram the stack
+    // receives, here the engine's TEST_FROM_HOST, sent every 500 ms, and
+    // takes a lock this thread holds. The receive path used to run with
+    // interrupts masked, so the worker blocked masked on the contended lock:
+    // the tick stopped and the kernel froze until the engine killed it, on
+    // the same three log lines as the CI run. It runs under the stack's own
+    // lock now, with interrupts on, so the worker waits as any thread does,
+    // this thread keeps running, and the worker takes the lock once it is
+    // released. Nothing enters the stack from here while the lock is held:
+    // the waiting worker holds the stack's lock, so that would wait on it.
+    private static void TestUDPHandlerWaitsOnHeldLock()
+    {
+        if (!NetworkManager.Ready)
+        {
+            Assert.True(false, "Network device not ready");
+            return;
+        }
+
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        s_handlerReached = false;
+        s_handlerEntered = false;
+        UdpDataReceivedHandler? previous = UdpPacket.OnUDPDataReceived;
+        UdpPacket.OnUDPDataReceived = TakeHandlerGate;
+
+        bool reached;
+        bool enteredWhileHeld;
+        s_handlerGate.Enter();
+        try
+        {
+            int waited = 0;
+            while (!s_handlerReached && waited < 3000)
+            {
+                TimerManager.Wait(10);
+                waited += 10;
+            }
+
+            reached = s_handlerReached;
+
+            // Leave the worker waiting for a few ticks: this thread only runs
+            // again if the waiting worker gave the CPU away.
+            TimerManager.Wait(100);
+            enteredWhileHeld = s_handlerEntered;
+        }
+        finally
+        {
+            s_handlerGate.Exit();
+        }
+
+        int waitedAfter = 0;
+        while (!s_handlerEntered && waitedAfter < 3000)
+        {
+            TimerManager.Wait(10);
+            waitedAfter += 10;
+        }
+
+        UdpPacket.OnUDPDataReceived = previous;
+
+        Log.WriteString("[Test] Handler reached the held lock: ");
+        Log.WriteString(reached ? "yes" : "no");
+        Log.WriteString(", took it once released: ");
+        Log.WriteString(s_handlerEntered ? "yes" : "no");
+        Log.WriteString("\n");
+
+        Assert.True(reached, "A datagram should reach the callback while the lock is held");
+        Assert.False(enteredWhileHeld, "The callback should wait while this thread holds the lock");
+        Assert.True(s_handlerEntered, "The callback should take the lock once it is released");
+    }
+
+    private static void TakeHandlerGate(UdpPacket packet)
+    {
+        s_handlerReached = true;
+        lock (s_handlerGate)
+        {
+            s_handlerEntered = true;
+        }
     }
 
     // ==================== Packet Seam Tests ====================

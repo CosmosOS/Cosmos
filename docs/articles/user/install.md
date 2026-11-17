@@ -54,7 +54,7 @@ To update:
 cosmos update
 ```
 
-Run it inside a kernel project directory to also move the project's Cosmos version pins (the `Sdk="Cosmos.Sdk/..."` attribute and `Cosmos.*` package references) to the latest release. Additional options:
+Run it inside a kernel project directory to also move the project's Cosmos version pins (the `Sdk="Cosmos.Sdk/..."` attribute and the `Cosmos.Kernel*` and `Cosmos.Build.*` package references) to the latest release. Other `Cosmos.*` packages, such as `Cosmos.Executable.Lua`, keep their own version. Additional options:
 
 | Option | Effect |
 |--------|--------|

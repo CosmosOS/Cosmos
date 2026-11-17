@@ -159,7 +159,7 @@ internal static unsafe partial class GarbageCollector
         // another CPU's current thread: the idle thread of an application processor, which halts in
         // Smp.ApMain and is never switched out, so the switch path has recorded neither its stack
         // pointer nor a context for it (and it holds no reference: nothing on that path allocates),
-        // or a thread the scheduler moved there (SMP phase 3a), which keeps running while this CPU
+        // or a thread whose CPU set put it there (SMP phases 3a and 3b), which keeps running while this CPU
         // collects and whose frames only the stop rendezvous of phase 4 can capture. Scanning the
         // idle thread from this CPU's stack pointer up to a boot stack top read, on a multi-core
         // machine, whatever memory lies between the collecting thread's stack and that top; the

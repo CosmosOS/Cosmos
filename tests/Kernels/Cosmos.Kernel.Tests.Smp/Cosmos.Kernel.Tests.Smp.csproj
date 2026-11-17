@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Cosmos.Sdk" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- COSMOS0001: the cross-CPU cells drive SchedulerManager (the Balance
+         cell, the offline-set cell) and read a SchedulerThread and its state
+         (the TryStart cell, the parked cell, the workers), all on the
+         experimental scheduler seam. COSMOS0004: the suite is the proof of
+         ThreadAffinity and the DefaultAffinity setter, experimental until the
+         collector stops every CPU (SMP phase 4). -->
+    <NoWarn>$(NoWarn);COSMOS0001;COSMOS0004</NoWarn>
+    <!-- Off on purpose: the suite uses no network, and QEMU's default NIC
+         would bind a driver whose drain wakes the driver kit's worker every
+         10 ms (q35's E1000E on x64) or 50 ms (the virt machine's virtio-net
+         on arm64). That worker is housekeeping, so it never leaves CPU 0, but
+         when it is the tail of CPU 0's queue the Balance cell's pull finds
+         a thread it may not take and has to ask again. With the switch off
+         no network driver is in the manifest. -->
+    <CosmosEnableNetwork>false</CosmosEnableNetwork>
+  </PropertyGroup>
+
+  <!--
+    The bare cell, and the same cells on four CPUs: the CPU set arithmetic
+    and the ring's reads and refusals run on both, and the cells that move a
+    thread between CPUs run on the four-CPU machine and skip on one CPU.
+    Definitions live in tests/profiles.json.
+  -->
+  <ItemGroup>
+    <CosmosTestProfile Include="bare" />
+    <CosmosTestModifier Include="smp4" />
+  </ItemGroup>
+
+  <!-- Core kernel packages (using project references for development) -->
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
+    <ProjectReference Include="../../../src/Cosmos.Kernel.System/Cosmos.Kernel.System.csproj" />
+    <ProjectReference Include="../../Cosmos.TestRunner.Framework/Cosmos.TestRunner.Framework.csproj" />
+  </ItemGroup>
+
+  <!-- Architecture-specific HAL (using project references for development) -->
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_X64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.X64/Cosmos.Kernel.HAL.X64.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DefineConstants)' != '' AND $(DefineConstants.Contains('ARCH_ARM64'))">
+    <ProjectReference Include="../../../src/Cosmos.Kernel.HAL.ARM64/Cosmos.Kernel.HAL.ARM64.csproj" />
+  </ItemGroup>
+
+</Project>

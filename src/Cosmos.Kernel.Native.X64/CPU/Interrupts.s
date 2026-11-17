@@ -301,6 +301,17 @@ _native_x64_test_int32:
 .equ PERCPU_SWITCH_IS_NEW_THREAD, 0x20
 .equ PERCPU_TEMP_IS_NEW_THREAD,   0x28
 .equ PERCPU_LAST_ERROR_CODE,      0x30
+.equ PERCPU_SWITCH_PREV_ON_CPU,   0x60
+
+// void _native_set_context_switch_prev_on_cpu(nuint slot)
+// Stages the address of the outgoing thread's on-CPU marker: the stub stores
+// 0 through it once it has switched stacks, so another CPU may resume that
+// thread. 0 for none.
+// rdi = address of the marker
+.global _native_set_context_switch_prev_on_cpu
+_native_set_context_switch_prev_on_cpu:
+    mov qword ptr gs:[PERCPU_SWITCH_PREV_ON_CPU], rdi
+    ret
 
 // void _native_set_context_switch_sp(nuint newSp)
 // Stages a context switch on the calling CPU: the stub that runs on this
@@ -767,6 +778,18 @@ irq\n\()_stub:
 
     // Switch stack
     mov rsp, rax
+
+    // Off the outgoing thread's stack now: clear its on-CPU marker through the
+    // staged address, so a CPU waiting to resume it elsewhere may go on. x64
+    // stores are ordered, so everything written before is visible with it.
+    // rdx holds the new-thread flag; rcx is the zero from the slot clears.
+    mov rcx, qword ptr gs:[PERCPU_SWITCH_PREV_ON_CPU]
+    test rcx, rcx
+    jz .Lmarker_done\n
+    mov qword ptr [rcx], 0
+    xor rcx, rcx
+    mov qword ptr gs:[PERCPU_SWITCH_PREV_ON_CPU], rcx
+.Lmarker_done\n:
 
     // Store flag in a location we can read after GPR restore
     // Use the TempRcx slot in the context (offset 400 from start, or after GPRs+info)

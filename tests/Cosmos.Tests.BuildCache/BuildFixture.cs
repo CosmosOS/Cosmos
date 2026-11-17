@@ -32,7 +32,11 @@ public class BuildFixture
     public string AsmObjDir { get; }
     public string CObjDir { get; }
 
+    /// <summary>The tree the ISO is made from, under the intermediate directory.</summary>
+    public string IsoRootDir { get; }
+
     // Source files for change tests
+    public string DevKernelDir { get; }
     public string DevKernelCs { get; }
     public string AsmFile { get; }
     public string CFile { get; }
@@ -59,9 +63,11 @@ public class BuildFixture
         IlcOutput = Path.Combine(objBase, "cosmos", "native", "DevKernel.o");
         AsmObjDir = Path.Combine(objBase, "cosmos", "asm");
         CObjDir = Path.Combine(objBase, "cosmos", "cobj");
+        IsoRootDir = Path.Combine(objBase, "cosmos", "iso_root");
 
-        DevKernelCsproj = Path.Combine(RootDir, "examples", "DevKernel", "DevKernel.csproj");
-        DevKernelCs = Path.Combine(RootDir, "examples", "DevKernel", "Kernel.cs");
+        DevKernelDir = Path.Combine(RootDir, "examples", "DevKernel");
+        DevKernelCsproj = Path.Combine(DevKernelDir, "DevKernel.csproj");
+        DevKernelCs = Path.Combine(DevKernelDir, "Kernel.cs");
 
         // ASM source: DevKernel uses NuGet packages, so the ASM file the build actually
         // reads lives inside the user's NuGet cache, not the repo source tree.

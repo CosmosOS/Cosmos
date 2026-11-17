@@ -55,6 +55,7 @@ flowchart TD
     COSMOS_COBJ --> LINK
     LINKER_SCRIPT["linker.ld"] --> LINK
     LIMINE_CONF["limine.conf"] --> FINAL_ISO
+    ISO_FILES["isoFiles/ + CosmosIsoFile items"] --> FINAL_ISO
 
     style CS fill:#e1f5e1
     style ASM_SRC fill:#e1f5e1
@@ -62,6 +63,7 @@ flowchart TD
     style PLUGS fill:#e1f5e1
     style LINKER_SCRIPT fill:#e1f5e1
     style LIMINE_CONF fill:#e1f5e1
+    style ISO_FILES fill:#e1f5e1
     
     style PUBLISH fill:#ffe1e1
 ```

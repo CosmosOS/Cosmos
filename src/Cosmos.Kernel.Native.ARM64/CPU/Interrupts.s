@@ -11,6 +11,7 @@
 .equ PERCPU_SWITCH_TARGET_SP,     0x18
 .equ PERCPU_SWITCH_IS_NEW_THREAD, 0x20
 .equ PERCPU_TEMP_IS_NEW_THREAD,   0x28
+.equ PERCPU_SWITCH_PREV_ON_CPU,   0x60
 
 // ============================================================================
 // Exception Vector Table - must be 2KB aligned for VBAR_EL1
@@ -214,6 +215,15 @@ __exception_common:
     // Switch to new context's stack
     // x12 = new SP (points to start of saved context)
     mov     sp, x12
+
+    // Off the outgoing thread's stack now: clear its on-CPU marker through the
+    // staged address with a release store, so the saved context and every
+    // field the switch wrote are visible to the CPU that resumes it elsewhere.
+    // x11 is still this CPU's block; x14 is restored from the context below.
+    ldr     x14, [x11, #PERCPU_SWITCH_PREV_ON_CPU]
+    cbz     x14, __restore_context
+    stlr    xzr, [x14]
+    str     xzr, [x11, #PERCPU_SWITCH_PREV_ON_CPU]
 
 __restore_context:
     // Restore using sp as base (context is at sp)

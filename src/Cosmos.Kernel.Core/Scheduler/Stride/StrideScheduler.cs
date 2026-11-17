@@ -327,24 +327,25 @@ internal class StrideScheduler : IScheduler
 
     // ========== Load Balancing ==========
 
-    public uint SelectCpu(SchedulerThread thread, uint currentCpu, uint cpuCount)
+    public uint SelectCpu(SchedulerThread thread, PerCpuState[] cpus, CpuSet allowed)
     {
-        if ((thread.Flags & SchedulerThreadFlags.Pinned) != 0)
-        {
-            return currentCpu;
-        }
+        // The thread's preference first, then where it is, then the lowest
+        // allowed CPU; a clearly lighter allowed CPU wins over that start.
+        // The loads are read under no lock: a snapshot is enough for a
+        // placement the mechanism verifies against the set anyway.
+        uint best = allowed.Contains(thread.IdealCpu) ? thread.IdealCpu
+                  : allowed.Contains(thread.CpuId) ? thread.CpuId
+                  : allowed.First;
+        ulong bestLoad = GetCpuLoad(cpus, best);
 
-        uint best = currentCpu;
-        ulong bestLoad = GetCpuLoad(currentCpu);
-
-        for (uint cpu = 0; cpu < cpuCount; cpu++)
+        for (uint cpu = 0; cpu < cpus.Length; cpu++)
         {
-            if (cpu == currentCpu)
+            if (cpu == best || !allowed.Contains(cpu))
             {
                 continue;
             }
 
-            ulong load = GetCpuLoad(cpu);
+            ulong load = GetCpuLoad(cpus, cpu);
             if (load < bestLoad * 80 / 100)
             {
                 best = cpu;
@@ -366,7 +367,19 @@ internal class StrideScheduler : IScheduler
             return;
         }
 
-        RemoveThreadFromQueue(fromData.RunQueue, thread);
+        if (thread.State == SchedulerThreadState.Running)
+        {
+            // Evicted by the switch-out: it was on the CPU, not queued, and
+            // the saved Remain dates from its last park. What it has left of
+            // its slice is its distance from the source's clock now.
+            UpdateGlobalPass(fromData);
+            threadData.Remain = threadData.Pass - (long)fromData.GlobalPass;
+        }
+        else
+        {
+            RemoveThreadFromQueue(fromData.RunQueue, thread);
+        }
+
         fromData.TotalTickets -= threadData.Tickets;
 
         threadData.Pass = (long)toData.GlobalPass + threadData.Remain;
@@ -375,18 +388,23 @@ internal class StrideScheduler : IScheduler
         toData.TotalTickets += threadData.Tickets;
     }
 
-    public void Balance(PerCpuState cpuState, PerCpuState[] allCpuStates)
+    public SchedulerThread? Balance(PerCpuState cpuState, PerCpuState[] allCpuStates)
     {
+        // Only an idle CPU pulls, and it pulls the tail (the highest Pass,
+        // the thread the busiest CPU would run last) of the longest queue
+        // that holds at least two and whose tail may run here. Reads are
+        // snapshots under no lock; the mechanism re-checks the answer under
+        // both queue locks before it moves anything.
         StrideCpuData? cpuData = CpuDataOf(cpuState);
         if (cpuData is null || cpuData.RunQueue.Count > 0)
         {
-            return;
+            return null;
         }
 
-        PerCpuState? busiest = null;
-        int maxCount = 0;
+        SchedulerThread? victim = null;
+        int maxCount = 1;
 
-        foreach (var state in allCpuStates)
+        foreach (PerCpuState state in allCpuStates)
         {
             if (state == cpuState)
             {
@@ -394,30 +412,20 @@ internal class StrideScheduler : IScheduler
             }
 
             StrideCpuData? data = CpuDataOf(state);
-            if (data is not null && data.RunQueue.Count > maxCount)
+            if (data is null || data.RunQueue.Count <= maxCount)
+            {
+                continue;
+            }
+
+            SchedulerThread tail = data.RunQueue[data.RunQueue.Count - 1];
+            if (tail.Affinity.Contains(cpuState.CpuId))
             {
                 maxCount = data.RunQueue.Count;
-                busiest = state;
+                victim = tail;
             }
         }
 
-        if (busiest is null || maxCount <= 1)
-        {
-            return;
-        }
-
-        StrideCpuData? busiestData = CpuDataOf(busiest);
-        if (busiestData is null || busiestData.RunQueue.Count == 0)
-        {
-            return;
-        }
-
-        var victim = busiestData.RunQueue[busiestData.RunQueue.Count - 1];
-
-        if ((victim.Flags & SchedulerThreadFlags.Pinned) == 0)
-        {
-            OnThreadMigrate(victim, busiest, cpuState);
-        }
+        return victim;
     }
 
     // ========== Dynamic Reconfiguration ==========
@@ -553,10 +561,9 @@ internal class StrideScheduler : IScheduler
         cpuData.RunQueue.Insert(index, thread);
     }
 
-    private ulong GetCpuLoad(uint cpuId)
+    private static ulong GetCpuLoad(PerCpuState[] cpus, uint cpuId)
     {
-        var state = SchedulerManager.GetCpuState(cpuId);
-        StrideCpuData? data = state is not null ? CpuDataOf(state) : null;
+        StrideCpuData? data = CpuDataOf(cpus[cpuId]);
         return data?.TotalTickets ?? 0;
     }
 
