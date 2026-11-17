@@ -286,7 +286,11 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        # Not ubuntu-latest: these tests link a kernel with the bundled
+        # ld.lld, which loads libxml2.so.2, and the ubuntu-26.04 image only
+        # has libxml2.so.16 (#3245). Pinned like the kernel test workflows
+        # until the tools no longer depend on it.
+        os: [ ubuntu-24.04 ]
         dotnet-version: [ 10.0.x ]
     steps:
       - name: Checkout Code
