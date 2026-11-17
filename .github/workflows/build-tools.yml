@@ -3,9 +3,19 @@ name: Build Tools
 on:
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 env:
+  # No question from apt in the build containers
+  DEBIAN_FRONTEND: noninteractive
   LLVM_VERSION: "22.1.3"
   LLVM_TAG: "llvmorg-22.1.3"
+  # libxml2 shipped beside the Linux ld.lld (see build-llvm). 2.13 is the last
+  # series whose library is named libxml2.so.2, the name that linker asks for.
+  LIBXML2_VERSION: "2.13.9"
+  LIBXML2_SHA256: "a2c9ae7b770da34860050c309f903221c67830c86e4a7e760692b803df95143a"
   XORRISO_VERSION: "1.5.8.pl01"
   XORRISO_DIR: "1.5.8"
   QEMU_VERSION: "10.2.2"
@@ -22,6 +32,9 @@ jobs:
   build-llvm:
     name: LLVM ${{ matrix.target }}
     runs-on: ubuntu-latest
+    # The oldest Ubuntu release still supported. What is compiled in it asks
+    # for its C library or a later one, whatever image the runner has.
+    container: ubuntu:22.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -31,6 +44,11 @@ jobs:
           - target: darwin-arm64
           - target: win-x64
     steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential ca-certificates curl xz-utils zip
+
       - name: Download & repackage LLVM
         shell: bash
         run: |
@@ -84,7 +102,35 @@ jobs:
           # Stamp the bundle so ToolResolver can compare against system tools
           echo "${LLVM_VERSION}" > pkg/llvm-tools/VERSION
 
-          # Package
+      # The upstream Linux ld.lld is linked against libxml2.so.2 and looks for
+      # it in ../lib first (its RUNPATH is $ORIGIN/../lib). A distribution on
+      # libxml2 2.14 or later ships libxml2.so.16 only, and the linker does not
+      # start there (#3245). The bundle therefore carries its own copy, built
+      # from source with every optional dependency off, so that it needs
+      # nothing but the C library.
+      - name: Bundle libxml2 beside ld.lld (Linux)
+        if: matrix.target == 'linux-x64'
+        run: |
+          curl -fL -o libxml2.tar.xz \
+            "https://download.gnome.org/sources/libxml2/${LIBXML2_VERSION%.*}/libxml2-${LIBXML2_VERSION}.tar.xz"
+          echo "${LIBXML2_SHA256}  libxml2.tar.xz" | sha256sum -c -
+          mkdir libxml2 && tar xf libxml2.tar.xz -C libxml2 --strip-components=1
+
+          cd libxml2
+          ./configure --disable-static --without-python --without-zlib --without-lzma \
+            --without-icu --without-iconv --without-http --without-modules \
+            --without-debug --without-readline --without-history
+          make -j"$(nproc)" libxml2.la
+          cd ..
+
+          # One regular file under the name the linker asks for, no symlink chain
+          cp -L libxml2/.libs/libxml2.so.2 pkg/llvm-tools/lib/libxml2.so.2
+          strip pkg/llvm-tools/lib/libxml2.so.2
+          cp libxml2/Copyright pkg/llvm-tools/lib/libxml2.so.2.LICENSE
+          ls -la pkg/llvm-tools/lib/
+
+      - name: Package
+        run: |
           if [ "${{ matrix.target }}" = "win-x64" ]; then
             cd pkg && zip -r ../llvm-tools-${LLVM_VERSION}-${{ matrix.target }}.zip llvm-tools
           else
