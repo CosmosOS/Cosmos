@@ -1316,9 +1316,10 @@ public class Kernel : Sys.Kernel
 
     /// <summary>
     /// Worker: collects twice while the main thread waits, then allocates enough garbage to
-    /// overwrite whatever the collections freed. The main thread is the boot thread, on the
-    /// bootloader stack, and it is switched out: the collection scans it conservatively from the
-    /// context its interrupt saved, which on ARM64 lies on the SP_EL1 stack, not on its own.
+    /// overwrite whatever the collections freed. The main thread waits on a stack of its own
+    /// (SMP phase 5b): the collection scans it conservatively from its saved context. The boot
+    /// thread the cell was written for is now CPU 0's idle thread, on the bootloader stack,
+    /// which every collection of the suite scans the same way, up to the boot stack top.
     /// </summary>
     private static void GCCollectWorker()
     {
@@ -1338,7 +1339,7 @@ public class Kernel : Sys.Kernel
     private static void TestGCCollectFromWorkerThread()
     {
         // A survivor only this frame references: the worker's collection must find it on the
-        // switched-out main thread's stack, and must not read past that stack to look for it.
+        // waiting main thread's stack, and must not read past that stack to look for it.
         // On ARM64, scanning the boot thread from its saved context up to the boot stack top
         // walked most of the address space with interrupts masked and hung the CPU.
         int[] survivor = new int[64];
