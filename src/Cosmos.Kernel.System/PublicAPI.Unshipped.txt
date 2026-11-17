@@ -683,6 +683,8 @@ Cosmos.Kernel.System.Input.Layouts.USDvorakLayout
 Cosmos.Kernel.System.Input.Layouts.USDvorakLayout.USDvorakLayout() -> void
 Cosmos.Kernel.System.Input.Layouts.USStandardLayout
 Cosmos.Kernel.System.Input.Layouts.USStandardLayout.USStandardLayout() -> void
+Cosmos.Kernel.System.Input.Layouts.ITStandardLayout
+Cosmos.Kernel.System.Input.Layouts.ITStandardLayout.ITStandardLayout() -> void
 Cosmos.Kernel.System.Input.MouseManager
 Cosmos.Kernel.System.Internal.KernelEntry
 Cosmos.Kernel.System.Kernel
