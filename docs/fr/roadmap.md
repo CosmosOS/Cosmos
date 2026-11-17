@@ -1,5 +1,5 @@
 ---
-source_hash: 42f0471f49f8b9b09b952a9954c1ebbaa078489f
+source_hash: 2bad57cfc5819f387da608190853fc35b52a1fd8
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -20,7 +20,7 @@ source_hash: 42f0471f49f8b9b09b952a9954c1ebbaa078489f
 | Débogueur| ✅ | 🟡 Partiel | Bugs de source link et des variables dans vscode |
 | Calcul mathématique accéléré par CPU/FPU | ✅ | ✅ | x64 uniquement : FPU x87 (sin/cos/tan/exp/log/atan) |
 | Sous-système graphique Cosmos | ✅ | ✅ | Le framebuffer du firmware via Limine, ainsi que les pilotes d'affichage virtio-gpu, VMware SVGA II, AMD DCN 3.1.5 et graphismes intégrés Intel au-dessus du kit de pilotes (SVGA3D sur celui de VMware). |
-| Interface réseau | ✅ | ✅ | |
+| Interface réseau | ✅ | ✅ | Intel E1000E (qui lie aussi la carte e1000 8254x) et virtio-net via le kit de pilotes. ARP, IPv4, IPv6 lien-local, UDP, TCP, DHCP et DNS par les classes standard `System.Net.Sockets` et `System.Net.Dns` ; Telnet, FTP et HTTP (client et serveur) sous forme de paquets. |
 | Minuteur / horloge | ✅ | ✅ | |
 | Saisie au clavier | ✅ | ✅ | Claviers PS/2 (x64), virtio et USB, tous sous forme de pilotes du kit de pilotes |
 | Saisie à la souris | ✅ | ✅ | Souris PS/2 (x64), virtio et USB, toutes sous forme de pilotes du kit de pilotes |
@@ -41,6 +41,7 @@ Au-delà de la parité avec Gen2, Gen3 apporte de nouvelles capacités :
 | **Commutateurs de fonctionnalité** | ✅ |  |
 | **Extension Cosmos pour VS Code** | ✅ |  |
 | **Prise en charge USB** | ✅ | Contrôleurs hôtes xHCI, EHCI et OHCI avec hubs et branchement à chaud (x64 + ARM64) sous forme de pilotes du kit de pilotes, avec les pilotes de classe clavier HID boot, souris HID boot et stockage de masse (Bulk-Only Transport). Pas d'UHCI (le contrôleur compagnon USB 1.1 d'Intel, accessible par E/S de port). |
+| **HTTPS** | ✅ | TLS 1.3 et 1.2 en code managé (BouncyCastle), par le paquet Cosmos.Network.Http ([HTTP et HTTPS](articles/user/network.md#http-and-https)) : `HttpClient` et `HttpListener` en `https://`, avec des certificats vérifiés par rapport aux racines de Mozilla. |
 
 <a id="future-releases"></a>
 
@@ -51,7 +52,6 @@ Fonctionnalités prévues après la première version :
 | Fonctionnalité | État | Remarques |
 |---------|--------|-------|
 | **SMP (multitraitement symétrique)** | ❌ Non commencé | Démarrage des AP sur plusieurs cœurs, ordonnancement par CPU, équilibreur de charge. |
-| **HTTPS** | ❌ Non commencé | Implémentation de TLS/SSL, gestion des certificats, sockets sécurisés. |
 | **GC générationnel** | ❌ Non commencé | Remplacer l'actuel marquage-balayage par un collecteur générationnel (Gen0/Gen1/Gen2) pour de meilleures performances. |
 | **Exécution de code** | ❌ Non commencé | VM WASM en espace utilisateur |
 | **Le GIC, l'ITS et les horloges à partir du device tree** | ❌ Non commencé | Aujourd'hui, le contrôleur d'interruptions ARM64 provient d'ACPI ou des valeurs par défaut de virt, si bien qu'un démarrage avec acpi=off n'a pas de MSI ; le bus de plateforme lit déjà l'arbre. x64 n'en a jamais. |

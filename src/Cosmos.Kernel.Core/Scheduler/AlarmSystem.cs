@@ -2,7 +2,6 @@
 
 using System.Diagnostics;
 using Cosmos.Kernel.Core.IO;
-using SysThread = System.Threading.Thread;
 
 namespace Cosmos.Kernel.Core.Scheduler;
 
@@ -11,7 +10,10 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// interrupt-context software timers (TimerManager.Schedule), alarm callbacks
 /// run in thread context and may block, allocate, and use scheduler
 /// primitives. Requires the scheduler; resolution is bounded by the scheduler
-/// tick.
+/// tick. The alarm thread is one of the kernel's own
+/// (<see cref="KernelThread.TryStart(Action)"/>): it runs on the housekeeping
+/// CPU, beside the timers, whichever thread scheduled the first alarm and
+/// whatever CPU set that thread carries.
 /// </summary>
 /// <remarks>
 /// Internal: a kernel reaches this through Cosmos.Kernel.System's AlarmManager.
@@ -42,7 +44,7 @@ internal static class AlarmSystem
     private static readonly List<Alarm> s_alarms = [];
     private static readonly Mutex s_mutex = new();
     private static readonly ConditionVariable s_alarmsChanged = new();
-    private static SysThread? s_thread;
+    private static bool s_started;
     private static ulong s_nextId = 1;
 
     /// <summary>
@@ -113,7 +115,12 @@ internal static class AlarmSystem
 
         s_mutex.Acquire();
 
-        EnsureStartedLocked();
+        if (!EnsureStartedLocked())
+        {
+            s_mutex.Release();
+            Serial.WriteString("[AlarmSystem] ERROR: the alarm thread did not start, alarm not scheduled\n");
+            return 0;
+        }
 
         ulong id = s_nextId++;
         InsertSortedLocked(new Alarm
@@ -132,17 +139,18 @@ internal static class AlarmSystem
     }
 
     /// <summary>
-    /// Starts the alarm thread on first use. Caller must hold <see cref="s_mutex"/>.
+    /// Starts the alarm thread on first use. Caller must hold <see cref="s_mutex"/>,
+    /// which the new thread waits for: it takes it first thing. False when the
+    /// scheduler could not start the thread; the next alarm tries again.
     /// </summary>
-    private static void EnsureStartedLocked()
+    private static bool EnsureStartedLocked()
     {
-        if (s_thread is not null)
+        if (!s_started)
         {
-            return;
+            s_started = KernelThread.TryStart(DoTick);
         }
 
-        s_thread = new SysThread(DoTick);
-        s_thread.Start();
+        return s_started;
     }
 
     /// <summary>

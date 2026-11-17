@@ -162,10 +162,15 @@ namespace Cosmos.Kernel.Core.Runtime
             memmove((byte*)dest, (byte*)src, len);
         }
 
+        /// <summary>
+        /// What <c>Environment.ProcessorCount</c> reports, and what CoreLib sizes the thread
+        /// pool and its locks' spinning for: the CPUs the default CPU set names
+        /// (<see cref="Scheduler.SchedulerManager.ProcessCpuCount"/>), 1 without a scheduler.
+        /// </summary>
         [RuntimeExport("RhGetProcessCpuCount")]
         internal static int RhGetProcessCpuCount()
         {
-            return 1;
+            return Scheduler.SchedulerManager.ProcessCpuCount;
         }
 
         /// <summary>
@@ -219,8 +224,7 @@ namespace Cosmos.Kernel.Core.Runtime
         {
             if (CosmosFeatures.SchedulerEnabled && Scheduler.SchedulerManager.IsRunning)
             {
-                Scheduler.PerCpuState? cpuState = Scheduler.SchedulerManager.CurrentCpuState;
-                return cpuState?.CurrentThread?.Id ?? 1;
+                return Scheduler.SchedulerManager.CurrentThread?.Id ?? 1;
             }
 
             return 1;

@@ -5,18 +5,18 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <!-- COSMOS0001: the cross-CPU cells drive SchedulerManager (the Balance
-         cell, the offline-set cell) and read a SchedulerThread and its state
-         (the TryStart cell, the parked cell, the workers), all on the
-         experimental scheduler seam. -->
+    <!-- COSMOS0001: the offline-set cell drives SchedulerManager, and the
+         cross-CPU cells read a SchedulerThread and its state (the TryStart
+         cell, the parked cells, the workers), all on the experimental
+         scheduler seam. -->
     <NoWarn>$(NoWarn);COSMOS0001</NoWarn>
     <!-- Off on purpose: the suite uses no network, and QEMU's default NIC
          would bind a driver whose drain wakes the driver kit's worker every
          10 ms (q35's E1000E on x64) or 50 ms (the virt machine's virtio-net
          on arm64). That worker is housekeeping, so it never leaves CPU 0, but
-         when it is the tail of CPU 0's queue the Balance cell's pull finds
-         a thread it may not take and has to ask again. With the switch off
-         no network driver is in the manifest. -->
+         it would take turns there with the workers the cells watch on that
+         CPU, and lengthen every window they count across. With the switch
+         off no network driver is in the manifest. -->
     <CosmosEnableNetwork>false</CosmosEnableNetwork>
   </PropertyGroup>
 

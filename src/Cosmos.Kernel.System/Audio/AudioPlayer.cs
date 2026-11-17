@@ -277,7 +277,7 @@ public sealed class AudioPlayer
     private static void Pause(uint milliseconds)
     {
         SchedulerThread? current = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentCpuState?.CurrentThread
+            ? SchedulerManager.CurrentThread
             : null;
 
         if (current is not null && !current.IsIdle)

@@ -162,7 +162,7 @@ internal static class FinalizerThreadTests
         // White-box read of the experimental scheduler seam: the finalizer thread is a kernel
         // thread, with no managed Thread to ask.
 #pragma warning disable COSMOS0001
-        return SchedulerManager.CurrentCpuState?.CurrentThread?.Id ?? 0;
+        return SchedulerManager.CurrentThread?.Id ?? 0;
 #pragma warning restore COSMOS0001
     }
 

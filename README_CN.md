@@ -1,4 +1,4 @@
-<!-- source_hash: 0b7fc587374d85f0272654836d48a1450f83505b -->
+<!-- source_hash: c51eb2611255fdfd661a0f3f81257c491c185ca8 -->
 <p align="center">
   <img src="https://user-images.githubusercontent.com/63316499/89792973-43587480-daf3-11ea-99d6-82f89dd2ffc3.png" width="25%" />
 </p>
@@ -38,7 +38,7 @@ Cosmos gen2 通过自定义的转译器 **IL2CPU** 把 C# IL 编译为 x86 汇�
 - UART 串口
 - [Cosmos 图形子系统](https://cosmosos.github.io/zh/articles/user/graphics.html)
 - [键盘](https://cosmosos.github.io/zh/articles/user/keyboard.html)和[鼠标](https://cosmosos.github.io/zh/articles/user/mouse.html)输入
-- [网络协议栈](https://cosmosos.github.io/zh/articles/user/network.html)
+- [网络协议栈](https://cosmosos.github.io/zh/articles/user/network.html)，并以包的形式提供 [HTTP 和 HTTPS](https://cosmosos.github.io/zh/articles/user/network.html#http-and-https)、FTP 和 Telnet
 - 存储驱动程序（AHCI/SATA、NVMe、virtio-blk、USB 大容量存储），支持 MBR、GPT 和 EBR 分区
 - 基于 Unix 风格 VFS（挂载、超级块、inode、只读挂载）的 [FAT12/16/32、ext2 和 ISO 9660 文件系统](https://cosmosos.github.io/zh/articles/user/filesystem.html)
 - 定时器 / 时钟

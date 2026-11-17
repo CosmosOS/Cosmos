@@ -1,6 +1,7 @@
 using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Memory;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Internal.Runtime;
@@ -221,9 +222,14 @@ internal static unsafe class GC
     internal static long RhGetAllocatedBytesForCurrentThread()
     {
         // Cumulative bytes allocated by this thread. Does not subtract unused TLAB space
-        // (that would cause the value to decrease on TLAB refill).
-        ref AllocContext ac = ref GetCurrentAllocContext();
-        return (long)(ac.AllocBytes + ac.AllocBytesUoh);
+        // (that would cause the value to decrease on TLAB refill). Masked like an
+        // allocation: the context is found through the CPU the thread runs on, and a
+        // thread moved between the two steps would read another thread's.
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            ref AllocContext ac = ref GetCurrentAllocContext();
+            return (long)(ac.AllocBytes + ac.AllocBytesUoh);
+        }
     }
 
     [RuntimeExport("RhGetTotalAllocatedBytes")]
