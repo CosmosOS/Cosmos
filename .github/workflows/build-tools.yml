@@ -19,6 +19,9 @@ env:
   XORRISO_VERSION: "1.5.8.pl01"
   XORRISO_DIR: "1.5.8"
   QEMU_VERSION: "10.2.2"
+  # SDL built for the Linux QEMU (see build-qemu)
+  SDL2_VERSION: "2.32.10"
+  SDL2_SHA256: "5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165"
   GDB_VERSION: "17.1"
   # CPython embedded in gdb for scripting (pretty-printers, kernel debug
   # helpers). macOS bundling paths are keyed on this exact version.
@@ -263,6 +266,8 @@ jobs:
   build-qemu:
     name: QEMU ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
+    # Linux only (see the matrix): macOS and Windows build on the runner itself
+    container: ${{ matrix.container }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -270,18 +275,47 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux-x64
+            container: ubuntu:22.04
           - os: macos-latest
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
     steps:
+      # The image is bare: everything the build uses is named here. The second
+      # group is what SDL can drive (X11, Wayland, the sound servers). It is
+      # needed to build SDL and is not linked into anything: see Build SDL2.
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-venv \
-            ninja-build pkg-config libglib2.0-dev libpixman-1-dev \
-            libslirp-dev libsdl2-dev libfdt-dev flex bison
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential ca-certificates curl xz-utils bzip2 pkg-config \
+            python3 python3-venv python3-tomli ninja-build \
+            libglib2.0-dev libpixman-1-dev libslirp-dev libfdt-dev libzstd-dev
+          apt-get install -y --no-install-recommends \
+            libx11-dev libxext-dev libxcursor-dev libxi-dev libxfixes-dev libxrandr-dev libxss-dev \
+            libwayland-dev wayland-protocols libxkbcommon-dev libdecor-0-dev \
+            libegl-dev libgles-dev libgl-dev \
+            libasound2-dev libpulse-dev libpipewire-0.3-dev libdbus-1-dev
+
+      # Ubuntu's SDL is linked against the whole desktop (X11, Wayland,
+      # PulseAudio and what they pull in): some fifty libraries the package
+      # then has to carry, in this image's versions, ahead of those of the
+      # machine QEMU runs on. Built from source, SDL loads them from that
+      # machine instead, and only once a window or a sound device is opened.
+      # The library itself needs the C library and nothing else.
+      - name: Build SDL2 (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl -fL -o sdl2.tar.gz \
+            "https://github.com/libsdl-org/SDL/releases/download/release-${SDL2_VERSION}/SDL2-${SDL2_VERSION}.tar.gz"
+          echo "${SDL2_SHA256}  sdl2.tar.gz" | sha256sum -c -
+          tar xzf sdl2.tar.gz
+          cd "SDL2-${SDL2_VERSION}"
+          ./configure --disable-static
+          make -j"$(nproc)"
+          make install
+          ldconfig
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
@@ -334,12 +368,21 @@ jobs:
         shell: bash
         run: |
           NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          PLATFORM_FLAGS=()
+          if [ "$(uname)" = "Linux" ]; then
+            # Sound goes through SDL, like the window: QEMU's own ALSA,
+            # PulseAudio and PipeWire drivers would link those libraries into
+            # it. gio only serves the D-Bus display and audio, unused here,
+            # and brings GObject, libmount and SELinux with it.
+            PLATFORM_FLAGS=(--audio-drv-list=sdl --disable-alsa --disable-pa --disable-pipewire --disable-gio)
+          fi
           cd qemu-${{ env.QEMU_VERSION }}
           ./configure \
             --target-list=x86_64-softmmu,aarch64-softmmu \
             --enable-slirp \
             --enable-sdl \
-            --disable-docs
+            --disable-docs \
+            "${PLATFORM_FLAGS[@]}"
           # Build only the binaries we need (skip tests — broken on Windows mingw)
           ninja -C build -j$NPROC qemu-system-x86_64 qemu-system-aarch64 qemu-img
 
