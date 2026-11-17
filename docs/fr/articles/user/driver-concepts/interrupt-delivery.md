@@ -1,0 +1,14 @@
+---
+source_hash: e773f33586b94f7400dcb76900c636a202aebec5
+---
+<a id="interrupt-delivery"></a>
+
+# Acheminement des interruptions
+
+Un périphérique sollicite l'attention du CPU en levant une demande d'interruption (IRQ), qui transite par un contrôleur d'interruptions : l'I/O APIC et l'APIC local sur x64, le GIC sur ARM64. Le contrôleur numérote les sources, peut masquer chacune d'elles et transforme une demande en un numéro d'après lequel le noyau aiguille l'interruption. Après le gestionnaire d'interruption, le noyau signale la fin d'interruption pour que le contrôleur puisse acheminer la suivante.
+
+La fin d'interruption informe le contrôleur, pas le périphérique. Le périphérique garde sa cause en attente dans un registre d'état, que seul son pilote sait effacer. Une ligne déclenchée sur niveau reste active tant qu'une cause est en attente, si bien qu'un gestionnaire d'interruption qui laisse la cause positionnée s'exécute de nouveau aussitôt, indéfiniment. Sur une ligne déclenchée sur front, le contrôleur ne voit que la transition, si bien qu'une cause laissée en attente peut ne jamais produire de nouveau front, et le périphérique devient muet. Dans les deux cas, le gestionnaire d'interruption acquitte d'abord le périphérique. Masquer la source est l'autre outil, pour une cause que seul un thread peut effacer.
+
+Une fonction PCI classique signale ses interruptions sur une broche héritée (INTx), un fil déclenché sur niveau, au routage propre à la carte, que plusieurs périphériques peuvent partager ; chaque gestionnaire d'interruption qui y est branché vérifie donc que c'est son propre périphérique qui l'a levée. MSI et MSI-X remplacent le fil par une écriture en mémoire : le périphérique écrit une valeur à une adresse, toutes deux choisies par le noyau, et le contrôleur transforme cette écriture en interruption. Les messages ne sont jamais partagés, n'exigent aucun routage sur la carte, et un périphérique peut en avoir un par file. MSI-X conserve sa table de messages, avec un bit de masquage par entrée, dans l'un des [BAR](pci.md) du périphérique.
+
+Dans le kit de pilotes, la ligne héritée d'un nœud PCI n'est routée que sur x64, pour les lignes 3 à 15, n'est jamais partagée et est programmée en déclenchement sur front, ce que QEMU achemine mais qu'un vrai chipset peut ne pas acheminer ; ses messages sont uniquement MSI-X, jusqu'à 32, nécessitent sur ARM64 le service de traduction des interruptions (ITS) de GICv3, et en connecter un désactive la ligne. `InterruptHandle.Mask()` et `Unmask()` arrêtent et relancent une seule source, au niveau du contrôleur pour une ligne et dans la table pour un message. Voir [Interruptions](../drivers.md#interrupts), [La ligne héritée](../drivers.md#the-legacy-line) et [Interruptions par message](../drivers.md#message-interrupts).

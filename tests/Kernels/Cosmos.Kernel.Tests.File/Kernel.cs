@@ -24,10 +24,13 @@ public class Kernel : Sys.Kernel
 {
     /// <summary>Exact TR.Run cell count — the harness synthesizes failures
     /// for missing tests, so a mid-suite hang can't report ALL TESTS PASSED.</summary>
-    private const ushort ExpectedTestCount = 37;
+    private const ushort ExpectedTestCount = 39;
 
     private const string DriverName = "fat-file-test";
     private const string MountPoint = "/mnt";
+
+    /// <summary>Where the same volume is mounted again with <see cref="MountFlags.ReadOnly"/>.</summary>
+    private const string ReadOnlyMountPoint = "/ro";
 
     /// <summary>Payload sizes: small buffers stay inside one 4 KiB cluster,
     /// the large one spans 24 clusters to exercise chain walking.</summary>
@@ -465,6 +468,37 @@ public class Kernel : Sys.Kernel
             Directory.SetCurrentDirectory("/");
         });
 
+        // ---------- read-only mount ----------
+
+        TR.Run("Test_ReadOnlyMount_RefusesMutations", () =>
+        {
+            // The flag the mount was made with is enforced by the VFS and the
+            // plug, whatever the driver can do: a FAT volume mounted
+            // read-only answers EROFS, which the BCL reports as a plain
+            // IOException ("Read-only file system").
+            Directory.CreateDirectory("/mnt/ro");
+            File.WriteAllText("/mnt/ro/keep.txt", "keep");
+            Assert.True(VfsManager.TryMount(DriverName, "", MountFlags.ReadOnly, ReadOnlyMountPoint, out VfsMount? mount));
+            Assert.True(mount is not null && mount.IsReadOnly, "the mount must report read-only");
+            Assert.Equal("keep", File.ReadAllText("/ro/ro/keep.txt"));
+            Assert.True(WriteThrowsIOException("/ro/ro/new.txt"), "File.WriteAllText on a read-only mount must throw IOException");
+            Assert.True(DeleteThrowsIOException("/ro/ro/keep.txt"), "File.Delete on a read-only mount must throw IOException");
+            Assert.True(CreateDirectoryThrowsIOException("/ro/ro/sub"), "Directory.CreateDirectory on a read-only mount must throw IOException");
+            Assert.True(File.Exists("/ro/ro/keep.txt"), "the file must survive the refused delete");
+            Assert.False(VfsManager.TryCreateFile("/ro/ro/direct.txt", VfsMode.OwnerRead), "VfsManager.TryCreateFile must refuse a read-only mount");
+        });
+
+        TR.Run("Test_ReadOnlyMount_OtherMountStillWrites", () =>
+        {
+            // The flag is per mount: the same volume through its read-write
+            // mount point still takes writes, and the read-only one sees them.
+            File.WriteAllText("/mnt/ro/written.txt", "through rw");
+            Assert.Equal("through rw", File.ReadAllText("/ro/ro/written.txt"));
+            File.Delete("/mnt/ro/written.txt");
+            Assert.False(File.Exists("/ro/ro/written.txt"));
+            Assert.True(VfsManager.TryUnmount(ReadOnlyMountPoint));
+        });
+
         TR.Finish();
 
         Log.WriteString("\n[Tests Complete - System Halting]\n");
@@ -643,6 +677,32 @@ public class Kernel : Sys.Kernel
         catch (Exception)
         {
             return false;
+        }
+    }
+
+    private static bool DeleteThrowsIOException(string path)
+    {
+        try
+        {
+            File.Delete(path);
+            return false;
+        }
+        catch (Exception e)
+        {
+            return e is IOException && e is not FileNotFoundException && e is not DirectoryNotFoundException;
+        }
+    }
+
+    private static bool CreateDirectoryThrowsIOException(string path)
+    {
+        try
+        {
+            Directory.CreateDirectory(path);
+            return false;
+        }
+        catch (Exception e)
+        {
+            return e is IOException && e is not FileNotFoundException && e is not DirectoryNotFoundException;
         }
     }
 }

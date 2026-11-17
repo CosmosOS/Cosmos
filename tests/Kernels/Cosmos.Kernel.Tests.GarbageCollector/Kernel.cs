@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Memory;
@@ -10,6 +11,7 @@ using Cosmos.Kernel.Core.Runtime.GcInfo;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using CoreGC = Cosmos.Kernel.Core.Memory.GarbageCollector.GarbageCollector;
+using GCHandle = System.Runtime.InteropServices.GCHandle;
 using Sys = Cosmos.Kernel.System;
 using TR = Cosmos.TestRunner.Framework.TestRunner;
 
@@ -24,7 +26,13 @@ public class Kernel : Sys.Kernel
         Serial.WriteString("[GarbageCollector] BeforeRun() reached!\n");
         Serial.WriteString("[GarbageCollector] Starting tests...\n");
 
-        TR.Start("GarbageCollector Tests", expectedTests: 50);
+        TR.Start("GarbageCollector Tests", expectedTests: 53 + FinalizerTests.TestCount + FinalizerThreadTests.TestCount);
+
+        // First: Kernel.Start turned the finalizer thread on, CosmosEnableFinalizerThread being on
+        // in this kernel. The cells below check the collector with the finalizers run inline, on
+        // the collecting thread, so the cell turns the thread off again; FinalizerThreadTests
+        // turns it on and checks the thread.
+        TR.Run("GC_FinalizerThread_OnByDefault", TestFinalizerThreadOnByDefault);
 
         // Garbage Collection Tests
         TR.Run("GC_IsEnabled", TestGCIsEnabled);
@@ -49,6 +57,7 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_DependentHandleCleanup", TestGCDependentHandleCleanup);
         TR.Run("GC_DependentHandleNullValue", TestGCDependentHandleNullValue);
         TR.Run("GC_HandleStoreIntegrity", TestGCHandleStoreIntegrity);
+        TR.Run("GC_HandleStore_ConcurrentSegmentGrowth", TestGCHandleStoreConcurrentSegmentGrowth);
         TR.Run("GC_PinnedHeapReuse", TestGCPinnedHeapReuse);
         TR.Run("GC_StackScanPaddingStress", TestGCStackScanPaddingStress);
         TR.Run("GC_GcInfoDecoder", TestGCGcInfoDecoder);
@@ -61,13 +70,17 @@ public class Kernel : Sys.Kernel
         // GC_InteriorPointerRootMidTlab pins the interior-pointer lookup to a layout
         // where the parent's start was never recorded in the brick table. The PinnedHeap
         // and Fixed cells cross the slot's GC_CALL_PINNED flag with the heap the parent
-        // lives on, since the lookup must not take one for the other.
+        // lives on, since the lookup must not take one for the other. GC_CollectFromWorkerThread
+        // collects from a worker while the main thread, the boot thread on the bootloader stack,
+        // is switched out: its scan must start from that thread's own stack pointer (on ARM64
+        // the interrupt saved its context on the SP_EL1 stack, not on the boot stack).
         TR.Run("GC_InteriorPointerRoot", TestGCInteriorPointerRoot);
         TR.Run("GC_InteriorPointerRootMidTlab", TestGCInteriorPointerRootMidTlab);
         TR.Run("GC_InteriorPointerRootPinnedHeap", TestGCInteriorPointerRootPinnedHeap);
         TR.Run("GC_InteriorPointerRootFixed", TestGCInteriorPointerRootFixed);
         TR.Run("GC_StaticOnlyReachability", TestGCStaticOnlyReachability);
         TR.Run("GC_MultithreadChurnUnderCollect", TestGCMultithreadChurnUnderCollect);
+        TR.Run("GC_CollectFromWorkerThread", TestGCCollectFromWorkerThread);
         TR.Run("GC_MallocHeapNotSwept", TestGCMallocHeapNotSwept);
 
         // GC Info & Configuration Tests
@@ -88,6 +101,10 @@ public class Kernel : Sys.Kernel
         TR.Run("GC_TLAB_SurvivalAfterCollect", TestTlabSurvivalAfterCollect);
         TR.Run("GC_TLAB_GapStampedOnCollect", TestTlabGapStampedOnCollect);
 
+        // Finalizer Tests
+        FinalizerTests.RunAll();
+        FinalizerThreadTests.RunAll();
+
         TR.Finish();
 
         Serial.WriteString("\n[Tests Complete - System Halting]\n");
@@ -97,6 +114,15 @@ public class Kernel : Sys.Kernel
     {
         // All tests ran in BeforeRun; stop the main loop after one iteration
         Stop();
+    }
+
+    private static void TestFinalizerThreadOnByDefault()
+    {
+        Assert.True(Sys.KernelFeatures.FinalizerThread, "GC: CosmosEnableFinalizerThread is on in this kernel");
+        Assert.True(CoreGC.ThreadedFinalizer, "GC: Kernel.Start turned the finalizer thread on");
+
+        CoreGC.ThreadedFinalizer = false;
+        Assert.False(CoreGC.ThreadedFinalizer, "GC: the cells below run the finalizers on the collecting thread");
     }
 
     protected override void AfterRun()
@@ -546,6 +572,72 @@ public class Kernel : Sys.Kernel
         CoreGC.Collect();
         Assert.True(ReferenceEquals(wr4.Target, alive),
             "GC: handle store works after cleanup (weak ref still resolves to the strong local)");
+    }
+
+    /// <summary>Handles each worker of the segment-growth test allocates: over two segments' worth between them.</summary>
+    private const int HandleGrowthPerWorker = 400;
+
+    private static int s_handleGrowthWorkersDone;
+    private static int s_handleGrowthLostTargets;
+
+    private static void TestGCHandleStoreConcurrentSegmentGrowth()
+    {
+        // Two threads allocate Normal handles (GCHandle.Alloc) past the capacity of the store's
+        // segments at once, so both reach the fallback that appends a segment. Without the chain
+        // lock, each appended its own segment onto the same tail and the second link orphaned
+        // the first: handles in the orphan were neither scanned as roots nor found by Free. Every
+        // handle must still resolve its target after collections, and freeing them all must
+        // leave the store as it was.
+        s_handleGrowthWorkersDone = 0;
+        s_handleGrowthLostTargets = 0;
+
+        Thread worker1 = new Thread(HandleGrowthWorker);
+        Thread worker2 = new Thread(HandleGrowthWorker);
+        worker1.Start();
+        worker2.Start();
+
+        for (int i = 0; i < 600 && s_handleGrowthWorkersDone < 2; i++)
+        {
+            TimerManager.Wait(10);
+        }
+
+        Assert.Equal(2, s_handleGrowthWorkersDone, "GC: both handle-growth workers must finish");
+        Assert.Equal(0, s_handleGrowthLostTargets, "GC: every handle must keep and resolve its target across a collection");
+    }
+
+    private static void HandleGrowthWorker()
+    {
+        GCHandle[] handles = new GCHandle[HandleGrowthPerWorker];
+        for (int i = 0; i < HandleGrowthPerWorker; i++)
+        {
+            handles[i] = GCHandle.Alloc(new HandleGrowthTarget(i));
+        }
+
+        // The targets are only reachable through the handles: a handle the collector does not
+        // see as a root lets its target die, and the next read of it is a freed object.
+        CoreGC.Collect();
+
+        int lost = 0;
+        for (int i = 0; i < HandleGrowthPerWorker; i++)
+        {
+            if (handles[i].Target is not HandleGrowthTarget target || target.Index != i)
+            {
+                lost++;
+            }
+        }
+
+        for (int i = 0; i < HandleGrowthPerWorker; i++)
+        {
+            handles[i].Free();
+        }
+
+        Interlocked.Add(ref s_handleGrowthLostTargets, lost);
+        Interlocked.Increment(ref s_handleGrowthWorkersDone);
+    }
+
+    private sealed class HandleGrowthTarget(int index)
+    {
+        public int Index { get; } = index;
     }
 
     private static void TestGCPinnedHeapReuse()
@@ -1197,6 +1289,58 @@ public class Kernel : Sys.Kernel
         Assert.True(s_churnIterations > 0, "GC: churn workers must have completed at least one iteration");
         Assert.Equal(0, s_churnErrorCount,
             "GC: parked-thread survivors must never be corrupted by collections (" + s_churnErrorCount + " errors)");
+    }
+
+    private static int s_workerCollectDone;
+
+    /// <summary>
+    /// Worker: collects twice while the main thread waits, then allocates enough garbage to
+    /// overwrite whatever the collections freed. The main thread is the boot thread, on the
+    /// bootloader stack, and it is switched out: the collection scans it conservatively from the
+    /// context its interrupt saved, which on ARM64 lies on the SP_EL1 stack, not on its own.
+    /// </summary>
+    private static void GCCollectWorker()
+    {
+        CoreGC.Collect();
+        CoreGC.Collect();
+
+        for (int i = 0; i < 256; i++)
+        {
+            int[] garbage = new int[64];
+            garbage[0] = i;
+            garbage[63] = i;
+        }
+
+        Interlocked.Increment(ref s_workerCollectDone);
+    }
+
+    private static void TestGCCollectFromWorkerThread()
+    {
+        // A survivor only this frame references: the worker's collection must find it on the
+        // switched-out main thread's stack, and must not read past that stack to look for it.
+        // On ARM64, scanning the boot thread from its saved context up to the boot stack top
+        // walked most of the address space with interrupts masked and hung the CPU.
+        int[] survivor = new int[64];
+        for (int i = 0; i < survivor.Length; i++)
+        {
+            survivor[i] = 0x7D000000 + i;
+        }
+
+        s_workerCollectDone = 0;
+        CoreGC.GetStats(out int collsBefore, out int _);
+
+        Thread worker = new Thread(GCCollectWorker);
+        worker.Start();
+        for (int i = 0; i < 400 && s_workerCollectDone == 0; i++)
+        {
+            TimerManager.Wait(10);
+        }
+
+        CoreGC.GetStats(out int collsAfter, out int _2);
+        Assert.Equal(1, s_workerCollectDone, "GC: the collecting worker must finish");
+        Assert.Equal(collsBefore + 2, collsAfter, "GC: both collections of the worker must be recorded");
+        Assert.True(survivor[0] == 0x7D000000 && survivor[63] == 0x7D00003F,
+            "GC: a main-thread local must survive a collection run by another thread");
     }
 
     /// <summary>

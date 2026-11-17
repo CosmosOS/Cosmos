@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.Devices.Network;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
@@ -11,13 +10,10 @@ namespace Cosmos.Kernel.System.Network;
 /// The network manager's consumer of the driver kit: every network
 /// interface a kit driver publishes becomes a <see cref="KitNetworkDevice"/>
 /// in the manager's table, and leaves it when withdrawn. A received frame
-/// is copied into an array and handed to the stack's handler under
-/// <see cref="InternalCpu.DisableInterruptsScope"/>: the stack has no locks
-/// and was serialized until now by running inside the driver's interrupt
-/// handler, so the scope restores that atomicity on the single CPU (a
-/// driver's transmit lock nests inside it, since the kit's lock scope saves
-/// and restores the interrupt flag). That is the migration-period rule
-/// until the stack gets a lock of its own. A frame the stack's handler
+/// is copied into an array and handed to the stack's handler with interrupts
+/// on: the stack serializes itself with <see cref="NetworkStackLock"/>, which
+/// <see cref="NetworkStack.HandlePacket"/> takes, and a contended lock below
+/// it blocks the worker as any wait does. A frame the stack's handler
 /// throws on is dropped and logged here: the kit cancels a work item that
 /// throws, which would stop the driver's receive path for good. Installed
 /// by <see cref="NetworkManager.Initialize"/>, before the driver stage runs.
@@ -90,18 +86,15 @@ internal sealed class KitNetworkConsumer : NetworkConsumer
         }
 
         byte[] copy = frame.ToArray();
-        using (InternalCpu.DisableInterruptsScope())
+        try
         {
-            try
-            {
-                handler(copy, copy.Length);
-            }
-            catch (Exception exception)
-            {
-                Serial.WriteString("[NetworkManager] packet handler threw: ");
-                Serial.WriteString(exception.Message);
-                Serial.WriteString("\n");
-            }
+            handler(copy, copy.Length);
+        }
+        catch (Exception exception)
+        {
+            Serial.WriteString("[NetworkManager] packet handler threw: ");
+            Serial.WriteString(exception.Message);
+            Serial.WriteString("\n");
         }
     }
 

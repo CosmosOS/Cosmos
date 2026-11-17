@@ -76,3 +76,17 @@ When there is no random number instruction but the timings pass, the seed rests 
 ```
 
 The health tests catch a timer that is stuck or repeats a short pattern, not every predictable one: a machine that runs deterministically, such as QEMU under `-icount` or record/replay, can pass them and still produce the same output on every boot.
+
+---
+
+## Summary
+
+| Task | Call |
+|---|---|
+| Fill a buffer with secure random bytes | `RandomNumberGenerator.Fill(data)` |
+| Get secure random bytes in a new array | `RandomNumberGenerator.GetBytes(count)` |
+| Pick a secure random integer in a range | `RandomNumberGenerator.GetInt32(fromInclusive, toExclusive)` |
+| Fill a buffer with secure random bytes that are never zero | `RandomNumberGenerator.Create().GetNonZeroBytes(data)` |
+| Get a generator instance | `RandomNumberGenerator.Create()` |
+| Make a unique identifier | `Guid.NewGuid()` |
+| Get random numbers for a game or a shuffle | `System.Random`, `Random.Shared` |

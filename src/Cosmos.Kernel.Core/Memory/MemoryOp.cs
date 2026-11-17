@@ -254,17 +254,32 @@ internal static unsafe class MemoryOp
 
     #region MemCmp
 
-    public static bool MemCmp(uint* dest, uint* src, int count)
+    /// <summary>
+    /// Compares <paramref name="count"/> bytes as unsigned values and returns
+    /// the difference of the first pair that differs, 0 when all are equal:
+    /// the C <c>memcmp</c> contract, which callers order by sign.
+    /// </summary>
+    public static int MemCmp(byte* s1, byte* s2, int count)
     {
-        for (int i = 0; i < count; i++)
+        int i = 0;
+
+        // Skip 8 equal bytes at a time
+        while (i + 8 <= count && *(ulong*)(s1 + i) == *(ulong*)(s2 + i))
         {
-            if (dest[i] != src[i])
-            {
-                return false;
-            }
+            i += 8;
         }
 
-        return true;
+        // Find the first differing byte
+        while (i < count)
+        {
+            if (s1[i] != s2[i])
+            {
+                return s1[i] - s2[i];
+            }
+            i++;
+        }
+
+        return 0;
     }
 
     #endregion

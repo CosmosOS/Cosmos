@@ -42,6 +42,35 @@ public class Kernel : Sys.Kernel
     private const ushort TcpServerPort = 5558;  // Kernel listens, test runner connects
     private const ushort TcpLingerPort = 5559;  // Kernel connects, test runner echoes but never closes its side
 
+    // The host request TCP_ServerAccept sends once its listener is up: the
+    // engine's TcpTestServer then connects to TcpServerPort and runs the echo
+    // exchange. Port 5558 is a QEMU hostfwd, so a connect the engine made on
+    // its own clock was accepted by slirp before the guest listened and
+    // reached it as a SYN on slirp's retransmit schedule, 6 then 12 s apart,
+    // which misses a listener that comes up late (#3361).
+    private const string TcpConnectRequest = "tcp-connect";
+
+    // How long TCP_ServerAccept waits for the engine's connection after the
+    // request, in 100 ms polls. Under the engine's 10 s stall window: the
+    // request is the cell's last protocol frame before the wait, so a
+    // connection that never comes fails the cell, not the run.
+    private const int TcpAcceptWaitMilliseconds = 8000;
+
+    // The second adapter of the multi-adapter DHCP cells: its MAC, and a static
+    // configuration on a network the profile's NIC is not on, so a lookup that
+    // lands on it is a wrong answer.
+    private static readonly byte[] s_secondMac = [0x52, 0x54, 0x00, 0xAA, 0xBB, 0xCC];
+    private static readonly Address4 s_secondAddress = new(192, 168, 77, 2);
+    private static readonly Address4 s_secondMask = new(255, 255, 255, 0);
+    private static readonly Address4 s_secondGateway = new(192, 168, 77, 1);
+
+    // UDP_HandlerWaitsOnHeldLock: a lock the test holds while the stack's
+    // receive path, on the kit worker, tries to take it from a datagram
+    // callback, and what the callback got to.
+    private static readonly Lock s_handlerGate = new();
+    private static volatile bool s_handlerReached;
+    private static volatile bool s_handlerEntered;
+
     protected override void BeforeRun()
     {
         Log.WriteString("[Network Tests] Starting test suite\n");
@@ -53,12 +82,17 @@ public class Kernel : Sys.Kernel
         // VirtioNetDriver over either transport, PCI on both arches and MMIO on
         // arm64, through the VirtioPciTransportDriver or VirtioMmioTransportDriver
         // node above it.
-        TR.Start("Network Tests", expectedTests: 24);
+        TR.Start("Network Tests", expectedTests: 27);
 
         // Network initialization tests
         TR.Run("Network_DeviceDetected", TestNetworkDeviceDetected);
         TR.Run("Network_DeviceReady", TestNetworkDeviceReady);
         TR.Run("DHCP_AutoConfigure", TestDHCPConfiguration);
+
+        // Multi-adapter DHCP (CosmosOS/Cosmos#3275): a second, statically
+        // configured adapter sits beside the profile's NIC during the exchange
+        TR.Run("DHCP_LeavesOtherAdaptersAlone", TestDHCPLeavesOtherAdaptersAlone);
+        TR.Run("DHCP_ReleaseLeavesOtherAdaptersAlone", TestDHCPReleaseLeavesOtherAdaptersAlone);
 
         // ICMP tests
         TR.Run("ICMP_PingGateway", TestICMPPingGateway);
@@ -72,6 +106,7 @@ public class Kernel : Sys.Kernel
         // UDP tests
         TR.Run("UDP_SendPacket", TestUDPSendPacket);
         TR.Run("UDP_ReceivePacket", TestUDPReceivePacket);
+        TR.Run("UDP_HandlerWaitsOnHeldLock", TestUDPHandlerWaitsOnHeldLock);
 
         // Packet seam (COSMOS0002): crafted packets through the public packet types
         TR.Run("PacketSeam_CraftedEchoRoundTrip", TestPacketSeamCraftedEchoRoundTrip);
@@ -204,6 +239,131 @@ public class Kernel : Sys.Kernel
 
         // Verify we got a valid IP (not 0.0.0.0)
         Assert.True(s_localIP != Address4.Zero, "DHCP should assign a non-zero IP address");
+    }
+
+    // ==================== Multi-adapter DHCP ====================
+
+    /// <summary>
+    /// Registers a second adapter beside the profile's NIC and gives it the
+    /// static configuration above, through the public handle API.
+    /// </summary>
+    /// <returns>The adapter's handle, or an invalid one when the manager refused the device.</returns>
+    private static NetworkAdapter RegisterSecondAdapter(RecordingNetworkDevice device)
+    {
+        if (!NetworkManager.RegisterDevice(device))
+        {
+            return default;
+        }
+
+        NetworkAdapter adapter = NetworkManager.GetAdapter(NetworkManager.DeviceCount - 1);
+        IPConfig.Enable(adapter, s_secondAddress, s_secondMask, s_secondGateway);
+        return adapter;
+    }
+
+    /// <summary>
+    /// Takes the second adapter out again, configuration and registration
+    /// both, so the cells after this one see the profile's NIC alone.
+    /// </summary>
+    private static void UnregisterSecondAdapter(RecordingNetworkDevice device)
+    {
+        NetworkStack.RemoveConfigIP(device);
+        NetworkManager.UnregisterDevice(device);
+    }
+
+    /// <summary>
+    /// The second adapter still carries its static configuration and the
+    /// exchange sent nothing through it.
+    /// </summary>
+    private static void AssertSecondAdapterUntouched(NetworkAdapter adapter, RecordingNetworkDevice device, string when)
+    {
+        IPConfig? config = adapter.IPConfig;
+        Assert.True(config is not null, "The second adapter should still be configured " + when);
+        if (config is not null)
+        {
+            Assert.True(config.Address == s_secondAddress && config.SubnetMask == s_secondMask && config.DefaultGateway == s_secondGateway,
+                "The second adapter should keep its static configuration " + when);
+        }
+
+        Assert.True(device.FramesSent == 0, "The exchange should leave through the primary adapter only, not the second one (" + when + ")");
+    }
+
+    private static void TestDHCPLeavesOtherAdaptersAlone()
+    {
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        RecordingNetworkDevice second = new("second0", new MacAddress(s_secondMac));
+        NetworkAdapter adapter = RegisterSecondAdapter(second);
+        if (!adapter.IsValid)
+        {
+            Assert.Fail("The network manager should register a second adapter");
+            return;
+        }
+
+        try
+        {
+            // A fresh exchange on the primary adapter while the second one is
+            // configured: the lease lands on the primary, the second keeps
+            // its address, and no DHCP frame leaves through it.
+            int result = new DhcpClient().SendDiscoverPacket();
+            Assert.True(result != -1, "DHCP should obtain a lease for the primary adapter");
+
+            IPConfig? primary = NetworkManager.Primary.IPConfig;
+            Assert.True(primary is not null && primary.Address != Address4.Zero, "The primary adapter should carry the lease");
+
+            AssertSecondAdapterUntouched(adapter, second, "after the exchange");
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("DHCP threw with two adapters registered: " + ex.Message);
+        }
+        finally
+        {
+            UnregisterSecondAdapter(second);
+        }
+    }
+
+    private static void TestDHCPReleaseLeavesOtherAdaptersAlone()
+    {
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        RecordingNetworkDevice second = new("second0", new MacAddress(s_secondMac));
+        NetworkAdapter adapter = RegisterSecondAdapter(second);
+        if (!adapter.IsValid)
+        {
+            Assert.Fail("The network manager should register a second adapter");
+            return;
+        }
+
+        try
+        {
+            // Releasing the primary's lease leaves the primary unconfigured
+            // and the second adapter as it was.
+            new DhcpClient().SendReleasePacket();
+            Assert.True(NetworkManager.Primary.IPConfig is null, "Release should leave the primary adapter unconfigured");
+            AssertSecondAdapterUntouched(adapter, second, "after the release");
+
+            // The cells after this one need the lease back.
+            int result = new DhcpClient().SendDiscoverPacket();
+            Assert.True(result != -1, "DHCP should hand the primary adapter a lease again after the release");
+
+            IPConfig? primary = NetworkManager.Primary.IPConfig;
+            Assert.True(primary is not null && primary.Address != Address4.Zero, "The primary adapter should carry the new lease");
+            AssertSecondAdapterUntouched(adapter, second, "after the new lease");
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("DHCP release threw with two adapters registered: " + ex.Message);
+        }
+        finally
+        {
+            UnregisterSecondAdapter(second);
+        }
     }
 
     // ==================== ICMP Tests ====================
@@ -696,6 +856,88 @@ public class Kernel : Sys.Kernel
         udpClient.Close();
     }
 
+    // The receive path reaching a lock another thread holds (#3387). The
+    // callback below runs on the kit worker for every datagram the stack
+    // receives, here the engine's TEST_FROM_HOST, sent every 500 ms, and
+    // takes a lock this thread holds. The receive path used to run with
+    // interrupts masked, so the worker blocked masked on the contended lock:
+    // the tick stopped and the kernel froze until the engine killed it, on
+    // the same three log lines as the CI run. It runs under the stack's own
+    // lock now, with interrupts on, so the worker waits as any thread does,
+    // this thread keeps running, and the worker takes the lock once it is
+    // released. Nothing enters the stack from here while the lock is held:
+    // the waiting worker holds the stack's lock, so that would wait on it.
+    private static void TestUDPHandlerWaitsOnHeldLock()
+    {
+        if (!NetworkManager.Ready)
+        {
+            Assert.True(false, "Network device not ready");
+            return;
+        }
+
+        if (!s_networkConfigured)
+        {
+            TestDHCPConfiguration();
+        }
+
+        s_handlerReached = false;
+        s_handlerEntered = false;
+        UdpDataReceivedHandler? previous = UdpPacket.OnUDPDataReceived;
+        UdpPacket.OnUDPDataReceived = TakeHandlerGate;
+
+        bool reached;
+        bool enteredWhileHeld;
+        s_handlerGate.Enter();
+        try
+        {
+            int waited = 0;
+            while (!s_handlerReached && waited < 3000)
+            {
+                TimerManager.Wait(10);
+                waited += 10;
+            }
+
+            reached = s_handlerReached;
+
+            // Leave the worker waiting for a few ticks: this thread only runs
+            // again if the waiting worker gave the CPU away.
+            TimerManager.Wait(100);
+            enteredWhileHeld = s_handlerEntered;
+        }
+        finally
+        {
+            s_handlerGate.Exit();
+        }
+
+        int waitedAfter = 0;
+        while (!s_handlerEntered && waitedAfter < 3000)
+        {
+            TimerManager.Wait(10);
+            waitedAfter += 10;
+        }
+
+        UdpPacket.OnUDPDataReceived = previous;
+
+        Log.WriteString("[Test] Handler reached the held lock: ");
+        Log.WriteString(reached ? "yes" : "no");
+        Log.WriteString(", took it once released: ");
+        Log.WriteString(s_handlerEntered ? "yes" : "no");
+        Log.WriteString("\n");
+
+        Assert.True(reached, "A datagram should reach the callback while the lock is held");
+        Assert.False(enteredWhileHeld, "The callback should wait while this thread holds the lock");
+        Assert.True(s_handlerEntered, "The callback should take the lock once it is released");
+    }
+
+    private static void TakeHandlerGate(UdpPacket packet)
+    {
+        s_handlerReached = true;
+        lock (s_handlerGate)
+        {
+            s_handlerEntered = true;
+        }
+    }
+
     // ==================== Packet Seam Tests ====================
 
     private static void TestPacketSeamCraftedEchoRoundTrip()
@@ -959,13 +1201,15 @@ public class Kernel : Sys.Kernel
             var listener = new DotNetTcpListener(IPAddress.Any, TcpServerPort);
             listener.Start();
 
-            Log.WriteString("[Test] Listening, waiting for connection from test runner...\n");
+            // The listener is up: ask the engine to connect now, so the SYN
+            // leaves while something answers it.
+            TR.RequestHost(TcpConnectRequest);
+            Log.WriteString("[Test] Listening, asked the test runner to connect...\n");
 
-            // Wait for connection from test runner (it connects after a delay)
             DotNetTcpClient? client = null;
             int waitTime = 0;
 
-            while (client == null && waitTime < 10000)
+            while (client == null && waitTime < TcpAcceptWaitMilliseconds)
             {
                 if (listener.Pending())
                 {

@@ -6,6 +6,7 @@
 .global _native_cpu_enable_interrupts
 .global _native_cpu_save_irq_and_disable
 .global _native_cpu_restore_irq
+.global _native_cpu_read_irq_flags
 .global _native_cpu_read_cr3
 .global _native_cpu_invlpg
 .global _native_cpu_rdmsr
@@ -39,6 +40,13 @@ _native_cpu_save_irq_and_disable:
 _native_cpu_restore_irq:
     push    rdi
     popfq
+    ret
+
+// Read RFLAGS without changing it: the interrupt state, with no window closed.
+// Returns: RFLAGS in RAX.
+_native_cpu_read_irq_flags:
+    pushfq
+    pop     rax
     ret
 
 // Read Time Stamp Counter

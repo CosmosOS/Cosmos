@@ -8,8 +8,9 @@ namespace Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
 /// The contract a USB host controller driver implements for the kit: how
 /// a device on a port gets its address and how its state is freed again.
 /// The host driver binds the controller's own node (a PCI function for
-/// xHCI), creates a <see cref="UsbBus"/> over this object from its probe,
-/// and owns every register, ring, context and DMA page; the kit never
+/// xHCI, EHCI and OHCI), creates a <see cref="UsbBus"/> over this object
+/// from its probe, and owns every register, ring, descriptor list, context
+/// and DMA page; the kit never
 /// publishes a node for the controller itself. A host implements the
 /// protected members; the kit calls them through the internal ones, so a
 /// class driver holding a reference can reach neither.
@@ -17,7 +18,7 @@ namespace Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
 [Experimental(Experimentals.DriverKitSeamDiagId)]
 public abstract class UsbHostController
 {
-    /// <summary>A short name for logs, <c>"xHCI"</c>.</summary>
+    /// <summary>A short name for logs, <c>"xHCI"</c>, <c>"EHCI"</c> or <c>"OHCI"</c>.</summary>
     public abstract string Name { get; }
 
     /// <summary>Creates the contract half of a host controller.</summary>

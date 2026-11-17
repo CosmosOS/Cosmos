@@ -392,3 +392,22 @@ driver kit: IAudioOutput "hda"                                           (HdAudi
         │  16 KiB cyclic DMA buffer, drained on the codec's clock
 HD Audio controller → codec converter → pin → speakers (or QEMU's audio backend)
 ```
+
+## Summary
+
+| Task | Call |
+|---|---|
+| Check that audio is compiled in | `AudioManager.IsEnabled` |
+| Get the primary output | `AudioManager.Primary` |
+| List the outputs | `AudioManager.Count`, `AudioManager.TryGet(index, out device)` |
+| Play on another output | `new AudioPlayer(device).Play(stream)`, `AudioPlayback.TryStart(device, stream, owned, out playback)` |
+| Play a tone | `Console.Beep()`, `Console.Beep(frequency, duration)` |
+| Read a WAV file held in memory | `MemoryAudioStream.FromWave(file)` |
+| Play a stream and wait for its end | `AudioManager.Play(stream)` |
+| Stream a WAV file off a volume | `VfsManager.TryOpenFile(path, out file)`, `WaveAudioStream.TryOpen(file, out stream)` |
+| Play a stream in the background | `AudioManager.TryStartPlayback(stream, owned, out playback)` |
+| Follow a background playback | `AudioPlayback.IsPlaying`, `AudioPlayback.State` |
+| Stop a playback early | `AudioPlayback.Stop()` |
+| Play a buffer of samples | `new MemoryAudioStream(format, sampleRate, data)` |
+| Compute a sound as it is read | `AudioStream.Format`, `SampleRate`, `Depleted`, `Read(destination)` |
+| Write frames to an output yourself | `AudioDevice.TrySetFormat(format, sampleRate)`, `Start()`, `Write(frames)`, `Stop()` |

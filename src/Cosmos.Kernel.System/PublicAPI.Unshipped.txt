@@ -236,6 +236,12 @@ Cosmos.Kernel.System.FileSystem.IInodeOperations.SetAttr(Cosmos.Kernel.System.Fi
 Cosmos.Kernel.System.FileSystem.IInodeOperations.Symlink(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name, System.ReadOnlySpan<char> target, out Cosmos.Kernel.System.FileSystem.IVfsInode? inode) -> bool
 Cosmos.Kernel.System.FileSystem.IInodeOperations.TryReadLink(Cosmos.Kernel.System.FileSystem.IVfsInode! symlink, out string? target) -> bool
 Cosmos.Kernel.System.FileSystem.IInodeOperations.Unlink(Cosmos.Kernel.System.FileSystem.IVfsInode! dir, System.ReadOnlySpan<char> name) -> bool
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.Iso9660FileSystemType() -> void
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.Iso9660FileSystemType(Cosmos.Kernel.HAL.Devices.Storage.IBlockDevice! device) -> void
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.TryDestroy(System.ReadOnlySpan<char> source) -> bool
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.TryFormat(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.IVfsFormatOptions? options) -> bool
+Cosmos.Kernel.System.FileSystem.Iso9660.Iso9660FileSystemType.TryMount(System.ReadOnlySpan<char> source, Cosmos.Kernel.System.FileSystem.MountFlags flags, out Cosmos.Kernel.System.FileSystem.IVfsSuperblock? superblock) -> bool
 Cosmos.Kernel.System.FileSystem.ISuperblockOperations
 Cosmos.Kernel.System.FileSystem.ISuperblockOperations.Drop(Cosmos.Kernel.System.FileSystem.IVfsSuperblock! superblock) -> void
 Cosmos.Kernel.System.FileSystem.ISuperblockOperations.StatFs(Cosmos.Kernel.System.FileSystem.IVfsSuperblock! superblock, out Cosmos.Kernel.System.FileSystem.VfsStatFs statFs) -> bool
@@ -277,6 +283,7 @@ Cosmos.Kernel.System.FileSystem.IVfsOpenFile.Position.get -> long
 Cosmos.Kernel.System.FileSystem.IVfsOpenFile.Position.set -> void
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock.BlockSize.get -> long
+Cosmos.Kernel.System.FileSystem.IVfsSuperblock.IsReadOnly.get -> bool
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock.MaxNameLength.get -> ulong
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock.Root.get -> Cosmos.Kernel.System.FileSystem.IVfsInode!
 Cosmos.Kernel.System.FileSystem.IVfsSuperblock.SuperOperations.get -> Cosmos.Kernel.System.FileSystem.ISuperblockOperations!
@@ -323,6 +330,8 @@ Cosmos.Kernel.System.FileSystem.VfsMode.Socket = Cosmos.Kernel.System.FileSystem
 Cosmos.Kernel.System.FileSystem.VfsMode.Sticky = 512 -> Cosmos.Kernel.System.FileSystem.VfsMode
 Cosmos.Kernel.System.FileSystem.VfsMode.SymbolicLink = Cosmos.Kernel.System.FileSystem.VfsMode.CharacterDevice | Cosmos.Kernel.System.FileSystem.VfsMode.RegularFile -> Cosmos.Kernel.System.FileSystem.VfsMode
 Cosmos.Kernel.System.FileSystem.VfsMount
+Cosmos.Kernel.System.FileSystem.VfsMount.Flags.get -> Cosmos.Kernel.System.FileSystem.MountFlags
+Cosmos.Kernel.System.FileSystem.VfsMount.IsReadOnly.get -> bool
 Cosmos.Kernel.System.FileSystem.VfsMount.MountPoint.get -> string!
 Cosmos.Kernel.System.FileSystem.VfsMount.Name.get -> string!
 Cosmos.Kernel.System.FileSystem.VfsMount.Partition.get -> Cosmos.Kernel.System.Storage.Partition?
@@ -674,6 +683,8 @@ Cosmos.Kernel.System.Input.Layouts.USDvorakLayout
 Cosmos.Kernel.System.Input.Layouts.USDvorakLayout.USDvorakLayout() -> void
 Cosmos.Kernel.System.Input.Layouts.USStandardLayout
 Cosmos.Kernel.System.Input.Layouts.USStandardLayout.USStandardLayout() -> void
+Cosmos.Kernel.System.Input.Layouts.ITStandardLayout
+Cosmos.Kernel.System.Input.Layouts.ITStandardLayout.ITStandardLayout() -> void
 Cosmos.Kernel.System.Input.MouseManager
 Cosmos.Kernel.System.Internal.KernelEntry
 Cosmos.Kernel.System.Kernel
@@ -724,6 +735,7 @@ Cosmos.Kernel.System.Network.AddressNumericStyle.Dec = 0 -> Cosmos.Kernel.System
 Cosmos.Kernel.System.Network.AddressNumericStyle.Hex = 1 -> Cosmos.Kernel.System.Network.AddressNumericStyle
 Cosmos.Kernel.System.Network.DhcpClient
 Cosmos.Kernel.System.Network.DhcpClient.DhcpClient() -> void
+Cosmos.Kernel.System.Network.DhcpClient.DhcpClient(Cosmos.Kernel.System.Network.NetworkAdapter adapter) -> void
 Cosmos.Kernel.System.Network.DhcpClient.SendDiscoverPacket() -> int
 Cosmos.Kernel.System.Network.DhcpClient.SendReleasePacket() -> void
 Cosmos.Kernel.System.Network.DnsClient
@@ -1030,6 +1042,7 @@ static Cosmos.Kernel.System.Internal.KernelEntry.Start(Cosmos.Kernel.System.Kern
 static Cosmos.Kernel.System.Kernel.Current.get -> Cosmos.Kernel.System.Kernel?
 static Cosmos.Kernel.System.KernelFeatures.Audio.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Fat.get -> bool
+static Cosmos.Kernel.System.KernelFeatures.FinalizerThread.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Graphics.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Interrupts.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Keyboard.get -> bool
@@ -1243,6 +1256,7 @@ virtual Cosmos.Kernel.System.Sessions.ConsoleSession.OnWritten(char value, bool 
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacket.TransactionID.get -> ushort
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketAnswer
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketAnswer.DnsPacketAnswer(byte[]! rawData) -> void
+[COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketAnswer.Truncated.get -> bool
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketQuery
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketQuery.DnsPacketQuery(byte[]! rawData) -> void
 [COSMOS0002]Cosmos.Kernel.System.Network.Protocols.Dns.DnsPacketQuery.DnsPacketQuery(Cosmos.Kernel.System.Network.Address! source, Cosmos.Kernel.System.Network.Address! dest, string! url, ushort recordType = 1) -> void

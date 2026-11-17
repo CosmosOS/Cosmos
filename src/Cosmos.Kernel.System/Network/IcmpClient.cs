@@ -57,10 +57,13 @@ public sealed class IcmpClient : IDisposable
         // Reconnecting to a second host has to drop the first registration:
         // s_clients is static, so a stale entry both misroutes replies and
         // roots this client for the life of the kernel.
-        Close();
+        using (NetworkStackLock.Enter())
+        {
+            Close();
 
-        _destination = dest;
-        s_clients[dest] = this;
+            _destination = dest;
+            s_clients[dest] = this;
+        }
     }
 
     /// <summary>
@@ -68,9 +71,12 @@ public sealed class IcmpClient : IDisposable
     /// </summary>
     public void Close()
     {
-        if (_destination is not null)
+        using (NetworkStackLock.Enter())
         {
-            s_clients.Remove(_destination);
+            if (_destination is not null)
+            {
+                s_clients.Remove(_destination);
+            }
         }
     }
 
@@ -132,12 +138,7 @@ public sealed class IcmpClient : IDisposable
             waited += 10;
         }
 
-        if (_rxBuffer.Count < 1)
-        {
-            return null;
-        }
-
-        return _rxBuffer.Dequeue();
+        return TryDequeue(out IcmpPacket? packet) ? packet : null;
     }
 
     /// <summary>
@@ -158,12 +159,12 @@ public sealed class IcmpClient : IDisposable
             waited += 10;
         }
 
-        if (_rxBuffer.Count < 1)
+        if (!TryDequeue(out IcmpPacket? received))
         {
             return -1;
         }
 
-        IcmpEchoReply packet = new(_rxBuffer.Dequeue().RawData);
+        IcmpEchoReply packet = new(received.RawData);
         source.Address = packet.SourceIP;
 
         return waited;
@@ -176,6 +177,20 @@ public sealed class IcmpClient : IDisposable
     internal void ReceiveData(IcmpPacket packet)
     {
         _rxBuffer.Enqueue(packet);
+    }
+
+    /// <summary>
+    /// Takes the oldest queued reply, under the stack's lock: the receive
+    /// path queues replies from the kit worker.
+    /// </summary>
+    /// <param name="packet">The reply, when one was queued.</param>
+    /// <returns>True when a reply was taken.</returns>
+    private bool TryDequeue([NotNullWhen(true)] out IcmpPacket? packet)
+    {
+        using (NetworkStackLock.Enter())
+        {
+            return _rxBuffer.TryDequeue(out packet);
+        }
     }
 
     /// <summary>

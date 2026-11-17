@@ -274,9 +274,10 @@ public static class SchedulerManager
     }
 
     /// <summary>
-    /// Allocates a new unique thread ID.
+    /// Allocates a new unique thread ID. Atomic: threads are created from any
+    /// thread, and a bare increment read by two of them handed out one id twice.
     /// </summary>
-    internal static uint AllocateThreadId() => s_nextThreadId++;
+    internal static uint AllocateThreadId() => Interlocked.Increment(ref s_nextThreadId) - 1;
 
     // ========== Thread Entry Dispatch ==========
     [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "StartThread")]
@@ -469,7 +470,7 @@ public static class SchedulerManager
                 {
                     continue;
                 }
-                if ((t.Flags & SchedulerThreadFlags.IdleThread) != 0)
+                if (t.IsIdle)
                 {
                     continue;
                 }
@@ -548,7 +549,7 @@ public static class SchedulerManager
         {
             if (s_allThreads[i] == thread)
             {
-                if ((thread.Flags & SchedulerThreadFlags.IdleThread) == 0)
+                if (!thread.IsIdle)
                 {
                     s_exitedNonIdleRuntimeNs += thread.TotalRuntime;
                 }
@@ -622,6 +623,13 @@ public static class SchedulerManager
                 return;
             }
 
+            // The hook runs before the state changes, so the policy sees what
+            // the thread is waking from (Blocked, Sleeping, or Created for a
+            // first start), the same order MarkSleeping keeps for
+            // OnThreadBlocked. Interrupts are masked, so nothing observes the
+            // thread queued but not yet Ready.
+            s_currentScheduler.OnThreadReady(state, thread);
+
             // Only set to Ready if not a new thread (Created).
             // New threads stay Created until they actually start running.
             // This allows ScheduleFromInterrupt to detect first-time execution.
@@ -629,8 +637,6 @@ public static class SchedulerManager
             {
                 thread.State = SchedulerThreadState.Ready;
             }
-
-            s_currentScheduler.OnThreadReady(state, thread);
 
             // Ask the next hardware-IRQ exit to reschedule: when this wake
             // comes from an ISR (InterruptEvent.Signal), the woken thread
@@ -772,18 +778,33 @@ public static class SchedulerManager
     /// time, out of the time of the threads that could run. Returns at once
     /// when a wake already landed. The idle thread, and any thread before the
     /// controller can raise the interrupt, halts instead. Thread context,
-    /// interrupts enabled.
+    /// interrupts enabled: a thread that parks with interrupts masked is
+    /// stopped with a panic naming the wait it came from, since the
+    /// reschedule interrupt and the tick both stay pending and nothing can
+    /// switch away from it or wake it.
     /// </summary>
     /// <param name="thread">The calling thread.</param>
-    internal static void Park(SchedulerThread thread)
+    /// <param name="waiter">The member that parks, for the panic. Filled in by the compiler.</param>
+    /// <param name="file">Its source file. Filled in by the compiler.</param>
+    /// <param name="line">Its line. Filled in by the compiler.</param>
+    internal static void Park(
+        SchedulerThread thread,
+        [CallerMemberName] string waiter = "",
+        [CallerFilePath] string file = "",
+        [CallerLineNumber] int line = 0)
     {
         if (!IsParked(thread))
         {
             return;
         }
 
+        if (!InternalCpu.InterruptsEnabled)
+        {
+            PanicMaskedPark(thread, waiter, file, line);
+        }
+
         PerCpuState[]? states = s_cpuStates;
-        if (states is not null && thread.CpuId < s_cpuCount && (thread.Flags & SchedulerThreadFlags.IdleThread) == 0)
+        if (states is not null && thread.CpuId < s_cpuCount && !thread.IsIdle)
         {
             Volatile.Write(ref states[thread.CpuId]._needReschedule, true);
             if (InterruptManager.TryRaiseReschedule())
@@ -804,6 +825,28 @@ public static class SchedulerManager
         {
             InternalCpu.Halt();
         }
+    }
+
+    /// <summary>
+    /// Stops the kernel for a thread that parked with interrupts masked, the
+    /// freeze of #3387: a wait under an interrupt mask, or under a spinlock
+    /// taken with <see cref="SpinLock.AcquireIrqSafe"/>, spun with the timer
+    /// masked until a watchdog killed the machine, and the log ended on the
+    /// wait without saying who waited. Allocation-free.
+    /// </summary>
+    [DoesNotReturn]
+    private static void PanicMaskedPark(SchedulerThread thread, string waiter, string file, int line)
+    {
+        Serial.WriteString("[SCHED] Thread ");
+        Serial.WriteNumber(thread.Id);
+        Serial.WriteString(" parked with interrupts masked\n");
+        Panic.Halt(
+            "A thread blocked with interrupts masked: the reschedule interrupt and the tick stay pending, "
+            + "so nothing can switch away from it or wake it. Leave the masked section (or the IRQ-safe "
+            + "spinlock) before waiting, or take a lock that blocks instead.",
+            waiter,
+            file,
+            line);
     }
 
     /// <summary>
@@ -1022,7 +1065,8 @@ public static class SchedulerManager
     /// <param name="elapsedNs">Nanoseconds since last tick.</param>
     internal static void OnTimerInterrupt(uint cpuId, nuint currentRsp, ulong elapsedNs)
     {
-        s_tickCount++;
+        // Atomic: one tick per CPU, and the counters are read from any thread.
+        uint tick = Interlocked.Increment(ref s_tickCount);
 
         // Recorded before the early returns below, so the period is readable
         // whether or not the scheduler is armed yet. The timer owns this
@@ -1034,7 +1078,7 @@ public static class SchedulerManager
         // Refresh the debug-live snapshot every 10 ticks (~100ms at 100Hz)
         // so the host-side QMP poller sees fresh thread state without
         // pausing the kernel.
-        if ((s_tickCount % SnapshotRefreshTickInterval) == 0)
+        if ((tick % SnapshotRefreshTickInterval) == 0)
         {
             Runtime.DebugLiveSnapshot.Update();
             Runtime.DebugLiveGCSnapshot.Update();
@@ -1045,10 +1089,10 @@ public static class SchedulerManager
         // live. This runs in the timer ISR with interrupts masked, and a
         // periodic line would stall every IRQ on polled UART bytes for the
         // whole uptime.
-        if (s_tickCount <= InitialTickLogCount)
+        if (tick <= InitialTickLogCount)
         {
             Serial.WriteString("[SCHED] Tick ");
-            Serial.WriteNumber(s_tickCount);
+            Serial.WriteNumber(tick);
             Serial.WriteString(" enabled=");
             Serial.WriteString(s_enabled ? "1" : "0");
             Serial.WriteString("\n");
@@ -1188,7 +1232,7 @@ public static class SchedulerManager
 
         if (next != prev)
         {
-            s_switchCount++;
+            Interlocked.Increment(ref s_switchCount);
 
             /*
             Serial.WriteString("[SCHED] Context switch: thread ");

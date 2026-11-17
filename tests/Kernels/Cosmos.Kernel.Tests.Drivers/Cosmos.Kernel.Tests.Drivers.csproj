@@ -14,21 +14,30 @@
     <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
   </PropertyGroup>
 
-  <!-- Four cells on x64 and five on arm64: bare, where the synthetic groups
+  <!-- Eight cells on x64 and nine on arm64: bare, where the synthetic groups
        need no hardware and the hardware group reads what the machine carries
        by default (the PCI host on both arches; q35's default e1000e on x64,
        while virt's default NIC is a virtio-net-pci function that the kit's
        VirtioNetDriver binds, so the E1000E tests skip there); usb-kbd, which
        adds a qemu-xhci controller with a usb-kbd plugged in at boot for the
-       USB keyboard group, which skips elsewhere; usb-mouse, the same
-       controller with a usb-mouse for the USB mouse group; virtio-blk-pci, a virtio-blk
-       disk behind a PCI Express root port for the virtio-blk and root port
-       groups; and, on arm64 alone, virtio-blk-mmio, the same disk in the virt
-       machine's window.
+       USB host and USB keyboard groups, which skip elsewhere; usb-kbd-ehci,
+       usb-kbd-ohci and usb-kbd-ohci-hub, the same keyboard on a usb-ehci, on
+       a pci-ohci and behind a usb-hub on a pci-ohci, and usb-kbd-ehci-ohci,
+       an ICH9 EHCI with a pci-ohci companion the full-speed keyboard is
+       handed to, so the two groups run once per shipped host driver (the
+       four drop q35's default NIC, which would take the controllers' legacy
+       line); usb-mouse, the xHCI with a usb-mouse for the USB mouse group;
+       virtio-blk-pci, a virtio-blk disk behind a PCI Express root port for
+       the virtio-blk and root port groups; and, on arm64 alone,
+       virtio-blk-mmio, the same disk in the virt machine's window.
        Definitions live in tests/profiles.json. -->
   <ItemGroup>
     <CosmosTestProfile Include="bare" />
     <CosmosTestProfile Include="usb-kbd" />
+    <CosmosTestProfile Include="usb-kbd-ehci" />
+    <CosmosTestProfile Include="usb-kbd-ohci" />
+    <CosmosTestProfile Include="usb-kbd-ehci-ohci" />
+    <CosmosTestProfile Include="usb-kbd-ohci-hub" />
     <CosmosTestProfile Include="usb-mouse" />
     <CosmosTestProfile Include="virtio-blk-pci" />
     <CosmosTestProfile Include="virtio-blk-mmio" />

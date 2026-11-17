@@ -247,11 +247,14 @@ public partial class Engine
 
                 // Every boot starts with the sticks, the hot-pluggable PCI
                 // disks and the keyboard plugged in, and a QEMU of its own
-                // with a monitor for the hot-plug and input requests.
-                await using QemuMonitor monitor = QemuMonitor.For(disks, profile.KeyboardDevice);
+                // with a monitor for the hot-plug and input requests; the
+                // monitor learns the USB host controller so a replug lands
+                // on the bus, the port and the device version of the boot.
+                await using QemuMonitor monitor = QemuMonitor.For(disks, profile.KeyboardDevice, profile.UsbController, profile.UsbDeviceVersion, profile.UsbHub);
                 QemuRunResult result = await _qemuHost.RunKernelAsync(
                     bootIsoPath, bootLogPath, _config.TimeoutSeconds, _config.ShouldShowDisplay, enableNetworkTesting, disks, profile.MachineOptions,
-                    new ProfileDevices(profile.NetworkCard, profile.KeyboardDevice, profile.MouseDevice, profile.VgaAdapter, profile.GpuDevice, profile.AudioDevice),
+                    new ProfileDevices(profile.NetworkCard, profile.KeyboardDevice, profile.MouseDevice, profile.VgaAdapter, profile.GpuDevice, profile.AudioDevice,
+                        profile.UsbController, profile.UsbDeviceVersion, profile.UsbHub),
                     monitor);
 
                 combinedLog.Append(result.UartLog);

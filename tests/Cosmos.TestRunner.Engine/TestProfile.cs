@@ -39,6 +39,24 @@ public sealed record TestProfile
     public string? MouseDevice { get; init; }
 
     /// <summary>
+    /// The host controller the USB disks, the USB keyboard and the USB mouse
+    /// sit on (<c>usbController</c>): the xHCI unless the profile names
+    /// <c>ehci</c>, <c>ohci</c> or <c>ehci-ohci</c>, an ICH9 EHCI with an
+    /// OHCI companion that takes the full-speed devices.
+    /// </summary>
+    public UsbHostControllerModel UsbController { get; init; } = UsbHostControllerModel.Xhci;
+
+    /// <summary>
+    /// The USB version the usb-kbd and usb-mouse present (<c>usbDeviceVersion</c>):
+    /// 2, or 1 for a device with the full-speed descriptor set alone, which
+    /// an EHCI hands to its companion.
+    /// </summary>
+    public int UsbDeviceVersion { get; init; } = QemuLauncher.DefaultUsbDeviceVersion;
+
+    /// <summary>Whether a usb-hub sits on root port 1 with the keyboard behind it, on its port 1 (<c>usbHub</c>); the hub is full speed only and needs an OHCI.</summary>
+    public bool UsbHub { get; init; }
+
+    /// <summary>
     /// VGA adapter to swap in for the architecture default, as a QEMU
     /// <c>-vga</c> backend name (e.g. <c>vmware</c>), or null to leave the
     /// default in place. Replaces rather than adds: a second display adapter
@@ -503,6 +521,42 @@ public static class TestProfileLoader
                 }
             }
 
+            // The USB host controller axis: the launcher's four spellings,
+            // the two device versions QEMU's HID devices take, a full-speed
+            // device only where a full-speed port exists, and a hub only
+            // where its full speed can attach. Each is checked here so a
+            // typo fails the catalog rather than a cell minutes later.
+            UsbHostControllerModel usbController = UsbHostControllerModel.Xhci;
+            string? usbControllerName = NullIfBlank(entry.UsbController);
+            if (usbControllerName is not null && !QemuLauncher.TryParseUsbController(usbControllerName, out usbController))
+            {
+                throw new InvalidOperationException(
+                    $"{path}: profile '{entry.Name}' names unknown USB host controller '{usbControllerName}'. Expected {QemuLauncher.UsbControllerNames}.");
+            }
+
+            int usbDeviceVersion = entry.UsbDeviceVersion ?? QemuLauncher.DefaultUsbDeviceVersion;
+            if (usbDeviceVersion != QemuLauncher.DefaultUsbDeviceVersion && usbDeviceVersion != QemuLauncher.FullSpeedUsbDeviceVersion)
+            {
+                throw new InvalidOperationException(
+                    $"{path}: profile '{entry.Name}' sets usbDeviceVersion to {usbDeviceVersion}; QEMU's usb-kbd and usb-mouse take {QemuLauncher.FullSpeedUsbDeviceVersion} or {QemuLauncher.DefaultUsbDeviceVersion}.");
+            }
+
+            // usb-ehci's root ports are high speed only and the standalone
+            // model has no companion to hand a full-speed device to, so
+            // QEMU refuses the attach at startup.
+            if (usbDeviceVersion == QemuLauncher.FullSpeedUsbDeviceVersion && usbController == UsbHostControllerModel.Ehci)
+            {
+                throw new InvalidOperationException(
+                    $"{path}: profile '{entry.Name}' sets usbDeviceVersion {QemuLauncher.FullSpeedUsbDeviceVersion} on the 'ehci' controller; usb-ehci's ports are high speed only, so a full-speed-only device cannot attach (use 'ohci' or 'ehci-ohci').");
+            }
+
+            bool usbHub = entry.UsbHub ?? false;
+            if (usbHub && !QemuLauncher.TakesUsbHub(usbController))
+            {
+                throw new InvalidOperationException(
+                    $"{path}: profile '{entry.Name}' sets usbHub on the '{usbControllerName ?? "xhci"}' controller; the hub is full speed only and needs 'ohci' or 'ehci-ohci'.");
+            }
+
             profiles[entry.Name] = new TestProfile
             {
                 Name = entry.Name,
@@ -510,6 +564,9 @@ public static class TestProfileLoader
                 NetworkCard = NullIfBlank(entry.Nic),
                 KeyboardDevice = NullIfBlank(entry.Keyboard),
                 MouseDevice = NullIfBlank(entry.Mouse),
+                UsbController = usbController,
+                UsbDeviceVersion = usbDeviceVersion,
+                UsbHub = usbHub,
                 VgaAdapter = NullIfBlank(entry.Vga),
                 GpuDevice = NullIfBlank(entry.Gpu),
                 AudioDevice = NullIfBlank(entry.Audio),
@@ -624,6 +681,11 @@ public static class TestProfileLoader
         string? Nic,
         string? Keyboard,
         string? Mouse,
+        // The USB host controller axis: xhci, ehci, ohci or ehci-ohci; 1 or
+        // 2 for the HID devices' USB version; a usb-hub on port 1.
+        string? UsbController,
+        int? UsbDeviceVersion,
+        bool? UsbHub,
         string? Vga,
         string? Gpu,
         string? Audio,

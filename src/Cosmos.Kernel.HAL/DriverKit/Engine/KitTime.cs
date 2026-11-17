@@ -35,7 +35,7 @@ internal static class KitTime
         get
         {
             SchedulerThread? current = CurrentThread;
-            return current is not null && (current.Flags & SchedulerThreadFlags.IdleThread) == 0;
+            return current is not null && !current.IsIdle;
         }
     }
 

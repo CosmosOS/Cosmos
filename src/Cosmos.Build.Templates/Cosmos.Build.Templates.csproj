@@ -33,8 +33,9 @@
 
   <!-- Each template's own files keep their path in the package. The files the
        templates share (the bootloader configuration, the VS Code tasks and
-       launch configurations, the native source folder) live once under
-       templates\common and are packed into each template's folder. -->
+       launch configurations, the native source folder, the icon Visual Studio
+       shows for the template) live once under templates\common and are packed
+       into each template's folder. -->
   <ItemGroup>
     <Content Include="templates\**\*" Exclude="templates\common\**;@(KernelTemplateProject)" />
     <Content Include="templates\common\**\*" PackagePath="content\templates\cosmos-kernel-csharp" />

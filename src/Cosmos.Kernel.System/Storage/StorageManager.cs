@@ -120,10 +120,12 @@ public static class StorageManager
 
     /// <summary>
     /// Gets the primary block device: the first entry of <see cref="Devices"/>
-    /// in the manager's order (a kit disk before a hand-registered one, the
+    /// in the manager's order (a writable disk before a read-only medium
+    /// such as a CD-ROM, a kit disk before a hand-registered one, the
     /// lowest node path among kit disks, then registration order), or
     /// <see langword="null"/> when storage is compiled out or no device is
-    /// registered.
+    /// registered. A kernel booted from a CD with no disk attached gets
+    /// the CD.
     /// </summary>
     public static IBlockDevice? PrimaryDevice
     {
@@ -140,9 +142,11 @@ public static class StorageManager
     public static int DeviceCount => s_devices?.Length ?? 0;
 
     /// <summary>
-    /// Every registered block device, in the manager's order: kit disks by
-    /// node path, then hand-registered disks in registration order. Empty
-    /// before initialization and when storage support is compiled out.
+    /// Every registered block device, in the manager's order: writable
+    /// devices first, kit disks by node path, then hand-registered disks in
+    /// registration order, and read-only media (a CD-ROM drive) after them
+    /// in the same order. Empty before initialization and when storage
+    /// support is compiled out.
     /// </summary>
     public static IReadOnlyList<IBlockDevice> Devices => s_devices ?? [];
 
@@ -464,15 +468,24 @@ public static class StorageManager
     }
 
     /// <summary>
-    /// The order rule: a kit device (one with a node path) before a
-    /// hand-registered one; among kit devices the smaller node path by
-    /// ordinal comparison; equal paths and hand-registered devices compare
-    /// equal, so their registration order holds.
+    /// The order rule: a writable device before a read-only medium (a
+    /// CD-ROM), so <see cref="PrimaryDevice"/> is a disk a kernel can
+    /// write whenever one is there; then a kit device (one with a node
+    /// path) before a hand-registered one; among kit devices the smaller
+    /// node path by ordinal comparison; equal paths and hand-registered
+    /// devices compare equal, so their registration order holds.
     /// </summary>
     /// <param name="left">One entry.</param>
     /// <param name="right">The other.</param>
     private static int Compare(BlockDeviceEntry left, BlockDeviceEntry right)
     {
+        bool leftReadOnly = left.Device is IRemovableMedia { IsReadOnly: true };
+        bool rightReadOnly = right.Device is IRemovableMedia { IsReadOnly: true };
+        if (leftReadOnly != rightReadOnly)
+        {
+            return leftReadOnly ? 1 : -1;
+        }
+
         bool leftKit = left.NodePath is not null;
         bool rightKit = right.NodePath is not null;
         if (leftKit != rightKit)
@@ -512,6 +525,19 @@ public static class StorageManager
     private static List<Partition> ScanPartitions(IBlockDevice device)
     {
         List<Partition> partitions = [];
+
+        // A read-only medium (a CD-ROM) carries no partition table a kernel
+        // could write, and a 2048-byte-sector device reads an ISO's
+        // protective MBR at the wrong granularity anyway: its entries are
+        // in 512-byte units. The whole medium is its one partition, so a
+        // mount by index reaches the volume, as the Partitions contract
+        // promises for an unpartitioned host.
+        if (device is IRemovableMedia { IsReadOnly: true })
+        {
+            partitions.Add(new Partition(device, 0, device.BlockCount, 0u));
+            return partitions;
+        }
+
         try
         {
             if (Gpt.IsGpt(device))

@@ -690,7 +690,7 @@ internal static unsafe partial class libSystemNative
         return release;
     }
 
-    private static ulong GetMonotonicNs()
+    internal static ulong GetMonotonicNs()
     {
         long ticks = Stopwatch.GetTimestamp();
         long freq = Stopwatch.Frequency;

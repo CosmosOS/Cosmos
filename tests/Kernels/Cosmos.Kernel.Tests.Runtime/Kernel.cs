@@ -39,10 +39,10 @@
 //            100%  = every return value / out param / buffer state asserted against expected
 //
 // Summary:
-//   120 runtime exports implemented in src/Cosmos.Kernel.Core/Runtime/
-//   103 tests written in this file, covering 95 distinct endpoints (79%)
+//   121 runtime exports implemented in src/Cosmos.Kernel.Core/Runtime/ (2 of them in the native Runtime.s)
+//   107 tests written in this file, covering 96 distinct endpoints (79%)
 //    25 implemented endpoints are intentionally NOT directly tested (notes below)
-//    66 endpoints expected by the dotnet NativeAOT CoreLib are NOT implemented
+//    65 endpoints expected by the dotnet NativeAOT CoreLib are NOT implemented
 //
 // ┌───────────────────────────────────────────────────┬─────┬────┬─────┬──────┬───────┬──────┬──────┐
 // │ Endpoint                                          │File │ In │ Out │ Impl │ Tests │ In%  │ Out% │
@@ -51,7 +51,7 @@
 // │ memmove                                           │ Mem │  3 │   0 │ real │   2   │  50  │ 100  │
 // │ memset                                            │ Mem │  3 │   0 │ real │   1   │  33  │ 100  │
 // │ RhAllocateNewArray                                │ Mem │  3 │   1 │ real │   1   │  33  │ 100  │
-// │ RhAllocateNewObject                               │ Mem │  3 │   1 │ real │   1   │  33  │ 100  │
+// │ RhAllocateNewObject                               │ Mem │  3 │   1 │ real │   2   │  67  │ 100  │
 // │ RhHandleFree                                      │ Mem │  1 │   0 │ real │   1   │  33  │  50  │
 // │ RhHandleSet                                       │ Mem │  1 │   0 │ real │   1   │  33  │ 100  │
 // │ RhNewArray                                        │ Mem │  2 │   1 │ real │   1   │  33  │ 100  │
@@ -88,8 +88,8 @@
 // │ RhpAssignRef                                      │ Std │  2 │   0 │ real │   1   │  33  │ 100  │
 // │ RhpByRefAssignRef (ARM64)                         │ Std │  2 │   0 │ real │   -   │   0  │   0  │
 // │ RhpCheckedAssignRef                               │ Std │  2 │   0 │ real │   1   │  33  │ 100  │
-// │ RhpCheckedLockCmpXchg                             │ Std │  4 │   1 │ real │   2   │ 100  │ 100  │
-// │ RhpCheckedXchg                                    │ Std │  2 │   1 │ real │   1   │  33  │ 100  │
+// │ RhpCheckedLockCmpXchg (asm)                       │ Std │  3 │   1 │ real │   2   │ 100  │ 100  │
+// │ RhpCheckedXchg (asm)                              │ Std │  2 │   1 │ real │   1   │  50  │ 100  │
 // │ RhpLdelemaRef                                     │ Std │  3 │   1 │ real │   1   │  33  │ 100  │
 // │ RhpStelemRef                                      │ Std │  3 │   0 │ real │   2   │  67  │ 100  │
 // │ RhSpanHelpers_MemZero                             │ Std │  2 │   0 │ real │   1   │  33  │ 100  │
@@ -110,18 +110,20 @@
 // │ RhGetGenerationSize                               │ GC  │  1 │   1 │ real │   1   │  67  │ 100  │
 // │ RhGetGCSegmentSize                                │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
 // │ RhGetLastGCPercentTimeInGC                        │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
+// │ RhGetMaxGcGeneration                              │ GC  │  0 │   1 │ stub │   1   │  —   │ 100  │
 // │ RhGetMemoryInfo                                   │ GC  │  2 │   0 │ real │   1   │  33  │  50  │
 // │ RhGetTotalAllocatedBytes                          │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
 // │ RhGetTotalAllocatedBytesPrecise                   │ GC  │  0 │   1 │ real │   1   │  —   │ 100  │
 // │ RhIsPromoted                                      │ GC  │  1 │   1 │ stub │   1   │  33  │ 100  │
 // │ RhIsServerGc                                      │ GC  │  0 │   1 │ stub │   1   │  —   │ 100  │
 // │ RhpGcPoll                                         │ Std │  0 │   0 │ stub │   1   │  —   │  50  │
-// │ RhpNewFinalizable                                 │ Std │  1 │   1 │ real │   1   │  33  │ 100  │
+// │ RhpNewFinalizable                                 │ Std │  1 │   1 │ real │   2   │  67  │ 100  │
 // │ RhpTrapThreads                                    │ Std │  0 │   0 │ stub │   1   │  —   │  50  │
 // │ RhRegisterForGCReporting                          │ GC  │  1 │   0 │ stub │   1   │  33  │  50  │
-// │ RhReRegisterForFinalize                           │ Std │  1 │   0 │ stub │   1   │  33  │  50  │
-// │ RhSuppressFinalize                                │ Std │  1 │   0 │ stub │   1   │  33  │  50  │
+// │ RhReRegisterForFinalize                           │ Std │  1 │   0 │ real │   1   │  33  │  50  │
+// │ RhSuppressFinalize                                │ Std │  1 │   0 │ real │   1   │  33  │  50  │
 // │ RhUnregisterForGCReporting                        │ GC  │  1 │   0 │ stub │   1   │  33  │  50  │
+// │ RhWaitForPendingFinalizers                        │ GC  │  1 │   0 │ real │   1   │  33  │ 100  │
 // │ ----- Threading / Runtime Info ------------------ │     │    │     │      │       │      │      │
 // │ DebugDebugger_IsNativeDebuggerAttached            │ Dbg │  0 │   1 │ stub │   1   │  —   │ 100  │
 // │ GetSystemArrayEEType                              │ Std │  0 │   1 │ real │   1   │  —   │ 100  │
@@ -208,6 +210,11 @@
 //                                 exercised by the kernel's own ref-assignment paths
 //                                 on ARM64 CI.
 //
+// Endpoints marked "(asm)" are assembly in Cosmos.Kernel.Native.X64/ARM64 (Runtime.s), with
+// no C# body in src/Cosmos.Kernel.Core/Runtime/: their cells reach them the way CoreLib
+// does (Interlocked.CompareExchange / Exchange on a reference). A second thread racing them
+// is Threading's Interlocked_ReferenceExchange_TwoThreads.
+//
 // =============================================================================
 // MISSING STUBS (expected by dotnet NativeAOT, not implemented in cosmos)
 // =============================================================================
@@ -221,12 +228,12 @@
 //   RhpFirstChanceExceptionNotification, RhpSfiInit, RhpSfiNext,
 //   RhpValidateExInfoStack, RhpGetDispatchCellInfo
 //
-// GC (full / background / server / knobs) (19 — 11 now implemented):
+// GC (full / background / server / knobs) (22):
 //   RhCancelFullGCNotification, RhEndNoGCRegion, RhGetCurrentObjSize,
 //   RhGetGcLatencyMode, RhGetGCNow,
 //   RhGetKnobValues, RhGetLastGCDuration,
 //   RhGetLastGCStartTime, RhGetLoadedOSModules, RhGetLohCompactionMode,
-//   RhGetMaxGcGeneration, RhGetTotalPauseDuration,
+//   RhGetTotalPauseDuration,
 //   RhIsGCBridgeActive, RhpGetNextFinalizableObject,
 //   RhpInitializeGcStress, RhRegisterForFullGCNotification, RhRegisterGcCallout,
 //   RhSetGcLatencyMode, RhSetLohCompactionMode, RhStartNoGCRegion,
@@ -284,7 +291,7 @@ public unsafe class Kernel : Sys.Kernel
         Serial.WriteString("[Runtime] BeforeRun() reached!\n");
         Serial.WriteString("[Runtime] Starting tests...\n");
 
-        TR.Start("Runtime Tests", expectedTests: 103);
+        TR.Start("Runtime Tests", expectedTests: 107);
 
         // ==================== Memory Allocation Stubs ====================
         // -- memmove --
@@ -331,7 +338,7 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("RhBox_NullableNullFlag_ReturnsNull", Test_RhBox_NullableNullFlag_ReturnsNull);
         TR.Run("RhBox_NullableWithValue_Boxes", Test_RhBox_NullableWithValue_Boxes);
         // -- RhBoxAny --
-        TR.Run("RhBoxAny_ReferenceType_Passthrough", Test_RhBoxAny_ReferenceType_Passthrough);
+        TR.Run("RhBoxAny_ReferenceType_ReturnsReferent", Test_RhBoxAny_ReferenceType_ReturnsReferent);
         TR.Run("RhBoxAny_ValueType_DelegatesToRhBox", Test_RhBoxAny_ValueType_DelegatesToRhBox);
         // -- RhUnbox --
         TR.Run("RhUnbox_CopiesValueToDest", Test_RhUnbox_CopiesValueToDest);
@@ -414,6 +421,8 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("RhGetGCSegmentSize_Positive", Test_RhGetGCSegmentSize_Positive);
         // -- RhGetLastGCPercentTimeInGC --
         TR.Run("RhGetLastGCPercentTimeInGC_InRange", Test_RhGetLastGCPercentTimeInGC_InRange);
+        // -- RhGetMaxGcGeneration --
+        TR.Run("RhGetMaxGcGeneration_ReturnsZero", Test_RhGetMaxGcGeneration_ReturnsZero);
         // -- RhGetMemoryInfo --
         TR.Run("RhGetMemoryInfo_Smoke", Test_RhGetMemoryInfo_Smoke);
         // -- RhGetTotalAllocatedBytes --
@@ -427,7 +436,10 @@ public unsafe class Kernel : Sys.Kernel
         // -- RhpGcPoll --
         TR.Run("RhpGcPoll_Smoke", Test_RhpGcPoll_Smoke);
         // -- RhpNewFinalizable --
-        TR.Run("RhpNewFinalizable_Object_NonNull", Test_RhpNewFinalizable_Object_NonNull);
+        TR.Run("RhpNewFinalizable_NonNull", Test_RhpNewFinalizable_NonNull);
+        TR.Run("RhpNewFinalizable_RegistersForFinalization", Test_RhpNewFinalizable_RegistersForFinalization);
+        // -- RhAllocateNewObject, the finalize flag --
+        TR.Run("RhAllocateNewObject_NoFlags_NotRegistered", Test_RhAllocateNewObject_NoFlags_NotRegistered);
         // -- RhpTrapThreads --
         TR.Run("RhpTrapThreads_Smoke", Test_RhpTrapThreads_Smoke);
         // -- RhRegisterForGCReporting / RhUnregisterForGCReporting --
@@ -436,6 +448,8 @@ public unsafe class Kernel : Sys.Kernel
         TR.Run("RhReRegisterForFinalize_Smoke", Test_RhReRegisterForFinalize_Smoke);
         // -- RhSuppressFinalize --
         TR.Run("RhSuppressFinalize_Smoke", Test_RhSuppressFinalize_Smoke);
+        // -- RhWaitForPendingFinalizers --
+        TR.Run("RhWaitForPendingFinalizers_RunsQueuedFinalizers", Test_RhWaitForPendingFinalizers_RunsQueuedFinalizers);
 
         // ==================== Threading / Runtime Info Stubs ====================
         // -- GetSystemArrayEEType --
@@ -807,12 +821,21 @@ public unsafe class Kernel : Sys.Kernel
     }
 
     // -- RhBoxAny --
-    private static void Test_RhBoxAny_ReferenceType_Passthrough()
+    private static void Test_RhBoxAny_ReferenceType_ReturnsReferent()
     {
-        string input = "hello";
-        byte* inputPtr = (byte*)Unsafe.AsPointer(ref input);
-        void* result = Boxing.RhBoxAny(inputPtr, MethodTable.Of<string>());
-        Assert.True(result == inputPtr, "RhBoxAny on reference type must pass through");
+        // CoreLib (ValueType.Equals, Attribute.Equals) passes the address of a
+        // field and, for a reference-typed field, the MethodTable of object:
+        // the boxed value is the reference stored in the field, not the
+        // field's address (CosmosOS/Cosmos#3362).
+        string slot = "hello";
+        byte* slotPtr = (byte*)Unsafe.AsPointer(ref slot);
+        void* referent = *(void**)slotPtr;
+        void* result = Boxing.RhBoxAny(slotPtr, MethodTable.Of<object>());
+        Assert.True(result == referent, "RhBoxAny on a reference field must return the stored reference");
+        Assert.True(result != slotPtr, "RhBoxAny on a reference field must not return the field's address");
+
+        slot = null!;
+        Assert.True(Boxing.RhBoxAny(slotPtr, MethodTable.Of<object>()) == null, "RhBoxAny on a null reference field must return null");
     }
 
     private static void Test_RhBoxAny_ValueType_DelegatesToRhBox()
@@ -1020,14 +1043,24 @@ public unsafe class Kernel : Sys.Kernel
     }
 
     // -- RhpCheckedXchg --
+    // Reached as CoreLib reaches it: Interlocked.Exchange on a reference is a call to
+    // RuntimeImports.InterlockedExchange, which the assembly stub implements.
+    // The values are heap objects: ILC inlines the exchange of a null or a frozen object
+    // (a string literal) itself, without the stub.
     private static void Test_RhpCheckedXchg_SwapsAndReturnsOriginal()
     {
-        int originalSentinel = 1;
-        int newSentinel = 2;
-        void* location = &originalSentinel;
-        void* original = StartupCodeHelpers.InterlockedExchange(&location, &newSentinel);
-        Assert.True(original == &originalSentinel, "RhpCheckedXchg must return original");
-        Assert.True(location == &newSentinel, "RhpCheckedXchg must install new value");
+        object originalSentinel = new object();
+        object newSentinel = new object();
+        object? location = originalSentinel;
+        object? original = Interlocked.Exchange(ref location, newSentinel);
+        Assert.True(ReferenceEquals(original, originalSentinel), "RhpCheckedXchg must return original");
+        Assert.True(ReferenceEquals(location, newSentinel), "RhpCheckedXchg must install new value");
+
+        // From a null location: the previous value is null, the new one goes in.
+        location = null;
+        original = Interlocked.Exchange(ref location, originalSentinel);
+        Assert.True(original is null, "RhpCheckedXchg must return null from a null location");
+        Assert.True(ReferenceEquals(location, originalSentinel), "RhpCheckedXchg must install the value over null");
     }
 
     // -- RhpLdelemaRef --
@@ -1199,6 +1232,13 @@ public unsafe class Kernel : Sys.Kernel
         Assert.True(pct >= 0 && pct <= 100, "RhGetLastGCPercentTimeInGC must be in [0, 100]");
     }
 
+    // -- RhGetMaxGcGeneration --
+    private static void Test_RhGetMaxGcGeneration_ReturnsZero()
+    {
+        int maxGeneration = RuntimeGC.RhGetMaxGcGeneration();
+        Assert.Equal(0, maxGeneration, "RhGetMaxGcGeneration must be 0: the collector has a single generation");
+    }
+
     // -- RhGetMemoryInfo --
     private static void Test_RhGetMemoryInfo_Smoke()
     {
@@ -1248,14 +1288,69 @@ public unsafe class Kernel : Sys.Kernel
     }
 
     // -- RhpNewFinalizable --
-    private static void Test_RhpNewFinalizable_Object_NonNull()
+    private static void Test_RhpNewFinalizable_NonNull()
     {
-        void* raw = StartupCodeHelpers.RhpNewFinalizable(MethodTable.Of<object>());
+        // The helper's contract is a type with a finalizer, as ILC calls it; the pass reads that
+        // type's finalizer slot, which a type without one does not have.
+        void* raw = StartupCodeHelpers.RhpNewFinalizable(MethodTable.Of<FinalizableProbe>());
         Assert.True(raw != null, "RhpNewFinalizable returned null");
 
         object obj = null!;
         *(void**)Unsafe.AsPointer(ref obj) = raw;
         Assert.NotNull(obj, "RhpNewFinalizable result should cast to object");
+    }
+
+    private static void Test_RhpNewFinalizable_RegistersForFinalization()
+    {
+        // The helper's GC_ALLOC_FINALIZE flag is what registers the object: the collection must
+        // queue the dead probe and the wait must run its finalizer.
+        int[] counter = new int[1];
+        CreateProbeThroughRhpNewFinalizable(counter);
+
+        RuntimeGC.RhCollect(0, default);
+        RuntimeGC.RhWaitForPendingFinalizers(0);
+
+        Assert.Equal(1, counter[0], "RhpNewFinalizable must register the object for finalization");
+    }
+
+    private static void Test_RhAllocateNewObject_NoFlags_NotRegistered()
+    {
+        // The flag, not the type, is the request: a finalizable type allocated without it is
+        // reclaimed without its finalizer running, as in .NET.
+        int[] counter = new int[1];
+        CreateProbeWithoutFinalizeFlag(counter);
+
+        RuntimeGC.RhCollect(0, default);
+        RuntimeGC.RhWaitForPendingFinalizers(0);
+
+        Assert.Equal(0, counter[0], "RhAllocateNewObject without GC_ALLOC_FINALIZE must not register the object");
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateProbeThroughRhpNewFinalizable(int[] counter)
+    {
+        void* raw = StartupCodeHelpers.RhpNewFinalizable(MethodTable.Of<FinalizableProbe>());
+        Assert.True(raw != null, "RhpNewFinalizable returned null");
+        InitializeProbe(raw, counter);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateProbeWithoutFinalizeFlag(int[] counter)
+    {
+        void* raw;
+        RuntimeMemory.RhAllocateNewObject(MethodTable.Of<FinalizableProbe>(), GC_ALLOC_FLAGS.GC_ALLOC_NO_FLAGS, &raw);
+        Assert.True(raw != null, "RhAllocateNewObject returned null");
+        InitializeProbe(raw, counter);
+    }
+
+    /// <summary>
+    /// Gives a probe allocated through a raw helper the counter its constructor would have set.
+    /// </summary>
+    private static void InitializeProbe(void* raw, int[] counter)
+    {
+        FinalizableProbe probe = null!;
+        *(void**)Unsafe.AsPointer(ref probe) = raw;
+        probe.SetCounter(counter);
     }
 
     // -- RhpTrapThreads --
@@ -1278,16 +1373,69 @@ public unsafe class Kernel : Sys.Kernel
     private static void Test_RhReRegisterForFinalize_Smoke()
     {
         object obj = new();
-        StartupCodeHelpers.RhReRegisterForFinalize(obj);
-        Assert.True(true, "RhReRegisterForFinalize no-op returned");
+        GCObject* gcObject = (GCObject*)Unsafe.As<object, nint>(ref obj);
+        Assert.True(RuntimeGC.RhReRegisterForFinalize(gcObject), "RhReRegisterForFinalize must succeed");
     }
 
     // -- RhSuppressFinalize --
     private static void Test_RhSuppressFinalize_Smoke()
     {
         object obj = new();
-        StartupCodeHelpers.RhSuppressFinalize(obj);
-        Assert.True(true, "RhSuppressFinalize no-op returned");
+        GCObject* gcObject = (GCObject*)Unsafe.As<object, nint>(ref obj);
+        RuntimeGC.RhSuppressFinalize(gcObject);
+        Assert.True(true, "RhSuppressFinalize returned");
+    }
+
+    // -- RhWaitForPendingFinalizers --
+    private static void Test_RhWaitForPendingFinalizers_RunsQueuedFinalizers()
+    {
+        // The collection queues the dead probe; the wait returns once its finalizer has run,
+        // on the finalizer thread when Kernel.Start turned it on, on this thread otherwise.
+        int[] counter = new int[1];
+        CreateFinalizableProbe(counter);
+
+        RuntimeGC.RhCollect(0, default);
+        RuntimeGC.RhWaitForPendingFinalizers(0);
+
+        Assert.Equal(1, counter[0], "RhWaitForPendingFinalizers must return once the finalizer the collection queued has run");
+    }
+
+    /// <summary>
+    /// Allocates the probe in a frame of its own, so no slot of the caller keeps it reachable.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void CreateFinalizableProbe(int[] counter)
+    {
+        object probe = new FinalizableProbe(counter);
+        if (probe is null)
+        {
+            Assert.Fail("probe allocation returned null");
+        }
+    }
+
+    private sealed class FinalizableProbe
+    {
+        private int[] _counter;
+
+        public FinalizableProbe(int[] counter)
+        {
+            _counter = counter;
+        }
+
+        /// <summary>Sets the counter on a probe a raw allocation helper handed out unconstructed.</summary>
+        public void SetCounter(int[] counter)
+        {
+            _counter = counter;
+        }
+
+        ~FinalizableProbe()
+        {
+            // A probe a raw helper handed out and nothing counted (the smoke cell) has no counter.
+            if (_counter is not null)
+            {
+                _counter[0]++;
+            }
+        }
     }
 
     // =============================================================================
@@ -1363,28 +1511,36 @@ public unsafe class Kernel : Sys.Kernel
     }
 
     // -- RhpCheckedLockCmpXchg --
+    // Reached as CoreLib reaches it: Interlocked.CompareExchange on a reference is a call to
+    // RuntimeImports.InterlockedCompareExchange, which the assembly stub implements. The
+    // comparand and the value are distinct non-null objects, so that ILC cannot inline the
+    // null and frozen-object cases it handles itself.
     private static void Test_RhpCheckedLockCmpXchg_MatchSwaps()
     {
-        object a = "a";
-        object b = "b";
-        object location = a;
-        object* locPtr = (object*)Unsafe.AsPointer(ref location);
+        object a = new object();
+        object b = new object();
+        object? location = a;
         // comparand == *location → value wins
-        object result = StartupCodeHelpers.RhpCheckedLockCmpXchg(locPtr, b, a, 0);
+        object? result = Interlocked.CompareExchange(ref location, b, a);
         Assert.True(ReferenceEquals(result, a), "RhpCheckedLockCmpXchg returns original when comparand matches");
         Assert.True(ReferenceEquals(location, b), "RhpCheckedLockCmpXchg writes value when comparand matches");
     }
 
     private static void Test_RhpCheckedLockCmpXchg_NoMatchKeeps()
     {
-        object a = "first";
-        object b = "second";
-        object location = a;
-        object* locPtr = (object*)Unsafe.AsPointer(ref location);
+        object a = new object();
+        object b = new object();
+        object? location = a;
         // comparand != *location → location stays as a
-        object result = StartupCodeHelpers.RhpCheckedLockCmpXchg(locPtr, b, b, 0);
+        object? result = Interlocked.CompareExchange(ref location, b, b);
         Assert.True(ReferenceEquals(result, a), "RhpCheckedLockCmpXchg returns original when comparand differs");
         Assert.True(ReferenceEquals(location, a), "RhpCheckedLockCmpXchg leaves location unchanged when comparand differs");
+
+        // A null location against a null comparand is a match: the value goes in.
+        location = null;
+        result = Interlocked.CompareExchange(ref location, a, null);
+        Assert.True(result is null, "RhpCheckedLockCmpXchg returns null from a null location");
+        Assert.True(ReferenceEquals(location, a), "RhpCheckedLockCmpXchg writes value over a matching null");
     }
 
     // -- RhpGetTickCount64 --

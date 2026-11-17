@@ -132,14 +132,11 @@ namespace Cosmos.Kernel.Core.Runtime
             *location = value;
         }
 
-        [RuntimeExport("RhpCheckedXchg")]
-        internal static void* InterlockedExchange(void** location1, void* value)
-        {
-            void* original = *location1;
-            *location1 = value;
-            return original;
-        }
-
+        // RhpCheckedXchg and RhpCheckedLockCmpXchg, the reference forms of
+        // Interlocked.Exchange and CompareExchange, are assembly (Runtime.s of
+        // Cosmos.Kernel.Native.X64 and .ARM64): a locked instruction, or an
+        // exclusive load/store loop. In C# they were a read then a write, and a
+        // tick between the two let a second thread's exchange succeed as well.
 
         [RuntimeExport("RhpTrapThreads")]
         internal static void RhpTrapThreads() { }
@@ -165,29 +162,11 @@ namespace Cosmos.Kernel.Core.Runtime
             memmove((byte*)dest, (byte*)src, len);
         }
 
-        [RuntimeExport("RhpCheckedLockCmpXchg")]
-        internal static unsafe object RhpCheckedLockCmpXchg(object* location, object value, object comparand, int typeHandle)
-        {
-            object original = *location;
-            if (original == comparand)
-            {
-                *location = value;
-            }
-
-            return original;
-        }
-
         [RuntimeExport("RhGetProcessCpuCount")]
         internal static int RhGetProcessCpuCount()
         {
             return 1;
         }
-
-        [RuntimeExport("RhSuppressFinalize")]
-        internal static void RhSuppressFinalize(object obj) { }
-
-        [RuntimeExport("RhReRegisterForFinalize")]
-        internal static void RhReRegisterForFinalize(object obj) { }
 
         /// <summary>
         /// Returns the MethodTable* for System.Array. This is used by the runtime when
@@ -202,7 +181,15 @@ namespace Cosmos.Kernel.Core.Runtime
         [RuntimeExport("RhNewObject")]
         internal static unsafe void* RhNewObject(MethodTable* pEEType)
         {
-            return Memory.RhpNewFast(pEEType); // Simplified implementation
+            // The slow allocation path CoreLib takes for MemberwiseClone, GetUninitializedObject
+            // and reflection: the finalizer flag comes from the type, as Runtime.Base's RhNewObject
+            // picks RhpNewFinalizable for a finalizable type.
+            if (pEEType->IsFinalizable)
+            {
+                return RhpNewFinalizable(pEEType);
+            }
+
+            return Memory.RhpNewFast(pEEType);
         }
 
         [RuntimeExport("RhpStelemRef")]
@@ -262,8 +249,11 @@ namespace Cosmos.Kernel.Core.Runtime
         [RuntimeExport("RhpNewFinalizable")]
         internal static unsafe void* RhpNewFinalizable(MethodTable* pEEType)
         {
-            // TODO: Should actually be Memory.RhAllocateNewObject with finalizable flag
-            return Memory.RhpNewFast(pEEType); // Simplified implementation (Should set gc flag)
+            // ILC calls this helper for every `new` of a type with a finalizer; the flag is what
+            // registers the object for finalization, as in .NET (portable.cpp passes the same).
+            void* result;
+            Memory.RhAllocateNewObject(pEEType, GC_ALLOC_FLAGS.GC_ALLOC_FINALIZE, &result);
+            return result;
         }
 
         // RhpRethrow is now implemented in assembly (CPU/ExceptionHandling.s)

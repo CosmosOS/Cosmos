@@ -6,7 +6,8 @@ namespace Cosmos.Kernel.HAL.DriverKit.Buses.Usb;
 
 /// <summary>
 /// One USB function behind one port: the host created it when it addressed
-/// the port (an xHCI slot) and derives from it to carry its per-device
+/// the port (an xHCI slot, an EHCI queue head set or an OHCI endpoint
+/// descriptor set) and derives from it to carry its per-device
 /// state and the transfer primitives; the enumeration core fills the
 /// identity it read from the descriptors. A host implements the protected
 /// members; the kit calls them through the internal ones, so a class driver

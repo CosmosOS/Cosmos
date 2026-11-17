@@ -9,6 +9,14 @@ namespace Cosmos.Kernel.Core.Runtime;
 internal static class Boxing
 {
 
+    /// <summary>
+    /// Boxes the value stored at <paramref name="data"/>, a field address CoreLib
+    /// hands over from <c>ValueType.Equals</c>, <c>ValueType.GetHashCode</c> and
+    /// <c>Attribute.Equals</c> when it compares a value type field by field: a
+    /// value type is copied into a new box, a reference type is already an object,
+    /// so the result is the reference the field holds (null when the field is null),
+    /// not the address of the field (CosmosOS/Cosmos#3362).
+    /// </summary>
     [RuntimeExport("RhBoxAny")]
     public static unsafe void* RhBoxAny(byte* data, MethodTable* pEEType)
     {
@@ -19,7 +27,8 @@ internal static class Boxing
         }
         else
         {
-            return data;
+            // CoreLib: Unsafe.As<byte, object>(ref data), the reference stored in the slot.
+            return *(void**)data;
         }
     }
     [RuntimeExport("RhBox")]

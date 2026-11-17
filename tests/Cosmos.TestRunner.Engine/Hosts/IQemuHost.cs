@@ -17,13 +17,19 @@ namespace Cosmos.TestRunner.Engine;
 /// <param name="VgaAdapter">VGA adapter as a <c>-vga</c> backend name, e.g. <c>vmware</c>; replaces the default adapter rather than adding a second one.</param>
 /// <param name="GpuDevice">Display adapter attached as a <c>-device</c> line, e.g. <c>virtio-gpu-pci</c>; added alongside the default adapter rather than replacing it.</param>
 /// <param name="AudioDevice">HD Audio controller, e.g. <c>intel-hda</c>; the launcher adds its codec and the hosts play it into QEMU's <c>none</c> backend.</param>
+/// <param name="UsbController">The host controller the USB disks, the USB keyboard and the USB mouse sit on; the xHCI unless the profile names another.</param>
+/// <param name="UsbDeviceVersion">The USB version the usb-kbd and usb-mouse present, 2 unless the profile asks for 1, a device with the full-speed descriptor set alone.</param>
+/// <param name="UsbHub">Whether a usb-hub sits on root port 1 with the keyboard behind it, on its port 1.</param>
 public sealed record ProfileDevices(
     string? NetworkCard,
     string? KeyboardDevice,
     string? MouseDevice,
     string? VgaAdapter,
     string? GpuDevice = null,
-    string? AudioDevice = null);
+    string? AudioDevice = null,
+    UsbHostControllerModel UsbController = UsbHostControllerModel.Xhci,
+    int UsbDeviceVersion = QemuLauncher.DefaultUsbDeviceVersion,
+    bool UsbHub = false);
 
 /// <summary>
 /// Interface for QEMU virtual machine hosts that can run test kernels
@@ -43,7 +49,7 @@ public interface IQemuHost
     /// <param name="timeoutSeconds">Maximum time to run (default 30s)</param>
     /// <param name="showDisplay">Show QEMU display window (default false = headless)</param>
     /// <param name="enableNetworkTesting">Enable UDP test server for network tests (default false)</param>
-    /// <param name="disks">Per-profile disk attachments. AHCI entries share one <c>ich9-ahci</c> controller; NVMe entries each get their own <c>nvme</c> controller; USB entries share one <c>qemu-xhci</c> controller; virtio-blk entries are one virtio-blk-pci function each (behind a root port when hot-pluggable); virtio-blk-mmio entries one virtio-blk-device slot each, arm64 only. Per-disk extra device options (e.g. <c>msix=off</c>) flow through.</param>
+    /// <param name="disks">Per-profile disk attachments. AHCI entries share one <c>ich9-ahci</c> controller; NVMe entries each get their own <c>nvme</c> controller; USB entries share the one host controller <see cref="ProfileDevices.UsbController"/> names; virtio-blk entries are one virtio-blk-pci function each (behind a root port when hot-pluggable); virtio-blk-mmio entries one virtio-blk-device slot each, arm64 only. Per-disk extra device options (e.g. <c>msix=off</c>) flow through.</param>
     /// <param name="machineOptions">Extra <c>-M</c> properties (e.g. <c>{"gic-version", "2"}</c> on ARM64). Caller is responsible for passing arch-appropriate keys.</param>
     /// <param name="devices">Per-profile NIC and input device models; null leaves the architecture defaults in place.</param>
     /// <param name="monitor">Carries out the guest's requests (USB and PCI hot-plug, key and pointer injection) through the QMP monitor QEMU is launched with; null when the caller opened none.</param>

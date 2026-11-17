@@ -25,16 +25,16 @@ namespace Cosmos.TestRunner.Engine.Hosts;
 /// </summary>
 public sealed class QemuMonitor : IAsyncDisposable
 {
-    /// <summary>Pulls stick n (0 when omitted) off the xHCI controller.</summary>
+    /// <summary>Pulls stick n (0 when omitted) off the cell's USB host controller.</summary>
     public const string UsbUnplugRequest = "usb-unplug";
 
-    /// <summary>Plugs stick n (0 when omitted) back in, on the same image.</summary>
+    /// <summary>Plugs stick n (0 when omitted) back in, on the same image, on the same bus and, where the controller pins ports, the same port.</summary>
     public const string UsbPlugRequest = "usb-plug";
 
-    /// <summary>Pulls the profile's USB keyboard off the xHCI controller.</summary>
+    /// <summary>Pulls the profile's USB keyboard off the cell's USB host controller.</summary>
     public const string UsbKeyboardUnplugRequest = "usb-kbd-unplug";
 
-    /// <summary>Plugs it back in.</summary>
+    /// <summary>Plugs it back in, on the same bus, the same port where the controller pins one, with the same USB version.</summary>
     public const string UsbKeyboardPlugRequest = "usb-kbd-plug";
 
     /// <summary>
@@ -75,6 +75,9 @@ public sealed class QemuMonitor : IAsyncDisposable
     /// <summary>QEMU id of the keyboard's device, null while it is unplugged.</summary>
     private string? _keyboardId;
 
+    /// <summary>The host controller the command line put the USB devices on, which names the root port a replugged stick goes back on.</summary>
+    private readonly UsbHostControllerModel _usbController;
+
     /// <summary>The hot-pluggable PCI disks, in the order the profile attaches them.</summary>
     private readonly IReadOnlyList<PciDisk> _pciDisks;
 
@@ -95,11 +98,24 @@ public sealed class QemuMonitor : IAsyncDisposable
     /// <summary>Port QEMU connects its monitor to (<see cref="QemuLaunchOptions.MonitorPort"/>).</summary>
     public int Port { get; }
 
-    private QemuMonitor(IReadOnlyList<DiskAttachment> sticks, bool keyboard, IReadOnlyList<PciDisk> pciDisks)
+    /// <summary>The bus a replugged stick or keyboard goes back on: the root hub of the run's host controller, <see cref="QemuLauncher.UsbBus"/>.</summary>
+    public string UsbBus { get; }
+
+    /// <summary>The port a replugged keyboard goes back on, behind the hub when the run has one; null on the xHCI, which picks its own.</summary>
+    public string? KeyboardPort { get; }
+
+    /// <summary>The USB version a replugged keyboard presents: the one the command line gave it.</summary>
+    public int UsbDeviceVersion { get; }
+
+    private QemuMonitor(IReadOnlyList<DiskAttachment> sticks, bool keyboard, IReadOnlyList<PciDisk> pciDisks, UsbHostControllerModel usbController, int usbDeviceVersion, bool usbHub)
     {
         _sticks = sticks;
         _keyboard = keyboard;
         _keyboardId = keyboard ? QemuLauncher.UsbKeyboardId : null;
+        _usbController = usbController;
+        UsbBus = QemuLauncher.UsbBus(usbController);
+        KeyboardPort = QemuLauncher.UsbKeyboardPortOf(usbController, usbHub);
+        UsbDeviceVersion = usbDeviceVersion;
         _deviceIds = new string?[sticks.Count];
         for (int i = 0; i < sticks.Count; i++)
         {
@@ -120,13 +136,17 @@ public sealed class QemuMonitor : IAsyncDisposable
 
     /// <summary>
     /// An instance for a run attaching <paramref name="disks"/> and the
-    /// keyboard model <paramref name="keyboardDevice"/>. The USB sticks and the
+    /// keyboard model <paramref name="keyboardDevice"/> on the host
+    /// controller <paramref name="usbController"/>. The USB sticks and the
     /// hot-pluggable virtio-blk disks among the disks and a
     /// <see cref="QemuLauncher.UsbKeyboardModel"/> keyboard are what the
-    /// hot-plug requests act on; the input requests need no device, so a run
-    /// with none of them gets a monitor too.
+    /// hot-plug requests act on, and a replug repeats what the launcher
+    /// gave the device: the controller's bus, its port where the controller
+    /// pins one (behind the hub when <paramref name="usbHub"/> put one on
+    /// port 1) and <paramref name="usbDeviceVersion"/>. The input requests
+    /// need no device, so a run with none of them gets a monitor too.
     /// </summary>
-    public static QemuMonitor For(IReadOnlyList<DiskAttachment> disks, string? keyboardDevice)
+    public static QemuMonitor For(IReadOnlyList<DiskAttachment> disks, string? keyboardDevice, UsbHostControllerModel usbController = UsbHostControllerModel.Xhci, int usbDeviceVersion = QemuLauncher.DefaultUsbDeviceVersion, bool usbHub = false)
     {
         List<DiskAttachment> sticks = disks.Where(d => d.Kind == DiskKind.Usb).ToList();
         bool keyboard = string.Equals(keyboardDevice, QemuLauncher.UsbKeyboardModel, StringComparison.OrdinalIgnoreCase);
@@ -150,7 +170,7 @@ public sealed class QemuMonitor : IAsyncDisposable
             virtioBlkIndex++;
         }
 
-        return new QemuMonitor(sticks, keyboard, pciDisks);
+        return new QemuMonitor(sticks, keyboard, pciDisks, usbController, usbDeviceVersion, usbHub);
     }
 
     /// <summary>Takes QEMU's monitor connection. Called once QEMU was started.</summary>
@@ -268,6 +288,65 @@ public sealed class QemuMonitor : IAsyncDisposable
         ["bus"] = bus,
         ["id"] = deviceId
     };
+
+    /// <summary>
+    /// The <c>device_add</c> arguments of a <see cref="UsbPlugRequest"/>: a
+    /// usb-storage stick on <paramref name="driveId"/>, on the bus the
+    /// command line put it on and, where the controller pins ports, back on
+    /// its own, <c>{"driver":"usb-storage","drive":"usbdisk0p1","bus":"usbehci0.0","id":"usbstick0p1","port":"3"}</c>.
+    /// </summary>
+    /// <param name="driveId">QEMU id of the drive the stick serves.</param>
+    /// <param name="bus">The controller's root hub, <see cref="QemuLauncher.UsbBus"/>.</param>
+    /// <param name="port">The port the stick left, or null on the xHCI, which picks its own.</param>
+    /// <param name="deviceId">QEMU id of the new device.</param>
+    public static JsonObject UsbPlugArguments(string driveId, string bus, string? port, string deviceId)
+    {
+        JsonObject arguments = new()
+        {
+            ["driver"] = "usb-storage",
+            ["drive"] = driveId,
+            ["bus"] = bus,
+            ["id"] = deviceId
+        };
+        if (port is not null)
+        {
+            arguments["port"] = port;
+        }
+
+        return arguments;
+    }
+
+    /// <summary>
+    /// The <c>device_add</c> arguments of a <see cref="UsbKeyboardPlugRequest"/>:
+    /// a usb-kbd on the same bus, back on its own port where the controller
+    /// pins one, with the same <c>usb_version</c> when the launcher set one,
+    /// so the replugged keyboard is the device the boot-time one was,
+    /// <c>{"driver":"usb-kbd","bus":"usbohci0.0","id":"usbkbd0p1","port":"1.1","usb_version":1}</c>.
+    /// </summary>
+    /// <param name="bus">The controller's root hub, <see cref="QemuLauncher.UsbBus"/>.</param>
+    /// <param name="port">The port the keyboard left, or null on the xHCI.</param>
+    /// <param name="deviceVersion">The USB version the launcher gave the keyboard; QEMU's default, 2, is left unsaid.</param>
+    /// <param name="deviceId">QEMU id of the new device.</param>
+    public static JsonObject UsbKeyboardPlugArguments(string bus, string? port, int deviceVersion, string deviceId)
+    {
+        JsonObject arguments = new()
+        {
+            ["driver"] = QemuLauncher.UsbKeyboardModel,
+            ["bus"] = bus,
+            ["id"] = deviceId
+        };
+        if (port is not null)
+        {
+            arguments["port"] = port;
+        }
+
+        if (deviceVersion != QemuLauncher.DefaultUsbDeviceVersion)
+        {
+            arguments["usb_version"] = deviceVersion;
+        }
+
+        return arguments;
+    }
 
     /// <summary>One relative pointer event on <paramref name="axis"/> by <paramref name="value"/> units.</summary>
     private static JsonObject RelativeEvent(string axis, int value)
@@ -425,13 +504,7 @@ public sealed class QemuMonitor : IAsyncDisposable
 
         await ExecuteAsync(
             "device_add",
-            new JsonObject
-            {
-                ["driver"] = "usb-storage",
-                ["drive"] = driveId,
-                ["bus"] = $"{QemuLauncher.UsbControllerId}.0",
-                ["id"] = deviceId
-            },
+            UsbPlugArguments(driveId, UsbBus, QemuLauncher.UsbDiskPortOf(_usbController, index), deviceId),
             cancellationToken);
         _deviceIds[index] = deviceId;
     }
@@ -496,15 +569,11 @@ public sealed class QemuMonitor : IAsyncDisposable
         string deviceId = $"{QemuLauncher.UsbKeyboardId}p{_keyboardPlugCount}";
 
         // No drive: the keyboard is the device alone, on the same root hub
-        // the command line put it on.
+        // the command line put it on, back on its port where the controller
+        // pins one and at the same USB version.
         await ExecuteAsync(
             "device_add",
-            new JsonObject
-            {
-                ["driver"] = QemuLauncher.UsbKeyboardModel,
-                ["bus"] = $"{QemuLauncher.UsbControllerId}.0",
-                ["id"] = deviceId
-            },
+            UsbKeyboardPlugArguments(UsbBus, KeyboardPort, UsbDeviceVersion, deviceId),
             cancellationToken);
         _keyboardId = deviceId;
     }

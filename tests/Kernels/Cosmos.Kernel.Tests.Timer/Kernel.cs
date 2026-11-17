@@ -23,8 +23,8 @@ public class Kernel : Sys.Kernel
         Log.WriteString("[Timer Tests] Starting test suite\n");
 
 #if ARCH_X64
-        // x64: Stopwatch (2) + PIT (3) + TimerManager (7) + LAPIC (3) + DateTime (4) + AlarmManager (3) + BCL Timer (4) = 26
-        TR.Start("Timer Tests", expectedTests: 26);
+        // x64: Stopwatch (2) + PIT (3) + TimerManager (8) + LAPIC (3) + DateTime (4) + AlarmManager (3) + BCL Timer (4) = 27
+        TR.Start("Timer Tests", expectedTests: 27);
 
         // PIT Tests (using Stopwatch for verification)
         TR.Run("PIT_Initialized", TestPITInitialized);
@@ -38,8 +38,8 @@ public class Kernel : Sys.Kernel
 
 #else
         // ARM64: No PIT or LAPIC, just basic timer manager tests
-        // Stopwatch (2) + TimerManager (7) + DateTime (4) + AlarmManager (3) + BCL Timer (4) = 20
-        TR.Start("Timer Tests", expectedTests: 20);
+        // Stopwatch (2) + TimerManager (8) + DateTime (4) + AlarmManager (3) + BCL Timer (4) = 21
+        TR.Start("Timer Tests", expectedTests: 21);
 #endif
 
         // Stopwatch/TSC Tests - must run first to verify timing source
@@ -49,6 +49,7 @@ public class Kernel : Sys.Kernel
         // TimerManager Tests
         TR.Run("TimerManager_Initialized", TestTimerManagerInitialized);
         TR.Run("TimerManager_Wait_500ms", TestTimerManagerWait500ms);
+        TR.Run("TimerManager_Wait_10ms", TestTimerManagerWait10ms);
         TR.Run("TimerManager_Schedule_OneShot", TestScheduleOneShot);
         TR.Run("TimerManager_Schedule_Recurring", TestScheduleRecurring);
         TR.Run("TimerManager_Schedule_Cancel", TestScheduleCancel);
@@ -231,6 +232,36 @@ public class Kernel : Sys.Kernel
         // Check if within tolerance (250-1000ms for 500ms wait)
         bool inRange = elapsedMs >= 250 && elapsedMs <= 1000;
         Assert.True(inRange, "TimerManager: Wait(500ms) should complete in roughly 500ms");
+    }
+
+    private static void TestTimerManagerWait10ms()
+    {
+        // The receive loops of the network ring (DnsClient.ReceiveAll, the UDP
+        // and ICMP clients) poll with Wait(10) and count 10 ms per call, and
+        // every call after the first starts on the tick that ended the last
+        // one. Wait(1) puts the first call there too. From a tick, Wait(10)
+        // must last one tick of 10 ms: a tick that reports less than 10 ms
+        // makes every call two ticks long, and the PIT's reset divisor, a
+        // 55 ms tick, makes it 5.5 times as long.
+        TimerManager.Wait(1);
+
+        long tsStart = Stopwatch.GetTimestamp();
+        for (int i = 0; i < 50; i++)
+        {
+            TimerManager.Wait(10);
+        }
+        long tsEnd = Stopwatch.GetTimestamp();
+
+        long elapsedMs = (tsEnd - tsStart) * 1000 / Stopwatch.Frequency;
+
+        Log.WriteString("[Timer Tests] TimerManager 50 x Wait(10ms) - elapsed ms: ");
+        Log.WriteNumber((ulong)elapsedMs);
+        Log.WriteString("\n");
+
+        // The upper bound leaves room for emulation (about 650 ms under TCG on
+        // ARM64) and stays under the 1000 ms that two ticks per call take.
+        bool inRange = elapsedMs >= 450 && elapsedMs <= 900;
+        Assert.True(inRange, "TimerManager: 50 x Wait(10ms) should complete in roughly 500ms");
     }
 
     private static volatile int s_oneShotFireCount;
@@ -491,6 +522,12 @@ public class Kernel : Sys.Kernel
 
     private static void TestPITWait100ms()
     {
+        // Registering the wait's timer restarts channel 0's countdown, so
+        // Wait(100) is a whole number of ticks: ten of 10 ms. A tick shorter
+        // than the 10 ms it was asked for takes eleven (110 ms), and the reset
+        // divisor's 55 ms tick two (110 ms). The one-shot count restarts only
+        // when the handler re-arms it, so each tick also carries the
+        // interrupt's latency: 103 ms under TCG.
         long tsStart = Stopwatch.GetTimestamp();
         PIT.Instance!.Wait(100);
         long tsEnd = Stopwatch.GetTimestamp();
@@ -507,9 +544,8 @@ public class Kernel : Sys.Kernel
         Log.WriteNumber((ulong)elapsedMs);
         Log.WriteString("\n");
 
-        // Check if within tolerance (50-200ms for 100ms wait)
-        bool inRange = elapsedMs >= 50 && elapsedMs <= 200;
-        Assert.True(inRange, "PIT: Wait(100ms) should complete in roughly 100ms");
+        bool inRange = elapsedMs >= 95 && elapsedMs <= 106;
+        Assert.True(inRange, "PIT: Wait(100ms) should complete in 100ms");
     }
 
     private static void TestPITWaitProportional()

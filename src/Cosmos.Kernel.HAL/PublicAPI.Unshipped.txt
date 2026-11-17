@@ -195,6 +195,10 @@ static Cosmos.Kernel.HAL.Devices.Network.MacAddress.None.get -> Cosmos.Kernel.HA
 [COSMOS0003]Cosmos.Kernel.HAL.Devices.Network.NetworkSink
 [COSMOS0003]Cosmos.Kernel.HAL.Devices.Network.NetworkSink.LinkChanged(bool up) -> void
 [COSMOS0003]Cosmos.Kernel.HAL.Devices.Network.NetworkSink.Receive(System.ReadOnlySpan<byte> frame) -> void
+[COSMOS0003]Cosmos.Kernel.HAL.Devices.Storage.IRemovableMedia
+[COSMOS0003]Cosmos.Kernel.HAL.Devices.Storage.IRemovableMedia.HasMedia.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.Devices.Storage.IRemovableMedia.IsReadOnly.get -> bool
+[COSMOS0003]Cosmos.Kernel.HAL.Devices.Storage.IRemovableMedia.IsRemovable.get -> bool
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Buses.Pci.PciAccess
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Buses.Pci.PciAccess.Bars.get -> System.ReadOnlySpan<Cosmos.Kernel.HAL.DriverKit.Buses.Pci.PciBar>
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.Buses.Pci.PciAccess.EnableBusMastering(bool enable) -> void
@@ -572,6 +576,7 @@ static Cosmos.Kernel.HAL.Devices.Network.MacAddress.None.get -> Cosmos.Kernel.HA
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Audio = 13 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Fat = 9 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
+[COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.FinalizerThread = 14 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Graphics = 10 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Interrupts = 1 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature
 [COSMOS0003]Cosmos.Kernel.HAL.DriverKit.DriverFeature.Keyboard = 5 -> Cosmos.Kernel.HAL.DriverKit.DriverFeature

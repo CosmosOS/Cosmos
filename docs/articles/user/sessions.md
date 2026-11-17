@@ -136,3 +136,21 @@ The kernel's sockets are not safe to use from two threads at once, so the Telnet
 Every session keeps its screen as a `KernelConsole` grid on the display's canvas. Only the grid of the active session paints the canvas; the others keep their cells up to date and repaint the whole display when shown. A Telnet session also sends every change to its client as it happens: each character, and the escape sequence for each cursor move and colour change, taken from the grid. The two therefore agree on where every line wraps: the grid wraps as soon as a line is full, and the session ends the line explicitly on the client.
 
 A session's reader blocks on an `InterruptEvent` that is signalled when a key is queued for it. Keys come either from the keyboard's decoder, which queues them on the active session, possibly in interrupt context, or from a remote session's server: the Telnet server's thread looks at its connections every 10 ms while they are idle, and queues the keys a client sent. A switch key wakes a thread that is otherwise blocked. The primary console's reader runs on the scheduler's idle thread, so it waits for the next interrupt instead of blocking, as the keyboard always did.
+
+## Summary
+
+| Task | Call |
+|---|---|
+| Open a virtual console | `SessionManager.CreateVirtualConsole()` |
+| Run a thread on a session | `SessionManager.Start(session, body)` |
+| Read and write the session from its thread | `Console.ReadLine()`, `Console.WriteLine()` |
+| List the open sessions | `SessionManager.GetSessions()` |
+| Find the session on the display | `SessionManager.Active` |
+| Show a session on the display | `SessionManager.Switch(id)` |
+| Serve a shell over Telnet | `new TelnetServer(shell)`, `server.Start()`, `server.Stop()` |
+| Write a session class for a remote terminal | `ConsoleSession(cols, rows)`, `Name`, `IsRemote` |
+| Queue a key the terminal sent | `EnqueueInput(key)` |
+| Follow the terminal's window size | `Resize(cols, rows)` |
+| Spot the changes to send to the terminal | `OnWritten`, `OnCleared`, `OnCursorMoved`, `OnCursorVisibilityChanged`, `OnColorsChanged` |
+| Read the cursor position and the colours | `CursorLeft`, `CursorTop`, `ExplicitForeground`, `ExplicitBackground` |
+| List a remote session and start its thread | `SessionManager.TryRegister(session)`, `SessionManager.Start(session, body)` |

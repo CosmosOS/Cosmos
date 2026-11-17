@@ -24,7 +24,6 @@ internal static unsafe class MemNative
     [UnmanagedCallersOnly(EntryPoint = "__cosmos_memcmp")]
     public static int MemCmp(void* s1, void* s2, nuint count)
     {
-        bool equal = MemoryOp.MemCmp((uint*)s1, (uint*)s2, (int)(count / sizeof(uint)));
-        return equal ? 0 : 1;
+        return MemoryOp.MemCmp((byte*)s1, (byte*)s2, (int)count);
     }
 }

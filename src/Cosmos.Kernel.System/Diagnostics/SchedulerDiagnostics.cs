@@ -216,7 +216,7 @@ public static class SchedulerDiagnostics
             return ThreadKillResult.NotFound;
         }
 
-        if ((target.Flags & SchedulerThreadFlags.IdleThread) != 0)
+        if (target.IsIdle)
         {
             return ThreadKillResult.RefusedIdle;
         }
@@ -257,7 +257,7 @@ public static class SchedulerDiagnostics
             thread.Id,
             thread.CpuId,
             MapState(thread.State),
-            (thread.Flags & SchedulerThreadFlags.IdleThread) != 0,
+            thread.IsIdle,
             (thread.Flags & SchedulerThreadFlags.Managed) != 0,
             thread.TotalRuntime,
             thread.StackSize,

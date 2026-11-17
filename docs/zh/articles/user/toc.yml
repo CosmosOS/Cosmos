@@ -1,0 +1,31 @@
+# source_hash: e905e44e3f709c0700bf2c6f40e4fb4374eb361d
+- name: 安装指南
+  href: install.md
+- name: 内核启动
+  href: startup.md
+- name: 文件系统
+  href: filesystem.md
+- name: 网络
+  href: network.md
+- name: 定时器与闹钟
+  href: timers.md
+- name: 随机数
+  href: random.md
+- name: 图形
+  href: graphics.md
+- name: 音频
+  href: audio.md
+- name: 键盘
+  href: keyboard.md
+- name: 控制台会话与 Telnet
+  href: sessions.md
+- name: 鼠标
+  href: mouse.md
+- name: 编写驱动程序
+  href: drivers.md
+- name: 编写驱动程序 - 术语表
+  href: driver-glossary.md
+- name: 编写调度器
+  href: scheduler-plugging.md
+- name: 使用 VS Code 和 QEMU 调试
+  href: debugging.md

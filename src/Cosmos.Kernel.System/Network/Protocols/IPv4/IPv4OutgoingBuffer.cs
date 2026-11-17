@@ -62,14 +62,17 @@ internal static class IPv4OutgoingBuffer
     /// <returns>False when no configured interface matches the packet's source address.</returns>
     public static bool AddPacket(IPPacket packet)
     {
-        INetworkDevice? device = IPConfig.FindInterface(packet.SourceIP);
-        if (device is null)
+        using (NetworkStackLock.Enter())
         {
-            return false;
-        }
+            INetworkDevice? device = IPConfig.FindInterface(packet.SourceIP);
+            if (device is null)
+            {
+                return false;
+            }
 
-        AddPacket(packet, device);
-        return true;
+            AddPacket(packet, device);
+            return true;
+        }
     }
 
     /// <summary>
@@ -79,126 +82,151 @@ internal static class IPv4OutgoingBuffer
     /// <param name="device">The Network Interface Controller.</param>
     public static void AddPacket(IPPacket packet, INetworkDevice device)
     {
-        packet.SourceMac = device.MacAddress;
-        s_queue.Add(new BufferEntry(device, packet));
+        using (NetworkStackLock.Enter())
+        {
+            packet.SourceMac = device.MacAddress;
+            s_queue.Add(new BufferEntry(device, packet));
+        }
     }
 
     /// <summary>
-    /// Sends packets from the buffer.
+    /// Sends packets from the buffer, pass after pass until it is empty or
+    /// the iteration cap is reached. Each pass runs under the stack's lock;
+    /// the wait between two passes does not, since the ARP replies a pass
+    /// asked for come in on the kit worker, which needs the lock to deliver
+    /// them.
     /// </summary>
     internal static void Send()
     {
         int iterations = 0;
 
-        while (s_queue.Count > 0)
+        while (true)
         {
-            iterations++;
-            if (iterations >= MaxIterations)
+            using (NetworkStackLock.Enter())
             {
-                Serial.WriteString("[IPv4OutgoingBuffer] ARP timeout\n");
-                s_queue.Clear();
-                break;
+                if (s_queue.Count == 0)
+                {
+                    return;
+                }
+
+                iterations++;
+                if (iterations >= MaxIterations)
+                {
+                    Serial.WriteString("[IPv4OutgoingBuffer] ARP timeout\n");
+                    s_queue.Clear();
+                    return;
+                }
+
+                SendPass();
+                if (s_queue.Count == 0)
+                {
+                    return;
+                }
             }
 
-            for (int e = s_queue.Count - 1; e >= 0; e--)
-            {
-                BufferEntry entry = s_queue[e];
-                if (entry.Status == BufferEntry.EntryStatus.Added)
-                {
-                    if (!IPConfig.IsLocalAddress(entry.Packet.DestinationIP))
-                    {
-                        Address? nextHop = IPConfig.FindRoute(entry.Packet.DestinationIP);
-                        entry.NextHop = nextHop;
-                        if (nextHop is null)
-                        {
-                            s_queue.RemoveAt(e);
-                            continue;
-                        }
+            // Spin to let the receive path take the ARP replies.
+            Thread.SpinWait(10_000);
+        }
+    }
 
-                        MacAddress? nextHopMac = ArpCache.Resolve(nextHop);
-                        if (nextHopMac is not null)
-                        {
-                            entry.Packet.DestinationMac = nextHopMac;
-                            entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
-                            s_queue.RemoveAt(e);
-                        }
-                        else
-                        {
-                            ArpRequestEthernet arpRequest = new(
-                                entry.NIC.MacAddress,
-                                entry.Packet.SourceIP,
-                                MacAddress.Broadcast,
-                                nextHop,
-                                MacAddress.None
-                            );
-                            entry.NIC.Send(arpRequest.RawData, arpRequest.RawData.Length);
-                            entry.Status = BufferEntry.EntryStatus.RouteArpSent;
-                        }
+    /// <summary>
+    /// One pass over the queue: sends every packet whose next hop resolved
+    /// and asks ARP for the others. Under the stack's lock.
+    /// </summary>
+    private static void SendPass()
+    {
+        for (int e = s_queue.Count - 1; e >= 0; e--)
+        {
+            BufferEntry entry = s_queue[e];
+            if (entry.Status == BufferEntry.EntryStatus.Added)
+            {
+                if (!IPConfig.IsLocalAddress(entry.Packet.DestinationIP))
+                {
+                    Address? nextHop = IPConfig.FindRoute(entry.Packet.DestinationIP);
+                    entry.NextHop = nextHop;
+                    if (nextHop is null)
+                    {
+                        s_queue.RemoveAt(e);
                         continue;
                     }
 
-                    MacAddress? cachedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
-                    if (cachedMac is not null)
+                    MacAddress? nextHopMac = ArpCache.Resolve(nextHop);
+                    if (nextHopMac is not null)
                     {
-                        entry.Packet.DestinationMac = cachedMac;
+                        entry.Packet.DestinationMac = nextHopMac;
                         entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
                         s_queue.RemoveAt(e);
                     }
                     else
                     {
-                        Serial.WriteString("[IPv4OutgoingBuffer] Sending ARP request\n");
                         ArpRequestEthernet arpRequest = new(
                             entry.NIC.MacAddress,
                             entry.Packet.SourceIP,
                             MacAddress.Broadcast,
-                            entry.Packet.DestinationIP,
+                            nextHop,
                             MacAddress.None
                         );
-                        bool sent = entry.NIC.Send(arpRequest.RawData, arpRequest.RawData.Length);
-                        Serial.WriteString("[IPv4OutgoingBuffer] ARP send result: ");
-                        Serial.WriteString(sent ? "OK" : "FAIL");
-                        Serial.WriteString(" len=");
-                        Serial.WriteNumber((ulong)arpRequest.RawData.Length);
-                        Serial.WriteString("\n");
-                        entry.Status = BufferEntry.EntryStatus.ArpSent;
+                        entry.NIC.Send(arpRequest.RawData, arpRequest.RawData.Length);
+                        entry.Status = BufferEntry.EntryStatus.RouteArpSent;
                     }
+                    continue;
                 }
-                else if (entry.Status == BufferEntry.EntryStatus.ArpSent)
+
+                MacAddress? cachedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
+                if (cachedMac is not null)
                 {
-                    MacAddress? repliedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
-                    if (repliedMac is not null)
-                    {
-                        entry.Packet.DestinationMac = repliedMac;
-                        entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
-                        s_queue.RemoveAt(e);
-                    }
-                }
-                else if (entry.Status == BufferEntry.EntryStatus.RouteArpSent)
-                {
-                    MacAddress? routedMac = entry.NextHop is null ? null : ArpCache.Resolve(entry.NextHop);
-                    if (routedMac is not null)
-                    {
-                        entry.Packet.DestinationMac = routedMac;
-                        entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
-                        s_queue.RemoveAt(e);
-                    }
-                }
-                else if (entry.Status == BufferEntry.EntryStatus.DhcpRequest)
-                {
+                    entry.Packet.DestinationMac = cachedMac;
                     entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
                     s_queue.RemoveAt(e);
                 }
-                else if (entry.Status == BufferEntry.EntryStatus.JustSend)
+                else
                 {
+                    Serial.WriteString("[IPv4OutgoingBuffer] Sending ARP request\n");
+                    ArpRequestEthernet arpRequest = new(
+                        entry.NIC.MacAddress,
+                        entry.Packet.SourceIP,
+                        MacAddress.Broadcast,
+                        entry.Packet.DestinationIP,
+                        MacAddress.None
+                    );
+                    bool sent = entry.NIC.Send(arpRequest.RawData, arpRequest.RawData.Length);
+                    Serial.WriteString("[IPv4OutgoingBuffer] ARP send result: ");
+                    Serial.WriteString(sent ? "OK" : "FAIL");
+                    Serial.WriteString(" len=");
+                    Serial.WriteNumber((ulong)arpRequest.RawData.Length);
+                    Serial.WriteString("\n");
+                    entry.Status = BufferEntry.EntryStatus.ArpSent;
+                }
+            }
+            else if (entry.Status == BufferEntry.EntryStatus.ArpSent)
+            {
+                MacAddress? repliedMac = ArpCache.Resolve(entry.Packet.DestinationIP);
+                if (repliedMac is not null)
+                {
+                    entry.Packet.DestinationMac = repliedMac;
                     entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
                     s_queue.RemoveAt(e);
                 }
             }
-
-            // Spin to allow interrupt processing (ARP replies)
-            if (s_queue.Count > 0)
+            else if (entry.Status == BufferEntry.EntryStatus.RouteArpSent)
             {
-                Thread.SpinWait(10_000);
+                MacAddress? routedMac = entry.NextHop is null ? null : ArpCache.Resolve(entry.NextHop);
+                if (routedMac is not null)
+                {
+                    entry.Packet.DestinationMac = routedMac;
+                    entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
+                    s_queue.RemoveAt(e);
+                }
+            }
+            else if (entry.Status == BufferEntry.EntryStatus.DhcpRequest)
+            {
+                entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
+                s_queue.RemoveAt(e);
+            }
+            else if (entry.Status == BufferEntry.EntryStatus.JustSend)
+            {
+                entry.NIC.Send(entry.Packet.RawData, entry.Packet.RawData.Length);
+                s_queue.RemoveAt(e);
             }
         }
     }
@@ -209,6 +237,7 @@ internal static class IPv4OutgoingBuffer
     /// address and leaves on the next pass of <see cref="Send"/>.
     /// </summary>
     /// <param name="arpReply">The ARP reply.</param>
+    /// <remarks>Called by the receive path, under the stack's lock.</remarks>
     internal static void UpdateARPCache(ArpReplyEthernet arpReply)
     {
         for (int e = 0; e < s_queue.Count; e++)

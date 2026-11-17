@@ -1,5 +1,5 @@
 // ACPI subsystem for Cosmos OS
-// C# interop layer for LAI (Lightweight ACPI Implementation)
+// C# interop layer over the MADT the native ACPI code parsed (uACPI table API)
 
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.IO;

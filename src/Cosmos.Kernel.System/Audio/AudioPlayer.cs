@@ -280,7 +280,7 @@ public sealed class AudioPlayer
             ? SchedulerManager.CurrentCpuState?.CurrentThread
             : null;
 
-        if (current is not null && (current.Flags & SchedulerThreadFlags.IdleThread) == 0)
+        if (current is not null && !current.IsIdle)
         {
             SchedulerManager.Sleep(milliseconds);
             return;

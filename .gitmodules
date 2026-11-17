@@ -2,6 +2,6 @@
 	path = dotnet/runtime
 	url = https://github.com/dotnet/runtime.git
 	branch = release/10.0
-[submodule "src/Cosmos.Kernel.Native.MultiArch/lai"]
-	path = src/Cosmos.Kernel.Native.MultiArch/ACPI/lai
-	url = https://github.com/managarm/lai.git
+[submodule "src/Cosmos.Kernel.Native.MultiArch/ACPI/uacpi"]
+	path = src/Cosmos.Kernel.Native.MultiArch/ACPI/uacpi
+	url = https://github.com/uACPI/uACPI.git

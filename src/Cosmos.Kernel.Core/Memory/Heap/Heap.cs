@@ -9,6 +9,20 @@ namespace Cosmos.Kernel.Core.Memory.Heap;
 internal static unsafe class Heap
 {
     /// <summary>
+    /// The lock of the three sub-heaps' structures (the SMT pages and their
+    /// block chains, the medium and large headers), taken IRQ-safe around
+    /// every entry point: thread stacks, the runtime's unmanaged blocks and
+    /// <c>NativeMemory</c> all allocate here from any thread, and the
+    /// collector's prune walks the same chains. Masking interrupts, which is
+    /// all these entries did before, excludes only the threads of one CPU.
+    /// Nothing under it allocates a managed object or takes a lock other than
+    /// the page allocator's (<c>s_ratLock</c>, always inner to this one) and
+    /// the serial port's; a throw moves out of the locked section first.
+    /// Plain zeroed static data, so it works from the first allocation.
+    /// </summary>
+    private static Scheduler.SpinLock s_lock;
+
+    /// <summary>
     /// Re-allocates or "re-sizes" data asigned to a pointer.
     /// The pointer specified must be the start of an allocated block in the heap.
     /// This shouldn't be used with objects as a new address is given when realocating memory.
@@ -18,7 +32,9 @@ internal static unsafe class Heap
     /// <returns>New pointer with specified size while maintaining old data.</returns>
     public static byte* Realloc(byte* aPtr, uint newSize)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        bool unknownPage = false;
+
+        using (s_lock.AcquireIrqSafe())
         {
             PageType currentType = PageAllocator.GetPageType(aPtr);
 
@@ -55,32 +71,41 @@ internal static unsafe class Heap
                 }
                 else
                 {
-                    throw new Exception();
+                    unknownPage = true;
                 }
 
-                byte* newPtr = MediumHeap.Alloc(newSize);
-                // Copy the smaller of oldSize and newSize to avoid buffer overread
-                int copySize = oldSize < (int)newSize ? oldSize : (int)newSize;
-                MemoryOp.MemCopy(newPtr, aPtr, copySize);
-
-                // Free the old allocation
-                if (currentType == PageType.HeapLarge)
+                if (!unknownPage)
                 {
-                    LargeHeap.Free(aPtr);
-                }
-                else if (currentType == PageType.HeapSmall)
-                {
-                    SmallHeap.Free(aPtr);
-                }
+                    byte* newPtr = MediumHeap.Alloc(newSize);
+                    // Copy the smaller of oldSize and newSize to avoid buffer overread
+                    int copySize = oldSize < (int)newSize ? oldSize : (int)newSize;
+                    MemoryOp.MemCopy(newPtr, aPtr, copySize);
 
-                return newPtr;
+                    // Free the old allocation
+                    if (currentType == PageType.HeapLarge)
+                    {
+                        LargeHeap.Free(aPtr);
+                    }
+                    else if (currentType == PageType.HeapSmall)
+                    {
+                        SmallHeap.Free(aPtr);
+                    }
+
+                    return newPtr;
+                }
             }
-
-            if (newSize >= LargeHeap.MinSize)
+            else if (newSize >= LargeHeap.MinSize)
             {
                 result = LargeHeap.Alloc(newSize);
                 return result;
             }
+        }
+
+        // Thrown outside the lock: the exception is a managed allocation, and the
+        // unwind would otherwise leave the locked section through a funclet.
+        if (unknownPage)
+        {
+            throw new Exception();
         }
 
         return (byte*)0;
@@ -95,7 +120,7 @@ internal static unsafe class Heap
     {
         byte* result;
 
-        using (InternalCpu.DisableInterruptsScope())
+        using (s_lock.AcquireIrqSafe())
         {
             if (aSize > MediumHeap.MinSize && aSize <= MediumHeap.MaxSize)
             {
@@ -128,7 +153,9 @@ internal static unsafe class Heap
     /// </exception>
     public static void Free(void* aPtr)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        bool unmanagedPage = false;
+
+        using (s_lock.AcquireIrqSafe())
         {
             PageType currentType = PageAllocator.GetPageType(aPtr);
 
@@ -145,8 +172,14 @@ internal static unsafe class Heap
                     break;
                 default:
                     Debugger.SendKernelPanic(Panics.NonManagedPage);
-                    throw new NotSupportedException("This is not a managed page");
+                    unmanagedPage = true;
+                    break;
             }
+        }
+
+        if (unmanagedPage)
+        {
+            throw new NotSupportedException("This is not a managed page");
         }
     }
 
@@ -159,12 +192,18 @@ internal static unsafe class Heap
     {
         int result;
 
+        // Run GC to identify and free unreachable objects. Masked, not locked:
+        // managed objects do not live in this heap, and a collection under a
+        // spinlock is what the collector's own stop-the-world must never meet.
         using (InternalCpu.DisableInterruptsScope())
         {
-            // Run GC to identify and free unreachable objects
             result = GarbageCollector.GarbageCollector.Collect();
+        }
 
-            // Also prune empty SMT pages
+        // Also prune empty SMT pages: that unlinks pages from the chains Alloc
+        // and Free walk, so it takes their lock.
+        using (s_lock.AcquireIrqSafe())
+        {
             result += SmallHeap.PruneSMT();
         }
 

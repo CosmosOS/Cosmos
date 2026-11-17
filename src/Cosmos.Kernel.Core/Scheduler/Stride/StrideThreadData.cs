@@ -26,22 +26,20 @@ internal class StrideThreadData
     public long Remain { get; internal set; }
 
     /// <summary>
-    /// Timestamp of last wakeup (for interactive detection).
+    /// Stopwatch timestamp of the last park (block or sleep), for measuring
+    /// how long the thread stayed parked when it next wakes.
     /// </summary>
-    public ulong LastWakeup { get; internal set; }
+    public ulong LastParked { get; internal set; }
 
     /// <summary>
-    /// Number of times thread has slept (I/O pattern tracking).
+    /// Nanoseconds the thread ran since its last wake (or its creation),
+    /// for interactive detection.
     /// </summary>
-    public uint SleepCount { get; internal set; }
+    public ulong RunSinceWakeNs { get; internal set; }
 
     /// <summary>
-    /// Whether thread is detected as interactive.
+    /// Whether the last wake classified the thread interactive: it parked for
+    /// more than twice what it had run since the wake before.
     /// </summary>
     public bool IsInteractive { get; internal set; }
-
-    /// <summary>
-    /// Whether thread currently has priority boost.
-    /// </summary>
-    public bool IsBoosted { get; internal set; }
 }

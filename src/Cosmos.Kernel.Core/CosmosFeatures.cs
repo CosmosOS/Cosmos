@@ -101,11 +101,12 @@ internal static class CosmosFeatures
         AppContext.TryGetSwitch("Cosmos.Kernel.System.Filesystems.Fat.Enabled", out bool enabled) ? enabled : true;
 
     /// <summary>
-    /// Controls USB: the kit's xHCI host controller driver, the hub driver and
-    /// the USB keyboard, mouse and mass storage class drivers, which the driver
-    /// manifest registers under this switch. Requires PCI; the MSBuild
-    /// cascade in Sdk.targets disables this when PCI is off. When the property
-    /// is not set, Sdk.targets enables it only if Keyboard, Mouse or Storage is on.
+    /// Controls USB: the kit's xHCI, EHCI and OHCI host controller drivers,
+    /// the hub driver and the USB keyboard, mouse and mass storage class
+    /// drivers, which the driver manifest registers under this switch.
+    /// Requires PCI; the MSBuild cascade in Sdk.targets disables this when
+    /// PCI is off. When the property is not set, Sdk.targets enables it only
+    /// if Keyboard, Mouse or Storage is on.
     /// Set via CosmosEnableUsb property in csproj.
     /// </summary>
     [FeatureSwitchDefinition("Cosmos.Kernel.HAL.Usb.Enabled")]
@@ -121,4 +122,16 @@ internal static class CosmosFeatures
     [FeatureSwitchDefinition("Cosmos.Kernel.System.Audio.Enabled")]
     public static bool AudioEnabled =>
         AppContext.TryGetSwitch("Cosmos.Kernel.System.Audio.Enabled", out bool enabled) ? enabled : true;
+
+    /// <summary>
+    /// Controls the finalizer thread: whether <c>Kernel.Start</c> turns
+    /// <c>GarbageCollector.ThreadedFinalizer</c> on once the driver stage is done, so
+    /// finalizers run on a thread of their own, as in .NET, rather than on the thread that
+    /// collected or allocated. Requires Scheduler; the MSBuild cascade in Sdk.targets
+    /// disables this when the scheduler is off.
+    /// Set via CosmosEnableFinalizerThread property in csproj.
+    /// </summary>
+    [FeatureSwitchDefinition("Cosmos.Kernel.Core.FinalizerThread.Enabled")]
+    public static bool FinalizerThreadEnabled =>
+        AppContext.TryGetSwitch("Cosmos.Kernel.Core.FinalizerThread.Enabled", out bool enabled) ? enabled : true;
 }

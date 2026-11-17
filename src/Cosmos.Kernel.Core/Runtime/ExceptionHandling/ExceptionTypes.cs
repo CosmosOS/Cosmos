@@ -23,7 +23,7 @@ internal enum ExceptionIDs
 internal enum EHClauseKind
 {
     EH_CLAUSE_TYPED = 0,   // Catch handler for specific exception type
-    EH_CLAUSE_FAULT = 1,   // Fault handler (like finally, runs on exception)
+    EH_CLAUSE_FAULT = 1,   // Finally or fault handler: runs while an exception leaves its try region
     EH_CLAUSE_FILTER = 2,  // Filter expression before catch
 }
 

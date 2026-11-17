@@ -1,6 +1,8 @@
 // ARM64 NativeAOT Runtime Stubs
-// Write barriers and EH section accessors
+// Write barriers, interlocked reference exchanges and EH section accessors
 
+.global RhpCheckedLockCmpXchg
+.global RhpCheckedXchg
 .global RhpAssignRefArm64
 .global RhpCheckedAssignRefArm64
 .global RhpByRefAssignRefArm64
@@ -14,6 +16,50 @@
 
 .text
 .align 4
+
+// ============================================================================
+// Interlocked exchanges on object references
+//
+// CoreLib reaches these through RuntimeImports.InterlockedCompareExchange and
+// InterlockedExchange: Interlocked.CompareExchange and Exchange on a reference,
+// so Lock, LazyInitializer, the thread pool's queues and ConcurrentQueue. ILC
+// inlines the integer forms; the reference forms are calls, and were plain
+// read-then-write C#, which a tick between the two halves broke.
+//
+// Exclusive load/store loops (ARMv8.0): the cores the kernel is built and
+// tested for (cortex-a53, cortex-a72) have no LSE, where casal and swpal are
+// undefined instructions. A CPU-features word read at boot can select them
+// later. The trailing dmb ish makes the operation a full fence, as
+// Interlocked promises and as the runtime's own non-LSE path does. No write
+// barrier follows the store: the collector is neither generational nor
+// concurrent, and RhpCheckedAssignRefArm64 is a plain store as well.
+// ============================================================================
+
+// object RhpCheckedLockCmpXchg(object* location, object value, object comparand)
+// AAPCS64: x0 = location, x1 = value, x2 = comparand. Returns the value the
+// location held before, in x0, whether or not it was replaced.
+RhpCheckedLockCmpXchg:
+1:
+        ldaxr   x9, [x0]            // load, exclusive and acquire
+        cmp     x9, x2
+        b.ne    2f                  // not the comparand: nothing stored
+        stlxr   w10, x1, [x0]       // store, release; w10 = 1 when the monitor was lost
+        cbnz    w10, 1b
+2:
+        dmb     ish
+        mov     x0, x9
+        ret
+
+// object RhpCheckedXchg(object* location, object value)
+// AAPCS64: x0 = location, x1 = value. Returns the previous value in x0.
+RhpCheckedXchg:
+1:
+        ldaxr   x9, [x0]
+        stlxr   w10, x1, [x0]
+        cbnz    w10, 1b
+        dmb     ish
+        mov     x0, x9
+        ret
 
 // void RhpByRefAssignRefArm64()
 //

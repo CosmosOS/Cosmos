@@ -2,6 +2,9 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Cosmos.Build.API.Enum;
+using Cosmos.Kernel.Drivers.Pci.Bus.Ehci;
+using Cosmos.Kernel.Drivers.Pci.Bus.Ohci;
 using Cosmos.Kernel.Drivers.Pci.Bus.PcieRootPort;
 using Cosmos.Kernel.Drivers.Pci.Bus.VirtioPci;
 using Cosmos.Kernel.Drivers.Pci.Bus.Xhci;
@@ -11,9 +14,11 @@ using Cosmos.Kernel.Drivers.Platform.Bus.PciHost;
 using Cosmos.Kernel.Drivers.Platform.Bus.VirtioMmio;
 using Cosmos.Kernel.Drivers.Ps2.Input.Ps2Keyboard;
 using Cosmos.Kernel.Drivers.Ps2.Input.Ps2Mouse;
+using Cosmos.Kernel.Drivers.Usb.Bus.UsbHub;
 using Cosmos.Kernel.Drivers.Usb.Input.UsbKeyboard;
 using Cosmos.Kernel.Drivers.Usb.Input.UsbMouse;
 using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
+using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.Devices.Display;
 using Cosmos.Kernel.HAL.Devices.Input;
 using Cosmos.Kernel.HAL.Devices.Network;
@@ -56,12 +61,19 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// <c>Cosmos.Kernel.Drivers</c> and published to the ring. virt's default
 /// NIC is a virtio-net-pci function that the kit's VirtioNetDriver binds, so
 /// the E1000E tests skip on arm64. The usb-kbd cell adds a qemu-xhci
-/// controller with a usb-kbd plugged in at boot: the USB keyboard group
-/// proves the kit's Usb bus kind over it, the decline-after-open
-/// fall-through to the shipped <see cref="UsbKeyboardDriver"/>, and the
+/// controller with a usb-kbd plugged in at boot, the usb-kbd-ehci cell a
+/// usb-ehci, the usb-kbd-ohci and usb-kbd-ohci-hub cells a pci-ohci (the
+/// latter with the keyboard behind a usb-hub) and the usb-kbd-ehci-ohci
+/// cell an ICH9 EHCI with a pci-ohci companion that takes the full-speed
+/// keyboard: the host group proves each shipped host driver
+/// (<see cref="XhciDriver"/>, <see cref="EhciDriver"/>, <see cref="OhciDriver"/>)
+/// bound over its function, and the USB keyboard group proves the kit's
+/// Usb bus kind over whichever host the cell carries, the
+/// decline-after-open fall-through to the shipped
+/// <see cref="UsbKeyboardDriver"/>, the key the engine types, and the
 /// unplug and replug the engine performs over QMP when a test asks; the
-/// group skips on the other cells. The usb-mouse cell puts a usb-mouse on
-/// the same controller: the USB mouse group proves the shipped
+/// groups skip on the other cells. The usb-mouse cell puts a usb-mouse on
+/// the xHCI: the USB mouse group proves the shipped
 /// <see cref="UsbMouseDriver"/> with the pointer events the engine injects
 /// over QMP, which QEMU hands to the USB mouse once its driver polls it;
 /// the group skips on the other cells. q35's built-in 8042 carries a
@@ -92,8 +104,8 @@ namespace Cosmos.Kernel.Tests.Drivers;
 /// </summary>
 public class Kernel : Sys.Kernel
 {
-    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 6 USB keyboard, 4 USB mouse, 7 PS/2, 6 virtio-blk, 3 PCI Express root port.</summary>
-    private const int ExpectedTestCount = 60;
+    /// <summary>Total tests: 6 manifest, 2 engine, 5 arbitration, 7 keyboard device, 1 display device, 1 block device, 3 retract, 3 children, 1 diagnostics, 5 hardware, 3 USB host, 6 USB keyboard, 4 USB mouse, 7 PS/2, 6 virtio-blk, 3 PCI Express root port.</summary>
+    private const int ExpectedTestCount = 63;
 
     /// <summary>Key of the node the constructor publishes, before the engine starts.</summary>
     private const string BootKey = "boot";
@@ -191,6 +203,30 @@ public class Kernel : Sys.Kernel
     /// <summary>The end of a function node's description for an xHCI controller: class 0C, subclass 03, programming interface 30.</summary>
     private const string XhciClassDescription = "class 0c.03.30";
 
+    /// <summary>The end of a function node's description for an EHCI controller: class 0C, subclass 03, programming interface 20.</summary>
+    private const string EhciClassDescription = "class 0c.03.20";
+
+    /// <summary>The end of a function node's description for an OHCI controller: class 0C, subclass 03, programming interface 10.</summary>
+    private const string OhciClassDescription = "class 0c.03.10";
+
+    /// <summary>What the host tests call the xHCI in their failure messages.</summary>
+    private const string XhciName = "xHCI";
+
+    /// <summary>What the host tests call the EHCI in their failure messages.</summary>
+    private const string EhciName = "EHCI";
+
+    /// <summary>What the host tests call the OHCI in their failure messages.</summary>
+    private const string OhciName = "OHCI";
+
+    /// <summary>The fragment of a cell's profile name that says its host is an EHCI, alone or with its companion.</summary>
+    private const string EhciProfileFragment = "ehci";
+
+    /// <summary>The fragment of a cell's profile name that says its host is an OHCI, alone or as the EHCI's companion.</summary>
+    private const string OhciProfileFragment = "ohci";
+
+    /// <summary>The fragment of a cell's profile name that says its keyboard sits behind a hub.</summary>
+    private const string HubProfileFragment = "hub";
+
     /// <summary>The end of an interface node's description for a HID boot keyboard: interface class 03, subclass 01, protocol 01.</summary>
     private const string UsbKeyboardDescriptionSuffix = "class 03.01.01";
 
@@ -222,8 +258,17 @@ public class Kernel : Sys.Kernel
     /// <summary>How long a hot-plug wait sleeps between looks, so those threads get to run.</summary>
     private const int HotPlugPollMilliseconds = 50;
 
-    /// <summary>Skip reason of the USB tests on a cell whose bus carries no xHCI controller.</summary>
+    /// <summary>Skip reason of the USB keyboard and mouse tests on a cell whose bus carries no USB host controller.</summary>
+    private const string SkipNoUsbHost = "no USB host controller on this cell";
+
+    /// <summary>Skip reason of the xHCI host test on a cell whose bus carries no xHCI controller.</summary>
     private const string SkipNoXhci = "no xHCI controller on this cell";
+
+    /// <summary>Skip reason of the EHCI host test on a cell whose bus carries no EHCI controller.</summary>
+    private const string SkipNoEhci = "no EHCI controller on this cell";
+
+    /// <summary>Skip reason of the OHCI host test on a cell whose bus carries no OHCI controller.</summary>
+    private const string SkipNoOhci = "no OHCI controller on this cell";
 
     /// <summary>Skip reason of the USB keyboard tests on a cell whose controller carries no keyboard.</summary>
     private const string SkipNoUsbKeyboard = "no USB keyboard on this cell";
@@ -270,8 +315,8 @@ public class Kernel : Sys.Kernel
     /// <summary>The name the shipped driver publishes the PS/2 mouse under.</summary>
     private const string Ps2MouseName = "ps2-mouse";
 
-    /// <summary>Asks the engine to press and release a key (see TR.RequestHost): QEMU's qcode a, which the controller's translation delivers as set 1 make 0x1E and break 0x9E.</summary>
-    private const string Ps2KeyRequest = "key-press a";
+    /// <summary>Asks the engine to press and release a key (see TR.RequestHost): QEMU's qcode a, which reaches the active keyboard: the 8042's translation delivers it as set 1 make 0x1E and break 0x9E, and the USB keyboard driver maps HID usage 0x04 to the same codes.</summary>
+    private const string KeyPressRequest = "key-press a";
 
     /// <summary>Asks the engine to move the mouse 10 units right and none down; QEMU hands it to the active mouse, the USB one when present.</summary>
     private const string MouseMoveRequest = "mouse-move 10 0";
@@ -409,8 +454,13 @@ public class Kernel : Sys.Kernel
     private BusState? _busState;
     private string? _e1000ePath;
     private string? _xhciPath;
+    private string? _ehciPath;
+    private string? _ohciPath;
+    private string? _usbKeyboardHostPath;
+    private string? _usbKeyboardParentPath;
     private string? _usbKeyboardPath;
     private DeviceNode? _usbKeyboardNode;
+    private string? _usbMouseHostPath;
     private string? _usbMousePath;
     private string? _i8042Path;
     private string? _virtioBlkPath;
@@ -503,20 +553,38 @@ public class Kernel : Sys.Kernel
         TR.RunIf(hasE1000E, "Hardware_E1000E_LinkUp", TestHardwareE1000ELinkUp, SkipNoE1000E);
         TR.RunIf(hasE1000E, "Hardware_E1000E_Transmit", TestHardwareE1000ETransmit, SkipNoE1000E);
 
+        // ==================== USB host controllers ====================
+        // The usb-kbd and usb-mouse cells carry a qemu-xhci controller, the
+        // usb-kbd-ehci cell a usb-ehci, the usb-kbd-ohci and usb-kbd-ohci-hub
+        // cells a pci-ohci and the usb-kbd-ehci-ohci cell an ICH9 EHCI with a
+        // pci-ohci companion; bare and the virtio-blk cells carry none and
+        // every USB group skips. Each host function is found by its PCI
+        // class, whatever its state, and tested through its own driver's
+        // state. The probes scan the root ports at the driver stage, so a
+        // device present at boot is in the tree by now.
+        _xhciPath = FindUsbHostPath(XhciClassDescription);
+        _ehciPath = FindUsbHostPath(EhciClassDescription);
+        _ohciPath = FindUsbHostPath(OhciClassDescription);
+        bool hasUsbHost = _xhciPath is not null || _ehciPath is not null || _ohciPath is not null;
+        TR.RunIf(_xhciPath is not null, "Usb_XhciHost_Bound", TestUsbXhciHostBound, SkipNoXhci);
+        TR.RunIf(_ehciPath is not null, "Usb_EhciHost_Bound", TestUsbEhciHostBound, SkipNoEhci);
+        TR.RunIf(_ohciPath is not null, "Usb_OhciHost_Bound", TestUsbOhciHostBound, SkipNoOhci);
+
         // ==================== USB keyboard ====================
-        // The usb-kbd cell carries a qemu-xhci controller with a usb-kbd plugged
-        // in at boot; the engine unplugs and replugs it over QMP when asked. On
-        // the bare cell there is no controller and the group skips, and on the
-        // usb-mouse cell the controller carries no keyboard. The xHCI probe
-        // scans the root ports at the driver stage, so a device present at
-        // boot is in the tree by now.
-        _xhciPath = FindXhciPath();
-        bool hasXhci = _xhciPath is not null;
-        bool hasUsbKeyboard = hasXhci && FindUsbKeyboardPath() is not null;
-        string skipUsbKeyboard = hasXhci ? SkipNoUsbKeyboard : SkipNoXhci;
-        TR.RunIf(hasXhci, "Usb_XhciHost_Bound", TestUsbXhciHostBound, SkipNoXhci);
+        // Every usb-kbd cell has a usb-kbd plugged in at boot on whichever
+        // host it carries, behind the hub on the hub cell, where the keyboard
+        // is one offer deeper (the hub's probe publishes it, on the kit
+        // worker) and so waited for; the engine types on it, unplugs it and
+        // replugs it over QMP when asked. On the usb-mouse cell the
+        // controller carries no keyboard. The host above the keyboard is
+        // what the group's state assertions read, through UsbHostView.
+        string? usbKeyboardPath = hasUsbHost && TR.ProfileContains(HubProfileFragment) ? WaitForUsbKeyboardPath() : FindUsbKeyboardPath();
+        _usbKeyboardHostPath = usbKeyboardPath is null ? null : FindUsbHostPathAbove(usbKeyboardPath);
+        bool hasUsbKeyboard = _usbKeyboardHostPath is not null;
+        string skipUsbKeyboard = hasUsbHost ? SkipNoUsbKeyboard : SkipNoUsbHost;
         TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_BoundAfterDecline", TestUsbKeyboardBoundAfterDecline, skipUsbKeyboard);
         TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_SetLedsRoundTrip", TestUsbKeyboardSetLedsRoundTrip, skipUsbKeyboard);
+        TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_KeyInjected", TestUsbKeyboardKeyInjected, skipUsbKeyboard);
         TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_Unplug_RetractsNode", TestUsbKeyboardUnplugRetractsNode, skipUsbKeyboard);
         TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_Replug_PublishesAgain", TestUsbKeyboardReplugPublishesAgain, skipUsbKeyboard);
         TR.RunIf(hasUsbKeyboard, "Usb_Keyboard_Replug_SetLeds", TestUsbKeyboardReplugSetLeds, skipUsbKeyboard);
@@ -525,9 +593,13 @@ public class Kernel : Sys.Kernel
         // The usb-mouse cell carries a qemu-xhci controller with a usb-mouse
         // plugged in at boot; the engine injects pointer events over QMP when
         // asked, which QEMU hands to the USB mouse once its driver polls it.
-        _usbMousePath = hasXhci ? FindUsbMousePath() : null;
+        // The group reads the host above the mouse the way the keyboard
+        // group does, so a mouse on another host would run it unchanged.
+        string? usbMousePath = FindUsbMousePath();
+        _usbMouseHostPath = usbMousePath is null ? null : FindUsbHostPathAbove(usbMousePath);
+        _usbMousePath = _usbMouseHostPath is null ? null : usbMousePath;
         bool hasUsbMouse = _usbMousePath is not null;
-        string skipUsbMouse = hasXhci ? SkipNoUsbMouse : SkipNoXhci;
+        string skipUsbMouse = hasUsbHost ? SkipNoUsbMouse : SkipNoUsbHost;
         TR.RunIf(hasUsbMouse, "Usb_Mouse_Bound", TestUsbMouseBound, skipUsbMouse);
         TR.RunIf(hasUsbMouse, "Usb_Mouse_MovementInjected", TestUsbMouseMovementInjected, skipUsbMouse);
         TR.RunIf(hasUsbMouse, "Usb_Mouse_ButtonInjected", TestUsbMouseButtonInjected, skipUsbMouse);
@@ -537,17 +609,21 @@ public class Kernel : Sys.Kernel
         // q35 has an 8042 with a keyboard and a mouse built in, on every x64
         // cell; virt has none and the group skips. The host injects a key and
         // pointer events over QMP when asked; QEMU hands the key to a usb-kbd
-        // and the pointer events to a usb-mouse when one is present, so the
-        // key test skips on usb-kbd and the pointer tests on usb-mouse.
+        // and the pointer events to a usb-mouse when one is present, on
+        // whichever host controller, so the key test skips on every usb-kbd
+        // cell and the pointer tests on usb-mouse. The gates read the
+        // devices' presence alone, not the host they hang off.
+        bool usbKeyboardPresent = usbKeyboardPath is not null;
+        bool usbMousePresent = usbMousePath is not null;
         _i8042Path = FindI8042Path();
         bool has8042 = _i8042Path is not null;
         TR.RunIf(has8042, "Ps2_Controller_Bound", TestPs2ControllerBound, SkipNo8042);
         TR.RunIf(has8042, "Ps2_Keyboard_Bound", TestPs2KeyboardBound, SkipNo8042);
-        TR.RunIf(has8042 && !hasUsbKeyboard, "Ps2_Keyboard_KeyInjected", TestPs2KeyboardKeyInjected, has8042 ? SkipUsbKeyboardTakesKeys : SkipNo8042);
+        TR.RunIf(has8042 && !usbKeyboardPresent, "Ps2_Keyboard_KeyInjected", TestPs2KeyboardKeyInjected, has8042 ? SkipUsbKeyboardTakesKeys : SkipNo8042);
         TR.RunIf(has8042, "Ps2_Keyboard_SetLedsRoundTrip", TestPs2KeyboardSetLedsRoundTrip, SkipNo8042);
         TR.RunIf(has8042, "Ps2_Mouse_Bound", TestPs2MouseBound, SkipNo8042);
-        TR.RunIf(has8042 && !hasUsbMouse, "Ps2_Mouse_MovementInjected", TestPs2MouseMovementInjected, has8042 ? SkipUsbMouseTakesPointer : SkipNo8042);
-        TR.RunIf(has8042 && !hasUsbMouse, "Ps2_Mouse_ButtonInjected", TestPs2MouseButtonInjected, has8042 ? SkipUsbMouseTakesPointer : SkipNo8042);
+        TR.RunIf(has8042 && !usbMousePresent, "Ps2_Mouse_MovementInjected", TestPs2MouseMovementInjected, has8042 ? SkipUsbMouseTakesPointer : SkipNo8042);
+        TR.RunIf(has8042 && !usbMousePresent, "Ps2_Mouse_ButtonInjected", TestPs2MouseButtonInjected, has8042 ? SkipUsbMouseTakesPointer : SkipNo8042);
 
         // ==================== virtio-blk ====================
         // The virtio-blk-pci and virtio-blk-mmio cells attach one virtio-blk disk;
@@ -1366,27 +1442,27 @@ public class Kernel : Sys.Kernel
         Assert.Equal(transmittedBefore + 1, state.FramesTransmitted, "the driver should count the one frame the ring queued");
     }
 
-    // ==================== USB keyboard ====================
+    // ==================== USB host controllers ====================
     //
-    // The kit's Usb bus kind over the cell's qemu-xhci controller: the host
-    // driver bound and running its hot-plug thread, the keyboard interface
-    // bound by the shipped driver after the suite's higher-priority driver
-    // opened its pipe and declined, an LED write through the state object,
-    // then one unplug and one replug the engine performs over QMP. The
-    // shipped drivers are no RecordingDriver, so their detach shows through
-    // the node, the kit's counts and the suite's consumer.
+    // One test per shipped host driver, each on the cells whose bus carries
+    // its function: the node bound by the right driver and holding its
+    // registers, the hot-plug thread running, the events taken from the
+    // interrupt where the platform routes one, and the bus numbered as the
+    // cell's controllers bound. The companion cell carries two: the EHCI,
+    // bound first, released its full-speed keyboard to the OHCI, so the
+    // device is on the OHCI's bus and under the OHCI's node while the
+    // EHCI's bus stays empty. The hub cell's OHCI carries the hub and the
+    // keyboard behind it.
 
     private void TestUsbXhciHostBound()
     {
-        if (!TryGetXhci(out string? path, out DeviceNodeInfo info))
+        if (!TryGetUsbHost(_xhciPath, XhciName, out string? path, out DeviceNodeInfo info))
         {
             return;
         }
 
-        Assert.True(info.State == DeviceNodeState.Bound, "the xHCI driver should hold the controller");
-        Assert.True(info.DriverName == nameof(XhciDriver), "XhciDriver should hold the controller");
+        AssertUsbHostNode(info, nameof(XhciDriver));
         Assert.True(info.ChildCount >= 1, "the controller should have published the boot-time device's interface node under it");
-        Assert.True(info.HeldResourceCount >= 1, "the binding should hold the controller's register window at least");
 
         XhciState? state = FindDriverState<XhciState>(path);
         Assert.NotNull(state);
@@ -1400,6 +1476,130 @@ public class Kernel : Sys.Kernel
         Assert.True(state.Bus.DeviceCount >= 1, "the bus should carry the device plugged in at boot");
         Assert.Equal(1, state.Bus.Ordinal, "the cell's one controller is bus 1");
     }
+
+    // Alone, the EHCI carries the high-speed keyboard; with its companion it
+    // carries nothing, having handed the full-speed keyboard over, and the
+    // hand-off is what the companion cell proves.
+    private void TestUsbEhciHostBound()
+    {
+        if (!TryGetUsbHost(_ehciPath, EhciName, out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        AssertUsbHostNode(info, nameof(EhciDriver));
+
+        EhciState? state = FindDriverState<EhciState>(path);
+        Assert.NotNull(state);
+        if (state is null)
+        {
+            return;
+        }
+
+        Assert.True(state.HotPlugRunning, "TryStartThread needs the scheduler");
+        AssertLegacyLineEvents(state.HasInterrupt, state.IsPolling, EhciProfileFragment);
+        Assert.Equal(1, state.Bus.Ordinal, "the EHCI binds first on every cell that carries one: bus 1");
+
+        if (_ohciPath is null)
+        {
+            Assert.True(info.ChildCount >= 1, "the controller should have published the boot-time device's interface node under it");
+            Assert.True(state.Bus.DeviceCount >= 1, "the bus should carry the high-speed device plugged in at boot");
+            return;
+        }
+
+        Assert.Equal(0, info.ChildCount, "the full-speed keyboard went to the companion: nothing sits under the EHCI's node");
+        Assert.Equal(0, state.Bus.DeviceCount, "the EHCI's bus carries no device once the keyboard is the companion's");
+        Assert.True(state.CompanionPortsReleased >= 1, "the EHCI should have released the keyboard's port to the companion");
+    }
+
+    // Alone, the OHCI is bus 1; as the EHCI's companion it binds second and
+    // is bus 2, with the keyboard the EHCI released. On the hub cell its
+    // bus carries the hub and the keyboard behind it, whose node sits under
+    // the hub's, which sits under the controller's.
+    private void TestUsbOhciHostBound()
+    {
+        if (!TryGetUsbHost(_ohciPath, OhciName, out string? path, out DeviceNodeInfo info))
+        {
+            return;
+        }
+
+        AssertUsbHostNode(info, nameof(OhciDriver));
+        Assert.True(info.ChildCount >= 1, "the controller should have published the boot-time device's interface node under it");
+
+        OhciState? state = FindDriverState<OhciState>(path);
+        Assert.NotNull(state);
+        if (state is null)
+        {
+            return;
+        }
+
+        Assert.True(state.HotPlugRunning, "TryStartThread needs the scheduler");
+        AssertLegacyLineEvents(state.HasInterrupt, state.IsPolling, OhciProfileFragment);
+        Assert.True(state.Bus.DeviceCount >= 1, "the bus should carry the device plugged in at boot");
+        if (_ehciPath is null)
+        {
+            Assert.Equal(1, state.Bus.Ordinal, "the cell's one controller is bus 1");
+        }
+        else
+        {
+            Assert.Equal(2, state.Bus.Ordinal, "the companion binds after the EHCI it serves: bus 2");
+        }
+
+        if (!TR.ProfileContains(HubProfileFragment))
+        {
+            return;
+        }
+
+        Assert.True(state.Bus.DeviceCount >= 2, "the hub cell's bus should carry the hub and the keyboard behind it");
+        string? keyboardPath = FindUsbKeyboardPath();
+        Assert.NotNull(keyboardPath, "the hub cell should carry a keyboard behind the hub");
+        if (keyboardPath is null)
+        {
+            return;
+        }
+
+        Assert.True(TryFindNode(keyboardPath, out DeviceNodeInfo keyboard) && keyboard.ParentPath is not null && TryFindNode(keyboard.ParentPath, out DeviceNodeInfo hub) && hub.DriverName == nameof(UsbHubDriver) && hub.ParentPath == path, "the keyboard's node should sit under the hub's node, which sits under the OHCI's");
+    }
+
+    /// <summary>The assertions every host's node must pass: bound by its driver and holding its register window.</summary>
+    /// <param name="info">The host function node's snapshot.</param>
+    /// <param name="driverName">The shipped host driver's class name.</param>
+    private static void AssertUsbHostNode(DeviceNodeInfo info, string driverName)
+    {
+        Assert.True(info.State == DeviceNodeState.Bound, $"{driverName} should hold the controller");
+        Assert.True(info.DriverName == driverName, $"{driverName} should be the driver on the controller's node");
+        Assert.True(info.HeldResourceCount >= 1, "the binding should hold the controller's register window at least");
+    }
+
+    /// <summary>
+    /// Checks how an EHCI or OHCI takes its events. Both are INTx-only
+    /// functions: on x64 the I/O APIC routes the line and the cell's profile
+    /// leaves it free (no NIC), so the handler path must be the one in use,
+    /// not only the invariant; the ARM64 platform routes no legacy line, so
+    /// there the controller polls, and either way it is one or the other.
+    /// </summary>
+    /// <param name="hasInterrupt">The state's HasInterrupt.</param>
+    /// <param name="isPolling">The state's IsPolling.</param>
+    /// <param name="profileFragment">The fragment of the profile name that says the cell was shaped for this controller.</param>
+    private static void AssertLegacyLineEvents(bool hasInterrupt, bool isPolling, string profileFragment)
+    {
+        Assert.True(hasInterrupt != isPolling, "the controller takes its events from the line interrupt or polls, never both or neither");
+        if (PlatformHAL.Architecture != PlatformArchitecture.ARM64 && TR.ProfileContains(profileFragment))
+        {
+            Assert.True(hasInterrupt, "on x64 the function's line is routed and free, so the handler should be the path in use");
+        }
+    }
+
+    // ==================== USB keyboard ====================
+    //
+    // The kit's Usb bus kind over the cell's host controller, whichever it
+    // is: the keyboard interface bound by the shipped driver after the
+    // suite's higher-priority driver opened its pipe and declined, an LED
+    // write through the state object, a key the engine types over QMP, then
+    // one unplug and one replug the engine performs over QMP. The shipped
+    // drivers are no RecordingDriver, so their detach shows through the
+    // node, the kit's counts and the suite's consumer; the host's state is
+    // read through UsbHostView, the same members on every host.
 
     // The keyboard published at boot went to the ring's consumer, so the
     // keyboard manager holds it; the suite's consumer, installed afterwards,
@@ -1420,7 +1620,22 @@ public class Kernel : Sys.Kernel
         Assert.True(TryFindNode(path, out DeviceNodeInfo info), "the keyboard node should be in the tree");
         Assert.True(info.State == DeviceNodeState.Bound, "the keyboard interface should be bound");
         Assert.True(info.DriverName == nameof(UsbKeyboardDriver), "UsbKeyboardDriver should hold the keyboard interface");
-        Assert.True(info.ParentPath == _xhciPath, "the interface node should sit under the controller's node");
+        _usbKeyboardParentPath = info.ParentPath;
+        if (TR.ProfileContains(HubProfileFragment))
+        {
+            Assert.True(info.ParentPath is not null && TryFindNode(info.ParentPath, out DeviceNodeInfo hub) && hub.DriverName == nameof(UsbHubDriver) && hub.ParentPath == _usbKeyboardHostPath, "behind a hub, the interface node should sit under the hub's node, which sits under the controller's");
+        }
+        else
+        {
+            Assert.True(info.ParentPath == _usbKeyboardHostPath, "the interface node should sit under the controller's node");
+        }
+
+        if (TryGetUsbKeyboardHostView(out _, out UsbHostView? host))
+        {
+            Assert.True(host.HotPlugRunning, "the host above the keyboard should be running its hot-plug thread");
+            Assert.True(host.Bus.DeviceCount >= 1, "the host's bus should carry the keyboard");
+        }
+
         Assert.True(info.BusName == UsbBusName, "the interface node sits on the usb bus");
         Assert.Equal(0, info.ResourceCount, "a USB interface node carries no resources");
         Assert.Equal(0, info.InterruptCount, "a USB interface node carries no interrupt sources");
@@ -1469,66 +1684,85 @@ public class Kernel : Sys.Kernel
         Assert.True(state.LastLedStatus == UsbTransferStatus.Success, "the keyboard should accept the output report");
     }
 
+    // QMP send-key reaches the USB keyboard when one is present and releases
+    // the key after its default 100 ms hold time: two reports through the
+    // host's interrupt pipe, which the shipped driver maps to the set 1 make
+    // and break the PS/2 test expects. The one place each host's report pipe
+    // re-queue runs under test.
+    private void TestUsbKeyboardKeyInjected()
+    {
+        if (!TryGetUsbKeyboardState(out UsbKeyboardState? state))
+        {
+            return;
+        }
+
+        int keysBefore = _keyboardConsumer.KeyCount;
+        int eventsBefore = state.KeyEvents;
+
+        TR.RequestHost(KeyPressRequest);
+
+        Assert.True(WaitUntil(() => _keyboardConsumer.KeyCount >= keysBefore + 2), "the make and the break of the injected key should reach the consumer");
+        Assert.Equal(TestScanCode, _keyboardConsumer.LastPressedScanCode, "the driver maps HID usage 0x04 to set 1 make code 0x1E");
+        Assert.True(_keyboardConsumer.LastScanCode == TestScanCode && _keyboardConsumer.LastReleased, "the last report is the release");
+        Assert.True(_keyboardConsumer.LastKeyDevice is { Device: IKeyboard keyboard } && keyboard.Name == UsbKeyboardName, "the key came from the USB keyboard");
+        Assert.True(state.KeyEvents >= eventsBefore + 2, "the driver should have forwarded the press and the release");
+    }
+
     // The node leaves the tree on the kit worker, in the teardown's last
     // step; the bus releases the device on the hot-plug thread, after the
-    // slot is disabled. The wait covers both.
+    // slot is disabled. The wait covers both. The parent whose child count
+    // drops is the host's node, or the hub's on the hub cell, where the hub
+    // stays on the bus and the device count drops by the keyboard alone.
     private void TestUsbKeyboardUnplugRetractsNode()
     {
-        if (!TryGetXhci(out string? xhciPath, out DeviceNodeInfo hostBefore) || !TryGetUsbKeyboard(out string? path, out DeviceNode? node))
+        if (!TryGetUsbKeyboardHostView(out string? hostPath, out UsbHostView? host)
+            || !TryGetUsbKeyboardParent(out string? parentPath, out DeviceNodeInfo parentBefore)
+            || !TryGetUsbKeyboard(out string? path, out DeviceNode? node))
         {
             return;
         }
 
-        XhciState? state = FindDriverState<XhciState>(xhciPath);
-        Assert.NotNull(state);
-        if (state is null)
-        {
-            return;
-        }
-
-        int childrenBefore = hostBefore.ChildCount;
+        int childrenBefore = parentBefore.ChildCount;
+        int busDevicesBefore = host.Bus.DeviceCount;
         int nodesBefore = DriverDiagnostics.NodeCount;
         int devicesBefore = DriverDiagnostics.DeviceCount;
         int withdrawnBefore = _keyboardConsumer.WithdrawnCount;
 
         TR.RequestHost(UsbKeyboardUnplugRequest);
 
-        Assert.True(WaitUntil(() => !TryFindNode(path, out _) && state.Bus.DeviceCount == 0), "the keyboard node should leave the tree and the bus should release its device after the unplug");
+        Assert.True(WaitUntil(() => !TryFindNode(path, out _) && host.Bus.DeviceCount == busDevicesBefore - 1), "the keyboard node should leave the tree and the bus should release its device after the unplug");
         Assert.True(node.State == NodeState.Retracted, "the node should be retracted");
         Assert.True(node.Binding is { IsDetaching: true }, "the binding should be flagged as detaching");
         Assert.True(FindDeviceIndex(UsbKeyboardName) < 0, "the withdrawn keyboard should have left the published list");
         Assert.Equal(devicesBefore - 1, DriverDiagnostics.DeviceCount, "the published list should have shrunk by one");
         Assert.Equal(withdrawnBefore + 1, _keyboardConsumer.WithdrawnCount, "the consumer should be told the keyboard is gone");
         Assert.Equal(nodesBefore - 1, DriverDiagnostics.NodeCount, "the node count should drop by one");
-        Assert.True(TryFindNode(xhciPath, out DeviceNodeInfo hostAfter), "the controller's node should still be in the tree");
-        Assert.Equal(childrenBefore - 1, hostAfter.ChildCount, "a retracted child leaves its parent's count");
-        Assert.Equal(0, state.Bus.DeviceCount, "the bus should carry no device once the keyboard is gone");
-        Assert.True(state.PipesClosed >= 1, "the controller should have closed the keyboard's report pipe");
+        Assert.True(TryFindNode(parentPath, out DeviceNodeInfo parentAfter), "the keyboard's parent node should still be in the tree");
+        Assert.Equal(childrenBefore - 1, parentAfter.ChildCount, "a retracted child leaves its parent's count");
+        Assert.Equal(busDevicesBefore - 1, host.Bus.DeviceCount, "the bus should carry one device fewer once the keyboard is gone");
+        UsbHostView? after = FindUsbHostView(hostPath);
+        Assert.True(after is not null && after.PipesClosed >= 1, "the controller should have closed the keyboard's report pipe");
     }
 
-    // The root port QEMU picks for the replug is its own (the next free
-    // one), so the new path is logged, not asserted.
+    // The root port QEMU picks for the replug is its own on the xHCI (the
+    // next free one); on the EHCI and OHCI the engine pins the port the
+    // keyboard left, behind the hub on the hub cell. The new path is
+    // logged, not asserted.
     private void TestUsbKeyboardReplugPublishesAgain()
     {
-        if (!TryGetXhci(out string? xhciPath, out DeviceNodeInfo hostBefore))
-        {
-            return;
-        }
-
-        XhciState? state = FindDriverState<XhciState>(xhciPath);
-        Assert.NotNull(state);
-        if (state is null)
+        if (!TryGetUsbKeyboardHostView(out _, out UsbHostView? host) || !TryGetUsbKeyboardParent(out string? parentPath, out DeviceNodeInfo parentBefore))
         {
             return;
         }
 
         int publishedBefore = _keyboardConsumer.PublishedCount;
         int nodesBefore = DriverDiagnostics.NodeCount;
-        int childrenBefore = hostBefore.ChildCount;
+        int childrenBefore = parentBefore.ChildCount;
+        int busDevicesBefore = host.Bus.DeviceCount;
 
         TR.RequestHost(UsbKeyboardPlugRequest);
 
-        Assert.True(WaitUntil(() => FindUsbKeyboardPath() is { } found && TryFindNode(found, out DeviceNodeInfo foundInfo) && foundInfo.State == DeviceNodeState.Bound && state.Bus.DeviceCount == 1), "the keyboard should be bound again after the replug");
+        Assert.True(WaitUntil(() => FindUsbKeyboardPath() is { } found && TryFindNode(found, out DeviceNodeInfo foundInfo) && foundInfo.State == DeviceNodeState.Bound && host.Bus.DeviceCount == busDevicesBefore + 1), "the keyboard should be bound again after the replug");
 
         DeviceNode? oldNode = _usbKeyboardNode;
         string? path = FindUsbKeyboardPath();
@@ -1555,8 +1789,8 @@ public class Kernel : Sys.Kernel
         Assert.Equal(publishedBefore + 1, _keyboardConsumer.PublishedCount, "the suite's consumer should be handed the replugged keyboard");
         Assert.True(_keyboardConsumer.LastPublished is { Device: IKeyboard keyboard } && keyboard.Name == UsbKeyboardName, "the published device should be the shipped driver's keyboard");
         Assert.Equal(nodesBefore + 1, DriverDiagnostics.NodeCount, "the node count should grow by one");
-        Assert.True(TryFindNode(xhciPath, out DeviceNodeInfo hostAfter), "the controller's node should still be in the tree");
-        Assert.Equal(childrenBefore + 1, hostAfter.ChildCount, "the controller should count its child again");
+        Assert.True(TryFindNode(parentPath, out DeviceNodeInfo parentAfter), "the keyboard's parent node should still be in the tree");
+        Assert.Equal(childrenBefore + 1, parentAfter.ChildCount, "the parent should count its child again");
         Assert.True(FindDeviceIndex(UsbKeyboardName) >= 0, "the keyboard should be back in the published list");
     }
 
@@ -1598,7 +1832,9 @@ public class Kernel : Sys.Kernel
         Assert.True(TryFindNode(path, out DeviceNodeInfo info), "the mouse node should be in the tree");
         Assert.True(info.State == DeviceNodeState.Bound, "the mouse interface should be bound");
         Assert.True(info.DriverName == nameof(UsbMouseDriver), "UsbMouseDriver should hold the mouse interface");
-        Assert.True(info.ParentPath == _xhciPath, "the interface node should sit under the controller's node");
+        Assert.True(info.ParentPath == _usbMouseHostPath, "the interface node should sit under the controller's node");
+        UsbHostView? host = _usbMouseHostPath is null ? null : FindUsbHostView(_usbMouseHostPath);
+        Assert.True(host is not null && host.HotPlugRunning && host.Bus.DeviceCount >= 1, "the mouse's host should run its hot-plug thread with the mouse on its bus");
         Assert.True(info.BusName == UsbBusName, "the interface node sits on the usb bus");
         Assert.Equal(0, info.ResourceCount, "a USB interface node carries no resources");
         Assert.Equal(0, info.InterruptCount, "a USB interface node carries no interrupt sources");
@@ -1781,7 +2017,7 @@ public class Kernel : Sys.Kernel
         int keysBefore = _keyboardConsumer.KeyCount;
         int eventsBefore = state.KeyEvents;
 
-        TR.RequestHost(Ps2KeyRequest);
+        TR.RequestHost(KeyPressRequest);
 
         Assert.True(WaitUntil(() => _keyboardConsumer.KeyCount >= keysBefore + 2), "the make and the break of the injected key should reach the consumer");
         Assert.Equal(TestScanCode, _keyboardConsumer.LastPressedScanCode, "qcode a is set 1 make code 0x1E");
@@ -2364,20 +2600,23 @@ public class Kernel : Sys.Kernel
     }
 
     /// <summary>
-    /// Finds the path of the first function node describing an xHCI
-    /// controller, whatever its state: the USB tests decide from the
-    /// hardware's presence, as the E1000E tests do, so a probe that failed
-    /// shows up as a failed test rather than a skip.
+    /// Finds the path of the first function node describing a USB host
+    /// controller of one class (<see cref="XhciClassDescription"/>,
+    /// <see cref="EhciClassDescription"/> or <see cref="OhciClassDescription"/>),
+    /// whatever its state: the USB tests decide from the hardware's
+    /// presence, as the E1000E tests do, so a probe that failed shows up as
+    /// a failed test rather than a skip.
     /// </summary>
+    /// <param name="classDescription">The end of the function's description: its class, subclass and programming interface.</param>
     /// <returns>The node's path, or null when no such function is on the bus.</returns>
-    private static string? FindXhciPath()
+    private static string? FindUsbHostPath(string classDescription)
     {
         int count = DriverDiagnostics.NodeCount;
         for (int i = 0; i < count; i++)
         {
             if (DriverDiagnostics.TryGetNode(i, out DeviceNodeInfo info)
                 && info.BusName == PciBusName
-                && info.Description.Contains(XhciClassDescription, StringComparison.Ordinal))
+                && info.Description.Contains(classDescription, StringComparison.Ordinal))
             {
                 return info.Path;
             }
@@ -2431,16 +2670,109 @@ public class Kernel : Sys.Kernel
         return null;
     }
 
-    /// <summary>Hands back the controller's path and a fresh snapshot of its node, or fails the test when BeforeRun found none.</summary>
+    /// <summary>Hands back a host controller's path and a fresh snapshot of its node, or fails the test when BeforeRun found none.</summary>
+    /// <param name="hostPath">The path BeforeRun recorded for the controller, null when it found none.</param>
+    /// <param name="name">What the failure message calls the controller.</param>
     /// <param name="path">The node's path.</param>
     /// <param name="info">The node's snapshot.</param>
     /// <returns>True when the node is in the tree.</returns>
-    private bool TryGetXhci([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    private static bool TryGetUsbHost(string? hostPath, string name, [NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
     {
-        path = _xhciPath;
+        path = hostPath;
         if (path is null || !TryFindNode(path, out info))
         {
-            Assert.Fail("the xHCI controller's node was not found by BeforeRun");
+            Assert.Fail($"the {name} controller's node was not found by BeforeRun");
+            info = default;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Finds the host controller above an interface node: the nearest
+    /// ancestor whose binding keeps one of the three shipped hosts' states.
+    /// A device on a root port sits right under the host's node; one behind
+    /// a hub sits under the hub's interface node, which the hub driver's
+    /// binding published, one level further down.
+    /// </summary>
+    /// <param name="path">The interface node's path.</param>
+    /// <returns>The host function node's path, or null when no host is above the node.</returns>
+    private static string? FindUsbHostPathAbove(string path)
+    {
+        DeviceNode? node = FindNode(path)?.Parent;
+        while (node is not null)
+        {
+            if (UsbHostView.Of(node.Binding?.DriverState) is not null)
+            {
+                return node.Path;
+            }
+
+            node = node.Parent;
+        }
+
+        return null;
+    }
+
+    /// <summary>Reads the state behind a host function node's binding, whichever shipped host driver holds it.</summary>
+    /// <param name="path">The host function node's path.</param>
+    /// <returns>The view, or null when the node is not bound by a shipped host driver.</returns>
+    private static UsbHostView? FindUsbHostView(string path)
+    {
+        return UsbHostView.Of(FindNode(path)?.Binding?.DriverState);
+    }
+
+    /// <summary>
+    /// Waits for the keyboard's interface node on the hub cell: the hub's
+    /// node, published by the OHCI's probe, is bound on the kit worker, and
+    /// the hub's probe publishes the keyboard's node, one offer deeper than
+    /// a root-port device; a worker still at it when BeforeRun looks would
+    /// otherwise turn the group into a skip.
+    /// </summary>
+    /// <returns>The node's path, or null when none appeared within the hot-plug budget.</returns>
+    private static string? WaitForUsbKeyboardPath()
+    {
+        string? path = null;
+        WaitUntil(() => (path = FindUsbKeyboardPath()) is not null);
+        return path;
+    }
+
+    /// <summary>Hands back the path of the host above the keyboard and a fresh snapshot of its node, or fails the test when BeforeRun found none.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private bool TryGetUsbKeyboardHost([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    {
+        return TryGetUsbHost(_usbKeyboardHostPath, "USB keyboard's host", out path, out info);
+    }
+
+    /// <summary>Hands back the path of the host above the keyboard and the view of its state, or fails the test.</summary>
+    /// <param name="path">The host function node's path.</param>
+    /// <param name="host">The view when found.</param>
+    /// <returns>True when the host is bound by a shipped host driver.</returns>
+    private bool TryGetUsbKeyboardHostView([NotNullWhen(true)] out string? path, [NotNullWhen(true)] out UsbHostView? host)
+    {
+        host = null;
+        if (!TryGetUsbKeyboardHost(out path, out _))
+        {
+            return false;
+        }
+
+        host = FindUsbHostView(path);
+        Assert.NotNull(host, "the keyboard's host should be bound by a shipped host driver");
+        return host is not null;
+    }
+
+    /// <summary>Hands back the path of the keyboard's parent node, the host or the hub cell's hub, as the bound test recorded it, and a fresh snapshot of it, or fails the test.</summary>
+    /// <param name="path">The node's path.</param>
+    /// <param name="info">The node's snapshot.</param>
+    /// <returns>True when the node is in the tree.</returns>
+    private bool TryGetUsbKeyboardParent([NotNullWhen(true)] out string? path, out DeviceNodeInfo info)
+    {
+        path = _usbKeyboardParentPath;
+        if (path is null || !TryFindNode(path, out info))
+        {
+            Assert.Fail("the USB keyboard's parent node was not recorded by the bound test");
             info = default;
             return false;
         }

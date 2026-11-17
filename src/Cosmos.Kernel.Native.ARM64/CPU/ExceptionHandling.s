@@ -1,16 +1,11 @@
 // Exception Handling Assembly Stubs for ARM64 (AAPCS64)
 // Implements the low-level exception dispatching for NativeAOT
 
-.section .data
-
-// Global exception info stack head (single-threaded kernel, no TLS needed)
-.global __cosmos_exinfo_stack_head
-__cosmos_exinfo_stack_head: .quad 0
-
 .section .text
 
 // External managed functions
 .extern RhThrowEx                    // C# exception dispatcher
+.extern __cosmos_exinfo_head         // &head of the running thread's ExInfo chain (ExceptionNative)
 
 //=============================================================================
 // Structure offsets
@@ -125,6 +120,12 @@ RhpThrowEx:
     sub     sp, sp, #STACKSIZEOF_ExInfo
     .cfi_adjust_cfa_offset STACKSIZEOF_ExInfo
 
+    // x4 = &head of this thread's ExInfo chain. A managed callout, so it may clobber x0-x17 and
+    // LR: it runs before the ExInfo is set up through x1. The exception object sits in x19, which
+    // it preserves, and the throw site's LR is already in the context.
+    bl      __cosmos_exinfo_head
+    mov     x4, x0
+
     // x1 = ExInfo* (current SP)
     mov     x1, sp
 
@@ -137,12 +138,10 @@ RhpThrowEx:
     mov     w2, #ExKind_Throw
     strb    w2, [x1, #OFFSETOF__ExInfo__m_kind]            // kind = Throw
 
-    // Link ExInfo into the global exception chain
-    adrp    x2, __cosmos_exinfo_stack_head
-    add     x2, x2, :lo12:__cosmos_exinfo_stack_head
-    ldr     x3, [x2]                                        // x3 = current head
+    // Link ExInfo into this thread's exception chain
+    ldr     x3, [x4]                                        // x3 = current head
     str     x3, [x1, #OFFSETOF__ExInfo__m_pPrevExInfo]     // pExInfo->m_pPrevExInfo = head
-    str     x1, [x2]                                        // head = pExInfo
+    str     x1, [x4]                                        // head = pExInfo
 
     // Set the exception context pointer
     add     x3, sp, #STACKSIZEOF_ExInfo                    // x3 = PAL_LIMITED_CONTEXT*
@@ -232,8 +231,12 @@ RhpCallCatchFunclet:
     ldr     x8, [sp, #0x68]             // handler address
     blr     x8                          // call handler funclet
 
-    // x0 now contains the resume address
-    mov     x9, x0                      // Save resume address
+    // x0 = the resume address. Keep it in the handler slot, dead now, across the callout for the
+    // head of this thread's ExInfo chain: a managed call that may clobber x0-x17 and LR.
+    str     x0, [sp, #0x68]
+    bl      __cosmos_exinfo_head
+    mov     x8, x0                      // x8 = &head of this thread's ExInfo chain
+    ldr     x9, [sp, #0x68]             // x9 = resume address
 
     // Reload REGDISPLAY* from stack (x2 may have been clobbered)
     ldr     x2, [sp, #0x70]             // REGDISPLAY*
@@ -242,9 +245,6 @@ RhpCallCatchFunclet:
     ldr     x11, [x2, #OFFSETOF__REGDISPLAY__SP]   // x11 = handler frame's FP
 
     // Pop ExInfo entries that are below the resume SP
-    adrp    x8, __cosmos_exinfo_stack_head
-    add     x8, x8, :lo12:__cosmos_exinfo_stack_head
-
 .pop_exinfo_loop:
     ldr     x10, [x8]                   // current ExInfo
     cbz     x10, .pop_exinfo_done       // null = done
@@ -355,6 +355,72 @@ RhpCallFilterFunclet:
 
 
 //=============================================================================
+// RhpCallFinallyFunclet - Call a finally (or fault) funclet while an exception unwinds its frame
+//
+// INPUT:  x0 = handler funclet address
+//         x1 = REGDISPLAY*
+//
+// The funclet runs with the frame's FP/x19-x28 (restored below) and returns here, and this stub
+// returns to the dispatcher, which goes on with the next clause or frame. The funclet keeps the
+// callee-saved registers as it found them, so nothing is written back to the REGDISPLAY.
+//
+// CFI: see the note on RhpCallCatchFunclet. The epilogue here is the ordinary 5x ldp + indexed
+// ldp + ret; GC cannot fire in it, so prologue CFI is sufficient.
+//=============================================================================
+.global RhpCallFinallyFunclet
+.balign 4
+.cfi_startproc
+RhpCallFinallyFunclet:
+    // Save callee-saved registers. No `mov x29, sp`: x29 is reloaded from REGDISPLAY below, so it
+    // would be dead; CFA stays SP-based.
+    stp     x29, x30, [sp, #-0x60]!
+    .cfi_def_cfa_offset 0x60
+    .cfi_rel_offset x29, 0
+    .cfi_rel_offset x30, 8
+    stp     x19, x20, [sp, #0x10]
+    .cfi_rel_offset x19, 0x10
+    .cfi_rel_offset x20, 0x18
+    stp     x21, x22, [sp, #0x20]
+    .cfi_rel_offset x21, 0x20
+    .cfi_rel_offset x22, 0x28
+    stp     x23, x24, [sp, #0x30]
+    .cfi_rel_offset x23, 0x30
+    .cfi_rel_offset x24, 0x38
+    stp     x25, x26, [sp, #0x40]
+    .cfi_rel_offset x25, 0x40
+    .cfi_rel_offset x26, 0x48
+    stp     x27, x28, [sp, #0x50]
+    .cfi_rel_offset x27, 0x50
+    .cfi_rel_offset x28, 0x58
+
+    // Restore the frame's callee-saved registers from REGDISPLAY (x1); x8 keeps the handler address
+    mov     x8, x0
+    ldr     x29, [x1, #OFFSETOF__REGDISPLAY__FP]
+    ldr     x19, [x1, #OFFSETOF__REGDISPLAY__X19]
+    ldr     x20, [x1, #OFFSETOF__REGDISPLAY__X20]
+    ldr     x21, [x1, #OFFSETOF__REGDISPLAY__X21]
+    ldr     x22, [x1, #OFFSETOF__REGDISPLAY__X22]
+    ldr     x23, [x1, #OFFSETOF__REGDISPLAY__X23]
+    ldr     x24, [x1, #OFFSETOF__REGDISPLAY__X24]
+    ldr     x25, [x1, #OFFSETOF__REGDISPLAY__X25]
+    ldr     x26, [x1, #OFFSETOF__REGDISPLAY__X26]
+    ldr     x27, [x1, #OFFSETOF__REGDISPLAY__X27]
+    ldr     x28, [x1, #OFFSETOF__REGDISPLAY__X28]
+
+    blr     x8                          // call finally funclet
+
+    // Restore our callee-saved registers from stack
+    ldp     x27, x28, [sp, #0x50]
+    ldp     x25, x26, [sp, #0x40]
+    ldp     x23, x24, [sp, #0x30]
+    ldp     x21, x22, [sp, #0x20]
+    ldp     x19, x20, [sp, #0x10]
+    ldp     x29, x30, [sp], #0x60
+    ret
+.cfi_endproc
+
+
+//=============================================================================
 // RhpRethrow - Rethrow the current exception
 //
 // Called when a 'throw;' statement (without exception object) is executed.
@@ -362,9 +428,11 @@ RhpCallFilterFunclet:
 .global RhpRethrow
 .balign 4
 RhpRethrow:
-    // Get current exception from ExInfo chain
-    adrp    x0, __cosmos_exinfo_stack_head
-    add     x0, x0, :lo12:__cosmos_exinfo_stack_head
+    // The exception to rethrow is the one at the head of this thread's ExInfo chain. The head comes
+    // from a managed callout, which clobbers LR, the rethrow site RhpThrowEx records: keep it.
+    str     x30, [sp, #-16]!
+    bl      __cosmos_exinfo_head
+    ldr     x30, [sp], #16
     ldr     x0, [x0]
     cbz     x0, .halt
 

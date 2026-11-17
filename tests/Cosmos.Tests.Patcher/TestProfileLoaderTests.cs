@@ -192,6 +192,179 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Contains("only a 'virtio-blk' disk", ex.Message);
     }
 
+    // The USB host controller axis reaches the launcher as its model, with
+    // the HID devices' USB version and the hub beside it; a profile naming
+    // none of them keeps the xHCI, version 2 and no hub.
+    [Fact]
+    public void LoadFor_ReadsTheUsbControllerAxisOffTheProfile()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            {
+              "name": "companion",
+              "keyboard": "usb-kbd",
+              "usbController": "ehci-ohci",
+              "usbDeviceVersion": 1
+            },
+            {
+              "name": "hub",
+              "keyboard": "usb-kbd",
+              "usbController": "ohci",
+              "usbHub": true
+            },
+            {
+              "name": "stick",
+              "disks": [
+                { "type": "usb" }
+              ]
+            }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "companion,hub,stick");
+
+        TestProfile[] cells = TestProfileLoader.LoadFor(_suiteDir, "x64").ToArray();
+
+        TestProfile companion = Assert.Single(cells, c => c.Name == "companion");
+        Assert.Equal(UsbHostControllerModel.EhciWithOhciCompanion, companion.UsbController);
+        Assert.Equal(QemuLauncher.FullSpeedUsbDeviceVersion, companion.UsbDeviceVersion);
+        Assert.False(companion.UsbHub);
+
+        TestProfile hub = Assert.Single(cells, c => c.Name == "hub");
+        Assert.Equal(UsbHostControllerModel.Ohci, hub.UsbController);
+        Assert.Equal(QemuLauncher.DefaultUsbDeviceVersion, hub.UsbDeviceVersion);
+        Assert.True(hub.UsbHub);
+
+        TestProfile stick = Assert.Single(cells, c => c.Name == "stick");
+        Assert.Equal(UsbHostControllerModel.Xhci, stick.UsbController);
+        Assert.Equal(QemuLauncher.DefaultUsbDeviceVersion, stick.UsbDeviceVersion);
+        Assert.False(stick.UsbHub);
+    }
+
+    // The launcher knows four spellings; a fifth would otherwise boot the
+    // xHCI the profile was written to avoid.
+    [Fact]
+    public void LoadFor_RejectsAnUnknownUsbControllerNamingTheChoices()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            { "name": "oops", "keyboard": "usb-kbd", "usbController": "uhci" }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "oops");
+
+        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
+            () => TestProfileLoader.LoadFor(_suiteDir, "x64"));
+
+        Assert.Contains("uhci", ex.Message);
+        Assert.Contains("ehci-ohci", ex.Message);
+    }
+
+    // QEMU's usb-kbd and usb-mouse take usb_version 1 or 2 and nothing else.
+    [Fact]
+    public void LoadFor_RejectsAUsbDeviceVersionQemuDoesNotTake()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            { "name": "oops", "keyboard": "usb-kbd", "usbController": "ehci", "usbDeviceVersion": 3 }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "oops");
+
+        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
+            () => TestProfileLoader.LoadFor(_suiteDir, "x64"));
+
+        Assert.Contains("usbDeviceVersion", ex.Message);
+    }
+
+    // usb-ehci's root ports are high speed only and the standalone model has
+    // no companion, so a usb_version=1 keyboard cannot attach: QEMU refuses
+    // it at startup, after the build, and the cell reports a failed boot.
+    [Fact]
+    public void LoadFor_RejectsAFullSpeedDeviceOnTheStandaloneEhci()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            { "name": "oops", "keyboard": "usb-kbd", "usbController": "ehci", "usbDeviceVersion": 1 }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "oops");
+
+        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
+            () => TestProfileLoader.LoadFor(_suiteDir, "x64"));
+
+        Assert.Contains("usbDeviceVersion", ex.Message);
+        Assert.Contains("'ehci'", ex.Message);
+        Assert.Contains("ehci-ohci", ex.Message);
+    }
+
+    // The hub is full speed only: port 1 of qemu-xhci is a USB 3 port and a
+    // standalone EHCI has no full-speed port, so QEMU would refuse the
+    // attach at startup, minutes into a CI run.
+    [Theory]
+    [InlineData("xhci")]
+    [InlineData("ehci")]
+    public void LoadFor_RejectsAHubOnAHighSpeedOnlyController(string controller)
+    {
+        string catalog = $$"""
+        {
+          "profiles": [
+            { "name": "oops", "keyboard": "usb-kbd", "usbController": "{{controller}}", "usbHub": true }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "oops");
+
+        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(
+            () => TestProfileLoader.LoadFor(_suiteDir, "x64"));
+
+        Assert.Contains("usbHub", ex.Message);
+        Assert.Contains(controller, ex.Message);
+    }
+
+    // The overlay copies the profile, so the controller axis survives a
+    // modifier as the device models do.
+    [Fact]
+    public void LoadFor_ModifierOverlayPreservesTheUsbControllerAxis()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            {
+              "name": "ohci-hub",
+              "architectures": ["arm64"],
+              "keyboard": "usb-kbd",
+              "usbController": "ohci",
+              "usbHub": true
+            }
+          ],
+          "modifiers": [
+            {
+              "name": "gicv3",
+              "architectures": ["arm64"],
+              "machineOptions": { "gic-version": "3" }
+            }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "ohci-hub", "gicv3");
+
+        TestProfile[] cells = TestProfileLoader.LoadFor(_suiteDir, "arm64").ToArray();
+
+        TestProfile withModifier = Assert.Single(cells, c => c.Name == "ohci-hub+gicv3");
+        Assert.Equal(UsbHostControllerModel.Ohci, withModifier.UsbController);
+        Assert.True(withModifier.UsbHub);
+        Assert.Equal("usb-kbd", withModifier.KeyboardDevice);
+        Assert.Equal("3", withModifier.MachineOptions["gic-version"]);
+    }
+
     // One suite, two architectures, one csproj: each arch keeps only the
     // profile describing hardware it can actually present. Uses the two
     // arch-pinned profiles: virtio-pci deliberately spans both, so it would
@@ -222,6 +395,9 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Null(profile.VgaAdapter);
         Assert.Null(profile.GpuDevice);
         Assert.Null(profile.AudioDevice);
+        Assert.Equal(UsbHostControllerModel.Xhci, profile.UsbController);
+        Assert.Equal(QemuLauncher.DefaultUsbDeviceVersion, profile.UsbDeviceVersion);
+        Assert.False(profile.UsbHub);
     }
 
     // A modifier overlays machine/device options; everything it does not touch

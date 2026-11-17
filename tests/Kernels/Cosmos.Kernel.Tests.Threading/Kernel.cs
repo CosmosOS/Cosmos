@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.Core.Scheduler;
+using Cosmos.Kernel.Core.Scheduler.Stride;
 using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.Input;
+using Cosmos.Kernel.System.Sessions;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
 using Sys = Cosmos.Kernel.System;
@@ -18,7 +21,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 78;
+    private const int ExpectedTestCount = 89;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -53,6 +56,30 @@ public class Kernel : Sys.Kernel
     /// <summary>How long a Join on a killed thread may take before the test calls it a hang.</summary>
     private const int KillJoinTimeoutMs = 2000;
 
+    /// <summary>Rounds of two threads throwing unhandled exceptions in the per-thread dispatch test (the scenario of valentinbreiz/nativeaot-patcher#440).</summary>
+    private const int UncaughtThrowRounds = 5;
+
+    /// <summary>Threads throwing, catching and rethrowing at once in the concurrent catch test.</summary>
+    private const int ThrowWorkerCount = 4;
+
+    /// <summary>Throws each worker of the concurrent catch test makes.</summary>
+    private const int ThrowsPerWorker = 300;
+
+    /// <summary>How long a Join on a throwing thread may take before the test calls it a hang.</summary>
+    private const int ThrowJoinTimeoutMs = 30_000;
+
+    /// <summary>Scheduler ticks the reference compare-exchange race runs for: a tick has to land inside an exchange for the race to exist, so the cell counts ticks, not claims.</summary>
+    private const uint ExchangeRunTicks = 300;
+
+    /// <summary>Workers racing on the reference compare-exchange.</summary>
+    private const int ExchangeWorkerCount = 2;
+
+    /// <summary>Threads started in a burst by each worker of the thread-id uniqueness test.</summary>
+    private const int IdBurstThreadsPerWorker = 24;
+
+    /// <summary>Workers starting threads in the thread-id uniqueness test.</summary>
+    private const int IdBurstWorkerCount = 2;
+
     /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
     private const uint UnregisteredCpuId = 4096;
 
@@ -71,6 +98,14 @@ public class Kernel : Sys.Kernel
     private const int ExitGraceWaitMs = 200;
     /// <summary>Hold time (ms) the idle-contention worker keeps the mutex, spanning several scheduler ticks.</summary>
     private const int IdleMutexHoldMs = 300;
+    /// <summary>Rounds of Thread.Sleep the main (idle) thread makes in the condition-variable ticket test.</summary>
+    private const int IdleSleepRounds = 3;
+    /// <summary>Length (ms) of each Thread.Sleep the main (idle) thread makes in the condition-variable ticket test.</summary>
+    private const int IdleSleepMs = 50;
+    /// <summary>Sleep (ms) of the worker whose wake Stride must classify interactive: far longer than the few ticks it can have run.</summary>
+    private const int WakeClassifySleepMs = 200;
+    /// <summary>Quanta of run charged through OnTick to the synthetic Stride thread before its second park, so that park, microseconds long, reads as a short one.</summary>
+    private const int WakeClassifyRunQuanta = 100;
     /// <summary>Hold time (ms) each contender keeps the mutex so the others pile up in _waitingThreads.</summary>
     private const int MutexContenderHoldMs = 100;
     /// <summary>Wait (ms) giving the hand-off contender a few quanta to park in _waitingThreads.</summary>
@@ -122,7 +157,21 @@ public class Kernel : Sys.Kernel
     private static volatile int s_sharedCounter;
     private static volatile int s_thread1Counter;
     private static volatile int s_thread2Counter;
+    private static int s_throwWorkersDone;
+    private static int s_throwFinallyRuns;
+    private static int s_throwMismatches;
     private static Cosmos.Kernel.Core.Scheduler.SpinLock s_testLock;
+
+    // Shared state for the reference compare-exchange race
+    private static object? s_exchangeSlot;
+    private static int s_exchangeDoubleWins;
+    private static int s_exchangeWins;
+    private static int s_exchangeWorkersDone;
+
+    // Shared state for the thread-id uniqueness test
+    private static readonly uint[] s_burstThreadIds = new uint[IdBurstWorkerCount * IdBurstThreadsPerWorker];
+    private static int s_burstThreadsStarted;
+    private static int s_burstWorkersDone;
 
     // Shared state for Monitor/lock tests
     private static readonly object s_lockObj = new object();
@@ -159,6 +208,10 @@ public class Kernel : Sys.Kernel
         // Thread tests
         TR.Run("Thread_Start_ExecutesDelegate", TestThreadExecution);
         TR.Run("Thread_Multiple_CanRunConcurrently", TestMultipleThreads);
+        TR.Run("Thread_Throw_TwoThreadsUnhandled_BothJoin", TestUnhandledThrowsOnTwoThreads);
+        TR.Run("Thread_Throw_ConcurrentCatchRethrow_OwnExceptions", TestConcurrentCatchAndRethrow);
+        TR.Run("Interlocked_ReferenceExchange_TwoThreads", TestInterlockedReferenceExchangeTwoThreads);
+        TR.Run("Thread_Ids_UniqueAcrossConcurrentStarts", TestThreadIdsUniqueAcrossConcurrentStarts);
         TR.Run("SpinLock_ProtectsSharedData_AcrossThreads", TestSpinLockWithThreads);
         TR.Run("Thread_ThreadStatics", TestThreadStatics);
         TR.Run("Thread_EnsureSufficientExecutionStack_Passes", TestEnsureSufficientStackInThread);
@@ -169,6 +222,7 @@ public class Kernel : Sys.Kernel
         TR.Run("Thread_Kill_Queued_StopsManagedSide", TestKillQueuedThreadStopsManagedSide);
         TR.Run("ScheduleFromInterrupt_UnregisteredCpu_IsNoOp", TestScheduleFromInterruptIgnoresUnregisteredCpu);
         TR.Run("Mutex_IdleThreadContention_KeepsTicketAccounting", TestMutexIdleThreadContention);
+        TR.Run("ConditionVariable_IdleThreadWait_KeepsTicketAccounting", TestConditionVariableIdleThreadWait);
         TR.Run("InterruptEvent_TwoWaiters_BothWake", TestInterruptEventTwoWaiters);
         TR.Run("Mutex_ThreeContenders_AllAcquire", TestMutexThreeContenders);
         TR.Run("Mutex_ReleaseHandsOffToParkedWaiter", TestMutexReleaseHandsOff);
@@ -221,6 +275,9 @@ public class Kernel : Sys.Kernel
         TR.Run("RoundRobin_Hooks_BlockYieldExit", TestRoundRobinHooksBlockAndYield);
         TR.Run("Scheduler_BootPolicy_IsStride", TestBootPolicyIsStride);
         TR.Run("Stride_ProportionalShare_FollowsTickets", TestStrideProportionalShare);
+        TR.Run("Stride_Hooks_WakePlacement_BoostThenCap", TestStrideHooksWakePlacement);
+        TR.Run("Stride_Hooks_InheritedParkedThread_FirstWakeJudged", TestStrideHooksInheritedParkedFirstWake);
+        TR.Run("Stride_SleepWake_ClassifiesInteractive", TestStrideSleepWakeClassifiesInteractive);
         TR.Run("SetScheduler_InstallsRoundRobinPolicy", TestSetSchedulerInstallsRoundRobin);
         TR.Run("RoundRobin_ThreadRuns_UnderNewPolicy", TestThreadRunsUnderRoundRobin);
         TR.Run("RoundRobin_DispatchesEveryThread", TestRoundRobinDispatchesEveryThread);
@@ -231,6 +288,12 @@ public class Kernel : Sys.Kernel
         TR.Run("RoundRobin_BlockedThread_LeavesRunQueue", TestRoundRobinBlockedLeavesQueue);
         TR.Run("SetScheduler_RestoresStrideDefault", TestSetSchedulerRestoresStride);
         TR.Run("SetScheduler_RehomesLiveThreads", TestSetSchedulerRehomesLiveThreads);
+
+        // Console.Read on a session thread (CosmosOS/Cosmos#3276): the reader
+        // blocks for a line and hands it out character by character
+        TR.Run("ConsoleRead_WaitsForLine_ThenReturnsItsCharacters", TestConsoleReadWaitsForLine);
+        TR.Run("ConsoleRead_ReadLine_TakesTheRestOfTheLine", TestConsoleReadLineTakesRest);
+        TR.Run("ConsoleRead_ClosedSession_ReturnsEndOfStream", TestConsoleReadClosedSession);
 
         // Finish test suite
         TR.Finish();
@@ -700,6 +763,64 @@ public class Kernel : Sys.Kernel
         s_mutexWorkerExited = true;
     }
 
+    // ===== ConditionVariable idle-thread wait (CoreLib waits from the main thread) =====
+    // CoreLib's own waits, Thread.Sleep and Thread.Join among them, reach the
+    // kernel's ConditionVariable through LowLevelMonitor. Parking the idle
+    // thread there took its tickets out of the Stride total without the wake
+    // that would return them (the idle fallback resurrects it as Running), so
+    // the total wrapped under zero, Stride1 / TotalTickets became 0 and
+    // GlobalPass stopped; every thread created afterwards then started at a
+    // frozen GlobalPass and kept the main thread off the CPU
+    // (Stride_ProportionalShare_FollowsTickets hung). Unlike that hang, the
+    // drift is deterministic, and the Mutex cell above does not see it: it
+    // compares before/after inside its own window.
+    private static void TestConditionVariableIdleThreadWait()
+    {
+        uint cpuId = SchedulerManager.GetCurrentCpuId();
+        Cosmos.Kernel.Core.Scheduler.Stride.StrideCpuData? cpuData =
+            SchedulerManager.GetCpuState(cpuId)?.SchedulerData
+                as Cosmos.Kernel.Core.Scheduler.Stride.StrideCpuData;
+        Assert.True(cpuData is not null, "stride per-CPU data should exist");
+
+        ulong ticketsBefore = cpuData!.TotalTickets;
+        ulong passBefore = cpuData.GlobalPass;
+
+        // Thread.Sleep: LowLevelMonitor.TimedWait -> ConditionVariable.WaitTimeout.
+        for (int i = 0; i < IdleSleepRounds; i++)
+        {
+            SysThread.Sleep(IdleSleepMs);
+        }
+
+        ulong ticketsAfterSleep = cpuData.TotalTickets;
+
+        // Thread.Join: LowLevelMonitor.Wait -> ConditionVariable.Wait. The grace
+        // wait lets the worker's exit finish inside this cell, since its
+        // OnThreadExit takes the worker's own tickets back out of the total.
+        SysThread worker = new(static () => { });
+        worker.Start();
+        worker.Join();
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        ulong ticketsAfterJoin = cpuData.TotalTickets;
+        ulong passAfterJoin = cpuData.GlobalPass;
+
+        Serial.WriteString("[IdleWait] TotalTickets before=");
+        Serial.WriteNumber((long)ticketsBefore);
+        Serial.WriteString(" afterSleep=");
+        Serial.WriteNumber((long)ticketsAfterSleep);
+        Serial.WriteString(" afterJoin=");
+        Serial.WriteNumber((long)ticketsAfterJoin);
+        Serial.WriteString(" GlobalPass before=");
+        Serial.WriteNumber((long)passBefore);
+        Serial.WriteString(" afterJoin=");
+        Serial.WriteNumber((long)passAfterJoin);
+        Serial.WriteString("\n");
+
+        Assert.True(ticketsBefore == ticketsAfterSleep, "Thread.Sleep from the idle thread must not drift TotalTickets");
+        Assert.True(ticketsBefore == ticketsAfterJoin, "Thread.Join from the idle thread must not drift TotalTickets");
+        Assert.True(passAfterJoin > passBefore, "GlobalPass must keep advancing across idle-thread waits");
+    }
+
     // ===== Multi-waiter paths (List<Thread> scans on non-empty lists) =====
     // The single-waiter driver flow keeps _waiters/_waitingThreads empty at
     // the Contains call, so the list-scan path (EqualityComparer<Thread>)
@@ -793,9 +914,14 @@ public class Kernel : Sys.Kernel
     // Release used to clear ownership and merely ready the parked waiter;
     // until that waiter's retry ran, ANY thread could re-take the mutex and
     // send the waiter to the back of the queue again, repeatably, so a
-    // waiter on a contended mutex could starve. The releaser's immediate
-    // TryAcquire is the deterministic probe: with ownership handed off in
-    // Release it must fail.
+    // waiter on a contended mutex could starve. The releaser's TryAcquire
+    // right after Release is the probe: with ownership handed off in Release
+    // it must fail. It is deterministic because both calls run with
+    // interrupts masked, not because they are back to back: Release readies
+    // the waiter, the next interrupt exit switches to it, and the waiter
+    // could take the mutex, release it and exit before the TryAcquire, which
+    // would then find the mutex free and report a barge that never happened
+    // (#3385).
     private static Cosmos.Kernel.Core.Scheduler.Mutex? s_handoffMutex;
     private static volatile bool s_handoffWorkerHolding;
     private static volatile bool s_handoffReleaseRequested;
@@ -851,8 +977,14 @@ public class Kernel : Sys.Kernel
         {
             // spin: stay runnable so the contender has to park behind us
         }
-        s_handoffMutex.Release();
-        bool barged = s_handoffMutex.TryAcquire();
+        // The switch Release asks for happens when the scope ends.
+        bool barged;
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            s_handoffMutex.Release();
+            barged = s_handoffMutex.TryAcquire();
+        }
+
         s_handoffBargeResult = barged ? BargeResultBarged : BargeResultNoBarge;
         if (barged)
         {
@@ -976,6 +1108,247 @@ public class Kernel : Sys.Kernel
 
         Assert.Equal(WorkerIterationCount, s_thread1Counter);
         Assert.Equal(WorkerIterationCount, s_thread2Counter);
+    }
+
+    private static void TestUnhandledThrowsOnTwoThreads()
+    {
+        // The scenario of valentinbreiz/nativeaot-patcher#440: each thread's throw is dispatched on
+        // its own stack, so a thread preempted inside its dispatch must not make the other thread's
+        // throw a "recursive" one, which halted that thread and left its Join waiting forever.
+        for (int round = 0; round < UncaughtThrowRounds; round++)
+        {
+            SysThread first = new(ThrowUnhandled);
+            SysThread second = new(ThrowUnhandled);
+
+            first.Start();
+            second.Start();
+
+            Assert.True(first.Join(ThrowJoinTimeoutMs), "A thread whose exception is unhandled must exit and be joinable");
+            Assert.True(second.Join(ThrowJoinTimeoutMs), "The second throwing thread must exit as well");
+        }
+    }
+
+    private static void ThrowUnhandled()
+    {
+        throw new InvalidOperationException("Unhandled on purpose");
+    }
+
+    private static void TestConcurrentCatchAndRethrow()
+    {
+        // Several threads throw, run a finally, catch and rethrow at once: the ExInfo chain, the
+        // dispatch guard and the records of the running funclets are each thread's own, so a `throw;`
+        // rethrows the thread's own exception and no throw lands as "recursive".
+        s_throwWorkersDone = 0;
+        s_throwFinallyRuns = 0;
+        s_throwMismatches = 0;
+
+        SysThread[] workers = new SysThread[ThrowWorkerCount];
+        for (int i = 0; i < ThrowWorkerCount; i++)
+        {
+            int id = i;
+            workers[i] = new SysThread(() => ThrowCatchRethrowWorker(id));
+        }
+
+        for (int i = 0; i < ThrowWorkerCount; i++)
+        {
+            workers[i].Start();
+        }
+
+        for (int i = 0; i < ThrowWorkerCount; i++)
+        {
+            Assert.True(workers[i].Join(ThrowJoinTimeoutMs), "Every throwing worker must finish");
+        }
+
+        Assert.Equal(ThrowWorkerCount, s_throwWorkersDone);
+        Assert.Equal(ThrowWorkerCount * ThrowsPerWorker, s_throwFinallyRuns);
+        Assert.Equal(0, s_throwMismatches);
+    }
+
+    private static void ThrowCatchRethrowWorker(int id)
+    {
+        for (int i = 0; i < ThrowsPerWorker; i++)
+        {
+            string expected = $"worker {id} throw {i}";
+            InvalidOperationException? thrown = null;
+            try
+            {
+                try
+                {
+                    try
+                    {
+                        throw new InvalidOperationException(expected);
+                    }
+                    finally
+                    {
+                        Interlocked.Increment(ref s_throwFinallyRuns);
+                    }
+                }
+                catch (InvalidOperationException caught)
+                {
+                    thrown = caught;
+                    throw;
+                }
+            }
+            catch (InvalidOperationException rethrown)
+            {
+                if (!ReferenceEquals(thrown, rethrown) || rethrown.Message != expected)
+                {
+                    Interlocked.Increment(ref s_throwMismatches);
+                }
+            }
+        }
+
+        Interlocked.Increment(ref s_throwWorkersDone);
+    }
+
+    private static void TestInterlockedReferenceExchangeTwoThreads()
+    {
+        // Interlocked.CompareExchange on a reference is RhpCheckedLockCmpXchg, and the two
+        // workers claim one slot with it: a claim is from null to the worker's own token, the
+        // release is a plain store of null, and a worker that wins while the other holds the slot
+        // has seen two "successful" exchanges for one slot. The C# read-then-write stub this
+        // replaces lost that race whenever the tick landed between its read and its write.
+        s_exchangeSlot = null;
+        s_exchangeDoubleWins = 0;
+        s_exchangeWins = 0;
+        s_exchangeWorkersDone = 0;
+
+        SysThread[] workers = new SysThread[ExchangeWorkerCount];
+        for (int i = 0; i < ExchangeWorkerCount; i++)
+        {
+            workers[i] = new SysThread(ExchangeClaimWorker);
+        }
+
+        for (int i = 0; i < ExchangeWorkerCount; i++)
+        {
+            workers[i].Start();
+        }
+
+        for (int i = 0; i < ExchangeWorkerCount; i++)
+        {
+            Assert.True(workers[i].Join(ThrowJoinTimeoutMs), "Every exchange worker must finish");
+        }
+
+        Serial.WriteString("[Test] exchange wins: ");
+        Serial.WriteNumber((uint)s_exchangeWins);
+        Serial.WriteString(", double wins: ");
+        Serial.WriteNumber((uint)s_exchangeDoubleWins);
+        Serial.WriteString("\n");
+
+        Assert.Equal(ExchangeWorkerCount, s_exchangeWorkersDone);
+        Assert.True(s_exchangeWins > ExchangeWorkerCount, "Both workers must claim the slot many times over the run");
+        Assert.Equal(0, s_exchangeDoubleWins);
+    }
+
+    private static void ExchangeClaimWorker()
+    {
+        // A fresh object: a null or a frozen literal would let ILC inline the exchange without the stub.
+        object token = new object();
+        int claims = 0;
+        // Runs for ExchangeRunTicks scheduler ticks: the race needs a tick to land between the read
+        // and the write of a broken exchange, so the run is sized in ticks (3 s at 100 Hz), and the
+        // loop body is kept short so that window is a large share of it.
+        uint start = SchedulerManager.TickCount;
+        while (SchedulerManager.TickCount - start < ExchangeRunTicks)
+        {
+            if (Interlocked.CompareExchange(ref s_exchangeSlot, token, null) is not null)
+            {
+                continue;
+            }
+
+            claims++;
+            // The slot is ours: it must still hold our token, and nobody else may have claimed it.
+            if (!ReferenceEquals(Volatile.Read(ref s_exchangeSlot), token))
+            {
+                Interlocked.Increment(ref s_exchangeDoubleWins);
+            }
+
+            Volatile.Write(ref s_exchangeSlot, null);
+        }
+
+        Interlocked.Add(ref s_exchangeWins, claims);
+        Interlocked.Increment(ref s_exchangeWorkersDone);
+    }
+
+    private static void TestThreadIdsUniqueAcrossConcurrentStarts()
+    {
+        // AllocateThreadId was a bare increment: two threads creating threads across a tick
+        // could read the same id. Two workers each start a burst of threads that record the id
+        // the scheduler gave them; every recorded id must be distinct.
+        for (int i = 0; i < s_burstThreadIds.Length; i++)
+        {
+            s_burstThreadIds[i] = 0;
+        }
+
+        s_burstThreadsStarted = 0;
+        s_burstWorkersDone = 0;
+
+        SysThread[] workers = new SysThread[IdBurstWorkerCount];
+        for (int i = 0; i < IdBurstWorkerCount; i++)
+        {
+            workers[i] = new SysThread(IdBurstWorker);
+        }
+
+        for (int i = 0; i < IdBurstWorkerCount; i++)
+        {
+            workers[i].Start();
+        }
+
+        for (int i = 0; i < IdBurstWorkerCount; i++)
+        {
+            Assert.True(workers[i].Join(ThrowJoinTimeoutMs), "Every id-burst worker must finish");
+        }
+
+        Assert.Equal(IdBurstWorkerCount, s_burstWorkersDone);
+        Assert.Equal(s_burstThreadIds.Length, s_burstThreadsStarted);
+
+        int duplicates = 0;
+        for (int i = 0; i < s_burstThreadIds.Length; i++)
+        {
+            Assert.True(s_burstThreadIds[i] != 0, "Every burst thread must record its id");
+            for (int j = i + 1; j < s_burstThreadIds.Length; j++)
+            {
+                if (s_burstThreadIds[i] == s_burstThreadIds[j])
+                {
+                    duplicates++;
+                }
+            }
+        }
+
+        Assert.Equal(0, duplicates);
+    }
+
+    private static void IdBurstWorker()
+    {
+        SysThread[] burst = new SysThread[IdBurstThreadsPerWorker];
+        for (int i = 0; i < IdBurstThreadsPerWorker; i++)
+        {
+            burst[i] = new SysThread(RecordOwnThreadId);
+        }
+
+        for (int i = 0; i < IdBurstThreadsPerWorker; i++)
+        {
+            burst[i].Start();
+        }
+
+        for (int i = 0; i < IdBurstThreadsPerWorker; i++)
+        {
+            burst[i].Join();
+        }
+
+        Interlocked.Increment(ref s_burstWorkersDone);
+    }
+
+    private static void RecordOwnThreadId()
+    {
+        if (SchedulerDiagnostics.TryGetCurrentThread(SchedulerManager.GetCurrentCpuId(), out KernelThreadInfo info))
+        {
+            int slot = Interlocked.Increment(ref s_burstThreadsStarted) - 1;
+            if (slot < s_burstThreadIds.Length)
+            {
+                s_burstThreadIds[slot] = info.Id;
+            }
+        }
     }
 
     private static void Thread1Worker()
@@ -1764,6 +2137,151 @@ public class Kernel : Sys.Kernel
             "a 4x ticket edge must yield a clearly larger (>= 1.5x) CPU share under Stride");
     }
 
+    // ===== Stride wakeup placement =====
+    // ReadyThread calls OnThreadReady before it marks the thread Ready, so the
+    // policy reads the state the thread wakes from (nativeaot-patcher#445).
+    // The first cell drives a throwaway StrideScheduler over a throwaway
+    // thread, as the Round-Robin hook cells do, and sets the state by hand to
+    // reach each placement; GlobalPass only moves inside the hooks, so the
+    // value read right after OnThreadReady is the one the placement used. The
+    // second cell checks the live order through a real sleep: a worker that
+    // slept far longer than it ran wakes classified interactive only if the
+    // hook saw it Sleeping rather than Ready.
+
+    private static void TestStrideHooksWakePlacement()
+    {
+        StrideScheduler policy = new();
+        PerCpuState state = new();
+        policy.InitializeCpu(state);
+
+        SchedulerThread thread = new();
+        policy.OnThreadCreate(state, thread);
+
+        StrideCpuData? cpuData = state.SchedulerData as StrideCpuData;
+        StrideThreadData? data = thread.SchedulerData as StrideThreadData;
+        Assert.True(cpuData is not null && data is not null,
+            "InitializeCpu and OnThreadCreate should attach Stride bookkeeping");
+        if (cpuData is null || data is null)
+        {
+            return;
+        }
+
+        // First start: a Created thread is placed at GlobalPass, unboosted.
+        policy.OnThreadReady(state, thread);
+        Assert.True(data.Pass == (long)cpuData.GlobalPass, "a first start must be placed at GlobalPass");
+        Assert.False(data.IsInteractive, "a first start must not be classified interactive");
+
+        // A wake after a park with no run since the previous wake: interactive,
+        // half a quantum ahead of GlobalPass.
+        policy.OnThreadBlocked(state, thread);
+        thread.State = SchedulerThreadState.Blocked;
+        policy.OnThreadReady(state, thread);
+        Assert.True(data.IsInteractive,
+            "a thread that parked longer than twice what it ran since its wake must be interactive");
+        Assert.True(data.Pass == (long)cpuData.GlobalPass - (long)(data.Stride / 2),
+            "an interactive wake must be placed half a quantum ahead of GlobalPass");
+
+        // A wake after a long run and a short park: reclassified, and placed
+        // at GlobalPass + Remain, never more than two Stride1 behind.
+        Assert.True(ReferenceEquals(policy.PickNext(state), thread), "the sole queued thread must be picked");
+        thread.State = SchedulerThreadState.Running;
+        for (int i = 0; i < WakeClassifyRunQuanta; i++)
+        {
+            policy.OnTick(state, thread, SchedulerManager.DefaultQuantumNs);
+        }
+        policy.OnThreadBlocked(state, thread);
+        thread.State = SchedulerThreadState.Blocked;
+        policy.OnThreadReady(state, thread);
+        long capped = Math.Max((long)cpuData.GlobalPass + data.Remain,
+            (long)cpuData.GlobalPass - (long)(2 * StrideScheduler.Stride1));
+        Assert.False(data.IsInteractive,
+            "a thread that ran far longer than it parked must lose the interactive classification");
+        Assert.True(data.Pass == capped,
+            "a non-interactive wake must be placed at GlobalPass + Remain, floored two Stride1 behind");
+        Assert.Equal(1, policy.GetRunQueueCount(state), "each wake must queue the thread once");
+    }
+
+    private static void TestStrideHooksInheritedParkedFirstWake()
+    {
+        StrideScheduler policy = new();
+        PerCpuState state = new();
+        policy.InitializeCpu(state);
+
+        // Two threads handed over parked, as SetScheduler does: one that never
+        // ran, one that ran a hundred quanta under the previous policy.
+        SchedulerThread fresh = new();
+        SchedulerThread seasoned = new();
+        fresh.State = SchedulerThreadState.Blocked;
+        seasoned.State = SchedulerThreadState.Sleeping;
+        seasoned.TotalRuntime = WakeClassifyRunQuanta * SchedulerManager.DefaultQuantumNs;
+        policy.OnThreadCreate(state, fresh);
+        policy.OnThreadCreate(state, seasoned);
+
+        // Let real time pass, so the park measured from the hand-over is not
+        // a few timestamp ticks that could round to nothing.
+        TimerManager.Wait(FlagPollIntervalMs);
+
+        StrideCpuData? cpuData = state.SchedulerData as StrideCpuData;
+        StrideThreadData? freshData = fresh.SchedulerData as StrideThreadData;
+        StrideThreadData? seasonedData = seasoned.SchedulerData as StrideThreadData;
+        Assert.True(cpuData is not null && freshData is not null && seasonedData is not null,
+            "OnThreadCreate should attach Stride bookkeeping to an inherited thread");
+        if (cpuData is null || freshData is null || seasonedData is null)
+        {
+            return;
+        }
+
+        policy.OnThreadReady(state, fresh);
+        Assert.True(freshData.IsInteractive,
+            "an inherited parked thread that never ran must wake interactive: any park outweighs no run");
+
+        policy.OnThreadReady(state, seasoned);
+        long capped = Math.Max((long)cpuData.GlobalPass + seasonedData.Remain,
+            (long)cpuData.GlobalPass - (long)(2 * StrideScheduler.Stride1));
+        Assert.False(seasonedData.IsInteractive,
+            "an inherited parked thread is judged on its lifetime runtime, not on a run of zero");
+        Assert.True(seasonedData.Pass == capped,
+            "a non-interactive inherited wake must take the capped placement");
+        Assert.Equal(2, policy.GetRunQueueCount(state), "each inherited thread must be queued once");
+    }
+
+    private static volatile bool s_sleepWakeDone;
+    private static volatile bool s_sleepWakeHadData;
+    private static volatile bool s_sleepWakeInteractive;
+
+    private static void SleepWakeWorker()
+    {
+        // Thread.Sleep on a worker: MarkSleeping, then the tick's
+        // CheckSleepingThreads readies it from the Sleeping state.
+        SysThread.Sleep(WakeClassifySleepMs);
+
+        StrideThreadData? data = CurrentSchedulerThread()?.SchedulerData as StrideThreadData;
+        s_sleepWakeHadData = data is not null;
+        s_sleepWakeInteractive = data is not null && data.IsInteractive;
+        s_sleepWakeDone = true;
+    }
+
+    private static void TestStrideSleepWakeClassifiesInteractive()
+    {
+        s_sleepWakeDone = false;
+        s_sleepWakeHadData = false;
+        s_sleepWakeInteractive = false;
+
+        SysThread worker = new(SleepWakeWorker);
+        worker.Start();
+
+        for (int i = 0; i < FlagPollRetries && !s_sleepWakeDone; i++)
+        {
+            TimerManager.Wait(FlagPollIntervalMs);
+        }
+        TimerManager.Wait(ExitGraceWaitMs);
+
+        Assert.True(s_sleepWakeDone, "the sleeping worker should wake and finish");
+        Assert.True(s_sleepWakeHadData, "the worker should carry Stride bookkeeping");
+        Assert.True(s_sleepWakeInteractive,
+            "a thread that slept far longer than it ran must wake classified interactive, which needs the hook to see it Sleeping rather than Ready");
+    }
+
     private static void TestSetSchedulerInstallsRoundRobin()
     {
         s_roundRobin = new RoundRobinScheduler();
@@ -2292,5 +2810,186 @@ public class Kernel : Sys.Kernel
         Assert.True(backUnderStride > underRoundRobin,
             "a thread alive across the swap back must keep running under Stride");
         Assert.True(s_rehomeDone, "the re-homed spinner should observe stop and exit");
+    }
+
+    // ==================== Console.Read on a session ====================
+
+    /// <summary>How long the reader thread gets to start and block before the cell checks that it did.</summary>
+    private const int ConsoleReadSettleMs = 1000;
+
+    /// <summary>Polls of <see cref="ConsoleReadPollMs"/> before a Console.Read cell gives up on its reader thread.</summary>
+    private const int ConsoleReadPollRetries = 100;
+
+    /// <summary>Poll interval while a Console.Read cell waits for its reader thread.</summary>
+    private const int ConsoleReadPollMs = 50;
+
+    /// <summary>What the reader threads report: the values Console.Read and Peek returned.</summary>
+    private static readonly int[] s_consoleReadResults = new int[3];
+    private static volatile string? s_consoleReadLine;
+    private static volatile bool s_consoleReadKeyAvailable;
+    private static volatile int s_consoleReadPhase;
+    private static volatile bool s_consoleReadDone;
+
+    /// <summary>
+    /// A session with no terminal behind it: keys come from
+    /// <see cref="ConsoleSession.EnqueueInput"/> and the echo goes to its
+    /// hidden screen. What the Telnet server's session is, minus the socket.
+    /// </summary>
+    private sealed class ProbeSession : ConsoleSession
+    {
+        public ProbeSession() : base(80, 25)
+        {
+        }
+
+        public override string Name => "probe";
+
+        public override bool IsRemote => true;
+
+        /// <summary>Types a line: its characters, then Enter. Any thread, as a terminal server's would.</summary>
+        public void Type(string text)
+        {
+            foreach (char c in text)
+            {
+                // The line editor reads the character; the key matters only
+                // for the editing keys.
+                EnqueueInput(new KeyEvent(c, Key.NoName, shift: false, alt: false, control: false, KeyEvent.KeyEventType.Make));
+            }
+
+            EnqueueInput(new KeyEvent('\0', Key.Enter, shift: false, alt: false, control: false, KeyEvent.KeyEventType.Make));
+        }
+    }
+
+    private static bool WaitForConsoleRead()
+    {
+        for (int i = 0; i < ConsoleReadPollRetries && !s_consoleReadDone; i++)
+        {
+            TimerManager.Wait(ConsoleReadPollMs);
+        }
+
+        return s_consoleReadDone;
+    }
+
+    private static void ResetConsoleRead()
+    {
+        for (int i = 0; i < s_consoleReadResults.Length; i++)
+        {
+            s_consoleReadResults[i] = int.MinValue;
+        }
+
+        s_consoleReadLine = null;
+        s_consoleReadKeyAvailable = false;
+        s_consoleReadPhase = 0;
+        s_consoleReadDone = false;
+    }
+
+    /// <summary>Starts a thread bound to a fresh probe session, or fails the cell.</summary>
+    private static ProbeSession? StartProbe(Action body)
+    {
+        ProbeSession session = new();
+        if (!SessionManager.TryRegister(session))
+        {
+            Assert.Fail("the session manager should list the probe session");
+            return null;
+        }
+
+        SessionManager.Start(session, body);
+        return session;
+    }
+
+    // Console.Read on gen3 answered -1, the end of the stream, whenever no key
+    // was waiting, so this reader was done before the keys were typed with
+    // -1 in every slot; a reader that waited for one key at a time read the
+    // Enter as '\0'. It now waits for the line and returns its characters in
+    // order, the new line last.
+    private static void TestConsoleReadWaitsForLine()
+    {
+        ResetConsoleRead();
+        ProbeSession? session = StartProbe(() =>
+        {
+            s_consoleReadPhase = 1;
+            s_consoleReadResults[0] = Console.Read();
+            s_consoleReadResults[1] = Console.Read();
+            s_consoleReadResults[2] = Console.Read();
+            s_consoleReadDone = true;
+        });
+        if (session is null)
+        {
+            return;
+        }
+
+        // The reader is blocked in Read before anything is typed.
+        TimerManager.Wait(ConsoleReadSettleMs);
+        Assert.Equal(1, s_consoleReadPhase, "the reader thread should have started");
+        Assert.False(s_consoleReadDone, "Console.Read should block while no line was entered");
+
+        session.Type("hi");
+
+        Assert.True(WaitForConsoleRead(), "the reader should return once the line is entered");
+        Assert.Equal((int)'h', s_consoleReadResults[0], "the first Read should return the line's first character");
+        Assert.Equal((int)'i', s_consoleReadResults[1], "the second Read should return the line's second character");
+        Assert.Equal((int)'\n', s_consoleReadResults[2], "the Enter that ended the line should read as a new line");
+    }
+
+    // The session holds what is left of a line Read started on, as .NET's
+    // reader does: KeyAvailable reports it, Peek sees the next character
+    // without taking it, and ReadLine returns the rest without its
+    // terminator rather than waiting for a second line.
+    private static void TestConsoleReadLineTakesRest()
+    {
+        ResetConsoleRead();
+        ProbeSession? session = StartProbe(() =>
+        {
+            s_consoleReadResults[0] = Console.Read();
+            s_consoleReadKeyAvailable = Console.KeyAvailable;
+            s_consoleReadResults[1] = Console.In.Peek();
+            s_consoleReadLine = Console.ReadLine();
+            s_consoleReadResults[2] = Console.Read();
+            s_consoleReadDone = true;
+        });
+        if (session is null)
+        {
+            return;
+        }
+
+        session.Type("abc");
+        TimerManager.Wait(ConsoleReadSettleMs);
+        Assert.False(s_consoleReadDone, "the last Read should block for a second line");
+
+        session.Type("d");
+
+        Assert.True(WaitForConsoleRead(), "the reader should finish once the second line is entered");
+        Assert.Equal((int)'a', s_consoleReadResults[0], "Read should take the first character");
+        Assert.True(s_consoleReadKeyAvailable, "KeyAvailable should report the rest of the line");
+        Assert.Equal((int)'b', s_consoleReadResults[1], "Peek should show the next character without taking it");
+        Assert.True(s_consoleReadLine == "bc", "ReadLine should return the rest of the line, without the new line");
+        Assert.Equal((int)'d', s_consoleReadResults[2], "the next Read should start on the second line");
+    }
+
+    // Closing the session ends the stream: a Read blocked on it returns -1,
+    // and so does every Read after it.
+    private static void TestConsoleReadClosedSession()
+    {
+        ResetConsoleRead();
+        ProbeSession? session = StartProbe(() =>
+        {
+            s_consoleReadPhase = 1;
+            s_consoleReadResults[0] = Console.Read();
+            s_consoleReadResults[1] = Console.In.Peek();
+            s_consoleReadDone = true;
+        });
+        if (session is null)
+        {
+            return;
+        }
+
+        TimerManager.Wait(ConsoleReadSettleMs);
+        Assert.Equal(1, s_consoleReadPhase, "the reader thread should have started");
+        Assert.False(s_consoleReadDone, "Console.Read should block until the session closes");
+
+        session.Close();
+
+        Assert.True(WaitForConsoleRead(), "the reader should return once the session is closed");
+        Assert.Equal(-1, s_consoleReadResults[0], "a Read blocked on a session that closes should return -1");
+        Assert.Equal(-1, s_consoleReadResults[1], "Peek on a closed session should return -1");
     }
 }

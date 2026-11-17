@@ -9,6 +9,7 @@ using Cosmos.Kernel.Drivers.Virtio.Network.VirtioNet;
 using Cosmos.Kernel.Drivers.Virtio.Storage.VirtioBlk;
 using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.HAL.Devices.Network;
+using Cosmos.Kernel.HAL.Devices.Storage;
 using Cosmos.Kernel.HAL.DriverKit;
 using Cosmos.Kernel.HAL.DriverKit.Engine;
 using Cosmos.Kernel.System.Diagnostics;
@@ -344,7 +345,23 @@ public class Kernel : Sys.Kernel
             Assert.False(device.IsWithdrawn, "the disk should not be withdrawn");
         }
 
-        Assert.Equal(1, StorageManager.DeviceCount, "the storage manager should hold the virtio-blk disk and nothing else");
+        Assert.Equal(1, StorageManager.DeviceCount - CdRomCount(), "the storage manager should hold the virtio-blk disk and nothing else");
+    }
+
+    /// <summary>The registered devices that are read-only removable media: the boot CD the x64 cells carry, which the AHCI driver publishes beside the cell's disk.</summary>
+    private static int CdRomCount()
+    {
+        IReadOnlyList<IBlockDevice> devices = StorageManager.Devices;
+        int count = 0;
+        for (int i = 0; i < devices.Count; i++)
+        {
+            if (devices[i] is IRemovableMedia { IsReadOnly: true })
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     // The same cross-check as the NIC's, for the disk: its node names the

@@ -4,11 +4,12 @@
 
 <p align="center">
   <a href="https://chat.gocosmos.org"><img src="https://img.shields.io/badge/official-chat-blue?logo=matrix" /></a>
-  <a href="https://discord.com/invite/kwtBwv6jhD"><img src="https://img.shields.io/discord/833970409337913344?label=discord&logo=discord&color=5865F2" /></a>
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/dotnet.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/dotnet.yml?branch=gen3&label=.NET%20tests&logo=github" /></a>
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/kernel-tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/kernel-tests.yml?branch=gen3&label=kernel%20tests&logo=github" /></a>
   <a href="https://github.com/CosmosOS/Cosmos/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/CosmosOS/Cosmos/release.yml?label=release&logo=github" /></a>
 </p>
+
+English | [Français](README_FR.md) | [简体中文](README_CN.md) | [Polski](README_PL.md)
 
 # Cosmos gen3
 
@@ -18,7 +19,7 @@ Originally based on [Zarlo's NativeAOT patcher](https://gitlab.com/liquip/native
 
 ## Why gen3?
 
-Cosmos gen2 (the current public Cosmos OS) compiles C# IL to x86 assembly through **IL2CPU**, a custom transpiler. IL2CPU is powerful but maintains its own JIT-like backend separate from the .NET ecosystem. Gen3 replaces it with **NativeAOT**, the official .NET ahead-of-time toolchain, so kernels benefit from the same optimizer used in the wider .NET ecosystem and stay aligned with upstream as it evolves. This also makes it possible to support modern .NET features and additional architectures (currently ARM64 and RISC-V in the future) without re-implementing them in the toolchain.
+Cosmos gen2 compiled C# IL to x86 assembly through **IL2CPU**, a custom transpiler. IL2CPU is powerful but maintains its own JIT-like backend separate from the .NET ecosystem. Gen3 replaces it with **NativeAOT**, the official .NET ahead-of-time toolchain, so kernels benefit from the same optimizer used in the wider .NET ecosystem and stay aligned with upstream as it evolves. This also makes it possible to support modern .NET features and additional architectures (currently ARM64 and RISC-V in the future) without re-implementing them in the toolchain.
 
 ## Features
 
@@ -31,14 +32,14 @@ Cosmos gen2 (the current public Cosmos OS) compiles C# IL to x86 assembly throug
 - [Priority-based Stride Scheduler](https://cosmosos.github.io/articles/dev/scheduler.html)
 - Exception handling
 - Interrupts (APIC on x64, GIC on ARM64)
-- ACPI (via [LAI](https://github.com/managarm/lai))
+- ACPI (via [uACPI](https://github.com/uACPI/uACPI))
 - PCI and MMIO drivers
 - UART serial
 - [Cosmos Graphics Subsystem](https://cosmosos.github.io/articles/user/graphics.html)
 - [Keyboard](https://cosmosos.github.io/articles/user/keyboard.html) and [Mouse](https://cosmosos.github.io/articles/user/mouse.html) input
-- [Network stack](https://cosmosos.github.io/articles/user/network.html)
+- [Network stack](https://cosmosos.github.io/articles/user/network.html), with [HTTP and HTTPS](https://cosmosos.github.io/articles/user/network.html#http-and-https), FTP and Telnet as packages
 - Storage drivers (AHCI/SATA, NVMe, virtio-blk, USB mass storage) with MBR, GPT and EBR partitioning
-- [FAT12/16/32 filesystem](https://cosmosos.github.io/articles/user/filesystem.html) on a Unix-style VFS (mount, superblocks, inodes)
+- [FAT12/16/32, ext2 and ISO 9660 filesystems](https://cosmosos.github.io/articles/user/filesystem.html) on a Unix-style VFS (mount, superblocks, inodes, read-only mounts)
 - Timer / Clock
 
 ## Documentation

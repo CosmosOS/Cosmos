@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -57,10 +58,43 @@ public sealed class QemuLaunchOptions
     /// Mouse device attached to the guest, or <c>null</c> to add none. Same
     /// <c>"ps2"</c>/<c>"none"</c> handling as <see cref="KeyboardDevice"/>;
     /// <c>virtio-mouse-device</c> is the ARM64 <c>virt</c> option, and
-    /// <see cref="QemuLauncher.UsbMouseModel"/> puts a USB mouse on the xHCI
-    /// controller on either architecture.
+    /// <see cref="QemuLauncher.UsbMouseModel"/> puts a USB mouse on the host
+    /// controller <see cref="UsbController"/> names, on either architecture.
     /// </summary>
     public string? MouseDevice { get; init; }
+
+    /// <summary>
+    /// The host controller the USB disks, the USB keyboard and the USB mouse
+    /// sit on, <see cref="UsbHostControllerModel.Xhci"/> by default. It is
+    /// emitted once, ahead of the first device that needs it, and only when
+    /// one does. On the EHCI and OHCI models every device is pinned to a
+    /// root port (<see cref="QemuLauncher.UsbKeyboardPortOf"/>,
+    /// <see cref="QemuLauncher.UsbMousePortOf"/> and
+    /// <see cref="QemuLauncher.UsbDiskPortOf"/>): their ports form one
+    /// numbered space that QEMU fills in command-line order, inserting a hub
+    /// of its own on the last free port.
+    /// </summary>
+    public UsbHostControllerModel UsbController { get; init; } = UsbHostControllerModel.Xhci;
+
+    /// <summary>
+    /// The USB version QEMU's <c>usb-kbd</c> and <c>usb-mouse</c> present:
+    /// <see cref="QemuLauncher.DefaultUsbDeviceVersion"/>, a device with a
+    /// high-speed descriptor set beside its full-speed one, or
+    /// <see cref="QemuLauncher.FullSpeedUsbDeviceVersion"/>, one with the
+    /// full-speed set alone, which an EHCI hands to its companion. A
+    /// <c>usb-storage</c> stick has no such property and follows the
+    /// controller.
+    /// </summary>
+    public int UsbDeviceVersion { get; init; } = QemuLauncher.DefaultUsbDeviceVersion;
+
+    /// <summary>
+    /// Puts a <c>usb-hub</c> on root port 1 and the USB keyboard behind it,
+    /// on the hub's port 1, so a run exercises hub enumeration. The hub is
+    /// full speed only: it needs an OHCI, alone or as the EHCI's companion,
+    /// and the launcher refuses it on the xHCI, whose port 1 is a USB 3 port,
+    /// and on a standalone EHCI, whose ports are high speed only.
+    /// </summary>
+    public bool UsbHub { get; init; }
 
     /// <summary>
     /// Audio controller attached to the guest as a <c>-device</c> line (e.g.
@@ -164,7 +198,7 @@ public enum DiskKind
     /// <summary>A namespace on a dedicated <c>nvme</c> controller.</summary>
     Nvme,
 
-    /// <summary>A <c>usb-storage</c> stick on the shared <c>qemu-xhci</c> controller.</summary>
+    /// <summary>A <c>usb-storage</c> stick on the one host controller <see cref="QemuLaunchOptions.UsbController"/> names.</summary>
     Usb,
 
     /// <summary>
@@ -175,6 +209,22 @@ public enum DiskKind
 
     /// <summary>A virtio-blk-device in the arm64 virt machine's virtio-mmio window; refused on x64.</summary>
     VirtioBlkMmio
+}
+
+/// <summary>The host controller a run puts its USB devices on; see <see cref="QemuLaunchOptions.UsbController"/>.</summary>
+public enum UsbHostControllerModel
+{
+    /// <summary><c>qemu-xhci</c>, id <c>usbxhci0</c>: USB 3 ports 1 to 4 and USB 2 ports 5 to 8, every device at its own top speed, on the port QEMU picks.</summary>
+    Xhci,
+
+    /// <summary><c>usb-ehci</c> alone, id <c>usbehci0</c>: six high-speed root ports and no companion, so a full-speed-only device cannot attach.</summary>
+    Ehci,
+
+    /// <summary><c>pci-ohci</c> alone, id <c>usbohci0</c>, with six root ports: every device at full speed.</summary>
+    Ohci,
+
+    /// <summary><c>ich9-usb-ehci1</c>, id <c>usbehci0</c>, with a <c>pci-ohci</c> companion, id <c>usbohci0</c>, over its six ports: the devices attach on the EHCI's bus, and the EHCI hands a full-speed one to the companion.</summary>
+    EhciWithOhciCompanion
 }
 
 /// <summary>
@@ -219,20 +269,154 @@ public static class QemuLauncher
     /// </summary>
     private const int NetworkTestRawSocketPort = 5560;
 
-    /// <summary>QEMU id of the xHCI controller USB disks, the USB keyboard and the USB mouse sit on; its root hub is the bus <c>usbxhci0.0</c>.</summary>
-    public const string UsbControllerId = "usbxhci0";
+    /// <summary>QEMU id of the xHCI controller; its root hub is the bus <c>usbxhci0.0</c>.</summary>
+    public const string XhciControllerId = "usbxhci0";
 
-    /// <summary>The keyboard model a profile names to get a USB keyboard on the xHCI controller, and QEMU's driver name for it.</summary>
+    /// <summary>QEMU id of the EHCI controller, alone or with its companion; its root hub is the bus <c>usbehci0.0</c>.</summary>
+    public const string EhciControllerId = "usbehci0";
+
+    /// <summary>QEMU id of the OHCI controller; alone, its root hub is the bus <c>usbohci0.0</c>, while as a companion it has no bus of its own.</summary>
+    public const string OhciControllerId = "usbohci0";
+
+    /// <summary>QEMU's driver name for the xHCI controller.</summary>
+    public const string XhciModel = "qemu-xhci";
+
+    /// <summary>QEMU's driver name for the standalone EHCI controller (Intel ICH4, 8086:24cd), which takes no companion.</summary>
+    public const string EhciModel = "usb-ehci";
+
+    /// <summary>QEMU's driver name for the EHCI controller that takes a companion (Intel ICH9, 8086:293a).</summary>
+    public const string CompanionEhciModel = "ich9-usb-ehci1";
+
+    /// <summary>QEMU's driver name for the OHCI controller (Apple, 106b:003f).</summary>
+    public const string OhciModel = "pci-ohci";
+
+    /// <summary>Root ports asked of the OHCI: QEMU gives it three by default and the EHCI six, and the port plan below wants six on either.</summary>
+    public const int UsbRootPortCount = 6;
+
+    /// <summary>QEMU's driver name for a hub.</summary>
+    public const string UsbHubModel = "usb-hub";
+
+    /// <summary>QEMU id of the hub <see cref="QemuLaunchOptions.UsbHub"/> adds.</summary>
+    public const string UsbHubId = "usbhub0";
+
+    /// <summary>Root port of the USB keyboard on a port-pinning controller, and of the hub when one is asked for.</summary>
+    public const string UsbKeyboardPort = "1";
+
+    /// <summary>The keyboard's port when a hub is asked for: root port 1, then port 1 of the hub.</summary>
+    public const string UsbKeyboardPortBehindHub = "1.1";
+
+    /// <summary>Root port of the USB mouse on a port-pinning controller.</summary>
+    public const string UsbMousePort = "2";
+
+    /// <summary>Root port of the first USB disk on a port-pinning controller; the next disks take the next ports.</summary>
+    public const int FirstUsbDiskPort = 3;
+
+    /// <summary>The USB version QEMU's usb-kbd and usb-mouse present by default: a high-speed descriptor set beside the full-speed one.</summary>
+    public const int DefaultUsbDeviceVersion = 2;
+
+    /// <summary>The USB version that leaves usb-kbd and usb-mouse with their full-speed descriptor set alone.</summary>
+    public const int FullSpeedUsbDeviceVersion = 1;
+
+    /// <summary>The spellings <see cref="TryParseUsbController"/> accepts, for the messages that list them.</summary>
+    public const string UsbControllerNames = "'xhci', 'ehci', 'ohci' or 'ehci-ohci'";
+
+    /// <summary>The keyboard model a profile names to get a USB keyboard on the host controller, and QEMU's driver name for it.</summary>
     public const string UsbKeyboardModel = "usb-kbd";
 
     /// <summary>QEMU id of the USB keyboard plugged in at boot, the one to unplug.</summary>
     public const string UsbKeyboardId = "usbkbd0";
 
-    /// <summary>The mouse model a profile names to get a USB mouse on the xHCI controller, and QEMU's driver name for it.</summary>
+    /// <summary>The mouse model a profile names to get a USB mouse on the host controller, and QEMU's driver name for it.</summary>
     public const string UsbMouseModel = "usb-mouse";
 
     /// <summary>QEMU id of the USB mouse plugged in at boot.</summary>
     public const string UsbMouseId = "usbmouse0";
+
+    /// <summary>QEMU id of the controller the USB devices of a run sit on: the EHCI's for the companion model, whose OHCI has no bus of its own.</summary>
+    public static string UsbControllerId(UsbHostControllerModel model)
+    {
+        return model switch
+        {
+            UsbHostControllerModel.Xhci => XhciControllerId,
+            UsbHostControllerModel.Ehci or UsbHostControllerModel.EhciWithOhciCompanion => EhciControllerId,
+            UsbHostControllerModel.Ohci => OhciControllerId,
+            _ => throw new ArgumentOutOfRangeException(nameof(model), model, "Unknown USB host controller model.")
+        };
+    }
+
+    /// <summary>The bus the USB devices of a run attach to, the root hub of <see cref="UsbControllerId"/>: <c>usbxhci0.0</c>, <c>usbehci0.0</c> or <c>usbohci0.0</c>.</summary>
+    public static string UsbBus(UsbHostControllerModel model)
+    {
+        return $"{UsbControllerId(model)}.0";
+    }
+
+    /// <summary>
+    /// True when the model pins each USB device to a root port: the EHCI and
+    /// OHCI models, whose ports form one numbered space that QEMU fills in
+    /// command-line order, inserting a hub of its own on the last free port.
+    /// The xHCI picks its own ports and takes no pin.
+    /// </summary>
+    public static bool PinsUsbPorts(UsbHostControllerModel model)
+    {
+        return model != UsbHostControllerModel.Xhci;
+    }
+
+    /// <summary>True when the model can carry the full-speed hub: an OHCI, alone or as the EHCI's companion.</summary>
+    public static bool TakesUsbHub(UsbHostControllerModel model)
+    {
+        return model is UsbHostControllerModel.Ohci or UsbHostControllerModel.EhciWithOhciCompanion;
+    }
+
+    /// <summary>The port the USB keyboard is pinned to, or null on the xHCI: root port 1, or the hub's port 1.1 when a hub is asked for.</summary>
+    public static string? UsbKeyboardPortOf(UsbHostControllerModel model, bool hub)
+    {
+        if (!PinsUsbPorts(model))
+        {
+            return null;
+        }
+
+        return hub ? UsbKeyboardPortBehindHub : UsbKeyboardPort;
+    }
+
+    /// <summary>The port the USB mouse is pinned to, or null on the xHCI: root port 2.</summary>
+    public static string? UsbMousePortOf(UsbHostControllerModel model)
+    {
+        return PinsUsbPorts(model) ? UsbMousePort : null;
+    }
+
+    /// <summary>The port the <paramref name="index"/>th USB disk is pinned to, or null on the xHCI: root ports from 3.</summary>
+    public static string? UsbDiskPortOf(UsbHostControllerModel model, int index)
+    {
+        return PinsUsbPorts(model) ? (FirstUsbDiskPort + index).ToString(CultureInfo.InvariantCulture) : null;
+    }
+
+    /// <summary>
+    /// Reads the spelling the profile catalog and <c>cosmos run</c> use for a
+    /// controller, whatever its case: <c>xhci</c>, <c>ehci</c>, <c>ohci</c>
+    /// or <c>ehci-ohci</c>.
+    /// </summary>
+    /// <returns>False for any other spelling, with <paramref name="model"/> left at the xHCI.</returns>
+    public static bool TryParseUsbController(string? name, out UsbHostControllerModel model)
+    {
+        switch ((name ?? string.Empty).Trim().ToLowerInvariant())
+        {
+            case "xhci":
+                model = UsbHostControllerModel.Xhci;
+                return true;
+            case "ehci":
+                model = UsbHostControllerModel.Ehci;
+                return true;
+            case "ohci":
+                model = UsbHostControllerModel.Ohci;
+                return true;
+            case "ehci-ohci":
+                model = UsbHostControllerModel.EhciWithOhciCompanion;
+                return true;
+            default:
+                model = UsbHostControllerModel.Xhci;
+                return false;
+        }
+    }
 
     /// <summary>QEMU id of the drive behind the <paramref name="index"/>th USB disk.</summary>
     public static string UsbDriveId(int index) => $"usbdisk{index}";
@@ -507,8 +691,10 @@ public static class QemuLauncher
     /// Attach AHCI/SATA, NVMe, USB and virtio-blk disks. AHCI disks share one <c>ich9-ahci</c>
     /// controller and consume successive ports; NVMe disks each get a
     /// dedicated <c>nvme</c> controller so the guest exercises multi-controller
-    /// binding; USB disks are <c>usb-storage</c> sticks on one shared
-    /// <c>qemu-xhci</c> controller; <see cref="DiskKind.VirtioBlk"/> disks are
+    /// binding; USB disks are <c>usb-storage</c> sticks on the one host
+    /// controller <see cref="QemuLaunchOptions.UsbController"/> names, pinned
+    /// to root ports from 3 to <see cref="UsbRootPortCount"/> on the EHCI and
+    /// OHCI models, which take four at most; <see cref="DiskKind.VirtioBlk"/> disks are
     /// one <c>virtio-blk-pci</c> function each, a hot-pluggable one behind a
     /// <c>pcie-root-port</c> of its own (on x64 with the ICH9 global that turns
     /// the ports to native hot-plug, emitted once), and <see cref="DiskKind.VirtioBlkMmio"/>
@@ -517,7 +703,7 @@ public static class QemuLauncher
     /// appended after the standard device properties so profiles can flip
     /// things like <c>msix=off</c>.
     /// </summary>
-    /// <returns>True when the xHCI controller was emitted, so the USB keyboard and mouse can share it.</returns>
+    /// <returns>True when the USB host controller was emitted, so the USB keyboard and mouse can share it.</returns>
     internal static bool AppendStorageArgs(StringBuilder args, QemuLaunchOptions options)
     {
         int ahciIndex = 0;
@@ -552,13 +738,21 @@ public static class QemuLauncher
                     break;
 
                 case DiskKind.Usb:
-                    if (!usbControllerEmitted)
+                    // The port plan pins the sticks from port 3 up, so a
+                    // port-pinning controller takes four; QEMU refuses a
+                    // port past the last with a message that names neither
+                    // the plan nor the disk.
+                    if (PinsUsbPorts(options.UsbController) && FirstUsbDiskPort + usbIndex > UsbRootPortCount)
                     {
-                        args.Append($" -device qemu-xhci,id={UsbControllerId}");
-                        usbControllerEmitted = true;
+                        throw new ArgumentException(
+                            $"At most {UsbRootPortCount - FirstUsbDiskPort + 1} USB disks fit the {UsbRootPortCount} root ports of the EHCI and OHCI models (ports {FirstUsbDiskPort} to {UsbRootPortCount}).",
+                            nameof(options));
                     }
+                    AppendUsbController(args, options, usbControllerEmitted);
+                    usbControllerEmitted = true;
                     args.Append($" -drive file=\"{EscapeDriveFileValue(disk.Path)}\",if=none,id={UsbDriveId(usbIndex)},format=raw");
-                    args.Append($" -device usb-storage,drive={UsbDriveId(usbIndex)},bus={UsbControllerId}.0,id={UsbDeviceId(usbIndex)}");
+                    args.Append($" -device usb-storage,drive={UsbDriveId(usbIndex)},bus={UsbBus(options.UsbController)},id={UsbDeviceId(usbIndex)}");
+                    AppendUsbPort(args, UsbDiskPortOf(options.UsbController, usbIndex));
                     AppendDeviceOptions(args, disk.ExtraDeviceOptions);
                     usbIndex++;
                     break;
@@ -609,10 +803,13 @@ public static class QemuLauncher
 
     /// <summary>
     /// Attaches the USB keyboard when <see cref="QemuLaunchOptions.KeyboardDevice"/>
-    /// is <see cref="UsbKeyboardModel"/>: on the xHCI controller the USB
+    /// is <see cref="UsbKeyboardModel"/>: on the host controller the USB
     /// disks emitted, or on one added here when the run has no USB disk, so
-    /// the keyboard always sits on <c>usbxhci0.0</c> under the id the engine
-    /// unplugs and replugs.
+    /// the keyboard always sits on the bus of <see cref="QemuLaunchOptions.UsbController"/>
+    /// under the id the engine unplugs and replugs, pinned to root port 1
+    /// (or the hub's port 1.1) on the EHCI and OHCI models, and with
+    /// <c>usb_version=1</c> when <see cref="QemuLaunchOptions.UsbDeviceVersion"/>
+    /// asks for a full-speed device.
     /// </summary>
     /// <returns>True when the controller is on the command line, emitted before or here.</returns>
     internal static bool AppendUsbKeyboardArgs(StringBuilder args, QemuLaunchOptions options, bool controllerEmitted)
@@ -622,16 +819,20 @@ public static class QemuLauncher
             return controllerEmitted;
         }
 
-        AppendUsbController(args, controllerEmitted);
-        args.Append($" -device {UsbKeyboardModel},bus={UsbControllerId}.0,id={UsbKeyboardId}");
+        AppendUsbController(args, options, controllerEmitted);
+        args.Append($" -device {UsbKeyboardModel},bus={UsbBus(options.UsbController)},id={UsbKeyboardId}");
+        AppendUsbPort(args, UsbKeyboardPortOf(options.UsbController, options.UsbHub));
+        AppendUsbDeviceVersion(args, options);
         return true;
     }
 
     /// <summary>
     /// Attaches the USB mouse when <see cref="QemuLaunchOptions.MouseDevice"/>
-    /// is <see cref="UsbMouseModel"/>: on the xHCI controller the USB disks or
+    /// is <see cref="UsbMouseModel"/>: on the host controller the USB disks or
     /// the USB keyboard emitted, or on one added here, so the mouse always
-    /// sits on <c>usbxhci0.0</c>.
+    /// sits on the bus of <see cref="QemuLaunchOptions.UsbController"/>, pinned
+    /// to root port 2 on the EHCI and OHCI models, with the same
+    /// <c>usb_version</c> handling as the keyboard.
     /// </summary>
     /// <returns>True when the controller is on the command line, emitted before or here.</returns>
     internal static bool AppendUsbMouseArgs(StringBuilder args, QemuLaunchOptions options, bool controllerEmitted)
@@ -641,18 +842,90 @@ public static class QemuLauncher
             return controllerEmitted;
         }
 
-        AppendUsbController(args, controllerEmitted);
-        args.Append($" -device {UsbMouseModel},bus={UsbControllerId}.0,id={UsbMouseId}");
+        AppendUsbController(args, options, controllerEmitted);
+        args.Append($" -device {UsbMouseModel},bus={UsbBus(options.UsbController)},id={UsbMouseId}");
+        AppendUsbPort(args, UsbMousePortOf(options.UsbController));
+        AppendUsbDeviceVersion(args, options);
         return true;
     }
 
-    /// <summary>Emits the xHCI controller unless an earlier device already did.</summary>
-    private static void AppendUsbController(StringBuilder args, bool controllerEmitted)
+    /// <summary>
+    /// Emits the controller <see cref="QemuLaunchOptions.UsbController"/>
+    /// names unless an earlier device already did: the companion right after
+    /// the EHCI it serves, and the hub, when asked for, after the controller
+    /// on root port 1. QEMU resolves <c>bus=</c> and <c>port=</c> against the
+    /// devices already on the command line, so all of them precede every
+    /// device.
+    /// </summary>
+    private static void AppendUsbController(StringBuilder args, QemuLaunchOptions options, bool controllerEmitted)
     {
-        if (!controllerEmitted)
+        if (controllerEmitted)
         {
-            args.Append($" -device qemu-xhci,id={UsbControllerId}");
+            return;
         }
+
+        switch (options.UsbController)
+        {
+            case UsbHostControllerModel.Xhci:
+                args.Append($" -device {XhciModel},id={XhciControllerId}");
+                break;
+            case UsbHostControllerModel.Ehci:
+                args.Append($" -device {EhciModel},id={EhciControllerId}");
+                break;
+            case UsbHostControllerModel.Ohci:
+                args.Append($" -device {OhciModel},id={OhciControllerId},num-ports={UsbRootPortCount}");
+                break;
+            case UsbHostControllerModel.EhciWithOhciCompanion:
+                args.Append($" -device {CompanionEhciModel},id={EhciControllerId}");
+                args.Append($" -device {OhciModel},id={OhciControllerId},masterbus={EhciControllerId}.0,firstport=0,num-ports={UsbRootPortCount}");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(options), options.UsbController, "Unknown USB host controller model.");
+        }
+
+        if (!options.UsbHub)
+        {
+            return;
+        }
+
+        if (!TakesUsbHub(options.UsbController))
+        {
+            throw new ArgumentException(
+                "A usb-hub is full speed only and needs an OHCI, alone or as the EHCI's companion: a standalone EHCI has high-speed ports only and port 1 of qemu-xhci is a USB 3 port.",
+                nameof(options));
+        }
+
+        args.Append($" -device {UsbHubModel},bus={UsbBus(options.UsbController)},id={UsbHubId},port={UsbKeyboardPort}");
+    }
+
+    /// <summary>Pins the device just written to <paramref name="port"/>; nothing on the xHCI, which picks its own.</summary>
+    private static void AppendUsbPort(StringBuilder args, string? port)
+    {
+        if (port is not null)
+        {
+            args.Append($",port={port}");
+        }
+    }
+
+    /// <summary>
+    /// Appends <c>usb_version=1</c> to the HID device just written when the
+    /// run asks for a full-speed one; QEMU's default is 2 and is left unsaid.
+    /// </summary>
+    private static void AppendUsbDeviceVersion(StringBuilder args, QemuLaunchOptions options)
+    {
+        if (options.UsbDeviceVersion == DefaultUsbDeviceVersion)
+        {
+            return;
+        }
+
+        if (options.UsbDeviceVersion != FullSpeedUsbDeviceVersion)
+        {
+            throw new ArgumentException(
+                $"The USB device version must be {FullSpeedUsbDeviceVersion} or {DefaultUsbDeviceVersion}, found {options.UsbDeviceVersion}.",
+                nameof(options));
+        }
+
+        args.Append($",usb_version={FullSpeedUsbDeviceVersion}");
     }
 
     /// <summary>
@@ -712,7 +985,7 @@ public static class QemuLauncher
     /// nothing (PS/2 is part of the x64 chipset, not a device you attach), so
     /// only real QEMU models (e.g. <c>virtio-keyboard-device</c>) are emitted.
     /// <see cref="UsbKeyboardModel"/> and <see cref="UsbMouseModel"/> add
-    /// nothing here either: they go on the xHCI controller through
+    /// nothing here either: they go on the USB host controller through
     /// <see cref="AppendUsbKeyboardArgs"/> and <see cref="AppendUsbMouseArgs"/>.
     /// </summary>
     internal static void AppendInputDevice(StringBuilder args, string? model)
