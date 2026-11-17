@@ -750,7 +750,10 @@ public class KernelConsole
     /// Writes a string at the current cursor position.
     /// Thread-safe: uses spinlock with interrupt protection.
     /// </summary>
-    internal void Write(string text)=> Write(text.AsSpan());
+    internal void Write(string text)
+    {
+        Write(text.AsSpan());
+    }
 
     /// <summary>
     /// Writes a span of characters at the current cursor position.
@@ -759,11 +762,11 @@ public class KernelConsole
     /// <param name="buffer">The characters to write.</param>
     internal void Write(ReadOnlySpan<char> buffer)
     {
-        const int chunkSize = 256;
-        for (int i =0; i < buffer.Length; i+= chunkSize)
+        const int ChunkSize = 256;
+        for (int i = 0; i < buffer.Length; i += ChunkSize)
         {
-            int count = Math.Min(chunkSize, buffer.Length - i);
-            var chunk = buffer.Slice(i, count);
+            int count = Math.Min(ChunkSize, buffer.Length - i);
+            ReadOnlySpan<char> chunk = buffer.Slice(i, count);
             using (InternalCpu.DisableInterruptsScope())
             {
                 _lock.Acquire();
