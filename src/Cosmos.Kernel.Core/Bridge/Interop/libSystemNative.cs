@@ -105,7 +105,8 @@ internal static unsafe partial class libSystemNative
     /// private StartHelper. A plug of <c>Thread.CreateThread</c> could not
     /// reach that field: an <c>UnsafeAccessor</c> rejects a byref return of a
     /// field whose type is inaccessible, so the seam runs here, below it.
-    /// Returns 0, CoreLib's failure, when the thread registry is full.
+    /// Returns 0, CoreLib's failure, when the thread registry is full or
+    /// there is no memory for the thread's stack.
     /// </summary>
     [UnmanagedCallersOnly(EntryPoint = "SystemNative_CreateThread")]
     internal static int SystemNative_CreateThread(IntPtr stackSize, delegate* unmanaged<IntPtr, IntPtr> startAddress, IntPtr parameter)
@@ -149,11 +150,24 @@ internal static unsafe partial class libSystemNative
             nuint entryPoint = (nuint)(delegate* unmanaged<IntPtr, void>)&ThreadNative.EntryPointStub;
 #if ARCH_ARM64
             // ARM64: no code selector needed, use 0.
-            thread.InitializeStack(entryPoint, 0, (nuint)parameter, size);
+            bool hasStack = thread.InitializeStack(entryPoint, 0, (nuint)parameter, size);
 #else
             ushort cs = (ushort)GetCurrentCodeSelector();
-            thread.InitializeStack(entryPoint, cs, (nuint)parameter, size);
+            bool hasStack = thread.InitializeStack(entryPoint, cs, (nuint)parameter, size);
 #endif
+            // No memory for the stack, even after the collection the
+            // allocation asked for: the same failure code as a full
+            // registry, which CoreLib's Thread.Start turns into its
+            // exception.
+            if (!hasStack)
+            {
+                thread._managedThread.Dispose();
+                Serial.WriteString("[libSystemNative] Thread ");
+                Serial.WriteNumber(thread.Id);
+                Serial.WriteString(" refused: no memory for its stack\n");
+                return 0;
+            }
+
             // A full registry refuses the thread (#444): the registry is the
             // collector's root set, so a thread that ran unregistered would
             // have the objects on its stack freed under it. The failure code

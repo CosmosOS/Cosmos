@@ -239,17 +239,34 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
 
     /// <summary>
     /// Allocates and initializes the thread stack with initial context.
-    /// After this call, the thread is ready to be scheduled.
+    /// When it returns true, the thread is ready to be scheduled.
     /// </summary>
     /// <param name="entryPoint">Thread entry point function address.</param>
     /// <param name="codeSegment">Code segment selector (CS).</param>
     /// <param name="arg">Optional argument passed to entry point.</param>
     /// <param name="stackSize">Stack size in bytes.</param>
-    internal void InitializeStack(nuint entryPoint, ushort codeSegment, nuint arg = 0, nuint stackSize = DefaultStackSize)
+    /// <returns>False when there is no memory for the stack, even after a collection: the thread has none and must not be started.</returns>
+    internal bool InitializeStack(nuint entryPoint, ushort codeSegment, nuint arg = 0, nuint stackSize = DefaultStackSize)
     {
-        // Allocate stack memory
+        // The collector runs only when its own heap cannot grow, so by the
+        // time a stack is asked for, the pages may all be held by segments
+        // full of dead objects. A collection returns the empty ones, and the
+        // allocation is tried once more. Without the check the context below
+        // was written at address 0.
+        nuint stackBase = (nuint)Memory.MemoryOp.Alloc((uint)stackSize);
+        if (stackBase == 0 && GarbageCollector.IsEnabled)
+        {
+            GarbageCollector.Collect();
+            stackBase = (nuint)Memory.MemoryOp.Alloc((uint)stackSize);
+        }
+
+        if (stackBase == 0)
+        {
+            return false;
+        }
+
         StackSize = stackSize;
-        StackBase = (nuint)Memory.MemoryOp.Alloc((uint)stackSize);
+        StackBase = stackBase;
 
         // Stack layout (growing downward from top):
         // [StackBase + stackSize] = Top of usable stack
@@ -279,6 +296,7 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
         StackPointer = contextAddr;
         InstructionPointer = entryPoint;
         State = SchedulerThreadState.Created;
+        return true;
     }
 
     /// <summary>
