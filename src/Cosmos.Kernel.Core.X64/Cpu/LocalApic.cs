@@ -408,7 +408,10 @@ public static class LocalApic
     }
 
     /// <summary>
-    /// Blocks for the specified number of milliseconds using the LAPIC timer.
+    /// Blocks for the specified number of milliseconds using the LAPIC timer
+    /// of the CPU the caller runs on, with interrupts masked for the whole
+    /// wait. A stop another CPU asks for meanwhile (a collection, a policy
+    /// swap) is answered from inside the wait.
     /// </summary>
     /// <param name="ms">Number of milliseconds to wait.</param>
     public static void Wait(uint ms)
@@ -424,29 +427,40 @@ public static class LocalApic
             return;
         }
 
-        // Set timer divide to 16 (same as calibration)
-        Write(LAPIC_TIMER_DIVIDE, TIMER_DIVIDE_BY_16);
-
-        // Calculate ticks needed
-        uint ticks = s_ticksPerMs * ms;
-
-        // Set up one-shot timer (masked - we poll instead of interrupt)
-        Write(LAPIC_TIMER_LVT, LVT_MASKED);
-        Write(LAPIC_TIMER_INIT, ticks);
-
-        // Poll until timer reaches zero
-        while (Read(LAPIC_TIMER_CURRENT) > 0)
+        // The wait takes this CPU's timer, the scheduler tick, and gives it
+        // back at the end, so the caller must stay on this CPU from the
+        // first write to the last. A thread may be switched away at any
+        // interrupt exit and resume on another CPU (Main runs on the compute
+        // CPUs, SMP phase 5b): it would then poll that CPU's periodic count,
+        // which is never 0 for long enough to be read, and leave this CPU's
+        // tick masked for good. Masked, nothing takes the thread off the CPU.
+        using (InternalCpu.DisableInterruptsScope())
         {
-            // Busy wait
-        }
+            // Set timer divide to 16 (same as calibration)
+            Write(LAPIC_TIMER_DIVIDE, TIMER_DIVIDE_BY_16);
 
-        // Re-arm the periodic scheduler tick this wait hijacked: the LVT was
-        // masked and switched to one-shot above, and without this the
-        // scheduler tick stays dead after the first Wait call.
-        if (s_timerIntervalMs != 0)
-        {
-            Write(LAPIC_TIMER_LVT, TIMER_PERIODIC | TIMER_VECTOR);
-            Write(LAPIC_TIMER_INIT, s_ticksPerMs * s_timerIntervalMs);
+            uint ticks = s_ticksPerMs * ms;
+
+            // Set up one-shot timer (masked - we poll instead of interrupt)
+            Write(LAPIC_TIMER_LVT, LVT_MASKED);
+            Write(LAPIC_TIMER_INIT, ticks);
+
+            while (Read(LAPIC_TIMER_CURRENT) > 0)
+            {
+                // Masked, this CPU takes no stop interrupt, and the wait can
+                // outlast a collection: the stop is answered from here, as a
+                // spinlock's spin answers it. The count runs on meanwhile.
+                CpuStop.Safepoint();
+            }
+
+            // Re-arm the periodic scheduler tick this wait hijacked: the LVT was
+            // masked and switched to one-shot above, and without this the
+            // scheduler tick stays dead after the first Wait call.
+            if (s_timerIntervalMs != 0)
+            {
+                Write(LAPIC_TIMER_LVT, TIMER_PERIODIC | TIMER_VECTOR);
+                Write(LAPIC_TIMER_INIT, s_ticksPerMs * s_timerIntervalMs);
+            }
         }
     }
 
